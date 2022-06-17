@@ -32,8 +32,8 @@ import fr.acinq.phoenix.android.navigate
 @Composable
 fun SettingsView() {
     val nc = navController
-    SettingScreen {
-        SettingHeader(title = stringResource(id = R.string.menu_settings), onBackClick = { nc.popBackStack() })
+    DefaultScreenLayout {
+        DefaultScreenHeader(title = stringResource(id = R.string.menu_settings), onBackClick = { nc.popBackStack() })
         // -- general
         SettingCategory(R.string.settings_general_title)
         Card {
@@ -41,7 +41,7 @@ fun SettingsView() {
             SettingButton(text = R.string.settings_display_prefs, icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences) })
             SettingButton(text = R.string.settings_electrum, icon = R.drawable.ic_chain, onClick = { nc.navigate(Screen.ElectrumServer) })
             SettingButton(text = R.string.settings_tor, icon = R.drawable.ic_tor_shield, onClick = { })
-            SettingButton(text = R.string.settings_payment_settings, icon = R.drawable.ic_tool, onClick = { })
+            SettingButton(text = R.string.settings_payment_settings, icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings)})
         }
 
         // -- security
@@ -55,7 +55,7 @@ fun SettingsView() {
         SettingCategory(R.string.settings_advanced_title)
         Card {
             SettingButton(text = R.string.settings_list_channels, icon = R.drawable.ic_zap, onClick = { nc.navigate(Screen.Channels) })
-            SettingButton(text = R.string.settings_logs, icon = R.drawable.ic_text, onClick = { })
+            SettingButton(text = R.string.settings_logs, icon = R.drawable.ic_text, onClick = { nc.navigate(Screen.Logs)})
             SettingButton(text = R.string.settings_mutual_close, icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose) })
             SettingButton(text = R.string.settings_force_close, icon = R.drawable.ic_alert_triangle, onClick = { })
         }

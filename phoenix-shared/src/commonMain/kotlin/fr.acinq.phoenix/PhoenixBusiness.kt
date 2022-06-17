@@ -6,6 +6,7 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.setLightningLoggerFactory
+import fr.acinq.lightning.wire.InitTlv
 import fr.acinq.phoenix.controllers.*
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.controllers.config.*
@@ -19,6 +20,7 @@ import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.createAppDbDriver
 import fr.acinq.phoenix.controllers.payments.Scan
+import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.utils.*
 import io.ktor.client.*
 import io.ktor.client.features.json.JsonFeature
@@ -86,9 +88,11 @@ class PhoenixBusiness(
         setLightningLoggerFactory(loggerFactory)
     }
 
-    fun start() {
+    fun start(startupParams: StartupParams) {
+        logger.info { "starting with params=$startupParams" }
         if (appConnectionsDaemon == null) {
             logger.debug { "start business" }
+            appConfigurationManager.setStartupParams(startupParams)
             appConnectionsDaemon = AppConnectionsDaemon(this)
         }
     }

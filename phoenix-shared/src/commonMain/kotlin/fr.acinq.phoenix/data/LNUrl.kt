@@ -42,8 +42,8 @@ import org.kodein.log.newLogger
  * errors that break the specs, or errors raised when the data returned
  * by the LNUrl service are not valid.
  *
- * A companion object contains utility methods to parse the urls, read a response from a LNURL service, and
- * transform this response in a valid LNUrl object.
+ * A companion object contains the utility methods that parse the urls, read a response
+ * from a LNURL service, and transform this response into a valid LNUrl object.
  */
 sealed class LNUrl {
 

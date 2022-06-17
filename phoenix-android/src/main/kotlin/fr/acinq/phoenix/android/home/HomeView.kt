@@ -16,9 +16,14 @@
 
 package fr.acinq.phoenix.android.home
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -39,7 +44,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.*
@@ -48,7 +52,11 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.datastore.InternalData
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.legacy.utils.MigrationResult
+import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import fr.acinq.phoenix.managers.Connections
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -64,6 +72,8 @@ fun HomeView(
     onSendClick: () -> Unit,
 ) {
     val log = logger("HomeView")
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val connectionsState = homeViewModel.connectionsFlow.collectAsState()
 
     val showConnectionsDialog = remember { mutableStateOf(false) }
@@ -73,6 +83,10 @@ fun HomeView(
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val payments = homeViewModel.paymentsFlow.collectAsState().value.values.toList()
+
+    // controls for the migration dialog
+    val migrationResult = PrefsDatastore.getMigrationResult(context).collectAsState(initial = null).value
+    val migrationResultShown = InternalData.getMigrationResultShown(context).collectAsState(initial = null).value
 
     ModalDrawer(
         drawerState = drawerState,
@@ -84,12 +98,12 @@ fun HomeView(
                     TopBar(showConnectionsDialog, connectionsState)
                     Spacer(modifier = Modifier.height(16.dp))
                     AmountView(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(horizontal = 16.dp),
                         amount = model.balance,
                         amountTextStyle = MaterialTheme.typography.h1,
                         unitTextStyle = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(horizontal = 16.dp)
                     )
                     model.incomingBalance?.run {
                         Spacer(modifier = Modifier.height(8.dp))
@@ -117,6 +131,12 @@ fun HomeView(
                         }
                     }
                     BottomBar(drawerState, onReceiveClick, onSendClick)
+                }
+            }
+
+            if (migrationResultShown == false && migrationResult != null) {
+                MigrationResultDialog(migrationResult) {
+                    scope.launch { InternalData.saveMigrationResultShown(context, true) }
                 }
             }
         }
@@ -184,7 +204,7 @@ private fun SideMenu(
         Button(
             text = stringResource(id = R.string.home__drawer__faq),
             icon = R.drawable.ic_help_circle,
-            onClick = { },
+            onClick = { openLink(context, "https://phoenix.acinq.co/faq") },
             padding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier.fillMaxWidth()
@@ -319,7 +339,11 @@ private fun BottomBar(
                     .weight(1f)
             )
         }
-        Row(Modifier.padding(horizontal = 32.dp).align(Alignment.BottomCenter)) {
+        Row(
+            Modifier
+                .padding(horizontal = 32.dp)
+                .align(Alignment.BottomCenter)
+        ) {
             Surface(
                 shape = CircleShape,
                 color = MaterialTheme.colors.primary,
@@ -328,5 +352,15 @@ private fun BottomBar(
                     .height(4.dp)
             ) { }
         }
+    }
+}
+
+@Composable
+private fun MigrationResultDialog(
+    migrationResult: MigrationResult,
+    onClose: () -> Unit
+) {
+    Dialog(title = stringResource(id = R.string.migration_dialog_title), onDismiss = onClose) {
+        Text(text = stringResource(id = R.string.migration_dialog_message), Modifier.padding(horizontal = 24.dp))
     }
 }

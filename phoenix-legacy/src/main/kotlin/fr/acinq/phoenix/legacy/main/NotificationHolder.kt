@@ -42,11 +42,9 @@ class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     if (notification.priority == 1) {
       itemView.background = ContextCompat.getDrawable(itemView.context, R.drawable.app_notif_bg_critical)
-      messageView.setTextColor(itemView.context.getColor(R.color.white))
-      iconView.imageTintList = ColorStateList.valueOf(itemView.context.getColor(R.color.white))
+      iconView.imageTintList = ColorStateList.valueOf(ThemeHelper.color(itemView.context, R.attr.negativeColor))
     } else {
       itemView.background = ContextCompat.getDrawable(itemView.context, R.drawable.app_notif_bg)
-      messageView.setTextColor(ThemeHelper.color(itemView.context, R.attr.textColor))
       iconView.imageTintList = ColorStateList.valueOf(ThemeHelper.color(itemView.context, R.attr.textColor))
     }
 
@@ -65,6 +63,7 @@ class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       when (notification) {
         InAppNotifications.MNEMONICS_NEVER_SEEN -> actionButton.setOnClickListener { itemView.findNavController().navigate(R.id.action_main_to_display_seed) }
         InAppNotifications.MEMPOOL_HIGH_USAGE -> actionButton.setOnClickListener { itemView.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/faq#high-mempool-size-impacts"))) }
+        InAppNotifications.PREPARE_WALLET_MIGRATION -> actionButton.setOnClickListener { itemView.findNavController().navigate(R.id.action_main_to_migration) }
         else -> {}
       }
       itemView.setPadding(spaceSM, spaceSM, spaceSM, 0)

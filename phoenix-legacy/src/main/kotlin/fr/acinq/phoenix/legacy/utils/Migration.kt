@@ -31,8 +31,8 @@ object Migration {
   /** Apply migration scripts when needed. */
   fun doMigration(context: Context) {
     val version = Prefs.getLastVersionUsed(context)
-    if (0 < version && version < BuildConfig.VERSION_CODE) {
-      log.info("previously used version=$version, now using version=${BuildConfig.VERSION_CODE}, starting migration")
+    if (0 < version && version < BuildConfig.LIB_CODE) {
+      log.info("previously used version=$version, now using version=${BuildConfig.LIB_CODE}, starting migration")
 //      when {
 //        version < XX -> applyMigration_XX
 //      }
@@ -41,7 +41,7 @@ object Migration {
     } else {
       log.debug("previously used version=$version, no migration needed")
     }
-    Prefs.setLastVersionUsed(context, BuildConfig.VERSION_CODE)
+    Prefs.setLastVersionUsed(context, BuildConfig.LIB_CODE)
   }
 
   /** A patch note must be shown if the given version is below at least one version with a notable change */

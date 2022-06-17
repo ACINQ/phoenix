@@ -260,6 +260,7 @@
   <string name="settings_general_title">General</string>
   <string name="settings_display_prefs">Display</string>
   <string name="settings_security_title">Security</string>
+  <string name="settings_migration_title">Migration</string>
   <string name="settings_display_seed">Recovery phrase</string>
   <string name="settings_access_control">App access settings</string>
   <string name="settings_advanced_title">Advanced</string>
@@ -272,6 +273,7 @@
   <string name="settings_tor">Tor</string>
   <string name="settings_about">About</string>
   <string name="settings_payment_settings">Payment options and fees</string>
+  <string name="settings_upgrade">Upgrade to latest version</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -384,6 +386,8 @@
   <string name="inappnotif_upgrade_critical">A critical update is available. The wallet may malfunction if not updated.</string>
   <string name="inappnotif_mempool_high_usage">Bitcoin mempool is full and fees are high.</string>
   <string name="inappnotif_mempool_high_usage_action">See how Phoenix is affected</string>
+  <string name="inappnotif_prepare_migration">Phoenix can upgrade to a new better version.</string>
+  <string name="inappnotif_prepare_migration_action">Prepare migration</string>
 
   <!-- //////////////// display seed //////////////// -->
 
@@ -783,5 +787,18 @@
   <string name="channels_import_failure_invalid">data are not valid.</string>
   <string name="channels_import_failure_decryption">could not decrypt data.</string>
   <string name="channels_import_failure_db">could not write channels to database.</string>
+
+  <!-- //////////////// Migration to KMP //////////////// -->
+
+  <string name="migration_title">Upgrading Phoenix</string>
+  <string name="migration_prepare_message">You can upgrade to the next version of Phoenix, with a modern Lightning engine and improved features.\n\nThe process will take some time during which your channels and balance are moved to this new version.\n\nThe downtime should not take more than 1 hour. There is no cost involved.</string>
+  <string name="migration_more_info_button">Learn more…</string>
+  <string name="migration_prepare_button">Upgrade</string>
+  <string name="migration_dismiss_button">Skip for now</string>
+  <string name="migration_notifying_message">Initiating migration…</string>
+  <string name="migration_swapin">Getting new address…</string>
+  <string name="migration_closing_channels">Moving funds to new address…</string>
+
+  <string name="finish_legacy_app">Switching to new app…</string>
 
 </resources>

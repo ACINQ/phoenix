@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -33,25 +34,22 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.phoenix.android.home.HomeView
-import fr.acinq.phoenix.android.home.HomeViewModel
-import fr.acinq.phoenix.android.home.ReadDataView
-import fr.acinq.phoenix.android.home.StartupView
-import fr.acinq.phoenix.android.init.CreateWalletView
-import fr.acinq.phoenix.android.init.InitWallet
-import fr.acinq.phoenix.android.init.RestoreWalletView
+import fr.acinq.phoenix.android.home.*
+import fr.acinq.phoenix.android.init.*
 import fr.acinq.phoenix.android.payments.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.ReceiveView
 import fr.acinq.phoenix.android.payments.SendView
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
-import fr.acinq.phoenix.android.utils.Prefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.walletPaymentId
+import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
+import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
@@ -65,11 +63,12 @@ fun AppView(
 
     val navController = rememberNavController()
     val fiatRates = application.business.currencyManager.ratesFlow.collectAsState(listOf())
+    val walletContext = application.business.appConfigurationManager.chainContext.collectAsState(initial = null)
     val context = LocalContext.current
-    val isAmountInFiat = Prefs.getIsAmountInFiat(context).collectAsState(false)
-    val fiatCurrency = Prefs.getFiatCurrency(context).collectAsState(initial = FiatCurrency.USD)
-    val bitcoinUnit = Prefs.getBitcoinUnit(context).collectAsState(initial = BitcoinUnit.Sat)
-    val electrumServer = Prefs.getElectrumServer(context).collectAsState(initial = null)
+    val isAmountInFiat = UserPrefs.getIsAmountInFiat(context).collectAsState(false)
+    val fiatCurrency = UserPrefs.getFiatCurrency(context).collectAsState(initial = FiatCurrency.USD)
+    val bitcoinUnit = UserPrefs.getBitcoinUnit(context).collectAsState(initial = BitcoinUnit.Sat)
+    val electrumServer = UserPrefs.getElectrumServer(context).collectAsState(initial = null)
     val business = application.business
 
     CompositionLocalProvider(
@@ -80,7 +79,8 @@ fun AppView(
         LocalBitcoinUnit provides bitcoinUnit.value,
         LocalFiatCurrency provides fiatCurrency.value,
         LocalShowInFiat provides isAmountInFiat.value,
-        LocalElectrumServer provides electrumServer.value
+        LocalWalletContext provides walletContext.value,
+        LocalElectrumServer provides electrumServer.value,
     ) {
 
         // this view model should not be tied to the HomeView composition because it contains a dynamic payments list that must not be lost when switching to another view
@@ -92,6 +92,11 @@ fun AppView(
                 getController = CF::home
             )
         )
+
+        val legacyAppStatus = PrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
+        if (legacyAppStatus.value is LegacyAppStatus.Required && navController.currentDestination?.route != Screen.SwitchToLegacy.route) {
+            navController.navigate(Screen.SwitchToLegacy.route)
+        }
 
         Column(
             Modifier
@@ -115,10 +120,10 @@ fun AppView(
                     )
                 }
                 composable(Screen.CreateWallet.route) {
-                    CreateWalletView(appVM = appVM, onSeedWritten = { navController.navigate(Screen.Startup.route) })
+                    CreateWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
                 }
                 composable(Screen.RestoreWallet.route) {
-                    RestoreWalletView(appVM = appVM, onSeedWritten = { navController.navigate(Screen.Startup.route) })
+                    RestoreWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
                 }
                 composable(Screen.Home.route) {
                     RequireKey(appVM.walletState.value) {
@@ -179,10 +184,13 @@ fun AppView(
                 ) {
                     val direction = it.arguments?.getLong("direction")
                     val id = it.arguments?.getString("id")
-                    if (direction != null && id != null) {
-                        PaymentDetailsView(direction = direction, id = id, onBackClick = {
-                            navController.navigate(Screen.Home.route)
-                        })
+                    val paymentId = if (id != null && direction != null) WalletPaymentId.create(direction, id) else null
+                    if (paymentId != null) {
+                        PaymentDetailsView(
+                            paymentId = paymentId,
+                            onBackClick = {
+                                navController.navigate(Screen.Home.route)
+                            })
                     }
                 }
                 composable(Screen.Settings.route) {
@@ -206,11 +214,20 @@ fun AppView(
                 composable(Screen.About.route) {
                     AboutView()
                 }
+                composable(Screen.PaymentSettings.route) {
+                    PaymentSettingsView()
+                }
                 composable(Screen.AppLock.route) {
                     AppLockView(
                         mainActivity = mainActivity,
                         appVM = appVM
                     )
+                }
+                composable(Screen.Logs.route) {
+                    LogsView()
+                }
+                composable(Screen.SwitchToLegacy.route) {
+                    LegacySwitcherView(onLegacyFinished = { navController.navigate(Screen.Startup.route) })
                 }
             }
         }

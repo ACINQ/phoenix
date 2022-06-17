@@ -303,7 +303,7 @@ class ReceiveFragment : BaseFragment() {
         model.state.value = SwapInState.ERROR
       }) {
         model.state.value = SwapInState.IN_PROGRESS
-        app.requireService.sendSwapIn()
+        app.requireService.requestSwapIn()
       }
     }
   }

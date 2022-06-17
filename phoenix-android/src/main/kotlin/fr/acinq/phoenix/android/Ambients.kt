@@ -26,10 +26,7 @@ import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.controllers.ControllerFactory
-import fr.acinq.phoenix.data.BitcoinUnit
-import fr.acinq.phoenix.data.CurrencyUnit
-import fr.acinq.phoenix.data.ExchangeRate
-import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.data.*
 
 
 typealias CF = ControllerFactory
@@ -42,8 +39,8 @@ val LocalBitcoinUnit = compositionLocalOf { BitcoinUnit.Sat }
 val LocalFiatCurrency = compositionLocalOf { FiatCurrency.USD }
 val LocalExchangeRates = compositionLocalOf<List<ExchangeRate>> { listOf() }
 val LocalShowInFiat = compositionLocalOf { false }
+val LocalWalletContext = compositionLocalOf <WalletContext.V0.ChainContext?> { null }
 val LocalElectrumServer = compositionLocalOf<ServerAddress?> { null }
-
 val isDarkTheme: Boolean
     @Composable
     get() = LocalTheme.current.let { it == UserTheme.DARK || (it == UserTheme.SYSTEM && isSystemInDarkTheme()) }

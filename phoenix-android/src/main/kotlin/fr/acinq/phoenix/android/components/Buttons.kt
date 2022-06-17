@@ -16,6 +16,9 @@
 
 package fr.acinq.phoenix.android.components
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -32,12 +35,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
 
@@ -203,8 +209,11 @@ fun Button(
 fun Clickable(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     textStyle: TextStyle = MaterialTheme.typography.button,
     backgroundColor: Color = Color.Unspecified, // transparent by default!
+    clickDescription: String = "",
+    internalPadding: PaddingValues = PaddingValues(0.dp),
     content: @Composable () -> Unit,
 ) {
     val colors = ButtonDefaults.buttonColors(
@@ -219,8 +228,11 @@ fun Clickable(
         modifier = modifier
             .clickable(
                 onClick = onClick,
+                enabled = enabled,
                 role = Role.Button,
+                onClickLabel = clickDescription,
             )
+            .padding(internalPadding)
     ) {
         CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(value = textStyle) {
@@ -228,4 +240,23 @@ fun Clickable(
             }
         }
     }
+}
+
+@Composable
+fun WebLink(text: String, url: String) {
+    val context = LocalContext.current
+    Text(
+        modifier = Modifier.clickable(
+            role = Role.Button,
+            onClickLabel = stringResource(id = R.string.accessibility_link)
+        ) {
+            openLink(context, url)
+        },
+        text = text,
+        style = MaterialTheme.typography.body1.copy(textDecoration = TextDecoration.Underline, color = MaterialTheme.colors.primary)
+    )
+}
+
+fun openLink(context: Context, link: String) {
+    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
 }

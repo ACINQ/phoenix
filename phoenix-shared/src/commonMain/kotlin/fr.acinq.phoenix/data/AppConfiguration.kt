@@ -1,16 +1,21 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.Block
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.utils.ServerAddress
+import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.wire.InitTlv
 import kotlinx.serialization.Serializable
 import kotlin.math.roundToLong
 
 
 sealed class Chain(val name: String, val block: Block) {
-    object Regtest: Chain("Regtest", Block.RegtestGenesisBlock)
-    object Testnet: Chain("Testnet", Block.TestnetGenesisBlock)
-    object Mainnet: Chain("Mainnet", Block.LivenetGenesisBlock)
+    object Regtest : Chain("Regtest", Block.RegtestGenesisBlock)
+    object Testnet : Chain("Testnet", Block.TestnetGenesisBlock)
+    object Mainnet : Chain("Mainnet", Block.LivenetGenesisBlock)
+
     fun isMainnet(): Boolean = this is Mainnet
     fun isTestnet(): Boolean = this is Testnet
 
@@ -219,4 +224,18 @@ enum class FiatCurrency : CurrencyUnit {
 sealed class ElectrumConfig {
     data class Custom(val server: ServerAddress) : ElectrumConfig()
     object Random : ElectrumConfig()
+}
+
+data class StartupParams(
+    /** When true, we use a [InitTlv] to ask our peer whether there are legacy channels to reestablish for the legacy node id. */
+    val requestCheckLegacyChannels: Boolean = false,
+
+    // TODO: add custom electrum address, fiat currencies, ...
+)
+
+object PaymentOptionsConstants {
+    val minBaseFee: Satoshi = 0.sat
+    val maxBaseFee: Satoshi = 100_000.sat
+    const val minProportionalFeePercent: Double = 0.0 // 0%
+    const val maxProportionalFeePercent: Double = 50.0 // 50%
 }

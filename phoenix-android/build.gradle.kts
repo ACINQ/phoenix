@@ -58,6 +58,9 @@ android {
         kotlinCompilerExtensionVersion = Versions.Android.compose
     }
 
+    packagingOptions {
+        resources.merges.add("reference.conf")
+    }
 }
 
 kotlin {
@@ -70,6 +73,8 @@ kotlin {
 
 dependencies {
     implementation(project(":phoenix-shared"))
+    api(project(":phoenix-legacy"))
+
     implementation("com.google.android.material:material:1.4.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
@@ -101,6 +106,10 @@ dependencies {
     // -- AndroidX: biometric
     implementation("androidx.biometric:biometric:${Versions.Android.biometrics}")
 
+    implementation("androidx.work:work-runtime-ktx:${Versions.AndroidLegacy.work}") {
+        exclude(group = "com.google.guava", module = "listenablefuture")
+    }
+
     // -- scanner zxing
     implementation("com.journeyapps:zxing-android-embedded:${Versions.Android.zxing}")
 
@@ -110,6 +119,9 @@ dependencies {
 
     // firebase cloud messaging
     implementation("com.google.firebase:firebase-messaging:${Versions.Android.fcm}")
+
+    // guava, because of https://groups.google.com/g/guava-discuss/c/AKBGPca9unw
+    implementation("com.google.guava:guava:31.0.1-android")
 
     testImplementation("junit:junit:${Versions.junit}")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")

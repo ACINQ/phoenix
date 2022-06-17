@@ -24,6 +24,7 @@ import org.kodein.log.newLogger
 
 
 sealed class Screen(val route: String) {
+    object SwitchToLegacy : Screen("switchtolegacy")
     object InitWallet : Screen("initwallet")
     object CreateWallet : Screen("createwallet")
     object RestoreWallet : Screen("restorewallet")
@@ -43,6 +44,8 @@ sealed class Screen(val route: String) {
     object Preferences : Screen("settings/preferences")
     object About : Screen("settings/about")
     object AppLock : Screen("settings/applock")
+    object PaymentSettings : Screen("settings/paymentsettings")
+    object Logs : Screen("settings/logs")
 }
 
 fun NavHostController.navigate(screen: Screen, arg: List<Any> = emptyList(), builder: NavOptionsBuilder.() -> Unit = {}) {

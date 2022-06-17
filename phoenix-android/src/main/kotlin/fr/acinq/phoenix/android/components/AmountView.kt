@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,8 +24,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
@@ -32,7 +35,10 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.CurrencyUnit
+import kotlinx.coroutines.launch
 
 @Composable
 fun AmountView(
@@ -43,22 +49,35 @@ fun AmountView(
     isOutgoing: Boolean? = null,
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
     unitTextStyle: TextStyle = MaterialTheme.typography.body1,
-    separatorSpace: Dp = 8.dp
+    separatorSpace: Dp = 4.dp,
+    mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE
 ) {
     val unit = forceUnit ?: if (LocalShowInFiat.current) {
         LocalFiatCurrency.current
     } else {
         LocalBitcoinUnit.current
     }
-    Row(horizontalArrangement = Arrangement.Center, modifier = modifier) {
+    val inFiat = LocalShowInFiat.current
+
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    Row(horizontalArrangement = Arrangement.Center,
+        modifier = modifier.clickable {
+            scope.launch {
+                UserPrefs.saveIsAmountInFiat(context, !inFiat)
+            }
+        })
+    {
         if (isOutgoing != null && amount > MilliSatoshi(0)) {
             Text(
                 text = stringResource(id = if (isOutgoing) R.string.paymentline_sent_prefix else R.string.paymentline_received_prefix),
-                style = amountTextStyle
+                style = amountTextStyle,
+                modifier = Modifier.alignBy(FirstBaseline)
             )
         }
         Text(
-            text = amount.toPrettyString(unit, fiatRate),
+            text = amount.toPrettyString(unit, fiatRate, mSatDisplayPolicy = mSatDisplayPolicy),
             style = amountTextStyle,
             modifier = Modifier.alignBy(FirstBaseline)
         )
@@ -67,8 +86,7 @@ fun AmountView(
             Text(
                 text = unit.toString(),
                 style = unitTextStyle,
-                modifier = Modifier
-                    .alignBy(FirstBaseline)
+                modifier = Modifier.alignBy(FirstBaseline)
             )
         }
     }

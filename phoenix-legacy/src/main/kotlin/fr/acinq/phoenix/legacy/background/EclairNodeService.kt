@@ -30,7 +30,6 @@ import android.net.ConnectivityManager
 import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
-import android.text.format.DateUtils
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationCompat
@@ -109,7 +108,7 @@ import scala.collection.immutable.List as ScalaList
 class EclairNodeService : Service() {
 
   companion object {
-    const val EXTRA_REASON = "${BuildConfig.APPLICATION_ID}.SERVICE_SPAWN_REASON"
+    const val EXTRA_REASON = "${BuildConfig.LIBRARY_PACKAGE_NAME}.SERVICE_SPAWN_REASON"
   }
 
   private val log = LoggerFactory.getLogger(this::class.java)
@@ -172,7 +171,7 @@ class EclairNodeService : Service() {
     notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline)
       .setOnlyAlertOnce(true)
       .setContentTitle(getString(R.string.notif__headless_title__default))
-      .setContentIntent(PendingIntent.getActivity(this, Constants.NOTIF_ID__HEADLESS, intent, PendingIntent.FLAG_ONE_SHOT))
+      .setContentIntent(PendingIntent.getActivity(this, Constants.NOTIF_ID__HEADLESS, intent, PendingIntent.FLAG_IMMUTABLE))
     log.info("service created")
   }
 
@@ -402,7 +401,7 @@ class EclairNodeService : Service() {
 
     Class.forName("org.sqlite.JDBC")
     val setup = Setup(Wallet.getDatadir(context), Option.apply(seed), Option.empty(), Option.apply(address), system)
-    log.info("node setup ready, running version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+    log.info("node setup ready, running library version ${BuildConfig.LIB_COMMIT} (${BuildConfig.LIB_CODE})")
 
     // we could do this only once, but we want to make sure that previous installs, that were using DNS resolution
     // (which caused issues related to IPv6) do overwrite the previous value
@@ -426,6 +425,7 @@ class EclairNodeService : Service() {
     system.eventStream().subscribe(nodeSupervisor, ElectrumClient.ElectrumEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, ChannelErrorOccurred::class.java)
     system.eventStream().subscribe(nodeSupervisor, MissedPayToOpenPayment::class.java)
+    system.eventStream().subscribe(nodeSupervisor, PhoenixAndroidLegacyMigrateResponse::class.java)
 
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
     // this is only needed to create the peer when we don't yet have any channel, connection will be handled by the reconnection task
@@ -467,7 +467,6 @@ class EclairNodeService : Service() {
   }
 
   /** Retrieves list of channels from router. Can filter by state. */
-  @UiThread
   suspend fun getChannels(channelState: State? = null): Iterable<RES_GETINFO> {
     return withContext(serviceScope.coroutineContext + Dispatchers.IO) {
       api?.run {
@@ -647,11 +646,21 @@ class EclairNodeService : Service() {
   }
 
   /** Request swap-in details. */
-  suspend fun sendSwapIn() = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
+  suspend fun requestSwapIn() = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
     kit?.run {
       switchboard().tell(Peer.SendSwapInRequest(Wallet.ACINQ.nodeId()), ActorRef.noSender())
       Unit
     } ?: throw KitNotInitialized
+  }
+
+  /** Send message to the peer to prepare migration. */
+  fun sendLegacyMigrationSignal() = serviceScope.launch(Dispatchers.Default) {
+    kit?.run { doSendLegacyMigrationSignal(this) } ?: throw KitNotInitialized
+  }
+
+  private fun doSendLegacyMigrationSignal(kit: Kit) {
+    val newNodeId = kit.nodeParams().keyManager().kmpNodeKey().publicKey()
+    kit.switchboard().tell(Peer.SendPhoenixAndroidLegacyMigrate(Wallet.ACINQ.nodeId(), newNodeId), ActorRef.noSender())
   }
 
   /** Generate a BOLT 11 payment request. */
@@ -912,6 +921,25 @@ class EclairNodeService : Service() {
         }
       }
     } ?: log.info("could not refresh fcm token because kit is not ready yet")
+  }
+
+  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  fun handleEvent(event: CheckHasActiveChannels) {
+    checkActiveChannelsForMigration()
+  }
+
+  private fun checkActiveChannelsForMigration() {
+    serviceScope.launch {
+      kit?.run {
+        if (nodeParams().db().channels().listLocalChannels().isEmpty) {
+//          doSendLegacyMigrationSignal(this)
+          delay(1000)
+          // FIXME we should not move to KMP automatically because this method can be triggered for many cases
+          // migration should be manually triggered.
+          // PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.NotRequired)
+        }
+      }
+    }
   }
 
   // =========================================================== //
