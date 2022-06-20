@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.TrampolineFees
+import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.data.*
 import org.slf4j.LoggerFactory
@@ -67,6 +68,25 @@ object Converter {
         unit == BitcoinUnit.MBtc -> MBTC_FORMAT
         unit == BitcoinUnit.Btc && withMillis -> BTC_FORMAT_WITH_MILLIS
         else -> BTC_FORMAT
+    }
+
+    /** Converts a [Double] amount to [MilliSatoshi], assuming that this amount is in fiat. */
+    fun Double.toMilliSatoshi(fiatRate: Double): MilliSatoshi = (this / fiatRate).toMilliSatoshi(BitcoinUnit.Btc)
+
+    /** Converts a [Double] amount to [MilliSatoshi], assuming that this amount is in Bitcoin. */
+    fun Double.toMilliSatoshi(unit: BitcoinUnit): MilliSatoshi = when (unit) {
+        BitcoinUnit.Sat -> this.toBigDecimal().movePointRight(3).toLong().msat
+        BitcoinUnit.Bit -> this.toBigDecimal().movePointRight(5).toLong().msat
+        BitcoinUnit.MBtc -> this.toBigDecimal().movePointRight(8).toLong().msat
+        BitcoinUnit.Btc -> this.toBigDecimal().movePointRight(11).toLong().msat
+    }
+
+    /** Converts [MilliSatoshi] to another Bitcoin unit. */
+    fun MilliSatoshi.toUnit(unit: BitcoinUnit): Double = when (unit) {
+        BitcoinUnit.Sat -> this.msat.toBigDecimal().movePointLeft(3).toDouble()
+        BitcoinUnit.Bit -> this.msat.toBigDecimal().movePointLeft(5).toDouble()
+        BitcoinUnit.MBtc -> this.msat.toBigDecimal().movePointLeft(8).toDouble()
+        BitcoinUnit.Btc -> this.msat.toBigDecimal().movePointLeft(11).toDouble()
     }
 
     /** Format the double as a String using [DecimalFormat]. */

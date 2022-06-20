@@ -27,7 +27,6 @@ import fr.acinq.eclair.db.sqlite.SqliteUtils
 import fr.acinq.eclair.wire.TemporaryNodeFailure
 import fr.acinq.eclair.wire.TrampolineFeeInsufficient
 import fr.acinq.eclair.wire.UnknownNextPeer
-import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.Lightning
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.db.ChannelClosingType
@@ -40,9 +39,6 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.android.BuildConfig
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.legacy.db.*
 import fr.acinq.phoenix.legacy.utils.Wallet
