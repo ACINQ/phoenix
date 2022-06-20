@@ -31,6 +31,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -62,8 +63,8 @@ fun ChannelsView() {
         )
     }
 
-    SettingScreen(isScrollable = false) {
-        SettingHeader(
+    DefaultScreenLayout(isScrollable = false) {
+        DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.listallchannels_title),
         )
@@ -89,6 +90,8 @@ fun ChannelsView() {
 private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: () -> Unit) {
     val balance = channel.localBalance ?: 0.sat
     val capacity = balance + (channel.remoteBalance ?: 0.sat)
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     Row(modifier = Modifier
         .clickable { onClick() }
         .padding(horizontal = 16.dp, vertical = 16.dp),

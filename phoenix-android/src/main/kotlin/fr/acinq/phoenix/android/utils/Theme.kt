@@ -37,9 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import fr.acinq.phoenix.android.LocalTheme
-import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.isDarkTheme
-import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 
 // primary for testnet
 val horizon = Color(0xff91b4d1)
@@ -69,7 +68,7 @@ val gray600 = Color(0xFF5F6A8A)
 val gray500 = Color(0xFF73899E)
 val gray400 = Color(0xFF8B99AD)
 val gray300 = Color(0xff99a2b6)
-val gray200 = Color(0xffb5bccc)
+val gray200 = Color(0xFFB5BBC9)
 val gray100 = Color(0xffd1d7e3)
 val gray70 = Color(0xffe1eBeD)
 val gray50 = Color(0xFFE9F1F3)
@@ -152,13 +151,13 @@ fun typography(palette: Colors) = Typography(
     ),
     h4 = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Medium,
         fontSize = 18.sp,
         color = palette.onSurface,
     ),
     h5 = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         color = palette.onSurface,
     ),
@@ -201,7 +200,7 @@ val shapes = Shapes(
 @Composable
 fun PhoenixAndroidTheme(content: @Composable () -> Unit) {
     val context = LocalContext.current
-    val userTheme by Prefs.getUserTheme(context).collectAsState(initial = UserTheme.SYSTEM)
+    val userTheme by UserPrefs.getUserTheme(context).collectAsState(initial = UserTheme.SYSTEM)
     val systemUiController = rememberSystemUiController()
 
     CompositionLocalProvider(
@@ -243,7 +242,7 @@ fun negativeColor(): Color = if (isDarkTheme) red500 else red300
 fun positiveColor(): Color = if (isDarkTheme) green else applegreen
 
 @Composable
-fun mutedTextColor(): Color = if (isDarkTheme) gray600 else gray400
+fun mutedTextColor(): Color = if (isDarkTheme) gray600 else gray200
 
 @Composable
 fun mutedBgColor(): Color = if (isDarkTheme) gray950 else gray30
@@ -264,6 +263,17 @@ fun whiteLowOp(): Color = Color(0x33ffffff)
 fun textFieldColors() = TextFieldDefaults.textFieldColors(
     focusedLabelColor = MaterialTheme.colors.primary,
     backgroundColor = MaterialTheme.colors.surface,
+)
+
+@Composable
+fun outlinedTextFieldColors() = TextFieldDefaults.outlinedTextFieldColors(
+    focusedLabelColor = MaterialTheme.colors.primary,
+    focusedBorderColor = MaterialTheme.colors.primary,
+    disabledTextColor = MaterialTheme.colors.onSurface,
+    disabledBorderColor = MaterialTheme.colors.onSurface,
+    disabledLabelColor = MaterialTheme.colors.onSurface,
+    disabledPlaceholderColor = MaterialTheme.colors.onSurface,
+
 )
 
 /** Get a color using the old way. Use in legacy AndroidView. */

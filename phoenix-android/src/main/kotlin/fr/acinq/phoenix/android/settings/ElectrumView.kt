@@ -40,7 +40,7 @@ import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.utils.Prefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.controllers.config.ElectrumConfiguration
@@ -59,8 +59,8 @@ fun ElectrumView() {
     val prefElectrumServer = LocalElectrumServer.current
     var showServerDialog by rememberSaveable { mutableStateOf(false) }
 
-    SettingScreen {
-        SettingHeader(
+    DefaultScreenLayout {
+        DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.electrum_title),
             subtitle = stringResource(id = R.string.electrum_subtitle)
@@ -74,7 +74,7 @@ fun ElectrumView() {
                         onConfirm = { host, port ->
                             scope.launch {
                                 val address = host?.let { ServerAddress(it, port ?: 50002, TcpSocket.TLS.TRUSTED_CERTIFICATES) }
-                                Prefs.saveElectrumServer(context, address)
+                                UserPrefs.saveElectrumServer(context, address)
                                 postIntent(ElectrumConfiguration.Intent.UpdateElectrumServer(address))
                                 showServerDialog = false
                             }

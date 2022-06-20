@@ -36,6 +36,10 @@ inline fun <T> tryWith(exception: Exception, action: () -> T): T = try {
     throw exception
 }
 
+inline fun <T1 : Any, T2 : Any, R : Any> safeLet(p1: T1?, p2: T2?, block: (T1, T2) -> R?): R? {
+    return if (p1 != null && p2 != null) block(p1, p2) else null
+}
+
 @Composable
 fun BitcoinUnit.label(): String = when (this) {
     BitcoinUnit.Sat -> stringResource(id = R.string.prefs_display_coin_sat_label)
@@ -46,7 +50,7 @@ fun BitcoinUnit.label(): String = when (this) {
 
 @Composable
 fun FiatCurrency.label(): String = remember(key1 = this.name) {
-    Currency.getInstance(this.name).displayName
+    "(" + this.name + ") " + if (this.name.length == 3) Currency.getInstance(this.name).displayName else ""
 }
 
 @Composable

@@ -62,33 +62,6 @@ class AppViewModel() : ViewModel() {
     /** Tells if the UI is locked with biometrics. */
     var lockState by mutableStateOf<LockState>(LockState.Locked.Default)
 
-    fun writeSeed(context: Context, mnemonics: List<String>) {
-        try {
-            val existing = SeedManager.loadSeedFromDisk(context)
-            if (existing == null) {
-                val encrypted = EncryptedSeed.V2.NoAuth.encrypt(EncryptedSeed.fromMnemonics(mnemonics))
-                SeedManager.writeSeedToDisk(context, encrypted)
-                log.info("seed has been written to disk")
-            } else {
-                log.warn("cannot overwrite existing seed=${existing.name()}")
-            }
-        } catch (e: Exception) {
-            log.error("failed to create new wallet: ", e)
-        }
-    }
-
-    fun decryptSeed(context: Context): ByteArray? {
-        return try {
-            when (val seed = SeedManager.loadSeedFromDisk(context)) {
-                is EncryptedSeed.V2.NoAuth -> seed.decrypt()
-                else -> throw RuntimeException("no seed sorry")
-            }
-        } catch (e: Exception) {
-            log.error("could not decrypt seed", e)
-            null
-        }
-    }
-
     override fun onCleared() {
         super.onCleared()
         service?.shutdown()

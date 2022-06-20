@@ -24,10 +24,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.lightning.io.ReceivePayment
-import fr.acinq.lightning.io.SendPaymentNormal
-import fr.acinq.lightning.io.SendPaymentSwapOut
-import fr.acinq.lightning.io.SwapOutResponseEvent
+import fr.acinq.lightning.io.*
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
@@ -129,7 +126,7 @@ class AppScanController(
                     amountToSend = intent.amount,
                     paymentRequest = intent.paymentRequest,
                     customMaxFees = intent.maxFees,
-                    lnurlPayMetadata = null,
+                    metadata = null,
                     swapOutInfo = null
                 )
             }
@@ -146,7 +143,7 @@ class AppScanController(
                     amountToSend = intent.amount.toMilliSatoshi(),
                     paymentRequest = intent.paymentRequest,
                     customMaxFees = intent.maxFees,
-                    lnurlPayMetadata = null,
+                    metadata = null,
                     swapOutInfo = intent.address
                 )
                 model(
@@ -290,14 +287,14 @@ class AppScanController(
         amountToSend: MilliSatoshi,
         paymentRequest: PaymentRequest,
         customMaxFees: MaxFees?,
-        lnurlPayMetadata: LnurlPayMetadata?,
+        metadata: WalletPaymentMetadata?,
         swapOutInfo: BitcoinAddressInfo?,
     ) {
         val paymentId = UUID.randomUUID()
         val peer = peerManager.getPeer()
 
         // save lnurl metadata if any
-        lnurlPayMetadata?.let { WalletPaymentMetadataRow.serialize(WalletPaymentMetadata(it)) }?.let { row ->
+        metadata?.let { WalletPaymentMetadataRow.serialize(it) }?.let { row ->
             databaseManager.paymentsDb().enqueueMetadata(
                 row = row,
                 id = WalletPaymentId.OutgoingPaymentId(paymentId)
@@ -312,6 +309,7 @@ class AppScanController(
             )
         }
 
+        model(Scan.Model.LnurlPayFlow.Sending)
         peer.send(
             if (swapOutInfo != null) {
                 SendPaymentSwapOut(
@@ -398,14 +396,16 @@ class AppScanController(
                     amountToSend = intent.amount,
                     paymentRequest = result.value.paymentRequest,
                     customMaxFees = intent.maxFees,
-                    lnurlPayMetadata = LnurlPayMetadata(
-                        pay = intent.lnurlPay,
-                        description = intent.lnurlPay.metadata.plainText,
-                        successAction = result.value.successAction
+                    metadata = WalletPaymentMetadata(
+                        lnurl = LnurlPayMetadata(
+                            pay = intent.lnurlPay,
+                            description = intent.lnurlPay.metadata.plainText,
+                            successAction = result.value.successAction
+                        ),
+                        userNotes = intent.comment
                     ),
                     swapOutInfo = null,
                 )
-                model(Scan.Model.LnurlPayFlow.Sending)
             }
         }
     }

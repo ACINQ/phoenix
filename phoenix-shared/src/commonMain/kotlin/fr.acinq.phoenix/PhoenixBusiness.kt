@@ -16,13 +16,11 @@ import fr.acinq.phoenix.controllers.payments.AppReceiveController
 import fr.acinq.phoenix.controllers.payments.AppScanController
 import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.Chain
+import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.createAppDbDriver
 import fr.acinq.phoenix.managers.*
-import fr.acinq.phoenix.utils.BlockchainExplorer
-import fr.acinq.phoenix.utils.LogMemory
-import fr.acinq.phoenix.utils.PlatformContext
-import fr.acinq.phoenix.utils.getApplicationFilesDirectoryPath
+import fr.acinq.phoenix.utils.*
 import io.ktor.client.*
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.*
@@ -87,9 +85,11 @@ class PhoenixBusiness(
         setLightningLoggerFactory(loggerFactory)
     }
 
-    fun start() {
+    fun start(startupParams: StartupParams) {
+        logger.info { "starting with params=$startupParams" }
         if (appConnectionsDaemon == null) {
             logger.debug { "start business" }
+            appConfigurationManager.setStartupParams(startupParams)
             appConnectionsDaemon = AppConnectionsDaemon(this)
         }
     }

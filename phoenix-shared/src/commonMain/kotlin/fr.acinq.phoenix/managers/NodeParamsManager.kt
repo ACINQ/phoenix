@@ -16,14 +16,12 @@
 
 package fr.acinq.phoenix.managers
 
-import fr.acinq.bitcoin.Block
 import fr.acinq.lightning.*
 import fr.acinq.lightning.blockchain.fee.FeerateTolerance
 import fr.acinq.lightning.blockchain.fee.OnChainFeeConf
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.Chain
 import kotlinx.coroutines.CoroutineScope

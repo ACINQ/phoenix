@@ -2,7 +2,7 @@ import SwiftUI
 import PhoenixShared
 import os.log
 
-#if DEBUG && false
+#if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
 	category: "ChannelsConfigurationView"
@@ -10,6 +10,10 @@ fileprivate var log = Logger(
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
+
+fileprivate enum NavLinkTag: String {
+	case ForceCloseChannelsView
+}
 
 struct ChannelsConfigurationView: MVIView {
 
@@ -26,32 +30,36 @@ struct ChannelsConfigurationView: MVIView {
 	@ViewBuilder
 	var view: some View {
 		
-		Group {
-			if (mvi.model.channels.isEmpty) {
-				NoChannelsView(
-					mvi: mvi,
-					sharing: $sharing,
-					showChannelsRemoteBalance: $showChannelsRemoteBalance,
-					toast: toast
-				)
-			} else {
-				ChannelsView(
-					mvi: mvi,
-					sharing: $sharing,
-					showChannelsRemoteBalance: $showChannelsRemoteBalance,
-					toast: toast
-				)
+		content()
+			.sharing($sharing)
+			.frame(maxWidth: .infinity, maxHeight: .infinity)
+			.onDisappear {
+				onDisappear()
 			}
+			.navigationBarTitle(
+				NSLocalizedString("Payment channels", comment: "Navigation bar title"),
+				displayMode: .inline
+			)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
+		if (mvi.model.channels.isEmpty) {
+			NoChannelsView(
+				mvi: mvi,
+				sharing: $sharing,
+				showChannelsRemoteBalance: $showChannelsRemoteBalance,
+				toast: toast
+			)
+		} else {
+			ChannelsView(
+				mvi: mvi,
+				sharing: $sharing,
+				showChannelsRemoteBalance: $showChannelsRemoteBalance,
+				toast: toast
+			)
 		}
-		.sharing($sharing)
-		.onDisappear {
-			onDisappear()
-		}
-		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationBarTitle(
-			NSLocalizedString("Payment channels", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
 	}
 	
 	func onDisappear() {
@@ -91,11 +99,26 @@ fileprivate struct ChannelsView : View {
 	@Binding var showChannelsRemoteBalance: Bool
 	@ObservedObject var toast: Toast
 	
+	@State var navLinkTag: NavLinkTag? = nil
+	
 	@Environment(\.popoverState) var popoverState: PopoverState
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	var body: some View {
 		
 		ZStack {
+			
+			NavigationLink(
+				destination: navLinkView(),
+				isActive: Binding(
+					get: { navLinkTag != nil },
+					set: { if !$0 { navLinkTag = nil }}
+				)
+			) {
+				EmptyView()
+			}
 			
 			VStack {
 				
@@ -121,16 +144,66 @@ fileprivate struct ChannelsView : View {
 			toast.view()
 			
 		} // </ZStack>
-		.navigationBarItems(trailing: shareChannelsButton())
+		.navigationBarItems(trailing: menuButton())
 	}
 	
 	@ViewBuilder
-	func shareChannelsButton() -> some View {
+	func navLinkView() -> some View {
 		
-		Button {
-			sharing = mvi.model.json
+		switch navLinkTag {
+		case .ForceCloseChannelsView:
+			ForceCloseChannelsView()
+		default:
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func menuButton() -> some View {
+		
+		Menu {
+			Button {
+				sharing = mvi.model.json
+			} label: {
+				Label {
+					Text(verbatim: "Share all")
+				} icon: {
+					Image(systemName: "square.and.arrow.up")
+				}
+			}
+			Button {
+				closeAllChannels()
+			} label: {
+				Label {
+					Text(verbatim: "Close all")
+				} icon: {
+					Image(systemName: "xmark.circle")
+				}
+			}
+			if #available(iOS 15.0, *) {
+				Button(role: .destructive) {
+					forceCloseAllChannels()
+				} label: {
+					Label {
+						Text(verbatim: "Force close all")
+					} icon: {
+						Image(systemName: "exclamationmark.triangle")
+					}
+				}
+			} else {
+				Button {
+					forceCloseAllChannels()
+				} label: {
+					Label {
+						Text(verbatim: "Force close all")
+					} icon: {
+						Image(systemName: "exclamationmark.triangle")
+					}
+				}
+			}
+			
 		} label: {
-			Image(systemName: "square.and.arrow.up")
+			Image(systemName: "ellipsis")
 		}
 	}
 	
@@ -153,6 +226,21 @@ fileprivate struct ChannelsView : View {
 			showChannelsRemoteBalance: $showChannelsRemoteBalance,
 			toast: toast
 		)
+	}
+	
+	func closeAllChannels() {
+		log.trace("closeAllChannels()")
+		
+		presentationMode.wrappedValue.dismiss()
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
+			deepLinkManager.broadcast(.drainWallet)
+		}
+	}
+	
+	func forceCloseAllChannels() {
+		log.trace("forceCloseAllChannels()")
+		
+		navLinkTag = .ForceCloseChannelsView
 	}
 }
 

@@ -37,6 +37,7 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.controllers.payments.MaxFees
 import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.WalletContext
 
@@ -44,6 +45,7 @@ import fr.acinq.phoenix.data.WalletContext
 @Composable
 fun SendSwapOutView(
     model: Scan.Model.SwapOutFlow,
+    maxFees: MaxFees?,
     onBackClick: () -> Unit,
     onInvalidate: (Scan.Intent.SwapOutFlow.Invalidate) -> Unit,
     onPrepareSwapOutClick: (Scan.Intent.SwapOutFlow.PrepareSwapOut) -> Unit,
@@ -158,7 +160,7 @@ fun SendSwapOutView(
                                 Scan.Intent.SwapOutFlow.SendSwapOut(
                                     amount = total,
                                     paymentRequest = model.paymentRequest,
-                                    maxFees = null,
+                                    maxFees = maxFees,
                                     address = model.address
                                 )
                             )
@@ -180,12 +182,11 @@ private fun SwapOutInputView(
     errorMessage: String,
 ) {
     Spacer(modifier = Modifier.height(110.dp))
-    AmountInput(
+    AmountHeroInput(
         initialAmount = initialAmount?.toMilliSatoshi(),
-        onAmountChange = { newAmount, _, _ ->
-            newAmount?.let { onAmountChange(it.truncateToSatoshi()) }
+        onAmountChange = { newAmount ->
+            newAmount?.let { onAmountChange(it.amount.truncateToSatoshi()) }
         },
-        useBasicInput = true,
         inputTextSize = 48.sp,
     )
     Spacer(modifier = Modifier.height(4.dp))

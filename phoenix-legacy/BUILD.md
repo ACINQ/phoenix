@@ -1,10 +1,10 @@
-This document is related to the legacy Phoenix app, based on eclair-core. For the new application, see the BUILD.md document in the root.
+This document is related to the legacy app, based on eclair-core.
+
+🚧 Phoenix is currently in a transition phase between the old app and the new app. During that transition phase, to build the new app you'll need to build the old app as well.
 
 # How-to build Phoenix (legacy)
 
-This section explains how to install a development environment for Phoenix. If you simply want to build the Phoenix APK, check the [Release section below](#release-phoenix).
-
-First you'll have to build the various dependencies for the application.
+First you'll have to build the various dependencies for the legacy application.
 
 ## Building eclair-core for Phoenix
 
@@ -25,63 +25,14 @@ Phoenix uses a library to manage the communication with the tor binary. This lib
 ./gradlew :android:publishToMaven
 ```
 
-## Building the app proper
+## Troubleshooting
 
-[Android Studio](https://developer.android.com/studio) is the recommended development environment.
-
-1. Install Android Studio
-2. Clone the phoenix project from https://github.com/ACINQ/phoenix
-3. Checkout the `master` branch (this is the default development branch, using the `TESTNET` blockchain)
-4. Open Android Studio, and click on `File` > `Open...`, and open the cloned folder
-5. Project initialization will proceed.
-
-Note:
-- If you have an error mentioning that the `eclair-core` library could not be found, it's because you need to build it first (see above).
-- The version of eclair-core used by Phoenix often changes; tagged version of the app (aka releases) always depends on a tagged version of eclair-core. The current `android-phoenix` branch may be a SNAPSHOT version which does not correspond to what the current Phoenix `master` depends on.
+- If you have an error mentioning that the `eclair-core` library could not be found, it's because you need to build it first (see above), with the correct version (see below).
+- The version of eclair-core used by Phoenix often changes; tagged version of the app (aka releases) always depends on a tagged version of eclair-core. The current `android-phoenix` branch may be a SNAPSHOT version which may not correspond to what the current Phoenix `master` depends on.
 - You can check what eclair-core `.jar` file you have built by checking your local maven repository (`path/to/repo/fr/acinq/eclair/eclair-core_2.11/<version>/`). Default repository is `~/.m2`.
 
-# Release Phoenix
+# Starting or releasing Phoenix legacy
 
-Phoenix releases are deterministically built using a dockerized Linux environment. This allow anyone to recreate the same APK that is published in the release page (minus the release signing part which is obviously not public).
+Phoenix legacy is now an AAR library embedded in the modern, KMM application (which is hosted in the `phoenix-android` module). Follow the instructions in the BUILD.md file located in the root folder.
 
-Notes:
-- This tool works on Linux and Windows.
-- Following instructions only work for releases after v.1.3.1 (excluded).
-
-### Prerequisites
-
-You don't have to worry about installing any development tool, except:
-
-1. Docker (Community Edition)
-
-Note: on Windows at least, it is strongly recommended to bump the resources allocation settings from the default values, especially for Memory.
-
-### Build the APK
-
-1. Clone the phoenix project from https://github.com/ACINQ/phoenix ;
-
-2. Open a terminal at the root of the cloned project ;
-
-3. Checkout the tag you want to build, for example:
-
-```shell
-git checkout v1.4.0
-```
-
-4. Build the docker image mirroring the release environment (this typically takes ~20min):
-
-```shell
-docker build -t phoenix_build .
-```
-
-5. Build the APKs using the docker image (takes typically ~10min):
-
-```shell
-# If you're on linux:
-docker run --rm -v $(pwd):/home/ubuntu/phoenix/phoenix-legacy/build/outputs -w /home/ubuntu/phoenix phoenix_build ./gradlew :phoenix-legacy:assemble
-
-# If you're on Windows:
-docker run --rm -v ${pwd}:/home/ubuntu/phoenix/phoenix-legacy/build/outputs -w //home/ubuntu/phoenix phoenix_build ./gradlew :phoenix-legacy:assemble
-```
-
-6. Built artifacts are in `.apk/release`.
+If you want to build old, standalone versions of the legacy app, checkout the tag you want to build and follow the build instructions for that tag.

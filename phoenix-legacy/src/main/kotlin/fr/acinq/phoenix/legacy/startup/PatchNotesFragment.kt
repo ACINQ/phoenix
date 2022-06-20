@@ -46,7 +46,7 @@ class PatchNotesFragment : BaseFragment(stayIfNotStarted = true) {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    log.info("displaying patch notes from version=${args.version} to version=${BuildConfig.VERSION_CODE}")
+    log.info("displaying patch notes from version=${args.version} to version=${BuildConfig.LIB_CODE}")
     val notes = Migration.listNotableChangesSince(args.version.toInt()).map {
       log.debug("adding patch note for version=$it")
       getPatchNoteForVersion(it)

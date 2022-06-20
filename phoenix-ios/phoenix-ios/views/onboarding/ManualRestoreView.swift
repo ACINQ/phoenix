@@ -258,7 +258,7 @@ struct EnterSeedView: View {
 			.cornerRadius(100)
 			.overlay(
 				RoundedRectangle(cornerRadius: 16)
-					.stroke(Color(UIColor.separator), lineWidth: 1.5)
+					.stroke(Color.textFieldBorder, lineWidth: 1.5)
 			)
 			.padding(.top)
 			.id(inputID)

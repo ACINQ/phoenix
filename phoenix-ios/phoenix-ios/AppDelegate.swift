@@ -91,8 +91,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			others: Prefs.shared.preferredFiatCurrencies
 		)
 		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
-		
-		business.start()
+
+		let startupParams = StartupParams(requestCheckLegacyChannels: false)
+		business.start(startupParams: startupParams)
 	}
 	
 	// --------------------------------------------------

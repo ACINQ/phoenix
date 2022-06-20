@@ -122,17 +122,14 @@ struct PrivacyView: View {
 		// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
 		// and forcibly undo it.
 		
-		if value == nil {
-			// We reached the final destination of the deep link
-			clearSwiftUiBugWorkaround(delay: 1.0)
-		
-		} else {
+		if let value = value {
 			
 			// Navigate towards deep link (if needed)
 			var newNavLinkTag: NavLinkTag? = nil
 			switch value {
-				case .electrum : newNavLinkTag = NavLinkTag.ElectrumConfigurationView
-				default        : break
+				case .backup      : break
+				case .drainWallet : break
+				case .electrum    : newNavLinkTag = NavLinkTag.ElectrumConfigurationView
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
@@ -143,6 +140,10 @@ struct PrivacyView: View {
 				
 				self.navLinkTag = newNavLinkTag // Trigger/push the view
 			}
+			
+		} else {
+			// We reached the final destination of the deep link
+			clearSwiftUiBugWorkaround(delay: 1.0)
 		}
 	}
 	

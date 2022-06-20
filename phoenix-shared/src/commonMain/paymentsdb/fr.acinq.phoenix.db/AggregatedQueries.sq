@@ -106,7 +106,7 @@ UNION ALL
 LEFT OUTER JOIN payments_metadata ON
     payments_metadata.type = combined_payments.type AND
     payments_metadata.id = combined_payments.id
-ORDER BY combined_payments.created_at DESC
+ORDER BY COALESCE(combined_payments.completed_at, combined_payments.created_at) DESC
 LIMIT :limit OFFSET :offset;
 
 listAllPaymentsCount:

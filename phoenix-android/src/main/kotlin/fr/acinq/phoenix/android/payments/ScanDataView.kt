@@ -50,11 +50,13 @@ import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.databinding.ScanViewBinding
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.readClipboard
 import fr.acinq.phoenix.android.utils.whiteLowOp
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ScanController
+import fr.acinq.phoenix.controllers.payments.MaxFees
 import fr.acinq.phoenix.controllers.payments.Scan
 import kotlinx.coroutines.delay
 
@@ -75,6 +77,8 @@ class ScanDataViewModel(controller: ScanController) : MVIControllerViewModel<Sca
 fun ScanDataView(
     onBackClick: () -> Unit,
 ) {
+    val trampolineMaxFees by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(null)
+    val maxFees = trampolineMaxFees?.let { MaxFees(it.feeBase, it.feeProportional) }
     val vm: ScanDataViewModel = viewModel(factory = ScanDataViewModel.Factory(controllerFactory, CF::scan))
     MVIView(vm) { model, postIntent ->
         when (model) {
@@ -103,6 +107,7 @@ fun ScanDataView(
             is Scan.Model.InvoiceFlow.InvoiceRequest -> {
                 SendLightningPaymentView(
                     paymentRequest = model.paymentRequest,
+                    trampolineMaxFees = maxFees,
                     onBackClick = onBackClick,
                     onPayClick = { postIntent(it) }
                 )
@@ -112,6 +117,7 @@ fun ScanDataView(
                 if (paymentRequest == null) {
                     SendSwapOutView(
                         model = model,
+                        maxFees = maxFees,
                         onBackClick = onBackClick,
                         onInvalidate = { postIntent(it) },
                         onPrepareSwapOutClick = { postIntent(it) },

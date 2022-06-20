@@ -172,9 +172,14 @@ class AppConfigurationManager(
         }
     }
 
-    /* The flow containing the configuration to use for Electrum.
-     * If null, we do not know what conf to use.
-     */
+    /** Used by the [PeerManager] to know what parameters to use when starting up the [Peer] connection. If null, the [PeerManager] will wait before instantiating the [Peer]. */
+    private val _startupParams by lazy { MutableStateFlow<StartupParams?>(null) }
+    val startupParams: StateFlow<StartupParams?> = _startupParams
+    internal fun setStartupParams(params: StartupParams) {
+        if (_startupParams.value == null) _startupParams.value = params
+    }
+
+    /** Used by the [AppConnectionsDaemon] to know which server to connect to. If null, the daemon will wait for a config to be set. */
     private val _electrumConfig by lazy { MutableStateFlow<ElectrumConfig?>(null) }
     fun electrumConfig(): StateFlow<ElectrumConfig?> = _electrumConfig
 

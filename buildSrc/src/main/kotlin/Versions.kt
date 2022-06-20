@@ -35,16 +35,16 @@ object Versions {
     }
 
     object AndroidLegacy {
-        const val eclair = "0.4.15-android-phoenix"
+        const val eclair = "0.4.16-android-phoenix-SNAPSHOT"
 
         const val safeArgs = "2.3.5"
-        const val appCompat = "1.2.0"
+        const val appCompat = "1.3.0"
         const val material = "1.4.0-alpha02"
         const val navigation = "2.3.5"
         const val constraint = "2.0.4"
         const val lifecycleExtensions = "2.2.0"
         const val lifecycle = "2.3.1"
-        const val work = "2.5.0"
+        const val work = "2.7.0"
         const val viewpager = "1.0.0"
         const val eventbus = "3.1.1"
         const val torWrapper = "0.0.5"

@@ -1,9 +1,12 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.wire.InitTlv
+import fr.acinq.lightning.wire.TlvStream
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.utils.calculateBalance
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +31,7 @@ class PeerManager(
     private val electrumWatcher: ElectrumWatcher,
 ) : CoroutineScope by MainScope() {
 
-    constructor(business: PhoenixBusiness): this(
+    constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
         nodeParamsManager = business.nodeParamsManager,
         databaseManager = business.databaseManager,
@@ -47,7 +50,24 @@ class PeerManager(
 
     init {
         launch {
+            val nodeParams = nodeParamsManager.nodeParams.filterNotNull().first()
+            val walletParams = configurationManager.chainContext.filterNotNull().first().walletParams()
+            val startupParams = configurationManager.startupParams.filterNotNull().first()
+
+            var initTlvs = TlvStream.empty<InitTlv>()
+            if (startupParams.requestCheckLegacyChannels) {
+                val legacyKey = nodeParams.keyManager.legacyNodeKey
+                val signature = Crypto.sign(
+                    data = Crypto.sha256(legacyKey.publicKey.toUncompressedBin()),
+                    privateKey = legacyKey.privateKey
+                )
+                initTlvs = initTlvs.addOrUpdate(InitTlv.PhoenixAndroidLegacyNodeId(legacyNodeId = legacyKey.publicKey, signature = signature))
+            }
+
+            logger.debug { "instantiating peer with nodeParams=$nodeParams walletParams=$walletParams initTlvs=$initTlvs" }
+
             val peer = Peer(
+                initTlvStream = initTlvs,
                 nodeParams = nodeParamsManager.nodeParams.filterNotNull().first(),
                 walletParams = configurationManager.chainContext.filterNotNull().first().walletParams(),
                 watcher = electrumWatcher,

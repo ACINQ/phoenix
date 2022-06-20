@@ -33,20 +33,19 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.AmountInput
-import fr.acinq.phoenix.android.components.AmountView
-import fr.acinq.phoenix.android.components.BackButton
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.mutedItalicTypo
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.controllers.payments.MaxFees
 import fr.acinq.phoenix.controllers.payments.Scan
 
 
 @Composable
 fun SendLightningPaymentView(
     paymentRequest: PaymentRequest,
+    trampolineMaxFees: MaxFees?,
     onBackClick: () -> Unit,
     onPayClick: (Scan.Intent.InvoiceFlow.SendInvoicePayment) -> Unit
 ) {
@@ -67,25 +66,24 @@ fun SendLightningPaymentView(
     ) {
 
         Spacer(modifier = Modifier.height(110.dp))
-        AmountInput(
+        AmountHeroInput(
             initialAmount = amount,
-            onAmountChange = { newAmount, _, _ ->
+            onAmountChange = { newAmount ->
                 amountErrorMessage = ""
                 when {
                     newAmount == null -> {}
-                    balance != null && newAmount > balance -> {
+                    balance != null && newAmount.amount > balance -> {
                         amountErrorMessage = context.getString(R.string.send_error_amount_over_balance)
                     }
-                    requestedAmount != null && newAmount < requestedAmount -> {
+                    requestedAmount != null && newAmount.amount < requestedAmount -> {
                         amountErrorMessage = context.getString(R.string.send_error_amount_below_requested)
                     }
-                    requestedAmount != null && newAmount > requestedAmount * 2 -> {
+                    requestedAmount != null && newAmount.amount > requestedAmount * 2 -> {
                         amountErrorMessage = context.getString(R.string.send_error_amount_overpaying)
                     }
                 }
-                amount = newAmount
+                amount = newAmount?.amount
             },
-            useBasicInput = true,
             inputTextSize = 48.sp,
         )
         Text(amountErrorMessage, style = MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 14.sp), maxLines = 1)
@@ -106,7 +104,7 @@ fun SendLightningPaymentView(
             enabled = amount != null && amountErrorMessage.isBlank(),
         ) {
             amount?.let {
-                onPayClick(Scan.Intent.InvoiceFlow.SendInvoicePayment(paymentRequest = paymentRequest, amount = it, maxFees = null))
+                onPayClick(Scan.Intent.InvoiceFlow.SendInvoicePayment(paymentRequest = paymentRequest, amount = it, maxFees = trampolineMaxFees))
             }
         }
     }

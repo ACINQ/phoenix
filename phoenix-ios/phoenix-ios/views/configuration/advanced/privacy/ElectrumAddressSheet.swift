@@ -218,7 +218,7 @@ struct ElectrumAddressSheet: View {
 								: Color(UIColor.systemBackground)
 							)
 						Capsule()
-							.strokeBorder(Color(UIColor.separator))
+							.strokeBorder(Color.textFieldBorder)
 					}
 				)
 			} // </HStack> (row)
@@ -267,7 +267,7 @@ struct ElectrumAddressSheet: View {
 								: Color(UIColor.systemBackground)
 							)
 						Capsule()
-							.strokeBorder(Color(UIColor.separator))
+							.strokeBorder(Color.textFieldBorder)
 					}
 				)
 			} // </HStack> (row)

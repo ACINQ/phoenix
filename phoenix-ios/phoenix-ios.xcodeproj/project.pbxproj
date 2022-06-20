@@ -727,7 +727,6 @@
 				DC27E4C02791BFFC00C777CC /* privacy */,
 				53BEF0A8669F9379E4E4596F /* logs */,
 				53BEF648B3A03C66B611BC06 /* ChannelsConfigurationView.swift */,
-				DCF360CF2591018300E92031 /* CloseChannelsView.swift */,
 				DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */,
 			);
 			path = advanced;
@@ -739,6 +738,7 @@
 				C8D7A2327BC90150A3E1493D /* AboutView.swift */,
 				C8D7A986A61CCD64FA661B88 /* DisplayConfigurationView.swift */,
 				DC0732EB263CA6C3004CB88D /* PaymentOptionsView.swift */,
+				DCF360CF2591018300E92031 /* CloseChannelsView.swift */,
 				DC27E4CD2791D18600C777CC /* recovery phrase */,
 			);
 			path = general;
