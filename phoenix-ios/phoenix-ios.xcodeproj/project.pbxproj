@@ -164,6 +164,7 @@
 		DCF360D02591018300E92031 /* CloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF360CF2591018300E92031 /* CloseChannelsView.swift */; };
 		DCFA8759260E6F2E00AE8953 /* IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA8758260E6F2E00AE8953 /* IntroView.swift */; };
 		DCFA876D260E91E600AE8953 /* IntroContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA876C260E91E600AE8953 /* IntroContainer.swift */; };
+		DCFC72012862122B00D6B293 /* AppMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFC72002862122B00D6B293 /* AppMigration.swift */; };
 		DCFD079126D84A380020DD8E /* HorizontalActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFD079026D84A380020DD8E /* HorizontalActivity.swift */; };
 		F4AED297257A50CD009485C1 /* LogsConfigurationViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AED295257A50CD009485C1 /* LogsConfigurationViewerView.swift */; };
 		F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */; };
@@ -382,6 +383,7 @@
 		DCF93130279F1BE900FD7776 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = ar; path = ar.lproj/advancedSecurity.html; sourceTree = "<group>"; };
 		DCFA8758260E6F2E00AE8953 /* IntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroView.swift; sourceTree = "<group>"; };
 		DCFA876C260E91E600AE8953 /* IntroContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroContainer.swift; sourceTree = "<group>"; };
+		DCFC72002862122B00D6B293 /* AppMigration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppMigration.swift; sourceTree = "<group>"; };
 		DCFD079026D84A380020DD8E /* HorizontalActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalActivity.swift; sourceTree = "<group>"; };
 		F4AED295257A50CD009485C1 /* LogsConfigurationViewerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogsConfigurationViewerView.swift; sourceTree = "<group>"; };
 		F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogsConfigurationView.swift; sourceTree = "<group>"; };
@@ -538,6 +540,7 @@
 			children = (
 				7555FF7E242A565900829871 /* AppDelegate.swift */,
 				7555FF80242A565900829871 /* SceneDelegate.swift */,
+				DCFC72002862122B00D6B293 /* AppMigration.swift */,
 				7555FF82242A565900829871 /* ContentView.swift */,
 				7555FF84242A565B00829871 /* Assets.xcassets */,
 				DC67654D25655D93004D4263 /* Colors.xcassets */,
@@ -1088,6 +1091,7 @@
 				DCB876302735AA7300657570 /* Prefs+Serialization.swift in Sources */,
 				DCE1E5FA26418183005465B8 /* Toast.swift in Sources */,
 				DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */,
+				DCFC72012862122B00D6B293 /* AppMigration.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				DCB876322735AAB500657570 /* Prefs+Codable.swift in Sources */,
 				DCD777D226DE9FE800979A12 /* DelayedSave.swift in Sources */,
