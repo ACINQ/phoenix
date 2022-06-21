@@ -732,26 +732,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 					// User is restoring wallet after manually typing in the recovery phrase.
 					// So we can mark the manual_backup task as completed.
 					//
-					Prefs.shared.manualBackup_setTaskDone(true, encryptedNodeId: encryptedNodeId)
+					Prefs.shared.backupSeed.manualBackup_setTaskDone(true, encryptedNodeId: encryptedNodeId)
 					//
 					// And ensure cloud backup is disabled for the wallet.
 					//
-					Prefs.shared.backupSeed_isEnabled = false
-					Prefs.shared.backupSeed_setName(nil, encryptedNodeId: encryptedNodeId)
-					Prefs.shared.backupSeed_setHasUploadedSeed(false, encryptedNodeId: encryptedNodeId)
+					Prefs.shared.backupSeed.isEnabled = false
+					Prefs.shared.backupSeed.setName(nil, encryptedNodeId: encryptedNodeId)
+					Prefs.shared.backupSeed.setHasUploadedSeed(false, encryptedNodeId: encryptedNodeId)
 					
 				case .fromCloudBackup(let name):
 					//
 					// User is restoring wallet from an existing iCloud backup.
 					// So we can mark the iCloud backpu as completed.
 					//
-					Prefs.shared.backupSeed_isEnabled = true
-					Prefs.shared.backupSeed_setName(name, encryptedNodeId: encryptedNodeId)
-					Prefs.shared.backupSeed_setHasUploadedSeed(true, encryptedNodeId: encryptedNodeId)
+					Prefs.shared.backupSeed.isEnabled = true
+					Prefs.shared.backupSeed.setName(name, encryptedNodeId: encryptedNodeId)
+					Prefs.shared.backupSeed.setHasUploadedSeed(true, encryptedNodeId: encryptedNodeId)
 					//
 					// And ensure manual backup is diabled for the wallet.
 					//
-					Prefs.shared.manualBackup_setTaskDone(false, encryptedNodeId: encryptedNodeId)
+					Prefs.shared.backupSeed.manualBackup_setTaskDone(false, encryptedNodeId: encryptedNodeId)
 				}
 			}
 			
@@ -835,8 +835,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		// The ideal solution would be to have the server send some kind of Ack for the
 		// registration. Which we could then use to trigger a storage in UserDefaults.
 	}
-}
-
-func assertMainThread() -> Void {
-	assert(Thread.isMainThread, "Improper thread: expected main thread; Thread-unsafe code ahead")
 }

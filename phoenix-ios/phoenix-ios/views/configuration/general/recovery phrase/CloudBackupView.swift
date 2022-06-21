@@ -62,7 +62,7 @@ struct CloudBackupView: View {
 		self._legal_governmentRisk = State<Bool>(initialValue: enabled)
 		
 		let encryptedNodeId = AppDelegate.get().encryptedNodeId!
-		let originalName = Prefs.shared.backupSeed_name(encryptedNodeId: encryptedNodeId) ?? ""
+		let originalName = Prefs.shared.backupSeed.name(encryptedNodeId: encryptedNodeId) ?? ""
 		
 		self.encryptedNodeId = encryptedNodeId
 		self.originalName = originalName
@@ -274,11 +274,11 @@ struct CloudBackupView: View {
 			// But it might result in 2 uploads.
 			//
 			if toggle_enabled {
-				Prefs.shared.backupSeed_setName(name, encryptedNodeId: encryptedNodeId)
-				Prefs.shared.backupSeed_isEnabled = toggle_enabled
+				Prefs.shared.backupSeed.setName(name, encryptedNodeId: encryptedNodeId)
+				Prefs.shared.backupSeed.isEnabled = toggle_enabled
 			} else {
-				Prefs.shared.backupSeed_isEnabled = toggle_enabled
-				Prefs.shared.backupSeed_setName(name, encryptedNodeId: encryptedNodeId)
+				Prefs.shared.backupSeed.isEnabled = toggle_enabled
+				Prefs.shared.backupSeed.setName(name, encryptedNodeId: encryptedNodeId)
 			}
 		}
 		presentationMode.wrappedValue.dismiss()

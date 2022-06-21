@@ -73,10 +73,10 @@ struct HomeView : MVIView {
 	@State var externalLightningRequest: AppScanController? = nil
 	@State var temp: [AppScanController] = []
 	
-	let backupSeed_enabled_publisher = Prefs.shared.backupSeed_isEnabled_publisher
-	let manualBackup_taskDone_publisher = Prefs.shared.manualBackup_taskDone_publisher
-	@State var backupSeed_enabled = Prefs.shared.backupSeed_isEnabled
-	@State var manualBackup_taskDone = Prefs.shared.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
+	let backupSeed_enabled_publisher = Prefs.shared.backupSeed.isEnabled_publisher
+	let manualBackup_taskDone_publisher = Prefs.shared.backupSeed.manualBackup_taskDone_publisher
+	@State var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
+	@State var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
 	
 	@ViewBuilder
 	var view: some View {
@@ -139,7 +139,7 @@ struct HomeView : MVIView {
 			self.backupSeed_enabled = $0
 		}
 		.onReceive(manualBackup_taskDone_publisher) {
-			self.manualBackup_taskDone = Prefs.shared.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
+			self.manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
 		}
 	}
 
