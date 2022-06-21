@@ -55,6 +55,28 @@ class BitcoinAddressTest {
                 amount = 1.sat,
                 paymentRequest = null,
                 ignoredParams = Parameters.Empty
+            ),
+            BitcoinAddressInfo(
+                address = "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7",
+                chain = Chain.Testnet,
+                type = BitcoinAddressType.SegWitScriptHash,
+                hash = ByteVector.fromHex("1863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262"),
+                label = "max amount",
+                message = null,
+                amount = 21_000_000_000_00000.sat,
+                paymentRequest = null,
+                ignoredParams = Parameters.Empty
+            ),
+            BitcoinAddressInfo(
+                address = "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7",
+                chain = Chain.Testnet,
+                type = BitcoinAddressType.SegWitScriptHash,
+                hash = ByteVector.fromHex("1863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262"),
+                label = null,
+                message = null,
+                amount = null,
+                paymentRequest = null,
+                ignoredParams = Parameters.Empty
             )
         )
 

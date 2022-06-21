@@ -48,7 +48,12 @@ data class BitcoinAddressInfo(
         val params = Parameters.build {
             label?.let { append("label", it) }
             message?.let { append("message", it) }
-            amount?.let { append("amount", (it.toLong().toBigDecimal().movePointLeft(8).toPlainString())) } // amount field is in BTC
+            // amount field is converted to BTC
+            amount?.sat?.toString()?.padStart(9, '0')?.let {
+                val satPart = it.takeLast(8)
+                val btcPart = it.substring(0, it.length - 8)
+                append("amount", "${btcPart}.${satPart}")
+            }
             paymentRequest?.let { append("lightning", it.write()) }
         }
         return "bitcoin:$address?${(params + ignoredParams).formUrlEncode()}"

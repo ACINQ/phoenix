@@ -20,10 +20,7 @@ import fr.acinq.bitcoin.*
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.sat
-import fr.acinq.phoenix.data.BitcoinAddressError
-import fr.acinq.phoenix.data.BitcoinAddressInfo
-import fr.acinq.phoenix.data.BitcoinAddressType
-import fr.acinq.phoenix.data.Chain
+import fr.acinq.phoenix.data.*
 import io.ktor.http.*
 import io.ktor.util.*
 
@@ -83,10 +80,17 @@ object Parser {
         if (requiredParams.isNotEmpty()) {
             return Either.Left(BitcoinAddressError.UnhandledRequiredParams(requiredParams))
         }
-        val amount = url.parameters["amount"]?.toBigDecimalOrNull()
-            ?.movePointRight(8)
-            ?.toLong()?.sat
-            ?.takeIf { it > 0.sat && it <= (21_000_000 * 100_000_000L).sat }
+
+        val amountSplit = url.parameters["amount"]?.trim()?.split(".", ignoreCase = true, limit = 2)
+        val btcPart = amountSplit?.first()
+        val satPart = amountSplit?.last()?.take(8)?.padEnd(8, '0')
+        val amount = when {
+            btcPart != null && satPart != null -> btcPart + satPart
+            btcPart != null && satPart == null -> btcPart + "00000000"
+            btcPart == null && satPart != null -> satPart
+            else -> null
+        }?.toLongOrNull()?.takeIf { it > 0L && it <= 21e14 }?.sat
+
         val label = url.parameters["label"]
         val message = url.parameters["message"]
         val lightning = url.parameters["lightning"]?.let {

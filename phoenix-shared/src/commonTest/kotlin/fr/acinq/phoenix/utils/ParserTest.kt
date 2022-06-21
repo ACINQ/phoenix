@@ -140,20 +140,40 @@ class ParserTest {
     @Test
     fun parse_bitcoin_uri_with_amount() {
         listOf<Pair<String, Either<BitcoinAddressError, BitcoinAddressInfo>>>(
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0.0123" to Either.Right(
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0.0123  " to Either.Right(
                 BitcoinAddressInfo(
                     "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", Chain.Mainnet, BitcoinAddressType.SegWitPubKeyHash, ByteVector.fromHex("751e76e8199196d454941c45d1b3a323f1433bd6"),
                     amount = 12_30000.sat
                 )
             ),
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1.23456789" to Either.Right(
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1.23456789999" to Either.Right(
                 BitcoinAddressInfo(
                     "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", Chain.Mainnet, BitcoinAddressType.SegWitPubKeyHash, ByteVector.fromHex("751e76e8199196d454941c45d1b3a323f1433bd6"),
                     amount = 1_234_56789.sat
                 )
             ),
-            // invalid amount is ignored
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0.0.01a2" to Either.Right(
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=21000000.000" to Either.Right(
+                BitcoinAddressInfo(
+                    "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", Chain.Mainnet, BitcoinAddressType.SegWitPubKeyHash, ByteVector.fromHex("751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = 21_000_000_000_00000.sat
+                )
+            ),
+            // amount with invalid chars is ignored
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0.001a2" to Either.Right(
+                BitcoinAddressInfo(
+                    "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", Chain.Mainnet, BitcoinAddressType.SegWitPubKeyHash, ByteVector.fromHex("751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            // amount with two decimal separators is ignored
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0.001.2" to Either.Right(
+                BitcoinAddressInfo(
+                    "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", Chain.Mainnet, BitcoinAddressType.SegWitPubKeyHash, ByteVector.fromHex("751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            // amount with a comma separator is ignored
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0,0012" to Either.Right(
                 BitcoinAddressInfo(
                     "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", Chain.Mainnet, BitcoinAddressType.SegWitPubKeyHash, ByteVector.fromHex("751e76e8199196d454941c45d1b3a323f1433bd6"),
                     amount = null
