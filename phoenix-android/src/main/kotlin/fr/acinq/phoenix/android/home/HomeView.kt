@@ -74,11 +74,11 @@ fun HomeView(
     val log = logger("HomeView")
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val connectionsState = homeViewModel.connectionsFlow.collectAsState()
+    val connectionsState by homeViewModel.connectionsFlow.collectAsState(null)
 
-    val showConnectionsDialog = remember { mutableStateOf(false) }
-    if (showConnectionsDialog.value) {
-        ConnectionDialog(connections = connectionsState.value, onClose = { showConnectionsDialog.value = false })
+    var showConnectionsDialog by remember { mutableStateOf(false) }
+    if (showConnectionsDialog) {
+        ConnectionDialog(connections = connectionsState, onClose = { showConnectionsDialog = false })
     }
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -95,7 +95,12 @@ fun HomeView(
         content = {
             MVIView(homeViewModel) { model, _ ->
                 Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    TopBar(showConnectionsDialog, connectionsState)
+                    TopBar(
+                        onConnectionsStateButtonClick = {
+                            showConnectionsDialog = true
+                        },
+                        connectionsState = connectionsState
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
                     AmountView(
                         modifier = Modifier
@@ -222,7 +227,10 @@ private fun SideMenu(
 }
 
 @Composable
-fun TopBar(showConnectionsDialog: MutableState<Boolean>, connectionsState: State<Connections>) {
+fun TopBar(
+    onConnectionsStateButtonClick: () -> Unit,
+    connectionsState: Connections?
+) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -230,7 +238,7 @@ fun TopBar(showConnectionsDialog: MutableState<Boolean>, connectionsState: State
             .height(40.dp)
             .clipToBounds()
     ) {
-        if (connectionsState.value.electrum is Connection.CLOSED || connectionsState.value.peer is Connection.CLOSED) {
+        if (connectionsState?.electrum !is Connection.ESTABLISHED || connectionsState?.peer !is Connection.ESTABLISHED) {
             val connectionsTransition = rememberInfiniteTransition()
             val connectionsButtonAlpha by connectionsTransition.animateFloat(
                 initialValue = 0.3f,
@@ -243,7 +251,7 @@ fun TopBar(showConnectionsDialog: MutableState<Boolean>, connectionsState: State
             FilledButton(
                 text = R.string.home__connection__connecting,
                 icon = R.drawable.ic_connection_lost,
-                onClick = { showConnectionsDialog.value = true },
+                onClick = onConnectionsStateButtonClick,
                 textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
                 backgroundColor = mutedBgColor(),
                 space = 8.dp,
@@ -255,23 +263,32 @@ fun TopBar(showConnectionsDialog: MutableState<Boolean>, connectionsState: State
 }
 
 @Composable
-private fun ConnectionDialog(connections: Connections, onClose: () -> Unit) {
+private fun ConnectionDialog(connections: Connections?, onClose: () -> Unit) {
     Dialog(title = stringResource(id = R.string.conndialog_title), onDismiss = onClose) {
         Column {
-            Text(text = stringResource(id = R.string.conndialog_summary_not_ok), Modifier.padding(horizontal = 24.dp))
-            Spacer(modifier = Modifier.height(24.dp))
-            HSeparator()
-            ConnectionDialogLine(label = stringResource(id = R.string.conndialog_electrum), connection = connections.electrum)
-            HSeparator()
-            ConnectionDialogLine(label = stringResource(id = R.string.conndialog_lightning), connection = connections.peer)
-            HSeparator()
-            Spacer(Modifier.height(16.dp))
+            if (connections?.internet != Connection.ESTABLISHED) {
+                Text(
+                    text = stringResource(id = R.string.conndialog_network),
+                    modifier = Modifier.padding(top = 16.dp, start = 24.dp, end = 24.dp)
+                )
+            } else {
+                if (connections.electrum != Connection.ESTABLISHED || connections.peer != Connection.ESTABLISHED) {
+                    Text(text = stringResource(id = R.string.conndialog_summary_not_ok), Modifier.padding(horizontal = 24.dp))
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+                HSeparator()
+                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_electrum), connection = connections?.electrum)
+                HSeparator()
+                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_lightning), connection = connections?.peer)
+                HSeparator()
+                Spacer(Modifier.height(16.dp))
+            }
         }
     }
 }
 
 @Composable
-private fun ConnectionDialogLine(label: String, connection: Connection) {
+private fun ConnectionDialogLine(label: String, connection: Connection?) {
     Row(modifier = Modifier.padding(vertical = 12.dp, horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically) {
         Surface(
             shape = CircleShape,
