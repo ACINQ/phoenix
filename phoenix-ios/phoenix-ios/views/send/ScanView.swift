@@ -17,8 +17,6 @@ struct ScanView: View {
 	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
 	@ObservedObject var toast: Toast
 	
-	@Binding var paymentRequest: String?
-	
 	@State var showingFullMenu = false
 	@State var chevronPosition: AnimatedChevron.Position = .pointingUp
 	@State var clipboardHasString = UIPasteboard.general.hasStrings

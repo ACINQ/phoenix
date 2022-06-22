@@ -20,8 +20,6 @@ struct SendView: MVIView {
 	
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
-
-	@State var paymentRequest: String? = nil
 	
 	@StateObject var toast = Toast()
 	
@@ -72,12 +70,8 @@ struct SendView: MVIView {
 		     _ as Scan.Model_InvoiceFlow_DangerousRequest,
 		     _ as Scan.Model_LnurlServiceFetch:
 
-			ScanView(
-				mvi: mvi,
-				toast: toast,
-				paymentRequest: $paymentRequest
-			)
-			.zIndex(4)
+			ScanView(mvi: mvi, toast: toast)
+				.zIndex(4)
 
 		case _ as Scan.Model_InvoiceFlow_InvoiceRequest,
 		     _ as Scan.Model_SwapOutFlow_Init,
@@ -118,20 +112,20 @@ struct SendView: MVIView {
 	func modelDidChange(_ newModel: Scan.Model) {
 		log.trace("modelDidChange()")
 		
-		if let newModel = newModel as? Scan.Model_BadRequest {
-			showErrorToast(newModel)
-		}
-		else if let model = newModel as? Scan.Model_InvoiceFlow_DangerousRequest {
-			paymentRequest = model.request
-		}
-		else if let model = newModel as? Scan.Model_InvoiceFlow_InvoiceRequest {
-			paymentRequest = model.request
-		}
-		else if newModel is Scan.Model_InvoiceFlow_Sending ||
-		        newModel is Scan.Model_LnurlPayFlow_Sending
-		{
+		switch newModel {
+		case let model as Scan.Model_BadRequest:
+			
+			showErrorToast(model)
+			
+		case is Scan.Model_InvoiceFlow_Sending,
+		     is Scan.Model_SwapOutFlow_Sending,
+		     is Scan.Model_LnurlPayFlow_Sending:
+			
 			// Pop self from NavigationStack; Back to HomeView
 			presentationMode.wrappedValue.dismiss()
+			
+		default:
+			break
 		}
 	}
 	
