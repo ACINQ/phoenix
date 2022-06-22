@@ -1223,7 +1223,7 @@ struct ValidateView: View {
 			
 			saveTipPercentInPrefs()
 			mvi.intent(Scan.Intent_SwapOutFlow_Send(
-				amount: model.initialUserAmount,
+				amount: model.initialUserAmount.plus(other: model.fee),
 				address: model.address,
 				paymentRequest: model.paymentRequest,
 				maxFees: Prefs.shared.maxFees?.toKotlin()

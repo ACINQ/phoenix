@@ -719,7 +719,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 						Button {
 							openURL(link)
 						} label: {
-							Text("blockchain tx")
+							Text("view on blockchain")
 						}
 					}
 				}

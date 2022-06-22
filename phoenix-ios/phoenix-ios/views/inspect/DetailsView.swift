@@ -143,6 +143,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			paymentRequest_amountRequested(paymentRequest)
 			paymentRequest_paymentHash(paymentRequest)
 		
+		} else if let swapOut = outgoingPayment.details.asSwapOut() {
+			
+			header(NSLocalizedString("Swap Out", comment: "Title in DetailsView_IncomingPayment"))
+			
+			swapOut_address(swapOut.address)
+			paymentRequest_paymentHash(swapOut.paymentRequest)
+			
 		} else if let channelClosing = outgoingPayment.details.asChannelClosing() {
 			
 			header(NSLocalizedString("Channel Closing", comment: "Title in DetailsView_IncomingPayment"))
@@ -439,6 +446,24 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				msat: receivedWith.amount,
 				originalFiat: paymentInfo.metadata.originalFiat
 			))
+		}
+	}
+	
+	@ViewBuilder
+	func swapOut_address(_ address: String) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			
+			keyColumn(NSLocalizedString("address", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			Text(verbatim: address)
 		}
 	}
 	
