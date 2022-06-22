@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.controllers.payments
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.Feature
 import fr.acinq.lightning.Features
@@ -127,7 +128,7 @@ class AppScanController(
                     paymentRequest = intent.paymentRequest,
                     customMaxFees = intent.maxFees,
                     metadata = null,
-                    swapOutInfo = null
+                    swapOutData = null
                 )
             }
             is Scan.Intent.CancelLnurlServiceFetch -> launch { cancelLnurlFetch() }
@@ -144,7 +145,7 @@ class AppScanController(
                     paymentRequest = intent.paymentRequest,
                     customMaxFees = intent.maxFees,
                     metadata = null,
-                    swapOutInfo = intent.address
+                    swapOutData = intent.swapOutFee to intent.address.address
                 )
                 model(
                     Scan.Model.SwapOutFlow.SendingSwapOut(
@@ -288,7 +289,7 @@ class AppScanController(
         paymentRequest: PaymentRequest,
         customMaxFees: MaxFees?,
         metadata: WalletPaymentMetadata?,
-        swapOutInfo: BitcoinAddressInfo?,
+        swapOutData: Pair<Satoshi, String>?,
     ) {
         val paymentId = UUID.randomUUID()
         val peer = peerManager.getPeer()
@@ -311,14 +312,15 @@ class AppScanController(
 
         model(Scan.Model.LnurlPayFlow.Sending)
         peer.send(
-            if (swapOutInfo != null) {
+            if (swapOutData != null) {
                 SendPaymentSwapOut(
                     paymentId = paymentId,
                     amount = amountToSend,
                     recipient = paymentRequest.nodeId,
                     details = OutgoingPayment.Details.SwapOut(
-                        address = swapOutInfo.address,
-                        paymentRequest = paymentRequest
+                        address = swapOutData.second,
+                        paymentRequest = paymentRequest,
+                        swapOutFee = swapOutData.first
                     ),
                     trampolineFeesOverride = trampolineFees
                 )
@@ -404,7 +406,7 @@ class AppScanController(
                         ),
                         userNotes = intent.comment
                     ),
-                    swapOutInfo = null,
+                    swapOutData = null,
                 )
             }
         }

@@ -241,7 +241,7 @@ private fun ScannerView(
                 scanView.decodeContinuous(object : BarcodeCallback {
                     override fun possibleResultPoints(resultPoints: MutableList<ResultPoint>?) = Unit
                     override fun barcodeResult(result: BarcodeResult?) {
-                        result?.text?.let {
+                        result?.text?.trim()?.takeIf { it.isNotBlank() }?.let {
                             scanView.pause()
                             log.debug { "scanned text=$it" }
                             onScannedText(it)

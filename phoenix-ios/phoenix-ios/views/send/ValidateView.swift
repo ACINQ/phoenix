@@ -1226,7 +1226,8 @@ struct ValidateView: View {
 				amount: model.initialUserAmount.plus(other: model.fee),
 				address: model.address,
 				paymentRequest: model.paymentRequest,
-				maxFees: Prefs.shared.maxFees?.toKotlin()
+				maxFees: Prefs.shared.maxFees?.toKotlin(),
+				swapOutFee: model.fee
 			))
 			
 		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {

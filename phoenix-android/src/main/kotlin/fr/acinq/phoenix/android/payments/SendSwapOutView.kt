@@ -161,7 +161,8 @@ fun SendSwapOutView(
                                     amount = total,
                                     paymentRequest = model.paymentRequest,
                                     maxFees = maxFees,
-                                    address = model.address
+                                    address = model.address,
+                                    swapOutFee = model.fee
                                 )
                             )
                         }

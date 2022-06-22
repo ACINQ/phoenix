@@ -176,6 +176,7 @@ object Scan {
 
             data class SendSwapOut(
                 val amount: Satoshi,
+                val swapOutFee: Satoshi,
                 val address: BitcoinAddressInfo,
                 val paymentRequest: PaymentRequest,
                 val maxFees: MaxFees?,

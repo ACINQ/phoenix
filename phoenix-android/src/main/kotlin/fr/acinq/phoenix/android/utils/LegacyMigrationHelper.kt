@@ -175,7 +175,8 @@ object LegacyMigrationHelper {
                     description = "swap-out to ${paymentMeta.swap_out_address} for ${paymentMeta.swap_out_feerate_per_byte} sat/b",
                     minFinalCltvExpiryDelta = PaymentRequest.DEFAULT_MIN_FINAL_EXPIRY_DELTA,
                     features = nodeParams.features.invoiceFeatures()
-                )
+                ),
+                swapOutFee = paymentMeta.swap_out_fee_sat?.sat ?: 0.sat
             )
         } else if (head.paymentType() == "ClosingChannel") {
             OutgoingPayment.Details.ChannelClosing(
