@@ -84,8 +84,8 @@ class SyncSeedManager: SyncManagerProtcol {
 		self.encryptedNodeId = encryptedNodeId
 		
 		actor = SyncSeedManager_Actor(
-			isEnabled: Prefs.shared.backupSeed_isEnabled,
-			hasUploadedSeed: Prefs.shared.backupSeed_hasUploadedSeed(encryptedNodeId: encryptedNodeId)
+			isEnabled: Prefs.shared.backupSeed.isEnabled,
+			hasUploadedSeed: Prefs.shared.backupSeed.hasUploadedSeed(encryptedNodeId: encryptedNodeId)
 		)
 		statePublisher = CurrentValueSubject<SyncSeedManager_State, Never>(actor.initialState)
 		
@@ -208,7 +208,7 @@ class SyncSeedManager: SyncManagerProtcol {
 		log.trace("startPreferencesMonitor()")
 		
 		var isFirstFire = true
-		Prefs.shared.backupSeed_isEnabled_publisher.sink {[weak self](shouldEnable: Bool) in
+		Prefs.shared.backupSeed.isEnabled_publisher.sink {[weak self](shouldEnable: Bool) in
 			
 			if isFirstFire {
 				isFirstFire = false
@@ -231,7 +231,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	private func startNameMonitor() {
 		log.trace("startNameMonitor()")
 		
-		Prefs.shared.backupSeed_name_publisher.sink {[weak self] _ in
+		Prefs.shared.backupSeed.name_publisher.sink {[weak self] _ in
 			
 			guard let self = self else {
 				return
@@ -326,7 +326,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	private func uploadSeed() {
 		log.trace("uploadSeed()")
 		
-		let uploadedName = Prefs.shared.backupSeed_name(encryptedNodeId: encryptedNodeId) ?? ""
+		let uploadedName = Prefs.shared.backupSeed.name(encryptedNodeId: encryptedNodeId) ?? ""
 		
 		var cancellables = Set<AnyCancellable>()
 		let finish = { (result: Result<Void, Error>) in
@@ -335,13 +335,13 @@ class SyncSeedManager: SyncManagerProtcol {
 			case .success:
 				log.trace("uploadSeed(): finish(): success")
 				
-				let currentName = Prefs.shared.backupSeed_name(encryptedNodeId: self.encryptedNodeId) ?? ""
+				let currentName = Prefs.shared.backupSeed.name(encryptedNodeId: self.encryptedNodeId) ?? ""
 				let needsReUpload = currentName != uploadedName
 				
 				if needsReUpload {
 					log.debug("uploadSeed(): finish(): needsReUpload")
 				} else {
-					Prefs.shared.backupSeed_setHasUploadedSeed(true, encryptedNodeId: self.encryptedNodeId)
+					Prefs.shared.backupSeed.setHasUploadedSeed(true, encryptedNodeId: self.encryptedNodeId)
 				}
 				self.consecutiveErrorCount = 0
 				Task {
@@ -447,7 +447,7 @@ class SyncSeedManager: SyncManagerProtcol {
 			case .success:
 				log.trace("deleteSeed(): finish(): success")
 				
-				Prefs.shared.backupSeed_setHasUploadedSeed(false, encryptedNodeId: self.encryptedNodeId)
+				Prefs.shared.backupSeed.setHasUploadedSeed(false, encryptedNodeId: self.encryptedNodeId)
 				self.consecutiveErrorCount = 0
 				Task {
 					if let newState = await self.actor.didDeleteSeed() {

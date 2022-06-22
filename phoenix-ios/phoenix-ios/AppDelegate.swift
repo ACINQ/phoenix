@@ -81,7 +81,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		business = PhoenixBusiness(ctx: PlatformContext())
 		AppDelegate._isTestnet = business.chain.isTestnet()
 		super.init()
-		performVersionUpgradeChecks()
+		AppMigration.performMigrationChecks()
 		
 		let electrumConfig = Prefs.shared.electrumConfig
 		business.appConfigurationManager.updateElectrumConfig(server: electrumConfig?.serverAddress)
@@ -732,26 +732,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 					// User is restoring wallet after manually typing in the recovery phrase.
 					// So we can mark the manual_backup task as completed.
 					//
-					Prefs.shared.manualBackup_setTaskDone(true, encryptedNodeId: encryptedNodeId)
+					Prefs.shared.backupSeed.manualBackup_setTaskDone(true, encryptedNodeId: encryptedNodeId)
 					//
 					// And ensure cloud backup is disabled for the wallet.
 					//
-					Prefs.shared.backupSeed_isEnabled = false
-					Prefs.shared.backupSeed_setName(nil, encryptedNodeId: encryptedNodeId)
-					Prefs.shared.backupSeed_setHasUploadedSeed(false, encryptedNodeId: encryptedNodeId)
+					Prefs.shared.backupSeed.isEnabled = false
+					Prefs.shared.backupSeed.setName(nil, encryptedNodeId: encryptedNodeId)
+					Prefs.shared.backupSeed.setHasUploadedSeed(false, encryptedNodeId: encryptedNodeId)
 					
 				case .fromCloudBackup(let name):
 					//
 					// User is restoring wallet from an existing iCloud backup.
 					// So we can mark the iCloud backpu as completed.
 					//
-					Prefs.shared.backupSeed_isEnabled = true
-					Prefs.shared.backupSeed_setName(name, encryptedNodeId: encryptedNodeId)
-					Prefs.shared.backupSeed_setHasUploadedSeed(true, encryptedNodeId: encryptedNodeId)
+					Prefs.shared.backupSeed.isEnabled = true
+					Prefs.shared.backupSeed.setName(name, encryptedNodeId: encryptedNodeId)
+					Prefs.shared.backupSeed.setHasUploadedSeed(true, encryptedNodeId: encryptedNodeId)
 					//
 					// And ensure manual backup is diabled for the wallet.
 					//
-					Prefs.shared.manualBackup_setTaskDone(false, encryptedNodeId: encryptedNodeId)
+					Prefs.shared.backupSeed.manualBackup_setTaskDone(false, encryptedNodeId: encryptedNodeId)
 				}
 			}
 			
@@ -835,148 +835,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		// The ideal solution would be to have the server send some kind of Ack for the
 		// registration. Which we could then use to trigger a storage in UserDefaults.
 	}
-	
-	// --------------------------------------------------
-	// MARK: Migration
-	// --------------------------------------------------
-	
-	private func performVersionUpgradeChecks() -> Void {
-		
-		// Upgrade check(s)
-
-		let key = "lastVersionCheck"
-		let previousBuild = UserDefaults.standard.string(forKey: key) ?? "3"
-
-		// v0.7.3 (build 4)
-		// - serialization change for Channels
-		// - attempting to deserialize old version causes crash
-		// - we decided to delete old channels database (due to low number of test users)
-		//
-		if previousBuild.isVersion(lessThan: "4") {
-			migrateChannelsDbFiles()
-		}
-
-		// v0.7.4 (build 5)
-		// - serialization change for Channels
-		// - attempting to deserialize old version causes crash
-		//
-		if previousBuild.isVersion(lessThan: "5") {
-			migrateChannelsDbFiles()
-		}
-
-		// v0.7.6 (build 7)
-		// - adding support for both soft & hard biometrics
-		// - previously only supported hard biometics
-		//
-		if previousBuild.isVersion(lessThan: "7") {
-			AppSecurity.shared.performMigration(previousBuild: previousBuild)
-		}
-		
-		// v0.8.0 (build 8)
-		// - app db structure has changed
-		// - channels/payments db have changed but files are renamed, no need to delete
-		//
-		if previousBuild.isVersion(lessThan: "8") {
-			removeAppDbFile()
-		}
-
-		let currentBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
-		if previousBuild.isVersion(lessThan: currentBuild) {
-
-			UserDefaults.standard.set(currentBuild, forKey: key)
-		}
-	}
-	
-	private func migrateChannelsDbFiles() -> Void {
-		
-		let fm = FileManager.default
-		
-		let appSupportDirs = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask)
-		guard let appSupportDir = appSupportDirs.first else {
-			return
-		}
-		
-		let databasesDir = appSupportDir.appendingPathComponent("databases", isDirectory: true)
-		
-		let db1 = databasesDir.appendingPathComponent("channels.sqlite", isDirectory: false)
-		let db2 = databasesDir.appendingPathComponent("channels.sqlite-shm", isDirectory: false)
-		let db3 = databasesDir.appendingPathComponent("channels.sqlite-wal", isDirectory: false)
-		
-		if !fm.fileExists(atPath: db1.path) &&
-		   !fm.fileExists(atPath: db2.path) &&
-		   !fm.fileExists(atPath: db3.path)
-		{
-			// Database files don't exist. So there's nothing to migrate.
-			return
-		}
-		
-		let placeholder = "{version}"
-		
-		let template1 = "channels.\(placeholder).sqlite"
-		let template2 = "channels.\(placeholder).sqlite-shm"
-		let template3 = "channels.\(placeholder).sqlite-wal"
-		
-		var done = false
-		var version = 0
-		
-		while !done {
-			
-			let f1 = template1.replacingOccurrences(of: placeholder, with: String(version))
-			let f2 = template2.replacingOccurrences(of: placeholder, with: String(version))
-			let f3 = template3.replacingOccurrences(of: placeholder, with: String(version))
-			
-			let dst1 = databasesDir.appendingPathComponent(f1, isDirectory: false)
-			let dst2 = databasesDir.appendingPathComponent(f2, isDirectory: false)
-			let dst3 = databasesDir.appendingPathComponent(f3, isDirectory: false)
-			
-			if fm.fileExists(atPath: dst1.path) ||
-			   fm.fileExists(atPath: dst2.path) ||
-			   fm.fileExists(atPath: dst2.path)
-			{
-				version += 1
-			} else {
-				
-				try? fm.moveItem(at: db1, to: dst1)
-				try? fm.moveItem(at: db2, to: dst2)
-				try? fm.moveItem(at: db3, to: dst3)
-				
-				done = true
-			}
-		}
-		
-		// As a safety precaution (to prevent a crash), always delete the original filePath.
-		
-		try? fm.removeItem(at: db1)
-		try? fm.removeItem(at: db2)
-		try? fm.removeItem(at: db3)
-		
-		// We just migrated the user's channels database.
-		// Which means their existing channels are going to get force closed by the server.
-		// So we need to inform the user about what just happened.
-		
-//		popoverState.display(dismissable: false) {
-//			PardonOurMess()
-//		}
-	}
-	
-	private func removeAppDbFile() {
-		let fm = FileManager.default
-		
-		let appSupportDirs = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask)
-		guard let appSupportDir = appSupportDirs.first else {
-			return
-		}
-		
-		let databasesDir = appSupportDir.appendingPathComponent("databases", isDirectory: true)
-		let db = databasesDir.appendingPathComponent("app.sqlite", isDirectory: false)
-		if !fm.fileExists(atPath: db.path) {
-			return
-		} else {
-			try? fm.removeItem(at: db)
-		}
-	}
-}
-
-func assertMainThread() -> Void {
-	assert(Thread.isMainThread, "Improper thread: expected main thread; Thread-unsafe code ahead")
 }

@@ -113,9 +113,9 @@ class SyncTxManager {
 		self.encryptedNodeId = encryptedNodeId
 		
 		self.actor = SyncTxManager_Actor(
-			isEnabled: Prefs.shared.backupTransactions_isEnabled,
-			recordZoneCreated: Prefs.shared.recordZoneCreated(encryptedNodeId: encryptedNodeId),
-			hasDownloadedRecords: Prefs.shared.hasDownloadedRecords(encryptedNodeId: encryptedNodeId)
+			isEnabled: Prefs.shared.backupTransactions.isEnabled,
+			recordZoneCreated: Prefs.shared.backupTransactions.recordZoneCreated(encryptedNodeId: encryptedNodeId),
+			hasDownloadedRecords: Prefs.shared.backupTransactions.hasDownloadedRecords(encryptedNodeId: encryptedNodeId)
 		)
 		statePublisher = CurrentValueSubject<SyncTxManager_State, Never>(.initializing)
 		
@@ -149,7 +149,7 @@ class SyncTxManager {
 			let count = Int(clamping: queueCount)
 			
 			let wait: SyncTxManager_State_Waiting?
-			if Prefs.shared.backupTransactions_useUploadDelay {
+			if Prefs.shared.backupTransactions.useUploadDelay {
 				let delay = TimeInterval.random(in: 10 ..< 900)
 				wait = SyncTxManager_State_Waiting(kind: .randomizedUploadDelay, parent: self, delay: delay)
 			} else {
@@ -169,7 +169,7 @@ class SyncTxManager {
 		log.trace("startPreferencesMonitor()")
 		
 		var isFirstFire = true
-		Prefs.shared.backupTransactions_isEnabledPublisher.sink {[weak self](shouldEnable: Bool) in
+		Prefs.shared.backupTransactions.isEnabledPublisher.sink {[weak self](shouldEnable: Bool) in
 			
 			if isFirstFire {
 				isFirstFire = false
@@ -243,12 +243,12 @@ class SyncTxManager {
 						// We were going to enable cloud syncing.
 						// But the user just changed their mind, and cancelled it.
 						// So now we need to disable it again.
-						Prefs.shared.backupTransactions_isEnabled = false
+						Prefs.shared.backupTransactions.isEnabled = false
 					} else {
 						// We were going to disable cloud syncing.
 						// But the user just changed their mind, and cancelled it.
 						// So now we need to enable it again.
-						Prefs.shared.backupTransactions_isEnabled = true
+						Prefs.shared.backupTransactions.isEnabled = true
 					}
 				}
 			}
@@ -377,7 +377,7 @@ class SyncTxManager {
 			case .success:
 				log.trace("createZone(): finish(): success")
 				
-				Prefs.shared.setRecordZoneCreated(true, encryptedNodeId: self.encryptedNodeId)
+				Prefs.shared.backupTransactions.setRecordZoneCreated(true, encryptedNodeId: self.encryptedNodeId)
 				self.consecutiveErrorCount = 0
 				Task {
 					if let newState = await self.actor.didCreateRecordZone() {
@@ -434,7 +434,7 @@ class SyncTxManager {
 			case .success:
 				log.trace("deleteRecordZone(): finish(): success")
 				
-				Prefs.shared.setRecordZoneCreated(false, encryptedNodeId: self.encryptedNodeId)
+				Prefs.shared.backupTransactions.setRecordZoneCreated(false, encryptedNodeId: self.encryptedNodeId)
 				self.consecutiveErrorCount = 0
 				Task {
 					if let newState = await self.actor.didDeleteRecordZone() {
@@ -523,7 +523,7 @@ class SyncTxManager {
 			case .success:
 				log.trace("downloadPayments(): finish(): success")
 				
-				Prefs.shared.setHasDownloadedRecords(true, encryptedNodeId: self.encryptedNodeId)
+				Prefs.shared.backupTransactions.setHasDownloadedRecords(true, encryptedNodeId: self.encryptedNodeId)
 				self.consecutiveErrorCount = 0
 				Task {
 					if let newState = await self.actor.didDownloadPayments() {
@@ -1092,7 +1092,7 @@ class SyncTxManager {
 			}
 			
 			let configuration = CKOperation.Configuration()
-			configuration.allowsCellularAccess = Prefs.shared.backupTransactions_useCellular
+			configuration.allowsCellularAccess = Prefs.shared.backupTransactions.useCellular
 			
 			operation.configuration = configuration
 			
