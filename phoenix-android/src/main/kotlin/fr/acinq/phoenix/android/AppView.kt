@@ -129,9 +129,7 @@ fun AppView(
                             onPaymentClick = { navigateToPaymentDetails(navController, it) },
                             onSettingsClick = { navController.navigate(Screen.Settings.route) },
                             onReceiveClick = { navController.navigate(Screen.Receive.route) },
-                            onSendClick = {
-                                navController.navigate(Screen.ScanData.route) { launchSingleTop = true }
-                            }
+                            onSendClick = { navController.navigate(Screen.ScanData.route) { launchSingleTop = true } }
                         )
                     }
                 }
@@ -139,7 +137,13 @@ fun AppView(
                     ReceiveView()
                 }
                 composable(Screen.ScanData.route) {
-                    ScanDataView(onBackClick = { navController.popBackStack() })
+                    ScanDataView(onBackClick = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Home.route) {
+                                inclusive = true
+                            }
+                        }
+                    })
                 }
                 composable(
                     route = "${Screen.PaymentDetails.route}/{direction}/{id}",

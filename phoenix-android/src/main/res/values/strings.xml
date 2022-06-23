@@ -199,15 +199,15 @@
     <string name="scan_error_expired">Payment has expired.</string>
     <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
     <string name="scan_error_invalid_chain">This payment does not use the same blockchain as your wallet.</string>
-    <string name="scan_error_lnurl_unsupported">This type of Lightning URL is not supported yet!</string>
-    <string name="scan_error_invalid_scan">Invalid data.\nPlease try again.</string>
+    <string name="scan_error_lnurl_invalid">Failed to process this LNUrl link. Make sure it is valid.</string>
+    <string name="scan_error_lnurl_service_error">The LNUrl service returned an error.</string>
+    <string name="scan_error_lnurl_unsupported">This type of LNUrl is not supported yet!</string>
+    <string name="scan_error_invalid_generic">This data uses an unknown format and cannot be processed.</string>
+
+    <string name="scan_lnurl_fetching">Fetching data from service…</string>
 
     <string name="scan_amountless_legacy_title">Warning</string>
-    <string name="scan_amountless_legacy_message"><![CDATA[
-    This invoice doesn\'t include an amount. This may be dangerous: malicious nodes may be able to steal your payment. To be safe, you should <b>ask the payee to specify an amount</b> in the payment request.
-    <br /><br />
-    Are you sure you want to pay this invoice?
-  ]]></string>
+    <string name="scan_amountless_legacy_message">This invoice doesn\'t include an amount. This may be dangerous: malicious nodes may be able to steal your payment. To be safe, you should <b>ask the payee to specify an amount</b> in the payment request.\n\nAre you sure you want to pay this invoice?</string>
     <string name="scan_amountless_legacy_confirm_button">Confirm</string>
     <string name="scan_amountless_legacy_cancel_button">Cancel</string>
 

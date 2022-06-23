@@ -33,7 +33,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -116,14 +115,12 @@ private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: (
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ChannelDialog(onDismiss: () -> Unit, channel: ChannelsConfiguration.Model.Channel) {
     val context = LocalContext.current
     val business = business
     Dialog(
         onDismiss = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false),
         buttons = {
             Row(Modifier.fillMaxWidth()) {
                 Button(onClick = { copyToClipboard(context, channel.json, "channel data") }, icon = R.drawable.ic_copy)

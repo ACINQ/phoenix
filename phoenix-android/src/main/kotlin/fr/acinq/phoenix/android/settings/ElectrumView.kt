@@ -27,7 +27,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -124,7 +123,6 @@ fun ElectrumView() {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ElectrumServerDialog(
     initialAddress: ServerAddress?,
@@ -136,7 +134,6 @@ private fun ElectrumServerDialog(
     var addressError by rememberSaveable { mutableStateOf(false) }
     Dialog(
         onDismiss = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false),
         buttons = {
             Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel))
             Button(

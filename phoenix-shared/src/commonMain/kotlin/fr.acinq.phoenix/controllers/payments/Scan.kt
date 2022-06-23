@@ -36,7 +36,6 @@ object Scan {
 
     sealed class BadRequestReason {
         object UnknownFormat : BadRequestReason()
-        object IsBitcoinAddress : BadRequestReason()
         object AlreadyPaidInvoice : BadRequestReason()
         data class ChainMismatch(val myChain: Chain, val requestChain: Chain?) : BadRequestReason()
         data class ServiceError(val url: Url, val error: LNUrl.Error.RemoteFailure) : BadRequestReason()
