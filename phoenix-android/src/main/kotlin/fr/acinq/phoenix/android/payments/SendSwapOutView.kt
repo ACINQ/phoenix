@@ -21,8 +21,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -42,6 +44,7 @@ import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.WalletContext
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SendSwapOutView(
     model: Scan.Model.SwapOutFlow,
@@ -56,6 +59,7 @@ fun SendSwapOutView(
 
     val context = LocalContext.current
     val prefBtcUnit = LocalBitcoinUnit.current
+    val keyboardManager = LocalSoftwareKeyboardController.current
 
     val requestedAmount = model.address.amount
     var amount by remember { mutableStateOf(model.address.amount) }
@@ -127,9 +131,8 @@ fun SendSwapOutView(
                     enabled = amountErrorMessage.isBlank(),
                 ) {
                     amount?.let {
-                        onPrepareSwapOutClick(
-                            Scan.Intent.SwapOutFlow.PrepareSwapOut(address = model.address, amount = it)
-                        )
+                        keyboardManager?.hide()
+                        onPrepareSwapOutClick(Scan.Intent.SwapOutFlow.PrepareSwapOut(address = model.address, amount = it))
                     } ?: run {
                         amountErrorMessage = context.getString(R.string.send_error_amount_invalid)
                     }
