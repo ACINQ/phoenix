@@ -170,7 +170,7 @@ fun SendSwapOutView(
                 }
             }
             is Scan.Model.SwapOutFlow.SendingSwapOut -> {
-                Text(stringResource(id = R.string.send_swapout_payment_in_progress))
+                LaunchedEffect(key1 = Unit) { onBackClick() }
             }
         }
     }

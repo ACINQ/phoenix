@@ -188,7 +188,6 @@
     <string name="send_swapout_mining_fee_dialog_body">
       Payments to on-chain addresses require a swap and incur mining fees for the Bitcoin network. The fee rate used for the transaction is fixed by the swap service.
     </string>
-    <string name="send_swapout_payment_in_progress">Transaction in progress…</string>
 
     <!-- //////////////// scan //////////////// -->
 
