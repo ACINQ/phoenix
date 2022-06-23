@@ -84,11 +84,11 @@ fun SendSwapOutView(
             initialAmount = amount,
             onAmountChange = { newAmount ->
                 amountErrorMessage = ""
+                if (model !is Scan.Model.SwapOutFlow.Init && amount != newAmount) {
+                    // if amount changes after a swap-out request has already been prepared, we must start over again
+                    onInvalidate(Scan.Intent.SwapOutFlow.Invalidate(model.address))
+                }
                 when {
-                    model !is Scan.Model.SwapOutFlow.Init && amount != newAmount -> {
-                        // if amount changes after a swap-out request has already been prepared, we must start over again
-                        onInvalidate(Scan.Intent.SwapOutFlow.Invalidate(model.address))
-                    }
                     newAmount < swapOutConfig.minAmountSat.sat -> {
                         amountErrorMessage = context.getString(
                             R.string.send_swapout_error_amount_too_small,
