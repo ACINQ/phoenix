@@ -17,13 +17,13 @@ object Versions {
 
     object Android {
         const val ktx = "1.5.0"
-        const val lifecycle = "2.3.1"
-        const val prefs = "1.1.1"
+        const val lifecycle = "2.4.1"
+        const val prefs = "1.2.0"
         const val datastore = "1.0.0"
-        const val compose = "1.1.0-beta02"
-        const val navCompose = "2.4.0-beta02"
-        const val constraintLayoutCompose = "1.0.0-beta02"
-        const val accompanist = "0.21.4-beta"
+        const val compose = "1.1.1"
+        const val navCompose = "2.4.2"
+        const val constraintLayoutCompose = "1.0.1"
+        const val accompanist = "0.23.1"
         const val biometrics = "1.1.0"
 
         const val zxing = "4.1.0"
