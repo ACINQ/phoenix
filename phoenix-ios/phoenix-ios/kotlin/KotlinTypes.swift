@@ -76,7 +76,6 @@ extension Scan {
 	typealias BadRequestReason_AlreadyPaidInvoice = BadRequestReasonAlreadyPaidInvoice
 	typealias BadRequestReason_ChainMismatch = BadRequestReasonChainMismatch
 	typealias BadRequestReason_InvalidLnUrl = BadRequestReasonInvalidLnUrl
-	typealias BadRequestReason_IsBitcoinAddress = BadRequestReasonIsBitcoinAddress
 	typealias BadRequestReason_ServiceError = BadRequestReasonServiceError
 	typealias BadRequestReason_UnknownFormat = BadRequestReasonUnknownFormat
 	typealias BadRequestReason_UnsupportedLnUrl = BadRequestReasonUnsupportedLnUrl

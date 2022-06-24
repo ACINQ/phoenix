@@ -148,16 +148,6 @@ struct SendView: MVIView {
 				comment: "Error message - scanning lightning invoice"
 			)
 			
-		} else if model.reason is Scan.BadRequestReason_IsBitcoinAddress {
-			
-			msg = NSLocalizedString(
-				"""
-				You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments. \
-				You can use a third-party service to make the offchain->onchain swap.
-				""",
-				comment: "Error message - scanning lightning invoice"
-			)
-			
 		} else if model.reason is Scan.BadRequestReason_AlreadyPaidInvoice {
 			
 			msg = NSLocalizedString(

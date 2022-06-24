@@ -1224,10 +1224,10 @@ struct ValidateView: View {
 			saveTipPercentInPrefs()
 			mvi.intent(Scan.Intent_SwapOutFlow_Send(
 				amount: model.initialUserAmount.plus(other: model.fee),
+				swapOutFee: model.fee,
 				address: model.address,
 				paymentRequest: model.paymentRequest,
-				maxFees: Prefs.shared.maxFees?.toKotlin(),
-				swapOutFee: model.fee
+				maxFees: Prefs.shared.maxFees?.toKotlin()
 			))
 			
 		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
