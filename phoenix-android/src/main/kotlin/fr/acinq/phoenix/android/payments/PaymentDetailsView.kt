@@ -129,7 +129,7 @@ private fun CenterContentView(
         verticalArrangement = Arrangement.Center
     ) {
         Card(modifier = Modifier) {
-            Text(stringResource(id = R.string.paymentdetails_loading))
+            content()
         }
     }
 }
