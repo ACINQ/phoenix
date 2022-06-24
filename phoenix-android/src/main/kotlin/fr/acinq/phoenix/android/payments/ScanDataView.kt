@@ -107,6 +107,9 @@ fun ScanDataView(
                     onPayClick = { postIntent(it) }
                 )
             }
+            Scan.Model.InvoiceFlow.Sending -> {
+                LaunchedEffect(key1 = Unit) { onBackClick() }
+            }
             is Scan.Model.SwapOutFlow -> {
                 val paymentRequest = model.address.paymentRequest
                 if (paymentRequest == null) {
@@ -134,7 +137,6 @@ fun ScanDataView(
                     }
                 }
             }
-            Scan.Model.InvoiceFlow.Sending -> Text("Sending payment...")
         }
     }
 }

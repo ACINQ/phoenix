@@ -122,7 +122,6 @@ class AppScanController(
             is Scan.Intent.Parse -> launch { processScannedInput(intent) }
             is Scan.Intent.InvoiceFlow.ConfirmDangerousRequest -> launch { confirmAmountlessInvoice(intent) }
             is Scan.Intent.InvoiceFlow.SendInvoicePayment -> launch {
-                model(Scan.Model.InvoiceFlow.Sending)
                 sendPayment(
                     amountToSend = intent.amount,
                     paymentRequest = intent.paymentRequest,
@@ -130,6 +129,7 @@ class AppScanController(
                     metadata = null,
                     swapOutData = null
                 )
+                model(Scan.Model.InvoiceFlow.Sending)
             }
             is Scan.Intent.CancelLnurlServiceFetch -> launch { cancelLnurlFetch() }
             is Scan.Intent.LnurlPayFlow.SendLnurlPayment -> launch { processLnurlPay(intent) }
@@ -310,7 +310,6 @@ class AppScanController(
             )
         }
 
-        model(Scan.Model.LnurlPayFlow.Sending)
         peer.send(
             if (swapOutData != null) {
                 SendPaymentSwapOut(
@@ -408,6 +407,7 @@ class AppScanController(
                     ),
                     swapOutData = null,
                 )
+                model(Scan.Model.LnurlPayFlow.Sending)
             }
         }
     }
