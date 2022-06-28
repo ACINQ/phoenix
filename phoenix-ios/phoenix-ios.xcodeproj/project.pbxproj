@@ -80,7 +80,7 @@
 		DC384D7F265BF36600131772 /* StyledString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D7E265BF36600131772 /* StyledString.swift */; };
 		DC384D81265C12B700131772 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D80265C12B700131772 /* Cache.swift */; };
 		DC384D83265C32F100131772 /* TextField+Verbatim.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D82265C32F100131772 /* TextField+Verbatim.swift */; };
-		DC4195D825FA6EBA008F0888 /* DYPopoverView in Frameworks */ = {isa = PBXBuildFile; productRef = DC4195D725FA6EBA008F0888 /* DYPopoverView */; };
+		DC39D4E5286B4A7E0030F18D /* Popovers in Frameworks */ = {isa = PBXBuildFile; productRef = DC39D4E4286B4A7E0030F18D /* Popovers */; };
 		DC46BAE426C6FDD300E760A6 /* CircularCheckmarkProgress in Frameworks */ = {isa = PBXBuildFile; productRef = DC46BAE326C6FDD300E760A6 /* CircularCheckmarkProgress */; };
 		DC46BAF326CACCF700E760A6 /* KotlinExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAED26CACCF700E760A6 /* KotlinExtensions.swift */; };
 		DC46BAF426CACCF700E760A6 /* KotlinFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */; };
@@ -399,9 +399,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				DCD71A79273987FE00B9A1EF /* Focuser in Frameworks */,
-				DC4195D825FA6EBA008F0888 /* DYPopoverView in Frameworks */,
 				DC46BAE426C6FDD300E760A6 /* CircularCheckmarkProgress in Frameworks */,
 				DCC9D99C267BEB3D00EA36DD /* CloudKit.framework in Frameworks */,
+				DC39D4E5286B4A7E0030F18D /* Popovers in Frameworks */,
 				DCC46F1625C3521C005D32D9 /* FirebaseMessaging in Frameworks */,
 				DCB0DB8A255AE42F005B29C8 /* PhoenixShared.framework in Frameworks */,
 			);
@@ -880,9 +880,9 @@
 			name = "phoenix-ios";
 			packageProductDependencies = (
 				DC72C31825A3CF87008A927A /* FirebaseMessaging */,
-				DC4195D725FA6EBA008F0888 /* DYPopoverView */,
 				DC46BAE326C6FDD300E760A6 /* CircularCheckmarkProgress */,
 				DCD71A78273987FE00B9A1EF /* Focuser */,
+				DC39D4E4286B4A7E0030F18D /* Popovers */,
 			);
 			productName = "phoenix-ios";
 			productReference = 7555FF7B242A565900829871 /* Phoenix.app */;
@@ -987,9 +987,9 @@
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
 				DC72C2EA25A3CADC008A927A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				DC4195CB25FA6777008F0888 /* XCRemoteSwiftPackageReference "DYPopoverView" */,
 				DC46BAE226C6FDD300E760A6 /* XCRemoteSwiftPackageReference "CircularCheckmarkProgress" */,
 				DCD71A752739864400B9A1EF /* XCRemoteSwiftPackageReference "swift-focuser" */,
+				DC39D4E3286B4A7E0030F18D /* XCRemoteSwiftPackageReference "Popovers" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -1708,12 +1708,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		DC4195CB25FA6777008F0888 /* XCRemoteSwiftPackageReference "DYPopoverView" */ = {
+		DC39D4E3286B4A7E0030F18D /* XCRemoteSwiftPackageReference "Popovers" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/DominikButz/DYPopoverView.git";
+			repositoryURL = "https://github.com/aheze/Popovers";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.1;
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.3.0;
 			};
 		};
 		DC46BAE226C6FDD300E760A6 /* XCRemoteSwiftPackageReference "CircularCheckmarkProgress" */ = {
@@ -1743,10 +1743,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		DC4195D725FA6EBA008F0888 /* DYPopoverView */ = {
+		DC39D4E4286B4A7E0030F18D /* Popovers */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = DC4195CB25FA6777008F0888 /* XCRemoteSwiftPackageReference "DYPopoverView" */;
-			productName = DYPopoverView;
+			package = DC39D4E3286B4A7E0030F18D /* XCRemoteSwiftPackageReference "Popovers" */;
+			productName = Popovers;
 		};
 		DC46BAE326C6FDD300E760A6 /* CircularCheckmarkProgress */ = {
 			isa = XCSwiftPackageProductDependency;

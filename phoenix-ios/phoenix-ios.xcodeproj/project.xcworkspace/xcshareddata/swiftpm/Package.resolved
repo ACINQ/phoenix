@@ -28,15 +28,6 @@
       }
     },
     {
-      "identity" : "dypopoverview",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/DominikButz/DYPopoverView.git",
-      "state" : {
-        "revision" : "1dbd6cca68d4d833bbe7e0122913eecf39d41c2e",
-        "version" : "1.1.1"
-      }
-    },
-    {
       "identity" : "firebase-ios-sdk",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/firebase-ios-sdk.git",
@@ -106,6 +97,15 @@
       "state" : {
         "revision" : "819d0a2173aff699fb8c364b6fb906f7cdb1a692",
         "version" : "2.30909.0"
+      }
+    },
+    {
+      "identity" : "popovers",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/aheze/Popovers",
+      "state" : {
+        "revision" : "de44c4dd7271ec6413fe350f7efadb14e5e18dce",
+        "version" : "1.3.2"
       }
     },
     {

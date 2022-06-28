@@ -87,18 +87,17 @@ extension Lightning_kmpWalletPayment {
 		return nil
 	}
 	
-	func paymentFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String)? {
+	func standardFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String)? {
 		
 		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
 		
 			// An incomingPayment may have fees if a new channel was automatically opened
 			if let received = incomingPayment.received {
-				
+					
 				let msat = received.receivedWith.map { $0.fees.msat }.reduce(0, +)
 				if msat > 0 {
 					
 					let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
-					
 					let exp = NSLocalizedString(
 						"""
 						In order to receive this payment, a new payment channel was opened. \
@@ -120,7 +119,7 @@ extension Lightning_kmpWalletPayment {
 			}
 			
 		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
-			
+		
 			if let _ = outgoingPayment.status.asFailed() {
 				
 				// no fees for failed payments
@@ -151,7 +150,11 @@ extension Lightning_kmpWalletPayment {
 				
 			} else if let _ = outgoingPayment.status.asOffChain() {
 				
-				let msat = outgoingPayment.fees.msat
+				let msat = outgoingPayment.routingFee.msat // excludes swapOutFee
+				if msat == 0 {
+					return nil
+				}
+				
 				let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
 				
 				var parts = 0
@@ -191,6 +194,30 @@ extension Lightning_kmpWalletPayment {
 		}
 		
 		return nil
+	}
+	
+	func swapOutFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String)? {
+		
+		guard let outgoingPayment = self as? Lightning_kmpOutgoingPayment else {
+			return nil
+		}
+		
+		if let _ = outgoingPayment.details.asSwapOut() {
+			
+			let msat = outgoingPayment.fees.msat - outgoingPayment.routingFee.msat
+			let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
+			
+			let exp = NSLocalizedString(
+				"Includes Bitcoin network miner fees, and the fee for the Swap-Out service.",
+				comment: "Fees explanation"
+			)
+			
+			return (formattedAmt, exp)
+			
+		} else {
+			
+			return nil
+		}
 	}
 	
 	/// If the OutgoingPayment succeeded or failed, reports the total elapsed time.
