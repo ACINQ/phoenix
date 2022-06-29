@@ -1,6 +1,6 @@
 import SwiftUI
 import PhoenixShared
-import DYPopoverView
+import Popovers
 import os.log
 
 #if DEBUG && false
@@ -12,18 +12,12 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-fileprivate let explainFeesButtonViewId = "explainFeesButtonViewId"
-
 struct SummaryView: View {
 	
 	@State var paymentInfo: WalletPaymentInfo
 	@State var paymentInfoIsStale: Bool
 	
 	let closeSheet: () -> Void
-	
-	@State var explainFeesText: String = ""
-	@State var explainFeesPopoverVisible = false
-	@State var explainFeesPopoverFrame = CGRect(x: 0, y: 0, width: 200, height:500)
 	
 	@State var showDeletePaymentConfirmationDialog = false
 	
@@ -98,30 +92,6 @@ struct SummaryView: View {
 					.padding()
 				}
 				Spacer()
-			}
-
-			// An invisible layer used to detect taps, and dismiss the DYPopoverView.
-			if explainFeesPopoverVisible {
-				Color.clear
-					.contentShape(Rectangle()) // required: https://stackoverflow.com/a/60151771/43522
-					.onTapGesture {
-						explainFeesPopoverVisible = false
-					}
-			}
-		}
-		.popoverView( // DYPopoverView
-			content: { ExplainFeesPopover(explanationText: $explainFeesText) },
-			background: { Color.mutedBackground },
-			isPresented: $explainFeesPopoverVisible,
-			frame: $explainFeesPopoverFrame,
-			anchorFrame: nil,
-			popoverType: .popover,
-			position: .top,
-			viewId: explainFeesButtonViewId
-		)
-		.onPreferenceChange(ExplainFeesPopoverHeight.self) {
-			if let height = $0 {
-				explainFeesPopoverFrame = CGRect(x: 0, y: 0, width: explainFeesPopoverFrame.width, height: height)
 			}
 		}
 		.onAppear { onAppear() }
@@ -264,10 +234,7 @@ struct SummaryView: View {
 			)
 			.padding(.bottom, 24)
 			
-			SummaryInfoGrid(
-				paymentInfo: $paymentInfo,
-				explainFeesPopoverVisible: $explainFeesPopoverVisible
-			)
+			SummaryInfoGrid(paymentInfo: $paymentInfo)
 			
 			if #available(iOS 15.0, *) {
 				if payment.state() == WalletPaymentState.failure {
@@ -377,12 +344,6 @@ struct SummaryView: View {
 		currencyPrefs.toggleCurrencyType()
 	}
 	
-	func explainFeesPopoverText() -> String {
-		
-		let feesInfo = paymentInfo.payment.paymentFees(currencyPrefs: currencyPrefs)
-		return feesInfo?.1 ?? ""
-	}
-	
 	func onAppear() {
 		log.trace("onAppear()")
 		
@@ -393,9 +354,6 @@ struct SummaryView: View {
 			didAppear = true
 			
 			// First time displaying the SummaryView (coming from HomeView)
-			
-			// Update text in explainFeesPopover
-			explainFeesText = explainFeesPopoverText()
 			
 			if paymentInfoIsStale {
 				
@@ -408,7 +366,6 @@ struct SummaryView: View {
 
 						if let result = result {
 							paymentInfo = result
-							explainFeesText = explainFeesPopoverText()
 						}
 					}
 
@@ -418,7 +375,6 @@ struct SummaryView: View {
 						
 						if let result = result {
 							paymentInfo = result
-							explainFeesText = explainFeesPopoverText()
 						}
 					}
 				}
@@ -434,7 +390,6 @@ struct SummaryView: View {
 				
 				if let result = result {
 					paymentInfo = result
-					explainFeesText = explainFeesPopoverText()
 				}
 			}
 		}
@@ -463,7 +418,6 @@ struct SummaryView: View {
 fileprivate struct SummaryInfoGrid: InfoGridView {
 	
 	@Binding var paymentInfo: WalletPaymentInfo
-	@Binding var explainFeesPopoverVisible: Bool
 	
 	// <InfoGridView Protocol>
 	@State var keyColumnWidths: [InfoGridRow_KeyColumn_Width] = []
@@ -481,6 +435,9 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	private let verticalSpacingBetweenRows: CGFloat = 12
 	private let horizontalSpacingBetweenColumns: CGFloat = 8
 	
+	@State var popoverPresent_standardFees = false
+	@State var popoverPresent_swapFees = false
+	
 	@Environment(\.openURL) var openURL
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
@@ -495,14 +452,38 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			// Splitting this up into separate ViewBuilders,
 			// because the compiler will sometimes choke while processing this method.
 			
-			paymentServiceRow
-			paymentDescriptionRow
-			paymentMessageRow
-			paymentNotesRow
-			paymentTypeRow
-			channelClosingRow
-			paymentFeesRow
-			paymentErrorRow
+			paymentServiceRow()
+			paymentDescriptionRow()
+			paymentMessageRow()
+			paymentNotesRow()
+			paymentTypeRow()
+			channelClosingRow()
+			
+			let standardFees = paymentInfo.payment.standardFees(currencyPrefs: currencyPrefs)
+			let swapOutFees = paymentInfo.payment.swapOutFees(currencyPrefs: currencyPrefs)
+			
+			if let standardFees = standardFees {
+				let title = swapOutFees == nil
+				  ? NSLocalizedString("Fees", comment: "Label in SummaryInfoGrid")
+				  : NSLocalizedString("Lightning Fees", comment: "Label in SummaryInfoGrid")
+				
+				paymentFeesRow(
+					title: title,
+					amount: standardFees.0,
+					explanation: standardFees.1,
+					binding: $popoverPresent_standardFees
+				)
+			}
+			if let swapOutFees = swapOutFees {
+				paymentFeesRow(
+					title: NSLocalizedString("Swap Fees", comment: "Label in SummaryInfoGrid"),
+					amount: swapOutFees.0,
+					explanation: swapOutFees.1,
+					binding: $popoverPresent_swapFees
+				)
+			}
+			
+			paymentErrorRow()
 		}
 		.padding([.leading, .trailing])
 	}
@@ -514,7 +495,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	var paymentServiceRow: some View {
+	func paymentServiceRow() -> some View {
 		let identifier: String = #function
 		
 		if let lnurlPay = paymentInfo.metadata.lnurl?.pay {
@@ -535,7 +516,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	var paymentDescriptionRow: some View {
+	func paymentDescriptionRow() -> some View {
 		let identifier: String = #function
 		
 		InfoGridRow(
@@ -562,7 +543,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	var paymentMessageRow: some View {
+	func paymentMessageRow() -> some View {
 		let identifier: String = #function
 		let successAction = paymentInfo.metadata.lnurl?.successAction
 		
@@ -672,7 +653,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	var paymentNotesRow: some View {
+	func paymentNotesRow() -> some View {
 		let identifier: String = #function
 		
 		if let notes = paymentInfo.metadata.userNotes, notes.count > 0 {
@@ -693,7 +674,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	var paymentTypeRow: some View {
+	func paymentTypeRow() -> some View {
 		let identifier: String = #function
 		
 		if let pType = paymentInfo.payment.paymentType() {
@@ -719,7 +700,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 						Button {
 							openURL(link)
 						} label: {
-							Text("blockchain tx")
+							Text("view on blockchain")
 						}
 					}
 				}
@@ -728,7 +709,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	var channelClosingRow: some View {
+	func channelClosingRow() -> some View {
 		let identifier: String = #function
 		
 		if let pClosingInfo = paymentInfo.payment.channelClosing() {
@@ -767,65 +748,70 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	var paymentFeesRow: some View {
-		let identifier: String = #function
+	func paymentFeesRow(
+		title: String,
+		amount: FormattedAmount,
+		explanation: String,
+		binding: Binding<Bool>
+	) -> some View {
+		let identifier: String = "paymentFeesRow:\(title)"
 		
-		if let pFees = paymentInfo.payment.paymentFees(currencyPrefs: currencyPrefs) {
-
-			InfoGridRow(
-				identifier: identifier,
-				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
-			) {
+		InfoGridRow(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			
+			keyColumn(title)
+			
+		} valueColumn: {
 				
-				keyColumn(NSLocalizedString("Fees", comment: "Label in SummaryInfoGrid"))
+			HStack(alignment: VerticalAlignment.center, spacing: 6) {
 				
-			} valueColumn: {
-				
-				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				if amount.hasSubFractionDigits {
 					
-					let amount: FormattedAmount = pFees.0
+					// We're showing sub-fractional values.
+					// For example, we're showing millisatoshis.
+					//
+					// It's helpful to downplay the sub-fractional part visually.
 					
-					if amount.hasSubFractionDigits {
-						
-						// We're showing sub-fractional values.
-						// For example, we're showing millisatoshis.
-						//
-						// It's helpful to downplay the sub-fractional part visually.
-						
-						let hasStdFractionDigits = amount.hasStdFractionDigits
-						
-						let styledText: Text =
-							Text(verbatim: amount.integerDigits)
-						+	Text(verbatim: amount.decimalSeparator)
-								.foregroundColor(hasStdFractionDigits ? .primary : .secondary)
-						+	Text(verbatim: amount.stdFractionDigits)
-						+	Text(verbatim: amount.subFractionDigits)
-								.foregroundColor(.secondary)
-								.font(.callout)
-								.fontWeight(.light)
-						+	Text(verbatim: " \(amount.type)")
-						
-						styledText
-							.onTapGesture { toggleCurrencyType() }
-						
-					} else {
-						Text(amount.string)
-							.onTapGesture { toggleCurrencyType() }
+					let hasStdFractionDigits = amount.hasStdFractionDigits
+					
+					let styledText: Text =
+						Text(verbatim: amount.integerDigits)
+					+	Text(verbatim: amount.decimalSeparator)
+							.foregroundColor(hasStdFractionDigits ? .primary : .secondary)
+					+	Text(verbatim: amount.stdFractionDigits)
+					+	Text(verbatim: amount.subFractionDigits)
+							.foregroundColor(.secondary)
+							.font(.callout)
+							.fontWeight(.light)
+					+	Text(verbatim: " \(amount.type)")
+					
+					styledText
+						.onTapGesture { toggleCurrencyType() }
+					
+				} else {
+					Text(amount.string)
+						.onTapGesture { toggleCurrencyType() }
+				}
+				
+				if !explanation.isEmpty {
+					
+					Button {
+						binding.wrappedValue.toggle()
+					//	popoverPresent_lightningFees = true
+					} label: {
+						Image(systemName: "questionmark.circle")
+							.renderingMode(.template)
+							.foregroundColor(.secondary)
+							.font(.body)
 					}
-					
-					if pFees.1.count > 0 {
-						
-						Button {
-							explainFeesPopoverVisible = true
-						} label: {
-							Image(systemName: "questionmark.circle")
-								.renderingMode(.template)
-								.foregroundColor(.secondary)
-								.font(.body)
+					.popover(present: binding) {
+						Templates.Container {
+							Text(verbatim: explanation)
+								.padding(.all, 4)
 						}
-						.anchorView(viewId: explainFeesButtonViewId)
-						.padding(.leading, 6)
 					}
 				}
 			}
@@ -833,7 +819,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	var paymentErrorRow: some View {
+	func paymentErrorRow() -> some View {
 		let identifier: String = #function
 		
 		if let pError = paymentInfo.payment.paymentFinalError() {
@@ -886,50 +872,5 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 
 	func toggleCurrencyType() -> Void {
 		currencyPrefs.toggleCurrencyType()
-	}
-}
-
-fileprivate struct ExplainFeesPopover: View {
-	
-	@Binding var explanationText: String
-	
-	var body: some View {
-		
-		VStack {
-			Text(explanationText)
-				.padding()
-				.background(GeometryReader { proxy in
-					Color.clear.preference(
-						key: ExplainFeesPopoverHeight.self,
-						value: proxy.size.height
-					)
-				})
-		}.frame(minHeight: 500)
-		// ^^^ Why? ^^^
-		//
-		// We're trying to accomplish 2 things:
-		// - allow the explanationText to be dynamically changed
-		// - calculate the appropriate height for the text
-		//
-		// But there's a problem, which occurs like so:
-		// - explainFeesPopoverFrame starts with hard-coded frame of (150, 500)
-		// - SwiftUI performs layout of our body with inherited frame of (150, 500)
-		// - We calculate appropriate height (X) for our text,
-		//   and it gets reported via ExplainFeesPopoverHeight
-		// - explainFeesPopoverFrame is resized to (150, X)
-		// - explanationText is changed, triggering a view update
-		// - SwiftUI performs layout of our body with previous frame of (150, X)
-		// - Text cannot report appropriate height, as it's restricted to X
-		//
-		// So we force the height of our VStack to 500,
-		// giving the Text room to size itself appropriately.
-	}
-}
-
-fileprivate struct ExplainFeesPopoverHeight: PreferenceKey {
-	static let defaultValue: CGFloat? = nil
-	
-	static func reduce(value: inout CGFloat?, nextValue: () -> CGFloat?) {
-		value = value ?? nextValue()
 	}
 }

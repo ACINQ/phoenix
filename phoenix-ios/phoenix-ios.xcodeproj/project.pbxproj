@@ -47,7 +47,7 @@
 		DC118C0227B453110080BBAC /* PaymentRequestedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC118C0127B453110080BBAC /* PaymentRequestedView.swift */; };
 		DC118C0427B454720080BBAC /* PaymentInFlightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC118C0327B454720080BBAC /* PaymentInFlightView.swift */; };
 		DC118C0627B4557D0080BBAC /* ValidateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC118C0527B4557D0080BBAC /* ValidateView.swift */; };
-		DC118C0827B457520080BBAC /* LnurlFetchNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC118C0727B457520080BBAC /* LnurlFetchNotice.swift */; };
+		DC118C0827B457520080BBAC /* FetchActivityNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC118C0727B457520080BBAC /* FetchActivityNotice.swift */; };
 		DC118C0A27B457F70080BBAC /* LnurlFlowErrorNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC118C0927B457F70080BBAC /* LnurlFlowErrorNotice.swift */; };
 		DC118C0C27B561210080BBAC /* CurrencyAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC118C0B27B561210080BBAC /* CurrencyAmount.swift */; };
 		DC142135261E72320075857A /* AboutHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC142134261E72320075857A /* AboutHTML.swift */; };
@@ -80,7 +80,8 @@
 		DC384D7F265BF36600131772 /* StyledString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D7E265BF36600131772 /* StyledString.swift */; };
 		DC384D81265C12B700131772 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D80265C12B700131772 /* Cache.swift */; };
 		DC384D83265C32F100131772 /* TextField+Verbatim.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D82265C32F100131772 /* TextField+Verbatim.swift */; };
-		DC4195D825FA6EBA008F0888 /* DYPopoverView in Frameworks */ = {isa = PBXBuildFile; productRef = DC4195D725FA6EBA008F0888 /* DYPopoverView */; };
+		DC39D4E5286B4A7E0030F18D /* Popovers in Frameworks */ = {isa = PBXBuildFile; productRef = DC39D4E4286B4A7E0030F18D /* Popovers */; };
+		DC39D4E7286BB2130030F18D /* PaymentLayerChoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC39D4E6286BB2120030F18D /* PaymentLayerChoice.swift */; };
 		DC46BAE426C6FDD300E760A6 /* CircularCheckmarkProgress in Frameworks */ = {isa = PBXBuildFile; productRef = DC46BAE326C6FDD300E760A6 /* CircularCheckmarkProgress */; };
 		DC46BAF326CACCF700E760A6 /* KotlinExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAED26CACCF700E760A6 /* KotlinExtensions.swift */; };
 		DC46BAF426CACCF700E760A6 /* KotlinFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */; };
@@ -158,6 +159,7 @@
 		DCE7233027B167240017CF56 /* SyncSeedManager_Actor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE7232F27B167240017CF56 /* SyncSeedManager_Actor.swift */; };
 		DCE77A5627C5240500F0FA24 /* TLSConnectionCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE77A5527C5240500F0FA24 /* TLSConnectionCheck.swift */; };
 		DCE77A5827C671D600F0FA24 /* ElectrumAddressSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE77A5727C671D600F0FA24 /* ElectrumAddressSheet.swift */; };
+		DCE9F95728412A9D005E03ED /* PaymentSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */; };
 		DCEC6A1827A82A98002C20BA /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEC6A1727A82A98002C20BA /* ImagePicker.swift */; };
 		DCED09D42625DBC4005D5EE2 /* AnimationCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */; };
 		DCEFD922276A796800001767 /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEFD921276A796800001767 /* SyncManager.swift */; };
@@ -264,7 +266,7 @@
 		DC118C0127B453110080BBAC /* PaymentRequestedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentRequestedView.swift; sourceTree = "<group>"; };
 		DC118C0327B454720080BBAC /* PaymentInFlightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentInFlightView.swift; sourceTree = "<group>"; };
 		DC118C0527B4557D0080BBAC /* ValidateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidateView.swift; sourceTree = "<group>"; };
-		DC118C0727B457520080BBAC /* LnurlFetchNotice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LnurlFetchNotice.swift; sourceTree = "<group>"; };
+		DC118C0727B457520080BBAC /* FetchActivityNotice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchActivityNotice.swift; sourceTree = "<group>"; };
 		DC118C0927B457F70080BBAC /* LnurlFlowErrorNotice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LnurlFlowErrorNotice.swift; sourceTree = "<group>"; };
 		DC118C0B27B561210080BBAC /* CurrencyAmount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyAmount.swift; sourceTree = "<group>"; };
 		DC142134261E72320075857A /* AboutHTML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutHTML.swift; sourceTree = "<group>"; };
@@ -298,6 +300,7 @@
 		DC384D7E265BF36600131772 /* StyledString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyledString.swift; sourceTree = "<group>"; };
 		DC384D80265C12B700131772 /* Cache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		DC384D82265C32F100131772 /* TextField+Verbatim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextField+Verbatim.swift"; sourceTree = "<group>"; };
+		DC39D4E6286BB2120030F18D /* PaymentLayerChoice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentLayerChoice.swift; sourceTree = "<group>"; };
 		DC46BAED26CACCF700E760A6 /* KotlinExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KotlinExtensions.swift; sourceTree = "<group>"; };
 		DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KotlinFlow.swift; sourceTree = "<group>"; };
 		DC46BAEF26CACCF700E760A6 /* KotlinPublishers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KotlinPublishers.swift; sourceTree = "<group>"; };
@@ -374,6 +377,7 @@
 		DCE7232F27B167240017CF56 /* SyncSeedManager_Actor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSeedManager_Actor.swift; sourceTree = "<group>"; };
 		DCE77A5527C5240500F0FA24 /* TLSConnectionCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLSConnectionCheck.swift; sourceTree = "<group>"; };
 		DCE77A5727C671D600F0FA24 /* ElectrumAddressSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectrumAddressSheet.swift; sourceTree = "<group>"; };
+		DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSummaryView.swift; sourceTree = "<group>"; };
 		DCEC6A1727A82A98002C20BA /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationCompletion.swift; sourceTree = "<group>"; };
 		DCEFD921276A796800001767 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
@@ -397,9 +401,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				DCD71A79273987FE00B9A1EF /* Focuser in Frameworks */,
-				DC4195D825FA6EBA008F0888 /* DYPopoverView in Frameworks */,
 				DC46BAE426C6FDD300E760A6 /* CircularCheckmarkProgress in Frameworks */,
 				DCC9D99C267BEB3D00EA36DD /* CloudKit.framework in Frameworks */,
+				DC39D4E5286B4A7E0030F18D /* Popovers in Frameworks */,
 				DCC46F1625C3521C005D32D9 /* FirebaseMessaging in Frameworks */,
 				DCB0DB8A255AE42F005B29C8 /* PhoenixShared.framework in Frameworks */,
 			);
@@ -610,13 +614,15 @@
 				53BEFCB8A24A5FAA785AFD03 /* SendView.swift */,
 				DC118BFB27B4504B0080BBAC /* ScanView.swift */,
 				DC118C0527B4557D0080BBAC /* ValidateView.swift */,
+				DC39D4E6286BB2120030F18D /* PaymentLayerChoice.swift */,
+				DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */,
 				DC118BF927B44F840080BBAC /* PriceSliderSheet.swift */,
 				DC118BFD27B451890080BBAC /* MetadataSheet.swift */,
 				DC118BFF27B4523B0080BBAC /* CommentSheet.swift */,
 				DC118BF727B44E6E0080BBAC /* LoginView.swift */,
 				DC118C0327B454720080BBAC /* PaymentInFlightView.swift */,
 				DC118C0127B453110080BBAC /* PaymentRequestedView.swift */,
-				DC118C0727B457520080BBAC /* LnurlFetchNotice.swift */,
+				DC118C0727B457520080BBAC /* FetchActivityNotice.swift */,
 				DC118C0927B457F70080BBAC /* LnurlFlowErrorNotice.swift */,
 			);
 			path = send;
@@ -877,9 +883,9 @@
 			name = "phoenix-ios";
 			packageProductDependencies = (
 				DC72C31825A3CF87008A927A /* FirebaseMessaging */,
-				DC4195D725FA6EBA008F0888 /* DYPopoverView */,
 				DC46BAE326C6FDD300E760A6 /* CircularCheckmarkProgress */,
 				DCD71A78273987FE00B9A1EF /* Focuser */,
+				DC39D4E4286B4A7E0030F18D /* Popovers */,
 			);
 			productName = "phoenix-ios";
 			productReference = 7555FF7B242A565900829871 /* Phoenix.app */;
@@ -984,9 +990,9 @@
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
 				DC72C2EA25A3CADC008A927A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				DC4195CB25FA6777008F0888 /* XCRemoteSwiftPackageReference "DYPopoverView" */,
 				DC46BAE226C6FDD300E760A6 /* XCRemoteSwiftPackageReference "CircularCheckmarkProgress" */,
 				DCD71A752739864400B9A1EF /* XCRemoteSwiftPackageReference "swift-focuser" */,
+				DC39D4E3286B4A7E0030F18D /* XCRemoteSwiftPackageReference "Popovers" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -1099,6 +1105,7 @@
 				DC118C0027B4523B0080BBAC /* CommentSheet.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
 				DCC9D99A267BD28600EA36DD /* SyncTxManager.swift in Sources */,
+				DCE9F95728412A9D005E03ED /* PaymentSummaryView.swift in Sources */,
 				DCB876302735AA7300657570 /* UserDefaults+Serialization.swift in Sources */,
 				DCE1E5FA26418183005465B8 /* Toast.swift in Sources */,
 				DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */,
@@ -1116,7 +1123,7 @@
 				DCCD045D27EE0173007D57A5 /* EditInfoView.swift in Sources */,
 				DC1D2B4B2593EB860036AD38 /* Currency.swift in Sources */,
 				DC118C0627B4557D0080BBAC /* ValidateView.swift in Sources */,
-				DC118C0827B457520080BBAC /* LnurlFetchNotice.swift in Sources */,
+				DC118C0827B457520080BBAC /* FetchActivityNotice.swift in Sources */,
 				DCE7233027B167240017CF56 /* SyncSeedManager_Actor.swift in Sources */,
 				DCBA371B2758076F00610EC8 /* SyncSeedManager.swift in Sources */,
 				53BEFD54160278C5E393E319 /* HomeView.swift in Sources */,
@@ -1139,6 +1146,7 @@
 				DCB493CB269F3B06001B0F09 /* Result+Deugly.swift in Sources */,
 				DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */,
 				DC384D7F265BF36600131772 /* StyledString.swift in Sources */,
+				DC39D4E7286BB2130030F18D /* PaymentLayerChoice.swift in Sources */,
 				DC27E4C22791C00F00C777CC /* PrivacyView.swift in Sources */,
 				DC46BAF626CACCF700E760A6 /* KotlinFutures.swift in Sources */,
 				53BEF981E71E3087871890F9 /* SendView.swift in Sources */,
@@ -1704,12 +1712,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		DC4195CB25FA6777008F0888 /* XCRemoteSwiftPackageReference "DYPopoverView" */ = {
+		DC39D4E3286B4A7E0030F18D /* XCRemoteSwiftPackageReference "Popovers" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/DominikButz/DYPopoverView.git";
+			repositoryURL = "https://github.com/aheze/Popovers";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.1;
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.3.0;
 			};
 		};
 		DC46BAE226C6FDD300E760A6 /* XCRemoteSwiftPackageReference "CircularCheckmarkProgress" */ = {
@@ -1739,10 +1747,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		DC4195D725FA6EBA008F0888 /* DYPopoverView */ = {
+		DC39D4E4286B4A7E0030F18D /* Popovers */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = DC4195CB25FA6777008F0888 /* XCRemoteSwiftPackageReference "DYPopoverView" */;
-			productName = DYPopoverView;
+			package = DC39D4E3286B4A7E0030F18D /* XCRemoteSwiftPackageReference "Popovers" */;
+			productName = Popovers;
 		};
 		DC46BAE326C6FDD300E760A6 /* CircularCheckmarkProgress */ = {
 			isa = XCSwiftPackageProductDependency;

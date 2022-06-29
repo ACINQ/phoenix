@@ -6,9 +6,7 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.setLightningLoggerFactory
-import fr.acinq.lightning.wire.InitTlv
 import fr.acinq.phoenix.controllers.*
-import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.controllers.config.*
 import fr.acinq.phoenix.controllers.init.AppInitController
 import fr.acinq.phoenix.controllers.init.AppRestoreWalletController
@@ -16,16 +14,16 @@ import fr.acinq.phoenix.controllers.main.AppContentController
 import fr.acinq.phoenix.controllers.main.AppHomeController
 import fr.acinq.phoenix.controllers.payments.AppReceiveController
 import fr.acinq.phoenix.controllers.payments.AppScanController
+import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.Chain
+import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.createAppDbDriver
-import fr.acinq.phoenix.controllers.payments.Scan
-import fr.acinq.phoenix.data.StartupParams
+import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.*
 import io.ktor.client.*
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.*
-import io.ktor.http.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.serialization.json.Json
@@ -81,7 +79,6 @@ class PhoenixBusiness(
     val currencyManager by lazy { CurrencyManager(this) }
     val connectionsManager by lazy { ConnectionsManager(this) }
     val lnUrlManager by lazy { LNUrlManager(this) }
-    val util by lazy { Utilities(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
 
     init {

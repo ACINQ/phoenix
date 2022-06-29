@@ -17,8 +17,6 @@ struct ScanView: View {
 	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
 	@ObservedObject var toast: Toast
 	
-	@Binding var paymentRequest: String?
-	
 	@State var showingFullMenu = false
 	@State var chevronPosition: AnimatedChevron.Position = .pointingUp
 	@State var clipboardHasString = UIPasteboard.general.hasStrings
@@ -67,7 +65,7 @@ struct ScanView: View {
 			content()
 			
 			if mvi.model is Scan.Model_LnurlServiceFetch {
-				LnurlFetchNotice(
+				FetchActivityNotice(
 					title: NSLocalizedString("Fetching Lightning URL", comment: "Progress title"),
 					onCancel: { didCancelLnurlServiceFetch() }
 				)
@@ -234,8 +232,40 @@ struct ScanView: View {
 								Text("Pay ") +
 								Text(Image(systemName: "arrow.forward")) +
 								Text(verbatim: " \(desc)")
+							} else {
+								Text("Pay Invoice")
 							}
 						
+						} else if let content = clipboardContent as? Scan.ClipboardContent_BitcoinRequest {
+							
+							let addrInfo: BitcoinAddressInfo = content.address
+							
+							let desc: String = {
+								return addrInfo.label ?? addrInfo.message
+							}()?.trimmingCharacters(in: .whitespaces) ?? ""
+							
+							if let sat = addrInfo.amount {
+								let amt = Utils.format(currencyPrefs, sat: sat)
+							
+								if desc.isEmpty {
+									Text("Pay \(amt.string)")
+								} else {
+									Text("Pay \(amt.string) ") +
+									Text(Image(systemName: "arrow.forward")) +
+									Text(verbatim: " \(desc)")
+								}
+							} else if !desc.isEmpty {
+								Text("Pay ") +
+								Text(Image(systemName: "arrow.forward")) +
+								Text(verbatim: " \(desc)")
+							} else {
+								let addr = addrInfo.address.prefix(6) + "..." + addrInfo.address.suffix(6)
+								
+								Text("Pay ") +
+								Text(Image(systemName: "arrow.forward")) +
+								Text(verbatim: " \(addr)")
+							}
+							
 						} else if let content = clipboardContent as? Scan.ClipboardContent_LoginRequest {
 							
 							let title = content.auth.actionPromptTitle
@@ -326,9 +356,7 @@ struct ScanView: View {
 			}
 			
 			let controller = mvi.controller as! AppScanController
-			controller.inspectClipboard(string: string) {(result, _) in
-				self.clipboardContent = result
-			}
+			self.clipboardContent = controller.inspectClipboard(data: string)
 			
 		} else {
 			clipboardHasString = false

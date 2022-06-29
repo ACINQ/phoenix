@@ -28,6 +28,7 @@ import fr.acinq.eclair.wire.TemporaryNodeFailure
 import fr.acinq.eclair.wire.TrampolineFeeInsufficient
 import fr.acinq.eclair.wire.UnknownNextPeer
 import fr.acinq.lightning.Lightning
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
@@ -41,6 +42,8 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.legacy.db.*
 import fr.acinq.phoenix.legacy.utils.Wallet
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConversions
 import scala.collection.JavaConverters
@@ -64,6 +67,9 @@ object LegacyMigrationHelper {
         val legacyPaymentsDb = SqlitePaymentsDb(SqliteUtils.openSqliteFile(Wallet.getChainDatadir(context), "eclairdb-migration.sqlite", true, "wal", "normal"))
         log.info("opened legacy payments db")
 
+        val nodeParams = business.nodeParamsManager.nodeParams.filterNotNull().first()
+        log.info("retrieved node params from business")
+
         // 2 - get the new payments database
         val newPaymentsDb = business.databaseManager.paymentsDb()
 
@@ -72,9 +78,9 @@ object LegacyMigrationHelper {
         log.info("migrating ${outgoing.size} outgoing payments")
         outgoing.forEach {
             try {
-                saveOutgoingLegacyPayment(it.value, newPaymentsDb, legacyMetaRepository)
+                saveOutgoingLegacyPayment(nodeParams, newPaymentsDb, legacyMetaRepository, it.value)
             } catch (e: Exception) {
-                log.error("payment migration: failed to save payment=$it", e)
+                log.error("payment migration: failed to save payment=$it: ", e)
             }
         }
 
@@ -83,9 +89,9 @@ object LegacyMigrationHelper {
         log.info("migrating ${incoming.size} incoming payments")
         incoming.forEach {
             try {
-                saveIncomingLegacyPayment(it, newPaymentsDb, legacyMetaRepository, legacyPayToOpenMetaRepository)
+                saveIncomingLegacyPayment(nodeParams, newPaymentsDb, legacyMetaRepository, legacyPayToOpenMetaRepository, it)
             } catch (e: Exception) {
-                log.error("payment migration: failed to save payment=$it", e)
+                log.error("payment migration: failed to save payment=$it: ", e)
             }
         }
 
@@ -95,10 +101,11 @@ object LegacyMigrationHelper {
     }
 
     private suspend fun saveIncomingLegacyPayment(
-        payment: fr.acinq.eclair.db.IncomingPayment,
+        nodeParams: NodeParams,
         newPaymentsDb: fr.acinq.phoenix.db.SqlitePaymentsDb,
         legacyMetaRepository: PaymentMetaRepository,
         legacyPayToOpenMetaRepository: PayToOpenMetaRepository,
+        payment: fr.acinq.eclair.db.IncomingPayment,
     ) {
         val status = payment.status()
         if (status !is IncomingPaymentStatus.Received) {
@@ -144,20 +151,32 @@ object LegacyMigrationHelper {
     }
 
     private suspend fun saveOutgoingLegacyPayment(
-        payments: List<fr.acinq.eclair.db.OutgoingPayment>,
+        nodeParams: NodeParams,
         newPaymentsDb: fr.acinq.phoenix.db.SqlitePaymentsDb,
         legacyMetaRepository: PaymentMetaRepository,
+        payments: List<fr.acinq.eclair.db.OutgoingPayment>,
     ) {
         val head = payments.first()
         val id = UUID.fromString(payments.first().parentId().toString())
         val paymentMeta = legacyMetaRepository.get(payments.first().parentId().toString())
+        val paymentRequest = if (head.paymentRequest().isDefined) {
+            PaymentRequest.read(fr.acinq.eclair.payment.PaymentRequest.write(head.paymentRequest().get()))
+        } else null
 
         // retrieve details from the first payment in the list
         val details = if (paymentMeta?.swap_out_address != null) {
             OutgoingPayment.Details.SwapOut(
                 address = paymentMeta.swap_out_address ?: "",
-                // FIXME: we use a random payment hash
-                paymentHash = Lightning.randomBytes32().sha256()
+                paymentRequest = paymentRequest ?: PaymentRequest.create(
+                    chainHash = nodeParams.chainHash,
+                    amount = head.recipientAmount().toLong().msat + (paymentMeta.swap_out_fee_sat?.sat?.toMilliSatoshi() ?: 0.msat),
+                    paymentHash = head.paymentHash().bytes().toArray().byteVector32(),
+                    privateKey = Lightning.randomKey(),
+                    description = "swap-out to ${paymentMeta.swap_out_address} for ${paymentMeta.swap_out_feerate_per_byte} sat/b",
+                    minFinalCltvExpiryDelta = PaymentRequest.DEFAULT_MIN_FINAL_EXPIRY_DELTA,
+                    features = nodeParams.features.invoiceFeatures()
+                ),
+                swapOutFee = paymentMeta.swap_out_fee_sat?.sat ?: 0.sat
             )
         } else if (head.paymentType() == "ClosingChannel") {
             OutgoingPayment.Details.ChannelClosing(
@@ -165,10 +184,8 @@ object LegacyMigrationHelper {
                 closingAddress = paymentMeta?.closing_main_output_script ?: "",
                 isSentToDefaultAddress = paymentMeta?.closing_type != ClosingType.Mutual.code
             )
-        } else if (head.paymentRequest().isDefined) {
-            OutgoingPayment.Details.Normal(
-                paymentRequest = PaymentRequest.read(fr.acinq.eclair.payment.PaymentRequest.write(head.paymentRequest().get()))
-            )
+        } else if (paymentRequest != null) {
+            OutgoingPayment.Details.Normal(paymentRequest)
         } else {
             OutgoingPayment.Details.KeySend(preimage = Lightning.randomBytes32().sha256())
         }

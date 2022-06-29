@@ -326,13 +326,13 @@ struct CloseChannelsView : MVIView {
 		let isScannedValue = textFieldValue == scannedValue
 		
 		let business = AppDelegate.get().business
-		let result = business.util.parseBitcoinAddress(input: textFieldValue)
+		let result = Parser.shared.readBitcoinAddress(chain: business.chain, input: textFieldValue)
 		
 		if let error = result.left {
 			
 			log.debug("result.error = \(error)")
 			
-			if let error = error as? Utilities.BitcoinAddressErrorChainMismatch {
+			if let error = error as? BitcoinAddressError.ChainMismatch {
 				detailedErrorMsg = String(format: NSLocalizedString(
 					"""
 					The address is for %@, \
@@ -342,7 +342,7 @@ struct CloseChannelsView : MVIView {
 					error.addrChain.name, error.myChain.name
 				)
 			}
-			else if error is Utilities.BitcoinAddressErrorUnknownBech32Version {
+			else if error is BitcoinAddressError.UnknownBech32Version {
 				detailedErrorMsg = NSLocalizedString(
 					"Unknown Bech32 version",
 					comment: "Error message - parsing bitcoin address"

@@ -74,6 +74,27 @@ extension CurrencyManager {
 	}
 }
 
+extension PeerManager {
+	
+	fileprivate struct _Key {
+		static var balancePublisher = 0
+	}
+	
+	func balancePublisher() -> AnyPublisher<Lightning_kmpMilliSatoshi?, Never> {
+		
+		executeOnce(storageKey: &_Key.balancePublisher) {
+			
+			// Transforming from Kotlin:
+			// `balance: StateFlow<MilliSatoshi?>`
+			//
+			KotlinCurrentValueSubject<Lightning_kmpMilliSatoshi, Lightning_kmpMilliSatoshi?>(
+				self.balance
+			)
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
 extension PaymentsManager {
 	
 	fileprivate struct _Key {

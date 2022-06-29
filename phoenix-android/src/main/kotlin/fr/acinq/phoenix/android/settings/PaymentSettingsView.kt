@@ -23,7 +23,6 @@ import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -147,8 +146,6 @@ fun PaymentSettingsView() {
     }
 }
 
-
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun DefaultExpiryInvoiceDialog(
     expiry: (Long),
@@ -160,7 +157,6 @@ private fun DefaultExpiryInvoiceDialog(
     Dialog(
         onDismiss = onDismiss,
         title = stringResource(id = R.string.paymentsettings_expiry_dialog_title),
-        properties = DialogProperties(usePlatformDefaultWidth = false),
         buttons = {
             Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel))
             Button(
@@ -202,7 +198,6 @@ private fun DefaultExpiryInvoiceDialog(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun DefaultDescriptionInvoiceDialog(
     description: (String),
@@ -214,7 +209,6 @@ private fun DefaultDescriptionInvoiceDialog(
     Dialog(
         onDismiss = onDismiss,
         title = stringResource(id = R.string.paymentsettings_defaultdesc_dialog_title),
-        properties = DialogProperties(usePlatformDefaultWidth = false),
         buttons = {
             Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel))
             Button(
@@ -238,8 +232,6 @@ private fun DefaultDescriptionInvoiceDialog(
     }
 }
 
-
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun TrampolineMaxFeesDialog(
     initialTrampolineMaxFee: TrampolineFees,
@@ -254,7 +246,6 @@ private fun TrampolineMaxFeesDialog(
     Dialog(
         onDismiss = onDismiss,
         title = stringResource(id = R.string.paymentsettings_trampoline_fees_title),
-        properties = DialogProperties(usePlatformDefaultWidth = false),
         buttons = {
             Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel))
             Button(
@@ -313,7 +304,6 @@ private fun TrampolineMaxFeesDialog(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun PayToOpenDialog(
     onDismiss: () -> Unit
@@ -322,7 +312,6 @@ private fun PayToOpenDialog(
         title = stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_title),
         onDismiss = onDismiss,
         buttons = { },
-        properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Column(Modifier.padding(horizontal = 24.dp)) {
             Text(text = stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_message))

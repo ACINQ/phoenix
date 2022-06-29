@@ -29,6 +29,18 @@ class Utils {
 		return toMsat(from: btc, bitcoinUnit: .btc)
 	}
 	
+	/// Converts from satoshi to millisatoshi
+	///
+	static func toMsat(sat: Bitcoin_kmpSatoshi) -> Int64 {
+		return toMsat(sat: sat.toLong())
+	}
+	
+	/// Converts from satoshi to millisatoshi
+	///
+	static func toMsat(sat: Int64) -> Int64 {
+		return sat * Int64(Millisatoshis_Per_Satoshi)
+	}
+	
 	/// Converts to millisatoshi, the preferred unit for performing conversions.
 	///
 	static func toMsat(from amount: Double, bitcoinUnit: BitcoinUnit) -> Int64 {

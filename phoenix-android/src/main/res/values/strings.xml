@@ -102,7 +102,6 @@
     <string name="paymentline_failed">Failed</string>
     <string name="paymentline_sent_prefix">-</string>
     <string name="paymentline_received_prefix">+</string>
-    <string name="paymentline_no_desc">No description</string>
     <string name="paymentline_keysend_outgoing">Donation</string>
     <string name="paymentline_keysend_incoming">Spontaneous payment</string>
     <string name="paymentline_closing_desc_no_address">Channel closing</string>
@@ -162,34 +161,33 @@
 
     <string name="send_balance_prefix">Balance:</string>
     <string name="send_use_all_balance">Send all</string>
-    <string name="send_loading">Checking payment…</string>
-    <string name="send_invalid_pr_generic">This payment is not valid. You may have scanned an incorrect invoice.\n\nPlease try again.</string>
-    <string name="send_amount_error">Please enter a valid amount.</string>
-    <string name="send_amount_error_balance">Amount exceeds your balance.</string>
-    <string name="send_amount_error_too_large">Amount is too large.</string>
-    <string name="send_amount_error_negative">Amount cannot be negative.</string>
-    <string name="send_amount_error_swap_out_too_small">Min. 10000 sat for on-chain payment.</string>
+    <string name="send_error_amount_too_large">Amount is too large.</string>
+    <string name="send_error_amount_negative">Amount cannot be negative.</string>
+    <string name="send_error_amount_invalid">This is not a valid amount.</string>
+    <string name="send_error_amount_over_balance">This amount exceeds your balance.</string>
+    <string name="send_error_amount_overpaying">Cannot pay more than 2 times the requested amount.</string>
+    <string name="send_error_amount_below_requested">This amount is below the requested amount.</string>
     <string name="send_destination_label">Send to</string>
     <string name="send_description_label">Desc.</string>
-    <string name="send_chain_fees_edit">Edit fees</string>
-    <string name="send_chain_fees_label">Fee rate</string>
-    <string name="send_chain_fees_unit">sat/byte</string>
-    <string name="send_chain_fees_description">This payment is an on-chain transaction, which is slower and usually more expensive. A mining fee will apply.</string>
-    <string name="send_chain_fees_feedback_invalid">Please use a valid fee rate.</string>
-    <string name="send_chain_fees_feedback_too_low">This fee rate is too low. It must be at least %1$s sat/byte.</string>
-    <string name="send_chain_fees_feedback_20min">With this fee rate, the transaction should be received within 30 minutes.</string>
-    <string name="send_chain_fees_feedback_1h">With this fee rate, the transaction should be received within the hour.</string>
-    <string name="send_chain_fees_feedback_12h">With this fee rate, the transaction should be received within 12 hours.</string>
-    <string name="send_chain_fees_feedback_inf">With this fee rate, the transaction will not be received before 12 hours or more.</string>
-    <string name="send_error_sending">There was an internal error when trying to send this payment. No money was sent.</string>
     <string name="send_pay_button">Pay</string>
-    <string name="send_swap_in_progress">Preparing transaction</string>
-    <string name="send_swap_error">Swap to chain has failed. Please try again.</string>
-    <string name="send_swap_required_button">Prepare transaction</string>
-    <string name="send_swap_complete_recap_amount">Amount</string>
-    <string name="send_swap_complete_recap_fee">Miner Fee</string>
-    <string name="send_swap_complete_recap_total">Total</string>
-    <string name="send_swap_complete_cannot_afford">Total after fees exceeds your balance.</string>
+
+    <string name="send_paymentmode_onchain">Pay on-chain</string>
+    <string name="send_paymentmode_onchain_desc">On-chain transactions are typically slower and best suited for large payments.</string>
+    <string name="send_paymentmode_lightning">Pay with Lightning</string>
+    <string name="send_paymentmode_lightning_desc">Lightning payments are fast and best suited for small payments.</string>
+
+    <string name="send_swapout_error_amount_too_small">Min. %1$s for on-chain payments</string>
+    <string name="send_swapout_error_amount_too_large">Max. %1$s for on-chain payments</string>
+    <string name="send_swapout_error_cannot_afford_fees">Total after fees exceeds your balance.\nThis payment cannot be sent.</string>
+    <string name="send_swapout_prepare_button">Prepare transaction</string>
+    <string name="send_swapout_prepare_in_progress">Preparing transaction</string>
+    <string name="send_swapout_complete_recap_amount">Amount</string>
+    <string name="send_swapout_complete_recap_fee">Miner Fee</string>
+    <string name="send_swapout_complete_recap_total">Total</string>
+    <string name="send_swapout_mining_fee_dialog_title">What are those fees?</string>
+    <string name="send_swapout_mining_fee_dialog_body">
+      Payments to on-chain addresses require a swap and incur mining fees for the Bitcoin network. The fee rate used for the transaction is fixed by the swap service.
+    </string>
 
     <!-- //////////////// scan //////////////// -->
 
@@ -200,15 +198,15 @@
     <string name="scan_error_expired">Payment has expired.</string>
     <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
     <string name="scan_error_invalid_chain">This payment does not use the same blockchain as your wallet.</string>
-    <string name="scan_error_lnurl_unsupported">This type of Lightning URL is not supported yet!</string>
-    <string name="scan_error_invalid_scan">Invalid data.\nPlease try again.</string>
+    <string name="scan_error_lnurl_invalid">Failed to process this LNUrl link. Make sure it is valid.</string>
+    <string name="scan_error_lnurl_service_error">The LNUrl service returned an error.</string>
+    <string name="scan_error_lnurl_unsupported">This type of LNUrl is not supported yet!</string>
+    <string name="scan_error_invalid_generic">This data uses an unknown format and cannot be processed.</string>
+
+    <string name="scan_lnurl_fetching">Fetching data from service…</string>
 
     <string name="scan_amountless_legacy_title">Warning</string>
-    <string name="scan_amountless_legacy_message"><![CDATA[
-    This invoice doesn\'t include an amount. This may be dangerous: malicious nodes may be able to steal your payment. To be safe, you should <b>ask the payee to specify an amount</b> in the payment request.
-    <br /><br />
-    Are you sure you want to pay this invoice?
-  ]]></string>
+    <string name="scan_amountless_legacy_message">This invoice doesn\'t include an amount. This may be dangerous: malicious nodes may be able to steal your payment. To be safe, you should <b>ask the payee to specify an amount</b> in the payment request.\n\nAre you sure you want to pay this invoice?</string>
     <string name="scan_amountless_legacy_confirm_button">Confirm</string>
     <string name="scan_amountless_legacy_cancel_button">Cancel</string>
 
@@ -623,8 +621,8 @@
     <!-- ////////////// connection issues dialog //////////////// -->
 
     <string name="conndialog_title">Connections status</string>
-    <string name="conndialog_summary_not_ok">You have some connection issue(s). The app will not function properly.</string>
-    <string name="conndialog_network">Internet</string>
+    <string name="conndialog_summary_not_ok">You have connection issue(s). The app will not function properly.</string>
+    <string name="conndialog_network">Your device has no Internet connection. The app will not function properly.\n\nPlease check your device\'s setting.</string>
     <string name="conndialog_electrum">Electrum</string>
     <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Lightning Peer</string>

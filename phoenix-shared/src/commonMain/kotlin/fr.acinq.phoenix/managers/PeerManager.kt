@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.managers
 
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.Peer
@@ -7,9 +8,11 @@ import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.wire.InitTlv
 import fr.acinq.lightning.wire.TlvStream
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.utils.calculateBalance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -40,7 +43,10 @@ class PeerManager(
     private val logger = newLogger(loggerFactory)
 
     private val _peer = MutableStateFlow<Peer?>(null)
-    public val peerState: StateFlow<Peer?> = _peer
+    val peerState: StateFlow<Peer?> = _peer
+
+    private val _balance = MutableStateFlow<MilliSatoshi?>(null)
+    val balance: StateFlow<MilliSatoshi?> = _balance
 
     init {
         launch {
@@ -60,15 +66,19 @@ class PeerManager(
 
             logger.debug { "instantiating peer with nodeParams=$nodeParams walletParams=$walletParams initTlvs=$initTlvs" }
 
-            _peer.value = Peer(
+            val peer = Peer(
                 initTlvStream = initTlvs,
-                nodeParams = nodeParams,
-                walletParams = walletParams,
+                nodeParams = nodeParamsManager.nodeParams.filterNotNull().first(),
+                walletParams = configurationManager.chainContext.filterNotNull().first().walletParams(),
                 watcher = electrumWatcher,
                 db = databaseManager.databases.filterNotNull().first(),
                 socketBuilder = tcpSocketBuilder,
                 scope = MainScope()
             )
+            _peer.value = peer
+            peer.channelsFlow.collect { channels ->
+                _balance.value = calculateBalance(channels)
+            }
         }
     }
 

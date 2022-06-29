@@ -28,7 +28,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -36,8 +35,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,11 +49,17 @@ import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.fiatRate
-import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toFiat
+import fr.acinq.phoenix.android.utils.Converter.toMilliSatoshi
 import fr.acinq.phoenix.android.utils.Converter.toPlainString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.data.*
+import fr.acinq.phoenix.android.utils.Converter.toUnit
+import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.android.utils.outlinedTextFieldColors
+import fr.acinq.phoenix.data.BitcoinUnit
+import fr.acinq.phoenix.data.CurrencyUnit
+import fr.acinq.phoenix.data.ExchangeRate
+import fr.acinq.phoenix.data.FiatCurrency
 import org.slf4j.LoggerFactory
 
 data class ComplexAmount(
@@ -105,10 +108,10 @@ object AmountInputHelper {
                 } else {
                     val msat = amount.toMilliSatoshi(rate.price)
                     if (msat.toUnit(BitcoinUnit.Btc) > 21e6) {
-                        onError(context.getString(R.string.send_amount_error_too_large))
+                        onError(context.getString(R.string.send_error_amount_too_large))
                         null
                     } else if (msat < 0.msat) {
-                        onError(context.getString(R.string.send_amount_error_negative))
+                        onError(context.getString(R.string.send_error_amount_negative))
                         null
                     } else {
                         onConverted(msat.toPrettyString(prefBitcoinUnit, withUnit = true))
@@ -119,10 +122,10 @@ object AmountInputHelper {
             is BitcoinUnit -> {
                 val msat = amount.toMilliSatoshi(unit)
                 if (msat.toUnit(BitcoinUnit.Btc) > 21e6) {
-                    onError(context.getString(R.string.send_amount_error_too_large))
+                    onError(context.getString(R.string.send_error_amount_too_large))
                     null
                 } else if (msat < 0.msat) {
-                    onError(context.getString(R.string.send_amount_error_negative))
+                    onError(context.getString(R.string.send_error_amount_negative))
                     null
                 } else if (rate == null) {
                     // conversion is not possible but that should not stop a payment from happening

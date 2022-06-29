@@ -16,15 +16,14 @@
 
 package fr.acinq.phoenix.android.components
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -61,30 +60,18 @@ fun BackButton(onClick: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Dialog(
     onDismiss: () -> Unit,
     title: String? = null,
-    properties: DialogProperties = DialogProperties(),
+    properties: DialogProperties = DialogProperties(usePlatformDefaultWidth = false),
     isScrollable: Boolean = true,
-    buttons: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit,
+    buttons: (@Composable RowScope.() -> Unit)? = null,
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = properties) {
-        Column(
-            Modifier
-                .padding(vertical = 50.dp, horizontal = 16.dp) // min padding for tall/wide dialogs
-                .clip(MaterialTheme.shapes.large)
-                .background(MaterialTheme.colors.surface)
-                .widthIn(max = 600.dp)
-                .then(
-                    if (isScrollable) {
-                        Modifier.verticalScroll(rememberScrollState())
-                    } else {
-                        Modifier
-                    }
-                )
-        ) {
+        DialogBody(isScrollable) {
             // optional title
             title?.run {
                 Text(text = title, modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 12.dp), style = MaterialTheme.typography.h4)
@@ -104,6 +91,29 @@ fun Dialog(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun DialogBody(
+    isScrollable: Boolean = true,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Column(
+        Modifier
+            .padding(vertical = 50.dp, horizontal = 16.dp) // min padding for tall/wide dialogs
+            .clip(MaterialTheme.shapes.large)
+            .background(MaterialTheme.colors.surface)
+            .widthIn(max = 600.dp)
+            .then(
+                if (isScrollable) {
+                    Modifier.verticalScroll(rememberScrollState())
+                } else {
+                    Modifier
+                }
+            )
+    ) {
+        content()
     }
 }
 
@@ -193,6 +203,7 @@ fun Card(
     externalPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
     internalPadding: PaddingValues = PaddingValues(0.dp),
     shape: Shape = RoundedCornerShape(16.dp),
+    withBorder: Boolean = false,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     content: @Composable ColumnScope.() -> Unit
@@ -202,6 +213,9 @@ fun Card(
             .padding(externalPadding)
             .widthIn(max = 500.dp)
             .clip(shape)
+            .then(
+                if (withBorder) Modifier.border(BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary), shape) else Modifier
+            )
             .background(MaterialTheme.colors.surface)
             .padding(internalPadding),
         horizontalAlignment = horizontalAlignment,

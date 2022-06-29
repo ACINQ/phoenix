@@ -25,7 +25,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -244,7 +243,6 @@ private fun DetailsRow(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun EditPaymentDetails(
     initialDescription: String?,
@@ -254,7 +252,6 @@ private fun EditPaymentDetails(
     var description by rememberSaveable { mutableStateOf(initialDescription) }
     Dialog(
         onDismiss = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false),
         buttons = {
             Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel))
             Button(
