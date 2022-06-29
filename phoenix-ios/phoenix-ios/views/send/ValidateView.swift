@@ -51,6 +51,8 @@ struct ValidateView: View {
 	@State var comment: String = ""
 	@State var hasPromptedForComment = false
 	
+	@State var hasPickedSwapOutMode = false
+	
 	@State var didAppear = false
 	
 	let balancePublisher = AppDelegate.get().business.peerManager.balancePublisher()
@@ -633,7 +635,6 @@ struct ValidateView: View {
 	func paymentNumbers() -> PaymentNumbers? {
 		
 		guard let preMinerFeeMsat = parsedAmountMsat() else {
-			log.debug("paymentNumbers() -> nil: totalMsat is nil")
 			return nil
 		}
 		
@@ -658,7 +659,6 @@ struct ValidateView: View {
 		}
 		
 		if tipMsat <= 0 && minerFeeMsat <= 0 {
-			log.debug("paymentNumbers() -> nil: !tipMsat && !minerFeeMsat")
 			return nil
 		}
 		
@@ -757,6 +757,16 @@ struct ValidateView: View {
 		} else {
 			altAmount = NSLocalizedString("Enter an amount", comment: "error message")
 			problem = nil // display in gray at very beginning
+		}
+		
+		if mvi.model is Scan.Model_SwapOutFlow_Init && !hasPickedSwapOutMode {
+			log.debug("triggering popover w/PaymentLayerChoice")
+			
+			popoverState.display(dismissable: false) {
+				PaymentLayerChoice(mvi: mvi)
+			} onWillDisappear: {
+				hasPickedSwapOutMode = true
+			}
 		}
 	}
 	
