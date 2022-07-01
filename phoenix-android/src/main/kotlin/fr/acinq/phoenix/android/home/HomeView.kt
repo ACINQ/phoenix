@@ -16,14 +16,9 @@
 
 package fr.acinq.phoenix.android.home
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.util.Log
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -53,7 +48,6 @@ import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.InternalData
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.legacy.utils.MigrationResult
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
@@ -125,13 +119,13 @@ fun HomeView(
                         items(
                             items = payments,
                         ) {
-                            if (it.payment == null) {
+                            if (it.paymentInfo == null) {
                                 LaunchedEffect(key1 = it.orderRow.id.identifier) {
                                     homeViewModel.getPaymentDescription(it.orderRow)
                                 }
                                 PaymentLineLoading(it.orderRow.id, it.orderRow.createdAt, onPaymentClick)
                             } else {
-                                PaymentLine(it.payment, onPaymentClick)
+                                PaymentLine(it.paymentInfo, onPaymentClick)
                             }
                         }
                     }

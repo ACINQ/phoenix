@@ -16,19 +16,17 @@
 
 package fr.acinq.phoenix.android.home
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.HomeController
 import fr.acinq.phoenix.controllers.main.Home
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
+import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.Connections
@@ -43,7 +41,7 @@ import kotlinx.coroutines.launch
 
 data class PaymentRowState(
     val orderRow: WalletPaymentOrderRow,
-    val payment: WalletPayment?
+    val paymentInfo: WalletPaymentInfo?
 )
 
 @ExperimentalCoroutinesApi
@@ -101,7 +99,7 @@ class HomeViewModel(
             val paymentInfo = paymentsManager.fetcher.getPayment(row, WalletPaymentFetchOptions.Descriptions)
             if (paymentInfo != null) {
                 viewModelScope.launch(Dispatchers.Main) {
-                    _paymentsFlow.value += (row.id.identifier to PaymentRowState(row, paymentInfo.payment))
+                    _paymentsFlow.value += (row.id.identifier to PaymentRowState(row, paymentInfo))
                 }
             }
         }

@@ -51,6 +51,7 @@ import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.walletPaymentId
 import kotlinx.coroutines.launch
 
@@ -88,12 +89,10 @@ fun PaymentLineLoading(
 
 @Composable
 fun PaymentLine(
-    payment: WalletPayment,
+    paymentInfo: WalletPaymentInfo,
     onPaymentClick: (WalletPaymentId) -> Unit
 ) {
-
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val payment = paymentInfo.payment
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -105,7 +104,7 @@ fun PaymentLine(
         Spacer(modifier = Modifier.width(16.dp))
         Column {
             Row {
-                PaymentDescription(payment = payment, modifier = Modifier.weight(1.0f))
+                PaymentDescription(paymentInfo = paymentInfo, modifier = Modifier.weight(1.0f))
                 Spacer(modifier = Modifier.width(16.dp))
                 if (!isPaymentFailed(payment)) {
                     val isOutgoing = payment is OutgoingPayment
@@ -138,8 +137,10 @@ fun PaymentLine(
 }
 
 @Composable
-private fun PaymentDescription(payment: WalletPayment, modifier: Modifier = Modifier) {
-    val desc = when (payment) {
+private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifier = Modifier) {
+    val payment = paymentInfo.payment
+    val metadata = paymentInfo.metadata
+    val desc = metadata.userDescription ?: when (payment) {
         is OutgoingPayment -> when (val d = payment.details) {
             is OutgoingPayment.Details.Normal -> d.paymentRequest.description
             is OutgoingPayment.Details.KeySend -> stringResource(id = R.string.paymentline_keysend_outgoing)
