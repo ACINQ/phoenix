@@ -124,6 +124,7 @@ dependencies {
     implementation("com.google.guava:guava:31.0.1-android")
 
     testImplementation("junit:junit:${Versions.junit}")
+    testImplementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:${Versions.Android.espresso}")
 

@@ -212,6 +212,29 @@ class SqlitePaymentsDb(
         }
     }
 
+    /**
+     * Should only be used for migrating legacy payments, where mapping old error messages to new
+     * error types is not possible.
+     */
+    @Deprecated("only use this method for migrating legacy payments")
+    suspend fun completeOutgoingLightningPartLegacy(
+        partId: UUID,
+        failedStatus: OutgoingPayment.LightningPart.Status.Failed,
+        completedAt: Long
+    ) {
+        val outQueries = _doNotFreezeMe.outQueries
+
+        withContext(Dispatchers.Default) {
+            val (statusType, statusData) = failedStatus.mapToDb()
+            outQueries.database.outgoingPaymentsQueries.updateLightningPart(
+                part_id = partId.toString(),
+                part_status_type = statusType,
+                part_status_blob = statusData,
+                part_completed_at = completedAt
+            )
+        }
+    }
+
     override suspend fun getOutgoingPaymentFromPartId(
         partId: UUID
     ): OutgoingPayment? {

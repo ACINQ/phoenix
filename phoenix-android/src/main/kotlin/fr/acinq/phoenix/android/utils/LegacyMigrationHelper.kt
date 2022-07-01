@@ -22,14 +22,17 @@ import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.eclair.db.IncomingPaymentStatus
 import fr.acinq.eclair.db.OutgoingPaymentStatus
+import fr.acinq.eclair.db.PaymentType
 import fr.acinq.eclair.db.sqlite.SqlitePaymentsDb
 import fr.acinq.eclair.db.sqlite.SqliteUtils
 import fr.acinq.eclair.wire.TemporaryNodeFailure
 import fr.acinq.eclair.wire.TrampolineFeeInsufficient
 import fr.acinq.eclair.wire.UnknownNextPeer
+import fr.acinq.lightning.Features
 import fr.acinq.lightning.Lightning
-import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.ShortChannelId
 import fr.acinq.lightning.db.ChannelClosingType
+import fr.acinq.lightning.db.HopDesc
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.payment.FinalFailure
@@ -42,11 +45,10 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.legacy.db.*
 import fr.acinq.phoenix.legacy.utils.Wallet
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConversions
 import scala.collection.JavaConverters
+import scala.collection.Seq
 import java.io.File
 
 object LegacyMigrationHelper {
@@ -67,18 +69,66 @@ object LegacyMigrationHelper {
         val legacyPaymentsDb = SqlitePaymentsDb(SqliteUtils.openSqliteFile(Wallet.getChainDatadir(context), "eclairdb-migration.sqlite", true, "wal", "normal"))
         log.info("opened legacy payments db")
 
-        val nodeParams = business.nodeParamsManager.nodeParams.filterNotNull().first()
-        log.info("retrieved node params from business")
-
         // 2 - get the new payments database
         val newPaymentsDb = business.databaseManager.paymentsDb()
 
         // 3 - extract all outgoing payments from the legacy database, and save them to the new database
-        val outgoing = JavaConversions.asJavaCollection(legacyPaymentsDb.listAllOutgoingPayments()).toList().groupBy { it.parentId() }
+        val outgoing = groupLegacyOutgoingPayments(legacyPaymentsDb.listAllOutgoingPayments())
         log.info("migrating ${outgoing.size} outgoing payments")
         outgoing.forEach {
             try {
-                saveOutgoingLegacyPayment(nodeParams, newPaymentsDb, legacyMetaRepository, it.value)
+                val parentId = it.key
+                val paymentMeta = legacyMetaRepository.get(parentId.toString())
+                val payment = modernizeLegacyOutgoingPayment(business.chain.chainHash, parentId, it.value, paymentMeta)
+
+                // save payment to database
+                newPaymentsDb.addOutgoingPayment(payment)
+                // status must be updated separately!
+                when (val status = payment.status) {
+                    is OutgoingPayment.Status.Completed.Succeeded.OffChain -> {
+                        newPaymentsDb.completeOutgoingPaymentOffchain(
+                            id = payment.id,
+                            preimage = status.preimage,
+                            completedAt = status.completedAt
+                        )
+                    }
+                    is OutgoingPayment.Status.Completed.Succeeded.OnChain -> {
+                        newPaymentsDb.completeOutgoingPaymentForClosing(
+                            id = payment.id,
+                            parts = emptyList(), // closing tx parts have already been inserted
+                            completedAt = status.completedAt
+                        )
+                    }
+                    is OutgoingPayment.Status.Completed.Failed -> {
+                        newPaymentsDb.completeOutgoingPaymentOffchain(
+                            id = payment.id,
+                            finalFailure = status.reason,
+                            completedAt = status.completedAt
+                        )
+                    }
+                    OutgoingPayment.Status.Pending -> {
+                        // no need to update the DB as this is the default status
+                    }
+                }
+                payment.parts.filterIsInstance<OutgoingPayment.LightningPart>().forEach { part ->
+                    when (val status = part.status) {
+                        is OutgoingPayment.LightningPart.Status.Succeeded -> newPaymentsDb.completeOutgoingLightningPart(part.id, status.preimage, status.completedAt)
+                        is OutgoingPayment.LightningPart.Status.Failed -> newPaymentsDb.completeOutgoingLightningPartLegacy(part.id, status, status.completedAt)
+                        OutgoingPayment.LightningPart.Status.Pending -> {}
+                    }
+                }
+                log.debug("migrated outgoing payment=$payment")
+
+                // save metadata
+                if (paymentMeta?.custom_desc != null) {
+                    newPaymentsDb.updateMetadata(
+                        id = WalletPaymentId.OutgoingPaymentId(parentId),
+                        userDescription = paymentMeta.custom_desc,
+                        userNotes = null
+                    )
+                    log.debug("saved custom desc=${paymentMeta.custom_desc} for payment=$parentId")
+                }
+                log.info("successfully migrated ${outgoing.size} outgoing payments")
             } catch (e: Exception) {
                 log.error("payment migration: failed to save payment=$it: ", e)
             }
@@ -89,35 +139,59 @@ object LegacyMigrationHelper {
         log.info("migrating ${incoming.size} incoming payments")
         incoming.forEach {
             try {
-                saveIncomingLegacyPayment(nodeParams, newPaymentsDb, legacyMetaRepository, legacyPayToOpenMetaRepository, it)
+                val paymentHash = it.paymentRequest().paymentHash().bytes().toHex()
+                val paymentMeta = legacyMetaRepository.get(paymentHash)
+                val payment = modernizeLegacyIncomingPayment(
+                    paymentMeta = legacyMetaRepository.get(paymentHash),
+                    payToOpenMeta = legacyPayToOpenMetaRepository.get(paymentHash),
+                    payment = it
+                )
+                if (payment?.received != null) {
+                    newPaymentsDb.addAndReceivePayment(
+                        preimage = payment.preimage,
+                        origin = payment.origin,
+                        receivedWith = payment.received!!.receivedWith,
+                        createdAt = it.createdAt(),
+                        receivedAt = payment.received!!.receivedAt
+                    )
+                    log.debug("migrated incoming payment=$payment")
+                }
+                // save metadata
+                if (paymentMeta?.custom_desc != null) {
+                    newPaymentsDb.updateMetadata(
+                        id = WalletPaymentId.IncomingPaymentId(paymentHash = ByteVector32.fromValidHex(paymentHash)),
+                        userDescription = paymentMeta.custom_desc,
+                        userNotes = null
+                    )
+                    log.debug("saved custom desc=${paymentMeta.custom_desc} for payment=$paymentHash")
+                }
+                log.info("successfully migrated ${incoming.size} incoming payments")
             } catch (e: Exception) {
                 log.error("payment migration: failed to save payment=$it: ", e)
             }
         }
 
-        log.info("moving legacy database to finalize migration...")
-        // eclairDbFile.renameTo(File(Wallet.getChainDatadir(context), "eclair-migrated.sqlite"))
-        log.info("legacy database has been moved")
+        log.info("moving eclair.sqlite legacy database to finalize migration...")
+        eclairDbFile.renameTo(File(Wallet.getChainDatadir(context), "eclair-migrated.sqlite"))
     }
 
-    private suspend fun saveIncomingLegacyPayment(
-        nodeParams: NodeParams,
-        newPaymentsDb: fr.acinq.phoenix.db.SqlitePaymentsDb,
-        legacyMetaRepository: PaymentMetaRepository,
-        legacyPayToOpenMetaRepository: PayToOpenMetaRepository,
+    fun modernizeLegacyIncomingPayment(
+        paymentMeta: PaymentMeta?,
+        payToOpenMeta: PayToOpenMeta?,
         payment: fr.acinq.eclair.db.IncomingPayment,
-    ) {
+    ): IncomingPayment? {
         val status = payment.status()
-        if (status !is IncomingPaymentStatus.Received) {
+        return if (status !is IncomingPaymentStatus.Received) {
             log.debug("ignore incoming pending payment=$payment")
+            null
         } else {
-            val paymentHash = payment.paymentRequest().paymentHash().bytes().toArray().byteVector32()
-            val paymentMeta = legacyMetaRepository.get(paymentHash.toHex())
-            val payToOpenMeta = legacyPayToOpenMetaRepository.get(paymentHash.toHex())
-
             // get details
-            val origin: IncomingPayment.Origin = if (paymentMeta?.swap_in_address != null) {
-                IncomingPayment.Origin.SwapIn(address = paymentMeta.swap_in_address)
+            val origin: IncomingPayment.Origin = if (payment.paymentType() == "SwapIn") {
+                if (paymentMeta?.swap_in_address != null) {
+                    IncomingPayment.Origin.SwapIn(address = paymentMeta.swap_in_address)
+                } else {
+                    IncomingPayment.Origin.SwapIn(address = "")
+                }
             } else {
                 IncomingPayment.Origin.Invoice(
                     paymentRequest = PaymentRequest.read(fr.acinq.eclair.payment.PaymentRequest.write(payment.paymentRequest()))
@@ -125,11 +199,11 @@ object LegacyMigrationHelper {
             }
 
             // use the PayToOpen metadata to know how the payment was received
-            val receivedWith = if (payToOpenMeta != null) {
+            val receivedWith = if (payToOpenMeta != null || payment.paymentType() == PaymentType.SwapIn()) {
                 IncomingPayment.ReceivedWith.NewChannel(
                     amount = status.amount().toLong().msat,
-                    fees = payToOpenMeta.fee_sat.sat.toMilliSatoshi(),
-                    channelId = null
+                    fees = payToOpenMeta?.fee_sat?.sat?.toMilliSatoshi() ?: 0.msat,
+                    channelId = ByteVector32.Zeroes
                 )
             } else {
                 IncomingPayment.ReceivedWith.LightningPayment(
@@ -139,26 +213,25 @@ object LegacyMigrationHelper {
                 )
             }
 
-            // save the payment as received
-            newPaymentsDb.addAndReceivePayment(
+            IncomingPayment(
                 preimage = payment.paymentPreimage().bytes().toArray().byteVector32(),
                 origin = origin,
-                receivedWith = setOf(receivedWith),
-                createdAt = payment.createdAt(),
-                receivedAt = status.receivedAt()
+                received = IncomingPayment.Received(setOf(receivedWith), status.receivedAt()),
+                createdAt = payment.createdAt()
             )
         }
     }
 
-    private suspend fun saveOutgoingLegacyPayment(
-        nodeParams: NodeParams,
-        newPaymentsDb: fr.acinq.phoenix.db.SqlitePaymentsDb,
-        legacyMetaRepository: PaymentMetaRepository,
-        payments: List<fr.acinq.eclair.db.OutgoingPayment>,
-    ) {
-        val head = payments.first()
-        val id = UUID.fromString(payments.first().parentId().toString())
-        val paymentMeta = legacyMetaRepository.get(payments.first().parentId().toString())
+    fun groupLegacyOutgoingPayments(payments: Seq<fr.acinq.eclair.db.OutgoingPayment>): Map<UUID, List<fr.acinq.eclair.db.OutgoingPayment>> =
+        JavaConversions.asJavaCollection(payments).toList().groupBy { UUID.fromString(it.parentId().toString()) }
+
+    fun modernizeLegacyOutgoingPayment(
+        chainHash: ByteVector32,
+        parentId: UUID,
+        listOfParts: List<fr.acinq.eclair.db.OutgoingPayment>,
+        paymentMeta: PaymentMeta?,
+    ): OutgoingPayment {
+        val head = listOfParts.first()
         val paymentRequest = if (head.paymentRequest().isDefined) {
             PaymentRequest.read(fr.acinq.eclair.payment.PaymentRequest.write(head.paymentRequest().get()))
         } else null
@@ -168,13 +241,13 @@ object LegacyMigrationHelper {
             OutgoingPayment.Details.SwapOut(
                 address = paymentMeta.swap_out_address ?: "",
                 paymentRequest = paymentRequest ?: PaymentRequest.create(
-                    chainHash = nodeParams.chainHash,
-                    amount = head.recipientAmount().toLong().msat + (paymentMeta.swap_out_fee_sat?.sat?.toMilliSatoshi() ?: 0.msat),
+                    chainHash = chainHash,
+                    amount = head.recipientAmount().toLong().msat,
                     paymentHash = head.paymentHash().bytes().toArray().byteVector32(),
                     privateKey = Lightning.randomKey(),
                     description = "swap-out to ${paymentMeta.swap_out_address} for ${paymentMeta.swap_out_feerate_per_byte} sat/b",
                     minFinalCltvExpiryDelta = PaymentRequest.DEFAULT_MIN_FINAL_EXPIRY_DELTA,
-                    features = nodeParams.features.invoiceFeatures()
+                    features = Features.empty
                 ),
                 swapOutFee = paymentMeta.swap_out_fee_sat?.sat ?: 0.sat
             )
@@ -191,41 +264,57 @@ object LegacyMigrationHelper {
         }
 
         // lightning parts
-        val lightningParts = payments.map { part ->
-            val (fees, status) = when (val partStatus = part.status()) {
+        val lightningParts = listOfParts.filter { it.paymentType() == PaymentType.Standard() }.map { part ->
+            when (val partStatus = part.status()) {
                 is OutgoingPaymentStatus.Succeeded -> {
-                    partStatus.feesPaid().toLong().msat to OutgoingPayment.LightningPart.Status.Succeeded(
-                        preimage = partStatus.paymentPreimage().bytes().toArray().byteVector32(),
-                        completedAt = partStatus.completedAt()
+                    OutgoingPayment.LightningPart(
+                        id = UUID.fromString(part.id().toString()),
+                        amount = part.amount().toLong().msat + partStatus.feesPaid().toLong().msat, // must include the fee!!!
+                        route = JavaConverters.asJavaCollectionConverter(partStatus.route()).asJavaCollection().toList().map { hop ->
+                            HopDesc(
+                                nodeId = PublicKey.fromHex(hop.nodeId().toString()),
+                                nextNodeId = PublicKey.fromHex(hop.nextNodeId().toString()),
+                                shortChannelId = if (hop.shortChannelId().isDefined) ShortChannelId(hop.shortChannelId().get().toLong()) else null
+                            )
+                        },
+                        status = OutgoingPayment.LightningPart.Status.Succeeded(
+                            preimage = partStatus.paymentPreimage().bytes().toArray().byteVector32(),
+                            completedAt = partStatus.completedAt()
+                        ),
+                        createdAt = part.createdAt()
                     )
                 }
                 is OutgoingPaymentStatus.Failed -> {
-                    val lastFailure = JavaConverters.asJavaCollectionConverter(partStatus.failures()).asJavaCollection().toList().lastOrNull()
-                    0.msat to OutgoingPayment.LightningPart.Status.Failed(
-                        remoteFailureCode = null,
-                        details = lastFailure?.failureMessage() ?: "error details unavailable",
-                        completedAt = partStatus.completedAt()
+                    OutgoingPayment.LightningPart(
+                        id = UUID.fromString(part.id().toString()),
+                        amount = part.amount().toLong().msat + 0.msat, // must include the fee!!!
+                        route = listOf(),
+                        status = OutgoingPayment.LightningPart.Status.Failed(
+                            remoteFailureCode = null,
+                            details = JavaConverters.asJavaCollectionConverter(partStatus.failures()).asJavaCollection().toList().lastOrNull()?.failureMessage() ?: "error details unavailable",
+                            completedAt = partStatus.completedAt()
+                        ),
+                        createdAt = part.createdAt()
                     )
                 }
                 else -> {
-                    0.msat to OutgoingPayment.LightningPart.Status.Pending
+                    OutgoingPayment.LightningPart(
+                        id = UUID.fromString(part.id().toString()),
+                        amount = part.amount().toLong().msat + 0.msat, // must include the fee!!!
+                        route = listOf(),
+                        status = OutgoingPayment.LightningPart.Status.Pending,
+                        createdAt = part.createdAt()
+                    )
                 }
             }
-            OutgoingPayment.LightningPart(
-                id = UUID.fromString(part.id().toString()),
-                amount = part.amount().toLong().msat + fees, // must include the fee!!!
-                route = listOf(),
-                status = status,
-                createdAt = part.createdAt()
-            )
         }
 
         val closingTxs = paymentMeta?.getSpendingTxs()?.map { ByteVector32.fromValidHex(it) } ?: emptyList()
         val closingTxsParts = if (head.paymentType() == "ClosingChannel") {
-            closingTxs.map { tx ->
+            closingTxs.mapIndexed { index, tx ->
                 OutgoingPayment.ClosingTxPart(
                     id = UUID.randomUUID(),
-                    claimed = 0.sat,
+                    claimed = if (index == 0) head.amount().truncateToSatoshi().toLong().sat else 0.sat,
                     txId = tx,
                     closingType = when (paymentMeta?.closing_type) {
                         ClosingType.Mutual.code -> ChannelClosingType.Mutual
@@ -242,19 +331,17 @@ object LegacyMigrationHelper {
 
         // save status
         val status: OutgoingPayment.Status = when {
-            payments.any { p -> p.status() is OutgoingPaymentStatus.`Pending$` } -> {
+            listOfParts.any { p -> p.status() is OutgoingPaymentStatus.`Pending$` } -> {
                 // pending is the default status of the payment
                 OutgoingPayment.Status.Pending
             }
-            payments.any { p -> p.status() is OutgoingPaymentStatus.Succeeded } -> {
-                val statuses = payments.map { it.status() }.filterIsInstance<OutgoingPaymentStatus.Succeeded>()
+            listOfParts.any { p -> p.status() is OutgoingPaymentStatus.Succeeded } -> {
+                val statuses = listOfParts.map { it.status() }.filterIsInstance<OutgoingPaymentStatus.Succeeded>()
                 if (paymentMeta?.swap_out_address != null && paymentMeta.swap_out_fee_sat != null && paymentMeta.swap_out_feerate_per_byte != null) {
-                    OutgoingPayment.Status.Completed.Succeeded.OnChain(completedAt = statuses.first().completedAt())
-                    // TODO: save legacy swap-out data
-                    // val totalSent = parts.map { p -> p.amount().toLong().msat + (p.status() as OutgoingPaymentStatus.Succeeded).feesPaid().toLong().msat }
-                    // val totalFees = totalSent - payments.first().recipientAmount().toLong().msat
-                    // val completedAt = parts.map { p -> p.status() as OutgoingPaymentStatus.Succeeded }.maxOf { s -> s.completedAt() }
-                    // val feeSwapOut = Satoshi(paymentMeta.swap_out_fee_sat)
+                    OutgoingPayment.Status.Completed.Succeeded.OffChain(
+                        preimage = statuses.first().paymentPreimage().bytes().toArray().byteVector32(),
+                        completedAt = statuses.last().completedAt()
+                    )
                 } else if (head.paymentType() == "ClosingChannel") {
                     OutgoingPayment.Status.Completed.Succeeded.OnChain(completedAt = statuses.first().completedAt())
                 } else {
@@ -265,9 +352,9 @@ object LegacyMigrationHelper {
                 }
             }
 
-            payments.any { p -> p.status() is OutgoingPaymentStatus.Failed } -> {
+            listOfParts.any { p -> p.status() is OutgoingPaymentStatus.Failed } -> {
                 // attempt to translate the old failure type to a kmp `FinalFailure`
-                val (finalFailure, completedAt) = payments.filter { p -> p.status() is OutgoingPaymentStatus.Failed }.let {
+                val (finalFailure, completedAt) = listOfParts.filter { p -> p.status() is OutgoingPaymentStatus.Failed }.let {
                     val lastFailure = JavaConverters.asJavaCollectionConverter((it.last().status() as OutgoingPaymentStatus.Failed).failures()).asJavaCollection().toList().lastOrNull()
                     when {
                         lastFailure == null -> FinalFailure.UnknownError
@@ -282,29 +369,19 @@ object LegacyMigrationHelper {
                 OutgoingPayment.Status.Completed.Failed(reason = finalFailure, completedAt = completedAt)
             }
 
-            else -> OutgoingPayment.Status.Pending
+            else -> {
+                OutgoingPayment.Status.Pending
+            }
         }
 
-        // add payment to db (without status)
-        newPaymentsDb.addOutgoingPayment(
-            OutgoingPayment(
-                id = id,
-                recipientAmount = head.recipientAmount().toLong().msat,
-                recipient = PublicKey.fromHex(head.recipientNodeId().toUncompressedBin().toHex()),
-                details = details,
-                parts = lightningParts + closingTxsParts,
-                status = status,
-                createdAt = head.createdAt()
-            )
+        return OutgoingPayment(
+            id = parentId,
+            recipientAmount = head.recipientAmount().toLong().msat,
+            recipient = PublicKey.fromHex(head.recipientNodeId().toString()),
+            details = details,
+            parts = lightningParts + closingTxsParts,
+            status = status,
+            createdAt = head.createdAt()
         )
-
-        // save metadata
-        if (paymentMeta?.custom_desc != null) {
-            newPaymentsDb.updateMetadata(
-                id = WalletPaymentId.OutgoingPaymentId(id),
-                userDescription = paymentMeta.custom_desc,
-                userNotes = null
-            )
-        }
     }
 }
