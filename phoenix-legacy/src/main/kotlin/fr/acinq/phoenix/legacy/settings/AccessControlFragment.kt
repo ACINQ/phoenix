@@ -76,7 +76,7 @@ class AccessControlFragment : BaseFragment(), SharedPreferences.OnSharedPreferen
   override fun onStart() {
     super.onStart()
     context?.let { model.updateLockState(it) }
-    PreferenceManager.getDefaultSharedPreferences(context).registerOnSharedPreferenceChangeListener(this)
+    context?.let { PreferenceManager.getDefaultSharedPreferences(it).registerOnSharedPreferenceChangeListener(this) }
     mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
     mBinding.softAuthUnavailable.setOnClickListener { startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS)) }
 
@@ -127,7 +127,7 @@ class AccessControlFragment : BaseFragment(), SharedPreferences.OnSharedPreferen
 
   override fun onStop() {
     super.onStop()
-    PreferenceManager.getDefaultSharedPreferences(context).unregisterOnSharedPreferenceChangeListener(this)
+    context?.let { PreferenceManager.getDefaultSharedPreferences(it).unregisterOnSharedPreferenceChangeListener(this) }
   }
 
   override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {

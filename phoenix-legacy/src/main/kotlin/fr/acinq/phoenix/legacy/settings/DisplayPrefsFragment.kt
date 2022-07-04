@@ -42,7 +42,7 @@ class DisplayPrefsFragment : BaseFragment(stayIfNotStarted = true), SharedPrefer
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentSettingsPrefsDisplayBinding.inflate(inflater, container, false)
     mBinding.lifecycleOwner = this
-    PreferenceManager.getDefaultSharedPreferences(context).registerOnSharedPreferenceChangeListener(this)
+    context?.let { PreferenceManager.getDefaultSharedPreferences(it).registerOnSharedPreferenceChangeListener(this) }
     return mBinding.root
   }
 

@@ -171,7 +171,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       EventBus.getDefault().register(this)
     }
     Wallet.hideKeyboard(context, mBinding.main)
-    PreferenceManager.getDefaultSharedPreferences(context).registerOnSharedPreferenceChangeListener(prefsListener)
+    context?.let { PreferenceManager.getDefaultSharedPreferences(it).registerOnSharedPreferenceChangeListener(prefsListener) }
 
     context?.let {
       refreshNotifications(it)
@@ -189,7 +189,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   override fun onStop() {
     super.onStop()
     EventBus.getDefault().unregister(this)
-    PreferenceManager.getDefaultSharedPreferences(context).unregisterOnSharedPreferenceChangeListener(prefsListener)
+    context?.let { PreferenceManager.getDefaultSharedPreferences(it).unregisterOnSharedPreferenceChangeListener(prefsListener) }
   }
 
   override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
