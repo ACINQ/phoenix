@@ -584,12 +584,7 @@ class AppScanController(
         } ?: Parser.readBitcoinAddress(chain, input).let {
             when (it) {
                 is Either.Left -> null
-                is Either.Right -> {
-                    val bitcoinAddrInfo = it.value
-                    bitcoinAddrInfo.paymentRequest?.let { paymentRequest ->
-                        Scan.ClipboardContent.InvoiceRequest(paymentRequest)
-                    } ?: Scan.ClipboardContent.BitcoinRequest(bitcoinAddrInfo)
-                }
+                is Either.Right -> Scan.ClipboardContent.BitcoinRequest(it.value)
             }
         }
     }
