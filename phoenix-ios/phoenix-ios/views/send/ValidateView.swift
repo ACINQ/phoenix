@@ -759,7 +759,10 @@ struct ValidateView: View {
 			problem = nil // display in gray at very beginning
 		}
 		
-		if mvi.model is Scan.Model_SwapOutFlow_Init && !hasPickedSwapOutMode {
+		if let model = mvi.model as? Scan.Model_SwapOutFlow_Init,
+		   model.address.paymentRequest != nil,
+		   !hasPickedSwapOutMode
+		{
 			log.debug("triggering popover w/PaymentLayerChoice")
 			
 			popoverState.display(dismissable: false) {
