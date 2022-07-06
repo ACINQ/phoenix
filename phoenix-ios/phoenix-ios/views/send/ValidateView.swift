@@ -546,6 +546,32 @@ struct ValidateView: View {
 	// MARK: Utilities
 	// --------------------------------------------------
 	
+	/// The amount we use when initializing the UI.
+	/// This gets pulled based on the type of flow in use.
+	///
+	func initialAmount() -> Lightning_kmpMilliSatoshi? {
+		
+		if let paymentRequest = paymentRequest() {
+			return paymentRequest.amount
+			
+		} else if let lnurlPay = lnurlPay() {
+			return lnurlPay.minSendable
+			
+		} else if let lnurlWithdraw = lnurlWithdraw() {
+			return lnurlWithdraw.maxWithdrawable
+			
+		} else if let model = mvi.model as? Scan.Model_SwapOutFlow_Init {
+			
+			if let amount_sat = model.address.amount {
+				return Lightning_kmpMilliSatoshi(sat: amount_sat)
+			} else if let paymentRequest = model.address.paymentRequest {
+				return paymentRequest.amount
+			}
+		}
+		
+		return nil
+	}
+	
 	func paymentRequest() -> Lightning_kmpPaymentRequest? {
 		
 		if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest {
@@ -735,16 +761,7 @@ struct ValidateView: View {
 		currency = Currency.bitcoin(bitcoinUnit)
 		currencyPickerChoice = currency.abbrev
 		
-		var amount_msat: Lightning_kmpMilliSatoshi? = nil
-		if let paymentRequest = paymentRequest() {
-			amount_msat = paymentRequest.amount
-		} else if let lnurlPay = lnurlPay() {
-			amount_msat = lnurlPay.minSendable
-		} else if let lnurlWithdraw = lnurlWithdraw() {
-			amount_msat = lnurlWithdraw.maxWithdrawable
-		}
-		
-		if let amount_msat = amount_msat {
+		if let amount_msat = initialAmount() {
 			
 			let formattedAmt = Utils.formatBitcoin(
 				msat: amount_msat,
