@@ -22,7 +22,7 @@ import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.utils.Parser
 import io.ktor.http.*
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
