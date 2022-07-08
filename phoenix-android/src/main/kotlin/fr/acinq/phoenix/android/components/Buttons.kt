@@ -61,7 +61,7 @@ fun BorderButton(
     enabled: Boolean = true,
     space: Dp = 16.dp,
     textStyle: TextStyle = MaterialTheme.typography.button,
-    padding: PaddingValues = PaddingValues(12.dp),
+    padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     isPrimary: Boolean = true,
     onClick: () -> Unit,
 ) {
@@ -90,7 +90,7 @@ fun FilledButton(
     enabled: Boolean = true,
     space: Dp = 16.dp,
     textStyle: TextStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.onPrimary),
-    padding: PaddingValues = PaddingValues(12.dp),
+    padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     backgroundColor: Color = MaterialTheme.colors.primary,
     onClick: () -> Unit,
 ) {
@@ -170,7 +170,7 @@ fun Button(
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Center,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = RectangleShape,
-    border: BorderStroke? = null, // ButtonDefaults.outlinedBorder,
+    border: BorderStroke? = null,
     elevation: ButtonElevation? = null,
     backgroundColor: Color = Color.Unspecified, // transparent by default!
 ) {

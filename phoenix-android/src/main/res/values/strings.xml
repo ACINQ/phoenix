@@ -168,7 +168,7 @@
     <string name="send_error_amount_overpaying">Cannot pay more than 2 times the requested amount.</string>
     <string name="send_error_amount_below_requested">This amount is below the requested amount.</string>
     <string name="send_destination_label">Send to</string>
-    <string name="send_description_label">Desc.</string>
+    <string name="send_description_label">Payment description</string>
     <string name="send_pay_button">Pay</string>
 
     <string name="send_paymentmode_onchain">Pay on-chain</string>
@@ -197,6 +197,7 @@
 
     <string name="scan_error_expired">Payment has expired.</string>
     <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
+    <string name="scan_error_already_paid">This payment has already been paid.</string>
     <string name="scan_error_invalid_chain">This payment does not use the same blockchain as your wallet.</string>
     <string name="scan_error_lnurl_invalid">Failed to process this LNUrl link. Make sure it is valid.</string>
     <string name="scan_error_lnurl_service_error">The LNUrl service returned an error.</string>
@@ -536,13 +537,6 @@
     <string name="lnurl_auth_failure_remote_io">Could not connect to %1$s</string>
     <string name="lnurl_auth_failure_remote_details">Server responded with %1$s</string>
 
-    <!-- //////////////// ln url pay //////////////// -->
-
-    <string name="lnurl_pay_wait" translatable="false">Retrieving payment details…</string>
-    <string name="lnurl_pay_error_remote" translatable="false">Could not get a valid invoice from %1$s.\n\nYou may want to try again later.</string>
-    <string name="lnurl_pay_error_remote_code" translatable="false">Could not get a valid invoice from %1$s (code %2$s).\n\nYou may want to try again later.</string>
-    <string name="lnurl_pay_error_missing_callback" translatable="false">There was an error when handling this invoice. Please try again later.</string>
-
     <!-- //////////////// ln url withdraw //////////////// -->
 
     <string name="lnurl_withdraw_amount_label">Amount to receive</string>
@@ -558,6 +552,35 @@
     <string name="lnurl_withdraw_error_amount_max">Amount cannot exceed %1$s.</string>
     <string name="lnurl_withdraw_error_remote">%1$s responded with an error: %2$s.\n\nTry again later, or contact their support.</string>
     <string name="lnurl_withdraw_error_remote_invalid_response">Invalid data</string>
+
+    <!-- //////////////// ln url pay //////////////// -->
+
+    <string name="lnurl_pay_domain">Served by</string>
+    <string name="lnurl_pay_meta_description">Payment description</string>
+    <string name="lnurl_pay_comment_title">Add optional comment</string>
+    <string name="lnurl_pay_comment_message">You can attach a comment to the payment (max %1$d characters). It will be sent to the recipient.</string>
+    <string name="lnurl_pay_comment_hint">No comment</string>
+    <string name="lnurl_pay_pay_button">Pay</string>
+    <string name="lnurl_pay_requesting_invoice">Requesting invoice…</string>
+    <string name="lnurl_pay_checking_invoice">Checking invoice…</string>
+    <string name="lnurl_pay_sending_payment">Sending payment…</string>
+
+    <string name="lnurl_pay_amount_empty">Amount must not be empty</string>
+    <string name="lnurl_pay_amount_below_min">Amount must be at least %1$s</string>
+    <string name="lnurl_pay_amount_above_max">Amount must be at most %1$s</string>
+    <string name="lnurl_pay_amount_above_balance">Amount exceeds your balance</string>
+    <string name="lnurl_pay_amount_invalid">Invalid amount</string>
+
+    <string name="lnurl_pay_error_header">Payment has failed:</string>
+    <string name="lnurl_pay_error_invalid_chain">The invoice returned by \'%1$s\' does not use the same chain as your wallet.</string>
+    <string name="lnurl_pay_error_already_paid">The invoice returned by \'%1$s\' has already been paid.</string>
+    <string name="lnurl_pay_error_invalid_amount">The invoice returned by \'%1$s\' has an incorrect amount.</string>
+    <string name="lnurl_pay_error_invalid_hash">The invoice returned by \'%1$s\' does not match the request details.</string>
+    <string name="lnurl_pay_error_invalid_malformed">The invoice returned by \'%1$s\' is malformed.</string>
+    <string name="lnurl_pay_error_remote_connection">The service \'%1$s\' is not reachable.</string>
+    <string name="lnurl_pay_error_remote_code">The service \'%1$s\' returned a HTTP %2$s error.</string>
+    <string name="lnurl_pay_error_remote_details">The service \'%1$s\' returned the following error: %2$s.</string>
+    <string name="lnurl_pay_error_remote_unreadable">The service \'%1$s\' returned an unreadable response.</string>
 
     <!-- //////////////// display preferences //////////////// -->
 

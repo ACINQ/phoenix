@@ -100,7 +100,7 @@ private class ReceiveViewModel(controller: ReceiveController, description: Strin
         viewModelScope.launch(Dispatchers.Default) {
             log.info("generating qrcode for invoice=$invoice")
             try {
-                qrBitmap = QRCode.generateBitmap(invoice).asImageBitmap()
+                qrBitmap = BitmapHelper.generateBitmap(invoice).asImageBitmap()
             } catch (e: Exception) {
                 log.error("error when generating bitmap QR for invoice=$invoice:", e)
             }

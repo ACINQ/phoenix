@@ -19,6 +19,9 @@ package fr.acinq.phoenix.android.components
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clipScrollableContainer
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -27,33 +30,34 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.constraintlayout.compose.ChainStyle
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.ConstraintSet
-import androidx.constraintlayout.compose.Dimension
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.msat
-import fr.acinq.phoenix.android.LocalBitcoinUnit
-import fr.acinq.phoenix.android.LocalFiatCurrency
+import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.utils.Converter.toFiat
 import fr.acinq.phoenix.android.utils.Converter.toMilliSatoshi
 import fr.acinq.phoenix.android.utils.Converter.toPlainString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toUnit
+import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.outlinedTextFieldColors
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -232,129 +236,97 @@ fun AmountInput(
     }
 }
 
+private enum class SlotsEnum { Input, Unit, DashedLine }
+
 /**
- * This input is designed to be in the center stage of a screen and use a customised basic input
+ * This input is designed to be in the center stage of a screen. It uses a customised basic input
  * instead of a standard, material-design input.
  */
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun AmountHeroInput(
     initialAmount: MilliSatoshi?,
     onAmountChange: (ComplexAmount?) -> Unit,
+    validationErrorMessage: String,
     modifier: Modifier = Modifier,
     inputModifier: Modifier = Modifier,
     dropdownModifier: Modifier = Modifier,
     inputTextSize: TextUnit = 16.sp,
-    unitTextSize: TextUnit = 16.sp,
 ) {
+    val log = logger("AmountHeroInput")
     val context = LocalContext.current
+    val prefUnit = preferredAmountUnit
     val prefBitcoinUnit = LocalBitcoinUnit.current
     val prefFiat = LocalFiatCurrency.current
     val rate = fiatRate
     val units = listOf<CurrencyUnit>(BitcoinUnit.Sat, BitcoinUnit.Bit, BitcoinUnit.MBtc, BitcoinUnit.Btc, prefFiat)
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
-    var unit: CurrencyUnit by remember { mutableStateOf(prefBitcoinUnit) }
-    var inputValue: String by remember { mutableStateOf(initialAmount?.toUnit(prefBitcoinUnit).toPlainString()) }
+    var unit: CurrencyUnit by remember { mutableStateOf(prefUnit) }
+    var inputValue by remember { mutableStateOf(TextFieldValue(initialAmount?.toUnit(prefBitcoinUnit).toPlainString())) }
     var convertedValue: String by remember { mutableStateOf(initialAmount?.toPrettyString(prefFiat, rate, withUnit = true) ?: "") }
-    var errorMessage: String by remember { mutableStateOf("") }
+    var internalErrorMessage: String by remember { mutableStateOf(validationErrorMessage ?: "") }
 
-    // references for constraint layout
-    val amountRef = "amount_input"
-    val unitRef = "unit_dropdown"
-    val altAmountRef = "alt_amount"
-    val amountLineRef = "amount_line"
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        ConstraintLayout(
-            constraintSet = ConstraintSet {
-                val amountInput = createRefFor(amountRef)
-                val unitDropdown = createRefFor(unitRef)
-                val altAmount = createRefFor(altAmountRef)
-
-                createHorizontalChain(amountInput, unitDropdown, chainStyle = ChainStyle.Packed)
-                constrain(amountInput) {
-                    width = Dimension.preferredValue(150.dp)
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(unitDropdown.start)
-                }
-                constrain(unitDropdown) {
-                    baseline.linkTo(amountInput.baseline)
-                    start.linkTo(amountInput.end, margin = 2.dp)
-                    end.linkTo(parent.end)
-                }
-                val amountLine = createRefFor(amountLineRef)
-                constrain(amountLine) {
-                    width = Dimension.fillToConstraints
-                    top.linkTo(amountInput.bottom, margin = 2.dp)
-                    start.linkTo(amountInput.start)
-                    end.linkTo(unitDropdown.end)
-                }
-                constrain(altAmount) {
-                    top.linkTo(amountInput.bottom, margin = 8.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
+    val input: @Composable () -> Unit = {
+        BasicTextField(
+            value = inputValue,
+            onValueChange = { newValue ->
+                inputValue = newValue
+                AmountInputHelper.convertToComplexAmount(
+                    context = context,
+                    input = inputValue.text,
+                    unit = unit,
+                    prefBitcoinUnit = prefBitcoinUnit,
+                    rate = rate,
+                    onConverted = { convertedValue = it },
+                    onError = { internalErrorMessage = it }
+                ).let { onAmountChange(it) }
             },
-            modifier = modifier.width(IntrinsicSize.Min)
-        ) {
-            BasicTextField(
-                value = inputValue,
-                onValueChange = { newValue ->
-                    inputValue = newValue
-                    AmountInputHelper.convertToComplexAmount(
-                        context = context,
-                        input = inputValue,
-                        unit = unit,
-                        prefBitcoinUnit = prefBitcoinUnit,
-                        rate = rate,
-                        onConverted = { convertedValue = it },
-                        onError = { errorMessage = it }
-                    ).let { onAmountChange(it) }
-                },
-                modifier = inputModifier
-                    .layoutId(amountRef)
-                    .defaultMinSize(minWidth = 32.dp)
-                    .sizeIn(maxWidth = 180.dp),
-                textStyle = MaterialTheme.typography.body1.copy(
-                    fontSize = 32.sp,
-                    color = MaterialTheme.colors.primary
-                ),
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.None,
-                    autoCorrect = false,
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                singleLine = true,
-            )
+            modifier = inputModifier
+                .clipScrollableContainer(Orientation.Horizontal)
+                .defaultMinSize(minWidth = 32.dp) // for good ux
+                .width(IntrinsicSize.Min), // make the textfield fits its content
+            textStyle = MaterialTheme.typography.body1.copy(
+                fontSize = inputTextSize,
+                color = MaterialTheme.colors.primary,
+                fontWeight = FontWeight.Light,
+            ),
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.None,
+                autoCorrect = false,
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus(); keyboardController?.hide() }),
+            singleLine = true,
+        )
+    }
 
-            UnitDropdown(
-                selectedUnit = unit,
-                units = units,
-                onUnitChange = { newValue ->
-                    unit = newValue
-                    AmountInputHelper.convertToComplexAmount(
-                        context = context,
-                        input = inputValue,
-                        unit = unit,
-                        prefBitcoinUnit = prefBitcoinUnit,
-                        rate = rate,
-                        onConverted = { convertedValue = it },
-                        onError = { errorMessage = it }
-                    ).let { onAmountChange(it) }
-                },
-                onDismiss = { },
-                modifier = dropdownModifier.layoutId(unitRef)
-            )
+    val unitDropdown: @Composable () -> Unit = {
+        UnitDropdown(
+            selectedUnit = unit,
+            units = units,
+            onUnitChange = { newValue ->
+                unit = newValue
+                AmountInputHelper.convertToComplexAmount(
+                    context = context,
+                    input = inputValue.text,
+                    unit = unit,
+                    prefBitcoinUnit = prefBitcoinUnit,
+                    rate = rate,
+                    onConverted = { convertedValue = it },
+                    onError = { internalErrorMessage = it }
+                ).let { onAmountChange(it) }
+            },
+            onDismiss = { },
+            modifier = dropdownModifier
+        )
+    }
 
-            // -- dashed line
-            AndroidView(modifier = Modifier
-                .layoutId(amountLineRef), factory = {
+    val dashedLine: @Composable () -> Unit = {
+        AndroidView(
+            factory = {
                 ImageView(it).apply {
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
@@ -362,20 +334,65 @@ fun AmountHeroInput(
                     )
                     setBackgroundResource(R.drawable.line_dots)
                 }
-            })
-        }
-
-        Text(
-            text = errorMessage.ifBlank {
-                convertedValue.takeIf { it.isNotBlank() }?.let { stringResource(id = R.string.utils_converted_amount, it) } ?: ""
-            },
-            maxLines = 1,
-            style = if (errorMessage.isNotBlank()) MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 14.sp) else MaterialTheme.typography.caption.copy(fontSize = 14.sp),
-            modifier = Modifier
-                .layoutId(altAmountRef)
-                .align(Alignment.CenterHorizontally)
+            }
         )
     }
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        SubcomposeLayout(modifier = Modifier) { constraints ->
+            val unitSlotPlaceables: List<Placeable> = subcompose(SlotsEnum.Unit, unitDropdown).map { it.measure(constraints) }
+            val unitWidth = unitSlotPlaceables.maxOf { it.width }
+            val unitHeight = unitSlotPlaceables.maxOf { it.height }
+
+            val inputSlotPlaceables: List<Placeable> = subcompose(SlotsEnum.Input, input).map {
+                it.measure(constraints.copy(maxWidth = constraints.maxWidth - unitWidth))
+            }
+            val inputWidth = inputSlotPlaceables.maxOf { it.width }
+            val inputHeight = inputSlotPlaceables.maxOf { it.height }
+
+            // dashed line width is input's width + unit's width
+            val layoutWidth = inputWidth + unitWidth
+            val dashedLinePlaceables = subcompose(SlotsEnum.DashedLine, dashedLine).map {
+                it.measure(constraints.copy(minWidth = layoutWidth, maxWidth = layoutWidth))
+            }
+            val dashedLineHeight = dashedLinePlaceables.maxOf { it.height }
+            val layoutHeight = listOf(inputHeight, unitHeight).maxOrNull() ?: 0 + dashedLineHeight
+
+            val inputBaseline = inputSlotPlaceables.map { it[FirstBaseline] }.maxOrNull() ?: 0
+            val unitBaseline = unitSlotPlaceables.map { it[FirstBaseline] }.maxOrNull() ?: 0
+
+            layout(layoutWidth, layoutHeight) {
+                var x = 0
+                var y = 0
+                inputSlotPlaceables.forEach {
+                    it.placeRelative(x, 0)
+                    x += it.width
+                    y = maxOf(y, it.height)
+                }
+                unitSlotPlaceables.forEach {
+                    it.placeRelative(x, inputBaseline - unitBaseline)
+                    x += it.width
+                    y = maxOf(y, it.height)
+                }
+                dashedLinePlaceables.forEach {
+                    it.placeRelative(0, y)
+                }
+            }
+        }
+
+        val errorMessage = validationErrorMessage.ifBlank { internalErrorMessage.ifBlank { null } }
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = errorMessage ?: convertedValue.takeIf { it.isNotBlank() }?.let { stringResource(id = R.string.utils_converted_amount, it) } ?: "",
+            maxLines = 1,
+            fontSize = 15.sp,
+            style = if (errorMessage != null) MaterialTheme.typography.body1.copy(color = negativeColor()) else MaterialTheme.typography.body1,
+        )
+    }
+
 }
 
 @Composable

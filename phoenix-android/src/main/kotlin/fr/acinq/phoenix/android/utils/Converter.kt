@@ -110,6 +110,14 @@ object Converter {
         if (withUnit) "$this $unit" else this
     }
 
+    fun MilliSatoshi.toPrettyStringWithFallback(unit: CurrencyUnit, rate: ExchangeRate.BitcoinPriceRate? = null, withUnit: Boolean = false, mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE): String {
+        return if (rate == null) {
+            toPrettyString(BitcoinUnit.Sat, null, withUnit, mSatDisplayPolicy)
+        } else {
+            toPrettyString(unit, rate, withUnit, mSatDisplayPolicy)
+        }
+    }
+
     fun MilliSatoshi.toPrettyString(unit: CurrencyUnit, rate: ExchangeRate.BitcoinPriceRate? = null, withUnit: Boolean = false, mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE): String = when {
         unit is BitcoinUnit -> this.toUnit(unit).toPrettyString(unit, withUnit, mSatDisplayPolicy)
         unit is FiatCurrency && rate != null -> this.toFiat(rate.price).toPrettyString(unit, withUnit)

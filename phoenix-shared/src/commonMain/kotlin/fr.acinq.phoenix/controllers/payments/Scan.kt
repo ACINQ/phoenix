@@ -95,16 +95,19 @@ object Scan {
         object LnurlServiceFetch : Model()
 
         sealed class LnurlPayFlow : Model() {
+            abstract val lnurlPay: LNUrl.Pay
             data class LnurlPayRequest(
-                val lnurlPay: LNUrl.Pay,
+                override val lnurlPay: LNUrl.Pay,
                 val error: LnurlPayError?
             ) : LnurlPayFlow()
 
             data class LnurlPayFetch(
-                val lnurlPay: LNUrl.Pay,
+                override val lnurlPay: LNUrl.Pay
             ) : LnurlPayFlow()
 
-            object Sending : LnurlPayFlow()
+            data class Sending(
+                override val lnurlPay: LNUrl.Pay
+            ) : LnurlPayFlow()
         }
 
         sealed class LnurlWithdrawFlow : Model() {

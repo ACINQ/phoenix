@@ -96,8 +96,6 @@ dependencies {
     implementation("androidx.compose.ui:ui-viewbinding:${Versions.Android.compose}")
     implementation("androidx.compose.runtime:runtime-livedata:${Versions.Android.compose}")
     implementation("androidx.compose.material:material:${Versions.Android.compose}")
-    // -- jetpack compose: constraint layout
-    implementation("androidx.constraintlayout:constraintlayout-compose:${Versions.Android.constraintLayoutCompose}")
     // -- jetpack compose: navigation
     implementation("androidx.navigation:navigation-compose:${Versions.Android.navCompose}")
     // -- jetpack compose: accompanist (utility library for compose)

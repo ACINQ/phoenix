@@ -387,6 +387,7 @@ class AppScanController(
         when (result) {
             null -> Unit
             is Either.Left -> {
+                logger.info { "lnurl-pay has failed with result=$result" }
                 model(
                     Scan.Model.LnurlPayFlow.LnurlPayRequest(
                         lnurlPay = intent.lnurlPay,
@@ -409,7 +410,7 @@ class AppScanController(
                     ),
                     swapOutData = null,
                 )
-                model(Scan.Model.LnurlPayFlow.Sending)
+                model(Scan.Model.LnurlPayFlow.Sending(intent.lnurlPay))
             }
         }
     }

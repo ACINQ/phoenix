@@ -322,7 +322,7 @@ private fun ConnectionDialogLine(label: String, connection: Connection?, onClick
 @Composable
 private fun IncomingAmountNotif(amount: MilliSatoshi) {
     Text(
-        text = stringResource(id = R.string.home__swapin_incoming, amount.toPrettyString(amountUnit, fiatRate, withUnit = true)),
+        text = stringResource(id = R.string.home__swapin_incoming, amount.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true)),
         style = MaterialTheme.typography.caption
     )
 }
