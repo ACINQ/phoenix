@@ -16,14 +16,12 @@
 
 package fr.acinq.phoenix.managers
 
-import fr.acinq.bitcoin.Block
 import fr.acinq.lightning.*
 import fr.acinq.lightning.blockchain.fee.FeerateTolerance
 import fr.acinq.lightning.blockchain.fee.OnChainFeeConf
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.Chain
 import kotlinx.coroutines.CoroutineScope
@@ -66,14 +64,25 @@ class NodeParamsManager(
                     keyManager = keyManager,
                     alias = "phoenix",
                     features = Features(
-                        Feature.OptionDataLossProtect to FeatureSupport.Mandatory,
+                        Feature.InitialRoutingSync to FeatureSupport.Optional,
+                        Feature.OptionDataLossProtect to FeatureSupport.Optional,
                         Feature.VariableLengthOnion to FeatureSupport.Mandatory,
                         Feature.PaymentSecret to FeatureSupport.Mandatory,
                         Feature.BasicMultiPartPayment to FeatureSupport.Optional,
                         Feature.Wumbo to FeatureSupport.Optional,
                         Feature.StaticRemoteKey to FeatureSupport.Optional,
-                        Feature.TrampolinePayment to FeatureSupport.Optional,
                         Feature.AnchorOutputs to FeatureSupport.Optional,
+                        Feature.ShutdownAnySegwit to FeatureSupport.Optional,
+                        Feature.ChannelType to FeatureSupport.Mandatory,
+                        Feature.PaymentMetadata to FeatureSupport.Optional,
+                        Feature.TrampolinePayment to FeatureSupport.Optional,
+                        Feature.ExperimentalTrampolinePayment to FeatureSupport.Optional,
+                        Feature.ZeroReserveChannels to FeatureSupport.Optional,
+                        Feature.ZeroConfChannels to FeatureSupport.Optional,
+                        Feature.WakeUpNotificationClient to FeatureSupport.Optional,
+                        Feature.PayToOpenClient to FeatureSupport.Optional,
+                        Feature.TrustedSwapInClient to FeatureSupport.Optional,
+                        Feature.ChannelBackupClient to FeatureSupport.Optional,
                     ),
                     dustLimit = 546.sat,
                     maxRemoteDustLimit = 600.sat,

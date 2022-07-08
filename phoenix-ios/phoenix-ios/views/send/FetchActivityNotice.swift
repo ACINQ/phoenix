@@ -4,7 +4,7 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "LnurlFetchNotice"
+	category: "FetchActivityNotice"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
@@ -12,7 +12,7 @@ fileprivate var log = Logger(OSLog.disabled)
 
 /// Designed to go into a small sub-view
 ///
-struct LnurlFetchNotice: View {
+struct FetchActivityNotice: View {
 	
 	let title: String
 	let onCancel: () -> Void

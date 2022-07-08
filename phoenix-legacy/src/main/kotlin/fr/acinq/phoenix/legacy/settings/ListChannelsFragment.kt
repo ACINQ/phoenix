@@ -94,6 +94,9 @@ class ListChannelsFragment : BaseFragment(), OnRefreshListener {
         shareChannelsData(list)
       }
     }
+    mBinding.importChannelsButton.setOnClickListener {
+      findNavController().navigate(R.id.action_list_channels_to_channels_import)
+    }
   }
 
   private fun shareChannelsData(list: MutableList<RES_GETINFO>) {

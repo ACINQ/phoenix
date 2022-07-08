@@ -11,43 +11,22 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct TipNumbers {
+struct PaymentNumbers {
 	let baseMsat: Int64
 	let tipMsat: Int64
+	let minerFeeMsat: Int64
 	let totalMsat: Int64
-	let percent: Double
+	let tipPercent: Double
+	let minerFeePercent: Double
 }
 
-struct TipStrings {
-	let bitcoin_base: FormattedAmount
-	let bitcoin_tip: FormattedAmount
-	let bitcoin_total: FormattedAmount
-	let fiat_base: FormattedAmount
-	let fiat_tip: FormattedAmount
-	let fiat_total: FormattedAmount
-	let percent: String
-	let isEmpty: Bool
-	
-	static func empty(_ currencyPrefs: CurrencyPrefs) -> TipStrings {
-		let zeroBitcoin = Utils.formatBitcoin(msat: 0, bitcoinUnit: currencyPrefs.bitcoinUnit)
-		let exchangeRate =  ExchangeRate.BitcoinPriceRate(
-			fiatCurrency: currencyPrefs.fiatCurrency,
-			price: 0.0,
-			source: "",
-			timestampMillis: 0
-		)
-		let zeroFiat = Utils.formatFiat(msat: 0, exchangeRate: exchangeRate)
-		return TipStrings(
-			bitcoin_base: zeroBitcoin,
-			bitcoin_tip: zeroBitcoin,
-			bitcoin_total: zeroBitcoin,
-			fiat_base: zeroFiat,
-			fiat_tip: zeroFiat,
-			fiat_total: zeroFiat,
-			percent: "0%",
-			isEmpty: true
-		)
-	}
+enum Problem: Error {
+	case emptyInput
+	case invalidInput
+	case expiredInvoice
+	case amountExceedsBalance
+	case finalAmountExceedsBalance // including minerFee
+	case amountOutOfRange
 }
 
 struct ValidateView: View {
@@ -64,8 +43,7 @@ struct ValidateView: View {
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
 	
 	@State var altAmount: String = ""
-	@State var isInvalidAmount: Bool = false
-	@State var isExpiredInvoice: Bool = false
+	@State var problem: Problem? = nil
 	
 	@State var preTipAmountMsat: Int64? = nil
 	@State var priceSliderVisible: Bool = false
@@ -73,11 +51,19 @@ struct ValidateView: View {
 	@State var comment: String = ""
 	@State var hasPromptedForComment = false
 	
+	@State var hasPickedSwapOutMode = false
+	
 	@State var didAppear = false
+	
+	let balancePublisher = AppDelegate.get().business.peerManager.balancePublisher()
+	@State var balanceMsat: Int64 = 0
+	
+	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
+	@State var chainContext: WalletContext.V0ChainContext? = nil
 	
 	@StateObject var connectionsManager = ObservableConnectionsManager()
 	
-	@Environment(\.colorScheme) var colorScheme
+	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.popoverState) var popoverState: PopoverState
 	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
@@ -89,22 +75,6 @@ struct ValidateView: View {
 		value: { [$0.size.width] }
 	)
 	@State var maxButtonWidth: CGFloat? = nil
-	
-	// For the tipSummary: the max of: [base, tip, total]
-	enum MaxBitcoinWidth: Preference {}
-	let maxBitcoinWidthReader = GeometryPreferenceReader(
-		key: AppendValue<MaxBitcoinWidth>.self,
-		value: { [$0.size.width] }
-	)
-	@State var maxBitcoinWidth: CGFloat? = nil
-	
-	// For the tipSummary: the max of: [base, tip, total]
-	enum MaxFiatWidth: Preference {}
-	let maxFiatWidthReader = GeometryPreferenceReader(
-		key: AppendValue<MaxFiatWidth>.self,
-		value: { [$0.size.width] }
-	)
-	@State var maxFiatWidth: CGFloat? = nil
 	
 	// --------------------------------------------------
 	// MARK: ViewBuilders
@@ -133,27 +103,33 @@ struct ValidateView: View {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.ignoresSafeArea(.all, edges: .all)
-					.onTapGesture {
-						dismissKeyboardIfVisible()
-					}
-			} else {
-				Color.clear
-					.ignoresSafeArea(.all, edges: .all)
-					.contentShape(Rectangle())
-					.onTapGesture {
-						dismissKeyboardIfVisible()
-					}
 			}
 			
-			content
+			GeometryReader { geometry in
+				ScrollView(.vertical) {
+					content
+						.frame(width: geometry.size.width)
+						.frame(minHeight: geometry.size.height)
+				}
+				.onTapGesture {
+					dismissKeyboardIfVisible()
+				}
+			}
 			
-			if mvi.model is Scan.Model_LnurlPayFlow_LnurlPayFetch {
-				LnurlFetchNotice(
+			if mvi.model is Scan.Model_SwapOutFlow_Requesting {
+				FetchActivityNotice(
+					title: NSLocalizedString("Fetching Invoice", comment: "Progress title"),
+					onCancel: { didCancelSwapOutRequest() }
+				)
+			}
+			else if mvi.model is Scan.Model_LnurlPayFlow_LnurlPayFetch {
+				FetchActivityNotice(
 					title: NSLocalizedString("Fetching Invoice", comment: "Progress title"),
 					onCancel: { didCancelLnurlPayFetch() }
 				)
-			} else if mvi.model is Scan.Model_LnurlWithdrawFlow_LnurlWithdrawFetch {
-				LnurlFetchNotice(
+			}
+			else if mvi.model is Scan.Model_LnurlWithdrawFlow_LnurlWithdrawFetch {
+				FetchActivityNotice(
 					title: NSLocalizedString("Forwarding Invoice", comment: "Progress title"),
 					onCancel: { didCancelLnurlWithdrawFetch() }
 				)
@@ -184,13 +160,21 @@ struct ValidateView: View {
 		.onChange(of: currencyPickerChoice) { _ in
 			currencyPickerDidChange()
 		}
+		.onReceive(balancePublisher) {
+			balanceDidChange($0)
+		}
+		.onReceive(chainContextPublisher) {
+			chainContextDidChange($0)
+		}
 	}
 	
 	@ViewBuilder
 	var content: some View {
 	
-		let isDisconnected = connectionsManager.connections.global != .established
+		let isDisconnected = !(connectionsManager.connections.global is Lightning_kmpConnection.ESTABLISHED)
 		VStack {
+			
+			Spacer().frame(height: 20)
 	
 			if let host = paymentHost() {
 				VStack(alignment: HorizontalAlignment.center, spacing: 10) {
@@ -220,7 +204,7 @@ struct ValidateView: View {
 					.font(.title)
 					.multilineTextAlignment(.trailing)
 					.minimumScaleFactor(0.95) // SwiftUI bugs: truncating text in RTL
-					.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
+					.foregroundColor(isInvalidAmount() ? Color.appNegative : Color.primaryForeground)
 			
 				Picker(selection: $currencyPickerChoice, label: Text(currencyPickerChoice).frame(minWidth: 40)) {
 					ForEach(currencyPickerOptions(), id: \.self) { option in
@@ -241,7 +225,7 @@ struct ValidateView: View {
 			
 			Text(altAmount)
 				.font(.caption)
-				.foregroundColor((isInvalidAmount || isExpiredInvoice) ? Color.appNegative : .secondary)
+				.foregroundColor(problem != nil ? Color.appNegative : .secondary)
 				.padding(.top, 4)
 				.padding(.bottom)
 			
@@ -273,31 +257,36 @@ struct ValidateView: View {
 			}
 			
 			Button {
-				sendPayment()
+				if mvi.model is Scan.Model_SwapOutFlow_Init {
+					prepareTransaction()
+				} else {
+					sendPayment()
+				}
 			} label: {
 				HStack {
-					if mvi.model is Scan.Model_LnurlWithdrawFlow {
+					if mvi.model is Scan.Model_SwapOutFlow_Init {
+						Image(systemName: "hammer")
+							.renderingMode(.template)
+						Text("Prepare Transaction")
+					}
+					else if mvi.model is Scan.Model_LnurlWithdrawFlow {
 						Image("ic_receive")
 							.renderingMode(.template)
 							.resizable()
 							.aspectRatio(contentMode: .fit)
-							.foregroundColor(Color.white)
 							.frame(width: 22, height: 22)
 						Text("Redeem")
-							.font(.title2)
-							.foregroundColor(Color.white)
 					} else {
 						Image("ic_send")
 							.renderingMode(.template)
 							.resizable()
 							.aspectRatio(contentMode: .fit)
-							.foregroundColor(Color.white)
 							.frame(width: 22, height: 22)
 						Text("Pay")
-							.font(.title2)
-							.foregroundColor(Color.white)
 					}
 				}
+				.font(.title2)
+				.foregroundColor(Color.white)
 				.padding(.top, 4)
 				.padding(.bottom, 5)
 				.padding([.leading, .trailing], 24)
@@ -307,9 +296,9 @@ struct ValidateView: View {
 				backgroundFill: Color.appAccent,
 				disabledBackgroundFill: Color.gray
 			))
-			.disabled(isInvalidAmount || isExpiredInvoice || isDisconnected)
+			.disabled(problem != nil || isDisconnected)
 		
-			if !isInvalidAmount && !isExpiredInvoice && isDisconnected {
+			if problem == nil && isDisconnected {
 				
 				Button {
 					showAppStatusPopover()
@@ -324,58 +313,13 @@ struct ValidateView: View {
 				.padding(.top, 4)
 			}
 			
-			tipSummary
-				.padding(.top)
-				.padding(.top)
+			PaymentSummaryView(
+				problem: $problem,
+				paymentNumbers: paymentNumbers()
+			)
+			.padding(.top)
+			.padding(.top)
 		} // </VStack>
-	}
-	
-	@ViewBuilder
-	var tipSummary: some View {
-		
-		let tipInfo = tipStrings()
-		
-		// 1,000 sat       0.57 usd
-		//    30 sat  +3%  0.01 usd
-		// ---------       --------
-		// 1,030 sat       0.58 usd
-		
-		HStack(alignment: VerticalAlignment.center, spacing: 16) {
-		
-			VStack(alignment: HorizontalAlignment.trailing, spacing: 8) {
-				Text(verbatim: tipInfo.bitcoin_base.string)
-					.read(maxBitcoinWidthReader)
-				Text(verbatim: "+ \(tipInfo.bitcoin_tip.string)")
-					.read(maxBitcoinWidthReader)
-				Divider()
-					.frame(width: tipInfo.isEmpty ? 0 : maxBitcoinWidth ?? 0, height: 1)
-				Text(verbatim: tipInfo.bitcoin_total.string)
-					.read(maxBitcoinWidthReader)
-			}
-			
-			VStack(alignment: HorizontalAlignment.center, spacing: 8) {
-				Text(verbatim: "")
-				Text(verbatim: tipInfo.percent)
-				Divider()
-					.frame(width: 0, height: 1)
-				Text(verbatim: "")
-			}
-			
-			VStack(alignment: HorizontalAlignment.trailing, spacing: 8) {
-				Text(verbatim: tipInfo.fiat_base.string)
-					.read(maxFiatWidthReader)
-				Text(verbatim: "+ \(tipInfo.fiat_tip.string)")
-					.read(maxFiatWidthReader)
-				Divider()
-					.frame(width: tipInfo.isEmpty ? 0 : maxBitcoinWidth ?? 0, height: 1)
-				Text(verbatim: tipInfo.fiat_total.string)
-					.read(maxFiatWidthReader)
-			}
-		}
-		.assignMaxPreference(for: maxBitcoinWidthReader.key, to: $maxBitcoinWidth)
-		.assignMaxPreference(for: maxFiatWidthReader.key, to: $maxFiatWidth)
-		.font(.footnote)
-		.foregroundColor(tipInfo.isEmpty ? Color.clear : Color.secondary)
 	}
 	
 	@ViewBuilder
@@ -472,20 +416,6 @@ struct ValidateView: View {
 		)
 	}
 	
-	func priceTargetButtonText() -> String {
-		
-		if let _ = lnurlWithdraw() {
-			return NSLocalizedString("range", comment: "button label - try to make it short")
-		} else {
-			return NSLocalizedString("tip", comment: "button label - try to make it short")
-		}
-	}
-	
-	func priceTargetButtonDisabled() -> Bool {
-		
-		return isAmountlessInvoice() && (parsedAmountMsat() == nil)
-	}
-	
 	func paymentHost() -> String? {
 		
 		if let lnurlPay = lnurlPay() {
@@ -499,9 +429,29 @@ struct ValidateView: View {
 		}
 	}
 	
+	func isInvalidAmount() -> Bool {
+		
+		if let problem = problem {
+			switch problem {
+				case .emptyInput: return true
+				case .invalidInput: return true
+				case .amountOutOfRange: return true
+				case .amountExceedsBalance: return true
+				case .finalAmountExceedsBalance: return false // problem isn't amount, it's the minerFee
+				case .expiredInvoice: return false // problem isn't amount, it's the invoice
+			}
+			
+		} else {
+			return false
+		}
+	}
+	
 	func requestDescription() -> String? {
 		
-		if let paymentRequest = paymentRequest() {
+		if mvi.model is Scan.Model_SwapOutFlow {
+			return NSLocalizedString("On-Chain Payment", comment: "Generic description for L1 payment")
+			
+		} else if let paymentRequest = paymentRequest() {
 			return paymentRequest.desc()
 			
 		} else if let lnurlPay = lnurlPay() {
@@ -539,7 +489,7 @@ struct ValidateView: View {
 		// The "price target" button has multiple uses/meanings:
 		//
 		// - for invoices, it means adding a tip
-		// - for lnurl-pay, it's the acceptable range (generally a tip)
+		// - for lnurl-pay, it's the acceptable range (could be a tip, depends on context)
 		// - for lnurl-withdraw, it's the range of money to withdraw
 		
 		if let tuple = priceRange() {
@@ -554,6 +504,20 @@ struct ValidateView: View {
 		}
 	}
 	
+	func priceTargetButtonText() -> String {
+		
+		if let _ = lnurlWithdraw() {
+			return NSLocalizedString("range", comment: "button label - try to make it short")
+		} else {
+			return NSLocalizedString("tip", comment: "button label - try to make it short")
+		}
+	}
+	
+	func priceTargetButtonDisabled() -> Bool {
+		
+		return isAmountlessInvoice() && (parsedAmountMsat() == nil)
+	}
+	
 	func supportsComment() -> Bool {
 		
 		guard let lnurlPay = lnurlPay() else {
@@ -566,72 +530,55 @@ struct ValidateView: View {
 	
 	func disconnectedText() -> String {
 		
-		if connectionsManager.connections.internet != Lightning_kmpConnection.established {
+		if !(connectionsManager.connections.internet is Lightning_kmpConnection.ESTABLISHED) {
 			return NSLocalizedString("waiting for internet", comment: "button text")
 		}
-		if connectionsManager.connections.peer != Lightning_kmpConnection.established {
+		if !(connectionsManager.connections.peer is Lightning_kmpConnection.ESTABLISHED) {
 			return NSLocalizedString("connecting to peer", comment: "button text")
 		}
-		if connectionsManager.connections.electrum != Lightning_kmpConnection.established {
+		if !(connectionsManager.connections.electrum is Lightning_kmpConnection.ESTABLISHED) {
 			return NSLocalizedString("connecting to electrum", comment: "button text")
 		}
 		return ""
-	}
-	
-	func tipStrings() -> TipStrings {
-		
-		if isInvalidAmount { // e.g. exceeds balance
-			return TipStrings.empty(currencyPrefs)
-		}
-		
-		guard let nums = tipNumbers() else {
-			return TipStrings.empty(currencyPrefs)
-		}
-		
-		let bitcoin_base = Utils.formatBitcoin(msat: nums.baseMsat, bitcoinUnit: currencyPrefs.bitcoinUnit)
-		let bitcoin_tip = Utils.formatBitcoin(msat: nums.tipMsat, bitcoinUnit: currencyPrefs.bitcoinUnit)
-		let bitcoin_total = Utils.formatBitcoin(msat: nums.totalMsat, bitcoinUnit: currencyPrefs.bitcoinUnit)
-		
-		let fiat_base: FormattedAmount
-		let fiat_tip: FormattedAmount
-		let fiat_total: FormattedAmount
-		if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: currencyPrefs.fiatCurrency) {
-			
-			fiat_base = Utils.formatFiat(msat: nums.baseMsat, exchangeRate: exchangeRate)
-			fiat_tip = Utils.formatFiat(msat: nums.tipMsat, exchangeRate: exchangeRate)
-			fiat_total = Utils.formatFiat(msat: nums.totalMsat, exchangeRate: exchangeRate)
-		} else {
-			fiat_base = Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
-			fiat_tip = Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
-			fiat_total = Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
-		}
-		
-		let formatter = NumberFormatter()
-		formatter.numberStyle = .percent
-		
-		let percentStr = formatter.string(from: NSNumber(value: nums.percent)) ?? "?%"
-		
-		return TipStrings(
-			bitcoin_base  : bitcoin_base,
-			bitcoin_tip   : bitcoin_tip,
-			bitcoin_total : bitcoin_total,
-			fiat_base     : fiat_base,
-			fiat_tip      : fiat_tip,
-			fiat_total    : fiat_total,
-			percent       : percentStr,
-			isEmpty       : false
-		)
 	}
 	
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
 	
+	/// The amount we use when initializing the UI.
+	/// This gets pulled based on the type of flow in use.
+	///
+	func initialAmount() -> Lightning_kmpMilliSatoshi? {
+		
+		if let paymentRequest = paymentRequest() {
+			return paymentRequest.amount
+			
+		} else if let lnurlPay = lnurlPay() {
+			return lnurlPay.minSendable
+			
+		} else if let lnurlWithdraw = lnurlWithdraw() {
+			return lnurlWithdraw.maxWithdrawable
+			
+		} else if let model = mvi.model as? Scan.Model_SwapOutFlow_Init {
+			
+			if let amount_sat = model.address.amount {
+				return Lightning_kmpMilliSatoshi(sat: amount_sat)
+			} else if let paymentRequest = model.address.paymentRequest {
+				return paymentRequest.amount
+			}
+		}
+		
+		return nil
+	}
+	
 	func paymentRequest() -> Lightning_kmpPaymentRequest? {
 		
 		if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest {
 			return model.paymentRequest
 		} else {
+			// Note: there's technically a `paymentRequest` within `Scan.Model_SwapOutFlow_Ready`.
+			// But this method is designed to only pull from `Scan.Model_InvoiceFlow_InvoiceRequest`.
 			return nil
 		}
 	}
@@ -658,9 +605,15 @@ struct ValidateView: View {
 		}
 	}
 	
+	/// Returns true if:
+	/// - this is a normal lightning invoice without a set amount
+	/// - this is an on-chain payment (i.e. swap-out)
+	///
 	func isAmountlessInvoice() -> Bool {
 		
-		if let paymentRequest = paymentRequest() {
+		if mvi.model is Scan.Model_SwapOutFlow {
+			return true
+		} else if let paymentRequest = paymentRequest() {
 			return paymentRequest.amount == nil
 		} else {
 			return false
@@ -676,12 +629,13 @@ struct ValidateView: View {
 					max: min.times(m: 2.0)
 				)
 			}
-		}
-		else if let lnurlPay = lnurlPay() {
+			
+		} else if let lnurlPay = lnurlPay() {
 			return MsatRange(
 				min: lnurlPay.minSendable,
 				max: lnurlPay.maxSendable
 			)
+			
 		} else if let lnurlWithdraw = lnurlWithdraw() {
 			return MsatRange(
 				min: lnurlWithdraw.minWithdrawable,
@@ -692,48 +646,59 @@ struct ValidateView: View {
 		return nil
 	}
 	
-	func balanceMsat() -> Int64? {
+	func swapOutRange() -> MsatRange? {
 		
-		if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest {
-			return model.balanceMsat
-		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
-			return model.balanceMsat
-		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayFetch {
-			return model.balanceMsat
-		} else if let model = mvi.model as? Scan.Model_LnurlWithdrawFlow_LnurlWithdrawRequest {
-			return model.balanceMsat
-		} else if let model = mvi.model as? Scan.Model_LnurlWithdrawFlow_LnurlWithdrawFetch {
-			return model.balanceMsat
-		} else {
+		guard let chainContext = chainContext, mvi.model is Scan.Model_SwapOutFlow else {
 			return nil
 		}
+
+		return MsatRange(
+			min: Utils.toMsat(sat: chainContext.swapOut.v1.minAmountSat),
+			max: Utils.toMsat(sat: chainContext.swapOut.v1.maxAmountSat)
+		)
 	}
 	
-	func tipNumbers() -> TipNumbers? {
+	func paymentNumbers() -> PaymentNumbers? {
 		
-		guard let totalMsat = parsedAmountMsat() else {
-			log.debug("tipNumbers() -> nil: totalMsat is nil")
+		guard let preMinerFeeMsat = parsedAmountMsat() else {
 			return nil
 		}
 		
-		var baseMsat: Int64? = nil
+		var preTipMsat: Int64? = nil
 		if let preTipAmountMsat = preTipAmountMsat {
-			baseMsat = preTipAmountMsat
+			preTipMsat = preTipAmountMsat
 		} else if let paymentRequest = paymentRequest() {
-			baseMsat = paymentRequest.amount?.msat
+			preTipMsat = paymentRequest.amount?.msat
 		} else if let lnurlPay = lnurlPay() {
-			baseMsat = lnurlPay.minSendable.msat
+			preTipMsat = lnurlPay.minSendable.msat
+		}
+		let baseMsat = preTipMsat ?? preMinerFeeMsat
+		
+		let tipMsat = preMinerFeeMsat - baseMsat
+		let tipPercent = Double(tipMsat) / Double(baseMsat)
+		
+		let minerFeeMsat: Int64
+		if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
+			minerFeeMsat = Utils.toMsat(sat: model.fee)
+		} else {
+			minerFeeMsat = 0
 		}
 		
-		guard let baseMsat = baseMsat, totalMsat > baseMsat else {
-			log.debug("tipNumbers() -> nil: baseMsat is nil")
+		if tipMsat <= 0 && minerFeeMsat <= 0 {
 			return nil
 		}
 		
-		let tipMsat = totalMsat - baseMsat
-		let percent = Double(tipMsat) / Double(baseMsat)
+		let minerFeePercent = Double(minerFeeMsat) / Double(preMinerFeeMsat)
+		let totalMsat = preMinerFeeMsat + minerFeeMsat
 		
-		return TipNumbers(baseMsat: baseMsat, tipMsat: tipMsat, totalMsat: totalMsat, percent: percent)
+		return PaymentNumbers(
+			baseMsat        : baseMsat,
+			tipMsat         : tipMsat,
+			minerFeeMsat    : minerFeeMsat,
+			totalMsat       : totalMsat,
+			tipPercent      : tipPercent,
+			minerFeePercent : minerFeePercent
+		)
 	}
 	
 	func currencyPickerOptions() -> [String] {
@@ -796,31 +761,48 @@ struct ValidateView: View {
 		currency = Currency.bitcoin(bitcoinUnit)
 		currencyPickerChoice = currency.abbrev
 		
-		var amount_msat: Lightning_kmpMilliSatoshi? = nil
-		if let paymentRequest = paymentRequest() {
-			amount_msat = paymentRequest.amount
-		} else if let lnurlPay = lnurlPay() {
-			amount_msat = lnurlPay.minSendable
-		} else if let lnurlWithdraw = lnurlWithdraw() {
-			amount_msat = lnurlWithdraw.maxWithdrawable
-		}
-		
-		if let amount_msat = amount_msat {
+		if let amount_msat = initialAmount() {
 			
-			let formattedAmt = Utils.formatBitcoin(msat: amount_msat, bitcoinUnit: bitcoinUnit, policy: .showMsats)
+			let formattedAmt = Utils.formatBitcoin(
+				msat: amount_msat,
+				bitcoinUnit: bitcoinUnit,
+				policy: .showMsatsIfNonZero
+			)
 			
 			parsedAmount = Result.success(formattedAmt.amount) // do this first !
 			amount = formattedAmt.digits
 		} else {
 			altAmount = NSLocalizedString("Enter an amount", comment: "error message")
-			isInvalidAmount = false // display in gray at very beginning
+			problem = nil // display in gray at very beginning
+		}
+		
+		if let model = mvi.model as? Scan.Model_SwapOutFlow_Init,
+		   model.address.paymentRequest != nil,
+		   !hasPickedSwapOutMode
+		{
+			log.debug("triggering popover w/PaymentLayerChoice")
+			
+			popoverState.display(dismissable: false) {
+				PaymentLayerChoice(mvi: mvi)
+			} onWillDisappear: {
+				hasPickedSwapOutMode = true
+			}
 		}
 	}
 	
 	func modelDidChange(_ newModel: Scan.Model) -> Void {
 		log.trace("modelDidChange()")
 		
-		if let model = newModel as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
+		if newModel is Scan.Model_SwapOutFlow {
+			
+			// Possible transitions:
+			// - Init -> Requesting
+			// - Requesting -> Ready => amount + minerFee >? balance
+			// - Ready -> Init       => remove minerFee from calculations
+			
+			refreshAltAmount()
+		
+		} else if let model = newModel as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
 			if let payError = model.error {
 				
 				popoverState.display(dismissable: true) {
@@ -863,6 +845,9 @@ struct ValidateView: View {
 		log.trace("amountDidChange()")
 		
 		refreshAltAmount()
+		if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
+			mvi.intent(Scan.Intent_SwapOutFlow_Invalidate(address: model.address))
+		}
 	}
 	
 	func currencyPickerDidChange() -> Void {
@@ -879,6 +864,9 @@ struct ValidateView: View {
 				
 				// This seems to be needed, because `amountDidChange` isn't automatically called
 				refreshAltAmount()
+				if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
+					mvi.intent(Scan.Intent_SwapOutFlow_Invalidate(address: model.address))
+				}
 			}
 			
 		} else { // user selected "other"
@@ -892,22 +880,39 @@ struct ValidateView: View {
 		}
 	}
 	
+	func balanceDidChange(_ balance: Lightning_kmpMilliSatoshi?) {
+		log.trace("balanceDidChange()")
+		
+		if let balance = balance {
+			balanceMsat = balance.msat
+		} else {
+			balanceMsat = 0
+		}
+	}
+	
+	func chainContextDidChange(_ context: WalletContext.V0ChainContext) -> Void {
+		log.trace("chainContextDidChange()")
+		
+		chainContext = context
+	}
+	
 	func refreshAltAmount() -> Void {
 		log.trace("refreshAltAmount()")
 		
 		switch parsedAmount {
 		case .failure(let error):
-			isInvalidAmount = true
 			
 			switch error {
 			case .emptyInput:
+				problem = .emptyInput
 				altAmount = NSLocalizedString("Enter an amount", comment: "error message")
 			case .invalidInput:
+				problem = .invalidInput
 				altAmount = NSLocalizedString("Enter a valid amount", comment: "error message")
 			}
 			
 		case .success(let amt):
-			isInvalidAmount = false
+			problem = nil
 			
 			var msat: Int64? = nil
 			switch currency {
@@ -920,12 +925,25 @@ struct ValidateView: View {
 				}
 			}
 			
-			if let msat = msat {
+			if let msat = msat, !(mvi.model is Scan.Model_LnurlWithdrawFlow) {
 				
-				let balanceMsat = balanceMsat() ?? 0
-				if msat > balanceMsat && !(mvi.model is Scan.Model_LnurlWithdrawFlow) {
-					isInvalidAmount = true
+				// There are 2 scenarios that we handle slightly differently:
+				// - amount user selected (amount + tip) exceeds balance
+				// - total amount (including server-selected miner fee) exceeds balance
+				//
+				// In one scenario, the user is at fault.
+				// In the other, the user unexpectedly went over the limit.
+				
+				if msat > balanceMsat {
+					problem = .amountExceedsBalance
 					altAmount = NSLocalizedString("Amount exceeds your balance", comment: "error message")
+					
+				} else if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
+					let totalMsat = msat + Utils.toMsat(sat: model.fee)
+					if totalMsat > balanceMsat {
+						problem = .finalAmountExceedsBalance
+						altAmount = NSLocalizedString("Total amount exceeds your balance", comment: "error message")
+					}
 				}
 			}
 			
@@ -933,17 +951,15 @@ struct ValidateView: View {
 			   let expiryTimestampSeconds = paymentRequest.expiryTimestampSeconds()?.doubleValue,
 			   Date(timeIntervalSince1970: expiryTimestampSeconds) <= Date()
 			{
-				isExpiredInvoice = true
-				if !isInvalidAmount {
+				if problem == nil {
+					problem = .expiredInvoice
 					altAmount = NSLocalizedString("Invoice is expired", comment: "error message")
 				}
-			} else {
-				isExpiredInvoice = false
 			}
 			
-			if !isInvalidAmount,
+			if problem == nil,
 			   let msat = msat,
-			   let range = priceRange()
+			   let range = priceRange() ?? swapOutRange()
 			{
 				let minMsat = range.min.msat
 				let maxMsat = range.max.msat
@@ -967,7 +983,7 @@ struct ValidateView: View {
 				// And render fiat conversions as approximate.
 				
 				if !isRange && msat != minMsat { // amount must be exact
-					isInvalidAmount = true
+					problem = .amountOutOfRange
 					
 					let exactBitcoin = Utils.formatBitcoin(msat: minMsat, bitcoinUnit: bitcoinUnit)
 					
@@ -987,7 +1003,7 @@ struct ValidateView: View {
 					}
 					
 				} else if msat < minMsat { // amount is too low
-					isInvalidAmount = true
+					problem = .amountOutOfRange
 					
 					let minBitcoin = Utils.formatBitcoin(msat: minMsat, bitcoinUnit: bitcoinUnit)
 					
@@ -1007,7 +1023,7 @@ struct ValidateView: View {
 					}
 					
 				} else if msat > maxMsat { // amount is too high
-					isInvalidAmount = true
+					problem = .amountOutOfRange
 					
 					let maxBitcoin = Utils.formatBitcoin(msat: maxMsat, bitcoinUnit: bitcoinUnit)
 					
@@ -1028,7 +1044,7 @@ struct ValidateView: View {
 				}
 			}
 			
-			if !isInvalidAmount && !isExpiredInvoice {
+			if problem == nil {
 				
 				if let msat = msat {
 					
@@ -1126,29 +1142,25 @@ struct ValidateView: View {
 				msat = maxMsat
 			}
 			
-			var flowType: FlowType? = nil
-			if paymentRequest() != nil || lnurlPay() != nil {
-				flowType = FlowType.pay(range: range)
-				
-			} else if lnurlWithdraw() != nil {
+			let flowType: FlowType
+			if lnurlWithdraw() != nil {
 				flowType = FlowType.withdraw(range: range)
+			} else {
+				flowType = FlowType.pay(range: range)
 			}
 			
-			if let flowType = flowType {
+			priceSliderVisible = true
+			dismissKeyboardIfVisible()
+			shortSheetState.display(dismissable: true) {
 				
-				priceSliderVisible = true
-				dismissKeyboardIfVisible()
-				shortSheetState.display(dismissable: true) {
-					
-					PriceSliderSheet(
-						flowType: flowType,
-						msat: msat,
-						valueChanged: priceSliderChanged
-					)
-					
-				} onWillDisappear: {
-					priceSliderVisible = false
-				}
+				PriceSliderSheet(
+					flowType: flowType,
+					msat: msat,
+					valueChanged: priceSliderChanged
+				)
+				
+			} onWillDisappear: {
+				priceSliderVisible = false
 			}
 			
 		} else if msat != minMsat {
@@ -1171,11 +1183,11 @@ struct ValidateView: View {
 		// The TextFieldCurrencyStyler doesn't seem to fire when we manually set the text value.
 		// So we need to do it manually here, to ensure the `parsedAmount` is properly updated.
 		
-		let amt = Utils.formatBitcoin(msat: msat, bitcoinUnit: preferredBitcoinUnit)
-		let result = TextFieldCurrencyStyler.format(input: amt.digits, currency: currency, hideMsats: false)
+		let amtDbl = Utils.convertBitcoin(msat: msat, to: preferredBitcoinUnit)
+		let amtFrmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: preferredBitcoinUnit, policy: .showMsatsIfNonZero)
 		
-		parsedAmount = result.1
-		amount = result.0
+		parsedAmount = Result.success(amtDbl)
+		amount = amtFrmt.digits
 	}
 	
 	func commentButtonTapped() {
@@ -1197,18 +1209,34 @@ struct ValidateView: View {
 		}
 	}
 	
+	func prepareTransaction() {
+		log.trace("prepareTransaction()")
+		
+		guard let msat = parsedAmountMsat() else {
+			return
+		}
+		
+		let amountSat = Int64(Utils.convertBitcoin(msat: msat, to: .sat))
+		
+		if let model = mvi.model as? Scan.Model_SwapOutFlow_Init {
+			mvi.intent(Scan.Intent_SwapOutFlow_Prepare(
+				address: model.address,
+				amount: Bitcoin_kmpSatoshi(sat: amountSat)
+			))
+		}
+	}
+	
 	func sendPayment() {
 		log.trace("sendPayment()")
 		
 		guard let msat = parsedAmountMsat() else {
-			isInvalidAmount = true
 			return
 		}
 		
 		let saveTipPercentInPrefs = {
-			if let tip = tipNumbers() {
-				let percent = Int(tip.percent * 100.0)
-				Prefs.shared.addRecentTipPercent(percent)
+			if let nums = paymentNumbers(), nums.tipMsat > 0 {
+				let tipPercent = Int(nums.tipPercent * 100.0)
+				Prefs.shared.addRecentTipPercent(tipPercent)
 			}
 		}
 		
@@ -1218,6 +1246,17 @@ struct ValidateView: View {
 			mvi.intent(Scan.Intent_InvoiceFlow_SendInvoicePayment(
 				paymentRequest: model.paymentRequest,
 				amount: Lightning_kmpMilliSatoshi(msat: msat),
+				maxFees: Prefs.shared.maxFees?.toKotlin()
+			))
+			
+		} else if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
+			
+			saveTipPercentInPrefs()
+			mvi.intent(Scan.Intent_SwapOutFlow_Send(
+				amount: model.initialUserAmount.plus(other: model.fee),
+				swapOutFee: model.fee,
+				address: model.address,
+				paymentRequest: model.paymentRequest,
 				maxFees: Prefs.shared.maxFees?.toKotlin()
 			))
 			
@@ -1264,6 +1303,18 @@ struct ValidateView: View {
 		}
 	}
 	
+	func didCancelSwapOutRequest() {
+		log.trace("didCancelSwapOutRequest()")
+		
+		guard let model = mvi.model as? Scan.Model_SwapOutFlow_Requesting else {
+			return
+		}
+		
+		mvi.intent(Scan.Intent_SwapOutFlow_Invalidate(
+			address: model.address
+		))
+	}
+	
 	func didCancelLnurlPayFetch() {
 		log.trace("didCancelLnurlPayFetch()")
 		
@@ -1305,9 +1356,16 @@ struct ValidateView: View {
 			let formattedAmt: FormattedAmount
 			switch newAmt.currency {
 			case .bitcoin(let bitcoinUnit):
-				formattedAmt = Utils.formatBitcoin(amount: newAmt.amount, bitcoinUnit: bitcoinUnit, policy: .showMsats)
+				formattedAmt = Utils.formatBitcoin(
+					amount: newAmt.amount,
+					bitcoinUnit: bitcoinUnit,
+					policy: .showMsatsIfNonZero
+				)
 			case .fiat(let fiatCurrency):
-				formattedAmt = Utils.formatFiat(amount: newAmt.amount, fiatCurrency: fiatCurrency)
+				formattedAmt = Utils.formatFiat(
+					amount: newAmt.amount,
+					fiatCurrency: fiatCurrency
+				)
 			}
 
 			parsedAmount = Result.success(newAmt.amount)

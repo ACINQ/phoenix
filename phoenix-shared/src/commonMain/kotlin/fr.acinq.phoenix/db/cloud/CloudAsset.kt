@@ -1,8 +1,6 @@
 package fr.acinq.phoenix.db.cloud
 
 import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.phoenix.data.ExchangeRate
-import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.db.payments.LNUrlBase
 import fr.acinq.phoenix.db.payments.LNUrlMetadata
 import fr.acinq.phoenix.db.payments.LNUrlSuccessAction
@@ -84,6 +82,8 @@ data class CloudAsset(
         val type: String,
         val rate: Double
     )
+
+    companion object
 }
 
 fun WalletPaymentMetadataRow.cloudSerialize(): ByteArray {

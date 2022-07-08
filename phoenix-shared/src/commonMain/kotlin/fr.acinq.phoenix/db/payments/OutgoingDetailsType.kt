@@ -17,11 +17,14 @@
 package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.serialization.v1.ByteVector32KSerializer
+import fr.acinq.lightning.serialization.v3.SatoshiKSerializer
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -49,7 +52,7 @@ sealed class OutgoingDetailsData {
 
     sealed class SwapOut : OutgoingDetailsData() {
         @Serializable
-        data class V0(val address: String, @Serializable(with = ByteVector32KSerializer::class) val paymentHash: ByteVector32) : SwapOut()
+        data class V0(val address: String, val paymentRequest: String, @Serializable(with = SatoshiKSerializer::class) val swapOutFee: Satoshi) : SwapOut()
     }
 
     sealed class Closing : OutgoingDetailsData() {
@@ -62,24 +65,26 @@ sealed class OutgoingDetailsData {
     }
 
     companion object {
+        @OptIn(ExperimentalSerializationApi::class)
         fun deserialize(typeVersion: OutgoingDetailsTypeVersion, blob: ByteArray): OutgoingPayment.Details = DbTypesHelper.decodeBlob(blob) { json, format ->
             when (typeVersion) {
                 OutgoingDetailsTypeVersion.NORMAL_V0 -> format.decodeFromString<Normal.V0>(json).let { OutgoingPayment.Details.Normal(PaymentRequest.read(it.paymentRequest)) }
                 OutgoingDetailsTypeVersion.KEYSEND_V0 -> format.decodeFromString<KeySend.V0>(json).let { OutgoingPayment.Details.KeySend(it.preimage) }
-                OutgoingDetailsTypeVersion.SWAPOUT_V0 -> format.decodeFromString<SwapOut.V0>(json).let { OutgoingPayment.Details.SwapOut(it.address, it.paymentHash) }
+                OutgoingDetailsTypeVersion.SWAPOUT_V0 -> format.decodeFromString<SwapOut.V0>(json).let { OutgoingPayment.Details.SwapOut(it.address, PaymentRequest.read(it.paymentRequest), it.swapOutFee) }
                 OutgoingDetailsTypeVersion.CLOSING_V0 -> format.decodeFromString<Closing.V0>(json).let { OutgoingPayment.Details.ChannelClosing(it.channelId, it.closingAddress, it.isSentToDefaultAddress) }
             }
         }
     }
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 fun OutgoingPayment.Details.mapToDb(): Pair<OutgoingDetailsTypeVersion, ByteArray> = when (this) {
     is OutgoingPayment.Details.Normal -> OutgoingDetailsTypeVersion.NORMAL_V0 to
             Json.encodeToString(OutgoingDetailsData.Normal.V0(paymentRequest.write())).toByteArray(Charsets.UTF_8)
     is OutgoingPayment.Details.KeySend -> OutgoingDetailsTypeVersion.KEYSEND_V0 to
             Json.encodeToString(OutgoingDetailsData.KeySend.V0(preimage)).toByteArray(Charsets.UTF_8)
     is OutgoingPayment.Details.SwapOut -> OutgoingDetailsTypeVersion.SWAPOUT_V0 to
-            Json.encodeToString(OutgoingDetailsData.SwapOut.V0(address, paymentHash)).toByteArray(Charsets.UTF_8)
+            Json.encodeToString(OutgoingDetailsData.SwapOut.V0(address, paymentRequest.write(), swapOutFee)).toByteArray(Charsets.UTF_8)
     is OutgoingPayment.Details.ChannelClosing -> OutgoingDetailsTypeVersion.CLOSING_V0 to
             Json.encodeToString(OutgoingDetailsData.Closing.V0(channelId, closingAddress, isSentToDefaultAddress)).toByteArray(Charsets.UTF_8)
 }

@@ -2,10 +2,11 @@ import SwiftUI
 
 class Toast: ObservableObject {
 	
-	enum ToastLocation {
-		case bottom
-		case middle
+	enum ToastAlignment {
 		case top
+		case middle
+		case bottom
+		case none
 	}
 	
 	enum ToastStyle {
@@ -22,7 +23,7 @@ class Toast: ObservableObject {
 	
 	@Published private var colorScheme: ColorScheme = ColorScheme.light
 	@Published private var style: ToastStyle = .regular
-	@Published private var location: ToastLocation = .bottom
+	@Published private var alignment: ToastAlignment = .bottom
 	@Published private var showCloseButton: Bool = false
 	
 	func pop(
@@ -30,7 +31,7 @@ class Toast: ObservableObject {
 		colorScheme: ColorScheme,
 		style: ToastStyle = .regular,
 		duration: TimeInterval = 1.5,
-		location: ToastLocation = .bottom,
+		alignment: ToastAlignment = .bottom,
 		showCloseButton: Bool = false
 	) {
 		
@@ -41,7 +42,7 @@ class Toast: ObservableObject {
 			self.content = content
 			self.colorScheme = colorScheme
 			self.style = style
-			self.location = location
+			self.alignment = alignment
 			self.showCloseButton = showCloseButton
 		}
 		DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
@@ -66,19 +67,25 @@ class Toast: ObservableObject {
 	@ViewBuilder
 	private func aligned(_ content: AnyView) -> some View {
 		
-		VStack {
-			switch location {
-			case .bottom:
-				Spacer()
-				wrapped(content).padding(.bottom, 45)
-			case .middle:
-				Spacer()
-				wrapped(content)
-				Spacer()
-			case .top:
+		switch alignment {
+		case .top:
+			VStack {
 				wrapped(content).padding(.top, 45)
 				Spacer()
 			}
+		case .middle:
+			VStack {
+				Spacer()
+				wrapped(content)
+				Spacer()
+			}
+		case .bottom:
+			VStack {
+				Spacer()
+				wrapped(content).padding(.bottom, 45)
+			}
+		case .none:
+			wrapped(content)
 		}
 	}
 	

@@ -1,6 +1,21 @@
 import SwiftUI
 import PhoenixShared
 
+extension UserDefaults {
+	
+	func getCodable<Element: Codable>(forKey key: String) -> Element? {
+		guard let data = UserDefaults.standard.data(forKey: key) else {
+			return nil
+		}
+		let element = try? JSONDecoder().decode(Element.self, from: data)
+		return element
+	}
+	
+	func setCodable<Element: Codable>(value: Element, forKey key: String) {
+		let data = try? JSONEncoder().encode(value)
+		UserDefaults.standard.setValue(data, forKey: key)
+	}
+}
 
 enum CurrencyType: String, CaseIterable, Codable {
 	case fiat
@@ -51,18 +66,33 @@ struct FcmTokenInfo: Equatable, Codable {
 struct ElectrumConfigPrefs: Codable {
 	let host: String
 	let port: UInt16
+	let pinnedPubKey: String?
 	
 	private let version: Int // for potential future upgrades
 	
-	init(host: String, port: UInt16) {
+	init(host: String, port: UInt16, pinnedPubKey: String?) {
 		self.host = host
 		self.port = port
-		self.version = 1
-	}
+		self.pinnedPubKey = pinnedPubKey
+		self.version = 2
+	} 
 	
 	var serverAddress: Lightning_kmpServerAddress {
-		return Lightning_kmpServerAddress(host: host, port: Int32(port), tls: Lightning_kmpTcpSocketTLS.safe)
+		if let pinnedPubKey = pinnedPubKey {
+			return Lightning_kmpServerAddress(
+				host : host,
+				port : Int32(port),
+				tls  : Lightning_kmpTcpSocketTLS.PINNED_PUBLIC_KEY(pubKey: pinnedPubKey)
+			)
+		} else {
+			return Lightning_kmpServerAddress(
+				host : host,
+				port : Int32(port),
+				tls  : Lightning_kmpTcpSocketTLS.TRUSTED_CERTIFICATES()
+			)
+		}
 	}
+
 }
 
 struct MaxFees: Codable {

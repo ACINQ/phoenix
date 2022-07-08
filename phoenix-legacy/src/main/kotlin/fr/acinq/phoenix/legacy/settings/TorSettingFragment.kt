@@ -65,7 +65,7 @@ class TorSettingFragment : BaseFragment(stayIfNotStarted = true), SharedPreferen
   override fun onStart() {
     super.onStart()
     context?.let { refreshUIState(it) }
-    PreferenceManager.getDefaultSharedPreferences(context).registerOnSharedPreferenceChangeListener(this)
+    context?.let { PreferenceManager.getDefaultSharedPreferences(it).registerOnSharedPreferenceChangeListener(this) }
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
     mBinding.torSwitch.setOnClickListener {
       val isChecked = mBinding.torSwitch.isChecked()
@@ -87,7 +87,7 @@ class TorSettingFragment : BaseFragment(stayIfNotStarted = true), SharedPreferen
 
   override fun onStop() {
     super.onStop()
-    PreferenceManager.getDefaultSharedPreferences(context).unregisterOnSharedPreferenceChangeListener(this)
+    context?.let { PreferenceManager.getDefaultSharedPreferences(it).unregisterOnSharedPreferenceChangeListener(this) }
   }
 
   override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {

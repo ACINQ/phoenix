@@ -29,6 +29,7 @@ import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import fr.acinq.eclair.payment.PaymentFailed
@@ -39,7 +40,11 @@ import fr.acinq.phoenix.legacy.background.KitState
 import fr.acinq.phoenix.legacy.databinding.ActivityMainBinding
 import fr.acinq.phoenix.legacy.paymentdetails.PaymentDetailsFragment
 import fr.acinq.phoenix.legacy.send.ReadInputFragmentDirections
+import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.Prefs
+import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -89,7 +94,7 @@ class MainActivity : AppCompatActivity() {
     }
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
     app = ViewModelProvider(this).get(AppViewModel::class.java)
-    app.navigationEvent.observe(this, {
+    app.navigationEvent.observe(this) {
       when (it) {
         is PaymentSent -> {
           val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.OUTGOING, it.id().toString(), fromEvent = true)
@@ -105,15 +110,27 @@ class MainActivity : AppCompatActivity() {
         }
         else -> log.info("unhandled navigation event $it")
       }
-    })
-    app.state.observe(this, {
+    }
+    app.state.observe(this) {
       handleUriIntent()
-    })
-    app.currentURIIntent.observe(this, {
+    }
+    app.currentURIIntent.observe(this) {
       handleUriIntent()
-    })
+    }
     // app may be started with a payment request intent
     intent?.let { saveURIIntent(intent) }
+
+    lifecycleScope.launchWhenCreated {
+      PrefsDatastore.getLegacyAppStatus(applicationContext).collect {
+        delay(500)
+        if (it is LegacyAppStatus.NotRequired) {
+          log.info("finishing legacy activity in state=${it.name()}")
+          (application as AppContext).onLegacyFinish()
+          delay(200)
+          finish()
+        }
+      }
+    }
   }
 
   override fun onStart() {

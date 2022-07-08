@@ -24,14 +24,18 @@ import org.kodein.log.newLogger
 
 
 sealed class Screen(val route: String) {
+    object SwitchToLegacy : Screen("switchtolegacy")
     object InitWallet : Screen("initwallet")
     object CreateWallet : Screen("createwallet")
     object RestoreWallet : Screen("restorewallet")
     object Startup : Screen("startup")
     object Home : Screen("home")
     object Receive : Screen("receive")
-    object ReadData : Screen("readdata")
-    object Send : Screen("send/{request}")
+    /**
+     * This route also manages the payment flow.
+     * TODO: Separate scanning the data from processing the data (aka send payment, process lnurl...). Split to be done at the controller level.
+     */
+    object ScanData : Screen("readdata")
     object PaymentDetails : Screen("payment")
 
     // -- settings
@@ -43,6 +47,8 @@ sealed class Screen(val route: String) {
     object Preferences : Screen("settings/preferences")
     object About : Screen("settings/about")
     object AppLock : Screen("settings/applock")
+    object PaymentSettings : Screen("settings/paymentsettings")
+    object Logs : Screen("settings/logs")
 }
 
 fun NavHostController.navigate(screen: Screen, arg: List<Any> = emptyList(), builder: NavOptionsBuilder.() -> Unit = {}) {

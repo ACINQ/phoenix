@@ -1,16 +1,18 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.Block
-import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.utils.ServerAddress
+import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.wire.InitTlv
 import kotlinx.serialization.Serializable
-import kotlin.math.roundToLong
 
 
 sealed class Chain(val name: String, val block: Block) {
-    object Regtest: Chain("Regtest", Block.RegtestGenesisBlock)
-    object Testnet: Chain("Testnet", Block.TestnetGenesisBlock)
-    object Mainnet: Chain("Mainnet", Block.LivenetGenesisBlock)
+    object Regtest : Chain("Regtest", Block.RegtestGenesisBlock)
+    object Testnet : Chain("Testnet", Block.TestnetGenesisBlock)
+    object Mainnet : Chain("Mainnet", Block.LivenetGenesisBlock)
+
     fun isMainnet(): Boolean = this is Mainnet
     fun isTestnet(): Boolean = this is Testnet
 
@@ -30,25 +32,6 @@ enum class BitcoinUnit : CurrencyUnit {
     companion object {
         val values = values().toList()
     }
-}
-
-/** Converts a [Double] amount to [MilliSatoshi], assuming that this amount is in fiat. */
-fun Double.toMilliSatoshi(fiatRate: Double): MilliSatoshi = (this / fiatRate).toMilliSatoshi(BitcoinUnit.Btc)
-
-/** Converts a [Double] amount to [MilliSatoshi], assuming that this amount is in Bitcoin. */
-fun Double.toMilliSatoshi(unit: BitcoinUnit): MilliSatoshi = when (unit) {
-    BitcoinUnit.Sat -> MilliSatoshi((this * 1_000.0).roundToLong())
-    BitcoinUnit.Bit -> MilliSatoshi((this * 100_000.0).roundToLong())
-    BitcoinUnit.MBtc -> MilliSatoshi((this * 100_000_000.0).roundToLong())
-    BitcoinUnit.Btc -> MilliSatoshi((this * 100_000_000_000.0).roundToLong())
-}
-
-/** Converts [MilliSatoshi] to another Bitcoin unit. */
-fun MilliSatoshi.toUnit(unit: BitcoinUnit): Double = when (unit) {
-    BitcoinUnit.Sat -> this.msat / 1_000.0
-    BitcoinUnit.Bit -> this.msat / 100_000.0
-    BitcoinUnit.MBtc -> this.msat / 100_000_000.0
-    BitcoinUnit.Btc -> this.msat / 100_000_000_000.0
 }
 
 @Serializable
@@ -219,4 +202,18 @@ enum class FiatCurrency : CurrencyUnit {
 sealed class ElectrumConfig {
     data class Custom(val server: ServerAddress) : ElectrumConfig()
     object Random : ElectrumConfig()
+}
+
+data class StartupParams(
+    /** When true, we use a [InitTlv] to ask our peer whether there are legacy channels to reestablish for the legacy node id. */
+    val requestCheckLegacyChannels: Boolean = false,
+
+    // TODO: add custom electrum address, fiat currencies, ...
+)
+
+object PaymentOptionsConstants {
+    val minBaseFee: Satoshi = 0.sat
+    val maxBaseFee: Satoshi = 100_000.sat
+    const val minProportionalFeePercent: Double = 0.0 // 0%
+    const val maxProportionalFeePercent: Double = 50.0 // 50%
 }

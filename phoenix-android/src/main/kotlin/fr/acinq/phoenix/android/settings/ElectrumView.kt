@@ -27,24 +27,25 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.utils.Prefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.controllers.config.ElectrumConfiguration
 import fr.acinq.phoenix.data.ElectrumConfig
 import kotlinx.coroutines.launch
+import java.net.URI
 import java.text.NumberFormat
 
 @Composable
@@ -57,8 +58,8 @@ fun ElectrumView() {
     val prefElectrumServer = LocalElectrumServer.current
     var showServerDialog by rememberSaveable { mutableStateOf(false) }
 
-    SettingScreen {
-        SettingHeader(
+    DefaultScreenLayout {
+        DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.electrum_title),
             subtitle = stringResource(id = R.string.electrum_subtitle)
@@ -69,10 +70,11 @@ fun ElectrumView() {
                 if (showServerDialog) {
                     ElectrumServerDialog(
                         initialAddress = prefElectrumServer,
-                        onConfirm = { address ->
+                        onConfirm = { host, port ->
                             scope.launch {
-                                Prefs.saveElectrumServer(context, address)
-                                postIntent(ElectrumConfiguration.Intent.UpdateElectrumServer(address = address))
+                                val address = host?.let { ServerAddress(it, port ?: 50002, TcpSocket.TLS.TRUSTED_CERTIFICATES) }
+                                UserPrefs.saveElectrumServer(context, address)
+                                postIntent(ElectrumConfiguration.Intent.UpdateElectrumServer(address))
                                 showServerDialog = false
                             }
                         },
@@ -88,7 +90,7 @@ fun ElectrumView() {
                 SettingInteractive(
                     title = stringResource(id = R.string.electrum_server_connection),
                     description = when (model.connection) {
-                        Connection.CLOSED -> if (config is ElectrumConfig.Custom) {
+                        is Connection.CLOSED -> if (config is ElectrumConfig.Custom) {
                             stringResource(id = R.string.electrum_not_connected_to_custom, config.server.host)
                         } else {
                             stringResource(id = R.string.electrum_not_connected)
@@ -121,11 +123,10 @@ fun ElectrumView() {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ElectrumServerDialog(
     initialAddress: ServerAddress?,
-    onConfirm: (String) -> Unit,
+    onConfirm: (String?, Int?) -> Unit,
     onDismiss: () -> Unit
 ) {
     var useCustomServer by rememberSaveable { mutableStateOf(initialAddress != null) }
@@ -133,19 +134,21 @@ private fun ElectrumServerDialog(
     var addressError by rememberSaveable { mutableStateOf(false) }
     Dialog(
         onDismiss = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false),
         buttons = {
             Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel))
             Button(
                 onClick = {
                     if (useCustomServer) {
-                        if (address.matches("""(.*):(\d*)""".toRegex())) {
-                            onConfirm(address)
+                        if (address.matches("""(.*):*(\d*)""".toRegex())) {
+                            val (host, port) = address.trim().run {
+                                substringBeforeLast(":") to (substringAfterLast(":").toIntOrNull())
+                            }
+                            onConfirm(host, port)
                         } else {
                             addressError = true
                         }
                     } else {
-                        onConfirm("")
+                        onConfirm(null, 0)
                     }
                 },
                 text = stringResource(id = R.string.btn_save)

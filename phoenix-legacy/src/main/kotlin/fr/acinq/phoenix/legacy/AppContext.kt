@@ -21,20 +21,18 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ProcessLifecycleOwner
 import fr.acinq.bitcoin.scala.Satoshi
 import fr.acinq.eclair.CltvExpiryDelta
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.legacy.background.BalanceEvent
 import fr.acinq.phoenix.legacy.main.InAppNotifications
-import fr.acinq.phoenix.legacy.utils.Constants
-import fr.acinq.phoenix.legacy.utils.Logging
-import fr.acinq.phoenix.legacy.utils.Prefs
-import fr.acinq.phoenix.legacy.utils.ThemeHelper
 import fr.acinq.phoenix.legacy.utils.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request
@@ -45,17 +43,18 @@ import org.greenrobot.eventbus.ThreadMode
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.io.IOException
-import java.lang.IllegalStateException
 import java.util.*
 import kotlin.collections.ArrayList
 
-class AppContext : Application(), DefaultLifecycleObserver {
+
+/** This datastore persists user's preferences (theme, currencies, ...). */
+val Context.userPrefs: DataStore<Preferences> by preferencesDataStore(name = "userprefs")
+/** This datastore persists miscellaneous internal data representing various states of the app. */
+val Context.internalData: DataStore<Preferences> by preferencesDataStore(name = "internaldata")
+
+abstract class AppContext : Application() {
 
   val log = LoggerFactory.getLogger(this::class.java)
-
-  @Volatile
-  var isAppVisible = false
-    private set
 
   override fun onCreate() {
     super<Application>.onCreate()
@@ -66,23 +65,9 @@ class AppContext : Application(), DefaultLifecycleObserver {
     }
   }
 
-  override fun onStart(owner: LifecycleOwner) {
-    isAppVisible = true
-  }
-
-  override fun onStop(owner: LifecycleOwner) {
-    isAppVisible = false
-  }
-
-  override fun onDestroy(owner: LifecycleOwner) {
-    super.onDestroy(owner)
-    EventBus.getDefault().unregister(this)
-  }
-
   private fun init() {
     ThemeHelper.applyTheme(Prefs.getTheme(applicationContext))
     Logging.setupLogger(applicationContext)
-    ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     Converter.refreshCoinPattern(applicationContext)
     Prefs.getLastKnownWalletContext(applicationContext)?.run {
       try {
@@ -214,6 +199,20 @@ class AppContext : Application(), DefaultLifecycleObserver {
   private fun handleWalletContext(json: JSONObject) {
     val inAppNotifs = notifications.value
 
+    // -- check if migration is ON
+    CoroutineScope(Dispatchers.Default).launch {
+      val hasMigrationBeenDone = PrefsDatastore.getMigrationResult(applicationContext).first() != null
+      if (!hasMigrationBeenDone) {
+        val isMigrationEnabled = if (json.has("migration_kmp")) json.getJSONObject("migration_kmp").getBoolean("is_enabled") else false
+        if (isMigrationEnabled) {
+          inAppNotifs?.add(InAppNotifications.PREPARE_WALLET_MIGRATION)
+        } else {
+          inAppNotifs?.remove(InAppNotifications.PREPARE_WALLET_MIGRATION)
+        }
+      }
+      inAppNotifs?.add(InAppNotifications.PREPARE_WALLET_MIGRATION)
+    }
+
     // -- check warning for high mempool usage (no free channels)
     json.getJSONObject("mempool").getJSONObject("v1").run {
       mempoolContext.postValue(MempoolContext(getBoolean("high_usage")))
@@ -225,7 +224,7 @@ class AppContext : Application(), DefaultLifecycleObserver {
     }
 
     // -- version context
-    val installedVersion = BuildConfig.VERSION_CODE
+    val installedVersion = BuildConfig.LIB_CODE
     val latestVersion = json.getInt("version")
     val latestCriticalVersion = json.getInt("latest_critical_version")
     if (installedVersion < latestCriticalVersion) {
@@ -405,6 +404,8 @@ class AppContext : Application(), DefaultLifecycleObserver {
     }
     Prefs.setExchangeRate(context, code, rate)
   }
+
+  abstract fun onLegacyFinish()
 }
 
 data class TrampolineFeeSetting(val feeBase: Satoshi, val feeProportionalMillionths: Long, val cltvExpiry: CltvExpiryDelta) {

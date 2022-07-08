@@ -117,6 +117,12 @@
     <action
       android:id="@+id/action_main_to_connectivity"
       app:destination="@id/connectivity_dialog" />
+    <action
+      android:id="@+id/action_main_to_migration"
+      app:destination="@id/migration_fragment" />
+    <action
+      android:id="@+id/action_main_to_finish"
+      app:destination="@id/finish_fragment" />
   </fragment>
 
   <!-- init wallet -->
@@ -375,6 +381,9 @@
     <action
       android:id="@+id/action_list_channels_to_channel_details"
       app:destination="@id/channel_details" />
+    <action
+      android:id="@+id/action_list_channels_to_channels_import"
+      app:destination="@id/channels_import" />
   </fragment>
 
   <!-- settings: channel details dialog -->
@@ -445,6 +454,18 @@
     android:name="fr.acinq.phoenix.legacy.settings.PaymentSettingsFragment"
     android:label="PaymentSettingsFragment" />
 
+  <!-- prepare migration -->
+  <dialog
+    android:id="@+id/migration_fragment"
+    android:name="fr.acinq.phoenix.legacy.main.MigrationFragmentDialog"
+    android:label="MigrationDialog" />
+
+  <!-- finish app -->
+  <dialog
+    android:id="@+id/finish_fragment"
+    android:name="fr.acinq.phoenix.legacy.main.FinishLegacyFragmentDialog"
+    android:label="FinishDialog" />
+
   <!-- first time user exp -->
   <fragment
     android:id="@+id/ftue_fragment"
@@ -467,5 +488,12 @@
       android:name="version"
       app:argType="long" />
   </fragment>
+
+  <!-- settings: channels import dialog -->
+  <dialog
+    android:id="@+id/channels_import"
+    android:name="fr.acinq.phoenix.legacy.settings.ChannelsImportDialog"
+    android:label="channels_import">
+  </dialog>
 
 </navigation>

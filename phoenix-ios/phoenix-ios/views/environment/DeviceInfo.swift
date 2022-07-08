@@ -40,9 +40,38 @@ class DeviceInfo: ObservableObject {
 	// iPhone 13           - 390x844 pt (1170x2532 px @3x)
 	// iPhone 13 Pro       - 390x844 pt (1170x2532 px @3x)
 	// iPhone 13 Pro Max   - 428x926 pt (1284x2778 px @3x)
-
 	
 	var isShortHeight: Bool {
+		// - iPod touch (gen 5+)
+		// - iPhone SE (2016)
+		// - iPhone SE (2020)
+		// - iPhone 6s
+		// - iPhone 7
+		// - iPhone 8
   		return UIScreen.main.bounds.height < 700
+	}
+	
+	var isSmallWidth: Bool {
+		// - iPod touch (gen 5+)
+		// - iPhone SE (2016)
+		return UIScreen.main.bounds.width < 350
+	}
+	
+	var isAverageWidth: Bool {
+		// - iPhone SE (2020)
+		// - iPhone 6s
+		// - iPhone 7
+		// - iPhone 8
+		// - iPhone X
+		// - iPhone XS
+		// - iPhone 11 Pro
+		// - iPhone 12 mini
+		// - iPhone 12
+		// - iPhone 12 Pro
+		// - iPhone 13 mini
+		// - iPhone 13
+		// - iPhone 13 Pro
+		let width = UIScreen.main.bounds.width
+		return width >= 350 && width < 400
 	}
 }

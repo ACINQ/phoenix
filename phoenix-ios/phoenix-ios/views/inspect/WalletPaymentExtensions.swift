@@ -87,18 +87,17 @@ extension Lightning_kmpWalletPayment {
 		return nil
 	}
 	
-	func paymentFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String)? {
+	func standardFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String)? {
 		
 		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
 		
 			// An incomingPayment may have fees if a new channel was automatically opened
 			if let received = incomingPayment.received {
-				
+					
 				let msat = received.receivedWith.map { $0.fees.msat }.reduce(0, +)
 				if msat > 0 {
 					
-					let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsats)
-					
+					let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
 					let exp = NSLocalizedString(
 						"""
 						In order to receive this payment, a new payment channel was opened. \
@@ -120,22 +119,20 @@ extension Lightning_kmpWalletPayment {
 			}
 			
 		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
-			
+		
 			if let _ = outgoingPayment.status.asFailed() {
 				
 				// no fees for failed payments
 				return nil
 				
-			} else if let onChain = outgoingPayment.status.asOnChain() {
+			} else if let _ = outgoingPayment.status.asOnChain() {
 				
 				// for on-chain payments, the fees are extracted from the mined transaction(s)
 				
-				let channelDrain: Lightning_kmpMilliSatoshi = outgoingPayment.recipientAmount
-				let claimed = Lightning_kmpMilliSatoshi(sat: onChain.claimed)
-				let fees = channelDrain.minus(other: claimed)
-				let formattedAmt = Utils.format(currencyPrefs, msat: fees, policy: .showMsats)
+				let fees = outgoingPayment.fees
+				let formattedAmt = Utils.format(currencyPrefs, msat: fees, policy: .showMsatsIfNonZero)
 				
-				let txCount = onChain.component1().count
+				let txCount = outgoingPayment.closingTxParts().count
 				let exp: String
 				if txCount == 1 {
 					exp = NSLocalizedString(
@@ -153,15 +150,20 @@ extension Lightning_kmpWalletPayment {
 				
 			} else if let _ = outgoingPayment.status.asOffChain() {
 				
-				let msat = outgoingPayment.fees.msat
-				let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsats)
+				let msat = outgoingPayment.routingFee.msat // excludes swapOutFee
+				if msat == 0 {
+					return nil
+				}
+				
+				let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
 				
 				var parts = 0
 				var hops = 0
 				for part in outgoingPayment.parts {
-					
-					parts += 1
-					hops = part.route.count
+					if (part is Lightning_kmpOutgoingPayment.LightningPart) {
+						parts += 1
+						hops = (part as! Lightning_kmpOutgoingPayment.LightningPart).route.count
+					}
 				}
 				
 				let exp: String
@@ -192,6 +194,30 @@ extension Lightning_kmpWalletPayment {
 		}
 		
 		return nil
+	}
+	
+	func swapOutFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String)? {
+		
+		guard let outgoingPayment = self as? Lightning_kmpOutgoingPayment else {
+			return nil
+		}
+		
+		if let _ = outgoingPayment.details.asSwapOut() {
+			
+			let msat = outgoingPayment.fees.msat - outgoingPayment.routingFee.msat
+			let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
+			
+			let exp = NSLocalizedString(
+				"Includes Bitcoin network miner fees, and the fee for the Swap-Out service.",
+				comment: "Fees explanation"
+			)
+			
+			return (formattedAmt, exp)
+			
+		} else {
+			
+			return nil
+		}
 	}
 	
 	/// If the OutgoingPayment succeeded or failed, reports the total elapsed time.
@@ -230,5 +256,30 @@ extension Lightning_kmpWalletPayment {
 		}
 		
 		return nil
+	}
+}
+
+extension Lightning_kmpOutgoingPayment {
+	
+	func closingTxParts() -> [Lightning_kmpOutgoingPayment.ClosingTxPart] {
+		
+		var closingTxParts = [Lightning_kmpOutgoingPayment.ClosingTxPart]()
+		for part in self.parts {
+			if let closingTxPart = part as? Lightning_kmpOutgoingPayment.ClosingTxPart {
+				closingTxParts.append(closingTxPart)
+			}
+		}
+		
+		return closingTxParts
+	}
+	
+	func claimedOnChain() -> Bitcoin_kmpSatoshi {
+		
+		var sat: Int64 = 0
+		for part in closingTxParts() {
+			sat += part.claimed.sat
+		}
+		
+		return Bitcoin_kmpSatoshi(sat: sat)
 	}
 }

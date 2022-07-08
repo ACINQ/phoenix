@@ -25,6 +25,7 @@ extension Color {
 	static let primaryForeground = Color("primaryForeground")
 	static let borderColor = Color("borderColor")
 	static let mutedBackground = Color("mutedBackground")
+	static let textFieldBorder = Color("textFieldBorder")
 }
 
 extension UIColor {

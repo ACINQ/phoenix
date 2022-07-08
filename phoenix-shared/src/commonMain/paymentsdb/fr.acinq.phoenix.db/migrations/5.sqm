@@ -1,0 +1,22 @@
+import fr.acinq.phoenix.db.payments.OutgoingPartClosingInfoTypeVersion;
+
+-- Migration: v5 -> v6
+--
+-- Changes:
+-- * Add a new table that stores the transactions closing a lightning channel, represented
+--   as parts of an outgoing payment.
+-- * Add an index on parent_id in the closing txs table.
+
+CREATE TABLE IF NOT EXISTS outgoing_payment_closing_tx_parts (
+    part_id TEXT NOT NULL PRIMARY KEY,
+    part_parent_id TEXT NOT NULL,
+    part_tx_id BLOB NOT NULL,
+    part_amount_sat INTEGER NOT NULL,
+    part_closing_info_type TEXT AS OutgoingPartClosingInfoTypeVersion NOT NULL,
+    part_closing_info_blob BLOB NOT NULL,
+    part_created_at INTEGER NOT NULL,
+
+    FOREIGN KEY(part_parent_id) REFERENCES outgoing_payments(id)
+);
+
+CREATE INDEX IF NOT EXISTS parent_id_idx ON outgoing_payment_closing_tx_parts(part_parent_id);

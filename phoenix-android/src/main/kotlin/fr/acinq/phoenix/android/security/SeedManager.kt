@@ -68,7 +68,6 @@ object SeedManager {
         } else {
             seedFile.readBytes()
                 .run {
-                    log.info { "read decoded seed=$this" }
                     EncryptedSeed.deserialize(this)
                 }
         }

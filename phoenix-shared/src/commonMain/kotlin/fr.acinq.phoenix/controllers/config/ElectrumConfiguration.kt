@@ -10,7 +10,7 @@ object ElectrumConfiguration {
     data class Model(
         val configuration: ElectrumConfig? = null,
         val currentServer: ServerAddress? = null,
-        val connection: Connection = Connection.CLOSED,
+        val connection: Connection = Connection.CLOSED(reason = null),
         val feeRate: Long = 0,
         val blockHeight: Int = 0,
         val tipTimestamp: Long = 0,
@@ -21,7 +21,6 @@ object ElectrumConfiguration {
     }
 
     sealed class Intent : MVI.Intent() {
-        data class UpdateElectrumServer(val address: String?) : Intent()
+        data class UpdateElectrumServer(val server: ServerAddress?) : Intent()
     }
-
 }

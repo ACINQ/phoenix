@@ -3,7 +3,6 @@ package fr.acinq.phoenix.db.cloud
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.db.payments.*
@@ -20,15 +19,17 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
     val recipient: ByteArray,
     val details: DetailsWrapper,
     val parts: List<OutgoingPartWrapper>,
+    val closingTxsParts: List<OutgoingClosingTxPartWrapper> = emptyList(),
     val status: StatusWrapper?,
     val createdAt: Long
 ) {
-    constructor(payment: OutgoingPayment): this(
+    constructor(payment: OutgoingPayment) : this(
         id = payment.id,
         msat = payment.recipientAmount.msat,
         recipient = payment.recipient.value.toByteArray(),
         details = DetailsWrapper(payment.details),
-        parts = payment.parts.map { OutgoingPartWrapper(it) },
+        parts = payment.parts.filterIsInstance<OutgoingPayment.LightningPart>().map { OutgoingPartWrapper(it) },
+        closingTxsParts = payment.parts.filterIsInstance<OutgoingPayment.ClosingTxPart>().map { OutgoingClosingTxPartWrapper(it) },
         status = StatusWrapper(payment.status),
         createdAt = payment.createdAt
     )
@@ -39,7 +40,7 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
         recipient = PublicKey(ByteVector(recipient)),
         details = details.unwrap()
     ).copy(
-        parts = parts.map { it.unwrap() },
+        parts = parts.map { it.unwrap() } + closingTxsParts.map { it.unwrap() } + (status?.getClosingPartsFromV0OnchainStatus() ?: emptyList()),
         status = status?.unwrap() ?: OutgoingPayment.Status.Pending,
         createdAt = createdAt
     )
@@ -109,9 +110,19 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
             )
         }
 
+        /** The status blob may contain closing transaction data, when type is [OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0]. */
+        fun getClosingPartsFromV0OnchainStatus(): List<OutgoingPayment.ClosingTxPart> {
+            return if (OutgoingStatusTypeVersion.valueOf(type) == OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0) {
+                OutgoingStatusData.getClosingPartsFromV0Status(blob, ts)
+            } else {
+                emptyList()
+            }
+        }
+
     } // </StatusWrapper>
 
-} // </OutgoingPaymentData>
+    companion object
+} // </OutgoingPaymentWrapper>
 
 @OptIn(ExperimentalSerializationApi::class)
 fun OutgoingPayment.cborSerialize(): ByteArray {
@@ -120,10 +131,8 @@ fun OutgoingPayment.cborSerialize(): ByteArray {
 }
 
 @OptIn(ExperimentalSerializationApi::class)
-fun OutgoingPaymentWrapper.Companion.cborDeserialize(blob: ByteArray): OutgoingPayment? {
-    var result: OutgoingPayment? = null
-    try {
-        result = Cbor.decodeFromByteArray<OutgoingPaymentWrapper>(blob).unwrap()
-    } catch (e: Throwable) {}
-    return result
+fun OutgoingPaymentWrapper.cborDeserialize(blob: ByteArray): OutgoingPayment? = try {
+    Cbor.decodeFromByteArray<OutgoingPaymentWrapper>(blob).unwrap()
+} catch (e: Throwable) {
+    null
 }

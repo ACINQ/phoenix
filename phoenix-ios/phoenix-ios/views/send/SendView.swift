@@ -20,8 +20,6 @@ struct SendView: MVIView {
 	
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
-
-	@State var paymentRequest: String? = nil
 	
 	@StateObject var toast = Toast()
 	
@@ -72,14 +70,13 @@ struct SendView: MVIView {
 		     _ as Scan.Model_InvoiceFlow_DangerousRequest,
 		     _ as Scan.Model_LnurlServiceFetch:
 
-			ScanView(
-				mvi: mvi,
-				toast: toast,
-				paymentRequest: $paymentRequest
-			)
-			.zIndex(4)
+			ScanView(mvi: mvi, toast: toast)
+				.zIndex(4)
 
 		case _ as Scan.Model_InvoiceFlow_InvoiceRequest,
+		     _ as Scan.Model_SwapOutFlow_Init,
+		     _ as Scan.Model_SwapOutFlow_Ready,
+		     _ as Scan.Model_SwapOutFlow_Requesting,
 		     _ as Scan.Model_LnurlPayFlow_LnurlPayRequest,
 		     _ as Scan.Model_LnurlPayFlow_LnurlPayFetch,
 		     _ as Scan.Model_LnurlWithdrawFlow_LnurlWithdrawRequest,
@@ -89,6 +86,7 @@ struct SendView: MVIView {
 				.zIndex(3)
 
 		case _ as Scan.Model_InvoiceFlow_Sending,
+		     _ as Scan.Model_SwapOutFlow_Sending,
 		     _ as Scan.Model_LnurlPayFlow_Sending:
 
 			PaymentInFlightView(mvi: mvi)
@@ -114,20 +112,20 @@ struct SendView: MVIView {
 	func modelDidChange(_ newModel: Scan.Model) {
 		log.trace("modelDidChange()")
 		
-		if let newModel = newModel as? Scan.Model_BadRequest {
-			showErrorToast(newModel)
-		}
-		else if let model = newModel as? Scan.Model_InvoiceFlow_DangerousRequest {
-			paymentRequest = model.request
-		}
-		else if let model = newModel as? Scan.Model_InvoiceFlow_InvoiceRequest {
-			paymentRequest = model.request
-		}
-		else if newModel is Scan.Model_InvoiceFlow_Sending ||
-		        newModel is Scan.Model_LnurlPayFlow_Sending
-		{
+		switch newModel {
+		case let model as Scan.Model_BadRequest:
+			
+			showErrorToast(model)
+			
+		case is Scan.Model_InvoiceFlow_Sending,
+		     is Scan.Model_SwapOutFlow_Sending,
+		     is Scan.Model_LnurlPayFlow_Sending:
+			
 			// Pop self from NavigationStack; Back to HomeView
 			presentationMode.wrappedValue.dismiss()
+			
+		default:
+			break
 		}
 	}
 	
@@ -147,16 +145,6 @@ struct SendView: MVIView {
 			
 			msg = NSLocalizedString(
 				"Phoenix does not support this type of LNURL yet",
-				comment: "Error message - scanning lightning invoice"
-			)
-			
-		} else if model.reason is Scan.BadRequestReason_IsBitcoinAddress {
-			
-			msg = NSLocalizedString(
-				"""
-				You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments. \
-				You can use a third-party service to make the offchain->onchain swap.
-				""",
 				comment: "Error message - scanning lightning invoice"
 			)
 			
@@ -211,7 +199,7 @@ struct SendView: MVIView {
 			colorScheme: colorScheme.opposite,
 			style: .chrome,
 			duration: 30.0,
-			location: .middle,
+			alignment: .middle,
 			showCloseButton: true
 		)
 	}

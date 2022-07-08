@@ -16,9 +16,27 @@
 
 package fr.acinq.phoenix.android.utils
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import fr.acinq.phoenix.android.BuildConfig
+import fr.acinq.phoenix.android.R
 
 object Notifications {
     const val HEADLESS_NOTIF_ID = 354321
     const val HEADLESS_NOTIF_CHANNEL_ID = "${BuildConfig.APPLICATION_ID}.FCM_NOTIF"
+
+    fun registerNotificationChannels(context: Context) {
+        // notification channels (android 8+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.getSystemService(NotificationManager::class.java)?.createNotificationChannels(
+                listOf(
+                    NotificationChannel(HEADLESS_NOTIF_CHANNEL_ID, context.getString(R.string.notification_headless_title), NotificationManager.IMPORTANCE_HIGH).apply {
+                        description = context.getString(R.string.notification_headless_desc)
+                    },
+                )
+            )
+        }
+    }
 }

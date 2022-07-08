@@ -28,8 +28,8 @@ object ThemeHelper {
     return typedValue.data
   }
 
-  private const val lightMode = "light"
-  private const val darkMode = "dark"
+  const val lightMode = "light"
+  const val darkMode = "dark"
   const val default = "default"
 
   fun applyTheme(theme: String) {

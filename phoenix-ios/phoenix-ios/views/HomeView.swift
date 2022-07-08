@@ -40,6 +40,8 @@ struct HomeView : MVIView {
 	@State var selectedItem: WalletPaymentInfo? = nil
 	@State var isMempoolFull = false
 	
+	@StateObject var customElectrumServerObserver = CustomElectrumServerObserver()
+	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
@@ -71,10 +73,10 @@ struct HomeView : MVIView {
 	@State var externalLightningRequest: AppScanController? = nil
 	@State var temp: [AppScanController] = []
 	
-	let backupSeed_enabled_publisher = Prefs.shared.backupSeed_isEnabled_publisher
-	let manualBackup_taskDone_publisher = Prefs.shared.manualBackup_taskDone_publisher
-	@State var backupSeed_enabled = Prefs.shared.backupSeed_isEnabled
-	@State var manualBackup_taskDone = Prefs.shared.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
+	let backupSeed_enabled_publisher = Prefs.shared.backupSeed.isEnabled_publisher
+	let manualBackup_taskDone_publisher = Prefs.shared.backupSeed.manualBackup_taskDone_publisher
+	@State var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
+	@State var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
 	
 	@ViewBuilder
 	var view: some View {
@@ -137,7 +139,7 @@ struct HomeView : MVIView {
 			self.backupSeed_enabled = $0
 		}
 		.onReceive(manualBackup_taskDone_publisher) {
-			self.manualBackup_taskDone = Prefs.shared.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
+			self.manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
 		}
 	}
 
@@ -164,46 +166,51 @@ struct HomeView : MVIView {
 						
 						Text(amount.digits)
 							.font(.largeTitle)
-							.onTapGesture { toggleCurrencyType() }
 						
 					} else {
-						let amount = Utils.format(currencyPrefs, msat: mvi.model.balance.msat, policy: .showMsatsIfZeroSats)
+						let amount = Utils.format( currencyPrefs,
+						                     msat: mvi.model.balance.msat,
+						                   policy: .showMsatsIfZeroSats)
 						
-						if currencyPrefs.currencyType == .bitcoin &&
-							currencyPrefs.bitcoinUnit == .sat &&
-							amount.hasFractionDigits
-						{
-							// We're showing the value in satoshis, but the value contains a fractional
-							// component representing the millisatoshis.
-							// This can be a little confusing for those new to Lightning.
-							// So we're going to downplay the millisatoshis visually.
+						if amount.hasSubFractionDigits {
+							
+							// We're showing sub-fractional values.
+							// For example, we're showing millisatoshis.
+							//
+							// It's helpful to downplay the sub-fractional part visually.
+							
+							let hasStdFractionDigits = amount.hasStdFractionDigits
+							
 							HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-								Text(amount.integerDigits)
+								Text(verbatim: amount.integerDigits)
 									.font(.largeTitle)
-									.onTapGesture { toggleCurrencyType() }
-								Text(verbatim: "\(amount.decimalSeparator)\(amount.fractionDigits)")
+								Text(verbatim: amount.decimalSeparator)
+									.font(hasStdFractionDigits ? .largeTitle : .title)
+									.foregroundColor(hasStdFractionDigits ? .primary : .secondary)
+								if hasStdFractionDigits {
+									Text(verbatim: amount.stdFractionDigits)
+										.font(.largeTitle)
+								}
+								Text(verbatim: amount.subFractionDigits)
 									.font(.title)
 									.foregroundColor(.secondary)
-									.onTapGesture { toggleCurrencyType() }
 							}
 							.environment(\.layoutDirection, .leftToRight) // issue #237
-							
+						
 						} else {
 							Text(amount.digits)
 								.font(.largeTitle)
-								.onTapGesture { toggleCurrencyType() }
 						}
 						
 						Text(amount.type)
 							.font(.title2)
 							.foregroundColor(Color.appAccent)
 							.padding(.bottom, 4)
-							.onTapGesture { toggleCurrencyType() }
-						
 					}
 				} // </HStack>
-				.lineLimit(1)            // SwiftUI bugs
-				.minimumScaleFactor(0.5) // Truncating text
+				.lineLimit(1)            // SwiftUI truncation bugs
+				.minimumScaleFactor(0.5) // SwiftUI truncation bugs
+				.onTapGesture { toggleCurrencyType() }
 				
 				if let incoming = incomingAmount() {
 					let incomingAmountStr = currencyPrefs.hideAmountsOnHomeScreen ? incoming.digits : incoming.string
@@ -273,28 +280,8 @@ struct HomeView : MVIView {
 			)
 			.padding(.bottom, 25)
 
-			// === Beta Version Disclaimer ===
-			generalNotice
-			
-			// === Mempool Full Warning ====
-			if isMempoolFull {
-				NoticeBox {
-					HStack(alignment: VerticalAlignment.top, spacing: 0) {
-						Image(systemName: "exclamationmark.triangle")
-							.imageScale(.large)
-							.padding(.trailing, 10)
-						VStack(alignment: HorizontalAlignment.leading, spacing: 5) {
-							Text("Bitcoin mempool is full and fees are high.")
-							Button {
-								mempoolFullInfo()
-							} label: {
-								Text("See how Phoenix is affected".uppercased())
-							}
-						}
-					}
-					.font(.caption)
-				}
-			}
+			// === Notices & Warnings ===
+			notices
 			
 			// === Payments List ====
 			ScrollView {
@@ -343,8 +330,9 @@ struct HomeView : MVIView {
 	}
 	
 	@ViewBuilder
-	var generalNotice: some View {
+	var notices: some View {
 		
+		// === Welcome / Backup Seed ====
 		if mvi.model.balance.msat == 0 && Prefs.shared.isNewWallet {
 
 			// Reserved for potential "welcome" message.
@@ -377,6 +365,56 @@ struct HomeView : MVIView {
 				.font(.caption)
 			} // </NoticeBox>
 			
+		}
+		
+		// === Custom Electrum Server Problems ====
+		if customElectrumServerObserver.problem == .badCertificate {
+			
+			NoticeBox {
+				HStack(alignment: VerticalAlignment.top, spacing: 0) {
+					Image(systemName: "exclamationmark.shield")
+						.imageScale(.large)
+						.padding(.trailing, 10)
+				}
+				.font(.caption)
+				Button {
+					navigationToElecrumServer()
+				} label: {
+					Group {
+						Text("Custom electrum server: bad certificate ! ")
+							.foregroundColor(.primary)
+						+
+						Text("Check it ")
+							.foregroundColor(.appAccent)
+						+
+						Text(Image(systemName: "arrowtriangle.forward"))
+							.foregroundColor(.appAccent)
+					}
+					.multilineTextAlignment(.leading)
+					.allowsTightening(true)
+				}
+			} // </NoticeBox>
+		}
+		
+		// === Mempool Full Warning ====
+		if isMempoolFull {
+			
+			NoticeBox {
+				HStack(alignment: VerticalAlignment.top, spacing: 0) {
+					Image(systemName: "tray.full")
+						.imageScale(.large)
+						.padding(.trailing, 10)
+					VStack(alignment: HorizontalAlignment.leading, spacing: 5) {
+						Text("Bitcoin mempool is full and fees are high.")
+						Button {
+							mempoolFullInfo()
+						} label: {
+							Text("See how Phoenix is affected".uppercased())
+						}
+					}
+				}
+				.font(.caption)
+			}
 		}
 	}
 
@@ -449,7 +487,7 @@ struct HomeView : MVIView {
 	}
 	
 	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged()")
+		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
 		
 		if tag == nil {
 			// If we pushed the SendView, triggered by an external lightning url,
@@ -776,14 +814,24 @@ struct HomeView : MVIView {
 		deepLinkManager.broadcast(DeepLink.backup)
 	}
 	
-	func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged()")
+	func navigationToElecrumServer() {
+		log.trace("navigateToElectrumServer()")
 		
-		switch value {
-		case .backup:
-			self.navLinkTag = .ConfigurationView
-		default:
-			break
+		deepLinkManager.broadcast(DeepLink.electrum)
+	}
+	
+	func deepLinkChanged(_ value: DeepLink?) {
+		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		
+		if let value = value {
+			switch value {
+			case .backup:
+				self.navLinkTag = .ConfigurationView
+			case .drainWallet:
+				self.navLinkTag = .ConfigurationView
+			case .electrum:
+				self.navLinkTag = .ConfigurationView
+			}
 		}
 	}
 }
@@ -797,6 +845,8 @@ fileprivate struct PaymentCell : View, ViewName {
 	
 	@State var fetched: WalletPaymentInfo?
 	@State var fetchedIsStale: Bool
+	
+	@ScaledMetric var textScaling: CGFloat = 100
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 
@@ -919,14 +969,25 @@ fileprivate struct PaymentCell : View, ViewName {
 	
 	func paymentTimestamp() -> String {
 
-		if let payment = fetched?.payment {
-			let timestamp = payment.completedAt()
-			return timestamp > 0
-				? timestamp.formatDateMS()
-				: NSLocalizedString("pending", comment: "timestamp string for pending transaction")
-		} else {
+		guard let payment = fetched?.payment else {
 			return ""
 		}
+		let timestamp = payment.completedAt()
+		guard timestamp > 0 else {
+			return NSLocalizedString("pending", comment: "timestamp string for pending transaction")
+		}
+			
+		let date = timestamp.toDate(from: .milliseconds)
+		
+		let formatter = DateFormatter()
+		if textScaling > 100 {
+			formatter.dateStyle = .short
+		} else {
+			formatter.dateStyle = .long
+		}
+		formatter.timeStyle = .short
+		
+		return formatter.string(from: date)
 	}
 	
 	func paymentAmountInfo() -> (FormattedAmount, Bool, Bool) {
@@ -1010,7 +1071,7 @@ fileprivate struct AppStatusButton: View, ViewName {
 	var buttonContent: some View {
 		
 		let connectionStatus = connectionsManager.connections.global
-		if connectionStatus == .closed {
+		if connectionStatus is Lightning_kmpConnection.CLOSED {
 			HStack(alignment: .firstTextBaseline, spacing: 3) {
 				Image(systemName: "bolt.slash.fill")
 					.imageScale(.large)
@@ -1019,7 +1080,7 @@ fileprivate struct AppStatusButton: View, ViewName {
 			}
 			.font(.caption2)
 		}
-		else if connectionStatus == .establishing {
+		else if connectionStatus is Lightning_kmpConnection.ESTABLISHING {
 			HStack(alignment: .firstTextBaseline, spacing: 3) {
 				Image(systemName: "bolt.slash")
 					.imageScale(.large)
@@ -1350,9 +1411,9 @@ fileprivate struct BottomBar: View, ViewName {
 class HomeView_Previews: PreviewProvider {
 	
 	static let connections = Connections(
-		internet : .established,
-		peer     : .established,
-		electrum : .closed
+		internet : Lightning_kmpConnection.ESTABLISHED(),
+		peer     : Lightning_kmpConnection.ESTABLISHED(),
+		electrum : Lightning_kmpConnection.CLOSED(reason: nil)
 	)
 
 	static var previews: some View {

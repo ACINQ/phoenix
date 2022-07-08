@@ -49,6 +49,8 @@ struct RecoveryPhraseList: View {
 	@Namespace var sectionID_button
 	@Namespace var sectionID_legal
 	@Namespace var sectionID_cloudBackup
+
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -60,10 +62,10 @@ struct RecoveryPhraseList: View {
 		self.encryptedNodeId = encryptedNodeId
 		self.syncSeedManager = appDelegate.syncManager!.syncSeedManager
 		
-		let manualBackup_taskDone = Prefs.shared.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
+		let manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
 		self._manualBackup_taskDone = State<Bool>(initialValue: manualBackup_taskDone)
 		
-		let backupSeed_enabled = Prefs.shared.backupSeed_isEnabled
+		let backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
 		self._backupSeed_enabled = State<Bool>(initialValue: backupSeed_enabled)
 		
 		self._legal_taskDone = State<Bool>(initialValue: manualBackup_taskDone)
@@ -298,6 +300,12 @@ struct RecoveryPhraseList: View {
 		
 		if !didAppear {
 			didAppear = true
+			
+			if deepLinkManager.deepLink == .backup {
+				// Reached our destination
+				deepLinkManager.broadcast(nil)
+			}
+			
 			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
 				withAnimation(Animation.linear(duration: 1.0).repeatForever(autoreverses: true)) {
 					animatingLegalToggleColor = true
@@ -368,7 +376,7 @@ struct RecoveryPhraseList: View {
 		if taskDone != manualBackup_taskDone {
 			
 			manualBackup_taskDone = taskDone
-			Prefs.shared.manualBackup_setTaskDone(taskDone, encryptedNodeId: encryptedNodeId)
+			Prefs.shared.backupSeed.manualBackup_setTaskDone(taskDone, encryptedNodeId: encryptedNodeId)
 		}
 	}
 }

@@ -66,7 +66,7 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = true) {
 
   override fun onStart() {
     super.onStart()
-    PreferenceManager.getDefaultSharedPreferences(context).registerOnSharedPreferenceChangeListener(prefsListener)
+    context?.let { PreferenceManager.getDefaultSharedPreferences(it).registerOnSharedPreferenceChangeListener(prefsListener) }
     refreshUI()
     mBinding.defaultDescriptionButton.setOnClickListener {
       context?.let { ctx ->
@@ -113,7 +113,7 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = true) {
 
   override fun onStop() {
     super.onStop()
-    PreferenceManager.getDefaultSharedPreferences(context).unregisterOnSharedPreferenceChangeListener(prefsListener)
+    context?.let { PreferenceManager.getDefaultSharedPreferences(it).unregisterOnSharedPreferenceChangeListener(prefsListener) }
   }
 
   private fun refreshUI() {
