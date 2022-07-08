@@ -161,7 +161,7 @@ class CloudDataTest {
                 id = uuid,
                 amount = 1_000_000.msat,
                 recipient = publicKey,
-                details = OutgoingPayment.Details.SwapOut(bitcoinAddress, invoice)
+                details = OutgoingPayment.Details.SwapOut(bitcoinAddress, invoice, 2_500.sat)
             )
         )
     }

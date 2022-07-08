@@ -61,7 +61,7 @@ class OutgoingPaymentDbTypeVersionTest {
 
     @Test
     fun outgoing_details_swapout() {
-        val details = OutgoingPayment.Details.SwapOut(address1, paymentRequest1)
+        val details = OutgoingPayment.Details.SwapOut(address1, paymentRequest1, 1_000.sat)
         val deserialized = OutgoingDetailsData.deserialize(OutgoingDetailsTypeVersion.SWAPOUT_V0, details.mapToDb().second)
         assertEquals(details, deserialized)
     }

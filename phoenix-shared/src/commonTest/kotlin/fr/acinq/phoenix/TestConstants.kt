@@ -43,15 +43,23 @@ object TestConstants {
             features = Features(
                 Feature.InitialRoutingSync to FeatureSupport.Optional,
                 Feature.OptionDataLossProtect to FeatureSupport.Optional,
-                Feature.ChannelRangeQueries to FeatureSupport.Optional,
-                Feature.ChannelRangeQueriesExtended to FeatureSupport.Optional,
                 Feature.VariableLengthOnion to FeatureSupport.Mandatory,
                 Feature.PaymentSecret to FeatureSupport.Mandatory,
                 Feature.BasicMultiPartPayment to FeatureSupport.Optional,
                 Feature.Wumbo to FeatureSupport.Optional,
-                Feature.StaticRemoteKey to FeatureSupport.Mandatory,
-                Feature.AnchorOutputs to FeatureSupport.Mandatory,
-                Feature.TrampolinePayment to FeatureSupport.Optional
+                Feature.StaticRemoteKey to FeatureSupport.Optional,
+                Feature.AnchorOutputs to FeatureSupport.Optional,
+                Feature.ShutdownAnySegwit to FeatureSupport.Optional,
+                Feature.ChannelType to FeatureSupport.Mandatory,
+                Feature.PaymentMetadata to FeatureSupport.Optional,
+                Feature.TrampolinePayment to FeatureSupport.Optional,
+                Feature.ExperimentalTrampolinePayment to FeatureSupport.Optional,
+                Feature.ZeroReserveChannels to FeatureSupport.Optional,
+                Feature.ZeroConfChannels to FeatureSupport.Optional,
+                Feature.WakeUpNotificationClient to FeatureSupport.Optional,
+                Feature.PayToOpenClient to FeatureSupport.Optional,
+                Feature.TrustedSwapInClient to FeatureSupport.Optional,
+                Feature.ChannelBackupClient to FeatureSupport.Optional,
             ),
             dustLimit = 1_000.sat,
             maxRemoteDustLimit = 1_500.sat,
@@ -97,7 +105,7 @@ object TestConstants {
 val rawWalletParams = """
 {
   "testnet": {
-    "version": 25,
+    "version": 28,
     "latest_critical_version": 0,
     "trampoline": {
       "v1": {
@@ -109,16 +117,6 @@ val rawWalletParams = """
       "v2": {
         "attempts": [{
             "fee_base_sat": 1,
-            "fee_percent": 0.0001,
-            "fee_per_millionths": 100,
-            "cltv_expiry": 576
-          }, {
-            "fee_base_sat": 3,
-            "fee_percent": 0.0001,
-            "fee_per_millionths": 100,
-            "cltv_expiry": 576
-          }, {
-            "fee_base_sat": 5,
             "fee_percent": 0.0005,
             "fee_per_millionths": 500,
             "cltv_expiry": 576
@@ -134,91 +132,14 @@ val rawWalletParams = """
             "cltv_expiry": 576
           }, {
             "fee_base_sat": 12,
-            "fee_percent": 0.003,
-            "fee_per_millionths": 3000,
+            "fee_percent": 0.005,
+            "fee_per_millionths": 5000,
             "cltv_expiry": 576
           }
         ],
         "nodes": [{
           "name": "endurance",
           "uri": "03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@13.248.222.197:9735"
-        }]
-      }
-    },
-     "pay_to_open": {
-      "v1": {
-        "min_funding_sat": 10000,
-        "min_fee_sat": 3000,
-        "fee_percent": 0.01,
-        "status": 0
-      }
-    },
-    "swap_in": {
-      "v1": {
-        "min_funding_sat": 10000,
-        "min_fee_sat": 3000,
-        "fee_percent": 0.01,
-        "status": 0
-      }
-    },
-    "swap_out": {
-      "v1": {
-        "min_feerate_sat_byte": 0,
-        "status": 0
-      }
-    },
-    "mempool": {
-      "v1": {
-        "high_usage": false
-      }
-    }
-  },
-  "mainnet": {
-    "version": 25,
-    "latest_critical_version": 0,
-    "trampoline": {
-      "v1": {
-        "fee_base_sat": 2,
-        "fee_percent": 0.001,
-        "hops_count": 5,
-        "cltv_expiry": 143
-      },
-      "v2": {
-        "attempts": [{
-            "fee_base_sat": 1,
-            "fee_percent": 0.0001,
-            "fee_per_millionths": 100,
-            "cltv_expiry": 576
-          }, {
-            "fee_base_sat": 3,
-            "fee_percent": 0.0001,
-            "fee_per_millionths": 100,
-            "cltv_expiry": 576
-          }, {
-            "fee_base_sat": 5,
-            "fee_percent": 0.0005,
-            "fee_per_millionths": 500,
-            "cltv_expiry": 576
-          }, {
-            "fee_base_sat": 7,
-            "fee_percent": 0.001,
-            "fee_per_millionths": 1000,
-            "cltv_expiry": 576
-          }, {
-            "fee_base_sat": 10,
-            "fee_percent": 0.0012,
-            "fee_per_millionths": 1200,
-            "cltv_expiry": 576
-          }, {
-            "fee_base_sat": 12,
-            "fee_percent": 0.003,
-            "fee_per_millionths": 3000,
-            "cltv_expiry": 576
-          }
-        ],
-        "nodes": [{
-          "name": "ACINQ",
-          "uri": "03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f@34.239.230.56:9735"
         }]
       }
     },
@@ -241,6 +162,77 @@ val rawWalletParams = """
     "swap_out": {
       "v1": {
         "min_feerate_sat_byte": 0,
+        "min_amount_sat": 10000,
+        "max_amount_sat": 2000000,
+        "status": 0
+      }
+    },
+    "mempool": {
+      "v1": {
+        "high_usage": false
+      }
+    }
+  },
+  "mainnet": {
+    "version": 28,
+    "latest_critical_version": 0,
+    "trampoline": {
+      "v1": {
+        "fee_base_sat": 2,
+        "fee_percent": 0.001,
+        "hops_count": 5,
+        "cltv_expiry": 143
+      },
+      "v2": {
+        "attempts": [{
+            "fee_base_sat": 1,
+            "fee_percent": 0.0005,
+            "fee_per_millionths": 500,
+            "cltv_expiry": 576
+          }, {
+            "fee_base_sat": 7,
+            "fee_percent": 0.001,
+            "fee_per_millionths": 1000,
+            "cltv_expiry": 576
+          }, {
+            "fee_base_sat": 10,
+            "fee_percent": 0.0012,
+            "fee_per_millionths": 1200,
+            "cltv_expiry": 576
+          }, {
+            "fee_base_sat": 12,
+            "fee_percent": 0.005,
+            "fee_per_millionths": 5000,
+            "cltv_expiry": 576
+          }
+        ],
+        "nodes": [{
+          "name": "ACINQ",
+          "uri": "03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f@3.33.236.230:9735"
+        }]
+      }
+    },
+    "pay_to_open": {
+      "v1": {
+        "min_funding_sat": 10000,
+        "min_fee_sat": 3000,
+        "fee_percent": 0.01,
+        "status": 0
+      }
+    },
+    "swap_in": {
+      "v1": {
+        "min_funding_sat": 10000,
+        "min_fee_sat": 3000,
+        "fee_percent": 0.01,
+        "status": 0
+      }
+    },
+    "swap_out": {
+      "v1": {
+        "min_feerate_sat_byte": 20,
+        "min_amount_sat": 10000,
+        "max_amount_sat": 2000000,
         "status": 0
       }
     },

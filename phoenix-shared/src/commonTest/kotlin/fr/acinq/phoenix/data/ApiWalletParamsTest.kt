@@ -36,11 +36,11 @@ class ApiWalletParamsTest {
         assertNotNull(decodedParams)
 
         fun WalletContext.V0.ChainContext.checkStructure() {
-            assertEquals(25, version)
+            assertEquals(28, version)
             assertEquals(0, latestCriticalVersion)
-            assertEquals(6, trampoline.v2.attempts.size)
-            assertEquals(WalletContext.V0.TrampolineParams.TrampolineFees(1, 100, 576), trampoline.v2.attempts.first())
-            assertEquals(WalletContext.V0.TrampolineParams.TrampolineFees(12, 3000, 576), trampoline.v2.attempts.last())
+            assertEquals(4, trampoline.v2.attempts.size)
+            assertEquals(WalletContext.V0.TrampolineParams.TrampolineFees(1, 500, 576), trampoline.v2.attempts.first())
+            assertEquals(WalletContext.V0.TrampolineParams.TrampolineFees(12, 5000, 576), trampoline.v2.attempts.last())
         }
 
         decodedParams.testnet.checkStructure()
