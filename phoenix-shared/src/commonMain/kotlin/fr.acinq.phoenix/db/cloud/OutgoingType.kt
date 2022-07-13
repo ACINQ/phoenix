@@ -37,7 +37,7 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
     fun unwrap() = OutgoingPayment(
         id = id,
         amount = MilliSatoshi(msat = msat),
-        recipient = PublicKey(ByteVector(recipient)),
+        recipient = PublicKey.parse(recipient),
         details = details.unwrap()
     ).copy(
         parts = parts.map { it.unwrap() } + closingTxsParts.map { it.unwrap() } + (status?.getClosingPartsFromV0OnchainStatus() ?: emptyList()),
