@@ -102,6 +102,40 @@ class SqlitePaymentsDatabaseTest {
     }
 
     @Test
+    fun incoming__receive_new_channel_mpp_uneven_split() = runTest {
+        val preimage = randomBytes32()
+        val paymentHash = Crypto.sha256(preimage).toByteVector32()
+        val origin = IncomingPayment.Origin.Invoice(createInvoice(preimage, 1_000_000_000.msat))
+        val channelId = randomBytes32()
+        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(amount = 600_000_000.msat, fees = 5_000.msat, channelId = channelId)
+        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(amount = 400_000_000.msat, fees = 5_000.msat, channelId = channelId)
+        val receivedWith = setOf(mppPart1, mppPart2)
+
+        db.addIncomingPayment(preimage, origin, 0)
+        db.receivePayment(paymentHash, receivedWith, 15)
+        db.getIncomingPayment(paymentHash)!!.let {
+            assertEquals(2, it.received?.receivedWith?.size)
+        }
+    }
+
+    @Test
+    fun incoming__receive_new_channel_mpp_even_split() = runTest {
+        val preimage = randomBytes32()
+        val paymentHash = Crypto.sha256(preimage).toByteVector32()
+        val origin = IncomingPayment.Origin.Invoice(createInvoice(preimage, 1_000_000_000.msat))
+        val channelId = randomBytes32()
+        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(amount = 500_000_000.msat, fees = 5_000.msat, channelId = channelId)
+        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(amount = 500_000_000.msat, fees = 5_000.msat, channelId = channelId)
+        val receivedWith = setOf(mppPart1, mppPart2)
+
+        db.addIncomingPayment(preimage, origin, 0)
+        db.receivePayment(paymentHash, receivedWith, 15)
+        db.getIncomingPayment(paymentHash)!!.let {
+            assertEquals(2, it.received?.receivedWith?.size)
+        }
+    }
+
+    @Test
     fun incoming__list() = runTest {
         db.addIncomingPayment(preimage1, origin1, 0)
         db.addIncomingPayment(preimage2, origin2, 15)
@@ -409,8 +443,19 @@ class SqlitePaymentsDatabaseTest {
             Feature.BasicMultiPartPayment to FeatureSupport.Optional
         )
 
-        private fun createInvoice(preimage: ByteVector32): PaymentRequest {
-            return PaymentRequest.create(Block.LivenetGenesisBlock.hash, 150_000.msat, Crypto.sha256(preimage).toByteVector32(), Lightning.randomKey(), "invoice", CltvExpiryDelta(16), defaultFeatures)
+        private fun createInvoice(
+            preimage: ByteVector32,
+            msat: MilliSatoshi = 150_000.msat
+        ): PaymentRequest {
+            return PaymentRequest.create(
+                chainHash = Block.LivenetGenesisBlock.hash,
+                amount = msat,
+                paymentHash = Crypto.sha256(preimage).toByteVector32(),
+                privateKey = Lightning.randomKey(),
+                description = "invoice",
+                minFinalCltvExpiryDelta = CltvExpiryDelta(16),
+                features = defaultFeatures
+            )
         }
     }
 }
