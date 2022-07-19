@@ -248,6 +248,7 @@ class LegacyMigrationHelperTest {
                 received = IncomingPayment.Received(
                     receivedWith = setOf(
                         IncomingPayment.ReceivedWith.NewChannel(
+                            id = newIncomingPayments[0]!!.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().first().id,
                             amount = 32_000_000.msat,
                             fees = 0.msat,
                             channelId = ByteVector32.Zeroes,
@@ -316,6 +317,7 @@ class LegacyMigrationHelperTest {
                 received = IncomingPayment.Received(
                     receivedWith = setOf(
                         IncomingPayment.ReceivedWith.NewChannel(
+                            id = newIncomingPayments[3]!!.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().first().id,
                             amount = 57_000_000.msat,
                             channelId = ByteVector32.Zeroes,
                             fees = 3_000_000.msat
@@ -339,6 +341,7 @@ class LegacyMigrationHelperTest {
                 received = IncomingPayment.Received(
                     receivedWith = setOf(
                         IncomingPayment.ReceivedWith.NewChannel(
+                            id = newIncomingPayments[6]!!.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().first().id,
                             amount = 562_212_000.msat,
                             channelId = ByteVector32.Zeroes,
                             fees = 5_678_000.msat

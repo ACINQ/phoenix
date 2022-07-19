@@ -117,7 +117,7 @@ class CloudDataTest {
     fun incoming__receivedWith_newChannel() = runTest {
         val invoice = createInvoice(preimage, 10_000_000.msat)
         val receivedWith = IncomingPayment.ReceivedWith.NewChannel(
-            amount = 7_000_000.msat, fees = 3_000_000.msat, channelId = channelId
+            id = UUID.randomUUID(), amount = 7_000_000.msat, fees = 3_000_000.msat, channelId = channelId
         )
         testRoundtrip(
             IncomingPayment(
