@@ -19,6 +19,7 @@ package fr.acinq.phoenix.db
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.db.payments.*
 import io.ktor.utils.io.charsets.*
@@ -91,7 +92,7 @@ class IncomingPaymentDbTypeVersionTest {
     @Test
     fun incoming_receivedwith_multipart_v0_newchannel_paytoopen() {
         // pay-to-open with MULTIPARTS_V0: amount contains the fee which is a special case that must be fixed when deserializing.
-        val receivedWith = setOf(IncomingPayment.ReceivedWith.NewChannel(2_000_000.msat, 5_000.msat, channelId1))
+        val receivedWith = setOf(IncomingPayment.ReceivedWith.NewChannel(UUID.randomUUID(), 2_000_000.msat, 5_000.msat, channelId1))
         val deserialized = IncomingReceivedWithData.deserialize(
             IncomingReceivedWithTypeVersion.MULTIPARTS_V0,
             receivedWith.mapToDb()!!.second,
@@ -106,7 +107,7 @@ class IncomingPaymentDbTypeVersionTest {
 
     @Test
     fun incoming_receivedwith_multipart_v1_newchannel_paytoopen() {
-        val receivedWith = setOf(IncomingPayment.ReceivedWith.NewChannel(1_995_000.msat, 5_000.msat, channelId1))
+        val receivedWith = setOf(IncomingPayment.ReceivedWith.NewChannel(UUID.randomUUID(), 1_995_000.msat, 5_000.msat, channelId1))
         val deserialized = IncomingReceivedWithData.deserialize(
             IncomingReceivedWithTypeVersion.MULTIPARTS_V1,
             receivedWith.mapToDb()!!.second,
@@ -118,7 +119,7 @@ class IncomingPaymentDbTypeVersionTest {
 
     @Test
     fun incoming_receivedwith_multipart_v0_newchannel_swapin_nochannel() {
-        val receivedWith = setOf(IncomingPayment.ReceivedWith.NewChannel(111111111.msat, 1000.msat, null))
+        val receivedWith = setOf(IncomingPayment.ReceivedWith.NewChannel(UUID.randomUUID(), 111111111.msat, 1000.msat, null))
         val deserialized = IncomingReceivedWithData.deserialize(
             IncomingReceivedWithTypeVersion.MULTIPARTS_V0,
             receivedWith.mapToDb()!!.second,
@@ -130,7 +131,7 @@ class IncomingPaymentDbTypeVersionTest {
 
     @Test
     fun incoming_receivedwith_multipart_v1_newchannel_swapin_nochannel() {
-        val receivedWith = setOf(IncomingPayment.ReceivedWith.NewChannel(164495787.msat, 4058671.msat, null))
+        val receivedWith = setOf(IncomingPayment.ReceivedWith.NewChannel(UUID.randomUUID(), 164495787.msat, 4058671.msat, null))
         val deserialized = IncomingReceivedWithData.deserialize(
             IncomingReceivedWithTypeVersion.MULTIPARTS_V1,
             receivedWith.mapToDb()!!.second,

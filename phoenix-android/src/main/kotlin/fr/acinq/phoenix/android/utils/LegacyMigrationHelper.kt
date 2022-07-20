@@ -201,6 +201,7 @@ object LegacyMigrationHelper {
             // use the PayToOpen metadata to know how the payment was received
             val receivedWith = if (payToOpenMeta != null || payment.paymentType() == PaymentType.SwapIn()) {
                 IncomingPayment.ReceivedWith.NewChannel(
+                    id = UUID.randomUUID(),
                     amount = status.amount().toLong().msat,
                     fees = payToOpenMeta?.fee_sat?.sat?.toMilliSatoshi() ?: 0.msat,
                     channelId = ByteVector32.Zeroes

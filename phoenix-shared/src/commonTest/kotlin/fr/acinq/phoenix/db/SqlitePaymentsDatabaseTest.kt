@@ -48,7 +48,7 @@ class SqlitePaymentsDatabaseTest {
     private val preimage2 = randomBytes32()
     private val paymentHash2 = Crypto.sha256(preimage2).toByteVector32()
     private val origin2 = IncomingPayment.Origin.KeySend
-    private val receivedWith2 = setOf(IncomingPayment.ReceivedWith.NewChannel(amount = 1_995_000.msat, fees = 5_000.msat, channelId = randomBytes32()))
+    private val receivedWith2 = setOf(IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 1_995_000.msat, fees = 5_000.msat, channelId = randomBytes32()))
 
     val origin3 = IncomingPayment.Origin.SwapIn(address = "1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb")
 
@@ -99,6 +99,36 @@ class SqlitePaymentsDatabaseTest {
             assertEquals(15, it.received?.receivedAt)
             assertEquals(receivedWith2, it.received?.receivedWith)
         }
+    }
+
+    @Test
+    fun incoming__receive_new_channel_mpp_uneven_split() = runTest {
+        val preimage = randomBytes32()
+        val paymentHash = Crypto.sha256(preimage).toByteVector32()
+        val origin = IncomingPayment.Origin.Invoice(createInvoice(preimage, 1_000_000_000.msat))
+        val channelId = randomBytes32()
+        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 600_000_000.msat, fees = 5_000.msat, channelId = channelId)
+        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 400_000_000.msat, fees = 5_000.msat, channelId = channelId)
+        val receivedWith = setOf(mppPart1, mppPart2)
+
+        db.addIncomingPayment(preimage, origin, 0)
+        db.receivePayment(paymentHash, receivedWith, 15)
+        assertEquals(2, db.getIncomingPayment(paymentHash)!!.received?.receivedWith?.size)
+    }
+
+    @Test
+    fun incoming__receive_new_channel_mpp_even_split() = runTest {
+        val preimage = randomBytes32()
+        val paymentHash = Crypto.sha256(preimage).toByteVector32()
+        val origin = IncomingPayment.Origin.Invoice(createInvoice(preimage, 1_000_000_000.msat))
+        val channelId = randomBytes32()
+        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 500_000_000.msat, fees = 5_000.msat, channelId = channelId)
+        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 500_000_000.msat, fees = 5_000.msat, channelId = channelId)
+        val receivedWith = setOf(mppPart1, mppPart2)
+
+        db.addIncomingPayment(preimage, origin, 0)
+        db.receivePayment(paymentHash, receivedWith, 15)
+        assertEquals(2, db.getIncomingPayment(paymentHash)!!.received?.receivedWith?.size)
     }
 
     @Test
@@ -409,8 +439,19 @@ class SqlitePaymentsDatabaseTest {
             Feature.BasicMultiPartPayment to FeatureSupport.Optional
         )
 
-        private fun createInvoice(preimage: ByteVector32): PaymentRequest {
-            return PaymentRequest.create(Block.LivenetGenesisBlock.hash, 150_000.msat, Crypto.sha256(preimage).toByteVector32(), Lightning.randomKey(), "invoice", CltvExpiryDelta(16), defaultFeatures)
+        private fun createInvoice(
+            preimage: ByteVector32,
+            msat: MilliSatoshi = 150_000.msat
+        ): PaymentRequest {
+            return PaymentRequest.create(
+                chainHash = Block.LivenetGenesisBlock.hash,
+                amount = msat,
+                paymentHash = Crypto.sha256(preimage).toByteVector32(),
+                privateKey = Lightning.randomKey(),
+                description = "invoice",
+                minFinalCltvExpiryDelta = CltvExpiryDelta(16),
+                features = defaultFeatures
+            )
         }
     }
 }
