@@ -17,9 +17,7 @@
 package fr.acinq.phoenix.db
 
 import com.squareup.sqldelight.db.SqlDriver
-import fr.acinq.bitcoin.Block
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Crypto
+import fr.acinq.bitcoin.*
 import fr.acinq.lightning.*
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.channel.TooManyAcceptedHtlcs
@@ -32,7 +30,9 @@ import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.TemporaryNodeFailure
+import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.runTest
+import fr.acinq.secp256k1.Hex
 import kotlin.test.*
 
 class SqlitePaymentsDatabaseTest {
@@ -48,7 +48,7 @@ class SqlitePaymentsDatabaseTest {
     private val preimage2 = randomBytes32()
     private val paymentHash2 = Crypto.sha256(preimage2).toByteVector32()
     private val origin2 = IncomingPayment.Origin.KeySend
-    private val receivedWith2 = setOf(IncomingPayment.ReceivedWith.NewChannel(amount = 1_995_000.msat, fees = 5_000.msat, channelId = randomBytes32()))
+    private val receivedWith2 = setOf(IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 1_995_000.msat, fees = 5_000.msat, channelId = randomBytes32()))
 
     val origin3 = IncomingPayment.Origin.SwapIn(address = "1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb")
 
@@ -99,6 +99,36 @@ class SqlitePaymentsDatabaseTest {
             assertEquals(15, it.received?.receivedAt)
             assertEquals(receivedWith2, it.received?.receivedWith)
         }
+    }
+
+    @Test
+    fun incoming__receive_new_channel_mpp_uneven_split() = runTest {
+        val preimage = randomBytes32()
+        val paymentHash = Crypto.sha256(preimage).toByteVector32()
+        val origin = IncomingPayment.Origin.Invoice(createInvoice(preimage, 1_000_000_000.msat))
+        val channelId = randomBytes32()
+        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 600_000_000.msat, fees = 5_000.msat, channelId = channelId)
+        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 400_000_000.msat, fees = 5_000.msat, channelId = channelId)
+        val receivedWith = setOf(mppPart1, mppPart2)
+
+        db.addIncomingPayment(preimage, origin, 0)
+        db.receivePayment(paymentHash, receivedWith, 15)
+        assertEquals(2, db.getIncomingPayment(paymentHash)!!.received?.receivedWith?.size)
+    }
+
+    @Test
+    fun incoming__receive_new_channel_mpp_even_split() = runTest {
+        val preimage = randomBytes32()
+        val paymentHash = Crypto.sha256(preimage).toByteVector32()
+        val origin = IncomingPayment.Origin.Invoice(createInvoice(preimage, 1_000_000_000.msat))
+        val channelId = randomBytes32()
+        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 500_000_000.msat, fees = 5_000.msat, channelId = channelId)
+        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 500_000_000.msat, fees = 5_000.msat, channelId = channelId)
+        val receivedWith = setOf(mppPart1, mppPart2)
+
+        db.addIncomingPayment(preimage, origin, 0)
+        db.receivePayment(paymentHash, receivedWith, 15)
+        assertEquals(2, db.getIncomingPayment(paymentHash)!!.received?.receivedWith?.size)
     }
 
     @Test
@@ -237,6 +267,24 @@ class SqlitePaymentsDatabaseTest {
         assertNull(db.getOutgoingPayment(UUID.randomUUID()))
         p.parts.forEach { assertEquals(p, db.getOutgoingPaymentFromPartId(it.id)) }
         assertNull(db.getOutgoingPaymentFromPartId(UUID.randomUUID()))
+    }
+
+    @Test
+    fun outgoing__read_legacy_closing() = runTest {
+        val payment = OutgoingQueries.mapOutgoingPaymentWithoutParts(
+            id = "ff7f08e8-89d1-4731-be7c-ad37c9d09afc",
+            recipient_amount_msat = 150_000L,
+            recipient_node_id = "0479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8",
+            payment_hash = Hex.decode("5a920fd957bb4634fb8960a8a69d401fa0fbb4ebf5c4391ba8ee2732058fefbc"),
+            details_type = OutgoingDetailsTypeVersion.CLOSING_V0,
+            details_blob = Hex.decode("7b226368616e6e656c4964223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c22636c6f73696e6741646472657373223a22666f6f626172222c22697353656e74546f44656661756c7441646472657373223a747275657d"),
+            created_at = 100,
+            completed_at = 200,
+            status_type = OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0,
+            status_blob = Hex.decode("7b227478496473223a5b2265636632623763396366613734356532336634623661343766396365623139623066363330653064373365343434326566333236643364613234633930336635225d2c22636c61696d6564223a3130302c22636c6f73696e6754797065223a224c6f63616c227d")
+        )
+        assertEquals(PublicKey.Generator, payment.recipient)
+        assertEquals(payment.status, OutgoingPayment.Status.Completed.Succeeded.OnChain(200))
     }
 
     @Test
@@ -409,8 +457,19 @@ class SqlitePaymentsDatabaseTest {
             Feature.BasicMultiPartPayment to FeatureSupport.Optional
         )
 
-        private fun createInvoice(preimage: ByteVector32): PaymentRequest {
-            return PaymentRequest.create(Block.LivenetGenesisBlock.hash, 150_000.msat, Crypto.sha256(preimage).toByteVector32(), Lightning.randomKey(), "invoice", CltvExpiryDelta(16), defaultFeatures)
+        private fun createInvoice(
+            preimage: ByteVector32,
+            msat: MilliSatoshi = 150_000.msat
+        ): PaymentRequest {
+            return PaymentRequest.create(
+                chainHash = Block.LivenetGenesisBlock.hash,
+                amount = msat,
+                paymentHash = Crypto.sha256(preimage).toByteVector32(),
+                privateKey = Lightning.randomKey(),
+                description = "invoice",
+                minFinalCltvExpiryDelta = CltvExpiryDelta(16),
+                features = defaultFeatures
+            )
         }
     }
 }
