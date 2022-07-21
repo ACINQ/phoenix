@@ -1,18 +1,270 @@
 import SwiftUI
+import PhoenixShared
+import os.log
+
+#if DEBUG && true
+fileprivate var log = Logger(
+	subsystem: Bundle.main.bundleIdentifier!,
+	category: "TransactionsView"
+)
+#else
+fileprivate var log = Logger(OSLog.disabled)
+#endif
+
+
+fileprivate let PAGE_COUNT_START = 25
+fileprivate let PAGE_COUNT_INCREMENT = 25
+
 
 struct TransactionsView: View {
+	
+	static private let appDelegate = AppDelegate.get()
+	static private let phoenixBusiness = appDelegate.business
+	static private let paymentsManager = phoenixBusiness.paymentsManager
+	static private let paymentsPageFetcher = paymentsManager.makePageFetcher()
+	
+	private let phoenixBusiness = TransactionsView.phoenixBusiness
+	private let paymentsManager = TransactionsView.paymentsManager
+	private let paymentsPageFetcher = TransactionsView.paymentsPageFetcher
+	
+	let paymentsCountPublisher = paymentsManager.paymentsCountPublisher()
+	@State var paymentsCount: Int64 = 0
+	
+	let paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
+	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
+	
+	@State var selectedItem: WalletPaymentInfo? = nil
+	
+	@State var didAppear = false
+	@State var didPreFetch = false
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	var body: some View {
 		
-		List {
+		ZStack {
+			NavigationLink(
+				destination: navLinkView(),
+				isActive: Binding(
+					get: { selectedItem != nil },
+					set: { if !$0 { selectedItem = nil }}
+				)
+			) {
+				EmptyView()
+			}
+			.isDetailLink(false)
 			
-			
+			content()
 		}
-		.listStyle(.insetGrouped)
 		.navigationBarTitle(
-			NSLocalizedString("Transactions", comment: "Navigation bar title"),
+			NSLocalizedString("Payments", comment: "Navigation bar title"),
 			displayMode: .inline
 		)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			Color.primaryBackground.frame(height: 25)
+			
+			ScrollView {
+				LazyVStack {
+					// paymentsPage.rows: [WalletPaymentOrderRow]
+					//
+					// Here's how this works:
+					// - ForEach uses the given type (which conforms to Swift's Identifiable protocol)
+					//   to determine whether or not the row is new/modified or the same as before.
+					// - If the row is new/modified, then it it initialized with fresh state,
+					//   and the row's `onAppear` will fire.
+					// - If the row is unmodified, then it is initialized with existing state,
+					//   and the row's `onAppear` with NOT fire.
+					//
+					// Since we ultimately use WalletPaymentOrderRow.identifier, our unique identifier
+					// contains the row's completedAt date, which is modified when the row changes.
+					// Thus our row is automatically refreshed after it fails/succeeds.
+					//
+					ForEach(paymentsPage.rows) { row in
+						Button {
+							didSelectPayment(row: row)
+						} label: {
+							PaymentCell(row: row, didAppearCallback: paymentCellDidAppear)
+						}
+					}
+					
+				} // </LazyVStack>
+			} // </ScrollView>
+			.background(
+				Color.primaryBackground.ignoresSafeArea()
+			)
+			
+		} // </VStack>
+		.onAppear {
+			onAppear()
+		}
+		.onReceive(paymentsCountPublisher) {
+			paymentsCountChanged($0)
+		}
+		.onReceive(paymentsPagePublisher) {
+			paymentsPageChanged($0)
+		}
+	}
+	
+	@ViewBuilder
+	func navLinkView() -> some View {
+		
+		if let selectedItem = selectedItem {
+			PaymentView(
+				type: .embedded,
+				paymentInfo: selectedItem
+			)
+			
+		} else {
+			EmptyView()
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		// Careful: this function is also called when returning from subviews
+		if !didAppear {
+			didAppear = true
+			paymentsPageFetcher.subscribeToAll(
+				offset: 0,
+				count: Int32(PAGE_COUNT_START)
+			)
+		}
+	}
+	
+	func paymentsCountChanged(_ count: Int64) {
+		log.trace("paymentsCountChanged() => \(count)")
+		
+		paymentsCount = count
+	}
+	
+	func paymentsPageChanged(_ page: PaymentsPage) {
+		log.trace("paymentsPageChanged() => \(page.count)")
+		
+		paymentsPage = page
+		maybePreFetchPaymentsFromDatabase()
+	}
+	
+	func paymentCellDidAppear(_ visibleRow: WalletPaymentOrderRow) -> Void {
+		log.trace("paymentCellDidAppear(): \(visibleRow.id)")
+		
+		// Infinity Scrolling
+		//
+		// Here's the general idea:
+		//
+		// - We start by fetching a small "page" from the database.
+		//   For example: Page(offset=0, count=50)
+		// - When the user scrolls to the bottom, we can increase the count.
+		//   For example: Page(offset=0, count=100)
+		//
+		// Note:
+		// In the original design, we didn't increase the count forever.
+		// At some point we incremented the offset instead.
+		// However, this doesn't work well with LazyVStack, because the contentOffset isn't adjusted.
+		// So the end result is that the user's position within the scrollView jumps,
+		// and results in a very confusing user experience.
+		// I cannot find a clean way of accomplishing a solution with pure SwiftUI.
+		// So this remains a todo item for future improvement.
+		
+		var rowIdxWithinPage: Int? = nil
+		for (idx, r) in paymentsPage.rows.enumerated() {
+			
+			if r == visibleRow {
+				rowIdxWithinPage = idx
+				break
+			}
+		}
+		
+		guard let rowIdxWithinPage = rowIdxWithinPage else {
+			// Row not found within current page.
+			// Perhaps the page just changed, and it no longer includes this row.
+			return
+		}
+		
+		let isLastRowWithinPage = rowIdxWithinPage + 1 == paymentsPage.rows.count
+		if isLastRowWithinPage {
+		
+			let rowIdxWithinDatabase = Int(paymentsPage.offset) + rowIdxWithinPage
+			let hasMoreRowsInDatabase = rowIdxWithinDatabase + 1 < paymentsCount
+			
+			if hasMoreRowsInDatabase {
+				
+				// increase paymentsPage.count
+				
+				let prvOffset = paymentsPage.offset
+				let newCount = paymentsPage.count + Int32(PAGE_COUNT_INCREMENT)
+				
+				log.debug("increasing page.count: Page(offset=\(prvOffset), count=\(newCount)")
+				
+				paymentsPageFetcher.subscribeToRecent(
+					offset: prvOffset,
+					count: newCount,
+					seconds: (2 * 60)
+				)
+			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func didSelectPayment(row: WalletPaymentOrderRow) -> Void {
+		log.trace("didSelectPayment()")
+		
+		// pretty much guaranteed to be in the cache
+		let fetcher = paymentsManager.fetcher
+		let options = WalletPaymentFetchOptions.companion.Descriptions
+		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
+			
+			if let result = result {
+				selectedItem = result
+			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Prefetch
+	// --------------------------------------------------
+	
+	func maybePreFetchPaymentsFromDatabase() -> Void {
+		
+		if !didPreFetch && paymentsPage.rows.count > 0 {
+			didPreFetch = true
+			
+			// Delay the pre-fetch process a little bit, to give priority to other app-startup tasks.
+			DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+				prefetchPaymentsFromDatabase(idx: 0)
+			}
+		}
+	}
+	
+	func prefetchPaymentsFromDatabase(idx: Int) {
+
+		guard idx < paymentsPage.rows.count else {
+			// recursion complete
+			return
+		}
+
+		let row = paymentsPage.rows[idx]
+		log.debug("Pre-fetching: \(row.id)")
+
+		let options = WalletPaymentFetchOptions.companion.Descriptions
+		paymentsManager.fetcher.getPayment(row: row, options: options) { (_, _) in
+			prefetchPaymentsFromDatabase(idx: idx + 1)
+		}
 	}
 }

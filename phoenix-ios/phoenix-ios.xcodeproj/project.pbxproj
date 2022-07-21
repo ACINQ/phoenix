@@ -171,6 +171,7 @@
 		DCE9F95728412A9D005E03ED /* PaymentSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */; };
 		DCEC6A1827A82A98002C20BA /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEC6A1727A82A98002C20BA /* ImagePicker.swift */; };
 		DCED09D42625DBC4005D5EE2 /* AnimationCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */; };
+		DCEE8998288605FD00FE42DD /* PaymentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEE8997288605FD00FE42DD /* PaymentCell.swift */; };
 		DCEFD922276A796800001767 /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEFD921276A796800001767 /* SyncManager.swift */; };
 		DCF360D02591018300E92031 /* CloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF360CF2591018300E92031 /* CloseChannelsView.swift */; };
 		DCFA8759260E6F2E00AE8953 /* IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA8758260E6F2E00AE8953 /* IntroView.swift */; };
@@ -398,6 +399,7 @@
 		DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSummaryView.swift; sourceTree = "<group>"; };
 		DCEC6A1727A82A98002C20BA /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationCompletion.swift; sourceTree = "<group>"; };
+		DCEE8997288605FD00FE42DD /* PaymentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCell.swift; sourceTree = "<group>"; };
 		DCEFD921276A796800001767 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
 		DCF360CF2591018300E92031 /* CloseChannelsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloseChannelsView.swift; sourceTree = "<group>"; };
 		DCF9312C279F1A4D00FD7776 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -856,6 +858,7 @@
 			isa = PBXGroup;
 			children = (
 				DCD1208628663F4A00EB39C5 /* TransactionsView.swift */,
+				DCEE8997288605FD00FE42DD /* PaymentCell.swift */,
 			);
 			path = transactions;
 			sourceTree = "<group>";
@@ -1144,6 +1147,7 @@
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				DC74174B270F332700F7E3E3 /* KotlinTypes.swift in Sources */,
 				DC142135261E72320075857A /* AboutHTML.swift in Sources */,
+				DCEE8998288605FD00FE42DD /* PaymentCell.swift in Sources */,
 				DCDD9ED428637EBB001800A3 /* ToolsButton.swift in Sources */,
 				DCDD9ED0286377B7001800A3 /* MainView_Big.swift in Sources */,
 				DC1706D926A71D8E00BAFCD0 /* ErrorView.swift in Sources */,

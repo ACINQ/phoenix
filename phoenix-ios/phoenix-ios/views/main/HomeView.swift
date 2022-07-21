@@ -18,16 +18,16 @@ fileprivate let PAGE_COUNT_INCREMENT = 25
 
 struct HomeView : MVIView {
 
-	static let appDelegate = AppDelegate.get()
-	static let phoenixBusiness = appDelegate.business
-	static let encryptedNodeId = appDelegate.encryptedNodeId!
-	static let paymentsManager = phoenixBusiness.paymentsManager
-	static let paymentsPageFetcher = paymentsManager.makePageFetcher()
+	static private let appDelegate = AppDelegate.get()
+	static private let phoenixBusiness = appDelegate.business
+	static private let encryptedNodeId = appDelegate.encryptedNodeId!
+	static private let paymentsManager = phoenixBusiness.paymentsManager
+	static private let paymentsPageFetcher = paymentsManager.makePageFetcher()
 	
-	let phoenixBusiness = HomeView.phoenixBusiness
-	let encryptedNodeId = HomeView.encryptedNodeId
-	let paymentsManager = HomeView.paymentsManager
-	let paymentsPageFetcher = HomeView.paymentsPageFetcher
+	private let phoenixBusiness = HomeView.phoenixBusiness
+	private let encryptedNodeId = HomeView.encryptedNodeId
+	private let paymentsManager = HomeView.paymentsManager
+	private let paymentsPageFetcher = HomeView.paymentsPageFetcher
 	
 	@StateObject var mvi = MVIState({ $0.home() })
 
@@ -42,6 +42,9 @@ struct HomeView : MVIView {
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	
+	let recentPaymentSecondsPublisher = Prefs.shared.recentPaymentSecondsPublisher
+	@State var recentPaymentSeconds = Prefs.shared.recentPaymentSeconds
 	
 	let paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
@@ -70,6 +73,10 @@ struct HomeView : MVIView {
 	@State var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
 	@State var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
 	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var view: some View {
 		
@@ -81,6 +88,9 @@ struct HomeView : MVIView {
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
+		}
+		.onReceive(recentPaymentSecondsPublisher) {
+			recentPaymentSecondsChanged($0)
 		}
 		.onReceive(paymentsPagePublisher) {
 			paymentsPageChanged($0)
@@ -270,10 +280,9 @@ struct HomeView : MVIView {
 			get: { selectedItem != nil },
 			set: { if !$0 { selectedItem = nil }} // needed if user slides the sheet to dismiss
 		)) {
-
 			PaymentView(
-				paymentInfo: selectedItem!,
-				closeSheet: { self.selectedItem = nil }
+				type: .sheet(closeAction: { self.selectedItem = nil }),
+				paymentInfo: selectedItem!
 			)
 			.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
 		}
@@ -357,7 +366,7 @@ struct HomeView : MVIView {
 					VStack(alignment: HorizontalAlignment.leading, spacing: 5) {
 						Text("Bitcoin mempool is full and fees are high.")
 						Button {
-							mempoolFullInfo()
+							openMempoolFullURL()
 						} label: {
 							Text("See how Phoenix is affected".uppercased())
 						}
@@ -367,6 +376,10 @@ struct HomeView : MVIView {
 			}
 		}
 	}
+	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
 	
 	func incomingAmount() -> FormattedAmount? {
 		
@@ -382,19 +395,9 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func didSelectPayment(row: WalletPaymentOrderRow) -> Void {
-		log.trace("didSelectPayment()")
-		
-		// pretty much guaranteed to be in the cache
-		let fetcher = paymentsManager.fetcher
-		let options = WalletPaymentFetchOptions.companion.Descriptions
-		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
-			
-			if let result = result {
-				selectedItem = result
-			}
-		}
-	}
+	// --------------------------------------------------
+	// MARK: View Lifecycle
+	// --------------------------------------------------
 	
 	func onAppear() {
 		log.trace("onAppear()")
@@ -405,10 +408,14 @@ struct HomeView : MVIView {
 			paymentsPageFetcher.subscribeToRecent(
 				offset: 0,
 				count: Int32(PAGE_COUNT_START),
-				seconds: (2 * 60)
+				seconds: Int32(recentPaymentSeconds)
 			)
 		}
 	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
 	
 	func onModelChange(model: Home.Model) -> Void {
 		log.trace("onModelChange()")
@@ -420,14 +427,25 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func paymentsPageChanged(_ page: PaymentsPage) -> Void {
+	func recentPaymentSecondsChanged(_ seconds: Int) {
+		log.trace("recentPaymentSecondsChanged()")
+		
+		recentPaymentSeconds = seconds
+		paymentsPageFetcher.subscribeToRecent(
+			offset: paymentsPage.offset,
+			count: paymentsPage.count,
+			seconds: Int32(recentPaymentSeconds)
+		)
+	}
+	
+	func paymentsPageChanged(_ page: PaymentsPage) {
 		log.trace("paymentsPageChanged()")
 		
 		paymentsPage = page
 		maybePreFetchPaymentsFromDatabase()
 	}
 	
-	func lastCompletedPaymentChanged(_ payment: Lightning_kmpWalletPayment) -> Void {
+	func lastCompletedPaymentChanged(_ payment: Lightning_kmpWalletPayment) {
 		log.trace("lastCompletedPaymentChanged()")
 		
 		let paymentId = payment.walletPaymentId()
@@ -469,6 +487,155 @@ struct HomeView : MVIView {
 		}
 	}
 	
+	func paymentCellDidAppear(_ visibleRow: WalletPaymentOrderRow) -> Void {
+		log.trace("paymentCellDidAppear(): \(visibleRow.id)")
+		
+		// Infinity Scrolling
+		//
+		// Here's the general idea:
+		//
+		// - We start by fetching a small "page" from the database.
+		//   For example: Page(offset=0, count=50)
+		// - When the user scrolls to the bottom, we can increase the count.
+		//   For example: Page(offset=0, count=100)
+		//
+		// Note:
+		// In the original design, we didn't increase the count forever.
+		// At some point we incremented the offset instead.
+		// However, this doesn't work well with LazyVStack, because the contentOffset isn't adjusted.
+		// So the end result is that the user's position within the scrollView jumps,
+		// and results in a very confusing user experience.
+		// I cannot find a clean way of accomplishing a solution with pure SwiftUI.
+		// So this remains a todo item for future improvement.
+		
+		var rowIdxWithinPage: Int? = nil
+		for (idx, r) in paymentsPage.rows.enumerated() {
+			
+			if r == visibleRow {
+				rowIdxWithinPage = idx
+				break
+			}
+		}
+		
+		guard let rowIdxWithinPage = rowIdxWithinPage else {
+			// Row not found within current page.
+			// Perhaps the page just changed, and it no longer includes this row.
+			return
+		}
+		
+		let isLastRowWithinPage = rowIdxWithinPage + 1 == paymentsPage.rows.count
+		if isLastRowWithinPage {
+		
+			// `paymentsPage.count` => how many we requested
+			// `paymentsPage.rows.count` => how many were fetched
+			
+			let maybeHasMoreRowsInDatabase = paymentsPage.rows.count == paymentsPage.count
+			if maybeHasMoreRowsInDatabase {
+				
+				// increase paymentsPage.count
+				
+				let prvOffset = paymentsPage.offset
+				let newCount = paymentsPage.count + Int32(PAGE_COUNT_INCREMENT)
+				
+				log.debug("increasing page.count: Page(offset=\(prvOffset), count=\(newCount)")
+				
+				paymentsPageFetcher.subscribeToRecent(
+					offset: prvOffset,
+					count: newCount,
+					seconds: Int32(recentPaymentSeconds)
+				)
+			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func toggleCurrencyType() -> Void {
+		log.trace("toggleCurrencyType()")
+		
+		// bitcoin -> fiat -> hidden
+		
+		if currencyPrefs.hideAmountsOnHomeScreen {
+			currencyPrefs.toggleHideAmountsOnHomeScreen()
+			if currencyPrefs.currencyType == .fiat {
+				currencyPrefs.toggleCurrencyType()
+			}
+			
+		} else if currencyPrefs.currencyType == .bitcoin {
+			currencyPrefs.toggleCurrencyType()
+			
+		} else if currencyPrefs.currencyType == .fiat {
+			currencyPrefs.toggleHideAmountsOnHomeScreen()
+		}
+	}
+	
+	func exploreIncomingSwap(website: BlockchainExplorer.Website) {
+		log.trace("exploreIncomingSwap()")
+		
+		guard let addr = lastIncomingSwaps.keys.first else {
+			return
+		}
+		
+		let business = AppDelegate.get().business
+		let txUrlStr = business.blockchainExplorer.addressUrl(addr: addr, website: website)
+		if let txUrl = URL(string: txUrlStr) {
+			UIApplication.shared.open(txUrl)
+		}
+	}
+	
+	func copyIncomingSwap() {
+		log.trace("copyIncomingSwap()")
+		
+		let addresses = lastIncomingSwaps.keys
+		
+		if addresses.count == 1 {
+			UIPasteboard.general.string = addresses.first
+			
+		} else if addresses.count >= 2 {
+			UIPasteboard.general.string = addresses.joined(separator: ", ")
+		}
+	}
+	
+	func navigateToBackup() {
+		log.trace("navigateToBackup()")
+		
+		deepLinkManager.broadcast(DeepLink.backup)
+	}
+	
+	func navigationToElecrumServer() {
+		log.trace("navigateToElectrumServer()")
+		
+		deepLinkManager.broadcast(DeepLink.electrum)
+	}
+	
+	func openMempoolFullURL() {
+		log.trace("openMempoolFullURL()")
+		
+		if let url = URL(string: "https://phoenix.acinq.co/faq#high-mempool-size-impacts") {
+			openURL(url)
+		}
+	}
+	
+	func didSelectPayment(row: WalletPaymentOrderRow) -> Void {
+		log.trace("didSelectPayment()")
+		
+		// pretty much guaranteed to be in the cache
+		let fetcher = paymentsManager.fetcher
+		let options = WalletPaymentFetchOptions.companion.Descriptions
+		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
+			
+			if let result = result {
+				selectedItem = result
+			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Prefetch
+	// --------------------------------------------------
+	
 	func maybePreFetchPaymentsFromDatabase() -> Void {
 		
 		if !didPreFetch && paymentsPage.rows.count > 0 {
@@ -496,6 +663,10 @@ struct HomeView : MVIView {
 			prefetchPaymentsFromDatabase(idx: idx + 1)
 		}
 	}
+	
+	// --------------------------------------------------
+	// MARK: Incoming Swap Animation
+	// --------------------------------------------------
 	
 	func startAnimatingIncomingSwapText() -> Void {
 		log.trace("startAnimatingIncomingSwapText()")
@@ -567,328 +738,6 @@ struct HomeView : MVIView {
 		if incomingSwapAnimationsRemaining > 0 {
 			animateIncomingSwapText()
 		}
-	}
-	
-	func toggleCurrencyType() -> Void {
-		log.trace("toggleCurrencyType()")
-		
-		// bitcoin -> fiat -> hidden
-		
-		if currencyPrefs.hideAmountsOnHomeScreen {
-			currencyPrefs.toggleHideAmountsOnHomeScreen()
-			if currencyPrefs.currencyType == .fiat {
-				currencyPrefs.toggleCurrencyType()
-			}
-			
-		} else if currencyPrefs.currencyType == .bitcoin {
-			currencyPrefs.toggleCurrencyType()
-			
-		} else if currencyPrefs.currencyType == .fiat {
-			currencyPrefs.toggleHideAmountsOnHomeScreen()
-		}
-	}
-	
-	func mempoolFullInfo() -> Void {
-		log.trace("mempoolFullInfo()")
-		
-		if let url = URL(string: "https://phoenix.acinq.co/faq#high-mempool-size-impacts") {
-			openURL(url)
-		}
-	}
-	
-	func paymentCellDidAppear(_ visibleRow: WalletPaymentOrderRow) -> Void {
-		log.trace("paymentCellDidAppear(): \(visibleRow.id)")
-		
-		// Infinity Scrolling
-		//
-		// Here's the general idea:
-		//
-		// - We start by fetching a small "page" from the database.
-		//   For example: Page(offset=0, count=50)
-		// - When the user scrolls to the bottom, we can increase the count.
-		//   For example: Page(offset=0, count=100)
-		//
-		// Note:
-		// In the original design, we didn't increase the count forever.
-		// At some point we incremented the offset instead.
-		// However, this doesn't work well with LazyVStack, because the contentOffset isn't adjusted.
-		// So the end result is that the user's position within the scrollView jumps,
-		// and results in a very confusing user experience.
-		// I cannot find a clean way of accomplishing a solution with pure SwiftUI.
-		// So this remains a todo item for future improvement.
-		
-		var rowIdxWithinPage: Int? = nil
-		for (idx, r) in paymentsPage.rows.enumerated() {
-			
-			if r == visibleRow {
-				rowIdxWithinPage = idx
-				break
-			}
-		}
-		
-		guard let rowIdxWithinPage = rowIdxWithinPage else {
-			// Row not found within current page.
-			// Perhaps the page just changed, and it no longer includes this row.
-			return
-		}
-		
-		let isLastRowWithinPage = rowIdxWithinPage + 1 == paymentsPage.rows.count
-		if isLastRowWithinPage {
-		
-			let rowIdxWithinDatabase = Int(paymentsPage.offset) + rowIdxWithinPage
-			let hasMoreRowsInDatabase = rowIdxWithinDatabase + 1 < mvi.model.paymentsCount
-			
-			if hasMoreRowsInDatabase {
-				
-				// increase paymentsPage.count
-				
-				let prvOffset = paymentsPage.offset
-				let newCount = paymentsPage.count + Int32(PAGE_COUNT_INCREMENT)
-				
-				log.debug("increasing page.count: Page(offset=\(prvOffset), count=\(newCount)")
-				
-				paymentsPageFetcher.subscribeToRecent(
-					offset: prvOffset,
-					count: newCount,
-					seconds: (2 * 60)
-				)
-			}
-		}
-	}
-	
-	func exploreIncomingSwap(website: BlockchainExplorer.Website) {
-		log.trace("exploreIncomingSwap()")
-		
-		guard let addr = lastIncomingSwaps.keys.first else {
-			return
-		}
-		
-		let business = AppDelegate.get().business
-		let txUrlStr = business.blockchainExplorer.addressUrl(addr: addr, website: website)
-		if let txUrl = URL(string: txUrlStr) {
-			UIApplication.shared.open(txUrl)
-		}
-	}
-	
-	func copyIncomingSwap() {
-		log.trace("copyIncomingSwap()")
-		
-		let addresses = lastIncomingSwaps.keys
-		
-		if addresses.count == 1 {
-			UIPasteboard.general.string = addresses.first
-			
-		} else if addresses.count >= 2 {
-			UIPasteboard.general.string = addresses.joined(separator: ", ")
-		}
-	}
-	
-	func navigateToBackup() {
-		log.trace("navigateToBackup()")
-		
-		deepLinkManager.broadcast(DeepLink.backup)
-	}
-	
-	func navigationToElecrumServer() {
-		log.trace("navigateToElectrumServer()")
-		
-		deepLinkManager.broadcast(DeepLink.electrum)
-	}
-}
-
-fileprivate struct PaymentCell : View, ViewName {
-
-	static let appDelegate = AppDelegate.get()
-	static let phoenixBusiness = appDelegate.business
-	static let paymentsManager = phoenixBusiness.paymentsManager
-	
-	let paymentsManager = PaymentCell.paymentsManager
-	
-	let row: WalletPaymentOrderRow
-	let didAppearCallback: (WalletPaymentOrderRow) -> Void
-	
-	@State var fetched: WalletPaymentInfo?
-	@State var fetchedIsStale: Bool
-	
-	@ScaledMetric var textScaling: CGFloat = 100
-	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-
-	init(
-		row: WalletPaymentOrderRow,
-		didAppearCallback: @escaping (WalletPaymentOrderRow)->Void
-	) {
-		self.row = row
-		self.didAppearCallback = didAppearCallback
-		
-		let options = WalletPaymentFetchOptions.companion.Descriptions
-		var result = paymentsManager.fetcher.getCachedPayment(row: row, options: options)
-		if let _ = result {
-			
-			self._fetched = State(initialValue: result)
-			self._fetchedIsStale = State(initialValue: false)
-		} else {
-			
-			result = paymentsManager.fetcher.getCachedStalePayment(row: row, options: options)
-			
-			self._fetched = State(initialValue: result)
-			self._fetchedIsStale = State(initialValue: true)
-		}
-	}
-	
-	var body: some View {
-		
-		HStack {
-			if let payment = fetched?.payment {
-				
-				switch payment.state() {
-					case .success:
-						Image("payment_holder_def_success")
-							.foregroundColor(Color.accentColor)
-							.padding(4)
-							.background(
-								RoundedRectangle(cornerRadius: .infinity)
-									.fill(Color.appAccent)
-							)
-					case .pending:
-						Image("payment_holder_def_pending")
-							.foregroundColor(Color.appAccent)
-							.padding(4)
-					case .failure:
-						Image("payment_holder_def_failed")
-							.foregroundColor(Color.appAccent)
-							.padding(4)
-					default:
-						Image(systemName: "doc.text.magnifyingglass")
-							.padding(4)
-				}
-			} else {
-				
-				Image(systemName: "doc.text.magnifyingglass")
-					.padding(4)
-			}
-
-			VStack(alignment: .leading) {
-				Text(paymentDescription())
-					.lineLimit(1)
-					.truncationMode(.tail)
-					.foregroundColor(.primaryForeground)
-
-				Text(paymentTimestamp())
-					.font(.caption)
-					.foregroundColor(.secondary)
-			}
-			.frame(maxWidth: .infinity, alignment: .leading)
-			.padding([.leading, .trailing], 6)
-
-			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-
-				let (amount, isFailure, isOutgoing) = paymentAmountInfo()
-
-				if currencyPrefs.hideAmountsOnHomeScreen {
-					
-					// Do not display any indication as to whether payment in incoming or outgoing
-					Text(verbatim: amount.digits)
-						.foregroundColor(.primary)
-					
-				} else {
-					
-					let color: Color = isFailure ? .secondary : (isOutgoing ? .appNegative : .appPositive)
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-					
-						Text(verbatim: isOutgoing ? "-" : "+")
-							.foregroundColor(color)
-							.padding(.trailing, 1)
-						
-						Text(verbatim: amount.digits)
-							.foregroundColor(color)
-					}
-					.environment(\.layoutDirection, .leftToRight) // issue #237
-					
-					Text(verbatim: " ") // separate for RTL languages
-						.font(.caption)
-						.foregroundColor(.gray)
-					Text(verbatim: amount.type)
-						.font(.caption)
-						.foregroundColor(.gray)
-				}
-			}
-		}
-		.padding([.top, .bottom], 14)
-		.padding([.leading, .trailing], 12)
-		.onAppear {
-			onAppear()
-		}
-	}
-
-	func paymentDescription() -> String {
-
-		if let fetched = fetched {
-			return fetched.paymentDescription() ?? NSLocalizedString("No description", comment: "placeholder text")
-		} else {
-			return ""
-		}
-	}
-	
-	func paymentTimestamp() -> String {
-
-		guard let payment = fetched?.payment else {
-			return ""
-		}
-		let timestamp = payment.completedAt()
-		guard timestamp > 0 else {
-			return NSLocalizedString("pending", comment: "timestamp string for pending transaction")
-		}
-			
-		let date = timestamp.toDate(from: .milliseconds)
-		
-		let formatter = DateFormatter()
-		if textScaling > 100 {
-			formatter.dateStyle = .short
-		} else {
-			formatter.dateStyle = .long
-		}
-		formatter.timeStyle = .short
-		
-		return formatter.string(from: date)
-	}
-	
-	func paymentAmountInfo() -> (FormattedAmount, Bool, Bool) {
-
-		if let payment = fetched?.payment {
-
-			let amount = currencyPrefs.hideAmountsOnHomeScreen
-				? Utils.hiddenAmount(currencyPrefs)
-				: Utils.format(currencyPrefs, msat: payment.amount)
-
-			let isFailure = payment.state() == WalletPaymentState.failure
-			let isOutgoing = payment is Lightning_kmpOutgoingPayment
-
-			return (amount, isFailure, isOutgoing)
-
-		} else {
-			
-			let currency = currencyPrefs.currency
-			let amount = FormattedAmount(amount: 0.0, currency: currency, digits: "", decimalSeparator: " ")
-
-			let isFailure = false
-			let isOutgoing = true
-
-			return (amount, isFailure, isOutgoing)
-		}
-	}
-	
-	func onAppear() -> Void {
-		
-		if fetched == nil || fetchedIsStale {
-			
-			let options = WalletPaymentFetchOptions.companion.Descriptions
-			paymentsManager.fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
-				self.fetched = result
-			}
-		}
-		
-		didAppearCallback(row)
 	}
 }
 

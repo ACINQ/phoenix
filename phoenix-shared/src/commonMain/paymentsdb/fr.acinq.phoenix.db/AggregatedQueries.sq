@@ -154,11 +154,24 @@ LEFT OUTER JOIN payments_metadata ON
 ORDER BY COALESCE(combined_payments.completed_at, combined_payments.created_at) DESC
 LIMIT :limit OFFSET :offset;
 
-listRecentPaymentsCount:
-SELECT SUM(result) AS result FROM (
-    SELECT COUNT(*) AS result FROM outgoing_payments WHERE completed_at IS NULL
-    UNION ALL
-    SELECT COUNT(*) AS result FROM outgoing_payments WHERE completed_at >= :date
-    UNION ALL
-    SELECT COUNT(*) AS result FROM incoming_payments WHERE received_at >= :date
-);
+listOutgoingInFlightPaymentsOrder:
+SELECT
+    combined_payments.type         AS type,
+    combined_payments.id           AS id,
+    combined_payments.created_at   AS created_at,
+    combined_payments.completed_at AS completed_at,
+    payments_metadata.modified_at  AS metadata_modified_at
+FROM (
+    SELECT
+        2            AS type,
+        id           AS id,
+        created_at   AS created_at,
+        completed_at AS completed_at
+    FROM outgoing_payments AS combined_payments
+    WHERE completed_at IS NULL
+) combined_payments
+LEFT OUTER JOIN payments_metadata ON
+    payments_metadata.type = combined_payments.type AND
+    payments_metadata.id = combined_payments.id
+ORDER BY COALESCE(combined_payments.completed_at, combined_payments.created_at) DESC
+LIMIT :limit OFFSET :offset;

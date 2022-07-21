@@ -98,11 +98,25 @@ extension PeerManager {
 extension PaymentsManager {
 	
 	fileprivate struct _Key {
-		static var paymentsPagePublisher = 0
+		static var paymentsCountPublisher = 0
 		static var incomingSwapsPublisher = 0
 		static var lastCompletedPaymentPublisher = 0
 		static var lastIncomingPaymentPublisher = 0
 		static var inFlightOutgoingPaymentsPublisher = 0
+	}
+	
+	func paymentsCountPublisher() -> AnyPublisher<Int64, Never> {
+		
+		executeOnce(storageKey: &_Key.paymentsCountPublisher) {
+			
+			// Transforming from Kotlin:
+			// `paymentsCount: StateFlow<Long>`
+			//
+			KotlinCurrentValueSubject<KotlinLong, Int64>(
+				self.paymentsCount
+			)
+			.eraseToAnyPublisher()
+		}
 	}
 	
 	func incomingSwapsPublisher() -> AnyPublisher<[String: Lightning_kmpMilliSatoshi], Never> {

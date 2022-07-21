@@ -66,10 +66,21 @@ class PaymentsPageFetcher(
         this.offset = offset
         this.count = count
         this.seconds = Int.MIN_VALUE
+        this.subscriptionIdx += 1
+
+        val offsetSnapshot = offset
+        val countSnapshot = count
         this.job = launch {
             val db = databaseManager.paymentsDb()
-            db.listPaymentsOrderFlow(count = count, skip = offset).collect {
-                _paymentsPage.value = PaymentsPage(offset = offset, count = count, rows = it)
+            db.listPaymentsOrderFlow(
+                count = countSnapshot,
+                skip = offsetSnapshot
+            ).collect {
+                _paymentsPage.value = PaymentsPage(
+                    offset = offsetSnapshot,
+                    count = countSnapshot,
+                    rows = it
+                )
             }
         }
     }
@@ -103,17 +114,39 @@ class PaymentsPageFetcher(
             job = null
         }
 
-        val date = Clock.System.now() - Duration.seconds(seconds)
+        val offsetSnapshot = offset
+        val countSnapshot = count
+        val secondsSnapshot = seconds
         job = launch {
             val db = databaseManager.paymentsDb()
-            db.listRecentPaymentsOrderFlow(
-                date = date.toEpochMilliseconds(),
-                count = count,
-                skip = offset
-            ).collect { rows ->
-                _paymentsPage.value = PaymentsPage(offset = offset, count = count, rows = rows)
-                resetRefreshJob(idx, rows)
+            if (secondsSnapshot > 0) {
+                val date = Clock.System.now() - Duration.seconds(secondsSnapshot)
+                db.listRecentPaymentsOrderFlow(
+                    date = date.toEpochMilliseconds(),
+                    count = countSnapshot,
+                    skip = offsetSnapshot
+                ).collect { rows ->
+                    _paymentsPage.value = PaymentsPage(
+                        offset = offsetSnapshot,
+                        count = countSnapshot,
+                        rows = rows
+                    )
+                    resetRefreshJob(idx, rows)
+                }
+            } else {
+                db.listOutgoingInFlightPaymentsOrderFlow(
+                    count = countSnapshot,
+                    skip = offsetSnapshot
+                ).collect { rows ->
+                    _paymentsPage.value = PaymentsPage(
+                        offset = offsetSnapshot,
+                        count = countSnapshot,
+                        rows = rows
+                    )
+                    resetRefreshJob(idx, rows)
+                }
             }
+
         }
     }
 
@@ -129,7 +162,7 @@ class PaymentsPageFetcher(
             this.refreshJob = null
         }
         if (this.seconds <= 0) {
-            log.debug { "resetRefreshJob: ignoring: seconds <= zero"}
+            // The refreshJob isn't needed in this scenario
             return
         }
 

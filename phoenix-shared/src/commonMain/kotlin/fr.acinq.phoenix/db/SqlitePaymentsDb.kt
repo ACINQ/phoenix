@@ -540,6 +540,21 @@ class SqlitePaymentsDb(
         }
     }
 
+    suspend fun listOutgoingInFlightPaymentsOrderFlow(
+        count: Int,
+        skip: Int
+    ): Flow<List<WalletPaymentOrderRow>> {
+        val aggrQueries = _doNotFreezeMe.aggrQueries
+
+        return withContext(Dispatchers.Default) {
+            aggrQueries.listOutgoingInFlightPaymentsOrder(
+                limit = count.toLong(),
+                offset = skip.toLong(),
+                mapper = ::allPaymentsOrderMapper
+            ).asFlow().mapToList()
+        }
+    }
+
     override suspend fun listPayments(
         count: Int,
         skip: Int,

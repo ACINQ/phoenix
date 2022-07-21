@@ -198,7 +198,6 @@ class Prefs {
 		set {
 			let key = Key.maxFees.rawValue
 			defaults.setCodable(value: newValue, forKey: key)
-			log.debug("Prefs.maxFees: \(String(describing: newValue))")
 			maxFeesPublisher.send(newValue)
 		}
 	}
@@ -212,6 +211,10 @@ class Prefs {
 		}
 	}
 	
+	lazy private(set) var recentPaymentSecondsPublisher: CurrentValueSubject<Int, Never> = {
+		return CurrentValueSubject<Int, Never>(self.recentPaymentSeconds)
+	}()
+	
 	var recentPaymentSeconds: Int {
 		get {
 			return defaults.integer(forKey: Key.recentPaymentSeconds.rawValue)
@@ -220,6 +223,7 @@ class Prefs {
 			let oldValue = recentPaymentSeconds
 			if oldValue != newValue {
 				defaults.set(newValue, forKey: Key.recentPaymentSeconds.rawValue)
+				recentPaymentSecondsPublisher.send(newValue)
 			}
 		}
 	}
