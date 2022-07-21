@@ -32,6 +32,7 @@ class Prefs {
 		case invoiceExpirationDays
 		case maxFees
 		case hideAmountsOnHomeScreen
+		case recentPaymentSeconds
 	}
 	
 	public static let shared = Prefs()
@@ -39,7 +40,8 @@ class Prefs {
 	private init() {
 		UserDefaults.standard.register(defaults: [
 			Key.isNewWallet.rawValue: true,
-			Key.invoiceExpirationDays.rawValue: 7
+			Key.invoiceExpirationDays.rawValue: 7,
+			Key.recentPaymentSeconds.rawValue: (60 * 60 * 24 * 7)
 		])
 	}
 	
@@ -207,6 +209,18 @@ class Prefs {
 		}
 		set {
 			defaults.set(newValue, forKey: Key.hideAmountsOnHomeScreen.rawValue)
+		}
+	}
+	
+	var recentPaymentSeconds: Int {
+		get {
+			return defaults.integer(forKey: Key.recentPaymentSeconds.rawValue)
+		}
+		set {
+			let oldValue = recentPaymentSeconds
+			if oldValue != newValue {
+				defaults.set(newValue, forKey: Key.recentPaymentSeconds.rawValue)
+			}
 		}
 	}
 	

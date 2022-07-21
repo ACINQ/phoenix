@@ -21,9 +21,13 @@ struct HomeView : MVIView {
 	static let appDelegate = AppDelegate.get()
 	static let phoenixBusiness = appDelegate.business
 	static let encryptedNodeId = appDelegate.encryptedNodeId!
+	static let paymentsManager = phoenixBusiness.paymentsManager
+	static let paymentsPageFetcher = paymentsManager.makePageFetcher()
 	
 	let phoenixBusiness = HomeView.phoenixBusiness
 	let encryptedNodeId = HomeView.encryptedNodeId
+	let paymentsManager = HomeView.paymentsManager
+	let paymentsPageFetcher = HomeView.paymentsPageFetcher
 	
 	@StateObject var mvi = MVIState({ $0.home() })
 
@@ -39,13 +43,13 @@ struct HomeView : MVIView {
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
-	let paymentsPagePublisher = phoenixBusiness.paymentsManager.paymentsPagePublisher()
-	@State var paymentsPage = PaymentsManager.PaymentsPage(offset: 0, count: 0, rows: [])
+	let paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
+	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	
-	let lastCompletedPaymentPublisher = phoenixBusiness.paymentsManager.lastCompletedPaymentPublisher()
+	let lastCompletedPaymentPublisher = paymentsManager.lastCompletedPaymentPublisher()
 	let chainContextPublisher = phoenixBusiness.appConfigurationManager.chainContextPublisher()
 	
-	let incomingSwapsPublisher = phoenixBusiness.paymentsManager.incomingSwapsPublisher()
+	let incomingSwapsPublisher = paymentsManager.incomingSwapsPublisher()
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 	@State var lastIncomingSwaps = [String: Lightning_kmpMilliSatoshi]()
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
@@ -382,7 +386,7 @@ struct HomeView : MVIView {
 		log.trace("didSelectPayment()")
 		
 		// pretty much guaranteed to be in the cache
-		let fetcher = HomeView.phoenixBusiness.paymentsManager.fetcher
+		let fetcher = paymentsManager.fetcher
 		let options = WalletPaymentFetchOptions.companion.Descriptions
 		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
 			
@@ -398,9 +402,10 @@ struct HomeView : MVIView {
 		// Careful: this function may be called when returning from the Receive/Send view
 		if !didAppear {
 			didAppear = true
-			AppDelegate.get().business.paymentsManager.subscribeToPaymentsPage(
+			paymentsPageFetcher.subscribeToRecent(
 				offset: 0,
-				count: Int32(PAGE_COUNT_START)
+				count: Int32(PAGE_COUNT_START),
+				seconds: (2 * 60)
 			)
 		}
 	}
@@ -415,7 +420,7 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func paymentsPageChanged(_ page: PaymentsManager.PaymentsPage) -> Void {
+	func paymentsPageChanged(_ page: PaymentsPage) -> Void {
 		log.trace("paymentsPageChanged()")
 		
 		paymentsPage = page
@@ -431,7 +436,7 @@ struct HomeView : MVIView {
 		// so as long as we're fetching from the database, we might as well fetch everything we need.
 		let options = WalletPaymentFetchOptions.companion.All
 		
-		phoenixBusiness.paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
+		paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
 			
 			if selectedItem == nil {
 				selectedItem = result // triggers display of PaymentView sheet
@@ -486,9 +491,8 @@ struct HomeView : MVIView {
 		let row = paymentsPage.rows[idx]
 		log.debug("Pre-fetching: \(row.id)")
 
-		let fetcher = phoenixBusiness.paymentsManager.fetcher
 		let options = WalletPaymentFetchOptions.companion.Descriptions
-		fetcher.getPayment(row: row, options: options) { (_, _) in
+		paymentsManager.fetcher.getPayment(row: row, options: options) { (_, _) in
 			prefetchPaymentsFromDatabase(idx: idx + 1)
 		}
 	}
@@ -643,9 +647,10 @@ struct HomeView : MVIView {
 				
 				log.debug("increasing page.count: Page(offset=\(prvOffset), count=\(newCount)")
 				
-				AppDelegate.get().business.paymentsManager.subscribeToPaymentsPage(
+				paymentsPageFetcher.subscribeToRecent(
 					offset: prvOffset,
-					count: newCount
+					count: newCount,
+					seconds: (2 * 60)
 				)
 			}
 		}
@@ -693,10 +698,14 @@ struct HomeView : MVIView {
 
 fileprivate struct PaymentCell : View, ViewName {
 
+	static let appDelegate = AppDelegate.get()
+	static let phoenixBusiness = appDelegate.business
+	static let paymentsManager = phoenixBusiness.paymentsManager
+	
+	let paymentsManager = PaymentCell.paymentsManager
+	
 	let row: WalletPaymentOrderRow
 	let didAppearCallback: (WalletPaymentOrderRow) -> Void
-	
-	let phoenixBusiness: PhoenixBusiness = AppDelegate.get().business
 	
 	@State var fetched: WalletPaymentInfo?
 	@State var fetchedIsStale: Bool
@@ -712,16 +721,15 @@ fileprivate struct PaymentCell : View, ViewName {
 		self.row = row
 		self.didAppearCallback = didAppearCallback
 		
-		let fetcher = phoenixBusiness.paymentsManager.fetcher
 		let options = WalletPaymentFetchOptions.companion.Descriptions
-		var result = fetcher.getCachedPayment(row: row, options: options)
+		var result = paymentsManager.fetcher.getCachedPayment(row: row, options: options)
 		if let _ = result {
 			
 			self._fetched = State(initialValue: result)
 			self._fetchedIsStale = State(initialValue: false)
 		} else {
 			
-			result = fetcher.getCachedStalePayment(row: row, options: options)
+			result = paymentsManager.fetcher.getCachedStalePayment(row: row, options: options)
 			
 			self._fetched = State(initialValue: result)
 			self._fetchedIsStale = State(initialValue: true)
@@ -874,9 +882,8 @@ fileprivate struct PaymentCell : View, ViewName {
 		
 		if fetched == nil || fetchedIsStale {
 			
-			let fetcher = phoenixBusiness.paymentsManager.fetcher
 			let options = WalletPaymentFetchOptions.companion.Descriptions
-			fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
+			paymentsManager.fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
 				self.fetched = result
 			}
 		}

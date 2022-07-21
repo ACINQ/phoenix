@@ -506,11 +506,47 @@ class SqlitePaymentsDb(
         }
     }
 
+    suspend fun listRecentPaymentsOrder(
+        date: Long,
+        count: Int,
+        skip: Int
+    ): List<WalletPaymentOrderRow> {
+        val aggrQueries = _doNotFreezeMe.aggrQueries
+
+        return withContext(Dispatchers.Default) {
+            aggrQueries.listRecentPaymentsOrder(
+                date = date,
+                limit = count.toLong(),
+                offset = skip.toLong(),
+                mapper = ::allPaymentsOrderMapper
+            ).executeAsList()
+        }
+    }
+
+    suspend fun listRecentPaymentsOrderFlow(
+        date: Long,
+        count: Int,
+        skip: Int
+    ): Flow<List<WalletPaymentOrderRow>> {
+        val aggrQueries = _doNotFreezeMe.aggrQueries
+
+        return withContext(Dispatchers.Default) {
+            aggrQueries.listRecentPaymentsOrder(
+                date = date,
+                limit = count.toLong(),
+                offset = skip.toLong(),
+                mapper = ::allPaymentsOrderMapper
+            ).asFlow().mapToList()
+        }
+    }
+
     override suspend fun listPayments(
         count: Int,
         skip: Int,
         filters: Set<PaymentTypeFilter>
     ): List<WalletPayment> = throw NotImplementedError("Use listPaymentsOrderFlow instead")
+
+
 
     /**
      * The lightning-kmp layer triggers the addition of a payment to the database.

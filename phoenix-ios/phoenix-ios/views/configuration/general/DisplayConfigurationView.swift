@@ -11,11 +11,75 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+struct RecentPaymentsOption: Equatable {
+	let seconds: Int
+	let display: String
+	
+	/// These are the options that will be displayed in the UI via the Slider
+	static func all() -> [RecentPaymentsOption] {
+		return [
+			RecentPaymentsOption(
+				seconds: 0,
+				display: NSLocalizedString("Only show in-flight outgoing payments.", comment: "Recent payments option")
+			),
+			RecentPaymentsOption(
+				seconds: (60 * 1),
+				display: NSLocalizedString("Show payments within the last 1 minute.", comment: "Time duration")
+			),
+			RecentPaymentsOption(
+				seconds: (60 * 10),
+				display: NSLocalizedString("Show payments within the last 10 minutes.", comment: "Time duration")
+			),
+			RecentPaymentsOption(
+				seconds: (60 * 60 * 2),
+				display: NSLocalizedString("Show payments within the last 2 hours.", comment: "Time duration")
+			),
+			RecentPaymentsOption(
+				seconds: (60 * 60 * 24),
+				display: NSLocalizedString("Show payments within the last 24 hours.", comment: "Time duration")
+			),
+			RecentPaymentsOption(
+				seconds: (60 * 60 * 24 * 3),
+				display: NSLocalizedString("Show payments within the last 3 days.", comment: "Time duration")
+			),
+			RecentPaymentsOption(
+				seconds: (60 * 60 * 24 * 7),
+				display: NSLocalizedString("Show payments within the last 7 days.", comment: "Time duration")
+			)
+		]
+	}
+	
+	static func closest(seconds: Int) -> (Int, RecentPaymentsOption) {
+		
+		let allOptions = self.all()
+		
+		let minIdx = allOptions.enumerated().map { (idx, option) in
+			return (idx, abs(option.seconds - seconds))
+		}
+		.min(by: { tuple1, tuple2 in
+			let (_, diff1) = tuple1
+			let (_, diff2) = tuple2
+			
+			// areInIncreasingOrder
+			// The predicate returns true if its first argument should be
+			// ordered before its second argument; otherwise, false.
+			
+			return (diff1 < diff2) ? true : false
+		})!.0
+		
+		return (minIdx, allOptions[minIdx])
+	}
+}
+
 struct DisplayConfigurationView: View {
 	
 	@State var fiatCurrency = Prefs.shared.fiatCurrency
 	@State var bitcoinUnit = Prefs.shared.bitcoinUnit
 	@State var theme = Prefs.shared.theme
+	
+	let allRecentPaymentsOptions = RecentPaymentsOption.all()
+	@State var sliderValue: Double = 0
+	@State var selectedRecentPaymentsOption: RecentPaymentsOption? = nil
 	
 	@State var sectionId = UUID()
 	@State var firstAppearance = true
@@ -78,6 +142,32 @@ struct DisplayConfigurationView: View {
 				
 			} // </Section>
 			
+			Section(header: Text("Home Screen")) {
+				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+					Text("Recent payments")
+						.fixedSize(horizontal: false, vertical: true)
+						.padding(.bottom, 8)
+					
+					let lastIdx = Double(allRecentPaymentsOptions.count - 1)
+					Slider(value: $sliderValue, in: 0...lastIdx, step: 1)
+						 .accentColor(Color.accentColor)
+						 .padding(.bottom, 8)
+					
+					let selected = selectedRecentPaymentsOption ?? allRecentPaymentsOptions.last!
+					Text(verbatim: selected.display)
+						.minimumScaleFactor(0.5) // SwiftUI truncation bugs
+						.padding(.bottom, 8)
+					
+					Text("Use the payments screen to view your full payment history.")
+						.font(.callout)
+						.fixedSize(horizontal: false, vertical: true) // SwiftUI truncation bugs
+						.foregroundColor(Color.secondary)
+						.padding(.bottom, 4)
+				
+				} // </VStack>
+				.padding(.vertical, 8)
+			} // </Section>
+			
 		} // </List>
 		.listStyle(.insetGrouped)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -87,6 +177,9 @@ struct DisplayConfigurationView: View {
 		)
 		.onAppear {
 			onAppear()
+		}
+		.onChange(of: sliderValue) { newValue in
+			sliderValueChanged(newValue)
 		}
 		.onReceive(Prefs.shared.fiatCurrencyPublisher) { newValue in
 			fiatCurrency = newValue
@@ -118,9 +211,23 @@ struct DisplayConfigurationView: View {
 		
 		if firstAppearance {
 			firstAppearance = false
+			
+			let seconds = Prefs.shared.recentPaymentSeconds
+			let closest = RecentPaymentsOption.closest(seconds: seconds)
+			sliderValue = Double(closest.0)
+			
 		} else {
 			sectionId = UUID()
 		}
+	}
+	
+	func sliderValueChanged(_ newValue: Double) {
+		log.trace("sliderValueChanged(\(newValue))")
+		
+		let selected = allRecentPaymentsOptions[Int(newValue)]
+		Prefs.shared.recentPaymentSeconds = selected.seconds
+	
+		selectedRecentPaymentsOption = selected
 	}
 }
 

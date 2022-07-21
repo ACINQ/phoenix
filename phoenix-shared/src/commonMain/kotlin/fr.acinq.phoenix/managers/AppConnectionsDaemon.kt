@@ -111,7 +111,7 @@ class AppConnectionsDaemon(
                                 name = "Electrum",
                                 statusStateFlow = electrumClient.connectionState
                             ) {
-                                val electrumServerAddress : ServerAddress? = configurationManager.electrumConfig().value?.let { electrumConfig ->
+                                val electrumServerAddress : ServerAddress? = configurationManager.electrumConfig.value?.let { electrumConfig ->
                                     when (electrumConfig) {
                                         is ElectrumConfig.Custom -> electrumConfig.server
                                         is ElectrumConfig.Random -> configurationManager.randomElectrumServer()
@@ -226,7 +226,7 @@ class AppConnectionsDaemon(
         // listen to electrum configuration changes and reconnect when needed.
         launch {
             var previousElectrumConfig: ElectrumConfig? = null
-            configurationManager.electrumConfig().collect { newElectrumConfig ->
+            configurationManager.electrumConfig.collect { newElectrumConfig ->
                 logger.info { "electrum config changed from=$previousElectrumConfig to $newElectrumConfig" }
                 val changed = when (val oldElectrumConfig = previousElectrumConfig) {
                     is ElectrumConfig.Custom -> {

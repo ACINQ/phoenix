@@ -105,19 +105,6 @@ extension PaymentsManager {
 		static var inFlightOutgoingPaymentsPublisher = 0
 	}
 	
-	func paymentsPagePublisher() -> AnyPublisher<PaymentsPage, Never> {
-		
-		executeOnce(storageKey: &_Key.paymentsPagePublisher) {
-			
-			// Transforming from Kotlin:
-			// `paymentsPage: StateFlow<PaymentsPage>`
-			//
-			KotlinCurrentValueSubject<PaymentsPage, PaymentsPage>(
-				self.paymentsPage
-			).eraseToAnyPublisher()
-		}
-	}
-	
 	func incomingSwapsPublisher() -> AnyPublisher<[String: Lightning_kmpMilliSatoshi], Never> {
 		
 		executeOnce(storageKey: &_Key.incomingSwapsPublisher) {
@@ -177,6 +164,27 @@ extension PaymentsManager {
 			.map {
 				return $0.count
 			}
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+extension PaymentsPageFetcher {
+	
+	fileprivate struct _Key {
+		static var paymentsPagePublisher = 0
+	}
+	
+	func paymentsPagePublisher() -> AnyPublisher<PaymentsPage, Never> {
+		
+		executeOnce(storageKey: &_Key.paymentsPagePublisher) {
+			
+			// Transforming from Kotlin:
+			// `paymentsPage: StateFlow<PaymentsPage>`
+			//
+			KotlinCurrentValueSubject<PaymentsPage, PaymentsPage>(
+				self.paymentsPage
+			)
 			.eraseToAnyPublisher()
 		}
 	}
