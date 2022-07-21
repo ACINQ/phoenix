@@ -34,6 +34,7 @@ import fr.acinq.lightning.wire.FailureMessage
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.PaymentsDatabase
 import fr.acinq.phoenix.db.didCompleteWalletPayment
+import fr.acinq.secp256k1.Hex
 
 class OutgoingQueries(val database: PaymentsDatabase) {
 
@@ -268,7 +269,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
             return OutgoingPayment(
                 id = UUID.fromString(id),
                 recipientAmount = MilliSatoshi(recipient_amount_msat),
-                recipient = PublicKey(ByteVector(recipient_node_id)),
+                recipient = PublicKey.parse(Hex.decode(recipient_node_id)),
                 details = OutgoingDetailsData.deserialize(details_type, details_blob),
                 parts = listOf(),
                 status = mapPaymentStatus(status_type, status_blob, completed_at),
@@ -416,8 +417,8 @@ class OutgoingQueries(val database: PaymentsDatabase) {
                 databaseValue.isEmpty() -> listOf()
                 else -> databaseValue.split(";").map { hop ->
                     val els = hop.split(":")
-                    val n1 = PublicKey(ByteVector(els[0]))
-                    val n2 = PublicKey(ByteVector(els[1]))
+                    val n1 = PublicKey.parse(Hex.decode(els[0]))
+                    val n2 = PublicKey.parse(Hex.decode(els[1]))
                     val cid = els[2].takeIf { it.isNotBlank() }?.run { ShortChannelId(this) }
                     HopDesc(n1, n2, cid)
                 }
