@@ -81,45 +81,25 @@ struct AppStatusButton: View {
 		let connectionStatus = connectionsManager.connections.global
 		if connectionStatus is Lightning_kmpConnection.CLOSED {
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
-				if deviceInfo.isIPad {
-					Text(NSLocalizedString("Offline", comment: "Connection state"))
-						.padding(.leading, 10)
-						.padding(.trailing, -5)
-					Image(systemName: "bolt.slash.fill")
-						.imageScale(.large)
-						.frame(minHeight: headerButtonHeight)
-						.squareFrame()
-				} else {
-					Image(systemName: "bolt.slash.fill")
-						.imageScale(.large)
-						.frame(minHeight: headerButtonHeight)
-						.squareFrame()
-					Text(NSLocalizedString("Offline", comment: "Connection state"))
-						.padding(.trailing, 10)
-						.padding(.leading, -5)
-				}
+				Text(NSLocalizedString("Offline", comment: "Connection state"))
+					.padding(.leading, 10)
+					.padding(.trailing, -5)
+				Image(systemName: "bolt.slash.fill")
+					.imageScale(.large)
+					.frame(minHeight: headerButtonHeight)
+					.squareFrame()
 			}
 			.font(.caption2)
 		}
 		else if connectionStatus is Lightning_kmpConnection.ESTABLISHING {
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
-				if deviceInfo.isIPad {
-					Text(NSLocalizedString("Connecting...", comment: "Connection state"))
-						.padding(.leading, 10)
-						.padding(.trailing, -5)
-					Image(systemName: "bolt.slash")
-						.imageScale(.large)
-						.frame(minHeight: headerButtonHeight)
-						.squareFrame()
-				} else {
-					Image(systemName: "bolt.slash")
-						.imageScale(.large)
-						.frame(minHeight: headerButtonHeight)
-						.squareFrame()
-					Text(NSLocalizedString("Connecting...", comment: "Connection state"))
-						.padding(.trailing, 10)
-						.padding(.leading, -5)
-				}
+				Text(NSLocalizedString("Connecting...", comment: "Connection state"))
+					.padding(.leading, 10)
+					.padding(.trailing, -5)
+				Image(systemName: "bolt.slash")
+					.imageScale(.large)
+					.frame(minHeight: headerButtonHeight)
+					.squareFrame()
 			}
 			.font(.caption2)
 		} else /* .established */ {

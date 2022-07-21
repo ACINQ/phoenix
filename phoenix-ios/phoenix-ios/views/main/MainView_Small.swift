@@ -13,6 +13,7 @@ fileprivate var log = Logger(OSLog.disabled)
 
 fileprivate enum NavLinkTag: String {
 	case ConfigurationView
+	case TransactionsView
 	case ReceiveView
 	case SendView
 	case CurrencyConverter
@@ -29,13 +30,33 @@ struct MainView_Small: View {
 	@State var externalLightningRequest: AppScanController? = nil
 	@State var temp: [AppScanController] = []
 	
+	@ScaledMetric var footerButtonImageSize: CGFloat = 22
+	
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	
 	let headerButtonHeightReader = GeometryPreferenceReader(
 		key: AppendValue<HeaderButtonHeight>.self,
 		value: { [$0.size.height] }
 	)
 	@State var headerButtonHeight: CGFloat? = nil
 	
-	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	enum FooterButtonWidth: Preference {}
+	let footerButtonWidthReader = GeometryPreferenceReader(
+		key: AppendValue<FooterButtonWidth>.self,
+		value: { [$0.size.width] }
+	)
+	@State var footerButtonWidth: CGFloat? = nil
+	
+	enum FooterButtonHeight: Preference {}
+	let footerButtonHeightReader = GeometryPreferenceReader(
+		key: AppendValue<FooterButtonHeight>.self,
+		value: { [$0.size.height] }
+	)
+	@State var footerButtonHeight: CGFloat? = nil
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	var body: some View {
@@ -94,89 +115,150 @@ struct MainView_Small: View {
 	func content() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			
-			// === Top-row buttons ===
-			HStack {
-				AppStatusButton(
-					headerButtonHeightReader: headerButtonHeightReader,
-					headerButtonHeight: $headerButtonHeight
-				)
-				Spacer()
-				ToolsMenu(
-					buttonHeightReader: headerButtonHeightReader,
-					buttonHeight: $headerButtonHeight,
-					openCurrencyConverter: { navLinkTag = .CurrencyConverter }
-				)
-			}
-			.padding(.all)
-			.assignMaxPreference(for: headerButtonHeightReader.key, to: $headerButtonHeight)
-			
+			header()
 			HomeView()
-			bottomBar()
-			
-		} // </VStack>
+			footer()
+		}
 	}
 	
 	@ViewBuilder
-	func bottomBar() -> some View {
+	func header() -> some View {
 		
-		HStack {
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
-			Button {
-				navLinkTag = .ConfigurationView
-			} label: {
-				Image("ic_settings")
-					.resizable()
-					.frame(width: 22, height: 22)
-					.foregroundColor(Color.appAccent)
-			}
-			.padding()
-			.padding(.leading, 8)
-
-			Divider().frame(width: 1, height: 40).background(Color.borderColor)
+			// Leading Button 1
+			header_settingsButton()
+				.padding(.trailing)
+			
+			// Leading Button 2
+			header_transactionsButton()
+			
 			Spacer()
 			
+			// Trailing Button 2
+			AppStatusButton(
+				headerButtonHeightReader: headerButtonHeightReader,
+				headerButtonHeight: $headerButtonHeight
+			)
+			.padding(.trailing)
+			
+			// Trailing Button 1
+			ToolsMenu(
+				buttonHeightReader: headerButtonHeightReader,
+				buttonHeight: $headerButtonHeight,
+				openCurrencyConverter: { navLinkTag = .CurrencyConverter }
+			)
+		}
+		.padding([.top, .leading, .trailing])
+		.padding(.bottom, 40) // extra padding on bottom, between Header & HomeView
+		.assignMaxPreference(for: headerButtonHeightReader.key, to: $headerButtonHeight)
+	}
+	
+	@ViewBuilder
+	func header_settingsButton() -> some View {
+		
+		Button {
+			navLinkTag = .ConfigurationView
+		} label: {
+			Image(systemName: "gearshape.fill")
+				.renderingMode(.template)
+				.imageScale(.large)
+				.font(.caption2)
+				.foregroundColor(.primary)
+				.padding(.all, 7)
+				.read(headerButtonHeightReader)
+				.frame(minHeight: headerButtonHeight)
+				.squareFrame()
+				.background(Color.buttonFill)
+				.cornerRadius(30)
+				.overlay(
+					RoundedRectangle(cornerRadius: 30)
+						.stroke(Color.borderColor, lineWidth: 1)
+				)
+		}
+	}
+	
+	@ViewBuilder
+	func header_transactionsButton() -> some View {
+		
+		Button {
+			navLinkTag = .TransactionsView
+		} label: {
+			Image(systemName: "list.bullet")
+				.renderingMode(.template)
+				.imageScale(.large)
+				.font(.caption2)
+				.foregroundColor(.primary)
+				.padding(.all, 7)
+				.read(headerButtonHeightReader)
+				.frame(minHeight: headerButtonHeight)
+				.squareFrame()
+				.background(Color.buttonFill)
+				.cornerRadius(30)
+				.overlay(
+					RoundedRectangle(cornerRadius: 30)
+						.stroke(Color.borderColor, lineWidth: 1)
+				)
+		}
+	}
+	
+	@ViewBuilder
+	func footer() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			
+			Spacer()
 			Button {
 				navLinkTag = .ReceiveView
 			} label: {
-				HStack {
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
 					Image("ic_receive")
 						.resizable()
-						.frame(width: 22, height: 22)
-						.foregroundColor(Color.appAccent)
-						.padding(4)
+						.frame(width: footerButtonImageSize, height: footerButtonImageSize)
+						.foregroundColor(.appAccent)
 					Text("Receive")
+						.minimumScaleFactor(0.5)
 						.foregroundColor(.primaryForeground)
 				}
+				.frame(minWidth: footerButtonWidth, alignment: Alignment.trailing)
+				.read(footerButtonWidthReader)
+				.read(footerButtonHeightReader)
 			}
 
 			Spacer()
-			Divider().frame(width: 1, height: 40).background(Color.borderColor)
-			Spacer()
+			if let footerButtonHeight = footerButtonHeight {
+				Divider().frame(width: 1, height: footerButtonHeight).background(Color.borderColor)
+				Spacer()
+			}
 
 			Button {
 				navLinkTag = .SendView
 			} label: {
-				HStack {
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
 					Image("ic_scan")
 						.resizable()
-						.frame(width: 22, height: 22)
-						.foregroundColor(Color.appAccent)
-						.padding(4)
+						.frame(width: footerButtonImageSize, height: footerButtonImageSize)
+						.foregroundColor(.appAccent)
 					Text("Send")
+						.minimumScaleFactor(0.5)
 						.foregroundColor(.primaryForeground)
 				}
+				.frame(minWidth: footerButtonWidth, alignment: Alignment.leading)
+				.read(footerButtonWidthReader)
+				.read(footerButtonHeightReader)
 			}
-
 			Spacer()
 		
 		} // </HStack>
-		.padding(.top, 10)
+		.padding(.top, 20)
+		.padding(.bottom, 10)
 		.background(
 			Color.mutedBackground
 				.cornerRadius(15, corners: [.topLeft, .topRight])
 				.edgesIgnoringSafeArea([.horizontal, .bottom])
 		)
+		.assignMaxPreference(for: footerButtonWidthReader.key, to: $footerButtonWidth)
+		.assignMaxPreference(for: footerButtonHeightReader.key, to: $footerButtonHeight)
 	}
 	
 	@ViewBuilder
@@ -185,6 +267,8 @@ struct MainView_Small: View {
 		switch navLinkTag {
 		case .ConfigurationView:
 			ConfigurationView()
+		case .TransactionsView:
+			TransactionsView()
 		case .ReceiveView:
 			ReceiveView()
 		case .SendView:
@@ -195,6 +279,10 @@ struct MainView_Small: View {
 			EmptyView()
 		}
 	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
 	
 	private func navLinkTagChanged(_ tag: NavLinkTag?) {
 		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
