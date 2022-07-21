@@ -59,7 +59,15 @@ struct MainView_Big: View {
 	)
 	@State var headerButtonHeight: CGFloat? = nil
 	
-	@ScaledMetric var bottomBarImageSize: CGFloat = 32
+	enum FooterButtonWidth: Preference {}
+	let footerButtonWidthReader = GeometryPreferenceReader(
+		key: AppendValue<FooterButtonWidth>.self,
+		value: { [$0.size.width] }
+	)
+	@State var footerButtonWidth: CGFloat? = nil
+	
+	@ScaledMetric var sendImageSize: CGFloat = 22
+	@ScaledMetric var receiveImageSize: CGFloat = 22
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -367,62 +375,71 @@ struct MainView_Big: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			HomeView()
-			primary_bottomBar()
+			primary_footer()
 		}
 		.padding(.bottom, 60)
 	}
 	
 	@ViewBuilder
-	func primary_bottomBar() -> some View {
+	func primary_footer() -> some View {
 		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+		HStack(alignment: VerticalAlignment.center, spacing: 20) {
 			
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				Spacer()
-				Button {
-					withAnimation {
-						navLinkTag = .ReceiveView
-					}
-				} label: {
-					Label {
-						Text("Receive")
-							.font(.title2)
-							.foregroundColor(.primaryForeground)
-					} icon: {
-						Image("ic_receive")
-							.resizable()
-							.aspectRatio(contentMode: .fit)
-							.foregroundColor(Color.appAccent)
-							.frame(width: bottomBarImageSize, height: bottomBarImageSize, alignment: .center)
-					}
-				} // </Button>
-			} // <HStack>
+			Button {
+				withAnimation {
+					navLinkTag = .ReceiveView
+				}
+			} label: {
+				Label {
+					Text("Receive")
+						.font(.title2.weight(.medium))
+						.foregroundColor(.white)
+				} icon: {
+					Image("ic_receive_resized")
+						.resizable()
+						.aspectRatio(contentMode: .fit)
+						.foregroundColor(Color.white)
+						.frame(width: receiveImageSize, height: receiveImageSize, alignment: .center)
+				}
+				.padding(.leading, 16)
+				.padding(.trailing, 18)
+				.padding(.top, 9)
+				.padding(.bottom, 9)
+			} // </Button>
+			.buttonStyle(ScaleButtonStyle(
+				cornerRadius: 100,
+				backgroundFill: Color.appAccent
+			))
+			.frame(minWidth: footerButtonWidth, alignment: Alignment.center)
+			.read(footerButtonWidthReader)
 
-			Divider()
-				.frame(width: 1, height: 40)
-				.background(Color.borderColor)
-				.padding(.horizontal, 20)
-
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				Button {
-					withAnimation {
-						navLinkTag = .SendView
-					}
-				} label: {
-					Label {
-						Text("Send")
-							.font(.title2)
-							.foregroundColor(.primaryForeground)
-					} icon: {
-						Image("ic_scan")
-							.resizable()
-							.aspectRatio(contentMode: .fit)
-							.foregroundColor(Color.appAccent)
-							.frame(width: bottomBarImageSize, height: bottomBarImageSize, alignment: .center)
-					}
-				} // </Button>
-				Spacer()
-			} // </HStack>
+			Button {
+				withAnimation {
+					navLinkTag = .SendView
+				}
+			} label: {
+				Label {
+					Text("Send")
+						.font(.title2.weight(.medium))
+						.foregroundColor(.white)
+				} icon: {
+					Image("ic_scan_resized")
+						.resizable()
+						.aspectRatio(contentMode: .fit)
+						.foregroundColor(.white)
+						.frame(width: sendImageSize, height: sendImageSize, alignment: .center)
+				}
+				.padding(.leading, 26)
+				.padding(.trailing, 28)
+				.padding(.top, 9)
+				.padding(.bottom, 9)
+			} // </Button>
+			.buttonStyle(ScaleButtonStyle(
+				cornerRadius: 100,
+				backgroundFill: Color.appAccent
+			))
+			.frame(minWidth: footerButtonWidth, alignment: Alignment.center)
+			.read(footerButtonWidthReader)
 		
 		} // </HStack>
 	}
