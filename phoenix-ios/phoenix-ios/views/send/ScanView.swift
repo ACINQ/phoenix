@@ -29,7 +29,7 @@ struct ScanView: View {
 	@State var ignoreScanner: Bool = false
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	@Environment(\.popoverState) var popoverState: PopoverState
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
@@ -404,7 +404,7 @@ struct ScanView: View {
 		log.trace("manualInput()")
 		
 		ignoreScanner = true
-		shortSheetState.display(dismissable: true) {
+		smartModalState.display(dismissable: true) {
 			
 			ManualInput(mvi: mvi, ignoreScanner: $ignoreScanner)
 		}
@@ -488,7 +488,7 @@ struct ManualInput: View, ViewName {
 	
 	@State var input = ""
 	
-	@Environment(\.shortSheetState) private var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) private var smartModalState: SmartModalState
 	
 	@ViewBuilder
 	var body: some View {
@@ -552,7 +552,7 @@ struct ManualInput: View, ViewName {
 	func didCancel() -> Void {
 		log.trace("[\(viewName)] didCancel()")
 		
-		shortSheetState.close {
+		smartModalState.close {
 			ignoreScanner = false
 		}
 	}
@@ -565,7 +565,7 @@ struct ManualInput: View, ViewName {
 			mvi.intent(Scan.Intent_Parse(request: request))
 		}
 		
-		shortSheetState.close()
+		smartModalState.close()
 	}
 }
 

@@ -65,7 +65,7 @@ struct ValidateView: View {
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.popoverState) var popoverState: PopoverState
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	// For the cicular buttons: [metadata, tip, comment]
@@ -1094,7 +1094,7 @@ struct ValidateView: View {
 		}
 		
 		dismissKeyboardIfVisible()
-		shortSheetState.display(dismissable: true) {
+		smartModalState.display(dismissable: true) {
 		
 			MetadataSheet(lnurlPay: lnurlPay)
 		}
@@ -1151,7 +1151,7 @@ struct ValidateView: View {
 			
 			priceSliderVisible = true
 			dismissKeyboardIfVisible()
-			shortSheetState.display(dismissable: true) {
+			smartModalState.display(dismissable: true) {
 				
 				PriceSliderSheet(
 					flowType: flowType,
@@ -1200,7 +1200,7 @@ struct ValidateView: View {
 		let maxCommentLength = lnurlPay.maxCommentLength?.intValue ?? 140
 		
 		dismissKeyboardIfVisible()
-		shortSheetState.display(dismissable: true) {
+		smartModalState.display(dismissable: true) {
 			
 			CommentSheet(
 				comment: $comment,
@@ -1267,7 +1267,7 @@ struct ValidateView: View {
 				let maxCommentLength = model.lnurlPay.maxCommentLength?.intValue ?? 140
 				
 				dismissKeyboardIfVisible()
-				shortSheetState.display(dismissable: true) {
+				smartModalState.display(dismissable: true) {
 					
 					CommentSheet(
 						comment: $comment,
@@ -1277,7 +1277,7 @@ struct ValidateView: View {
 				
 				} onWillDisappear: {
 					
-					log.debug("shortSheetState.onWillDisappear {}")
+					log.debug("smartModalState.onWillDisappear {}")
 					hasPromptedForComment = true
 				}
 				

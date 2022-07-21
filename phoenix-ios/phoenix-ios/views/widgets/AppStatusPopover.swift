@@ -51,9 +51,7 @@ struct AppStatusPopover: View {
 			HStack {
 				Spacer()
 				Button(NSLocalizedString("Close", comment: "Button")) {
-					withAnimation {
-						popoverState.close()
-					}
+					close()
 				}
 				.font(.title2)
 			}
@@ -115,7 +113,7 @@ struct AppStatusPopover: View {
 					}
 				}
 				
-			} // </HStack>
+			} // </Group>
 			.font(.title3)
 			.padding(.bottom, 15)
 			
@@ -346,6 +344,14 @@ struct AppStatusPopover: View {
 		log.trace("pendingSettingsChanged()")
 		
 		pendingSettings = newPendingSettings
+	}
+	
+	func close() {
+		log.trace("close()")
+		
+		withAnimation {
+			popoverState.close()
+		}
 	}
 }
 

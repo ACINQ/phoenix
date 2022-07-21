@@ -183,16 +183,6 @@ struct ConfigurationView: View {
 						}
 					}
 
-//					NavigationLink(
-//						destination: ForceCloseChannelsView(),
-//						tag: NavLinkTag.ForceCloseChannelsView,
-//						selection: $navLinkTag
-//					) {
-//						Label { Text("Danger zone") } icon: {
-//							Image(systemName: "exclamationmark.triangle")
-//						}
-//					}.foregroundColor(.appNegative)
-
 				} // </if: hasWallet>
 				
 				NavigationLink(

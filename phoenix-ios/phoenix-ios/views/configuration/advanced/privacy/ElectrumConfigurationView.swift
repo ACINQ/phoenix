@@ -25,7 +25,7 @@ struct ElectrumConfigurationView: MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	func connectionInfo() -> (String, String) {
 		
@@ -160,7 +160,7 @@ struct ElectrumConfigurationView: MVIView {
 	func didTapModify() {
 		log.trace("didTapModify()")
 		
-		shortSheetState.display(dismissable: false) {
+		smartModalState.display(dismissable: false) {
 			
 			ElectrumAddressSheet(mvi: mvi)
 		}

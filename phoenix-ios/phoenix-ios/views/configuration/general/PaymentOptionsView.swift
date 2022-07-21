@@ -25,7 +25,7 @@ struct PaymentOptionsView: View {
 	@State var payToOpen_minFeeSat: Int64 = 0
 	
 	@Environment(\.openURL) var openURL
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	let maxFeesPublisher = Prefs.shared.maxFeesPublisher
 	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
@@ -200,7 +200,7 @@ struct PaymentOptionsView: View {
 	func showMaxFeeSheet() {
 		log.trace("showMaxFeeSheet()")
 		
-		shortSheetState.display(dismissable: false) {
+		smartModalState.display(dismissable: false) {
 			MaxFeeConfiguration()
 		}
 	}
@@ -259,7 +259,7 @@ struct MaxFeeConfiguration: View, ViewName {
 	let examplePayments: [Int64] = [1_000, 10_000, 100_000, 1_000_000]
 	@State var examplePaymentsIdx = 1
 	
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	enum ExampleHeight: Preference {}
 	let exampleHeightReader = GeometryPreferenceReader(
@@ -865,7 +865,7 @@ struct MaxFeeConfiguration: View, ViewName {
 	func didTapCancelButton() {
 		log.trace("[\(viewName)] didTapCancelButton()")
 		
-		shortSheetState.close()
+		smartModalState.close()
 	}
 	
 	func didTapSaveButton() {
@@ -917,7 +917,7 @@ struct MaxFeeConfiguration: View, ViewName {
 			Prefs.shared.maxFees = nil
 		}
 		
-		shortSheetState.close()
+		smartModalState.close()
 	}
 }
 

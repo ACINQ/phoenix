@@ -20,15 +20,21 @@ import Combine
 ///
 public class PopoverState: ObservableObject {
 
-	// Fires when:
-	// - view will animate on screen (onWillAppear)
-	// - view has animated off screen (onDidDisappear)
-	//
+	/// Singleton instance
+	///
+	public static let shared = PopoverState()
+	
+	private init() {/* must use shared instance */}
+	
+	/// Fires when:
+	/// - view will animate on screen (onWillAppear)
+	/// - view has animated off screen (onDidDisappear)
+	///
 	var publisher = PassthroughSubject<PopoverItem?, Never>()
 	
-	// Fires when:
-	// - view will animate off screen (onWillDisapper)
-	//
+	/// Fires when:
+	/// - view will animate off screen (onWillDisapper)
+	///
 	var closePublisher = PassthroughSubject<Void, Never>()
 	
 	func display<Content: View>(
@@ -101,7 +107,7 @@ public struct PopoverItem {
 
 struct PopoverEnvironmentKey: EnvironmentKey {
 
-	static var defaultValue = PopoverState()
+	static var defaultValue = PopoverState.shared
 }
 
 public extension EnvironmentValues {
@@ -148,6 +154,7 @@ struct PopoverWrapper<Content: View>: View {
 						RoundedRectangle(cornerRadius: 16)
 							.stroke(Color(UIColor.secondarySystemBackground), lineWidth: 1.0)
 					)
+					.frame(maxWidth: 600, alignment: .center)
 					.padding(.all, 20)
 				}
 				.zIndex(1)

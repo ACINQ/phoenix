@@ -10,7 +10,7 @@ struct CopyOptionsSheet: View {
 	let copyText: () -> Void
 	let copyImage: () -> Void
 	
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	@ViewBuilder
 	var body: some View {
@@ -18,7 +18,7 @@ struct CopyOptionsSheet: View {
 		VStack {
 			
 			Button {
-				shortSheetState.close {
+				smartModalState.close {
 					copyText()
 				}
 			} label: {
@@ -44,7 +44,7 @@ struct CopyOptionsSheet: View {
 			.padding(.bottom, 8)
 			
 			Button {
-				shortSheetState.close {
+				smartModalState.close {
 					copyImage()
 				}
 			} label: {

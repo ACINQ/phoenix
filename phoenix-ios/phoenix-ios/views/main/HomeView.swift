@@ -16,13 +16,6 @@ fileprivate let PAGE_COUNT_START = 25
 fileprivate let PAGE_COUNT_INCREMENT = 25
 
 
-fileprivate enum NavLinkTag: String {
-	case ConfigurationView
-	case ReceiveView
-	case SendView
-	case CurrencyConverter
-}
-
 struct HomeView : MVIView {
 
 	static let appDelegate = AppDelegate.get()
@@ -42,6 +35,7 @@ struct HomeView : MVIView {
 	
 	@StateObject var customElectrumServerObserver = CustomElectrumServerObserver()
 	
+	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
@@ -67,12 +61,6 @@ struct HomeView : MVIView {
 	@State var didAppear = false
 	@State var didPreFetch = false
 	
-	@State private var navLinkTag: NavLinkTag? = nil
-	
-	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
-	@State var externalLightningRequest: AppScanController? = nil
-	@State var temp: [AppScanController] = []
-	
 	let backupSeed_enabled_publisher = Prefs.shared.backupSeed.isEnabled_publisher
 	let manualBackup_taskDone_publisher = Prefs.shared.backupSeed.manualBackup_taskDone_publisher
 	@State var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
@@ -83,42 +71,12 @@ struct HomeView : MVIView {
 		
 		ZStack {
 
-			// iOS 14 & 15 have bugs when using NavigationLink.
-			// The suggested workarounds include using only a single NavigationLink.
-			//
-			NavigationLink(
-				destination: navLinkView(),
-				isActive: Binding(
-					get: { navLinkTag != nil },
-					set: { if !$0 { navLinkTag = nil }}
-				)
-			) {
-				EmptyView()
-			}
-			
-			Color.primaryBackground
-				.edgesIgnoringSafeArea(.all)
-
-			if AppDelegate.showTestnetBackground {
-				Image("testnet_bg")
-					.resizable(resizingMode: .tile)
-					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
-			}
-
 			main
 
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationBarTitle("", displayMode: .inline)
-		.navigationBarHidden(true)
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
-		}
-		.onChange(of: navLinkTag) { tag in
-			navLinkTagChanged(tag)
-		}
-		.onChange(of: deepLinkManager.deepLink) {
-			deepLinkChanged($0)
 		}
 		.onReceive(paymentsPagePublisher) {
 			paymentsPageChanged($0)
@@ -132,9 +90,6 @@ struct HomeView : MVIView {
 		.onReceive(incomingSwapsPublisher) {
 			onIncomingSwapsChanged($0)
 		}
-		.onReceive(externalLightningUrlPublisher) {
-			didReceiveExternalLightningUrl($0)
-		}
 		.onReceive(backupSeed_enabled_publisher) {
 			self.backupSeed_enabled = $0
 		}
@@ -147,14 +102,6 @@ struct HomeView : MVIView {
 	var main: some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			
-			// === Top-row buttons ===
-			HStack {
-				AppStatusButton()
-				Spacer()
-				ToolsButton(navLinkTag: $navLinkTag)
-			}
-			.padding(.all)
 
 			// === Total Balance ====
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
@@ -309,8 +256,7 @@ struct HomeView : MVIView {
 					}
 				}
 			}
-
-			BottomBar(navLinkTag: $navLinkTag)
+			.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 		
 		} // </VStack>
 		.onAppear {
@@ -417,23 +363,6 @@ struct HomeView : MVIView {
 			}
 		}
 	}
-
-	@ViewBuilder
-	func navLinkView() -> some View {
-		
-		switch navLinkTag {
-		case .ConfigurationView:
-			ConfigurationView()
-		case .ReceiveView:
-			ReceiveView()
-		case .SendView:
-			SendView(controller: externalLightningRequest)
-		case .CurrencyConverter:
-			CurrencyConverterView()
-		default:
-			EmptyView()
-		}
-	}
 	
 	func incomingAmount() -> FormattedAmount? {
 		
@@ -483,16 +412,6 @@ struct HomeView : MVIView {
 			if Prefs.shared.isNewWallet {
 				Prefs.shared.isNewWallet = false
 			}
-		}
-	}
-	
-	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
-		
-		if tag == nil {
-			// If we pushed the SendView, triggered by an external lightning url,
-			// then we can nil out the associated controller now (since we handed off to SendView).
-			self.externalLightningRequest = nil
 		}
 	}
 	
@@ -759,55 +678,6 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
-		log.trace("didReceiveExternalLightningUrl()")
-	
-		if navLinkTag == .SendView {
-			log.debug("Ignoring: handled by SendView")
-			return
-		}
-		
-		// We want to:
-		// - Parse the incoming lightning url
-		// - If it's invalid, we want to display a warning (using the Toast view)
-		// - Otherwise we want to jump DIRECTLY to the "Confirm Payment" screen.
-		//
-		// In particular, we do **NOT** want the user experience to be:
-		// - switch to SendView
-		// - then again switch to ConfirmView
-		// This feels jittery :(
-		//
-		// So we need to:
-		// - get a Scan.ModelValidate instance
-		// - pass this to SendView as the `firstModel` parameter
-		
-		let controllers = AppDelegate.get().business.controllers
-		guard let scanController = controllers.scan(firstModel: Scan.ModelReady()) as? AppScanController else {
-			return
-		}
-		temp.append(scanController)
-		
-		var unsubscribe: (() -> Void)? = nil
-		unsubscribe = scanController.subscribe { (model: Scan.Model) in
-			
-			// Ignore first subscription fire (Scan.ModelReady)
-			if let _ = model as? Scan.ModelReady {
-				return
-			} else {
-				self.externalLightningRequest = scanController
-				self.navLinkTag = .SendView
-			}
-			
-			// Cleanup
-			if let idx = self.temp.firstIndex(where: { $0 === scanController }) {
-				self.temp.remove(at: idx)
-			}
-			unsubscribe?()
-		}
-		
-		scanController.intent(intent: Scan.IntentParse(request: urlStr))
-	}
-	
 	func navigateToBackup() {
 		log.trace("navigateToBackup()")
 		
@@ -818,21 +688,6 @@ struct HomeView : MVIView {
 		log.trace("navigateToElectrumServer()")
 		
 		deepLinkManager.broadcast(DeepLink.electrum)
-	}
-	
-	func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
-		
-		if let value = value {
-			switch value {
-			case .backup:
-				self.navLinkTag = .ConfigurationView
-			case .drainWallet:
-				self.navLinkTag = .ConfigurationView
-			case .electrum:
-				self.navLinkTag = .ConfigurationView
-			}
-		}
 	}
 }
 
@@ -1030,293 +885,6 @@ fileprivate struct PaymentCell : View, ViewName {
 	}
 }
 
-fileprivate struct AppStatusButton: View, ViewName {
-	
-	@State var dimStatus = false
-	
-	@State var syncState: SyncTxManager_State = .initializing
-	@State var pendingSettings: SyncTxManager_PendingSettings? = nil
-	
-	@StateObject var connectionsManager = ObservableConnectionsManager()
-	
-	@Environment(\.popoverState) var popoverState: PopoverState
-
-	let syncTxManager = AppDelegate.get().syncManager!.syncTxManager
-	
-	@ViewBuilder
-	var body: some View {
-		
-		Button {
-			showAppStatusPopover()
-		} label: {
-			buttonContent
-		}
-		.buttonStyle(PlainButtonStyle())
-		.padding(.all, 7)
-		.background(Color.buttonFill)
-		.cornerRadius(30)
-		.overlay(
-			RoundedRectangle(cornerRadius: 30) // Test this with larger dynamicFontSize
-				.stroke(Color.borderColor, lineWidth: 1)
-		)
-		.onReceive(syncTxManager.statePublisher) {
-			syncTxManagerStateChanged($0)
-		}
-		.onReceive(syncTxManager.pendingSettingsPublisher) {
-			syncTxManagerPendingSettingsChanged($0)
-		}
-	}
-	
-	@ViewBuilder
-	var buttonContent: some View {
-		
-		let connectionStatus = connectionsManager.connections.global
-		if connectionStatus is Lightning_kmpConnection.CLOSED {
-			HStack(alignment: .firstTextBaseline, spacing: 3) {
-				Image(systemName: "bolt.slash.fill")
-					.imageScale(.large)
-				Text(NSLocalizedString("Offline", comment: "Connection state"))
-					.padding(.trailing, 6)
-			}
-			.font(.caption2)
-		}
-		else if connectionStatus is Lightning_kmpConnection.ESTABLISHING {
-			HStack(alignment: .firstTextBaseline, spacing: 3) {
-				Image(systemName: "bolt.slash")
-					.imageScale(.large)
-				Text(NSLocalizedString("Connecting...", comment: "Connection state"))
-					.padding(.trailing, 6)
-			}
-			.font(.caption2)
-		} else /* .established */ {
-			
-			if pendingSettings != nil {
-				// The user enabled/disabled cloud sync.
-				// We are using a 30 second delay before we start operating on the user's decision.
-				// Just in-case it was an accidental change, or the user changes his/her mind.
-				Image(systemName: "hourglass")
-					.imageScale(.large)
-					.font(.caption2)
-					.squareFrame()
-			} else {
-				let (isSyncing, isWaiting, isError) = buttonizeSyncStatus()
-				if isSyncing {
-					Image(systemName: "icloud")
-						.imageScale(.large)
-						.font(.caption2)
-						.squareFrame()
-				} else if isWaiting {
-					Image(systemName: "hourglass")
-						.imageScale(.large)
-						.font(.caption2)
-						.squareFrame()
-				} else if isError {
-					Image(systemName: "exclamationmark.triangle")
-						.imageScale(.large)
-						.font(.caption2)
-						.squareFrame()
-				} else {
-					// Everything is good: connected + {synced|disabled|initializing}
-					Image(systemName: "bolt.fill")
-						.imageScale(.large)
-						.font(.caption2)
-						.squareFrame()
-				}
-			}
-		}
-	}
-	
-	func buttonizeSyncStatus() -> (Bool, Bool, Bool) {
-		
-		var isSyncing = false
-		var isWaiting = false
-		var isError = false
-		
-		switch syncState {
-			case .initializing: break
-			case .updatingCloud: isSyncing = true
-			case .downloading: isSyncing = true
-			case .uploading: isSyncing = true
-			case .waiting(let details):
-				switch details.kind {
-					case .forInternet: break
-					case .forCloudCredentials: break // see discussion below
-					case .exponentialBackoff: isError = true
-					case .randomizedUploadDelay: isWaiting = true
-				}
-			case .synced: break
-			case .disabled: break
-		}
-		
-		// If the user isn't signed into iCloud, is this an error ?
-		// We are choosing to treat it more like the disabled case,
-		// since the user has choosed to not sign in,
-		// or has ignored Apple's continual "sign into iCloud" popups.
-		
-		return (isSyncing, isWaiting, isError)
-	}
-	
-	func syncTxManagerStateChanged(_ newState: SyncTxManager_State) -> Void {
-		log.trace("[\(viewName)] syncTxManagerStateChanged()")
-		
-		syncState = newState
-	}
-	
-	func syncTxManagerPendingSettingsChanged(_ newPendingSettings: SyncTxManager_PendingSettings?) -> Void {
-		log.trace("[\(viewName)] syncTxManagerPendingSettingsChanged()")
-		
-		pendingSettings = newPendingSettings
-	}
-	
-	func showAppStatusPopover() -> Void {
-		log.trace("[\(viewName)] showAppStatusPopover()")
-		
-		popoverState.display(dismissable: true) {
-			AppStatusPopover()
-		}
-	}
-}
-
-fileprivate struct ToolsButton: View, ViewName {
-	
-	@Binding var navLinkTag: NavLinkTag?
-	
-	@Environment(\.openURL) var openURL
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	
-	var body: some View {
-		
-		Menu {
-			Button {
-				currencyConverterTapped()
-			} label: {
-				Label(
-					NSLocalizedString("Currency converter", comment: "HomeView: Tools menu: Label"),
-					systemImage: "globe"
-				)
-			}
-			Button {
-				sendFeedbackButtonTapped()
-			} label: {
-				Label(
-					NSLocalizedString("Send feedback", comment: "HomeView: Tools menu: Label"),
-					image: "email"
-				)
-			}
-			Button {
-				faqButtonTapped()
-			} label: {
-				Label(
-					NSLocalizedString("FAQ", comment: "HomeView: Tools menu: Label"),
-					systemImage: "safari"
-				)
-			}
-			Button {
-				twitterButtonTapped()
-			} label: {
-				Label {
-					Text(verbatim: "Twitter")
-				} icon: {
-					Image("twitter")
-				}
-			}
-			Button {
-				telegramButtonTapped()
-			} label: {
-				Label {
-					Text(verbatim: "Telegram")
-				} icon: {
-					Image("telegram")
-				}
-			}
-			Button {
-				githubButtonTapped()
-			} label: {
-				Label {
-					Text("View source")
-				} icon: {
-					Image("github")
-				}
-			}
-			
-		} label: {
-			Image(systemName: "wrench.fill")
-				.renderingMode(.template)
-				.imageScale(.large)
-				.font(.caption2)
-				.foregroundColor(.primary)
-				.squareFrame()
-				.buttonStyle(PlainButtonStyle())
-				.padding(.all, 7)
-				.background(Color.buttonFill)
-				.cornerRadius(30)
-				.overlay(
-					RoundedRectangle(cornerRadius: 30)
-						.stroke(Color.borderColor, lineWidth: 1)
-				)
-		}
-	}
-	
-	func currencyConverterTapped() {
-		log.trace("[\(viewName)] currencyConverterTapped()")
-		navLinkTag = .CurrencyConverter
-	}
-	
-	func sendFeedbackButtonTapped() {
-		log.trace("[\(viewName)] sendFeedbackButtonTapped()")
-		
-		let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-		let device = UIDevice.current
-		
-		var body = "Phoenix v\(appVersion ?? "x.y.z") "
-		body += "(\(device.systemName) \(device.systemVersion))"
-		
-		var comps = URLComponents()
-		comps.scheme = "mailto"
-		comps.path = "phoenix@acinq.co"
-		comps.queryItems = [
-			URLQueryItem(name: "subject", value: "Phoenix iOS Feedback"),
-			URLQueryItem(name: "body", value: body)
-		]
-
-		if let url = comps.url {
-			openURL(url)
-		}
-	}
-	
-	func telegramButtonTapped() {
-		log.trace("[\(viewName)] telegramButtonTapped()")
-		
-		if let url = URL(string: "https://t.me/phoenix_wallet") {
-			openURL(url)
-		}
-	}
-	
-	func twitterButtonTapped() {
-		log.trace("[\(viewName)] twitterButtonTapped()")
-		
-		if let url = URL(string: "https://twitter.com/PhoenixWallet") {
-			openURL(url)
-		}
-	}
-	
-	func faqButtonTapped() {
-		log.trace("[\(viewName)] faqButtonTapped()")
-		
-		if let url = URL(string: "https://phoenix.acinq.co/faq") {
-			openURL(url)
-		}
-	}
-	
-	func githubButtonTapped() {
-		log.trace("[\(viewName)] githubButtonTapped()")
-		
-		if let url = URL(string: "https://github.com/ACINQ/phoenix") {
-			openURL(url)
-		}
-	}
-}
-
 fileprivate struct NoticeBox<Content: View>: View {
 	
 	let content: Content
@@ -1338,102 +906,5 @@ fileprivate struct NoticeBox<Content: View>: View {
 				.stroke(Color.appAccent, lineWidth: 1)
 		)
 		.padding([.leading, .trailing, .bottom], 10)
-	}
-}
-
-fileprivate struct BottomBar: View, ViewName {
-	
-	@Binding var navLinkTag: NavLinkTag?
-	
-	var body: some View {
-		
-		HStack {
-			
-			Button {
-				navLinkTag = .ConfigurationView
-			} label: {
-				Image("ic_settings")
-					.resizable()
-					.frame(width: 22, height: 22)
-					.foregroundColor(Color.appAccent)
-			}
-			.padding()
-			.padding(.leading, 8)
-
-			Divider().frame(width: 1, height: 40).background(Color.borderColor)
-			Spacer()
-			
-			Button {
-				navLinkTag = .ReceiveView
-			} label: {
-				HStack {
-					Image("ic_receive")
-						.resizable()
-						.frame(width: 22, height: 22)
-						.foregroundColor(Color.appAccent)
-						.padding(4)
-					Text("Receive")
-						.foregroundColor(.primaryForeground)
-				}
-			}
-
-			Spacer()
-			Divider().frame(width: 1, height: 40).background(Color.borderColor)
-			Spacer()
-
-			Button {
-				navLinkTag = .SendView
-			} label: {
-				HStack {
-					Image("ic_scan")
-						.resizable()
-						.frame(width: 22, height: 22)
-						.foregroundColor(Color.appAccent)
-						.padding(4)
-					Text("Send")
-						.foregroundColor(.primaryForeground)
-				}
-			}
-
-			Spacer()
-		}
-		.padding(.top, 10)
-		.background(
-			Color.mutedBackground
-				.cornerRadius(15, corners: [.topLeft, .topRight])
-				.edgesIgnoringSafeArea([.horizontal, .bottom])
-		)
-	}
-}
-
-// MARK: -
-
-class HomeView_Previews: PreviewProvider {
-	
-	static let connections = Connections(
-		internet : Lightning_kmpConnection.ESTABLISHED(),
-		peer     : Lightning_kmpConnection.ESTABLISHED(),
-		electrum : Lightning_kmpConnection.CLOSED(reason: nil)
-	)
-
-	static var previews: some View {
-		
-		HomeView().mock(Home.Model(
-			balance: Lightning_kmpMilliSatoshi(msat: 123500),
-			incomingBalance: Lightning_kmpMilliSatoshi(msat: 0),
-			paymentsCount: 0
-		))
-		.preferredColorScheme(.dark)
-		.previewDevice("iPhone 8")
-		.environmentObject(CurrencyPrefs.mockEUR())
-
-		HomeView().mock(Home.Model(
-			balance: Lightning_kmpMilliSatoshi(msat: 1000000),
-			incomingBalance: Lightning_kmpMilliSatoshi(msat: 12000000),
-			paymentsCount: 0
-		))
-		.preferredColorScheme(.light)
-		.previewDevice("iPhone 8")
-		.environmentObject(CurrencyPrefs.mockEUR())
 	}
 }
