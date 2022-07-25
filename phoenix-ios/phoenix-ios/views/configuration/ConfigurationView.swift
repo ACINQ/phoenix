@@ -302,9 +302,10 @@ struct ConfigurationView: View {
 			// Navigate towards deep link (if needed)
 			var newNavLinkTag: NavLinkTag? = nil
 			switch value {
-				case .backup      : newNavLinkTag = NavLinkTag.RecoveryPhraseView
-				case .drainWallet : newNavLinkTag = NavLinkTag.CloseChannelsView
-				case .electrum    : newNavLinkTag = NavLinkTag.PrivacyView
+				case .paymentHistory : break
+				case .backup         : newNavLinkTag = NavLinkTag.RecoveryPhraseView
+				case .drainWallet    : newNavLinkTag = NavLinkTag.CloseChannelsView
+				case .electrum       : newNavLinkTag = NavLinkTag.PrivacyView
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {

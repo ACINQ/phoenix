@@ -81,10 +81,8 @@ struct HomeView : MVIView {
 	var view: some View {
 		
 		ZStack {
-
-			main
-
-		} // </ZStack>
+			content()
+		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
@@ -113,166 +111,15 @@ struct HomeView : MVIView {
 	}
 
 	@ViewBuilder
-	var main: some View {
+	func content() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 
-			// === Total Balance ====
-			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			
-				HStack(alignment: VerticalAlignment.firstTextBaseline) {
-					
-					if currencyPrefs.hideAmountsOnHomeScreen {
-						let amount = Utils.hiddenAmount(currencyPrefs)
-						
-						Text(amount.digits)
-							.font(.largeTitle)
-						
-					} else {
-						let amount = Utils.format( currencyPrefs,
-						                     msat: mvi.model.balance.msat,
-						                   policy: .showMsatsIfZeroSats)
-						
-						if amount.hasSubFractionDigits {
-							
-							// We're showing sub-fractional values.
-							// For example, we're showing millisatoshis.
-							//
-							// It's helpful to downplay the sub-fractional part visually.
-							
-							let hasStdFractionDigits = amount.hasStdFractionDigits
-							
-							HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-								Text(verbatim: amount.integerDigits)
-									.font(.largeTitle)
-								Text(verbatim: amount.decimalSeparator)
-									.font(hasStdFractionDigits ? .largeTitle : .title)
-									.foregroundColor(hasStdFractionDigits ? .primary : .secondary)
-								if hasStdFractionDigits {
-									Text(verbatim: amount.stdFractionDigits)
-										.font(.largeTitle)
-								}
-								Text(verbatim: amount.subFractionDigits)
-									.font(.title)
-									.foregroundColor(.secondary)
-							}
-							.environment(\.layoutDirection, .leftToRight) // issue #237
-						
-						} else {
-							Text(amount.digits)
-								.font(.largeTitle)
-						}
-						
-						Text(amount.type)
-							.font(.title2)
-							.foregroundColor(Color.appAccent)
-							.padding(.bottom, 4)
-					}
-				} // </HStack>
-				.lineLimit(1)            // SwiftUI truncation bugs
-				.minimumScaleFactor(0.5) // SwiftUI truncation bugs
-				.onTapGesture { toggleCurrencyType() }
-				
-				if let incoming = incomingAmount() {
-					let incomingAmountStr = currencyPrefs.hideAmountsOnHomeScreen ? incoming.digits : incoming.string
-					
-					HStack(alignment: VerticalAlignment.center, spacing: 0) {
-					
-						if #available(iOS 15.0, *) {
-						
-							Image(systemName: "link") // 
-								.padding(.trailing, 2)
-								.onTapGesture { showBlockchainExplorerOptions = true }
-							
-							Text("+\(incomingAmountStr) incoming".lowercased())
-								.onTapGesture { showBlockchainExplorerOptions = true }
-								.confirmationDialog("Blockchain Explorer",
-									isPresented: $showBlockchainExplorerOptions,
-									titleVisibility: .automatic
-								) {
-									Button("Mempool.space") {
-										exploreIncomingSwap(website: BlockchainExplorer.WebsiteMempoolSpace())
-									}
-									Button("Blockstream.info") {
-										exploreIncomingSwap(website: BlockchainExplorer.WebsiteBlockstreamInfo())
-									}
-									
-									let addrCount = lastIncomingSwaps.count
-									if addrCount >= 2 {
-										Button("Copy bitcoin addresses (\(addrCount)") {
-											copyIncomingSwap()
-										}
-									} else {
-										Button("Copy bitcoin address") {
-											copyIncomingSwap()
-										}
-									}
-									
-								}
-							
-						} else { // same functionality as before
-							
-							Image(systemName: "link")
-								.padding(.trailing, 2)
-							
-							Text("+\(incomingAmountStr) incoming".lowercased())
-								.onTapGesture { toggleCurrencyType() }
-						}
-					}
-					.font(.callout)
-					.foregroundColor(.secondary)
-					.padding(.top, 7)
-					.padding(.bottom, 2)
-					.scaleEffect(incomingSwapScaleFactor, anchor: .top)
-					.onAnimationCompleted(for: incomingSwapScaleFactor) {
-						incomingSwapAnimationCompleted()
-					}
-				}
-			}
-			.padding([.top, .leading, .trailing])
-			.padding(.bottom, 30)
-			.background(
-				VStack {
-					Spacer()
-					RoundedRectangle(cornerRadius: 10)
-						.frame(width: 70, height: 6, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
-						.foregroundColor(Color.appAccent)
-				}
-			)
-			.padding(.bottom, 25)
-
-			// === Notices & Warnings ===
-			notices
-			
-			// === Payments List ====
-			ScrollView {
-				LazyVStack {
-					// paymentsPage.rows: [WalletPaymentOrderRow]
-					//
-					// Here's how this works:
-					// - ForEach uses the given type (which conforms to Swift's Identifiable protocol)
-					//   to determine whether or not the row is new/modified or the same as before.
-					// - If the row is new/modified, then it it initialized with fresh state,
-					//   and the row's `onAppear` will fire.
-					// - If the row is unmodified, then it is initialized with existing state,
-					//   and the row's `onAppear` with NOT fire.
-					//
-					// Since we ultimately use WalletPaymentOrderRow.identifier, our unique identifier
-					// contains the row's completedAt date, which is modified when the row changes.
-					// Thus our row is automatically refreshed after it fails/succeeds.
-					//
-					ForEach(paymentsPage.rows) { row in
-						Button {
-							didSelectPayment(row: row)
-						} label: {
-							PaymentCell(row: row, didAppearCallback: paymentCellDidAppear)
-						}
-					}
-				}
-			}
-			.frame(maxWidth: deviceInfo.textColumnMaxWidth)
-		
-		} // </VStack>
+			totalBalance()
+				.padding(.bottom, 25)
+			notices()
+			paymentsList()
+		}
 		.onAppear {
 			onAppear()
 		}
@@ -289,7 +136,133 @@ struct HomeView : MVIView {
 	}
 	
 	@ViewBuilder
-	var notices: some View {
+	func totalBalance() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+		
+			HStack(alignment: VerticalAlignment.firstTextBaseline) {
+				
+				if currencyPrefs.hideAmountsOnHomeScreen {
+					let amount = Utils.hiddenAmount(currencyPrefs)
+					
+					Text(amount.digits)
+						.font(.largeTitle)
+					
+				} else {
+					let amount = Utils.format( currencyPrefs,
+					                     msat: mvi.model.balance.msat,
+					                   policy: .showMsatsIfZeroSats)
+					
+					if amount.hasSubFractionDigits {
+						
+						// We're showing sub-fractional values.
+						// For example, we're showing millisatoshis.
+						//
+						// It's helpful to downplay the sub-fractional part visually.
+						
+						let hasStdFractionDigits = amount.hasStdFractionDigits
+						
+						HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+							Text(verbatim: amount.integerDigits)
+								.font(.largeTitle)
+							Text(verbatim: amount.decimalSeparator)
+								.font(hasStdFractionDigits ? .largeTitle : .title)
+								.foregroundColor(hasStdFractionDigits ? .primary : .secondary)
+							if hasStdFractionDigits {
+								Text(verbatim: amount.stdFractionDigits)
+									.font(.largeTitle)
+							}
+							Text(verbatim: amount.subFractionDigits)
+								.font(.title)
+								.foregroundColor(.secondary)
+						}
+						.environment(\.layoutDirection, .leftToRight) // issue #237
+					
+					} else {
+						Text(amount.digits)
+							.font(.largeTitle)
+					}
+					
+					Text(amount.type)
+						.font(.title2)
+						.foregroundColor(Color.appAccent)
+						.padding(.bottom, 4)
+				}
+			} // </HStack>
+			.lineLimit(1)            // SwiftUI truncation bugs
+			.minimumScaleFactor(0.5) // SwiftUI truncation bugs
+			.onTapGesture { toggleCurrencyType() }
+			
+			if let incoming = incomingAmount() {
+				let incomingAmountStr = currencyPrefs.hideAmountsOnHomeScreen ? incoming.digits : incoming.string
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				
+					if #available(iOS 15.0, *) {
+					
+						Image(systemName: "link") //
+							.padding(.trailing, 2)
+							.onTapGesture { showBlockchainExplorerOptions = true }
+						
+						Text("+\(incomingAmountStr) incoming".lowercased())
+							.onTapGesture { showBlockchainExplorerOptions = true }
+							.confirmationDialog("Blockchain Explorer",
+								isPresented: $showBlockchainExplorerOptions,
+								titleVisibility: .automatic
+							) {
+								Button("Mempool.space") {
+									exploreIncomingSwap(website: BlockchainExplorer.WebsiteMempoolSpace())
+								}
+								Button("Blockstream.info") {
+									exploreIncomingSwap(website: BlockchainExplorer.WebsiteBlockstreamInfo())
+								}
+								
+								let addrCount = lastIncomingSwaps.count
+								if addrCount >= 2 {
+									Button("Copy bitcoin addresses (\(addrCount)") {
+										copyIncomingSwap()
+									}
+								} else {
+									Button("Copy bitcoin address") {
+										copyIncomingSwap()
+									}
+								}
+								
+							}
+						
+					} else { // same functionality as before
+						
+						Image(systemName: "link")
+							.padding(.trailing, 2)
+						
+						Text("+\(incomingAmountStr) incoming".lowercased())
+							.onTapGesture { toggleCurrencyType() }
+					}
+				}
+				.font(.callout)
+				.foregroundColor(.secondary)
+				.padding(.top, 7)
+				.padding(.bottom, 2)
+				.scaleEffect(incomingSwapScaleFactor, anchor: .top)
+				.onAnimationCompleted(for: incomingSwapScaleFactor) {
+					incomingSwapAnimationCompleted()
+				}
+			}
+		}
+		.padding([.top, .leading, .trailing])
+		.padding(.bottom, 30)
+		.background(
+			VStack {
+				Spacer()
+				RoundedRectangle(cornerRadius: 10)
+					.frame(width: 70, height: 6, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+					.foregroundColor(Color.appAccent)
+			}
+		)
+	}
+	
+	@ViewBuilder
+	func notices() -> some View {
 		
 		// === Welcome / Backup Seed ====
 		if mvi.model.balance.msat == 0 && Prefs.shared.isNewWallet {
@@ -377,6 +350,47 @@ struct HomeView : MVIView {
 		}
 	}
 	
+	@ViewBuilder
+	func paymentsList() -> some View {
+		
+		ScrollView {
+			LazyVStack {
+				// paymentsPage.rows: [WalletPaymentOrderRow]
+				//
+				// Here's how this works:
+				// - ForEach uses the given type (which conforms to Swift's Identifiable protocol)
+				//   to determine whether or not the row is new/modified or the same as before.
+				// - If the row is new/modified, then it it initialized with fresh state,
+				//   and the row's `onAppear` will fire.
+				// - If the row is unmodified, then it is initialized with existing state,
+				//   and the row's `onAppear` with NOT fire.
+				//
+				// Since we ultimately use WalletPaymentOrderRow.identifier, our unique identifier
+				// contains the row's completedAt date, which is modified when the row changes.
+				// Thus our row is automatically refreshed after it fails/succeeds.
+				//
+				ForEach(paymentsPage.rows) { row in
+					Button {
+						didSelectPayment(row: row)
+					} label: {
+						PaymentCell(row: row, didAppearCallback: nil)
+					}
+				}
+				
+				let totalPaymentCount: Int? = paymentsPage.rows.count < paymentsPage.count
+				  ? paymentsPage.rows.count + Int(paymentsPage.offset)
+				  : nil
+				
+				FooterCell(
+					totalPaymentCount: totalPaymentCount,
+					recentPaymentSeconds: recentPaymentSeconds,
+					didAppearCallback: footerCellDidAppear
+				)
+			}
+		}
+		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
+	}
+	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
@@ -432,9 +446,9 @@ struct HomeView : MVIView {
 		
 		recentPaymentSeconds = seconds
 		paymentsPageFetcher.subscribeToRecent(
-			offset: paymentsPage.offset,
-			count: paymentsPage.count,
-			seconds: Int32(recentPaymentSeconds)
+			offset: 0,
+			count: Int32(PAGE_COUNT_START),
+			seconds: Int32(seconds)
 		)
 	}
 	
@@ -487,8 +501,8 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func paymentCellDidAppear(_ visibleRow: WalletPaymentOrderRow) -> Void {
-		log.trace("paymentCellDidAppear(): \(visibleRow.id)")
+	fileprivate func footerCellDidAppear() {
+		log.trace("footerCellDidAppear()")
 		
 		// Infinity Scrolling
 		//
@@ -508,43 +522,26 @@ struct HomeView : MVIView {
 		// I cannot find a clean way of accomplishing a solution with pure SwiftUI.
 		// So this remains a todo item for future improvement.
 		
-		var rowIdxWithinPage: Int? = nil
-		for (idx, r) in paymentsPage.rows.enumerated() {
+		let maybeHasMoreRowsInDatabase = paymentsPage.rows.count == paymentsPage.count
+		if maybeHasMoreRowsInDatabase {
+			log.trace("maybeHasMoreRowsInDatabase")
 			
-			if r == visibleRow {
-				rowIdxWithinPage = idx
-				break
-			}
-		}
-		
-		guard let rowIdxWithinPage = rowIdxWithinPage else {
-			// Row not found within current page.
-			// Perhaps the page just changed, and it no longer includes this row.
-			return
-		}
-		
-		let isLastRowWithinPage = rowIdxWithinPage + 1 == paymentsPage.rows.count
-		if isLastRowWithinPage {
-		
-			// `paymentsPage.count` => how many we requested
-			// `paymentsPage.rows.count` => how many were fetched
+			// increase paymentsPage.count
 			
-			let maybeHasMoreRowsInDatabase = paymentsPage.rows.count == paymentsPage.count
-			if maybeHasMoreRowsInDatabase {
-				
-				// increase paymentsPage.count
-				
-				let prvOffset = paymentsPage.offset
-				let newCount = paymentsPage.count + Int32(PAGE_COUNT_INCREMENT)
-				
-				log.debug("increasing page.count: Page(offset=\(prvOffset), count=\(newCount)")
-				
-				paymentsPageFetcher.subscribeToRecent(
-					offset: prvOffset,
-					count: newCount,
-					seconds: Int32(recentPaymentSeconds)
-				)
-			}
+			let prvOffset = paymentsPage.offset
+			let newCount = paymentsPage.count + Int32(PAGE_COUNT_INCREMENT)
+			
+			log.debug("increasing page.count: Page(offset=\(prvOffset), count=\(newCount)")
+			
+			paymentsPageFetcher.subscribeToRecent(
+				offset: prvOffset,
+				count: newCount,
+				seconds: Int32(recentPaymentSeconds)
+			)
+			
+		} else {
+			
+			log.trace("!maybeHasMoreRowsInDatabase")
 		}
 	}
 	
@@ -741,6 +738,10 @@ struct HomeView : MVIView {
 	}
 }
 
+// --------------------------------------------------
+// MARK: -
+// --------------------------------------------------
+
 fileprivate struct NoticeBox<Content: View>: View {
 	
 	let content: Content
@@ -762,5 +763,61 @@ fileprivate struct NoticeBox<Content: View>: View {
 				.stroke(Color.appAccent, lineWidth: 1)
 		)
 		.padding([.leading, .trailing, .bottom], 10)
+	}
+}
+
+// --------------------------------------------------
+// MARK: -
+// --------------------------------------------------
+
+fileprivate struct FooterCell: View {
+	
+	let totalPaymentCount: Int?
+	let recentPaymentSeconds: Int
+	let didAppearCallback: () -> Void
+	
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	
+	@ViewBuilder
+	var body: some View {
+		Group {
+			if let totalPaymentCount = totalPaymentCount {
+				body(totalPaymentCount)
+			} else {
+				Text("Fetching more rows...")
+			//	EmptyView()
+			}
+		}
+		.onAppear {
+			onAppear()
+		}
+	}
+	
+	@ViewBuilder
+	func body(_ totalPaymentCount: Int) -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			let option = RecentPaymentsOption.closest(seconds: recentPaymentSeconds).1
+			let localizedString = option.homeDisplay(paymentCount: totalPaymentCount)
+			
+			Text(verbatim: localizedString)
+				.font(.subheadline)
+				.foregroundColor(.secondary)
+			
+			Button {
+				deepLinkManager.broadcast(DeepLink.paymentHistory)
+			} label: {
+				Text("full payment history")
+					.font(.footnote)
+					.padding(.top, 4)
+			}
+		}
+		.padding(.top, 10)
+	}
+	
+	func onAppear() {
+		log.trace("[FooterCell] onAppear()")
+		
+		didAppearCallback()
 	}
 }

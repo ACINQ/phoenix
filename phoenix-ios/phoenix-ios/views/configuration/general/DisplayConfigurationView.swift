@@ -11,73 +11,13 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct RecentPaymentsOption: Equatable {
-	let seconds: Int
-	let display: String
-	
-	/// These are the options that will be displayed in the UI via the Slider
-	static func all() -> [RecentPaymentsOption] {
-		return [
-			RecentPaymentsOption(
-				seconds: 0,
-				display: NSLocalizedString("Only show in-flight outgoing payments.", comment: "Recent payments option")
-			),
-			RecentPaymentsOption(
-				seconds: (60 * 1),
-				display: NSLocalizedString("Show payments within the last 1 minute.", comment: "Time duration")
-			),
-			RecentPaymentsOption(
-				seconds: (60 * 10),
-				display: NSLocalizedString("Show payments within the last 10 minutes.", comment: "Time duration")
-			),
-			RecentPaymentsOption(
-				seconds: (60 * 60 * 2),
-				display: NSLocalizedString("Show payments within the last 2 hours.", comment: "Time duration")
-			),
-			RecentPaymentsOption(
-				seconds: (60 * 60 * 24),
-				display: NSLocalizedString("Show payments within the last 24 hours.", comment: "Time duration")
-			),
-			RecentPaymentsOption(
-				seconds: (60 * 60 * 24 * 3),
-				display: NSLocalizedString("Show payments within the last 3 days.", comment: "Time duration")
-			),
-			RecentPaymentsOption(
-				seconds: (60 * 60 * 24 * 7),
-				display: NSLocalizedString("Show payments within the last 7 days.", comment: "Time duration")
-			)
-		]
-	}
-	
-	static func closest(seconds: Int) -> (Int, RecentPaymentsOption) {
-		
-		let allOptions = self.all()
-		
-		let minIdx = allOptions.enumerated().map { (idx, option) in
-			return (idx, abs(option.seconds - seconds))
-		}
-		.min(by: { tuple1, tuple2 in
-			let (_, diff1) = tuple1
-			let (_, diff2) = tuple2
-			
-			// areInIncreasingOrder
-			// The predicate returns true if its first argument should be
-			// ordered before its second argument; otherwise, false.
-			
-			return (diff1 < diff2) ? true : false
-		})!.0
-		
-		return (minIdx, allOptions[minIdx])
-	}
-}
-
 struct DisplayConfigurationView: View {
 	
 	@State var fiatCurrency = Prefs.shared.fiatCurrency
 	@State var bitcoinUnit = Prefs.shared.bitcoinUnit
 	@State var theme = Prefs.shared.theme
 	
-	let allRecentPaymentsOptions = RecentPaymentsOption.all()
+	let allRecentPaymentsOptions = RecentPaymentsOption.allCases
 	@State var sliderValue: Double = 0
 	@State var selectedRecentPaymentsOption: RecentPaymentsOption? = nil
 	
@@ -154,7 +94,7 @@ struct DisplayConfigurationView: View {
 						 .padding(.bottom, 8)
 					
 					let selected = selectedRecentPaymentsOption ?? allRecentPaymentsOptions.last!
-					Text(verbatim: selected.display)
+					Text(verbatim: selected.configDisplay())
 						.minimumScaleFactor(0.5) // SwiftUI truncation bugs
 						.padding(.bottom, 8)
 					

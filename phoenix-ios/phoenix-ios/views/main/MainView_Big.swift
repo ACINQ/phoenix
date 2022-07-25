@@ -69,6 +69,8 @@ struct MainView_Big: View {
 	@ScaledMetric var sendImageSize: CGFloat = 22
 	@ScaledMetric var receiveImageSize: CGFloat = 22
 	
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -84,6 +86,9 @@ struct MainView_Big: View {
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.onChange(of: deviceInfo.windowSize) { newSize in
 			windowSizeDidChange(newSize)
+		}
+		.onChange(of: deepLinkManager.deepLink) {
+			deepLinkChanged($0)
 		}
 		.onReceive(externalLightningUrlPublisher) {
 			didReceiveExternalLightningUrl($0)
@@ -375,6 +380,7 @@ struct MainView_Big: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			HomeView()
+				.padding(.bottom, 15)
 			primary_footer()
 		}
 		.padding(.bottom, 60)
@@ -797,6 +803,25 @@ struct MainView_Big: View {
 		}
 		
 		wasIPadLandscapeFullscreen = deviceInfo.isIPadLandscapeFullscreen
+	}
+	
+	private func deepLinkChanged(_ value: DeepLink?) {
+		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		
+		if let value = value {
+			switch value {
+				case .paymentHistory :
+					if !isShowingTransactions {
+						toggleIsShowingTransactions()
+					}
+				case .backup      : fallthrough
+				case .drainWallet : fallthrough
+				case .electrum    :
+					if !isShowingSettings {
+						toggleIsShowingSettings()
+					}
+			}
+		}
 	}
 	
 	private func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {

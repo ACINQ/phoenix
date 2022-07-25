@@ -118,6 +118,7 @@
 		DC99E95825BA2BA800FB20F7 /* about.css in Resources */ = {isa = PBXBuildFile; fileRef = DC99E95625BA2BA800FB20F7 /* about.css */; };
 		DC99E95925BA2BA800FB20F7 /* advancedSecurity.css in Resources */ = {isa = PBXBuildFile; fileRef = DC99E95725BA2BA800FB20F7 /* advancedSecurity.css */; };
 		DC9B8EE225D72CC200E13818 /* ForceCloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */; };
+		DC9DCCCD288AED990074AEF7 /* RecentPaymentsOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9DCCCC288AED990074AEF7 /* RecentPaymentsOption.swift */; };
 		DCA5079F286231FD00290AED /* Prefs+Backup.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA5079E286231FD00290AED /* Prefs+Backup.swift */; };
 		DCA849E02813311D000FADE1 /* aes256Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA849DF2813311D000FADE1 /* aes256Tests.swift */; };
 		DCA849E2281333EB000FADE1 /* currencyFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA849E1281333EB000FADE1 /* currencyFormattingTests.swift */; };
@@ -347,6 +348,7 @@
 		DC99E95625BA2BA800FB20F7 /* about.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = about.css; sourceTree = "<group>"; };
 		DC99E95725BA2BA800FB20F7 /* advancedSecurity.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = advancedSecurity.css; sourceTree = "<group>"; };
 		DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForceCloseChannelsView.swift; sourceTree = "<group>"; };
+		DC9DCCCC288AED990074AEF7 /* RecentPaymentsOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPaymentsOption.swift; sourceTree = "<group>"; };
 		DCA5079E286231FD00290AED /* Prefs+Backup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Prefs+Backup.swift"; sourceTree = "<group>"; };
 		DCA849DF2813311D000FADE1 /* aes256Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = aes256Tests.swift; sourceTree = "<group>"; };
 		DCA849E1281333EB000FADE1 /* currencyFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = currencyFormattingTests.swift; sourceTree = "<group>"; };
@@ -895,6 +897,7 @@
 				DCA5079E286231FD00290AED /* Prefs+Backup.swift */,
 				DCB876312735AAB500657570 /* UserDefaults+Codable.swift */,
 				DCB8762F2735AA7300657570 /* UserDefaults+Serialization.swift */,
+				DC9DCCCC288AED990074AEF7 /* RecentPaymentsOption.swift */,
 			);
 			path = prefs;
 			sourceTree = "<group>";
@@ -1256,6 +1259,7 @@
 				DC2F432027B69F320006FCC4 /* BgAppRefreshDisabledPopover.swift in Sources */,
 				DCCC7FD526B0A006008ACD9B /* SquareSize.swift in Sources */,
 				DCDD9ED628637FD7001800A3 /* AppStatusButton.swift in Sources */,
+				DC9DCCCD288AED990074AEF7 /* RecentPaymentsOption.swift in Sources */,
 				DCB493D1269F890D001B0F09 /* SyncTxManager_PendingSettings.swift in Sources */,
 				DCAEF8F727628BEB00015993 /* Either.swift in Sources */,
 				DC09086325B626B300A46136 /* AppStatusPopover.swift in Sources */,

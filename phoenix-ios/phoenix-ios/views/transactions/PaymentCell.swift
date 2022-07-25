@@ -21,7 +21,7 @@ struct PaymentCell : View {
 	private let paymentsManager = PaymentCell.paymentsManager
 	
 	let row: WalletPaymentOrderRow
-	let didAppearCallback: (WalletPaymentOrderRow) -> Void
+	let didAppearCallback: ((WalletPaymentOrderRow) -> Void)?
 	
 	@State var fetched: WalletPaymentInfo?
 	@State var fetchedIsStale: Bool
@@ -32,7 +32,7 @@ struct PaymentCell : View {
 
 	init(
 		row: WalletPaymentOrderRow,
-		didAppearCallback: @escaping (WalletPaymentOrderRow)->Void
+		didAppearCallback: ((WalletPaymentOrderRow) -> Void)?
 	) {
 		self.row = row
 		self.didAppearCallback = didAppearCallback
@@ -52,6 +52,7 @@ struct PaymentCell : View {
 		}
 	}
 	
+	@ViewBuilder
 	var body: some View {
 		
 		HStack {
@@ -204,6 +205,8 @@ struct PaymentCell : View {
 			}
 		}
 		
-		didAppearCallback(row)
+		if let didAppearCallback = didAppearCallback {
+			didAppearCallback(row)
+		}
 	}
 }
