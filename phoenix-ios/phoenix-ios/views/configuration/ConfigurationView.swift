@@ -277,7 +277,7 @@ struct ConfigurationView: View {
 				// We are implementing the least risky solution.
 				// Which requires us to change the `List.id` property.
 				
-				if navLinkTag != nil {
+				if navLinkTag != nil && swiftUiBugWorkaround == nil {
 					navLinkTag = nil
 					listViewId = UUID()
 				}
