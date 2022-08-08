@@ -301,9 +301,11 @@ struct RecoveryPhraseList: View {
 		if !didAppear {
 			didAppear = true
 			
-			if deepLinkManager.deepLink == .backup {
+			if let deepLink = deepLinkManager.deepLink, deepLink == .backup {
 				// Reached our destination
-				deepLinkManager.broadcast(nil)
+				DispatchQueue.main.async { // iOS 14 issues workaround
+					deepLinkManager.unbroadcast(deepLink)
+				}
 			}
 			
 			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

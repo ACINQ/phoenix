@@ -38,6 +38,9 @@ struct TransactionsView: View {
 	@State var didAppear = false
 	@State var didPreFetch = false
 	
+	@EnvironmentObject var deviceInfo: DeviceInfo
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -142,6 +145,16 @@ struct TransactionsView: View {
 				offset: 0,
 				count: Int32(PAGE_COUNT_START)
 			)
+		}
+		
+		if !deviceInfo.isIPad {
+			// On iPad, we handle this within MainView_Big
+			if let deepLink = deepLinkManager.deepLink, deepLink == .paymentHistory {
+				// Reached our destination
+				DispatchQueue.main.async { // iOS 14 issues workaround
+					deepLinkManager.unbroadcast(deepLink)
+				}
+			}
 		}
 	}
 	

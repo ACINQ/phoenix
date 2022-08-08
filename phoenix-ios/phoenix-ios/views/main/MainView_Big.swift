@@ -785,9 +785,11 @@ struct MainView_Big: View {
 		// because TransactionsView.onAppear only fires on the first appearance.
 		// And we need to perform this everytime we show the view.
 		//
-		if deepLinkManager.deepLink == .paymentHistory {
+		if let deepLink = deepLinkManager.deepLink, deepLink == .paymentHistory {
 			// Reached our destination
-			deepLinkManager.broadcast(nil)
+			DispatchQueue.main.async { // iOS 14 issues workaround
+				deepLinkManager.unbroadcast(deepLink)
+			}
 		}
 	}
 	

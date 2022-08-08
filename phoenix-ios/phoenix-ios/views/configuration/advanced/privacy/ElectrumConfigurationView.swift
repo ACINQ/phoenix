@@ -150,9 +150,11 @@ struct ElectrumConfigurationView: MVIView {
 		if !didAppear {
 			didAppear = true
 			
-			if deepLinkManager.deepLink == .electrum {
+			if let deepLink = deepLinkManager.deepLink, deepLink == .electrum {
 				// Reached our destination
-				deepLinkManager.broadcast(nil)
+				DispatchQueue.main.async { // iOS 14 issues workaround
+					deepLinkManager.unbroadcast(deepLink)
+				}
 			}
 		}
 	}

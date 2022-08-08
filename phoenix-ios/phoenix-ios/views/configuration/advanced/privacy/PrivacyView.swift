@@ -102,7 +102,9 @@ struct PrivacyView: View {
 		if !didAppear {
 			didAppear = true
 			if let deepLink = deepLinkManager.deepLink {
-				deepLinkChanged(deepLink)
+				DispatchQueue.main.async { // iOS 14 issues workaround
+					deepLinkChanged(deepLink)
+				}
 			}
 			
 		}
