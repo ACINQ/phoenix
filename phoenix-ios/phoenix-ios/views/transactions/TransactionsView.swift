@@ -38,8 +38,6 @@ struct TransactionsView: View {
 	@State var didAppear = false
 	@State var didPreFetch = false
 	
-	@EnvironmentObject var deepLinkManager: DeepLinkManager
-	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -144,11 +142,6 @@ struct TransactionsView: View {
 				offset: 0,
 				count: Int32(PAGE_COUNT_START)
 			)
-		}
-		
-		if deepLinkManager.deepLink == .paymentHistory {
-			// Reached our destination
-			deepLinkManager.broadcast(nil)
 		}
 	}
 	

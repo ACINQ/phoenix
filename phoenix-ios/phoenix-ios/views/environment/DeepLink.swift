@@ -1,4 +1,15 @@
 import Foundation
+import os.log
+
+#if DEBUG && true
+fileprivate var log = Logger(
+	subsystem: Bundle.main.bundleIdentifier!,
+	category: "DeepLinkManager"
+)
+#else
+fileprivate var log = Logger(OSLog.disabled)
+#endif
+
 
 enum DeepLink: String, Equatable {
 	case paymentHistory
@@ -13,6 +24,8 @@ class DeepLinkManager: ObservableObject {
 	private var deepLinkIdx = 0
 	
 	func broadcast(_ value: DeepLink?) {
+		log.trace("broadcast(\(value?.rawValue ?? "nil"))")
+		
 		self.deepLinkIdx += 1
 		self.deepLink = value
 		

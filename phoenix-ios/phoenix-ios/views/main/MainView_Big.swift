@@ -730,34 +730,64 @@ struct MainView_Big: View {
 	func toggleIsShowingSettings() {
 		log.trace("toggleIsShowingSettings()")
 		
-		let newValue = isShowingSettings ? false : true
-		withAnimation(.linear(duration: 0.3)) {
-			if isShowingSettings {
-				leadingSidebarContent = nil
-			} else {
-				settingsViewTop = true
-				leadingSidebarContent = .settings
-			}
-		}
-		DispatchQueue.main.asyncAfter(deadline: .now() + 0.31) {
-			sidebarWasOpen = newValue
+		if isShowingSettings {
+			closeLeadingSidebar()
+		} else {
+			showSettings()
 		}
 	}
 	
 	func toggleIsShowingTransactions() {
 		log.trace("toggleIsShowingTransactions()")
 		
-		let newValue = isShowingTransactions ? false : true
+		if isShowingTransactions {
+			closeLeadingSidebar()
+		} else {
+			showTransactions()
+		}
+	}
+	
+	func closeLeadingSidebar() {
+		log.trace("closeLeadingSidebar()")
+		
 		withAnimation(.linear(duration: 0.3)) {
-			if isShowingTransactions {
-				leadingSidebarContent = nil
-			} else {
-				settingsViewTop = false
-				leadingSidebarContent = .transactions
-			}
+			leadingSidebarContent = nil
 		}
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.31) {
-			sidebarWasOpen = newValue
+			sidebarWasOpen = false
+		}
+	}
+	
+	func showSettings() {
+		log.trace("showSettings()")
+		
+		withAnimation(.linear(duration: 0.3)) {
+			settingsViewTop = true
+			leadingSidebarContent = .settings
+		}
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.31) {
+			sidebarWasOpen = true
+		}
+	}
+	
+	func showTransactions() {
+		log.trace("showTransactions()")
+		
+		withAnimation(.linear(duration: 0.3)) {
+			settingsViewTop = false
+			leadingSidebarContent = .transactions
+		}
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.31) {
+			sidebarWasOpen = true
+		}
+		
+		// We do this here, and not in TransactionsView.onAppear,
+		// because TransactionsView.onAppear only fires on the first appearance.
+		// And we need to perform this everytime we show the view.
+		//
+		if deepLinkManager.deepLink == .paymentHistory {
+			// Reached our destination
+			deepLinkManager.broadcast(nil)
 		}
 	}
 	
@@ -810,16 +840,10 @@ struct MainView_Big: View {
 		
 		if let value = value {
 			switch value {
-				case .paymentHistory :
-					if !isShowingTransactions {
-						toggleIsShowingTransactions()
-					}
-				case .backup      : fallthrough
-				case .drainWallet : fallthrough
-				case .electrum    :
-					if !isShowingSettings {
-						toggleIsShowingSettings()
-					}
+				case .paymentHistory : showTransactions()
+				case .backup         : fallthrough
+				case .drainWallet    : fallthrough
+				case .electrum       : showSettings()
 			}
 		}
 	}
