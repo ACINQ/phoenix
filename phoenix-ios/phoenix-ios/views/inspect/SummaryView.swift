@@ -14,16 +14,18 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct SummaryView: View {
 	
+	let type: PaymentViewType
+	
 	@State var paymentInfo: WalletPaymentInfo
 	@State var paymentInfoIsStale: Bool
-	
-	let closeSheet: () -> Void
 	
 	@State var showDeletePaymentConfirmationDialog = false
 	
 	@State var didAppear = false
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	enum ButtonWidth: Preference {}
 	let buttonWidthReader = GeometryPreferenceReader(
@@ -39,7 +41,9 @@ struct SummaryView: View {
 	)
 	@State var buttonHeight: CGFloat? = nil
 	
-	init(paymentInfo: WalletPaymentInfo, closeSheet: @escaping () -> Void) {
+	init(type: PaymentViewType, paymentInfo: WalletPaymentInfo) {
+		
+		self.type = type
 		
 		// Try to optimize by using the in-memory cache.
 		// If we get a cache hit, we can skip the UI refresh/flicker.
@@ -64,46 +68,72 @@ struct SummaryView: View {
 			self._paymentInfo = State(initialValue: paymentInfo)
 			self._paymentInfoIsStale = State(initialValue: true)
 		}
-		
-		self.closeSheet = closeSheet
 	}
 	
 	@ViewBuilder
 	var body: some View {
 		
-		ZStack {
-
-			ScrollView {
-				self.main
-			}
-			.frame(maxWidth: .infinity)
-
-			// Close button in upper right-hand corner
-			VStack {
-				HStack {
-					Spacer()
-					Button {
-						closeSheet()
-					} label: {
-						Image("ic_cross")
-							.resizable()
-							.frame(width: 30, height: 30)
-					}
-					.padding()
-				}
-				Spacer()
-			}
+		switch type {
+		case .sheet:
+			main()
+				.navigationBarTitle("", displayMode: .inline)
+				.navigationBarHidden(true)
+			
+		case .embedded:
+			
+			main()
+				.navigationBarTitle("Payment", displayMode: .inline)
+				.background(
+					Color.primaryBackground.ignoresSafeArea(.all, edges: .bottom)
+				)
 		}
-		.onAppear { onAppear() }
 	}
 	
 	@ViewBuilder
-	var main: some View {
+	func main() -> some View {
+		
+		ZStack {
+
+			// This technique is used to center the content vertically
+			GeometryReader { geometry in
+				ScrollView(.vertical) {
+					content()
+						.frame(width: geometry.size.width)
+						.frame(minHeight: geometry.size.height)
+				}
+			}
+
+			// Close button in upper right-hand corner
+			if case .sheet(let closeAction) = type {
+				VStack {
+					HStack {
+						Spacer()
+						Button {
+							closeAction()
+						} label: {
+							Image("ic_cross")
+								.resizable()
+								.frame(width: 30, height: 30)
+						}
+						.padding()
+					}
+					Spacer()
+				}
+			}
+		
+		} // </ZStack>
+		.onAppear {
+			onAppear()
+		}
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
 		
 		let payment = paymentInfo.payment
 		
 		VStack {
-			Spacer(minLength: 90)
+			Spacer(minLength: 25)
 			
 			switch payment.state() {
 			case .success:
@@ -245,6 +275,8 @@ struct SummaryView: View {
 			} else {
 				buttonList
 			}
+			
+			Spacer(minLength: 25)
 		}
 	}
 	
@@ -258,8 +290,8 @@ struct SummaryView: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 		
 			NavigationLink(destination: DetailsView(
-				paymentInfo: $paymentInfo,
-				closeSheet: closeSheet
+				type: type,
+				paymentInfo: $paymentInfo
 			)) {
 				Text("Details")
 					.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
@@ -267,10 +299,12 @@ struct SummaryView: View {
 					.read(buttonHeightReader)
 			}
 			
-			Divider()
-				.frame(height: buttonHeight)
+			if let buttonHeight = buttonHeight {
+				Divider().frame(height: buttonHeight)
+			}
 			
 			NavigationLink(destination: EditInfoView(
+				type: type,
 				paymentInfo: $paymentInfo
 			)) {
 				Text("Edit")
@@ -293,8 +327,8 @@ struct SummaryView: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 			
 			NavigationLink(destination: DetailsView(
-				paymentInfo: $paymentInfo,
-				closeSheet: closeSheet
+				type: type,
+				paymentInfo: $paymentInfo
 			)) {
 				Text("Details")
 					.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
@@ -302,10 +336,12 @@ struct SummaryView: View {
 					.read(buttonHeightReader)
 			}
 			
-			Divider()
-				.frame(height: buttonHeight)
+			if let buttonHeight = buttonHeight {
+				Divider().frame(height: buttonHeight)
+			}
 			
 			NavigationLink(destination: EditInfoView(
+				type: type,
 				paymentInfo: $paymentInfo
 			)) {
 				Text("Edit")
@@ -314,8 +350,9 @@ struct SummaryView: View {
 					.read(buttonHeightReader)
 			}
 			
-			Divider()
-				.frame(height: buttonHeight)
+			if let buttonHeight = buttonHeight {
+				Divider().frame(height: buttonHeight)
+			}
 			
 			Button {
 				showDeletePaymentConfirmationDialog = true
@@ -409,7 +446,12 @@ struct SummaryView: View {
 			})
 		}
 		
-		closeSheet()
+		switch type {
+		case .sheet(let closeAction):
+			closeAction()
+		case .embedded:
+			presentationMode.wrappedValue.dismiss()
+		}
 	}
 }
 

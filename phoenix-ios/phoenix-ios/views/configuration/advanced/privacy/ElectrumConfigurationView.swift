@@ -25,7 +25,7 @@ struct ElectrumConfigurationView: MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	func connectionInfo() -> (String, String) {
 		
@@ -150,9 +150,11 @@ struct ElectrumConfigurationView: MVIView {
 		if !didAppear {
 			didAppear = true
 			
-			if deepLinkManager.deepLink == .electrum {
+			if let deepLink = deepLinkManager.deepLink, deepLink == .electrum {
 				// Reached our destination
-				deepLinkManager.broadcast(nil)
+				DispatchQueue.main.async { // iOS 14 issues workaround
+					deepLinkManager.unbroadcast(deepLink)
+				}
 			}
 		}
 	}
@@ -160,7 +162,7 @@ struct ElectrumConfigurationView: MVIView {
 	func didTapModify() {
 		log.trace("didTapModify()")
 		
-		shortSheetState.display(dismissable: false) {
+		smartModalState.display(dismissable: false) {
 			
 			ElectrumAddressSheet(mvi: mvi)
 		}

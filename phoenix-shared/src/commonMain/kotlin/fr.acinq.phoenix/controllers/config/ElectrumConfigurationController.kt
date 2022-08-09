@@ -31,7 +31,7 @@ class AppElectrumConfigurationController(
     init {
         launch {
             combine(
-                configurationManager.electrumConfig(),
+                configurationManager.electrumConfig,
                 appConnectionsDaemon.lastElectrumServerAddress,
                 electrumClient.connectionState,
                 configurationManager.electrumMessages(),

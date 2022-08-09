@@ -102,7 +102,9 @@ struct PrivacyView: View {
 		if !didAppear {
 			didAppear = true
 			if let deepLink = deepLinkManager.deepLink {
-				deepLinkChanged(deepLink)
+				DispatchQueue.main.async { // iOS 14 issues workaround
+					deepLinkChanged(deepLink)
+				}
 			}
 			
 		}
@@ -127,9 +129,10 @@ struct PrivacyView: View {
 			// Navigate towards deep link (if needed)
 			var newNavLinkTag: NavLinkTag? = nil
 			switch value {
-				case .backup      : break
-				case .drainWallet : break
-				case .electrum    : newNavLinkTag = NavLinkTag.ElectrumConfigurationView
+				case .paymentHistory : break
+				case .backup         : break
+				case .drainWallet    : break
+				case .electrum       : newNavLinkTag = NavLinkTag.ElectrumConfigurationView
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {

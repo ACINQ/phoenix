@@ -17,6 +17,8 @@ struct RestoreView: View {
 	
 	@StateObject var fetcher = FetchSeedsObserver()
 	
+	@EnvironmentObject var deviceInfo: DeviceInfo
+	
 	@ViewBuilder
 	var body: some View {
 		
@@ -53,6 +55,7 @@ struct RestoreView: View {
 			
 			Spacer()
 		}
+		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 	}
 	
 	@ViewBuilder

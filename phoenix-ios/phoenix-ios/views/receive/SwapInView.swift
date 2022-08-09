@@ -34,7 +34,7 @@ struct SwapInView: View {
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
 	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
@@ -428,7 +428,7 @@ struct SwapInView: View {
 	func didLongPressCopyButton() -> Void {
 		log.trace("didLongPressCopyButton()")
 		
-		shortSheetState.display(dismissable: true) {
+		smartModalState.display(dismissable: true) {
 			
 			CopyOptionsSheet(copyText: {
 				copyTextToPasteboard()
@@ -469,7 +469,7 @@ struct SwapInView: View {
 	func didLongPressShareButton() {
 		log.trace("didLongPressShareButton()")
 		
-		shortSheetState.display(dismissable: true) {
+		smartModalState.display(dismissable: true) {
 					
 			ShareOptionsSheet(shareText: {
 				shareTextToSystem()

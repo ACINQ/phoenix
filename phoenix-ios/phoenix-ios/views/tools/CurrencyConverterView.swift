@@ -108,30 +108,31 @@ struct CurrencyConverterView: View {
 			//
 			ScrollView {
 				VStack {
-					
-					ForEach(BitcoinUnit.companion.values) { bitcoinUnit in
+					ForEach(currencies) { currency in
 						
-						Text(bitcoinUnit.shortName)
-							.foregroundColor(Color.clear)
-							.read(currencyTextWidthReader)
-							.frame(width: currencyTextWidth, alignment: .leading) // required, or refreshes after display
+						switch currency {
+						case .bitcoin(let bitcoinUnit):
+							Text(bitcoinUnit.shortName)
+								.foregroundColor(Color.clear)
+								.read(currencyTextWidthReader)
+							//	.frame(width: currencyTextWidth, alignment: .leading) // required, or refreshes after display
+							
+						case .fiat(let fiatCurrency):
+							Text(fiatCurrency.shortName)
+								.foregroundColor(Color.clear)
+								.read(currencyTextWidthReader)
+							//	.frame(width: currencyTextWidth, alignment: .leading) // required, or refreshes after display
+							
+							Text(fiatCurrency.flag)
+								.foregroundColor(Color.clear)
+								.read(flagWidthReader)
+							//	.frame(width: flagWidth, alignment: .leading) // required, or refreshes after display
+						}
 					}
-					ForEach(FiatCurrency.companion.values) { fiatCurrency in
-
-						Text(fiatCurrency.shortName)
-							.foregroundColor(Color.clear)
-							.read(currencyTextWidthReader)
-							.frame(width: currencyTextWidth, alignment: .leading) // required, or refreshes after display
-						
-						Text(fiatCurrency.flag)
-							.foregroundColor(Color.clear)
-							.read(flagWidthReader)
-							.frame(width: flagWidth, alignment: .leading) // required, or refreshes after display
-					}
-				}
+				} // </VStack>
 				.assignMaxPreference(for: currencyTextWidthReader.key, to: $currencyTextWidth)
 				.assignMaxPreference(for: flagWidthReader.key, to: $flagWidth)
-			}
+			} // </ScrollView>
 			
 			content
 			
@@ -161,10 +162,16 @@ struct CurrencyConverterView: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
+			Color.primaryBackground.frame(height: 25)
+			
 			List {
 				if #available(iOS 15.0, *) {
 					currencyRows()
-					lastRow().listRowSeparator(.hidden)
+					lastRow()
+						.listRowInsets(EdgeInsets()) // remove extra padding space in rows
+						.listRowSeparator(.hidden)   // remove lines between items
+						.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+					
 				} else {
 					currencyRows_iOS14()
 					lastRow()
@@ -295,15 +302,16 @@ struct CurrencyConverterView: View {
 				}
 				.padding(.leading, 4)
 			}
-		}
+		
+		} // </HStack>
 		.font(.footnote)
 		.padding(.horizontal)
-		.padding([.top, .bottom], 4)
+		.padding([.top, .bottom], 6)
 		.frame(maxWidth: .infinity, minHeight: 40)
 		.background(
 			Color(
 				colorScheme == ColorScheme.light
-				? UIColor.systemGroupedBackground
+				? UIColor.primaryBackground
 				: UIColor.secondarySystemGroupedBackground
 			)
 			.edgesIgnoringSafeArea(.bottom) // background color should extend to bottom of screen

@@ -79,10 +79,19 @@ fileprivate struct NoChannelsView : View {
 	var body: some View {
 		
 		VStack {
-			Text("You don't have any payment channels.")
-				.padding()
 			
-			Spacer()
+			List {
+				Section {
+					VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+						Text("You don't have any payment channels.")
+							.multilineTextAlignment(.center)
+					}
+				}
+			}
+			.listStyle(.insetGrouped)
+			
+			Spacer(minLength: 0)
+			
 			FooterView(
 				mvi: mvi,
 				showChannelsRemoteBalance: $showChannelsRemoteBalance,
@@ -120,7 +129,9 @@ fileprivate struct ChannelsView : View {
 				EmptyView()
 			}
 			
-			VStack {
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				
+				Color.primaryBackground.frame(height: 25)
 				
 				ScrollView {
 					LazyVStack(pinnedViews: [.sectionHeaders]) {
@@ -130,8 +141,7 @@ fileprivate struct ChannelsView : View {
 							}
 						}
 					}
-					
-				} // </ScrollView>
+				}
 				
 				FooterView(
 					mvi: mvi,
@@ -272,13 +282,7 @@ struct ChannelHeaderView: View {
 		}
 		.frame(maxWidth: .infinity)
 		.padding()
-		.background(
-			Color(
-				colorScheme == ColorScheme.light
-				? UIColor.systemGroupedBackground
-				: UIColor.secondarySystemGroupedBackground
-			)
-		)
+		.background(Color.primaryBackground)
 	}
 	
 	func balances() -> (FormattedAmount, FormattedAmount) {
@@ -445,7 +449,7 @@ fileprivate struct FooterView: View, ViewName {
 		.background(
 			Color(
 				colorScheme == ColorScheme.light
-				? UIColor.systemGroupedBackground
+				? UIColor.primaryBackground
 				: UIColor.secondarySystemGroupedBackground
 			)
 			.edgesIgnoringSafeArea(.bottom)

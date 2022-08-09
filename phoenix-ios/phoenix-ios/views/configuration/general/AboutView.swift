@@ -18,6 +18,7 @@ struct AboutView: View {
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
 			.padding(.leading, 20)
 			.padding(.trailing, 20) // must match LocalWebView.scrollIndicatorInsets.right
+			.background(Color(UIColor.systemBackground))
 			
 			Text("Version \(versionString())")
 				.padding([.top, .bottom], 4)
@@ -25,12 +26,14 @@ struct AboutView: View {
 				.background(
 					Color(
 						colorScheme == ColorScheme.light
-						? UIColor.systemGroupedBackground
+						? UIColor.primaryBackground
 						: UIColor.secondarySystemGroupedBackground
 					)
 					.edgesIgnoringSafeArea(.bottom) // background color should extend to bottom of screen
 				)
 		}
+		.padding(.top, 25)
+		.background(Color.primaryBackground)
 		.navigationBarTitle(
 			NSLocalizedString("About", comment: "Navigation bar title"),
 			displayMode: .inline
