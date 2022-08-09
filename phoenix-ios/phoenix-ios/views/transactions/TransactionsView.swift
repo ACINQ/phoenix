@@ -165,7 +165,7 @@ struct TransactionsView: View {
 	}
 	
 	func paymentsPageChanged(_ page: PaymentsPage) {
-		log.trace("paymentsPageChanged() => \(page.count)")
+		log.trace("paymentsPageChanged() => \(page.rows.count)")
 		
 		paymentsPage = page
 		maybePreFetchPaymentsFromDatabase()
@@ -220,12 +220,11 @@ struct TransactionsView: View {
 				let prvOffset = paymentsPage.offset
 				let newCount = paymentsPage.count + Int32(PAGE_COUNT_INCREMENT)
 				
-				log.debug("increasing page.count: Page(offset=\(prvOffset), count=\(newCount)")
+				log.debug("increasing page.count: Page(offset=\(prvOffset), count=\(newCount))")
 				
-				paymentsPageFetcher.subscribeToRecent(
+				paymentsPageFetcher.subscribeToAll(
 					offset: prvOffset,
-					count: newCount,
-					seconds: (2 * 60)
+					count: newCount
 				)
 			}
 		}
