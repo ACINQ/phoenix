@@ -41,7 +41,7 @@ class Prefs {
 		UserDefaults.standard.register(defaults: [
 			Key.isNewWallet.rawValue: true,
 			Key.invoiceExpirationDays.rawValue: 7,
-			Key.recentPaymentSeconds.rawValue: (60 * 60 * 24 * 7)
+			Key.recentPaymentSeconds.rawValue: (60 * 60 * 24 * 3)
 		])
 	}
 	
