@@ -782,10 +782,9 @@ fileprivate struct FooterCell: View {
 	var body: some View {
 		Group {
 			if let totalPaymentCount = totalPaymentCount {
-				body(totalPaymentCount)
+				body_ready(totalPaymentCount)
 			} else {
-				Text("Fetching more rows...")
-			//	EmptyView()
+				body_pending()
 			}
 		}
 		.onAppear {
@@ -794,7 +793,7 @@ fileprivate struct FooterCell: View {
 	}
 	
 	@ViewBuilder
-	func body(_ totalPaymentCount: Int) -> some View {
+	func body_ready(_ totalPaymentCount: Int) -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			let option = RecentPaymentsOption.closest(seconds: recentPaymentSeconds).1
@@ -812,7 +811,19 @@ fileprivate struct FooterCell: View {
 					.padding(.top, 4)
 			}
 		}
-		.padding(.top, 10)
+		.padding(.vertical, 10)
+	}
+	
+	@ViewBuilder
+	func body_pending() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			Text("fetching more rows...")
+				.font(.footnote)
+				.foregroundColor(.secondary)
+		}
+		.padding(.vertical, 10)
 	}
 	
 	func onAppear() {
