@@ -379,7 +379,7 @@
 /* Error message in LockView */
 "Please enable Touch ID" = "يرجى تمكين Touch ID";
 /* Error message in LockView */
-"Please enabled Face ID" = "يرجى تمكين Face ID";
+"Please enable Face ID" = "يرجى تمكين Face ID";
 "Please restart Phoenix" = "الرجاء إعادة تشغيل Phoenix";
 "Please try again" = "حاول مرة اخرى";
 "Port" = "المنفذ";

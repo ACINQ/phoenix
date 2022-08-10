@@ -58,7 +58,7 @@ extension View {
 	}
 
 	func read<K: PreferenceKey, V>(_ reader: GeometryPreferenceReader<K, V>) -> some View {
-		modifier(GeometryPreferenceViewModifier(reader: reader))
+		return self.modifier(GeometryPreferenceViewModifier(reader: reader))
 	}
 }
 

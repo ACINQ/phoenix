@@ -17,6 +17,10 @@ struct DisplayConfigurationView: View {
 	@State var bitcoinUnit = Prefs.shared.bitcoinUnit
 	@State var theme = Prefs.shared.theme
 	
+	let allRecentPaymentsOptions = RecentPaymentsOption.allCases
+	@State var sliderValue: Double = 0
+	@State var selectedRecentPaymentsOption: RecentPaymentsOption? = nil
+	
 	@State var sectionId = UUID()
 	@State var firstAppearance = true
 	
@@ -78,6 +82,32 @@ struct DisplayConfigurationView: View {
 				
 			} // </Section>
 			
+			Section(header: Text("Home Screen")) {
+				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+					Text("Recent payments")
+						.fixedSize(horizontal: false, vertical: true)
+						.padding(.bottom, 8)
+					
+					let lastIdx = Double(allRecentPaymentsOptions.count - 1)
+					Slider(value: $sliderValue, in: 0...lastIdx, step: 1)
+						 .accentColor(Color.accentColor)
+						 .padding(.bottom, 8)
+					
+					let selected = selectedRecentPaymentsOption ?? allRecentPaymentsOptions.last!
+					Text(verbatim: selected.configDisplay())
+						.minimumScaleFactor(0.5) // SwiftUI truncation bugs
+						.padding(.bottom, 8)
+					
+					Text("Use the payments screen to view your full payment history.")
+						.font(.callout)
+						.fixedSize(horizontal: false, vertical: true) // SwiftUI truncation bugs
+						.foregroundColor(Color.secondary)
+						.padding(.bottom, 4)
+				
+				} // </VStack>
+				.padding(.vertical, 8)
+			} // </Section>
+			
 		} // </List>
 		.listStyle(.insetGrouped)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -87,6 +117,9 @@ struct DisplayConfigurationView: View {
 		)
 		.onAppear {
 			onAppear()
+		}
+		.onChange(of: sliderValue) { newValue in
+			sliderValueChanged(newValue)
 		}
 		.onReceive(Prefs.shared.fiatCurrencyPublisher) { newValue in
 			fiatCurrency = newValue
@@ -118,9 +151,23 @@ struct DisplayConfigurationView: View {
 		
 		if firstAppearance {
 			firstAppearance = false
+			
+			let seconds = Prefs.shared.recentPaymentSeconds
+			let closest = RecentPaymentsOption.closest(seconds: seconds)
+			sliderValue = Double(closest.0)
+			
 		} else {
 			sectionId = UUID()
 		}
+	}
+	
+	func sliderValueChanged(_ newValue: Double) {
+		log.trace("sliderValueChanged(\(newValue))")
+		
+		let selected = allRecentPaymentsOptions[Int(newValue)]
+		Prefs.shared.recentPaymentSeconds = selected.seconds
+	
+		selectedRecentPaymentsOption = selected
 	}
 }
 

@@ -84,7 +84,7 @@ struct IntroView1: View {
 			
 			button().padding()
 		}
-		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 	}
 	
 	@ViewBuilder
@@ -162,6 +162,7 @@ struct IntroView2: View {
 			
 			button().padding()
 		}
+		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 	}
 	
 	@ViewBuilder
@@ -272,6 +273,7 @@ struct IntroView3: View {
 			
 			button().padding()
 		}
+		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 	}
 	
 	@ViewBuilder

@@ -29,10 +29,11 @@ struct ScanView: View {
 	@State var ignoreScanner: Bool = false
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	@Environment(\.popoverState) var popoverState: PopoverState
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var deviceInfo: DeviceInfo
 	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification
@@ -184,20 +185,32 @@ struct ScanView: View {
 				}
 				.transition(.move(edge: .bottom).combined(with: .opacity))
 			}
+			
+			if #available(iOS 15.0, *) {
+			} else /* iOS 14 */ {
+				
+				// The bottom safe area is being ignored, so we need to add it back.
+				// This only seems to occur on iOS 14.
+				// And only on iPad, not iPhone.
+				
+				if deviceInfo.isIPad {
+					Spacer().frame(height: deviceInfo.windowSafeArea.bottom)
+				}
+			}
 		}
 		.frame(maxWidth: .infinity)
 		.background(
 			ZStack {
 				Color.primaryBackground
-					.edgesIgnoringSafeArea(.all)
-				
+					.ignoresSafeArea()
+
 				if AppDelegate.showTestnetBackground {
 					Image("testnet_bg")
 						.resizable(resizingMode: .tile)
-						.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+						.ignoresSafeArea()
 				}
 			}
-		)
+		) // </.background>
 	}
 	
 	@ViewBuilder
@@ -404,7 +417,7 @@ struct ScanView: View {
 		log.trace("manualInput()")
 		
 		ignoreScanner = true
-		shortSheetState.display(dismissable: true) {
+		smartModalState.display(dismissable: true) {
 			
 			ManualInput(mvi: mvi, ignoreScanner: $ignoreScanner)
 		}
@@ -488,7 +501,7 @@ struct ManualInput: View, ViewName {
 	
 	@State var input = ""
 	
-	@Environment(\.shortSheetState) private var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) private var smartModalState: SmartModalState
 	
 	@ViewBuilder
 	var body: some View {
@@ -552,7 +565,7 @@ struct ManualInput: View, ViewName {
 	func didCancel() -> Void {
 		log.trace("[\(viewName)] didCancel()")
 		
-		shortSheetState.close {
+		smartModalState.close {
 			ignoreScanner = false
 		}
 	}
@@ -565,7 +578,7 @@ struct ManualInput: View, ViewName {
 			mvi.intent(Scan.Intent_Parse(request: request))
 		}
 		
-		shortSheetState.close()
+		smartModalState.close()
 	}
 }
 

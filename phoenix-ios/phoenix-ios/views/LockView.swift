@@ -178,7 +178,7 @@ struct LockView : View {
 			case .faceID_available    : errorMsg = nil
 			case .faceID_notEnrolled  : fallthrough
 			case .faceID_notAvailable : errorMsg = NSLocalizedString(
-				"Please enabled Face ID", comment: "Error message in LockView"
+				"Please enable Face ID", comment: "Error message in LockView"
 			)
 			
 			default: errorMsg = NSLocalizedString(

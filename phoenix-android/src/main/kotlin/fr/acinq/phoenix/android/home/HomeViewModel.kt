@@ -55,7 +55,8 @@ class HomeViewModel(
     val paymentsFlow: StateFlow<Map<String, PaymentRowState>> = _paymentsFlow
 
     init {
-        paymentsManager.subscribeToPaymentsPage(0, 150)
+        val paymentPageFetcher = paymentsManager.makePageFetcher()
+        paymentPageFetcher.subscribeToAll(0, 150)
 
         // get details when a payment completes
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
@@ -81,7 +82,7 @@ class HomeViewModel(
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             log.error("failed to collect payments page items: ", e)
         }) {
-            paymentsManager.paymentsPage.collect {
+            paymentPageFetcher.paymentsPage.collect {
                 viewModelScope.launch(Dispatchers.Default) {
                     // rewrite all the payments flow map to keep payments ordering - adding the diff would put new elements to the bottom of the map
                     _paymentsFlow.value = it.rows.map { row ->

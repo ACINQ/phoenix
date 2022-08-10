@@ -16,7 +16,7 @@ struct MetadataSheet: View {
 	
 	let lnurlPay: LNUrl.Pay
 	
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	@ViewBuilder
 	var body: some View {
@@ -123,6 +123,6 @@ struct MetadataSheet: View {
 	func closeButtonTapped() {
 		log.trace("closeButtonTapped()")
 		
-		shortSheetState.close()
+		smartModalState.close()
 	}
 }

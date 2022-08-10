@@ -55,7 +55,7 @@ struct ReceiveLightningView: View {
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.popoverState) var popoverState: PopoverState
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
@@ -240,7 +240,7 @@ struct ReceiveLightningView: View {
 					Text("Show a Bitcoin address")
 				}
 			}
-			.padding(.top)
+			.padding(.vertical)
 			
 			Spacer()
 			
@@ -854,7 +854,7 @@ struct ReceiveLightningView: View {
 	func didLongPressCopyButton() -> Void {
 		log.trace("didLongPressCopyButton()")
 		
-		shortSheetState.display(dismissable: true) {
+		smartModalState.display(dismissable: true) {
 			
 			CopyOptionsSheet(copyText: {
 				copyTextToPasteboard()
@@ -897,7 +897,7 @@ struct ReceiveLightningView: View {
 	func didLongPressShareButton() -> Void {
 		log.trace("didLongPressShareButton()")
 		
-		shortSheetState.display(dismissable: true) {
+		smartModalState.display(dismissable: true) {
 			
 			ShareOptionsSheet(shareText: {
 				shareTextToSystem()
@@ -912,7 +912,7 @@ struct ReceiveLightningView: View {
 		
 		if let model = mvi.model as? Receive.Model_Generated {
 			
-			shortSheetState.display(dismissable: true) {
+			smartModalState.display(dismissable: true) {
 				
 				ModifyInvoiceSheet(
 					mvi: mvi,
@@ -998,7 +998,7 @@ struct ReceiveLightningView: View {
 			desc = model.desc
 		}
 		
-		shortSheetState.display(dismissable: true) {
+		smartModalState.display(dismissable: true) {
 			
 			ModifyInvoiceSheet(
 				mvi: mvi,

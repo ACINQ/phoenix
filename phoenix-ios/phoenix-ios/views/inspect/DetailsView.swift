@@ -14,43 +14,69 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct DetailsView: View {
 	
+	let type: PaymentViewType
 	@Binding var paymentInfo: WalletPaymentInfo
-	let closeSheet: () -> Void
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@ViewBuilder
 	var body: some View {
+		
+		switch type {
+		case .sheet:
+			content()
+				.navigationBarTitle(
+					NSLocalizedString("Details", comment: "Navigation bar title"),
+					displayMode: .inline
+				)
+				.navigationBarHidden(true)
+			
+		case .embedded:
+			
+			content()
+				.navigationBarTitle(
+					NSLocalizedString("Payment Details", comment: "Navigation bar title"),
+					displayMode: .inline
+				)
+				.background(
+					Color.primaryBackground.ignoresSafeArea(.all, edges: .bottom)
+				)
+		}
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				Button {
-					presentationMode.wrappedValue.dismiss()
-				} label: {
-					Image(systemName: "chevron.backward")
-						.imageScale(.medium)
-				}
-				Spacer()
-				Button {
-					closeSheet()
-				} label: {
-					Image(systemName: "xmark") // must match size of chevron.backward above
-						.imageScale(.medium)
-				}
+			if case .sheet(let closeAction) = type {
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					Button {
+						presentationMode.wrappedValue.dismiss()
+					} label: {
+						Image(systemName: "chevron.backward")
+							.imageScale(.medium)
+					}
+					Spacer()
+					Button {
+						closeAction()
+					} label: {
+						Image(systemName: "xmark") // must match size of chevron.backward above
+							.imageScale(.medium)
+					}
+				} // </VStack>
+				.font(.title2)
+				.padding()
+				
+			} else {
+				Spacer().frame(height: 25)
 			}
-			.font(.title2)
-			.padding()
 				
 			ScrollView {
 				DetailsInfoGrid(paymentInfo: $paymentInfo)
 					.padding([.leading, .trailing])
 			}
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Details", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
-		.navigationBarHidden(true)
 	}
 }
 

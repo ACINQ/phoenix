@@ -23,7 +23,7 @@ import org.kodein.log.newLogger
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PaymentsManager(
-    loggerFactory: LoggerFactory,
+    private val loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
     private val databaseManager: DatabaseManager
 ) : CoroutineScope by MainScope() {
@@ -36,33 +36,12 @@ class PaymentsManager(
 
     private val log = newLogger(loggerFactory)
 
-    data class PaymentsPage(
-        val offset: Int,
-        val count: Int,
-        val rows: List<WalletPaymentOrderRow>
-    ) {
-        constructor(): this(0, 0, emptyList())
-    }
-
-    /**
-     * A flow containing a page of payment rows.
-     * This is controlled by the `subscribeToPaymentsPage()` function.
-     * You use that function to control initialize the flow, and to modify it.
-     *
-     * Note:
-     * iOS (with SwiftUI & LazyVStack) has some issues supporting a non-zero offset.
-     * So on iOS, we're currently only incrementing the count.
-     */
-    val paymentsPage = MutableStateFlow<PaymentsPage>(PaymentsPage())
-    private var paymentsPage_offset: Int = 0
-    private var paymentsPage_count: Int = 0
-    private var paymentsPage_job: Job? = null
-
     /**
      * A flow containing the total number of payments in the database,
      * and automatically refreshed when the database changes.
      */
-    internal val paymentsCount = MutableStateFlow<Long>(0)
+    private val _paymentsCount = MutableStateFlow<Long>(0)
+    val paymentsCount: StateFlow<Long> = _paymentsCount
 
     /** Flow of map of (bitcoinAddress -> amount) swap-ins. */
     private val _incomingSwaps = MutableStateFlow<Map<String, MilliSatoshi>>(HashMap())
@@ -85,6 +64,14 @@ class PaymentsManager(
     val fetcher: PaymentsFetcher by lazy {
         PaymentsFetcher(paymentsManager = this, cacheSizeLimit = 250)
     }
+
+    fun makeFetcher(cacheSizeLimit: Int = 250): PaymentsFetcher {
+        return PaymentsFetcher(this, cacheSizeLimit)
+    }
+
+    fun makePageFetcher(): PaymentsPageFetcher {
+        return PaymentsPageFetcher(loggerFactory, databaseManager)
+    }
     
     private val _inFlightOutgoingPayments = MutableStateFlow<Set<UUID>>(setOf())
     val inFlightOutgoingPayments: StateFlow<Set<UUID>> = _inFlightOutgoingPayments
@@ -92,7 +79,7 @@ class PaymentsManager(
     init {
         launch {
             paymentsDb().listPaymentsCountFlow().collect {
-                paymentsCount.value = it
+                _paymentsCount.value = it
             }
         }
 
@@ -165,29 +152,6 @@ class PaymentsManager(
                     metadata = it.second ?: WalletPaymentMetadata(),
                     fetchOptions = options
                 )
-            }
-        }
-    }
-
-    fun subscribeToPaymentsPage(offset: Int, count: Int) {
-        if (paymentsPage_offset == offset && paymentsPage_count == count) {
-            // No changes
-            return
-        }
-        paymentsPage_job?.let {
-            it.cancel()
-            paymentsPage_job = null
-        }
-
-        // There could be a significant delay between requesting the list
-        // and receiving the list. So paymentsPage_offset/count are used to track
-        // the current request, even if it hasn't completed yet.
-
-        paymentsPage_offset = offset
-        paymentsPage_count = count
-        paymentsPage_job = launch {
-            paymentsDb().listPaymentsOrderFlow(count = count, skip = offset).collect {
-                paymentsPage.value = PaymentsPage(offset = offset, count = count, rows = it)
             }
         }
     }

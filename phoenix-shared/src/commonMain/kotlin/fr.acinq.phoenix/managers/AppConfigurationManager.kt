@@ -172,18 +172,28 @@ class AppConfigurationManager(
         }
     }
 
-    /** Used by the [PeerManager] to know what parameters to use when starting up the [Peer] connection. If null, the [PeerManager] will wait before instantiating the [Peer]. */
+    /**
+     * Used by the [PeerManager] to know what parameters to use when starting
+     * up the [Peer] connection. If null, the [PeerManager] will wait before
+     * instantiating the [Peer].
+     */
     private val _startupParams by lazy { MutableStateFlow<StartupParams?>(null) }
-    val startupParams: StateFlow<StartupParams?> = _startupParams
+    val startupParams: StateFlow<StartupParams?> by lazy { _startupParams }
     internal fun setStartupParams(params: StartupParams) {
         if (_startupParams.value == null) _startupParams.value = params
     }
 
-    /** Used by the [AppConnectionsDaemon] to know which server to connect to. If null, the daemon will wait for a config to be set. */
+    /**
+     * Used by the [AppConnectionsDaemon] to know which server to connect to.
+     * If null, the daemon will wait for a config to be set.
+     */
     private val _electrumConfig by lazy { MutableStateFlow<ElectrumConfig?>(null) }
-    fun electrumConfig(): StateFlow<ElectrumConfig?> = _electrumConfig
+    val electrumConfig: StateFlow<ElectrumConfig?> by lazy { _electrumConfig }
 
-    /** Use this method to set a server to connect to. If null, will connect to a random server. */
+    /**
+     * Use this method to set a server to connect to.
+     * If null, will connect to a random server from the hard-coded list.
+     */
     fun updateElectrumConfig(server: ServerAddress?) {
         _electrumConfig.value = server?.let { ElectrumConfig.Custom(it) } ?: ElectrumConfig.Random
     }
@@ -236,7 +246,7 @@ class AppConfigurationManager(
     }
 
     private val _preferredFiatCurrencies by lazy { MutableStateFlow<PreferredFiatCurrencies?>(null) }
-    fun preferredFiatCurrencies(): StateFlow<PreferredFiatCurrencies?> = _preferredFiatCurrencies
+    val preferredFiatCurrencies: StateFlow<PreferredFiatCurrencies?> by lazy { _preferredFiatCurrencies }
 
     fun updatePreferredFiatCurrencies(current: PreferredFiatCurrencies) {
         _preferredFiatCurrencies.value = current

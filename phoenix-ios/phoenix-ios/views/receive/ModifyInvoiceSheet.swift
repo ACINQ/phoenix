@@ -35,7 +35,7 @@ struct ModifyInvoiceSheet: View {
 	
 	@EnvironmentObject private var currencyPrefs: CurrencyPrefs
 	
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	// Workaround for SwiftUI bug
 	enum TextHeight: Preference {}
@@ -280,7 +280,7 @@ struct ModifyInvoiceSheet: View {
 			}
 			
 			currencyConverterOpen = true
-			shortSheetState.close()
+			smartModalState.close()
 		}
 	}
 	
@@ -384,7 +384,7 @@ struct ModifyInvoiceSheet: View {
 			savedAmount = nil
 		}
 		
-		shortSheetState.close {
+		smartModalState.close {
 			
 			mvi.intent(Receive.IntentAsk(
 				amount: msat,

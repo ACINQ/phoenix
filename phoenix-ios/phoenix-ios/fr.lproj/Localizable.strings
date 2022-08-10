@@ -965,7 +965,7 @@
 "Please enable Touch ID" = "Veuillez activer Touch ID";
 
 /* Error message in LockView */
-"Please enabled Face ID" = "Veuillez activer Face ID";
+"Please enable Face ID" = "Veuillez activer Face ID";
 
 /* No comment provided by engineer. */
 "Please restart Phoenix" = "Veuillez redémarrer Phoenix";

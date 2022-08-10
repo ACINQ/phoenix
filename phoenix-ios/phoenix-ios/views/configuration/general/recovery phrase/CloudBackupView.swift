@@ -92,14 +92,21 @@ struct CloudBackupView: View {
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				if hasChanges {
 					if canSave {
-						Image(systemName: "chevron.backward").font(.title2)
+						Image(systemName: "chevron.backward")
+							.font(.title3.weight(.semibold))
 						Text("Save")
+							.padding(.leading, 3)
 					} else {
-						Image(systemName: "chevron.backward").font(.title2).foregroundColor(Color.appNegative)
-						Text("Cancel").foregroundColor(Color.appNegative)
+						Image(systemName: "chevron.backward")
+							.font(.title3.weight(.semibold))
+							.foregroundColor(.appNegative)
+						Text("Cancel")
+							.padding(.leading, 3)
+							.foregroundColor(.appNegative)
 					}
 				} else {
-					Image(systemName: "chevron.backward").font(.title2)
+					Image(systemName: "chevron.backward")
+						.font(.title3.weight(.semibold))
 				}
 			}
 		}

@@ -21,7 +21,7 @@ struct CommentSheet: View {
 	
 	let sendButtonAction: (() -> Void)?
 	
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	init(comment: Binding<String>, maxCommentLength: Int, sendButtonAction: (() -> Void)? = nil) {
 		self._comment = comment
@@ -161,13 +161,13 @@ struct CommentSheet: View {
 	func closeButtonTapped() {
 		log.trace("closeButtonTapped()")
 		
-		shortSheetState.close()
+		smartModalState.close()
 	}
 	
 	func sendButtonTapped() {
 		log.trace("sendButtonTapped()")
 		
-		shortSheetState.close {
+		smartModalState.close {
 			sendButtonAction!()
 		}
 	}

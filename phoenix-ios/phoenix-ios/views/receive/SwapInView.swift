@@ -34,7 +34,7 @@ struct SwapInView: View {
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
 	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
@@ -101,7 +101,7 @@ struct SwapInView: View {
 					Text("Show a Lightning invoice")
 				}
 			}
-			.padding(.top)
+			.padding(.vertical)
 			
 			Spacer()
 			
@@ -311,8 +311,9 @@ struct SwapInView: View {
 					On-chain deposits sent to this address will be converted to Lightning channels.
 					"""
 				)
-				.lineLimit(nil)
-				.multilineTextAlignment(.leading)
+				.lineLimit(nil)                               // text truncation bugs
+				.multilineTextAlignment(.leading)             // text truncation bugs
+				.fixedSize(horizontal: false, vertical: true) // text truncation bugs
 				.padding(.bottom, 14)
 				
 				Text(styled: String(format: NSLocalizedString(
@@ -322,8 +323,9 @@ struct SwapInView: View {
 					comment:	"Minimum amount description."),
 					minFunding.string, feePercent, minFee.string
 				))
-				.lineLimit(nil)
-				.multilineTextAlignment(.leading)
+				.lineLimit(nil)                               // text truncation bugs
+				.multilineTextAlignment(.leading)             // text truncation bugs
+				.fixedSize(horizontal: false, vertical: true) // text truncation bugs
 			}
 		}
 		.font(.subheadline)
@@ -428,7 +430,7 @@ struct SwapInView: View {
 	func didLongPressCopyButton() -> Void {
 		log.trace("didLongPressCopyButton()")
 		
-		shortSheetState.display(dismissable: true) {
+		smartModalState.display(dismissable: true) {
 			
 			CopyOptionsSheet(copyText: {
 				copyTextToPasteboard()
@@ -469,7 +471,7 @@ struct SwapInView: View {
 	func didLongPressShareButton() {
 		log.trace("didLongPressShareButton()")
 		
-		shortSheetState.display(dismissable: true) {
+		smartModalState.display(dismissable: true) {
 					
 			ShareOptionsSheet(shareText: {
 				shareTextToSystem()

@@ -42,11 +42,31 @@ struct ContentView: MVIView {
 	
 	@ViewBuilder
 	var view: some View {
+		
+		GeometryReader { geometry in
+			content
+				.frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
+				.modifier(GlobalEnvironment())
+				.onAppear {
+					GlobalEnvironment.deviceInfo._windowSize = geometry.size
+					GlobalEnvironment.deviceInfo.windowSafeArea = geometry.safeAreaInsets
+				}
+				.onChange(of: geometry.size) { newSize in
+					GlobalEnvironment.deviceInfo._windowSize = newSize
+				}
+				.onChange(of: geometry.safeAreaInsets) { newValue in
+					GlobalEnvironment.deviceInfo.windowSafeArea = newValue
+				}
+		} // </GeometryReader>
+	}
+	
+	@ViewBuilder
+	var content: some View {
 
 		ZStack {
-			
+
 			if lockState.isUnlocked || unlockedOnce {
-			
+				
 				primaryView()
 					.zIndex(0) // needed for proper animation
 					.onAppear {
@@ -59,28 +79,25 @@ struct ContentView: MVIView {
 					}
 					.zIndex(1) // needed for proper animation
 				}
-				
+
 				if let popoverItem = popoverItem {
 					PopoverWrapper(dismissable: popoverItem.dismissable) {
 						popoverItem.view
 					}
 					.zIndex(2) // needed for proper animation
 				}
-			
-			} else { // prior to first unlock
 
-				NavigationView {
-					loadingView()
-				}
-				.zIndex(3) // needed for proper animation
-				.transition(.asymmetric(
-					insertion : .identity,
-					removal   : .opacity
-				))
+			} else { // prior to first unlock
+				
+				loadingView()
+					.zIndex(3) // needed for proper animation
+					.transition(.asymmetric(
+						insertion : .identity,
+						removal   : .opacity
+					))
 			}
 			
 		} // </ZStack>
-		.modifier(GlobalEnvironment())
 		.onReceive(shortSheetState.publisher) { (item: ShortSheetItem?) in
 			withAnimation {
 				shortSheetItem = item
@@ -96,17 +113,13 @@ struct ContentView: MVIView {
 	@ViewBuilder
 	func primaryView() -> some View {
 
-		NavigationView {
-
-			if mvi.model is Content.ModelIsInitialized {
-				HomeView()
-			} else if mvi.model is Content.ModelNeedInitialization {
-				IntroContainer()
-			} else {
-				loadingView()
-			}
+		if mvi.model is Content.ModelIsInitialized {
+			MainView()
+		} else if mvi.model is Content.ModelNeedInitialization {
+			IntroContainer()
+		} else {
+			loadingView()
 		}
-		.navigationViewStyle(StackNavigationViewStyle())
 	}
 
 	@ViewBuilder

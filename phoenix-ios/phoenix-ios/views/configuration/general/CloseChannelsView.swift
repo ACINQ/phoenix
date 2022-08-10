@@ -294,9 +294,11 @@ struct CloseChannelsView : MVIView {
 		if !didAppear {
 			didAppear = true
 			
-			if deepLinkManager.deepLink == .drainWallet {
+			if let deepLink = deepLinkManager.deepLink, deepLink == .drainWallet {
 				// Reached our destination
-				deepLinkManager.broadcast(nil)
+				DispatchQueue.main.async { // iOS 14 issues workaround
+					deepLinkManager.unbroadcast(deepLink)
+				}
 			}
 		}
 	}

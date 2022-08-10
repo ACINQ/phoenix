@@ -80,7 +80,7 @@ struct ElectrumAddressSheet: View {
 	@State var titleWidth: CGFloat? = nil
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	init(mvi: MVIState<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>) {
 		self.mvi = mvi
@@ -615,7 +615,7 @@ struct ElectrumAddressSheet: View {
 	
 	func closeSheet() {
 		log.trace("closeSheet()")
-		shortSheetState.close()
+		smartModalState.close()
 	}
 	
 	func copyCert() {
@@ -722,7 +722,7 @@ struct ElectrumAddressSheet: View {
 			mvi.intent(ElectrumConfiguration.IntentUpdateElectrumServer(server: nil))
 		}
 		
-		shortSheetState.close()
+		smartModalState.close()
 	}
 	
 	@discardableResult

@@ -10,7 +10,7 @@ struct ShareOptionsSheet: View {
 	let shareText: () -> Void
 	let shareImage: () -> Void
 	
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	@ViewBuilder
 	var body: some View {
@@ -18,7 +18,7 @@ struct ShareOptionsSheet: View {
 		VStack {
 			
 			Button {
-				shortSheetState.close {
+				smartModalState.close {
 					shareText()
 				}
 			} label: {
@@ -44,7 +44,7 @@ struct ShareOptionsSheet: View {
 			.padding(.bottom, 8)
 			
 			Button {
-				shortSheetState.close {
+				smartModalState.close {
 					shareImage()
 				}
 			} label: {

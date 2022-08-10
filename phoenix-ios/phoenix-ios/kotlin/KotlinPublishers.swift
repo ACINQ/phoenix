@@ -98,23 +98,24 @@ extension PeerManager {
 extension PaymentsManager {
 	
 	fileprivate struct _Key {
-		static var paymentsPagePublisher = 0
+		static var paymentsCountPublisher = 0
 		static var incomingSwapsPublisher = 0
 		static var lastCompletedPaymentPublisher = 0
 		static var lastIncomingPaymentPublisher = 0
 		static var inFlightOutgoingPaymentsPublisher = 0
 	}
 	
-	func paymentsPagePublisher() -> AnyPublisher<PaymentsPage, Never> {
+	func paymentsCountPublisher() -> AnyPublisher<Int64, Never> {
 		
-		executeOnce(storageKey: &_Key.paymentsPagePublisher) {
+		executeOnce(storageKey: &_Key.paymentsCountPublisher) {
 			
 			// Transforming from Kotlin:
-			// `paymentsPage: StateFlow<PaymentsPage>`
+			// `paymentsCount: StateFlow<Long>`
 			//
-			KotlinCurrentValueSubject<PaymentsPage, PaymentsPage>(
-				self.paymentsPage
-			).eraseToAnyPublisher()
+			KotlinCurrentValueSubject<KotlinLong, Int64>(
+				self.paymentsCount
+			)
+			.eraseToAnyPublisher()
 		}
 	}
 	
@@ -177,6 +178,27 @@ extension PaymentsManager {
 			.map {
 				return $0.count
 			}
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+extension PaymentsPageFetcher {
+	
+	fileprivate struct _Key {
+		static var paymentsPagePublisher = 0
+	}
+	
+	func paymentsPagePublisher() -> AnyPublisher<PaymentsPage, Never> {
+		
+		executeOnce(storageKey: &_Key.paymentsPagePublisher) {
+			
+			// Transforming from Kotlin:
+			// `paymentsPage: StateFlow<PaymentsPage>`
+			//
+			KotlinCurrentValueSubject<PaymentsPage, PaymentsPage>(
+				self.paymentsPage
+			)
 			.eraseToAnyPublisher()
 		}
 	}

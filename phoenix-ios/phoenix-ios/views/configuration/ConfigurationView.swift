@@ -183,16 +183,6 @@ struct ConfigurationView: View {
 						}
 					}
 
-//					NavigationLink(
-//						destination: ForceCloseChannelsView(),
-//						tag: NavLinkTag.ForceCloseChannelsView,
-//						selection: $navLinkTag
-//					) {
-//						Label { Text("Danger zone") } icon: {
-//							Image(systemName: "exclamationmark.triangle")
-//						}
-//					}.foregroundColor(.appNegative)
-
 				} // </if: hasWallet>
 				
 				NavigationLink(
@@ -263,7 +253,9 @@ struct ConfigurationView: View {
 		if !didAppear {
 			didAppear = true
 			if let deepLink = deepLinkManager.deepLink {
-				deepLinkChanged(deepLink)
+				DispatchQueue.main.async { // iOS 14 issues workaround
+					deepLinkChanged(deepLink)
+				}
 			}
 			
 		} else {
@@ -285,7 +277,7 @@ struct ConfigurationView: View {
 				// We are implementing the least risky solution.
 				// Which requires us to change the `List.id` property.
 				
-				if navLinkTag != nil {
+				if navLinkTag != nil && swiftUiBugWorkaround == nil {
 					navLinkTag = nil
 					listViewId = UUID()
 				}
@@ -312,9 +304,10 @@ struct ConfigurationView: View {
 			// Navigate towards deep link (if needed)
 			var newNavLinkTag: NavLinkTag? = nil
 			switch value {
-				case .backup      : newNavLinkTag = NavLinkTag.RecoveryPhraseView
-				case .drainWallet : newNavLinkTag = NavLinkTag.CloseChannelsView
-				case .electrum    : newNavLinkTag = NavLinkTag.PrivacyView
+				case .paymentHistory : break
+				case .backup         : newNavLinkTag = NavLinkTag.RecoveryPhraseView
+				case .drainWallet    : newNavLinkTag = NavLinkTag.CloseChannelsView
+				case .electrum       : newNavLinkTag = NavLinkTag.PrivacyView
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {

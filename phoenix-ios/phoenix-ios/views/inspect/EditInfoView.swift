@@ -12,8 +12,9 @@ fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 
-struct EditInfoView: View, ViewName {
+struct EditInfoView: View {
 	
+	let type: PaymentViewType
 	@Binding var paymentInfo: WalletPaymentInfo
 	
 	let defaultDescText: String
@@ -33,7 +34,9 @@ struct EditInfoView: View, ViewName {
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	init(paymentInfo: Binding<WalletPaymentInfo>) {
+	init(type: PaymentViewType, paymentInfo: Binding<WalletPaymentInfo>) {
+		
+		self.type = type
 		_paymentInfo = paymentInfo
 		
 		let pi = paymentInfo.wrappedValue
@@ -58,39 +61,61 @@ struct EditInfoView: View, ViewName {
 		_remainingNotesCount = State(initialValue: maxNotesCount - notes.count)
 	}
 	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var body: some View {
 		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+		switch type {
+		case .sheet:
+			main()
+				.navigationBarTitle(
+					NSLocalizedString("Edit Info", comment: "Navigation bar title"),
+					displayMode: .inline
+				)
+				.navigationBarHidden(true)
 			
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				Button {
-					saveButtonTapped()
-				} label: {
-					HStack(alignment: .center, spacing: 4) {
-						Image(systemName: "chevron.backward")
-							.imageScale(.medium)
-						Text("Save")
-					}
-				}
-				Spacer()
-			}
-			.font(.title3)
-			.padding()
-			
-			ScrollView {
-				content
-			}
+		case .embedded:
+			main()
+				.navigationBarTitle(
+					NSLocalizedString("Edit Payment", comment: "Navigation bar title"),
+					displayMode: .inline
+				)
+				.navigationBarBackButtonHidden(true)
+				.navigationBarItems(leading: saveButton())
+				.background(
+					Color.primaryBackground.ignoresSafeArea(.all, edges: .bottom)
+				)
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Edit Info", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
-		.navigationBarHidden(true)
 	}
 	
 	@ViewBuilder
-	var content: some View {
+	func main() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+		
+			switch type {
+			case .sheet:
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					saveButton()
+					Spacer()
+				}
+				.padding()
+				
+			case .embedded:
+				Spacer().frame(height: 25)
+			}
+			
+			ScrollView {
+				content()
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
@@ -111,6 +136,10 @@ struct EditInfoView: View, ViewName {
 				.isHidden(descText == "")
 			}
 			.padding(.all, 8)
+			.background(
+				RoundedRectangle(cornerRadius: 8)
+					.fill(Color(UIColor.systemBackground))
+			)
 			.overlay(
 				RoundedRectangle(cornerRadius: 8)
 					.stroke(Color.textFieldBorder, lineWidth: 1)
@@ -134,6 +163,10 @@ struct EditInfoView: View, ViewName {
 			TextEditor(text: $notesText)
 				.frame(minHeight: 80, maxHeight: 320)
 				.padding(.all, 8)
+				.background(
+					RoundedRectangle(cornerRadius: 8)
+						.fill(Color(UIColor.systemBackground))
+				)
 				.overlay(
 					RoundedRectangle(cornerRadius: 8)
 						.stroke(Color.textFieldBorder, lineWidth: 1)
@@ -167,19 +200,24 @@ struct EditInfoView: View, ViewName {
 		}
 	}
 	
-	func descTextDidChange(_ newText: String) {
-		log.trace("[\(viewName)] descTextDidChange()")
+	@ViewBuilder
+	func saveButton() -> some View {
 		
-		remainingDescCount = maxDescCount - newText.count
-		updateHasChanges()
+		Button {
+			saveButtonTapped()
+		} label: {
+			HStack(alignment: .center, spacing: 4) {
+				Image(systemName: "chevron.backward")
+					.imageScale(.medium)
+				Text("Save")
+			}
+		}
+		.font(.title3.weight(.semibold))
 	}
 	
-	func notesTextDidChange(_ newText: String) {
-		log.trace("[\(viewName)] notesTextDidChange()")
-		
-		remainingNotesCount = maxNotesCount - newText.count
-		updateHasChanges()
-	}
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
 	
 	func updateHasChanges() {
 		
@@ -188,8 +226,30 @@ struct EditInfoView: View, ViewName {
 			notesText != (originalNotesText ?? "")
 	}
 	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func descTextDidChange(_ newText: String) {
+		log.trace("descTextDidChange()")
+		
+		remainingDescCount = maxDescCount - newText.count
+		updateHasChanges()
+	}
+	
+	func notesTextDidChange(_ newText: String) {
+		log.trace("notesTextDidChange()")
+		
+		remainingNotesCount = maxNotesCount - newText.count
+		updateHasChanges()
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
 	func discardButtonTapped() {
-		log.trace("[\(viewName)] discardButtonTapped()")
+		log.trace("discardButtonTapped()")
 		
 		let realizedDesc = originalDescText ?? ""
 		if realizedDesc == defaultDescText {
@@ -206,7 +266,7 @@ struct EditInfoView: View, ViewName {
 	}
 	
 	func saveButtonTapped() {
-		log.trace("[\(viewName)] saveButtonTapped()")
+		log.trace("saveButtonTapped()")
 		
 		let paymentId = paymentInfo.id()
 		var desc = descText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -242,7 +302,7 @@ struct EditInfoView: View, ViewName {
 				}
 			}
 		} else {
-			log.debug("[\(viewName)] no changes - nothing to save")
+			log.debug("no changes - nothing to save")
 		}
 		
 		presentationMode.wrappedValue.dismiss()

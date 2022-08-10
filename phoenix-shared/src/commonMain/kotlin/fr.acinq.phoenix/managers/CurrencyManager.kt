@@ -134,7 +134,7 @@ class CurrencyManager(
      */
     fun calculateOriginalFiat(): ExchangeRate.BitcoinPriceRate? {
 
-        val fiatCurrency = configurationManager.preferredFiatCurrencies().value?.primary
+        val fiatCurrency = configurationManager.preferredFiatCurrencies.value?.primary
         if (fiatCurrency == null) {
             return null
         }
@@ -272,7 +272,7 @@ class CurrencyManager(
                     log.debug { "API(coindesk): Next UsdPriceRate refresh: $nextDelay" }
                     delay(nextDelay)
                 }
-                val preferredFiatCurrencies = configurationManager.preferredFiatCurrencies().value
+                val preferredFiatCurrencies = configurationManager.preferredFiatCurrencies.value
                 val (preferred, remaining) = preferredFiatCurrencies?.let {
                     val preferred = it.all
                     val remaining = api.fiatCurrencies.filter { !preferred.contains(it) }

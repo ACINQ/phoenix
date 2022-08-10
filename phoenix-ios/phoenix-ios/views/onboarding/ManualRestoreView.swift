@@ -23,6 +23,8 @@ struct ManualRestoreView: MVIView {
 	@State var mnemonics = [String]()
 	@State var autocomplete = [String]()
 	
+	@EnvironmentObject var deviceInfo: DeviceInfo
+	
 	@ViewBuilder
 	var view: some View {
 		
@@ -53,6 +55,7 @@ struct ManualRestoreView: MVIView {
 			}
 			
 			main
+				.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 		}
 		.navigationBarTitle(
 			NSLocalizedString("Manual restore", comment: "Navigation bar title"),

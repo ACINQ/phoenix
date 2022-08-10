@@ -18,6 +18,15 @@ struct IntroContainer: View {
 	@ViewBuilder
 	var body: some View {
 		
+		NavigationView {
+			content
+		}
+		.navigationViewStyle(StackNavigationViewStyle())
+	}
+	
+	@ViewBuilder
+	var content: some View {
+		
 		ZStack {
 			
 			if introFinished {

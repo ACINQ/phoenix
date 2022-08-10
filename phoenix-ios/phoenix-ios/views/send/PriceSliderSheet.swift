@@ -87,7 +87,7 @@ struct PriceSliderSheet: View {
 	@State var contentHeight: CGFloat? = nil
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	@ViewBuilder
@@ -575,6 +575,6 @@ struct PriceSliderSheet: View {
 	func closeButtonTapped() {
 		log.trace("closeButtonTapped()")
 		
-		shortSheetState.close()
+		smartModalState.close()
 	}
 }

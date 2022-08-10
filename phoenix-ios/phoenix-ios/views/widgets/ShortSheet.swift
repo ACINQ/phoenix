@@ -20,15 +20,21 @@ import Combine
 ///
 public class ShortSheetState: ObservableObject {
 
-	// Fires when:
-	// - sheet view will animate on screen (onWillAppear)
-	// - sheet view has animated off screen (onDidDisappear)
-	//
+	/// Singleton instance
+	///
+	public static let shared = ShortSheetState()
+	
+	private init() {/* must use shared instance */}
+	
+	/// Fires when:
+	/// - sheet view will animate on screen (onWillAppear)
+	/// - sheet view has animated off screen (onDidDisappear)
+	///
 	var publisher = PassthroughSubject<ShortSheetItem?, Never>()
 	
-	// Fires when:
-	// - sheet view will animate off screen (onWillDisapper)
-	// 
+	/// Fires when:
+	/// - sheet view will animate off screen (onWillDisapper)
+	///
 	var closePublisher = PassthroughSubject<Void, Never>()
 	
 	func display<Content: View>(
@@ -101,7 +107,7 @@ public struct ShortSheetItem {
 
 struct ShortSheetEnvironmentKey: EnvironmentKey {
 
-	static var defaultValue = ShortSheetState()
+	static var defaultValue = ShortSheetState.shared
 }
 
 public extension EnvironmentValues {
