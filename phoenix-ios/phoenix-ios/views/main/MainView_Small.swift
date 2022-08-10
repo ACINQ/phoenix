@@ -30,7 +30,8 @@ struct MainView_Small: View {
 	@State var externalLightningRequest: AppScanController? = nil
 	@State var temp: [AppScanController] = []
 	
-	@ScaledMetric var footerButtonImageSize: CGFloat = 22
+	@ScaledMetric var sendImageSize: CGFloat = 17
+	@ScaledMetric var receiveImageSize: CGFloat = 18
 	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
@@ -211,19 +212,20 @@ struct MainView_Small: View {
 			Button {
 				navLinkTag = .ReceiveView
 			} label: {
-				HStack(alignment: VerticalAlignment.center, spacing: 4) {
-					Image("ic_receive")
-						.resizable()
-						.frame(width: footerButtonImageSize, height: footerButtonImageSize)
-						.foregroundColor(.appAccent)
+				Label {
 					Text("Receive")
 						.minimumScaleFactor(0.5)
 						.foregroundColor(.primaryForeground)
+				} icon: {
+					Image("ic_receive_resized")
+						.resizable()
+						.frame(width: receiveImageSize, height: receiveImageSize)
+						.foregroundColor(.appAccent)
 				}
-				.frame(minWidth: footerButtonWidth, alignment: Alignment.trailing)
-				.read(footerButtonWidthReader)
-				.read(footerButtonHeightReader)
 			}
+			.frame(minWidth: footerButtonWidth, alignment: Alignment.trailing)
+			.read(footerButtonWidthReader)
+			.read(footerButtonHeightReader)
 
 			Spacer()
 			if let footerButtonHeight = footerButtonHeight {
@@ -234,19 +236,21 @@ struct MainView_Small: View {
 			Button {
 				navLinkTag = .SendView
 			} label: {
-				HStack(alignment: VerticalAlignment.center, spacing: 4) {
-					Image("ic_scan")
-						.resizable()
-						.frame(width: footerButtonImageSize, height: footerButtonImageSize)
-						.foregroundColor(.appAccent)
+				Label {
 					Text("Send")
 						.minimumScaleFactor(0.5)
 						.foregroundColor(.primaryForeground)
+				} icon: {
+					Image("ic_scan_resized")
+						.resizable()
+						.frame(width: sendImageSize, height: sendImageSize)
+						.foregroundColor(.appAccent)
 				}
-				.frame(minWidth: footerButtonWidth, alignment: Alignment.leading)
-				.read(footerButtonWidthReader)
-				.read(footerButtonHeightReader)
 			}
+			.frame(minWidth: footerButtonWidth, alignment: Alignment.leading)
+			.read(footerButtonWidthReader)
+			.read(footerButtonHeightReader)
+			
 			Spacer()
 		
 		} // </HStack>
