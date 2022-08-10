@@ -311,8 +311,9 @@ struct SwapInView: View {
 					On-chain deposits sent to this address will be converted to Lightning channels.
 					"""
 				)
-				.lineLimit(nil)
-				.multilineTextAlignment(.leading)
+				.lineLimit(nil)                               // text truncation bugs
+				.multilineTextAlignment(.leading)             // text truncation bugs
+				.fixedSize(horizontal: false, vertical: true) // text truncation bugs
 				.padding(.bottom, 14)
 				
 				Text(styled: String(format: NSLocalizedString(
@@ -322,8 +323,9 @@ struct SwapInView: View {
 					comment:	"Minimum amount description."),
 					minFunding.string, feePercent, minFee.string
 				))
-				.lineLimit(nil)
-				.multilineTextAlignment(.leading)
+				.lineLimit(nil)                               // text truncation bugs
+				.multilineTextAlignment(.leading)             // text truncation bugs
+				.fixedSize(horizontal: false, vertical: true) // text truncation bugs
 			}
 		}
 		.font(.subheadline)
