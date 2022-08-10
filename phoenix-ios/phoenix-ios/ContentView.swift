@@ -98,8 +98,6 @@ struct ContentView: MVIView {
 			}
 			
 		} // </ZStack>
-		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.ignoresSafeArea()
 		.onReceive(shortSheetState.publisher) { (item: ShortSheetItem?) in
 			withAnimation {
 				shortSheetItem = item

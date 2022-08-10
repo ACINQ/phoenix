@@ -16,8 +16,6 @@ struct MainView: View {
 	
 	let idiom = UIDevice.current.userInterfaceIdiom
 	
-	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
-	
 	@ViewBuilder
 	var body: some View {
 		if idiom == .pad {
