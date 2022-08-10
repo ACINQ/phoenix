@@ -101,7 +101,7 @@ struct SwapInView: View {
 					Text("Show a Lightning invoice")
 				}
 			}
-			.padding(.top)
+			.padding(.vertical)
 			
 			Spacer()
 			

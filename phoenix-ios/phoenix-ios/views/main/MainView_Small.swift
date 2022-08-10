@@ -33,6 +33,7 @@ struct MainView_Small: View {
 	@ScaledMetric var sendImageSize: CGFloat = 17
 	@ScaledMetric var receiveImageSize: CGFloat = 18
 	
+	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	let headerButtonHeightReader = GeometryPreferenceReader(
@@ -255,7 +256,7 @@ struct MainView_Small: View {
 		
 		} // </HStack>
 		.padding(.top, 20)
-		.padding(.bottom, 10)
+		.padding(.bottom, deviceInfo.isFaceID ? 10 : 20)
 		.background(
 			Color.mutedBackground
 				.cornerRadius(15, corners: [.topLeft, .topRight])

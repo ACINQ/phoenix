@@ -240,7 +240,7 @@ struct ReceiveLightningView: View {
 					Text("Show a Bitcoin address")
 				}
 			}
-			.padding(.top)
+			.padding(.vertical)
 			
 			Spacer()
 			

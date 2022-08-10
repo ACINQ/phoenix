@@ -48,10 +48,20 @@ class DeviceInfo: ObservableObject {
 		return self.windowSize == UIScreen.main.bounds.size
 	}
 	
+	var isFaceID: Bool {
+		switch AppSecurity.shared.deviceBiometricSupport() {
+			case .faceID_available    : return true
+			case .faceID_notAvailable : return true
+			case .faceID_notEnrolled  : return true
+			default                   : return false
+		}
+	}
+	
 	// iPod touch (gen 5+) - 320x568 pt (@2x)
 	//
 	// iPhone SE (2016)    - 320x568 pt (@2x)
 	// iPhone SE (2020)    - 375x667 pt (@2x)
+	// iPhone SE (2022)    - 375x667 pt (@2x)
 	//
 	// iPhone 6s           - 375x667 pt (@2x)
 	// iPhone 6s Plus      - 414x736 pt (@3x)
@@ -81,10 +91,10 @@ class DeviceInfo: ObservableObject {
 	// iPhone 13 Pro       - 390x844 pt (@3x)
 	// iPhone 13 Pro Max   - 428x926 pt (@3x)
 	//
-	// iPad Pro 12.9-inch  - 2048x2732 pt
-	// iPad Pro 11-inch    - 1668x2388 pt
+	// iPad Pro 9.7-inch   -  768x1024 pt
 	// iPad Pro 10.5-inch  - 1668x2244 pt
-	// iPad Pro 9.7-inch   - 768x1024 pt
+	// iPad Pro 11-inch    - 1668x2388 pt
+	// iPad Pro 12.9-inch  - 2048x2732 pt
 	//
 	// iPad Mini 6th gen   - 744x1133 pt
 	
