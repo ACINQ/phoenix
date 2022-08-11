@@ -801,6 +801,7 @@ fileprivate struct FooterCell: View {
 			
 			Text(verbatim: localizedString)
 				.font(.subheadline)
+				.multilineTextAlignment(.center)
 				.foregroundColor(.secondary)
 			
 			Button {
