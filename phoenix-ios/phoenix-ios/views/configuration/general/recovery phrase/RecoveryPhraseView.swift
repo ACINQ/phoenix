@@ -665,36 +665,50 @@ fileprivate struct RecoveryPhraseReveal: View {
 	@Binding var isShowing: Bool
 	@Binding var mnemonics: [String]
 	
+	@State var truncationDetected: Bool = false
+	
 	func mnemonic(_ idx: Int) -> String {
 		return (mnemonics.count > idx) ? mnemonics[idx] : " "
 	}
 	
+	@ViewBuilder
 	var body: some View {
 		
 		ZStack {
-			
-			// close button
-			// (required for landscapse mode, where swipe to dismiss isn't possible)
-			VStack {
-				HStack {
-					Spacer()
-					Button {
-						close()
-					} label: {
-						Image("ic_cross")
-							.resizable()
-							.frame(width: 30, height: 30)
-					}
+			GeometryReader { geometry in
+				ScrollView(.vertical) {
+					content()
+						.frame(width: geometry.size.width)
+						.frame(minHeight: geometry.size.height)
 				}
-				Spacer()
 			}
-			.padding()
 			
-			main
+			// (required for landscapse mode, where swipe to dismiss isn't possible)
+			closeButton()
 		}
 	}
 	
-	var main: some View {
+	@ViewBuilder
+	func closeButton() -> some View {
+		
+		VStack {
+			HStack {
+				Spacer()
+				Button {
+					close()
+				} label: {
+					Image("ic_cross")
+						.resizable()
+						.frame(width: 30, height: 30)
+				}
+			}
+			Spacer()
+		}
+		.padding()
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
 		
 		VStack {
 			
@@ -702,57 +716,24 @@ fileprivate struct RecoveryPhraseReveal: View {
 			
 			Text("KEEP THIS SEED SAFE.")
 				.font(.title2)
+				.lineLimit(nil)
 				.multilineTextAlignment(.center)
+				.fixedSize(horizontal: false, vertical: true)
 				.padding(.bottom, 2)
 			Text("DO NOT SHARE.")
-				.multilineTextAlignment(.center)
 				.font(.title2)
+				.lineLimit(nil)
+				.multilineTextAlignment(.center)
+				.fixedSize(horizontal: false, vertical: true)
 			
 			Spacer()
 			
-			HStack {
-				Spacer()
-				
-				VStack {
-					ForEach(0..<6, id: \.self) { idx in
-						Text(verbatim: "#\(idx + 1) ")
-							.font(.headline)
-							.foregroundColor(.secondary)
-							.padding(.bottom, 2)
-					}
+			Group {
+				if truncationDetected {
+					singleColumnLayout()
+				} else {
+					twoColumnLayout()
 				}
-				.padding(.trailing, 2)
-				
-				VStack(alignment: .leading) {
-					ForEach(0..<6, id: \.self) { idx in
-						Text(mnemonic(idx))
-							.font(.headline)
-							.padding(.bottom, 2)
-					}
-				}
-				.padding(.trailing, 4) // boost spacing a wee bit
-				
-				Spacer()
-				
-				VStack {
-					ForEach(6..<12, id: \.self) { idx in
-						Text(verbatim: "#\(idx + 1) ")
-							.font(.headline)
-							.foregroundColor(.secondary)
-							.padding(.bottom, 2)
-					}
-				}
-				.padding(.trailing, 2)
-				
-				VStack(alignment: .leading) {
-					ForEach(6..<12, id: \.self) { idx in
-						Text(mnemonic(idx))
-							.font(.headline)
-							.padding(.bottom, 2)
-					}
-				}
-				
-				Spacer()
 			}
 			.environment(\.layoutDirection, .leftToRight) // issue #237
 			.padding(.top, 20)
@@ -764,11 +745,113 @@ fileprivate struct RecoveryPhraseReveal: View {
 			Text("BIP39 seed with standard BIP84 derivation path")
 				.font(.footnote)
 				.foregroundColor(.secondary)
+				.fixedSize(horizontal: false, vertical: true)
 			
 		}
 		.padding(.top, 20)
 		.padding([.leading, .trailing], 30)
 		.padding(.bottom, 20)
+	}
+	
+	@ViewBuilder
+	func twoColumnLayout() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			Spacer()
+			
+			VStack {
+				ForEach(0..<6, id: \.self) { idx in
+					Text(verbatim: "#\(idx + 1) ")
+						.font(.headline)
+						.lineLimit(1)
+						.foregroundColor(.secondary)
+						.padding(.bottom, 2)
+				}
+			}
+			.padding(.trailing, 2)
+			
+			VStack(alignment: .leading) {
+				ForEach(0..<6, id: \.self) { idx in
+					TruncatableView(
+						fixedHorizontal: true,
+						fixedVertical: true
+					) {
+						Text(mnemonic(idx))
+							.font(.headline)
+							.lineLimit(1)
+					} wasTruncated: {
+						self.wasTruncated(visibleIdx: idx+1)
+					}
+					.padding(.bottom, 2)
+				}
+			}
+			.padding(.trailing, 4) // boost spacing a wee bit
+			
+			Spacer()
+			
+			VStack {
+				ForEach(6..<12, id: \.self) { idx in
+					Text(verbatim: "#\(idx + 1) ")
+						.font(.headline)
+						.lineLimit(1)
+						.foregroundColor(.secondary)
+						.padding(.bottom, 2)
+				}
+			}
+			.padding(.trailing, 2)
+			
+			VStack(alignment: .leading) {
+				ForEach(6..<12, id: \.self) { idx in
+					TruncatableView(
+						fixedHorizontal: true,
+						fixedVertical: true
+					) {
+						Text(mnemonic(idx))
+							.font(.headline)
+							.lineLimit(1)
+					} wasTruncated: {
+						self.wasTruncated(visibleIdx: idx+1)
+					}
+					.padding(.bottom, 2)
+				}
+			}
+			
+			Spacer()
+		}
+	}
+	
+	@ViewBuilder
+	func singleColumnLayout() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+				ForEach(0..<12, id: \.self) { idx in
+					Text(verbatim: "#\(idx + 1) ")
+						.font(.headline)
+						.foregroundColor(.secondary)
+						.padding(.bottom, 2)
+				} // </ForEach>
+			} // </VStack>
+			.padding(.trailing, 2)
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+				ForEach(0..<12, id: \.self) { idx in
+					Text(mnemonic(idx))
+						.font(.headline)
+						.padding(.bottom, 2)
+				} // </ForEach>
+			} // </VStack>
+			
+		} // </HStack>
+	}
+	
+	func wasTruncated(visibleIdx: Int) {
+		log.trace("[RecoverySeedReveal] wasTruncated(#: \(visibleIdx))")
+		
+		DispatchQueue.main.async {
+			truncationDetected = true
+		}
 	}
 	
 	func close() {
