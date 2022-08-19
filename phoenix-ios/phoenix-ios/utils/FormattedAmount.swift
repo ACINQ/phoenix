@@ -48,9 +48,9 @@ struct FormattedAmount {
 	}
 	
 	/// Returns only the integer portion of the digits. E.g.:
-	/// - digits="12,845.123456" => "12,845"
-	/// - digits="12 845.123456" => "12 845"
-	/// - digits="12.845,123456" => "12.845"
+	/// - digits="12,845.123456" => integerDigits="12,845"
+	/// - digits="12 845.123456" => integerDigits="12 845"
+	/// - digits="12.845,123456" => integerDigits="12.845"
 	///
 	var integerDigits: String {
 	
@@ -62,9 +62,9 @@ struct FormattedAmount {
 	}
 	
 	/// Returns only the fraction portion of the digits. E.g.:
-	/// - digits="12,845.123456" => "123456"
-	/// - digits="12 845.123456" => "123456"
-	/// - digits="12.845,123456" => "123456"
+	/// - digits="12,845.123456" => fractionDigits="123456"
+	/// - digits="12 845.123456" => fractionDigits="123456"
+	/// - digits="12.845,123456" => fractionDigits="123456"
 	///
 	var fractionDigits: String {
 		
@@ -76,8 +76,8 @@ struct FormattedAmount {
 	}
 	
 	/// Returns whether or not the amount contains any fractional digits. E.g.:
-	/// - digits="12,845"   => false
-	/// - digits="12 845.1" => true
+	/// - digits="12,845"   => hasFractionDigits=false
+	/// - digits="12 845.1" => hasFractionDigits=true
 	///
 	var hasFractionDigits: Bool {
 		return !fractionDigits.isEmpty
@@ -94,6 +94,7 @@ struct FormattedAmount {
 	/// A similar concept applies to bitcoin, where millisatoshis are considered sub-fractional:
 	///
 	/// - if currency=sat && fractionDigits="102" => stdFractionDigits="", subFractionDigits="102"
+	/// - if currency=btc && fractionDigits="12345678901" => stdFractionDigits="12345678", subFractionDigits="901"
 	///
 	var stdFractionDigits: String {
 		
@@ -138,7 +139,8 @@ struct FormattedAmount {
 		
 		switch currency {
 			case .fiat(_):
-				return 2
+				return 2 // Room for improvement: https://stripe.com/docs/currencies#zero-decimal
+			
 			case .bitcoin(let bitcoinUnit):
 				switch bitcoinUnit {
 					case .sat  : return 0
