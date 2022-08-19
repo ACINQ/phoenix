@@ -209,7 +209,7 @@ class NodeService : Service() {
         val seed = business.prepWallet(EncryptedSeed.toMnemonics(decryptedPayload))
 
         business.loadWallet(seed)
-        business.start(StartupParams(requestCheckLegacyChannels = requestCheckLegacyChannels))
+        business.start(StartupParams(requestCheckLegacyChannels = requestCheckLegacyChannels, isTorEnabled = true))
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
 
         serviceScope.launch {
