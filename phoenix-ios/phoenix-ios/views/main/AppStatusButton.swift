@@ -23,6 +23,7 @@ struct AppStatusButton: View {
 	@State var pendingSettings: SyncTxManager_PendingSettings? = nil
 	
 	@State var timer: Timer? = nil
+	@State var showText: Bool = false
 	let showTextDelay: TimeInterval = 10 // seconds
 	
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
@@ -97,7 +98,7 @@ struct AppStatusButton: View {
 		let connectionStatus = connectionsMonitor.connections.global
 		if connectionStatus is Lightning_kmpConnection.CLOSED {
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
-				if showText() {
+				if showText {
 					Text(NSLocalizedString("Offline", comment: "Connection state"))
 						.padding(.leading, 10)
 						.padding(.trailing, -5)
@@ -111,7 +112,7 @@ struct AppStatusButton: View {
 		}
 		else if connectionStatus is Lightning_kmpConnection.ESTABLISHING {
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
-				if showText() {
+				if showText {
 					Text(NSLocalizedString("Connecting…", comment: "Connection state"))
 						.padding(.leading, 10)
 						.padding(.trailing, -5)
@@ -199,15 +200,6 @@ struct AppStatusButton: View {
 		return (isSyncing, isWaiting, isError)
 	}
 	
-	func showText() -> Bool {
-		
-		if let diff = showTextDelayDiff() {
-			return diff <= 0.0
-		} else {
-			return false
-		}
-	}
-	
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
@@ -247,7 +239,6 @@ struct AppStatusButton: View {
 	// --------------------------------------------------
 	
 	func updateTimer() {
-		log.trace("updateTimer()")
 		
 		if timer != nil {
 			timer?.invalidate()
@@ -255,11 +246,25 @@ struct AppStatusButton: View {
 		}
 		
 		if let diff = showTextDelayDiff(), diff > 0 {
-			log.trace("updateTimer: seconds=\(diff)")
+			log.trace("updateTimer(): seconds=\(diff)")
 			
-			timer = Timer(timeInterval: diff, repeats: false, block: { _ in
-				timer = nil
-			})
+			timer = Timer.scheduledTimer(withTimeInterval: diff, repeats: false) { _ in
+				log.debug("timer fire")
+				updateShowText()
+			}
+		} else {
+			log.trace("updateTimer(): nil")
+		}
+	}
+	
+	func updateShowText() {
+		
+		if let diff = showTextDelayDiff() {
+			showText = diff <= 0.0
+			log.trace("updateShowText(): \(showText) (diff: \(diff))")
+		} else {
+			showText = false
+			log.trace("updateShowText(): false (diff == nil)")
 		}
 	}
 	
