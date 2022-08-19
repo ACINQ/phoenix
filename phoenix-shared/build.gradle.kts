@@ -70,6 +70,7 @@ kotlin {
     sourceSets {
         sourceSets["commonMain"].dependencies {
             api("fr.acinq.lightning:lightning-kmp:${Versions.lightningKmp}")
+            api("fr.acinq.tor:tor-mobile-kmp:${Versions.torMobile}")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:${Versions.serialization}")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:${Versions.serialization}")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.serialization}")

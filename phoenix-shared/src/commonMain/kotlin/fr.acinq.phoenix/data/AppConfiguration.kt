@@ -207,7 +207,8 @@ sealed class ElectrumConfig {
 data class StartupParams(
     /** When true, we use a [InitTlv] to ask our peer whether there are legacy channels to reestablish for the legacy node id. */
     val requestCheckLegacyChannels: Boolean = false,
-
+    /** Tor state must be defined before the node starts. */
+    val isTorEnabled: Boolean,
     // TODO: add custom electrum address, fiat currencies, ...
 )
 

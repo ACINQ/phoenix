@@ -181,6 +181,7 @@ class AppConfigurationManager(
     val startupParams: StateFlow<StartupParams?> by lazy { _startupParams }
     internal fun setStartupParams(params: StartupParams) {
         if (_startupParams.value == null) _startupParams.value = params
+        if (_isTorEnabled.value == null) _isTorEnabled.value = params.isTorEnabled
     }
 
     /**
@@ -222,10 +223,10 @@ class AppConfigurationManager(
     }
 
     // Tor configuration
-    private val isTorEnabled = MutableStateFlow(false)
-    fun subscribeToIsTorEnabled(): StateFlow<Boolean> = isTorEnabled
+    private val _isTorEnabled = MutableStateFlow<Boolean?>(null)
+    val isTorEnabled get(): StateFlow<Boolean?> = _isTorEnabled.asStateFlow()
     fun updateTorUsage(enabled: Boolean): Unit {
-        isTorEnabled.value = enabled
+        _isTorEnabled.value = enabled
     }
 
     // Fiat preferences

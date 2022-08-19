@@ -1,10 +1,14 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.ElectrumConfig
+import fr.acinq.phoenix.utils.TorHelper.connectionState
+import fr.acinq.tor.Tor
+import fr.acinq.tor.TorState
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -24,6 +28,8 @@ class AppConnectionsDaemon(
     private val peerManager: PeerManager,
     private val currencyManager: CurrencyManager,
     private val networkManager: NetworkManager,
+    private val tcpSocketBuilder: suspend () -> TcpSocket.Builder,
+    private val tor: Tor,
     private val electrumClient: ElectrumClient,
 ) : CoroutineScope by MainScope() {
 
@@ -34,6 +40,8 @@ class AppConnectionsDaemon(
         peerManager = business.peerManager,
         currencyManager = business.currencyManager,
         networkManager = business.networkMonitor,
+        tcpSocketBuilder = business.tcpSocketBuilderFactory,
+        tor = business.tor,
         electrumClient = business.electrumClient
     )
 
@@ -41,6 +49,7 @@ class AppConnectionsDaemon(
 
     private var peerConnectionJob: Job? = null
     private var electrumConnectionJob: Job? = null
+    private var torConnectionJob: Job? = null
     private var httpControlFlowEnabled: Boolean = false
 
     private var networkStatus = MutableStateFlow(NetworkState.NotAvailable)
@@ -81,6 +90,9 @@ class AppConnectionsDaemon(
     private val httpApiControlFlow = MutableStateFlow(TrafficControl())
     private val httpApiControlChanges = Channel<TrafficControl.() -> TrafficControl>()
 
+    private val torControlFlow = MutableStateFlow(TrafficControl())
+    private val torControlChanges = Channel<TrafficControl.() -> TrafficControl>()
+
     private var _lastElectrumServerAddress = MutableStateFlow<ServerAddress?>(null)
     val lastElectrumServerAddress: StateFlow<ServerAddress?> = _lastElectrumServerAddress
 
@@ -92,7 +104,7 @@ class AppConnectionsDaemon(
         ) = launch {
             controlChanges.consumeEach { change ->
                 val newState = controlFlow.value.change()
-                logger.debug { "$label = $newState" }
+                logger.info { "$label = $newState" }
                 controlFlow.value = newState
             }
         }
@@ -100,6 +112,7 @@ class AppConnectionsDaemon(
         enableControlFlow("peerControlFlow", peerControlFlow, peerControlChanges)
         enableControlFlow("electrumControlFlow", electrumControlFlow, electrumControlChanges)
         enableControlFlow("httpApiControlFlow", httpApiControlFlow, httpApiControlChanges)
+        enableControlFlow("torControlFlow", torControlFlow, torControlChanges)
 
         // Electrum
         launch {
@@ -107,6 +120,7 @@ class AppConnectionsDaemon(
                 when {
                     it.networkIsAvailable && it.disconnectCount <= 0 -> {
                         if (electrumConnectionJob == null) {
+                            logger.info { "electrum socket builder=${electrumClient.socketBuilder}" }
                             electrumConnectionJob = connectionLoop(
                                 name = "Electrum",
                                 statusStateFlow = electrumClient.connectionState
@@ -121,6 +135,7 @@ class AppConnectionsDaemon(
                                     logger.info { "ignored electrum connection opportunity because no server is configured yet" }
                                 } else {
                                     logger.info { "connecting to electrum server=$electrumServerAddress" }
+                                    electrumClient.socketBuilder = tcpSocketBuilder()
                                     electrumClient.connect(electrumServerAddress)
                                 }
                                 _lastElectrumServerAddress.value = electrumServerAddress
@@ -129,7 +144,7 @@ class AppConnectionsDaemon(
                     }
                     else -> {
                         electrumConnectionJob?.let { job ->
-                            logger.debug { "disconnecting from electrum" }
+                            logger.info { "disconnecting from electrum" }
                             job.cancel()
                             electrumClient.disconnect()
                         }
@@ -149,6 +164,7 @@ class AppConnectionsDaemon(
                                 name = "Peer",
                                 statusStateFlow = peer.connectionState
                             ) {
+                                peer.socketBuilder = tcpSocketBuilder()
                                 peer.connect()
                             }
                         }
@@ -160,6 +176,34 @@ class AppConnectionsDaemon(
                             peer.disconnect()
                         }
                         peerConnectionJob = null
+                    }
+                }
+            }
+        }
+        // Tor
+        launch {
+            combine(configurationManager.isTorEnabled.filterNotNull(), torControlFlow) { torEnabled, controlFlow ->
+                logger.info { "Tor isEnabled=$torEnabled" }
+                if (torEnabled) controlFlow else controlFlow.copy(networkIsAvailable = false)
+            }.filterNotNull().collect { controlFlow ->
+                when {
+                    controlFlow.networkIsAvailable && controlFlow.disconnectCount <= 0 -> {
+                        if (torConnectionJob == null) {
+                            torConnectionJob = connectionLoop("Tor", tor.state.connectionState(this)) {
+                                try {
+                                    tor.start(this)
+                                } catch (t: Throwable) {
+                                    logger.error(t) { "tor cannot be started: ${t.message}" }
+                                }
+                            }
+                        }
+                    }
+                    else -> {
+                        torConnectionJob?.let {
+                            it.cancel()
+                            tor.stop()
+                        }
+                        torConnectionJob = null
                     }
                 }
             }
@@ -197,8 +241,14 @@ class AppConnectionsDaemon(
         launch {
             networkStatus.collect {
                 when(it) {
-                    NetworkState.Available -> httpApiControlChanges.send { copy(networkIsAvailable = true) }
-                    NetworkState.NotAvailable -> httpApiControlChanges.send { copy(networkIsAvailable = false) }
+                    NetworkState.Available -> {
+                        torControlChanges.send { copy(networkIsAvailable = true) }
+                        httpApiControlChanges.send { copy(networkIsAvailable = true) }
+                    }
+                    NetworkState.NotAvailable -> {
+                        torControlChanges.send { copy(networkIsAvailable = false) }
+                        httpApiControlChanges.send { copy(networkIsAvailable = false) }
+                    }
                 }
             }
         }
@@ -206,23 +256,28 @@ class AppConnectionsDaemon(
         launch {
             // Suspends until the wallet is initialized
             walletManager.wallet.filterNotNull().first()
-            networkStatus.collect {
-                when (it) {
-                    NetworkState.Available -> {
-                        peerControlChanges.send { copy(networkIsAvailable = true) }
-                        electrumControlChanges.send { copy(networkIsAvailable = true) }
-                    }
+            // internet dependent flows depend on the state of tor if it is enabled.
+            combine(networkStatus, configurationManager.isTorEnabled.filterNotNull(), tor.state) { networkState, torEnabled, torState ->
+                networkState to (if (torEnabled) torState else null)
+            }.collect { (networkStatus, torState) ->
+                when (networkStatus) {
                     NetworkState.NotAvailable -> {
                         peerControlChanges.send { copy(networkIsAvailable = false) }
                         electrumControlChanges.send { copy(networkIsAvailable = false) }
                     }
+                    NetworkState.Available -> when (torState) {
+                        TorState.STOPPED, TorState.STARTING -> {
+                            peerControlChanges.send { copy(networkIsAvailable = false) }
+                            electrumControlChanges.send { copy(networkIsAvailable = false) }
+                        }
+                        null, TorState.RUNNING -> {
+                            peerControlChanges.send { copy(networkIsAvailable = true) }
+                            electrumControlChanges.send { copy(networkIsAvailable = true) }
+                        }
+                    }
                 }
             }
         }
-        // TODO Tor usage
-        launch { configurationManager.subscribeToIsTorEnabled().collect {
-            logger.info { "Tor is ${if (it) "enabled" else "disabled"}." }
-        } }
         // listen to electrum configuration changes and reconnect when needed.
         launch {
             var previousElectrumConfig: ElectrumConfig? = null
@@ -275,10 +330,11 @@ class AppConnectionsDaemon(
     data class ControlTarget(val flags: Int) { // <- bitmask
 
         companion object {
-            val Peer = ControlTarget(0b001)
-            val Electrum = ControlTarget(0b010)
-            val Http = ControlTarget(0b100)
-            val All = ControlTarget(0b111)
+            val Peer = ControlTarget(0b0001)
+            val Electrum = ControlTarget(0b0010)
+            val Http = ControlTarget(0b0100)
+            val Tor = ControlTarget(0b1000)
+            val All = ControlTarget(0b1111)
         }
 
         /* The `+` operator is implemented, so it can be used like so:
@@ -295,6 +351,7 @@ class AppConnectionsDaemon(
         val containsPeer get() = contains(Peer)
         val containsElectrum get() = contains(Electrum)
         val containsHttp get() = contains(Http)
+        val containsTor get() = contains(Tor)
     }
 
     fun incrementDisconnectCount(target: ControlTarget = ControlTarget.All) {
@@ -307,6 +364,9 @@ class AppConnectionsDaemon(
             }
             if (target.containsHttp) {
                 httpApiControlChanges.send { incrementDisconnectCount() }
+            }
+            if (target.containsTor) {
+                torControlChanges.send { incrementDisconnectCount() }
             }
         }
     }
@@ -322,18 +382,21 @@ class AppConnectionsDaemon(
             if (target.containsHttp) {
                 httpApiControlChanges.send { decrementDisconnectCount() }
             }
+            if (target.containsTor) {
+                torControlChanges.send { decrementDisconnectCount() }
+            }
         }
     }
 
     private fun connectionLoop(
         name: String,
         statusStateFlow: StateFlow<Connection>,
-        connect: () -> Unit
+        connect: suspend () -> Unit
     ) = launch {
         var pause = Duration.seconds(0)
         statusStateFlow.collect {
             if (it is Connection.CLOSED) {
-                logger.debug { "next $name connection attempt in $pause" }
+                logger.info { "next $name connection attempt in $pause" }
                 delay(pause)
                 val minPause = Duration.seconds(0.25)
                 val maxPause = Duration.seconds(8)

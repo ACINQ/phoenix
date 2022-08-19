@@ -21,11 +21,14 @@ import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.createAppDbDriver
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.*
+import fr.acinq.tor.Tor
 import io.ktor.client.*
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import org.kodein.log.LoggerFactory
 import org.kodein.log.frontend.defaultLogFrontend
@@ -48,7 +51,15 @@ class PhoenixBusiness(
 
     private val logger = loggerFactory.newLogger(this::class)
 
-    internal val tcpSocketBuilder = TcpSocket.Builder()
+    private val tcpSocketBuilder = TcpSocket.Builder()
+    internal val tcpSocketBuilderFactory = suspend {
+        val isTorEnabled = appConfigurationManager.isTorEnabled.filterNotNull().first()
+        if (isTorEnabled) {
+            tcpSocketBuilder.torProxy(loggerFactory)
+        } else {
+            tcpSocketBuilder
+        }
+    }
 
     internal val networkMonitor by lazy { NetworkManager(loggerFactory, ctx) }
     internal val httpClient by lazy {
@@ -63,7 +74,7 @@ class PhoenixBusiness(
 
     val chain = Chain.Testnet
 
-    internal val electrumClient by lazy { ElectrumClient(tcpSocketBuilder, MainScope()) }
+    internal val electrumClient by lazy { ElectrumClient(null, MainScope()) }
     internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope()) }
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
@@ -80,6 +91,7 @@ class PhoenixBusiness(
     val connectionsManager by lazy { ConnectionsManager(this) }
     val lnUrlManager by lazy { LNUrlManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
+    val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(loggerFactory)) }
 
     init {
         setLightningLoggerFactory(loggerFactory)
