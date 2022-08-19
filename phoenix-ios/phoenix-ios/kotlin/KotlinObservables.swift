@@ -13,20 +13,27 @@ fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 
-class ObservableConnectionsManager: ObservableObject {
+class ObservableConnectionsMonitor: ObservableObject {
 	
 	@Published var connections: Connections
+	@Published var disconnectedAt: Date? = nil
+	@Published var connectingAt: Date? = nil
 	
 	private var watcher: Ktor_ioCloseable?
 	
 	init() {
 		let connectionsManager = AppDelegate.get().business.connectionsManager
-		connections = connectionsManager.currentValue
+		let currentConnections = connectionsManager.currentValue
+		
+		connections = currentConnections
+		update(currentConnections)
 		
 		let swiftFlow = SwiftFlow<Connections>(origin: connectionsManager.connections)
 		
 		watcher = swiftFlow.watch {[weak self](newConnections: Connections?) in
-			self?.connections = newConnections!
+			if let newConnections = newConnections {
+				self?.update(newConnections)
+			}
 		}
 	}
 	
@@ -41,6 +48,34 @@ class ObservableConnectionsManager: ObservableObject {
 		let _watcher = watcher
 		DispatchQueue.main.async {
 			_watcher?.close()
+		}
+	}
+	
+	private func update(_ newConnections: Connections) {
+		connections = newConnections
+		
+		if newConnections.global is Lightning_kmpConnection.ESTABLISHED {
+			// All connections are established
+			if disconnectedAt != nil {
+				disconnectedAt = nil
+			}
+		} else {
+			// One or more connections are disconnected
+			if disconnectedAt == nil {
+				disconnectedAt = Date()
+			}
+		}
+		
+		if newConnections.oneOrMoreEstablishing() {
+			// We're establishing a connection
+			if connectingAt == nil {
+				connectingAt = Date()
+			}
+		} else {
+			// Not establishing a connection
+			if connectingAt != nil {
+				connectingAt = nil
+			}
 		}
 	}
 }

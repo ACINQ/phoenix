@@ -336,7 +336,7 @@
 "Connecting to:" = "Connexion à :";
 
 /* Connection state */
-"Connecting..." = "En connexion…";
+"Connecting…" = "En connexion…";
 
 /* Error title */
 "Connection failure" = "Erreur de connexion";

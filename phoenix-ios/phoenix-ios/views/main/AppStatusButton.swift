@@ -22,7 +22,10 @@ struct AppStatusButton: View {
 	@State var syncState: SyncTxManager_State = .initializing
 	@State var pendingSettings: SyncTxManager_PendingSettings? = nil
 	
-	@StateObject var connectionsManager = ObservableConnectionsManager()
+	@State var timer: Timer? = nil
+	let showTextDelay: TimeInterval = 10 // seconds
+	
+	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 
@@ -33,6 +36,10 @@ struct AppStatusButton: View {
 	let systemImagesUsed = [
 		"bolt.fill", "bolt.slash", "bolt.slash.fill", "hourglass", "icloud", "exclamationmark.triangle"
 	]
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	var body: some View {
@@ -48,25 +55,17 @@ struct AppStatusButton: View {
 					.read(headerButtonHeightReader)
 			} // </ForEach>
 			
-			button
+			button()
 		}
-	}
-	
-	@ViewBuilder
-	var button: some View {
-		
-		Button {
-			showAppStatusPopover()
-		} label: {
-			buttonContent
+		.onAppear {
+			onAppear()
 		}
-		.buttonStyle(PlainButtonStyle())
-		.background(Color.buttonFill)
-		.cornerRadius(30)
-		.overlay(
-			RoundedRectangle(cornerRadius: 30) // Test this with larger dynamicFontSize
-				.stroke(Color.borderColor, lineWidth: 1)
-		)
+		.onChange(of: connectionsMonitor.disconnectedAt) { _ in
+			updateTimer()
+		}
+		.onChange(of: connectionsMonitor.connectingAt) { _ in
+			updateTimer()
+		}
 		.onReceive(syncTxManager.statePublisher) {
 			syncTxManagerStateChanged($0)
 		}
@@ -76,14 +75,33 @@ struct AppStatusButton: View {
 	}
 	
 	@ViewBuilder
-	var buttonContent: some View {
+	func button() -> some View {
 		
-		let connectionStatus = connectionsManager.connections.global
+		Button {
+			showAppStatusPopover()
+		} label: {
+			buttonContent()
+		}
+		.buttonStyle(PlainButtonStyle())
+		.background(Color.buttonFill)
+		.cornerRadius(30)
+		.overlay(
+			RoundedRectangle(cornerRadius: 30) // Test this with larger dynamicFontSize
+				.stroke(Color.borderColor, lineWidth: 1)
+		)
+	}
+	
+	@ViewBuilder
+	func buttonContent() -> some View {
+		
+		let connectionStatus = connectionsMonitor.connections.global
 		if connectionStatus is Lightning_kmpConnection.CLOSED {
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
-				Text(NSLocalizedString("Offline", comment: "Connection state"))
-					.padding(.leading, 10)
-					.padding(.trailing, -5)
+				if showText() {
+					Text(NSLocalizedString("Offline", comment: "Connection state"))
+						.padding(.leading, 10)
+						.padding(.trailing, -5)
+				}
 				Image(systemName: "bolt.slash.fill")
 					.imageScale(.large)
 					.frame(minHeight: headerButtonHeight)
@@ -93,9 +111,11 @@ struct AppStatusButton: View {
 		}
 		else if connectionStatus is Lightning_kmpConnection.ESTABLISHING {
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
-				Text(NSLocalizedString("Connecting...", comment: "Connection state"))
-					.padding(.leading, 10)
-					.padding(.trailing, -5)
+				if showText() {
+					Text(NSLocalizedString("Connecting…", comment: "Connection state"))
+						.padding(.leading, 10)
+						.padding(.trailing, -5)
+				}
 				Image(systemName: "bolt.slash")
 					.imageScale(.large)
 					.frame(minHeight: headerButtonHeight)
@@ -145,6 +165,10 @@ struct AppStatusButton: View {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
 	func buttonizeSyncStatus() -> (Bool, Bool, Bool) {
 		
 		var isSyncing = false
@@ -175,23 +199,82 @@ struct AppStatusButton: View {
 		return (isSyncing, isWaiting, isError)
 	}
 	
-	func syncTxManagerStateChanged(_ newState: SyncTxManager_State) -> Void {
+	func showText() -> Bool {
+		
+		if let diff = showTextDelayDiff() {
+			return diff <= 0.0
+		} else {
+			return false
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		updateTimer()
+	}
+	
+	func syncTxManagerStateChanged(_ newState: SyncTxManager_State) {
 		log.trace("syncTxManagerStateChanged()")
 		
 		syncState = newState
 	}
 	
-	func syncTxManagerPendingSettingsChanged(_ newPendingSettings: SyncTxManager_PendingSettings?) -> Void {
+	func syncTxManagerPendingSettingsChanged(_ newPendingSettings: SyncTxManager_PendingSettings?) {
 		log.trace("syncTxManagerPendingSettingsChanged()")
 		
 		pendingSettings = newPendingSettings
 	}
 	
-	func showAppStatusPopover() -> Void {
+	// --------------------------------------------------
+	// MARK: User Actions
+	// --------------------------------------------------
+	
+	func showAppStatusPopover() {
 		log.trace("showAppStatusPopover()")
 		
 		popoverState.display(dismissable: true) {
 			AppStatusPopover()
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Timer
+	// --------------------------------------------------
+	
+	func updateTimer() {
+		log.trace("updateTimer()")
+		
+		if timer != nil {
+			timer?.invalidate()
+			timer = nil
+		}
+		
+		if let diff = showTextDelayDiff(), diff > 0 {
+			log.trace("updateTimer: seconds=\(diff)")
+			
+			timer = Timer(timeInterval: diff, repeats: false, block: { _ in
+				timer = nil
+			})
+		}
+	}
+	
+	func showTextDelayDiff() -> TimeInterval? {
+		
+		if let connectingAt = connectionsMonitor.connectingAt {
+			// connectingAt => Date/time at which we started a connection attempt
+			return connectingAt.addingTimeInterval(showTextDelay).timeIntervalSinceNow
+			
+		} else if let disconnectedAt = connectionsMonitor.disconnectedAt {
+			// disconnectedAt => Date/time at which we first disconnected
+			return disconnectedAt.addingTimeInterval(showTextDelay).timeIntervalSinceNow
+			
+		} else {
+			return nil
 		}
 	}
 }

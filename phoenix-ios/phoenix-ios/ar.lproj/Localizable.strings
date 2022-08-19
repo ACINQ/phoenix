@@ -147,7 +147,7 @@
 /* Connection status */
 "Connecting to:" = "الاتصال بـ:";
 /* Connection state */
-"Connecting..." = "توصيل...";
+"Connecting…" = "توصيل…";
 /* Error title */
 "Connection failure" = "فشل الاتصال";
 "Copied QR code image to pasteboard!" = "تم نسخ صورة رمز QR إلى الحافظة!";
