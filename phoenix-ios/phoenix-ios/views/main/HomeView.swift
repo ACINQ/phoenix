@@ -115,7 +115,7 @@ struct HomeView : MVIView {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 
-			totalBalance()
+			balance()
 				.padding(.bottom, 25)
 			notices()
 			paymentsList()
@@ -136,119 +136,49 @@ struct HomeView : MVIView {
 	}
 	
 	@ViewBuilder
-	func totalBalance() -> some View {
+	func balance() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-		
-			HStack(alignment: VerticalAlignment.firstTextBaseline) {
-				
-				if currencyPrefs.hideAmountsOnHomeScreen {
-					let amount = Utils.hiddenAmount(currencyPrefs)
-					
-					Text(amount.digits)
-						.font(.largeTitle)
-					
-				} else {
-					let amount = Utils.format( currencyPrefs,
-					                     msat: mvi.model.balance.msat,
-					                   policy: .showMsatsIfZeroSats)
-					
-					if amount.hasSubFractionDigits {
-						
-						// We're showing sub-fractional values.
-						// For example, we're showing millisatoshis.
-						//
-						// It's helpful to downplay the sub-fractional part visually.
-						
-						let hasStdFractionDigits = amount.hasStdFractionDigits
-						
-						HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-							Text(verbatim: amount.integerDigits)
-								.font(.largeTitle)
-							Text(verbatim: amount.decimalSeparator)
-								.font(hasStdFractionDigits ? .largeTitle : .title)
-								.foregroundColor(hasStdFractionDigits ? .primary : .secondary)
-							if hasStdFractionDigits {
-								Text(verbatim: amount.stdFractionDigits)
-									.font(.largeTitle)
-							}
-							Text(verbatim: amount.subFractionDigits)
-								.font(.title)
-								.foregroundColor(.secondary)
-						}
-						.environment(\.layoutDirection, .leftToRight) // issue #237
-					
-					} else {
-						Text(amount.digits)
-							.font(.largeTitle)
-					}
-					
-					Text(amount.type)
-						.font(.title2)
-						.foregroundColor(Color.appAccent)
-						.padding(.bottom, 4)
-				}
-			} // </HStack>
-			.lineLimit(1)            // SwiftUI truncation bugs
-			.minimumScaleFactor(0.5) // SwiftUI truncation bugs
-			.onTapGesture { toggleCurrencyType() }
+			
+			totalBalance()
 			
 			if let incoming = incomingAmount() {
-				let incomingAmountStr = currencyPrefs.hideAmountsOnHomeScreen ? incoming.digits : incoming.string
-				
-				HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				
-					if #available(iOS 15.0, *) {
+			
+				if #available(iOS 15.0, *) {
 					
-						Image(systemName: "link") //
-							.padding(.trailing, 2)
-							.onTapGesture { showBlockchainExplorerOptions = true }
-						
-						Text("+\(incomingAmountStr) incoming".lowercased())
-							.onTapGesture { showBlockchainExplorerOptions = true }
-							.confirmationDialog("Blockchain Explorer",
-								isPresented: $showBlockchainExplorerOptions,
-								titleVisibility: .automatic
-							) {
-								Button("Mempool.space") {
-									exploreIncomingSwap(website: BlockchainExplorer.WebsiteMempoolSpace())
-								}
-								Button("Blockstream.info") {
-									exploreIncomingSwap(website: BlockchainExplorer.WebsiteBlockstreamInfo())
-								}
-								
-								let addrCount = lastIncomingSwaps.count
-								if addrCount >= 2 {
-									Button("Copy bitcoin addresses (\(addrCount)") {
-										copyIncomingSwap()
-									}
-								} else {
-									Button("Copy bitcoin address") {
-										copyIncomingSwap()
-									}
-								}
-								
+					incomingBalance(incoming)
+						.onTapGesture { showBlockchainExplorerOptions = true }
+						.confirmationDialog("Blockchain Explorer",
+							isPresented: $showBlockchainExplorerOptions,
+							titleVisibility: .automatic
+						) {
+							Button("Mempool.space") {
+								exploreIncomingSwap(website: BlockchainExplorer.WebsiteMempoolSpace())
 							}
-						
-					} else { // same functionality as before
-						
-						Image(systemName: "link")
-							.padding(.trailing, 2)
-						
-						Text("+\(incomingAmountStr) incoming".lowercased())
-							.onTapGesture { toggleCurrencyType() }
-					}
-				}
-				.font(.callout)
-				.foregroundColor(.secondary)
-				.padding(.top, 7)
-				.padding(.bottom, 2)
-				.scaleEffect(incomingSwapScaleFactor, anchor: .top)
-				.onAnimationCompleted(for: incomingSwapScaleFactor) {
-					incomingSwapAnimationCompleted()
+							Button("Blockstream.info") {
+								exploreIncomingSwap(website: BlockchainExplorer.WebsiteBlockstreamInfo())
+							}
+							
+							let addrCount = lastIncomingSwaps.count
+							if addrCount >= 2 {
+								Button("Copy bitcoin addresses (\(addrCount)") {
+									copyIncomingSwap()
+								}
+							} else {
+								Button("Copy bitcoin address") {
+									copyIncomingSwap()
+								}
+							}
+						} // </confirmationDialog>
+					
+				} else /* iOS 14 */ { // same functionality as before
+					
+					incomingBalance(incoming)
+						.onTapGesture { toggleCurrencyType() }
 				}
 			}
-		}
+			
+		} // </VStack>
 		.padding([.top, .leading, .trailing])
 		.padding(.bottom, 30)
 		.background(
@@ -259,6 +189,103 @@ struct HomeView : MVIView {
 					.foregroundColor(Color.appAccent)
 			}
 		)
+	}
+	
+	@ViewBuilder
+	func totalBalance() -> some View {
+		
+		ZStack(alignment: Alignment.center) {
+				
+			HStack(alignment: VerticalAlignment.firstTextBaseline) {
+				
+				let amount = Utils.format( currencyPrefs,
+				                     msat: mvi.model.balance.msat,
+				                   policy: .showMsatsIfZeroSats)
+				
+				if amount.hasSubFractionDigits {
+						
+					// We're showing sub-fractional values.
+					// For example, we're showing millisatoshis.
+					//
+					// It's helpful to downplay the sub-fractional part visually.
+					
+					let hasStdFractionDigits = amount.hasStdFractionDigits
+					
+					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+						Text(verbatim: amount.integerDigits)
+							.font(.largeTitle)
+						Text(verbatim: amount.decimalSeparator)
+							.font(hasStdFractionDigits ? .largeTitle : .title)
+							.foregroundColor(hasStdFractionDigits ? .primary : .secondary)
+						if hasStdFractionDigits {
+							Text(verbatim: amount.stdFractionDigits)
+								.font(.largeTitle)
+						}
+						Text(verbatim: amount.subFractionDigits)
+							.font(.title)
+							.foregroundColor(.secondary)
+					}
+					.environment(\.layoutDirection, .leftToRight) // issue #237
+				
+				} else {
+					Text(amount.digits)
+						.font(.largeTitle)
+				}
+				
+				Text(amount.type)
+					.font(.title2)
+					.foregroundColor(Color.appAccent)
+					.padding(.bottom, 4)
+				
+			} // </HStack>
+			.lineLimit(1)            // SwiftUI truncation bugs
+			.minimumScaleFactor(0.5) // SwiftUI truncation bugs
+			.onTapGesture { toggleCurrencyType() }
+			.if(currencyPrefs.hideAmountsOnHomeScreen) { view in
+				view.opacity(0.0)
+			}
+			
+			if currencyPrefs.hideAmountsOnHomeScreen {
+				
+				Group {
+					Text(Image(systemName: "circle.fill")) + Text("\u{202f}") +
+					Text(Image(systemName: "circle.fill")) + Text("\u{202f}") +
+					Text(Image(systemName: "circle.fill"))
+				}
+				.font(.body)
+				.if(colorScheme == .dark) { view in
+					view.foregroundColor(Color(UIColor.systemGray2))
+				}
+				.lineLimit(1)            // SwiftUI truncation bugs
+				.minimumScaleFactor(0.5) // SwiftUI truncation bugs
+				.onTapGesture { toggleCurrencyType() }
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func incomingBalance(_ incoming: FormattedAmount) -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+		
+			Image(systemName: "link")
+				.padding(.trailing, 2)
+			
+			if currencyPrefs.hideAmountsOnHomeScreen {
+				Text("+\(incoming.digits) incoming".lowercased()) // digits => "***"
+				
+			} else {
+				Text("+\(incoming.string) incoming".lowercased())
+			}
+		}
+		.font(.callout)
+		.foregroundColor(.secondary)
+		.padding(.top, 7)
+		.padding(.bottom, 2)
+		.scaleEffect(incomingSwapScaleFactor, anchor: .top)
+		.onAnimationCompleted(for: incomingSwapScaleFactor) {
+			incomingSwapAnimationCompleted()
+		}
 	}
 	
 	@ViewBuilder

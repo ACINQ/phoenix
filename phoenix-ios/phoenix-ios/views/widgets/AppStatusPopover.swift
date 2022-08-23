@@ -16,7 +16,7 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct AppStatusPopover: View {
 
-	@StateObject var monitor = ObservableConnectionsManager()
+	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
 	@State var syncState: SyncTxManager_State = .initializing
 	@State var pendingSettings: SyncTxManager_PendingSettings? = nil
@@ -78,7 +78,7 @@ struct AppStatusPopover: View {
 			
 			Group {
 				
-				let globalStatus = monitor.connections.global
+				let globalStatus = connectionsMonitor.connections.global
 				if globalStatus is Lightning_kmpConnection.CLOSED {
 					
 					Label {
@@ -93,7 +93,7 @@ struct AppStatusPopover: View {
 				} else if globalStatus is Lightning_kmpConnection.ESTABLISHING {
 					
 					Label {
-						Text("Connecting...")
+						Text("Connecting…")
 					} icon: {
 						Image(systemName: "bolt.slash")
 							.imageScale(.medium)
@@ -119,11 +119,11 @@ struct AppStatusPopover: View {
 			
 			ConnectionCell(
 				label: NSLocalizedString("Internet", comment: "AppStatusPopover: label"),
-				connection: monitor.connections.internet
+				connection: connectionsMonitor.connections.internet
 			)
 			.padding(.bottom, 8)
 			
-			if let tor = monitor.connections.tor {
+			if let tor = connectionsMonitor.connections.tor {
 				ConnectionCell(
 					label: NSLocalizedString("Tor", comment: "AppStatusPopover: label"),
 					connection: tor
@@ -133,13 +133,13 @@ struct AppStatusPopover: View {
 			
 			ConnectionCell(
 				label: NSLocalizedString("Lightning peer", comment: "AppStatusPopover: label"),
-				connection: monitor.connections.peer
+				connection: connectionsMonitor.connections.peer
 			)
 			.padding(.bottom, 8)
 			
 			ConnectionCell(
 				label: NSLocalizedString("Electrum server", comment: "AppStatusPopover: label"),
-				connection: monitor.connections.electrum
+				connection: connectionsMonitor.connections.electrum
 			)
 		
 		} // </VStack>

@@ -209,7 +209,7 @@ extension Lightning_kmpConnection {
 	func localizedText() -> String {
 		switch self {
 		case is CLOSED       : return NSLocalizedString("Offline", comment: "Connection state")
-		case is ESTABLISHING : return NSLocalizedString("Connecting...", comment: "Connection state")
+		case is ESTABLISHING : return NSLocalizedString("Connecting…", comment: "Connection state")
 		case is ESTABLISHED  : return NSLocalizedString("Connected", comment: "Connection state")
 		default              : return NSLocalizedString("Unknown", comment: "Connection state")
 		}
@@ -246,6 +246,23 @@ extension ConnectionsManager {
 		}
 
 		return publisher
+	}
+}
+
+extension Connections {
+	
+	func oneOrMoreEstablishing() -> Bool {
+		
+		if self.internet is Lightning_kmpConnection.ESTABLISHING {
+			return true
+		}
+		if self.peer is Lightning_kmpConnection.ESTABLISHING {
+			return true
+		}
+		if self.electrum is Lightning_kmpConnection.ESTABLISHING {
+			return true
+		}
+		return false
 	}
 }
 

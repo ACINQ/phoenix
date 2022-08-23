@@ -61,7 +61,7 @@ struct ValidateView: View {
 	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
 	@State var chainContext: WalletContext.V0ChainContext? = nil
 	
-	@StateObject var connectionsManager = ObservableConnectionsManager()
+	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.popoverState) var popoverState: PopoverState
@@ -171,7 +171,7 @@ struct ValidateView: View {
 	@ViewBuilder
 	var content: some View {
 	
-		let isDisconnected = !(connectionsManager.connections.global is Lightning_kmpConnection.ESTABLISHED)
+		let isDisconnected = !(connectionsMonitor.connections.global is Lightning_kmpConnection.ESTABLISHED)
 		VStack {
 			
 			Spacer().frame(height: 20)
@@ -530,13 +530,13 @@ struct ValidateView: View {
 	
 	func disconnectedText() -> String {
 		
-		if !(connectionsManager.connections.internet is Lightning_kmpConnection.ESTABLISHED) {
+		if !(connectionsMonitor.connections.internet is Lightning_kmpConnection.ESTABLISHED) {
 			return NSLocalizedString("waiting for internet", comment: "button text")
 		}
-		if !(connectionsManager.connections.peer is Lightning_kmpConnection.ESTABLISHED) {
+		if !(connectionsMonitor.connections.peer is Lightning_kmpConnection.ESTABLISHED) {
 			return NSLocalizedString("connecting to peer", comment: "button text")
 		}
-		if !(connectionsManager.connections.electrum is Lightning_kmpConnection.ESTABLISHED) {
+		if !(connectionsMonitor.connections.electrum is Lightning_kmpConnection.ESTABLISHED) {
 			return NSLocalizedString("connecting to electrum", comment: "button text")
 		}
 		return ""
