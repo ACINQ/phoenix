@@ -91,9 +91,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			others: Prefs.shared.preferredFiatCurrencies
 		)
 		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
-
-		let startupParams = StartupParams(requestCheckLegacyChannels: false, isTorEnabled: true)
-		business.start(startupParams: startupParams)
+		
+		business.start(startupParams: StartupParams(
+			requestCheckLegacyChannels: false,
+			isTorEnabled: Prefs.shared.isTorEnabled
+		))
 	}
 	
 	// --------------------------------------------------
@@ -149,9 +151,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		}.store(in: &cancellables)
 		
 		// Tor configuration observer
-//		Prefs.shared.isTorEnabledPublisher.sink {(isTorEnabled: Bool) in
-//			self.business.updateTorUsage(isEnabled: isTorEnabled)
-//		}.store(in: &cancellables)
+		Prefs.shared.isTorEnabledPublisher.sink {(isTorEnabled: Bool) in
+			self.business.updateTorUsage(isEnabled: isTorEnabled)
+		}.store(in: &cancellables)
 		
 		// PreferredFiatCurrenies observers
 		Publishers.CombineLatest(
