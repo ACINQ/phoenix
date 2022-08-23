@@ -1113,6 +1113,7 @@ class SyncTxManager {
 			log.trace("uploadPayments(): handlePartialError()")
 			
 			var nextOpInfo = opInfo
+			var isAccountFailure = false
 			var recordIDsToFetch: [CKRecord.ID] = []
 			
 			if let map = ckerror.partialErrorsByItemID {
@@ -1140,15 +1141,25 @@ class SyncTxManager {
 						// If this is a standard your-changetag-was-out-of-date message from the server,
 						// then we just need to fetch the latest CKRecord metadata from the cloud,
 						// and then re-try our upload.
-						if let recordError = value as? CKError,
-							recordError.errorCode == CKError.serverRecordChanged.rawValue
-						{
-							recordIDsToFetch.append(recordID)
+						if let recordError = value as? CKError {
+							if recordError.errorCode == CKError.serverRecordChanged.rawValue {
+								recordIDsToFetch.append(recordID)
+							}
+							if #available(iOS 15.0, *) {
+								if recordError.errorCode == CKError.accountTemporarilyUnavailable.rawValue {
+									isAccountFailure = true
+								}
+							}
 						}
 					}
 				}
 			}
 			
+			if isAccountFailure {
+				log.debug("uploadPayments(): handlePartialError(): isAccountFailure")
+		
+				return finish(.failure(ckerror))
+			}
 			if recordIDsToFetch.count == 0 {
 				log.debug("uploadPayments(): handlePartialError(): No outdated records")
 				
@@ -1718,13 +1729,28 @@ class SyncTxManager {
 				
 				default: break
 			}
+			if #available(iOS 15.0, *) {
+				switch ckerror.errorCode {
+					case CKError.accountTemporarilyUnavailable.rawValue:
+						isNotAuthenticated = true
+					
+					default: break
+				}
+			}
 			
 			// Sometimes a `notAuthenticated` error is hidden in a partial error.
 			if let partialErrorsByZone = ckerror.partialErrorsByItemID {
 				
 				for (_, perZoneError) in partialErrorsByZone {
-					if (perZoneError as NSError).code == CKError.notAuthenticated.rawValue {
+					let errCode = (perZoneError as NSError).code
+					
+					if errCode == CKError.notAuthenticated.rawValue {
 						isNotAuthenticated = true
+					}
+					if #available(iOS 15.0, *) {
+						if errCode == CKError.accountTemporarilyUnavailable.rawValue {
+							isNotAuthenticated = true
+						}
 					}
 				}
 			}

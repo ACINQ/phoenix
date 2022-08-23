@@ -586,16 +586,31 @@ class SyncSeedManager: SyncManagerProtcol {
 				
 				case CKError.notAuthenticated.rawValue:
 					isNotAuthenticated = true
-				
+					
 				default: break
+			}
+			if #available(iOS 15.0, *) {
+				switch ckerror.errorCode {
+					case CKError.accountTemporarilyUnavailable.rawValue:
+						isNotAuthenticated = true
+					
+					default: break
+				}
 			}
 			
 			// Sometimes a `notAuthenticated` error is hidden in a partial error.
 			if let partialErrorsByZone = ckerror.partialErrorsByItemID {
 				
 				for (_, perZoneError) in partialErrorsByZone {
-					if (perZoneError as NSError).code == CKError.notAuthenticated.rawValue {
+					let errCode = (perZoneError as NSError).code
+					
+					if errCode == CKError.notAuthenticated.rawValue {
 						isNotAuthenticated = true
+					}
+					if #available(iOS 15.0, *) {
+						if errCode == CKError.accountTemporarilyUnavailable.rawValue {
+							isNotAuthenticated = true
+						}
 					}
 				}
 			}
