@@ -189,9 +189,12 @@ class AppConnectionsDaemon(
                 when {
                     controlFlow.networkIsAvailable && controlFlow.disconnectCount <= 0 -> {
                         if (torConnectionJob == null) {
-                            torConnectionJob = connectionLoop("Tor", tor.state.connectionState(this)) {
+                            torConnectionJob = connectionLoop(
+                                "Tor",
+                                tor.state.connectionState(this)
+                            ) {
                                 try {
-                                    tor.start(this)
+                                    tor.startInProperScope(this)
                                 } catch (t: Throwable) {
                                     logger.error(t) { "tor cannot be started: ${t.message}" }
                                 }
@@ -408,3 +411,6 @@ class AppConnectionsDaemon(
         }
     }
 }
+
+/** The start function must run on a different dispatcher depending on the platform. */
+expect suspend fun Tor.startInProperScope(scope: CoroutineScope)
