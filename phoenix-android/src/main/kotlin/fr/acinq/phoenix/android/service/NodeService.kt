@@ -206,6 +206,7 @@ class NodeService : Service() {
         log.info("starting up node...")
         val business = (applicationContext as? PhoenixApplication)?.business ?: throw RuntimeException("invalid context type, should be PhoenixApplication")
         val electrumServer = UserPrefs.getElectrumServer(applicationContext).first()
+        val isTorEnabled = UserPrefs.getIsAutoPayToOpenEnabled(applicationContext).first()
         val seed = business.prepWallet(EncryptedSeed.toMnemonics(decryptedPayload))
 
         business.loadWallet(seed)

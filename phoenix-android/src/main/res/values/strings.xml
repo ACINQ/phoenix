@@ -612,7 +612,8 @@
     <!-- //////////////// Tor setting //////////////// -->
 
     <string name="tor_settings_title">Tor Settings</string>
-    <string name="tor_settings_subtitle">You can improve your privacy by only using Tor when connecting to an Electrum server or to your Lightning peer. This will slightly slow down the application startup.</string>
+    <string name="tor_settings_subtitle">Tor hides your IP from the other nodes in the Lightning Network and from Electrum servers. This improves your privacy. Enabling this will slightly slow down the application startup.</string>
+    <string name="tor_settings_unknown">Checking preferences…</string>
     <string name="tor_settings_enabled">Tor is enabled</string>
     <string name="tor_settings_disabled">Tor is disabled</string>
     <string name="tor_settings_confirm_disable_title">Are you sure you want to disable Tor?</string>

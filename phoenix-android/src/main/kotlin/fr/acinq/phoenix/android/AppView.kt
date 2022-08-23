@@ -172,6 +172,9 @@ fun AppView(
                 composable(Screen.ElectrumServer.route) {
                     ElectrumView()
                 }
+                composable(Screen.TorConfig.route) {
+                    TorConfigView()
+                }
                 composable(Screen.Channels.route) {
                     ChannelsView()
                 }

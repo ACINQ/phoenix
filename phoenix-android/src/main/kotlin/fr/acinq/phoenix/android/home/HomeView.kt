@@ -48,6 +48,7 @@ import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.InternalData
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.legacy.utils.MigrationResult
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
@@ -271,9 +272,17 @@ private fun ConnectionDialog(connections: Connections?, onClose: () -> Unit) {
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 HSeparator()
-                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_electrum), connection = connections?.electrum)
+
+                val context = LocalContext.current
+                val isTorEnabled = UserPrefs.getIsTorEnabled(context).collectAsState(initial = null).value
+                if (isTorEnabled != null && isTorEnabled) {
+                    ConnectionDialogLine(label = stringResource(id = R.string.conndialog_tor), connection = connections.tor)
+                    HSeparator()
+                }
+
+                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_electrum), connection = connections.electrum)
                 HSeparator()
-                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_lightning), connection = connections?.peer)
+                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_lightning), connection = connections.peer)
                 HSeparator()
                 Spacer(Modifier.height(16.dp))
             }
