@@ -202,6 +202,26 @@ enum class FiatCurrency : CurrencyUnit {
 sealed class ElectrumConfig {
     data class Custom(val server: ServerAddress) : ElectrumConfig()
     object Random : ElectrumConfig()
+
+    override operator fun equals(other: Any?): Boolean {
+        if (other !is ElectrumConfig) {
+            return false
+        }
+        return when (this) {
+            is Custom -> {
+                when (other) {
+                    is Custom -> this == other // custom =?= custom
+                    is Random -> false         // custom != random
+                }
+            }
+            is Random -> {
+                when (other) {
+                    is Custom -> false // random != custom
+                    is Random -> true  // random == random
+                }
+            }
+        }
+    }
 }
 
 data class StartupParams(
