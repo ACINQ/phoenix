@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import PhoenixShared
 import Network
 import os.log
@@ -48,6 +49,8 @@ struct HomeView : MVIView {
 	
 	let paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
+	
+	@StateObject var syncState = DownloadMonitor()
 	
 	let lastCompletedPaymentPublisher = paymentsManager.lastCompletedPaymentPublisher()
 	let chainContextPublisher = phoenixBusiness.appConfigurationManager.chainContextPublisher()
@@ -411,6 +414,7 @@ struct HomeView : MVIView {
 				FooterCell(
 					totalPaymentCount: totalPaymentCount,
 					recentPaymentSeconds: recentPaymentSeconds,
+					isDownloadingRecentTxs: isDownloadingRecentTxs(),
 					didAppearCallback: footerCellDidAppear
 				)
 			}
@@ -433,6 +437,35 @@ struct HomeView : MVIView {
 				: Utils.format(currencyPrefs, msat: msatTotal)
 		} else {
 			return nil
+		}
+	}
+	
+	func isDownloadingRecentTxs() -> Bool {
+		
+		guard syncState.isDownloading else {
+			return false
+		}
+		
+		if let oldest = syncState.oldestCompletedDownload {
+			log.debug("oldest = \(oldest.description)")
+			
+			// We've downloaded one or more batches from the cloud.
+			// Let's check to see if we expect to download any more "recent" payments.
+			let cutoff = Date().addingTimeInterval(Double(recentPaymentSeconds * -1))
+			log.debug("cutoff = \(cutoff.description)")
+			
+			if oldest < cutoff {
+				// Already downloaded all the tx's that could be considered "recent"
+				return false
+			} else {
+				// May have more "recent" tx's to download
+				return true
+			}
+			
+		} else {
+			// We're downloading the first batch from the cloud
+			log.debug("oldest = nil")
+			return true
 		}
 	}
 	
@@ -801,6 +834,7 @@ fileprivate struct FooterCell: View {
 	
 	let totalPaymentCount: Int?
 	let recentPaymentSeconds: Int
+	let isDownloadingRecentTxs: Bool
 	let didAppearCallback: () -> Void
 	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -808,7 +842,9 @@ fileprivate struct FooterCell: View {
 	@ViewBuilder
 	var body: some View {
 		Group {
-			if let totalPaymentCount = totalPaymentCount {
+			if isDownloadingRecentTxs {
+				body_downloading()
+			} else if let totalPaymentCount = totalPaymentCount {
 				body_ready(totalPaymentCount)
 			} else {
 				body_pending()
@@ -817,6 +853,20 @@ fileprivate struct FooterCell: View {
 		.onAppear {
 			onAppear()
 		}
+	}
+	
+	@ViewBuilder
+	func body_downloading() -> some View {
+		
+		Label {
+			Text("Downloading payments from cloud")
+		} icon: {
+			Image(systemName: "icloud.and.arrow.down")
+				.imageScale(.large)
+		}
+		.font(.callout)
+		.foregroundColor(.secondary)
+		.padding(.vertical, 10)
 	}
 	
 	@ViewBuilder
@@ -845,18 +895,61 @@ fileprivate struct FooterCell: View {
 	@ViewBuilder
 	func body_pending() -> some View {
 		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			
-			Text("fetching more rows...")
-				.font(.footnote)
-				.foregroundColor(.secondary)
-		}
-		.padding(.vertical, 10)
+		Text("fetching more rows...")
+			.font(.footnote)
+			.foregroundColor(.secondary)
+			.padding(.vertical, 10)
 	}
 	
 	func onAppear() {
 		log.trace("[FooterCell] onAppear()")
 		
 		didAppearCallback()
+	}
+}
+
+// --------------------------------------------------
+// MARK: -
+// --------------------------------------------------
+
+class DownloadMonitor: ObservableObject {
+	
+	@Published var isDownloading: Bool = false
+	@Published var oldestCompletedDownload: Date? = nil
+	
+	private var cancellables = Set<AnyCancellable>()
+	
+	init() {
+		let appDelegate = AppDelegate.get()
+		let syncStatePublisher = appDelegate.syncManager!.syncTxManager.statePublisher
+		
+		syncStatePublisher.sink {[weak self](state: SyncTxManager_State) in
+			self?.update(state)
+		}
+		.store(in: &cancellables)
+	}
+	
+	private func update(_ state: SyncTxManager_State) {
+		log.trace("[DownloadMonitor] update()")
+		
+		if case .downloading(let details) = state {
+			log.trace("[DownloadMonitor] isDownloading = true")
+			isDownloading = true
+			
+			subscribe(details)
+		} else {
+			log.trace("[DownloadMonitor] isDownloading = false")
+			isDownloading = false
+		}
+	}
+	
+	private func subscribe(_ details: SyncTxManager_State_Downloading) {
+		log.trace("[DownloadMonitor] subscribe()")
+		
+		details.$oldestCompletedDownload.sink {[weak self](date: Date?) in
+			log.trace("[DownloadMonitor] oldestCompletedDownload = \(date?.description ?? "nil")")
+			self?.oldestCompletedDownload = date
+		}
+		.store(in: &cancellables)
 	}
 }

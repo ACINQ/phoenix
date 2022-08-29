@@ -348,8 +348,7 @@ actor SyncTxManager_Actor {
 							default:
 								return (true, nil)
 						}
-					case .downloading(let progress):
-						progress.cancel()
+					case .downloading(_):
 						return (true, nil)
 					case .uploading(let progress):
 						progress.cancel()
@@ -386,11 +385,9 @@ actor SyncTxManager_Actor {
 			if needsCreateRecordZone {
 				state = .updatingCloud_creatingRecordZone()
 			} else if needsDownloadExisting {
-				state = .downloading(details: SyncTxManager_State_Progress(
-					totalCount: 0
-				))
+				state = .downloading(details: SyncTxManager_State_Downloading())
 			} else if paymentsQueueCount > 0 {
-				state = .uploading(details: SyncTxManager_State_Progress(
+				state = .uploading(details: SyncTxManager_State_Uploading(
 					totalCount: paymentsQueueCount
 				))
 			} else {

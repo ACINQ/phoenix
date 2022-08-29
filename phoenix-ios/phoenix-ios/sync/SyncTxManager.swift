@@ -514,7 +514,7 @@ class SyncTxManager {
 		step1()
 	}
 	
-	private func downloadPayments(_ downloadProgress: SyncTxManager_State_Progress) {
+	private func downloadPayments(_ downloadProgress: SyncTxManager_State_Downloading) {
 		log.trace("downloadPayments()")
 		
 		let finish = { (result: Result<Void, Error>) in
@@ -560,6 +560,8 @@ class SyncTxManager {
 				} else {
 					
 					let oldestCreationDate = self.millisToDate(millis)
+					downloadProgress.setOldestCompletedDownload(oldestCreationDate)
+					
 					DispatchQueue.global(qos: .utility).async {
 						fetchTotalCount(oldestCreationDate)
 					}
@@ -782,6 +784,8 @@ class SyncTxManager {
 			// Kotlin will crash if we try to use multiple threads (like a real app)
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
+			var oldest: Date? = nil
+			
 			var paymentRows: [Lightning_kmpWalletPayment] = []
 			var paymentMetadataRows: [WalletPaymentId: WalletPaymentMetadataRow] = [:]
 			var metadataMap: [WalletPaymentId: CloudKitDb.MetadataRow] = [:]
@@ -793,7 +797,9 @@ class SyncTxManager {
 				let paymentId = item.payment.walletPaymentId()
 				paymentMetadataRows[paymentId] = item.metadata
 				
-				let creation = self.dateToMillis(item.record.creationDate ?? Date())
+				let creationDate = item.record.creationDate ?? Date()
+				
+				let creation = self.dateToMillis(creationDate)
 				let metadata = self.metadataForRecord(item.record)
 				
 				metadataMap[paymentId] = CloudKitDb.MetadataRow(
@@ -801,6 +807,14 @@ class SyncTxManager {
 					recordCreation: creation,
 					recordBlob: metadata.toKotlinByteArray()
 				)
+				
+				if let prv = oldest {
+					if creationDate < prv {
+						oldest = creationDate
+					}
+				} else {
+					oldest = creationDate
+				}
 			}
 			
 			self.cloudKitDb.updateRows(
@@ -815,7 +829,7 @@ class SyncTxManager {
 					log.error("downloadPayments(): updateDatabase(): error: \(String(describing: error))")
 					finish(.failure(error))
 				} else {
-					downloadProgress.completeInFlight(completed: items.count)
+					downloadProgress.finishBatch(completed: items.count, oldest: oldest)
 					
 					if let cursor = cursor {
 						log.debug("downloadPayments(): updateDatabase(): moreInCloud = true")
@@ -859,7 +873,7 @@ class SyncTxManager {
 	/// - remove the uploaded items from the queue
 	/// - repeat as needed
 	///
-	private func uploadPayments(_ uploadProgress: SyncTxManager_State_Progress) {
+	private func uploadPayments(_ uploadProgress: SyncTxManager_State_Uploading) {
 		log.trace("uploadPayments()")
 		
 		let finish = { (result: Result<Void, Error>) in
