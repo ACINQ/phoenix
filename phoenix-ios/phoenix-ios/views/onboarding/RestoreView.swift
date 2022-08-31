@@ -62,15 +62,16 @@ struct RestoreView: View {
 	func iCloudStatus() -> some View {
 		
 		if fetcher.isFetching {
-			
+
 			HStack(alignment: VerticalAlignment.center, spacing: 4) {
 				ProgressView()
 					.progressViewStyle(CircularProgressViewStyle(tint: Color.appAccent))
 				Text("Checking iCloud for wallet backups…")
 			}
-			
+			.accessibilityElement(children: .combine)
+
 		} else if let error = fetcher.error {
-			
+
 			Label {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
 					Text("Error fetching wallet backups from iCloud")
@@ -81,9 +82,9 @@ struct RestoreView: View {
 			} icon: {
 				Image(systemName: "exclamationmark.icloud")
 			}
-			
+
 		} else {
-			
+
 			HStack(alignment: VerticalAlignment.center, spacing: 4) {
 				Image(systemName: "checkmark.icloud")
 				if fetcher.results.count == 1 {
@@ -92,6 +93,7 @@ struct RestoreView: View {
 					Text("Found \(fetcher.results.count) wallets in iCloud")
 				}
 			}
+			.accessibilityElement(children: .combine)
 		}
 	}
 	

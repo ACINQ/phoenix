@@ -199,11 +199,11 @@ struct HomeView : MVIView {
 		
 		ZStack(alignment: Alignment.center) {
 				
+			let amount = Utils.format( currencyPrefs,
+			                     msat: mvi.model.balance.msat,
+			                   policy: .showMsatsIfZeroSats)
+			
 			HStack(alignment: VerticalAlignment.firstTextBaseline) {
-				
-				let amount = Utils.format( currencyPrefs,
-				                     msat: mvi.model.balance.msat,
-				                   policy: .showMsatsIfZeroSats)
 				
 				if amount.hasSubFractionDigits {
 						
@@ -244,8 +244,14 @@ struct HomeView : MVIView {
 			.lineLimit(1)            // SwiftUI truncation bugs
 			.minimumScaleFactor(0.5) // SwiftUI truncation bugs
 			.onTapGesture { toggleCurrencyType() }
+			.accessibilityElement(children: .combine)
+			.accessibilityLabel("Total balance is \(amount.string)")
+			.accessibilityAddTraits(.isButton)
+			.accessibilitySortPriority(49)
 			.if(currencyPrefs.hideAmountsOnHomeScreen) { view in
-				view.opacity(0.0)
+				view
+					.opacity(0.0)
+					.accessibility(hidden: true)
 			}
 			
 			if currencyPrefs.hideAmountsOnHomeScreen {
@@ -262,6 +268,9 @@ struct HomeView : MVIView {
 				.lineLimit(1)            // SwiftUI truncation bugs
 				.minimumScaleFactor(0.5) // SwiftUI truncation bugs
 				.onTapGesture { toggleCurrencyType() }
+				.accessibilityLabel("Hidden balance")
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(49)
 			}
 		}
 	}
@@ -276,6 +285,7 @@ struct HomeView : MVIView {
 			
 			if currencyPrefs.hideAmountsOnHomeScreen {
 				Text("+\(incoming.digits) incoming".lowercased()) // digits => "***"
+					.accessibilityLabel("plus hidden amount incoming")
 				
 			} else {
 				Text("+\(incoming.string) incoming".lowercased())
@@ -289,6 +299,9 @@ struct HomeView : MVIView {
 		.onAnimationCompleted(for: incomingSwapScaleFactor) {
 			incomingSwapAnimationCompleted()
 		}
+		.accessibilityElement(children: .combine)
+		.accessibilityHint("pending on-chain confirmation")
+		.accessibilitySortPriority(48)
 	}
 	
 	@ViewBuilder
@@ -888,6 +901,7 @@ fileprivate struct FooterCell: View {
 					.font(.footnote)
 					.padding(.top, 4)
 			}
+			.accessibilityHidden(true) // duplicate button
 		}
 		.padding(.vertical, 10)
 	}

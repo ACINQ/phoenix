@@ -146,6 +146,7 @@ struct ToolsMenu: View {
 		} label: {
 			toolsImage
 		}
+		.accessibilityLabel("Tools")
 	}
 	
 	func currencyConverterTapped() {

@@ -38,6 +38,7 @@ struct InitializationView: MVIView {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+					.accessibilityHidden(true)
 			}
 			
 			// Position the settings icon in top-right corner.
@@ -49,6 +50,8 @@ struct InitializationView: MVIView {
 							.renderingMode(.template)
 							.imageScale(.large)
 					}
+					.accessibilityLabel("Settings")
+					.accessibilitySortPriority(-1)
 					Spacer()
 				}
 				.padding(.all, 20)
@@ -59,14 +62,17 @@ struct InitializationView: MVIView {
 			
 				Spacer()
 				
-				Image(logoImageName)
-					.resizable()
-					.frame(width: 96, height: 96)
+				VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+					Image(logoImageName)
+						.resizable()
+						.frame(width: 96, height: 96)
 
-				Text("Phoenix")
-					.font(Font.title2)
-					.padding(.top, -10)
-					.padding(.bottom, 80)
+					Text("Phoenix")
+						.font(Font.title2)
+						.padding(.top, -10)
+						.padding(.bottom, 80)
+				}
+				.accessibilityHidden(true)
 				
 				Button {
 					createMnemonics()

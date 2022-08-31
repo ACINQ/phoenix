@@ -54,6 +54,7 @@ struct AppStatusButton: View {
 					.foregroundColor(.clear)
 					.padding(.all, 7)
 					.read(headerButtonHeightReader)
+					.accessibilityHidden(true)
 			} // </ForEach>
 			
 			button()
@@ -90,6 +91,7 @@ struct AppStatusButton: View {
 			RoundedRectangle(cornerRadius: 30) // Test this with larger dynamicFontSize
 				.stroke(Color.borderColor, lineWidth: 1)
 		)
+		.accessibilityLabel("App status")
 	}
 	
 	@ViewBuilder

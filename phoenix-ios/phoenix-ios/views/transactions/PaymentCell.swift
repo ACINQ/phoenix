@@ -107,6 +107,7 @@ struct PaymentCell : View {
 					// Do not display any indication as to whether payment in incoming or outgoing
 					Text(verbatim: amount.digits)
 						.foregroundColor(Color(UIColor.systemGray2))
+						.accessibilityLabel("hidden amount")
 					
 				} else {
 					

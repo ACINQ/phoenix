@@ -33,6 +33,7 @@ struct IntroView: View {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+					.accessibilityHidden(true)
 			}
 			
 			TabView(selection: $selectedPage) {

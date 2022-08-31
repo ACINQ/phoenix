@@ -96,6 +96,7 @@ struct MainView_Small: View {
 			) {
 				EmptyView()
 			}
+			.accessibilityHidden(true)
 			
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
@@ -104,6 +105,7 @@ struct MainView_Small: View {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+					.accessibilityHidden(true)
 			}
 
 			content()
@@ -188,6 +190,7 @@ struct MainView_Small: View {
 						.stroke(Color.borderColor, lineWidth: 1)
 				)
 		}
+		.accessibilityLabel("Settings")
 	}
 	
 	@ViewBuilder
@@ -212,6 +215,7 @@ struct MainView_Small: View {
 						.stroke(Color.borderColor, lineWidth: 1)
 				)
 		}
+		.accessibilityLabel("Payment history")
 	}
 	
 	@ViewBuilder
@@ -279,6 +283,8 @@ struct MainView_Small: View {
 			.frame(minWidth: footerButtonWidth, alignment: Alignment.center)
 			.read(footerButtonWidthReader)
 			.read(footerButtonHeightReader)
+			.accessibilityLabel("Receive payment")
+			.accessibilitySortPriority(38)
 
 			Spacer(minLength: 2)
 			if let footerButtonHeight = footerButtonHeight {
@@ -308,6 +314,8 @@ struct MainView_Small: View {
 			.frame(minWidth: footerButtonWidth, alignment: Alignment.center)
 			.read(footerButtonWidthReader)
 			.read(footerButtonHeightReader)
+			.accessibilityLabel("Send payment")
+			.accessibilitySortPriority(39)
 			
 			Spacer(minLength: 2)
 		
@@ -350,6 +358,8 @@ struct MainView_Small: View {
 				} // </Label>
 			} // </Button>
 			.read(footerButtonHeightReader)
+			.accessibilityLabel("Receive payment")
+			.accessibilitySortPriority(38)
 
 			Spacer(minLength: 0)
 			if let footerButtonHeight = footerButtonHeight {
@@ -377,6 +387,8 @@ struct MainView_Small: View {
 				} // </Label>
 			} // </Button>
 			.read(footerButtonHeightReader)
+			.accessibilityLabel("Send payment")
+			.accessibilitySortPriority(39)
 		
 			Spacer(minLength: 0)
 			
@@ -406,6 +418,8 @@ struct MainView_Small: View {
 				} // </Button>
 				.frame(minWidth: footerButtonWidth, alignment: Alignment.leading)
 				.read(footerButtonWidthReader)
+				.accessibilityLabel("Receive payment")
+				.accessibilitySortPriority(38)
 				
 				Divider().frame(height: 1).background(Color.borderColor)
 				
@@ -425,6 +439,8 @@ struct MainView_Small: View {
 				} // </Button>
 				.frame(minWidth: footerButtonWidth, alignment: Alignment.leading)
 				.read(footerButtonWidthReader)
+				.accessibilityLabel("Send payment")
+				.accessibilitySortPriority(39)
 				
 			} // </VStack>
 			Spacer()
