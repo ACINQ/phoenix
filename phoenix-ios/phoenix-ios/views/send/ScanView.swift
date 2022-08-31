@@ -186,8 +186,7 @@ struct ScanView: View {
 				.transition(.move(edge: .bottom).combined(with: .opacity))
 			}
 			
-			if #available(iOS 15.0, *) {
-			} else /* iOS 14 */ {
+			if #unavailable(iOS 15.0) {
 				
 				// The bottom safe area is being ignored, so we need to add it back.
 				// This only seems to occur on iOS 14.

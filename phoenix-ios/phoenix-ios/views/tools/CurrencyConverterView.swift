@@ -348,7 +348,7 @@ struct CurrencyConverterView: View {
 	private func onAppear() {
 		log.trace("onAppear()")
 		
-		if #available(iOS 15.0, *) { } else {
+		if #unavailable(iOS 15.0) {
 			// iOS 14 workaround
 			log.debug("Setting UITableView.background = .systemBackground")
 			UITableView.appearance().backgroundColor = .systemBackground
@@ -360,7 +360,7 @@ struct CurrencyConverterView: View {
 			
 			UIScrollView.appearance().keyboardDismissMode = .interactive
 			
-			if #available(iOS 15.0, *) { } else {
+			if #unavailable(iOS 15.0) {
 				// iOS 14 bug workaround
 				currencies = Prefs.shared.currencyConverterList
 			}
@@ -398,7 +398,7 @@ struct CurrencyConverterView: View {
 	private func onDisappear() {
 		log.trace("onDisappear()")
 		
-		if #available(iOS 15.0, *) { } else {
+		if #unavailable(iOS 15.0) {
 			// iOS 14 workaround
 			if !currencySelectorOpen {
 				log.debug("Setting UITableView.background = .primaryBackground")
