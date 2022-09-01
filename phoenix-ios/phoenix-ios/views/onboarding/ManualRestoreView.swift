@@ -52,6 +52,7 @@ struct ManualRestoreView: MVIView {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+					.accessibilityHidden(true)
 			}
 			
 			main
@@ -133,6 +134,7 @@ struct WarningView: View {
 				Spacer()
 			}
 			.padding([.top, .bottom], 16)
+			.accessibilityElement(children: .combine)
 
 			Button {
 				withAnimation {
@@ -156,6 +158,8 @@ struct WarningView: View {
 					disabledBorderStroke: Color(UIColor.separator)
 				)
 			)
+			.accessibilityElement()
+			.accessibilityLabel("Next")
 			
 			Spacer()
 			

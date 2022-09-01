@@ -123,13 +123,15 @@ struct RestoreView: View {
 					if name.isEmpty {
 						Text("Wallet").font(.headline)
 					} else {
-						Text(name).font(.headline)
+						Text(name)
+							.font(.headline)
+							.accessibilityLabel("wallet: \(name)")
 					}
 					
-					let created = stringForDate(seedBackup.created)
-					Text("created: \(created)")
+					Text("created: \(visibleStringForDate(seedBackup.created))")
 						.font(.subheadline)
 						.foregroundColor(.secondary)
+						.accessibilityLabel("created: \(audibleStringForDate(seedBackup.created))")
 				}
 			} icon: {
 				Image(systemName: "bitcoinsign.circle")
@@ -176,10 +178,18 @@ struct RestoreView: View {
 		}
 	}
 	
-	func stringForDate(_ date: Date) -> String {
+	func visibleStringForDate(_ date: Date) -> String {
 		
 		let formatter = DateFormatter()
 		formatter.dateStyle = .short
+		formatter.timeStyle = .short
+		return formatter.string(from: date)
+	}
+	
+	func audibleStringForDate(_ date: Date) -> String {
+		
+		let formatter = DateFormatter()
+		formatter.dateStyle = .long
 		formatter.timeStyle = .short
 		return formatter.string(from: date)
 	}
