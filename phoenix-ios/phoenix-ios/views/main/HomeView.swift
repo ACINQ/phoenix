@@ -90,6 +90,9 @@ struct HomeView : MVIView {
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
+		.onChange(of: currencyPrefs.hideAmountsOnHomeScreen) { _ in
+			hideAmountsOnHomeScreenChanged()
+		}
 		.onReceive(recentPaymentSecondsPublisher) {
 			recentPaymentSecondsChanged($0)
 		}
@@ -430,6 +433,7 @@ struct HomeView : MVIView {
 					isDownloadingRecentTxs: isDownloadingRecentTxs(),
 					didAppearCallback: footerCellDidAppear
 				)
+				.accessibilitySortPriority(10)
 			}
 		}
 		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
@@ -514,6 +518,14 @@ struct HomeView : MVIView {
 		}
 	}
 	
+	func hideAmountsOnHomeScreenChanged() {
+		log.trace("hideAmountsOnHomeScreenChanged()")
+		
+		// Without this, VoiceOver re-reads the previous text/button,
+		// before reading the new text/button that replaces it.
+		UIAccessibility.post(notification: .screenChanged, argument: nil)
+	}
+
 	func recentPaymentSecondsChanged(_ seconds: Int) {
 		log.trace("recentPaymentSecondsChanged()")
 		

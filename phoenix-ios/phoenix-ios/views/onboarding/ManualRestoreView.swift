@@ -232,6 +232,7 @@ struct EnterSeedView: View {
 				Spacer()
 				Text("Your wallet's seed is a list of 12 English words.")
 					.id(topID)
+					.accessibilitySortPriority(202)
 				Spacer()
 			}
 			.padding([.leading, .trailing], 16)
@@ -248,15 +249,19 @@ struct EnterSeedView: View {
 				.disableAutocorrection(true)
 				.disabled(mnemonics.count == 12)
 				.padding(.trailing, 4)
+				.accessibilitySortPriority(201)
 				
 				// Clear button (appears when TextField's text is non-empty)
-				Button {
-					wordInput = ""
-				} label: {
-					Image(systemName: "multiply.circle.fill")
-						.foregroundColor(.secondary)
+				if !wordInput.isEmpty {
+					Button {
+						wordInput = ""
+					} label: {
+						Image(systemName: "multiply.circle.fill")
+							.foregroundColor(.secondary)
+					}
+					.accessibilityLabel("Clear textfield")
+					.accessibilitySortPriority(200)
 				}
-				.isHidden(wordInput == "")
 			}
 			.padding([.top, .bottom], 8)
 			.padding(.leading, 16)
@@ -437,81 +442,138 @@ struct EnterSeedView: View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
-			// #1
-			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-				ForEach(0..<6, id: \.self) { idx in
-					HStack(alignment: VerticalAlignment.center, spacing: 0) {
-						Text(verbatim: "#\(idx + 1) ")
-							.font(Font.headline.weight(.regular))
-							.foregroundColor(Color(UIColor.tertiaryLabel))
-					}
-					.padding(.bottom, row_bottomSpacing)
-				}
-			}
-			.padding(.trailing, 2)
+			// #1 - #6
+			seedWordIndexColumn(0..<6, row_bottomSpacing)
+				.padding(.trailing, 2)
+			seedWordColumn(0..<6, row_bottomSpacing)
+				.padding(.trailing, 8)
 			
-			// hammer (x)
-			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-				ForEach(0..<6, id: \.self) { idx in
-					HStack(alignment: VerticalAlignment.center, spacing: 0) {
-						Text(mnemonic(idx))
-							.font(.headline)
-							.frame(maxWidth: .infinity, alignment: .leading)
-						
-						Button {
-							mnemonics.removeSubrange(idx..<mnemonics.count)
-						} label: {
-							Image(systemName: "xmark")
-								.font(Font.caption.weight(.thin))
-								.foregroundColor(Color(UIColor.tertiaryLabel))
-						}
-						.isHidden(mnemonics.count <= idx)
-					}
-					.padding(.bottom, row_bottomSpacing)
-				}
-			}
-			.padding(.trailing, 8)
+			// #7 - #12
+			seedWordIndexColumn(6..<12, row_bottomSpacing)
+				.padding(.trailing, 2)
+			seedWordColumn(6..<12, row_bottomSpacing)
 			
-			// #7
-			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-				ForEach(6..<12, id: \.self) { idx in
-					HStack(alignment: VerticalAlignment.center, spacing: 0) {
-						Text(verbatim: "#\(idx + 1) ")
-							.font(Font.headline.weight(.regular))
-							.foregroundColor(Color(UIColor.tertiaryLabel))
-					}
-					.padding(.bottom, row_bottomSpacing)
-				}
-			}
-			.padding(.trailing, 2)
-			
-			// bacon (x)
-			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-				ForEach(6..<12, id: \.self) { idx in
-					HStack(alignment: VerticalAlignment.center, spacing: 0) {
-						Text(mnemonic(idx ))
-							.font(.headline)
-							.frame(maxWidth: .infinity, alignment: .leading)
-						
-						Button {
-							mnemonics.removeSubrange(idx..<mnemonics.count)
-						} label: {
-							Image(systemName: "xmark")
-								.font(Font.caption.weight(.thin))
-								.foregroundColor(Color(UIColor.tertiaryLabel))
-						}
-						.isHidden(mnemonics.count <= idx)
-					}
-					.padding(.bottom, row_bottomSpacing)
-				}
-			}
 		}
 		.environment(\.layoutDirection, .leftToRight) // issue #237
 	}
 	
-	func mnemonic(_ idx: Int) -> String {
-		return (mnemonics.count > idx) ? mnemonics[idx] : " "
+	@ViewBuilder
+	func seedWordIndexColumn(_ range: Range<Int>, _ row_bottomSpacing: CGFloat) -> some View {
+		
+		// Produce a vertical column:
+		// #1
+		// #2
+		// #3
+		// #4
+		// #5
+		// #6
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			ForEach(range, id: \.self) { idx in
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					Text(verbatim: "#\(idx + 1) ")
+						.font(Font.headline.weight(.regular))
+						.foregroundColor(Color(UIColor.tertiaryLabel))
+						.accessibilityHidden(true)
+				}
+				.padding(.bottom, row_bottomSpacing)
+			}
+		}
 	}
+	
+	@ViewBuilder
+	func seedWordColumn(_ range: Range<Int>, _ row_bottomSpacing: CGFloat) -> some View {
+		
+		// Produce a vertical column:
+		// hammer (x)
+		// bacon  (x)
+		// animal (x)
+		// fat    (x)
+		// menu   (x)
+		// drink  (x)
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			ForEach(range, id: \.self) { idx in
+				
+				// Accessibility sort priority:
+				//
+				// idx |0  |1  |2  |3  |4  |5  |6  |7  |8  |9  |10 |11
+				// -----------------------------------------------------
+				//   A |124|122|120|118|116|114|112|110|108|106|104|102
+				//   B |123|121|119|117|115|113|111|109|107|105|103|101
+				
+				let wordPriority = 100 + ((12 - idx) * 2) // row (A) in table above
+				let bttnPriority = wordPriority - 1       // row (B) in table above
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					if let word = mnemonic(idx) {
+						Text(word)
+							.font(.headline)
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.accessibilityLabel("#\(idx+1): \(word)")
+							.accessibilitySortPriority(Double(wordPriority))
+					} else {
+						Text(" ")
+							.font(.headline)
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.accessibilityHidden(true)
+					}
+					
+					if mnemonics.count > idx {
+						Button {
+							mnemonics.removeSubrange(idx..<mnemonics.count)
+						} label: {
+							Image(systemName: "xmark")
+								.font(Font.caption.weight(.thin))
+								.foregroundColor(Color(UIColor.tertiaryLabel))
+						}
+						.accessibilityLabel("Remove")
+						.accessibilitySortPriority(Double(bttnPriority))
+					}
+				}
+				.padding(.bottom, row_bottomSpacing)
+			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: View helpers
+	// --------------------------------------------------
+	
+	func mnemonic(_ idx: Int) -> String? {
+		return (mnemonics.count > idx) ? mnemonics[idx] : nil
+	}
+	
+	func updateAutocompleteList() {
+		log.trace("[RestoreView] updateAutocompleteList()")
+		
+		// Some keyboards will inject the entire word plus a space.
+		//
+		// For example, if using a sliding keyboard (e.g. SwiftKey),
+		// then after sliding from key to key, and lifting your finger,
+		// the entire word will be injected plus a space: "bacon "
+		//
+		// We should also consider the possibility that the user pasted in their seed.
+		
+		let tokens = wordInput.trimmingCharacters(in: .whitespaces).split(separator: " ")
+		if let firstToken = tokens.first {
+			log.debug("[RestoreView] Requesting autocomplete for: '\(firstToken)'")
+			mvi.intent(RestoreWallet.IntentFilterWordList(
+				predicate: String(firstToken),
+				uuid: UUID().uuidString
+			))
+		} else {
+			log.debug("[RestoreView] Clearing autocomplete list")
+			mvi.intent(RestoreWallet.IntentFilterWordList(
+				predicate: "",
+				uuid: UUID().uuidString
+			))
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
 	
 	func onModelChange(model: RestoreWallet.Model) -> Void {
 		log.trace("[RestoreView] onModelChange()")
@@ -541,33 +603,6 @@ struct EnterSeedView: View {
 			return
 		} else {
 			updateAutocompleteList()
-		}
-	}
-	
-	func updateAutocompleteList() {
-		log.trace("[RestoreView] updateAutocompleteList()")
-		
-		// Some keyboards will inject the entire word plus a space.
-		//
-		// For example, if using a sliding keyboard (e.g. SwiftKey),
-		// then after sliding from key to key, and lifting your finger,
-		// the entire word will be injected plus a space: "bacon "
-		//
-		// We should also consider the possibility that the user pasted in their seed.
-		
-		let tokens = wordInput.trimmingCharacters(in: .whitespaces).split(separator: " ")
-		if let firstToken = tokens.first {
-			log.debug("[RestoreView] Requesting autocomplete for: '\(firstToken)'")
-			mvi.intent(RestoreWallet.IntentFilterWordList(
-				predicate: String(firstToken),
-				uuid: UUID().uuidString
-			))
-		} else {
-			log.debug("[RestoreView] Clearing autocomplete list")
-			mvi.intent(RestoreWallet.IntentFilterWordList(
-				predicate: "",
-				uuid: UUID().uuidString
-			))
 		}
 	}
 	
@@ -650,6 +685,10 @@ struct EnterSeedView: View {
 		
 		return false
 	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
 	
 	func selectMnemonic(_ word: String) -> Void {
 		log.trace("[RestoreView] selectMnemonic()")

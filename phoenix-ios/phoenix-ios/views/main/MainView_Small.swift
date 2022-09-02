@@ -143,9 +143,11 @@ struct MainView_Small: View {
 			// Leading Button 1
 			header_settingsButton()
 				.padding(.trailing)
+				.accessibilitySortPriority(23)
 			
 			// Leading Button 2
 			header_transactionsButton()
+				.accessibilitySortPriority(22)
 			
 			Spacer()
 			
@@ -155,6 +157,7 @@ struct MainView_Small: View {
 				headerButtonHeight: $headerButtonHeight
 			)
 			.padding(.trailing)
+			.accessibilitySortPriority(21)
 			
 			// Trailing Button 1
 			ToolsMenu(
@@ -162,6 +165,7 @@ struct MainView_Small: View {
 				buttonHeight: $headerButtonHeight,
 				openCurrencyConverter: { navLinkTag = .CurrencyConverter }
 			)
+			.accessibilitySortPriority(20)
 		}
 		.padding([.top, .leading, .trailing])
 		.padding(.bottom, 40) // extra padding on bottom, between Header & HomeView
