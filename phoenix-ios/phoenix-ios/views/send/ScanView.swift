@@ -39,6 +39,11 @@ struct ScanView: View {
 		UIApplication.willEnterForegroundNotification
 	)
 	
+	@State var voiceOverEnabled = UIAccessibility.isVoiceOverRunning
+	let voiceOverStatusPublisher = NotificationCenter.default.publisher(for:
+		UIAccessibility.voiceOverStatusDidChangeNotification
+	)
+	
 	// Subtle timing bug:
 	//
 	// Steps to reproduce:
@@ -90,6 +95,9 @@ struct ScanView: View {
 		.onReceive(willEnterForegroundPublisher) { _ in
 			willEnterForeground()
 		}
+		.onReceive(voiceOverStatusPublisher) { _ in
+			voiceOverStatusChanged()
+		}
 		.onChange(of: mvi.model) { newModel in
 			modelDidChange(newModel)
 		}
@@ -105,8 +113,10 @@ struct ScanView: View {
 		
 		ZStack(alignment: Alignment.bottom) {
 			
-			QrCodeScannerView {(request: String) in
+			QrCodeScannerView { (request: String) in
 				didScanQRCode(request)
+			} ready: {
+				didEnableCamera()
 			}
 			
 			menu()
@@ -122,40 +132,51 @@ struct ScanView: View {
 
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 
-			ZStack(alignment: Alignment.top) {
-				
-				TopTab(
-					color: Color.primaryBackground,
-					size: CGSize(width: 72, height: 21)
-				)
-				.offset(y: 1)
-				.onTapGesture {
-					withAnimation {
-						if showingFullMenu {
-							showingFullMenu = false
-							chevronPosition = .pointingUp
-						} else {
-							showingFullMenu = true
-							chevronPosition = .pointingDown
-						}
-					}
-				}
-				
-				AnimatedChevron(
-					position: $chevronPosition,
-					color: Color.appAccent,
-					lineWidth: 22,
-					lineThickness: 3,
-					verticalOffset: 6
-				)
-				.offset(y: 7)
-				
-			} // </ZStack>
-			.zIndex(1)
+			if !voiceOverEnabled {
+				menuButton()
+			}
 			
 			menuOptions()
 				.zIndex(0)
 		}
+	}
+	
+	@ViewBuilder
+	func menuButton() -> some View {
+		
+		ZStack(alignment: Alignment.top) {
+				
+			TopTab(
+				color: Color.primaryBackground,
+				size: CGSize(width: 72, height: 21)
+			)
+			.offset(y: 1)
+			.onTapGesture {
+				withAnimation {
+					if showingFullMenu {
+						showingFullMenu = false
+						chevronPosition = .pointingUp
+					} else {
+						showingFullMenu = true
+						chevronPosition = .pointingDown
+					}
+				}
+			}
+			
+			AnimatedChevron(
+				position: $chevronPosition,
+				color: Color.appAccent,
+				lineWidth: 22,
+				lineThickness: 3,
+				verticalOffset: 6
+			)
+			.offset(y: 7)
+			
+		} // </ZStack>
+		.zIndex(1)
+		.accessibilityElement()
+		.accessibilityLabel(showingFullMenu ? "Less options" : "More options")
+		.accessibilityAddTraits(.isButton)
 	}
 	
 	@ViewBuilder
@@ -167,8 +188,9 @@ struct ScanView: View {
 				.padding(.horizontal, 20)
 				.padding(.top, 20)
 				.padding(.bottom, 12)
+				.accessibilitySortPriority(3)
 			
-			if showingFullMenu {
+			if showingFullMenu || voiceOverEnabled {
 				VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 					
 					Divider()
@@ -176,12 +198,14 @@ struct ScanView: View {
 					menuOption_chooseImage()
 						.padding(.horizontal, 20)
 						.padding(.vertical, 12)
+						.accessibilitySortPriority(2)
 					
 					Divider()
 					
 					menuOption_manualInput()
 						.padding(.horizontal, 20)
 						.padding(.vertical, 12)
+						.accessibilitySortPriority(1)
 				}
 				.transition(.move(edge: .bottom).combined(with: .opacity))
 			}
@@ -207,6 +231,7 @@ struct ScanView: View {
 					Image("testnet_bg")
 						.resizable(resizingMode: .tile)
 						.ignoresSafeArea()
+						.accessibilityHidden(true)
 				}
 			}
 		) // </.background>
@@ -356,6 +381,12 @@ struct ScanView: View {
 		checkClipboard()
 	}
 	
+	func voiceOverStatusChanged() {
+		log.trace("voiceOverStatusChanged()")
+		
+		voiceOverEnabled = UIAccessibility.isVoiceOverRunning
+	}
+	
 	func checkClipboard() {
 		if UIPasteboard.general.hasStrings {
 			clipboardHasString = true
@@ -404,6 +435,12 @@ struct ScanView: View {
 		if !ignoreScanner && !isFetchingLnurl {
 			mvi.intent(Scan.Intent_Parse(request: request))
 		}
+	}
+	
+	func didEnableCamera() {
+		log.trace("didEnableCamera()")
+		
+		UIAccessibility.post(notification: .announcement, argument: "Your camera is open to scan a QR code")
 	}
 	
 	func didCancelLnurlServiceFetch() {
@@ -493,6 +530,10 @@ struct ScanView: View {
 	}
 }
 
+// --------------------------------------------------
+// MARK: -
+// --------------------------------------------------
+
 struct ManualInput: View, ViewName {
 	
 	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
@@ -510,6 +551,7 @@ struct ManualInput: View, ViewName {
 			Text("Manual Input")
 				.font(.title2)
 				.padding(.bottom)
+				.accessibilityAddTraits(.isHeader)
 			
 			Text(
 				"""
@@ -529,6 +571,7 @@ struct ManualInput: View, ViewName {
 					Image(systemName: "multiply.circle.fill")
 						.foregroundColor(.secondary)
 				}
+				.accessibilityLabel("Clear textfield")
 				.isHidden(input == "")
 			}
 			.padding(.all, 8)
@@ -581,6 +624,10 @@ struct ManualInput: View, ViewName {
 	}
 }
 
+// --------------------------------------------------
+// MARK: -
+// --------------------------------------------------
+
 struct DangerousInvoiceAlert: View, ViewName {
 
 	let model: Scan.Model_InvoiceFlow_DangerousRequest
@@ -598,6 +645,7 @@ struct DangerousInvoiceAlert: View, ViewName {
 			Text("Warning")
 				.font(.title2)
 				.padding(.bottom)
+				.accessibilityAddTraits(.isHeader)
 			
 			if model.reason is Scan.DangerousRequestReasonIsAmountlessInvoice {
 				content_amountlessInvoice
@@ -638,7 +686,7 @@ struct DangerousInvoiceAlert: View, ViewName {
 				"""
 				The invoice doesn't include an amount. This can be dangerous: \
 				malicious nodes may be able to steal your payment. To be safe, \
-				**ask the payee to specify an amount**  in the payment request.
+				**ask the payee to specify an amount** in the payment request.
 				""",
 				comment: "SendView"
 			))

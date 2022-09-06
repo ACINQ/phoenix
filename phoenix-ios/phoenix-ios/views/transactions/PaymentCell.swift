@@ -98,18 +98,21 @@ struct PaymentCell : View {
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding([.leading, .trailing], 6)
 
-			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-
-				let (amount, isFailure, isOutgoing) = paymentAmountInfo()
-
-				if currencyPrefs.hideAmountsOnHomeScreen {
+			let (amount, isFailure, isOutgoing) = paymentAmountInfo()
+			
+			if currencyPrefs.hideAmountsOnHomeScreen {
+				
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					
 					// Do not display any indication as to whether payment in incoming or outgoing
 					Text(verbatim: amount.digits)
 						.foregroundColor(Color(UIColor.systemGray2))
 						.accessibilityLabel("hidden amount")
+				}
 					
-				} else {
+			} else {
+			
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					
 					let color: Color = isFailure ? .secondary : (isOutgoing ? .appNegative : .appPositive)
 					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
@@ -130,8 +133,12 @@ struct PaymentCell : View {
 						.font(.caption)
 						.foregroundColor(.gray)
 				}
-			}
-		}
+				.accessibilityElement()
+				.accessibilityLabel("\(isOutgoing ? "-" : "+")\(amount.string)")
+				
+			} // </amount>
+			
+		} // </HStack>
 		.padding([.top, .bottom], 14)
 		.padding([.leading, .trailing], 12)
 		.onAppear {

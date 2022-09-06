@@ -70,6 +70,7 @@ struct ModifyInvoiceSheet: View {
 			Text("Edit payment request")
 				.font(.title3)
 				.padding([.top, .bottom])
+				.accessibilityAddTraits(.isHeader)
 
 			HStack {
 				TextField(

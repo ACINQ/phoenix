@@ -251,6 +251,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		)
 		.padding(.top, 24)
 		.padding(.bottom, 4)
+		.accessibilityAddTraits(.isHeader)
 	}
 	
 	@ViewBuilder

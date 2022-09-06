@@ -140,6 +140,11 @@ struct ShortSheetWrapper<Content: View>: View {
 							shortSheetState.close()
 						}
 					}
+					.if(dismissable) { view in
+						view
+							.accessibilityLabel("Dismiss sheet")
+							.accessibilitySortPriority(-1)
+					}
 				
 				VStack {
 					Spacer()
@@ -171,7 +176,13 @@ struct ShortSheetWrapper<Content: View>: View {
 	}
 	
 	func animationCompleted() {
-		if animation == 2 {
+		if animation == 1 {
+			// ShortSheet is now visible
+			UIAccessibility.post(notification: .screenChanged, argument: nil)
+		}
+		else if animation == 2 {
+			// ShortSheet is now hidden
+			UIAccessibility.post(notification: .screenChanged, argument: nil)
 			shortSheetState.publisher.send(nil)
 		}
 	}

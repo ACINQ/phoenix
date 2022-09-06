@@ -1191,7 +1191,7 @@
 "The fee is **%@%%** with a minimum fee of **%@**." = "Les frais sont de **%1$@%%** avec un minimum de **%2$@**.";
 
 /* SendView */
-"The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount**  in the payment request." = "Cette requête de paiement ne définit pas de montant. Cela peut être dangereux : un noeud malicieux pourrait intercepter le paiement. Pour assurer la sécurité du paiement, **demandez au destinataire du paiement de spécifier un montant** dans sa requête.";
+"The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount** in the payment request." = "Cette requête de paiement ne définit pas de montant. Cela peut être dangereux : un noeud malicieux pourrait intercepter le paiement. Pour assurer la sécurité du paiement, **demandez au destinataire du paiement de spécifier un montant** dans sa requête.";
 
 /* Error message - scanning lightning invoice */
 "The invoice is for (requestChain), but you're on (reason.myChain.name)" = "Cette requête est valable pour la chaîne (requestChain), mais vous êtes sur la chaîne (reason.myChain.name).";

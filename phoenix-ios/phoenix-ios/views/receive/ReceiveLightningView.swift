@@ -95,6 +95,7 @@ struct ReceiveLightningView: View {
 			) {
 				EmptyView()
 			}
+			.accessibilityHidden(true)
 			
 			content()
 		}
@@ -503,6 +504,8 @@ struct ReceiveLightningView: View {
 					.frame(width: 32, height: 32)
 			}
 			.padding(.top, paddingTop)
+			.accessibilityLabel("Warning: background app refresh disabled")
+			.accessibilityHint("Tap for more info")
 		}
 		else if !pushPermissionRequestedFromOS {
 			
@@ -520,6 +523,8 @@ struct ReceiveLightningView: View {
 					.frame(width: 32, height: 32)
 			}
 			.padding(.top, paddingTop)
+			.accessibilityLabel("Warning: notifications disabled")
+			.accessibilityHint("Tap for more info")
 		}
 		else if notificationsDisabled || (alertsDisabled && badgesDisabled) {
 			
@@ -541,6 +546,8 @@ struct ReceiveLightningView: View {
 					.frame(width: 32, height: 32)
 			}
 			.padding(.top, paddingTop)
+			.accessibilityLabel("Warning: notifications disabled")
+			.accessibilityHint("Tap for more info")
 		}
 	}
 	
