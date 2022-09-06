@@ -183,7 +183,7 @@ struct ErrorDetailsView: View, ViewName {
 				Button {
 					UIPasteboard.general.string = errTxt
 					toast.pop(
-						Text("Copied to pasteboard!").anyView,
+						NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 						colorScheme: colorScheme.opposite
 					)
 				} label: {

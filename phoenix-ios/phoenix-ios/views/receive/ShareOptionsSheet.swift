@@ -7,6 +7,7 @@ import SwiftUI
 ///
 struct ShareOptionsSheet: View {
 	
+	let textType: String
 	let shareText: () -> Void
 	let shareImage: () -> Void
 	
@@ -27,7 +28,7 @@ struct ShareOptionsSheet: View {
 						.imageScale(.medium)
 					Text("Share Text")
 					Spacer()
-					Text("(Lightning invoice)")
+					Text(verbatim: textType)
 						.font(.footnote)
 						.foregroundColor(.secondary)
 				}

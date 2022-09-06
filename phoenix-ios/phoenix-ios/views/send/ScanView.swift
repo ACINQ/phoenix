@@ -518,7 +518,7 @@ struct ScanView: View {
 				mvi.intent(Scan.Intent_Parse(request: qrCodeString))
 			} else {
 				toast.pop(
-					Text("Image doesn't contain a readable QR code.").multilineTextAlignment(.center).anyView,
+					NSLocalizedString("Image doesn't contain a readable QR code.", comment: "Toast message"),
 					colorScheme: colorScheme.opposite,
 					style: .chrome,
 					duration: 10.0,

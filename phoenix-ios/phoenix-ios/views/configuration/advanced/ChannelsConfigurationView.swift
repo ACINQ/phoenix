@@ -461,7 +461,7 @@ fileprivate struct FooterView: View, ViewName {
 		
 		UIPasteboard.general.string = nodeID
 		toast.pop(
-			Text("Copied to pasteboard!").anyView,
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 			colorScheme: colorScheme.opposite
 		)
 	}
@@ -494,7 +494,7 @@ fileprivate struct ChannelInfoPopup: View, ViewName {
 				Button {
 					UIPasteboard.general.string = channel.json
 					toast.pop(
-						Text("Copied to pasteboard!").anyView,
+						NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 						colorScheme: colorScheme.opposite
 					)
 				} label: {

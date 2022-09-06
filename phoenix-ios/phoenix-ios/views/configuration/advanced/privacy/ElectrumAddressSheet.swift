@@ -628,7 +628,7 @@ struct ElectrumAddressSheet: View {
 		
 		UIPasteboard.general.string = pem
 		toast.pop(
-			Text("Copied to pasteboard!").anyView,
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 			colorScheme: colorScheme.opposite,
 			alignment: .none
 		)
@@ -693,7 +693,7 @@ struct ElectrumAddressSheet: View {
 			if let cert = untrustedCert {
 				guard let pubKey = pubKey(cert) else {
 					return toast.pop(
-						Text("Unable to extract public key!").anyView,
+						NSLocalizedString("Unable to extract public key!", comment: "Toast message"),
 						colorScheme: colorScheme.opposite,
 						alignment: .none
 					)
