@@ -120,8 +120,8 @@ class CustomElectrumServerObserver: ObservableObject {
 			}
 		}
 		
-		electrumConfig = Prefs.shared.electrumConfig
-		Prefs.shared.electrumConfigPublisher.sink {[weak self](config: ElectrumConfigPrefs?) in
+		electrumConfig = GroupPrefs.shared.electrumConfig
+		GroupPrefs.shared.electrumConfigPublisher.sink {[weak self](config: ElectrumConfigPrefs?) in
 			self?.configChanged(config)
 			
 		}.store(in: &cancellables)

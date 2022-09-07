@@ -117,14 +117,12 @@ class CurrencyManager(
         override val fiatCurrencies = setOf(FiatCurrency.ARS_BM)
     }
 
-    val _ratesFlow: Flow<List<ExchangeRate>> = appDb.listBitcoinRates()
-
     /** Public consumable flow that includes the most recent exchange rates */
-    val ratesFlow: StateFlow<List<ExchangeRate>> = _ratesFlow.stateIn(
+    val ratesFlow: StateFlow<List<ExchangeRate>> by lazy { appDb.listBitcoinRates().stateIn(
         scope = this,
         started = SharingStarted.Eagerly,
         initialValue = listOf<ExchangeRate>()
-    )
+    )}
 
     /**
      * Returns a snapshot of the ExchangeRate for the primary FiatCurrency.
@@ -201,12 +199,13 @@ class CurrencyManager(
         }
     }
     private var refreshList = mutableMapOf<FiatCurrency, RefreshInfo>()
-    private var refreshJob: Job? = null
+    private var autoRefreshJob: Job? = null
 
     private val _refreshFlow = MutableStateFlow<Set<FiatCurrency>>(setOf())
     val refreshFlow: StateFlow<Set<FiatCurrency>> = _refreshFlow
 
     private var networkAccessEnabled = false
+    private var autoRefreshEnabled = true
 
     /**
      * Used by AppConnectionsDaemon.
@@ -214,7 +213,7 @@ class CurrencyManager(
      */
     internal fun enableNetworkAccess() {
         networkAccessEnabled = true
-        start()
+        maybeStartAutoRefresh()
     }
 
     /**
@@ -223,36 +222,46 @@ class CurrencyManager(
      */
     internal fun disableNetworkAccess() {
         networkAccessEnabled = false
-        stop()
+        stopAutoRefresh()
     }
 
-    private fun start() {
-        if (networkAccessEnabled && refreshJob == null) {
-            refreshJob = startRefreshJob()
+    fun enableAutoRefresh() {
+        autoRefreshEnabled = true
+        maybeStartAutoRefresh()
+    }
+
+    fun disableAutoRefresh() {
+        autoRefreshEnabled = false
+        stopAutoRefresh()
+    }
+
+    private fun maybeStartAutoRefresh() {
+        if (networkAccessEnabled && autoRefreshEnabled && autoRefreshJob == null) {
+            autoRefreshJob = launchAutoRefreshJob()
         }
     }
 
-    private fun stop() = launch {
-        refreshJob?.cancelAndJoin()
-        refreshJob = null
+    private fun stopAutoRefresh() = launch {
+        autoRefreshJob?.cancelAndJoin()
+        autoRefreshJob = null
     }
 
-    fun refreshAll(targets: List<FiatCurrency>) = launch {
-        stop().join()
+    fun refreshAll(targets: List<FiatCurrency>, force: Boolean = true) = launch {
+        stopAutoRefresh().join()
         val deferred1 = async {
-            refreshFromBlockchainInfo(targets = targets, forceRefresh = true)
+            refreshFromBlockchainInfo(targets = targets, forceRefresh = force)
         }
         val deferred2 = async {
-            refreshFromCoinDesk(targets = targets, forceRefresh = true)
+            refreshFromCoinDesk(targets = targets, forceRefresh = force)
         }
         val deferred3 = async {
-            refreshFromBluelytics(targets = targets, forceRefresh = true)
+            refreshFromBluelytics(targets = targets, forceRefresh = force)
         }
         listOf(deferred1, deferred2, deferred3).awaitAll()
-        start()
+        maybeStartAutoRefresh()
     }
 
-    private fun startRefreshJob() = launch {
+    private fun launchAutoRefreshJob() = launch {
         launch {
             // This Job refreshes the BitcoinPriceRates from the blockchain.info API.
             val api = blockchainInfoAPI

@@ -4,6 +4,7 @@ import fr.acinq.bitcoin.*
 import fr.acinq.bitcoin.crypto.Digest
 import fr.acinq.bitcoin.crypto.Pack
 import fr.acinq.bitcoin.crypto.hmac
+import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.secp256k1.Hex
 import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.*
@@ -55,6 +56,11 @@ data class Wallet(val seed: ByteVector64, val chain: Chain) {
         val hash = Crypto.hash160(cloudKey).byteVector().toHex()
 
         return Pair(cloudKey, hash)
+    }
+
+    fun nodeId(): PublicKey {
+        val keyManager = LocalKeyManager(seed = seed, chainHash = chain.chainHash)
+        return keyManager.nodeId
     }
 
     fun lnurlAuthLinkingKey(domain: String): PrivateKey {

@@ -109,6 +109,12 @@ class SqliteAppDb(driver: SqlDriver) {
         }
     }
 
+    suspend fun deleteBitcoinRate(fiat: String) {
+        withContext(Dispatchers.Default) {
+            priceQueries.delete(fiat)
+        }
+    }
+
     suspend fun setWalletContext(version: WalletContext.Version, rawData: String): WalletContext.V0? {
         withContext(Dispatchers.Default) {
             paramsQueries.transaction {

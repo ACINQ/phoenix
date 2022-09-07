@@ -63,6 +63,8 @@ kotlin {
                     "-Xuse-experimental=kotlinx.serialization.ExperimentalSerializationApi"
                 kotlinOptions.freeCompilerArgs +=
                     "-Xoverride-konan-properties=osVersionMin.ios_x64=14.0;osVersionMin.ios_arm64=14.0"
+                kotlinOptions.freeCompilerArgs +=
+                    listOf("-linker-options", "-application_extension")
             }
         }
     }

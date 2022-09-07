@@ -23,7 +23,7 @@ class AppConnectionsDaemon(
     private val walletManager: WalletManager,
     private val peerManager: PeerManager,
     private val currencyManager: CurrencyManager,
-    private val networkManager: NetworkManager,
+    private val networkMonitor: NetworkMonitor,
     private val electrumClient: ElectrumClient,
 ) : CoroutineScope by MainScope() {
 
@@ -33,7 +33,7 @@ class AppConnectionsDaemon(
         walletManager = business.walletManager,
         peerManager = business.peerManager,
         currencyManager = business.currencyManager,
-        networkManager = business.networkMonitor,
+        networkMonitor = business.networkMonitor,
         electrumClient = business.electrumClient
     )
 
@@ -62,6 +62,8 @@ class AppConnectionsDaemon(
         // decrementing the value when the app goes into the foreground again.
         val disconnectCount: Int = 0
     ) {
+        val canConnect get() = networkIsAvailable && disconnectCount <= 0
+
         fun incrementDisconnectCount(): TrafficControl {
             val safeInc = disconnectCount.let { if (it == Int.MAX_VALUE) it else it + 1 }
             return copy(disconnectCount = safeInc)
@@ -105,7 +107,7 @@ class AppConnectionsDaemon(
         launch {
             electrumControlFlow.collect {
                 when {
-                    it.networkIsAvailable && it.disconnectCount <= 0 -> {
+                    it.canConnect -> {
                         if (electrumConnectionJob == null) {
                             electrumConnectionJob = connectionLoop(
                                 name = "Electrum",
@@ -143,7 +145,7 @@ class AppConnectionsDaemon(
             peerControlFlow.collect {
                 val peer = peerManager.getPeer()
                 when {
-                    it.networkIsAvailable && it.disconnectCount <= 0 -> {
+                    it.canConnect -> {
                         if (peerConnectionJob == null) {
                             peerConnectionJob = connectionLoop(
                                 name = "Peer",
@@ -168,7 +170,7 @@ class AppConnectionsDaemon(
         launch {
             httpApiControlFlow.collect {
                 when {
-                    it.networkIsAvailable && it.disconnectCount <= 0 -> {
+                    it.canConnect -> {
                         if (!httpControlFlowEnabled) {
                             httpControlFlowEnabled = true
                             configurationManager.enableNetworkAccess()
@@ -187,8 +189,8 @@ class AppConnectionsDaemon(
         }
         // Internet connection monitor
         launch {
-            networkManager.start()
-            networkManager.networkState.filter { it != networkStatus.value }.collect {
+            networkMonitor.start()
+            networkMonitor.networkState.filter { it != networkStatus.value }.collect {
                 logger.info { "network state=$it" }
                 networkStatus.value = it
             }

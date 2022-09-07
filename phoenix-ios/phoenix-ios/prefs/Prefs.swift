@@ -16,17 +16,12 @@ fileprivate var log = Logger(OSLog.disabled)
 class Prefs {
 	
 	fileprivate enum Key: String {
-		case currencyType
-		case fiatCurrency
-		case bitcoinUnit
 		case theme
-		case fcmTokenInfo
 		case pushPermissionQuery
-		case electrumConfig
+		case pushTokenRegistration
 		case isTorEnabled
 		case defaultPaymentDescription
 		case showChannelsRemoteBalance
-		case currencyConverterList
 		case recentTipPercents
 		case isNewWallet
 		case invoiceExpirationDays
@@ -52,60 +47,6 @@ class Prefs {
 	// --------------------------------------------------
 	// MARK: User Options
 	// --------------------------------------------------
-
-	var currencyType: CurrencyType {
-		get {
-			let key = Key.currencyType.rawValue
-			let saved: CurrencyType? = defaults.getCodable(forKey: key)
-			return saved ?? CurrencyType.bitcoin
-		}
-		set {
-			let key = Key.currencyType.rawValue
-			defaults.setCodable(value: newValue, forKey: key)
-	  }
-	}
-	
-	lazy private(set) var fiatCurrencyPublisher: CurrentValueSubject<FiatCurrency, Never> = {
-		return CurrentValueSubject<FiatCurrency, Never>(self.fiatCurrency)
-	}()
-	
-	var fiatCurrency: FiatCurrency {
-		get {
-			let key = Key.fiatCurrency.rawValue
-			var saved: FiatCurrency? = nil
-			if let str = defaults.string(forKey: key) {
-				saved = FiatCurrency.deserialize(str)
-			}
-			return saved ?? FiatCurrency.localeDefault() ?? FiatCurrency.usd
-		}
-		set {
-			let key = Key.fiatCurrency.rawValue
-			let str = newValue.serialize()
-			defaults.set(str, forKey: key)
-			fiatCurrencyPublisher.send(newValue)
-	  }
-	}
-	
-	lazy private(set) var bitcoinUnitPublisher: CurrentValueSubject<BitcoinUnit, Never> = {
-		return CurrentValueSubject<BitcoinUnit, Never>(self.bitcoinUnit)
-	}()
-	
-	var bitcoinUnit: BitcoinUnit {
-		get {
-			let key = Key.bitcoinUnit.rawValue
-			var saved: BitcoinUnit? = nil
-			if let str = defaults.string(forKey: key) {
-				saved = BitcoinUnit.deserialize(str)
-			}
-			return saved ?? BitcoinUnit.sat
-		}
-		set {
-			let key = Key.bitcoinUnit.rawValue
-			let str = newValue.serialize()
-			defaults.set(str, forKey: key)
-			bitcoinUnitPublisher.send(newValue)
-		}
-	}
 	
 	lazy private(set) var themePublisher: CurrentValueSubject<Theme, Never> = {
 		return CurrentValueSubject<Theme, Never>(self.theme)
@@ -135,23 +76,6 @@ class Prefs {
 		set {
 			defaults.set(newValue, forKey: Key.isTorEnabled.rawValue)
 			isTorEnabledPublisher.send(newValue)
-		}
-	}
-	
-	lazy private(set) var electrumConfigPublisher: CurrentValueSubject<ElectrumConfigPrefs?, Never> = {
-		return CurrentValueSubject<ElectrumConfigPrefs?, Never>(self.electrumConfig)
-	}()
-	
-	var electrumConfig: ElectrumConfigPrefs? {
-		get {
-			let key = Key.electrumConfig.rawValue
-			let saved: ElectrumConfigPrefs? = defaults.getCodable(forKey: key)
-			return saved
-		}
-		set {
-			let key = Key.electrumConfig.rawValue
-			defaults.setCodable(value: newValue, forKey: key)
-			electrumConfigPublisher.send(newValue)
 		}
 	}
 	
@@ -245,54 +169,6 @@ class Prefs {
 			defaults.set(newValue, forKey: Key.isNewWallet.rawValue)
 		}
 	}
-
-	// --------------------------------------------------
-	// MARK: Currency Conversion
-	// --------------------------------------------------
-	
-	lazy private(set) var currencyConverterListPublisher: CurrentValueSubject<[Currency], Never> = {
-		return CurrentValueSubject<[Currency], Never>(self.currencyConverterList)
-	}()
-	
-	var currencyConverterList: [Currency] {
-		get {
-			if let list = defaults.string(forKey: Key.currencyConverterList.rawValue) {
-				log.debug("get: currencyConverterList = \(list)")
-				return Currency.deserializeList(list)
-			} else {
-				log.debug("get: currencyConverterList = nil")
-				return [Currency]()
-			}
-		}
-		set {
-			if newValue.isEmpty {
-				log.debug("set: currencyConverterList = nil")
-				defaults.removeObject(forKey: Key.currencyConverterList.rawValue)
-			} else {
-				let list = Currency.serializeList(newValue)
-				log.debug("set: currencyConverterList = \(list)")
-				defaults.set(list, forKey: Key.currencyConverterList.rawValue)
-			}
-		}
-	}
-	
-	var preferredFiatCurrencies: [FiatCurrency] {
-		get {
-			var resultArray = [self.fiatCurrency]
-			var resultSet = Set<FiatCurrency>(resultArray)
-			
-			for currency in self.currencyConverterList {
-				if case .fiat(let fiat) = currency {
-					let (inserted, _) = resultSet.insert(fiat)
-					if inserted {
-						resultArray.append(fiat)
-					}
-				}
-			}
-			
-			return resultArray
-		}
-	}
 	
 	// --------------------------------------------------
 	// MARK: Recent Tips
@@ -330,18 +206,6 @@ class Prefs {
 	// MARK: Push Notifications
 	// --------------------------------------------------
 	
-	var fcmTokenInfo: FcmTokenInfo? {
-		get {
-			let key = Key.fcmTokenInfo.rawValue
-			let result: FcmTokenInfo? = defaults.getCodable(forKey: key)
-			return result
-		}
-		set {
-			let key = Key.fcmTokenInfo.rawValue
-			defaults.setCodable(value: newValue, forKey: key)
-		}
-	}
-	
 	var pushPermissionQuery: PushPermissionQuery {
 		get {
 			let key = Key.pushPermissionQuery.rawValue
@@ -350,6 +214,18 @@ class Prefs {
 		}
 		set {
 			let key = Key.pushPermissionQuery.rawValue
+			defaults.setCodable(value: newValue, forKey: key)
+		}
+	}
+	
+	var pushTokenRegistration: PushTokenRegistration? {
+		get {
+			let key = Key.pushTokenRegistration.rawValue
+			let result: PushTokenRegistration? = defaults.getCodable(forKey: key)
+			return result
+		}
+		set {
+			let key = Key.pushTokenRegistration.rawValue
 			defaults.setCodable(value: newValue, forKey: key)
 		}
 	}
