@@ -17,6 +17,10 @@ extension UserDefaults {
 	}
 }
 
+/**
+ * Here we define various types stored in UserDefaults, which conform to `Codable`.
+ */
+
 enum CurrencyType: String, CaseIterable, Codable {
 	case fiat
 	case bitcoin
@@ -58,9 +62,10 @@ enum PushPermissionQuery: String, Codable {
 	case userAccepted
 }
 
-struct FcmTokenInfo: Equatable, Codable {
-	let nodeID: String
-	let fcmToken: String
+struct PushTokenRegistration: Equatable, Codable {
+	let pushToken: String
+	let nodeIdHash: String
+	let registrationDate: Date
 }
 
 struct ElectrumConfigPrefs: Codable {

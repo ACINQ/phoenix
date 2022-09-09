@@ -11,8 +11,10 @@ enum class NetworkState {
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-expect class NetworkManager(loggerFactory: LoggerFactory, ctx: PlatformContext) {
+expect class NetworkMonitor(loggerFactory: LoggerFactory, ctx: PlatformContext) {
     val networkState: StateFlow<NetworkState>
+    fun enable()
+    fun disable()
     fun start()
     fun stop()
 }

@@ -705,7 +705,7 @@ struct ElectrumAddressSheet: View {
 				tls = Lightning_kmpTcpSocketTLS.TRUSTED_CERTIFICATES()
 			}
 			
-			Prefs.shared.electrumConfig = ElectrumConfigPrefs(
+			GroupPrefs.shared.electrumConfig = ElectrumConfigPrefs(
 				host: checkedHost,
 				port: checkedPort,
 				pinnedPubKey: pinnedPubKey
@@ -718,7 +718,7 @@ struct ElectrumAddressSheet: View {
 			
 		} else {
 			
-			Prefs.shared.electrumConfig = nil
+			GroupPrefs.shared.electrumConfig = nil
 			mvi.intent(ElectrumConfiguration.IntentUpdateElectrumServer(server: nil))
 		}
 		

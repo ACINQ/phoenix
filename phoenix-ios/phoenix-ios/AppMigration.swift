@@ -50,6 +50,17 @@ class AppMigration {
 		if previousBuild.isVersion(lessThan: "8") {
 			removeAppDbFile()
 		}
+		
+		// v1.5.1 (build 40)
+		// - notification service extension added
+		// - several UserDefault values move to shared group
+		// - ...
+		if previousBuild.isVersion(lessThan: "40") {
+			
+			migrateDbFilesToGroup()
+			GroupPrefs.shared.performMigration(previousBuild: previousBuild)
+			AppSecurity.shared.performMigration(previousBuild: previousBuild)
+		}
 
 		let currentBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
 		if previousBuild.isVersion(lessThan: currentBuild) {
@@ -140,6 +151,51 @@ class AppMigration {
 			return
 		} else {
 			try? fm.removeItem(at: db)
+		}
+	}
+	
+	/// Moves all the database files to ...
+	private static func migrateDbFilesToGroup() -> Void {
+		
+		let fm = FileManager.default
+		
+		guard
+			let appSupportDir = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,
+			let groupDir = fm.containerURL(forSecurityApplicationGroupIdentifier: "group.co.acinq.phoenix")
+		else {
+			return
+		}
+		
+		let oldDbDir = appSupportDir.appendingPathComponent("databases", isDirectory: true)
+		let newDbDir = groupDir.appendingPathComponent("databases", isDirectory: true)
+		
+		do {
+			try fm.createDirectory(at: newDbDir, withIntermediateDirectories: true)
+		} catch {
+			log.error("Error creating directory: \(String(describing: error))")
+		}
+		
+		let contents = try? fm.contentsOfDirectory(
+			at: oldDbDir,
+			includingPropertiesForKeys: nil,
+			options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants, .skipsPackageDescendants]
+		)
+		for srcUrl in (contents ?? []) {
+		
+			if srcUrl.path.contains(".sqlite") {
+				
+				let filename = srcUrl.lastPathComponent
+				let dstUrl = newDbDir.appendingPathComponent(filename, isDirectory: false)
+				
+				log.debug("mv: \(srcUrl.path) -> \(dstUrl.path)")
+				
+				do {
+					try fm.moveItem(at: srcUrl, to: dstUrl)
+					
+				} catch {
+					log.error("Error moving file: \(String(describing: error))")
+				}
+			}
 		}
 	}
 }

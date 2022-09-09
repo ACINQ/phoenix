@@ -23,13 +23,13 @@ data class Connections(
 class ConnectionsManager(
     peerManager: PeerManager,
     electrumClient: ElectrumClient,
-    networkManager: NetworkManager
+    networkMonitor: NetworkMonitor
 ): CoroutineScope {
 
     constructor(business: PhoenixBusiness): this(
         peerManager = business.peerManager,
         electrumClient = business.electrumClient,
-        networkManager = business.networkMonitor
+        networkMonitor = business.networkMonitor
     )
 
     private val job = Job()
@@ -43,7 +43,7 @@ class ConnectionsManager(
             combine(
                 peerManager.getPeer().connectionState,
                 electrumClient.connectionState,
-                networkManager.networkState
+                networkMonitor.networkState
             ) { peerState, electrumState, internetState ->
                 Connections(
                     peer = peerState,

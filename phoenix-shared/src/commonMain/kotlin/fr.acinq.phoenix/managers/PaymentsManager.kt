@@ -8,10 +8,7 @@ import fr.acinq.lightning.utils.getValue
 import fr.acinq.lightning.utils.setValue
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
-import fr.acinq.phoenix.data.WalletPaymentId
-import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.data.WalletPaymentMetadata
+import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import kotlinx.coroutines.*
@@ -84,23 +81,45 @@ class PaymentsManager(
         }
 
         launch {
+            var mostRecentCompleted_prvLaunch: WalletPayment? = null
+            var isFirstCollection = true
+
+            paymentsDb().listPaymentsOrderFlow(count = 25, skip = 0).collect { list ->
+                var mostRecentCompleted: WalletPayment? = null
+                for (row in list) {
+                    val paymentInfo = fetcher.getPayment(row, WalletPaymentFetchOptions.None)
+                    if (paymentInfo != null && paymentInfo.payment.completedAt() > 0) {
+                        mostRecentCompleted = paymentInfo.payment
+                        break
+                    }
+                }
+
+                if (isFirstCollection) {
+                    isFirstCollection = false
+                    mostRecentCompleted_prvLaunch = mostRecentCompleted
+                } else if (mostRecentCompleted != null &&
+                           mostRecentCompleted != mostRecentCompleted_prvLaunch) {
+                    _lastCompletedPayment.value = mostRecentCompleted
+                }
+            }
+        }
+
+        launch {
+            // iOS Note:
+            // If the payment was received via the notification-service-extension
+            // (which runs in a separate process), then you won't receive the
+            // corresponding notifications (PaymentReceived) thru this mechanism.
+            //
             peerManager.getPeer().openListenerEventSubscription().consumeEach { event ->
                 when (event) {
                     is PaymentProgress -> {
                         addToInFlightOutgoingPayments(event.request.paymentId)
                     }
                     is PaymentSent -> {
-                        _lastCompletedPayment.value = event.payment
                         removeFromInFlightOutgoingPayments(event.request.paymentId)
                     }
                     is PaymentNotSent -> {
-                        paymentsDb().getOutgoingPayment(event.request.paymentId)?.let {
-                            _lastCompletedPayment.value = it
-                        }
                         removeFromInFlightOutgoingPayments(event.request.paymentId)
-                    }
-                    is PaymentReceived -> {
-                        _lastCompletedPayment.value = event.incomingPayment
                     }
                     is SwapInPendingEvent -> {
                         _incomingSwapsMap += (event.swapInPending.bitcoinAddress to event.swapInPending.amount.toMilliSatoshi())
