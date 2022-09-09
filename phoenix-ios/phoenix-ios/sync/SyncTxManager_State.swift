@@ -59,8 +59,8 @@ enum SyncTxManager_State: Equatable, CustomStringConvertible {
 	
 	case initializing
 	case updatingCloud(details: SyncTxManager_State_UpdatingCloud)
-	case downloading(details: SyncTxManager_State_Progress)
-	case uploading(details: SyncTxManager_State_Progress)
+	case downloading(details: SyncTxManager_State_Downloading)
+	case uploading(details: SyncTxManager_State_Uploading)
 	case waiting(details: SyncTxManager_State_Waiting)
 	case synced
 	case disabled
@@ -177,15 +177,59 @@ class SyncTxManager_State_UpdatingCloud: Equatable {
 	}
 }
 
+/// Exposes an ObservableObject that can be used by the UI for various purposes.
+/// All changes to `@Published` properties will be made on the UI thread.
+///
+class SyncTxManager_State_Downloading: ObservableObject, Equatable {
+	
+	@Published private(set) var completedCount: Int = 0
+	@Published private(set) var oldestCompletedDownload: Date? = nil
+	
+	private func updateOnMainThread(_ block: @escaping () -> Void) {
+		if Thread.isMainThread {
+			block()
+		} else {
+			DispatchQueue.main.async { block() }
+		}
+	}
+	
+	func setOldestCompletedDownload(_ date: Date?) {
+		updateOnMainThread {
+			self.oldestCompletedDownload = date
+		}
+	}
+	
+	func finishBatch(completed: Int, oldest: Date?) {
+		updateOnMainThread {
+			self.completedCount += completed
+			
+			if let oldest = oldest {
+				if let prv = self.oldestCompletedDownload {
+					if oldest < prv {
+						self.oldestCompletedDownload = oldest
+					}
+				} else {
+					self.oldestCompletedDownload = oldest
+				}
+			}
+		}
+	}
+	
+	static func == (lhs: SyncTxManager_State_Downloading, rhs: SyncTxManager_State_Downloading) -> Bool {
+		// Equality for this class is is based on pointers
+		return lhs === rhs
+	}
+}
+
 /// Exposes an ObservableObject that can be used by the UI to display progress information.
 /// All changes to `@Published` properties will be made on the UI thread.
 ///
-class SyncTxManager_State_Progress: ObservableObject, Equatable {
+class SyncTxManager_State_Uploading: ObservableObject, Equatable {
 	
-	@Published var totalCount: Int
-	@Published var completedCount: Int = 0
-	@Published var inFlightCount: Int = 0
-	@Published var inFlightProgress: Progress? = nil
+	@Published private(set) var totalCount: Int
+	@Published private(set) var completedCount: Int = 0
+	@Published private(set) var inFlightCount: Int = 0
+	@Published private(set) var inFlightProgress: Progress? = nil
 	
 	private(set) var isCancelled = false
 	private(set) var operation: CKOperation? = nil
@@ -237,7 +281,7 @@ class SyncTxManager_State_Progress: ObservableObject, Equatable {
 		}
 	}
 	
-	static func == (lhs: SyncTxManager_State_Progress, rhs: SyncTxManager_State_Progress) -> Bool {
+	static func == (lhs: SyncTxManager_State_Uploading, rhs: SyncTxManager_State_Uploading) -> Bool {
 		// Equality for this class is is based on pointers
 		return lhs === rhs
 	}

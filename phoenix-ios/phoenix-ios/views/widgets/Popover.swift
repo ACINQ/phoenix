@@ -140,6 +140,9 @@ struct PopoverWrapper<Content: View>: View {
 							popoverState.close()
 						}
 					}
+					.accessibilityHidden(!dismissable)
+					.accessibilityLabel("Dismiss popover")
+					.accessibilitySortPriority(-1000)
 				
 				VStack {
 					VStack {
@@ -179,7 +182,12 @@ struct PopoverWrapper<Content: View>: View {
 	}
 	
 	func animationCompleted() {
-		if animation == 2 {
+		if animation == 1 {
+			// Popover is now visible
+			UIAccessibility.post(notification: .screenChanged, argument: nil)
+		} else if animation == 2 {
+			// Popover is now hidden
+			UIAccessibility.post(notification: .screenChanged, argument: nil)
 			popoverState.publisher.send(nil)
 		}
 	}

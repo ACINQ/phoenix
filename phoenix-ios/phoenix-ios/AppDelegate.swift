@@ -5,7 +5,7 @@ import Firebase
 import Combine
 import BackgroundTasks
 
-#if DEBUG && false
+#if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
 	category: "AppDelegate"
@@ -58,7 +58,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		return _encryptedNodeId
 	}
 	
-	private var walletLoaded = false
+	private var walletInfo: WalletManager.WalletInfo? = nil
+	private var pushToken: String? = nil
 	private var fcmToken: String? = nil
 	private var peerConnectionState: Lightning_kmpConnection? = nil
 	
@@ -83,12 +84,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		super.init()
 		AppMigration.performMigrationChecks()
 		
-		let electrumConfig = Prefs.shared.electrumConfig
+		let electrumConfig = GroupPrefs.shared.electrumConfig
 		business.appConfigurationManager.updateElectrumConfig(server: electrumConfig?.serverAddress)
 		
 		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
-			primary: Prefs.shared.fiatCurrency,
-			others: Prefs.shared.preferredFiatCurrencies
+			primary: GroupPrefs.shared.fiatCurrency,
+			others: GroupPrefs.shared.preferredFiatCurrencies
 		)
 		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
 
@@ -155,15 +156,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		// PreferredFiatCurrenies observers
 		Publishers.CombineLatest(
-			Prefs.shared.fiatCurrencyPublisher,
-			Prefs.shared.currencyConverterListPublisher
+			GroupPrefs.shared.fiatCurrencyPublisher,
+			GroupPrefs.shared.currencyConverterListPublisher
 		).sink { _ in
 			let current = AppConfigurationManager.PreferredFiatCurrencies(
-				primary: Prefs.shared.fiatCurrency,
-				others: Prefs.shared.preferredFiatCurrencies
+				primary: GroupPrefs.shared.fiatCurrency,
+				others: GroupPrefs.shared.preferredFiatCurrencies
 			)
 			self.business.appConfigurationManager.updatePreferredFiatCurrencies(current: current)
 		}.store(in: &cancellables)
+		
+		
+		CrossProcessCommunication.shared.start(receivedMessage: {
+			self.didReceiveMessageFromAppExtension()
+		})
 		
 		return true
 	}
@@ -251,6 +257,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		let pushToken = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
 		log.debug("pushToken: \(pushToken)")
 		
+		self.pushToken = pushToken
+		maybeRegisterPushToken()
 		Messaging.messaging().apnsToken = deviceToken
 	}
 
@@ -709,21 +717,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		log.trace("loadWallet()")
 		assertMainThread()
 		
-		guard walletLoaded == false else {
+		guard walletInfo == nil else {
 			return false
 		}
 		
-		let seed = knownSeed ?? business.prepWallet(mnemonics: mnemonics, passphrase: "")
-		let cloudInfo = business.loadWallet(seed: seed)
-		walletLoaded = true
+		let seed = knownSeed ?? business.walletManager.mnemonicsToSeed(mnemonics: mnemonics, passphrase: "")
+		walletInfo = business.walletManager.loadWallet(seed: seed)
 		
+		maybeRegisterPushToken()
 		maybeRegisterFcmToken()
 		setupActivePaymentsListener()
 		
-		if let cloudInfo = cloudInfo {
+		if let walletInfo = walletInfo {
 			
-			let cloudKey = cloudInfo.first!
-			let encryptedNodeId = cloudInfo.second! as String
+			let cloudKey = walletInfo.cloudKey
+			let encryptedNodeId = walletInfo.encryptedNodeId as String
 			
 			if let walletRestoreType = walletRestoreType {
 				switch walletRestoreType {
@@ -784,16 +792,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		log.trace("maybeRegisterFcmToken()")
 		assertMainThread()
 		
-		if !walletLoaded {
-			log.debug("maybeRegisterFcmToken: no: !walletLoaded")
+		if walletInfo == nil {
+			log.debug("maybeRegisterFcmToken: walletInfo is nil")
 			return
 		}
 		if fcmToken == nil {
-			log.debug("maybeRegisterFcmToken: no: !fcmToken")
+			log.debug("maybeRegisterFcmToken: fcmToken is nil")
 			return
 		}
 		if !(peerConnectionState is Lightning_kmpConnection.ESTABLISHED) {
-			log.debug("maybeRegisterFcmToken: no: !peerConnection")
+			log.debug("maybeRegisterFcmToken: peerConnection not established")
 			return
 		}
 		
@@ -834,5 +842,143 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		//
 		// The ideal solution would be to have the server send some kind of Ack for the
 		// registration. Which we could then use to trigger a storage in UserDefaults.
+	}
+	
+	func maybeRegisterPushToken() -> Void {
+		log.trace("maybeRegisterPushToken()")
+		assertMainThread()
+		
+		guard let pushToken = pushToken else {
+			log.debug("maybeRegisterPushToken: pushToken is nil")
+			return
+		}
+		guard let walletInfo = walletInfo else {
+			log.debug("maybeRegisterPushToken: walletInfo is nil")
+			return
+		}
+		
+		let nodeIdHash = walletInfo.nodeId.hash160().toSwiftData().toHex()
+		
+		if let prvRegistration = Prefs.shared.pushTokenRegistration {
+
+			if prvRegistration.pushToken == pushToken &&
+			   prvRegistration.nodeIdHash == nodeIdHash
+			{
+				// We've already registered our {pushToken, nodeId} tuple.
+
+				if abs(prvRegistration.registrationDate.timeIntervalSinceNow) < 30.days() {
+					// The last registration was recent, so we can skip registration.
+					log.debug("Push token already registered")
+					return
+
+				} else {
+					// It's been awhile since we last registered, so let's re-register.
+					// This is a self-healing mechanism, in case of server problems.
+				}
+			}
+		}
+		
+		let registration = PushTokenRegistration(
+			pushToken: pushToken,
+			nodeIdHash: nodeIdHash,
+			registrationDate: Date()
+		)
+		
+		let url = URL(string: "https://s7r6lsmzk7.execute-api.us-west-2.amazonaws.com/v1/pub/push/register")
+		guard let requestUrl = url else { return }
+		
+		#if DEBUG
+		let platform = "iOS-development"
+		#else
+		// Note: This is actually wrong if you build-and-run using RELEASE mode.
+		let platform = "iOS-production"
+		#endif
+		
+		let body = [
+			"app_id"     : "co.acinq.phoenix",
+			"platform"   : platform,
+			"push_token" : pushToken,
+			"node_id"    : walletInfo.nodeId.value.toHex()
+		]
+		let bodyData = try? JSONSerialization.data(
+			 withJSONObject: body,
+			 options: []
+		)
+		
+		var request = URLRequest(url: requestUrl)
+		request.httpMethod = "POST"
+		request.httpBody = bodyData
+		
+		let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+			
+			var statusCode = 418
+			var success = false
+			if let httpResponse = response as? HTTPURLResponse {
+				statusCode = httpResponse.statusCode
+				if statusCode >= 200 && statusCode < 300 {
+					success = true
+				}
+			}
+			
+			if success {
+				log.debug("/push/register: success")
+				Prefs.shared.pushTokenRegistration = registration
+			}
+			else if let error = error {
+				log.debug("/push/register: error: \(String(describing: error))")
+			} else {
+				log.debug("/push/register: statusCode: \(statusCode)")
+				if let data = data, let dataString = String(data: data, encoding: .utf8) {
+					log.debug("/push/register: response:\n\(dataString)")
+				}
+			}
+		}
+		
+		log.debug("/push/register ...")
+		task.resume()
+	}
+	
+	private func didReceiveMessageFromAppExtension() {
+		log.trace("didReceiveMessageFromAppExtension()")
+		
+		// We received a message from the notification-service-extension.
+		// This usually happens when:
+		// - phoenix was running in the background
+		// - a received push notification launched our notification-service-extension
+		// - our app extension received an incoming payment
+		// - the user returns to phoenix app
+		//
+		// So our app extension may have updated the database.
+		// However, we don't know about all these changes yet...
+		//
+		// This is because the SQLDelight query flows do NOT automatically update
+		// if changes occur in a separate process. Within SQLDelight there is:
+		//
+		// `TransactorImpl.notifyQueries(...)`
+		//
+		// This function needs to get called in order for the flows to re-perform
+		// their query, and update their state.
+		//
+		// So there are 2 ways in which we can accomplish this:
+		// - Jump thru a bunch of hoops to subclass the SqlDriver,
+		//   and then add a custom transaction that calls invokes notifyQueries
+		//   with the appropriate parameters.
+		// - Just make some no-op calls, which automatically invoke notifyQueries for us.
+		//
+		// We're using the easier option for now.
+		// Especially since there are changes in the upcoming v2.0 release of SQLDelight
+		// that change the corresponding API, and aim to make it more accesible for us.
+		
+		let business = AppDelegate.get().business
+		business.databaseManager.paymentsDb { paymentsDb, _ in
+		
+			let fakePaymentId = WalletPaymentId.IncomingPaymentId(paymentHash: Bitcoin_kmpByteVector32.random())
+			paymentsDb?.deletePayment(paymentId: fakePaymentId) { _, _ in
+				// Nothing is actually deleted
+			}
+		}
+		business.appDb.deleteBitcoinRate(fiat: "FakeFiatCurrency") { _, _ in
+			// Nothing is actually deleted
+		}
 	}
 }

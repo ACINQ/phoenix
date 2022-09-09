@@ -324,7 +324,7 @@
 "Connecting to:" = "Conectando a:";
 
 /* Connection state */
-"Connecting..." = "Conectando...";
+"Connecting…" = "Conectando…";
 
 /* Error title */
 "Connection failure" = "Fallo de conexión";
@@ -1125,7 +1125,7 @@
 "The fee is **%@%%** with a minimum fee of **%@**." = "La tarifa es de **%@%%** con una tarifa mínima de **%@** ";
 
 /* SendView */
-"The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount**  in the payment request." = "La factura no incluye el monto. Esto puede ser peligroso: los nodos maliciosos pueden robar su pago. Para estar seguro, **solicite al beneficiario que especifique un monto** en la solicitud de pago.";
+"The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount** in the payment request." = "La factura no incluye el monto. Esto puede ser peligroso: los nodos maliciosos pueden robar su pago. Para estar seguro, **solicite al beneficiario que especifique un monto** en la solicitud de pago.";
 
 /* Error message - scanning lightning invoice */
 "The invoice is for (requestChain), but you're on (reason.myChain.name)" = "La factura es para (requestChain), pero estás en (reason.myChain.name)";

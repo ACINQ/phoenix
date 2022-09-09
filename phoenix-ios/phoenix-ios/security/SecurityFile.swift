@@ -9,17 +9,15 @@ struct SecurityFile: Codable {
 	private enum CodingKeys: String, CodingKey {
 		case keychain
 		case biometrics
-		case passphrase
 	}
 	
 	/// The "keychain" option represents the default security.
-	/// That is, the user has not enabled any additional security measures such as touchID or passphrase.
+	/// That is, the user has not enabled any additional security measures such as touchID/faceID.
 	///
 	/// Here's how it works:
 	/// The seed is wrapped with a randomly generated key (called the locking key).
 	/// The lockingKey is then stored in the iOS keychain.
-	/// And the SecurityFile contains the parameters needed to reproduce the seed
-	/// if given the lockingKey.
+	/// And the SecurityFile contains the parameters needed to reproduce the seed, given the lockingKey.
 	/// E.g. the salt, nonce, IV, tag, rounds ... whatever the specific crypto algorithm needs
 	///
 	let keychain: KeyInfo?
@@ -30,32 +28,24 @@ struct SecurityFile: Codable {
 	/// The seed is wrapped with a randomly generated key (called the locking key).
 	/// The lockingKey is then stored in the iOS keychain, and configured with access-control
 	/// settings that require biometrics to unlock/access the keychain item.
-	/// And the SecurityFile contains the parameters needed to reproduce the seed
-	/// if given the lockingKey.
+	/// And the SecurityFile contains the parameters needed to reproduce the seed, given the lockingKey.
 	/// E.g. the salt, nonce, IV, tag, rounds ... whatever the specific crypto algorithm needs
 	///
 	let biometrics: KeyInfo?
 	
-	/// Reserved for future use.
-	/// 
-	let passphrase: KeyInfo?
-	
 	init() {
 		self.keychain = nil
 		self.biometrics = nil
-		self.passphrase = nil
 	}
 	
 	init(keychain: KeyInfo) {
 		self.keychain = keychain
 		self.biometrics = nil
-		self.passphrase = nil
 	}
 	
-	init(biometrics: KeyInfo?, passphrase: KeyInfo?) {
+	init(biometrics: KeyInfo) {
 		self.keychain = nil
 		self.biometrics = biometrics
-		self.passphrase = passphrase
 	}
 
 	init(from decoder: Decoder) throws {
@@ -63,7 +53,6 @@ struct SecurityFile: Codable {
 		
 		self.keychain = try container.decodeIfPresent(KeyInfo_ChaChaPoly.self, forKey: .keychain)
 		self.biometrics = try container.decodeIfPresent(KeyInfo_ChaChaPoly.self, forKey: .biometrics)
-		self.passphrase = try container.decodeIfPresent(KeyInfo_ChaChaPoly.self, forKey: .passphrase)
 	}
 	
 	func encode(to encoder: Encoder) throws {
@@ -75,9 +64,6 @@ struct SecurityFile: Codable {
 		}
 		if let biometrics = self.biometrics as? KeyInfo_ChaChaPoly {
 			try container.encode(biometrics, forKey: .biometrics)
-		}
-		if let passphrase = self.passphrase as? KeyInfo_ChaChaPoly {
-			try container.encode(passphrase, forKey: .passphrase)
 		}
 	}
 }

@@ -56,6 +56,16 @@ struct MainView_Small: View {
 	)
 	@State var footerButtonHeight: CGFloat? = nil
 	
+	@State var footerTruncationDetection_standard: [ContentSizeCategory: Bool] = [:]
+	@State var footerTruncationDetection_condensed: [ContentSizeCategory: Bool] = [:]
+	
+	@Environment(\.sizeCategory) var contentSizeCategory: ContentSizeCategory
+	
+	// When we drop iOS 14 support, switch to this:
+//	@State var footerTruncationDetection_standard: [DynamicTypeSize: Bool] = [:]
+//	@State var footerTruncationDetection_condensed: [DynamicTypeSize: Bool] = [:]
+//	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
+	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -86,6 +96,7 @@ struct MainView_Small: View {
 			) {
 				EmptyView()
 			}
+			.accessibilityHidden(true)
 			
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
@@ -94,6 +105,7 @@ struct MainView_Small: View {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+					.accessibilityHidden(true)
 			}
 
 			content()
@@ -131,9 +143,11 @@ struct MainView_Small: View {
 			// Leading Button 1
 			header_settingsButton()
 				.padding(.trailing)
+				.accessibilitySortPriority(23)
 			
 			// Leading Button 2
 			header_transactionsButton()
+				.accessibilitySortPriority(22)
 			
 			Spacer()
 			
@@ -143,6 +157,7 @@ struct MainView_Small: View {
 				headerButtonHeight: $headerButtonHeight
 			)
 			.padding(.trailing)
+			.accessibilitySortPriority(21)
 			
 			// Trailing Button 1
 			ToolsMenu(
@@ -150,6 +165,7 @@ struct MainView_Small: View {
 				buttonHeight: $headerButtonHeight,
 				openCurrencyConverter: { navLinkTag = .CurrencyConverter }
 			)
+			.accessibilitySortPriority(20)
 		}
 		.padding([.top, .leading, .trailing])
 		.padding(.bottom, 40) // extra padding on bottom, between Header & HomeView
@@ -178,6 +194,7 @@ struct MainView_Small: View {
 						.stroke(Color.borderColor, lineWidth: 1)
 				)
 		}
+		.accessibilityLabel("Settings")
 	}
 	
 	@ViewBuilder
@@ -202,59 +219,25 @@ struct MainView_Small: View {
 						.stroke(Color.borderColor, lineWidth: 1)
 				)
 		}
+		.accessibilityLabel("Payment history")
 	}
 	
 	@ViewBuilder
 	func footer() -> some View {
 		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			
-			Spacer()
-			Button {
-				navLinkTag = .ReceiveView
-			} label: {
-				Label {
-					Text("Receive")
-						.minimumScaleFactor(0.5)
-						.foregroundColor(.primaryForeground)
-				} icon: {
-					Image("ic_receive_resized")
-						.resizable()
-						.frame(width: receiveImageSize, height: receiveImageSize)
-						.foregroundColor(.appAccent)
-				}
-			}
-			.frame(minWidth: footerButtonWidth, alignment: Alignment.trailing)
-			.read(footerButtonWidthReader)
-			.read(footerButtonHeightReader)
-
-			Spacer()
-			if let footerButtonHeight = footerButtonHeight {
-				Divider().frame(width: 1, height: footerButtonHeight).background(Color.borderColor)
-				Spacer()
-			}
-
-			Button {
-				navLinkTag = .SendView
-			} label: {
-				Label {
-					Text("Send")
-						.minimumScaleFactor(0.5)
-						.foregroundColor(.primaryForeground)
-				} icon: {
-					Image("ic_scan_resized")
-						.resizable()
-						.frame(width: sendImageSize, height: sendImageSize)
-						.foregroundColor(.appAccent)
-				}
-			}
-			.frame(minWidth: footerButtonWidth, alignment: Alignment.leading)
-			.read(footerButtonWidthReader)
-			.read(footerButtonHeightReader)
-			
-			Spacer()
+		let csc = contentSizeCategory
+		let footerTruncationDetected_condensed = footerTruncationDetection_condensed[csc] ?? false
+		let footerTruncationDetected_standard = footerTruncationDetection_standard[csc] ?? false
 		
-		} // </HStack>
+		Group {
+			if footerTruncationDetected_condensed {
+				footer_accessibility()
+			} else if footerTruncationDetected_standard {
+				footer_condensed(csc)
+			} else {
+				footer_standard(csc)
+			}
+		}
 		.padding(.top, 20)
 		.padding(.bottom, deviceInfo.isFaceID ? 10 : 20)
 		.background(
@@ -264,6 +247,209 @@ struct MainView_Small: View {
 		)
 		.assignMaxPreference(for: footerButtonWidthReader.key, to: $footerButtonWidth)
 		.assignMaxPreference(for: footerButtonHeightReader.key, to: $footerButtonHeight)
+	}
+	
+	@ViewBuilder
+	func footer_standard(_ csc: ContentSizeCategory) -> some View {
+		
+		// We're trying to center the divider:
+		//
+		// ---------------------------------
+		// | [img] Receive | [img] Send    |
+		// ---------------------------------
+		//                 ^ perfectly centered
+		//
+		// To accomplish this, we make both buttons the same width.
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			
+			Spacer(minLength: 2)
+			
+			Button {
+				navLinkTag = .ReceiveView
+			} label: {
+				Label {
+					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+						Text("Receive")
+							.lineLimit(1)
+							.foregroundColor(.primaryForeground)
+					} wasTruncated: {
+						log.debug("footerTruncationDetected_standard(receive): \(csc)")
+						self.footerTruncationDetection_standard[csc] = true
+					}
+				} icon: {
+					Image("ic_receive_resized")
+						.resizable()
+						.frame(width: receiveImageSize, height: receiveImageSize)
+						.foregroundColor(.appAccent)
+				}
+			}
+			.frame(minWidth: footerButtonWidth, alignment: Alignment.center)
+			.read(footerButtonWidthReader)
+			.read(footerButtonHeightReader)
+			.accessibilityLabel("Receive payment")
+			.accessibilitySortPriority(38)
+
+			Spacer(minLength: 2)
+			if let footerButtonHeight = footerButtonHeight {
+				Divider().frame(width: 1, height: footerButtonHeight).background(Color.borderColor)
+				Spacer(minLength: 2)
+			}
+
+			Button {
+				navLinkTag = .SendView
+			} label: {
+				Label {
+					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+						Text("Send")
+							.lineLimit(1)
+							.foregroundColor(.primaryForeground)
+					} wasTruncated: {
+						log.debug("footerTruncationDetected_standard(send): \(csc)")
+						self.footerTruncationDetection_standard[csc] = true
+					}
+				} icon: {
+					Image("ic_scan_resized")
+						.resizable()
+						.frame(width: sendImageSize, height: sendImageSize)
+						.foregroundColor(.appAccent)
+				}
+			}
+			.frame(minWidth: footerButtonWidth, alignment: Alignment.center)
+			.read(footerButtonWidthReader)
+			.read(footerButtonHeightReader)
+			.accessibilityLabel("Send payment")
+			.accessibilitySortPriority(39)
+			
+			Spacer(minLength: 2)
+		
+		} // </HStack>
+	}
+	
+	@ViewBuilder
+	func footer_condensed(_ csc: ContentSizeCategory) -> some View {
+		
+		// There's a large font being used, and possibly a small screen too.
+		// Thus horizontal space is tight.
+		//
+		// So we're going to just try to squeeze the buttons into a single line.
+		//
+		// ------------------------------
+		// | [img] Receive | [img] Send |
+		// ------------------------------
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			
+			Spacer(minLength: 0)
+			
+			Button {
+				navLinkTag = .ReceiveView
+			} label: {
+				Label {
+					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+						Text("Receive")
+							.lineLimit(1)
+							.foregroundColor(.primaryForeground)
+					} wasTruncated: {
+						log.debug("footerTruncationDetected_condensed(receive): \(csc)")
+						self.footerTruncationDetection_condensed[csc] = true
+					}
+				} icon: {
+					Image("ic_receive_resized")
+						.resizable()
+						.frame(width: receiveImageSize, height: receiveImageSize)
+						.foregroundColor(.appAccent)
+				} // </Label>
+			} // </Button>
+			.read(footerButtonHeightReader)
+			.accessibilityLabel("Receive payment")
+			.accessibilitySortPriority(38)
+
+			Spacer(minLength: 0)
+			if let footerButtonHeight = footerButtonHeight {
+				Divider().frame(width: 1, height: footerButtonHeight).background(Color.borderColor)
+				Spacer(minLength: 0)
+			}
+
+			Button {
+				navLinkTag = .SendView
+			} label: {
+				Label {
+					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+						Text("Send")
+							.lineLimit(1)
+							.foregroundColor(.primaryForeground)
+					} wasTruncated: {
+						log.debug("footerTruncationDetected_condensed(send): \(csc)")
+						self.footerTruncationDetection_condensed[csc] = true
+					}
+				} icon: {
+					Image("ic_scan_resized")
+						.resizable()
+						.frame(width: sendImageSize, height: sendImageSize)
+						.foregroundColor(.appAccent)
+				} // </Label>
+			} // </Button>
+			.read(footerButtonHeightReader)
+			.accessibilityLabel("Send payment")
+			.accessibilitySortPriority(39)
+		
+			Spacer(minLength: 0)
+			
+		} // </HStack>
+	}
+	
+	@ViewBuilder
+	func footer_accessibility() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			Spacer()
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				
+				Button {
+					navLinkTag = .ReceiveView
+				} label: {
+					Label {
+						Text("Receive")
+							.lineLimit(1)
+							.foregroundColor(.primaryForeground)
+					} icon: {
+						Image("ic_receive_resized")
+							.resizable()
+							.frame(width: receiveImageSize, height: receiveImageSize)
+							.foregroundColor(.appAccent)
+					} // </Label>
+				} // </Button>
+				.frame(minWidth: footerButtonWidth, alignment: Alignment.leading)
+				.read(footerButtonWidthReader)
+				.accessibilityLabel("Receive payment")
+				.accessibilitySortPriority(38)
+				
+				Divider().frame(height: 1).background(Color.borderColor)
+				
+				Button {
+					navLinkTag = .SendView
+				} label: {
+					Label {
+						Text("Send")
+							.lineLimit(1)
+							.foregroundColor(.primaryForeground)
+					} icon: {
+						Image("ic_scan_resized")
+							.resizable()
+							.frame(width: sendImageSize, height: sendImageSize)
+							.foregroundColor(.appAccent)
+					} // </Label>
+				} // </Button>
+				.frame(minWidth: footerButtonWidth, alignment: Alignment.leading)
+				.read(footerButtonWidthReader)
+				.accessibilityLabel("Send payment")
+				.accessibilitySortPriority(39)
+				
+			} // </VStack>
+			Spacer()
+		} // </HStack>
+		.padding(.horizontal)
 	}
 	
 	@ViewBuilder
@@ -358,6 +544,26 @@ struct MainView_Small: View {
 				case .drainWallet    : self.navLinkTag = .ConfigurationView
 				case .electrum       : self.navLinkTag = .ConfigurationView
 			}
+		}
+	}
+}
+
+extension ContentSizeCategory: CustomStringConvertible {
+	public var description: String {
+		switch self {
+			case .extraSmall                        : return "XS"
+			case .small                             : return "S"
+			case .medium                            : return "M"
+			case .large                             : return "L"
+			case .extraLarge                        : return "XL"
+			case .extraExtraLarge                   : return "XXL"
+			case .extraExtraExtraLarge              : return "XXXL"
+			case .accessibilityMedium               : return "aM"
+			case .accessibilityLarge                : return "aL"
+			case .accessibilityExtraLarge           : return "aXL"
+			case .accessibilityExtraExtraLarge      : return "aXXL"
+			case .accessibilityExtraExtraExtraLarge : return "aXXXL"
+			@unknown default                        : return "U"
 		}
 	}
 }

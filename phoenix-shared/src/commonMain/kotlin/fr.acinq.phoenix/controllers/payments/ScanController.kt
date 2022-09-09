@@ -244,7 +244,7 @@ class AppScanController(
                 when {
                     result == null -> {} // do nothing, this request has been cancelled.
                     result is Either.Left -> model(Scan.Model.BadRequest(result.value))
-                    result is Either.Right && result.value is LNUrl.Pay -> { // result: LNUrl
+                    result is Either.Right -> { // result: LNUrl
                         when (val lnurl = result.value) {
                             is LNUrl.Pay -> {
                                 model(

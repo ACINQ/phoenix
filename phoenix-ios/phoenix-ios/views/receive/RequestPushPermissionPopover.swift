@@ -32,6 +32,8 @@ struct RequestPushPermissionPopover: View {
 				Text("Would you like to be notified when somebody sends you a payment?")
 			}
 			.padding(.bottom)
+			.accessibilityAddTraits(.isHeader)
+			.accessibilitySortPriority(1)
 			
 			HStack {
 				Button {

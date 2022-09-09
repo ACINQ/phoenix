@@ -49,8 +49,6 @@ class PhoenixBusiness(
     private val logger = loggerFactory.newLogger(this::class)
 
     internal val tcpSocketBuilder = TcpSocket.Builder()
-
-    internal val networkMonitor by lazy { NetworkManager(loggerFactory, ctx) }
     internal val httpClient by lazy {
         HttpClient {
             install(JsonFeature) {
@@ -68,8 +66,8 @@ class PhoenixBusiness(
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
 
-    internal val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
-
+    val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
+    val networkMonitor by lazy { NetworkMonitor(loggerFactory, ctx) }
     val walletManager by lazy { WalletManager(chain) }
     val nodeParamsManager by lazy { NodeParamsManager(this) }
     val databaseManager by lazy { DatabaseManager(this) }
@@ -93,23 +91,6 @@ class PhoenixBusiness(
             appConnectionsDaemon = AppConnectionsDaemon(this)
         }
     }
-
-    // Converts a mnemonics list to a seed.
-    // This is generally called with a mnemonics list that has been previously saved.
-    fun prepWallet(mnemonics: List<String>, passphrase: String = ""): ByteArray {
-        MnemonicCode.validate(mnemonics)
-        return MnemonicCode.toSeed(mnemonics, passphrase)
-    }
-
-    fun loadWallet(seed: ByteArray): Pair<ByteVector32, String>? {
-        if (walletManager.wallet.value == null) {
-            walletManager.loadWallet(seed)
-            return walletManager.wallet.value?.cloudKeyAndEncryptedNodeId()
-        }
-        return null
-    }
-
-    fun getXpub(): Pair<String, String>? = walletManager.wallet.value?.xpub()
 
     fun peerState() = peerManager.peerState
 

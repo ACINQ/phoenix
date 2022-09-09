@@ -1,6 +1,32 @@
 /**
  * Code inspired from Apple Sample Code:
  * https://developer.apple.com/documentation/cryptokit/storing_cryptokit_keys_in_the_keychain
+ *
+ * Notes concerning the AccessGroup:
+ *
+ * Apple has a good article that discusses AccessGroup's:
+ *
+ * - Title: "Sharing Access to Keychain Items Among a Collection of Apps"
+ * - Link: https://developer.apple.com/documentation/security/keychain_services/
+ *         keychain_items/sharing_access_to_keychain_items_among_a_collection_of_apps
+ *
+ * Cliff notes:
+ * - An app can belong to multiple access groups
+ * - Each access group represents a distinct keychain domain
+ * - A keychain item can only belong to a single keychain domain
+ * - The default domain is "${TeamID}.${AppID}"
+ * - The list of domains is a sorted array, which represents the search order
+ * - The default domain comes before app groups
+ *
+ * IMPORTANT:
+ * - If you specify a nil group, you will search ALL domains
+ *
+ * Thus, if you say, for example:
+ * `keychain.deleteKey(account: "foobar", accessGroup: nil)`
+ *
+ * Then this would delete the associated ITEM from ALL keychain domains !
+ * Which may be an unexpected result, and could lead to lost funds.
+ * Thus the `accessGroup` is a REQUIRED parameter.
 */
 
 import Foundation
@@ -13,14 +39,16 @@ struct GenericPasswordStore {
 	/// Stores raw Data in the keychain.
 	///
 	func storeKey(
-		_ key   : Data,
-		account : String,
-		mixins  : [String: Any]
+		_ key       : Data,
+		account     : String,
+		accessGroup : String, // always required (see notes atop)
+		mixins      : [String: Any]? = nil
 	) throws {
 		
-		var query = mixins
+		var query = mixins ?? [String: Any]()
 		query[kSecClass as String] = kSecClassGenericPassword
 		query[kSecAttrAccount as String] = account
+		query[kSecAttrAccessGroup as String] = accessGroup
 		query[kSecUseDataProtectionKeychain as String] = true
 		query[kSecValueData as String] = key
 		
@@ -34,33 +62,36 @@ struct GenericPasswordStore {
 	/// Stores a simple String in the keychain.
 	///
 	func storeKey(
-		_ key   : String,
-		account : String,
-		mixins  : [String: Any]
+		_ key       : String,
+		account     : String,
+		accessGroup : String,
+		mixins      : [String: Any]? = nil
 	) throws {
 		
 		guard let keyData = key.data(using: .utf8) else {
-			throw KeyStoreError("Unable to convert strong to data using utf8")
+			throw KeyStoreError("Unable to convert string to data using utf8")
 		}
 		
-		try storeKey(keyData, account: account, mixins: mixins)
+		try storeKey(keyData, account: account, accessGroup: accessGroup, mixins: mixins)
 	}
 	
 	/// Stores a CryptoKit key in the keychain.
 	///
 	func storeKey<T: GenericPasswordConvertible>(
-		_ key   : T,
-		account : String,
-		mixins  : [String: Any]
+		_ key       : T,
+		account     : String,
+		accessGroup : String,
+		mixins      : [String: Any]? = nil
 	) throws {
 
 		let keyData = key.rawRepresentation
 		
-		try storeKey(keyData, account: account, mixins: mixins)
+		try storeKey(keyData, account: account, accessGroup: accessGroup, mixins: mixins)
 	}
 	
 	func keyExists(
-		account: String
+		account     : String,
+		accessGroup : String // always required (see notes atop)
 	) throws -> Bool {
 		
 		let context = LAContext()
@@ -69,8 +100,9 @@ struct GenericPasswordStore {
 		var query = [String: Any]()
 		query[kSecClass as String] = kSecClassGenericPassword
 		query[kSecAttrAccount as String] = account
+		query[kSecAttrAccessGroup as String] = accessGroup
 		query[kSecUseDataProtectionKeychain as String] = true
-		query[kSecReturnData as String] = false // <- don't want it
+		query[kSecReturnData as String] = false // <- don't need it, don't want it
 		query[kSecMatchLimit as String] = kSecMatchLimitOne
 		query[kSecUseAuthenticationContext as String] = context
 		
@@ -86,14 +118,16 @@ struct GenericPasswordStore {
 	/// Reads raw Data from the keychain.
 	///
 	func readKey(
-		account : String,
-		mixins  : [String: Any]? = nil
+		account     : String,
+		accessGroup : String, // always required (see notes atop)
+		mixins      : [String: Any]? = nil
 	) throws -> Data? {
 		
 		// Seek a generic password with the given account.
 		var query = mixins ?? [String: Any]()
 		query[kSecClass as String] = kSecClassGenericPassword
 		query[kSecAttrAccount as String] = account
+		query[kSecAttrAccessGroup as String] = accessGroup
 		query[kSecUseDataProtectionKeychain as String] = true
 		query[kSecReturnData as String] = true
 		query[kSecMatchLimit as String] = kSecMatchLimitOne
@@ -110,11 +144,12 @@ struct GenericPasswordStore {
 	/// Reads data from the keychain, and interprets it as a String.
 	///
 	func readKey(
-		account : String,
-		mixins  : [String: Any]? = nil
+		account     : String,
+		accessGroup : String,
+		mixins      : [String: Any]? = nil
 	) throws -> String? {
 		
-		if let data: Data = try readKey(account: account, mixins: mixins) {
+		if let data: Data = try readKey(account: account, accessGroup: accessGroup, mixins: mixins) {
 			return String(data: data, encoding: .utf8)
 		}
 		return nil
@@ -123,28 +158,33 @@ struct GenericPasswordStore {
 	/// Reads a CryptoKit key from the keychain.
 	///
 	func readKey<T: GenericPasswordConvertible>(
-		account : String,
-		mixins  : [String: Any]? = nil
+		account     : String,
+		accessGroup : String,
+		mixins      : [String: Any]? = nil
 	) throws -> T? {
 
-		if let data: Data = try readKey(account: account, mixins: mixins) {
+		if let data: Data = try readKey(account: account, accessGroup: accessGroup, mixins: mixins) {
 			return try T(rawRepresentation: data)
 		}
 		return nil
 	}
 	
 	/// Removes any existing key with the given account.
-	func deleteKey(account: String) throws {
-		let query = [
-			kSecClass                     : kSecClassGenericPassword,
-			kSecAttrAccount               : account,
-			kSecUseDataProtectionKeychain : true
-		] as [String: Any]
+	func deleteKey(
+		account     : String,
+		accessGroup : String // always required (see notes atop)
+	) throws {
 		
-        switch SecItemDelete(query as CFDictionary) {
-        	case errSecItemNotFound, errSecSuccess: break // Okay to ignore
-        	case let status:
-            	throw KeyStoreError("Unexpected deletion error: \(status.message)")
+		var query = [String: Any]()
+		query[kSecClass as String] = kSecClassGenericPassword
+		query[kSecAttrAccount as String] = account
+		query[kSecAttrAccessGroup as String] = accessGroup
+		query[kSecUseDataProtectionKeychain as String] = true
+		
+		switch SecItemDelete(query as CFDictionary) {
+			case errSecItemNotFound, errSecSuccess: break // OK to ignore ItemNotFound
+			case let status:
+				throw KeyStoreError("Unexpected deletion error: \(status.message)")
 		}
 	}
 }

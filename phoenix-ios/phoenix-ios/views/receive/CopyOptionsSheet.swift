@@ -7,6 +7,7 @@ import SwiftUI
 ///
 struct CopyOptionsSheet: View {
 	
+	let textType: String
 	let copyText: () -> Void
 	let copyImage: () -> Void
 	
@@ -27,7 +28,7 @@ struct CopyOptionsSheet: View {
 						.imageScale(.medium)
 					Text("Copy Text")
 					Spacer()
-					Text("(Lightning invoice)")
+					Text(verbatim: textType)
 						.font(.footnote)
 						.foregroundColor(.secondary)
 				}

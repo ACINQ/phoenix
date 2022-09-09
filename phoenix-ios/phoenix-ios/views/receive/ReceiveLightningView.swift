@@ -78,7 +78,7 @@ struct ReceiveLightningView: View {
 	@State var maxButtonWidth: CGFloat? = nil
 	
 	// --------------------------------------------------
-	// MARK: ViewBuilders
+	// MARK: View Builders
 	// --------------------------------------------------
 	
 	@ViewBuilder
@@ -95,6 +95,7 @@ struct ReceiveLightningView: View {
 			) {
 				EmptyView()
 			}
+			.accessibilityHidden(true)
 			
 			content()
 		}
@@ -182,7 +183,7 @@ struct ReceiveLightningView: View {
 	func mainPortrait() -> some View {
 		
 		VStack {
-			qrCodeView
+			qrCodeView()
 				.frame(width: 200, height: 200)
 				.padding()
 				.background(Color.white)
@@ -252,7 +253,7 @@ struct ReceiveLightningView: View {
 		
 		HStack {
 			
-			qrCodeView
+			qrCodeView()
 				.frame(width: 200, height: 200)
 				.padding(.all, 20)
 				.background(Color.white)
@@ -304,7 +305,7 @@ struct ReceiveLightningView: View {
 		
 		ZStack {
 			
-			qrCodeView
+			qrCodeView()
 				.padding()
 				.background(Color.white)
 				.cornerRadius(20)
@@ -330,6 +331,8 @@ struct ReceiveLightningView: View {
 							.frame(width: 30, height: 30)
 					}
 					.padding()
+					.accessibilityLabel("Close full screen")
+					.accessibilitySortPriority(1)
 				}
 				Spacer()
 			}
@@ -337,7 +340,7 @@ struct ReceiveLightningView: View {
 	}
 	
 	@ViewBuilder
-	var qrCodeView: some View {
+	func qrCodeView() -> some View {
 		
 		if let m = mvi.model as? Receive.Model_Generated,
 		   let qrCodeValue = qrCode.value,
@@ -371,6 +374,21 @@ struct ReceiveLightningView: View {
 					}
 				} // </contextMenu>
 				.matchedGeometryEffect(id: "qrCodeView_inner", in: qrCodeAnimation_inner)
+				.accessibilityElement()
+				.accessibilityAddTraits(.isImage)
+				.accessibilityLabel("QR code")
+				.accessibilityHint("Lightning invoice")
+				.accessibilityAction(named: "Copy Image") {
+					copyImageToPasteboard()
+				}
+				.accessibilityAction(named: "Share Image") {
+					shareImageToSystem()
+				}
+				.accessibilityAction(named: "Full Screen") {
+					withAnimation {
+						isFullScreenQrcode = true
+					}
+				}
 			
 		} else {
 			VStack {
@@ -383,6 +401,7 @@ struct ReceiveLightningView: View {
 					.foregroundColor(Color(UIColor.darkGray))
 					.font(.caption)
 			}
+			.accessibilityElement(children: .combine)
 		}
 	}
 	
@@ -425,6 +444,9 @@ struct ReceiveLightningView: View {
 		} // </Button>
 		.frame(width: maxButtonWidth)
 		.read(maxButtonWidthReader)
+		.accessibilityElement()
+		.accessibilityLabel(text)
+		.accessibilityAddTraits(.isButton)
 	}
 	
 	@ViewBuilder
@@ -445,6 +467,12 @@ struct ReceiveLightningView: View {
 		.simultaneousGesture(TapGesture().onEnded {
 			didTapCopyButton()
 		})
+		.accessibilityAction(named: "Copy Text (lightning invoice)") {
+			copyTextToPasteboard()
+		}
+		.accessibilityAction(named: "Copy Image (QR code)") {
+			copyImageToPasteboard()
+		}
 	}
 	
 	@ViewBuilder
@@ -465,6 +493,12 @@ struct ReceiveLightningView: View {
 		.simultaneousGesture(TapGesture().onEnded {
 			didTapShareButton()
 		})
+		.accessibilityAction(named: "Share Text (lightning invoice)") {
+			shareTextToSystem()
+		}
+		.accessibilityAction(named: "Share Image (QR code)") {
+			shareImageToSystem()
+		}
 	}
 	
 	@ViewBuilder
@@ -503,6 +537,8 @@ struct ReceiveLightningView: View {
 					.frame(width: 32, height: 32)
 			}
 			.padding(.top, paddingTop)
+			.accessibilityLabel("Warning: background app refresh disabled")
+			.accessibilityHint("Tap for more info")
 		}
 		else if !pushPermissionRequestedFromOS {
 			
@@ -520,6 +556,8 @@ struct ReceiveLightningView: View {
 					.frame(width: 32, height: 32)
 			}
 			.padding(.top, paddingTop)
+			.accessibilityLabel("Warning: notifications disabled")
+			.accessibilityHint("Tap for more info")
 		}
 		else if notificationsDisabled || (alertsDisabled && badgesDisabled) {
 			
@@ -541,6 +579,8 @@ struct ReceiveLightningView: View {
 					.frame(width: 32, height: 32)
 			}
 			.padding(.top, paddingTop)
+			.accessibilityLabel("Warning: notifications disabled")
+			.accessibilityHint("Tap for more info")
 		}
 	}
 	
@@ -599,7 +639,7 @@ struct ReceiveLightningView: View {
 	}
 	
 	// --------------------------------------------------
-	// MARK: UI Content Helpers
+	// MARK: View Helpers
 	// --------------------------------------------------
 	
 	func invoiceAmount() -> String {
@@ -641,7 +681,7 @@ struct ReceiveLightningView: View {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Actions
+	// MARK: View Transitions
 	// --------------------------------------------------
 	
 	func onAppear() -> Void {
@@ -686,6 +726,20 @@ struct ReceiveLightningView: View {
 		showRequestPushPermissionPopoverTimer?.invalidate()
 	}
 	
+	func willEnterForeground() -> Void {
+		log.trace("willEnterForeground()")
+		
+		let query = Prefs.shared.pushPermissionQuery
+		if query != .neverAskedUser {
+			
+			checkPushPermissions()
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
 	func onModelChange(model: Receive.Model) -> Void {
 		log.trace("onModelChange()")
 		
@@ -697,15 +751,154 @@ struct ReceiveLightningView: View {
 		}
 	}
 	
-	func willEnterForeground() -> Void {
-		log.trace("willEnterForeground()")
+	func lastIncomingPaymentChanged(_ lastIncomingPayment: Lightning_kmpIncomingPayment) {
+		log.trace("lastIncomingPaymentChanged()")
 		
-		let query = Prefs.shared.pushPermissionQuery
-		if query != .neverAskedUser {
-			
-			checkPushPermissions()
+		guard let model = mvi.model as? Receive.Model_Generated else {
+			return
+		}
+		
+		if lastIncomingPayment.state() == WalletPaymentState.success &&
+			lastIncomingPayment.paymentHash.toHex() == model.paymentHash
+		{
+			presentationMode.wrappedValue.dismiss()
 		}
 	}
+	
+	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
+		log.trace("chainContextChanged()")
+		
+		swapIn_enabled = context.swapIn.v1.status is WalletContext.V0ServiceStatusActive
+		payToOpen_enabled = context.payToOpen.v1.status is WalletContext.V0ServiceStatusActive
+		payToOpen_minFundingSat = context.payToOpen.v1.minFundingSat
+	}
+	
+	func channelsChanged(_ channels: Lightning_kmpPeer.ChannelsMap) -> Void {
+		log.trace("channelsChanged()")
+		
+		var availableCount = 0
+		for (_, channel) in channels {
+			
+			if channel.asClosing() != nil ||
+				channel.asClosed() != nil ||
+				channel.asAborted() != nil
+			{
+				// ignore - channel isn't usable for incoming payments
+			} else {
+				availableCount += 1
+			}
+			
+		}
+		
+		channelsCount = availableCount
+	}
+	
+	func currencyConverterDidChange(_ amount: CurrencyAmount?) {
+		log.trace("currencyConverterDidChange()")
+		
+		modificationAmount = amount
+	}
+	
+	func currencyConvertDidClose() {
+		log.trace("currencyConverterDidClose()")
+		
+		var amount: Lightning_kmpMilliSatoshi? = nil
+		var desc: String? = nil
+		if let model = mvi.model as? Receive.Model_Generated {
+			amount = model.amount
+			desc = model.desc
+		}
+		
+		smartModalState.display(dismissable: true) {
+			
+			ModifyInvoiceSheet(
+				mvi: mvi,
+				savedAmount: $modificationAmount,
+				amount: amount,
+				desc: desc ?? "",
+				currencyConverterOpen: $currencyConverterOpen
+			)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func didTapCopyButton() -> Void {
+		log.trace("didTapCopyButton()")
+		
+		copyTextToPasteboard()
+	}
+	
+	func didLongPressCopyButton() -> Void {
+		log.trace("didLongPressCopyButton()")
+		
+		smartModalState.display(dismissable: true) {
+			
+			CopyOptionsSheet(
+				textType: NSLocalizedString("(Lightning invoice)", comment: "Type of text being copied"),
+				copyText: { copyTextToPasteboard() },
+				copyImage: { copyImageToPasteboard() }
+			)
+		}
+	}
+	
+	func didTapShareButton() -> Void {
+		log.trace("didTapShareButton()")
+		
+		shareTextToSystem()
+	}
+	
+	func didLongPressShareButton() -> Void {
+		log.trace("didLongPressShareButton()")
+		
+		smartModalState.display(dismissable: true) {
+			
+			ShareOptionsSheet(
+				textType: NSLocalizedString("(Lightning invoice)", comment: "Type of text being copied"),
+				shareText: { shareTextToSystem() },
+				shareImage: { shareImageToSystem() }
+			)
+		}
+	}
+	
+	func didTapEditButton() -> Void {
+		log.trace("didTapEditButton()")
+		
+		if let model = mvi.model as? Receive.Model_Generated {
+			
+			smartModalState.display(dismissable: true) {
+				
+				ModifyInvoiceSheet(
+					mvi: mvi,
+					savedAmount: $modificationAmount,
+					amount: model.amount,
+					desc: model.desc ?? "",
+					currencyConverterOpen: $currencyConverterOpen
+				)
+			}
+		}
+	}
+	
+	func didTapSwapInButton() -> Void {
+		log.trace("didTapSwapInButton()")
+		
+		if swapIn_enabled {
+			
+			mvi.intent(Receive.IntentRequestSwapIn())
+			
+		} else {
+			
+			popoverState.display(dismissable: true) {
+				SwapInDisabledPopover()
+			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Utilities
+	// --------------------------------------------------
 	
 	func requestPushPermission() -> Void {
 		log.trace("requestPushPermission()")
@@ -821,7 +1014,7 @@ struct ReceiveLightningView: View {
 		if let m = mvi.model as? Receive.Model_Generated {
 			UIPasteboard.general.string = m.request
 			toast.pop(
-				Text("Copied to pasteboard!").anyView,
+				NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 				colorScheme: colorScheme.opposite,
 				style: .chrome
 			)
@@ -839,28 +1032,9 @@ struct ReceiveLightningView: View {
 			let uiImg = UIImage(cgImage: qrCodeCgImage)
 			UIPasteboard.general.image = uiImg
 			toast.pop(
-				Text("Copied QR code image to pasteboard!").anyView,
+				NSLocalizedString("Copied QR code image to pasteboard!", comment: "Toast message"),
 				colorScheme: colorScheme.opposite
 			)
-		}
-	}
-	
-	func didTapCopyButton() -> Void {
-		log.trace("didTapCopyButton()")
-		
-		copyTextToPasteboard()
-	}
-	
-	func didLongPressCopyButton() -> Void {
-		log.trace("didLongPressCopyButton()")
-		
-		smartModalState.display(dismissable: true) {
-			
-			CopyOptionsSheet(copyText: {
-				copyTextToPasteboard()
-			}, copyImage: {
-				copyImageToPasteboard()
-			})
 		}
 	}
 	
@@ -885,128 +1059,6 @@ struct ReceiveLightningView: View {
 		{
 			let uiImg = UIImage(cgImage: qrCodeCgImage)
 			sheet = ReceiveViewSheet.sharingImg(img: uiImg)
-		}
-	}
-	
-	func didTapShareButton() -> Void {
-		log.trace("didTapShareButton()")
-		
-		shareTextToSystem()
-	}
-	
-	func didLongPressShareButton() -> Void {
-		log.trace("didLongPressShareButton()")
-		
-		smartModalState.display(dismissable: true) {
-			
-			ShareOptionsSheet(shareText: {
-				shareTextToSystem()
-			}, shareImage: {
-				shareImageToSystem()
-			})
-		}
-	}
-	
-	func didTapEditButton() -> Void {
-		log.trace("didTapEditButton()")
-		
-		if let model = mvi.model as? Receive.Model_Generated {
-			
-			smartModalState.display(dismissable: true) {
-				
-				ModifyInvoiceSheet(
-					mvi: mvi,
-					savedAmount: $modificationAmount,
-					amount: model.amount,
-					desc: model.desc ?? "",
-					currencyConverterOpen: $currencyConverterOpen
-				)
-			}
-		}
-	}
-	
-	func lastIncomingPaymentChanged(_ lastIncomingPayment: Lightning_kmpIncomingPayment) {
-		log.trace("lastIncomingPaymentChanged()")
-		
-		guard let model = mvi.model as? Receive.Model_Generated else {
-			return
-		}
-		
-		if lastIncomingPayment.state() == WalletPaymentState.success &&
-		   lastIncomingPayment.paymentHash.toHex() == model.paymentHash
-		{
-			presentationMode.wrappedValue.dismiss()
-		}
-	}
-	
-	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
-		log.trace("chainContextChanged()")
-		
-		swapIn_enabled = context.swapIn.v1.status is WalletContext.V0ServiceStatusActive
-		payToOpen_enabled = context.payToOpen.v1.status is WalletContext.V0ServiceStatusActive
-		payToOpen_minFundingSat = context.payToOpen.v1.minFundingSat
-	}
-	
-	func channelsChanged(_ channels: Lightning_kmpPeer.ChannelsMap) -> Void {
-		log.trace("channelsChanged()")
-		
-		var availableCount = 0
-		for (_, channel) in channels {
-			
-			if channel.asClosing() != nil ||
-			   channel.asClosed() != nil ||
-			   channel.asAborted() != nil
-			{
-				// ignore - channel isn't usable for incoming payments
-			} else {
-				availableCount += 1
-			}
-			
-		}
-		
-		channelsCount = availableCount
-	}
-	
-	func didTapSwapInButton() -> Void {
-		log.trace("didTapSwapInButton()")
-		
-		if swapIn_enabled {
-			
-			mvi.intent(Receive.IntentRequestSwapIn())
-			
-		} else {
-			
-			popoverState.display(dismissable: true) {
-				SwapInDisabledPopover()
-			}
-		}
-	}
-	
-	func currencyConverterDidChange(_ amount: CurrencyAmount?) {
-		log.trace("currencyConverterDidChange()")
-		
-		modificationAmount = amount
-	}
-	
-	func currencyConvertDidClose() {
-		log.trace("currencyConverterDidClose()")
-		
-		var amount: Lightning_kmpMilliSatoshi? = nil
-		var desc: String? = nil
-		if let model = mvi.model as? Receive.Model_Generated {
-			amount = model.amount
-			desc = model.desc
-		}
-		
-		smartModalState.display(dismissable: true) {
-			
-			ModifyInvoiceSheet(
-				mvi: mvi,
-				savedAmount: $modificationAmount,
-				amount: amount,
-				desc: desc ?? "",
-				currencyConverterOpen: $currencyConverterOpen
-			)
 		}
 	}
 }

@@ -72,6 +72,7 @@ struct ContentView: MVIView {
 					.onAppear {
 						unlockedOnce = true
 					}
+					.accessibilityHidden(shortSheetItem != nil || popoverItem != nil)
 
 				if let shortSheetItem = shortSheetItem {
 					ShortSheetWrapper(dismissable: shortSheetItem.dismissable) {

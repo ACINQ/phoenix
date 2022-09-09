@@ -279,7 +279,7 @@
 "Connecting to:" = "Připojování k:";
 
 /* Connection state */
-"Connecting..." = "Připojování ...";
+"Connecting…" = "Připojování …";
 
 /* No comment provided by engineer. */
 "Connection status" = "Stav připojení";
@@ -841,7 +841,7 @@
 "The fee is **%@%%** with a minimum fee of **%@**." = "Poplatek je **%@%%** s minimálním poplatkem **%@** ";
 
 /* SendView */
-"The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount**  in the payment request." = "Faktura neobsahuje žádnou částku. To může být nebezpečné: škodlivé uzly mohou být schopné vaši platbu ukrást. Pro jistotu ** požádejte příjemce, aby v žádosti o platbu uvedl částku **.";
+"The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount** in the payment request." = "Faktura neobsahuje žádnou částku. To může být nebezpečné: škodlivé uzly mohou být schopné vaši platbu ukrást. Pro jistotu ** požádejte příjemce, aby v žádosti o platbu uvedl částku **.";
 
 /* Error message - scanning lightning invoice */
 "The invoice is for (requestChain), but you're on (reason.myChain.name)" = "Faktura je pro (requestChain),ale vy jste na (reason.myChain.name)";

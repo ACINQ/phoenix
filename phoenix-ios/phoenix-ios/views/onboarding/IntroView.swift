@@ -18,8 +18,7 @@ struct IntroView: View {
 	let finish: () -> Void
 	 
 	@State private var selectedPage = 0
-	
-	@EnvironmentObject var deviceInfo: DeviceInfo
+	@EnvironmentObject private var deviceInfo: DeviceInfo
 	
 	@ViewBuilder
 	var body: some View {
@@ -33,25 +32,32 @@ struct IntroView: View {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+					.accessibilityHidden(true)
 			}
 			
-			TabView(selection: $selectedPage) {
-				
-				IntroView1(advance: advance)
-					.tag(0)
-				
-				IntroView2(advance: advance)
-					.tag(1)
-				
-				IntroView3(finish: finish)
-					.tag(2)
-			}
-			.tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-			.padding(.bottom, deviceInfo.isShortHeight ? 0 : 40)
+			content()
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.navigationBarTitle("", displayMode: .inline)
 		.navigationBarHidden(true)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
+		TabView(selection: $selectedPage) {
+			
+			IntroView1(advance: advance)
+				.tag(0)
+			
+			IntroView2(advance: advance)
+				.tag(1)
+			
+			IntroView3(finish: wrappedFinish)
+				.tag(2)
+		}
+		.tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+		.padding(.bottom, deviceInfo.isShortHeight ? 0 : 40)
 	}
 	
 	func advance() -> Void {
@@ -59,11 +65,18 @@ struct IntroView: View {
 		
 		withAnimation {
 			selectedPage += 1
+			UIAccessibility.post(notification: .screenChanged, argument: nil)
 		}
+	}
+	
+	func wrappedFinish() -> Void {
+		
+		finish()
+		UIAccessibility.post(notification: .screenChanged, argument: nil)
 	}
 }
 
-struct IntroView1: View {
+struct IntroView1: View, ViewName {
 	
 	let advance: () -> Void
 	
@@ -82,7 +95,7 @@ struct IntroView1: View {
 				}
 			}
 			
-			button().padding()
+			button()
 		}
 		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 	}
@@ -95,8 +108,10 @@ struct IntroView1: View {
 			Text("Welcome!")
 				.font(.title)
 				.multilineTextAlignment(.center)
+				.accessibilityAddTraits(.isHeader)
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 25) {
+				
 				Text("With Phoenix, receiving and sending bitcoin is safe, easy, and fast.")
 			}
 			.multilineTextAlignment(.center)
@@ -133,10 +148,11 @@ struct IntroView1: View {
 				backgroundFill: Color.appAccent
 			)
 		)
+		.padding()
 	}
 }
 
-struct IntroView2: View {
+struct IntroView2: View, ViewName {
 	
 	let advance: () -> Void
 	
@@ -160,7 +176,7 @@ struct IntroView2: View {
 				}
 			}
 			
-			button().padding()
+			button()
 		}
 		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 	}
@@ -173,6 +189,7 @@ struct IntroView2: View {
 			Text("Automatic Channel Creation")
 				.font(.title)
 				.multilineTextAlignment(.center)
+				.accessibilityAddTraits(.isHeader)
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 25) {
 				
@@ -233,13 +250,7 @@ struct IntroView2: View {
 				backgroundFill: Color.appAccent
 			)
 		)
-	}
-	
-	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
-		log.trace("chainContextChanged()")
-		
-		payToOpen_feePercent = context.payToOpen.v1.feePercent * 100 // 0.01 => 1%
-		payToOpen_minFeeSat = context.payToOpen.v1.minFeeSat
+		.padding()
 	}
 	
 	func formatFeePercent() -> String {
@@ -250,9 +261,16 @@ struct IntroView2: View {
 		
 		return formatter.string(from: NSNumber(value: payToOpen_feePercent))!
 	}
+	
+	func chainContextChanged(_ context: WalletContext.V0ChainContext) {
+		log.trace("[\(viewName)] chainContextChanged()")
+		
+		payToOpen_feePercent = context.payToOpen.v1.feePercent * 100 // 0.01 => 1%
+		payToOpen_minFeeSat = context.payToOpen.v1.minFeeSat
+	}
 }
 
-struct IntroView3: View {
+struct IntroView3: View, ViewName {
 	
 	let finish: () -> Void
 	
@@ -271,7 +289,7 @@ struct IntroView3: View {
 				}
 			}
 			
-			button().padding()
+			button()
 		}
 		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 	}
@@ -284,6 +302,7 @@ struct IntroView3: View {
 			Text("Keep Control")
 				.font(.title)
 				.multilineTextAlignment(.center)
+				.accessibilityAddTraits(.isHeader)
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 25) {
 				
@@ -325,5 +344,6 @@ struct IntroView3: View {
 				backgroundFill: Color.appAccent
 			)
 		)
+		.padding()
 	}
 }

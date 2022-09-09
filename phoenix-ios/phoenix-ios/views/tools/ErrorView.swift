@@ -13,7 +13,7 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct ErrorView: View {
 	
-	let danger: LossOfSeedDanger
+	let danger: UnlockError
 	
 	@Environment(\.popoverState) private var popoverState: PopoverState
 	@State private var popoverItem: PopoverItem? = nil
@@ -150,7 +150,7 @@ struct ErrorView: View {
 
 struct ErrorDetailsView: View, ViewName {
 	
-	let danger: LossOfSeedDanger
+	let danger: UnlockError
 	@ObservedObject var toast: Toast
 	
 	@State var sharing: String? = nil
@@ -183,7 +183,7 @@ struct ErrorDetailsView: View, ViewName {
 				Button {
 					UIPasteboard.general.string = errTxt
 					toast.pop(
-						Text("Copied to pasteboard!").anyView,
+						NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 						colorScheme: colorScheme.opposite
 					)
 				} label: {

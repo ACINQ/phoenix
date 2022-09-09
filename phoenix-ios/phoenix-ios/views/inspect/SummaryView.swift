@@ -116,6 +116,8 @@ struct SummaryView: View {
 								.frame(width: 30, height: 30)
 						}
 						.padding()
+						.accessibilityLabel("Close sheet")
+						.accessibilitySortPriority(-1)
 					}
 					Spacer()
 				}
@@ -144,16 +146,20 @@ struct SummaryView: View {
 					.aspectRatio(contentMode: .fit)
 					.foregroundColor(Color.appPositive)
 					.padding(.bottom, 16)
+					.accessibilityHidden(true)
 				VStack {
 					Group {
 						if payment is Lightning_kmpOutgoingPayment {
 							Text("SENT")
+								.accessibilityLabel("Payment sent")
 						} else {
 							Text("RECEIVED")
+								.accessibilityLabel("Payment received")
 						}
 					}
 					.font(Font.title2.bold())
 					.padding(.bottom, 2)
+					
 					Text(payment.completedAt().formatDateMS())
 						.font(.subheadline)
 						.foregroundColor(.secondary)
@@ -167,9 +173,11 @@ struct SummaryView: View {
 					.foregroundColor(Color.borderColor)
 					.frame(width: 100, height: 100)
 					.padding(.bottom, 16)
+					.accessibilityHidden(true)
 				Text("PENDING")
 					.font(Font.title2.bold())
 					.padding(.bottom, 30)
+					.accessibilityLabel("Pending payment")
 				
 			case .failure:
 				Image(systemName: "xmark.circle")
@@ -178,10 +186,12 @@ struct SummaryView: View {
 					.frame(width: 100, height: 100)
 					.foregroundColor(.appNegative)
 					.padding(.bottom, 16)
+					.accessibilityHidden(true)
 				VStack {
 					Text("FAILED")
 						.font(Font.title2.bold())
 						.padding(.bottom, 2)
+						.accessibilityLabel("Failed payment")
 					
 					Text("NO FUNDS HAVE BEEN SENT")
 						.font(Font.title2.uppercaseSmallCaps())
@@ -198,10 +208,11 @@ struct SummaryView: View {
 				EmptyView()
 			}
 
+			let isOutgoing = payment is Lightning_kmpOutgoingPayment
+			let amount = Utils.format(currencyPrefs, msat: payment.amount, policy: .showMsatsIfNonZero)
+			
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-				let isOutgoing = payment is Lightning_kmpOutgoingPayment
-				let amount = Utils.format(currencyPrefs, msat: payment.amount, policy: .showMsatsIfNonZero)
-
+				
 				if amount.hasSubFractionDigits {
 					
 					// We're showing sub-fractional values.
@@ -263,6 +274,8 @@ struct SummaryView: View {
 				}
 			)
 			.padding(.bottom, 24)
+			.accessibilityElement()
+			.accessibilityLabel("\(isOutgoing ? "-" : "+")\(amount.string)")
 			
 			SummaryInfoGrid(paymentInfo: $paymentInfo)
 			
@@ -553,7 +566,8 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			} valueColumn: {
 				
 				Text(lnurlPay.lnurl.host)
-			}
+				
+			} // </InfoGridRow>
 		}
 	}
 	
@@ -568,6 +582,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 		) {
 			
 			keyColumn(NSLocalizedString("Desc", comment: "Label in SummaryInfoGrid"))
+				.accessibilityLabel("Description")
 			
 		} valueColumn: {
 			
@@ -581,7 +596,8 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 						Text("Copy")
 					}
 				}
-		}
+			
+		} // </InfoGridRow>
 	}
 	
 	@ViewBuilder
@@ -609,7 +625,8 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 							Text("Copy")
 						}
 					}
-			}
+				
+			} // </InfoGridRow>
 			
 		} else if let sa_url = successAction as? LNUrl.PayInvoice_SuccessAction_Url {
 			
@@ -641,8 +658,9 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 							}
 						}
 					}
-				}
-			}
+				} // </VStack>
+				
+			} // </InfoGridRow>
 		
 		} else if let sa_aes = successAction as? LNUrl.PayInvoice_SuccessAction_Aes {
 			
@@ -690,8 +708,9 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 						Text("<decryption error>")
 					}
 				}
-			}
-		}
+			} // </InfoGridRow>
+			
+		} // </else if let sa_aes>
 	}
 	
 	@ViewBuilder
@@ -711,7 +730,8 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			} valueColumn: {
 				
 				Text(notes)
-			}
+				
+			} // </InfoGridRow>
 		}
 	}
 	
@@ -746,7 +766,8 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 						}
 					}
 				}
-			}
+				
+			} // </InfoGridRow>
 		}
 	}
 	
@@ -785,7 +806,8 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 							.padding(.top, 4)
 					}
 				}
-			}
+				
+			} // </InfoGridRow>
 		}
 	}
 	
@@ -832,6 +854,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 					
 					styledText
 						.onTapGesture { toggleCurrencyType() }
+						.accessibilityLabel("\(amount.string)")
 					
 				} else {
 					Text(amount.string)
@@ -857,7 +880,8 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 					}
 				}
 			}
-		}
+			
+		} // </InfoGridRow>
 	}
 	
 	@ViewBuilder
@@ -877,7 +901,8 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			} valueColumn: {
 				
 				Text(pError)
-			}
+				
+			} // </InfoGridRow>
 		}
 	}
 

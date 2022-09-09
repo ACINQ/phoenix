@@ -40,6 +40,7 @@ struct ReceiveView: MVIView {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+					.accessibilityHidden(true)
 			}
 			
 			if mvi.model is Receive.Model_SwapIn {

@@ -31,6 +31,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	let lockState = LockState(isUnlocked: false)
 	
 	var isAppLaunch = true
+	var isInBackground = false
 
 	func scene(
 		_ scene: UIScene,
@@ -132,12 +133,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	func sceneWillEnterForeground(_ scene: UIScene) {
 		log.trace("sceneWillEnterForeground()")
 		
-		// Called as the scene transitions from the background to the foreground.
-		// Use this method to undo the changes made on entering the background.
+		if isInBackground {
+			isInBackground = false
+			CrossProcessCommunication.shared.resume()
+		}
 	}
 
 	func sceneDidEnterBackground(_ scene: UIScene) {
 		log.trace("sceneDidEnterBackground()")
+		
+		if !isInBackground {
+			isInBackground = true
+			CrossProcessCommunication.shared.suspend()
+		}
 		
 		let currentSecurity = AppSecurity.shared.enabledSecurity.value
 		if !currentSecurity.isEmpty {
@@ -226,7 +234,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		}.store(in: &cancellables)
 		
 		AppSecurity.shared.tryUnlockWithKeychain {
-			(mnemonics: [String]?, enabledSecurity: EnabledSecurity, danger: LossOfSeedDanger?) in
+			(mnemonics: [String]?, enabledSecurity: EnabledSecurity, error: UnlockError?) in
 
 			// There are multiple potential configurations:
 			//
@@ -243,15 +251,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 				AppDelegate.get().loadWallet(mnemonics: mnemonics)
 			}
 			
-			if let danger = danger {
-				self.showErrorWindow(danger)
+			if let error = error {
+				self.showErrorWindow(error)
 			} else if enabledSecurity.isEmpty {
 				self.lockState.isUnlocked = true
 			} else {
 				self.showLockWindow()
 			}
 			
-			if mnemonics == nil && danger == nil && enabledSecurity.isEmpty {
+			if mnemonics == nil && error == nil && enabledSecurity.isEmpty {
 				// The user doesn't have a wallet yet.
 				//
 				// Issue #282 - Face ID remains enabled between app installs.
@@ -322,7 +330,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		}
 	}
 	
-	private func showErrorWindow(_ danger: LossOfSeedDanger) {
+	private func showErrorWindow(_ error: UnlockError) {
 		log.trace("showErrorWindow()")
 		
 		guard let windowScene = self.window?.windowScene else {
@@ -331,7 +339,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		
 		if errorWindow == nil {
 			
-			let errorView = ErrorView(danger: danger)
+			let errorView = ErrorView(danger: error)
 			
 			let controller = UIHostingController(rootView: errorView)
 			controller.view.backgroundColor = .clear

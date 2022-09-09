@@ -16,19 +16,25 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct QrCodeScannerView: UIViewControllerRepresentable {
 
-	let callback: (String) -> Void
+	let resultCallback: (String) -> Void
+	let readyCallback: (() -> Void)?
+	
 	let supportedBarcodeTypes: [AVMetadataObject.ObjectType] = [.qr]
 
-	init(onResult callback: @escaping (String) -> Void) {
+	init(
+		result resultCallback: @escaping (String) -> Void,
+		ready readyCallback: (() -> Void)? = nil
+	) {
 		log.trace("QrCodeScannerView: init")
 		
-		self.callback = callback
+		self.resultCallback = resultCallback
+		self.readyCallback = readyCallback
 	}
 	
 	func makeCoordinator() -> Coordinator {
 		log.trace("QrCodeScannerView: makeCoordinator")
 		
-		return Coordinator(callback: self.callback)
+		return Coordinator(callback: self.resultCallback)
 	}
 	
 	func makeUIViewController(context: Context) -> CameraPreviewViewController {
@@ -112,6 +118,10 @@ struct QrCodeScannerView: UIViewControllerRepresentable {
 		view.previewLayer = previewLayer
 
 		view.session.startRunning()
+		
+		if let readyCallback = readyCallback {
+			readyCallback()
+		}
 	}
 
 	func updateUIViewController(_ vc: CameraPreviewViewController, context: Context) {

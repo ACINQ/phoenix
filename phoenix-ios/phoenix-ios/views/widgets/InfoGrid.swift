@@ -167,6 +167,7 @@ struct InfoGridRow<KeyColumn: View, ValueColumn: View>: View {
 
 			valueColumn
 		}
+		.accessibilityElement(children: .combine)
 	}
 }
 
