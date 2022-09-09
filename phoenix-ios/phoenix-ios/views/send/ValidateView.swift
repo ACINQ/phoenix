@@ -77,7 +77,7 @@ struct ValidateView: View {
 	@State var maxButtonWidth: CGFloat? = nil
 	
 	// --------------------------------------------------
-	// MARK: ViewBuilders
+	// MARK: View Builders
 	// --------------------------------------------------
 	
 	@ViewBuilder
@@ -95,6 +95,7 @@ struct ValidateView: View {
 			) {
 				EmptyView()
 			}
+			.accessibilityHidden(true)
 			
 			Color.primaryBackground
 				.ignoresSafeArea(.all, edges: .all)
@@ -103,6 +104,7 @@ struct ValidateView: View {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.ignoresSafeArea(.all, edges: .all)
+					.accessibilityHidden(true)
 			}
 			
 			GeometryReader { geometry in
@@ -187,6 +189,7 @@ struct ValidateView: View {
 				}
 				.padding(.bottom)
 				.padding(.bottom)
+				.accessibilityElement(children: .combine)
 			}
 			
 			if mvi.model is Scan.Model_LnurlWithdrawFlow {
@@ -205,6 +208,7 @@ struct ValidateView: View {
 					.multilineTextAlignment(.trailing)
 					.minimumScaleFactor(0.95) // SwiftUI bugs: truncating text in RTL
 					.foregroundColor(isInvalidAmount() ? Color.appNegative : Color.primaryForeground)
+					.accessibilityHint("amount in \(currency.abbrev)")
 			
 				Picker(selection: $currencyPickerChoice, label: Text(currencyPickerChoice).frame(minWidth: 40)) {
 					ForEach(currencyPickerOptions(), id: \.self) { option in
@@ -212,6 +216,16 @@ struct ValidateView: View {
 					}
 				}
 				.pickerStyle(MenuPickerStyle())
+				.accessibilityLabel("") // see below
+				.accessibilityHint("Currency picker")
+				
+				// For a Picker, iOS is setting the VoiceOver text twice:
+				// > "sat sat, Button"
+				//
+				// If we change the accessibilityLabel to "foobar", then we get:
+				// > "sat foobar, Button"
+				//
+				// So we have to set it to the empty string to avoid the double-word.
 
 			} // </HStack>
 			.padding([.leading, .trailing])
@@ -249,6 +263,7 @@ struct ValidateView: View {
 				Text(description)
 					.padding()
 					.padding(.bottom)
+					.accessibilityHint("payment description")
 			} else {
 				Text("No description")
 					.foregroundColor(.secondary)
@@ -256,47 +271,7 @@ struct ValidateView: View {
 					.padding(.bottom)
 			}
 			
-			Button {
-				if mvi.model is Scan.Model_SwapOutFlow_Init {
-					prepareTransaction()
-				} else {
-					sendPayment()
-				}
-			} label: {
-				HStack {
-					if mvi.model is Scan.Model_SwapOutFlow_Init {
-						Image(systemName: "hammer")
-							.renderingMode(.template)
-						Text("Prepare Transaction")
-					}
-					else if mvi.model is Scan.Model_LnurlWithdrawFlow {
-						Image("ic_receive")
-							.renderingMode(.template)
-							.resizable()
-							.aspectRatio(contentMode: .fit)
-							.frame(width: 22, height: 22)
-						Text("Redeem")
-					} else {
-						Image("ic_send")
-							.renderingMode(.template)
-							.resizable()
-							.aspectRatio(contentMode: .fit)
-							.frame(width: 22, height: 22)
-						Text("Pay")
-					}
-				}
-				.font(.title2)
-				.foregroundColor(Color.white)
-				.padding(.top, 4)
-				.padding(.bottom, 5)
-				.padding([.leading, .trailing], 24)
-			}
-			.buttonStyle(ScaleButtonStyle(
-				cornerRadius: 100,
-				backgroundFill: Color.appAccent,
-				disabledBackgroundFill: Color.gray
-			))
-			.disabled(problem != nil || isDisconnected)
+			paymentButton(isDisconnected)
 		
 			if problem == nil && isDisconnected {
 				
@@ -320,6 +295,53 @@ struct ValidateView: View {
 			.padding(.top)
 			.padding(.top)
 		} // </VStack>
+	}
+	
+	@ViewBuilder
+	func paymentButton(_ isDisconnected: Bool) -> some View {
+		
+		Button {
+			if mvi.model is Scan.Model_SwapOutFlow_Init {
+				prepareTransaction()
+			} else {
+				sendPayment()
+			}
+		} label: {
+			HStack {
+				if mvi.model is Scan.Model_SwapOutFlow_Init {
+					Image(systemName: "hammer")
+						.renderingMode(.template)
+					Text("Prepare Transaction")
+				}
+				else if mvi.model is Scan.Model_LnurlWithdrawFlow {
+					Image("ic_receive")
+						.renderingMode(.template)
+						.resizable()
+						.aspectRatio(contentMode: .fit)
+						.frame(width: 22, height: 22)
+					Text("Redeem")
+				} else {
+					Image("ic_send")
+						.renderingMode(.template)
+						.resizable()
+						.aspectRatio(contentMode: .fit)
+						.frame(width: 22, height: 22)
+					Text("Pay")
+				}
+			}
+			.font(.title2)
+			.foregroundColor(Color.white)
+			.padding(.top, 4)
+			.padding(.bottom, 5)
+			.padding([.leading, .trailing], 24)
+		}
+		.buttonStyle(ScaleButtonStyle(
+			cornerRadius: 100,
+			backgroundFill: Color.appAccent,
+			disabledBackgroundFill: Color.gray
+		))
+		.disabled(problem != nil || isDisconnected)
+		.accessibilityHint(paymentButtonHint())
 	}
 	
 	@ViewBuilder
@@ -403,7 +425,7 @@ struct ValidateView: View {
 	}
 	
 	// --------------------------------------------------
-	// MARK: UI Content Helpers
+	// MARK: View Helpers
 	// --------------------------------------------------
 
 	func currencyStyler() -> TextFieldCurrencyStyler {
@@ -540,6 +562,38 @@ struct ValidateView: View {
 			return NSLocalizedString("connecting to electrum", comment: "button text")
 		}
 		return ""
+	}
+	
+	// --------------------------------------------------
+	// MARK: Accessibility
+	// --------------------------------------------------
+	
+	func paymentButtonHint() -> String {
+		
+		if mvi.model is Scan.Model_SwapOutFlow_Init {
+			
+			return NSLocalizedString("fetches the swap-out fee", comment: "VoiceOver hint")
+			
+		} else {
+			
+			guard let msat = parsedAmountMsat() else {
+				return ""
+			}
+			
+			let btcnAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit)
+			
+			if let exchangeRate = currencyPrefs.fiatExchangeRate() {
+				let fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
+				
+				return NSLocalizedString("total amount: \(btcnAmt.string), ≈\(fiatAmt.string)",
+					comment: "VoiceOver hint"
+				)
+			} else {
+				return NSLocalizedString("total amount: ≈\(btcnAmt.string)",
+					comment: "VoiceOver hint"
+				)
+			}
+		}
 	}
 	
 	// --------------------------------------------------
@@ -744,7 +798,7 @@ struct ValidateView: View {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Actions
+	// MARK: View Transitions
 	// --------------------------------------------------
 	
 	func onAppear() -> Void {
@@ -790,6 +844,10 @@ struct ValidateView: View {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
 	func modelDidChange(_ newModel: Scan.Model) -> Void {
 		log.trace("modelDidChange()")
 		
@@ -820,33 +878,19 @@ struct ValidateView: View {
 		}
 	}
 	
-	func dismissKeyboardIfVisible() -> Void {
-		log.trace("dismissKeyboardIfVisible()")
+	func chainContextDidChange(_ context: WalletContext.V0ChainContext) -> Void {
+		log.trace("chainContextDidChange()")
 		
-		let keyWindow = UIApplication.shared.connectedScenes
-			.filter({ $0.activationState == .foregroundActive })
-			.map({ $0 as? UIWindowScene })
-			.compactMap({ $0 })
-			.first?.windows
-			.filter({ $0.isKeyWindow }).first
-		keyWindow?.endEditing(true)
+		chainContext = context
 	}
 	
-	func userDidEditTextField() {
-		log.trace("userDidEditTextField()")
+	func balanceDidChange(_ balance: Lightning_kmpMilliSatoshi?) {
+		log.trace("balanceDidChange()")
 		
-		// This is called if the user manually edits the TextField.
-		// Which is distinct from `amountDidChange`, which may be triggered via code.
-		
-		preTipAmountMsat = nil
-	}
-	
-	func amountDidChange() -> Void {
-		log.trace("amountDidChange()")
-		
-		refreshAltAmount()
-		if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
-			mvi.intent(Scan.Intent_SwapOutFlow_Invalidate(address: model.address))
+		if let balance = balance {
+			balanceMsat = balance.msat
+		} else {
+			balanceMsat = 0
 		}
 	}
 	
@@ -880,20 +924,38 @@ struct ValidateView: View {
 		}
 	}
 	
-	func balanceDidChange(_ balance: Lightning_kmpMilliSatoshi?) {
-		log.trace("balanceDidChange()")
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func dismissKeyboardIfVisible() -> Void {
+		log.trace("dismissKeyboardIfVisible()")
 		
-		if let balance = balance {
-			balanceMsat = balance.msat
-		} else {
-			balanceMsat = 0
-		}
+		let keyWindow = UIApplication.shared.connectedScenes
+			.filter({ $0.activationState == .foregroundActive })
+			.map({ $0 as? UIWindowScene })
+			.compactMap({ $0 })
+			.first?.windows
+			.filter({ $0.isKeyWindow }).first
+		keyWindow?.endEditing(true)
 	}
 	
-	func chainContextDidChange(_ context: WalletContext.V0ChainContext) -> Void {
-		log.trace("chainContextDidChange()")
+	func userDidEditTextField() {
+		log.trace("userDidEditTextField()")
 		
-		chainContext = context
+		// This is called if the user manually edits the TextField.
+		// Which is distinct from `amountDidChange`, which may be triggered via code.
+		
+		preTipAmountMsat = nil
+	}
+	
+	func amountDidChange() -> Void {
+		log.trace("amountDidChange()")
+		
+		refreshAltAmount()
+		if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
+			mvi.intent(Scan.Intent_SwapOutFlow_Invalidate(address: model.address))
+		}
 	}
 	
 	func refreshAltAmount() -> Void {

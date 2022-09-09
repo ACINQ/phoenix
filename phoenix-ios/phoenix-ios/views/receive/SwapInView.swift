@@ -92,7 +92,7 @@ struct SwapInView: View {
 			}
 			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			
-			feesInfoView
+			feesInfoView()
 				.padding([.top, .leading, .trailing])
 			
 			Button {
@@ -164,6 +164,16 @@ struct SwapInView: View {
 						Text("Share")
 					}
 				}
+				.accessibilityElement()
+				.accessibilityAddTraits(.isImage)
+				.accessibilityLabel("QR code")
+				.accessibilityHint("Bitcoin address")
+				.accessibilityAction(named: "Copy Image") {
+					copyImageToPasteboard()
+				}
+				.accessibilityAction(named: "Share Image") {
+					shareImageToSystem()
+				}
 			
 		} else {
 			VStack {
@@ -181,6 +191,7 @@ struct SwapInView: View {
 				}
 				.foregroundColor(Color(UIColor.darkGray))
 				.font(.caption)
+				.accessibilityElement(children: .combine)
 			}
 		}
 	}
@@ -304,12 +315,13 @@ struct SwapInView: View {
 	}
 	
 	@ViewBuilder
-	var feesInfoView: some View {
+	func feesInfoView() -> some View {
 		
 		HStack(alignment: VerticalAlignment.top, spacing: 8) {
 			
 			Image(systemName: "exclamationmark.circle")
 				.imageScale(.large)
+				.accessibilityHidden(true)
 			
 			let minFunding = Utils.formatBitcoin(sat: swapIn_minFundingSat, bitcoinUnit: .sat)
 			

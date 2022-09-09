@@ -166,6 +166,7 @@ struct PaymentSummaryView: View {
 		.assignMaxPreference(for: maxLabelWidthReader.key, to: $maxLabelWidth)
 		.assignMaxPreference(for: maxNumberWidthReader.key, to: $maxNumberWidth)
 		.font(.footnote)
+		.accessibilityHidden(info.isEmpty)
 	}
 	
 	func paymentSummaryStrings() -> PaymentSummaryStrings {

@@ -331,6 +331,8 @@ struct ReceiveLightningView: View {
 							.frame(width: 30, height: 30)
 					}
 					.padding()
+					.accessibilityLabel("Close full screen")
+					.accessibilitySortPriority(1)
 				}
 				Spacer()
 			}
