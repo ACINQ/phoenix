@@ -623,11 +623,13 @@
     <string name="conndialog_title">Connections status</string>
     <string name="conndialog_summary_not_ok">You have connection issue(s). The app will not function properly.</string>
     <string name="conndialog_network">Your device has no Internet connection. The app will not function properly.\n\nPlease check your device\'s setting.</string>
+    <string name="conndialog_internet">Internet</string>
     <string name="conndialog_electrum">Electrum</string>
     <string name="conndialog_tor">Tor</string>
-    <string name="conndialog_lightning">Lightning Peer</string>
-    <string name="conndialog_ok">Connected</string>
-    <string name="conndialog_not_ok">Connecting…</string>
+    <string name="conndialog_lightning">Peer</string>
+    <string name="conndialog_connecting">Connecting…</string>
+    <string name="conndialog_connected">Connected</string>
+    <string name="conndialog_closed">Closed</string>
 
     <!-- //////////////// about screen //////////////// -->
 

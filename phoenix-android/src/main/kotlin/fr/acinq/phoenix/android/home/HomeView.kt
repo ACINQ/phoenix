@@ -271,9 +271,11 @@ private fun ConnectionDialog(connections: Connections?, onClose: () -> Unit) {
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 HSeparator()
-                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_electrum), connection = connections?.electrum)
+                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_internet), connection = connections.internet)
                 HSeparator()
-                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_lightning), connection = connections?.peer)
+                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_electrum), connection = connections.electrum)
+                HSeparator()
+                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_lightning), connection = connections.peer)
                 HSeparator()
                 Spacer(Modifier.height(16.dp))
             }
@@ -286,12 +288,20 @@ private fun ConnectionDialogLine(label: String, connection: Connection?) {
     Row(modifier = Modifier.padding(vertical = 12.dp, horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically) {
         Surface(
             shape = CircleShape,
-            color = if (connection == Connection.ESTABLISHED) positiveColor() else negativeColor(),
+            color = when (connection) {
+                Connection.ESTABLISHING -> orange
+                Connection.ESTABLISHED -> positiveColor()
+                else -> negativeColor()
+            },
             modifier = Modifier.size(8.dp)
         ) {}
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = label, modifier = Modifier.weight(1.0f))
-        Text(text = stringResource(id = if (connection == Connection.ESTABLISHED) R.string.conndialog_ok else R.string.conndialog_not_ok), style = monoTypo())
+        Text(text = when (connection) {
+            Connection.ESTABLISHING -> stringResource(R.string.conndialog_connecting)
+            Connection.ESTABLISHED -> stringResource(R.string.conndialog_connected)
+            else -> stringResource(R.string.conndialog_closed)
+        }, style = monoTypo())
     }
 }
 
