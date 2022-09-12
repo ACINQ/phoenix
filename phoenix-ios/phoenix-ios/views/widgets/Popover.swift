@@ -143,6 +143,9 @@ struct PopoverWrapper<Content: View>: View {
 					.accessibilityHidden(!dismissable)
 					.accessibilityLabel("Dismiss popover")
 					.accessibilitySortPriority(-1000)
+					.accessibilityAction {
+						popoverState.close()
+					}
 				
 				VStack {
 					VStack {

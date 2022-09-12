@@ -143,6 +143,9 @@ struct ShortSheetWrapper<Content: View>: View {
 					.accessibilityHidden(!dismissable)
 					.accessibilityLabel("Dismiss sheet")
 					.accessibilitySortPriority(-1000)
+					.accessibilityAction {
+						shortSheetState.close()
+					}
 				
 				VStack {
 					Spacer()

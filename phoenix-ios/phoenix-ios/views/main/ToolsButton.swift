@@ -99,6 +99,7 @@ struct ToolsMenu: View {
 					systemImage: "globe"
 				)
 			}
+			
 			Button {
 				sendFeedbackButtonTapped()
 			} label: {
@@ -107,6 +108,8 @@ struct ToolsMenu: View {
 					image: "email"
 				)
 			}
+			.accessibilityHint("opens email app")
+			
 			Button {
 				faqButtonTapped()
 			} label: {
@@ -115,6 +118,8 @@ struct ToolsMenu: View {
 					systemImage: "safari"
 				)
 			}
+			.accessibilityHint("opens browser")
+			
 			Button {
 				twitterButtonTapped()
 			} label: {
@@ -124,6 +129,8 @@ struct ToolsMenu: View {
 					Image("twitter")
 				}
 			}
+			.accessibilityHint("opens browser")
+			
 			Button {
 				telegramButtonTapped()
 			} label: {
@@ -133,6 +140,8 @@ struct ToolsMenu: View {
 					Image("telegram")
 				}
 			}
+			.accessibilityHint("opens browser")
+			
 			Button {
 				githubButtonTapped()
 			} label: {
@@ -142,6 +151,7 @@ struct ToolsMenu: View {
 					Image("github")
 				}
 			}
+			.accessibilityHint("opens browser")
 			
 		} label: {
 			toolsImage

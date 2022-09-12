@@ -80,6 +80,14 @@ struct HomeView : MVIView {
 	// MARK: View Builders
 	// --------------------------------------------------
 	
+	/* Accessibility sort priority:
+	 *
+	 * - Total balance    = 49
+	 * - Incoming balance = 48
+	 * - Notice boxes     = 47
+	 * - Footer cell      = 10
+	 */
+	
 	@ViewBuilder
 	var view: some View {
 		
@@ -323,6 +331,8 @@ struct HomeView : MVIView {
 					Image(systemName: "exclamationmark.triangle")
 						.imageScale(.large)
 						.padding(.trailing, 10)
+						.accessibilityLabel("Warning")
+					
 					Button {
 						navigateToBackup()
 					} label: {
@@ -338,11 +348,14 @@ struct HomeView : MVIView {
 						}
 						.multilineTextAlignment(.leading)
 						.allowsTightening(true)
-					}
+					} // </Button>
 				} // </HStack>
 				.font(.caption)
+				.accessibilityElement(children: .combine)
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(47)
+				
 			} // </NoticeBox>
-			
 		}
 		
 		// === Custom Electrum Server Problems ====
@@ -353,24 +366,32 @@ struct HomeView : MVIView {
 					Image(systemName: "exclamationmark.shield")
 						.imageScale(.large)
 						.padding(.trailing, 10)
-				}
+						.accessibilityHidden(true)
+						.accessibilityLabel("Warning")
+					
+					Button {
+						navigationToElecrumServer()
+					} label: {
+						Group {
+							Text("Custom electrum server: bad certificate ! ")
+								.foregroundColor(.primary)
+							+
+							Text("Check it ")
+								.foregroundColor(.appAccent)
+							+
+							Text(Image(systemName: "arrowtriangle.forward"))
+								.foregroundColor(.appAccent)
+						}
+						.multilineTextAlignment(.leading)
+						.allowsTightening(true)
+					} // </Button>
+					
+				} // </HStack>
 				.font(.caption)
-				Button {
-					navigationToElecrumServer()
-				} label: {
-					Group {
-						Text("Custom electrum server: bad certificate ! ")
-							.foregroundColor(.primary)
-						+
-						Text("Check it ")
-							.foregroundColor(.appAccent)
-						+
-						Text(Image(systemName: "arrowtriangle.forward"))
-							.foregroundColor(.appAccent)
-					}
-					.multilineTextAlignment(.leading)
-					.allowsTightening(true)
-				}
+				.accessibilityElement(children: .combine)
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(47)
+				
 			} // </NoticeBox>
 		}
 		
@@ -382,6 +403,9 @@ struct HomeView : MVIView {
 					Image(systemName: "tray.full")
 						.imageScale(.large)
 						.padding(.trailing, 10)
+						.accessibilityHidden(true)
+						.accessibilityLabel("Warning")
+					
 					VStack(alignment: HorizontalAlignment.leading, spacing: 5) {
 						Text("Bitcoin mempool is full and fees are high.")
 						Button {
@@ -389,10 +413,14 @@ struct HomeView : MVIView {
 						} label: {
 							Text("See how Phoenix is affected".uppercased())
 						}
-					}
-				}
+					} // </VStack>
+				} // </HStack>
 				.font(.caption)
-			}
+				.accessibilityElement(children: .combine)
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(47)
+				
+			} // </NoticeBox>
 		}
 	}
 	

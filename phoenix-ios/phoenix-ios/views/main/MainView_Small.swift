@@ -70,6 +70,16 @@ struct MainView_Small: View {
 	// MARK: View Builders
 	// --------------------------------------------------
 	
+	/* .accessibilitySortPriority():
+	 *
+	 * - Footer button: send         = 39
+	 * - Footer button: receive      = 38
+	 * - Header button: settings     = 23
+	 * - Header button: transactions = 22
+	 * - Header button: app status   = 21
+	 * - Header button: tools        = 20
+	 */
+	
 	@ViewBuilder
 	var body: some View {
 		
