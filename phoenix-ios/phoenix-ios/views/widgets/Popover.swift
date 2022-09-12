@@ -30,7 +30,7 @@ public class PopoverState: ObservableObject {
 	/// - view will animate on screen (onWillAppear)
 	/// - view has animated off screen (onDidDisappear)
 	///
-	var publisher = PassthroughSubject<PopoverItem?, Never>()
+	var publisher = CurrentValueSubject<PopoverItem?, Never>(nil)
 	
 	/// Fires when:
 	/// - view will animate off screen (onWillDisapper)
@@ -95,9 +95,9 @@ public class PopoverState: ObservableObject {
 
 /// Encompasses the view & options for the popover.
 ///
-public struct PopoverItem {
+public struct PopoverItem: SmartModalItem {
 	
-	/// Whether or not the popover is dimissable by clicking outside the popover.
+	/// Whether or not the popover is dimissable by tapping outside the popover.
 	let dismissable: Bool
 	
 	/// The view to be displayed in the popover window.

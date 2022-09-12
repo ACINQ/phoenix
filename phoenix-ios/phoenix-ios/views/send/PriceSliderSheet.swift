@@ -208,7 +208,8 @@ struct PriceSliderSheet: View {
 							.resizable()
 							.frame(width: 30, height: 30)
 					}
-					.accessibilityHidden(true) // duplication functionality; sheet itself is dismissable
+					.accessibilityLabel("Close")
+					.accessibilityHidden(smartModalState.currentItem?.dismissable ?? false)
 				}
 				.padding(.horizontal)
 				.padding(.vertical, 8)

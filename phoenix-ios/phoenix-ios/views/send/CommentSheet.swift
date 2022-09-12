@@ -39,7 +39,10 @@ struct CommentSheet: View {
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				Text("Add optional comment")
 					.font(.title3)
+					.accessibilityAddTraits(.isHeader)
+				
 				Spacer()
+				
 				Button {
 					closeButtonTapped()
 				} label: {
@@ -47,6 +50,8 @@ struct CommentSheet: View {
 						.resizable()
 						.frame(width: 30, height: 30)
 				}
+				.accessibilityLabel("Close")
+				.accessibilityHidden(smartModalState.currentItem?.dismissable ?? false)
 			}
 			.padding(.horizontal)
 			.padding(.vertical, 8)

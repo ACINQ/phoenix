@@ -30,7 +30,7 @@ public class ShortSheetState: ObservableObject {
 	/// - sheet view will animate on screen (onWillAppear)
 	/// - sheet view has animated off screen (onDidDisappear)
 	///
-	var publisher = PassthroughSubject<ShortSheetItem?, Never>()
+	var publisher = CurrentValueSubject<ShortSheetItem?, Never>(nil)
 	
 	/// Fires when:
 	/// - sheet view will animate off screen (onWillDisapper)
@@ -95,9 +95,9 @@ public class ShortSheetState: ObservableObject {
 
 /// Encompasses the view & options for the popover.
 ///
-public struct ShortSheetItem {
+public struct ShortSheetItem: SmartModalItem {
 	
-	/// Whether or not the popover is dimissable by clicking outside the popover.
+	/// Whether or not the popover is dimissable by tapping outside the popover.
 	let dismissable: Bool
 	
 	/// The view to be displayed in the sheet.

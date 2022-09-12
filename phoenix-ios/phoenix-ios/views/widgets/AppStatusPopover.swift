@@ -54,6 +54,8 @@ struct AppStatusPopover: View {
 					close()
 				}
 				.font(.title2)
+				.accessibilityHidden(popoverState.publisher.value?.dismissable ?? false)
+				
 			}
 			.padding(.top, 10)
 			.padding([.leading, .trailing])
@@ -76,46 +78,18 @@ struct AppStatusPopover: View {
 		
 		VStack(alignment: .leading) {
 			
-			Group {
-				
-				let globalStatus = connectionsMonitor.connections.global
-				if globalStatus is Lightning_kmpConnection.CLOSED {
-					
-					Label {
-						Text("Offline")
-					} icon: {
-						Image(systemName: "bolt.slash.fill")
-							.imageScale(.medium)
-							.read(titleIconWidthReader)
-							.frame(width: titleIconWidth, alignment: .center)
-					}
-				
-				} else if globalStatus is Lightning_kmpConnection.ESTABLISHING {
-					
-					Label {
-						Text("Connecting…")
-					} icon: {
-						Image(systemName: "bolt.slash")
-							.imageScale(.medium)
-							.read(titleIconWidthReader)
-							.frame(width: titleIconWidth, alignment: .center)
-					}
-				
-				} else {
-				
-					Label {
-						Text("Connected")
-					} icon: {
-						Image(systemName: "bolt.fill")
-							.imageScale(.medium)
-							.read(titleIconWidthReader)
-							.frame(width: titleIconWidth, alignment: .center)
-					}
-				}
-				
-			} // </Group>
+			let (txt, img) = connectionStatusHeader()
+			Label {
+				Text(verbatim: txt)
+			} icon: {
+				Image(systemName: img)
+					.imageScale(.medium)
+					.read(titleIconWidthReader)
+					.frame(width: titleIconWidth, alignment: .center)
+			}
 			.font(.title3)
 			.padding(.bottom, 15)
+			.accessibilityLabel("Connection status: \(txt)")
 			
 			ConnectionCell(
 				label: NSLocalizedString("Internet", comment: "AppStatusPopover: label"),
@@ -133,6 +107,28 @@ struct AppStatusPopover: View {
 			)
 		
 		} // </VStack>
+	}
+	
+	func connectionStatusHeader() -> (String, String) {
+		
+		let globalStatus = connectionsMonitor.connections.global
+		let txt: String
+		let img: String
+		
+		if globalStatus is Lightning_kmpConnection.CLOSED {
+			txt = NSLocalizedString("Offline", comment: "Connection status")
+			img = "bolt.slash.fill"
+			
+		} else if globalStatus is Lightning_kmpConnection.ESTABLISHING {
+			txt = NSLocalizedString("Connecting…", comment: "Connection status")
+			img = "bolt.slash"
+			
+		} else {
+			txt = NSLocalizedString("Connected", comment: "Connection status")
+			img = "bolt.fill"
+		}
+		
+		return (txt, img)
 	}
 	
 	@ViewBuilder
@@ -364,7 +360,9 @@ fileprivate struct ConnectionCell: View {
 	var body: some View {
 		
 		HStack(alignment: VerticalAlignment.center) {
-			let bullet = Image(systemName: "circle.fill").imageScale(.small)
+			let bullet = Image(systemName: "circle.fill")
+				.imageScale(.small)
+				.accessibilityHidden(true)
 
 			if connection is Lightning_kmpConnection.ESTABLISHED{
 				bullet.foregroundColor(.appPositive)
@@ -382,6 +380,7 @@ fileprivate struct ConnectionCell: View {
 			
 		} // </HStack>
 		.font(.callout)
+		.accessibilityElement(children: .combine)
 	}
 }
 
