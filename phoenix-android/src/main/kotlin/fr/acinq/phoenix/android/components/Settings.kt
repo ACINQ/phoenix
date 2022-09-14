@@ -18,11 +18,9 @@ package fr.acinq.phoenix.android.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Switch
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -64,6 +62,19 @@ fun SettingInteractive(
     enabled: Boolean = true,
     onClick: (() -> Unit)
 ) {
+    SettingInteractive(modifier = modifier, title = title, icon = icon, enabled = enabled, onClick = onClick,
+        description = { description?.let { Text(it) } })
+}
+
+@Composable
+fun SettingInteractive(
+    modifier: Modifier = Modifier,
+    title: String,
+    description: @Composable () -> Unit = {},
+    icon: Int? = null,
+    enabled: Boolean = true,
+    onClick: (() -> Unit)
+) {
     Column(
         modifier
             .fillMaxWidth()
@@ -86,7 +97,11 @@ fun SettingInteractive(
             if (icon != null) {
                 Spacer(modifier = Modifier.width(34.dp))
             }
-            Text(text = description ?: "", style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f))
+            Column(modifier = Modifier.weight(1f)) {
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.subtitle2) {
+                    description()
+                }
+            }
         }
     }
 }

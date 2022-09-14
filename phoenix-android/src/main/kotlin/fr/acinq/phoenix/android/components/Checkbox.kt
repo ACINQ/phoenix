@@ -38,6 +38,7 @@ fun Checkbox(
     text: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier,
     padding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 0.dp)
 ) {
@@ -45,6 +46,7 @@ fun Checkbox(
     val interactionSource = remember { MutableInteractionSource() }
     Row(
         modifier = modifier
+            .enableOrFade(enabled)
             .clickable(interactionSource = interactionSource, indication = null, role = Role.Checkbox) {
                 internalChecked = !internalChecked
                 onCheckedChange(internalChecked)

@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -82,6 +83,7 @@ fun FilledButton(
     modifier: Modifier = Modifier,
     text: Int? = null,
     icon: Int? = null,
+    iconTint: Color = LocalContentColor.current,
     enabled: Boolean = true,
     space: Dp = 16.dp,
     textStyle: TextStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.onPrimary),
@@ -92,7 +94,7 @@ fun FilledButton(
     Button(
         text = text?.run { stringResource(this) },
         icon = icon,
-        iconTint = textStyle.color, // icon has the same colors as the text
+        iconTint = iconTint,
         enabled = enabled,
         space = space,
         onClick = onClick,
@@ -105,10 +107,31 @@ fun FilledButton(
 }
 
 @Composable
-fun IconWithText(icon: Int, text: String, iconTint: Color = LocalContentColor.current, space: Dp = 16.dp) {
-    PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize), iconTint)
-    Spacer(Modifier.width(space))
-    Text(text)
+fun TextWithIcon(
+    text: String,
+    icon: Int,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = LocalTextStyle.current,
+    iconTint: Color = LocalContentColor.current,
+    padding: PaddingValues = PaddingValues(0.dp),
+    space: Dp = 6.dp,
+    alignBaseLine: Boolean = false
+) {
+    Row(
+        modifier = modifier.padding(padding),
+        verticalAlignment = if (alignBaseLine) Alignment.Top else Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = icon),
+            contentDescription = "icon for $text",
+            modifier = Modifier
+                .size(ButtonDefaults.IconSize)
+                .then(if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier),
+            colorFilter = ColorFilter.tint(iconTint)
+        )
+        Spacer(Modifier.width(space))
+        Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier)
+    }
 }
 
 @Composable
@@ -192,7 +215,7 @@ fun Button(
                     verticalAlignment = Alignment.CenterVertically,
                     content = {
                         if (text != null && icon != null) {
-                            IconWithText(icon, text, iconTint, space)
+                            TextWithIcon(text = text, icon = icon, iconTint = iconTint, space = space)
                         } else if (text != null) {
                             Text(text)
                         } else if (icon != null) {

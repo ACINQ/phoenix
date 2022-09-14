@@ -357,6 +357,7 @@
     <string name="home__drawer__faq">Read the FAQ</string>
     <string name="home__drawer__support">Help center</string>
     <string name="home__faq_button">FAQ</string>
+    <string name="home__connection__bad_cert">Electrum certificate</string>
     <string name="home__connection__connecting">Connecting…</string>
     <string name="home__connection__tor_active">Tor enabled</string>
 
@@ -579,9 +580,7 @@
     <!-- //////////////// electrum server //////////////// -->
 
     <string name="electrum_title">Electrum server</string>
-    <string name="electrum_subtitle">Phoenix needs to access the Bitcoin blockchain to monitor and secure your channels.</string>
-    <string name="electrum_server_desc_random">Server is picked at random.</string>
-    <string name="electrum_server_desc_custom">Server is custom.</string>
+    <string name="electrum_subtitle">Phoenix needs to access the Bitcoin blockchain to monitor and secure your channels. This is done using public Electrum servers. You can also configure your own server.</string>
 
     <string name="electrum_block_height_label">Block height</string>
     <string name="electrum_tip_label">Tip timestamp</string>
@@ -591,18 +590,30 @@
     <string name="electrum_fee_rate">%1$s sat/byte</string>
     <string name="electrum_connection_label">Server</string>
 
-    <string name="electrum_server_connection">Server</string>
+    <string name="electrum_server_label_random">Server (picked at random)</string>
+    <string name="electrum_server_label_custom">Server (custom address)</string>
     <string name="electrum_not_connected">Disconnected</string>
     <string name="electrum_not_connected_to_custom">Disconnected from %1$s</string>
-    <string name="electrum_connecting">Connecting to random server…</string>
-    <string name="electrum_connecting_to_custom">Connecting to %1$s…</string>
+    <string name="electrum_not_connected_to_custom_bad_certificate">%1$s provided an unknown certificate!\nTap to configure.</string>
+    <string name="electrum_connecting">Connecting to %1$s…</string>
     <string name="electrum_connected">Connected to %1$s</string>
+    <string name="electrum_connected_to_pinned">We are using the pinned public key %1$s</string>
 
     <string name="electrum_dialog_checkbox">Use a custom server</string>
-    <string name="electrum_dialog_ssl">Server must have a valid certificate</string>
-    <string name="electrum_dialog_ssl_tor">Also check certificate for this Onion address</string>
-    <string name="electrum_dialog_input">Server address (host:port).</string>
-    <string name="electrum_empty_custom_address">Please enter an electrum server address</string>
+    <string name="electrum_dialog_input">Server address (host:port)</string>
+    <string name="electrum_dialog_invalid_input">This address is invalid.</string>
+    <string name="electrum_dialog_cert_check_button">Connect</string>
+    <string name="electrum_dialog_cert_checking">Checking certificate…</string>
+    <string name="electrum_dialog_cert_failure">Failed to connect:\n%1$s</string>
+    <string name="electrum_dialog_cert_unresolved">This address cannot be resolved.</string>
+    <string name="electrum_dialog_cert_header">Untrusted certificate</string>
+    <string name="electrum_dialog_cert_sha1">SHA1 Fingerprint</string>
+    <string name="electrum_dialog_cert_sha256">SHA256 Fingerprint</string>
+    <string name="electrum_dialog_cert_issuer">Issuer</string>
+    <string name="electrum_dialog_cert_subject">Subject</string>
+    <string name="electrum_dialog_cert_expiration">Valid until</string>
+    <string name="electrum_dialog_cert_copy">Copy certificate</string>
+    <string name="electrum_dialog_cert_accept">Trust certificate</string>
 
     <!-- ////////////// virtual keyboard hints //////////////// -->
 
@@ -621,15 +632,17 @@
     <!-- ////////////// connection issues dialog //////////////// -->
 
     <string name="conndialog_title">Connections status</string>
-    <string name="conndialog_summary_not_ok">You have connection issue(s). The app will not function properly.</string>
+    <string name="conndialog_summary_not_ok">You have connection issue(s). The app will not function correctly.</string>
     <string name="conndialog_network">Your device has no Internet connection. The app will not function properly.\n\nPlease check your device\'s setting.</string>
     <string name="conndialog_internet">Internet</string>
     <string name="conndialog_electrum">Electrum</string>
     <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Peer</string>
+    <string name="conndialog_accessibility_desc">Manage connection for %1$s</string>
     <string name="conndialog_connecting">Connecting…</string>
     <string name="conndialog_connected">Connected</string>
-    <string name="conndialog_closed">Closed</string>
+    <string name="conndialog_closed">Disconnected</string>
+    <string name="conndialog_closed_bad_cert">Bad certificate</string>
 
     <!-- //////////////// about screen //////////////// -->
 

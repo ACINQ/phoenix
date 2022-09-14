@@ -20,9 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
+import java.security.cert.CertificateException
 import java.util.*
 
 /**
@@ -64,3 +66,5 @@ fun UserTheme.label(): String {
         }
     }
 }
+
+fun Connection.CLOSED.isBadCertificate() = this.reason?.cause is CertificateException

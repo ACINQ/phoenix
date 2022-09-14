@@ -73,14 +73,17 @@ object UserPrefs {
 
     val PREFS_ELECTRUM_ADDRESS_HOST = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS_HOST")
     val PREFS_ELECTRUM_ADDRESS_PORT = intPreferencesKey("PREFS_ELECTRUM_ADDRESS_PORT")
-    const val PREFS_ELECTRUM_FORCE_SSL = "PREFS_ELECTRUM_FORCE_SSL"
+    val PREFS_ELECTRUM_ADDRESS_PINNED_KEY = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS_PINNED_KEY")
 
     fun getElectrumServer(context: Context): Flow<ServerAddress?> = prefs(context).map {
         val host = it[PREFS_ELECTRUM_ADDRESS_HOST]?.takeIf { it.isNotBlank() }
         val port = it[PREFS_ELECTRUM_ADDRESS_PORT]
-        log.info("retrieved preferred electrum host=$host port=$port from datastore")
-        if (host != null && port != null) {
+        val pinnedKey = it[PREFS_ELECTRUM_ADDRESS_PINNED_KEY]?.takeIf { it.isNotBlank() }
+        log.info("retrieved electrum address from datastore, host=$host port=$port key=$pinnedKey")
+        if (host != null && port != null && pinnedKey == null) {
             ServerAddress(host, port, TcpSocket.TLS.TRUSTED_CERTIFICATES)
+        } else if (host != null && port != null && pinnedKey != null) {
+            ServerAddress(host, port, TcpSocket.TLS.PINNED_PUBLIC_KEY(pinnedKey))
         } else {
             null
         }
@@ -90,9 +93,16 @@ object UserPrefs {
         if (address == null) {
             it.remove(PREFS_ELECTRUM_ADDRESS_HOST)
             it.remove(PREFS_ELECTRUM_ADDRESS_PORT)
+            it.remove(PREFS_ELECTRUM_ADDRESS_PINNED_KEY)
         } else {
             it[PREFS_ELECTRUM_ADDRESS_HOST] = address.host
             it[PREFS_ELECTRUM_ADDRESS_PORT] = address.port
+            val tls = address.tls
+            if (tls is TcpSocket.TLS.PINNED_PUBLIC_KEY) {
+                it[PREFS_ELECTRUM_ADDRESS_PINNED_KEY] =  tls.pubKey
+            } else {
+                it.remove(PREFS_ELECTRUM_ADDRESS_PINNED_KEY)
+            }
         }
     }
 

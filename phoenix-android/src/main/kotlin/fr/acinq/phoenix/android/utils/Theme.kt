@@ -105,7 +105,7 @@ private val DarkColorPalette = darkColors(
     // secondary = primary
     secondary = azur,
     secondaryVariant = azur,
-    onSecondary = white,
+    onSecondary = black,
     // app background
     background = black,
     onBackground = gray70,
@@ -132,7 +132,7 @@ fun typography(palette: Colors) = Typography(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
-        color = mutedTextColor(),
+        color = if (isDarkTheme) gray500 else gray300,
     ),
     h1 = TextStyle(
         fontFamily = FontFamily.SansSerif,

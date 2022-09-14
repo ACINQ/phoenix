@@ -19,6 +19,7 @@ package fr.acinq.phoenix.android.home
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,6 +37,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -232,7 +234,7 @@ fun TopBar(
             .height(40.dp)
             .clipToBounds()
     ) {
-        if (connectionsState?.electrum !is Connection.ESTABLISHED || connectionsState?.peer !is Connection.ESTABLISHED) {
+        if (connectionsState?.electrum !is Connection.ESTABLISHED || connectionsState.peer !is Connection.ESTABLISHED) {
             val connectionsTransition = rememberInfiniteTransition()
             val connectionsButtonAlpha by connectionsTransition.animateFloat(
                 initialValue = 0.3f,
@@ -242,11 +244,14 @@ fun TopBar(
                     repeatMode = RepeatMode.Reverse
                 )
             )
+            val electrumConnection = connectionsState?.electrum
+            val isBadElectrumCert = electrumConnection != null && electrumConnection is Connection.CLOSED && electrumConnection.isBadCertificate()
             FilledButton(
-                text = R.string.home__connection__connecting,
-                icon = R.drawable.ic_connection_lost,
+                text = if (isBadElectrumCert) R.string.home__connection__bad_cert else R.string.home__connection__connecting,
+                icon = if (isBadElectrumCert) R.drawable.ic_alert_triangle else R.drawable.ic_connection_lost,
+                iconTint = if (isBadElectrumCert) negativeColor() else LocalContentColor.current,
                 onClick = onConnectionsStateButtonClick,
-                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
+                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = if (isBadElectrumCert) negativeColor() else LocalContentColor.current),
                 backgroundColor = mutedBgColor(),
                 space = 8.dp,
                 padding = PaddingValues(8.dp),
@@ -258,6 +263,7 @@ fun TopBar(
 
 @Composable
 private fun ConnectionDialog(connections: Connections?, onClose: () -> Unit) {
+    val nc = navController
     Dialog(title = stringResource(id = R.string.conndialog_title), onDismiss = onClose) {
         Column {
             if (connections?.internet != Connection.ESTABLISHED) {
@@ -273,7 +279,7 @@ private fun ConnectionDialog(connections: Connections?, onClose: () -> Unit) {
                 HSeparator()
                 ConnectionDialogLine(label = stringResource(id = R.string.conndialog_internet), connection = connections.internet)
                 HSeparator()
-                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_electrum), connection = connections.electrum)
+                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_electrum), connection = connections.electrum, onClick = { nc.navigate(Screen.ElectrumServer) })
                 HSeparator()
                 ConnectionDialogLine(label = stringResource(id = R.string.conndialog_lightning), connection = connections.peer)
                 HSeparator()
@@ -284,8 +290,15 @@ private fun ConnectionDialog(connections: Connections?, onClose: () -> Unit) {
 }
 
 @Composable
-private fun ConnectionDialogLine(label: String, connection: Connection?) {
-    Row(modifier = Modifier.padding(vertical = 12.dp, horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically) {
+private fun ConnectionDialogLine(label: String, connection: Connection?, onClick: (() -> Unit)? = null) {
+    Row(
+        modifier = Modifier
+            .then(
+                if (onClick != null) Modifier.clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.conndialog_accessibility_desc, label), onClick = onClick) else Modifier
+            )
+            .padding(vertical = 12.dp, horizontal = 24.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Surface(
             shape = CircleShape,
             color = when (connection) {
@@ -300,7 +313,11 @@ private fun ConnectionDialogLine(label: String, connection: Connection?) {
         Text(text = when (connection) {
             Connection.ESTABLISHING -> stringResource(R.string.conndialog_connecting)
             Connection.ESTABLISHED -> stringResource(R.string.conndialog_connected)
-            else -> stringResource(R.string.conndialog_closed)
+            else -> if (connection is Connection.CLOSED && connection.isBadCertificate()) {
+                stringResource(R.string.conndialog_closed_bad_cert)
+            } else {
+                stringResource(R.string.conndialog_closed)
+            }
         }, style = monoTypo())
     }
 }
