@@ -7,14 +7,13 @@ import fr.acinq.bitcoin.PublicKey
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.Wallet
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalCoroutinesApi::class)
+
 class WalletManager(
     private val chain: Chain
 ) : CoroutineScope by MainScope() {

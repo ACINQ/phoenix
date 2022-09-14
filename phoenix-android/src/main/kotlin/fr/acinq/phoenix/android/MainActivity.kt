@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         // listen to legacy channels events on the peer's event bus
         lifecycleScope.launch {
             val application = (application as PhoenixApplication)
-            application.business.peerManager.getPeer().openListenerEventSubscription().receiveAsFlow().collect {
+            application.business.peerManager.getPeer().eventsFlow.collect {
                 if (it is PhoenixAndroidLegacyInfoEvent) {
                     if (it.info.hasChannels) {
                         log.info("legacy channels have been found")

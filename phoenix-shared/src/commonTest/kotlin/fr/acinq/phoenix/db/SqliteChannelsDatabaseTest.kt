@@ -26,7 +26,6 @@ import fr.acinq.lightning.serialization.Serialization
 import fr.acinq.phoenix.TestConstants
 import fr.acinq.phoenix.runTest
 import fr.acinq.secp256k1.Hex
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
@@ -36,8 +35,6 @@ class SqliteChannelsDatabaseTest {
     private val db = SqliteChannelsDb(testChannelsDriver(), TestConstants.Bob.nodeParams)
     private val db2 = SqlitePaymentsDb(testPaymentsDriver())
 
-
-    @ExperimentalCoroutinesApi
     @Test
     fun basic() = runTest {
 

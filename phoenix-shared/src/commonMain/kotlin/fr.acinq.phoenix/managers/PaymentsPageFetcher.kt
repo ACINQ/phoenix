@@ -20,7 +20,7 @@ data class PaymentsPage(
     constructor(): this(0, 0, emptyList())
 }
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
+@OptIn(ExperimentalTime::class)
 class PaymentsPageFetcher(
     loggerFactory: LoggerFactory,
     private val databaseManager: DatabaseManager

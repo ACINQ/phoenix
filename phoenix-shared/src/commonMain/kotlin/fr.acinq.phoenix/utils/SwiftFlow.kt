@@ -14,11 +14,10 @@ import kotlinx.coroutines.flow.*
 // This doesn't work in Swift.
 // For some reason, in Swift, it is exposed as a function within SwiftFlow itself.
 /*
-@ExperimentalCoroutinesApi
 fun <T> Flow<T>.wrap() = SwiftFlow(this)
 */
 
-@ExperimentalCoroutinesApi
+
 class SwiftFlow<T>(private val origin: Flow<T>) : Flow<T> by origin {
     fun watch(block: (T) -> Unit): Closeable {
         val job = Job()
@@ -35,7 +34,7 @@ class SwiftFlow<T>(private val origin: Flow<T>) : Flow<T> by origin {
     }
 }
 
-@ExperimentalCoroutinesApi
+
 class SwiftStateFlow<T>(private val origin: StateFlow<T>) : StateFlow<T> by origin {
     fun watch(block: (T) -> Unit): Closeable {
         val job = Job()

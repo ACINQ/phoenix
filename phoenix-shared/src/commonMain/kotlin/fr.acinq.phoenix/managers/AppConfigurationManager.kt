@@ -20,7 +20,7 @@ import org.kodein.log.newLogger
 import kotlin.math.*
 import kotlin.time.*
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class, ExperimentalStdlibApi::class)
+@OptIn(ExperimentalTime::class, ExperimentalStdlibApi::class)
 class AppConfigurationManager(
     private val appDb: SqliteAppDb,
     private val httpClient: HttpClient,
@@ -205,7 +205,7 @@ class AppConfigurationManager(
     }.let {
         if (it.pinnedPublicKey != null) {
             ServerAddress(it.host, it.tlsPort, TcpSocket.TLS.PINNED_PUBLIC_KEY(it.pinnedPublicKey))
-        }  else {
+        } else {
             ServerAddress(it.host, it.tlsPort, TcpSocket.TLS.TRUSTED_CERTIFICATES)
         }
     }
@@ -215,10 +215,9 @@ class AppConfigurationManager(
     fun electrumMessages(): StateFlow<HeaderSubscriptionResponse?> = _electrumMessages
 
     private fun watchElectrumMessages() = launch {
-        electrumClient.openNotificationsSubscription().consumeAsFlow().filterIsInstance<HeaderSubscriptionResponse>()
-            .collect {
-                _electrumMessages.value = it
-            }
+        electrumClient.notifications.filterIsInstance<HeaderSubscriptionResponse>().collect {
+            _electrumMessages.value = it
+        }
     }
 
     // Tor configuration
@@ -233,16 +232,17 @@ class AppConfigurationManager(
         val primary: FiatCurrency,
         val others: Set<FiatCurrency>
     ) {
-        constructor(primary: FiatCurrency, others: List<FiatCurrency>):
-            this(primary = primary, others = others.toSet())
+        constructor(primary: FiatCurrency, others: List<FiatCurrency>) :
+                this(primary = primary, others = others.toSet())
 
-        val all: Set<FiatCurrency> get() {
-            return if (others.contains(primary)) {
-                others
-            } else {
-                others.toMutableSet().apply { add(primary) }
+        val all: Set<FiatCurrency>
+            get() {
+                return if (others.contains(primary)) {
+                    others
+                } else {
+                    others.toMutableSet().apply { add(primary) }
+                }
             }
-        }
     }
 
     private val _preferredFiatCurrencies by lazy { MutableStateFlow<PreferredFiatCurrencies?>(null) }

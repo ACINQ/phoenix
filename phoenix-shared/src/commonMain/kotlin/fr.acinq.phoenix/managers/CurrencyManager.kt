@@ -39,7 +39,7 @@ import kotlin.time.ExperimentalTime
 /**
  * Manages fetching and updating exchange rates.
  */
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class, ExperimentalStdlibApi::class)
+@OptIn(ExperimentalTime::class, ExperimentalStdlibApi::class)
 class CurrencyManager(
     loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,

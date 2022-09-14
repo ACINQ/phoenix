@@ -16,7 +16,7 @@ import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
+@OptIn(ExperimentalTime::class)
 class AppConnectionsDaemon(
     loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,

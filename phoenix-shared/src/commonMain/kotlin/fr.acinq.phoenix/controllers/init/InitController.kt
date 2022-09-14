@@ -3,12 +3,10 @@ package fr.acinq.phoenix.controllers.init
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class AppInitController(
     loggerFactory: LoggerFactory
 ) : AppController<Initialization.Model, Initialization.Intent>(

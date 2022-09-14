@@ -74,7 +74,6 @@ data class Wallet(val seed: ByteVector64, val chain: Chain) {
      *
      * Test vectors exist for path derivation.
      */
-    @ExperimentalUnsignedTypes
     internal fun lnurlAuthPath(domain: String, hashingKey: ByteArray): KeyPath {
         val fullHash = Digest.sha256().hmac(
             key = hashingKey,

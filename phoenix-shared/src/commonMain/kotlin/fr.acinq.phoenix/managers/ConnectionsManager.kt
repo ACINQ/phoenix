@@ -19,7 +19,6 @@ data class Connections(
         get() = internet + peer + electrum
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class ConnectionsManager(
     peerManager: PeerManager,
     electrumClient: ElectrumClient,

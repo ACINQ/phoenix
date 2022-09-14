@@ -10,12 +10,11 @@ import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.data.Chain
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.collect
 import org.kodein.log.LoggerFactory
 import kotlin.random.Random
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class AppReceiveController(
     loggerFactory: LoggerFactory,
     private val chain: Chain,
@@ -34,7 +33,7 @@ class AppReceiveController(
 
     init {
         launch {
-            peerManager.getPeer().openListenerEventSubscription().consumeEach { event ->
+            peerManager.getPeer().eventsFlow.collect { event ->
                 if (event is SwapInResponseEvent && models.value is Receive.Model.SwapIn.Requesting) {
                     logger.debug { "received swap-in response=$event" }
                     model(Receive.Model.SwapIn.Generated(event.swapInResponse.bitcoinAddress))

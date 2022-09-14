@@ -54,11 +54,9 @@ import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.legacy.utils.MigrationResult
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import fr.acinq.phoenix.managers.Connections
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 
-@ExperimentalCoroutinesApi
+
 @Composable
 fun HomeView(
     homeViewModel: HomeViewModel,
@@ -144,7 +142,6 @@ fun HomeView(
     )
 }
 
-@OptIn(ObsoleteCoroutinesApi::class)
 @Composable
 private fun SideMenu(
     onSettingsClick: () -> Unit,

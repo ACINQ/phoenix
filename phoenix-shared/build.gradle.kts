@@ -58,8 +58,6 @@ kotlin {
             }
             compilations.all {
                 kotlinOptions.freeCompilerArgs +=
-                    "-Xuse-experimental=kotlinx.coroutines.ObsoleteCoroutinesApi"
-                kotlinOptions.freeCompilerArgs +=
                     "-Xuse-experimental=kotlinx.serialization.ExperimentalSerializationApi"
                 kotlinOptions.freeCompilerArgs +=
                     "-Xoverride-konan-properties=osVersionMin.ios_x64=14.0;osVersionMin.ios_arm64=14.0"
@@ -129,7 +127,7 @@ kotlin {
         }
 
         all {
-            languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
+            languageSettings.optIn("kotlin.RequiresOptIn")
         }
     }
 }

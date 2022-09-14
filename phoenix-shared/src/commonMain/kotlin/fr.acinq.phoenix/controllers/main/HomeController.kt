@@ -8,7 +8,6 @@ import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.calculateBalance
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
@@ -16,7 +15,6 @@ import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class AppHomeController(
     loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,

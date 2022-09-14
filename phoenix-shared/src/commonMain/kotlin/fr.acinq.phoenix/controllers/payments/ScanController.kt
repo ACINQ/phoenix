@@ -49,6 +49,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -97,7 +98,7 @@ class AppScanController(
 
     init {
         launch {
-            peerManager.getPeer().openListenerEventSubscription().consumeEach { event ->
+            peerManager.getPeer().eventsFlow.collect { event ->
                 when (event) {
                     is SwapOutResponseEvent -> {
                         val currentModel = models.value

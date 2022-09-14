@@ -5,13 +5,12 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import fr.acinq.phoenix.controllers.AppController
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 
-@OptIn(ExperimentalCoroutinesApi::class)
+
 class AppElectrumConfigurationController(
     loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,

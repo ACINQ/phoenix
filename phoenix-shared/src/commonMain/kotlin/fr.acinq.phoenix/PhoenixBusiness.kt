@@ -24,7 +24,6 @@ import fr.acinq.phoenix.utils.*
 import io.ktor.client.*
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.serialization.json.Json
 import org.kodein.log.LoggerFactory
@@ -35,7 +34,6 @@ import org.kodein.memory.file.Path
 import org.kodein.memory.file.resolve
 
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalUnsignedTypes::class)
 class PhoenixBusiness(
     internal val ctx: PlatformContext
 ) {

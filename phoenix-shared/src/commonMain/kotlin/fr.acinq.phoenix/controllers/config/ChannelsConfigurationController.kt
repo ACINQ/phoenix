@@ -9,7 +9,6 @@ import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.utils.localCommitmentSpec
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.MapSerializer
@@ -17,7 +16,6 @@ import kotlinx.serialization.json.Json
 import org.kodein.log.LoggerFactory
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class AppChannelsConfigurationController(
     loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,

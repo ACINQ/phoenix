@@ -18,7 +18,6 @@ import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class PaymentsManager(
     private val loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
@@ -110,7 +109,7 @@ class PaymentsManager(
             // (which runs in a separate process), then you won't receive the
             // corresponding notifications (PaymentReceived) thru this mechanism.
             //
-            peerManager.getPeer().openListenerEventSubscription().consumeEach { event ->
+            peerManager.getPeer().eventsFlow.collect { event ->
                 when (event) {
                     is PaymentProgress -> {
                         addToInFlightOutgoingPayments(event.request.paymentId)
