@@ -35,7 +35,7 @@ object Versions {
     }
 
     object AndroidLegacy {
-        const val eclair = "0.4.16-android-phoenix-SNAPSHOT"
+        const val eclair = "0.4.16-android-phoenix"
 
         const val safeArgs = "2.3.5"
         const val appCompat = "1.2.0"
