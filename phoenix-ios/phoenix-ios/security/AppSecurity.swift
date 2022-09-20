@@ -669,65 +669,19 @@ class AppSecurity {
 	// --------------------------------------------------------------------------------
 	
 	public func performMigration(
-		_ previousBuild: String,
+		_ targetBuild: String,
 		_ completionPublisher: CurrentValueSubject<Int, Never>
 	) -> Void {
-		log.trace("performMigration(previousBuild: \(previousBuild))")
+		log.trace("performMigration(to: \(targetBuild))")
 		
-		if previousBuild.isVersion(lessThan: "5") {
-			performMigration_toBuild5()
-		}
+		// NB: The first version released in the App Store was version 1.0.0 (build 17)
 		
-		if previousBuild.isVersion(lessThan: "40") {
+		if targetBuild.isVersion(equalTo: "40") {
 			performMigration_toBuild40()
 		}
 		
-		if previousBuild.isVersion(lessThan: "41") {
+		if targetBuild.isVersion(equalTo: "41") {
 			performMigration_toBuild41(completionPublisher)
-		}
-	}
-	
-	private func performMigration_toBuild5() {
-		log.trace("performMigration_toBuild5()")
-		
-		let keychain = GenericPasswordStore()
-		var hardBiometricsEnabled = false
-		
-		do {
-			hardBiometricsEnabled = try keychain.keyExists(
-				account     : keychain_accountName_biometrics,
-				accessGroup : privateAccessGroup()
-			)
-		} catch {
-			log.error("keychain.keyExists(account: hardBiometrics): error: \(String(describing: error))")
-		}
-		
-		if hardBiometricsEnabled {
-			// Then soft biometrics are implicitly enabled.
-			// So we need to set that flag.
-			
-			let account = keychain_accountName_softBiometrics
-			do {
-				try keychain.deleteKey(
-					account     : account,
-					accessGroup : privateAccessGroup()
-				)
-			} catch {
-				log.error("keychain.deleteKey(account: softBiometrics): error: \(String(describing: error))")
-			}
-			
-			do {
-				var query = [String: Any]()
-				query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-				
-				try keychain.storeKey( "true",
-				              account: account,
-				          accessGroup: privateAccessGroup(),
-				               mixins: query)
-				
-			} catch {
-				log.error("keychain.storeKey(account: softBiometrics): error: \(String(describing: error))")
-			}
 		}
 	}
 	
