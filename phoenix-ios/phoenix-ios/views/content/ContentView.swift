@@ -163,7 +163,7 @@ struct ContentView: MVIView {
 			// Waiting for first keychain read
 			return true
 		}
-		if lockState.foundMnemonics && mvi.model is Content.ModelNeedInitialization {
+		if lockState.firstUnlockFoundMnemonics && mvi.model is Content.ModelNeedInitialization {
 			// We're in the process of unlocking the wallet.
 			return true
 		}

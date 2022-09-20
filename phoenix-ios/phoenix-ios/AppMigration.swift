@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 import os.log
 
 #if DEBUG && true
@@ -13,10 +14,26 @@ fileprivate var log = Logger(OSLog.disabled)
 
 class AppMigration {
 	
-	public static func performMigrationChecks() -> Void {
-
+	/// Singleton instance
+	public static let shared = AppMigration()
+	
+	private let completionPublisher = CurrentValueSubject<Int, Never>(1)
+	private var cancellables = Set<AnyCancellable>()
+	
+	public func performMigrationChecks() -> Void {
+		
 		let key = "lastVersionCheck"
 		let previousBuild = UserDefaults.standard.string(forKey: key) ?? "3"
+		let currentBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
+		
+		completionPublisher.sink { value in
+			if value == 0 { // migration complete !
+				if previousBuild.isVersion(lessThan: currentBuild) {
+					UserDefaults.standard.set(currentBuild, forKey: key)
+				}
+				LockState.shared.migrationStepsCompleted = true
+			}
+		}.store(in: &cancellables)
 
 		// v0.7.3 (build 4)
 		// - serialization change for Channels
@@ -40,7 +57,7 @@ class AppMigration {
 		// - previously only supported hard biometics
 		//
 		if previousBuild.isVersion(lessThan: "7") {
-			AppSecurity.shared.performMigration(previousBuild: previousBuild)
+			AppSecurity.shared.performMigration(previousBuild, completionPublisher)
 		}
 		
 		// v0.8.0 (build 8)
@@ -53,23 +70,30 @@ class AppMigration {
 		
 		// v1.5.1 (build 40)
 		// - notification service extension added
-		// - several UserDefault values move to shared group
-		// - ...
+		// - database files moved to shared group
+		// - several UserDefault values moved to shared group
+		// - security.json file moved to shared group
+		// - keychain item moved to shared group
+		//
 		if previousBuild.isVersion(lessThan: "40") {
 			
 			migrateDbFilesToGroup()
-			GroupPrefs.shared.performMigration(previousBuild: previousBuild)
-			AppSecurity.shared.performMigration(previousBuild: previousBuild)
+			GroupPrefs.shared.performMigration(previousBuild, completionPublisher)
+			AppSecurity.shared.performMigration(previousBuild, completionPublisher)
 		}
-
-		let currentBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
-		if previousBuild.isVersion(lessThan: currentBuild) {
-
-			UserDefaults.standard.set(currentBuild, forKey: key)
+		
+		// v1.5.2 (build 41)
+		// - hot-fix for `!protectedDataAvailable`
+		//
+		if previousBuild.isVersion(lessThan: "41") {
+			
+			AppSecurity.shared.performMigration(previousBuild, completionPublisher)
 		}
+		
+		completionPublisher.value -= 1
 	}
 	
-	private static func migrateChannelsDbFiles() -> Void {
+	private func migrateChannelsDbFiles() -> Void {
 		
 		let fm = FileManager.default
 		
@@ -137,7 +161,7 @@ class AppMigration {
 		// - Which means their existing channels are going to get force closed by the server.
 	}
 	
-	private static func removeAppDbFile() {
+	private func removeAppDbFile() {
 		let fm = FileManager.default
 		
 		let appSupportDirs = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask)
@@ -155,7 +179,7 @@ class AppMigration {
 	}
 	
 	/// Moves all the database files to ...
-	private static func migrateDbFilesToGroup() -> Void {
+	private func migrateDbFilesToGroup() -> Void {
 		
 		let fm = FileManager.default
 		

@@ -236,7 +236,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 				self?.tryFirstUnlock()
 			}
 		}.store(in: &cancellables)
+		
+		// We delay our work until any needed migration has been completed.
+		//
+		LockState.shared.$migrationStepsCompleted.sink {[weak self] migrationStepsCompleted in
+			
+			log.debug("LockState.shared.migrationStepsCompleted = \(migrationStepsCompleted)")
+			if migrationStepsCompleted {
+				self?.checkProtectedDataAvailable()
+			}
+		}.store(in: &cancellables)
+	}
 	
+	private func checkProtectedDataAvailable() {
+		log.trace("checkProtectedDataAvailable()")
+		assertMainThread()
+		
 		if UIApplication.shared.isProtectedDataAvailable {
 			log.debug("UIApplication.shared.isProtectedDataAvailable == true")
 	
@@ -259,7 +274,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 				}
 			}.store(in: &cancellables)
 		}
-	
 	}
 	
 	private func tryFirstUnlock() {
@@ -288,8 +302,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 			if let mnemonics = mnemonics {
 				// unlock & load wallet
-				AppDelegate.get().loadWallet(mnemonics: mnemonics)
-				LockState.shared.foundMnemonics = true
+				if AppDelegate.get().loadWallet(mnemonics: mnemonics) {
+					LockState.shared.firstUnlockFoundMnemonics = true
+				}
 			}
 		
 			if let error = error {

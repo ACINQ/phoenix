@@ -8,13 +8,11 @@ class LockState: ObservableObject {
 	
 	/// Indicates whether the app is locked or unlocked.
 	/// This will be set to true if app-lock is disabled, or if the user has authenticated using biometrics.
-	/// This value is managed by the SceneDelegate.
 	///
 	@Published var isUnlocked: Bool
 	
 	/// Indicates whether the iOS keychain is available and ready.
 	/// Failure to wait for this flag may result in the keychain returning item-not-found errors.
-	/// This valus is managed by the AppDelegate.
 	///
 	@Published var protectedDataAvailable: Bool
 	
@@ -24,15 +22,20 @@ class LockState: ObservableObject {
 	@Published var firstUnlockAttempted: Bool
 	
 	/// Indicates whether or not we found mnemonics in the keychain during first unlock attempt.
+	/// This value will be set prior to firstUnlockAttempted.
 	///
-	@Published var foundMnemonics: Bool
+	@Published var firstUnlockFoundMnemonics: Bool
 	
+	/// Indicates whether or not any required migration steps are still in flight.
+	/// 
+	@Published var migrationStepsCompleted: Bool
 	
 	private init() { // must use shared instance
 		
 		self.isUnlocked = false
 		self.protectedDataAvailable = false
 		self.firstUnlockAttempted = false
-		self.foundMnemonics = false
+		self.firstUnlockFoundMnemonics = false
+		self.migrationStepsCompleted = false
 	}
 }

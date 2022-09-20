@@ -78,13 +78,16 @@ struct LoadingView: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			if !lockState.protectedDataAvailable {
+			if !lockState.migrationStepsCompleted {
+				Text("Updating internals…")
+				
+			} else if !lockState.protectedDataAvailable {
 				Text("Waiting for keychain…")
 				
 			} else if !lockState.firstUnlockAttempted {
 				Text("Loading…")
 				
-			} else if lockState.foundMnemonics {
+			} else if lockState.firstUnlockFoundMnemonics {
 				Text("Decrypting wallet…")
 				
 			} else {

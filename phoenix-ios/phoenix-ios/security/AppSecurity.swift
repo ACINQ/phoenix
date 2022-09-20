@@ -3,6 +3,7 @@ import Combine
 import CommonCrypto
 import CryptoKit
 import LocalAuthentication
+import SwiftUI
 import os.log
 
 #if DEBUG && true
@@ -667,7 +668,10 @@ class AppSecurity {
 	// MARK: Migration
 	// --------------------------------------------------------------------------------
 	
-	public func performMigration(previousBuild: String) -> Void {
+	public func performMigration(
+		_ previousBuild: String,
+		_ completionPublisher: CurrentValueSubject<Int, Never>
+	) -> Void {
 		log.trace("performMigration(previousBuild: \(previousBuild))")
 		
 		if previousBuild.isVersion(lessThan: "5") {
@@ -676,6 +680,10 @@ class AppSecurity {
 		
 		if previousBuild.isVersion(lessThan: "40") {
 			performMigration_toBuild40()
+		}
+		
+		if previousBuild.isVersion(lessThan: "41") {
+			performMigration_toBuild41(completionPublisher)
 		}
 	}
 	
@@ -746,8 +754,59 @@ class AppSecurity {
 		// Step 2 of 2:
 		// Migrate keychain entry to group container.
 		
+		migrateKeychainItemToSharedGroup()
+	}
+	
+	private func performMigration_toBuild41(_ completionPublisher: CurrentValueSubject<Int, Never>) {
+		log.trace("performMigration_toBuild41()")
+		
+		// There was a bug in versions prior to build 41,
+		// where we didn't check the UIApplication's `isProtectedDataAvailable` flag.
+		//
+		// If that value happened to be false, and we attempted to read from the keychain,
+		// we would have received an item-not-found error.
+		//
+		// If this occurred during performMigration_toBuild40(),
+		// this would have resulted in the app failing to read the keychain item forever (in build 40).
+		// So in build 41, we have to perform this migration again,
+		// but this time not until `isProtectedDataAvailable` is true.
+		
+		if UIApplication.shared.isProtectedDataAvailable {
+			migrateKeychainItemToSharedGroup()
+			
+		} else {
+			
+			completionPublisher.value += 1
+			var cancellables = Set<AnyCancellable>()
+			
+			let nc = NotificationCenter.default
+			nc.publisher(for: UIApplication.protectedDataDidBecomeAvailableNotification).sink { _ in
+				
+				// Apple doesn't specify which thread this notification is posted on.
+				// Should be the main thread, but just in case, let's be safe.
+				if Thread.isMainThread {
+					self.migrateKeychainItemToSharedGroup()
+					completionPublisher.value -= 1
+				} else {
+					DispatchQueue.main.async {
+						self.migrateKeychainItemToSharedGroup()
+						completionPublisher.value -= 1
+					}
+				}
+				
+				cancellables.removeAll()
+			}.store(in: &cancellables)
+		}
+	}
+	
+	private func migrateKeychainItemToSharedGroup() {
+		log.trace("migrateKeychainItemToSharedGroup()")
+		
 		let keychain = GenericPasswordStore()
 		
+		// Step 1 of 4:
+		// - Read the OLD keychain item.
+		// - If it exists, then we need to migrate it to the new location.
 		var savedKey: SymmetricKey? = nil
 		do {
 			savedKey = try keychain.readKey(
@@ -759,11 +818,17 @@ class AppSecurity {
 		}
 		
 		if let lockingKey = savedKey {
+			// The OLD keychain item exists, so we're going to migrate it.
+			
 			var migrated = false
 			do {
+				// Step 2 of 4:
+				// - Delete the NEW keychain item.
+				// - It shouldn't exist, but if it does it will cause an error on the next step.
 				try keychain.deleteKey(
 					account     : keychain_accountName_keychain,
-					accessGroup : sharedAccessGroup())
+					accessGroup : sharedAccessGroup() // <- new location
+				)
 			} catch {
 				log.error("keychain.deleteKey(account: keychain, group: shared): error: \(String(describing: error))")
 			}
@@ -771,11 +836,19 @@ class AppSecurity {
 				var query = [String: Any]()
 				query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
 				
+				// Step 3 of 4:
+				// - Copy the OLD keychain item to the NEW location.
+				// - If this step fails, an exception is thrown, and we do NOT advance to step 4.
 				try keychain.storeKey( lockingKey,
 				              account: keychain_accountName_keychain,
 				          accessGroup: sharedAccessGroup(), // <- new location
-				               mixins: query)
+				               mixins: query
+				)
 				migrated = true
+				
+				// Step 4 of 4:
+				// - Finally, delete the OLD keychain item.
+				// - This prevents any duplicate migration attempts in the future.
 				try keychain.deleteKey(
 					account     : keychain_accountName_keychain,
 					accessGroup : privateAccessGroup() // <- old location

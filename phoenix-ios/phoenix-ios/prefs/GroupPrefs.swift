@@ -152,7 +152,10 @@ class GroupPrefs {
 	// MARK: Migration
 	// --------------------------------------------------
 	
-	public func performMigration(previousBuild: String) -> Void {
+	public func performMigration(
+		_ previousBuild: String,
+		_ completionPublisher: CurrentValueSubject<Int, Never>
+	) -> Void {
 		log.trace("performMigration(previousBuild: \(previousBuild))")
 		
 		if previousBuild.isVersion(lessThan: "40") {
