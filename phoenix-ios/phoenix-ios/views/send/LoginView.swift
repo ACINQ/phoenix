@@ -63,7 +63,8 @@ struct LoginView: View {
 		.assignMaxPreference(for: maxImageHeightReader.key, to: $maxImageHeight)
 		.frame(maxHeight: .infinity)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
-		.navigationBarTitle("lnurl-auth", displayMode: .inline)
+		.navigationTitle("lnurl-auth")
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder

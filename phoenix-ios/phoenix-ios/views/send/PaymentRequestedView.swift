@@ -39,10 +39,8 @@ struct PaymentRequestedView: View {
 		}
 		.frame(maxHeight: .infinity)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
-		.navigationBarTitle(
-			NSLocalizedString("Payment Requested", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Payment Requested", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 		.onReceive(lastIncomingPaymentPublisher) {
 			lastIncomingPaymentChanged($0)
 		}

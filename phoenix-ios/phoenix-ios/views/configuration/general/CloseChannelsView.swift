@@ -43,10 +43,8 @@ struct CloseChannelsView : MVIView {
 			.onAppear {
 				onAppear()
 			}
-			.navigationBarTitle(
-				NSLocalizedString("Drain wallet", comment: "Navigation bar title"),
-				displayMode: .inline
-			)
+			.navigationTitle(NSLocalizedString("Drain wallet", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder

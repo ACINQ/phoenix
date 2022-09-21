@@ -25,19 +25,15 @@ struct DetailsView: View {
 		switch type {
 		case .sheet:
 			content()
-				.navigationBarTitle(
-					NSLocalizedString("Details", comment: "Navigation bar title"),
-					displayMode: .inline
-				)
+				.navigationTitle(NSLocalizedString("Details", comment: "Navigation bar title"))
+				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarHidden(true)
 			
 		case .embedded:
 			
 			content()
-				.navigationBarTitle(
-					NSLocalizedString("Payment Details", comment: "Navigation bar title"),
-					displayMode: .inline
-				)
+				.navigationTitle(NSLocalizedString("Payment Details", comment: "Navigation bar title"))
+				.navigationBarTitleDisplayMode(.inline)
 				.background(
 					Color.primaryBackground.ignoresSafeArea(.all, edges: .bottom)
 				)

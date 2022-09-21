@@ -127,10 +127,8 @@ struct SwapInView: View {
 				
 			} // </switch>
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Swap In", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Swap In", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}

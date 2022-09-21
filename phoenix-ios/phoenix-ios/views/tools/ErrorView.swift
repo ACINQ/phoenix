@@ -127,10 +127,17 @@ struct ErrorView: View {
 			
 			Spacer()
 			Spacer() // Move center up a little bit
+			
+			Text("Phoenix Version: \(versionString())")
+				.foregroundColor(.secondary)
 		
 		} // </VStack>
 		.padding([.top, .bottom])
 		.padding([.leading, .trailing], 40)
+	}
+	
+	func versionString() -> String {
+		return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
 	}
 	
 	func terminateApp() {

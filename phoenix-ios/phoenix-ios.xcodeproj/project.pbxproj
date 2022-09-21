@@ -92,6 +92,8 @@
 		DC46BAF626CACCF700E760A6 /* KotlinFutures.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAF026CACCF700E760A6 /* KotlinFutures.swift */; };
 		DC46BAF726CACCF700E760A6 /* KotlinBasics.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAF126CACCF700E760A6 /* KotlinBasics.swift */; };
 		DC46BAF826CACCF700E760A6 /* KotlinAssociatedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAF226CACCF700E760A6 /* KotlinAssociatedObject.swift */; };
+		DC46CB1228D9AAB000C4EAC7 /* LockState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46CB1128D9AAB000C4EAC7 /* LockState.swift */; };
+		DC46CB1628D9F30500C4EAC7 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46CB1528D9F30500C4EAC7 /* LoadingView.swift */; };
 		DC48D2C42593DE30008D138C /* TextFieldCurrencyStyler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC48D2C32593DE30008D138C /* TextFieldCurrencyStyler.swift */; };
 		DC49DA8E258BB882005BC4BC /* ScaledButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */; };
 		DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC59377027516296003B4B53 /* Sequence+Sum.swift */; };
@@ -374,6 +376,8 @@
 		DC46BAF026CACCF700E760A6 /* KotlinFutures.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KotlinFutures.swift; sourceTree = "<group>"; };
 		DC46BAF126CACCF700E760A6 /* KotlinBasics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KotlinBasics.swift; sourceTree = "<group>"; };
 		DC46BAF226CACCF700E760A6 /* KotlinAssociatedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KotlinAssociatedObject.swift; sourceTree = "<group>"; };
+		DC46CB1128D9AAB000C4EAC7 /* LockState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockState.swift; sourceTree = "<group>"; };
+		DC46CB1528D9F30500C4EAC7 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		DC48D2C32593DE30008D138C /* TextFieldCurrencyStyler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldCurrencyStyler.swift; sourceTree = "<group>"; };
 		DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaledButtonStyle.swift; sourceTree = "<group>"; };
 		DC59377027516296003B4B53 /* Sequence+Sum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Sum.swift"; sourceTree = "<group>"; };
@@ -585,7 +589,7 @@
 		53BEFD3C3C84A395C4A66297 /* views */ = {
 			isa = PBXGroup;
 			children = (
-				DCACF70D256701870009B01E /* LockView.swift */,
+				DC46CB1028D9AA8000C4EAC7 /* content */,
 				DCDD9ECC28637390001800A3 /* main */,
 				DC2F431227B696A40006FCC4 /* receive */,
 				DC118BF627B44E4C0080BBAC /* send */,
@@ -641,7 +645,6 @@
 			children = (
 				7555FF7E242A565900829871 /* AppDelegate.swift */,
 				7555FF80242A565900829871 /* SceneDelegate.swift */,
-				7555FF82242A565900829871 /* ContentView.swift */,
 				7555FF84242A565B00829871 /* Assets.xcassets */,
 				DC67654D25655D93004D4263 /* Colors.xcassets */,
 				7555FF89242A565B00829871 /* LaunchScreen.storyboard */,
@@ -779,6 +782,17 @@
 				DC74174A270F332700F7E3E3 /* KotlinTypes.swift */,
 			);
 			path = kotlin;
+			sourceTree = "<group>";
+		};
+		DC46CB1028D9AA8000C4EAC7 /* content */ = {
+			isa = PBXGroup;
+			children = (
+				DC46CB1128D9AAB000C4EAC7 /* LockState.swift */,
+				7555FF82242A565900829871 /* ContentView.swift */,
+				DCACF70D256701870009B01E /* LockView.swift */,
+				DC46CB1528D9F30500C4EAC7 /* LoadingView.swift */,
+			);
+			path = content;
 			sourceTree = "<group>";
 		};
 		DC49DA8C258BB85F005BC4BC /* style */ = {
@@ -1407,6 +1421,7 @@
 				DCACF7092566D0F00009B01E /* AppAccessView.swift in Sources */,
 				DC27E4D1279753EC00C777CC /* TextFieldNumberParser.swift in Sources */,
 				F4AED297257A50CD009485C1 /* LogsConfigurationViewerView.swift in Sources */,
+				DC46CB1628D9F30500C4EAC7 /* LoadingView.swift in Sources */,
 				DC39D4EF287497440030F18D /* SmartModal.swift in Sources */,
 				DC2F431A27B699800006FCC4 /* ModifyInvoiceSheet.swift in Sources */,
 				DCD5FF4326A0D34B009CC666 /* EqualSizes.swift in Sources */,
@@ -1418,6 +1433,7 @@
 				C8D7AB09E80CE2B6AE270A97 /* TorConfigurationView.swift in Sources */,
 				DC27E4C42791C58C00C777CC /* PaymentsBackupView.swift in Sources */,
 				DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */,
+				DC46CB1228D9AAB000C4EAC7 /* LockState.swift in Sources */,
 				DC2F431427B6972C0006FCC4 /* SwapInView.swift in Sources */,
 				DC71E7352728A5720063613D /* KotlinIdentifiable.swift in Sources */,
 			);
@@ -1600,7 +1616,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_BITCODE = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1663,7 +1678,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_BITCODE = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1691,7 +1705,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Blue";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-ios/Phoenix.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 40;
+				CURRENT_PROJECT_VERSION = 41;
 				DEVELOPMENT_ASSET_PATHS = "\"phoenix-ios/Preview Content\"";
 				DEVELOPMENT_TEAM = XD77LN4376;
 				ENABLE_PREVIEWS = YES;
@@ -1720,7 +1734,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Blue";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-ios/Phoenix.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 40;
+				CURRENT_PROJECT_VERSION = 41;
 				DEVELOPMENT_ASSET_PATHS = "\"phoenix-ios/Preview Content\"";
 				DEVELOPMENT_TEAM = XD77LN4376;
 				ENABLE_PREVIEWS = YES;

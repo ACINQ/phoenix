@@ -28,10 +28,8 @@ struct RestoreView: View {
 			
 			content()
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Restore my wallet", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Restore my wallet", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder

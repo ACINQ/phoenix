@@ -214,10 +214,8 @@ struct ConfigurationView: View {
 		.onReceive(externalLightningUrlPublisher) {(url: String) in
 			onExternalLightningUrl(url)
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Settings", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Settings", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 			
 	} // end: body
 	

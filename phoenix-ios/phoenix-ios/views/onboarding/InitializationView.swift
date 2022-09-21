@@ -128,7 +128,8 @@ struct InitializationView: MVIView {
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.assignMaxPreference(for: buttonWidthReader.key, to: $buttonWidth)
-		.navigationBarTitle("", displayMode: .inline)
+		.navigationTitle("")
+		.navigationBarTitleDisplayMode(.inline)
 		.navigationBarHidden(true)
 		.onChange(of: mvi.model, perform: { model in
 			onModelChange(model: model)

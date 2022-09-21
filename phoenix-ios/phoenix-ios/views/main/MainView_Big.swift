@@ -367,7 +367,8 @@ struct MainView_Big: View {
 				primary_body()
 			
 			} // <ZStack>
-			.navigationBarTitle("", displayMode: .inline)
+			.navigationTitle("")
+			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarHidden(true)
 			
 		} // </NavigationView>

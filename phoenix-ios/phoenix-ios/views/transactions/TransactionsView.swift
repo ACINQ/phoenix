@@ -66,10 +66,8 @@ struct TransactionsView: View {
 			
 			content()
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Payments", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Payments", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder

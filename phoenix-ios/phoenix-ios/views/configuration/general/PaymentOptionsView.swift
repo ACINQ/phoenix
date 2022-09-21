@@ -157,7 +157,8 @@ struct PaymentOptionsView: View {
 			} // </Section>
 		} // </List>
 		.listStyle(.insetGrouped)
-		.navigationBarTitle(NSLocalizedString("Payment Options", comment: "Navigation Bar Title"))
+		.navigationTitle(NSLocalizedString("Payment Options", comment: "Navigation Bar Title"))
+		.navigationBarTitleDisplayMode(.inline)
 		.onReceive(maxFeesPublisher) {
 			maxFeesChanged($0)
 		}

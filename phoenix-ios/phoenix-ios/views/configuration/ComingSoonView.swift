@@ -16,6 +16,7 @@ struct ComingSoonView: View {
 			}
 		}
 		.listStyle(.insetGrouped)
-		.navigationBarTitle(title)
+		.navigationTitle(title)
+		.navigationBarTitleDisplayMode(.inline)
 	}
 }
