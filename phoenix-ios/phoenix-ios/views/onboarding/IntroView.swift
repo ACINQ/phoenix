@@ -38,7 +38,8 @@ struct IntroView: View {
 			content()
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationBarTitle("", displayMode: .inline)
+		.navigationTitle("")
+		.navigationBarTitleDisplayMode(.inline)
 		.navigationBarHidden(true)
 	}
 	

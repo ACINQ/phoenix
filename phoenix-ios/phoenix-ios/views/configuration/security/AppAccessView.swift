@@ -30,10 +30,8 @@ struct AppAccessView : View {
 	var body: some View {
 		
 		content()
-			.navigationBarTitle(
-				NSLocalizedString("App Access", comment: "Navigation bar title"),
-				displayMode: .inline
-			)
+			.navigationTitle(NSLocalizedString("App Access", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder

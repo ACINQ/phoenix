@@ -82,7 +82,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		business = PhoenixBusiness(ctx: PlatformContext())
 		AppDelegate._isTestnet = business.chain.isTestnet()
 		super.init()
-		AppMigration.performMigrationChecks()
+		AppMigration.shared.performMigrationChecks()
 		
 		let electrumConfig = GroupPrefs.shared.electrumConfig
 		business.appConfigurationManager.updateElectrumConfig(server: electrumConfig?.serverAddress)
@@ -722,56 +722,56 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		}
 		
 		let seed = knownSeed ?? business.walletManager.mnemonicsToSeed(mnemonics: mnemonics, passphrase: "")
-		walletInfo = business.walletManager.loadWallet(seed: seed)
+		guard let _walletInfo = business.walletManager.loadWallet(seed: seed) else {
+			return false
+		}
 		
+		walletInfo = _walletInfo
 		maybeRegisterPushToken()
 		maybeRegisterFcmToken()
 		setupActivePaymentsListener()
 		
-		if let walletInfo = walletInfo {
-			
-			let cloudKey = walletInfo.cloudKey
-			let encryptedNodeId = walletInfo.encryptedNodeId as String
-			
-			if let walletRestoreType = walletRestoreType {
-				switch walletRestoreType {
-				case .fromManualEntry:
-					//
-					// User is restoring wallet after manually typing in the recovery phrase.
-					// So we can mark the manual_backup task as completed.
-					//
-					Prefs.shared.backupSeed.manualBackup_setTaskDone(true, encryptedNodeId: encryptedNodeId)
-					//
-					// And ensure cloud backup is disabled for the wallet.
-					//
-					Prefs.shared.backupSeed.isEnabled = false
-					Prefs.shared.backupSeed.setName(nil, encryptedNodeId: encryptedNodeId)
-					Prefs.shared.backupSeed.setHasUploadedSeed(false, encryptedNodeId: encryptedNodeId)
-					
-				case .fromCloudBackup(let name):
-					//
-					// User is restoring wallet from an existing iCloud backup.
-					// So we can mark the iCloud backpu as completed.
-					//
-					Prefs.shared.backupSeed.isEnabled = true
-					Prefs.shared.backupSeed.setName(name, encryptedNodeId: encryptedNodeId)
-					Prefs.shared.backupSeed.setHasUploadedSeed(true, encryptedNodeId: encryptedNodeId)
-					//
-					// And ensure manual backup is diabled for the wallet.
-					//
-					Prefs.shared.backupSeed.manualBackup_setTaskDone(false, encryptedNodeId: encryptedNodeId)
-				}
-			}
-			
-			_encryptedNodeId = encryptedNodeId
-			_syncManager = SyncManager(
-				chain: business.chain,
-				mnemonics: mnemonics,
-				cloudKey: cloudKey,
-				encryptedNodeId: encryptedNodeId
-			)
-		}
+		let cloudKey = _walletInfo.cloudKey
+		let encryptedNodeId = _walletInfo.encryptedNodeId as String
 		
+		if let walletRestoreType = walletRestoreType {
+			switch walletRestoreType {
+			case .fromManualEntry:
+				//
+				// User is restoring wallet after manually typing in the recovery phrase.
+				// So we can mark the manual_backup task as completed.
+				//
+				Prefs.shared.backupSeed.manualBackup_setTaskDone(true, encryptedNodeId: encryptedNodeId)
+				//
+				// And ensure cloud backup is disabled for the wallet.
+				//
+				Prefs.shared.backupSeed.isEnabled = false
+				Prefs.shared.backupSeed.setName(nil, encryptedNodeId: encryptedNodeId)
+				Prefs.shared.backupSeed.setHasUploadedSeed(false, encryptedNodeId: encryptedNodeId)
+				
+			case .fromCloudBackup(let name):
+				//
+				// User is restoring wallet from an existing iCloud backup.
+				// So we can mark the iCloud backpu as completed.
+				//
+				Prefs.shared.backupSeed.isEnabled = true
+				Prefs.shared.backupSeed.setName(name, encryptedNodeId: encryptedNodeId)
+				Prefs.shared.backupSeed.setHasUploadedSeed(true, encryptedNodeId: encryptedNodeId)
+				//
+				// And ensure manual backup is diabled for the wallet.
+				//
+				Prefs.shared.backupSeed.manualBackup_setTaskDone(false, encryptedNodeId: encryptedNodeId)
+			}
+		}
+			
+		_encryptedNodeId = encryptedNodeId
+		_syncManager = SyncManager(
+			chain: business.chain,
+			mnemonics: mnemonics,
+			cloudKey: cloudKey,
+			encryptedNodeId: encryptedNodeId
+		)
+			
 		return true
 	}
 	

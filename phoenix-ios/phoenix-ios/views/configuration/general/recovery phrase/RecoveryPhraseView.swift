@@ -102,10 +102,8 @@ struct RecoveryPhraseList: View {
 				mnemonics: $mnemonics
 			)
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Recovery Phrase", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Recovery Phrase", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 		.onAppear {
 			onAppear()
 		}

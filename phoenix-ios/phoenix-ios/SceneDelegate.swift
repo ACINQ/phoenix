@@ -12,14 +12,6 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-class LockState: ObservableObject {
-	@Published var isUnlocked: Bool
-
-	init(isUnlocked: Bool) {
-		self.isUnlocked = isUnlocked
-	}
-}
-
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 	var window: UIWindow?
@@ -28,10 +20,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	var lockWindow: UIWindow?
 	var errorWindow: UIWindow?
 	
-	let lockState = LockState(isUnlocked: false)
-	
 	var isAppLaunch = true
 	var isInBackground = false
+	var firstUnlockAttempted = false
 
 	func scene(
 		_ scene: UIScene,
@@ -42,7 +33,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		
 		if let windowScene = scene as? UIWindowScene {
 			
-			let contentView = ContentView(lockState: lockState)
+			let contentView = ContentView()
 			
 			let window = UIWindow(windowScene: windowScene)
 			window.rootViewController = UIHostingController(rootView: contentView)
@@ -150,7 +141,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		let currentSecurity = AppSecurity.shared.enabledSecurity.value
 		if !currentSecurity.isEmpty {
 			
-			lockState.isUnlocked = false
+			LockState.shared.isUnlocked = false
 			showLockWindow()
 			
 			// Shortly after this method returns:
@@ -160,7 +151,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			// > It also displays the image temporarily when bringing your app
 			// > back to the foreground.
 			//
-			// We've requested a UI update (via @State change to lockState).
+			// We've requested a UI update (via @State change to LockState.shared).
 			// But it appears that the update will run AFTER the OS takes the screenshot.
 			// So we have to explicitly notify the system than an update is needed / pending.
 			//
@@ -221,26 +212,89 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	private func onAppLaunch() -> Void {
 		log.trace("onAppLaunch()")
 		
-		// Note that we cannot use `lockState.objectWillChange.sink`,
-		// because the callback is invoked before the lockState is changed,
+		// Note that we cannot use `LockState.shared.objectWillChange.sink`,
+		// because the callback is invoked before the `isUnlocked` value is changed,
 		// and doesn't provide us with the new value.
 		//
-		lockState.$isUnlocked.sink {[weak self] isUnlocked in
+		LockState.shared.$isUnlocked.sink {[weak self] isUnlocked in
 			
-			log.debug("lockState.isUnlocked = \(isUnlocked)")
+			log.debug("LockState.shared.isUnlocked = \(isUnlocked)")
 			if isUnlocked {
 				self?.hideLockWindow()
 			}
 		}.store(in: &cancellables)
+		
+		// Attempting to access the keychain before `protectedDataAvailable` is true
+		// will result in the keychain returning an item-not-found error.
+		//
+		// So we need to wait until the keychain is ready.
+		//
+		LockState.shared.$protectedDataAvailable.sink {[weak self] protectedDataAvailable in
+			
+			log.debug("LockState.shared.protectedDataAvailable = \(protectedDataAvailable)")
+			if protectedDataAvailable {
+				self?.tryFirstUnlock()
+			}
+		}.store(in: &cancellables)
+		
+		// We delay our work until any needed migration has been completed.
+		//
+		LockState.shared.$migrationStepsCompleted.sink {[weak self] migrationStepsCompleted in
+			
+			log.debug("LockState.shared.migrationStepsCompleted = \(migrationStepsCompleted)")
+			if migrationStepsCompleted {
+				self?.checkProtectedDataAvailable()
+			}
+		}.store(in: &cancellables)
+	}
+	
+	private func checkProtectedDataAvailable() {
+		log.trace("checkProtectedDataAvailable()")
+		assertMainThread()
+		
+		if UIApplication.shared.isProtectedDataAvailable {
+			log.debug("UIApplication.shared.isProtectedDataAvailable == true")
+	
+			LockState.shared.protectedDataAvailable = true
+			
+		} else {
+			log.debug("UIApplication.shared.isProtectedDataAvailable == false (waiting for notification)")
+			
+			let nc = NotificationCenter.default
+			nc.publisher(for: UIApplication.protectedDataDidBecomeAvailableNotification).sink { _ in
+				
+				// Apple doesn't specify which thread this notification is posted on.
+				// Should be the main thread, but just in case, let's be safe.
+				if Thread.isMainThread {
+					LockState.shared.protectedDataAvailable = true
+				} else {
+					DispatchQueue.main.async {
+						LockState.shared.protectedDataAvailable = true
+					}
+				}
+			}.store(in: &cancellables)
+		}
+	}
+	
+	private func tryFirstUnlock() {
+		log.trace("tryFirstUnlock()")
+		assertMainThread()
+		
+		guard !firstUnlockAttempted else {
+			log.debug("tryFirstUnlock() - ignoring, task already completed")
+			return
+		}
+		firstUnlockAttempted = true
 		
 		AppSecurity.shared.tryUnlockWithKeychain {
 			(mnemonics: [String]?, enabledSecurity: EnabledSecurity, error: UnlockError?) in
 
 			// There are multiple potential configurations:
 			//
-			// - no security       => mnemonics are available, enabledSecurity is empty
-			// - standard security => mnemonics are available, enabledSecurity is non-empty
-			// - advanced security => mnemonics are not available, enabledSecurity is non-empty
+			// - no wallet         => mnemoncis == nil, enabledSecurity is empty
+			// - no security       => mnemonics != nil, enabledSecurity is empty
+			// - standard security => mnemonics != nil, enabledSecurity is non-empty
+			// - advanced security => mnemonics == nil, enabledSecurity is non-empty
 			//
 			// Another way to think about it:
 			// - standard security => biometrics only protect the UI, wallet can immediately be loaded
@@ -248,13 +302,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 			if let mnemonics = mnemonics {
 				// unlock & load wallet
-				AppDelegate.get().loadWallet(mnemonics: mnemonics)
+				if AppDelegate.get().loadWallet(mnemonics: mnemonics) {
+					LockState.shared.firstUnlockFoundMnemonics = true
+				}
 			}
-			
+		
 			if let error = error {
 				self.showErrorWindow(error)
 			} else if enabledSecurity.isEmpty {
-				self.lockState.isUnlocked = true
+				LockState.shared.isUnlocked = true
 			} else {
 				self.showLockWindow()
 			}
@@ -267,6 +323,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 				// So we clear the flag here.
 				AppSecurity.shared.setSoftBiometrics(enabled: false) { _ in }
 			}
+			
+			LockState.shared.firstUnlockAttempted = true
 		}
 	}
 	
@@ -276,6 +334,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	
 	private func showLockWindow() {
 		log.trace("showLockWindow()")
+		assertMainThread()
 		
 		guard errorWindow == nil else {
 			return
@@ -286,7 +345,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		
 		if lockWindow == nil {
 			
-			let lockView = LockView(lockState: lockState)
+			let lockView = LockView()
 			
 			let controller = UIHostingController(rootView: lockView)
 			controller.view.backgroundColor = .clear
@@ -303,6 +362,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	
 	private func hideLockWindow() {
 		log.trace("hideLockWindow()")
+		assertMainThread()
 		
 		guard errorWindow == nil else {
 			return
@@ -320,7 +380,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			guard let self = self else {
 				return
 			}
-			if self.lockState.isUnlocked {
+			if LockState.shared.isUnlocked {
 				
 				log.debug("Cleaning up lockWindow resources...")
 				
@@ -332,6 +392,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	
 	private func showErrorWindow(_ error: UnlockError) {
 		log.trace("showErrorWindow()")
+		assertMainThread()
 		
 		guard let windowScene = self.window?.windowScene else {
 			return

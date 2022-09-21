@@ -137,10 +137,8 @@ struct ReceiveLightningView: View {
 			
 			} // </switch>
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Receive", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Receive", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder

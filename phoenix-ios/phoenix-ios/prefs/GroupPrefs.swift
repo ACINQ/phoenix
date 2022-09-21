@@ -3,7 +3,7 @@ import Combine
 import PhoenixShared
 import os.log
 
-#if DEBUG && false
+#if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
 	category: "GroupPrefs"
@@ -152,30 +152,40 @@ class GroupPrefs {
 	// MARK: Migration
 	// --------------------------------------------------
 	
-	public func performMigration(previousBuild: String) -> Void {
-		log.trace("performMigration(previousBuild: \(previousBuild))")
+	public func performMigration(
+		_ targetBuild: String,
+		_ completionPublisher: CurrentValueSubject<Int, Never>
+	) -> Void {
+		log.trace("performMigration(to: \(targetBuild))")
 		
-		if previousBuild.isVersion(lessThan: "40") {
+		// NB: The first version released in the App Store was version 1.0.0 (build 17)
+		
+		if targetBuild.isVersion(equalTo: "40") {
+			performMigration_toBuild40()
+		}
+	}
+	
+	private func performMigration_toBuild40() {
+		log.trace("performMigration_toBuild40()")
+		
+		let MigrateToGroup = {(key: Key) in
 			
-			let MigrateToGroup = {(key: Key) in
+			let savedGrp = UserDefaults.group.value(forKey: key.rawValue)
+			if savedGrp == nil {
 				
-				let savedGrp = UserDefaults.group.value(forKey: key.rawValue)
-				if savedGrp == nil {
+				let savedStd = UserDefaults.standard.value(forKey: key.rawValue)
+				if savedStd != nil {
 					
-					let savedStd = UserDefaults.standard.value(forKey: key.rawValue)
-					if savedStd != nil {
-						
-						UserDefaults.group.set(savedStd, forKey: key.rawValue)
-						UserDefaults.standard.removeObject(forKey: key.rawValue)
-					}
+					UserDefaults.group.set(savedStd, forKey: key.rawValue)
+					UserDefaults.standard.removeObject(forKey: key.rawValue)
 				}
 			}
-			
-			MigrateToGroup(Key.currencyType)
-			MigrateToGroup(Key.bitcoinUnit)
-			MigrateToGroup(Key.fiatCurrency)
-			MigrateToGroup(Key.currencyConverterList)
-			MigrateToGroup(Key.electrumConfig)
 		}
+		
+		MigrateToGroup(Key.currencyType)
+		MigrateToGroup(Key.bitcoinUnit)
+		MigrateToGroup(Key.fiatCurrency)
+		MigrateToGroup(Key.currencyConverterList)
+		MigrateToGroup(Key.electrumConfig)
 	}
 }

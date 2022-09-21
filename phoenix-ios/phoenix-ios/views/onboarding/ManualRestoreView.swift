@@ -58,10 +58,8 @@ struct ManualRestoreView: MVIView {
 			main
 				.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Manual restore", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Manual restore", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 		.onChange(of: mvi.model, perform: { model in
 			onModelChange(model: model)
 		})

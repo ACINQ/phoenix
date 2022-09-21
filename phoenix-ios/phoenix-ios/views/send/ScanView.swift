@@ -79,10 +79,8 @@ struct ScanView: View {
 			}
 		}
 		.frame(maxHeight: .infinity)
-		.navigationBarTitle(
-			NSLocalizedString("Scan a QR code", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Scan a QR code", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 		.transition(
 			.asymmetric(
 				insertion: .identity,

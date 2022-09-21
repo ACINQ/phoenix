@@ -111,10 +111,8 @@ struct DisplayConfigurationView: View {
 		} // </List>
 		.listStyle(.insetGrouped)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationBarTitle(
-			NSLocalizedString("Display options", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Display options", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 		.onAppear {
 			onAppear()
 		}
@@ -242,10 +240,8 @@ struct FiatCurrencySelector: View, ViewName {
 				content
 			}
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Fiat currency", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Fiat currency", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -359,10 +355,8 @@ struct BitcoinUnitSelector: View, ViewName {
 					.edgesIgnoringSafeArea(.bottom) // background color should extend to bottom of screen
 				)
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Bitcoin unit", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Bitcoin unit", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder

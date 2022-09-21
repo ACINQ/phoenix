@@ -21,10 +21,8 @@ struct TorConfigurationView: View {
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.edgesIgnoringSafeArea(.bottom)
-		.navigationBarTitle(
-			NSLocalizedString("Tor Settings", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Tor Settings", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 
 	struct TorFormHeader: View {

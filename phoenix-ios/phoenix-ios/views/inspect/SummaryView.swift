@@ -76,13 +76,15 @@ struct SummaryView: View {
 		switch type {
 		case .sheet:
 			main()
-				.navigationBarTitle("", displayMode: .inline)
+				.navigationTitle("")
+				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarHidden(true)
 			
 		case .embedded:
 			
 			main()
-				.navigationBarTitle("Payment", displayMode: .inline)
+				.navigationTitle("Payment")
+				.navigationBarTitleDisplayMode(.inline)
 				.background(
 					Color.primaryBackground.ignoresSafeArea(.all, edges: .bottom)
 				)
