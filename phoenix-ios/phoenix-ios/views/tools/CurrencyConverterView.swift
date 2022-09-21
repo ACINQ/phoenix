@@ -188,10 +188,8 @@ struct CurrencyConverterView: View {
 			footer()
 			
 		} // </VStack>
-		.navigationBarTitle(
-			NSLocalizedString("Currency Converter", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Currency Converter", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -1057,10 +1055,8 @@ fileprivate struct CurrencySelector: View, ViewName {
 				content
 			}
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Fiat currency", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Fiat currency", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder

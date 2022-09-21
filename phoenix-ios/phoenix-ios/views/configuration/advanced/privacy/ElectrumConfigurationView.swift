@@ -66,10 +66,9 @@ struct ElectrumConfigurationView: MVIView {
 	@ViewBuilder
 	var view: some View {
 
-		main.navigationBarTitle(
-			NSLocalizedString("Electrum server", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		main
+			.navigationTitle(NSLocalizedString("Electrum server", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
 	}
 
 	@ViewBuilder

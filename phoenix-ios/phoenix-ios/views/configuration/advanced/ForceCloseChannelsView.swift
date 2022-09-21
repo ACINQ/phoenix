@@ -29,10 +29,8 @@ struct ForceCloseChannelsView : MVIView {
 	var view: some View {
 		
 		content()
-			.navigationBarTitle(
-				NSLocalizedString("Force close channels", comment: "Navigation bar title"),
-				displayMode: .inline
-			)
+			.navigationTitle(NSLocalizedString("Force close channels", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder

@@ -36,10 +36,8 @@ struct ChannelsConfigurationView: MVIView {
 			.onDisappear {
 				onDisappear()
 			}
-			.navigationBarTitle(
-				NSLocalizedString("Payment channels", comment: "Navigation bar title"),
-				displayMode: .inline
-			)
+			.navigationTitle(NSLocalizedString("Payment channels", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder

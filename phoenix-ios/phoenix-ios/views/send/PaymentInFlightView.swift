@@ -28,9 +28,7 @@ struct PaymentInFlightView: View {
 		}
 		.frame(maxHeight: .infinity)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
-		.navigationBarTitle(
-			NSLocalizedString("Sending payment", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Sending payment", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 }

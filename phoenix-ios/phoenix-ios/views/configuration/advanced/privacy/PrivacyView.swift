@@ -69,10 +69,8 @@ struct PrivacyView: View {
 			
 		} // </List>
 		.listStyle(.insetGrouped)
-		.navigationBarTitle(
-			NSLocalizedString("Privacy", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Privacy", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 		.onAppear() {
 			onAppear()
 		}

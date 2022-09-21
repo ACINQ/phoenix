@@ -131,7 +131,8 @@ struct ContentView: MVIView {
 				.imageScale(.large)
 		}
 		.edgesIgnoringSafeArea(.all)
-		.navigationBarTitle("", displayMode: .inline)
+		.navigationTitle("")
+		.navigationBarTitleDisplayMode(.inline)
 		.navigationBarHidden(true)
 	}
 	

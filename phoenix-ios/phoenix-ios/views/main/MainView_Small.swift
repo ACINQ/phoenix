@@ -112,7 +112,8 @@ struct MainView_Small: View {
 
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationBarTitle("", displayMode: .inline)
+		.navigationTitle("")
+		.navigationBarTitleDisplayMode(.inline)
 		.navigationBarHidden(true)
 		.onChange(of: navLinkTag) { tag in
 			navLinkTagChanged(tag)

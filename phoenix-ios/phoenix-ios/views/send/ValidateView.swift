@@ -138,12 +138,12 @@ struct ValidateView: View {
 			}
 			
 		}// </ZStack>
-		.navigationBarTitle(
+		.navigationTitle(
 			mvi.model is Scan.Model_LnurlWithdrawFlow
 				? NSLocalizedString("Confirm Withdraw", comment: "Navigation bar title")
-				: NSLocalizedString("Confirm Payment", comment: "Navigation bar title"),
-			displayMode: .inline
+				: NSLocalizedString("Confirm Payment", comment: "Navigation bar title")
 		)
+		.navigationBarTitleDisplayMode(.inline)
 		.transition(
 			.asymmetric(
 				insertion: .identity,

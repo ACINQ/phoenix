@@ -71,18 +71,14 @@ struct EditInfoView: View {
 		switch type {
 		case .sheet:
 			main()
-				.navigationBarTitle(
-					NSLocalizedString("Edit Info", comment: "Navigation bar title"),
-					displayMode: .inline
-				)
+				.navigationTitle(NSLocalizedString("Edit Info", comment: "Navigation bar title"))
+				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarHidden(true)
 			
 		case .embedded:
 			main()
-				.navigationBarTitle(
-					NSLocalizedString("Edit Payment", comment: "Navigation bar title"),
-					displayMode: .inline
-				)
+				.navigationTitle(NSLocalizedString("Edit Payment", comment: "Navigation bar title"))
+				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarBackButtonHidden(true)
 				.navigationBarItems(leading: saveButton())
 				.background(

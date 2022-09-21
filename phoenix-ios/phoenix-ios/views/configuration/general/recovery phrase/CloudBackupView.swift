@@ -79,6 +79,7 @@ struct CloudBackupView: View {
 		}
 		.listStyle(.insetGrouped)
 		.navigationTitle("iCloud Backup")
+		.navigationBarTitleDisplayMode(.inline)
 		.navigationBarBackButtonHidden(true)
 		.navigationBarItems(leading: backButton())
 	}

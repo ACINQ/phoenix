@@ -34,10 +34,8 @@ struct AboutView: View {
 		}
 		.padding(.top, 25)
 		.background(Color.primaryBackground)
-		.navigationBarTitle(
-			NSLocalizedString("About", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("About", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	func versionString() -> String {
