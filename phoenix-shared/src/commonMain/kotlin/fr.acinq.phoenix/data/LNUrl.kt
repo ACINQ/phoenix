@@ -252,7 +252,7 @@ sealed class LNUrl {
             val url = response.request.url
             return try {
                 if (response.status.isSuccess()) {
-                    val json: JsonObject = Json.decodeFromString(response.readText(Charsets.UTF_8))
+                    val json: JsonObject = Json.decodeFromString(response.bodyAsText())
                     log.debug { "lnurl service=${url.host} returned response=$json" }
                     if (json["status"]?.jsonPrimitive?.content?.trim()?.equals("error", true) == true) {
                         log.error { "lnurl service=${url.host} returned error=$json" }

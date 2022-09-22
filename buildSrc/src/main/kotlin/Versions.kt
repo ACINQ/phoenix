@@ -6,7 +6,7 @@ object Versions {
     const val coroutines = "1.6.3-native-mt"
     const val serialization = "1.2.2"
 
-    const val ktor = "1.6.3"
+    const val ktor = "2.0.3"
     const val sqlDelight = "1.5.3"
     const val kodeinMemory = "0.8.0"
 

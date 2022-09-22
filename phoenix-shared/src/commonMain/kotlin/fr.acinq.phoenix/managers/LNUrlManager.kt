@@ -25,8 +25,8 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LNUrl
 import fr.acinq.phoenix.utils.PublicSuffixList
 import io.ktor.client.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -37,6 +37,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
@@ -50,10 +51,8 @@ class LNUrlManager(
     private val httpClient: HttpClient by lazy {
         HttpClient {
             expectSuccess = false // required for non-json responses
-            install(JsonFeature) {
-                serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
-                    ignoreUnknownKeys = true
-                })
+            install(ContentNegotiation) {
+                json(json = Json { ignoreUnknownKeys = true })
                 expectSuccess = false
             }
         }

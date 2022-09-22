@@ -6,7 +6,6 @@ import fr.acinq.phoenix.db.SqliteAppDb
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
@@ -431,9 +430,8 @@ class CurrencyManager(
         }
 
         val fetchedRates = try {
-            httpClient.get<Map<String, BlockchainInfoPriceObject>>(
-                urlString = "https://blockchain.info/ticker"
-            ).mapNotNull {
+            val rates: Map<String, BlockchainInfoPriceObject> = httpClient.get("https://blockchain.info/ticker").body()
+            rates.mapNotNull {
                 FiatCurrency.valueOfOrNull(it.key)?.let { fiatCurrency ->
                     if (api.fiatCurrencies.contains(fiatCurrency)) {
                         ExchangeRate.BitcoinPriceRate(
@@ -512,16 +510,14 @@ class CurrencyManager(
             val fiat = fiatCurrency.name // e.g.: "AUD"
             async {
                 val response = try {
-                    http.get<HttpResponse>(
-                        urlString = "https://api.coindesk.com/v1/bpi/currentprice/$fiat.json"
-                    )
+                    http.get("https://api.coindesk.com/v1/bpi/currentprice/$fiat.json")
                 } catch (e: Exception) {
                     throw WrappedException(e, fiatCurrency,
                         "failed to fetch price from api.coindesk.com"
                     )
                 }
                 val result = try {
-                    json.decodeFromString<CoinDeskResponse>(response.receive())
+                    json.decodeFromString<CoinDeskResponse>(response.body())
                 } catch (e: Exception) {
                     throw WrappedException(e, fiatCurrency,
                         "failed to parse price from api.coindesk.com"
@@ -601,14 +597,12 @@ class CurrencyManager(
 
         val result = try {
             val response = try {
-                httpClient.get<HttpResponse>(
-                    urlString = "https://api.bluelytics.com.ar/v2/latest"
-                )
+                httpClient.get(urlString = "https://api.bluelytics.com.ar/v2/latest")
             } catch (e: Exception) {
                 throw WrappedException(e, FiatCurrency.ARS_BM, "failed to get http response")
             }
             try {
-                json.decodeFromString<BluelyticsResponse>(response.receive())
+                json.decodeFromString<BluelyticsResponse>(response.body())
             } catch (e: Exception) {
                 throw WrappedException(e, FiatCurrency.ARS_BM, "failed to parse json response")
             }

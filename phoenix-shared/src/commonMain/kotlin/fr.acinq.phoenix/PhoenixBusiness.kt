@@ -22,8 +22,8 @@ import fr.acinq.phoenix.db.createAppDbDriver
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.*
 import io.ktor.client.*
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.MainScope
 import kotlinx.serialization.json.Json
 import org.kodein.log.LoggerFactory
@@ -49,10 +49,8 @@ class PhoenixBusiness(
     internal val tcpSocketBuilder = TcpSocket.Builder()
     internal val httpClient by lazy {
         HttpClient {
-            install(JsonFeature) {
-                serializer = KotlinxSerializer(Json {
-                    ignoreUnknownKeys = true
-                })
+            install(ContentNegotiation) {
+                json(json = Json { ignoreUnknownKeys = true })
             }
         }
     }

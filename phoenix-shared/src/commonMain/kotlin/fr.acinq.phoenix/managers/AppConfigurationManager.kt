@@ -10,6 +10,7 @@ import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
 import io.ktor.client.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
@@ -123,16 +124,16 @@ class AppConfigurationManager(
 
     private suspend fun fetchAndStoreWalletContext(): WalletContext.V0? {
         return try {
-            httpClient.get<String>("https://acinq.co/phoenix/walletcontext.json")
+            httpClient.get("https://acinq.co/phoenix/walletcontext.json")
         } catch (e1: Exception) {
             try {
-                httpClient.get<String>("https://s3.eu-west-1.amazonaws.com/acinq.co/phoenix/walletcontext.json")
+                httpClient.get("https://s3.eu-west-1.amazonaws.com/acinq.co/phoenix/walletcontext.json")
             } catch (e2: Exception) {
                 logger.error { "failed to fetch wallet context: ${e2.message?.take(200)}" }
                 null
             }
         }?.let {
-            appDb.setWalletContext(currentWalletContextVersion, it)
+            appDb.setWalletContext(currentWalletContextVersion, it.bodyAsText())
         }
     }
 
@@ -153,7 +154,7 @@ class AppConfigurationManager(
         }
 
         val latestList: String = try {
-            httpClient.get("https://acinq.co/phoenix/public_suffix_list.dat")
+            httpClient.get("https://acinq.co/phoenix/public_suffix_list.dat").bodyAsText()
         } catch (err: Throwable) {
             logger.warning { "Error fetching public_suffix_list.dat: $err" }
             return databaseRow
