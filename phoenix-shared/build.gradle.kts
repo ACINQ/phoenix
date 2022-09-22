@@ -13,6 +13,7 @@ plugins {
 val includeAndroid = System.getProperty("includeAndroid")?.toBoolean() ?: false
 if (includeAndroid) {
     extensions.configure<com.android.build.gradle.LibraryExtension>("android") {
+        namespace = "fr.acinq.phoenix.shared"
         compileSdk = 31
         defaultConfig {
             minSdk = 24
