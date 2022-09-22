@@ -7,11 +7,11 @@ plugins {
 val chain: String by project
 
 android {
-    compileSdk = 31
+    compileSdk = 32
     defaultConfig {
         applicationId = "fr.acinq.phoenix.android"
         minSdk = 24
-        targetSdk = 31
+        targetSdk = 32
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -54,7 +54,7 @@ android {
 
     composeOptions {
         kotlinCompilerVersion = Versions.kotlin
-        kotlinCompilerExtensionVersion = Versions.Android.compose
+        kotlinCompilerExtensionVersion = Versions.Android.composeCompiler
     }
 
     packagingOptions {

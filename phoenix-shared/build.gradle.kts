@@ -9,15 +9,15 @@ plugins {
         id("com.android.library")
     }
 }
-
+val currentOs = org.gradle.internal.os.OperatingSystem.current()
 val includeAndroid = System.getProperty("includeAndroid")?.toBoolean() ?: false
 if (includeAndroid) {
     extensions.configure<com.android.build.gradle.LibraryExtension>("android") {
         namespace = "fr.acinq.phoenix.shared"
-        compileSdk = 31
+        compileSdk = 32
         defaultConfig {
             minSdk = 24
-            targetSdk = 31
+            targetSdk = 32
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
 
@@ -105,8 +105,8 @@ kotlin {
             }
             sourceSets["androidTest"].dependencies {
                 implementation(kotlin("test-junit"))
-                implementation("androidx.test.ext:junit:1.1.2")
-                implementation("androidx.test.espresso:espresso-core:3.3.0")
+                implementation("androidx.test.ext:junit:1.1.3")
+                implementation("androidx.test.espresso:espresso-core:3.4.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutines}")
                 val currentOs = org.gradle.internal.os.OperatingSystem.current()
                 val target = when {
