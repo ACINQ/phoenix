@@ -14,11 +14,9 @@ import org.kodein.memory.file.openWriteableFile
 import org.kodein.memory.file.resolve
 import org.kodein.memory.text.putString
 import org.kodein.memory.use
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.seconds
 
 
-@OptIn(DangerousInternalIoApi::class, ExperimentalTime::class)
 class LogMemory(val directory: Path) : LogFrontend {
 
     data class Line(val instant: Instant, val tag: Logger.Tag, val entry: Logger.Entry, val message: String?)
@@ -30,7 +28,7 @@ class LogMemory(val directory: Path) : LogFrontend {
     val file get() = directory.resolve(toFileName(currentDate()) + ".txt")
 
     private val threshold = 20
-    private val every = Duration.seconds(10)
+    private val every = 10.seconds
     private var lastRotate = Clock.System.now()
 
     init {

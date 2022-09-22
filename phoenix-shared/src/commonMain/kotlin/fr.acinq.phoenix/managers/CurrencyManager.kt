@@ -15,7 +15,8 @@ import kotlinx.serialization.json.Json
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Architecture Notes:
@@ -38,7 +39,6 @@ import kotlin.time.ExperimentalTime
 /**
  * Manages fetching and updating exchange rates.
  */
-@OptIn(ExperimentalTime::class, ExperimentalStdlibApi::class)
 class CurrencyManager(
     loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,
@@ -88,7 +88,7 @@ class CurrencyManager(
      * Since bitcoin prices are volatile, we refresh them often.
      */
     private val blockchainInfoAPI = object: API {
-        override val refreshDelay = Duration.minutes(20)
+        override val refreshDelay = 20.minutes
         override val fiatCurrencies = FiatCurrency.values.filter {
             highLiquidityMarkets.contains(it)
         }.toSet()
@@ -100,7 +100,7 @@ class CurrencyManager(
      * Also, the source only refreshes the values once per hour.
      */
     private val coindeskAPI = object: API {
-        override val refreshDelay = Duration.minutes(60)
+        override val refreshDelay = 60.minutes
         override val fiatCurrencies = FiatCurrency.values.filter {
             !highLiquidityMarkets.contains(it) && it != FiatCurrency.ARS_BM
         }.toSet()
@@ -112,7 +112,7 @@ class CurrencyManager(
      * - ARS_BM => free market exchange rate
      */
     private val bluelyticsAPI = object: API {
-        override val refreshDelay = Duration.minutes(120)
+        override val refreshDelay = 120.minutes
         override val fiatCurrencies = setOf(FiatCurrency.ARS_BM)
     }
 
@@ -182,13 +182,13 @@ class CurrencyManager(
         fun fail(now: Instant): RefreshInfo {
             val newFailCount = failCount + 1
             val delay = when (newFailCount) {
-                1 -> Duration.seconds(30)
-                2 -> Duration.minutes(1)
-                3 -> Duration.minutes(5)
-                4 -> Duration.minutes(10)
-                5 -> Duration.minutes(30)
-                6 -> Duration.minutes(60)
-                else -> Duration.minutes(120)
+                1 -> 30.seconds
+                2 -> 1.minutes
+                3 -> 5.minutes
+                4 -> 10.minutes
+                5 -> 30.minutes
+                6 -> 60.minutes
+                else -> 120.minutes
             }
             return RefreshInfo(
                 lastRefresh = this.lastRefresh,

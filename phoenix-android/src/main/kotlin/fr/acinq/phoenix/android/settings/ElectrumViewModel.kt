@@ -29,18 +29,16 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.security.cert.CertPathValidatorException
 import java.security.cert.Certificate
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.seconds
 
 class ElectrumViewModel : ViewModel() {
     val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-    @OptIn(ExperimentalTime::class)
     internal suspend fun checkCertificate(host: String, port: Int): CertificateCheckState {
         return withContext(viewModelScope.coroutineContext + Dispatchers.IO) {
             delay(500) // add a small pause for better ux
             try {
-                withTimeout(Duration.seconds(10)) {
+                withTimeout(10.seconds) {
                     val socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(host, port).tls(viewModelScope.coroutineContext + Dispatchers.IO)
                     socket.close()
                     CertificateCheckState.Valid(host, port)

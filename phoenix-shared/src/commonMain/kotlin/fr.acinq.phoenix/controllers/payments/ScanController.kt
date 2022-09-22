@@ -57,6 +57,7 @@ import kotlinx.serialization.json.JsonObject
 import org.kodein.log.LoggerFactory
 import kotlin.random.Random
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
 
@@ -548,7 +549,7 @@ class AppScanController(
         if (error != null) {
             model(Scan.Model.LnurlAuthFlow.LoginResult(auth = intent.auth, error = error))
         } else {
-            val pending = Duration.seconds(intent.minSuccessDelaySeconds) - start.elapsedNow()
+            val pending = intent.minSuccessDelaySeconds.seconds - start.elapsedNow()
             if (pending > Duration.ZERO) {
                 delay(pending)
             }

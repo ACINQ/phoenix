@@ -15,13 +15,17 @@ import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.datetime.Clock
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.math.*
 import kotlin.time.*
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalTime::class, ExperimentalStdlibApi::class)
+
 class AppConfigurationManager(
     private val appDb: SqliteAppDb,
     private val httpClient: HttpClient,
@@ -65,13 +69,13 @@ class AppConfigurationManager(
     private fun initWalletContext() = launch {
         val (timestamp, localContext) = appDb.getWalletContextOrNull(currentWalletContextVersion)
 
-        val freshness = Duration.milliseconds(Clock.System.now().toEpochMilliseconds() - timestamp)
+        val freshness = (currentTimestampMillis() - timestamp).milliseconds
         logger.info { "local context was updated $freshness ago" }
 
-        val timeout = if (freshness < Duration.hours(48)) {
-            Duration.seconds(2)
+        val timeout = if (freshness < 48.hours) {
+            2.seconds
         } else {
-            Duration.seconds(2) * max(freshness.inWholeDays.toInt(), 5)
+            2.seconds * max(freshness.inWholeDays.toInt(), 5)
         } // max=10s
 
         // TODO are we using TOR? -> increase timeout
@@ -108,15 +112,14 @@ class AppConfigurationManager(
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun updateWalletContextLoop() = launch {
-        var pause = Duration.seconds(0.5)
+        var pause = 0.5.seconds
         while (isActive) {
-            pause = (pause * 2).coerceAtMost(Duration.minutes(5))
+            pause = (pause * 2).coerceAtMost(5.minutes)
             fetchAndStoreWalletContext()?.let {
                 val chainContext = it.export(chain)
                 _chainContext.value = chainContext
-                pause = Duration.minutes(60)
+                pause = 60.minutes
             }
             delay(pause)
         }
@@ -138,7 +141,7 @@ class AppConfigurationManager(
     }
 
     private val publicSuffixListKey = "publicSuffixList"
-    private val publicSuffixListDefaultRefresh = Duration.days(30)
+    private val publicSuffixListDefaultRefresh = 30.days
 
     private suspend fun fetchPublicSuffixList(
         refreshIfOlderThan: Duration = publicSuffixListDefaultRefresh
@@ -148,7 +151,7 @@ class AppConfigurationManager(
         }
         if (databaseRow != null) {
             val elapsed = currentTimestampMillis() - databaseRow.second
-            if (Duration.milliseconds(elapsed) <= refreshIfOlderThan) {
+            if (elapsed.milliseconds <= refreshIfOlderThan) {
                 return databaseRow
             }
         }

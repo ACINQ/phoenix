@@ -24,14 +24,12 @@ import fr.acinq.phoenix.controllers.MVI
 import fr.acinq.phoenix.data.BitcoinAddressInfo
 import fr.acinq.phoenix.data.LNUrl
 import io.ktor.http.*
-import kotlin.time.ExperimentalTime
 
 data class MaxFees(
     val feeBase: Satoshi,
     val feeProportionalMillionths: Long
 )
 
-@OptIn(ExperimentalTime::class)
 object Scan {
 
     sealed class BadRequestReason {
