@@ -1,7 +1,5 @@
 package fr.acinq.phoenix.utils
 
-import io.ktor.utils.io.*
-import io.ktor.utils.io.core.internal.*
 import kotlinx.coroutines.*
 import kotlinx.datetime.*
 import org.kodein.log.LogFrontend
@@ -21,7 +19,7 @@ class LogMemory(val directory: Path) : LogFrontend {
 
     data class Line(val instant: Instant, val tag: Logger.Tag, val entry: Logger.Entry, val message: String?)
 
-    private var lines = ArrayList<Line>().also { it.preventFreeze() }
+    private var lines = ArrayList<Line>()
 
     private fun currentDate() = Clock.System.now().toLocalDateTime(TimeZone.UTC).date
 
@@ -33,8 +31,6 @@ class LogMemory(val directory: Path) : LogFrontend {
 
     init {
         directory.createDirs()
-
-        preventFreeze()
 
         MainScope().launch {
             while (true) {
@@ -61,9 +57,9 @@ class LogMemory(val directory: Path) : LogFrontend {
         }
 
         val localLines = this.lines
-        this.lines = ArrayList<Line>().also { it.preventFreeze() }
+        this.lines = ArrayList()
 
-        return writeLogs(ArrayList(localLines).also { it.makeShared() }, file)
+        return writeLogs(ArrayList(localLines), file)
     }
 
 
