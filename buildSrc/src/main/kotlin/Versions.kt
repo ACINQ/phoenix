@@ -3,7 +3,7 @@ object Versions {
     const val secp256k1 = "0.7.0"
 
     const val kotlin = "1.6.21"
-    const val coroutines = "1.6.3-native-mt"
+    const val coroutines = "1.6.3"
     const val serialization = "1.3.3"
 
     const val ktor = "2.0.3"
