@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -111,11 +112,12 @@ fun FilledButton(
 
 @Composable
 fun TextWithIcon(
-    text: String,
+    text: AnnotatedString,
     icon: Int,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = LocalTextStyle.current,
     iconTint: Color = LocalContentColor.current,
+    iconSize: Dp = ButtonDefaults.IconSize,
     padding: PaddingValues = PaddingValues(0.dp),
     space: Dp = 6.dp,
     alignBaseLine: Boolean = false
@@ -128,7 +130,36 @@ fun TextWithIcon(
             painter = painterResource(id = icon),
             contentDescription = "icon for $text",
             modifier = Modifier
-                .size(ButtonDefaults.IconSize)
+                .size(iconSize)
+                .then(if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier),
+            colorFilter = ColorFilter.tint(iconTint)
+        )
+        Spacer(Modifier.width(space))
+        Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier)
+    }
+}
+
+@Composable
+fun TextWithIcon(
+    text: String,
+    icon: Int,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = LocalTextStyle.current,
+    iconTint: Color = LocalContentColor.current,
+    iconSize: Dp = ButtonDefaults.IconSize,
+    padding: PaddingValues = PaddingValues(0.dp),
+    space: Dp = 6.dp,
+    alignBaseLine: Boolean = false
+) {
+    Row(
+        modifier = modifier.padding(padding),
+        verticalAlignment = if (alignBaseLine) Alignment.Top else Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = icon),
+            contentDescription = "icon for $text",
+            modifier = Modifier
+                .size(iconSize)
                 .then(if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier),
             colorFilter = ColorFilter.tint(iconTint)
         )
@@ -165,6 +196,7 @@ fun Button(
     iconTint: Color = MaterialTheme.colors.primary,
     space: Dp = 12.dp,
     enabled: Boolean = true,
+    enabledEffect: Boolean = true,
     textStyle: TextStyle = MaterialTheme.typography.button,
     padding: PaddingValues = PaddingValues(16.dp),
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Center,
@@ -213,7 +245,7 @@ fun Button(
                         )
                         .indication(interactionSource, LocalIndication.current)
                         .padding(padding)
-                        .alpha(if (enabled) 1f else 0.5f),
+                        .alpha(if (!enabled && !enabledEffect) 0.5f else 1f),
                     horizontalArrangement = horizontalArrangement,
                     verticalAlignment = Alignment.CenterVertically,
                     content = {

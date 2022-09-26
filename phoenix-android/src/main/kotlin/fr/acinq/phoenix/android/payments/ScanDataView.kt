@@ -143,7 +143,7 @@ fun ScanDataView(
                 Text("auth")
             }
             is Scan.Model.LnurlWithdrawFlow -> {
-                Text("withdraw")
+                LnurlWithdrawView(model = model, onBackClick = onBackClick, onWithdrawClick = { postIntent(it) })
             }
         }
     }

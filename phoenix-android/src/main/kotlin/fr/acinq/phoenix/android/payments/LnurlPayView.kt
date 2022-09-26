@@ -99,6 +99,7 @@ fun LnurlPayView(
                 },
                 validationErrorMessage = amountErrorMessage,
                 inputTextSize = 42.sp,
+                enabled = model.lnurlPay.minSendable != model.lnurlPay.maxSendable
             )
             Spacer(Modifier.height(24.dp))
             Column(

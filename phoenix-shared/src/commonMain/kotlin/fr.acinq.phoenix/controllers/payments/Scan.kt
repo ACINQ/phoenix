@@ -111,17 +111,18 @@ object Scan {
         }
 
         sealed class LnurlWithdrawFlow : Model() {
+            abstract val lnurlWithdraw: LNUrl.Withdraw
             data class LnurlWithdrawRequest(
-                val lnurlWithdraw: LNUrl.Withdraw,
+                override val lnurlWithdraw: LNUrl.Withdraw,
                 val error: LnurlWithdrawError?
             ) : LnurlWithdrawFlow()
 
             data class LnurlWithdrawFetch(
-                val lnurlWithdraw: LNUrl.Withdraw,
+                override val lnurlWithdraw: LNUrl.Withdraw,
             ) : LnurlWithdrawFlow()
 
             data class Receiving(
-                val lnurlWithdraw: LNUrl.Withdraw,
+                override val lnurlWithdraw: LNUrl.Withdraw,
                 val amount: MilliSatoshi,
                 val description: String?,
                 val paymentHash: String

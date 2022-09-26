@@ -252,6 +252,7 @@ fun AmountHeroInput(
     inputModifier: Modifier = Modifier,
     dropdownModifier: Modifier = Modifier,
     inputTextSize: TextUnit = 16.sp,
+    enabled: Boolean = true,
 ) {
     val log = logger("AmountHeroInput")
     val context = LocalContext.current
@@ -300,6 +301,7 @@ fun AmountHeroInput(
             ),
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus(); keyboardController?.hide() }),
             singleLine = true,
+            enabled = enabled
         )
     }
 
@@ -320,7 +322,8 @@ fun AmountHeroInput(
                 ).let { onAmountChange(it) }
             },
             onDismiss = { },
-            modifier = dropdownModifier
+            modifier = dropdownModifier,
+            enabled = enabled
         )
     }
 
@@ -403,6 +406,7 @@ private fun UnitDropdown(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     internalPadding: PaddingValues = PaddingValues(8.dp),
+    enabled: Boolean = true,
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableStateOf(maxOf(units.lastIndexOf(selectedUnit), 0)) }
@@ -413,6 +417,7 @@ private fun UnitDropdown(
             onClick = { expanded = true },
             padding = internalPadding,
             space = 8.dp,
+            enabled = enabled,
         )
         DropdownMenu(
             expanded = expanded,
