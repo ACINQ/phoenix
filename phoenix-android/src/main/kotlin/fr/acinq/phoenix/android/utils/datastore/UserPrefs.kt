@@ -149,14 +149,14 @@ object UserPrefs {
 
     // -- lnurl authentication key
     private val LNURL_AUTH_KEY_TYPE = intPreferencesKey("LNURL_AUTH_KEY_TYPE")
-    fun getLnurlKeyType(context: Context): Flow<LNUrl.Auth.KeyType?> = prefs(context).map {
+    fun getLnurlAuthKeyType(context: Context): Flow<LNUrl.Auth.KeyType?> = prefs(context).map {
         when (it[LNURL_AUTH_KEY_TYPE]) {
             LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE.id -> LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE
             LNUrl.Auth.KeyType.LEGACY_KEY_TYPE.id -> LNUrl.Auth.KeyType.LEGACY_KEY_TYPE
             else -> LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE
         }
     }
-    suspend fun saveLnurlKeyType(context: Context, keyType: LNUrl.Auth.KeyType?) = context.userPrefs.edit {
+    suspend fun saveLnurlAuthKeyType(context: Context, keyType: LNUrl.Auth.KeyType?) = context.userPrefs.edit {
         if (keyType == null) {
             it.remove(LNURL_AUTH_KEY_TYPE)
         } else {

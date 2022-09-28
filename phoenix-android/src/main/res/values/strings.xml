@@ -544,9 +544,9 @@
     <!-- //////////////// ln url auth key types //////////////// -->
 
     <string name="lnurl_auth_keytype_default">Default scheme</string>
-    <string name="lnurl_auth_keytype_default_desc">This is the default, standard LNURL key derivation scheme. You should always use this when creating accounts on new services.</string>
+    <string name="lnurl_auth_keytype_default_desc">This is the recommended LNURL derivation scheme. Always use this when logging into a new service for the first time.</string>
     <string name="lnurl_auth_keytype_legacy">Legacy scheme</string>
-    <string name="lnurl_auth_keytype_legacy_desc">This is the scheme used on the old Phoenix Android wallet. Try this if the default scheme does not connect you to your usual account.</string>
+    <string name="lnurl_auth_keytype_legacy_desc">This is a compatibility scheme for old Phoenix Android wallets. Try this if the default scheme does not connect to your usual account.</string>
 
     <!-- //////////////// ln url withdraw //////////////// -->
 
@@ -738,6 +738,8 @@
     <string name="paymentsettings_paytoopen_fees_dialog_title">On-the-fly channels</string>
     <string name="paymentsettings_paytoopen_fees_dialog_message">This fee applies when you receive a payment over Lightning and a new channel needs to be created.</string>
     <string name="paymentsettings_paytoopen_fees_dialog_message_clickable">See the FAQ for more information</string>
+
+    <string name="paymentsettings_lnurlauth_keytype_title">LNUrl authentication scheme</string>
 
     <!-- ////////////// migration result dialog //////////////// -->
 

@@ -25,7 +25,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
@@ -41,6 +40,8 @@ internal fun <T> ListPreferenceButton(
     selectedItem: T,
     preferences: List<PreferenceItem<T>>,
     onPreferenceSubmit: (PreferenceItem<T>) -> Unit,
+    dialogTitle: String? = null,
+    dialogDescription: String? = null
 ) {
     var showPreferenceDialog by remember { mutableStateOf(false) }
 
@@ -50,6 +51,8 @@ internal fun <T> ListPreferenceButton(
 
     if (showPreferenceDialog) {
         ListPreferenceDialog(
+            title = dialogTitle ?: title,
+            description = dialogDescription,
             initialPrefIndex = preferences.map { it.item }.indexOf(selectedItem).takeIf { it >= 0 },
             preferences = preferences,
             onSubmit = {
@@ -63,12 +66,15 @@ internal fun <T> ListPreferenceButton(
 
 @Composable
 private fun <T> ListPreferenceDialog(
+    title: String,
+    description: String?,
     initialPrefIndex: Int?,
     preferences: List<PreferenceItem<T>>,
     onSubmit: (PreferenceItem<T>) -> Unit,
     onCancel: () -> Unit,
 ) {
     Dialog(
+        title = title,
         onDismiss = onCancel,
         isScrollable = false,
         buttons = { Button(onClick = onCancel, text = stringResource(id = R.string.btn_cancel), padding = PaddingValues(16.dp)) }
@@ -78,6 +84,10 @@ private fun <T> ListPreferenceDialog(
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         ) {
+            if (description != null) {
+                Text(text = description, modifier = Modifier.padding(horizontal = 32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             LazyColumn {
                 itemsIndexed(preferences) { index, item ->
                     PreferenceDialogItem(

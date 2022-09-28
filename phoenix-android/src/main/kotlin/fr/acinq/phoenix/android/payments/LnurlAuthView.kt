@@ -53,7 +53,7 @@ fun LnurlAuthView(
     log.info { "compose lnurl-auth view with model=${model}" }
 
     val context = LocalContext.current
-    val prefAuthKeyTypeState = UserPrefs.getLnurlKeyType(context).collectAsState(initial = null)
+    val prefAuthKeyTypeState = UserPrefs.getLnurlAuthKeyType(context).collectAsState(initial = null)
     val prefAuthKeyType = prefAuthKeyTypeState.value
     val selectedAuthKeyType = remember { mutableStateOf(prefAuthKeyTypeState.value) }
 
