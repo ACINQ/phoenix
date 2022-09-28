@@ -115,12 +115,20 @@ class LNUrlAuthFragment : BaseFragment() {
     }) {
       model.state.postValue(LNUrlAuthState.InProgress)
       val domain = model.domainToSignIn
-      val key = getAuthLinkingKey(domain)
-      val signedK1 = Crypto.compact2der(Crypto.sign(ByteVector32.fromValidHex(args.url.k1).bytes(), key)).toHex()
-      val request = Request.Builder().url(model.url.newBuilder()
-        .addQueryParameter("sig", signedK1)
-        .addQueryParameter("key", key.publicKey().toString())
-        .build())
+      val appState = app.state.value
+
+      val (signedK1, authKey) = if (appState is KitState.Started) {
+        signLnurlAuthK1WithKey(key = appState.kit.nodeParams().keyManager().nodeKey(), k1 = args.url.k1, domain = domain)
+      } else {
+        throw KitNotInitialized
+      }
+
+      val request = Request.Builder().url(
+        model.url.newBuilder()
+          .addQueryParameter("sig", signedK1)
+          .addQueryParameter("key", authKey.publicKey().toString())
+          .build()
+      )
         .get()
         .build()
       val response = try {
@@ -132,27 +140,34 @@ class LNUrlAuthFragment : BaseFragment() {
       val json = LNUrl.handleLNUrlRemoteResponse(response)
       // if no failure, let's try to map to a pertinent state, with a fallback to Done.Authed
       delay(500)
-      model.state.postValue(if (json.has("event")) {
-        when (json.getString("event").toLowerCase(Locale.ROOT)) {
-          "registered" -> LNUrlAuthState.Done.Registered
-          "loggedin" -> LNUrlAuthState.Done.LoggedIn
-          "linked" -> LNUrlAuthState.Done.Linked
-          "authed" -> LNUrlAuthState.Done.Authed
-          else -> LNUrlAuthState.Done.Authed
+      model.state.postValue(
+        if (json.has("event")) {
+          when (json.getString("event").lowercase(Locale.ROOT)) {
+            "registered" -> LNUrlAuthState.Done.Registered
+            "loggedin" -> LNUrlAuthState.Done.LoggedIn
+            "linked" -> LNUrlAuthState.Done.Linked
+            "authed" -> LNUrlAuthState.Done.Authed
+            else -> LNUrlAuthState.Done.Authed
+          }
+        } else {
+          LNUrlAuthState.Done.Authed
         }
-      } else {
-        LNUrlAuthState.Done.Authed
-      })
+      )
     }
   }
 
-  private fun getAuthLinkingKey(message: String): Crypto.PrivateKey {
-    val appState = app.state.value
-    return if (appState is KitState.Started) {
+  companion object {
+
+    fun signLnurlAuthK1WithKey(key: DeterministicWallet.ExtendedPrivateKey, k1: String, domain: String): Pair<String, Crypto.PrivateKey> {
+      val authKey = getAuthLinkingKey(key, domain)
+      return Crypto.compact2der(Crypto.sign(ByteVector32.fromValidHex(k1).bytes(), authKey)).toHex() to authKey
+    }
+
+    private fun getAuthLinkingKey(baseKey: DeterministicWallet.ExtendedPrivateKey, domain: String): Crypto.PrivateKey {
       // 0 - the LNURL auth master key is the node key
-      val key = DeterministicWallet.derivePrivateKey(appState.kit.nodeParams().keyManager().nodeKey(), DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/138'/0"))
+      val derivedKey = DeterministicWallet.derivePrivateKey(baseKey, DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/138'/0"))
       // 1 - get derivation path by hashing the service domain name
-      val domainHash = `Mac32$`.`MODULE$`.hmac256(key.privateKey().value().bytes(), ByteVector.view(message.toByteArray(Charsets.UTF_8)))
+      val domainHash = `Mac32$`.`MODULE$`.hmac256(derivedKey.privateKey().value().bytes(), ByteVector.view(domain.toByteArray(Charsets.UTF_8)))
       require(domainHash.bytes().size() >= 16) { "domain hash must be at least 16 chars" }
       val stream = ByteArrayInputStream(domainHash.bytes().slice(0, 16).toArray())
       val path1 = Protocol.uint32(stream, ByteOrder.BIG_ENDIAN)
@@ -161,9 +176,7 @@ class LNUrlAuthFragment : BaseFragment() {
       val path4 = Protocol.uint32(stream, ByteOrder.BIG_ENDIAN)
       val path = DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/138'/$path1/$path2/$path3/$path4")
       // 2 - build key that will be used to link with service
-      DeterministicWallet.derivePrivateKey(key, path).privateKey()
-    } else {
-      throw KitNotInitialized
+      return DeterministicWallet.derivePrivateKey(derivedKey, path).privateKey()
     }
   }
 }

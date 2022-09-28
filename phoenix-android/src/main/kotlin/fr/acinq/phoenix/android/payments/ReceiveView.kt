@@ -179,7 +179,7 @@ private fun DefaultView(vm: ReceiveViewModel) {
                         onEdit = { vm.state = ReceiveViewState.EditInvoice })
                     Spacer(modifier = Modifier.height(24.dp))
                     BorderButton(
-                        text = R.string.receive__swapin_button,
+                        text = stringResource(id = R.string.receive__swapin_button),
                         icon = R.drawable.ic_swap,
                         onClick = { postIntent(Receive.Intent.RequestSwapIn) })
                 }
@@ -259,7 +259,7 @@ private fun CopyShareEditButtons(
         if (onEdit != null) {
             Spacer(modifier = Modifier.width(16.dp))
             BorderButton(
-                text = R.string.receive__edit_button,
+                text = stringResource(id = R.string.receive__edit_button),
                 icon = R.drawable.ic_edit,
                 onClick = onEdit
             )

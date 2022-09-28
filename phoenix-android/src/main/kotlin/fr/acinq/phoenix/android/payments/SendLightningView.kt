@@ -98,13 +98,13 @@ fun SendLightningPaymentView(
                 modifier = Modifier.padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Label(label = stringResource(R.string.send_description_label)) {
+                Label(text = stringResource(R.string.send_description_label)) {
                     (paymentRequest.description ?: paymentRequest.descriptionHash?.toHex())?.takeIf { it.isNotBlank() }?.let {
                         Text(text = it)
                     }
                 }
                 Spacer(modifier = Modifier.height(24.dp))
-                Label(label = stringResource(R.string.send_destination_label)) {
+                Label(text = stringResource(R.string.send_destination_label)) {
                     SelectionContainer {
                         Text(text = paymentRequest.nodeId.toHex(), maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
@@ -126,14 +126,14 @@ fun SendLightningPaymentView(
 
 @Composable
 fun Label(
-    label: String,
+    text: String,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = label.uppercase(),
+            text = text.uppercase(),
             style = MaterialTheme.typography.body1.copy(color = mutedTextColor(), fontSize = 12.sp),
             textAlign = TextAlign.Center,
         )

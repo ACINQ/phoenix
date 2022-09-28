@@ -527,15 +527,26 @@
     <string name="accessctrl_full_lock_confirm_title">Notice</string>
     <string name="accessctrl_full_lock_confirm_message">Background features will be disabled. To receive payments the app will have to be unlocked.</string>
 
-    <!-- //////////////// ln url login //////////////// -->
+    <!-- //////////////// ln url auth //////////////// -->
 
-    <string name="lnurl_auth_instructions"><![CDATA[You can use your wallet to anonymously sign and authorize an action on:<br/><br/><b>%1$s</b><br/><br/>No personal data will be shared with this service.]]></string>
+    <string name="lnurl_auth_instructions">You can anonymously sign-in and authorize an action on:</string>
+    <string name="lnurl_auth_instructions_2">No personal data will be shared with this service.</string>
+    <string name="lnurl_auth_keytype_wait">Retrieving authentication schemes…</string>
+    <string name="lnurl_auth_keytype_label">Authentication scheme</string>
     <string name="lnurl_auth_button">Sign-in</string>
-    <string name="lnurl_auth_in_progress"><![CDATA[Signing-in to\n<b>%1$s</b>]]></string>
+    <string name="lnurl_auth_try_again_button">Try again</string>
+    <string name="lnurl_auth_in_progress">Signing-in to\n<b>%1$s</b></string>
     <string name="lnurl_auth_success">Authentication success.</string>
-    <string name="lnurl_auth_failure">Authentication failure.\n\nDetails: %1$s</string>
-    <string name="lnurl_auth_failure_remote_io">Could not connect to %1$s</string>
-    <string name="lnurl_auth_failure_remote_details">Server responded with %1$s</string>
+    <string name="lnurl_auth_failure">Authentication failure:</string>
+    <string name="lnurl_auth_error_network">Network error. Check your internet connection.</string>
+    <string name="lnurl_auth_error_other">An unknown error occurred.</string>
+
+    <!-- //////////////// ln url auth key types //////////////// -->
+
+    <string name="lnurl_auth_keytype_default">Default scheme</string>
+    <string name="lnurl_auth_keytype_default_desc">This is the default, standard LNURL key derivation scheme. You should always use this when creating accounts on new services.</string>
+    <string name="lnurl_auth_keytype_legacy">Legacy scheme</string>
+    <string name="lnurl_auth_keytype_legacy_desc">This is the scheme used on the old Phoenix Android wallet. Try this if the default scheme does not connect you to your usual account.</string>
 
     <!-- //////////////// ln url withdraw //////////////// -->
 
@@ -549,10 +560,13 @@
     <string name="lnurl_withdraw_amount_below_min">Amount must be at least %1$s.</string>
     <string name="lnurl_withdraw_amount_above_max">Amount cannot exceed %1$s.</string>
     <string name="lnurl_withdraw_error_header">Withdrawal has failed:</string>
-    <string name="lnurl_withdraw_error_remote_details">The service \'%1$s\' responded with an error: %2$s.\n\nTry again, or contact their support.</string>
-    <string name="lnurl_withdraw_error_remote_code">The service \'%1$s\' returned an HTTP error (%2$s).\n\nTry again, or contact their support.</string>
-    <string name="lnurl_withdraw_error_remote_unreadable">The service \'%1$s\' returned a malformed message.</string>
-    <string name="lnurl_withdraw_error_remote_connection">Could not connect to service \'%1$s\'.</string>
+
+  <!-- //////////////// ln url remote error messages //////////////// -->
+
+    <string name="lnurl_error_remote_details">The service \'%1$s\' responded with an error: %2$s.\n\nTry again, or contact their support.</string>
+    <string name="lnurl_error_remote_code">The service \'%1$s\' returned an HTTP error (%2$s).\n\nTry again, or contact their support.</string>
+    <string name="lnurl_error_remote_unreadable">The service \'%1$s\' returned a malformed message.</string>
+    <string name="lnurl_error_remote_connection">Could not connect to service \'%1$s\'.</string>
 
     <!-- //////////////// ln url pay //////////////// -->
 
@@ -578,10 +592,6 @@
     <string name="lnurl_pay_error_invalid_amount">The invoice returned by \'%1$s\' has an incorrect amount.</string>
     <string name="lnurl_pay_error_invalid_hash">The invoice returned by \'%1$s\' does not match the request details.</string>
     <string name="lnurl_pay_error_invalid_malformed">The invoice returned by \'%1$s\' is malformed.</string>
-    <string name="lnurl_pay_error_remote_connection">The service \'%1$s\' is not reachable.</string>
-    <string name="lnurl_pay_error_remote_code">The service \'%1$s\' returned a HTTP %2$s error.</string>
-    <string name="lnurl_pay_error_remote_details">The service \'%1$s\' returned the following error: %2$s.</string>
-    <string name="lnurl_pay_error_remote_unreadable">The service \'%1$s\' returned an unreadable response.</string>
 
     <!-- //////////////// display preferences //////////////// -->
 

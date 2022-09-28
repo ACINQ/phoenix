@@ -130,16 +130,17 @@ object Scan {
         }
 
         sealed class LnurlAuthFlow : Model() {
+            abstract val auth: LNUrl.Auth
             data class LoginRequest(
-                val auth: LNUrl.Auth
+                override val auth: LNUrl.Auth
             ) : LnurlAuthFlow()
 
             data class LoggingIn(
-                val auth: LNUrl.Auth
+                override val auth: LNUrl.Auth
             ) : LnurlAuthFlow()
 
             data class LoginResult(
-                val auth: LNUrl.Auth,
+                override val auth: LNUrl.Auth,
                 val error: LoginError?
             ) : LnurlAuthFlow()
         }
@@ -214,7 +215,8 @@ object Scan {
         sealed class LnurlAuthFlow : Intent() {
             data class Login(
                 val auth: LNUrl.Auth,
-                val minSuccessDelaySeconds: Double = 0.0
+                val minSuccessDelaySeconds: Double = 0.0,
+                val keyType: LNUrl.Auth.KeyType
             ) : LnurlAuthFlow()
         }
     }

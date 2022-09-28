@@ -57,7 +57,7 @@ import fr.acinq.phoenix.utils.BlockchainExplorer
 @Composable
 fun BorderButton(
     modifier: Modifier = Modifier,
-    text: Int? = null,
+    text: String? = null,
     icon: Int? = null,
     enabled: Boolean = true,
     space: Dp = 12.dp,
@@ -67,7 +67,7 @@ fun BorderButton(
     onClick: () -> Unit,
 ) {
     Button(
-        text = text?.run { stringResource(this) },
+        text = text,
         icon = icon,
         enabled = enabled,
         space = space,

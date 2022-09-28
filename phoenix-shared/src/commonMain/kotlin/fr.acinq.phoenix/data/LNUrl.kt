@@ -66,6 +66,12 @@ sealed class LNUrl {
                 }
             }
         }
+
+        /** The Legacy Android app used a non-standard key format. The user should be able to pick that format for backward compatibility reasons, at least on Android. */
+        sealed class KeyType(val id: Int) {
+            object DEFAULT_KEY_TYPE : KeyType(0)
+            object LEGACY_KEY_TYPE : KeyType(1)
+        }
     }
 
     data class Withdraw(

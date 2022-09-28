@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
@@ -35,14 +34,12 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.preferredAmountUnit
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.LNUrl
 import fr.acinq.phoenix.android.utils.Converter.toPrettyStringWithFallback
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.positiveColor
 
 @Composable
 fun LnurlWithdrawView(
@@ -100,7 +97,7 @@ fun LnurlWithdrawView(
                         enabled = model.lnurlWithdraw.minWithdrawable != model.lnurlWithdraw.maxWithdrawable
                     )
                     Spacer(Modifier.height(24.dp))
-                    Label(label = stringResource(R.string.lnurl_pay_meta_description)) {
+                    Label(text = stringResource(R.string.lnurl_pay_meta_description)) {
                         Text(text = model.lnurlWithdraw.defaultDescription)
                     }
                 }
@@ -136,7 +133,7 @@ fun LnurlWithdrawView(
                 Card(externalPadding = PaddingValues(horizontal = 16.dp), internalPadding = PaddingValues(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(text = annotatedStringResource(id = R.string.lnurl_withdraw_success, model.lnurlWithdraw.callback.host))
                     Spacer(Modifier.height(12.dp))
-                    BorderButton(text = R.string.btn_ok, icon = R.drawable.ic_check_circle, onClick = onBackClick)
+                    BorderButton(text = stringResource(id = R.string.btn_ok), icon = R.drawable.ic_check_circle, onClick = onBackClick)
                 }
             }
         }
@@ -148,15 +145,22 @@ private fun RemoteErrorResponseView(
     error: LNUrl.Error.RemoteFailure
 ) {
     Text(
-        text = stringResource(R.string.lnurl_withdraw_error_header) + "\n" + when (error) {
-            is LNUrl.Error.RemoteFailure.Code -> stringResource(id = R.string.lnurl_withdraw_error_remote_code, error.origin, error.code)
-            is LNUrl.Error.RemoteFailure.CouldNotConnect -> stringResource(id = R.string.lnurl_withdraw_error_remote_code, error.origin)
-            is LNUrl.Error.RemoteFailure.Detailed -> stringResource(id = R.string.lnurl_withdraw_error_remote_details, error.origin, error.reason)
-            is LNUrl.Error.RemoteFailure.Unreadable -> stringResource(id = R.string.lnurl_withdraw_error_remote_unreadable, error.origin)
-        },
+        text = stringResource(R.string.lnurl_withdraw_error_header) + "\n" + getRemoteErrorMessage(error = error),
         style = MaterialTheme.typography.body1.copy(color = negativeColor(), textAlign = TextAlign.Center),
         modifier = Modifier.padding(horizontal = 48.dp)
     )
     Spacer(Modifier.height(24.dp))
+}
+
+@Composable
+fun getRemoteErrorMessage(
+    error: LNUrl.Error.RemoteFailure
+): String {
+    return when (error) {
+        is LNUrl.Error.RemoteFailure.Code -> stringResource(id = R.string.lnurl_error_remote_code, error.origin, error.code)
+        is LNUrl.Error.RemoteFailure.CouldNotConnect -> stringResource(id = R.string.lnurl_error_remote_code, error.origin)
+        is LNUrl.Error.RemoteFailure.Detailed -> stringResource(id = R.string.lnurl_error_remote_details, error.origin, error.reason)
+        is LNUrl.Error.RemoteFailure.Unreadable -> stringResource(id = R.string.lnurl_error_remote_unreadable, error.origin)
+    }
 }
 

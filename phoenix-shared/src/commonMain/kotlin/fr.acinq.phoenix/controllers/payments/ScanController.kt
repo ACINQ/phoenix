@@ -45,14 +45,11 @@ import fr.acinq.phoenix.utils.PublicSuffixList
 import fr.acinq.phoenix.utils.chain
 import fr.acinq.phoenix.utils.createTrampolineFees
 import io.ktor.http.*
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
 import org.kodein.log.LoggerFactory
 import kotlin.random.Random
@@ -138,7 +135,10 @@ class AppScanController(
             is Scan.Intent.LnurlPayFlow.CancelLnurlPayment -> launch { cancelLnurlPay(intent) }
             is Scan.Intent.LnurlWithdrawFlow.SendLnurlWithdraw -> launch { processLnurlWithdraw(intent) }
             is Scan.Intent.LnurlWithdrawFlow.CancelLnurlWithdraw -> launch { cancelLnurlWithdraw(intent) }
-            is Scan.Intent.LnurlAuthFlow.Login -> launch { processLnurlAuth(intent) }
+            is Scan.Intent.LnurlAuthFlow.Login -> {
+                logger.info { "processLnurlAuth 00000" }
+                launch { processLnurlAuth(intent) }
+            }
             is Scan.Intent.SwapOutFlow.Invalidate -> launch { model(Scan.Model.SwapOutFlow.Init(intent.address)) }
             is Scan.Intent.SwapOutFlow.PrepareSwapOut -> launch { prepareSwapOutTransaction(intent) }
             is Scan.Intent.SwapOutFlow.SendSwapOut -> launch {
@@ -520,41 +520,44 @@ class AppScanController(
     private suspend fun processLnurlAuth(
         intent: Scan.Intent.LnurlAuthFlow.Login
     ) {
-        model(Scan.Model.LnurlAuthFlow.LoggingIn(auth = intent.auth))
-        val start = TimeSource.Monotonic.markNow()
-        val psl = prefetchPublicSuffixListTask?.await()
-        if (psl == null) {
-            model(
-                Scan.Model.LnurlAuthFlow.LoginResult(
-                    auth = intent.auth,
-                    error = Scan.LoginError.OtherError(
-                        details = LNUrl.Error.Auth.MissingPublicSuffixList
+        withContext(Dispatchers.Default) {
+            model(Scan.Model.LnurlAuthFlow.LoggingIn(auth = intent.auth))
+            val start = TimeSource.Monotonic.markNow()
+            val psl = prefetchPublicSuffixListTask?.await()
+            if (psl == null) {
+                model(
+                    Scan.Model.LnurlAuthFlow.LoginResult(
+                        auth = intent.auth,
+                        error = Scan.LoginError.OtherError(
+                            details = LNUrl.Error.Auth.MissingPublicSuffixList
+                        )
                     )
                 )
-            )
-            return
-        }
-        val error = try {
-            lnurlManager.requestAuth(
-                auth = intent.auth,
-                publicSuffixList = PublicSuffixList(psl.first)
-            )
-            null
-        } catch (e: LNUrl.Error.RemoteFailure.CouldNotConnect) {
-            Scan.LoginError.NetworkError(details = e)
-        } catch (e: LNUrl.Error.RemoteFailure) {
-            Scan.LoginError.ServerError(details = e)
-        } catch (e: Throwable) {
-            Scan.LoginError.OtherError(details = e)
-        }
-        if (error != null) {
-            model(Scan.Model.LnurlAuthFlow.LoginResult(auth = intent.auth, error = error))
-        } else {
-            val pending = intent.minSuccessDelaySeconds.seconds - start.elapsedNow()
-            if (pending > Duration.ZERO) {
-                delay(pending)
+                return@withContext
             }
-            model(Scan.Model.LnurlAuthFlow.LoginResult(auth = intent.auth, error = error))
+            val error = try {
+                lnurlManager.requestAuth(
+                    auth = intent.auth,
+                    publicSuffixList = PublicSuffixList(psl.first),
+                    keyType = intent.keyType
+                )
+                null
+            } catch (e: LNUrl.Error.RemoteFailure.CouldNotConnect) {
+                Scan.LoginError.NetworkError(details = e)
+            } catch (e: LNUrl.Error.RemoteFailure) {
+                Scan.LoginError.ServerError(details = e)
+            } catch (e: Throwable) {
+                Scan.LoginError.OtherError(details = e)
+            }
+            if (error != null) {
+                model(Scan.Model.LnurlAuthFlow.LoginResult(auth = intent.auth, error = error))
+            } else {
+                val pending = intent.minSuccessDelaySeconds.seconds - start.elapsedNow()
+                if (pending > Duration.ZERO) {
+                    delay(pending)
+                }
+                model(Scan.Model.LnurlAuthFlow.LoginResult(auth = intent.auth, error = error))
+            }
         }
     }
 

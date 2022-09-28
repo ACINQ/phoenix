@@ -115,11 +115,11 @@ fun LnurlPayView(
                     Image(bitmap = it, contentDescription = model.lnurlPay.metadata.plainText, modifier = Modifier.size(90.dp))
                     Spacer(modifier = Modifier.height(16.dp))
                 }
-                Label(label = stringResource(R.string.lnurl_pay_meta_description)) {
+                Label(text = stringResource(R.string.lnurl_pay_meta_description)) {
                     Text(text = model.lnurlPay.metadata.longDesc ?: model.lnurlPay.metadata.plainText, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
                 Spacer(Modifier.height(24.dp))
-                Label(label = stringResource(R.string.lnurl_pay_domain)) {
+                Label(text = stringResource(R.string.lnurl_pay_domain)) {
                     Text(text = model.lnurlPay.callback.host, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
@@ -175,12 +175,7 @@ private fun RemoteErrorResponseView(
                 is LNUrl.Error.PayInvoice.InvalidHash -> stringResource(R.string.lnurl_pay_error_invalid_hash, errorDetail.origin)
                 is LNUrl.Error.PayInvoice.Malformed -> stringResource(R.string.lnurl_pay_error_invalid_malformed, errorDetail.origin)
             }
-            is Scan.LnurlPayError.RemoteError -> when (val errorDetail = error.err) {
-                is LNUrl.Error.RemoteFailure.CouldNotConnect -> stringResource(R.string.lnurl_pay_error_remote_connection, errorDetail.origin)
-                is LNUrl.Error.RemoteFailure.Code -> stringResource(R.string.lnurl_pay_error_remote_code, errorDetail.origin, errorDetail.code)
-                is LNUrl.Error.RemoteFailure.Detailed -> stringResource(R.string.lnurl_pay_error_remote_details, errorDetail.origin, errorDetail.reason)
-                is LNUrl.Error.RemoteFailure.Unreadable -> stringResource(R.string.lnurl_pay_error_remote_unreadable, errorDetail.origin)
-            }
+            is Scan.LnurlPayError.RemoteError -> getRemoteErrorMessage(error = error.err)
         },
         style = MaterialTheme.typography.body1.copy(color = negativeColor(), textAlign = TextAlign.Center),
         modifier = Modifier.padding(horizontal = 48.dp)

@@ -5,14 +5,13 @@ import fr.acinq.bitcoin.crypto.Digest
 import fr.acinq.bitcoin.crypto.Pack
 import fr.acinq.bitcoin.crypto.hmac
 import fr.acinq.lightning.crypto.LocalKeyManager
-import fr.acinq.secp256k1.Hex
 import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.*
 
 
 data class Wallet(val seed: ByteVector64, val chain: Chain) {
 
-    constructor(seed: ByteArray, chain: Chain): this(ByteVector64(seed), chain)
+    constructor(seed: ByteArray, chain: Chain) : this(ByteVector64(seed), chain)
 
     private val master by lazy { DeterministicWallet.generate(seed) }
 
@@ -63,10 +62,14 @@ data class Wallet(val seed: ByteVector64, val chain: Chain) {
         return keyManager.nodeId
     }
 
-    fun lnurlAuthLinkingKey(domain: String): PrivateKey {
-        val hashingKey = DeterministicWallet.derivePrivateKey(master, "m/138'/0")
+    fun lnurlAuthLinkingKey(domain: String, keyType: LNUrl.Auth.KeyType): PrivateKey {
+        val baseKey = if (keyType == LNUrl.Auth.KeyType.LEGACY_KEY_TYPE) LocalKeyManager(seed = seed, chainHash = chain.chainHash).legacyNodeKey else master
+        val hashingKey = DeterministicWallet.derivePrivateKey(baseKey, "m/138'/0")
         val path = lnurlAuthPath(domain, hashingKey.privateKey.value.toByteArray())
-        return DeterministicWallet.derivePrivateKey(master, path).privateKey
+        return DeterministicWallet.derivePrivateKey(
+            parent = if (keyType == LNUrl.Auth.KeyType.LEGACY_KEY_TYPE) hashingKey else master,
+            keyPath = path
+        ).privateKey
     }
 
     /* lnurl-auth path derivation, as described in spec:

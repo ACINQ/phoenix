@@ -26,6 +26,7 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.data.LNUrl
 import fr.acinq.phoenix.legacy.userPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -145,5 +146,22 @@ object UserPrefs {
     private val AUTO_PAY_TO_OPEN = booleanPreferencesKey("AUTO_PAY_TO_OPEN")
     fun getIsAutoPayToOpenEnabled(context: Context): Flow<Boolean> = prefs(context).map { it[AUTO_PAY_TO_OPEN] ?: true }
     suspend fun saveIsAutoPayToOpenEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[AUTO_PAY_TO_OPEN] = isEnabled }
+
+    // -- lnurl authentication key
+    private val LNURL_AUTH_KEY_TYPE = intPreferencesKey("LNURL_AUTH_KEY_TYPE")
+    fun getLnurlKeyType(context: Context): Flow<LNUrl.Auth.KeyType?> = prefs(context).map {
+        when (it[LNURL_AUTH_KEY_TYPE]) {
+            LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE.id -> LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE
+            LNUrl.Auth.KeyType.LEGACY_KEY_TYPE.id -> LNUrl.Auth.KeyType.LEGACY_KEY_TYPE
+            else -> LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE
+        }
+    }
+    suspend fun saveLnurlKeyType(context: Context, keyType: LNUrl.Auth.KeyType?) = context.userPrefs.edit {
+        if (keyType == null) {
+            it.remove(LNURL_AUTH_KEY_TYPE)
+        } else {
+            it[LNURL_AUTH_KEY_TYPE] = keyType.id
+        }
+    }
 
 }

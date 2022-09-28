@@ -140,7 +140,7 @@ fun ScanDataView(
                 )
             }
             is Scan.Model.LnurlAuthFlow -> {
-                Text("auth")
+                LnurlAuthView(model = model, onBackClick = onBackClick, onLoginClick = { postIntent(it) })
             }
             is Scan.Model.LnurlWithdrawFlow -> {
                 LnurlWithdrawView(model = model, onBackClick = onBackClick, onWithdrawClick = { postIntent(it) })

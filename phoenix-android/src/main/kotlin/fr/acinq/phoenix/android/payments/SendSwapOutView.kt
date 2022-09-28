@@ -130,7 +130,7 @@ fun SendSwapOutView(
                 modifier = Modifier.padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Label(label = stringResource(R.string.send_destination_label)) {
+                Label(text = stringResource(R.string.send_destination_label)) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -149,7 +149,7 @@ fun SendSwapOutView(
         when (model) {
             is Scan.Model.SwapOutFlow.Init -> {
                 BorderButton(
-                    text = R.string.send_swapout_prepare_button,
+                    text = stringResource(id = R.string.send_swapout_prepare_button),
                     icon = R.drawable.ic_build,
                     enabled = amountErrorMessage.isBlank(),
                 ) {
