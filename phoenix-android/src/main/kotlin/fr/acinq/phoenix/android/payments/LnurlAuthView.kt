@@ -53,9 +53,8 @@ fun LnurlAuthView(
     log.info { "compose lnurl-auth view with model=${model}" }
 
     val context = LocalContext.current
-    val prefAuthKeyTypeState = UserPrefs.getLnurlAuthKeyType(context).collectAsState(initial = null)
-    val prefAuthKeyType = prefAuthKeyTypeState.value
-    val selectedAuthKeyType = remember { mutableStateOf(prefAuthKeyTypeState.value) }
+    val prefAuthKeyType by UserPrefs.getLnurlAuthKeyType(context).collectAsState(initial = null)
+    val selectedAuthKeyType = remember(prefAuthKeyType) { mutableStateOf(prefAuthKeyType) }
 
     Column(
         modifier = Modifier
@@ -79,11 +78,12 @@ fun LnurlAuthView(
                     Text(text = stringResource(R.string.lnurl_auth_instructions_2), style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center, fontSize = 12.sp))
                     Spacer(modifier = Modifier.height(32.dp))
                     Label(text = stringResource(id = R.string.lnurl_auth_keytype_label)) {
-                        if (prefAuthKeyType == null) {
+                        val keyType = selectedAuthKeyType.value
+                        if (keyType == null) {
                             Text(text = stringResource(id = R.string.lnurl_auth_keytype_wait), modifier = Modifier.padding(16.dp))
                         } else {
                             LnurlAuthKeyPicker(
-                                initialKeyType = prefAuthKeyType,
+                                initialKeyType = keyType,
                                 onAuthKeyTypeChange = {
                                     selectedAuthKeyType.value = it
                                 },
@@ -220,4 +220,3 @@ private fun ErrorResponseView(
     )
     Spacer(Modifier.height(24.dp))
 }
-
