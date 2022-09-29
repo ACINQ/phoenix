@@ -61,6 +61,7 @@ class NodeParamsManager(
                 log.info { "nodeid=${keyManager.nodeId}" }
 
                 val nodeParams = NodeParams(
+                    loggerFactory = loggerFactory,
                     keyManager = keyManager,
                     alias = "phoenix",
                     features = Features(
