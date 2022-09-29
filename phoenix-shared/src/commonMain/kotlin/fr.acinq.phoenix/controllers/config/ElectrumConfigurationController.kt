@@ -39,7 +39,7 @@ class AppElectrumConfigurationController(
                         configuration = configState,
                         currentServer = currentServer,
                         connection = connectionState,
-                        blockHeight = message?.height ?: 0,
+                        blockHeight = message?.blockHeight ?: 0,
                         tipTimestamp = message?.header?.time ?: 0,
                     )
                 }
