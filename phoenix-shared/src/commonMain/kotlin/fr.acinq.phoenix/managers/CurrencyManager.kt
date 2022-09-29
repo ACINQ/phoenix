@@ -588,7 +588,7 @@ class CurrencyManager(
                 throw WrappedException(e, FiatCurrency.ARS_BM, "failed to get http response")
             }
             try {
-                json.decodeFromString<BluelyticsResponse>(response.body())
+                json.decodeFromString<BluelyticsResponse>(response.bodyAsText())
             } catch (e: Exception) {
                 throw WrappedException(e, FiatCurrency.ARS_BM, "failed to parse json response")
             }
