@@ -429,7 +429,12 @@ fileprivate struct UploadProgressDetails: View {
 		let numerator: Double = Double(details.completedCount) + inFlightValue
 		let denominator: Double = Double(details.totalCount)
 		
-		return numerator / denominator
+		guard denominator != 0 else {
+			return 0.0
+		}
+		
+		let percent = numerator / denominator
+		return max(0.0, min(1.0, percent))
 	}
 	
 	func uploadProgressText() -> String {
