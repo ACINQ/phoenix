@@ -136,7 +136,7 @@ class SyncTxManager {
 	private func startQueueCountMonitor() {
 		log.trace("setupQueueCountMonitor()")
 		
-		// Kotlin will crash if we try to use multiple threads (like a real app)
+		// Kotlin suspend functions are currently only supported on the main thread
 		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 		
 		self.cloudKitDb.fetchQueueCountPublisher().sink {[weak self] (queueCount: Int64) in
@@ -202,10 +202,10 @@ class SyncTxManager {
 	private func publishNewState(_ state: SyncTxManager_State) {
 		log.trace("publishNewState()")
 		
+		// Contract: Changes to this publisher will always occur on the main thread.
 		let block = {
 			self.statePublisher.value = state
 		}
-		
 		if Thread.isMainThread {
 			block()
 		} else {
@@ -216,10 +216,10 @@ class SyncTxManager {
 	private func publishPendingSettings(_ pending: SyncTxManager_PendingSettings?) {
 		log.trace("publishPendingSettings()")
 		
+		// Contract: Changes to this publisher will always occur on the main thread.
 		let block = {
 			self.pendingSettingsPublisher.value = pending
 		}
-		
 		if Thread.isMainThread {
 			block()
 		} else {
@@ -310,7 +310,7 @@ class SyncTxManager {
 					self.handleNewState(newState)
 				}
 				
-				// Kotlin will crash if we try to use multiple threads (like a real app)
+				// Kotlin suspend functions are currently only supported on the main thread
 				DispatchQueue.main.async {
 					self.startQueueCountMonitor()
 					self.startPreferencesMonitor()
@@ -318,7 +318,7 @@ class SyncTxManager {
 			}
 		}
 		
-		// Kotlin will crash if we try to use multiple threads (like a real app)
+		// Kotlin suspend functions are currently only supported on the main thread
 		DispatchQueue.main.async {
 			
 			let databaseManager = AppDelegate.get().business.databaseManager
@@ -494,7 +494,7 @@ class SyncTxManager {
 		step2 = {
 			log.trace("deleteRecordZone(): step2()")
 			
-			// Kotlin will crash if we try to use multiple threads (like a real app)
+			// Kotlin suspend functions are currently only supported on the main thread
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
 			self.cloudKitDb.clearDatabaseTables { (_, error) in
@@ -550,7 +550,7 @@ class SyncTxManager {
 		checkDatabase = {
 			log.trace("downloadPayments(): checkDatabase()")
 			
-			// Kotlin will crash if we try to use multiple threads (like a real app)
+			// Kotlin suspend functions are currently only supported on the main thread
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
 			self.cloudKitDb.fetchOldestCreation() { (millis: KotlinLong?, error: Error?) in
@@ -666,18 +666,6 @@ class SyncTxManager {
 				var payment: Lightning_kmpWalletPayment? = nil
 				var metadata: WalletPaymentMetadataRow? = nil
 				
-				// Reminder: Kotlin-MPP has horrible multithreading support.
-				// It basically doesn't allow you to use multiple threads.
-				// Any Kotlin objects we create here will be tied to this background thread.
-				// And when we attempt to use them from another thread,
-				// Kotlin will throw an exception:
-				//
-				// > kotlin.native.IncorrectDereferenceException:
-				// >   illegal attempt to access non-shared
-				// >   fr.acinq.phoenix.db.WalletPaymentId.IncomingPaymentId@2881e28 from other thread
-				//
-				// We are working around this restriction by freezing objects via `doCopyAndFreeze()`.
-				
 				if let ciphertext = record[record_column_data] as? Data {
 					log.debug(" - data.count: \(ciphertext.count)")
 					
@@ -700,7 +688,7 @@ class SyncTxManager {
 							let paddingSize = Int(wrapper.padding?.size ?? 0)
 							unpaddedSize = paddedSize - paddingSize
 							
-							payment = wrapper.unwrap()?.doCopyAndFreeze()
+							payment = wrapper.unwrap()
 						}
 						
 					} catch {
@@ -727,7 +715,7 @@ class SyncTxManager {
 								let cleartext_kotlin = cleartext.toKotlinByteArray()
 								let row = CloudAsset.companion.cloudDeserialize(blob: cleartext_kotlin)
 								
-								metadata = row?.doCopyAndFreeze()
+								metadata = row
 								
 							} catch {
 								log.error("meta decryption error: \(String(describing: error))")
@@ -781,7 +769,7 @@ class SyncTxManager {
 		) -> Void in
 			log.trace("downloadPayments(): updateDatabase()")
 			
-			// Kotlin will crash if we try to use multiple threads (like a real app)
+			// Kotlin suspend functions are currently only supported on the main thread
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
 			var oldest: Date? = nil
@@ -837,7 +825,9 @@ class SyncTxManager {
 						
 					} else {
 						log.debug("downloadPayments(): updateDatabase(): moreInCloud = false")
-						enqueueMissing()
+						DispatchQueue.main.async { // Kotlin completion may or may not be on main thread
+							enqueueMissing()
+						}
 					}
 				}
 			}
@@ -846,7 +836,7 @@ class SyncTxManager {
 		enqueueMissing = { () -> Void in
 			log.trace("downloadPayments(): enqueueMissing()")
 			
-			// Kotlin will crash if we try to use multiple threads (like a real app)
+			// Kotlin suspend functions are currently only supported on the main thread
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
 			self.cloudKitDb.enqueueMissingItems { (_, error) in
@@ -911,7 +901,7 @@ class SyncTxManager {
 		checkDatabase = { () -> Void in
 			log.trace("uploadPayments(): checkDatabase()")
 			
-			// Kotlin will crash if we try to use multiple threads (like a real app)
+			// Kotlin suspend functions are currently only supported on the main thread
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
 			self.cloudKitDb.fetchQueueBatch(limit: 20) {
@@ -1232,7 +1222,7 @@ class SyncTxManager {
 		updateDatabase = { (opInfo: UploadOperationInfo) -> Void in
 			log.trace("uploadPayments(): updateDatabase()")
 			
-			// Kotlin will crash if we try to use multiple threads (like a real app)
+			// Kotlin suspend functions are currently only supported on the main thread
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
 			var deleteFromQueue = [KotlinLong]()
@@ -1272,7 +1262,6 @@ class SyncTxManager {
 			log.debug("deleteFromQueue.count = \(deleteFromQueue.count)")
 			log.debug("deleteFromMetadata.count = \(deleteFromMetadata.count)")
 			log.debug("updateMetadata.count = \(updateMetadata.count)")
-			log.debug("updateMetadata: \(updateMetadata)")
 			
 			self.cloudKitDb.updateRows(
 				deleteFromQueue: deleteFromQueue,
@@ -1290,7 +1279,9 @@ class SyncTxManager {
 					
 					// Check to see if there are more items to upload.
 					// Perhaps items were added to the database while we were uploading.
-					checkDatabase()
+					DispatchQueue.main.async { // Kotlin completion may or may not be on main threadru
+						checkDatabase()
+					}
 				}
 			}
 			
@@ -1534,7 +1525,9 @@ class SyncTxManager {
 		return filePath
 	}
 	
-	func createProgress(for operation: CKModifyRecordsOperation) -> (Progress, [CKRecord.ID: Progress]) {
+	private func createProgress(
+		for operation: CKModifyRecordsOperation
+	) -> (Progress, [CKRecord.ID: Progress]) {
 		
 		// A CKModifyRecordsOperation consists of uploading:
 		// - zero or more CKRecords (with a serialized & encrypted payment)
@@ -1571,7 +1564,7 @@ class SyncTxManager {
 		return (parentProgress, children)
 	}
 	
-	func genRandomBytes(_ count: Int) -> Data {
+	private func genRandomBytes(_ count: Int) -> Data {
 
 		var data = Data(count: count)
 		let _ = data.withUnsafeMutableBytes { (ptr: UnsafeMutableRawBufferPointer) in
@@ -1583,7 +1576,9 @@ class SyncTxManager {
 	/// Incorporates failures from the last CKModifyRecordsOperation,
 	/// and returns a list of permanently failed items.
 	///
-	func updateConsecutivePartialFailures(_ partialFailures: [WalletPaymentId: CKError?]) -> [WalletPaymentId] {
+	private func updateConsecutivePartialFailures(
+		_ partialFailures: [WalletPaymentId: CKError?]
+	) -> [WalletPaymentId] {
 		
 		// Handle partial failures.
 		// The rules are:
