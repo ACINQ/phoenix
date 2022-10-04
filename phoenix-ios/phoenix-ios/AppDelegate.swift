@@ -258,7 +258,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		log.debug("pushToken: \(pushToken)")
 		
 		self.pushToken = pushToken
-		maybeRegisterPushToken()
 		Messaging.messaging().apnsToken = deviceToken
 	}
 
@@ -727,7 +726,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		}
 		
 		walletInfo = _walletInfo
-		maybeRegisterPushToken()
 		maybeRegisterFcmToken()
 		setupActivePaymentsListener()
 		
@@ -842,100 +840,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		//
 		// The ideal solution would be to have the server send some kind of Ack for the
 		// registration. Which we could then use to trigger a storage in UserDefaults.
-	}
-	
-	func maybeRegisterPushToken() -> Void {
-		log.trace("maybeRegisterPushToken()")
-		assertMainThread()
-		
-		guard let pushToken = pushToken else {
-			log.debug("maybeRegisterPushToken: pushToken is nil")
-			return
-		}
-		guard let walletInfo = walletInfo else {
-			log.debug("maybeRegisterPushToken: walletInfo is nil")
-			return
-		}
-		
-		let nodeIdHash = walletInfo.nodeId.hash160().toSwiftData().toHex()
-		
-		if let prvRegistration = Prefs.shared.pushTokenRegistration {
-
-			if prvRegistration.pushToken == pushToken &&
-			   prvRegistration.nodeIdHash == nodeIdHash
-			{
-				// We've already registered our {pushToken, nodeId} tuple.
-
-				if abs(prvRegistration.registrationDate.timeIntervalSinceNow) < 30.days() {
-					// The last registration was recent, so we can skip registration.
-					log.debug("Push token already registered")
-					return
-
-				} else {
-					// It's been awhile since we last registered, so let's re-register.
-					// This is a self-healing mechanism, in case of server problems.
-				}
-			}
-		}
-		
-		let registration = PushTokenRegistration(
-			pushToken: pushToken,
-			nodeIdHash: nodeIdHash,
-			registrationDate: Date()
-		)
-		
-		let url = URL(string: "https://s7r6lsmzk7.execute-api.us-west-2.amazonaws.com/v1/pub/push/register")
-		guard let requestUrl = url else { return }
-		
-		#if DEBUG
-		let platform = "iOS-development"
-		#else
-		// Note: This is actually wrong if you build-and-run using RELEASE mode.
-		let platform = "iOS-production"
-		#endif
-		
-		let body = [
-			"app_id"     : "co.acinq.phoenix",
-			"platform"   : platform,
-			"push_token" : pushToken,
-			"node_id"    : walletInfo.nodeId.value.toHex()
-		]
-		let bodyData = try? JSONSerialization.data(
-			 withJSONObject: body,
-			 options: []
-		)
-		
-		var request = URLRequest(url: requestUrl)
-		request.httpMethod = "POST"
-		request.httpBody = bodyData
-		
-		let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-			
-			var statusCode = 418
-			var success = false
-			if let httpResponse = response as? HTTPURLResponse {
-				statusCode = httpResponse.statusCode
-				if statusCode >= 200 && statusCode < 300 {
-					success = true
-				}
-			}
-			
-			if success {
-				log.debug("/push/register: success")
-				Prefs.shared.pushTokenRegistration = registration
-			}
-			else if let error = error {
-				log.debug("/push/register: error: \(String(describing: error))")
-			} else {
-				log.debug("/push/register: statusCode: \(statusCode)")
-				if let data = data, let dataString = String(data: data, encoding: .utf8) {
-					log.debug("/push/register: response:\n\(dataString)")
-				}
-			}
-		}
-		
-		log.debug("/push/register ...")
-		task.resume()
 	}
 	
 	private func didReceiveMessageFromAppExtension() {

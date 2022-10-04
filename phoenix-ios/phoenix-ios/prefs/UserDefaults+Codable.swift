@@ -62,12 +62,6 @@ enum PushPermissionQuery: String, Codable {
 	case userAccepted
 }
 
-struct PushTokenRegistration: Equatable, Codable {
-	let pushToken: String
-	let nodeIdHash: String
-	let registrationDate: Date
-}
-
 struct ElectrumConfigPrefs: Codable {
 	let host: String
 	let port: UInt16
