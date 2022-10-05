@@ -83,6 +83,7 @@ class NodeParamsManager(
                         Feature.PayToOpenClient to FeatureSupport.Optional,
                         Feature.TrustedSwapInClient to FeatureSupport.Optional,
                         Feature.ChannelBackupClient to FeatureSupport.Optional,
+                        Feature.DualFunding to FeatureSupport.Mandatory,
                     ),
                     dustLimit = 546.sat,
                     maxRemoteDustLimit = 600.sat,
@@ -102,8 +103,6 @@ class NodeParamsManager(
                     maxToLocalDelayBlocks = CltvExpiryDelta(1008),
                     feeBase = 1000.msat,
                     feeProportionalMillionth = 100,
-                    reserveToFundingRatio = 0.01, // note: not used (overridden below)
-                    maxReserveToFundingRatio = 0.05,
                     revocationTimeoutSeconds = 20,
                     authTimeoutSeconds = 10,
                     initTimeoutSeconds = 10,

@@ -29,6 +29,7 @@ import fr.acinq.secp256k1.Hex
 import kotlinx.coroutines.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import org.kodein.log.LoggerFactory
 
 object TestConstants {
     object Bob {
@@ -37,6 +38,7 @@ object TestConstants {
         val seed = MnemonicCode.toSeed(mnemonics, "").toByteVector32()
         val keyManager = LocalKeyManager(seed, Block.RegtestGenesisBlock.hash)
         val nodeParams = NodeParams(
+            loggerFactory = LoggerFactory.default,
             keyManager = keyManager,
             alias = "bob",
             features = Features(
@@ -51,7 +53,6 @@ object TestConstants {
                 Feature.ShutdownAnySegwit to FeatureSupport.Optional,
                 Feature.ChannelType to FeatureSupport.Mandatory,
                 Feature.PaymentMetadata to FeatureSupport.Optional,
-                Feature.TrampolinePayment to FeatureSupport.Optional,
                 Feature.ExperimentalTrampolinePayment to FeatureSupport.Optional,
                 Feature.ZeroReserveChannels to FeatureSupport.Optional,
                 Feature.ZeroConfChannels to FeatureSupport.Optional,
@@ -59,6 +60,7 @@ object TestConstants {
                 Feature.PayToOpenClient to FeatureSupport.Optional,
                 Feature.TrustedSwapInClient to FeatureSupport.Optional,
                 Feature.ChannelBackupClient to FeatureSupport.Optional,
+                Feature.DualFunding to FeatureSupport.Mandatory,
             ),
             dustLimit = 1_000.sat,
             maxRemoteDustLimit = 1_500.sat,
@@ -78,8 +80,6 @@ object TestConstants {
             maxToLocalDelayBlocks = CltvExpiryDelta(1024),
             feeBase = 10.msat,
             feeProportionalMillionth = 10,
-            reserveToFundingRatio = 0.01, // note: not used (overridden below)
-            maxReserveToFundingRatio = 0.05,
             revocationTimeoutSeconds = 20,
             authTimeoutSeconds = 10,
             initTimeoutSeconds = 10,
