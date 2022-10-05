@@ -21,8 +21,7 @@ fileprivate enum NavLinkTag: String {
 
 struct MainView_Small: View {
 	
-	private let appDelegate = AppDelegate.get()
-	private let phoenixBusiness = AppDelegate.get().business
+	private let phoenixBusiness = Biz.business
 	
 	@State private var navLinkTag: NavLinkTag? = nil
 	
@@ -111,7 +110,7 @@ struct MainView_Small: View {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 
-			if AppDelegate.showTestnetBackground {
+			if BusinessManager.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -518,7 +517,7 @@ struct MainView_Small: View {
 		// - get a Scan.ModelValidate instance
 		// - pass this to SendView as the `firstModel` parameter
 		
-		let controllers = AppDelegate.get().business.controllers
+		let controllers = Biz.business.controllers
 		guard let scanController = controllers.scan(firstModel: Scan.ModelReady()) as? AppScanController else {
 			return
 		}

@@ -50,7 +50,7 @@ struct ConfigurationView: View {
 	@State var didAppear = false
 	
 	init() {
-		if let encryptedNodeId = AppDelegate.get().encryptedNodeId {
+		if let encryptedNodeId = Biz.encryptedNodeId {
 			backupSeedStatePublisher = Prefs.shared.backupSeedStatePublisher(encryptedNodeId)
 		} else {
 			backupSeedStatePublisher = PassthroughSubject<BackupSeedState, Never>().eraseToAnyPublisher()
@@ -221,7 +221,7 @@ struct ConfigurationView: View {
 	
 	func hasWallet() -> Bool {
 		
-		let walletManager = AppDelegate.get().business.walletManager
+		let walletManager = Biz.business.walletManager
 		let hasWalletFlow = SwiftStateFlow<NSNumber>(origin: walletManager.hasWallet)
 		
 		if let value = hasWalletFlow.value_ {

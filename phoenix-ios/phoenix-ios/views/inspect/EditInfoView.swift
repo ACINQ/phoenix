@@ -291,7 +291,7 @@ struct EditInfoView: View {
 		
 		if (originalDescText != newDesc) || (originalNotesText != newNotes) {
 		
-			let business = AppDelegate.get().business
+			let business = Biz.business
 			business.databaseManager.paymentsDb { (paymentsDb: SqlitePaymentsDb?, _) in
 				
 				paymentsDb?.updateMetadata(id: paymentId, userDescription: newDesc, userNotes: newNotes) { (_, err) in

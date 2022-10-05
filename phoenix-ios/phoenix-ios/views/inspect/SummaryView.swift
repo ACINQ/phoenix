@@ -49,7 +49,7 @@ struct SummaryView: View {
 		// If we get a cache hit, we can skip the UI refresh/flicker.
 		if let row = paymentInfo.toOrderRow() {
 			
-			let fetcher = AppDelegate.get().business.paymentsManager.fetcher
+			let fetcher = Biz.business.paymentsManager.fetcher
 			let options = WalletPaymentFetchOptions.companion.All
 			
 			if let result = fetcher.getCachedPayment(row: row, options: options) {
@@ -399,7 +399,7 @@ struct SummaryView: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		let business = AppDelegate.get().business
+		let business = Biz.business
 		let options = WalletPaymentFetchOptions.companion.All
 		
 		if !didAppear {
@@ -450,8 +450,7 @@ struct SummaryView: View {
 	func deletePayment() {
 		log.trace("deletePayment()")
 		
-		let business = AppDelegate.get().business
-		business.databaseManager.paymentsDb { paymentsDb, _ in
+		Biz.business.databaseManager.paymentsDb { paymentsDb, _ in
 			
 			paymentsDb?.deletePayment(paymentId: paymentInfo.id(), completionHandler: { _, error in
 				

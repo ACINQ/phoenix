@@ -97,7 +97,7 @@ struct LoadingView: View {
 	}
 	
 	var logoImageName: String {
-		if AppDelegate.isTestnet {
+		if BusinessManager.isTestnet {
 			return "logo_blue"
 		} else {
 			return "logo_green"

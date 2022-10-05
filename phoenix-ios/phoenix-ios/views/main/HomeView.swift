@@ -19,15 +19,11 @@ fileprivate let PAGE_COUNT_INCREMENT = 25
 
 struct HomeView : MVIView {
 
-	static private let appDelegate = AppDelegate.get()
-	static private let phoenixBusiness = appDelegate.business
-	static private let encryptedNodeId = appDelegate.encryptedNodeId!
-	static private let paymentsManager = phoenixBusiness.paymentsManager
-	static private let paymentsPageFetcher = paymentsManager.makePageFetcher()
+	static private let paymentsPageFetcher = Biz.business.paymentsManager.makePageFetcher()
 	
-	private let phoenixBusiness = HomeView.phoenixBusiness
-	private let encryptedNodeId = HomeView.encryptedNodeId
-	private let paymentsManager = HomeView.paymentsManager
+	private let phoenixBusiness = Biz.business
+	private let encryptedNodeId = Biz.encryptedNodeId!
+	private let paymentsManager = Biz.business.paymentsManager
 	private let paymentsPageFetcher = HomeView.paymentsPageFetcher
 	
 	@StateObject var mvi = MVIState({ $0.home() })
@@ -52,10 +48,10 @@ struct HomeView : MVIView {
 	
 	@StateObject var syncState = DownloadMonitor()
 	
-	let lastCompletedPaymentPublisher = paymentsManager.lastCompletedPaymentPublisher()
-	let chainContextPublisher = phoenixBusiness.appConfigurationManager.chainContextPublisher()
+	let lastCompletedPaymentPublisher = Biz.business.paymentsManager.lastCompletedPaymentPublisher()
+	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
-	let incomingSwapsPublisher = paymentsManager.incomingSwapsPublisher()
+	let incomingSwapsPublisher = Biz.business.paymentsManager.incomingSwapsPublisher()
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 	@State var lastIncomingSwaps = [String: Lightning_kmpMilliSatoshi]()
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
@@ -74,7 +70,9 @@ struct HomeView : MVIView {
 	let backupSeed_enabled_publisher = Prefs.shared.backupSeed.isEnabled_publisher
 	let manualBackup_taskDone_publisher = Prefs.shared.backupSeed.manualBackup_taskDone_publisher
 	@State var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
-	@State var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
+	@State var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(
+		encryptedNodeId: Biz.encryptedNodeId!
+	)
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -688,8 +686,7 @@ struct HomeView : MVIView {
 			return
 		}
 		
-		let business = AppDelegate.get().business
-		let txUrlStr = business.blockchainExplorer.addressUrl(addr: addr, website: website)
+		let txUrlStr = Biz.business.blockchainExplorer.addressUrl(addr: addr, website: website)
 		if let txUrl = URL(string: txUrlStr) {
 			UIApplication.shared.open(txUrl)
 		}
@@ -974,8 +971,8 @@ class DownloadMonitor: ObservableObject {
 	private var cancellables = Set<AnyCancellable>()
 	
 	init() {
-		let appDelegate = AppDelegate.get()
-		let syncStatePublisher = appDelegate.syncManager!.syncTxManager.statePublisher
+		let syncManager = Biz.syncManager!
+		let syncStatePublisher = syncManager.syncTxManager.statePublisher
 		
 		syncStatePublisher.sink {[weak self](state: SyncTxManager_State) in
 			self?.update(state)

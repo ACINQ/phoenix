@@ -131,7 +131,7 @@ struct LockView: View {
 	}
 	
 	var logoImageName: String {
-		if AppDelegate.isTestnet {
+		if BusinessManager.isTestnet {
 			return "logo_blue"
 		} else {
 			return "logo_green"
@@ -230,7 +230,7 @@ struct LockView: View {
 			
 			switch result {
 				case .success(let mnemonics):
-					AppDelegate.get().loadWallet(mnemonics: mnemonics)
+					Biz.loadWallet(mnemonics: mnemonics)
 					withAnimation(.easeInOut) {
 						lockState.isUnlocked = true
 					}

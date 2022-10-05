@@ -28,7 +28,7 @@ struct PaymentOptionsView: View {
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	let maxFeesPublisher = Prefs.shared.maxFeesPublisher
-	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
+	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	var body: some View {
 		
@@ -924,7 +924,7 @@ struct MaxFeeConfiguration: View, ViewName {
 
 fileprivate func defaultMaxFees() -> MaxFees {
 	
-	let peer = AppDelegate.get().business.getPeer()
+	let peer = Biz.business.getPeer()
 	if let defaultMaxFees = peer?.walletParams.trampolineFees.last {
 		return MaxFees.fromTrampolineFees(defaultMaxFees)
 	} else {

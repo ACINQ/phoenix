@@ -13,12 +13,8 @@ fileprivate var log = Logger(OSLog.disabled)
 
 
 struct PaymentCell : View {
-
-	static private let appDelegate = AppDelegate.get()
-	static private let phoenixBusiness = appDelegate.business
-	static private let paymentsManager = phoenixBusiness.paymentsManager
 	
-	private let paymentsManager = PaymentCell.paymentsManager
+	private let paymentsManager = Biz.business.paymentsManager
 	
 	let row: WalletPaymentOrderRow
 	let didAppearCallback: ((WalletPaymentOrderRow) -> Void)?

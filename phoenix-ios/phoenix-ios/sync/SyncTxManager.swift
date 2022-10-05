@@ -321,7 +321,7 @@ class SyncTxManager {
 		// Kotlin will crash if we try to use multiple threads (like a real app)
 		DispatchQueue.main.async {
 			
-			let databaseManager = AppDelegate.get().business.databaseManager
+			let databaseManager = Biz.business.databaseManager
 			databaseManager.getDatabases().sink { databases in
 				
 				if let paymentsDb = databases.payments as? SqlitePaymentsDb,

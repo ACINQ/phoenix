@@ -19,16 +19,12 @@ fileprivate let PAGE_COUNT_INCREMENT = 25
 
 struct TransactionsView: View {
 	
-	static private let appDelegate = AppDelegate.get()
-	static private let phoenixBusiness = appDelegate.business
-	static private let paymentsManager = phoenixBusiness.paymentsManager
-	static private let paymentsPageFetcher = paymentsManager.makePageFetcher()
+	static private let paymentsPageFetcher = Biz.business.paymentsManager.makePageFetcher()
 	
-	private let phoenixBusiness = TransactionsView.phoenixBusiness
-	private let paymentsManager = TransactionsView.paymentsManager
+	private let paymentsManager = Biz.business.paymentsManager
 	private let paymentsPageFetcher = TransactionsView.paymentsPageFetcher
 	
-	let paymentsCountPublisher = paymentsManager.paymentsCountPublisher()
+	let paymentsCountPublisher = Biz.business.paymentsManager.paymentsCountPublisher()
 	@State var paymentsCount: Int64 = 0
 	
 	let paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
@@ -36,7 +32,7 @@ struct TransactionsView: View {
 	
 	@State var selectedItem: WalletPaymentInfo? = nil
 	
-	let syncStatePublisher = appDelegate.syncManager!.syncTxManager.statePublisher
+	let syncStatePublisher = Biz.syncManager!.syncTxManager.statePublisher
 	@State var isDownloadingTxs: Bool = false
 	
 	@State var didAppear = false
