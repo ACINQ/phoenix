@@ -156,8 +156,9 @@ private fun HeaderForIncoming(
         Text(
             when (payment.origin) {
                 is IncomingPayment.Origin.Invoice -> stringResource(R.string.paymentdetails_normal_incoming)
-                is IncomingPayment.Origin.SwapIn -> stringResource(R.string.paymentdetails_swapin)
                 is IncomingPayment.Origin.KeySend -> stringResource(R.string.paymentdetails_keysend)
+                is IncomingPayment.Origin.SwapIn -> stringResource(R.string.paymentdetails_swapin)
+                is IncomingPayment.Origin.DualSwapIn -> stringResource(R.string.paymentdetails_swapin)
             }
         )
     }
@@ -272,6 +273,7 @@ private fun DetailsForIncoming(
             }
         }
         is IncomingPayment.Origin.KeySend -> {}
+        is IncomingPayment.Origin.DualSwapIn -> TODO()
     }
 }
 

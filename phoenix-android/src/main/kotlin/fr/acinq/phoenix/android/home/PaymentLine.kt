@@ -151,6 +151,7 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
             is IncomingPayment.Origin.Invoice -> o.paymentRequest.description
             is IncomingPayment.Origin.KeySend -> stringResource(id = R.string.paymentline_keysend_incoming)
             is IncomingPayment.Origin.SwapIn -> o.address ?: stringResource(id = R.string.paymentline_swap_in_desc)
+            is IncomingPayment.Origin.DualSwapIn -> stringResource(id = R.string.paymentline_swap_in_desc)
         }
     }.takeIf { !it.isNullOrBlank() }
     Text(

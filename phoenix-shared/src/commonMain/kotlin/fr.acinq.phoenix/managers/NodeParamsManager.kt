@@ -120,6 +120,7 @@ class NodeParamsManager(
                     maxFundingSatoshis = 21_000_000_000_00000.sat,
                     maxPaymentAttempts = 5,
                     enableTrampolinePayment = true,
+                    zeroConfPeers = setOf()
                 )
 
                 _nodeParams.value = nodeParams

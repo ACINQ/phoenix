@@ -70,4 +70,5 @@ fun IncomingPayment.Origin.mapToDb(): Pair<IncomingOriginTypeVersion, ByteArray>
             Json.encodeToString(IncomingOriginData.Invoice.V0(paymentRequest.write())).toByteArray(Charsets.UTF_8)
     is IncomingPayment.Origin.SwapIn -> IncomingOriginTypeVersion.SWAPIN_V0 to
             Json.encodeToString(IncomingOriginData.SwapIn.V0(address)).toByteArray(Charsets.UTF_8)
+    is IncomingPayment.Origin.DualSwapIn -> TODO()
 }
