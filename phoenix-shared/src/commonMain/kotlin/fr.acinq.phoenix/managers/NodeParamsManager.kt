@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.managers
 
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.*
 import fr.acinq.lightning.blockchain.fee.FeerateTolerance
 import fr.acinq.lightning.blockchain.fee.OnChainFeeConf
@@ -78,10 +79,8 @@ class NodeParamsManager(
                         Feature.PaymentMetadata to FeatureSupport.Optional,
                         Feature.ExperimentalTrampolinePayment to FeatureSupport.Optional,
                         Feature.ZeroReserveChannels to FeatureSupport.Optional,
-                        Feature.ZeroConfChannels to FeatureSupport.Optional,
                         Feature.WakeUpNotificationClient to FeatureSupport.Optional,
                         Feature.PayToOpenClient to FeatureSupport.Optional,
-                        Feature.TrustedSwapInClient to FeatureSupport.Optional,
                         Feature.ChannelBackupClient to FeatureSupport.Optional,
                         Feature.DualFunding to FeatureSupport.Mandatory,
                     ),
@@ -120,7 +119,7 @@ class NodeParamsManager(
                     maxFundingSatoshis = 21_000_000_000_00000.sat,
                     maxPaymentAttempts = 5,
                     enableTrampolinePayment = true,
-                    zeroConfPeers = setOf()
+                    zeroConfPeers = setOf(PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134"))
                 )
 
                 _nodeParams.value = nodeParams

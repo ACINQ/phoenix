@@ -18,6 +18,7 @@ package fr.acinq.phoenix
 
 import fr.acinq.bitcoin.Block
 import fr.acinq.bitcoin.MnemonicCode
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.*
 import fr.acinq.lightning.blockchain.fee.FeerateTolerance
 import fr.acinq.lightning.blockchain.fee.OnChainFeeConf
@@ -55,10 +56,8 @@ object TestConstants {
                 Feature.PaymentMetadata to FeatureSupport.Optional,
                 Feature.ExperimentalTrampolinePayment to FeatureSupport.Optional,
                 Feature.ZeroReserveChannels to FeatureSupport.Optional,
-                Feature.ZeroConfChannels to FeatureSupport.Optional,
                 Feature.WakeUpNotificationClient to FeatureSupport.Optional,
                 Feature.PayToOpenClient to FeatureSupport.Optional,
-                Feature.TrustedSwapInClient to FeatureSupport.Optional,
                 Feature.ChannelBackupClient to FeatureSupport.Optional,
                 Feature.DualFunding to FeatureSupport.Mandatory,
             ),
@@ -96,7 +95,8 @@ object TestConstants {
             minFundingSatoshis = 1_000.sat,
             maxFundingSatoshis = 25_000_000.sat,
             maxPaymentAttempts = 5,
-            enableTrampolinePayment = true
+            enableTrampolinePayment = true,
+            zeroConfPeers = setOf(PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134"))
         )
     }
 }
