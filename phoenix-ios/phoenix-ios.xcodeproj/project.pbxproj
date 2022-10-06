@@ -509,13 +509,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DCB0DB80255AE42F005B29C8 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		DCB511C4281AED58001BC525 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1010,16 +1003,6 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		DCB0DB7E255AE42F005B29C8 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
 		7555FF7A242A565900829871 /* phoenix-ios */ = {
 			isa = PBXNativeTarget;
@@ -1089,10 +1072,6 @@
 			buildConfigurationList = DCB0DB8C255AE42F005B29C8 /* Build configuration list for PBXNativeTarget "phoenix-ios-framework" */;
 			buildPhases = (
 				DCB0DB95255AE43E005B29C8 /* ShellScript */,
-				DCB0DB7E255AE42F005B29C8 /* Headers */,
-				DCB0DB7F255AE42F005B29C8 /* Sources */,
-				DCB0DB80255AE42F005B29C8 /* Frameworks */,
-				DCB0DB81255AE42F005B29C8 /* Resources */,
 				DCB0DB9F255AE6F1005B29C8 /* ShellScript */,
 			);
 			buildRules = (
@@ -1217,13 +1196,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DCB0DB81255AE42F005B29C8 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		DCB511C5281AED58001BC525 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1249,7 +1221,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"$SRCROOT/..\"\necho ./gradlew :phoenix-shared:packForXCode -PXCODE_CONFIGURATION=${CONFIGURATION} -PXCODE_PLATFORM_NAME=${PLATFORM_NAME} -PskipAndroid=true\n./gradlew :phoenix-shared:packForXCode -PXCODE_CONFIGURATION=${CONFIGURATION} -PXCODE_PLATFORM_NAME=${PLATFORM_NAME} -PskipAndroid=true\n";
+			shellScript = "cd \"$SRCROOT/..\"\necho ./gradlew embedAndSignAppleFrameworkForXcode\n./gradlew embedAndSignAppleFrameworkForXcode\n";
 		};
 		DCB0DB9F255AE6F1005B29C8 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1266,7 +1238,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "SrcFrmk=\"$SRCROOT/../phoenix-shared/build/xcode-frameworks/PhoenixShared.framework\"\necho \"SrcFrmk = $SrcFrmk\"\n\nDstFrmk=\"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\"\necho \"DstFrmk = $DstFrmk\"\n\necho \"cp -R $SrcFrmk/ $DstFrmk/\"\ncp -R \"$SrcFrmk/\" \"$DstFrmk/\"\n";
+			shellScript = "SrcFrmk=\"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework\"\necho \"SrcFrmk = $SrcFrmk\"\n\nDstFrmk=\"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\"\necho \"DstFrmk = $DstFrmk\"\n\necho \"cp -R $SrcFrmk/ $DstFrmk/\"\ncp -R \"$SrcFrmk/\" \"$DstFrmk/\"\n\necho \"cp -R $SrcFrmk.dSYM/ $DstFrmk.dSYM/\"\ncp -R \"$SrcFrmk.dSYM/\" \"$DstFrmk.dSYM/\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1453,13 +1425,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7555FFA1242A565B00829871 /* phoenix-iosUITests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DCB0DB7F255AE42F005B29C8 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
