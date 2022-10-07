@@ -22,7 +22,6 @@ import fr.acinq.phoenix.legacy.internalData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -30,7 +29,6 @@ import org.slf4j.LoggerFactory
 import java.io.IOException
 
 
-@OptIn(ExperimentalSerializationApi::class)
 object PrefsDatastore {
   private val log = LoggerFactory.getLogger(this::class.java)
 

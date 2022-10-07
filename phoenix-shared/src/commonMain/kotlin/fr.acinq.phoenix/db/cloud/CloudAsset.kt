@@ -77,7 +77,6 @@ data class CloudAsset(
     }
 
     @Serializable
-    @OptIn(ExperimentalSerializationApi::class)
     data class OriginalFiatWrapper(
         val type: String,
         val rate: Double

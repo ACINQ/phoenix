@@ -20,7 +20,6 @@ import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.db.OutgoingPayment
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -46,6 +45,5 @@ sealed class OutgoingPartClosingInfoData {
     }
 }
 
-@OptIn(ExperimentalSerializationApi::class)
 fun OutgoingPayment.ClosingTxPart.mapClosingTypeToDb() = OutgoingPartClosingInfoTypeVersion.CLOSING_INFO_V0 to
         Json.encodeToString(OutgoingPartClosingInfoData.V0(this.closingType)).toByteArray(Charsets.UTF_8)

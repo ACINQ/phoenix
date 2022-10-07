@@ -47,7 +47,6 @@ sealed class LNUrlBase {
     }
 
     companion object {
-        @OptIn(ExperimentalSerializationApi::class)
         fun deserialize(typeVersion: TypeVersion, blob: ByteArray): LNUrlBase {
             return when (typeVersion) {
                 TypeVersion.PAY_V0 -> {
@@ -56,7 +55,6 @@ sealed class LNUrlBase {
             }
         }
 
-        @OptIn(ExperimentalSerializationApi::class)
         fun serialize(pay: LNUrl.Pay): Pair<TypeVersion, ByteArray> {
             val wrapper = Pay(pay)
             val blob = Cbor.encodeToByteArray(wrapper)
@@ -90,7 +88,6 @@ sealed class LNUrlMetadata {
     }
 
     companion object {
-        @OptIn(ExperimentalSerializationApi::class)
         fun deserialize(typeVersion: TypeVersion, blob: ByteArray): LNUrlMetadata {
             return when (typeVersion) {
                 TypeVersion.PAY_V0 -> {
@@ -99,7 +96,6 @@ sealed class LNUrlMetadata {
             }
         }
 
-        @OptIn(ExperimentalSerializationApi::class)
         fun serialize(metadata: LNUrl.Pay.Metadata): Pair<TypeVersion, ByteArray> {
             val wrapper = PayMetadata(metadata)
             val blob = Cbor.encodeToByteArray(wrapper)
@@ -173,7 +169,6 @@ sealed class LNUrlSuccessAction {
     }
 
     companion object {
-        @OptIn(ExperimentalSerializationApi::class)
         fun deserialize(
             typeVersion: TypeVersion,
             blob: ByteArray
@@ -191,7 +186,6 @@ sealed class LNUrlSuccessAction {
             }
         }
 
-        @OptIn(ExperimentalSerializationApi::class)
         fun serialize(successAction: LNUrl.PayInvoice.SuccessAction): Pair<TypeVersion, ByteArray> {
             return when (successAction) {
                 is LNUrl.PayInvoice.SuccessAction.Message -> {

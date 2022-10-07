@@ -124,13 +124,11 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
     companion object
 } // </OutgoingPaymentWrapper>
 
-@OptIn(ExperimentalSerializationApi::class)
 fun OutgoingPayment.cborSerialize(): ByteArray {
     val wrapper = OutgoingPaymentWrapper(payment = this)
     return Cbor.encodeToByteArray(wrapper)
 }
 
-@OptIn(ExperimentalSerializationApi::class)
 fun OutgoingPaymentWrapper.cborDeserialize(blob: ByteArray): OutgoingPayment? = try {
     Cbor.decodeFromByteArray<OutgoingPaymentWrapper>(blob).unwrap()
 } catch (e: Throwable) {
