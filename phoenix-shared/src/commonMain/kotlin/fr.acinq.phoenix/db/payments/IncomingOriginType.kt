@@ -16,9 +16,12 @@
 
 package fr.acinq.phoenix.db.payments
 
+import fr.acinq.bitcoin.OutPoint
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.db.payments.DbTypesHelper.decodeBlob
+import fr.acinq.phoenix.db.serializers.deserializeFromDb
+import fr.acinq.phoenix.db.serializers.serializeForDb
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
@@ -31,7 +34,8 @@ import kotlinx.serialization.json.Json
 enum class IncomingOriginTypeVersion {
     KEYSEND_V0,
     INVOICE_V0,
-    SWAPIN_V0
+    SWAPIN_V0,
+    DUALSWAPIN_V0,
 }
 
 sealed class IncomingOriginData {
@@ -52,12 +56,20 @@ sealed class IncomingOriginData {
         data class V0(val address: String?) : SwapIn()
     }
 
+    sealed class DualSwapIn : IncomingOriginData() {
+        @Serializable
+        data class V0(val outpoints: List<String>) : SwapIn()
+    }
+
     companion object {
         fun deserialize(typeVersion: IncomingOriginTypeVersion, blob: ByteArray): IncomingPayment.Origin = decodeBlob(blob) { json, format ->
             when (typeVersion) {
                 IncomingOriginTypeVersion.KEYSEND_V0 -> IncomingPayment.Origin.KeySend
                 IncomingOriginTypeVersion.INVOICE_V0 -> format.decodeFromString<Invoice.V0>(json).let { IncomingPayment.Origin.Invoice(PaymentRequest.read(it.paymentRequest)) }
                 IncomingOriginTypeVersion.SWAPIN_V0 -> format.decodeFromString<SwapIn.V0>(json).let { IncomingPayment.Origin.SwapIn(it.address) }
+                IncomingOriginTypeVersion.DUALSWAPIN_V0 -> format.decodeFromString<DualSwapIn.V0>(json).let {
+                    IncomingPayment.Origin.DualSwapIn(it.outpoints.map { OutPoint.deserializeFromDb(it) }.toSet())
+                }
             }
         }
     }
@@ -70,5 +82,6 @@ fun IncomingPayment.Origin.mapToDb(): Pair<IncomingOriginTypeVersion, ByteArray>
             Json.encodeToString(IncomingOriginData.Invoice.V0(paymentRequest.write())).toByteArray(Charsets.UTF_8)
     is IncomingPayment.Origin.SwapIn -> IncomingOriginTypeVersion.SWAPIN_V0 to
             Json.encodeToString(IncomingOriginData.SwapIn.V0(address)).toByteArray(Charsets.UTF_8)
-    is IncomingPayment.Origin.DualSwapIn -> TODO()
+    is IncomingPayment.Origin.DualSwapIn -> IncomingOriginTypeVersion.DUALSWAPIN_V0 to
+            Json.encodeToString(IncomingOriginData.DualSwapIn.V0(this.localInputs.map { it.serializeForDb() })).toByteArray(Charsets.UTF_8)
 }
