@@ -84,7 +84,7 @@ struct PrivacyView: View {
 	
 	func hasWallet() -> Bool {
 		
-		let walletManager = AppDelegate.get().business.walletManager
+		let walletManager = Biz.business.walletManager
 		let hasWalletFlow = SwiftStateFlow<NSNumber>(origin: walletManager.hasWallet)
 		
 		if let value = hasWalletFlow.value_ {

@@ -59,11 +59,11 @@ struct ReceiveLightningView: View {
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
-	let lastIncomingPaymentPublisher = AppDelegate.get().business.paymentsManager.lastIncomingPaymentPublisher()
-	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
+	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
+	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	// Saving custom publisher in @State since otherwise it fires on every render
-	@State var channelsPublisher = AppDelegate.get().business.peerPublisher().flatMap { $0.channelsPublisher() }
+	@State var channelsPublisher = Biz.business.peerPublisher().flatMap { $0.channelsPublisher() }
 	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification

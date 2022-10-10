@@ -40,7 +40,7 @@ extension View {
 
 class MockControllerFactory : ControllerFactory {
 	
-	let base: ControllerFactory = AppDelegate.get().business.controllers
+	let base: ControllerFactory = Biz.business.controllers
 	
 	var mock_channelsConfiguration: ChannelsConfiguration.Model? = nil
 	init(_ mock: ChannelsConfiguration.Model) {

@@ -51,7 +51,7 @@ struct ErrorView: View {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 
-			if AppDelegate.showTestnetBackground {
+			if BusinessManager.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar

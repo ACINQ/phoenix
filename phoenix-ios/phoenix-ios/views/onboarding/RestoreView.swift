@@ -199,7 +199,7 @@ struct RestoreView: View {
 		
 		AppSecurity.shared.addKeychainEntry(mnemonics: mnemonics) { (error: Error?) in
 			if error == nil {
-				AppDelegate.get().loadWallet(
+				Biz.loadWallet(
 					mnemonics: mnemonics,
 					walletRestoreType: .fromCloudBackup(name: seedBackup.name)
 				)
@@ -217,7 +217,7 @@ class FetchSeedsObserver: ObservableObject {
 	private var cancellables = Set<AnyCancellable>()
 	
 	init() {
-		let chain = AppDelegate.get().business.chain
+		let chain = Biz.business.chain
 		let q = DispatchQueue.main
 		
 		SyncSeedManager

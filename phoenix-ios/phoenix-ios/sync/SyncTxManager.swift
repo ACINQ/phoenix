@@ -321,7 +321,7 @@ class SyncTxManager {
 		// Kotlin suspend functions are currently only supported on the main thread
 		DispatchQueue.main.async {
 			
-			let databaseManager = AppDelegate.get().business.databaseManager
+			let databaseManager = Biz.business.databaseManager
 			databaseManager.getDatabases().sink { databases in
 				
 				if let paymentsDb = databases.payments as? SqlitePaymentsDb,

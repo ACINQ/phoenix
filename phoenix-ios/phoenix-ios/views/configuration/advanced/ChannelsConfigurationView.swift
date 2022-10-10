@@ -568,7 +568,7 @@ fileprivate struct ChannelInfoPopup: View, ViewName {
 	func exploreTx(txId: String, website: BlockchainExplorer.Website) {
 		log.trace("[\(viewName)] exploreTx()")
 		
-		let business = AppDelegate.get().business
+		let business = Biz.business
 		let txUrlStr = business.blockchainExplorer.txUrl(txId: txId, website: website)
 		if let txUrl = URL(string: txUrlStr) {
 			UIApplication.shared.open(txUrl)

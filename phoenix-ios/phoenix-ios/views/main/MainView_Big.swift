@@ -358,7 +358,7 @@ struct MainView_Big: View {
 				Color.primaryBackground
 					.ignoresSafeArea()
 
-				if AppDelegate.showTestnetBackground {
+				if BusinessManager.showTestnetBackground {
 					Image("testnet_bg")
 						.resizable(resizingMode: .tile)
 						.ignoresSafeArea()

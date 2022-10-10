@@ -137,7 +137,7 @@ extension MVIView {
 }
 
 fileprivate struct ControllerFactoryKey: EnvironmentKey {
-	static let defaultValue: ControllerFactory = AppDelegate.get().business.controllers
+	static let defaultValue: ControllerFactory = Biz.business.controllers
 }
 
 extension EnvironmentValues {

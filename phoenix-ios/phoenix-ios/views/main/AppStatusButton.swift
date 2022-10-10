@@ -32,7 +32,7 @@ struct AppStatusButton: View {
 
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	
-	let syncTxManager = AppDelegate.get().syncManager!.syncTxManager
+	let syncTxManager = Biz.syncManager!.syncTxManager
 	
 	let systemImagesUsed = [
 		"bolt.fill", "bolt.slash", "bolt.slash.fill", "hourglass", "icloud", "exclamationmark.triangle"

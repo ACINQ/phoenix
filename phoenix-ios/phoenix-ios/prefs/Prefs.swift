@@ -218,18 +218,6 @@ class Prefs {
 		}
 	}
 	
-	var pushTokenRegistration: PushTokenRegistration? {
-		get {
-			let key = Key.pushTokenRegistration.rawValue
-			let result: PushTokenRegistration? = defaults.getCodable(forKey: key)
-			return result
-		}
-		set {
-			let key = Key.pushTokenRegistration.rawValue
-			defaults.setCodable(value: newValue, forKey: key)
-		}
-	}
-	
 	// --------------------------------------------------
 	// MARK: Backup
 	// --------------------------------------------------

@@ -302,7 +302,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 			if let mnemonics = mnemonics {
 				// unlock & load wallet
-				if AppDelegate.get().loadWallet(mnemonics: mnemonics) {
+				if Biz.loadWallet(mnemonics: mnemonics) {
 					LockState.shared.firstUnlockFoundMnemonics = true
 				}
 			}

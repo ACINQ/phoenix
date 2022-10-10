@@ -325,7 +325,7 @@ struct CloseChannelsView : MVIView {
 		
 		let isScannedValue = textFieldValue == scannedValue
 		
-		let business = AppDelegate.get().business
+		let business = Biz.business
 		let result = Parser.shared.readBitcoinAddress(chain: business.chain, input: textFieldValue)
 		
 		if let error = result.left {

@@ -23,7 +23,7 @@ struct AppStatusPopover: View {
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 	
-	let syncManager = AppDelegate.get().syncManager!.syncTxManager
+	let syncManager = Biz.syncManager!.syncTxManager
 	
 	enum TitleIconWidth: Preference {}
 	let titleIconWidthReader = GeometryPreferenceReader(

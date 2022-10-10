@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		53BEF2924096C8E7976D46E3 /* shapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF8EAA43946FC1C7A6E7E /* shapes.swift */; };
-		53BEF4D5663CD782DC63DF63 /* colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFA112E0701FFD6B84217 /* colors.swift */; };
+		53BEF4D5663CD782DC63DF63 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFA112E0701FFD6B84217 /* AppColors.swift */; };
 		53BEF90975122B844248569C /* ReceiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */; };
 		53BEF96EC93BBB4B6C9E0845 /* lang.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF6CBB2587136D25A625A /* lang.swift */; };
 		53BEF981E71E3087871890F9 /* SendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFCB8A24A5FAA785AFD03 /* SendView.swift */; };
@@ -185,6 +185,8 @@
 		DCD5FF4326A0D34B009CC666 /* EqualSizes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD5FF4226A0D34B009CC666 /* EqualSizes.swift */; };
 		DCD71A79273987FE00B9A1EF /* Focuser in Frameworks */ = {isa = PBXBuildFile; productRef = DCD71A78273987FE00B9A1EF /* Focuser */; };
 		DCD777D226DE9FE800979A12 /* DelayedSave.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD777D126DE9FE800979A12 /* DelayedSave.swift */; };
+		DCD7E0AC28EC32CB009C30E5 /* BusinessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD7E0AB28EC32CB009C30E5 /* BusinessManager.swift */; };
+		DCD7E0AF28EC3C0D009C30E5 /* WatchTower.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD7E0AE28EC3C0D009C30E5 /* WatchTower.swift */; };
 		DCDD9ECB28637242001800A3 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ECA28637242001800A3 /* MainView.swift */; };
 		DCDD9ECE28637474001800A3 /* Orientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ECD28637474001800A3 /* Orientation.swift */; };
 		DCDD9ED0286377B7001800A3 /* MainView_Big.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ECF286377B7001800A3 /* MainView_Big.swift */; };
@@ -285,7 +287,7 @@
 		53BEF648B3A03C66B611BC06 /* ChannelsConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChannelsConfigurationView.swift; sourceTree = "<group>"; };
 		53BEF6CBB2587136D25A625A /* lang.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = lang.swift; sourceTree = "<group>"; };
 		53BEF8EAA43946FC1C7A6E7E /* shapes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = shapes.swift; sourceTree = "<group>"; };
-		53BEFA112E0701FFD6B84217 /* colors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = colors.swift; sourceTree = "<group>"; };
+		53BEFA112E0701FFD6B84217 /* AppColors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
 		53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReceiveView.swift; sourceTree = "<group>"; };
 		53BEFCB8A24A5FAA785AFD03 /* SendView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SendView.swift; sourceTree = "<group>"; };
 		53BEFE171C182513A5762686 /* HomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -453,6 +455,8 @@
 		DCD1208628663F4A00EB39C5 /* TransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsView.swift; sourceTree = "<group>"; };
 		DCD5FF4226A0D34B009CC666 /* EqualSizes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EqualSizes.swift; sourceTree = "<group>"; };
 		DCD777D126DE9FE800979A12 /* DelayedSave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayedSave.swift; sourceTree = "<group>"; };
+		DCD7E0AB28EC32CB009C30E5 /* BusinessManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessManager.swift; sourceTree = "<group>"; };
+		DCD7E0AE28EC3C0D009C30E5 /* WatchTower.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTower.swift; sourceTree = "<group>"; };
 		DCDD9ECA28637242001800A3 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		DCDD9ECD28637474001800A3 /* Orientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Orientation.swift; sourceTree = "<group>"; };
 		DCDD9ECF286377B7001800A3 /* MainView_Big.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_Big.swift; sourceTree = "<group>"; };
@@ -657,8 +661,10 @@
 				53BEF1337AFCFF0AE82A46BD /* utils */,
 				DCACF6EE2566D0A60009B01E /* extensions */,
 				DCA6DEC42829BD060073C658 /* xpc */,
+				53BEFA112E0701FFD6B84217 /* AppColors.swift */,
 				DC641C6C2820826000862DCD /* AppMigration.swift */,
-				53BEFA112E0701FFD6B84217 /* colors.swift */,
+				DCD7E0AB28EC32CB009C30E5 /* BusinessManager.swift */,
+				DCD7E0AE28EC3C0D009C30E5 /* WatchTower.swift */,
 			);
 			path = "phoenix-ios";
 			sourceTree = "<group>";
@@ -1284,6 +1290,7 @@
 				DC1D2B4B2593EB860036AD38 /* Currency.swift in Sources */,
 				DC118C0627B4557D0080BBAC /* ValidateView.swift in Sources */,
 				DC118C0827B457520080BBAC /* FetchActivityNotice.swift in Sources */,
+				DCD7E0AC28EC32CB009C30E5 /* BusinessManager.swift in Sources */,
 				DCE7233027B167240017CF56 /* SyncSeedManager_Actor.swift in Sources */,
 				DCBA371B2758076F00610EC8 /* SyncSeedManager.swift in Sources */,
 				DC39D4F12874DDF40030F18D /* View+If.swift in Sources */,
@@ -1304,6 +1311,7 @@
 				DC118C0C27B561210080BBAC /* CurrencyAmount.swift in Sources */,
 				DC46BAF726CACCF700E760A6 /* KotlinBasics.swift in Sources */,
 				DC142140261E72E40075857A /* AnyHTML.swift in Sources */,
+				DCD7E0AF28EC3C0D009C30E5 /* WatchTower.swift in Sources */,
 				DCB493CB269F3B06001B0F09 /* Result+Deugly.swift in Sources */,
 				DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */,
 				DC384D7F265BF36600131772 /* StyledString.swift in Sources */,
@@ -1325,7 +1333,7 @@
 				DC16965F27FE0FAC003DE1DD /* KotlinCurrencies.swift in Sources */,
 				DCEFD922276A796800001767 /* SyncManager.swift in Sources */,
 				DC2F431C27B69BB20006FCC4 /* ReceiveLightningView.swift in Sources */,
-				53BEF4D5663CD782DC63DF63 /* colors.swift in Sources */,
+				53BEF4D5663CD782DC63DF63 /* AppColors.swift in Sources */,
 				DC27E4CC2791D17A00C777CC /* CloudBackupView.swift in Sources */,
 				DC118BFE27B451890080BBAC /* MetadataSheet.swift in Sources */,
 				DCF360D02591018300E92031 /* CloseChannelsView.swift in Sources */,
@@ -1603,6 +1611,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -1658,6 +1667,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1865,7 +1875,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-notifySrvExt/phoenix-notifySrvExt.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 41;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "phoenix-notifySrvExt/Info.plist";
@@ -1893,7 +1903,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-notifySrvExt/phoenix-notifySrvExt.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 41;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "phoenix-notifySrvExt/Info.plist";

@@ -55,10 +55,10 @@ struct ValidateView: View {
 	
 	@State var didAppear = false
 	
-	let balancePublisher = AppDelegate.get().business.peerManager.balancePublisher()
+	let balancePublisher = Biz.business.peerManager.balancePublisher()
 	@State var balanceMsat: Int64 = 0
 	
-	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
+	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	@State var chainContext: WalletContext.V0ChainContext? = nil
 	
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
@@ -100,7 +100,7 @@ struct ValidateView: View {
 			Color.primaryBackground
 				.ignoresSafeArea(.all, edges: .all)
 			
-			if AppDelegate.showTestnetBackground {
+			if BusinessManager.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.ignoresSafeArea(.all, edges: .all)

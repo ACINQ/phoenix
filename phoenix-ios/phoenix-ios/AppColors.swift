@@ -31,7 +31,7 @@ extension Color {
 extension UIColor {
 	
 	static var appAccent: UIColor {
-		if AppDelegate.isTestnet {
+		if BusinessManager.isTestnet {
 			return UIColor(named: "appAccentBlue")!
 		} else {
 			return UIColor(named: "appAccentGreen")!

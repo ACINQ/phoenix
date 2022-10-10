@@ -36,8 +36,8 @@ struct SwapInView: View {
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
-	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
-	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
+	let incomingSwapsPublisher = Biz.business.paymentsManager.incomingSwapsPublisher()
+	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	// For the cicular buttons: [copy, share]
 	enum MaxButtonWidth: Preference {}

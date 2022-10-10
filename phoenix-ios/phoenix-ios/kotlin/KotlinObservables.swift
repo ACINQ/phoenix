@@ -22,7 +22,7 @@ class ObservableConnectionsMonitor: ObservableObject {
 	private var watcher: Ktor_ioCloseable?
 	
 	init() {
-		let connectionsManager = AppDelegate.get().business.connectionsManager
+		let connectionsManager = Biz.business.connectionsManager
 		let currentConnections = connectionsManager.currentValue
 		
 		connections = currentConnections
@@ -110,7 +110,7 @@ class CustomElectrumServerObserver: ObservableObject {
 	private var electrumConfig: ElectrumConfigPrefs?
 	
 	init() {
-		let connectionsManager = AppDelegate.get().business.connectionsManager
+		let connectionsManager = Biz.business.connectionsManager
 		
 		let swiftFlow = SwiftFlow<Connections>(origin: connectionsManager.connections)
 		
