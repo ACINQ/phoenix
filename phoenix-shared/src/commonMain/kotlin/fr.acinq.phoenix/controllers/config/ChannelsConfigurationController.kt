@@ -2,14 +2,13 @@ package fr.acinq.phoenix.controllers.config
 
 import fr.acinq.lightning.channel.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.Normal
-import fr.acinq.lightning.serialization.v1.ByteVector32KSerializer
-import fr.acinq.lightning.serialization.v1.Serialization.lightningSerializersModule
+import fr.acinq.lightning.serialization.v3.ByteVector32KSerializer
+import fr.acinq.lightning.serialization.v3.Serialization.lightningSerializersModule
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.utils.localCommitmentSpec
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.json.Json
@@ -31,6 +30,7 @@ class AppChannelsConfigurationController(
     )
 
     private val json = Json {
+        ignoreUnknownKeys = true
         prettyPrint = true
         serializersModule = lightningSerializersModule
         allowStructuredMapKeys = true
@@ -47,10 +47,10 @@ class AppChannelsConfigurationController(
                     json = json.encodeToString(
                         serializer = MapSerializer(
                             ByteVector32KSerializer,
-                            fr.acinq.lightning.serialization.v1.ChannelState.serializer()
+                            fr.acinq.lightning.serialization.v3.ChannelState.serializer()
                         ),
                         value = channels.mapValues {
-                            fr.acinq.lightning.serialization.v1.ChannelState.import(it.value)
+                            fr.acinq.lightning.serialization.v3.ChannelState.import(it.value)
                         }
                     ),
                     channels = channels.map { (id, state) ->
@@ -58,15 +58,11 @@ class AppChannelsConfigurationController(
                             id = id.toHex(),
                             isOk = state is Normal,
                             stateName = state::class.simpleName ?: "Unknown",
-                            localBalance = state.localCommitmentSpec?.let {
-                                it.toLocal.truncateToSatoshi()
-                            },
-                            remoteBalance = state.localCommitmentSpec?.let {
-                                it.toRemote.truncateToSatoshi()
-                            },
+                            localBalance = state.localCommitmentSpec?.toLocal?.truncateToSatoshi(),
+                            remoteBalance = state.localCommitmentSpec?.toRemote?.truncateToSatoshi(),
                             json = json.encodeToString(
-                                fr.acinq.lightning.serialization.v1.ChannelState.serializer(),
-                                fr.acinq.lightning.serialization.v1.ChannelState.import(state)
+                                fr.acinq.lightning.serialization.v3.ChannelState.serializer(),
+                                fr.acinq.lightning.serialization.v3.ChannelState.import(state)
                             ),
                             txId = if (state is ChannelStateWithCommitments) {
                                 state.commitments.commitInput.outPoint.txid.toString()
