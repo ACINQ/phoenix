@@ -198,7 +198,11 @@ private fun PaymentIcon(payment: WalletPayment) {
                 description = stringResource(id = R.string.paymentdetails_status_received_pending)
             )
             else -> PaymentIconComponent(
-                icon = R.drawable.ic_payment_success,
+                icon = if (payment.origin is IncomingPayment.Origin.SwapIn || payment.origin is IncomingPayment.Origin.DualSwapIn) {
+                    R.drawable.ic_chain
+                } else {
+                    R.drawable.ic_payment_success
+                },
                 description = stringResource(id = R.string.paymentdetails_status_received_successful),
                 iconSize = 18.dp,
                 iconColor = MaterialTheme.colors.onPrimary,

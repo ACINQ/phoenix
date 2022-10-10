@@ -43,6 +43,8 @@ import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.components.WebLink
+import fr.acinq.phoenix.android.components.txLink
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateString
 import fr.acinq.phoenix.android.utils.Converter.toFiat
@@ -52,7 +54,7 @@ import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.utils.createdAt
 
-@OptIn(ExperimentalFoundationApi::class)
+
 @Composable
 fun PaymentDetailsTechnicalView(
     data: WalletPaymentInfo
@@ -273,7 +275,18 @@ private fun DetailsForIncoming(
             }
         }
         is IncomingPayment.Origin.KeySend -> {}
-        is IncomingPayment.Origin.DualSwapIn -> TODO()
+        is IncomingPayment.Origin.DualSwapIn -> {
+            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = payment.preimage.toHex())
+            TechnicalRow(label = stringResource(id = R.string.paymentdetails_dualswapin_tx_label)) {
+                origin.localInputs.mapIndexed { index, outpoint ->
+                    Row {
+                        Text(text = stringResource(id = R.string.paymentdetails_dualswapin_tx_value, index + 1))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        WebLink(text = outpoint.txid.toHex(), url = txLink(txId = outpoint.txid.toHex()), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                }
+            }
+        }
     }
 }
 
