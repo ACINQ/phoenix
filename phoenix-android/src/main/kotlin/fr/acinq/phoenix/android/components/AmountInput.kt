@@ -44,14 +44,18 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.msat
-import fr.acinq.phoenix.android.*
+import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.utils.Converter.toFiat
 import fr.acinq.phoenix.android.utils.Converter.toMilliSatoshi
 import fr.acinq.phoenix.android.utils.Converter.toPlainString
@@ -256,7 +260,6 @@ fun AmountHeroInput(
 ) {
     val log = logger("AmountHeroInput")
     val context = LocalContext.current
-    val prefUnit = preferredAmountUnit
     val prefBitcoinUnit = LocalBitcoinUnit.current
     val prefFiat = LocalFiatCurrency.current
     val rate = fiatRate
@@ -264,7 +267,7 @@ fun AmountHeroInput(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    var unit: CurrencyUnit by remember { mutableStateOf(prefUnit) }
+    var unit: CurrencyUnit by remember { mutableStateOf(prefBitcoinUnit) }
     var inputValue by remember { mutableStateOf(TextFieldValue(initialAmount?.toUnit(prefBitcoinUnit).toPlainString())) }
     var convertedValue: String by remember { mutableStateOf(initialAmount?.toPrettyString(prefFiat, rate, withUnit = true) ?: "") }
     var internalErrorMessage: String by remember { mutableStateOf(validationErrorMessage ?: "") }
@@ -362,7 +365,7 @@ fun AmountHeroInput(
                 it.measure(constraints.copy(minWidth = layoutWidth, maxWidth = layoutWidth))
             }
             val dashedLineHeight = dashedLinePlaceables.maxOf { it.height }
-            val layoutHeight = listOf(inputHeight, unitHeight).maxOrNull() ?: 0 + dashedLineHeight
+            val layoutHeight = listOf(inputHeight, unitHeight).maxOrNull() ?: (0 + dashedLineHeight)
 
             val inputBaseline = inputSlotPlaceables.map { it[FirstBaseline] }.maxOrNull() ?: 0
             val unitBaseline = unitSlotPlaceables.map { it[FirstBaseline] }.maxOrNull() ?: 0
@@ -388,12 +391,23 @@ fun AmountHeroInput(
 
         val errorMessage = validationErrorMessage.ifBlank { internalErrorMessage.ifBlank { null } }
         Spacer(Modifier.height(8.dp))
-        Text(
-            text = errorMessage ?: convertedValue.takeIf { it.isNotBlank() }?.let { stringResource(id = R.string.utils_converted_amount, it) } ?: "",
-            maxLines = 1,
-            fontSize = 15.sp,
-            style = if (errorMessage != null) MaterialTheme.typography.body1.copy(color = negativeColor()) else MaterialTheme.typography.body1,
-        )
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 14.sp, textAlign = TextAlign.Center),
+                modifier = Modifier.sizeIn(maxWidth = 300.dp, minHeight = 28.dp)
+            )
+        } else {
+            Text(
+                text = convertedValue.takeIf { it.isNotBlank() }?.let { stringResource(id = R.string.utils_converted_amount, it) } ?: "",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.body1.copy(textAlign = TextAlign.Center),
+                modifier = Modifier.sizeIn(minHeight = 28.dp)
+            )
+        }
     }
 
 }

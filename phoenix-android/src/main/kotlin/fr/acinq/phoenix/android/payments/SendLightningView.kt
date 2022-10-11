@@ -34,9 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.controllers.payments.MaxFees
@@ -55,6 +57,7 @@ fun SendLightningPaymentView(
 
     val context = LocalContext.current
     val balance = business.peerManager.balance.collectAsState(null).value
+    val prefBitcoinUnit = LocalBitcoinUnit.current
 
     val requestedAmount = paymentRequest.amount
     var amount by remember { mutableStateOf(requestedAmount) }
@@ -70,6 +73,7 @@ fun SendLightningPaymentView(
         Spacer(Modifier.height(16.dp))
         Card(
             externalPadding = PaddingValues(horizontal = 16.dp),
+            internalPadding = PaddingValues(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(48.dp))
@@ -83,10 +87,12 @@ fun SendLightningPaymentView(
                             amountErrorMessage = context.getString(R.string.send_error_amount_over_balance)
                         }
                         requestedAmount != null && newAmount.amount < requestedAmount -> {
-                            amountErrorMessage = context.getString(R.string.send_error_amount_below_requested)
+                            amountErrorMessage = context.getString(R.string.send_error_amount_below_requested,
+                                (requestedAmount).toPrettyString(prefBitcoinUnit, withUnit = true))
                         }
                         requestedAmount != null && newAmount.amount > requestedAmount * 2 -> {
-                            amountErrorMessage = context.getString(R.string.send_error_amount_overpaying)
+                            amountErrorMessage = context.getString(R.string.send_error_amount_overpaying,
+                                (requestedAmount * 2).toPrettyString(prefBitcoinUnit, withUnit = true))
                         }
                     }
                     amount = newAmount?.amount
@@ -95,15 +101,16 @@ fun SendLightningPaymentView(
                 inputTextSize = 42.sp,
             )
             Column(
-                modifier = Modifier.padding(32.dp),
+                modifier = Modifier.padding(top = 20.dp, bottom = 32.dp, start = 16.dp, end = 16.dp).sizeIn(maxWidth = 400.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Label(text = stringResource(R.string.send_description_label)) {
-                    (paymentRequest.description ?: paymentRequest.descriptionHash?.toHex())?.takeIf { it.isNotBlank() }?.let {
-                        Text(text = it)
+                val description = remember { paymentRequest.description ?: paymentRequest.descriptionHash?.toHex() }
+                if (!description.isNullOrBlank()) {
+                    Label(text = stringResource(R.string.send_description_label)) {
+                        Text(text = description)
                     }
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
-                Spacer(modifier = Modifier.height(24.dp))
                 Label(text = stringResource(R.string.send_destination_label)) {
                     SelectionContainer {
                         Text(text = paymentRequest.nodeId.toHex(), maxLines = 1, overflow = TextOverflow.Ellipsis)

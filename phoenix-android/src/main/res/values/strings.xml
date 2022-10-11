@@ -165,8 +165,8 @@
     <string name="send_error_amount_negative">Amount cannot be negative.</string>
     <string name="send_error_amount_invalid">This is not a valid amount.</string>
     <string name="send_error_amount_over_balance">This amount exceeds your balance.</string>
-    <string name="send_error_amount_overpaying">Cannot pay more than 2 times the requested amount.</string>
-    <string name="send_error_amount_below_requested">This amount is below the requested amount.</string>
+    <string name="send_error_amount_overpaying">Cannot pay more than %1$s.</string>
+    <string name="send_error_amount_below_requested">This amount is below the requested amount of %1$s.</string>
     <string name="send_destination_label">Send to</string>
     <string name="send_description_label">Payment description</string>
     <string name="send_pay_button">Pay</string>

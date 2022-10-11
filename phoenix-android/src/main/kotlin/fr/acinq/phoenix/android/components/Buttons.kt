@@ -116,6 +116,8 @@ fun TextWithIcon(
     icon: Int,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = LocalTextStyle.current,
+    maxLines: Int = Int.MAX_VALUE,
+    textOverflow: TextOverflow = TextOverflow.Clip,
     iconTint: Color = LocalContentColor.current,
     iconSize: Dp = ButtonDefaults.IconSize,
     padding: PaddingValues = PaddingValues(0.dp),
@@ -135,7 +137,7 @@ fun TextWithIcon(
             colorFilter = ColorFilter.tint(iconTint)
         )
         Spacer(Modifier.width(space))
-        Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier)
+        Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier, maxLines = maxLines, overflow = textOverflow)
     }
 }
 
@@ -145,6 +147,8 @@ fun TextWithIcon(
     icon: Int,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = LocalTextStyle.current,
+    maxLines: Int = Int.MAX_VALUE,
+    textOverflow: TextOverflow = TextOverflow.Clip,
     iconTint: Color = LocalContentColor.current,
     iconSize: Dp = ButtonDefaults.IconSize,
     padding: PaddingValues = PaddingValues(0.dp),
@@ -164,7 +168,7 @@ fun TextWithIcon(
             colorFilter = ColorFilter.tint(iconTint)
         )
         Spacer(Modifier.width(space))
-        Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier)
+        Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier, maxLines = maxLines, overflow = textOverflow)
     }
 }
 
@@ -208,15 +212,13 @@ fun Button(
 ) {
     val colors = ButtonDefaults.buttonColors(
         backgroundColor = backgroundColor,
-        disabledBackgroundColor = backgroundColor.copy(alpha = 0.5f),
-        contentColor = LocalContentColor.current,
-        disabledContentColor = mutedTextColor(),
+        disabledBackgroundColor = if (enabledEffect) backgroundColor.copy(alpha = 0.4f) else backgroundColor,
     )
     val contentColor by colors.contentColor(true)
     Surface(
         shape = shape,
-        color = colors.backgroundColor(true).value,
-        contentColor = colors.contentColor(true).value, //contentColor.copy(1f),
+        color = colors.backgroundColor(enabled).value,
+        contentColor = colors.contentColor(enabled).value,
         border = border,
         elevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp,
         modifier = modifier
@@ -245,7 +247,7 @@ fun Button(
                         )
                         .indication(interactionSource, LocalIndication.current)
                         .padding(padding)
-                        .alpha(if (!enabled && !enabledEffect) 0.5f else 1f),
+                        .alpha(if (!enabled && enabledEffect) 0.85f else 1f),
                     horizontalArrangement = horizontalArrangement,
                     verticalAlignment = Alignment.CenterVertically,
                     content = {

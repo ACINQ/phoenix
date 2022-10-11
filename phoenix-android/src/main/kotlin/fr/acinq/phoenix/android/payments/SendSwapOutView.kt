@@ -88,6 +88,7 @@ fun SendSwapOutView(
         Spacer(Modifier.height(16.dp))
         Card(
             externalPadding = PaddingValues(horizontal = 16.dp),
+            internalPadding = PaddingValues(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(48.dp))
@@ -118,7 +119,8 @@ fun SendSwapOutView(
                             amountErrorMessage = context.getString(R.string.send_error_amount_over_balance)
                         }
                         requestedAmount != null && newAmount < requestedAmount -> {
-                            amountErrorMessage = context.getString(R.string.send_error_amount_below_requested)
+                            amountErrorMessage = context.getString(R.string.send_error_amount_below_requested,
+                                (requestedAmount).toMilliSatoshi().toPrettyString(prefBtcUnit, withUnit = true))
                         }
                     }
                     amount = newAmount
@@ -127,7 +129,7 @@ fun SendSwapOutView(
                 inputTextSize = 42.sp
             )
             Column(
-                modifier = Modifier.padding(32.dp),
+                modifier = Modifier.padding(top = 20.dp, bottom = 32.dp, start = 16.dp, end = 16.dp).sizeIn(maxWidth = 400.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Label(text = stringResource(R.string.send_destination_label)) {
