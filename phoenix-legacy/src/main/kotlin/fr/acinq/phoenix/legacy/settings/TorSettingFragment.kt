@@ -123,7 +123,7 @@ version=${app.requireService.getTorInfo("version")}
 network=${app.requireService.getTorInfo("network-liveness")}
 
 ---
-or connections
+Relay connections
 ---
 ${app.requireService.getTorInfo("orconn-status")}
 
