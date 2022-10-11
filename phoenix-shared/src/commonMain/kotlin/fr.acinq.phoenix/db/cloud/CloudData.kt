@@ -103,15 +103,17 @@ data class CloudData @OptIn(ExperimentalSerializationApi::class) constructor(
     companion object
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 fun CloudData.cborSerialize(): ByteArray {
     return Cbor.encodeToByteArray(this)
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 fun CloudData.Companion.cborDeserialize(blob: ByteArray): CloudData? {
     var result: CloudData? = null
     try {
         result = Cbor.decodeFromByteArray(blob)
-    } catch (e: Throwable) {
+    } catch (_: Throwable) {
     }
 
     return result

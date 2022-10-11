@@ -1,6 +1,5 @@
 package fr.acinq.phoenix.db.cloud
 
-import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.OutgoingPayment
@@ -124,11 +123,13 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
     companion object
 } // </OutgoingPaymentWrapper>
 
+@OptIn(ExperimentalSerializationApi::class)
 fun OutgoingPayment.cborSerialize(): ByteArray {
     val wrapper = OutgoingPaymentWrapper(payment = this)
     return Cbor.encodeToByteArray(wrapper)
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 fun OutgoingPaymentWrapper.cborDeserialize(blob: ByteArray): OutgoingPayment? = try {
     Cbor.decodeFromByteArray<OutgoingPaymentWrapper>(blob).unwrap()
 } catch (e: Throwable) {
