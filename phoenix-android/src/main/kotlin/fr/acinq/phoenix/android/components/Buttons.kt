@@ -49,6 +49,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
+import fr.acinq.phoenix.utils.BlockchainExplorer
 
 
 /** A rounded button with a solid surface background and a muted outline. */
@@ -290,8 +291,8 @@ fun WebLink(
 }
 
 @Composable
-fun txLink(txId: String): String {
-    return "https://mempool.space/${if (business.chain.isTestnet()) "testnet/tx" else "tx"}/$txId"
+fun txUrl(txId: String): String {
+    return business.blockchainExplorer.txUrl(txId = txId, website = BlockchainExplorer.Website.MempoolSpace)
 }
 
 fun openLink(context: Context, link: String) {

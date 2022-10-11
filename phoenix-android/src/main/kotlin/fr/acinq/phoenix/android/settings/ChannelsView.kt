@@ -115,24 +115,14 @@ private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: (
 @Composable
 private fun ChannelDialog(onDismiss: () -> Unit, channel: ChannelsConfiguration.Model.Channel) {
     val context = LocalContext.current
-    val business = business
+    val txUrl = txUrl(txId = channel.txId ?: "")
     Dialog(
         onDismiss = onDismiss,
         buttons = {
             Row(Modifier.fillMaxWidth()) {
                 Button(onClick = { copyToClipboard(context, channel.json, "channel data") }, icon = R.drawable.ic_copy)
                 Button(onClick = { share(context, channel.json, subject = "") }, icon = R.drawable.ic_share)
-                Button(
-                    onClick = {
-                        context.startActivity(
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse("https://mempool.space/${if (business.chain.isTestnet()) "testnet/tx" else "tx"}/${channel.txId}")
-                            )
-                        )
-                    },
-                    text = stringResource(id = R.string.listallchannels_funding_tx)
-                )
+                Button(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(txUrl))) }, text = stringResource(id = R.string.listallchannels_funding_tx))
                 Spacer(modifier = Modifier.weight(1.0f))
                 Button(onClick = onDismiss, text = stringResource(id = R.string.listallchannels_close))
             }

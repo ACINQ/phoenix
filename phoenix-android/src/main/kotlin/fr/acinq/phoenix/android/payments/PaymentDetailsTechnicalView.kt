@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.android.payments
 
 import android.text.format.DateUtils
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.MaterialTheme
@@ -44,7 +43,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.WebLink
-import fr.acinq.phoenix.android.components.txLink
+import fr.acinq.phoenix.android.components.txUrl
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateString
 import fr.acinq.phoenix.android.utils.Converter.toFiat
@@ -282,7 +281,7 @@ private fun DetailsForIncoming(
                     Row {
                         Text(text = stringResource(id = R.string.paymentdetails_dualswapin_tx_value, index + 1))
                         Spacer(modifier = Modifier.width(4.dp))
-                        WebLink(text = outpoint.txid.toHex(), url = txLink(txId = outpoint.txid.toHex()), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        WebLink(text = outpoint.txid.toHex(), url = txUrl(txId = outpoint.txid.toHex()), maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
             }
