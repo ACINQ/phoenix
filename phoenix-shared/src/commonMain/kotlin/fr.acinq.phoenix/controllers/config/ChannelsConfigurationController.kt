@@ -2,7 +2,7 @@ package fr.acinq.phoenix.controllers.config
 
 import fr.acinq.lightning.channel.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.Normal
-import fr.acinq.lightning.serialization.v3.Serialization.lightningSerializersModule
+import fr.acinq.lightning.serialization.v1.Serialization.lightningSerializersModule
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.controllers.AppController
@@ -45,8 +45,8 @@ class AppChannelsConfigurationController(
                         localBalance = state.localCommitmentSpec?.toLocal?.truncateToSatoshi(),
                         remoteBalance = state.localCommitmentSpec?.toRemote?.truncateToSatoshi(),
                         json = json.encodeToString(
-                            fr.acinq.lightning.serialization.v3.ChannelState.serializer(),
-                            fr.acinq.lightning.serialization.v3.ChannelState.import(state)
+                            fr.acinq.lightning.serialization.v1.ChannelState.serializer(),
+                            fr.acinq.lightning.serialization.v1.ChannelState.import(state)
                         ),
                         txId = if (state is ChannelStateWithCommitments) {
                             state.commitments.commitInput.outPoint.txid.toString()
