@@ -1,9 +1,6 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.bitcoin.PrivateKey
-import fr.acinq.bitcoin.PublicKey
+import fr.acinq.bitcoin.*
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.Wallet
 import kotlinx.coroutines.CoroutineScope
@@ -42,10 +39,26 @@ class WalletManager(
         return MnemonicCode.toSeed(mnemonics, passphrase)
     }
 
+    /**
+     * - nodeIdHash:
+     *   We need to store data in the local filesystem that's associated with the
+     *   specific nodeId, but we don't want to leak the nodeId.
+     *   (i.e. We don't want to use the nodeId in cleartext anywhere).
+     *   So we instead use the nodeIdHash as the identifier for local files.
+     * 
+     * - cloudKey:
+     *   We need a key to encypt/decrypt the blobs we store in the cloud.
+     *   And we prefer this key to be seperate from other keys.
+     * 
+     * - cloudKeyHash:
+     *   Similar to the nodeIdHash, we need to store data in the cloud that's associated
+     *   with the specific nodeId, but we don't want to leak the nodeId.
+     */
     data class WalletInfo(
         val nodeId: PublicKey,
+        val nodeIdHash: String,     // used for local storage
         val cloudKey: ByteVector32, // used for cloud storage
-        val encryptedNodeId: String // used for cloud storage
+        val cloudKeyHash: String    // used for cloud storage
     )
 
     fun loadWallet(seed: ByteArray): WalletInfo? {
@@ -56,11 +69,17 @@ class WalletManager(
         val newWallet = Wallet(seed, chain)
         _wallet.value = newWallet
 
-        val (cloudKey, encryptedNodeId) = newWallet.cloudKeyAndEncryptedNodeId()
+        val nodeId = newWallet.nodeId()
+        val nodeIdHash = Crypto.hash160(nodeId.value).byteVector().toHex()
+
+        val cloudKey = newWallet.cloudKey()
+        val cloudKeyHash = Crypto.hash160(cloudKey).byteVector().toHex()
+
         return WalletInfo(
-            nodeId = newWallet.nodeId(),
+            nodeId = nodeId,
+            nodeIdHash = nodeIdHash,
             cloudKey = cloudKey,
-            encryptedNodeId = encryptedNodeId
+            cloudKeyHash = cloudKeyHash
         )
     }
 

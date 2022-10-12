@@ -15,10 +15,9 @@ fileprivate var log = Logger(OSLog.disabled)
 
 class Prefs {
 	
-	fileprivate enum Key: String {
+	private enum Key: String {
 		case theme
 		case pushPermissionQuery
-		case pushTokenRegistration
 		case isTorEnabled
 		case defaultPaymentDescription
 		case showChannelsRemoteBalance
@@ -229,4 +228,28 @@ class Prefs {
 	lazy private(set) var backupSeed: Prefs_BackupSeed = {
 		return Prefs_BackupSeed()
 	}()
+	
+	// --------------------------------------------------
+	// MARK: Close Wallet
+	// --------------------------------------------------
+	
+	func closeWallet(encryptedNodeId: String) {
+		
+		// Purposefully not resetting:
+		// - Key.theme: App feels weird when this changes unexpectedly.
+		// - Key.pushPermissionQuery: Not related to wallet; More so to the device.
+		
+		defaults.removeObject(forKey: Key.isTorEnabled.rawValue)
+		defaults.removeObject(forKey: Key.defaultPaymentDescription.rawValue)
+		defaults.removeObject(forKey: Key.showChannelsRemoteBalance.rawValue)
+		defaults.removeObject(forKey: Key.recentTipPercents.rawValue)
+		defaults.removeObject(forKey: Key.isNewWallet.rawValue)
+		defaults.removeObject(forKey: Key.invoiceExpirationDays.rawValue)
+		defaults.removeObject(forKey: Key.maxFees.rawValue)
+		defaults.removeObject(forKey: Key.hideAmountsOnHomeScreen.rawValue)
+		defaults.removeObject(forKey: Key.recentPaymentSeconds.rawValue)
+		
+		self.backupTransactions.closeWallet(encryptedNodeId: encryptedNodeId)
+		self.backupSeed.closeWallet(encryptedNodeId: encryptedNodeId)
+	}
 }

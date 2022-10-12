@@ -24,6 +24,7 @@ import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.serialization.json.Json
 import org.kodein.log.LoggerFactory
 import org.kodein.log.frontend.defaultLogFrontend
@@ -83,7 +84,31 @@ class PhoenixBusiness(
         }
     }
 
-    fun peerState() = peerManager.peerState
+    /**
+     * Cancels the CoroutineScope of all managers, and closes all database connections.
+     * It's recommended that you close the network connections (electrum + peer)
+     * BEFORE invoking this function, to ensure a clean disconnect from the server.
+     */
+    fun stop() {
+        electrumClient.stop()
+        electrumClient.cancel()
+        electrumWatcher.stop()
+        electrumWatcher.cancel()
+        appConnectionsDaemon?.cancel()
+        appDb.close()
+        networkMonitor.stop()
+        walletManager.cancel()
+        nodeParamsManager.cancel()
+        databaseManager.close()
+        databaseManager.cancel()
+        databaseManager.cancel()
+        peerManager.cancel()
+        paymentsManager.cancel()
+        appConfigurationManager.cancel()
+        currencyManager.cancel()
+        lnUrlManager.cancel()
+        logMemory.cancel()
+    }
 
     // The (node_id, fcm_token) tuple only needs to be registered once.
     // And after that, only if the tuple changes (e.g. different fcm_token).
@@ -91,8 +116,6 @@ class PhoenixBusiness(
         logger.info { "registering token=$token" }
         peerManager.getPeer().registerFcmToken(token)
     }
-
-    fun updateTorUsage(isEnabled: Boolean) = appConfigurationManager.updateTorUsage(isEnabled)
 
     private val _this = this
     val controllers: ControllerFactory = object : ControllerFactory {

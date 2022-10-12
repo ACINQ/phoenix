@@ -21,7 +21,7 @@ extension UserDefaults {
 
 class GroupPrefs {
 	
-	fileprivate enum Key: String {
+	private enum Key: String {
 		case currencyType
 		case fiatCurrency
 		case bitcoinUnit
@@ -146,6 +146,19 @@ class GroupPrefs {
 			defaults.setCodable(value: newValue, forKey: key)
 			electrumConfigPublisher.send(newValue)
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Close Wallet
+	// --------------------------------------------------
+	
+	func closeWallet() {
+		
+		defaults.removeObject(forKey: Key.currencyType.rawValue)
+		defaults.removeObject(forKey: Key.fiatCurrency.rawValue)
+		defaults.removeObject(forKey: Key.bitcoinUnit.rawValue)
+		defaults.removeObject(forKey: Key.currencyConverterList.rawValue)
+		defaults.removeObject(forKey: Key.electrumConfig.rawValue)
 	}
 	
 	// --------------------------------------------------

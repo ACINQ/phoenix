@@ -18,14 +18,14 @@ fileprivate enum NavLinkTag: String {
 	case DisplayConfigurationView
 	case PaymentOptionsView
 	case RecoveryPhraseView
-	case CloseChannelsView
+//	case DrainWalletView
+	case CloseWalletView
 	// Security
 	case AppAccessView
 	// Advanced
 	case PrivacyView
 	case LogsConfigurationView
 	case ChannelsConfigurationView
-	case ForceCloseChannelsView
 }
 
 struct ConfigurationView: View {
@@ -61,6 +61,14 @@ struct ConfigurationView: View {
 	
 	@ViewBuilder
 	var body: some View {
+		
+		content()
+			.navigationTitle(NSLocalizedString("Settings", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
 		
 		List {
 			let hasWallet = hasWallet()
@@ -128,12 +136,22 @@ struct ConfigurationView: View {
 						}
 					}
 					
+//					NavigationLink(
+//						destination: DrainWalletView(),
+//						tag: NavLinkTag.DrainWalletView,
+//						selection: $navLinkTag
+//					) {
+//						Label { Text("Drain wallet") } icon: {
+//							Image(systemName: "xmark.circle")
+//						}
+//					}
+					
 					NavigationLink(
-						destination: CloseChannelsView(),
-						tag: NavLinkTag.CloseChannelsView,
+						destination: CloseWalletView(popToRoot: { self.navLinkTag = nil }),
+						tag: NavLinkTag.CloseWalletView,
 						selection: $navLinkTag
 					) {
-						Label { Text("Drain wallet") } icon: {
+						Label { Text("Close wallet") } icon: {
 							Image(systemName: "xmark.circle")
 						}
 					}
@@ -214,8 +232,6 @@ struct ConfigurationView: View {
 		.onReceive(externalLightningUrlPublisher) {(url: String) in
 			onExternalLightningUrl(url)
 		}
-		.navigationTitle(NSLocalizedString("Settings", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
 			
 	} // end: body
 	
@@ -302,7 +318,7 @@ struct ConfigurationView: View {
 			switch value {
 				case .paymentHistory : break
 				case .backup         : newNavLinkTag = NavLinkTag.RecoveryPhraseView
-				case .drainWallet    : newNavLinkTag = NavLinkTag.CloseChannelsView
+				case .drainWallet    : newNavLinkTag = NavLinkTag.CloseWalletView
 				case .electrum       : newNavLinkTag = NavLinkTag.PrivacyView
 			}
 			

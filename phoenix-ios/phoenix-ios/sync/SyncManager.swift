@@ -53,6 +53,10 @@ class SyncManager {
 		
 		networkMonitor.pathUpdateHandler = {[weak self](path: NWPath) -> Void in
 			
+			guard let self = self else {
+				return
+			}
+			
 			let hasInternet: Bool
 			switch path.status {
 				case .satisfied:
@@ -72,8 +76,8 @@ class SyncManager {
 					hasInternet = false
 			}
 			
-			self?.syncSeedManager.networkStatusChanged(hasInternet: hasInternet)
-			self?.syncTxManager.networkStatusChanged(hasInternet: hasInternet)
+			self.syncSeedManager.networkStatusChanged(hasInternet: hasInternet)
+			self.syncTxManager.networkStatusChanged(hasInternet: hasInternet)
 		}
 		
 		networkMonitor.start(queue: DispatchQueue.main)
@@ -98,6 +102,10 @@ class SyncManager {
 		log.trace("checkForCloudCredentials")
 		
 		CKContainer.default().accountStatus {[weak self](accountStatus: CKAccountStatus, error: Error?) in
+			
+			guard let self = self else {
+				return
+			}
 			
 			if let error = error {
 				log.warning("Error fetching CKAccountStatus: \(String(describing: error))")
@@ -130,8 +138,8 @@ class SyncManager {
 				hasCloudCredentials = false
 			}
 			
-			self?.syncSeedManager.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials)
-			self?.syncTxManager.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials)
+			self.syncSeedManager.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials)
+			self.syncTxManager.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials)
 		}
 	}
 }

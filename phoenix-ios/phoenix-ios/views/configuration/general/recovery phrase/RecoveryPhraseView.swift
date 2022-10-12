@@ -215,7 +215,7 @@ struct RecoveryPhraseList: View {
 				.disabled(isDecrypting)
 				.padding(.vertical, 5)
 				
-				let enabledSecurity = AppSecurity.shared.enabledSecurity.value
+				let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
 				if enabledSecurity != .none {
 					Text("(requires authentication)")
 						.font(.footnote)
@@ -343,7 +343,7 @@ struct RecoveryPhraseList: View {
 			isDecrypting = false
 		}
 		
-		let enabledSecurity = AppSecurity.shared.enabledSecurity.value
+		let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
 		if enabledSecurity == .none {
 			AppSecurity.shared.tryUnlockWithKeychain { (mnemonics, _, _) in
 				

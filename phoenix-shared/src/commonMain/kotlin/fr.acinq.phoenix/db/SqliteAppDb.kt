@@ -20,7 +20,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 
-class SqliteAppDb(driver: SqlDriver) {
+class SqliteAppDb(private val driver: SqlDriver) {
 
     private val database = AppDatabase(
         driver = driver,
@@ -185,5 +185,9 @@ class SqliteAppDb(driver: SqlDriver) {
             }
             now
         }
+    }
+
+    fun close() {
+        driver.close()
     }
 }

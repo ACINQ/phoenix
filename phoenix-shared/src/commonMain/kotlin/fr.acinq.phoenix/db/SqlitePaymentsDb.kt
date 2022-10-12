@@ -44,7 +44,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 
 class SqlitePaymentsDb(
-    driver: SqlDriver,
+    private val driver: SqlDriver,
     private val currencyManager: CurrencyManager? = null
 ) : PaymentsDb {
 
@@ -636,6 +636,10 @@ class SqlitePaymentsDb(
                 didDeleteWalletPayment(paymentId, database)
             }
         }
+    }
+
+    fun close() {
+        driver.close()
     }
 
     companion object {

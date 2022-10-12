@@ -54,13 +54,6 @@ class BusinessManager {
 	///
 	public private(set) var syncManager: SyncManager? = nil
 	
-	/// The current encryptedNodeId (from the current unlocked wallet).
-	///
-	/// Always fetch this on demand - don't cache it.
-	/// Because it might change if the user closes his/her wallet.
-	///
-	public private(set) var encryptedNodeId: String? = nil
-	
 	private var walletInfo: WalletManager.WalletInfo? = nil
 	private var pushToken: String? = nil
 	private var fcmToken: String? = nil
@@ -93,6 +86,20 @@ class BusinessManager {
 		registerForNotifications()
 	}
 	
+	public func stop() {
+		
+		cancellables.removeAll()
+		business.stop()
+	}
+	
+	public func reset() {
+		
+		business = PhoenixBusiness(ctx: PlatformContext())
+		walletInfo = nil
+		start()
+		registerForNotifications()
+	}
+	
 	// --------------------------------------------------
 	// MARK: Notification Registration
 	// --------------------------------------------------
@@ -118,7 +125,7 @@ class BusinessManager {
 		
 		// Tor configuration observer
 		Prefs.shared.isTorEnabledPublisher.sink { (isTorEnabled: Bool) in
-			self.business.updateTorUsage(isEnabled: isTorEnabled)
+			self.business.appConfigurationManager.updateTorUsage(enabled: isTorEnabled)
 		}
 		.store(in: &cancellables)
 		
@@ -167,11 +174,11 @@ class BusinessManager {
 			return false
 		}
 		
-		walletInfo = _walletInfo
+		self.walletInfo = _walletInfo
 		maybeRegisterFcmToken()
 		
 		let cloudKey = _walletInfo.cloudKey
-		let encryptedNodeId = _walletInfo.encryptedNodeId as String
+		let encryptedNodeId = _walletInfo.cloudKeyHash as String
 		
 		if let walletRestoreType = walletRestoreType {
 			switch walletRestoreType {
@@ -202,16 +209,38 @@ class BusinessManager {
 				Prefs.shared.backupSeed.manualBackup_setTaskDone(false, encryptedNodeId: encryptedNodeId)
 			}
 		}
-			
-		self.encryptedNodeId = encryptedNodeId
+		
 		self.syncManager = SyncManager(
 			chain: business.chain,
 			mnemonics: mnemonics,
 			cloudKey: cloudKey,
 			encryptedNodeId: encryptedNodeId
 		)
-			
+		
+		if LockState.shared.walletExistence == .doesNotExist {
+			LockState.shared.walletExistence = .exists
+		}
 		return true
+	}
+	
+	/// The current encryptedNodeId (from the current unlocked wallet).
+	///
+	/// Always fetch this on demand - don't cache it.
+	/// Because it might change if the user closes his/her wallet.
+	///
+	public var encryptedNodeId: String? {
+		
+		// For historical reasons, this is the cloudKeyHash, and NOT the nodeIdHash.
+		return walletInfo?.cloudKeyHash
+	}
+	
+	/// The current nodeIdHash (from the current unlocked wallet).
+	///
+	/// Always fetch this on demand - don't cache it.
+	/// Because it might change if the user closes his/her wallet.
+	///
+	public var nodeIdHash: String? {
+		return walletInfo?.nodeIdHash
 	}
 	
 	// --------------------------------------------------

@@ -41,21 +41,15 @@ data class Wallet(val seed: ByteVector64, val chain: Chain) {
         return Bitcoin.computeBIP84Address(publicKey, chainHash)
     }
 
-    // For cloud storage, we need:
-    // - an encryption key
-    // - a cleartext string that's tied to a specific nodeId
-    //
-    // But we also don't want to expose the nodeId.
-    // So we deterministically derive both values from the seed.
-    //
-    fun cloudKeyAndEncryptedNodeId(): Pair<ByteVector32, String> {
+    /**
+     * We use a separate key for cloud storage.
+     * That is, the key we use to encyrpt/decrypt the blobs we store in the cloud.
+    **/
+    fun cloudKey(): ByteVector32 {
         val path = if (chain.isMainnet()) "m/51'/0'/0'/0" else "m/51'/1'/0'/0"
         val extPrivKey = DeterministicWallet.derivePrivateKey(master, path)
 
-        val cloudKey = extPrivKey.privateKey.value
-        val hash = Crypto.hash160(cloudKey).byteVector().toHex()
-
-        return Pair(cloudKey, hash)
+        return extPrivKey.privateKey.value
     }
 
     fun nodeId(): PublicKey {

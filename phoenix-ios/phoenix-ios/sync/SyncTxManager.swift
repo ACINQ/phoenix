@@ -91,6 +91,8 @@ class SyncTxManager {
 	public let statePublisher: CurrentValueSubject<SyncTxManager_State, Never>
 	
 	/// Informs the user interface about a pending change to the SyncTxManager's global settings.
+	///
+	/// Changes to this publisher will always occur on the main thread.
 	/// 
 	public let pendingSettingsPublisher = CurrentValueSubject<SyncTxManager_PendingSettings?, Never>(nil)
 	

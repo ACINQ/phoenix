@@ -54,7 +54,7 @@ class AppSecurity {
 	
 	/// Changes always posted to the main thread.
 	///
-	public let enabledSecurity = CurrentValueSubject<EnabledSecurity, Never>(EnabledSecurity())
+	public let enabledSecurityPublisher = CurrentValueSubject<EnabledSecurity, Never>(EnabledSecurity())
 	
 	/// Serial queue ensures that only one operation is reading/modifying the
 	/// keychain and/or security file at any given time.
@@ -62,6 +62,22 @@ class AppSecurity {
 	private let queue = DispatchQueue(label: "AppSecurity")
 	
 	private init() {/* must use shared instance */}
+	
+	// --------------------------------------------------------------------------------
+	// MARK: Publisher
+	// --------------------------------------------------------------------------------
+	
+	private func publishEnabledSecurity(_ value: EnabledSecurity) {
+		
+		let block = {
+			self.enabledSecurityPublisher.send(value)
+		}
+		if Thread.isMainThread {
+			block()
+		} else {
+			DispatchQueue.main.async { block() }
+		}
+	}
 	
 	// --------------------------------------------------------------------------------
 	// MARK: Private Utilities
@@ -214,7 +230,7 @@ class AppSecurity {
 		let finish = {(mnemonics: [String]?, configuration: EnabledSecurity) -> Void in
 			
 			DispatchQueue.main.async {
-				self.enabledSecurity.send(configuration)
+				self.publishEnabledSecurity(configuration)
 				completion(mnemonics, configuration, nil)
 			}
 		}
@@ -224,7 +240,7 @@ class AppSecurity {
 			let danger = UnlockError(error, nil)
 			
 			DispatchQueue.main.async {
-				self.enabledSecurity.send(configuration)
+				self.publishEnabledSecurity(configuration)
 				completion(nil, configuration, danger)
 			}
 		}
@@ -234,7 +250,7 @@ class AppSecurity {
 			let danger = UnlockError(nil, error)
 			
 			DispatchQueue.main.async {
-				self.enabledSecurity.send(configuration)
+				self.publishEnabledSecurity(configuration)
 				completion(nil, configuration, danger)
 			}
 		}
@@ -306,7 +322,7 @@ class AppSecurity {
 		let succeed = {(securityFile: SecurityFile) -> Void in
 			DispatchQueue.main.async {
 				let newEnabledSecurity = self.calculateEnabledSecurity(securityFile)
-				self.enabledSecurity.send(newEnabledSecurity)
+				self.publishEnabledSecurity(newEnabledSecurity)
 				completion(nil)
 			}
 		}
@@ -425,7 +441,7 @@ class AppSecurity {
 			let securityFile = self.readFromDisk()
 			DispatchQueue.main.async {
 				let newEnabledSecurity = self.calculateEnabledSecurity(securityFile)
-				self.enabledSecurity.send(newEnabledSecurity)
+				self.publishEnabledSecurity(newEnabledSecurity)
 				completion(nil)
 			}
 		}
@@ -662,6 +678,67 @@ class AppSecurity {
 		context.evaluatePolicy( .deviceOwnerAuthenticationWithBiometrics,
 		       localizedReason: prompt ?? self.biometricsPrompt(),
 		                 reply: completion)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Close Wallet
+	// --------------------------------------------------
+	
+	public func closeWallet() {
+		
+		let fm = FileManager.default
+		let securityJsonUrl = SharedSecurity.shared.securityJsonUrl
+		
+		do {
+			try fm.removeItem(at: securityJsonUrl)
+			log.error("Deleted file security.json")
+		} catch {
+			log.error("Unable to delete security.json: \(error)")
+		}
+			
+		let keychain = GenericPasswordStore()
+		
+		do {
+			try keychain.deleteKey(
+				account: keychain_accountName_keychain,
+				accessGroup: privateAccessGroup() // <- old location
+			)
+			log.info("Deleted keychain item: act(keychain) grp(private)")
+		} catch {
+			log.error("Unable to delete keychain item: act(keychain) grp(private): \(error)")
+		}
+		
+		do {
+			try keychain.deleteKey(
+				account: keychain_accountName_keychain,
+				accessGroup: sharedAccessGroup() // <- new location
+			)
+			log.info("Deleted keychain item: act(keychain) grp(shared)")
+		} catch {
+			log.error("Unable to delete keychain item: act(keychain) grp(shared): \(error)")
+		}
+		
+		do {
+			try keychain.deleteKey(
+				account: keychain_accountName_biometrics,
+				accessGroup: privateAccessGroup()
+			)
+			log.info("Deleted keychain item: act(biometrics) grp(private)")
+		} catch {
+			log.error("Unable to delete keychain item: act(biometrics) grp(private): \(error)")
+		}
+		
+		do {
+			try keychain.deleteKey(
+				account: keychain_accountName_softBiometrics,
+				accessGroup: privateAccessGroup()
+			)
+			log.error("Deleted keychain item: act(softBiometrics) grp(private)")
+		} catch {
+			log.error("Unable to delete keychain item: act(softBiometrics) grp(private): \(error)")
+		}
+		
+		publishEnabledSecurity(EnabledSecurity())
 	}
 	
 	// --------------------------------------------------------------------------------
