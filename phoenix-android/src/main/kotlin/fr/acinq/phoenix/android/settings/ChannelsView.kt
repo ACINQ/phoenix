@@ -31,13 +31,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.CF
@@ -49,16 +47,17 @@ import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.controllers.config.ChannelsConfiguration
 
+
 @Composable
 fun ChannelsView() {
     val log = logger("ChannelsView")
     val nc = navController
 
     val showChannelDialog = remember { mutableStateOf<ChannelsConfiguration.Model.Channel?>(null) }
-    showChannelDialog.value?.run {
+    showChannelDialog.value?.let {
         ChannelDialog(
             onDismiss = { showChannelDialog.value = null },
-            channel = this,
+            channel = it,
         )
     }
 
@@ -89,8 +88,6 @@ fun ChannelsView() {
 private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: () -> Unit) {
     val balance = channel.localBalance ?: 0.sat
     val capacity = balance + (channel.remoteBalance ?: 0.sat)
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     Row(modifier = Modifier
         .clickable { onClick() }
         .padding(horizontal = 16.dp, vertical = 16.dp),
@@ -118,24 +115,14 @@ private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: (
 @Composable
 private fun ChannelDialog(onDismiss: () -> Unit, channel: ChannelsConfiguration.Model.Channel) {
     val context = LocalContext.current
-    val business = business
+    val txUrl = txUrl(txId = channel.txId ?: "")
     Dialog(
         onDismiss = onDismiss,
         buttons = {
             Row(Modifier.fillMaxWidth()) {
                 Button(onClick = { copyToClipboard(context, channel.json, "channel data") }, icon = R.drawable.ic_copy)
                 Button(onClick = { share(context, channel.json, subject = "") }, icon = R.drawable.ic_share)
-                Button(
-                    onClick = {
-                        context.startActivity(
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse("https://mempool.space/${if (business.chain.isTestnet()) "testnet/tx" else "tx"}/${channel.txId}")
-                            )
-                        )
-                    },
-                    text = stringResource(id = R.string.listallchannels_funding_tx)
-                )
+                Button(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(txUrl))) }, text = stringResource(id = R.string.listallchannels_funding_tx))
                 Spacer(modifier = Modifier.weight(1.0f))
                 Button(onClick = onDismiss, text = stringResource(id = R.string.listallchannels_close))
             }

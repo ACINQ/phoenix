@@ -13,7 +13,7 @@ import kotlinx.serialization.cbor.ByteString
 
 
 @Serializable
-data class OutgoingClosingTxPartWrapper(
+data class OutgoingClosingTxPartWrapper @OptIn(ExperimentalSerializationApi::class) constructor(
     @Serializable(with = UUIDSerializer::class) val id: UUID,
     @ByteString val txId: ByteArray,
     val sat: Long,

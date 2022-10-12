@@ -5,7 +5,6 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.TcpSocket
-import fr.acinq.lightning.utils.setLightningLoggerFactory
 import fr.acinq.phoenix.controllers.*
 import fr.acinq.phoenix.controllers.config.*
 import fr.acinq.phoenix.controllers.init.AppInitController
@@ -22,8 +21,8 @@ import fr.acinq.phoenix.db.createAppDbDriver
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.*
 import io.ktor.client.*
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.MainScope
 import kotlinx.serialization.json.Json
 import org.kodein.log.LoggerFactory
@@ -49,18 +48,16 @@ class PhoenixBusiness(
     internal val tcpSocketBuilder = TcpSocket.Builder()
     internal val httpClient by lazy {
         HttpClient {
-            install(JsonFeature) {
-                serializer = KotlinxSerializer(Json {
-                    ignoreUnknownKeys = true
-                })
+            install(ContentNegotiation) {
+                json(json = Json { ignoreUnknownKeys = true })
             }
         }
     }
 
     val chain = Chain.Testnet
 
-    internal val electrumClient by lazy { ElectrumClient(tcpSocketBuilder, MainScope()) }
-    internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope()) }
+    internal val electrumClient by lazy { ElectrumClient(tcpSocketBuilder, MainScope(), loggerFactory) }
+    internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope(), loggerFactory) }
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
 
@@ -76,10 +73,6 @@ class PhoenixBusiness(
     val connectionsManager by lazy { ConnectionsManager(this) }
     val lnUrlManager by lazy { LNUrlManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
-
-    init {
-        setLightningLoggerFactory(loggerFactory)
-    }
 
     fun start(startupParams: StartupParams) {
         logger.info { "starting with params=$startupParams" }

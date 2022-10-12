@@ -3,7 +3,7 @@ package fr.acinq.phoenix.controllers.config
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.channel.*
-import fr.acinq.lightning.io.WrappedChannelEvent
+import fr.acinq.lightning.io.WrappedChannelCommand
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.managers.WalletManager
@@ -137,8 +137,8 @@ class AppCloseChannelsConfigurationController(
                 } else {
                     CMD_FORCECLOSE
                 }
-                val channelEvent = ChannelEvent.ExecuteCommand(command)
-                val peerEvent = WrappedChannelEvent(channelId, channelEvent)
+                val channelEvent = ChannelCommand.ExecuteCommand(command)
+                val peerEvent = WrappedChannelCommand(channelId, channelEvent)
                 peer.send(peerEvent)
             }
         }

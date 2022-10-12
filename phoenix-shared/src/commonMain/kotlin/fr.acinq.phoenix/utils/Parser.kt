@@ -114,8 +114,6 @@ object Parser {
                 Base58.Prefix.ScriptAddress -> Chain.Mainnet to BitcoinAddressType.Base58ScriptHash
                 Base58.Prefix.PubkeyAddressTestnet -> Chain.Testnet to BitcoinAddressType.Base58PubKeyHash
                 Base58.Prefix.ScriptAddressTestnet -> Chain.Testnet to BitcoinAddressType.Base58ScriptHash
-                Base58.Prefix.PubkeyAddressSegnet -> Chain.Regtest to BitcoinAddressType.Base58PubKeyHash
-                Base58.Prefix.ScriptAddressSegnet -> Chain.Regtest to BitcoinAddressType.Base58ScriptHash
                 else -> return Either.Left(BitcoinAddressError.UnknownBase58Prefix(prefix))
             }
             if (prefixChain != chain) {

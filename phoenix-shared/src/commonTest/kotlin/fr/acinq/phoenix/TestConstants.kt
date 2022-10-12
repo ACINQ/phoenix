@@ -18,6 +18,7 @@ package fr.acinq.phoenix
 
 import fr.acinq.bitcoin.Block
 import fr.acinq.bitcoin.MnemonicCode
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.*
 import fr.acinq.lightning.blockchain.fee.FeerateTolerance
 import fr.acinq.lightning.blockchain.fee.OnChainFeeConf
@@ -28,8 +29,8 @@ import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.secp256k1.Hex
 import kotlinx.coroutines.*
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
+import kotlin.time.Duration.Companion.seconds
+import org.kodein.log.LoggerFactory
 
 object TestConstants {
     object Bob {
@@ -38,6 +39,7 @@ object TestConstants {
         val seed = MnemonicCode.toSeed(mnemonics, "").toByteVector32()
         val keyManager = LocalKeyManager(seed, Block.RegtestGenesisBlock.hash)
         val nodeParams = NodeParams(
+            loggerFactory = LoggerFactory.default,
             keyManager = keyManager,
             alias = "bob",
             features = Features(
@@ -52,14 +54,12 @@ object TestConstants {
                 Feature.ShutdownAnySegwit to FeatureSupport.Optional,
                 Feature.ChannelType to FeatureSupport.Mandatory,
                 Feature.PaymentMetadata to FeatureSupport.Optional,
-                Feature.TrampolinePayment to FeatureSupport.Optional,
                 Feature.ExperimentalTrampolinePayment to FeatureSupport.Optional,
                 Feature.ZeroReserveChannels to FeatureSupport.Optional,
-                Feature.ZeroConfChannels to FeatureSupport.Optional,
                 Feature.WakeUpNotificationClient to FeatureSupport.Optional,
                 Feature.PayToOpenClient to FeatureSupport.Optional,
-                Feature.TrustedSwapInClient to FeatureSupport.Optional,
                 Feature.ChannelBackupClient to FeatureSupport.Optional,
+                Feature.DualFunding to FeatureSupport.Mandatory,
             ),
             dustLimit = 1_000.sat,
             maxRemoteDustLimit = 1_500.sat,
@@ -79,8 +79,6 @@ object TestConstants {
             maxToLocalDelayBlocks = CltvExpiryDelta(1024),
             feeBase = 10.msat,
             feeProportionalMillionth = 10,
-            reserveToFundingRatio = 0.01, // note: not used (overridden below)
-            maxReserveToFundingRatio = 0.05,
             revocationTimeoutSeconds = 20,
             authTimeoutSeconds = 10,
             initTimeoutSeconds = 10,
@@ -97,7 +95,8 @@ object TestConstants {
             minFundingSatoshis = 1_000.sat,
             maxFundingSatoshis = 25_000_000.sat,
             maxPaymentAttempts = 5,
-            enableTrampolinePayment = true
+            enableTrampolinePayment = true,
+            zeroConfPeers = setOf(PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134"))
         )
     }
 }
@@ -245,7 +244,6 @@ val rawWalletParams = """
 }
 """
 
-@OptIn(ExperimentalTime::class)
 fun runTest(timeout: Duration = 30.seconds, test: suspend CoroutineScope.() -> Unit) {
     runBlocking {
         withTimeout(timeout) {

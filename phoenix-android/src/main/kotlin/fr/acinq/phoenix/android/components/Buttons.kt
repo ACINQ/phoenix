@@ -42,11 +42,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
+import fr.acinq.phoenix.utils.BlockchainExplorer
 
 
 /** A rounded button with a solid surface background and a muted outline. */
@@ -266,18 +269,30 @@ fun Clickable(
 }
 
 @Composable
-fun WebLink(text: String, url: String) {
+fun WebLink(
+    text: String,
+    url: String,
+    modifier: Modifier = Modifier,
+    maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.Clip,
+) {
     val context = LocalContext.current
     Text(
-        modifier = Modifier.clickable(
+        modifier = modifier.clickable(
             role = Role.Button,
-            onClickLabel = stringResource(id = R.string.accessibility_link)
-        ) {
-            openLink(context, url)
-        },
+            onClickLabel = stringResource(id = R.string.accessibility_link),
+            onClick = { openLink(context, url) }
+        ),
         text = text,
+        overflow = overflow,
+        maxLines = maxLines,
         style = MaterialTheme.typography.body1.copy(textDecoration = TextDecoration.Underline, color = MaterialTheme.colors.primary)
     )
+}
+
+@Composable
+fun txUrl(txId: String): String {
+    return business.blockchainExplorer.txUrl(txId = txId, website = BlockchainExplorer.Website.MempoolSpace)
 }
 
 fun openLink(context: Context, link: String) {

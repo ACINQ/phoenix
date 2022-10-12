@@ -24,7 +24,6 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.db.cloud.b64Decode
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.utils.io.charsets.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
@@ -252,7 +251,7 @@ sealed class LNUrl {
             val url = response.request.url
             return try {
                 if (response.status.isSuccess()) {
-                    val json: JsonObject = Json.decodeFromString(response.readText(Charsets.UTF_8))
+                    val json: JsonObject = Json.decodeFromString(response.bodyAsText())
                     log.debug { "lnurl service=${url.host} returned response=$json" }
                     if (json["status"]?.jsonPrimitive?.content?.trim()?.equals("error", true) == true) {
                         log.error { "lnurl service=${url.host} returned error=$json" }
@@ -312,7 +311,6 @@ sealed class LNUrl {
         }
 
         /** Decode a serialized [LNUrl.Pay.Metadata] object. */
-        @OptIn(ExperimentalSerializationApi::class)
         internal fun decodeLNUrlPayMetadata(raw: String): Pay.Metadata =
             Helper.decodeLNUrlPayMetadata(raw = raw, log = log)
 
@@ -407,7 +405,6 @@ sealed class LNUrl {
      * This Helper is a temporary workaround until we fix the problem properly.
      */
     object Helper {
-        @OptIn(ExperimentalSerializationApi::class)
         internal fun decodeLNUrlPayMetadata(
             raw: String,
             log: Logger? = null

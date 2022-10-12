@@ -13,10 +13,9 @@ import kotlinx.coroutines.flow.*
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.seconds
 
 
-@OptIn(ExperimentalTime::class)
 class AppConnectionsDaemon(
     loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,
@@ -332,17 +331,17 @@ class AppConnectionsDaemon(
         statusStateFlow: StateFlow<Connection>,
         connect: () -> Unit
     ) = launch {
-        var pause = Duration.seconds(0)
+        var pause = Duration.ZERO
         statusStateFlow.collect {
             if (it is Connection.CLOSED) {
                 logger.debug { "next $name connection attempt in $pause" }
                 delay(pause)
-                val minPause = Duration.seconds(0.25)
-                val maxPause = Duration.seconds(60)
+                val minPause = 0.25.seconds
+                val maxPause = 60.seconds
                 pause = (pause.coerceAtLeast(minPause) * 2).coerceAtMost(maxPause)
                 connect()
             } else if (it == Connection.ESTABLISHED) {
-                pause = Duration.seconds(0.5)
+                pause = 0.5.seconds
             }
         }
     }

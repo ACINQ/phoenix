@@ -195,7 +195,7 @@ class LNUrlAuthViewModel(val url: HttpUrl) : ViewModel() {
 
   class Factory(private val url: HttpUrl) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
       return LNUrlAuthViewModel(url) as T
     }
   }

@@ -129,6 +129,9 @@ struct SwapInView: View {
 		}
 		.navigationTitle(NSLocalizedString("Swap In", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
+		.onAppear {
+			onAppear()
+		}
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
@@ -384,6 +387,17 @@ struct SwapInView: View {
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
+	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		// If the model updates before the view finishes drawing,
+		// we might need to manually invoke onModelChange.
+		//
+		if mvi.model is Receive.Model_SwapIn_Generated {
+			onModelChange(model: mvi.model)
+		}
+	}
 	
 	func onModelChange(model: Receive.Model) -> Void {
 		log.trace("onModelChange()")

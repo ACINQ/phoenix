@@ -117,13 +117,21 @@ fun DialogBody(
 
 /** The default screen is a full-height, full-width column with the material theme's background color. It is scrollable by default. */
 @Composable
-fun DefaultScreenLayout(isScrollable: Boolean = true, backgroundColor: Color = MaterialTheme.colors.background, content: @Composable ColumnScope.() -> Unit) {
+fun DefaultScreenLayout(
+    isScrollable: Boolean = true,
+    backgroundColor: Color = MaterialTheme.colors.background,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
             .background(backgroundColor)
-            .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier)
+            .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier),
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
     ) {
         content()
     }

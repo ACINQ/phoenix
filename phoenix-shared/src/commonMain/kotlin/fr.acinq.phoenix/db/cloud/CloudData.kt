@@ -7,7 +7,6 @@ import kotlinx.serialization.*
 import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.json.Json
-import org.kodein.memory.util.freeze
 
 // Architecture & Notes:
 //
@@ -114,7 +113,7 @@ fun CloudData.Companion.cborDeserialize(blob: ByteArray): CloudData? {
     var result: CloudData? = null
     try {
         result = Cbor.decodeFromByteArray(blob)
-    } catch (e: Throwable) {
+    } catch (_: Throwable) {
     }
 
     return result

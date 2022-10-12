@@ -106,7 +106,7 @@
     <string name="paymentline_keysend_incoming">Spontaneous payment</string>
     <string name="paymentline_closing_desc_no_address">Channel closing</string>
     <string name="paymentline_closing_desc">Channel closing to %1$s</string>
-    <string name="paymentline_swap_in_desc">Incoming swap</string>
+    <string name="paymentline_swap_in_desc">On-chain deposit</string>
 
     <!-- //////////////// receive //////////////// -->
 
@@ -446,6 +446,8 @@
     <string name="paymentdetails_keysend">Keysend (spontaneous payment)</string>
     <string name="paymentdetails_swapin_address_label">Deposit address</string>
     <string name="paymentdetails_swapout_address_label">Bitcoin address</string>
+    <string name="paymentdetails_dualswapin_tx_label">Transactions</string>
+    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
     <string name="paymentdetails_closing_channel_label">Id of the channel</string>
     <string name="paymentdetails_closing_address_label">Closing address</string>

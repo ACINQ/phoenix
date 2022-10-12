@@ -8,12 +8,10 @@ import io.ktor.util.*
 //
 // Lol. If we don't use Cbor, then we should at least use Base64.
 
-@OptIn(InternalAPI::class)
 fun ByteArray.b64Encode(): String {
     return this.encodeBase64() // io.ktor.util
 }
 
-@OptIn(InternalAPI::class)
 fun String.b64Decode(): ByteArray {
     return this.decodeBase64Bytes() // io.ktor.util
 }
