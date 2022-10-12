@@ -42,8 +42,8 @@ class AppChannelsConfigurationController(
                         id = id.toHex(),
                         isOk = state is Normal,
                         stateName = state::class.simpleName ?: "Unknown",
-                        localBalance = state.localCommitmentSpec?.toLocal?.truncateToSatoshi(),
-                        remoteBalance = state.localCommitmentSpec?.toRemote?.truncateToSatoshi(),
+                        localBalance = state.localCommitmentSpec?.toLocal,
+                        remoteBalance = state.localCommitmentSpec?.toRemote,
                         json = json.encodeToString(
                             fr.acinq.lightning.serialization.v1.ChannelState.serializer(),
                             fr.acinq.lightning.serialization.v1.ChannelState.import(state)

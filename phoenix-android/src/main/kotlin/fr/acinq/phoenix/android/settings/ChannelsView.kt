@@ -36,11 +36,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.navController
@@ -86,8 +85,8 @@ fun ChannelsView() {
 
 @Composable
 private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: () -> Unit) {
-    val balance = channel.localBalance ?: 0.sat
-    val capacity = balance + (channel.remoteBalance ?: 0.sat)
+    val balance = channel.localBalance ?: 0.msat
+    val capacity = balance + (channel.remoteBalance ?: 0.msat)
     Row(modifier = Modifier
         .clickable { onClick() }
         .padding(horizontal = 16.dp, vertical = 16.dp),
@@ -104,11 +103,11 @@ private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: (
             modifier = Modifier.weight(1.0f)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        AmountView(amount = balance.toMilliSatoshi(), showUnit = false)
+        AmountView(amount = balance, showUnit = false)
         Spacer(modifier = Modifier.width(2.dp))
         Text(text = "/")
         Spacer(modifier = Modifier.width(2.dp))
-        AmountView(amount = capacity.toMilliSatoshi(), unitTextStyle = MaterialTheme.typography.caption)
+        AmountView(amount = capacity, unitTextStyle = MaterialTheme.typography.caption)
     }
 }
 
