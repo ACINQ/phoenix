@@ -103,7 +103,7 @@ struct CloseWalletView_Delete: MVISubView, ViewName {
 	@ViewBuilder
 	func section_transactionHistory(_ idx: Int) -> some View {
 		
-		Section(header: Text("#\(idx)")) {
+		Section {
 			
 			Text(styled: NSLocalizedString(
 				"""
@@ -111,13 +111,17 @@ struct CloseWalletView_Delete: MVISubView, ViewName {
 				""",
 				comment: "CloseWalletView_Review"
 			))
-		}
+			
+		} header: {
+			Text("Step #\(idx)")
+			
+		} // </Section>
 	}
 	
 	@ViewBuilder
 	func section_seedBackup(_ idx: Int) -> some View {
 		
-		Section(header: Text("#\(idx)")) {
+		Section {
 			
 			Text(styled: NSLocalizedString(
 				"""
@@ -125,7 +129,11 @@ struct CloseWalletView_Delete: MVISubView, ViewName {
 				""",
 				comment: "CloseWalletView_Review"
 			))
-		}
+			
+		} header: {
+			Text("Step #\(idx)")
+			
+		} // </Section>
 	}
 	
 	@ViewBuilder

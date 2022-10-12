@@ -118,7 +118,7 @@ struct CloseWalletView_Drain_Action: MVISubView {
 				Label {
 					Text(
 						"""
-						If you are planning on deleting your wallet data, \
+						If you're planning on deleting your wallet data, \
 						we recommend waiting until after the closing transactions \
 						have been confirmed on the blockchain.
 						"""
