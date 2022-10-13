@@ -61,13 +61,22 @@ class BusinessManager {
 	
 	private var longLivedTask: UIBackgroundTaskIdentifier = .invalid
 	
+	private var paymentsPageFetchers = [String: PaymentsPageFetcher]()
 	private var cancellables = Set<AnyCancellable>()
+	
+	// --------------------------------------------------
+	// MARK: Init
+	// --------------------------------------------------
 	
 	private init() { // must use shared instance
 		
 		business = PhoenixBusiness(ctx: PlatformContext())
 		BusinessManager._isTestnet = business.chain.isTestnet()
 	}
+	
+	// --------------------------------------------------
+	// MARK: Lifecycle
+	// --------------------------------------------------
 	
 	public func start() {
 		
@@ -96,6 +105,8 @@ class BusinessManager {
 		
 		business = PhoenixBusiness(ctx: PlatformContext())
 		walletInfo = nil
+		paymentsPageFetchers.removeAll()
+		
 		start()
 		registerForNotifications()
 	}
@@ -375,6 +386,22 @@ class BusinessManager {
 				target: AppConnectionsDaemon.ControlTarget.companion.All
 			)
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Utils
+	// --------------------------------------------------
+	
+	func getPaymentsPageFetcher(name: String) -> PaymentsPageFetcher {
+		
+		if let cached = paymentsPageFetchers[name] {
+			return cached
+		}
+		
+		let ppf = business.paymentsManager.makePageFetcher()
+		paymentsPageFetchers[name] = ppf
+		
+		return ppf
 	}
 }
 
