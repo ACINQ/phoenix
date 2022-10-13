@@ -197,7 +197,7 @@ sealed class LNUrl {
         /** Convert human readable LNUrls (using a custom lnurl scheme like lnurlc, lnurlp, etc...) into a regular http url. */
         fun parseNonBech32Url(source: String): Url {
             return URLBuilder(source).apply {
-                encodedPath.drop(1).split("/", ignoreCase = true, limit = 2).let {
+                encodedPath.split("/", ignoreCase = true, limit = 2).let {
                     this.host = it.first()
                     this.encodedPath = "/${it.drop(1).joinToString()}"
                 }
