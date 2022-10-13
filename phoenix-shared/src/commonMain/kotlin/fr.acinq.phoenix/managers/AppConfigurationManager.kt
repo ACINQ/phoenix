@@ -1,8 +1,8 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.HeaderSubscriptionResponse
-import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
@@ -29,7 +29,7 @@ import kotlin.time.Duration.Companion.seconds
 class AppConfigurationManager(
     private val appDb: SqliteAppDb,
     private val httpClient: HttpClient,
-    private val electrumClient: ElectrumClient,
+    private val electrumWatcher: ElectrumWatcher,
     private val chain: Chain,
     loggerFactory: LoggerFactory
 ) : CoroutineScope by MainScope() {
@@ -39,7 +39,7 @@ class AppConfigurationManager(
         chain = business.chain,
         appDb = business.appDb,
         httpClient = business.httpClient,
-        electrumClient = business.electrumClient
+        electrumWatcher = business.electrumWatcher,
     )
 
     private val logger = newLogger(loggerFactory)
@@ -213,7 +213,7 @@ class AppConfigurationManager(
     fun electrumMessages(): StateFlow<HeaderSubscriptionResponse?> = _electrumMessages
 
     private fun watchElectrumMessages() = launch {
-        electrumClient.notifications.filterIsInstance<HeaderSubscriptionResponse>().collect {
+        electrumWatcher.notificationsFlow.filterIsInstance<HeaderSubscriptionResponse>().collect {
             _electrumMessages.value = it
         }
     }
