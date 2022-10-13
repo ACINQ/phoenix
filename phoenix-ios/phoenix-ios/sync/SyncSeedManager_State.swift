@@ -12,11 +12,9 @@ import Foundation
  *   - exponentialBackoff
  * - synced
  * - disabled
+ * - shutdown
  *
- * The state is modified via the `updateState` functions:
- *
- * Note that `(defer)` in the state diagram below signifies a transition to the "simplified state flow",
- * as implemented by the `updateState` function.
+ * State machine transitions:
  *
  * (init) --*--> [synced]
  *          |--> [disabled]
@@ -24,15 +22,26 @@ import Foundation
  *
  * [uploading] --*--> (defer)
  *               |--> [waiting_exponentialBackoff]
+ *               |--> [shutdown]
  *
  * [deleting] --*--> (defer)
  *              |--> [waiting_exponentialBackoff]
+ *              |--> [shutdown]
  *
- * [waiting_any] --> (defer)
+ * [waiting_any] --*--> (defer)
+ *                 |--> [shutdown]
  *
- * [synced] -> (defer)
+ * [synced] --*--> (defer)
+ *            |--> [shutdown]
  *
- * [disabled] -> (defer)
+ * [disabled] --*--> (defer)
+ *              |--> [shutdown]
+ *
+ * [shutdown] -> X // stopped
+ *
+ *
+ * Note: The term `(defer)` in the state diagram above signifies a transition to the "simplified state flow",
+ * as implemented by the actor's `simplifiedStateFlow` function.
  */
 
 enum SyncSeedManager_State: Equatable, CustomStringConvertible {
@@ -42,6 +51,7 @@ enum SyncSeedManager_State: Equatable, CustomStringConvertible {
 	case waiting(details: SyncSeedManager_State_Waiting)
 	case synced
 	case disabled
+	case shutdown
 	
 	var description: String {
 		switch self {
@@ -62,6 +72,8 @@ enum SyncSeedManager_State: Equatable, CustomStringConvertible {
 				return "synced"
 			case .disabled:
 				return "disabled"
+			case .shutdown:
+				return "shutdown"
 		}
 	}
 	

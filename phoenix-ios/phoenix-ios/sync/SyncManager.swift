@@ -98,8 +98,11 @@ class SyncManager {
 		}.store(in: &cancellables)
 	}
 	
+	/// May also be called by `SyncTxManager` or `SyncSeedManager` if they encounter
+	/// errors related to iCloud credential problems.
+	///
 	func checkForCloudCredentials() {
-		log.trace("checkForCloudCredentials")
+		log.trace("checkForCloudCredentials()")
 		
 		CKContainer.default().accountStatus {[weak self](accountStatus: CKAccountStatus, error: Error?) in
 			
@@ -141,6 +144,16 @@ class SyncManager {
 			self.syncSeedManager.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials)
 			self.syncTxManager.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials)
 		}
+	}
+	
+	func shutdown() {
+		log.trace("shutdown()")
+		
+		networkMonitor.cancel()
+		cancellables.removeAll()
+		
+		syncSeedManager.shutdown()
+		syncTxManager.shutdown()
 	}
 }
 

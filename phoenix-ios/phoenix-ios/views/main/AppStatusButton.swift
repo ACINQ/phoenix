@@ -192,6 +192,7 @@ struct AppStatusButton: View {
 				}
 			case .synced: break
 			case .disabled: break
+			case .shutdown: break
 		}
 		
 		// If the user isn't signed into iCloud, is this an error ?

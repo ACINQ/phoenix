@@ -99,12 +99,15 @@ class BusinessManager {
 		
 		cancellables.removeAll()
 		business.stop()
+		syncManager?.shutdown()
 	}
 	
 	public func reset() {
 		
 		business = PhoenixBusiness(ctx: PlatformContext())
+		syncManager = nil
 		walletInfo = nil
+		peerConnectionState = nil
 		paymentsPageFetchers.removeAll()
 		
 		start()

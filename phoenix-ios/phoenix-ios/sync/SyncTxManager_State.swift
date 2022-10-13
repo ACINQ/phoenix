@@ -18,15 +18,15 @@ import CloudKit
  *   - randomizedUploadDelay
  * - synced
  * - disabled
+ * - shutdown
  *
- * The state is modified via the `updateState` functions:
+ * State machine transitions:
  *
- * Note that `(defer)` in the state diagram below signifies a transition to the "simplified state flow",
- * as implemented by the `updateState` function.
+ * [initializing] --*--> (defer)
+ *                  |--> [shutdown]
  *
- * [initializing] --> (defer)
- *
- * [waiting_any] --> (defer)
+ * [waiting_any] --*--> (defer)
+ *                 |--> [shutdown]
  *
  * (defer) --*--> [waiting_forCloudCredentials]
  *           |--> [waiting_forInternet]
@@ -38,21 +38,32 @@ import CloudKit
  *
  * [updatingCloud_any] --*--> (defer) // success or known error
  *                       |--> [waiting_exponentialBackoff]
+ *                       |--> [shutdown]
  *
  * [downloading] --*--> (defer) // success or known error
  *                 |--> [waiting_exponentialBackoff]
+ *                 |--> [shutdown]
  *
  * [uploading] --*--> [synced] // success
  *               |--> [waiting_exponentialBackoff]
  *               |--> (defer) // known error
+ *               |--> [shutdown]
  *
  * [synced] --*--> [waiting_forInternet]
  *            |--> [waiting_forCloudCredentials]
  *            |--> [waiting_randomizedUploadDelay]
  *            |--> [disabled]
  *            |--> (defer)
+ *            |--> [shutdown]
  *
- * [disabled] --> (defer)
+ * [disabled] --*--> (defer)
+ *              |--> [shutdown]
+ *
+ * [shutdown] --> X // stopped
+ *
+ *
+ * Note: The term `(defer)` in the state diagram above signifies a transition to the "simplified state flow",
+ * as implemented by the actor's `simplifiedStateFlow` function.
  */
 
 enum SyncTxManager_State: Equatable, CustomStringConvertible {
@@ -64,6 +75,7 @@ enum SyncTxManager_State: Equatable, CustomStringConvertible {
 	case waiting(details: SyncTxManager_State_Waiting)
 	case synced
 	case disabled
+	case shutdown
 	
 	var description: String {
 		switch self {
@@ -95,6 +107,8 @@ enum SyncTxManager_State: Equatable, CustomStringConvertible {
 				return "synced"
 			case .disabled:
 				return "disabled"
+			case .shutdown:
+				return "shutdown"
 		}
 	}
 	

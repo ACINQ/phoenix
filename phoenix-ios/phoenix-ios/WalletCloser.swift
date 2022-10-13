@@ -85,6 +85,19 @@ class WalletCloser {
 	private func connectionsChanged(_ connections: Connections) {
 		log.trace("connectionsChanged()")
 		
+		switch connections.peer {
+			case is Lightning_kmpConnection.ESTABLISHED  : log.debug("connections.peer = ESTABLISHED")
+			case is Lightning_kmpConnection.ESTABLISHING : log.debug("connections.peer = ESTABLISHING")
+			case is Lightning_kmpConnection.CLOSED       : log.debug("connections.peer = CLOSED")
+			default                                      : log.debug("connections.peer = UNKNOWN")
+		}
+		switch connections.electrum {
+			case is Lightning_kmpConnection.ESTABLISHED  : log.debug("connections.electrum = ESTABLISHED")
+			case is Lightning_kmpConnection.ESTABLISHING : log.debug("connections.electrum = ESTABLISHING")
+			case is Lightning_kmpConnection.CLOSED       : log.debug("connections.electrum = CLOSED")
+			default                                      : log.debug("connections.electrum = UNKNOWN")
+		}
+		
 		if connections.peer is Lightning_kmpConnection.CLOSED &&
 			connections.electrum is Lightning_kmpConnection.CLOSED
 		{

@@ -56,6 +56,10 @@ actor SyncSeedManager_Actor {
 		state = initialState
 	}
 	
+	// --------------------------------------------------
+	// MARK: Transition Logic
+	// --------------------------------------------------
+	
 	func didChangeIsEnabled(_ flag: Bool) -> SyncSeedManager_State? {
 		log.trace("didChangeIsEnabled = \(flag ? "true" : "false")")
 
@@ -260,6 +264,18 @@ actor SyncSeedManager_Actor {
 				return nil
 		}
 	}
+	
+	func shutdown() -> SyncSeedManager_State? {
+		
+		switch state {
+			case .shutdown: return nil       // already shutdown
+			default       : return .shutdown
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Internal
+	// --------------------------------------------------
 	
 	private func simplifiedStateFlow() -> SyncSeedManager_State? {
 		

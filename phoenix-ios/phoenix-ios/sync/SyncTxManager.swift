@@ -230,9 +230,35 @@ class SyncTxManager {
 	}
 	
 	// ----------------------------------------
-	// MARK: State Machine
+	// MARK: External Control
 	// ----------------------------------------
 	
+	/// Called from SyncManager; part of SyncManagerProtocol
+	///
+	func networkStatusChanged(hasInternet: Bool) {
+		log.trace("networkStatusChanged(hasInternet: \(hasInternet))")
+		
+		Task {
+			if let newState = await self.actor.networkStatusChanged(hasInternet: hasInternet) {
+				self.handleNewState(newState)
+			}
+		}
+	}
+	
+	/// Called from SyncManager; part of SyncManagerProtocol
+	///
+	func cloudCredentialsChanged(hasCloudCredentials: Bool) {
+		log.trace("cloudCredentialsChanged(hasCloudCredentials: \(hasCloudCredentials))")
+		
+		Task {
+			if let newState = await self.actor.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials) {
+				self.handleNewState(newState)
+			}
+		}
+	}
+	
+	/// Called from `SyncTxManager_PendingSettings`
+	///
 	func dequeuePendingSettings(_ pending: SyncTxManager_PendingSettings, approved: Bool) {
 		log.trace("dequeuePendingSettings(_, approved: \(approved ? "true" : "false"))")
 		
@@ -260,6 +286,8 @@ class SyncTxManager {
 		}
 	}
 	
+	/// Called from `SyncTxManager_State_Waiting`
+	///
 	func finishWaiting(_ waiting: SyncTxManager_State_Waiting) {
 		log.trace("finishWaiting()")
 		
@@ -269,6 +297,25 @@ class SyncTxManager {
 			}
 		}
 	}
+	
+	/// Used when closing the corresponding wallet.
+	/// We transition to a terminal state.
+	///
+	func shutdown() {
+		log.trace("shutdown()")
+		
+		Task {
+			if let newState = await self.actor.shutdown() {
+				self.handleNewState(newState)
+			}
+		}
+		
+		cancellables.removeAll()
+	}
+	
+	// ----------------------------------------
+	// MARK: Flow
+	// ----------------------------------------
 	
 	private func handleNewState(_ newState: SyncTxManager_State) {
 		
@@ -291,10 +338,6 @@ class SyncTxManager {
 		
 		publishNewState(newState)
 	}
-	
-	// ----------------------------------------
-	// MARK: Flow
-	// ----------------------------------------
 	
 	/// We have to wait until the databases are setup and ready.
 	/// This may take a moment if a migration is triggered.
@@ -339,30 +382,6 @@ class SyncTxManager {
 				}
 				
 			}.store(in: &cancellables)
-		}
-	}
-	
-	/// Called from SyncManager; part of SyncManagerProtocol
-	///
-	func networkStatusChanged(hasInternet: Bool) {
-		log.trace("networkStatusChanged(hasInternet: \(hasInternet))")
-		
-		Task {
-			if let newState = await self.actor.networkStatusChanged(hasInternet: hasInternet) {
-				self.handleNewState(newState)
-			}
-		}
-	}
-	
-	/// Called from SyncManager; part of SyncManagerProtocol
-	///
-	func cloudCredentialsChanged(hasCloudCredentials: Bool) {
-		log.trace("cloudCredentialsChanged(hasCloudCredentials: \(hasCloudCredentials))")
-		
-		Task {
-			if let newState = await self.actor.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials) {
-				self.handleNewState(newState)
-			}
 		}
 	}
 	
