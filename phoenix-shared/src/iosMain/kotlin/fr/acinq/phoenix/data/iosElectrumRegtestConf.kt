@@ -1,3 +1,6 @@
 package fr.acinq.phoenix.data
 
-actual fun platformElectrumRegtestConf(): ElectrumAddress = ElectrumAddress(host = "127.0.0.1", tlsPort = 51002)
+import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.utils.ServerAddress
+
+actual fun platformElectrumRegtestConf(): ServerAddress = ServerAddress(host = "127.0.0.1", port = 51002, TcpSocket.TLS.DISABLED)
