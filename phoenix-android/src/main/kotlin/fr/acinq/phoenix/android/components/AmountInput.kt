@@ -439,7 +439,6 @@ private fun UnitDropdown(
                 expanded = false
                 onDismiss()
             },
-//            modifier = Modifier.fillMaxWidth()
         ) {
             units.forEachIndexed { index, s ->
                 DropdownMenuItem(onClick = {

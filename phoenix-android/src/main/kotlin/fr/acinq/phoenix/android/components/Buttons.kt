@@ -212,7 +212,7 @@ fun Button(
 ) {
     val colors = ButtonDefaults.buttonColors(
         backgroundColor = backgroundColor,
-        disabledBackgroundColor = if (enabledEffect) backgroundColor.copy(alpha = 0.4f) else backgroundColor,
+        disabledBackgroundColor = if (enabledEffect && backgroundColor != Color.Unspecified) backgroundColor.copy(alpha = 0.4f) else backgroundColor,
     )
     val contentColor by colors.contentColor(true)
     Surface(
@@ -247,7 +247,13 @@ fun Button(
                         )
                         .indication(interactionSource, LocalIndication.current)
                         .padding(padding)
-                        .alpha(if (!enabled && enabledEffect) 0.85f else 1f),
+                        .alpha(
+                            if (!enabled && enabledEffect) {
+                                if (backgroundColor == Color.Unspecified) 0.3f else 0.8f
+                            } else {
+                                1f
+                            }
+                        ),
                     horizontalArrangement = horizontalArrangement,
                     verticalAlignment = Alignment.CenterVertically,
                     content = {
