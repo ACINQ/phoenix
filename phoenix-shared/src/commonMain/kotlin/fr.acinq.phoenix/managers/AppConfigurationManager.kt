@@ -199,15 +199,9 @@ class AppConfigurationManager(
     }
 
     fun randomElectrumServer() = when (chain) {
-        Chain.Mainnet -> electrumMainnetConfigurations.random()
-        Chain.Testnet -> electrumTestnetConfigurations.random()
+        Chain.Mainnet -> mainnetElectrumServers.random()
+        Chain.Testnet -> testnetElectrumServers.random()
         Chain.Regtest -> platformElectrumRegtestConf()
-    }.let {
-        if (it.pinnedPublicKey != null) {
-            ServerAddress(it.host, it.tlsPort, TcpSocket.TLS.PINNED_PUBLIC_KEY(it.pinnedPublicKey))
-        }  else {
-            ServerAddress(it.host, it.tlsPort, TcpSocket.TLS.TRUSTED_CERTIFICATES)
-        }
     }
 
     /** The flow containing the electrum header responses messages. */

@@ -509,13 +509,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DCB0DB80255AE42F005B29C8 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		DCB511C4281AED58001BC525 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1010,16 +1003,6 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		DCB0DB7E255AE42F005B29C8 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
 		7555FF7A242A565900829871 /* phoenix-ios */ = {
 			isa = PBXNativeTarget;
@@ -1089,10 +1072,6 @@
 			buildConfigurationList = DCB0DB8C255AE42F005B29C8 /* Build configuration list for PBXNativeTarget "phoenix-ios-framework" */;
 			buildPhases = (
 				DCB0DB95255AE43E005B29C8 /* ShellScript */,
-				DCB0DB7E255AE42F005B29C8 /* Headers */,
-				DCB0DB7F255AE42F005B29C8 /* Sources */,
-				DCB0DB80255AE42F005B29C8 /* Frameworks */,
-				DCB0DB81255AE42F005B29C8 /* Resources */,
 				DCB0DB9F255AE6F1005B29C8 /* ShellScript */,
 			);
 			buildRules = (
@@ -1217,13 +1196,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DCB0DB81255AE42F005B29C8 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		DCB511C5281AED58001BC525 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1266,7 +1238,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "SrcFrmk=\"$SRCROOT/../phoenix-shared/build/xcode-frameworks/PhoenixShared.framework\"\necho \"SrcFrmk = $SrcFrmk\"\n\nDstFrmk=\"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\"\necho \"DstFrmk = $DstFrmk\"\n\necho \"cp -R $SrcFrmk/ $DstFrmk/\"\ncp -R \"$SrcFrmk/\" \"$DstFrmk/\"\n";
+			shellScript = "SrcFrmk=\"$SRCROOT/../phoenix-shared/build/xcode-frameworks/PhoenixShared.framework\"\necho \"SrcFrmk = $SrcFrmk\"\n\nDstFrmk=\"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\"\necho \"DstFrmk = $DstFrmk\"\n\necho \"cp -R $SrcFrmk/ $DstFrmk/\"\ncp -R \"$SrcFrmk/\" \"$DstFrmk/\"\n\necho \"cp -R $SrcFrmk.dSYM/ $DstFrmk.dSYM/\"\ncp -R \"$SrcFrmk.dSYM/\" \"$DstFrmk.dSYM/\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1453,13 +1425,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7555FFA1242A565B00829871 /* phoenix-iosUITests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DCB0DB7F255AE42F005B29C8 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1705,7 +1670,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Green";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-ios/Phoenix.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 41;
+				CURRENT_PROJECT_VERSION = 42;
 				DEVELOPMENT_ASSET_PATHS = "\"phoenix-ios/Preview Content\"";
 				DEVELOPMENT_TEAM = XD77LN4376;
 				ENABLE_PREVIEWS = YES;
@@ -1734,7 +1699,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Green";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-ios/Phoenix.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 41;
+				CURRENT_PROJECT_VERSION = 42;
 				DEVELOPMENT_ASSET_PATHS = "\"phoenix-ios/Preview Content\"";
 				DEVELOPMENT_TEAM = XD77LN4376;
 				ENABLE_PREVIEWS = YES;
@@ -1900,7 +1865,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-notifySrvExt/phoenix-notifySrvExt.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 41;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "phoenix-notifySrvExt/Info.plist";
@@ -1928,7 +1893,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-notifySrvExt/phoenix-notifySrvExt.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 41;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "phoenix-notifySrvExt/Info.plist";

@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 
 plugins {
     kotlin("multiplatform")
@@ -55,6 +56,7 @@ kotlin {
         binaries {
             framework {
                 baseName = "PhoenixShared"
+                embedBitcode = Framework.BitcodeEmbeddingMode.DISABLE
             }
             compilations.all {
                 kotlinOptions.freeCompilerArgs +=
