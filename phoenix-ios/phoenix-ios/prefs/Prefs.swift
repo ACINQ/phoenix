@@ -251,5 +251,10 @@ class Prefs {
 		
 		self.backupTransactions.closeWallet(encryptedNodeId: encryptedNodeId)
 		self.backupSeed.closeWallet(encryptedNodeId: encryptedNodeId)
+		
+		// Reset any publishers with stored state
+		isTorEnabledPublisher.send(self.isTorEnabled)
+		maxFeesPublisher.send(self.maxFees)
+		recentPaymentSecondsPublisher.send(self.recentPaymentSeconds)
 	}
 }

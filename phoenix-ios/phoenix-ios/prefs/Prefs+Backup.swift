@@ -122,6 +122,9 @@ class Prefs_BackupTransactions {
 		defaults.removeObject(forKey: Key.backupTransactions_enabled.rawValue)
 		defaults.removeObject(forKey: Key.backupTransactions_useCellularData.rawValue)
 		defaults.removeObject(forKey: Key.backupTransactions_useUploadDelay.rawValue)
+		
+		// Reset any publishers with stored state
+		isEnabledPublisher.send(self.isEnabled)
 	}
 }
 	
@@ -246,6 +249,9 @@ class Prefs_BackupSeed {
 		defaults.removeObject(forKey: hasUploadedSeed_key(encryptedNodeId))
 		defaults.removeObject(forKey: name_key(encryptedNodeId))
 		defaults.removeObject(forKey: manualBackup_taskDone_key(encryptedNodeId))
+		
+		// Reset any publishers with stored state
+		isEnabled_publisher.send(self.isEnabled)
 	}
 }
 

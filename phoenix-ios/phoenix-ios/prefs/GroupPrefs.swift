@@ -159,6 +159,12 @@ class GroupPrefs {
 		defaults.removeObject(forKey: Key.bitcoinUnit.rawValue)
 		defaults.removeObject(forKey: Key.currencyConverterList.rawValue)
 		defaults.removeObject(forKey: Key.electrumConfig.rawValue)
+		
+		// Reset any publishers with stored state
+		fiatCurrencyPublisher.send(self.fiatCurrency)
+		bitcoinUnitPublisher.send(self.bitcoinUnit)
+		currencyConverterListPublisher.send(self.currencyConverterList)
+		electrumConfigPublisher.send(self.electrumConfig)
 	}
 	
 	// --------------------------------------------------
