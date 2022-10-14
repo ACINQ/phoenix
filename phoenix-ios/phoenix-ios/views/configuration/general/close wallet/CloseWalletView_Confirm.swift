@@ -5,13 +5,13 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "CloseWalletView_Delete"
+	category: "CloseWalletView_Confirm"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct CloseWalletView_Delete: MVISubView, ViewName {
+struct CloseWalletView_Confirm: MVISubView, ViewName {
 	
 	@ObservedObject var mvi: MVIState<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>
 	
@@ -164,7 +164,7 @@ struct CloseWalletView_Delete: MVISubView, ViewName {
 			
 		} header: {
 			if let idx = idx {
-				Text("#\(idx)")
+				Text("Step #\(idx)")
 			} else {
 				EmptyView()
 			}
@@ -352,6 +352,11 @@ struct CloseWalletView_Delete: MVISubView, ViewName {
 	
 	func showICloudBackupWarning() -> Bool {
 		
+		// iCloud warning:
+		//
+		// > iCloud backup not completed!
+		// > You enabled iCloud backup for your recovery phrase, but the backup didn't complete.
+		
 		if backupSeed_enabled {
 			return backupSeed_state != .synced
 		} else {
@@ -361,9 +366,23 @@ struct CloseWalletView_Delete: MVISubView, ViewName {
 	
 	func showManualBackupWarning() -> Bool {
 		
+		// Manual backup warning:
+		//
+		// > Don't lose your funds:
+		// > You are responsible for storing your recovery phrase.
+		// > ...
+		
 		if backupSeed_enabled {
-			return false
+			if deleteSeedBackup {
+				// The seed is stored in iCloud, but the user is asking to delete their seed from iCloud!
+				return mvi.balanceSats() > 0
+			} else {
+				// The seed is stored in iCloud, so the user can restore their wallet.
+				return false
+			}
 		} else {
+			// Maybe the user has reported that he/she has already backed up their seed.
+			// But even if they did, this is still a perfect time to remind them.
 			return mvi.balanceSats() > 0
 		}
 	}

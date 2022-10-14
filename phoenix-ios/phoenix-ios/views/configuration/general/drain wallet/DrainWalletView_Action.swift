@@ -5,13 +5,13 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "CloseWalletView_Drain_Action"
+	category: "DrainWalletView_Action"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct CloseWalletView_Drain_Action: MVISubView {
+struct DrainWalletView_Action: MVISubView {
 	
 	@ObservedObject var mvi: MVIState<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>
 	let expectedTxCount: Int
@@ -28,17 +28,9 @@ struct CloseWalletView_Drain_Action: MVISubView {
 			section_sent()
 			section_info()
 			section_button()
-			
-		//	if mvi.model is CloseChannelsConfiguration.ModelChannelsClosed {
-		//		section_sent()
-		//		section_info()
-		//		section_button()
-		//	} else {
-		//		section_sending()
-		//	}
 		}
 		.listStyle(.insetGrouped)
-		.navigationTitle(NSLocalizedString("Close wallet", comment: "Navigation bar title"))
+		.navigationTitle(NSLocalizedString("Drain wallet", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
 		.navigationBarBackButtonHidden()
 	}
@@ -52,7 +44,7 @@ struct CloseWalletView_Drain_Action: MVISubView {
 				HStack(alignment: VerticalAlignment.center, spacing: 5) {
 					
 					Image(systemName: "paperplane.fill")
-						.imageScale(.large)
+						.imageScale(.medium)
 						.foregroundColor(.gray)
 					
 					Text("Sending funds…")
@@ -76,7 +68,7 @@ struct CloseWalletView_Drain_Action: MVISubView {
 				HStack(alignment: VerticalAlignment.center, spacing: 5) {
 					
 					Image(systemName: "paperplane.fill")
-						.imageScale(.large)
+						.imageScale(.medium)
 						.foregroundColor(.appPositive)
 					
 					Text("Funds sent")

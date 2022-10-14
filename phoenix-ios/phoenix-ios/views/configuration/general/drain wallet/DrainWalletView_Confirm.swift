@@ -5,13 +5,13 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "CloseWalletView_Drain"
+	category: "DrainWalletView_Confirm"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct CloseWalletView_Drain: MVISubView {
+struct DrainWalletView_Confirm: MVISubView {
 	
 	@ObservedObject var mvi: MVIState<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>
 	let bitcoinAddress: String
@@ -40,7 +40,7 @@ struct CloseWalletView_Drain: MVISubView {
 			
 			content()
 		}
-		.navigationTitle(NSLocalizedString("Confirm Close", comment: "Navigation bar title"))
+		.navigationTitle(NSLocalizedString("Confirm Drain", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
 	}
 	
@@ -138,7 +138,7 @@ struct CloseWalletView_Drain: MVISubView {
 	@ViewBuilder
 	func actionScreen() -> some View {
 		
-		CloseWalletView_Drain_Action(
+		DrainWalletView_Action(
 			mvi: mvi,
 			expectedTxCount: expectedTxCount,
 			popToRoot: popToRoot

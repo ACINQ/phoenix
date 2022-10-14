@@ -18,6 +18,7 @@ fileprivate enum NavLinkTag: String {
 	case DisplayConfigurationView
 	case PaymentOptionsView
 	case RecoveryPhraseView
+	case DrainWalletView
 	case CloseWalletView
 	// Security
 	case AppAccessView
@@ -136,12 +137,22 @@ struct ConfigurationView: View {
 					}
 					
 					NavigationLink(
-						destination: CloseWalletView(popToRoot: { self.navLinkTag = nil }),
+						destination: DrainWalletView(popToRoot: { self.navLinkTag = nil }),
+						tag: NavLinkTag.DrainWalletView,
+						selection: $navLinkTag
+					) {
+						Label { Text("Drain wallet") } icon: {
+							Image(systemName: "xmark.circle")
+						}
+					}
+					
+					NavigationLink(
+						destination: CloseWalletView(),
 						tag: NavLinkTag.CloseWalletView,
 						selection: $navLinkTag
 					) {
 						Label { Text("Close wallet") } icon: {
-							Image(systemName: "xmark.circle")
+							Image(systemName: "trash")
 						}
 					}
 				
@@ -307,7 +318,7 @@ struct ConfigurationView: View {
 			switch value {
 				case .paymentHistory : break
 				case .backup         : newNavLinkTag = NavLinkTag.RecoveryPhraseView
-				case .drainWallet    : newNavLinkTag = NavLinkTag.CloseWalletView
+				case .drainWallet    : newNavLinkTag = NavLinkTag.DrainWalletView
 				case .electrum       : newNavLinkTag = NavLinkTag.PrivacyView
 			}
 			

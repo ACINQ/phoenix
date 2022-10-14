@@ -480,7 +480,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		
 		if closeWalletWindow == nil {
 			
-			let view = CloseWalletView_Delete_Action(
+			let view = CloseWalletView_Action(
 				deleteTransactionHistory: deleteTransactionHistory,
 				deleteSeedBackup: deleteSeedBackup
 			)

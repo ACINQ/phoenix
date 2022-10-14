@@ -5,7 +5,7 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "CloseWalletView_Delete_Action"
+	category: "CloseWalletView_Action"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
@@ -20,7 +20,7 @@ fileprivate enum DeleteState {
 	case done
 }
 
-struct CloseWalletView_Delete_Action: View {
+struct CloseWalletView_Action: View {
 	
 	let deleteTransactionHistory: Bool
 	let deleteSeedBackup: Bool
