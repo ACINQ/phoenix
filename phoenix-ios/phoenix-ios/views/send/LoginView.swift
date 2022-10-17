@@ -239,7 +239,8 @@ struct LoginView: View {
 			//
 			mvi.intent(Scan.Intent_LnurlAuthFlow_Login(
 				auth: model.auth,
-				minSuccessDelaySeconds: 1.6
+				minSuccessDelaySeconds: 1.6,
+				keyType: LNUrl.AuthKeyType_DEFAULT_KEY_TYPE()
 			))
 		}
 	}
