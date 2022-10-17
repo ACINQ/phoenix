@@ -145,16 +145,6 @@ struct ConfigurationView: View {
 							Image(systemName: "xmark.circle")
 						}
 					}
-					
-					NavigationLink(
-						destination: CloseWalletView(),
-						tag: NavLinkTag.CloseWalletView,
-						selection: $navLinkTag
-					) {
-						Label { Text("Close wallet") } icon: {
-							Image(systemName: "trash")
-						}
-					}
 				
 				} // </if: hasWallet>
 				
@@ -210,6 +200,19 @@ struct ConfigurationView: View {
 				) {
 					Label { Text("Logs") } icon: {
 						Image(systemName: "doc.text")
+					}
+				}
+				
+				if hasWallet {
+					
+					NavigationLink(
+						destination: CloseWalletView(),
+						tag: NavLinkTag.CloseWalletView,
+						selection: $navLinkTag
+					) {
+						Label { Text("Close wallet") } icon: {
+							Image(systemName: "trash")
+						}
 					}
 				}
 				
