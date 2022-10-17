@@ -320,13 +320,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			return
 		}
 		
+		// We have to be careful to start the close-wallet process *after* we've closed the RootView.
+		// This is because we might crash if:
+		//
+		// - the close-wallet process deletes something
+		// - a subview re-renders, and assumes that something still exists
+		//
+		// For example:
+		//
+		// - the close-wallet process sets Biz.syncManager to nil
+		// - a subview calls `Biz.syncManager!
+		//
+		// NB: Using a `DispatchQueue.main.asyncAfter` here doesn't seem to be enough to prevent crashes on iPad.
+		// We really need to give it time to fully unload the rootWindow.
+		
 		showCloseWalletWindow(
 			deleteTransactionHistory: deleteTransactionHistory,
-			deleteSeedBackup: deleteSeedBackup
+			deleteSeedBackup: deleteSeedBackup,
+			startDelay: 0.4
 		)
-		DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {[weak self] in
-			self?.hideRootWindow()
-		}
+		hideRootWindow()
 	}
 	
 	public func transitionBackToMainWindow() -> Bool {
@@ -341,8 +354,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		}
 		
 		showRootWindow(windowScene)
-		DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {[weak self] in
-			self?.hideCloseWalletWindow()
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+			self.hideCloseWalletWindow()
 		}
 		
 		return true
@@ -469,7 +482,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	
 	private func showCloseWalletWindow(
 		deleteTransactionHistory: Bool,
-		deleteSeedBackup: Bool
+		deleteSeedBackup: Bool,
+		startDelay: TimeInterval
 	) {
 		log.trace("showCloseWalletWindow()")
 		assertMainThread()
@@ -482,7 +496,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			
 			let view = CloseWalletView_Action(
 				deleteTransactionHistory: deleteTransactionHistory,
-				deleteSeedBackup: deleteSeedBackup
+				deleteSeedBackup: deleteSeedBackup,
+				startDelay: startDelay
 			)
 			
 			let controller = UIHostingController(rootView: view)

@@ -24,6 +24,7 @@ struct CloseWalletView_Action: View {
 	
 	let deleteTransactionHistory: Bool
 	let deleteSeedBackup: Bool
+	let startDelay: TimeInterval
 	
 	@State private var deleteTxHistoryState = DeleteState.waitingToStart
 	@State private var deleteSeedState = DeleteState.waitingToStart
@@ -359,7 +360,9 @@ struct CloseWalletView_Action: View {
 			visible = true
 		}
 		
-		action_next()
+		DispatchQueue.main.asyncAfter(deadline: .now() + startDelay) {
+			action_next()
+		}
 	}
 	
 	func syncTx_pendingSettingsChanged(_ pendingSettings: SyncTxManager_PendingSettings?) {
