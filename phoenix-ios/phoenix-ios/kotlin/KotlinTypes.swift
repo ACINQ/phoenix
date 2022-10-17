@@ -106,4 +106,7 @@ extension LNUrl {
 	typealias Error_PayInvoice_InvalidHash = ErrorPayInvoiceInvalidHash
 	typealias Error_PayInvoice_Malformed = ErrorPayInvoiceMalformed
 	
+	typealias AuthKeyType_DEFAULT_KEY_TYPE = AuthKeyTypeDEFAULT_KEY_TYPE
+	typealias AuthKeyType_LEGACY_KEY_TYPE = AuthKeyTypeLEGACY_KEY_TYPE
+	
 }
