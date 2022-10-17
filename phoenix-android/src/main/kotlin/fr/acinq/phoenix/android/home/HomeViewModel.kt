@@ -33,10 +33,8 @@ import fr.acinq.phoenix.managers.Connections
 import fr.acinq.phoenix.managers.PaymentsManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 data class PaymentRowState(
@@ -44,7 +42,6 @@ data class PaymentRowState(
     val paymentInfo: WalletPaymentInfo?
 )
 
-@ExperimentalCoroutinesApi
 class HomeViewModel(
     val connectionsFlow: StateFlow<Connections>,
     val paymentsManager: PaymentsManager,
