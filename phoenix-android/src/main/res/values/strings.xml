@@ -165,10 +165,10 @@
     <string name="send_error_amount_negative">Amount cannot be negative.</string>
     <string name="send_error_amount_invalid">This is not a valid amount.</string>
     <string name="send_error_amount_over_balance">This amount exceeds your balance.</string>
-    <string name="send_error_amount_overpaying">Cannot pay more than 2 times the requested amount.</string>
-    <string name="send_error_amount_below_requested">This amount is below the requested amount.</string>
+    <string name="send_error_amount_overpaying">Cannot pay more than %1$s.</string>
+    <string name="send_error_amount_below_requested">This amount is below the requested amount of %1$s.</string>
     <string name="send_destination_label">Send to</string>
-    <string name="send_description_label">Desc.</string>
+    <string name="send_description_label">Payment description</string>
     <string name="send_pay_button">Pay</string>
 
     <string name="send_paymentmode_onchain">Pay on-chain</string>
@@ -197,6 +197,7 @@
 
     <string name="scan_error_expired">Payment has expired.</string>
     <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
+    <string name="scan_error_already_paid">This payment has already been paid.</string>
     <string name="scan_error_invalid_chain">This payment does not use the same blockchain as your wallet.</string>
     <string name="scan_error_lnurl_invalid">Failed to process this LNUrl link. Make sure it is valid.</string>
     <string name="scan_error_lnurl_service_error">The LNUrl service returned an error.</string>
@@ -526,38 +527,71 @@
     <string name="accessctrl_full_lock_confirm_title">Notice</string>
     <string name="accessctrl_full_lock_confirm_message">Background features will be disabled. To receive payments the app will have to be unlocked.</string>
 
-    <!-- //////////////// ln url login //////////////// -->
+    <!-- //////////////// ln url auth //////////////// -->
 
-    <string name="lnurl_auth_instructions"><![CDATA[You can use your wallet to anonymously sign and authorize an action on:<br/><br/><b>%1$s</b><br/><br/>No personal data will be shared with this service.]]></string>
+    <string name="lnurl_auth_instructions">You can anonymously sign-in and authorize an action on:</string>
+    <string name="lnurl_auth_instructions_2">No personal data will be shared with this service.</string>
+    <string name="lnurl_auth_keytype_wait">Retrieving authentication schemes…</string>
+    <string name="lnurl_auth_keytype_label">Authentication scheme</string>
     <string name="lnurl_auth_button">Sign-in</string>
-    <string name="lnurl_auth_in_progress"><![CDATA[Signing-in to\n<b>%1$s</b>]]></string>
+    <string name="lnurl_auth_try_again_button">Try again</string>
+    <string name="lnurl_auth_in_progress">Signing-in to\n<b>%1$s</b></string>
     <string name="lnurl_auth_success">Authentication success.</string>
-    <string name="lnurl_auth_failure">Authentication failure.\n\nDetails: %1$s</string>
-    <string name="lnurl_auth_failure_remote_io">Could not connect to %1$s</string>
-    <string name="lnurl_auth_failure_remote_details">Server responded with %1$s</string>
+    <string name="lnurl_auth_failure">Authentication failure:</string>
+    <string name="lnurl_auth_error_network">Network error. Check your internet connection.</string>
+    <string name="lnurl_auth_error_other">An unknown error occurred.</string>
 
-    <!-- //////////////// ln url pay //////////////// -->
+    <!-- //////////////// ln url auth key types //////////////// -->
 
-    <string name="lnurl_pay_wait" translatable="false">Retrieving payment details…</string>
-    <string name="lnurl_pay_error_remote" translatable="false">Could not get a valid invoice from %1$s.\n\nYou may want to try again later.</string>
-    <string name="lnurl_pay_error_remote_code" translatable="false">Could not get a valid invoice from %1$s (code %2$s).\n\nYou may want to try again later.</string>
-    <string name="lnurl_pay_error_missing_callback" translatable="false">There was an error when handling this invoice. Please try again later.</string>
+    <string name="lnurl_auth_keytype_default">Default scheme</string>
+    <string name="lnurl_auth_keytype_default_desc">This is the recommended LNURL derivation scheme. Always use this when logging into a new service for the first time.</string>
+    <string name="lnurl_auth_keytype_legacy">Legacy scheme</string>
+    <string name="lnurl_auth_keytype_legacy_desc">This is a compatibility scheme for old Phoenix Android wallets. Try this if the default scheme does not connect to your usual account.</string>
 
     <!-- //////////////// ln url withdraw //////////////// -->
 
+    <string name="lnurl_withdraw_header">You can redeem funds from\n<b>%1$s</b>.</string>
     <string name="lnurl_withdraw_amount_label">Amount to receive</string>
     <string name="lnurl_withdraw_description_label">Details</string>
-    <string name="lnurl_withdraw_service_host_label"><![CDATA[You are redeeming funds from<br/><b>%1$s</b>.]]></string>
     <string name="lnurl_withdraw_confirm_button">Redeem</string>
-    <string name="lnurl_withdraw_wait">Redeeming funds…</string>
-    <string name="lnurl_withdraw_success">Please hold while %1$s is sending funds.\n\nKeep the app online.</string>
-    <string name="lnurl_withdraw_error_internal">Could not redeem the payment. Please try again.</string>
-    <string name="lnurl_withdraw_error_invalid">This request to redeem payment is invalid. Please try again.</string>
-    <string name="lnurl_withdraw_error_amount">Amount is invalid.</string>
-    <string name="lnurl_withdraw_error_amount_min">Amount must be at least %1$s.</string>
-    <string name="lnurl_withdraw_error_amount_max">Amount cannot exceed %1$s.</string>
-    <string name="lnurl_withdraw_error_remote">%1$s responded with an error: %2$s.\n\nTry again later, or contact their support.</string>
-    <string name="lnurl_withdraw_error_remote_invalid_response">Invalid data</string>
+    <string name="lnurl_withdraw_wait">Requesting funds…</string>
+    <string name="lnurl_withdraw_success">Request successfully sent to <b>%1$s</b>.\n\nIt may take some time before they send the funds. Please keep the app online in the meanwhile.</string>
+    <string name="lnurl_withdraw_amount_invalid">Amount is invalid.</string>
+    <string name="lnurl_withdraw_amount_below_min">Amount must be at least %1$s.</string>
+    <string name="lnurl_withdraw_amount_above_max">Amount cannot exceed %1$s.</string>
+    <string name="lnurl_withdraw_error_header">Withdrawal has failed:</string>
+
+  <!-- //////////////// ln url remote error messages //////////////// -->
+
+    <string name="lnurl_error_remote_details">The service \'%1$s\' responded with an error: %2$s.\n\nTry again, or contact their support.</string>
+    <string name="lnurl_error_remote_code">The service \'%1$s\' returned an HTTP error (%2$s).\n\nTry again, or contact their support.</string>
+    <string name="lnurl_error_remote_unreadable">The service \'%1$s\' returned a malformed message.</string>
+    <string name="lnurl_error_remote_connection">Could not connect to service \'%1$s\'.</string>
+
+    <!-- //////////////// ln url pay //////////////// -->
+
+    <string name="lnurl_pay_domain">Served by</string>
+    <string name="lnurl_pay_meta_description">Payment description</string>
+    <string name="lnurl_pay_comment_title">Add optional comment</string>
+    <string name="lnurl_pay_comment_message">You can attach a comment to the payment (max %1$d characters). It will be sent to the recipient.</string>
+    <string name="lnurl_pay_comment_hint">No comment</string>
+    <string name="lnurl_pay_pay_button">Pay</string>
+    <string name="lnurl_pay_requesting_invoice">Requesting invoice…</string>
+    <string name="lnurl_pay_checking_invoice">Checking invoice…</string>
+    <string name="lnurl_pay_sending_payment">Sending payment…</string>
+
+    <string name="lnurl_pay_amount_empty">Amount must not be empty</string>
+    <string name="lnurl_pay_amount_below_min">Amount must be at least %1$s</string>
+    <string name="lnurl_pay_amount_above_max">Amount must be at most %1$s</string>
+    <string name="lnurl_pay_amount_above_balance">Amount exceeds your balance</string>
+    <string name="lnurl_pay_amount_invalid">Invalid amount</string>
+
+    <string name="lnurl_pay_error_header">Payment has failed:</string>
+    <string name="lnurl_pay_error_invalid_chain">The invoice returned by \'%1$s\' does not use the same chain as your wallet.</string>
+    <string name="lnurl_pay_error_already_paid">The invoice returned by \'%1$s\' has already been paid.</string>
+    <string name="lnurl_pay_error_invalid_amount">The invoice returned by \'%1$s\' has an incorrect amount.</string>
+    <string name="lnurl_pay_error_invalid_hash">The invoice returned by \'%1$s\' does not match the request details.</string>
+    <string name="lnurl_pay_error_invalid_malformed">The invoice returned by \'%1$s\' is malformed.</string>
 
     <!-- //////////////// display preferences //////////////// -->
 
@@ -704,6 +738,8 @@
     <string name="paymentsettings_paytoopen_fees_dialog_title">On-the-fly channels</string>
     <string name="paymentsettings_paytoopen_fees_dialog_message">This fee applies when you receive a payment over Lightning and a new channel needs to be created.</string>
     <string name="paymentsettings_paytoopen_fees_dialog_message_clickable">See the FAQ for more information</string>
+
+    <string name="paymentsettings_lnurlauth_keytype_title">LNUrl authentication scheme</string>
 
     <!-- ////////////// migration result dialog //////////////// -->
 

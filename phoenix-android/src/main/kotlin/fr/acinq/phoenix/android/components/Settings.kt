@@ -57,13 +57,13 @@ fun Setting(modifier: Modifier = Modifier, title: String, description: String?) 
 fun SettingInteractive(
     modifier: Modifier = Modifier,
     title: String,
-    description: String?,
+    description: String,
     icon: Int? = null,
     enabled: Boolean = true,
     onClick: (() -> Unit)
 ) {
     SettingInteractive(modifier = modifier, title = title, icon = icon, enabled = enabled, onClick = onClick,
-        description = { description?.let { Text(it) } })
+        description = { Text(description) })
 }
 
 @Composable

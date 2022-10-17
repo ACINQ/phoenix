@@ -30,7 +30,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
@@ -43,9 +42,11 @@ import fr.acinq.phoenix.android.utils.Converter.proportionalFeeAsPercentage
 import fr.acinq.phoenix.android.utils.Converter.proportionalFeeAsPercentageString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.utils.label
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.data.BitcoinUnit
+import fr.acinq.phoenix.data.LNUrl
 import fr.acinq.phoenix.data.PaymentOptionsConstants
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
@@ -68,6 +69,8 @@ fun PaymentSettingsView() {
     val walletContext = LocalWalletContext.current
     val prefsTrampolineMaxFee by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(null)
     val trampolineFees = prefsTrampolineMaxFee ?: walletContext?.trampoline?.v2?.attempts?.last()?.export()
+
+    val prefLnurlAuthKeyTypeState = UserPrefs.getLnurlAuthKeyType(context).collectAsState(initial = null)
 
     DefaultScreenLayout {
         DefaultScreenHeader(
@@ -93,17 +96,45 @@ fun PaymentSettingsView() {
             )
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_trampoline_fees_title),
-                description = trampolineFees?.let { stringResource(id = R.string.paymentsettings_trampoline_fees_desc,
-                    trampolineFees.feeBase, trampolineFees.proportionalFeeAsPercentageString) },
+                description = trampolineFees?.let {
+                    stringResource(id = R.string.paymentsettings_trampoline_fees_desc, trampolineFees.feeBase, trampolineFees.proportionalFeeAsPercentageString)
+                } ?: stringResource(R.string.utils_unknown),
                 onClick = { showTrampolineMaxFeeDialog = true }
             )
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_paytoopen_fees_title),
                 description = walletContext?.let {
                     stringResource(id = R.string.paymentsettings_paytoopen_fees_desc, String.format("%.2f", 100 * (it.payToOpen.v1.feePercent)), it.payToOpen.v1.minFeeSat)
-                },
+                } ?: stringResource(id = R.string.utils_unknown),
                 onClick = { showPayToOpenDialog = true }
             )
+        }
+        val prefLnurlAuthKeyType = prefLnurlAuthKeyTypeState.value
+        if (prefLnurlAuthKeyType != null) {
+            Card {
+                val keyTypes = listOf<PreferenceItem<LNUrl.Auth.KeyType>>(
+                    PreferenceItem(
+                        item = LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE,
+                        title = stringResource(id = R.string.lnurl_auth_keytype_default),
+                        description = stringResource(id = R.string.lnurl_auth_keytype_default_desc)
+                    ),
+                    PreferenceItem(item = LNUrl.Auth.KeyType.LEGACY_KEY_TYPE, title = stringResource(id = R.string.lnurl_auth_keytype_legacy), description = stringResource(id = R.string.lnurl_auth_keytype_legacy_desc))
+                )
+                ListPreferenceButton(
+                    title = stringResource(id = R.string.paymentsettings_lnurlauth_keytype_title),
+                    subtitle = when (prefLnurlAuthKeyType) {
+                        LNUrl.Auth.KeyType.LEGACY_KEY_TYPE -> stringResource(id = R.string.lnurl_auth_keytype_legacy)
+                        LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE -> stringResource(id = R.string.lnurl_auth_keytype_default)
+                        else -> stringResource(id = R.string.utils_unknown)
+                    },
+                    enabled = true,
+                    selectedItem = prefLnurlAuthKeyType,
+                    preferences = keyTypes,
+                    onPreferenceSubmit = {
+                        scope.launch { UserPrefs.saveLnurlAuthKeyType(context, it.item) }
+                    }
+                )
+            }
         }
     }
 
@@ -277,11 +308,15 @@ private fun TrampolineMaxFeesDialog(
                 initialValue = feeBase?.toDouble(),
                 onValueChange = { feeBase = it?.toLong() },
                 enabled = useCustomMaxFee,
-                minErrorMessage = stringResource(R.string.paymentsettings_trampoline_fees_dialog_base_below_min,
-                    PaymentOptionsConstants.minBaseFee.toMilliSatoshi().toPrettyString(BitcoinUnit.Sat, withUnit = true)),
+                minErrorMessage = stringResource(
+                    R.string.paymentsettings_trampoline_fees_dialog_base_below_min,
+                    PaymentOptionsConstants.minBaseFee.toMilliSatoshi().toPrettyString(BitcoinUnit.Sat, withUnit = true)
+                ),
                 minValue = PaymentOptionsConstants.minBaseFee.toLong().toDouble(),
-                maxErrorMessage = stringResource(R.string.paymentsettings_trampoline_fees_dialog_base_above_max,
-                    PaymentOptionsConstants.maxBaseFee.toMilliSatoshi().toPrettyString(BitcoinUnit.Sat, withUnit = true)),
+                maxErrorMessage = stringResource(
+                    R.string.paymentsettings_trampoline_fees_dialog_base_above_max,
+                    PaymentOptionsConstants.maxBaseFee.toMilliSatoshi().toPrettyString(BitcoinUnit.Sat, withUnit = true)
+                ),
                 maxValue = PaymentOptionsConstants.maxBaseFee.toLong().toDouble(),
                 acceptDecimal = false
             )
@@ -294,11 +329,15 @@ private fun TrampolineMaxFeesDialog(
                 onValueChange = { feeProportional = it },
                 enabled = useCustomMaxFee,
                 minValue = PaymentOptionsConstants.minProportionalFeePercent,
-                minErrorMessage = stringResource(R.string.paymentsettings_trampoline_fees_dialog_proportional_below_min,
-                    PaymentOptionsConstants.minProportionalFeePercent),
+                minErrorMessage = stringResource(
+                    R.string.paymentsettings_trampoline_fees_dialog_proportional_below_min,
+                    PaymentOptionsConstants.minProportionalFeePercent
+                ),
                 maxValue = PaymentOptionsConstants.maxProportionalFeePercent,
-                maxErrorMessage = stringResource(R.string.paymentsettings_trampoline_fees_dialog_proportional_above_max,
-                    PaymentOptionsConstants.maxProportionalFeePercent),
+                maxErrorMessage = stringResource(
+                    R.string.paymentsettings_trampoline_fees_dialog_proportional_above_max,
+                    PaymentOptionsConstants.maxProportionalFeePercent
+                ),
             )
         }
     }

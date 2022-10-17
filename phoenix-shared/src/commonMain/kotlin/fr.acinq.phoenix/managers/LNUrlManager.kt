@@ -245,11 +245,15 @@ class LNUrlManager(
         // And then the user will be told to wait for the incoming payment.
     }
 
-    suspend fun requestAuth(auth: LNUrl.Auth, publicSuffixList: PublicSuffixList) {
+    suspend fun requestAuth(
+        auth: LNUrl.Auth,
+        publicSuffixList: PublicSuffixList,
+        keyType: LNUrl.Auth.KeyType,
+    ) {
         val wallet = walletManager.wallet.filterNotNull().first()
 
         val domain = publicSuffixList.eTldPlusOne(auth.url.host) ?: throw LNUrl.Error.Auth.CouldNotDetermineDomain
-        val key = wallet.lnurlAuthLinkingKey(domain)
+        val key = wallet.lnurlAuthLinkingKey(domain, keyType)
         val signedK1 = Crypto.compact2der(
             Crypto.sign(
                 data = ByteVector32.fromValidHex(auth.k1),

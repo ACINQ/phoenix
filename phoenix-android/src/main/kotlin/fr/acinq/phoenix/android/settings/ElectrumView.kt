@@ -254,7 +254,7 @@ private fun ElectrumServerDialog(
                 }
                 ElectrumViewModel.CertificateCheckState.Checking -> {
                     Row(Modifier.align(Alignment.End)) {
-                        ProgressText(label = stringResource(id = R.string.electrum_dialog_cert_checking))
+                        ProgressView(text = stringResource(id = R.string.electrum_dialog_cert_checking))
                     }
                 }
                 is ElectrumViewModel.CertificateCheckState.Valid -> {

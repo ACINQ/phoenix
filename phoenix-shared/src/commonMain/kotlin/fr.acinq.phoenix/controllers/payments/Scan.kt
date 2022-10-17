@@ -95,30 +95,34 @@ object Scan {
         object LnurlServiceFetch : Model()
 
         sealed class LnurlPayFlow : Model() {
+            abstract val lnurlPay: LNUrl.Pay
             data class LnurlPayRequest(
-                val lnurlPay: LNUrl.Pay,
+                override val lnurlPay: LNUrl.Pay,
                 val error: LnurlPayError?
             ) : LnurlPayFlow()
 
             data class LnurlPayFetch(
-                val lnurlPay: LNUrl.Pay,
+                override val lnurlPay: LNUrl.Pay
             ) : LnurlPayFlow()
 
-            object Sending : LnurlPayFlow()
+            data class Sending(
+                override val lnurlPay: LNUrl.Pay
+            ) : LnurlPayFlow()
         }
 
         sealed class LnurlWithdrawFlow : Model() {
+            abstract val lnurlWithdraw: LNUrl.Withdraw
             data class LnurlWithdrawRequest(
-                val lnurlWithdraw: LNUrl.Withdraw,
+                override val lnurlWithdraw: LNUrl.Withdraw,
                 val error: LnurlWithdrawError?
             ) : LnurlWithdrawFlow()
 
             data class LnurlWithdrawFetch(
-                val lnurlWithdraw: LNUrl.Withdraw,
+                override val lnurlWithdraw: LNUrl.Withdraw,
             ) : LnurlWithdrawFlow()
 
             data class Receiving(
-                val lnurlWithdraw: LNUrl.Withdraw,
+                override val lnurlWithdraw: LNUrl.Withdraw,
                 val amount: MilliSatoshi,
                 val description: String?,
                 val paymentHash: String
@@ -126,16 +130,17 @@ object Scan {
         }
 
         sealed class LnurlAuthFlow : Model() {
+            abstract val auth: LNUrl.Auth
             data class LoginRequest(
-                val auth: LNUrl.Auth
+                override val auth: LNUrl.Auth
             ) : LnurlAuthFlow()
 
             data class LoggingIn(
-                val auth: LNUrl.Auth
+                override val auth: LNUrl.Auth
             ) : LnurlAuthFlow()
 
             data class LoginResult(
-                val auth: LNUrl.Auth,
+                override val auth: LNUrl.Auth,
                 val error: LoginError?
             ) : LnurlAuthFlow()
         }
@@ -210,7 +215,8 @@ object Scan {
         sealed class LnurlAuthFlow : Intent() {
             data class Login(
                 val auth: LNUrl.Auth,
-                val minSuccessDelaySeconds: Double = 0.0
+                val minSuccessDelaySeconds: Double = 0.0,
+                val keyType: LNUrl.Auth.KeyType
             ) : LnurlAuthFlow()
         }
     }

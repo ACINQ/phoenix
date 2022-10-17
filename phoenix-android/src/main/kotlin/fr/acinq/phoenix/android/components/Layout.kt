@@ -46,7 +46,7 @@ fun BackButton(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         shape = RoundedCornerShape(topStart = 0.dp, topEnd = 50.dp, bottomEnd = 50.dp, bottomStart = 0.dp),
-        contentPadding = PaddingValues(start = 20.dp, top = 8.dp, bottom = 8.dp, end = 16.dp),
+        contentPadding = PaddingValues(start = 20.dp, top = 8.dp, bottom = 8.dp, end = 12.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color.Unspecified,
             disabledBackgroundColor = Color.Unspecified,
@@ -54,7 +54,7 @@ fun BackButton(onClick: () -> Unit) {
             disabledContentColor = mutedTextColor(),
         ),
         elevation = null,
-        modifier = Modifier.size(width = 62.dp, height = 52.dp)
+        modifier = Modifier.size(width = 58.dp, height = 52.dp)
     ) {
         PhoenixIcon(resourceId = R.drawable.ic_arrow_back, Modifier.width(24.dp))
     }

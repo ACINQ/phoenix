@@ -41,6 +41,7 @@ import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
@@ -97,7 +98,7 @@ fun AppView(
 
         Column(
             Modifier
-                .background(appBackground())
+                .background(mutedBgColor())
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {

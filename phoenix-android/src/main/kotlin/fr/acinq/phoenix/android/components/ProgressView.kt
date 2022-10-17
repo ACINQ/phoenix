@@ -21,13 +21,13 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-
 @Composable
-fun ProgressText(
-    label: String,
+fun ProgressView(
+    text: String,
     modifier: Modifier = Modifier,
     padding: PaddingValues = PaddingValues(16.dp),
     space: Dp = 8.dp
@@ -37,6 +37,6 @@ fun ProgressText(
     ) {
         CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
         Spacer(Modifier.width(space))
-        Text(label)
+        Text(text =text)
     }
 }

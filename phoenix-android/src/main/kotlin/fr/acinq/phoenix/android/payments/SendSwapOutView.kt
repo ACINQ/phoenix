@@ -17,15 +17,20 @@
 package fr.acinq.phoenix.android.payments
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,6 +43,7 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.controllers.payments.MaxFees
 import fr.acinq.phoenix.controllers.payments.Scan
@@ -72,52 +78,71 @@ fun SendSwapOutView(
         _status = 0
     )
 
-    BackButtonWithBalance(onBackClick = onBackClick, balance = balance)
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .verticalScroll(rememberScrollState())
+            .padding(PaddingValues(bottom = 50.dp)),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
-        SwapOutInputView(
-            initialAmount = amount,
-            onAmountChange = { newAmount ->
-                amountErrorMessage = ""
-                if (model !is Scan.Model.SwapOutFlow.Init && amount != newAmount) {
-                    // if amount changes after a swap-out request has already been prepared, we must start over again
-                    onInvalidate(Scan.Intent.SwapOutFlow.Invalidate(model.address))
+        BackButtonWithBalance(onBackClick = onBackClick, balance = balance)
+        Spacer(Modifier.height(16.dp))
+        Card(
+            externalPadding = PaddingValues(horizontal = 16.dp),
+            internalPadding = PaddingValues(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Spacer(modifier = Modifier.height(48.dp))
+            AmountHeroInput(
+                initialAmount = amount?.toMilliSatoshi(),
+                onAmountChange = {
+                    amountErrorMessage = ""
+                    val newAmount = it?.amount?.truncateToSatoshi()
+                    if (model !is Scan.Model.SwapOutFlow.Init && amount != newAmount) {
+                        // if amount changes after a swap-out request has already been prepared, we must start over again
+                        onInvalidate(Scan.Intent.SwapOutFlow.Invalidate(model.address))
+                    }
+                    when {
+                        newAmount == null -> {}
+                        newAmount < swapOutConfig.minAmountSat.sat -> {
+                            amountErrorMessage = context.getString(
+                                R.string.send_swapout_error_amount_too_small,
+                                swapOutConfig.minAmountSat.sat.toMilliSatoshi().toPrettyString(prefBtcUnit, rate = null, withUnit = true)
+                            )
+                        }
+                        newAmount > swapOutConfig.maxAmountSat.sat -> {
+                            amountErrorMessage = context.getString(
+                                R.string.send_swapout_error_amount_too_large,
+                                swapOutConfig.maxAmountSat.sat.toMilliSatoshi().toPrettyString(prefBtcUnit, rate = null, withUnit = true)
+                            )
+                        }
+                        balance != null && newAmount > balance.truncateToSatoshi() -> {
+                            amountErrorMessage = context.getString(R.string.send_error_amount_over_balance)
+                        }
+                        requestedAmount != null && newAmount < requestedAmount -> {
+                            amountErrorMessage = context.getString(R.string.send_error_amount_below_requested,
+                                (requestedAmount).toMilliSatoshi().toPrettyString(prefBtcUnit, withUnit = true))
+                        }
+                    }
+                    amount = newAmount
+                },
+                validationErrorMessage = amountErrorMessage,
+                inputTextSize = 42.sp
+            )
+            Column(
+                modifier = Modifier.padding(top = 20.dp, bottom = 32.dp, start = 16.dp, end = 16.dp).sizeIn(maxWidth = 400.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Label(text = stringResource(R.string.send_destination_label)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        PhoenixIcon(resourceId = R.drawable.ic_chain, modifier = Modifier.size(18.dp), tint = MaterialTheme.colors.primary)
+                        Spacer(Modifier.width(4.dp))
+                        SelectionContainer {
+                            Text(text = model.address.address, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                    }
                 }
-                when {
-                    newAmount < swapOutConfig.minAmountSat.sat -> {
-                        amountErrorMessage = context.getString(
-                            R.string.send_swapout_error_amount_too_small,
-                            swapOutConfig.minAmountSat.sat.toMilliSatoshi().toPrettyString(prefBtcUnit, rate = null, withUnit = true)
-                        )
-                    }
-                    newAmount > swapOutConfig.maxAmountSat.sat -> {
-                        amountErrorMessage = context.getString(
-                            R.string.send_swapout_error_amount_too_large,
-                            swapOutConfig.maxAmountSat.sat.toMilliSatoshi().toPrettyString(prefBtcUnit, rate = null, withUnit = true)
-                        )
-                    }
-                    balance != null && newAmount > balance.truncateToSatoshi() -> {
-                        amountErrorMessage = context.getString(R.string.send_error_amount_over_balance)
-                    }
-                    requestedAmount != null && newAmount < requestedAmount -> {
-                        amountErrorMessage = context.getString(R.string.send_error_amount_below_requested)
-                    }
-                }
-                amount = newAmount
-            },
-            errorMessage = amountErrorMessage
-        )
-
-        SendBasicDetailsRow(label = stringResource(R.string.send_destination_label)) {
-            Row {
-                PhoenixIcon(resourceId = R.drawable.ic_chain, tint = MaterialTheme.colors.primary)
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(text = model.address.address, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
         }
 
@@ -126,7 +151,7 @@ fun SendSwapOutView(
         when (model) {
             is Scan.Model.SwapOutFlow.Init -> {
                 BorderButton(
-                    text = R.string.send_swapout_prepare_button,
+                    text = stringResource(id = R.string.send_swapout_prepare_button),
                     icon = R.drawable.ic_build,
                     enabled = amountErrorMessage.isBlank(),
                 ) {
@@ -180,25 +205,6 @@ fun SendSwapOutView(
 }
 
 @Composable
-private fun SwapOutInputView(
-    initialAmount: Satoshi?,
-    onAmountChange: (Satoshi) -> Unit,
-    errorMessage: String,
-) {
-    Spacer(modifier = Modifier.height(110.dp))
-    AmountHeroInput(
-        initialAmount = initialAmount?.toMilliSatoshi(),
-        onAmountChange = { newAmount ->
-            newAmount?.let { onAmountChange(it.amount.truncateToSatoshi()) }
-        },
-        inputTextSize = 48.sp,
-    )
-    Spacer(modifier = Modifier.height(4.dp))
-    Text(errorMessage, style = MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 14.sp), maxLines = 1)
-    Spacer(modifier = Modifier.height(24.dp))
-}
-
-@Composable
 private fun SwapOutFeeSummaryView(
     userAmount: Satoshi,
     fee: Satoshi,
@@ -208,17 +214,37 @@ private fun SwapOutFeeSummaryView(
         internalPadding = PaddingValues(16.dp),
         modifier = Modifier.widthIn(max = 300.dp),
         withBorder = true,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        SendBasicDetailsRow(label = stringResource(id = R.string.send_swapout_complete_recap_amount), contentWeight = 1.5f) {
-            AmountWithFiatView(amount = userAmount.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        SendBasicDetailsRow(label = stringResource(id = R.string.send_swapout_complete_recap_fee), contentWeight = 1.5f) {
-            AmountWithFiatView(amount = fee.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        SendBasicDetailsRow(label = stringResource(id = R.string.send_swapout_complete_recap_total), contentWeight = 1.5f) {
-            AmountWithFiatView(amount = total.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
+        FeeSummary(label = stringResource(id = R.string.send_swapout_complete_recap_amount), amount = userAmount.toMilliSatoshi())
+        FeeSummary(label = stringResource(id = R.string.send_swapout_complete_recap_fee), amount = fee.toMilliSatoshi())
+        FeeSummary(label = stringResource(id = R.string.send_swapout_complete_recap_total), amount = total.toMilliSatoshi())
+    }
+}
+
+@Composable
+private fun FeeSummary(
+    label: String,
+    amount: fr.acinq.lightning.MilliSatoshi
+) {
+    Row(
+        modifier = Modifier.widthIn(max = 500.dp)
+    ) {
+        Text(
+            text = label.uppercase(),
+            style = MaterialTheme.typography.body1.copy(color = mutedTextColor(), fontSize = 12.sp),
+            textAlign = TextAlign.End,
+            modifier = Modifier
+                .alignBy(FirstBaseline)
+                .weight(1f)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Column(
+            modifier = Modifier
+                .alignBy(FirstBaseline)
+                .weight(2f)
+        ) {
+            AmountWithFiatView(amount = amount, amountTextStyle = MaterialTheme.typography.body2)
         }
     }
 }

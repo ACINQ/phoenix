@@ -24,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -63,7 +64,7 @@ fun InitWallet(
         )
         Spacer(modifier = Modifier.height(16.dp))
         BorderButton(
-            text = R.string.initwallet_restore,
+            text = stringResource(id = R.string.initwallet_restore),
             icon = R.drawable.ic_restore,
             onClick = onRestoreWalletClick
         )

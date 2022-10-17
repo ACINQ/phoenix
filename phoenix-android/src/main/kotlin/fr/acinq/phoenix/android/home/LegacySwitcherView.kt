@@ -89,7 +89,7 @@ fun LegacySwitcherView(
                 // just wait
             }
             LegacyAppStatus.Required.Interrupted -> {
-                BorderButton(text = R.string.legacyswitch_restart, onClick = {
+                BorderButton(text = stringResource(id = R.string.legacyswitch_restart), onClick = {
                     scope.launch {
                         PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
                     }

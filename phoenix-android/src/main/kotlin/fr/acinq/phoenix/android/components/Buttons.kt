@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -56,17 +57,17 @@ import fr.acinq.phoenix.utils.BlockchainExplorer
 @Composable
 fun BorderButton(
     modifier: Modifier = Modifier,
-    text: Int? = null,
+    text: String? = null,
     icon: Int? = null,
     enabled: Boolean = true,
-    space: Dp = 16.dp,
+    space: Dp = 12.dp,
     textStyle: TextStyle = MaterialTheme.typography.button,
-    padding: PaddingValues = PaddingValues(12.dp),
+    padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     isPrimary: Boolean = true,
     onClick: () -> Unit,
 ) {
     Button(
-        text = text?.run { stringResource(this) },
+        text = text,
         icon = icon,
         enabled = enabled,
         space = space,
@@ -86,11 +87,11 @@ fun FilledButton(
     modifier: Modifier = Modifier,
     text: Int? = null,
     icon: Int? = null,
-    iconTint: Color = LocalContentColor.current,
+    iconTint: Color = MaterialTheme.colors.onPrimary,
     enabled: Boolean = true,
-    space: Dp = 16.dp,
+    space: Dp = 12.dp,
     textStyle: TextStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.onPrimary),
-    padding: PaddingValues = PaddingValues(12.dp),
+    padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     backgroundColor: Color = MaterialTheme.colors.primary,
     onClick: () -> Unit,
 ) {
@@ -111,11 +112,14 @@ fun FilledButton(
 
 @Composable
 fun TextWithIcon(
-    text: String,
+    text: AnnotatedString,
     icon: Int,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = LocalTextStyle.current,
+    maxLines: Int = Int.MAX_VALUE,
+    textOverflow: TextOverflow = TextOverflow.Clip,
     iconTint: Color = LocalContentColor.current,
+    iconSize: Dp = ButtonDefaults.IconSize,
     padding: PaddingValues = PaddingValues(0.dp),
     space: Dp = 6.dp,
     alignBaseLine: Boolean = false
@@ -128,12 +132,43 @@ fun TextWithIcon(
             painter = painterResource(id = icon),
             contentDescription = "icon for $text",
             modifier = Modifier
-                .size(ButtonDefaults.IconSize)
+                .size(iconSize)
                 .then(if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier),
             colorFilter = ColorFilter.tint(iconTint)
         )
         Spacer(Modifier.width(space))
-        Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier)
+        Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier, maxLines = maxLines, overflow = textOverflow)
+    }
+}
+
+@Composable
+fun TextWithIcon(
+    text: String,
+    icon: Int,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = LocalTextStyle.current,
+    maxLines: Int = Int.MAX_VALUE,
+    textOverflow: TextOverflow = TextOverflow.Clip,
+    iconTint: Color = LocalContentColor.current,
+    iconSize: Dp = ButtonDefaults.IconSize,
+    padding: PaddingValues = PaddingValues(0.dp),
+    space: Dp = 6.dp,
+    alignBaseLine: Boolean = false
+) {
+    Row(
+        modifier = modifier.padding(padding),
+        verticalAlignment = if (alignBaseLine) Alignment.Top else Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = icon),
+            contentDescription = "icon for $text",
+            modifier = Modifier
+                .size(iconSize)
+                .then(if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier),
+            colorFilter = ColorFilter.tint(iconTint)
+        )
+        Spacer(Modifier.width(space))
+        Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier, maxLines = maxLines, overflow = textOverflow)
     }
 }
 
@@ -163,28 +198,27 @@ fun Button(
     text: String? = null,
     icon: Int? = null,
     iconTint: Color = MaterialTheme.colors.primary,
-    space: Dp = 16.dp,
+    space: Dp = 12.dp,
     enabled: Boolean = true,
+    enabledEffect: Boolean = true,
     textStyle: TextStyle = MaterialTheme.typography.button,
     padding: PaddingValues = PaddingValues(16.dp),
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Center,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = RectangleShape,
-    border: BorderStroke? = null, // ButtonDefaults.outlinedBorder,
+    border: BorderStroke? = null,
     elevation: ButtonElevation? = null,
     backgroundColor: Color = Color.Unspecified, // transparent by default!
 ) {
     val colors = ButtonDefaults.buttonColors(
         backgroundColor = backgroundColor,
-        disabledBackgroundColor = backgroundColor.copy(alpha = 0.5f),
-        contentColor = LocalContentColor.current,
-        disabledContentColor = mutedTextColor(),
+        disabledBackgroundColor = if (enabledEffect && backgroundColor != Color.Unspecified) backgroundColor.copy(alpha = 0.4f) else backgroundColor,
     )
     val contentColor by colors.contentColor(true)
     Surface(
         shape = shape,
-        color = colors.backgroundColor(true).value,
-        contentColor = colors.contentColor(true).value, //contentColor.copy(1f),
+        color = colors.backgroundColor(enabled).value,
+        contentColor = colors.contentColor(enabled).value,
         border = border,
         elevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp,
         modifier = modifier
@@ -213,7 +247,13 @@ fun Button(
                         )
                         .indication(interactionSource, LocalIndication.current)
                         .padding(padding)
-                        .alpha(if (enabled) 1f else 0.5f),
+                        .alpha(
+                            if (!enabled && enabledEffect) {
+                                if (backgroundColor == Color.Unspecified) 0.3f else 0.8f
+                            } else {
+                                1f
+                            }
+                        ),
                     horizontalArrangement = horizontalArrangement,
                     verticalAlignment = Alignment.CenterVertically,
                     content = {
