@@ -70,7 +70,8 @@ class AppCloseChannelsConfigurationController(
 
     init {
         launch {
-            peerManager.getPeer().channelsFlow.collect { channels ->
+            val peer = peerManager.getPeer()
+            peer.channelsFlow.collect { channels ->
 
                 val closingChannelIdsCopy = closingChannelIds?.toSet()
 
@@ -95,14 +96,7 @@ class AppCloseChannelsConfigurationController(
                     val closableChannelsList = updatedChannelsList.filter {
                         isClosable(it.status)
                     }
-
-                    val path = when (chain) {
-                        Chain.Mainnet -> "m/84'/0'/0'/0/0"
-                        else -> "m/84'/1'/0'/0/0"
-                    }
-                    val wallet = walletManager.wallet.value!!
-                    val address = wallet.onchainAddress(path)
-
+                    val address = peer.finalAddress
                     model(CloseChannelsConfiguration.Model.Ready(
                         channels = closableChannelsList,
                         address = address
