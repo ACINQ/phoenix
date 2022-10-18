@@ -30,12 +30,14 @@ fun ProgressView(
     text: String,
     modifier: Modifier = Modifier,
     padding: PaddingValues = PaddingValues(16.dp),
-    space: Dp = 8.dp
+    progressCircleSize: Dp = 20.dp,
+    progressCircleWidth: Dp = 2.dp,
+    space: Dp = 8.dp,
 ) {
     Row(
         modifier.padding(padding)
     ) {
-        CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+        CircularProgressIndicator(Modifier.size(progressCircleSize), strokeWidth = progressCircleWidth)
         Spacer(Modifier.width(space))
         Text(text =text)
     }

@@ -207,9 +207,13 @@ struct HomeView : MVIView {
 	func totalBalance() -> some View {
 		
 		ZStack(alignment: Alignment.center) {
-				
+			
+			let balanceMsats = mvi.model.balance?.msat
+			let unknownBalance = balanceMsats == nil
+			let hiddenBalance = currencyPrefs.hideAmountsOnHomeScreen
+			
 			let amount = Utils.format( currencyPrefs,
-			                     msat: mvi.model.balance.msat,
+			                     msat: balanceMsats ?? 0,
 			                   policy: .showMsatsIfZeroSats)
 			
 			HStack(alignment: VerticalAlignment.firstTextBaseline) {
@@ -257,18 +261,19 @@ struct HomeView : MVIView {
 			.accessibilityLabel("Total balance is \(amount.string)")
 			.accessibilityAddTraits(.isButton)
 			.accessibilitySortPriority(49)
-			.if(currencyPrefs.hideAmountsOnHomeScreen) { view in
+			.if(unknownBalance || hiddenBalance) { view in
 				view
 					.opacity(0.0)
 					.accessibility(hidden: true)
 			}
 			
-			if currencyPrefs.hideAmountsOnHomeScreen {
+			if unknownBalance || hiddenBalance {
 				
+				let imgName = unknownBalance ? "circle.dotted" : "circle.fill"
 				Group {
-					Text(Image(systemName: "circle.fill")) + Text("\u{202f}") +
-					Text(Image(systemName: "circle.fill")) + Text("\u{202f}") +
-					Text(Image(systemName: "circle.fill"))
+					Text(Image(systemName: imgName)) + Text("\u{202f}") +
+					Text(Image(systemName: imgName)) + Text("\u{202f}") +
+					Text(Image(systemName: imgName))
 				}
 				.font(.body)
 				.if(colorScheme == .dark) { view in
@@ -317,7 +322,7 @@ struct HomeView : MVIView {
 	func notices() -> some View {
 		
 		// === Welcome / Backup Seed ====
-		if mvi.model.balance.msat == 0 && Prefs.shared.isNewWallet {
+		if mvi.model.balance?.msat == 0 && Prefs.shared.isNewWallet {
 
 			// Reserved for potential "welcome" message.
 			EmptyView()
@@ -537,7 +542,10 @@ struct HomeView : MVIView {
 	func onModelChange(model: Home.Model) -> Void {
 		log.trace("onModelChange()")
 		
-		if model.balance.msat > 0 || model.incomingBalance?.msat ?? 0 > 0 || model.paymentsCount > 0 {
+		let balance = model.balance?.msat ?? 0
+		let incomingBalance = model.incomingBalance?.msat ?? 0
+		
+		if balance > 0 || incomingBalance > 0 || model.paymentsCount > 0 {
 			if Prefs.shared.isNewWallet {
 				Prefs.shared.isNewWallet = false
 			}
