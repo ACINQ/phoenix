@@ -75,9 +75,7 @@ class AppCloseChannelsConfigurationController(
                 val closingChannelIdsCopy = closingChannelIds?.toSet()
 
                 val updatedChannelsList = channels.filter {
-                    closingChannelIdsCopy?.let { set ->
-                        set.contains(it.key)
-                    } ?: true
+                    closingChannelIdsCopy?.contains(it.key) ?: true
                 }.mapNotNull {
                     channelInfoStatus(it.value)?.let { mappedStatus ->
                         CloseChannelsConfiguration.Model.ChannelInfo(
