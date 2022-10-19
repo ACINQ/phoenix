@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import PhoenixShared
 import Network
 import os.log
@@ -18,15 +19,11 @@ fileprivate let PAGE_COUNT_INCREMENT = 25
 
 struct HomeView : MVIView {
 
-	static private let appDelegate = AppDelegate.get()
-	static private let phoenixBusiness = appDelegate.business
-	static private let encryptedNodeId = appDelegate.encryptedNodeId!
-	static private let paymentsManager = phoenixBusiness.paymentsManager
-	static private let paymentsPageFetcher = paymentsManager.makePageFetcher()
+	static private let paymentsPageFetcher = Biz.business.paymentsManager.makePageFetcher()
 	
-	private let phoenixBusiness = HomeView.phoenixBusiness
-	private let encryptedNodeId = HomeView.encryptedNodeId
-	private let paymentsManager = HomeView.paymentsManager
+	private let phoenixBusiness = Biz.business
+	private let encryptedNodeId = Biz.encryptedNodeId!
+	private let paymentsManager = Biz.business.paymentsManager
 	private let paymentsPageFetcher = HomeView.paymentsPageFetcher
 	
 	@StateObject var mvi = MVIState({ $0.home() })
@@ -49,10 +46,12 @@ struct HomeView : MVIView {
 	let paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	
-	let lastCompletedPaymentPublisher = paymentsManager.lastCompletedPaymentPublisher()
-	let chainContextPublisher = phoenixBusiness.appConfigurationManager.chainContextPublisher()
+	@StateObject var syncState = DownloadMonitor()
 	
-	let incomingSwapsPublisher = paymentsManager.incomingSwapsPublisher()
+	let lastCompletedPaymentPublisher = Biz.business.paymentsManager.lastCompletedPaymentPublisher()
+	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
+	
+	let incomingSwapsPublisher = Biz.business.paymentsManager.incomingSwapsPublisher()
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 	@State var lastIncomingSwaps = [String: Lightning_kmpMilliSatoshi]()
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
@@ -71,11 +70,21 @@ struct HomeView : MVIView {
 	let backupSeed_enabled_publisher = Prefs.shared.backupSeed.isEnabled_publisher
 	let manualBackup_taskDone_publisher = Prefs.shared.backupSeed.manualBackup_taskDone_publisher
 	@State var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
-	@State var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
+	@State var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(
+		encryptedNodeId: Biz.encryptedNodeId!
+	)
 	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
+	
+	/* Accessibility sort priority:
+	 *
+	 * - Total balance    = 49
+	 * - Incoming balance = 48
+	 * - Notice boxes     = 47
+	 * - Footer cell      = 10
+	 */
 	
 	@ViewBuilder
 	var view: some View {
@@ -86,6 +95,9 @@ struct HomeView : MVIView {
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
+		}
+		.onChange(of: currencyPrefs.hideAmountsOnHomeScreen) { _ in
+			hideAmountsOnHomeScreenChanged()
 		}
 		.onReceive(recentPaymentSecondsPublisher) {
 			recentPaymentSecondsChanged($0)
@@ -195,12 +207,16 @@ struct HomeView : MVIView {
 	func totalBalance() -> some View {
 		
 		ZStack(alignment: Alignment.center) {
-				
+			
+			let balanceMsats = mvi.model.balance?.msat
+			let unknownBalance = balanceMsats == nil
+			let hiddenBalance = currencyPrefs.hideAmountsOnHomeScreen
+			
+			let amount = Utils.format( currencyPrefs,
+			                     msat: balanceMsats ?? 0,
+			                   policy: .showMsatsIfZeroSats)
+			
 			HStack(alignment: VerticalAlignment.firstTextBaseline) {
-				
-				let amount = Utils.format( currencyPrefs,
-				                     msat: mvi.model.balance.msat,
-				                   policy: .showMsatsIfZeroSats)
 				
 				if amount.hasSubFractionDigits {
 						
@@ -241,16 +257,23 @@ struct HomeView : MVIView {
 			.lineLimit(1)            // SwiftUI truncation bugs
 			.minimumScaleFactor(0.5) // SwiftUI truncation bugs
 			.onTapGesture { toggleCurrencyType() }
-			.if(currencyPrefs.hideAmountsOnHomeScreen) { view in
-				view.opacity(0.0)
+			.accessibilityElement(children: .combine)
+			.accessibilityLabel("Total balance is \(amount.string)")
+			.accessibilityAddTraits(.isButton)
+			.accessibilitySortPriority(49)
+			.if(unknownBalance || hiddenBalance) { view in
+				view
+					.opacity(0.0)
+					.accessibility(hidden: true)
 			}
 			
-			if currencyPrefs.hideAmountsOnHomeScreen {
+			if unknownBalance || hiddenBalance {
 				
+				let imgName = unknownBalance ? "circle.dotted" : "circle.fill"
 				Group {
-					Text(Image(systemName: "circle.fill")) + Text("\u{202f}") +
-					Text(Image(systemName: "circle.fill")) + Text("\u{202f}") +
-					Text(Image(systemName: "circle.fill"))
+					Text(Image(systemName: imgName)) + Text("\u{202f}") +
+					Text(Image(systemName: imgName)) + Text("\u{202f}") +
+					Text(Image(systemName: imgName))
 				}
 				.font(.body)
 				.if(colorScheme == .dark) { view in
@@ -259,6 +282,9 @@ struct HomeView : MVIView {
 				.lineLimit(1)            // SwiftUI truncation bugs
 				.minimumScaleFactor(0.5) // SwiftUI truncation bugs
 				.onTapGesture { toggleCurrencyType() }
+				.accessibilityLabel("Hidden balance")
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(49)
 			}
 		}
 	}
@@ -273,6 +299,7 @@ struct HomeView : MVIView {
 			
 			if currencyPrefs.hideAmountsOnHomeScreen {
 				Text("+\(incoming.digits) incoming".lowercased()) // digits => "***"
+					.accessibilityLabel("plus hidden amount incoming")
 				
 			} else {
 				Text("+\(incoming.string) incoming".lowercased())
@@ -286,13 +313,16 @@ struct HomeView : MVIView {
 		.onAnimationCompleted(for: incomingSwapScaleFactor) {
 			incomingSwapAnimationCompleted()
 		}
+		.accessibilityElement(children: .combine)
+		.accessibilityHint("pending on-chain confirmation")
+		.accessibilitySortPriority(48)
 	}
 	
 	@ViewBuilder
 	func notices() -> some View {
 		
 		// === Welcome / Backup Seed ====
-		if mvi.model.balance.msat == 0 && Prefs.shared.isNewWallet {
+		if mvi.model.balance?.msat == 0 && Prefs.shared.isNewWallet {
 
 			// Reserved for potential "welcome" message.
 			EmptyView()
@@ -304,6 +334,8 @@ struct HomeView : MVIView {
 					Image(systemName: "exclamationmark.triangle")
 						.imageScale(.large)
 						.padding(.trailing, 10)
+						.accessibilityLabel("Warning")
+					
 					Button {
 						navigateToBackup()
 					} label: {
@@ -319,11 +351,14 @@ struct HomeView : MVIView {
 						}
 						.multilineTextAlignment(.leading)
 						.allowsTightening(true)
-					}
+					} // </Button>
 				} // </HStack>
 				.font(.caption)
+				.accessibilityElement(children: .combine)
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(47)
+				
 			} // </NoticeBox>
-			
 		}
 		
 		// === Custom Electrum Server Problems ====
@@ -334,24 +369,32 @@ struct HomeView : MVIView {
 					Image(systemName: "exclamationmark.shield")
 						.imageScale(.large)
 						.padding(.trailing, 10)
-				}
+						.accessibilityHidden(true)
+						.accessibilityLabel("Warning")
+					
+					Button {
+						navigationToElecrumServer()
+					} label: {
+						Group {
+							Text("Custom electrum server: bad certificate ! ")
+								.foregroundColor(.primary)
+							+
+							Text("Check it ")
+								.foregroundColor(.appAccent)
+							+
+							Text(Image(systemName: "arrowtriangle.forward"))
+								.foregroundColor(.appAccent)
+						}
+						.multilineTextAlignment(.leading)
+						.allowsTightening(true)
+					} // </Button>
+					
+				} // </HStack>
 				.font(.caption)
-				Button {
-					navigationToElecrumServer()
-				} label: {
-					Group {
-						Text("Custom electrum server: bad certificate ! ")
-							.foregroundColor(.primary)
-						+
-						Text("Check it ")
-							.foregroundColor(.appAccent)
-						+
-						Text(Image(systemName: "arrowtriangle.forward"))
-							.foregroundColor(.appAccent)
-					}
-					.multilineTextAlignment(.leading)
-					.allowsTightening(true)
-				}
+				.accessibilityElement(children: .combine)
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(47)
+				
 			} // </NoticeBox>
 		}
 		
@@ -363,6 +406,9 @@ struct HomeView : MVIView {
 					Image(systemName: "tray.full")
 						.imageScale(.large)
 						.padding(.trailing, 10)
+						.accessibilityHidden(true)
+						.accessibilityLabel("Warning")
+					
 					VStack(alignment: HorizontalAlignment.leading, spacing: 5) {
 						Text("Bitcoin mempool is full and fees are high.")
 						Button {
@@ -370,10 +416,14 @@ struct HomeView : MVIView {
 						} label: {
 							Text("See how Phoenix is affected".uppercased())
 						}
-					}
-				}
+					} // </VStack>
+				} // </HStack>
 				.font(.caption)
-			}
+				.accessibilityElement(children: .combine)
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(47)
+				
+			} // </NoticeBox>
 		}
 	}
 	
@@ -411,8 +461,10 @@ struct HomeView : MVIView {
 				FooterCell(
 					totalPaymentCount: totalPaymentCount,
 					recentPaymentSeconds: recentPaymentSeconds,
+					isDownloadingRecentTxs: isDownloadingRecentTxs(),
 					didAppearCallback: footerCellDidAppear
 				)
+				.accessibilitySortPriority(10)
 			}
 		}
 		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
@@ -433,6 +485,35 @@ struct HomeView : MVIView {
 				: Utils.format(currencyPrefs, msat: msatTotal)
 		} else {
 			return nil
+		}
+	}
+	
+	func isDownloadingRecentTxs() -> Bool {
+		
+		guard syncState.isDownloading else {
+			return false
+		}
+		
+		if let oldest = syncState.oldestCompletedDownload {
+			log.debug("oldest = \(oldest.description)")
+			
+			// We've downloaded one or more batches from the cloud.
+			// Let's check to see if we expect to download any more "recent" payments.
+			let cutoff = Date().addingTimeInterval(Double(recentPaymentSeconds * -1))
+			log.debug("cutoff = \(cutoff.description)")
+			
+			if oldest < cutoff {
+				// Already downloaded all the tx's that could be considered "recent"
+				return false
+			} else {
+				// May have more "recent" tx's to download
+				return true
+			}
+			
+		} else {
+			// We're downloading the first batch from the cloud
+			log.debug("oldest = nil")
+			return true
 		}
 	}
 	
@@ -461,13 +542,24 @@ struct HomeView : MVIView {
 	func onModelChange(model: Home.Model) -> Void {
 		log.trace("onModelChange()")
 		
-		if model.balance.msat > 0 || model.incomingBalance?.msat ?? 0 > 0 || model.paymentsCount > 0 {
+		let balance = model.balance?.msat ?? 0
+		let incomingBalance = model.incomingBalance?.msat ?? 0
+		
+		if balance > 0 || incomingBalance > 0 || model.paymentsCount > 0 {
 			if Prefs.shared.isNewWallet {
 				Prefs.shared.isNewWallet = false
 			}
 		}
 	}
 	
+	func hideAmountsOnHomeScreenChanged() {
+		log.trace("hideAmountsOnHomeScreenChanged()")
+		
+		// Without this, VoiceOver re-reads the previous text/button,
+		// before reading the new text/button that replaces it.
+		UIAccessibility.post(notification: .screenChanged, argument: nil)
+	}
+
 	func recentPaymentSecondsChanged(_ seconds: Int) {
 		log.trace("recentPaymentSecondsChanged()")
 		
@@ -602,8 +694,7 @@ struct HomeView : MVIView {
 			return
 		}
 		
-		let business = AppDelegate.get().business
-		let txUrlStr = business.blockchainExplorer.addressUrl(addr: addr, website: website)
+		let txUrlStr = Biz.business.blockchainExplorer.addressUrl(addr: addr, website: website)
 		if let txUrl = URL(string: txUrlStr) {
 			UIApplication.shared.open(txUrl)
 		}
@@ -801,6 +892,7 @@ fileprivate struct FooterCell: View {
 	
 	let totalPaymentCount: Int?
 	let recentPaymentSeconds: Int
+	let isDownloadingRecentTxs: Bool
 	let didAppearCallback: () -> Void
 	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -808,7 +900,9 @@ fileprivate struct FooterCell: View {
 	@ViewBuilder
 	var body: some View {
 		Group {
-			if let totalPaymentCount = totalPaymentCount {
+			if isDownloadingRecentTxs {
+				body_downloading()
+			} else if let totalPaymentCount = totalPaymentCount {
 				body_ready(totalPaymentCount)
 			} else {
 				body_pending()
@@ -817,6 +911,20 @@ fileprivate struct FooterCell: View {
 		.onAppear {
 			onAppear()
 		}
+	}
+	
+	@ViewBuilder
+	func body_downloading() -> some View {
+		
+		Label {
+			Text("Downloading payments from cloud")
+		} icon: {
+			Image(systemName: "icloud.and.arrow.down")
+				.imageScale(.large)
+		}
+		.font(.callout)
+		.foregroundColor(.secondary)
+		.padding(.vertical, 10)
 	}
 	
 	@ViewBuilder
@@ -838,6 +946,7 @@ fileprivate struct FooterCell: View {
 					.font(.footnote)
 					.padding(.top, 4)
 			}
+			.accessibilityHidden(true) // duplicate button
 		}
 		.padding(.vertical, 10)
 	}
@@ -845,18 +954,61 @@ fileprivate struct FooterCell: View {
 	@ViewBuilder
 	func body_pending() -> some View {
 		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			
-			Text("fetching more rows...")
-				.font(.footnote)
-				.foregroundColor(.secondary)
-		}
-		.padding(.vertical, 10)
+		Text("fetching more rows...")
+			.font(.footnote)
+			.foregroundColor(.secondary)
+			.padding(.vertical, 10)
 	}
 	
 	func onAppear() {
 		log.trace("[FooterCell] onAppear()")
 		
 		didAppearCallback()
+	}
+}
+
+// --------------------------------------------------
+// MARK: -
+// --------------------------------------------------
+
+class DownloadMonitor: ObservableObject {
+	
+	@Published var isDownloading: Bool = false
+	@Published var oldestCompletedDownload: Date? = nil
+	
+	private var cancellables = Set<AnyCancellable>()
+	
+	init() {
+		let syncManager = Biz.syncManager!
+		let syncStatePublisher = syncManager.syncTxManager.statePublisher
+		
+		syncStatePublisher.sink {[weak self](state: SyncTxManager_State) in
+			self?.update(state)
+		}
+		.store(in: &cancellables)
+	}
+	
+	private func update(_ state: SyncTxManager_State) {
+		log.trace("[DownloadMonitor] update()")
+		
+		if case .downloading(let details) = state {
+			log.trace("[DownloadMonitor] isDownloading = true")
+			isDownloading = true
+			
+			subscribe(details)
+		} else {
+			log.trace("[DownloadMonitor] isDownloading = false")
+			isDownloading = false
+		}
+	}
+	
+	private func subscribe(_ details: SyncTxManager_State_Downloading) {
+		log.trace("[DownloadMonitor] subscribe()")
+		
+		details.$oldestCompletedDownload.sink {[weak self](date: Date?) in
+			log.trace("[DownloadMonitor] oldestCompletedDownload = \(date?.description ?? "nil")")
+			self?.oldestCompletedDownload = date
+		}
+		.store(in: &cancellables)
 	}
 }

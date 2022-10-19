@@ -49,7 +49,7 @@ val navController: NavHostController
     @Composable
     get() = LocalNavController.current ?: error("navigation controller is not available")
 
-val amountUnit: CurrencyUnit
+val preferredAmountUnit: CurrencyUnit
     @Composable
     get() = if (LocalShowInFiat.current) LocalFiatCurrency.current else LocalBitcoinUnit.current
 

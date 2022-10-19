@@ -358,7 +358,7 @@ struct MainView_Big: View {
 				Color.primaryBackground
 					.ignoresSafeArea()
 
-				if AppDelegate.showTestnetBackground {
+				if BusinessManager.showTestnetBackground {
 					Image("testnet_bg")
 						.resizable(resizingMode: .tile)
 						.ignoresSafeArea()
@@ -367,7 +367,8 @@ struct MainView_Big: View {
 				primary_body()
 			
 			} // <ZStack>
-			.navigationBarTitle("", displayMode: .inline)
+			.navigationTitle("")
+			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarHidden(true)
 			
 		} // </NavigationView>

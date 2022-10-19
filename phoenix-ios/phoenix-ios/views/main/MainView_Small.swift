@@ -21,8 +21,7 @@ fileprivate enum NavLinkTag: String {
 
 struct MainView_Small: View {
 	
-	private let appDelegate = AppDelegate.get()
-	private let phoenixBusiness = AppDelegate.get().business
+	private let phoenixBusiness = Biz.business
 	
 	@State private var navLinkTag: NavLinkTag? = nil
 	
@@ -70,6 +69,16 @@ struct MainView_Small: View {
 	// MARK: View Builders
 	// --------------------------------------------------
 	
+	/* .accessibilitySortPriority():
+	 *
+	 * - Footer button: send         = 39
+	 * - Footer button: receive      = 38
+	 * - Header button: settings     = 23
+	 * - Header button: transactions = 22
+	 * - Header button: app status   = 21
+	 * - Header button: tools        = 20
+	 */
+	
 	@ViewBuilder
 	var body: some View {
 		
@@ -96,21 +105,24 @@ struct MainView_Small: View {
 			) {
 				EmptyView()
 			}
+			.accessibilityHidden(true)
 			
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 
-			if AppDelegate.showTestnetBackground {
+			if BusinessManager.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+					.accessibilityHidden(true)
 			}
 
 			content()
 
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationBarTitle("", displayMode: .inline)
+		.navigationTitle("")
+		.navigationBarTitleDisplayMode(.inline)
 		.navigationBarHidden(true)
 		.onChange(of: navLinkTag) { tag in
 			navLinkTagChanged(tag)
@@ -141,9 +153,11 @@ struct MainView_Small: View {
 			// Leading Button 1
 			header_settingsButton()
 				.padding(.trailing)
+				.accessibilitySortPriority(23)
 			
 			// Leading Button 2
 			header_transactionsButton()
+				.accessibilitySortPriority(22)
 			
 			Spacer()
 			
@@ -153,6 +167,7 @@ struct MainView_Small: View {
 				headerButtonHeight: $headerButtonHeight
 			)
 			.padding(.trailing)
+			.accessibilitySortPriority(21)
 			
 			// Trailing Button 1
 			ToolsMenu(
@@ -160,6 +175,7 @@ struct MainView_Small: View {
 				buttonHeight: $headerButtonHeight,
 				openCurrencyConverter: { navLinkTag = .CurrencyConverter }
 			)
+			.accessibilitySortPriority(20)
 		}
 		.padding([.top, .leading, .trailing])
 		.padding(.bottom, 40) // extra padding on bottom, between Header & HomeView
@@ -188,6 +204,7 @@ struct MainView_Small: View {
 						.stroke(Color.borderColor, lineWidth: 1)
 				)
 		}
+		.accessibilityLabel("Settings")
 	}
 	
 	@ViewBuilder
@@ -212,6 +229,7 @@ struct MainView_Small: View {
 						.stroke(Color.borderColor, lineWidth: 1)
 				)
 		}
+		.accessibilityLabel("Payment history")
 	}
 	
 	@ViewBuilder
@@ -279,6 +297,8 @@ struct MainView_Small: View {
 			.frame(minWidth: footerButtonWidth, alignment: Alignment.center)
 			.read(footerButtonWidthReader)
 			.read(footerButtonHeightReader)
+			.accessibilityLabel("Receive payment")
+			.accessibilitySortPriority(38)
 
 			Spacer(minLength: 2)
 			if let footerButtonHeight = footerButtonHeight {
@@ -308,6 +328,8 @@ struct MainView_Small: View {
 			.frame(minWidth: footerButtonWidth, alignment: Alignment.center)
 			.read(footerButtonWidthReader)
 			.read(footerButtonHeightReader)
+			.accessibilityLabel("Send payment")
+			.accessibilitySortPriority(39)
 			
 			Spacer(minLength: 2)
 		
@@ -350,6 +372,8 @@ struct MainView_Small: View {
 				} // </Label>
 			} // </Button>
 			.read(footerButtonHeightReader)
+			.accessibilityLabel("Receive payment")
+			.accessibilitySortPriority(38)
 
 			Spacer(minLength: 0)
 			if let footerButtonHeight = footerButtonHeight {
@@ -377,6 +401,8 @@ struct MainView_Small: View {
 				} // </Label>
 			} // </Button>
 			.read(footerButtonHeightReader)
+			.accessibilityLabel("Send payment")
+			.accessibilitySortPriority(39)
 		
 			Spacer(minLength: 0)
 			
@@ -406,6 +432,8 @@ struct MainView_Small: View {
 				} // </Button>
 				.frame(minWidth: footerButtonWidth, alignment: Alignment.leading)
 				.read(footerButtonWidthReader)
+				.accessibilityLabel("Receive payment")
+				.accessibilitySortPriority(38)
 				
 				Divider().frame(height: 1).background(Color.borderColor)
 				
@@ -425,6 +453,8 @@ struct MainView_Small: View {
 				} // </Button>
 				.frame(minWidth: footerButtonWidth, alignment: Alignment.leading)
 				.read(footerButtonWidthReader)
+				.accessibilityLabel("Send payment")
+				.accessibilitySortPriority(39)
 				
 			} // </VStack>
 			Spacer()
@@ -487,7 +517,7 @@ struct MainView_Small: View {
 		// - get a Scan.ModelValidate instance
 		// - pass this to SendView as the `firstModel` parameter
 		
-		let controllers = AppDelegate.get().business.controllers
+		let controllers = Biz.business.controllers
 		guard let scanController = controllers.scan(firstModel: Scan.ModelReady()) as? AppScanController else {
 			return
 		}

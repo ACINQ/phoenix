@@ -23,7 +23,7 @@ struct AppStatusPopover: View {
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 	
-	let syncManager = AppDelegate.get().syncManager!.syncTxManager
+	let syncManager = Biz.syncManager!.syncTxManager
 	
 	enum TitleIconWidth: Preference {}
 	let titleIconWidthReader = GeometryPreferenceReader(
@@ -54,6 +54,8 @@ struct AppStatusPopover: View {
 					close()
 				}
 				.font(.title2)
+				.accessibilityHidden(popoverState.publisher.value?.dismissable ?? false)
+				
 			}
 			.padding(.top, 10)
 			.padding([.leading, .trailing])
@@ -76,46 +78,18 @@ struct AppStatusPopover: View {
 		
 		VStack(alignment: .leading) {
 			
-			Group {
-				
-				let globalStatus = connectionsMonitor.connections.global
-				if globalStatus is Lightning_kmpConnection.CLOSED {
-					
-					Label {
-						Text("Offline")
-					} icon: {
-						Image(systemName: "bolt.slash.fill")
-							.imageScale(.medium)
-							.read(titleIconWidthReader)
-							.frame(width: titleIconWidth, alignment: .center)
-					}
-				
-				} else if globalStatus is Lightning_kmpConnection.ESTABLISHING {
-					
-					Label {
-						Text("Connecting…")
-					} icon: {
-						Image(systemName: "bolt.slash")
-							.imageScale(.medium)
-							.read(titleIconWidthReader)
-							.frame(width: titleIconWidth, alignment: .center)
-					}
-				
-				} else {
-				
-					Label {
-						Text("Connected")
-					} icon: {
-						Image(systemName: "bolt.fill")
-							.imageScale(.medium)
-							.read(titleIconWidthReader)
-							.frame(width: titleIconWidth, alignment: .center)
-					}
-				}
-				
-			} // </Group>
+			let (txt, img) = connectionStatusHeader()
+			Label {
+				Text(verbatim: txt)
+			} icon: {
+				Image(systemName: img)
+					.imageScale(.medium)
+					.read(titleIconWidthReader)
+					.frame(width: titleIconWidth, alignment: .center)
+			}
 			.font(.title3)
 			.padding(.bottom, 15)
+			.accessibilityLabel("Connection status: \(txt)")
 			
 			ConnectionCell(
 				label: NSLocalizedString("Internet", comment: "AppStatusPopover: label"),
@@ -143,6 +117,28 @@ struct AppStatusPopover: View {
 			)
 		
 		} // </VStack>
+	}
+	
+	func connectionStatusHeader() -> (String, String) {
+		
+		let globalStatus = connectionsMonitor.connections.global
+		let txt: String
+		let img: String
+		
+		if globalStatus is Lightning_kmpConnection.CLOSED {
+			txt = NSLocalizedString("Offline", comment: "Connection status")
+			img = "bolt.slash.fill"
+			
+		} else if globalStatus is Lightning_kmpConnection.ESTABLISHING {
+			txt = NSLocalizedString("Connecting…", comment: "Connection status")
+			img = "bolt.slash"
+			
+		} else {
+			txt = NSLocalizedString("Connected", comment: "Connection status")
+			img = "bolt.fill"
+		}
+		
+		return (txt, img)
 	}
 	
 	@ViewBuilder
@@ -218,7 +214,7 @@ struct AppStatusPopover: View {
 							Text("Deleting record zone...").font(.callout)
 					}
 					
-				case .downloading(let progress):
+				case .downloading(let details):
 					
 					Label {
 						Text("Downloading payments")
@@ -231,10 +227,10 @@ struct AppStatusPopover: View {
 					.font(.title3)
 					.padding(.bottom, 15)
 					
-					SyncProgressDetails(syncState: $syncState, syncProgress: progress)
+					DownloadProgressDetails(details: details)
 						.font(.callout)
 				
-				case .uploading(let progress):
+				case .uploading(let details):
 					
 					Label {
 						Text("Uploading payments")
@@ -247,7 +243,7 @@ struct AppStatusPopover: View {
 					.font(.title3)
 					.padding(.bottom, 15)
 					
-					SyncProgressDetails(syncState: $syncState, syncProgress: progress)
+					UploadProgressDetails(details: details)
 						.font(.callout)
 				
 				case .waiting(let details):
@@ -374,7 +370,9 @@ fileprivate struct ConnectionCell: View {
 	var body: some View {
 		
 		HStack(alignment: VerticalAlignment.center) {
-			let bullet = Image(systemName: "circle.fill").imageScale(.small)
+			let bullet = Image(systemName: "circle.fill")
+				.imageScale(.small)
+				.accessibilityHidden(true)
 
 			if connection is Lightning_kmpConnection.ESTABLISHED{
 				bullet.foregroundColor(.appPositive)
@@ -392,65 +390,68 @@ fileprivate struct ConnectionCell: View {
 			
 		} // </HStack>
 		.font(.callout)
+		.accessibilityElement(children: .combine)
 	}
 }
 
-fileprivate struct SyncProgressDetails: View {
+fileprivate struct DownloadProgressDetails: View {
 	
-	@Binding var syncState: SyncTxManager_State
-	@StateObject var syncProgress: SyncTxManager_State_Progress
+	@StateObject var details: SyncTxManager_State_Downloading
 	
 	@ViewBuilder
 	var body: some View {
 			
 		HStack(alignment: .center, spacing: 6) {
 			
-			switch syncState {
-				case .downloading:
+			ProgressView()
+				.progressViewStyle(CircularProgressViewStyle())
 			
-					ProgressView()
-						.progressViewStyle(CircularProgressViewStyle())
-						
-					if syncProgress.completedCount == 1 {
-						Text("Fetched \(syncProgress.completedCount) item")
-					} else {
-						Text("Fetched \(syncProgress.completedCount) items")
-					}
+			if details.completedCount == 1 {
+				Text("Fetched \(details.completedCount) item")
+			} else {
+				Text("Fetched \(details.completedCount) items")
+			}
+		}
+	}
+}
+
+fileprivate struct UploadProgressDetails: View {
+	
+	@StateObject var details: SyncTxManager_State_Uploading
+	
+	@ViewBuilder
+	var body: some View {
 			
-				case .uploading:
-				
-					ProgressView(value: uploadProgressValue())
-						.progressViewStyle(CircularProgressViewStyle())
-					
-					Text(uploadProgressText())
-				
-				default:
-				
-					ProgressView()
-						.progressViewStyle(CircularProgressViewStyle())
-					
-					Text(verbatim: "...")
-					
-			} // </switch>
-		} // </HStack>
+		HStack(alignment: .center, spacing: 6) {
+			
+			ProgressView(value: uploadProgressValue())
+				.progressViewStyle(CircularProgressViewStyle())
+			
+			Text(uploadProgressText())
+		}
 	}
 	
 	func uploadProgressValue() -> Double {
 		
-		let inFlightFraction = syncProgress.inFlightProgress?.fractionCompleted ?? 0.0
-		let inFlightValue = Double(syncProgress.inFlightCount) * inFlightFraction
+		let inFlightFraction = details.inFlightProgress?.fractionCompleted ?? 0.0
+		let inFlightValue = Double(details.inFlightCount) * inFlightFraction
 		
-		let numerator: Double = Double(syncProgress.completedCount) + inFlightValue
-		let denominator: Double = Double(syncProgress.totalCount)
+		let numerator: Double = Double(details.completedCount) + inFlightValue
+		let denominator: Double = Double(details.totalCount)
 		
-		return numerator / denominator
+		guard denominator != 0 else {
+			return 0.0
+		}
+		
+		let percent = numerator / denominator
+		return max(0.0, min(1.0, percent))
 	}
 	
 	func uploadProgressText() -> String {
 	
-		let completed = syncProgress.completedCount
-		let total = syncProgress.totalCount
-		let inFlight = syncProgress.inFlightCount
+		let completed = details.completedCount
+		let total = details.totalCount
+		let inFlight = details.inFlightCount
 		
 		if inFlight > 0 {
 			return NSLocalizedString(

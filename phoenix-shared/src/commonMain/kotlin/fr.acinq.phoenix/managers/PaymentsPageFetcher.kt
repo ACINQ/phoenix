@@ -2,15 +2,13 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import kotlinx.coroutines.*
-import kotlin.time.Duration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.seconds
 
 data class PaymentsPage(
     val offset: Int,
@@ -20,7 +18,6 @@ data class PaymentsPage(
     constructor(): this(0, 0, emptyList())
 }
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class PaymentsPageFetcher(
     loggerFactory: LoggerFactory,
     private val databaseManager: DatabaseManager
@@ -120,7 +117,7 @@ class PaymentsPageFetcher(
         job = launch {
             val db = databaseManager.paymentsDb()
             if (secondsSnapshot > 0) {
-                val date = Clock.System.now() - Duration.seconds(secondsSnapshot)
+                val date = Clock.System.now() - secondsSnapshot.seconds
                 db.listRecentPaymentsOrderFlow(
                     date = date.toEpochMilliseconds(),
                     count = countSnapshot,
@@ -169,7 +166,7 @@ class PaymentsPageFetcher(
         val oldestCompleted = rows.lastOrNull { it.completedAt != null } ?: return
         val oldestTimestamp = Instant.fromEpochMilliseconds(oldestCompleted.completedAt!!)
 
-        val refreshTimestamp = oldestTimestamp + Duration.seconds(this.seconds)
+        val refreshTimestamp = oldestTimestamp + this.seconds.seconds
         val diff = refreshTimestamp - Clock.System.now()
 
         log.debug { "oldestTimestamp: ${oldestTimestamp.toEpochMilliseconds()}"}

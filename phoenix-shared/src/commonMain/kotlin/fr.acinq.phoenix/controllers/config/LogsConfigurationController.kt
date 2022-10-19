@@ -6,14 +6,13 @@ import fr.acinq.phoenix.utils.LogMemory
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.getTemporaryDirectoryPath
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.kodein.log.LoggerFactory
 import org.kodein.memory.file.*
 import org.kodein.memory.use
 
-@OptIn(ExperimentalCoroutinesApi::class)
+
 class AppLogsConfigurationController(
     ctx: PlatformContext,
     loggerFactory: LoggerFactory,

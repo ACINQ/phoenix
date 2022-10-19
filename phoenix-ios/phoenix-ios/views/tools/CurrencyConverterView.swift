@@ -31,7 +31,7 @@ struct CurrencyConverterView: View {
 	
 	@State var lastChange: CurrencyAmount?
 	
-	@State var currencies: [Currency] = Prefs.shared.currencyConverterList
+	@State var currencies: [Currency] = GroupPrefs.shared.currencyConverterList
 	
 	@State var parsedRow: ParsedRow? = nil
 	
@@ -42,7 +42,7 @@ struct CurrencyConverterView: View {
 	@State var isRefreshingExchangeRates = false
 	
 	let refreshingExchangeRatesPublisher =
-		AppDelegate.get().business.currencyManager.refreshPublisher()
+		Biz.business.currencyManager.refreshPublisher()
 	
 	let timer = Timer.publish(every: 15 /* seconds */, on: .current, in: .common).autoconnect()
 	@State var currentDate = Date()
@@ -188,10 +188,8 @@ struct CurrencyConverterView: View {
 			footer()
 			
 		} // </VStack>
-		.navigationBarTitle(
-			NSLocalizedString("Currency Converter", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Currency Converter", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -348,7 +346,7 @@ struct CurrencyConverterView: View {
 	private func onAppear() {
 		log.trace("onAppear()")
 		
-		if #available(iOS 15.0, *) { } else {
+		if #unavailable(iOS 15.0) {
 			// iOS 14 workaround
 			log.debug("Setting UITableView.background = .systemBackground")
 			UITableView.appearance().backgroundColor = .systemBackground
@@ -360,9 +358,9 @@ struct CurrencyConverterView: View {
 			
 			UIScrollView.appearance().keyboardDismissMode = .interactive
 			
-			if #available(iOS 15.0, *) { } else {
+			if #unavailable(iOS 15.0) {
 				// iOS 14 bug workaround
-				currencies = Prefs.shared.currencyConverterList
+				currencies = GroupPrefs.shared.currencyConverterList
 			}
 			if currencies.isEmpty {
 				currencies = defaultCurrencies()
@@ -398,7 +396,7 @@ struct CurrencyConverterView: View {
 	private func onDisappear() {
 		log.trace("onDisappear()")
 		
-		if #available(iOS 15.0, *) { } else {
+		if #unavailable(iOS 15.0) {
 			// iOS 14 workaround
 			if !currencySelectorOpen {
 				log.debug("Setting UITableView.background = .primaryBackground")
@@ -422,9 +420,9 @@ struct CurrencyConverterView: View {
 		log.trace("currenciesDidChange(): \(Currency.serializeList(currencies))")
 		
 		if currencies == defaultCurrencies() {
-			Prefs.shared.currencyConverterList = []
+			GroupPrefs.shared.currencyConverterList = []
 		} else {
-			Prefs.shared.currencyConverterList = currencies
+			GroupPrefs.shared.currencyConverterList = currencies
 		}
 	}
 	
@@ -566,7 +564,10 @@ struct CurrencyConverterView: View {
 	private func refreshRates() {
 		log.trace("refreshRates()")
 		
-		AppDelegate.get().business.currencyManager.refreshAll(targets: FiatCurrency.companion.values)
+		Biz.business.currencyManager.refreshAll(
+			targets : FiatCurrency.companion.values,
+			force   : true
+		)
 	}
 	
 	private func didSelectCurrency(_ newCurrency: Currency) {
@@ -1054,10 +1055,8 @@ fileprivate struct CurrencySelector: View, ViewName {
 				content
 			}
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Fiat currency", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Fiat currency", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder

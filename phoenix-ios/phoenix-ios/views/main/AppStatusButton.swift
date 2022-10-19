@@ -32,8 +32,8 @@ struct AppStatusButton: View {
 
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	
-	let syncTxManager = AppDelegate.get().syncManager!.syncTxManager
-	
+	let syncTxManager = Biz.syncManager!.syncTxManager
+
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -46,7 +46,8 @@ struct AppStatusButton: View {
 				icon.view()
 					.foregroundColor(.clear)
 					.read(headerButtonHeightReader)
-			}
+					.accessibilityHidden(true)
+			} // </ForEach>
 			
 			button()
 		}
@@ -82,6 +83,7 @@ struct AppStatusButton: View {
 			RoundedRectangle(cornerRadius: 30) // Test this with larger dynamicFontSize
 				.stroke(Color.borderColor, lineWidth: 1)
 		)
+		.accessibilityLabel("App status")
 	}
 	
 	@ViewBuilder
@@ -278,9 +280,9 @@ fileprivate enum AppStatusButtonIcon: CaseIterable, Identifiable {
 	case syncing
 	case waiting
 	case error;
-	
+
 	var id: Self { self }
-	
+
 	@ViewBuilder func view() -> some View {
 		switch self {
 		case .disconnected:

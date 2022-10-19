@@ -75,31 +75,47 @@ struct PaymentSummaryView: View {
 					.foregroundColor(labelColor)
 					.fontWeight(.thin)
 					.read(maxLabelWidthReader)
+					.accessibilityLabel(baseAmountLabel(info))
+					.accessibilityHidden(info.isEmpty)
 				Text(verbatim: "")
 					.padding(.bottom, 4)
+					.accessibilityHidden(true)
+				
 				if info.hasTip || info.isEmpty {
 					Text("tip")
 						.foregroundColor(labelColor)
 						.fontWeight(.thin)
 						.read(maxLabelWidthReader)
+						.accessibilityLabel(tipAmountLabel(info))
+						.accessibilityHidden(info.isEmpty)
 					Text(verbatim: "")
 						.padding(.bottom, 4)
+						.accessibilityHidden(true)
 				}
+				
 				if info.hasMinerFee {
 					Text("miner fee")
 						.foregroundColor(labelColor)
 						.fontWeight(.thin)
 						.read(maxLabelWidthReader)
+						.accessibilityLabel(minerFeeAmountLabel(info))
+						.accessibilityHidden(info.isEmpty)
 					Text(verbatim: "")
 						.padding(.bottom, 4)
+						.accessibilityHidden(true)
 				}
+				
 				Divider()
 					.frame(width: 0, height: 1)
+				
 				Text("total")
 					.fontWeight(.thin)
 					.foregroundColor(labelColor)
 					.read(maxLabelWidthReader)
+					.accessibilityLabel(totalAmountLabel(info))
+					.accessibilityHidden(info.isEmpty)
 				Text(verbatim: "")
+					.accessibilityHidden(true)
 			}
 			
 			VStack(alignment: HorizontalAlignment.trailing, spacing: 8) {
@@ -110,6 +126,7 @@ struct PaymentSummaryView: View {
 					.foregroundColor(fiatColor)
 					.read(maxNumberWidthReader)
 					.padding(.bottom, 4)
+				
 				if info.hasTip || info.isEmpty {
 					Text(verbatim: info.bitcoin_tip.string)
 						.foregroundColor(bitcoinColor)
@@ -119,6 +136,7 @@ struct PaymentSummaryView: View {
 						.read(maxNumberWidthReader)
 						.padding(.bottom, 4)
 				}
+				
 				if info.hasMinerFee {
 					Text(verbatim: info.bitcoin_minerFee.string)
 						.foregroundColor(bitcoinColor)
@@ -128,9 +146,11 @@ struct PaymentSummaryView: View {
 						.read(maxNumberWidthReader)
 						.padding(.bottom, 4)
 				}
+				
 				Divider()
 					.foregroundColor(dividerColor)
 					.frame(width: info.isEmpty ? 0 : maxNumberWidth ?? 0, height: 1)
+				
 				Text(verbatim: info.bitcoin_total.string)
 					.foregroundColor(bitcoinColor)
 					.read(maxNumberWidthReader)
@@ -138,11 +158,13 @@ struct PaymentSummaryView: View {
 					.foregroundColor(fiatColor)
 					.read(maxNumberWidthReader)
 			}
+			.accessibilityHidden(true)
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
 				Text(verbatim: "")
 				Text(verbatim: "")
 					.padding(.bottom, 4)
+				
 				if info.hasTip || info.isEmpty {
 					Text(verbatim: info.percent_tip)
 						.foregroundColor(percentColor)
@@ -150,6 +172,7 @@ struct PaymentSummaryView: View {
 					Text(verbatim: "")
 						.padding(.bottom, 4)
 				}
+				
 				if info.hasMinerFee {
 					Text(verbatim: info.percent_minerFee)
 						.foregroundColor(percentColor)
@@ -157,11 +180,14 @@ struct PaymentSummaryView: View {
 					Text(verbatim: "")
 						.padding(.bottom, 4)
 				}
+				
 				Divider()
 					.frame(width: 0, height: 1)
+				
 				Text(verbatim: "")
 				Text(verbatim: "")
 			}
+			.accessibilityHidden(true)
 		}
 		.assignMaxPreference(for: maxLabelWidthReader.key, to: $maxLabelWidth)
 		.assignMaxPreference(for: maxNumberWidthReader.key, to: $maxNumberWidth)
@@ -256,6 +282,52 @@ struct PaymentSummaryView: View {
 			isEmpty          : false,
 			hasTip           : nums.tipMsat > 0,
 			hasMinerFee      : nums.minerFeeMsat > 0
+		)
+	}
+	
+	func baseAmountLabel(_ info: PaymentSummaryStrings) -> String {
+		
+		let amountBitcoin = info.bitcoin_base.string
+		let amountFiat    = info.fiat_base.string
+		
+		return NSLocalizedString(
+			"Base amount: \(amountBitcoin), ≈\(amountFiat)",
+			comment: "VoiceOver label: PaymentSummaryView"
+		)
+	}
+	
+	func tipAmountLabel(_ info: PaymentSummaryStrings) -> String {
+
+		let percent       = info.percent_tip
+		let amountBitcoin = info.bitcoin_tip.string
+		let amountFiat    = info.fiat_tip.string
+		
+		return NSLocalizedString(
+			"Tip amount: \(percent), \(amountBitcoin), ≈\(amountFiat)",
+			comment: "VoiceOver label: PaymentSummaryView"
+		)
+	}
+	
+	func minerFeeAmountLabel(_ info: PaymentSummaryStrings) -> String {
+		
+		let percent       = info.percent_minerFee
+		let amountBitcoin = info.bitcoin_minerFee.string
+		let amountFiat    = info.fiat_minerFee.string
+		
+		return NSLocalizedString(
+			"Miner fee amount: \(percent), \(amountBitcoin), ≈\(amountFiat)",
+			comment: "VoiceOver label: PaymentSummaryView"
+		)
+	}
+	
+	func totalAmountLabel(_ info: PaymentSummaryStrings) -> String {
+		
+		let amountBitcoin = info.bitcoin_total.string
+		let amountFiat    = info.fiat_total.string
+		
+		return NSLocalizedString(
+			"Total amount: \(amountBitcoin), ≈\(amountFiat)",
+			comment: "VoiceOver label: PaymentSummaryView"
 		)
 	}
 }

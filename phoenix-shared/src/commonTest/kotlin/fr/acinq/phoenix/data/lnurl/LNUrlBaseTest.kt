@@ -40,7 +40,7 @@ class LNUrlBaseTest {
         assertTrue { url.protocol.isSecure() }
         assertEquals("service.com", url.host)
         assertEquals("/api", url.encodedPath)
-        assertEquals(parametersOf("q", "3fc3645b439ce8e7f2553a69e5267081d96dcd340693afabe04be7b0ccd178df"), url.parameters)
+        assertEquals("3fc3645b439ce8e7f2553a69e5267081d96dcd340693afabe04be7b0ccd178df", url.parameters["q"])
     }
 
     @Test

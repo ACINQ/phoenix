@@ -23,7 +23,6 @@ import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.*
-import fracinqphoenixdb.IncomingPaymentsQueries
 
 class IncomingQueries(private val database: PaymentsDatabase) {
 

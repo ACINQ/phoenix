@@ -3,9 +3,10 @@ import Combine
 import CommonCrypto
 import CryptoKit
 import LocalAuthentication
+import SwiftUI
 import os.log
 
-#if DEBUG && false
+#if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
 	category: "AppSecurity"
@@ -35,22 +36,7 @@ enum BiometricSupport {
 	}
 }
 
-enum ReadSecurityFileError: Error {
-	case fileNotFound
-	case errorReadingFile(underlying: Error)
-	case errorDecodingFile(underlying: Error)
-}
-
-enum ReadKeychainError: Error {
-	case keychainOptionNotEnabled
-	case keychainBoxCorrupted(underlying: Error)
-	case errorReadingKey(underlying: Error)
-	case keyNotFound
-	case errorOpeningBox(underlying: Error)
-	case invalidMnemonics
-}
-
-struct LossOfSeedDanger {
+struct UnlockError {
 	let readSecurityFileError: ReadSecurityFileError?
 	let readKeychainError: ReadKeychainError?
 	
@@ -59,11 +45,6 @@ struct LossOfSeedDanger {
 		self.readKeychainError = readKeychainError
 	}
 }
-
-// Names of entries stored within the OS keychain:
-private let keychain_accountName_keychain = "securityFile_keychain"
-private let keychain_accountName_biometrics = "securityFile_biometrics"
-private let keychain_accountName_softBiometrics = "biometrics"
 
 class AppSecurity {
 	
@@ -83,69 +64,24 @@ class AppSecurity {
 	private init() {/* must use shared instance */}
 	
 	// --------------------------------------------------------------------------------
-	// MARK:- Private Utilities
+	// MARK: Private Utilities
 	// --------------------------------------------------------------------------------
 	
-	private lazy var securityJsonUrl: URL = {
-		
-		// Thread safety: lazy => thread-safe / uses dispatch_once primitives internally
-		
-		guard let appSupportDir = try?
-			FileManager.default.url(for: .applicationSupportDirectory,
-			                         in: .userDomainMask,
-			             appropriateFor: nil,
-			                     create: true)
-		else {
-			fatalError("FileManager returned nil applicationSupportDirectory !")
-		}
-		
-		return appSupportDir.appendingPathComponent("security.json", isDirectory: false)
-	}()
-	
-	/// Performs disk IO - prefer use in background thread.
-	///
-	private func safeReadFromDisk() -> Result<SecurityFile, ReadSecurityFileError> {
-		
-		let fileUrl = self.securityJsonUrl
-		
-		if !FileManager.default.fileExists(atPath: fileUrl.path) {
-			return .failure(.fileNotFound)
-		}
-		
-		let data: Data
-		do {
-			data = try Data(contentsOf: fileUrl)
-		} catch {
-			log.error("safeReadFromDisk(): error reading file: \(String(describing: error))")
-			return .failure(.errorReadingFile(underlying: error))
-		}
-		
-		let result: SecurityFile
-		do {
-			result = try JSONDecoder().decode(SecurityFile.self, from: data)
-		} catch {
-			log.error("safeReadFromDisk(): error decoding file: \(String(describing: error))")
-			return .failure(.errorDecodingFile(underlying: error))
-		}
-		
-		return .success(result)
-	}
-	
-	/// Performs disk IO - prefer use in background thread.
+	/// Performs disk IO - use in background thread.
 	///
 	private func readFromDisk() -> SecurityFile {
 		
-		let result = safeReadFromDisk()
+		let result = SharedSecurity.shared.readSecurityJsonFromDisk()
 		let securityFile = try? result.get()
 		
 		return securityFile ?? SecurityFile()
 	}
 	
-	/// Performs disk IO - prefer use in background thread.
+	/// Performs disk IO - use in background thread.
 	///
 	private func writeToDisk(securityFile: SecurityFile) throws {
 		
-		var url = self.securityJsonUrl
+		var url = SharedSecurity.shared.securityJsonUrl
 		
 		let jsonData = try JSONEncoder().encode(securityFile)
 		try jsonData.write(to: url, options: [.atomic])
@@ -188,15 +124,11 @@ class AppSecurity {
 			enabledSecurity.insert(.biometrics)
 		}
 		
-		if (securityFile.passphrase != nil) {
-			enabledSecurity.insert(.passphrase)
-		}
-		
 		return enabledSecurity
 	}
 	
 	// --------------------------------------------------------------------------------
-	// MARK:- Public Utilities
+	// MARK: Public Utilities
 	// --------------------------------------------------------------------------------
 	
 	public func generateEntropy() -> Data {
@@ -243,46 +175,28 @@ class AppSecurity {
 		return .notAvailable
 	}
 	
-	public func performMigration(previousBuild: String) -> Void {
-		log.trace("performMigration(previousBuild: \(previousBuild)")
+	// --------------------------------------------------------------------------------
+	// MARK: Access Groups
+	// --------------------------------------------------------------------------------
+	
+	/// Represents the keychain domain for this app.
+	/// I.E. can NOT be accessed by our app extensions.
+	///
+	fileprivate func privateAccessGroup() -> String {
 		
-		if previousBuild.isVersion(lessThan: "5") {
-			
-			let keychain = GenericPasswordStore()
-			var hardBiometricsEnabled = false
-			
-			do {
-				hardBiometricsEnabled = try keychain.keyExists(account: keychain_accountName_biometrics)
-			} catch {
-				log.error("keychain.keyExists(account: hardBiometrics): error: \(String(describing: error))")
-			}
-			
-			if hardBiometricsEnabled {
-				// Then soft biometrics are implicitly enabled.
-				// So we need to set that flag.
-				
-				let account = keychain_accountName_softBiometrics
-				do {
-					try keychain.deleteKey(account: account)
-				} catch {
-					log.error("keychain.deleteKey(account: softBiometrics): error: \(String(describing: error))")
-				}
-				
-				do {
-					var query = [String: Any]()
-					query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-					
-					try keychain.storeKey("true", account: account, mixins: query)
-					
-				} catch {
-					log.error("keychain.storeKey(account: softBiometrics): error: \(String(describing: error))")
-				}
-			}
-		}
+		return "XD77LN4376.co.acinq.phoenix"
+	}
+	
+	/// Represents the keychain domain for our app group.
+	/// I.E. can be accessed by our app extensions (e.g. notification-service-extension).
+	///
+	fileprivate func sharedAccessGroup() -> String {
+		
+		return SharedSecurity.shared.sharedAccessGroup()
 	}
 	
 	// --------------------------------------------------------------------------------
-	// MARK:- Keychain
+	// MARK: Keychain
 	// --------------------------------------------------------------------------------
 	
 	/// Attempts to extract the mnemonics using the keychain.
@@ -293,7 +207,7 @@ class AppSecurity {
 		completion: @escaping (
 			_ mnemonics: [String]?,
 			_ configuration: EnabledSecurity,
-			_ danger: LossOfSeedDanger?
+			_ error: UnlockError?
 		) -> Void
 	) {
 		
@@ -307,7 +221,7 @@ class AppSecurity {
 		
 		let dangerZone1 = {(error: ReadSecurityFileError, configuration: EnabledSecurity) -> Void in
 			
-			let danger = LossOfSeedDanger(error, nil)
+			let danger = UnlockError(error, nil)
 			
 			DispatchQueue.main.async {
 				self.enabledSecurity.send(configuration)
@@ -317,7 +231,7 @@ class AppSecurity {
 		
 		let dangerZone2 = {(error: ReadKeychainError, configuration: EnabledSecurity) -> Void in
 			
-			let danger = LossOfSeedDanger(nil, error)
+			let danger = UnlockError(nil, error)
 			
 			DispatchQueue.main.async {
 				self.enabledSecurity.send(configuration)
@@ -331,7 +245,7 @@ class AppSecurity {
 			
 			// Fetch the "security.json" file.
 			// If the file doesn't exist, an empty SecurityFile is returned.
-			let diskResult = self.safeReadFromDisk()
+			let diskResult = SharedSecurity.shared.readSecurityJsonFromDisk()
 			
 			switch diskResult {
 				case .failure(let reason):
@@ -352,7 +266,7 @@ class AppSecurity {
 					
 					let configuration = self.calculateEnabledSecurity(securityFile)
 					
-					let keychainResult = self.readKeychainEntry(securityFile)
+					let keychainResult = SharedSecurity.shared.readKeychainEntry(securityFile)
 					switch keychainResult {
 						case .failure(let reason):
 							
@@ -375,57 +289,7 @@ class AppSecurity {
 		}
 	}
 	
-	private func readKeychainEntry(_ securityFile: SecurityFile) -> Result<[String], ReadKeychainError> {
-		
-		// The securityFile tells us which security options have been enabled.
-		// If there isn't a keychain entry, then we cannot unlock the seed.
-		guard let keyInfo = securityFile.keychain as? KeyInfo_ChaChaPoly else {
-			return .failure(.keychainOptionNotEnabled)
-		}
-		
-		let sealedBox: ChaChaPoly.SealedBox
-		do {
-			sealedBox = try keyInfo.toSealedBox()
-		} catch {
-			log.error("readKeychainEntry(): error: keychainBoxCorrupted: \(String(describing: error))")
-			return .failure(.keychainBoxCorrupted(underlying: error))
-		}
-		
-		let keychain = GenericPasswordStore()
-		
-		// Read the lockingKey from the OS keychain
-		let fetchedKey: SymmetricKey?
-		do {
-			fetchedKey = try keychain.readKey(account: keychain_accountName_keychain)
-		} catch {
-			log.error("readKeychainEntry(): error: readingKey: \(String(describing: error))")
-			return .failure(.errorReadingKey(underlying: error))
-		}
-		
-		guard let lockingKey = fetchedKey else {
-			log.error("readKeychainEntry(): error: keyNotFound")
-			return .failure(.keyNotFound)
-		}
-		
-		// Decrypt the databaseKey using the lockingKey
-		let mnemonicsData: Data
-		do {
-			mnemonicsData = try ChaChaPoly.open(sealedBox, using: lockingKey)
-		} catch {
-			log.error("readKeychainEntry(): error: openingBox: \(String(describing: error))")
-			return .failure(.errorOpeningBox(underlying: error))
-		}
-		
-		guard let mnemonicsString = String(data: mnemonicsData, encoding: .utf8) else {
-			log.error("readKeychainEntry(): error: invalidMnemonics")
-			return .failure(.invalidMnemonics)
-		}
-		
-		let mnemonics = mnemonicsString.split(separator: " ").map { String($0) }
-		return .success(mnemonics)
-	}
-	
-	/// Updates the keychain & security file to include an keychain entry.
+	/// Updates the keychain & security file to include a keychain entry.
 	/// This is a destructive action - existing entries will be removed from
 	/// both the keychain & security file.
 	///
@@ -508,7 +372,10 @@ class AppSecurity {
 			let keychain = GenericPasswordStore()
 			
 			do {
-				try keychain.deleteKey(account: keychain_accountName_keychain)
+				try keychain.deleteKey(
+					account     : keychain_accountName_keychain,
+					accessGroup : self.sharedAccessGroup()
+				)
 			} catch {/* ignored */}
 			do {
 				// Access control considerations:
@@ -518,10 +385,11 @@ class AppSecurity {
 				// So we shouldn't need access to the keychain item when the device is locked.
 				
 				var query = [String: Any]()
-				query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+				query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
 				
 				try keychain.storeKey( lockingKey,
 				              account: keychain_accountName_keychain,
+				          accessGroup: self.sharedAccessGroup(),
 				               mixins: query)
 			} catch {
 				log.error("keychain.storeKey(account: keychain): error: \(String(describing: error))")
@@ -535,9 +403,12 @@ class AppSecurity {
 				return fail(error)
 			}
 			
-			// Now we can safely delete the touchID entry in the database (if it exists)
+			// Now we can safely delete the biometric entry in the database (if it exists)
 			do {
-				try keychain.deleteKey(account: keychain_accountName_biometrics)
+				try keychain.deleteKey(
+					account     : keychain_accountName_biometrics,
+					accessGroup : self.privateAccessGroup()
+				)
 			} catch {/* ignored */}
 			
 			succeed(securityFile)
@@ -577,7 +448,10 @@ class AppSecurity {
 					var query = [String: Any]()
 					query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
 					
-					try keychain.storeKey("true", account: account, mixins: query)
+					try keychain.storeKey( "true",
+					              account: account,
+					          accessGroup: self.privateAccessGroup(),
+					               mixins: query)
 					
 				} catch {
 					log.error("keychain.storeKey(account: softBiometrics): error: \(String(describing: error))")
@@ -586,7 +460,10 @@ class AppSecurity {
 				
 			} else {
 				do {
-					try keychain.deleteKey(account: account)
+					try keychain.deleteKey(
+						account     : account,
+						accessGroup : self.privateAccessGroup()
+					)
 				
 				} catch {
 					log.error("keychain.deleteKey(account: softBiometrics): error: \(String(describing: error))")
@@ -606,7 +483,10 @@ class AppSecurity {
 		
 		var enabled = false
 		do {
-			let value: String? = try keychain.readKey(account: account)
+			let value: String? = try keychain.readKey(
+				account     : account,
+				accessGroup : privateAccessGroup()
+			)
 			enabled = value != nil
 			
 		} catch {
@@ -617,7 +497,7 @@ class AppSecurity {
 	}
 	
 	// --------------------------------------------------------------------------------
-	// MARK:- Biometrics
+	// MARK: Biometrics
 	// --------------------------------------------------------------------------------
 	
 	private func biometricsPrompt() -> String {
@@ -645,9 +525,20 @@ class AppSecurity {
 			}
 		}
 		
+		// "Advanced security" technique removed in v1.4.
+		// Replaced with notification-service-extension,
+		// with ability to receive payments when app is running in the background.
+		// 
+		let disableAdvancedSecurityAndSucceed = {(_ mnemonics: [String]) in
+			
+			self.addKeychainEntry(mnemonics: mnemonics) { _ in
+				succeed(mnemonics)
+			}
+		}
+		
 		let trySoftBiometrics = {(_ securityFile: SecurityFile) -> Void in
 			
-			let result = self.readKeychainEntry(securityFile)
+			let result = SharedSecurity.shared.readKeychainEntry(securityFile)
 			switch result {
 			case .failure(let error):
 				fail(error)
@@ -696,7 +587,11 @@ class AppSecurity {
 		
 			let fetchedKey: SymmetricKey?
 			do {
-				fetchedKey = try keychain.readKey(account: account, mixins: query)
+				fetchedKey = try keychain.readKey(
+					account     : account,
+					accessGroup : self.privateAccessGroup(),
+					mixins      : query
+				)
 			} catch {
 				return fail(error)
 			}
@@ -746,13 +641,13 @@ class AppSecurity {
 				if let error = error {
 					fail(error)
 				} else {
-					succeed(mnemonics)
+					disableAdvancedSecurityAndSucceed(mnemonics)
 				}
 			}
 		#else
 		
 			// iOS device
-			succeed(mnemonics)
+			disableAdvancedSecurityAndSucceed(mnemonics)
 		
 		#endif
 		}
@@ -769,102 +664,162 @@ class AppSecurity {
 		                 reply: completion)
 	}
 	
-	public func addBiometricsEntry(
-		mnemonics : [String],
-		completion  : @escaping (_ error: Error?) -> Void
-	) {
-		let mnemonicsData = validateParameter(mnemonics: mnemonics)
+	// --------------------------------------------------------------------------------
+	// MARK: Migration
+	// --------------------------------------------------------------------------------
+	
+	public func performMigration(
+		_ targetBuild: String,
+		_ completionPublisher: CurrentValueSubject<Int, Never>
+	) -> Void {
+		log.trace("performMigration(to: \(targetBuild))")
 		
-		let succeed = {(securityFile: SecurityFile) -> Void in
-			DispatchQueue.main.async {
-				let newEnabledSecurity = self.calculateEnabledSecurity(securityFile)
-				self.enabledSecurity.send(newEnabledSecurity)
-				completion(nil)
+		// NB: The first version released in the App Store was version 1.0.0 (build 17)
+		
+		if targetBuild.isVersion(equalTo: "40") {
+			performMigration_toBuild40()
+		}
+		
+		if targetBuild.isVersion(equalTo: "41") {
+			performMigration_toBuild41(completionPublisher)
+		}
+	}
+	
+	private func performMigration_toBuild40() {
+		log.trace("performMigration_toBuild40()")
+		
+		// Step 1 of 2:
+		// Migrate "security.json" file to group container directory.
+		
+		let fm = FileManager.default
+		
+		if let appSupportDir = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,
+		   let groupDir = fm.containerURL(forSecurityApplicationGroupIdentifier: "group.co.acinq.phoenix")
+		{
+			let oldFile = appSupportDir.appendingPathComponent("security.json", isDirectory: false)
+			let newFile = groupDir.appendingPathComponent("security.json", isDirectory: false)
+			
+			if fm.fileExists(atPath: oldFile.path) {
+				
+				try? fm.moveItem(at: oldFile, to: newFile)
 			}
 		}
 		
-		let fail = {(_ error: Error) -> Void in
-			DispatchQueue.main.async {
-				completion(error)
-			}
-		}
+		// Step 2 of 2:
+		// Migrate keychain entry to group container.
 		
-		// Disk IO ahead - get off the main thread.
-		// Also - go thru the serial queue for proper thread safety.
-		queue.async {
+		migrateKeychainItemToSharedGroup()
+	}
+	
+	private func performMigration_toBuild41(_ completionPublisher: CurrentValueSubject<Int, Never>) {
+		log.trace("performMigration_toBuild41()")
+		
+		// There was a bug in versions prior to build 41,
+		// where we didn't check the UIApplication's `isProtectedDataAvailable` flag.
+		//
+		// If that value happened to be false, and we attempted to read from the keychain,
+		// we would have received an item-not-found error.
+		//
+		// If this occurred during performMigration_toBuild40(),
+		// this would have resulted in the app failing to read the keychain item forever (in build 40).
+		// So in build 41, we have to perform this migration again,
+		// but this time not until `isProtectedDataAvailable` is true.
+		
+		if UIApplication.shared.isProtectedDataAvailable {
+			migrateKeychainItemToSharedGroup()
 			
-			let lockingKey = SymmetricKey(size: .bits256)
+		} else {
 			
-			let sealedBox: ChaChaPoly.SealedBox
-			do {
-				sealedBox = try ChaChaPoly.seal(mnemonicsData, using: lockingKey)
-			} catch {
-				return fail(error)
-			}
+			completionPublisher.value += 1
+			var cancellables = Set<AnyCancellable>()
 			
-			let keyInfo_biometrics = KeyInfo_ChaChaPoly(sealedBox: sealedBox)
-			
-			let oldSecurityFile = self.readFromDisk()
-			let securityFile = SecurityFile(
-				biometrics : keyInfo_biometrics,
-				passphrase : oldSecurityFile.passphrase // maintain existing option
+			let nc = NotificationCenter.default
+			nc.publisher(for: UIApplication.protectedDataDidBecomeAvailableNotification).sink { _ in
+				
+				// Apple doesn't specify which thread this notification is posted on.
+				// Should be the main thread, but just in case, let's be safe.
+				if Thread.isMainThread {
+					self.migrateKeychainItemToSharedGroup()
+					completionPublisher.value -= 1
+				} else {
+					DispatchQueue.main.async {
+						self.migrateKeychainItemToSharedGroup()
+						completionPublisher.value -= 1
+					}
+				}
+				
+				cancellables.removeAll()
+			}.store(in: &cancellables)
+		}
+	}
+	
+	private func migrateKeychainItemToSharedGroup() {
+		log.trace("migrateKeychainItemToSharedGroup()")
+		
+		let keychain = GenericPasswordStore()
+		
+		// Step 1 of 4:
+		// - Read the OLD keychain item.
+		// - If it exists, then we need to migrate it to the new location.
+		var savedKey: SymmetricKey? = nil
+		do {
+			savedKey = try keychain.readKey(
+				account     : keychain_accountName_keychain,
+				accessGroup : privateAccessGroup() // <- old location
 			)
+		} catch {
+			log.error("keychain.readKey(account: keychain, group: nil): error: \(String(describing: error))")
+		}
+		
+		if let lockingKey = savedKey {
+			// The OLD keychain item exists, so we're going to migrate it.
 			
-			// Order matters !
-			// Don't lock out the user from their wallet !
-			//
-			// There are 2 scenarios in which this method may be called:
-			//
-			// 1. User had no security options enabled, but is now enabling touch ID.
-			//    There is an existing keychain entry for the keychain option.
-			//    There is an existing security.json file with the keychain option.
-			//
-			// 2. User only had passphrase option enabled, but is now adding touch ID.
-			//    There is an existing keychain entry for the passphrase option.
-			//    There is an existing security.json file with the passphrase option.
-			
-			let keychain = GenericPasswordStore()
-			
+			var migrated = false
 			do {
-				try keychain.deleteKey(account: keychain_accountName_biometrics)
-			} catch {/* ignored */}
+				// Step 2 of 4:
+				// - Delete the NEW keychain item.
+				// - It shouldn't exist, but if it does it will cause an error on the next step.
+				try keychain.deleteKey(
+					account     : keychain_accountName_keychain,
+					accessGroup : sharedAccessGroup() // <- new location
+				)
+			} catch {
+				log.error("keychain.deleteKey(account: keychain, group: shared): error: \(String(describing: error))")
+			}
 			do {
-				let accessControl = SecAccessControlCreateWithFlags(
-					/* allocator  : */ nil,
-					/* protection : */ kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
-					/* flags      : */ .userPresence,
-					/* error      : */ nil
-				)!
-				
 				var query = [String: Any]()
-				query[kSecAttrAccessControl as String] = accessControl
+				query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
 				
-				try keychain.storeKey(lockingKey,
-				             account: keychain_accountName_biometrics,
-				              mixins: query)
+				// Step 3 of 4:
+				// - Copy the OLD keychain item to the NEW location.
+				// - If this step fails, an exception is thrown, and we do NOT advance to step 4.
+				try keychain.storeKey( lockingKey,
+				              account: keychain_accountName_keychain,
+				          accessGroup: sharedAccessGroup(), // <- new location
+				               mixins: query
+				)
+				migrated = true
+				
+				// Step 4 of 4:
+				// - Finally, delete the OLD keychain item.
+				// - This prevents any duplicate migration attempts in the future.
+				try keychain.deleteKey(
+					account     : keychain_accountName_keychain,
+					accessGroup : privateAccessGroup() // <- old location
+				)
+				
 			} catch {
-				print("keychain.storeKey(account: touchID): error: \(error)")
-				return fail(error)
+				if !migrated {
+					log.error("keychain.storeKey(account: keychain, group: shared): error: \(String(describing: error))")
+				} else {
+					log.error("keychain.deleteKey(account: keychain, group: private): error: \(String(describing: error))")
+				}
 			}
-			
-			do {
-				try self.writeToDisk(securityFile: securityFile)
-			} catch {
-				print("writeToDisk(securityFile): error: \(error)")
-				return fail(error)
-			}
-			
-			// Now we can safely delete the keychain entry now (if it exists)
-			do {
-				try keychain.deleteKey(account: keychain_accountName_keychain)
-			} catch {/* ignored */}
-			
-			succeed(securityFile)
 		}
 	}
 }
 
-// MARK:- Utilities
+// MARK: - Utilities
 
 fileprivate func genericError(_ code: Int, _ description: String? = nil) -> NSError {
 	

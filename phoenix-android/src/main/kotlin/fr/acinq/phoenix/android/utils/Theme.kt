@@ -53,6 +53,9 @@ val green = Color(0xff1ac486)
 // alternative primary for mainnet
 val purple = Color(0xff5741d9)
 
+// used for warning
+val orange = Color(0xfff3b600)
+
 val red500 = Color(0xffd03d33)
 val red300 = Color(0xffc76d6d)
 val red50 = Color(0xfff9e9ec)
@@ -102,7 +105,7 @@ private val DarkColorPalette = darkColors(
     // secondary = primary
     secondary = azur,
     secondaryVariant = azur,
-    onSecondary = white,
+    onSecondary = black,
     // app background
     background = black,
     onBackground = gray70,
@@ -129,7 +132,7 @@ fun typography(palette: Colors) = Typography(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
-        color = mutedTextColor(),
+        color = if (isDarkTheme) gray500 else gray300,
     ),
     h1 = TextStyle(
         fontFamily = FontFamily.SansSerif,

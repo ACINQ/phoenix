@@ -480,7 +480,7 @@
 /* IntroView */
 "The fee is **%@%%** with a minimum fee of **%@**." = "الرسوم **%@٪** مع حد أدنى للرسوم **%@**.";
 /* SendView */
-"The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount**  in the payment request." = "لا تتضمن هذه الفاتورة مبلغًا. قد يكون هذا أمرًا خطيرًا: فقد تتمكن العقد الضارة من سرقة مبلغك. لكي تبقى بأمان، ***اطلب من المستفيد تحديد مبلغ*** في طلب الدفع.";
+"The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount** in the payment request." = "لا تتضمن هذه الفاتورة مبلغًا. قد يكون هذا أمرًا خطيرًا: فقد تتمكن العقد الضارة من سرقة مبلغك. لكي تبقى بأمان، ***اطلب من المستفيد تحديد مبلغ*** في طلب الدفع.";
 /* Error message - scanning lightning invoice */
 "The invoice is for (requestChain), but you're on (reason.myChain.name)" = "الفاتورة لـ (requestChain) ، لكنك على (reason.myChain.name)";
 "The invoice is for you. You are about to pay yourself." = "الفاتورة تابعة لك. انك تحاول أن تدفع لنفسك.";

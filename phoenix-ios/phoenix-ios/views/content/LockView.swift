@@ -10,9 +10,9 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct LockView : View {
+struct LockView: View {
 	
-	@ObservedObject var lockState: LockState
+	@ObservedObject var lockState = LockState.shared
 	
 	@State var isTouchID = true
 	@State var isFaceID = false
@@ -24,15 +24,16 @@ struct LockView : View {
 		UIApplication.willEnterForegroundNotification
 	)
 	
+	@ViewBuilder
 	var body: some View {
 		
-		ZStack {
+		ZStack(alignment: Alignment.top) {
 			
 			Color.clear   // an additional layer
 				.zIndex(0) // for animation purposes
 			
 			if !lockState.isUnlocked {
-				main
+				content()
 					.zIndex(1)
 					.transition(.asymmetric(
 						insertion : .identity,
@@ -42,19 +43,56 @@ struct LockView : View {
 		}
 	}
 	
-	var main: some View {
+	@ViewBuilder
+	func content() -> some View {
 		
-		VStack {
+		// The layout & math here is designed to match the LoadingView.
+		//
+		// That is, both the LoadingView & LockView are designed to place
+		// the logoContent at the exact same coordinates.
+		// So that a transition from the LoadingView to the LockView is smooth.
+		
+		GeometryReader { geometry in
+			
+			let topPadding = geometry.size.height / 4.0
+			
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				logoContent()
+					.padding(.bottom, 40)
+				lockedContent()
+			}
+			.padding(.top, topPadding)
+			.frame(maxWidth: .infinity)
+		}
+		.background(Color(UIColor.systemBackground))
+		.edgesIgnoringSafeArea(.all)
+		.onAppear {
+			onAppear()
+		}
+		.onReceive(willEnterForegroundPublisher, perform: { _ in
+			willEnterForeground()
+		})
+	}
+	
+	@ViewBuilder
+	func logoContent() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
 			Image(logoImageName)
 				.resizable()
 				.frame(width: 96, height: 96)
-				.padding([.top, .bottom], 0)
 
 			Text("Phoenix")
-			.font(Font.title2)
-			.padding(.top, -10)
-			.padding(.bottom, 40)
+				.font(Font.title2)
+				.padding(.top, -5)
+		}
+	}
+	
+	@ViewBuilder
+	func lockedContent() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 20) {
 			
 			if isTouchID || isFaceID {
 				
@@ -90,20 +128,10 @@ struct LockView : View {
 					.padding(.top, 10)
 			}
 		}
-		.offset(x: 0, y: -80) // move center upwards; logo not hidden by TouchID popover
-		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.background(Color(UIColor.systemBackground))
-		.edgesIgnoringSafeArea(.all)
-		.onAppear {
-			onAppear()
-		}
-		.onReceive(willEnterForegroundPublisher, perform: { _ in
-			willEnterForeground()
-		})
 	}
 	
 	var logoImageName: String {
-		if AppDelegate.isTestnet {
+		if BusinessManager.isTestnet {
 			return "logo_blue"
 		} else {
 			return "logo_green"
@@ -131,7 +159,7 @@ struct LockView : View {
 		log.trace("willEnterForeground()")
 		
 		// NB: At this moment in time: UIApplication.shared.applicationState == .background
-		
+	
 		checkStatus(canPrompt: true)
 	}
 	
@@ -202,7 +230,7 @@ struct LockView : View {
 			
 			switch result {
 				case .success(let mnemonics):
-					AppDelegate.get().loadWallet(mnemonics: mnemonics)
+					Biz.loadWallet(mnemonics: mnemonics)
 					withAnimation(.easeInOut) {
 						lockState.isUnlocked = true
 					}

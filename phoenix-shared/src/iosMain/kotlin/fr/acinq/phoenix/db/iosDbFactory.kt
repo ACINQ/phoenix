@@ -22,9 +22,31 @@ import com.squareup.sqldelight.drivers.native.NativeSqliteDriver
 import com.squareup.sqldelight.drivers.native.wrapConnection
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.utils.PlatformContext
+import fr.acinq.phoenix.utils.getDatabaseFilesDirectoryPath
 
-actual fun createChannelsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
-    return NativeSqliteDriver(ChannelsDatabase.Schema, "channels-${chain.name.lowercase()}-$nodeIdHash.sqlite")
+actual fun createChannelsDbDriver(
+    ctx: PlatformContext,
+    chain: Chain,
+    nodeIdHash: String
+): SqlDriver {
+    val schema = ChannelsDatabase.Schema
+    val name = "channels-${chain.name.lowercase()}-$nodeIdHash.sqlite"
+
+    val dbDir = getDatabaseFilesDirectoryPath(ctx)
+    val configuration = DatabaseConfiguration(
+        name = name,
+        version = schema.version,
+        extendedConfig = DatabaseConfiguration.Extended(
+            basePath = dbDir
+        ),
+        create = { connection ->
+            wrapConnection(connection) { schema.create(it) }
+        },
+        upgrade = { connection, oldVersion, newVersion ->
+            wrapConnection(connection) { schema.migrate(it, oldVersion, newVersion) }
+        }
+    )
+    return NativeSqliteDriver(configuration)
 }
 
 actual fun createPaymentsDbDriver(
@@ -41,12 +63,13 @@ actual fun createPaymentsDbDriver(
     //
     // The official solution is implemented below, however it doesn't work.
 
-//  return NativeSqliteDriver(schema, name)
+    val dbDir = getDatabaseFilesDirectoryPath(ctx)
     val configuration = DatabaseConfiguration(
         name = name,
         version = schema.version,
         extendedConfig = DatabaseConfiguration.Extended(
-            foreignKeyConstraints = true
+            basePath = dbDir,
+            foreignKeyConstraints = true // <= official solution doesn't work :(
         ),
         create = { connection ->
             wrapConnection(connection) { schema.create(it) }
@@ -58,6 +81,25 @@ actual fun createPaymentsDbDriver(
     return NativeSqliteDriver(configuration)
 }
 
-actual fun createAppDbDriver(ctx: PlatformContext): SqlDriver {
-    return NativeSqliteDriver(AppDatabase.Schema, "app.sqlite")
+actual fun createAppDbDriver(
+    ctx: PlatformContext
+): SqlDriver {
+    val schema = AppDatabase.Schema
+    val name = "app.sqlite"
+
+    val dbDir = getDatabaseFilesDirectoryPath(ctx)
+    val configuration = DatabaseConfiguration(
+        name = name,
+        version = schema.version,
+        extendedConfig = DatabaseConfiguration.Extended(
+            basePath = dbDir
+        ),
+        create = { connection ->
+            wrapConnection(connection) { schema.create(it) }
+        },
+        upgrade = { connection, oldVersion, newVersion ->
+            wrapConnection(connection) { schema.migrate(it, oldVersion, newVersion) }
+        }
+    )
+    return NativeSqliteDriver(configuration)
 }

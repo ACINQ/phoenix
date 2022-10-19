@@ -46,7 +46,7 @@ fun BackButton(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         shape = RoundedCornerShape(topStart = 0.dp, topEnd = 50.dp, bottomEnd = 50.dp, bottomStart = 0.dp),
-        contentPadding = PaddingValues(start = 20.dp, top = 8.dp, bottom = 8.dp, end = 16.dp),
+        contentPadding = PaddingValues(start = 20.dp, top = 8.dp, bottom = 8.dp, end = 12.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color.Unspecified,
             disabledBackgroundColor = Color.Unspecified,
@@ -54,7 +54,7 @@ fun BackButton(onClick: () -> Unit) {
             disabledContentColor = mutedTextColor(),
         ),
         elevation = null,
-        modifier = Modifier.size(width = 62.dp, height = 52.dp)
+        modifier = Modifier.size(width = 58.dp, height = 52.dp)
     ) {
         PhoenixIcon(resourceId = R.drawable.ic_arrow_back, Modifier.width(24.dp))
     }
@@ -67,7 +67,7 @@ fun Dialog(
     title: String? = null,
     properties: DialogProperties = DialogProperties(usePlatformDefaultWidth = false),
     isScrollable: Boolean = true,
-    buttons: (@Composable RowScope.() -> Unit)? = null,
+    buttons: (@Composable RowScope.() -> Unit)? = { Button(onClick = onDismiss, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(16.dp)) },
     content: @Composable ColumnScope.() -> Unit,
 ) {
     androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = properties) {
@@ -78,16 +78,14 @@ fun Dialog(
             }
             // content, must set the padding etc...
             content()
-            Spacer(Modifier.height(24.dp))
             // buttons
-            Row(
-                modifier = Modifier
-                    .align(Alignment.End)
-            ) {
-                if (buttons != null) {
+            if (buttons != null) {
+                Spacer(Modifier.height(24.dp))
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.End)
+                ) {
                     buttons()
-                } else {
-                    Button(onClick = onDismiss, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(16.dp))
                 }
             }
         }
@@ -119,13 +117,21 @@ fun DialogBody(
 
 /** The default screen is a full-height, full-width column with the material theme's background color. It is scrollable by default. */
 @Composable
-fun DefaultScreenLayout(isScrollable: Boolean = true, backgroundColor: Color = MaterialTheme.colors.background, content: @Composable ColumnScope.() -> Unit) {
+fun DefaultScreenLayout(
+    isScrollable: Boolean = true,
+    backgroundColor: Color = MaterialTheme.colors.background,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
             .background(backgroundColor)
-            .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier)
+            .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier),
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
     ) {
         content()
     }

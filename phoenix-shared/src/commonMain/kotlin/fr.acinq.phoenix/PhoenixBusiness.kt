@@ -5,7 +5,6 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.TcpSocket
-import fr.acinq.lightning.utils.setLightningLoggerFactory
 import fr.acinq.phoenix.controllers.*
 import fr.acinq.phoenix.controllers.config.*
 import fr.acinq.phoenix.controllers.init.AppInitController
@@ -23,9 +22,8 @@ import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.*
 import fr.acinq.tor.Tor
 import io.ktor.client.*
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -38,7 +36,6 @@ import org.kodein.memory.file.Path
 import org.kodein.memory.file.resolve
 
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalUnsignedTypes::class)
 class PhoenixBusiness(
     internal val ctx: PlatformContext
 ) {
@@ -61,26 +58,23 @@ class PhoenixBusiness(
         }
     }
 
-    internal val networkMonitor by lazy { NetworkManager(loggerFactory, ctx) }
     internal val httpClient by lazy {
         HttpClient {
-            install(JsonFeature) {
-                serializer = KotlinxSerializer(Json {
-                    ignoreUnknownKeys = true
-                })
+            install(ContentNegotiation) {
+                json(json = Json { ignoreUnknownKeys = true })
             }
         }
     }
 
     val chain = Chain.Testnet
 
-    internal val electrumClient by lazy { ElectrumClient(null, MainScope()) }
-    internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope()) }
+    internal val electrumClient by lazy { ElectrumClient(null, MainScope(), loggerFactory) }
+    internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient.Caller(), MainScope(), loggerFactory) }
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
 
-    internal val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
-
+    val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
+    val networkMonitor by lazy { NetworkMonitor(loggerFactory, ctx) }
     val walletManager by lazy { WalletManager(chain) }
     val nodeParamsManager by lazy { NodeParamsManager(this) }
     val databaseManager by lazy { DatabaseManager(this) }
@@ -93,10 +87,6 @@ class PhoenixBusiness(
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
     val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(loggerFactory)) }
 
-    init {
-        setLightningLoggerFactory(loggerFactory)
-    }
-
     fun start(startupParams: StartupParams) {
         logger.info { "starting with params=$startupParams" }
         if (appConnectionsDaemon == null) {
@@ -105,23 +95,6 @@ class PhoenixBusiness(
             appConnectionsDaemon = AppConnectionsDaemon(this)
         }
     }
-
-    // Converts a mnemonics list to a seed.
-    // This is generally called with a mnemonics list that has been previously saved.
-    fun prepWallet(mnemonics: List<String>, passphrase: String = ""): ByteArray {
-        MnemonicCode.validate(mnemonics)
-        return MnemonicCode.toSeed(mnemonics, passphrase)
-    }
-
-    fun loadWallet(seed: ByteArray): Pair<ByteVector32, String>? {
-        if (walletManager.wallet.value == null) {
-            walletManager.loadWallet(seed)
-            return walletManager.wallet.value?.cloudKeyAndEncryptedNodeId()
-        }
-        return null
-    }
-
-    fun getXpub(): Pair<String, String>? = walletManager.wallet.value?.xpub()
 
     fun peerState() = peerManager.peerState
 

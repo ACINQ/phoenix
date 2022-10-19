@@ -36,10 +36,8 @@ struct ChannelsConfigurationView: MVIView {
 			.onDisappear {
 				onDisappear()
 			}
-			.navigationBarTitle(
-				NSLocalizedString("Payment channels", comment: "Navigation bar title"),
-				displayMode: .inline
-			)
+			.navigationTitle(NSLocalizedString("Payment channels", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -287,24 +285,24 @@ struct ChannelHeaderView: View {
 	
 	func balances() -> (FormattedAmount, FormattedAmount) {
 		
-		let localSats = mvi.model.channels.map { channel in
-			channel.localBalance?.sat ?? Int64(0)
+		let localMsats = mvi.model.channels.map { channel in
+			channel.localBalance?.msat ?? Int64(0)
 		}
 		.reduce(into: Int64(0)) { result, next in
 			result += next
 		}
-		let remoteSats = mvi.model.channels.map { channel in
-			channel.remoteBalance?.sat ?? Int64(0)
+		let remoteMsats = mvi.model.channels.map { channel in
+			channel.remoteBalance?.msat ?? Int64(0)
 		}
 		.reduce(into: Int64(0)) { result, next in
 			result += next
 		}
 		
-		let numerator_sats = localSats
-		let denominator_sats = showChannelsRemoteBalance ? remoteSats : (localSats + remoteSats)
+		let numerator_msats = localMsats
+		let denominator_msats = showChannelsRemoteBalance ? remoteMsats : (localMsats + remoteMsats)
 		
-		let numerator = Utils.formatBitcoin(sat: numerator_sats, bitcoinUnit: .sat)
-		let denominator = Utils.formatBitcoin(sat: denominator_sats, bitcoinUnit: .sat)
+		let numerator = Utils.formatBitcoin(msat: numerator_msats, bitcoinUnit: .sat, policy: .showMsatsIfZeroSats)
+		let denominator = Utils.formatBitcoin(msat: denominator_msats, bitcoinUnit: .sat, policy: .hideMsats)
 		
 		return (numerator, denominator)
 	}
@@ -355,17 +353,17 @@ fileprivate struct ChannelRowView: View {
 	
 	func balances() -> (FormattedAmount, FormattedAmount)? {
 		
-		guard let localSats = channel.localBalance?.sat,
-				let remoteSats = channel.remoteBalance?.sat
+		guard let localMsats = channel.localBalance?.msat,
+				let remoteMsats = channel.remoteBalance?.msat
 		else {
 			return nil
 		}
 		
-		let numerator_sats = localSats
-		let denominator_sats = showChannelsRemoteBalance ? remoteSats : (localSats + remoteSats)
+		let numerator_msats = localMsats
+		let denominator_msats = showChannelsRemoteBalance ? remoteMsats : (localMsats + remoteMsats)
 		
-		let numerator = Utils.formatBitcoin(sat: numerator_sats, bitcoinUnit: .sat)
-		let denominator = Utils.formatBitcoin(sat: denominator_sats, bitcoinUnit: .sat)
+		let numerator = Utils.formatBitcoin(msat: numerator_msats, bitcoinUnit: .sat, policy: .showMsatsIfZeroSats)
+		let denominator = Utils.formatBitcoin(msat: denominator_msats, bitcoinUnit: .sat, policy: .hideMsats)
 		
 		return (numerator, denominator)
 	}
@@ -461,7 +459,7 @@ fileprivate struct FooterView: View, ViewName {
 		
 		UIPasteboard.general.string = nodeID
 		toast.pop(
-			Text("Copied to pasteboard!").anyView,
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 			colorScheme: colorScheme.opposite
 		)
 	}
@@ -494,7 +492,7 @@ fileprivate struct ChannelInfoPopup: View, ViewName {
 				Button {
 					UIPasteboard.general.string = channel.json
 					toast.pop(
-						Text("Copied to pasteboard!").anyView,
+						NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 						colorScheme: colorScheme.opposite
 					)
 				} label: {
@@ -570,7 +568,7 @@ fileprivate struct ChannelInfoPopup: View, ViewName {
 	func exploreTx(txId: String, website: BlockchainExplorer.Website) {
 		log.trace("[\(viewName)] exploreTx()")
 		
-		let business = AppDelegate.get().business
+		let business = Biz.business
 		let txUrlStr = business.blockchainExplorer.txUrl(txId: txId, website: website)
 		if let txUrl = URL(string: txUrlStr) {
 			UIApplication.shared.open(txUrl)
@@ -599,8 +597,8 @@ class ChannelsConfigurationView_Previews : PreviewProvider {
 		id: "b50bf19d16156de8231f6d3d3fb3dd105ba338de5366d0421b0954b9ceb0d4f8",
 		isOk: true,
 		stateName: "Normal",
-		localBalance: Bitcoin_kmpSatoshi(sat: 50_000),
-		remoteBalance: Bitcoin_kmpSatoshi(sat: 200_000),
+		localBalance: Lightning_kmpMilliSatoshi(msat: 50_000_000),
+		remoteBalance: Lightning_kmpMilliSatoshi(msat: 200_000_000),
 		json: "{Everything is normal!}",
 		txId: nil
 	)
@@ -609,8 +607,8 @@ class ChannelsConfigurationView_Previews : PreviewProvider {
 		id: "e5366d0421b0954b9ceb0d4f8b50bf19d16156de8231f6d3d3fb3dd105ba338d",
 		isOk: false,
 		stateName: "Woops",
-		localBalance: Bitcoin_kmpSatoshi(sat: 0),
-		remoteBalance: Bitcoin_kmpSatoshi(sat: 0),
+		localBalance: Lightning_kmpMilliSatoshi(msat: 0),
+		remoteBalance: Lightning_kmpMilliSatoshi(msat: 0),
 		json: "{Woops!}",
 		txId: nil
 	)

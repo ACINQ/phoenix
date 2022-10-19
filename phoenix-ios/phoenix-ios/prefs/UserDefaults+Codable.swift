@@ -4,7 +4,7 @@ import PhoenixShared
 extension UserDefaults {
 	
 	func getCodable<Element: Codable>(forKey key: String) -> Element? {
-		guard let data = UserDefaults.standard.data(forKey: key) else {
+		guard let data = self.data(forKey: key) else {
 			return nil
 		}
 		let element = try? JSONDecoder().decode(Element.self, from: data)
@@ -13,9 +13,13 @@ extension UserDefaults {
 	
 	func setCodable<Element: Codable>(value: Element, forKey key: String) {
 		let data = try? JSONEncoder().encode(value)
-		UserDefaults.standard.setValue(data, forKey: key)
+		self.setValue(data, forKey: key)
 	}
 }
+
+/**
+ * Here we define various types stored in UserDefaults, which conform to `Codable`.
+ */
 
 enum CurrencyType: String, CaseIterable, Codable {
 	case fiat
@@ -56,11 +60,6 @@ enum PushPermissionQuery: String, Codable {
 	case neverAskedUser
 	case userDeclined
 	case userAccepted
-}
-
-struct FcmTokenInfo: Equatable, Codable {
-	let nodeID: String
-	let fcmToken: String
 }
 
 struct ElectrumConfigPrefs: Codable {

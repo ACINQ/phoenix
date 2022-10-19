@@ -1,7 +1,6 @@
 import Foundation
 import PhoenixShared
 import Combine
-import UIKit
 import os.log
 
 #if DEBUG && true
@@ -41,20 +40,20 @@ class CurrencyPrefs: ObservableObject {
 	private var currencyTypeDelayedSave = DelayedSave()
 
 	init() {
-		currencyType = Prefs.shared.currencyType
-		fiatCurrency = Prefs.shared.fiatCurrency
-		bitcoinUnit = Prefs.shared.bitcoinUnit
+		currencyType = GroupPrefs.shared.currencyType
+		fiatCurrency = GroupPrefs.shared.fiatCurrency
+		bitcoinUnit = GroupPrefs.shared.bitcoinUnit
 		hideAmountsOnHomeScreen = Prefs.shared.hideAmountsOnHomeScreen
 		
-		Prefs.shared.fiatCurrencyPublisher.sink {[weak self](newValue: FiatCurrency) in
+		GroupPrefs.shared.fiatCurrencyPublisher.sink {[weak self](newValue: FiatCurrency) in
 			self?.fiatCurrency = newValue
 		}.store(in: &cancellables)
 		
-		Prefs.shared.bitcoinUnitPublisher.sink {[weak self](newValue: BitcoinUnit) in
+		GroupPrefs.shared.bitcoinUnitPublisher.sink {[weak self](newValue: BitcoinUnit) in
 			self?.bitcoinUnit = newValue
 		}.store(in: &cancellables)
 		
-		let business = AppDelegate.get().business
+		let business = Biz.business
 		business.currencyManager.ratesPubliser().sink {[weak self](rates: [ExchangeRate]) in
 			self?.fiatExchangeRates = rates
 		}.store(in: &cancellables)
@@ -92,7 +91,7 @@ class CurrencyPrefs: ObservableObject {
 		// So we're using a timer, plus a listener on applicationWillResignActive.
 		//
 		currencyTypeDelayedSave.save(withDelay: 10.0) {
-			Prefs.shared.currencyType = self.currencyType
+			GroupPrefs.shared.currencyType = self.currencyType
 		}
 	}
 	
@@ -115,38 +114,7 @@ class CurrencyPrefs: ObservableObject {
 	///
 	func fiatExchangeRate(fiatCurrency: FiatCurrency) -> ExchangeRate.BitcoinPriceRate? {
 		
-		let btcExchangeRates: [ExchangeRate.BitcoinPriceRate] = fiatExchangeRates.compactMap { rate in
-			return rate as? ExchangeRate.BitcoinPriceRate
-		}
-		
-		if let paramToBtc = btcExchangeRates.first(where: { (rate: ExchangeRate.BitcoinPriceRate) in
-			rate.fiatCurrency == fiatCurrency
-		}) {
-			return paramToBtc
-		}
-		
-		let usdExchangeRates: [ExchangeRate.UsdPriceRate] = fiatExchangeRates.compactMap { rate in
-			return rate as? ExchangeRate.UsdPriceRate
-		}
-		
-		guard let paramToUsd = usdExchangeRates.first(where: { (rate: ExchangeRate.UsdPriceRate) in
-			rate.fiatCurrency == fiatCurrency
-		}) else {
-			return nil
-		}
-		
-		guard let usdToBtc = btcExchangeRates.first(where: { (rate: ExchangeRate.BitcoinPriceRate) in
-			rate.fiatCurrency == FiatCurrency.usd
-		}) else {
-			return nil
-		}
-		
-		return ExchangeRate.BitcoinPriceRate(
-			fiatCurrency: fiatCurrency,
-			price: usdToBtc.price * paramToUsd.price,
-			source: "\(usdToBtc.source), \(paramToUsd.source)",
-			timestampMillis: min(usdToBtc.timestampMillis, paramToUsd.timestampMillis)
-		)
+		return Utils.exchangeRate(for: fiatCurrency, fromRates: fiatExchangeRates)
 	}
 	
 	func convert(srcAmount: Double, srcCurrency: Currency, dstCurrency: Currency) -> Double? {

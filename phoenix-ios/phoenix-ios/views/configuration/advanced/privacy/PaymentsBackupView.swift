@@ -25,6 +25,7 @@ struct PaymentsBackupView: View {
 		}
 		.listStyle(.insetGrouped)
 		.navigationTitle("Payments Backup")
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder

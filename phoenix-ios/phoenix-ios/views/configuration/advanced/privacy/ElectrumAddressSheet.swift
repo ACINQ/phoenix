@@ -628,7 +628,7 @@ struct ElectrumAddressSheet: View {
 		
 		UIPasteboard.general.string = pem
 		toast.pop(
-			Text("Copied to pasteboard!").anyView,
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 			colorScheme: colorScheme.opposite,
 			alignment: .none
 		)
@@ -693,7 +693,7 @@ struct ElectrumAddressSheet: View {
 			if let cert = untrustedCert {
 				guard let pubKey = pubKey(cert) else {
 					return toast.pop(
-						Text("Unable to extract public key!").anyView,
+						NSLocalizedString("Unable to extract public key!", comment: "Toast message"),
 						colorScheme: colorScheme.opposite,
 						alignment: .none
 					)
@@ -705,7 +705,7 @@ struct ElectrumAddressSheet: View {
 				tls = Lightning_kmpTcpSocketTLS.TRUSTED_CERTIFICATES()
 			}
 			
-			Prefs.shared.electrumConfig = ElectrumConfigPrefs(
+			GroupPrefs.shared.electrumConfig = ElectrumConfigPrefs(
 				host: checkedHost,
 				port: checkedPort,
 				pinnedPubKey: pinnedPubKey
@@ -718,7 +718,7 @@ struct ElectrumAddressSheet: View {
 			
 		} else {
 			
-			Prefs.shared.electrumConfig = nil
+			GroupPrefs.shared.electrumConfig = nil
 			mvi.intent(ElectrumConfiguration.IntentUpdateElectrumServer(server: nil))
 		}
 		

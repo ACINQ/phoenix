@@ -33,7 +33,7 @@ struct LoginView: View {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 			
-			if AppDelegate.showTestnetBackground {
+			if BusinessManager.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.ignoresSafeArea(.all, edges: .all)
@@ -63,7 +63,8 @@ struct LoginView: View {
 		.assignMaxPreference(for: maxImageHeightReader.key, to: $maxImageHeight)
 		.frame(maxHeight: .infinity)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
-		.navigationBarTitle("lnurl-auth", displayMode: .inline)
+		.navigationTitle("lnurl-auth")
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -238,7 +239,8 @@ struct LoginView: View {
 			//
 			mvi.intent(Scan.Intent_LnurlAuthFlow_Login(
 				auth: model.auth,
-				minSuccessDelaySeconds: 1.6
+				minSuccessDelaySeconds: 1.6,
+				keyType: LNUrl.AuthKeyType_DEFAULT_KEY_TYPE()
 			))
 		}
 	}

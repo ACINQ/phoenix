@@ -34,10 +34,11 @@ struct InitializationView: MVIView {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 			
-			if AppDelegate.showTestnetBackground {
+			if BusinessManager.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+					.accessibilityHidden(true)
 			}
 			
 			// Position the settings icon in top-right corner.
@@ -49,6 +50,8 @@ struct InitializationView: MVIView {
 							.renderingMode(.template)
 							.imageScale(.large)
 					}
+					.accessibilityLabel("Settings")
+					.accessibilitySortPriority(-1)
 					Spacer()
 				}
 				.padding(.all, 20)
@@ -59,14 +62,17 @@ struct InitializationView: MVIView {
 			
 				Spacer()
 				
-				Image(logoImageName)
-					.resizable()
-					.frame(width: 96, height: 96)
+				VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+					Image(logoImageName)
+						.resizable()
+						.frame(width: 96, height: 96)
 
-				Text("Phoenix")
-					.font(Font.title2)
-					.padding(.top, -10)
-					.padding(.bottom, 80)
+					Text("Phoenix")
+						.font(Font.title2)
+						.padding(.top, -10)
+						.padding(.bottom, 80)
+				}
+				.accessibilityHidden(true)
 				
 				Button {
 					createMnemonics()
@@ -122,7 +128,8 @@ struct InitializationView: MVIView {
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.assignMaxPreference(for: buttonWidthReader.key, to: $buttonWidth)
-		.navigationBarTitle("", displayMode: .inline)
+		.navigationTitle("")
+		.navigationBarTitleDisplayMode(.inline)
 		.navigationBarHidden(true)
 		.onChange(of: mvi.model, perform: { model in
 			onModelChange(model: model)
@@ -130,7 +137,7 @@ struct InitializationView: MVIView {
 	}
 	
 	var logoImageName: String {
-		if AppDelegate.isTestnet {
+		if BusinessManager.isTestnet {
 			return "logo_blue"
 		} else {
 			return "logo_green"
@@ -160,7 +167,7 @@ struct InitializationView: MVIView {
 		
 		AppSecurity.shared.addKeychainEntry(mnemonics: model.mnemonics) { (error: Error?) in
 			if error == nil {
-				AppDelegate.get().loadWallet(mnemonics: model.mnemonics, seed: model.seed)
+				Biz.loadWallet(mnemonics: model.mnemonics, seed: model.seed)
 			}
 		}
 	}

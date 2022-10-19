@@ -100,7 +100,7 @@ private class ReceiveViewModel(controller: ReceiveController, description: Strin
         viewModelScope.launch(Dispatchers.Default) {
             log.info("generating qrcode for invoice=$invoice")
             try {
-                qrBitmap = QRCode.generateBitmap(invoice).asImageBitmap()
+                qrBitmap = BitmapHelper.generateBitmap(invoice).asImageBitmap()
             } catch (e: Exception) {
                 log.error("error when generating bitmap QR for invoice=$invoice:", e)
             }
@@ -127,12 +127,9 @@ fun ReceiveView() {
     val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(LocalContext.current).collectAsState(null)
     val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState(null)
     safeLet(invoiceDefaultDesc, invoiceDefaultExpiry) { description, expiry ->
-
         val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(controllerFactory, CF::receive, description, expiry))
         when (val state = vm.state) {
-            is ReceiveViewState.Default -> DefaultView(
-                vm = vm
-            )
+            is ReceiveViewState.Default -> DefaultView(vm = vm)
             is ReceiveViewState.EditInvoice -> EditInvoiceView(
                 amount = vm.customAmount,
                 description = vm.customDesc,
@@ -148,15 +145,8 @@ fun ReceiveView() {
 @Composable
 private fun DefaultView(vm: ReceiveViewModel) {
     val context = LocalContext.current
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
-    ) {
-        val nc = navController
+    val nc = navController
+    DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally) {
         DefaultScreenHeader(onBackClick = { nc.popBackStack() }, backgroundColor = Color.Unspecified)
         MVIView(vm) { model, postIntent ->
             when (model) {
@@ -189,7 +179,7 @@ private fun DefaultView(vm: ReceiveViewModel) {
                         onEdit = { vm.state = ReceiveViewState.EditInvoice })
                     Spacer(modifier = Modifier.height(24.dp))
                     BorderButton(
-                        text = R.string.receive__swapin_button,
+                        text = stringResource(id = R.string.receive__swapin_button),
                         icon = R.drawable.ic_swap,
                         onClick = { postIntent(Receive.Intent.RequestSwapIn) })
                 }
@@ -269,7 +259,7 @@ private fun CopyShareEditButtons(
         if (onEdit != null) {
             Spacer(modifier = Modifier.width(16.dp))
             BorderButton(
-                text = R.string.receive__edit_button,
+                text = stringResource(id = R.string.receive__edit_button),
                 icon = R.drawable.ic_edit,
                 onClick = onEdit
             )

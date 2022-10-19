@@ -20,7 +20,7 @@ extension PhoenixBusiness {
 
 	func peerPublisher() -> AnyPublisher<Lightning_kmpPeer, Never> {
 
-		executeOnce(storageKey: &_Key.peerPublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.peerPublisher) {
 			
 			// Transforming from Kotlin:
 			// ```
@@ -44,7 +44,7 @@ extension CurrencyManager {
 	
 	func ratesPubliser() -> AnyPublisher<[ExchangeRate], Never> {
 		
-		executeOnce(storageKey: &_Key.ratesPublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.ratesPublisher) {
 			
 			// Transforming from Kotlin:
 			// `ratesFlow: Flow<List<ExchangeRate>>`
@@ -58,7 +58,7 @@ extension CurrencyManager {
 	
 	func refreshPublisher() -> AnyPublisher<Bool, Never> {
 		
-		executeOnce(storageKey: &_Key.refreshPublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.refreshPublisher) {
 			
 			// Transforming from Kotlin:
 			// `refreshFlow: StateFlow<Set<FiatCurrency>>`
@@ -82,7 +82,7 @@ extension PeerManager {
 	
 	func balancePublisher() -> AnyPublisher<Lightning_kmpMilliSatoshi?, Never> {
 		
-		executeOnce(storageKey: &_Key.balancePublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.balancePublisher) {
 			
 			// Transforming from Kotlin:
 			// `balance: StateFlow<MilliSatoshi?>`
@@ -107,7 +107,7 @@ extension PaymentsManager {
 	
 	func paymentsCountPublisher() -> AnyPublisher<Int64, Never> {
 		
-		executeOnce(storageKey: &_Key.paymentsCountPublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.paymentsCountPublisher) {
 			
 			// Transforming from Kotlin:
 			// `paymentsCount: StateFlow<Long>`
@@ -121,7 +121,7 @@ extension PaymentsManager {
 	
 	func incomingSwapsPublisher() -> AnyPublisher<[String: Lightning_kmpMilliSatoshi], Never> {
 		
-		executeOnce(storageKey: &_Key.incomingSwapsPublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.incomingSwapsPublisher) {
 			
 			// Transforming from Kotlin:
 			// `incomingSwaps: StateFlow<Map<String, MilliSatoshi>>`
@@ -135,7 +135,7 @@ extension PaymentsManager {
 	
 	func lastCompletedPaymentPublisher() -> AnyPublisher<Lightning_kmpWalletPayment, Never> {
 		
-		executeOnce(storageKey: &_Key.lastCompletedPaymentPublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.lastCompletedPaymentPublisher) {
 			
 			// Transforming from Kotlin:
 			// `lastCompletedPayment: StateFlow<WalletPayment?>`
@@ -150,7 +150,7 @@ extension PaymentsManager {
 	
 	func lastIncomingPaymentPublisher() -> AnyPublisher<Lightning_kmpIncomingPayment, Never> {
 		
-		executeOnce(storageKey: &_Key.lastIncomingPaymentPublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.lastIncomingPaymentPublisher) {
 		
 			// Transforming from Kotlin:
 			// `lastCompletedPayment: StateFlow<WalletPayment?>`
@@ -167,7 +167,7 @@ extension PaymentsManager {
 	
 	func inFlightOutgoingPaymentsPublisher() -> AnyPublisher<Int, Never> {
 		
-		executeOnce(storageKey: &_Key.inFlightOutgoingPaymentsPublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.inFlightOutgoingPaymentsPublisher) {
 			
 			// Transforming from Kotlin:
 			// `inFlightOutgoingPayments: StateFlow<Set<UUID>>`
@@ -191,7 +191,7 @@ extension PaymentsPageFetcher {
 	
 	func paymentsPagePublisher() -> AnyPublisher<PaymentsPage, Never> {
 		
-		executeOnce(storageKey: &_Key.paymentsPagePublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.paymentsPagePublisher) {
 			
 			// Transforming from Kotlin:
 			// `paymentsPage: StateFlow<PaymentsPage>`
@@ -212,7 +212,7 @@ extension AppConfigurationManager {
 	
 	func chainContextPublisher() -> AnyPublisher<WalletContext.V0ChainContext, Never> {
 		
-		executeOnce(storageKey: &_Key.chainContextPublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.chainContextPublisher) {
 			
 			// Transforming from Kotlin:
 			// `chainContext: StateFlow<WalletContext.V0.ChainContext?>`
@@ -234,7 +234,7 @@ extension Lightning_kmpElectrumWatcher {
 	
 	func upToDatePublisher() -> AnyPublisher<Int64, Never> {
 		
-		executeOnce(storageKey: &_Key.upToDatePublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.upToDatePublisher) {
 			
 			/// Transforming from Kotlin:
 			/// `openUpToDateFlow(): Flow<Long>`
@@ -257,7 +257,7 @@ extension Lightning_kmpPeer {
 	
 	func channelsPublisher() -> AnyPublisher<ChannelsMap, Never> {
 		
-		executeOnce(storageKey: &_Key.channelsPublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.channelsPublisher) {
 			
 			/// Transforming from Kotlin:
 			/// `channelsFlow: StateFlow<Map<ByteVector32, ChannelState>>`
@@ -278,7 +278,7 @@ extension CloudKitDb {
 	
 	func fetchQueueCountPublisher() -> AnyPublisher<Int64, Never> {
 		
-		executeOnce(storageKey: &_Key.fetchQueueCountPublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.fetchQueueCountPublisher) {
 			
 			/// Transforming from Kotlin:
 			/// `queueCount: StateFlow<Long>`

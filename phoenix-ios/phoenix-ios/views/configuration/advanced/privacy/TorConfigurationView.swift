@@ -8,7 +8,7 @@ struct TorConfigurationView: View {
 	var body: some View {
 		Form {
 			Section {
-				
+
 				Toggle(isOn: $isTorEnabled.animation()) {
 					if isTorEnabled {
 						Text("Tor is enabled")
@@ -18,7 +18,7 @@ struct TorConfigurationView: View {
 				}.onChange(of: isTorEnabled) { newValue in
 					self.toggleTor(newValue)
 				}
-				
+
 				Text(
 					"""
 					You can improve your privacy by only using Tor when connecting to an Electrum server or \

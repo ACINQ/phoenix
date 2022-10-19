@@ -97,7 +97,7 @@ fun PaymentDetailsSplashView(
                 is IncomingPayment -> when (val origin = payment.origin) {
                     is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description ?: origin.paymentRequest.descriptionHash?.toHex()
                     is IncomingPayment.Origin.KeySend -> "Spontaneous payment"
-                    is IncomingPayment.Origin.SwapIn -> "On-chain swap deposit"
+                    is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.DualSwapIn -> "On-chain swap deposit"
                 }
                 else -> null
             }?.takeIf { it.isNotBlank() },

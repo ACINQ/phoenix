@@ -13,8 +13,8 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct DisplayConfigurationView: View {
 	
-	@State var fiatCurrency = Prefs.shared.fiatCurrency
-	@State var bitcoinUnit = Prefs.shared.bitcoinUnit
+	@State var fiatCurrency = GroupPrefs.shared.fiatCurrency
+	@State var bitcoinUnit = GroupPrefs.shared.bitcoinUnit
 	@State var theme = Prefs.shared.theme
 	
 	let allRecentPaymentsOptions = RecentPaymentsOption.allCases
@@ -111,20 +111,18 @@ struct DisplayConfigurationView: View {
 		} // </List>
 		.listStyle(.insetGrouped)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationBarTitle(
-			NSLocalizedString("Display options", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Display options", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 		.onAppear {
 			onAppear()
 		}
 		.onChange(of: sliderValue) { newValue in
 			sliderValueChanged(newValue)
 		}
-		.onReceive(Prefs.shared.fiatCurrencyPublisher) { newValue in
+		.onReceive(GroupPrefs.shared.fiatCurrencyPublisher) { newValue in
 			fiatCurrency = newValue
 		}
-		.onReceive(Prefs.shared.bitcoinUnitPublisher) { newValue in
+		.onReceive(GroupPrefs.shared.bitcoinUnitPublisher) { newValue in
 			bitcoinUnit = newValue
 		}
 		.onReceive(Prefs.shared.themePublisher) { newValue in
@@ -242,10 +240,8 @@ struct FiatCurrencySelector: View, ViewName {
 				content
 			}
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Fiat currency", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Fiat currency", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -293,7 +289,7 @@ struct FiatCurrencySelector: View, ViewName {
 		log.trace("didSelect(fiatCurrency = \(fiatCurrency.shortName)")
 		
 		selectedFiatCurrency = fiatCurrency
-		Prefs.shared.fiatCurrency = fiatCurrency
+		GroupPrefs.shared.fiatCurrency = fiatCurrency
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.10) {
 			presentationMode.wrappedValue.dismiss()
@@ -359,10 +355,8 @@ struct BitcoinUnitSelector: View, ViewName {
 					.edgesIgnoringSafeArea(.bottom) // background color should extend to bottom of screen
 				)
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Bitcoin unit", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Bitcoin unit", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -408,7 +402,7 @@ struct BitcoinUnitSelector: View, ViewName {
 		log.trace("didSelect(bitcoinUnit = \(bitcoinUnit.shortName)")
 		
 		selectedBitcoinUnit = bitcoinUnit
-		Prefs.shared.bitcoinUnit = bitcoinUnit
+		GroupPrefs.shared.bitcoinUnit = bitcoinUnit
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.10) {
 			presentationMode.wrappedValue.dismiss()

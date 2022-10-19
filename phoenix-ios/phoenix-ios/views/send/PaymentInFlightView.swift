@@ -14,7 +14,7 @@ struct PaymentInFlightView: View {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 			
-			if AppDelegate.showTestnetBackground {
+			if BusinessManager.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.ignoresSafeArea(.all, edges: .all)
@@ -28,9 +28,7 @@ struct PaymentInFlightView: View {
 		}
 		.frame(maxHeight: .infinity)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
-		.navigationBarTitle(
-			NSLocalizedString("Sending payment", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Sending payment", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 }

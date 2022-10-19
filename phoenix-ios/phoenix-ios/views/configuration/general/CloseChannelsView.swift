@@ -43,10 +43,8 @@ struct CloseChannelsView : MVIView {
 			.onAppear {
 				onAppear()
 			}
-			.navigationBarTitle(
-				NSLocalizedString("Drain wallet", comment: "Navigation bar title"),
-				displayMode: .inline
-			)
+			.navigationTitle(NSLocalizedString("Drain wallet", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -327,7 +325,7 @@ struct CloseChannelsView : MVIView {
 		
 		let isScannedValue = textFieldValue == scannedValue
 		
-		let business = AppDelegate.get().business
+		let business = Biz.business
 		let result = Parser.shared.readBitcoinAddress(chain: business.chain, input: textFieldValue)
 		
 		if let error = result.left {

@@ -15,10 +15,15 @@ fileprivate var log = Logger(OSLog.disabled)
 
 class MVIState<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 	
+	private var _initialModel: Model? = nil
 	@Published private var _model: Model? = nil
 	
 	var model: Model {
-		return _model!
+		if let updatedModel = _model {
+			return updatedModel
+		} else {
+			return _initialModel!
+		}
 	}
 	
 	private let _getController: ((ControllerFactory) -> MVIController<Model, Intent>)?
@@ -39,7 +44,7 @@ class MVIState<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 	init(_ controller: MVIController<Model, Intent>) {
 		_getController = nil
 		_controller = controller
-		_model = controller.firstModel
+		_initialModel = controller.firstModel
 	}
 
 	deinit {
@@ -58,7 +63,17 @@ class MVIState<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 			if let getController = _getController {
 				let controller = getController(factory)
 				_controller = controller
-				_model = controller.firstModel
+				_initialModel = controller.firstModel
+				
+				// Architecture note:
+				// This method is called from MVIView.body, which is a ViewBuilder.
+				// And if you attempt to update the @Published `_model` variable from here,
+				// then you will get a runtime warning:
+				//
+				// > Publishing changes from within view updates is not allowed,
+				// > this will cause undefined behavior.
+				//
+				// This is the reason we have both `_initialModel` && `_model`.
 			}
 		}
 	}
@@ -122,7 +137,7 @@ extension MVIView {
 }
 
 fileprivate struct ControllerFactoryKey: EnvironmentKey {
-	static let defaultValue: ControllerFactory = AppDelegate.get().business.controllers
+	static let defaultValue: ControllerFactory = Biz.business.controllers
 }
 
 extension EnvironmentValues {

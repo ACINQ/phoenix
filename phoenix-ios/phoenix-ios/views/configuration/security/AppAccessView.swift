@@ -16,14 +16,10 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct AppAccessView : View {
 	
-	@State var biometricStatus = AppSecurity.shared.deviceBiometricSupport()
+	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
 	@State var biometricsEnabled = AppSecurity.shared.enabledSecurity.value.contains(.biometrics)
-	@State var advancedSecurityEnabled = AppSecurity.shared.enabledSecurity.value.contains(.advancedSecurity)
 	
 	@State var ignoreToggle_biometricsEnabled = false
-	@State var ignoreToggle_advancedSecurityEnabled = false
-	
-	@State var showHelpSheet = false
 	
 	@Environment(\.colorScheme) var colorScheme
 	
@@ -33,21 +29,19 @@ struct AppAccessView : View {
 	
 	var body: some View {
 		
-		form()
-		.navigationBarTitle(
-			NSLocalizedString("App Access", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		content()
+			.navigationTitle(NSLocalizedString("App Access", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
-	func form() -> some View {
+	func content() -> some View {
 		
 		List {
 			Section {
 				Toggle(isOn: $biometricsEnabled) {
-				
-					switch biometricStatus {
+					Label {
+						switch biometricSupport {
 						case .touchID_available:
 							Text("Require Touch ID")
 							
@@ -68,72 +62,36 @@ struct AppAccessView : View {
 						
 						default:
 							Text("Biometrics") + Text(" (not available)").foregroundColor(.secondary)
+						}
+					} icon: {
+						Image(systemName: isTouchID() ? "touchid" : "faceid")
+							.renderingMode(.template)
+							.imageScale(.medium)
+							.foregroundColor(Color.appAccent)
 					}
 					
-				}
+				} // </Toggle>
 				.onChange(of: biometricsEnabled) { value in
 					self.toggleBiometrics(value)
 				}
-				.disabled(!biometricStatus.isAvailable())
+				.disabled(!biometricSupport.isAvailable())
 				
-				securityStatus()
-			} // </Section>
-			
-			Section {
+				// Implicit divider added here
 				
-				// SwiftUI Design:
-				//
-				// We have 2 options:
-				// Toggle {
-				//    HStack {
-				//       Text
-				//       Button // <- disabled if toggle is disabled
-				// }
-				//
-				// HStack {
-				//   Text
-				//   Button
-				//   Spacer
-				//   Toggle.labelsHidden
-				// }
-				//
-				// The problem with the former option is that,
-				// when the Toggle is disabled, the Button is automatically disabled as well.
-				//
-				// We decided we wanted the (?) button to be tappable, even when the Toggle is disabled.
-				// So we went with the later design.
-				
-				HStack(alignment: VerticalAlignment.center) {
+				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 					
-					Text("Advanced security")
-						.padding(.trailing, 2)
-					Button {
-						advancedSecurityHelpButtonTapped()
-					} label: {
-						Image(systemName: "questionmark.circle")
-							.renderingMode(.template)
-							.imageScale(.large)
-							.foregroundColor(colorScheme == ColorScheme.light ? Color.black : Color.white)
-					}
-					Spacer()
-					Toggle("", isOn: $advancedSecurityEnabled)
-						.labelsHidden()
-						.onChange(of: advancedSecurityEnabled) { value in
-							self.toggleAdvancedSecurity(value)
-						}
-						.disabled(!biometricsEnabled)
-				}
-				.font(.body)
-				.buttonStyle(PlainButtonStyle()) // disable row highlight when tapping help button
+					securityLabel()
+						.padding(.top, 5)
+					
+					receiveLabel()
+						.padding(.top, 20)
+					
+				} // </VStack>
+				.padding(.vertical, 10)
 				
-				receiveStatus()
 			} // </Section>
 		} // </List>
 		.listStyle(.insetGrouped)
-		.sheet(isPresented: $showHelpSheet) {
-			
-			AdvancedSecurityHelp(isShowing: $showHelpSheet)
-		}
 		.onReceive(willEnterForegroundPublisher, perform: { _ in
 			onWillEnterForeground()
 		})
@@ -143,67 +101,59 @@ struct AppAccessView : View {
 	}
 	
 	@ViewBuilder
-	func securityStatus() -> some View {
+	func securityLabel() -> some View {
 		
-		HStack(alignment: VerticalAlignment.top) {
+		if biometricsEnabled {
 			
-			if !biometricsEnabled {
-				
-				Image(systemName: "exclamationmark.triangle")
+			Label {
+				Text("Access to Phoenix is protected by biometrics.")
+					.fixedSize(horizontal: false, vertical: true) // SwiftUI truncating text
+			} icon: {
+				Image(systemName: "checkmark.shield")
 					.renderingMode(.template)
 					.imageScale(.medium)
-					.foregroundColor(Color.appWarn)
+					.foregroundColor(Color.appAccent)
+			}
+			
+		} else {
+		
+			Label {
 				Text(
 					"""
 					Phoenix can be accessed without credentials. \
 					Make sure that you have enabled adequate protections for iOS.
 					"""
 				)
-				
-			} else {
-				
-				Image(systemName: "checkmark.shield")
+				.fixedSize(horizontal: false, vertical: true) // SwiftUI truncating text
+			} icon: {
+				Image(systemName: "exclamationmark.triangle")
+					.renderingMode(.template)
 					.imageScale(.medium)
-				Text("Access to Phoenix is protected by biometrics.")
+					.foregroundColor(Color.appWarn)
 			}
 		}
-		.padding(.top, 5)
-		.padding(.bottom, 20)
 	}
 	
 	@ViewBuilder
-	func receiveStatus() -> some View {
+	func receiveLabel() -> some View {
 		
-		HStack(alignment: VerticalAlignment.top) {
-			
-			Image(systemName: "bolt")
-				.imageScale(.medium)
-			
+		Label {
 			VStack(alignment: HorizontalAlignment.leading) {
-				if advancedSecurityEnabled {
-					Text(
-						"""
-						To receive incoming payments, Phoenix must be running, \
-						and you must have unlocked the app once.
-						"""
-					)
-					.lineLimit(nil)          // SwiftUI bugs
-					.minimumScaleFactor(0.5) // Truncating text
-					
-				} else {
-					Text("To receive incoming payments, Phoenix must be running.")
-						.lineLimit(nil)          // SwiftUI bugs
-						.minimumScaleFactor(0.5) // Truncating text
-				}
+				Text("To receive incoming payments, Phoenix must be running.")
+					.fixedSize(horizontal: false, vertical: true) // SwiftUI truncating text
 				
 				Text("(Phoenix can be running in the background.)")
-					.lineLimit(nil)          // SwiftUI bugs
-					.minimumScaleFactor(0.5) // Truncating text
-					.foregroundColor(Color.gray)
+					.fixedSize(horizontal: false, vertical: true) // SwiftUI truncating text
+					.foregroundColor(.gray)
 					.padding(.top, 2)
 			}
+			
+		} icon: {
+			Image(systemName: "bolt")
+				.renderingMode(.template)
+				.imageScale(.medium)
+				.foregroundColor(Color.appAccent)
 		}
-		.padding(.top, 5)
 	}
 	
 	func onAppear() -> Void {
@@ -218,7 +168,21 @@ struct AppAccessView : View {
 		// When the app returns from being in the background, the biometric status may have changed.
 		// For example: .touchID_notEnrolled => .touchID_available
 		
-		self.biometricStatus = AppSecurity.shared.deviceBiometricSupport()
+		self.biometricSupport = AppSecurity.shared.deviceBiometricSupport()
+	}
+	
+	func isTouchID() -> Bool {
+		
+		// We're using the same logic here as in ConfigurationView.
+		// That is, we shouldn't show a TouchID symbol here if we're
+		// showing a FaceID symbol in the other view.
+		
+		switch biometricSupport {
+			case .touchID_available    : fallthrough
+			case .touchID_notEnrolled  : fallthrough
+			case .touchID_notAvailable : return true
+			default                    : return false
+		}
 	}
 	
 	func toggleBiometrics(_ flag: Bool) {
@@ -230,6 +194,7 @@ struct AppAccessView : View {
 		}
 		
 		if flag { // toggle => ON
+			
 			enableSoftBiometrics { (success: Bool) in
 				if !success {
 					self.ignoreToggle_biometricsEnabled = true
@@ -239,84 +204,31 @@ struct AppAccessView : View {
 			
 		} else { // toggle => OFF
 			
-			let disableSoft = {
-				disableSoftBiometrics { (success: Bool) in
-					if !success {
-						self.ignoreToggle_biometricsEnabled = true
-						self.biometricsEnabled = true // failed to disable soft => enabled
-					}
-				}
+			// User just disabled biometrics switch.
+			// What should occur within the UI:
+			// - user is prompted for biometrics verification
+			// - if SUCCESS:
+			//   - biometrics switch remains disabled
+			// - if FAILURE:
+			//   - biometrics switch changes back to enabled
+			
+			let failedToDisable = {
+				self.ignoreToggle_biometricsEnabled = true
+				self.biometricsEnabled = true // failed to disable soft => enabled
 			}
 			
-			if advancedSecurityEnabled {
-				
-				// What should occur within the UI:
-				// - user is prompted for biometrics verification
-				// - if SUCCESS:
-				//   - biometrics switch remains disabled
-				//   - advancedSecurity switch changes to disabled
-				// - if FAILURE:
-				//   - biometrics switch changes back to enabled
-				//   - advancedSecurity switch remains enabled
-				
-				disableHardBiometrics { (success: Bool) in
-					if success {
-						self.ignoreToggle_advancedSecurityEnabled = true
-						self.advancedSecurityEnabled = false // successfully disabled hard (manually)
-						
-						disableSoft()
-					} else {
-						
-						self.ignoreToggle_biometricsEnabled = true
-						self.biometricsEnabled = true // failed to disable hard, so soft still enabled
-					}
-				}
-				
-			} else {
-				
-				// What should occur within the UI:
-				// - user is prompted for biometrics verification
-				// - if SUCCESS:
-				//   - biometrics switch remains disabled
-				// - if FAILURE:
-				//   - biometrics switch changes back to enabled
-				
-				let prompt = localizedDisableBiometricsPrompt()
-				
-				AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
-					
-					if case .success(_) = result {
-						disableSoft()
-					} else {
-						self.ignoreToggle_biometricsEnabled = true
-						self.biometricsEnabled = true // failed to disable soft => enabled
-					}
-				}
-			}
-		}
-	}
-	
-	func toggleAdvancedSecurity(_ flag: Bool) -> Void {
-		log.trace("toggleAdvancedSecurity()")
-		
-		if ignoreToggle_advancedSecurityEnabled {
-			ignoreToggle_advancedSecurityEnabled = false
-			return
-		}
-		
-		if flag { // toggle => ON
-			enableHardBiometrics { (success: Bool) in
-				if !success {
-					self.ignoreToggle_advancedSecurityEnabled = true
-					self.advancedSecurityEnabled = false // failed to enable => disabled
-				}
-			}
+			let prompt = localizedDisableBiometricsPrompt()
 			
-		} else { // toggle => OFF
-			disableHardBiometrics { (success: Bool) in
-				if !success {
-					self.ignoreToggle_advancedSecurityEnabled = true
-					self.advancedSecurityEnabled = true // failed to disable => enabled
+			AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
+				
+				if case .success(_) = result {
+					disableSoftBiometrics { (success: Bool) in
+						if !success {
+							failedToDisable()
+						}
+					}
+				} else {
+					failedToDisable()
 				}
 			}
 		}
@@ -363,107 +275,6 @@ struct AppAccessView : View {
 		AppSecurity.shared.setSoftBiometrics(enabled: false) { (error: Error?) in
 			completion(error == nil)
 		}
-	}
-	
-	func enableHardBiometrics(
-		completion: @escaping (_ success: Bool) -> Void
-	) -> Void {
-		
-		log.trace("enableHardBiometrics()")
-		
-		// CurrentState:
-		// - SecurityFile.keychain != nil
-		// - SecurityFile.biometrics == nil
-		//
-		// TargetState:
-		// - SecurityFile.keychain == nil
-		// - SecurityFile.biometrics != nil
-		
-		AppSecurity.shared.tryUnlockWithKeychain {(mnemonics: [String]?, _, _) in
-			
-			guard let mnemnoics = mnemonics else {
-				return completion(false)
-			}
-			
-			AppSecurity.shared.addBiometricsEntry(mnemonics: mnemnoics) {(error: Error?) in
-				completion(error == nil)
-			}
-		}
-	}
-	
-	func disableHardBiometrics(
-		completion: @escaping (_ success: Bool) -> Void
-	) -> Void {
-		
-		log.trace("disableHardBiometrics()")
-		
-		// CurrentState:
-		// - SecurityFile.keychain == nil
-		// - SecurityFile.biometrics != nil
-		//
-		// TargetState:
-		// - SecurityFile.keychain != nil
-		// - SecurityFile.biometrics == nil
-		
-		let prompt = localizedDisableBiometricsPrompt()
-		
-		AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
-			
-			guard case .success(let mnemonics) = result else {
-				return completion(false)
-			}
-			
-			AppSecurity.shared.addKeychainEntry(mnemonics: mnemonics) { (error: Error?) in
-				completion(error == nil)
-			}
-		}
-	}
-	
-	func advancedSecurityHelpButtonTapped() -> Void {
-		log.trace("advancedSecurityHelpButtonTapped()")
-		
-		showHelpSheet = true
-	}
-}
-
-struct AdvancedSecurityHelp: View {
-	
-	@Binding var isShowing: Bool
-	
-	var body: some View {
-		
-		ZStack {
-		
-			LocalWebView(
-				html: AdvancedSecurityHTML(),
-				scrollIndicatorInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -20)
-			)
-			.frame(maxWidth: .infinity, maxHeight: .infinity)
-			.padding(.leading, 20)
-			.padding(.trailing, 20) // must match LocalWebView.scrollIndicatorInsets.right
-			
-			// close button
-			// (required for landscapse mode, where swipe-to-dismiss isn't possible)
-			VStack {
-				HStack {
-					Spacer()
-					Button {
-						close()
-					} label: {
-						Image("ic_cross")
-							.resizable()
-							.frame(width: 30, height: 30)
-					}
-				}
-				Spacer()
-			}
-			.padding()
-		}
-	}
-	
-	func close() {
-		log.trace("[AdvancedSecurityHelp] close()")
-		isShowing = false
 	}
 }
 

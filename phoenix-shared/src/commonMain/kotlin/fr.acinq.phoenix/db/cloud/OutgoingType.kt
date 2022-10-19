@@ -1,6 +1,5 @@
 package fr.acinq.phoenix.db.cloud
 
-import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.OutgoingPayment

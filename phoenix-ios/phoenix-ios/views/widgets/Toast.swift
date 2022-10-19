@@ -1,4 +1,15 @@
 import SwiftUI
+import os.log
+
+#if DEBUG && true
+fileprivate var log = Logger(
+	subsystem: Bundle.main.bundleIdentifier!,
+	category: "Toast"
+)
+#else
+fileprivate var log = Logger(OSLog.disabled)
+#endif
+
 
 class Toast: ObservableObject {
 	
@@ -19,15 +30,14 @@ class Toast: ObservableObject {
 	
 	private var contentId: Int = 0
 	
-	@Published private var content: AnyView? = nil
-	
+	@Published private var message: String? = nil
 	@Published private var colorScheme: ColorScheme = ColorScheme.light
 	@Published private var style: ToastStyle = .regular
 	@Published private var alignment: ToastAlignment = .bottom
 	@Published private var showCloseButton: Bool = false
 	
 	func pop(
-		_ content: AnyView,
+		_ message: String,
 		colorScheme: ColorScheme,
 		style: ToastStyle = .regular,
 		duration: TimeInterval = 1.5,
@@ -39,7 +49,7 @@ class Toast: ObservableObject {
 		let prvContentId = contentId
 		
 		withAnimation(.linear(duration: 0.15)) {
-			self.content = content
+			self.message = message
 			self.colorScheme = colorScheme
 			self.style = style
 			self.alignment = alignment
@@ -48,7 +58,7 @@ class Toast: ObservableObject {
 		DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
 			withAnimation(.linear(duration: 0.15)) {
 				if self.contentId == prvContentId {
-					self.content = nil
+					self.message = nil
 				}
 			}
 		}
@@ -57,63 +67,72 @@ class Toast: ObservableObject {
 	@ViewBuilder
 	func view() -> some View {
 		
-		if let content = content {
-			aligned(content)
+		if let message = message {
+			aligned(message)
 				.transition(.opacity)
 				.zIndex(1001)
+				.onAppear {
+					self.onAppear()
+				}
 		}
 	}
 	
 	@ViewBuilder
-	private func aligned(_ content: AnyView) -> some View {
+	private func aligned(_ message: String) -> some View {
 		
 		switch alignment {
 		case .top:
 			VStack {
-				wrapped(content).padding(.top, 45)
+				wrapped(message).padding(.top, 45)
 				Spacer()
 			}
 		case .middle:
 			VStack {
 				Spacer()
-				wrapped(content)
+				wrapped(message)
 				Spacer()
 			}
 		case .bottom:
 			VStack {
 				Spacer()
-				wrapped(content).padding(.bottom, 45)
+				wrapped(message).padding(.bottom, 45)
 			}
 		case .none:
-			wrapped(content)
+			wrapped(message)
 		}
 	}
 	
 	@ViewBuilder
-	private func wrapped(_ content: AnyView) -> some View {
+	private func wrapped(_ message: String) -> some View {
 		
 		if showCloseButton {
-			withBlurBackground(content)
+			withBlurBackground(message)
 				.padding(.all, 18)
 				.background(closeButton())
 				.padding(.all, 4)
 			
 		} else {
-			withBlurBackground(content)
+			withBlurBackground(message)
 				.padding()
 		}
 	}
 	
 	@ViewBuilder
-	private func withBlurBackground(_ content: AnyView) -> some View {
+	private func withBlurBackground(_ message: String) -> some View {
 		
-		content
+		text(message)
 			.environment(\.colorScheme, self.colorScheme)
 			.padding()
 			.background(
 				VisualEffectView(style: blurEffectStyle())
 					.clipShape(Capsule())
 			)
+	}
+	
+	@ViewBuilder
+	private func text(_ message: String) -> some View {
+		
+		Text(message).multilineTextAlignment(.center)
 	}
 	
 	@ViewBuilder
@@ -144,10 +163,18 @@ class Toast: ObservableObject {
 		}
 	}
 	
-	private func closeToast() -> Void {
+	private func closeToast() {
 		
 		withAnimation(.linear(duration: 0.15)) {
-			self.content = nil
+			self.message = nil
+		}
+	}
+	
+	private func onAppear() {
+		log.trace("onAppear()")
+		
+		if let message = message {
+			UIAccessibility.post(notification: .announcement, argument: message)
 		}
 	}
 }

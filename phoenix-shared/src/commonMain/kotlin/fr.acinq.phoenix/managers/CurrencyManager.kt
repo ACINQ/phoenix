@@ -16,7 +16,8 @@ import kotlinx.serialization.json.Json
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Architecture Notes:
@@ -39,7 +40,6 @@ import kotlin.time.ExperimentalTime
 /**
  * Manages fetching and updating exchange rates.
  */
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class, ExperimentalStdlibApi::class)
 class CurrencyManager(
     loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,
@@ -47,7 +47,7 @@ class CurrencyManager(
     private val httpClient: HttpClient
 ) : CoroutineScope by MainScope() {
 
-    constructor(business: PhoenixBusiness): this(
+    constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
         configurationManager = business.appConfigurationManager,
         appDb = business.appDb,
@@ -55,7 +55,7 @@ class CurrencyManager(
     )
 
     private val log = newLogger(loggerFactory)
-    
+
     private val json = Json {
         ignoreUnknownKeys = true
     }
@@ -88,11 +88,9 @@ class CurrencyManager(
      * The blockchain.info API is used to refresh the BitcoinPriceRates.
      * Since bitcoin prices are volatile, we refresh them often.
      */
-    private val blockchainInfoAPI = object: API {
-        override val refreshDelay = Duration.minutes(20)
-        override val fiatCurrencies = FiatCurrency.values.filter {
-            highLiquidityMarkets.contains(it)
-        }.toSet()
+    private val blockchainInfoAPI = object : API {
+        override val refreshDelay = 20.minutes
+        override val fiatCurrencies = FiatCurrency.values.filter { highLiquidityMarkets.contains(it) }.toSet()
     }
 
     /**
@@ -100,11 +98,9 @@ class CurrencyManager(
      * Since fiat prices are less volatile, we refresh them less often.
      * Also, the source only refreshes the values once per hour.
      */
-    private val coindeskAPI = object: API {
-        override val refreshDelay = Duration.minutes(60)
-        override val fiatCurrencies = FiatCurrency.values.filter {
-            !highLiquidityMarkets.contains(it) && it != FiatCurrency.ARS_BM
-        }.toSet()
+    private val coindeskAPI = object : API {
+        override val refreshDelay = 60.minutes
+        override val fiatCurrencies = FiatCurrency.values.filter { !highLiquidityMarkets.contains(it) && it != FiatCurrency.ARS_BM }.toSet()
     }
 
     /**
@@ -112,19 +108,19 @@ class CurrencyManager(
      * - ARS => government controlled exchange rate
      * - ARS_BM => free market exchange rate
      */
-    private val bluelyticsAPI = object: API {
-        override val refreshDelay = Duration.minutes(120)
+    private val bluelyticsAPI = object : API {
+        override val refreshDelay = 120.minutes
         override val fiatCurrencies = setOf(FiatCurrency.ARS_BM)
     }
 
-    val _ratesFlow: Flow<List<ExchangeRate>> = appDb.listBitcoinRates()
-
     /** Public consumable flow that includes the most recent exchange rates */
-    val ratesFlow: StateFlow<List<ExchangeRate>> = _ratesFlow.stateIn(
-        scope = this,
-        started = SharingStarted.Eagerly,
-        initialValue = listOf<ExchangeRate>()
-    )
+    val ratesFlow: StateFlow<List<ExchangeRate>> by lazy {
+        appDb.listBitcoinRates().stateIn(
+            scope = this,
+            started = SharingStarted.Eagerly,
+            initialValue = listOf()
+        )
+    }
 
     /**
      * Returns a snapshot of the ExchangeRate for the primary FiatCurrency.
@@ -134,17 +130,11 @@ class CurrencyManager(
      */
     fun calculateOriginalFiat(): ExchangeRate.BitcoinPriceRate? {
 
-        val fiatCurrency = configurationManager.preferredFiatCurrencies.value?.primary
-        if (fiatCurrency == null) {
-            return null
-        }
+        val fiatCurrency = configurationManager.preferredFiatCurrencies.value?.primary ?: return null
 
         val rates = ratesFlow.value
 
-        val fiatRate = rates.firstOrNull { it.fiatCurrency == fiatCurrency }
-        if (fiatRate == null) {
-            return null
-        }
+        val fiatRate = rates.firstOrNull { it.fiatCurrency == fiatCurrency } ?: return null
 
         return when (fiatRate) {
             is ExchangeRate.BitcoinPriceRate -> {
@@ -177,21 +167,22 @@ class CurrencyManager(
         val nextRefresh: Instant,
         val failCount: Int
     ) {
-        constructor(): this(
+        constructor() : this(
             lastRefresh = Instant.fromEpochMilliseconds(0),
             nextRefresh = Instant.fromEpochMilliseconds(0),
             failCount = 0
         )
+
         fun fail(now: Instant): RefreshInfo {
             val newFailCount = failCount + 1
             val delay = when (newFailCount) {
-                1 -> Duration.seconds(30)
-                2 -> Duration.minutes(1)
-                3 -> Duration.minutes(5)
-                4 -> Duration.minutes(10)
-                5 -> Duration.minutes(30)
-                6 -> Duration.minutes(60)
-                else -> Duration.minutes(120)
+                1 -> 30.seconds
+                2 -> 1.minutes
+                3 -> 5.minutes
+                4 -> 10.minutes
+                5 -> 30.minutes
+                6 -> 60.minutes
+                else -> 120.minutes
             }
             return RefreshInfo(
                 lastRefresh = this.lastRefresh,
@@ -200,13 +191,15 @@ class CurrencyManager(
             )
         }
     }
+
     private var refreshList = mutableMapOf<FiatCurrency, RefreshInfo>()
-    private var refreshJob: Job? = null
+    private var autoRefreshJob: Job? = null
 
     private val _refreshFlow = MutableStateFlow<Set<FiatCurrency>>(setOf())
     val refreshFlow: StateFlow<Set<FiatCurrency>> = _refreshFlow
 
     private var networkAccessEnabled = false
+    private var autoRefreshEnabled = true
 
     /**
      * Used by AppConnectionsDaemon.
@@ -214,7 +207,7 @@ class CurrencyManager(
      */
     internal fun enableNetworkAccess() {
         networkAccessEnabled = true
-        start()
+        maybeStartAutoRefresh()
     }
 
     /**
@@ -223,36 +216,46 @@ class CurrencyManager(
      */
     internal fun disableNetworkAccess() {
         networkAccessEnabled = false
-        stop()
+        stopAutoRefresh()
     }
 
-    private fun start() {
-        if (networkAccessEnabled && refreshJob == null) {
-            refreshJob = startRefreshJob()
+    fun enableAutoRefresh() {
+        autoRefreshEnabled = true
+        maybeStartAutoRefresh()
+    }
+
+    fun disableAutoRefresh() {
+        autoRefreshEnabled = false
+        stopAutoRefresh()
+    }
+
+    private fun maybeStartAutoRefresh() {
+        if (networkAccessEnabled && autoRefreshEnabled && autoRefreshJob == null) {
+            autoRefreshJob = launchAutoRefreshJob()
         }
     }
 
-    private fun stop() = launch {
-        refreshJob?.cancelAndJoin()
-        refreshJob = null
+    private fun stopAutoRefresh() = launch {
+        autoRefreshJob?.cancelAndJoin()
+        autoRefreshJob = null
     }
 
-    fun refreshAll(targets: List<FiatCurrency>) = launch {
-        stop().join()
+    fun refreshAll(targets: List<FiatCurrency>, force: Boolean = true) = launch {
+        stopAutoRefresh().join()
         val deferred1 = async {
-            refreshFromBlockchainInfo(targets = targets, forceRefresh = true)
+            refreshFromBlockchainInfo(targets = targets, forceRefresh = force)
         }
         val deferred2 = async {
-            refreshFromCoinDesk(targets = targets, forceRefresh = true)
+            refreshFromCoinDesk(targets = targets, forceRefresh = force)
         }
         val deferred3 = async {
-            refreshFromBluelytics(targets = targets, forceRefresh = true)
+            refreshFromBluelytics(targets = targets, forceRefresh = force)
         }
         listOf(deferred1, deferred2, deferred3).awaitAll()
-        start()
+        maybeStartAutoRefresh()
     }
 
-    private fun startRefreshJob() = launch {
+    private fun launchAutoRefreshJob() = launch {
         launch {
             // This Job refreshes the BitcoinPriceRates from the blockchain.info API.
             val api = blockchainInfoAPI
@@ -334,7 +337,7 @@ class CurrencyManager(
             val dbValues = ratesFlow.filterNotNull().first()
                 .filter { api.fiatCurrencies.contains(it.fiatCurrency) }
             for (fiatCurrency in api.fiatCurrencies) {
-                val lastRefresh = dbValues.firstOrNull { it.fiatCurrency == fiatCurrency  }?.let {
+                val lastRefresh = dbValues.firstOrNull { it.fiatCurrency == fiatCurrency }?.let {
                     Instant.fromEpochMilliseconds(it.timestampMillis)
                 } ?: run {
                     Instant.fromEpochMilliseconds(0)
@@ -422,9 +425,8 @@ class CurrencyManager(
         }
 
         val fetchedRates = try {
-            httpClient.get<Map<String, BlockchainInfoPriceObject>>(
-                urlString = "https://blockchain.info/ticker"
-            ).mapNotNull {
+            val rates: Map<String, BlockchainInfoPriceObject> = httpClient.get("https://blockchain.info/ticker").body()
+            rates.mapNotNull {
                 FiatCurrency.valueOfOrNull(it.key)?.let { fiatCurrency ->
                     if (api.fiatCurrencies.contains(fiatCurrency)) {
                         ExchangeRate.BitcoinPriceRate(
@@ -465,7 +467,7 @@ class CurrencyManager(
         val inner: Exception?,
         val fiatCurrency: FiatCurrency,
         val reason: String
-    ): Exception("$fiatCurrency: $reason: $inner")
+    ) : Exception("$fiatCurrency: $reason: $inner")
 
     private suspend fun refreshFromCoinDesk(
         targets: Collection<FiatCurrency>,
@@ -494,36 +496,30 @@ class CurrencyManager(
         //   https://youtrack.jetbrains.com/issue/KTOR-3362
         //   If that bug is fixed, the process will take around 800 milliseconds.
         //
-        val http = HttpClient { engine {
-            threadsCount = 1
-            pipelining = true
-        }}
+        val http = HttpClient {
+            engine {
+                threadsCount = 1
+                pipelining = true
+            }
+        }
 
         fiatCurrencies.map { fiatCurrency ->
             val fiat = fiatCurrency.name // e.g.: "AUD"
             async {
                 val response = try {
-                    http.get<HttpResponse>(
-                        urlString = "https://api.coindesk.com/v1/bpi/currentprice/$fiat.json"
-                    )
+                    http.get("https://api.coindesk.com/v1/bpi/currentprice/$fiat.json")
                 } catch (e: Exception) {
-                    throw WrappedException(e, fiatCurrency,
-                        "failed to fetch price from api.coindesk.com"
-                    )
+                    throw WrappedException(e, fiatCurrency, "failed to fetch price from api.coindesk.com")
                 }
                 val result = try {
-                    json.decodeFromString<CoinDeskResponse>(response.receive())
+                    json.decodeFromString<CoinDeskResponse>(response.body())
                 } catch (e: Exception) {
-                    throw WrappedException(e, fiatCurrency,
-                        "failed to parse price from api.coindesk.com"
-                    )
+                    throw WrappedException(e, fiatCurrency, "failed to parse price from api.coindesk.com")
                 }
                 val usdRate = result.bpi["USD"]
                 val fiatRate = result.bpi[fiat]
                 if (usdRate == null || fiatRate == null) {
-                    throw WrappedException(null, fiatCurrency,
-                        "failed to extract USD or FIAT price from api.coindesk.com"
-                    )
+                    throw WrappedException(null, fiatCurrency, "failed to extract USD or FIAT price from api.coindesk.com")
                 }
                 // log.debug { "$fiat = ${fiatRate.rate}" }
                 // Example (fiat = "ILS"):
@@ -553,17 +549,12 @@ class CurrencyManager(
             val failedRates = results.mapNotNull { it.exceptionOrNull() }
 
             if (failedRates.isNotEmpty()) {
-                log.error {
-                    "Failed to refresh fiat exchange rates for ${failedRates.size} currencies: \n"+
-                    " - 0: ${failedRates.first()}"
-                }
+                log.error { "Failed to refresh fiat exchange rates for ${failedRates.size} currencies:\n - 0: ${failedRates.first()}" }
             }
 
             if (fetchedRates.isNotEmpty()) {
                 appDb.saveExchangeRates(fetchedRates)
-                log.info {
-                    "successfully refreshed ${fetchedRates.size} exchange rates from coindesk.com"
-                }
+                log.info { "successfully refreshed ${fetchedRates.size} exchange rates from coindesk.com" }
             }
 
             // Update all the corresponding values in `refreshList`
@@ -592,14 +583,12 @@ class CurrencyManager(
 
         val result = try {
             val response = try {
-                httpClient.get<HttpResponse>(
-                    urlString = "https://api.bluelytics.com.ar/v2/latest"
-                )
+                httpClient.get(urlString = "https://api.bluelytics.com.ar/v2/latest")
             } catch (e: Exception) {
                 throw WrappedException(e, FiatCurrency.ARS_BM, "failed to get http response")
             }
             try {
-                json.decodeFromString<BluelyticsResponse>(response.receive())
+                json.decodeFromString<BluelyticsResponse>(response.bodyAsText())
             } catch (e: Exception) {
                 throw WrappedException(e, FiatCurrency.ARS_BM, "failed to parse json response")
             }
@@ -610,19 +599,19 @@ class CurrencyManager(
 
         val fetchedRates = mutableListOf<ExchangeRate>()
         if (result != null) {
-            fetchedRates.add(ExchangeRate.UsdPriceRate(
-                fiatCurrency = FiatCurrency.ARS_BM,
-                price = result.blue.value_avg,
-                source = "bluelytics.com.ar",
-                timestampMillis = Clock.System.now().toEpochMilliseconds()
-            ))
+            fetchedRates.add(
+                ExchangeRate.UsdPriceRate(
+                    fiatCurrency = FiatCurrency.ARS_BM,
+                    price = result.blue.value_avg,
+                    source = "bluelytics.com.ar",
+                    timestampMillis = Clock.System.now().toEpochMilliseconds()
+                )
+            )
         }
 
         if (fetchedRates.isNotEmpty()) {
             appDb.saveExchangeRates(fetchedRates)
-            log.info {
-                "successfully refreshed exchange rate from bluelytics.com.ar"
-            }
+            log.info { "successfully refreshed exchange rate from bluelytics.com.ar" }
         }
 
         // Update all the corresponding values in `refreshList`

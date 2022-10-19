@@ -50,7 +50,7 @@ struct ConfigurationView: View {
 	@State var didAppear = false
 	
 	init() {
-		if let encryptedNodeId = AppDelegate.get().encryptedNodeId {
+		if let encryptedNodeId = Biz.encryptedNodeId {
 			backupSeedStatePublisher = Prefs.shared.backupSeedStatePublisher(encryptedNodeId)
 		} else {
 			backupSeedStatePublisher = PassthroughSubject<BackupSeedState, Never>().eraseToAnyPublisher()
@@ -214,16 +214,14 @@ struct ConfigurationView: View {
 		.onReceive(externalLightningUrlPublisher) {(url: String) in
 			onExternalLightningUrl(url)
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Settings", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Settings", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 			
 	} // end: body
 	
 	func hasWallet() -> Bool {
 		
-		let walletManager = AppDelegate.get().business.walletManager
+		let walletManager = Biz.business.walletManager
 		let hasWalletFlow = SwiftStateFlow<NSNumber>(origin: walletManager.hasWallet)
 		
 		if let value = hasWalletFlow.value_ {
@@ -260,12 +258,10 @@ struct ConfigurationView: View {
 			
 		} else {
 		
-			if #available(iOS 15.0, *) {
-				// No workaround needed
-			} else {
-				// SwiftUI BUG, and workaround.
+			if #unavailable(iOS 15.0) {
+				// iOS 14 BUG and workaround.
 				//
-				// In iOS 14, the NavigationLink remains selected after we return to the ConfigurationView.
+				// The NavigationLink remains selected after we return to the ConfigurationView.
 				// For example:
 				// - Tap on "About", to push the AboutView onto the NavigationView
 				// - Tap "<" to pop the AboutView
@@ -356,9 +352,9 @@ struct ConfigurationView: View {
 	func onExternalLightningUrl(_ urlStr: String) {
 		log.trace("onExternalLightningUrl()")
 		
-		if #available(iOS 15.0, *) {
-			// No workaround needed
-		} else {
+		if #unavailable(iOS 15.0) {
+			// iOS 14 bug workaround
+			//
 			// We previoulsy had a crash under the following conditions:
 			// - navigate to ConfigurationView
 			// - navigate to a subview (such as AboutView)
@@ -367,7 +363,7 @@ struct ConfigurationView: View {
 			//
 			// It works fine as long as the NavigationStack is popped to at least the ConfigurationView.
 			//
-			// This is only needed for iOS 14. Apple has fixed the issue in iOS 15.
+			// Apple has fixed the issue in iOS 15.
 			navLinkTag = nil
 		}
 	}

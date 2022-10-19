@@ -1,37 +1,39 @@
 package fr.acinq.phoenix.managers
 
+import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.SwapInEvents
 import fr.acinq.lightning.db.WalletPayment
-import fr.acinq.lightning.io.*
-import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.getValue
-import fr.acinq.lightning.utils.setValue
-import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.lightning.io.PaymentNotSent
+import fr.acinq.lightning.io.PaymentProgress
+import fr.acinq.lightning.io.PaymentSent
+import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
-import fr.acinq.phoenix.data.WalletPaymentId
-import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.data.WalletPaymentMetadata
+import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqlitePaymentsDb
-import fr.acinq.phoenix.db.WalletPaymentOrderRow
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class PaymentsManager(
     private val loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
-    private val databaseManager: DatabaseManager
+    private val databaseManager: DatabaseManager,
+    private val nodeParamsManager: NodeParamsManager,
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness): this(
         loggerFactory = business.loggerFactory,
         peerManager = business.peerManager,
-        databaseManager = business.databaseManager
+        databaseManager = business.databaseManager,
+        nodeParamsManager = business.nodeParamsManager,
     )
 
     private val log = newLogger(loggerFactory)
@@ -84,44 +86,90 @@ class PaymentsManager(
         }
 
         launch {
-            peerManager.getPeer().openListenerEventSubscription().consumeEach { event ->
+            var appLaunch: Long = currentTimestampMillis()
+            var isFirstCollection = true
+
+            paymentsDb().listPaymentsOrderFlow(count = 25, skip = 0).collect { list ->
+
+                // NB: lastCompletedPayment should NOT fire under any of the following conditions:
+                // - relaunching app with completed payments in database
+                // - restoring old wallet and downloading transaction history
+
+                if (isFirstCollection) {
+                    isFirstCollection = false
+                } else {
+                    for (row in list) {
+                        val paymentInfo = fetcher.getPayment(row, WalletPaymentFetchOptions.None)
+                        if (paymentInfo != null) {
+                            val completedAt = paymentInfo.payment.completedAt()
+                            if (completedAt > 0) {
+                                // This is the most recent completed payment in the database
+                                if (completedAt > appLaunch) {
+                                    _lastCompletedPayment.value = paymentInfo.payment
+                                }
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        launch {
+            // iOS Note:
+            // If the payment was received via the notification-service-extension
+            // (which runs in a separate process), then you won't receive the
+            // corresponding notifications (PaymentReceived) thru this mechanism.
+            //
+            peerManager.getPeer().eventsFlow.collect { event ->
                 when (event) {
                     is PaymentProgress -> {
                         addToInFlightOutgoingPayments(event.request.paymentId)
                     }
                     is PaymentSent -> {
-                        _lastCompletedPayment.value = event.payment
                         removeFromInFlightOutgoingPayments(event.request.paymentId)
                     }
                     is PaymentNotSent -> {
-                        paymentsDb().getOutgoingPayment(event.request.paymentId)?.let {
-                            _lastCompletedPayment.value = it
-                        }
                         removeFromInFlightOutgoingPayments(event.request.paymentId)
-                    }
-                    is PaymentReceived -> {
-                        _lastCompletedPayment.value = event.incomingPayment
-                    }
-                    is SwapInPendingEvent -> {
-                        _incomingSwapsMap += (event.swapInPending.bitcoinAddress to event.swapInPending.amount.toMilliSatoshi())
-                    }
-                    is SwapInConfirmedEvent -> {
-                        _incomingSwapsMap -= event.swapInConfirmed.bitcoinAddress
                     }
                     else -> Unit
                 }
             }
         }
+        launch {
+            nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents.collect {
+                when (it) {
+                    is SwapInEvents.Requested -> {
+                        // for now, we use a placeholder address because it's not yet exposed by the lightning-kmp API
+                        _incomingSwapsMap = _incomingSwapsMap + ("foobar" to it.req.localFundingAmount.toMilliSatoshi())
+                    }
+                    is SwapInEvents.Accepted -> {
+                        log.info { "swap-in request=${it.requestId} has been accepted for funding_fee=${it.fundingFee} service_fee=${it.serviceFee}" }
+                    }
+                    is SwapInEvents.Rejected -> {
+                        log.error { "rejected swap-in for required_fee=${it.requiredFees} with error=${it.failure}" }
+                        _incomingSwapsMap = _incomingSwapsMap - "foobar"
+                    }
+                    is ChannelEvents.Creating -> {
+                        log.info { "channel=${it.state.channelId} is being created" }
+                    }
+                    is ChannelEvents.Created -> {
+                        log.info { "channel=${it.state.channelId} has been successfully created!" }
+                        _incomingSwapsMap = _incomingSwapsMap - "foobar"
+                    }
+                }
+            }
+        }
     }
 
-    /// Adds to StateFlow<Set<UUID>>
+    /** Adds to StateFlow<Set<UUID>> */
     private fun addToInFlightOutgoingPayments(id: UUID) {
         val oldSet = _inFlightOutgoingPayments.value
         val newSet = oldSet.plus(id)
         _inFlightOutgoingPayments.value = newSet
     }
 
-    /// Removes from StateFlow<Set<UUID>>
+    /** Removes from StateFlow<Set<UUID>> */
     private fun removeFromInFlightOutgoingPayments(id: UUID) {
         val oldSet = _inFlightOutgoingPayments.value
         val newSet = oldSet.minus(id)

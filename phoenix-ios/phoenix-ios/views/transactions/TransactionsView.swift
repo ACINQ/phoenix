@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import PhoenixShared
 import os.log
 
@@ -18,22 +19,21 @@ fileprivate let PAGE_COUNT_INCREMENT = 25
 
 struct TransactionsView: View {
 	
-	static private let appDelegate = AppDelegate.get()
-	static private let phoenixBusiness = appDelegate.business
-	static private let paymentsManager = phoenixBusiness.paymentsManager
-	static private let paymentsPageFetcher = paymentsManager.makePageFetcher()
+	static private let paymentsPageFetcher = Biz.business.paymentsManager.makePageFetcher()
 	
-	private let phoenixBusiness = TransactionsView.phoenixBusiness
-	private let paymentsManager = TransactionsView.paymentsManager
+	private let paymentsManager = Biz.business.paymentsManager
 	private let paymentsPageFetcher = TransactionsView.paymentsPageFetcher
 	
-	let paymentsCountPublisher = paymentsManager.paymentsCountPublisher()
+	let paymentsCountPublisher = Biz.business.paymentsManager.paymentsCountPublisher()
 	@State var paymentsCount: Int64 = 0
 	
 	let paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	
 	@State var selectedItem: WalletPaymentInfo? = nil
+	
+	let syncStatePublisher = Biz.syncManager!.syncTxManager.statePublisher
+	@State var isDownloadingTxs: Bool = false
 	
 	@State var didAppear = false
 	@State var didPreFetch = false
@@ -62,10 +62,8 @@ struct TransactionsView: View {
 			
 			content()
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Payments", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Payments", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -98,6 +96,12 @@ struct TransactionsView: View {
 							PaymentCell(row: row, didAppearCallback: paymentCellDidAppear)
 						}
 					}
+				
+					if isDownloadingTxs {
+						cell_syncing()
+					} else if paymentsPage.rows.isEmpty {
+						cell_zeroPayments()
+					}
 					
 				} // </LazyVStack>
 			} // </ScrollView>
@@ -114,6 +118,40 @@ struct TransactionsView: View {
 		}
 		.onReceive(paymentsPagePublisher) {
 			paymentsPageChanged($0)
+		}
+		.onReceive(syncStatePublisher) {
+			syncStateChanged($0)
+		}
+	}
+	
+	@ViewBuilder
+	func cell_syncing() -> some View {
+		
+		Label {
+			Text("Downloading payments from cloud")
+		} icon: {
+			Image(systemName: "icloud.and.arrow.down")
+				.imageScale(.large)
+		}
+		.font(.callout)
+		.foregroundColor(.secondary)
+		.padding(.vertical, 10)
+	}
+	
+	@ViewBuilder
+	func cell_zeroPayments() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			Label {
+				Text("No payments yet")
+			} icon: {
+				Image(systemName: "moon.zzz")
+					.imageScale(.large)
+			}
+			.font(.callout)
+			.foregroundColor(.secondary)
+			.padding(.vertical, 10)
 		}
 	}
 	
@@ -227,6 +265,16 @@ struct TransactionsView: View {
 					count: newCount
 				)
 			}
+		}
+	}
+	
+	func syncStateChanged(_ state: SyncTxManager_State) {
+		log.trace("syncStateChanged()")
+		
+		if case .downloading(_) = state {
+			self.isDownloadingTxs = true
+		} else {
+			self.isDownloadingTxs = false
 		}
 	}
 	

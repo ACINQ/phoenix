@@ -31,7 +31,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
@@ -90,9 +89,7 @@ fun SeedView() {
                     }
                 }
                 is SeedViewState.ReadingSeed -> {
-                    Row (modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        IconWithText(icon = R.drawable.ic_key, text = stringResource(id = R.string.displayseed_loading))
-                    }
+                    TextWithIcon(text = stringResource(id = R.string.displayseed_loading), icon = R.drawable.ic_key, padding = PaddingValues(16.dp), space = 16.dp)
                 }
                 is SeedViewState.ShowSeed -> {
                     SeedDialog(onDismiss = { state = SeedViewState.Init }, words = s.words)

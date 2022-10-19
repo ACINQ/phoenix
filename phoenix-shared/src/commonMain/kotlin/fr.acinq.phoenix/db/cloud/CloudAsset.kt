@@ -77,7 +77,6 @@ data class CloudAsset(
     }
 
     @Serializable
-    @OptIn(ExperimentalSerializationApi::class)
     data class OriginalFiatWrapper(
         val type: String,
         val rate: Double
@@ -86,6 +85,7 @@ data class CloudAsset(
     companion object
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 fun WalletPaymentMetadataRow.cloudSerialize(): ByteArray {
     val wrapper = CloudAsset(
         version = CloudAssetVersion.V1.value,

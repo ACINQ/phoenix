@@ -4,44 +4,33 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.io.*
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.secure
-import fr.acinq.lightning.wire.SwapInRequest
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
-import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.data.Chain
+import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.phoenix.managers.WalletManager
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.consumeEach
 import org.kodein.log.LoggerFactory
 import kotlin.random.Random
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class AppReceiveController(
     loggerFactory: LoggerFactory,
     private val chain: Chain,
-    private val peerManager: PeerManager
+    private val peerManager: PeerManager,
+    private val walletManager: WalletManager,
 ) : AppController<Receive.Model, Receive.Intent>(
     loggerFactory = loggerFactory,
     firstModel = Receive.Model.Awaiting
 ) {
-    constructor(business: PhoenixBusiness): this(
+    constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
         chain = business.chain,
-        peerManager = business.peerManager
+        peerManager = business.peerManager,
+        walletManager = business.walletManager
     )
 
     private val Receive.Intent.Ask.description: String get() = desc?.takeIf { it.isNotBlank() } ?: ""
-
-    init {
-        launch {
-            peerManager.getPeer().openListenerEventSubscription().consumeEach { event ->
-                if (event is SwapInResponseEvent && models.value is Receive.Model.SwapIn.Requesting) {
-                    logger.debug { "received swap-in response=$event" }
-                    model(Receive.Model.SwapIn.Generated(event.swapInResponse.bitcoinAddress))
-                }
-            }
-        }
-    }
 
     override fun process(intent: Receive.Intent) {
         when (intent) {
@@ -72,9 +61,7 @@ class AppReceiveController(
             }
             Receive.Intent.RequestSwapIn -> {
                 launch {
-                    model(Receive.Model.SwapIn.Requesting)
-                    logger.info { "requesting swap-in" }
-                    peerManager.getPeer().sendToPeer(SwapInRequest(chain.chainHash))
+                    model(Receive.Model.SwapIn.Generated(peerManager.getPeer().swapInAddress))
                 }
             }
         }

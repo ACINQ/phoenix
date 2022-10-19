@@ -57,10 +57,9 @@ struct RecoveryPhraseList: View {
 	init(scrollViewProxy: ScrollViewProxy) {
 		self.scrollViewProxy = scrollViewProxy
 		
-		let appDelegate = AppDelegate.get()
-		let encryptedNodeId = appDelegate.encryptedNodeId! 
+		let encryptedNodeId = Biz.encryptedNodeId!
 		self.encryptedNodeId = encryptedNodeId
-		self.syncSeedManager = appDelegate.syncManager!.syncSeedManager
+		self.syncSeedManager = Biz.syncManager!.syncSeedManager
 		
 		let manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
 		self._manualBackup_taskDone = State<Bool>(initialValue: manualBackup_taskDone)
@@ -102,10 +101,8 @@ struct RecoveryPhraseList: View {
 				mnemonics: $mnemonics
 			)
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Recovery Phrase", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Recovery Phrase", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 		.onAppear {
 			onAppear()
 		}

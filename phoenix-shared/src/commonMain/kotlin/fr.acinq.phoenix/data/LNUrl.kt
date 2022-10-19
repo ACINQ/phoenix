@@ -24,7 +24,6 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.db.cloud.b64Decode
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.utils.io.charsets.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
@@ -66,6 +65,12 @@ sealed class LNUrl {
                     else -> null
                 }
             }
+        }
+
+        /** The Legacy Android app used a non-standard key format. The user should be able to pick that format for backward compatibility reasons, at least on Android. */
+        sealed class KeyType(val id: Int) {
+            object DEFAULT_KEY_TYPE : KeyType(0)
+            object LEGACY_KEY_TYPE : KeyType(1)
         }
     }
 
@@ -198,7 +203,7 @@ sealed class LNUrl {
         /** Convert human readable LNUrls (using a custom lnurl scheme like lnurlc, lnurlp, etc...) into a regular http url. */
         fun parseNonBech32Url(source: String): Url {
             return URLBuilder(source).apply {
-                encodedPath.drop(1).split("/", ignoreCase = true, limit = 2).let {
+                encodedPath.split("/", ignoreCase = true, limit = 2).let {
                     this.host = it.first()
                     this.encodedPath = "/${it.drop(1).joinToString()}"
                 }
@@ -252,7 +257,7 @@ sealed class LNUrl {
             val url = response.request.url
             return try {
                 if (response.status.isSuccess()) {
-                    val json: JsonObject = Json.decodeFromString(response.readText(Charsets.UTF_8))
+                    val json: JsonObject = Json.decodeFromString(response.bodyAsText())
                     log.debug { "lnurl service=${url.host} returned response=$json" }
                     if (json["status"]?.jsonPrimitive?.content?.trim()?.equals("error", true) == true) {
                         log.error { "lnurl service=${url.host} returned error=$json" }
@@ -312,7 +317,6 @@ sealed class LNUrl {
         }
 
         /** Decode a serialized [LNUrl.Pay.Metadata] object. */
-        @OptIn(ExperimentalSerializationApi::class)
         internal fun decodeLNUrlPayMetadata(raw: String): Pay.Metadata =
             Helper.decodeLNUrlPayMetadata(raw = raw, log = log)
 
@@ -407,7 +411,6 @@ sealed class LNUrl {
      * This Helper is a temporary workaround until we fix the problem properly.
      */
     object Helper {
-        @OptIn(ExperimentalSerializationApi::class)
         internal fun decodeLNUrlPayMetadata(
             raw: String,
             log: Logger? = null

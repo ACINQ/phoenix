@@ -17,17 +17,16 @@ import kotlinx.coroutines.flow.*
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.seconds
 
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class AppConnectionsDaemon(
     loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,
     private val walletManager: WalletManager,
     private val peerManager: PeerManager,
     private val currencyManager: CurrencyManager,
-    private val networkManager: NetworkManager,
+    private val networkMonitor: NetworkMonitor,
     private val tcpSocketBuilder: suspend () -> TcpSocket.Builder,
     private val tor: Tor,
     private val electrumClient: ElectrumClient,
@@ -39,7 +38,7 @@ class AppConnectionsDaemon(
         walletManager = business.walletManager,
         peerManager = business.peerManager,
         currencyManager = business.currencyManager,
-        networkManager = business.networkMonitor,
+        networkMonitor = business.networkMonitor,
         tcpSocketBuilder = business.tcpSocketBuilderFactory,
         tor = business.tor,
         electrumClient = business.electrumClient
@@ -92,6 +91,12 @@ class AppConnectionsDaemon(
         // force a disconnect & reconnect.
         val configVersion: Int = 0
     ) {
+        val canConnect get() = if (walletIsAvailable && internetIsAvailable && disconnectCount <= 0) {
+            if (torIsEnabled) torIsAvailable else true
+        } else {
+            false
+        }
+
         fun incrementDisconnectCount(): TrafficControl {
             val safeInc = disconnectCount.let { if (it == Int.MAX_VALUE) it else it + 1 }
             return copy(disconnectCount = safeInc)
@@ -148,8 +153,8 @@ class AppConnectionsDaemon(
 
         // Internet monitor
         launch {
-            networkManager.start()
-            networkManager.networkState.collect {
+            networkMonitor.start()
+            networkMonitor.networkState.collect {
                 val newValue = it == NetworkState.Available
                 logger.debug { "internetIsAvailable = $newValue" }
                 torControlChanges.send { copy(internetIsAvailable = newValue) }
@@ -229,13 +234,7 @@ class AppConnectionsDaemon(
                     } else {
                         false
                     }
-                val canConnect: Boolean =
-                    if (it.walletIsAvailable && it.internetIsAvailable && it.disconnectCount <= 0) {
-                        if (it.torIsEnabled) it.torIsAvailable else true
-                    } else {
-                        false
-                    }
-                if (forceDisconnect || !canConnect) {
+                if (forceDisconnect || !it.canConnect) {
                     peerConnectionJob?.let { job ->
                         logger.info { "disconnecting from peer" }
                         job.cancel()
@@ -244,7 +243,7 @@ class AppConnectionsDaemon(
                     }
 
                 }
-                if (canConnect) {
+                if (it.canConnect) {
                     if (peerConnectionJob == null) {
                         logger.info { "connecting to peer" }
                         peerConnectionJob = connectionLoop(
@@ -272,13 +271,7 @@ class AppConnectionsDaemon(
                     } else {
                         false
                     }
-                val canConnect: Boolean =
-                    if (it.walletIsAvailable && it.internetIsAvailable && it.disconnectCount <= 0) {
-                        if (it.torIsEnabled) it.torIsAvailable else true
-                    } else {
-                        false
-                    }
-                if (forceDisconnect || !canConnect) {
+                if (forceDisconnect || !it.canConnect) {
                     electrumConnectionJob?.let { job ->
                         logger.info { "disconnecting from electrum" }
                         job.cancel()
@@ -286,7 +279,7 @@ class AppConnectionsDaemon(
                         electrumConnectionJob = null
                     }
                 }
-                if (canConnect) {
+                if (it.canConnect) {
                     if (electrumConnectionJob == null) {
                         logger.info { "connecting to electrum" }
                         logger.info { "electrum socket builder=${electrumClient.socketBuilder}" }
@@ -422,17 +415,17 @@ class AppConnectionsDaemon(
         statusStateFlow: StateFlow<Connection>,
         connect: suspend () -> Unit
     ) = launch {
-        var pause = Duration.seconds(0)
+        var pause = Duration.ZERO
         statusStateFlow.collect {
             if (it is Connection.CLOSED) {
                 logger.info { "next $name connection attempt in $pause" }
                 delay(pause)
-                val minPause = Duration.seconds(0.25)
-                val maxPause = Duration.seconds(8)
+                val minPause = 0.25.seconds
+                val maxPause = 60.seconds
                 pause = (pause.coerceAtLeast(minPause) * 2).coerceAtMost(maxPause)
                 connect()
             } else if (it == Connection.ESTABLISHED) {
-                pause = Duration.seconds(0.5)
+                pause = 0.5.seconds
             }
         }
     }

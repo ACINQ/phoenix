@@ -19,6 +19,7 @@ package fr.acinq.phoenix.android.home
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,6 +37,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,11 +55,9 @@ import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.legacy.utils.MigrationResult
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import fr.acinq.phoenix.managers.Connections
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 
-@ExperimentalCoroutinesApi
+
 @Composable
 fun HomeView(
     homeViewModel: HomeViewModel,
@@ -89,6 +89,7 @@ fun HomeView(
         drawerContent = { SideMenu(onSettingsClick) },
         content = {
             MVIView(homeViewModel) { model, _ ->
+                val balance = remember(model) { model.balance }
                 Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     TopBar(
                         onConnectionsStateButtonClick = {
@@ -97,17 +98,22 @@ fun HomeView(
                         connectionsState = connectionsState
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    AmountView(
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(horizontal = 16.dp),
-                        amount = model.balance,
-                        amountTextStyle = MaterialTheme.typography.h1,
-                        unitTextStyle = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
-                    )
-                    model.incomingBalance?.run {
+
+                    if (balance == null) {
+                        ProgressView(text = stringResource(id = R.string.home__balance_loading))
+                    } else {
+                        AmountView(
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(horizontal = 16.dp),
+                            amount = balance,
+                            amountTextStyle = MaterialTheme.typography.h1,
+                            unitTextStyle = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
+                        )
+                    }
+                    model.incomingBalance?.let { incomingSwapAmount ->
                         Spacer(modifier = Modifier.height(8.dp))
-                        IncomingAmountNotif(this)
+                        IncomingAmountNotif(incomingSwapAmount)
                     }
                     Spacer(modifier = Modifier.height(24.dp))
                     PrimarySeparator()
@@ -143,7 +149,6 @@ fun HomeView(
     )
 }
 
-@OptIn(ObsoleteCoroutinesApi::class)
 @Composable
 private fun SideMenu(
     onSettingsClick: () -> Unit,
@@ -233,7 +238,7 @@ fun TopBar(
             .height(40.dp)
             .clipToBounds()
     ) {
-        if (connectionsState?.electrum !is Connection.ESTABLISHED || connectionsState?.peer !is Connection.ESTABLISHED) {
+        if (connectionsState?.electrum !is Connection.ESTABLISHED || connectionsState.peer !is Connection.ESTABLISHED) {
             val connectionsTransition = rememberInfiniteTransition()
             val connectionsButtonAlpha by connectionsTransition.animateFloat(
                 initialValue = 0.3f,
@@ -243,11 +248,14 @@ fun TopBar(
                     repeatMode = RepeatMode.Reverse
                 )
             )
+            val electrumConnection = connectionsState?.electrum
+            val isBadElectrumCert = electrumConnection != null && electrumConnection is Connection.CLOSED && electrumConnection.isBadCertificate()
             FilledButton(
-                text = R.string.home__connection__connecting,
-                icon = R.drawable.ic_connection_lost,
+                text = if (isBadElectrumCert) R.string.home__connection__bad_cert else R.string.home__connection__connecting,
+                icon = if (isBadElectrumCert) R.drawable.ic_alert_triangle else R.drawable.ic_connection_lost,
+                iconTint = if (isBadElectrumCert) negativeColor() else LocalContentColor.current,
                 onClick = onConnectionsStateButtonClick,
-                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
+                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = if (isBadElectrumCert) negativeColor() else LocalContentColor.current),
                 backgroundColor = mutedBgColor(),
                 space = 8.dp,
                 padding = PaddingValues(8.dp),
@@ -259,6 +267,7 @@ fun TopBar(
 
 @Composable
 private fun ConnectionDialog(connections: Connections?, onClose: () -> Unit) {
+    val nc = navController
     Dialog(title = stringResource(id = R.string.conndialog_title), onDismiss = onClose) {
         Column {
             if (connections?.internet != Connection.ESTABLISHED) {
@@ -271,6 +280,8 @@ private fun ConnectionDialog(connections: Connections?, onClose: () -> Unit) {
                     Text(text = stringResource(id = R.string.conndialog_summary_not_ok), Modifier.padding(horizontal = 24.dp))
                 }
                 Spacer(modifier = Modifier.height(24.dp))
+                HSeparator()
+                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_internet), connection = connections.internet)
                 HSeparator()
 
                 val context = LocalContext.current
@@ -291,23 +302,42 @@ private fun ConnectionDialog(connections: Connections?, onClose: () -> Unit) {
 }
 
 @Composable
-private fun ConnectionDialogLine(label: String, connection: Connection?) {
-    Row(modifier = Modifier.padding(vertical = 12.dp, horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically) {
+private fun ConnectionDialogLine(label: String, connection: Connection?, onClick: (() -> Unit)? = null) {
+    Row(
+        modifier = Modifier
+            .then(
+                if (onClick != null) Modifier.clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.conndialog_accessibility_desc, label), onClick = onClick) else Modifier
+            )
+            .padding(vertical = 12.dp, horizontal = 24.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Surface(
             shape = CircleShape,
-            color = if (connection == Connection.ESTABLISHED) positiveColor() else negativeColor(),
+            color = when (connection) {
+                Connection.ESTABLISHING -> orange
+                Connection.ESTABLISHED -> positiveColor()
+                else -> negativeColor()
+            },
             modifier = Modifier.size(8.dp)
         ) {}
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = label, modifier = Modifier.weight(1.0f))
-        Text(text = stringResource(id = if (connection == Connection.ESTABLISHED) R.string.conndialog_ok else R.string.conndialog_not_ok), style = monoTypo())
+        Text(text = when (connection) {
+            Connection.ESTABLISHING -> stringResource(R.string.conndialog_connecting)
+            Connection.ESTABLISHED -> stringResource(R.string.conndialog_connected)
+            else -> if (connection is Connection.CLOSED && connection.isBadCertificate()) {
+                stringResource(R.string.conndialog_closed_bad_cert)
+            } else {
+                stringResource(R.string.conndialog_closed)
+            }
+        }, style = monoTypo())
     }
 }
 
 @Composable
 private fun IncomingAmountNotif(amount: MilliSatoshi) {
     Text(
-        text = stringResource(id = R.string.home__swapin_incoming, amount.toPrettyString(amountUnit, fiatRate, withUnit = true)),
+        text = stringResource(id = R.string.home__swapin_incoming, amount.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true)),
         style = MaterialTheme.typography.caption
     )
 }

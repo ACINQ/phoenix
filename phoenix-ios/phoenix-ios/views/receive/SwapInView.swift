@@ -36,8 +36,8 @@ struct SwapInView: View {
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
-	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
-	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
+	let incomingSwapsPublisher = Biz.business.paymentsManager.incomingSwapsPublisher()
+	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	// For the cicular buttons: [copy, share]
 	enum MaxButtonWidth: Preference {}
@@ -46,6 +46,10 @@ struct SwapInView: View {
 		value: { [$0.size.width] }
 	)
 	@State var maxButtonWidth: CGFloat? = nil
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	var body: some View {
@@ -88,7 +92,7 @@ struct SwapInView: View {
 			}
 			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			
-			feesInfoView
+			feesInfoView()
 				.padding([.top, .leading, .trailing])
 			
 			Button {
@@ -123,10 +127,11 @@ struct SwapInView: View {
 				
 			} // </switch>
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Swap In", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Swap In", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
+		.onAppear {
+			onAppear()
+		}
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
@@ -160,6 +165,16 @@ struct SwapInView: View {
 						Text("Share")
 					}
 				}
+				.accessibilityElement()
+				.accessibilityAddTraits(.isImage)
+				.accessibilityLabel("QR code")
+				.accessibilityHint("Bitcoin address")
+				.accessibilityAction(named: "Copy Image") {
+					copyImageToPasteboard()
+				}
+				.accessibilityAction(named: "Share Image") {
+					shareImageToSystem()
+				}
 			
 		} else {
 			VStack {
@@ -177,6 +192,7 @@ struct SwapInView: View {
 				}
 				.foregroundColor(Color(UIColor.darkGray))
 				.font(.caption)
+				.accessibilityElement(children: .combine)
 			}
 		}
 	}
@@ -248,6 +264,9 @@ struct SwapInView: View {
 		} // </Button>
 		.frame(width: maxButtonWidth)
 		.read(maxButtonWidthReader)
+		.accessibilityElement()
+		.accessibilityLabel(text)
+		.accessibilityAddTraits(.isButton)
 	}
 	
 	@ViewBuilder
@@ -268,6 +287,12 @@ struct SwapInView: View {
 		.simultaneousGesture(TapGesture().onEnded {
 			didTapCopyButton()
 		})
+		.accessibilityAction(named: "Copy Text (bitcoin address)") {
+			copyTextToPasteboard()
+		}
+		.accessibilityAction(named: "Copy Image (QR code)") {
+			copyImageToPasteboard()
+		}
 	}
 	
 	@ViewBuilder
@@ -291,12 +316,13 @@ struct SwapInView: View {
 	}
 	
 	@ViewBuilder
-	var feesInfoView: some View {
+	func feesInfoView() -> some View {
 		
 		HStack(alignment: VerticalAlignment.top, spacing: 8) {
 			
 			Image(systemName: "exclamationmark.circle")
 				.imageScale(.large)
+				.accessibilityHidden(true)
 			
 			let minFunding = Utils.formatBitcoin(sat: swapIn_minFundingSat, bitcoinUnit: .sat)
 			
@@ -336,6 +362,10 @@ struct SwapInView: View {
 		)
 	}
 	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
 	func bitcoinAddress() -> String? {
 		
 		if let m = mvi.model as? Receive.Model_SwapIn_Generated {
@@ -352,6 +382,21 @@ struct SwapInView: View {
 		formatter.maximumFractionDigits = 3
 		
 		return formatter.string(from: NSNumber(value: swapIn_feePercent))!
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		// If the model updates before the view finishes drawing,
+		// we might need to manually invoke onModelChange.
+		//
+		if mvi.model is Receive.Model_SwapIn_Generated {
+			onModelChange(model: mvi.model)
+		}
 	}
 	
 	func onModelChange(model: Receive.Model) -> Void {
@@ -392,34 +437,9 @@ struct SwapInView: View {
 		swapIn_minFundingSat = context.payToOpen.v1.minFundingSat // not yet segregated for swapIn - future work
 	}
 	
-	func copyTextToPasteboard() -> Void {
-		log.trace("copyTextToPasteboard()")
-		
-		if let m = mvi.model as? Receive.Model_SwapIn_Generated {
-			UIPasteboard.general.string = m.address
-			toast.pop(
-				Text("Copied to pasteboard!").anyView,
-				colorScheme: colorScheme.opposite
-			)
-		}
-	}
-	
-	func copyImageToPasteboard() -> Void {
-		log.trace("copyImageToPasteboard()")
-		
-		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
-		   let qrCodeValue = qrCode.value,
-		   qrCodeValue.caseInsensitiveCompare(m.address) == .orderedSame,
-			let qrCodeCgImage = qrCode.cgImage
-		{
-			let uiImg = UIImage(cgImage: qrCodeCgImage)
-			UIPasteboard.general.image = uiImg
-			toast.pop(
-				Text("Copied QR code image to pasteboard!").anyView,
-				colorScheme: colorScheme.opposite
-			)
-		}
-	}
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
 	
 	func didTapCopyButton() -> Void {
 		log.trace("didTapCopyButton()")
@@ -432,11 +452,73 @@ struct SwapInView: View {
 		
 		smartModalState.display(dismissable: true) {
 			
-			CopyOptionsSheet(copyText: {
-				copyTextToPasteboard()
-			}, copyImage: {
-				copyImageToPasteboard()
-			})
+			CopyOptionsSheet(
+				textType: NSLocalizedString("(Bitcoin address)", comment: "Type of text being copied"),
+				copyText: {	copyTextToPasteboard() },
+				copyImage: { copyImageToPasteboard() }
+			)
+		}
+	}
+	
+	func didTapShareButton() {
+		log.trace("didTapShareButton()")
+		
+		shareTextToSystem()
+	}
+	
+	func didLongPressShareButton() {
+		log.trace("didLongPressShareButton()")
+		
+		smartModalState.display(dismissable: true) {
+					
+			ShareOptionsSheet(
+				textType: NSLocalizedString("(Bitcoin address)", comment: "Type of text being copied"),
+				shareText: { shareTextToSystem() },
+				shareImage: { shareImageToSystem() }
+			)
+		}
+	}
+	
+	func didTapLightningButton() {
+		log.trace("didTapLightningButton()")
+		
+		mvi.intent(Receive.IntentAsk(
+			amount: lastAmount,
+			desc: lastDescription,
+			expirySeconds: Int64(60 * 60 * 24 * Prefs.shared.invoiceExpirationDays)
+		))
+	}
+	
+	// --------------------------------------------------
+	// MARK: Utilities
+	// --------------------------------------------------
+	
+	func copyTextToPasteboard() -> Void {
+		log.trace("copyTextToPasteboard()")
+		
+		if let m = mvi.model as? Receive.Model_SwapIn_Generated {
+			UIPasteboard.general.string = m.address
+			toast.pop(
+				NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+				colorScheme: colorScheme.opposite
+			)
+		}
+	}
+	
+	func copyImageToPasteboard() -> Void {
+		log.trace("copyImageToPasteboard()")
+		
+		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
+			let qrCodeValue = qrCode.value,
+			qrCodeValue.caseInsensitiveCompare(m.address) == .orderedSame,
+			let qrCodeCgImage = qrCode.cgImage
+		{
+			let uiImg = UIImage(cgImage: qrCodeCgImage)
+			UIPasteboard.general.image = uiImg
+			toast.pop(
+				NSLocalizedString("Copied QR code image to pasteboard!", comment: "Toast message"),
+				colorScheme: colorScheme.opposite
+			)
 		}
 	}
 	
@@ -453,41 +535,12 @@ struct SwapInView: View {
 		log.trace("shareImageToSystem()")
 		
 		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
-		   let qrCodeValue = qrCode.value,
+			let qrCodeValue = qrCode.value,
 			qrCodeValue.caseInsensitiveCompare(m.address) == .orderedSame,
 			let qrCodeCgImage = qrCode.cgImage
 		{
 			let uiImg = UIImage(cgImage: qrCodeCgImage)
 			sheet = ReceiveViewSheet.sharingImg(img: uiImg)
 		}
-	}
-	
-	func didTapShareButton() {
-		log.trace("didTapShareButton()")
-		
-		shareTextToSystem()
-	}
-	
-	func didLongPressShareButton() {
-		log.trace("didLongPressShareButton()")
-		
-		smartModalState.display(dismissable: true) {
-					
-			ShareOptionsSheet(shareText: {
-				shareTextToSystem()
-			}, shareImage: {
-				shareImageToSystem()
-			})
-		}
-	}
-	
-	func didTapLightningButton() {
-		log.trace("didTapLightningButton()")
-		
-		mvi.intent(Receive.IntentAsk(
-			amount: lastAmount,
-			desc: lastDescription,
-			expirySeconds: Int64(60 * 60 * 24 * Prefs.shared.invoiceExpirationDays)
-		))
 	}
 }

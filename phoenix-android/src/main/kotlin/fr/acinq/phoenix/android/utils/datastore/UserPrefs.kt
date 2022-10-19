@@ -26,6 +26,7 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.data.LNUrl
 import fr.acinq.phoenix.legacy.userPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -73,14 +74,17 @@ object UserPrefs {
 
     val PREFS_ELECTRUM_ADDRESS_HOST = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS_HOST")
     val PREFS_ELECTRUM_ADDRESS_PORT = intPreferencesKey("PREFS_ELECTRUM_ADDRESS_PORT")
-    const val PREFS_ELECTRUM_FORCE_SSL = "PREFS_ELECTRUM_FORCE_SSL"
+    val PREFS_ELECTRUM_ADDRESS_PINNED_KEY = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS_PINNED_KEY")
 
     fun getElectrumServer(context: Context): Flow<ServerAddress?> = prefs(context).map {
         val host = it[PREFS_ELECTRUM_ADDRESS_HOST]?.takeIf { it.isNotBlank() }
         val port = it[PREFS_ELECTRUM_ADDRESS_PORT]
-        log.info("retrieved preferred electrum host=$host port=$port from datastore")
-        if (host != null && port != null) {
+        val pinnedKey = it[PREFS_ELECTRUM_ADDRESS_PINNED_KEY]?.takeIf { it.isNotBlank() }
+        log.info("retrieved electrum address from datastore, host=$host port=$port key=$pinnedKey")
+        if (host != null && port != null && pinnedKey == null) {
             ServerAddress(host, port, TcpSocket.TLS.TRUSTED_CERTIFICATES)
+        } else if (host != null && port != null && pinnedKey != null) {
+            ServerAddress(host, port, TcpSocket.TLS.PINNED_PUBLIC_KEY(pinnedKey))
         } else {
             null
         }
@@ -90,9 +94,16 @@ object UserPrefs {
         if (address == null) {
             it.remove(PREFS_ELECTRUM_ADDRESS_HOST)
             it.remove(PREFS_ELECTRUM_ADDRESS_PORT)
+            it.remove(PREFS_ELECTRUM_ADDRESS_PINNED_KEY)
         } else {
             it[PREFS_ELECTRUM_ADDRESS_HOST] = address.host
             it[PREFS_ELECTRUM_ADDRESS_PORT] = address.port
+            val tls = address.tls
+            if (tls is TcpSocket.TLS.PINNED_PUBLIC_KEY) {
+                it[PREFS_ELECTRUM_ADDRESS_PINNED_KEY] =  tls.pubKey
+            } else {
+                it.remove(PREFS_ELECTRUM_ADDRESS_PINNED_KEY)
+            }
         }
     }
 
@@ -136,8 +147,26 @@ object UserPrefs {
     fun getIsAutoPayToOpenEnabled(context: Context): Flow<Boolean> = prefs(context).map { it[AUTO_PAY_TO_OPEN] ?: true }
     suspend fun saveIsAutoPayToOpenEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[AUTO_PAY_TO_OPEN] = isEnabled }
 
+    // -- lnurl authentication key
+    private val LNURL_AUTH_KEY_TYPE = intPreferencesKey("LNURL_AUTH_KEY_TYPE")
+    fun getLnurlAuthKeyType(context: Context): Flow<LNUrl.Auth.KeyType?> = prefs(context).map {
+        when (it[LNURL_AUTH_KEY_TYPE]) {
+            LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE.id -> LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE
+            LNUrl.Auth.KeyType.LEGACY_KEY_TYPE.id -> LNUrl.Auth.KeyType.LEGACY_KEY_TYPE
+            else -> LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE
+        }
+    }
+    suspend fun saveLnurlAuthKeyType(context: Context, keyType: LNUrl.Auth.KeyType?) = context.userPrefs.edit {
+        if (keyType == null) {
+            it.remove(LNURL_AUTH_KEY_TYPE)
+        } else {
+            it[LNURL_AUTH_KEY_TYPE] = keyType.id
+        }
+    }
+
     private val IS_TOR_ENABLED = booleanPreferencesKey("IS_TOR_ENABLED")
     fun getIsTorEnabled(context: Context): Flow<Boolean> = prefs(context).map { it[IS_TOR_ENABLED] ?: false }
     suspend fun saveIsTorEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[IS_TOR_ENABLED] = isEnabled }
+
 
 }

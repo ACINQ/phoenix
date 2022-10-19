@@ -2,7 +2,7 @@ import SwiftUI
 import PhoenixShared
 import os.log
 
-#if DEBUG && false
+#if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
 	category: "ContentView"
@@ -31,7 +31,7 @@ struct ContentView: MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 
-	@ObservedObject var lockState: LockState
+	@ObservedObject var lockState = LockState.shared
 	@State var unlockedOnce = false
 	
 	@Environment(\.shortSheetState) private var shortSheetState: ShortSheetState
@@ -65,13 +65,14 @@ struct ContentView: MVIView {
 
 		ZStack {
 
-			if lockState.isUnlocked || unlockedOnce {
+			if (lockState.isUnlocked || unlockedOnce) && !isWaitingForKeychainOrWallet() {
 				
 				primaryView()
 					.zIndex(0) // needed for proper animation
 					.onAppear {
 						unlockedOnce = true
 					}
+					.accessibilityHidden(shortSheetItem != nil || popoverItem != nil)
 
 				if let shortSheetItem = shortSheetItem {
 					ShortSheetWrapper(dismissable: shortSheetItem.dismissable) {
@@ -89,7 +90,7 @@ struct ContentView: MVIView {
 
 			} else { // prior to first unlock
 				
-				loadingView()
+				LoadingView()
 					.zIndex(3) // needed for proper animation
 					.transition(.asymmetric(
 						insertion : .identity,
@@ -130,29 +131,44 @@ struct ContentView: MVIView {
 				.imageScale(.large)
 		}
 		.edgesIgnoringSafeArea(.all)
-		.navigationBarTitle("", displayMode: .inline)
+		.navigationTitle("")
+		.navigationBarTitleDisplayMode(.inline)
 		.navigationBarHidden(true)
 	}
-}
-
-
-class ContentView_Previews: PreviewProvider {
-
-	static var lockState_true = LockState(isUnlocked: true)
-	static var lockState_false = LockState(isUnlocked: false)
 	
-	static var previews: some View {
+	func isWaitingForKeychainOrWallet() -> Bool {
 		
-		ContentView(lockState: lockState_true)
-			.mock(Content.ModelWaiting())
-			.previewDevice("iPhone 11")
+		// Here's the UI transition sequence that we want:
+		//
+		// - No wallet available:
+		//   - LoadingView -> IntroContainer
+		// - Wallet available & unlocked:
+		//   - LoadingView -> MainView
+		// - Wallet available & locked:
+		//   - LoadingView -> LockView
+		//
+		// However, there are various delays that we have to work around:
+		//
+		// - On app launch, we might encounter `protectedDataAvailable == false`.
+		//   This means we have to wait until the OS sends us a notification.
+		//
+		// - Querying the keychain takes a variable amount of time.
+		//   So we need to wait to hear back about the status of our wallet & lock state.
+		//
+		// - If the wallet's seed is available, we can call `loadWallet()`,
+		//   but it takes a moment before we receive the updated Model_IsInitialized.
+		//
+		// So we have these checks to ensure we don't show any other view preemptively.
 		
-//		ContentView(lockState: lockState_true)
-//			.mock(Content.ModelNeedInitialization())
-//			.previewDevice("iPhone 11")
+		if !lockState.firstUnlockAttempted {
+			// Waiting for first keychain read
+			return true
+		}
+		if lockState.firstUnlockFoundMnemonics && mvi.model is Content.ModelNeedInitialization {
+			// We're in the process of unlocking the wallet.
+			return true
+		}
 		
-//		ContentView(lockState: lockState_false)
-//			.mock(Content.ModelIsInitialized())
-//			.previewDevice("iPhone 11")
+		return false
 	}
 }

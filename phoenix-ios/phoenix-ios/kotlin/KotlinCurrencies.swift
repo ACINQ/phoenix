@@ -515,7 +515,7 @@ extension FiatCurrency {
 	
 	func matchingLocales() -> [Locale] {
 		
-		return executeOnce(storageKey: &_Key.matchingLocales) {
+		return self.getSetAssociatedObject(storageKey: &_Key.matchingLocales) {
 			
 			var matchingLocales = [Locale]()
 			for identifier in Locale.availableIdentifiers {
@@ -538,7 +538,7 @@ extension FiatCurrency {
 			return true
 		}
 		
-		return executeOnce(storageKey: &_Key.usesCents) {
+		return self.getSetAssociatedObject(storageKey: &_Key.usesCents) {
 			
 			let formatter = NumberFormatter()
 			formatter.numberStyle = .currency

@@ -19,11 +19,10 @@ data class Connections(
         get() = internet + tor + peer + electrum
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class ConnectionsManager(
     peerManager: PeerManager,
     electrumClient: ElectrumClient,
-    networkManager: NetworkManager,
+    networkMonitor: NetworkMonitor,
     appConfigurationManager: AppConfigurationManager,
     tor: Tor
 ): CoroutineScope {
@@ -31,7 +30,7 @@ class ConnectionsManager(
     constructor(business: PhoenixBusiness): this(
         peerManager = business.peerManager,
         electrumClient = business.electrumClient,
-        networkManager = business.networkMonitor,
+        networkMonitor = business.networkMonitor,
         appConfigurationManager = business.appConfigurationManager,
         tor = business.tor
     )
@@ -47,7 +46,7 @@ class ConnectionsManager(
             combine(
                 peerManager.getPeer().connectionState,
                 electrumClient.connectionState,
-                networkManager.networkState,
+                networkMonitor.networkState,
                 appConfigurationManager.isTorEnabled.filterNotNull(),
                 tor.state.connectionState(this)
             ) { peerState, electrumState, internetState, torEnabled, torState ->

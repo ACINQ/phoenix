@@ -28,10 +28,8 @@ struct RestoreView: View {
 			
 			content()
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Restore my wallet", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Restore my wallet", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -62,15 +60,16 @@ struct RestoreView: View {
 	func iCloudStatus() -> some View {
 		
 		if fetcher.isFetching {
-			
+
 			HStack(alignment: VerticalAlignment.center, spacing: 4) {
 				ProgressView()
 					.progressViewStyle(CircularProgressViewStyle(tint: Color.appAccent))
 				Text("Checking iCloud for wallet backups…")
 			}
-			
+			.accessibilityElement(children: .combine)
+
 		} else if let error = fetcher.error {
-			
+
 			Label {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
 					Text("Error fetching wallet backups from iCloud")
@@ -81,9 +80,9 @@ struct RestoreView: View {
 			} icon: {
 				Image(systemName: "exclamationmark.icloud")
 			}
-			
+
 		} else {
-			
+
 			HStack(alignment: VerticalAlignment.center, spacing: 4) {
 				Image(systemName: "checkmark.icloud")
 				if fetcher.results.count == 1 {
@@ -92,6 +91,7 @@ struct RestoreView: View {
 					Text("Found \(fetcher.results.count) wallets in iCloud")
 				}
 			}
+			.accessibilityElement(children: .combine)
 		}
 	}
 	
@@ -121,13 +121,15 @@ struct RestoreView: View {
 					if name.isEmpty {
 						Text("Wallet").font(.headline)
 					} else {
-						Text(name).font(.headline)
+						Text(name)
+							.font(.headline)
+							.accessibilityLabel("wallet: \(name)")
 					}
 					
-					let created = stringForDate(seedBackup.created)
-					Text("created: \(created)")
+					Text("created: \(visibleStringForDate(seedBackup.created))")
 						.font(.subheadline)
 						.foregroundColor(.secondary)
+						.accessibilityLabel("created: \(audibleStringForDate(seedBackup.created))")
 				}
 			} icon: {
 				Image(systemName: "bitcoinsign.circle")
@@ -174,10 +176,18 @@ struct RestoreView: View {
 		}
 	}
 	
-	func stringForDate(_ date: Date) -> String {
+	func visibleStringForDate(_ date: Date) -> String {
 		
 		let formatter = DateFormatter()
 		formatter.dateStyle = .short
+		formatter.timeStyle = .short
+		return formatter.string(from: date)
+	}
+	
+	func audibleStringForDate(_ date: Date) -> String {
+		
+		let formatter = DateFormatter()
+		formatter.dateStyle = .long
 		formatter.timeStyle = .short
 		return formatter.string(from: date)
 	}
@@ -189,7 +199,7 @@ struct RestoreView: View {
 		
 		AppSecurity.shared.addKeychainEntry(mnemonics: mnemonics) { (error: Error?) in
 			if error == nil {
-				AppDelegate.get().loadWallet(
+				Biz.loadWallet(
 					mnemonics: mnemonics,
 					walletRestoreType: .fromCloudBackup(name: seedBackup.name)
 				)
@@ -207,7 +217,7 @@ class FetchSeedsObserver: ObservableObject {
 	private var cancellables = Set<AnyCancellable>()
 	
 	init() {
-		let chain = AppDelegate.get().business.chain
+		let chain = Biz.business.chain
 		let q = DispatchQueue.main
 		
 		SyncSeedManager

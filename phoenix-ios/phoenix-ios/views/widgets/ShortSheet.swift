@@ -30,7 +30,7 @@ public class ShortSheetState: ObservableObject {
 	/// - sheet view will animate on screen (onWillAppear)
 	/// - sheet view has animated off screen (onDidDisappear)
 	///
-	var publisher = PassthroughSubject<ShortSheetItem?, Never>()
+	var publisher = CurrentValueSubject<ShortSheetItem?, Never>(nil)
 	
 	/// Fires when:
 	/// - sheet view will animate off screen (onWillDisapper)
@@ -95,9 +95,9 @@ public class ShortSheetState: ObservableObject {
 
 /// Encompasses the view & options for the popover.
 ///
-public struct ShortSheetItem {
+public struct ShortSheetItem: SmartModalItem {
 	
-	/// Whether or not the popover is dimissable by clicking outside the popover.
+	/// Whether or not the popover is dimissable by tapping outside the popover.
 	let dismissable: Bool
 	
 	/// The view to be displayed in the sheet.
@@ -140,6 +140,12 @@ struct ShortSheetWrapper<Content: View>: View {
 							shortSheetState.close()
 						}
 					}
+					.accessibilityHidden(!dismissable)
+					.accessibilityLabel("Dismiss sheet")
+					.accessibilitySortPriority(-1000)
+					.accessibilityAction {
+						shortSheetState.close()
+					}
 				
 				VStack {
 					Spacer()
@@ -171,7 +177,13 @@ struct ShortSheetWrapper<Content: View>: View {
 	}
 	
 	func animationCompleted() {
-		if animation == 2 {
+		if animation == 1 {
+			// ShortSheet is now visible
+			UIAccessibility.post(notification: .screenChanged, argument: nil)
+		}
+		else if animation == 2 {
+			// ShortSheet is now hidden
+			UIAccessibility.post(notification: .screenChanged, argument: nil)
 			shortSheetState.publisher.send(nil)
 		}
 	}

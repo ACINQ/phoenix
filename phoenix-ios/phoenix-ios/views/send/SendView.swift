@@ -195,7 +195,7 @@ struct SendView: MVIView {
 			)
 		}
 		toast.pop(
-			Text(msg).multilineTextAlignment(.center).anyView,
+			msg,
 			colorScheme: colorScheme.opposite,
 			style: .chrome,
 			duration: 30.0,

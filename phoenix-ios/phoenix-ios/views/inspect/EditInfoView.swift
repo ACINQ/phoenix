@@ -71,18 +71,14 @@ struct EditInfoView: View {
 		switch type {
 		case .sheet:
 			main()
-				.navigationBarTitle(
-					NSLocalizedString("Edit Info", comment: "Navigation bar title"),
-					displayMode: .inline
-				)
+				.navigationTitle(NSLocalizedString("Edit Info", comment: "Navigation bar title"))
+				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarHidden(true)
 			
 		case .embedded:
 			main()
-				.navigationBarTitle(
-					NSLocalizedString("Edit Payment", comment: "Navigation bar title"),
-					displayMode: .inline
-				)
+				.navigationTitle(NSLocalizedString("Edit Payment", comment: "Navigation bar title"))
+				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarBackButtonHidden(true)
 				.navigationBarItems(leading: saveButton())
 				.background(
@@ -122,6 +118,7 @@ struct EditInfoView: View {
 			Text("Description:")
 				.padding(.leading, 8)
 				.padding(.bottom, 4)
+				.accessibilityHint("Maximum length is \(maxDescCount) characters")
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				TextField(defaultDescText, text: $descText)
@@ -151,6 +148,7 @@ struct EditInfoView: View {
 				Text("\(remainingDescCount) remaining")
 					.font(.callout)
 					.foregroundColor(remainingDescCount >= 0 ? Color.secondary : Color.appNegative)
+					.accessibilityLabel("\(remainingDescCount) characters remaining")
 			}
 			.padding([.leading, .trailing], 8)
 			.padding(.top, 4)
@@ -159,6 +157,7 @@ struct EditInfoView: View {
 				.padding(.top, 20)
 				.padding(.leading, 8)
 				.padding(.bottom, 4)
+				.accessibilityHint("Maximum length is \(maxNotesCount) characters")
 				
 			TextEditor(text: $notesText)
 				.frame(minHeight: 80, maxHeight: 320)
@@ -178,6 +177,7 @@ struct EditInfoView: View {
 				Text("\(remainingNotesCount) remaining")
 					.font(.callout)
 					.foregroundColor(remainingNotesCount >= 0 ? Color.secondary : Color.appNegative)
+					.accessibilityLabel("\(remainingNotesCount) characters remaining")
 			}
 			.padding([.leading, .trailing], 8)
 			.padding(.top, 4)
@@ -291,7 +291,7 @@ struct EditInfoView: View {
 		
 		if (originalDescText != newDesc) || (originalNotesText != newNotes) {
 		
-			let business = AppDelegate.get().business
+			let business = Biz.business
 			business.databaseManager.paymentsDb { (paymentsDb: SqlitePaymentsDb?, _) in
 				
 				paymentsDb?.updateMetadata(id: paymentId, userDescription: newDesc, userNotes: newNotes) { (_, err) in

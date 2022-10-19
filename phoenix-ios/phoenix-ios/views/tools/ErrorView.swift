@@ -13,7 +13,7 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct ErrorView: View {
 	
-	let danger: LossOfSeedDanger
+	let danger: UnlockError
 	
 	@Environment(\.popoverState) private var popoverState: PopoverState
 	@State private var popoverItem: PopoverItem? = nil
@@ -51,7 +51,7 @@ struct ErrorView: View {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 
-			if AppDelegate.showTestnetBackground {
+			if BusinessManager.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -127,10 +127,17 @@ struct ErrorView: View {
 			
 			Spacer()
 			Spacer() // Move center up a little bit
+			
+			Text("Phoenix Version: \(versionString())")
+				.foregroundColor(.secondary)
 		
 		} // </VStack>
 		.padding([.top, .bottom])
 		.padding([.leading, .trailing], 40)
+	}
+	
+	func versionString() -> String {
+		return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
 	}
 	
 	func terminateApp() {
@@ -150,7 +157,7 @@ struct ErrorView: View {
 
 struct ErrorDetailsView: View, ViewName {
 	
-	let danger: LossOfSeedDanger
+	let danger: UnlockError
 	@ObservedObject var toast: Toast
 	
 	@State var sharing: String? = nil
@@ -183,7 +190,7 @@ struct ErrorDetailsView: View, ViewName {
 				Button {
 					UIPasteboard.general.string = errTxt
 					toast.pop(
-						Text("Copied to pasteboard!").anyView,
+						NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 						colorScheme: colorScheme.opposite
 					)
 				} label: {

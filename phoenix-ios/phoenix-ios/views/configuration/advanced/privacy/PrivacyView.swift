@@ -69,10 +69,8 @@ struct PrivacyView: View {
 			
 		} // </List>
 		.listStyle(.insetGrouped)
-		.navigationBarTitle(
-			NSLocalizedString("Privacy", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationTitle(NSLocalizedString("Privacy", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 		.onAppear() {
 			onAppear()
 		}
@@ -86,7 +84,7 @@ struct PrivacyView: View {
 	
 	func hasWallet() -> Bool {
 		
-		let walletManager = AppDelegate.get().business.walletManager
+		let walletManager = Biz.business.walletManager
 		let hasWalletFlow = SwiftStateFlow<NSNumber>(origin: walletManager.hasWallet)
 		
 		if let value = hasWalletFlow.value_ {
