@@ -27,6 +27,7 @@ class GroupPrefs {
 		case bitcoinUnit
 		case currencyConverterList
 		case electrumConfig
+		case isTorEnabled
 	}
 	
 	public static let shared = GroupPrefs()
@@ -148,6 +149,20 @@ class GroupPrefs {
 		}
 	}
 	
+	lazy private(set) var isTorEnabledPublisher: CurrentValueSubject<Bool, Never> = {
+		return CurrentValueSubject<Bool, Never>(self.isTorEnabled)
+	}()
+
+	var isTorEnabled: Bool {
+		get {
+			 defaults.bool(forKey: Key.isTorEnabled.rawValue)
+		}
+		set {
+			defaults.set(newValue, forKey: Key.isTorEnabled.rawValue)
+			isTorEnabledPublisher.send(newValue)
+		}
+	}
+
 	// --------------------------------------------------
 	// MARK: Migration
 	// --------------------------------------------------

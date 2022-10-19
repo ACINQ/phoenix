@@ -45,7 +45,7 @@ class PhoenixManager {
 		business.networkMonitor.disable()
 		business.currencyManager.disableAutoRefresh()
 		
-		let startupParams = StartupParams(requestCheckLegacyChannels: false)
+		let startupParams = StartupParams(requestCheckLegacyChannels: false, isTorEnabled: GroupPrefs.shared.isTorEnabled)
 		business.start(startupParams: startupParams)
 	}
 	
