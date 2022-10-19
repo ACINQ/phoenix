@@ -511,7 +511,7 @@ struct EnterSeedView: View {
 							.accessibilityLabel("#\(idx+1): \(word)")
 							.accessibilitySortPriority(Double(wordPriority))
 					} else {
-						Text(" ")
+						Text(verbatim: " ")
 							.font(.headline)
 							.frame(maxWidth: .infinity, alignment: .leading)
 							.accessibilityHidden(true)

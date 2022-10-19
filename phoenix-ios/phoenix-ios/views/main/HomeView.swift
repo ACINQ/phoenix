@@ -164,11 +164,15 @@ struct HomeView : MVIView {
 							isPresented: $showBlockchainExplorerOptions,
 							titleVisibility: .automatic
 						) {
-							Button("Mempool.space") {
+							Button {
 								exploreIncomingSwap(website: BlockchainExplorer.WebsiteMempoolSpace())
+							} label: {
+								Text(verbatim: "Mempool.space") // no localization needed
 							}
-							Button("Blockstream.info") {
+							Button {
 								exploreIncomingSwap(website: BlockchainExplorer.WebsiteBlockstreamInfo())
+							} label: {
+								Text(verbatim: "Blockstream.info") // no localization needed
 							}
 							
 							let addrCount = lastIncomingSwaps.count

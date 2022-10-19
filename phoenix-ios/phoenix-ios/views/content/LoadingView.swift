@@ -91,7 +91,7 @@ struct LoadingView: View {
 				Text("Decrypting wallet…")
 				
 			} else {
-				Text("…")
+				Text(verbatim: "…")
 			}
 		}
 	}

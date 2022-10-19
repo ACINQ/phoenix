@@ -582,14 +582,14 @@ struct MaxFeeConfiguration: View, ViewName {
 				Button {
 					decrementExamplePaymentsIdx()
 				} label: {
-					Text("-")
+					Text(verbatim: "-")
 				}
 				.disabled(examplePaymentsIdx == 0)
 				
 				Button {
 					incrementExamplePaymentsIdx()
 				} label: {
-					Text("+")
+					Text(verbatim: "+")
 				}
 				.disabled(examplePaymentsIdx+1 == examplePayments.count)
 				
