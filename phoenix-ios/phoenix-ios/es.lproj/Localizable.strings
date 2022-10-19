@@ -4,16 +4,40 @@
 /* No comment provided by engineer. */
 " (not enrolled)" = "(no inscrito)";
 
+/* Type of text being copied */
+"(Bitcoin address)" = "(Dirección Bitcoin)";
+
 /* Upload progress information */
 "(completed) of (total)" = "(completed) de (total)";
 
 /* Upload progress information */
 "(completed) of (total), pushing batch of (inFlight)" = "(completed) de (total), subiendo en grupos de (inFlight)";
 
+/* Recent payments footer */
+"(count) in-flight outgoing payments" = "(count) pagos en camino";
+
+/* Recent payments footer */
+"(count) payments within the last 2 hours" = "(count) pagos en las últimas 2 horas";
+
+/* Recent payments footer */
+"(count) payments within the last 3 days" = "(count) pagos en los últimos 3 días";
+
+/* Recent payments option */
+"(count) payments within the last 7 days" = "(count) pagos en los últimos 7 días";
+
+/* Recent payments footer */
+"(count) payments within the last 10 minutes" = "(count) pagos en los últims 10 minutos";
+
+/* Recent payments footer */
+"(count) payments within the last 24 hours" = "(count) pagos en las últimas 24 horas";
+
+/* Recent payments footer */
+"(count) payments within the last minute" = "(count) pagos en el último minuto";
+
 /* No comment provided by engineer. */
 "(derived from your seed)" = "(derivado de tu semilla)";
 
-/* No comment provided by engineer. */
+/* Type of text being copied */
 "(Lightning invoice)" = "(Factura de Lightning)";
 
 /* No comment provided by engineer. */
@@ -70,6 +94,27 @@
 /* No comment provided by engineer. */
 "1 channel" = "1 canal";
 
+/* Recent payments footer */
+"1 in-flight outgoing payment" = "1 pago en camino";
+
+/* Recent payments footer */
+"1 payment within the last 2 hours" = "1 pago en las últimas 2 horas";
+
+/* Recent payments option */
+"1 payment within the last 7 days" = "1 pago en los últimos 7 días";
+
+/* Recent payments footer */
+"1 payment within the last 10 minutes" = "1 pago en los últimos 10 minutos";
+
+/* Recent payments footer */
+"1 payment within the last minute" = "1 pago en el último minuto";
+
+/* Recent payments footer */
+"1 payments within the last 24 hours" = "1 pago en las últimas 24 horas";
+
+/* Recent payments footer */
+"1 payment within the last 3 days" = "1 pago en los últimos días ";
+
 /* No comment provided by engineer. */
 "A backup phrase is generated, storing all the information needed to restore your Bitcoin funds." = "Una semilla de respaldo será generada. Esta información será necesaria para restaurar sus fondos de Bitcoin.";
 
@@ -93,6 +138,9 @@
 
 /* No comment provided by engineer. */
 "Address" = "Dirección";
+
+/* Label in DetailsView_IncomingPayment */
+"address" = "dirección";
 
 /* Label in DetailsView_IncomingPayment */
 "address type" = "Tipo de dirección";
@@ -135,6 +183,9 @@
 
 /* Label in DetailsView_IncomingPayment */
 "amount requested" = "valor requerido";
+
+/* Label in DetailsView_IncomingPayment */
+"amount sent" = "cantidad enviada";
 
 /* SendView: lnurl-withdraw flow */
 "amount to receive" = "cantidad a recibir";
@@ -186,6 +237,9 @@
 
 /* No comment provided by engineer. */
 "Backup your recovery phrase to prevent losing your funds. " = "Haga una copia de seguridad de su frase de recuperación para evitar perder sus fondos.";
+
+/* VoiceOver label: PaymentSummaryView */
+"Base amount: (amountBitcoin), ≈(amountFiat)" = "Cantidad base: (amountBitcoin), ≈(amountFiat)";
 
 /* No comment provided by engineer. */
 "Biometrics" = "Biometría";
@@ -308,7 +362,8 @@
 /* Navigation bar title */
 "Confirm Withdraw" = "Confirmar retiro";
 
-/* Connection state */
+/* Connection state
+   Connection status */
 "Connected" = "Conectado";
 
 /* Connection status */
@@ -323,20 +378,24 @@
 /* Connection status */
 "Connecting to:" = "Conectando a:";
 
-/* Connection state */
+/* Connection state
+   Connection status */
 "Connecting…" = "Conectando…";
 
 /* Error title */
 "Connection failure" = "Fallo de conexión";
 
-/* No comment provided by engineer. */
+/* Toast message */
 "Copied QR code image to pasteboard!" = "Se copió la imagen de código QR en Pasteboard!";
 
-/* No comment provided by engineer. */
+/* Toast message */
 "Copied to pasteboard!" = "¡Copiado al portapapeles!";
 
 /* No comment provided by engineer. */
 "Copy" = "Copiar";
+
+/* button label - try to make it short */
+"copy" = "copiar";
 
 /* No comment provided by engineer. */
 "Copy Image" = "Copiar imagen";
@@ -351,7 +410,7 @@
 "Could not connect to host:" = "No se pudo conectar al servidor:";
 
 /* Error message - scanning lightning invoice */
-"Could not connect to service" = "No se pudo conectar al servicio";
+"Could not connect to service: (origin)" = "No se pudo conectar al servicio: (origin)";
 
 /* No comment provided by engineer. */
 "Create new wallet" = "Crear nueva billetera";
@@ -434,11 +493,20 @@
 /* No comment provided by engineer. */
 "Drain my wallet" = "Vaciar mi billetera";
 
+/* Navigation bar title */
+"Drain wallet" = "Vaciar billetera";
+
 /* No comment provided by engineer. */
 "Edit" = "Editar";
 
+/* button label - try to make it short */
+"edit" = "editar";
+
 /* Navigation bar title */
 "Edit Info" = "Editar información";
+
+/* Navigation bar title */
+"Edit Payment" = "Editar Pago";
 
 /* No comment provided by engineer. */
 "Edit payment request" = "Editar solicitud de pago";
@@ -630,6 +698,9 @@
 /* Fees explanation */
 "In order to receive this payment, a new payment channel was opened. This is not always required." = "Para recibir este pago un nuevo canal de pago se abrió. Esto no siempre es necesario.";
 
+/* Fees explanation */
+"Includes Bitcoin network miner fees, and the fee for the Swap-Out service." = "Incluye las taridas del miner de Bitcoin y la tarifa del servicio Swap-Out.";
+
 /* button label - try to make it short */
 "info" = "Info";
 
@@ -680,6 +751,9 @@
 
 /* App theme option */
 "Light" = "Claro";
+
+/* Label in SummaryInfoGrid */
+"Lightning Fees" = "Tarifas Lightning";
 
 /* Fees explanation */
 "Lightning fees for routing the payment. Payment required %d hops." = "Tarifas de Lightning para enrutar el pago. El pago requirió %d saltos.";
@@ -759,6 +833,9 @@
 /* No comment provided by engineer. */
 "Min: " = "Mínimo:";
 
+/* VoiceOver label: PaymentSummaryView */
+"Miner fee amount: (percent), (amountBitcoin), ≈(amountFiat)" = "Monto de la tarifa del miner: percent), (amountBitcoin), ≈(amountFiat)";
+
 /* No comment provided by engineer. */
 "Modify" = "Modificar";
 
@@ -816,17 +893,27 @@
 /* No comment provided by engineer. */
 "now" = "ahora";
 
-/* Connection state */
+/* Connection state
+   Connection status */
 "Offline" = "Desconectado";
 
 /* No comment provided by engineer. */
 "OK" = "OK";
+
+/* Generic description for L1 payment */
+"On-Chain Payment" = "Pagos en cadena (On-Chain)";
+
+/* Recent payments option */
+"Only show in-flight outgoing payments." = "Solo mostrar pagos en camino.";
 
 /* No comment provided by engineer. */
 "Only you alone possess this seed. Keep it private." = "Solo tú posees esta semilla. Mantenla en privado.";
 
 /* No comment provided by engineer. */
 "open link" = "abrir enlace";
+
+/* Option in currency picker list. Sends user to Currency Converter */
+"other" = "otro";
 
 /* Label in SummaryInfoGrid */
 "Output" = "Salida";
@@ -880,6 +967,9 @@
 /* Title in DetailsView_IncomingPayment */
 "Payment Sent" = "Pago enviado";
 
+/* Navigation bar title */
+"Payments" = "Pagos";
+
 /* Explanation for 'Randomize upload delays' toggle */
 "Payments are uploaded to the cloud immediately upon completion." = "Los pagos se cargan en la nube inmediatamente después de su finalización.";
 
@@ -913,6 +1003,9 @@
 /* No comment provided by engineer. */
 "Please restart Phoenix" = "Reinicia Phoenix";
 
+/* Error message in LockView */
+"Please enable Touch ID" = "Habilite Touch ID";
+
 /* reason for iCloud failure */
 "Please sign into iCloud" = "Inicie sesión en iCloud";
 
@@ -921,6 +1014,9 @@
 
 /* No comment provided by engineer. */
 "Port" = "Puerto";
+
+/* Navigation bar title */
+"Privacy" = "Privacidad";
 
 /* Connection info */
 "Random server" = "Servidor aleatorio";
@@ -953,7 +1049,7 @@
 /* Label in DetailsView_IncomingPayment */
 "recipient pubkey" = "Receptor de clave publica";
 
-/* No comment provided by engineer. */
+/* Navigation bar title */
 "Recovery Phrase" = "Frase de recuperación";
 
 /* No comment provided by engineer. */
@@ -1061,6 +1157,9 @@
 /* No comment provided by engineer. */
 "Share" = "Compartir";
 
+/* button label - try to make it short */
+"share" = "compartir";
+
 /* No comment provided by engineer. */
 "Share Image" = "Compartir imagen";
 
@@ -1079,6 +1178,24 @@
 /* No comment provided by engineer. */
 "Show a Lightning invoice" = "Mostrar una factura de Lightning";
 
+/* Recent payments option */
+"Show payments within the last 1 minute." = "Mostrar pagos en el último minuto.";
+
+/* Recent payments option */
+"Show payments within the last 2 hours." = "Mostrar pagos en las últimas 2 horas.";
+
+/* Recent payments option */
+"Show payments within the last 3 days." = "Mostrar pagos en los últimos 3 días.";
+
+/* Recent payments option */
+"Show payments within the last 7 days." = "Mostrar pagos en los últimos 7 días.";
+
+/* Recent payments option */
+"Show payments within the last 10 minutes." = "Mostrar pagos en los últimos 10 minutos.";
+
+/* Recent payments option */
+"Show payments within the last 24 hours." = "Mostrar pagos en las últimas 24 horas.";
+
 /* No comment provided by engineer. */
 "Sign into iCloud to backup your payments" = "Inicie sesión en iCloud para hacer una copia de seguridad de sus pagos";
 
@@ -1094,8 +1211,14 @@
 /* No comment provided by engineer. */
 "Status" = "Estado";
 
+/* Label in SummaryInfoGrid */
+"Swap Fees" = "Tarifas Swap";
+
 /* Navigation bar title */
 "Swap In" = "Intercambio";
+
+/* Title in DetailsView_IncomingPayment */
+"Swap Out" = "Swap Out";
 
 /* Transaction Info: Value */
 "Swap-In" = "Swap-In";
@@ -1139,6 +1262,12 @@
 /* Error message - parsing bitcoin address */
 "The scanned QR code is not a bitcoin address" = "El código QR escaneado no es una dirección de Bitcoin";
 
+/* Error message - scanning lightning invoice */
+"The service ((origin)) appears to be offline, or they have a down server" = "El servicio ((origin)) parece estar fuera de línea, o tienen un servidor inactivo";
+
+/* Error message - scanning lightning invoice */
+"The service ((origin)) doesn't support Lightning addresses, or doesn't know this user" = "El servicio ((origin)) no admite direcciones Lightning o no conoce a este usuario";
+
 /* Warning for iOS Simulator (only for devs) */
 "The simulator cannot access the camera. Please use the clipboard." = "El simulador no puede acceder a la cámara. Utilice el portapapeles.";
 
@@ -1181,6 +1310,12 @@
 /* button label - try to make it short */
 "tip" = "propina";
 
+/* VoiceOver label: PaymentSummaryView */
+"Tip amount: (percent), (amountBitcoin), ≈(amountFiat)" = "Cantidad de propina: (percent), (amountBitcoin), ≈(amountFiat)";
+
+/* VoiceOver information: Customize tip sheet */
+"tip amount: (tipBtcn), ≈(tipFiat), total amount: (ttlBtcn), ≈(ttlFiat)" = "Cantidad de propina: (tipBtcn), ≈(tipFiat), cantidad total: (ttlBtcn), ≈(ttlFiat)";
+
 /* No comment provided by engineer. */
 "Tip timestamp" = "Marca de tiempo";
 
@@ -1210,6 +1345,21 @@
 
 /* Label in DetailsView_IncomingPayment */
 "total amount" = "Cantidad total";
+
+/* error message */
+"Total amount exceeds your balance" = "El monto total excede su saldo";
+
+/* VoiceOver label: PaymentSummaryView */
+"Total amount: (amountBitcoin), ≈(amountFiat)" = "Cantidad total: (amountBitcoin), ≈(amountFiat)";
+
+/* VoiceOver hint */
+"total amount: (btcnAmt.string), ≈(fiatAmt.string)" = "Cantidad total: (btcnAmt.string), ≈(fiatAmt.string)";
+
+/* VoiceOver information: Customize tip sheet */
+"total amount: (ttlBtcn) ≈(ttlFiat)" = "Cantidad total: (ttlBtcn) ≈(ttlFiat)";
+
+/* VoiceOver hint */
+"total amount: ≈(btcnAmt.string)" = "Cantidad total: ≈(btcnAmt.string)";
 
 /* No comment provided by engineer. */
 "Transactions" = "Transacciones";
@@ -1258,6 +1408,9 @@
 
 /* Explanation for 'Use cellular data' toggle */
 "Uploads will only occur over WiFi." = "Las cargas solo se realizarán a través de WiFi.";
+
+/* Error message - scanning lightning invoice */
+"Unreadable response from service: (origin)" = "Respuesta ilegible del servicio: (origin)";
 
 /* No comment provided by engineer. */
 "Use a custom server" = "Utilice un servidor personalizado";

@@ -88,6 +88,7 @@ fun HomeView(
         drawerContent = { SideMenu(onSettingsClick) },
         content = {
             MVIView(homeViewModel) { model, _ ->
+                val balance = remember(model) { model.balance }
                 Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     TopBar(
                         onConnectionsStateButtonClick = {
@@ -96,17 +97,22 @@ fun HomeView(
                         connectionsState = connectionsState
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    AmountView(
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(horizontal = 16.dp),
-                        amount = model.balance,
-                        amountTextStyle = MaterialTheme.typography.h1,
-                        unitTextStyle = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
-                    )
-                    model.incomingBalance?.run {
+
+                    if (balance == null) {
+                        ProgressView(text = stringResource(id = R.string.home__balance_loading))
+                    } else {
+                        AmountView(
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(horizontal = 16.dp),
+                            amount = balance,
+                            amountTextStyle = MaterialTheme.typography.h1,
+                            unitTextStyle = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
+                        )
+                    }
+                    model.incomingBalance?.let { incomingSwapAmount ->
                         Spacer(modifier = Modifier.height(8.dp))
-                        IncomingAmountNotif(this)
+                        IncomingAmountNotif(incomingSwapAmount)
                     }
                     Spacer(modifier = Modifier.height(24.dp))
                     PrimarySeparator()

@@ -7,15 +7,9 @@ import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentProgress
 import fr.acinq.lightning.io.PaymentSent
-import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.getValue
-import fr.acinq.lightning.utils.setValue
-import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
-import fr.acinq.phoenix.data.WalletPaymentId
-import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.data.WalletPaymentMetadata
+import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -92,25 +86,31 @@ class PaymentsManager(
         }
 
         launch {
-            var mostRecentCompleted_prvLaunch: WalletPayment? = null
+            var appLaunch: Long = currentTimestampMillis()
             var isFirstCollection = true
 
             paymentsDb().listPaymentsOrderFlow(count = 25, skip = 0).collect { list ->
-                var mostRecentCompleted: WalletPayment? = null
-                for (row in list) {
-                    val paymentInfo = fetcher.getPayment(row, WalletPaymentFetchOptions.None)
-                    if (paymentInfo != null && paymentInfo.payment.completedAt() > 0) {
-                        mostRecentCompleted = paymentInfo.payment
-                        break
-                    }
-                }
+
+                // NB: lastCompletedPayment should NOT fire under any of the following conditions:
+                // - relaunching app with completed payments in database
+                // - restoring old wallet and downloading transaction history
 
                 if (isFirstCollection) {
                     isFirstCollection = false
-                    mostRecentCompleted_prvLaunch = mostRecentCompleted
-                } else if (mostRecentCompleted != null &&
-                           mostRecentCompleted != mostRecentCompleted_prvLaunch) {
-                    _lastCompletedPayment.value = mostRecentCompleted
+                } else {
+                    for (row in list) {
+                        val paymentInfo = fetcher.getPayment(row, WalletPaymentFetchOptions.None)
+                        if (paymentInfo != null) {
+                            val completedAt = paymentInfo.payment.completedAt()
+                            if (completedAt > 0) {
+                                // This is the most recent completed payment in the database
+                                if (completedAt > appLaunch) {
+                                    _lastCompletedPayment.value = paymentInfo.payment
+                                }
+                                break
+                            }
+                        }
+                    }
                 }
             }
         }
