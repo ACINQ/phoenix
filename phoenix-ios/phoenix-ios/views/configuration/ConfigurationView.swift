@@ -19,13 +19,13 @@ fileprivate enum NavLinkTag: String {
 	case PaymentOptionsView
 	case RecoveryPhraseView
 	case DrainWalletView
-	case CloseWalletView
 	// Security
 	case AppAccessView
 	// Advanced
 	case PrivacyView
-	case LogsConfigurationView
 	case ChannelsConfigurationView
+	case LogsConfigurationView
+	case ResetWalletView
 }
 
 struct ConfigurationView: View {
@@ -206,11 +206,11 @@ struct ConfigurationView: View {
 				if hasWallet {
 					
 					NavigationLink(
-						destination: CloseWalletView(),
-						tag: NavLinkTag.CloseWalletView,
+						destination: ResetWalletView(),
+						tag: NavLinkTag.ResetWalletView,
 						selection: $navLinkTag
 					) {
-						Label { Text("Close wallet") } icon: {
+						Label { Text("Reset wallet") } icon: {
 							Image(systemName: "trash")
 						}
 					}

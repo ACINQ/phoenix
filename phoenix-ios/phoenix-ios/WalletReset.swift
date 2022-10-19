@@ -6,7 +6,7 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "WalletCloser"
+	category: "WalletReset"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
@@ -24,17 +24,17 @@ fileprivate var log = Logger(OSLog.disabled)
 /// 1. Remove the ContentView & associated Window from the system.
 ///    This happens in the SceneDelegate.
 ///
-/// 2. Use the WalletCloser to reset everything.
+/// 2. Use the WalletReset class to reset everything.
 ///
 /// 3. Recreate the ContentView & associated Window.
 ///    Doing so will create a new UIHostingController,
 ///    which will come with a fresh State for every view,
 ///    ensuring that no references to the previous PhoenixShared instance are being used.
 ///
-class WalletCloser {
+class WalletReset {
 	
 	/// Singleton instance
-	public static let shared = WalletCloser()
+	public static let shared = WalletReset()
 	
 	enum Progress: Int, CustomStringConvertible {
 		
@@ -216,8 +216,8 @@ class WalletCloser {
 		
 		let encrypedNodeId = Biz.encryptedNodeId ?? "nil"
 		
-		Prefs.shared.closeWallet(encryptedNodeId: encrypedNodeId)
-		GroupPrefs.shared.closeWallet()
+		Prefs.shared.resetWallet(encryptedNodeId: encrypedNodeId)
+		GroupPrefs.shared.resetWallet()
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
 			self.step5()
@@ -232,7 +232,7 @@ class WalletCloser {
 		log.trace("step5()")
 		progress.send(.deletingKeychainItems)
 		
-		AppSecurity.shared.closeWallet()
+		AppSecurity.shared.resetWallet()
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
 			self.step6()

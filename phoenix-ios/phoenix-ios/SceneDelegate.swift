@@ -18,7 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	var cancellables = Set<AnyCancellable>()
 	
 	var lockWindow: UIWindow?
-	var closeWalletWindow: UIWindow?
+	var resetWalletWindow: UIWindow?
 	var errorWindow: UIWindow?
 	
 	var isAppLaunch = true
@@ -309,14 +309,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	// MARK: Window Transitions
 	// --------------------------------------------------
 	
-	public func transitionToCloseWalletWindow(
+	public func transitionToResetWalletWindow(
 		deleteTransactionHistory: Bool,
 		deleteSeedBackup: Bool
 	) {
-		log.trace("transitionToCloseWalletWindow()")
+		log.trace("transitionToResetWalletWindow()")
 		assertMainThread()
 		
-		guard window != nil && closeWalletWindow == nil else {
+		guard window != nil && resetWalletWindow == nil else {
 			return
 		}
 		
@@ -334,7 +334,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		// NB: Using a `DispatchQueue.main.asyncAfter` here doesn't seem to be enough to prevent crashes on iPad.
 		// We really need to give it time to fully unload the rootWindow.
 		
-		showCloseWalletWindow(
+		showResetWalletWindow(
 			deleteTransactionHistory: deleteTransactionHistory,
 			deleteSeedBackup: deleteSeedBackup,
 			startDelay: 0.4
@@ -346,7 +346,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		log.trace("transitionBackToMainWindow()")
 		assertMainThread()
 		
-		guard window == nil && closeWalletWindow != nil else {
+		guard window == nil && resetWalletWindow != nil else {
 			return false
 		}
 		guard let windowScene = findWindowScene() else {
@@ -355,7 +355,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		
 		showRootWindow(windowScene)
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-			self.hideCloseWalletWindow()
+			self.hideResetWalletWindow()
 		}
 		
 		return true
@@ -477,24 +477,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	}
 	
 	// --------------------------------------------------
-	// MARK: CloseWallet Window
+	// MARK: ResetWallet Window
 	// --------------------------------------------------
 	
-	private func showCloseWalletWindow(
+	private func showResetWalletWindow(
 		deleteTransactionHistory: Bool,
 		deleteSeedBackup: Bool,
 		startDelay: TimeInterval
 	) {
-		log.trace("showCloseWalletWindow()")
+		log.trace("showResetWalletWindow()")
 		assertMainThread()
 		
 		guard let windowScene = findWindowScene() else {
 			return
 		}
 		
-		if closeWalletWindow == nil {
+		if resetWalletWindow == nil {
 			
-			let view = CloseWalletView_Action(
+			let view = ResetWalletView_Action(
 				deleteTransactionHistory: deleteTransactionHistory,
 				deleteSeedBackup: deleteSeedBackup,
 				startDelay: startDelay
@@ -502,22 +502,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			
 			let controller = UIHostingController(rootView: view)
 			
-			closeWalletWindow = UIWindow(windowScene: windowScene)
-			closeWalletWindow?.rootViewController = controller
-			closeWalletWindow?.tintColor = UIColor.appAccent
-			closeWalletWindow?.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle()
-			closeWalletWindow?.windowLevel = .normal + 1
+			resetWalletWindow = UIWindow(windowScene: windowScene)
+			resetWalletWindow?.rootViewController = controller
+			resetWalletWindow?.tintColor = UIColor.appAccent
+			resetWalletWindow?.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle()
+			resetWalletWindow?.windowLevel = .normal + 1
 		}
 		
-		closeWalletWindow?.makeKeyAndVisible()
+		resetWalletWindow?.makeKeyAndVisible()
 	}
 	
-	private func hideCloseWalletWindow() {
-		log.trace("hideCloseWalletWindow()")
+	private func hideResetWalletWindow() {
+		log.trace("hideResetWalletWindow()")
 		assertMainThread()
 		
-		closeWalletWindow?.isHidden = true
-		closeWalletWindow = nil
+		resetWalletWindow?.isHidden = true
+		resetWalletWindow = nil
 	}
 	
 	// --------------------------------------------------
@@ -557,7 +557,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		
 		return window?.windowScene ??
 			lockWindow?.windowScene ??
-			closeWalletWindow?.windowScene ??
+			resetWalletWindow?.windowScene ??
 			errorWindow?.windowScene ??
 			nil
 	}

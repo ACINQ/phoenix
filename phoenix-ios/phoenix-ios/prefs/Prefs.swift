@@ -230,10 +230,10 @@ class Prefs {
 	}()
 	
 	// --------------------------------------------------
-	// MARK: Close Wallet
+	// MARK: Reset Wallet
 	// --------------------------------------------------
 	
-	func closeWallet(encryptedNodeId: String) {
+	func resetWallet(encryptedNodeId: String) {
 		
 		// Purposefully not resetting:
 		// - Key.theme: App feels weird when this changes unexpectedly.
@@ -249,8 +249,8 @@ class Prefs {
 		defaults.removeObject(forKey: Key.hideAmountsOnHomeScreen.rawValue)
 		defaults.removeObject(forKey: Key.recentPaymentSeconds.rawValue)
 		
-		self.backupTransactions.closeWallet(encryptedNodeId: encryptedNodeId)
-		self.backupSeed.closeWallet(encryptedNodeId: encryptedNodeId)
+		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
+		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
 		
 		// Reset any publishers with stored state
 		isTorEnabledPublisher.send(self.isTorEnabled)

@@ -5,13 +5,13 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "CloseWalletView_Confirm"
+	category: "ResetWalletView_Confirm"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct CloseWalletView_Confirm: MVISubView, ViewName {
+struct ResetWalletView_Confirm: MVISubView, ViewName {
 	
 	@ObservedObject var mvi: MVIState<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>
 	
@@ -31,10 +31,6 @@ struct CloseWalletView_Confirm: MVISubView, ViewName {
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	// --------------------------------------------------
-	// MARK: Init
-	// --------------------------------------------------
-	
-	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
 	
@@ -44,7 +40,7 @@ struct CloseWalletView_Confirm: MVISubView, ViewName {
 		ZStack {
 			content()
 		}
-		.navigationTitle(NSLocalizedString("Confirm Close", comment: "Navigation bar title"))
+		.navigationTitle(NSLocalizedString("Confirm Reset", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
 	}
 	
@@ -109,7 +105,7 @@ struct CloseWalletView_Confirm: MVISubView, ViewName {
 				"""
 				The **payment history** for this wallet will be deleted from your iCloud account.
 				""",
-				comment: "CloseWalletView_Review"
+				comment: "ResetWalletView_Review"
 			))
 			
 		} header: {
@@ -127,7 +123,7 @@ struct CloseWalletView_Confirm: MVISubView, ViewName {
 				"""
 				The **seed backup** for this wallet will be deleted from your iCloud account.
 				""",
-				comment: "CloseWalletView_Review"
+				comment: "ResetWalletView_Review"
 			))
 			
 		} header: {
@@ -147,7 +143,7 @@ struct CloseWalletView_Confirm: MVISubView, ViewName {
 					"""
 					The wallet will be completely deleted from **this device**.
 					""",
-					comment: "CloseWalletView_Review"
+					comment: "ResetWalletView_Review"
 				))
 				
 				Text(
@@ -438,7 +434,7 @@ struct CloseWalletView_Confirm: MVISubView, ViewName {
 			let sceneDelegate = scene.delegate as? UIWindowSceneDelegate,
 			let mySceneDelegate = sceneDelegate as? SceneDelegate
 		{
-			mySceneDelegate.transitionToCloseWalletWindow(
+			mySceneDelegate.transitionToResetWalletWindow(
 				deleteTransactionHistory: deleteTransactionHistory,
 				deleteSeedBackup: deleteSeedBackup
 			)

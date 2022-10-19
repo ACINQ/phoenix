@@ -5,14 +5,14 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "CloseWalletView_Options"
+	category: "ResetWalletView_Options"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 
-struct CloseWalletView: MVIView {
+struct ResetWalletView: MVIView {
 	
 	@StateObject var mvi = MVIState({ $0.closeChannelsConfiguration() })
 	
@@ -67,7 +67,7 @@ struct CloseWalletView: MVIView {
 			self.manualBackup_taskDone =
 				Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
 		}
-		.navigationTitle(NSLocalizedString("Close wallet", comment: "Navigation bar title"))
+		.navigationTitle(NSLocalizedString("Reset wallet", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
 	}
 	
@@ -325,7 +325,7 @@ struct CloseWalletView: MVIView {
 	@ViewBuilder
 	func reviewScreen() -> some View {
 		
-		CloseWalletView_Confirm(
+		ResetWalletView_Confirm(
 			mvi: mvi,
 			deleteTransactionHistory: deleteTransactionHistory,
 			deleteSeedBackup: deleteSeedBackup

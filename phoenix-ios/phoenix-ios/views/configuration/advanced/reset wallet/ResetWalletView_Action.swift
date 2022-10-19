@@ -5,7 +5,7 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "CloseWalletView_Action"
+	category: "ResetWalletView_Action"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
@@ -20,7 +20,7 @@ fileprivate enum DeleteState {
 	case done
 }
 
-struct CloseWalletView_Action: View {
+struct ResetWalletView_Action: View {
 	
 	let deleteTransactionHistory: Bool
 	let deleteSeedBackup: Bool
@@ -28,14 +28,14 @@ struct CloseWalletView_Action: View {
 	
 	@State private var deleteTxHistoryState = DeleteState.waitingToStart
 	@State private var deleteSeedState = DeleteState.waitingToStart
-	@State private var deleteLocalProgress = WalletCloser.Progress.starting
+	@State private var deleteLocalProgress = WalletReset.Progress.starting
 	
 	let syncTx_pendingSettingsPublisher = Biz.syncManager!.syncTxManager.pendingSettingsPublisher
 	let syncTx_statePublisher = Biz.syncManager!.syncTxManager.statePublisher
 	
 	let syncSeed_statePublisher = Biz.syncManager!.syncSeedManager.statePublisher
 	
-	let walletCloser_progressPublisher = WalletCloser.shared.progress
+	let walletCloser_progressPublisher = WalletReset.shared.progress
 	
 	@State var visible = false
 	@State var didAppear = false
@@ -99,7 +99,7 @@ struct CloseWalletView_Action: View {
 			section_button()
 		}
 		.listStyle(.insetGrouped)
-		.navigationTitle(NSLocalizedString("Closing Wallet", comment: "Navigation bar title"))
+		.navigationTitle(NSLocalizedString("Resetting Wallet", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
 		.onReceive(syncTx_pendingSettingsPublisher) {
 			syncTx_pendingSettingsChanged($0)
@@ -125,7 +125,7 @@ struct CloseWalletView_Action: View {
 					"""
 					Deleting **payment history** from iCloud
 					""",
-					comment: "CloseWalletView_Delete_Action"
+					comment: "ResetWalletView_Delete_Action"
 				))
 			} icon: {
 				Image(systemName: "icloud.fill")
@@ -151,7 +151,7 @@ struct CloseWalletView_Action: View {
 					"""
 					Deleting **recovery phrase** from iCloud
 					""",
-					comment: "CloseWalletView_Delete_Action"
+					comment: "ResetWalletView_Delete_Action"
 				))
 			} icon: {
 				Image(systemName: "icloud.fill")
@@ -237,14 +237,14 @@ struct CloseWalletView_Action: View {
 					"""
 					Deleting data from **this device**
 					""",
-					comment: "CloseWalletView_Delete_Action"
+					comment: "ResetWalletView_Delete_Action"
 				))
 			} icon: {
 				Image(systemName: "folder")
 			}
 			.font(.title3)
 			
-			if deleteLocalProgress.rawValue > WalletCloser.Progress.deletingDatabaseFiles.rawValue {
+			if deleteLocalProgress.rawValue > WalletReset.Progress.deletingDatabaseFiles.rawValue {
 				Label {
 					Text("Deleted database files")
 				} icon: {
@@ -260,7 +260,7 @@ struct CloseWalletView_Action: View {
 				.foregroundColor(.primary)
 			}
 			
-			if deleteLocalProgress.rawValue > WalletCloser.Progress.resetingUserDefaults.rawValue {
+			if deleteLocalProgress.rawValue > WalletReset.Progress.resetingUserDefaults.rawValue {
 				Label {
 					Text("Reset user preferences")
 				} icon: {
@@ -276,7 +276,7 @@ struct CloseWalletView_Action: View {
 				.foregroundColor(.primary)
 			}
 			
-			if deleteLocalProgress.rawValue > WalletCloser.Progress.deletingKeychainItems.rawValue {
+			if deleteLocalProgress.rawValue > WalletReset.Progress.deletingKeychainItems.rawValue {
 				Label {
 					Text("Deleted keychain items")
 				} icon: {
@@ -433,7 +433,7 @@ struct CloseWalletView_Action: View {
 		} // </switch>
 	}
 	
-	func walletCloser_progressChanged(_ progress: WalletCloser.Progress) {
+	func walletCloser_progressChanged(_ progress: WalletReset.Progress) {
 		log.trace("walletCloser_progressChanged(\(progress.description))")
 		
 		self.deleteLocalProgress = progress
@@ -473,7 +473,7 @@ struct CloseWalletView_Action: View {
 	func action_deleteLocalData() {
 		log.trace("action_deleteLocalData()")
 		
-		WalletCloser.shared.start()
+		WalletReset.shared.start()
 	}
 	
 	// --------------------------------------------------

@@ -681,10 +681,10 @@ class AppSecurity {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Close Wallet
+	// MARK: Reset Wallet
 	// --------------------------------------------------
 	
-	public func closeWallet() {
+	public func resetWallet() {
 		
 		let fm = FileManager.default
 		let securityJsonUrl = SharedSecurity.shared.securityJsonUrl

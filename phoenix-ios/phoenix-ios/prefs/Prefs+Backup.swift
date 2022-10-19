@@ -115,7 +115,7 @@ class Prefs_BackupTransactions {
 		}
 	}
 	
-	func closeWallet(encryptedNodeId: String) {
+	func resetWallet(encryptedNodeId: String) {
 		
 		defaults.removeObject(forKey: recordZoneCreatedKey(encryptedNodeId))
 		defaults.removeObject(forKey: hasDownloadedRecordsKey(encryptedNodeId))
@@ -243,7 +243,7 @@ class Prefs_BackupSeed {
 		manualBackup_taskDone_publisher.send()
 	}
 	
-	func closeWallet(encryptedNodeId: String) {
+	func resetWallet(encryptedNodeId: String) {
 		
 		defaults.removeObject(forKey: Key.backupSeed_enabled.rawValue)
 		defaults.removeObject(forKey: hasUploadedSeed_key(encryptedNodeId))

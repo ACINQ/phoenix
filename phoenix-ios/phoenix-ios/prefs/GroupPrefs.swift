@@ -149,10 +149,10 @@ class GroupPrefs {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Close Wallet
+	// MARK: Reset Wallet
 	// --------------------------------------------------
 	
-	func closeWallet() {
+	func resetWallet() {
 		
 		defaults.removeObject(forKey: Key.currencyType.rawValue)
 		defaults.removeObject(forKey: Key.fiatCurrency.rawValue)
