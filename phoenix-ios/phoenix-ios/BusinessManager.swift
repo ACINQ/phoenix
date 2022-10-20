@@ -87,7 +87,10 @@ class BusinessManager {
 		)
 		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
 
-		let startupParams = StartupParams(requestCheckLegacyChannels: false, isTorEnabled: Prefs.shared.isTorEnabled)
+		let startupParams = StartupParams(
+			requestCheckLegacyChannels: false,
+			isTorEnabled: GroupPrefs.shared.isTorEnabled
+		)
 		business.start(startupParams: startupParams)
 		
 		registerForNotifications()
@@ -117,7 +120,7 @@ class BusinessManager {
 		.store(in: &cancellables)
 		
 		// Tor configuration observer
-		Prefs.shared.isTorEnabledPublisher.sink { (isTorEnabled: Bool) in
+		GroupPrefs.shared.isTorEnabledPublisher.sink { (isTorEnabled: Bool) in
 			self.business.updateTorUsage(isEnabled: isTorEnabled)
 		}
 		.store(in: &cancellables)

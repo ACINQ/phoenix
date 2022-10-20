@@ -2,7 +2,7 @@ import SwiftUI
 
 struct TorConfigurationView: View {
 
-	@State var isTorEnabled = Prefs.shared.isTorEnabled
+	@State var isTorEnabled = GroupPrefs.shared.isTorEnabled
 
 	@ViewBuilder
 	var body: some View {
@@ -40,6 +40,6 @@ struct TorConfigurationView: View {
 	}
 
 	func toggleTor(_ isEnabled: Bool) {
-		Prefs.shared.isTorEnabled = isEnabled
+		GroupPrefs.shared.isTorEnabled = isEnabled
 	}
 }

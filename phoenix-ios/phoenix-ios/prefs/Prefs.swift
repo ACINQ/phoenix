@@ -19,7 +19,6 @@ class Prefs {
 		case theme
 		case pushPermissionQuery
 		case pushTokenRegistration
-		case isTorEnabled
 		case defaultPaymentDescription
 		case showChannelsRemoteBalance
 		case recentTipPercents
@@ -62,20 +61,6 @@ class Prefs {
 			let key = Key.theme.rawValue
 			defaults.setCodable(value: newValue, forKey: key)
 			themePublisher.send(newValue)
-		}
-	}
-
-	lazy private(set) var isTorEnabledPublisher: CurrentValueSubject<Bool, Never> = {
-		return CurrentValueSubject<Bool, Never>(self.isTorEnabled)
-	}()
-
-	var isTorEnabled: Bool {
-		get {
-			 defaults.bool(forKey: Key.isTorEnabled.rawValue)
-		}
-		set {
-			defaults.set(newValue, forKey: Key.isTorEnabled.rawValue)
-			isTorEnabledPublisher.send(newValue)
 		}
 	}
 	
