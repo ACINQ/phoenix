@@ -49,6 +49,10 @@ actor SyncTxManager_Actor {
 		state = .initializing
 	}
 	
+	// --------------------------------------------------
+	// MARK: Transition Logic
+	// --------------------------------------------------
+	
 	func markDatabasesReady() -> SyncTxManager_State? {
 		
 		waitingForDatabases = false
@@ -372,6 +376,18 @@ actor SyncTxManager_Actor {
 			}
 		}
 	}
+	
+	func shutdown() -> SyncTxManager_State? {
+		
+		switch state {
+			case .shutdown: return nil       // already shutdown
+			default       : return .shutdown
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Internal
+	// --------------------------------------------------
 	
 	private func simplifiedStateFlow() -> SyncTxManager_State? {
 		

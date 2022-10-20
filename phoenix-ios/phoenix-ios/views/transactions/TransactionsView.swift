@@ -19,15 +19,12 @@ fileprivate let PAGE_COUNT_INCREMENT = 25
 
 struct TransactionsView: View {
 	
-	static private let paymentsPageFetcher = Biz.business.paymentsManager.makePageFetcher()
-	
-	private let paymentsManager = Biz.business.paymentsManager
-	private let paymentsPageFetcher = TransactionsView.paymentsPageFetcher
+	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "TransactionsView")
 	
 	let paymentsCountPublisher = Biz.business.paymentsManager.paymentsCountPublisher()
 	@State var paymentsCount: Int64 = 0
 	
-	let paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
+	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	
 	@State var selectedItem: WalletPaymentInfo? = nil
@@ -40,6 +37,14 @@ struct TransactionsView: View {
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	
+	// --------------------------------------------------
+	// MARK: Init
+	// --------------------------------------------------
+	
+	init() {
+		paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
+	}
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -286,7 +291,7 @@ struct TransactionsView: View {
 		log.trace("didSelectPayment()")
 		
 		// pretty much guaranteed to be in the cache
-		let fetcher = paymentsManager.fetcher
+		let fetcher = Biz.business.paymentsManager.fetcher
 		let options = WalletPaymentFetchOptions.companion.Descriptions
 		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
 			
@@ -323,7 +328,7 @@ struct TransactionsView: View {
 		log.debug("Pre-fetching: \(row.id)")
 
 		let options = WalletPaymentFetchOptions.companion.Descriptions
-		paymentsManager.fetcher.getPayment(row: row, options: options) { (_, _) in
+		Biz.business.paymentsManager.fetcher.getPayment(row: row, options: options) { (_, _) in
 			prefetchPaymentsFromDatabase(idx: idx + 1)
 		}
 	}

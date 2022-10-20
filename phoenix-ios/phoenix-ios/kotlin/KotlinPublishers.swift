@@ -12,29 +12,6 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-extension PhoenixBusiness {
-	
-	fileprivate struct _Key {
-		static var peerPublisher = 0
-	}
-
-	func peerPublisher() -> AnyPublisher<Lightning_kmpPeer, Never> {
-
-		self.getSetAssociatedObject(storageKey: &_Key.peerPublisher) {
-			
-			// Transforming from Kotlin:
-			// ```
-			// peerState: StateFlow<Peer?>
-			// ```
-			KotlinCurrentValueSubject<Lightning_kmpPeer, Lightning_kmpPeer?>(
-				self.peerState()
-			)
-			.compactMap { $0 }
-			.eraseToAnyPublisher()
-		}
-	}
-}
-
 extension CurrencyManager {
 	
 	fileprivate struct _Key {
@@ -78,6 +55,7 @@ extension PeerManager {
 	
 	fileprivate struct _Key {
 		static var balancePublisher = 0
+		static var peerStatePublisher = 0
 	}
 	
 	func balancePublisher() -> AnyPublisher<Lightning_kmpMilliSatoshi?, Never> {
@@ -90,6 +68,22 @@ extension PeerManager {
 			KotlinCurrentValueSubject<Lightning_kmpMilliSatoshi, Lightning_kmpMilliSatoshi?>(
 				self.balance
 			)
+			.eraseToAnyPublisher()
+		}
+	}
+	
+	func peerStatePublisher() -> AnyPublisher<Lightning_kmpPeer, Never> {
+
+		self.getSetAssociatedObject(storageKey: &_Key.peerStatePublisher) {
+			
+			// Transforming from Kotlin:
+			// ```
+			// peerState: StateFlow<Peer?>
+			// ```
+			KotlinCurrentValueSubject<Lightning_kmpPeer, Lightning_kmpPeer?>(
+				self.peerState
+			)
+			.compactMap { $0 }
 			.eraseToAnyPublisher()
 		}
 	}

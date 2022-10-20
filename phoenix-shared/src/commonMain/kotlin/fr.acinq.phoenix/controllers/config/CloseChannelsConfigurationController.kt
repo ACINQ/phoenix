@@ -34,9 +34,9 @@ class AppCloseChannelsConfigurationController(
         isForceClose = isForceClose
     )
 
-    var closingChannelIds: Set<ByteVector32>? = null
+    private var closingChannelIds: Set<ByteVector32>? = null
 
-    fun channelInfoStatus(channel: ChannelState): ChannelInfoStatus? = when (channel) {
+    private fun channelInfoStatus(channel: ChannelState): ChannelInfoStatus? = when (channel) {
         is Normal -> ChannelInfoStatus.Normal
         is Offline -> ChannelInfoStatus.Offline
         is Syncing -> ChannelInfoStatus.Syncing
@@ -46,36 +46,37 @@ class AppCloseChannelsConfigurationController(
         else -> null
     }
 
-    fun isMutualClosable(channelInfoStatus: ChannelInfoStatus): Boolean = when (channelInfoStatus) {
+    private fun isMutualClosable(channelInfoStatus: ChannelInfoStatus): Boolean = when (channelInfoStatus) {
         ChannelInfoStatus.Normal -> true
         else -> false
     }
 
-    fun isForceClosable(channelInfoStatus: ChannelInfoStatus): Boolean = when (channelInfoStatus) {
+    private fun isForceClosable(channelInfoStatus: ChannelInfoStatus): Boolean = when (channelInfoStatus) {
         ChannelInfoStatus.Normal -> true
         ChannelInfoStatus.Offline -> true
         ChannelInfoStatus.Syncing -> true
         else -> false
     }
 
-    fun isClosable(channelInfoStatus: ChannelInfoStatus): Boolean = if (isForceClose) {
+    private fun isClosable(channelInfoStatus: ChannelInfoStatus): Boolean = if (isForceClose) {
         isForceClosable(channelInfoStatus)
     } else {
         isMutualClosable(channelInfoStatus)
     }
 
-    fun isClosable(channel: ChannelState): Boolean = channelInfoStatus(channel)?.let {
+    private fun isClosable(channel: ChannelState): Boolean = channelInfoStatus(channel)?.let {
         isClosable(it)
     } ?: false
 
     init {
         launch {
-            peerManager.getPeer().channelsFlow.collect { channels ->
+            val peer = peerManager.getPeer()
+            peer.channelsFlow.collect { channels ->
+
+                val closingChannelIdsCopy = closingChannelIds?.toSet()
 
                 val updatedChannelsList = channels.filter {
-                    closingChannelIds?.let { set ->
-                        set.contains(it.key)
-                    } ?: true
+                    closingChannelIdsCopy?.contains(it.key) ?: true
                 }.mapNotNull {
                     channelInfoStatus(it.value)?.let { mappedStatus ->
                         CloseChannelsConfiguration.Model.ChannelInfo(
@@ -86,27 +87,26 @@ class AppCloseChannelsConfigurationController(
                     }
                 }
 
-                if (closingChannelIds != null) {
-                    model(CloseChannelsConfiguration.Model.ChannelsClosed(updatedChannelsList))
+                if (closingChannelIdsCopy != null) {
+                    model(CloseChannelsConfiguration.Model.ChannelsClosed(
+                        channels = updatedChannelsList,
+                        closing = closingChannelIdsCopy
+                    ))
                 } else {
                     val closableChannelsList = updatedChannelsList.filter {
                         isClosable(it.status)
                     }
-
-                    val path = when (chain) {
-                        Chain.Mainnet -> "m/84'/0'/0'/0/0"
-                        else -> "m/84'/1'/0'/0/0"
-                    }
-                    val wallet = walletManager.wallet.value!!
-                    val address = wallet.onchainAddress(path)
-
-                    model(CloseChannelsConfiguration.Model.Ready(closableChannelsList, address))
+                    val address = peer.finalAddress
+                    model(CloseChannelsConfiguration.Model.Ready(
+                        channels = closableChannelsList,
+                        address = address
+                    ))
                 }
             }
         }
     }
 
-    fun sats(channel: ChannelState): Long {
+    private fun sats(channel: ChannelState): Long {
         return channel.localCommitmentSpec?.toLocal?.truncateToSatoshi()?.toLong() ?: 0
     }
 

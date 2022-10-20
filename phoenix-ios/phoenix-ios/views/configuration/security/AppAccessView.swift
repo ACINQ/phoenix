@@ -17,7 +17,7 @@ fileprivate var log = Logger(OSLog.disabled)
 struct AppAccessView : View {
 	
 	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
-	@State var biometricsEnabled = AppSecurity.shared.enabledSecurity.value.contains(.biometrics)
+	@State var biometricsEnabled = AppSecurity.shared.enabledSecurityPublisher.value.contains(.biometrics)
 	
 	@State var ignoreToggle_biometricsEnabled = false
 	
@@ -159,7 +159,7 @@ struct AppAccessView : View {
 	func onAppear() -> Void {
 		log.trace("onAppear()")
 		
-		log.debug("enabledSecurity = \(AppSecurity.shared.enabledSecurity.value)")
+		log.debug("enabledSecurity = \(AppSecurity.shared.enabledSecurityPublisher.value)")
 	}
 	
 	func onWillEnterForeground() -> Void {

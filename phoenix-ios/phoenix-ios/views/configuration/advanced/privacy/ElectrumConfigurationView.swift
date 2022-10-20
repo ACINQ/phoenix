@@ -16,14 +16,14 @@ struct ElectrumConfigurationView: MVIView {
 	
 	@StateObject var mvi = MVIState({ $0.electrumConfiguration() })
 	
+	@Environment(\.controllerFactory) var factoryEnv
+	var factory: ControllerFactory { return factoryEnv }
+	
 	@StateObject var customElectrumServerObserver = CustomElectrumServerObserver()
 	
 	@State var didAppear = false
 	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
-	
-	@Environment(\.controllerFactory) var factoryEnv
-	var factory: ControllerFactory { return factoryEnv }
 	
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	

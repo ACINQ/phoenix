@@ -153,7 +153,7 @@ private fun SideMenu(
     onSettingsClick: () -> Unit,
 ) {
     val context = LocalContext.current
-    val peerState = business.peerState().collectAsState()
+    val peerState = business.peerManager.peerState.collectAsState()
     Column(
         modifier = Modifier
             .background(systemNavBarColor())

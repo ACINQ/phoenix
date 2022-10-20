@@ -18,13 +18,11 @@ fileprivate let PAGE_COUNT_INCREMENT = 25
 
 
 struct HomeView : MVIView {
-
-	static private let paymentsPageFetcher = Biz.business.paymentsManager.makePageFetcher()
 	
 	private let phoenixBusiness = Biz.business
 	private let encryptedNodeId = Biz.encryptedNodeId!
 	private let paymentsManager = Biz.business.paymentsManager
-	private let paymentsPageFetcher = HomeView.paymentsPageFetcher
+	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "HomeView")
 	
 	@StateObject var mvi = MVIState({ $0.home() })
 
@@ -43,7 +41,7 @@ struct HomeView : MVIView {
 	let recentPaymentSecondsPublisher = Prefs.shared.recentPaymentSecondsPublisher
 	@State var recentPaymentSeconds = Prefs.shared.recentPaymentSeconds
 	
-	let paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
+	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	
 	@StateObject var syncState = DownloadMonitor()
@@ -73,6 +71,14 @@ struct HomeView : MVIView {
 	@State var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(
 		encryptedNodeId: Biz.encryptedNodeId!
 	)
+	
+	// --------------------------------------------------
+	// MARK: Init
+	// --------------------------------------------------
+	
+	init() {
+		paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
+	}
 	
 	// --------------------------------------------------
 	// MARK: View Builders

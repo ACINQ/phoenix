@@ -14,7 +14,7 @@ enum BackupSeedState {
 
 class Prefs_BackupTransactions {
 	
-	fileprivate enum Key: String {
+	private enum Key: String {
 		case hasCKRecordZone
 		case hasDownloadedCKRecords
 		case backupTransactions_enabled
@@ -114,11 +114,27 @@ class Prefs_BackupTransactions {
 			defaults.set(newValue, forKey: key)
 		}
 	}
+	
+	func resetWallet(encryptedNodeId: String) {
+		
+		defaults.removeObject(forKey: recordZoneCreatedKey(encryptedNodeId))
+		defaults.removeObject(forKey: hasDownloadedRecordsKey(encryptedNodeId))
+		defaults.removeObject(forKey: Key.backupTransactions_enabled.rawValue)
+		defaults.removeObject(forKey: Key.backupTransactions_useCellularData.rawValue)
+		defaults.removeObject(forKey: Key.backupTransactions_useUploadDelay.rawValue)
+		
+		// Reset any publishers with stored state
+		isEnabledPublisher.send(self.isEnabled)
+	}
 }
+	
+// --------------------------------------------------
+// MARK: -
+// --------------------------------------------------
 
 class Prefs_BackupSeed {
 	
-	fileprivate enum Key: String {
+	private enum Key: String {
 		case backupSeed_enabled
 		case backupSeed_hasUploadedSeed
 		case backupSeed_name
@@ -225,6 +241,17 @@ class Prefs_BackupSeed {
 			defaults.removeObject(forKey: key)
 		}
 		manualBackup_taskDone_publisher.send()
+	}
+	
+	func resetWallet(encryptedNodeId: String) {
+		
+		defaults.removeObject(forKey: Key.backupSeed_enabled.rawValue)
+		defaults.removeObject(forKey: hasUploadedSeed_key(encryptedNodeId))
+		defaults.removeObject(forKey: name_key(encryptedNodeId))
+		defaults.removeObject(forKey: manualBackup_taskDone_key(encryptedNodeId))
+		
+		// Reset any publishers with stored state
+		isEnabled_publisher.send(self.isEnabled)
 	}
 }
 

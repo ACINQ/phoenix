@@ -11,7 +11,7 @@ import fr.acinq.lightning.utils.Connection
  * Class types from lightning-kmp & bitcoin-kmp are not exported to iOS unless we explicitly
  * reference them within PhoenixShared, either as a public parameter or return type.
  *
- * This problem is restricted to iOS, and doesn't not affect Android.
+ * This problem is restricted to iOS, and does not affect Android.
  */
 
 fun IncomingPayment.Origin.asInvoice(): IncomingPayment.Origin.Invoice? = when (this) {
