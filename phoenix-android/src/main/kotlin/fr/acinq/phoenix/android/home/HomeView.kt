@@ -65,10 +65,12 @@ fun HomeView(
     onSettingsClick: () -> Unit,
     onReceiveClick: () -> Unit,
     onSendClick: () -> Unit,
+    onTorClick: () -> Unit,
 ) {
     val log = logger("HomeView")
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val torEnabledState = UserPrefs.getIsTorEnabled(context).collectAsState(initial = null)
     val connectionsState by homeViewModel.connectionsFlow.collectAsState(null)
 
     var showConnectionsDialog by remember { mutableStateOf(false) }
@@ -95,7 +97,9 @@ fun HomeView(
                         onConnectionsStateButtonClick = {
                             showConnectionsDialog = true
                         },
-                        connectionsState = connectionsState
+                        connectionsState = connectionsState,
+                        isTorEnabled = torEnabledState.value,
+                        onTorButtonClick = onTorClick
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -229,7 +233,9 @@ private fun SideMenu(
 @Composable
 fun TopBar(
     onConnectionsStateButtonClick: () -> Unit,
-    connectionsState: Connections?
+    connectionsState: Connections?,
+    onTorButtonClick: () -> Unit,
+    isTorEnabled: Boolean?
 ) {
     Row(
         Modifier
@@ -261,6 +267,19 @@ fun TopBar(
                 padding = PaddingValues(8.dp),
                 modifier = Modifier.alpha(connectionsButtonAlpha)
             )
+        } else if (isTorEnabled == true) {
+            if (connectionsState.tor is Connection.ESTABLISHED) {
+                FilledButton(
+                    text = R.string.home__connection__tor_active,
+                    icon = R.drawable.ic_tor_shield_ok,
+                    iconTint = positiveColor(),
+                    onClick = onTorButtonClick,
+                    textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = LocalContentColor.current),
+                    backgroundColor = mutedBgColor(),
+                    space = 8.dp,
+                    padding = PaddingValues(8.dp)
+                )
+            }
         }
     }
 }

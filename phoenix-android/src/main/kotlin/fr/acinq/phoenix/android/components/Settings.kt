@@ -36,7 +36,7 @@ fun SettingCategory(textResId: Int) {
         style = MaterialTheme.typography.subtitle1.copy(fontSize = 14.sp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 62.dp, top = 24.dp, end = 0.dp, bottom = 4.dp)
+            .padding(start = 58.dp, top = 24.dp, end = 0.dp, bottom = 4.dp)
     )
 }
 
@@ -50,6 +50,42 @@ fun Setting(modifier: Modifier = Modifier, title: String, description: String?) 
         Text(title, style = MaterialTheme.typography.body2)
         Spacer(modifier = Modifier.height(2.dp))
         Text(description ?: "", style = MaterialTheme.typography.subtitle2)
+    }
+}
+
+@Composable
+fun SettingWithDecoration(
+    modifier: Modifier = Modifier,
+    title: String,
+    description: @Composable () -> Unit = {},
+    decoration: (@Composable ()-> Unit)?,
+) {
+    Column(
+        modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+    ) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (decoration != null) {
+                decoration()
+                Spacer(Modifier.width(12.dp))
+            }
+            Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
+        }
+        Spacer(modifier = Modifier.height(2.dp))
+        Row(Modifier.fillMaxWidth()) {
+            if (decoration != null) {
+                Spacer(modifier = Modifier.width(30.dp))
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.subtitle2) {
+                    description()
+                }
+            }
+        }
     }
 }
 
@@ -75,34 +111,22 @@ fun SettingInteractive(
     enabled: Boolean = true,
     onClick: (() -> Unit)
 ) {
-    Column(
-        modifier
-            .fillMaxWidth()
-            .clickable(onClick = { if (enabled) onClick() })
-            .enableOrFade(enabled)
-            .padding(16.dp),
-    ) {
-        Row(
-            Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (icon != null) {
-                PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize))
-                Spacer(Modifier.width(16.dp))
-            }
-            Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
-        }
-        Spacer(modifier = Modifier.height(2.dp))
-        Row(Modifier.fillMaxWidth()) {
-            if (icon != null) {
-                Spacer(modifier = Modifier.width(34.dp))
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.subtitle2) {
-                    description()
-                }
-            }
-        }
+    if (icon != null) {
+        SettingWithDecoration(
+            title = title,
+            description = description,
+            decoration = { PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize)) },
+            modifier = modifier.clickable(onClick = { if (enabled) onClick() })
+                .enableOrFade(enabled)
+        )
+    } else {
+        SettingWithDecoration(
+            title = title,
+            description = description,
+            decoration = null,
+            modifier = modifier.clickable(onClick = { if (enabled) onClick() })
+                .enableOrFade(enabled)
+        )
     }
 }
 
@@ -110,7 +134,7 @@ fun SettingInteractive(
 fun SettingSwitch(
     modifier: Modifier = Modifier,
     title: String,
-    description: String?,
+    description: String? = null,
     icon: Int = R.drawable.ic_blank,
     enabled: Boolean,
     isChecked: Boolean,
@@ -125,16 +149,18 @@ fun SettingSwitch(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize))
-            Spacer(Modifier.width(16.dp))
+            Spacer(Modifier.width(12.dp))
             Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
             Spacer(Modifier.width(16.dp))
             Switch(checked = isChecked, onCheckedChange = null)
         }
-        Spacer(modifier = Modifier.height(2.dp))
-        Row(Modifier.fillMaxWidth()) {
-            Spacer(modifier = Modifier.width(34.dp))
-            Text(text = description ?: "", style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f))
-            Spacer(Modifier.width(48.dp))
+        if (description != null) {
+            Spacer(modifier = Modifier.height(2.dp))
+            Row(Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.width(30.dp))
+                Text(text = description ?: "", style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f))
+                Spacer(Modifier.width(48.dp))
+            }
         }
     }
 }

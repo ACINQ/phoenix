@@ -39,6 +39,6 @@ fun ProgressView(
     ) {
         CircularProgressIndicator(Modifier.size(progressCircleSize), strokeWidth = progressCircleWidth)
         Spacer(Modifier.width(space))
-        Text(text =text)
+        Text(text = text)
     }
 }
