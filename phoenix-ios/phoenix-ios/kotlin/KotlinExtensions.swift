@@ -10,6 +10,30 @@ extension PhoenixBusiness {
 	}
 }
 
+extension WalletPaymentOrderRow {
+	
+	var createdAtDate: Date {
+		return Date(timeIntervalSince1970: (Double(createdAt) / Double(1_000)))
+	}
+	
+	var completedAtDate: Date? {
+		if let completedAt = self.completedAt?.int64Value {
+			return Date(timeIntervalSince1970: (Double(createdAt) / Double(1_000)))
+		} else {
+			return nil
+		}
+	}
+	
+	/// Models the sorting done in the raw Sqlite queries.
+	/// I.e.: `ORDER BY COALESCE(completed_at, created_at)`
+	/// 
+	/// See: AggregatedQueries.sq
+	///
+	var sortDate: Date {
+		return completedAtDate ?? createdAtDate
+	}
+}
+
 extension WalletPaymentInfo {
 	
 	func paymentDescription(includingUserDescription: Bool = true) -> String? {

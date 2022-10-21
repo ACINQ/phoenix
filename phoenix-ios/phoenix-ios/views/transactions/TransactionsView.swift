@@ -26,6 +26,7 @@ struct TransactionsView: View {
 	
 	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
+	@State var sections: [PaymentsSection] = []
 	
 	@State var selectedItem: WalletPaymentInfo? = nil
 	
@@ -34,6 +35,8 @@ struct TransactionsView: View {
 	
 	@State var didAppear = false
 	@State var didPreFetch = false
+	
+	@Environment(\.colorScheme) var colorScheme
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -79,7 +82,7 @@ struct TransactionsView: View {
 			Color.primaryBackground.frame(height: 25)
 			
 			ScrollView {
-				LazyVStack {
+				LazyVStack(pinnedViews: [.sectionHeaders]) {
 					// paymentsPage.rows: [WalletPaymentOrderRow]
 					//
 					// Here's how this works:
@@ -94,11 +97,25 @@ struct TransactionsView: View {
 					// contains the row's completedAt date, which is modified when the row changes.
 					// Thus our row is automatically refreshed after it fails/succeeds.
 					//
-					ForEach(paymentsPage.rows) { row in
-						Button {
-							didSelectPayment(row: row)
-						} label: {
-							PaymentCell(row: row, didAppearCallback: paymentCellDidAppear)
+					ForEach(sections) { section in
+						Section {
+							ForEach(section.payments) { row in
+								Button {
+									didSelectPayment(row: row)
+								} label: {
+									PaymentCell(row: row, didAppearCallback: paymentCellDidAppear)
+								}
+							}
+							
+						} header: {
+							Text(verbatim: section.name)
+								.padding([.top, .bottom], 10)
+								.frame(maxWidth: .infinity)
+								.background(
+									colorScheme == ColorScheme.light
+									? Color(UIColor.secondarySystemBackground)
+									: Color.mutedBackground // Color(UIColor.secondarySystemGroupedBackground)
+								)
 						}
 					}
 				
@@ -210,7 +227,37 @@ struct TransactionsView: View {
 	func paymentsPageChanged(_ page: PaymentsPage) {
 		log.trace("paymentsPageChanged() => \(page.rows.count)")
 		
+		let calendar = Calendar.current
+		
+		let dateFormatter = DateFormatter()
+		dateFormatter.setLocalizedDateFormatFromTemplate("yyyyMMMM")
+		
+		var newSections = [PaymentsSection]()
+		for row in page.rows {
+			
+			let date = row.sortDate
+			let comps = calendar.dateComponents([.year, .month], from: date)
+			
+			let year = comps.year!
+			let month = comps.month!
+			
+			if var lastSection = newSections.last, lastSection.year == year, lastSection.month == month {
+				
+				lastSection.payments.append(row)
+				let _ = newSections.popLast()
+				newSections.append(lastSection)
+				
+			} else {
+				let name = dateFormatter.string(from: date)
+				var section = PaymentsSection(year: year, month: month, name: name)
+				
+				section.payments.append(row)
+				newSections.append(section)
+			}
+		}
+		
 		paymentsPage = page
+		sections = newSections
 		maybePreFetchPaymentsFromDatabase()
 	}
 	
@@ -236,9 +283,9 @@ struct TransactionsView: View {
 		// So this remains a todo item for future improvement.
 		
 		var rowIdxWithinPage: Int? = nil
-		for (idx, r) in paymentsPage.rows.enumerated() {
+		for (idx, row) in paymentsPage.rows.enumerated() {
 			
-			if r == visibleRow {
+			if row == visibleRow {
 				rowIdxWithinPage = idx
 				break
 			}
