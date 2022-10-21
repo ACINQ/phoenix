@@ -417,7 +417,7 @@ struct CurrencyConverterView: View {
 	}
 	
 	private func currenciesDidChange() {
-		log.trace("currenciesDidChange(): \(Currency.serializeList(currencies))")
+		log.trace("currenciesDidChange(): \(Currency.serializeList(currencies) ?? "<empty>")")
 		
 		if currencies == defaultCurrencies() {
 			GroupPrefs.shared.currencyConverterList = []

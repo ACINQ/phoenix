@@ -15,10 +15,12 @@ extension FiatCurrency {
 		return self.name
 	}
 	
-	static func deserialize(_ str: String) -> FiatCurrency? {
-		for value in FiatCurrency.companion.values {
-			if str == value.serialize() {
-				return value
+	static func deserialize(_ str: String?) -> FiatCurrency? {
+		if let str = str {
+			for value in FiatCurrency.companion.values {
+				if str == value.serialize() {
+					return value
+				}
 			}
 		}
 		return nil
@@ -45,12 +47,20 @@ extension FiatCurrency {
 		return nil
 	}
 	
-	static func serializeList(_ list: [FiatCurrency]) -> String {
-		return list.map { $0.serialize() }.joined(separator: ",")
+	static func serializeList(_ list: [FiatCurrency]) -> String? {
+		if list.isEmpty {
+			return nil
+		} else {
+			return list.map { $0.serialize() }.joined(separator: ",")
+		}
 	}
 	
-	static func deserializeList(_ str: String) -> [FiatCurrency] {
-		return str.components(separatedBy: ",").compactMap { FiatCurrency.deserialize($0) }
+	static func deserializeList(_ str: String?) -> [FiatCurrency] {
+		if let str = str {
+			return str.components(separatedBy: ",").compactMap { FiatCurrency.deserialize($0) }
+		} else {
+			return []
+		}
 	}
 }
 
@@ -60,10 +70,12 @@ extension BitcoinUnit {
 		return self.name
 	}
 	
-	static func deserialize(_ str: String) -> BitcoinUnit? {
-		for value in BitcoinUnit.companion.values {
-			if str == value.serialize() {
-				return value
+	static func deserialize(_ str: String?) -> BitcoinUnit? {
+		if let str = str {
+			for value in BitcoinUnit.companion.values {
+				if str == value.serialize() {
+					return value
+				}
 			}
 		}
 		return nil
@@ -81,29 +93,39 @@ extension Currency {
 		}
 	}
 	
-	static func deserialize(_ str: String) -> Currency? {
-		let components = str.split(separator: ":")
-		if components.count >= 2 {
-			switch components[0].lowercased() {
-			case "bitcoin":
-				if let bitcoinUnit = BitcoinUnit.deserialize(String(components[1])) {
-					return Currency.bitcoin(bitcoinUnit)
+	static func deserialize(_ str: String?) -> Currency? {
+		if let str = str {
+			let components = str.split(separator: ":")
+			if components.count >= 2 {
+				switch components[0].lowercased() {
+				case "bitcoin":
+					if let bitcoinUnit = BitcoinUnit.deserialize(String(components[1])) {
+						return Currency.bitcoin(bitcoinUnit)
+					}
+				case "fiat":
+					if let fiatCurrency = FiatCurrency.deserialize(String(components[1])) {
+						return Currency.fiat(fiatCurrency)
+					}
+				default: break
 				}
-			case "fiat":
-				if let fiatCurrency = FiatCurrency.deserialize(String(components[1])) {
-					return Currency.fiat(fiatCurrency)
-				}
-			default: break
 			}
 		}
 		return nil
 	}
 	
-	static func serializeList(_ list: [Currency]) -> String {
-		return list.map { $0.serialize() }.joined(separator: ",")
+	static func serializeList(_ list: [Currency]) -> String? {
+		if list.isEmpty {
+			return nil
+		} else {
+			return list.map { $0.serialize() }.joined(separator: ",")
+		}
 	}
 	
-	static func deserializeList(_ str: String) -> [Currency] {
-		return str.components(separatedBy: ",").compactMap { Currency.deserialize($0) }
+	static func deserializeList(_ str: String?) -> [Currency] {
+		if let str = str {
+			return str.components(separatedBy: ",").compactMap { Currency.deserialize($0) }
+		} else {
+			return []
+		}
 	}
 }

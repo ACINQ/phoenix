@@ -19,16 +19,21 @@ extension UserDefaults {
 	}
 }
 
+fileprivate enum Key: String {
+	case currencyType
+	case fiatCurrency
+	case bitcoinUnit
+	case currencyConverterList
+	case electrumConfig
+	case isTorEnabled
+}
+
+/// Group preferences, stored in the iOS UserDefaults system.
+///
+/// Note that the values here are SHARED with other extensions bundled in the app,
+/// such as the notification-service-extension.
+///
 class GroupPrefs {
-	
-	private enum Key: String {
-		case currencyType
-		case fiatCurrency
-		case bitcoinUnit
-		case currencyConverterList
-		case electrumConfig
-		case isTorEnabled
-	}
 	
 	public static let shared = GroupPrefs()
 	
@@ -37,81 +42,56 @@ class GroupPrefs {
 	}
 	
 	var currencyType: CurrencyType {
-		get {
-			let key = Key.currencyType.rawValue
-			let saved: CurrencyType? = defaults.getCodable(forKey: key)
-			return saved ?? CurrencyType.bitcoin
-		}
-		set {
-			let key = Key.currencyType.rawValue
-			defaults.setCodable(value: newValue, forKey: key)
-	  }
+		get { defaults.currencyType?.jsonDecode() ?? .bitcoin }
+		set { defaults.currencyType = newValue.jsonEncode() }
 	}
 	
-	lazy private(set) var fiatCurrencyPublisher: CurrentValueSubject<FiatCurrency, Never> = {
-		return CurrentValueSubject<FiatCurrency, Never>(self.fiatCurrency)
+	lazy private(set) var fiatCurrencyPublisher: AnyPublisher<FiatCurrency, Never> = {
+		defaults.publisher(for: \.fiatCurrency, options: [.new])
+			.map({ (str: String?) -> FiatCurrency in
+				FiatCurrency.deserialize(str) ?? self.defaultFiatCurrency()
+			})
+			.removeDuplicates()
+			.eraseToAnyPublisher()
 	}()
+	
+	private func defaultFiatCurrency() -> FiatCurrency {
+		return FiatCurrency.localeDefault() ?? FiatCurrency.usd
+	}
 	
 	var fiatCurrency: FiatCurrency {
-		get {
-			let key = Key.fiatCurrency.rawValue
-			var saved: FiatCurrency? = nil
-			if let str = defaults.string(forKey: key) {
-				saved = FiatCurrency.deserialize(str)
-			}
-			return saved ?? FiatCurrency.localeDefault() ?? FiatCurrency.usd
-		}
-		set {
-			let key = Key.fiatCurrency.rawValue
-			let str = newValue.serialize()
-			defaults.set(str, forKey: key)
-			fiatCurrencyPublisher.send(newValue)
-	  }
+		get { FiatCurrency.deserialize(defaults.fiatCurrency) ?? defaultFiatCurrency() }
+		set { defaults.fiatCurrency = newValue.serialize() }
 	}
 	
-	lazy private(set) var bitcoinUnitPublisher: CurrentValueSubject<BitcoinUnit, Never> = {
-		return CurrentValueSubject<BitcoinUnit, Never>(self.bitcoinUnit)
+	lazy private(set) var bitcoinUnitPublisher: AnyPublisher<BitcoinUnit, Never> = {
+		defaults.publisher(for: \.bitcoinUnit, options: [.new])
+			.map({ (str: String?) -> BitcoinUnit in
+				BitcoinUnit.deserialize(str) ?? self.defaultBitcoinUnit
+			})
+			.removeDuplicates()
+			.eraseToAnyPublisher()
 	}()
 	
+	private let defaultBitcoinUnit = BitcoinUnit.sat
+	
 	var bitcoinUnit: BitcoinUnit {
-		get {
-			let key = Key.bitcoinUnit.rawValue
-			var saved: BitcoinUnit? = nil
-			if let str = defaults.string(forKey: key) {
-				saved = BitcoinUnit.deserialize(str)
-			}
-			return saved ?? BitcoinUnit.sat
-		}
-		set {
-			let key = Key.bitcoinUnit.rawValue
-			let str = newValue.serialize()
-			defaults.set(str, forKey: key)
-			bitcoinUnitPublisher.send(newValue)
-		}
+		get { BitcoinUnit.deserialize(defaults.bitcoinUnit) ?? defaultBitcoinUnit }
+		set { defaults.bitcoinUnit = newValue.serialize() }
 	}
 	
-	lazy private(set) var currencyConverterListPublisher: CurrentValueSubject<[Currency], Never> = {
-		return CurrentValueSubject<[Currency], Never>(self.currencyConverterList)
+	lazy private(set) var currencyConverterListPublisher: AnyPublisher<[Currency], Never> = {
+		defaults.publisher(for: \.currencyConverterList, options: [.new])
+			.map({ (str: String?) -> [Currency] in
+				Currency.deserializeList(str)
+			})
+			.removeDuplicates()
+			.eraseToAnyPublisher()
 	}()
 	
 	var currencyConverterList: [Currency] {
-		get {
-			let key = Key.currencyConverterList.rawValue
-			if let list = defaults.string(forKey: key) {
-				return Currency.deserializeList(list)
-			} else {
-				return [Currency]()
-			}
-		}
-		set {
-			let key = Key.currencyConverterList.rawValue
-			if newValue.isEmpty {
-				defaults.removeObject(forKey: key)
-			} else {
-				let list = Currency.serializeList(newValue)
-				defaults.set(list, forKey: key)
-			}
-		}
+		get { Currency.deserializeList(defaults.currencyConverterList) }
+		set { defaults.currencyConverterList = Currency.serializeList(newValue) }
 	}
 	
 	var preferredFiatCurrencies: [FiatCurrency] {
@@ -132,35 +112,29 @@ class GroupPrefs {
 		}
 	}
 	
-	lazy private(set) var electrumConfigPublisher: CurrentValueSubject<ElectrumConfigPrefs?, Never> = {
-		return CurrentValueSubject<ElectrumConfigPrefs?, Never>(self.electrumConfig)
+	lazy private(set) var electrumConfigPublisher: AnyPublisher<ElectrumConfigPrefs?, Never> = {
+		defaults.publisher(for: \.electrumConfig, options: [.new])
+			.map({ (data: Data?) -> ElectrumConfigPrefs? in
+				data?.jsonDecode()
+			})
+			.removeDuplicates()
+			.eraseToAnyPublisher()
 	}()
 
 	var electrumConfig: ElectrumConfigPrefs? {
-		get {
-			let key = Key.electrumConfig.rawValue
-			let saved: ElectrumConfigPrefs? = defaults.getCodable(forKey: key)
-			return saved
-		}
-		set {
-			let key = Key.electrumConfig.rawValue
-			defaults.setCodable(value: newValue, forKey: key)
-			electrumConfigPublisher.send(newValue)
-		}
+		get { defaults.electrumConfig?.jsonDecode() }
+		set { defaults.electrumConfig = newValue?.jsonEncode() }
 	}
 	
-	lazy private(set) var isTorEnabledPublisher: CurrentValueSubject<Bool, Never> = {
-		return CurrentValueSubject<Bool, Never>(self.isTorEnabled)
+	lazy private(set) var isTorEnabledPublisher: AnyPublisher<Bool, Never> = {
+		defaults.publisher(for: \.isTorEnabled, options: [.new])
+			.removeDuplicates()
+			.eraseToAnyPublisher()
 	}()
 
 	var isTorEnabled: Bool {
-		get {
-			 defaults.bool(forKey: Key.isTorEnabled.rawValue)
-		}
-		set {
-			defaults.set(newValue, forKey: Key.isTorEnabled.rawValue)
-			isTorEnabledPublisher.send(newValue)
-		}
+		get { defaults.isTorEnabled }
+		set { defaults.isTorEnabled = newValue }
 	}
 	
 	// --------------------------------------------------
@@ -175,13 +149,6 @@ class GroupPrefs {
 		defaults.removeObject(forKey: Key.currencyConverterList.rawValue)
 		defaults.removeObject(forKey: Key.electrumConfig.rawValue)
 		defaults.removeObject(forKey: Key.isTorEnabled.rawValue)
-		
-		// Reset any publishers with stored state
-		fiatCurrencyPublisher.send(self.fiatCurrency)
-		bitcoinUnitPublisher.send(self.bitcoinUnit)
-		currencyConverterListPublisher.send(self.currencyConverterList)
-		electrumConfigPublisher.send(self.electrumConfig)
-		isTorEnabledPublisher.send(self.isTorEnabled)
 	}
 	
 	// --------------------------------------------------
@@ -223,5 +190,38 @@ class GroupPrefs {
 		MigrateToGroup(Key.fiatCurrency)
 		MigrateToGroup(Key.currencyConverterList)
 		MigrateToGroup(Key.electrumConfig)
+	}
+}
+
+extension UserDefaults {
+	
+	@objc fileprivate var currencyType: Data? {
+		get { data(forKey: Key.currencyType.rawValue) }
+		set { set(newValue, forKey: Key.currencyType.rawValue) }
+	}
+	
+	@objc fileprivate var fiatCurrency: String? {
+		get { string(forKey: Key.fiatCurrency.rawValue) }
+		set { set(newValue, forKey: Key.fiatCurrency.rawValue) }
+	}
+	
+	@objc fileprivate var bitcoinUnit: String? {
+		get { string(forKey: Key.bitcoinUnit.rawValue) }
+		set { set(newValue, forKey: Key.bitcoinUnit.rawValue) }
+	}
+	
+	@objc fileprivate var currencyConverterList: String? {
+		get { string(forKey: Key.currencyConverterList.rawValue) }
+		set { set(newValue, forKey: Key.currencyConverterList.rawValue) }
+	}
+	
+	@objc fileprivate var electrumConfig: Data? {
+		get { data(forKey: Key.electrumConfig.rawValue) }
+		set { set(newValue, forKey: Key.electrumConfig.rawValue) }
+	}
+	
+	@objc fileprivate var isTorEnabled: Bool {
+		get { bool(forKey: Key.isTorEnabled.rawValue) }
+		set { set(newValue, forKey: Key.isTorEnabled.rawValue) }
 	}
 }
