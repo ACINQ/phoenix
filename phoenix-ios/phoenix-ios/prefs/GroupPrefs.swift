@@ -27,6 +27,7 @@ class GroupPrefs {
 		case bitcoinUnit
 		case currencyConverterList
 		case electrumConfig
+		case isTorEnabled
 	}
 	
 	public static let shared = GroupPrefs()
@@ -148,6 +149,20 @@ class GroupPrefs {
 		}
 	}
 	
+	lazy private(set) var isTorEnabledPublisher: CurrentValueSubject<Bool, Never> = {
+		return CurrentValueSubject<Bool, Never>(self.isTorEnabled)
+	}()
+
+	var isTorEnabled: Bool {
+		get {
+			 defaults.bool(forKey: Key.isTorEnabled.rawValue)
+		}
+		set {
+			defaults.set(newValue, forKey: Key.isTorEnabled.rawValue)
+			isTorEnabledPublisher.send(newValue)
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Reset Wallet
 	// --------------------------------------------------
@@ -159,12 +174,14 @@ class GroupPrefs {
 		defaults.removeObject(forKey: Key.bitcoinUnit.rawValue)
 		defaults.removeObject(forKey: Key.currencyConverterList.rawValue)
 		defaults.removeObject(forKey: Key.electrumConfig.rawValue)
+		defaults.removeObject(forKey: Key.isTorEnabled.rawValue)
 		
 		// Reset any publishers with stored state
 		fiatCurrencyPublisher.send(self.fiatCurrency)
 		bitcoinUnitPublisher.send(self.bitcoinUnit)
 		currencyConverterListPublisher.send(self.currencyConverterList)
 		electrumConfigPublisher.send(self.electrumConfig)
+		isTorEnabledPublisher.send(self.isTorEnabled)
 	}
 	
 	// --------------------------------------------------

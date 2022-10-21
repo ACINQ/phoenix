@@ -138,7 +138,7 @@ class BusinessManager {
 		.store(in: &cancellables)
 		
 		// Tor configuration observer
-		Prefs.shared.isTorEnabledPublisher.sink { (isTorEnabled: Bool) in
+		GroupPrefs.shared.isTorEnabledPublisher.sink { (isTorEnabled: Bool) in
 			self.business.appConfigurationManager.updateTorUsage(enabled: isTorEnabled)
 		}
 		.store(in: &cancellables)
