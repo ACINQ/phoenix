@@ -834,7 +834,7 @@
 "Min: " = "Mínimo:";
 
 /* VoiceOver label: PaymentSummaryView */
-"Miner fee amount: (percent), (amountBitcoin), ≈(amountFiat)" = "Monto de la tarifa del miner: percent), (amountBitcoin), ≈(amountFiat)";
+"Miner fee amount: (percent), (amountBitcoin), ≈(amountFiat)" = "Monto de la tarifa del miner: (percent), (amountBitcoin), ≈(amountFiat)";
 
 /* No comment provided by engineer. */
 "Modify" = "Modificar";
