@@ -4,6 +4,9 @@
 /* No comment provided by engineer. */
 " (not enrolled)" = "(not enrolled)";
 
+/* Type of text being copied */
+ "(Bitcoin address)" = "(Bitcoinová adresa)";
+ 
 /* No comment provided by engineer. */
 "(coming soon)" = "(již brzy)";
 
@@ -13,7 +16,28 @@
 /* Upload progress information */
 "(completed) of (total), pushing batch of (inFlight)" = "(dokončeno) z (celkem), posílání (inFlight)";
 
-/* No comment provided by engineer. */
+ /* Recent payments footer */
+ "(count) in-flight outgoing payments" = "(count) plateb je na cestě";
+
+ /* Recent payments footer */
+ "(count) payments within the last 2 hours" = "(count) zaplacení za poslední 2 hodiny";
+
+ /* Recent payments footer */
+ "(count) payments within the last 3 days" = "(count) zaplacení za poslední 3 dny";
+
+ /* Recent payments option */
+ "(count) payments within the last 7 days" = "(count) zaplacení za posledních 7 dní";
+
+ /* Recent payments footer */
+ "(count) payments within the last 10 minutes" = "(count) zaplacení za posledních 10 minut";
+
+ /* Recent payments footer */
+ "(count) payments within the last 24 hours" = "(count) zaplacení za posledních 24 hodin";
+
+ /* Recent payments footer */
+ "(count) payments within the last minute" = "(count) zaplacení za poslední minutu";
+
+/* Type of text being copied. */
 "(derived from your seed)" = "(odvozeno z vašeho seedu)";
 
 /* No comment provided by engineer. */
@@ -67,6 +91,27 @@
 /* No comment provided by engineer. */
 "1 channel" = "1 kanál";
 
+/* Recent payments footer */
+ "1 in-flight outgoing payment" = "1 odchozí platba na cestě";
+
+ /* Recent payments footer */
+ "1 payment within the last 2 hours" = "1 platba za poslední 2 hodin";
+
+ /* Recent payments option */
+ "1 payment within the last 7 days" = "1 platba za posledních 7 dnů";
+
+ /* Recent payments footer */
+ "1 payment within the last 10 minutes" = "1 platba za posledních 10 minut";
+
+ /* Recent payments footer */
+ "1 payment within the last minute" = "1 platba za poslední minutu";
+
+ /* Recent payments footer */
+ "1 payments within the last 24 hours" = "1 platba za posledních 24 hodin";
+
+ /* Recent payments footer */
+ "1 payment within the last 3 days" = "1 platba za poslední den";
+
 /* No comment provided by engineer. */
 "A backup phrase is generated, storing all the information needed to restore your Bitcoin funds." = "Bude vytvořena záložní fráze, ve které jsou uloženy všechny informace, které jsou potřebné k obnovení vašich bitcoinových prostředků.";
 
@@ -89,6 +134,9 @@
 "Address" = "Adresa";
 
 /* Label in DetailsView_IncomingPayment */
+"address" = "adresa";
+
+/* Label in DetailsView_IncomingPayment */
 "address type" = "Typ adresy";
 
 /* No comment provided by engineer. */
@@ -104,10 +152,13 @@
 "Amount exceeds your balance" = "Částka převyšuje váš zůstatek";
 
 /* Label in DetailsView_IncomingPayment */
-"amount received" = "přijatá částka";
+"amount requested" = "požadovaná částka";
 
 /* Label in DetailsView_IncomingPayment */
-"amount requested" = "požadovaná částka";
+ "amount sent" = "odeslaná částka";
+
+/* Label in DetailsView_IncomingPayment */
+"amount received" = "přijatá částka";
 
 /* placeholder: invoice is amount-less */
 "any amount" = "libovolná částka";
@@ -150,6 +201,12 @@
 
 /* No comment provided by engineer. */
 "Backup transactions" = "Záložní transakce";
+
+/* No comment provided by engineer. */
+ "Backup your recovery phrase to prevent losing your funds. " = "Zazálohujte si bezpečnostní frázi, ať nepřijdete o své zůstatky";
+
+/* VoiceOver label: PaymentSummaryView */
+"Base amount: (amountBitcoin), ≈(amountFiat)" = "Základní hodnota: (amountBitcoin), ≈(amountFiat)";
 
 /* No comment provided by engineer. */
 "Biometrics" = "Biometrie";
@@ -249,7 +306,7 @@
 "Cloud sync paused" = "Synchronizace s cloudem pozastavena";
 
 /* No comment provided by engineer. */
-"Coming Soon" = "Již brzy";
+"Coming Soon" = "-";
 
 /* Label in DetailsView_IncomingPayment */
 "completed at" = "Dokončeno v ";
@@ -359,11 +416,23 @@
 /* No comment provided by engineer. */
 "Downloading payments" = "Stahování plateb";
 
-/* No comment provided by engineer. */
-"Drain my wallet" = "Vyprázdnit moji peněženku";
+/* Navigation bar title */
+"Drain wallet" = "Vyprázdnit peněženku";
 
 /* No comment provided by engineer. */
 "Edit payment request" = "Upravit žádost o platbu";
+
+/* No comment provided by engineer. */
+"Edit" = "Upravit";
+
+/* button label - try to make it short */
+"edit" = "upravit";
+
+/* Navigation bar title */
+"Edit Info" = "Upravit informace";
+
+/* Navigation bar title */
+"Edit Payment" = "Upravit platbu";
 
 /* Label in SummaryInfoGrid */
 "elapsed" = "uplynulý čas";
@@ -387,7 +456,7 @@
 "Euro" = "Euro";
 
 /* label text */
-"Expect to receive %d separate payments." = "Doručení očekáváno  %d oddělených platbách.";
+"Expect to receive %d separate payments." = "Doručení očekáváno %d oddělených platbách.";
 
 /* No comment provided by engineer. */
 "External" = "Externí";
@@ -482,6 +551,9 @@
 /* Fees explanation */
 "In order to receive this payment, a new payment channel was opened. This is not always required." = "Aby bylo možné tuto platbu přijmout, byl otevřen nový platební kanál. To není vždy nutné.";
 
+/* Fees explanation */
+"Includes Bitcoin network miner fees, and the fee for the Swap-Out service." = "Zahrnuje poplatky za těžbu bitcoinů a poplatek za službu Swap-Out.";
+
 /* Currency name: INR */
 "Indian Rupee" = "Indická rupie";
 
@@ -524,6 +596,9 @@
 /* App theme option */
 "Light" = "Světlý";
 
+/* Label in SummaryInfoGrid */
+"Lightning Fees" = "Lightning poplatky";
+
 /* Fees explanation */
 "Lightning fees for routing the payment. Payment required %d hops." = "Lightning poplatky za směrování platby. Platba vyžadovuje %d skoků.";
 
@@ -547,6 +622,9 @@
 
 /* Currency name: MXN */
 "Mexican Peso" = "Mexické Peso";
+
+/* VoiceOver label: PaymentSummaryView */
+"Miner fee amount: (percent), (amountBitcoin), ≈(amountFiat)" = "Velikost poplatku těžaře: (percent), (amountBitcoin), ≈(amountFiat)";
 
 /* No comment provided by engineer. */
 "Modify" = "Upravit";
@@ -581,14 +659,30 @@
 /* No comment provided by engineer. */
 "Note: Server must have a valid certificate" = "Poznámka: Server musí mít platný certifikát";
 
+/* No comment provided by engineer. */
+ "now" = "nyní";
+
 /* Connection state */
 "Offline" = "Offline";
 
 /* No comment provided by engineer. */
 "OK" = "OK";
 
+/* Generic description for L1 payment */
+"On-Chain Payment" = "On-Chain platba";
+
+/* Recent payments option */
+"Only show in-flight outgoing payments." = "Zobrazit pouze platby na cestě.";
+
 /* No comment provided by engineer. */
 "Only you alone possess this seed. Keep it private." = "Tento seed vlastníš jen ty sám. Uchovej ho v tajnosti.";
+
+
+/* No comment provided by engineer. */
+"open link" = "otevřít odkaz";
+
+/* Option in currency picker list. Sends user to Currency Converter */
+"other" = "jiné";
 
 /* Label in SummaryInfoGrid */
 "Output" = "Výstup";
@@ -633,6 +727,9 @@
 /* Title in DetailsView_IncomingPayment */
 "Payment Sent" = "Platba odeslána";
 
+/* Navigation bar title */
+"Payments" = "Platby";
+
 /* Explanation for 'Randomize upload delays' toggle */
 "Payments are uploaded to the cloud immediately upon completion." = "Platby se nahrávají do cloudu ihned po dokončení.";
 
@@ -663,8 +760,14 @@
 /* No comment provided by engineer. */
 "Please restart Phoenix" = "Restartujte Phoenix";
 
+/* reason for iCloud failure */
+ "Please sign into iCloud" = "Přihlaste se prosím do služby iCloud";
+
 /* Currency name: PLN */
 "Polish Zloty" = "Polský zlotý";
+
+/* Navigation bar title */
+"Privacy" = "Soukromí";
 
 /* No comment provided by engineer. */
 "Port" = "Port";
@@ -691,10 +794,10 @@
 "received at" = "přijmuto v";
 
 /* Label in DetailsView_IncomingPayment */
-"recipient pubkey" = "Příjemce veřejného klíče";
+"recipient pubkey" = "příjemce veřejného klíče";
 
-/* No comment provided by engineer. */
-"Recovery phrase" = "Fráze pro obnovení";
+/* Navigation bar title */
+"Recovery Phrase" = "Fráze pro obnovení";
 
 /* Navigation bar title */
 "Recovery Seed" = "Recovery Seed";
@@ -765,6 +868,9 @@
 /* No comment provided by engineer. */
 "Share" = "Sdílet";
 
+/* button label - try to make it short */
+"share" = "sdílet";
+
 /* No comment provided by engineer. */
 "Share Image" = "Sdílet obrázek";
 
@@ -776,6 +882,24 @@
 
 /* No comment provided by engineer. */
 "Show a Bitcoin address" = "Zobrazit bitcoinovou adresu ";
+
+/* Recent payments option */
+"Show payments within the last 1 minute." = "Zobrazit platby za poslední minutu.";
+
+/* Recent payments option */
+"Show payments within the last 2 hours." = "Zobrazit platby za poslední 2 hodiny.";
+
+/* Recent payments option */
+"Show payments within the last 3 days." = "Zobrazit platby za poslední 3 dny.";
+
+/* Recent payments option */
+"Show payments within the last 7 days." = "Zobrazit platby za posledních 7 dnů.";
+
+/* Recent payments option */
+"Show payments within the last 10 minutes." = "Zobrazit platby za posledních 10 minut.";
+
+/* Recent payments option */
+"Show payments within the last 24 hours." = "Zobrazit platby za posledních 24 hodin.";
 
 /* No comment provided by engineer. */
 "Sign into iCloud to backup your payments" = "Přihlaste se do služby iCloud a zálohujte své platby";
@@ -804,6 +928,9 @@
 /* Transaction Info: Value */
 "Swap-Out" = "Swap-out";
 
+/* Label in SummaryInfoGrid */
+"Swap Fees" = "poplatky za Swap";
+
 /* Currency name: SEK */
 "Swedish Krona" = "Švédská koruna";
 
@@ -824,6 +951,13 @@
 
 /* Error message - parsing bitcoin address */
 "The address is for %@, but you're on %@" = "Adresa je pro %@, ale jste na %@";
+
+
+/* Error message - scanning lightning invoice */
+"The service ((origin)) appears to be offline, or they have a down server" = "Služba ((origin)) se zdá být offline nebo má neaktivní server.";
+
+/* Error message - scanning lightning invoice */
+"The service ((origin)) doesn't support Lightning addresses, or doesn't know this user" = "Služba ((origin)) nepodporuje Lightning adresy nebo nezná tohoto uživatele.";
 
 /* No comment provided by engineer. */
 "The backup phrase, known as a seed, is a list of 12 English words. It allows you to recover full access to your funds if needed." = "Záložní fráze, známá jako seed, je seznam 12 anglických slov. V případě potřeby vám umožní obnovit plný přístup k vašim finančním prostředkům.";
@@ -895,7 +1029,16 @@
 "timestamp" = "Časová značka";
 
 /* No comment provided by engineer. */
-"Tip timestamp" = "Tip timestamp";
+"Tip timestamp" = "Časové razítko dýška";
+
+/* button label - try to make it short */
+"tip" = "dýško";
+
+/* VoiceOver label: PaymentSummaryView */
+"Tip amount: (percent), (amountBitcoin), ≈(amountFiat)" = "Hodnota dýška: (percent), (amountBitcoin), ≈(amountFiat)";
+
+/* VoiceOver information: Customize tip sheet */
+"tip amount: (tipBtcn), ≈(tipFiat), total amount: (ttlBtcn), ≈(ttlFiat)" = "Hodnota dýška: (tipBtcn), ≈(tipFiat), cantidad total: (ttlBtcn), ≈(ttlFiat)";
 
 /* No comment provided by engineer. */
 "To fix this re-enable Background App Refresh via: Settings -> General -> Background App Refresh" = "Chcete-li povolit aktualizaci aplikace na pozadí, zvolte: Nastavení -> Obecné -> Aktualizace aplikace na pozadí";
@@ -920,6 +1063,22 @@
 
 /* Navigation bar title */
 "Tor Settings" = "Tor Nastavení";
+
+
+/* error message */
+"Total amount exceeds your balance" = "Celková částka převyšuje zůstatek";
+
+/* VoiceOver label: PaymentSummaryView */
+"Total amount: (amountBitcoin), ≈(amountFiat)" = "Celková částka: (amountBitcoin), ≈(amountFiat)";
+
+/* VoiceOver hint */
+"total amount: (btcnAmt.string), ≈(fiatAmt.string)" = "celková částka: (btcnAmt.string), ≈(fiatAmt.string)";
+
+/* VoiceOver information: Customize tip sheet */
+"total amount: (ttlBtcn) ≈(ttlFiat)" = "celková částka: (ttlBtcn) ≈(ttlFiat)";
+
+/* VoiceOver hint */
+"total amount: ≈(btcnAmt.string)" = "celková částka: ≈(btcnAmt.string)";
 
 /* Label in DetailsView_IncomingPayment */
 "total amount" = "celková částka";
@@ -962,6 +1121,10 @@
 
 /* Explanation for 'Use cellular data' toggle */
 "Uploads will only occur over WiFi." = "Nahrávání bude probíhat pouze přes WiFi.";
+
+
+/* Error message - scanning lightning invoice */
+"Unreadable response from service: (origin)" = "Nečitelná odpověď služby: (origin)";
 
 /* No comment provided by engineer. */
 "Use a custom server" = "Použít vlastní server";
