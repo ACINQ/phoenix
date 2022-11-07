@@ -251,10 +251,10 @@
     <string name="settings_display_prefs">Display</string>
     <string name="settings_security_title">Security</string>
     <string name="settings_display_seed">Recovery phrase</string>
-    <string name="settings_access_control">App access settings</string>
+    <string name="settings_access_control">Access control</string>
     <string name="settings_advanced_title">Advanced</string>
     <string name="settings_fees">Fees Settings</string>
-    <string name="settings_list_channels">Channels list</string>
+    <string name="settings_list_channels">Payment channels</string>
     <string name="settings_logs">Logs</string>
     <string name="settings_electrum">Electrum server</string>
     <string name="settings_mutual_close">Close all channels</string>

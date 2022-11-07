@@ -75,77 +75,69 @@ fun HomeView(
         ConnectionDialog(connections = connectionsState, onClose = { showConnectionsDialog = false })
     }
 
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val payments = homeViewModel.paymentsFlow.collectAsState().value.values.toList()
 
     // controls for the migration dialog
     val migrationResult = PrefsDatastore.getMigrationResult(context).collectAsState(initial = null).value
     val migrationResultShown = InternalData.getMigrationResultShown(context).collectAsState(initial = null).value
 
-    ModalDrawer(
-        drawerState = drawerState,
-        drawerShape = RectangleShape,
-        drawerContent = { SideMenu(onSettingsClick) },
-        content = {
-            MVIView(homeViewModel) { model, _ ->
-                val balance = remember(model) { model.balance }
-                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    TopBar(
-                        onConnectionsStateButtonClick = {
-                            showConnectionsDialog = true
-                        },
-                        connectionsState = connectionsState
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+    MVIView(homeViewModel) { model, _ ->
+        val balance = remember(model) { model.balance }
+        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            TopBar(
+                onConnectionsStateButtonClick = {
+                    showConnectionsDialog = true
+                },
+                connectionsState = connectionsState
+            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-                    if (balance == null) {
-                        ProgressView(text = stringResource(id = R.string.home__balance_loading))
-                    } else {
-                        AmountView(
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .padding(horizontal = 16.dp),
-                            amount = balance,
-                            amountTextStyle = MaterialTheme.typography.h1,
-                            unitTextStyle = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
-                        )
-                    }
-                    model.incomingBalance?.let { incomingSwapAmount ->
-                        Spacer(modifier = Modifier.height(8.dp))
-                        IncomingAmountNotif(incomingSwapAmount)
-                    }
-                    Spacer(modifier = Modifier.height(24.dp))
-                    PrimarySeparator()
-                    Spacer(modifier = Modifier.height(24.dp))
-                    LazyColumn(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                    ) {
-                        items(
-                            items = payments,
-                        ) {
-                            if (it.paymentInfo == null) {
-                                LaunchedEffect(key1 = it.orderRow.id.identifier) {
-                                    homeViewModel.getPaymentDescription(it.orderRow)
-                                }
-                                PaymentLineLoading(it.orderRow.id, it.orderRow.createdAt, onPaymentClick)
-                            } else {
-                                PaymentLine(it.paymentInfo, onPaymentClick)
-                            }
+            if (balance == null) {
+                ProgressView(text = stringResource(id = R.string.home__balance_loading))
+            } else {
+                AmountView(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(horizontal = 16.dp),
+                    amount = balance,
+                    amountTextStyle = MaterialTheme.typography.h1,
+                    unitTextStyle = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
+                )
+            }
+            model.incomingBalance?.let { incomingSwapAmount ->
+                Spacer(modifier = Modifier.height(8.dp))
+                IncomingAmountNotif(incomingSwapAmount)
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            PrimarySeparator()
+            Spacer(modifier = Modifier.height(24.dp))
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                items(
+                    items = payments,
+                ) {
+                    if (it.paymentInfo == null) {
+                        LaunchedEffect(key1 = it.orderRow.id.identifier) {
+                            homeViewModel.getPaymentDescription(it.orderRow)
                         }
+                        PaymentLineLoading(it.orderRow.id, it.orderRow.createdAt, onPaymentClick)
+                    } else {
+                        PaymentLine(it.paymentInfo, onPaymentClick)
                     }
-                    BottomBar(drawerState, onReceiveClick, onSendClick)
                 }
             }
-
-            if (migrationResultShown == false && migrationResult != null) {
-                MigrationResultDialog(migrationResult) {
-                    scope.launch { InternalData.saveMigrationResultShown(context, true) }
-                }
-            }
+            BottomBar(onSettingsClick, onReceiveClick, onSendClick)
         }
-    )
+    }
+
+    if (migrationResultShown == false && migrationResult != null) {
+        MigrationResultDialog(migrationResult) {
+            scope.launch { InternalData.saveMigrationResultShown(context, true) }
+        }
+    }
 }
 
 @Composable
@@ -335,11 +327,10 @@ private fun IncomingAmountNotif(amount: MilliSatoshi) {
 
 @Composable
 private fun BottomBar(
-    drawerState: DrawerState,
+    onSettingsClick: () -> Unit,
     onReceiveClick: () -> Unit,
     onSendClick: () -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
     Box(
         Modifier
             .fillMaxWidth()
@@ -350,11 +341,7 @@ private fun BottomBar(
         Row {
             Button(
                 icon = R.drawable.ic_settings,
-                onClick = {
-                    scope.launch {
-                        drawerState.open()
-                    }
-                },
+                onClick = onSettingsClick,
                 iconTint = MaterialTheme.colors.onSurface,
                 padding = PaddingValues(20.dp),
                 modifier = Modifier.fillMaxHeight()
