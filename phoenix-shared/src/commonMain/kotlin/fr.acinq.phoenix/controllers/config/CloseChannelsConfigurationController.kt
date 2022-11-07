@@ -11,8 +11,7 @@ import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration.Model.ChannelInfoStatus
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.utils.Parser
-import fr.acinq.phoenix.utils.localCommitmentSpec
-import kotlinx.coroutines.flow.collect
+import fr.acinq.phoenix.utils.extensions.localCommitmentSpec
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 

@@ -6,7 +6,7 @@ import fr.acinq.lightning.serialization.v1.Serialization.lightningSerializersMod
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.controllers.AppController
-import fr.acinq.phoenix.utils.localCommitmentSpec
+import fr.acinq.phoenix.utils.extensions.localCommitmentSpec
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json

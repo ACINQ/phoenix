@@ -7,8 +7,7 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.managers.PeerManager
-import fr.acinq.phoenix.utils.calculateBalance
-import kotlinx.coroutines.flow.collect
+import fr.acinq.phoenix.utils.extensions.calculateBalance
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch

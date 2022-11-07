@@ -50,7 +50,7 @@ import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.utils.errorMessage
+import fr.acinq.phoenix.utils.extensions.errorMessage
 
 
 @Composable

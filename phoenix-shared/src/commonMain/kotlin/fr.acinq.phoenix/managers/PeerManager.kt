@@ -8,7 +8,7 @@ import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.wire.InitTlv
 import fr.acinq.lightning.wire.TlvStream
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.utils.calculateBalance
+import fr.acinq.phoenix.utils.extensions.calculateBalance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
