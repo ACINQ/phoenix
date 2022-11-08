@@ -48,7 +48,7 @@ class SqlitePaymentsDatabaseTest {
     private val preimage2 = randomBytes32()
     private val paymentHash2 = Crypto.sha256(preimage2).toByteVector32()
     private val origin2 = IncomingPayment.Origin.KeySend
-    private val receivedWith2 = setOf(IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 1_995_000.msat, fees = 5_000.msat, channelId = randomBytes32()))
+    private val receivedWith2 = setOf(IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 1_995_000.msat, serviceFee = 5_000.msat, channelId = randomBytes32()))
 
     val origin3 = IncomingPayment.Origin.SwapIn(address = "1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb")
 
@@ -107,8 +107,8 @@ class SqlitePaymentsDatabaseTest {
         val paymentHash = Crypto.sha256(preimage).toByteVector32()
         val origin = IncomingPayment.Origin.Invoice(createInvoice(preimage, 1_000_000_000.msat))
         val channelId = randomBytes32()
-        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 600_000_000.msat, fees = 5_000.msat, channelId = channelId)
-        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 400_000_000.msat, fees = 5_000.msat, channelId = channelId)
+        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 600_000_000.msat, serviceFee = 5_000.msat, channelId = channelId)
+        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 400_000_000.msat, serviceFee = 5_000.msat, channelId = channelId)
         val receivedWith = setOf(mppPart1, mppPart2)
 
         db.addIncomingPayment(preimage, origin, 0)
@@ -122,8 +122,8 @@ class SqlitePaymentsDatabaseTest {
         val paymentHash = Crypto.sha256(preimage).toByteVector32()
         val origin = IncomingPayment.Origin.Invoice(createInvoice(preimage, 1_000_000_000.msat))
         val channelId = randomBytes32()
-        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 500_000_000.msat, fees = 5_000.msat, channelId = channelId)
-        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 500_000_000.msat, fees = 5_000.msat, channelId = channelId)
+        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 500_000_000.msat, serviceFee = 5_000.msat, channelId = channelId)
+        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 500_000_000.msat, serviceFee = 5_000.msat, channelId = channelId)
         val receivedWith = setOf(mppPart1, mppPart2)
 
         db.addIncomingPayment(preimage, origin, 0)
