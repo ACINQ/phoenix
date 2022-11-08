@@ -16,26 +16,69 @@
 
 package fr.acinq.phoenix.db
 
+import co.touchlab.sqliter.DatabaseConfiguration
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.drivers.native.NativeSqliteDriver
+import com.squareup.sqldelight.drivers.native.wrapConnection
 import fr.acinq.lightning.Lightning
+import fr.acinq.phoenix.utils.PlatformContext
+import fr.acinq.phoenix.utils.getDatabaseFilesDirectoryPath
 
 actual fun testChannelsDriver(): SqlDriver {
-    return NativeSqliteDriver(ChannelsDatabase.Schema, ":memory:")
-}
+    val schema = ChannelsDatabase.Schema
 
-actual fun testPaymentsDriver(): SqlDriver {
     // In-memory databases don't seem to work on native/iOS.
     // The call succeeds, but in reality it creates a persistent database,
     // which then breaks our unit test logic.
-//  return NativeSqliteDriver(PaymentsDatabase.Schema, ":memory:")
     // The docs reference other ways of making in-memory databases:
     // https://sqlite.org/inmemorydb.html
     // But none of them seem to work (at the time of writing).
-    //
-    // Current workaround is to create a fresh database for each test.
-    val randomName = Lightning.randomBytes32().toHex()
-    return NativeSqliteDriver(PaymentsDatabase.Schema, randomName)
+    // So the current workaround is to create a fresh database for each test.
+//  val name = ":memory:"
+    val name = Lightning.randomBytes32().toHex()
+
+    val dbDir = getDatabaseFilesDirectoryPath(PlatformContext())
+    val configuration = DatabaseConfiguration(
+        name = name,
+        version = schema.version,
+        extendedConfig = DatabaseConfiguration.Extended(
+            basePath = dbDir,
+            foreignKeyConstraints = true // <= official solution doesn't work :(
+        ),
+        create = { connection ->
+            wrapConnection(connection) { schema.create(it) }
+        },
+        upgrade = { connection, oldVersion, newVersion ->
+            wrapConnection(connection) { schema.migrate(it, oldVersion, newVersion) }
+        }
+    )
+    return NativeSqliteDriver(configuration)
+}
+
+actual fun testPaymentsDriver(): SqlDriver {
+    val schema = PaymentsDatabase.Schema
+
+    // In-memory databases don't seem to work on native/iOS.
+    // See explanation above.
+//  val name = ":memory:"
+    val name = Lightning.randomBytes32().toHex()
+
+    val dbDir = getDatabaseFilesDirectoryPath(PlatformContext())
+    val configuration = DatabaseConfiguration(
+        name = name,
+        version = schema.version,
+        extendedConfig = DatabaseConfiguration.Extended(
+            basePath = dbDir,
+            foreignKeyConstraints = true // <= official solution doesn't work :(
+        ),
+        create = { connection ->
+            wrapConnection(connection) { schema.create(it) }
+        },
+        upgrade = { connection, oldVersion, newVersion ->
+            wrapConnection(connection) { schema.migrate(it, oldVersion, newVersion) }
+        }
+    )
+    return NativeSqliteDriver(configuration)
 }
 
 // Workaround for known bugs in SQLDelight on native/iOS.

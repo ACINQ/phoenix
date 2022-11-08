@@ -58,11 +58,7 @@ class SqliteChannelsDatabaseTest {
         val cltvExpiry2 = CltvExpiry(456)
 
         // cannot add htlc if no channels
-        // FIXME: this check fails on iOS
-        // The foreign_keys constraint isn't properly enabled for native/iOS.
-        // More information can be found here:
-        // https://github.com/cashapp/sqldelight/issues/1356
-        // assertFails { db.addHtlcInfo(normal.channelId, commitNumber, paymentHash1, cltvExpiry1) }
+        assertFails { db.addHtlcInfo(normal.channelId, commitNumber, paymentHash1, cltvExpiry1) }
 
         // db is empty
         assertEquals(0, db.listLocalChannels().size)

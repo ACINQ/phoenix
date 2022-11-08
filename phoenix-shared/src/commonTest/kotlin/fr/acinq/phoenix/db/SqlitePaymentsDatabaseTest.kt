@@ -314,18 +314,12 @@ class SqlitePaymentsDatabaseTest {
             OutgoingPayment.LightningPart(UUID.randomUUID(), 5_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), OutgoingPayment.LightningPart.Status.Pending, 115),
             OutgoingPayment.LightningPart(UUID.randomUUID(), 10_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), OutgoingPayment.LightningPart.Status.Pending, 120),
         )
-        if (isIOS()) {
-            // This is a known bug in SQLDelight on iOS.
-            // The problem is that foreign key constraints are disabled.
-            // See iosDbFactory.kt for discussion.
-        } else {
-            assertFails { db.addOutgoingLightningParts(UUID.randomUUID(), newParts) }
-            assertFails {
-                db.addOutgoingLightningParts(
-                    parentId = onePartFailed.id,
-                    parts = newParts.map { it.copy(id = p.parts[0].id) }
-                )
-            }
+        assertFails { db.addOutgoingLightningParts(UUID.randomUUID(), newParts) }
+        assertFails {
+            db.addOutgoingLightningParts(
+                parentId = onePartFailed.id,
+                parts = newParts.map { it.copy(id = p.parts[0].id) }
+            )
         }
 
         // Can add new parts to existing payment.
