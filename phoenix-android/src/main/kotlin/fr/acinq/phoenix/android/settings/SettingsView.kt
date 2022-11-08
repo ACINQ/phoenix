@@ -42,6 +42,7 @@ fun SettingsView() {
             SettingButton(text = R.string.settings_electrum, icon = R.drawable.ic_chain, onClick = { nc.navigate(Screen.ElectrumServer) })
             SettingButton(text = R.string.settings_tor, icon = R.drawable.ic_tor_shield, onClick = { })
             SettingButton(text = R.string.settings_payment_settings, icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings)})
+            SettingButton(text = R.string.settings_mutual_close, icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose) })
         }
 
         // -- security
@@ -56,7 +57,6 @@ fun SettingsView() {
         Card {
             SettingButton(text = R.string.settings_list_channels, icon = R.drawable.ic_zap, onClick = { nc.navigate(Screen.Channels) })
             SettingButton(text = R.string.settings_logs, icon = R.drawable.ic_text, onClick = { nc.navigate(Screen.Logs)})
-            SettingButton(text = R.string.settings_mutual_close, icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose) })
             SettingButton(text = R.string.settings_force_close, icon = R.drawable.ic_alert_triangle, onClick = { })
         }
         Spacer(Modifier.height(32.dp))

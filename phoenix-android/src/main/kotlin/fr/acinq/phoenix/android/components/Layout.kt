@@ -115,6 +115,23 @@ fun DialogBody(
     }
 }
 
+@Composable
+fun ConfirmDialog(
+    message: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    Dialog(
+        onDismiss = onDismiss,
+        buttons = {
+            Button(text = stringResource(id = R.string.btn_cancel), onClick = onDismiss)
+            Button(text = stringResource(id = R.string.btn_confirm), onClick = onConfirm)
+        }
+    ) {
+        Text(text = message)
+    }
+}
+
 /** The default screen is a full-height, full-width column with the material theme's background color. It is scrollable by default. */
 @Composable
 fun DefaultScreenLayout(

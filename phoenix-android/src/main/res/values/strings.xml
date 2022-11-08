@@ -215,8 +215,6 @@
 
     <!-- #1: sign / #2: integer part / #3: decimal part / #4: unit -->
     <string name="utils_converted_amount">≈ %1$s</string>
-    <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
-    <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
     <string name="utils_unknown_amount" translatable="false">!?</string>
     <string name="utils_no_conversion">BTC exchange rate unavailable</string>
     <string name="utils_amount_hint">Amount</string>
@@ -257,7 +255,7 @@
     <string name="settings_list_channels">Payment channels</string>
     <string name="settings_logs">Logs</string>
     <string name="settings_electrum">Electrum server</string>
-    <string name="settings_mutual_close">Close all channels</string>
+    <string name="settings_mutual_close">Drain wallet</string>
     <string name="settings_force_close">Danger zone</string>
     <string name="settings_tor">Tor</string>
     <string name="settings_about">About</string>
@@ -285,31 +283,21 @@
 
     <!-- //////////////// close all channels //////////////// -->
 
-    <string name="closechannels_title">Close channels</string>
-    <string name="closechannels_mutual_title">Close my channels</string>
-    <string name="closechannels_mutual_subtitle">Use this screen to close your payments channels and drain your funds to a Bitcoin address.</string>
-    <string name="closechannels_checking_channels">Checking your channels, please hold…</string>
-    <string name="closechannels_channels_recap">You have %1$d active Lightning channel(s) holding an aggregated balance of %2$s. Closing those channels will send funds to the provided Bitcoin address.\n\nMake sure that this address is correct.</string>
-    <string name="closechannels_channels_none">You currently don\'t have any channels that could be closed.</string>
-    <string name="closechannels_mutual_input_hint">Bitcoin address</string>
-    <string name="closechannels_mutual_button">Drain my wallet</string>
-    <string name="closechannels_force_title">Force close</string>
-    <string name="closechannels_force_instructions"><![CDATA[
-    Force close allows you to unilaterally close your channels.
-    <br/><br/>
-    This feature is not a &quot;fix everything magic button&quot;; it is here as a safety measure and <b>should only be used in extreme scenarii</b>. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, <b>if you experience issues with Phoenix you should contact support</b>.
-    <br/><br/>
-    Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days. <b>Do not uninstall the app until your channels are fully closed or you will lose money.</b>
-    <br/><br/>
-    <b>Do not use this feature if you don\'t fully understand what it does.</b>
-  ]]></string>
-    <string name="closechannels_force_destination">Funds will eventually be sent to:</string>
-    <string name="closechannels_force_destination_desc">This address is derived from your seed and belongs to you.</string>
-    <string name="closechannels_force_button">Force close channels</string>
-    <string name="closechannels_confirm_dialog_message">Are you sure you want to proceed?</string>
-    <string name="closechannels_message_error">There was a problem. Please try again later.</string>
-    <string name="closechannels_message_done">%1$d channel(s) have been closed. You can find the details in the home screen.</string>
-    <string name="closechannels_message_in_progress">Please wait…</string>
+    <string name="mutualclose_title">Drain my wallet</string>
+    <string name="mutualclose_loading">Loading…</string>
+    <string name="mutualclose_checking_balance">Checking balance…</string>
+    <string name="mutualclose_balance">Balance: <b>%1$s</b> (≈ %2$s)</string>
+    <string name="mutualclose_no_channels">The wallet does not have any channels and cannot be drained.</string>
+    <string name="mutualclose_input_instructions">Send all funds to a Bitcoin wallet. All payments channels will be closed.</string>
+    <string name="mutualclose_input_hint">Bitcoin address</string>
+    <string name="mutualclose_input_placeholder">Enter a Bitcoin address here</string>
+    <string name="mutualclose_button">Drain my wallet</string>
+    <string name="mutualclose_error_chain_mismatch">This address uses a different blockchain</string>
+    <string name="mutualclose_error_chain_reqparams">This address uses unsupported features</string>
+    <string name="mutualclose_error_chain_generic">This address is not supported</string>
+    <string name="mutualclose_confirm">Are you sure you want to proceed?</string>
+    <string name="mutualclose_done">%1$d channel(s) have been closed. You can find the details in the home screen.</string>
+    <string name="mutualclose_inprogress">Please wait…</string>
 
     <!-- //////////////// list all channels //////////////// -->
 

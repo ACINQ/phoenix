@@ -149,7 +149,6 @@ fun ScanDataView(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ReadDataView(
     model: Scan.Model,
@@ -168,16 +167,6 @@ fun ReadDataView(
         ScannerView(
             onScanViewBinding = { _scanView = it },
             onScannedText = onScannedText
-        )
-
-        // visor
-        Box(
-            Modifier
-                .width(dimensionResource(id = R.dimen.scanner_size))
-                .height(dimensionResource(id = R.dimen.scanner_size))
-                .clip(RoundedCornerShape(24.dp))
-                .background(whiteLowOp())
-                .align(Alignment.Center)
         )
 
         if (model is Scan.Model.BadRequest) {
@@ -222,7 +211,7 @@ fun ReadDataView(
 }
 
 @Composable
-private fun ScannerView(
+fun BoxScope.ScannerView(
     onScanViewBinding: (DecoratedBarcodeView) -> Unit,
     onScannedText: (String) -> Unit
 ) {
@@ -251,7 +240,17 @@ private fun ScannerView(
                 scanView.resume()
             }
             binding
-        })
+        }
+    )
+    // visor
+    Box(
+        Modifier
+            .width(dimensionResource(id = R.dimen.scanner_size))
+            .height(dimensionResource(id = R.dimen.scanner_size))
+            .clip(RoundedCornerShape(24.dp))
+            .background(whiteLowOp())
+            .align(Alignment.Center)
+    )
 }
 
 

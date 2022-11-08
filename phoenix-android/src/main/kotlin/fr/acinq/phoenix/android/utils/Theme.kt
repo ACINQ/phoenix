@@ -271,7 +271,9 @@ fun textFieldColors() = TextFieldDefaults.textFieldColors(
 @Composable
 fun outlinedTextFieldColors() = TextFieldDefaults.outlinedTextFieldColors(
     focusedLabelColor = MaterialTheme.colors.primary,
+    unfocusedLabelColor = MaterialTheme.typography.caption.color,
     focusedBorderColor = MaterialTheme.colors.primary,
+    unfocusedBorderColor = borderColor(),
     disabledTextColor = MaterialTheme.colors.onSurface,
     disabledBorderColor = MaterialTheme.colors.onSurface,
     disabledLabelColor = MaterialTheme.colors.onSurface,
