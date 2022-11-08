@@ -21,11 +21,11 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.payment.FinalFailure
-import fr.acinq.lightning.serialization.v1.ByteVector32KSerializer
-import fr.acinq.lightning.serialization.v1.SatoshiKSerializer
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.db.payments.DbTypesHelper.decodeBlob
+import fr.acinq.phoenix.db.serializers.v1.ByteVector32KSerializer
+import fr.acinq.phoenix.db.serializers.v1.SatoshiKSerializer
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable

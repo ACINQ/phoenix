@@ -19,9 +19,11 @@ package fr.acinq.phoenix.db.payments
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.serialization.v1.ByteVector32KSerializer
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
+import fr.acinq.phoenix.db.serializers.v1.ByteVector32KSerializer
+import fr.acinq.phoenix.db.serializers.v1.MilliSatoshiSerializer
+import fr.acinq.phoenix.db.serializers.v1.UUIDSerializer
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.*
@@ -47,6 +49,7 @@ sealed class IncomingReceivedWithData {
         @Serializable
         @Suppress("DEPRECATION")
         data class V0(
+            @Serializable(with = MilliSatoshiSerializer::class)
             val fees: MilliSatoshi,
             @Serializable(with = ByteVector32KSerializer::class)
             val channelId: ByteVector32?
@@ -65,16 +68,38 @@ sealed class IncomingReceivedWithData {
     sealed class Part : IncomingReceivedWithData() {
         sealed class Htlc : Part() {
             @Serializable
-            data class V0(val amount: MilliSatoshi, @Serializable(with = ByteVector32KSerializer::class) val channelId: ByteVector32, val htlcId: Long) : Htlc()
+            data class V0(
+                @Serializable(with = MilliSatoshiSerializer::class)
+                val amount: MilliSatoshi,
+                @Serializable(with = ByteVector32KSerializer::class)
+                val channelId: ByteVector32,
+                val htlcId: Long
+            ) : Htlc()
         }
         sealed class NewChannel : Part() {
             @Deprecated("Legacy type. Use V1 instead for new parts, with the new `id` field.")
             @Serializable
-            data class V0(val amount: MilliSatoshi, val fees: MilliSatoshi, @Serializable(with = ByteVector32KSerializer::class) val channelId: ByteVector32?) : NewChannel()
+            data class V0(
+                @Serializable(with = MilliSatoshiSerializer::class)
+                val amount: MilliSatoshi,
+                @Serializable(with = MilliSatoshiSerializer::class)
+                val fees: MilliSatoshi,
+                @Serializable(with = ByteVector32KSerializer::class)
+                val channelId: ByteVector32?
+            ) : NewChannel()
 
             /** V1 contains a new `id` field that ensure that each [NewChannel] is unique. Old V0 data will use a random UUID to respect the [IncomingPayment.ReceivedWith.NewChannel] interface. */
             @Serializable
-            data class V1(val id: UUID, val amount: MilliSatoshi, val fees: MilliSatoshi, @Serializable(with = ByteVector32KSerializer::class) val channelId: ByteVector32?) : NewChannel()
+            data class V1(
+                @Serializable(with = UUIDSerializer::class)
+                val id: UUID,
+                @Serializable(with = MilliSatoshiSerializer::class)
+                val amount: MilliSatoshi,
+                @Serializable(with = MilliSatoshiSerializer::class)
+                val fees: MilliSatoshi,
+                @Serializable(with = ByteVector32KSerializer::class)
+                val channelId: ByteVector32?
+            ) : NewChannel()
         }
     }
 

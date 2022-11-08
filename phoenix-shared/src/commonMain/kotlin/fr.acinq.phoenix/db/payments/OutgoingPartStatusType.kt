@@ -18,7 +18,7 @@ package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.lightning.serialization.v1.ByteVector32KSerializer
+import fr.acinq.phoenix.db.serializers.v1.ByteVector32KSerializer
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
