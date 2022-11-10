@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+@file:UseSerializers(
+    SatoshiSerializer::class,
+    ByteVector32Serializer::class,
+)
+
 package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
@@ -24,11 +29,12 @@ import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.db.payments.DbTypesHelper.decodeBlob
-import fr.acinq.phoenix.db.serializers.v1.ByteVector32KSerializer
-import fr.acinq.phoenix.db.serializers.v1.SatoshiKSerializer
+import fr.acinq.phoenix.db.serializers.v1.ByteVector32Serializer
+import fr.acinq.phoenix.db.serializers.v1.SatoshiSerializer
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -45,14 +51,14 @@ sealed class OutgoingStatusData {
 
     sealed class SucceededOffChain : OutgoingStatusData() {
         @Serializable
-        data class V0(@Serializable(with = ByteVector32KSerializer::class) val preimage: ByteVector32) : SucceededOffChain()
+        data class V0(@Serializable val preimage: ByteVector32) : SucceededOffChain()
     }
 
     sealed class SucceededOnChain : OutgoingStatusData() {
         @Serializable
         data class V0(
-            val txIds: List<@Serializable(with = ByteVector32KSerializer::class) ByteVector32>,
-            @Serializable(with = SatoshiKSerializer::class) val claimed: Satoshi,
+            val txIds: List<@Serializable ByteVector32>,
+            @Serializable val claimed: Satoshi,
             val closingType: String
         ) : SucceededOnChain()
 

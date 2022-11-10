@@ -17,10 +17,14 @@
 package fr.acinq.phoenix.db.serializers.v1
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.OutPoint
 
-
-object ByteVector32Serializer : AbstractStringSerializer<ByteVector32>(
-    name = "ByteVector32",
-    toString = ByteVector32::toHex,
-    fromString = ::ByteVector32
+class OutpointSerializer : AbstractStringSerializer<OutPoint>(
+    name = "Outpoint",
+    fromString = { str ->
+        str.split(":").let {
+            OutPoint(ByteVector32.fromValidHex(it[0]), it[1].toLong())
+        }
+    },
+    toString = { outpoint -> "${outpoint.hash.toHex()}:${outpoint.index}" }
 )

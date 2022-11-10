@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
+@file:UseSerializers(
+    SatoshiSerializer::class,
+    ByteVector32Serializer::class,
+)
+
 package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.phoenix.db.serializers.v1.ByteVector32KSerializer
-import fr.acinq.phoenix.db.serializers.v1.SatoshiKSerializer
+import fr.acinq.phoenix.db.serializers.v1.ByteVector32Serializer
+import fr.acinq.phoenix.db.serializers.v1.SatoshiSerializer
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -46,18 +52,18 @@ sealed class OutgoingDetailsData {
 
     sealed class KeySend : OutgoingDetailsData() {
         @Serializable
-        data class V0(@Serializable(with = ByteVector32KSerializer::class) val preimage: ByteVector32) : KeySend()
+        data class V0(@Serializable val preimage: ByteVector32) : KeySend()
     }
 
     sealed class SwapOut : OutgoingDetailsData() {
         @Serializable
-        data class V0(val address: String, val paymentRequest: String, @Serializable(with = SatoshiKSerializer::class) val swapOutFee: Satoshi) : SwapOut()
+        data class V0(val address: String, val paymentRequest: String, @Serializable val swapOutFee: Satoshi) : SwapOut()
     }
 
     sealed class Closing : OutgoingDetailsData() {
         @Serializable
         data class V0(
-            @Serializable(with = ByteVector32KSerializer::class) val channelId: ByteVector32,
+            @Serializable val channelId: ByteVector32,
             val closingAddress: String,
             val isSentToDefaultAddress: Boolean
         ) : Closing()

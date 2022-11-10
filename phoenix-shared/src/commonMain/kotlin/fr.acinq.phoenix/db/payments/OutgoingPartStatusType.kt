@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
+@file:UseSerializers(
+    ByteVector32Serializer::class,
+)
+
 package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.phoenix.db.serializers.v1.ByteVector32KSerializer
+import fr.acinq.phoenix.db.serializers.v1.ByteVector32Serializer
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -36,7 +41,7 @@ sealed class OutgoingPartStatusData {
 
     sealed class Succeeded : OutgoingPartStatusData() {
         @Serializable
-        data class V0(@Serializable(with = ByteVector32KSerializer::class) val preimage: ByteVector32) : Succeeded()
+        data class V0(@Serializable val preimage: ByteVector32) : Succeeded()
     }
 
     sealed class Failed : OutgoingPartStatusData() {
