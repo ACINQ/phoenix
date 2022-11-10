@@ -303,7 +303,7 @@
 
     <string name="listallchannels_title">Channels List</string>
     <string name="listallchannels_in_progress">Please hold…</string>
-    <string name="listallchannels_node_id">Node id: %1$s</string>
+    <string name="listallchannels_node_id">Node id:</string>
     <string name="listallchannels_no_channels">You don\'t have any channels yet.\n\nPayments channels are created automatically when needed to receive payments.</string>
     <plurals name="listallchannels_channels_header">
         <item quantity="one">You have %1$d channel.</item>
@@ -483,11 +483,12 @@
 
     <!-- //////////////// channel state state //////////////// -->
 
-    <string name="state_wait_confirmed">Funding tx is being confirmed</string>
+    <string name="state_wait_confirmed">Waiting for confirmation</string>
+    <string name="state_wait_open">Waiting for peer</string>
     <string name="state_closing">Channel is closing</string>
     <string name="state_closed">Channel has been closed</string>
     <string name="state_normal">Up and running</string>
-    <string name="state_sync">Synchronizing with peer</string>
+    <string name="state_sync">Synchronizing</string>
     <string name="state_offline">Peer is offline</string>
     <string name="state_shutdown">Shutdown</string>
 
