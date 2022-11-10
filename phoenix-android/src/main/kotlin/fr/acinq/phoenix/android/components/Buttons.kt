@@ -85,24 +85,25 @@ fun BorderButton(
 @Composable
 fun FilledButton(
     modifier: Modifier = Modifier,
-    text: Int? = null,
+    text: String? = null,
     icon: Int? = null,
     iconTint: Color = MaterialTheme.colors.onPrimary,
     enabled: Boolean = true,
     space: Dp = 12.dp,
+    shape: Shape = CircleShape,
     textStyle: TextStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.onPrimary),
     padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     backgroundColor: Color = MaterialTheme.colors.primary,
     onClick: () -> Unit,
 ) {
     Button(
-        text = text?.run { stringResource(this) },
+        text = text,
         icon = icon,
         iconTint = iconTint,
         enabled = enabled,
         space = space,
         onClick = onClick,
-        shape = CircleShape,
+        shape = shape,
         backgroundColor = backgroundColor,
         textStyle = textStyle,
         padding = padding,

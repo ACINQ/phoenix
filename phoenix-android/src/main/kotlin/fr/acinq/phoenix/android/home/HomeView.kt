@@ -165,7 +165,7 @@ fun TopBar(
             val electrumConnection = connectionsState?.electrum
             val isBadElectrumCert = electrumConnection != null && electrumConnection is Connection.CLOSED && electrumConnection.isBadCertificate()
             FilledButton(
-                text = if (isBadElectrumCert) R.string.home__connection__bad_cert else R.string.home__connection__connecting,
+                text = stringResource(id = if (isBadElectrumCert) R.string.home__connection__bad_cert else R.string.home__connection__connecting),
                 icon = if (isBadElectrumCert) R.drawable.ic_alert_triangle else R.drawable.ic_connection_lost,
                 iconTint = if (isBadElectrumCert) negativeColor() else LocalContentColor.current,
                 onClick = onConnectionsStateButtonClick,

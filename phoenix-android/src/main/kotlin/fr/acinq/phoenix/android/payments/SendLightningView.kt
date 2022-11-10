@@ -120,7 +120,7 @@ fun SendLightningPaymentView(
         }
         Spacer(modifier = Modifier.height(36.dp))
         FilledButton(
-            text = R.string.send_pay_button,
+            text = stringResource(id = R.string.send_pay_button),
             icon = R.drawable.ic_send,
             enabled = amount != null && amountErrorMessage.isBlank(),
         ) {

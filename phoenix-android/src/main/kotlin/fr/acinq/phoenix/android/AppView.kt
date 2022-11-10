@@ -177,7 +177,10 @@ fun AppView(
                     ChannelsView()
                 }
                 composable(Screen.MutualClose.route) {
-                    MutualCloseView()
+                    MutualCloseView(onBackClick = { navController.popBackStack() })
+                }
+                composable(Screen.ForceClose.route) {
+                    ForceCloseView(onBackClick = { navController.popBackStack() })
                 }
                 composable(Screen.Preferences.route) {
                     DisplayPrefsView()

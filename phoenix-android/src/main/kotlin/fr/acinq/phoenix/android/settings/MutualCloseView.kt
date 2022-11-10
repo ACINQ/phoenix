@@ -46,9 +46,10 @@ import fr.acinq.phoenix.utils.Parser
 
 
 @Composable
-fun MutualCloseView() {
+fun MutualCloseView(
+    onBackClick: () -> Unit,
+) {
     val log = logger("MutualCloseView")
-    val nc = navController
     val context = LocalContext.current
     val balance by business.peerManager.balance.collectAsState(0.msat)
 
@@ -92,7 +93,7 @@ fun MutualCloseView() {
         } else {
             DefaultScreenLayout {
                 DefaultScreenHeader(
-                    onBackClick = { nc.popBackStack() },
+                    onBackClick = onBackClick,
                     title = stringResource(id = R.string.mutualclose_title),
                 )
                 when (model) {

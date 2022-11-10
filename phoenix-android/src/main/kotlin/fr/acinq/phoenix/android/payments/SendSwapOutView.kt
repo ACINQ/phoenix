@@ -180,7 +180,7 @@ fun SendSwapOutView(
                         )
                     } else {
                         FilledButton(
-                            text = R.string.send_pay_button,
+                            text = stringResource(id = R.string.send_pay_button),
                             icon = R.drawable.ic_send,
                             enabled = amountErrorMessage.isBlank()
                         ) {

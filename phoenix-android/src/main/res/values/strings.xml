@@ -299,6 +299,12 @@
     <string name="mutualclose_done">%1$d channel(s) have been closed. You can find the details in the home screen.</string>
     <string name="mutualclose_inprogress">Please wait…</string>
 
+    <string name="forceclose_title">Force-close channels</string>
+    <string name="forceclose_no_channels">No channels to close</string>
+    <string name="forceclose_instructions">This screen allows you to unilaterally close your channels.\n\nThis is not a \"fix-everything\" magic button: it is here as a safety measure and <b>should only be used in extreme scenarios</b>. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, <b>if you experience issues with Phoenix you should contact support</b>.\n\nForce closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days.\n\n<b>Do not uninstall the app until your channels are fully closed or you will lose money.</b>\n\n<b>Do not use this feature if you don\'t fully understand what it does.</b></string>
+    <string name="forceclose_address_label">Funds will eventually be sent to:</string>
+    <string name="forceclose_button">Force-close all my channels</string>
+
     <!-- //////////////// list all channels //////////////// -->
 
     <string name="listallchannels_title">Channels List</string>

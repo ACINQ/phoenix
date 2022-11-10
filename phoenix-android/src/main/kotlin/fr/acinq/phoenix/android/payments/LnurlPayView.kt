@@ -132,7 +132,7 @@ fun LnurlPayView(
                     RemoteErrorResponseView(model.lnurlPay, error)
                 }
                 FilledButton(
-                    text = R.string.lnurl_pay_pay_button,
+                    text = stringResource(id = R.string.lnurl_pay_pay_button),
                     icon = R.drawable.ic_send,
                     enabled = amount != null && amountErrorMessage.isBlank(),
                 ) {

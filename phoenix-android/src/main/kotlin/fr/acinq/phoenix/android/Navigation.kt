@@ -44,6 +44,7 @@ sealed class Screen(val route: String) {
     object ElectrumServer : Screen("settings/electrum")
     object Channels : Screen("settings/channels")
     object MutualClose : Screen("settings/mutualclose")
+    object ForceClose : Screen("settings/forceclose")
     object Preferences : Screen("settings/preferences")
     object About : Screen("settings/about")
     object AppLock : Screen("settings/applock")
