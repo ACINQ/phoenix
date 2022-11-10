@@ -203,7 +203,8 @@ object LegacyMigrationHelper {
                 IncomingPayment.ReceivedWith.NewChannel(
                     id = UUID.randomUUID(),
                     amount = status.amount().toLong().msat,
-                    fees = payToOpenMeta?.fee_sat?.sat?.toMilliSatoshi() ?: 0.msat,
+                    serviceFee = payToOpenMeta?.fee_sat?.sat?.toMilliSatoshi() ?: 0.msat,
+                    fundingFee = 0.sat,
                     channelId = ByteVector32.Zeroes
                 )
             } else {

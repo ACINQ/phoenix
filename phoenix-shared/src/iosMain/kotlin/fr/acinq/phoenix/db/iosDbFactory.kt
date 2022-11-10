@@ -32,12 +32,16 @@ actual fun createChannelsDbDriver(
     val schema = ChannelsDatabase.Schema
     val name = "channels-${chain.name.lowercase()}-$nodeIdHash.sqlite"
 
+    // The foreign_keys constraint needs to be set via the DatabaseConfiguration:
+    // https://github.com/cashapp/sqldelight/issues/1356
+
     val dbDir = getDatabaseFilesDirectoryPath(ctx)
     val configuration = DatabaseConfiguration(
         name = name,
         version = schema.version,
         extendedConfig = DatabaseConfiguration.Extended(
-            basePath = dbDir
+            basePath = dbDir,
+            foreignKeyConstraints = true
         ),
         create = { connection ->
             wrapConnection(connection) { schema.create(it) }
@@ -57,19 +61,13 @@ actual fun createPaymentsDbDriver(
     val schema = PaymentsDatabase.Schema
     val name = "payments-${chain.name.lowercase()}-$nodeIdHash.sqlite"
 
-    // The foreign_keys constraint isn't properly enabled for native/iOS.
-    // More information can be found here:
-    // https://github.com/cashapp/sqldelight/issues/1356
-    //
-    // The official solution is implemented below, however it doesn't work.
-
     val dbDir = getDatabaseFilesDirectoryPath(ctx)
     val configuration = DatabaseConfiguration(
         name = name,
         version = schema.version,
         extendedConfig = DatabaseConfiguration.Extended(
             basePath = dbDir,
-            foreignKeyConstraints = true // <= official solution doesn't work :(
+            foreignKeyConstraints = true
         ),
         create = { connection ->
             wrapConnection(connection) { schema.create(it) }
@@ -92,7 +90,8 @@ actual fun createAppDbDriver(
         name = name,
         version = schema.version,
         extendedConfig = DatabaseConfiguration.Extended(
-            basePath = dbDir
+            basePath = dbDir,
+            foreignKeyConstraints = true
         ),
         create = { connection ->
             wrapConnection(connection) { schema.create(it) }

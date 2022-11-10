@@ -48,8 +48,7 @@ class DatabaseManager(
 
                 val nodeIdHash = nodeParams.nodeId.hash160().toHexString()
                 val channelsDb = SqliteChannelsDb(
-                    driver = createChannelsDbDriver(ctx, chain, nodeIdHash),
-                    nodeParams = nodeParams.copy()
+                    driver = createChannelsDbDriver(ctx, chain, nodeIdHash)
                 )
                 val paymentsDb = SqlitePaymentsDb(
                     driver = createPaymentsDbDriver(ctx, chain, nodeIdHash),
