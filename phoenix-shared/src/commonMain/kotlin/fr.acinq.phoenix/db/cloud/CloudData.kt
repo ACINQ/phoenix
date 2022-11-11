@@ -127,6 +127,6 @@ fun CloudData.Companion.cborDeserialize(blob: ByteArray): CloudData? {
 // To optimize for JSON, you would use ByteVector's,
 // and encode the data as Base64 via ByteVectorJsonSerializer.
 
-fun CloudData.jsonSerialize(): ByteArray {
-    return Json.encodeToString(this).encodeToByteArray()
+fun CloudData.jsonSerialize(): String {
+    return Json.encodeToString(this)
 }

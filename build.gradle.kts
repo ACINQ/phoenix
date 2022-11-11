@@ -30,3 +30,12 @@ allprojects {
 val clean by tasks.creating(Delete::class) {
     delete(rootProject.buildDir)
 }
+
+afterEvaluate {
+    tasks.withType<org.jetbrains.kotlin.gradle.targets.jvm.tasks.KotlinJvmTest> {
+        environment("TEST_RESOURCES_PATH", projectDir.resolve("phoenix-shared/src/commonTest/resources"))
+    }
+    tasks.withType<org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeHostTest> {
+        environment("TEST_RESOURCES_PATH", projectDir.resolve("phoenix-shared/src/commonTest/resources"))
+    }
+}
