@@ -19,6 +19,7 @@ package fr.acinq.phoenix.android.home
 import android.content.Context
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,13 +29,15 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import fr.acinq.phoenix.android.*
+import fr.acinq.phoenix.android.AppViewModel
+import fr.acinq.phoenix.android.LockState
+import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.android.service.NodeService
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.utils.BiometricsHelper
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
@@ -44,12 +47,9 @@ import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import fr.acinq.phoenix.legacy.utils.Wallet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import org.kodein.log.Logger
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun StartupView(
     mainActivity: MainActivity,
@@ -57,71 +57,99 @@ fun StartupView(
     onKeyAbsent: () -> Unit,
     onBusinessStarted: () -> Unit,
 ) {
-    val log = logger("StartupView")
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val walletState = appVM.walletState.observeAsState()
-    val isLockActive by UserPrefs.getIsScreenLockActive(context).collectAsState(initial = null)
+    val walletState by appVM.walletState.observeAsState()
+    val isLockActiveState by UserPrefs.getIsScreenLockActive(context).collectAsState(initial = null)
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
-        when (isLockActive) {
-            null -> Text(stringResource(id = R.string.startup_check_lock))
-            true -> when (appVM.lockState) {
-                is LockState.Locked -> {
-                    LaunchedEffect(key1 = true) {
-                        val promptInfo = BiometricPrompt.PromptInfo.Builder().apply {
-                            setTitle(context.getString(R.string.authprompt_title))
-                            setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL or BiometricManager.Authenticators.BIOMETRIC_WEAK)
-                        }.build()
-                        BiometricsHelper.getPrompt(
-                            activity = mainActivity,
-                            onSuccess = { appVM.lockState = LockState.Unlocked },
-                            onFailure = { appVM.lockState = LockState.Locked.WithError(it) },
-                            onCancel = { log.debug { "cancelled auth prompt" } }
-                        ).authenticate(promptInfo)
-                    }
-                }
-                is LockState.Unlocked -> {
-                    AttemptStart(
-                        context = context,
-                        scope = scope,
-                        log = log,
-                        appVM = appVM,
-                        walletState = walletState.value,
-                        onKeyAbsent = onKeyAbsent,
-                        onBusinessStarted = onBusinessStarted
-                    )
-                }
-            }
-            false -> {
-                AttemptStart(
-                    context = context,
-                    scope = scope,
-                    log = log,
-                    appVM = appVM,
-                    walletState = walletState.value,
+        Column(modifier = Modifier.weight(.55f), verticalArrangement = Arrangement.Bottom) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_phoenix),
+                contentDescription = "phoenix-icon",
+            )
+        }
+        Column(modifier = Modifier.weight(.45f), verticalArrangement = Arrangement.Top) {
+            isLockActiveState?.let {
+                LoadOrUnlock(
+                    mainActivity = mainActivity,
+                    isLockActive = it,
+                    lockState = appVM.lockState,
+                    walletState = walletState,
+                    startBusiness = { seed, checkLegacyChannels -> appVM.service?.startBusiness(seed, checkLegacyChannels) },
+                    onUnlockSuccess = { appVM.lockState = LockState.Unlocked },
+                    onUnlockFailure = { appVM.lockState = LockState.Locked.WithError(it) },
                     onKeyAbsent = onKeyAbsent,
-                    onBusinessStarted = onBusinessStarted
+                    onBusinessStarted = onBusinessStarted,
                 )
-            }
+            } ?: Text(stringResource(id = R.string.startup_check_lock))
         }
     }
 }
 
 @Composable
-private fun AttemptStart(
-    context: Context,
-    scope: CoroutineScope,
-    log: Logger,
-    appVM: AppViewModel,
+private fun LoadOrUnlock(
+    mainActivity: MainActivity,
+    isLockActive: Boolean,
+    lockState: LockState,
     walletState: WalletState?,
+    startBusiness: (ByteArray, Boolean) -> Unit,
+    onUnlockSuccess: (cryptoObject: BiometricPrompt.CryptoObject?) -> Unit,
+    onUnlockFailure: (Int?) -> Unit,
     onKeyAbsent: () -> Unit,
     onBusinessStarted: () -> Unit,
 ) {
+    val log = logger("StartupView")
+    val context = LocalContext.current
+    if (isLockActive) {
+        when (lockState) {
+            is LockState.Locked -> {
+                LaunchedEffect(key1 = true) {
+                    val promptInfo = BiometricPrompt.PromptInfo.Builder().apply {
+                        setTitle(context.getString(R.string.authprompt_title))
+                        setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL or BiometricManager.Authenticators.BIOMETRIC_WEAK)
+                    }.build()
+                    BiometricsHelper.getPrompt(
+                        activity = mainActivity,
+                        onSuccess = onUnlockSuccess,
+                        onFailure = onUnlockFailure,
+                        onCancel = { log.debug { "cancelled auth prompt" } }
+                    ).authenticate(promptInfo)
+                }
+            }
+            is LockState.Unlocked -> {
+                LoadingView(
+                    context = context,
+                    walletState = walletState,
+                    startBusiness = startBusiness,
+                    onKeyAbsent = onKeyAbsent,
+                    onBusinessStarted = onBusinessStarted
+                )
+            }
+        }
+    } else {
+        LoadingView(
+            context = context,
+            walletState = walletState,
+            startBusiness = startBusiness,
+            onKeyAbsent = onKeyAbsent,
+            onBusinessStarted = onBusinessStarted
+        )
+    }
+}
+
+@Composable
+private fun LoadingView(
+    context: Context,
+    walletState: WalletState?,
+    startBusiness: (ByteArray, Boolean) -> Unit,
+    onKeyAbsent: () -> Unit,
+    onBusinessStarted: () -> Unit,
+) {
+    val log = logger("StartupView")
+    val scope = rememberCoroutineScope()
     val legacyAppStatus = PrefsDatastore.getLegacyAppStatus(context).collectAsState(null).value
     when (walletState) {
         is WalletState.Off -> {
@@ -138,25 +166,31 @@ private fun AttemptStart(
                     log.info { "wallet ready to start with legacyAppStatus=$legacyAppStatus" }
                     when (legacyAppStatus) {
                         LegacyAppStatus.Unknown -> {
-                            Text(stringResource(id = R.string.startup_wait_legacy_check))
                             if (Wallet.getEclairDBFile(context).exists()) {
+                                Text(stringResource(id = R.string.startup_wait_legacy_check))
                                 log.info { "found legacy database file while in unknown legacy status; switching to legacy app" }
                                 LaunchedEffect(true) {
                                     PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
                                 }
                             } else {
-                                StartKMP(scope = scope, service = appVM.service, encryptedSeed = keyState.encryptedSeed, checkLegacyChannel = true)
+                                Text(stringResource(id = R.string.startup_checking_seed))
+                                LaunchedEffect(keyState.encryptedSeed) {
+                                    startBusiness(scope, keyState.encryptedSeed, doStartBusiness = { startBusiness(it, true) })
+                                }
                             }
                         }
                         LegacyAppStatus.NotRequired -> {
-                            StartKMP(scope = scope, service = appVM.service, encryptedSeed = keyState.encryptedSeed, checkLegacyChannel = false)
+                            Text(stringResource(id = R.string.startup_checking_seed))
+                            LaunchedEffect(keyState.encryptedSeed) {
+                                startBusiness(scope, keyState.encryptedSeed, doStartBusiness = { startBusiness(it, false) })
+                            }
                         }
                         else -> Text(stringResource(id = R.string.startup_wait))
                     }
                 }
             }
         }
-        is WalletState.Disconnected -> Text(stringResource(id = R.string.startup_binding_service))
+        null, is WalletState.Disconnected -> Text(stringResource(id = R.string.startup_binding_service))
         is WalletState.Bootstrap -> Text(stringResource(id = R.string.startup_starting))
         is WalletState.Error.Generic -> Text(stringResource(id = R.string.startup_error_generic, walletState.message))
         is WalletState.Started -> {
@@ -175,23 +209,20 @@ private fun AttemptStart(
     }
 }
 
-@Composable
-private fun StartKMP(scope: CoroutineScope, service: NodeService?, encryptedSeed: EncryptedSeed.V2, checkLegacyChannel: Boolean) {
-    val log = logger("StartupView")
-    when (encryptedSeed) {
-        is EncryptedSeed.V2.NoAuth -> {
-            Text(stringResource(id = R.string.startup_checking_seed))
-            LaunchedEffect(encryptedSeed) {
-                scope.launch(Dispatchers.IO) {
-                    log.debug { "decrypting seed..." }
-                    val seed = encryptedSeed.decrypt()
-                    log.debug { "seed has been decrypted" }
-                    service?.startBusiness(seed, checkLegacyChannel)
-                }
+private fun startBusiness(
+    scope: CoroutineScope,
+    encryptedSeed: EncryptedSeed.V2,
+    doStartBusiness: (ByteArray) -> Unit
+) {
+    scope.launch(Dispatchers.IO) {
+        when (encryptedSeed) {
+            is EncryptedSeed.V2.NoAuth -> {
+                val seed = encryptedSeed.decrypt()
+                doStartBusiness(seed)
             }
-        }
-        is EncryptedSeed.V2.WithAuth -> {
-            Text("seed=$encryptedSeed version is not handled yet")
+            is EncryptedSeed.V2.WithAuth -> {
+                TODO("unsupported auth=$encryptedSeed")
+            }
         }
     }
 }

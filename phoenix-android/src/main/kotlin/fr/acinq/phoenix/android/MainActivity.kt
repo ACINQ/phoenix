@@ -43,13 +43,11 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
-@ExperimentalCoroutinesApi
 class MainActivity : AppCompatActivity() {
 
     val log: Logger = LoggerFactory.getLogger(MainActivity::class.java)
     private val appViewModel by viewModels<AppViewModel>()
 
-    @OptIn(InternalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.CAMERA), 1234)
