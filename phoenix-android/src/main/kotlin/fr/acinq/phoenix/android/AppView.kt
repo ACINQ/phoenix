@@ -26,10 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import fr.acinq.phoenix.android.home.*
 import fr.acinq.phoenix.android.init.*
@@ -48,18 +48,17 @@ import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
 @Composable
 fun AppView(
     mainActivity: MainActivity,
     appVM: AppViewModel,
+    navController: NavHostController,
 ) {
     val log = logger("AppView")
     log.debug { "init app view composition" }
 
-    val navController = rememberNavController()
     val fiatRates = application.business.currencyManager.ratesFlow.collectAsState(listOf())
     val walletContext = application.business.appConfigurationManager.chainContext.collectAsState(initial = null)
     val context = LocalContext.current
@@ -98,7 +97,7 @@ fun AppView(
 
         Column(
             Modifier
-                .background(mutedBgColor())
+                .background(appBackground())
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {

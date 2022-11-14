@@ -259,7 +259,7 @@ private fun BottomBar(
             .fillMaxWidth()
             .height(78.dp)
             .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-            .background(systemNavBarColor())
+            .background(MaterialTheme.colors.surface)
     ) {
         Row {
             Button(

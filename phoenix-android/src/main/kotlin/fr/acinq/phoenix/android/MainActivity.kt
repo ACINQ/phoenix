@@ -29,15 +29,15 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.io.PhoenixAndroidLegacyInfoEvent
 import fr.acinq.phoenix.android.components.mvi.MockView
 import fr.acinq.phoenix.android.service.NodeService
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -79,8 +79,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContent {
-            PhoenixAndroidTheme {
-                AppView(this@MainActivity, appViewModel)
+            val navController = rememberNavController()
+            PhoenixAndroidTheme(navController) {
+                AppView(this@MainActivity, appViewModel, navController)
             }
         }
     }
@@ -113,5 +114,5 @@ class MainActivity : AppCompatActivity() {
 @Preview(device = Devices.PIXEL_3)
 @Composable
 fun DefaultPreview() {
-    MockView { PhoenixAndroidTheme { Text("Preview") } }
+    MockView { PhoenixAndroidTheme(rememberNavController()) { Text("Preview") } }
 }

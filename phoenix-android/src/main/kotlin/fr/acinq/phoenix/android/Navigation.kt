@@ -52,8 +52,8 @@ sealed class Screen(val route: String) {
     object Logs : Screen("settings/logs")
 }
 
-fun NavHostController.navigate(screen: Screen, arg: List<Any> = emptyList(), builder: NavOptionsBuilder.() -> Unit = {}) {
-    val log = newLogger<NavController>(LoggerFactory.default)
+fun NavController.navigate(screen: Screen, arg: List<Any> = emptyList(), builder: NavOptionsBuilder.() -> Unit = {}) {
+    val log = newLogger(LoggerFactory.default)
     val path = arg.joinToString{ "/$it" }
     val route = "${screen.route}$path"
     log.debug { "navigating from ${currentDestination?.route} to $route" }
