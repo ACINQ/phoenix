@@ -459,7 +459,7 @@
     <string name="paymentdetails_status_pending">Pending</string>
     <string name="paymentdetails_status_failed">Failed</string>
 
-    <string name="paymentdetails_parts_label">Payment parts</string>
+    <string name="paymentdetails_parts_label">Payment parts (%1$d)</string>
     <string name="paymentdetails_part_label">Part</string>
     <string name="paymentdetails_part_hops_label">Hops</string>
     <string name="paymentdetails_part_transaction_label">Transaction id</string>
