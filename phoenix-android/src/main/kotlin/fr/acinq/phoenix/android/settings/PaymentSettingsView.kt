@@ -122,10 +122,14 @@ fun PaymentSettingsView() {
                 )
                 ListPreferenceButton(
                     title = stringResource(id = R.string.paymentsettings_lnurlauth_keytype_title),
-                    subtitle = when (prefLnurlAuthKeyType) {
-                        LNUrl.Auth.KeyType.LEGACY_KEY_TYPE -> stringResource(id = R.string.lnurl_auth_keytype_legacy)
-                        LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE -> stringResource(id = R.string.lnurl_auth_keytype_default)
-                        else -> stringResource(id = R.string.utils_unknown)
+                    subtitle = {
+                        Text(
+                            text = when (prefLnurlAuthKeyType) {
+                                LNUrl.Auth.KeyType.LEGACY_KEY_TYPE -> stringResource(id = R.string.lnurl_auth_keytype_legacy)
+                                LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE -> stringResource(id = R.string.lnurl_auth_keytype_default)
+                                else -> stringResource(id = R.string.utils_unknown)
+                            }
+                        )
                     },
                     enabled = true,
                     selectedItem = prefLnurlAuthKeyType,

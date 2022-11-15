@@ -150,7 +150,7 @@ fun TextWithIcon(
     textStyle: TextStyle = LocalTextStyle.current,
     maxLines: Int = Int.MAX_VALUE,
     textOverflow: TextOverflow = TextOverflow.Clip,
-    iconTint: Color = LocalContentColor.current,
+    iconTint: Color? = null,
     iconSize: Dp = ButtonDefaults.IconSize,
     padding: PaddingValues = PaddingValues(0.dp),
     space: Dp = 6.dp,
@@ -166,7 +166,7 @@ fun TextWithIcon(
             modifier = Modifier
                 .size(iconSize)
                 .then(if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier),
-            colorFilter = ColorFilter.tint(iconTint)
+            colorFilter = iconTint?.let { ColorFilter.tint(it) }
         )
         Spacer(Modifier.width(space))
         Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier, maxLines = maxLines, overflow = textOverflow)

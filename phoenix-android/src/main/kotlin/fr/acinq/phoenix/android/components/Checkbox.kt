@@ -38,8 +38,8 @@ fun Checkbox(
     text: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    enabled: Boolean = true,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     padding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 0.dp)
 ) {
     var internalChecked by rememberSaveable { mutableStateOf(checked) }

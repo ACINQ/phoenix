@@ -211,7 +211,7 @@
     <string name="scan_amountless_legacy_confirm_button">Confirm</string>
     <string name="scan_amountless_legacy_cancel_button">Cancel</string>
 
-    <!-- //////////////// utilities strings //////////////// -->
+    <!-- //////////////// utility strings //////////////// -->
 
     <!-- #1: sign / #2: integer part / #3: decimal part / #4: unit -->
     <string name="utils_converted_amount">≈ %1$s</string>
@@ -741,5 +741,9 @@
 
     <string name="migration_dialog_title">Congratulations!</string>
     <string name="migration_dialog_message">You are now using the new Phoenix version. Your channels are being migrated and will be ready soon.</string>
+
+    <!-- ////////////// currencies ////////////// -->
+
+    <string name="currency_ars_bm">Argentine Peso (Blue Market)</string>
 
 </resources>
