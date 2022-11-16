@@ -24,21 +24,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 
-
-@Composable
-fun SettingCategory(textResId: Int) {
-    Text(
-        text = stringResource(id = textResId),
-        style = MaterialTheme.typography.subtitle1.copy(fontSize = 14.sp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 62.dp, top = 24.dp, end = 0.dp, bottom = 4.dp)
-    )
-}
 
 @Composable
 fun Setting(modifier: Modifier = Modifier, title: String, description: String?) {

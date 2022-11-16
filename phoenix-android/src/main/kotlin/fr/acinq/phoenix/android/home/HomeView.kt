@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.android.home
 
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,7 +24,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,12 +35,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
@@ -59,29 +59,30 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HomeView(
-    homeViewModel: HomeViewModel,
+    paymentsViewModel: PaymentsViewModel,
     onPaymentClick: (WalletPaymentId) -> Unit,
     onSettingsClick: () -> Unit,
     onReceiveClick: () -> Unit,
     onSendClick: () -> Unit,
+    onPaymentsHistoryClick: () -> Unit,
 ) {
     val log = logger("HomeView")
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val connectionsState by homeViewModel.connectionsFlow.collectAsState(null)
+    val connectionsState by paymentsViewModel.connectionsFlow.collectAsState(null)
 
     var showConnectionsDialog by remember { mutableStateOf(false) }
     if (showConnectionsDialog) {
         ConnectionDialog(connections = connectionsState, onClose = { showConnectionsDialog = false })
     }
 
-    val payments = homeViewModel.paymentsFlow.collectAsState().value.values.toList()
+    val payments = paymentsViewModel.recentPaymentsFlow.collectAsState().value.values.toList().take(3)
 
     // controls for the migration dialog
     val migrationResult = PrefsDatastore.getMigrationResult(context).collectAsState(initial = null).value
     val migrationResultShown = InternalData.getMigrationResultShown(context).collectAsState(initial = null).value
 
-    MVIView(homeViewModel) { model, _ ->
+    MVIView(CF::home) { model, _ ->
         val balance = remember(model) { model.balance }
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             TopBar(
@@ -90,7 +91,7 @@ fun HomeView(
                 },
                 connectionsState = connectionsState
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(64.dp))
 
             if (balance == null) {
                 ProgressView(text = stringResource(id = R.string.home__balance_loading))
@@ -100,7 +101,7 @@ fun HomeView(
                         .align(Alignment.CenterHorizontally)
                         .padding(horizontal = 16.dp),
                     amount = balance,
-                    amountTextStyle = MaterialTheme.typography.h1,
+                    amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 40.sp),
                     unitTextStyle = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
                 )
             }
@@ -108,27 +109,55 @@ fun HomeView(
                 Spacer(modifier = Modifier.height(8.dp))
                 IncomingAmountNotif(incomingSwapAmount)
             }
-            Spacer(modifier = Modifier.height(24.dp))
-            PrimarySeparator()
-            Spacer(modifier = Modifier.height(24.dp))
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-            ) {
-                items(
-                    items = payments,
+            Spacer(modifier = Modifier.height(54.dp))
+            if (payments.isEmpty()) {
+                Text(
+                    text = stringResource(id = R.string.home__payments_none),
+                    style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center),
+                    modifier = Modifier.padding(horizontal = 32.dp)
+                )
+                Spacer(Modifier.height(16.dp))
+                FilledButton(
+                    text = stringResource(id = R.string.home__payments_more_button),
+                    icon = R.drawable.ic_chevron_down,
+                    iconTint = MaterialTheme.typography.caption.color,
+                    onClick = onPaymentsHistoryClick,
+                    backgroundColor = Color.Transparent,
+                    textStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
+                )
+            } else {
+                Text(
+                    text = stringResource(id = R.string.home__payments_header),
+                    style = MaterialTheme.typography.caption.copy(fontSize = 12.sp, textAlign = TextAlign.Center)
+                )
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
-                    if (it.paymentInfo == null) {
-                        LaunchedEffect(key1 = it.orderRow.id.identifier) {
-                            homeViewModel.getPaymentDescription(it.orderRow)
+                    LazyColumn {
+                        items(
+                            items = payments,
+                        ) {
+                            if (it.paymentInfo == null) {
+                                LaunchedEffect(key1 = it.orderRow.id.identifier) {
+                                    paymentsViewModel.getPaymentDescription(it.orderRow)
+                                }
+                                PaymentLineLoading(it.orderRow.id, it.orderRow.createdAt, onPaymentClick)
+                            } else {
+                                PaymentLine(it.paymentInfo, onPaymentClick)
+                            }
                         }
-                        PaymentLineLoading(it.orderRow.id, it.orderRow.createdAt, onPaymentClick)
-                    } else {
-                        PaymentLine(it.paymentInfo, onPaymentClick)
                     }
+                    Button(
+                        text = stringResource(id = R.string.home__payments_more_button),
+                        icon = R.drawable.ic_chevron_down,
+                        onClick = onPaymentsHistoryClick,
+                        padding = PaddingValues(top = 12.dp, bottom = 8.dp),
+                        textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
             }
+            Spacer(modifier = Modifier.weight(1f))
             BottomBar(onSettingsClick, onReceiveClick, onSendClick)
         }
     }
@@ -145,8 +174,9 @@ fun TopBar(
     onConnectionsStateButtonClick: () -> Unit,
     connectionsState: Connections?
 ) {
+    val context = LocalContext.current
     Row(
-        Modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .height(40.dp)
@@ -170,12 +200,23 @@ fun TopBar(
                 iconTint = if (isBadElectrumCert) negativeColor() else LocalContentColor.current,
                 onClick = onConnectionsStateButtonClick,
                 textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = if (isBadElectrumCert) negativeColor() else LocalContentColor.current),
-                backgroundColor = mutedBgColor(),
+                backgroundColor = MaterialTheme.colors.surface,
                 space = 8.dp,
                 padding = PaddingValues(8.dp),
                 modifier = Modifier.alpha(connectionsButtonAlpha)
             )
         }
+        Spacer(modifier = Modifier.weight(1f))
+        FilledButton(
+            text = stringResource(R.string.home__faq_button),
+            icon = R.drawable.ic_help_circle,
+            iconTint = LocalContentColor.current,
+            onClick = { openLink(context, "https://phoenix.acinq.co/faq") },
+            textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
+            backgroundColor = MaterialTheme.colors.surface,
+            space = 8.dp,
+            padding = PaddingValues(8.dp),
+        )
     }
 }
 
@@ -228,15 +269,17 @@ private fun ConnectionDialogLine(label: String, connection: Connection?, onClick
         ) {}
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = label, modifier = Modifier.weight(1.0f))
-        Text(text = when (connection) {
-            Connection.ESTABLISHING -> stringResource(R.string.conndialog_connecting)
-            Connection.ESTABLISHED -> stringResource(R.string.conndialog_connected)
-            else -> if (connection is Connection.CLOSED && connection.isBadCertificate()) {
-                stringResource(R.string.conndialog_closed_bad_cert)
-            } else {
-                stringResource(R.string.conndialog_closed)
-            }
-        }, style = monoTypo())
+        Text(
+            text = when (connection) {
+                Connection.ESTABLISHING -> stringResource(R.string.conndialog_connecting)
+                Connection.ESTABLISHED -> stringResource(R.string.conndialog_connected)
+                else -> if (connection is Connection.CLOSED && connection.isBadCertificate()) {
+                    stringResource(R.string.conndialog_closed_bad_cert)
+                } else {
+                    stringResource(R.string.conndialog_closed)
+                }
+            }, style = monoTypo()
+        )
     }
 }
 
@@ -300,7 +343,7 @@ private fun BottomBar(
                 color = MaterialTheme.colors.primary,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(4.dp)
+                    .height(3.dp)
             ) { }
         }
     }

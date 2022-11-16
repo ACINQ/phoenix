@@ -34,6 +34,7 @@ import androidx.navigation.navArgument
 import fr.acinq.phoenix.android.home.*
 import fr.acinq.phoenix.android.init.*
 import fr.acinq.phoenix.android.payments.PaymentDetailsView
+import fr.acinq.phoenix.android.payments.PaymentsHistoryView
 import fr.acinq.phoenix.android.payments.ReceiveView
 import fr.acinq.phoenix.android.payments.ScanDataView
 import fr.acinq.phoenix.android.service.WalletState
@@ -41,7 +42,6 @@ import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
@@ -80,13 +80,11 @@ fun AppView(
         LocalElectrumServer provides electrumServer.value,
     ) {
 
-        // this view model should not be tied to the HomeView composition because it contains a dynamic payments list that must not be lost when switching to another view
-        val homeViewModel: HomeViewModel = viewModel(
-            factory = HomeViewModel.Factory(
+        // we keep a view model storing payments so that we don't have to fetch them every time
+        val paymentsViewModel: PaymentsViewModel = viewModel(
+            factory = PaymentsViewModel.Factory(
                 connectionsFlow = business.connectionsManager.connections,
                 paymentsManager = business.paymentsManager,
-                controllerFactory = controllerFactory,
-                getController = CF::home
             )
         )
 
@@ -125,11 +123,12 @@ fun AppView(
                 composable(Screen.Home.route) {
                     RequireKey(appVM.walletState.value) {
                         HomeView(
-                            homeViewModel = homeViewModel,
+                            paymentsViewModel = paymentsViewModel,
                             onPaymentClick = { navigateToPaymentDetails(navController, it) },
                             onSettingsClick = { navController.navigate(Screen.Settings.route) },
                             onReceiveClick = { navController.navigate(Screen.Receive.route) },
-                            onSendClick = { navController.navigate(Screen.ScanData.route) { launchSingleTop = true } }
+                            onSendClick = { navController.navigate(Screen.ScanData.route) { launchSingleTop = true } },
+                            onPaymentsHistoryClick = { navController.navigate(Screen.PaymentsHistory.route) }
                         )
                     }
                 }
@@ -162,6 +161,13 @@ fun AppView(
                                 navController.navigate(Screen.Home.route)
                             })
                     }
+                }
+                composable(Screen.PaymentsHistory.route) {
+                    PaymentsHistoryView(
+                        onBackClick = { navController.popBackStack() },
+                        paymentsViewModel = paymentsViewModel,
+                        onPaymentClick = { navigateToPaymentDetails(navController, it) }
+                    )
                 }
                 composable(Screen.Settings.route) {
                     SettingsView()

@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.android
 
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
@@ -36,7 +35,8 @@ sealed class Screen(val route: String) {
      * TODO: Separate scanning the data from processing the data (aka send payment, process lnurl...). Split to be done at the controller level.
      */
     object ScanData : Screen("readdata")
-    object PaymentDetails : Screen("payment")
+    object PaymentDetails : Screen("payments")
+    object PaymentsHistory : Screen("payments/all")
 
     // -- settings
     object Settings : Screen("settings")
