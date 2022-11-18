@@ -47,7 +47,7 @@ fun AppLockView(
     val nc = navController
 
     DefaultScreenLayout {
-        DefaultScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.accessctrl_title), subtitle = stringResource(id = R.string.accessctrl_subtitle))
+        DefaultScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.accessctrl_title))
         Card {
             SettingSwitch(
                 title = stringResource(id = R.string.accessctrl_screen_lock_switch),

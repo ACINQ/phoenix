@@ -126,7 +126,6 @@
     <string name="receive__share__button">Share…</string>
 
     <string name="receive__edit__title">Edit my invoice</string>
-    <string name="receive__edit__subtitle">The amount and the description of an invoice are optional and can be edited.</string>
     <string name="receive__edit__amount_label">Amount (optional)</string>
     <string name="receive__edit__amount_placeholder">Any amount</string>
     <string name="receive__edit__desc_label">Description (optional):</string>
@@ -307,7 +306,7 @@
 
     <!-- //////////////// list all channels //////////////// -->
 
-    <string name="listallchannels_title">Channels List</string>
+    <string name="listallchannels_title">Payment channels</string>
     <string name="listallchannels_in_progress">Please hold…</string>
     <string name="listallchannels_node_id">Node id:</string>
     <string name="listallchannels_no_channels">You don\'t have any channels yet.\n\nPayments channels are created when you receive a payment and a new channel is needed. This is done automatically.</string>
@@ -382,7 +381,6 @@
     <!-- //////////////// logs settings //////////////// -->
 
     <string name="logs_title">Application logs</string>
-    <string name="logs_subtitle">Here you can extract and share the application logs.</string>
     <string name="logs_view_button">View logs…</string>
     <string name="logs_view_with">View logs with…</string>
     <string name="logs_share_button">Share logs…</string>
@@ -499,7 +497,6 @@
     <!-- //////////////// access control //////////////// -->
 
     <string name="accessctrl_title">Application access</string>
-    <string name="accessctrl_subtitle">We recommend enabling the screen lock to prevent unintended use of your wallet.</string>
 
     <string name="accessctrl_auth_no_hw">Your device does not support hardware backed user authentication.</string>
     <string name="accessctrl_auth_hw_unavailable">Your biometric hardware is not available.</string>
@@ -513,13 +510,6 @@
 
     <string name="accessctrl_screen_lock_switch">Screen lock</string>
     <string name="accessctrl_screen_lock_switch_desc">Lock access to the app with Android\'s screen lock/fingerprint</string>
-    <string name="accessctrl_full_lock_switch_unavailable">Enroll a fingerprint in Android for additional security features.</string>
-    <string name="accessctrl_full_lock_switch_backup_required">Confirm that you\'ve backed up your recovery phrase for additional security features.</string>
-    <string name="accessctrl_full_lock_switch_backup_required_button">Access my recovery phrase</string>
-    <string name="accessctrl_full_lock_switch">Prevent background execution</string>
-    <string name="accessctrl_full_lock_switch_desc">App requires manual user unlock to run. Background payment reception is therefore not possible.\n\nOnly fingerprint authentication is supported.</string>
-    <string name="accessctrl_full_lock_confirm_title">Notice</string>
-    <string name="accessctrl_full_lock_confirm_message">Background features will be disabled. To receive payments the app will have to be unlocked.</string>
 
     <!-- //////////////// ln url auth //////////////// -->
 
@@ -610,8 +600,7 @@
     <!-- //////////////// electrum server //////////////// -->
 
     <string name="electrum_title">Electrum server</string>
-    <string name="electrum_subtitle">Phoenix needs to access the Bitcoin blockchain to monitor and secure your channels. This is done using public Electrum servers. You can also configure your own server.</string>
-
+    <string name="electrum_about">To secure your payment channels Phoenix monitors the Bitcoin blockchain through Electrum servers.\n\nBy default, random servers are used. You can also configure Phoenix to connect only to your own server.</string>
     <string name="electrum_block_height_label">Block height</string>
     <string name="electrum_tip_label">Tip timestamp</string>
     <string name="electrum_fee_rate_label">Fee rate</string>
@@ -620,14 +609,14 @@
     <string name="electrum_fee_rate">%1$s sat/byte</string>
     <string name="electrum_connection_label">Server</string>
 
-    <string name="electrum_server_label_random">Server (picked at random)</string>
-    <string name="electrum_server_label_custom">Server (custom address)</string>
-    <string name="electrum_not_connected">Disconnected</string>
-    <string name="electrum_not_connected_to_custom">Disconnected from %1$s</string>
-    <string name="electrum_not_connected_to_custom_bad_certificate">%1$s provided an unknown certificate!\nTap to configure.</string>
-    <string name="electrum_connecting">Connecting to %1$s…</string>
-    <string name="electrum_connected">Connected to %1$s</string>
-    <string name="electrum_connected_to_pinned">We are using the pinned public key %1$s</string>
+    <string name="electrum_connection_closed_with_random">Disconnected from Electrum</string>
+    <string name="electrum_connection_closed_with_custom">Disconnected from %1$s</string>
+    <string name="electrum_connection_connecting_to_random">Connecting to Electrum</string>
+    <string name="electrum_connection_connecting_to_custom">Connecting to %1$s</string>
+    <string name="electrum_connection_connected">Connected to %1$s</string>
+
+    <string name="electrum_description_custom">You are using a custom server</string>
+    <string name="electrum_description_bad_certificate">This server provided an unknown certificate. Connection is rejected.</string>
 
     <string name="electrum_dialog_checkbox">Use a custom server</string>
     <string name="electrum_dialog_input">Server address (host:port)</string>
@@ -692,7 +681,6 @@
     <!-- //////////////// settings: options for payments //////////////// -->
 
     <string name="paymentsettings_title">Payment settings</string>
-    <string name="paymentsettings_subtitle">Set various options regarding payments you send or receive.</string>
 
     <string name="paymentsettings_defaultdesc_title">Incoming payment description</string>
     <string name="paymentsettings_defaultdesc_none">No description set…</string>

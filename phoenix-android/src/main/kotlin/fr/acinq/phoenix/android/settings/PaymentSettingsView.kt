@@ -76,7 +76,6 @@ fun PaymentSettingsView() {
         DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.paymentsettings_title),
-            subtitle = stringResource(id = R.string.paymentsettings_subtitle)
         )
         Card {
             SettingInteractive(

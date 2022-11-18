@@ -23,8 +23,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
@@ -62,6 +64,8 @@ fun SettingInteractive(
     title: String,
     description: @Composable () -> Unit = {},
     icon: Int? = null,
+    iconTint: Color? = null,
+    maxTitleLines: Int = Int.MAX_VALUE,
     enabled: Boolean = true,
     onClick: (() -> Unit)
 ) {
@@ -77,10 +81,16 @@ fun SettingInteractive(
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (icon != null) {
-                PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize))
+                PhoenixIcon(icon, tint = iconTint ?: LocalContentColor.current, modifier = Modifier.size(ButtonDefaults.IconSize))
                 Spacer(Modifier.width(16.dp))
             }
-            Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.body2,
+                modifier = Modifier.weight(1f),
+                maxLines = maxTitleLines,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
         Spacer(modifier = Modifier.height(2.dp))
         Row(Modifier.fillMaxWidth()) {

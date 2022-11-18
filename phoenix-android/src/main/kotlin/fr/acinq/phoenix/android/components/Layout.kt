@@ -30,10 +30,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.borderColor
@@ -154,11 +152,10 @@ fun DefaultScreenLayout(
     }
 }
 
-/** The default header of a screen contains a back button, an optional title and an optional subtitle (which uses a muted typo style). */
+/** The default header of a screen contains a back button and an optional title. */
 @Composable
 fun DefaultScreenHeader(
     title: String? = null,
-    subtitle: String? = null,
     onBackClick: () -> Unit,
     backgroundColor: Color = MaterialTheme.colors.background,
 ) {
@@ -166,18 +163,12 @@ fun DefaultScreenHeader(
         modifier = Modifier
             .fillMaxWidth()
             .background(backgroundColor)
-            .padding(horizontal = 0.dp, vertical = 6.dp),
+            .padding(start = 0.dp, top = 2.dp, bottom = 2.dp, end = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         BackButton(onClick = onBackClick)
-        Column(
-            modifier = Modifier.padding(start = 0.dp, top = 14.dp, end = 16.dp, bottom = 14.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
-            title?.run { Text(text = this) }
-            subtitle?.run {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = this, style = TextStyle(color = mutedTextColor(), fontSize = 14.sp))
-            }
+        title?.let {
+            Text(text = it)
         }
     }
 }

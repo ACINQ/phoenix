@@ -68,12 +68,12 @@ fun ElectrumView() {
         DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.electrum_title),
-            subtitle = stringResource(id = R.string.electrum_subtitle)
         )
-
+        Card(internalPadding = PaddingValues(16.dp)) {
+            Text(text = stringResource(R.string.electrum_about)) //, style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
+        }
         MVIView(CF::electrumConfiguration) { model, postIntent ->
             Card {
-
                 val config = model.configuration
                 if (showCustomServerDialog) {
                     ElectrumServerDialog(
@@ -97,43 +97,45 @@ fun ElectrumView() {
                 // -- connection detail
                 val connection = model.connection
                 SettingInteractive(
-                    title = when (config) {
-                        is ElectrumConfig.Custom -> stringResource(id = R.string.electrum_server_label_custom)
-                        else -> stringResource(id = R.string.electrum_server_label_random)
+                    title = when {
+                        connection is Connection.ESTABLISHED -> {
+                            stringResource(id = R.string.electrum_connection_connected, "${model.currentServer?.host}:${model.currentServer?.port}")
+                        }
+                        connection is Connection.ESTABLISHING && config is ElectrumConfig.Random -> {
+                            stringResource(id = R.string.electrum_connecting, "${model.currentServer?.host}:${model.currentServer?.port}")
+                        }
+                        connection is Connection.ESTABLISHING && config is ElectrumConfig.Custom -> {
+                            stringResource(id = R.string.electrum_connecting, config.server.host)
+                        }
+                        connection is Connection.CLOSED && config is ElectrumConfig.Custom -> {
+                            stringResource(id = R.string.electrum_connection_closed_with_custom, config.server.host)
+                        }
+                        else -> {
+                            stringResource(id = R.string.electrum_connection_closed_with_random)
+                        }
                     },
                     description = {
-                        when (connection) {
-                            is Connection.CLOSED -> if (config is ElectrumConfig.Custom) {
-                                Text(text = stringResource(id = R.string.electrum_not_connected_to_custom, config.server.host))
-                                if (connection.isBadCertificate()) {
-                                    Spacer(Modifier.height(8.dp))
-                                    HSeparator(width = 50.dp)
-                                    Spacer(Modifier.height(8.dp))
-                                    TextWithIcon(
-                                        text = stringResource(id = R.string.electrum_not_connected_to_custom_bad_certificate, config.server.host),
-                                        textStyle = MaterialTheme.typography.subtitle2.copy(color = negativeColor()),
-                                        icon = R.drawable.ic_alert_triangle,
-                                        iconTint = negativeColor(),
-                                        alignBaseLine = true
+                        when (config) {
+                            is ElectrumConfig.Custom -> {
+                                if (connection is Connection.CLOSED && connection.isBadCertificate()) {
+                                    Text(
+                                        text = stringResource(id = R.string.electrum_description_bad_certificate),
+                                        style = MaterialTheme.typography.subtitle2.copy(color = negativeColor())
                                     )
+                                } else {
+                                    Text(text = stringResource(id = R.string.electrum_description_custom))
                                 }
-                            } else {
-                                Text(text = stringResource(id = R.string.electrum_not_connected))
                             }
-                            Connection.ESTABLISHING -> if (config is ElectrumConfig.Custom) {
-                                Text(text = stringResource(id = R.string.electrum_connecting, config.server.host))
-                            } else {
-                                Text(text = stringResource(id = R.string.electrum_connecting, "${model.currentServer?.host}:${model.currentServer?.port}"))
-                            }
-                            Connection.ESTABLISHED -> {
-                                TextWithIcon(
-                                    text = stringResource(id = R.string.electrum_connected, "${model.currentServer?.host}:${model.currentServer?.port}"),
-                                    icon = R.drawable.ic_check,
-                                    iconTint = positiveColor()
-                                )
-                            }
+                            else -> Unit
                         }
-                    }
+                    },
+                    icon = R.drawable.ic_server,
+                    iconTint = when (connection) {
+                        is Connection.ESTABLISHED -> positiveColor()
+                        is Connection.ESTABLISHING -> orange
+                        else -> negativeColor()
+                    },
+                    maxTitleLines = 1
                 ) { showCustomServerDialog = true }
             }
 
