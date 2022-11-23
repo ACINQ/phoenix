@@ -17,16 +17,21 @@
 package fr.acinq.phoenix.android.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -60,11 +65,24 @@ fun AmountView(
     }
     val inFiat = LocalShowInFiat.current
 
+    // for the press animation
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
     Row(
         horizontalArrangement = Arrangement.Center,
-        modifier = modifier.clickable {
-            scope.launch { UserPrefs.saveIsAmountInFiat(context, !inFiat) }
-        }
+        modifier = modifier
+            .graphicsLayer {
+                scaleX = if (isPressed) 0.9f else 1f
+                scaleY = if (isPressed) 0.9f else 1f
+            }
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                role = Role.Button
+            ) {
+                scope.launch { UserPrefs.saveIsAmountInFiat(context, !inFiat) }
+            }
     ) {
         if (isOutgoing != null && amount > MilliSatoshi(0)) {
             Text(
