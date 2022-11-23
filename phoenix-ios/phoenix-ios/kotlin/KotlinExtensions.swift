@@ -18,7 +18,7 @@ extension WalletPaymentOrderRow {
 	
 	var completedAtDate: Date? {
 		if let completedAt = self.completedAt?.int64Value {
-			return Date(timeIntervalSince1970: (Double(createdAt) / Double(1_000)))
+			return Date(timeIntervalSince1970: (Double(completedAt) / Double(1_000)))
 		} else {
 			return nil
 		}
