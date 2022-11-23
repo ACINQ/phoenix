@@ -54,6 +54,11 @@ object InternalData {
     fun getMigrationResultShown(context: Context): Flow<Boolean> = prefs(context).map { it[MIGRATION_RESULT_SHOWN] ?: false }
     suspend fun saveMigrationResultShown(context: Context, isShown: Boolean) = context.internalData.edit { it[MIGRATION_RESULT_SHOWN] = isShown }
 
+    // -- Show introduction screen at startup. True by default.
+    private val SHOW_INTRO = booleanPreferencesKey("SHOW_INTRO")
+    fun getShowIntro(context: Context): Flow<Boolean> = prefs(context).map { it[SHOW_INTRO] ?: true }
+    suspend fun saveShowIntro(context: Context, showIntro: Boolean) = context.internalData.edit { it[SHOW_INTRO] = showIntro }
+
     private fun prefs(context: Context): Flow<Preferences> {
         return context.internalData.data.catch { exception ->
             if (exception is IOException) {

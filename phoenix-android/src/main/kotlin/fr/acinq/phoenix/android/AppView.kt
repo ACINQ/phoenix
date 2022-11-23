@@ -33,6 +33,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import fr.acinq.phoenix.android.home.*
 import fr.acinq.phoenix.android.init.*
+import fr.acinq.phoenix.android.intro.IntroView
 import fr.acinq.phoenix.android.payments.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.PaymentsHistoryView
 import fr.acinq.phoenix.android.payments.ReceiveView
@@ -104,9 +105,13 @@ fun AppView(
                     StartupView(
                         mainActivity,
                         appVM,
+                        onShowIntro = { navController.navigate(Screen.Intro.route) },
                         onKeyAbsent = { navController.navigate(Screen.InitWallet.route) },
                         onBusinessStarted = { navController.navigate(Screen.Home.route) }
                     )
+                }
+                composable(Screen.Intro.route) {
+                    IntroView(onBackClick = { navController.popBackStack() }, onFinishClick = { navController.navigate(Screen.Startup.route) })
                 }
                 composable(Screen.InitWallet.route) {
                     InitWallet(

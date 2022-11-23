@@ -151,7 +151,7 @@ fun typography(palette: Colors) = Typography(
     ),
     h3 = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Light,
+        fontWeight = FontWeight.Medium,
         fontSize = 24.sp,
         color = palette.onSurface,
     ),

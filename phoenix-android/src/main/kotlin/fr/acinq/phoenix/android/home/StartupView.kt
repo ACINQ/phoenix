@@ -40,6 +40,7 @@ import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.utils.BiometricsHelper
+import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
@@ -54,11 +55,13 @@ import kotlinx.coroutines.launch
 fun StartupView(
     mainActivity: MainActivity,
     appVM: AppViewModel,
+    onShowIntro: () -> Unit,
     onKeyAbsent: () -> Unit,
     onBusinessStarted: () -> Unit,
 ) {
     val context = LocalContext.current
     val walletState by appVM.walletState.observeAsState()
+    val showIntro by InternalData.getShowIntro(context).collectAsState(initial = null)
     val isLockActiveState by UserPrefs.getIsScreenLockActive(context).collectAsState(initial = null)
 
     Column(
@@ -72,10 +75,15 @@ fun StartupView(
             )
         }
         Column(modifier = Modifier.weight(.45f), verticalArrangement = Arrangement.Top) {
-            isLockActiveState?.let {
+            val isLockActive = isLockActiveState
+            if (isLockActive == null || showIntro == null) {
+                Text(stringResource(id = R.string.startup_wait_prefs))
+            } else if (showIntro == true) {
+                LaunchedEffect(key1 = Unit) { onShowIntro() }
+            } else {
                 LoadOrUnlock(
                     mainActivity = mainActivity,
-                    isLockActive = it,
+                    isLockActive = isLockActive,
                     lockState = appVM.lockState,
                     walletState = walletState,
                     startBusiness = { seed, checkLegacyChannels -> appVM.service?.startBusiness(seed, checkLegacyChannels) },
@@ -84,7 +92,7 @@ fun StartupView(
                     onKeyAbsent = onKeyAbsent,
                     onBusinessStarted = onBusinessStarted,
                 )
-            } ?: Text(stringResource(id = R.string.startup_check_lock))
+            }
         }
     }
 }

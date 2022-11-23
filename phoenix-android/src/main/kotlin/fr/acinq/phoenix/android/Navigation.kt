@@ -24,6 +24,7 @@ import org.kodein.log.newLogger
 
 sealed class Screen(val route: String) {
     object SwitchToLegacy : Screen("switchtolegacy")
+    object Intro : Screen("intro")
     object InitWallet : Screen("initwallet")
     object CreateWallet : Screen("createwallet")
     object RestoreWallet : Screen("restorewallet")
