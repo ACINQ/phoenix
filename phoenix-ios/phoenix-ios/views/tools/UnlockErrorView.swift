@@ -4,14 +4,14 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "ErrorView"
+	category: "UnlockErrorView"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 
-struct ErrorView: View {
+struct UnlockErrorView: View {
 	
 	let danger: UnlockError
 	

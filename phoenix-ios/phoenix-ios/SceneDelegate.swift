@@ -534,7 +534,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		
 		if errorWindow == nil {
 			
-			let view = ErrorView(danger: error)
+			let view = UnlockErrorView(danger: error)
 			
 			let controller = UIHostingController(rootView: view)
 			controller.view.backgroundColor = .clear
