@@ -7,11 +7,11 @@ plugins {
 val chain: String by project
 
 android {
-    compileSdk = 32
+    compileSdk = 33
     defaultConfig {
         applicationId = "fr.acinq.phoenix.android"
         minSdk = 24
-        targetSdk = 32
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -80,7 +80,7 @@ dependencies {
     }
 
     // -- AndroidX
-    implementation("androidx.core:core-ktx:${Versions.Android.ktx}")
+    implementation("androidx.core:core-ktx:${Versions.Android.coreKtx}")
     // -- AndroidX: livedata
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.Android.lifecycle}")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:${Versions.Android.lifecycle}")

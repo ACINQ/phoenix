@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 
 plugins {
@@ -67,7 +66,7 @@ kotlin {
         if (includeAndroid) {
             val androidMain by getting {
                 dependencies {
-                    implementation("androidx.core:core-ktx:${Versions.Android.ktx}")
+                    implementation("androidx.core:core-ktx:${Versions.Android.coreKtx}")
                     implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-android:${Versions.secp256k1}")
                     implementation("io.ktor:ktor-network:${Versions.ktor}")
                     implementation("io.ktor:ktor-network-tls:${Versions.ktor}")
