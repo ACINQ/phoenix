@@ -16,6 +16,10 @@
 
 package fr.acinq.phoenix.android.payments
 
+import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
+import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -50,18 +54,21 @@ import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.utils.extensions.errorMessage
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun PaymentDetailsSplashView(
     data: WalletPaymentInfo,
-    onDetailsClick: (WalletPaymentId) -> Unit
+    onDetailsClick: (WalletPaymentId) -> Unit,
+    fromEvent: Boolean,
 ) {
     val payment = data.payment
     var showEditDescriptionDialog by remember { mutableStateOf(false) }
 
     // status
-    PaymentStatus(payment)
+    PaymentStatus(payment, fromEvent)
     Spacer(modifier = Modifier.height(72.dp))
 
     // details
@@ -164,23 +171,27 @@ fun PaymentDetailsSplashView(
 
 @Composable
 private fun PaymentStatus(
-    payment: WalletPayment
+    payment: WalletPayment,
+    fromEvent: Boolean,
 ) {
     when (payment) {
         is OutgoingPayment -> when (payment.status) {
             is OutgoingPayment.Status.Pending -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_pending),
                 imageResId = R.drawable.ic_payment_details_pending_static,
+                isAnimated = false,
                 color = mutedTextColor()
             )
             is OutgoingPayment.Status.Completed.Failed -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_failed),
                 imageResId = R.drawable.ic_payment_details_failure_static,
+                isAnimated = false,
                 color = negativeColor()
             )
             is OutgoingPayment.Status.Completed.Succeeded -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_successful),
-                imageResId = R.drawable.ic_payment_details_success_static,
+                imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
+                isAnimated = fromEvent,
                 color = positiveColor(),
                 timestamp = payment.completedAt()
             )
@@ -189,11 +200,13 @@ private fun PaymentStatus(
             null -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_received_pending),
                 imageResId = R.drawable.ic_payment_details_pending_static,
+                isAnimated = false,
                 color = mutedTextColor()
             )
             else -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_received_successful),
-                imageResId = R.drawable.ic_payment_details_success_static,
+                imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
+                isAnimated = fromEvent,
                 color = positiveColor(),
                 timestamp = payment.received?.receivedAt
             )
@@ -201,19 +214,35 @@ private fun PaymentStatus(
     }
 }
 
+@OptIn(ExperimentalAnimationGraphicsApi::class)
 @Composable
 private fun PaymentStatusIcon(
     message: String,
     timestamp: Long? = null,
+    isAnimated: Boolean,
     imageResId: Int,
     color: Color,
 ) {
+    val scope = rememberCoroutineScope()
+    var atEnd by remember { mutableStateOf(false) }
     Image(
-        painter = painterResource(id = imageResId),
-        contentDescription = message,
+        painter = if (isAnimated) {
+            rememberAnimatedVectorPainter(AnimatedImageVector.animatedVectorResource(imageResId), atEnd)
+        } else {
+            painterResource(id = imageResId)
+        },
+        contentDescription = null,
         colorFilter = ColorFilter.tint(color),
-        modifier = Modifier.size(80.dp)
+        modifier = Modifier.size(90.dp)
     )
+    if (isAnimated) {
+        LaunchedEffect(key1 = Unit) {
+            scope.launch {
+                delay(150)
+                atEnd = true
+            }
+        }
+    }
     Spacer(Modifier.height(16.dp))
     Text(text = message.uppercase(), style = MaterialTheme.typography.body2)
     timestamp?.let {

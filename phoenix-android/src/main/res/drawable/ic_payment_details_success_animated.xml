@@ -22,22 +22,22 @@
   <aapt:attr name="android:drawable">
     <vector
       android:name="vector"
-      android:width="24dp"
-      android:height="24dp"
+      android:width="48dp"
+      android:height="48dp"
       android:viewportWidth="24"
       android:viewportHeight="24">
       <group
         android:name="group"
         android:pivotX="12"
         android:pivotY="12"
-        android:scaleX="0.7"
-        android:scaleY="0.7">
+        android:scaleX="0.6"
+        android:scaleY="0.6">
         <path
           android:name="circle"
           android:pathData="M 2 12 C 2 9.35 3.05 6.8 4.929 4.929 C 6.804 3.054 9.349 2 12 2 C 14.651 2 17.196 3.054 19.071 4.929 C 20.946 6.804 22 9.349 22 12 C 22 14.651 20.946 17.196 19.071 19.071 C 17.196 20.946 14.651 22 12 22 C 9.349 22 6.804 20.946 4.929 19.071 C 3.054 17.196 2 14.651 2 12"
           android:fillColor="#00000000"
           android:strokeColor="?attr/colorPrimary"
-          android:strokeWidth="0.5"
+          android:strokeWidth="1"
           android:trimPathEnd="0"
           android:strokeLineCap="round"
           android:strokeLineJoin="round"/>
@@ -46,7 +46,7 @@
           android:pathData="M 7.5 12.5 L 10.5 15.5 L 16.5 9.5"
           android:fillColor="#00000000"
           android:strokeColor="?attr/colorPrimary"
-          android:strokeWidth="1"
+          android:strokeWidth="2"
           android:trimPathEnd="0"
           android:strokeLineCap="round"
           android:strokeLineJoin="round"/>
@@ -59,16 +59,16 @@
       <set>
         <objectAnimator
           android:propertyName="strokeWidth"
-          android:startOffset="299"
-          android:duration="701"
-          android:valueFrom="0"
-          android:valueTo="2.5"
+          android:startOffset="300"
+          android:duration="700"
+          android:valueFrom="3"
+          android:valueTo="11"
           android:valueType="floatType"
           android:interpolator="@android:anim/overshoot_interpolator"/>
         <objectAnimator
           android:propertyName="trimPathEnd"
-          android:startOffset="299"
-          android:duration="701"
+          android:startOffset="300"
+          android:duration="700"
           android:valueFrom="0"
           android:valueTo="1"
           android:valueType="floatType"
@@ -83,8 +83,8 @@
         <objectAnimator
           android:propertyName="strokeWidth"
           android:duration="1000"
-          android:valueFrom="0.5"
-          android:valueTo="1"
+          android:valueFrom="2"
+          android:valueTo="6"
           android:valueType="floatType"
           android:interpolator="@android:anim/bounce_interpolator"/>
         <objectAnimator
@@ -110,18 +110,18 @@
       <set>
         <objectAnimator
           android:propertyName="scaleX"
-          android:duration="600"
-          android:valueFrom="0.7"
+          android:duration="800"
+          android:valueFrom="0.6"
           android:valueTo="1"
           android:valueType="floatType"
-          android:interpolator="@android:interpolator/fast_out_slow_in"/>
+          android:interpolator="@android:anim/overshoot_interpolator"/>
         <objectAnimator
           android:propertyName="scaleY"
-          android:duration="600"
-          android:valueFrom="0.7"
+          android:duration="800"
+          android:valueFrom="0.6"
           android:valueTo="1"
           android:valueType="floatType"
-          android:interpolator="@android:interpolator/fast_out_slow_in"/>
+          android:interpolator="@android:anim/overshoot_interpolator"/>
       </set>
     </aapt:attr>
   </target>

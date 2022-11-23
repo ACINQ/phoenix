@@ -129,7 +129,7 @@ fun AppView(
                     RequireKey(appVM.walletState.value) {
                         HomeView(
                             paymentsViewModel = paymentsViewModel,
-                            onPaymentClick = { navigateToPaymentDetails(navController, it) },
+                            onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },
                             onSettingsClick = { navController.navigate(Screen.Settings.route) },
                             onReceiveClick = { navController.navigate(Screen.Receive.route) },
                             onSendClick = { navController.navigate(Screen.ScanData.route) { launchSingleTop = true } },
@@ -150,10 +150,14 @@ fun AppView(
                     })
                 }
                 composable(
-                    route = "${Screen.PaymentDetails.route}/{direction}/{id}",
+                    route = "${Screen.PaymentDetails.route}?direction={direction}&id={id}&fromEvent={fromEvent}",
                     arguments = listOf(
                         navArgument("direction") { type = NavType.LongType },
-                        navArgument("id") { type = NavType.StringType }
+                        navArgument("id") { type = NavType.StringType },
+                        navArgument("fromEvent") {
+                            type = NavType.BoolType
+                            defaultValue = false
+                        }
                     ),
                 ) {
                     val direction = it.arguments?.getLong("direction")
@@ -164,14 +168,16 @@ fun AppView(
                             paymentId = paymentId,
                             onBackClick = {
                                 navController.navigate(Screen.Home.route)
-                            })
+                            },
+                            fromEvent = it.arguments?.getBoolean("fromEvent") ?: false
+                        )
                     }
                 }
                 composable(Screen.PaymentsHistory.route) {
                     PaymentsHistoryView(
                         onBackClick = { navController.popBackStack() },
                         paymentsViewModel = paymentsViewModel,
-                        onPaymentClick = { navigateToPaymentDetails(navController, it) }
+                        onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) }
                     )
                 }
                 composable(Screen.Settings.route) {
@@ -222,13 +228,13 @@ fun AppView(
     if (lastCompletedPayment != null) {
         log.debug { "completed payment=${lastCompletedPayment}" }
         LaunchedEffect(key1 = lastCompletedPayment.walletPaymentId()) {
-            navigateToPaymentDetails(navController, lastCompletedPayment.walletPaymentId())
+            navigateToPaymentDetails(navController, id = lastCompletedPayment.walletPaymentId(), isFromEvent = true)
         }
     }
 }
 
-private fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId) {
-    navController.navigate("${Screen.PaymentDetails.route}/${id.dbType.value}/${id.dbId}")
+private fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId, isFromEvent: Boolean) {
+    navController.navigate("${Screen.PaymentDetails.route}?direction=${id.dbType.value}&id=${id.dbId}&fromEvent=${isFromEvent}")
 }
 
 @Composable

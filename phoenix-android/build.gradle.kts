@@ -73,7 +73,7 @@ dependencies {
     implementation(project(":phoenix-shared"))
     api(project(":phoenix-legacy"))
 
-    implementation("com.google.android.material:material:1.4.0")
+    implementation("com.google.android.material:material:1.7.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
         version { strictly(Versions.coroutines) }
@@ -95,6 +95,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-viewbinding:${Versions.Android.compose}")
     implementation("androidx.compose.runtime:runtime-livedata:${Versions.Android.compose}")
     implementation("androidx.compose.material:material:${Versions.Android.compose}")
+    implementation("androidx.compose.animation:animation:${Versions.Android.compose}")
+    implementation("androidx.compose.animation:animation-graphics:${Versions.Android.compose}")
     // -- jetpack compose: navigation
     implementation("androidx.navigation:navigation-compose:${Versions.Android.navCompose}")
     // -- jetpack compose: accompanist (utility library for compose)

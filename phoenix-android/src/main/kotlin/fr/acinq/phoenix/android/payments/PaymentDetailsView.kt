@@ -78,6 +78,7 @@ class PaymentDetailsViewModel(
 fun PaymentDetailsView(
     paymentId: WalletPaymentId,
     onBackClick: () -> Unit,
+    fromEvent: Boolean,
 ) {
     val vm: PaymentDetailsViewModel = viewModel(factory = PaymentDetailsViewModel.Factory(business.paymentsManager))
 
@@ -110,7 +111,11 @@ fun PaymentDetailsView(
                     .padding(horizontal = 16.dp, vertical = 44.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                PaymentDetailsSplashView(data = state.payment, onDetailsClick = { vm.state = PaymentDetailsState.Success.TechnicalDetails(state.payment) })
+                PaymentDetailsSplashView(
+                    data = state.payment,
+                    onDetailsClick = { vm.state = PaymentDetailsState.Success.TechnicalDetails(state.payment) },
+                    fromEvent = fromEvent,
+                )
             }
             is PaymentDetailsState.Success.TechnicalDetails -> {
                 PaymentDetailsTechnicalView(data = state.payment)
