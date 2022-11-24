@@ -82,8 +82,9 @@
     <!-- //////////////// payment holder //////////////// -->
 
     <string name="paymentline_loading">Loading…</string>
-    <string name="paymentline_sent_prefix">-</string>
-    <string name="paymentline_received_prefix">+</string>
+    <string name="paymentline_prefix_sent">-</string>
+    <string name="paymentline_prefix_received">+</string>
+    <string name="paymentline_prefix_rounded">≈</string>
     <string name="paymentline_keysend_outgoing">Donation</string>
     <string name="paymentline_keysend_incoming">Spontaneous payment</string>
     <string name="paymentline_closing_desc">Channel closing to %1$s</string>
@@ -381,7 +382,7 @@
     ]]></string>
 
     <string name="paymentdetails_edit_dialog_title">Add a custom description to this payment</string>
-    <string name="paymentdetails_edit_button">Edit</string>
+    <string name="paymentdetails_edit_button">Edit description</string>
     <string name="paymentdetails_details_button">Details</string>
 
     <string name="paymentdetails_failure_recipient_unknown_or_liquidity">Recipient is not reachable, or does not have enough inbound liquidity.</string>

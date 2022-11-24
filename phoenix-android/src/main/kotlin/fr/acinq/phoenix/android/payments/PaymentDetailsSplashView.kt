@@ -35,9 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -45,9 +43,12 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
+import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateString
+import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
@@ -62,6 +63,7 @@ import kotlinx.coroutines.launch
 fun PaymentDetailsSplashView(
     data: WalletPaymentInfo,
     onDetailsClick: (WalletPaymentId) -> Unit,
+    onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
     fromEvent: Boolean,
 ) {
     val payment = data.payment
@@ -69,7 +71,7 @@ fun PaymentDetailsSplashView(
 
     // status
     PaymentStatus(payment, fromEvent)
-    Spacer(modifier = Modifier.height(72.dp))
+    Spacer(modifier = Modifier.height(64.dp))
 
     // details
     Column(
@@ -77,31 +79,29 @@ fun PaymentDetailsSplashView(
             .widthIn(500.dp)
             .clip(RoundedCornerShape(32.dp))
             .background(MaterialTheme.colors.surface)
-            .padding(top = 36.dp, bottom = 8.dp, start = 24.dp, end = 24.dp),
+            .padding(top = 40.dp, bottom = 0.dp, start = 0.dp, end = 0.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        AmountView(
+        AmountWithAltView(
             amount = payment.amount,
-            amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 32.sp, fontFamily = FontFamily.Default, fontWeight = FontWeight.Light),
-            unitTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp, fontFamily = FontFamily.Default, fontWeight = FontWeight.Light),
+            amountTextStyle = MaterialTheme.typography.h2,
+            unitTextStyle = MaterialTheme.typography.h4,
             separatorSpace = 4.dp,
             isOutgoing = payment is OutgoingPayment
         )
-        Spacer(modifier = Modifier.height(32.dp))
-        PrimarySeparator(height = 6.dp)
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         DetailsRow(
             label = stringResource(id = R.string.paymentdetails_desc_label),
             value = when (payment) {
                 is OutgoingPayment -> when (val details = payment.details) {
-                    is OutgoingPayment.Details.Normal -> details.paymentRequest.description ?: details.paymentRequest.descriptionHash?.toHex()
+                    is OutgoingPayment.Details.Normal -> data.metadata.userDescription ?: details.paymentRequest.description ?: details.paymentRequest.descriptionHash?.toHex()
                     is OutgoingPayment.Details.ChannelClosing -> "Closing channel ${details.channelId}"
                     is OutgoingPayment.Details.KeySend -> "Donation"
                     is OutgoingPayment.Details.SwapOut -> "Swap to a Bitcoin address"
                 }
                 is IncomingPayment -> when (val origin = payment.origin) {
-                    is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description ?: origin.paymentRequest.descriptionHash?.toHex()
+                    is IncomingPayment.Origin.Invoice -> data.metadata.userDescription ?: origin.paymentRequest.description ?: origin.paymentRequest.descriptionHash?.toHex()
                     is IncomingPayment.Origin.KeySend -> "Spontaneous payment"
                     is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.DualSwapIn -> "On-chain swap deposit"
                 }
@@ -125,6 +125,12 @@ fun PaymentDetailsSplashView(
             )
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+        DetailsRow(
+            label = stringResource(id = R.string.paymentdetails_fees_label),
+            value = payment.fees.toPrettyString(LocalBitcoinUnit.current, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW)
+        )
+
         payment.errorMessage()?.let { errorMessage ->
             Spacer(modifier = Modifier.height(8.dp))
             DetailsRow(
@@ -133,26 +139,27 @@ fun PaymentDetailsSplashView(
             )
         }
 
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         Row(
-            modifier = Modifier.height(44.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
             Button(
                 text = stringResource(id = R.string.paymentdetails_details_button),
-                textStyle = MaterialTheme.typography.caption,
-                space = 4.dp,
-                padding = PaddingValues(horizontal = 20.dp, vertical = 10.dp),
+                textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp),
+                icon = R.drawable.ic_tool,
+                modifier = Modifier.weight(1f),
+                space = 8.dp,
                 onClick = {
                     onDetailsClick(data.id())
                 })
-            VSeparator(padding = PaddingValues(vertical = 8.dp))
             Button(
                 text = stringResource(id = R.string.paymentdetails_edit_button),
-                space = 4.dp,
-                textStyle = MaterialTheme.typography.caption,
-                padding = PaddingValues(horizontal = 20.dp, vertical = 10.dp),
+                textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp),
+                icon = R.drawable.ic_edit,
+                modifier = Modifier.weight(1f),
+                space = 8.dp,
                 onClick = { showEditDescriptionDialog = true })
         }
     }
@@ -161,7 +168,7 @@ fun PaymentDetailsSplashView(
         EditPaymentDetails(
             initialDescription = data.metadata.userDescription,
             onConfirm = {
-                // TODO: save user desc
+                onMetadataDescriptionUpdate(data.id(), it?.trim()?.takeIf { it.isNotBlank() })
                 showEditDescriptionDialog = false
             },
             onDismiss = { showEditDescriptionDialog = false }
@@ -246,7 +253,7 @@ private fun PaymentStatusIcon(
     Spacer(Modifier.height(16.dp))
     Text(text = message.uppercase(), style = MaterialTheme.typography.body2)
     timestamp?.let {
-        Text(text = timestamp.toRelativeDateString(), style = MaterialTheme.typography.caption)
+        Text(text = timestamp.toAbsoluteDateString(), style = MaterialTheme.typography.caption)
     }
 }
 
@@ -258,13 +265,15 @@ private fun DetailsRow(
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip
 ) {
-    Row {
-        Text(text = label, style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.End), modifier = Modifier.width(96.dp))
+    Row(
+        modifier = Modifier.padding(horizontal = 24.dp).widthIn(max = 400.dp)
+    ) {
+        Text(text = label, style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.End), modifier = Modifier.weight(.7f))
         Spacer(Modifier.width(8.dp))
         Text(
             text = value ?: fallbackValue,
             style = MaterialTheme.typography.body1.copy(fontStyle = if (value == null) FontStyle.Italic else FontStyle.Normal),
-            modifier = Modifier.width(300.dp),
+            modifier = Modifier.weight(1f),
             maxLines = maxLines,
             overflow = overflow,
         )

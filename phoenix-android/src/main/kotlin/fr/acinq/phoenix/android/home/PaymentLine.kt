@@ -25,13 +25,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,15 +43,13 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountView
+import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
-import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.walletPaymentId
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -120,7 +116,7 @@ fun PaymentLine(
                         amount = amount,
                         amountTextStyle = MaterialTheme.typography.body1.copy(color = if (isOutgoing) negativeColor() else positiveColor()),
                         unitTextStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
-                        isOutgoing = isOutgoing
+                        prefix = stringResource(if (isOutgoing) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received)
                     )
                 }
             }

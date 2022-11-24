@@ -180,6 +180,14 @@ class PaymentsManager(
         return databaseManager.paymentsDb()
     }
 
+    suspend fun updateMetadata(id: WalletPaymentId, userDescription: String?) {
+        paymentsDb().updateMetadata(
+            id = id,
+            userDescription = userDescription,
+            userNotes = null
+        )
+    }
+
     suspend fun getPayment(
         id: WalletPaymentId,
         options: WalletPaymentFetchOptions
