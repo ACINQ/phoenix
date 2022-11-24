@@ -27,6 +27,7 @@ import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.Connections
 import fr.acinq.phoenix.managers.PaymentsManager
+import fr.acinq.phoenix.managers.PaymentsPageFetcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,11 +53,14 @@ class PaymentsViewModel(
     private val _recentPaymentsFlow = MutableStateFlow<Map<String, PaymentRowState>>(HashMap())
     val recentPaymentsFlow: StateFlow<Map<String, PaymentRowState>> = _recentPaymentsFlow
 
+    private val allPaymentsPageFetcher: PaymentsPageFetcher
+    private val recentPaymentsPageFetcher: PaymentsPageFetcher
+
     init {
-        val allPaymentsPageFetcher = paymentsManager.makePageFetcher()
+        allPaymentsPageFetcher = paymentsManager.makePageFetcher()
         allPaymentsPageFetcher.subscribeToAll(offset = 0, count = 5)
 
-        val recentPaymentsPageFetcher = paymentsManager.makePageFetcher()
+        recentPaymentsPageFetcher = paymentsManager.makePageFetcher()
         recentPaymentsPageFetcher.subscribeToRecent(offset = 0, count = 5, seconds = (60 * 60 * 24 * 3))
 
         // get details when a payment completes
@@ -87,7 +91,7 @@ class PaymentsViewModel(
                 viewModelScope.launch(Dispatchers.Default) {
                     // rewrite all the payments flow map to keep payments ordering - adding the diff would put new elements to the bottom of the map
                     _allPaymentsFlow.value = it.rows.associate { row ->
-                        row.id.identifier to (_recentPaymentsFlow.value[row.id.identifier] ?: run {
+                        row.id.identifier to (_allPaymentsFlow.value[row.id.identifier] ?: run {
                             PaymentRowState(row, null)
                         })
                     }
@@ -121,6 +125,11 @@ class PaymentsViewModel(
                 }
             }
         }
+    }
+
+    /** Listens to changes in payments db for payments within given count and offset and updates the [allPaymentsFlow]. */
+    fun subscribeToAllPayments(offset: Int, count: Int) {
+        allPaymentsPageFetcher.subscribeToAll(offset, count)
     }
 
     class Factory(

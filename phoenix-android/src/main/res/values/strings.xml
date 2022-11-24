@@ -696,7 +696,7 @@
 
     <!-- ////////////// payments history ////////////// -->
 
-    <string name="payments_history_title">My payments</string>
+    <string name="payments_history_title">My payments (%1$d)</string>
     <string name="payments_history_backup_notavailable">Payments backup is not available yet.</string>
 
     <!-- ////////////// currencies ////////////// -->

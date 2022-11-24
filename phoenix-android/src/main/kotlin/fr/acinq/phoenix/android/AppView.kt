@@ -167,7 +167,7 @@ fun AppView(
                         PaymentDetailsView(
                             paymentId = paymentId,
                             onBackClick = {
-                                navController.navigate(Screen.Home.route)
+                                navController.popBackStack()
                             },
                             fromEvent = it.arguments?.getBoolean("fromEvent") ?: false
                         )

@@ -17,27 +17,31 @@
 package fr.acinq.phoenix.android.payments
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.home.PaymentLine
 import fr.acinq.phoenix.android.home.PaymentLineLoading
 import fr.acinq.phoenix.android.home.PaymentsViewModel
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.WalletPaymentId
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import java.time.format.TextStyle
@@ -52,24 +56,48 @@ fun PaymentsHistoryView(
     onPaymentClick: (WalletPaymentId) -> Unit,
 ) {
     val log = logger("PaymentsHistory")
-    val groupedPayments = paymentsViewModel.allPaymentsFlow.collectAsState().value.values.toList()
-        .groupBy {
-            val date = Instant.fromEpochMilliseconds(it.orderRow.completedAt ?: it.orderRow.createdAt).toLocalDateTime(TimeZone.currentSystemDefault())
-            date.month
-        }
-
+    val listState = rememberLazyListState()
+    val paymentsCount = business.paymentsManager.paymentsCount
+    val payments = paymentsViewModel.allPaymentsFlow.collectAsState()
+    val groupedPayments = payments.value.values.groupBy {
+        val date = Instant.fromEpochMilliseconds(it.orderRow.completedAt ?: it.orderRow.createdAt).toLocalDateTime(TimeZone.currentSystemDefault())
+        date.month to date.year
+    }
     DefaultScreenLayout(
         isScrollable = false
     ) {
-        DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.payments_history_title))
-        Card {
-            LazyColumn {
-                groupedPayments.forEach { (month, payments) ->
+        DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.payments_history_title, paymentsCount.value))
+        Card(modifier = Modifier.weight(1f, fill = false)) {
+            LaunchedEffect(key1 = listState) {
+                snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull() }
+                    .filterNotNull()
+                    .map { it.index }
+                    .distinctUntilChanged()
+                    .filter { index ->
+                        val entriesInListCount = groupedPayments.entries.size + payments.value.size
+                        val isLastElementFetched = index == entriesInListCount - 1
+                        isLastElementFetched
+                    }
+                    .distinctUntilChanged()
+                    .collect { index ->
+                        val hasMorePaymentsToFetch = payments.value.size < paymentsCount.value
+                        if (hasMorePaymentsToFetch) {
+                            paymentsViewModel.subscribeToAllPayments(offset = 0, count = index + 10)
+                        }
+                    }
+                }
+            LazyColumn(
+                state = listState,
+            ) {
+                groupedPayments.forEach { (date, payments) ->
                     stickyHeader {
                         Text(
-                            text = month.getDisplayName(TextStyle.FULL, Locale.getDefault()).uppercase(),
-                            style = MaterialTheme.typography.body2.copy(fontSize = 12.sp, textAlign = TextAlign.Center),
-                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+                            text = "${date.first.getDisplayName(TextStyle.FULL, Locale.getDefault()).uppercase()} ${date.second}",
+                            style = MaterialTheme.typography.body2.copy(fontSize = 12.sp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colors.surface)
+                                .padding(vertical = 8.dp, horizontal = 16.dp),
                         )
                     }
                     items(items = payments) {
@@ -85,11 +113,5 @@ fun PaymentsHistoryView(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = stringResource(id = R.string.payments_history_backup_notavailable),
-            style = MaterialTheme.typography.caption.copy(fontSize = 14.sp, textAlign = TextAlign.Center),
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-        )
     }
 }
