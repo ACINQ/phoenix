@@ -29,6 +29,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
@@ -53,11 +54,7 @@ class NodeParamsManager(
     init {
         // we listen to the wallet manager and update node params and databases when the wallet changes
         launch {
-            walletManager.wallet.collect {
-                if (it == null) return@collect
-                log.info { "wallet available: building nodeParams..." }
-
-                val keyManager = LocalKeyManager(seed = it.seed, chainHash = chain.chainHash)
+            walletManager.keyManager.filterNotNull().collect { keyManager ->
                 log.info { "nodeid=${keyManager.nodeId}" }
 
                 val nodeParams = NodeParams(

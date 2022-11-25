@@ -248,7 +248,7 @@ fun mutedTextColor(): Color = if (isDarkTheme) gray600 else gray200
 fun mutedBgColor(): Color = if (isDarkTheme) gray950 else gray30
 
 @Composable
-fun borderColor(): Color = if (isDarkTheme) gray900 else gray50
+fun borderColor(): Color = if (isDarkTheme) gray800 else gray70
 
 @Composable
 fun systemStatusBarColor() = mutedBgColor()

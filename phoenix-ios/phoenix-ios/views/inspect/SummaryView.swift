@@ -567,7 +567,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				
 			} valueColumn: {
 				
-				Text(lnurlPay.lnurl.host)
+				Text(lnurlPay.initialUrl.host)
 				
 			} // </InfoGridRow>
 		}
@@ -607,7 +607,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 		let identifier: String = #function
 		let successAction = paymentInfo.metadata.lnurl?.successAction
 		
-		if let sa_message = successAction as? LNUrl.PayInvoice_SuccessAction_Message {
+		if let sa_message = successAction as? LnurlPay.Invoice_SuccessAction_Message {
 			
 			InfoGridRow(
 				identifier: identifier,
@@ -630,7 +630,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				
 			} // </InfoGridRow>
 			
-		} else if let sa_url = successAction as? LNUrl.PayInvoice_SuccessAction_Url {
+		} else if let sa_url = successAction as? LnurlPay.Invoice_SuccessAction_Url {
 			
 			InfoGridRow(
 				identifier: identifier,
@@ -664,7 +664,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				
 			} // </InfoGridRow>
 		
-		} else if let sa_aes = successAction as? LNUrl.PayInvoice_SuccessAction_Aes {
+		} else if let sa_aes = successAction as? LnurlPay.Invoice_SuccessAction_Aes {
 			
 			InfoGridRow(
 				identifier: identifier,
@@ -908,7 +908,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 		}
 	}
 
-	func decrypt(aes sa_aes: LNUrl.PayInvoice_SuccessAction_Aes) -> LNUrl.PayInvoice_SuccessAction_Aes_Decrypted? {
+	func decrypt(aes sa_aes: LnurlPay.Invoice_SuccessAction_Aes) -> LnurlPay.Invoice_SuccessAction_Aes_Decrypted? {
 		
 		guard
 			let outgoingPayment = paymentInfo.payment as? Lightning_kmpOutgoingPayment,
@@ -926,14 +926,14 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			let plaintext_data = try aes.decrypt(sa_aes.ciphertext.toSwiftData(), padding: .PKCS7)
 			if let plaintext_str = String(bytes: plaintext_data, encoding: .utf8) {
 				
-				return LNUrl.PayInvoice_SuccessAction_Aes_Decrypted(
+				return LnurlPay.Invoice_SuccessAction_Aes_Decrypted(
 					description: sa_aes.description_,
 					plaintext: plaintext_str
 				)
 			}
 			
 		} catch {
-			log.error("Error decrypting LNUrl.PayInvoice_SuccessAction_Aes: \(String(describing: error))")
+			log.error("Error decrypting LnurlPay.Invoice_SuccessAction_Aes: \(String(describing: error))")
 		}
 		
 		return nil

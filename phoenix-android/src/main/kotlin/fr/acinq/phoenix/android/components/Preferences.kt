@@ -41,8 +41,11 @@ internal fun <T> ListPreferenceButton(
     selectedItem: T,
     preferences: List<PreferenceItem<T>>,
     onPreferenceSubmit: (PreferenceItem<T>) -> Unit,
+    dialogTitle: String? = null,
+    dialogDescription: String? = null,
+    initialShowDialog: Boolean = false,
 ) {
-    var showPreferenceDialog by remember { mutableStateOf(false) }
+    var showPreferenceDialog by remember { mutableStateOf(initialShowDialog) }
 
     SettingInteractive(title = title, description = subtitle, enabled = enabled) {
         showPreferenceDialog = true
@@ -50,6 +53,8 @@ internal fun <T> ListPreferenceButton(
 
     if (showPreferenceDialog) {
         ListPreferenceDialog(
+            title = dialogTitle ?: title,
+            description = dialogDescription,
             initialPrefIndex = preferences.map { it.item }.indexOf(selectedItem).takeIf { it >= 0 },
             preferences = preferences,
             onSubmit = {
@@ -63,12 +68,15 @@ internal fun <T> ListPreferenceButton(
 
 @Composable
 private fun <T> ListPreferenceDialog(
+    title: String,
+    description: String?,
     initialPrefIndex: Int?,
     preferences: List<PreferenceItem<T>>,
     onSubmit: (PreferenceItem<T>) -> Unit,
     onCancel: () -> Unit,
 ) {
     Dialog(
+        title = title,
         onDismiss = onCancel,
         isScrollable = false,
         buttons = { Button(onClick = onCancel, text = stringResource(id = R.string.btn_cancel), padding = PaddingValues(16.dp)) }
@@ -78,6 +86,10 @@ private fun <T> ListPreferenceDialog(
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         ) {
+            if (description != null) {
+                Text(text = description, modifier = Modifier.padding(horizontal = 32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             LazyColumn {
                 itemsIndexed(preferences) { index, item ->
                     PreferenceDialogItem(

@@ -1,5 +1,5 @@
 object Versions {
-    const val lightningKmp = "1.4.2"
+    const val lightningKmp = "1.4.3-SNAPSHOT"
     const val secp256k1 = "0.6.4"
 
     const val kotlin = "1.5.31"
@@ -35,7 +35,7 @@ object Versions {
     }
 
     object AndroidLegacy {
-        const val eclair = "0.4.16-android-phoenix-SNAPSHOT"
+        const val eclair = "0.4.17-android-phoenix-SNAPSHOT"
 
         const val safeArgs = "2.3.5"
         const val appCompat = "1.3.0"

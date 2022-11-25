@@ -261,7 +261,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func lnurl_service(_ lnurlPay: LNUrl.Pay) -> some View {
+	func lnurl_service(_ lnurlPay: LnurlPay.Intent) -> some View {
 		let identifier: String = #function
 		
 		InfoGridRowWrapper(
@@ -274,12 +274,12 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			Text(lnurlPay.lnurl.host)
+			Text(lnurlPay.initialUrl.host)
 		}
 	}
 	
 	@ViewBuilder
-	func lnurl_range(_ lnurlPay: LNUrl.Pay) -> some View {
+	func lnurl_range(_ lnurlPay: LnurlPay.Intent) -> some View {
 		let identifier: String = #function
 		
 		if lnurlPay.maxSendable.msat > lnurlPay.minSendable.msat {

@@ -304,7 +304,7 @@ struct ScanView: View {
 						} else if let content = clipboardContent as? Scan.ClipboardContent_LoginRequest {
 							
 							let title = content.auth.actionPromptTitle
-							let domain = content.auth.url.host
+							let domain = content.auth.initialUrl.host
 							
 							Text(verbatim: "\(title) ") +
 							Text(Image(systemName: "arrow.forward")) +

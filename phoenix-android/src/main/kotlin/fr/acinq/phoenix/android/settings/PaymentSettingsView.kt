@@ -47,11 +47,14 @@ import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.PaymentOptionsConstants
+import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 
 @Composable
-fun PaymentSettingsView() {
+fun PaymentSettingsView(
+    initialShowLnurlAuthSchemeDialog: Boolean = false
+) {
     val log = logger("PaymentSettingsView")
     val nc = navController
     val scope = rememberCoroutineScope()
@@ -68,6 +71,8 @@ fun PaymentSettingsView() {
     val walletContext = LocalWalletContext.current
     val prefsTrampolineMaxFee by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(null)
     val trampolineFees = prefsTrampolineMaxFee ?: walletContext?.trampoline?.v2?.attempts?.last()?.export()
+
+    val prefLnurlAuthSchemeState = UserPrefs.getLnurlAuthScheme(context).collectAsState(initial = null)
 
     DefaultScreenLayout {
         DefaultScreenHeader(
@@ -104,6 +109,38 @@ fun PaymentSettingsView() {
                 },
                 onClick = { showPayToOpenDialog = true }
             )
+        }
+        val prefLnurlAuthScheme = prefLnurlAuthSchemeState.value
+        if (prefLnurlAuthScheme != null) {
+            Card {
+                val schemes = listOf<PreferenceItem<LnurlAuth.Scheme>>(
+                    PreferenceItem(
+                        item = LnurlAuth.Scheme.DEFAULT_SCHEME,
+                        title = stringResource(id = R.string.lnurl_auth_scheme_default),
+                        description = stringResource(id = R.string.lnurl_auth_scheme_default_desc)
+                    ),
+                    PreferenceItem(
+                        item = LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME,
+                        title = stringResource(id = R.string.lnurl_auth_scheme_legacy),
+                        description = stringResource(id = R.string.lnurl_auth_scheme_legacy_desc)
+                    )
+                )
+                ListPreferenceButton(
+                    title = stringResource(id = R.string.paymentsettings_lnurlauth_scheme_title),
+                    subtitle = when (prefLnurlAuthScheme) {
+                        LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME -> stringResource(id = R.string.lnurl_auth_scheme_legacy)
+                        LnurlAuth.Scheme.DEFAULT_SCHEME -> stringResource(id = R.string.lnurl_auth_scheme_default)
+                        else -> stringResource(id = R.string.utils_unknown)
+                    },
+                    enabled = true,
+                    selectedItem = prefLnurlAuthScheme,
+                    preferences = schemes,
+                    onPreferenceSubmit = {
+                        scope.launch { UserPrefs.saveLnurlAuthScheme(context, it.item) }
+                    },
+                    initialShowDialog = initialShowLnurlAuthSchemeDialog
+                )
+            }
         }
     }
 

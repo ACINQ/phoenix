@@ -441,10 +441,10 @@ struct ValidateView: View {
 	func paymentHost() -> String? {
 		
 		if let lnurlPay = lnurlPay() {
-			return lnurlPay.lnurl.host
+			return lnurlPay.initialUrl.host
 			
 		} else if let lnurlWithdraw = lnurlWithdraw() {
-			return lnurlWithdraw.lnurl.host
+			return lnurlWithdraw.initialUrl.host
 			
 		} else {
 			return nil
@@ -637,18 +637,18 @@ struct ValidateView: View {
 		}
 	}
 	
-	func lnurlPay() -> LNUrl.Pay? {
+	func lnurlPay() -> LnurlPay.Intent? {
 		
-		if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
-			return model.lnurlPay
+		if let model = mvi.model as? Scan.Model_LnurlPayFlow {
+			return model.paymentIntent
 		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayFetch {
-			return model.lnurlPay
+			return model.paymentIntent
 		} else {
 			return nil
 		}
 	}
 	
-	func lnurlWithdraw() -> LNUrl.Withdraw? {
+	func lnurlWithdraw() -> LnurlWithdraw? {
 		
 		if let model = mvi.model as? Scan.Model_LnurlWithdrawFlow_LnurlWithdrawRequest {
 			return model.lnurlWithdraw
@@ -1326,7 +1326,7 @@ struct ValidateView: View {
 			
 			if supportsComment() && comment.count == 0 && !hasPromptedForComment {
 				
-				let maxCommentLength = model.lnurlPay.maxCommentLength?.intValue ?? 140
+				let maxCommentLength = model.paymentIntent.maxCommentLength?.intValue ?? 140
 				
 				dismissKeyboardIfVisible()
 				smartModalState.display(dismissable: true) {
@@ -1346,8 +1346,8 @@ struct ValidateView: View {
 			} else {
 				
 				saveTipPercentInPrefs()
-				mvi.intent(Scan.Intent_LnurlPayFlow_SendLnurlPayment(
-					lnurlPay: model.lnurlPay,
+				mvi.intent(Scan.Intent_LnurlPayFlow_RequestInvoice(
+					paymentIntent: model.paymentIntent,
 					amount: Lightning_kmpMilliSatoshi(msat: msat),
 					maxFees: Prefs.shared.maxFees?.toKotlin(),
 					comment: comment

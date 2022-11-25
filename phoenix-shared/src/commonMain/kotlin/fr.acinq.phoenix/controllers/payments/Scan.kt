@@ -22,7 +22,7 @@ import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.controllers.MVI
 import fr.acinq.phoenix.data.BitcoinAddressInfo
-import fr.acinq.phoenix.data.LNUrl
+import fr.acinq.phoenix.data.lnurl.*
 import io.ktor.http.*
 import kotlin.time.ExperimentalTime
 
@@ -38,9 +38,9 @@ object Scan {
         object UnknownFormat : BadRequestReason()
         object AlreadyPaidInvoice : BadRequestReason()
         data class ChainMismatch(val myChain: Chain, val requestChain: Chain?) : BadRequestReason()
-        data class ServiceError(val url: Url, val error: LNUrl.Error.RemoteFailure) : BadRequestReason()
-        data class InvalidLnUrl(val url: Url) : BadRequestReason()
-        data class UnsupportedLnUrl(val url: Url) : BadRequestReason()
+        data class ServiceError(val url: Url, val error: LnurlError.RemoteFailure) : BadRequestReason()
+        data class InvalidLnurl(val url: Url) : BadRequestReason()
+        data class UnsupportedLnurl(val url: Url) : BadRequestReason()
     }
 
     sealed class DangerousRequestReason {
@@ -49,18 +49,18 @@ object Scan {
     }
 
     sealed class LnurlPayError {
-        data class RemoteError(val err: LNUrl.Error.RemoteFailure) : LnurlPayError()
-        data class BadResponseError(val err: LNUrl.Error.PayInvoice) : LnurlPayError()
+        data class RemoteError(val err: LnurlError.RemoteFailure) : LnurlPayError()
+        data class BadResponseError(val err: LnurlError.Pay.Invoice) : LnurlPayError()
         data class ChainMismatch(val myChain: Chain, val requestChain: Chain?) : LnurlPayError()
         object AlreadyPaidInvoice : LnurlPayError()
     }
 
     sealed class LnurlWithdrawError {
-        data class RemoteError(val err: LNUrl.Error.RemoteFailure) : LnurlWithdrawError()
+        data class RemoteError(val err: LnurlError.RemoteFailure) : LnurlWithdrawError()
     }
 
     sealed class LoginError {
-        data class ServerError(val details: LNUrl.Error.RemoteFailure) : LoginError()
+        data class ServerError(val details: LnurlError.RemoteFailure) : LoginError()
         data class NetworkError(val details: Throwable) : LoginError()
         data class OtherError(val details: Throwable) : LoginError()
     }
@@ -97,30 +97,34 @@ object Scan {
         object LnurlServiceFetch : Model()
 
         sealed class LnurlPayFlow : Model() {
+            abstract val paymentIntent: LnurlPay.Intent
             data class LnurlPayRequest(
-                val lnurlPay: LNUrl.Pay,
+                override val paymentIntent: LnurlPay.Intent,
                 val error: LnurlPayError?
             ) : LnurlPayFlow()
 
             data class LnurlPayFetch(
-                val lnurlPay: LNUrl.Pay,
+                override val paymentIntent: LnurlPay.Intent
             ) : LnurlPayFlow()
 
-            object Sending : LnurlPayFlow()
+            data class Sending(
+                override val paymentIntent: LnurlPay.Intent
+            ) : LnurlPayFlow()
         }
 
         sealed class LnurlWithdrawFlow : Model() {
+            abstract val lnurlWithdraw: LnurlWithdraw
             data class LnurlWithdrawRequest(
-                val lnurlWithdraw: LNUrl.Withdraw,
+                override val lnurlWithdraw: LnurlWithdraw,
                 val error: LnurlWithdrawError?
             ) : LnurlWithdrawFlow()
 
             data class LnurlWithdrawFetch(
-                val lnurlWithdraw: LNUrl.Withdraw,
+                override val lnurlWithdraw: LnurlWithdraw,
             ) : LnurlWithdrawFlow()
 
             data class Receiving(
-                val lnurlWithdraw: LNUrl.Withdraw,
+                override val lnurlWithdraw: LnurlWithdraw,
                 val amount: MilliSatoshi,
                 val description: String?,
                 val paymentHash: String
@@ -128,16 +132,17 @@ object Scan {
         }
 
         sealed class LnurlAuthFlow : Model() {
+            abstract val auth: LnurlAuth
             data class LoginRequest(
-                val auth: LNUrl.Auth
+                override val auth: LnurlAuth
             ) : LnurlAuthFlow()
 
             data class LoggingIn(
-                val auth: LNUrl.Auth
+                override val auth: LnurlAuth
             ) : LnurlAuthFlow()
 
             data class LoginResult(
-                val auth: LNUrl.Auth,
+                override val auth: LnurlAuth,
                 val error: LoginError?
             ) : LnurlAuthFlow()
         }
@@ -185,34 +190,35 @@ object Scan {
         object CancelLnurlServiceFetch : Intent()
 
         sealed class LnurlPayFlow : Intent() {
-            data class SendLnurlPayment(
-                val lnurlPay: LNUrl.Pay,
+            data class RequestInvoice(
+                val paymentIntent: LnurlPay.Intent,
                 val amount: MilliSatoshi,
                 val maxFees: MaxFees?,
                 val comment: String?
             ) : LnurlPayFlow()
 
             data class CancelLnurlPayment(
-                val lnurlPay: LNUrl.Pay
+                val lnurlPay: LnurlPay.Intent
             ) : LnurlPayFlow()
         }
 
         sealed class LnurlWithdrawFlow : Intent() {
             data class SendLnurlWithdraw(
-                val lnurlWithdraw: LNUrl.Withdraw,
+                val lnurlWithdraw: LnurlWithdraw,
                 val amount: MilliSatoshi,
                 val description: String?
             ) : LnurlWithdrawFlow()
 
             data class CancelLnurlWithdraw(
-                val lnurlWithdraw: LNUrl.Withdraw
+                val lnurlWithdraw: LnurlWithdraw
             ) : LnurlWithdrawFlow()
         }
 
         sealed class LnurlAuthFlow : Intent() {
             data class Login(
-                val auth: LNUrl.Auth,
-                val minSuccessDelaySeconds: Double = 0.0
+                val auth: LnurlAuth,
+                val minSuccessDelaySeconds: Double = 0.0,
+                val scheme: LnurlAuth.Scheme
             ) : LnurlAuthFlow()
         }
     }
@@ -231,7 +237,7 @@ object Scan {
         ) : ClipboardContent()
 
         data class LoginRequest(
-            val auth: LNUrl.Auth
+            val auth: LnurlAuth
         ) : ClipboardContent()
     }
 }
