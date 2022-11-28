@@ -18,6 +18,7 @@ struct PaymentCell : View {
 	
 	let row: WalletPaymentOrderRow
 	let didAppearCallback: ((WalletPaymentOrderRow) -> Void)?
+	let didDisappearCallback: ((WalletPaymentOrderRow) -> Void)?
 	
 	@State var fetched: WalletPaymentInfo?
 	@State var fetchedIsStale: Bool
@@ -28,10 +29,12 @@ struct PaymentCell : View {
 
 	init(
 		row: WalletPaymentOrderRow,
-		didAppearCallback: ((WalletPaymentOrderRow) -> Void)?
+		didAppearCallback: ((WalletPaymentOrderRow) -> Void)?,
+		didDisappearCallback: ((WalletPaymentOrderRow) -> Void)? = nil
 	) {
 		self.row = row
 		self.didAppearCallback = didAppearCallback
+		self.didDisappearCallback = didDisappearCallback
 		
 		let options = WalletPaymentFetchOptions.companion.Descriptions
 		var result = paymentsManager.fetcher.getCachedPayment(row: row, options: options)
@@ -140,6 +143,9 @@ struct PaymentCell : View {
 		.onAppear {
 			onAppear()
 		}
+		.onDisappear {
+			onDisappear()
+		}
 	}
 
 	func paymentDescription() -> String {
@@ -199,7 +205,7 @@ struct PaymentCell : View {
 		}
 	}
 	
-	func onAppear() -> Void {
+	func onAppear() {
 		
 		if fetched == nil || fetchedIsStale {
 			
@@ -211,6 +217,13 @@ struct PaymentCell : View {
 		
 		if let didAppearCallback = didAppearCallback {
 			didAppearCallback(row)
+		}
+	}
+	
+	func onDisappear() {
+		
+		if let didDisappearCallback = didDisappearCallback {
+			didDisappearCallback(row)
 		}
 	}
 }

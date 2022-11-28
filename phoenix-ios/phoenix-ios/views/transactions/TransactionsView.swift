@@ -12,9 +12,9 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-
-fileprivate let PAGE_COUNT_START = 25
-fileprivate let PAGE_COUNT_INCREMENT = 25
+fileprivate let PAGE_COUNT_START = 30
+fileprivate let PAGE_COUNT_INCREMENT = 20
+fileprivate let PAGE_COUNT_MAX = PAGE_COUNT_START + (PAGE_COUNT_INCREMENT * 2) // 70
 
 
 struct TransactionsView: View {
@@ -26,7 +26,9 @@ struct TransactionsView: View {
 	
 	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
+	@State var cachedRows: [WalletPaymentOrderRow] = []
 	@State var sections: [PaymentsSection] = []
+	@State var visibleRows: Set<WalletPaymentOrderRow> = Set()
 	
 	@State var selectedItem: WalletPaymentInfo? = nil
 	
@@ -34,7 +36,6 @@ struct TransactionsView: View {
 	@State var isDownloadingTxs: Bool = false
 	
 	@State var didAppear = false
-	@State var didPreFetch = false
 	
 	@Environment(\.colorScheme) var colorScheme
 	
@@ -83,9 +84,7 @@ struct TransactionsView: View {
 			
 			ScrollView {
 				LazyVStack(pinnedViews: [.sectionHeaders]) {
-					// paymentsPage.rows: [WalletPaymentOrderRow]
-					//
-					// Here's how this works:
+					// Reminder:
 					// - ForEach uses the given type (which conforms to Swift's Identifiable protocol)
 					//   to determine whether or not the row is new/modified or the same as before.
 					// - If the row is new/modified, then it it initialized with fresh state,
@@ -103,7 +102,11 @@ struct TransactionsView: View {
 								Button {
 									didSelectPayment(row: row)
 								} label: {
-									PaymentCell(row: row, didAppearCallback: paymentCellDidAppear)
+									PaymentCell(
+										row: row,
+										didAppearCallback: paymentCellDidAppear,
+										didDisappearCallback: paymentCellDidDisappear
+									)
 								}
 							}
 							
@@ -121,7 +124,7 @@ struct TransactionsView: View {
 				
 					if isDownloadingTxs {
 						cell_syncing()
-					} else if paymentsPage.rows.isEmpty {
+					} else if sections.isEmpty {
 						cell_zeroPayments()
 					}
 					
@@ -227,13 +230,17 @@ struct TransactionsView: View {
 	func paymentsPageChanged(_ page: PaymentsPage) {
 		log.trace("paymentsPageChanged() => \(page.rows.count)")
 		
+		let preOffsetPayments = preOffsetPayments(page: page)
+		let allPayments = preOffsetPayments + page.rows
+		log.debug("allPayments.count = \(allPayments.count)")
+		
 		let calendar = Calendar.current
 		
 		let dateFormatter = DateFormatter()
 		dateFormatter.setLocalizedDateFormatFromTemplate("yyyyMMMM")
 		
 		var newSections = [PaymentsSection]()
-		for row in page.rows {
+		for row in allPayments {
 			
 			let date = row.sortDate
 			let comps = calendar.dateComponents([.year, .month], from: date)
@@ -258,7 +265,18 @@ struct TransactionsView: View {
 		
 		paymentsPage = page
 		sections = newSections
-		maybePreFetchPaymentsFromDatabase()
+		
+		let sortedVisibleRows = visibleRows.sorted { a, b in
+			// return true if `a` should be ordered before `b`; otherwise return false
+			return a.sortDate > b.sortDate
+		}
+		
+		if let topVisibleRow = sortedVisibleRows.first {
+			paymentCellDidAppear(topVisibleRow)
+			if let bottomVisibleRow = sortedVisibleRows.last {
+				paymentCellDidAppear(bottomVisibleRow)
+			}
+		}
 	}
 	
 	func paymentCellDidAppear(_ visibleRow: WalletPaymentOrderRow) -> Void {
@@ -269,55 +287,180 @@ struct TransactionsView: View {
 		// Here's the general idea:
 		//
 		// - We start by fetching a small "page" from the database.
-		//   For example: Page(offset=0, count=50)
+		//   => Page(offset=0, count=30)
 		// - When the user scrolls to the bottom, we can increase the count.
-		//   For example: Page(offset=0, count=100)
+		//   => Page(offset=0, count=50)
+		// - As the user continues scrolling, we continue increasing the count until we reach the max.
+		//   => Page(offset=0, count=70)
+		// - After the max, we instead increase the offset.
+		//   => Page(offset=20, count=70)
+		// - If the user scrolls back up to the offset (idx=20), then we decrease the offset.
+		//   => Page(offset=0, count=70)
 		//
-		// Note:
-		// In the original design, we didn't increase the count forever.
-		// At some point we incremented the offset instead.
-		// However, this doesn't work well with LazyVStack, because the contentOffset isn't adjusted.
-		// So the end result is that the user's position within the scrollView jumps,
-		// and results in a very confusing user experience.
-		// I cannot find a clean way of accomplishing a solution with pure SwiftUI.
-		// So this remains a todo item for future improvement.
+		// In the past (pre-SwiftUI; using UIKit) when we changed the offset, we could simultaneously
+		// change the scrollView's contentOffset so it looked like nothing changed.
+		// That is, so the current rows on the screen remained in the exact same position.
+		// However, using the same approach doesn't work well with SwiftUI.
+		//
+		// First, there's no API to set the scrollView's contentOffset.
+		// If we hack it, by assuming the SwiftUI ScrollView is backed by UIKit's UIScrollView,
+		// then we risk it breaking in a future update (or on some platforms and not others).
+		//
+		// Second, in SwiftUI, the change in rows seems to trigger an automatic scroll
+		// to the top of the List. So we have contend with that problem too.
+		//
+		// To get around these problems, we simply keep in memory the (stale) versions of earlier rows.
+		// Here's what this looks like:
+		//
+		//     1      2      3      4      5      6      7
+		// --- -> --- -> --- -> --- -> --- -> --- -> --- -> ---
+		// |V|    |P|    |P|    |S|    |S|    |S|    |S|    |P|
+		// |P|    |V|    |P|    |P|    |S|    |S|    |P|    |V|
+		// ---    |P|    |V|    |P|    |P|    |P|    |V|    |P|
+		//        ---    |P|    |V|    |P|    |V|    |P|    |P|
+		//               ---    |P|    |V|    |P|    |P|    ---
+		//                      ---    |P|    |P|    ---
+		//                             ---    ---
+		//
+		// P => The paymentsPage; We're subscribed to these rows. If they change in the DB, we're notified.
+		// V => Visible rows on screen; This is a subset of P.
+		// S => Stale cached rows stored in memory; Falls outside of paymentsPage range.
+		//
+		// (1): user scrolls to the bottom, and we increment page.count
+		// (2): user scrolls to the bottom, and we increment page.count again (now we're at max page.count)
+		// (3): user scrolls to the bottom, and we increment page.offset (earlier rows cached in memory)
+		// (4): user scrolls to the bottom, and we increment page.offset again
+		// (5): user scrolls up, nothing to do since they're moving within page
+		// (6): user scrolls to top of P, and we decrement page.offset (P replaces S, and cache items dropped)
+		// (7): user scrolls to top of P, and we decrement page.offset again (cache items dropped)
+		//
+		// Notes:
+		//
+		// 1) We only increase the count, we never decrease it.
+		//    Thus once we reach the max count, it remains that way.
+		//
+		// 2) When we increase the offset, we keep in memory the previous rowIds.
+		//    For example, if we have Page(offset=20, count=70),
+		//    then we'll also have cached in memory rows[0-20]
+		//
+		// 3) The rows cached in memory are never on screen.
+		//    If the user scrolls back up, we decrease the page offset,
+		//    and trim the cache.
+		//
+		// 4) Since we're using a LazyVStack, only the visisble rows are kept in memory.
+		//    All non-visible rows are only represnted as an instance of `WalletPaymentOrderRow` in memory.
+		//
+		//
+		// There's one other detail to discuss:
+		// What happens when a new payment arrives ?
+		//
+		// Let's consider what happens under 2 different scenarios.
+		//
+		// Scenario #1: Page(offset=0, count=70)
+		//
+		// The new payment arrives, and is inserted into the table at index 0.
+		// All other rows get shifted down by 1.
+		//
+		// So if the user is at the top, they will see the new payment inserted.
+		// If they're scrolled down a little bit, they will see all rows shift down.
+		//
+		// Technically, the last row is dropped from the table.
+		// However, this row isn't visible to the user.
+		// If it was visible, then we would have already incremented the page.count or page.offset.
+		//
+		// Scenario #2: Page(offset=20, count=70)
+		//
+		// The new payment arrives, which affects the rows in Page.
+		// So the row that used to be at index 19 is now at 20.
+		// And thus there is an overlap between the cache and the page.
+		// That is, the row formerly known as 19 is now represented in both the cache and the page.
+		//
+		// This isn't a problem at all.
+		// We simply remove any duplicates from the cache.
+		//
+		// The end effect is that the user's scroll position remains in the same place.
+		// Because ultimately the only thing that changed is that we removed the last row from the table.
+		// That is, we used to have cache.size=20 + page.size=70
+		// But now we have cache.size=19 + page.size=70
+		//
+		// And remember, the last row isn't visible to the user.
+		// If it was visible, then we would have already increment the page.offset.
+		//
+		//
+		// But what if we try really hard to break things ?
+		// What if set Page(offset=20, count=70), and then we receive 20 payments ?
+		//
+		// The only extra logic we need to fix this is:
+		// - in `paymentsPageChanged`, just invoke `paymentCellDidAppear` for first & last rows
+		// - this will perform the standard check (like during scrolling) to see if offset needs to change
 		
-		var rowIdxWithinPage: Int? = nil
-		for (idx, row) in paymentsPage.rows.enumerated() {
-			
-			if row == visibleRow {
-				rowIdxWithinPage = idx
-				break
-			}
-		}
+		visibleRows.insert(visibleRow)
+		let allRows = sections.flatMap { $0.payments }
 		
-		guard let rowIdxWithinPage = rowIdxWithinPage else {
+		guard let rowIdx = allRows.firstIndexAsInt(of: visibleRow) else {
 			// Row not found within current page.
 			// Perhaps the page just changed, and it no longer includes this row.
 			return
 		}
 		
-		let isLastRowWithinPage = rowIdxWithinPage + 1 == paymentsPage.rows.count
-		if isLastRowWithinPage {
-		
-			let rowIdxWithinDatabase = Int(paymentsPage.offset) + rowIdxWithinPage
-			let hasMoreRowsInDatabase = rowIdxWithinDatabase + 1 < paymentsCount
+		if rowIdx == (allRows.count - 1) {
 			
-			if hasMoreRowsInDatabase {
+			// We've reached the last row, so we'd like to load more items.
+			// That is, if we have reason to believe there are more items.
+			
+			let maybeHasMoreRows = paymentsPage.rows.count == paymentsPage.count
+			if maybeHasMoreRows {
 				
-				// increase paymentsPage.count
+				var newOffset = paymentsPage.offset
+				var newCount = paymentsPage.count + Int32(PAGE_COUNT_INCREMENT)
 				
-				let prvOffset = paymentsPage.offset
-				let newCount = paymentsPage.count + Int32(PAGE_COUNT_INCREMENT)
-				
-				log.debug("increasing page.count: Page(offset=\(prvOffset), count=\(newCount))")
-				
-				paymentsPageFetcher.subscribeToAll(
-					offset: prvOffset,
-					count: newCount
-				)
+				if newCount <= PAGE_COUNT_MAX { // increase count
+					
+					log.debug("increasing page.count: Page(offset=\(newOffset), count=\(newCount))")
+					
+					paymentsPageFetcher.subscribeToAll(
+						offset: newOffset,
+						count: newCount
+					)
+					
+				} else { // increase offset instead
+					
+					newOffset = paymentsPage.offset + Int32(PAGE_COUNT_INCREMENT)
+					newCount = paymentsPage.count
+					log.debug("increasing page.offset: Page(offset=\(newOffset), count=\(newCount))")
+					
+					cachedRows = allRows
+					paymentsPageFetcher.subscribeToAll(
+						offset: newOffset,
+						count: newCount
+					)
+				}
 			}
+			
+		} else if rowIdx == (allRows.count - PAGE_COUNT_MAX) {
+			
+			// The user is scrolling up (towards more recent items).
+			// We want to move the subscription window 1 increment backwards.
+			
+			let preOffsetPayments = preOffsetPayments(page: paymentsPage)
+			
+			let newOffset = max(Int32(0), paymentsPage.offset - Int32(PAGE_COUNT_INCREMENT))
+			let newCount = paymentsPage.count
+			
+			log.debug("decreasing page.offset: Page(offset=\(newOffset), count=\(newCount))")
+			
+			cachedRows = preOffsetPayments
+			paymentsPageFetcher.subscribeToAll(
+				offset: newOffset,
+				count: newCount
+			)
 		}
+	}
+	
+	func paymentCellDidDisappear(_ visibleRow: WalletPaymentOrderRow) -> Void {
+		log.trace("paymentCellDidDisappear(): \(visibleRow.id)")
+		
+		visibleRows.remove(visibleRow)
 	}
 	
 	func syncStateChanged(_ state: SyncTxManager_State) {
@@ -328,6 +471,44 @@ struct TransactionsView: View {
 		} else {
 			self.isDownloadingTxs = false
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Utilities
+	// --------------------------------------------------
+	
+	func preOffsetPayments(page: PaymentsPage) -> [WalletPaymentOrderRow] {
+		
+		if cachedRows.isEmpty {
+			return []
+		}
+		
+		// We want a list of all the payments in the list PRIOR to the given page.
+		//
+		// Where PRIOR means:
+		// - more recent
+		// - towards the top of the list (e.g. lower index values)
+		//
+		// Step 1:
+		// First we simply exclude any duplicate payments.
+		
+		let pagePaymentIds = Set(page.rows.map { $0.walletPaymentId })
+		var preOffsetPayments = cachedRows.filter { !pagePaymentIds.contains($0.walletPaymentId) }
+		
+		// Step 2:
+		// In the unlikely chance that the cached list not only overlaps the page,
+		// but exceeds it in time, we'll also remove anything out-of-order.
+		//
+		// This is theoretically possible.
+		// But only if the user receives a large batch of payments while scrolling.
+		
+		if let first = page.rows.first {
+			let firstDate = first.sortDate
+			
+			preOffsetPayments = preOffsetPayments.filter { $0.sortDate >= firstDate }
+		}
+		
+		return preOffsetPayments
 	}
 	
 	// --------------------------------------------------
@@ -345,38 +526,6 @@ struct TransactionsView: View {
 			if let result = result {
 				selectedItem = result
 			}
-		}
-	}
-	
-	// --------------------------------------------------
-	// MARK: Prefetch
-	// --------------------------------------------------
-	
-	func maybePreFetchPaymentsFromDatabase() -> Void {
-		
-		if !didPreFetch && paymentsPage.rows.count > 0 {
-			didPreFetch = true
-			
-			// Delay the pre-fetch process a little bit, to give priority to other app-startup tasks.
-			DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-				prefetchPaymentsFromDatabase(idx: 0)
-			}
-		}
-	}
-	
-	func prefetchPaymentsFromDatabase(idx: Int) {
-
-		guard idx < paymentsPage.rows.count else {
-			// recursion complete
-			return
-		}
-
-		let row = paymentsPage.rows[idx]
-		log.debug("Pre-fetching: \(row.id)")
-
-		let options = WalletPaymentFetchOptions.companion.Descriptions
-		Biz.business.paymentsManager.fetcher.getPayment(row: row, options: options) { (_, _) in
-			prefetchPaymentsFromDatabase(idx: idx + 1)
 		}
 	}
 }

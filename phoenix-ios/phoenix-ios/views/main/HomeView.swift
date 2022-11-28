@@ -63,7 +63,6 @@ struct HomeView : MVIView {
 	@Environment(\.colorScheme) var colorScheme
 	
 	@State var didAppear = false
-	@State var didPreFetch = false
 	
 	let backupSeed_enabled_publisher = Prefs.shared.backupSeed.isEnabled_publisher
 	let manualBackup_taskDone_publisher = Prefs.shared.backupSeed.manualBackup_taskDone_publisher
@@ -585,7 +584,6 @@ struct HomeView : MVIView {
 		log.trace("paymentsPageChanged()")
 		
 		paymentsPage = page
-		maybePreFetchPaymentsFromDatabase()
 	}
 	
 	func lastCompletedPaymentChanged(_ payment: Lightning_kmpWalletPayment) {
@@ -754,38 +752,6 @@ struct HomeView : MVIView {
 			if let result = result {
 				selectedItem = result
 			}
-		}
-	}
-	
-	// --------------------------------------------------
-	// MARK: Prefetch
-	// --------------------------------------------------
-	
-	func maybePreFetchPaymentsFromDatabase() -> Void {
-		
-		if !didPreFetch && paymentsPage.rows.count > 0 {
-			didPreFetch = true
-			
-			// Delay the pre-fetch process a little bit, to give priority to other app-startup tasks.
-			DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-				prefetchPaymentsFromDatabase(idx: 0)
-			}
-		}
-	}
-	
-	func prefetchPaymentsFromDatabase(idx: Int) {
-
-		guard idx < paymentsPage.rows.count else {
-			// recursion complete
-			return
-		}
-
-		let row = paymentsPage.rows[idx]
-		log.debug("Pre-fetching: \(row.id)")
-
-		let options = WalletPaymentFetchOptions.companion.Descriptions
-		paymentsManager.fetcher.getPayment(row: row, options: options) { (_, _) in
-			prefetchPaymentsFromDatabase(idx: idx + 1)
 		}
 	}
 	
