@@ -212,7 +212,7 @@ class LNUrlAuthFragment : BaseFragment() {
       val path4 = Protocol.uint32(stream, ByteOrder.BIG_ENDIAN)
       val path = DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/138'/$path1/$path2/$path3/$path4")
       // 2 - build key that will be used to link with service
-      return DeterministicWallet.derivePrivateKey(if (isLegacyEligible(url)) keyManager.nodeKey() else keyManager.master(), path).privateKey()
+      return DeterministicWallet.derivePrivateKey(if (isLegacyEligible(url)) hashingKey else keyManager.master(), path).privateKey()
     }
   }
 }

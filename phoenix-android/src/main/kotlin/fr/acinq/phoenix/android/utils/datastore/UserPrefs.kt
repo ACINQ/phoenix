@@ -143,7 +143,7 @@ object UserPrefs {
         when (it[LNURL_AUTH_SCHEME]) {
             LnurlAuth.Scheme.DEFAULT_SCHEME.id -> LnurlAuth.Scheme.DEFAULT_SCHEME
             LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME.id -> LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME
-            else -> LnurlAuth.Scheme.DEFAULT_SCHEME
+            else -> LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME
         }
     }
     suspend fun saveLnurlAuthScheme(context: Context, scheme: LnurlAuth.Scheme?) = context.userPrefs.edit {
