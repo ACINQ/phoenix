@@ -149,6 +149,7 @@ class LnurlManager(
     ) {
         val key = LnurlAuth.getAuthLinkingKey(
             localKeyManager = walletManager.keyManager.filterNotNull().first(),
+            master = walletManager._master!!,
             serviceUrl = auth.initialUrl,
             scheme = scheme
         )

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.*
 class WalletManager(
     private val chain: Chain
 ) : CoroutineScope by MainScope() {
+    internal var _master: DeterministicWallet.ExtendedPrivateKey? = null
 
     private val _localKeyManager = MutableStateFlow<LocalKeyManager?>(null)
     internal val keyManager: StateFlow<LocalKeyManager?> = _localKeyManager
@@ -33,10 +34,11 @@ class WalletManager(
 
     /** Loads a seed and creates the key manager. Returns an objet containing some keys for the iOS app. */
     fun loadWallet(seed: ByteArray): WalletInfo {
+        _master = DeterministicWallet.generate(seed)
         val km = keyManager.value ?: LocalKeyManager(seed.byteVector(), chain.chainHash).also {
             _localKeyManager.value = it
         }
-        val (cloudKey, encryptedNodeId) = km.cloudKeyAndEncryptedNodeId()
+        val (cloudKey, encryptedNodeId) = cloudKeyAndEncryptedNodeId()
         return WalletInfo(
             nodeId = km.nodeId,
             cloudKey = cloudKey,
@@ -44,7 +46,37 @@ class WalletManager(
         )
     }
 
-    fun getXpub(): Pair<String, String>? = keyManager.value?.xpub()
+    fun getXpub(): Pair<String, String>? {
+        if (_master == null) return null
+        val masterPubkeyPath = KeyPath(if (isMainnet()) "m/84'/0'/0'" else "m/84'/1'/0'")
+        val publicKey = DeterministicWallet.publicKey(privateKey(masterPubkeyPath))
+
+        return DeterministicWallet.encode(
+            input = publicKey,
+            prefix = if (isMainnet()) DeterministicWallet.zpub else DeterministicWallet.vpub
+        ) to masterPubkeyPath.toString()
+    }
+
+    /** Key used to encrypt/decrypt blobs we store in the cloud. */
+    private fun cloudKeyAndEncryptedNodeId(): Pair<ByteVector32, String> {
+        val path = KeyPath(if (isMainnet()) "m/51'/0'/0'/0" else "m/51'/1'/0'/0")
+        val extPrivKey = privateKey(path)
+
+        val cloudKey = extPrivKey.privateKey.value
+        val hash = Crypto.hash160(cloudKey).byteVector().toHex()
+
+        return Pair(cloudKey, hash)
+    }
+
+    private fun isMainnet() = chain.isMainnet()
+
+    fun privateKey(keyPath: KeyPath): DeterministicWallet.ExtendedPrivateKey = DeterministicWallet.derivePrivateKey(_master!!, keyPath)
+
+    fun onchainAddress(path: KeyPath): String {
+        val chainHash = if (isMainnet()) Block.LivenetGenesisBlock.hash else Block.TestnetGenesisBlock.hash
+        val publicKey = privateKey(path).publicKey
+        return Bitcoin.computeBIP84Address(publicKey, chainHash)
+    }
 
     /**
      * TODO: Remove this object and and use keyManager methods directly.
@@ -69,36 +101,4 @@ class WalletManager(
         val cloudKey: ByteVector32, // used for cloud storage
         val encryptedNodeId: String // used for cloud storage
     )
-}
-
-fun LocalKeyManager.nodeIdHash(): String = this.nodeId.hash160().byteVector().toHex()
-
-/** Key used to encrypt/decrypt blobs we store in the cloud. */
-fun LocalKeyManager.cloudKeyAndEncryptedNodeId(): Pair<ByteVector32, String> {
-    val path = KeyPath(if (isMainnet()) "m/51'/0'/0'/0" else "m/51'/1'/0'/0")
-    val extPrivKey = privateKey(path)
-
-    val cloudKey = extPrivKey.privateKey.value
-    val hash = Crypto.hash160(cloudKey).byteVector().toHex()
-
-    return Pair(cloudKey, hash)
-}
-
-fun LocalKeyManager.isMainnet() = chainHash == Chain.Mainnet.chainHash
-
-/** Get the wallet's (xpub, path) */
-fun LocalKeyManager.xpub(): Pair<String, String> {
-    val masterPubkeyPath = KeyPath(if (isMainnet()) "m/84'/0'/0'" else "m/84'/1'/0'")
-    val publicKey = DeterministicWallet.publicKey(privateKey(masterPubkeyPath))
-
-    return DeterministicWallet.encode(
-        input = publicKey,
-        prefix = if (isMainnet()) DeterministicWallet.zpub else DeterministicWallet.vpub
-    ) to masterPubkeyPath.toString()
-}
-
-fun LocalKeyManager.onchainAddress(path: KeyPath): String {
-    val chainHash = if (isMainnet()) Block.LivenetGenesisBlock.hash else Block.TestnetGenesisBlock.hash
-    val publicKey = privateKey(path).publicKey
-    return Bitcoin.computeBIP84Address(publicKey, chainHash)
 }

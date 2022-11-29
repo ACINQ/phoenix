@@ -11,7 +11,6 @@ import fr.acinq.phoenix.managers.WalletManager
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration.Model.ChannelInfoStatus
 import fr.acinq.phoenix.data.Chain
-import fr.acinq.phoenix.managers.onchainAddress
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.localCommitmentSpec
 import kotlinx.coroutines.flow.collect
@@ -99,7 +98,7 @@ class AppCloseChannelsConfigurationController(
                         Chain.Mainnet -> KeyPath("m/84'/0'/0'/0/0")
                         else -> KeyPath("m/84'/1'/0'/0/0")
                     }
-                    val address = walletManager.keyManager.value!!.onchainAddress(path)
+                    val address = walletManager.onchainAddress(path)
 
                     model(CloseChannelsConfiguration.Model.Ready(closableChannelsList, address))
                 }
