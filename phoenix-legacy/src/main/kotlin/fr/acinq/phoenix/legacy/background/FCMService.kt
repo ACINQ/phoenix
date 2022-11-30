@@ -62,7 +62,7 @@ class FCMService : FirebaseMessagingService() {
             setContentTitle(getString(R.string.notif__headless_title__missed_fulfill))
             setContentText(getString(R.string.notif__headless_message__pending_fulfill))
           }
-          setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__HEADLESS, intent, PendingIntent.FLAG_ONE_SHOT))
+          setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__HEADLESS, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT))
         }.build().run {
           NotificationManagerCompat.from(applicationContext).notify(Constants.NOTIF_ID__HEADLESS, this)
         }
