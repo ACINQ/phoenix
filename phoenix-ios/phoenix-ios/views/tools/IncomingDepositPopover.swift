@@ -95,7 +95,7 @@ struct IncomingDepositPopover: View {
 			
 			Text(styled: String(format: NSLocalizedString(
 				"""
-				Deposits must be at least **%@**.
+				Total deposits must be at least **%@**. Please make additional deposits to use the funds within Phoenix.
 				""",
 				comment:	"Minimum amount description."),
 				minFunding.string

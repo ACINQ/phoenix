@@ -57,27 +57,39 @@ struct PaymentCell : View {
 		HStack {
 			if let payment = fetched?.payment {
 				
-				switch payment.state() {
-					case .success:
-						Image("payment_holder_def_success")
-							.foregroundColor(Color.accentColor)
-							.padding(4)
-							.background(
-								RoundedRectangle(cornerRadius: .infinity)
-									.fill(Color.appAccent)
-							)
-					case .pending:
-						Image("payment_holder_def_pending")
-							.foregroundColor(Color.appAccent)
-							.padding(4)
-					case .failure:
-						Image("payment_holder_def_failed")
-							.foregroundColor(Color.appAccent)
-							.padding(4)
-					default:
-						Image(systemName: "doc.text.magnifyingglass")
-							.padding(4)
+				if fetched?.isOnChain() ?? false {
+					
+					Image(systemName: "link.circle.fill")
+						.resizable()
+						.frame(width: 26, height: 26)
+						.foregroundColor(Color.appAccent)
+						.padding(.vertical, 4)
+					
+				} else {
+					
+					switch payment.state() {
+						case .success:
+							Image("payment_holder_def_success")
+								.foregroundColor(Color.accentColor)
+								.padding(4)
+								.background(
+									RoundedRectangle(cornerRadius: .infinity)
+										.fill(Color.appAccent)
+								)
+						case .pending:
+							Image("payment_holder_def_pending")
+								.foregroundColor(Color.appAccent)
+								.padding(4)
+						case .failure:
+							Image("payment_holder_def_failed")
+								.foregroundColor(Color.appAccent)
+								.padding(4)
+						default:
+							Image(systemName: "doc.text.magnifyingglass")
+								.padding(4)
+					}
 				}
+				
 			} else {
 				
 				Image(systemName: "doc.text.magnifyingglass")
@@ -151,7 +163,7 @@ struct PaymentCell : View {
 	func paymentDescription() -> String {
 
 		if let fetched = fetched {
-			return fetched.paymentDescription() ?? NSLocalizedString("No description", comment: "placeholder text")
+			return fetched.paymentDescription() ?? fetched.defaultPaymentDescription()
 		} else {
 			return ""
 		}

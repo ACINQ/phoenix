@@ -597,8 +597,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			let description = paymentInfo.paymentDescription() ??
-			                  NSLocalizedString("No description", comment: "placeholder text")
+			let description = paymentInfo.paymentDescription() ?? paymentInfo.defaultPaymentDescription()
 			Text(description)
 				.contextMenu {
 					Button(action: {

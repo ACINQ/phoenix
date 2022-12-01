@@ -32,6 +32,11 @@ fun IncomingPayment.Origin.asSwapIn(): IncomingPayment.Origin.SwapIn? = when (th
     else -> null
 }
 
+fun IncomingPayment.Origin.asDualSwapIn(): IncomingPayment.Origin.DualSwapIn? = when (this) {
+    is IncomingPayment.Origin.DualSwapIn -> this
+    else -> null
+}
+
 fun IncomingPayment.ReceivedWith.asLightningPayment(): IncomingPayment.ReceivedWith.LightningPayment? = when (this) {
     is IncomingPayment.ReceivedWith.LightningPayment -> this
     else -> null

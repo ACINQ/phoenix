@@ -335,7 +335,6 @@ struct SwapInView: View {
 				
 				Text(
 					"""
-					This is an address controlled by your wallet. \
 					On-chain deposits sent to this address will be converted to Lightning channels.
 					"""
 				)
@@ -345,7 +344,7 @@ struct SwapInView: View {
 				
 				Text(styled: String(format: NSLocalizedString(
 					"""
-					Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum).
+					Total deposits must be at least **%@**. The fee is **%@%%** (%@ minimum).
 					""",
 					comment:	"Minimum amount description."),
 					minFunding.string, feePercent, minFee.string
