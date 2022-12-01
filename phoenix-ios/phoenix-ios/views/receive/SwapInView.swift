@@ -32,12 +32,14 @@ struct SwapInView: View {
 	@State var swapIn_minFeeSat: Int64 = 0
 	@State var swapIn_minFundingSat: Int64 = 0
 	
+	let swapInWalletBalancePublisher = Biz.business.peerManager.swapInWalletBalancePublisher()
+	@State var swapInWalletBalance: WalletBalance = WalletBalance.companion.empty()
+	
+	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
+	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
-	
-	let incomingSwapsPublisher = Biz.business.paymentsManager.incomingSwapsPublisher()
-	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	// For the cicular buttons: [copy, share]
 	enum MaxButtonWidth: Preference {}
@@ -135,8 +137,8 @@ struct SwapInView: View {
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
-		.onReceive(incomingSwapsPublisher) {
-			onIncomingSwapsChanged($0)
+		.onReceive(swapInWalletBalancePublisher) {
+			swapInWalletBalanceChanged($0)
 		}
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
@@ -410,21 +412,19 @@ struct SwapInView: View {
 		}
 	}
 	
-	func onIncomingSwapsChanged(_ incomingSwaps: [String: Lightning_kmpMilliSatoshi]) -> Void {
-		log.trace("onIncomingSwapsChanged(): \(incomingSwaps)")
+	func swapInWalletBalanceChanged(_ walletBalance: WalletBalance) {
+		log.trace("swapInWalletBalanceChanged()")
 		
-		guard let bitcoinAddress = bitcoinAddress() else {
-			return
-		}
-		
-		// incomingSwaps: [bitcoinAddress: pendingAmount]
-		//
-		// If incomingSwaps has an entry for the bitcoin address that we're displaying,
+		// If we detect a new incoming payment on the swap-in address,
 		// then let's dismiss this sheet, and show the user the home screen.
 		//
 		// Because the home screen has the "+X sat incoming" message
 		
-		if incomingSwaps[bitcoinAddress] != nil {
+		let oldBalance = swapInWalletBalance.total.sat
+		let newBalance = walletBalance.total.sat
+		
+		swapInWalletBalance = walletBalance
+		if newBalance > oldBalance {
 			presentationMode.wrappedValue.dismiss()
 		}
 	}

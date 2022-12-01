@@ -1,11 +1,14 @@
 package fr.acinq.phoenix.utils
 
+import fr.acinq.lightning.blockchain.electrum.ElectrumMiniWallet
+import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.io.NativeSocketException
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.Connection
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Class types from lightning-kmp & bitcoin-kmp are not exported to iOS unless we explicitly
@@ -150,3 +153,5 @@ fun NativeSocketException.asTLS(): NativeSocketException.TLS? = when (this) {
     is NativeSocketException.TLS -> this
     else -> null
 }
+
+fun ElectrumMiniWallet.currentWalletState(): WalletState = this.walletStateFlow.value

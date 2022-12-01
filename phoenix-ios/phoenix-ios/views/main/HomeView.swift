@@ -49,9 +49,10 @@ struct HomeView : MVIView {
 	let lastCompletedPaymentPublisher = Biz.business.paymentsManager.lastCompletedPaymentPublisher()
 	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
-	let incomingSwapsPublisher = Biz.business.paymentsManager.incomingSwapsPublisher()
+	let swapInWalletBalancePublisher = Biz.business.peerManager.swapInWalletBalancePublisher()
+	@State var swapInWalletBalance: WalletBalance = WalletBalance.companion.empty()
+	
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
-	@State var lastIncomingSwaps = [String: Lightning_kmpMilliSatoshi]()
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
 	@State var incomingSwapAnimationsRemaining = 0
 	
@@ -116,8 +117,8 @@ struct HomeView : MVIView {
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
 		}
-		.onReceive(incomingSwapsPublisher) {
-			onIncomingSwapsChanged($0)
+		.onReceive(swapInWalletBalancePublisher) {
+			swapInWalletBalanceChanged($0)
 		}
 		.onReceive(backupSeed_enabled_publisher) {
 			self.backupSeed_enabled = $0
@@ -179,16 +180,8 @@ struct HomeView : MVIView {
 							} label: {
 								Text(verbatim: "Blockstream.info") // no localization needed
 							}
-							
-							let addrCount = lastIncomingSwaps.count
-							if addrCount >= 2 {
-								Button("Copy bitcoin addresses (\(addrCount)") {
-									copyIncomingSwap()
-								}
-							} else {
-								Button("Copy bitcoin address") {
-									copyIncomingSwap()
-								}
+							Button("Copy bitcoin address") {
+								copyIncomingSwap()
 							}
 						} // </confirmationDialog>
 					
@@ -485,13 +478,11 @@ struct HomeView : MVIView {
 	
 	func incomingAmount() -> FormattedAmount? {
 		
-		let msatTotal = lastIncomingSwaps.values.reduce(Int64(0)) {(sum, item) -> Int64 in
-			return sum + item.msat
-		}
-		if msatTotal > 0 {
+		let sat = swapInWalletBalance.total.sat
+		if sat > 0 {
 			return currencyPrefs.hideAmountsOnHomeScreen
 				? Utils.hiddenAmount(currencyPrefs)
-				: Utils.format(currencyPrefs, msat: msatTotal)
+				: Utils.format(currencyPrefs, sat: sat)
 		} else {
 			return nil
 		}
@@ -603,25 +594,21 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
+	func chainContextChanged(_ context: WalletContext.V0ChainContext) {
 		log.trace("chainContextChanged()")
 		
 		isMempoolFull = context.mempool.v1.highUsage
 	}
 	
-	func onIncomingSwapsChanged(_ incomingSwaps: [String: Lightning_kmpMilliSatoshi]) -> Void {
-		log.trace("onIncomingSwapsChanged(): \(incomingSwaps)")
+	func swapInWalletBalanceChanged(_ walletBalance: WalletBalance) {
+		log.trace("swapInWalletBalanceChanged()")
 		
-		let oldSum = lastIncomingSwaps.values.reduce(Int64(0)) {(sum, item) -> Int64 in
-			return sum + item.msat
-		}
-		let newSum = incomingSwaps.values.reduce(Int64(0)) { (sum, item) -> Int64 in
-			return sum + item.msat
-		}
+		let oldBalance = swapInWalletBalance.total.sat
+		let newBalance = walletBalance.total.sat
 		
-		lastIncomingSwaps = incomingSwaps
-		if newSum > oldSum {
-			// Since the sum increased, there is a new incomingSwap for the user.
+		swapInWalletBalance = walletBalance
+		if newBalance > oldBalance {
+			// Since the balance increased, there is a new utxo for the user.
 			// This isn't added to the transaction list, but is instead displayed under the balance.
 			// So let's add a little animation to draw the user's attention to it.
 			startAnimatingIncomingSwapText()
@@ -698,9 +685,10 @@ struct HomeView : MVIView {
 	func exploreIncomingSwap(website: BlockchainExplorer.Website) {
 		log.trace("exploreIncomingSwap()")
 		
-		guard let addr = lastIncomingSwaps.keys.first else {
+		guard let peer = Biz.business.getPeer() else {
 			return
 		}
+		let addr = peer.swapInAddress
 		
 		let txUrlStr = Biz.business.blockchainExplorer.addressUrl(addr: addr, website: website)
 		if let txUrl = URL(string: txUrlStr) {
@@ -711,14 +699,12 @@ struct HomeView : MVIView {
 	func copyIncomingSwap() {
 		log.trace("copyIncomingSwap()")
 		
-		let addresses = lastIncomingSwaps.keys
-		
-		if addresses.count == 1 {
-			UIPasteboard.general.string = addresses.first
-			
-		} else if addresses.count >= 2 {
-			UIPasteboard.general.string = addresses.joined(separator: ", ")
+		guard let peer = Biz.business.getPeer() else {
+			return
 		}
+		let addr = peer.swapInAddress
+		
+		UIPasteboard.general.string = addr
 	}
 	
 	func navigateToBackup() {
