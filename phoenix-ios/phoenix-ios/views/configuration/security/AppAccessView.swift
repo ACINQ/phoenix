@@ -83,9 +83,6 @@ struct AppAccessView : View {
 					securityLabel()
 						.padding(.top, 5)
 					
-					receiveLabel()
-						.padding(.top, 20)
-					
 				} // </VStack>
 				.padding(.vertical, 10)
 				
@@ -132,28 +129,6 @@ struct AppAccessView : View {
 					.imageScale(.medium)
 					.foregroundColor(Color.appWarn)
 			}
-		}
-	}
-	
-	@ViewBuilder
-	func receiveLabel() -> some View {
-		
-		Label {
-			VStack(alignment: HorizontalAlignment.leading) {
-				Text("To receive incoming payments, Phoenix must be running.")
-					.fixedSize(horizontal: false, vertical: true) // SwiftUI truncating text
-				
-				Text("(Phoenix can be running in the background.)")
-					.fixedSize(horizontal: false, vertical: true) // SwiftUI truncating text
-					.foregroundColor(.gray)
-					.padding(.top, 2)
-			}
-			
-		} icon: {
-			Image(systemName: "bolt")
-				.renderingMode(.template)
-				.imageScale(.medium)
-				.foregroundColor(Color.appAccent)
 		}
 	}
 	
