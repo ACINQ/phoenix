@@ -1,5 +1,7 @@
 package fr.acinq.phoenix.db.payments
 
+import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.byteVector32
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.*
@@ -110,6 +112,19 @@ class MetadataQueries(val database: PaymentsDatabase) {
             }
             didUpdateWalletPaymentMetadata(id, database)
         }
+    }
+
+    fun mapChannelId(channelId: ByteVector32, paymentHash: ByteVector32) {
+        queries.mapChannelId(
+            channel_id = channelId.toByteArray(),
+            payment_hash = paymentHash.toByteArray()
+        )
+    }
+
+    fun fetchPaymentHash(channelId: ByteVector32): ByteVector32? {
+        return queries.fetchPaymentHash(
+            channel_id = channelId.toByteArray()
+        ).executeAsOneOrNull()?.byteVector32()
     }
 
     companion object {

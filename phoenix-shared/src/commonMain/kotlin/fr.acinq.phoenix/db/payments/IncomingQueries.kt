@@ -93,9 +93,34 @@ class IncomingQueries(private val database: PaymentsDatabase) {
                     is IncomingPayment.ReceivedWith.NewChannel -> it.copy(channelId = channelId)
                     else -> it
                 }
-            }?.toSet()?.mapToDb() ?: null to null
+            }?.toSet()?.mapToDb() ?: (null to null)
             queries.updateReceived(
                 received_at = paymentInDb?.received?.receivedAt,
+                received_with_type = receivedWithType,
+                received_with_blob = receivedWithBlob,
+                payment_hash = paymentHash.toByteArray()
+            )
+            if (queries.changes().executeAsOne() != 1L) {
+                throw IncomingPaymentNotFound(paymentHash)
+            }
+            didCompleteWalletPayment(WalletPaymentId.IncomingPaymentId(paymentHash), database)
+        }
+    }
+
+    fun updateNewChannelConfirmed(paymentHash: ByteVector32, receivedAt: Long) {
+        database.transaction {
+            val paymentInDb: IncomingPayment? = queries.get(
+                payment_hash = paymentHash.toByteArray(),
+                mapper = ::mapIncomingPayment
+            ).executeAsOneOrNull()
+            val (receivedWithType, receivedWithBlob) = paymentInDb?.received?.receivedWith?.map {
+                when (it) {
+                    is IncomingPayment.ReceivedWith.NewChannel -> it.copy(confirmed = true)
+                    else -> it
+                }
+            }?.toSet()?.mapToDb() ?: (null to null)
+            queries.updateReceived(
+                received_at = receivedAt,
                 received_with_type = receivedWithType,
                 received_with_blob = receivedWithBlob,
                 payment_hash = paymentHash.toByteArray()

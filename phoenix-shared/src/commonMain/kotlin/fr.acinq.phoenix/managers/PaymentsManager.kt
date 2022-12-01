@@ -45,7 +45,10 @@ class PaymentsManager(
     private val _paymentsCount = MutableStateFlow<Long>(0)
     val paymentsCount: StateFlow<Long> = _paymentsCount
 
-    /** Flow of map of (bitcoinAddress -> amount) swap-ins. */
+    /**
+     * Flow of map of (bitcoinAddress -> amount) swap-ins.
+     * Deprecated: Replace with PeerManager.swapInWalletBalance
+     */
     private val _incomingSwaps = MutableStateFlow<Map<String, MilliSatoshi>>(HashMap())
     val incomingSwaps: StateFlow<Map<String, MilliSatoshi>> = _incomingSwaps
     private var _incomingSwapsMap by _incomingSwaps
@@ -86,7 +89,7 @@ class PaymentsManager(
         }
 
         launch {
-            var appLaunch: Long = currentTimestampMillis()
+            val appLaunch: Long = currentTimestampMillis()
             var isFirstCollection = true
 
             paymentsDb().listPaymentsOrderFlow(count = 25, skip = 0).collect { list ->
@@ -156,6 +159,12 @@ class PaymentsManager(
                     is ChannelEvents.Created -> {
                         log.info { "channel=${it.state.channelId} has been successfully created!" }
                         _incomingSwapsMap = _incomingSwapsMap - "foobar"
+                    }
+                    is ChannelEvents.Confirmed -> {
+                        paymentsDb().updateNewChannelConfirmed(
+                            channelId = it.state.channelId,
+                            receivedAt = currentTimestampMillis()
+                        )
                     }
                 }
             }

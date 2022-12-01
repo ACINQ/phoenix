@@ -26,10 +26,7 @@ import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.channel.ChannelException
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.FinalFailure
-import fr.acinq.lightning.utils.Either
-import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.ensureNeverFrozen
-import fr.acinq.lightning.utils.toByteVector32
+import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.FailureMessage
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
@@ -42,8 +39,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
+import org.kodein.log.LoggerFactory
+import org.kodein.log.newLogger
 
 class SqlitePaymentsDb(
+    loggerFactory: LoggerFactory,
     private val driver: SqlDriver,
     private val currencyManager: CurrencyManager? = null
 ) : PaymentsDb {
@@ -51,6 +51,8 @@ class SqlitePaymentsDb(
     init {
         ensureNeverFrozen() // Crashes when attempting to freeze CurrencyManager sub-graph
     }
+
+    private val log = newLogger(loggerFactory)
 
     /**
      * Within `SqlitePaymentsDb`, we are using background threads.
@@ -339,10 +341,19 @@ class SqlitePaymentsDb(
     ) {
         val database = _doNotFreezeMe.database
         val inQueries = _doNotFreezeMe.inQueries
+        val metaQueries = _doNotFreezeMe.metaQueries
 
         withContext(Dispatchers.Default) {
             database.transaction {
                 inQueries.receivePayment(paymentHash, receivedWith, receivedAt)
+                // Add mappings for any newly created channels
+                receivedWith
+                    .filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>()
+                    .mapNotNull { it.channelId }
+                    .toSet()
+                    .forEach { channelId ->
+                        metaQueries.mapChannelId(channelId, paymentHash)
+                    }
             }
         }
     }
@@ -375,6 +386,14 @@ class SqlitePaymentsDb(
                 if (!metadataRow.isEmpty()) {
                     metaQueries.addMetadata(paymentId, metadataRow)
                 }
+                // Add mappings for any newly created channels
+                receivedWith
+                    .filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>()
+                    .mapNotNull { it.channelId }
+                    .toSet()
+                    .forEach { channelId ->
+                        metaQueries.mapChannelId(channelId, paymentHash)
+                    }
             }
         }
     }
@@ -383,10 +402,32 @@ class SqlitePaymentsDb(
         paymentHash: ByteVector32,
         channelId: ByteVector32
     ) {
+        val database = _doNotFreezeMe.database
         val inQueries = _doNotFreezeMe.inQueries
+        val metaQueries = _doNotFreezeMe.metaQueries
 
         withContext(Dispatchers.Default) {
-            inQueries.updateNewChannelReceivedWithChannelId(paymentHash, channelId)
+            database.transaction {
+                inQueries.updateNewChannelReceivedWithChannelId(paymentHash, channelId)
+                metaQueries.mapChannelId(channelId, paymentHash)
+            }
+        }
+    }
+
+    suspend fun updateNewChannelConfirmed(
+        channelId: ByteVector32,
+        receivedAt: Long
+    ) {
+        val database = _doNotFreezeMe.database
+        val inQueries = _doNotFreezeMe.inQueries
+        val metaQueries = _doNotFreezeMe.metaQueries
+
+        withContext(Dispatchers.Default) {
+            database.transaction {
+                metaQueries.fetchPaymentHash(channelId)?.let { paymentHash ->
+                    inQueries.updateNewChannelConfirmed(paymentHash, receivedAt)
+                }
+            }
         }
     }
 

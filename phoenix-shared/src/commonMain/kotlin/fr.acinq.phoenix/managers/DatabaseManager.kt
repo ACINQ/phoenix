@@ -51,6 +51,7 @@ class DatabaseManager(
                     driver = createChannelsDbDriver(ctx, chain, nodeIdHash)
                 )
                 val paymentsDb = SqlitePaymentsDb(
+                    loggerFactory,
                     driver = createPaymentsDbDriver(ctx, chain, nodeIdHash),
                     currencyManager = currencyManager
                 )

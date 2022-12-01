@@ -1,0 +1,9 @@
+-- Migration: v6 -> v7
+--
+-- Changes:
+-- * Added table channel_id_map
+
+CREATE TABLE IF NOT EXISTS channel_id_map (
+    channel_id BLOB NOT NULL PRIMARY KEY,
+    payment_hash BLOB NOT NULL
+);
