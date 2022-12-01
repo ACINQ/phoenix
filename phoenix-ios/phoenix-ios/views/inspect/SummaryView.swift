@@ -175,17 +175,33 @@ struct SummaryView: View {
 				.padding(.bottom, 30)
 				
 			case .pending:
-				Image("ic_payment_sending")
-					.renderingMode(.template)
-					.resizable()
-					.foregroundColor(Color.borderColor)
-					.frame(width: 100, height: 100)
-					.padding(.bottom, 16)
-					.accessibilityHidden(true)
-				Text("PENDING")
-					.font(Font.title2.bold())
-					.padding(.bottom, 30)
-					.accessibilityLabel("Pending payment")
+				if payment.isOnChain() {
+					Image(systemName: "hourglass.circle")
+						.renderingMode(.template)
+						.resizable()
+						.foregroundColor(Color.borderColor)
+						.frame(width: 100, height: 100)
+						.padding(.bottom, 16)
+						.accessibilityHidden(true)
+					Text("WAITING FOR CONFIRMATIONS")
+						.font(.title2.uppercaseSmallCaps())
+						.multilineTextAlignment(.center)
+						.padding(.bottom, 30)
+						.accessibilityLabel("Pending payment")
+						.accessibilityHint("Waiting for confirmations")
+				} else {
+					Image("ic_payment_sending")
+						.renderingMode(.template)
+						.resizable()
+						.foregroundColor(Color.borderColor)
+						.frame(width: 100, height: 100)
+						.padding(.bottom, 16)
+						.accessibilityHidden(true)
+					Text("PENDING")
+						.font(.title2.bold())
+						.padding(.bottom, 30)
+						.accessibilityLabel("Pending payment")
+				}
 				
 			case .failure:
 				Image(systemName: "xmark.circle")
@@ -197,12 +213,12 @@ struct SummaryView: View {
 					.accessibilityHidden(true)
 				VStack {
 					Text("FAILED")
-						.font(Font.title2.bold())
+						.font(.title2.bold())
 						.padding(.bottom, 2)
 						.accessibilityLabel("Failed payment")
 					
 					Text("NO FUNDS HAVE BEEN SENT")
-						.font(Font.title2.uppercaseSmallCaps())
+						.font(.title2.uppercaseSmallCaps())
 						.padding(.bottom, 6)
 					
 					if let completedAtDate = payment.completedAtDate() {

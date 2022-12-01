@@ -91,10 +91,13 @@ extension WalletPaymentInfo {
 	
 		return NSLocalizedString("No description", comment: "placeholder text")
 	}
-	
+}
+
+extension Lightning_kmpWalletPayment {
+
 	func isOnChain() -> Bool {
 		
-		if let incomingPayment = payment as? Lightning_kmpIncomingPayment {
+		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
 			
 			if let _ = incomingPayment.origin.asSwapIn() {
 				return true
@@ -102,7 +105,7 @@ extension WalletPaymentInfo {
 				return true
 			}
 			
-		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
+		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
 			
 			if let _ = outgoingPayment.details.asSwapOut() {
 				return true
