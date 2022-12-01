@@ -10,7 +10,6 @@
 		53BEF2924096C8E7976D46E3 /* shapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF8EAA43946FC1C7A6E7E /* shapes.swift */; };
 		53BEF4D5663CD782DC63DF63 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFA112E0701FFD6B84217 /* AppColors.swift */; };
 		53BEF90975122B844248569C /* ReceiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */; };
-		53BEF96EC93BBB4B6C9E0845 /* lang.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF6CBB2587136D25A625A /* lang.swift */; };
 		53BEF981E71E3087871890F9 /* SendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFCB8A24A5FAA785AFD03 /* SendView.swift */; };
 		53BEFA633D95514CA5C0422A /* ChannelsConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF648B3A03C66B611BC06 /* ChannelsConfigurationView.swift */; };
 		53BEFBECABE13063AB28A4D6 /* publishers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF60DF224046E5DE0FDCC /* publishers.swift */; };
@@ -88,6 +87,9 @@
 		DC39D4E7286BB2130030F18D /* PaymentLayerChoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC39D4E6286BB2120030F18D /* PaymentLayerChoice.swift */; };
 		DC39D4EF287497440030F18D /* SmartModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC39D4EE287497440030F18D /* SmartModal.swift */; };
 		DC39D4F12874DDF40030F18D /* View+If.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC39D4F02874DDF40030F18D /* View+If.swift */; };
+		DC422F3329392ABD00E72253 /* Date+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC422F3229392ABD00E72253 /* Date+Format.swift */; };
+		DC422F3529392B0500E72253 /* Int+ToDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC422F3429392B0500E72253 /* Int+ToDate.swift */; };
+		DC422F3629392C0000E72253 /* Int+ToDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC422F3429392B0500E72253 /* Int+ToDate.swift */; };
 		DC46BAE426C6FDD300E760A6 /* CircularCheckmarkProgress in Frameworks */ = {isa = PBXBuildFile; productRef = DC46BAE326C6FDD300E760A6 /* CircularCheckmarkProgress */; };
 		DC46BAF326CACCF700E760A6 /* KotlinExtensions+Other.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAED26CACCF700E760A6 /* KotlinExtensions+Other.swift */; };
 		DC46BAF426CACCF700E760A6 /* KotlinFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */; };
@@ -299,7 +301,6 @@
 		53BEF4DAE061532668494988 /* PaymentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentView.swift; sourceTree = "<group>"; };
 		53BEF60DF224046E5DE0FDCC /* publishers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = publishers.swift; sourceTree = "<group>"; };
 		53BEF648B3A03C66B611BC06 /* ChannelsConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChannelsConfigurationView.swift; sourceTree = "<group>"; };
-		53BEF6CBB2587136D25A625A /* lang.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = lang.swift; sourceTree = "<group>"; };
 		53BEF8EAA43946FC1C7A6E7E /* shapes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = shapes.swift; sourceTree = "<group>"; };
 		53BEFA112E0701FFD6B84217 /* AppColors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
 		53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReceiveView.swift; sourceTree = "<group>"; };
@@ -388,6 +389,8 @@
 		DC39D4E6286BB2120030F18D /* PaymentLayerChoice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentLayerChoice.swift; sourceTree = "<group>"; };
 		DC39D4EE287497440030F18D /* SmartModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartModal.swift; sourceTree = "<group>"; };
 		DC39D4F02874DDF40030F18D /* View+If.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+If.swift"; sourceTree = "<group>"; };
+		DC422F3229392ABD00E72253 /* Date+Format.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+Format.swift"; sourceTree = "<group>"; };
+		DC422F3429392B0500E72253 /* Int+ToDate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Int+ToDate.swift"; sourceTree = "<group>"; };
 		DC46BAED26CACCF700E760A6 /* KotlinExtensions+Other.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Other.swift"; sourceTree = "<group>"; };
 		DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KotlinFlow.swift; sourceTree = "<group>"; };
 		DC46BAEF26CACCF700E760A6 /* KotlinPublishers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KotlinPublishers.swift; sourceTree = "<group>"; };
@@ -587,7 +590,6 @@
 				DCFC72032862237400D6B293 /* Asserts.swift */,
 				DC384D80265C12B700131772 /* Cache.swift */,
 				53BEFFB3CB63090BBCFF6A36 /* ui.swift */,
-				53BEF6CBB2587136D25A625A /* lang.swift */,
 				53BEF60DF224046E5DE0FDCC /* publishers.swift */,
 				53BEF8EAA43946FC1C7A6E7E /* shapes.swift */,
 				DC18C41C256FF91100A2D083 /* Utils.swift */,
@@ -944,14 +946,16 @@
 		DCACF6EE2566D0A60009B01E /* extensions */ = {
 			isa = PBXGroup;
 			children = (
+				DCEE3E532931446A00EB4DFF /* Collections+AsInt.swift */,
 				DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */,
-				DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */,
+				DC422F3229392ABD00E72253 /* Date+Format.swift */,
+				DCB493CC269F8531001B0F09 /* Int+TimeInterval.swift */,
+				DC422F3429392B0500E72253 /* Int+ToDate.swift */,
+				DCB493CA269F3B05001B0F09 /* Result+Deugly.swift */,
+				DC59377027516296003B4B53 /* Sequence+Sum.swift */,
 				DC09085725B5E43900A46136 /* String+VersionComparison.swift */,
 				DC384D82265C32F100131772 /* TextField+Verbatim.swift */,
-				DCB493CA269F3B05001B0F09 /* Result+Deugly.swift */,
-				DCB493CC269F8531001B0F09 /* Int+TimeInterval.swift */,
-				DC59377027516296003B4B53 /* Sequence+Sum.swift */,
-				DCEE3E532931446A00EB4DFF /* Collections+AsInt.swift */,
+				DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -1392,7 +1396,6 @@
 				53BEF981E71E3087871890F9 /* SendView.swift in Sources */,
 				DC1D2B502594CE900036AD38 /* FormattedAmount.swift in Sources */,
 				DC18C418256FE22300A2D083 /* Prefs.swift in Sources */,
-				53BEF96EC93BBB4B6C9E0845 /* lang.swift in Sources */,
 				DCAEF8F5276131A600015993 /* CheckboxToggleStyle.swift in Sources */,
 				DC641C712820889C00862DCD /* GroupPrefs.swift in Sources */,
 				DC118BFA27B44F840080BBAC /* PriceSliderSheet.swift in Sources */,
@@ -1401,6 +1404,7 @@
 				DCE6FB8C28D0B5F200054511 /* ResetWalletView.swift in Sources */,
 				DCE7232E27AD68CD0017CF56 /* SyncTxManager_Actor.swift in Sources */,
 				DC16965F27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift in Sources */,
+				DC422F3329392ABD00E72253 /* Date+Format.swift in Sources */,
 				DCEFD922276A796800001767 /* SyncManager.swift in Sources */,
 				DC2F431C27B69BB20006FCC4 /* ReceiveLightningView.swift in Sources */,
 				53BEF4D5663CD782DC63DF63 /* AppColors.swift in Sources */,
@@ -1420,6 +1424,7 @@
 				DCB493CD269F8531001B0F09 /* Int+TimeInterval.swift in Sources */,
 				DC2F431E27B69DD30006FCC4 /* NotificationsDisabledPopover.swift in Sources */,
 				DC118C0227B453110080BBAC /* PaymentRequestedView.swift in Sources */,
+				DC422F3529392B0500E72253 /* Int+ToDate.swift in Sources */,
 				DC384D83265C32F100131772 /* TextField+Verbatim.swift in Sources */,
 				DCFA8759260E6F2E00AE8953 /* IntroView.swift in Sources */,
 				C8D7A84CCF914B08BDB03BE6 /* ManualRestoreView.swift in Sources */,
@@ -1541,6 +1546,7 @@
 				DCEB2797282D7ADC0096B87E /* KotlinFlow.swift in Sources */,
 				DC641C78282171EA00862DCD /* KotlinAssociatedObject.swift in Sources */,
 				DCA6DECA2829C31B0073C658 /* KeyStoreError.swift in Sources */,
+				DC422F3629392C0000E72253 /* Int+ToDate.swift in Sources */,
 				DC641C83282189AC00862DCD /* Utils.swift in Sources */,
 				DC0D2EA8293928E100284608 /* KotlinExtensions+Payments.swift in Sources */,
 			);

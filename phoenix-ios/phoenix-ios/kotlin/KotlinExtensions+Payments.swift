@@ -5,12 +5,12 @@ import PhoenixShared
 extension WalletPaymentOrderRow {
 	
 	var createdAtDate: Date {
-		return Date(timeIntervalSince1970: (Double(createdAt) / Double(1_000)))
+		return createdAt.toDate(from: .milliseconds)
 	}
 	
 	var completedAtDate: Date? {
 		if let completedAt = self.completedAt?.int64Value {
-			return Date(timeIntervalSince1970: (Double(completedAt) / Double(1_000)))
+			return completedAt.toDate(from: .milliseconds)
 		} else {
 			return nil
 		}
@@ -90,58 +90,71 @@ extension WalletPaymentMetadata {
 	}
 }
 
+extension Lightning_kmpWalletPayment {
+	
+	func completedAtDate() -> Date? {
+		
+		let millis = self.completedAt()
+		if millis > 0 {
+			return millis.toDate(from: .milliseconds)
+		} else {
+			return nil
+		}
+	}	
+}
+
 extension Lightning_kmpIncomingPayment {
 	
 	var createdAtDate: Date {
-		return Date(timeIntervalSince1970: (Double(createdAt) / Double(1_000)))
+		return createdAt.toDate(from: .milliseconds)
 	}
 }
 
 extension Lightning_kmpIncomingPayment.Received {
 	
 	var receivedAtDate: Date {
-		return Date(timeIntervalSince1970: (Double(receivedAt) / Double(1_000)))
+		return receivedAt.toDate(from: .milliseconds)
 	}
 }
 
 extension Lightning_kmpOutgoingPayment {
 	
 	var createdAtDate: Date {
-		return Date(timeIntervalSince1970: (Double(createdAt) / Double(1_000)))
+		return createdAt.toDate(from: .milliseconds)
 	}
 }
 
 extension Lightning_kmpOutgoingPayment.Part {
 	
 	var createdAtDate: Date {
-		return Date(timeIntervalSince1970: (Double(createdAt) / Double(1_000)))
+		return createdAt.toDate(from: .milliseconds)
 	}
 }
 
 extension Lightning_kmpOutgoingPayment.LightningPartStatusSucceeded {
 	
 	var completedAtDate: Date {
-		return Date(timeIntervalSince1970: (Double(completedAt) / Double(1_000)))
+		return completedAt.toDate(from: .milliseconds)
 	}
 }
 
 extension Lightning_kmpOutgoingPayment.LightningPartStatusFailed {
 	
 	var completedAtDate: Date {
-		return Date(timeIntervalSince1970: (Double(completedAt) / Double(1_000)))
+		return completedAt.toDate(from: .milliseconds)
 	}
 }
 
 extension Lightning_kmpOutgoingPayment.StatusCompleted {
 	
 	var completedAtDate: Date {
-		return Date(timeIntervalSince1970: (Double(completedAt) / Double(1_000)))
+		return completedAt.toDate(from: .milliseconds)
 	}
 }
 
 extension Lightning_kmpPaymentRequest {
 	
 	var timestampDate: Date {
-		return Date(timeIntervalSince1970: Double(timestampSeconds))
+		return timestampSeconds.toDate(from: .seconds)
 	}
 }

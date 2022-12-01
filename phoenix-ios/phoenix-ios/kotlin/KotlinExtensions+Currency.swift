@@ -581,6 +581,6 @@ extension BitcoinUnit {
 extension ExchangeRate {
 	
 	var timestamp: Date {
-		return Date(timeIntervalSince1970: (Double(timestampMillis) / Double(1_000)))
+		return timestampMillis.toDate(from: .milliseconds)
 	}
 }

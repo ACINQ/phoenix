@@ -70,6 +70,10 @@ struct SummaryView: View {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var body: some View {
 		
@@ -162,9 +166,11 @@ struct SummaryView: View {
 					.font(Font.title2.bold())
 					.padding(.bottom, 2)
 					
-					Text(payment.completedAt().formatDateMS())
-						.font(.subheadline)
-						.foregroundColor(.secondary)
+					if let completedAtDate = payment.completedAtDate() {
+						Text(completedAtDate.format())
+							.font(.subheadline)
+							.foregroundColor(.secondary)
+					}
 				}
 				.padding(.bottom, 30)
 				
@@ -199,11 +205,13 @@ struct SummaryView: View {
 						.font(Font.title2.uppercaseSmallCaps())
 						.padding(.bottom, 6)
 					
-					Text(payment.completedAt().formatDateMS())
-						.font(Font.subheadline)
-						.foregroundColor(.secondary)
+					if let completedAtDate = payment.completedAtDate() {
+						Text(completedAtDate.format())
+							.font(Font.subheadline)
+							.foregroundColor(.secondary)
+					}
 					
-				}
+				} // </VStack>
 				.padding(.bottom, 30)
 				
 			default:

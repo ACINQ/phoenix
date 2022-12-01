@@ -116,19 +116,23 @@ struct ElectrumConfigurationView: MVIView {
 				ListItem(header: Text("Block height")) {
 
 					let height = mvi.model.blockHeight
-					Text(verbatim: height > 0 ? height.formatInDecimalStyle() : "-")
+					Text(verbatim: height > 0 ? formatInDecimalStyle(height) : "-")
 				}
 				
 				ListItem(header: Text("Tip timestamp")) {
 					
 					let time = mvi.model.tipTimestamp
-					Text(verbatim: time > 0 ? time.formatDateS() : "-")
+					if time > 0 {
+						Text(verbatim: time.toDate(from: .seconds).format(date: .long, time: .short))
+					} else {
+						Text(verbatim: "-")
+					}
 				}
 				
 				ListItem(header: Text("Fee rate")) {
 					
 					if mvi.model.feeRate > 0 {
-						Text("\(mvi.model.feeRate.formatInDecimalStyle()) sat/byte")
+						Text("\(formatInDecimalStyle(mvi.model.feeRate)) sat/byte")
 					} else {
 						Text(verbatim: "-")
 					}
@@ -141,6 +145,21 @@ struct ElectrumConfigurationView: MVIView {
 		.onAppear() {
 			onAppear()
 		}
+	}
+	
+	func formatInDecimalStyle(_ value: Int32) -> String {
+		return formatInDecimalStyle(NSNumber(value: value))
+	}
+	
+	func formatInDecimalStyle(_ value: Int64) -> String {
+		return formatInDecimalStyle(NSNumber(value: value))
+	}
+	
+	func formatInDecimalStyle(_ value: NSNumber) -> String {
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .decimal
+		formatter.usesGroupingSeparator = true
+		return formatter.string(from: value)!
 	}
 	
 	func onAppear() {
