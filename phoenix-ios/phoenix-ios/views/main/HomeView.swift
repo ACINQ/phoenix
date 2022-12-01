@@ -30,7 +30,9 @@ struct HomeView : MVIView {
 	var factory: ControllerFactory { return factoryEnv }
 
 	@State var selectedItem: WalletPaymentInfo? = nil
+	
 	@State var isMempoolFull = false
+	@State var swapIn_minFundingSat: Int64 = 0
 	
 	@StateObject var customElectrumServerObserver = CustomElectrumServerObserver()
 	
@@ -157,42 +159,9 @@ struct HomeView : MVIView {
 	func balance() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			
 			totalBalance()
-			
-			if let incoming = incomingAmount() {
-			
-				if #available(iOS 15.0, *) {
-					
-					incomingBalance(incoming)
-						.onTapGesture { showBlockchainExplorerOptions = true }
-						.confirmationDialog("Blockchain Explorer",
-							isPresented: $showBlockchainExplorerOptions,
-							titleVisibility: .automatic
-						) {
-							Button {
-								exploreIncomingSwap(website: BlockchainExplorer.WebsiteMempoolSpace())
-							} label: {
-								Text(verbatim: "Mempool.space") // no localization needed
-							}
-							Button {
-								exploreIncomingSwap(website: BlockchainExplorer.WebsiteBlockstreamInfo())
-							} label: {
-								Text(verbatim: "Blockstream.info") // no localization needed
-							}
-							Button("Copy bitcoin address") {
-								copyIncomingSwap()
-							}
-						} // </confirmationDialog>
-					
-				} else /* iOS 14 */ { // same functionality as before
-					
-					incomingBalance(incoming)
-						.onTapGesture { toggleCurrencyType() }
-				}
-			}
-			
-		} // </VStack>
+			incomingBalance()
+		}
 		.padding([.top, .leading, .trailing])
 		.padding(.bottom, 30)
 		.background(
@@ -292,7 +261,26 @@ struct HomeView : MVIView {
 	}
 	
 	@ViewBuilder
-	func incomingBalance(_ incoming: FormattedAmount) -> some View {
+	func incomingBalance() -> some View {
+		
+		let incomingSat = swapInWalletBalance.total.sat
+		if incomingSat > 0 {
+			let formattedAmount = currencyPrefs.hideAmountsOnHomeScreen
+				? Utils.hiddenAmount(currencyPrefs)
+				: Utils.format(currencyPrefs, sat: incomingSat)
+			
+			if incomingSat >= swapIn_minFundingSat {
+				incomingBalance_sufficient(formattedAmount)
+					.onTapGesture { showIncomingDepositPopover() }
+			} else {
+				incomingBalance_insufficient(formattedAmount)
+					.onTapGesture { showIncomingDepositPopover() }
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func incomingBalance_sufficient(_ incoming: FormattedAmount) -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 		
@@ -317,6 +305,35 @@ struct HomeView : MVIView {
 		}
 		.accessibilityElement(children: .combine)
 		.accessibilityHint("pending on-chain confirmation")
+		.accessibilitySortPriority(48)
+	}
+	
+	@ViewBuilder
+	func incomingBalance_insufficient(_ incoming: FormattedAmount) -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+		
+			Image(systemName: "exclamationmark.triangle")
+				.padding(.trailing, 2)
+			
+			if currencyPrefs.hideAmountsOnHomeScreen {
+				Text("+\(incoming.digits) incoming".lowercased()) // digits => "***"
+					.accessibilityLabel("plus hidden amount incoming")
+				
+			} else {
+				Text("+\(incoming.string) incoming".lowercased())
+			}
+		}
+		.font(.callout)
+		.foregroundColor(.appNegative)
+		.padding(.top, 7)
+		.padding(.bottom, 2)
+		.scaleEffect(incomingSwapScaleFactor, anchor: .top)
+		.onAnimationCompleted(for: incomingSwapScaleFactor) {
+			incomingSwapAnimationCompleted()
+		}
+		.accessibilityElement(children: .combine)
+		.accessibilityHint("amount insufficient")
 		.accessibilitySortPriority(48)
 	}
 	
@@ -476,18 +493,6 @@ struct HomeView : MVIView {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func incomingAmount() -> FormattedAmount? {
-		
-		let sat = swapInWalletBalance.total.sat
-		if sat > 0 {
-			return currencyPrefs.hideAmountsOnHomeScreen
-				? Utils.hiddenAmount(currencyPrefs)
-				: Utils.format(currencyPrefs, sat: sat)
-		} else {
-			return nil
-		}
-	}
-	
 	func isDownloadingRecentTxs() -> Bool {
 		
 		guard syncState.isDownloading else {
@@ -598,6 +603,7 @@ struct HomeView : MVIView {
 		log.trace("chainContextChanged()")
 		
 		isMempoolFull = context.mempool.v1.highUsage
+		swapIn_minFundingSat = context.payToOpen.v1.minFundingSat // not yet segregated for swapIn - future work
 	}
 	
 	func swapInWalletBalanceChanged(_ walletBalance: WalletBalance) {
@@ -682,29 +688,12 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func exploreIncomingSwap(website: BlockchainExplorer.Website) {
-		log.trace("exploreIncomingSwap()")
+	func showIncomingDepositPopover() {
+		log.trace("showIncomingDepositPopover()")
 		
-		guard let peer = Biz.business.getPeer() else {
-			return
+		popoverState.display(dismissable: true) {
+			IncomingDepositPopover()
 		}
-		let addr = peer.swapInAddress
-		
-		let txUrlStr = Biz.business.blockchainExplorer.addressUrl(addr: addr, website: website)
-		if let txUrl = URL(string: txUrlStr) {
-			UIApplication.shared.open(txUrl)
-		}
-	}
-	
-	func copyIncomingSwap() {
-		log.trace("copyIncomingSwap()")
-		
-		guard let peer = Biz.business.getPeer() else {
-			return
-		}
-		let addr = peer.swapInAddress
-		
-		UIPasteboard.general.string = addr
 	}
 	
 	func navigateToBackup() {
