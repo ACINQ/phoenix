@@ -500,6 +500,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	private let horizontalSpacingBetweenColumns: CGFloat = 8
 	
 	@State var popoverPresent_standardFees = false
+	@State var popoverPresent_minerFees = false
 	@State var popoverPresent_swapFees = false
 	
 	@Environment(\.openURL) var openURL
@@ -523,26 +524,27 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			paymentTypeRow()
 			channelClosingRow()
 			
-			let standardFees = paymentInfo.payment.standardFees(currencyPrefs: currencyPrefs)
-			let swapOutFees = paymentInfo.payment.swapOutFees(currencyPrefs: currencyPrefs)
-			
-			if let standardFees = standardFees {
-				let title = swapOutFees == nil
-				  ? NSLocalizedString("Fees", comment: "Label in SummaryInfoGrid")
-				  : NSLocalizedString("Lightning Fees", comment: "Label in SummaryInfoGrid")
-				
+			if let standardFees = paymentInfo.payment.standardFees(currencyPrefs: currencyPrefs) {
 				paymentFeesRow(
-					title: title,
+					title: standardFees.1,
 					amount: standardFees.0,
-					explanation: standardFees.1,
+					explanation: standardFees.2,
 					binding: $popoverPresent_standardFees
 				)
 			}
-			if let swapOutFees = swapOutFees {
+			if let minerFees = paymentInfo.payment.minerFees(currencyPrefs: currencyPrefs) {
 				paymentFeesRow(
-					title: NSLocalizedString("Swap Fees", comment: "Label in SummaryInfoGrid"),
+					title: minerFees.1,
+					amount: minerFees.0,
+					explanation: minerFees.2,
+					binding: $popoverPresent_minerFees
+				)
+			}
+			if let swapOutFees = paymentInfo.payment.swapOutFees(currencyPrefs: currencyPrefs) {
+				paymentFeesRow(
+					title: swapOutFees.1,
 					amount: swapOutFees.0,
-					explanation: swapOutFees.1,
+					explanation: swapOutFees.2,
 					binding: $popoverPresent_swapFees
 				)
 			}
