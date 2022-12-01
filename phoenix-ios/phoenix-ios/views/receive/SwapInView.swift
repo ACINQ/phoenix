@@ -33,7 +33,7 @@ struct SwapInView: View {
 	@State var swapIn_minFundingSat: Int64 = 0
 	
 	let swapInWalletBalancePublisher = Biz.business.peerManager.swapInWalletBalancePublisher()
-	@State var swapInWalletBalance: WalletBalance = WalletBalance.companion.empty()
+	@State var swapInWalletBalance = Biz.business.peerManager.swapInWalletBalanceValue()
 	
 	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
