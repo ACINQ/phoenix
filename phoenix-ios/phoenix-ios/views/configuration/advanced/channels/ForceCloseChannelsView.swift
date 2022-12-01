@@ -56,6 +56,7 @@ struct ForceCloseChannelsView : MVIView {
 			}
 		}
 		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 	}
 	
 	@ViewBuilder

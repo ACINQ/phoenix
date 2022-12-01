@@ -110,6 +110,7 @@ struct DisplayConfigurationView: View {
 			
 		} // </List>
 		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.navigationTitle(NSLocalizedString("Display options", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
@@ -258,6 +259,7 @@ struct FiatCurrencySelector: View, ViewName {
 			}
 		}
 		.listStyle(PlainListStyle())
+		.listBackgroundColor(.primaryBackground)
 	}
 	
 	@ViewBuilder
@@ -341,6 +343,7 @@ struct BitcoinUnitSelector: View, ViewName {
 				}
 			}
 			.listStyle(PlainListStyle())
+			.listBackgroundColor(.primaryBackground)
 			
 			footer()
 				.padding(.horizontal, 10)

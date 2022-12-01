@@ -92,6 +92,7 @@ struct AppAccessView : View {
 			} // </Section>
 		} // </List>
 		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 		.onReceive(willEnterForegroundPublisher, perform: { _ in
 			onWillEnterForeground()
 		})

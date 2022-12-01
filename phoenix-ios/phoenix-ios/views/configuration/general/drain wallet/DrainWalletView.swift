@@ -80,6 +80,7 @@ struct DrainWalletView: MVIView {
 			}
 		}
 		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 	}
 	
 	@ViewBuilder

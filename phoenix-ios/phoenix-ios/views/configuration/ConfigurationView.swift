@@ -219,6 +219,7 @@ struct ConfigurationView: View {
 			} // </Section: Advanced>
 		} // </List>
 		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 		.id(listViewId)
 		.onAppear() {
 			onAppear()

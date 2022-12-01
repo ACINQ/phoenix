@@ -71,7 +71,16 @@ struct RecoveryPhraseList: View {
 		self._legal_lossRisk = State<Bool>(initialValue: manualBackup_taskDone)
 	}
 	
+	@ViewBuilder
 	var body: some View {
+		
+		content()
+			.navigationTitle(NSLocalizedString("Recovery Phrase", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
 		
 		List {
 			if !backupSeed_enabled && !(legal_taskDone && legal_lossRisk) {
@@ -94,6 +103,7 @@ struct RecoveryPhraseList: View {
 			.id(sectionID_cloudBackup)
 		}
 		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 		.sheet(isPresented: $revealSeed) {
 			
 			RecoveryPhraseReveal(
@@ -101,8 +111,6 @@ struct RecoveryPhraseList: View {
 				mnemonics: $mnemonics
 			)
 		}
-		.navigationTitle(NSLocalizedString("Recovery Phrase", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
 		.onAppear {
 			onAppear()
 		}

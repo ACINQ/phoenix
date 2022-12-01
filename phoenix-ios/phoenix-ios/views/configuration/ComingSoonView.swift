@@ -16,6 +16,7 @@ struct ComingSoonView: View {
 			}
 		}
 		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 		.navigationTitle(title)
 		.navigationBarTitleDisplayMode(.inline)
 	}

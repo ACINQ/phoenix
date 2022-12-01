@@ -78,6 +78,7 @@ struct ResetWalletView_Confirm: MVISubView, ViewName {
 			section_button()
 		}
 		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 		.onAppear {
 			onAppear()
 		}
