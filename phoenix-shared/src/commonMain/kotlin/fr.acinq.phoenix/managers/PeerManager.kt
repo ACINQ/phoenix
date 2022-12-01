@@ -8,6 +8,9 @@ import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.electrum.WalletState.Utxo
+import fr.acinq.lightning.channel.ChannelStateWithCommitments
+import fr.acinq.lightning.channel.*
+import fr.acinq.lightning.channel.Offline
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.sat
@@ -157,6 +160,37 @@ class PeerManager(
     }
 
     suspend fun getPeer() = peerState.filterNotNull().first()
+
+    fun fundingTxId(channelId: ByteVector32): ByteVector32? {
+        val peer = peerState.value ?: return null
+        var channel = peer.channels[channelId] ?: return null
+        channel = when (channel) {
+            is Offline -> channel.state
+            else -> channel
+        }
+        return when (channel) {
+            is ChannelStateWithCommitments -> channel.commitments.fundingTxId
+            else -> null
+        }
+    }
+
+    fun minDepthForFunding(channelId: ByteVector32): Int? {
+        val nodeParams = nodeParamsManager.nodeParams.value ?: return null
+        val peer = peerState.value ?: return null
+        var channel = peer.channels[channelId] ?: return null
+        channel = when (channel) {
+            is Offline -> channel.state
+            else -> channel
+        }
+        val commitments = when (channel) {
+            is ChannelStateWithCommitments -> channel.commitments
+            else -> return null
+        }
+        return Helpers.minDepthForFunding(
+            nodeParams = nodeParams,
+            fundingAmount = commitments.fundingAmount
+        )
+    }
 }
 
 data class WalletBalance(

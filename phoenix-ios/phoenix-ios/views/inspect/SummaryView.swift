@@ -183,12 +183,32 @@ struct SummaryView: View {
 						.frame(width: 100, height: 100)
 						.padding(.bottom, 16)
 						.accessibilityHidden(true)
-					Text("WAITING FOR CONFIRMATIONS")
-						.font(.title2.uppercaseSmallCaps())
-						.multilineTextAlignment(.center)
-						.padding(.bottom, 30)
-						.accessibilityLabel("Pending payment")
-						.accessibilityHint("Waiting for confirmations")
+					VStack(alignment: HorizontalAlignment.center, spacing: 2) {
+						Text("WAITING FOR CONFIRMATIONS")
+							.font(.title2.uppercaseSmallCaps())
+							.multilineTextAlignment(.center)
+							.padding(.bottom, 6)
+							.accessibilityLabel("Pending payment")
+							.accessibilityHint("Waiting for confirmations")
+						if let depth = minFundingDepth() {
+							let minutes = depth * 10
+							Text("requires \(depth) confirmations")
+								.font(.footnote)
+								.multilineTextAlignment(.center)
+								.foregroundColor(.secondary)
+							Text("≈\(minutes) minutes")
+								.font(.footnote)
+								.multilineTextAlignment(.center)
+								.foregroundColor(.secondary)
+						}
+						if let broadcastDate = onChainBroadcastDate() {
+							Text(broadcastDate.format())
+								.font(.subheadline)
+								.foregroundColor(.secondary)
+								.padding(.top, 12)
+						}
+					} // </VStack>
+					.padding(.bottom, 30)
 				} else {
 					Image("ic_payment_sending")
 						.renderingMode(.template)
@@ -416,9 +436,42 @@ struct SummaryView: View {
 		.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
 	}
 	
-	func toggleCurrencyType() -> Void {
-		currencyPrefs.toggleCurrencyType()
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	func minFundingDepth() -> Int? {
+		
+		guard
+			let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment,
+			let received = incomingPayment.received,
+			let newChannel = received.receivedWith.compactMap({ $0.asNewChannel() }).first,
+			let channelId = newChannel.channelId,
+			let minFundingDepth = Biz.business.peerManager.minDepthForFunding(channelId: channelId)
+		else {
+			return nil
+		}
+		
+		return minFundingDepth.intValue
 	}
+	
+	func onChainBroadcastDate() -> Date? {
+		
+		if let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment {
+			
+			if let _ = incomingPayment.origin.asDualSwapIn() {
+				if let received = incomingPayment.received {
+					return received.receivedAtDate
+				}
+			}
+		}
+		
+		return nil
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
 	
 	func onAppear() {
 		log.trace("onAppear()")
@@ -469,6 +522,14 @@ struct SummaryView: View {
 				}
 			}
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func toggleCurrencyType() -> Void {
+		currencyPrefs.toggleCurrencyType()
 	}
 	
 	func deletePayment() {
