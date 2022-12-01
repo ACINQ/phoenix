@@ -322,7 +322,7 @@ struct SwapInView: View {
 		
 		HStack(alignment: VerticalAlignment.top, spacing: 8) {
 			
-			Image(systemName: "exclamationmark.circle")
+			Image(systemName: "info.circle")
 				.imageScale(.large)
 				.accessibilityHidden(true)
 			
@@ -335,12 +335,11 @@ struct SwapInView: View {
 				
 				Text(
 					"""
-					This is a swap address. It is not controlled by your wallet. \
+					This is an address controlled by your wallet. \
 					On-chain deposits sent to this address will be converted to Lightning channels.
 					"""
 				)
-				.lineLimit(nil)                               // text truncation bugs
-				.multilineTextAlignment(.leading)             // text truncation bugs
+				.multilineTextAlignment(.leading)
 				.fixedSize(horizontal: false, vertical: true) // text truncation bugs
 				.padding(.bottom, 14)
 				
@@ -351,8 +350,7 @@ struct SwapInView: View {
 					comment:	"Minimum amount description."),
 					minFunding.string, feePercent, minFee.string
 				))
-				.lineLimit(nil)                               // text truncation bugs
-				.multilineTextAlignment(.leading)             // text truncation bugs
+				.multilineTextAlignment(.leading)
 				.fixedSize(horizontal: false, vertical: true) // text truncation bugs
 			}
 		}
