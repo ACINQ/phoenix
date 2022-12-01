@@ -172,7 +172,7 @@ class EclairNodeService : Service() {
     notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline)
       .setOnlyAlertOnce(true)
       .setContentTitle(getString(R.string.notif__headless_title__default))
-      .setContentIntent(PendingIntent.getActivity(this, Constants.NOTIF_ID__HEADLESS, intent, PendingIntent.FLAG_ONE_SHOT))
+      .setContentIntent(PendingIntent.getActivity(this, Constants.NOTIF_ID__HEADLESS, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT))
     log.info("service created")
   }
 
@@ -872,7 +872,7 @@ class EclairNodeService : Service() {
       .setContentText(message)
       .setStyle(NotificationCompat.BigTextStyle().bigText(message))
       .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__MISSED_PAY_TO_OPEN,
-        Intent(applicationContext, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP }, PendingIntent.FLAG_UPDATE_CURRENT))
+        Intent(applicationContext, MainActivity::class.java).apply { Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP }, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
       .setAutoCancel(true)
       .build())
   }

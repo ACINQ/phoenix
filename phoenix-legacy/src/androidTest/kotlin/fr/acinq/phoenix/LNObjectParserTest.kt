@@ -63,7 +63,7 @@ class LNObjectParserTest {
     Assert.assertEquals(MilliSatoshi(20_000), url.maxSendable)
     Assert.assertEquals(null, url.maxCommentLength)
     Assert.assertEquals("https://lnurl-toolbox.degreesofzero.com/u/a07d243eb98af499b538e0b6ad387b014b48181b04a5feb6e55d30993f96635a", url.callbackUrl)
-    Assert.assertEquals(LNUrlPayMetadata(raw = "[[\"text/plain\",\"lnurl-toolbox: payRequest\"]]", plainText = "lnurl-toolbox: payRequest", image = null), url.rawMetadata)
+    Assert.assertEquals(LNUrlPayMetadata(raw = "[[\"text/plain\",\"lnurl-toolbox: payRequest\"]]", plainText = "lnurl-toolbox: payRequest", image = null, longDesc = null, identifier = null, email = null), url.rawMetadata)
 
     // lightning address
     url = Wallet.parseLNObject("acinq@zbd.gg")
