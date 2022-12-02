@@ -66,10 +66,13 @@ object SeedManager {
         } else if (!seedFile.isFile) {
             throw UnreadableSeed("not a file")
         } else {
-            seedFile.readBytes()
-                .run {
-                    EncryptedSeed.deserialize(this)
+            seedFile.readBytes().let {
+                if (it.isEmpty()) {
+                    throw UnreadableSeed("empty file!")
+                } else {
+                    EncryptedSeed.deserialize(it)
                 }
+            }
         }
     }
 

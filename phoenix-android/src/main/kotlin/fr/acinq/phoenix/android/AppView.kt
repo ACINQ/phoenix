@@ -137,13 +137,10 @@ fun AppView(
                     ReceiveView()
                 }
                 composable(Screen.ScanData.route) {
-                    ScanDataView(onBackClick = {
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Home.route) {
-                                inclusive = true
-                            }
-                        }
-                    })
+                    ScanDataView(
+                        onBackClick = { navController.navigate(Screen.Home.route) { popUpTo(Screen.Home.route) { inclusive = true } } },
+                        onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") }
+                    )
                 }
                 composable(
                     route = "${Screen.PaymentDetails.route}/{direction}/{id}",
@@ -158,9 +155,8 @@ fun AppView(
                     if (paymentId != null) {
                         PaymentDetailsView(
                             paymentId = paymentId,
-                            onBackClick = {
-                                navController.navigate(Screen.Home.route)
-                            })
+                            onBackClick = { navController.navigate(Screen.Home.route) }
+                        )
                     }
                 }
                 composable(Screen.Settings.route) {
@@ -185,7 +181,13 @@ fun AppView(
                     AboutView()
                 }
                 composable(Screen.PaymentSettings.route) {
-                    PaymentSettingsView()
+                    PaymentSettingsView(initialShowLnurlAuthSchemeDialog = false)
+                }
+                composable("${Screen.PaymentSettings.route}/{showAuthSchemeDialog}", arguments = listOf(
+                    navArgument("showAuthSchemeDialog") { type = NavType.BoolType }
+                )) {
+                    val showAuthSchemeDialog = it.arguments?.getBoolean("showAuthSchemeDialog") ?: false
+                    PaymentSettingsView(showAuthSchemeDialog)
                 }
                 composable(Screen.AppLock.route) {
                     AppLockView(

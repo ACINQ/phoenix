@@ -3,6 +3,7 @@ package fr.acinq.phoenix.db.payments
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.*
+import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.db.PaymentsDatabase
 import fr.acinq.phoenix.db.didUpdateWalletPaymentMetadata
 import io.ktor.http.*
@@ -132,12 +133,12 @@ class MetadataQueries(val database: PaymentsDatabase) {
         fun mapAll(
             type: Long,
             id: String,
-            lnurl_base_type: LNUrlBase.TypeVersion?,
+            lnurl_base_type: LnurlBase.TypeVersion?,
             lnurl_base_blob: ByteArray?,
             lnurl_description: String?,
-            lnurl_metadata_type: LNUrlMetadata.TypeVersion?,
+            lnurl_metadata_type: LnurlMetadata.TypeVersion?,
             lnurl_metadata_blob: ByteArray?,
-            lnurl_successAction_type: LNUrlSuccessAction.TypeVersion?,
+            lnurl_successAction_type: LnurlSuccessAction.TypeVersion?,
             lnurl_successAction_blob: ByteArray?,
             user_description: String?,
             user_notes: String?,
@@ -180,12 +181,12 @@ class MetadataQueries(val database: PaymentsDatabase) {
 }
 
 fun LnurlPayMetadata.Companion.placeholder(description: String) = LnurlPayMetadata(
-    pay = LNUrl.Pay(
-        lnurl = Url("https://phoenix.acinq.co/"),
+    pay = LnurlPay.Intent(
+        initialUrl = Url("https://phoenix.acinq.co/"),
         callback = Url("https://phoenix.acinq.co/"),
         minSendable = MilliSatoshi(0),
         maxSendable = MilliSatoshi(0),
-        metadata = LNUrl.Pay.Metadata(
+        metadata = LnurlPay.Intent.Metadata(
             raw = "",
             plainText = description,
             longDesc = null,

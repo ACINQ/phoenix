@@ -35,15 +35,13 @@ import fr.acinq.lightning.wire.SwapOutRequest
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.data.*
+import fr.acinq.phoenix.data.lnurl.*
 import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
-import fr.acinq.phoenix.managers.AppConfigurationManager
-import fr.acinq.phoenix.managers.DatabaseManager
-import fr.acinq.phoenix.managers.LNUrlManager
-import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.Parser
-import fr.acinq.phoenix.utils.PublicSuffixList
 import fr.acinq.phoenix.utils.chain
 import fr.acinq.phoenix.utils.createTrampolineFees
+import kotlinx.coroutines.*
 import io.ktor.http.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
@@ -58,12 +56,13 @@ import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
+import kotlin.time.seconds
 
 class AppScanController(
     loggerFactory: LoggerFactory,
     firstModel: Scan.Model?,
     private val peerManager: PeerManager,
-    private val lnurlManager: LNUrlManager,
+    private val lnurlManager: LnurlManager,
     private val databaseManager: DatabaseManager,
     private val appConfigManager: AppConfigurationManager,
     private val chain: Chain
@@ -71,16 +70,15 @@ class AppScanController(
     loggerFactory = loggerFactory,
     firstModel = firstModel ?: Scan.Model.Ready
 ) {
-    private var prefetchPublicSuffixListTask: Deferred<Pair<String, Long>?>? = null
 
     /** Arbitraty identifier used to track the current lnurl task. Those tasks are asynchronous and can be cancelled. We use this field to track which one is in progress. */
     private var lnurlRequestId = 1
 
     /** Tracks the task fetching information for a given lnurl. Use this field to cancel the task (see [cancelLnurlFetch]). */
-    private var continueLnurlTask: Deferred<LNUrl>? = null
+    private var continueLnurlTask: Deferred<Lnurl>? = null
 
     /** Tracks the task requesting an invoice to a Lnurl service. Use this field to cancel the task (see [cancelLnurlPay]). */
-    private var requestPayInvoiceTask: Deferred<LNUrl.PayInvoice>? = null
+    private var requestPayInvoiceTask: Deferred<LnurlPay.Invoice>? = null
 
     /** Tracks the task that send an invoice we generated to a Lnurl service, in order to make a withdrawal. Use this field to cancel the task (see [cancelLnurlWithdraw]). */
     private var sendWithdrawInvoiceTask: Deferred<JsonObject>? = null
@@ -89,7 +87,7 @@ class AppScanController(
         loggerFactory = business.loggerFactory,
         firstModel = firstModel,
         peerManager = business.peerManager,
-        lnurlManager = business.lnUrlManager,
+        lnurlManager = business.lnurlManager,
         databaseManager = business.databaseManager,
         appConfigManager = business.appConfigurationManager,
         chain = business.chain,
@@ -112,6 +110,7 @@ class AppScanController(
                             )
                         }
                     }
+                    else -> Unit
                 }
             }
         }
@@ -132,7 +131,7 @@ class AppScanController(
                 model(Scan.Model.InvoiceFlow.Sending)
             }
             is Scan.Intent.CancelLnurlServiceFetch -> launch { cancelLnurlFetch() }
-            is Scan.Intent.LnurlPayFlow.SendLnurlPayment -> launch { processLnurlPay(intent) }
+            is Scan.Intent.LnurlPayFlow.RequestInvoice -> launch { processLnurlPayRequestInvoice(intent) }
             is Scan.Intent.LnurlPayFlow.CancelLnurlPayment -> launch { cancelLnurlPay(intent) }
             is Scan.Intent.LnurlWithdrawFlow.SendLnurlWithdraw -> launch { processLnurlWithdraw(intent) }
             is Scan.Intent.LnurlWithdrawFlow.CancelLnurlWithdraw -> launch { cancelLnurlWithdraw(intent) }
@@ -164,8 +163,8 @@ class AppScanController(
 
         Parser.readPaymentRequest(input)?.let {
             processLightningInvoice(it)
-        } ?: readLNURL(input)?.let {
-            processLnurlData(it)
+        } ?: readLnurl(input)?.let {
+            processLnurl(it)
         } ?: Parser.readBitcoinAddress(chain, input).let {
             processBitcoinAddress(it)
         }
@@ -212,63 +211,47 @@ class AppScanController(
         }
     }
 
-    private suspend fun processLnurlData(data: Either<LNUrl.Auth, Url>) {
-        when (data) {
-            // lnurl-auths are not called automatically. The user must initiate the request.
-            is Either.Left -> {
-                // proceed to lnurl-auth flow
-                prefetchPublicSuffixListTask = appConfigManager.fetchPublicSuffixListAsync()
-                model(Scan.Model.LnurlAuthFlow.LoginRequest(auth = data.value))
+    private suspend fun processLnurl(lnurl: Lnurl) {
+        when (lnurl) {
+            is LnurlAuth -> {
+                model(Scan.Model.LnurlAuthFlow.LoginRequest(auth = lnurl))
             }
-            // this is a standard url, and it can be executed immediately in order to get the actual
-            // lnurl details from the service (the service should return either a LNUrl.Pay or a LNUrl.Withdraw).
-            is Either.Right -> {
-                val url = data.value
+            // this lnurl is a standard url that must be executed immediately in order to get the actual
+            // details from the service (the service should return either a LnurlPay or a LnurlWithdraw).
+            is Lnurl.Request -> {
+                val url = lnurl.initialUrl
                 model(Scan.Model.LnurlServiceFetch)
                 val result = executeLnurlAction {
-                    val task = lnurlManager.continueLnurlAsync(url)
+                    val task = lnurlManager.executeLnurl(url)
                     continueLnurlTask = task
                     try {
                         Either.Right(task.await())
                     } catch (e: Exception) {
                         when (e) {
-                            is LNUrl.Error.RemoteFailure -> Either.Left(
-                                Scan.BadRequestReason.ServiceError(url, e)
-                            )
-                            else -> Either.Left(
-                                Scan.BadRequestReason.InvalidLnUrl(url)
-                            )
+                            is LnurlError.RemoteFailure -> Either.Left(Scan.BadRequestReason.ServiceError(url, e))
+                            else -> Either.Left(Scan.BadRequestReason.InvalidLnurl(url))
                         }
                     }
                 }
-                when {
-                    result == null -> {} // do nothing, this request has been cancelled.
-                    result is Either.Left -> model(Scan.Model.BadRequest(result.value))
-                    result is Either.Right -> { // result: LNUrl
-                        when (val lnurl = result.value) {
-                            is LNUrl.Pay -> {
-                                model(
-                                    Scan.Model.LnurlPayFlow.LnurlPayRequest(
-                                        lnurlPay = lnurl,
-                                        error = null
-                                    )
-                                )
+                when (result) {
+                    null -> Unit
+                    is Either.Left -> model(Scan.Model.BadRequest(result.value))
+                    is Either.Right -> { // result: Lnurl
+                        when (val res = result.value) {
+                            is LnurlPay.Intent -> {
+                                model(Scan.Model.LnurlPayFlow.LnurlPayRequest(paymentIntent = res, error = null))
                             }
-                            is LNUrl.Withdraw -> {
-                                model(
-                                    Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(
-                                        lnurlWithdraw = lnurl,
-                                        error = null
-                                    )
-                                )
+                            is LnurlWithdraw -> {
+                                model(Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(lnurlWithdraw = res, error = null))
                             }
                             else -> {
-                                model(Scan.Model.BadRequest(Scan.BadRequestReason.UnsupportedLnUrl(url)))
+                                model(Scan.Model.BadRequest(Scan.BadRequestReason.UnsupportedLnurl(url)))
                             }
                         }
                     }
                 }
             }
+            else -> Unit
         }
     }
 
@@ -345,13 +328,13 @@ class AppScanController(
         model(Scan.Model.Ready)
     }
 
-    private suspend fun processLnurlPay(
-        intent: Scan.Intent.LnurlPayFlow.SendLnurlPayment
+    private suspend fun processLnurlPayRequestInvoice(
+        intent: Scan.Intent.LnurlPayFlow.RequestInvoice
     ) {
-        model(Scan.Model.LnurlPayFlow.LnurlPayFetch(lnurlPay = intent.lnurlPay))
+        model(Scan.Model.LnurlPayFlow.LnurlPayFetch(paymentIntent = intent.paymentIntent))
         val result = executeLnurlAction {
-            val task = lnurlManager.requestPayInvoiceAsync(
-                lnurlPay = intent.lnurlPay,
+            val task = lnurlManager.requestPayInvoice(
+                intent = intent.paymentIntent,
                 amount = intent.amount,
                 comment = intent.comment
             )
@@ -369,14 +352,14 @@ class AppScanController(
                 }
             } catch (err: Throwable) {
                 when (err) {
-                    is LNUrl.Error.RemoteFailure -> Either.Left(
+                    is LnurlError.RemoteFailure -> Either.Left(
                         Scan.LnurlPayError.RemoteError(err)
                     )
-                    is LNUrl.Error.PayInvoice -> Either.Left(
+                    is LnurlError.Pay.Invoice -> Either.Left(
                         Scan.LnurlPayError.BadResponseError(err)
                     )
                     else -> Either.Left(
-                        Scan.LnurlPayError.RemoteError(LNUrl.Error.RemoteFailure.Unreadable(origin = intent.lnurlPay.callback.host))
+                        Scan.LnurlPayError.RemoteError(LnurlError.RemoteFailure.Unreadable(origin = intent.paymentIntent.callback.host))
                     )
                 }
             }
@@ -387,7 +370,7 @@ class AppScanController(
             is Either.Left -> {
                 model(
                     Scan.Model.LnurlPayFlow.LnurlPayRequest(
-                        lnurlPay = intent.lnurlPay,
+                        paymentIntent = intent.paymentIntent,
                         error = result.value
                     )
                 )
@@ -399,15 +382,15 @@ class AppScanController(
                     customMaxFees = intent.maxFees,
                     metadata = WalletPaymentMetadata(
                         lnurl = LnurlPayMetadata(
-                            pay = intent.lnurlPay,
-                            description = intent.lnurlPay.metadata.plainText,
+                            pay = intent.paymentIntent,
+                            description = intent.paymentIntent.metadata.plainText,
                             successAction = result.value.successAction
                         ),
                         userNotes = intent.comment
                     ),
                     swapOutData = null,
                 )
-                model(Scan.Model.LnurlPayFlow.Sending)
+                model(Scan.Model.LnurlPayFlow.Sending(intent.paymentIntent))
             }
         }
     }
@@ -420,7 +403,7 @@ class AppScanController(
         requestPayInvoiceTask = null
         model(
             Scan.Model.LnurlPayFlow.LnurlPayRequest(
-                lnurlPay = intent.lnurlPay,
+                paymentIntent = intent.lnurlPay,
                 error = null
             )
         )
@@ -454,7 +437,7 @@ class AppScanController(
             // Intent.LnurlWithdrawFlow.CancelLnurlWithdraw has been issued
             return
         }
-        val task = lnurlManager.sendWithdrawInvoiceAsync(
+        val task = lnurlManager.sendWithdrawInvoice(
             lnurlWithdraw = intent.lnurlWithdraw,
             paymentRequest = paymentRequest
         )
@@ -464,12 +447,12 @@ class AppScanController(
             null
         } catch (err: Throwable) {
             when (err) {
-                is LNUrl.Error.RemoteFailure -> {
+                is LnurlError.RemoteFailure -> {
                     Scan.LnurlWithdrawError.RemoteError(err)
                 }
                 else -> { // unexpected exception: map to generic error
                     Scan.LnurlWithdrawError.RemoteError(
-                        LNUrl.Error.RemoteFailure.Unreadable(
+                        LnurlError.RemoteFailure.Unreadable(
                             origin = intent.lnurlWithdraw.callback.host
                         )
                     )
@@ -519,27 +502,15 @@ class AppScanController(
     ) {
         model(Scan.Model.LnurlAuthFlow.LoggingIn(auth = intent.auth))
         val start = TimeSource.Monotonic.markNow()
-        val psl = prefetchPublicSuffixListTask?.await()
-        if (psl == null) {
-            model(
-                Scan.Model.LnurlAuthFlow.LoginResult(
-                    auth = intent.auth,
-                    error = Scan.LoginError.OtherError(
-                        details = LNUrl.Error.Auth.MissingPublicSuffixList
-                    )
-                )
-            )
-            return
-        }
         val error = try {
-            lnurlManager.requestAuth(
+            lnurlManager.signAndSendAuthRequest(
                 auth = intent.auth,
-                publicSuffixList = PublicSuffixList(psl.first)
+                scheme = intent.scheme
             )
             null
-        } catch (e: LNUrl.Error.RemoteFailure.CouldNotConnect) {
+        } catch (e: LnurlError.RemoteFailure.CouldNotConnect) {
             Scan.LoginError.NetworkError(details = e)
-        } catch (e: LNUrl.Error.RemoteFailure) {
+        } catch (e: LnurlError.RemoteFailure) {
             Scan.LoginError.ServerError(details = e)
         } catch (e: Throwable) {
             Scan.LoginError.OtherError(details = e)
@@ -576,10 +547,11 @@ class AppScanController(
 
         return Parser.readPaymentRequest(input)?.let {
             Scan.ClipboardContent.InvoiceRequest(it)
-        } ?: readLNURL(input)?.let {
+        } ?: readLnurl(input)?.let {
             when (it) {
-                is Either.Left -> Scan.ClipboardContent.LoginRequest(it.value)
-                is Either.Right -> Scan.ClipboardContent.LnurlRequest(it.value)
+                is LnurlAuth -> Scan.ClipboardContent.LoginRequest(it)
+                is Lnurl.Request -> Scan.ClipboardContent.LnurlRequest(it.initialUrl)
+                else -> null
             }
         } ?: Parser.readBitcoinAddress(chain, input).let {
             when (it) {
@@ -615,8 +587,8 @@ class AppScanController(
     }
 
     /** Reads a lnurl and return either a lnurl-auth (i.e. a http query that must not be called automatically), or the actual url embedded in the lnurl (that can be called afterwards). */
-    private fun readLNURL(input: String): Either<LNUrl.Auth, Url>? = try {
-        lnurlManager.interactiveExtractLnurl(Parser.trimMatchingPrefix(input, listOf("lightning://", "lightning:")))
+    private fun readLnurl(input: String): Lnurl? = try {
+        Lnurl.extractLnurl(input)
     } catch (t: Throwable) {
         null
     }

@@ -90,21 +90,21 @@ struct LnurlFlowErrorNotice: View {
 				
 			} else if let err = payError as? Scan.LnurlPay_Error_BadResponseError {
 				
-				if let details = err.err as? LNUrl.Error_PayInvoice_Malformed {
+				if let details = err.err as? LnurlError.Pay_Invoice_Malformed {
 					
 					Text("Host: \(details.origin)")
 						.font(.system(.subheadline, design: .monospaced))
 					Text("Malformed: \(details.context)")
 						.font(.system(.subheadline, design: .monospaced))
 					
-				} else if let details = err.err as? LNUrl.Error_PayInvoice_InvalidHash {
+				} else if let details = err.err as? LnurlError.Pay_Invoice_InvalidHash {
 					
 					Text("Host: \(details.origin)")
 						.font(.system(.subheadline, design: .monospaced))
 					Text("Error: invalid hash")
 						.font(.system(.subheadline, design: .monospaced))
 					
-				} else if let details = err.err as? LNUrl.Error_PayInvoice_InvalidAmount {
+				} else if let details = err.err as? LnurlError.Pay_Invoice_InvalidAmount {
 				 
 					Text("Host: \(details.origin)")
 						.font(.system(.subheadline, design: .monospaced))
@@ -148,21 +148,21 @@ struct LnurlFlowErrorNotice: View {
 	}
 	
 	@ViewBuilder
-	func errorMessage(_ remoteFailure: LNUrl.Error_RemoteFailure) -> some View {
+	func errorMessage(_ remoteFailure: LnurlError.RemoteFailure) -> some View {
 		
-		if let _ = remoteFailure as? LNUrl.Error_RemoteFailure_CouldNotConnect {
+		if let _ = remoteFailure as? LnurlError.RemoteFailure_CouldNotConnect {
 			
 			Text("Could not connect to host:")
 			Text(remoteFailure.origin)
 				.font(.system(.subheadline, design: .monospaced))
 		
-		} else if let details = remoteFailure as? LNUrl.Error_RemoteFailure_Code {
+		} else if let details = remoteFailure as? LnurlError.RemoteFailure_Code {
 			
 			Text("Host returned status code \(details.code.value):")
 			Text(remoteFailure.origin)
 				.font(.system(.subheadline, design: .monospaced))
 		 
-		} else if let details = remoteFailure as? LNUrl.Error_RemoteFailure_Detailed {
+		} else if let details = remoteFailure as? LnurlError.RemoteFailure_Detailed {
 		
 			Text("Host returned error response.")
 			Text("Host: \(details.origin)")
@@ -170,7 +170,7 @@ struct LnurlFlowErrorNotice: View {
 			Text("Error: \(details.reason)")
 				.font(.system(.subheadline, design: .monospaced))
 	 
-		} else if let _ = remoteFailure as? LNUrl.Error_RemoteFailure_Unreadable {
+		} else if let _ = remoteFailure as? LnurlError.RemoteFailure_Unreadable {
 		
 			Text("Host returned unreadable response:", comment: "error details")
 			Text(remoteFailure.origin)
@@ -226,9 +226,9 @@ struct LnurlFlowErrorNotice: View {
 		}
 	}
 	
-	private func title(_ remoteFailure: LNUrl.Error_RemoteFailure) -> String {
+	private func title(_ remoteFailure: LnurlError.RemoteFailure) -> String {
 		
-		if remoteFailure is LNUrl.Error_RemoteFailure_CouldNotConnect {
+		if remoteFailure is LnurlError.RemoteFailure_CouldNotConnect {
 			return NSLocalizedString("Connection failure", comment: "Error title")
 		} else {
 			return NSLocalizedString("Invalid response", comment: "Error title")

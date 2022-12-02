@@ -17,8 +17,6 @@
 
 package fr.acinq.phoenix.android.payments
 
-import android.content.ClipboardManager
-import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -49,10 +47,7 @@ import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.Dialog
-import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
@@ -83,14 +78,14 @@ class ScanDataViewModel(controller: ScanController) : MVIControllerViewModel<Sca
 @Composable
 fun ScanDataView(
     onBackClick: () -> Unit,
+    onAuthSchemeInfoClick: () -> Unit,
 ) {
     val trampolineMaxFees by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(null)
     val maxFees = trampolineMaxFees?.let { MaxFees(it.feeBase, it.feeProportional) }
     val vm: ScanDataViewModel = viewModel(factory = ScanDataViewModel.Factory(controllerFactory, CF::scan))
     MVIView(vm) { model, postIntent ->
         when (model) {
-            Scan.Model.Ready, is Scan.Model.BadRequest, is Scan.Model.InvoiceFlow.DangerousRequest,
-            is Scan.Model.LnurlWithdrawFlow, is Scan.Model.LnurlAuthFlow, is Scan.Model.LnurlServiceFetch, is Scan.Model.LnurlPayFlow -> {
+            Scan.Model.Ready, is Scan.Model.BadRequest, is Scan.Model.InvoiceFlow.DangerousRequest, is Scan.Model.LnurlServiceFetch -> {
                 ReadDataView(
                     model = model,
                     onBackClick = onBackClick,
@@ -124,7 +119,7 @@ fun ScanDataView(
                 } else {
                     var hasPickedSwapOutMode by remember { mutableStateOf(false) }
                     if (!hasPickedSwapOutMode) {
-                        SwapOutOrLightningDialog(
+                        ChooseSwapOutOrLightningDialog(
                             onPayWithLightningClick = {
                                 hasPickedSwapOutMode = true
                                 postIntent(Scan.Intent.Parse(request = paymentRequest.write()))
@@ -137,11 +132,24 @@ fun ScanDataView(
                     }
                 }
             }
+            is Scan.Model.LnurlPayFlow -> {
+                LnurlPayView(
+                    model = model,
+                    trampolineMaxFees = maxFees,
+                    onBackClick = onBackClick,
+                    onSendLnurlPayClick = { postIntent(it) }
+                )
+            }
+            is Scan.Model.LnurlAuthFlow -> {
+                LnurlAuthView(model = model, onBackClick = onBackClick, onLoginClick = { postIntent(it) }, onAuthSchemeInfoClick = onAuthSchemeInfoClick)
+            }
+            is Scan.Model.LnurlWithdrawFlow -> {
+                LnurlWithdrawView(model = model, onBackClick = onBackClick, onWithdrawClick = { postIntent(it) })
+            }
         }
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ReadDataView(
     model: Scan.Model,
@@ -172,42 +180,18 @@ fun ReadDataView(
                 .align(Alignment.Center)
         )
 
-        val feedbackMessage = when {
-            model is Scan.Model.BadRequest && model.reason is Scan.BadRequestReason.ChainMismatch -> stringResource(R.string.scan_error_invalid_chain)
-            model is Scan.Model.BadRequest && model.reason is Scan.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.scan_error_pay_to_self)
-            model is Scan.Model.BadRequest && model.reason is Scan.BadRequestReason.ServiceError -> stringResource(R.string.scan_error_lnurl_service_error)
-            model is Scan.Model.BadRequest && model.reason is Scan.BadRequestReason.InvalidLnUrl -> stringResource(R.string.scan_error_lnurl_invalid)
-            model is Scan.Model.BadRequest && model.reason is Scan.BadRequestReason.UnsupportedLnUrl -> stringResource(R.string.scan_error_lnurl_unsupported)
-            model is Scan.Model.BadRequest && model.reason is Scan.BadRequestReason.UnknownFormat -> stringResource(R.string.scan_error_invalid_generic)
-            model is Scan.Model.LnurlServiceFetch -> stringResource(R.string.scan_lnurl_fetching)
-            model is Scan.Model.LnurlPayFlow -> "Lnurl-pay not suppported yet"
-            model is Scan.Model.LnurlWithdrawFlow -> "Lnurl-withdraw not suppported yet"
-            model is Scan.Model.LnurlAuthFlow -> "Lnurl-auth not suppported yet"
-            else -> null
+        if (model is Scan.Model.BadRequest) {
+            ScanErrorView(model, onFeedbackDismiss)
         }
-        if (feedbackMessage != null) {
-            Dialog(
-                onDismiss = onFeedbackDismiss,
-                content = { Text(feedbackMessage, modifier = Modifier.padding(top = 24.dp, start = 24.dp, end = 24.dp)) }
-            )
-        } else if (model is Scan.Model.InvoiceFlow.DangerousRequest) {
-            Dialog(
-                onDismiss = {},
-                properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false, usePlatformDefaultWidth = false),
-                title = stringResource(id = R.string.scan_amountless_legacy_title),
-                buttons = {
-                    Button(
-                        onClick = onFeedbackDismiss,
-                        text = stringResource(id = R.string.btn_cancel)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Button(
-                        onClick = { onConfirmDangerousRequest(model.request, model.paymentRequest) },
-                        text = stringResource(id = R.string.btn_confirm)
-                    )
-                },
-                content = { Text(annotatedStringResource(id = R.string.scan_amountless_legacy_message), modifier = Modifier.padding(horizontal = 24.dp)) }
-            )
+
+        if (model is Scan.Model.InvoiceFlow.DangerousRequest) {
+            DangerousRequestDialog(request = model.request, paymentRequest = model.paymentRequest, onDismiss = onFeedbackDismiss, onConfirmDangerousRequest = onConfirmDangerousRequest)
+        }
+
+        if (model is Scan.Model.LnurlServiceFetch) {
+            Card(modifier = Modifier.align(Alignment.Center), internalPadding = PaddingValues(24.dp)) {
+                Text(text = stringResource(R.string.scan_lnurl_fetching))
+            }
         }
 
         // buttons at the bottom of the screen
@@ -270,8 +254,55 @@ private fun ScannerView(
         })
 }
 
+
 @Composable
-private fun SwapOutOrLightningDialog(
+private fun ScanErrorView(
+    model: Scan.Model.BadRequest,
+    onErrorDialogDismiss: () -> Unit,
+) {
+    val errorMessage = when (model.reason) {
+        is Scan.BadRequestReason.ChainMismatch -> stringResource(R.string.scan_error_invalid_chain)
+        is Scan.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.scan_error_pay_to_self)
+        is Scan.BadRequestReason.ServiceError -> stringResource(R.string.scan_error_lnurl_service_error)
+        is Scan.BadRequestReason.InvalidLnurl -> stringResource(R.string.scan_error_lnurl_invalid)
+        is Scan.BadRequestReason.UnsupportedLnurl -> stringResource(R.string.scan_error_lnurl_unsupported)
+        is Scan.BadRequestReason.UnknownFormat -> stringResource(R.string.scan_error_invalid_generic)
+    }
+    Dialog(
+        onDismiss = onErrorDialogDismiss,
+        content = { Text(errorMessage, modifier = Modifier.padding(top = 24.dp, start = 24.dp, end = 24.dp)) }
+    )
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun DangerousRequestDialog(
+    request: String,
+    paymentRequest: PaymentRequest,
+    onDismiss: () -> Unit,
+    onConfirmDangerousRequest: (String, PaymentRequest) -> Unit
+) {
+    Dialog(
+        onDismiss = {},
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false, usePlatformDefaultWidth = false),
+        title = stringResource(id = R.string.scan_amountless_legacy_title),
+        buttons = {
+            Button(
+                onClick = onDismiss,
+                text = stringResource(id = R.string.btn_cancel)
+            )
+            Spacer(Modifier.width(8.dp))
+            Button(
+                onClick = { onConfirmDangerousRequest(request, paymentRequest) },
+                text = stringResource(id = R.string.btn_confirm)
+            )
+        },
+        content = { Text(annotatedStringResource(id = R.string.scan_amountless_legacy_message), modifier = Modifier.padding(horizontal = 24.dp)) }
+    )
+}
+
+@Composable
+private fun ChooseSwapOutOrLightningDialog(
     onPayWithSwapOutClick: () -> Unit,
     onPayWithLightningClick: () -> Unit,
 ) {

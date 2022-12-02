@@ -273,14 +273,14 @@ extension ExchangeRate {
 	}
 }
 
-extension LNUrl.Auth {
+extension LnurlAuth {
 	
 	static var defaultActionPromptTitle: String {
 		return NSLocalizedString("Authenticate", comment: "lnurl-auth: login button title")
 	}
 	
 	var actionPromptTitle: String {
-		if let action = self.action() {
+		if let action = self.action {
 			switch action {
 				case .register_ : return NSLocalizedString("Register",     comment: "lnurl-auth: login button title")
 				case .login     : return NSLocalizedString("Login",        comment: "lnurl-auth: login button title")
@@ -289,7 +289,7 @@ extension LNUrl.Auth {
 				default         : break
 			}
 		}
-		return LNUrl.Auth.defaultActionPromptTitle
+		return LnurlAuth.defaultActionPromptTitle
 	}
 	
 	static var defaultActionSuccessTitle: String {
@@ -297,7 +297,7 @@ extension LNUrl.Auth {
 	}
 	
 	var actionSuccessTitle: String {
-		if let action = self.action() {
+		if let action = self.action {
 			switch action {
 				case .register_ : return NSLocalizedString("Registered",    comment: "lnurl-auth: success text")
 				case .login     : return NSLocalizedString("Logged In",     comment: "lnurl-auth: success text")
@@ -306,7 +306,7 @@ extension LNUrl.Auth {
 				default         : break
 			}
 		}
-		return LNUrl.Auth.defaultActionSuccessTitle
+		return LnurlAuth.defaultActionSuccessTitle
 	}
 }
 

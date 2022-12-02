@@ -23,7 +23,7 @@ class AppConfigurationController(
     init {
         launch {
             model(
-                if (walletManager.wallet.value == null)
+                if (!walletManager.isLoaded())
                     Configuration.Model.SimpleMode
                 else
                     Configuration.Model.FullMode

@@ -76,7 +76,7 @@ class PhoenixBusiness(
     val appConfigurationManager by lazy { AppConfigurationManager(this) }
     val currencyManager by lazy { CurrencyManager(this) }
     val connectionsManager by lazy { ConnectionsManager(this) }
-    val lnUrlManager by lazy { LNUrlManager(this) }
+    val lnurlManager by lazy { LnurlManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
 
     init {

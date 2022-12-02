@@ -61,7 +61,7 @@ struct ConfigurationView: View {
 	
 	@ViewBuilder
 	var body: some View {
-		
+
 		List {
 			let hasWallet = hasWallet()
 
@@ -194,7 +194,7 @@ struct ConfigurationView: View {
 						Image(systemName: "doc.text")
 					}
 				}
-				
+
 			} // </Section: Advanced>
 		} // </List>
 		.listStyle(.insetGrouped)
@@ -216,19 +216,12 @@ struct ConfigurationView: View {
 		}
 		.navigationTitle(NSLocalizedString("Settings", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
-			
+
 	} // end: body
 	
 	func hasWallet() -> Bool {
 		
-		let walletManager = AppDelegate.get().business.walletManager
-		let hasWalletFlow = SwiftStateFlow<NSNumber>(origin: walletManager.hasWallet)
-		
-		if let value = hasWalletFlow.value_ {
-			return value.boolValue
-		} else {
-			return false
-		}
+		return AppDelegate.get().business.walletManager.isLoaded()
 	}
 	
 	func onAppear() {

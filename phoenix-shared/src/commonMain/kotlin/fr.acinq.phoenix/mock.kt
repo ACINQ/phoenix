@@ -13,7 +13,7 @@ import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
-import fr.acinq.phoenix.data.LNUrl
+import fr.acinq.phoenix.data.lnurl.LnurlWithdraw
 import io.ktor.http.*
 
 object Mock {
@@ -122,10 +122,10 @@ object Mock {
         defaultDescription: String,
         minWithdrawable: MilliSatoshi,
         maxWithdrawable: MilliSatoshi
-    ): LNUrl.Withdraw {
+    ): LnurlWithdraw {
 
-        return LNUrl.Withdraw(
-            lnurl = URLBuilder(lnurl).build(),
+        return LnurlWithdraw(
+            initialUrl = URLBuilder(lnurl).build(),
             callback = URLBuilder(callback).build(),
             k1 = k1,
             defaultDescription = defaultDescription,

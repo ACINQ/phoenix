@@ -207,7 +207,7 @@ class AppConnectionsDaemon(
         // Internet dependent flows - related to the Wallet
         launch {
             // Suspends until the wallet is initialized
-            walletManager.wallet.filterNotNull().first()
+            walletManager.keyManager.filterNotNull().first()
             networkStatus.collect {
                 when (it) {
                     NetworkState.Available -> {

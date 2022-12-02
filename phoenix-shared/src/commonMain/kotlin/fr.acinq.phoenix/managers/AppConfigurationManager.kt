@@ -136,42 +136,6 @@ class AppConfigurationManager(
         }
     }
 
-    private val publicSuffixListKey = "publicSuffixList"
-    private val publicSuffixListDefaultRefresh = Duration.days(30)
-
-    private suspend fun fetchPublicSuffixList(
-        refreshIfOlderThan: Duration = publicSuffixListDefaultRefresh
-    ): Pair<String, Long>? {
-        val databaseRow = appDb.getValue(publicSuffixListKey) {
-            String(bytes = it, charset = Charsets.UTF_8)
-        }
-        if (databaseRow != null) {
-            val elapsed = currentTimestampMillis() - databaseRow.second
-            if (Duration.milliseconds(elapsed) <= refreshIfOlderThan) {
-                return databaseRow
-            }
-        }
-
-        val latestList: String = try {
-            httpClient.get("https://acinq.co/phoenix/public_suffix_list.dat")
-        } catch (err: Throwable) {
-            logger.warning { "Error fetching public_suffix_list.dat: $err" }
-            return databaseRow
-        }
-
-        val latestListData = latestList.toByteArray(charset = Charsets.UTF_8)
-        val refreshTimestamp = appDb.setValue(latestListData, publicSuffixListKey)
-        return Pair(latestList, refreshTimestamp)
-    }
-
-    suspend fun fetchPublicSuffixListAsync(
-        refreshIfOlderThan: Duration = publicSuffixListDefaultRefresh
-    ): Deferred<Pair<String, Long>?> {
-        return async {
-            fetchPublicSuffixList(refreshIfOlderThan)
-        }
-    }
-
     /**
      * Used by the [PeerManager] to know what parameters to use when starting
      * up the [Peer] connection. If null, the [PeerManager] will wait before
