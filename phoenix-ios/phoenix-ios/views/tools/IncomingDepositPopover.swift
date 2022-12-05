@@ -22,7 +22,7 @@ struct IncomingDepositPopover: View {
 	// Toggles confirmation dialog (used to select preferred explorer)
 	@State var showBlockchainExplorerOptions = false
 	
-	let swapInWalletBalancePublisher = Biz.business.peerManager.swapInWalletBalancePublisher()
+	let swapInWalletBalancePublisher = Biz.business.balanceManager.swapInWalletBalancePublisher()
 	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	@Environment(\.popoverState) var popoverState: PopoverState

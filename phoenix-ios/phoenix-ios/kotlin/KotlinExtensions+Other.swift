@@ -10,7 +10,7 @@ extension PhoenixBusiness {
 	}
 }
 
-extension PeerManager {
+extension BalanceManager {
 	
 	func swapInWalletBalanceValue() -> WalletBalance {
 		if let value = swapInWalletBalance.value_ as? WalletBalance {

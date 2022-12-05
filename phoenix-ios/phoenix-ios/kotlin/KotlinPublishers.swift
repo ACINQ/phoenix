@@ -15,23 +15,7 @@ fileprivate var log = Logger(OSLog.disabled)
 extension PeerManager {
 	
 	fileprivate struct _Key {
-		static var balancePublisher = 0
 		static var peerStatePublisher = 0
-		static var swapInWalletBalancePublisher = 0
-	}
-	
-	func balancePublisher() -> AnyPublisher<Lightning_kmpMilliSatoshi?, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.balancePublisher) {
-			
-			// Transforming from Kotlin:
-			// `balance: StateFlow<MilliSatoshi?>`
-			//
-			KotlinCurrentValueSubject<Lightning_kmpMilliSatoshi, Lightning_kmpMilliSatoshi?>(
-				self.balance
-			)
-			.eraseToAnyPublisher()
-		}
 	}
 	
 	func peerStatePublisher() -> AnyPublisher<Lightning_kmpPeer, Never> {
@@ -46,21 +30,6 @@ extension PeerManager {
 				self.peerState
 			)
 			.compactMap { $0 }
-			.eraseToAnyPublisher()
-		}
-	}
-	
-	func swapInWalletBalancePublisher() -> AnyPublisher<WalletBalance, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.swapInWalletBalancePublisher) {
-			
-			// Transforming from Kotlin:
-			// ```
-			// swapInWalletBalance: StateFlow<WalletBalance>
-			// ```
-			KotlinCurrentValueSubject<WalletBalance, WalletBalance>(
-				self.swapInWalletBalance
-			)
 			.eraseToAnyPublisher()
 		}
 	}
@@ -84,6 +53,44 @@ extension AppConfigurationManager {
 				self.chainContext
 			)
 			.compactMap { $0 }
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+// MARK: -
+extension BalanceManager {
+	
+	fileprivate struct _Key {
+		static var balancePublisher = 0
+		static var swapInWalletBalancePublisher = 0
+	}
+	
+	func balancePublisher() -> AnyPublisher<Lightning_kmpMilliSatoshi?, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.balancePublisher) {
+			
+			// Transforming from Kotlin:
+			// `balance: StateFlow<MilliSatoshi?>`
+			//
+			KotlinCurrentValueSubject<Lightning_kmpMilliSatoshi, Lightning_kmpMilliSatoshi?>(
+				self.balance
+			)
+			.eraseToAnyPublisher()
+		}
+	}
+	
+	func swapInWalletBalancePublisher() -> AnyPublisher<WalletBalance, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.swapInWalletBalancePublisher) {
+			
+			// Transforming from Kotlin:
+			// ```
+			// swapInWalletBalance: StateFlow<WalletBalance>
+			// ```
+			KotlinCurrentValueSubject<WalletBalance, WalletBalance>(
+				self.swapInWalletBalance
+			)
 			.eraseToAnyPublisher()
 		}
 	}

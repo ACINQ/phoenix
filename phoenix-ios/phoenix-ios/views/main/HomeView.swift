@@ -51,7 +51,7 @@ struct HomeView : MVIView {
 	let lastCompletedPaymentPublisher = Biz.business.paymentsManager.lastCompletedPaymentPublisher()
 	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
-	let swapInWalletBalancePublisher = Biz.business.peerManager.swapInWalletBalancePublisher()
+	let swapInWalletBalancePublisher = Biz.business.balanceManager.swapInWalletBalancePublisher()
 	@State var swapInWalletBalance: WalletBalance = WalletBalance.companion.empty()
 	
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2

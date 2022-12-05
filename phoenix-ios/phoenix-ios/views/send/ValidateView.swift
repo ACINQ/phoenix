@@ -55,7 +55,7 @@ struct ValidateView: View {
 	
 	@State var didAppear = false
 	
-	let balancePublisher = Biz.business.peerManager.balancePublisher()
+	let balancePublisher = Biz.business.balanceManager.balancePublisher()
 	@State var balanceMsat: Int64 = 0
 	
 	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
