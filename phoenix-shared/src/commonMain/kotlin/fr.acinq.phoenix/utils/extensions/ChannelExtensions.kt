@@ -18,6 +18,7 @@ package fr.acinq.phoenix.utils.extensions
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.transactions.CommitmentSpec
 import fr.acinq.lightning.utils.sum
@@ -30,6 +31,13 @@ val ChannelState.localCommitmentSpec: CommitmentSpec? get() =
         is Syncing -> state.localCommitmentSpec
         else -> null
     }
+
+fun ChannelStateWithCommitments.minDepthForFunding(nodeParams: NodeParams): Int {
+    return Helpers.minDepthForFunding(
+        nodeParams = nodeParams,
+        fundingAmount = commitments.fundingAmount
+    )
+}
 
 fun calculateBalance(channels: Map<ByteVector32, ChannelState>): MilliSatoshi {
     return channels.values.map {

@@ -552,7 +552,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		if let newChannel = receivedWith.asNewChannel(),
 			let channelId = newChannel.channelId,
-			let fundingTxId = Biz.business.peerManager.fundingTxId(channelId: channelId)
+			let channel = Biz.business.peerManager.getChannelWithCommitments(channelId: channelId)
 		{
 			InfoGridRowWrapper(
 				identifier: identifier,
@@ -564,7 +564,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				
 			} valueColumn: {
 				
-				let str = fundingTxId.toHex()
+				let str = channel.commitments.fundingTxId.toHex()
 				Text(str)
 					.contextMenu {
 						Button(action: {

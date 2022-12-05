@@ -161,7 +161,11 @@ class PeerManager(
 
     suspend fun getPeer() = peerState.filterNotNull().first()
 
-    fun fundingTxId(channelId: ByteVector32): ByteVector32? {
+    /**
+     * Returns the underlying channel, if it's of type ChannelStateWithCommitments.
+     * Note that Offline channels are automatically unwrapped.
+     */
+    fun getChannelWithCommitments(channelId: ByteVector32): ChannelStateWithCommitments? {
         val peer = peerState.value ?: return null
         var channel = peer.channels[channelId] ?: return null
         channel = when (channel) {
@@ -169,27 +173,9 @@ class PeerManager(
             else -> channel
         }
         return when (channel) {
-            is ChannelStateWithCommitments -> channel.commitments.fundingTxId
+            is ChannelStateWithCommitments -> channel
             else -> null
         }
-    }
-
-    fun minDepthForFunding(channelId: ByteVector32): Int? {
-        val nodeParams = nodeParamsManager.nodeParams.value ?: return null
-        val peer = peerState.value ?: return null
-        var channel = peer.channels[channelId] ?: return null
-        channel = when (channel) {
-            is Offline -> channel.state
-            else -> channel
-        }
-        val commitments = when (channel) {
-            is ChannelStateWithCommitments -> channel.commitments
-            else -> return null
-        }
-        return Helpers.minDepthForFunding(
-            nodeParams = nodeParams,
-            fundingAmount = commitments.fundingAmount
-        )
     }
 }
 

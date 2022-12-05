@@ -440,19 +440,20 @@ struct SummaryView: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func minFundingDepth() -> Int? {
+	func minFundingDepth() -> Int32? {
 		
 		guard
 			let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment,
 			let received = incomingPayment.received,
 			let newChannel = received.receivedWith.compactMap({ $0.asNewChannel() }).first,
 			let channelId = newChannel.channelId,
-			let minFundingDepth = Biz.business.peerManager.minDepthForFunding(channelId: channelId)
+			let channel = Biz.business.peerManager.getChannelWithCommitments(channelId: channelId),
+			let nodeParams = Biz.business.nodeParamsManager.nodeParams.value_ as? Lightning_kmpNodeParams
 		else {
 			return nil
 		}
 		
-		return minFundingDepth.intValue
+		return channel.minDepthForFunding(nodeParams: nodeParams)
 	}
 	
 	func onChainBroadcastDate() -> Date? {
