@@ -126,7 +126,7 @@ fun ConfirmDialog(
             Button(text = stringResource(id = R.string.btn_confirm), onClick = onConfirm)
         }
     ) {
-        Text(text = message)
+        Text(text = message, modifier = Modifier.padding(24.dp))
     }
 }
 
