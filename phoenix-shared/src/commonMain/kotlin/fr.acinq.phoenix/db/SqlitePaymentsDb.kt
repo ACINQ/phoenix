@@ -341,19 +341,10 @@ class SqlitePaymentsDb(
     ) {
         val database = _doNotFreezeMe.database
         val inQueries = _doNotFreezeMe.inQueries
-        val metaQueries = _doNotFreezeMe.metaQueries
 
         withContext(Dispatchers.Default) {
             database.transaction {
                 inQueries.receivePayment(paymentHash, receivedWith, receivedAt)
-                // Add mappings for any newly created channels
-                receivedWith
-                    .filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>()
-                    .mapNotNull { it.channelId }
-                    .toSet()
-                    .forEach { channelId ->
-                        metaQueries.mapChannelId(channelId, paymentHash)
-                    }
             }
         }
     }
@@ -386,14 +377,6 @@ class SqlitePaymentsDb(
                 if (!metadataRow.isEmpty()) {
                     metaQueries.addMetadata(paymentId, metadataRow)
                 }
-                // Add mappings for any newly created channels
-                receivedWith
-                    .filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>()
-                    .mapNotNull { it.channelId }
-                    .toSet()
-                    .forEach { channelId ->
-                        metaQueries.mapChannelId(channelId, paymentHash)
-                    }
             }
         }
     }
@@ -404,12 +387,10 @@ class SqlitePaymentsDb(
     ) {
         val database = _doNotFreezeMe.database
         val inQueries = _doNotFreezeMe.inQueries
-        val metaQueries = _doNotFreezeMe.metaQueries
 
         withContext(Dispatchers.Default) {
             database.transaction {
                 inQueries.updateNewChannelReceivedWithChannelId(paymentHash, channelId)
-                metaQueries.mapChannelId(channelId, paymentHash)
             }
         }
     }
@@ -420,11 +401,10 @@ class SqlitePaymentsDb(
     ) {
         val database = _doNotFreezeMe.database
         val inQueries = _doNotFreezeMe.inQueries
-        val metaQueries = _doNotFreezeMe.metaQueries
 
         withContext(Dispatchers.Default) {
             database.transaction {
-                metaQueries.fetchPaymentHash(channelId)?.let { paymentHash ->
+                inQueries.findNewChannelPayment(channelId)?.let { paymentHash ->
                     inQueries.updateNewChannelConfirmed(paymentHash, receivedAt)
                 }
             }

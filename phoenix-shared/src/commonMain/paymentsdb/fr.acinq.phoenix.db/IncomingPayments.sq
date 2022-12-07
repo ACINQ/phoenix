@@ -14,15 +14,20 @@ CREATE TABLE IF NOT EXISTS incoming_payments (
     received_at INTEGER DEFAULT NULL,
     -- received with
     received_with_type TEXT AS IncomingReceivedWithTypeVersion DEFAULT NULL,
-    received_with_blob BLOB DEFAULT NULL
+    received_with_blob BLOB DEFAULT NULL,
+    received_with_new_channel INTEGER DEFAULT 0
 );
 
--- The created_at column is used by AggregatedQueries.listAllPaymentsOrder for sorting.
--- And that query is used constantly by the app.
-CREATE INDEX IF NOT EXISTS incoming_payments_created_at_idx ON incoming_payments(created_at);
+-- These columns are used by AggregatedQueries for sorting.
+-- And those queriers are used constantly by the app.
+CREATE INDEX IF NOT EXISTS incoming_payments_sort_idx
+    ON incoming_payments(created_at, received_at);
 
--- The received_amount_msat column is used regularly as a filter within AggregatedQueries.
-CREATE INDEX IF NOT EXISTS received_amount_msat_idx ON incoming_payments(received_amount_msat);
+-- Used to find payments associated with new channels.
+-- That is, to assist in mapping from a channel_id to the associated initial payment.
+CREATE INDEX IF NOT EXISTS incoming_payments_new_channel_idx
+    ON incoming_payments(created_at)
+ WHERE received_with_new_channel = 1;
 
 -- queries
 
@@ -39,7 +44,8 @@ updateReceived:
 UPDATE incoming_payments
 SET    received_at=?,
        received_with_type=?,
-       received_with_blob=?
+       received_with_blob=?,
+       received_with_new_channel=?
 WHERE  payment_hash = ?;
 
 insertAndReceive:
@@ -50,8 +56,9 @@ INSERT INTO incoming_payments (
             origin_type, origin_blob,
             received_at,
             received_with_type,
-            received_with_blob)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+            received_with_blob,
+            received_with_new_channel)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 get:
 SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
@@ -82,6 +89,12 @@ ORDER BY
        r.received_at DESC,
        payment_hash DESC
 LIMIT :limit OFFSET :offset;
+
+listNewChannel:
+SELECT   payment_hash, received_amount_msat, received_at, received_with_type, received_with_blob, origin_type
+FROM     incoming_payments
+WHERE    received_with_new_channel = 1
+ORDER BY created_at DESC;
 
 scanCompleted:
 SELECT payment_hash,

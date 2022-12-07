@@ -114,19 +114,6 @@ class MetadataQueries(val database: PaymentsDatabase) {
         }
     }
 
-    fun mapChannelId(channelId: ByteVector32, paymentHash: ByteVector32) {
-        queries.mapChannelId(
-            channel_id = channelId.toByteArray(),
-            payment_hash = paymentHash.toByteArray()
-        )
-    }
-
-    fun fetchPaymentHash(channelId: ByteVector32): ByteVector32? {
-        return queries.fetchPaymentHash(
-            channel_id = channelId.toByteArray()
-        ).executeAsOneOrNull()?.byteVector32()
-    }
-
     companion object {
         fun mapDescriptions(
             lnurl_description: String?,

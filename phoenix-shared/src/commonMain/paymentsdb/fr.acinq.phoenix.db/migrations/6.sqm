@@ -1,9 +1,21 @@
 -- Migration: v6 -> v7
 --
 -- Changes:
--- * Added table channel_id_map
+-- * Removed index: received_amount_msat_idx
+-- * Replaced index: incoming_payments_created_at_idx -> incoming_payments_sort_idx
+-- * Replaced index: outgoing_payments_created_at_idx -> outgoing_payments_sort_idx
+-- * Added column: incoming_payments.received_with_new_channel
 
-CREATE TABLE IF NOT EXISTS channel_id_map (
-    channel_id BLOB NOT NULL PRIMARY KEY,
-    payment_hash BLOB NOT NULL
-);
+DROP INDEX IF EXISTS received_amount_msat_idx;
+
+DROP INDEX IF EXISTS incoming_payments_created_at_idx;
+CREATE INDEX IF NOT EXISTS incoming_payments_sort_idx ON incoming_payments(created_at, received_at);
+
+DROP INDEX IF EXISTS outgoing_payments_created_at_idx;
+CREATE INDEX IF NOT EXISTS outgoing_payments_sort_idx ON outgoing_payments(created_at, completed_at);
+
+ALTER TABLE incoming_payments ADD COLUMN received_with_new_channel INTEGER DEFAULT 0;
+
+CREATE INDEX IF NOT EXISTS incoming_payments_new_channel_idx
+    ON incoming_payments(created_at)
+ WHERE received_with_new_channel = 1;
