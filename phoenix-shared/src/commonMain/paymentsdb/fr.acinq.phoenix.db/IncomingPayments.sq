@@ -18,10 +18,11 @@ CREATE TABLE IF NOT EXISTS incoming_payments (
     received_with_new_channel INTEGER DEFAULT 0
 );
 
--- These columns are used by AggregatedQueries for sorting.
--- And those queriers are used constantly by the app.
-CREATE INDEX IF NOT EXISTS incoming_payments_sort_idx
-    ON incoming_payments(created_at, received_at);
+-- Create indexes to optimize the queries in AggregatedQueries.
+-- Tip: Use "explain query plan" to ensure they're actually being used.
+CREATE INDEX IF NOT EXISTS incoming_payments_filter_idx
+    ON incoming_payments(received_at)
+ WHERE received_at IS NOT NULL;
 
 -- Used to find payments associated with new channels.
 -- That is, to assist in mapping from a channel_id to the associated initial payment.

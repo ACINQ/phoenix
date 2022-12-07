@@ -2,17 +2,20 @@
 --
 -- Changes:
 -- * Removed index: received_amount_msat_idx
--- * Replaced index: incoming_payments_created_at_idx -> incoming_payments_sort_idx
--- * Replaced index: outgoing_payments_created_at_idx -> outgoing_payments_sort_idx
+-- * Replaced index: incoming_payments_created_at_idx -> incoming_payments_filter_idx
+-- * Replaced index: outgoing_payments_created_at_idx -> outgoing_payments_filter_idx
 -- * Added column: incoming_payments.received_with_new_channel
 
 DROP INDEX IF EXISTS received_amount_msat_idx;
 
 DROP INDEX IF EXISTS incoming_payments_created_at_idx;
-CREATE INDEX IF NOT EXISTS incoming_payments_sort_idx ON incoming_payments(created_at, received_at);
+CREATE INDEX IF NOT EXISTS incoming_payments_filter_idx
+    ON incoming_payments(received_at)
+ WHERE received_at IS NOT NULL;
 
 DROP INDEX IF EXISTS outgoing_payments_created_at_idx;
-CREATE INDEX IF NOT EXISTS outgoing_payments_sort_idx ON outgoing_payments(created_at, completed_at);
+CREATE INDEX IF NOT EXISTS outgoing_payments_filter_idx
+    ON outgoing_payments(completed_at);
 
 ALTER TABLE incoming_payments ADD COLUMN received_with_new_channel INTEGER DEFAULT 0;
 
