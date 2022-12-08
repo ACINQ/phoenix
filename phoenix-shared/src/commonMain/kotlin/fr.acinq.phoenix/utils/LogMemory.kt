@@ -73,6 +73,7 @@ class LogMemory(val directory: Path) : LogFrontend, CoroutineScope by MainScope(
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 private fun writeLogs(lines: List<LogMemory.Line>, file: Path): Job = GlobalScope.launch(Dispatchers.Default) {
     val allLines = buildString {
         lines.forEach { line ->
