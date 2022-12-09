@@ -848,19 +848,21 @@ struct ValidateView: View {
 	// MARK: Notifications
 	// --------------------------------------------------
 	
-	func modelDidChange(_ newModel: Scan.Model) -> Void {
+	func modelDidChange(_ newModel: Scan.Model) {
 		log.trace("modelDidChange()")
 		
-		if newModel is Scan.Model_SwapOutFlow {
-			
-			// Possible transitions:
-			// - Init -> Requesting
-			// - Requesting -> Ready => amount + minerFee >? balance
-			// - Ready -> Init       => remove minerFee from calculations
+		// There are several transitions that require re-calculating the altAmout:
+		//
+		// * SwapOutFlow_Requesting -> SwapOutFlow_Ready => amount + minerFee >? balance
+		// * SwapOutFlow_Ready -> SwapOutFlow_Init       => remove minerFee from calculations
+		// * SwapOutFlow_Init -> InvoiceFlow_X           => range changed (e.g. minAmount)
+		//
+		if newModel is Scan.Model_SwapOutFlow || newModel is Scan.Model_InvoiceFlow {
 			
 			refreshAltAmount()
+		}
 		
-		} else if let model = newModel as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
+		if let model = newModel as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
 			if let payError = model.error {
 				
 				popoverState.display(dismissable: true) {
@@ -949,7 +951,7 @@ struct ValidateView: View {
 		preTipAmountMsat = nil
 	}
 	
-	func amountDidChange() -> Void {
+	func amountDidChange() {
 		log.trace("amountDidChange()")
 		
 		refreshAltAmount()
@@ -958,7 +960,7 @@ struct ValidateView: View {
 		}
 	}
 	
-	func refreshAltAmount() -> Void {
+	func refreshAltAmount() {
 		log.trace("refreshAltAmount()")
 		
 		switch parsedAmount {
