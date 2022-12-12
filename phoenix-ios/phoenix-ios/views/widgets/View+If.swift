@@ -13,4 +13,18 @@ extension View {
 			self
 		}
 	}
+	
+	/// Can be used when extra logic is needed. For example:
+	/// ```
+	/// someView.modify { view in
+	///   if #available(iOS 16.0, *) {
+	///     view.foo()
+	///   } else {
+	///     view.bar()
+	///   }
+	/// }
+	/// ```
+	func modify<T: View>(@ViewBuilder _ modifier: (Self) -> T) -> some View {
+		return modifier(self)
+	}
 }

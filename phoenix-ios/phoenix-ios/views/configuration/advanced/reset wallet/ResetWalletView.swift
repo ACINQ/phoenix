@@ -85,6 +85,7 @@ struct ResetWalletView: MVIView {
 			}
 		}
 		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 	}
 	
 	@ViewBuilder

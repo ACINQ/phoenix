@@ -106,6 +106,8 @@ struct RestoreView: View {
 					row(seedBackup)
 				}
 			}
+			.listStyle(.insetGrouped)
+			.listBackgroundColor(.primaryBackground)
 		}
 	}
 	

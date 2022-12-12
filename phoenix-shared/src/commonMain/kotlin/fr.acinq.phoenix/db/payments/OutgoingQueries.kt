@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.db.payments
 
 import com.squareup.sqldelight.ColumnAdapter
-import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
@@ -319,8 +318,14 @@ class OutgoingQueries(val database: PaymentsDatabase) {
                 )
             } else emptyList()
 
-            val closingTxParts = if (closingtx_part_id != null && closingtx_part_tx_id != null && closingtx_part_amount_sat != null
-                && closingtx_part_closing_info_type != null && closingtx_part_closing_info_blob != null && closingtx_part_created_at != null
+            @Suppress("DEPRECATION")
+            val closingTxParts = if (
+                closingtx_part_id != null &&
+                closingtx_part_tx_id != null &&
+                closingtx_part_amount_sat != null &&
+                closingtx_part_closing_info_type != null &&
+                closingtx_part_closing_info_blob != null &&
+                closingtx_part_created_at != null
             ) {
                 listOf(
                     mapClosingTxPart(
@@ -332,7 +337,11 @@ class OutgoingQueries(val database: PaymentsDatabase) {
                         createdAt = closingtx_part_created_at
                     )
                 )
-            } else if (status_type == OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0 && status_blob != null && completed_at != null) {
+            } else if (
+                status_type == OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0 &&
+                status_blob != null &&
+                completed_at != null
+            ) {
                 // we used to store closing txs data in the payment status blob
                 OutgoingStatusData.getClosingPartsFromV0Status(status_blob, completed_at)
             } else emptyList()

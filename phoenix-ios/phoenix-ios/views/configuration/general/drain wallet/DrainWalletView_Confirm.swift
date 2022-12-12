@@ -53,6 +53,7 @@ struct DrainWalletView_Confirm: MVISubView {
 			section_button()
 		}
 		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 	}
 	
 	@ViewBuilder

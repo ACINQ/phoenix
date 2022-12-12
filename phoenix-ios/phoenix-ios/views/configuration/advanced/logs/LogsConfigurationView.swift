@@ -13,6 +13,14 @@ struct LogsConfigurationView: MVIView {
 	@ViewBuilder
 	var view: some View {
 		
+		content()
+			.navigationTitle(NSLocalizedString("Logs", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
 			Text("Here you can extract and visualize application logs, as well as share them.")
@@ -43,10 +51,10 @@ struct LogsConfigurationView: MVIView {
 					}
 				}
 			} // </List>
+			.listStyle(.insetGrouped)
+			.listBackgroundColor(.primaryBackground)
 			
 		} // </VStack>
-		.navigationTitle(NSLocalizedString("Logs", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
 	}
 }
 

@@ -60,7 +60,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		UINavigationBar.appearance().compactAppearance = navBarAppearance
 		UINavigationBar.appearance().standardAppearance = navBarAppearance
 		
+		// In iOS 16, List no longer depends on UITableView.
+		// So this doesn't have any effect there.
+		//
 		UITableView.appearance().backgroundColor = .primaryBackground
+		UICollectionView.appearance().backgroundColor = .primaryBackground
 		
 		#if !targetEnvironment(simulator) // push notifications don't work on iOS simulator
 			UIApplication.shared.registerForRemoteNotifications()

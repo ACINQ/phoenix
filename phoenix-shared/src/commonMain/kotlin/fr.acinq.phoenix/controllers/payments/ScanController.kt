@@ -109,6 +109,7 @@ class AppScanController(
                             )
                         }
                     }
+                    else -> {}
                 }
             }
         }

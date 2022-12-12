@@ -99,6 +99,7 @@ struct ResetWalletView_Action: View {
 			section_button()
 		}
 		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 		.navigationTitle(NSLocalizedString("Resetting Wallet", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
 		.onReceive(syncTx_pendingSettingsPublisher) {

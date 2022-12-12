@@ -24,15 +24,22 @@ struct DrainWalletView_Action: MVISubView {
 	@ViewBuilder
 	var view: some View {
 		
+		content()
+			.navigationTitle(NSLocalizedString("Drain wallet", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarBackButtonHidden()
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
 		List {
 			section_sent()
 			section_info()
 			section_button()
 		}
 		.listStyle(.insetGrouped)
-		.navigationTitle(NSLocalizedString("Drain wallet", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
-		.navigationBarBackButtonHidden()
+		.listBackgroundColor(.primaryBackground)
 	}
 	
 	@ViewBuilder
