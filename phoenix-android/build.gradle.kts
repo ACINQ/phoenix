@@ -1,7 +1,18 @@
+import java.io.ByteArrayOutputStream
+
 plugins {
     id("com.android.application")
     kotlin("android")
     id("com.google.gms.google-services")
+}
+
+fun gitCommitHash(): String {
+    val stream = ByteArrayOutputStream()
+    project.exec {
+        commandLine = "git rev-parse --verify --short HEAD".split(" ")
+        standardOutput = stream
+    }
+    return String(stream.toByteArray()).split("\n").first()
 }
 
 val chain: String by project
@@ -9,11 +20,11 @@ val chain: String by project
 android {
     compileSdk = 33
     defaultConfig {
-        applicationId = "fr.acinq.phoenix.android"
+        applicationId = "fr.acinq.phoenix.testnet"
         minSdk = 24
         targetSdk = 33
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 40
+        versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -32,6 +43,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        applicationVariants.all {
+            outputs.forEach {
+                val apkName = "phoenix-${defaultConfig.versionCode}-${defaultConfig.versionName}-${chain.drop(1).dropLast(1)}-${buildType.name}.apk"
+                (it as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName = apkName
+            }
         }
     }
 

@@ -89,8 +89,8 @@ jobs:
     - name: Sign artifact
       run: |
         mkdir upload
-        mv phoenix/phoenix-android/build/outputs/apk/release/phoenix-android-release-unsigned.apk upload/phoenix-testnet-kmp.apk
-        /usr/local/lib/android/sdk/build-tools/29.0.3/apksigner sign --ks signingkey --ks-pass pass:$TESTNET_STORE_PASS --ks-key-alias $TESTNET_ALIAS --key-pass pass:$TESTNET_KEY_PASS upload/phoenix-testnet-kmp.apk
+        mv phoenix/phoenix-android/build/outputs/apk/release/phoenix-*.apk upload/phoenix-testnet-latest.apk
+        /usr/local/lib/android/sdk/build-tools/29.0.3/apksigner sign --ks signingkey --ks-pass pass:$TESTNET_STORE_PASS --ks-key-alias $TESTNET_ALIAS --key-pass pass:$TESTNET_KEY_PASS upload/phoenix-testnet-latest.apk
       shell: bash
       env:
         TESTNET_STORE_PASS: ${{secrets.TESTNET_STORE_PASS}}
@@ -103,11 +103,11 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: phoenix-testnet
-        path: upload/phoenix-testnet-kmp.apk
+        path: upload/phoenix-testnet-latest.apk
 
     - name: Upload to acinq.co
       run: |
-        aws s3 cp ./upload/phoenix-testnet-kmp.apk s3://acinq.co/pub/phoenix/
+        aws s3 cp ./upload/phoenix-testnet-latest.apk s3://acinq.co/pub/phoenix/
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

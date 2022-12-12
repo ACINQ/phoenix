@@ -63,6 +63,7 @@ fun StartupView(
     val walletState by appVM.walletState.observeAsState()
     val showIntro by InternalData.getShowIntro(context).collectAsState(initial = null)
     val isLockActiveState by UserPrefs.getIsScreenLockActive(context).collectAsState(initial = null)
+    val legacyAppStatus = PrefsDatastore.getLegacyAppStatus(context).collectAsState(null).value
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -78,7 +79,7 @@ fun StartupView(
             val isLockActive = isLockActiveState
             if (isLockActive == null || showIntro == null) {
                 Text(stringResource(id = R.string.startup_wait_prefs))
-            } else if (showIntro == true) {
+            } else if (showIntro == true && legacyAppStatus != LegacyAppStatus.Unknown) {
                 LaunchedEffect(key1 = Unit) { onShowIntro() }
             } else {
                 LoadOrUnlock(
