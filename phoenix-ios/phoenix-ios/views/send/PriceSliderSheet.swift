@@ -11,29 +11,10 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct MsatRange {
-	let min: Lightning_kmpMilliSatoshi
-	let max: Lightning_kmpMilliSatoshi
-	
-	init(min: Lightning_kmpMilliSatoshi, max: Lightning_kmpMilliSatoshi) {
-		self.min = min
-		self.max = max
-	}
-	
-	init(min: Int64, max: Int64) {
-		self.min = Lightning_kmpMilliSatoshi(msat: min)
-		self.max = Lightning_kmpMilliSatoshi(msat: max)
-	}
-}
-
-enum FlowType {
-	case pay(range: MsatRange)
-	case withdraw(range: MsatRange)
-}
 
 struct PriceSliderSheet: View {
 	
-	let flowType: FlowType
+	let flow: FlowType
 	let valueChanged: (Int64) -> Void
 	
 	// The Slider family works with `BinaryFloatingPoint`, thus we're using `Double` here.
@@ -106,14 +87,14 @@ struct PriceSliderSheet: View {
 	// --------------------------------------------------
 	
 	init(
-		flowType: FlowType,
+		flow: FlowType,
 		msat: Int64,
 		valueChanged: @escaping (Int64) -> Void
 	) {
-		self.flowType = flowType
+		self.flow = flow
 		self.valueChanged = valueChanged
 		
-		switch flowType {
+		switch flow {
 		case .pay(let range):
 			
 			let dblMin = range.min.msat + range.min.msat
@@ -161,20 +142,6 @@ struct PriceSliderSheet: View {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Computed Properties
-	// --------------------------------------------------
-	
-	var range: MsatRange {
-		
-		switch flowType {
-		case .pay(let range):
-			return range
-		case .withdraw(let range):
-			return range
-		}
-	}
-	
-	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
 	
@@ -188,42 +155,47 @@ struct PriceSliderSheet: View {
 				.accessibilityHidden(true)
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				HStack(alignment: VerticalAlignment.center, spacing: 0) {
-					if isTip() {
-						Text("Customize tip")
-							.font(.title3)
-							.accessibilityAddTraits(.isHeader)
-							.accessibilitySortPriority(100)
-					} else {
-						Text("Customize amount")
-							.font(.title3)
-							.accessibilityAddTraits(.isHeader)
-							.accessibilitySortPriority(100)
-					}
-					Spacer()
-					Button {
-						closeButtonTapped()
-					} label: {
-						Image("ic_cross")
-							.resizable()
-							.frame(width: 30, height: 30)
-					}
-					.accessibilityLabel("Close")
-					.accessibilityHidden(smartModalState.currentItem?.dismissable ?? false)
-				}
-				.padding(.horizontal)
-				.padding(.vertical, 8)
-				.background(
-					Color(UIColor.secondarySystemBackground)
-						.cornerRadius(15, corners: [.topLeft, .topRight])
-				)
-				.padding(.bottom, 4)
-				
-				content().padding()
+				header()
+				content()
 				footer()
 			}
 		}
 		.assignMaxPreference(for: maxPercentWidthReader.key, to: $maxPercentWidth)
+	}
+	
+	@ViewBuilder
+	func header() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			if isTip() {
+				Text("Customize tip")
+					.font(.title3)
+					.accessibilityAddTraits(.isHeader)
+					.accessibilitySortPriority(100)
+			} else {
+				Text("Customize amount")
+					.font(.title3)
+					.accessibilityAddTraits(.isHeader)
+					.accessibilitySortPriority(100)
+			}
+			Spacer()
+			Button {
+				closeButtonTapped()
+			} label: {
+				Image("ic_cross")
+					.resizable()
+					.frame(width: 30, height: 30)
+			}
+			.accessibilityLabel("Close")
+			.accessibilityHidden(smartModalState.currentItem?.dismissable ?? false)
+		}
+		.padding(.horizontal)
+		.padding(.vertical, 8)
+		.background(
+			Color(UIColor.secondarySystemBackground)
+				.cornerRadius(15, corners: [.topLeft, .topRight])
+		)
+		.padding(.bottom, 4)
 	}
 	
 	@ViewBuilder
@@ -357,6 +329,7 @@ struct PriceSliderSheet: View {
 			.accessibilityHidden(isIOS15()) // duplicate functionality; available via Slider
 			
 		} // </VStack>
+		.padding()
 		.assignMaxPreference(for: maxAmountWidthReader.key, to: $maxAmountWidth)
 		.assignMaxPreference(for: contentHeightReader.key, to: $contentHeight)
 		.onChange(of: sliderValue) {
@@ -428,8 +401,8 @@ struct PriceSliderSheet: View {
 		// Reminder: percent != sliderValue
 		// 0.0 <= percent <= 1.0
 		
-		switch flowType {
-		case .pay(_):
+		switch flow {
+		case .pay(let range):
 			
 			let dblMin = range.min.msat + range.min.msat
 			if range.max.msat <= dblMin {
@@ -453,7 +426,7 @@ struct PriceSliderSheet: View {
 				return Int64(msat.rounded())
 			}
 			
-		case .withdraw(_):
+		case .withdraw(let range):
 			
 			// For withdraws:
 			// -   0 % => range.min
@@ -471,7 +444,7 @@ struct PriceSliderSheet: View {
 		// Reminder: percent != sliderValue
 		// 0.0 <= percent <= 1.0
 		
-		return range.min.msat + percentToTipMsat(percent)
+		return flow.range.min.msat + percentToTipMsat(percent)
 	}
 	
 	func tipMsat() -> Int64 {
@@ -548,8 +521,8 @@ struct PriceSliderSheet: View {
 		
 		// Can we treat this as a tip ?
 		
-		switch flowType {
-		case .pay(_):
+		switch flow {
+		case .pay(let range):
 			
 			// There are 3 scenarios:
 			//
@@ -579,7 +552,7 @@ struct PriceSliderSheet: View {
 	}
 	
 	func maxBitcoinAmount() -> FormattedAmount {
-		return formatBitcoinAmount(msat: range.max.msat)
+		return formatBitcoinAmount(msat: flow.range.max.msat)
 	}
 	
 	func bitcoinAmount() -> FormattedAmount {
@@ -587,7 +560,7 @@ struct PriceSliderSheet: View {
 	}
 	
 	func minBitcoinAmount() -> FormattedAmount {
-		return formatBitcoinAmount(msat: range.min.msat)
+		return formatBitcoinAmount(msat: flow.range.min.msat)
 	}
 	
 	func formatFiatAmount(msat: Int64) -> FormattedAmount {
@@ -599,7 +572,7 @@ struct PriceSliderSheet: View {
 	}
 	
 	func maxFiatAmount() -> FormattedAmount {
-		return formatFiatAmount(msat: range.max.msat)
+		return formatFiatAmount(msat: flow.range.max.msat)
 	}
 	
 	func fiatAmount() -> FormattedAmount {
@@ -607,7 +580,7 @@ struct PriceSliderSheet: View {
 	}
 	
 	func minFiatAmount() -> FormattedAmount {
-		return formatFiatAmount(msat: range.min.msat)
+		return formatFiatAmount(msat: flow.range.min.msat)
 	}
 	
 	func formatPercent(_ percent: Double) -> String {
@@ -702,8 +675,8 @@ struct PriceSliderSheet: View {
 		// Generally this makes sense if this isn't a tip,
 		// or if the maximum tip is less than 100%.
 		
-		switch flowType {
-		case .pay(_):
+		switch flow {
+		case .pay(let range):
 			return (range.min.msat + range.min.msat) != range.max.msat
 			
 		case .withdraw(_):
@@ -801,7 +774,7 @@ struct PriceSliderSheet: View {
 	func recentButtonTapped(_ percent: Int) {
 		log.trace("recentButtonTapped()")
 		
-		if case .pay(_) = flowType {
+		if case .pay(_) = flow {
 
 			self.sliderValue = Double(percent)
 		}

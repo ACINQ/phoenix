@@ -217,6 +217,8 @@
 		DCE77A5627C5240500F0FA24 /* TLSConnectionCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE77A5527C5240500F0FA24 /* TLSConnectionCheck.swift */; };
 		DCE77A5827C671D600F0FA24 /* ElectrumAddressSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE77A5727C671D600F0FA24 /* ElectrumAddressSheet.swift */; };
 		DCE9F95728412A9D005E03ED /* PaymentSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */; };
+		DCEAE5B72943CC7400320C46 /* RangeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAE5B62943CC7400320C46 /* RangeSheet.swift */; };
+		DCEAE5B92943D64B00320C46 /* FlowType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAE5B82943D64B00320C46 /* FlowType.swift */; };
 		DCEB2795282D7A9F0096B87E /* KotlinPublishers.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEF26CACCF700E760A6 /* KotlinPublishers.swift */; };
 		DCEB2796282D7AAB0096B87E /* KotlinTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174A270F332700F7E3E3 /* KotlinTypes.swift */; };
 		DCEB2797282D7ADC0096B87E /* KotlinFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */; };
@@ -503,6 +505,8 @@
 		DCE77A5527C5240500F0FA24 /* TLSConnectionCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLSConnectionCheck.swift; sourceTree = "<group>"; };
 		DCE77A5727C671D600F0FA24 /* ElectrumAddressSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectrumAddressSheet.swift; sourceTree = "<group>"; };
 		DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSummaryView.swift; sourceTree = "<group>"; };
+		DCEAE5B62943CC7400320C46 /* RangeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSheet.swift; sourceTree = "<group>"; };
+		DCEAE5B82943D64B00320C46 /* FlowType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowType.swift; sourceTree = "<group>"; };
 		DCEC6A1727A82A98002C20BA /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationCompletion.swift; sourceTree = "<group>"; };
 		DCEE3E532931446A00EB4DFF /* Collections+AsInt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collections+AsInt.swift"; sourceTree = "<group>"; };
@@ -750,6 +754,7 @@
 				DC118C0527B4557D0080BBAC /* ValidateView.swift */,
 				DC39D4E6286BB2120030F18D /* PaymentLayerChoice.swift */,
 				DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */,
+				DCEAE5B62943CC7400320C46 /* RangeSheet.swift */,
 				DC118BF927B44F840080BBAC /* PriceSliderSheet.swift */,
 				DC118BFD27B451890080BBAC /* MetadataSheet.swift */,
 				DC118BFF27B4523B0080BBAC /* CommentSheet.swift */,
@@ -758,6 +763,7 @@
 				DC118C0127B453110080BBAC /* PaymentRequestedView.swift */,
 				DC118C0727B457520080BBAC /* FetchActivityNotice.swift */,
 				DC118C0927B457F70080BBAC /* LnurlFlowErrorNotice.swift */,
+				DCEAE5B82943D64B00320C46 /* FlowType.swift */,
 			);
 			path = send;
 			sourceTree = "<group>";
@@ -1447,6 +1453,7 @@
 				C8D7AA4B09B32AD99C88BB5E /* DisplayConfigurationView.swift in Sources */,
 				DCE77A5827C671D600F0FA24 /* ElectrumAddressSheet.swift in Sources */,
 				DC384D81265C12B700131772 /* Cache.swift in Sources */,
+				DCEAE5B72943CC7400320C46 /* RangeSheet.swift in Sources */,
 				DCAC5B7027726FC80077BB98 /* DeepLink.swift in Sources */,
 				DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */,
 				DCDD9ECE28637474001800A3 /* Orientation.swift in Sources */,
@@ -1498,6 +1505,7 @@
 				F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */,
 				DC08A51A27FB6C5F0041603B /* TopTab.swift in Sources */,
 				DC27E4CF2792079600C777CC /* CenterTopLineAlignment.swift in Sources */,
+				DCEAE5B92943D64B00320C46 /* FlowType.swift in Sources */,
 				DC118BF827B44E6E0080BBAC /* LoginView.swift in Sources */,
 				DC74174D270F455D00F7E3E3 /* AES256.swift in Sources */,
 				C8D7AB09E80CE2B6AE270A97 /* TorConfigurationView.swift in Sources */,
