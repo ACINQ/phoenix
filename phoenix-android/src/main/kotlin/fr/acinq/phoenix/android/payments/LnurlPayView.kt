@@ -59,7 +59,7 @@ fun LnurlPayView(
     log.info { "init lnurl-pay view with url=${model.lnurlPay}" }
 
     val context = LocalContext.current
-    val balance = business.peerManager.balance.collectAsState(null).value
+    val balance = business.balanceManager.balance.collectAsState(null).value
     val prefUnit = preferredAmountUnit
     val rate = fiatRate
 

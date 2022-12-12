@@ -51,7 +51,7 @@ fun MutualCloseView(
 ) {
     val log = logger("MutualCloseView")
     val context = LocalContext.current
-    val balance by business.peerManager.balance.collectAsState(0.msat)
+    val balance by business.balanceManager.balance.collectAsState(0.msat)
 
     var address by remember { mutableStateOf("") }
     var addressErrorMessage by remember { mutableStateOf<String?>(null) }
