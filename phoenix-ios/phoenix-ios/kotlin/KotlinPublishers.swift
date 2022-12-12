@@ -12,6 +12,91 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+extension PeerManager {
+	
+	fileprivate struct _Key {
+		static var peerStatePublisher = 0
+	}
+	
+	func peerStatePublisher() -> AnyPublisher<Lightning_kmpPeer, Never> {
+
+		self.getSetAssociatedObject(storageKey: &_Key.peerStatePublisher) {
+			
+			// Transforming from Kotlin:
+			// ```
+			// peerState: StateFlow<Peer?>
+			// ```
+			KotlinCurrentValueSubject<Lightning_kmpPeer, Lightning_kmpPeer?>(
+				self.peerState
+			)
+			.compactMap { $0 }
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+// MARK: -
+extension AppConfigurationManager {
+	
+	fileprivate struct _Key {
+		static var chainContextPublisher = 0
+	}
+	
+	func chainContextPublisher() -> AnyPublisher<WalletContext.V0ChainContext, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.chainContextPublisher) {
+			
+			// Transforming from Kotlin:
+			// `chainContext: StateFlow<WalletContext.V0.ChainContext?>`
+			//
+			KotlinCurrentValueSubject<WalletContext.V0ChainContext, WalletContext.V0ChainContext?>(
+				self.chainContext
+			)
+			.compactMap { $0 }
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+// MARK: -
+extension BalanceManager {
+	
+	fileprivate struct _Key {
+		static var balancePublisher = 0
+		static var swapInWalletBalancePublisher = 0
+	}
+	
+	func balancePublisher() -> AnyPublisher<Lightning_kmpMilliSatoshi?, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.balancePublisher) {
+			
+			// Transforming from Kotlin:
+			// `balance: StateFlow<MilliSatoshi?>`
+			//
+			KotlinCurrentValueSubject<Lightning_kmpMilliSatoshi, Lightning_kmpMilliSatoshi?>(
+				self.balance
+			)
+			.eraseToAnyPublisher()
+		}
+	}
+	
+	func swapInWalletBalancePublisher() -> AnyPublisher<WalletBalance, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.swapInWalletBalancePublisher) {
+			
+			// Transforming from Kotlin:
+			// ```
+			// swapInWalletBalance: StateFlow<WalletBalance>
+			// ```
+			KotlinCurrentValueSubject<WalletBalance, WalletBalance>(
+				self.swapInWalletBalance
+			)
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+// MARK: -
 extension CurrencyManager {
 	
 	fileprivate struct _Key {
@@ -51,49 +136,11 @@ extension CurrencyManager {
 	}
 }
 
-extension PeerManager {
-	
-	fileprivate struct _Key {
-		static var balancePublisher = 0
-		static var peerStatePublisher = 0
-	}
-	
-	func balancePublisher() -> AnyPublisher<Lightning_kmpMilliSatoshi?, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.balancePublisher) {
-			
-			// Transforming from Kotlin:
-			// `balance: StateFlow<MilliSatoshi?>`
-			//
-			KotlinCurrentValueSubject<Lightning_kmpMilliSatoshi, Lightning_kmpMilliSatoshi?>(
-				self.balance
-			)
-			.eraseToAnyPublisher()
-		}
-	}
-	
-	func peerStatePublisher() -> AnyPublisher<Lightning_kmpPeer, Never> {
-
-		self.getSetAssociatedObject(storageKey: &_Key.peerStatePublisher) {
-			
-			// Transforming from Kotlin:
-			// ```
-			// peerState: StateFlow<Peer?>
-			// ```
-			KotlinCurrentValueSubject<Lightning_kmpPeer, Lightning_kmpPeer?>(
-				self.peerState
-			)
-			.compactMap { $0 }
-			.eraseToAnyPublisher()
-		}
-	}
-}
-
+// MARK: -
 extension PaymentsManager {
 	
 	fileprivate struct _Key {
 		static var paymentsCountPublisher = 0
-		static var incomingSwapsPublisher = 0
 		static var lastCompletedPaymentPublisher = 0
 		static var lastIncomingPaymentPublisher = 0
 		static var inFlightOutgoingPaymentsPublisher = 0
@@ -108,20 +155,6 @@ extension PaymentsManager {
 			//
 			KotlinCurrentValueSubject<KotlinLong, Int64>(
 				self.paymentsCount
-			)
-			.eraseToAnyPublisher()
-		}
-	}
-	
-	func incomingSwapsPublisher() -> AnyPublisher<[String: Lightning_kmpMilliSatoshi], Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.incomingSwapsPublisher) {
-			
-			// Transforming from Kotlin:
-			// `incomingSwaps: StateFlow<Map<String, MilliSatoshi>>`
-			//
-			KotlinCurrentValueSubject<NSDictionary, [String: Lightning_kmpMilliSatoshi]>(
-				self.incomingSwaps
 			)
 			.eraseToAnyPublisher()
 		}
@@ -177,6 +210,7 @@ extension PaymentsManager {
 	}
 }
 
+// MARK: -
 extension PaymentsPageFetcher {
 	
 	fileprivate struct _Key {
@@ -198,49 +232,28 @@ extension PaymentsPageFetcher {
 	}
 }
 
-extension AppConfigurationManager {
+// MARK: -
+extension CloudKitDb {
 	
 	fileprivate struct _Key {
-		static var chainContextPublisher = 0
+		static var fetchQueueCountPublisher = 0
 	}
 	
-	func chainContextPublisher() -> AnyPublisher<WalletContext.V0ChainContext, Never> {
+	func fetchQueueCountPublisher() -> AnyPublisher<Int64, Never> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.chainContextPublisher) {
-			
-			// Transforming from Kotlin:
-			// `chainContext: StateFlow<WalletContext.V0.ChainContext?>`
-			//
-			KotlinCurrentValueSubject<WalletContext.V0ChainContext, WalletContext.V0ChainContext?>(
-				self.chainContext
-			)
-			.compactMap { $0 }
-			.eraseToAnyPublisher()
-		}
-	}
-}
-
-extension Lightning_kmpElectrumWatcher {
-	
-	fileprivate struct _Key {
-		static var upToDatePublisher = 0
-	}
-	
-	func upToDatePublisher() -> AnyPublisher<Int64, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.upToDatePublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.fetchQueueCountPublisher) {
 			
 			/// Transforming from Kotlin:
-			/// `openUpToDateFlow(): Flow<Long>`
+			/// `queueCount: StateFlow<Long>`
 			///
-			KotlinPassthroughSubject<KotlinLong, Int64>(
-				self.openUpToDateFlow()
-			)
-			.eraseToAnyPublisher()
+			KotlinCurrentValueSubject<KotlinLong, Int64>(
+				self.queueCount
+			).eraseToAnyPublisher()
 		}
 	}
 }
 
+// MARK: -
 extension Lightning_kmpPeer {
 	
 	fileprivate struct _Key {
@@ -264,22 +277,24 @@ extension Lightning_kmpPeer {
 	}
 }
 
-extension CloudKitDb {
+// MARK: -
+extension Lightning_kmpElectrumWatcher {
 	
 	fileprivate struct _Key {
-		static var fetchQueueCountPublisher = 0
+		static var upToDatePublisher = 0
 	}
 	
-	func fetchQueueCountPublisher() -> AnyPublisher<Int64, Never> {
+	func upToDatePublisher() -> AnyPublisher<Int64, Never> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.fetchQueueCountPublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.upToDatePublisher) {
 			
 			/// Transforming from Kotlin:
-			/// `queueCount: StateFlow<Long>`
+			/// `openUpToDateFlow(): Flow<Long>`
 			///
-			KotlinCurrentValueSubject<KotlinLong, Int64>(
-				self.queueCount
-			).eraseToAnyPublisher()
+			KotlinPassthroughSubject<KotlinLong, Int64>(
+				self.openUpToDateFlow()
+			)
+			.eraseToAnyPublisher()
 		}
 	}
 }

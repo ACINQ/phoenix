@@ -1,7 +1,5 @@
 package fr.acinq.phoenix
 
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.TcpSocket
@@ -69,6 +67,7 @@ class PhoenixBusiness(
     val databaseManager by lazy { DatabaseManager(this) }
     val peerManager by lazy { PeerManager(this) }
     val paymentsManager by lazy { PaymentsManager(this) }
+    val balanceManager by lazy { BalanceManager(this) }
     val appConfigurationManager by lazy { AppConfigurationManager(this) }
     val currencyManager by lazy { CurrencyManager(this) }
     val connectionsManager by lazy { ConnectionsManager(this) }

@@ -175,17 +175,53 @@ struct SummaryView: View {
 				.padding(.bottom, 30)
 				
 			case .pending:
-				Image("ic_payment_sending")
-					.renderingMode(.template)
-					.resizable()
-					.foregroundColor(Color.borderColor)
-					.frame(width: 100, height: 100)
-					.padding(.bottom, 16)
-					.accessibilityHidden(true)
-				Text("PENDING")
-					.font(Font.title2.bold())
+				if payment.isOnChain() {
+					Image(systemName: "hourglass.circle")
+						.renderingMode(.template)
+						.resizable()
+						.foregroundColor(Color.borderColor)
+						.frame(width: 100, height: 100)
+						.padding(.bottom, 16)
+						.accessibilityHidden(true)
+					VStack(alignment: HorizontalAlignment.center, spacing: 2) {
+						Text("WAITING FOR CONFIRMATIONS")
+							.font(.title2.uppercaseSmallCaps())
+							.multilineTextAlignment(.center)
+							.padding(.bottom, 6)
+							.accessibilityLabel("Pending payment")
+							.accessibilityHint("Waiting for confirmations")
+						if let depth = minFundingDepth() {
+							let minutes = depth * 10
+							Text("requires \(depth) confirmations")
+								.font(.footnote)
+								.multilineTextAlignment(.center)
+								.foregroundColor(.secondary)
+							Text("≈\(minutes) minutes")
+								.font(.footnote)
+								.multilineTextAlignment(.center)
+								.foregroundColor(.secondary)
+						}
+						if let broadcastDate = onChainBroadcastDate() {
+							Text(broadcastDate.format())
+								.font(.subheadline)
+								.foregroundColor(.secondary)
+								.padding(.top, 12)
+						}
+					} // </VStack>
 					.padding(.bottom, 30)
-					.accessibilityLabel("Pending payment")
+				} else {
+					Image("ic_payment_sending")
+						.renderingMode(.template)
+						.resizable()
+						.foregroundColor(Color.borderColor)
+						.frame(width: 100, height: 100)
+						.padding(.bottom, 16)
+						.accessibilityHidden(true)
+					Text("PENDING")
+						.font(.title2.bold())
+						.padding(.bottom, 30)
+						.accessibilityLabel("Pending payment")
+				}
 				
 			case .failure:
 				Image(systemName: "xmark.circle")
@@ -197,12 +233,12 @@ struct SummaryView: View {
 					.accessibilityHidden(true)
 				VStack {
 					Text("FAILED")
-						.font(Font.title2.bold())
+						.font(.title2.bold())
 						.padding(.bottom, 2)
 						.accessibilityLabel("Failed payment")
 					
 					Text("NO FUNDS HAVE BEEN SENT")
-						.font(Font.title2.uppercaseSmallCaps())
+						.font(.title2.uppercaseSmallCaps())
 						.padding(.bottom, 6)
 					
 					if let completedAtDate = payment.completedAtDate() {
@@ -400,9 +436,43 @@ struct SummaryView: View {
 		.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
 	}
 	
-	func toggleCurrencyType() -> Void {
-		currencyPrefs.toggleCurrencyType()
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	func minFundingDepth() -> Int32? {
+		
+		guard
+			let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment,
+			let received = incomingPayment.received,
+			let newChannel = received.receivedWith.compactMap({ $0.asNewChannel() }).first,
+			let channelId = newChannel.channelId,
+			let channel = Biz.business.peerManager.getChannelWithCommitments(channelId: channelId),
+			let nodeParams = Biz.business.nodeParamsManager.nodeParams.value_ as? Lightning_kmpNodeParams
+		else {
+			return nil
+		}
+		
+		return channel.minDepthForFunding(nodeParams: nodeParams)
 	}
+	
+	func onChainBroadcastDate() -> Date? {
+		
+		if let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment {
+			
+			if let _ = incomingPayment.origin.asDualSwapIn() {
+				if let received = incomingPayment.received {
+					return received.receivedAtDate
+				}
+			}
+		}
+		
+		return nil
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
 	
 	func onAppear() {
 		log.trace("onAppear()")
@@ -455,6 +525,14 @@ struct SummaryView: View {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func toggleCurrencyType() -> Void {
+		currencyPrefs.toggleCurrencyType()
+	}
+	
 	func deletePayment() {
 		log.trace("deletePayment()")
 		
@@ -500,6 +578,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	private let horizontalSpacingBetweenColumns: CGFloat = 8
 	
 	@State var popoverPresent_standardFees = false
+	@State var popoverPresent_minerFees = false
 	@State var popoverPresent_swapFees = false
 	
 	@Environment(\.openURL) var openURL
@@ -523,26 +602,27 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			paymentTypeRow()
 			channelClosingRow()
 			
-			let standardFees = paymentInfo.payment.standardFees(currencyPrefs: currencyPrefs)
-			let swapOutFees = paymentInfo.payment.swapOutFees(currencyPrefs: currencyPrefs)
-			
-			if let standardFees = standardFees {
-				let title = swapOutFees == nil
-				  ? NSLocalizedString("Fees", comment: "Label in SummaryInfoGrid")
-				  : NSLocalizedString("Lightning Fees", comment: "Label in SummaryInfoGrid")
-				
+			if let standardFees = paymentInfo.payment.standardFees(currencyPrefs: currencyPrefs) {
 				paymentFeesRow(
-					title: title,
+					title: standardFees.1,
 					amount: standardFees.0,
-					explanation: standardFees.1,
+					explanation: standardFees.2,
 					binding: $popoverPresent_standardFees
 				)
 			}
-			if let swapOutFees = swapOutFees {
+			if let minerFees = paymentInfo.payment.minerFees(currencyPrefs: currencyPrefs) {
 				paymentFeesRow(
-					title: NSLocalizedString("Swap Fees", comment: "Label in SummaryInfoGrid"),
+					title: minerFees.1,
+					amount: minerFees.0,
+					explanation: minerFees.2,
+					binding: $popoverPresent_minerFees
+				)
+			}
+			if let swapOutFees = paymentInfo.payment.swapOutFees(currencyPrefs: currencyPrefs) {
+				paymentFeesRow(
+					title: swapOutFees.1,
 					amount: swapOutFees.0,
-					explanation: swapOutFees.1,
+					explanation: swapOutFees.2,
 					binding: $popoverPresent_swapFees
 				)
 			}
@@ -595,8 +675,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			let description = paymentInfo.paymentDescription() ??
-			                  NSLocalizedString("No description", comment: "placeholder text")
+			let description = paymentInfo.paymentDescription() ?? paymentInfo.defaultPaymentDescription()
 			Text(description)
 				.contextMenu {
 					Button(action: {

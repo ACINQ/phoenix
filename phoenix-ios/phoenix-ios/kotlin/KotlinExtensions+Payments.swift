@@ -33,7 +33,7 @@ extension WalletPaymentInfo {
 		let sanitize = { (input: String?) -> String? in
 			
 			if let trimmedInput = input?.trimmingCharacters(in: .whitespacesAndNewlines) {
-				if trimmedInput.count > 0 {
+				if !trimmedInput.isEmpty {
 					return trimmedInput
 				}
 			}
@@ -54,26 +54,67 @@ extension WalletPaymentInfo {
 			
 			if let invoice = incomingPayment.origin.asInvoice() {
 				return sanitize(invoice.paymentRequest.description_)
-			} else if let _ = incomingPayment.origin.asKeySend() {
-				return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
-			} else if let swapIn = incomingPayment.origin.asSwapIn() {
-				return sanitize(swapIn.address)
 			}
 			
 		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
 			
 			if let normal = outgoingPayment.details.asNormal() {
 				return sanitize(normal.paymentRequest.desc())
-			} else if let _ = outgoingPayment.details.asKeySend() {
-				return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
 			} else if let swapOut = outgoingPayment.details.asSwapOut() {
 				return sanitize(swapOut.address)
-			} else if let _ = outgoingPayment.details.asChannelClosing() {
-				return NSLocalizedString("Channel closing", comment: "Payment description for channel closing")
 			}
 		}
 		
 		return nil
+	}
+	
+	func defaultPaymentDescription() -> String {
+	
+		if let incomingPayment = payment as? Lightning_kmpIncomingPayment {
+			
+			if let _ = incomingPayment.origin.asKeySend() {
+				return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
+			} else if let _ = incomingPayment.origin.asSwapIn() {
+				return NSLocalizedString("On-chain deposit", comment: "Payment description for received deposit")
+			} else if let _ = incomingPayment.origin.asDualSwapIn() {
+				return NSLocalizedString("On-chain deposit", comment: "Payment description for received deposit")
+			}
+			
+		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
+	
+			if let _ = outgoingPayment.details.asKeySend() {
+				return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
+			} else if let _ = outgoingPayment.details.asChannelClosing() {
+				return NSLocalizedString("Channel closing", comment: "Payment description for channel closing")
+			}
+		}
+	
+		return NSLocalizedString("No description", comment: "placeholder text")
+	}
+}
+
+extension Lightning_kmpWalletPayment {
+
+	func isOnChain() -> Bool {
+		
+		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
+			
+			if let _ = incomingPayment.origin.asSwapIn() {
+				return true
+			} else if let _ = incomingPayment.origin.asDualSwapIn() {
+				return true
+			}
+			
+		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
+			
+			if let _ = outgoingPayment.details.asSwapOut() {
+				return true
+			} else if let _ = outgoingPayment.details.asChannelClosing() {
+				return true
+			}
+		}
+		
+		return false
 	}
 }
 
