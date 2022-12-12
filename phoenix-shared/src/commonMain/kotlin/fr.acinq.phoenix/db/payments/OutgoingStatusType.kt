@@ -96,6 +96,7 @@ sealed class OutgoingStatusData {
         }
 
         fun deserialize(typeVersion: OutgoingStatusTypeVersion, blob: ByteArray, completedAt: Long): OutgoingPayment.Status = decodeBlob(blob) { json, format ->
+            @Suppress("DEPRECATION")
             when (typeVersion) {
                 OutgoingStatusTypeVersion.SUCCEEDED_OFFCHAIN_V0 -> format.decodeFromString<SucceededOffChain.V0>(json).let {
                     OutgoingPayment.Status.Completed.Succeeded.OffChain(it.preimage, completedAt)

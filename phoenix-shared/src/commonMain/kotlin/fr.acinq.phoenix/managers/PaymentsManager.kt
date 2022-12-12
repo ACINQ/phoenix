@@ -86,7 +86,7 @@ class PaymentsManager(
         }
 
         launch {
-            var appLaunch: Long = currentTimestampMillis()
+            val appLaunch: Long = currentTimestampMillis()
             var isFirstCollection = true
 
             paymentsDb().listPaymentsOrderFlow(count = 25, skip = 0).collect { list ->
@@ -157,6 +157,7 @@ class PaymentsManager(
                         log.info { "channel=${it.state.channelId} has been successfully created!" }
                         _incomingSwapsMap = _incomingSwapsMap - "foobar"
                     }
+                    else -> {}
                 }
             }
         }
