@@ -21,18 +21,17 @@ import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -66,101 +65,119 @@ fun PaymentDetailsSplashView(
     onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
     fromEvent: Boolean,
 ) {
+    val context = LocalContext.current
     val payment = data.payment
     var showEditDescriptionDialog by remember { mutableStateOf(false) }
 
-    // status
-    PaymentStatus(payment, fromEvent)
-    Spacer(modifier = Modifier.height(64.dp))
-
-    // details
     Column(
         modifier = Modifier
-            .widthIn(500.dp)
-            .clip(RoundedCornerShape(32.dp))
-            .background(MaterialTheme.colors.surface)
-            .padding(top = 40.dp, bottom = 0.dp, start = 0.dp, end = 0.dp),
+            .fillMaxSize()
+            .padding(vertical = 44.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        AmountWithAltView(
-            amount = payment.amount,
-            amountTextStyle = MaterialTheme.typography.h2,
-            unitTextStyle = MaterialTheme.typography.h4,
-            separatorSpace = 4.dp,
-            isOutgoing = payment is OutgoingPayment
-        )
-        Spacer(modifier = Modifier.height(40.dp))
+        // status
+        PaymentStatus(payment, fromEvent)
+        Spacer(modifier = Modifier.height(64.dp))
 
-        DetailsRow(
-            label = stringResource(id = R.string.paymentdetails_desc_label),
-            value = when (payment) {
-                is OutgoingPayment -> when (val details = payment.details) {
-                    is OutgoingPayment.Details.Normal -> data.metadata.userDescription ?: details.paymentRequest.description ?: details.paymentRequest.descriptionHash?.toHex()
-                    is OutgoingPayment.Details.ChannelClosing -> "Closing channel ${details.channelId}"
-                    is OutgoingPayment.Details.KeySend -> "Donation"
-                    is OutgoingPayment.Details.SwapOut -> "Swap to a Bitcoin address"
-                }
-                is IncomingPayment -> when (val origin = payment.origin) {
-                    is IncomingPayment.Origin.Invoice -> data.metadata.userDescription ?: origin.paymentRequest.description ?: origin.paymentRequest.descriptionHash?.toHex()
-                    is IncomingPayment.Origin.KeySend -> "Spontaneous payment"
-                    is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.DualSwapIn -> "On-chain swap deposit"
-                }
-                else -> null
-            }?.takeIf { it.isNotBlank() },
-            fallbackValue = stringResource(id = R.string.paymentdetails_no_description)
-        )
-
-        if (payment is OutgoingPayment) {
-            Spacer(modifier = Modifier.height(8.dp))
-            DetailsRow(
-                label = stringResource(id = R.string.paymentdetails_destination_label),
-                value = when (val details = payment.details) {
-                    is OutgoingPayment.Details.Normal -> details.paymentRequest.nodeId.toString()
-                    is OutgoingPayment.Details.ChannelClosing -> details.closingAddress
-                    is OutgoingPayment.Details.KeySend -> null
-                    is OutgoingPayment.Details.SwapOut -> details.address
-                },
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-        DetailsRow(
-            label = stringResource(id = R.string.paymentdetails_fees_label),
-            value = payment.fees.toPrettyString(LocalBitcoinUnit.current, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW)
-        )
-
-        payment.errorMessage()?.let { errorMessage ->
-            Spacer(modifier = Modifier.height(8.dp))
-            DetailsRow(
-                label = stringResource(id = R.string.paymentdetails_error_label),
-                value = errorMessage
-            )
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+        // details
+        Card(
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(40.dp))
+            AmountWithAltView(
+                amount = payment.amount,
+                amountTextStyle = MaterialTheme.typography.h2,
+                unitTextStyle = MaterialTheme.typography.h4,
+                separatorSpace = 4.dp,
+                isOutgoing = payment is OutgoingPayment
+            )
+            Spacer(modifier = Modifier.height(40.dp))
+
+            val paymentDesc = remember(payment) {
+                when (payment) {
+                    is OutgoingPayment -> when (val details = payment.details) {
+                        is OutgoingPayment.Details.Normal -> details.paymentRequest.description ?: details.paymentRequest.descriptionHash?.toHex()
+                        is OutgoingPayment.Details.ChannelClosing -> context.getString(R.string.paymentdetails_desc_closing_channel)
+                        is OutgoingPayment.Details.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
+                        is OutgoingPayment.Details.SwapOut -> context.getString(R.string.paymentdetails_desc_swapout, details.address)
+                    }
+                    is IncomingPayment -> when (val origin = payment.origin) {
+                        is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description ?: origin.paymentRequest.descriptionHash?.toHex()
+                        is IncomingPayment.Origin.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
+                        is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.DualSwapIn -> context.getString(R.string.paymentdetails_desc_swapin)
+                    }
+                    else -> null
+                }?.takeIf { it.isNotBlank() }
+            }
+            val customDesc = remember(data) { data.metadata.userDescription?.takeIf { it.isNotBlank() } }
+            DetailsRow(
+                label = stringResource(id = R.string.paymentdetails_desc_label),
+                // if no default desc, show custom desc.
+                value = paymentDesc ?: customDesc ?: stringResource(id = R.string.paymentdetails_no_description),
+                additionalContent = {
+                    if (paymentDesc != null && customDesc != null) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        HSeparator(width = 50.dp)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = customDesc)
+                    }
+                    Button(
+                        text = stringResource(id = when (customDesc) {
+                            null -> R.string.paymentdetails_attach_desc_button
+                            else -> R.string.paymentdetails_edit_desc_button
+                        }),
+                        textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
+                        modifier = Modifier.offset(x = (-8).dp),
+                        icon = R.drawable.ic_text,
+                        space = 6.dp,
+                        shape = CircleShape,
+                        padding = PaddingValues(8.dp),
+                        onClick = { showEditDescriptionDialog = true }
+                    )
+                },
+                fallbackValue = stringResource(id = R.string.paymentdetails_no_description)
+            )
+
+            if (payment is OutgoingPayment) {
+                Spacer(modifier = Modifier.height(8.dp))
+                DetailsRow(
+                    label = stringResource(id = R.string.paymentdetails_destination_label),
+                    value = when (val details = payment.details) {
+                        is OutgoingPayment.Details.Normal -> details.paymentRequest.nodeId.toString()
+                        is OutgoingPayment.Details.ChannelClosing -> details.closingAddress
+                        is OutgoingPayment.Details.KeySend -> null
+                        is OutgoingPayment.Details.SwapOut -> details.address
+                    },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            DetailsRow(
+                label = stringResource(id = R.string.paymentdetails_fees_label),
+                value = payment.fees.toPrettyString(LocalBitcoinUnit.current, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW)
+            )
+
+            payment.errorMessage()?.let { errorMessage ->
+                Spacer(modifier = Modifier.height(8.dp))
+                DetailsRow(
+                    label = stringResource(id = R.string.paymentdetails_error_label),
+                    value = errorMessage
+                )
+            }
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        Card(shape = CircleShape) {
             Button(
                 text = stringResource(id = R.string.paymentdetails_details_button),
-                textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp),
                 icon = R.drawable.ic_tool,
-                modifier = Modifier.weight(1f),
-                space = 8.dp,
-                onClick = {
-                    onDetailsClick(data.id())
-                })
-            Button(
-                text = stringResource(id = R.string.paymentdetails_edit_button),
-                textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp),
-                icon = R.drawable.ic_edit,
-                modifier = Modifier.weight(1f),
-                space = 8.dp,
-                onClick = { showEditDescriptionDialog = true })
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onDetailsClick(data.id()) },
+            )
         }
     }
 
@@ -261,22 +278,31 @@ private fun PaymentStatusIcon(
 private fun DetailsRow(
     label: String,
     value: String?,
+    additionalContent: (@Composable () -> Unit)? = null,
     fallbackValue: String = stringResource(id = R.string.utils_unknown),
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip
 ) {
     Row(
-        modifier = Modifier.padding(horizontal = 24.dp).widthIn(max = 400.dp)
+        modifier = Modifier
+            .padding(horizontal = 24.dp)
+            .widthIn(max = 400.dp)
     ) {
         Text(text = label, style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.End), modifier = Modifier.weight(.7f))
         Spacer(Modifier.width(8.dp))
-        Text(
-            text = value ?: fallbackValue,
-            style = MaterialTheme.typography.body1.copy(fontStyle = if (value == null) FontStyle.Italic else FontStyle.Normal),
+        Column(
             modifier = Modifier.weight(1f),
-            maxLines = maxLines,
-            overflow = overflow,
-        )
+        ) {
+            Text(
+                text = value ?: fallbackValue,
+                style = MaterialTheme.typography.body1.copy(fontStyle = if (value == null) FontStyle.Italic else FontStyle.Normal),
+                maxLines = maxLines,
+                overflow = overflow,
+            )
+            if (additionalContent != null) {
+                additionalContent()
+            }
+        }
     }
 }
 

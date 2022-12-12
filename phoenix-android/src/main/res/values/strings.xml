@@ -367,23 +367,21 @@
     <string name="paymentdetails_desc_custom_title">Add note</string>
     <string name="paymentdetails_desc_custom_info">You can attach a note to this payment.</string>
     <string name="paymentdetails_destination_label">To</string>
-    <string name="paymentdetails_relayer_label">Relayed by</string>
     <string name="paymentdetails_fees_label">Fees</string>
-    <string name="paymentdetails_pay_to_open_label">Fees</string>
     <string name="paymentdetails_pay_to_open_desc">This fee covers the cost of opening a new payment channel.</string>
     <string name="paymentdetails_error_label">Error</string>
     <string name="paymentdetails_no_description">No description</string>
-    <string name="paymentdetails_address_label">Address</string>
-    <string name="paymentdetails_address_open_explorer">Show in explorer</string>
-    <string name="paymentdetails_info_uniclose"><![CDATA[
-      This payment happened following a conflict in a channel. Funds will be sent to your on-chain address: %1$s.
-      <br /><br />
-      To recover your funds, follow <a href="https://phoenix.acinq.co/faq#my-channels-got-force-closed-how-do-i-recover-my-money">the FAQ instructions</a>.
-    ]]></string>
+    <string name="paymentdetails_info_uniclose">This payment happened following a conflict in a channel.</string>
+
+    <string name="paymentdetails_desc_closing_channel">Closing channel</string>
+    <string name="paymentdetails_desc_keysend">Donation</string>
+    <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>
+    <string name="paymentdetails_desc_swapin">On-chain deposit</string>
 
     <string name="paymentdetails_edit_dialog_title">Add a custom description to this payment</string>
-    <string name="paymentdetails_edit_button">Edit description</string>
-    <string name="paymentdetails_details_button">Details</string>
+    <string name="paymentdetails_attach_desc_button">Attach note</string>
+    <string name="paymentdetails_edit_desc_button">Edit note</string>
+    <string name="paymentdetails_details_button">Technical details</string>
 
     <string name="paymentdetails_failure_recipient_unknown_or_liquidity">Recipient is not reachable, or does not have enough inbound liquidity.</string>
     <string name="paymentdetails_failure_invalid_details">Payment rejected by the recipient.\nThis usually occurs when the invoice has already been paid or when it contains an expiration date, and you attempted to send a payment after the expiration.</string>

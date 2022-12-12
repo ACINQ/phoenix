@@ -109,7 +109,7 @@ fun PaymentDetailsView(
         }
     }
     BackHandler(onBack = onBack)
-    DefaultScreenLayout() {
+    DefaultScreenLayout {
         DefaultScreenHeader(
             onBackClick = onBack,
             backgroundColor = Color.Unspecified,
@@ -122,12 +122,7 @@ fun PaymentDetailsView(
             is PaymentDetailsState.Failure -> CenterContentView {
                 Text(stringResource(id = R.string.paymentdetails_error, state.error.message ?: stringResource(id = R.string.utils_unknown)))
             }
-            is PaymentDetailsState.Success.Splash -> Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 44.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            is PaymentDetailsState.Success.Splash -> {
                 PaymentDetailsSplashView(
                     data = state.payment,
                     onDetailsClick = { vm.state = PaymentDetailsState.Success.TechnicalDetails(state.payment) },

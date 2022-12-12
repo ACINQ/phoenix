@@ -220,12 +220,13 @@ fun Card(
     withBorder: Boolean = false,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    maxWidth: Dp = 500.dp,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
         modifier = modifier
             .padding(externalPadding)
-            .widthIn(max = 500.dp)
+            .widthIn(max = maxWidth)
             .clip(shape)
             .then(
                 if (withBorder) Modifier.border(BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary), shape) else Modifier
