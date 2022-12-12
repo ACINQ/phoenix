@@ -125,6 +125,8 @@ class MainActivity : AppCompatActivity() {
         delay(500)
         if (it is LegacyAppStatus.NotRequired) {
           log.info("finishing legacy activity in state=${it.name()}")
+          app.service?.closeConnections()
+          delay(500)
           (application as AppContext).onLegacyFinish()
           delay(200)
           finish()

@@ -82,26 +82,11 @@
       </androidx.constraintlayout.widget.ConstraintLayout>
 
       <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/step2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_md"
-        android:visibility="@{model.state instanceof MigrationScreenState.Notifying}"
-        app:layout_constraintTop_toBottomOf="@id/title">
-
-        <TextView
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:text="@string/migration_notifying_message"
-          app:layout_constraintTop_toTopOf="parent" />
-      </androidx.constraintlayout.widget.ConstraintLayout>
-
-      <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/step3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_md"
-        android:visibility="@{model.state instanceof MigrationScreenState.RequestingSwapInAddress}"
+        android:visibility="@{model.state instanceof MigrationScreenState.RequestingKmpSwapInAddress}"
         app:layout_constraintTop_toBottomOf="@id/title">
 
         <TextView
@@ -116,7 +101,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_md"
-        android:visibility="@{model.state instanceof MigrationScreenState.ReceivedSwapInAddress || model.state instanceof MigrationScreenState.RequestingChannelsClosing || model.state instanceof MigrationScreenState.CompletedChannelsClosing}"
+        android:visibility="@{model.state instanceof MigrationScreenState.ReadyToClose || model.state instanceof MigrationScreenState.ClosingChannels || model.state instanceof MigrationScreenState.ChannelsClosed}"
         app:layout_constraintTop_toBottomOf="@id/title">
 
         <TextView

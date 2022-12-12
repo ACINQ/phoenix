@@ -217,7 +217,7 @@ fun AppView(
                     LogsView()
                 }
                 composable(Screen.SwitchToLegacy.route) {
-                    LegacySwitcherView(onLegacyFinished = { navController.navigate(Screen.Startup.route) })
+                    LegacySwitcherView(onProceedNormally = { navController.navigate(Screen.Startup.route) })
                 }
             }
         }

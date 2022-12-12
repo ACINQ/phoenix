@@ -33,7 +33,9 @@ import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.io.PhoenixAndroidLegacyInfoEvent
 import fr.acinq.phoenix.android.components.mvi.MockView
 import fr.acinq.phoenix.android.service.NodeService
+import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
+import fr.acinq.phoenix.android.utils.datastore.LegacyPrefsMigration
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import kotlinx.coroutines.flow.filterNotNull
@@ -59,6 +61,16 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             if (PrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first() is LegacyAppStatus.Required) {
                 PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
+            }
+        }
+
+        // migrate legacy data if needed
+        lifecycleScope.launch {
+            val doDataMigration = PrefsDatastore.getDataMigrationExpected(applicationContext).first()
+            if (doDataMigration == true) {
+                LegacyMigrationHelper.migrateLegacyPayments(applicationContext)
+                LegacyPrefsMigration.doMigration(applicationContext)
+                PrefsDatastore.saveDataMigrationExpected(applicationContext, false)
             }
         }
 

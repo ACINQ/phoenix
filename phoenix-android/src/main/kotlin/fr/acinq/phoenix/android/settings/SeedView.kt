@@ -64,12 +64,16 @@ fun SeedView() {
             Text(text = annotatedStringResource(id = R.string.displayseed_instructions))
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Card {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             when (val s = state) {
                 is SeedViewState.Init -> {
                     Button(
                         text = stringResource(R.string.displayseed_authenticate_button),
                         icon = R.drawable.ic_key,
+                        modifier = Modifier.fillMaxWidth(),
                         onClick = {
                             state = SeedViewState.ReadingSeed
                             scope.launch {
@@ -81,11 +85,11 @@ fun SeedView() {
                                         state = SeedViewState.ShowSeed(words)
                                     }
                                     keyState is KeyState.Error.Unreadable -> {
-                                        state = SeedViewState.Error(context.getString(R.string.displayseed_error_details, keyState.message ?: "n/a"))
+                                        state = SeedViewState.Error(keyState.message ?: "n/a")
                                     }
                                     else -> {
                                         log.info { "unable to read seed in state=$keyState" }
-                                        // TODO: handle errors
+                                        state = SeedViewState.Error("unhandled state=${keyState::class.simpleName}")
                                     }
                                 }
                             }
@@ -93,10 +97,13 @@ fun SeedView() {
                     )
                 }
                 is SeedViewState.ReadingSeed -> {
-                    TextWithIcon(text = stringResource(id = R.string.displayseed_loading), icon = R.drawable.ic_key, padding = PaddingValues(16.dp), space = 16.dp)
+                    ProgressView(text = stringResource(id = R.string.displayseed_loading))
                 }
                 is SeedViewState.ShowSeed -> {
                     SeedDialog(onDismiss = { state = SeedViewState.Init }, words = s.words)
+                }
+                is SeedViewState.Error -> {
+                    Text(text = stringResource(id = R.string.displayseed_error_details, s.message))
                 }
             }
         }

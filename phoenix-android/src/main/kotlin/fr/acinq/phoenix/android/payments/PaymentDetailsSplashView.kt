@@ -72,18 +72,18 @@ fun PaymentDetailsSplashView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(vertical = 44.dp),
+            .padding(vertical = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // status
         PaymentStatus(payment, fromEvent)
-        Spacer(modifier = Modifier.height(64.dp))
+        Spacer(modifier = Modifier.height(58.dp))
 
         // details
         Card(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(36.dp))
             AmountWithAltView(
                 amount = payment.amount,
                 amountTextStyle = MaterialTheme.typography.h2,
@@ -91,7 +91,7 @@ fun PaymentDetailsSplashView(
                 separatorSpace = 4.dp,
                 isOutgoing = payment is OutgoingPayment
             )
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(36.dp))
 
             val paymentDesc = remember(payment) {
                 when (payment) {

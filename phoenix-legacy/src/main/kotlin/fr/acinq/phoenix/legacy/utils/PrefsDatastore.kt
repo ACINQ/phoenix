@@ -63,6 +63,12 @@ object PrefsDatastore {
   suspend fun saveMigrationResult(context: Context, result: MigrationResult) = context.internalData.edit {
     it[MIGRATION_RESULT] = json.encodeToString(result)
   }
+
+  private val DATA_MIGRATION_EXPECTED = booleanPreferencesKey("DATA_MIGRATION_EXPECTED")
+  fun getDataMigrationExpected(context: Context): Flow<Boolean?> = prefs(context).map { it[DATA_MIGRATION_EXPECTED] }
+  suspend fun saveDataMigrationExpected(context: Context, isExpected: Boolean) = context.internalData.edit {
+    it[DATA_MIGRATION_EXPECTED] = isExpected
+  }
 }
 
 /**
@@ -83,7 +89,6 @@ sealed class LegacyAppStatus {
     object Expected: Required()
     object InitStart: Required()
     object Running: Required()
-    object Finished: Required()
     object Interrupted: Required()
   }
   object NotRequired: LegacyAppStatus()

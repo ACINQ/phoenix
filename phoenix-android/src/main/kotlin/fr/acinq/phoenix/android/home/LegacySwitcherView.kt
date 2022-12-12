@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LegacySwitcherView(
-    onLegacyFinished: () -> Unit
+    onProceedNormally: () -> Unit
 ) {
     val log = logger("LegacySwitcherView")
     val context = LocalContext.current
@@ -95,8 +95,8 @@ fun LegacySwitcherView(
                     }
                 })
             }
-            LegacyAppStatus.NotRequired -> onLegacyFinished()
-            LegacyAppStatus.Unknown -> onLegacyFinished()
+            LegacyAppStatus.NotRequired -> onProceedNormally()
+            LegacyAppStatus.Unknown -> onProceedNormally()
         }
     }
 }

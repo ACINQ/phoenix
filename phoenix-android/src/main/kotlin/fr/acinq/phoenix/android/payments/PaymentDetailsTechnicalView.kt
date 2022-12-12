@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.db.IncomingPayment
@@ -242,7 +243,9 @@ private fun DetailsForOutgoingPayment(
             TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = details.paymentHash.toHex())
         }
         is OutgoingPayment.Details.ChannelClosing -> {
-            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_closing_channel_label), value = details.channelId.toHex())
+            if (details.channelId != ByteVector32.Zeroes) {
+                TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_closing_channel_label), value = details.channelId.toHex())
+            }
             TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_closing_address_label), value = details.closingAddress)
         }
     }
@@ -298,9 +301,10 @@ private fun ReceivedWithLightning(
     TechnicalRow(label = stringResource(id = R.string.paymentdetails_received_with_label)) {
         Text(text = stringResource(id = R.string.paymentdetails_received_with_lightning))
     }
-    val channelId = receivedWith.channelId
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_channel_id_label)) {
-        Text(text = channelId.toHex())
+    if (receivedWith.channelId != ByteVector32.Zeroes) {
+        TechnicalRow(label = stringResource(id = R.string.paymentdetails_channel_id_label)) {
+            Text(text = receivedWith.channelId.toHex())
+        }
     }
     TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
 }
@@ -314,7 +318,7 @@ private fun ReceivedWithNewChannel(
         Text(text = stringResource(id = R.string.paymentdetails_received_with_channel))
     }
     val channelId = receivedWith.channelId
-    if (channelId != null) {
+    if (channelId != null && channelId != ByteVector32.Zeroes) {
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_channel_id_label)) {
             Text(text = channelId.toHex())
         }

@@ -141,7 +141,11 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
             is OutgoingPayment.Details.Normal -> d.paymentRequest.description
             is OutgoingPayment.Details.KeySend -> stringResource(id = R.string.paymentline_keysend_outgoing)
             is OutgoingPayment.Details.SwapOut -> d.address
-            is OutgoingPayment.Details.ChannelClosing -> stringResource(R.string.paymentline_closing_desc, d.closingAddress)
+            is OutgoingPayment.Details.ChannelClosing -> if (d.closingAddress.isNullOrBlank()) {
+                stringResource(R.string.paymentline_closing_desc_no_address)
+            } else {
+                stringResource(R.string.paymentline_closing_desc, d.closingAddress)
+            }
         }
         is IncomingPayment -> when (val o = payment.origin) {
             is IncomingPayment.Origin.Invoice -> o.paymentRequest.description
@@ -183,7 +187,7 @@ private fun PaymentIcon(payment: WalletPayment) {
             is OutgoingPayment.Status.Completed.Succeeded.OnChain -> PaymentIconComponent(
                 icon = R.drawable.ic_payment_success_onchain,
                 description = stringResource(id = R.string.paymentdetails_status_sent_successful),
-                iconSize = 12.dp,
+                iconSize = 14.dp,
                 iconColor = MaterialTheme.colors.onPrimary,
                 backgroundColor = MaterialTheme.colors.primary
             )
@@ -191,16 +195,23 @@ private fun PaymentIcon(payment: WalletPayment) {
         is IncomingPayment -> when (payment.received) {
             null -> PaymentIconComponent(
                 icon = R.drawable.ic_payment_pending,
-                description = stringResource(id = R.string.paymentdetails_status_received_pending)
+                description = stringResource(id = R.string.paymentdetails_status_received_pending),
+                iconSize = 18.dp,
+                iconColor = MaterialTheme.colors.onPrimary,
+                backgroundColor = MaterialTheme.colors.primary
             )
             else -> PaymentIconComponent(
                 icon = if (payment.origin is IncomingPayment.Origin.SwapIn || payment.origin is IncomingPayment.Origin.DualSwapIn) {
-                    R.drawable.ic_chain
+                    R.drawable.ic_payment_success_onchain
                 } else {
                     R.drawable.ic_payment_success
                 },
                 description = stringResource(id = R.string.paymentdetails_status_received_successful),
-                iconSize = 18.dp,
+                iconSize = if (payment.origin is IncomingPayment.Origin.SwapIn || payment.origin is IncomingPayment.Origin.DualSwapIn) {
+                    14.dp
+                } else {
+                    18.dp
+                },
                 iconColor = MaterialTheme.colors.onPrimary,
                 backgroundColor = MaterialTheme.colors.primary
             )

@@ -41,10 +41,11 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
-import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.legacy.db.*
 import fr.acinq.phoenix.legacy.utils.Wallet
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConversions
 import scala.collection.JavaConverters
@@ -53,23 +54,28 @@ import java.io.File
 
 object LegacyMigrationHelper {
 
-    val log = LoggerFactory.getLogger(this::class.java)
+    val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     suspend fun migrateLegacyPayments(
         context: Context,
-        business: PhoenixBusiness
     ) {
-        // 1 - create a copy of the eclair database file we can safely work on
-        val eclairDbFile = Wallet.getEclairDBFile(context)
-        eclairDbFile.copyTo(File(Wallet.getChainDatadir(context), "eclairdb-migration.sqlite"), overwrite = true)
-        log.info("legacy database file has been copied")
+        val eclairDbBackupFile = File(Wallet.getChainDatadir(context), "eclair.sqlite.bak")
+        if (!eclairDbBackupFile.exists()) {
+            log.info("no legacy database backup file found, no migration needed.")
+            return
+        }
+
+        // 1 - create a copy of the eclair database backup file we can safely work on
+        eclairDbBackupFile.copyTo(File(Wallet.getChainDatadir(context), "eclair-migration.sqlite"), overwrite = true)
+        log.info("legacy database backup file has been copied")
 
         val legacyMetaRepository = PaymentMetaRepository.getInstance(AppDb.getInstance(context).paymentMetaQueries)
         val legacyPayToOpenMetaRepository = PayToOpenMetaRepository.getInstance(AppDb.getInstance(context).payToOpenMetaQueries)
-        val legacyPaymentsDb = SqlitePaymentsDb(SqliteUtils.openSqliteFile(Wallet.getChainDatadir(context), "eclairdb-migration.sqlite", true, "wal", "normal"))
+        val legacyPaymentsDb = SqlitePaymentsDb(SqliteUtils.openSqliteFile(Wallet.getChainDatadir(context), "eclair-migration.sqlite", true, "wal", "normal"))
         log.info("opened legacy payments db")
 
         // 2 - get the new payments database
+        val business = (context as PhoenixApplication).business
         val newPaymentsDb = business.databaseManager.paymentsDb()
 
         // 3 - extract all outgoing payments from the legacy database, and save them to the new database
@@ -172,7 +178,9 @@ object LegacyMigrationHelper {
         }
 
         log.info("moving eclair.sqlite legacy database to finalize migration...")
-        eclairDbFile.renameTo(File(Wallet.getChainDatadir(context), "eclair-migrated.sqlite"))
+        legacyPaymentsDb.close()
+        // move the db backup file so that when a migration successfully completes, the process will not repeat
+        eclairDbBackupFile.renameTo(File(Wallet.getChainDatadir(context), "eclair.sqlite.bak.migrated"))
     }
 
     fun modernizeLegacyIncomingPayment(

@@ -87,6 +87,7 @@
     <string name="paymentline_prefix_rounded">≈</string>
     <string name="paymentline_keysend_outgoing">Donation</string>
     <string name="paymentline_keysend_incoming">Spontaneous payment</string>
+    <string name="paymentline_closing_desc_no_address">Channel closing</string>
     <string name="paymentline_closing_desc">Channel closing to %1$s</string>
     <string name="paymentline_swap_in_desc">On-chain deposit</string>
 

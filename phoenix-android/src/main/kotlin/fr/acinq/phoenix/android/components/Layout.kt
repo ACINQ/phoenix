@@ -216,7 +216,7 @@ fun Card(
     modifier: Modifier = Modifier,
     externalPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
     internalPadding: PaddingValues = PaddingValues(0.dp),
-    shape: Shape = RoundedCornerShape(16.dp),
+    shape: Shape = RoundedCornerShape(24.dp),
     withBorder: Boolean = false,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
