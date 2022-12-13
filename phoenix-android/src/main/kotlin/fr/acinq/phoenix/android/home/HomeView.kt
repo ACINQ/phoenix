@@ -67,6 +67,7 @@ fun HomeView(
     onSendClick: () -> Unit,
     onPaymentsHistoryClick: () -> Unit,
     onTorClick: () -> Unit,
+    onElectrumClick: () -> Unit,
 ) {
     val log = logger("HomeView")
     val context = LocalContext.current
@@ -76,7 +77,7 @@ fun HomeView(
 
     var showConnectionsDialog by remember { mutableStateOf(false) }
     if (showConnectionsDialog) {
-        ConnectionDialog(connections = connectionsState, onClose = { showConnectionsDialog = false })
+        ConnectionDialog(connections = connectionsState, onClose = { showConnectionsDialog = false }, onTorClick = onTorClick, onElectrumClick = onElectrumClick)
     }
 
     val payments = paymentsViewModel.recentPaymentsFlow.collectAsState().value.values.toList().take(3)
@@ -94,7 +95,7 @@ fun HomeView(
                 },
                 connectionsState = connectionsState,
                 isTorEnabled = torEnabledState.value,
-                onTorButtonClick = onTorClick
+                onTorClick = onTorClick
             )
             Spacer(modifier = Modifier.height(64.dp))
 
@@ -178,7 +179,7 @@ fun HomeView(
 fun TopBar(
     onConnectionsStateButtonClick: () -> Unit,
     connectionsState: Connections?,
-    onTorButtonClick: () -> Unit,
+    onTorClick: () -> Unit,
     isTorEnabled: Boolean?
 ) {
     val context = LocalContext.current
@@ -218,7 +219,7 @@ fun TopBar(
                     text = stringResource(id = R.string.home__connection__tor_active),
                     icon = R.drawable.ic_tor_shield_ok,
                     iconTint = positiveColor(),
-                    onClick = onTorButtonClick,
+                    onClick = onTorClick,
                     textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = LocalContentColor.current),
                     backgroundColor = mutedBgColor(),
                     space = 8.dp,
@@ -241,8 +242,12 @@ fun TopBar(
 }
 
 @Composable
-private fun ConnectionDialog(connections: Connections?, onClose: () -> Unit) {
-    val nc = navController
+private fun ConnectionDialog(
+    connections: Connections?,
+    onClose: () -> Unit,
+    onTorClick: () -> Unit,
+    onElectrumClick: () -> Unit,
+) {
     Dialog(title = stringResource(id = R.string.conndialog_title), onDismiss = onClose) {
         Column {
             if (connections?.internet != Connection.ESTABLISHED) {
@@ -262,11 +267,11 @@ private fun ConnectionDialog(connections: Connections?, onClose: () -> Unit) {
                 val context = LocalContext.current
                 val isTorEnabled = UserPrefs.getIsTorEnabled(context).collectAsState(initial = null).value
                 if (isTorEnabled != null && isTorEnabled) {
-                    ConnectionDialogLine(label = stringResource(id = R.string.conndialog_tor), connection = connections.tor)
+                    ConnectionDialogLine(label = stringResource(id = R.string.conndialog_tor), connection = connections.tor, onClick = onTorClick)
                     HSeparator()
                 }
 
-                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_electrum), connection = connections.electrum)
+                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_electrum), connection = connections.electrum, onClick = onElectrumClick)
                 HSeparator()
                 ConnectionDialogLine(label = stringResource(id = R.string.conndialog_lightning), connection = connections.peer)
                 HSeparator()
@@ -277,7 +282,11 @@ private fun ConnectionDialog(connections: Connections?, onClose: () -> Unit) {
 }
 
 @Composable
-private fun ConnectionDialogLine(label: String, connection: Connection?, onClick: (() -> Unit)? = null) {
+private fun ConnectionDialogLine(
+    label: String,
+    connection: Connection?,
+    onClick: (() -> Unit)? = null
+) {
     Row(
         modifier = Modifier
             .then(

@@ -134,7 +134,8 @@ fun AppView(
                             onReceiveClick = { navController.navigate(Screen.Receive.route) },
                             onSendClick = { navController.navigate(Screen.ScanData.route) { launchSingleTop = true } },
                             onPaymentsHistoryClick = { navController.navigate(Screen.PaymentsHistory.route) },
-                            onTorClick = { navController.navigate(Screen.TorConfig)}
+                            onTorClick = { navController.navigate(Screen.TorConfig)},
+                            onElectrumClick = { navController.navigate(Screen.ElectrumServer)}
                         )
                     }
                 }
