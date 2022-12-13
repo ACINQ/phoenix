@@ -20,16 +20,23 @@ struct PaymentsBackupView: View {
 	@ViewBuilder
 	var body: some View {
 		
-		List {
-			section
-		}
-		.listStyle(.insetGrouped)
-		.navigationTitle("Payments Backup")
-		.navigationBarTitleDisplayMode(.inline)
+		content()
+			.navigationTitle("Payments Backup")
+			.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
-	var section: some View {
+	func content() -> some View {
+		
+		List {
+			section()
+		}
+		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
+	}
+	
+	@ViewBuilder
+	func section() -> some View {
 		
 		Section {
 			

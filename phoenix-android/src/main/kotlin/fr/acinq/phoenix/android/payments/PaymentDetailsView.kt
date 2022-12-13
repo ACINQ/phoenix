@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android.payments
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -26,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -34,6 +36,9 @@ import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.managers.PaymentsManager
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
 
@@ -64,6 +69,16 @@ class PaymentDetailsViewModel(
         } ?: PaymentDetailsState.Failure(NoSuchElementException("no payment found for id=$id"))
     }
 
+    fun updateMetadata(id: WalletPaymentId, userDescription: String?) {
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+            log.error("failed to save user description to database: ", e)
+        }) {
+            // update meta then refresh
+            paymentsManager.updateMetadata(id, userDescription)
+            getPayment(id)
+        }
+    }
+
     class Factory(
         private val paymentsManager: PaymentsManager
     ) : ViewModelProvider.Factory {
@@ -78,6 +93,7 @@ class PaymentDetailsViewModel(
 fun PaymentDetailsView(
     paymentId: WalletPaymentId,
     onBackClick: () -> Unit,
+    fromEvent: Boolean,
 ) {
     val vm: PaymentDetailsViewModel = viewModel(factory = PaymentDetailsViewModel.Factory(business.paymentsManager))
 
@@ -85,15 +101,17 @@ fun PaymentDetailsView(
         vm.getPayment(paymentId)
     }
     val state = vm.state
-    DefaultScreenLayout() {
+    val onBack = {
+        if (state is PaymentDetailsState.Success.TechnicalDetails) {
+            vm.state = PaymentDetailsState.Success.Splash(state.payment)
+        } else {
+            onBackClick()
+        }
+    }
+    BackHandler(onBack = onBack)
+    DefaultScreenLayout {
         DefaultScreenHeader(
-            onBackClick = {
-                if (state is PaymentDetailsState.Success.TechnicalDetails) {
-                    vm.state = PaymentDetailsState.Success.Splash(state.payment)
-                } else {
-                    onBackClick()
-                }
-            },
+            onBackClick = onBack,
             backgroundColor = Color.Unspecified,
             title = if (state is PaymentDetailsState.Success.TechnicalDetails) stringResource(id = R.string.paymentdetails_title) else null
         )
@@ -104,13 +122,13 @@ fun PaymentDetailsView(
             is PaymentDetailsState.Failure -> CenterContentView {
                 Text(stringResource(id = R.string.paymentdetails_error, state.error.message ?: stringResource(id = R.string.utils_unknown)))
             }
-            is PaymentDetailsState.Success.Splash -> Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 44.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                PaymentDetailsSplashView(data = state.payment, onDetailsClick = { vm.state = PaymentDetailsState.Success.TechnicalDetails(state.payment) })
+            is PaymentDetailsState.Success.Splash -> {
+                PaymentDetailsSplashView(
+                    data = state.payment,
+                    onDetailsClick = { vm.state = PaymentDetailsState.Success.TechnicalDetails(state.payment) },
+                    onMetadataDescriptionUpdate = { id, description -> vm.updateMetadata(id, description) },
+                    fromEvent = fromEvent,
+                )
             }
             is PaymentDetailsState.Success.TechnicalDetails -> {
                 PaymentDetailsTechnicalView(data = state.payment)

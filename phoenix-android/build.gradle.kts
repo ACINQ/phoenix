@@ -1,19 +1,30 @@
+import java.io.ByteArrayOutputStream
+
 plugins {
     id("com.android.application")
     kotlin("android")
     id("com.google.gms.google-services")
 }
 
+fun gitCommitHash(): String {
+    val stream = ByteArrayOutputStream()
+    project.exec {
+        commandLine = "git rev-parse --verify --short HEAD".split(" ")
+        standardOutput = stream
+    }
+    return String(stream.toByteArray()).split("\n").first()
+}
+
 val chain: String by project
 
 android {
-    compileSdk = 32
+    compileSdk = 33
     defaultConfig {
-        applicationId = "fr.acinq.phoenix.android"
+        applicationId = "fr.acinq.phoenix.testnet"
         minSdk = 24
-        targetSdk = 32
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 33
+        versionCode = 40
+        versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -32,6 +43,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        applicationVariants.all {
+            outputs.forEach {
+                val apkName = "phoenix-${defaultConfig.versionCode}-${defaultConfig.versionName}-${chain.drop(1).dropLast(1)}-${buildType.name}.apk"
+                (it as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName = apkName
+            }
         }
     }
 
@@ -73,14 +90,14 @@ dependencies {
     implementation(project(":phoenix-shared"))
     api(project(":phoenix-legacy"))
 
-    implementation("com.google.android.material:material:1.4.0")
+    implementation("com.google.android.material:material:1.7.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
         version { strictly(Versions.coroutines) }
     }
 
     // -- AndroidX
-    implementation("androidx.core:core-ktx:${Versions.Android.ktx}")
+    implementation("androidx.core:core-ktx:${Versions.Android.coreKtx}")
     // -- AndroidX: livedata
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.Android.lifecycle}")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:${Versions.Android.lifecycle}")
@@ -95,6 +112,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-viewbinding:${Versions.Android.compose}")
     implementation("androidx.compose.runtime:runtime-livedata:${Versions.Android.compose}")
     implementation("androidx.compose.material:material:${Versions.Android.compose}")
+    implementation("androidx.compose.animation:animation:${Versions.Android.compose}")
+    implementation("androidx.compose.animation:animation-graphics:${Versions.Android.compose}")
     // -- jetpack compose: navigation
     implementation("androidx.navigation:navigation-compose:${Versions.Android.navCompose}")
     // -- jetpack compose: accompanist (utility library for compose)

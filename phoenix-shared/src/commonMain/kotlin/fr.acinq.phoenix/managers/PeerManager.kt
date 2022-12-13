@@ -1,14 +1,15 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
+import fr.acinq.lightning.channel.ChannelStateWithCommitments
+import fr.acinq.lightning.channel.Offline
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.wire.InitTlv
 import fr.acinq.lightning.wire.TlvStream
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.utils.calculateBalance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
@@ -37,9 +38,6 @@ class PeerManager(
     private val _peer = MutableStateFlow<Peer?>(null)
     val peerState: StateFlow<Peer?> = _peer
 
-    private val _balance = MutableStateFlow<MilliSatoshi?>(null)
-    val balance: StateFlow<MilliSatoshi?> = _balance
-
     init {
         launch {
             val nodeParams = nodeParamsManager.nodeParams.filterNotNull().first()
@@ -60,19 +58,33 @@ class PeerManager(
 
             val peer = Peer(
                 initTlvStream = initTlvs,
-                nodeParams = nodeParamsManager.nodeParams.filterNotNull().first(),
-                walletParams = configurationManager.chainContext.filterNotNull().first().walletParams(),
+                nodeParams = nodeParams,
+                walletParams = walletParams,
                 watcher = electrumWatcher,
                 db = databaseManager.databases.filterNotNull().first(),
                 socketBuilder = null,
                 scope = MainScope()
             )
             _peer.value = peer
-            peer.channelsFlow.collect { channels ->
-                _balance.value = calculateBalance(channels)
-            }
         }
     }
 
     suspend fun getPeer() = peerState.filterNotNull().first()
+
+    /**
+     * Returns the underlying channel, if it's of type ChannelStateWithCommitments.
+     * Note that Offline channels are automatically unwrapped.
+     */
+    fun getChannelWithCommitments(channelId: ByteVector32): ChannelStateWithCommitments? {
+        val peer = peerState.value ?: return null
+        var channel = peer.channels[channelId] ?: return null
+        channel = when (channel) {
+            is Offline -> channel.state
+            else -> channel
+        }
+        return when (channel) {
+            is ChannelStateWithCommitments -> channel
+            else -> null
+        }
+    }
 }

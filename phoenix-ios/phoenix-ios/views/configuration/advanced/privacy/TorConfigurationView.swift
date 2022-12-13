@@ -3,6 +3,7 @@ import SwiftUI
 struct TorConfigurationView: View {
 
 	@State var isTorEnabled = GroupPrefs.shared.isTorEnabled
+	@State var theme = Prefs.shared.theme
 
 	@ViewBuilder
 	var body: some View {

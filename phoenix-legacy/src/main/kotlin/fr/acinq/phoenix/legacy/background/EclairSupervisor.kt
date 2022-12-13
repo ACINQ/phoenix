@@ -101,9 +101,6 @@ class EclairSupervisor(val applicationContext: Context) : UntypedActor() {
           log.debug("channel ${event.channel()} in state ${event.currentState()} from ${event.previousState()}")
           EventBus.getDefault().post(ChannelStateChange())
         }
-
-        // if the app does not have any channels, mark the legacy app as not required
-        EventBus.getDefault().post(CheckHasActiveChannels)
       }
       is ChannelErrorOccurred -> {
         if (event.channelId() != null && event.isFatal) {

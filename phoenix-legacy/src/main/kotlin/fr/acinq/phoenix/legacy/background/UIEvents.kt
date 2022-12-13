@@ -35,5 +35,3 @@ object PeerConnectionChange
 class RemovePendingSwapIn(val address: String)
 
 data class FCMToken(val token: String)
-
-object CheckHasActiveChannels

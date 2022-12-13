@@ -85,24 +85,25 @@ fun BorderButton(
 @Composable
 fun FilledButton(
     modifier: Modifier = Modifier,
-    text: Int? = null,
+    text: String? = null,
     icon: Int? = null,
     iconTint: Color = MaterialTheme.colors.onPrimary,
     enabled: Boolean = true,
     space: Dp = 12.dp,
+    shape: Shape = CircleShape,
     textStyle: TextStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.onPrimary),
     padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     backgroundColor: Color = MaterialTheme.colors.primary,
     onClick: () -> Unit,
 ) {
     Button(
-        text = text?.run { stringResource(this) },
+        text = text,
         icon = icon,
         iconTint = iconTint,
         enabled = enabled,
         space = space,
         onClick = onClick,
-        shape = CircleShape,
+        shape = shape,
         backgroundColor = backgroundColor,
         textStyle = textStyle,
         padding = padding,
@@ -149,7 +150,7 @@ fun TextWithIcon(
     textStyle: TextStyle = LocalTextStyle.current,
     maxLines: Int = Int.MAX_VALUE,
     textOverflow: TextOverflow = TextOverflow.Clip,
-    iconTint: Color = LocalContentColor.current,
+    iconTint: Color? = null,
     iconSize: Dp = ButtonDefaults.IconSize,
     padding: PaddingValues = PaddingValues(0.dp),
     space: Dp = 6.dp,
@@ -165,7 +166,7 @@ fun TextWithIcon(
             modifier = Modifier
                 .size(iconSize)
                 .then(if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier),
-            colorFilter = ColorFilter.tint(iconTint)
+            colorFilter = iconTint?.let { ColorFilter.tint(it) }
         )
         Spacer(Modifier.width(space))
         Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier, maxLines = maxLines, overflow = textOverflow)

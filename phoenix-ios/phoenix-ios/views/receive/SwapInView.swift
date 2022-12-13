@@ -32,12 +32,14 @@ struct SwapInView: View {
 	@State var swapIn_minFeeSat: Int64 = 0
 	@State var swapIn_minFundingSat: Int64 = 0
 	
+	let swapInWalletBalancePublisher = Biz.business.balanceManager.swapInWalletBalancePublisher()
+	@State var swapInWalletBalance = Biz.business.balanceManager.swapInWalletBalanceValue()
+	
+	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
+	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
-	
-	let incomingSwapsPublisher = Biz.business.paymentsManager.incomingSwapsPublisher()
-	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	// For the cicular buttons: [copy, share]
 	enum MaxButtonWidth: Preference {}
@@ -135,8 +137,8 @@ struct SwapInView: View {
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
-		.onReceive(incomingSwapsPublisher) {
-			onIncomingSwapsChanged($0)
+		.onReceive(swapInWalletBalancePublisher) {
+			swapInWalletBalanceChanged($0)
 		}
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
@@ -320,7 +322,7 @@ struct SwapInView: View {
 		
 		HStack(alignment: VerticalAlignment.top, spacing: 8) {
 			
-			Image(systemName: "exclamationmark.circle")
+			Image(systemName: "info.circle")
 				.imageScale(.large)
 				.accessibilityHidden(true)
 			
@@ -333,24 +335,21 @@ struct SwapInView: View {
 				
 				Text(
 					"""
-					This is a swap address. It is not controlled by your wallet. \
 					On-chain deposits sent to this address will be converted to Lightning channels.
 					"""
 				)
-				.lineLimit(nil)                               // text truncation bugs
-				.multilineTextAlignment(.leading)             // text truncation bugs
+				.multilineTextAlignment(.leading)
 				.fixedSize(horizontal: false, vertical: true) // text truncation bugs
 				.padding(.bottom, 14)
 				
 				Text(styled: String(format: NSLocalizedString(
 					"""
-					Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum).
+					Total deposits must be at least **%@**. The fee is **%@%%** (%@ minimum).
 					""",
 					comment:	"Minimum amount description."),
 					minFunding.string, feePercent, minFee.string
 				))
-				.lineLimit(nil)                               // text truncation bugs
-				.multilineTextAlignment(.leading)             // text truncation bugs
+				.multilineTextAlignment(.leading)
 				.fixedSize(horizontal: false, vertical: true) // text truncation bugs
 			}
 		}
@@ -410,21 +409,19 @@ struct SwapInView: View {
 		}
 	}
 	
-	func onIncomingSwapsChanged(_ incomingSwaps: [String: Lightning_kmpMilliSatoshi]) -> Void {
-		log.trace("onIncomingSwapsChanged(): \(incomingSwaps)")
+	func swapInWalletBalanceChanged(_ walletBalance: WalletBalance) {
+		log.trace("swapInWalletBalanceChanged()")
 		
-		guard let bitcoinAddress = bitcoinAddress() else {
-			return
-		}
-		
-		// incomingSwaps: [bitcoinAddress: pendingAmount]
-		//
-		// If incomingSwaps has an entry for the bitcoin address that we're displaying,
+		// If we detect a new incoming payment on the swap-in address,
 		// then let's dismiss this sheet, and show the user the home screen.
 		//
 		// Because the home screen has the "+X sat incoming" message
 		
-		if incomingSwaps[bitcoinAddress] != nil {
+		let oldBalance = swapInWalletBalance.total.sat
+		let newBalance = walletBalance.total.sat
+		
+		swapInWalletBalance = walletBalance
+		if newBalance > oldBalance {
 			presentationMode.wrappedValue.dismiss()
 		}
 	}

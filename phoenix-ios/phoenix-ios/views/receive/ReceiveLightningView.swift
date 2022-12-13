@@ -63,7 +63,7 @@ struct ReceiveLightningView: View {
 	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	// Saving custom publisher in @State since otherwise it fires on every render
-	@State var channelsPublisher = Biz.business.peerPublisher().flatMap { $0.channelsPublisher() }
+	@State var channelsPublisher = Biz.business.peerManager.peerStatePublisher().flatMap { $0.channelsPublisher() }
 	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification

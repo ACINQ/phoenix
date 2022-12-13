@@ -21,39 +21,47 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
-import fr.acinq.phoenix.controllers.ControllerFactory
-import fr.acinq.phoenix.controllers.HomeController
-import fr.acinq.phoenix.controllers.main.Home
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.Connections
 import fr.acinq.phoenix.managers.PaymentsManager
+import fr.acinq.phoenix.managers.PaymentsPageFetcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.slf4j.LoggerFactory
 
 data class PaymentRowState(
     val orderRow: WalletPaymentOrderRow,
     val paymentInfo: WalletPaymentInfo?
 )
 
-class HomeViewModel(
+class PaymentsViewModel(
     val connectionsFlow: StateFlow<Connections>,
     val paymentsManager: PaymentsManager,
-    controller: HomeController
-) : MVIControllerViewModel<Home.Model, Home.Intent>(controller) {
+) : ViewModel() {
 
-    private val _paymentsFlow = MutableStateFlow<Map<String, PaymentRowState>>(HashMap())
-    val paymentsFlow: StateFlow<Map<String, PaymentRowState>> = _paymentsFlow
+    private val log = LoggerFactory.getLogger(this::class.java)
+
+    private val _allPaymentsFlow = MutableStateFlow<Map<String, PaymentRowState>>(HashMap())
+    val allPaymentsFlow: StateFlow<Map<String, PaymentRowState>> = _allPaymentsFlow
+
+    private val _recentPaymentsFlow = MutableStateFlow<Map<String, PaymentRowState>>(HashMap())
+    val recentPaymentsFlow: StateFlow<Map<String, PaymentRowState>> = _recentPaymentsFlow
+
+    private val allPaymentsPageFetcher: PaymentsPageFetcher
+    private val recentPaymentsPageFetcher: PaymentsPageFetcher
 
     init {
-        val paymentPageFetcher = paymentsManager.makePageFetcher()
-        paymentPageFetcher.subscribeToAll(0, 150)
+        allPaymentsPageFetcher = paymentsManager.makePageFetcher()
+        allPaymentsPageFetcher.subscribeToAll(offset = 0, count = 5)
+
+        recentPaymentsPageFetcher = paymentsManager.makePageFetcher()
+        recentPaymentsPageFetcher.subscribeToRecent(offset = 0, count = 5, seconds = (60 * 60 * 24 * 3))
 
         // get details when a payment completes
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
@@ -77,13 +85,28 @@ class HomeViewModel(
         }
 
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
-            log.error("failed to collect payments page items: ", e)
+            log.error("failed to collect all payments page items: ", e)
         }) {
-            paymentPageFetcher.paymentsPage.collect {
+            allPaymentsPageFetcher.paymentsPage.collect {
                 viewModelScope.launch(Dispatchers.Default) {
                     // rewrite all the payments flow map to keep payments ordering - adding the diff would put new elements to the bottom of the map
-                    _paymentsFlow.value = it.rows.map { row ->
-                        row.id.identifier to (_paymentsFlow.value[row.id.identifier] ?: run {
+                    _allPaymentsFlow.value = it.rows.associate { row ->
+                        row.id.identifier to (_allPaymentsFlow.value[row.id.identifier] ?: run {
+                            PaymentRowState(row, null)
+                        })
+                    }
+                }
+            }
+        }
+
+        viewModelScope.launch(CoroutineExceptionHandler { _, e ->
+            log.error("failed to collect recent payments page items: ", e)
+        }) {
+            recentPaymentsPageFetcher.paymentsPage.collect {
+                viewModelScope.launch(Dispatchers.Default) {
+                    // rewrite all the payments flow map to keep payments ordering - adding the diff would put new elements to the bottom of the map
+                    _recentPaymentsFlow.value = it.rows.map { row ->
+                        row.id.identifier to (_recentPaymentsFlow.value[row.id.identifier] ?: run {
                             PaymentRowState(row, null)
                         })
                     }.toMap()
@@ -97,21 +120,25 @@ class HomeViewModel(
             val paymentInfo = paymentsManager.fetcher.getPayment(row, WalletPaymentFetchOptions.Descriptions)
             if (paymentInfo != null) {
                 viewModelScope.launch(Dispatchers.Main) {
-                    _paymentsFlow.value += (row.id.identifier to PaymentRowState(row, paymentInfo))
+                    _recentPaymentsFlow.value += (row.id.identifier to PaymentRowState(row, paymentInfo))
+                    _allPaymentsFlow.value += (row.id.identifier to PaymentRowState(row, paymentInfo))
                 }
             }
         }
     }
 
+    /** Listens to changes in payments db for payments within given count and offset and updates the [allPaymentsFlow]. */
+    fun subscribeToAllPayments(offset: Int, count: Int) {
+        allPaymentsPageFetcher.subscribeToAll(offset, count)
+    }
+
     class Factory(
         private val connectionsFlow: StateFlow<Connections>,
         private val paymentsManager: PaymentsManager,
-        private val controllerFactory: ControllerFactory,
-        private val getController: ControllerFactory.() -> HomeController
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return HomeViewModel(connectionsFlow, paymentsManager, controllerFactory.getController()) as T
+            return PaymentsViewModel(connectionsFlow, paymentsManager) as T
         }
     }
 }

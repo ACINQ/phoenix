@@ -59,7 +59,7 @@ fun LnurlPayView(
     log.info { "init lnurl-pay view with url=${model.lnurlPay}" }
 
     val context = LocalContext.current
-    val balance = business.peerManager.balance.collectAsState(null).value
+    val balance = business.balanceManager.balance.collectAsState(null).value
     val prefUnit = preferredAmountUnit
     val rate = fiatRate
 
@@ -132,7 +132,7 @@ fun LnurlPayView(
                     RemoteErrorResponseView(model.lnurlPay, error)
                 }
                 FilledButton(
-                    text = R.string.lnurl_pay_pay_button,
+                    text = stringResource(id = R.string.lnurl_pay_pay_button),
                     icon = R.drawable.ic_send,
                     enabled = amount != null && amountErrorMessage.isBlank(),
                 ) {

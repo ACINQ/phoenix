@@ -16,10 +16,7 @@
 
 package fr.acinq.phoenix.android.settings
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Surface
@@ -59,8 +56,10 @@ fun TorConfigView(
         DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.tor_settings_title),
-            subtitle = stringResource(id = R.string.tor_settings_subtitle)
         )
+        Card {
+            Text(text = stringResource(id = R.string.tor_settings_subtitle), modifier = Modifier.padding(16.dp))
+        }
         val isTorEnabled = torEnabledState.value
         Card {
             if (isTorEnabled == null) {
@@ -80,7 +79,6 @@ fun TorConfigView(
                 )
             }
         }
-
         if (isTorEnabled == true) {
             Card {
                 val torState = connState.value.tor

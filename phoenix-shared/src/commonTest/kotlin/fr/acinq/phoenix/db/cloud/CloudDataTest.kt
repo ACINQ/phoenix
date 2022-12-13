@@ -14,7 +14,6 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
-import fr.acinq.phoenix.db.payments.IncomingReceivedWithData
 import fr.acinq.phoenix.runTest
 import fr.acinq.secp256k1.Hex
 import kotlin.test.*
@@ -22,7 +21,6 @@ import kotlin.test.*
 class CloudDataTest {
 
     private val preimage = randomBytes32()
-    private val paymentHash = Crypto.sha256(preimage).toByteVector32()
 
     private val bitcoinAddress = "1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb"
 
@@ -115,7 +113,7 @@ class CloudDataTest {
     fun incoming__receivedWith_newChannel() = runTest {
         val invoice = createInvoice(preimage, 10_000_000.msat)
         val receivedWith = IncomingPayment.ReceivedWith.NewChannel(
-            id = UUID.randomUUID(), amount = 7_000_000.msat, fees = 3_000_000.msat, channelId = channelId
+            id = UUID.randomUUID(), amount = 7_000_000.msat, serviceFee = 3_000_000.msat, channelId = channelId
         )
         testRoundtrip(
             IncomingPayment(
@@ -140,8 +138,8 @@ class CloudDataTest {
         val expectedChannelId = Hex.decode("e8a0e7ba91a485ed6857415cc0c60f77eda6cb1ebe1da841d42d7b4388cc2bcc").byteVector32()
         val expectedReceived = IncomingPayment.Received(
             receivedWith = setOf(
-                IncomingPayment.ReceivedWith.NewChannel(id = uuid1, amount = 7_000_000.msat, fees = 3_000_000.msat, channelId = expectedChannelId),
-                IncomingPayment.ReceivedWith.NewChannel(id = uuid2, amount = 9_000_000.msat, fees = 6_000_000.msat, channelId = expectedChannelId)
+                IncomingPayment.ReceivedWith.NewChannel(id = uuid1, amount = 7_000_000.msat, serviceFee = 3_000_000.msat, channelId = expectedChannelId),
+                IncomingPayment.ReceivedWith.NewChannel(id = uuid2, amount = 9_000_000.msat, serviceFee = 6_000_000.msat, channelId = expectedChannelId)
             ),
             receivedAt = 1658246347319
         )

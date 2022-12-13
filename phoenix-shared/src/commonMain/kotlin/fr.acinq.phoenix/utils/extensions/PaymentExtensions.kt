@@ -1,10 +1,27 @@
-package fr.acinq.phoenix.utils
+/*
+ * Copyright 2022 ACINQ SAS
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package fr.acinq.phoenix.utils.extensions
 
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.data.Chain
+import fr.acinq.phoenix.db.payments.IncomingReceivedWithData
 import org.kodein.memory.util.freeze
 
 /**
@@ -30,9 +47,16 @@ fun WalletPayment.state(): WalletPaymentState = when (this) {
         is OutgoingPayment.Status.Completed.Succeeded.OnChain -> WalletPaymentState.Success
         is OutgoingPayment.Status.Completed.Succeeded.OffChain -> WalletPaymentState.Success
     }
-    is IncomingPayment -> when (received) {
+    is IncomingPayment -> when (val received = received) {
         null -> WalletPaymentState.Pending
-        else -> WalletPaymentState.Success
+        else -> {
+            if (received.receivedWith.all {
+                when (it) {
+                    is IncomingPayment.ReceivedWith.NewChannel -> it.confirmed
+                    else -> true
+                }
+            }) WalletPaymentState.Success else WalletPaymentState.Pending
+        }
     }
 }
 

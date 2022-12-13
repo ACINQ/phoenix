@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.db.IncomingPayment
@@ -51,7 +52,7 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.utils.createdAt
+import fr.acinq.phoenix.utils.extensions.createdAt
 
 
 @Composable
@@ -77,7 +78,7 @@ fun PaymentDetailsTechnicalView(
 
             val receivedWith = payment.received?.receivedWith
             if (!receivedWith.isNullOrEmpty()) {
-                Text(text = stringResource(id = R.string.paymentdetails_parts_label), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, style = MaterialTheme.typography.subtitle1)
+                Text(text = stringResource(id = R.string.paymentdetails_parts_label, receivedWith.size), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, style = MaterialTheme.typography.subtitle1)
                 receivedWith.forEach {
                     TechnicalCard {
                         when (it) {
@@ -104,7 +105,7 @@ fun PaymentDetailsTechnicalView(
             val lightningParts = payment.parts.filterIsInstance<OutgoingPayment.LightningPart>().filter { it.status is OutgoingPayment.LightningPart.Status.Succeeded }
             val closingTxsParts = payment.parts.filterIsInstance<OutgoingPayment.ClosingTxPart>()
             if (lightningParts.isNotEmpty() || closingTxsParts.isNotEmpty()) {
-                Text(text = stringResource(id = R.string.paymentdetails_parts_label), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, style = MaterialTheme.typography.subtitle1)
+                Text(text = stringResource(id = R.string.paymentdetails_parts_label, payment.parts.size), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, style = MaterialTheme.typography.subtitle1)
             }
             lightningParts.forEachIndexed { index, part ->
                 TechnicalCard {
@@ -185,13 +186,16 @@ private fun TimestampSection(
         }
     }
 
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_created_at_label)) {
-        Text(text = payment.createdAt.toAbsoluteDateString())
-    }
+    // show time to completion for outgoing payments, when relevant
+    if (payment is OutgoingPayment && (payment.details is OutgoingPayment.Details.Normal || payment.details is OutgoingPayment.Details.ChannelClosing)) {
+        TechnicalRow(label = stringResource(id = R.string.paymentdetails_created_at_label)) {
+            Text(text = payment.createdAt.toAbsoluteDateString())
+        }
 
-    if (payment.completedAt() > 0) {
-        TechnicalRow(label = stringResource(id = R.string.paymentdetails_elapsed_label)) {
-            Text(text = stringResource(id = R.string.paymentdetails_elapsed, (payment.completedAt() - payment.createdAt).toString()))
+        if (payment.completedAt() > 0) {
+            TechnicalRow(label = stringResource(id = R.string.paymentdetails_elapsed_label)) {
+                Text(text = stringResource(id = R.string.paymentdetails_elapsed, (payment.completedAt() - payment.createdAt).toString()))
+            }
         }
     }
 }
@@ -239,7 +243,9 @@ private fun DetailsForOutgoingPayment(
             TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = details.paymentHash.toHex())
         }
         is OutgoingPayment.Details.ChannelClosing -> {
-            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_closing_channel_label), value = details.channelId.toHex())
+            if (details.channelId != ByteVector32.Zeroes) {
+                TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_closing_channel_label), value = details.channelId.toHex())
+            }
             TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_closing_address_label), value = details.closingAddress)
         }
     }
@@ -268,14 +274,12 @@ private fun DetailsForIncoming(
             InvoiceSection(paymentRequest = origin.paymentRequest)
         }
         is IncomingPayment.Origin.SwapIn -> {
-            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = payment.preimage.toHex())
             TechnicalRow(label = stringResource(id = R.string.paymentdetails_swapin_address_label)) {
                 Text(origin.address ?: stringResource(id = R.string.utils_unknown))
             }
         }
         is IncomingPayment.Origin.KeySend -> {}
         is IncomingPayment.Origin.DualSwapIn -> {
-            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = payment.preimage.toHex())
             TechnicalRow(label = stringResource(id = R.string.paymentdetails_dualswapin_tx_label)) {
                 origin.localInputs.mapIndexed { index, outpoint ->
                     Row {
@@ -297,9 +301,10 @@ private fun ReceivedWithLightning(
     TechnicalRow(label = stringResource(id = R.string.paymentdetails_received_with_label)) {
         Text(text = stringResource(id = R.string.paymentdetails_received_with_lightning))
     }
-    val channelId = receivedWith.channelId
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_channel_id_label)) {
-        Text(text = channelId.toHex())
+    if (receivedWith.channelId != ByteVector32.Zeroes) {
+        TechnicalRow(label = stringResource(id = R.string.paymentdetails_channel_id_label)) {
+            Text(text = receivedWith.channelId.toHex())
+        }
     }
     TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
 }
@@ -313,7 +318,7 @@ private fun ReceivedWithNewChannel(
         Text(text = stringResource(id = R.string.paymentdetails_received_with_channel))
     }
     val channelId = receivedWith.channelId
-    if (channelId != null) {
+    if (channelId != null && channelId != ByteVector32.Zeroes) {
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_channel_id_label)) {
             Text(text = channelId.toHex())
         }

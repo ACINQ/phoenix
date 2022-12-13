@@ -111,6 +111,7 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
 
         /** The status blob may contain closing transaction data, when type is [OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0]. */
         fun getClosingPartsFromV0OnchainStatus(): List<OutgoingPayment.ClosingTxPart> {
+            @Suppress("DEPRECATION")
             return if (OutgoingStatusTypeVersion.valueOf(type) == OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0) {
                 OutgoingStatusData.getClosingPartsFromV0Status(blob, ts)
             } else {

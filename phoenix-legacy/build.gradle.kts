@@ -31,7 +31,7 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
-    val libCode = 36
+    val libCode = 40
     getByName("debug") {
       resValue("string", "CHAIN", chain)
       buildConfigField("String", "CHAIN", chain)
@@ -81,7 +81,7 @@ dependencies {
   implementation("com.google.android.material:material:${Versions.AndroidLegacy.material}")
 
   // ANDROIDX
-  implementation("androidx.core:core-ktx:${Versions.Android.ktx}")
+  implementation("androidx.core:core-ktx:${Versions.Android.coreKtx}")
   implementation("androidx.appcompat:appcompat:${Versions.AndroidLegacy.appCompat}")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.serialization}")
   // ANDROIDX - navigation

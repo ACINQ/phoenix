@@ -1,19 +1,3 @@
-<!--
-  ~ Copyright 2022 ACINQ SAS
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="@dimen/icon_size"
     android:height="@dimen/icon_size"
@@ -21,28 +5,28 @@
     android:viewportHeight="24">
     <path
         android:fillColor="#00000000"
-        android:pathData="M22,12L2,12"
+        android:pathData="M4,2L20,2A2,2 0,0 1,22 4L22,8A2,2 0,0 1,20 10L4,10A2,2 0,0 1,2 8L2,4A2,2 0,0 1,4 2z"
         android:strokeWidth="1.5"
         android:strokeColor="?attr/colorPrimary"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
     <path
         android:fillColor="#00000000"
-        android:pathData="M5.45,5.11L2,12v6a2,2 0,0 0,2 2h16a2,2 0,0 0,2 -2v-6l-3.45,-6.89A2,2 0,0 0,16.76 4H7.24a2,2 0,0 0,-1.79 1.11z"
+        android:pathData="M4,14L20,14A2,2 0,0 1,22 16L22,20A2,2 0,0 1,20 22L4,22A2,2 0,0 1,2 20L2,16A2,2 0,0 1,4 14z"
         android:strokeWidth="1.5"
         android:strokeColor="?attr/colorPrimary"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
     <path
         android:fillColor="#00000000"
-        android:pathData="M6,16L6.01,16"
+        android:pathData="M6,6L6.01,6"
         android:strokeWidth="1.5"
         android:strokeColor="?attr/colorPrimary"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
     <path
         android:fillColor="#00000000"
-        android:pathData="M10,16L10.01,16"
+        android:pathData="M6,18L6.01,18"
         android:strokeWidth="1.5"
         android:strokeColor="?attr/colorPrimary"
         android:strokeLineCap="round"

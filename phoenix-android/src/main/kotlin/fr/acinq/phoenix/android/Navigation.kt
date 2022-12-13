@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.android
 
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
@@ -25,6 +24,7 @@ import org.kodein.log.newLogger
 
 sealed class Screen(val route: String) {
     object SwitchToLegacy : Screen("switchtolegacy")
+    object Intro : Screen("intro")
     object InitWallet : Screen("initwallet")
     object CreateWallet : Screen("createwallet")
     object RestoreWallet : Screen("restorewallet")
@@ -36,7 +36,8 @@ sealed class Screen(val route: String) {
      * TODO: Separate scanning the data from processing the data (aka send payment, process lnurl...). Split to be done at the controller level.
      */
     object ScanData : Screen("readdata")
-    object PaymentDetails : Screen("payment")
+    object PaymentDetails : Screen("payments")
+    object PaymentsHistory : Screen("payments/all")
 
     // -- settings
     object Settings : Screen("settings")
@@ -45,6 +46,7 @@ sealed class Screen(val route: String) {
     object TorConfig : Screen("settings/tor")
     object Channels : Screen("settings/channels")
     object MutualClose : Screen("settings/mutualclose")
+    object ForceClose : Screen("settings/forceclose")
     object Preferences : Screen("settings/preferences")
     object About : Screen("settings/about")
     object AppLock : Screen("settings/applock")
@@ -52,8 +54,8 @@ sealed class Screen(val route: String) {
     object Logs : Screen("settings/logs")
 }
 
-fun NavHostController.navigate(screen: Screen, arg: List<Any> = emptyList(), builder: NavOptionsBuilder.() -> Unit = {}) {
-    val log = newLogger<NavController>(LoggerFactory.default)
+fun NavController.navigate(screen: Screen, arg: List<Any> = emptyList(), builder: NavOptionsBuilder.() -> Unit = {}) {
+    val log = newLogger(LoggerFactory.default)
     val path = arg.joinToString{ "/$it" }
     val route = "${screen.route}$path"
     log.debug { "navigating from ${currentDestination?.route} to $route" }

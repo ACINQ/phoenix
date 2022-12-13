@@ -148,6 +148,7 @@ object UserPrefs {
     suspend fun saveIsAutoPayToOpenEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[AUTO_PAY_TO_OPEN] = isEnabled }
 
     // -- lnurl authentication key
+
     private val LNURL_AUTH_KEY_TYPE = intPreferencesKey("LNURL_AUTH_KEY_TYPE")
     fun getLnurlAuthKeyType(context: Context): Flow<LNUrl.Auth.KeyType?> = prefs(context).map {
         when (it[LNURL_AUTH_KEY_TYPE]) {

@@ -23,22 +23,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 
-
-@Composable
-fun SettingCategory(textResId: Int) {
-    Text(
-        text = stringResource(id = textResId),
-        style = MaterialTheme.typography.subtitle1.copy(fontSize = 14.sp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 58.dp, top = 24.dp, end = 0.dp, bottom = 4.dp)
-    )
-}
 
 @Composable
 fun Setting(modifier: Modifier = Modifier, title: String, description: String?) {
@@ -108,25 +98,45 @@ fun SettingInteractive(
     title: String,
     description: @Composable () -> Unit = {},
     icon: Int? = null,
+    iconTint: Color? = null,
+    maxTitleLines: Int = Int.MAX_VALUE,
     enabled: Boolean = true,
     onClick: (() -> Unit)
 ) {
-    if (icon != null) {
-        SettingWithDecoration(
-            title = title,
-            description = description,
-            decoration = { PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize)) },
-            modifier = modifier.clickable(onClick = { if (enabled) onClick() })
-                .enableOrFade(enabled)
-        )
-    } else {
-        SettingWithDecoration(
-            title = title,
-            description = description,
-            decoration = null,
-            modifier = modifier.clickable(onClick = { if (enabled) onClick() })
-                .enableOrFade(enabled)
-        )
+    Column(
+        modifier
+            .fillMaxWidth()
+            .clickable(onClick = { if (enabled) onClick() })
+            .enableOrFade(enabled)
+            .padding(16.dp),
+    ) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (icon != null) {
+                PhoenixIcon(icon, tint = iconTint ?: LocalContentColor.current, modifier = Modifier.size(ButtonDefaults.IconSize))
+                Spacer(Modifier.width(16.dp))
+            }
+            Text(
+                text = title,
+                style = MaterialTheme.typography.body2,
+                modifier = Modifier.weight(1f),
+                maxLines = maxTitleLines,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Spacer(modifier = Modifier.height(2.dp))
+        Row(Modifier.fillMaxWidth()) {
+            if (icon != null) {
+                Spacer(modifier = Modifier.width(34.dp))
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.subtitle2) {
+                    description()
+                }
+            }
+        }
     }
 }
 

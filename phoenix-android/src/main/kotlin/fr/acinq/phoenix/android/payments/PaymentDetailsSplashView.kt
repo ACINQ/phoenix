@@ -16,138 +16,168 @@
 
 package fr.acinq.phoenix.android.payments
 
+import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
+import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
+import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateString
+import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.utils.errorMessage
+import fr.acinq.phoenix.utils.extensions.errorMessage
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun PaymentDetailsSplashView(
     data: WalletPaymentInfo,
-    onDetailsClick: (WalletPaymentId) -> Unit
+    onDetailsClick: (WalletPaymentId) -> Unit,
+    onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
+    fromEvent: Boolean,
 ) {
+    val context = LocalContext.current
     val payment = data.payment
     var showEditDescriptionDialog by remember { mutableStateOf(false) }
 
-    // status
-    PaymentStatus(payment)
-    Spacer(modifier = Modifier.height(72.dp))
-
-    // details
     Column(
         modifier = Modifier
-            .widthIn(500.dp)
-            .clip(RoundedCornerShape(32.dp))
-            .background(MaterialTheme.colors.surface)
-            .padding(top = 36.dp, bottom = 8.dp, start = 24.dp, end = 24.dp),
+            .fillMaxSize()
+            .padding(vertical = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        AmountView(
-            amount = payment.amount,
-            amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 32.sp, fontFamily = FontFamily.Default, fontWeight = FontWeight.Light),
-            unitTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp, fontFamily = FontFamily.Default, fontWeight = FontWeight.Light),
-            separatorSpace = 4.dp,
-            isOutgoing = payment is OutgoingPayment
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-        PrimarySeparator(height = 6.dp)
-        Spacer(modifier = Modifier.height(28.dp))
+        // status
+        PaymentStatus(payment, fromEvent)
+        Spacer(modifier = Modifier.height(58.dp))
 
-        DetailsRow(
-            label = stringResource(id = R.string.paymentdetails_desc_label),
-            value = when (payment) {
-                is OutgoingPayment -> when (val details = payment.details) {
-                    is OutgoingPayment.Details.Normal -> details.paymentRequest.description ?: details.paymentRequest.descriptionHash?.toHex()
-                    is OutgoingPayment.Details.ChannelClosing -> "Closing channel ${details.channelId}"
-                    is OutgoingPayment.Details.KeySend -> "Donation"
-                    is OutgoingPayment.Details.SwapOut -> "Swap to a Bitcoin address"
-                }
-                is IncomingPayment -> when (val origin = payment.origin) {
-                    is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description ?: origin.paymentRequest.descriptionHash?.toHex()
-                    is IncomingPayment.Origin.KeySend -> "Spontaneous payment"
-                    is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.DualSwapIn -> "On-chain swap deposit"
-                }
-                else -> null
-            }?.takeIf { it.isNotBlank() },
-            fallbackValue = stringResource(id = R.string.paymentdetails_no_description)
-        )
-
-        if (payment is OutgoingPayment) {
-            Spacer(modifier = Modifier.height(8.dp))
-            DetailsRow(
-                label = stringResource(id = R.string.paymentdetails_destination_label),
-                value = when (val details = payment.details) {
-                    is OutgoingPayment.Details.Normal -> details.paymentRequest.nodeId.toString()
-                    is OutgoingPayment.Details.ChannelClosing -> details.closingAddress
-                    is OutgoingPayment.Details.KeySend -> null
-                    is OutgoingPayment.Details.SwapOut -> details.address
-                },
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-
-        payment.errorMessage()?.let { errorMessage ->
-            Spacer(modifier = Modifier.height(8.dp))
-            DetailsRow(
-                label = stringResource(id = R.string.paymentdetails_error_label),
-                value = errorMessage
-            )
-        }
-
-        Spacer(modifier = Modifier.height(28.dp))
-
-        Row(
-            modifier = Modifier.height(44.dp),
-            horizontalArrangement = Arrangement.Center
+        // details
+        Card(
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(36.dp))
+            AmountWithAltView(
+                amount = payment.amount,
+                amountTextStyle = MaterialTheme.typography.h2,
+                unitTextStyle = MaterialTheme.typography.h4,
+                separatorSpace = 4.dp,
+                isOutgoing = payment is OutgoingPayment
+            )
+            Spacer(modifier = Modifier.height(36.dp))
+
+            val paymentDesc = remember(payment) {
+                when (payment) {
+                    is OutgoingPayment -> when (val details = payment.details) {
+                        is OutgoingPayment.Details.Normal -> details.paymentRequest.description ?: details.paymentRequest.descriptionHash?.toHex()
+                        is OutgoingPayment.Details.ChannelClosing -> context.getString(R.string.paymentdetails_desc_closing_channel)
+                        is OutgoingPayment.Details.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
+                        is OutgoingPayment.Details.SwapOut -> context.getString(R.string.paymentdetails_desc_swapout, details.address)
+                    }
+                    is IncomingPayment -> when (val origin = payment.origin) {
+                        is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description ?: origin.paymentRequest.descriptionHash?.toHex()
+                        is IncomingPayment.Origin.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
+                        is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.DualSwapIn -> context.getString(R.string.paymentdetails_desc_swapin)
+                    }
+                    else -> null
+                }?.takeIf { it.isNotBlank() }
+            }
+            val customDesc = remember(data) { data.metadata.userDescription?.takeIf { it.isNotBlank() } }
+            DetailsRow(
+                label = stringResource(id = R.string.paymentdetails_desc_label),
+                // if no default desc, show custom desc.
+                value = paymentDesc ?: customDesc ?: stringResource(id = R.string.paymentdetails_no_description),
+                additionalContent = {
+                    if (paymentDesc != null && customDesc != null) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        HSeparator(width = 50.dp)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = customDesc)
+                    }
+                    Button(
+                        text = stringResource(id = when (customDesc) {
+                            null -> R.string.paymentdetails_attach_desc_button
+                            else -> R.string.paymentdetails_edit_desc_button
+                        }),
+                        textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
+                        modifier = Modifier.offset(x = (-8).dp),
+                        icon = R.drawable.ic_text,
+                        space = 6.dp,
+                        shape = CircleShape,
+                        padding = PaddingValues(8.dp),
+                        onClick = { showEditDescriptionDialog = true }
+                    )
+                },
+                fallbackValue = stringResource(id = R.string.paymentdetails_no_description)
+            )
+
+            if (payment is OutgoingPayment) {
+                Spacer(modifier = Modifier.height(8.dp))
+                DetailsRow(
+                    label = stringResource(id = R.string.paymentdetails_destination_label),
+                    value = when (val details = payment.details) {
+                        is OutgoingPayment.Details.Normal -> details.paymentRequest.nodeId.toString()
+                        is OutgoingPayment.Details.ChannelClosing -> details.closingAddress
+                        is OutgoingPayment.Details.KeySend -> null
+                        is OutgoingPayment.Details.SwapOut -> details.address
+                    },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            DetailsRow(
+                label = stringResource(id = R.string.paymentdetails_fees_label),
+                value = payment.fees.toPrettyString(LocalBitcoinUnit.current, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW)
+            )
+
+            payment.errorMessage()?.let { errorMessage ->
+                Spacer(modifier = Modifier.height(8.dp))
+                DetailsRow(
+                    label = stringResource(id = R.string.paymentdetails_error_label),
+                    value = errorMessage
+                )
+            }
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        Card(shape = CircleShape) {
             Button(
                 text = stringResource(id = R.string.paymentdetails_details_button),
-                textStyle = MaterialTheme.typography.caption,
-                space = 4.dp,
-                padding = PaddingValues(horizontal = 20.dp, vertical = 10.dp),
-                onClick = {
-                    onDetailsClick(data.id())
-                })
-            VSeparator(padding = PaddingValues(vertical = 8.dp))
-            Button(
-                text = stringResource(id = R.string.paymentdetails_edit_button),
-                space = 4.dp,
-                textStyle = MaterialTheme.typography.caption,
-                padding = PaddingValues(horizontal = 20.dp, vertical = 10.dp),
-                onClick = { showEditDescriptionDialog = true })
+                icon = R.drawable.ic_tool,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onDetailsClick(data.id()) },
+            )
         }
     }
 
@@ -155,7 +185,7 @@ fun PaymentDetailsSplashView(
         EditPaymentDetails(
             initialDescription = data.metadata.userDescription,
             onConfirm = {
-                // TODO: save user desc
+                onMetadataDescriptionUpdate(data.id(), it?.trim()?.takeIf { it.isNotBlank() })
                 showEditDescriptionDialog = false
             },
             onDismiss = { showEditDescriptionDialog = false }
@@ -165,23 +195,27 @@ fun PaymentDetailsSplashView(
 
 @Composable
 private fun PaymentStatus(
-    payment: WalletPayment
+    payment: WalletPayment,
+    fromEvent: Boolean,
 ) {
     when (payment) {
         is OutgoingPayment -> when (payment.status) {
             is OutgoingPayment.Status.Pending -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_pending),
                 imageResId = R.drawable.ic_payment_details_pending_static,
+                isAnimated = false,
                 color = mutedTextColor()
             )
             is OutgoingPayment.Status.Completed.Failed -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_failed),
                 imageResId = R.drawable.ic_payment_details_failure_static,
+                isAnimated = false,
                 color = negativeColor()
             )
             is OutgoingPayment.Status.Completed.Succeeded -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_successful),
-                imageResId = R.drawable.ic_payment_details_success_static,
+                imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
+                isAnimated = fromEvent,
                 color = positiveColor(),
                 timestamp = payment.completedAt()
             )
@@ -190,11 +224,13 @@ private fun PaymentStatus(
             null -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_received_pending),
                 imageResId = R.drawable.ic_payment_details_pending_static,
+                isAnimated = false,
                 color = mutedTextColor()
             )
             else -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_received_successful),
-                imageResId = R.drawable.ic_payment_details_success_static,
+                imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
+                isAnimated = fromEvent,
                 color = positiveColor(),
                 timestamp = payment.received?.receivedAt
             )
@@ -202,23 +238,39 @@ private fun PaymentStatus(
     }
 }
 
+@OptIn(ExperimentalAnimationGraphicsApi::class)
 @Composable
 private fun PaymentStatusIcon(
     message: String,
     timestamp: Long? = null,
+    isAnimated: Boolean,
     imageResId: Int,
     color: Color,
 ) {
+    val scope = rememberCoroutineScope()
+    var atEnd by remember { mutableStateOf(false) }
     Image(
-        painter = painterResource(id = imageResId),
-        contentDescription = message,
+        painter = if (isAnimated) {
+            rememberAnimatedVectorPainter(AnimatedImageVector.animatedVectorResource(imageResId), atEnd)
+        } else {
+            painterResource(id = imageResId)
+        },
+        contentDescription = null,
         colorFilter = ColorFilter.tint(color),
-        modifier = Modifier.size(80.dp)
+        modifier = Modifier.size(90.dp)
     )
+    if (isAnimated) {
+        LaunchedEffect(key1 = Unit) {
+            scope.launch {
+                delay(150)
+                atEnd = true
+            }
+        }
+    }
     Spacer(Modifier.height(16.dp))
     Text(text = message.uppercase(), style = MaterialTheme.typography.body2)
     timestamp?.let {
-        Text(text = timestamp.toRelativeDateString(), style = MaterialTheme.typography.caption)
+        Text(text = timestamp.toAbsoluteDateString(), style = MaterialTheme.typography.caption)
     }
 }
 
@@ -226,20 +278,31 @@ private fun PaymentStatusIcon(
 private fun DetailsRow(
     label: String,
     value: String?,
+    additionalContent: (@Composable () -> Unit)? = null,
     fallbackValue: String = stringResource(id = R.string.utils_unknown),
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip
 ) {
-    Row {
-        Text(text = label, style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.End), modifier = Modifier.width(96.dp))
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 24.dp)
+            .widthIn(max = 400.dp)
+    ) {
+        Text(text = label, style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.End), modifier = Modifier.weight(.7f))
         Spacer(Modifier.width(8.dp))
-        Text(
-            text = value ?: fallbackValue,
-            style = MaterialTheme.typography.body1.copy(fontStyle = if (value == null) FontStyle.Italic else FontStyle.Normal),
-            modifier = Modifier.width(300.dp),
-            maxLines = maxLines,
-            overflow = overflow,
-        )
+        Column(
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = value ?: fallbackValue,
+                style = MaterialTheme.typography.body1.copy(fontStyle = if (value == null) FontStyle.Italic else FontStyle.Normal),
+                maxLines = maxLines,
+                overflow = overflow,
+            )
+            if (additionalContent != null) {
+                additionalContent()
+            }
+        }
     }
 }
 

@@ -15,7 +15,7 @@ import org.kodein.memory.use
 import kotlin.time.Duration.Companion.seconds
 
 
-class LogMemory(val directory: Path) : LogFrontend {
+class LogMemory(val directory: Path) : LogFrontend, CoroutineScope by MainScope() {
 
     data class Line(val instant: Instant, val tag: Logger.Tag, val entry: Logger.Entry, val message: String?)
 
@@ -32,7 +32,7 @@ class LogMemory(val directory: Path) : LogFrontend {
     init {
         directory.createDirs()
 
-        MainScope().launch {
+        launch {
             while (true) {
                 delay(every)
                 if (Clock.System.now() - lastRotate >= (every / 2)) {
@@ -73,6 +73,7 @@ class LogMemory(val directory: Path) : LogFrontend {
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 private fun writeLogs(lines: List<LogMemory.Line>, file: Path): Job = GlobalScope.launch(Dispatchers.Default) {
     val allLines = buildString {
         lines.forEach { line ->

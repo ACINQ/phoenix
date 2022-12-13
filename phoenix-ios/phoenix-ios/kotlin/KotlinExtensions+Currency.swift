@@ -577,3 +577,10 @@ extension BitcoinUnit {
 		return self.name
 	}
 }
+
+extension ExchangeRate {
+	
+	var timestamp: Date {
+		return timestampMillis.toDate(from: .milliseconds)
+	}
+}

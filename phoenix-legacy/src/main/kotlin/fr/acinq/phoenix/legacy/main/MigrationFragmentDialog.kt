@@ -21,23 +21,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.*
-import fr.acinq.bitcoin.scala.Crypto
-import fr.acinq.eclair.wire.PhoenixAndroidLegacyMigrateResponse
-import fr.acinq.eclair.wire.SwapInResponse
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import fr.acinq.eclair.db.Databases.FileBackup
 import fr.acinq.phoenix.legacy.AppViewModel
 import fr.acinq.phoenix.legacy.databinding.FragmentMigrationBinding
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.MigrationResult
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.File
 
 class MigrationFragmentDialog : DialogFragment() {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -55,62 +55,46 @@ class MigrationFragmentDialog : DialogFragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(MigrationDialogViewModel::class.java)
     activity?.let { activity ->
-      app = ViewModelProvider(activity).get(AppViewModel::class.java)
+      app = ViewModelProvider(activity)[AppViewModel::class.java]
     } ?: dismiss()
 
+    val context = requireContext()
     isCancelable = false
 
     model.state.observe(viewLifecycleOwner) {
-      log.info("migration state=>$it")
       when (it) {
-        is MigrationScreenState.Acked -> {
-          lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
-            log.error("migration failed, error when requesting swap-in address: ", exception)
-            model.state.value = MigrationScreenState.Failure.SwapInError
-          }) {
-            delay(500)
-            val state = model.state.value
-            if (state is MigrationScreenState.Acked) {
-              model.state.value = MigrationScreenState.RequestingSwapInAddress(state.newNodeId)
-              delay(500)
-              app.requireService.requestSwapIn()
-            }
-          }
-        }
-        is MigrationScreenState.ReceivedSwapInAddress -> {
+        is MigrationScreenState.ReadyToClose -> {
           lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
             log.error("migration failed, error in mutal close: ", exception)
             model.state.value = MigrationScreenState.Failure.ClosingError
           }) {
             delay(500)
-            val context = requireContext()
             val state = model.state.value
-            if (state is MigrationScreenState.ReceivedSwapInAddress) {
-              val newNodeId = state.newNodeId
-              model.state.value = MigrationScreenState.RequestingChannelsClosing(state.newNodeId, it.address)
+            if (state is MigrationScreenState.ReadyToClose) {
+              model.state.value = MigrationScreenState.ClosingChannels(state.address)
               delay(500)
-              log.info("closing channels to ${it.address} for migration to new wallet")
+              log.info("(migration) closing channels to ${state.address}")
               app.requireService.mutualCloseAllChannels(it.address)
-              log.info("channels closing completed!")
-              model.state.value = MigrationScreenState.CompletedChannelsClosing(newNodeId, it.address)
+              log.info("(migration) channels successfully closed to ${state.address}")
+              model.state.value = MigrationScreenState.ClosingChannels(state.address)
+              // force db backup that will be used later for the the payments data migration
+              val db = app.service?.state?.value?.kit()?.nodeParams()?.db()
+              (db as? FileBackup)?.backup(File(Wallet.getChainDatadir(context), "eclair.sqlite.back"))
+              PrefsDatastore.saveDataMigrationExpected(context, true)
               PrefsDatastore.saveMigrationResult(
                 context, MigrationResult(
                   legacyNodeId = app.state.value?.getNodeId()?.toString()!!,
-                  newNodeId = newNodeId.toString(),
-                  address = it.address
+                  newNodeId = app.state.value?.getKmpNodeId().toString(),
+                  address = state.address
                 )
               )
               PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.NotRequired)
             }
           }
         }
-        is MigrationScreenState.RequestingChannelsClosing -> {
-          log.info("closing...")
+        else -> {
+          log.info("migration state=$it")
         }
-        is MigrationScreenState.CompletedChannelsClosing -> {
-          log.info("closed!")
-        }
-        else -> {}
       }
     }
     mBinding.model = model
@@ -118,48 +102,27 @@ class MigrationFragmentDialog : DialogFragment() {
 
   override fun onStart() {
     super.onStart()
-    if (!EventBus.getDefault().isRegistered(this)) {
-      EventBus.getDefault().register(this)
-    }
     mBinding.dismissButton.setOnClickListener { dismiss() }
     mBinding.upgradeButton.setOnClickListener {
       if (model.state.value is MigrationScreenState.Ready) {
-        model.state.value = MigrationScreenState.Notifying
-        app.service?.sendLegacyMigrationSignal()
+        model.state.value = MigrationScreenState.RequestingKmpSwapInAddress
+        val swapInAddress = app.service?.state?.value?.getKmpSwapInAddress()
+        if (swapInAddress == null) {
+          model.state.value = MigrationScreenState.Failure.SwapInError
+        } else {
+          model.state.value = MigrationScreenState.ReadyToClose(swapInAddress)
+        }
       }
     }
   }
-
-  override fun onStop() {
-    super.onStop()
-    EventBus.getDefault().unregister(this)
-  }
-
-  @Subscribe(threadMode = ThreadMode.MAIN)
-  fun handleEvent(event: PhoenixAndroidLegacyMigrateResponse) {
-    log.info("peer acked migration request to nodeid=${event.newNodeId()}")
-    model.state.value = MigrationScreenState.Acked(event.newNodeId())
-  }
-
-  @Subscribe(threadMode = ThreadMode.MAIN)
-  fun handleEvent(event: SwapInResponse) {
-    log.info("received swap-in response with address=${event.bitcoinAddress()}")
-    val state = model.state.value
-    if (state is MigrationScreenState.RequestingSwapInAddress) {
-      model.state.value = MigrationScreenState.ReceivedSwapInAddress(state.newNodeId, event.bitcoinAddress())
-    }
-  }
-
 }
 
 sealed class MigrationScreenState {
   object Ready : MigrationScreenState()
-  object Notifying : MigrationScreenState()
-  data class Acked(val newNodeId: Crypto.PublicKey) : MigrationScreenState()
-  data class RequestingSwapInAddress(val newNodeId: Crypto.PublicKey) : MigrationScreenState()
-  data class ReceivedSwapInAddress(val newNodeId: Crypto.PublicKey, val address: String) : MigrationScreenState()
-  data class RequestingChannelsClosing(val newNodeId: Crypto.PublicKey, val address: String) : MigrationScreenState()
-  data class CompletedChannelsClosing(val newNodeId: Crypto.PublicKey, val address: String) : MigrationScreenState()
+  object RequestingKmpSwapInAddress: MigrationScreenState()
+  data class ReadyToClose(val address: String): MigrationScreenState()
+  data class ClosingChannels(val address: String) : MigrationScreenState()
+  data class ChannelsClosed(val address: String) : MigrationScreenState()
   sealed class Failure : MigrationScreenState() {
     object ClosingError : Failure()
     object SwapInError : Failure()
@@ -169,10 +132,4 @@ sealed class MigrationScreenState {
 class MigrationDialogViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(this::class.java)
   val state = MutableLiveData<MigrationScreenState>(MigrationScreenState.Ready)
-
-  fun closeChannels(address: String) {
-    viewModelScope.launch {
-
-    }
-  }
 }

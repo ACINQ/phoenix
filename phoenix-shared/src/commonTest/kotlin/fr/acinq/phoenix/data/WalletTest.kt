@@ -39,14 +39,6 @@ class WalletTest {
     }
 
     @Test
-    fun onchainAddress() {
-        // Mainnet
-        assertEquals(mainnetWallet.onchainAddress("m/84'/0'/0'/0/0"), "bc1qcr8te4kr609gcawutmrza0j4xv80jy8z306fyu")
-        // Testnet
-        assertEquals(testnetWallet.onchainAddress("m/84'/1'/0'/0/0"), "tb1q6rz28mcfaxtmd6v789l9rrlrusdprr9pqcpvkl")
-    }
-
-    @Test
     fun lnurlAuthPath() {
         // Test vector from spec:
         // https://github.com/fiatjaf/lnurl-rfc/blob/luds/05.md

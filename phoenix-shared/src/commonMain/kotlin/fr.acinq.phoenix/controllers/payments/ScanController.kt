@@ -42,12 +42,10 @@ import fr.acinq.phoenix.managers.LNUrlManager
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.PublicSuffixList
-import fr.acinq.phoenix.utils.chain
+import fr.acinq.phoenix.utils.extensions.chain
 import fr.acinq.phoenix.utils.createTrampolineFees
 import io.ktor.http.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.JsonObject
@@ -111,6 +109,7 @@ class AppScanController(
                             )
                         }
                     }
+                    else -> {}
                 }
             }
         }

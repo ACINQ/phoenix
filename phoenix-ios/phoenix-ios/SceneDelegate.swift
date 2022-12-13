@@ -18,6 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	var cancellables = Set<AnyCancellable>()
 	
 	var lockWindow: UIWindow?
+	var resetWalletWindow: UIWindow?
 	var errorWindow: UIWindow?
 	
 	var isAppLaunch = true
@@ -32,45 +33,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		log.trace("scene(_:willConnectTo:options:)")
 		
 		if let windowScene = scene as? UIWindowScene {
-			
-			let contentView = ContentView()
-			
-			let window = UIWindow(windowScene: windowScene)
-			window.rootViewController = UIHostingController(rootView: contentView)
-			window.windowLevel = .normal
-			
-			// Set the app-wide tint/accent color scheme.
-			//
-			// Credit for bug fix:
-			// https://adampaxton.com/how-to-globally-set-a-tint-or-accent-color-in-swiftui/
-			//
-			window.tintColor = UIColor.appAccent
-			
-			// Set the app-wide color scheme.
-			//
-			// There are other ways to accomplish this, but they are buggy.
-			//
-			// SwiftUI offers 2 similar methods:
-			// - .colorScheme()
-			// - .preferredColorScheme()
-			//
-			// I used multiple variations to make those work, but all variations had bugs.
-			// If you use only colorScheme(), certain UI elements like the statusBar don't adapt properly.
-			// If you use only the preferredColorScheme, then passing it a non-nil value once will
-			// prevent your UI from supporting the system color prior to app re-launch.
-			// There may be other variations I didn't try, but this solution is currently the most stable.
-			//
-			window.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle()
-			
-			Prefs.shared.themePublisher.sink {[weak self](theme: Theme) in
-				
-				self?.window?.overrideUserInterfaceStyle = theme.toInterfaceStyle()
-				self?.window?.tintColor = UIColor.appAccent // appAccent color might be customized for theme
-				
-			}.store(in: &cancellables)
-			
-			self.window = window
-			window.makeKeyAndVisible()
+			showRootWindow(windowScene)
 		}
 		
 		// From Apple docs:
@@ -138,7 +101,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			CrossProcessCommunication.shared.suspend()
 		}
 		
-		let currentSecurity = AppSecurity.shared.enabledSecurity.value
+		let currentSecurity = AppSecurity.shared.enabledSecurityPublisher.value
 		if !currentSecurity.isEmpty {
 			
 			LockState.shared.isUnlocked = false
@@ -211,6 +174,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	
 	private func onAppLaunch() -> Void {
 		log.trace("onAppLaunch()")
+		
+		// List for changes to the themePublisher,
+		// and update the windows accordingly.
+		//
+		Prefs.shared.themePublisher.sink {[weak self](theme: Theme) in
+			
+			guard let self = self else {
+				return
+			}
+			self.window?.overrideUserInterfaceStyle = theme.toInterfaceStyle()
+			self.window?.tintColor = UIColor.appAccent // appAccent color might be customized for theme
+			
+		}.store(in: &cancellables)
 		
 		// Note that we cannot use `LockState.shared.objectWillChange.sink`,
 		// because the callback is invoked before the `isUnlocked` value is changed,
@@ -300,11 +276,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			// - standard security => biometrics only protect the UI, wallet can immediately be loaded
 			// - advanced security => biometrics required to unlock both the UI and the seed
 
+			if mnemonics == nil && enabledSecurity.isEmpty && error == nil {
+				// The user doesn't have a wallet yet.
+				LockState.shared.walletExistence = .doesNotExist
+				
+				// Issue #282 - Face ID remains enabled between app installs.
+				// Items stored in the iOS keychain remain persisted between iOS installs.
+				// So we clear the flag here.
+				AppSecurity.shared.setSoftBiometrics(enabled: false) { _ in }
+				
+			} else {
+				// The user has a wallet. (UI may or may not be locked.)
+				LockState.shared.walletExistence = .exists
+			}
+			
 			if let mnemonics = mnemonics {
-				// unlock & load wallet
-				if Biz.loadWallet(mnemonics: mnemonics) {
-					LockState.shared.firstUnlockFoundMnemonics = true
-				}
+				// Load wallet into memory. (UI may or may not be locked.)
+				Biz.loadWallet(mnemonics: mnemonics)
 			}
 		
 			if let error = error {
@@ -314,22 +302,120 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			} else {
 				self.showLockWindow()
 			}
-			
-			if mnemonics == nil && error == nil && enabledSecurity.isEmpty {
-				// The user doesn't have a wallet yet.
-				//
-				// Issue #282 - Face ID remains enabled between app installs.
-				// Items stored in the iOS keychain remain persisted between iOS installs.
-				// So we clear the flag here.
-				AppSecurity.shared.setSoftBiometrics(enabled: false) { _ in }
-			}
-			
-			LockState.shared.firstUnlockAttempted = true
 		}
 	}
 	
 	// --------------------------------------------------
-	// MARK: App Switcher Privacy
+	// MARK: Window Transitions
+	// --------------------------------------------------
+	
+	public func transitionToResetWalletWindow(
+		deleteTransactionHistory: Bool,
+		deleteSeedBackup: Bool
+	) {
+		log.trace("transitionToResetWalletWindow()")
+		assertMainThread()
+		
+		guard window != nil && resetWalletWindow == nil else {
+			return
+		}
+		
+		// We have to be careful to start the close-wallet process *after* we've closed the RootView.
+		// This is because we might crash if:
+		//
+		// - the close-wallet process deletes something
+		// - a subview re-renders, and assumes that something still exists
+		//
+		// For example:
+		//
+		// - the close-wallet process sets Biz.syncManager to nil
+		// - a subview calls `Biz.syncManager!
+		//
+		// NB: Using a `DispatchQueue.main.asyncAfter` here doesn't seem to be enough to prevent crashes on iPad.
+		// We really need to give it time to fully unload the rootWindow.
+		
+		showResetWalletWindow(
+			deleteTransactionHistory: deleteTransactionHistory,
+			deleteSeedBackup: deleteSeedBackup,
+			startDelay: 0.4
+		)
+		hideRootWindow()
+	}
+	
+	public func transitionBackToMainWindow() -> Bool {
+		log.trace("transitionBackToMainWindow()")
+		assertMainThread()
+		
+		guard window == nil && resetWalletWindow != nil else {
+			return false
+		}
+		guard let windowScene = findWindowScene() else {
+			return false
+		}
+		
+		showRootWindow(windowScene)
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+			self.hideResetWalletWindow()
+		}
+		
+		return true
+	}
+	
+	// --------------------------------------------------
+	// MARK: Root Window
+	// --------------------------------------------------
+	
+	private func showRootWindow(_ windowScene: UIWindowScene) {
+		log.trace("showRootWindow()")
+		assertMainThread()
+		
+		if window == nil {
+			
+			let view = RootView()
+			
+			let controller = UIHostingController(rootView: view)
+			
+			window = UIWindow(windowScene: windowScene)
+			window?.rootViewController = controller
+			window?.windowLevel = .normal
+			
+			// Set the app-wide tint/accent color scheme.
+			//
+			// Credit for bug fix:
+			// https://adampaxton.com/how-to-globally-set-a-tint-or-accent-color-in-swiftui/
+			//
+			window?.tintColor = UIColor.appAccent
+			
+			// Set the app-wide color scheme.
+			//
+			// There are other ways to accomplish this, but they are buggy.
+			//
+			// SwiftUI offers 2 similar methods:
+			// - .colorScheme()
+			// - .preferredColorScheme()
+			//
+			// I used multiple variations to make those work, but all variations had bugs.
+			// If you use only colorScheme(), certain UI elements like the statusBar don't adapt properly.
+			// If you use only the preferredColorScheme, then passing it a non-nil value once will
+			// prevent your UI from supporting the system color prior to app re-launch.
+			// There may be other variations I didn't try, but this solution is currently the most stable.
+			//
+			window?.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle()
+		}
+		
+		window?.makeKeyAndVisible()
+	}
+	
+	private func hideRootWindow() {
+		log.trace("hideRootWindow()")
+		assertMainThread()
+		
+		window?.isHidden = true
+		window = nil
+	}
+	
+	// --------------------------------------------------
+	// MARK: Lock Window
 	// --------------------------------------------------
 	
 	private func showLockWindow() {
@@ -339,15 +425,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		guard errorWindow == nil else {
 			return
 		}
-		guard let windowScene = self.window?.windowScene else {
+		guard let windowScene = findWindowScene() else {
 			return
 		}
 		
 		if lockWindow == nil {
 			
-			let lockView = LockView()
+			let view = LockView()
 			
-			let controller = UIHostingController(rootView: lockView)
+			let controller = UIHostingController(rootView: view)
 			controller.view.backgroundColor = .clear
 			
 			lockWindow = UIWindow(windowScene: windowScene)
@@ -390,19 +476,67 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: ResetWallet Window
+	// --------------------------------------------------
+	
+	private func showResetWalletWindow(
+		deleteTransactionHistory: Bool,
+		deleteSeedBackup: Bool,
+		startDelay: TimeInterval
+	) {
+		log.trace("showResetWalletWindow()")
+		assertMainThread()
+		
+		guard let windowScene = findWindowScene() else {
+			return
+		}
+		
+		if resetWalletWindow == nil {
+			
+			let view = ResetWalletView_Action(
+				deleteTransactionHistory: deleteTransactionHistory,
+				deleteSeedBackup: deleteSeedBackup,
+				startDelay: startDelay
+			)
+			
+			let controller = UIHostingController(rootView: view)
+			
+			resetWalletWindow = UIWindow(windowScene: windowScene)
+			resetWalletWindow?.rootViewController = controller
+			resetWalletWindow?.tintColor = UIColor.appAccent
+			resetWalletWindow?.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle()
+			resetWalletWindow?.windowLevel = .normal + 1
+		}
+		
+		resetWalletWindow?.makeKeyAndVisible()
+	}
+	
+	private func hideResetWalletWindow() {
+		log.trace("hideResetWalletWindow()")
+		assertMainThread()
+		
+		resetWalletWindow?.isHidden = true
+		resetWalletWindow = nil
+	}
+	
+	// --------------------------------------------------
+	// MARK: Error Window
+	// --------------------------------------------------
+	
 	private func showErrorWindow(_ error: UnlockError) {
 		log.trace("showErrorWindow()")
 		assertMainThread()
 		
-		guard let windowScene = self.window?.windowScene else {
+		guard let windowScene = findWindowScene() else {
 			return
 		}
 		
 		if errorWindow == nil {
 			
-			let errorView = ErrorView(danger: error)
+			let view = UnlockErrorView(danger: error)
 			
-			let controller = UIHostingController(rootView: errorView)
+			let controller = UIHostingController(rootView: view)
 			controller.view.backgroundColor = .clear
 			
 			errorWindow = UIWindow(windowScene: windowScene)
@@ -413,6 +547,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		}
 		
 		errorWindow?.makeKeyAndVisible()
+	}
+	
+	// --------------------------------------------------
+	// MARK: Utilities
+	// --------------------------------------------------
+	
+	func findWindowScene() -> UIWindowScene? {
+		
+		return window?.windowScene ??
+			lockWindow?.windowScene ??
+			resetWalletWindow?.windowScene ??
+			errorWindow?.windowScene ??
+			nil
 	}
 }
 

@@ -63,6 +63,10 @@ struct ScanView: View {
 	// - library sends us ModelValidate
 	// - library sends us ModelRequestWithoutAmount
 
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var body: some View {
 		
@@ -182,7 +186,7 @@ struct ScanView: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			menuOption_pasteFromClipboard()
+			menuOption_paste()
 				.padding(.horizontal, 20)
 				.padding(.top, 20)
 				.padding(.bottom, 12)
@@ -236,10 +240,48 @@ struct ScanView: View {
 	}
 	
 	@ViewBuilder
-	func menuOption_pasteFromClipboard() -> some View {
+	func menuOption_paste() -> some View {
+		
+		if #available(iOS 16.0, *) {
+		//	menuOption_paste_ios16() // this looks horrible; thanks apple :(
+			menuOption_paste_pre16()
+		} else {
+			menuOption_paste_pre16()
+		}
+	}
+	
+	@ViewBuilder
+	@available(iOS 16.0, *)
+	func menuOption_paste_ios16() -> some View {
+		
+		PasteButton(payloadType: String.self) { strings in
+			if let string = strings.first {
+				pasteFromClipboard_ios16(string)
+			}
+		}
+		.buttonStyle(.borderedProminent)
+		.buttonBorderShape(ButtonBorderShape.capsule)
+		
+		// There's not a lot of customization we can do here.
+		// According to the docs:
+		//
+		// > you can use view modifiers like buttonBorderShape(_:), labelStyle(_:), and tint(_:)
+		// > to customize the button in some contexts.
+		//
+		// However, we *CANNOT* remove the background color of the button.
+		// .tint(.clear)             // <- doesn't work
+		// .ting(.primaryBackground) // <- also doesn't work
+		//
+		// This means we cannot make the PasteButton match our other buttons.
+		// Which means, unless we want the UI to look ugly,
+		// we have to completely re-design the entire button menu...
+	}
+	
+	@ViewBuilder
+	func menuOption_paste_pre16() -> some View {
 		
 		Button {
-			pasteFromClipboard()
+			pasteFromClipboard_pre16()
 		} label: {
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 				Label {
@@ -247,91 +289,98 @@ struct ScanView: View {
 				} icon: {
 					Image(systemName: "arrow.right.doc.on.clipboard")
 				}
-				if clipboardContent != nil {
-					Group {
-						if let content = clipboardContent as? Scan.ClipboardContent_InvoiceRequest {
-						
-							let desc = content.paymentRequest.description_?.trimmingCharacters(in: .whitespaces) ?? ""
-							
-							if let msat = content.paymentRequest.amount {
-								let amt = Utils.format(currencyPrefs, msat: msat)
-							
-								if desc.isEmpty {
-									Text("Pay \(amt.string)")
-								} else {
-									Text("Pay \(amt.string) ") +
-									Text(Image(systemName: "arrow.forward")) +
-									Text(verbatim: " \(desc)")
-								}
-							} else if !desc.isEmpty {
-								Text("Pay ") +
-								Text(Image(systemName: "arrow.forward")) +
-								Text(verbatim: " \(desc)")
-							} else {
-								Text("Pay Invoice")
-							}
-						
-						} else if let content = clipboardContent as? Scan.ClipboardContent_BitcoinRequest {
-							
-							let addrInfo: BitcoinAddressInfo = content.address
-							
-							let desc: String = {
-								return addrInfo.label ?? addrInfo.message
-							}()?.trimmingCharacters(in: .whitespaces) ?? ""
-							
-							if let sat = addrInfo.amount {
-								let amt = Utils.format(currencyPrefs, sat: sat)
-							
-								if desc.isEmpty {
-									Text("Pay \(amt.string)")
-								} else {
-									Text("Pay \(amt.string) ") +
-									Text(Image(systemName: "arrow.forward")) +
-									Text(verbatim: " \(desc)")
-								}
-							} else if !desc.isEmpty {
-								Text("Pay ") +
-								Text(Image(systemName: "arrow.forward")) +
-								Text(verbatim: " \(desc)")
-							} else {
-								let addr = addrInfo.address.prefix(6) + "..." + addrInfo.address.suffix(6)
-								
-								Text("Pay ") +
-								Text(Image(systemName: "arrow.forward")) +
-								Text(verbatim: " \(addr)")
-							}
-							
-						} else if let content = clipboardContent as? Scan.ClipboardContent_LoginRequest {
-							
-							let title = content.auth.actionPromptTitle
-							let domain = content.auth.url.host
-							
-							Text(verbatim: "\(title) ") +
-							Text(Image(systemName: "arrow.forward")) +
-							Text(verbatim: " \(domain)")
-						
-						} else if let content = clipboardContent as? Scan.ClipboardContent_LnurlRequest {
-							
-							let domain = content.url.host
-							
-							Text(verbatim: "LnUrl ") +
-							Text(Image(systemName: "bolt.fill")) +
-							Text(verbatim: " \(domain)")
-						}
-						
-					} // </Group>
-					.font(.footnote)
-					.foregroundColor(.secondary)
-					.lineLimit(1)
-					.truncationMode(.tail)
-					.padding(.top, 4)
-					
-				} // </if clipboardContent != nil>
+				
+				menuOption_paste_clipboardPreview()
 			} // </VStack>
 			
 		} // </Button>
 		.font(.title3)
 		.disabled(!clipboardHasString)
+	}
+	
+	@ViewBuilder
+	func menuOption_paste_clipboardPreview() -> some View {
+		
+		if clipboardContent != nil {
+			Group {
+				if let content = clipboardContent as? Scan.ClipboardContent_InvoiceRequest {
+				
+					let desc = content.paymentRequest.description_?.trimmingCharacters(in: .whitespaces) ?? ""
+					
+					if let msat = content.paymentRequest.amount {
+						let amt = Utils.format(currencyPrefs, msat: msat)
+					
+						if desc.isEmpty {
+							Text("Pay \(amt.string)")
+						} else {
+							Text("Pay \(amt.string) ") +
+							Text(Image(systemName: "arrow.forward")) +
+							Text(verbatim: " \(desc)")
+						}
+					} else if !desc.isEmpty {
+						Text("Pay ") +
+						Text(Image(systemName: "arrow.forward")) +
+						Text(verbatim: " \(desc)")
+					} else {
+						Text("Pay Invoice")
+					}
+				
+				} else if let content = clipboardContent as? Scan.ClipboardContent_BitcoinRequest {
+					
+					let addrInfo: BitcoinAddressInfo = content.address
+					
+					let desc: String = {
+						return addrInfo.label ?? addrInfo.message
+					}()?.trimmingCharacters(in: .whitespaces) ?? ""
+					
+					if let sat = addrInfo.amount {
+						let amt = Utils.format(currencyPrefs, sat: sat)
+					
+						if desc.isEmpty {
+							Text("Pay \(amt.string)")
+						} else {
+							Text("Pay \(amt.string) ") +
+							Text(Image(systemName: "arrow.forward")) +
+							Text(verbatim: " \(desc)")
+						}
+					} else if !desc.isEmpty {
+						Text("Pay ") +
+						Text(Image(systemName: "arrow.forward")) +
+						Text(verbatim: " \(desc)")
+					} else {
+						let addr = addrInfo.address.prefix(6) + "..." + addrInfo.address.suffix(6)
+						
+						Text("Pay ") +
+						Text(Image(systemName: "arrow.forward")) +
+						Text(verbatim: " \(addr)")
+					}
+					
+				} else if let content = clipboardContent as? Scan.ClipboardContent_LoginRequest {
+					
+					let title = content.auth.actionPromptTitle
+					let domain = content.auth.url.host
+					
+					Text(verbatim: "\(title) ") +
+					Text(Image(systemName: "arrow.forward")) +
+					Text(verbatim: " \(domain)")
+				
+				} else if let content = clipboardContent as? Scan.ClipboardContent_LnurlRequest {
+					
+					let domain = content.url.host
+					
+					Text(verbatim: "LnUrl ") +
+					Text(Image(systemName: "bolt.fill")) +
+					Text(verbatim: " \(domain)")
+				}
+				
+			} // </Group>
+			.font(.footnote)
+			.foregroundColor(.secondary)
+			.lineLimit(1)
+			.truncationMode(.tail)
+			.padding(.top, 4)
+			
+		} // </if clipboardContent != nil>
 	}
 	
 	@ViewBuilder
@@ -367,42 +416,30 @@ struct ScanView: View {
 		.font(.title3)
 	}
 	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		checkClipboard()
+		if #unavailable(iOS 16.0) {
+			checkClipboard()
+		}
 	}
 
 	func willEnterForeground() {
 		log.trace("willEnterForeground()")
 		
-		checkClipboard()
+		if #unavailable(iOS 16.0) {
+			checkClipboard()
+		}
 	}
 	
 	func voiceOverStatusChanged() {
 		log.trace("voiceOverStatusChanged()")
 		
 		voiceOverEnabled = UIAccessibility.isVoiceOverRunning
-	}
-	
-	func checkClipboard() {
-		if UIPasteboard.general.hasStrings {
-			clipboardHasString = true
-			
-			guard let string = UIPasteboard.general.string else {
-				// iOS lied to us ?!?
-				clipboardHasString = false
-				clipboardContent = nil
-				return
-			}
-			
-			let controller = mvi.controller as! AppScanController
-			self.clipboardContent = controller.inspectClipboard(data: string)
-			
-		} else {
-			clipboardHasString = false
-			clipboardContent = nil
-		}
 	}
 	
 	func modelDidChange(_ newModel: Scan.Model) {
@@ -447,6 +484,48 @@ struct ScanView: View {
 		mvi.intent(Scan.Intent_CancelLnurlServiceFetch())
 	}
 	
+	// --------------------------------------------------
+	// MARK: Utilities
+	// --------------------------------------------------
+	
+	func checkClipboard() {
+		if UIPasteboard.general.hasStrings {
+			clipboardHasString = true
+			
+			guard let string = UIPasteboard.general.string else {
+				// iOS lied to us ?!?
+				clipboardHasString = false
+				clipboardContent = nil
+				return
+			}
+			
+			let controller = mvi.controller as! AppScanController
+			self.clipboardContent = controller.inspectClipboard(data: string)
+			
+		} else {
+			clipboardHasString = false
+			clipboardContent = nil
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func pasteFromClipboard_ios16(_ string: String) {
+		log.trace("pasteFromClipboard_ios16()")
+		
+		mvi.intent(Scan.Intent_Parse(request: string))
+	}
+	
+	func pasteFromClipboard_pre16() {
+		log.trace("pasteFromClipboard_pre16()")
+		
+		if let request = UIPasteboard.general.string {
+			mvi.intent(Scan.Intent_Parse(request: request))
+		}
+	}
+	
 	func manualInput() {
 		log.trace("manualInput()")
 		
@@ -454,14 +533,6 @@ struct ScanView: View {
 		smartModalState.display(dismissable: true) {
 			
 			ManualInput(mvi: mvi, ignoreScanner: $ignoreScanner)
-		}
-	}
-	
-	func pasteFromClipboard() {
-		log.trace("pasteFromClipboard()")
-		
-		if let request = UIPasteboard.general.string {
-			mvi.intent(Scan.Intent_Parse(request: request))
 		}
 	}
 	

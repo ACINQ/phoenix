@@ -70,7 +70,7 @@ fun SendSwapOutView(
     val requestedAmount = model.address.amount
     var amount by remember { mutableStateOf(model.address.amount) }
     var amountErrorMessage by remember { mutableStateOf("") }
-    val balance = business.peerManager.balance.collectAsState(null).value
+    val balance = business.balanceManager.balance.collectAsState(null).value
     val swapOutConfig = business.appConfigurationManager.chainContext.collectAsState(initial = null).value?.swapOut?.v1 ?: WalletContext.V0.SwapOut.V1(
         minFeerateSatByte = 20,
         minAmountSat = 10_000,
@@ -180,7 +180,7 @@ fun SendSwapOutView(
                         )
                     } else {
                         FilledButton(
-                            text = R.string.send_pay_button,
+                            text = stringResource(id = R.string.send_pay_button),
                             icon = R.drawable.ic_send,
                             enabled = amountErrorMessage.isBlank()
                         ) {

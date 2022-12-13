@@ -21,7 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.utils.UserTheme
@@ -34,7 +34,7 @@ typealias CF = ControllerFactory
 val LocalTheme = staticCompositionLocalOf { UserTheme.SYSTEM }
 val LocalBusiness = staticCompositionLocalOf<PhoenixBusiness?> { null }
 val LocalControllerFactory = staticCompositionLocalOf<ControllerFactory?> { null }
-val LocalNavController = staticCompositionLocalOf<NavHostController?> { null }
+val LocalNavController = staticCompositionLocalOf<NavController?> { null }
 val LocalBitcoinUnit = compositionLocalOf { BitcoinUnit.Sat }
 val LocalFiatCurrency = compositionLocalOf { FiatCurrency.USD }
 val LocalExchangeRates = compositionLocalOf<List<ExchangeRate>> { listOf() }
@@ -45,7 +45,7 @@ val isDarkTheme: Boolean
     @Composable
     get() = LocalTheme.current.let { it == UserTheme.DARK || (it == UserTheme.SYSTEM && isSystemInDarkTheme()) }
 
-val navController: NavHostController
+val navController: NavController
     @Composable
     get() = LocalNavController.current ?: error("navigation controller is not available")
 

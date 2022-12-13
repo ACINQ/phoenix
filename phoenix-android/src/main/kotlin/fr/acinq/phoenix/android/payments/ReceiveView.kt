@@ -280,7 +280,6 @@ private fun EditInvoiceView(
     DefaultScreenLayout {
         DefaultScreenHeader(
             title = stringResource(id = R.string.receive__edit__title),
-            subtitle = stringResource(id = R.string.receive__edit__subtitle),
             onBackClick = onCancel
         )
         Card(internalPadding = PaddingValues(16.dp)) {

@@ -58,7 +58,7 @@ fun InitWallet(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         FilledButton(
-            text = R.string.initwallet_create,
+            text = stringResource(id = R.string.initwallet_create),
             icon = R.drawable.ic_fire,
             onClick = onCreateWalletClick
         )

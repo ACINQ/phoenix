@@ -142,6 +142,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				paymentReceived_amountReceived(receivedWith)
 				paymentReceived_via(receivedWith)
 				paymentReceived_channelId(receivedWith)
+				paymentReceived_fundingTxId(receivedWith)
 			}
 		}
 	}
@@ -545,6 +546,36 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		}
 	}
 	
+	@ViewBuilder
+	func paymentReceived_fundingTxId(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
+		let identifier: String = #function
+		
+		if let newChannel = receivedWith.asNewChannel(),
+			let channelId = newChannel.channelId,
+			let channel = Biz.business.peerManager.getChannelWithCommitments(channelId: channelId)
+		{
+			InfoGridRowWrapper(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				
+				keyColumn(NSLocalizedString("funding txid", comment: "Label in DetailsView_IncomingPayment"))
+				
+			} valueColumn: {
+				
+				let str = channel.commitments.fundingTxId.toHex()
+				Text(str)
+					.contextMenu {
+						Button(action: {
+							UIPasteboard.general.string = str
+						}) {
+							Text("Copy")
+						}
+					}
+			}
+		}
+	}
 	@ViewBuilder
 	func channelClosing_channelId(_ channelClosing: Lightning_kmpOutgoingPayment.DetailsChannelClosing) -> some View {
 		let identifier: String = #function

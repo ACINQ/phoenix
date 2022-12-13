@@ -11,7 +11,7 @@ import plus
 
 data class Connections(
     val internet: Connection = Connection.CLOSED(reason = null),
-    val tor: Connection? = null,
+    val tor: Connection = Connection.CLOSED(reason = null),
     val peer: Connection = Connection.CLOSED(reason = null),
     val electrum: Connection = Connection.CLOSED(reason = null)
 ) {
@@ -57,7 +57,7 @@ class ConnectionsManager(
                         NetworkState.Available -> Connection.ESTABLISHED
                         NetworkState.NotAvailable -> Connection.CLOSED(reason = null)
                     },
-                    tor = if (torEnabled) torState else null
+                    tor = if (torEnabled) torState else Connection.CLOSED(reason = null)
                 )
             }.collect {
                 _connections.value = it

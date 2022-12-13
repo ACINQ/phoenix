@@ -42,7 +42,6 @@ fun LogsView() {
         DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.logs_title),
-            subtitle = stringResource(id = R.string.logs_subtitle)
         )
         Card {
 

@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.android.settings
 
 import android.content.Context
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -28,6 +29,7 @@ import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.android.utils.label
+import fr.acinq.phoenix.android.utils.labels
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import kotlinx.coroutines.CoroutineScope
@@ -60,7 +62,7 @@ private fun BitcoinUnitPreference(context: Context, scope: CoroutineScope) {
     val currentPref = LocalBitcoinUnit.current
     ListPreferenceButton(
         title = stringResource(id = R.string.prefs_display_coin_label),
-        subtitle = currentPref.label(),
+        subtitle = { TextWithIcon(text = currentPref.label(), icon = R.drawable.ic_bitcoin) },
         enabled = prefsEnabled,
         selectedItem = currentPref,
         preferences = preferences,
@@ -79,13 +81,14 @@ private fun FiatCurrencyPreference(context: Context, scope: CoroutineScope) {
     var prefEnabled by remember { mutableStateOf(true) }
 
     val preferences = FiatCurrency.values.map {
-        PreferenceItem(it, it.label())
+        val (title, desc) = it.labels()
+        PreferenceItem(item = it, title = title, description = desc)
     }
 
     val currentPref = LocalFiatCurrency.current
     ListPreferenceButton(
         title = stringResource(id = R.string.prefs_display_fiat_label),
-        subtitle = currentPref.label(),
+        subtitle = { Text(text = currentPref.labels().first) },
         enabled = prefEnabled,
         selectedItem = currentPref,
         preferences = preferences,
@@ -108,7 +111,7 @@ private fun UserThemePreference(context: Context, scope: CoroutineScope) {
     val currentPref by UserPrefs.getUserTheme(context).collectAsState(initial = UserTheme.SYSTEM)
     ListPreferenceButton(
         title = stringResource(id = R.string.prefs_display_theme_label),
-        subtitle = currentPref.label(),
+        subtitle = { Text(text = currentPref.label()) },
         enabled = prefEnabled,
         selectedItem = currentPref,
         preferences = preferences,

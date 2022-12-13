@@ -18,14 +18,14 @@ fileprivate enum NavLinkTag: String {
 	case DisplayConfigurationView
 	case PaymentOptionsView
 	case RecoveryPhraseView
-	case CloseChannelsView
+	case DrainWalletView
 	// Security
 	case AppAccessView
 	// Advanced
 	case PrivacyView
-	case LogsConfigurationView
 	case ChannelsConfigurationView
-	case ForceCloseChannelsView
+	case LogsConfigurationView
+	case ResetWalletView
 }
 
 struct ConfigurationView: View {
@@ -61,6 +61,14 @@ struct ConfigurationView: View {
 	
 	@ViewBuilder
 	var body: some View {
+		
+		content()
+			.navigationTitle(NSLocalizedString("Settings", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
 		
 		List {
 			let hasWallet = hasWallet()
@@ -129,8 +137,8 @@ struct ConfigurationView: View {
 					}
 					
 					NavigationLink(
-						destination: CloseChannelsView(),
-						tag: NavLinkTag.CloseChannelsView,
+						destination: DrainWalletView(popToRoot: { self.navLinkTag = nil }),
+						tag: NavLinkTag.DrainWalletView,
 						selection: $navLinkTag
 					) {
 						Label { Text("Drain wallet") } icon: {
@@ -195,9 +203,23 @@ struct ConfigurationView: View {
 					}
 				}
 				
+				if hasWallet {
+					
+					NavigationLink(
+						destination: ResetWalletView(),
+						tag: NavLinkTag.ResetWalletView,
+						selection: $navLinkTag
+					) {
+						Label { Text("Reset wallet") } icon: {
+							Image(systemName: "trash")
+						}
+					}
+				}
+				
 			} // </Section: Advanced>
 		} // </List>
 		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 		.id(listViewId)
 		.onAppear() {
 			onAppear()
@@ -214,8 +236,6 @@ struct ConfigurationView: View {
 		.onReceive(externalLightningUrlPublisher) {(url: String) in
 			onExternalLightningUrl(url)
 		}
-		.navigationTitle(NSLocalizedString("Settings", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
 			
 	} // end: body
 	
@@ -302,7 +322,7 @@ struct ConfigurationView: View {
 			switch value {
 				case .paymentHistory : break
 				case .backup         : newNavLinkTag = NavLinkTag.RecoveryPhraseView
-				case .drainWallet    : newNavLinkTag = NavLinkTag.CloseChannelsView
+				case .drainWallet    : newNavLinkTag = NavLinkTag.DrainWalletView
 				case .electrum       : newNavLinkTag = NavLinkTag.PrivacyView
 			}
 			

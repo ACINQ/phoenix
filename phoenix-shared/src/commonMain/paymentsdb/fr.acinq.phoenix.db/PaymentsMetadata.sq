@@ -5,6 +5,13 @@ import fr.acinq.phoenix.db.payments.LNUrlSuccessAction;
 -- This table stores metadata corresponding to a payment.
 -- * type => enum indicating whether payment is incoming or outgoing
 -- * id => stores the primary key of the payment row
+-- * lnurl_base => serialized lnurl object (e.g. LNUrl.Pay), excluding metadata content
+-- * lnurl_metadata => serialized lnurl metadata (e.g. LNUrl.Pay.Metadata)
+-- * lnurl_successAction => serialized LUD-09 (e.g. LNUrl.PayInvoice.SuccessAction.Message)
+-- * user_description => user-customized short description
+-- * user_notes => user-customized notes (can be much longer than description)
+-- * modified_at => last time this DB entry was modified (i.e. within payments_metadata table)
+-- * original_fiat => stores original fiat price (via conversion rate) at time of transaction
 --
 CREATE TABLE IF NOT EXISTS payments_metadata (
     type INTEGER NOT NULL,
@@ -23,6 +30,8 @@ CREATE TABLE IF NOT EXISTS payments_metadata (
     original_fiat_rate REAL DEFAULT NULL,
     PRIMARY KEY (type, id)
 );
+
+-- queries for payments_metadata table
 
 hasMetadata:
 SELECT COUNT(*) FROM payments_metadata

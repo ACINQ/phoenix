@@ -93,7 +93,7 @@ fun LnurlAuthView(
                 }
                 Spacer(Modifier.height(32.dp))
                 FilledButton(
-                    text = R.string.lnurl_auth_button,
+                    text = stringResource(id = R.string.lnurl_auth_button),
                     icon = R.drawable.ic_key,
                     onClick = {
                         val keyType = selectedAuthKeyType.value
@@ -134,7 +134,7 @@ fun LnurlAuthView(
                         Text(text = annotatedStringResource(id = R.string.lnurl_auth_success, model.auth.url.host), textAlign = TextAlign.Center)
                     }
                     Spacer(Modifier.height(32.dp))
-                    FilledButton(text = R.string.btn_ok, icon = R.drawable.ic_check, onClick = onBackClick)
+                    FilledButton(text = stringResource(id = R.string.btn_ok), icon = R.drawable.ic_check, onClick = onBackClick)
                 }
             }
         }

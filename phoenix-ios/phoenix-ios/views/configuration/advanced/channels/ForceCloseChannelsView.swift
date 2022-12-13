@@ -56,6 +56,7 @@ struct ForceCloseChannelsView : MVIView {
 			}
 		}
 		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 	}
 	
 	@ViewBuilder
@@ -370,7 +371,7 @@ class ForceCloseChannelsView_Previews: PreviewProvider {
 						balance: 500_000,
 						status: CloseChannelsConfiguration.ModelChannelInfoStatus.closing
 					)
-				])
+				], closing: Set<Bitcoin_kmpByteVector32>())
 			)
 		}
 		.preferredColorScheme(.light)
@@ -389,7 +390,7 @@ class ForceCloseChannelsView_Previews: PreviewProvider {
 						balance: 500_000,
 						status: CloseChannelsConfiguration.ModelChannelInfoStatus.closing
 					)
-				])
+				], closing: Set<Bitcoin_kmpByteVector32>())
 			)
 		}
 		.preferredColorScheme(.light)

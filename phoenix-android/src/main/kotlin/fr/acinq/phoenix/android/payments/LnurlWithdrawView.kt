@@ -110,7 +110,7 @@ fun LnurlWithdrawView(
                         RemoteErrorResponseView(error.err)
                     }
                     FilledButton(
-                        text = R.string.lnurl_withdraw_confirm_button,
+                        text = stringResource(id = R.string.lnurl_withdraw_confirm_button),
                         icon = R.drawable.ic_receive,
                         enabled = amount != null && amountErrorMessage.isBlank(),
                     ) {

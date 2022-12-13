@@ -2,11 +2,9 @@ package fr.acinq.phoenix.db
 
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
-import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentId
@@ -195,10 +193,10 @@ class CloudKitDb(
 
                     val process = { list: List<Long> ->
                         val mean = list.sum().toDouble() / list.size.toDouble()
-                        val variance = list.map {
+                        val variance = list.sumOf {
                             val diff = it.toDouble() - mean
                             diff.pow(2)
-                        }.sum()
+                        }
                         val standardDeviation = sqrt(variance)
 
                         MetadataStats(
@@ -207,8 +205,8 @@ class CloudKitDb(
                         )
                     }
 
-                    var incoming = mutableListOf<Long>()
-                    var outgoing = mutableListOf<Long>()
+                    val incoming = mutableListOf<Long>()
+                    val outgoing = mutableListOf<Long>()
 
                     ckQueries.scanSizes().executeAsList().forEach { row ->
                         if (row.unpadded_size > 0) {
@@ -359,11 +357,15 @@ class CloudKitDb(
                     val received = incomingPayment.received
 
                     if (oldReceived == null && received != null) {
-                        val (type, blob) = received.receivedWith.mapToDb() ?: null to null
+                        val (type, blob) = received.receivedWith.mapToDb() ?: (null to null)
+                        val receivedWithNewChannel = received.receivedWith.any {
+                            it is IncomingPayment.ReceivedWith.NewChannel
+                        }
                         inQueries.updateReceived(
                             received_at = received.receivedAt,
                             received_with_type = type,
                             received_with_blob = blob,
+                            received_with_new_channel = if (receivedWithNewChannel) 1 else 0,
                             payment_hash = incomingPayment.paymentHash.toByteArray()
                         )
                     }
@@ -516,7 +518,7 @@ class CloudKitDb(
         val timestamp: Long
     )
 
-    suspend fun enqueueMissingItems(): Unit {
+    suspend fun enqueueMissingItems() {
         withContext(Dispatchers.Default) {
 
             val ckQueries = database.cloudKitPaymentsQueries
@@ -574,7 +576,7 @@ class CloudKitDb(
         }
     }
 
-    suspend fun clearDatabaseTables(): Unit {
+    suspend fun clearDatabaseTables() {
         withContext(Dispatchers.Default) {
 
             val ckQueries = database.cloudKitPaymentsQueries

@@ -5,18 +5,22 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "CloseChannelsView"
+	category: "DrainWalletView"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct CloseChannelsView : MVIView {
+
+struct DrainWalletView: MVIView {
 	
 	@StateObject var mvi = MVIState({ $0.closeChannelsConfiguration() })
 	
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
+	
+	let popToRoot: () -> Void
+	let encryptedNodeId = Biz.encryptedNodeId!
 	
 	@State var didAppear = false
 	
@@ -27,24 +31,34 @@ struct CloseChannelsView : MVIView {
 	
 	@State var isScanningQrCode = false
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
+	@State var reviewRequested = false
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
-	// MARK: ViewBuilders
+	// MARK: View Builders
 	// --------------------------------------------------
 	
 	@ViewBuilder
 	var view: some View {
 
-		content()
-			.onAppear {
-				onAppear()
+		ZStack {
+			NavigationLink(
+				destination: reviewScreen(),
+				isActive: $reviewRequested
+			) {
+				EmptyView()
 			}
-			.navigationTitle(NSLocalizedString("Drain wallet", comment: "Navigation bar title"))
-			.navigationBarTitleDisplayMode(.inline)
+			.accessibilityHidden(true)
+			
+			content()
+		}
+		.onAppear {
+			onAppear()
+		}
+		.navigationTitle(NSLocalizedString("Drain wallet", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -60,13 +74,13 @@ struct CloseChannelsView : MVIView {
 				// What if the balance is zero ? Do we still display this ?
 				// Yes, because the user could still have open channels (w/balance: zero local / non-zero remote),
 				// and we want to allow them to close the channels if they desire.
-				section_drain()
-			}
-			else if mvi.model is CloseChannelsConfiguration.ModelChannelsClosed {
-				section_sent()
+				//
+				section_options()
+				section_button()
 			}
 		}
 		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 	}
 	
 	@ViewBuilder
@@ -100,26 +114,25 @@ struct CloseChannelsView : MVIView {
 			
 		} // </Section>
 	}
-			
+	
 	@ViewBuilder
-	func section_drain() -> some View {
+	func section_options() -> some View {
 		
-		Section {
-			VStack(alignment: HorizontalAlignment.leading) {
-				Text(
-					"""
-					Funds can be sent to a Bitcoin wallet. \
-					Make sure the address is correct before sending.
-					"""
-				)
-				.fixedSize(horizontal: false, vertical: true)
-				.padding(.top, 8)
-				.padding(.bottom, 16)
+		Section() {
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 15) {
 				
+				Text("Send all funds to a Bitcoin wallet.")
+					.foregroundColor(.primary)
+					.fixedSize(horizontal: false, vertical: true)
+				
+				//  [(TextField:BtcAddr) (Button::X)] [Button::ScanQrCode]
 				HStack(alignment: VerticalAlignment.center, spacing: 10) {
-				
-					// [Bitcoin Address TextField (X)]
-					HStack {
+					
+					// [TextField::BtcAddr (Button::X)]
+					HStack(alignment: VerticalAlignment.center, spacing: 2) {
+						
+						// TextField::BtcAddr
 						TextField(
 							NSLocalizedString("Bitcoin address", comment: "TextField placeholder"),
 							text: $textFieldValue
@@ -128,21 +141,26 @@ struct CloseChannelsView : MVIView {
 							checkBitcoinAddress()
 						}
 						
-						// Clear text field button
-						Button {
-							clearTextField()
-						} label: {
-							Image(systemName: "multiply.circle.fill")
-								.foregroundColor(.secondary)
+						// Button::X
+						if !textFieldValue.isEmpty {
+							Button {
+								clearTextField()
+							} label: {
+								Image(systemName: "multiply.circle.fill")
+									.foregroundColor(.secondary)
+							}
+							.buttonStyle(BorderlessButtonStyle()) // prevents trigger when row tapped
+							.accessibilityLabel("Clear textfield")
 						}
-						.buttonStyle(BorderlessButtonStyle()) // prevents trigger when row tapped
-						.isHidden(textFieldValue == "")
-					}
-					.padding([.top, .bottom], 8)
-					.padding([.leading, .trailing], 16)
-					.background(Capsule().stroke(Color.textFieldBorder))
+						
+					} // </HStack>
+					.padding(.all, 8)
+					.overlay(
+						RoundedRectangle(cornerRadius: 8)
+							.stroke(Color.textFieldBorder, lineWidth: 1)
+					)
 					
-					// [Scan QRCode Button]
+					// [Button::ScanQrCode]
 					Button {
 						didTapScanQrCodeButton()
 					} label: {
@@ -151,44 +169,21 @@ struct CloseChannelsView : MVIView {
 							.frame(width: 30, height: 30)
 					}
 					.buttonStyle(BorderlessButtonStyle()) // prevents trigger when row tapped
-				}
-				.padding(.bottom, 10)
-				
-				Button {
-					drainWallet()
-				} label: {
-					HStack {
-						Image(systemName: "bitcoinsign.circle")
-							.imageScale(.small)
-						
-						Text("Drain my wallet")
-					}
-					.padding([.top, .bottom], 8)
-					.padding([.leading, .trailing], 16)
-				}
-				.buttonStyle(
-					ScaleButtonStyle(
-						cornerRadius: 100,
-						borderStroke: Color.appAccent,
-						disabledBorderStroke: Color(UIColor.separator)
-					)
-				)
-				.disabled(parsedBitcoinAddress == nil)
-				.padding(.bottom, 10)
+					
+				} // </HStack>
 				
 				if let detailedErrorMsg = detailedErrorMsg {
 					Text(detailedErrorMsg)
 						.foregroundColor(Color.appNegative)
-						.padding(.bottom, 10)
 				}
 				
 				Text("All payment channels will be closed.")
 					.font(.footnote)
 					.foregroundColor(.secondary)
-					.padding(.bottom, 10)
 				
 			} // </VStack>
-		} // </Section>
+			
+		} // </Section>
 		.sheet(isPresented: $isScanningQrCode) {
 			
 			ScanBitcoinAddressSheet(didScanQrCode: self.didScanQrCode)
@@ -196,82 +191,57 @@ struct CloseChannelsView : MVIView {
 	}
 	
 	@ViewBuilder
-	func section_sent() -> some View {
+	func section_button() -> some View {
 		
 		Section {
-			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				
-				Image(systemName: "paperplane.fill")
-					.renderingMode(.template)
-					.resizable()
-					.aspectRatio(contentMode: .fit)
-					.frame(width: 64, height: 64)
-					.foregroundColor(Color.appPositive)
-				
-				Text("Funds sent")
-					.font(.title)
-					.padding(.bottom, 30)
-
-				let expectedTxCount = nonZeroChannelsCount()
-				let msg = (expectedTxCount > 1)
-					? String(format: NSLocalizedString(
-						"Expect to receive %d separate payments.",
-						comment: "label text"
-					), expectedTxCount)
-					: NSLocalizedString(
-						"The closing transaction is in your transactions list.",
-						comment: "label text"
-					)
-
-				Text(styled: msg)
-					.multilineTextAlignment(.center)
-					.fixedSize(horizontal: false, vertical: true) // Workaround for SwiftUI bugs
-
-			} // </VStack>
-			.padding(.vertical, 8)
-			.frame(maxWidth: .infinity)
 			
-		} // </Section>
+			VStack(alignment: HorizontalAlignment.center, spacing: 5) {
+					
+				let missingBitcoinAddress = parsedBitcoinAddress == nil
+				let invalidBitcoinAddress = missingBitcoinAddress && !textFieldValue.isEmpty
+					
+				Button {
+					reviewButtonTapped()
+				} label: {
+					HStack(alignment: VerticalAlignment.center, spacing: 5) {
+						Text("Review")
+						Image(systemName: "arrow.forward")
+							.imageScale(.small)
+					}
+				}
+				.disabled(missingBitcoinAddress || invalidBitcoinAddress)
+				.font(.title3.weight(.medium))
+					
+				if invalidBitcoinAddress {
+					Text("Invalid bitcoin address")
+						.font(.callout)
+						.foregroundColor(.appNegative)
+				}
+					
+			} // </VStack>
+			.frame(maxWidth: .infinity)
+		}
+	}
+	
+	@ViewBuilder
+	func reviewScreen() -> some View {
+		
+		if let bitcoinAddress = parsedBitcoinAddress {
+			DrainWalletView_Confirm(
+				mvi: mvi,
+				bitcoinAddress: bitcoinAddress,
+				popToRoot: popToRoot
+			)
+		}
 	}
 	
 	// --------------------------------------------------
-	// MARK: UI Content Helpers
+	// MARK: View Helpers
 	// --------------------------------------------------
-	
-	func channels() -> [CloseChannelsConfiguration.ModelChannelInfo]? {
-		
-		if let model = mvi.model as? CloseChannelsConfiguration.ModelReady {
-			return model.channels
-		} else if let model = mvi.model as? CloseChannelsConfiguration.ModelChannelsClosed {
-			return model.channels
-		} else {
-			return nil
-		}
-	}
-	
-	func nonZeroChannelsCount() -> Int {
-		
-		if let channels = channels() {
-			return channels.filter { $0.balance > 0 }.count
-		} else {
-			return 0
-		}
-	}
-	
-	func balanceSats() -> Int64 {
-		
-		// Todo: replace me with `business.peerManager.balance` (from commit d5f6fe8e)
-		if let channels = channels() {
-			return channels.map { $0.balance }.reduce(0, +)
-		} else {
-			return 0
-		}
-	}
 	
 	func formattedBalances() -> (FormattedAmount, FormattedAmount?) {
 		
-		// Todo: replace me with `business.peerManager.balance` (from commit d5f6fe8e)
-		let balance_sats = balanceSats()
+		let balance_sats = mvi.balanceSats()
 		
 		let balance_bitcoin = Utils.formatBitcoin(sat: balance_sats, bitcoinUnit: currencyPrefs.bitcoinUnit)
 		var balance_fiat: FormattedAmount? = nil
@@ -382,75 +352,15 @@ struct CloseChannelsView : MVIView {
 		textFieldValue = ""
 	}
 	
-	func drainWallet() {
-		log.trace("drainWallet()")
-		
-		popoverState.display(dismissable: false) {
-			ConfirmationPopover(confirmAction: confirmDrainWallet)
-		}
-	}
-	
-	func confirmDrainWallet() -> Void {
-		log.trace("confirmDrainWallet()")
-		
-		guard let bitcoinAddress = parsedBitcoinAddress else {
-			log.trace("Ignoring: parsedBitcoinAddress is nil")
-			return
-		}
-		
-		mvi.intent(
-			CloseChannelsConfiguration.IntentMutualCloseAllChannels(
-				address: bitcoinAddress
-			)
-		)
+	func reviewButtonTapped() {
+		log.trace("reviewButtonTapped()")
+		reviewRequested = true
 	}
 }
 
-fileprivate struct ConfirmationPopover : View {
-	
-	let confirmAction: () -> Void
-	
-	@Environment(\.popoverState) var popoverState: PopoverState
-	
-	var body: some View {
-		
-		VStack(alignment: .trailing) {
-		
-			VStack(alignment: .leading) {
-				Text("Are you sure you want to proceed?")
-			}
-			.padding(.bottom, 20)
-			
-			HStack {
-				Button {
-					didTapCancel()
-				} label : {
-					Text("Cancel")
-				}
-				.padding(.trailing, 10)
-				
-				Button {
-					didTapConfirm()
-				} label : {
-					Text("Send Funds")
-				}
-			}
-			
-		} // </VStack>
-		.padding()
-	}
-	
-	func didTapCancel() -> Void {
-		log.trace("cancel()")
-		popoverState.close()
-	}
-	
-	func didTapConfirm() -> Void {
-		log.trace("confirm()")
-		popoverState.close()
-		confirmAction()
-	}
-}
+// --------------------------------------------------
+// MARK: -
+// --------------------------------------------------
 
 fileprivate struct ScanBitcoinAddressSheet: View, ViewName {
 	
@@ -495,68 +405,5 @@ fileprivate struct ScanBitcoinAddressSheet: View, ViewName {
 		log.trace("[\(viewName)] didTapClose()")
 		
 		presentationMode.wrappedValue.dismiss()
-	}
-}
-
-// MARK: -
-
-class CloseChannelsView_Previews: PreviewProvider {
-
-	static var previews: some View {
-		
-		NavigationView {
-			CloseChannelsView().mock(
-				CloseChannelsConfiguration.ModelLoading()
-			)
-		}
-		.preferredColorScheme(.light)
-		.previewDevice("iPhone 8")
-
-		NavigationView {
-			CloseChannelsView().mock(
-				CloseChannelsConfiguration.ModelReady(channels: [
-					CloseChannelsConfiguration.ModelChannelInfo(
-						id: Bitcoin_kmpByteVector32.random(),
-						balance: 500_000,
-						status: CloseChannelsConfiguration.ModelChannelInfoStatus.normal
-					)
-				], address: "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx")
-			)
-		}
-		.preferredColorScheme(.light)
-		.previewDevice("iPhone 8")
-		
-		NavigationView {
-			CloseChannelsView().mock(
-				CloseChannelsConfiguration.ModelChannelsClosed(channels: [
-					CloseChannelsConfiguration.ModelChannelInfo(
-						id: Bitcoin_kmpByteVector32.random(),
-						balance: 500_000,
-						status: CloseChannelsConfiguration.ModelChannelInfoStatus.closing
-					)
-				])
-			)
-		}
-		.preferredColorScheme(.light)
-		.previewDevice("iPhone 8")
-		
-		NavigationView {
-			CloseChannelsView().mock(
-				CloseChannelsConfiguration.ModelChannelsClosed(channels: [
-					CloseChannelsConfiguration.ModelChannelInfo(
-						id: Bitcoin_kmpByteVector32.random(),
-						balance: 500_000,
-						status: CloseChannelsConfiguration.ModelChannelInfoStatus.closing
-					),
-					CloseChannelsConfiguration.ModelChannelInfo(
-						id: Bitcoin_kmpByteVector32.random(),
-						balance: 500_000,
-						status: CloseChannelsConfiguration.ModelChannelInfoStatus.closing
-					)
-				])
-			)
-		}
-		.preferredColorScheme(.light)
-		.previewDevice("iPhone 8")
 	}
 }

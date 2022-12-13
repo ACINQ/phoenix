@@ -101,7 +101,7 @@ object Parser {
             }
         }
         val otherParams = ParametersBuilder().apply {
-            appendAll(url.parameters.filter { entry, value ->
+            appendAll(url.parameters.filter { entry, _ ->
                 !listOf("amount", "label", "message", "lightning").contains(entry)
             })
         }.build()

@@ -5,10 +5,10 @@ import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
+import fr.acinq.phoenix.managers.BalanceManager
 import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.managers.PeerManager
-import fr.acinq.phoenix.utils.calculateBalance
-import kotlinx.coroutines.flow.collect
+import fr.acinq.phoenix.utils.extensions.calculateBalance
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -18,7 +18,8 @@ import org.kodein.log.LoggerFactory
 class AppHomeController(
     loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
-    private val paymentsManager: PaymentsManager
+    private val paymentsManager: PaymentsManager,
+    private val balanceManager: BalanceManager
 ) : AppController<Home.Model, Home.Intent>(
     loggerFactory = loggerFactory,
     firstModel = Home.emptyModel
@@ -26,7 +27,8 @@ class AppHomeController(
     constructor(business: PhoenixBusiness): this(
         loggerFactory = business.loggerFactory,
         peerManager = business.peerManager,
-        paymentsManager = business.paymentsManager
+        paymentsManager = business.paymentsManager,
+        balanceManager = business.balanceManager
     )
 
     private var isBoot = true
@@ -51,7 +53,7 @@ class AppHomeController(
         }
 
         launch {
-            paymentsManager.incomingSwaps.collect {
+            balanceManager.incomingSwaps.collect {
                 model {
                     copy(incomingBalance = it.values.sum().takeIf { it.msat > 0 })
                 }

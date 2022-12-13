@@ -46,6 +46,7 @@ struct ValidateView: View {
 	@State var problem: Problem? = nil
 	
 	@State var preTipAmountMsat: Int64? = nil
+	@State var postTipAmountMsat: Int64? = nil
 	@State var priceSliderVisible: Bool = false
 	
 	@State var comment: String = ""
@@ -55,7 +56,7 @@ struct ValidateView: View {
 	
 	@State var didAppear = false
 	
-	let balancePublisher = Biz.business.peerManager.balancePublisher()
+	let balancePublisher = Biz.business.balanceManager.balancePublisher()
 	@State var balanceMsat: Int64 = 0
 	
 	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
@@ -243,13 +244,16 @@ struct ValidateView: View {
 				.padding(.top, 4)
 				.padding(.bottom)
 			
-			if hasExtendedMetadata() || supportsPriceTarget() || supportsComment() {
+			if hasExtendedMetadata() || hasRange() || canTip() || supportsComment() {
 				HStack(alignment: VerticalAlignment.center, spacing: 20) {
 					if hasExtendedMetadata() {
 						metadataButton()
 					}
-					if supportsPriceTarget() {
-						priceTargetButton()
+					if hasRange() {
+						rangeButton()
+					}
+					if canTip() {
+						tipButton()
 					}
 					if supportsComment() {
 						commentButton()
@@ -398,17 +402,30 @@ struct ValidateView: View {
 	}
 	
 	@ViewBuilder
-	func priceTargetButton() -> some View {
+	func rangeButton() -> some View {
 		
 		actionButton(
-			text: priceTargetButtonText(),
+			text: NSLocalizedString("range", comment: "button label - try to make it short"),
 			image: Image(systemName: "target"),
 			width: 20, height: 20,
 			xOffset: 0, yOffset: 0
 		) {
-			priceTargetButtonTapped()
+			rangeButtonTapped()
 		}
-		.disabled(priceTargetButtonDisabled())
+	}
+	
+	@ViewBuilder
+	func tipButton() -> some View {
+		
+		actionButton(
+			text: NSLocalizedString("tip", comment: "button label - try to make it short"),
+			image: Image(systemName: "heart"),
+			width: 18, height: 18,
+			xOffset: 0, yOffset: 0
+		) {
+			tipButtonTapped()
+		}
+		.disabled(tipButtonDisabled())
 	}
 	
 	@ViewBuilder
@@ -506,38 +523,44 @@ struct ValidateView: View {
 		return false
 	}
 	
-	func supportsPriceTarget() -> Bool {
+	func hasRange() -> Bool {
 		
-		// The "price target" button has multiple uses/meanings:
+		// The "range" button is used for:
+		// - lnurl-pay
+		// - lnurl-withdraw
 		//
-		// - for invoices, it means adding a tip
-		// - for lnurl-pay, it's the acceptable range (could be a tip, depends on context)
-		// - for lnurl-withdraw, it's the range of money to withdraw
+		// when those requests have a range (as opposed to a specific required amount)
 		
-		if let tuple = priceRange() {
-			// true if there's an actual range
-			return tuple.max.msat > tuple.min.msat
+		if let lnurlPay = lnurlPay() {
+			return lnurlPay.maxSendable.msat > lnurlPay.minSendable.msat
 			
-		} else if isAmountlessInvoice() {
-			return true
+		} else if let lnurlWithdraw = lnurlWithdraw() {
+			return lnurlWithdraw.maxWithdrawable.msat > lnurlWithdraw.minWithdrawable.msat
 			
 		} else {
 			return false
 		}
 	}
 	
-	func priceTargetButtonText() -> String {
+	func canTip() -> Bool {
 		
-		if let _ = lnurlWithdraw() {
-			return NSLocalizedString("range", comment: "button label - try to make it short")
-		} else {
-			return NSLocalizedString("tip", comment: "button label - try to make it short")
+		if mvi.model is Scan.Model_SwapOutFlow {
+			return true
+			
+		} else if let _ = paymentRequest() {
+			return true
+			
+		} else if let _ = lnurlPay() {
+			return true
+			
+		} else { // e.g. lnurlWithdraw()
+			return false
 		}
 	}
 	
-	func priceTargetButtonDisabled() -> Bool {
+	func tipButtonDisabled() -> Bool {
 		
-		return isAmountlessInvoice() && (parsedAmountMsat() == nil)
+		return parsedAmountMsat() == nil
 	}
 	
 	func supportsComment() -> Bool {
@@ -719,12 +742,10 @@ struct ValidateView: View {
 		}
 		
 		var preTipMsat: Int64? = nil
-		if let preTipAmountMsat = preTipAmountMsat {
-			preTipMsat = preTipAmountMsat
-		} else if let paymentRequest = paymentRequest() {
+		if let paymentRequest = paymentRequest() {
 			preTipMsat = paymentRequest.amount?.msat
-		} else if let lnurlPay = lnurlPay() {
-			preTipMsat = lnurlPay.minSendable.msat
+		} else if let preTipAmountMsat = preTipAmountMsat {
+			preTipMsat = preTipAmountMsat
 		}
 		let baseMsat = preTipMsat ?? preMinerFeeMsat
 		
@@ -770,6 +791,10 @@ struct ValidateView: View {
 	}
 	
 	func parsedAmountMsat() -> Int64? {
+		
+		if let postTipAmountMsat {
+			return postTipAmountMsat
+		}
 		
 		guard let amt = try? parsedAmount.get(), amt > 0 else {
 			return nil
@@ -848,19 +873,21 @@ struct ValidateView: View {
 	// MARK: Notifications
 	// --------------------------------------------------
 	
-	func modelDidChange(_ newModel: Scan.Model) -> Void {
+	func modelDidChange(_ newModel: Scan.Model) {
 		log.trace("modelDidChange()")
 		
-		if newModel is Scan.Model_SwapOutFlow {
-			
-			// Possible transitions:
-			// - Init -> Requesting
-			// - Requesting -> Ready => amount + minerFee >? balance
-			// - Ready -> Init       => remove minerFee from calculations
+		// There are several transitions that require re-calculating the altAmout:
+		//
+		// * SwapOutFlow_Requesting -> SwapOutFlow_Ready => amount + minerFee >? balance
+		// * SwapOutFlow_Ready -> SwapOutFlow_Init       => remove minerFee from calculations
+		// * SwapOutFlow_Init -> InvoiceFlow_X           => range changed (e.g. minAmount)
+		//
+		if newModel is Scan.Model_SwapOutFlow || newModel is Scan.Model_InvoiceFlow {
 			
 			refreshAltAmount()
+		}
 		
-		} else if let model = newModel as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
+		if let model = newModel as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
 			if let payError = model.error {
 				
 				popoverState.display(dismissable: true) {
@@ -921,6 +948,7 @@ struct ValidateView: View {
 		
 		if !priceSliderVisible {
 			preTipAmountMsat = nil
+			postTipAmountMsat = nil
 		}
 	}
 	
@@ -947,9 +975,10 @@ struct ValidateView: View {
 		// Which is distinct from `amountDidChange`, which may be triggered via code.
 		
 		preTipAmountMsat = nil
+		postTipAmountMsat = nil
 	}
 	
-	func amountDidChange() -> Void {
+	func amountDidChange() {
 		log.trace("amountDidChange()")
 		
 		refreshAltAmount()
@@ -958,7 +987,7 @@ struct ValidateView: View {
 		}
 	}
 	
-	func refreshAltAmount() -> Void {
+	func refreshAltAmount() {
 		log.trace("refreshAltAmount()")
 		
 		switch parsedAmount {
@@ -977,13 +1006,17 @@ struct ValidateView: View {
 			problem = nil
 			
 			var msat: Int64? = nil
-			switch currency {
-			case .bitcoin(let bitcoinUnit):
-				msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
-				
-			case .fiat(let fiatCurrency):
-				if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
-					msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
+			if let postTipAmountMsat {
+				msat = postTipAmountMsat
+			} else {
+				switch currency {
+				case .bitcoin(let bitcoinUnit):
+					msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
+					
+				case .fiat(let fiatCurrency):
+					if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
+						msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
+					}
 				}
 			}
 			
@@ -1162,32 +1195,75 @@ struct ValidateView: View {
 		}
 	}
 	
-	func priceTargetButtonTapped() {
-		log.trace("priceTargetButtonTapped()")
+	func rangeButtonTapped() {
+		log.trace("rangeButtonTapped()")
 		
-		var msat: Int64 = 0
-		var minMsat: Int64 = 0
-		var maxMsat: Int64 = 0
-		
+		var flow: FlowType? = nil
 		if let range = priceRange() {
-			minMsat = range.min.msat
-			maxMsat = range.max.msat
 			
-			msat = parsedAmountMsat() ?? minMsat
+			if lnurlWithdraw() != nil {
+				flow = FlowType.withdraw(range: range)
+			} else {
+				flow = FlowType.pay(range: range)
+			}
 			
 		} else if isAmountlessInvoice() {
 			
-			guard let parsedAmtMst = parsedAmountMsat() else {
-				return
+			if let parsedAmtMst = parsedAmountMsat() {
+				flow = FlowType.pay(range: MsatRange(min: parsedAmtMst, max: parsedAmtMst + parsedAmtMst))
 			}
+		}
+		
+		if let flow {
 			
-			msat = parsedAmtMst
-			minMsat = parsedAmtMst
-			maxMsat = parsedAmtMst * 2
-			preTipAmountMsat = parsedAmtMst
+			dismissKeyboardIfVisible()
+			smartModalState.display(dismissable: true) {
+				
+				RangeSheet(flow: flow, valueChanged: amountChanged_rangeSheet)
+			}
+		}
+	}
+	
+	func tipButtonTapped() {
+		log.trace("tipButtonTapped()")
+		
+		guard var msat = preTipAmountMsat ?? parsedAmountMsat() else {
+			return
+		}
+		
+		var minMsat: Int64 = 0
+		var maxMsat: Int64 = 0
+		
+		if let paymentRequest = paymentRequest(), let paymentRequestAmt = paymentRequest.amount {
+			// This is a paymentRequest with a specific amount.
+			// So it doesn't matter what the user typed in.
+			// The min must be paymentRequest.amount.
+			
+			minMsat = paymentRequestAmt.msat
+			maxMsat = paymentRequestAmt.msat * 2
 			
 		} else {
-			return
+			// Could be:
+			// - amountless paymentRequest
+			// - lnurl-pay with range
+			//
+			// Either way, the user is typing in an amount, and then tapping the "tip" button.
+			// So the base amount is what they typed in, and they are using the tip screen to do the math.
+			
+			minMsat = msat
+			maxMsat = msat * 2
+			preTipAmountMsat = msat
+			
+			if let range = priceRange() {
+				if range.contains(msat: msat) {
+					maxMsat = min(maxMsat, range.max.msat)
+				} else {
+					// User typed in an invalid amount.
+					// So we're just going to show them the whole range.
+					minMsat = range.min.msat
+					maxMsat = range.max.msat
+				}
+			}
 		}
 		
 		let isRange = maxMsat > minMsat
@@ -1204,11 +1280,11 @@ struct ValidateView: View {
 				msat = maxMsat
 			}
 			
-			let flowType: FlowType
+			let flow: FlowType
 			if lnurlWithdraw() != nil {
-				flowType = FlowType.withdraw(range: range)
+				flow = FlowType.withdraw(range: range)
 			} else {
-				flowType = FlowType.pay(range: range)
+				flow = FlowType.pay(range: range)
 			}
 			
 			priceSliderVisible = true
@@ -1216,9 +1292,9 @@ struct ValidateView: View {
 			smartModalState.display(dismissable: true) {
 				
 				PriceSliderSheet(
-					flowType: flowType,
+					flow: flow,
 					msat: msat,
-					valueChanged: priceSliderChanged
+					valueChanged: amountChanged_priceSliderSheet
 				)
 				
 			} onWillDisappear: {
@@ -1231,25 +1307,55 @@ struct ValidateView: View {
 			// There is only one valid amount.
 			// We set the amount directly via the button tap.
 			
-			priceSliderChanged(minMsat)
+			amountChangedExternally(minMsat)
 		}
 	}
 	
-	func priceSliderChanged(_ msat: Int64) {
-		log.trace("priceSliderChanged()")
+	func amountChanged_rangeSheet(_ msat: Int64) {
+		log.trace("amountChanged_priceSliderSheet()")
+		amountChangedExternally(msat)
+		preTipAmountMsat = nil
+		postTipAmountMsat = nil
+	}
+	
+	func amountChanged_priceSliderSheet(_ msat: Int64) {
+		log.trace("amountChanged_priceSliderSheet()")
+		amountChangedExternally(msat)
+	}
+	
+	func amountChangedExternally(_ msat: Int64) {
+		log.trace("amountChangedExternally()")
 		
-		let preferredBitcoinUnit = currencyPrefs.bitcoinUnit
-		currency = Currency.bitcoin(preferredBitcoinUnit)
-		currencyPickerChoice = currency.abbrev
-		
-		// The TextFieldCurrencyStyler doesn't seem to fire when we manually set the text value.
-		// So we need to do it manually here, to ensure the `parsedAmount` is properly updated.
-		
-		let amtDbl = Utils.convertBitcoin(msat: msat, to: preferredBitcoinUnit)
-		let amtFrmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: preferredBitcoinUnit, policy: .showMsatsIfNonZero)
-		
-		parsedAmount = Result.success(amtDbl)
-		amount = amtFrmt.digits
+		if case .fiat(let fiatCurrency) = currency,
+			let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
+		{
+			// The calculations were done in msat, but the user is in fiat mode.
+			// So let's perform the conversion back to fiat.
+			// But let's also keep the msat precision for internal calculations.
+			
+			let amtDbl = Utils.convertToFiat(msat: msat, exchangeRate: exchangeRate)
+			let amtFrmt = Utils.formatFiat(amount: amtDbl, fiatCurrency: currencyPrefs.fiatCurrency)
+			
+			parsedAmount = Result.success(amtDbl)
+			amount = amtFrmt.digits
+			postTipAmountMsat = msat
+			
+		} else {
+			
+			let preferredBitcoinUnit = currencyPrefs.bitcoinUnit
+			currency = Currency.bitcoin(preferredBitcoinUnit)
+			currencyPickerChoice = currency.abbrev
+			
+			// The TextFieldCurrencyStyler doesn't seem to fire when we manually set the text value.
+			// So we need to do it manually here, to ensure the `parsedAmount` is properly updated.
+			
+			let amtDbl = Utils.convertBitcoin(msat: msat, to: preferredBitcoinUnit)
+			let amtFrmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: preferredBitcoinUnit, policy: .showMsatsIfNonZero)
+			
+			parsedAmount = Result.success(amtDbl)
+			amount = amtFrmt.digits
+			postTipAmountMsat = nil
+		}
 	}
 	
 	func commentButtonTapped() {

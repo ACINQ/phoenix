@@ -34,18 +34,7 @@ class PhoenixApplication : AppContext() {
         Notifications.registerNotificationChannels(applicationContext)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onLegacyFinish() {
-        log.info("onLegacyFinish.enter")
-        GlobalScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-            log.error("error in legacy payments db migration: ", e)
-        }) {
-            log.info("starting legacy db migration ")
-            LegacyMigrationHelper.migrateLegacyPayments(
-                context = applicationContext,
-                business = business
-            )
-        }
         applicationContext.startActivity(Intent(applicationContext, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         })

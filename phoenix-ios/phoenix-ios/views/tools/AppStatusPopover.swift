@@ -335,6 +335,18 @@ struct AppStatusPopover: View {
 							.frame(width: titleIconWidth, alignment: .center)
 					}
 					.font(.title3)
+				
+				case .shutdown:
+					
+					Label {
+						Text("Cloud sync disabled")
+					} icon: {
+						Image(systemName: "icloud.slash")
+							.imageScale(.medium)
+							.read(titleIconWidthReader)
+							.frame(width: titleIconWidth, alignment: .center)
+					}
+					.font(.title3)
 			
 			} // </switch>
 		} // </VStack>

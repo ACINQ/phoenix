@@ -14,14 +14,26 @@
  * limitations under the License.
  */
 
+@file:UseSerializers(
+    SatoshiSerializer::class,
+    MilliSatoshiSerializer::class,
+    ByteVector32Serializer::class,
+    UUIDSerializer::class,
+)
+
 package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.serialization.v1.ByteVector32KSerializer
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
+import fr.acinq.phoenix.db.serializers.v1.ByteVector32Serializer
+import fr.acinq.phoenix.db.serializers.v1.MilliSatoshiSerializer
+import fr.acinq.phoenix.db.serializers.v1.UUIDSerializer
+import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.db.serializers.v1.SatoshiSerializer
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.*
@@ -47,8 +59,9 @@ sealed class IncomingReceivedWithData {
         @Serializable
         @Suppress("DEPRECATION")
         data class V0(
+            @Serializable
             val fees: MilliSatoshi,
-            @Serializable(with = ByteVector32KSerializer::class)
+            @Serializable
             val channelId: ByteVector32?
         ) : NewChannel()
     }
@@ -65,16 +78,43 @@ sealed class IncomingReceivedWithData {
     sealed class Part : IncomingReceivedWithData() {
         sealed class Htlc : Part() {
             @Serializable
-            data class V0(val amount: MilliSatoshi, @Serializable(with = ByteVector32KSerializer::class) val channelId: ByteVector32, val htlcId: Long) : Htlc()
+            data class V0(
+                @Serializable
+                val amount: MilliSatoshi,
+                @Serializable
+                val channelId: ByteVector32,
+                val htlcId: Long
+            ) : Htlc()
         }
         sealed class NewChannel : Part() {
             @Deprecated("Legacy type. Use V1 instead for new parts, with the new `id` field.")
             @Serializable
-            data class V0(val amount: MilliSatoshi, val fees: MilliSatoshi, @Serializable(with = ByteVector32KSerializer::class) val channelId: ByteVector32?) : NewChannel()
+            data class V0(
+                @Serializable
+                val amount: MilliSatoshi,
+                @Serializable
+                val fees: MilliSatoshi,
+                @Serializable
+                val channelId: ByteVector32?
+            ) : NewChannel()
 
             /** V1 contains a new `id` field that ensure that each [NewChannel] is unique. Old V0 data will use a random UUID to respect the [IncomingPayment.ReceivedWith.NewChannel] interface. */
             @Serializable
-            data class V1(val id: UUID, val amount: MilliSatoshi, val fees: MilliSatoshi, @Serializable(with = ByteVector32KSerializer::class) val channelId: ByteVector32?) : NewChannel()
+            data class V1(
+                @Serializable
+                val id: UUID,
+                @Serializable
+                val amount: MilliSatoshi,
+                @Serializable
+                @SerialName("fees")
+                val serviceFee: MilliSatoshi,
+                @Serializable
+                val fundingFee: Satoshi = 0.sat,
+                @Serializable
+                val channelId: ByteVector32?,
+                // Added for dual-funding flow; Defaults to true for older serialized instances.
+                val confirmed: Boolean = true
+            ) : NewChannel()
         }
     }
 
@@ -100,24 +140,24 @@ sealed class IncomingReceivedWithData {
                     IncomingPayment.ReceivedWith.LightningPayment(amount ?: 0.msat, ByteVector32.Zeroes, 0L)
                 )
                 IncomingReceivedWithTypeVersion.NEW_CHANNEL_V0 -> setOf(format.decodeFromString<NewChannel.V0>(json).let {
-                    IncomingPayment.ReceivedWith.NewChannel(UUID.randomUUID(), amount ?: 0.msat, it.fees, it.channelId)
+                    IncomingPayment.ReceivedWith.NewChannel(UUID.randomUUID(), amount ?: 0.msat, it.fees, 0.sat, it.channelId, confirmed = true)
                 })
                 IncomingReceivedWithTypeVersion.MULTIPARTS_V0 -> DbTypesHelper.polymorphicFormat.decodeFromString(SetSerializer(PolymorphicSerializer(Part::class)), json).map {
                     when (it) {
                         is Part.Htlc.V0 -> IncomingPayment.ReceivedWith.LightningPayment(it.amount, it.channelId, it.htlcId)
                         is Part.NewChannel.V0 -> if (originTypeVersion == IncomingOriginTypeVersion.SWAPIN_V0) {
-                            IncomingPayment.ReceivedWith.NewChannel(UUID.randomUUID(), it.amount, it.fees, it.channelId)
+                            IncomingPayment.ReceivedWith.NewChannel(UUID.randomUUID(), it.amount, it.fees, 0.sat, it.channelId, confirmed = true)
                         } else {
-                            IncomingPayment.ReceivedWith.NewChannel(UUID.randomUUID(),it.amount - it.fees, it.fees, it.channelId)
+                            IncomingPayment.ReceivedWith.NewChannel(UUID.randomUUID(),it.amount - it.fees, it.fees, 0.sat, it.channelId, confirmed = true)
                         }
-                        is Part.NewChannel.V1 -> IncomingPayment.ReceivedWith.NewChannel(it.id, it.amount, it.fees, it.channelId)
+                        is Part.NewChannel.V1 -> IncomingPayment.ReceivedWith.NewChannel(it.id, it.amount, it.serviceFee, it.fundingFee, it.channelId, it.confirmed)
                     }
                 }.toSet()
                 IncomingReceivedWithTypeVersion.MULTIPARTS_V1 -> DbTypesHelper.polymorphicFormat.decodeFromString(SetSerializer(PolymorphicSerializer(Part::class)), json).map {
                     when (it) {
                         is Part.Htlc.V0 -> IncomingPayment.ReceivedWith.LightningPayment(it.amount, it.channelId, it.htlcId)
-                        is Part.NewChannel.V0 -> IncomingPayment.ReceivedWith.NewChannel(UUID.randomUUID(), it.amount, it.fees, it.channelId)
-                        is Part.NewChannel.V1 -> IncomingPayment.ReceivedWith.NewChannel(it.id, it.amount, it.fees, it.channelId)
+                        is Part.NewChannel.V0 -> IncomingPayment.ReceivedWith.NewChannel(UUID.randomUUID(), it.amount, it.fees, 0.sat, it.channelId, confirmed = true)
+                        is Part.NewChannel.V1 -> IncomingPayment.ReceivedWith.NewChannel(it.id, it.amount, it.serviceFee, it.fundingFee, it.channelId, it.confirmed)
                     }
                 }.toSet()
             }
@@ -129,7 +169,7 @@ sealed class IncomingReceivedWithData {
 fun Set<IncomingPayment.ReceivedWith>.mapToDb(): Pair<IncomingReceivedWithTypeVersion, ByteArray>? = map {
     when (it) {
         is IncomingPayment.ReceivedWith.LightningPayment -> IncomingReceivedWithData.Part.Htlc.V0(it.amount, it.channelId, it.htlcId)
-        is IncomingPayment.ReceivedWith.NewChannel -> IncomingReceivedWithData.Part.NewChannel.V1(it.id, it.amount, it.fees, it.channelId)
+        is IncomingPayment.ReceivedWith.NewChannel -> IncomingReceivedWithData.Part.NewChannel.V1(it.id, it.amount, it.serviceFee, it.fundingFee, it.channelId, it.confirmed)
     }
 }.takeIf { it.isNotEmpty() }?.toSet()?.let {
     IncomingReceivedWithTypeVersion.MULTIPARTS_V1 to DbTypesHelper.polymorphicFormat.encodeToString(

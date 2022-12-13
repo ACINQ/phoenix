@@ -18,13 +18,11 @@ fileprivate let PAGE_COUNT_INCREMENT = 25
 
 
 struct HomeView : MVIView {
-
-	static private let paymentsPageFetcher = Biz.business.paymentsManager.makePageFetcher()
 	
 	private let phoenixBusiness = Biz.business
 	private let encryptedNodeId = Biz.encryptedNodeId!
 	private let paymentsManager = Biz.business.paymentsManager
-	private let paymentsPageFetcher = HomeView.paymentsPageFetcher
+	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "HomeView")
 	
 	@StateObject var mvi = MVIState({ $0.home() })
 
@@ -32,7 +30,9 @@ struct HomeView : MVIView {
 	var factory: ControllerFactory { return factoryEnv }
 
 	@State var selectedItem: WalletPaymentInfo? = nil
+	
 	@State var isMempoolFull = false
+	@State var swapIn_minFundingSat: Int64 = 0
 	
 	@StateObject var customElectrumServerObserver = CustomElectrumServerObserver()
 	
@@ -43,7 +43,7 @@ struct HomeView : MVIView {
 	let recentPaymentSecondsPublisher = Prefs.shared.recentPaymentSecondsPublisher
 	@State var recentPaymentSeconds = Prefs.shared.recentPaymentSeconds
 	
-	let paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
+	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	
 	@StateObject var syncState = DownloadMonitor()
@@ -51,9 +51,10 @@ struct HomeView : MVIView {
 	let lastCompletedPaymentPublisher = Biz.business.paymentsManager.lastCompletedPaymentPublisher()
 	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
-	let incomingSwapsPublisher = Biz.business.paymentsManager.incomingSwapsPublisher()
+	let swapInWalletBalancePublisher = Biz.business.balanceManager.swapInWalletBalancePublisher()
+	@State var swapInWalletBalance: WalletBalance = WalletBalance.companion.empty()
+	
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
-	@State var lastIncomingSwaps = [String: Lightning_kmpMilliSatoshi]()
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
 	@State var incomingSwapAnimationsRemaining = 0
 	
@@ -65,7 +66,6 @@ struct HomeView : MVIView {
 	@Environment(\.colorScheme) var colorScheme
 	
 	@State var didAppear = false
-	@State var didPreFetch = false
 	
 	let backupSeed_enabled_publisher = Prefs.shared.backupSeed.isEnabled_publisher
 	let manualBackup_taskDone_publisher = Prefs.shared.backupSeed.manualBackup_taskDone_publisher
@@ -73,6 +73,14 @@ struct HomeView : MVIView {
 	@State var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(
 		encryptedNodeId: Biz.encryptedNodeId!
 	)
+	
+	// --------------------------------------------------
+	// MARK: Init
+	// --------------------------------------------------
+	
+	init() {
+		paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
+	}
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -111,8 +119,8 @@ struct HomeView : MVIView {
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
 		}
-		.onReceive(incomingSwapsPublisher) {
-			onIncomingSwapsChanged($0)
+		.onReceive(swapInWalletBalancePublisher) {
+			swapInWalletBalanceChanged($0)
 		}
 		.onReceive(backupSeed_enabled_publisher) {
 			self.backupSeed_enabled = $0
@@ -151,46 +159,9 @@ struct HomeView : MVIView {
 	func balance() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			
 			totalBalance()
-			
-			if let incoming = incomingAmount() {
-			
-				if #available(iOS 15.0, *) {
-					
-					incomingBalance(incoming)
-						.onTapGesture { showBlockchainExplorerOptions = true }
-						.confirmationDialog("Blockchain Explorer",
-							isPresented: $showBlockchainExplorerOptions,
-							titleVisibility: .automatic
-						) {
-							Button("Mempool.space") {
-								exploreIncomingSwap(website: BlockchainExplorer.WebsiteMempoolSpace())
-							}
-							Button("Blockstream.info") {
-								exploreIncomingSwap(website: BlockchainExplorer.WebsiteBlockstreamInfo())
-							}
-							
-							let addrCount = lastIncomingSwaps.count
-							if addrCount >= 2 {
-								Button("Copy bitcoin addresses (\(addrCount)") {
-									copyIncomingSwap()
-								}
-							} else {
-								Button("Copy bitcoin address") {
-									copyIncomingSwap()
-								}
-							}
-						} // </confirmationDialog>
-					
-				} else /* iOS 14 */ { // same functionality as before
-					
-					incomingBalance(incoming)
-						.onTapGesture { toggleCurrencyType() }
-				}
-			}
-			
-		} // </VStack>
+			incomingBalance()
+		}
 		.padding([.top, .leading, .trailing])
 		.padding(.bottom, 30)
 		.background(
@@ -290,7 +261,26 @@ struct HomeView : MVIView {
 	}
 	
 	@ViewBuilder
-	func incomingBalance(_ incoming: FormattedAmount) -> some View {
+	func incomingBalance() -> some View {
+		
+		let incomingSat = swapInWalletBalance.total.sat
+		if incomingSat > 0 {
+			let formattedAmount = currencyPrefs.hideAmountsOnHomeScreen
+				? Utils.hiddenAmount(currencyPrefs)
+				: Utils.format(currencyPrefs, sat: incomingSat)
+			
+			if incomingSat >= swapIn_minFundingSat {
+				incomingBalance_sufficient(formattedAmount)
+					.onTapGesture { showIncomingDepositPopover() }
+			} else {
+				incomingBalance_insufficient(formattedAmount)
+					.onTapGesture { showIncomingDepositPopover() }
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func incomingBalance_sufficient(_ incoming: FormattedAmount) -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 		
@@ -315,6 +305,35 @@ struct HomeView : MVIView {
 		}
 		.accessibilityElement(children: .combine)
 		.accessibilityHint("pending on-chain confirmation")
+		.accessibilitySortPriority(48)
+	}
+	
+	@ViewBuilder
+	func incomingBalance_insufficient(_ incoming: FormattedAmount) -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+		
+			Image(systemName: "exclamationmark.triangle")
+				.padding(.trailing, 2)
+			
+			if currencyPrefs.hideAmountsOnHomeScreen {
+				Text("+\(incoming.digits) incoming".lowercased()) // digits => "***"
+					.accessibilityLabel("plus hidden amount incoming")
+				
+			} else {
+				Text("+\(incoming.string) incoming".lowercased())
+			}
+		}
+		.font(.callout)
+		.foregroundColor(.appNegative)
+		.padding(.top, 7)
+		.padding(.bottom, 2)
+		.scaleEffect(incomingSwapScaleFactor, anchor: .top)
+		.onAnimationCompleted(for: incomingSwapScaleFactor) {
+			incomingSwapAnimationCompleted()
+		}
+		.accessibilityElement(children: .combine)
+		.accessibilityHint("amount insufficient")
 		.accessibilitySortPriority(48)
 	}
 	
@@ -474,20 +493,6 @@ struct HomeView : MVIView {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func incomingAmount() -> FormattedAmount? {
-		
-		let msatTotal = lastIncomingSwaps.values.reduce(Int64(0)) {(sum, item) -> Int64 in
-			return sum + item.msat
-		}
-		if msatTotal > 0 {
-			return currencyPrefs.hideAmountsOnHomeScreen
-				? Utils.hiddenAmount(currencyPrefs)
-				: Utils.format(currencyPrefs, msat: msatTotal)
-		} else {
-			return nil
-		}
-	}
-	
 	func isDownloadingRecentTxs() -> Bool {
 		
 		guard syncState.isDownloading else {
@@ -575,7 +580,6 @@ struct HomeView : MVIView {
 		log.trace("paymentsPageChanged()")
 		
 		paymentsPage = page
-		maybePreFetchPaymentsFromDatabase()
 	}
 	
 	func lastCompletedPaymentChanged(_ payment: Lightning_kmpWalletPayment) {
@@ -595,25 +599,22 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
+	func chainContextChanged(_ context: WalletContext.V0ChainContext) {
 		log.trace("chainContextChanged()")
 		
 		isMempoolFull = context.mempool.v1.highUsage
+		swapIn_minFundingSat = context.payToOpen.v1.minFundingSat // not yet segregated for swapIn - future work
 	}
 	
-	func onIncomingSwapsChanged(_ incomingSwaps: [String: Lightning_kmpMilliSatoshi]) -> Void {
-		log.trace("onIncomingSwapsChanged(): \(incomingSwaps)")
+	func swapInWalletBalanceChanged(_ walletBalance: WalletBalance) {
+		log.trace("swapInWalletBalanceChanged()")
 		
-		let oldSum = lastIncomingSwaps.values.reduce(Int64(0)) {(sum, item) -> Int64 in
-			return sum + item.msat
-		}
-		let newSum = incomingSwaps.values.reduce(Int64(0)) { (sum, item) -> Int64 in
-			return sum + item.msat
-		}
+		let oldBalance = swapInWalletBalance.total.sat
+		let newBalance = walletBalance.total.sat
 		
-		lastIncomingSwaps = incomingSwaps
-		if newSum > oldSum {
-			// Since the sum increased, there is a new incomingSwap for the user.
+		swapInWalletBalance = walletBalance
+		if newBalance > oldBalance {
+			// Since the balance increased, there is a new utxo for the user.
 			// This isn't added to the transaction list, but is instead displayed under the balance.
 			// So let's add a little animation to draw the user's attention to it.
 			startAnimatingIncomingSwapText()
@@ -687,29 +688,11 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func exploreIncomingSwap(website: BlockchainExplorer.Website) {
-		log.trace("exploreIncomingSwap()")
+	func showIncomingDepositPopover() {
+		log.trace("showIncomingDepositPopover()")
 		
-		guard let addr = lastIncomingSwaps.keys.first else {
-			return
-		}
-		
-		let txUrlStr = Biz.business.blockchainExplorer.addressUrl(addr: addr, website: website)
-		if let txUrl = URL(string: txUrlStr) {
-			UIApplication.shared.open(txUrl)
-		}
-	}
-	
-	func copyIncomingSwap() {
-		log.trace("copyIncomingSwap()")
-		
-		let addresses = lastIncomingSwaps.keys
-		
-		if addresses.count == 1 {
-			UIPasteboard.general.string = addresses.first
-			
-		} else if addresses.count >= 2 {
-			UIPasteboard.general.string = addresses.joined(separator: ", ")
+		popoverState.display(dismissable: true) {
+			IncomingDepositPopover()
 		}
 	}
 	
@@ -744,38 +727,6 @@ struct HomeView : MVIView {
 			if let result = result {
 				selectedItem = result
 			}
-		}
-	}
-	
-	// --------------------------------------------------
-	// MARK: Prefetch
-	// --------------------------------------------------
-	
-	func maybePreFetchPaymentsFromDatabase() -> Void {
-		
-		if !didPreFetch && paymentsPage.rows.count > 0 {
-			didPreFetch = true
-			
-			// Delay the pre-fetch process a little bit, to give priority to other app-startup tasks.
-			DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-				prefetchPaymentsFromDatabase(idx: 0)
-			}
-		}
-	}
-	
-	func prefetchPaymentsFromDatabase(idx: Int) {
-
-		guard idx < paymentsPage.rows.count else {
-			// recursion complete
-			return
-		}
-
-		let row = paymentsPage.rows[idx]
-		log.debug("Pre-fetching: \(row.id)")
-
-		let options = WalletPaymentFetchOptions.companion.Descriptions
-		paymentsManager.fetcher.getPayment(row: row, options: options) { (_, _) in
-			prefetchPaymentsFromDatabase(idx: idx + 1)
 		}
 	}
 	

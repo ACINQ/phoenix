@@ -32,6 +32,14 @@ struct PrivacyView: View {
 	@ViewBuilder
 	var body: some View {
 		
+		content()
+			.navigationTitle(NSLocalizedString("Privacy", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
 		let hasWallet = hasWallet()
 		
 		List {
@@ -69,8 +77,7 @@ struct PrivacyView: View {
 			
 		} // </List>
 		.listStyle(.insetGrouped)
-		.navigationTitle(NSLocalizedString("Privacy", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
+		.listBackgroundColor(.primaryBackground)
 		.onAppear() {
 			onAppear()
 		}

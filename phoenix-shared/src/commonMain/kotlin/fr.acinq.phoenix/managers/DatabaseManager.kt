@@ -12,6 +12,7 @@ import fr.acinq.phoenix.db.createPaymentsDbDriver
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
@@ -47,10 +48,10 @@ class DatabaseManager(
 
                 val nodeIdHash = nodeParams.nodeId.hash160().toHexString()
                 val channelsDb = SqliteChannelsDb(
-                    driver = createChannelsDbDriver(ctx, chain, nodeIdHash),
-                    nodeParams = nodeParams.copy()
+                    driver = createChannelsDbDriver(ctx, chain, nodeIdHash)
                 )
                 val paymentsDb = SqlitePaymentsDb(
+                    loggerFactory,
                     driver = createPaymentsDbDriver(ctx, chain, nodeIdHash),
                     currencyManager = currencyManager
                 )
@@ -60,6 +61,14 @@ class DatabaseManager(
                     override val payments: PaymentsDb get() = paymentsDb
                 }
             }
+        }
+    }
+
+    fun close() {
+        val db = databases.value
+        if (db != null) {
+            (db.channels as SqliteChannelsDb).close()
+            (db.payments as SqlitePaymentsDb).close()
         }
     }
 

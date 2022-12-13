@@ -30,7 +30,16 @@ struct PaymentOptionsView: View {
 	let maxFeesPublisher = Prefs.shared.maxFeesPublisher
 	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
+	@ViewBuilder
 	var body: some View {
+		
+		content()
+			.navigationTitle(NSLocalizedString("Payment Options", comment: "Navigation Bar Title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
 		
 		List {
 			
@@ -157,8 +166,7 @@ struct PaymentOptionsView: View {
 			} // </Section>
 		} // </List>
 		.listStyle(.insetGrouped)
-		.navigationTitle(NSLocalizedString("Payment Options", comment: "Navigation Bar Title"))
-		.navigationBarTitleDisplayMode(.inline)
+		.listBackgroundColor(.primaryBackground)
 		.onReceive(maxFeesPublisher) {
 			maxFeesChanged($0)
 		}
@@ -582,14 +590,14 @@ struct MaxFeeConfiguration: View, ViewName {
 				Button {
 					decrementExamplePaymentsIdx()
 				} label: {
-					Text("-")
+					Text(verbatim: "-")
 				}
 				.disabled(examplePaymentsIdx == 0)
 				
 				Button {
 					incrementExamplePaymentsIdx()
 				} label: {
-					Text("+")
+					Text(verbatim: "+")
 				}
 				.disabled(examplePaymentsIdx+1 == examplePayments.count)
 				

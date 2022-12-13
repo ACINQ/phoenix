@@ -35,9 +35,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.utils.msat
-import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
@@ -51,6 +52,7 @@ import fr.acinq.phoenix.controllers.config.ChannelsConfiguration
 fun ChannelsView() {
     val log = logger("ChannelsView")
     val nc = navController
+    val context = LocalContext.current
 
     val showChannelDialog = remember { mutableStateOf<ChannelsConfiguration.Model.Channel?>(null) }
     showChannelDialog.value?.let {
@@ -66,17 +68,29 @@ fun ChannelsView() {
             title = stringResource(id = R.string.listallchannels_title),
         )
         MVIView(CF::channelsConfiguration) { model, _ ->
-            if (model.channels.isEmpty()) {
-                Card(internalPadding = PaddingValues(16.dp)) {
-                    Text(text = stringResource(id = R.string.listallchannels_no_channels))
-                }
-            } else {
-                Card {
-                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                        items(model.channels) {
-                            ChannelLine(channel = it, onClick = { showChannelDialog.value = it })
+            Column(modifier = Modifier.weight(1f)) {
+                if (model.channels.isEmpty()) {
+                    Card(internalPadding = PaddingValues(16.dp)) {
+                        Text(text = stringResource(id = R.string.listallchannels_no_channels))
+                    }
+                } else {
+                    Card {
+                        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                            items(model.channels) {
+                                ChannelLine(channel = it, onClick = { showChannelDialog.value = it })
+                            }
                         }
                     }
+                }
+            }
+            Card {
+                Row {
+                    Text(text = stringResource(id = R.string.listallchannels_node_id), modifier = Modifier.padding(16.dp))
+                    Text(text = model.nodeId, style = MaterialTheme.typography.body2, overflow = TextOverflow.Ellipsis, maxLines = 1, modifier = Modifier.padding(vertical = 16.dp).weight(1f))
+                    Button(
+                        icon = R.drawable.ic_copy,
+                        onClick = { copyToClipboard(context, model.nodeId, context.getString(R.string.listallchannels_node_id)) },
+                    )
                 }
             }
         }
@@ -99,8 +113,20 @@ private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: (
         ) {}
         Spacer(modifier = Modifier.width(16.dp))
         Text(
-            text = channel.stateName,
-            modifier = Modifier.weight(1.0f)
+            text = when (channel.stateName) {
+                Normal::class.simpleName -> stringResource(id = R.string.state_normal)
+                Closed::class.simpleName -> stringResource(id = R.string.state_closed)
+                Closing::class.simpleName -> stringResource(id = R.string.state_closing)
+                Syncing::class.simpleName -> stringResource(id = R.string.state_sync)
+                Offline::class.simpleName -> stringResource(id = R.string.state_offline)
+                ShuttingDown::class.simpleName -> stringResource(id = R.string.state_shutdown)
+                WaitForFundingConfirmed::class.simpleName, WaitForAcceptChannel::class.simpleName, WaitForChannelReady::class.simpleName, WaitForFundingSigned::class.simpleName, WaitForFundingCreated::class.simpleName -> stringResource(id = R.string.state_wait_confirmed)
+                WaitForOpenChannel::class.simpleName -> stringResource(id = R.string.state_wait_open)
+                else -> channel.stateName
+            },
+            modifier = Modifier.weight(1.0f),
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
         )
         Spacer(modifier = Modifier.width(8.dp))
         AmountView(amount = balance, showUnit = false)
@@ -117,15 +143,7 @@ private fun ChannelDialog(onDismiss: () -> Unit, channel: ChannelsConfiguration.
     val txUrl = txUrl(txId = channel.txId ?: "")
     Dialog(
         onDismiss = onDismiss,
-        buttons = {
-            Row(Modifier.fillMaxWidth()) {
-                Button(onClick = { copyToClipboard(context, channel.json, "channel data") }, icon = R.drawable.ic_copy)
-                Button(onClick = { share(context, channel.json, subject = "") }, icon = R.drawable.ic_share)
-                Button(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(txUrl))) }, text = stringResource(id = R.string.listallchannels_funding_tx))
-                Spacer(modifier = Modifier.weight(1.0f))
-                Button(onClick = onDismiss, text = stringResource(id = R.string.listallchannels_close))
-            }
-        }
+        buttons = null
     ) {
         Column(
             modifier = Modifier
@@ -141,6 +159,13 @@ private fun ChannelDialog(onDismiss: () -> Unit, channel: ChannelsConfiguration.
                     .verticalScroll(rememberScrollState()),
                 style = monoTypo(),
             )
+        }
+        Row(Modifier.fillMaxWidth()) {
+            Button(onClick = { copyToClipboard(context, channel.json, "channel data") }, icon = R.drawable.ic_copy)
+            Button(onClick = { share(context, channel.json, subject = "") }, icon = R.drawable.ic_share)
+            Button(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(txUrl))) }, text = stringResource(id = R.string.listallchannels_funding_tx))
+            Spacer(modifier = Modifier.weight(1.0f))
+            Button(onClick = onDismiss, text = stringResource(id = R.string.listallchannels_close))
         }
     }
 }

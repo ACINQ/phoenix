@@ -17,14 +17,14 @@ object Versions {
     const val fcmPlugin = "4.3.10"
 
     object Android {
-        const val ktx = "1.5.0"
-        const val lifecycle = "2.4.1"
+        const val coreKtx = "1.9.0"
+        const val lifecycle = "2.5.1"
         const val prefs = "1.2.0"
         const val datastore = "1.0.0"
-        const val compose = "1.2.1"
+        const val compose = "1.3.1"
         const val composeCompiler = "1.2.0-rc02"
-        const val navCompose = "2.4.2"
-        const val accompanist = "0.23.1"
+        const val navCompose = "2.5.3"
+        const val accompanist = "0.27.1"
         const val biometrics = "1.1.0"
 
         const val zxing = "4.1.0"
@@ -36,7 +36,7 @@ object Versions {
     }
 
     object AndroidLegacy {
-        const val eclair = "0.4.17-android-phoenix-SNAPSHOT"
+        const val eclair = "0.4.19-android-phoenix-SNAPSHOT"
 
         const val safeArgs = "2.3.5"
         const val appCompat = "1.3.0"

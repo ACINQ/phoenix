@@ -56,7 +56,7 @@ fun SendLightningPaymentView(
     log.info { "init sendview amount=${paymentRequest.amount} desc=${paymentRequest.description}" }
 
     val context = LocalContext.current
-    val balance = business.peerManager.balance.collectAsState(null).value
+    val balance = business.balanceManager.balance.collectAsState(null).value
     val prefBitcoinUnit = LocalBitcoinUnit.current
 
     val requestedAmount = paymentRequest.amount
@@ -120,7 +120,7 @@ fun SendLightningPaymentView(
         }
         Spacer(modifier = Modifier.height(36.dp))
         FilledButton(
-            text = R.string.send_pay_button,
+            text = stringResource(id = R.string.send_pay_button),
             icon = R.drawable.ic_send,
             enabled = amount != null && amountErrorMessage.isBlank(),
         ) {

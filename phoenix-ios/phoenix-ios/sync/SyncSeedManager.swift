@@ -267,36 +267,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	}
 	
 	// ----------------------------------------
-	// MARK: State Machine
-	// ----------------------------------------
-	
-	func finishWaiting(_ sender: SyncSeedManager_State_Waiting) {
-		log.trace("finishWaiting()")
-		
-		Task {
-			if let newState = await self.actor.finishWaiting(sender) {
-				self.handleNewState(newState)
-			}
-		}
-	}
-	
-	private func handleNewState(_ newState: SyncSeedManager_State) {
-		
-		log.debug("state = \(newState)")
-		switch newState {
-			case .uploading:
-				uploadSeed()
-			case .deleting:
-				deleteSeed()
-			default:
-				break
-		}
-		
-		publishNewState(newState)
-	}
-	
-	// ----------------------------------------
-	// MARK: Flow
+	// MARK: External Control
 	// ----------------------------------------
 	
 	/// Called from SyncManager; part of SyncManagerProtocol
@@ -321,6 +292,52 @@ class SyncSeedManager: SyncManagerProtcol {
 				self.handleNewState(newState)
 			}
 		}
+	}
+	
+	/// Called from `SyncSeedManager_State_Waiting`
+	/// 
+	func finishWaiting(_ sender: SyncSeedManager_State_Waiting) {
+		log.trace("finishWaiting()")
+		
+		Task {
+			if let newState = await self.actor.finishWaiting(sender) {
+				self.handleNewState(newState)
+			}
+		}
+	}
+	
+	/// Used when closing the corresponding wallet.
+	/// We transition to a terminal state.
+	///
+	func shutdown() {
+		log.trace("shutdown()")
+		
+		Task {
+			if let newState = await self.actor.shutdown() {
+				self.handleNewState(newState)
+			}
+		}
+		
+		cancellables.removeAll()
+	}
+	
+	// ----------------------------------------
+	// MARK: Flow
+	// ----------------------------------------
+	
+	private func handleNewState(_ newState: SyncSeedManager_State) {
+		
+		log.debug("state = \(newState)")
+		switch newState {
+			case .uploading:
+				uploadSeed()
+			case .deleting:
+				deleteSeed()
+			default:
+				break
+		}
+		
+		publishNewState(newState)
 	}
 	
 	private func uploadSeed() {
