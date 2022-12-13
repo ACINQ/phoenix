@@ -169,9 +169,7 @@ fun PaymentDetailsSplashView(
             Spacer(modifier = Modifier.height(32.dp))
         }
 
-        Spacer(Modifier.height(16.dp))
-
-        Card(shape = CircleShape) {
+        Card {
             Button(
                 text = stringResource(id = R.string.paymentdetails_details_button),
                 icon = R.drawable.ic_tool,

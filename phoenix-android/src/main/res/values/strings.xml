@@ -603,7 +603,7 @@
 
     <!-- //////////////// Tor setting //////////////// -->
 
-    <string name="tor_settings_title">Tor Settings</string>
+    <string name="tor_settings_title">Tor</string>
     <string name="tor_settings_subtitle">Phoenix can use Tor to shield your IP from the other nodes in the Lightning Network and Electrum servers. This improves your privacy but makes the app slower.</string>
     <string name="tor_settings_unknown">Checking preferences…</string>
     <string name="tor_settings_enabled">Tor is enabled</string>
@@ -614,7 +614,7 @@
     <string name="tor_settings_state_closed">The Tor proxy is shutdown.\nPlease wait and check your Internet connection.</string>
     <string name="tor_settings_state_starting">Starting Tor proxy…</string>
     <string name="tor_settings_state_started">Tor is online</string>
-    <string name="tor_settings_state_about_perfs">Note that the Tor network is an open project running on donations. It can be very slow sometimes.</string>
+    <string name="tor_settings_state_about_perfs">Note that the Tor network is an open project running on donations. It can sometimes be very slow, which will affect the app\'s performances.</string>
 
     <!-- ////////////// connection issues dialog //////////////// -->
 
