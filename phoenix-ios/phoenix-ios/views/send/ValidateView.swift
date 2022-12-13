@@ -244,18 +244,18 @@ struct ValidateView: View {
 				.padding(.top, 4)
 				.padding(.bottom)
 			
-			if hasExtendedMetadata() || hasRange() || canTip() || supportsComment() {
+			if showMetadataButton() || showRangeButton() || showTipButton() || showCommentButton() {
 				HStack(alignment: VerticalAlignment.center, spacing: 20) {
-					if hasExtendedMetadata() {
+					if showMetadataButton() {
 						metadataButton()
 					}
-					if hasRange() {
+					if showRangeButton() {
 						rangeButton()
 					}
-					if canTip() {
+					if showTipButton() {
 						tipButton()
 					}
-					if supportsComment() {
+					if showCommentButton() {
 						commentButton()
 					}
 				}
@@ -504,7 +504,7 @@ struct ValidateView: View {
 		}
 	}
 	
-	func hasExtendedMetadata() -> Bool {
+	func showMetadataButton() -> Bool {
 		
 		guard let lnurlPay = lnurlPay() else {
 			return false
@@ -523,8 +523,13 @@ struct ValidateView: View {
 		return false
 	}
 	
-	func hasRange() -> Bool {
+	func showRangeButton() -> Bool {
 		
+		// We've decided this button isn't particularly useful,
+		// and the error messages explaining min or max are sufficient.
+		return false
+		
+	/*
 		// The "range" button is used for:
 		// - lnurl-pay
 		// - lnurl-withdraw
@@ -540,9 +545,10 @@ struct ValidateView: View {
 		} else {
 			return false
 		}
+	*/
 	}
 	
-	func canTip() -> Bool {
+	func showTipButton() -> Bool {
 		
 		if mvi.model is Scan.Model_SwapOutFlow {
 			return true
@@ -563,7 +569,7 @@ struct ValidateView: View {
 		return parsedAmountMsat() == nil
 	}
 	
-	func supportsComment() -> Bool {
+	func showCommentButton() -> Bool {
 		
 		guard let lnurlPay = lnurlPay() else {
 			return false
@@ -1430,7 +1436,7 @@ struct ValidateView: View {
 			
 		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
 			
-			if supportsComment() && comment.count == 0 && !hasPromptedForComment {
+			if showCommentButton() && comment.count == 0 && !hasPromptedForComment {
 				
 				let maxCommentLength = model.lnurlPay.maxCommentLength?.intValue ?? 140
 				
