@@ -150,20 +150,6 @@ class GroupPrefs {
 		defaults.removeObject(forKey: Key.electrumConfig.rawValue)
 		defaults.removeObject(forKey: Key.isTorEnabled.rawValue)
 	}
-	
-	lazy private(set) var isTorEnabledPublisher: CurrentValueSubject<Bool, Never> = {
-		return CurrentValueSubject<Bool, Never>(self.isTorEnabled)
-	}()
-
-	var isTorEnabled: Bool {
-		get {
-			 defaults.bool(forKey: Key.isTorEnabled.rawValue)
-		}
-		set {
-			defaults.set(newValue, forKey: Key.isTorEnabled.rawValue)
-			isTorEnabledPublisher.send(newValue)
-		}
-	}
 
 	// --------------------------------------------------
 	// MARK: Migration
