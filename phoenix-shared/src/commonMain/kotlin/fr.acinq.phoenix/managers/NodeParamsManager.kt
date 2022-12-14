@@ -118,7 +118,8 @@ class NodeParamsManager(
                     maxFundingSatoshis = 21_000_000_000_00000.sat,
                     maxPaymentAttempts = 5,
                     enableTrampolinePayment = true,
-                    zeroConfPeers = setOf(PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134"))
+                    zeroConfPeers = setOf(PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134")),
+                    paymentRecipientExpiryParams = RecipientCltvExpiryParams(CltvExpiryDelta(4), CltvExpiryDelta(12)),
                 )
 
                 _nodeParams.value = nodeParams
