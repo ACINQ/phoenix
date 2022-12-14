@@ -39,7 +39,7 @@ object Versions {
 
         const val safeArgs = "2.3.5"
         const val appCompat = "1.3.0"
-        const val material = "1.4.0-alpha02"
+        const val material = "1.7.0"
         const val navigation = "2.3.5"
         const val constraint = "2.0.4"
         const val lifecycleExtensions = "2.2.0"

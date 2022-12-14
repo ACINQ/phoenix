@@ -23,11 +23,11 @@ fun gitCommitHash(): String {
 val chain: String by project
 
 android {
-  compileSdk = 32
+  compileSdk = 33
   ndkVersion = "23.1.7779620"
   defaultConfig {
     minSdk = 24
-    targetSdk = 32
+    targetSdk = 33
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
@@ -99,14 +99,14 @@ dependencies {
   // ANDROIDX - preferences
   implementation("androidx.preference:preference-ktx:${Versions.Android.prefs}")
   // ANDROIDX - work manager
-  implementation("androidx.work:work-runtime-ktx:${Versions.AndroidLegacy.work}") {
-    exclude(group = "com.google.guava", module = "listenablefuture")
-  }
+  implementation("androidx.work:work-runtime-ktx:${Versions.AndroidLegacy.work}")
   // ANDROIDX - view pager 2
   implementation("androidx.viewpager2:viewpager2:${Versions.AndroidLegacy.viewpager}")
 
   // -- AndroidX: preferences datastore
   implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+  implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
 
   // SQLDelight
   implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
