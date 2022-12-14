@@ -4,6 +4,9 @@ name: Build
 on:
   push:
     branches: [ master, test-ci-build ]
+    paths:
+      - 'phoenix-legacy/**'
+      - 'phoenix-android/**'
 
 jobs:
   build:
