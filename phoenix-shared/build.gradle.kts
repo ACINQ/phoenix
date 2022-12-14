@@ -29,6 +29,10 @@ kotlin {
             configureEach {
                 it.compilations.all {
                     kotlinOptions.freeCompilerArgs += "-Xoverride-konan-properties=osVersionMin.ios_x64=14.0;osVersionMin.ios_arm64=14.0"
+                    // The notification-service-extension is limited to 24 MB of memory.
+                    // With mimalloc we can easily hit the 24 MB limit, and the OS kills the process.
+                    // But with standard allocation, we're using less then half the limit.
+                    kotlinOptions.freeCompilerArgs += "-Xallocator=std"
                     kotlinOptions.freeCompilerArgs += listOf("-linker-options", "-application_extension")
                 }
             }
