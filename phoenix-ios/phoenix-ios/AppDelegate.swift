@@ -28,9 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		return UIApplication.shared.delegate as! AppDelegate
 	}
 	
-	private var badgeCount = 0
 	private var cancellables = Set<AnyCancellable>()
-	
 	private var isInBackground = false
 	
 	public var externalLightningUrlPublisher = PassthroughSubject<String, Never>()
@@ -117,7 +115,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		log.trace("### applicationDidBecomeActive(_:)")
 		
 		UIApplication.shared.applicationIconBadgeNumber = 0
-		self.badgeCount = 0
+		GroupPrefs.shared.badgeCount = 0
 	}
 	
 	func _applicationWillResignActive(_ application: UIApplication) {
@@ -256,7 +254,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		publisher = business.paymentsManager.lastIncomingPaymentPublisher()
 		cancellable = publisher!.sink(receiveValue: { (payment: Lightning_kmpIncomingPayment) in
-				
+			
 			assertMainThread()
 			
 			guard
@@ -321,32 +319,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 				return
 			}
 			
+			let paymentInfos = [
+				WalletPaymentInfo(
+					payment: payment,
+					metadata: WalletPaymentMetadata.empty(),
+					fetchOptions: WalletPaymentFetchOptions.companion.None
+				)
+			]
+			
 			let currencyPrefs = CurrencyPrefs()
-			let formattedAmt = Utils.format(currencyPrefs, msat: payment.amount)
-
-			let paymentInfo = WalletPaymentInfo(
-				payment: payment,
-				metadata: WalletPaymentMetadata.empty(),
-				fetchOptions: WalletPaymentFetchOptions.companion.None
-			)
-			
-			var body: String
-			if let desc = paymentInfo.paymentDescription(), desc.count > 0 {
-				body = "\(formattedAmt.string): \(desc)"
-			} else {
-				body = formattedAmt.string
-			}
-			
-			// The user can independently enabled/disable:
-			// - alerts
-			// - badges
-			// So we may only be able to badge the app icon, and that's it.
-			self.badgeCount += 1
+			let bitcoinUnit = currencyPrefs.bitcoinUnit
+			let fiatCurrency = currencyPrefs.fiatCurrency
+			let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
 			
 			let content = UNMutableNotificationContent()
-			content.title = "Payment received"
-			content.body = body
-			content.badge = NSNumber(value: self.badgeCount)
+			content.fillForReceivedPayments(
+				payments: paymentInfos,
+				bitcoinUnit: bitcoinUnit,
+				exchangeRate: exchangeRate
+			)
 			
 			let request = UNNotificationRequest(
 				identifier: payment.id(),
@@ -380,12 +371,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 				return
 			}
 			
-			self.badgeCount += 1
+			GroupPrefs.shared.badgeCount += 1
 			
 			let content = UNMutableNotificationContent()
 			content.title = "Some of your channels have closed"
 			content.body = "Please start Phoenix to review your channels."
-			content.badge = NSNumber(value: self.badgeCount)
+			content.badge = NSNumber(value: GroupPrefs.shared.badgeCount)
 			
 			let request = UNNotificationRequest(
 				identifier: "revokedCommit",

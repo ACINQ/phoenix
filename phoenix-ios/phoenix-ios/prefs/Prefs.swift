@@ -23,7 +23,6 @@ fileprivate enum Key: String {
 	case maxFees
 	case hideAmountsOnHomeScreen
 	case recentPaymentSeconds
-	case iLikeCheese
 }
 
 /// Standard app preferences, stored in the iOS UserDefaults system.
@@ -163,25 +162,6 @@ class Prefs {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Testing
-	// --------------------------------------------------
-	
-	lazy private(set) var iLikeCheesePublisher: AnyPublisher<Bool, Never> = {
-		defaults.publisher(for: \.iLikeCheese, options: [.new])
-			.removeDuplicates()
-			.eraseToAnyPublisher()
-	}()
-	
-	var iLikeCheese: Bool {
-		get { defaults.iLikeCheese }
-		set { defaults.iLikeCheese = newValue }
-	}
-	
-	func fakeReset() {
-		defaults.removeObject(forKey: Key.iLikeCheese.rawValue)
-	}
-	
-	// --------------------------------------------------
 	// MARK: Backup
 	// --------------------------------------------------
 	
@@ -267,10 +247,5 @@ extension UserDefaults {
 	@objc fileprivate var pushPermissionQuery: Data? {
 		get { data(forKey: Key.pushPermissionQuery.rawValue) }
 		set { set(newValue, forKey: Key.pushPermissionQuery.rawValue) }
-	}
-	
-	@objc fileprivate var iLikeCheese: Bool {
-		get { bool(forKey: Key.iLikeCheese.rawValue) }
-		set { set(newValue, forKey: Key.iLikeCheese.rawValue) }
 	}
 }
