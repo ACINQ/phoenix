@@ -26,6 +26,7 @@ fileprivate enum Key: String {
 	case currencyConverterList
 	case electrumConfig
 	case isTorEnabled
+	case badgeCount
 }
 
 /// Group preferences, stored in the iOS UserDefaults system.
@@ -136,7 +137,12 @@ class GroupPrefs {
 		get { defaults.isTorEnabled }
 		set { defaults.isTorEnabled = newValue }
 	}
-
+	
+	var badgeCount: Int {
+		get { defaults.badgeCount }
+		set { defaults.badgeCount = newValue }
+	}
+	
 	// --------------------------------------------------
 	// MARK: Reset Wallet
 	// --------------------------------------------------
@@ -149,6 +155,7 @@ class GroupPrefs {
 		defaults.removeObject(forKey: Key.currencyConverterList.rawValue)
 		defaults.removeObject(forKey: Key.electrumConfig.rawValue)
 		defaults.removeObject(forKey: Key.isTorEnabled.rawValue)
+		defaults.removeObject(forKey: Key.badgeCount.rawValue)
 	}
 
 	// --------------------------------------------------
@@ -223,5 +230,10 @@ extension UserDefaults {
 	@objc fileprivate var isTorEnabled: Bool {
 		get { bool(forKey: Key.isTorEnabled.rawValue) }
 		set { set(newValue, forKey: Key.isTorEnabled.rawValue) }
+	}
+	
+	@objc fileprivate var badgeCount: Int {
+		get { integer(forKey: Key.badgeCount.rawValue) }
+		set { set(newValue, forKey: Key.badgeCount.rawValue) }
 	}
 }

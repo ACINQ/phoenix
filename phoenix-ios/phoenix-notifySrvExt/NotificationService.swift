@@ -191,47 +191,23 @@ class NotificationService: UNNotificationServiceExtension {
 			
 		} else { // received 1 or more payments
 			
-			var msat: Int64 = 0
-			for payment in receivedPayments {
-				msat += payment.amount.msat
-			}
-			
-			let bitcoinUnit = GroupPrefs.shared.bitcoinUnit
-			let fiatCurrency = GroupPrefs.shared.fiatCurrency
-			
-			let bitcoinAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
-			
-			var fiatAmt: FormattedAmount? = nil
-			if let exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency) {
-				fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
-			}
-			
-			var amount = bitcoinAmt.string
-			if let fiatAmt = fiatAmt {
-				amount += " (≈\(fiatAmt.string))"
-			}
-			
-			if receivedPayments.count == 1 {
-				let payment = receivedPayments.first!
-				
-				let paymentInfo = WalletPaymentInfo(
+			let paymentInfos = receivedPayments.map { payment in
+				WalletPaymentInfo(
 					payment: payment,
 					metadata: WalletPaymentMetadata.empty(),
 					fetchOptions: WalletPaymentFetchOptions.companion.None
 				)
-				
-				bestAttemptContent.title = "Received payment"
-				if let desc = paymentInfo.paymentDescription(), desc.count > 0 {
-					bestAttemptContent.body = "\(amount): \(desc)"
-				} else {
-					bestAttemptContent.body = amount
-				}
-				
-			} else {
-				
-				bestAttemptContent.title = "Received multiple payments"
-				bestAttemptContent.body = amount
 			}
+			
+			let bitcoinUnit = GroupPrefs.shared.bitcoinUnit
+			let fiatCurrency = GroupPrefs.shared.fiatCurrency
+			let exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
+			
+			bestAttemptContent.fillForReceivedPayments(
+				payments: paymentInfos,
+				bitcoinUnit: bitcoinUnit,
+				exchangeRate: exchangeRate
+			)
 		}
 		
 		contentHandler(bestAttemptContent)

@@ -48,86 +48,49 @@ class SqlitePaymentsDb(
     private val currencyManager: CurrencyManager? = null
 ) : PaymentsDb {
 
-    init {
-        ensureNeverFrozen() // Crashes when attempting to freeze CurrencyManager sub-graph
-    }
-
     private val log = newLogger(loggerFactory)
 
-    /**
-     * Within `SqlitePaymentsDb`, we are using background threads.
-     * ```
-     * withContext(Dispatchers.Default) {
-     *     // code running in background thread here...
-     * }
-     * ```
-     * Recall that kotlin-native has that horrible unworkable memory management "feature",
-     * where it attempts to freeze the object sub-graph of any object moved between threads.
-     * This means that:
-     * ```
-     * withContext(Dispatchers.Default) {
-     *     // Any object we access within this lambda will be frozen.
-     *     localVariable.function() // implicitly accesses this...
-     *     // Thus kotlin-native will freeze `this`, and ALL local variables too.
-     *     // Which results in a crash.
-     * }
-     * ```
-     * There are various workarounds for this problem. In the long-term, the preferred solution
-     * is to disable kotlin's unworkable ridiculous policy. Which is possible in v1.6.0.
-     * But for the time being, the simplest solution is:
-     * ```
-     * val variable = localVariable
-     * withContext(Dispatchers.Default) {
-     *     variable.function() // only freeze variable, and not `this`
-     * }
-     * ```
-     */
-    class Properties(driver: SqlDriver) {
-        val database = PaymentsDatabase(
-            driver = driver,
-            outgoing_payment_partsAdapter = Outgoing_payment_parts.Adapter(
-                part_routeAdapter = OutgoingQueries.hopDescAdapter,
-                part_status_typeAdapter = EnumColumnAdapter()
-            ),
-            outgoing_paymentsAdapter = Outgoing_payments.Adapter(
-                status_typeAdapter = EnumColumnAdapter(),
-                details_typeAdapter = EnumColumnAdapter()
-            ),
-            incoming_paymentsAdapter = Incoming_payments.Adapter(
-                origin_typeAdapter = EnumColumnAdapter(),
-                received_with_typeAdapter = EnumColumnAdapter()
-            ),
-            payments_metadataAdapter = Payments_metadata.Adapter(
-                lnurl_base_typeAdapter = EnumColumnAdapter(),
-                lnurl_metadata_typeAdapter = EnumColumnAdapter(),
-                lnurl_successAction_typeAdapter = EnumColumnAdapter()
-            ),
-            outgoing_payment_closing_tx_partsAdapter = Outgoing_payment_closing_tx_parts.Adapter(
-                part_closing_info_typeAdapter = EnumColumnAdapter()
-            )
+    private val database = PaymentsDatabase(
+        driver = driver,
+        outgoing_payment_partsAdapter = Outgoing_payment_parts.Adapter(
+            part_routeAdapter = OutgoingQueries.hopDescAdapter,
+            part_status_typeAdapter = EnumColumnAdapter()
+        ),
+        outgoing_paymentsAdapter = Outgoing_payments.Adapter(
+            status_typeAdapter = EnumColumnAdapter(),
+            details_typeAdapter = EnumColumnAdapter()
+        ),
+        incoming_paymentsAdapter = Incoming_payments.Adapter(
+            origin_typeAdapter = EnumColumnAdapter(),
+            received_with_typeAdapter = EnumColumnAdapter()
+        ),
+        payments_metadataAdapter = Payments_metadata.Adapter(
+            lnurl_base_typeAdapter = EnumColumnAdapter(),
+            lnurl_metadata_typeAdapter = EnumColumnAdapter(),
+            lnurl_successAction_typeAdapter = EnumColumnAdapter()
+        ),
+        outgoing_payment_closing_tx_partsAdapter = Outgoing_payment_closing_tx_parts.Adapter(
+            part_closing_info_typeAdapter = EnumColumnAdapter()
         )
-        val inQueries = IncomingQueries(database)
-        val outQueries = OutgoingQueries(database)
-        val aggrQueries = database.aggregatedQueriesQueries
-        val metaQueries = MetadataQueries(database)
+    )
 
-        val cloudKitDb = makeCloudKitDb(database)
-    }
+    private val inQueries = IncomingQueries(database)
+    private val outQueries = OutgoingQueries(database)
+    private val aggrQueries = database.aggregatedQueriesQueries
+    private val metaQueries = MetadataQueries(database)
 
-    val _doNotFreezeMe = Properties(driver)
-
-    fun getCloudKitDb(): CloudKitInterface? {
-        return _doNotFreezeMe.cloudKitDb
-    }
+    private val cloudKitDb = makeCloudKitDb(database)
 
     private var metadataQueue = MutableStateFlow(mapOf<WalletPaymentId, WalletPaymentMetadataRow>())
+
+    fun getCloudKitDb(): CloudKitInterface? {
+        return cloudKitDb
+    }
 
     override suspend fun addOutgoingLightningParts(
         parentId: UUID,
         parts: List<OutgoingPayment.LightningPart>
     ) {
-        val outQueries = _doNotFreezeMe.outQueries
-
         withContext(Dispatchers.Default) {
             outQueries.addLightningParts(parentId, parts)
         }
@@ -136,10 +99,6 @@ class SqlitePaymentsDb(
     override suspend fun addOutgoingPayment(
         outgoingPayment: OutgoingPayment
     ) {
-        val database = _doNotFreezeMe.database
-        val outQueries = _doNotFreezeMe.outQueries
-        val metaQueries = _doNotFreezeMe.metaQueries
-
         val paymentId = outgoingPayment.walletPaymentId()
         val metadataRow = dequeueMetadata(paymentId)
 
@@ -159,8 +118,6 @@ class SqlitePaymentsDb(
         parts: List<OutgoingPayment.ClosingTxPart>,
         completedAt: Long
     ) {
-        val outQueries = _doNotFreezeMe.outQueries
-
         withContext(Dispatchers.Default) {
             outQueries.completePaymentForClosing(id, parts, OutgoingPayment.Status.Completed.Succeeded.OnChain(completedAt))
         }
@@ -171,8 +128,6 @@ class SqlitePaymentsDb(
         preimage: ByteVector32,
         completedAt: Long
     ) {
-        val outQueries = _doNotFreezeMe.outQueries
-
         withContext(Dispatchers.Default) {
             outQueries.completePayment(id, OutgoingPayment.Status.Completed.Succeeded.OffChain(preimage, completedAt))
         }
@@ -183,8 +138,6 @@ class SqlitePaymentsDb(
         finalFailure: FinalFailure,
         completedAt: Long
     ) {
-        val outQueries = _doNotFreezeMe.outQueries
-
         withContext(Dispatchers.Default) {
             outQueries.completePayment(id, OutgoingPayment.Status.Completed.Failed(finalFailure, completedAt))
         }
@@ -195,8 +148,6 @@ class SqlitePaymentsDb(
         preimage: ByteVector32,
         completedAt: Long
     ) {
-        val outQueries = _doNotFreezeMe.outQueries
-
         withContext(Dispatchers.Default) {
             outQueries.updateLightningPart(partId, preimage, completedAt)
         }
@@ -207,8 +158,6 @@ class SqlitePaymentsDb(
         failure: Either<ChannelException, FailureMessage>,
         completedAt: Long
     ) {
-        val outQueries = _doNotFreezeMe.outQueries
-
         withContext(Dispatchers.Default) {
             outQueries.updateLightningPart(partId, failure, completedAt)
         }
@@ -224,8 +173,6 @@ class SqlitePaymentsDb(
         failedStatus: OutgoingPayment.LightningPart.Status.Failed,
         completedAt: Long
     ) {
-        val outQueries = _doNotFreezeMe.outQueries
-
         withContext(Dispatchers.Default) {
             val (statusType, statusData) = failedStatus.mapToDb()
             outQueries.database.outgoingPaymentsQueries.updateLightningPart(
@@ -240,7 +187,6 @@ class SqlitePaymentsDb(
     override suspend fun getOutgoingPaymentFromPartId(
         partId: UUID
     ): OutgoingPayment? {
-        val outQueries = _doNotFreezeMe.outQueries
 
         return withContext(Dispatchers.Default) {
             outQueries.getPaymentFromPartId(partId)
@@ -250,7 +196,6 @@ class SqlitePaymentsDb(
     override suspend fun getOutgoingPayment(
         id: UUID
     ): OutgoingPayment? {
-        val outQueries = _doNotFreezeMe.outQueries
 
         return withContext(Dispatchers.Default) {
             outQueries.getPayment(id)
@@ -261,9 +206,6 @@ class SqlitePaymentsDb(
         id: UUID,
         options: WalletPaymentFetchOptions
     ): Pair<OutgoingPayment, WalletPaymentMetadata?>? {
-        val database = _doNotFreezeMe.database
-        val outQueries = _doNotFreezeMe.outQueries
-        val metaQueries = _doNotFreezeMe.metaQueries
 
         return withContext(Dispatchers.Default) {
             database.transactionWithResult {
@@ -283,7 +225,6 @@ class SqlitePaymentsDb(
     override suspend fun listOutgoingPayments(
         paymentHash: ByteVector32
     ): List<OutgoingPayment> {
-        val outQueries = _doNotFreezeMe.outQueries
 
         return withContext(Dispatchers.Default) {
             outQueries.listPayments(paymentHash)
@@ -296,7 +237,6 @@ class SqlitePaymentsDb(
         skip: Int,
         filters: Set<PaymentTypeFilter>
     ): List<OutgoingPayment> {
-        val outQueries = _doNotFreezeMe.outQueries
 
         return withContext(Dispatchers.Default) {
             outQueries.listPayments(count, skip)
@@ -310,10 +250,6 @@ class SqlitePaymentsDb(
         origin: IncomingPayment.Origin,
         createdAt: Long
     ) {
-        val database = _doNotFreezeMe.database
-        val inQueries = _doNotFreezeMe.inQueries
-        val metaQueries = _doNotFreezeMe.metaQueries
-
         val paymentHash = Crypto.sha256(preimage).toByteVector32()
         val paymentId = WalletPaymentId.IncomingPaymentId(paymentHash)
         val metadataRow = dequeueMetadata(paymentId)
@@ -339,9 +275,6 @@ class SqlitePaymentsDb(
         receivedWith: Set<IncomingPayment.ReceivedWith>,
         receivedAt: Long
     ) {
-        val database = _doNotFreezeMe.database
-        val inQueries = _doNotFreezeMe.inQueries
-
         withContext(Dispatchers.Default) {
             database.transaction {
                 inQueries.receivePayment(paymentHash, receivedWith, receivedAt)
@@ -356,10 +289,6 @@ class SqlitePaymentsDb(
         createdAt: Long,
         receivedAt: Long
     ) {
-        val database = _doNotFreezeMe.database
-        val inQueries = _doNotFreezeMe.inQueries
-        val metaQueries = _doNotFreezeMe.metaQueries
-
         val paymentHash = Crypto.sha256(preimage).toByteVector32()
         val paymentId = WalletPaymentId.IncomingPaymentId(paymentHash)
         val metadataRow = dequeueMetadata(paymentId)
@@ -385,9 +314,6 @@ class SqlitePaymentsDb(
         paymentHash: ByteVector32,
         channelId: ByteVector32
     ) {
-        val database = _doNotFreezeMe.database
-        val inQueries = _doNotFreezeMe.inQueries
-
         withContext(Dispatchers.Default) {
             database.transaction {
                 inQueries.updateNewChannelReceivedWithChannelId(paymentHash, channelId)
@@ -399,9 +325,6 @@ class SqlitePaymentsDb(
         channelId: ByteVector32,
         receivedAt: Long
     ) {
-        val database = _doNotFreezeMe.database
-        val inQueries = _doNotFreezeMe.inQueries
-
         withContext(Dispatchers.Default) {
             database.transaction {
                 inQueries.findNewChannelPayment(channelId)?.let { paymentHash ->
@@ -414,7 +337,6 @@ class SqlitePaymentsDb(
     override suspend fun getIncomingPayment(
         paymentHash: ByteVector32
     ): IncomingPayment? {
-        val inQueries = _doNotFreezeMe.inQueries
 
         return withContext(Dispatchers.Default) {
             inQueries.getIncomingPayment(paymentHash)
@@ -425,9 +347,6 @@ class SqlitePaymentsDb(
         paymentHash: ByteVector32,
         options: WalletPaymentFetchOptions
     ): Pair<IncomingPayment, WalletPaymentMetadata?>? {
-        val database = _doNotFreezeMe.database
-        val inQueries = _doNotFreezeMe.inQueries
-        val metaQueries = _doNotFreezeMe.metaQueries
 
         return withContext(Dispatchers.Default) {
             database.transactionWithResult {
@@ -447,7 +366,6 @@ class SqlitePaymentsDb(
         skip: Int,
         filters: Set<PaymentTypeFilter>
     ): List<IncomingPayment> {
-        val inQueries = _doNotFreezeMe.inQueries
 
         return withContext(Dispatchers.Default) {
             inQueries.listReceivedPayments(count, skip)
@@ -455,7 +373,6 @@ class SqlitePaymentsDb(
     }
 
     override suspend fun listIncomingPayments(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): List<IncomingPayment> {
-        val inQueries = _doNotFreezeMe.inQueries
 
         return withContext(Dispatchers.Default) {
             inQueries.listIncomingPayments(count, skip)
@@ -465,7 +382,6 @@ class SqlitePaymentsDb(
     // ---- cleaning expired payments
 
     override suspend fun listExpiredPayments(fromCreatedAt: Long, toCreatedAt: Long): List<IncomingPayment> {
-        val inQueries = _doNotFreezeMe.inQueries
 
         return withContext(Dispatchers.Default) {
             inQueries.listExpiredPayments(fromCreatedAt, toCreatedAt)
@@ -473,7 +389,7 @@ class SqlitePaymentsDb(
     }
 
     override suspend fun removeIncomingPayment(paymentHash: ByteVector32): Boolean {
-        val inQueries = _doNotFreezeMe.inQueries
+
         return withContext(Dispatchers.Default) {
             inQueries.deleteIncomingPayment(paymentHash)
         }
@@ -482,7 +398,6 @@ class SqlitePaymentsDb(
     // ---- list ALL payments
 
     suspend fun listPaymentsCount(): Long {
-        val aggrQueries = _doNotFreezeMe.aggrQueries
 
         return withContext(Dispatchers.Default) {
             aggrQueries.listAllPaymentsCount(::allPaymentsCountMapper).executeAsList().first()
@@ -490,7 +405,6 @@ class SqlitePaymentsDb(
     }
 
     suspend fun listPaymentsCountFlow(): Flow<Long> {
-        val aggrQueries = _doNotFreezeMe.aggrQueries
 
         return withContext(Dispatchers.Default) {
             aggrQueries.listAllPaymentsCount(::allPaymentsCountMapper).asFlow().mapToOne()
@@ -501,7 +415,6 @@ class SqlitePaymentsDb(
         count: Int,
         skip: Int
     ): List<WalletPaymentOrderRow> {
-        val aggrQueries = _doNotFreezeMe.aggrQueries
 
         return withContext(Dispatchers.Default) {
             aggrQueries.listAllPaymentsOrder(
@@ -516,7 +429,6 @@ class SqlitePaymentsDb(
         count: Int,
         skip: Int
     ): Flow<List<WalletPaymentOrderRow>> {
-        val aggrQueries = _doNotFreezeMe.aggrQueries
 
         return withContext(Dispatchers.Default) {
             aggrQueries.listAllPaymentsOrder(
@@ -532,7 +444,6 @@ class SqlitePaymentsDb(
         count: Int,
         skip: Int
     ): List<WalletPaymentOrderRow> {
-        val aggrQueries = _doNotFreezeMe.aggrQueries
 
         return withContext(Dispatchers.Default) {
             aggrQueries.listRecentPaymentsOrder(
@@ -549,7 +460,6 @@ class SqlitePaymentsDb(
         count: Int,
         skip: Int
     ): Flow<List<WalletPaymentOrderRow>> {
-        val aggrQueries = _doNotFreezeMe.aggrQueries
 
         return withContext(Dispatchers.Default) {
             aggrQueries.listRecentPaymentsOrder(
@@ -565,7 +475,6 @@ class SqlitePaymentsDb(
         count: Int,
         skip: Int
     ): Flow<List<WalletPaymentOrderRow>> {
-        val aggrQueries = _doNotFreezeMe.aggrQueries
 
         return withContext(Dispatchers.Default) {
             aggrQueries.listOutgoingInFlightPaymentsOrder(
@@ -621,8 +530,6 @@ class SqlitePaymentsDb(
         userDescription: String?,
         userNotes: String?
     ) {
-        val metaQueries = _doNotFreezeMe.metaQueries
-
         withContext(Dispatchers.Default) {
             metaQueries.updateUserInfo(
                 id = id,
@@ -635,8 +542,6 @@ class SqlitePaymentsDb(
     suspend fun deletePayment(
         paymentId: WalletPaymentId
     ) {
-        val database = _doNotFreezeMe.database
-
         withContext(Dispatchers.Default) {
             database.transaction {
                 when (paymentId) {
@@ -748,7 +653,7 @@ expect fun didCompleteWalletPayment(id: WalletPaymentId, database: PaymentsDatab
 expect fun didDeleteWalletPayment(id: WalletPaymentId, database: PaymentsDatabase)
 
 /**
- * Implement this function to execute platform specific code when a payment's metdata is updated.
+ * Implement this function to execute platform specific code when a payment's metadata is updated.
  * For example: the user modifies the payment description.
  *
  * This function is invoked inside the same transaction used to add/modify the row.
