@@ -140,7 +140,7 @@ struct AppStatusButton: View {
 						.squareFrame()
 				} else {
 					// Everything is good: connected + {synced|disabled|initializing}
-					if connectionsMonitor.connections.tor != nil {
+					if connectionsMonitor.connections.torEnabled {
 						AppStatusButtonIcon.connectedWithTor.view()
 							.frame(minHeight: headerButtonHeight)
 							.squareFrame()

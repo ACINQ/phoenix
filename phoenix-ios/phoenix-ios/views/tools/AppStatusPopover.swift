@@ -97,10 +97,10 @@ struct AppStatusPopover: View {
 			)
 			.padding(.bottom, 8)
 			
-			if let tor = connectionsMonitor.connections.tor {
+			if connectionsMonitor.connections.torEnabled {
 				ConnectionCell(
 					label: NSLocalizedString("Tor", comment: "AppStatusPopover: label"),
-					connection: tor
+					connection: connectionsMonitor.connections.tor
 				)
 				.padding(.bottom, 8)
 			}

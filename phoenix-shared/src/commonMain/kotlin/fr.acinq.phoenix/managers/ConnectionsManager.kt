@@ -13,10 +13,14 @@ data class Connections(
     val internet: Connection = Connection.CLOSED(reason = null),
     val tor: Connection = Connection.CLOSED(reason = null),
     val peer: Connection = Connection.CLOSED(reason = null),
-    val electrum: Connection = Connection.CLOSED(reason = null)
+    val electrum: Connection = Connection.CLOSED(reason = null),
+    val torEnabled: Boolean = false
 ) {
-    val global : Connection
-        get() = internet + tor + peer + electrum
+    val global : Connection get() = if (torEnabled) {
+        internet + tor + peer + electrum
+    } else {
+        internet + peer + electrum
+    }
 }
 
 class ConnectionsManager(
@@ -57,7 +61,8 @@ class ConnectionsManager(
                         NetworkState.Available -> Connection.ESTABLISHED
                         NetworkState.NotAvailable -> Connection.CLOSED(reason = null)
                     },
-                    tor = if (torEnabled) torState else Connection.CLOSED(reason = null)
+                    tor = if (torEnabled) torState else Connection.CLOSED(reason = null),
+                    torEnabled = torEnabled
                 )
             }.collect {
                 _connections.value = it
