@@ -22,7 +22,6 @@ class PeerManager(
     private val nodeParamsManager: NodeParamsManager,
     private val databaseManager: DatabaseManager,
     private val configurationManager: AppConfigurationManager,
-    private val tcpSocketBuilder: TcpSocket.Builder,
     private val electrumWatcher: ElectrumWatcher,
 ) : CoroutineScope by MainScope() {
 
@@ -31,7 +30,6 @@ class PeerManager(
         nodeParamsManager = business.nodeParamsManager,
         databaseManager = business.databaseManager,
         configurationManager = business.appConfigurationManager,
-        tcpSocketBuilder = business.tcpSocketBuilder,
         electrumWatcher = business.electrumWatcher
     )
 
@@ -64,7 +62,7 @@ class PeerManager(
                 walletParams = walletParams,
                 watcher = electrumWatcher,
                 db = databaseManager.databases.filterNotNull().first(),
-                socketBuilder = tcpSocketBuilder,
+                socketBuilder = null,
                 scope = MainScope()
             )
             _peer.value = peer

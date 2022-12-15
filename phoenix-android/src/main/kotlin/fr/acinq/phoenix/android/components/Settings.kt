@@ -25,10 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 
 
@@ -42,6 +40,42 @@ fun Setting(modifier: Modifier = Modifier, title: String, description: String?) 
         Text(title, style = MaterialTheme.typography.body2)
         Spacer(modifier = Modifier.height(2.dp))
         Text(description ?: "", style = MaterialTheme.typography.subtitle2)
+    }
+}
+
+@Composable
+fun SettingWithDecoration(
+    modifier: Modifier = Modifier,
+    title: String,
+    description: @Composable () -> Unit = {},
+    decoration: (@Composable ()-> Unit)?,
+) {
+    Column(
+        modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+    ) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (decoration != null) {
+                decoration()
+                Spacer(Modifier.width(12.dp))
+            }
+            Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
+        }
+        Spacer(modifier = Modifier.height(2.dp))
+        Row(Modifier.fillMaxWidth()) {
+            if (decoration != null) {
+                Spacer(modifier = Modifier.width(30.dp))
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.subtitle2) {
+                    description()
+                }
+            }
+        }
     }
 }
 
@@ -110,7 +144,7 @@ fun SettingInteractive(
 fun SettingSwitch(
     modifier: Modifier = Modifier,
     title: String,
-    description: String?,
+    description: String? = null,
     icon: Int = R.drawable.ic_blank,
     enabled: Boolean,
     isChecked: Boolean,
@@ -125,16 +159,18 @@ fun SettingSwitch(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize))
-            Spacer(Modifier.width(16.dp))
+            Spacer(Modifier.width(12.dp))
             Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
             Spacer(Modifier.width(16.dp))
             Switch(checked = isChecked, onCheckedChange = null)
         }
-        Spacer(modifier = Modifier.height(2.dp))
-        Row(Modifier.fillMaxWidth()) {
-            Spacer(modifier = Modifier.width(34.dp))
-            Text(text = description ?: "", style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f))
-            Spacer(Modifier.width(48.dp))
+        if (description != null) {
+            Spacer(modifier = Modifier.height(2.dp))
+            Row(Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.width(30.dp))
+                Text(text = description ?: "", style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f))
+                Spacer(Modifier.width(48.dp))
+            }
         }
     }
 }

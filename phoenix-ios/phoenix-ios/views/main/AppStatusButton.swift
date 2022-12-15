@@ -33,11 +33,7 @@ struct AppStatusButton: View {
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	
 	let syncTxManager = Biz.syncManager!.syncTxManager
-	
-	let systemImagesUsed = [
-		"bolt.fill", "bolt.slash", "bolt.slash.fill", "hourglass", "icloud", "exclamationmark.triangle"
-	]
-	
+
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -46,13 +42,9 @@ struct AppStatusButton: View {
 	var body: some View {
 		
 		ZStack {
-			ForEach(systemImagesUsed, id: \.self) { systemImageName in
-				Image(systemName: systemImageName)
-					.renderingMode(.template)
-					.imageScale(.large)
-					.font(.caption2)
+			ForEach(AppStatusButtonIcon.allCases) { icon in
+				icon.view()
 					.foregroundColor(.clear)
-					.padding(.all, 7)
 					.read(headerButtonHeightReader)
 					.accessibilityHidden(true)
 			} // </ForEach>
@@ -102,67 +94,61 @@ struct AppStatusButton: View {
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
 				if showText {
 					Text(NSLocalizedString("Offline", comment: "Connection state"))
+						.font(.caption2)
 						.padding(.leading, 10)
 						.padding(.trailing, -5)
 				}
-				Image(systemName: "bolt.slash.fill")
-					.imageScale(.large)
+				AppStatusButtonIcon.disconnected.view()
 					.frame(minHeight: headerButtonHeight)
 					.squareFrame()
 			}
-			.font(.caption2)
 		}
 		else if connectionStatus is Lightning_kmpConnection.ESTABLISHING {
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
 				if showText {
 					Text(NSLocalizedString("Connecting…", comment: "Connection state"))
+						.font(.caption2)
 						.padding(.leading, 10)
 						.padding(.trailing, -5)
 				}
-				Image(systemName: "bolt.slash")
-					.imageScale(.large)
+				AppStatusButtonIcon.connecting.view()
 					.frame(minHeight: headerButtonHeight)
 					.squareFrame()
 			}
-			.font(.caption2)
 		} else /* .established */ {
 			
 			if pendingSettings != nil {
 				// The user enabled/disabled cloud sync.
 				// We are using a 30 second delay before we start operating on the user's decision.
 				// Just in-case it was an accidental change, or the user changes his/her mind.
-				Image(systemName: "hourglass")
-					.imageScale(.large)
-					.font(.caption2)
+				AppStatusButtonIcon.waiting.view()
 					.frame(minHeight: headerButtonHeight)
 					.squareFrame()
 			} else {
 				let (isSyncing, isWaiting, isError) = buttonizeSyncStatus()
 				if isSyncing {
-					Image(systemName: "icloud")
-						.imageScale(.large)
-						.font(.caption2)
+					AppStatusButtonIcon.syncing.view()
 						.frame(minHeight: headerButtonHeight)
 						.squareFrame()
 				} else if isWaiting {
-					Image(systemName: "hourglass")
-						.imageScale(.large)
-						.font(.caption2)
+					AppStatusButtonIcon.waiting.view()
 						.frame(minHeight: headerButtonHeight)
 						.squareFrame()
 				} else if isError {
-					Image(systemName: "exclamationmark.triangle")
-						.imageScale(.large)
-						.font(.caption2)
+					AppStatusButtonIcon.error.view()
 						.frame(minHeight: headerButtonHeight)
 						.squareFrame()
 				} else {
 					// Everything is good: connected + {synced|disabled|initializing}
-					Image(systemName: "bolt.fill")
-						.imageScale(.large)
-						.font(.caption2)
-						.frame(minHeight: headerButtonHeight)
-						.squareFrame()
+					if connectionsMonitor.connections.torEnabled {
+						AppStatusButtonIcon.connectedWithTor.view()
+							.frame(minHeight: headerButtonHeight)
+							.squareFrame()
+					} else {
+						AppStatusButtonIcon.connected.view()
+							.frame(minHeight: headerButtonHeight)
+							.squareFrame()
+					}
 				}
 			}
 		}
@@ -283,6 +269,58 @@ struct AppStatusButton: View {
 			
 		} else {
 			return nil
+		}
+	}
+}
+
+fileprivate enum AppStatusButtonIcon: CaseIterable, Identifiable {
+	case disconnected
+	case connecting
+	case connected
+	case connectedWithTor
+	case syncing
+	case waiting
+	case error;
+
+	var id: Self { self }
+
+	@ViewBuilder func view() -> some View {
+		switch self {
+		case .disconnected:
+			Image(systemName: "bolt.slash.fill")
+				.imageScale(.large)
+				.font(.caption2)
+				.padding(.all, 7)
+		case .connecting:
+			Image(systemName: "bolt.slash")
+				.imageScale(.large)
+				.font(.caption2)
+				.padding(.all, 7)
+		case .connected:
+			Image(systemName: "bolt.fill")
+				.imageScale(.large)
+				.font(.caption2)
+				.padding(.all, 7)
+		case .connectedWithTor:
+			Image(systemName: "bolt.shield.fill")
+				.imageScale(.large)
+				.font(.subheadline) // bigger
+				.padding(.all, 0)   // bigger
+		case .syncing:
+			Image(systemName: "icloud")
+				.imageScale(.large)
+				.font(.caption2)
+				.padding(.all, 7)
+		case .waiting:
+			Image(systemName: "hourglass")
+				.imageScale(.large)
+				.font(.caption2)
+				.padding(.all, 7)
+		case .error:
+			Image(systemName: "exclamationmark.triangle")
+				.imageScale(.large)
+				.font(.caption2)
+				.padding(.all, 7)
 		}
 	}
 }

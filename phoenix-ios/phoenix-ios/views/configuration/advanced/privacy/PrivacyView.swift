@@ -54,7 +54,7 @@ struct PrivacyView: View {
 			}
 
 			NavigationLink(
-				destination: ComingSoonView(title: "Tor"),
+				destination: TorConfigurationView(),
 				tag: NavLinkTag.TorView,
 				selection: $navLinkTag
 			) {

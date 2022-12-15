@@ -58,9 +58,9 @@ class Prefs {
 			.removeDuplicates()
 			.eraseToAnyPublisher()
 	}()
-	
+
 	private let defaultTheme = Theme.system
-	
+
 	var theme: Theme {
 		get { defaults.theme?.jsonDecode() ?? defaultTheme }
 		set { defaults.theme = newValue.jsonEncode() }
@@ -160,7 +160,7 @@ class Prefs {
 		get { defaults.pushPermissionQuery?.jsonDecode() ?? .neverAskedUser }
 		set { defaults.pushPermissionQuery = newValue.jsonEncode() }
 	}
-	
+
 	// --------------------------------------------------
 	// MARK: Backup
 	// --------------------------------------------------
@@ -172,17 +172,17 @@ class Prefs {
 	lazy private(set) var backupSeed: Prefs_BackupSeed = {
 		return Prefs_BackupSeed()
 	}()
-	
+
 	// --------------------------------------------------
 	// MARK: Reset Wallet
 	// --------------------------------------------------
-	
+
 	func resetWallet(encryptedNodeId: String) {
-		
+
 		// Purposefully not resetting:
 		// - Key.theme: App feels weird when this changes unexpectedly.
 		// - Key.pushPermissionQuery: Not related to wallet; More so to the device.
-		
+
 		defaults.removeObject(forKey: Key.defaultPaymentDescription.rawValue)
 		defaults.removeObject(forKey: Key.showChannelsRemoteBalance.rawValue)
 		defaults.removeObject(forKey: Key.recentTipPercents.rawValue)
@@ -191,7 +191,7 @@ class Prefs {
 		defaults.removeObject(forKey: Key.maxFees.rawValue)
 		defaults.removeObject(forKey: Key.hideAmountsOnHomeScreen.rawValue)
 		defaults.removeObject(forKey: Key.recentPaymentSeconds.rawValue)
-		
+
 		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
 		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
 	}
@@ -203,47 +203,47 @@ extension UserDefaults {
 		get { data(forKey: Key.theme.rawValue) }
 		set { set(newValue, forKey: Key.theme.rawValue) }
 	}
-	
+
 	@objc fileprivate var defaultPaymentDescription: String? {
 		get { string(forKey: Key.defaultPaymentDescription.rawValue) }
 		set { setValue(newValue, forKey: Key.defaultPaymentDescription.rawValue) }
 	}
-	
+
 	@objc fileprivate var showChannelsRemoteBalance: Bool {
 		get { bool(forKey: Key.showChannelsRemoteBalance.rawValue) }
 		set { set(newValue, forKey: Key.showChannelsRemoteBalance.rawValue) }
 	}
-	
+
 	@objc fileprivate var invoiceExpirationDays: Int {
 		get { integer(forKey: Key.invoiceExpirationDays.rawValue) }
 		set { set(newValue, forKey: Key.invoiceExpirationDays.rawValue) }
 	}
-	
+
 	@objc fileprivate var maxFees: Data? {
 		get { data(forKey: Key.maxFees.rawValue) }
 		set { set(newValue, forKey: Key.maxFees.rawValue) }
 	}
-	
+
 	@objc fileprivate var hideAmountsOnHomeScreen: Bool {
 		get { bool(forKey: Key.hideAmountsOnHomeScreen.rawValue) }
 		set { set(newValue, forKey: Key.hideAmountsOnHomeScreen.rawValue) }
 	}
-	
+
 	@objc fileprivate var recentPaymentSeconds: Int {
 		get { integer(forKey: Key.recentPaymentSeconds.rawValue) }
 		set { set(newValue, forKey: Key.recentPaymentSeconds.rawValue) }
 	}
-	
+
 	@objc fileprivate var isNewWallet: Bool {
 		get { bool(forKey: Key.isNewWallet.rawValue) }
 		set { set(newValue, forKey: Key.isNewWallet.rawValue) }
 	}
-	
+
 	@objc fileprivate var recentTipPercents: Data? {
 		get { data(forKey: Key.recentTipPercents.rawValue) }
 		set { set(newValue, forKey: Key.recentTipPercents.rawValue) }
 	}
-	
+
 	@objc fileprivate var pushPermissionQuery: Data? {
 		get { data(forKey: Key.pushPermissionQuery.rawValue) }
 		set { set(newValue, forKey: Key.pushPermissionQuery.rawValue) }

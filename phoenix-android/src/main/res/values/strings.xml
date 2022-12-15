@@ -603,17 +603,23 @@
 
     <!-- //////////////// Tor setting //////////////// -->
 
-    <string name="tor_settings_title">Tor Settings</string>
-    <string name="tor_settings_subtitle">You can improve your privacy by only using Tor when connecting to an Electrum server or to your Lightning peer. This will slightly slow down the application startup.</string>
+    <string name="tor_settings_title">Tor</string>
+    <string name="tor_settings_subtitle">Phoenix can use Tor to shield your IP from the other nodes in the Lightning Network and Electrum servers. This improves your privacy but makes the app slower.</string>
+    <string name="tor_settings_unknown">Checking preferences…</string>
     <string name="tor_settings_enabled">Tor is enabled</string>
-    <string name="tor_settings_disabled">Tor is disabled</string>
+    <string name="tor_settings_enabled_description">Connections to the Lightning network and Electrum servers will be protected.</string>
     <string name="tor_settings_confirm_disable_title">Are you sure you want to disable Tor?</string>
     <string name="tor_settings_confirm_enable_title">Are you sure you want to enable Tor? Note that for best result, it\'s recommended to start a new wallet as well.</string>
+    <string name="tor_settings_state_unknown">The Tor proxy is not started yet.</string>
+    <string name="tor_settings_state_closed">The Tor proxy is shutdown.\nPlease wait and check your Internet connection.</string>
+    <string name="tor_settings_state_starting">Starting Tor proxy…</string>
+    <string name="tor_settings_state_started">Tor is online</string>
+    <string name="tor_settings_state_about_perfs">Note that the Tor network is an open project running on donations. It can sometimes be very slow, which will affect the app\'s performances.</string>
 
     <!-- ////////////// connection issues dialog //////////////// -->
 
     <string name="conndialog_title">Connections status</string>
-    <string name="conndialog_summary_not_ok">You have connection issue(s). The app will not function correctly.</string>
+    <string name="conndialog_summary_not_ok">The app will not function correctly until all connections are established.</string>
     <string name="conndialog_network">Your device has no Internet connection. The app will not function properly.\n\nPlease check your device\'s setting.</string>
     <string name="conndialog_internet">Internet</string>
     <string name="conndialog_electrum">Electrum</string>

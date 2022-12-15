@@ -27,10 +27,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	//	}
 		return UIApplication.shared.delegate as! AppDelegate
 	}
-	
+
 	private var cancellables = Set<AnyCancellable>()
 	private var isInBackground = false
-	
+
 	public var externalLightningUrlPublisher = PassthroughSubject<String, Never>()
 
 	override init() {
@@ -207,7 +207,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		log.debug("Received remote notification: \(userInfo)")
 		
 		// allow network connection, even if app in background
-		
+
 		let business = Biz.business
 		let appConnectionsDaemon = business.appConnectionsDaemon
 		let targets =
@@ -400,7 +400,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------
 	// MARK: CrossProcessCommunication
 	// --------------------------------------------------
@@ -435,7 +435,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		// We're using the easier option for now.
 		// Especially since there are changes in the upcoming v2.0 release of SQLDelight
 		// that change the corresponding API, and aim to make it more accesible for us.
-		
+
 		let business = Biz.business
 		business.databaseManager.paymentsDb { paymentsDb, _ in
 		

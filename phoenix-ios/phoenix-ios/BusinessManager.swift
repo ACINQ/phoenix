@@ -53,7 +53,7 @@ class BusinessManager {
 	/// Because it might change if the user closes his/her wallet.
 	///
 	public private(set) var syncManager: SyncManager? = nil
-	
+
 	private var walletInfo: WalletManager.WalletInfo? = nil
 	private var pushToken: String? = nil
 	private var fcmToken: String? = nil
@@ -67,7 +67,7 @@ class BusinessManager {
 	// --------------------------------------------------
 	// MARK: Init
 	// --------------------------------------------------
-	
+
 	private init() { // must use shared instance
 		
 		business = PhoenixBusiness(ctx: PlatformContext())
@@ -77,7 +77,7 @@ class BusinessManager {
 	// --------------------------------------------------
 	// MARK: Lifecycle
 	// --------------------------------------------------
-	
+
 	public func start() {
 		
 		let electrumConfig = GroupPrefs.shared.electrumConfig
@@ -89,27 +89,30 @@ class BusinessManager {
 		)
 		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
 
-		let startupParams = StartupParams(requestCheckLegacyChannels: false)
+		let startupParams = StartupParams(
+			requestCheckLegacyChannels: false,
+			isTorEnabled: GroupPrefs.shared.isTorEnabled
+		)
 		business.start(startupParams: startupParams)
 		
 		registerForNotifications()
 	}
-	
+
 	public func stop() {
-		
+
 		cancellables.removeAll()
 		business.stop()
 		syncManager?.shutdown()
 	}
-	
+
 	public func reset() {
-		
+
 		business = PhoenixBusiness(ctx: PlatformContext())
 		syncManager = nil
 		walletInfo = nil
 		peerConnectionState = nil
 		paymentsPageFetchers.removeAll()
-		
+
 		start()
 		registerForNotifications()
 	}
@@ -223,14 +226,14 @@ class BusinessManager {
 				Prefs.shared.backupSeed.manualBackup_setTaskDone(false, encryptedNodeId: encryptedNodeId)
 			}
 		}
-		
+
 		self.syncManager = SyncManager(
 			chain: business.chain,
 			mnemonics: mnemonics,
 			cloudKey: cloudKey,
 			encryptedNodeId: encryptedNodeId
 		)
-		
+
 		if LockState.shared.walletExistence == .doesNotExist {
 			LockState.shared.walletExistence = .exists
 		}
@@ -243,11 +246,11 @@ class BusinessManager {
 	/// Because it might change if the user closes his/her wallet.
 	///
 	public var encryptedNodeId: String? {
-		
+
 		// For historical reasons, this is the cloudKeyHash, and NOT the nodeIdHash.
 		return walletInfo?.cloudKeyHash
 	}
-	
+
 	/// The current nodeIdHash (from the current unlocked wallet).
 	///
 	/// Always fetch this on demand - don't cache it.
@@ -256,7 +259,7 @@ class BusinessManager {
 	public var nodeIdHash: String? {
 		return walletInfo?.nodeIdHash
 	}
-	
+
 	// --------------------------------------------------
 	// MARK: Push Token
 	// --------------------------------------------------
@@ -390,20 +393,20 @@ class BusinessManager {
 			)
 		}
 	}
-	
+
 	// --------------------------------------------------
 	// MARK: Utils
 	// --------------------------------------------------
-	
+
 	func getPaymentsPageFetcher(name: String) -> PaymentsPageFetcher {
-		
+
 		if let cached = paymentsPageFetchers[name] {
 			return cached
 		}
-		
+
 		let ppf = business.paymentsManager.makePageFetcher()
 		paymentsPageFetchers[name] = ppf
-		
+
 		return ppf
 	}
 }

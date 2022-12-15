@@ -133,7 +133,9 @@ fun AppView(
                             onSettingsClick = { navController.navigate(Screen.Settings.route) },
                             onReceiveClick = { navController.navigate(Screen.Receive.route) },
                             onSendClick = { navController.navigate(Screen.ScanData.route) { launchSingleTop = true } },
-                            onPaymentsHistoryClick = { navController.navigate(Screen.PaymentsHistory.route) }
+                            onPaymentsHistoryClick = { navController.navigate(Screen.PaymentsHistory.route) },
+                            onTorClick = { navController.navigate(Screen.TorConfig)},
+                            onElectrumClick = { navController.navigate(Screen.ElectrumServer)}
                         )
                     }
                 }
@@ -188,6 +190,9 @@ fun AppView(
                 }
                 composable(Screen.ElectrumServer.route) {
                     ElectrumView()
+                }
+                composable(Screen.TorConfig.route) {
+                    TorConfigView()
                 }
                 composable(Screen.Channels.route) {
                     ChannelsView()

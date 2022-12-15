@@ -55,11 +55,11 @@ class GroupPrefs {
 			.removeDuplicates()
 			.eraseToAnyPublisher()
 	}()
-	
+
 	private func defaultFiatCurrency() -> FiatCurrency {
 		return FiatCurrency.localeDefault() ?? FiatCurrency.usd
 	}
-	
+
 	var fiatCurrency: FiatCurrency {
 		get { FiatCurrency.deserialize(defaults.fiatCurrency) ?? defaultFiatCurrency() }
 		set { defaults.fiatCurrency = newValue.serialize() }
@@ -73,9 +73,9 @@ class GroupPrefs {
 			.removeDuplicates()
 			.eraseToAnyPublisher()
 	}()
-	
+
 	private let defaultBitcoinUnit = BitcoinUnit.sat
-	
+
 	var bitcoinUnit: BitcoinUnit {
 		get { BitcoinUnit.deserialize(defaults.bitcoinUnit) ?? defaultBitcoinUnit }
 		set { defaults.bitcoinUnit = newValue.serialize() }
@@ -126,7 +126,7 @@ class GroupPrefs {
 		get { defaults.electrumConfig?.jsonDecode() }
 		set { defaults.electrumConfig = newValue?.jsonEncode() }
 	}
-	
+
 	lazy private(set) var isTorEnabledPublisher: AnyPublisher<Bool, Never> = {
 		defaults.publisher(for: \.isTorEnabled, options: [.new])
 			.removeDuplicates()
@@ -146,9 +146,9 @@ class GroupPrefs {
 	// --------------------------------------------------
 	// MARK: Reset Wallet
 	// --------------------------------------------------
-	
+
 	func resetWallet() {
-		
+
 		defaults.removeObject(forKey: Key.currencyType.rawValue)
 		defaults.removeObject(forKey: Key.fiatCurrency.rawValue)
 		defaults.removeObject(forKey: Key.bitcoinUnit.rawValue)
@@ -157,7 +157,7 @@ class GroupPrefs {
 		defaults.removeObject(forKey: Key.isTorEnabled.rawValue)
 		defaults.removeObject(forKey: Key.badgeCount.rawValue)
 	}
-	
+
 	// --------------------------------------------------
 	// MARK: Migration
 	// --------------------------------------------------
@@ -201,32 +201,32 @@ class GroupPrefs {
 }
 
 extension UserDefaults {
-	
+
 	@objc fileprivate var currencyType: Data? {
 		get { data(forKey: Key.currencyType.rawValue) }
 		set { set(newValue, forKey: Key.currencyType.rawValue) }
 	}
-	
+
 	@objc fileprivate var fiatCurrency: String? {
 		get { string(forKey: Key.fiatCurrency.rawValue) }
 		set { set(newValue, forKey: Key.fiatCurrency.rawValue) }
 	}
-	
+
 	@objc fileprivate var bitcoinUnit: String? {
 		get { string(forKey: Key.bitcoinUnit.rawValue) }
 		set { set(newValue, forKey: Key.bitcoinUnit.rawValue) }
 	}
-	
+
 	@objc fileprivate var currencyConverterList: String? {
 		get { string(forKey: Key.currencyConverterList.rawValue) }
 		set { set(newValue, forKey: Key.currencyConverterList.rawValue) }
 	}
-	
+
 	@objc fileprivate var electrumConfig: Data? {
 		get { data(forKey: Key.electrumConfig.rawValue) }
 		set { set(newValue, forKey: Key.electrumConfig.rawValue) }
 	}
-	
+
 	@objc fileprivate var isTorEnabled: Bool {
 		get { bool(forKey: Key.isTorEnabled.rawValue) }
 		set { set(newValue, forKey: Key.isTorEnabled.rawValue) }

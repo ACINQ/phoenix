@@ -18,10 +18,13 @@ import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.createAppDbDriver
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.*
+import fr.acinq.tor.Tor
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.cancel
 import kotlinx.serialization.json.Json
 import org.kodein.log.LoggerFactory
@@ -44,7 +47,16 @@ class PhoenixBusiness(
 
     private val logger = loggerFactory.newLogger(this::class)
 
-    internal val tcpSocketBuilder = TcpSocket.Builder()
+    private val tcpSocketBuilder = TcpSocket.Builder()
+    internal val tcpSocketBuilderFactory = suspend {
+        val isTorEnabled = appConfigurationManager.isTorEnabled.filterNotNull().first()
+        if (isTorEnabled) {
+            tcpSocketBuilder.torProxy(loggerFactory)
+        } else {
+            tcpSocketBuilder
+        }
+    }
+
     internal val httpClient by lazy {
         HttpClient {
             install(ContentNegotiation) {
@@ -55,7 +67,7 @@ class PhoenixBusiness(
 
     val chain = Chain.Testnet
 
-    internal val electrumClient by lazy { ElectrumClient(tcpSocketBuilder, MainScope(), loggerFactory) }
+    internal val electrumClient by lazy { ElectrumClient(null, MainScope(), loggerFactory) }
     internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient.Caller(), MainScope(), loggerFactory) }
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
@@ -73,6 +85,7 @@ class PhoenixBusiness(
     val connectionsManager by lazy { ConnectionsManager(this) }
     val lnUrlManager by lazy { LNUrlManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
+    val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(loggerFactory)) }
 
     fun start(startupParams: StartupParams) {
         logger.info { "starting with params=$startupParams" }

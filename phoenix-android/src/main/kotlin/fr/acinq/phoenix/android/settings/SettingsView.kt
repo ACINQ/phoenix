@@ -54,7 +54,7 @@ fun SettingsView() {
         Card {
             SettingButton(text = R.string.settings_access_control, icon = R.drawable.ic_unlock, onClick = { nc.navigate(Screen.AppLock) })
             SettingButton(text = R.string.settings_electrum, icon = R.drawable.ic_chain, onClick = { nc.navigate(Screen.ElectrumServer) })
-            SettingButton(text = R.string.settings_tor, icon = R.drawable.ic_tor_shield, onClick = { })
+            SettingButton(text = R.string.settings_tor, icon = R.drawable.ic_tor_shield, onClick = { nc.navigate(Screen.TorConfig) })
         }
 
         // -- advanced

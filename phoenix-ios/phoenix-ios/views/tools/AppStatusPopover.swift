@@ -96,11 +96,21 @@ struct AppStatusPopover: View {
 				connection: connectionsMonitor.connections.internet
 			)
 			.padding(.bottom, 8)
+			
+			if connectionsMonitor.connections.torEnabled {
+				ConnectionCell(
+					label: NSLocalizedString("Tor", comment: "AppStatusPopover: label"),
+					connection: connectionsMonitor.connections.tor
+				)
+				.padding(.bottom, 8)
+			}
+			
 			ConnectionCell(
 				label: NSLocalizedString("Lightning peer", comment: "AppStatusPopover: label"),
 				connection: connectionsMonitor.connections.peer
 			)
 			.padding(.bottom, 8)
+			
 			ConnectionCell(
 				label: NSLocalizedString("Electrum server", comment: "AppStatusPopover: label"),
 				connection: connectionsMonitor.connections.electrum

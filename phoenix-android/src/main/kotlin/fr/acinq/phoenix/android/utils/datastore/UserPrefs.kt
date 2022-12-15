@@ -165,4 +165,9 @@ object UserPrefs {
         }
     }
 
+    private val IS_TOR_ENABLED = booleanPreferencesKey("IS_TOR_ENABLED")
+    fun getIsTorEnabled(context: Context): Flow<Boolean> = prefs(context).map { it[IS_TOR_ENABLED] ?: false }
+    suspend fun saveIsTorEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[IS_TOR_ENABLED] = isEnabled }
+
+
 }

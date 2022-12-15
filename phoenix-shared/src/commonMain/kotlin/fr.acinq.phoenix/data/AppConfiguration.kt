@@ -202,12 +202,33 @@ enum class FiatCurrency : CurrencyUnit {
 sealed class ElectrumConfig {
     data class Custom(val server: ServerAddress) : ElectrumConfig()
     object Random : ElectrumConfig()
+
+    override operator fun equals(other: Any?): Boolean {
+        if (other !is ElectrumConfig) {
+            return false
+        }
+        return when (this) {
+            is Custom -> {
+                when (other) {
+                    is Custom -> this == other // custom =?= custom
+                    is Random -> false         // custom != random
+                }
+            }
+            is Random -> {
+                when (other) {
+                    is Custom -> false // random != custom
+                    is Random -> true  // random == random
+                }
+            }
+        }
+    }
 }
 
 data class StartupParams(
     /** When true, we use a [InitTlv] to ask our peer whether there are legacy channels to reestablish for the legacy node id. */
     val requestCheckLegacyChannels: Boolean = false,
-
+    /** Tor state must be defined before the node starts. */
+    val isTorEnabled: Boolean,
     // TODO: add custom electrum address, fiat currencies, ...
 )
 

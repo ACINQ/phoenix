@@ -63,7 +63,6 @@ fun SeedView() {
         Card(internalPadding = PaddingValues(16.dp)) {
             Text(text = annotatedStringResource(id = R.string.displayseed_instructions))
         }
-        Spacer(modifier = Modifier.height(16.dp))
         Card(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
