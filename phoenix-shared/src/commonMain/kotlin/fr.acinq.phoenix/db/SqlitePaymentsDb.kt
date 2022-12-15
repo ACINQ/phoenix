@@ -74,8 +74,8 @@ class SqlitePaymentsDb(
         )
     )
 
-    private val inQueries = IncomingQueries(database)
-    private val outQueries = OutgoingQueries(database)
+    internal val inQueries = IncomingQueries(database)
+    internal val outQueries = OutgoingQueries(database)
     private val aggrQueries = database.aggregatedQueriesQueries
     private val metaQueries = MetadataQueries(database)
 

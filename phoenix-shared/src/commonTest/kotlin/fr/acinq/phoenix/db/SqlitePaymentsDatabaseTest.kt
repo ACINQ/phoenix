@@ -306,8 +306,8 @@ class SqlitePaymentsDatabaseTest {
         p.parts.forEach { assertEquals(onePartFailed, db.getOutgoingPaymentFromPartId(it.id)) }
 
         // Updating non-existing parts should fail.
-        assertFalse { db._doNotFreezeMe.outQueries.updateLightningPart(UUID.randomUUID(), Either.Right(TemporaryNodeFailure), 110) }
-        assertFalse { db._doNotFreezeMe.outQueries.updateLightningPart(UUID.randomUUID(), randomBytes32(), 110) }
+        assertFalse { db.outQueries.updateLightningPart(UUID.randomUUID(), Either.Right(TemporaryNodeFailure), 110) }
+        assertFalse { db.outQueries.updateLightningPart(UUID.randomUUID(), randomBytes32(), 110) }
 
         // Additional parts must have a unique id.
         val newParts = listOf(
@@ -360,7 +360,7 @@ class SqlitePaymentsDatabaseTest {
 
         // Should not be able to complete a payment that does not exist
         assertFalse {
-            db._doNotFreezeMe.outQueries.completePayment(
+            db.outQueries.completePayment(
                 id = UUID.randomUUID(),
                 completed = paymentStatus
             )
@@ -441,7 +441,7 @@ class SqlitePaymentsDatabaseTest {
         p.parts.forEach { assertEquals(paymentFailed, db.getOutgoingPaymentFromPartId(it.id)) }
 
         // Cannot fail a payment that does not exist
-        assertFalse { db._doNotFreezeMe.outQueries.completePayment(UUID.randomUUID(), paymentStatus) }
+        assertFalse { db.outQueries.completePayment(UUID.randomUUID(), paymentStatus) }
     }
 
     companion object {
