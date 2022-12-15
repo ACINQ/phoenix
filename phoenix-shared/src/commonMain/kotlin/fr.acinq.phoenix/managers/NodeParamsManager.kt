@@ -119,7 +119,7 @@ class NodeParamsManager(
                     maxPaymentAttempts = 5,
                     enableTrampolinePayment = true,
                     zeroConfPeers = setOf(PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134")),
-                    paymentRecipientExpiryParams = RecipientCltvExpiryParams(CltvExpiryDelta(4), CltvExpiryDelta(12)),
+                    paymentRecipientExpiryParams = RecipientCltvExpiryParams(CltvExpiryDelta(75), CltvExpiryDelta(200)),
                 )
 
                 _nodeParams.value = nodeParams
