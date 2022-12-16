@@ -33,10 +33,11 @@ import fr.acinq.lightning.wire.TemporaryNodeFailure
 import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.runTest
 import fr.acinq.secp256k1.Hex
+import org.kodein.log.LoggerFactory
 import kotlin.test.*
 
 class SqlitePaymentsDatabaseTest {
-    private val db = SqlitePaymentsDb(testPaymentsDriver())
+    private val db = SqlitePaymentsDb(LoggerFactory.default, testPaymentsDriver())
 
     private val preimage1 = randomBytes32()
     private val paymentHash1 = Crypto.sha256(preimage1).toByteVector32()
