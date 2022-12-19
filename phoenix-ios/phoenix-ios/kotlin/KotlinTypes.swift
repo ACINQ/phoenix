@@ -108,5 +108,13 @@ extension LNUrl {
 	
 	typealias AuthKeyType_DEFAULT_KEY_TYPE = AuthKeyTypeDEFAULT_KEY_TYPE
 	typealias AuthKeyType_LEGACY_KEY_TYPE = AuthKeyTypeLEGACY_KEY_TYPE
+}
+
+extension LogsConfiguration {
 	
+	typealias Model_Awaiting = ModelAwaiting
+	typealias Model_Exporting = ModelExporting
+	typealias Model_Ready = ModelReady
+	
+	typealias Intent_Export = IntentExport
 }
