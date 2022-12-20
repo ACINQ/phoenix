@@ -89,7 +89,7 @@ struct PaymentRequestedView: View {
 		
 		if let model = mvi.model as? Scan.Model_LnurlWithdrawFlow_Receiving {
 			
-			return model.lnurlWithdraw.lnurl.host
+			return model.lnurlWithdraw.initialUrl.host
 		}
 		
 		return nil

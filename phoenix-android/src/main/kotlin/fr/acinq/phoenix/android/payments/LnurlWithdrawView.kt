@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,9 +38,9 @@ import fr.acinq.phoenix.android.preferredAmountUnit
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.controllers.payments.Scan
-import fr.acinq.phoenix.data.LNUrl
 import fr.acinq.phoenix.android.utils.Converter.toPrettyStringWithFallback
 import fr.acinq.phoenix.android.utils.annotatedStringResource
+import fr.acinq.phoenix.data.lnurl.LnurlError
 
 @Composable
 fun LnurlWithdrawView(
@@ -75,7 +76,7 @@ fun LnurlWithdrawView(
                     internalPadding = PaddingValues(vertical = 32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text(text = annotatedStringResource(R.string.lnurl_withdraw_header, model.lnurlWithdraw.lnurl.host), textAlign = TextAlign.Center)
+                    Text(text = annotatedStringResource(R.string.lnurl_withdraw_header, model.lnurlWithdraw.initialUrl.host), textAlign = TextAlign.Center)
                     Spacer(modifier = Modifier.height(16.dp))
                     AmountHeroInput(
                         initialAmount = amount,
@@ -142,25 +143,26 @@ fun LnurlWithdrawView(
 
 @Composable
 private fun RemoteErrorResponseView(
-    error: LNUrl.Error.RemoteFailure
+    error: LnurlError.RemoteFailure
 ) {
+    Text(text = stringResource(R.string.lnurl_withdraw_error_header), style = MaterialTheme.typography.body2)
+    Spacer(Modifier.height(8.dp))
     Text(
-        text = stringResource(R.string.lnurl_withdraw_error_header) + "\n" + getRemoteErrorMessage(error = error),
+        text = getRemoteErrorMessage(error = error),
         style = MaterialTheme.typography.body1.copy(color = negativeColor(), textAlign = TextAlign.Center),
-        modifier = Modifier.padding(horizontal = 48.dp)
+        modifier = Modifier.padding(horizontal = 16.dp)
     )
     Spacer(Modifier.height(24.dp))
 }
 
 @Composable
 fun getRemoteErrorMessage(
-    error: LNUrl.Error.RemoteFailure
-): String {
+    error: LnurlError.RemoteFailure
+): AnnotatedString {
     return when (error) {
-        is LNUrl.Error.RemoteFailure.Code -> stringResource(id = R.string.lnurl_error_remote_code, error.origin, error.code)
-        is LNUrl.Error.RemoteFailure.CouldNotConnect -> stringResource(id = R.string.lnurl_error_remote_code, error.origin)
-        is LNUrl.Error.RemoteFailure.Detailed -> stringResource(id = R.string.lnurl_error_remote_details, error.origin, error.reason)
-        is LNUrl.Error.RemoteFailure.Unreadable -> stringResource(id = R.string.lnurl_error_remote_unreadable, error.origin)
+        is LnurlError.RemoteFailure.Code -> annotatedStringResource(id = R.string.lnurl_error_remote_code, error.origin, error.code)
+        is LnurlError.RemoteFailure.CouldNotConnect -> annotatedStringResource(id = R.string.lnurl_error_remote_code, error.origin)
+        is LnurlError.RemoteFailure.Detailed -> annotatedStringResource(id = R.string.lnurl_error_remote_details, error.origin, error.reason)
+        is LnurlError.RemoteFailure.Unreadable -> annotatedStringResource(id = R.string.lnurl_error_remote_unreadable, error.origin)
     }
 }
-

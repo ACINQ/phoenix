@@ -141,7 +141,7 @@ struct SendView: MVIView {
 				comment: "Error message - scanning lightning invoice"
 			)
 		
-		} else if model.reason is Scan.BadRequestReason_UnsupportedLnUrl {
+		} else if model.reason is Scan.BadRequestReason_UnsupportedLnurl {
 			
 			msg = NSLocalizedString(
 				"Phoenix does not support this type of LNURL yet",
@@ -161,19 +161,19 @@ struct SendView: MVIView {
 			let origin = serviceError.error.origin
 			
 			switch serviceError.error {
-			case is LNUrl.Error_RemoteFailure_CouldNotConnect:
+			case is LnurlError.RemoteFailure_CouldNotConnect:
 				msg = NSLocalizedString(
 					"Could not connect to service: \(origin)",
 					comment: "Error message - scanning lightning invoice"
 				)
-			case is LNUrl.Error_RemoteFailure_Unreadable:
+			case is LnurlError.RemoteFailure_Unreadable:
 				msg = NSLocalizedString(
 					"Unreadable response from service: \(origin)",
 					comment: "Error message - scanning lightning invoice"
 				)
 			default:
-				// is LNUrl.Error_RemoteFailure_Code
-				// is LNUrl.Error_RemoteFailure_Detailed
+				// is LnurlError.RemoteFailure_Code
+				// is LnurlError.RemoteFailure_Detailed
 				if isLightningAddress {
 					msg = NSLocalizedString(
 						"The service (\(origin)) doesn't support Lightning addresses, or doesn't know this user",

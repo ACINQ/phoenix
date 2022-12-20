@@ -41,9 +41,10 @@ internal fun <T> ListPreferenceButton(
     preferences: List<PreferenceItem<T>>,
     onPreferenceSubmit: (PreferenceItem<T>) -> Unit,
     dialogTitle: String? = null,
-    dialogDescription: String? = null
+    dialogDescription: String? = null,
+    initialShowDialog: Boolean = false,
 ) {
-    var showPreferenceDialog by remember { mutableStateOf(false) }
+    var showPreferenceDialog by remember { mutableStateOf(initialShowDialog) }
 
     SettingInteractive(title = title, description = subtitle, enabled = enabled) {
         showPreferenceDialog = true

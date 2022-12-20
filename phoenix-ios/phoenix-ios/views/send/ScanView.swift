@@ -66,7 +66,7 @@ struct ScanView: View {
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
-	
+
 	@ViewBuilder
 	var body: some View {
 		
@@ -241,7 +241,7 @@ struct ScanView: View {
 	
 	@ViewBuilder
 	func menuOption_paste() -> some View {
-		
+
 		if #available(iOS 16.0, *) {
 		//	menuOption_paste_ios16() // this looks horrible; thanks apple :(
 			menuOption_paste_pre16()
@@ -249,11 +249,11 @@ struct ScanView: View {
 			menuOption_paste_pre16()
 		}
 	}
-	
+
 	@ViewBuilder
 	@available(iOS 16.0, *)
 	func menuOption_paste_ios16() -> some View {
-		
+
 		PasteButton(payloadType: String.self) { strings in
 			if let string = strings.first {
 				pasteFromClipboard_ios16(string)
@@ -261,7 +261,7 @@ struct ScanView: View {
 		}
 		.buttonStyle(.borderedProminent)
 		.buttonBorderShape(ButtonBorderShape.capsule)
-		
+
 		// There's not a lot of customization we can do here.
 		// According to the docs:
 		//
@@ -276,7 +276,7 @@ struct ScanView: View {
 		// Which means, unless we want the UI to look ugly,
 		// we have to completely re-design the entire button menu...
 	}
-	
+
 	@ViewBuilder
 	func menuOption_paste_pre16() -> some View {
 		
@@ -289,27 +289,27 @@ struct ScanView: View {
 				} icon: {
 					Image(systemName: "arrow.right.doc.on.clipboard")
 				}
-				
+
 				menuOption_paste_clipboardPreview()
 			} // </VStack>
-			
+
 		} // </Button>
 		.font(.title3)
 		.disabled(!clipboardHasString)
 	}
-	
+
 	@ViewBuilder
 	func menuOption_paste_clipboardPreview() -> some View {
-		
+
 		if clipboardContent != nil {
 			Group {
 				if let content = clipboardContent as? Scan.ClipboardContent_InvoiceRequest {
-				
+
 					let desc = content.paymentRequest.description_?.trimmingCharacters(in: .whitespaces) ?? ""
-					
+
 					if let msat = content.paymentRequest.amount {
 						let amt = Utils.format(currencyPrefs, msat: msat)
-					
+
 						if desc.isEmpty {
 							Text("Pay \(amt.string)")
 						} else {
@@ -324,18 +324,18 @@ struct ScanView: View {
 					} else {
 						Text("Pay Invoice")
 					}
-				
+
 				} else if let content = clipboardContent as? Scan.ClipboardContent_BitcoinRequest {
-					
+
 					let addrInfo: BitcoinAddressInfo = content.address
-					
+
 					let desc: String = {
 						return addrInfo.label ?? addrInfo.message
 					}()?.trimmingCharacters(in: .whitespaces) ?? ""
-					
+
 					if let sat = addrInfo.amount {
 						let amt = Utils.format(currencyPrefs, sat: sat)
-					
+
 						if desc.isEmpty {
 							Text("Pay \(amt.string)")
 						} else {
@@ -349,37 +349,37 @@ struct ScanView: View {
 						Text(verbatim: " \(desc)")
 					} else {
 						let addr = addrInfo.address.prefix(6) + "..." + addrInfo.address.suffix(6)
-						
+
 						Text("Pay ") +
 						Text(Image(systemName: "arrow.forward")) +
 						Text(verbatim: " \(addr)")
 					}
-					
+
 				} else if let content = clipboardContent as? Scan.ClipboardContent_LoginRequest {
-					
+
 					let title = content.auth.actionPromptTitle
-					let domain = content.auth.url.host
-					
+					let domain = content.auth.initialUrl.host
+
 					Text(verbatim: "\(title) ") +
 					Text(Image(systemName: "arrow.forward")) +
 					Text(verbatim: " \(domain)")
-				
+
 				} else if let content = clipboardContent as? Scan.ClipboardContent_LnurlRequest {
-					
+
 					let domain = content.url.host
-					
+
 					Text(verbatim: "LnUrl ") +
 					Text(Image(systemName: "bolt.fill")) +
 					Text(verbatim: " \(domain)")
 				}
-				
+
 			} // </Group>
 			.font(.footnote)
 			.foregroundColor(.secondary)
 			.lineLimit(1)
 			.truncationMode(.tail)
 			.padding(.top, 4)
-			
+
 		} // </if clipboardContent != nil>
 	}
 	
@@ -419,7 +419,7 @@ struct ScanView: View {
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
-	
+
 	func onAppear() {
 		log.trace("onAppear()")
 		
@@ -441,7 +441,7 @@ struct ScanView: View {
 		
 		voiceOverEnabled = UIAccessibility.isVoiceOverRunning
 	}
-	
+
 	func modelDidChange(_ newModel: Scan.Model) {
 		log.trace("modelDidChange()")
 		
@@ -487,45 +487,45 @@ struct ScanView: View {
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
-	
+
 	func checkClipboard() {
 		if UIPasteboard.general.hasStrings {
 			clipboardHasString = true
-			
+
 			guard let string = UIPasteboard.general.string else {
 				// iOS lied to us ?!?
 				clipboardHasString = false
 				clipboardContent = nil
 				return
 			}
-			
+
 			let controller = mvi.controller as! AppScanController
 			self.clipboardContent = controller.inspectClipboard(data: string)
-			
+
 		} else {
 			clipboardHasString = false
 			clipboardContent = nil
 		}
 	}
-	
+
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
-	
+
 	func pasteFromClipboard_ios16(_ string: String) {
 		log.trace("pasteFromClipboard_ios16()")
-		
+
 		mvi.intent(Scan.Intent_Parse(request: string))
 	}
-	
+
 	func pasteFromClipboard_pre16() {
 		log.trace("pasteFromClipboard_pre16()")
-		
+
 		if let request = UIPasteboard.general.string {
 			mvi.intent(Scan.Intent_Parse(request: request))
 		}
 	}
-	
+
 	func manualInput() {
 		log.trace("manualInput()")
 		
@@ -535,7 +535,7 @@ struct ScanView: View {
 			ManualInput(mvi: mvi, ignoreScanner: $ignoreScanner)
 		}
 	}
-	
+
 	func showWarning() {
 		log.trace("showWarning()")
 		
