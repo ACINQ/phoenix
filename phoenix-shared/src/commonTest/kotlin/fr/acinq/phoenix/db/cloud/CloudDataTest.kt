@@ -138,8 +138,8 @@ class CloudDataTest {
         val expectedChannelId = Hex.decode("e8a0e7ba91a485ed6857415cc0c60f77eda6cb1ebe1da841d42d7b4388cc2bcc").byteVector32()
         val expectedReceived = IncomingPayment.Received(
             receivedWith = setOf(
-                IncomingPayment.ReceivedWith.NewChannel(id = uuid1, amount = 7_000_000.msat, serviceFee = 3_000_000.msat, channelId = expectedChannelId),
-                IncomingPayment.ReceivedWith.NewChannel(id = uuid2, amount = 9_000_000.msat, serviceFee = 6_000_000.msat, channelId = expectedChannelId)
+                IncomingPayment.ReceivedWith.NewChannel(id = uuid1, amount = 7_000_000.msat, serviceFee = 3_000_000.msat, channelId = expectedChannelId, confirmed = true),
+                IncomingPayment.ReceivedWith.NewChannel(id = uuid2, amount = 9_000_000.msat, serviceFee = 6_000_000.msat, channelId = expectedChannelId, confirmed = true)
             ),
             receivedAt = 1658246347319
         )
