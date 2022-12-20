@@ -18,11 +18,13 @@ package fr.acinq.phoenix.android.settings
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.FileProvider
+import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
@@ -37,6 +39,7 @@ fun LogsView() {
     val log = logger("LogsView")
     val nc = navController
     val context = LocalContext.current
+    val authority = remember { "${BuildConfig.APPLICATION_ID}.provider" }
 
     DefaultScreenLayout {
         DefaultScreenHeader(
@@ -49,10 +52,7 @@ fun LogsView() {
                 text = R.string.logs_view_button,
                 icon = R.drawable.ic_eye,
                 onClick = {
-
                     val logFile = Logging.getLastLogFile(context)
-                    val authority = "fr.acinq.phoenix.android.provider"
-
                     val uri = FileProvider.getUriForFile(context, authority, logFile)
                     val localViewIntent: Intent = Intent().apply {
                         action = Intent.ACTION_VIEW
@@ -67,12 +67,8 @@ fun LogsView() {
             SettingButton(
                 text = R.string.logs_share_button,
                 icon = R.drawable.ic_share,
-
                 onClick = {
-
                     val logFile = Logging.getLastLogFile(context)
-                    val authority = "fr.acinq.phoenix.android.provider"
-
                     val uri = FileProvider.getUriForFile(context, authority, logFile)
                     val sendIntent: Intent = Intent().apply {
                         action = Intent.ACTION_SEND
