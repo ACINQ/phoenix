@@ -180,12 +180,12 @@ class LNUrlAuthFragment : BaseFragment() {
       ;
     }
 
-    /** Get the domain for the given [Url]. If eligible returns a legacy domain, or the full domain name otherwise (i.e. specs compliant). */
+    /** Get the domain for the given [HttpUrl]. If eligible returns a legacy domain, or the full domain name otherwise (i.e. specs compliant). */
     private fun isLegacyEligible(url: HttpUrl): Boolean {
       return LegacyDomain.values().any { it.host == url.host() }
     }
 
-    /** Get the domain for the given [Url]. If eligible returns a legacy domain, or the full domain name otherwise (i.e. specs compliant). */
+    /** Get the domain for the given [HttpUrl]. If eligible returns a legacy domain, or the full domain name otherwise (i.e. specs compliant). */
     fun filterDomain(url: HttpUrl): String {
       return LegacyDomain.values().firstOrNull { it.host == url.host() }?.legacyCompatDomain ?: url.host()
     }

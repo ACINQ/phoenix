@@ -1,5 +1,5 @@
 # base image to build eclair-core
-FROM eclipse-temurin:11.0.14.1_1-jdk-alpine as ECLAIR_CORE_BUILD
+FROM eclipse-temurin:11.0.16.1_1-jdk-alpine as ECLAIR_CORE_BUILD
 
 # this is necessary to extract the eclair-core version that we need to clone for the build
 COPY ./buildSrc/src/main/kotlin/Versions.kt .
@@ -30,7 +30,7 @@ RUN git clone https://github.com/ACINQ/eclair -b v$(cat eclair-core-version.txt)
 RUN cd eclair && mvn install -pl eclair-core -am -Dmaven.test.skip=true
 
 # main build image
-FROM ubuntu:21.10
+FROM ubuntu:22.10
 
 ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8
