@@ -14,7 +14,7 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct MetadataSheet: View {
 	
-	let lnurlPay: LNUrl.Pay
+	let lnurlPay: LnurlPay.Intent
 	
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	

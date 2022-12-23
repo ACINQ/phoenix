@@ -2,7 +2,6 @@ package fr.acinq.phoenix.data.lnurl
 
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.msat
-import fr.acinq.phoenix.data.LNUrl
 import io.ktor.http.*
 import kotlinx.serialization.json.*
 import kotlin.test.Test
@@ -10,7 +9,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
-class LNUrlWithdrawTest {
+class LnurlWithdrawTest {
     val format = Json { ignoreUnknownKeys = true }
 
     private val defaultDesc = "Lorem ipsum dolor sit amet"
@@ -19,8 +18,8 @@ class LNUrlWithdrawTest {
     private val defaultLnurl = URLBuilder("https://lnurl.fiatjaf.com/foobar").build()
     private val defaultCallback = URLBuilder("https://lnurl.fiatjaf.com/lnurl-withdraw/callback/6e667d407298a7381f4bb02b228e72b3b86c0666b0662f751d089e30bd729b18").build()
     private val defaultK1 = "36352c79b25544ce2cb8b7fccaaf591ed00ad42989614aafcc569ba3d384b1bb"
-    private val defaultWithdraw = LNUrl.Withdraw(
-        lnurl = defaultLnurl,
+    private val defaultWithdraw = LnurlWithdraw(
+        initialUrl = defaultLnurl,
         callback = defaultCallback,
         k1 = defaultK1,
         defaultDescription = defaultDesc,
@@ -48,26 +47,26 @@ class LNUrlWithdrawTest {
 
     @Test
     fun testJson_ok() {
-        val url = LNUrl.parseLNUrlResponse(defaultLnurl, makeJson())
-        assertTrue { url is LNUrl.Withdraw }
+        val url = Lnurl.parseLnurlJson(defaultLnurl, makeJson())
+        assertTrue { url is LnurlWithdraw }
         assertEquals(defaultWithdraw, url)
     }
 
     @Test
     fun testJson_callback_unsafe() {
-        assertFailsWith(LNUrl.Error.UnsafeCallback::class) {
+        assertFailsWith(LnurlError.UnsafeResource::class) {
             val json = makeJson(
                 callback = "http://lnurl.fiatjaf.com/lnurl-withdraw/callback/6e667d407298a7381"
             )
-            LNUrl.parseLNUrlResponse(defaultLnurl, json)
+            Lnurl.parseLnurlJson(defaultLnurl, json)
         }
     }
 
     @Test
     fun testJson_callback_missing() {
-        assertFailsWith(LNUrl.Error.MissingCallback::class) {
+        assertFailsWith(LnurlError.MissingCallback::class) {
             val json = makeJson(callback = null)
-            LNUrl.parseLNUrlResponse(defaultLnurl, json)
+            Lnurl.parseLnurlJson(defaultLnurl, json)
         }
     }
 }

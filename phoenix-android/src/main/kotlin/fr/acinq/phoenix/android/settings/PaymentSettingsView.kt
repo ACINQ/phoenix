@@ -42,17 +42,18 @@ import fr.acinq.phoenix.android.utils.Converter.proportionalFeeAsPercentage
 import fr.acinq.phoenix.android.utils.Converter.proportionalFeeAsPercentageString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.android.utils.label
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.data.BitcoinUnit
-import fr.acinq.phoenix.data.LNUrl
 import fr.acinq.phoenix.data.PaymentOptionsConstants
+import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 
 @Composable
-fun PaymentSettingsView() {
+fun PaymentSettingsView(
+    initialShowLnurlAuthSchemeDialog: Boolean = false
+) {
     val log = logger("PaymentSettingsView")
     val nc = navController
     val scope = rememberCoroutineScope()
@@ -70,7 +71,7 @@ fun PaymentSettingsView() {
     val prefsTrampolineMaxFee by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(null)
     val trampolineFees = prefsTrampolineMaxFee ?: walletContext?.trampoline?.v2?.attempts?.last()?.export()
 
-    val prefLnurlAuthKeyTypeState = UserPrefs.getLnurlAuthKeyType(context).collectAsState(initial = null)
+    val prefLnurlAuthSchemeState = UserPrefs.getLnurlAuthScheme(context).collectAsState(initial = null)
 
     DefaultScreenLayout {
         DefaultScreenHeader(
@@ -108,34 +109,37 @@ fun PaymentSettingsView() {
                 onClick = { showPayToOpenDialog = true }
             )
         }
-        val prefLnurlAuthKeyType = prefLnurlAuthKeyTypeState.value
-        if (prefLnurlAuthKeyType != null) {
+        val prefLnurlAuthScheme = prefLnurlAuthSchemeState.value
+        if (prefLnurlAuthScheme != null) {
             Card {
-                val keyTypes = listOf<PreferenceItem<LNUrl.Auth.KeyType>>(
+                val schemes = listOf<PreferenceItem<LnurlAuth.Scheme>>(
                     PreferenceItem(
-                        item = LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE,
-                        title = stringResource(id = R.string.lnurl_auth_keytype_default),
-                        description = stringResource(id = R.string.lnurl_auth_keytype_default_desc)
+                        item = LnurlAuth.Scheme.DEFAULT_SCHEME,
+                        title = stringResource(id = R.string.lnurl_auth_scheme_default),
+                        description = stringResource(id = R.string.lnurl_auth_scheme_default_desc)
                     ),
-                    PreferenceItem(item = LNUrl.Auth.KeyType.LEGACY_KEY_TYPE, title = stringResource(id = R.string.lnurl_auth_keytype_legacy), description = stringResource(id = R.string.lnurl_auth_keytype_legacy_desc))
+                    PreferenceItem(
+                        item = LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME,
+                        title = stringResource(id = R.string.lnurl_auth_scheme_legacy),
+                        description = stringResource(id = R.string.lnurl_auth_scheme_legacy_desc)
+                    ),
                 )
                 ListPreferenceButton(
-                    title = stringResource(id = R.string.paymentsettings_lnurlauth_keytype_title),
+                    title = stringResource(id = R.string.paymentsettings_lnurlauth_scheme_title),
                     subtitle = {
-                        Text(
-                            text = when (prefLnurlAuthKeyType) {
-                                LNUrl.Auth.KeyType.LEGACY_KEY_TYPE -> stringResource(id = R.string.lnurl_auth_keytype_legacy)
-                                LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE -> stringResource(id = R.string.lnurl_auth_keytype_default)
-                                else -> stringResource(id = R.string.utils_unknown)
-                            }
-                        )
+                        when (prefLnurlAuthScheme) {
+                            LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME -> Text(text = stringResource(id = R.string.lnurl_auth_scheme_legacy))
+                            LnurlAuth.Scheme.DEFAULT_SCHEME -> Text(text = stringResource(id = R.string.lnurl_auth_scheme_default))
+                            else -> Text(text = stringResource(id = R.string.utils_unknown))
+                        }
                     },
                     enabled = true,
-                    selectedItem = prefLnurlAuthKeyType,
-                    preferences = keyTypes,
+                    selectedItem = prefLnurlAuthScheme,
+                    preferences = schemes,
                     onPreferenceSubmit = {
-                        scope.launch { UserPrefs.saveLnurlAuthKeyType(context, it.item) }
-                    }
+                        scope.launch { UserPrefs.saveLnurlAuthScheme(context, it.item) }
+                    },
+                    initialShowDialog = initialShowLnurlAuthSchemeDialog
                 )
             }
         }

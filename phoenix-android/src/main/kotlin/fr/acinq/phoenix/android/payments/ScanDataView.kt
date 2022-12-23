@@ -78,6 +78,7 @@ class ScanDataViewModel(controller: ScanController) : MVIControllerViewModel<Sca
 @Composable
 fun ScanDataView(
     onBackClick: () -> Unit,
+    onAuthSchemeInfoClick: () -> Unit,
 ) {
     val trampolineMaxFees by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(null)
     val maxFees = trampolineMaxFees?.let { MaxFees(it.feeBase, it.feeProportional) }
@@ -140,7 +141,7 @@ fun ScanDataView(
                 )
             }
             is Scan.Model.LnurlAuthFlow -> {
-                LnurlAuthView(model = model, onBackClick = onBackClick, onLoginClick = { postIntent(it) })
+                LnurlAuthView(model = model, onBackClick = onBackClick, onLoginClick = { postIntent(it) }, onAuthSchemeInfoClick = onAuthSchemeInfoClick)
             }
             is Scan.Model.LnurlWithdrawFlow -> {
                 LnurlWithdrawView(model = model, onBackClick = onBackClick, onWithdrawClick = { postIntent(it) })
@@ -168,6 +169,10 @@ fun ReadDataView(
             onScanViewBinding = { _scanView = it },
             onScannedText = onScannedText
         )
+
+        if (model is Scan.Model.BadRequest) {
+            ScanErrorView(model, onFeedbackDismiss)
+        }
 
         if (model is Scan.Model.BadRequest) {
             ScanErrorView(model, onFeedbackDismiss)
@@ -253,7 +258,6 @@ fun BoxScope.ScannerView(
     )
 }
 
-
 @Composable
 private fun ScanErrorView(
     model: Scan.Model.BadRequest,
@@ -263,8 +267,8 @@ private fun ScanErrorView(
         is Scan.BadRequestReason.ChainMismatch -> stringResource(R.string.scan_error_invalid_chain)
         is Scan.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.scan_error_pay_to_self)
         is Scan.BadRequestReason.ServiceError -> stringResource(R.string.scan_error_lnurl_service_error)
-        is Scan.BadRequestReason.InvalidLnUrl -> stringResource(R.string.scan_error_lnurl_invalid)
-        is Scan.BadRequestReason.UnsupportedLnUrl -> stringResource(R.string.scan_error_lnurl_unsupported)
+        is Scan.BadRequestReason.InvalidLnurl -> stringResource(R.string.scan_error_lnurl_invalid)
+        is Scan.BadRequestReason.UnsupportedLnurl -> stringResource(R.string.scan_error_lnurl_unsupported)
         is Scan.BadRequestReason.UnknownFormat -> stringResource(R.string.scan_error_invalid_generic)
     }
     Dialog(

@@ -3,6 +3,7 @@ package fr.acinq.phoenix.db.payments
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.data.*
+import fr.acinq.phoenix.data.lnurl.LnurlPay
 import io.ktor.http.*
 import kotlinx.serialization.*
 import kotlinx.serialization.cbor.ByteString
@@ -14,7 +15,7 @@ import org.kodein.memory.util.freeze
  * - lnurl_base_type
  * - lnurl_base_blob
  */
-sealed class LNUrlBase {
+sealed class LnurlBase {
 
     enum class TypeVersion {
         PAY_V0
@@ -27,17 +28,17 @@ sealed class LNUrlBase {
         val minSendableMsat: Long,
         val maxSendableMsat: Long,
         val maxCommentLength: Long?
-    ): LNUrlBase() {
-        constructor(pay: LNUrl.Pay): this(
-            lnurl = pay.lnurl.toString(),
-            callback = pay.callback.toString(),
-            minSendableMsat = pay.minSendable.msat,
-            maxSendableMsat = pay.maxSendable.msat,
-            maxCommentLength = pay.maxCommentLength
+    ): LnurlBase() {
+        constructor(intent: LnurlPay.Intent): this(
+            lnurl = intent.initialUrl.toString(),
+            callback = intent.callback.toString(),
+            minSendableMsat = intent.minSendable.msat,
+            maxSendableMsat = intent.maxSendable.msat,
+            maxCommentLength = intent.maxCommentLength
         )
 
-        fun unwrap(metadata: LNUrl.Pay.Metadata) = LNUrl.Pay(
-            lnurl = Url(this.lnurl),
+        fun unwrap(metadata: LnurlPay.Intent.Metadata) = LnurlPay.Intent(
+            initialUrl = Url(this.lnurl),
             callback = Url(this.callback),
             minSendable = MilliSatoshi(this.minSendableMsat),
             maxSendable = MilliSatoshi(this.maxSendableMsat),
@@ -48,7 +49,7 @@ sealed class LNUrlBase {
 
     companion object {
         @OptIn(ExperimentalSerializationApi::class)
-        fun deserialize(typeVersion: TypeVersion, blob: ByteArray): LNUrlBase {
+        fun deserialize(typeVersion: TypeVersion, blob: ByteArray): LnurlBase {
             return when (typeVersion) {
                 TypeVersion.PAY_V0 -> {
                     Cbor.decodeFromByteArray<Pay>(blob)
@@ -57,7 +58,7 @@ sealed class LNUrlBase {
         }
 
         @OptIn(ExperimentalSerializationApi::class)
-        fun serialize(pay: LNUrl.Pay): Pair<TypeVersion, ByteArray> {
+        fun serialize(pay: LnurlPay.Intent): Pair<TypeVersion, ByteArray> {
             val wrapper = Pay(pay)
             val blob = Cbor.encodeToByteArray(wrapper)
             return Pair(TypeVersion.PAY_V0, blob)
@@ -70,7 +71,7 @@ sealed class LNUrlBase {
  * - lnurl_metadata_type
  * - lnurl_metadata_blob
  */
-sealed class LNUrlMetadata {
+sealed class LnurlMetadata {
 
     enum class TypeVersion {
         PAY_V0
@@ -79,19 +80,19 @@ sealed class LNUrlMetadata {
     @Serializable
     data class PayMetadata(
         val raw: String
-    ): LNUrlMetadata() {
-        constructor(metadata: LNUrl.Pay.Metadata): this(
+    ): LnurlMetadata() {
+        constructor(metadata: LnurlPay.Intent.Metadata): this(
             raw = metadata.raw
         )
 
-        fun unwrap(): LNUrl.Pay.Metadata {
-            return LNUrl.Helper.decodeLNUrlPayMetadata(this.raw)
+        fun unwrap(): LnurlPay.Intent.Metadata {
+            return LnurlPay.parseMetadata(this.raw)
         }
     }
 
     companion object {
         @OptIn(ExperimentalSerializationApi::class)
-        fun deserialize(typeVersion: TypeVersion, blob: ByteArray): LNUrlMetadata {
+        fun deserialize(typeVersion: TypeVersion, blob: ByteArray): LnurlMetadata {
             return when (typeVersion) {
                 TypeVersion.PAY_V0 -> {
                     Cbor.decodeFromByteArray<PayMetadata>(blob)
@@ -100,7 +101,7 @@ sealed class LNUrlMetadata {
         }
 
         @OptIn(ExperimentalSerializationApi::class)
-        fun serialize(metadata: LNUrl.Pay.Metadata): Pair<TypeVersion, ByteArray> {
+        fun serialize(metadata: LnurlPay.Intent.Metadata): Pair<TypeVersion, ByteArray> {
             val wrapper = PayMetadata(metadata)
             val blob = Cbor.encodeToByteArray(wrapper)
             return Pair(TypeVersion.PAY_V0, blob)
@@ -113,7 +114,7 @@ sealed class LNUrlMetadata {
  * - lnurl_successAction_type
  * - lnurl_successAction_blob
  */
-sealed class LNUrlSuccessAction {
+sealed class LnurlSuccessAction {
 
     enum class TypeVersion {
         MESSAGE_V0,
@@ -124,12 +125,12 @@ sealed class LNUrlSuccessAction {
     @Serializable
     data class Message(
         val message: String
-    ): LNUrlSuccessAction() {
-        constructor(successAction: LNUrl.PayInvoice.SuccessAction.Message): this(
+    ): LnurlSuccessAction() {
+        constructor(successAction: LnurlPay.Invoice.SuccessAction.Message): this(
             message = successAction.message
         )
 
-        fun unwrap() = LNUrl.PayInvoice.SuccessAction.Message(
+        fun unwrap() = LnurlPay.Invoice.SuccessAction.Message(
             message = this.message
         )
     }
@@ -138,13 +139,13 @@ sealed class LNUrlSuccessAction {
     data class Url(
         val description: String,
         val url: String
-    ): LNUrlSuccessAction() {
-        constructor(successAction: LNUrl.PayInvoice.SuccessAction.Url): this(
+    ): LnurlSuccessAction() {
+        constructor(successAction: LnurlPay.Invoice.SuccessAction.Url): this(
             description = successAction.description,
             url = successAction.url.toString()
         )
 
-        fun unwrap() = LNUrl.PayInvoice.SuccessAction.Url(
+        fun unwrap() = LnurlPay.Invoice.SuccessAction.Url(
             description = this.description,
             url = Url(this.url)
         )
@@ -158,14 +159,14 @@ sealed class LNUrlSuccessAction {
         val ciphertext: ByteArray,
         @ByteString
         val iv: ByteArray
-    ): LNUrlSuccessAction() {
-        constructor(successAction: LNUrl.PayInvoice.SuccessAction.Aes): this(
+    ): LnurlSuccessAction() {
+        constructor(successAction: LnurlPay.Invoice.SuccessAction.Aes): this(
             description = successAction.description,
             ciphertext = successAction.ciphertext.toByteArray(),
             iv = successAction.iv.toByteArray()
         )
 
-        fun unwrap() = LNUrl.PayInvoice.SuccessAction.Aes(
+        fun unwrap() = LnurlPay.Invoice.SuccessAction.Aes(
             description = this.description,
             ciphertext = ByteVector(this.ciphertext),
             iv = ByteVector(this.iv)
@@ -177,7 +178,7 @@ sealed class LNUrlSuccessAction {
         fun deserialize(
             typeVersion: TypeVersion,
             blob: ByteArray
-        ): LNUrl.PayInvoice.SuccessAction {
+        ): LnurlPay.Invoice.SuccessAction {
             return when (typeVersion) {
                 TypeVersion.MESSAGE_V0 -> {
                     Cbor.decodeFromByteArray<Message>(blob).unwrap()
@@ -192,19 +193,19 @@ sealed class LNUrlSuccessAction {
         }
 
         @OptIn(ExperimentalSerializationApi::class)
-        fun serialize(successAction: LNUrl.PayInvoice.SuccessAction): Pair<TypeVersion, ByteArray> {
+        fun serialize(successAction: LnurlPay.Invoice.SuccessAction): Pair<TypeVersion, ByteArray> {
             return when (successAction) {
-                is LNUrl.PayInvoice.SuccessAction.Message -> {
+                is LnurlPay.Invoice.SuccessAction.Message -> {
                     val wrapper = Message(successAction)
                     val blob = Cbor.encodeToByteArray(wrapper)
                     Pair(TypeVersion.MESSAGE_V0, blob)
                 }
-                is LNUrl.PayInvoice.SuccessAction.Url -> {
+                is LnurlPay.Invoice.SuccessAction.Url -> {
                     val wrapper = Url(successAction)
                     val blob = Cbor.encodeToByteArray(wrapper)
                     Pair(TypeVersion.URL_V0, blob)
                 }
-                is LNUrl.PayInvoice.SuccessAction.Aes -> {
+                is LnurlPay.Invoice.SuccessAction.Aes -> {
                     val wrapper = Aes(successAction)
                     val blob = Cbor.encodeToByteArray(wrapper)
                     Pair(TypeVersion.AES_V0, blob)
@@ -215,9 +216,9 @@ sealed class LNUrlSuccessAction {
 }
 
 data class WalletPaymentMetadataRow(
-    val lnurl_base: Pair<LNUrlBase.TypeVersion, ByteArray>? = null,
-    val lnurl_metadata: Pair<LNUrlMetadata.TypeVersion, ByteArray>? = null,
-    val lnurl_successAction: Pair<LNUrlSuccessAction.TypeVersion, ByteArray>? = null,
+    val lnurl_base: Pair<LnurlBase.TypeVersion, ByteArray>? = null,
+    val lnurl_metadata: Pair<LnurlMetadata.TypeVersion, ByteArray>? = null,
+    val lnurl_successAction: Pair<LnurlSuccessAction.TypeVersion, ByteArray>? = null,
     val lnurl_description: String? = null,
     val original_fiat: Pair<String, Double>? = null,
     val user_description: String? = null,
@@ -227,11 +228,11 @@ data class WalletPaymentMetadataRow(
 
     fun deserialize(): WalletPaymentMetadata {
         val base = lnurl_base?.let { (baseType, baseBlob) ->
-            when (val base = LNUrlBase.deserialize(baseType, baseBlob)) {
-                is LNUrlBase.Pay -> {
+            when (val base = LnurlBase.deserialize(baseType, baseBlob)) {
+                is LnurlBase.Pay -> {
                     lnurl_metadata?.let { (metaType, metaBlob) ->
-                        when (val metadata = LNUrlMetadata.deserialize(metaType, metaBlob)) {
-                            is LNUrlMetadata.PayMetadata -> {
+                        when (val metadata = LnurlMetadata.deserialize(metaType, metaBlob)) {
+                            is LnurlMetadata.PayMetadata -> {
                                 metadata.unwrap()
                             }
                         }
@@ -243,7 +244,7 @@ data class WalletPaymentMetadataRow(
         }
 
         val successAction = lnurl_successAction?.let {
-            LNUrlSuccessAction.deserialize(it.first, it.second)
+            LnurlSuccessAction.deserialize(it.first, it.second)
         }
 
         val lnurl = base?.let {
@@ -300,16 +301,16 @@ data class WalletPaymentMetadataRow(
             metadata: WalletPaymentMetadata
         ): WalletPaymentMetadataRow? {
 
-            var lnurlBase: Pair<LNUrlBase.TypeVersion, ByteArray>? = null
-            var lnurlMetadata: Pair<LNUrlMetadata.TypeVersion, ByteArray>? = null
-            var lnurlSuccessAction: Pair<LNUrlSuccessAction.TypeVersion, ByteArray>? = null
+            var lnurlBase: Pair<LnurlBase.TypeVersion, ByteArray>? = null
+            var lnurlMetadata: Pair<LnurlMetadata.TypeVersion, ByteArray>? = null
+            var lnurlSuccessAction: Pair<LnurlSuccessAction.TypeVersion, ByteArray>? = null
             var lnurlDescription: String? = null
 
             metadata.lnurl?.let {
-                lnurlBase = LNUrlBase.serialize(it.pay)
-                lnurlMetadata = LNUrlMetadata.serialize(it.pay.metadata)
+                lnurlBase = LnurlBase.serialize(it.pay)
+                lnurlMetadata = LnurlMetadata.serialize(it.pay.metadata)
                 lnurlSuccessAction = it.successAction?.let { successAction ->
-                    LNUrlSuccessAction.serialize(successAction)
+                    LnurlSuccessAction.serialize(successAction)
                 }
                 lnurlDescription = it.pay.metadata.plainText
             }

@@ -42,11 +42,13 @@ import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.utils.BitmapHelper
 import fr.acinq.phoenix.android.utils.Converter.toPrettyStringWithFallback
+import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.controllers.payments.MaxFees
 import fr.acinq.phoenix.controllers.payments.Scan
-import fr.acinq.phoenix.data.LNUrl
+import fr.acinq.phoenix.data.lnurl.LnurlError
+import fr.acinq.phoenix.data.lnurl.LnurlPay
 
 @Composable
 fun LnurlPayView(
@@ -56,14 +58,14 @@ fun LnurlPayView(
     onSendLnurlPayClick: (Scan.Intent.LnurlPayFlow) -> Unit
 ) {
     val log = logger("SendLightningPaymentView")
-    log.info { "init lnurl-pay view with url=${model.lnurlPay}" }
+    log.info { "init lnurl-pay view with url=${model.paymentIntent}" }
 
     val context = LocalContext.current
     val balance = business.balanceManager.balance.collectAsState(null).value
     val prefUnit = preferredAmountUnit
     val rate = fiatRate
 
-    var amount by remember { mutableStateOf<MilliSatoshi?>(model.lnurlPay.minSendable) }
+    var amount by remember { mutableStateOf<MilliSatoshi?>(model.paymentIntent.minSendable) }
     var amountErrorMessage by remember { mutableStateOf("") }
 
     Column(
@@ -88,39 +90,39 @@ fun LnurlPayView(
                         balance != null && newAmount.amount > balance -> {
                             amountErrorMessage = context.getString(R.string.send_error_amount_over_balance)
                         }
-                        newAmount.amount < model.lnurlPay.minSendable -> {
-                            amountErrorMessage = context.getString(R.string.lnurl_pay_amount_below_min, model.lnurlPay.minSendable.toPrettyStringWithFallback(prefUnit, rate, withUnit = true))
+                        newAmount.amount < model.paymentIntent.minSendable -> {
+                            amountErrorMessage = context.getString(R.string.lnurl_pay_amount_below_min, model.paymentIntent.minSendable.toPrettyStringWithFallback(prefUnit, rate, withUnit = true))
                         }
-                        newAmount.amount > model.lnurlPay.maxSendable -> {
-                            amountErrorMessage = context.getString(R.string.lnurl_pay_amount_above_max, model.lnurlPay.maxSendable.toPrettyStringWithFallback(prefUnit, rate, withUnit = true))
+                        newAmount.amount > model.paymentIntent.maxSendable -> {
+                            amountErrorMessage = context.getString(R.string.lnurl_pay_amount_above_max, model.paymentIntent.maxSendable.toPrettyStringWithFallback(prefUnit, rate, withUnit = true))
                         }
                     }
                     amount = newAmount?.amount
                 },
                 validationErrorMessage = amountErrorMessage,
                 inputTextSize = 42.sp,
-                enabled = model.lnurlPay.minSendable != model.lnurlPay.maxSendable
+                enabled = model.paymentIntent.minSendable != model.paymentIntent.maxSendable
             )
             Spacer(Modifier.height(24.dp))
             Column(
                 modifier = Modifier.padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                val image = remember(model.lnurlPay.metadata.imagePng + model.lnurlPay.metadata.imageJpg) {
-                    listOfNotNull(model.lnurlPay.metadata.imagePng, model.lnurlPay.metadata.imageJpg).firstOrNull()?.let {
+                val image = remember(model.paymentIntent.metadata.imagePng + model.paymentIntent.metadata.imageJpg) {
+                    listOfNotNull(model.paymentIntent.metadata.imagePng, model.paymentIntent.metadata.imageJpg).firstOrNull()?.let {
                         BitmapHelper.decodeBase64Image(it)?.asImageBitmap()
                     }
                 }
                 image?.let {
-                    Image(bitmap = it, contentDescription = model.lnurlPay.metadata.plainText, modifier = Modifier.size(90.dp))
+                    Image(bitmap = it, contentDescription = model.paymentIntent.metadata.plainText, modifier = Modifier.size(90.dp))
                     Spacer(modifier = Modifier.height(16.dp))
                 }
                 Label(text = stringResource(R.string.lnurl_pay_meta_description)) {
-                    Text(text = model.lnurlPay.metadata.longDesc ?: model.lnurlPay.metadata.plainText, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(text = model.paymentIntent.metadata.longDesc ?: model.paymentIntent.metadata.plainText, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
                 Spacer(Modifier.height(24.dp))
                 Label(text = stringResource(R.string.lnurl_pay_domain)) {
-                    Text(text = model.lnurlPay.callback.host, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(text = model.paymentIntent.callback.host, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
         }
@@ -129,7 +131,7 @@ fun LnurlPayView(
             is Scan.Model.LnurlPayFlow.LnurlPayRequest -> {
                 val error = model.error
                 if (error != null) {
-                    RemoteErrorResponseView(model.lnurlPay, error)
+                    RemoteErrorResponseView(model.paymentIntent, error)
                 }
                 FilledButton(
                     text = stringResource(id = R.string.lnurl_pay_pay_button),
@@ -138,11 +140,11 @@ fun LnurlPayView(
                 ) {
                     amount?.let {
                         onSendLnurlPayClick(
-                            Scan.Intent.LnurlPayFlow.SendLnurlPayment(
-                                lnurlPay = model.lnurlPay,
+                            Scan.Intent.LnurlPayFlow.RequestInvoice(
+                                paymentIntent = model.paymentIntent,
                                 amount = it,
                                 maxFees = trampolineMaxFees,
-                                comment = "lorem ipsum"
+                                comment = null
                             )
                         )
                     }
@@ -163,17 +165,17 @@ fun LnurlPayView(
 
 @Composable
 private fun RemoteErrorResponseView(
-    lnUrlPay: LNUrl.Pay,
+    lnurlPay: LnurlPay.Intent,
     error: Scan.LnurlPayError
 ) {
     Text(
         text = stringResource(R.string.lnurl_pay_error_header) + "\n" + when (error) {
-            is Scan.LnurlPayError.AlreadyPaidInvoice -> stringResource(R.string.lnurl_pay_error_already_paid, lnUrlPay.callback.host)
-            is Scan.LnurlPayError.ChainMismatch -> stringResource(R.string.lnurl_pay_error_invalid_chain, lnUrlPay.callback.host)
+            is Scan.LnurlPayError.AlreadyPaidInvoice -> annotatedStringResource(R.string.lnurl_pay_error_already_paid, lnurlPay.callback.host)
+            is Scan.LnurlPayError.ChainMismatch -> annotatedStringResource(R.string.lnurl_pay_error_invalid_chain, lnurlPay.callback.host)
             is Scan.LnurlPayError.BadResponseError -> when (val errorDetail = error.err) {
-                is LNUrl.Error.PayInvoice.InvalidAmount -> stringResource(R.string.lnurl_pay_error_invalid_amount, errorDetail.origin)
-                is LNUrl.Error.PayInvoice.InvalidHash -> stringResource(R.string.lnurl_pay_error_invalid_hash, errorDetail.origin)
-                is LNUrl.Error.PayInvoice.Malformed -> stringResource(R.string.lnurl_pay_error_invalid_malformed, errorDetail.origin)
+                is LnurlError.Pay.Invoice.InvalidAmount -> annotatedStringResource(R.string.lnurl_pay_error_invalid_amount, errorDetail.origin)
+                is LnurlError.Pay.Invoice.InvalidHash -> annotatedStringResource(R.string.lnurl_pay_error_invalid_hash, errorDetail.origin)
+                is LnurlError.Pay.Invoice.Malformed -> annotatedStringResource(R.string.lnurl_pay_error_invalid_malformed, errorDetail.origin)
             }
             is Scan.LnurlPayError.RemoteError -> getRemoteErrorMessage(error = error.err)
         },
