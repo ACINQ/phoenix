@@ -126,7 +126,6 @@ enum class FiatCurrency : CurrencyUnit {
     MMK, // Myanma Kyat
     MNT, // Mongolian Tugrik
     MOP, // Macanese Pataca
-    MTL, // Maltese Lira
     MUR, // Mauritian Rupee
     MVR, // Maldivian Rufiyaa
     MWK, // Malawian Kwacha

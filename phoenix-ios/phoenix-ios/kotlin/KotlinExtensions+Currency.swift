@@ -115,7 +115,6 @@ extension FiatCurrency {
 		case .mmk   : return "Myanmar Kyat"
 		case .mnt   : return "Mongolian Tugrik"
 		case .mop   : return "Macanese Pataca"
-		case .mtl   : return "Maltese Lira"
 		case .mur   : return "Mauritian Rupee"
 		case .mvr   : return "Maldivian Rufiyaa"
 		case .mwk   : return "Malawian Kwacha"
@@ -271,7 +270,6 @@ extension FiatCurrency {
 		case .mmk   : return NSLocalizedString("MMK", tableName: "Currencies", comment: "Myanmar Kyat")
 		case .mnt   : return NSLocalizedString("MNT", tableName: "Currencies", comment: "Mongolian Tugrik")
 		case .mop   : return NSLocalizedString("MOP", tableName: "Currencies", comment: "Macanese Pataca")
-		case .mtl   : return NSLocalizedString("MTL", tableName: "Currencies", comment: "Maltese Lira")
 		case .mur   : return NSLocalizedString("MUR", tableName: "Currencies", comment: "Mauritian Rupee")
 		case .mvr   : return NSLocalizedString("MVR", tableName: "Currencies", comment: "Maldivian Rufiyaa")
 		case .mwk   : return NSLocalizedString("MWK", tableName: "Currencies", comment: "Malawian Kwacha")
@@ -443,7 +441,6 @@ extension FiatCurrency {
 		case .mmk   : return "🇲🇲" // Myanmar Kyat
 		case .mnt   : return "🇲🇳" // Mongolian Tugrik
 		case .mop   : return "🇲🇴" // Macanese Pataca
-		case .mtl   : return "🇲🇹" // Maltese Lira
 		case .mur   : return "🇲🇺" // Mauritian Rupee
 		case .mvr   : return "🇲🇻" // Maldivian Rufiyaa
 		case .mwk   : return "🇲🇼" // Malawian Kwacha

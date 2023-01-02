@@ -157,7 +157,6 @@ private fun getFlag(code: String): String {
         "MMK" -> "🇲🇲" // Myanmar Kyat
         "MNT" -> "🇲🇳" // Mongolian Tugrik
         "MOP" -> "🇲🇴" // Macanese Pataca
-        "MTL" -> "🇲🇹" // Maltese Lira
         "MUR" -> "🇲🇺" // Mauritian Rupee
         "MVR" -> "🇲🇻" // Maldivian Rufiyaa
         "MWK" -> "🇲🇼" // Malawian Kwacha
