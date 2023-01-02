@@ -5,6 +5,7 @@ import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.utils.extensions.createdAt
 
@@ -136,9 +137,9 @@ data class WalletPaymentMetadata(
 )
 
 data class LnurlPayMetadata(
-    val pay: LNUrl.Pay,
+    val pay: LnurlPay.Intent,
     val description: String,
-    val successAction: LNUrl.PayInvoice.SuccessAction?
+    val successAction: LnurlPay.Invoice.SuccessAction?
 ) {
     companion object {/* allow companion extensions */}
 }

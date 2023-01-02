@@ -143,7 +143,7 @@ class AppConnectionsDaemon(
         // Wallet monitor
         launch {
             // Suspends until the wallet is initialized
-            walletManager.wallet.filterNotNull().first()
+            walletManager.keyManager.filterNotNull().first()
             logger.debug { "walletIsAvailable = true" }
             torControlChanges.send { copy(walletIsAvailable = true) }
             peerControlChanges.send { copy(walletIsAvailable = true) }

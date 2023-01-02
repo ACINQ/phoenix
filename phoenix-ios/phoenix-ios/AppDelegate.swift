@@ -63,7 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		//
 		UITableView.appearance().backgroundColor = .primaryBackground
 		UICollectionView.appearance().backgroundColor = .primaryBackground
-		
+
 		#if !targetEnvironment(simulator) // push notifications don't work on iOS simulator
 			UIApplication.shared.registerForRemoteNotifications()
 		#endif
@@ -91,7 +91,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		nc.publisher(for: UIApplication.willEnterForegroundNotification).sink { _ in
 			self._applicationWillEnterForeground(application)
 		}.store(in: &cancellables)
-		
+
 		CrossProcessCommunication.shared.start(receivedMessage: {
 			self.didReceiveMessageFromAppExtension()
 		})
@@ -254,7 +254,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		publisher = business.paymentsManager.lastIncomingPaymentPublisher()
 		cancellable = publisher!.sink(receiveValue: { (payment: Lightning_kmpIncomingPayment) in
-			
+
 			assertMainThread()
 			
 			guard
@@ -404,7 +404,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	// --------------------------------------------------
 	// MARK: CrossProcessCommunication
 	// --------------------------------------------------
-	
+
 	private func didReceiveMessageFromAppExtension() {
 		log.trace("didReceiveMessageFromAppExtension()")
 		

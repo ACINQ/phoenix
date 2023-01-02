@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.utils.borderColor
@@ -111,6 +112,27 @@ fun FilledButton(
     )
 }
 
+@Composable
+fun InlineButton(
+    text: String,
+    icon: Int,
+    modifier: Modifier = Modifier,
+    padding: PaddingValues = PaddingValues(horizontal = 0.dp, vertical = 8.dp),
+    space: Dp = 6.dp,
+    onClick: () -> Unit,
+) {
+    Button(
+        text = text,
+        icon = icon,
+        modifier = modifier,
+        padding = padding,
+        space = space,
+        onClick = onClick,
+        textStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary, fontSize = 14.sp, textDecoration = TextDecoration.Underline)
+    )
+}
+
+/** For annotated string text param. */
 @Composable
 fun TextWithIcon(
     text: AnnotatedString,

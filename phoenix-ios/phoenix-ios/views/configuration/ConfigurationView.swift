@@ -61,15 +61,15 @@ struct ConfigurationView: View {
 	
 	@ViewBuilder
 	var body: some View {
-		
+
 		content()
 			.navigationTitle(NSLocalizedString("Settings", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 	}
-	
+
 	@ViewBuilder
 	func content() -> some View {
-		
+
 		List {
 			let hasWallet = hasWallet()
 
@@ -202,9 +202,9 @@ struct ConfigurationView: View {
 						Image(systemName: "doc.text")
 					}
 				}
-				
+
 				if hasWallet {
-					
+
 					NavigationLink(
 						destination: ResetWalletView(),
 						tag: NavLinkTag.ResetWalletView,
@@ -215,7 +215,7 @@ struct ConfigurationView: View {
 						}
 					}
 				}
-				
+
 			} // </Section: Advanced>
 		} // </List>
 		.listStyle(.insetGrouped)
@@ -236,19 +236,14 @@ struct ConfigurationView: View {
 		.onReceive(externalLightningUrlPublisher) {(url: String) in
 			onExternalLightningUrl(url)
 		}
-			
+		.navigationTitle(NSLocalizedString("Settings", comment: "Navigation bar title"))
+		.navigationBarTitleDisplayMode(.inline)
+
 	} // end: body
 	
 	func hasWallet() -> Bool {
 		
-		let walletManager = Biz.business.walletManager
-		let hasWalletFlow = SwiftStateFlow<NSNumber>(origin: walletManager.hasWallet)
-		
-		if let value = hasWalletFlow.value_ {
-			return value.boolValue
-		} else {
-			return false
-		}
+		return Biz.business.walletManager.isLoaded()
 	}
 	
 	func onAppear() {

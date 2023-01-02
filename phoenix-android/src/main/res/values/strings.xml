@@ -163,9 +163,9 @@
     <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
     <string name="scan_error_already_paid">This payment has already been paid.</string>
     <string name="scan_error_invalid_chain">This payment does not use the same blockchain as your wallet.</string>
-    <string name="scan_error_lnurl_invalid">Failed to process this LNUrl link. Make sure it is valid.</string>
-    <string name="scan_error_lnurl_service_error">The LNUrl service returned an error.</string>
-    <string name="scan_error_lnurl_unsupported">This type of LNUrl is not supported yet!</string>
+    <string name="scan_error_lnurl_invalid">Failed to process this LNURL link. Make sure it is valid.</string>
+    <string name="scan_error_lnurl_service_error">The LNURL service returned an error.</string>
+    <string name="scan_error_lnurl_unsupported">This type of LNURL is not supported yet!</string>
     <string name="scan_error_invalid_generic">This data uses an unknown format and cannot be processed.</string>
 
     <string name="scan_lnurl_fetching">Fetching data from service…</string>
@@ -476,25 +476,31 @@
     <!-- //////////////// ln url auth //////////////// -->
 
     <string name="lnurl_auth_instructions">You can anonymously sign-in and authorize an action on:</string>
-    <string name="lnurl_auth_instructions_2">No personal data will be shared with this service.</string>
-    <string name="lnurl_auth_keytype_wait">Retrieving authentication schemes…</string>
-    <string name="lnurl_auth_keytype_label">Authentication scheme</string>
+    <string name="lnurl_auth_legacy_notice">Legacy mode</string>
+    <string name="lnurl_auth_help">Tap here for more info</string>
+    <string name="lnurl_auth_help_dialog_title">How does it work?</string>
+    <string name="lnurl_auth_help_dialog_general_details">Phoenix authenticates with a key unique to <b>%1$s</b>. This unique key becomes your password for your account there.</string>
+    <string name="lnurl_auth_help_dialog_privacy_title">Privacy</string>
+    <string name="lnurl_auth_help_dialog_privacy_details">The service will not have access to your wallet whatsoever. They cannot see your balance, payments, or keys.</string>
+    <string name="lnurl_auth_help_dialog_compat_title">Legacy mode</string>
+    <string name="lnurl_auth_help_dialog_compat_details">Phoenix uses a non-standard scheme on this service to be compatible with older versions of the app. The associated account will not be portable to other wallets.</string>
+    <string name="lnurl_auth_help_dialog_compat_button">Change scheme</string>
     <string name="lnurl_auth_button">Sign-in</string>
     <string name="lnurl_auth_try_again_button">Try again</string>
     <string name="lnurl_auth_in_progress">Signing-in to\n<b>%1$s</b></string>
     <string name="lnurl_auth_success">Authentication success.</string>
     <string name="lnurl_auth_failure">Authentication failure:</string>
-    <string name="lnurl_auth_error_network">Network error. Check your internet connection.</string>
-    <string name="lnurl_auth_error_other">An unknown error occurred.</string>
+    <string name="lnurl_auth_error_network">Network error. Check your internet connection and try again.</string>
+    <string name="lnurl_auth_error_other">An unknown error occurred. Try again.</string>
 
-    <!-- //////////////// ln url auth key types //////////////// -->
+    <!-- //////////////// lnurl auth scheme types //////////////// -->
 
-    <string name="lnurl_auth_keytype_default">Default scheme</string>
-    <string name="lnurl_auth_keytype_default_desc">This is the recommended LNURL derivation scheme. Always use this when logging into a new service for the first time.</string>
-    <string name="lnurl_auth_keytype_legacy">Legacy scheme</string>
-    <string name="lnurl_auth_keytype_legacy_desc">This is a compatibility scheme for old Phoenix Android wallets. Try this if the default scheme does not connect to your usual account.</string>
+    <string name="lnurl_auth_scheme_default">Compliant (recommended)</string>
+    <string name="lnurl_auth_scheme_default_desc">Use the standard LNURL\'s specifications scheme. This is the recommended option, especially for new wallets.</string>
+    <string name="lnurl_auth_scheme_legacy">Legacy friendly</string>
+    <string name="lnurl_auth_scheme_legacy_desc">Use a legacy scheme on some services to let you use accounts that were created with the old Phoenix Android app.</string>
 
-    <!-- //////////////// ln url withdraw //////////////// -->
+    <!-- //////////////// lnurl withdraw //////////////// -->
 
     <string name="lnurl_withdraw_header">You can redeem funds from\n<b>%1$s</b>.</string>
     <string name="lnurl_withdraw_amount_label">Amount to receive</string>
@@ -507,14 +513,14 @@
     <string name="lnurl_withdraw_amount_above_max">Amount cannot exceed %1$s.</string>
     <string name="lnurl_withdraw_error_header">Withdrawal has failed:</string>
 
-  <!-- //////////////// ln url remote error messages //////////////// -->
+    <!-- //////////////// lnurl remote error messages //////////////// -->
 
-    <string name="lnurl_error_remote_details">The service \'%1$s\' responded with an error: %2$s.\n\nTry again, or contact their support.</string>
-    <string name="lnurl_error_remote_code">The service \'%1$s\' returned an HTTP error (%2$s).\n\nTry again, or contact their support.</string>
-    <string name="lnurl_error_remote_unreadable">The service \'%1$s\' returned a malformed message.</string>
-    <string name="lnurl_error_remote_connection">Could not connect to service \'%1$s\'.</string>
+    <string name="lnurl_error_remote_details">The service <b>%1$s</b> responded with an error:\n\n<i>%2$s</i>.\n\nContact their support if needed.</string>
+    <string name="lnurl_error_remote_code">The service <b>%1$s</b> returned an HTTP error (%2$s).\n\nContact their support if needed.</string>
+    <string name="lnurl_error_remote_unreadable">The service <b>%1$s</b> returned a malformed message.</string>
+    <string name="lnurl_error_remote_connection">Could not connect to service <b>%1$s</b>.</string>
 
-    <!-- //////////////// ln url pay //////////////// -->
+    <!-- //////////////// lnurl pay //////////////// -->
 
     <string name="lnurl_pay_domain">Served by</string>
     <string name="lnurl_pay_meta_description">Payment description</string>
@@ -532,12 +538,12 @@
     <string name="lnurl_pay_amount_above_balance">Amount exceeds your balance</string>
     <string name="lnurl_pay_amount_invalid">Invalid amount</string>
 
-    <string name="lnurl_pay_error_header">Payment has failed:</string>
-    <string name="lnurl_pay_error_invalid_chain">The invoice returned by \'%1$s\' does not use the same chain as your wallet.</string>
-    <string name="lnurl_pay_error_already_paid">The invoice returned by \'%1$s\' has already been paid.</string>
-    <string name="lnurl_pay_error_invalid_amount">The invoice returned by \'%1$s\' has an incorrect amount.</string>
-    <string name="lnurl_pay_error_invalid_hash">The invoice returned by \'%1$s\' does not match the request details.</string>
-    <string name="lnurl_pay_error_invalid_malformed">The invoice returned by \'%1$s\' is malformed.</string>
+    <string name="lnurl_pay_error_header">Payment has failed.</string>
+    <string name="lnurl_pay_error_invalid_chain">The invoice returned by <b>%1$s</b> does not use the same chain as your wallet.</string>
+    <string name="lnurl_pay_error_already_paid">The invoice returned by <b>%1$s</b> has already been paid.</string>
+    <string name="lnurl_pay_error_invalid_amount">The invoice returned by <b>%1$s</b> has an incorrect amount.</string>
+    <string name="lnurl_pay_error_invalid_hash">The invoice returned by <b>%1$s</b> does not match the request details.</string>
+    <string name="lnurl_pay_error_invalid_malformed">The invoice returned by <b>%1$s</b> is malformed.</string>
 
     <!-- //////////////// display preferences //////////////// -->
 
@@ -689,7 +695,7 @@
     <string name="paymentsettings_paytoopen_fees_dialog_message">This fee applies when you receive a payment over Lightning and a new channel needs to be created.</string>
     <string name="paymentsettings_paytoopen_fees_dialog_message_clickable">See the FAQ for more information</string>
 
-    <string name="paymentsettings_lnurlauth_keytype_title">LNURL authentication scheme</string>
+    <string name="paymentsettings_lnurlauth_scheme_title">LNURL authentication scheme</string>
 
     <!-- ////////////// migration result dialog //////////////// -->
 
