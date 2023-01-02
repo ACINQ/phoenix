@@ -32,6 +32,7 @@ import fr.acinq.bitcoin.scala.ByteVector32
 import fr.acinq.bitcoin.scala.Crypto
 import fr.acinq.bitcoin.scala.DeterministicWallet
 import fr.acinq.bitcoin.scala.Protocol
+import fr.acinq.eclair.crypto.KeyManager
 import fr.acinq.eclair.crypto.`Mac32$`
 import fr.acinq.phoenix.legacy.BaseFragment
 import fr.acinq.phoenix.legacy.R
@@ -77,7 +78,7 @@ class LNUrlAuthFragment : BaseFragment() {
       return
     }
     model = ViewModelProvider(this, LNUrlAuthViewModel.Factory(url)).get(LNUrlAuthViewModel::class.java)
-    model.state.observe(viewLifecycleOwner, { state ->
+    model.state.observe(viewLifecycleOwner) { state ->
       when (state) {
         is LNUrlAuthState.Error -> {
           val details = when (state.cause) {
@@ -95,7 +96,7 @@ class LNUrlAuthFragment : BaseFragment() {
         }, 3000)
         else -> Unit
       }
-    })
+    }
     mBinding.instructions.text = Converter.html(getString(R.string.lnurl_auth_instructions, model.domainToSignIn))
     mBinding.progress.setText(Converter.html(getString(R.string.lnurl_auth_in_progress, model.domainToSignIn)))
     mBinding.model = model
@@ -114,11 +115,10 @@ class LNUrlAuthFragment : BaseFragment() {
       model.state.postValue(LNUrlAuthState.Error(e))
     }) {
       model.state.postValue(LNUrlAuthState.InProgress)
-      val domain = model.domainToSignIn
       val appState = app.state.value
 
       val (signedK1, authKey) = if (appState is KitState.Started) {
-        signLnurlAuthK1WithKey(key = appState.kit.nodeParams().keyManager().nodeKey(), k1 = args.url.k1, domain = domain)
+        signLnurlAuthK1WithKey(keyManager = appState.kit.nodeParams().keyManager(), k1 = args.url.k1, url = model.url)
       } else {
         throw KitNotInitialized
       }
@@ -134,8 +134,8 @@ class LNUrlAuthFragment : BaseFragment() {
       val response = try {
         LNUrl.httpClient.newCall(request).execute()
       } catch (e: IOException) {
-        log.error("io error when authenticating with lnurl on domain=$domain: ", e)
-        throw LNUrlError.RemoteFailure.CouldNotConnect(domain)
+        log.error("io error when authenticating with lnurl on domain=${model.domainToSignIn}: ", e)
+        throw LNUrlError.RemoteFailure.CouldNotConnect(model.domainToSignIn)
       }
       val json = LNUrl.handleLNUrlRemoteResponse(response)
       // if no failure, let's try to map to a pertinent state, with a fallback to Done.Authed
@@ -158,16 +158,52 @@ class LNUrlAuthFragment : BaseFragment() {
 
   companion object {
 
-    fun signLnurlAuthK1WithKey(key: DeterministicWallet.ExtendedPrivateKey, k1: String, domain: String): Pair<String, Crypto.PrivateKey> {
-      val authKey = getAuthLinkingKey(key, domain)
+    /**
+     * Domains where we should use a legacy path instead of the regular full domain, for
+     * backward compatibility reasons.
+     *
+     * Those services are listed as using LUD-04 on the lnurl specs:
+     * https://github.com/fiatjaf/lnurl-rfc/tree/38d8baa6f8e3b3dfd13649bfa79e2175d6ca42ff#services
+     */
+    private enum class LegacyDomain(val host: String, val legacyCompatDomain: String) {
+      GEYSER("auth.geyser.fund", "geyser.fund"),
+      KOLLIDER("api.kollider.xyz", "kollider.xyz"),
+      LNMARKETS("api.lnmarkets.com", "lnmarkets.com"),
+      // LNBITS("", ""),
+      GETALBY("getalby.com", "getalby.com"),
+      LIGHTNING_VIDEO("lightning.video", "lightning.video"),
+      LOFT("api.loft.trade", "loft.trade"),
+      // WHEEL_OF_FORTUNE("", ""),
+      // COINOS("", ""),
+      LNSHORT("lnshort.it", "lnshort.it"),
+      STACKERNEWS("stacker.news", "stacker.news"),
+      ;
+    }
+
+    /** Get the domain for the given [HttpUrl]. If eligible returns a legacy domain, or the full domain name otherwise (i.e. specs compliant). */
+    private fun isLegacyEligible(url: HttpUrl): Boolean {
+      return LegacyDomain.values().any { it.host == url.host() }
+    }
+
+    /** Get the domain for the given [HttpUrl]. If eligible returns a legacy domain, or the full domain name otherwise (i.e. specs compliant). */
+    fun filterDomain(url: HttpUrl): String {
+      return LegacyDomain.values().firstOrNull { it.host == url.host() }?.legacyCompatDomain ?: url.host()
+    }
+
+    fun signLnurlAuthK1WithKey(keyManager: KeyManager, k1: String, url: HttpUrl): Pair<String, Crypto.PrivateKey> {
+      val authKey = getAuthLinkingKey(keyManager, url)
       return Crypto.compact2der(Crypto.sign(ByteVector32.fromValidHex(k1).bytes(), authKey)).toHex() to authKey
     }
 
-    private fun getAuthLinkingKey(baseKey: DeterministicWallet.ExtendedPrivateKey, domain: String): Crypto.PrivateKey {
-      // 0 - the LNURL auth master key is the node key
-      val derivedKey = DeterministicWallet.derivePrivateKey(baseKey, DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/138'/0"))
+    private fun getAuthLinkingKey(keyManager: KeyManager, url: HttpUrl): Crypto.PrivateKey {
+      // 0 - the LNURL hashing key is the node key on legacy domains, master otherwise
+      val hashingKey = DeterministicWallet.derivePrivateKey(
+        if (isLegacyEligible(url)) keyManager.nodeKey() else keyManager.master(),
+        DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/138'/0")
+      )
       // 1 - get derivation path by hashing the service domain name
-      val domainHash = `Mac32$`.`MODULE$`.hmac256(derivedKey.privateKey().value().bytes(), ByteVector.view(domain.toByteArray(Charsets.UTF_8)))
+      val domain = filterDomain(url)
+      val domainHash = `Mac32$`.`MODULE$`.hmac256(hashingKey.privateKey().value().bytes(), ByteVector.view(domain.toByteArray(Charsets.UTF_8)))
       require(domainHash.bytes().size() >= 16) { "domain hash must be at least 16 chars" }
       val stream = ByteArrayInputStream(domainHash.bytes().slice(0, 16).toArray())
       val path1 = Protocol.uint32(stream, ByteOrder.BIG_ENDIAN)
@@ -176,7 +212,7 @@ class LNUrlAuthFragment : BaseFragment() {
       val path4 = Protocol.uint32(stream, ByteOrder.BIG_ENDIAN)
       val path = DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/138'/$path1/$path2/$path3/$path4")
       // 2 - build key that will be used to link with service
-      return DeterministicWallet.derivePrivateKey(derivedKey, path).privateKey()
+      return DeterministicWallet.derivePrivateKey(if (isLegacyEligible(url)) hashingKey else keyManager.master(), path).privateKey()
     }
   }
 }
@@ -198,13 +234,7 @@ class LNUrlAuthViewModel(val url: HttpUrl) : ViewModel() {
   private val log = LoggerFactory.getLogger(this::class.java)
   val state = MutableLiveData<LNUrlAuthState>(LNUrlAuthState.Init)
 
-  /**
-   * The domain used for the signing key is the effective top level domain + 1, or the host
-   * if null (e.g. localhost...). It's better to use eTLD + 1 because the service's lnurl
-   * (including sub domains) can change which would in turn change the signing key, i.e lock
-   * users out of their accounts.
-   */
-  val domainToSignIn: String = url.topPrivateDomain() ?: url.host()
+  val domainToSignIn: String = LNUrlAuthFragment.filterDomain(url)
 
   class Factory(private val url: HttpUrl) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")

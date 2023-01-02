@@ -6,7 +6,6 @@ import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.io.WrappedChannelCommand
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.PeerManager
-import fr.acinq.phoenix.managers.WalletManager
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration.Model.ChannelInfoStatus
 import fr.acinq.phoenix.data.Chain
@@ -18,7 +17,6 @@ import org.kodein.log.LoggerFactory
 class AppCloseChannelsConfigurationController(
     loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
-    private val walletManager: WalletManager,
     private val chain: Chain,
     private val isForceClose: Boolean
 ) : AppController<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>(
@@ -28,7 +26,6 @@ class AppCloseChannelsConfigurationController(
     constructor(business: PhoenixBusiness, isForceClose: Boolean): this(
         loggerFactory = business.loggerFactory,
         peerManager = business.peerManager,
-        walletManager = business.walletManager,
         chain = business.chain,
         isForceClose = isForceClose
     )

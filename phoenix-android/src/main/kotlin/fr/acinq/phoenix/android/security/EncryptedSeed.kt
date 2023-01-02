@@ -103,7 +103,6 @@ sealed class EncryptedSeed {
   companion object {
     val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-    const val SEED_FILE_VERSION_1: Byte = 1
     const val SEED_FILE_VERSION_2: Byte = 2
 
     /** Reads an array of byte and de-serializes it as an [EncryptedSeed] object. */
@@ -112,7 +111,7 @@ sealed class EncryptedSeed {
       val version = stream.read()
       return when (version) {
         SEED_FILE_VERSION_2.toInt() -> V2.deserialize(stream)
-        else -> throw UnhandledSeedVersion(SEED_FILE_VERSION_1.toInt())
+        else -> throw UnhandledSeedVersion(version)
       }
     }
 

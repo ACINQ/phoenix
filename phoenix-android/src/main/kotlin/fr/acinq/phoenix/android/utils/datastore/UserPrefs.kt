@@ -26,7 +26,7 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
-import fr.acinq.phoenix.data.LNUrl
+import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.legacy.userPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -147,27 +147,24 @@ object UserPrefs {
     fun getIsAutoPayToOpenEnabled(context: Context): Flow<Boolean> = prefs(context).map { it[AUTO_PAY_TO_OPEN] ?: true }
     suspend fun saveIsAutoPayToOpenEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[AUTO_PAY_TO_OPEN] = isEnabled }
 
-    // -- lnurl authentication key
-
-    private val LNURL_AUTH_KEY_TYPE = intPreferencesKey("LNURL_AUTH_KEY_TYPE")
-    fun getLnurlAuthKeyType(context: Context): Flow<LNUrl.Auth.KeyType?> = prefs(context).map {
-        when (it[LNURL_AUTH_KEY_TYPE]) {
-            LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE.id -> LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE
-            LNUrl.Auth.KeyType.LEGACY_KEY_TYPE.id -> LNUrl.Auth.KeyType.LEGACY_KEY_TYPE
-            else -> LNUrl.Auth.KeyType.DEFAULT_KEY_TYPE
+    private val LNURL_AUTH_SCHEME = intPreferencesKey("LNURL_AUTH_SCHEME")
+    fun getLnurlAuthScheme(context: Context): Flow<LnurlAuth.Scheme?> = prefs(context).map {
+        when (it[LNURL_AUTH_SCHEME]) {
+            LnurlAuth.Scheme.DEFAULT_SCHEME.id -> LnurlAuth.Scheme.DEFAULT_SCHEME
+            LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME.id -> LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME
+            else -> LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME
         }
     }
-    suspend fun saveLnurlAuthKeyType(context: Context, keyType: LNUrl.Auth.KeyType?) = context.userPrefs.edit {
-        if (keyType == null) {
-            it.remove(LNURL_AUTH_KEY_TYPE)
+    suspend fun saveLnurlAuthScheme(context: Context, scheme: LnurlAuth.Scheme?) = context.userPrefs.edit {
+        if (scheme == null) {
+            it.remove(LNURL_AUTH_SCHEME)
         } else {
-            it[LNURL_AUTH_KEY_TYPE] = keyType.id
+            it[LNURL_AUTH_SCHEME] = scheme.id
         }
     }
 
     private val IS_TOR_ENABLED = booleanPreferencesKey("IS_TOR_ENABLED")
     fun getIsTorEnabled(context: Context): Flow<Boolean> = prefs(context).map { it[IS_TOR_ENABLED] ?: false }
     suspend fun saveIsTorEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[IS_TOR_ENABLED] = isEnabled }
-
 
 }

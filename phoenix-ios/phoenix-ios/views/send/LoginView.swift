@@ -152,7 +152,7 @@ struct LoginView: View {
 		.padding(.horizontal, 20)
 	}
 	
-	var auth: LNUrl.Auth? {
+	var auth: LnurlAuth? {
 		
 		if let model = mvi.model as? Scan.Model_LnurlAuthFlow_LoginRequest {
 			return model.auth
@@ -167,17 +167,17 @@ struct LoginView: View {
 	
 	func domain() -> String {
 		
-		return auth?.url.host ?? "?"
+		return auth?.initialUrl.host ?? "?"
 	}
 	
 	func buttonTitle() -> String {
 		
-		return auth?.actionPromptTitle ?? LNUrl.Auth.defaultActionPromptTitle
+		return auth?.actionPromptTitle ?? LnurlAuth.defaultActionPromptTitle
 	}
 	
 	func successTitle() -> String {
 		
-		return auth?.actionSuccessTitle ?? LNUrl.Auth.defaultActionSuccessTitle
+		return auth?.actionSuccessTitle ?? LnurlAuth.defaultActionSuccessTitle
 	}
 	
 	func errorText() -> String? {
@@ -185,11 +185,11 @@ struct LoginView: View {
 		if let model = mvi.model as? Scan.Model_LnurlAuthFlow_LoginResult, let error = model.error {
 			
 			if let error = error as? Scan.LoginErrorServerError {
-				if let details = error.details as? LNUrl.ErrorRemoteFailureCode {
+				if let details = error.details as? LnurlError.RemoteFailure_Code {
 					let frmt = NSLocalizedString("Server returned HTTP status code %d", comment: "error details")
 					return String(format: frmt, details.code.value)
 				
-				} else if let details = error.details as? LNUrl.ErrorRemoteFailureDetailed {
+				} else if let details = error.details as? LnurlError.RemoteFailure_Detailed {
 					let frmt = NSLocalizedString("Server returned error: %@", comment: "error details")
 					return String(format: frmt, details.reason)
 				
@@ -240,7 +240,7 @@ struct LoginView: View {
 			mvi.intent(Scan.Intent_LnurlAuthFlow_Login(
 				auth: model.auth,
 				minSuccessDelaySeconds: 1.6,
-				keyType: LNUrl.AuthKeyType_DEFAULT_KEY_TYPE()
+				scheme: LnurlAuth.Scheme_DEFAULT()
 			))
 		}
 	}

@@ -38,10 +38,10 @@ object Versions {
     object AndroidLegacy {
         const val eclair = "0.4.19-android-phoenix-SNAPSHOT"
 
-        const val safeArgs = "2.3.5"
+        const val safeArgs = "2.4.2"
         const val appCompat = "1.3.0"
         const val material = "1.7.0"
-        const val navigation = "2.3.5"
+        const val navigation = "2.4.2"
         const val constraint = "2.0.4"
         const val lifecycleExtensions = "2.2.0"
         const val lifecycle = "2.4.0"

@@ -1,9 +1,9 @@
 package fr.acinq.phoenix.db.cloud
 
 import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.phoenix.db.payments.LNUrlBase
-import fr.acinq.phoenix.db.payments.LNUrlMetadata
-import fr.acinq.phoenix.db.payments.LNUrlSuccessAction
+import fr.acinq.phoenix.db.payments.LnurlBase
+import fr.acinq.phoenix.db.payments.LnurlMetadata
+import fr.acinq.phoenix.db.payments.LnurlSuccessAction
 import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import kotlinx.serialization.*
 import kotlinx.serialization.cbor.ByteString
@@ -38,9 +38,9 @@ enum class CloudAssetVersion(val value: Int) {
 data class CloudAsset(
     @SerialName("v")
     val version: Int,
-    val lnurl_base: LNUrlBaseWrapper?,
-    val lnurl_metadata: LNUrlMetadataWrapper?,
-    val lnurl_successAction: LNUrlSuccessActionWrapper?,
+    val lnurl_base: LnurlBaseWrapper?,
+    val lnurl_metadata: LnurlMetadataWrapper?,
+    val lnurl_successAction: LnurlSuccessActionWrapper?,
     val lnurl_description: String?,
     val user_description: String?,
     val user_notes: String?,
@@ -48,32 +48,32 @@ data class CloudAsset(
 ) {
     @Serializable
     @OptIn(ExperimentalSerializationApi::class)
-    data class LNUrlBaseWrapper(
+    data class LnurlBaseWrapper(
         val type: String,
         @ByteString
         val blob: ByteArray
     ) {
-        var typeVersion = LNUrlBase.TypeVersion.valueOf(type)
+        var typeVersion = LnurlBase.TypeVersion.valueOf(type)
     }
 
     @Serializable
     @OptIn(ExperimentalSerializationApi::class)
-    data class LNUrlMetadataWrapper(
+    data class LnurlMetadataWrapper(
         val type: String,
         @ByteString
         val blob: ByteArray
     ) {
-        var typeVersion = LNUrlMetadata.TypeVersion.valueOf(type)
+        var typeVersion = LnurlMetadata.TypeVersion.valueOf(type)
     }
 
     @Serializable
     @OptIn(ExperimentalSerializationApi::class)
-    data class LNUrlSuccessActionWrapper(
+    data class LnurlSuccessActionWrapper(
         val type: String,
         @ByteString
         val blob: ByteArray
     ) {
-        var typeVersion = LNUrlSuccessAction.TypeVersion.valueOf(type)
+        var typeVersion = LnurlSuccessAction.TypeVersion.valueOf(type)
     }
 
     @Serializable
@@ -90,13 +90,13 @@ fun WalletPaymentMetadataRow.cloudSerialize(): ByteArray {
     val wrapper = CloudAsset(
         version = CloudAssetVersion.V1.value,
         lnurl_base = lnurl_base?.let {
-            CloudAsset.LNUrlBaseWrapper(it.first.name, it.second)
+            CloudAsset.LnurlBaseWrapper(it.first.name, it.second)
         },
         lnurl_metadata = lnurl_metadata?.let {
-            CloudAsset.LNUrlMetadataWrapper(it.first.name, it.second)
+            CloudAsset.LnurlMetadataWrapper(it.first.name, it.second)
         },
         lnurl_successAction = lnurl_successAction?.let {
-            CloudAsset.LNUrlSuccessActionWrapper(it.first.name, it.second)
+            CloudAsset.LnurlSuccessActionWrapper(it.first.name, it.second)
         },
         lnurl_description = lnurl_description,
         user_description = user_description,
