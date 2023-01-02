@@ -41,6 +41,7 @@ import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.chain
 import fr.acinq.phoenix.utils.createTrampolineFees
+import io.ktor.http.Url
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -65,7 +66,7 @@ class AppScanController(
     firstModel = firstModel ?: Scan.Model.Ready
 ) {
 
-    /** Arbitraty identifier used to track the current lnurl task. Those tasks are asynchronous and can be cancelled. We use this field to track which one is in progress. */
+    /** Arbitrary identifier used to track the current lnurl task. Those tasks are asynchronous and can be cancelled. We use this field to track which one is in progress. */
     private var lnurlRequestId = 1
 
     /** Tracks the task fetching information for a given lnurl. Use this field to cancel the task (see [cancelLnurlFetch]). */
@@ -159,9 +160,11 @@ class AppScanController(
             processLightningInvoice(it)
         } ?: readLnurl(input)?.let {
             processLnurl(it)
-        } ?: Parser.readBitcoinAddress(chain, input).let {
+        } ?: readBitcoinAddress(input)?.let {
             processBitcoinAddress(it)
-        }
+        } ?: readLNURLFallback(input)?.let {
+            processLnurl(it)
+        } ?: model(Scan.Model.BadRequest(reason = Scan.BadRequestReason.UnknownFormat))
     }
 
     /** Inspects the Lightning invoice for errors and update the model with the adequate value. */
@@ -550,10 +553,16 @@ class AppScanController(
                 is Lnurl.Request -> Scan.ClipboardContent.LnurlRequest(it.initialUrl)
                 else -> null
             }
-        } ?: Parser.readBitcoinAddress(chain, input).let {
+        } ?: readBitcoinAddress(input)?.let {
             when (it) {
                 is Either.Left -> null
                 is Either.Right -> Scan.ClipboardContent.BitcoinRequest(it.value)
+            }
+        } ?: readLNURLFallback(input)?.let {
+            when (it) {
+                is LnurlAuth -> Scan.ClipboardContent.LoginRequest(it)
+                is Lnurl.Request -> Scan.ClipboardContent.LnurlRequest(it.initialUrl)
+                else -> null
             }
         }
     }
@@ -586,6 +595,34 @@ class AppScanController(
     /** Reads a lnurl and return either a lnurl-auth (i.e. a http query that must not be called automatically), or the actual url embedded in the lnurl (that can be called afterwards). */
     private fun readLnurl(input: String): Lnurl? = try {
         Lnurl.extractLnurl(input)
+    } catch (t: Throwable) {
+        null
+    }
+
+    /**
+     * Invokes `Parser.readBitcoinAddress`, but maps the
+     * generic `BitcoinAddressError.UnknownFormat` to a null result instead.
+     */
+    private fun readBitcoinAddress(input: String): Either<BitcoinAddressError, BitcoinAddressInfo>? {
+        return when (val result = Parser.readBitcoinAddress(chain, input)) {
+            is Either.Left -> when (result.left) {
+                is BitcoinAddressError.UnknownFormat -> null
+                else -> result
+            }
+            is Either.Right -> result
+        }
+    }
+
+    /**
+     * Support for LNURL Fallback Scheme,
+     * e.g. as used by Bitcoin Beach Wallet's static Paycode QR.
+     * https://github.com/ACINQ/phoenix/issues/323
+     */
+    private fun readLNURLFallback(input: String): Lnurl? = try {
+        val url = Url(input)
+        url.parameters["lightning"]?.let { fallback ->
+            Lnurl.extractLnurl(fallback)
+        }
     } catch (t: Throwable) {
         null
     }

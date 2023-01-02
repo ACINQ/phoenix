@@ -239,10 +239,23 @@ struct PaymentSummaryView: View {
 			)
 		}
 		
-		let bitcoin_base = Utils.formatBitcoin(msat: nums.baseMsat, bitcoinUnit: currencyPrefs.bitcoinUnit)
-		let bitcoin_tip = Utils.formatBitcoin(msat: nums.tipMsat, bitcoinUnit: currencyPrefs.bitcoinUnit)
-		let bitcoin_minerFee = Utils.formatBitcoin(msat: nums.minerFeeMsat, bitcoinUnit: currencyPrefs.bitcoinUnit)
-		let bitcoin_total = Utils.formatBitcoin(msat: nums.totalMsat, bitcoinUnit: currencyPrefs.bitcoinUnit)
+		let bitcoin_base = Utils.formatBitcoin(
+			msat: nums.baseMsat,
+			bitcoinUnit: currencyPrefs.bitcoinUnit
+		)
+		let bitcoin_tip = Utils.formatBitcoin(
+			msat: nums.tipMsat,
+			bitcoinUnit: currencyPrefs.bitcoinUnit,
+			policy: .showMsatsIfZeroSats // tip can be small if amount is small
+		)
+		let bitcoin_minerFee = Utils.formatBitcoin(
+			msat: nums.minerFeeMsat,
+			bitcoinUnit: currencyPrefs.bitcoinUnit
+		)
+		let bitcoin_total = Utils.formatBitcoin(
+			msat: nums.totalMsat,
+			bitcoinUnit: currencyPrefs.bitcoinUnit
+		)
 		
 		let fiat_base: FormattedAmount
 		let fiat_tip: FormattedAmount
