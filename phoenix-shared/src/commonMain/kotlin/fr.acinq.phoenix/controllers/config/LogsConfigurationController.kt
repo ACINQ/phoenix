@@ -14,30 +14,33 @@ import org.kodein.memory.use
 
 
 class AppLogsConfigurationController(
-    ctx: PlatformContext,
     loggerFactory: LoggerFactory,
-    logMemory: LogMemory
+    private val ctx: PlatformContext,
+    private val logMemory: LogMemory
 ) : AppController<LogsConfiguration.Model, LogsConfiguration.Intent>(
     loggerFactory = loggerFactory,
-    firstModel = LogsConfiguration.Model.Loading
+    firstModel = LogsConfiguration.Model.Awaiting
 ) {
     constructor(business: PhoenixBusiness): this(
-        ctx = business.ctx,
         loggerFactory = business.loggerFactory,
+        ctx = business.ctx,
         logMemory = business.logMemory
     )
 
     private val numberOfFiles = 3 // Edit for longer files
 
-    init {
-        launch {
-            logMemory.rotate().join()
-            val file = mergeLogs(logMemory.directory, numberOfFiles, ctx)
-            model(LogsConfiguration.Model.Ready(file.path))
+    override fun process(intent: LogsConfiguration.Intent) {
+        when (intent) {
+            is LogsConfiguration.Intent.Export -> {
+                launch {
+                    model(LogsConfiguration.Model.Exporting)
+                    logMemory.rotate().join()
+                    val file = mergeLogs(logMemory.directory, numberOfFiles, ctx)
+                    model(LogsConfiguration.Model.Ready(file.path))
+                }
+            }
         }
     }
-
-    override fun process(intent: LogsConfiguration.Intent) = error("Nothing to process")
 
     private suspend fun mergeLogs(
         directory: Path,
