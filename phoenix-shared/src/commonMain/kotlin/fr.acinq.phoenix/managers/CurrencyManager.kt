@@ -66,14 +66,26 @@ class CurrencyManager(
      */
     private val highLiquidityMarkets = setOf(FiatCurrency.USD, FiatCurrency.EUR)
 
+    private val specialMarkets = setOf(FiatCurrency.ARS_BM)
+
+    private val missingFromCoinbase = setOf(
+        FiatCurrency.CUP, // Cuban Peso
+        FiatCurrency.ERN, // Eritrean Nakfa (accidentally overwritten by ERN altcoin?)
+        FiatCurrency.IRR, // Iranian Rial
+        FiatCurrency.KPW, // North Korean Won
+        FiatCurrency.SDG, // Sudanese Pound
+        FiatCurrency.SOS, // Somali Shilling
+        FiatCurrency.SYP  // Syrian Pound
+    )
+
     /**
-     * We use a number of different API's to fetch all the data we need.
+     * We use a number of different APIs to fetch all the data we need.
      * This interface defines the shared format for each API.
      */
     private interface API {
         /**
          * How often to perform an automatic refresh.
-         * Some API's impose limits, and others simply don't refresh (server-side) as often.
+         * Some APIs impose limits, and others simply don't refresh (server-side) as often.
          */
         val refreshDelay: Duration
 
@@ -90,17 +102,34 @@ class CurrencyManager(
      */
     private val blockchainInfoAPI = object : API {
         override val refreshDelay = 20.minutes
-        override val fiatCurrencies = FiatCurrency.values.filter { highLiquidityMarkets.contains(it) }.toSet()
+        override val fiatCurrencies = FiatCurrency.values.filter {
+            highLiquidityMarkets.contains(it)
+        }.toSet()
     }
 
     /**
-     * The coindesk API is used to refersh the UsdPriceRates.
+     * The coinbase API is used to refresh select UsdPriceRates.
+     * Since fiat prices are less volatile, we refresh them less often.
+     */
+    private val coinbaseAPI = object : API {
+        override val refreshDelay = 60.minutes
+        override val fiatCurrencies = FiatCurrency.values.filter {
+            !highLiquidityMarkets.contains(it) &&
+            !specialMarkets.contains(it) &&
+            !missingFromCoinbase.contains(it)
+        }.toSet()
+    }
+
+    /**
+     * The coindesk API is used to refresh select UsdPriceRates.
      * Since fiat prices are less volatile, we refresh them less often.
      * Also, the source only refreshes the values once per hour.
      */
     private val coindeskAPI = object : API {
         override val refreshDelay = 60.minutes
-        override val fiatCurrencies = FiatCurrency.values.filter { !highLiquidityMarkets.contains(it) && it != FiatCurrency.ARS_BM }.toSet()
+        override val fiatCurrencies = FiatCurrency.values.filter {
+            missingFromCoinbase.contains(it)
+        }.toSet()
     }
 
     /**
@@ -161,7 +190,7 @@ class CurrencyManager(
         }
     }
 
-    /** Utility class useed to track refresh progress on a per-currency basis. */
+    /** Utility class used to track refresh progress on a per-currency basis. */
     private data class RefreshInfo(
         val lastRefresh: Instant,
         val nextRefresh: Instant,
@@ -246,12 +275,15 @@ class CurrencyManager(
             refreshFromBlockchainInfo(targets = targets, forceRefresh = force)
         }
         val deferred2 = async {
-            refreshFromCoinDesk(targets = targets, forceRefresh = force)
+            refreshFromCoinbase(targets = targets, forceRefresh = force)
         }
         val deferred3 = async {
+            refreshFromCoinDesk(targets = targets, forceRefresh = force)
+        }
+        val deferred4 = async {
             refreshFromBluelytics(targets = targets, forceRefresh = force)
         }
-        listOf(deferred1, deferred2, deferred3).awaitAll()
+        listOf(deferred1, deferred2, deferred3, deferred4).awaitAll()
         maybeStartAutoRefresh()
     }
 
@@ -268,6 +300,17 @@ class CurrencyManager(
             }
         }
         launch {
+            // This Job refreshes the UsdPriceRates from the coinbase API
+            val api = coinbaseAPI
+            while (isActive) {
+                delay(api).let { nextDelay ->
+                    log.debug { "API(coinbase): Next UsdPriceRate refresh: $nextDelay" }
+                    delay(nextDelay)
+                }
+                refreshFromCoinbase(api.fiatCurrencies, forceRefresh = false)
+            }
+        }
+        launch {
             // This Job refreshes the UsdPriceRates from the coindesk.com API.
             val api = coindeskAPI
             while (isActive) {
@@ -276,8 +319,8 @@ class CurrencyManager(
                     delay(nextDelay)
                 }
                 val preferredFiatCurrencies = configurationManager.preferredFiatCurrencies.value
-                val (preferred, remaining) = preferredFiatCurrencies?.let {
-                    val preferred = it.all
+                val (preferred, remaining) = preferredFiatCurrencies?.let { pfc ->
+                    val preferred = pfc.all
                     val remaining = api.fiatCurrencies.filter { !preferred.contains(it) }
                     Pair(preferred, remaining)
                 } ?: run {
@@ -410,6 +453,12 @@ class CurrencyManager(
         }
     }
 
+    class WrappedException(
+        val inner: Exception?,
+        val fiatCurrency: FiatCurrency,
+        val reason: String
+    ) : Exception("$fiatCurrency: $reason: $inner")
+
     private suspend fun refreshFromBlockchainInfo(
         targets: Collection<FiatCurrency>,
         forceRefresh: Boolean
@@ -463,11 +512,63 @@ class CurrencyManager(
         removeRefreshTargets(fiatCurrencies)
     }
 
-    class WrappedException(
-        val inner: Exception?,
-        val fiatCurrency: FiatCurrency,
-        val reason: String
-    ) : Exception("$fiatCurrency: $reason: $inner")
+    private suspend fun refreshFromCoinbase(
+        targets: Collection<FiatCurrency>,
+        forceRefresh: Boolean
+    ) {
+        val api = coinbaseAPI
+        val fiatCurrencies = filterTargets(targets, forceRefresh, api)
+
+        if (fiatCurrencies.isEmpty()) {
+            return
+        } else {
+            log.info { "fetching ${fiatCurrencies.size} exchange rate(s) from coinbase.com" }
+            addRefreshTargets(fiatCurrencies)
+        }
+
+        val httpResponse: HttpResponse? = try {
+            httpClient.get(urlString = "https://api.coinbase.com/v2/exchange-rates?currency=USD")
+        } catch (e: Exception) {
+            log.error { "failed to fetch rates from api.coinbase.com: $e" }
+            null
+        }
+        val parsedResponse: CoinbaseResponse? = httpResponse?.let {
+            try {
+                json.decodeFromString<CoinbaseResponse>(it.bodyAsText())
+            } catch (e: Exception) {
+                log.error { "failed to parse json response from api.coinbase.com: $e" }
+                null
+            }
+        }
+
+        val fetchedRates: List<ExchangeRate> = parsedResponse?.let {
+            api.fiatCurrencies.mapNotNull { fiatCurrency ->
+                parsedResponse.data.rates[fiatCurrency.name]?.let { valueAsString ->
+                    valueAsString.toDoubleOrNull()?.let { valueAsDouble ->
+                        ExchangeRate.UsdPriceRate(
+                            fiatCurrency = fiatCurrency,
+                            price = valueAsDouble,
+                            source = "coinbase.com",
+                            timestampMillis = Clock.System.now().toEpochMilliseconds(),
+                        )
+                    }
+                }
+            }
+        } ?: listOf()
+
+        if (fetchedRates.isNotEmpty()) {
+            appDb.saveExchangeRates(fetchedRates)
+            log.info { "successfully refreshed ${fetchedRates.size} exchange rates from coinbase.com" }
+        }
+
+        // Update all the corresponding values in `refreshList`
+        updateRefreshList(
+            api = api,
+            attempted = fiatCurrencies,
+            refreshed = fetchedRates.map { it.fiatCurrency }
+        )
+        removeRefreshTargets(fiatCurrencies)
+    }
 
     private suspend fun refreshFromCoinDesk(
         targets: Collection<FiatCurrency>,

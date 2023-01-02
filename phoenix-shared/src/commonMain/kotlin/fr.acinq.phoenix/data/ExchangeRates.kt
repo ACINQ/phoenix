@@ -65,6 +65,30 @@ sealed class ExchangeRate {
 @Serializable data class BlockchainInfoPriceObject(val last: Double)
 
 /**
+ * Coinbase example:
+ * {
+ *   "data": {
+ *     "currency": "USD",
+ *     "rates": {
+ *       "AED": "3.6726399999999999",
+ *       "AFN": "89.2213",
+ *       ...
+ *     }
+ *   }
+ * }
+ */
+
+@Serializable
+data class CoinbaseResponse(
+    val data: Data,
+) {
+    @Serializable
+    data class Data(
+        val rates: Map<String, String>
+    )
+}
+
+/**
  * Coindesk example:
  * {
  *   "time":{
