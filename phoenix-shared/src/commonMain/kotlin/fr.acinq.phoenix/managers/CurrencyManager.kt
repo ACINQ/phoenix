@@ -724,4 +724,49 @@ class CurrencyManager(
 
         return fetchedRates
     }
+
+    /**
+     * For debugging purposes.
+     *
+     * It was discovered that Coinbase's currency rate for "ERN" wasn't accurate.
+     * It turns out that "ERN" didn't mean "Eritrean Nakfa", but instead refers to an altcoin.
+     * How did this happen ?
+     * It might be because the USA is sanctioning the country.
+     * After all, the other missing currencies from coinbase are sanctioned countries.
+     * However, it might also be an accident.
+     * And if it was an accident, this would imply that anytime an altcoin name happens
+     * to conflict with an existing currency name, the altcoin might take precedence.
+     * I think this is unlikely.
+     * But this function is a "quick-and-dirty" way to scan the list for suspicious exchange rates.
+     */
+    private suspend fun compareCoinbaseVsCoindesk() {
+
+        val fiatCurrencies = FiatCurrency.values.filter {
+            it != FiatCurrency.USD &&
+            it != FiatCurrency.EUR &&
+            it != FiatCurrency.ARS_BM
+        }.toSet()
+
+        val coinbaseRates = fetchFromCoinbase(fiatCurrencies)
+        val coindeskRates = fetchFromCoinDesk(fiatCurrencies)
+
+        val coinbaseMap = coinbaseRates.associateBy { it.fiatCurrency }
+        val coindeskMap = coindeskRates.associateBy { it.fiatCurrency }
+
+        for (fiatCurrency in fiatCurrencies) {
+            val coinbaseRate = coinbaseMap[fiatCurrency]
+            val coindeskRate = coindeskMap[fiatCurrency]
+
+            val coinbaseValue = when (coinbaseRate) {
+                is ExchangeRate.UsdPriceRate -> coinbaseRate.price.toString()
+                else -> "null"
+            }
+            val coindeskValue = when (coindeskRate) {
+                is ExchangeRate.UsdPriceRate -> coindeskRate.price.toString()
+                else -> "null"
+            }
+
+            log.debug { "${fiatCurrency.name}: coinbase($coinbaseValue), coindesk($coindeskValue)" }
+        }
+    }
 }
