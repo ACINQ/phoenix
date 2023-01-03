@@ -65,7 +65,8 @@ enum class FiatCurrency : CurrencyUnit {
     CDF, // Congolese Franc
     CHF, // Swiss Franc
     CLP, // Chilean Peso
-    CNY, // Chinese Yuan
+    CNH, // Chinese Yuan (offshore)
+    CNY, // Chinese Yuan (onshore)
     COP, // Colombian Peso
     CRC, // Costa Rican Colón
     CUP, // Cuban Peso
