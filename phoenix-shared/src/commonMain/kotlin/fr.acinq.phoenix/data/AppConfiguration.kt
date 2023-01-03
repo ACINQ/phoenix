@@ -70,6 +70,7 @@ enum class FiatCurrency : CurrencyUnit {
     COP, // Colombian Peso
     CRC, // Costa Rican Colón
     CUP, // Cuban Peso
+    CUP_FM, // Cuban Peso (free market)
     CVE, // Cape Verdean Escudo
     CZK, // Czech Republic Koruna
     DJF, // Djiboutian Franc

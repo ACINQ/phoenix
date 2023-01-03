@@ -198,3 +198,23 @@ data class BluelyticsResponse(
         val value_buy: Double
     )
 }
+
+/**
+ * Yadio example:
+ * {
+ *   "BTC": 16640.86,
+ *   "USD": {
+ *     "CUP": 170,
+ *     "IRR": 4063500,
+ *     ...
+ *   },
+ *   "base": "USD",
+ *   "timestamp": 1672776301979
+ * }
+ */
+
+@Serializable
+data class YadioResponse(
+    @SerialName("USD")
+    val usdRates: Map<String, Double>
+)

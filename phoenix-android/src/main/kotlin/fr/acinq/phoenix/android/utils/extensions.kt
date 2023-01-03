@@ -101,6 +101,7 @@ private fun getFlag(code: String): String {
         "COP" -> "🇨🇴" // Colombian Peso
         "CRC" -> "🇨🇷" // Costa Rican Colón
         "CUP" -> "🇨🇺" // Cuban Peso
+        "CUP_FM" -> "🇨🇺" // Cuban Peso (free market)
         "CVE" -> "🇨🇻" // Cape Verdean Escudo
         "CZK" -> "🇨🇿" // Czech Koruna
         "DJF" -> "🇩🇯" // Djiboutian Franc

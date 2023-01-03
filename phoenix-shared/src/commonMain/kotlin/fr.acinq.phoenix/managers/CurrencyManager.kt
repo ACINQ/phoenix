@@ -66,11 +66,14 @@ class CurrencyManager(
      */
     private val highLiquidityMarkets = setOf(FiatCurrency.USD, FiatCurrency.EUR)
 
-    private val specialMarkets = setOf(FiatCurrency.ARS_BM)
+    private val specialMarkets = setOf(
+        FiatCurrency.ARS_BM, // Argentine Peso (blue market)
+        FiatCurrency.CUP_FM  // Cuban Peso (free market)
+    )
 
     private val missingFromCoinbase = setOf(
         FiatCurrency.CUP, // Cuban Peso
-        FiatCurrency.ERN, // Eritrean Nakfa (accidentally overwritten by ERN altcoin?)
+        FiatCurrency.ERN, // Eritrean Nakfa (exists in response, but refers to ERN altcoin)
         FiatCurrency.IRR, // Iranian Rial
         FiatCurrency.KPW, // North Korean Won
         FiatCurrency.SDG, // Sudanese Pound
@@ -149,6 +152,17 @@ class CurrencyManager(
         override val name = "bluelytics"
         override val refreshDelay = 120.minutes
         override val fiatCurrencies = setOf(FiatCurrency.ARS_BM)
+    }
+
+    /**
+     * The yadio API is used to fetch the "free market" price for the Cuban Peso.
+     * - CUP => government controlled exchange rate
+     * - CUP_FM => free market exchange rate
+     */
+    private val yadioAPI = object : API {
+        override val name = "yadio"
+        override val refreshDelay = 120.minutes
+        override val fiatCurrencies = setOf(FiatCurrency.CUP_FM)
     }
 
     /** Public consumable flow that includes the most recent exchange rates */
@@ -281,18 +295,21 @@ class CurrencyManager(
     fun refreshAll(targets: List<FiatCurrency>, force: Boolean = true) = launch {
         stopAutoRefresh().join()
         val deferred1 = async {
-            refreshFromBlockchainInfo(targets = targets, forceRefresh = force)
+            refreshFromBlockchainInfo(targets, forceRefresh = force)
         }
         val deferred2 = async {
-            refreshFromCoinbase(targets = targets, forceRefresh = force)
+            refreshFromCoinbase(targets, forceRefresh = force)
         }
         val deferred3 = async {
-            refreshFromCoinDesk(targets = targets, forceRefresh = force)
+            refreshFromCoinDesk(targets, forceRefresh = force)
         }
         val deferred4 = async {
-            refreshFromBluelytics(targets = targets, forceRefresh = force)
+            refreshFromBluelytics(targets, forceRefresh = force)
         }
-        listOf(deferred1, deferred2, deferred3, deferred4).awaitAll()
+        val deferred5 = async {
+            refreshFromYadio(targets, forceRefresh = force)
+        }
+        listOf(deferred1, deferred2, deferred3, deferred4, deferred5).awaitAll()
         maybeStartAutoRefresh()
     }
 
@@ -350,6 +367,17 @@ class CurrencyManager(
                     delay(nextDelay)
                 }
                 refreshFromBluelytics(api.fiatCurrencies, forceRefresh = false)
+            }
+        }
+        launch {
+            // This Job refreshes the UsdPriceRates from the yadio.io API.
+            val api = yadioAPI
+            while (isActive) {
+                delay(api).let { nextDelay ->
+                    log.debug { "API(${api.name}): Next UsdPriceRate refresh: $nextDelay" }
+                    delay(nextDelay)
+                }
+                refreshFromYadio(api.fiatCurrencies, forceRefresh = false)
             }
         }
     }
@@ -503,6 +531,15 @@ class CurrencyManager(
         refresh(api, fiatCurrencies)
     }
 
+    private suspend fun refreshFromYadio(
+        targets: Collection<FiatCurrency>,
+        forceRefresh: Boolean
+    ) {
+        val api = yadioAPI
+        val fiatCurrencies = filterTargets(targets, forceRefresh, api)
+        refresh(api, fiatCurrencies)
+    }
+
     private suspend fun refresh(
         api: API,
         targets: Set<FiatCurrency>
@@ -519,6 +556,7 @@ class CurrencyManager(
             coinbaseAPI -> fetchFromCoinbase(targets)
             coindeskAPI -> fetchFromCoinDesk(targets)
             bluelyticsAPI -> fetchFromBluelytics(targets)
+            yadioAPI -> fetchFromYadio(targets)
             else -> listOf()
         }
         if (fetchedRates.isNotEmpty()) {
@@ -719,6 +757,42 @@ class CurrencyManager(
                     source = "bluelytics.com.ar",
                     timestampMillis = timestampMillis
                 )
+            }
+        } ?: listOf()
+
+        return fetchedRates
+    }
+
+    private suspend fun fetchFromYadio(
+        targets: Set<FiatCurrency>
+    ): List<ExchangeRate> {
+
+        val httpResponse: HttpResponse? = try {
+            httpClient.get(urlString = "https://api.yadio.io/exrates/USD")
+        } catch (e: Exception) {
+            log.error { "Failed to get http response from api.yadio.io: $e" }
+            null
+        }
+        val parsedResponse: YadioResponse? = httpResponse?.let {
+            try {
+                json.decodeFromString<YadioResponse>(httpResponse.bodyAsText())
+            } catch (e: Exception) {
+                log.error { "Failed to parse json response from api.yadio.io: $e" }
+                null
+            }
+        }
+
+        val timestampMillis = Clock.System.now().toEpochMilliseconds()
+        val fetchedRates: List<ExchangeRate> = parsedResponse?.let {
+            targets.filter { it == FiatCurrency.CUP_FM }.mapNotNull {
+                parsedResponse.usdRates["CUP"]?.let { valueAsDouble ->
+                    ExchangeRate.UsdPriceRate(
+                        fiatCurrency = FiatCurrency.CUP_FM,
+                        price = valueAsDouble,
+                        source = "yadio.io",
+                        timestampMillis = timestampMillis
+                    )
+                }
             }
         } ?: listOf()
 

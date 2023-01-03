@@ -59,6 +59,7 @@ extension FiatCurrency {
 		case .cop   : return "Colombian Peso"
 		case .crc   : return "Costa Rican Colón"
 		case .cup   : return "Cuban Peso"
+		case .cupFm : return "Cuban Peso (free market)"
 		case .cve   : return "Cape Verdean Escudo"
 		case .czk   : return "Czech Koruna"
 		case .djf   : return "Djiboutian Franc"
@@ -215,6 +216,7 @@ extension FiatCurrency {
 		case .cop   : return NSLocalizedString("COP", tableName: "Currencies", comment: "Colombian Peso")
 		case .crc   : return NSLocalizedString("CRC", tableName: "Currencies", comment: "Costa Rican Colón")
 		case .cup   : return NSLocalizedString("CUP", tableName: "Currencies", comment: "Cuban Peso")
+		case .cupFm : return NSLocalizedString("CUPfm", tableName: "Currencies", comment: "Cuban Peso (free market)")
 		case .cve   : return NSLocalizedString("CVE", tableName: "Currencies", comment: "Cape Verdean Escudo")
 		case .czk   : return NSLocalizedString("CZK", tableName: "Currencies", comment: "Czech Koruna")
 		case .djf   : return NSLocalizedString("DJF", tableName: "Currencies", comment: "Djiboutian Franc")
@@ -387,6 +389,7 @@ extension FiatCurrency {
 		case .cop   : return "🇨🇴" // Colombian Peso
 		case .crc   : return "🇨🇷" // Costa Rican Colón
 		case .cup   : return "🇨🇺" // Cuban Peso
+		case .cupFm : return "🇨🇺" // Cuban Peso (free market)
 		case .cve   : return "🇨🇻" // Cape Verdean Escudo
 		case .czk   : return "🇨🇿" // Czech Koruna
 		case .djf   : return "🇩🇯" // Djiboutian Franc
