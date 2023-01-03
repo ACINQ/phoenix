@@ -41,12 +41,6 @@ jobs:
         repository: ACINQ/Tor_Onion_Proxy_Library
         path: tor-lib
 
-    - name: Checkout tor-mobile-kmp (Tor for iOS and modern Android app)
-      uses: actions/checkout@v2
-      with:
-        repository: ACINQ/tor-mobile-kmp
-        path: tor-mobile-kmp
-
     # 2 - setup cache/jdk
 
     - name: Cache maven dependencies
@@ -87,12 +81,6 @@ jobs:
         ./gradlew :universal:build
         ./gradlew :android:build
         ./gradlew :android:publishToMaven
-
-    - name: Build tor-mobile-kmp and install to local maven repo
-      run: |
-        cd tor-mobile-kmp
-        git submodule update --init
-        ./gradlew clean build publishToMavenLocal
 
     - name: Assemble new android app apk
       run: |
