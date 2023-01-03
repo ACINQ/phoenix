@@ -8,6 +8,7 @@ on:
     paths:
       - 'phoenix-legacy/**'
       - 'phoenix-android/**'
+      - '.github/workflows/**'
 
 jobs:
   build:
