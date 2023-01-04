@@ -105,7 +105,8 @@ class CurrencyManager(
     }
 
     /**
-     * The blockchain.info API is used to refresh the BitcoinPriceRates.
+     * The blockchain.info API is used to refresh the BitcoinPriceRates, using high liquidity markets
+     * currencies (i.e. USD/EUR).
      * Since bitcoin prices are volatile, we refresh them often.
      */
     private val blockchainInfoAPI = object : API {
@@ -131,7 +132,7 @@ class CurrencyManager(
     }
 
     /**
-     * The coindesk API is used to refresh select UsdPriceRates.
+     * The coindesk API is used to refresh select UsdPriceRates that are not available from Coinbase.
      * Since fiat prices are less volatile, we refresh them less often.
      * Also, the source only refreshes the values once per hour.
      */
