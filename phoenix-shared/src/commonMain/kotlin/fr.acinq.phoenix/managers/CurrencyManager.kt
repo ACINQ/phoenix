@@ -295,20 +295,30 @@ class CurrencyManager(
 
     fun refreshAll(targets: List<FiatCurrency>, force: Boolean = true) = launch {
         stopAutoRefresh().join()
+
+        // All non-high-liquidity currencies require USD to perform proper conversions.
+        // E.g. COP => USD => BTC
+        // So if the given list includes any non-high-liquidity currencies,
+        // then we need to make sure we append USD to the list.
+        val requiresUsd = targets.any { !highLiquidityMarkets.contains(it) }
+        val targetSet = if (requiresUsd) {
+            targets.plus(FiatCurrency.USD).toSet()
+        } else targets.toSet()
+
         val deferred1 = async {
-            refreshFromBlockchainInfo(targets, forceRefresh = force)
+            refreshFromBlockchainInfo(targetSet, forceRefresh = force)
         }
         val deferred2 = async {
-            refreshFromCoinbase(targets, forceRefresh = force)
+            refreshFromCoinbase(targetSet, forceRefresh = force)
         }
         val deferred3 = async {
-            refreshFromCoinDesk(targets, forceRefresh = force)
+            refreshFromCoinDesk(targetSet, forceRefresh = force)
         }
         val deferred4 = async {
-            refreshFromBluelytics(targets, forceRefresh = force)
+            refreshFromBluelytics(targetSet, forceRefresh = force)
         }
         val deferred5 = async {
-            refreshFromYadio(targets, forceRefresh = force)
+            refreshFromYadio(targetSet, forceRefresh = force)
         }
         listOf(deferred1, deferred2, deferred3, deferred4, deferred5).awaitAll()
         maybeStartAutoRefresh()
