@@ -663,16 +663,35 @@ class CurrencyManager(
 
         // Performance notes:
         //
-        // - If we use zero concurrency, by fetching each URL one-at-a-time,
-        //   and writing to the database after each one,
-        //   then fetching every fiat currency takes around 46 seconds.
+        // The CoinDesk API forces us to fetch each rate individually. E.g.:
+        // https://api.coindesk.com/v1/bpi/currentprice/COP.json
         //
-        // - If we maximize concurrency by fetching all,
-        //   then the whole process takes around 10 seconds.
+        // This was a big problem when we were using CoinDesk for ~146 fiat currencies.
+        // It's much less of a problem now that we're only using it for 7.
         //
-        // - Ktor has a bug, and doesn't properly use a shared URLSession:
-        //   https://youtrack.jetbrains.com/issue/KTOR-3362
-        //   If that bug is fixed, the process will take around 800 milliseconds.
+        // In the past, we explored this problem in depth, since it was a bigger issue.
+        // Here's the historical notes:
+        //
+        // > - If we use zero concurrency, by fetching each URL one-at-a-time,
+        // >   and writing to the database after each one,
+        // >   then the whole process takes around 46 seconds.
+        // >
+        // > - If we maximize concurrency by fetching all of them,
+        // >   and then writing to the database once afterwards,
+        // >   then the whole process takes around 10 seconds.
+        // >
+        // > This should be much faster, because:
+        // > - the HttpClient should use 1 or 2 connections in total
+        // > - it should keep those connections open
+        // > - it should send multiple requests over the same connection
+        // >
+        // > It probably does this correctly on Android.
+        // > But on iOS there was a BUG, and it opened a different connection for each request.
+        // > So that's 146 TCP handshakes, and 146 TLS handshakes...
+        // > This bug was reported:
+        // > - https://youtrack.jetbrains.com/issue/KTOR-3362
+        // >
+        // > If that bug is fixed, the process will take around 800 milliseconds on iOS.
         //
         val http = HttpClient {
             engine {
