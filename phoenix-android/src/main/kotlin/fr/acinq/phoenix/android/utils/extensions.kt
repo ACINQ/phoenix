@@ -56,8 +56,13 @@ fun FiatCurrency.labels(): Pair<String, String> {
     val context = LocalContext.current
     return remember(key1 = code) {
         val fullName = when {
-            code.length == 3 -> Currency.getInstance(code).displayName
+            code.length == 3 -> try {
+                Currency.getInstance(code).displayName
+            } catch (e: Exception) {
+                "N/A"
+            }
             code == "ARS_BM" -> context.getString(R.string.currency_ars_bm)
+            code == "CUP_FM" -> context.getString(R.string.currency_cup_fm)
             else -> "N/A"
         }
         val flag = getFlag(code)

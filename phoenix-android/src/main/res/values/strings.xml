@@ -705,6 +705,7 @@
     <!-- ////////////// currencies ////////////// -->
 
     <string name="currency_ars_bm">Argentine Peso (Blue Market)</string>
+    <string name="currency_cup_fm">Cuban Peso (Free Market)</string>
 
     <!-- ////////////// payments history ////////////// -->
 
