@@ -54,10 +54,12 @@ extension FiatCurrency {
 		case .cdf   : return "Congolese Franc"
 		case .chf   : return "Swiss Franc"
 		case .clp   : return "Chilean Peso"
+		case .cnh   : return "Chinese Yuan (offshore)"
 		case .cny   : return "Chinese Yuan"
 		case .cop   : return "Colombian Peso"
 		case .crc   : return "Costa Rican Colón"
 		case .cup   : return "Cuban Peso"
+		case .cupFm : return "Cuban Peso (free market)"
 		case .cve   : return "Cape Verdean Escudo"
 		case .czk   : return "Czech Koruna"
 		case .djf   : return "Djiboutian Franc"
@@ -115,7 +117,6 @@ extension FiatCurrency {
 		case .mmk   : return "Myanmar Kyat"
 		case .mnt   : return "Mongolian Tugrik"
 		case .mop   : return "Macanese Pataca"
-		case .mtl   : return "Maltese Lira"
 		case .mur   : return "Mauritian Rupee"
 		case .mvr   : return "Maldivian Rufiyaa"
 		case .mwk   : return "Malawian Kwacha"
@@ -210,10 +211,12 @@ extension FiatCurrency {
 		case .cdf   : return NSLocalizedString("CDF", tableName: "Currencies", comment: "Congolese Franc")
 		case .chf   : return NSLocalizedString("CHF", tableName: "Currencies", comment: "Swiss Franc")
 		case .clp   : return NSLocalizedString("CLP", tableName: "Currencies", comment: "Chilean Peso")
-		case .cny   : return NSLocalizedString("CNY", tableName: "Currencies", comment: "Chinese Yuan")
+		case .cnh   : return NSLocalizedString("CNH", tableName: "Currencies", comment: "Chinese Yuan (offshore)")
+		case .cny   : return NSLocalizedString("CNY", tableName: "Currencies", comment: "Chinese Yuan (onshore)")
 		case .cop   : return NSLocalizedString("COP", tableName: "Currencies", comment: "Colombian Peso")
 		case .crc   : return NSLocalizedString("CRC", tableName: "Currencies", comment: "Costa Rican Colón")
 		case .cup   : return NSLocalizedString("CUP", tableName: "Currencies", comment: "Cuban Peso")
+		case .cupFm : return NSLocalizedString("CUPfm", tableName: "Currencies", comment: "Cuban Peso (free market)")
 		case .cve   : return NSLocalizedString("CVE", tableName: "Currencies", comment: "Cape Verdean Escudo")
 		case .czk   : return NSLocalizedString("CZK", tableName: "Currencies", comment: "Czech Koruna")
 		case .djf   : return NSLocalizedString("DJF", tableName: "Currencies", comment: "Djiboutian Franc")
@@ -271,7 +274,6 @@ extension FiatCurrency {
 		case .mmk   : return NSLocalizedString("MMK", tableName: "Currencies", comment: "Myanmar Kyat")
 		case .mnt   : return NSLocalizedString("MNT", tableName: "Currencies", comment: "Mongolian Tugrik")
 		case .mop   : return NSLocalizedString("MOP", tableName: "Currencies", comment: "Macanese Pataca")
-		case .mtl   : return NSLocalizedString("MTL", tableName: "Currencies", comment: "Maltese Lira")
 		case .mur   : return NSLocalizedString("MUR", tableName: "Currencies", comment: "Mauritian Rupee")
 		case .mvr   : return NSLocalizedString("MVR", tableName: "Currencies", comment: "Maldivian Rufiyaa")
 		case .mwk   : return NSLocalizedString("MWK", tableName: "Currencies", comment: "Malawian Kwacha")
@@ -382,10 +384,12 @@ extension FiatCurrency {
 		case .cdf   : return "🇨🇩" // Congolese Franc
 		case .chf   : return "🇨🇭" // Swiss Franc
 		case .clp   : return "🇨🇱" // Chilean Peso
-		case .cny   : return "🇨🇳" // Chinese Yuan
+		case .cnh   : return "🇨🇳" // Chinese Yuan (offshore)
+		case .cny   : return "🇨🇳" // Chinese Yuan (onshore)
 		case .cop   : return "🇨🇴" // Colombian Peso
 		case .crc   : return "🇨🇷" // Costa Rican Colón
 		case .cup   : return "🇨🇺" // Cuban Peso
+		case .cupFm : return "🇨🇺" // Cuban Peso (free market)
 		case .cve   : return "🇨🇻" // Cape Verdean Escudo
 		case .czk   : return "🇨🇿" // Czech Koruna
 		case .djf   : return "🇩🇯" // Djiboutian Franc
@@ -443,7 +447,6 @@ extension FiatCurrency {
 		case .mmk   : return "🇲🇲" // Myanmar Kyat
 		case .mnt   : return "🇲🇳" // Mongolian Tugrik
 		case .mop   : return "🇲🇴" // Macanese Pataca
-		case .mtl   : return "🇲🇹" // Maltese Lira
 		case .mur   : return "🇲🇺" // Mauritian Rupee
 		case .mvr   : return "🇲🇻" // Maldivian Rufiyaa
 		case .mwk   : return "🇲🇼" // Malawian Kwacha

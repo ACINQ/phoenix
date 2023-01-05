@@ -65,10 +65,12 @@ enum class FiatCurrency : CurrencyUnit {
     CDF, // Congolese Franc
     CHF, // Swiss Franc
     CLP, // Chilean Peso
-    CNY, // Chinese Yuan
+    CNH, // Chinese Yuan (offshore)
+    CNY, // Chinese Yuan (onshore)
     COP, // Colombian Peso
     CRC, // Costa Rican Colón
     CUP, // Cuban Peso
+    CUP_FM, // Cuban Peso (free market)
     CVE, // Cape Verdean Escudo
     CZK, // Czech Republic Koruna
     DJF, // Djiboutian Franc
@@ -126,7 +128,6 @@ enum class FiatCurrency : CurrencyUnit {
     MMK, // Myanma Kyat
     MNT, // Mongolian Tugrik
     MOP, // Macanese Pataca
-    MTL, // Maltese Lira
     MUR, // Mauritian Rupee
     MVR, // Maldivian Rufiyaa
     MWK, // Malawian Kwacha

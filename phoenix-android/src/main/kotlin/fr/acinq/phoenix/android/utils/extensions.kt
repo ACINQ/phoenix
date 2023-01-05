@@ -56,8 +56,13 @@ fun FiatCurrency.labels(): Pair<String, String> {
     val context = LocalContext.current
     return remember(key1 = code) {
         val fullName = when {
-            code.length == 3 -> Currency.getInstance(code).displayName
+            code.length == 3 -> try {
+                Currency.getInstance(code).displayName
+            } catch (e: Exception) {
+                "N/A"
+            }
             code == "ARS_BM" -> context.getString(R.string.currency_ars_bm)
+            code == "CUP_FM" -> context.getString(R.string.currency_cup_fm)
             else -> "N/A"
         }
         val flag = getFlag(code)
@@ -96,10 +101,12 @@ private fun getFlag(code: String): String {
         "CDF" -> "🇨🇩" // Congolese Franc
         "CHF" -> "🇨🇭" // Swiss Franc
         "CLP" -> "🇨🇱" // Chilean Peso
-        "CNY" -> "🇨🇳" // Chinese Yuan
+        "CNH" -> "🇨🇳" // Chinese Yuan (offshore)
+        "CNY" -> "🇨🇳" // Chinese Yuan (onshore)
         "COP" -> "🇨🇴" // Colombian Peso
         "CRC" -> "🇨🇷" // Costa Rican Colón
         "CUP" -> "🇨🇺" // Cuban Peso
+        "CUP_FM" -> "🇨🇺" // Cuban Peso (free market)
         "CVE" -> "🇨🇻" // Cape Verdean Escudo
         "CZK" -> "🇨🇿" // Czech Koruna
         "DJF" -> "🇩🇯" // Djiboutian Franc
@@ -157,7 +164,6 @@ private fun getFlag(code: String): String {
         "MMK" -> "🇲🇲" // Myanmar Kyat
         "MNT" -> "🇲🇳" // Mongolian Tugrik
         "MOP" -> "🇲🇴" // Macanese Pataca
-        "MTL" -> "🇲🇹" // Maltese Lira
         "MUR" -> "🇲🇺" // Mauritian Rupee
         "MVR" -> "🇲🇻" // Maldivian Rufiyaa
         "MWK" -> "🇲🇼" // Malawian Kwacha
