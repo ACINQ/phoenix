@@ -47,6 +47,8 @@ import kotlinx.serialization.Transient
  *     },
  *     "swap_in": {
  *       "v1": {
+ *         "min_funding_sat": 10000,
+ *         "min_fee_sat": 3000,
  *         "fee_percent": 0.001,
  *         "status": 0
  *       }
@@ -172,6 +174,8 @@ object WalletContext {
 
             @Serializable
             data class V1(
+                @SerialName("min_funding_sat") val minFundingSat: Long,
+                @SerialName("min_fee_sat") val minFeeSat: Long,
                 @SerialName("fee_percent") val feePercent: Double,
                 @SerialName("status") private val _status: Int
             ) {

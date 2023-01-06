@@ -41,8 +41,10 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
@@ -51,10 +53,12 @@ import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.data.WalletContext
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.legacy.utils.MigrationResult
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import fr.acinq.phoenix.managers.Connections
+import fr.acinq.phoenix.managers.WalletBalance
 import kotlinx.coroutines.launch
 
 
@@ -74,6 +78,7 @@ fun HomeView(
     val scope = rememberCoroutineScope()
     val torEnabledState = UserPrefs.getIsTorEnabled(context).collectAsState(initial = null)
     val connectionsState by paymentsViewModel.connectionsFlow.collectAsState(null)
+    val walletContext = business.appConfigurationManager.chainContext.collectAsState()
 
     var showConnectionsDialog by remember { mutableStateOf(false) }
     if (showConnectionsDialog) {
@@ -81,6 +86,8 @@ fun HomeView(
     }
 
     val payments = paymentsViewModel.recentPaymentsFlow.collectAsState().value.values.toList().take(3)
+
+    val swapInBalance = business.balanceManager.swapInWalletBalance.collectAsState()
 
     // controls for the migration dialog
     val migrationResult = PrefsDatastore.getMigrationResult(context).collectAsState(initial = null).value
@@ -111,11 +118,7 @@ fun HomeView(
                     unitTextStyle = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
                 )
             }
-            model.incomingBalance?.let { incomingSwapAmount ->
-                Spacer(modifier = Modifier.height(8.dp))
-                IncomingAmountNotif(incomingSwapAmount)
-            }
-            Spacer(modifier = Modifier.height(54.dp))
+            IncomingAmountNotif(walletContext.value?.swapIn?.v1, swapInBalance.value)
             if (payments.isEmpty()) {
                 Text(
                     text = stringResource(id = R.string.home__payments_none),
@@ -321,11 +324,91 @@ private fun ConnectionDialogLine(
 }
 
 @Composable
-private fun IncomingAmountNotif(amount: MilliSatoshi) {
-    Text(
-        text = stringResource(id = R.string.home__swapin_incoming, amount.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true)),
-        style = MaterialTheme.typography.caption
-    )
+private fun IncomingAmountNotif(
+    swapInParams: WalletContext.V0.SwapIn.V1?,
+    swapInBalance: WalletBalance
+) {
+    Column(modifier = Modifier.heightIn(min = 54.dp), verticalArrangement = Arrangement.Top) {
+        var showValidSwapInInfoDialog by remember { mutableStateOf(false) }
+        var showInvalidSwapInInfoDialog by remember { mutableStateOf(false) }
+
+        if (showValidSwapInInfoDialog && swapInParams != null) {
+            ValidSwapInInfoDialog(
+                onDismiss = { showValidSwapInInfoDialog = false },
+                swapInFeePercent = swapInParams.feePercent,
+                swapInMinFee = swapInParams.minFeeSat.sat
+            )
+        }
+
+        if (showInvalidSwapInInfoDialog && swapInParams != null) {
+            InvalidSwapInInfoDialog(
+                onDismiss = { showInvalidSwapInInfoDialog = false },
+                minFundingAmount = swapInParams.minFundingSat.sat,
+                swapInFeePercent = swapInParams.feePercent,
+                swapInMinFee = swapInParams.minFeeSat.sat
+            )
+        }
+
+        if (swapInBalance != WalletBalance.empty()) {
+            val balance = swapInBalance.total
+            // swap-in is invalid if amount < min_funding
+            val isInvalid = swapInParams?.let { balance < it.minFundingSat.sat } ?: false
+            if (isInvalid) {
+                FilledButton(
+                    text = stringResource(id = R.string.home__swapin_incoming, balance.toMilliSatoshi().toPrettyString(preferredAmountUnit, fiatRate, withUnit = true)),
+                    textStyle = MaterialTheme.typography.caption.copy(color = negativeColor()),
+                    icon = R.drawable.ic_alert_triangle,
+                    iconTint = negativeColor(),
+                    padding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    backgroundColor = Color.Transparent,
+                    onClick = {
+                        showValidSwapInInfoDialog = false
+                        showInvalidSwapInInfoDialog = true
+                    }
+                )
+            } else {
+                FilledButton(
+                    text = stringResource(id = R.string.home__swapin_incoming, balance.toMilliSatoshi().toPrettyString(preferredAmountUnit, fiatRate, withUnit = true)),
+                    textStyle = MaterialTheme.typography.caption,
+                    padding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    backgroundColor = Color.Transparent,
+                    onClick = {
+                        showValidSwapInInfoDialog = true
+                        showInvalidSwapInInfoDialog = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ValidSwapInInfoDialog(
+    onDismiss: () -> Unit,
+    swapInFeePercent: Double,
+    swapInMinFee: Satoshi,
+) {
+    Dialog(onDismiss = onDismiss, title = stringResource(id = R.string.home__swapin_dialog_valid_title)) {
+        Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            text = stringResource(R.string.home__swapin_dialog_valid_body, String.format("%.2f", 100 * (swapInFeePercent)), swapInMinFee)
+        )
+    }
+}
+
+@Composable
+private fun InvalidSwapInInfoDialog(
+    onDismiss: () -> Unit,
+    minFundingAmount: Satoshi,
+    swapInFeePercent: Double,
+    swapInMinFee: Satoshi,
+) {
+    Dialog(onDismiss = onDismiss, title = stringResource(id = R.string.home__swapin_dialog_invalid_title)) {
+        Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            text = annotatedStringResource(R.string.home__swapin_dialog_invalid_body, minFundingAmount, String.format("%.2f", 100 * (swapInFeePercent)), swapInMinFee)
+        )
+    }
 }
 
 @Composable

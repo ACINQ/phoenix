@@ -140,11 +140,13 @@ fun AppView(
                     }
                 }
                 composable(Screen.Receive.route) {
-                    ReceiveView()
+                    ReceiveView(
+                        onSwapInReceived = { popToHome(navController) },
+                    )
                 }
                 composable(Screen.ScanData.route) {
                     ScanDataView(
-                        onBackClick = { navController.navigate(Screen.Home.route) { popUpTo(Screen.Home.route) { inclusive = true } } },
+                        onBackClick = { popToHome(navController) },
                         onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") }
                     )
                 }
@@ -239,6 +241,11 @@ fun AppView(
             navigateToPaymentDetails(navController, id = lastCompletedPayment.walletPaymentId(), isFromEvent = true)
         }
     }
+}
+
+/** Navigates to Home and pops everything from the backstack up to Home. This effectively resets the nav stack. */
+private fun popToHome(navController: NavHostController) {
+    navController.navigate(Screen.Home.route) { popUpTo(Screen.Home.route) { inclusive = true } }
 }
 
 private fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId, isFromEvent: Boolean) {

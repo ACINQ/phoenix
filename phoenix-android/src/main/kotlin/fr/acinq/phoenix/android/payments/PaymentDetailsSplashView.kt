@@ -218,13 +218,21 @@ private fun PaymentStatus(
                 timestamp = payment.completedAt()
             )
         }
-        is IncomingPayment -> when (payment.received) {
-            null -> PaymentStatusIcon(
+        is IncomingPayment -> when {
+            payment.received == null -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_received_pending),
                 imageResId = R.drawable.ic_payment_details_pending_static,
                 isAnimated = false,
                 color = mutedTextColor()
             )
+            payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().any { !it.confirmed } -> {
+                PaymentStatusIcon(
+                    message = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
+                    isAnimated = false,
+                    imageResId = R.drawable.ic_clock,
+                    color = mutedTextColor()
+                )
+            }
             else -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_received_successful),
                 imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,

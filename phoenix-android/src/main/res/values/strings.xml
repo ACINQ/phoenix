@@ -311,6 +311,11 @@
 
     <string name="home__balance_loading">Loading…</string>
     <string name="home__swapin_incoming">+%1$s incoming</string>
+    <string name="home__swapin_dialog_valid_title">Incoming deposit</string>
+    <string name="home__swapin_dialog_valid_body">Once the incoming payment is confirmed, Phoenix will use the funds to open a payment channel.\n\nThe fee is %1$s%% (%2$s sat minimum).</string>
+    <string name="home__swapin_dialog_invalid_title">Deposit below minimum</string>
+  <string name="home__swapin_dialog_invalid_body">Deposits must be at least <b>%1$s</b>. Please make additional deposits to use the funds inside Phoenix.\n\nOnce the minimum amount is reached, Phoenix will use the funds to open a payment channel.\n\nThe fee is %2$s%% (%3$s sat minimum).</string>
+
     <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">You have not made any payments recently.\n\nUse the Receive and Send buttons at the bottom of this screen to get started!</string>
     <string name="home__payments_header">Recent payments</string>
@@ -361,7 +366,8 @@
     <string name="paymentdetails_status_sent_pending">Pending…</string>
     <string name="paymentdetails_status_sent_failed">Failed. No money has been sent.</string>
 
-    <string name="paymentdetails_status_received_pending">Payment has not been received yet.</string>
+    <string name="paymentdetails_status_received_pending">Not received yet.</string>
+    <string name="paymentdetails_status_received_unconfirmed">Waiting for confirmation</string>
     <string name="paymentdetails_status_received_successful">Received</string>
 
     <string name="paymentdetails_desc_label">Desc.</string>
@@ -670,11 +676,6 @@
     <string name="paymentsettings_expiry_two_weeks">2 weeks</string>
     <string name="paymentsettings_expiry_three_weeks">3 weeks</string>
     <string name="paymentsettings_expiry_value">%1$s seconds</string>
-
-    <string name="paymentsettings_paytoopen_auto_title">Automatically accept channel opening</string>
-    <string name="paymentsettings_paytoopen_auto_desc">It is sometimes necessary to create a new Lightning payment channel in order to receive an incoming payment.\n\nIn this case a fee of %1$s%% is deducted from the amount received, to cover the cost of creating the channel.</string>
-    <string name="paymentsettings_paytoopen_dialog_title">Are you sure?</string>
-    <string name="paymentsettings_paytoopen_dialog_description">The app will automatically create a channel when needed to receive a payment.\n\nNote that a %1$s%% fee is deducted from the amount received, to cover the cost of creating the channel.</string>
 
     <string name="paymentsettings_trampoline_fees_title">Maximum fee for outgoing Lightning payments</string>
     <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>

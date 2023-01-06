@@ -41,6 +41,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
@@ -52,6 +53,7 @@ import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ReceiveController
 import fr.acinq.phoenix.controllers.payments.Receive
+import fr.acinq.phoenix.managers.WalletBalance
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -121,15 +123,18 @@ private class ReceiveViewModel(controller: ReceiveController, description: Strin
 }
 
 @Composable
-fun ReceiveView() {
+fun ReceiveView(
+    onSwapInReceived: () -> Unit
+) {
     val log = logger("ReceiveView")
+    val context = LocalContext.current
+    val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(context).collectAsState(null)
+    val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(context).collectAsState(null)
 
-    val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(LocalContext.current).collectAsState(null)
-    val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState(null)
     safeLet(invoiceDefaultDesc, invoiceDefaultExpiry) { description, expiry ->
         val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(controllerFactory, CF::receive, description, expiry))
         when (val state = vm.state) {
-            is ReceiveViewState.Default -> DefaultView(vm = vm)
+            is ReceiveViewState.Default -> DefaultView(vm = vm, onSwapInReceived = onSwapInReceived)
             is ReceiveViewState.EditInvoice -> EditInvoiceView(
                 amount = vm.customAmount,
                 description = vm.customDesc,
@@ -143,11 +148,27 @@ fun ReceiveView() {
 }
 
 @Composable
-private fun DefaultView(vm: ReceiveViewModel) {
+private fun DefaultView(
+    vm: ReceiveViewModel,
+    onSwapInReceived: () -> Unit,
+) {
     val context = LocalContext.current
     val nc = navController
     DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally) {
         DefaultScreenHeader(onBackClick = { nc.popBackStack() }, backgroundColor = Color.Unspecified)
+
+        val business = business
+        LaunchedEffect(key1 = Unit) {
+            var previousBalance: WalletBalance? = null
+            business.balanceManager.swapInWalletBalance.collect {
+                if (previousBalance != null && it.total > 0.sat && it != previousBalance) {
+                    onSwapInReceived()
+                } else {
+                    previousBalance = it
+                }
+            }
+        }
+
         MVIView(vm) { model, postIntent ->
             when (model) {
                 is Receive.Model.Awaiting -> {
