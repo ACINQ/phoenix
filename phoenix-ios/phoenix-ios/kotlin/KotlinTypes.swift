@@ -8,8 +8,6 @@ extension Receive {
 	typealias Model_Generating = ModelGenerating
 	typealias Model_Generated = ModelGenerated
 	typealias Model_SwapIn = ModelSwapIn
-	typealias Model_SwapIn_Requesting = ModelSwapInRequesting
-	typealias Model_SwapIn_Generated = ModelSwapInGenerated
 }
 
 extension Scan {

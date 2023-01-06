@@ -175,7 +175,7 @@ private fun DefaultView(vm: ReceiveViewModel) {
                     Spacer(modifier = Modifier.height(24.dp))
                     CopyShareEditButtons(
                         onCopy = { copyToClipboard(context, data = model.request) },
-                        onShare = { share(context, model.request, subject = "") },
+                        onShare = { share(context, "lightning:${model.request}", context.getString(R.string.receive__share__subject), context.getString(R.string.receive_share_title)) },
                         onEdit = { vm.state = ReceiveViewState.EditInvoice })
                     Spacer(modifier = Modifier.height(24.dp))
                     BorderButton(
@@ -183,8 +183,7 @@ private fun DefaultView(vm: ReceiveViewModel) {
                         icon = R.drawable.ic_swap,
                         onClick = { postIntent(Receive.Intent.RequestSwapIn) })
                 }
-                is Receive.Model.SwapIn.Requesting -> Text(stringResource(id = R.string.receive__swapin__wait))
-                is Receive.Model.SwapIn.Generated -> {
+                is Receive.Model.SwapIn -> {
                     LaunchedEffect(model.address) {
                         vm.generateQrCodeBitmap(invoice = model.address)
                     }
@@ -195,7 +194,7 @@ private fun DefaultView(vm: ReceiveViewModel) {
                     Spacer(modifier = Modifier.height(24.dp))
                     CopyShareEditButtons(
                         onCopy = { copyToClipboard(context, data = model.address) },
-                        onShare = { /*TODO*/ },
+                        onShare = { share(context, "bitcoin:${model.address}", context.getString(R.string.receive__share__subject), context.getString(R.string.receive_share_title)) },
                         onEdit = null
                     )
                 }

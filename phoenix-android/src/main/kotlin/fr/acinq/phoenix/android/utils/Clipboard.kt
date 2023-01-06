@@ -35,11 +35,11 @@ fun readClipboard(context: Context): String? =
         .primaryClip?.getItemAt(0)?.text?.toString().takeIf { !it.isNullOrBlank() }
 
 fun share(context: Context, data: String, subject: String, chooserTitle: String? = null) {
-    val shareIntent = Intent.createChooser(Intent().apply {
+    val shareIntent = Intent().apply {
         action = Intent.ACTION_SEND
         type = "text/plain"
         putExtra(Intent.EXTRA_TEXT, data)
         putExtra(Intent.EXTRA_SUBJECT, subject)
-    }, null)
+    }
     context.startActivity(Intent.createChooser(shareIntent, chooserTitle))
 }

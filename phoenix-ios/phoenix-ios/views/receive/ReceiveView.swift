@@ -44,10 +44,7 @@ struct ReceiveView: MVIView {
 			}
 			
 			if mvi.model is Receive.Model_SwapIn {
-				
-				// Receive.Model_SwapIn_Requesting : Receive.Model_SwapIn
-				// Receive.Model_SwapIn_Generated : Receive.Model_SwapIn
-				
+			
 				SwapInView(
 					mvi: mvi,
 					toast: toast,

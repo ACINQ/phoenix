@@ -71,7 +71,7 @@ class AppReceiveController(
             }
             Receive.Intent.RequestSwapIn -> {
                 launch {
-                    model(Receive.Model.SwapIn.Generated(peerManager.getPeer().swapInAddress))
+                    model(Receive.Model.SwapIn(peerManager.getPeer().swapInAddress))
                 }
             }
         }

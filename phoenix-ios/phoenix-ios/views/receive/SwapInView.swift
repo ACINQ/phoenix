@@ -148,7 +148,7 @@ struct SwapInView: View {
 	@ViewBuilder
 	func qrCodeView() -> some View {
 		
-		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
+		if let m = mvi.model as? Receive.Model_SwapIn,
 		   let qrCodeValue = qrCode.value,
 		   qrCodeValue.caseInsensitiveCompare(m.address) == .orderedSame,
 			let qrCodeImage = qrCode.image
@@ -186,11 +186,7 @@ struct SwapInView: View {
 					.padding(.bottom, 10)
 			
 				Group {
-					if mvi.model is Receive.Model_SwapIn_Requesting {
-						Text("Requesting Swap-In Address...")
-					} else {
-						Text("Generating QRCode...")
-					}
+					Text("Generating QRCode...")
 				}
 				.foregroundColor(Color(UIColor.darkGray))
 				.font(.caption)
@@ -282,7 +278,7 @@ struct SwapInView: View {
 		) {
 			// using simultaneousGesture's below
 		}
-		.disabled(!(mvi.model is Receive.Model_SwapIn_Generated))
+		.disabled(!(mvi.model is Receive.Model_SwapIn))
 		.simultaneousGesture(LongPressGesture().onEnded { _ in
 			didLongPressCopyButton()
 		})
@@ -308,7 +304,7 @@ struct SwapInView: View {
 		) {
 			// using simultaneousGesture's below
 		}
-		.disabled(!(mvi.model is Receive.Model_SwapIn_Generated))
+		.disabled(!(mvi.model is Receive.Model_SwapIn))
 		.simultaneousGesture(LongPressGesture().onEnded { _ in
 			didLongPressShareButton()
 		})
@@ -367,7 +363,7 @@ struct SwapInView: View {
 	
 	func bitcoinAddress() -> String? {
 		
-		if let m = mvi.model as? Receive.Model_SwapIn_Generated {
+		if let m = mvi.model as? Receive.Model_SwapIn {
 			return m.address
 		} else {
 			return nil
@@ -393,7 +389,7 @@ struct SwapInView: View {
 		// If the model updates before the view finishes drawing,
 		// we might need to manually invoke onModelChange.
 		//
-		if mvi.model is Receive.Model_SwapIn_Generated {
+		if mvi.model is Receive.Model_SwapIn {
 			onModelChange(model: mvi.model)
 		}
 	}
@@ -401,7 +397,7 @@ struct SwapInView: View {
 	func onModelChange(model: Receive.Model) -> Void {
 		log.trace("onModelChange()")
 		
-		if let m = model as? Receive.Model_SwapIn_Generated {
+		if let m = model as? Receive.Model_SwapIn {
 			log.debug("updating qr code...")
 			
 			// Issue #196: Use uppercase lettering for invoices and address QRs
@@ -493,7 +489,7 @@ struct SwapInView: View {
 	func copyTextToPasteboard() -> Void {
 		log.trace("copyTextToPasteboard()")
 		
-		if let m = mvi.model as? Receive.Model_SwapIn_Generated {
+		if let m = mvi.model as? Receive.Model_SwapIn {
 			UIPasteboard.general.string = m.address
 			toast.pop(
 				NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
@@ -505,7 +501,7 @@ struct SwapInView: View {
 	func copyImageToPasteboard() -> Void {
 		log.trace("copyImageToPasteboard()")
 		
-		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
+		if let m = mvi.model as? Receive.Model_SwapIn,
 			let qrCodeValue = qrCode.value,
 			qrCodeValue.caseInsensitiveCompare(m.address) == .orderedSame,
 			let qrCodeCgImage = qrCode.cgImage
@@ -522,7 +518,7 @@ struct SwapInView: View {
 	func shareTextToSystem() {
 		log.trace("shareTextToSystem()")
 		
-		if let m = mvi.model as? Receive.Model_SwapIn_Generated {
+		if let m = mvi.model as? Receive.Model_SwapIn {
 			let url = "bitcoin:\(m.address)"
 			sheet = ReceiveViewSheet.sharingUrl(url: url)
 		}
@@ -531,7 +527,7 @@ struct SwapInView: View {
 	func shareImageToSystem() {
 		log.trace("shareImageToSystem()")
 		
-		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
+		if let m = mvi.model as? Receive.Model_SwapIn,
 			let qrCodeValue = qrCode.value,
 			qrCodeValue.caseInsensitiveCompare(m.address) == .orderedSame,
 			let qrCodeCgImage = qrCode.cgImage
