@@ -155,13 +155,13 @@ fun typography(palette: Colors) = Typography(
     ),
     h4 = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.Bold,
         fontSize = 18.sp,
         color = palette.onSurface,
     ),
     h5 = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.Bold,
         fontSize = 16.sp,
         color = palette.onSurface,
     ),

@@ -65,11 +65,11 @@ private fun spannableStringToAnnotatedString(
                 when (it) {
                     is StyleSpan -> when (it.style) {
                         Typeface.NORMAL -> addStyle(SpanStyle(fontWeight = FontWeight.Normal, fontStyle = FontStyle.Normal), start, end)
-                        Typeface.BOLD -> addStyle(SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Normal), start, end)
+                        Typeface.BOLD -> addStyle(SpanStyle(fontWeight = FontWeight.Medium, fontStyle = FontStyle.Normal), start, end)
                         Typeface.ITALIC -> addStyle(SpanStyle(fontWeight = FontWeight.Normal, fontStyle = FontStyle.Italic), start, end)
-                        Typeface.BOLD_ITALIC -> addStyle(SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic), start, end)
+                        Typeface.BOLD_ITALIC -> addStyle(SpanStyle(fontWeight = FontWeight.Medium, fontStyle = FontStyle.Italic), start, end)
                     }
-                    is FontWeight -> addStyle(SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Normal), start, end)
+                    is FontWeight -> addStyle(SpanStyle(fontWeight = FontWeight.Medium, fontStyle = FontStyle.Normal), start, end)
                     is UnderlineSpan -> addStyle(SpanStyle(textDecoration = TextDecoration.Underline), start, end)
                     else -> addStyle(SpanStyle(), start, end)
                 }
