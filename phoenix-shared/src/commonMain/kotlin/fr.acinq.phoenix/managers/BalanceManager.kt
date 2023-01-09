@@ -82,15 +82,8 @@ class BalanceManager(
     private val _swapInWalletBalance = MutableStateFlow(WalletBalance.empty())
     val swapInWalletBalance: StateFlow<WalletBalance> = _swapInWalletBalance
 
-    /**
-     * Flow of map of (bitcoinAddress -> amount) swap-ins.
-     * DEPRECATED: Replace with swapInWalletBalance
-     */
-    private val _incomingSwaps = MutableStateFlow<Map<String, MilliSatoshi>>(HashMap())
-    val incomingSwaps: StateFlow<Map<String, MilliSatoshi>> = _incomingSwaps
-    private var _incomingSwapsMap by _incomingSwaps
-
     init {
+        log.info { "init balance manager"}
         launch {
             val peer = peerManager.peerState.filterNotNull().first()
             launch { monitorChannelsBalance(peer) }
@@ -143,32 +136,30 @@ class BalanceManager(
         peer.nodeParams.nodeEvents.collect { event ->
             when (event) {
                 is SwapInEvents.Requested -> {
-                    // Using a placeholder address because it's not exposed by lightning-kmp.
-                    _incomingSwapsMap = _incomingSwapsMap + ("foobar" to event.req.localFundingAmount.toMilliSatoshi())
+                    log.info { "swap-in requested for ${event.req.localFundingAmount} id=${event.req.requestId}" }
                 }
                 is SwapInEvents.Accepted -> {
-                    log.info { "swap-in request=${event.requestId} has been accepted for funding_fee=${event.fundingFee} service_fee=${event.serviceFee}" }
+                    log.info { "swap-in accepted for id=${event.requestId} with funding_fee=${event.fundingFee} service_fee=${event.serviceFee}" }
                 }
                 is SwapInEvents.Rejected -> {
-                    log.error { "rejected swap-in for required_fee=${event.requiredFees} with error=${event.failure}" }
-                    _incomingSwapsMap = _incomingSwapsMap - "foobar"
+                    log.error { "swap-in rejected for id=${event.requestId} with required_fee=${event.requiredFees} error=${event.failure}" }
                 }
                 is ChannelEvents.Creating -> {
-                    log.info { "channel=${event.state.channelId} is being created" }
+                    log.info { "channel creating with id=${event.state.channelId}" }
                     val channelId = event.state.channelId
                     val channelUtxos = event.state.wallet.confirmedUtxos
                     _pendingReservedUtxos.update { it.plus(channelId to channelUtxos) }
                 }
                 is ChannelEvents.Created -> {
-                    log.info { "channel=${event.state.channelId} has been successfully created!" }
+                    log.info { "channel created with id=${event.state.channelId}" }
                     val channelId = event.state.channelId
                     _pendingReservedUtxos.value[channelId]?.let { channelUtxos ->
                         _reservedUtxos.update { it.union(channelUtxos) }
                         _pendingReservedUtxos.update { it.minus(channelId) }
                     }
-                    _incomingSwapsMap = _incomingSwapsMap - "foobar"
                 }
                 is ChannelEvents.Confirmed -> {
+                    log.info { "channel confirmed for id=${event.state.channelId}" }
                     databaseManager.paymentsDb().updateNewChannelConfirmed(
                         channelId = event.state.channelId,
                         receivedAt = currentTimestampMillis()
@@ -181,6 +172,7 @@ class BalanceManager(
     /** The swap-in balance is the swap-in wallet's balance without the [_reservedUtxos]. */
     private suspend fun monitorSwapInBalance() {
         combine(_swapInWallet.filterNotNull(), _reservedUtxos) { swapInWallet, reservedUtxos ->
+            log.info { "monitorSwapInBalance: reserved_utxos=$reservedUtxos swapInWallet=$swapInWallet"}
             swapInWallet.minus(reservedUtxos)
         }.collect { availableWallet ->
             _swapInWalletBalance.value = WalletBalance(

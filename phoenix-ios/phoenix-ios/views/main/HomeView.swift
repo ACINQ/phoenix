@@ -548,7 +548,7 @@ struct HomeView : MVIView {
 		log.trace("onModelChange()")
 		
 		let balance = model.balance?.msat ?? 0
-		let incomingBalance = model.incomingBalance?.msat ?? 0
+		let incomingBalance = swapInWalletBalance.total.sat
 		
 		if balance > 0 || incomingBalance > 0 || model.paymentsCount > 0 {
 			if Prefs.shared.isNewWallet {

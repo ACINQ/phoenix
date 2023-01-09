@@ -1,6 +1,5 @@
 package fr.acinq.phoenix.controllers.main
 
-import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.managers.BalanceManager
@@ -27,12 +26,6 @@ class AppHomeController(
         launch {
             balanceManager.balance.collect {
                 model { copy(balance = it) }
-            }
-        }
-
-        launch {
-            balanceManager.incomingSwaps.collect {
-                model { copy(incomingBalance = it.values.sum().takeIf { it.msat > 0 }) }
             }
         }
 
