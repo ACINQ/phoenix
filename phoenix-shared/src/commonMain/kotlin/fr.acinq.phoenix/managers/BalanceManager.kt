@@ -66,7 +66,7 @@ class BalanceManager(
     private val _pendingReservedUtxos = MutableStateFlow<Map<ByteVector32, List<WalletState.Utxo>>>(emptyMap())
 
     /**
-     * A map of (channelId -> List<Utxos>) representing the utxos that ARE reserved to create a channel.
+     * A map of (channelId -> List<Utxos>) representing the utxos that are reserved to create a channel.
      *
      * When a channel has been created (see [ChannelEvents.Created]), it is added to this flow and the utxos are
      * manually ignored when computing the swap-in balance.

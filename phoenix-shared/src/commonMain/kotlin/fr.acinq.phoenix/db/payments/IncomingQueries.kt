@@ -122,7 +122,7 @@ class IncomingQueries(private val database: PaymentsDatabase) {
             val query = queries.listNewChannel(mapper = ::mapListNewChannel)
             var match: ListNewChannelRow? = null
             query.execute { row ->
-                row.received?.receivedWith?.first {
+                row.received?.receivedWith?.firstOrNull() {
                     it is IncomingPayment.ReceivedWith.NewChannel && it.channelId == channelId
                 }?.let {
                     match = row
