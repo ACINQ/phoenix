@@ -37,6 +37,7 @@ import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
@@ -212,12 +213,35 @@ private fun AmountSection(
         rateThen = rateThen,
         mSatDisplayPolicy = if (hideMsat) MSatDisplayPolicy.HIDE else MSatDisplayPolicy.SHOW
     )
-    TechnicalRowAmount(
-        label = stringResource(id = R.string.paymentdetails_fees_label),
-        amount = payment.fees,
-        rateThen = rateThen,
-        mSatDisplayPolicy = if (hideMsat) MSatDisplayPolicy.HIDE else MSatDisplayPolicy.SHOW
-    )
+    when (payment) {
+        is OutgoingPayment -> {
+            TechnicalRowAmount(
+                label = stringResource(id = R.string.paymentdetails_fees_label),
+                amount = payment.fees,
+                rateThen = rateThen,
+                mSatDisplayPolicy = if (hideMsat) MSatDisplayPolicy.HIDE else MSatDisplayPolicy.SHOW
+            )
+        }
+        is IncomingPayment -> {
+            val receivedWithNewChannel = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>() ?: emptyList()
+            if (receivedWithNewChannel.isNotEmpty()) {
+                val serviceFee = receivedWithNewChannel.map { it.serviceFee }.sum()
+                val fundingFee = receivedWithNewChannel.map { it.fundingFee }.sum()
+                TechnicalRowAmount(
+                    label = stringResource(id = R.string.paymentdetails_service_fees_label),
+                    amount = serviceFee,
+                    rateThen = rateThen,
+                    mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+                )
+                TechnicalRowAmount(
+                    label = stringResource(id = R.string.paymentdetails_funding_fees_label),
+                    amount = fundingFee.toMilliSatoshi(),
+                    rateThen = rateThen,
+                    mSatDisplayPolicy = MSatDisplayPolicy.HIDE
+                )
+            }
+        }
+    }
 }
 
 @Composable

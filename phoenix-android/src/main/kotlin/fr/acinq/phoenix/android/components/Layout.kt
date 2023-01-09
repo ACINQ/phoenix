@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -31,8 +31,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.Popup
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
@@ -128,6 +131,41 @@ fun ConfirmDialog(
     ) {
         Text(text = message, modifier = Modifier.padding(24.dp))
     }
+}
+
+@Composable
+fun RowScope.HelpPopup(
+    message: String
+) {
+    var showHelpPopup by remember { mutableStateOf(false) }
+    if (showHelpPopup) {
+        Popup(
+            onDismissRequest = { showHelpPopup = false },
+            offset = IntOffset(x = 0, y = 68)
+        ) {
+            Surface(
+                modifier = Modifier.widthIn(min = 140.dp, max = 250.dp),
+                shape = RoundedCornerShape(8.dp),
+                elevation = 4.dp,
+            ) {
+                Text(
+                    text = message,
+                    modifier = Modifier.padding(8.dp),
+                    style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
+                )
+            }
+        }
+    }
+    Spacer(Modifier.width(8.dp))
+    BorderButton(
+        icon = R.drawable.ic_help,
+        iconTint = if (showHelpPopup) MaterialTheme.colors.onPrimary else mutedTextColor(),
+        backgroundColor = if (showHelpPopup) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
+        borderColor = if (showHelpPopup) MaterialTheme.colors.primary else mutedTextColor(),
+        padding = PaddingValues(2.dp),
+        modifier = Modifier.size(20.dp),
+        onClick = { showHelpPopup = true }
+    )
 }
 
 /** The default screen is a full-height, full-width column with the material theme's background color. It is scrollable by default. */

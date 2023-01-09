@@ -367,7 +367,8 @@
     <string name="paymentdetails_status_sent_failed">Failed. No money has been sent.</string>
 
     <string name="paymentdetails_status_received_pending">Not received yet.</string>
-    <string name="paymentdetails_status_received_unconfirmed">Waiting for confirmation</string>
+    <string name="paymentdetails_status_received_unconfirmed">Waiting for confirmations</string>
+    <string name="paymentdetails_status_received_unconfirmed_details">requires %1$d confirmations</string>
     <string name="paymentdetails_status_received_successful">Received</string>
 
     <string name="paymentdetails_desc_label">Desc.</string>
@@ -375,8 +376,11 @@
     <string name="paymentdetails_desc_custom_info">You can attach a note to this payment.</string>
     <string name="paymentdetails_destination_label">To</string>
     <string name="paymentdetails_fees_label">Fees</string>
-    <string name="paymentdetails_pay_to_open_desc">This fee covers the cost of opening a new payment channel.</string>
-    <string name="paymentdetails_error_label">Error</string>
+    <string name="paymentdetails_funding_fees_label">Miner fees</string>
+    <string name="paymentdetails_funding_fees_desc">Bitcoin network fees paid for on-chain transaction.</string>
+    <string name="paymentdetails_service_fees_label">Service fees</string>
+    <string name="paymentdetails_service_fees_desc">In order to receive this payment, a new payment channel was opened. This is not always required.</string>
+    \<string name="paymentdetails_error_label">Error</string>
     <string name="paymentdetails_no_description">No description</string>
     <string name="paymentdetails_info_uniclose">This payment happened following a conflict in a channel.</string>
 

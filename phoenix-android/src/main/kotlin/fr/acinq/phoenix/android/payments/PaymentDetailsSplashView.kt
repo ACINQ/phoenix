@@ -42,8 +42,11 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.utils.sum
+import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
@@ -153,11 +156,35 @@ fun PaymentDetailsSplashView(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            DetailsRow(
-                label = stringResource(id = R.string.paymentdetails_fees_label),
-                value = payment.fees.toPrettyString(LocalBitcoinUnit.current, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW)
-            )
+            // fees
+            when (payment) {
+                is OutgoingPayment -> {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    DetailsRow(
+                        label = stringResource(id = R.string.paymentdetails_fees_label),
+                        value = payment.fees.toPrettyString(LocalBitcoinUnit.current, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW)
+                    )
+                }
+                is IncomingPayment -> {
+                    val receivedWithNewChannel = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>() ?: emptyList()
+                    if (receivedWithNewChannel.isNotEmpty()) {
+                        val serviceFee = receivedWithNewChannel.map { it.serviceFee }.sum()
+                        val fundingFee = receivedWithNewChannel.map { it.fundingFee }.sum()
+                        Spacer(modifier = Modifier.height(8.dp))
+                        DetailsRow(
+                            label = stringResource(id = R.string.paymentdetails_service_fees_label),
+                            value = serviceFee.toPrettyString(LocalBitcoinUnit.current, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW),
+                            helpMessage = stringResource(R.string.paymentdetails_service_fees_desc)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        DetailsRow(
+                            label = stringResource(id = R.string.paymentdetails_funding_fees_label),
+                            value = fundingFee.toMilliSatoshi().toPrettyString(LocalBitcoinUnit.current, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE),
+                            helpMessage = stringResource(R.string.paymentdetails_funding_fees_desc)
+                        )
+                    }
+                }
+            }
 
             payment.errorMessage()?.let { errorMessage ->
                 Spacer(modifier = Modifier.height(8.dp))
@@ -215,7 +242,7 @@ private fun PaymentStatus(
                 imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
                 isAnimated = fromEvent,
                 color = positiveColor(),
-                timestamp = payment.completedAt()
+                details = payment.completedAt().toAbsoluteDateString()
             )
         }
         is IncomingPayment -> when {
@@ -226,11 +253,13 @@ private fun PaymentStatus(
                 color = mutedTextColor()
             )
             payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().any { !it.confirmed } -> {
+                val minDepth = business.nodeParamsManager.nodeParams.value?.minDepthBlocks
                 PaymentStatusIcon(
                     message = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
                     isAnimated = false,
                     imageResId = R.drawable.ic_clock,
-                    color = mutedTextColor()
+                    color = mutedTextColor(),
+                    details = minDepth?.let { stringResource(id = R.string.paymentdetails_status_received_unconfirmed_details, it) }
                 )
             }
             else -> PaymentStatusIcon(
@@ -238,7 +267,7 @@ private fun PaymentStatus(
                 imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
                 isAnimated = fromEvent,
                 color = positiveColor(),
-                timestamp = payment.received?.receivedAt
+                details = payment.received?.receivedAt?.toAbsoluteDateString()
             )
         }
     }
@@ -248,7 +277,7 @@ private fun PaymentStatus(
 @Composable
 private fun PaymentStatusIcon(
     message: String,
-    timestamp: Long? = null,
+    details: String? = null,
     isAnimated: Boolean,
     imageResId: Int,
     color: Color,
@@ -274,9 +303,9 @@ private fun PaymentStatusIcon(
         }
     }
     Spacer(Modifier.height(16.dp))
-    Text(text = message.uppercase(), style = MaterialTheme.typography.body2)
-    timestamp?.let {
-        Text(text = timestamp.toAbsoluteDateString(), style = MaterialTheme.typography.caption)
+    Text(text = message.uppercase(), style = MaterialTheme.typography.h5)
+    details?.let {
+        Text(text = details, style = MaterialTheme.typography.caption)
     }
 }
 
@@ -285,6 +314,7 @@ private fun DetailsRow(
     label: String,
     value: String?,
     additionalContent: (@Composable () -> Unit)? = null,
+    helpMessage: String? = null,
     fallbackValue: String = stringResource(id = R.string.utils_unknown),
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip
@@ -299,12 +329,17 @@ private fun DetailsRow(
         Column(
             modifier = Modifier.weight(1f),
         ) {
-            Text(
-                text = value ?: fallbackValue,
-                style = MaterialTheme.typography.body1.copy(fontStyle = if (value == null) FontStyle.Italic else FontStyle.Normal),
-                maxLines = maxLines,
-                overflow = overflow,
-            )
+            Row {
+                Text(
+                    text = value ?: fallbackValue,
+                    style = MaterialTheme.typography.body1.copy(fontStyle = if (value == null) FontStyle.Italic else FontStyle.Normal),
+                    maxLines = maxLines,
+                    overflow = overflow,
+                )
+                if (helpMessage != null) {
+                    HelpPopup(message = helpMessage)
+                }
+            }
             if (additionalContent != null) {
                 additionalContent()
             }
