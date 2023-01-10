@@ -55,6 +55,7 @@ import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.WalletContext
 import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.legacy.utils.MigrationResult
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import fr.acinq.phoenix.managers.Connections
@@ -85,8 +86,7 @@ fun HomeView(
         ConnectionDialog(connections = connectionsState, onClose = { showConnectionsDialog = false }, onTorClick = onTorClick, onElectrumClick = onElectrumClick)
     }
 
-    val payments = paymentsViewModel.recentPaymentsFlow.collectAsState().value.values.toList().take(3)
-
+    val payments by paymentsViewModel.latestPaymentsFlow.collectAsState()
     val swapInBalance = business.balanceManager.swapInWalletBalance.collectAsState()
 
     // controls for the migration dialog
@@ -105,7 +105,6 @@ fun HomeView(
                 onTorClick = onTorClick
             )
             Spacer(modifier = Modifier.height(64.dp))
-
             if (balance == null) {
                 ProgressView(text = stringResource(id = R.string.home__balance_loading))
             } else {
@@ -119,54 +118,10 @@ fun HomeView(
                 )
             }
             IncomingAmountNotif(walletContext.value?.swapIn?.v1, swapInBalance.value)
-            if (payments.isEmpty()) {
-                Text(
-                    text = stringResource(id = R.string.home__payments_none),
-                    style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center),
-                    modifier = Modifier.padding(horizontal = 32.dp)
-                )
-                Spacer(Modifier.height(16.dp))
-                FilledButton(
-                    text = stringResource(id = R.string.home__payments_more_button),
-                    icon = R.drawable.ic_chevron_down,
-                    iconTint = MaterialTheme.typography.caption.color,
-                    onClick = onPaymentsHistoryClick,
-                    backgroundColor = Color.Transparent,
-                    textStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
-                )
-            } else {
-                Text(
-                    text = stringResource(id = R.string.home__payments_header),
-                    style = MaterialTheme.typography.caption.copy(fontSize = 12.sp, textAlign = TextAlign.Center)
-                )
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    LazyColumn {
-                        items(
-                            items = payments,
-                        ) {
-                            if (it.paymentInfo == null) {
-                                LaunchedEffect(key1 = it.orderRow.id.identifier) {
-                                    paymentsViewModel.getPaymentDescription(it.orderRow)
-                                }
-                                PaymentLineLoading(it.orderRow.id, it.orderRow.createdAt, onPaymentClick)
-                            } else {
-                                PaymentLine(it.paymentInfo, onPaymentClick)
-                            }
-                        }
-                    }
-                    Button(
-                        text = stringResource(id = R.string.home__payments_more_button),
-                        icon = R.drawable.ic_chevron_down,
-                        onClick = onPaymentsHistoryClick,
-                        padding = PaddingValues(top = 12.dp, bottom = 8.dp),
-                        textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+            Column(modifier = Modifier.weight(1f, fill = true), horizontalAlignment = Alignment.CenterHorizontally) {
+                LatestPaymentsList(payments, onPaymentClick, onPaymentsHistoryClick) { paymentsViewModel.fetchPaymentDetails(it) }
             }
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.heightIn(min = 8.dp))
             BottomBar(onSettingsClick, onReceiveClick, onSendClick)
         }
     }
@@ -408,6 +363,62 @@ private fun InvalidSwapInInfoDialog(
             modifier = Modifier.padding(horizontal = 24.dp),
             text = annotatedStringResource(R.string.home__swapin_dialog_invalid_body, minFundingAmount, String.format("%.2f", 100 * (swapInFeePercent)), swapInMinFee)
         )
+    }
+}
+
+@Composable
+private fun ColumnScope.LatestPaymentsList(
+    payments: List<PaymentRowState>,
+    onPaymentClick: (WalletPaymentId) -> Unit,
+    onPaymentsHistoryClick: () -> Unit,
+    fetchPaymentDetails: (WalletPaymentOrderRow) -> Unit,
+) {
+    if (payments.isEmpty()) {
+        Text(
+            text = stringResource(id = R.string.home__payments_none),
+            style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center),
+            modifier = Modifier.padding(horizontal = 32.dp)
+        )
+        Spacer(Modifier.height(16.dp))
+        FilledButton(
+            text = stringResource(id = R.string.home__payments_more_button),
+            icon = R.drawable.ic_chevron_down,
+            iconTint = MaterialTheme.typography.caption.color,
+            onClick = onPaymentsHistoryClick,
+            backgroundColor = Color.Transparent,
+            textStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
+        )
+    } else {
+        Text(
+            text = stringResource(id = R.string.home__payments_header),
+            style = MaterialTheme.typography.caption.copy(fontSize = 12.sp, textAlign = TextAlign.Center)
+        )
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
+                items(
+                    items = payments,
+                ) {
+                    if (it.paymentInfo == null) {
+                        LaunchedEffect(key1 = it.orderRow.id.identifier) {
+                            fetchPaymentDetails(it.orderRow)
+                        }
+                        PaymentLineLoading(it.orderRow.id, it.orderRow.createdAt, onPaymentClick)
+                    } else {
+                        PaymentLine(it.paymentInfo, onPaymentClick)
+                    }
+                }
+            }
+            Button(
+                text = stringResource(id = R.string.home__payments_more_button),
+                icon = R.drawable.ic_chevron_down,
+                onClick = onPaymentsHistoryClick,
+                padding = PaddingValues(top = 12.dp, bottom = 8.dp),
+                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }
 

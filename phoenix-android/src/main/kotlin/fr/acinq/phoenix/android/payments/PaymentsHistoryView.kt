@@ -57,8 +57,8 @@ fun PaymentsHistoryView(
 ) {
     val log = logger("PaymentsHistory")
     val listState = rememberLazyListState()
-    val paymentsCount = business.paymentsManager.paymentsCount
-    val payments = paymentsViewModel.allPaymentsFlow.collectAsState()
+    val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
+    val payments = paymentsViewModel.paymentsFlow.collectAsState()
     val groupedPayments = payments.value.values.groupBy {
         val date = Instant.fromEpochMilliseconds(it.orderRow.completedAt ?: it.orderRow.createdAt).toLocalDateTime(TimeZone.currentSystemDefault())
         date.month to date.year
@@ -66,7 +66,7 @@ fun PaymentsHistoryView(
     DefaultScreenLayout(
         isScrollable = false
     ) {
-        DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.payments_history_title, paymentsCount.value))
+        DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.payments_history_title, allPaymentsCount))
         Card(modifier = Modifier.weight(1f, fill = false)) {
             LaunchedEffect(key1 = listState) {
                 snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull() }
@@ -80,9 +80,10 @@ fun PaymentsHistoryView(
                     }
                     .distinctUntilChanged()
                     .collect { index ->
-                        val hasMorePaymentsToFetch = payments.value.size < paymentsCount.value
+                        val hasMorePaymentsToFetch = payments.value.size < allPaymentsCount
                         if (hasMorePaymentsToFetch) {
-                            paymentsViewModel.subscribeToAllPayments(offset = 0, count = index + 10)
+                            // Subscribe to a bit more payments. Ideally would be the screen height / height of each payment.
+                            paymentsViewModel.subscribeToPayments(offset = 0, count = index + 10)
                         }
                     }
                 }
@@ -103,7 +104,7 @@ fun PaymentsHistoryView(
                     items(items = payments) {
                         if (it.paymentInfo == null) {
                             LaunchedEffect(key1 = it.orderRow.id.identifier) {
-                                paymentsViewModel.getPaymentDescription(it.orderRow)
+                                paymentsViewModel.fetchPaymentDetails(it.orderRow)
                             }
                             PaymentLineLoading(it.orderRow.id, it.orderRow.createdAt, onPaymentClick)
                         } else {

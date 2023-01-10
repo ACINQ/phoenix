@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
+import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
@@ -30,8 +31,8 @@ import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.managers.PaymentsPageFetcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
@@ -40,28 +41,43 @@ data class PaymentRowState(
     val paymentInfo: WalletPaymentInfo?
 )
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class PaymentsViewModel(
     val connectionsFlow: StateFlow<Connections>,
-    val paymentsManager: PaymentsManager,
+    private val paymentsManager: PaymentsManager,
 ) : ViewModel() {
+
+    /** How many payments should be fetched by the initial subscription. */
+    private val initialPaymentsCount = 15
+
+    /** How many payments should be visible in the home view. */
+    private val latestPaymentsCount = 3
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    private val _allPaymentsFlow = MutableStateFlow<Map<String, PaymentRowState>>(HashMap())
-    val allPaymentsFlow: StateFlow<Map<String, PaymentRowState>> = _allPaymentsFlow
+    private val _paymentsFlow = MutableStateFlow<Map<String, PaymentRowState>>(HashMap())
+    /**
+     * A flow of known payments. The key is a [WalletPaymentId], the value is the payments details
+     * which are basic at first, and then updated asynchronously (see [fetchPaymentDetails]).
+     *
+     * This flow is initialized by the view model, and then updated by [subscribeToPayments] which is
+     * called by the UI when needed (paging with scrolling, see the payments history view).
+     */
+    val paymentsFlow: StateFlow<Map<String, PaymentRowState>> = _paymentsFlow.asStateFlow()
 
-    private val _recentPaymentsFlow = MutableStateFlow<Map<String, PaymentRowState>>(HashMap())
-    val recentPaymentsFlow: StateFlow<Map<String, PaymentRowState>> = _recentPaymentsFlow
+    /** A subset of [paymentsFlow] used in the Home view. */
+    val latestPaymentsFlow: StateFlow<List<PaymentRowState>> = paymentsFlow.mapLatest {
+        it.values.take(latestPaymentsCount.coerceAtMost(initialPaymentsCount)).toList()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = emptyList()
+    )
 
-    private val allPaymentsPageFetcher: PaymentsPageFetcher
-    private val recentPaymentsPageFetcher: PaymentsPageFetcher
+    private val paymentsPageFetcher: PaymentsPageFetcher = paymentsManager.makePageFetcher()
 
     init {
-        allPaymentsPageFetcher = paymentsManager.makePageFetcher()
-        allPaymentsPageFetcher.subscribeToAll(offset = 0, count = 5)
-
-        recentPaymentsPageFetcher = paymentsManager.makePageFetcher()
-        recentPaymentsPageFetcher.subscribeToRecent(offset = 0, count = 5, seconds = (60 * 60 * 24 * 3))
+        paymentsPageFetcher.subscribeToAll(offset = 0, count = initialPaymentsCount)
 
         // get details when a payment completes
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
@@ -79,7 +95,7 @@ class PaymentsViewModel(
                         completedAt = it.completedAt(),
                         metadataModifiedAt = null
                     )
-                    getPaymentDescription(row)
+                    fetchPaymentDetails(row)
                 }
             }
         }
@@ -87,49 +103,34 @@ class PaymentsViewModel(
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             log.error("failed to collect all payments page items: ", e)
         }) {
-            allPaymentsPageFetcher.paymentsPage.collect {
+            paymentsPageFetcher.paymentsPage.collect {
                 viewModelScope.launch(Dispatchers.Default) {
                     // rewrite all the payments flow map to keep payments ordering - adding the diff would put new elements to the bottom of the map
-                    _allPaymentsFlow.value = it.rows.associate { row ->
-                        row.id.identifier to (_allPaymentsFlow.value[row.id.identifier] ?: run {
+                    _paymentsFlow.value = it.rows.associate { row ->
+                        row.id.identifier to (_paymentsFlow.value[row.id.identifier] ?: run {
                             PaymentRowState(row, null)
                         })
                     }
                 }
             }
         }
-
-        viewModelScope.launch(CoroutineExceptionHandler { _, e ->
-            log.error("failed to collect recent payments page items: ", e)
-        }) {
-            recentPaymentsPageFetcher.paymentsPage.collect {
-                viewModelScope.launch(Dispatchers.Default) {
-                    // rewrite all the payments flow map to keep payments ordering - adding the diff would put new elements to the bottom of the map
-                    _recentPaymentsFlow.value = it.rows.map { row ->
-                        row.id.identifier to (_recentPaymentsFlow.value[row.id.identifier] ?: run {
-                            PaymentRowState(row, null)
-                        })
-                    }.toMap()
-                }
-            }
-        }
     }
 
-    fun getPaymentDescription(row: WalletPaymentOrderRow) {
+    /** Fetches the details for a given payment and updates [paymentsFlow]. */
+    fun fetchPaymentDetails(row: WalletPaymentOrderRow) {
         viewModelScope.launch(Dispatchers.Default) {
             val paymentInfo = paymentsManager.fetcher.getPayment(row, WalletPaymentFetchOptions.Descriptions)
             if (paymentInfo != null) {
                 viewModelScope.launch(Dispatchers.Main) {
-                    _recentPaymentsFlow.value += (row.id.identifier to PaymentRowState(row, paymentInfo))
-                    _allPaymentsFlow.value += (row.id.identifier to PaymentRowState(row, paymentInfo))
+                    _paymentsFlow.value += (row.id.identifier to PaymentRowState(row, paymentInfo))
                 }
             }
         }
     }
 
-    /** Listens to changes in payments db for payments within given count and offset and updates the [allPaymentsFlow]. */
-    fun subscribeToAllPayments(offset: Int, count: Int) {
-        allPaymentsPageFetcher.subscribeToAll(offset, count)
+    /** Updates the payment fetcher to listen to changes within the given count and offset, indirectly updating the [paymentsFlow]. */
+    fun subscribeToPayments(offset: Int, count: Int) {
+        paymentsPageFetcher.subscribeToAll(offset, count)
     }
 
     class Factory(
