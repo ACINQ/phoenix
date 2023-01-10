@@ -60,11 +60,7 @@ class PaymentsManager(
      * (You can also create your own instances if needed.)
      */
     val fetcher: PaymentsFetcher by lazy {
-        PaymentsFetcher(paymentsManager = this, cacheSizeLimit = 250)
-    }
-
-    fun makeFetcher(cacheSizeLimit: Int = 250): PaymentsFetcher {
-        return PaymentsFetcher(this, cacheSizeLimit)
+        PaymentsFetcher(loggerFactory = loggerFactory, paymentsManager = this, cacheSizeLimit = 250)
     }
 
     fun makePageFetcher(): PaymentsPageFetcher {

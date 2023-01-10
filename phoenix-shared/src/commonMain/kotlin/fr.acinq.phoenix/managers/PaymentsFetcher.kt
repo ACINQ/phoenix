@@ -7,6 +7,8 @@ import fr.acinq.phoenix.utils.Cache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import org.kodein.log.LoggerFactory
+import org.kodein.log.newLogger
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
@@ -22,6 +24,7 @@ import kotlin.coroutines.suspendCoroutine
  * always provide an up-to-date WalletPayment instance in response to your query.
  */
 class PaymentsFetcher(
+    val loggerFactory: LoggerFactory,
     private var paymentsManager: PaymentsManager,
     cacheSizeLimit: Int
 ): CoroutineScope by MainScope() {
@@ -35,17 +38,13 @@ class PaymentsFetcher(
         val info: WalletPaymentInfo?
     )
 
+    private val log = newLogger(loggerFactory)
+
     // Using a strict cache to ensure eviction based on actual usage
     private var cache = Cache<String, Result>(sizeLimit = cacheSizeLimit)
 
     // Used to consolidate database lookups for the same item
     private var pendingFetches = mutableMapOf<String, List<Continuation<WalletPaymentInfo?>>>()
-
-    var cacheSizeLimit: Int
-        get() = cache.sizeLimit
-        set(value) {
-            cache.sizeLimit = value
-        }
 
     private fun cacheKey(
         row: WalletPaymentOrderRow,
@@ -120,7 +119,9 @@ class PaymentsFetcher(
     ): WalletPaymentInfo? = suspendCoroutine { continuation ->
 
         val key = cacheKey(row, options)
+        log.debug { "fetching payment for key=$key" }
         cache[key]?.let {
+            log.debug { "payment found in cache for key=$key" }
             continuation.resumeWith(kotlin.Result.success(it.info))
             return@suspendCoroutine
         }
@@ -135,16 +136,15 @@ class PaymentsFetcher(
         // If we consolidate them, we make less trips to the disk & speed up the UI.
 
         pendingFetches[key]?.let { pendingContinuations ->
+            log.debug { "fetching request found pending for key=$key" }
             pendingFetches[key] = pendingContinuations + continuation
             return@suspendCoroutine // database fetch already in progress
         }
         pendingFetches[key] = listOf(continuation)
 
         val completion = { result: Result ->
-
             cache[key] = result
             pendingFetches.remove(key)?.let { pendingContinuations ->
-
                 pendingContinuations.forEach { pendingContinuation ->
                     pendingContinuation.resumeWith(kotlin.Result.success(result.info))
                 }
