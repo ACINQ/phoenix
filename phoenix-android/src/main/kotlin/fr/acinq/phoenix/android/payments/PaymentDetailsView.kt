@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -55,7 +54,7 @@ sealed class PaymentDetailsState {
 }
 
 class PaymentDetailsViewModel(
-    val paymentsManager: PaymentsManager
+    private val paymentsManager: PaymentsManager
 ) : ViewModel() {
 
     val log = LoggerFactory.getLogger(this::class.java)

@@ -29,6 +29,7 @@ import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.Connections
 import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.managers.PaymentsPageFetcher
+import fr.acinq.phoenix.utils.extensions.createdAt
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -88,10 +89,7 @@ class PaymentsViewModel(
                 if (it != null) {
                     val row = WalletPaymentOrderRow(
                         id = it.walletPaymentId(),
-                        createdAt = when (it) {
-                            is OutgoingPayment -> it.createdAt
-                            is IncomingPayment -> it.createdAt
-                        },
+                        createdAt = it.createdAt,
                         completedAt = it.completedAt(),
                         metadataModifiedAt = null
                     )
@@ -100,16 +98,23 @@ class PaymentsViewModel(
             }
         }
 
+        // collect changes on the payments page that we subscribed to
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             log.error("failed to collect all payments page items: ", e)
         }) {
             paymentsPageFetcher.paymentsPage.collect {
                 viewModelScope.launch(Dispatchers.Default) {
-                    // rewrite all the payments flow map to keep payments ordering - adding the diff would put new elements to the bottom of the map
-                    _paymentsFlow.value = it.rows.associate { row ->
-                        row.id.identifier to (_paymentsFlow.value[row.id.identifier] ?: run {
-                            PaymentRowState(row, null)
-                        })
+                    // We must rewrite the whole payments flow map to keep payments ordering.
+                    // Adding the diff would only push new elements to the bottom of the map.
+                    _paymentsFlow.value = it.rows.associate { newRow ->
+                        val paymentId = newRow.id.identifier
+                        val existingData = paymentsFlow.value[paymentId]
+                        // We look at the row to check if the payment has changed (the row contains timestamps)
+                        if (existingData?.orderRow != newRow) {
+                            paymentId to PaymentRowState(newRow, null)
+                        } else {
+                            paymentId to existingData
+                        }
                     }
                 }
             }

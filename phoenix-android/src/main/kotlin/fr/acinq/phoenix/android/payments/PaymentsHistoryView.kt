@@ -58,8 +58,8 @@ fun PaymentsHistoryView(
     val log = logger("PaymentsHistory")
     val listState = rememberLazyListState()
     val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
-    val payments = paymentsViewModel.paymentsFlow.collectAsState()
-    val groupedPayments = payments.value.values.groupBy {
+    val payments by paymentsViewModel.paymentsFlow.collectAsState()
+    val groupedPayments = payments.values.groupBy {
         val date = Instant.fromEpochMilliseconds(it.orderRow.completedAt ?: it.orderRow.createdAt).toLocalDateTime(TimeZone.currentSystemDefault())
         date.month to date.year
     }
@@ -74,13 +74,13 @@ fun PaymentsHistoryView(
                     .map { it.index }
                     .distinctUntilChanged()
                     .filter { index ->
-                        val entriesInListCount = groupedPayments.entries.size + payments.value.size
+                        val entriesInListCount = groupedPayments.entries.size + payments.size
                         val isLastElementFetched = index == entriesInListCount - 1
                         isLastElementFetched
                     }
                     .distinctUntilChanged()
                     .collect { index ->
-                        val hasMorePaymentsToFetch = payments.value.size < allPaymentsCount
+                        val hasMorePaymentsToFetch = payments.size < allPaymentsCount
                         if (hasMorePaymentsToFetch) {
                             // Subscribe to a bit more payments. Ideally would be the screen height / height of each payment.
                             paymentsViewModel.subscribeToPayments(offset = 0, count = index + 10)
