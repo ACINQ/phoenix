@@ -66,7 +66,6 @@ object KeystoreHelper {
       setRandomizedEncryptionRequired(true)
       setKeySize(256)
       setUserAuthenticationRequired(true)
-      setUserAuthenticationValidityDurationSeconds(-1)
       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
         setUnlockedDeviceRequired(true)
       }

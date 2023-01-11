@@ -141,7 +141,7 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
             is OutgoingPayment.Details.Normal -> d.paymentRequest.description
             is OutgoingPayment.Details.KeySend -> stringResource(id = R.string.paymentline_keysend_outgoing)
             is OutgoingPayment.Details.SwapOut -> d.address
-            is OutgoingPayment.Details.ChannelClosing -> if (d.closingAddress.isNullOrBlank()) {
+            is OutgoingPayment.Details.ChannelClosing -> if (d.closingAddress.isBlank()) {
                 stringResource(R.string.paymentline_closing_desc_no_address)
             } else {
                 stringResource(R.string.paymentline_closing_desc, d.closingAddress)

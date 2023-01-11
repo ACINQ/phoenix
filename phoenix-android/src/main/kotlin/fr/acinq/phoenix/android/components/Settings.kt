@@ -168,7 +168,7 @@ fun SettingSwitch(
             Spacer(modifier = Modifier.height(2.dp))
             Row(Modifier.fillMaxWidth()) {
                 Spacer(modifier = Modifier.width(30.dp))
-                Text(text = description ?: "", style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f))
+                Text(text = description, style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f))
                 Spacer(Modifier.width(48.dp))
             }
         }

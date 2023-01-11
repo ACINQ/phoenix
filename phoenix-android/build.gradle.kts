@@ -79,7 +79,7 @@ android {
 kotlin {
     target {
         compilations.all {
-            kotlinOptions.freeCompilerArgs += listOf("-Xskip-metadata-version-check", "-Xinline-classes")
+            kotlinOptions.freeCompilerArgs += listOf("-Xskip-metadata-version-check", "-Xinline-classes", "-Xopt-in=kotlin.RequiresOptIn")
         }
     }
 }

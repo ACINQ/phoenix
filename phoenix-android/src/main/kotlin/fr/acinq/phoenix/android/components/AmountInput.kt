@@ -270,7 +270,7 @@ fun AmountHeroInput(
     var unit: CurrencyUnit by remember { mutableStateOf(prefBitcoinUnit) }
     var inputValue by remember { mutableStateOf(TextFieldValue(initialAmount?.toUnit(prefBitcoinUnit).toPlainString())) }
     var convertedValue: String by remember { mutableStateOf(initialAmount?.toPrettyString(prefFiat, rate, withUnit = true) ?: "") }
-    var internalErrorMessage: String by remember { mutableStateOf(validationErrorMessage ?: "") }
+    var internalErrorMessage: String by remember { mutableStateOf(validationErrorMessage) }
 
     val input: @Composable () -> Unit = {
         BasicTextField(
