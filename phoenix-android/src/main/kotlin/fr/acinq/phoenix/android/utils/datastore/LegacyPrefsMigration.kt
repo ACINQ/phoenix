@@ -62,7 +62,7 @@ object LegacyPrefsMigration {
                 else -> BitcoinUnit.Btc
             }
         )
-        UserPrefs.saveHideBalance(context, Prefs.showBalanceHome(context))
+        UserPrefs.saveHomeAmountDisplayMode(context, if (Prefs.showBalanceHome(context)) HomeAmountDisplayMode.BTC else HomeAmountDisplayMode.REDACTED)
         UserPrefs.saveIsAmountInFiat(context, Prefs.getShowAmountInFiat(context))
         UserPrefs.saveFiatCurrency(context, FiatCurrency.valueOfOrNull(Prefs.getFiatCurrency(context)) ?: FiatCurrency.USD)
 

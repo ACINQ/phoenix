@@ -16,7 +16,11 @@
 
 package fr.acinq.phoenix.android.home
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -45,12 +49,16 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
-import fr.acinq.phoenix.android.*
+import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.preferredAmountUnit
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.WalletContext
@@ -60,6 +68,7 @@ import fr.acinq.phoenix.legacy.utils.MigrationResult
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import fr.acinq.phoenix.managers.Connections
 import fr.acinq.phoenix.managers.WalletBalance
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 
@@ -80,6 +89,7 @@ fun HomeView(
     val torEnabledState = UserPrefs.getIsTorEnabled(context).collectAsState(initial = null)
     val connectionsState by paymentsViewModel.connectionsFlow.collectAsState(null)
     val walletContext = business.appConfigurationManager.chainContext.collectAsState()
+    val balanceDisplayMode by UserPrefs.getHomeAmountDisplayMode(context).collectAsState(initial = null)
 
     var showConnectionsDialog by remember { mutableStateOf(false) }
     if (showConnectionsDialog) {
@@ -108,18 +118,34 @@ fun HomeView(
             if (balance == null) {
                 ProgressView(text = stringResource(id = R.string.home__balance_loading))
             } else {
+                val isAmountRedacted = balanceDisplayMode == HomeAmountDisplayMode.REDACTED
                 AmountView(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(horizontal = 16.dp),
+                        .padding(horizontal = if (isAmountRedacted) 40.dp else 16.dp),
                     amount = balance,
                     amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 40.sp),
                     unitTextStyle = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
+                    isRedacted = isAmountRedacted,
+                    onClick = { context, inFiat ->
+                        when (UserPrefs.getHomeAmountDisplayMode(context).firstOrNull()) {
+                            HomeAmountDisplayMode.BTC -> { UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.FIAT) }
+                            HomeAmountDisplayMode.FIAT -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.REDACTED)
+                            HomeAmountDisplayMode.REDACTED -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.BTC)
+                            null -> Unit
+                        }
+                    }
                 )
             }
             IncomingAmountNotif(walletContext.value?.swapIn?.v1, swapInBalance.value)
             Column(modifier = Modifier.weight(1f, fill = true), horizontalAlignment = Alignment.CenterHorizontally) {
-                LatestPaymentsList(payments, onPaymentClick, onPaymentsHistoryClick) { paymentsViewModel.fetchPaymentDetails(it) }
+                LatestPaymentsList(
+                    payments = payments,
+                    onPaymentClick = onPaymentClick,
+                    onPaymentsHistoryClick = onPaymentsHistoryClick,
+                    fetchPaymentDetails = { paymentsViewModel.fetchPaymentDetails(it) },
+                    isAmountRedacted = balanceDisplayMode == HomeAmountDisplayMode.REDACTED,
+                )
             }
             Spacer(modifier = Modifier.heightIn(min = 8.dp))
             BottomBar(onSettingsClick, onReceiveClick, onSendClick)
@@ -367,11 +393,12 @@ private fun InvalidSwapInInfoDialog(
 }
 
 @Composable
-private fun ColumnScope.LatestPaymentsList(
+private fun LatestPaymentsList(
     payments: List<PaymentRowState>,
     onPaymentClick: (WalletPaymentId) -> Unit,
     onPaymentsHistoryClick: () -> Unit,
     fetchPaymentDetails: (WalletPaymentOrderRow) -> Unit,
+    isAmountRedacted: Boolean,
 ) {
     if (payments.isEmpty()) {
         Text(
@@ -404,9 +431,9 @@ private fun ColumnScope.LatestPaymentsList(
                         LaunchedEffect(key1 = it.orderRow.id.identifier) {
                             fetchPaymentDetails(it.orderRow)
                         }
-                        PaymentLineLoading(it.orderRow.id, it.orderRow.createdAt, onPaymentClick)
+                        PaymentLineLoading(it.orderRow.id, onPaymentClick)
                     } else {
-                        PaymentLine(it.paymentInfo, onPaymentClick)
+                        PaymentLine(it.paymentInfo, onPaymentClick, isAmountRedacted)
                     }
                 }
             }

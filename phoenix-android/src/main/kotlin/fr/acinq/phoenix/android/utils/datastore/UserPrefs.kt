@@ -26,6 +26,7 @@ import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
+import fr.acinq.phoenix.data.CurrencyUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.legacy.userPrefs
@@ -62,6 +63,19 @@ object UserPrefs {
     private val SHOW_AMOUNT_IN_FIAT = booleanPreferencesKey("SHOW_AMOUNT_IN_FIAT")
     fun getIsAmountInFiat(context: Context): Flow<Boolean> = prefs(context).map { it[SHOW_AMOUNT_IN_FIAT] ?: false }
     suspend fun saveIsAmountInFiat(context: Context, inFiat: Boolean) = context.userPrefs.edit { it[SHOW_AMOUNT_IN_FIAT] = inFiat }
+
+    private val HOME_AMOUNT_DISPLAY_MODE = stringPreferencesKey("HOME_AMOUNT_DISPLAY_MODE")
+    fun getHomeAmountDisplayMode(context: Context): Flow<HomeAmountDisplayMode> = prefs(context).map {
+        HomeAmountDisplayMode.safeValueOf(it[HOME_AMOUNT_DISPLAY_MODE])
+    }
+    suspend fun saveHomeAmountDisplayMode(context: Context, displayMode: HomeAmountDisplayMode) = context.userPrefs.edit {
+        it[HOME_AMOUNT_DISPLAY_MODE] = displayMode.name
+        when (displayMode) {
+            HomeAmountDisplayMode.FIAT -> it[SHOW_AMOUNT_IN_FIAT] = true
+            HomeAmountDisplayMode.BTC -> it[SHOW_AMOUNT_IN_FIAT] = false
+            else -> Unit
+        }
+    }
 
     private val THEME = stringPreferencesKey("THEME")
     fun getUserTheme(context: Context): Flow<UserTheme> = prefs(context).map { UserTheme.safeValueOf(it[THEME]) }
@@ -169,3 +183,16 @@ object UserPrefs {
     suspend fun saveIsTorEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[IS_TOR_ENABLED] = isEnabled }
 
 }
+
+enum class HomeAmountDisplayMode {
+    BTC, FIAT, REDACTED;
+    companion object {
+        fun safeValueOf(mode: String?) = when(mode) {
+            FIAT.name -> FIAT
+            REDACTED.name -> REDACTED
+            else -> BTC
+        }
+    }
+}
+
+object Redacted : CurrencyUnit

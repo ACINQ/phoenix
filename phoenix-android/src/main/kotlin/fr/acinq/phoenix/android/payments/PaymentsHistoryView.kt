@@ -106,7 +106,7 @@ fun PaymentsHistoryView(
                             LaunchedEffect(key1 = it.orderRow.id.identifier) {
                                 paymentsViewModel.fetchPaymentDetails(it.orderRow)
                             }
-                            PaymentLineLoading(it.orderRow.id, it.orderRow.createdAt, onPaymentClick)
+                            PaymentLineLoading(it.orderRow.id, onPaymentClick)
                         } else {
                             PaymentLine(it.paymentInfo, onPaymentClick)
                         }

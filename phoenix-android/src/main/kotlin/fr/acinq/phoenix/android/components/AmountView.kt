@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android.components
 
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -52,11 +53,13 @@ fun AmountView(
     modifier: Modifier = Modifier,
     showUnit: Boolean = true,
     forceUnit: CurrencyUnit? = null,
+    isRedacted: Boolean = false,
     prefix: String? = null,
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
     unitTextStyle: TextStyle = MaterialTheme.typography.body1,
     separatorSpace: Dp = 4.dp,
-    mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE
+    mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE,
+    onClick: suspend (Context, Boolean) -> Unit = { context, inFiat -> UserPrefs.saveIsAmountInFiat(context, !inFiat) }
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -81,12 +84,11 @@ fun AmountView(
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
-                role = Role.Button
-            ) {
-                scope.launch { UserPrefs.saveIsAmountInFiat(context, !inFiat) }
-            }
+                role = Role.Button,
+                onClick = { scope.launch { onClick(context, inFiat) } }
+            )
     ) {
-        if (prefix != null && amount > MilliSatoshi(0)) {
+        if (!isRedacted && prefix != null && amount > MilliSatoshi(0)) {
             Text(
                 text = prefix,
                 style = amountTextStyle,
@@ -94,11 +96,11 @@ fun AmountView(
             )
         }
         Text(
-            text = amount.toPrettyString(unit, fiatRate, mSatDisplayPolicy = mSatDisplayPolicy),
+            text = if (isRedacted) "****" else amount.toPrettyString(unit, fiatRate, mSatDisplayPolicy = mSatDisplayPolicy),
             style = amountTextStyle,
             modifier = Modifier.alignBy(FirstBaseline)
         )
-        if (showUnit) {
+        if (!isRedacted && showUnit) {
             Spacer(modifier = Modifier.width(separatorSpace))
             Text(
                 text = unit.toString(),

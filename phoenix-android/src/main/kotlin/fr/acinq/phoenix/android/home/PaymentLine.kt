@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -45,9 +44,10 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountView
-import fr.acinq.phoenix.android.isDarkTheme
-import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
+import fr.acinq.phoenix.android.utils.mutedTextColor
+import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.walletPaymentId
@@ -56,7 +56,6 @@ import fr.acinq.phoenix.data.walletPaymentId
 @Composable
 fun PaymentLineLoading(
     paymentId: WalletPaymentId,
-    timestamp: Long,
     onPaymentClick: (WalletPaymentId) -> Unit
 ) {
     val backgroundColor = MaterialTheme.colors.background.copy(alpha = 0.65f)
@@ -106,7 +105,8 @@ fun PaymentLineLoading(
 @Composable
 fun PaymentLine(
     paymentInfo: WalletPaymentInfo,
-    onPaymentClick: (WalletPaymentId) -> Unit
+    onPaymentClick: (WalletPaymentId) -> Unit,
+    isAmountRedacted: Boolean = false,
 ) {
     val payment = paymentInfo.payment
 
@@ -132,12 +132,16 @@ fun PaymentLine(
                         }
                         is IncomingPayment -> payment.received?.amount ?: 0.msat
                     }
-                    AmountView(
-                        amount = amount,
-                        amountTextStyle = MaterialTheme.typography.body1.copy(color = if (isOutgoing) negativeColor() else positiveColor()),
-                        unitTextStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
-                        prefix = stringResource(if (isOutgoing) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received)
-                    )
+                    if (isAmountRedacted) {
+                        Text(text = "****")
+                    } else {
+                        AmountView(
+                            amount = amount,
+                            amountTextStyle = MaterialTheme.typography.body1.copy(color = if (isOutgoing) negativeColor() else positiveColor()),
+                            unitTextStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
+                            prefix = stringResource(if (isOutgoing) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received)
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(2.dp))
