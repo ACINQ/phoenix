@@ -21,7 +21,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -43,10 +45,9 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountView
+import fr.acinq.phoenix.android.isDarkTheme
+import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
-import fr.acinq.phoenix.android.utils.mutedTextColor
-import fr.acinq.phoenix.android.utils.negativeColor
-import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.walletPaymentId
@@ -58,6 +59,7 @@ fun PaymentLineLoading(
     timestamp: Long,
     onPaymentClick: (WalletPaymentId) -> Unit
 ) {
+    val backgroundColor = MaterialTheme.colors.background.copy(alpha = 0.65f)
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -65,20 +67,38 @@ fun PaymentLineLoading(
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         PaymentIconComponent(
-            icon = R.drawable.ic_payment_pending,
+            icon = null,
+            backgroundColor = backgroundColor,
             description = stringResource(id = R.string.paymentdetails_status_sent_pending)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
+            Row {
+                Text(
+                    text = "",
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(backgroundColor)
+                )
+                Spacer(modifier = Modifier.width(24.dp))
+                Text(
+                    text = "",
+                    modifier = Modifier
+                        .width(80.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(backgroundColor)
+                )
+            }
+            Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = stringResource(id = R.string.paymentline_loading),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.body1.copy(color = mutedTextColor()),
-                modifier = Modifier.fillMaxWidth()
+                text = "",
+                fontSize = 12.sp,
+                modifier = Modifier
+                    .width(80.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(backgroundColor)
             )
-            Spacer(modifier = Modifier.width(2.dp))
-            Text(text = timestamp.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
         }
     }
 }
@@ -120,7 +140,7 @@ fun PaymentLine(
                     )
                 }
             }
-            Spacer(modifier = Modifier.width(2.dp))
+            Spacer(modifier = Modifier.height(2.dp))
             val timestamp: Long = remember {
                 payment.completedAt().takeIf { it > 0 } ?: when (payment) {
                     is OutgoingPayment -> payment.createdAt
@@ -233,7 +253,13 @@ private fun PaymentIcon(payment: WalletPayment) {
 }
 
 @Composable
-private fun PaymentIconComponent(icon: Int, description: String, iconSize: Dp = 18.dp, iconColor: Color = MaterialTheme.colors.primary, backgroundColor: Color = Color.Unspecified) {
+private fun PaymentIconComponent(
+    icon: Int?,
+    description: String,
+    iconSize: Dp = 18.dp,
+    iconColor: Color = MaterialTheme.colors.primary,
+    backgroundColor: Color = Color.Unspecified
+) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -242,11 +268,13 @@ private fun PaymentIconComponent(icon: Int, description: String, iconSize: Dp = 
             .background(color = backgroundColor)
             .padding(4.dp)
     ) {
-        Image(
-            painter = painterResource(icon),
-            contentDescription = description,
-            modifier = Modifier.size(iconSize),
-            colorFilter = ColorFilter.tint(iconColor)
-        )
+        if (icon != null) {
+            Image(
+                painter = painterResource(icon),
+                contentDescription = description,
+                modifier = Modifier.size(iconSize),
+                colorFilter = ColorFilter.tint(iconColor)
+            )
+        }
     }
 }
