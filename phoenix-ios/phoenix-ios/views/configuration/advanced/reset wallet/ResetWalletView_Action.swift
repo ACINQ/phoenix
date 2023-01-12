@@ -65,10 +65,9 @@ struct ResetWalletView_Action: View {
 	@ViewBuilder
 	func navWrappedContent() -> some View {
 		
-		NavigationView {
+		NavigationWrapper {
 			content()
 		}
-		.navigationViewStyle(.stack)
 	}
 	
 	@ViewBuilder

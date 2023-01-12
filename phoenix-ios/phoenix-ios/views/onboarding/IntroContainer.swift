@@ -18,14 +18,13 @@ struct IntroContainer: View {
 	@ViewBuilder
 	var body: some View {
 		
-		NavigationView {
-			content
+		NavigationWrapper {
+			content()
 		}
-		.navigationViewStyle(StackNavigationViewStyle())
 	}
 	
 	@ViewBuilder
-	var content: some View {
+	func content() -> some View {
 		
 		ZStack {
 			
@@ -46,7 +45,7 @@ struct IntroContainer: View {
 		}
 	}
 	
-	func introScreensFinished() -> Void {
+	func introScreensFinished() {
 		log.trace("introScreenFinished()")
 		
 		withAnimation {

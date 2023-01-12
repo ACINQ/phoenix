@@ -82,10 +82,12 @@ struct MainView_Small: View {
 	@ViewBuilder
 	var body: some View {
 		
-		NavigationView {
+		NavigationWrapper {
 			layers()
 		}
-		.navigationViewStyle(StackNavigationViewStyle())
+		.navigationTitle("")
+		.navigationBarTitleDisplayMode(.inline)
+		.navigationBarHidden(true)
 	}
 	
 	@ViewBuilder
@@ -93,19 +95,18 @@ struct MainView_Small: View {
 		
 		ZStack {
 
-			// iOS 14 & 15 have bugs when using NavigationLink.
-			// The suggested workarounds include using only a single NavigationLink.
-			//
-			NavigationLink(
-				destination: navLinkView(),
-				isActive: Binding(
-					get: { navLinkTag != nil },
-					set: { if !$0 { navLinkTag = nil }}
-				)
-			) {
-				EmptyView()
-			}
-			.accessibilityHidden(true)
+			if #unavailable(iOS 16.0) {
+				// iOS 14 & 15 have bugs when using NavigationLink.
+				// The suggested workarounds include using only a single NavigationLink.
+				NavigationLink(
+					destination: navLinkView(),
+					isActive: navLinkTagBinding(nil)
+				) {
+					EmptyView()
+				}
+				.accessibilityHidden(true)
+				
+			} // else: uses.navigationStackDestination()
 			
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
@@ -121,9 +122,21 @@ struct MainView_Small: View {
 
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationTitle("")
-		.navigationBarTitleDisplayMode(.inline)
-		.navigationBarHidden(true)
+		.navigationStackDestination(isPresented: navLinkTagBinding(.ConfigurationView)) { // For iOS 16+
+			navLinkView()
+		}
+		.navigationStackDestination(isPresented: navLinkTagBinding(.TransactionsView)) { // For iOS 16+
+			navLinkView()
+		}
+		.navigationStackDestination(isPresented: navLinkTagBinding(.ReceiveView)) { // For iOS 16+
+			navLinkView()
+		}
+		.navigationStackDestination(isPresented: navLinkTagBinding(.SendView)) { // For iOS 16+
+			navLinkView()
+		}
+		.navigationStackDestination(isPresented: navLinkTagBinding(.CurrencyConverter)) { // For iOS 16+
+			navLinkView()
+		}
 		.onChange(of: navLinkTag) { tag in
 			navLinkTagChanged(tag)
 		}
@@ -465,19 +478,41 @@ struct MainView_Small: View {
 	@ViewBuilder
 	func navLinkView() -> some View {
 		
-		switch navLinkTag {
-		case .ConfigurationView:
-			ConfigurationView()
-		case .TransactionsView:
-			TransactionsView()
-		case .ReceiveView:
-			ReceiveView()
-		case .SendView:
-			SendView(controller: externalLightningRequest)
-		case .CurrencyConverter:
-			CurrencyConverterView()
-		default:
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
 			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	private func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .ConfigurationView : ConfigurationView()
+		case .TransactionsView  : TransactionsView()
+		case .ReceiveView       : ReceiveView()
+		case .SendView          : SendView(controller: externalLightningRequest)
+		case .CurrencyConverter : CurrencyConverterView()
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	private func navLinkTagBinding(_ tag: NavLinkTag?) -> Binding<Bool> {
+		
+		if let tag { // specific tag
+			return Binding<Bool>(
+				get: { navLinkTag == tag },
+				set: { if $0 { navLinkTag = tag } else if (navLinkTag == tag) { navLinkTag = nil } }
+			)
+		} else { // any tag
+			return Binding<Bool>(
+				get: { navLinkTag != nil },
+				set: { if !$0 { navLinkTag = nil }}
+			)
 		}
 	}
 	

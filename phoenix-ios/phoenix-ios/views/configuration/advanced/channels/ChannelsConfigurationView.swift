@@ -11,9 +11,6 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	case ForceCloseChannelsView
-}
 
 struct ChannelsConfigurationView: MVIView {
 
@@ -106,7 +103,7 @@ fileprivate struct ChannelsView : View {
 	@Binding var showChannelsRemoteBalance: Bool
 	@ObservedObject var toast: Toast
 	
-	@State var navLinkTag: NavLinkTag? = nil
+	@State var forceCloseChannelsOpen = false
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -116,16 +113,16 @@ fileprivate struct ChannelsView : View {
 	var body: some View {
 		
 		ZStack {
-			
-			NavigationLink(
-				destination: navLinkView(),
-				isActive: Binding(
-					get: { navLinkTag != nil },
-					set: { if !$0 { navLinkTag = nil }}
-				)
-			) {
-				EmptyView()
-			}
+			if #unavailable(iOS 16.0) {
+				NavigationLink(
+					destination: forceCloseChannelsView(),
+					isActive: $forceCloseChannelsOpen
+				) {
+					EmptyView()
+				}
+				.accessibilityHidden(true)
+				
+			} // else: uses.navigationStackDestination()
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 				
@@ -153,17 +150,14 @@ fileprivate struct ChannelsView : View {
 			
 		} // </ZStack>
 		.navigationBarItems(trailing: menuButton())
+		.navigationStackDestination(isPresented: $forceCloseChannelsOpen) { // For iOS 16+
+			forceCloseChannelsView()
+		}
 	}
 	
 	@ViewBuilder
-	func navLinkView() -> some View {
-		
-		switch navLinkTag {
-		case .ForceCloseChannelsView:
-			ForceCloseChannelsView()
-		default:
-			EmptyView()
-		}
+	func forceCloseChannelsView() -> some View {
+		ForceCloseChannelsView()
 	}
 	
 	@ViewBuilder
@@ -248,7 +242,7 @@ fileprivate struct ChannelsView : View {
 	func forceCloseAllChannels() {
 		log.trace("forceCloseAllChannels()")
 		
-		navLinkTag = .ForceCloseChannelsView
+		forceCloseChannelsOpen = true
 	}
 }
 
@@ -615,7 +609,7 @@ class ChannelsConfigurationView_Previews : PreviewProvider {
 
 	static var previews: some View {
 		
-		NavigationView {
+		NavigationWrapper {
 			ChannelsConfigurationView().mock(ChannelsConfiguration.Model(
 				nodeId: "03af0ed6052cf28d670665549bc86f4b721c9fdb309d40c58f5811f63966e005d0",
 				json: "{}",
@@ -625,7 +619,7 @@ class ChannelsConfigurationView_Previews : PreviewProvider {
 		.preferredColorScheme(.light)
 		.previewDevice("iPhone 8")
 
-		NavigationView {
+		NavigationWrapper {
 			ChannelsConfigurationView().mock(ChannelsConfiguration.Model(
 				nodeId: "03af0ed6052cf28d670665549bc86f4b721c9fdb309d40c58f5811f63966e005d0",
 				json: "{}",

@@ -341,7 +341,7 @@ class ForceCloseChannelsView_Previews: PreviewProvider {
 	
 	static var previews: some View {
 		
-		NavigationView {
+		NavigationWrapper {
 			ForceCloseChannelsView().mock(
 				CloseChannelsConfiguration.ModelLoading()
 			)
@@ -349,7 +349,7 @@ class ForceCloseChannelsView_Previews: PreviewProvider {
 		.preferredColorScheme(.light)
 		.previewDevice("iPhone 8")
 		
-		NavigationView {
+		NavigationWrapper {
 			ForceCloseChannelsView().mock(
 				CloseChannelsConfiguration.ModelReady(channels: [
 					CloseChannelsConfiguration.ModelChannelInfo(
@@ -363,7 +363,7 @@ class ForceCloseChannelsView_Previews: PreviewProvider {
 		.preferredColorScheme(.light)
 		.previewDevice("iPhone 8")
 		
-		NavigationView {
+		NavigationWrapper {
 			ForceCloseChannelsView().mock(
 				CloseChannelsConfiguration.ModelChannelsClosed(channels: [
 					CloseChannelsConfiguration.ModelChannelInfo(
@@ -377,7 +377,7 @@ class ForceCloseChannelsView_Previews: PreviewProvider {
 		.preferredColorScheme(.light)
 		.previewDevice("iPhone 8")
 		
-		NavigationView {
+		NavigationWrapper {
 			ForceCloseChannelsView().mock(
 				CloseChannelsConfiguration.ModelChannelsClosed(channels: [
 					CloseChannelsConfiguration.ModelChannelInfo(

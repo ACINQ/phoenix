@@ -101,13 +101,13 @@ class ReceiveView_Previews: PreviewProvider {
 
 	static var previews: some View {
 
-		NavigationView {
+		NavigationWrapper {
 			ReceiveView().mock(Receive.Model_Awaiting())
 		}
 		.modifier(GlobalEnvironment())
 		.previewDevice("iPhone 11")
 
-		NavigationView {
+		NavigationWrapper {
 			ReceiveView().mock(Receive.Model_Generated(
 				request: request,
 				paymentHash: "foobar",

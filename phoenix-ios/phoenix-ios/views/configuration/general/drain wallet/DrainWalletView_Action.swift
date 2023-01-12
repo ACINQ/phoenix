@@ -17,6 +17,8 @@ struct DrainWalletView_Action: MVISubView {
 	let expectedTxCount: Int
 	let popToRoot: () -> Void
 	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -167,6 +169,7 @@ struct DrainWalletView_Action: MVISubView {
 	func doneButtonTapped() {
 		log.trace("doneButtonTapped()")
 		
+		presentationMode.wrappedValue.dismiss()
 		popToRoot()
 	}
 }

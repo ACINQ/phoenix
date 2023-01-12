@@ -163,6 +163,8 @@
 		DCA849E02813311D000FADE1 /* aes256Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA849DF2813311D000FADE1 /* aes256Tests.swift */; };
 		DCA849E2281333EB000FADE1 /* currencyFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA849E1281333EB000FADE1 /* currencyFormattingTests.swift */; };
 		DCAC5B7027726FC80077BB98 /* DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAC5B6F27726FC80077BB98 /* DeepLink.swift */; };
+		DCAC9FC329675E1A0098D769 /* NavigationWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAC9FC229675E1A0098D769 /* NavigationWrapper.swift */; };
+		DCAC9FC6296879770098D769 /* NavigationStackDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAC9FC5296879770098D769 /* NavigationStackDestination.swift */; };
 		DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */; };
 		DCACF6FA2566D0BA0009B01E /* KeyStoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */; };
 		DCACF6FB2566D0BA0009B01E /* GenericPasswordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F62566D0BA0009B01E /* GenericPasswordStore.swift */; };
@@ -451,6 +453,8 @@
 		DCA849DF2813311D000FADE1 /* aes256Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = aes256Tests.swift; sourceTree = "<group>"; };
 		DCA849E1281333EB000FADE1 /* currencyFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = currencyFormattingTests.swift; sourceTree = "<group>"; };
 		DCAC5B6F27726FC80077BB98 /* DeepLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLink.swift; sourceTree = "<group>"; };
+		DCAC9FC229675E1A0098D769 /* NavigationWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationWrapper.swift; sourceTree = "<group>"; };
+		DCAC9FC5296879770098D769 /* NavigationStackDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationStackDestination.swift; sourceTree = "<group>"; };
 		DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Data+Hexadecimal.swift"; sourceTree = "<group>"; };
 		DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyStoreError.swift; sourceTree = "<group>"; };
 		DCACF6F62566D0BA0009B01E /* GenericPasswordStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GenericPasswordStore.swift; sourceTree = "<group>"; };
@@ -586,7 +590,6 @@
 				DC08A51927FB6C5F0041603B /* TopTab.swift */,
 				DC39D4EE287497440030F18D /* SmartModal.swift */,
 				DC39D4F02874DDF40030F18D /* View+If.swift */,
-				DC6CF35A2938F32E001837EE /* ListBackgroundColor.swift */,
 			);
 			path = widgets;
 			sourceTree = "<group>";
@@ -629,6 +632,7 @@
 				DC71E7312728643C0063613D /* tools */,
 				DCFA8757260E6DFF00AE8953 /* onboarding */,
 				C8D7A7335040D755924F8FFC /* configuration */,
+				DCAC9FC42968793D0098D769 /* compatibility */,
 				53BEF0E7A62D4973FCC99476 /* widgets */,
 				DC49DA8C258BB85F005BC4BC /* style */,
 				DCB5D2DD280879160020B8F5 /* environment */,
@@ -919,6 +923,16 @@
 				DCA6DEC52829BDEB0073C658 /* CrossProcessCommunication.swift */,
 			);
 			path = xpc;
+			sourceTree = "<group>";
+		};
+		DCAC9FC42968793D0098D769 /* compatibility */ = {
+			isa = PBXGroup;
+			children = (
+				DC6CF35A2938F32E001837EE /* ListBackgroundColor.swift */,
+				DCAC9FC229675E1A0098D769 /* NavigationWrapper.swift */,
+				DCAC9FC5296879770098D769 /* NavigationStackDestination.swift */,
+			);
+			path = compatibility;
 			sourceTree = "<group>";
 		};
 		DCACF6DF2566CEC40009B01E /* advanced */ = {
@@ -1399,6 +1413,7 @@
 				DC384D7F265BF36600131772 /* StyledString.swift in Sources */,
 				DC5F1C4A28DDAA49007A55ED /* ResetWalletView_Confirm.swift in Sources */,
 				DC39D4E7286BB2130030F18D /* PaymentLayerChoice.swift in Sources */,
+				DCAC9FC6296879770098D769 /* NavigationStackDestination.swift in Sources */,
 				DC27E4C22791C00F00C777CC /* PrivacyView.swift in Sources */,
 				DC46BAF626CACCF700E760A6 /* KotlinFutures.swift in Sources */,
 				DC641C7E2821744000862DCD /* Currency+CurrencyPrefs.swift in Sources */,
@@ -1489,6 +1504,7 @@
 				DC0D2EA72939273B00284608 /* KotlinExtensions+Payments.swift in Sources */,
 				DC72C33925A663CA008A927A /* QRCode.swift in Sources */,
 				DC5CA4ED28F83C3B0048A737 /* DrainWalletView.swift in Sources */,
+				DCAC9FC329675E1A0098D769 /* NavigationWrapper.swift in Sources */,
 				DC65D86428E2F7D700686355 /* ResetWalletView_Action.swift in Sources */,
 				DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */,
 				DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */,

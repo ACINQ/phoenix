@@ -957,7 +957,7 @@ class PaymentOptionsView_Previews: PreviewProvider {
 	
 	static var previews: some View {
 		
-		NavigationView {
+		NavigationWrapper {
 			PaymentOptionsView()
 		}
 		.preferredColorScheme(.light)

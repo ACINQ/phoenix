@@ -85,17 +85,16 @@ struct ReceiveLightningView: View {
 	var body: some View {
 		
 		ZStack {
-			NavigationLink(
-				destination: CurrencyConverterView(
-					initialAmount: modificationAmount,
-					didChange: currencyConverterDidChange,
-					didClose: currencyConvertDidClose
-				),
-				isActive: $currencyConverterOpen
-			) {
-				EmptyView()
-			}
-			.accessibilityHidden(true)
+			if #unavailable(iOS 16.0) {
+				NavigationLink(
+					destination: currencyConverterView(),
+					isActive: $currencyConverterOpen
+				) {
+					EmptyView()
+				}
+				.accessibilityHidden(true)
+				
+			} // else: uses.navigationStackDestination()
 			
 			content()
 		}
@@ -105,6 +104,10 @@ struct ReceiveLightningView: View {
 		.onDisappear {
 			onDisappear()
 		}
+		.navigationStackDestination( // For iOS 16+
+			isPresented: $currencyConverterOpen,
+			destination: currencyConverterView
+		)
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
@@ -634,6 +637,16 @@ struct ReceiveLightningView: View {
 				.stroke(Color.appAccent, lineWidth: 1)
 		)
 		.padding([.leading, .trailing], 10)
+	}
+	
+	@ViewBuilder
+	func currencyConverterView() -> some View {
+		
+		CurrencyConverterView(
+			initialAmount: modificationAmount,
+			didChange: currencyConverterDidChange,
+			didClose: currencyConvertDidClose
+		)
 	}
 	
 	// --------------------------------------------------

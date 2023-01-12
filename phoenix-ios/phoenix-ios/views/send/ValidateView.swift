@@ -85,18 +85,16 @@ struct ValidateView: View {
 	var body: some View {
 		
 		ZStack {
-		
-			NavigationLink(
-				destination: CurrencyConverterView(
-					initialAmount: currentAmount(),
-					didChange: currencyConverterAmountChanged,
-					didClose: {}
-				),
-				isActive: $currencyConverterOpen
-			) {
-				EmptyView()
-			}
-			.accessibilityHidden(true)
+			if #unavailable(iOS 16.0) {
+				NavigationLink(
+					destination: currencyConverterView(),
+					isActive: $currencyConverterOpen
+				) {
+					EmptyView()
+				}
+				.accessibilityHidden(true)
+				
+			} // else: uses.navigationStackDestination()
 			
 			Color.primaryBackground
 				.ignoresSafeArea(.all, edges: .all)
@@ -154,6 +152,10 @@ struct ValidateView: View {
 		.onAppear() {
 			onAppear()
 		}
+		.navigationStackDestination( // For iOS 16+
+			isPresented: $currencyConverterOpen,
+			destination: currencyConverterView
+		)
 		.onChange(of: mvi.model) { newModel in
 			modelDidChange(newModel)
 		}
@@ -439,6 +441,16 @@ struct ValidateView: View {
 		) {
 			commentButtonTapped()
 		}
+	}
+	
+	@ViewBuilder
+	func currencyConverterView() -> some View {
+		
+		CurrencyConverterView(
+			initialAmount: currentAmount(),
+			didChange: currencyConverterAmountChanged,
+			didClose: {}
+		)
 	}
 	
 	// --------------------------------------------------

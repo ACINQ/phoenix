@@ -20,6 +20,10 @@ struct DrainWalletView_Confirm: MVISubView {
 	@State var actionRequested: Bool = false
 	@State var expectedTxCount: Int = 0
 	
+	@State var popToRootRequested = false
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	// --------------------------------------------------
@@ -30,15 +34,24 @@ struct DrainWalletView_Confirm: MVISubView {
 	var view: some View {
 		
 		ZStack {
-			NavigationLink(
-				destination: actionScreen(),
-				isActive: $actionRequested
-			) {
-				EmptyView()
-			}
-			.accessibilityHidden(true)
+			if #unavailable(iOS 16.0) {
+				NavigationLink(
+					destination: actionScreen(),
+					isActive: $actionRequested
+				) {
+					EmptyView()
+				}
+				.accessibilityHidden(true)
+				
+			} // else: uses.navigationStackDestination()
 			
 			content()
+		}
+		.onAppear {
+			onAppear()
+		}
+		.navigationStackDestination(isPresented: $actionRequested) { // For iOS 16+
+			actionScreen()
 		}
 		.navigationTitle(NSLocalizedString("Confirm Drain", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
@@ -142,7 +155,7 @@ struct DrainWalletView_Confirm: MVISubView {
 		DrainWalletView_Action(
 			mvi: mvi,
 			expectedTxCount: expectedTxCount,
-			popToRoot: popToRoot
+			popToRoot: updatedPopToRoot
 		)
 	}
 	
@@ -182,15 +195,33 @@ struct DrainWalletView_Confirm: MVISubView {
 		}
 	}
 	
+	func updatedPopToRoot() {
+		log.trace("updatedPopToRoot()")
+		
+		popToRootRequested = true
+		popToRoot()
+	}
+	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
 	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		if popToRootRequested {
+			popToRootRequested = false
+			presentationMode.wrappedValue.dismiss()
+		}
+	}
+	
 	func drainWallet() {
 		log.trace("drainWallet()")
 		
-		actionRequested = true
-		expectedTxCount = nonZeroChannelCount()
-		mvi.intent(CloseChannelsConfiguration.IntentMutualCloseAllChannels(address: bitcoinAddress))
+		if !actionRequested {
+			actionRequested = true
+			expectedTxCount = nonZeroChannelCount()
+			mvi.intent(CloseChannelsConfiguration.IntentMutualCloseAllChannels(address: bitcoinAddress))
+		}
 	}
 }
