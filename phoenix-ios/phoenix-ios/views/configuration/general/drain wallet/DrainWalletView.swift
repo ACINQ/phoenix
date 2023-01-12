@@ -23,6 +23,7 @@ struct DrainWalletView: MVIView {
 	let encryptedNodeId = Biz.encryptedNodeId!
 	
 	@State var didAppear = false
+	@State var popToRootRequested = false
 	
 	@State var textFieldValue: String = ""
 	@State var scannedValue: String? = nil
@@ -32,6 +33,8 @@ struct DrainWalletView: MVIView {
 	@State var isScanningQrCode = false
 	
 	@State var reviewRequested = false
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -236,7 +239,7 @@ struct DrainWalletView: MVIView {
 			DrainWalletView_Confirm(
 				mvi: mvi,
 				bitcoinAddress: bitcoinAddress,
-				popToRoot: popToRoot
+				popToRoot: updatedPopToRoot
 			)
 		}
 	}
@@ -258,6 +261,13 @@ struct DrainWalletView: MVIView {
 		return (balance_bitcoin, balance_fiat)
 	}
 	
+	func updatedPopToRoot() {
+		log.trace("updatedPopToRoot()")
+		
+		popToRootRequested = true
+		popToRoot()
+	}
+	
 	// --------------------------------------------------
 	// MARK: View Lifecycle
 	// --------------------------------------------------
@@ -273,6 +283,13 @@ struct DrainWalletView: MVIView {
 				DispatchQueue.main.async { // iOS 14 issues workaround
 					deepLinkManager.unbroadcast(deepLink)
 				}
+			}
+			
+		} else {
+			
+			if popToRootRequested {
+				popToRootRequested = false
+				presentationMode.wrappedValue.dismiss()
 			}
 		}
 	}

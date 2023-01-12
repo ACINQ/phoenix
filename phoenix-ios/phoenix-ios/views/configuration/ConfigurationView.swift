@@ -46,6 +46,9 @@ struct ConfigurationView: View {
 	@State private var swiftUiBugWorkaroundIdx = 0
 	
 	@State var didAppear = false
+	@State var popToRootRequested = false
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
@@ -252,7 +255,7 @@ struct ConfigurationView: View {
 	func popToRoot() {
 		log.trace("popToRoot")
 		
-		navLinkTag = nil
+		popToRootRequested = true
 	}
 	
 	func onAppear() {
@@ -282,6 +285,11 @@ struct ConfigurationView: View {
 			
 		} else {
 		
+			if popToRootRequested {
+				popToRootRequested = false
+				presentationMode.wrappedValue.dismiss()
+			}
+				
 			if #unavailable(iOS 15.0) {
 				// iOS 14 BUG and workaround.
 				//
