@@ -25,13 +25,9 @@ enum class CloudAssetVersion(val value: Int) {
 //    @SerialName("v")
 //    val version: Int
 // )
-// val version: CloudAssetVersion = try {
-//    Cbor {
-//       ignoreUnknownKeys = true
-//    }.decodeFromByteArray(blob)
-// } catch (e: Throwable) {
-//    return null
-// }
+// val version = try {
+//    Cbor { ignoreUnknownKeys = true }.decodeFromByteArray<CloudAssetVersion>(blob)
+// } catch (e: Throwable) { null }
 
 @Serializable
 @OptIn(ExperimentalSerializationApi::class)
@@ -111,9 +107,7 @@ fun WalletPaymentMetadataRow.cloudSerialize(): ByteArray {
 @OptIn(ExperimentalSerializationApi::class)
 fun CloudAsset.Companion.cloudDeserialize(blob: ByteArray): WalletPaymentMetadataRow? {
     val wrapper: CloudAsset = try {
-        Cbor {
-            ignoreUnknownKeys = true
-        }.decodeFromByteArray(blob)
+        Cbor { ignoreUnknownKeys = true }.decodeFromByteArray(blob)
     } catch (e: Throwable) {
         return null
     }

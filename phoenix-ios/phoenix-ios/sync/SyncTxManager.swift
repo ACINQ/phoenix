@@ -1504,9 +1504,9 @@ class SyncTxManager {
 			//	#endif
 				
 				let cleartext_kotlin = cleartext.toKotlinByteArray()
-				let wrapper = CloudData.companion.cborDeserialize(blob: cleartext_kotlin)
+				let pair = CloudData.companion.cborDeserialize(blob: cleartext_kotlin)
 				
-				if let wrapper = wrapper {
+				if let wrapper = pair.first {
 					
 				//	#if DEBUG
 				//	let jsonData = wrapper.jsonSerialize().toSwiftData()
@@ -1518,9 +1518,11 @@ class SyncTxManager {
 					let paddingSize = Int(wrapper.padding?.size ?? 0)
 					unpaddedSize = paddedSize - paddingSize
 					
-					payment = wrapper.unwrap()
+					payment = pair.second
+					
+				} else {
+					log.error("data deserialization error: skipping \(record.recordID)")
 				}
-				
 			} catch {
 				log.error("data decryption error: \(String(describing: error))")
 			}

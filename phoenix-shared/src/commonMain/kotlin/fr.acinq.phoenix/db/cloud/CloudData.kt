@@ -110,14 +110,20 @@ fun CloudData.cborSerialize(): ByteArray {
 }
 
 @OptIn(ExperimentalSerializationApi::class)
-fun CloudData.Companion.cborDeserialize(blob: ByteArray): CloudData? {
-    var result: CloudData? = null
-    try {
-        result = Cbor.decodeFromByteArray(blob)
+fun CloudData.Companion.cborDeserialize(
+    blob: ByteArray
+): Pair<CloudData?, WalletPayment?> {
+    val wrapper = try {
+        Cbor { ignoreUnknownKeys = true}.decodeFromByteArray<CloudData>(blob)
     } catch (_: Throwable) {
+        return Pair(null, null)
     }
-
-    return result
+    val payment = try {
+        wrapper.unwrap()
+    } catch (e: Throwable) {
+       null
+    }
+    return Pair(wrapper, payment)
 }
 
 // For DEBUGGING:

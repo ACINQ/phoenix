@@ -52,7 +52,7 @@ sealed class LnurlBase {
         fun deserialize(typeVersion: TypeVersion, blob: ByteArray): LnurlBase {
             return when (typeVersion) {
                 TypeVersion.PAY_V0 -> {
-                    Cbor.decodeFromByteArray<Pay>(blob)
+                    Cbor { ignoreUnknownKeys = true }.decodeFromByteArray<Pay>(blob)
                 }
             }
         }
@@ -95,7 +95,7 @@ sealed class LnurlMetadata {
         fun deserialize(typeVersion: TypeVersion, blob: ByteArray): LnurlMetadata {
             return when (typeVersion) {
                 TypeVersion.PAY_V0 -> {
-                    Cbor.decodeFromByteArray<PayMetadata>(blob)
+                    Cbor { ignoreUnknownKeys = true }.decodeFromByteArray<PayMetadata>(blob)
                 }
             }
         }
@@ -181,13 +181,13 @@ sealed class LnurlSuccessAction {
         ): LnurlPay.Invoice.SuccessAction {
             return when (typeVersion) {
                 TypeVersion.MESSAGE_V0 -> {
-                    Cbor.decodeFromByteArray<Message>(blob).unwrap()
+                    Cbor { ignoreUnknownKeys = true }.decodeFromByteArray<Message>(blob).unwrap()
                 }
                 TypeVersion.URL_V0 -> {
-                    Cbor.decodeFromByteArray<Url>(blob).unwrap()
+                    Cbor { ignoreUnknownKeys = true }.decodeFromByteArray<Url>(blob).unwrap()
                 }
                 TypeVersion.AES_V0 -> {
-                    Cbor.decodeFromByteArray<Aes>(blob).unwrap()
+                    Cbor { ignoreUnknownKeys = true }.decodeFromByteArray<Aes>(blob).unwrap()
                 }
             }
         }

@@ -134,8 +134,18 @@ fun OutgoingPayment.cborSerialize(): ByteArray {
 }
 
 @OptIn(ExperimentalSerializationApi::class)
-fun OutgoingPaymentWrapper.cborDeserialize(blob: ByteArray): OutgoingPayment? = try {
-    Cbor.decodeFromByteArray<OutgoingPaymentWrapper>(blob).unwrap()
-} catch (e: Throwable) {
-    null
+fun OutgoingPaymentWrapper.cborDeserialize(
+    blob: ByteArray
+): Pair<OutgoingPaymentWrapper?, OutgoingPayment?> {
+    val wrapper = try {
+        Cbor { ignoreUnknownKeys = true }.decodeFromByteArray<OutgoingPaymentWrapper>(blob)
+    } catch (e: Throwable) {
+        return Pair(null, null)
+    }
+    val payment = try {
+        wrapper.unwrap()
+    } catch (e: Throwable) {
+        null
+    }
+    return Pair(wrapper, payment)
 }
