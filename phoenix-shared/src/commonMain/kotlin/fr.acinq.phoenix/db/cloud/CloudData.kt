@@ -59,7 +59,8 @@ enum class CloudDataVersion(val value: Int) {
 }
 
 @Serializable
-data class CloudData @OptIn(ExperimentalSerializationApi::class) constructor(
+@OptIn(ExperimentalSerializationApi::class)
+data class CloudData(
     @ByteString
     @SerialName("i")
     val incoming: IncomingPaymentWrapper?,

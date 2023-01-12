@@ -10,7 +10,8 @@ import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
 
 @Serializable
-data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) constructor(
+@OptIn(ExperimentalSerializationApi::class)
+data class OutgoingPaymentWrapper(
     @Serializable(with = UUIDSerializer::class)
     val id: UUID,
     val msat: Long,
@@ -45,7 +46,8 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
     )
 
     @Serializable
-    data class DetailsWrapper @OptIn(ExperimentalSerializationApi::class) constructor(
+    @OptIn(ExperimentalSerializationApi::class)
+    data class DetailsWrapper(
         val type: String,
         @ByteString
         val blob: ByteArray
@@ -70,7 +72,8 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
     } // </DetailsWrapper>
 
     @Serializable
-    data class StatusWrapper @OptIn(ExperimentalSerializationApi::class) constructor(
+    @OptIn(ExperimentalSerializationApi::class)
+    data class StatusWrapper(
         val ts: Long,
         val type: String,
         @ByteString
