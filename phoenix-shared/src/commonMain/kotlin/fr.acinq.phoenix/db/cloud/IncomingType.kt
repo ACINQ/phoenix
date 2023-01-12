@@ -84,6 +84,7 @@ data class IncomingPaymentWrapper(
             }
         }
 
+        @Throws(Exception::class)
         fun unwrap(originTypeVersion: IncomingOriginTypeVersion): IncomingPayment.Received {
             val receivedWith = IncomingReceivedWithData.deserialize(
                 typeVersion = IncomingReceivedWithTypeVersion.valueOf(type),
@@ -108,18 +109,9 @@ fun IncomingPayment.cborSerialize(): ByteArray {
 }
 
 @OptIn(ExperimentalSerializationApi::class)
+@Throws(Exception::class)
 fun IncomingPaymentWrapper.Companion.cborDeserialize(
     blob: ByteArray
-): Pair<IncomingPaymentWrapper?, IncomingPayment?> {
-    val wrapper = try {
-        Cbor { ignoreUnknownKeys = true }.decodeFromByteArray<IncomingPaymentWrapper>(blob)
-    } catch (e: Throwable) {
-        return Pair(null, null)
-    }
-    val payment = try {
-        wrapper.unwrap()
-    } catch (e: Throwable) {
-        null
-    }
-    return Pair(wrapper, payment)
+): IncomingPaymentWrapper {
+    return Cbor { ignoreUnknownKeys = true }.decodeFromByteArray(blob)
 }

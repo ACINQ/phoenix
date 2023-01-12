@@ -95,6 +95,7 @@ data class CloudData(
         return this.copy(padding = padding)
     }
 
+    @Throws(Exception::class)
     fun unwrap(): WalletPayment? = when {
         incoming != null -> incoming.unwrap()
         outgoing != null -> outgoing.unwrap()
@@ -110,20 +111,11 @@ fun CloudData.cborSerialize(): ByteArray {
 }
 
 @OptIn(ExperimentalSerializationApi::class)
+@Throws(Exception::class)
 fun CloudData.Companion.cborDeserialize(
     blob: ByteArray
-): Pair<CloudData?, WalletPayment?> {
-    val wrapper = try {
-        Cbor { ignoreUnknownKeys = true}.decodeFromByteArray<CloudData>(blob)
-    } catch (_: Throwable) {
-        return Pair(null, null)
-    }
-    val payment = try {
-        wrapper.unwrap()
-    } catch (e: Throwable) {
-       null
-    }
-    return Pair(wrapper, payment)
+): CloudData {
+    return Cbor { ignoreUnknownKeys = true}.decodeFromByteArray(blob)
 }
 
 // For DEBUGGING:

@@ -34,6 +34,7 @@ data class OutgoingPaymentWrapper(
         createdAt = payment.createdAt
     )
 
+    @Throws(Exception::class)
     fun unwrap() = OutgoingPayment(
         id = id,
         amount = MilliSatoshi(msat = msat),
@@ -134,18 +135,9 @@ fun OutgoingPayment.cborSerialize(): ByteArray {
 }
 
 @OptIn(ExperimentalSerializationApi::class)
+@Throws(Exception::class)
 fun OutgoingPaymentWrapper.cborDeserialize(
     blob: ByteArray
-): Pair<OutgoingPaymentWrapper?, OutgoingPayment?> {
-    val wrapper = try {
-        Cbor { ignoreUnknownKeys = true }.decodeFromByteArray<OutgoingPaymentWrapper>(blob)
-    } catch (e: Throwable) {
-        return Pair(null, null)
-    }
-    val payment = try {
-        wrapper.unwrap()
-    } catch (e: Throwable) {
-        null
-    }
-    return Pair(wrapper, payment)
+): OutgoingPaymentWrapper {
+    return Cbor { ignoreUnknownKeys = true }.decodeFromByteArray(blob)
 }

@@ -1495,36 +1495,44 @@ class SyncTxManager {
 		if let ciphertext = record[record_column_data] as? Data {
 		//	log.debug(" - data.count: \(ciphertext.count)")
 			
+			var cleartext: Data? = nil
 			do {
 				let box = try ChaChaPoly.SealedBox(combined: ciphertext)
-				let cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
+				cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
 				
 			//	#if DEBUG
 			//	log.debug(" - raw payment: \(cleartext.toHex())")
 			//	#endif
-				
-				let cleartext_kotlin = cleartext.toKotlinByteArray()
-				let pair = CloudData.companion.cborDeserialize(blob: cleartext_kotlin)
-				
-				if let wrapper = pair.first {
+			} catch {
+				log.error("Error decrypting record.data: skipping \(record.recordID)")
+			}
+			
+			var wrapper: CloudData? = nil
+			if let cleartext {
+				do {
+					let cleartext_kotlin = cleartext.toKotlinByteArray()
+					wrapper = try CloudData.companion.cborDeserialize(blob: cleartext_kotlin)
 					
 				//	#if DEBUG
 				//	let jsonData = wrapper.jsonSerialize().toSwiftData()
 				//	let jsonStr = String(data: jsonData, encoding: .utf8)
 				//	log.debug(" - raw JSON:\n\(jsonStr ?? "<nil>")")
 				//	#endif
-					
+
 					let paddedSize = cleartext.count
-					let paddingSize = Int(wrapper.padding?.size ?? 0)
+					let paddingSize = Int(wrapper!.padding?.size ?? 0)
 					unpaddedSize = paddedSize - paddingSize
-					
-					payment = pair.second
-					
-				} else {
-					log.error("data deserialization error: skipping \(record.recordID)")
+				} catch {
+					log.error("Error deserializing record.data: skipping \(record.recordID)")
 				}
-			} catch {
-				log.error("data decryption error: \(String(describing: error))")
+			}
+			
+			if let wrapper {
+				do {
+					payment = try wrapper.unwrap()
+				} catch {
+					log.error("Error unwrapping record.data: skipping \(record.recordID)")
+				}
 			}
 		}
 		
@@ -1536,7 +1544,7 @@ class SyncTxManager {
 				do {
 					ciphertext = try Data(contentsOf: fileURL)
 				} catch {
-					log.error("asset read error: \(String(describing: error))")
+					log.error("Error reading record.asset: \(String(describing: error))")
 				}
 				
 				if let ciphertext = ciphertext {
@@ -1554,7 +1562,7 @@ class SyncTxManager {
 						metadata = row
 						
 					} catch {
-						log.error("meta decryption error: \(String(describing: error))")
+						log.error("Error decrypting record.asset: \(String(describing: error))")
 					}
 				}
 			}
