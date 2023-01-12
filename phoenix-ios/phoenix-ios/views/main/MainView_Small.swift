@@ -84,10 +84,10 @@ struct MainView_Small: View {
 		
 		NavigationWrapper {
 			layers()
+				.navigationTitle("")
+				.navigationBarTitleDisplayMode(.inline)
+				.navigationBarHidden(true)
 		}
-		.navigationTitle("")
-		.navigationBarTitleDisplayMode(.inline)
-		.navigationBarHidden(true)
 	}
 	
 	@ViewBuilder
