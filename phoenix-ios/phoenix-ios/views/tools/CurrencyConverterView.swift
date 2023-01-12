@@ -88,16 +88,16 @@ struct CurrencyConverterView: View {
 	var body: some View {
 		
 		ZStack {
-			
-			NavigationLink(destination: CurrencySelector(
-					selectedCurrencies: $currencies,
-					replacingCurrency: $replacingCurrency,
-					didSelectCurrency: didSelectCurrency
-				),
-				isActive: $currencySelectorOpen
-			) {
-				EmptyView()
-			}
+			if #unavailable(iOS 16.0) {
+				NavigationLink(
+					destination: currencySelectorView(),
+					isActive: $currencySelectorOpen
+				) {
+					EmptyView()
+				}
+				.accessibilityHidden(true)
+				
+			} // else: uses.navigationStackDestination()
 			
 			// We want to measure various items within the List.
 			// But we need to measure ALL of them.
@@ -143,6 +143,10 @@ struct CurrencyConverterView: View {
 		.onDisappear {
 			onDisappear()
 		}
+		.navigationStackDestination( // For iOS 16+
+			isPresented: $currencySelectorOpen,
+			destination: currencySelectorView
+		)
 		.onChange(of: currencies) { _ in
 			currenciesDidChange()
 		}
@@ -313,6 +317,16 @@ struct CurrencyConverterView: View {
 				: UIColor.secondarySystemGroupedBackground
 			)
 			.edgesIgnoringSafeArea(.bottom) // background color should extend to bottom of screen
+		)
+	}
+	
+	@ViewBuilder
+	func currencySelectorView() -> some View {
+		
+		CurrencySelector(
+			selectedCurrencies: $currencies,
+			replacingCurrency: $replacingCurrency,
+			didSelectCurrency: didSelectCurrency
 		)
 	}
 	

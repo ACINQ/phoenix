@@ -30,15 +30,21 @@ struct DrainWalletView_Confirm: MVISubView {
 	var view: some View {
 		
 		ZStack {
-			NavigationLink(
-				destination: actionScreen(),
-				isActive: $actionRequested
-			) {
-				EmptyView()
-			}
-			.accessibilityHidden(true)
+			if #unavailable(iOS 16.0) {
+				NavigationLink(
+					destination: actionScreen(),
+					isActive: $actionRequested
+				) {
+					EmptyView()
+				}
+				.accessibilityHidden(true)
+				
+			} // else: uses.navigationStackDestination()
 			
 			content()
+		}
+		.navigationStackDestination(isPresented: $actionRequested) { // For iOS 16+
+			actionScreen()
 		}
 		.navigationTitle(NSLocalizedString("Confirm Drain", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)

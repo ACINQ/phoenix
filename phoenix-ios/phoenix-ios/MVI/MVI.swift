@@ -160,7 +160,7 @@ extension MVIView {
 
 // MARK: -
 
-/// A view should implement the `MVIView` protocol when it has an `@ObservedObject var mvi` property.
+/// A view should implement the `MVISubView` protocol when it has an `@ObservedObject var mvi` property.
 /// The implementation looks something like this:
 ///
 /// > struct MyView: MVISubView {

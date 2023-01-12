@@ -58,16 +58,16 @@ struct TransactionsView: View {
 	var body: some View {
 		
 		ZStack {
-			NavigationLink(
-				destination: navLinkView(),
-				isActive: Binding(
-					get: { selectedItem != nil },
-					set: { if !$0 { selectedItem = nil }}
-				)
-			) {
-				EmptyView()
-			}
-			.isDetailLink(false)
+			if #unavailable(iOS 16.0) {
+				NavigationLink(
+					destination: navLinkView(),
+					isActive: selectedItemBinding()
+				) {
+					EmptyView()
+				}
+				.isDetailLink(false)
+				
+			} // else: uses.navigationStackDestination()
 			
 			content()
 		}
@@ -138,6 +138,10 @@ struct TransactionsView: View {
 		.onAppear {
 			onAppear()
 		}
+		.navigationStackDestination( // For iOS 16+
+			isPresented: selectedItemBinding(),
+			destination: navLinkView
+		)
 		.onReceive(paymentsCountPublisher) {
 			paymentsCountChanged($0)
 		}
@@ -192,6 +196,18 @@ struct TransactionsView: View {
 		} else {
 			EmptyView()
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	func selectedItemBinding() -> Binding<Bool> {
+		
+		return Binding<Bool>(
+			get: { selectedItem != nil },
+			set: { if !$0 { selectedItem = nil }}
+		)
 	}
 	
 	// --------------------------------------------------
