@@ -30,9 +30,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -185,7 +187,9 @@ private fun DefaultView(
                     val amount = model.amount
                     val description = model.desc
                     Spacer(modifier = Modifier.height(24.dp))
-                    vm.qrBitmap?.let { QRCode(it) }
+                    vm.qrBitmap?.let {
+                        QRCode(it) { copyToClipboard(context, model.request) }
+                    }
                     Spacer(modifier = Modifier.height(24.dp))
                     if (amount != null) {
                         QRCodeDetail(label = stringResource(id = R.string.receive__qr_amount_label), value = amount.toPrettyString(unit = LocalBitcoinUnit.current, rate = null, withUnit = true))
@@ -209,7 +213,9 @@ private fun DefaultView(
                         vm.generateQrCodeBitmap(invoice = model.address)
                     }
                     Spacer(modifier = Modifier.height(24.dp))
-                    vm.qrBitmap?.let { QRCode(it) }
+                    vm.qrBitmap?.let {
+                        QRCode(it) { copyToClipboard(context, model.address) }
+                    }
                     Spacer(modifier = Modifier.height(24.dp))
                     QRCodeDetail(label = stringResource(id = R.string.receive__swapin__address_label), value = model.address)
                     Spacer(modifier = Modifier.height(24.dp))
@@ -224,10 +230,29 @@ private fun DefaultView(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun QRCode(bitmap: ImageBitmap) {
+fun QRCode(
+    bitmap: ImageBitmap,
+    onLongClick: () -> Unit,
+) {
+    var showFullScreenQR by remember { mutableStateOf(false) }
+    val image: @Composable () -> Unit = {
+        Image(
+            bitmap = bitmap,
+            contentDescription = stringResource(id = R.string.receive__qr_about),
+            alignment = Alignment.Center,
+            contentScale = ContentScale.FillWidth,
+        )
+    }
     Surface(
         Modifier
+            .combinedClickable(
+                role = Role.Button,
+                onClick = { showFullScreenQR = true },
+                onLongClick = onLongClick,
+            )
+            .size(260.dp)
             .clip(RoundedCornerShape(16.dp))
             .border(
                 BorderStroke(1.dp, MaterialTheme.colors.primary),
@@ -235,15 +260,17 @@ fun QRCode(bitmap: ImageBitmap) {
             )
             .background(Color.White)
             .padding(24.dp)
-    ) {
-        Image(
-            bitmap = bitmap,
-            contentDescription = stringResource(id = R.string.receive__qr_about),
-            alignment = Alignment.Center,
-            modifier = Modifier
-                .width(220.dp)
-                .height(220.dp)
-        )
+    ) { image() }
+
+    if (showFullScreenQR) {
+        FullScreenDialog(onDismiss = { showFullScreenQR = false }) {
+            Surface(
+                Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .padding(16.dp)
+            ) { image() }
+        }
     }
 }
 
