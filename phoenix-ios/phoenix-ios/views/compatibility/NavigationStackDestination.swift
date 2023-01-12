@@ -68,6 +68,19 @@ extension View {
 		)
 	}
 	
+	/// Backwards compatibility for:
+	/// ```
+	/// someView
+	///   .navigationDestination(for:destination:)
+	/// ```
+	///
+	/// Since the above can only be called on iOS 16, you can instead use:
+	/// ```
+	/// someView
+	///   .navigationStackDestination(for:destination:)
+	/// ```
+	/// which will take effect on iOS 16+, and be ignored on earlier versions.
+	///
 	func navigationStackDestination<D, C>(
 		for dataType: D.Type,
 		destination: @escaping (D) -> C)

@@ -478,19 +478,22 @@ struct MainView_Small: View {
 	@ViewBuilder
 	func navLinkView() -> some View {
 		
-		switch navLinkTag {
-		case .ConfigurationView:
-			ConfigurationView()
-		case .TransactionsView:
-			TransactionsView()
-		case .ReceiveView:
-			ReceiveView()
-		case .SendView:
-			SendView(controller: externalLightningRequest)
-		case .CurrencyConverter:
-			CurrencyConverterView()
-		default:
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
 			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	private func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .ConfigurationView : ConfigurationView()
+		case .TransactionsView  : TransactionsView()
+		case .ReceiveView       : ReceiveView()
+		case .SendView          : SendView(controller: externalLightningRequest)
+		case .CurrencyConverter : CurrencyConverterView()
 		}
 	}
 	

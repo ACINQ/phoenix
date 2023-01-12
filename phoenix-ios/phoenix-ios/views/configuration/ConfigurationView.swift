@@ -42,12 +42,12 @@ struct ConfigurationView: View {
 	
 	let externalLightningUrlPublisher: PassthroughSubject<String, Never>
 	
-	@EnvironmentObject var deepLinkManager: DeepLinkManager
-	
 	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
 	@State private var swiftUiBugWorkaroundIdx = 0
 	
 	@State var didAppear = false
+	
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	init() {
 		if let encryptedNodeId = Biz.encryptedNodeId {
@@ -58,6 +58,10 @@ struct ConfigurationView: View {
 		
 		externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
 	}
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	var body: some View {
@@ -74,32 +78,20 @@ struct ConfigurationView: View {
 			let hasWallet = hasWallet()
 
 			Section(header: Text("General")) {
-					
-				NavigationLink(
-					destination: AboutView(),
-					tag: NavLinkTag.AboutView,
-					selection: $navLinkTag
-				) {
+				
+				navLink(.AboutView) {
 					Label { Text("About") } icon: {
 						Image(systemName: "info.circle")
 					}
 				}
 			
-				NavigationLink(
-					destination: DisplayConfigurationView(),
-					tag: NavLinkTag.DisplayConfigurationView,
-					selection: $navLinkTag
-				) {
+				navLink(.DisplayConfigurationView) {
 					Label { Text("Display") } icon: {
 						Image(systemName: "paintbrush.pointed")
 					}
 				}
 		
-				NavigationLink(
-					destination: PaymentOptionsView(),
-					tag: NavLinkTag.PaymentOptionsView,
-					selection: $navLinkTag
-				) {
+				navLink(.PaymentOptionsView) {
 					Label { Text("Payment options & fees") } icon: {
 						Image(systemName: "wrench")
 					}
@@ -107,11 +99,7 @@ struct ConfigurationView: View {
 			
 				if hasWallet {
 					
-					NavigationLink(
-						destination: RecoveryPhraseView(),
-						tag: NavLinkTag.RecoveryPhraseView,
-						selection: $navLinkTag
-					) {
+					navLink(.RecoveryPhraseView) {
 						Label {
 							switch backupSeedState {
 							case .notBackedUp:
@@ -136,11 +124,7 @@ struct ConfigurationView: View {
 						}
 					}
 					
-					NavigationLink(
-						destination: DrainWalletView(popToRoot: { self.navLinkTag = nil }),
-						tag: NavLinkTag.DrainWalletView,
-						selection: $navLinkTag
-					) {
+					navLink(.DrainWalletView) {
 						Label { Text("Drain wallet") } icon: {
 							Image(systemName: "xmark.circle")
 						}
@@ -153,11 +137,7 @@ struct ConfigurationView: View {
 			if hasWallet {
 				Section(header: Text("Security")) {
 
-					NavigationLink(
-						destination: AppAccessView(),
-						tag: NavLinkTag.AppAccessView,
-						selection: $navLinkTag
-					) {
+					navLink(.AppAccessView) {
 						Label { Text("App access") } icon: {
 							Image(systemName: isTouchID ? "touchid" : "faceid")
 						}
@@ -169,11 +149,7 @@ struct ConfigurationView: View {
 
 			Section(header: Text("Advanced")) {
 
-				NavigationLink(
-					destination: PrivacyView(),
-					tag: NavLinkTag.PrivacyView,
-					selection: $navLinkTag
-				) {
+				navLink(.PrivacyView) {
 					Label { Text("Privacy") } icon: {
 						Image(systemName: "eye")
 					}
@@ -181,11 +157,7 @@ struct ConfigurationView: View {
 
 				if hasWallet {
 
-					NavigationLink(
-						destination: ChannelsConfigurationView(),
-						tag: NavLinkTag.ChannelsConfigurationView,
-						selection: $navLinkTag
-					) {
+					navLink(.ChannelsConfigurationView) {
 						Label { Text("Payment channels") } icon: {
 							Image(systemName: "bolt")
 						}
@@ -193,11 +165,7 @@ struct ConfigurationView: View {
 
 				} // </if: hasWallet>
 				
-				NavigationLink(
-					destination: LogsConfigurationView(),
-					tag: NavLinkTag.LogsConfigurationView,
-					selection: $navLinkTag
-				) {
+				navLink(.LogsConfigurationView) {
 					Label { Text("Logs") } icon: {
 						Image(systemName: "doc.text")
 					}
@@ -205,11 +173,7 @@ struct ConfigurationView: View {
 
 				if hasWallet {
 
-					NavigationLink(
-						destination: ResetWalletView(),
-						tag: NavLinkTag.ResetWalletView,
-						selection: $navLinkTag
-					) {
+					navLink(.ResetWalletView) {
 						Label { Text("Reset wallet") } icon: {
 							Image(systemName: "trash")
 						}
@@ -236,14 +200,59 @@ struct ConfigurationView: View {
 		.onReceive(externalLightningUrlPublisher) {(url: String) in
 			onExternalLightningUrl(url)
 		}
-		.navigationTitle(NSLocalizedString("Settings", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
+	}
 
-	} // end: body
+	@ViewBuilder
+	private func navLink<Content>(
+		_ tag: NavLinkTag,
+		label: () -> Content
+	) -> some View where Content: View {
+		
+		NavigationLink(
+			destination: navLinkView(tag),
+			tag: tag,
+			selection: $navLinkTag,
+			label: label
+		)
+	}
+	
+	@ViewBuilder
+	private func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		// General
+			case .AboutView                 : AboutView()
+			case .DisplayConfigurationView  : DisplayConfigurationView()
+			case .PaymentOptionsView        : PaymentOptionsView()
+			case .RecoveryPhraseView        : RecoveryPhraseView()
+			case .DrainWalletView           : DrainWalletView(popToRoot: popToRoot)
+		// Security
+			case .AppAccessView             : AppAccessView()
+		// Advanced
+			case .PrivacyView               : PrivacyView()
+			case .ChannelsConfigurationView : ChannelsConfigurationView()
+			case .LogsConfigurationView     : LogsConfigurationView()
+			case .ResetWalletView           : ResetWalletView()
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
 	
 	func hasWallet() -> Bool {
 		
 		return Biz.business.walletManager.isLoaded()
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func popToRoot() {
+		log.trace("popToRoot")
+		
+		navLinkTag = nil
 	}
 	
 	func onAppear() {
@@ -316,9 +325,9 @@ struct ConfigurationView: View {
 			var newNavLinkTag: NavLinkTag? = nil
 			switch value {
 				case .paymentHistory : break
-				case .backup         : newNavLinkTag = NavLinkTag.RecoveryPhraseView
-				case .drainWallet    : newNavLinkTag = NavLinkTag.DrainWalletView
-				case .electrum       : newNavLinkTag = NavLinkTag.PrivacyView
+				case .backup         : newNavLinkTag = .RecoveryPhraseView
+				case .drainWallet    : newNavLinkTag = .DrainWalletView
+				case .electrum       : newNavLinkTag = .PrivacyView
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {

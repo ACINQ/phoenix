@@ -327,12 +327,12 @@ struct SummaryView: View {
 			
 			if #available(iOS 15.0, *) {
 				if payment.state() == WalletPaymentState.failure {
-					buttonList_withDeleteOption
+					buttonList_withDeleteOption()
 				} else {
-					buttonList
+					buttonList()
 				}
 			} else {
-				buttonList
+				buttonList()
 			}
 			
 			Spacer(minLength: 25)
@@ -340,7 +340,7 @@ struct SummaryView: View {
 	}
 	
 	@ViewBuilder
-	var buttonList: some View {
+	func buttonList() -> some View {
 		
 		// Details | Edit
 		//         ^
@@ -348,10 +348,7 @@ struct SummaryView: View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 		
-			NavigationLink(destination: DetailsView(
-				type: type,
-				paymentInfo: $paymentInfo
-			)) {
+			NavigationLink(destination: detailsView()) {
 				Text("Details")
 					.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
 					.read(buttonWidthReader)
@@ -362,10 +359,7 @@ struct SummaryView: View {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			NavigationLink(destination: EditInfoView(
-				type: type,
-				paymentInfo: $paymentInfo
-			)) {
+			NavigationLink(destination: editInfoView()) {
 				Text("Edit")
 					.frame(minWidth: buttonWidth, alignment: Alignment.leading)
 					.read(buttonWidthReader)
@@ -379,16 +373,13 @@ struct SummaryView: View {
 	
 	@ViewBuilder
 	@available(iOS 15.0, *)
-	var buttonList_withDeleteOption: some View {
+	func buttonList_withDeleteOption() -> some View {
 		
 		// Details | Edit | Delete
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 			
-			NavigationLink(destination: DetailsView(
-				type: type,
-				paymentInfo: $paymentInfo
-			)) {
+			NavigationLink(destination: detailsView()) {
 				Text("Details")
 					.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
 					.read(buttonWidthReader)
@@ -399,10 +390,7 @@ struct SummaryView: View {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			NavigationLink(destination: EditInfoView(
-				type: type,
-				paymentInfo: $paymentInfo
-			)) {
+			NavigationLink(destination: editInfoView()) {
 				Text("Edit")
 					.frame(minWidth: buttonWidth, alignment: Alignment.center)
 					.read(buttonWidthReader)
@@ -434,6 +422,22 @@ struct SummaryView: View {
 		.padding([.top, .bottom])
 		.assignMaxPreference(for: buttonWidthReader.key, to: $buttonWidth)
 		.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
+	}
+	
+	@ViewBuilder
+	func detailsView() -> some View {
+		DetailsView(
+			type: type,
+			paymentInfo: $paymentInfo
+		)
+	}
+	
+	@ViewBuilder
+	func editInfoView() -> some View {
+		EditInfoView(
+			type: type,
+			paymentInfo: $paymentInfo
+		)
 	}
 	
 	// --------------------------------------------------
