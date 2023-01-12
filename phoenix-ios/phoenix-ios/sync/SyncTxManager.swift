@@ -679,72 +679,7 @@ class SyncTxManager {
 			
 			operation.recordFetchedBlock = { (record: CKRecord) in
 				
-				log.debug("Received record:")
-				log.debug(" - recordID: \(record.recordID)")
-				log.debug(" - creationDate: \(record.creationDate ?? Date.distantPast)")
-				
-				var unpaddedSize: Int = 0
-				var payment: Lightning_kmpWalletPayment? = nil
-				var metadata: WalletPaymentMetadataRow? = nil
-				
-				if let ciphertext = record[record_column_data] as? Data {
-					log.debug(" - data.count: \(ciphertext.count)")
-					
-					do {
-						let box = try ChaChaPoly.SealedBox(combined: ciphertext)
-						let cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
-						
-						let cleartext_kotlin = cleartext.toKotlinByteArray()
-						let wrapper = CloudData.companion.cborDeserialize(blob: cleartext_kotlin)
-						
-						if let wrapper = wrapper {
-							
-							#if DEBUG
-						//	let jsonData = wrapper.jsonSerialize().toSwiftData()
-						//	let jsonStr = String(data: jsonData, encoding: .utf8)
-						//	log.debug("Downloaded record (JSON representation):\n\(jsonStr ?? "<nil>")")
-							#endif
-							
-							let paddedSize = cleartext.count
-							let paddingSize = Int(wrapper.padding?.size ?? 0)
-							unpaddedSize = paddedSize - paddingSize
-							
-							payment = wrapper.unwrap()
-						}
-						
-					} catch {
-						log.error("data decryption error: \(String(describing: error))")
-					}
-				}
-				
-				if let asset = record[record_column_meta] as? CKAsset {
-					
-					var ciphertext: Data? = nil
-					if let fileURL = asset.fileURL {
-						
-						do {
-							ciphertext = try Data(contentsOf: fileURL)
-						} catch {
-							log.error("asset read error: \(String(describing: error))")
-						}
-						
-						if let ciphertext = ciphertext {
-							do {
-								let box = try ChaChaPoly.SealedBox(combined: ciphertext)
-								let cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
-								
-								let cleartext_kotlin = cleartext.toKotlinByteArray()
-								let row = CloudAsset.companion.cloudDeserialize(blob: cleartext_kotlin)
-								
-								metadata = row
-								
-							} catch {
-								log.error("meta decryption error: \(String(describing: error))")
-							}
-						}
-					}
-				}
-				
+				let (payment, metadata, unpaddedSize) = self.decryptAndDeserializePayment(record)
 				if let payment = payment {
 					items.append(DownloadedItem(
 						record: record,
@@ -753,7 +688,6 @@ class SyncTxManager {
 						metadata: metadata
 					))
 				}
-				
 			}
 			
 			operation.queryCompletionBlock = { (cursor: CKQueryOperation.Cursor?, error: Error?) in
@@ -1544,6 +1478,87 @@ class SyncTxManager {
 		}
 		
 		return filePath
+	}
+	
+	private func decryptAndDeserializePayment(
+		_ record: CKRecord
+	) -> (Lightning_kmpWalletPayment?, WalletPaymentMetadataRow?, Int) {
+		
+		log.debug("Received record:")
+		log.debug(" - recordID: \(record.recordID)")
+		log.debug(" - creationDate: \(record.creationDate ?? Date.distantPast)")
+		
+		var unpaddedSize: Int = 0
+		var payment: Lightning_kmpWalletPayment? = nil
+		var metadata: WalletPaymentMetadataRow? = nil
+		
+		if let ciphertext = record[record_column_data] as? Data {
+		//	log.debug(" - data.count: \(ciphertext.count)")
+			
+			do {
+				let box = try ChaChaPoly.SealedBox(combined: ciphertext)
+				let cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
+				
+			//	#if DEBUG
+			//	log.debug(" - raw payment: \(cleartext.toHex())")
+			//	#endif
+				
+				let cleartext_kotlin = cleartext.toKotlinByteArray()
+				let wrapper = CloudData.companion.cborDeserialize(blob: cleartext_kotlin)
+				
+				if let wrapper = wrapper {
+					
+				//	#if DEBUG
+				//	let jsonData = wrapper.jsonSerialize().toSwiftData()
+				//	let jsonStr = String(data: jsonData, encoding: .utf8)
+				//	log.debug(" - raw JSON:\n\(jsonStr ?? "<nil>")")
+				//	#endif
+					
+					let paddedSize = cleartext.count
+					let paddingSize = Int(wrapper.padding?.size ?? 0)
+					unpaddedSize = paddedSize - paddingSize
+					
+					payment = wrapper.unwrap()
+				}
+				
+			} catch {
+				log.error("data decryption error: \(String(describing: error))")
+			}
+		}
+		
+		if let asset = record[record_column_meta] as? CKAsset {
+			
+			var ciphertext: Data? = nil
+			if let fileURL = asset.fileURL {
+				
+				do {
+					ciphertext = try Data(contentsOf: fileURL)
+				} catch {
+					log.error("asset read error: \(String(describing: error))")
+				}
+				
+				if let ciphertext = ciphertext {
+					do {
+						let box = try ChaChaPoly.SealedBox(combined: ciphertext)
+						let cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
+						
+					//	#if DEBUG
+					//	log.debug(" - raw metadata: \(cleartext.toHex())")
+					//	#endif
+						
+						let cleartext_kotlin = cleartext.toKotlinByteArray()
+						let row = CloudAsset.companion.cloudDeserialize(blob: cleartext_kotlin)
+						
+						metadata = row
+						
+					} catch {
+						log.error("meta decryption error: \(String(describing: error))")
+					}
+				}
+			}
+		}
+		
+		return (payment, metadata, unpaddedSize)
 	}
 	
 	private func createProgress(
