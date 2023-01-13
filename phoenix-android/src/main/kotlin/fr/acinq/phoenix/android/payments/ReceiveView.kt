@@ -42,6 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.channel.Aborted
+import fr.acinq.lightning.channel.Closed
+import fr.acinq.lightning.channel.Closing
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
@@ -232,7 +235,7 @@ private fun LightningInvoiceView(
     Spacer(modifier = Modifier.height(24.dp))
     LocalWalletContext.current?.payToOpen?.v1?.minFundingSat?.sat?.let { minPayToOpenAmount ->
         val channels by business.peerManager.peerState.filterNotNull().map { it.channelsFlow }.flattenMerge().collectAsState(initial = null)
-        if (channels != null && channels!!.isEmpty()) {
+        if (channels != null && channels!!.filterNot { it.value is Closed || it.value is Closing  || it.value is Aborted}.isEmpty()) {
             Text(
                 text = annotatedStringResource(id = R.string.receive__min_amount_pay_to_open, minPayToOpenAmount.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
                 style = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
@@ -271,7 +274,7 @@ private fun SwapInView(
     LocalWalletContext.current?.swapIn?.v1?.let { swapInConfig ->
         val minFunding = swapInConfig.minFundingSat.sat
         val feePercent = String.format("%.2f", 100 * (swapInConfig.feePercent))
-        val minFee = swapInConfig.minFeeSat.sat
+        val minFee = swapInConfig.minFeeSat
         Spacer(modifier = Modifier.height(24.dp))
         Text(
             text = annotatedStringResource(id = R.string.receive__swapin__disclaimer, minFunding.toPrettyString(BitcoinUnit.Sat, withUnit = true), feePercent, minFee),
