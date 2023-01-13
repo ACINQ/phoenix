@@ -16,8 +16,9 @@
 
 package fr.acinq.phoenix.android.payments
 
-import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,7 +31,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.components.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
@@ -107,7 +110,6 @@ fun PaymentDetailsView(
             onBackClick()
         }
     }
-    BackHandler(onBack = onBack)
     DefaultScreenLayout {
         DefaultScreenHeader(
             onBackClick = onBack,

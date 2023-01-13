@@ -22,9 +22,11 @@ import android.text.Spanned
 import android.text.format.DateUtils
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.data.*
 import org.slf4j.LoggerFactory
@@ -122,6 +124,10 @@ object Converter {
         unit is BitcoinUnit -> this.toUnit(unit).toPrettyString(unit, withUnit, mSatDisplayPolicy)
         unit is FiatCurrency && rate != null -> this.toFiat(rate.price).toPrettyString(unit, withUnit)
         else -> "?!"
+    }
+
+    fun Satoshi.toPrettyString(unit: CurrencyUnit, rate: ExchangeRate.BitcoinPriceRate? = null, withUnit: Boolean = false, mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE): String {
+        return this.toMilliSatoshi().toPrettyString(unit, rate, withUnit, mSatDisplayPolicy)
     }
 
     /** Converts this millis timestamp into a relative string date. */

@@ -59,7 +59,7 @@ fun AmountView(
     unitTextStyle: TextStyle = MaterialTheme.typography.body1,
     separatorSpace: Dp = 4.dp,
     mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE,
-    onClick: suspend (Context, Boolean) -> Unit = { context, inFiat -> UserPrefs.saveIsAmountInFiat(context, !inFiat) }
+    onClick: (suspend (Context, Boolean) -> Unit)? = { context, inFiat -> UserPrefs.saveIsAmountInFiat(context, !inFiat) }
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -81,12 +81,12 @@ fun AmountView(
                 scaleX = if (isPressed) 0.9f else 1f
                 scaleY = if (isPressed) 0.9f else 1f
             }
-            .clickable(
+            .then(if (onClick != null) Modifier.clickable(
                 interactionSource = interactionSource,
                 indication = null,
                 role = Role.Button,
                 onClick = { scope.launch { onClick(context, inFiat) } }
-            )
+            ) else Modifier)
     ) {
         if (!isRedacted && prefix != null && amount > MilliSatoshi(0)) {
             Text(
@@ -164,7 +164,7 @@ fun AmountWithFiatView(
     val fiatAmount = remember(amount) { amount.toPrettyString(prefFiatCurrency, rate, withUnit = true) }
 
     Column {
-        AmountView(amount = amount, amountTextStyle = amountTextStyle, unitTextStyle = unitTextStyle, separatorSpace = separatorSpace, modifier = modifier, forceUnit = prefBtcUnit)
+        AmountView(amount = amount, amountTextStyle = amountTextStyle, unitTextStyle = unitTextStyle, separatorSpace = separatorSpace, modifier = modifier, forceUnit = prefBtcUnit, onClick = null)
         Text(text = stringResource(id = R.string.utils_converted_amount, fiatAmount), style = MaterialTheme.typography.caption)
     }
 }

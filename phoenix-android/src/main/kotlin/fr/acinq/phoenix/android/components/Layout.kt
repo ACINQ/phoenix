@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android.components
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -84,6 +85,7 @@ fun DefaultScreenHeader(
     onBackClick: () -> Unit,
     backgroundColor: Color = MaterialTheme.colors.background,
 ) {
+    BackHandler(onBack = onBackClick)
     Row(
         modifier = Modifier
             .fillMaxWidth()

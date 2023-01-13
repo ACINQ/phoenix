@@ -96,8 +96,8 @@
     <string name="receive__generating">Generating invoice…</string>
     <string name="receive__qr_about">QR Code of the invoice</string>
     <string name="receive__qr_amount_label">Amount:</string>
-    <string name="receive__qr_desc_label">Description:</string>
-    <string name="receive__min_amount_pay_to_open">Your wallet is empty. First deposit must be at least <b>%1$s</b>.</string>
+    <string name="receive__qr_desc_label">Desc:</string>
+    <string name="receive__min_amount_pay_to_open">Your wallet is empty. The first payment you receive must be at least <b>%1$s</b>.</string>
     <string name="receive__edit_button">Edit</string>
     <string name="receive__share_button">Share</string>
     <string name="receive__swapin_button">Show a Bitcoin address</string>
@@ -113,11 +113,8 @@
     <string name="receive__edit__desc_label">Description (optional):</string>
     <string name="receive__edit__generate_button">Create invoice</string>
 
-    <string name="receive__swapin__error_message">Could not retrieve a Bitcoin address from the swap service.\n\nTry again later.</string>
-    <string name="receive__swapin__wait">Requesting a Bitcoin address…</string>
     <string name="receive__swapin__address_label">Address</string>
-    <string name="receive__swapin__min_amount">Deposit must be at least <b>%1$s</b>.</string>
-    <string name="receive__swapin__disclaimer">Funds sent to this address will show on Phoenix when confirmed on-chain.\n\nA <b>%1$s%%</b> fee will apply.</string>
+    <string name="receive__swapin__disclaimer">Deposits will be converted to Lightning channels.\n\nTotal deposits must be at least <b>%1$s</b>.\nThe fee is<b>%2$s%%</b> (%3$s sat minimum).</string>
 
     <!-- //////////////// send //////////////// -->
 
@@ -191,7 +188,7 @@
 
     <string name="accessibility_link">Open a link in a browser</string>
     <string name="validation_empty">This field cannot be blank</string>
-    <string name="validation_invalid_number">Please enter a valid number</string>
+    <string name="validation_invalid_number">Please enter a valid amount</string>
     <string name="validation_no_decimal">This field must be an integer</string>
     <string name="validation_below_min">Must be at least %1$s</string>
     <string name="validation_above_max">Must be no more than %1$s</string>
@@ -314,7 +311,7 @@
     <string name="home__swapin_dialog_valid_title">Incoming deposit</string>
     <string name="home__swapin_dialog_valid_body">Once the incoming payment is confirmed, Phoenix will use the funds to open a payment channel.\n\nThe fee is %1$s%% (%2$s sat minimum).</string>
     <string name="home__swapin_dialog_invalid_title">Deposit below minimum</string>
-  <string name="home__swapin_dialog_invalid_body">Deposits must be at least <b>%1$s</b>. Please make additional deposits to use the funds inside Phoenix.\n\nOnce the minimum amount is reached, Phoenix will use the funds to open a payment channel.\n\nThe fee is %2$s%% (%3$s sat minimum).</string>
+    <string name="home__swapin_dialog_invalid_body">Deposits must be at least <b>%1$s</b>. Please make additional deposits to use the funds inside Phoenix.\n\nOnce the minimum amount is reached, Phoenix will use the funds to open a payment channel.\n\nThe fee is %2$s%% (%3$s sat minimum).</string>
 
     <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">You have not made any payments recently.\n\nUse the Receive and Send buttons at the bottom of this screen to get started!</string>

@@ -103,7 +103,7 @@ object AmountInputHelper {
             return null
         }
         val amount = input.toDoubleOrNull()
-        if (amount == null) {
+        if (amount == null || amount <= 0.0) {
             onError(context.getString(R.string.validation_invalid_number))
             return null
         }
@@ -209,7 +209,8 @@ fun AmountInput(
                         ).let { onAmountChange(it) }
                     },
                     onDismiss = { },
-                    internalPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
+                    internalPadding = PaddingValues(16.dp),
+                    modifier = Modifier.fillMaxHeight()
                 )
 
             },
