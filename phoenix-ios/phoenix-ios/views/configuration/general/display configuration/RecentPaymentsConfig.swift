@@ -14,7 +14,7 @@ import Foundation
  * and help to map between the raw value and the enum option
  */
 
-enum RecentPaymentsConfig_WithinTime: Int, CaseIterable {
+enum RecentPaymentsConfig_WithinTime: Int, CaseIterable, Identifiable {
 	case oneMinute  = 60       // 60 * 1
 	case tenMinutes = 600      // 60 * 10
 	case twoHours   = 7_200    // 60 * 60 * 2
@@ -72,6 +72,17 @@ enum RecentPaymentsConfig_WithinTime: Int, CaseIterable {
 		}
 	}
 	
+	func configDisplayPicker() -> String {
+		switch self {
+		case .oneMinute  : return NSLocalizedString("1 minute", comment: "Recent payments option")
+		case .tenMinutes : return NSLocalizedString("10 minutes", comment: "Recent payments option")
+		case .twoHours   : return NSLocalizedString("2 hours", comment: "Recent payments option")
+		case .oneDay     : return NSLocalizedString("24 hours", comment: "Recent payments option")
+		case .threeDays  : return NSLocalizedString("3 days", comment: "Recent payments option")
+		case .sevenDays  : return NSLocalizedString("7 days", comment: "Recent payments option")
+		}
+	}
+	
 	func homeDisplay(paymentCount count: Int) -> String {
 		switch self {
 		case .oneMinute:
@@ -100,9 +111,20 @@ enum RecentPaymentsConfig_WithinTime: Int, CaseIterable {
 			  : NSLocalizedString("\(count) payments within the last 7 days", comment: "Recent payments footer")
 		}
 	}
+	
+	var id: String {
+		switch self {
+		case .oneMinute  : return "withinTime(1 minute)"
+		case .tenMinutes : return "withinTime(10 minutes)"
+		case .twoHours   : return "withinTime(2 hours)"
+		case .oneDay     : return "withinTime(24 hours)"
+		case .threeDays  : return "withinTime(3 days)"
+		case .sevenDays  : return "withinTime(7 days)"
+		}
+	}
 }
 
-enum RecentPaymentsConfig_MostRecent: Int, CaseIterable {
+enum RecentPaymentsConfig_MostRecent: Int, CaseIterable, Identifiable {
 	case one     = 1
 	case three   = 3
 	case five    = 5
@@ -157,6 +179,28 @@ enum RecentPaymentsConfig_MostRecent: Int, CaseIterable {
 			return NSLocalizedString("Show most recent 15 payments", comment: "Recent payments option")
 		case .twenty:
 			return NSLocalizedString("Show most recent 20 payments", comment: "Recent payments option")
+		}
+	}
+	
+	func configDisplayPicker() -> String {
+		switch self {
+		case .one     : return NSLocalizedString("1 payment", comment: "Recent payments option")
+		case .three   : return NSLocalizedString("3 payments", comment: "Recent payments option")
+		case .five    : return NSLocalizedString("5 payments", comment: "Recent payments option")
+		case .ten     : return NSLocalizedString("10 payments", comment: "Recent payments option")
+		case .fifteen : return NSLocalizedString("15 payments", comment: "Recent payments option")
+		case .twenty  : return NSLocalizedString("20 payments", comment: "Recent payments option")
+		}
+	}
+	
+	var id: String {
+		switch self {
+		case .one     : return "mostRecent(1 payment)"
+		case .three   : return "mostRecent(3 payments)"
+		case .five    : return "mostRecent(5 payments)"
+		case .ten     : return "mostRecent(10 payments)"
+		case .fifteen : return "mostRecent(15 payments)"
+		case .twenty  : return "mostRecent(20 payments)"
 		}
 	}
 }

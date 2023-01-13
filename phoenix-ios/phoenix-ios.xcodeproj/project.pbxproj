@@ -209,6 +209,7 @@
 		DCD7E0AC28EC32CB009C30E5 /* BusinessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD7E0AB28EC32CB009C30E5 /* BusinessManager.swift */; };
 		DCD7E0AF28EC3C0D009C30E5 /* WatchTower.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD7E0AE28EC3C0D009C30E5 /* WatchTower.swift */; };
 		DCD7E0F128ED89A0009C30E5 /* GlobalEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD7E0F028ED89A0009C30E5 /* GlobalEnvironment.swift */; };
+		DCDAA7402971C29700B406A8 /* RecentPaymentsSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDAA73F2971C29700B406A8 /* RecentPaymentsSelector.swift */; };
 		DCDD9ECB28637242001800A3 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ECA28637242001800A3 /* MainView.swift */; };
 		DCDD9ECE28637474001800A3 /* Orientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ECD28637474001800A3 /* Orientation.swift */; };
 		DCDD9ED0286377B7001800A3 /* MainView_Big.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ECF286377B7001800A3 /* MainView_Big.swift */; };
@@ -500,6 +501,7 @@
 		DCD7E0AB28EC32CB009C30E5 /* BusinessManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessManager.swift; sourceTree = "<group>"; };
 		DCD7E0AE28EC3C0D009C30E5 /* WatchTower.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTower.swift; sourceTree = "<group>"; };
 		DCD7E0F028ED89A0009C30E5 /* GlobalEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalEnvironment.swift; sourceTree = "<group>"; };
+		DCDAA73F2971C29700B406A8 /* RecentPaymentsSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPaymentsSelector.swift; sourceTree = "<group>"; };
 		DCDD9ECA28637242001800A3 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		DCDD9ECD28637474001800A3 /* Orientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Orientation.swift; sourceTree = "<group>"; };
 		DCDD9ECF286377B7001800A3 /* MainView_Big.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_Big.swift; sourceTree = "<group>"; };
@@ -800,6 +802,7 @@
 				C8D7A986A61CCD64FA661B88 /* DisplayConfigurationView.swift */,
 				DC2DC8692906AC620079E570 /* FiatCurrencySelector.swift */,
 				DC2DC8672906AC0B0079E570 /* BitcoinUnitSelector.swift */,
+				DCDAA73F2971C29700B406A8 /* RecentPaymentsSelector.swift */,
 				DC2CE54F28A52AD90070A2E1 /* RecentPaymentsConfig.swift */,
 			);
 			path = "display configuration";
@@ -1530,6 +1533,7 @@
 				DC39D4EF287497440030F18D /* SmartModal.swift in Sources */,
 				DC2F431A27B699800006FCC4 /* ModifyInvoiceSheet.swift in Sources */,
 				DCCCEAB528F6DA2A0047871A /* RootView.swift in Sources */,
+				DCDAA7402971C29700B406A8 /* RecentPaymentsSelector.swift in Sources */,
 				DCD5FF4326A0D34B009CC666 /* EqualSizes.swift in Sources */,
 				F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */,
 				DC08A51A27FB6C5F0041603B /* TopTab.swift in Sources */,

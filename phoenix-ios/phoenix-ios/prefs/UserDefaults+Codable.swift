@@ -109,8 +109,19 @@ struct MaxFees: Equatable, Codable {
 	}
 }
 
-enum RecentPaymentsConfig: Equatable, Codable {
+enum RecentPaymentsConfig: Equatable, Codable, Identifiable {
 	case withinTime(seconds: Int)
 	case mostRecent(count: Int)
 	case inFlightOnly
+	
+	var id: String {
+		switch self {
+		case .withinTime(let seconds):
+			return "withinTime(seconds=\(seconds))"
+		case .mostRecent(let count):
+			return "mostRecent(count=\(count)"
+		case .inFlightOnly:
+			return "inFlightOnly"
+		}
+	}
 }
