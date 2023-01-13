@@ -473,14 +473,12 @@ struct HomeView : MVIView {
 					}
 				}
 				
-				let totalPaymentCount: Int? = paymentsPage.rows.count < paymentsPage.count
-				  ? paymentsPage.rows.count + Int(paymentsPage.offset)
-				  : nil
-				
+				let totalPaymentCount = paymentsPage.rows.count + Int(paymentsPage.offset)
 				FooterCell(
 					totalPaymentCount: totalPaymentCount,
 					recentPaymentsConfig: recentPaymentsConfig,
-					isDownloadingRecentTxs: isDownloadingRecentTxs(),
+					isDownloadingMoreTxs: isDownloadingMoreTxs(),
+					isFetchingMoreTxs: isFetchingMoreTxs(),
 					didAppearCallback: footerCellDidAppear
 				)
 				.accessibilitySortPriority(10)
@@ -493,7 +491,7 @@ struct HomeView : MVIView {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func isDownloadingRecentTxs() -> Bool {
+	func isDownloadingMoreTxs() -> Bool {
 		
 		guard syncState.isDownloading else {
 			return false
@@ -548,6 +546,56 @@ struct HomeView : MVIView {
 			// We're only displaying (outgoing) in-flight payments.
 			// So there's no need to show the "still downloading" notice.
 			return false
+		}
+	}
+	
+	func isFetchingMoreTxs() -> Bool {
+		
+		switch recentPaymentsConfig {
+		case .withinTime(_):
+			// For this config, we increase the fetchCount when we scroll to the bottom:
+			//
+			// paymentsPageFetcher.subscribeToRecent(
+			//   offset: 0,
+			//   count: Int32(PAGE_COUNT_START), <-- value gets increased
+			//   seconds: Int32(seconds)
+			// )
+			//
+			// So we fetch more when we get to the end, if there might be more.
+			
+			if paymentsPage.rows.count < paymentsPage.count {
+				return false // done
+			} else {
+				return true // might be more
+			}
+			
+		case .mostRecent(_):
+			// For this config, we the fetchCount matches the recentCount:
+			//
+			// paymentsPageFetcher.subscribeToAll(
+			//   offset: 0,
+			//   count: Int32(count) <-- max value; doesn't change
+			// )
+			//
+			// So we don't ever have more to fetch from the database.
+			
+			return false
+			
+		case .inFlightOnly:
+			// For this config, we increase the fetchCount when we scroll to the bottom:
+			//
+			// paymentsPageFetcher.subscribeToInFlight(
+			//   offset: 0,
+			//   count: Int32(PAGE_COUNT_START) <-- value gets increased
+			// )
+			//
+			// So we fetch more when we get to the end, if there might be more.
+			
+			if paymentsPage.rows.count < paymentsPage.count {
+				return false // done
+			} else {
+				return true // might be more
+			}
 		}
 	}
 	
@@ -893,9 +941,10 @@ fileprivate struct NoticeBox<Content: View>: View {
 
 fileprivate struct FooterCell: View {
 	
-	let totalPaymentCount: Int?
+	let totalPaymentCount: Int
 	let recentPaymentsConfig: RecentPaymentsConfig
-	let isDownloadingRecentTxs: Bool
+	let isDownloadingMoreTxs: Bool
+	let isFetchingMoreTxs: Bool
 	let didAppearCallback: () -> Void
 	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -903,12 +952,12 @@ fileprivate struct FooterCell: View {
 	@ViewBuilder
 	var body: some View {
 		Group {
-			if isDownloadingRecentTxs {
+			if isDownloadingMoreTxs {
 				body_downloading()
-			} else if let totalPaymentCount = totalPaymentCount {
-				body_ready(totalPaymentCount)
+			} else if isFetchingMoreTxs {
+				body_fetching()
 			} else {
-				body_pending()
+				body_ready()
 			}
 		}
 		.onAppear {
@@ -931,11 +980,20 @@ fileprivate struct FooterCell: View {
 	}
 	
 	@ViewBuilder
-	func body_ready(_ totalPaymentCount: Int) -> some View {
+	func body_fetching() -> some View {
+		
+		Text("fetching more rows...")
+			.font(.footnote)
+			.foregroundColor(.secondary)
+			.padding(.vertical, 10)
+	}
+	
+	@ViewBuilder
+	func body_ready() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			Text(verbatim: limitedPaymentsText(totalPaymentCount))
+			Text(verbatim: limitedPaymentsText())
 				.font(.subheadline)
 				.multilineTextAlignment(.center)
 				.foregroundColor(.secondary)
@@ -952,16 +1010,7 @@ fileprivate struct FooterCell: View {
 		.padding(.vertical, 10)
 	}
 	
-	@ViewBuilder
-	func body_pending() -> some View {
-		
-		Text("fetching more rows...")
-			.font(.footnote)
-			.foregroundColor(.secondary)
-			.padding(.vertical, 10)
-	}
-	
-	func limitedPaymentsText(_ totalPaymentCount: Int) -> String {
+	func limitedPaymentsText() -> String {
 		
 		switch recentPaymentsConfig {
 		case .withinTime(let seconds):
