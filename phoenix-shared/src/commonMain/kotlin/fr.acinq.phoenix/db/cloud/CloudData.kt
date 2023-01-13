@@ -115,7 +115,7 @@ fun CloudData.cborSerialize(): ByteArray {
 fun CloudData.Companion.cborDeserialize(
     blob: ByteArray
 ): CloudData {
-    return Cbor { ignoreUnknownKeys = true}.decodeFromByteArray(blob)
+    return cborSerializer().decodeFromByteArray(blob)
 }
 
 // For DEBUGGING:

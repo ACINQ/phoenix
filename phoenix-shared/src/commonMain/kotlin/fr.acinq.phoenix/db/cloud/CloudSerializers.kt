@@ -4,6 +4,7 @@ import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.utils.UUID
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -63,6 +64,15 @@ import kotlinx.serialization.encoding.Encoder
 //
 // The winner is CBOR with @ByteString.
 
+/**
+ * Standard Cbor instance for serialization.
+ */
+fun cborSerializer() = Cbor { ignoreUnknownKeys = true }
+
+/**
+ * Serializer that uses base64 encoding.
+ * (this is more compact than hexadecimal encoding)
+ */
 object ByteVectorJsonSerializer : KSerializer<ByteVector> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("ByteVector", PrimitiveKind.STRING)
@@ -76,6 +86,10 @@ object ByteVectorJsonSerializer : KSerializer<ByteVector> {
     }
 }
 
+/**
+ * Serializer that uses base64 encoding.
+ * (this is more compact than hexadecimal encoding)
+ */
 object ByteVector32JsonSerializer : KSerializer<ByteVector32> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("ByteVector32", PrimitiveKind.STRING)
@@ -89,14 +103,15 @@ object ByteVector32JsonSerializer : KSerializer<ByteVector32> {
     }
 }
 
-// A UUID is serialized as: {
-//   "mostSignificantBits":-1321539888342873580,
-//   "leastSignificantBits":-7509590717981962141
-// }
-//
-// But we can decrease the size.
-//
-
+/**
+ * The old version (fr.acinq.phoenix.db.serializers.v1.UUIDSerializer)
+ * serializes a UUID like this: {
+ *   "mostSignificantBits":-1321539888342873580,
+ *   "leastSignificantBits":-7509590717981962141
+ * }
+ *
+ * This version is more compact.
+*/
 object UUIDSerializer : KSerializer<UUID> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)

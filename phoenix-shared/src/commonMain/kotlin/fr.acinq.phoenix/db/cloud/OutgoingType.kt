@@ -139,5 +139,5 @@ fun OutgoingPayment.cborSerialize(): ByteArray {
 fun OutgoingPaymentWrapper.cborDeserialize(
     blob: ByteArray
 ): OutgoingPaymentWrapper {
-    return Cbor { ignoreUnknownKeys = true }.decodeFromByteArray(blob)
+    return cborSerializer().decodeFromByteArray(blob)
 }
