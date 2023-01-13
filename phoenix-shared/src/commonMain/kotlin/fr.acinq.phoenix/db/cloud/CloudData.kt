@@ -45,12 +45,10 @@ import kotlinx.serialization.json.Json
 //
 // OPTIMIZATION #2:
 //
-// UUID is serialized as: {
-//   mostSignificantBits: Long,
-//   leastSignificantBits: Long
-// }
-// This is improved using a custom serializer.
-//
+// We use custom serializers when the other versions are found to
+// be inefficient (in terms of space).
+// For example, we supply an alternative UUIDSerializer.
+
 
 enum class CloudDataVersion(val value: Int) {
     // Initial version
@@ -73,17 +71,17 @@ data class CloudData(
     @SerialName("p")
     val padding: ByteArray?,
 ) {
-    constructor(incoming: IncomingPayment, version: CloudDataVersion) : this(
+    constructor(incoming: IncomingPayment) : this(
         incoming = IncomingPaymentWrapper(incoming),
         outgoing = null,
-        version = version.value,
+        version = CloudDataVersion.V0.value,
         padding = ByteArray(size = 0)
     )
 
-    constructor(outgoing: OutgoingPayment, version: CloudDataVersion) : this(
+    constructor(outgoing: OutgoingPayment) : this(
         incoming = null,
         outgoing = OutgoingPaymentWrapper(outgoing),
-        version = version.value,
+        version = CloudDataVersion.V0.value,
         padding = ByteArray(size = 0)
     )
 
@@ -118,14 +116,15 @@ fun CloudData.Companion.cborDeserialize(
     return cborSerializer().decodeFromByteArray(blob)
 }
 
-// For DEBUGGING:
-//
-// You can use the jsonSerializer to see what the data looks like.
-// Just keep in mind that the ByteArray's will be encoded super-inefficiently.
-// That's because we're optimizing for Cbor.
-// To optimize for JSON, you would use ByteVector's,
-// and encode the data as Base64 via ByteVectorJsonSerializer.
-
+/**
+ * For DEBUGGING:
+ *
+ * You can use the jsonSerializer to see what the data looks like.
+ * Just keep in mind that the ByteArray's will be encoded super-inefficiently.
+ * That's because we're optimizing for Cbor.
+ * To optimize for JSON, you would use ByteVector's,
+ * and encode the data as Base64 via ByteVectorJsonSerializer.
+ */
 fun CloudData.jsonSerialize(): ByteArray {
     return Json.encodeToString(this).encodeToByteArray()
 }

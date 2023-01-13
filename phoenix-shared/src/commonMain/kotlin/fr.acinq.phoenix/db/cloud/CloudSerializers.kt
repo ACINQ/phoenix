@@ -3,6 +3,7 @@ package fr.acinq.phoenix.db.cloud
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.utils.UUID
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -67,6 +68,7 @@ import kotlinx.serialization.encoding.Encoder
 /**
  * Standard Cbor instance for serialization.
  */
+@OptIn(ExperimentalSerializationApi::class)
 fun cborSerializer() = Cbor { ignoreUnknownKeys = true }
 
 /**

@@ -1327,10 +1327,10 @@ class SyncTxManager {
 		var wrapper: CloudData? = nil
 		
 		if let incoming = row as? Lightning_kmpIncomingPayment {
-			wrapper = CloudData(incoming: incoming, version: CloudDataVersion.v0)
+			wrapper = CloudData(incoming: incoming)
 			
 		} else if let outgoing = row as? Lightning_kmpOutgoingPayment {
-			wrapper = CloudData(outgoing: outgoing, version: CloudDataVersion.v0)
+			wrapper = CloudData(outgoing: outgoing)
 		}
 		
 		var cleartext: Data? = nil
@@ -1454,7 +1454,7 @@ class SyncTxManager {
 			return nil
 		}
 		
-		let cleartext = row.cloudSerialize().toSwiftData()
+		let cleartext = CloudAsset(row: row).cborSerialize().toSwiftData()
 		
 		let ciphertext: Data
 		do {
@@ -1540,30 +1540,42 @@ class SyncTxManager {
 			
 			var ciphertext: Data? = nil
 			if let fileURL = asset.fileURL {
-				
 				do {
 					ciphertext = try Data(contentsOf: fileURL)
 				} catch {
 					log.error("Error reading record.asset: \(String(describing: error))")
 				}
-				
-				if let ciphertext = ciphertext {
-					do {
-						let box = try ChaChaPoly.SealedBox(combined: ciphertext)
-						let cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
-						
-					//	#if DEBUG
-					//	log.debug(" - raw metadata: \(cleartext.toHex())")
-					//	#endif
-						
-						let cleartext_kotlin = cleartext.toKotlinByteArray()
-						let row = CloudAsset.companion.cloudDeserialize(blob: cleartext_kotlin)
-						
-						metadata = row
-						
-					} catch {
-						log.error("Error decrypting record.asset: \(String(describing: error))")
-					}
+			}
+			
+			var cleartext: Data? = nil
+			if let ciphertext {
+				do {
+					let box = try ChaChaPoly.SealedBox(combined: ciphertext)
+					cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
+					
+				//	#if DEBUG
+				//	log.debug(" - raw metadata: \(cleartext.toHex())")
+				//	#endif
+				} catch {
+					log.error("Error decrypting record.asset: \(String(describing: error))")
+				}
+			}
+			
+			var cloudAsset: CloudAsset? = nil
+			if let cleartext {
+				do {
+					let cleartext_kotlin = cleartext.toKotlinByteArray()
+					cloudAsset = try CloudAsset.companion.cborDeserialize(blob: cleartext_kotlin)
+				} catch {
+					log.error("Error deserializing record.asset: \(String(describing: error))")
+				}
+			}
+			
+			if let cloudAsset {
+				do {
+					metadata = try cloudAsset.unwrap()
+				} catch {
+					log.error("Error unwrapping record.asset: \(String(describing: error))")
 				}
 			}
 		}
