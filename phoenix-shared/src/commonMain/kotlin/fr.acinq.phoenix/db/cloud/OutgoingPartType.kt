@@ -13,7 +13,8 @@ import kotlinx.serialization.cbor.ByteString
 
 
 @Serializable
-data class OutgoingClosingTxPartWrapper @OptIn(ExperimentalSerializationApi::class) constructor(
+@OptIn(ExperimentalSerializationApi::class)
+data class OutgoingClosingTxPartWrapper(
     @Serializable(with = UUIDSerializer::class) val id: UUID,
     @ByteString val txId: ByteArray,
     val sat: Long,
@@ -39,7 +40,8 @@ data class OutgoingClosingTxPartWrapper @OptIn(ExperimentalSerializationApi::cla
 
     /** Wrapper for the closing info data object. */
     @Serializable
-    data class ClosingInfoWrapper @OptIn(ExperimentalSerializationApi::class) constructor(
+    @OptIn(ExperimentalSerializationApi::class)
+    data class ClosingInfoWrapper(
         val type: String,
         @ByteString
         val blob: ByteArray
@@ -90,7 +92,8 @@ data class OutgoingPartWrapper(
     )
 
     @Serializable
-    data class StatusWrapper @OptIn(ExperimentalSerializationApi::class) constructor(
+    @OptIn(ExperimentalSerializationApi::class)
+    data class StatusWrapper(
         val ts: Long, // timestamp: completedAt
         val type: String,
         @ByteString

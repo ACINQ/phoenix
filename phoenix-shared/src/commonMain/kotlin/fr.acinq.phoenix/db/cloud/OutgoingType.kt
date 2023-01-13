@@ -10,7 +10,8 @@ import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
 
 @Serializable
-data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) constructor(
+@OptIn(ExperimentalSerializationApi::class)
+data class OutgoingPaymentWrapper(
     @Serializable(with = UUIDSerializer::class)
     val id: UUID,
     val msat: Long,
@@ -33,6 +34,7 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
         createdAt = payment.createdAt
     )
 
+    @Throws(Exception::class)
     fun unwrap() = OutgoingPayment(
         id = id,
         amount = MilliSatoshi(msat = msat),
@@ -45,7 +47,8 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
     )
 
     @Serializable
-    data class DetailsWrapper @OptIn(ExperimentalSerializationApi::class) constructor(
+    @OptIn(ExperimentalSerializationApi::class)
+    data class DetailsWrapper(
         val type: String,
         @ByteString
         val blob: ByteArray
@@ -70,7 +73,8 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
     } // </DetailsWrapper>
 
     @Serializable
-    data class StatusWrapper @OptIn(ExperimentalSerializationApi::class) constructor(
+    @OptIn(ExperimentalSerializationApi::class)
+    data class StatusWrapper(
         val ts: Long,
         val type: String,
         @ByteString
@@ -131,8 +135,9 @@ fun OutgoingPayment.cborSerialize(): ByteArray {
 }
 
 @OptIn(ExperimentalSerializationApi::class)
-fun OutgoingPaymentWrapper.cborDeserialize(blob: ByteArray): OutgoingPayment? = try {
-    Cbor.decodeFromByteArray<OutgoingPaymentWrapper>(blob).unwrap()
-} catch (e: Throwable) {
-    null
+@Throws(Exception::class)
+fun OutgoingPaymentWrapper.cborDeserialize(
+    blob: ByteArray
+): OutgoingPaymentWrapper {
+    return cborSerializer().decodeFromByteArray(blob)
 }

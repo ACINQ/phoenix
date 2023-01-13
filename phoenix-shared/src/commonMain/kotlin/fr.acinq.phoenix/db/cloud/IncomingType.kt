@@ -8,7 +8,8 @@ import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
 
 @Serializable
-data class IncomingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) constructor(
+@OptIn(ExperimentalSerializationApi::class)
+data class IncomingPaymentWrapper(
     @ByteString
     val preimage: ByteArray,
     val origin: OriginWrapper,
@@ -36,7 +37,8 @@ data class IncomingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
     }
 
     @Serializable
-    data class OriginWrapper @OptIn(ExperimentalSerializationApi::class) constructor(
+    @OptIn(ExperimentalSerializationApi::class)
+    data class OriginWrapper(
         val type: String,
         @ByteString
         val blob: ByteArray
@@ -61,7 +63,8 @@ data class IncomingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
     } // </OriginWrapper>
 
     @Serializable
-    data class ReceivedWrapper @OptIn(ExperimentalSerializationApi::class) constructor(
+    @OptIn(ExperimentalSerializationApi::class)
+    data class ReceivedWrapper(
         val ts: Long, // timestamp / receivedAt
         val type: String,
         @ByteString
@@ -81,6 +84,7 @@ data class IncomingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
             }
         }
 
+        @Throws(Exception::class)
         fun unwrap(originTypeVersion: IncomingOriginTypeVersion): IncomingPayment.Received {
             val receivedWith = IncomingReceivedWithData.deserialize(
                 typeVersion = IncomingReceivedWithTypeVersion.valueOf(type),
@@ -105,8 +109,9 @@ fun IncomingPayment.cborSerialize(): ByteArray {
 }
 
 @OptIn(ExperimentalSerializationApi::class)
-fun IncomingPaymentWrapper.Companion.cborDeserialize(blob: ByteArray): IncomingPayment? = try {
-    Cbor.decodeFromByteArray<IncomingPaymentWrapper>(blob).unwrap()
-} catch (e: Throwable) {
-    null
+@Throws(Exception::class)
+fun IncomingPaymentWrapper.Companion.cborDeserialize(
+    blob: ByteArray
+): IncomingPaymentWrapper {
+    return cborSerializer().decodeFromByteArray(blob)
 }
