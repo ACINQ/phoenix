@@ -57,6 +57,13 @@ class AppMigration {
 			AppSecurity.shared.performMigration("41", completionPublisher)
 		}
 		
+		// v1.6.0 (build 44)
+		// - recentPaymentsSeconds -> recentPayments (enum)
+		//
+		if previousBuild.isVersion(lessThan: "44") {
+			Prefs.shared.performMigration("44", completionPublisher)
+		}
+		
 		completionPublisher.value -= 1
 	}
 	

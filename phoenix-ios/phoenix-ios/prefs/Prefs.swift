@@ -22,6 +22,10 @@ fileprivate enum Key: String {
 	case invoiceExpirationDays
 	case maxFees
 	case hideAmountsOnHomeScreen
+	case recentPaymentsConfig
+}
+
+fileprivate enum KeyDeprecated: String {
 	case recentPaymentSeconds
 }
 
@@ -37,8 +41,7 @@ class Prefs {
 	private init() {
 		UserDefaults.standard.register(defaults: [
 			Key.isNewWallet.rawValue: true,
-			Key.invoiceExpirationDays.rawValue: 7,
-			Key.recentPaymentSeconds.rawValue: (60 * 60 * 24 * 3)
+			Key.invoiceExpirationDays.rawValue: 7
 		])
 	}
 	
@@ -100,15 +103,20 @@ class Prefs {
 		set { defaults.hideAmountsOnHomeScreen = newValue }
 	}
 	
-	lazy private(set) var recentPaymentSecondsPublisher: AnyPublisher<Int, Never> = {
-		defaults.publisher(for: \.recentPaymentSeconds, options: [.new])
+	lazy private(set) var recentPaymentsConfigPublisher: AnyPublisher<RecentPaymentsConfig, Never> = {
+		defaults.publisher(for: \.recentPaymentsConfig, options: [.new])
+			.map({ (data: Data?) -> RecentPaymentsConfig in
+				data?.jsonDecode() ?? self.defaultRecentPaymentsConfig
+			})
 			.removeDuplicates()
 			.eraseToAnyPublisher()
 	}()
 	
-	var recentPaymentSeconds: Int {
-		get { defaults.recentPaymentSeconds }
-		set { defaults.recentPaymentSeconds = newValue }
+	let defaultRecentPaymentsConfig = RecentPaymentsConfig.withinTime(seconds: (60 * 60 * 24 * 3))
+	
+	var recentPaymentsConfig: RecentPaymentsConfig {
+		get { defaults.recentPaymentsConfig?.jsonDecode() ?? defaultRecentPaymentsConfig }
+		set { defaults.recentPaymentsConfig = newValue.jsonEncode() }
 	}
 	
 	// --------------------------------------------------
@@ -174,6 +182,43 @@ class Prefs {
 	}()
 
 	// --------------------------------------------------
+	// MARK: Migration
+	// --------------------------------------------------
+	
+	public func performMigration(
+		_ targetBuild: String,
+		_ completionPublisher: CurrentValueSubject<Int, Never>
+	) -> Void {
+		log.trace("performMigration(to: \(targetBuild))")
+		
+		// NB: The first version released in the App Store was version 1.0.0 (build 17)
+		
+		if targetBuild.isVersion(equalTo: "44") {
+			performMigration_toBuild44()
+		}
+	}
+	
+	private func performMigration_toBuild44() {
+		log.trace("performMigration_toBuild44()")
+		
+		let oldKey = KeyDeprecated.recentPaymentSeconds.rawValue
+		let newKey = Key.recentPaymentsConfig.rawValue
+		
+		if defaults.object(forKey: oldKey) != nil {
+			let seconds = defaults.integer(forKey: oldKey)
+			if seconds <= 0 {
+				let newValue = RecentPaymentsConfig.inFlightOnly
+				defaults.set(newValue.jsonEncode(), forKey: newKey)
+			} else {
+				let newValue = RecentPaymentsConfig.withinTime(seconds: seconds)
+				defaults.set(newValue.jsonEncode(), forKey: newKey)
+			}
+			
+			defaults.removeObject(forKey: oldKey)
+		}
+	}
+	
+	// --------------------------------------------------
 	// MARK: Reset Wallet
 	// --------------------------------------------------
 
@@ -190,8 +235,8 @@ class Prefs {
 		defaults.removeObject(forKey: Key.invoiceExpirationDays.rawValue)
 		defaults.removeObject(forKey: Key.maxFees.rawValue)
 		defaults.removeObject(forKey: Key.hideAmountsOnHomeScreen.rawValue)
-		defaults.removeObject(forKey: Key.recentPaymentSeconds.rawValue)
-
+		defaults.removeObject(forKey: Key.recentPaymentsConfig.rawValue)
+		
 		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
 		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
 	}
@@ -228,10 +273,10 @@ extension UserDefaults {
 		get { bool(forKey: Key.hideAmountsOnHomeScreen.rawValue) }
 		set { set(newValue, forKey: Key.hideAmountsOnHomeScreen.rawValue) }
 	}
-
-	@objc fileprivate var recentPaymentSeconds: Int {
-		get { integer(forKey: Key.recentPaymentSeconds.rawValue) }
-		set { set(newValue, forKey: Key.recentPaymentSeconds.rawValue) }
+	
+	@objc fileprivate var recentPaymentsConfig: Data? {
+		get { data(forKey: Key.recentPaymentsConfig.rawValue) }
+		set { set(newValue, forKey: Key.recentPaymentsConfig.rawValue) }
 	}
 
 	@objc fileprivate var isNewWallet: Bool {

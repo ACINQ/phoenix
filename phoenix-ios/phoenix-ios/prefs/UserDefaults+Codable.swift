@@ -108,3 +108,9 @@ struct MaxFees: Equatable, Codable {
 		)
 	}
 }
+
+enum RecentPaymentsConfig: Equatable, Codable {
+	case withinTime(seconds: Int)
+	case mostRecent(count: Int)
+	case inFlightOnly
+}

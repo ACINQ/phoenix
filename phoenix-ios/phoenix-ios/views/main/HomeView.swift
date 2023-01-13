@@ -40,8 +40,8 @@ struct HomeView : MVIView {
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
-	let recentPaymentSecondsPublisher = Prefs.shared.recentPaymentSecondsPublisher
-	@State var recentPaymentSeconds = Prefs.shared.recentPaymentSeconds
+	let recentPaymentsConfigPublisher = Prefs.shared.recentPaymentsConfigPublisher
+	@State var recentPaymentsConfig = Prefs.shared.recentPaymentsConfig
 	
 	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
@@ -107,8 +107,8 @@ struct HomeView : MVIView {
 		.onChange(of: currencyPrefs.hideAmountsOnHomeScreen) { _ in
 			hideAmountsOnHomeScreenChanged()
 		}
-		.onReceive(recentPaymentSecondsPublisher) {
-			recentPaymentSecondsChanged($0)
+		.onReceive(recentPaymentsConfigPublisher) {
+			recentPaymentsConfigChanged($0)
 		}
 		.onReceive(paymentsPagePublisher) {
 			paymentsPageChanged($0)
@@ -479,7 +479,7 @@ struct HomeView : MVIView {
 				
 				FooterCell(
 					totalPaymentCount: totalPaymentCount,
-					recentPaymentSeconds: recentPaymentSeconds,
+					recentPaymentsConfig: recentPaymentsConfig,
 					isDownloadingRecentTxs: isDownloadingRecentTxs(),
 					didAppearCallback: footerCellDidAppear
 				)
@@ -499,26 +499,55 @@ struct HomeView : MVIView {
 			return false
 		}
 		
-		if let oldest = syncState.oldestCompletedDownload {
-			log.debug("oldest = \(oldest.description)")
+		switch recentPaymentsConfig {
+		case .withinTime(let seconds):
 			
-			// We've downloaded one or more batches from the cloud.
-			// Let's check to see if we expect to download any more "recent" payments.
-			let cutoff = Date().addingTimeInterval(Double(recentPaymentSeconds * -1))
-			log.debug("cutoff = \(cutoff.description)")
+			// We're displaying all "recent" payments within a given time period.
+			//
+			// So we may still be downloading these payments until `syncState.oldestCompletedDownload`
+			// shows a date older than our "recent" range.
 			
-			if oldest < cutoff {
-				// Already downloaded all the tx's that could be considered "recent"
-				return false
+			if let oldest = syncState.oldestCompletedDownload {
+				log.debug("oldest = \(oldest.description)")
+				
+				// We've downloaded one or more batches from the cloud.
+				// Let's check to see if we expect to download any more "recent" payments.
+				let cutoff = Date().addingTimeInterval(Double(seconds * -1))
+				log.debug("cutoff = \(cutoff.description)")
+				
+				if oldest < cutoff {
+					// Already downloaded all the tx's that could be considered "recent"
+					return false
+				} else {
+					// May have more "recent" tx's to download
+					return true
+				}
+				
 			} else {
-				// May have more "recent" tx's to download
+				// We're downloading the first batch from the cloud
+				log.debug("oldest = nil")
 				return true
 			}
 			
-		} else {
-			// We're downloading the first batch from the cloud
-			log.debug("oldest = nil")
-			return true
+		case .mostRecent(let count):
+			
+			// We're displaying the most recent X payments.
+			//
+			// So we may still be downloading these payments until either:
+			// - we have X payments in the database (we always download from newest to oldest)
+			// - we're no longer downloading from the cloud
+			
+			if paymentsPage.count >= count {
+				return false
+			} else {
+				return true
+			}
+			
+		case .inFlightOnly:
+			
+			// We're only displaying (outgoing) in-flight payments.
+			// So there's no need to show the "still downloading" notice.
+			return false
 		}
 	}
 	
@@ -532,11 +561,7 @@ struct HomeView : MVIView {
 		// Careful: this function may be called when returning from the Receive/Send view
 		if !didAppear {
 			didAppear = true
-			paymentsPageFetcher.subscribeToRecent(
-				offset: 0,
-				count: Int32(PAGE_COUNT_START),
-				seconds: Int32(recentPaymentSeconds)
-			)
+			paymentsPageFetcher_subscribe()
 		}
 	}
 	
@@ -565,15 +590,11 @@ struct HomeView : MVIView {
 		UIAccessibility.post(notification: .screenChanged, argument: nil)
 	}
 
-	func recentPaymentSecondsChanged(_ seconds: Int) {
-		log.trace("recentPaymentSecondsChanged()")
+	func recentPaymentsConfigChanged(_ value: RecentPaymentsConfig) {
+		log.trace("recentPaymentsConfigChanged()")
 		
-		recentPaymentSeconds = seconds
-		paymentsPageFetcher.subscribeToRecent(
-			offset: 0,
-			count: Int32(PAGE_COUNT_START),
-			seconds: Int32(seconds)
-		)
+		recentPaymentsConfig = value
+		paymentsPageFetcher_subscribe()
 	}
 	
 	func paymentsPageChanged(_ page: PaymentsPage) {
@@ -644,24 +665,29 @@ struct HomeView : MVIView {
 		
 		let maybeHasMoreRowsInDatabase = paymentsPage.rows.count == paymentsPage.count
 		if maybeHasMoreRowsInDatabase {
-			log.trace("maybeHasMoreRowsInDatabase")
+			log.debug("maybeHasMoreRowsInDatabase")
 			
-			// increase paymentsPage.count
-			
-			let prvOffset = paymentsPage.offset
-			let newCount = paymentsPage.count + Int32(PAGE_COUNT_INCREMENT)
-			
-			log.debug("increasing page.count: Page(offset=\(prvOffset), count=\(newCount)")
-			
-			paymentsPageFetcher.subscribeToRecent(
-				offset: prvOffset,
-				count: newCount,
-				seconds: Int32(recentPaymentSeconds)
-			)
+			if case let .withinTime(recentPaymentSeconds) = recentPaymentsConfig {
+				
+				// increase paymentsPage.count
+				
+				let prvOffset = paymentsPage.offset
+				let newCount = paymentsPage.count + Int32(PAGE_COUNT_INCREMENT)
+				
+				log.debug("increasing page.count: Page(offset=\(prvOffset), count=\(newCount)")
+				
+				paymentsPageFetcher.subscribeToRecent(
+					offset: prvOffset,
+					count: newCount,
+					seconds: Int32(recentPaymentSeconds)
+				)
+			} else {
+				log.debug("!recentPayments.withinTime(X)")
+			}
 			
 		} else {
 			
-			log.trace("!maybeHasMoreRowsInDatabase")
+			log.debug("!maybeHasMoreRowsInDatabase")
 		}
 	}
 	
@@ -727,6 +753,32 @@ struct HomeView : MVIView {
 			if let result = result {
 				selectedItem = result
 			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: PaymentsFetcher
+	// --------------------------------------------------
+	
+	func paymentsPageFetcher_subscribe() {
+		
+		switch recentPaymentsConfig {
+		case .withinTime(let seconds):
+			paymentsPageFetcher.subscribeToRecent(
+				offset: 0,
+				count: Int32(PAGE_COUNT_START),
+				seconds: Int32(seconds)
+			)
+		case .mostRecent(let count):
+			paymentsPageFetcher.subscribeToAll(
+				offset: 0,
+				count: Int32(count)
+			)
+		case .inFlightOnly:
+			paymentsPageFetcher.subscribeToInFlight(
+				offset: 0,
+				count: Int32(PAGE_COUNT_START)
+			)
 		}
 	}
 	
@@ -842,7 +894,7 @@ fileprivate struct NoticeBox<Content: View>: View {
 fileprivate struct FooterCell: View {
 	
 	let totalPaymentCount: Int?
-	let recentPaymentSeconds: Int
+	let recentPaymentsConfig: RecentPaymentsConfig
 	let isDownloadingRecentTxs: Bool
 	let didAppearCallback: () -> Void
 	
@@ -882,10 +934,8 @@ fileprivate struct FooterCell: View {
 	func body_ready(_ totalPaymentCount: Int) -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			let option = RecentPaymentsOption.closest(seconds: recentPaymentSeconds).1
-			let localizedString = option.homeDisplay(paymentCount: totalPaymentCount)
 			
-			Text(verbatim: localizedString)
+			Text(verbatim: limitedPaymentsText(totalPaymentCount))
 				.font(.subheadline)
 				.multilineTextAlignment(.center)
 				.foregroundColor(.secondary)
@@ -909,6 +959,29 @@ fileprivate struct FooterCell: View {
 			.font(.footnote)
 			.foregroundColor(.secondary)
 			.padding(.vertical, 10)
+	}
+	
+	func limitedPaymentsText(_ totalPaymentCount: Int) -> String {
+		
+		switch recentPaymentsConfig {
+		case .withinTime(let seconds):
+			let option = RecentPaymentsConfig_WithinTime.closest(seconds: seconds).1
+			return option.homeDisplay(paymentCount: totalPaymentCount)
+			
+		case .mostRecent(_):
+			if totalPaymentCount == 1 {
+				return NSLocalizedString("1 recent payment", comment: "Recent payments footer")
+			} else {
+				return NSLocalizedString("\(totalPaymentCount) recent payments", comment: "Recent payments footer")
+			}
+			
+		case .inFlightOnly:
+			if totalPaymentCount == 1 {
+				return NSLocalizedString("1 in-flight payment", comment: "Recent payments footer")
+			} else {
+				return NSLocalizedString("\(totalPaymentCount) in-flight payments", comment: "Recent payments footer")
+			}
+		}
 	}
 	
 	func onAppear() {
