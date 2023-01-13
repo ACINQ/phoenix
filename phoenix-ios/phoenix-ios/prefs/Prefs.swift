@@ -112,7 +112,7 @@ class Prefs {
 			.eraseToAnyPublisher()
 	}()
 	
-	let defaultRecentPaymentsConfig = RecentPaymentsConfig.withinTime(seconds: (60 * 60 * 24 * 3))
+	let defaultRecentPaymentsConfig = RecentPaymentsConfig.mostRecent(count: 3)
 	
 	var recentPaymentsConfig: RecentPaymentsConfig {
 		get { defaults.recentPaymentsConfig?.jsonDecode() ?? defaultRecentPaymentsConfig }
