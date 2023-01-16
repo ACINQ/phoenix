@@ -16,11 +16,7 @@
 
 package fr.acinq.phoenix.android.home
 
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -49,13 +45,10 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
-import fr.acinq.phoenix.android.CF
+import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.fiatRate
-import fr.acinq.phoenix.android.preferredAmountUnit
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
@@ -428,7 +421,7 @@ private fun LatestPaymentsList(
                     items = payments,
                 ) {
                     if (it.paymentInfo == null) {
-                        LaunchedEffect(key1 = it.orderRow.id.identifier) {
+                        LaunchedEffect(key1 = it.orderRow.identifier) {
                             fetchPaymentDetails(it.orderRow)
                         }
                         PaymentLineLoading(it.orderRow.id, onPaymentClick)
