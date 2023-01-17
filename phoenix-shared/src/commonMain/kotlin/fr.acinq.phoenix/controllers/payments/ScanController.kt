@@ -224,6 +224,7 @@ class AppScanController(
                     try {
                         Either.Right(task.await())
                     } catch (e: Exception) {
+                        logger.error(e) { "failed to process lnurl=$lnurl" }
                         when (e) {
                             is LnurlError.RemoteFailure -> Either.Left(Scan.BadRequestReason.ServiceError(url, e))
                             else -> Either.Left(Scan.BadRequestReason.InvalidLnurl(url))
