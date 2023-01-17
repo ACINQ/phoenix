@@ -87,6 +87,14 @@ struct CurrencyConverterView: View {
 	@ViewBuilder
 	var body: some View {
 		
+		layers()
+			.navigationTitle(NSLocalizedString("Currency Converter", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
+		
 		ZStack {
 			if #unavailable(iOS 16.0) {
 				NavigationLink(
@@ -134,7 +142,7 @@ struct CurrencyConverterView: View {
 				.assignMaxPreference(for: flagWidthReader.key, to: $flagWidth)
 			} // </ScrollView>
 			
-			content
+			content()
 			
 		} // </ZStack>
 		.onAppear {
@@ -162,7 +170,7 @@ struct CurrencyConverterView: View {
 	}
 	
 	@ViewBuilder
-	var content: some View {
+	func content() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
@@ -187,13 +195,12 @@ struct CurrencyConverterView: View {
 			.toolbar {
 				EditButton()
 			}
-			.listStyle(PlainListStyle())
+			.listStyle(.plain)
+			.listBackgroundColor(Color(.systemBackground)) // For iOS 16
 			
 			footer()
 			
 		} // </VStack>
-		.navigationTitle(NSLocalizedString("Currency Converter", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder

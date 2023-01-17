@@ -32,7 +32,7 @@ struct BitcoinUnitSelector: View {
 					}
 				}
 			}
-			.listStyle(PlainListStyle())
+			.listStyle(.plain)
 			.listBackgroundColor(.primaryBackground)
 			
 			footer()

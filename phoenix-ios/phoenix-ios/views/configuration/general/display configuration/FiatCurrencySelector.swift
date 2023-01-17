@@ -99,7 +99,7 @@ struct FiatCurrencySelector: View {
 				}
 			}
 		}
-		.listStyle(PlainListStyle())
+		.listStyle(.plain)
 		.listBackgroundColor(.primaryBackground)
 	}
 	
