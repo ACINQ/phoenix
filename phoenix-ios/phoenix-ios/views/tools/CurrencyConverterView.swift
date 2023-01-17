@@ -694,6 +694,9 @@ fileprivate struct Row: View, ViewName {
 		.onChange(of: parsedRow) { _ in
 			parsedRowDidChange()
 		}
+		.onChange(of: currencyPrefs.fiatExchangeRates) { _ in
+			exchangeRatesDidChange()
+		}
 	}
 	
 	func currencyStyler() -> TextFieldCurrencyStyler {
@@ -709,6 +712,16 @@ fileprivate struct Row: View, ViewName {
 		log.trace("[Row:\(currency)] onAppear()")
 		
 		parsedRowDidChange(forceRefresh: true)
+	}
+	
+	func exchangeRatesDidChange() {
+		log.trace("[Row:\(currency)] exchangeRatesDidChange()")
+		
+		if focusedField != .amountTextfield {
+			// The exchangeRates changed, and the user is modifying the value of some other currency.
+			// Which means we may need to recalculate and update our amount.
+			parsedRowDidChange(forceRefresh: true)
+		}
 	}
 	
 	func clearTextField() {
@@ -886,6 +899,9 @@ fileprivate struct Row_iOS14: View, ViewName {
 		.onChange(of: parsedRow) { _ in
 			parsedRowDidChange()
 		}
+		.onChange(of: currencyPrefs.fiatExchangeRates) { _ in
+			exchangeRatesDidChange()
+		}
 	}
 	
 	func currencyStyler() -> TextFieldCurrencyStyler {
@@ -901,6 +917,16 @@ fileprivate struct Row_iOS14: View, ViewName {
 		log.trace("[Row:\(currency)] onAppear()")
 		
 		parsedRowDidChange()
+	}
+	
+	func exchangeRatesDidChange() {
+		log.trace("[Row:\(currency)] exchangeRatesDidChange()")
+		
+		if focusedField != .amountTextfield {
+			// The exchangeRates changed, and the user is modifying the value of some other currency.
+			// Which means we may need to recalculate and update our amount.
+			parsedRowDidChange()
+		}
 	}
 	
 	func clearTextField() {
