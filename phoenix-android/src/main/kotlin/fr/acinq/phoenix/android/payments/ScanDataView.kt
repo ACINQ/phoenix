@@ -161,6 +161,7 @@ fun ReadDataView(
     val context = LocalContext.current.applicationContext
     val log = logger("ReadDataView")
 
+    var showManualInputDialog by remember { mutableStateOf(false) }
     var _scanView by remember { mutableStateOf<DecoratedBarcodeView?>(null) }
 
     Box {
@@ -188,6 +189,10 @@ fun ReadDataView(
             }
         }
 
+        if (showManualInputDialog) {
+            ManualInputDialog(onInputConfirm = onScannedText, onDismiss = { showManualInputDialog = false })
+        }
+
         // buttons at the bottom of the screen
         Column(
             Modifier
@@ -200,8 +205,14 @@ fun ReadDataView(
                 LaunchedEffect(key1 = model) { _scanView?.resume() }
                 Button(
                     modifier = Modifier.fillMaxWidth(),
+                    icon = R.drawable.ic_input,
+                    text = stringResource(id = R.string.scan_manual_input_button),
+                    onClick = { showManualInputDialog = true },
+                )
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
                     icon = R.drawable.ic_clipboard,
-                    text = stringResource(id = R.string.send_init_paste),
+                    text = stringResource(id = R.string.scan_paste_button),
                     onClick = { readClipboard(context)?.let { onScannedText(it) } },
                 )
             }
@@ -265,7 +276,7 @@ private fun ScanErrorView(
 ) {
     val errorMessage = when (model.reason) {
         is Scan.BadRequestReason.ChainMismatch -> stringResource(R.string.scan_error_invalid_chain)
-        is Scan.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.scan_error_pay_to_self)
+        is Scan.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.scan_error_already_paid)
         is Scan.BadRequestReason.ServiceError -> stringResource(R.string.scan_error_lnurl_service_error)
         is Scan.BadRequestReason.InvalidLnurl -> stringResource(R.string.scan_error_lnurl_invalid)
         is Scan.BadRequestReason.UnsupportedLnurl -> stringResource(R.string.scan_error_lnurl_unsupported)
@@ -329,6 +340,36 @@ private fun ChooseSwapOutOrLightningDialog(
                     Text(text = stringResource(id = R.string.send_paymentmode_lightning_desc), style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ManualInputDialog(
+    onInputConfirm: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var input by remember { mutableStateOf("") }
+    Dialog(
+        onDismiss = onDismiss,
+        title = stringResource(id = R.string.scan_manual_input_title),
+        buttons = {
+            Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel), padding = PaddingValues(16.dp))
+            Button(onClick = { onInputConfirm(input); onDismiss() }, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(16.dp))
+        }
+    ) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+        ) {
+            Text(text = stringResource(id = R.string.scan_manual_input_instructions))
+            Spacer(Modifier.height(16.dp))
+            TextInput(
+                text = input,
+                onTextChange = { input = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text(text = stringResource(id = R.string.scan_manual_input_hint)) },
+            )
         }
     }
 }

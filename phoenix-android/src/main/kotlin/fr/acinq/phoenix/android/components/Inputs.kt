@@ -26,6 +26,7 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -34,8 +35,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.utils.negativeColor
-import fr.acinq.phoenix.android.utils.outlinedTextFieldColors
+import fr.acinq.phoenix.android.utils.*
 
 @Composable
 fun TextInput(
@@ -69,7 +69,21 @@ fun TextInput(
             ),
             label = label,
             placeholder = placeholder,
-            trailingIcon = trailingIcon,
+            trailingIcon = {
+                Row {
+                    if (text.isNotBlank()) {
+                        FilledButton(
+                            onClick = { onTextChange("") },
+                            icon = R.drawable.ic_cross,
+                            backgroundColor = Color.Transparent,
+                            iconTint = MaterialTheme.colors.onSurface,
+                            padding = PaddingValues(12.dp),
+                        )
+                        Spacer(Modifier.width(8.dp))
+                    }
+                    trailingIcon?.let { it() }
+                }
+            },
             enabled = enabled,
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             colors = outlinedTextFieldColors(),
@@ -94,7 +108,6 @@ fun TextInput(
         }
     }
 }
-
 
 /**
  * @param onValueChange the value in this callback will be null if the input is not valid and an error is

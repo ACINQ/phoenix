@@ -118,9 +118,6 @@
 
     <!-- //////////////// send //////////////// -->
 
-    <string name="send_init_paste">Paste data from clipboard</string>
-    <string name="send_init_reading">Reading scan…</string>
-
     <string name="send_balance_prefix">Balance:</string>
     <string name="send_use_all_balance">Send all</string>
     <string name="send_error_amount_too_large">Amount is too large.</string>
@@ -153,6 +150,9 @@
 
     <!-- //////////////// scan //////////////// -->
 
+    <string name="scan_reading">Reading scan…</string>
+    <string name="scan_manual_input_button">Manual input</string>
+    <string name="scan_paste_button">Paste data from clipboard</string>
     <string name="scan_request_camera_access">Grant camera permission</string>
     <string name="scan_instructions">Scan a QR code containing a payment request, a Bitcoin address or a LNURL</string>
 
@@ -171,6 +171,10 @@
     <string name="scan_amountless_legacy_message">This invoice doesn\'t include an amount. This may be dangerous: malicious nodes may be able to steal your payment. To be safe, you should <b>ask the payee to specify an amount</b> in the payment request.\n\nAre you sure you want to pay this invoice?</string>
     <string name="scan_amountless_legacy_confirm_button">Confirm</string>
     <string name="scan_amountless_legacy_cancel_button">Cancel</string>
+
+    <string name="scan_manual_input_title">Manual input</string>
+    <string name="scan_manual_input_instructions">Enter a Lightning invoice, LNURL, or Lightning address you want to send money to.</string>
+    <string name="scan_manual_input_hint">Enter an invoice or a LN address</string>
 
     <!-- //////////////// utility strings //////////////// -->
 
