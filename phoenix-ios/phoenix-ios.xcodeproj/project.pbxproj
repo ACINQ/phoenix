@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -1323,6 +1323,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		DCB0DB95255AE43E005B29C8 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -1333,6 +1334,8 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework",
+				"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework.dSYM",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1346,10 +1349,14 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework",
+				"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework.dSYM",
 			);
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME/PhoenixShared.framework,
+				$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME/PhoenixShared.framework.dSYM,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
