@@ -113,6 +113,7 @@ class AppScanController(
 
     override fun process(intent: Scan.Intent) {
         when (intent) {
+            is Scan.Intent.Reset -> launch { model(Scan.Model.Ready) }
             is Scan.Intent.Parse -> launch { processScannedInput(intent) }
             is Scan.Intent.InvoiceFlow.ConfirmDangerousRequest -> launch { confirmAmountlessInvoice(intent) }
             is Scan.Intent.InvoiceFlow.SendInvoicePayment -> launch {
@@ -161,16 +162,18 @@ class AppScanController(
         } ?: readLnurl(input)?.let {
             processLnurl(it)
         } ?: readBitcoinAddress(input)?.let {
-            processBitcoinAddress(it)
+            processBitcoinAddress(input, it)
         } ?: readLNURLFallback(input)?.let {
             processLnurl(it)
-        } ?: model(Scan.Model.BadRequest(reason = Scan.BadRequestReason.UnknownFormat))
+        } ?: run {
+            model(Scan.Model.BadRequest(request = intent.request, reason = Scan.BadRequestReason.UnknownFormat))
+        }
     }
 
     /** Inspects the Lightning invoice for errors and update the model with the adequate value. */
     private suspend fun processLightningInvoice(paymentRequest: PaymentRequest) {
         val model = checkForBadRequest(paymentRequest)?.let {
-            Scan.Model.BadRequest(it)
+            Scan.Model.BadRequest(request = paymentRequest.write(), reason = it)
         } ?: checkForDangerousRequest(paymentRequest)?.let {
             Scan.Model.InvoiceFlow.DangerousRequest(paymentRequest.write(), paymentRequest, it)
         } ?: Scan.Model.InvoiceFlow.InvoiceRequest(
@@ -181,16 +184,18 @@ class AppScanController(
     }
 
     /** Return the adequate model for a Bitcoin address result. */
-    private suspend fun processBitcoinAddress(data: Either<BitcoinAddressError, BitcoinAddressInfo>) {
-        logger.info { "processing bitcoin address=$data" }
-        val model = when (data) {
-            is Either.Right -> Scan.Model.SwapOutFlow.Init(address = data.value)
+    private suspend fun processBitcoinAddress(
+        input: String,
+        result: Either<BitcoinAddressError, BitcoinAddressInfo>
+    ) {
+        val model = when (result) {
+            is Either.Right -> Scan.Model.SwapOutFlow.Init(address = result.value)
             is Either.Left -> {
-                val error = data.value
+                val error = result.value
                 if (error is BitcoinAddressError.ChainMismatch) {
-                    Scan.Model.BadRequest(reason = Scan.BadRequestReason.ChainMismatch(myChain = error.myChain, requestChain = error.addrChain))
+                    Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.ChainMismatch(myChain = error.myChain, requestChain = error.addrChain))
                 } else {
-                    Scan.Model.BadRequest(reason = Scan.BadRequestReason.UnknownFormat)
+                    Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.UnknownFormat)
                 }
             }
         }
@@ -233,7 +238,7 @@ class AppScanController(
                 }
                 when (result) {
                     null -> Unit
-                    is Either.Left -> model(Scan.Model.BadRequest(result.value))
+                    is Either.Left -> model(Scan.Model.BadRequest(request = url.toString(), reason = result.value))
                     is Either.Right -> { // result: Lnurl
                         when (val res = result.value) {
                             is LnurlPay.Intent -> {
@@ -243,7 +248,7 @@ class AppScanController(
                                 model(Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(lnurlWithdraw = res, error = null))
                             }
                             else -> {
-                                model(Scan.Model.BadRequest(Scan.BadRequestReason.UnsupportedLnurl(url)))
+                                model(Scan.Model.BadRequest(request = url.toString(), reason = Scan.BadRequestReason.UnsupportedLnurl(url)))
                             }
                         }
                     }

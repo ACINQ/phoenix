@@ -89,7 +89,7 @@ fun ScanDataView(
                 ReadDataView(
                     model = model,
                     onBackClick = onBackClick,
-                    onFeedbackDismiss = { vm.model = Scan.Model.Ready },
+                    onFeedbackDismiss = { postIntent(Scan.Intent.Reset) },
                     onConfirmDangerousRequest = { request, invoice -> postIntent(Scan.Intent.InvoiceFlow.ConfirmDangerousRequest(request, invoice)) },
                     onScannedText = { postIntent(Scan.Intent.Parse(request = it)) }
                 )
