@@ -189,7 +189,7 @@ private fun GeneratingLightningInvoiceView(
     )
 }
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+@OptIn(FlowPreview::class)
 @Composable
 private fun LightningInvoiceView(
     context: Context,
@@ -213,7 +213,11 @@ private fun LightningInvoiceView(
             ) {
                 if (amount != null) {
                     QRCodeDetail(label = stringResource(id = R.string.receive__qr_amount_label)) {
-                        AmountWithFiatView(amount = amount)
+                        AmountWithFiatView(
+                            amount = amount,
+                            amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
+                            altTextStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+                        )
                     }
                 }
                 if (!description.isNullOrBlank()) {
@@ -365,7 +369,6 @@ private fun QRCodeDetail(label: String, value: String, maxLines: Int = Int.MAX_V
             Text(
                 text = value,
                 style = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
-                modifier = Modifier.alignBy(FirstBaseline),
                 maxLines = maxLines,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -374,7 +377,7 @@ private fun QRCodeDetail(label: String, value: String, maxLines: Int = Int.MAX_V
 }
 
 @Composable
-private fun QRCodeDetail(label: String, content: @Composable RowScope.() -> Unit) {
+private fun QRCodeDetail(label: String, content: @Composable () -> Unit) {
     Row(modifier = Modifier.padding(horizontal = 24.dp)) {
         Text(
             text = label,
@@ -382,7 +385,7 @@ private fun QRCodeDetail(label: String, content: @Composable RowScope.() -> Unit
             modifier = Modifier.alignBy(FirstBaseline)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        SelectionContainer {
+        Column(modifier = Modifier.alignBy(FirstBaseline)) {
             content()
         }
     }

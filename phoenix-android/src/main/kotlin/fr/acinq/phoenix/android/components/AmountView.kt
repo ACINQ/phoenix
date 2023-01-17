@@ -156,7 +156,8 @@ fun AmountWithFiatView(
     modifier: Modifier = Modifier,
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
     unitTextStyle: TextStyle = MaterialTheme.typography.body1,
-    separatorSpace: Dp = 4.dp
+    altTextStyle: TextStyle = MaterialTheme.typography.caption,
+    separatorSpace: Dp = 4.dp,
 ) {
     val prefBtcUnit = LocalBitcoinUnit.current
     val prefFiatCurrency = LocalFiatCurrency.current
@@ -165,6 +166,6 @@ fun AmountWithFiatView(
 
     Column {
         AmountView(amount = amount, amountTextStyle = amountTextStyle, unitTextStyle = unitTextStyle, separatorSpace = separatorSpace, modifier = modifier, forceUnit = prefBtcUnit, onClick = null)
-        Text(text = stringResource(id = R.string.utils_converted_amount, fiatAmount), style = MaterialTheme.typography.caption)
+        Text(text = stringResource(id = R.string.utils_converted_amount, fiatAmount), style = altTextStyle)
     }
 }
