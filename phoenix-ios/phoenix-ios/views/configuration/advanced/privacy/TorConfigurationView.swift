@@ -3,11 +3,19 @@ import SwiftUI
 struct TorConfigurationView: View {
 
 	@State var isTorEnabled = GroupPrefs.shared.isTorEnabled
-	@State var theme = Prefs.shared.theme
 
 	@ViewBuilder
 	var body: some View {
-		Form {
+		
+		content()
+			.navigationTitle(NSLocalizedString("Tor", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
+		List {
 			Section {
 
 				Toggle(isOn: $isTorEnabled.animation()) {
@@ -34,10 +42,8 @@ struct TorConfigurationView: View {
 				.padding(.bottom, 4)
 			}
 		}
-		.navigationBarTitle(
-			NSLocalizedString("Tor", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 	}
 
 	func toggleTor(_ isEnabled: Bool) {

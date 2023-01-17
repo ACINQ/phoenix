@@ -279,8 +279,8 @@ struct CurrencyConverterView: View {
 					.font(.title)
 					.foregroundColor(.appPositive)
 			}
+			.buttonStyle(PlainButtonStyle())
 		}
-		.buttonStyle(PlainButtonStyle())
 		.padding(.trailing, 8)
 	}
 	
