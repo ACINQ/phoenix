@@ -156,8 +156,7 @@
     <string name="scan_request_camera_access">Grant camera permission</string>
     <string name="scan_instructions">Scan a QR code containing a payment request, a Bitcoin address or a LNURL</string>
 
-    <string name="scan_error_expired">Payment has expired.</string>
-    <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
+    <string name="scan_error_expired">This invoice is expired.</string>
     <string name="scan_error_already_paid">This payment has already been paid.</string>
     <string name="scan_error_invalid_chain">This payment does not use the same blockchain as your wallet.</string>
     <string name="scan_error_lnurl_invalid">Failed to process this LNURL link. Make sure it is valid.</string>

@@ -275,6 +275,7 @@ private fun ScanErrorView(
     onErrorDialogDismiss: () -> Unit,
 ) {
     val errorMessage = when (model.reason) {
+        is Scan.BadRequestReason.Expired -> stringResource(R.string.scan_error_expired)
         is Scan.BadRequestReason.ChainMismatch -> stringResource(R.string.scan_error_invalid_chain)
         is Scan.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.scan_error_already_paid)
         is Scan.BadRequestReason.ServiceError -> stringResource(R.string.scan_error_lnurl_service_error)
