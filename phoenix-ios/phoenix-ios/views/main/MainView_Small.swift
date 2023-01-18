@@ -27,7 +27,6 @@ struct MainView_Small: View {
 	
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
 	@State var externalLightningRequest: AppScanController? = nil
-	@State var temp: [AppScanController] = []
 	
 	@ScaledMetric var sendImageSize: CGFloat = 17
 	@ScaledMetric var receiveImageSize: CGFloat = 18
@@ -137,8 +136,8 @@ struct MainView_Small: View {
 		.navigationStackDestination(isPresented: navLinkTagBinding(.CurrencyConverter)) { // For iOS 16+
 			navLinkView()
 		}
-		.onChange(of: navLinkTag) { tag in
-			navLinkTagChanged(tag)
+		.onChange(of: navLinkTag) {
+			navLinkTagChanged($0)
 		}
 		.onChange(of: deepLinkManager.deepLink) {
 			deepLinkChanged($0)
@@ -538,45 +537,11 @@ struct MainView_Small: View {
 			return
 		}
 		
-		// We want to:
-		// - Parse the incoming lightning url
-		// - If it's invalid, we want to display a warning (using the Toast view)
-		// - Otherwise we want to jump DIRECTLY to the "Confirm Payment" screen.
-		//
-		// In particular, we do **NOT** want the user experience to be:
-		// - switch to SendView
-		// - then again switch to ConfirmView
-		// This feels jittery :(
-		//
-		// So we need to:
-		// - get a Scan.ModelValidate instance
-		// - pass this to SendView as the `firstModel` parameter
-		
-		let controllers = Biz.business.controllers
-		guard let scanController = controllers.scan(firstModel: Scan.ModelReady()) as? AppScanController else {
-			return
-		}
-		temp.append(scanController)
-		
-		var unsubscribe: (() -> Void)? = nil
-		unsubscribe = scanController.subscribe { (model: Scan.Model) in
+		MainViewHelper.shared.processExternalLightningUrl(urlStr) { scanController in
 			
-			// Ignore first subscription fire (Scan.ModelReady)
-			if let _ = model as? Scan.ModelReady {
-				return
-			} else {
-				self.externalLightningRequest = scanController
-				self.navLinkTag = .SendView
-			}
-			
-			// Cleanup
-			if let idx = self.temp.firstIndex(where: { $0 === scanController }) {
-				self.temp.remove(at: idx)
-			}
-			unsubscribe?()
+			self.externalLightningRequest = scanController
+			self.navLinkTag = .SendView
 		}
-		
-		scanController.intent(intent: Scan.IntentParse(request: urlStr))
 	}
 	
 	private func deepLinkChanged(_ value: DeepLink?) {
