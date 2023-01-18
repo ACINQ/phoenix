@@ -133,7 +133,14 @@ struct SendView: MVIView {
 		log.trace("showErrorToast()")
 		
 		let msg: String
-		if let reason = model.reason as? Scan.BadRequestReason_ChainMismatch {
+		if model.reason is Scan.BadRequestReason_Expired {
+			
+			msg = NSLocalizedString(
+				"Invoice is expired",
+				comment: "Error message - scanning lightning invoice"
+			)
+			
+		} else if let reason = model.reason as? Scan.BadRequestReason_ChainMismatch {
 			
 			let requestChain = reason.requestChain?.name ?? "unknown"
 			msg = NSLocalizedString(

@@ -23,7 +23,6 @@ struct PaymentNumbers {
 enum Problem: Error {
 	case emptyInput
 	case invalidInput
-	case expiredInvoice
 	case amountExceedsBalance
 	case finalAmountExceedsBalance // including minerFee
 	case amountOutOfRange
@@ -489,7 +488,6 @@ struct ValidateView: View {
 				case .amountOutOfRange: return true
 				case .amountExceedsBalance: return true
 				case .finalAmountExceedsBalance: return false // problem isn't amount, it's the minerFee
-				case .expiredInvoice: return false // problem isn't amount, it's the invoice
 			}
 			
 		} else {
@@ -1057,16 +1055,6 @@ struct ValidateView: View {
 						problem = .finalAmountExceedsBalance
 						altAmount = NSLocalizedString("Total amount exceeds your balance", comment: "error message")
 					}
-				}
-			}
-			
-			if let paymentRequest = paymentRequest(),
-			   let expiryTimestampSeconds = paymentRequest.expiryTimestampSeconds()?.doubleValue,
-			   Date(timeIntervalSince1970: expiryTimestampSeconds) <= Date()
-			{
-				if problem == nil {
-					problem = .expiredInvoice
-					altAmount = NSLocalizedString("Invoice is expired", comment: "error message")
 				}
 			}
 			
