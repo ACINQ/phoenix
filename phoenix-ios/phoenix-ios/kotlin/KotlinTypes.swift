@@ -70,6 +70,7 @@ extension Scan {
 	typealias LnurlWithdraw_Error = LnurlWithdrawError
 	typealias LnurlWithdraw_Error_RemoteError = LnurlWithdrawErrorRemoteError
 
+	typealias BadRequestReason_Expired = BadRequestReasonExpired
 	typealias BadRequestReason_AlreadyPaidInvoice = BadRequestReasonAlreadyPaidInvoice
 	typealias BadRequestReason_ChainMismatch = BadRequestReasonChainMismatch
 	typealias BadRequestReason_InvalidLnurl = BadRequestReasonInvalidLnurl

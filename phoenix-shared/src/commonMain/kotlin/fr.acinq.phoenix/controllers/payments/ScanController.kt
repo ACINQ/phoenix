@@ -27,10 +27,7 @@ import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.io.*
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.utils.secure
-import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.SwapOutRequest
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
@@ -581,6 +578,10 @@ class AppScanController(
         val requestChain = paymentRequest.chain()
         if (chain != requestChain) {
             return Scan.BadRequestReason.ChainMismatch(chain, requestChain)
+        }
+
+        if (paymentRequest.isExpired(currentTimestampSeconds())) {
+            return Scan.BadRequestReason.Expired(paymentRequest.timestampSeconds, paymentRequest.expirySeconds ?: PaymentRequest.DEFAULT_EXPIRY_SECONDS.toLong())
         }
 
         val db = databaseManager.databases.filterNotNull().first()

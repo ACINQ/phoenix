@@ -204,7 +204,6 @@ struct PaymentSummaryView: View {
 			switch problem {
 				case .emptyInput: shouldDisplay = false
 				case .invalidInput: shouldDisplay = false
-				case .expiredInvoice: shouldDisplay = false
 				case .amountOutOfRange: shouldDisplay = true // problem might be the tip
 				case .amountExceedsBalance: shouldDisplay = true // problem might be the tip
 				case .finalAmountExceedsBalance: shouldDisplay = true // problem is miner fee
