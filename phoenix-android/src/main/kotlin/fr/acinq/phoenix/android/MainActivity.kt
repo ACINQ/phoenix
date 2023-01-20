@@ -24,11 +24,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.*
 import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.io.PhoenixAndroidLegacyInfoEvent
 import fr.acinq.phoenix.android.components.mvi.MockView
@@ -49,6 +50,7 @@ class MainActivity : AppCompatActivity() {
 
     val log: Logger = LoggerFactory.getLogger(MainActivity::class.java)
     private val appViewModel by viewModels<AppViewModel>()
+    private var navController: NavController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,11 +93,22 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContent {
-            val navController = rememberNavController()
-            PhoenixAndroidTheme(navController) {
-                AppView(this@MainActivity, appViewModel, navController)
+            rememberNavController().let {
+                navController = it
+                PhoenixAndroidTheme(it) {
+                    AppView(appViewModel, it)
+                }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        // force the intent flag to single top, in order to avoid [handleDeepLink] to finish the current activity.
+        // this would otherwise clear the app view model, i.e. loose the state which virtually reboots the app
+        // TODO: look into detaching the app state from the activity
+        intent!!.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        this.navController?.handleDeepLink(intent)
     }
 
     override fun onStart() {
@@ -105,12 +118,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        // (application as? PhoenixApplication)?.business?.incrementDisconnectCount()
-        log.info("stopping kmp activity")
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         try {
@@ -118,7 +125,7 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             log.error("failed to unbind activity from node service: {}", e.localizedMessage)
         }
-        log.info("main kmp activity destroyed")
+        log.info("destroyed main kmp activity")
     }
 
 }

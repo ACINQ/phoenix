@@ -101,7 +101,9 @@ fun SendLightningPaymentView(
                 inputTextSize = 42.sp,
             )
             Column(
-                modifier = Modifier.padding(top = 20.dp, bottom = 32.dp, start = 16.dp, end = 16.dp).sizeIn(maxWidth = 400.dp),
+                modifier = Modifier
+                    .padding(top = 20.dp, bottom = 32.dp, start = 16.dp, end = 16.dp)
+                    .sizeIn(maxWidth = 400.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 val description = remember { paymentRequest.description ?: paymentRequest.descriptionHash?.toHex() }

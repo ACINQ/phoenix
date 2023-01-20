@@ -39,10 +39,9 @@ import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.service.WalletState
-import fr.acinq.phoenix.android.utils.BiometricsHelper
+import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import fr.acinq.phoenix.legacy.utils.Wallet
@@ -53,7 +52,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun StartupView(
-    mainActivity: MainActivity,
     appVM: AppViewModel,
     onShowIntro: () -> Unit,
     onKeyAbsent: () -> Unit,
@@ -83,7 +81,6 @@ fun StartupView(
                 LaunchedEffect(key1 = Unit) { onShowIntro() }
             } else {
                 LoadOrUnlock(
-                    mainActivity = mainActivity,
                     isLockActive = isLockActive,
                     lockState = appVM.lockState,
                     walletState = walletState,
@@ -100,7 +97,6 @@ fun StartupView(
 
 @Composable
 private fun LoadOrUnlock(
-    mainActivity: MainActivity,
     isLockActive: Boolean,
     lockState: LockState,
     walletState: WalletState?,
@@ -112,6 +108,7 @@ private fun LoadOrUnlock(
 ) {
     val log = logger("StartupView")
     val context = LocalContext.current
+    val activity = context.findActivity()
     if (isLockActive) {
         when (lockState) {
             is LockState.Locked -> {
@@ -121,7 +118,7 @@ private fun LoadOrUnlock(
                         setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL or BiometricManager.Authenticators.BIOMETRIC_WEAK)
                     }.build()
                     BiometricsHelper.getPrompt(
-                        activity = mainActivity,
+                        activity = activity,
                         onSuccess = onUnlockSuccess,
                         onFailure = onUnlockFailure,
                         onCancel = { log.debug { "cancelled auth prompt" } }

@@ -39,6 +39,7 @@ import fr.acinq.phoenix.android.utils.mutedTextColor
 /** Button for navigation purpose, with the back arrow. */
 @Composable
 fun BackButton(onClick: () -> Unit) {
+    BackHandler(onBack = onClick)
     Button(
         onClick = onClick,
         shape = RoundedCornerShape(topStart = 0.dp, topEnd = 50.dp, bottomEnd = 50.dp, bottomStart = 0.dp),
@@ -85,7 +86,6 @@ fun DefaultScreenHeader(
     onBackClick: () -> Unit,
     backgroundColor: Color = MaterialTheme.colors.background,
 ) {
-    BackHandler(onBack = onBackClick)
     Row(
         modifier = Modifier
             .fillMaxWidth()

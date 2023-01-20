@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android
 
+import android.net.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -25,12 +26,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
+import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import fr.acinq.phoenix.android.home.*
 import fr.acinq.phoenix.android.init.*
 import fr.acinq.phoenix.android.intro.IntroView
@@ -53,7 +51,6 @@ import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 
 @Composable
 fun AppView(
-    mainActivity: MainActivity,
     appVM: AppViewModel,
     navController: NavHostController,
 ) {
@@ -94,20 +91,48 @@ fun AppView(
             navController.navigate(Screen.SwitchToLegacy.route)
         }
 
+        val scannerDeepLinks = remember {
+            listOf(
+                navDeepLink { uriPattern = "lightning:{data}" },
+                navDeepLink { uriPattern = "bitcoin:{data}" },
+                navDeepLink { uriPattern = "lnurl:{data}" },
+                navDeepLink { uriPattern = "lnurlp:{data}" },
+                navDeepLink { uriPattern = "lnurlw:{data}" },
+                navDeepLink { uriPattern = "keyauth:{data}" },
+                navDeepLink { uriPattern = "phoenix:lightning:{data}" },
+                navDeepLink { uriPattern = "phoenix:bitcoin:{data}" },
+                navDeepLink { uriPattern = "scanview:{data}" },
+            )
+        }
+
         Column(
             Modifier
                 .background(appBackground())
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
-            NavHost(navController = navController, startDestination = Screen.Startup.route) {
-                composable(Screen.Startup.route) {
+            NavHost(navController = navController, startDestination = "${Screen.Startup.route}?next={next}") {
+                composable(
+                    route = "${Screen.Startup.route}?next={next}",
+                    arguments = listOf(
+                        navArgument("next") { type = NavType.StringType ; nullable = true }
+                    ),
+                ) {
+                    val nextScreenLink = it.arguments?.getString("next")
+                    log.debug { "navigating to startup with next=$nextScreenLink" }
                     StartupView(
-                        mainActivity,
                         appVM,
                         onShowIntro = { navController.navigate(Screen.Intro.route) },
                         onKeyAbsent = { navController.navigate(Screen.InitWallet.route) },
-                        onBusinessStarted = { navController.navigate(Screen.Home.route) }
+                        onBusinessStarted = {
+                            if (nextScreenLink.isNullOrBlank()) {
+                                popToHome(navController)
+                            } else {
+                                navController.navigate(Uri.parse(nextScreenLink),
+                                    navOptions = navOptions { popUpTo(Screen.Home.route) { inclusive = true } }
+                                )
+                            }
+                        }
                     )
                 }
                 composable(Screen.Intro.route) {
@@ -126,7 +151,7 @@ fun AppView(
                     RestoreWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
                 }
                 composable(Screen.Home.route) {
-                    RequireKey(appVM.walletState.value) {
+                    RequireStarted(appVM.walletState.value) {
                         HomeView(
                             paymentsViewModel = paymentsViewModel,
                             onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },
@@ -134,8 +159,8 @@ fun AppView(
                             onReceiveClick = { navController.navigate(Screen.Receive.route) },
                             onSendClick = { navController.navigate(Screen.ScanData.route) { launchSingleTop = true } },
                             onPaymentsHistoryClick = { navController.navigate(Screen.PaymentsHistory.route) },
-                            onTorClick = { navController.navigate(Screen.TorConfig)},
-                            onElectrumClick = { navController.navigate(Screen.ElectrumServer)}
+                            onTorClick = { navController.navigate(Screen.TorConfig) },
+                            onElectrumClick = { navController.navigate(Screen.ElectrumServer) }
                         )
                     }
                 }
@@ -144,11 +169,15 @@ fun AppView(
                         onSwapInReceived = { popToHome(navController) },
                     )
                 }
-                composable(Screen.ScanData.route) {
-                    ScanDataView(
-                        onBackClick = { popToHome(navController) },
-                        onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") }
-                    )
+                composable(Screen.ScanData.route, deepLinks = scannerDeepLinks) {
+                    val input = it.arguments?.getString("data")
+                    RequireStarted(appVM.walletState.value, nextUri = "scanview:$input") {
+                        ScanDataView(
+                            input = input,
+                            onBackClick = { popToHome(navController) },
+                            onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") }
+                        )
+                    }
                 }
                 composable(
                     route = "${Screen.PaymentDetails.route}?direction={direction}&id={id}&fromEvent={fromEvent}",
@@ -218,10 +247,7 @@ fun AppView(
                     PaymentSettingsView(showAuthSchemeDialog)
                 }
                 composable(Screen.AppLock.route) {
-                    AppLockView(
-                        mainActivity = mainActivity,
-                        appVM = appVM
-                    )
+                    AppLockView()
                 }
                 composable(Screen.Logs.route) {
                     LogsView()
@@ -245,7 +271,9 @@ fun AppView(
 
 /** Navigates to Home and pops everything from the backstack up to Home. This effectively resets the nav stack. */
 private fun popToHome(navController: NavHostController) {
-    navController.navigate(Screen.Home.route) { popUpTo(Screen.Home.route) { inclusive = true } }
+    navController.navigate(Screen.Home.route) {
+        popUpTo(Screen.Home.route) { inclusive = true }
+    }
 }
 
 private fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId, isFromEvent: Boolean) {
@@ -253,14 +281,14 @@ private fun navigateToPaymentDetails(navController: NavController, id: WalletPay
 }
 
 @Composable
-private fun RequireKey(
-    walletState: WalletState?, // TODO: replace by UI lock state
+private fun RequireStarted(
+    walletState: WalletState?,
+    nextUri: String? = null,
     children: @Composable () -> Unit
 ) {
+    val log = logger("RequireStarted")
     if (walletState !is WalletState.Started) {
-        logger().warning { "rejecting access to screen with wallet in state=$walletState" }
-        navController.navigate(Screen.Startup)
-        Text("redirecting...")
+        navController.navigate("${Screen.Startup.route}?next=$nextUri")
     } else {
         logger().debug { "access to screen granted" }
         children()

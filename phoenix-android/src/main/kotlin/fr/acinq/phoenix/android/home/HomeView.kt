@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android.home
 
+import androidx.activity.compose.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -95,6 +96,11 @@ fun HomeView(
     // controls for the migration dialog
     val migrationResult = PrefsDatastore.getMigrationResult(context).collectAsState(initial = null).value
     val migrationResultShown = InternalData.getMigrationResultShown(context).collectAsState(initial = null).value
+
+    BackHandler {
+        // force the back button to minimize the app
+        context.findActivity().moveTaskToBack(false)
+    }
 
     MVIView(CF::home) { model, _ ->
         val balance = remember(model) { model.balance }

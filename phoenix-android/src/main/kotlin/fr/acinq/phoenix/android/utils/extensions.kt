@@ -16,11 +16,14 @@
 
 package fr.acinq.phoenix.android.utils
 
+import android.app.*
+import android.content.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
@@ -40,6 +43,15 @@ inline fun <T> tryWith(exception: Exception, action: () -> T): T = try {
 
 inline fun <T1 : Any, T2 : Any, R : Any> safeLet(p1: T1?, p2: T2?, block: (T1, T2) -> R?): R? {
     return if (p1 != null && p2 != null) block(p1, p2) else null
+}
+
+fun Context.findActivity(): MainActivity {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is MainActivity) return context
+        context = context.baseContext
+    }
+    throw IllegalStateException("not in the context of the main Phoenix activity")
 }
 
 @Composable

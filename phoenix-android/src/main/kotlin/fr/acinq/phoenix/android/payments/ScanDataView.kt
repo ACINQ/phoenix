@@ -75,21 +75,38 @@ class ScanDataViewModel(controller: ScanController) : MVIControllerViewModel<Sca
     }
 }
 
+/**
+ * @param input External input, for example a deeplink from another app, which needs to be parsed and validated.
+ *              When not null, the camera should not be initialized at first as we already have a data input.
+ */
 @Composable
 fun ScanDataView(
+    input: String? = null,
     onBackClick: () -> Unit,
     onAuthSchemeInfoClick: () -> Unit,
 ) {
+    val log = logger("ScanDataView")
+    var initialInput = remember { input }
     val trampolineMaxFees by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(null)
     val maxFees = trampolineMaxFees?.let { MaxFees(it.feeBase, it.feeProportional) }
     val vm: ScanDataViewModel = viewModel(factory = ScanDataViewModel.Factory(controllerFactory, CF::scan))
+
     MVIView(vm) { model, postIntent ->
+        LaunchedEffect(key1 = initialInput) {
+            initialInput?.takeIf { it.isNotBlank() }?.let {
+                postIntent(Scan.Intent.Parse(it))
+            }
+        }
         when (model) {
             Scan.Model.Ready, is Scan.Model.BadRequest, is Scan.Model.InvoiceFlow.DangerousRequest, is Scan.Model.LnurlServiceFetch -> {
                 ReadDataView(
+                    initialInput = initialInput,
                     model = model,
                     onBackClick = onBackClick,
-                    onFeedbackDismiss = { postIntent(Scan.Intent.Reset) },
+                    onFeedbackDismiss = {
+                        initialInput = ""
+                        postIntent(Scan.Intent.Reset)
+                    },
                     onConfirmDangerousRequest = { request, invoice -> postIntent(Scan.Intent.InvoiceFlow.ConfirmDangerousRequest(request, invoice)) },
                     onScannedText = { postIntent(Scan.Intent.Parse(request = it)) }
                 )
@@ -152,24 +169,27 @@ fun ScanDataView(
 
 @Composable
 fun ReadDataView(
+    initialInput: String?,
     model: Scan.Model,
     onFeedbackDismiss: () -> Unit,
     onBackClick: () -> Unit,
     onConfirmDangerousRequest: (String, PaymentRequest) -> Unit,
     onScannedText: (String) -> Unit,
 ) {
-    val context = LocalContext.current.applicationContext
     val log = logger("ReadDataView")
+    val context = LocalContext.current.applicationContext
 
     var showManualInputDialog by remember { mutableStateOf(false) }
-    var _scanView by remember { mutableStateOf<DecoratedBarcodeView?>(null) }
+    var scanView by remember { mutableStateOf<DecoratedBarcodeView?>(null) }
 
     Box {
 
-        ScannerView(
-            onScanViewBinding = { _scanView = it },
-            onScannedText = onScannedText
-        )
+        if (initialInput.isNullOrBlank()) {
+            ScannerView(
+                onScanViewBinding = { scanView = it },
+                onScannedText = onScannedText
+            )
+        }
 
         if (model is Scan.Model.BadRequest) {
             ScanErrorView(model, onFeedbackDismiss)
@@ -202,7 +222,9 @@ fun ReadDataView(
                 .background(MaterialTheme.colors.surface)
         ) {
             if (model is Scan.Model.Ready) {
-                LaunchedEffect(key1 = model) { _scanView?.resume() }
+                LaunchedEffect(key1 = model, key2 = initialInput) {
+                    if (initialInput.isNullOrBlank()) scanView?.resume()
+                }
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     icon = R.drawable.ic_input,
