@@ -679,7 +679,7 @@
     <string name="about_seed_title">Safeguarding your key</string>
     <string name="about_seed_content">This wallet is self-custodial: <b>you have sole custody of the wallet\'s 12-words seed key</b>.\n\nThis key gives access to your money. Do not reveal it to anyone, and beware of phishing.</string>
     <string name="about_rates_title">Exchange rates</string>
-    <string name="about_rates_content">Bitcoin/fiat exchange rates are retrieved from various third-party APIs:\n- Blockchain.info\n- powered by Coindesk.com\n\nThose rates may not be accurate. Always check the actual Bitcoin amount before sending a payment.</string>
+    <string name="about_rates_content">Bitcoin/fiat exchange rates are retrieved from various third-party APIs:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nThose rates may not be accurate. Always check the actual Bitcoin amount before sending a payment.</string>
     <string name="about_version">Version</string>
     <string name="about_faq_link">Any questions? Check the FAQ</string>
     <string name="about_support_link">Support</string>
@@ -736,5 +736,31 @@
 
     <string name="migration_dialog_title">Congratulations!</string>
     <string name="migration_dialog_message">You are now using the new Phoenix version. Your channels are being migrated and will be ready soon.</string>
+
+    <!-- ////////////// currencies ////////////// -->
+
+    <string name="currency_ars_bm">Argentine Peso (Blue Market)</string>
+    <string name="currency_cup_fm">Cuban Peso (Free Market)</string>
+
+    <!-- ////////////// payments history ////////////// -->
+
+    <string name="payments_history_title">My payments (%1$d)</string>
+    <string name="payments_history_backup_notavailable">Payments backup is not available yet.</string>
+
+    <!-- ////////////// currencies ////////////// -->
+
+    <string name="intro_welcome_title">Welcome!</string>
+    <string name="intro_welcome_sub1">With Phoenix, receiving and sending bitcoin is safe, easy, and fast.</string>
+    <string name="intro_welcome_next_button">Next</string>
+
+    <string name="intro_channels_title">Payment channels are automatically created when needed.</string>
+    <string name="intro_channels_sub1">The fee is %1$s%% with a minimum fee of %2$s. This fee only applies when a new channel needs to be created. Payments that use existing channels don\'t pay this.</string>
+    <string name="intro_channels_sub2">The fee is dynamic and may change depending on bitcoin network conditions.</string>
+    <string name="intro_channels_next_button">I understand</string>
+
+    <string name="intro_selfcustody_title">Keep control of your money.</string>
+    <string name="intro_selfcustody_sub1">Phoenix is self-custodial. A backup phrase is generated, containing all the information needed to restore your Bitcoin funds.</string>
+    <string name="intro_selfcustody_sub2">Keep this phrase safe and secret!</string>
+    <string name="intro_selfcustody_next_button">Get started</string>
 
 </resources>

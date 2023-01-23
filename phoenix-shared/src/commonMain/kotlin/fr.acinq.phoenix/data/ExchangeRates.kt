@@ -1,5 +1,7 @@
 package fr.acinq.phoenix.data
 
+import fr.acinq.phoenix.controllers.MVI
+import fr.acinq.phoenix.controllers.main.Home
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -62,7 +64,57 @@ sealed class ExchangeRate {
     }
 }
 
-@Serializable data class BlockchainInfoPriceObject(val last: Double)
+/**
+ * Blockchain.info example:
+ * {
+ *   "ARS": {
+ *     "15m": 5453151.01,
+ *     "last": 5453151.01,
+ *     "buy": 5453151.01,
+ *     "sell": 5453151.01,
+ *     "symbol": "ARS"
+ *   },
+ *   "AUD": {
+ *     "15m": 24869.41,
+ *     "last": 24869.41,
+ *     "buy": 24869.41,
+ *     "sell": 24869.41,
+ *     "symbol": "AUD"
+ *   },
+ *   ...
+ * }
+ */
+
+@Serializable
+data class BlockchainInfoPriceObject(
+    val last: Double
+)
+
+typealias BlockchainInfoResponse = Map<String, BlockchainInfoPriceObject>
+
+/**
+ * Coinbase example:
+ * {
+ *   "data": {
+ *     "currency": "USD",
+ *     "rates": {
+ *       "AED": "3.6726399999999999",
+ *       "AFN": "89.2213",
+ *       ...
+ *     }
+ *   }
+ * }
+ */
+
+@Serializable
+data class CoinbaseResponse(
+    val data: Data,
+) {
+    @Serializable
+    data class Data(
+        val rates: Map<String, String>
+    )
+}
 
 /**
  * Coindesk example:
@@ -146,3 +198,23 @@ data class BluelyticsResponse(
         val value_buy: Double
     )
 }
+
+/**
+ * Yadio example:
+ * {
+ *   "BTC": 16640.86,
+ *   "USD": {
+ *     "CUP": 170,
+ *     "IRR": 4063500,
+ *     ...
+ *   },
+ *   "base": "USD",
+ *   "timestamp": 1672776301979
+ * }
+ */
+
+@Serializable
+data class YadioResponse(
+    @SerialName("USD")
+    val usdRates: Map<String, Double>
+)
