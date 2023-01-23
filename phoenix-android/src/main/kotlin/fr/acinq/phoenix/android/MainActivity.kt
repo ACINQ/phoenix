@@ -54,7 +54,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.CAMERA), 1234)
         appViewModel.walletState.observe(this) {
             log.debug("wallet state update=${it.name}")
         }

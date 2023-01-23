@@ -121,6 +121,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:${Versions.Android.navCompose}")
     // -- jetpack compose: accompanist (utility library for compose)
     implementation("com.google.accompanist:accompanist-systemuicontroller:${Versions.Android.accompanist}")
+    implementation("com.google.accompanist:accompanist-permissions:${Versions.Android.accompanist}")
 
     // -- scanner zxing
     implementation("com.journeyapps:zxing-android-embedded:${Versions.Android.zxing}")

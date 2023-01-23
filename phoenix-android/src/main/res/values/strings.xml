@@ -153,7 +153,8 @@
     <string name="scan_reading">Reading scan…</string>
     <string name="scan_manual_input_button">Manual input</string>
     <string name="scan_paste_button">Paste data from clipboard</string>
-    <string name="scan_request_camera_access">Grant camera permission</string>
+    <string name="scan_request_camera_access">Tap to grant camera permission</string>
+    <string name="scan_request_camera_access_denied">Camera permission has been denied</string>
     <string name="scan_instructions">Scan a QR code containing a payment request, a Bitcoin address or a LNURL</string>
 
     <string name="scan_error_expired">This invoice is expired.</string>

@@ -17,7 +17,11 @@
 
 package fr.acinq.phoenix.android.payments
 
+import android.*
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.*
+import android.provider.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,9 +39,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.app.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.permissions.*
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.ResultPoint
 import com.google.zxing.client.android.Intents
@@ -45,6 +51,7 @@ import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
@@ -52,11 +59,8 @@ import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.databinding.ScanViewBinding
-import fr.acinq.phoenix.android.utils.annotatedStringResource
+import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.android.utils.readClipboard
-import fr.acinq.phoenix.android.utils.whiteLowOp
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ScanController
 import fr.acinq.phoenix.controllers.payments.MaxFees
@@ -182,12 +186,47 @@ fun ReadDataView(
     var showManualInputDialog by remember { mutableStateOf(false) }
     var scanView by remember { mutableStateOf<DecoratedBarcodeView?>(null) }
 
-    Box {
+    Box(Modifier.fillMaxSize()) {
 
         if (initialInput.isNullOrBlank()) {
             ScannerView(
                 onScanViewBinding = { scanView = it },
                 onScannedText = onScannedText
+            )
+            CameraPermissionsView {
+                LaunchedEffect(key1 = model, key2 = initialInput) {
+                    if (model is Scan.Model.Ready && initialInput.isNullOrBlank()) scanView?.resume()
+                }
+            }
+        }
+
+        // buttons at the bottom of the screen
+        Column(
+            Modifier
+                .align(Alignment.BottomCenter)
+                .padding(24.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(MaterialTheme.colors.surface)
+        ) {
+            if (model is Scan.Model.Ready) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    icon = R.drawable.ic_input,
+                    text = stringResource(id = R.string.scan_manual_input_button),
+                    onClick = { showManualInputDialog = true },
+                )
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    icon = R.drawable.ic_clipboard,
+                    text = stringResource(id = R.string.scan_paste_button),
+                    onClick = { readClipboard(context)?.let { onScannedText(it) } },
+                )
+            }
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(id = R.string.btn_cancel),
+                icon = R.drawable.ic_arrow_back,
+                onClick = onBackClick
             )
         }
 
@@ -211,39 +250,6 @@ fun ReadDataView(
 
         if (showManualInputDialog) {
             ManualInputDialog(onInputConfirm = onScannedText, onDismiss = { showManualInputDialog = false })
-        }
-
-        // buttons at the bottom of the screen
-        Column(
-            Modifier
-                .align(Alignment.BottomCenter)
-                .padding(24.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(MaterialTheme.colors.surface)
-        ) {
-            if (model is Scan.Model.Ready) {
-                LaunchedEffect(key1 = model, key2 = initialInput) {
-                    if (initialInput.isNullOrBlank()) scanView?.resume()
-                }
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    icon = R.drawable.ic_input,
-                    text = stringResource(id = R.string.scan_manual_input_button),
-                    onClick = { showManualInputDialog = true },
-                )
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    icon = R.drawable.ic_clipboard,
-                    text = stringResource(id = R.string.scan_paste_button),
-                    onClick = { readClipboard(context)?.let { onScannedText(it) } },
-                )
-            }
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(id = R.string.btn_cancel),
-                icon = R.drawable.ic_arrow_back,
-                onClick = onBackClick
-            )
         }
     }
 }
@@ -381,9 +387,10 @@ private fun ManualInputDialog(
             Button(onClick = { onInputConfirm(input); onDismiss() }, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(16.dp))
         }
     ) {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
         ) {
             Text(text = stringResource(id = R.string.scan_manual_input_instructions))
             Spacer(Modifier.height(16.dp))
@@ -392,6 +399,38 @@ private fun ManualInputDialog(
                 onTextChange = { input = it },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = stringResource(id = R.string.scan_manual_input_hint)) },
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun BoxScope.CameraPermissionsView(
+    onPermissionGranted: @Composable () -> Unit
+) {
+    val context = LocalContext.current
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+    if (cameraPermissionState.status.isGranted) {
+        onPermissionGranted()
+    } else {
+        Card(
+            modifier = Modifier.align(Alignment.Center),
+        ) {
+            // if user has denied permission, open the system settings for Phoenix
+            val isDenied = cameraPermissionState.status.shouldShowRationale
+            Button(
+                icon = R.drawable.ic_camera,
+                text = stringResource(id = if (isDenied) R.string.scan_request_camera_access_denied else R.string.scan_request_camera_access),
+                onClick = {
+                    if (isDenied) {
+                        context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        })
+                    } else {
+                        cameraPermissionState.launchPermissionRequest()
+                    }
+                }
             )
         }
     }

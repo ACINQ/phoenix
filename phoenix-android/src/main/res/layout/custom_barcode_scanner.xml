@@ -34,14 +34,4 @@
         app:zxing_viewfinder_laser="@android:color/transparent"
         app:zxing_viewfinder_mask="@android:color/transparent" />
 
-    <TextView
-        android:id="@+id/zxing_status_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:background="@color/zxing_transparent"
-        android:text=""
-        android:textColor="@color/zxing_status_text"
-        android:visibility="gone" />
-
 </merge>
