@@ -151,6 +151,7 @@ data class LnurlAuth(
         // COINOS("", ""),
         LNSHORT("lnshort.it", "lnshort.it"),
         STACKERNEWS("stacker.news", "stacker.news"),
+        BOLTFUN("auth.bolt.fun", "bolt.fun")
         ;
 
         companion object {
