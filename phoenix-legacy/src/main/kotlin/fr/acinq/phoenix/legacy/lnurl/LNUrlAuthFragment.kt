@@ -177,6 +177,7 @@ class LNUrlAuthFragment : BaseFragment() {
       // COINOS("", ""),
       LNSHORT("lnshort.it", "lnshort.it"),
       STACKERNEWS("stacker.news", "stacker.news"),
+      BOLTFUN("auth.bolt.fun", "bolt.fun"),
       ;
     }
 
