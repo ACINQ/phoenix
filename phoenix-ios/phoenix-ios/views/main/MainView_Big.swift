@@ -46,7 +46,6 @@ struct MainView_Big: View {
 	
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
 	@State var externalLightningRequest: AppScanController? = nil
-	@State var temp: [AppScanController] = []
 	
 	let sidebarDividerWidth: CGFloat = 1
 	
@@ -86,6 +85,9 @@ struct MainView_Big: View {
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.onChange(of: deviceInfo.windowSize) { newSize in
 			windowSizeDidChange(newSize)
+		}
+		.onChange(of: navLinkTag) {
+			navLinkTagChanged($0)
 		}
 		.onChange(of: deepLinkManager.deepLink) {
 			deepLinkChanged($0)
@@ -851,9 +853,28 @@ struct MainView_Big: View {
 		}
 	}
 	
+	private func navLinkTagChanged(_ tag: NavLinkTag?) {
+		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
+		
+		if tag == nil {
+			// If we pushed the SendView, triggered by an external lightning url,
+			// then we can nil out the associated controller now (since we handed off to SendView).
+			self.externalLightningRequest = nil
+		}
+	}
+	
 	private func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
 		log.trace("didReceiveExternalLightningUrl()")
 		
-		// Todo: Merge this logic into Main
+		if navLinkTag == .SendView {
+			log.debug("Ignoring: handled by SendView")
+			return
+		}
+		
+		MainViewHelper.shared.processExternalLightningUrl(urlStr) { scanController in
+			
+			self.externalLightningRequest = scanController
+			self.navLinkTag = .SendView
+		}
 	}
 }
