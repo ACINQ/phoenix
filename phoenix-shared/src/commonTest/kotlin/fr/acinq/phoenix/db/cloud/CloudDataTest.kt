@@ -373,9 +373,9 @@ class CloudDataTest {
         assertEquals(3_100.msat, outgoingPayment.fees)
         assertEquals(1, outgoingPayment.parts.filterIsInstance<OutgoingPayment.LightningPart>().size)
 
-        val metadataRow = CloudAsset.cloudDeserialize(metadataBlob)
+        val metadataRow = CloudAsset.cborDeserialize(metadataBlob)
         assertNotNull(metadataRow)
-        val metadata = metadataRow.deserialize()
+        val metadata = metadataRow.unwrap().deserialize()
         val lnurlPay = metadata.lnurl
         assertNotNull(lnurlPay)
         assertEquals("https://fake.it/initial", lnurlPay.pay.initialUrl.toString())
@@ -403,9 +403,9 @@ class CloudDataTest {
         assertEquals(3_100.msat, outgoingPayment.fees)
         assertEquals(1, outgoingPayment.parts.filterIsInstance<OutgoingPayment.LightningPart>().size)
 
-        val metadataRow = CloudAsset.cloudDeserialize(metadataBlob)
+        val metadataRow = CloudAsset.cborDeserialize(metadataBlob)
         assertNotNull(metadataRow)
-        val metadata = metadataRow.deserialize()
+        val metadata = metadataRow.unwrap().deserialize()
         val lnurlPay = metadata.lnurl
         assertNotNull(lnurlPay)
         assertEquals("https://fake.it/initial", lnurlPay.pay.initialUrl.toString())
