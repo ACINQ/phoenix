@@ -20,10 +20,10 @@ val skipAndroid = File("$rootDir/local.properties").takeIf { it.exists() }
 System.setProperty("includeAndroid", (!skipAndroid).toString())
 
 // The shared app is always included.
-include(":phoenix-shared")
+// include(":phoenix-shared")
 
 // Android apps are optional.
 if (!skipAndroid) {
-    include(":phoenix-android")
+    // include(":phoenix-android")
     include(":phoenix-legacy")
 }
