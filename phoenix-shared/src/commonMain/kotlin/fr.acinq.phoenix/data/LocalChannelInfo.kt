@@ -20,6 +20,14 @@ import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.transactions.*
 import fr.acinq.phoenix.utils.extensions.*
 
+/**
+ * @param channelId the channel's identifier as a hexadecimal string.
+ * @param state the channel's state that may contain commitments information.
+ * @param isBooting if true, this data comes from the local database and the channel has not yet been reestablished
+ *      with the peer. As such, the data may be obsolete (for example, if the peer actually force-closed the channel
+ *      while Phoenix was disconnected). If false, this data is the live view of the channel as negotiated with the
+ *      peer and can be considered up-to-date (but there's no guarantee, as the channel may actually be disconnected!).
+ */
 data class LocalChannelInfo(
     val channelId: String,
     val state: ChannelState,
