@@ -3,13 +3,12 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
-import fr.acinq.lightning.channel.ChannelStateWithCommitments
-import fr.acinq.lightning.channel.Offline
+import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.io.Peer
-import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.wire.InitTlv
 import fr.acinq.lightning.wire.TlvStream
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.data.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
@@ -37,6 +36,13 @@ class PeerManager(
 
     private val _peer = MutableStateFlow<Peer?>(null)
     val peerState: StateFlow<Peer?> = _peer
+
+    /**
+     * Our local view of our channels. It is initialized with data from the local db, then with the actual
+     * channels once they have been reestablished.
+     */
+    private val _channelsFlow = MutableStateFlow<Map<ByteVector32, LocalChannelInfo>?>(null)
+    val channelsFlow: StateFlow<Map<ByteVector32, LocalChannelInfo>?> = _channelsFlow
 
     init {
         launch {
@@ -66,6 +72,24 @@ class PeerManager(
                 scope = MainScope()
             )
             _peer.value = peer
+
+            // The local channels flow must use `bootFlow` first, as `channelsFlow` is empty when the wallet starts.
+            // `bootFlow` data come from the local database and will be overridden by fresh data once the connection
+            // with the peer has been established.
+            val bootFlow = peer.bootChannelsFlow.filterNotNull()
+            val channelsFlow = peer.channelsFlow
+            var isBoot = true
+            combine(bootFlow, channelsFlow) { bootChannels, channels ->
+                // bootFlow will fire once, after the channels have been read from the database.
+                if (isBoot) {
+                    isBoot = false
+                    bootChannels.entries.associate { it.key to LocalChannelInfo(it.key.toHex(), it.value, isBooting = true) }
+                } else {
+                    channels.entries.associate { it.key to LocalChannelInfo(it.key.toHex(),it.value, isBooting = false) }
+                }
+            }.collect {
+                _channelsFlow.value = it
+            }
         }
     }
 

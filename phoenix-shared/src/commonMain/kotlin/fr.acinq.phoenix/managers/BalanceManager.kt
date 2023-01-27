@@ -10,7 +10,7 @@ import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.utils.extensions.calculateBalance
+import fr.acinq.phoenix.utils.extensions.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
@@ -86,32 +86,17 @@ class BalanceManager(
         log.info { "init balance manager"}
         launch {
             val peer = peerManager.peerState.filterNotNull().first()
-            launch { monitorChannelsBalance(peer) }
+            launch { monitorChannelsBalance(peerManager) }
             launch { monitorSwapInWallet(peer) }
             launch { monitorNodeEvents(peer) }
             launch { monitorSwapInBalance() }
         }
     }
 
-    /**
-     * Watches the channels balance. It is first initialized with the channels in the database, then
-     * later uses the actual channels as they reestablish. This avoids having a misleading zero balance
-     * at startup, when [Peer.channelsFlow] is not yet available.
-     */
-    private suspend fun monitorChannelsBalance(peer: Peer) {
-        var isBoot = true
-        val bootFlow = peer.bootChannelsFlow.filterNotNull()
-        val channelsFlow = peer.channelsFlow
-        combine(bootFlow, channelsFlow) { bootChannels, channels ->
-            // The bootFlow will fire once, after the channels have been read from the database.
-            if (isBoot) {
-                isBoot = false
-                bootChannels
-            } else {
-                channels
-            }
-        }.collect { channels ->
-            _balance.value = calculateBalance(channels)
+    /** Watches the channels balance, first using the channels data from our database, then the live channels. */
+    private suspend fun monitorChannelsBalance(peerManager: PeerManager) {
+        peerManager.channelsFlow.collect { channels ->
+            _balance.value = channels?.map { it.value.state.localBalance() }?.sum()
         }
     }
 
