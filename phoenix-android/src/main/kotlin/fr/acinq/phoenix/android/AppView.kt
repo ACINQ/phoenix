@@ -121,16 +121,15 @@ fun AppView(
                     val nextScreenLink = it.arguments?.getString("next")
                     log.debug { "navigating to startup with next=$nextScreenLink" }
                     StartupView(
-                        appVM,
+                        appVM = appVM,
                         onShowIntro = { navController.navigate(Screen.Intro.route) },
                         onKeyAbsent = { navController.navigate(Screen.InitWallet.route) },
                         onBusinessStarted = {
-                            if (nextScreenLink.isNullOrBlank()) {
+                            val next = nextScreenLink?.takeIf { it.isNotBlank() }?.let { Uri.parse(it) }
+                            if (next == null) {
                                 popToHome(navController)
                             } else {
-                                navController.navigate(Uri.parse(nextScreenLink),
-                                    navOptions = navOptions { popUpTo(Screen.Home.route) { inclusive = true } }
-                                )
+                                navController.navigate(next, navOptions = navOptions { popUpTo(Screen.Home.route) { inclusive = true } })
                             }
                         }
                     )
