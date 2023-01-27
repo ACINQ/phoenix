@@ -42,9 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.channel.Aborted
-import fr.acinq.lightning.channel.Closed
-import fr.acinq.lightning.channel.Closing
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
@@ -56,11 +53,6 @@ import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.controllers.payments.Receive
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.managers.WalletBalance
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flattenMerge
-import kotlinx.coroutines.flow.map
 
 sealed class ReceiveViewState {
     object Default : ReceiveViewState()
@@ -189,7 +181,6 @@ private fun GeneratingLightningInvoiceView(
     )
 }
 
-@OptIn(FlowPreview::class)
 @Composable
 private fun LightningInvoiceView(
     context: Context,
@@ -238,8 +229,8 @@ private fun LightningInvoiceView(
     )
     Spacer(modifier = Modifier.height(24.dp))
     LocalWalletContext.current?.payToOpen?.v1?.minFundingSat?.sat?.let { minPayToOpenAmount ->
-        val channels by business.peerManager.peerState.filterNotNull().map { it.channelsFlow }.flattenMerge().collectAsState(initial = null)
-        if (channels != null && channels!!.filterNot { it.value is Closed || it.value is Closing  || it.value is Aborted}.isEmpty()) {
+        val channels by business.peerManager.channelsFlow.collectAsState(initial = null)
+        if (channels?.filter { !it.value.isUsable }.isNullOrEmpty()) {
             Text(
                 text = annotatedStringResource(id = R.string.receive__min_amount_pay_to_open, minPayToOpenAmount.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
                 style = MaterialTheme.typography.body1.copy(fontSize = 14.sp),

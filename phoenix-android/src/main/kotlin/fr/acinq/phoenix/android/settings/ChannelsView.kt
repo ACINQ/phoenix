@@ -25,25 +25,25 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.selection.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.*
+import androidx.compose.ui.unit.*
+import androidx.compose.ui.window.*
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.utils.msat
-import fr.acinq.phoenix.android.CF
+import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.controllers.config.ChannelsConfiguration
 
@@ -86,7 +86,12 @@ fun ChannelsView() {
             Card {
                 Row {
                     Text(text = stringResource(id = R.string.listallchannels_node_id), modifier = Modifier.padding(16.dp))
-                    Text(text = model.nodeId, style = MaterialTheme.typography.body2, overflow = TextOverflow.Ellipsis, maxLines = 1, modifier = Modifier.padding(vertical = 16.dp).weight(1f))
+                    Text(
+                        text = model.nodeId, style = MaterialTheme.typography.body2, overflow = TextOverflow.Ellipsis,
+                        maxLines = 1, modifier = Modifier
+                            .padding(vertical = 16.dp)
+                            .weight(1f)
+                    )
                     Button(
                         icon = R.drawable.ic_copy,
                         onClick = { copyToClipboard(context, model.nodeId, context.getString(R.string.listallchannels_node_id)) },
@@ -120,7 +125,9 @@ private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: (
                 Syncing::class.simpleName -> stringResource(id = R.string.state_sync)
                 Offline::class.simpleName -> stringResource(id = R.string.state_offline)
                 ShuttingDown::class.simpleName -> stringResource(id = R.string.state_shutdown)
-                WaitForFundingConfirmed::class.simpleName, WaitForAcceptChannel::class.simpleName, WaitForChannelReady::class.simpleName, WaitForFundingSigned::class.simpleName, WaitForFundingCreated::class.simpleName -> stringResource(id = R.string.state_wait_confirmed)
+                WaitForFundingConfirmed::class.simpleName, WaitForAcceptChannel::class.simpleName,
+                WaitForChannelReady::class.simpleName, WaitForFundingSigned::class.simpleName,
+                WaitForFundingCreated::class.simpleName -> stringResource(id = R.string.state_wait_confirmed)
                 WaitForOpenChannel::class.simpleName -> stringResource(id = R.string.state_wait_open)
                 else -> channel.stateName
             },
@@ -137,35 +144,59 @@ private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: (
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun ChannelDialog(onDismiss: () -> Unit, channel: ChannelsConfiguration.Model.Channel) {
+private fun ChannelDialog(
+    onDismiss: () -> Unit,
+    channel: ChannelsConfiguration.Model.Channel
+) {
     val context = LocalContext.current
     val txUrl = txUrl(txId = channel.txId ?: "")
-    Dialog(
-        onDismiss = onDismiss,
-        buttons = null
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(max = 400.dp)
-        ) {
-            Text(
-                text = channel.json,
-                modifier = Modifier
-                    .background(mutedBgColor())
-                    .weight(1.0f)
-                    .horizontalScroll(rememberScrollState())
-                    .verticalScroll(rememberScrollState()),
-                style = monoTypo(),
-            )
-        }
-        Row(Modifier.fillMaxWidth()) {
-            Button(onClick = { copyToClipboard(context, channel.json, "channel data") }, icon = R.drawable.ic_copy)
-            Button(onClick = { share(context, channel.json, subject = "") }, icon = R.drawable.ic_share)
-            Button(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(txUrl))) }, text = stringResource(id = R.string.listallchannels_funding_tx))
-            Spacer(modifier = Modifier.weight(1.0f))
-            Button(onClick = onDismiss, text = stringResource(id = R.string.listallchannels_close))
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Column {
+            Card {
+                Row(modifier = Modifier.padding(16.dp)) {
+                    Text(text = stringResource(id = R.string.listallchannels_channel_id))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    SelectionContainer {
+                        Text(
+                            text = channel.id, style = MaterialTheme.typography.body2,
+                            overflow = TextOverflow.Ellipsis, maxLines = 1, modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+            Card {
+                Column(
+                    modifier = Modifier
+                        .background(mutedBgColor())
+                        .fillMaxWidth()
+                        .heightIn(max = 350.dp)
+                ) {
+                    SelectionContainer {
+                        Text(
+                            text = channel.json,
+                            modifier = Modifier
+                                .weight(1.0f)
+                                .horizontalScroll(rememberScrollState())
+                                .verticalScroll(rememberScrollState()),
+                            style = monoTypo(),
+                        )
+                    }
+                }
+                Row(Modifier.fillMaxWidth()) {
+                    Button(onClick = { copyToClipboard(context, channel.json, context.getString(R.string.listallchannels_share_subject)) }, icon = R.drawable.ic_copy)
+                    Button(onClick = { share(context, channel.json, subject = context.getString(R.string.listallchannels_share_subject), context.getString(R.string.listallchannels_share_title)) }, icon = R.drawable.ic_share)
+                    Button(
+                        icon = R.drawable.ic_chain,
+                        onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(txUrl))) },
+                        text = stringResource(id = R.string.listallchannels_funding_tx),
+                        onClickLabel = stringResource(id = R.string.listallchannels_funding_tx_desc)
+                    )
+                    Spacer(modifier = Modifier.weight(1.0f))
+                    Button(onClick = onDismiss, text = stringResource(id = R.string.listallchannels_close))
+                }
+            }
         }
     }
 }

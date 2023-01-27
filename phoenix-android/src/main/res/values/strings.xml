@@ -97,7 +97,7 @@
     <string name="receive__qr_about">QR Code of the invoice</string>
     <string name="receive__qr_amount_label">Amount:</string>
     <string name="receive__qr_desc_label">Desc:</string>
-    <string name="receive__min_amount_pay_to_open">Your wallet is empty. The first payment you receive must be at least <b>%1$s</b>.</string>
+    <string name="receive__min_amount_pay_to_open">Your wallet is empty. First incoming payment must be at least <b>%1$s</b>.</string>
     <string name="receive__edit_button">Edit</string>
     <string name="receive__share_button">Share</string>
     <string name="receive__swapin_button">Show a Bitcoin address</string>
@@ -273,22 +273,15 @@
     <!-- //////////////// list all channels //////////////// -->
 
     <string name="listallchannels_title">Payment channels</string>
-    <string name="listallchannels_in_progress">Please hold…</string>
     <string name="listallchannels_node_id">Node id:</string>
     <string name="listallchannels_no_channels">You don\'t have any channels yet.\n\nPayments channels are created when you receive a payment and a new channel is needed. This is done automatically.</string>
-    <plurals name="listallchannels_channels_header">
-        <item quantity="one">You have %1$d channel.</item>
-        <item quantity="other">You have %1$d channels.</item>
-    </plurals>
-    <string name="listallchannels_copy">Copy</string>
-    <string name="listallchannels_share_all">Share all channels…</string>
     <string name="listallchannels_share">Share</string>
-    <string name="listallchannels_funding_tx">Tx</string>
+    <string name="listallchannels_channel_id">Channel id:</string>
+    <string name="listallchannels_funding_tx">Funding tx</string>
     <string name="listallchannels_funding_tx_desc">See funding transaction</string>
     <string name="listallchannels_close">Close</string>
     <string name="listallchannels_share_subject">Channels data</string>
     <string name="listallchannels_share_title">Share channel data</string>
-    <string name="listallchannels_serialization_error">Could not retrieve channel data</string>
 
     <!-- //////////////// channel details //////////////// -->
 
