@@ -534,10 +534,10 @@ struct TxHistoryExporter: View {
 					}
 					
 					try writer.endRow()
+					exportedCount = (exportedCount ?? 0) + 1
 				}
 				
 				rowsOffset += rows.count
-				exportedCount = rowsOffset
 				
 				if rows.count < FETCH_ROWS_BATCH_COUNT {
 					done = true
