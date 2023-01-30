@@ -97,3 +97,43 @@ LEFT OUTER JOIN payments_metadata ON
     payments_metadata.id = combined_payments.id
 ORDER BY COALESCE(combined_payments.completed_at, combined_payments.created_at) DESC
 LIMIT :limit OFFSET :offset;
+
+listRangePaymentsOrder:
+SELECT
+    combined_payments.type         AS type,
+    combined_payments.id           AS id,
+    combined_payments.created_at   AS created_at,
+    combined_payments.completed_at AS completed_at,
+    payments_metadata.modified_at  AS metadata_modified_at
+FROM (
+    SELECT
+        2            AS type,
+        id           AS id,
+        created_at   AS created_at,
+        completed_at AS completed_at
+    FROM outgoing_payments
+    WHERE completed_at BETWEEN :startDate AND :endDate
+UNION ALL
+    SELECT
+        1                        AS type,
+        lower(hex(payment_hash)) AS id,
+        created_at               AS created_at,
+        received_at              AS completed_at
+    FROM incoming_payments
+    WHERE incoming_payments.received_at BETWEEN :startDate AND :endDate
+) combined_payments
+LEFT OUTER JOIN payments_metadata ON
+    payments_metadata.type = combined_payments.type AND
+    payments_metadata.id = combined_payments.id
+ORDER BY COALESCE(combined_payments.completed_at, combined_payments.created_at) DESC
+LIMIT :limit OFFSET :offset;
+
+listRangePaymentsCount:
+SELECT SUM(result) AS result FROM (
+    SELECT COUNT(*) AS result
+    FROM outgoing_payments
+    WHERE completed_at BETWEEN :startDate AND :endDate
+UNION ALL
+    SELECT COUNT(*) AS result FROM incoming_payments
+    WHERE incoming_payments.received_at BETWEEN :startDate AND :endDate
+);

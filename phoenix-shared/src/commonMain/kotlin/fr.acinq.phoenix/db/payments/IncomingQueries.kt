@@ -193,6 +193,10 @@ class IncomingQueries(private val database: PaymentsDatabase) {
         return queries.get(payment_hash = paymentHash.toByteArray(), ::mapIncomingPayment).executeAsOneOrNull()
     }
 
+    fun getOldestReceivedDate(): Long? {
+        return queries.getOldestReceivedDate().executeAsOneOrNull()
+    }
+
     fun listExpiredPayments(fromCreatedAt: Long, toCreatedAt: Long): List<IncomingPayment> {
         return queries.listAllWithin(fromCreatedAt, toCreatedAt, ::mapIncomingPayment).executeAsList().filter {
             it.received == null

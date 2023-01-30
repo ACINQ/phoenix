@@ -95,6 +95,14 @@ extension WalletPaymentInfo {
 
 extension Lightning_kmpWalletPayment {
 
+	func inIncoming() -> Bool {
+		return self is Lightning_kmpIncomingPayment
+	}
+
+	func isOutgoing() -> Bool {
+		return self is Lightning_kmpOutgoingPayment
+	}
+	
 	func isOnChain() -> Bool {
 		
 		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
@@ -132,6 +140,10 @@ extension WalletPaymentMetadata {
 }
 
 extension Lightning_kmpWalletPayment {
+	
+	func createdAtDate() -> Date {
+		return self.createdAt.toDate(from: .milliseconds)
+	}
 	
 	func completedAtDate() -> Date? {
 		

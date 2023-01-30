@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
+import kotlin.math.min
 
 class SqlitePaymentsDb(
     loggerFactory: LoggerFactory,
@@ -439,22 +440,6 @@ class SqlitePaymentsDb(
         }
     }
 
-    suspend fun listRecentPaymentsOrder(
-        date: Long,
-        count: Int,
-        skip: Int
-    ): List<WalletPaymentOrderRow> {
-
-        return withContext(Dispatchers.Default) {
-            aggrQueries.listRecentPaymentsOrder(
-                date = date,
-                limit = count.toLong(),
-                offset = skip.toLong(),
-                mapper = ::allPaymentsOrderMapper
-            ).executeAsList()
-        }
-    }
-
     suspend fun listRecentPaymentsOrderFlow(
         date: Long,
         count: Int,
@@ -485,13 +470,51 @@ class SqlitePaymentsDb(
         }
     }
 
+    suspend fun listRangePaymentsOrder(
+        startDate: Long,
+        endDate: Long,
+        count: Int,
+        skip: Int
+    ): List<WalletPaymentOrderRow> {
+
+        return withContext(Dispatchers.Default) {
+            aggrQueries.listRangePaymentsOrder(
+                startDate = startDate,
+                endDate = endDate,
+                limit = count.toLong(),
+                offset = skip.toLong(),
+                mapper = ::allPaymentsOrderMapper
+            ).executeAsList()
+        }
+    }
+
+    suspend fun listRangePaymentsCount(
+        startDate: Long,
+        endDate: Long
+    ): Long {
+
+        return withContext(Dispatchers.Default) {
+            aggrQueries.listRangePaymentsCount(
+                startDate = startDate,
+                endDate = endDate,
+                mapper = ::allPaymentsCountMapper
+            ).executeAsList().first()
+        }
+    }
+
     override suspend fun listPayments(
         count: Int,
         skip: Int,
         filters: Set<PaymentTypeFilter>
     ): List<WalletPayment> = throw NotImplementedError("Use listPaymentsOrderFlow instead")
 
-
+    suspend fun getOldestCompletedDate(): Long? {
+        return withContext(Dispatchers.Default) {
+            val oldestIncoming = inQueries.getOldestReceivedDate()
+            val oldestOutgoing = outQueries.getOldestCompletedDate()
+            listOfNotNull(oldestIncoming, oldestOutgoing).minOrNull()
+        }
+    }
 
     /**
      * The lightning-kmp layer triggers the addition of a payment to the database.

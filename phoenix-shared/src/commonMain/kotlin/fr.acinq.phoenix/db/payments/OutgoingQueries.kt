@@ -217,6 +217,10 @@ class OutgoingQueries(val database: PaymentsDatabase) {
         }
     }
 
+    fun getOldestCompletedDate(): Long? {
+        return queries.getOldestCompletedDate().executeAsOneOrNull()
+    }
+
     fun listPayments(paymentHash: ByteVector32): List<OutgoingPayment> {
         return queries.listPaymentsForPaymentHash(paymentHash.toByteArray(), ::mapOutgoingPayment).executeAsList()
             .run { groupByRawOutgoing(this) }
