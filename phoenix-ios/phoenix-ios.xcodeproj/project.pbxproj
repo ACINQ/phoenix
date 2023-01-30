@@ -104,7 +104,7 @@
 		DC48D2C42593DE30008D138C /* TextFieldCurrencyStyler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC48D2C32593DE30008D138C /* TextFieldCurrencyStyler.swift */; };
 		DC49DA8E258BB882005BC4BC /* ScaledButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */; };
 		DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC59377027516296003B4B53 /* Sequence+Sum.swift */; };
-		DC5A934F297F2AE4004F19FD /* CodableCSV in Frameworks */ = {isa = PBXBuildFile; productRef = DC5A934E297F2AE4004F19FD /* CodableCSV */; };
+		DC5A935329846044004F19FD /* FileHandle+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5A935229846043004F19FD /* FileHandle+Async.swift */; };
 		DC5AF4542677BBF7003C911B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC5AF4522677BBF7003C911B /* InfoPlist.strings */; };
 		DC5AF4572677BBF7003C911B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC5AF4552677BBF7003C911B /* Localizable.strings */; };
 		DC5CA4ED28F83C3B0048A737 /* DrainWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */; };
@@ -415,6 +415,7 @@
 		DC48D2C32593DE30008D138C /* TextFieldCurrencyStyler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldCurrencyStyler.swift; sourceTree = "<group>"; };
 		DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaledButtonStyle.swift; sourceTree = "<group>"; };
 		DC59377027516296003B4B53 /* Sequence+Sum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Sum.swift"; sourceTree = "<group>"; };
+		DC5A935229846043004F19FD /* FileHandle+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileHandle+Async.swift"; sourceTree = "<group>"; };
 		DC5AF4532677BBF7003C911B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DC5AF4562677BBF7003C911B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrainWalletView.swift; sourceTree = "<group>"; };
@@ -542,7 +543,6 @@
 			files = (
 				DCD71A79273987FE00B9A1EF /* Focuser in Frameworks */,
 				DC46BAE426C6FDD300E760A6 /* CircularCheckmarkProgress in Frameworks */,
-				DC5A934F297F2AE4004F19FD /* CodableCSV in Frameworks */,
 				DCC9D99C267BEB3D00EA36DD /* CloudKit.framework in Frameworks */,
 				DC39D4E5286B4A7E0030F18D /* Popovers in Frameworks */,
 				DCC46F1625C3521C005D32D9 /* FirebaseMessaging in Frameworks */,
@@ -1000,6 +1000,7 @@
 				DC09085725B5E43900A46136 /* String+VersionComparison.swift */,
 				DC384D82265C32F100131772 /* TextField+Verbatim.swift */,
 				DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */,
+				DC5A935229846043004F19FD /* FileHandle+Async.swift */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -1146,7 +1147,6 @@
 				DC46BAE326C6FDD300E760A6 /* CircularCheckmarkProgress */,
 				DCD71A78273987FE00B9A1EF /* Focuser */,
 				DC39D4E4286B4A7E0030F18D /* Popovers */,
-				DC5A934E297F2AE4004F19FD /* CodableCSV */,
 			);
 			productName = "phoenix-ios";
 			productReference = 7555FF7B242A565900829871 /* Phoenix.app */;
@@ -1271,7 +1271,6 @@
 				DC46BAE226C6FDD300E760A6 /* XCRemoteSwiftPackageReference "CircularCheckmarkProgress" */,
 				DCD71A752739864400B9A1EF /* XCRemoteSwiftPackageReference "swift-focuser" */,
 				DC39D4E3286B4A7E0030F18D /* XCRemoteSwiftPackageReference "Popovers" */,
-				DC5A934D297F2AE4004F19FD /* XCRemoteSwiftPackageReference "CodableCSV" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -1533,6 +1532,7 @@
 				DC5EE4C927679C6300A3035C /* RestoreView.swift in Sources */,
 				C8D7A70EFE0F071ACA0AE246 /* QRCodeScanner.swift in Sources */,
 				DC2CE55028A52AD90070A2E1 /* RecentPaymentsConfig.swift in Sources */,
+				DC5A935329846044004F19FD /* FileHandle+Async.swift in Sources */,
 				DC118C0A27B457F70080BBAC /* LnurlFlowErrorNotice.swift in Sources */,
 				53BEF2924096C8E7976D46E3 /* shapes.swift in Sources */,
 				DC0D2EA72939273B00284608 /* KotlinExtensions+Payments.swift in Sources */,
@@ -2150,14 +2150,6 @@
 				version = 0.4.1;
 			};
 		};
-		DC5A934D297F2AE4004F19FD /* XCRemoteSwiftPackageReference "CodableCSV" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/dehesa/CodableCSV.git";
-			requirement = {
-				kind = exactVersion;
-				version = 0.6.7;
-			};
-		};
 		DC72C2EA25A3CADC008A927A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
@@ -2186,11 +2178,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DC46BAE226C6FDD300E760A6 /* XCRemoteSwiftPackageReference "CircularCheckmarkProgress" */;
 			productName = CircularCheckmarkProgress;
-		};
-		DC5A934E297F2AE4004F19FD /* CodableCSV */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DC5A934D297F2AE4004F19FD /* XCRemoteSwiftPackageReference "CodableCSV" */;
-			productName = CodableCSV;
 		};
 		DC72C31825A3CF87008A927A /* FirebaseMessaging */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -1,6 +1,5 @@
 import SwiftUI
 import PhoenixShared
-import CodableCSV
 import os.log
 
 #if DEBUG && true
@@ -419,34 +418,19 @@ struct TxHistoryExporter: View {
 		let tmpFilename = "phoenix.csv"
 		let tmpFile = tmpDir.appendingPathComponent(tmpFilename, isDirectory: false)
 		
-		var headers = [
-			FIELD_ID,
-			FIELD_DATE,
-			FIELD_AMOUNT_BTC
-		]
-		if includeFiat {
-			headers.append(FIELD_AMOUNT_FIAT)
-		}
-		if includeDescription {
-			headers.append(FIELD_DESCRIPTION)
-		}
-		if includeNotes {
-			headers.append(FIELD_NOTES)
+		if !FileManager.default.fileExists(atPath: tmpFile.path) {
+			FileManager.default.createFile(atPath: tmpFile.path, contents: nil)
 		}
 		
-		var writerConfig = CSVWriter.Configuration()
-		writerConfig.encoding = .utf8
-		writerConfig.delimiters = (field: ",", row: "\n")
-		writerConfig.headers = headers
-		
-		let writer: CSVWriter
-		do {
-			writer = try CSVWriter(fileURL: tmpFile, append: false)
-			try writer.write(row: headers)
-		} catch {
-			log.error("Unable to create CSVWriter: \(error)")
+		guard let fileHandle = try? FileHandle(forWritingTo: tmpFile) else {
 			return exportingFailed()
 		}
+		
+		let config = CsvWriter.Configuration(
+			includesFiat: includeFiat,
+			includesDescription: includeDescription,
+			includesNotes: includeNotes
+		)
 		
 		exportedCount = 0
 		
@@ -458,6 +442,11 @@ struct TxHistoryExporter: View {
 			
 			var done = false
 			var rowsOffset = 0
+			
+			let headerRowStr = CsvWriter.companion.makeHeaderRow(config: config)
+			let headerRowData = Data(headerRowStr.utf8)
+			
+			try await fileHandle.asyncWrite(data: headerRowData)
 			
 			while !done {
 				
@@ -477,66 +466,19 @@ struct TxHistoryExporter: View {
 						continue
 					}
 					
-					let id = info.payment.id()
-					let date = iso8601String(info)
+					let localizedDescription = info.paymentDescription() ?? info.defaultPaymentDescription()
+					let rowStr = CsvWriter.companion.makeRow(
+						info: info,
+						localizedDescription: localizedDescription,
+						config: config
+					)
+					let rowData = Data(rowStr.utf8)
 					
-					let amtMsat: Int64
-					if info.payment.isOutgoing() {
-						amtMsat = -info.payment.amount.msat
-					} else {
-						amtMsat = info.payment.amount.msat
-					}
-					
-					let amtBtc = "\(amtMsat) msat"
-					
-					try writer.write(field: id)     // FIELD_ID
-					try writer.write(field: date)   // FIELD_DATE
-					try writer.write(field: amtBtc) // FIELD_AMOUNT_BTC
-					
-					if includeFiat {
-						// Developer notes:
-						//
-						// - The fiat amount may not always be in the same currency.
-						//   That is, the user has the ability to set their preferred fiat currency in the app.
-						//   For example:
-						//   * user lives in USA, has currency set to USD
-						//     * payments will record USD/BTC exchange rate at time of payment
-						//     * exported payments will read "X.Y USD"
-						//   * user goes on vacation in Mexico, changes currency to MXN
-						//     * payments will record MXN/BTC exchange rate at time of payment
-						//     * exported payments will read "X.Y MXN"
-						//   * user moves to Spain, changes currency to EUR
-						//     * payments will record EUR/BTC exchange rate at time of payment
-						//     * exported payments will read "X.Y EUR"
-						//
-						// - Prior to v1.5.5, the exchange rates for fiat currencies other
-						//   than USD & EUR may have been unreliable. So if you're parsing,
-						//   for example COP (Colombian Pesos), and you have an alternative
-						//   source for fetching historical exchange rates, then you may
-						//   prefer that source over the CSV values.
-						//   v1.5.5 was released around Feb 1, 2023
-						
-						if let originalExchangeRate = info.metadata.originalFiat {
-							let amtFiat = Utils.formatFiat(msat: amtMsat, exchangeRate: originalExchangeRate)
-							try writer.write(field: amtFiat.string)
-						} else {
-							try writer.write(field: "") // unknown
-						}
-					}
-					
-					if includeDescription {
-						let description = info.paymentDescription() ?? info.defaultPaymentDescription()
-						try writer.write(field: description)
-					}
-					if includeNotes {
-						let notes = info.metadata.userNotes ?? ""
-						try writer.write(field: notes)
-					}
-					
-					try writer.endRow()
+					try await fileHandle.asyncWrite(data: rowData)
 					exportedCount = (exportedCount ?? 0) + 1
-				}
-				
+					
+				} // </for row in rows>
+		
 				rowsOffset += rows.count
 				
 				if rows.count < FETCH_ROWS_BATCH_COUNT {
@@ -547,24 +489,12 @@ struct TxHistoryExporter: View {
 				
 			} // </while !done>
 			
-			try writer.endEncoding()
+			try await fileHandle.asyncSyncAndClose()
 			exportingFinished(tmpFile)
 			
 		} catch {
 			log.error("Error: \(error)")
 			exportingFailed()
-		}
-	}
-	
-	private func iso8601String(_ info: WalletPaymentInfo) -> String {
-		
-		let date = info.payment.completedAtDate() ?? info.payment.createdAtDate()
-		if #available(iOS 15, *) {
-			return date.ISO8601Format()
-			
-		} else {
-			let formatter = ISO8601DateFormatter()
-			return formatter.string(from: date)
 		}
 	}
 }
