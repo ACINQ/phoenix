@@ -111,9 +111,11 @@ class CsvWriter {
                     val comp0 = if (components.size > 0) components[0] else "0"
                     val comp1 = if (components.size > 1) components[1] else "0"
 
-                    val fiatStr = "${comp0}.${comp1.take(4).padEnd(4, '0')}"
+                    val numStr = "${comp0}.${comp1.take(4).padEnd(4, '0')}"
+                    val currencyName = originalFiatExchangeRate.fiatCurrency.name
+                    val fiatStr = "$numStr $currencyName"
 
-                    row += ",${processField(fiatStr)} ${originalFiatExchangeRate.fiatCurrency.name}"
+                    row += ",${processField(fiatStr)}"
                 } ?: run {
                     row += ","
                 }
