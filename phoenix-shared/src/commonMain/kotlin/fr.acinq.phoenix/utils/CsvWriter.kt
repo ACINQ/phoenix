@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.utils
 
+import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.utils.extensions.createdAt
 import kotlinx.datetime.Instant
@@ -13,10 +14,11 @@ class CsvWriter {
     )
 
     companion object {
-        private const val FIELD_ID          = "ID"
         private const val FIELD_DATE        = "Date"
-        private const val FIELD_AMOUNT_BTC  = "Amount BTC"
+        private const val FIELD_AMOUNT_MSAT = "Amount Millisatoshi"
         private const val FIELD_AMOUNT_FIAT = "Amount Fiat"
+        private const val FIELD_FEES_MSAT   = "Fees Millisatoshi"
+        private const val FIELD_FEES_FIAT   = "Fees Fiat"
         private const val FIELD_DESCRIPTION = "Description"
         private const val FIELD_NOTES       = "Notes"
 
@@ -25,9 +27,9 @@ class CsvWriter {
          * This includes the CRLF that terminates the row.
          */
         fun makeHeaderRow(config: Configuration): String {
-            var header = "$FIELD_ID,$FIELD_DATE,$FIELD_AMOUNT_BTC"
+            var header = "$FIELD_DATE,$FIELD_AMOUNT_MSAT,$FIELD_FEES_MSAT"
             if (config.includesFiat) {
-                header += ",$FIELD_AMOUNT_FIAT"
+                header += ",$FIELD_AMOUNT_FIAT,$FIELD_FEES_FIAT"
             }
             if (config.includesDescription) {
                 header += ",$FIELD_DESCRIPTION"
@@ -54,16 +56,22 @@ class CsvWriter {
             config: Configuration
         ): String {
 
-            val id = info.id().dbId
-            var row = processField(id)
+            var row = ""
 
             val completedAt = info.payment.completedAt()
             val date = if (completedAt > 0) completedAt else info.payment.createdAt
             val dateStr = Instant.fromEpochMilliseconds(date).toString() // ISO-8601 format
             row += ",${processField(dateStr)}"
 
-            val amtBtc = "${info.payment.amount.msat} msat"
-            row += ",${processField(amtBtc)}"
+            val amtMsat = info.payment.amount.msat
+            val feesMsat = info.payment.fees.msat
+            val isOutgoing = info.payment is OutgoingPayment
+
+            val amtMsatStr = if (isOutgoing) "-$amtMsat" else "$amtMsat"
+            row += ",${processField(amtMsatStr)}"
+
+            val feesMsatStr = "-$feesMsat"
+            row += ",${processField(feesMsatStr)}"
 
             if (config.includesFiat) {
                 /**
@@ -89,35 +97,23 @@ class CsvWriter {
                  *   prefer that source over the CSV values.
                  */
 
-                info.metadata.originalFiat?.let { originalFiatExchangeRate ->
-                    val msatsPerBitcoin = 100_000_000_000
-                    val btc = info.payment.amount.msat.toDouble() / msatsPerBitcoin.toDouble()
-                    val fiat = btc * originalFiatExchangeRate.price
+                info.metadata.originalFiat?.let { exchangeRate ->
+                    val msatsPerBitcoin = 100_000_000_000.toDouble()
 
-                    // How do we display the fiat currency value ?
-                    // Some currencies use 2 decimal places, e.g. "4.26 EUR".
-                    // But there are also zero-decimal currencies, such as JPY.
-                    //
-                    // Since it's common to have micropayments on the lightning network,
-                    // we're simply going to always display 4 decimal places.
-                    //
-                    // The extra precision can be truncated / rounded / ignored
-                    // by the reader, who has more insight into how they wish
-                    // to use the exported information.
-                    //
-                    // Note: String.companion.format isn't available until Kotlin v1.7.2
+                    val amtFiat = (amtMsat / msatsPerBitcoin) * exchangeRate.price
+                    val feesFiat = (feesMsat / msatsPerBitcoin) * exchangeRate.price
 
-                    val components = fiat.toString().split(".")
-                    val comp0 = if (components.size > 0) components[0] else "0"
-                    val comp1 = if (components.size > 1) components[1] else "0"
+                    val currencyName = exchangeRate.fiatCurrency.name
 
-                    val numStr = "${comp0}.${comp1.take(4).padEnd(4, '0')}"
-                    val currencyName = originalFiatExchangeRate.fiatCurrency.name
-                    val fiatStr = "$numStr $currencyName"
+                    val amtPrefix = if (isOutgoing) "-" else ""
+                    val amtFiatStr = "${amtPrefix}${formatFiatValue(amtFiat)} $currencyName"
 
-                    row += ",${processField(fiatStr)}"
+                    val feesFiatStr = "-${formatFiatValue(feesFiat)} $currencyName"
+
+                    row += ",${processField(amtFiatStr)}"
+                    row += ",${processField(feesFiatStr)}"
                 } ?: run {
-                    row += ","
+                    row += ",,"
                 }
             }
 
@@ -135,6 +131,28 @@ class CsvWriter {
 
             row += "\r\n"
             return row
+        }
+
+        private fun formatFiatValue(amt: Double): String {
+
+            // How do we display the fiat currency value ?
+            // Some currencies use 2 decimal places, e.g. "4.26 EUR".
+            // But there are also zero-decimal currencies, such as JPY.
+            //
+            // Since it's common to have micropayments on the lightning network,
+            // we're simply going to always display 4 decimal places.
+            //
+            // The extra precision can be truncated / rounded / ignored
+            // by the reader, who has more insight into how they wish
+            // to use the exported information.
+            //
+            // Note: String.companion.format isn't available until Kotlin v1.7.2
+
+            val components = amt.toString().split(".")
+            val comp0 = if (components.size > 0) components[0] else "0"
+            val comp1 = if (components.size > 1) components[1] else "0"
+
+            return "${comp0}.${comp1.take(4).padEnd(4, '0')}"
         }
 
         private fun processField(str: String): String {
