@@ -426,19 +426,22 @@ struct TxHistoryExporter: View {
 			return exportingFailed()
 		}
 		
-		let config = CsvWriter.Configuration(
-			includesFiat: includeFiat,
-			includesDescription: includeDescription,
-			includesNotes: includeNotes
-		)
-		
 		exportedCount = 0
 		
 		let databaseManager = Biz.business.databaseManager
+		let peerManager = Biz.business.peerManager
 		let fetcher = Biz.business.paymentsManager.fetcher
 		
 		do {
 			let paymentsDb = try await databaseManager.paymentsDb()
+			let peer = try await peerManager.getPeer()
+			
+			let config = CsvWriter.Configuration(
+				includesFiat: includeFiat,
+				includesDescription: includeDescription,
+				includesNotes: includeNotes,
+				swapInAddress: peer.swapInAddress
+			)
 			
 			var done = false
 			var rowsOffset = 0
