@@ -235,6 +235,7 @@ fun Button(
     border: BorderStroke? = null,
     elevation: ButtonElevation? = null,
     backgroundColor: Color = Color.Unspecified, // transparent by default!
+    onClickLabel: String? = null,
 ) {
     val colors = ButtonDefaults.buttonColors(
         backgroundColor = backgroundColor,
@@ -250,6 +251,7 @@ fun Button(
         modifier = modifier
             .clickable(
                 onClick = onClick,
+                onClickLabel = onClickLabel,
                 enabled = enabled,
                 role = Role.Button,
                 interactionSource = interactionSource,
@@ -284,7 +286,7 @@ fun Button(
                     verticalAlignment = Alignment.CenterVertically,
                     content = {
                         if (text != null && icon != null) {
-                            TextWithIcon(text = text, icon = icon, iconTint = iconTint, space = space)
+                            TextWithIcon(text = text, icon = icon, iconTint = iconTint, space = space, alignBaseLine = true)
                         } else if (text != null) {
                             Text(text)
                         } else if (icon != null) {
