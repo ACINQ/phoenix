@@ -7,6 +7,7 @@ import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.payment.PaymentRequest
@@ -56,12 +57,7 @@ class CsvWriterTests {
         val actual = CsvWriter.makeRow(
             info = WalletPaymentInfo(payment, metadata, WalletPaymentFetchOptions.All),
             localizedDescription = "L2 Top-up",
-            config = CsvWriter.Configuration(
-                includesFiat = true,
-                includesDescription = true,
-                includesNotes = true,
-                swapInAddress = swapInAddress
-            )
+            config = makeConfig()
         )
 
         assertEquals(expected, actual)
@@ -97,12 +93,7 @@ class CsvWriterTests {
         val actual = CsvWriter.makeRow(
             info = WalletPaymentInfo(payment, metadata, WalletPaymentFetchOptions.All),
             localizedDescription = "Cafécito",
-            config = CsvWriter.Configuration(
-                includesFiat = true,
-                includesDescription = true,
-                includesNotes = true,
-                swapInAddress = swapInAddress
-            )
+            config = makeConfig()
         )
 
         assertEquals(expected, actual)
@@ -134,12 +125,7 @@ class CsvWriterTests {
         val actual = CsvWriter.makeRow(
             info = WalletPaymentInfo(payment, metadata, WalletPaymentFetchOptions.All),
             localizedDescription = "Arepa de Choclo",
-            config = CsvWriter.Configuration(
-                includesFiat = true,
-                includesDescription = true,
-                includesNotes = true,
-                swapInAddress = swapInAddress
-            )
+            config = makeConfig()
         )
 
         assertEquals(expected, actual)
@@ -171,12 +157,7 @@ class CsvWriterTests {
         val actual = CsvWriter.makeRow(
             info = WalletPaymentInfo(payment, metadata, WalletPaymentFetchOptions.All),
             localizedDescription = "Test 1",
-            config = CsvWriter.Configuration(
-                includesFiat = true,
-                includesDescription = true,
-                includesNotes = true,
-                swapInAddress = swapInAddress
-            )
+            config = makeConfig()
         )
 
         assertEquals(expected, actual)
@@ -208,12 +189,7 @@ class CsvWriterTests {
         val actual = CsvWriter.makeRow(
             info = WalletPaymentInfo(payment, metadata, WalletPaymentFetchOptions.All),
             localizedDescription = "Test 2",
-            config = CsvWriter.Configuration(
-                includesFiat = true,
-                includesDescription = true,
-                includesNotes = true,
-                swapInAddress = swapInAddress
-            )
+            config = makeConfig()
         )
 
         assertEquals(expected, actual)
@@ -248,12 +224,7 @@ class CsvWriterTests {
         val actual = CsvWriter.makeRow(
             info = WalletPaymentInfo(payment, metadata, WalletPaymentFetchOptions.All),
             localizedDescription = "Test 3",
-            config = CsvWriter.Configuration(
-                includesFiat = true,
-                includesDescription = true,
-                includesNotes = true,
-                swapInAddress = swapInAddress
-            )
+            config = makeConfig()
         )
 
         assertEquals(expected, actual)
@@ -288,12 +259,7 @@ class CsvWriterTests {
         val actual = CsvWriter.makeRow(
             info = WalletPaymentInfo(payment, metadata, WalletPaymentFetchOptions.All),
             localizedDescription = "L1 Top-up",
-            config = CsvWriter.Configuration(
-                includesFiat = true,
-                includesDescription = true,
-                includesNotes = true,
-                swapInAddress = swapInAddress
-            )
+            config = makeConfig()
         )
 
         assertEquals(expected, actual)
@@ -330,18 +296,13 @@ class CsvWriterTests {
         val actual = CsvWriter.makeRow(
             info = WalletPaymentInfo(payment, metadata, WalletPaymentFetchOptions.All),
             localizedDescription = "Swap for cash",
-            config = CsvWriter.Configuration(
-                includesFiat = true,
-                includesDescription = true,
-                includesNotes = true,
-                swapInAddress = swapInAddress
-            )
+            config = makeConfig()
         )
 
         assertEquals(expected, actual)
     }
 
-/*  @Test
+    @Test
     fun testRow_Outgoing_ChannelClose() {
         val payment = OutgoingPayment(
             id = UUID.randomUUID(),
@@ -352,9 +313,17 @@ class CsvWriterTests {
                 closingAddress = "tb1qz5gxe2450uadavle8wwcc5ngquqfj5xp4dy0ja",
                 isSentToDefaultAddress = false
             ),
-            parts = listOf(),
+            parts = listOf(
+                OutgoingPayment.ClosingTxPart(
+                    id = UUID.randomUUID(),
+                    txId = randomBytes32(),
+                    claimed = 8_690.sat,
+                    closingType = ChannelClosingType.Mutual,
+                    createdAt = 0
+                )
+            ),
             status = OutgoingPayment.Status.Completed.Succeeded.OnChain(
-                completedAt = 1675289814498
+                completedAt = 1675353533694
             )
         )
         val metadata = makeMetadata(
@@ -362,21 +331,15 @@ class CsvWriterTests {
             userNotes = null
         )
 
-        val expected = "?\r\n"
+        val expected = "2023-02-02T15:58:53.694Z,-8690464,-464,,tb1qz5gxe2450uadavle8wwcc5ngquqfj5xp4dy0ja,-2.0563 USD,-0.0001 USD,Channel closing,\r\n"
         val actual = CsvWriter.makeRow(
             info = WalletPaymentInfo(payment, metadata, WalletPaymentFetchOptions.All),
             localizedDescription = "Channel closing",
-            config = CsvWriter.Configuration(
-                includesFiat = true,
-                includesDescription = true,
-                includesNotes = true,
-                swapInAddress = swapInAddress
-            )
+            config = makeConfig()
         )
 
         assertEquals(expected, actual)
     }
-    */
 
     /**
      * The only thing the CsvWriter reads from a PaymentRequest is the paymentHash.
@@ -422,5 +385,14 @@ class CsvWriterTests {
             userDescription = null,
             userNotes = userNotes,
             modifiedAt = null
+        )
+
+    private fun makeConfig() =
+        CsvWriter.Configuration(
+            includesFiat = true,
+            includesDescription = true,
+            includesNotes = true,
+            includesOriginDestination = true,
+            swapInAddress = swapInAddress
         )
 }

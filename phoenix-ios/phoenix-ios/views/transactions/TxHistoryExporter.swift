@@ -20,6 +20,7 @@ struct TxHistoryExporter: View {
 	@State var includeDescription = true
 	@State var includeNotes = true
 	@State var includeFiat = true
+	@State var includeOriginDestination = true
 	
 	@State var invalidDates = false
 	@State var isExporting = false
@@ -145,6 +146,28 @@ struct TxHistoryExporter: View {
 				}
 				Spacer()
 				Toggle("", isOn: $includeFiat)
+					.labelsHidden()
+					.disabled(isExporting)
+					.padding(.trailing, 2)
+					.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
+						d[VerticalAlignment.center]
+					}
+					
+			} // </HStack>
+			.padding(.bottom)
+			
+			HStack(alignment: VerticalAlignment.centerTopLine) {
+				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+					Text("Include origin & destination")
+						.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
+							d[VerticalAlignment.center]
+						}
+					Text("(e.g. btc address payment was sent to)")
+						.foregroundColor(.secondary)
+						.padding(.leading, 4)
+				}
+				Spacer()
+				Toggle("", isOn: $includeOriginDestination)
 					.labelsHidden()
 					.disabled(isExporting)
 					.padding(.trailing, 2)
@@ -445,6 +468,7 @@ struct TxHistoryExporter: View {
 				includesFiat: includeFiat,
 				includesDescription: includeDescription,
 				includesNotes: includeNotes,
+				includesOriginDestination: includeOriginDestination,
 				swapInAddress: peer.swapInAddress
 			)
 			

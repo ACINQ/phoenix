@@ -12,6 +12,7 @@ class CsvWriter {
         val includesFiat: Boolean,
         val includesDescription: Boolean,
         val includesNotes: Boolean,
+        val includesOriginDestination: Boolean,
         val swapInAddress: String
     )
 
@@ -31,7 +32,10 @@ class CsvWriter {
          * This includes the CRLF that terminates the row.
          */
         fun makeHeaderRow(config: Configuration): String {
-            var header = "$FIELD_DATE,$FIELD_AMOUNT_MSAT,$FIELD_FEES_MSAT,$FIELD_ORIGIN,$FIELD_DESTINATION"
+            var header = "$FIELD_DATE,$FIELD_AMOUNT_MSAT,$FIELD_FEES_MSAT"
+            if (config.includesOriginDestination) {
+                header += ",$FIELD_ORIGIN,$FIELD_DESTINATION"
+            }
             if (config.includesFiat) {
                 header += ",$FIELD_AMOUNT_FIAT,$FIELD_FEES_FIAT"
             }
@@ -75,27 +79,29 @@ class CsvWriter {
             val feesMsatStr = if (feesMsat > 0) "-$feesMsat" else "$feesMsat"
             row += ",${processField(feesMsatStr)}"
 
-            val incomingPayment = info.payment as? IncomingPayment
-            val originStr = incomingPayment?.let {
-                when (val origin = it.origin) {
-                    is IncomingPayment.Origin.Invoice -> origin.paymentRequest.paymentHash.toHex()
-                    is IncomingPayment.Origin.KeySend -> ""
-                    is IncomingPayment.Origin.SwapIn -> origin.address ?: ""
-                    is IncomingPayment.Origin.DualSwapIn ->config.swapInAddress
-                }
-            } ?: ""
-            row += ",${processField(originStr)}"
+            if (config.includesOriginDestination) {
+                val incomingPayment = info.payment as? IncomingPayment
+                val originStr = incomingPayment?.let {
+                    when (val origin = it.origin) {
+                        is IncomingPayment.Origin.Invoice -> origin.paymentRequest.paymentHash.toHex()
+                        is IncomingPayment.Origin.KeySend -> ""
+                        is IncomingPayment.Origin.SwapIn -> origin.address ?: ""
+                        is IncomingPayment.Origin.DualSwapIn ->config.swapInAddress
+                    }
+                } ?: ""
+                row += ",${processField(originStr)}"
 
-            val outgoingPayment = info.payment as? OutgoingPayment
-            val destinationStr = outgoingPayment?.let {
-                when (val details = it.details) {
-                    is OutgoingPayment.Details.Normal -> details.paymentHash.toHex()
-                    is OutgoingPayment.Details.KeySend -> details.paymentHash.toHex()
-                    is OutgoingPayment.Details.SwapOut -> details.address
-                    is OutgoingPayment.Details.ChannelClosing -> details.closingAddress
-                }
-            } ?: ""
-            row += ",${processField(destinationStr)}"
+                val outgoingPayment = info.payment as? OutgoingPayment
+                val destinationStr = outgoingPayment?.let {
+                    when (val details = it.details) {
+                        is OutgoingPayment.Details.Normal -> details.paymentHash.toHex()
+                        is OutgoingPayment.Details.KeySend -> details.paymentHash.toHex()
+                        is OutgoingPayment.Details.SwapOut -> details.address
+                        is OutgoingPayment.Details.ChannelClosing -> details.closingAddress
+                    }
+                } ?: ""
+                row += ",${processField(destinationStr)}"
+            }
 
             if (config.includesFiat) {
                 /**
