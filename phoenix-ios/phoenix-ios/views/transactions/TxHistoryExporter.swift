@@ -255,7 +255,12 @@ struct TxHistoryExporter: View {
 	func datesChanged() {
 		log.trace("datesChanged()")
 		
-		if startDate > endDate {
+		// Remember: startDate and endDate can be the same day.
+		
+		let startMillis = sanitizeStartDate()
+		let endMillis = sanitizeEndDate()
+		
+		if startMillis > endMillis {
 			invalidDates = true
 			paymentCount = nil
 		} else {

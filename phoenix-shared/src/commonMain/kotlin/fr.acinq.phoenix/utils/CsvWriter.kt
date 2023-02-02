@@ -60,12 +60,10 @@ class CsvWriter {
             config: Configuration
         ): String {
 
-            var row = ""
-
             val completedAt = info.payment.completedAt()
             val date = if (completedAt > 0) completedAt else info.payment.createdAt
             val dateStr = Instant.fromEpochMilliseconds(date).toString() // ISO-8601 format
-            row += ",${processField(dateStr)}"
+            var row = processField(dateStr)
 
             val amtMsat = info.payment.amount.msat
             val feesMsat = info.payment.fees.msat
@@ -74,7 +72,7 @@ class CsvWriter {
             val amtMsatStr = if (isOutgoing) "-$amtMsat" else "$amtMsat"
             row += ",${processField(amtMsatStr)}"
 
-            val feesMsatStr = "-$feesMsat"
+            val feesMsatStr = if (feesMsat > 0) "-$feesMsat" else "$feesMsat"
             row += ",${processField(feesMsatStr)}"
 
             val incomingPayment = info.payment as? IncomingPayment
@@ -131,10 +129,8 @@ class CsvWriter {
 
                     val currencyName = exchangeRate.fiatCurrency.name
 
-                    val amtPrefix = if (isOutgoing) "-" else ""
-                    val amtFiatStr = "${amtPrefix}${formatFiatValue(amtFiat)} $currencyName"
-
-                    val feesFiatStr = "-${formatFiatValue(feesFiat)} $currencyName"
+                    val amtFiatStr = "${formatFiatValue(amtFiat, isOutgoing)} $currencyName"
+                    val feesFiatStr = "${formatFiatValue(feesFiat, true)} $currencyName"
 
                     row += ",${processField(amtFiatStr)}"
                     row += ",${processField(feesFiatStr)}"
@@ -159,7 +155,7 @@ class CsvWriter {
             return row
         }
 
-        private fun formatFiatValue(amt: Double): String {
+        private fun formatFiatValue(amt: Double, negative: Boolean): String {
 
             // How do we display the fiat currency value ?
             // Some currencies use 2 decimal places, e.g. "4.26 EUR".
@@ -172,13 +168,21 @@ class CsvWriter {
             // by the reader, who has more insight into how they wish
             // to use the exported information.
             //
-            // Note: String.companion.format isn't available until Kotlin v1.7.2
+            // Implementation Notes:
+            //
+            // We can't use Java's String.format function on KMM.
+            // And Kotlin's String.companion.format isn't available until Kotlin v1.7.2
+            //
+            // So we're stuck rolling our own solution.
+            // And the biggest problem we have is that Double.toString() might
+            // produce something like this: "7.900441605000001E-4"
 
-            val components = amt.toString().split(".")
-            val comp0 = if (components.size > 0) components[0] else "0"
-            val comp1 = if (components.size > 1) components[1] else "0"
+            val integerPart = amt.toLong().toString()
+            val fractionPart = ((amt % 1) * 10_000).toLong().toString()
+                .take(4).padStart(4, '0')
 
-            return "${comp0}.${comp1.take(4).padEnd(4, '0')}"
+            val formattedStr = "${integerPart}.${fractionPart}"
+            return if (negative && formattedStr != "0.0000") "-$formattedStr" else formattedStr
         }
 
         private fun processField(str: String): String {
