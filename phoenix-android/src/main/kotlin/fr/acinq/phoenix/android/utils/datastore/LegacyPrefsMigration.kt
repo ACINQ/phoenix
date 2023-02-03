@@ -35,7 +35,7 @@ object LegacyPrefsMigration {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     /** Import the legacy app's preferences into the new app's datastores. */
-    suspend fun doMigration(context: Context) {
+    suspend fun importLegacyPreferences(context: Context) {
         log.info("started migrating legacy user preferences")
 
         // -- utils

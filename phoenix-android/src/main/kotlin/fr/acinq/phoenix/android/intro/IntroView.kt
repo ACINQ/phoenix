@@ -16,164 +16,169 @@
 
 package fr.acinq.phoenix.android.intro
 
-import androidx.activity.compose.BackHandler
+import androidx.activity.compose.*
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.*
+import androidx.compose.ui.platform.*
+import androidx.compose.ui.res.*
+import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import fr.acinq.bitcoin.Satoshi
-import fr.acinq.lightning.utils.sat
+import com.google.accompanist.pager.*
+import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.FilledButton
-import fr.acinq.phoenix.android.utils.Converter.proportionalFeeAsPercentage
-import fr.acinq.phoenix.android.utils.Converter.proportionalFeeAsPercentageString
-import fr.acinq.phoenix.android.utils.datastore.InternalData
-import fr.acinq.phoenix.data.WalletContext
-import kotlinx.coroutines.launch
-import java.text.DecimalFormat
+import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.utils.*
+import fr.acinq.phoenix.android.utils.datastore.*
+import fr.acinq.phoenix.data.*
+import kotlinx.coroutines.*
 
-private enum class IntroViewSteps {
-    WELCOME, CHANNELS_INFO, SELF_CUSTODY
-}
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun IntroView(
-    onBackClick: () -> Unit,
     onFinishClick: () -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var step by remember { mutableStateOf(IntroViewSteps.WELCOME) }
+    val pagerState = rememberPagerState()
     val walletParams = business.appConfigurationManager.chainContext.collectAsState()
 
-    when (step) {
-        IntroViewSteps.WELCOME -> WelcomeView(
-            onBackClick = { Unit },
-            onNextClick = { step = IntroViewSteps.CHANNELS_INFO }
-        )
-        IntroViewSteps.CHANNELS_INFO -> ChannelsInfoView(
-            onBackClick = { step = IntroViewSteps.WELCOME },
-            onNextClick = { step = IntroViewSteps.SELF_CUSTODY },
-            walletParams.value,
-        )
-        IntroViewSteps.SELF_CUSTODY -> SelfCustodyView(
-            onBackClick = { step = IntroViewSteps.CHANNELS_INFO },
-            onNextClick = {
-                scope.launch {
-                    InternalData.saveShowIntro(context, false)
-                    onFinishClick()
+    HorizontalPager(count = 3, state = pagerState) { index ->
+        BackHandler { context.findActivity().moveTaskToBack(false) }
+        when (index) {
+            0 -> WelcomeView(
+                onNextClick = { scope.launch { pagerState.animateScrollToPage(1) } }
+            )
+            1 -> ChannelsInfoView(
+                onNextClick = { scope.launch { pagerState.animateScrollToPage(2) } },
+                walletContext = walletParams.value,
+            )
+            2 -> SelfCustodyView(
+                onNextClick = {
+                    scope.launch {
+                        InternalData.saveShowIntro(context, false)
+                        onFinishClick()
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 }
 
 @Composable
 private fun WelcomeView(
-    onBackClick: () -> Unit,
     onNextClick: () -> Unit,
 ) {
-    BackHandler() {
-        onBackClick()
-    }
-    Column(
-        modifier = Modifier
-            .padding(vertical = 16.dp, horizontal = 32.dp)
-            .widthIn(max = 500.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = stringResource(id = R.string.intro_welcome_title),
-            style = MaterialTheme.typography.h1,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = stringResource(id = R.string.intro_welcome_sub1), textAlign = TextAlign.Center)
-        Spacer(
-            modifier = Modifier
-                .weight(1f)
-                .heightIn(min = 16.dp)
-        )
-        FilledButton(text = stringResource(id = R.string.intro_welcome_next_button), onClick = onNextClick, modifier = Modifier.fillMaxWidth())
-    }
+    IntroLayout(
+        topContent = {
+            Image(painter = painterResource(id = R.drawable.intro_btc), contentDescription = "bitcoin logo")
+        },
+        bottomContent = {
+            Text(
+                text = stringResource(id = R.string.intro_welcome_title),
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.h2,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(id = R.string.intro_welcome_sub1),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+            )
+        },
+        navContent = {
+            FilledButton(text = stringResource(id = R.string.intro_welcome_next_button), onClick = onNextClick, modifier = Modifier.fillMaxWidth())
+        }
+    )
 }
 
 @Composable
 private fun ChannelsInfoView(
-    onBackClick: () -> Unit,
     onNextClick: () -> Unit,
     walletContext: WalletContext.V0.ChainContext?,
 ) {
-    BackHandler() {
-        onBackClick()
-    }
-    Column(
-        modifier = Modifier
-            .padding(vertical = 16.dp, horizontal = 32.dp)
-            .widthIn(max = 500.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = stringResource(id = R.string.intro_channels_title),
-            style = MaterialTheme.typography.h3,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        val (feePercent, minFeeAmount) = walletContext?.let {
-            DecimalFormat("0.####").format(it.payToOpen.v1.feePercent * 100) to it.payToOpen.v1.minFeeSat.sat
-        } ?: ("???" to "???")
-        Text(text = stringResource(id = R.string.intro_channels_sub1, feePercent, minFeeAmount), textAlign = TextAlign.Center)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = stringResource(id = R.string.intro_channels_sub2), textAlign = TextAlign.Center, style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
-
-        Spacer(
-            modifier = Modifier
-                .weight(1f)
-                .heightIn(min = 16.dp)
-        )
-        FilledButton(text = stringResource(id = R.string.intro_channels_next_button), onClick = onNextClick, modifier = Modifier.fillMaxWidth())
-    }
+    IntroLayout(
+        topContent = {
+            Image(painter = painterResource(id = R.drawable.intro_ln), contentDescription = "lightning channels")
+        },
+        bottomContent = {
+            Text(
+                text = stringResource(id = R.string.intro_channels_title),
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.h3,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+//            val (feePercent, minFeeAmount) = walletContext?.let {
+//                DecimalFormat("0.####").format(it.payToOpen.v1.feePercent * 100) to it.payToOpen.v1.minFeeSat.sat
+//            } ?: ("???" to "???")
+            Text(text = stringResource(id = R.string.intro_channels_sub1), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+       },
+        navContent = {
+            FilledButton(text = stringResource(id = R.string.intro_channels_next_button), onClick = onNextClick, modifier = Modifier.fillMaxWidth())
+        }
+    )
 }
 
 @Composable
 private fun SelfCustodyView(
-    onBackClick: () -> Unit,
     onNextClick: () -> Unit,
 ) {
-    BackHandler() {
-        onBackClick()
-    }
+    IntroLayout(
+        topContent = {
+            Image(painter = painterResource(id = R.drawable.intro_cust), contentDescription = "your key, your bitcoins")
+        },
+        bottomContent = {
+            Text(
+                text = stringResource(id = R.string.intro_selfcustody_title),
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.h3,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = stringResource(id = R.string.intro_selfcustody_sub1), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = stringResource(id = R.string.intro_selfcustody_sub2), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+        },
+        navContent = {
+            FilledButton(text = stringResource(id = R.string.intro_selfcustody_next_button), icon = R.drawable.ic_zap, onClick = onNextClick, modifier = Modifier.fillMaxWidth())
+        }
+    )
+}
+
+@Composable
+private fun IntroLayout(
+    topContent: @Composable ColumnScope.() -> Unit,
+    bottomContent: @Composable ColumnScope.() -> Unit,
+    navContent: @Composable () -> Unit,
+) {
     Column(
-        modifier = Modifier
-            .padding(vertical = 16.dp, horizontal = 32.dp)
-            .widthIn(max = 500.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.padding(vertical = 16.dp, horizontal = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(modifier = Modifier.weight(1f))
-        Text(text = stringResource(id = R.string.intro_selfcustody_title), style = MaterialTheme.typography.h3, textAlign = TextAlign.Center)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(text = stringResource(id = R.string.intro_selfcustody_sub1), textAlign = TextAlign.Center)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = stringResource(id = R.string.intro_selfcustody_sub2), textAlign = TextAlign.Center)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Spacer(
+        Column(
             modifier = Modifier
+                .fillMaxWidth()
+                .weight(1.3f, fill = true),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom,
+        ) {
+            topContent()
+        }
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
                 .weight(1f)
-                .heightIn(min = 16.dp)
-        )
-        FilledButton(text = stringResource(id = R.string.intro_selfcustody_next_button), icon = R.drawable.ic_zap, onClick = onNextClick, modifier = Modifier.fillMaxWidth())
+                .widthIn(max = 400.dp),
+            verticalArrangement = Arrangement.Bottom,
+        ) {
+            bottomContent()
+            Spacer(modifier = Modifier.height(32.dp))
+            navContent()
+        }
     }
 }

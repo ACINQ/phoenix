@@ -68,8 +68,7 @@ fun DefaultScreenLayout(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+            .fillMaxSize()
             .background(backgroundColor)
             .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier),
         verticalArrangement = verticalArrangement,

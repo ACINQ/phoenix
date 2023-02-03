@@ -714,17 +714,16 @@
     <!-- ////////////// currencies ////////////// -->
 
     <string name="intro_welcome_title">Welcome!</string>
-    <string name="intro_welcome_sub1">With Phoenix, receiving and sending bitcoin is safe, easy, and fast.</string>
+    <string name="intro_welcome_sub1">With Phoenix, sending and receiving bitcoins is easy and safe.</string>
     <string name="intro_welcome_next_button">Next</string>
 
-    <string name="intro_channels_title">Payment channels are automatically created when needed.</string>
-    <string name="intro_channels_sub1">The fee is %1$s%% with a minimum fee of %2$s. This fee only applies when a new channel needs to be created. Payments that use existing channels don\'t pay this.</string>
-    <string name="intro_channels_sub2">The fee is dynamic and may change depending on bitcoin network conditions.</string>
-    <string name="intro_channels_next_button">I understand</string>
+    <string name="intro_channels_title">Bitcoin supercharged</string>
+    <string name="intro_channels_sub1">Phoenix uses payment channels to make Bitcoin fast and private.</string>
+    <string name="intro_channels_next_button">Next</string>
 
-    <string name="intro_selfcustody_title">Keep control of your money.</string>
-    <string name="intro_selfcustody_sub1">Phoenix is self-custodial. A backup phrase is generated, containing all the information needed to restore your Bitcoin funds.</string>
-    <string name="intro_selfcustody_sub2">Keep this phrase safe and secret!</string>
+    <string name="intro_selfcustody_title">Your key, your bitcoins</string>
+    <string name="intro_selfcustody_sub1">Phoenix is self-custodial. You take control.</string>
+    <string name="intro_selfcustody_sub2">You can restore your wallet at anytime using your secret key. Keep it safe!</string>
     <string name="intro_selfcustody_next_button">Get started</string>
 
 </resources>

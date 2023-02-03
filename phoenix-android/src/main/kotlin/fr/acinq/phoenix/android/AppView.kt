@@ -135,7 +135,7 @@ fun AppView(
                     )
                 }
                 composable(Screen.Intro.route) {
-                    IntroView(onBackClick = { navController.popBackStack() }, onFinishClick = { navController.navigate(Screen.Startup.route) })
+                    IntroView(onFinishClick = { navController.navigate(Screen.Startup.route) })
                 }
                 composable(Screen.InitWallet.route) {
                     InitWallet(

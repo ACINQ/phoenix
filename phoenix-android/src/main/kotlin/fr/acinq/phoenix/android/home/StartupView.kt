@@ -76,8 +76,8 @@ fun StartupView(
         Column(modifier = Modifier.weight(.45f), verticalArrangement = Arrangement.Top) {
             val isLockActive = isLockActiveState
             if (isLockActive == null || showIntro == null) {
-                Text(stringResource(id = R.string.startup_wait_prefs))
-            } else if (showIntro == true && legacyAppStatus != LegacyAppStatus.Unknown) {
+                // wait for preferences to load
+            } else if (showIntro == true && legacyAppStatus != LegacyAppStatus.NotRequired) {
                 LaunchedEffect(key1 = Unit) { onShowIntro() }
             } else {
                 LoadOrUnlock(

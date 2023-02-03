@@ -137,20 +137,20 @@ fun typography(palette: Colors) = Typography(
     ),
     h1 = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Light,
+        fontWeight = FontWeight.Medium,
         fontSize = 48.sp,
         color = palette.onSurface,
     ),
     h2 = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.Medium,
         fontSize = 38.sp,
         color = palette.onSurface,
     ),
     h3 = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Medium,
-        fontSize = 24.sp,
+        fontSize = 26.sp,
         color = palette.onSurface,
     ),
     h4 = TextStyle(

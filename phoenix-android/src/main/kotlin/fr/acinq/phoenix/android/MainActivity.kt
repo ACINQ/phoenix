@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -27,7 +26,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.*
 import androidx.navigation.compose.rememberNavController
@@ -36,9 +34,8 @@ import fr.acinq.phoenix.android.components.mvi.MockView
 import fr.acinq.phoenix.android.service.NodeService
 import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
-import fr.acinq.phoenix.android.utils.datastore.LegacyPrefsMigration
-import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.android.utils.datastore.*
+import fr.acinq.phoenix.legacy.utils.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -58,6 +55,15 @@ class MainActivity : AppCompatActivity() {
             log.debug("wallet state update=${it.name}")
         }
 
+        // if not done yet and if relevant, import legacy app's preferences ASAP
+        lifecycleScope.launch {
+            if (!InternalData.getIsLegacyPrefsMigrationDone(applicationContext).first()) {
+                if (Wallet.getEclairDBFile(applicationContext).exists()) {
+                    LegacyPrefsMigration.importLegacyPreferences(applicationContext)
+                }
+            }
+        }
+
         // reset required status to expected if needed
         lifecycleScope.launch {
             if (PrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first() is LegacyAppStatus.Required) {
@@ -70,7 +76,6 @@ class MainActivity : AppCompatActivity() {
             val doDataMigration = PrefsDatastore.getDataMigrationExpected(applicationContext).first()
             if (doDataMigration == true) {
                 LegacyMigrationHelper.migrateLegacyPayments(applicationContext)
-                LegacyPrefsMigration.doMigration(applicationContext)
                 PrefsDatastore.saveDataMigrationExpected(applicationContext, false)
             }
         }
