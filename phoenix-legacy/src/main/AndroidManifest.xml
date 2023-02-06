@@ -60,6 +60,7 @@
         <data android:scheme="bitcoin" />
         <data android:scheme="lightning" />
         <data android:scheme="lnurl" />
+        <data android:scheme="phoenix" />
       </intent-filter>
     </activity>
 

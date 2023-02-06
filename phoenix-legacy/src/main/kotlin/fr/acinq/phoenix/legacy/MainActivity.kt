@@ -133,9 +133,21 @@ class MainActivity : AppCompatActivity() {
 
   private fun saveURIIntent(intent: Intent) {
     val data = intent.data
-    log.debug("reading URI intent=$intent with data=$data")
+    log.debug("reading URI intent=$intent with scheme=${data?.scheme} data=$data")
     if (data != null && data.scheme != null) {
       when (data.scheme) {
+        "phoenix" -> {
+          if (data.schemeSpecificPart.startsWith("bitcoin", ignoreCase = true)
+            || data.schemeSpecificPart.startsWith("lightning", ignoreCase = true)
+            || data.schemeSpecificPart.startsWith("lnurl", ignoreCase = true)
+            || data.schemeSpecificPart.startsWith("lnbc", ignoreCase = true)
+            || data.schemeSpecificPart.startsWith("lntb", ignoreCase = true)
+          ) {
+            app.currentURIIntent.value = data.schemeSpecificPart
+          } else {
+            // do nothing, just let the app open
+          }
+        }
         "bitcoin", "lightning", "lnurl" -> {
           app.currentURIIntent.value = data.toString()
         }
