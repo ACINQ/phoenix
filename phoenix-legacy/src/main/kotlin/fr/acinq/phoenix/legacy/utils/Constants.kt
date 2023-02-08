@@ -80,4 +80,6 @@ object Constants {
     status = ServiceStatus.Active)
   val DEFAULT_MEMPOOL_CONTEXT = MempoolContext(false)
   val DEFAULT_BALANCE = Balance(0, MilliSatoshi(0), MilliSatoshi(0))
+
+  const val LATEST_PAYMENTS_COUNT = 14
 }

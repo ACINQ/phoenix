@@ -689,10 +689,12 @@ class EclairNodeService : Service() {
     } ?: throw KitNotInitialized
   }
 
-  suspend fun getPayments(): List<PaymentWithMeta> = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
+  /** Fetches a list of payments from the eclair database, including metadata from the meta repository. */
+  suspend fun getPayments(limit: Int?): List<PaymentWithMeta> = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
     kit?.let {
       val t = System.currentTimeMillis()
-      JavaConverters.seqAsJavaListConverter(it.nodeParams().db().payments().listPaymentsOverview(50)).asJava().map { p ->
+      val limitOpt: Option<Any> = limit?.let { Option.apply(it) } ?: Option.empty()
+      JavaConverters.seqAsJavaListConverter(it.nodeParams().db().payments().listPaymentsOverview(limitOpt)).asJava().map { p ->
         val id = when {
           p is PlainOutgoingPayment && p.parentId().isDefined -> p.parentId().get().toString()
           else -> p.paymentHash().toString()
@@ -702,6 +704,10 @@ class EclairNodeService : Service() {
     } ?: throw KitNotInitialized
   }
 
+  /** Fetches a list of payments from the eclair database, including metadata from the meta repository. */
+  suspend fun getPaymentsCount(): Long = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
+    kit?.nodeParams()?.db()?.payments()?.countAllPaymentsOverview() ?: throw KitNotInitialized
+  }
 
   // =================================================== //
   //                     TOR HANDLING                    //
