@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   private val navigationCallback = NavController.OnDestinationChangedListener { _, destination, args ->
-    app.currentNav.postValue(destination.id)
+    app.currentNav.value = destination.id
   }
 
   @SuppressLint("SourceLockedOrientationActivity")
@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
     }
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
     app = ViewModelProvider(this).get(AppViewModel::class.java)
-    app.navigationEvent.observe(this, {
+    app.navigationEvent.observe(this) {
       when (it) {
         is PaymentSent -> {
           val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.OUTGOING, it.id().toString(), fromEvent = true)
@@ -105,13 +105,13 @@ class MainActivity : AppCompatActivity() {
         }
         else -> log.info("unhandled navigation event $it")
       }
-    })
-    app.state.observe(this, {
+    }
+    app.state.observe(this) {
       handleUriIntent()
-    })
-    app.currentURIIntent.observe(this, {
+    }
+    app.currentURIIntent.observe(this) {
       handleUriIntent()
-    })
+    }
     // app may be started with a payment request intent
     intent?.let { saveURIIntent(intent) }
   }

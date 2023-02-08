@@ -374,6 +374,7 @@
   <string name="main_connectivity_button">Connecting…</string>
   <string name="main_tor_connected_button">Tor enabled</string>
   <string name="main_stores_button">Stores</string>
+  <string name="main_payments_history_button">Show all…</string>
 
   <!-- //////////////// notifications //////////////////// -->
 
@@ -767,5 +768,8 @@
   <string name="paymentmode_onchain_desc">On-chain transactions are typically slower and more expensive</string>
   <string name="paymentmode_lightning">Pay with Lightning</string>
   <string name="paymentmode_lightning_desc">This is the recommended option</string>
+
+  <!-- payments history screen -->
+  <string name="payments_history_title">My payments (%1$d)</string>
 
 </resources>
