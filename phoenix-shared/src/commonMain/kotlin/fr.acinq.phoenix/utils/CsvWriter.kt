@@ -17,15 +17,14 @@ class CsvWriter {
     )
 
     companion object {
-        private const val FIELD_DATE        = "Date"
+        private const val FIELD_DATE = "Date"
         private const val FIELD_AMOUNT_MSAT = "Amount Millisatoshi"
         private const val FIELD_AMOUNT_FIAT = "Amount Fiat"
-        private const val FIELD_FEES_MSAT   = "Fees Millisatoshi"
-        private const val FIELD_ORIGIN      = "Origin"
-        private const val FIELD_DESTINATION = "Destination"
-        private const val FIELD_FEES_FIAT   = "Fees Fiat"
+        private const val FIELD_FEES_MSAT = "Fees Millisatoshi"
+        private const val FIELD_CONTEXT = "Context"
+        private const val FIELD_FEES_FIAT = "Fees Fiat"
         private const val FIELD_DESCRIPTION = "Description"
-        private const val FIELD_NOTES       = "Notes"
+        private const val FIELD_NOTES = "Notes"
 
         /**
          * Creates and returns the header row for the CSV file.
@@ -33,11 +32,11 @@ class CsvWriter {
          */
         fun makeHeaderRow(config: Configuration): String {
             var header = "$FIELD_DATE,$FIELD_AMOUNT_MSAT,$FIELD_FEES_MSAT"
-            if (config.includesOriginDestination) {
-                header += ",$FIELD_ORIGIN,$FIELD_DESTINATION"
-            }
             if (config.includesFiat) {
                 header += ",$FIELD_AMOUNT_FIAT,$FIELD_FEES_FIAT"
+            }
+            if (config.includesOriginDestination) {
+                header += ",$FIELD_CONTEXT"
             }
             if (config.includesDescription) {
                 header += ",$FIELD_DESCRIPTION"
@@ -79,30 +78,6 @@ class CsvWriter {
             val feesMsatStr = if (feesMsat > 0) "-$feesMsat" else "$feesMsat"
             row += ",${processField(feesMsatStr)}"
 
-            if (config.includesOriginDestination) {
-                val incomingPayment = info.payment as? IncomingPayment
-                val originStr = incomingPayment?.let {
-                    when (val origin = it.origin) {
-                        is IncomingPayment.Origin.Invoice -> origin.paymentRequest.paymentHash.toHex()
-                        is IncomingPayment.Origin.KeySend -> ""
-                        is IncomingPayment.Origin.SwapIn -> origin.address ?: ""
-                        is IncomingPayment.Origin.DualSwapIn ->config.swapInAddress
-                    }
-                } ?: ""
-                row += ",${processField(originStr)}"
-
-                val outgoingPayment = info.payment as? OutgoingPayment
-                val destinationStr = outgoingPayment?.let {
-                    when (val details = it.details) {
-                        is OutgoingPayment.Details.Normal -> details.paymentHash.toHex()
-                        is OutgoingPayment.Details.KeySend -> details.paymentHash.toHex()
-                        is OutgoingPayment.Details.SwapOut -> details.address
-                        is OutgoingPayment.Details.ChannelClosing -> details.closingAddress
-                    }
-                } ?: ""
-                row += ",${processField(destinationStr)}"
-            }
-
             if (config.includesFiat) {
                 /**
                  * Developer notes:
@@ -143,6 +118,30 @@ class CsvWriter {
                 } ?: run {
                     row += ",,"
                 }
+            }
+
+            if (config.includesOriginDestination) {
+                val details = when (val payment = info.payment) {
+                    is IncomingPayment -> when (val origin = payment.origin) {
+                        is IncomingPayment.Origin.Invoice -> "Incoming LN payment"
+                        is IncomingPayment.Origin.KeySend -> "Incoming LN payment (keysend)"
+                        is IncomingPayment.Origin.SwapIn -> "Swap-in to ${origin.address ?: "N/A"}"
+                        is IncomingPayment.Origin.DualSwapIn -> {
+                            // append txs ids if any, nothing otherwise
+                            val inputs = origin.localInputs.takeIf { it.isNotEmpty() }?.joinToString("\n- ") {
+                                it.txid.toHex()
+                            }?.let { "\n$it" } ?: ""
+                            "Swap-in to ${config.swapInAddress}$inputs"
+                        }
+                    }
+                    is OutgoingPayment -> when (val details = payment.details) {
+                        is OutgoingPayment.Details.Normal -> "Outgoing LN payment to ${details.paymentRequest.nodeId.toHex()}"
+                        is OutgoingPayment.Details.KeySend -> "Outgoing LN payment (keysend)"
+                        is OutgoingPayment.Details.SwapOut -> "Swap-out to ${details.address}"
+                        is OutgoingPayment.Details.ChannelClosing -> "Channel closing to ${details.closingAddress}"
+                    }
+                }
+                row += ",${processField(details)}"
             }
 
             if (config.includesDescription) {
