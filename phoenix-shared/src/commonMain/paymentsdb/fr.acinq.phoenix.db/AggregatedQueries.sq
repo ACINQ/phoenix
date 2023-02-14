@@ -98,7 +98,7 @@ LEFT OUTER JOIN payments_metadata ON
 ORDER BY COALESCE(combined_payments.completed_at, combined_payments.created_at) DESC
 LIMIT :limit OFFSET :offset;
 
-listRangePaymentsOrder:
+listRangeSuccessfulPaymentsOrder:
 SELECT
     combined_payments.type         AS type,
     combined_payments.id           AS id,
@@ -112,7 +112,8 @@ FROM (
         created_at   AS created_at,
         completed_at AS completed_at
     FROM outgoing_payments
-    WHERE completed_at BETWEEN :startDate AND :endDate
+    WHERE outgoing_payments.status_type LIKE 'SUCCEEDED_%'
+    AND   completed_at BETWEEN :startDate AND :endDate
 UNION ALL
     SELECT
         1                        AS type,
@@ -128,11 +129,12 @@ LEFT OUTER JOIN payments_metadata ON
 ORDER BY COALESCE(combined_payments.completed_at, combined_payments.created_at) DESC
 LIMIT :limit OFFSET :offset;
 
-listRangePaymentsCount:
+listRangeSuccessfulPaymentsCount:
 SELECT SUM(result) AS result FROM (
     SELECT COUNT(*) AS result
     FROM outgoing_payments
-    WHERE completed_at BETWEEN :startDate AND :endDate
+    WHERE outgoing_payments.status_type LIKE 'SUCCEEDED_%'
+    AND   completed_at BETWEEN :startDate AND :endDate
 UNION ALL
     SELECT COUNT(*) AS result FROM incoming_payments
     WHERE incoming_payments.received_at BETWEEN :startDate AND :endDate

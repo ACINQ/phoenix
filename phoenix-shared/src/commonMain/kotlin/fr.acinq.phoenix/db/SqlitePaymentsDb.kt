@@ -470,15 +470,22 @@ class SqlitePaymentsDb(
         }
     }
 
-    suspend fun listRangePaymentsOrder(
+    /**
+     * List payments successfully received or sent between [startDate] and [endDate], for page ([skip]->[skip+count]).
+     *
+     * @param startDate timestamp in millis
+     * @param endDate timestamp in millis
+     * @param count limit number of rows
+     * @param skip rows offset for paging
+     */
+    suspend fun listRangeSuccessfulPaymentsOrder(
         startDate: Long,
         endDate: Long,
         count: Int,
         skip: Int
     ): List<WalletPaymentOrderRow> {
-
         return withContext(Dispatchers.Default) {
-            aggrQueries.listRangePaymentsOrder(
+            aggrQueries.listRangeSuccessfulPaymentsOrder(
                 startDate = startDate,
                 endDate = endDate,
                 limit = count.toLong(),
@@ -488,13 +495,18 @@ class SqlitePaymentsDb(
         }
     }
 
-    suspend fun listRangePaymentsCount(
+    /**
+     * Count payments successfully received or sent between [startDate] and [endDate].
+     *
+     * @param startDate timestamp in millis
+     * @param endDate timestamp in millis
+     */
+    suspend fun listRangeSuccessfulPaymentsCount(
         startDate: Long,
         endDate: Long
     ): Long {
-
         return withContext(Dispatchers.Default) {
-            aggrQueries.listRangePaymentsCount(
+            aggrQueries.listRangeSuccessfulPaymentsCount(
                 startDate = startDate,
                 endDate = endDate,
                 mapper = ::allPaymentsCountMapper
