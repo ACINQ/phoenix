@@ -17,8 +17,10 @@
 package fr.acinq.phoenix.android.utils
 
 import android.content.Context
+import com.google.common.net.HostAndPort
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.eclair.db.IncomingPaymentStatus
 import fr.acinq.eclair.db.OutgoingPaymentStatus
@@ -28,22 +30,25 @@ import fr.acinq.eclair.db.sqlite.SqliteUtils
 import fr.acinq.eclair.wire.TemporaryNodeFailure
 import fr.acinq.eclair.wire.TrampolineFeeInsufficient
 import fr.acinq.eclair.wire.UnknownNextPeer
-import fr.acinq.lightning.Features
-import fr.acinq.lightning.Lightning
-import fr.acinq.lightning.ShortChannelId
+import fr.acinq.lightning.*
 import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.db.HopDesc
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.msat
-import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
+import fr.acinq.phoenix.android.utils.datastore.InternalData
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.data.BitcoinUnit
+import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.legacy.db.*
+import fr.acinq.phoenix.legacy.utils.Prefs
+import fr.acinq.phoenix.legacy.utils.ThemeHelper
 import fr.acinq.phoenix.legacy.utils.Wallet
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -54,7 +59,66 @@ import java.io.File
 
 object LegacyMigrationHelper {
 
-    val log: Logger = LoggerFactory.getLogger(this::class.java)
+    private val log: Logger = LoggerFactory.getLogger(this::class.java)
+
+    /** Import the legacy app's preferences into the new app's datastores. */
+    suspend fun migrateLegacyPreferences(context: Context) {
+        log.info("started migrating legacy user preferences")
+
+        // -- utils
+
+        InternalData.saveLastUsedAppCode(context, Prefs.getLastVersionUsed(context))
+        InternalData.saveMnemonicsCheckTimestamp(context, Prefs.getMnemonicsSeenTimestamp(context))
+        Prefs.getFCMToken(context)?.let { InternalData.saveFcmToken(context, it) }
+        InternalData.saveShowIntro(context, Prefs.showFTUE(context))
+
+        // -- display
+
+        UserPrefs.saveUserTheme(
+            context, when (Prefs.getTheme(context)) {
+                ThemeHelper.darkMode -> UserTheme.DARK
+                ThemeHelper.lightMode -> UserTheme.LIGHT
+                else -> UserTheme.SYSTEM
+            }
+        )
+        UserPrefs.saveBitcoinUnit(
+            context, when (Prefs.getCoinUnit(context).code()) {
+                "sat" -> BitcoinUnit.Sat
+                "bits" -> BitcoinUnit.Bit
+                "mbtc" -> BitcoinUnit.MBtc
+                else -> BitcoinUnit.Btc
+            }
+        )
+        UserPrefs.saveHomeAmountDisplayMode(context, if (Prefs.showBalanceHome(context)) HomeAmountDisplayMode.BTC else HomeAmountDisplayMode.REDACTED)
+        UserPrefs.saveIsAmountInFiat(context, Prefs.getShowAmountInFiat(context))
+        UserPrefs.saveFiatCurrency(context, FiatCurrency.valueOfOrNull(Prefs.getFiatCurrency(context)) ?: FiatCurrency.USD)
+
+        // -- security
+
+        UserPrefs.saveIsScreenLockActive(context, Prefs.isScreenLocked(context))
+
+        // -- electrum
+
+        UserPrefs.saveElectrumServer(context, Prefs.getElectrumServer(context).takeIf { it.isNotBlank() }?.let {
+            val hostPort = HostAndPort.fromString(it).withDefaultPort(50002)
+            // TODO: handle onion addresses and TOR
+            ServerAddress(hostPort.host, hostPort.port, TcpSocket.TLS.TRUSTED_CERTIFICATES)
+        })
+
+        // -- payment settings
+
+        UserPrefs.saveInvoiceDefaultDesc(context, Prefs.getDefaultPaymentDescription(context))
+        UserPrefs.saveInvoiceDefaultExpiry(context, Prefs.getPaymentsExpirySeconds(context))
+
+        Prefs.getMaxTrampolineCustomFee(context)?.let {
+            TrampolineFees(feeBase = Satoshi(it.feeBase.toLong()), feeProportional = it.feeProportionalMillionths, cltvExpiryDelta = CltvExpiryDelta(it.cltvExpiry.toInt()))
+        }?.let {
+            UserPrefs.saveTrampolineMaxFee(context, it)
+        }
+
+        UserPrefs.saveIsAutoPayToOpenEnabled(context, Prefs.isAutoPayToOpenEnabled(context))
+        log.info("finished migration of legacy user preferences")
+    }
 
     suspend fun migrateLegacyPayments(
         context: Context,

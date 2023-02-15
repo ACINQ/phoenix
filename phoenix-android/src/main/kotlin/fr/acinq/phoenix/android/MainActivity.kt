@@ -34,7 +34,6 @@ import fr.acinq.phoenix.android.components.mvi.MockView
 import fr.acinq.phoenix.android.service.NodeService
 import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
-import fr.acinq.phoenix.android.utils.datastore.*
 import fr.acinq.phoenix.legacy.utils.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -55,15 +54,6 @@ class MainActivity : AppCompatActivity() {
             log.debug("wallet state update=${it.name}")
         }
 
-        // if not done yet and if relevant, import legacy app's preferences ASAP
-        lifecycleScope.launch {
-            if (!InternalData.getIsLegacyPrefsMigrationDone(applicationContext).first()) {
-                if (Wallet.getEclairDBFile(applicationContext).exists()) {
-                    LegacyPrefsMigration.importLegacyPreferences(applicationContext)
-                }
-            }
-        }
-
         // reset required status to expected if needed
         lifecycleScope.launch {
             if (PrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first() is LegacyAppStatus.Required) {
@@ -75,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val doDataMigration = PrefsDatastore.getDataMigrationExpected(applicationContext).first()
             if (doDataMigration == true) {
+                LegacyMigrationHelper.migrateLegacyPreferences(applicationContext)
                 LegacyMigrationHelper.migrateLegacyPayments(applicationContext)
                 PrefsDatastore.saveDataMigrationExpected(applicationContext, false)
             }

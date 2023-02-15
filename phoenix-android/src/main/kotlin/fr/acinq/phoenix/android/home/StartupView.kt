@@ -33,7 +33,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.LockState
-import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeyState
@@ -61,7 +60,6 @@ fun StartupView(
     val walletState by appVM.walletState.observeAsState()
     val showIntro by InternalData.getShowIntro(context).collectAsState(initial = null)
     val isLockActiveState by UserPrefs.getIsScreenLockActive(context).collectAsState(initial = null)
-    val legacyAppStatus = PrefsDatastore.getLegacyAppStatus(context).collectAsState(null).value
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -77,7 +75,7 @@ fun StartupView(
             val isLockActive = isLockActiveState
             if (isLockActive == null || showIntro == null) {
                 // wait for preferences to load
-            } else if (showIntro == true && legacyAppStatus != LegacyAppStatus.NotRequired) {
+            } else if (showIntro!!) {
                 LaunchedEffect(key1 = Unit) { onShowIntro() }
             } else {
                 LoadOrUnlock(

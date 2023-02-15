@@ -19,7 +19,7 @@ package fr.acinq.phoenix.android.utils.datastore
 import android.content.Context
 import androidx.datastore.preferences.core.*
 import fr.acinq.phoenix.legacy.internalData
-import fr.acinq.phoenix.legacy.userPrefs
+import fr.acinq.phoenix.legacy.utils.Prefs as LegacyPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -44,11 +44,6 @@ object InternalData {
     fun getMnemonicsCheckTimestamp(context: Context): Flow<Long?> = prefs(context).map { it[MNEMONICS_CHECK_TIMESTAMP] }
     suspend fun saveMnemonicsCheckTimestamp(context: Context, timestamp: Long) = context.internalData.edit { it[MNEMONICS_CHECK_TIMESTAMP] = timestamp }
 
-    // -- Preferences from the legacy app must be migrated when needed.
-    private val IS_LEGACY_PREFS_MIGRATION_DONE = booleanPreferencesKey("IS_LEGACY_PREFS_MIGRATION_DONE")
-    fun getIsLegacyPrefsMigrationDone(context: Context): Flow<Boolean> = prefs(context).map { it[IS_LEGACY_PREFS_MIGRATION_DONE] ?: false }
-    suspend fun saveIsLegacyPrefsMigrationDone(context: Context, isDone: Boolean) = context.internalData.edit { it[IS_LEGACY_PREFS_MIGRATION_DONE] = isDone }
-
     // -- Show a message summing up the migration result.
     private val MIGRATION_RESULT_SHOWN = booleanPreferencesKey("MIGRATION_RESULT_SHOWN")
     fun getMigrationResultShown(context: Context): Flow<Boolean> = prefs(context).map { it[MIGRATION_RESULT_SHOWN] ?: false }
@@ -56,7 +51,7 @@ object InternalData {
 
     // -- Show introduction screen at startup. True by default.
     private val SHOW_INTRO = booleanPreferencesKey("SHOW_INTRO")
-    fun getShowIntro(context: Context): Flow<Boolean> = prefs(context).map { it[SHOW_INTRO] ?: true }
+    fun getShowIntro(context: Context): Flow<Boolean> = prefs(context).map { it[SHOW_INTRO] ?: LegacyPrefs.showFTUE(context) }
     suspend fun saveShowIntro(context: Context, showIntro: Boolean) = context.internalData.edit { it[SHOW_INTRO] = showIntro }
 
     private fun prefs(context: Context): Flow<Preferences> {
