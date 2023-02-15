@@ -47,7 +47,7 @@ import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.WebLink
 import fr.acinq.phoenix.android.components.txUrl
 import fr.acinq.phoenix.android.fiatRate
-import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateString
+import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toFiat
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
@@ -183,14 +183,14 @@ private fun TimestampSection(
 ) {
     if (payment.completedAt() > 0) {
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_completed_at_label)) {
-            Text(text = payment.completedAt().toAbsoluteDateString())
+            Text(text = payment.completedAt().toAbsoluteDateTimeString())
         }
     }
 
     // show time to completion for outgoing payments, when relevant
     if (payment is OutgoingPayment && (payment.details is OutgoingPayment.Details.Normal || payment.details is OutgoingPayment.Details.ChannelClosing)) {
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_created_at_label)) {
-            Text(text = payment.createdAt.toAbsoluteDateString())
+            Text(text = payment.createdAt.toAbsoluteDateTimeString())
         }
 
         if (payment.completedAt() > 0) {

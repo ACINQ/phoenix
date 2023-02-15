@@ -153,6 +153,13 @@ SELECT id,
 FROM outgoing_payments
 WHERE id=?;
 
+getOldestCompletedDate:
+SELECT   completed_at
+FROM     outgoing_payments AS o
+WHERE    completed_at IS NOT NULL
+ORDER BY o.completed_at ASC
+LIMIT 1;
+
 getPayment:
 SELECT parent.id,
        parent.recipient_amount_msat,

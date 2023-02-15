@@ -710,6 +710,23 @@
 
     <string name="payments_history_title">My payments (%1$d)</string>
     <string name="payments_history_backup_notavailable">Payments backup is not available yet.</string>
+    <string name="payments_history_export_button">Export</string>
+    <string name="payments_export_title">Export Payments</string>
+    <string name="payments_export_instructions">Export your payment history in CSV (comma separated value) format.</string>
+    <string name="payments_export_start_label">Start date</string>
+    <string name="payments_export_end_label">End date</string>
+    <string name="payments_export_context_label">Include origin/destination</string>
+    <string name="payments_export_description_label">Include description</string>
+    <string name="payments_export_generate_button">Export</string>
+    <string name="payments_export_initializing">Checking payments timestamp</string>
+    <string name="payments_export_invalid_timestamps">Please pick a valid start/end date</string>
+    <string name="payments_export_in_progress">Exporting payment #%1$d</string>
+    <string name="payments_export_success">%1$d payments successfully exported</string>
+    <string name="payments_export_share_subject">Phoenix - payments from %1$s to %2$s</string>
+    <string name="payments_export_share_title">Share Phoenix payments…</string>
+    <string name="payments_export_share_button">Share file</string>
+    <string name="payments_export_error">Export has failed.</string>
+    <string name="payments_export_no_data">No payments found.</string>
 
     <!-- ////////////// currencies ////////////// -->
 
@@ -725,5 +742,9 @@
     <string name="intro_selfcustody_sub1">Phoenix is self-custodial. You take control.</string>
     <string name="intro_selfcustody_sub2">You can restore your wallet at anytime using your secret key. Keep it safe!</string>
     <string name="intro_selfcustody_next_button">Get started</string>
+
+    <!-- components -->
+    <string name="component_calendar_inclusive">(inclusive)</string>
+    <string name="component_error_message_details">Cause: %1$s</string>
 
 </resources>

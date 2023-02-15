@@ -31,6 +31,7 @@ struct TransactionsView: View {
 	@State var visibleRows: Set<WalletPaymentOrderRow> = Set()
 	
 	@State var selectedItem: WalletPaymentInfo? = nil
+	@State var historyExporterOpen: Bool = false
 	
 	let syncStatePublisher = Biz.syncManager!.syncTxManager.statePublisher
 	@State var isDownloadingTxs: Bool = false
@@ -61,7 +62,7 @@ struct TransactionsView: View {
 			if #unavailable(iOS 16.0) {
 				NavigationLink(
 					destination: navLinkView(),
-					isActive: selectedItemBinding()
+					isActive: navLinkBinding()
 				) {
 					EmptyView()
 				}
@@ -73,6 +74,11 @@ struct TransactionsView: View {
 		}
 		.navigationTitle(NSLocalizedString("Payments", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
+		.navigationBarItems(trailing: exportButton())
+		.navigationStackDestination( // For iOS 16+
+			isPresented: navLinkBinding(),
+			destination: navLinkView
+		)
 	}
 	
 	@ViewBuilder
@@ -138,10 +144,6 @@ struct TransactionsView: View {
 		.onAppear {
 			onAppear()
 		}
-		.navigationStackDestination( // For iOS 16+
-			isPresented: selectedItemBinding(),
-			destination: navLinkView
-		)
 		.onReceive(paymentsCountPublisher) {
 			paymentsCountChanged($0)
 		}
@@ -185,13 +187,26 @@ struct TransactionsView: View {
 	}
 	
 	@ViewBuilder
+	func exportButton() -> some View {
+		
+		Button {
+			historyExporterOpen = true
+		} label: {
+			Image(systemName: "square.and.arrow.up")
+		}
+	}
+	
+	@ViewBuilder
 	func navLinkView() -> some View {
 		
-		if let selectedItem = selectedItem {
+		if let selectedItem {
 			PaymentView(
 				type: .embedded,
 				paymentInfo: selectedItem
 			)
+			
+		} else if historyExporterOpen {
+			TxHistoryExporter()
 			
 		} else {
 			EmptyView()
@@ -202,11 +217,11 @@ struct TransactionsView: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func selectedItemBinding() -> Binding<Bool> {
+	func navLinkBinding() -> Binding<Bool> {
 		
 		return Binding<Bool>(
-			get: { selectedItem != nil },
-			set: { if !$0 { selectedItem = nil }}
+			get: { selectedItem != nil || historyExporterOpen },
+			set: { if !$0 { selectedItem = nil; historyExporterOpen = false }}
 		)
 	}
 	

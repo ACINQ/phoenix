@@ -66,6 +66,13 @@ SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_am
 FROM   incoming_payments
 WHERE  payment_hash=?;
 
+getOldestReceivedDate:
+SELECT   received_at
+FROM     incoming_payments AS r
+WHERE    received_at IS NOT NULL
+ORDER BY r.received_at ASC
+LIMIT 1;
+
 listAll:
 SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
 FROM   incoming_payments

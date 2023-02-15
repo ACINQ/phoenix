@@ -85,6 +85,22 @@ fun DefaultScreenHeader(
     onBackClick: () -> Unit,
     backgroundColor: Color = MaterialTheme.colors.background,
 ) {
+    DefaultScreenHeader(
+        content = {
+            title?.let { Text(text = it) }
+        },
+        onBackClick = onBackClick,
+        backgroundColor = backgroundColor
+    )
+}
+
+/** The default header of a screen contains a back button and some content. */
+@Composable
+fun DefaultScreenHeader(
+    content: @Composable RowScope.() -> Unit,
+    onBackClick: () -> Unit,
+    backgroundColor: Color = MaterialTheme.colors.background,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -93,9 +109,7 @@ fun DefaultScreenHeader(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         BackButton(onClick = onBackClick)
-        title?.let {
-            Text(text = it)
-        }
+        content()
     }
 }
 
