@@ -707,7 +707,7 @@ class EclairNodeService : Service() {
   suspend fun getPayments(): List<PaymentWithMeta> = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
     kit?.let {
       val t = System.currentTimeMillis()
-      JavaConverters.seqAsJavaListConverter(it.nodeParams().db().payments().listPaymentsOverview(50)).asJava().map { p ->
+      JavaConverters.seqAsJavaListConverter(it.nodeParams().db().payments().listPaymentsOverview(Option.apply(50))).asJava().map { p ->
         val id = when {
           p is PlainOutgoingPayment && p.parentId().isDefined -> p.parentId().get().toString()
           else -> p.paymentHash().toString()
