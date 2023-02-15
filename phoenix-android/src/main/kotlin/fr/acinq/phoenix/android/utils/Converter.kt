@@ -35,6 +35,7 @@ import java.math.RoundingMode
 import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
 
@@ -142,8 +143,14 @@ object Converter {
         }
     }
 
-    /** Converts this millis timestamp into an absolute string date using the locale format. */
-    fun Long.toAbsoluteDateString(): String = DateFormat.getDateTimeInstance().format(Date(this))
+    /** Converts this millis timestamp into a pretty, absolute string date time using the locale format. */
+    fun Long.toAbsoluteDateTimeString(): String = DateFormat.getDateTimeInstance().format(Date(this))
+
+    /** Converts this millis timestamp into a pretty, absolute string date using the locale format. */
+    fun Long.toAbsoluteDateString(): String = DateFormat.getDateInstance().format(Date(this))
+
+    /** Converts this millis timestamp into an year-month-day string. */
+    fun Long.toBasicAbsoluteDateString(): String = SimpleDateFormat("yyyy-MM-dd").format(Date(this))
 
     @Composable
     public fun html(id: Int): Spanned {

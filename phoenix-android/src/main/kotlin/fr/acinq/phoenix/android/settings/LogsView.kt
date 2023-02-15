@@ -33,6 +33,7 @@ import fr.acinq.phoenix.android.components.SettingButton
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.shareFile
 
 @Composable
 fun LogsView() {
@@ -69,15 +70,12 @@ fun LogsView() {
                 icon = R.drawable.ic_share,
                 onClick = {
                     val logFile = Logging.getLastLogFile(context)
-                    val uri = FileProvider.getUriForFile(context, authority, logFile)
-                    val sendIntent: Intent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        type = "text/plain"
-                        putExtra(Intent.EXTRA_STREAM, uri)
-                        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.logs_share_subject))
-                    }
-                    val shareIntent = Intent.createChooser(sendIntent, null)
-                    context.startActivity(shareIntent)
+                    shareFile(
+                        context = context,
+                        data = FileProvider.getUriForFile(context, authority, logFile),
+                        subject = context.getString(R.string.logs_share_subject),
+                        chooserTitle = context.getString(R.string.logs_share_title)
+                    )
                 }
             )
         }

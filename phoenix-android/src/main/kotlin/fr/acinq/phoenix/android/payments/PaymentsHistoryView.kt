@@ -23,9 +23,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,6 +55,7 @@ fun PaymentsHistoryView(
     onBackClick: () -> Unit,
     paymentsViewModel: PaymentsViewModel,
     onPaymentClick: (WalletPaymentId) -> Unit,
+    onCsvExportClick: () -> Unit,
 ) {
     val log = logger("PaymentsHistory")
     val listState = rememberLazyListState()
@@ -63,10 +65,23 @@ fun PaymentsHistoryView(
         val date = Instant.fromEpochMilliseconds(it.orderRow.completedAt ?: it.orderRow.createdAt).toLocalDateTime(TimeZone.currentSystemDefault())
         date.month to date.year
     }
+
     DefaultScreenLayout(
         isScrollable = false
     ) {
-        DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.payments_history_title, allPaymentsCount))
+        DefaultScreenHeader(
+            content = {
+                Text(text =  stringResource(id = R.string.payments_history_title, allPaymentsCount))
+                Spacer(Modifier.weight(1f))
+                Button(
+                    text = stringResource(id = R.string.payments_history_export_button),
+                    icon = R.drawable.ic_share,
+                    shape = CircleShape,
+                    onClick = onCsvExportClick
+                )
+            },
+            onBackClick = onBackClick,
+        )
         Card(modifier = Modifier.weight(1f, fill = false)) {
             LaunchedEffect(key1 = listState) {
                 snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull() }

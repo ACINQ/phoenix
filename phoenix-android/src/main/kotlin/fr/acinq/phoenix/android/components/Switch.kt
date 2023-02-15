@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ACINQ SAS
+ * Copyright 2023 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Checkbox
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
@@ -34,35 +34,35 @@ import fr.acinq.phoenix.android.utils.gray300
 import fr.acinq.phoenix.android.utils.gray600
 
 @Composable
-fun Checkbox(
-    text: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
+fun SwitchView(
     modifier: Modifier = Modifier,
+    text: String,
     enabled: Boolean = true,
-    padding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 0.dp)
+    checked: Boolean,
+    onCheckedChange: ((Boolean) -> Unit),
 ) {
     var internalChecked by rememberSaveable { mutableStateOf(checked) }
     val interactionSource = remember { MutableInteractionSource() }
     Row(
         modifier = modifier
-            .enableOrFade(enabled)
-            .clickable(interactionSource = interactionSource, indication = null, role = Role.Checkbox) {
+            .clickable(interactionSource = interactionSource, indication = null, role = Role.Checkbox, enabled = enabled) {
                 internalChecked = !internalChecked
                 onCheckedChange(internalChecked)
-            }
-            .padding(padding),
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Checkbox(
-            checked = internalChecked,
+        Text(text = text)
+        Spacer(Modifier.weight(1f))
+        Switch(
+            checked = checked,
             onCheckedChange = null,
-            modifier = Modifier.indication(
-                interactionSource = interactionSource,
-                indication = rememberRipple(bounded = false, color = if (isDarkTheme) gray300 else gray600, radius = 28.dp)
-            )
+            modifier = Modifier
+                .enableOrFade(enabled)
+                .padding(vertical = 6.dp)
+                .indication(
+                    interactionSource = interactionSource,
+                    indication = rememberRipple(bounded = false, color = if (isDarkTheme) gray300 else gray600, radius = 28.dp)
+                )
         )
-        Spacer(Modifier.width(12.dp))
-        Text(text)
     }
 }

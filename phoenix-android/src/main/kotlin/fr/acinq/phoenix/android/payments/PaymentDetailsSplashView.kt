@@ -48,12 +48,9 @@ import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateString
+import fr.acinq.phoenix.android.utils.*
+import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
-import fr.acinq.phoenix.android.utils.mutedTextColor
-import fr.acinq.phoenix.android.utils.negativeColor
-import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.utils.extensions.errorMessage
@@ -96,22 +93,7 @@ fun PaymentDetailsSplashView(
             )
             Spacer(modifier = Modifier.height(36.dp))
 
-            val paymentDesc = remember(payment) {
-                when (payment) {
-                    is OutgoingPayment -> when (val details = payment.details) {
-                        is OutgoingPayment.Details.Normal -> details.paymentRequest.description ?: details.paymentRequest.descriptionHash?.toHex()
-                        is OutgoingPayment.Details.ChannelClosing -> context.getString(R.string.paymentdetails_desc_closing_channel)
-                        is OutgoingPayment.Details.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
-                        is OutgoingPayment.Details.SwapOut -> context.getString(R.string.paymentdetails_desc_swapout, details.address)
-                    }
-                    is IncomingPayment -> when (val origin = payment.origin) {
-                        is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description ?: origin.paymentRequest.descriptionHash?.toHex()
-                        is IncomingPayment.Origin.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
-                        is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.DualSwapIn -> context.getString(R.string.paymentdetails_desc_swapin)
-                    }
-                    else -> null
-                }?.takeIf { it.isNotBlank() }
-            }
+            val paymentDesc = remember(payment) { payment.smartDescription(context) }
             val customDesc = remember(data) { data.metadata.userDescription?.takeIf { it.isNotBlank() } }
             DetailsRow(
                 label = stringResource(id = R.string.paymentdetails_desc_label),
@@ -242,7 +224,7 @@ private fun PaymentStatus(
                 imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
                 isAnimated = fromEvent,
                 color = positiveColor(),
-                details = payment.completedAt().toAbsoluteDateString()
+                details = payment.completedAt().toAbsoluteDateTimeString()
             )
         }
         is IncomingPayment -> when {
@@ -267,7 +249,7 @@ private fun PaymentStatus(
                 imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
                 isAnimated = fromEvent,
                 color = positiveColor(),
-                details = payment.received?.receivedAt?.toAbsoluteDateString()
+                details = payment.received?.receivedAt?.toAbsoluteDateTimeString()
             )
         }
     }
@@ -381,3 +363,5 @@ private fun EditPaymentDetails(
         }
     }
 }
+
+

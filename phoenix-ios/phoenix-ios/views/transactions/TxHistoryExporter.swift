@@ -383,7 +383,7 @@ struct TxHistoryExporter: View {
 				return
 			}
 			
-			paymentsDb.listRangePaymentsCount(
+			paymentsDb.listRangeSuccessfulPaymentsCount(
 				startDate: startMillis,
 				endDate: endMillis
 			) { (result: KotlinLong?, _) in
@@ -482,7 +482,7 @@ struct TxHistoryExporter: View {
 			
 			while !done {
 				
-				let rows: [WalletPaymentOrderRow] = try await paymentsDb.listRangePaymentsOrder(
+				let rows: [WalletPaymentOrderRow] = try await paymentsDb.listRangeSuccessfulPaymentsOrder(
 					startDate: startMillis,
 					endDate: endMillis,
 					count: Int32(FETCH_ROWS_BATCH_COUNT),

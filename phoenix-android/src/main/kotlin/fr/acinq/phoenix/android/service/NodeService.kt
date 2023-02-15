@@ -25,8 +25,8 @@ import fr.acinq.phoenix.android.utils.Notifications
 import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.StartupParams
+import fr.acinq.phoenix.managers.AppConfigurationManager
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 import java.lang.Runnable
@@ -202,14 +202,21 @@ class NodeService : Service() {
     }
 
     @WorkerThread
-    private suspend fun doStartNode(decryptedPayload: ByteArray, requestCheckLegacyChannels: Boolean): WalletState.Started {
+    private suspend fun doStartNode(
+        decryptedPayload: ByteArray,
+        requestCheckLegacyChannels: Boolean,
+    ): WalletState.Started {
         log.info("starting up node...")
         val business = (applicationContext as? PhoenixApplication)?.business ?: throw RuntimeException("invalid context type, should be PhoenixApplication")
         val electrumServer = UserPrefs.getElectrumServer(applicationContext).first()
         val isTorEnabled = UserPrefs.getIsTorEnabled(applicationContext).first()
+        val preferredFiatCurrency = UserPrefs.getFiatCurrency(applicationContext).first()
         val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(decryptedPayload))
 
         business.walletManager.loadWallet(seed)
+        business.appConfigurationManager.updatePreferredFiatCurrencies(
+            AppConfigurationManager.PreferredFiatCurrencies(primary = preferredFiatCurrency, others = emptySet())
+        )
         business.start(StartupParams(requestCheckLegacyChannels = requestCheckLegacyChannels, isTorEnabled = isTorEnabled))
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
 

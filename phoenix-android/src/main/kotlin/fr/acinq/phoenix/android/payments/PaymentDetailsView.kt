@@ -19,12 +19,14 @@ package fr.acinq.phoenix.android.payments
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -118,10 +120,16 @@ fun PaymentDetailsView(
         )
         when (state) {
             is PaymentDetailsState.Loading -> CenterContentView {
-                Text(stringResource(id = R.string.paymentdetails_loading))
+                Text(
+                    text = stringResource(id = R.string.paymentdetails_loading),
+                    modifier = Modifier.padding(16.dp)
+                )
             }
             is PaymentDetailsState.Failure -> CenterContentView {
-                Text(stringResource(id = R.string.paymentdetails_error, state.error.message ?: stringResource(id = R.string.utils_unknown)))
+                Text(
+                    text = stringResource(id = R.string.paymentdetails_error, state.error.message ?: stringResource(id = R.string.utils_unknown)),
+                    modifier = Modifier.padding(16.dp),
+                )
             }
             is PaymentDetailsState.Success.Splash -> {
                 PaymentDetailsSplashView(

@@ -21,7 +21,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,10 +31,7 @@ import androidx.navigation.compose.composable
 import fr.acinq.phoenix.android.home.*
 import fr.acinq.phoenix.android.init.*
 import fr.acinq.phoenix.android.intro.IntroView
-import fr.acinq.phoenix.android.payments.PaymentDetailsView
-import fr.acinq.phoenix.android.payments.PaymentsHistoryView
-import fr.acinq.phoenix.android.payments.ReceiveView
-import fr.acinq.phoenix.android.payments.ScanDataView
+import fr.acinq.phoenix.android.payments.*
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.utils.appBackground
@@ -205,10 +201,14 @@ fun AppView(
                 }
                 composable(Screen.PaymentsHistory.route) {
                     PaymentsHistoryView(
-                        onBackClick = { navController.popBackStack() },
+                        onBackClick = { popToHome(navController) },
                         paymentsViewModel = paymentsViewModel,
-                        onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) }
+                        onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },
+                        onCsvExportClick = { navController.navigate(Screen.PaymentsCsvExport) },
                     )
+                }
+                composable(Screen.PaymentsCsvExport.route) {
+                    CsvExportView(onBackClick = { navController.navigate(Screen.PaymentsHistory.route) })
                 }
                 composable(Screen.Settings.route) {
                     SettingsView()

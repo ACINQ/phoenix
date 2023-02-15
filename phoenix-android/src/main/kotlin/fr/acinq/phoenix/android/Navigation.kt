@@ -38,6 +38,7 @@ sealed class Screen(val route: String) {
     object ScanData : Screen("readdata")
     object PaymentDetails : Screen("payments")
     object PaymentsHistory : Screen("payments/all")
+    object PaymentsCsvExport : Screen("payments/export")
 
     // -- settings
     object Settings : Screen("settings")

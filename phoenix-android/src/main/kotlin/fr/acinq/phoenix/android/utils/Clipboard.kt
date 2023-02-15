@@ -20,6 +20,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import fr.acinq.phoenix.android.R
 
@@ -40,6 +41,17 @@ fun share(context: Context, data: String, subject: String, chooserTitle: String?
         type = "text/plain"
         putExtra(Intent.EXTRA_TEXT, data)
         putExtra(Intent.EXTRA_SUBJECT, subject)
+    }
+    context.startActivity(Intent.createChooser(shareIntent, chooserTitle))
+}
+
+fun shareFile(context: Context, data: Uri, subject: String, chooserTitle: String? = null, mimeType: String = "text/plain") {
+    val shareIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        type = mimeType
+        putExtra(Intent.EXTRA_STREAM, data)
+        putExtra(Intent.EXTRA_SUBJECT, subject)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
     context.startActivity(Intent.createChooser(shareIntent, chooserTitle))
 }
