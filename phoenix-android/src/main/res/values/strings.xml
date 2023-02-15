@@ -718,7 +718,7 @@
     <string name="payments_export_context_label">Include origin/destination</string>
     <string name="payments_export_description_label">Include description</string>
     <string name="payments_export_generate_button">Export</string>
-    <string name="payments_export_initializing">Checking payments timestamp</string>
+    <string name="payments_export_no_payments">No successful payments yet</string>
     <string name="payments_export_invalid_timestamps">Please pick a valid start/end date</string>
     <string name="payments_export_in_progress">Exporting payment #%1$d</string>
     <string name="payments_export_success">%1$d payments successfully exported</string>

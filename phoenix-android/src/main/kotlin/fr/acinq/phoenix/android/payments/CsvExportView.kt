@@ -108,11 +108,7 @@ fun CsvExportView(
             when (val state = vm.state) {
                 CsvExportState.Init, is CsvExportState.Failed, is CsvExportState.NoData -> {
                     if (startTimestamp == null) {
-                        TextWithIcon(
-                            text = stringResource(id = R.string.payments_export_initializing),
-                            icon = R.drawable.ic_info,
-                            padding = PaddingValues(16.dp),
-                        )
+                        ErrorMessage(errorHeader = stringResource(id = R.string.payments_export_no_payments))
                     } else if (startTimestamp > endTimestamp) {
                         ErrorMessage(errorHeader = stringResource(id = R.string.payments_export_invalid_timestamps))
                     } else {
