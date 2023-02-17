@@ -708,7 +708,7 @@ struct ReceiveLightningView: View {
 		mvi.intent(Receive.IntentAsk(
 			amount: nil,
 			desc: defaultDesc,
-			expirySeconds: Int64(60 * 60 * 24 * Prefs.shared.invoiceExpirationDays)
+			expirySeconds: Prefs.shared.invoiceExpirationSeconds
 		))
 		
 		let query = Prefs.shared.pushPermissionQuery

@@ -84,6 +84,10 @@ class Prefs {
 		set { defaults.invoiceExpirationDays = newValue	}
 	}
 	
+	var invoiceExpirationSeconds: Int64 {
+		return Int64(invoiceExpirationDays) * Int64(60 * 60 * 24)
+	}
+	
 	lazy private(set) var maxFeesPublisher: AnyPublisher<MaxFees?, Never> = {
 		defaults.publisher(for: \.maxFees, options: [.new])
 			.map({ (data: Data?) -> MaxFees? in

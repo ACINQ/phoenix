@@ -478,7 +478,7 @@ struct SwapInView: View {
 		mvi.intent(Receive.IntentAsk(
 			amount: lastAmount,
 			desc: lastDescription,
-			expirySeconds: Int64(60 * 60 * 24 * Prefs.shared.invoiceExpirationDays)
+			expirySeconds: Prefs.shared.invoiceExpirationSeconds
 		))
 	}
 	
