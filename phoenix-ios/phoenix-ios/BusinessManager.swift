@@ -558,25 +558,52 @@ class BusinessManager {
 		_ userInfo: [AnyHashable : Any],
 		_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void
 	) {
-		
+		log.trace("processPushNotification()")
 		log.debug("Received remote notification: \(userInfo)")
+		
+		// This could be a push notification coming from either:
+		// - Google's Firebas Cloud Messaging (FCM)
+		// - Amazon Web Services (AWS)
+		
+		if PushNotification.isFCM(userInfo: userInfo) {
+			processPushNotification_fcm(userInfo, completionHandler)
+		} else {
+			processPushNotification_aws(userInfo, completionHandler)
+		}
+	}
+	
+	private func processPushNotification_fcm(
+		_ userInfo: [AnyHashable : Any],
+		_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+	) {
+		log.trace("processPushNotification_fcm()")
+		
+		// All FCM notifications are for incoming payments.
+		processPushNotification_payment(userInfo, completionHandler)
+	}
+	
+	private func processPushNotification_aws(
+		_ userInfo: [AnyHashable : Any],
+		_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+	) {
+		log.trace("processPushNotification_aws()")
 		
 		guard
 			let acinq = userInfo["acinq"] as? [String: Any],
 			let targetNodeId = acinq["n"] as? String
 		else {
-			log.error("processPushNotification: missing/invalid `acinq` section")
+			log.error("processPushNotification_aws: missing/invalid `acinq` section")
 			return completionHandler(.noData)
 		}
 		
 		guard let walletInfo = walletInfo else {
-			log.warning("processPushNotification: walletInfo is nil")
+			log.warning("processPushNotification_aws: walletInfo is nil")
 			return completionHandler(.failed)
 		}
 		
 		let myNodeId = walletInfo.nodeId.toHex()
 		if myNodeId.caseInsensitiveCompare(targetNodeId) != .orderedSame {
-			log.warning("processPushNotification: invalid nodeId")
+			log.warning("processPushNotification_aws: invalid nodeId")
 			unregisterPushToken(invalidNodeId: targetNodeId)
 			return completionHandler(.noData)
 		}

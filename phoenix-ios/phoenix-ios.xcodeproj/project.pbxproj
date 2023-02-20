@@ -82,6 +82,8 @@
 		DC2F432427B6A0240006FCC4 /* RequestPushPermissionPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F432327B6A0240006FCC4 /* RequestPushPermissionPopover.swift */; };
 		DC32FB3529A3D3FE009912AC /* XpcManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC32FB3429A3D3FE009912AC /* XpcManager.swift */; };
 		DC32FB3629A3F876009912AC /* Data+Hexadecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */; };
+		DC32FB3929A40404009912AC /* PushNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC32FB3829A40404009912AC /* PushNotification.swift */; };
+		DC32FB3A29A4047C009912AC /* PushNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC32FB3829A40404009912AC /* PushNotification.swift */; };
 		DC33369826BAF721000E3F49 /* ShortSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC33369726BAF721000E3F49 /* ShortSheet.swift */; };
 		DC34399F276CEFB600CAA73A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF84242A565B00829871 /* Assets.xcassets */; };
 		DC384D7F265BF36600131772 /* StyledString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D7E265BF36600131772 /* StyledString.swift */; };
@@ -397,6 +399,7 @@
 		DC2F432127B69FAA0006FCC4 /* SwapInDisabledPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInDisabledPopover.swift; sourceTree = "<group>"; };
 		DC2F432327B6A0240006FCC4 /* RequestPushPermissionPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestPushPermissionPopover.swift; sourceTree = "<group>"; };
 		DC32FB3429A3D3FE009912AC /* XpcManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XpcManager.swift; sourceTree = "<group>"; };
+		DC32FB3829A40404009912AC /* PushNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotification.swift; sourceTree = "<group>"; };
 		DC33369726BAF721000E3F49 /* ShortSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortSheet.swift; sourceTree = "<group>"; };
 		DC384D7C265BE41900131772 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = fr; path = fr.lproj/about.html; sourceTree = "<group>"; };
 		DC384D7E265BF36600131772 /* StyledString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyledString.swift; sourceTree = "<group>"; };
@@ -713,6 +716,7 @@
 				53BEF1337AFCFF0AE82A46BD /* utils */,
 				DCACF6EE2566D0A60009B01E /* extensions */,
 				DCA6DEC42829BD060073C658 /* xpc */,
+				DC32FB3729A403E1009912AC /* notifications */,
 				53BEFA112E0701FFD6B84217 /* AppColors.swift */,
 				DC641C6C2820826000862DCD /* AppMigration.swift */,
 				DCD7E0AB28EC32CB009C30E5 /* BusinessManager.swift */,
@@ -830,6 +834,15 @@
 				DC2F432127B69FAA0006FCC4 /* SwapInDisabledPopover.swift */,
 			);
 			path = receive;
+			sourceTree = "<group>";
+		};
+		DC32FB3729A403E1009912AC /* notifications */ = {
+			isa = PBXGroup;
+			children = (
+				DC9545C329490321008FCEF4 /* NotificationContent.swift */,
+				DC32FB3829A40404009912AC /* PushNotification.swift */,
+			);
+			path = notifications;
 			sourceTree = "<group>";
 		};
 		DC46BAEC26CACCF700E760A6 /* kotlin */ = {
@@ -1036,7 +1049,6 @@
 			children = (
 				DC641C6E282085F500862DCD /* phoenix-notifySrvExt.entitlements */,
 				DCB511C9281AED58001BC525 /* NotificationService.swift */,
-				DC9545C329490321008FCEF4 /* NotificationContent.swift */,
 				DC641C6A2820803100862DCD /* PhoenixManager.swift */,
 				DC32FB3429A3D3FE009912AC /* XpcManager.swift */,
 				DCB511CB281AED58001BC525 /* Info.plist */,
@@ -1507,6 +1519,7 @@
 				DCAC5B7027726FC80077BB98 /* DeepLink.swift in Sources */,
 				DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */,
 				DCDD9ECE28637474001800A3 /* Orientation.swift in Sources */,
+				DC32FB3929A40404009912AC /* PushNotification.swift in Sources */,
 				DCDD9ECB28637242001800A3 /* MainView.swift in Sources */,
 				DCDD9ED2286377C5001800A3 /* MainView_Small.swift in Sources */,
 				C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */,
@@ -1607,6 +1620,7 @@
 				DC641C77282171D200862DCD /* KotlinExtensions+Currency.swift in Sources */,
 				DC641C762821716A00862DCD /* UserDefaults+Serialization.swift in Sources */,
 				DCF9CFD52862656E001AD33F /* Asserts.swift in Sources */,
+				DC32FB3A29A4047C009912AC /* PushNotification.swift in Sources */,
 				DC641C7C282172BB00862DCD /* DelayedSave.swift in Sources */,
 				DCA6DECE282AB12B0073C658 /* SecurityFile.swift in Sources */,
 				DC32FB3529A3D3FE009912AC /* XpcManager.swift in Sources */,

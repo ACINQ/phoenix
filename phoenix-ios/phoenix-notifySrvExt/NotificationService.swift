@@ -92,6 +92,30 @@ class NotificationService: UNNotificationServiceExtension {
 		assertMainThread()
 		
 		let userInfo = request.content.userInfo
+		log.debug("userInfo: \(userInfo)")
+		
+		// This could be a push notification coming from either:
+		// - Google's Firebas Cloud Messaging (FCM)
+		// - Amazon Web Services (AWS)
+		
+		if PushNotification.isFCM(userInfo: userInfo) {
+			processRequest_fcm(request)
+		} else {
+			processRequest_aws(request)
+		}
+	}
+	
+	private func processRequest_fcm(_ request: UNNotificationRequest) {
+		log.trace("processRequest_fcm()")
+		
+		// All FCM notifications are for incoming payments.
+		// No custom processing needed here.
+	}
+	
+	private func processRequest_aws(_ request: UNNotificationRequest) {
+		log.trace("processRequest_aws()")
+		
+		let userInfo = request.content.userInfo
 		guard
 			let acinq = userInfo["acinq"] as? [String: Any]
 		else {
@@ -101,13 +125,13 @@ class NotificationService: UNNotificationServiceExtension {
 		
 		let type = acinq["t"] as? String ?? "payment"
 		if type == "invoice" {
-			Task { await processRequest_invoice(request) }
+			Task { await processRequest_aws_invoice(request) }
 		}
 	}
 	
 	@MainActor
-	private func processRequest_invoice(_ request: UNNotificationRequest) async {
-		log.trace("processRequest_invoice()")
+	private func processRequest_aws_invoice(_ request: UNNotificationRequest) async {
+		log.trace("processRequest_aws_invoice()")
 		assertMainThread()
 		
 		let userInfo = request.content.userInfo
