@@ -2034,7 +2034,6 @@
 				INFOPLIST_FILE = "phoenix-notifySrvExt/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "phoenix-notifySrvExt";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Acinq. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2062,7 +2061,6 @@
 				INFOPLIST_FILE = "phoenix-notifySrvExt/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "phoenix-notifySrvExt";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Acinq. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
