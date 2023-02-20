@@ -397,6 +397,87 @@ class BusinessManager {
 	}
 
 	// --------------------------------------------------
+	// MARK: Push Notifications
+	// --------------------------------------------------
+	
+	func processPushNotification(
+		_ userInfo: [AnyHashable : Any],
+		_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+	) {
+		
+		log.debug("Received remote notification: \(userInfo)")
+		assertMainThread()
+		
+		// allow network connection, even if app in background
+
+		let appConnectionsDaemon = business.appConnectionsDaemon
+		let targets =
+			AppConnectionsDaemon.ControlTarget.companion.Peer.plus(
+				other: AppConnectionsDaemon.ControlTarget.companion.Electrum
+			)
+		appConnectionsDaemon?.decrementDisconnectCount(target: targets)
+		
+		var didReceivePayment = false
+		var totalTimer: Timer? = nil
+		var postPaymentTimer: Timer? = nil
+		var publisher: AnyPublisher<Lightning_kmpIncomingPayment, Never>? = nil
+		var cancellable: AnyCancellable? = nil
+		
+		let pushReceivedAt = Date()
+		
+		var isFinished = false
+		let Finish = { (_: Timer) -> Void in
+			
+			assertMainThread()
+			
+			if !isFinished {
+				isFinished = true
+				
+				// balance previous decrement call
+				appConnectionsDaemon?.incrementDisconnectCount(target: targets)
+				
+				totalTimer?.invalidate()
+				postPaymentTimer?.invalidate()
+				publisher = nil
+				cancellable?.cancel()
+				
+				if didReceivePayment {
+					log.info("Background fetch: Cleaning up")
+				} else {
+					log.info("Background fetch: Didn't receive payment - giving up")
+				}
+				completionHandler(didReceivePayment ? .newData : .noData)
+			}
+		}
+		
+		// The OS gives us 30 seconds to fetch data, and then invoke the completionHandler.
+		// Failure to properly "clean up" in this way will result in the OS reprimanding us.
+		// So we set a timer to ensure we stop before the max allowed.
+		totalTimer = Timer.scheduledTimer(withTimeInterval: 29.0, repeats: false, block: Finish)
+		
+		publisher = business.paymentsManager.lastIncomingPaymentPublisher()
+		cancellable = publisher!.sink(receiveValue: { (payment: Lightning_kmpIncomingPayment) in
+
+			assertMainThread()
+			
+			guard
+				let paymentReceivedAt = payment.received?.receivedAtDate,
+				paymentReceivedAt > pushReceivedAt
+			else {
+				// Ignoring - this is the most recently received incomingPayment, but not a new one
+				return
+			}
+			
+			log.info("Background fetch: Payment received !")
+			
+			didReceivePayment = true
+			postPaymentTimer?.invalidate()
+			postPaymentTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false, block: Finish)
+			AppDelegate.get().displayLocalNotification_receivedPayment(payment)
+		})
+	}
+	
+	// --------------------------------------------------
 	// MARK: Utils
 	// --------------------------------------------------
 

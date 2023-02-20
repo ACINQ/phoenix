@@ -80,6 +80,7 @@
 		DC2F432027B69F320006FCC4 /* BgAppRefreshDisabledPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F431F27B69F320006FCC4 /* BgAppRefreshDisabledPopover.swift */; };
 		DC2F432227B69FAA0006FCC4 /* SwapInDisabledPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F432127B69FAA0006FCC4 /* SwapInDisabledPopover.swift */; };
 		DC2F432427B6A0240006FCC4 /* RequestPushPermissionPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F432327B6A0240006FCC4 /* RequestPushPermissionPopover.swift */; };
+		DC32FB3529A3D3FE009912AC /* XpcManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC32FB3429A3D3FE009912AC /* XpcManager.swift */; };
 		DC33369826BAF721000E3F49 /* ShortSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC33369726BAF721000E3F49 /* ShortSheet.swift */; };
 		DC34399F276CEFB600CAA73A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF84242A565B00829871 /* Assets.xcassets */; };
 		DC384D7F265BF36600131772 /* StyledString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D7E265BF36600131772 /* StyledString.swift */; };
@@ -394,6 +395,7 @@
 		DC2F431F27B69F320006FCC4 /* BgAppRefreshDisabledPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgAppRefreshDisabledPopover.swift; sourceTree = "<group>"; };
 		DC2F432127B69FAA0006FCC4 /* SwapInDisabledPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInDisabledPopover.swift; sourceTree = "<group>"; };
 		DC2F432327B6A0240006FCC4 /* RequestPushPermissionPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestPushPermissionPopover.swift; sourceTree = "<group>"; };
+		DC32FB3429A3D3FE009912AC /* XpcManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XpcManager.swift; sourceTree = "<group>"; };
 		DC33369726BAF721000E3F49 /* ShortSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortSheet.swift; sourceTree = "<group>"; };
 		DC384D7C265BE41900131772 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = fr; path = fr.lproj/about.html; sourceTree = "<group>"; };
 		DC384D7E265BF36600131772 /* StyledString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyledString.swift; sourceTree = "<group>"; };
@@ -1035,6 +1037,7 @@
 				DCB511C9281AED58001BC525 /* NotificationService.swift */,
 				DC9545C329490321008FCEF4 /* NotificationContent.swift */,
 				DC641C6A2820803100862DCD /* PhoenixManager.swift */,
+				DC32FB3429A3D3FE009912AC /* XpcManager.swift */,
 				DCB511CB281AED58001BC525 /* Info.plist */,
 			);
 			path = "phoenix-notifySrvExt";
@@ -1604,6 +1607,7 @@
 				DCF9CFD52862656E001AD33F /* Asserts.swift in Sources */,
 				DC641C7C282172BB00862DCD /* DelayedSave.swift in Sources */,
 				DCA6DECE282AB12B0073C658 /* SecurityFile.swift in Sources */,
+				DC32FB3529A3D3FE009912AC /* XpcManager.swift in Sources */,
 				DC9545C429490321008FCEF4 /* NotificationContent.swift in Sources */,
 				DCA6DEC72829BFD70073C658 /* CrossProcessCommunication.swift in Sources */,
 				DC641C7428208BD600862DCD /* String+VersionComparison.swift in Sources */,

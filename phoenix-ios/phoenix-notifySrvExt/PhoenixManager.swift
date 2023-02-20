@@ -14,11 +14,30 @@ fileprivate var log = Logger(OSLog.disabled)
 
 typealias PaymentListener = (Lightning_kmpIncomingPayment) -> Void
 
+/**
+ * What happens if multiple push notifications arrive ?
+ *
+ * iOS will launch the notification-service-extension upon receiving the first push notification.
+ * Subsequent push notifications are queued by the OS. After the app extension finishes processing
+ * the first notification (by invoking the `contentHandler`), then iOS will:
+ *
+ * - display the first push notification
+ * - dealloc the `UNNotificationServiceExtension`
+ * - Initialize a new `UNNotificationServiceExtension` instance
+ * - And invoke it's `didReceive(_:)` function with the next item in the queue
+ *
+ * Note that it does **NOT** create a new app extension process.
+ * It re-uses the existing process, and launches a new `UNNotificationServiceExtension` within it.
+ *
+ * This means that the following instances are recycled (continue existing in memory):
+ * - PhoenixManager.shared
+ * - XpcManager.shared
+ */
 class PhoenixManager {
 	
 	public static let shared = PhoenixManager()
 	
-	private let business: PhoenixBusiness
+	public let business: PhoenixBusiness
 	
 	private var queue = DispatchQueue(label: "PhoenixManager")
 	private var listener: PaymentListener? = nil
@@ -45,21 +64,25 @@ class PhoenixManager {
 		business.networkMonitor.disable()
 		business.currencyManager.disableAutoRefresh()
 		
-		let startupParams = StartupParams(requestCheckLegacyChannels: false, isTorEnabled: GroupPrefs.shared.isTorEnabled)
+		let startupParams = StartupParams(
+			requestCheckLegacyChannels: false,
+			isTorEnabled: GroupPrefs.shared.isTorEnabled
+		)
 		business.start(startupParams: startupParams)
 	}
 	
-	public func register(didReceivePayment: @escaping PaymentListener) {
+	public func register(didReceivePayment newListener: @escaping PaymentListener) {
 		log.trace("register(didReceivePayment:)")
 		
 		queue.async { [self] in
 			if listener == nil {
-				listener = didReceivePayment
+				listener = newListener
 			}
 		}
 	}
 	
 	public func unregister() {
+		log.trace("unregister()")
 		
 		queue.async { [self] in
 			listener = nil

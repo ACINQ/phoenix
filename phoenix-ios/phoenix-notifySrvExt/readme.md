@@ -66,7 +66,7 @@ iOS will launch the notification-service-extension upon receiving the first push
 
 
 
-Note that it does not create a new app extension process. It re-uses the existing process, and launches a new `UNNotificationServiceExtension` within it.
+Note that it **does not create a new app extension process**. It re-uses the existing process, and launches a new `UNNotificationServiceExtension` within it.
 
 
 
