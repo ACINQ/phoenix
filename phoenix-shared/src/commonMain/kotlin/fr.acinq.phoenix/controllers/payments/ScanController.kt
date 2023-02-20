@@ -424,11 +424,13 @@ class AppScanController(
 
         val deferred = CompletableDeferred<PaymentRequest>()
         val preimage = ByteVector32(Random.secure().nextBytes(32))
+        val description = intent.description ?: intent.lnurlWithdraw.defaultDescription
+        val desc: fr.acinq.lightning.utils.Either<String, ByteVector32> = fr.acinq.lightning.utils.Either.Left(description)
         peerManager.getPeer().send(
             ReceivePayment(
                 paymentPreimage = preimage,
                 amount = intent.amount,
-                description = intent.description ?: intent.lnurlWithdraw.defaultDescription,
+                description = desc,
                 expirySeconds = (3600 * 24 * 7).toLong(), // one week
                 result = deferred
             )

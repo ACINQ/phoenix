@@ -21,6 +21,27 @@ extension BalanceManager {
 	}
 }
 
+extension Lightning_kmpPeer {
+	
+	func connectionStateStream() -> AsyncStream<Lightning_kmpConnection> {
+		
+		return AsyncStream { continuation in
+			
+			let swiftFlow = SwiftFlow<Lightning_kmpConnection>(origin: self.connectionState)
+			
+			let watcher = swiftFlow.watch { (connection: Lightning_kmpConnection?) in
+				if let connection {
+					continuation.yield(connection)
+				}
+			}
+			
+			continuation.onTermination = { _ in
+				watcher.close()
+			}
+		}
+	}
+}
+
 extension Lightning_kmpConnection {
 	
 	func localizedText() -> String {

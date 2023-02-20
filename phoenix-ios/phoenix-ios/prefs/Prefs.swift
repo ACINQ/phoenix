@@ -15,6 +15,7 @@ fileprivate var log = Logger(OSLog.disabled)
 fileprivate enum Key: String {
 	case theme
 	case pushPermissionQuery
+	case pushTokenRegistration
 	case defaultPaymentDescription
 	case showChannelsRemoteBalance
 	case recentTipPercents
@@ -172,6 +173,12 @@ class Prefs {
 		get { defaults.pushPermissionQuery?.jsonDecode() ?? .neverAskedUser }
 		set { defaults.pushPermissionQuery = newValue.jsonEncode() }
 	}
+	
+	var pushTokenRegistration: PushTokenRegistration? {
+		get { defaults.pushTokenRegistration?.jsonDecode() }
+		set { defaults.pushTokenRegistration = newValue?.jsonEncode() }
+	}
+
 
 	// --------------------------------------------------
 	// MARK: Backup
@@ -296,5 +303,10 @@ extension UserDefaults {
 	@objc fileprivate var pushPermissionQuery: Data? {
 		get { data(forKey: Key.pushPermissionQuery.rawValue) }
 		set { set(newValue, forKey: Key.pushPermissionQuery.rawValue) }
+	}
+	
+	@objc fileprivate var pushTokenRegistration: Data? {
+		get { data(forKey: Key.pushTokenRegistration.rawValue) }
+		set { set(newValue, forKey: Key.pushTokenRegistration.rawValue) }
 	}
 }

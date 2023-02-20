@@ -19,6 +19,7 @@ package fr.acinq.phoenix.controllers.payments
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.io.*
 import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.Either
 import fr.acinq.lightning.utils.secure
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
@@ -54,7 +55,7 @@ class AppReceiveController(
                             ReceivePayment(
                                 paymentPreimage = preimage,
                                 amount = intent.amount,
-                                description = intent.description,
+                                description = Either.Left(intent.description),
                                 expirySeconds = intent.expirySeconds,
                                 result = deferred
                             )

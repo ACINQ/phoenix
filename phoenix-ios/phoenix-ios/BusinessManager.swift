@@ -195,6 +195,7 @@ class BusinessManager {
 		
 		self.walletInfo = _walletInfo
 		maybeRegisterFcmToken()
+		maybeRegisterPushToken()
 		
 		let cloudKey = _walletInfo.cloudKey
 		let encryptedNodeId = _walletInfo.cloudKeyHash as String
@@ -272,6 +273,7 @@ class BusinessManager {
 		
 		self.pushToken = value
 		maybeRegisterFcmToken()
+		maybeRegisterPushToken()
 	}
 	
 	public func setFcmToken(_ value: String) {
@@ -351,6 +353,158 @@ class BusinessManager {
 		// registration. Which we could then use to trigger a storage in UserDefaults.
 	}
 	
+	func maybeRegisterPushToken() {
+		log.trace("maybeRegisterPushToken()")
+		assertMainThread()
+		
+		guard let walletInfo = walletInfo else {
+			log.debug("maybeRegisterPushToken: walletInfo is nil")
+			return
+		}
+		guard let pushToken = pushToken else {
+			log.debug("maybeRegisterPushToken: pushToken is nil")
+			return
+		}
+		
+		let nodeId = walletInfo.nodeId.toHex()
+		log.debug("nodeId: \(nodeId)")
+		
+		if let prvRegistration = Prefs.shared.pushTokenRegistration {
+
+			if prvRegistration.pushToken == pushToken &&
+				prvRegistration.nodeId == nodeId
+			{
+				// We've already registered our {pushToken, nodeId} tuple.
+
+				if abs(prvRegistration.registrationDate.timeIntervalSinceNow) < 14.days() {
+					// The last registration was recent, so we can skip registration.
+					log.debug("Push token already registered")
+					return
+
+				} else {
+					// It's been awhile since we last registered, so let's re-register.
+					// This is a self-healing mechanism, in case of server problems.
+				}
+			}
+		}
+		
+		let registration = PushTokenRegistration(
+			pushToken: pushToken,
+			nodeId: nodeId,
+			registrationDate: Date()
+		)
+		
+		let url = URL(string: "https://phoenix.deusty.com/v1/pub/push/register")
+		guard let requestUrl = url else { return }
+		
+		#if DEBUG
+		let platform = "iOS-development"
+		#else
+		// Note: This is actually wrong if you build-and-run using RELEASE mode.
+		let platform = "iOS-production"
+		#endif
+		
+		let body = [
+			"app_id"     : "co.acinq.phoenix",
+			"platform"   : platform,
+			"push_token" : pushToken,
+			"node_id"    : nodeId
+		]
+		let bodyData = try? JSONSerialization.data(
+			 withJSONObject: body,
+			 options: []
+		)
+		
+		var request = URLRequest(url: requestUrl)
+		request.httpMethod = "POST"
+		request.httpBody = bodyData
+		
+		let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+			
+			var statusCode = 418
+			var success = false
+			if let httpResponse = response as? HTTPURLResponse {
+				statusCode = httpResponse.statusCode
+				if statusCode >= 200 && statusCode < 300 {
+					success = true
+				}
+			}
+			
+			if success {
+				log.debug("/push/register: success")
+				Prefs.shared.pushTokenRegistration = registration
+			}
+			else if let error = error {
+				log.debug("/push/register: error: \(String(describing: error))")
+			} else {
+				log.debug("/push/register: statusCode: \(statusCode)")
+				if let data = data, let dataString = String(data: data, encoding: .utf8) {
+					log.debug("/push/register: response:\n\(dataString)")
+				}
+			}
+		}
+		
+		log.debug("/push/register ...")
+		task.resume()
+	}
+	
+	/**
+	 * If we receive push notifications for a nodeID that doesn't match the current wallet,
+	 * then we unregister for push notifications from the previous nodeID.
+	 */
+	func unregisterPushToken(invalidNodeId: String) {
+		log.trace("unregisterPushToken: \(invalidNodeId)")
+		
+		guard let pushToken = pushToken else {
+			log.debug("unregisterPushToken: pushToken is nil")
+			return
+		}
+		
+		let url = URL(string: "https://phoenix.deusty.com/v1/pub/push/register")
+		guard let requestUrl = url else { return }
+		
+		let body = [
+			"push_token" : pushToken,
+			"node_id"    : invalidNodeId,
+			"app_id"     : "co.acinq.phoenix",
+		]
+		let bodyData = try? JSONSerialization.data(
+			 withJSONObject: body,
+			 options: []
+		)
+		
+		var request = URLRequest(url: requestUrl)
+		request.httpMethod = "POST"
+		request.httpBody = bodyData
+		
+		let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+			
+			var statusCode = 418
+			var success = false
+			if let httpResponse = response as? HTTPURLResponse {
+				statusCode = httpResponse.statusCode
+				if statusCode >= 200 && statusCode < 300 {
+					success = true
+				}
+			}
+			
+			if success {
+				log.debug("/push/unregister: success")
+			}
+			else if let error = error {
+				log.debug("/push/unregister: error: \(String(describing: error))")
+			} else {
+				log.debug("/push/unregister: statusCode: \(statusCode)")
+				if let data = data, let dataString = String(data: data, encoding: .utf8) {
+					log.debug("/push/unregister: response:\n\(dataString)")
+				}
+			}
+		}
+		
+		log.debug("/push/unregister ...")
+		task.resume()
+	}
+	
 	// --------------------------------------------------
 	// MARK: Long-Lived Tasks
 	// --------------------------------------------------
@@ -406,6 +560,41 @@ class BusinessManager {
 	) {
 		
 		log.debug("Received remote notification: \(userInfo)")
+		
+		guard
+			let acinq = userInfo["acinq"] as? [String: Any],
+			let targetNodeId = acinq["n"] as? String
+		else {
+			log.error("processPushNotification: missing/invalid `acinq` section")
+			return completionHandler(.noData)
+		}
+		
+		guard let walletInfo = walletInfo else {
+			log.warning("processPushNotification: walletInfo is nil")
+			return completionHandler(.failed)
+		}
+		
+		let myNodeId = walletInfo.nodeId.toHex()
+		if myNodeId.caseInsensitiveCompare(targetNodeId) != .orderedSame {
+			log.warning("processPushNotification: invalid nodeId")
+			unregisterPushToken(invalidNodeId: targetNodeId)
+			return completionHandler(.noData)
+		}
+		
+		let type = acinq["t"] as? String ?? "unknown"
+		switch type {
+			case "invoice" : Task { await processPushNotification_invoice(userInfo, completionHandler) }
+			case "payment" : processPushNotification_payment(userInfo, completionHandler)
+			default        : processPushNotification_payment(userInfo, completionHandler)
+		}
+	}
+	
+	private func processPushNotification_payment(
+		_ userInfo: [AnyHashable : Any],
+		_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+	) {
+		
+		log.trace("processPushNotification_payment()")
 		assertMainThread()
 		
 		// allow network connection, even if app in background
@@ -475,6 +664,88 @@ class BusinessManager {
 			postPaymentTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false, block: Finish)
 			AppDelegate.get().displayLocalNotification_receivedPayment(payment)
 		})
+	}
+	
+	@MainActor
+	private func processPushNotification_invoice(
+		_ userInfo: [AnyHashable : Any],
+		_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+	) async {
+		
+		log.trace("processPushNotification_invoice()")
+		
+		guard
+			let acinq = userInfo["acinq"] as? [String: Any],
+			let nodeId = acinq["n"] as? String, // verified in `processPushNotification()`
+			let amt = acinq["amt"] as? Int,
+			let h = acinq["h"] as? String,
+			let hBytes = Data(fromHex: h),
+			hBytes.count == 32
+		else {
+			log.error("Invalid `acinq` section !")
+			return completionHandler(.failed)
+		}
+		
+		let msat = Int64(amt)
+		let invoice: String
+		do {
+			invoice = try await business.paymentsManager.generateInvoice(
+				amount          : Lightning_kmpMilliSatoshi(msat: msat),
+				descriptionHash : Bitcoin_kmpByteVector32(bytes: hBytes.toKotlinByteArray()),
+				expirySeconds   : Prefs.shared.invoiceExpirationSeconds
+			)
+		} catch {
+			log.error("Error generating invoice: \(error)")
+			return completionHandler(.failed)
+		}
+		
+		let url = URL(string: "https://phoenix.deusty.com/v1/pub/lnurlp/enqueue")
+		guard let requestUrl = url else {
+			return completionHandler(.failed)
+		}
+		
+		let body = [
+			"node_id"     : nodeId,
+			"amount_msat" : msat,
+			"ln_invoice"  : invoice
+		] as [String : Any]
+		let bodyData = try? JSONSerialization.data(
+			 withJSONObject: body,
+			 options: []
+		)
+		
+		var request = URLRequest(url: requestUrl)
+		request.httpMethod = "POST"
+		request.httpBody = bodyData
+		
+		do {
+			let (data, response) = try await URLSession.shared.data(for: request)
+			
+			var statusCode = 418
+			var success = false
+			if let httpResponse = response as? HTTPURLResponse {
+				statusCode = httpResponse.statusCode
+				if statusCode >= 200 && statusCode < 300 {
+					success = true
+				}
+			}
+			
+			if success {
+				log.debug("/lnurlp/enqueue: success")
+				return completionHandler(.newData)
+			}
+			else {
+				log.debug("/lnurlp/enqueue: statusCode: \(statusCode)")
+				if let dataString = String(data: data, encoding: .utf8) {
+					log.debug("/lnurlp/enqueue: response:\n\(dataString)")
+				}
+				return completionHandler(.failed)
+			}
+			
+		} catch {
+			log.debug("/lnurlp/enqueue: error: \(error)")
+			return completionHandler(.failed)
+		}
 	}
 	
 	// --------------------------------------------------

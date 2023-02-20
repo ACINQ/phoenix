@@ -1,12 +1,13 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.lightning.ChannelEvents
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.SwapInEvents
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentProgress
 import fr.acinq.lightning.io.PaymentSent
+import fr.acinq.lightning.io.ReceivePayment
+import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
@@ -15,12 +16,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
-
+import kotlin.random.Random
+import kotlinx.coroutines.*
 
 class PaymentsManager(
     private val loggerFactory: LoggerFactory,
@@ -143,6 +143,26 @@ class PaymentsManager(
 
     private suspend fun paymentsDb(): SqlitePaymentsDb {
         return databaseManager.paymentsDb()
+    }
+
+    suspend fun generateInvoice(
+        amount: MilliSatoshi,
+        descriptionHash: ByteVector32,
+        expirySeconds: Long
+    ): String {
+        val deferred = CompletableDeferred<PaymentRequest>()
+        val preimage = ByteVector32(Random.secure().nextBytes(32)) // must be different everytime
+        peerManager.getPeer().send(
+            ReceivePayment(
+                paymentPreimage = preimage,
+                amount = amount,
+                description = Either.Right(descriptionHash),
+                expirySeconds = expirySeconds,
+                result = deferred
+            )
+        )
+        val request = deferred.await()
+        return request.write()
     }
 
     suspend fun updateMetadata(id: WalletPaymentId, userDescription: String?) {

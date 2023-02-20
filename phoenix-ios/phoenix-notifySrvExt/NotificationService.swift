@@ -69,6 +69,7 @@ class NotificationService: UNNotificationServiceExtension {
 			self.startTotalTimer()
 			self.startXpc()
 			self.startPhoenix()
+			self.processRequest(request)
 		}
 	}
 	
@@ -80,6 +81,125 @@ class NotificationService: UNNotificationServiceExtension {
 		// otherwise the original push payload will be used.
 		
 		displayPushNotification()
+	}
+	
+	// --------------------------------------------------
+	// MARK: Invoice Requests
+	// --------------------------------------------------
+	
+	private func processRequest(_ request: UNNotificationRequest) {
+		log.trace("processRequest()")
+		assertMainThread()
+		
+		let userInfo = request.content.userInfo
+		guard
+			let acinq = userInfo["acinq"] as? [String: Any]
+		else {
+			log.error("processRequest: missing/invalid `acinq` section")
+			return displayPushNotification()
+		}
+		
+		let type = acinq["t"] as? String ?? "payment"
+		if type == "invoice" {
+			Task { await processRequest_invoice(request) }
+		}
+	}
+	
+	@MainActor
+	private func processRequest_invoice(_ request: UNNotificationRequest) async {
+		log.trace("processRequest_invoice()")
+		assertMainThread()
+		
+		let userInfo = request.content.userInfo
+		guard
+			let acinq = userInfo["acinq"] as? [String: Any],
+			let nodeId = acinq["n"] as? String, // Todo: verify this is correct
+			let amt = acinq["amt"] as? Int,
+			let h = acinq["h"] as? String,
+			let hBytes = Data(fromHex: h),
+			hBytes.count == 32
+		else {
+			log.error("Invalid `acinq` section !")
+			return
+		}
+		
+		let msat = Int64(amt)
+		let business = PhoenixManager.shared.business
+		
+		let invoice: String
+		do {
+			invoice = try await business.paymentsManager.generateInvoice(
+				amount          : Lightning_kmpMilliSatoshi(msat: msat),
+				descriptionHash : Bitcoin_kmpByteVector32(bytes: hBytes.toKotlinByteArray()),
+				expirySeconds   : (60 * 60 * 24 * 7)
+			)
+		} catch {
+			log.error("Error generating invoice: \(error)")
+			return
+		}
+		
+		// TEST THEORY: don't post the invoice until AFTER we're connected
+		
+		let peer: Lightning_kmpPeer
+		do {
+			peer = try await business.peerManager.getPeer()
+		} catch {
+			log.error("Error getting peer: \(error)")
+			return
+		}
+		
+		for await state in peer.connectionStateStream() {
+			if state is Lightning_kmpConnection.ESTABLISHED {
+				break
+			}
+		}
+		
+		let url = URL(string: "https://phoenix.deusty.com/v1/pub/lnurlp/enqueue")
+		guard let requestUrl = url else {
+			log.error("Error generating url")
+			return
+		}
+		
+		let body = [
+			"node_id"     : nodeId,
+			"amount_msat" : msat,
+			"ln_invoice"  : invoice
+		] as [String : Any]
+		let bodyData = try? JSONSerialization.data(
+			 withJSONObject: body,
+			 options: []
+		)
+		
+		var request = URLRequest(url: requestUrl)
+		request.httpMethod = "POST"
+		request.httpBody = bodyData
+		
+		do {
+			log.debug("/lnurlp/enqueue: posting...")
+			let (data, response) = try await URLSession.shared.data(for: request)
+			
+			var statusCode = 418
+			var success = false
+			if let httpResponse = response as? HTTPURLResponse {
+				statusCode = httpResponse.statusCode
+				if statusCode >= 200 && statusCode < 300 {
+					success = true
+				}
+			}
+			
+			if success {
+				log.debug("/lnurlp/enqueue: success")
+			}
+			else {
+				log.debug("/lnurlp/enqueue: statusCode: \(statusCode)")
+				if let dataString = String(data: data, encoding: .utf8) {
+					log.debug("/lnurlp/enqueue: response:\n\(dataString)")
+				}
+			}
+			
+		} catch {
+			log.debug("/lnurlp/enqueue: error: \(error)")
+		}
 	}
 	
 	// --------------------------------------------------
