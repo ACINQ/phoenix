@@ -12,11 +12,14 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+fileprivate let LIGHTNING_ADDRESS_ENABLED = true
+
 fileprivate enum NavLinkTag: String {
 	// General
 	case AboutView
 	case DisplayConfigurationView
 	case PaymentOptionsView
+	case LightningAddressView
 	case RecoveryPhraseView
 	case DrainWalletView
 	// Security
@@ -80,110 +83,12 @@ struct ConfigurationView: View {
 		List {
 			let hasWallet = hasWallet()
 
-			Section(header: Text("General")) {
-				
-				navLink(.AboutView) {
-					Label { Text("About") } icon: {
-						Image(systemName: "info.circle")
-					}
-				}
-			
-				navLink(.DisplayConfigurationView) {
-					Label { Text("Display") } icon: {
-						Image(systemName: "paintbrush.pointed")
-					}
-				}
-		
-				navLink(.PaymentOptionsView) {
-					Label { Text("Payment options & fees") } icon: {
-						Image(systemName: "wrench")
-					}
-				}
-			
-				if hasWallet {
-					
-					navLink(.RecoveryPhraseView) {
-						Label {
-							switch backupSeedState {
-							case .notBackedUp:
-								HStack(alignment: VerticalAlignment.center, spacing: 0) {
-									Text("Recovery phrase")
-									Spacer()
-									Image(systemName: "exclamationmark.triangle")
-										.renderingMode(.template)
-										.foregroundColor(Color.appWarn)
-								}
-							case .backupInProgress:
-								HStack(alignment: VerticalAlignment.center, spacing: 0) {
-									Text("Recovery phrase")
-									Spacer()
-									Image(systemName: "icloud.and.arrow.up")
-								}
-							case .safelyBackedUp:
-								Text("Recovery phrase")
-							}
-						} icon: {
-							Image(systemName: "squareshape.split.3x3")
-						}
-					}
-					
-					navLink(.DrainWalletView) {
-						Label { Text("Drain wallet") } icon: {
-							Image(systemName: "xmark.circle")
-						}
-					}
-				
-				} // </if: hasWallet>
-				
-			} // </Section: General>
-
+			section_general(hasWallet)
 			if hasWallet {
-				Section(header: Text("Security")) {
-
-					navLink(.AppAccessView) {
-						Label { Text("App access") } icon: {
-							Image(systemName: isTouchID ? "touchid" : "faceid")
-						}
-					}
-
-				} // </Section: Security>
-
-			} // <if: hasWallet>
-
-			Section(header: Text("Advanced")) {
-
-				navLink(.PrivacyView) {
-					Label { Text("Privacy") } icon: {
-						Image(systemName: "eye")
-					}
-				}
-
-				if hasWallet {
-
-					navLink(.ChannelsConfigurationView) {
-						Label { Text("Payment channels") } icon: {
-							Image(systemName: "bolt")
-						}
-					}
-
-				} // </if: hasWallet>
-				
-				navLink(.LogsConfigurationView) {
-					Label { Text("Logs") } icon: {
-						Image(systemName: "doc.text")
-					}
-				}
-
-				if hasWallet {
-
-					navLink(.ResetWalletView) {
-						Label { Text("Reset wallet") } icon: {
-							Image(systemName: "trash")
-						}
-					}
-				}
-
-			} // </Section: Advanced>
+				section_security()
+			}
+			section_advanced(hasWallet)
+			
 		} // </List>
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
@@ -203,6 +108,125 @@ struct ConfigurationView: View {
 		.onReceive(externalLightningUrlPublisher) {(url: String) in
 			onExternalLightningUrl(url)
 		}
+	}
+	
+	@ViewBuilder
+	func section_general(_ hasWallet: Bool) -> some View {
+		
+		Section(header: Text("General")) {
+			
+			navLink(.AboutView) {
+				Label { Text("About") } icon: {
+					Image(systemName: "info.circle")
+				}
+			}
+		
+			navLink(.DisplayConfigurationView) {
+				Label { Text("Display") } icon: {
+					Image(systemName: "paintbrush.pointed")
+				}
+			}
+	
+			if hasWallet && LIGHTNING_ADDRESS_ENABLED {
+				navLink(.LightningAddressView) {
+					Label { Text("Lightning address") } icon: {
+						Image(systemName: "person.fill")
+					}
+				}
+			}
+			
+			navLink(.PaymentOptionsView) {
+				Label { Text("Payment options & fees") } icon: {
+					Image(systemName: "wrench")
+				}
+			}
+		
+			if hasWallet {
+				navLink(.RecoveryPhraseView) {
+					Label {
+						switch backupSeedState {
+						case .notBackedUp:
+							HStack(alignment: VerticalAlignment.center, spacing: 0) {
+								Text("Recovery phrase")
+								Spacer()
+								Image(systemName: "exclamationmark.triangle")
+									.renderingMode(.template)
+									.foregroundColor(Color.appWarn)
+							}
+						case .backupInProgress:
+							HStack(alignment: VerticalAlignment.center, spacing: 0) {
+								Text("Recovery phrase")
+								Spacer()
+								Image(systemName: "icloud.and.arrow.up")
+							}
+						case .safelyBackedUp:
+							Text("Recovery phrase")
+						}
+					} icon: {
+						Image(systemName: "squareshape.split.3x3")
+					}
+				}
+			}
+			
+			if hasWallet {
+				navLink(.DrainWalletView) {
+					Label { Text("Drain wallet") } icon: {
+						Image(systemName: "xmark.circle")
+					}
+				}
+			}
+			
+		} // </Section: General>
+	}
+	
+	@ViewBuilder
+	func section_security() -> some View {
+		
+		Section(header: Text("Security")) {
+
+			navLink(.AppAccessView) {
+				Label { Text("App access") } icon: {
+					Image(systemName: isTouchID ? "touchid" : "faceid")
+				}
+			}
+
+		} // </Section: Security>
+	}
+	
+	@ViewBuilder
+	func section_advanced(_ hasWallet: Bool) -> some View {
+		
+		Section(header: Text("Advanced")) {
+
+			navLink(.PrivacyView) {
+				Label { Text("Privacy") } icon: {
+					Image(systemName: "eye")
+				}
+			}
+
+			if hasWallet {
+				navLink(.ChannelsConfigurationView) {
+					Label { Text("Payment channels") } icon: {
+						Image(systemName: "bolt")
+					}
+				}
+			}
+			
+			navLink(.LogsConfigurationView) {
+				Label { Text("Logs") } icon: {
+					Image(systemName: "doc.text")
+				}
+			}
+
+			if hasWallet {
+				navLink(.ResetWalletView) {
+					Label { Text("Reset wallet") } icon: {
+						Image(systemName: "trash")
+					}
+				}
+			}
+
+		} // </Section: Advanced>
 	}
 
 	@ViewBuilder
@@ -227,6 +251,7 @@ struct ConfigurationView: View {
 			case .AboutView                 : AboutView()
 			case .DisplayConfigurationView  : DisplayConfigurationView()
 			case .PaymentOptionsView        : PaymentOptionsView()
+			case .LightningAddressView      : LightningAddressView()
 			case .RecoveryPhraseView        : RecoveryPhraseView()
 			case .DrainWalletView           : DrainWalletView(popToRoot: popToRoot)
 		// Security

@@ -148,6 +148,8 @@
 		DC74174D270F455D00F7E3E3 /* AES256.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174C270F455D00F7E3E3 /* AES256.swift */; };
 		DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC81B79E25BF2AA200F5A52C /* MVI.swift */; };
 		DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC82EED529789853007A5853 /* TxHistoryExporter.swift */; };
+		DC86B61029A6A21A00BF2A66 /* LightningAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC86B60F29A6A21A00BF2A66 /* LightningAddressView.swift */; };
+		DC86B61229A6BA3700BF2A66 /* TextFieldAutocapitalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC86B61129A6BA3700BF2A66 /* TextFieldAutocapitalization.swift */; };
 		DC87806F292D69C90061715B /* IncomingDepositPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC87806E292D69C90061715B /* IncomingDepositPopover.swift */; };
 		DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */; };
 		DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9473F9261270B4008D7242 /* MVI+Mock.swift */; };
@@ -453,6 +455,8 @@
 		DC74174C270F455D00F7E3E3 /* AES256.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AES256.swift; sourceTree = "<group>"; };
 		DC81B79E25BF2AA200F5A52C /* MVI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVI.swift; sourceTree = "<group>"; };
 		DC82EED529789853007A5853 /* TxHistoryExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxHistoryExporter.swift; sourceTree = "<group>"; };
+		DC86B60F29A6A21A00BF2A66 /* LightningAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightningAddressView.swift; sourceTree = "<group>"; };
+		DC86B61129A6BA3700BF2A66 /* TextFieldAutocapitalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldAutocapitalization.swift; sourceTree = "<group>"; };
 		DC87806E292D69C90061715B /* IncomingDepositPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingDepositPopover.swift; sourceTree = "<group>"; };
 		DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplicationState+Phoenix.swift"; sourceTree = "<group>"; };
 		DC9473F9261270B4008D7242 /* MVI+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MVI+Mock.swift"; sourceTree = "<group>"; };
@@ -943,6 +947,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		DC86B60E29A6A20700BF2A66 /* lightning identifier */ = {
+			isa = PBXGroup;
+			children = (
+				DC86B60F29A6A21A00BF2A66 /* LightningAddressView.swift */,
+			);
+			path = "lightning identifier";
+			sourceTree = "<group>";
+		};
 		DC99E94725BA258C00FB20F7 /* html */ = {
 			isa = PBXGroup;
 			children = (
@@ -968,6 +980,7 @@
 				DC6CF35A2938F32E001837EE /* ListBackgroundColor.swift */,
 				DCAC9FC229675E1A0098D769 /* NavigationWrapper.swift */,
 				DCAC9FC5296879770098D769 /* NavigationStackDestination.swift */,
+				DC86B61129A6BA3700BF2A66 /* TextFieldAutocapitalization.swift */,
 			);
 			path = compatibility;
 			sourceTree = "<group>";
@@ -989,6 +1002,7 @@
 				C8D7A2327BC90150A3E1493D /* AboutView.swift */,
 				DC0732EB263CA6C3004CB88D /* PaymentOptionsView.swift */,
 				DC2DC8662906ABE70079E570 /* display configuration */,
+				DC86B60E29A6A20700BF2A66 /* lightning identifier */,
 				DC27E4CD2791D18600C777CC /* recovery phrase */,
 				DC5CA4EB28F83C260048A737 /* drain wallet */,
 			);
@@ -1397,6 +1411,7 @@
 				DCACF6FE2566D0BA0009B01E /* GenericPasswordConvertible.swift in Sources */,
 				DC33369826BAF721000E3F49 /* ShortSheet.swift in Sources */,
 				DC99E90925B78FA800FB20F7 /* EnabledSecurity.swift in Sources */,
+				DC86B61229A6BA3700BF2A66 /* TextFieldAutocapitalization.swift in Sources */,
 				DCB493CF269F859E001B0F09 /* SyncTxManager_State.swift in Sources */,
 				DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */,
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
@@ -1549,6 +1564,7 @@
 				DC5EE4C927679C6300A3035C /* RestoreView.swift in Sources */,
 				C8D7A70EFE0F071ACA0AE246 /* QRCodeScanner.swift in Sources */,
 				DC2CE55028A52AD90070A2E1 /* RecentPaymentsConfig.swift in Sources */,
+				DC86B61029A6A21A00BF2A66 /* LightningAddressView.swift in Sources */,
 				DC5A935329846044004F19FD /* FileHandle+Async.swift in Sources */,
 				DC118C0A27B457F70080BBAC /* LnurlFlowErrorNotice.swift in Sources */,
 				53BEF2924096C8E7976D46E3 /* shapes.swift in Sources */,
