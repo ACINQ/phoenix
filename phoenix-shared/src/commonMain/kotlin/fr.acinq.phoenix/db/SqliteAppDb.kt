@@ -137,10 +137,11 @@ class SqliteAppDb(private val driver: SqlDriver) {
         return getWalletContextOrNull(version).second
     }
 
-    suspend fun getWalletContextOrNull(version: WalletContext.Version): Pair<Long, WalletContext.V0?> =
-        withContext(Dispatchers.Default) {
+    suspend fun getWalletContextOrNull(version: WalletContext.Version): Pair<Long, WalletContext.V0?> {
+        return withContext(Dispatchers.Default) {
             paramsQueries.get(version.name, ::mapWalletContext).executeAsOneOrNull()
-        } ?: Instant.DISTANT_PAST.toEpochMilliseconds() to null
+        } ?: (Instant.DISTANT_PAST.toEpochMilliseconds() to null)
+    }
 
     private fun mapWalletContext(
         version: String,

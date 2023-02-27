@@ -28,7 +28,7 @@ object Versions {
         const val biometrics = "1.1.0"
 
         const val zxing = "4.1.0"
-        const val fcm = "22.0.0"
+        const val fcm = "23.1.1"
         const val logback = "2.0.0"
 
         const val testRunner = "1.3.0"

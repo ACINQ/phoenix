@@ -1,6 +1,5 @@
 package fr.acinq.phoenix.android.service
 
-import android.app.Notification
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
@@ -44,7 +43,7 @@ class NodeService : Service() {
 
     // Notifications
     private lateinit var notificationManager: NotificationManagerCompat
-    private val notificationBuilder = NotificationCompat.Builder(this, Notifications.HEADLESS_NOTIF_CHANNEL_ID)
+    private val notificationBuilder = NotificationCompat.Builder(this, Notifications.BACKGROUND_NOTIF_CHANNEL)
 
     /** State of the wallet, provides access to the business when started. Private so that it's not mutated from the outside. */
     private val _state = MutableLiveData<WalletState>(WalletState.Off)
@@ -82,7 +81,7 @@ class NodeService : Service() {
         // UI is binding to the service. The service is not headless anymore and we can remove the notification.
         isHeadless = false
         stopForeground(STOP_FOREGROUND_REMOVE)
-        notificationManager.cancel(Notifications.HEADLESS_NOTIF_ID)
+        notificationManager.cancel(Notifications.BACKGROUND_NOTIF_ID)
         return binder
     }
 
@@ -100,7 +99,7 @@ class NodeService : Service() {
                 stopForeground(STOP_FOREGROUND_REMOVE)
             } else {
                 stopForeground(STOP_FOREGROUND_DETACH)
-                notificationManager.notify(Notifications.HEADLESS_NOTIF_ID, notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline).setAutoCancel(true).build())
+                notificationManager.notify(Notifications.BACKGROUND_NOTIF_ID, notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline).setAutoCancel(true).build())
             }
             shutdown()
         }
@@ -122,7 +121,7 @@ class NodeService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         log.info("start service from intent [ intent=$intent, flag=$flags, startId=$startId ]")
-        val reason = intent?.getStringExtra(EXTRA_REASON) // ?.also { spawnReason = it }
+        val reason = intent?.getStringExtra(EXTRA_REASON)?.takeIf { it.isNotBlank() } // ?.also { spawnReason = it }
 
         val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext)
         when {
@@ -140,7 +139,7 @@ class NodeService : Service() {
                 log.info("unhandled incoming payment with seed=${encryptedSeed?.name()}")
                 if (reason == "IncomingPayment") {
                     notifyForegroundService(getString(R.string.notif__headless_title__missed_incoming), getString(R.string.notif__headless_message__app_locked))
-                } else {
+                } else if (reason != null) {
                     notifyForegroundService(getString(R.string.notif__headless_title__missed_fulfill), getString(R.string.notif__headless_message__pending_fulfill))
                 }
             }
@@ -261,10 +260,6 @@ class NodeService : Service() {
     /** Display a blocking notification and set the service as being foregrounded. */
     private fun notifyForegroundService(title: String?, message: String?) {
         log.debug("notifying foreground service with msg=$message")
-        updateNotification(title, message).also { startForeground(Notifications.HEADLESS_NOTIF_ID, it) }
-    }
-
-    private fun updateNotification(title: String?, message: String?): Notification {
         title?.let {
             notificationBuilder.setContentTitle(it)
         }
@@ -273,8 +268,9 @@ class NodeService : Service() {
             notificationBuilder.setStyle(NotificationCompat.BigTextStyle().bigText(message))
         }
         notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline)
-        return notificationBuilder.build().apply {
-            notificationManager.notify(Notifications.HEADLESS_NOTIF_ID, this)
+        notificationBuilder.build().let {
+            notificationManager.notify(Notifications.BACKGROUND_NOTIF_ID, it)
+            startForeground(Notifications.BACKGROUND_NOTIF_ID, it)
         }
     }
 

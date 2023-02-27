@@ -1,6 +1,5 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.HeaderSubscriptionResponse
 import fr.acinq.lightning.utils.ServerAddress
@@ -19,7 +18,6 @@ import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.math.*
 import kotlin.time.*
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -59,15 +57,19 @@ class AppConfigurationManager(
         stopWalletContextLoop()
     }
 
-    private val currentWalletContextVersion = WalletContext.Version.V0
+    private val currentWalletContextVersion: WalletContext.Version = WalletContext.Version.V0
 
-    private val _walletContextInitialized = MutableStateFlow<Boolean>(false)
+    private val _walletContextInitialized = MutableStateFlow(false)
 
     private val _chainContext = MutableStateFlow<WalletContext.V0.ChainContext?>(null)
     val chainContext: StateFlow<WalletContext.V0.ChainContext?> = _chainContext
 
     private fun initWalletContext() = launch {
-        val (timestamp, localContext) = appDb.getWalletContextOrNull(currentWalletContextVersion)
+        val (timestamp, localContext) = if (currentWalletContextVersion != null) {
+            appDb.getWalletContextOrNull(currentWalletContextVersion)
+        } else {
+            appDb.getWalletContextOrNull(WalletContext.Version.V0)
+        }
 
         val freshness = (currentTimestampMillis() - timestamp).milliseconds
         logger.info { "local context was updated $freshness ago" }

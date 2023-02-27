@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.managers
 
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.PhoenixBusiness
@@ -32,8 +33,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.*
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
@@ -165,6 +165,23 @@ class LnurlManager(
         }
 
         Lnurl.processLnurlResponse(response) // throws on any/all non-success
+    }
+
+    suspend fun sendInvoiceToLnid(
+        nodeId: PublicKey,
+        amount: MilliSatoshi,
+        paymentRequest: PaymentRequest,
+    ) {
+        // FIXME: use proper service
+        httpClient.post("https://phoenix.deusty.com/v1/pub/lnurlp/enqueue") {
+            contentType(ContentType.Application.Json)
+            val json = buildJsonObject {
+                put("node_id", nodeId.toHex())
+                put("amount_msat", amount.msat)
+                put("ln_invoice", paymentRequest.write())
+            }
+            setBody(json)
+        }
     }
 }
 
