@@ -428,7 +428,7 @@ class AppScanController(
             ReceivePayment(
                 paymentPreimage = preimage,
                 amount = intent.amount,
-                description = intent.description ?: intent.lnurlWithdraw.defaultDescription,
+                description = fr.acinq.lightning.utils.Either.Left(intent.description ?: intent.lnurlWithdraw.defaultDescription),
                 expirySeconds = (3600 * 24 * 7).toLong(), // one week
                 result = deferred
             )
