@@ -549,10 +549,11 @@ struct MainView_Small: View {
 		
 		if let value = value {
 			switch value {
-				case .paymentHistory : self.navLinkTag = .TransactionsView
-				case .backup         : self.navLinkTag = .ConfigurationView
-				case .drainWallet    : self.navLinkTag = .ConfigurationView
-				case .electrum       : self.navLinkTag = .ConfigurationView
+				case .paymentHistory     : self.navLinkTag = .TransactionsView
+				case .backup             : self.navLinkTag = .ConfigurationView
+				case .drainWallet        : self.navLinkTag = .ConfigurationView
+				case .electrum           : self.navLinkTag = .ConfigurationView
+				case .backgroundPayments : self.navLinkTag = .ConfigurationView
 			}
 		}
 	}

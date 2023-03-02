@@ -14,7 +14,7 @@ fileprivate var log = Logger(OSLog.disabled)
 
 fileprivate enum Key: String {
 	case theme
-	case pushPermissionQuery
+	case discreetNotifications
 	case defaultPaymentDescription
 	case showChannelsRemoteBalance
 	case recentTipPercents
@@ -168,9 +168,9 @@ class Prefs {
 	// MARK: Push Notifications
 	// --------------------------------------------------
 	
-	var pushPermissionQuery: PushPermissionQuery {
-		get { defaults.pushPermissionQuery?.jsonDecode() ?? .neverAskedUser }
-		set { defaults.pushPermissionQuery = newValue.jsonEncode() }
+	var discreetNotifications: Bool {
+		get { defaults.discreetNotifications }
+		set { defaults.discreetNotifications = newValue }
 	}
 
 	// --------------------------------------------------
@@ -230,7 +230,7 @@ class Prefs {
 
 		// Purposefully not resetting:
 		// - Key.theme: App feels weird when this changes unexpectedly.
-		// - Key.pushPermissionQuery: Not related to wallet; More so to the device.
+		// - Key.discreetNotifications: Not related to wallet; More so to the device.
 
 		defaults.removeObject(forKey: Key.defaultPaymentDescription.rawValue)
 		defaults.removeObject(forKey: Key.showChannelsRemoteBalance.rawValue)
@@ -251,6 +251,11 @@ extension UserDefaults {
 	@objc fileprivate var theme: Data? {
 		get { data(forKey: Key.theme.rawValue) }
 		set { set(newValue, forKey: Key.theme.rawValue) }
+	}
+	
+	@objc fileprivate var discreetNotifications: Bool {
+		get { bool(forKey: Key.discreetNotifications.rawValue) }
+		set { set(newValue, forKey: Key.discreetNotifications.rawValue) }
 	}
 
 	@objc fileprivate var defaultPaymentDescription: String? {
@@ -291,10 +296,5 @@ extension UserDefaults {
 	@objc fileprivate var recentTipPercents: Data? {
 		get { data(forKey: Key.recentTipPercents.rawValue) }
 		set { set(newValue, forKey: Key.recentTipPercents.rawValue) }
-	}
-
-	@objc fileprivate var pushPermissionQuery: Data? {
-		get { data(forKey: Key.pushPermissionQuery.rawValue) }
-		set { set(newValue, forKey: Key.pushPermissionQuery.rawValue) }
 	}
 }

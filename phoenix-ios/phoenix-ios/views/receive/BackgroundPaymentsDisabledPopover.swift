@@ -4,13 +4,13 @@ import os.log
 #if DEBUG && false
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "NotificationsDisabledPopover"
+	category: "BackgroundPaymentsDisabledPopover"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct NotificationsDisabledPopover: View {
+struct BackgroundPaymentsDisabledPopover: View {
 	
 	@Environment(\.popoverState) private var popoverState: PopoverState
 	
@@ -23,16 +23,40 @@ struct NotificationsDisabledPopover: View {
 		VStack(alignment: .trailing) {
 			
 			VStack(alignment: .leading) {
-				Text("You have disabled notifications for this app.")
+				Text("You have disabled background payments.")
 					.bold()
 					.padding(.bottom, 4)
 				
 				Text(
 					"""
-					This means you will not be notified if you receive a payment while \
-					Phoenix is in the background.
+					Normally Phoenix can receive payments as long as you have internet. \
+					But with background payments disabled, Phoenix must be open and \
+					in the foreground.
 					"""
 				)
+				.lineLimit(nil)
+				.fixedSize(horizontal: false, vertical: true) // text truncation bugs
+				.padding(.bottom, 4)
+				
+				Text(
+					"""
+					To fix this re-enable notifications in iOS via: \
+					Settings -> Phoenix -> Notifications
+					"""
+				)
+				.lineLimit(nil)
+				.fixedSize(horizontal: false, vertical: true) // text truncation bugs
+				.padding(.bottom, 4)
+				
+				Text(
+					"""
+					Be sure to enable at least "Lock Screen" or "Notification Center".
+					"""
+				)
+				.font(.subheadline)
+				.lineLimit(nil)
+				.fixedSize(horizontal: false, vertical: true) // text truncation bugs
+				.padding(.bottom, 4)
 			}
 			.padding(.bottom)
 			

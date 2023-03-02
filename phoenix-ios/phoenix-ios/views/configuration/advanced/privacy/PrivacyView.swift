@@ -127,10 +127,11 @@ struct PrivacyView: View {
 			// Navigate towards deep link (if needed)
 			var newNavLinkTag: NavLinkTag? = nil
 			switch value {
-				case .paymentHistory : break
-				case .backup         : break
-				case .drainWallet    : break
-				case .electrum       : newNavLinkTag = NavLinkTag.ElectrumConfigurationView
+				case .paymentHistory     : break
+				case .backup             : break
+				case .drainWallet        : break
+				case .backgroundPayments : break
+				case .electrum           : newNavLinkTag = NavLinkTag.ElectrumConfigurationView
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
