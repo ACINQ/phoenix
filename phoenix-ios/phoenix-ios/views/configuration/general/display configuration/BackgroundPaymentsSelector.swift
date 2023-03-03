@@ -15,7 +15,7 @@ struct BackgroundPaymentsSelector: View {
 	
 	@State var settings = NotificationsManager.shared.settings.value
 	
-	@State var includeAmount = !Prefs.shared.discreetNotifications
+	@State var includeAmount = !GroupPrefs.shared.discreetNotifications
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
@@ -318,7 +318,7 @@ struct BackgroundPaymentsSelector: View {
 	func includeAmountChanged() {
 		log.trace("includeAmountChanged()")
 		
-		log.debug("Prefs.shared.discreetNotifications = \(!includeAmount)")
-		Prefs.shared.discreetNotifications = !includeAmount
+		log.debug("GroupPrefs.shared.discreetNotifications = \(!includeAmount)")
+		GroupPrefs.shared.discreetNotifications = !includeAmount
 	}
 }

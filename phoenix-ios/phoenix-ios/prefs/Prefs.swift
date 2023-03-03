@@ -14,7 +14,6 @@ fileprivate var log = Logger(OSLog.disabled)
 
 fileprivate enum Key: String {
 	case theme
-	case discreetNotifications
 	case defaultPaymentDescription
 	case showChannelsRemoteBalance
 	case recentTipPercents
@@ -163,15 +162,6 @@ class Prefs {
 		
 		defaults.recentTipPercents = recents.jsonEncode()
 	}
-	
-	// --------------------------------------------------
-	// MARK: Push Notifications
-	// --------------------------------------------------
-	
-	var discreetNotifications: Bool {
-		get { defaults.discreetNotifications }
-		set { defaults.discreetNotifications = newValue }
-	}
 
 	// --------------------------------------------------
 	// MARK: Backup
@@ -230,7 +220,6 @@ class Prefs {
 
 		// Purposefully not resetting:
 		// - Key.theme: App feels weird when this changes unexpectedly.
-		// - Key.discreetNotifications: Not related to wallet; More so to the device.
 
 		defaults.removeObject(forKey: Key.defaultPaymentDescription.rawValue)
 		defaults.removeObject(forKey: Key.showChannelsRemoteBalance.rawValue)
@@ -251,11 +240,6 @@ extension UserDefaults {
 	@objc fileprivate var theme: Data? {
 		get { data(forKey: Key.theme.rawValue) }
 		set { set(newValue, forKey: Key.theme.rawValue) }
-	}
-	
-	@objc fileprivate var discreetNotifications: Bool {
-		get { bool(forKey: Key.discreetNotifications.rawValue) }
-		set { set(newValue, forKey: Key.discreetNotifications.rawValue) }
 	}
 
 	@objc fileprivate var defaultPaymentDescription: String? {

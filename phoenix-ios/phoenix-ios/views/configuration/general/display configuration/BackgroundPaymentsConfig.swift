@@ -36,7 +36,7 @@ enum BackgroundPaymentsConfig: Equatable, CustomStringConvertible {
 			return .disabled
 		}
 		
-		let discreet = Prefs.shared.discreetNotifications
+		let discreet = GroupPrefs.shared.discreetNotifications
 		
 		if settings.lockScreenSetting         != .enabled &&
 			settings.notificationCenterSetting == .enabled &&

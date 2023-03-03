@@ -237,7 +237,7 @@ class NotificationsManager {
 				)
 			]
 			
-			let currencyPrefs = CurrencyPrefs()
+			let currencyPrefs = GlobalEnvironment.currencyPrefs
 			let bitcoinUnit = currencyPrefs.bitcoinUnit
 			let fiatCurrency = currencyPrefs.fiatCurrency
 			let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
