@@ -35,12 +35,12 @@ struct ConfigurationView: View {
 	
 	@State private var navLinkTag: NavLinkTag? = nil
 	
-	@State private var listViewId = UUID()
+	@State private var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State private var backupSeedState: BackupSeedState = .safelyBackedUp
 	let backupSeedStatePublisher: AnyPublisher<BackupSeedState, Never>
 	
-	let externalLightningUrlPublisher: PassthroughSubject<String, Never>
+	@State private var listViewId = UUID()
 	
 	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
 	@State private var swiftUiBugWorkaroundIdx = 0
@@ -58,8 +58,6 @@ struct ConfigurationView: View {
 		} else {
 			backupSeedStatePublisher = PassthroughSubject<BackupSeedState, Never>().eraseToAnyPublisher()
 		}
-		
-		externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
 	}
 	
 	// --------------------------------------------------
@@ -98,10 +96,13 @@ struct ConfigurationView: View {
 		.onChange(of: navLinkTag) {
 			navLinkTagChanged($0)
 		}
-		.onReceive(backupSeedStatePublisher) {(state: BackupSeedState) in
-			onBackupSeedState(state)
+		.onReceive(NotificationsManager.shared.permissions) {(permissions: NotificationPermissions) in
+			notificationPermissionsChanged(permissions)
 		}
-		.onReceive(externalLightningUrlPublisher) {(url: String) in
+		.onReceive(backupSeedStatePublisher) {(state: BackupSeedState) in
+			backupSeedStateChanged(state)
+		}
+		.onReceive(AppDelegate.get().externalLightningUrlPublisher) {(url: String) in
 			onExternalLightningUrl(url)
 		}
 	}
@@ -118,7 +119,21 @@ struct ConfigurationView: View {
 			}
 		
 			navLink(.DisplayConfigurationView) {
-				Label { Text("Display") } icon: {
+				Label {
+					switch notificationPermissions {
+					case .disabled:
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("Display")
+							Spacer()
+							Image(systemName: "exclamationmark.triangle")
+								.renderingMode(.template)
+								.foregroundColor(Color.appWarn)
+						}
+						
+					default:
+						Text("Display")
+					}
+				} icon: {
 					Image(systemName: "paintbrush.pointed")
 				}
 			}
@@ -286,14 +301,8 @@ struct ConfigurationView: View {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Actions
+	// MARK: Notifications
 	// --------------------------------------------------
-	
-	func popToRoot() {
-		log.trace("popToRoot")
-		
-		popToRootRequested = true
-	}
 	
 	func onAppear() {
 		log.trace("onAppear()")
@@ -401,21 +410,14 @@ struct ConfigurationView: View {
 		}
 	}
 	
-	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
+	func notificationPermissionsChanged(_ permissions: NotificationPermissions) {
+		log.trace("notificationPermissionsChanged()")
 		
-		let idx = self.swiftUiBugWorkaroundIdx
-		
-		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-			
-			if self.swiftUiBugWorkaroundIdx == idx {
-				log.debug("swiftUiBugWorkaround = nil")
-				self.swiftUiBugWorkaround = nil
-			}
-		}
+		notificationPermissions = permissions
 	}
 	
-	func onBackupSeedState(_ newState: BackupSeedState) {
-		log.trace("onBackupSeedState()")
+	func backupSeedStateChanged(_ newState: BackupSeedState) {
+		log.trace("backupSeedStateChanged()")
 		
 		backupSeedState = newState
 	}
@@ -436,6 +438,33 @@ struct ConfigurationView: View {
 			//
 			// Apple has fixed the issue in iOS 15.
 			navLinkTag = nil
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func popToRoot() {
+		log.trace("popToRoot")
+		
+		popToRootRequested = true
+	}
+	
+	// --------------------------------------------------
+	// MARK: Utilities
+	// --------------------------------------------------
+	
+	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
+		
+		let idx = self.swiftUiBugWorkaroundIdx
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+			
+			if self.swiftUiBugWorkaroundIdx == idx {
+				log.debug("swiftUiBugWorkaround = nil")
+				self.swiftUiBugWorkaround = nil
+			}
 		}
 	}
 }
