@@ -389,14 +389,14 @@ struct ConfigurationView: View {
 				
 				self.swiftUiBugWorkaround = newNavLinkTag
 				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: 5.0)
+				clearSwiftUiBugWorkaround(delay: 1.0)
 				
 				self.navLinkTag = newNavLinkTag // Trigger/push the view
 			}
 			
 		} else {
 			// We reached the final destination of the deep link
-			clearSwiftUiBugWorkaround(delay: 1.0)
+			clearSwiftUiBugWorkaround(delay: 0.0)
 		}
 	}
 	

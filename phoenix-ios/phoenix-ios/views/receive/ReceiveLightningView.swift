@@ -53,6 +53,7 @@ struct ReceiveLightningView: View {
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
 	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
@@ -512,7 +513,7 @@ struct ReceiveLightningView: View {
 			// The user has disabled "background payments"
 			
 			Button {
-				// Todo...
+				navigationToBackgroundPayments()
 			} label: {
 				Label {
 					Text("Background payments disabled")
@@ -820,17 +821,15 @@ struct ReceiveLightningView: View {
 		}
 	}
 	
+	func navigationToBackgroundPayments() {
+		log.trace("navigateToBackgroundPayments()")
+		
+		deepLinkManager.broadcast(DeepLink.backgroundPayments)
+	}
+	
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
-	
-	func showBackgroundPaymentsDisabledPopover() {
-		log.trace("showBackgroundPaymentsDisabledPopover()")
-		
-		popoverState.display(dismissable: false) {
-			BackgroundPaymentsDisabledPopover()
-		}
-	}
 	
 	func copyTextToPasteboard() -> Void {
 		log.trace("copyTextToPasteboard()")

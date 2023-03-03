@@ -86,11 +86,7 @@ struct DisplayConfigurationView: View {
 	func section_currency() -> some View {
 		
 		Section {
-			NavigationLink(
-				destination: FiatCurrencySelector(selectedFiatCurrency: fiatCurrency),
-				tag: NavLinkTag.FiatCurrencySelector,
-				selection: $navLinkTag
-			) {
+			navLink(.FiatCurrencySelector) {
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					Text("Fiat currency")
 					Spacer()
@@ -100,11 +96,7 @@ struct DisplayConfigurationView: View {
 				}
 			}
 			
-			NavigationLink(
-				destination: BitcoinUnitSelector(selectedBitcoinUnit: bitcoinUnit),
-				tag: NavLinkTag.BitcoinUnitSelector,
-				selection: $navLinkTag
-			) {
+			navLink(.BitcoinUnitSelector) {
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					Text("Bitcoin unit")
 					Spacer()
@@ -153,11 +145,8 @@ struct DisplayConfigurationView: View {
 		
 		Section(header: Text("Home Screen")) {
 			
-			NavigationLink(
-				destination: RecentPaymentsSelector(recentPaymentsConfig: recentPaymentsConfig),
-				tag: NavLinkTag.RecentPaymentsSelector,
-				selection: $navLinkTag
-			) {
+			navLink(.RecentPaymentsSelector) {
+				
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					switch recentPaymentsConfig {
 					case .withinTime(let seconds):
@@ -173,7 +162,7 @@ struct DisplayConfigurationView: View {
 							.fixedSize(horizontal: false, vertical: true)
 					}
 				}
-			}
+			} // </navLink>
 			
 			Text("Use the payments screen to view your full payment history.")
 				.font(.callout)
@@ -190,58 +179,82 @@ struct DisplayConfigurationView: View {
 		
 		Section(header: Text("Background Payments")) {
 			
-			NavigationLink(
-				destination: BackgroundPaymentsSelector(),
-				tag: NavLinkTag.BackgroundPaymentsSelector,
-				selection: $navLinkTag
-			) {
+			let config = BackgroundPaymentsConfig.fromSettings(notificationSettings)
+			let hideAmount = NSLocalizedString("(hide amount)", comment: "Background payments configuration")
+			
+			navLink(.BackgroundPaymentsSelector) {
 				
-				let config = BackgroundPaymentsConfig.fromSettings(notificationSettings)
-				let hideAmount = NSLocalizedString("(hide amount)", comment: "Background payments configuration")
-				
-				switch (config) {
-				case .receiveQuietly(let discreet):
-					HStack(alignment: VerticalAlignment.center, spacing: 4) {
-						Text("Receive quietly")
-						if discreet {
-							Text(verbatim: hideAmount)
-								.font(.subheadline)
-								.foregroundColor(.secondary)
-						}
-					}
-					
-				case .fullVisibility(let discreet):
-					HStack(alignment: VerticalAlignment.center, spacing: 4) {
-						Text("Visible")
-						if discreet {
-							Text(verbatim: hideAmount)
-								.font(.subheadline)
-								.foregroundColor(.secondary)
-						}
-					}
-					
-				case .customized(let discreet):
-					HStack(alignment: VerticalAlignment.center, spacing: 4) {
-						Text("Customized")
-						if discreet {
-							Text(verbatim: hideAmount)
-								.font(.subheadline)
-								.foregroundColor(.secondary)
-						}
-					}
-					
-				case .disabled:
-					HStack(alignment: VerticalAlignment.center, spacing: 0) {
-						Text("Disabled")
-						Spacer()
-						Image(systemName: "exclamationmark.triangle")
-							.renderingMode(.template)
-							.foregroundColor(Color.appWarn)
-					}
-				}
-			}
+				Group { // Compiler workaround: Type '()' cannot conform to 'View'
+					switch config {
+					case .receiveQuietly(let discreet):
+						HStack(alignment: VerticalAlignment.center, spacing: 4) {
+							Text("Receive quietly")
+							if discreet {
+								Text(verbatim: hideAmount)
+									.font(.subheadline)
+									.foregroundColor(.secondary)
+								}
+							}
+						
+					case .fullVisibility(let discreet):
+						HStack(alignment: VerticalAlignment.center, spacing: 4) {
+							Text("Visible")
+							if discreet {
+								Text(verbatim: hideAmount)
+									.font(.subheadline)
+									.foregroundColor(.secondary)
+								}
+							}
+						
+					case .customized(let discreet):
+						HStack(alignment: VerticalAlignment.center, spacing: 4) {
+							Text("Customized")
+							if discreet {
+								Text(verbatim: hideAmount)
+									.font(.subheadline)
+									.foregroundColor(.secondary)
+								}
+							}
+						
+					case .disabled:
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("Disabled")
+							Spacer()
+							Image(systemName: "exclamationmark.triangle")
+								.renderingMode(.template)
+								.foregroundColor(Color.appWarn)
+							}
+						
+					} // </switch>
+				} // </Group>
+			} // </navLink>
 			
 		} // </Section>
+	}
+	
+	@ViewBuilder
+	private func navLink<Content>(
+		_ tag: NavLinkTag,
+		label: () -> Content
+	) -> some View where Content: View {
+		
+		NavigationLink(
+			destination: navLinkView(tag),
+			tag: tag,
+			selection: $navLinkTag,
+			label: label
+		)
+	}
+	
+	@ViewBuilder
+	private func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .FiatCurrencySelector       : FiatCurrencySelector(selectedFiatCurrency: fiatCurrency)
+		case .BitcoinUnitSelector        : BitcoinUnitSelector(selectedBitcoinUnit: bitcoinUnit)
+		case .RecentPaymentsSelector     : RecentPaymentsSelector(recentPaymentsConfig: recentPaymentsConfig)
+		case .BackgroundPaymentsSelector : BackgroundPaymentsSelector()
+		}
 	}
 	
 	// --------------------------------------------------

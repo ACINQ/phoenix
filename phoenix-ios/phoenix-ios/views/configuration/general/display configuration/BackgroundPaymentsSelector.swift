@@ -17,7 +17,10 @@ struct BackgroundPaymentsSelector: View {
 	
 	@State var includeAmount = !GroupPrefs.shared.discreetNotifications
 	
+	@State var didAppear = false
+	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -47,6 +50,9 @@ struct BackgroundPaymentsSelector: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
+		.onAppear() {
+			onAppear()
+		}
 		.onReceive(NotificationsManager.shared.settings) {
 			settings = $0
 		}
@@ -287,6 +293,25 @@ struct BackgroundPaymentsSelector: View {
 		}
 		
 		return amount
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		if !didAppear {
+			didAppear = true
+			
+			if let deepLink = deepLinkManager.deepLink, deepLink == .backgroundPayments {
+				// Reached our destination
+				DispatchQueue.main.async { // iOS 14 issues workaround
+					deepLinkManager.unbroadcast(deepLink)
+				}
+			}
+		}
 	}
 	
 	// --------------------------------------------------
