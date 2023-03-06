@@ -24,9 +24,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,6 +48,7 @@ import fr.acinq.phoenix.controllers.payments.MaxFees
 import fr.acinq.phoenix.controllers.payments.Scan
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SendLightningPaymentView(
     paymentRequest: PaymentRequest,
@@ -56,6 +60,8 @@ fun SendLightningPaymentView(
     log.info { "init sendview amount=${paymentRequest.amount} desc=${paymentRequest.description}" }
 
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
+    val keyboardManager = LocalSoftwareKeyboardController.current
     val balance = business.balanceManager.balance.collectAsState(null).value
     val prefBitcoinUnit = LocalBitcoinUnit.current
 
@@ -127,6 +133,8 @@ fun SendLightningPaymentView(
             enabled = amount != null && amountErrorMessage.isBlank(),
         ) {
             amount?.let {
+                focusManager.clearFocus()
+                keyboardManager?.hide()
                 onPayClick(Scan.Intent.InvoiceFlow.SendInvoicePayment(paymentRequest = paymentRequest, amount = it, maxFees = trampolineMaxFees))
             }
         }

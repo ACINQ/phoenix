@@ -179,22 +179,20 @@ fun TextWithIcon(
     iconSize: Dp = ButtonDefaults.IconSize,
     padding: PaddingValues = PaddingValues(0.dp),
     space: Dp = 6.dp,
-    alignBaseLine: Boolean = false
 ) {
     Row(
         modifier = modifier.padding(padding),
-        verticalAlignment = if (alignBaseLine) Alignment.Top else Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
             painter = painterResource(id = icon),
             contentDescription = "icon for $text",
             modifier = Modifier
-                .size(iconSize)
-                .then(if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier),
+                .size(iconSize),
             colorFilter = iconTint?.let { ColorFilter.tint(it) }
         )
         Spacer(Modifier.width(space))
-        Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier, maxLines = maxLines, overflow = textOverflow)
+        Text(text, style = textStyle, maxLines = maxLines, overflow = textOverflow)
     }
 }
 
@@ -286,7 +284,7 @@ fun Button(
                     verticalAlignment = Alignment.CenterVertically,
                     content = {
                         if (text != null && icon != null) {
-                            TextWithIcon(text = text, icon = icon, iconTint = iconTint, space = space, alignBaseLine = true)
+                            TextWithIcon(text = text, icon = icon, iconTint = iconTint, space = space)
                         } else if (text != null) {
                             Text(text)
                         } else if (icon != null) {

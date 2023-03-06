@@ -16,7 +16,11 @@
 
 package fr.acinq.phoenix.android.payments
 
+import android.Manifest
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,6 +45,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.*
@@ -179,6 +187,7 @@ private fun GeneratingLightningInvoiceView(
         icon = R.drawable.ic_swap,
         onClick = onSwapInClick
     )
+    NotificationPermissionButton()
 }
 
 @Composable
@@ -247,6 +256,7 @@ private fun LightningInvoiceView(
         icon = R.drawable.ic_swap,
         onClick = onSwapInClick
     )
+    NotificationPermissionButton()
 }
 
 @Composable
@@ -445,5 +455,52 @@ private fun EditInvoiceView(
             icon = R.drawable.ic_qrcode,
             onClick = onSubmit
         )
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun NotificationPermissionButton() {
+    val context = LocalContext.current
+    val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+    if (notificationPermission.status.isGranted) {
+        // do nothing!
+    } else {
+        // if notification permission has been denied, display a different message and open the app system settings
+        val isDenied = notificationPermission.status.shouldShowRationale
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 32.dp)
+                .widthIn(max = 300.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(24.dp))
+            HSeparator(width = 50.dp)
+            if (isDenied) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(id = R.string.permission_notification_denied),
+                    style = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+                    textAlign = TextAlign.Center
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            FilledButton(
+                text = stringResource(id = R.string.permission_notification_request),
+                textStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+                icon = R.drawable.ic_notification,
+                iconTint = MaterialTheme.typography.caption.color,
+                backgroundColor = Color.Transparent,
+                onClick = {
+                    if (isDenied) {
+                        context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        })
+                    } else {
+                        notificationPermission.launchPermissionRequest()
+                    }
+                }
+            )
+        }
     }
 }

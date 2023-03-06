@@ -16,10 +16,7 @@
 
 package fr.acinq.phoenix.android.payments
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -55,22 +52,36 @@ sealed class PaymentDetailsState {
         data class TechnicalDetails(override val payment: WalletPaymentInfo) : Success()
     }
 
-    data class Failure(val error: Throwable) : PaymentDetailsState()
+    object NotFound: PaymentDetailsState()
 }
 
 class PaymentDetailsViewModel(
-    private val paymentsManager: PaymentsManager
+    private val paymentsManager: PaymentsManager,
+    private val paymentId: WalletPaymentId?
 ) : ViewModel() {
 
-    val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     var state by mutableStateOf<PaymentDetailsState>(PaymentDetailsState.Loading)
 
-    suspend fun getPayment(id: WalletPaymentId) {
+    init {
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+            log.error("failed to retrieve payment details for id=$paymentId: ", e)
+            state = PaymentDetailsState.NotFound
+        }) {
+            getPayment(paymentId)
+        }
+    }
+
+    /** Retrieve all available details of the payment. Should run on [Dispatchers.IO]. */
+    private suspend fun getPayment(id: WalletPaymentId?) {
         log.info("getting payment details for id=$id")
-        state = paymentsManager.getPayment(id, WalletPaymentFetchOptions.All)?.let {
+        val result = id?.let {
+            paymentsManager.getPayment(id, WalletPaymentFetchOptions.All)
+        }?.let {
             PaymentDetailsState.Success.Splash(it)
-        } ?: PaymentDetailsState.Failure(NoSuchElementException("no payment found for id=$id"))
+        } ?: PaymentDetailsState.NotFound
+        viewModelScope.launch(Dispatchers.Main) { state = result }
     }
 
     fun updateMetadata(id: WalletPaymentId, userDescription: String?) {
@@ -84,50 +95,46 @@ class PaymentDetailsViewModel(
     }
 
     class Factory(
-        private val paymentsManager: PaymentsManager
+        private val paymentsManager: PaymentsManager,
+        private val paymentId: WalletPaymentId?,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return PaymentDetailsViewModel(paymentsManager) as T
+            return PaymentDetailsViewModel(paymentsManager, paymentId) as T
         }
     }
 }
 
 @Composable
 fun PaymentDetailsView(
-    paymentId: WalletPaymentId,
+    paymentId: WalletPaymentId?,
     onBackClick: () -> Unit,
     fromEvent: Boolean,
 ) {
-    val vm: PaymentDetailsViewModel = viewModel(factory = PaymentDetailsViewModel.Factory(business.paymentsManager))
+    val vm: PaymentDetailsViewModel = viewModel(factory = PaymentDetailsViewModel.Factory(business.paymentsManager, paymentId))
 
-    LaunchedEffect(key1 = paymentId) {
-        vm.getPayment(paymentId)
-    }
-    val state = vm.state
     val onBack = {
-        if (state is PaymentDetailsState.Success.TechnicalDetails) {
-            vm.state = PaymentDetailsState.Success.Splash(state.payment)
-        } else {
-            onBackClick()
+        when (val state = vm.state) {
+            is PaymentDetailsState.Success.TechnicalDetails -> vm.state = PaymentDetailsState.Success.Splash(state.payment)
+            else -> onBackClick()
         }
     }
     DefaultScreenLayout {
         DefaultScreenHeader(
             onBackClick = onBack,
             backgroundColor = Color.Unspecified,
-            title = if (state is PaymentDetailsState.Success.TechnicalDetails) stringResource(id = R.string.paymentdetails_title) else null
+            title = if (vm.state is PaymentDetailsState.Success.TechnicalDetails) stringResource(id = R.string.paymentdetails_title) else null
         )
-        when (state) {
+        when (val state = vm.state) {
             is PaymentDetailsState.Loading -> CenterContentView {
                 Text(
                     text = stringResource(id = R.string.paymentdetails_loading),
                     modifier = Modifier.padding(16.dp)
                 )
             }
-            is PaymentDetailsState.Failure -> CenterContentView {
+            is PaymentDetailsState.NotFound -> CenterContentView {
                 Text(
-                    text = stringResource(id = R.string.paymentdetails_error, state.error.message ?: stringResource(id = R.string.utils_unknown)),
+                    text = stringResource(id = R.string.paymentdetails_error_not_found),
                     modifier = Modifier.padding(16.dp),
                 )
             }

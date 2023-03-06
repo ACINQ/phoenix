@@ -24,9 +24,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -50,6 +53,7 @@ import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.lnurl.LnurlError
 import fr.acinq.phoenix.data.lnurl.LnurlPay
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LnurlPayView(
     model: Scan.Model.LnurlPayFlow,
@@ -60,6 +64,8 @@ fun LnurlPayView(
     val log = logger("SendLightningPaymentView")
     log.info { "init lnurl-pay view with url=${model.paymentIntent}" }
 
+    val focusManager = LocalFocusManager.current
+    val keyboardManager = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
     val balance = business.balanceManager.balance.collectAsState(null).value
     val prefUnit = preferredAmountUnit
@@ -139,6 +145,8 @@ fun LnurlPayView(
                     enabled = amount != null && amountErrorMessage.isBlank(),
                 ) {
                     amount?.let {
+                        focusManager.clearFocus()
+                        keyboardManager?.hide()
                         onSendLnurlPayClick(
                             Scan.Intent.LnurlPayFlow.RequestInvoice(
                                 paymentIntent = model.paymentIntent,

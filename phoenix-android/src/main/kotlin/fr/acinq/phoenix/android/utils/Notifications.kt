@@ -18,24 +18,31 @@ package fr.acinq.phoenix.android.utils
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.BuildConfig
+import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.data.WalletPaymentId
 import kotlinx.coroutines.flow.first
 
 object Notifications {
     const val MISSED_PAYMENT_NOTIF_ID = 354319
     const val MISSED_PAYMENT_NOTIF_CHANNEL = "${BuildConfig.APPLICATION_ID}.MISSED_PAYMENT_NOTIF"
     const val RECEIVED_PAYMENT_NOTIF_ID = 354320
-    const val RECEIVED_PAYMENT_NOTIF_CHANNEL = "${BuildConfig.APPLICATION_ID}.RECEIVED_PAYMENT_NOTIF"
+    const val RECEIVED_PAYMENT_NOTIF_CHANNEL = "${BuildConfig.APPLICATION_ID}.INCOMING_PAYMENT_NOTIF"
     const val BACKGROUND_NOTIF_ID = 354321
     const val BACKGROUND_NOTIF_CHANNEL = "${BuildConfig.APPLICATION_ID}.FCM_NOTIF"
 
@@ -58,7 +65,24 @@ object Notifications {
         }
     }
 
-    suspend fun notifyPaymentReceived(context: Context, amount: MilliSatoshi, rates: List<ExchangeRate>) {
+    fun notifyPaymentNotReceived(context: Context) {
+        NotificationCompat.Builder(context, MISSED_PAYMENT_NOTIF_CHANNEL).apply {
+            setContentTitle(context.getString(R.string.notif__headless_title__not_received_title))
+            setContentText(context.getString(R.string.notif__headless_title__not_received_content))
+            setSmallIcon(R.drawable.ic_phoenix_outline)
+            setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE))
+            setAutoCancel(true)
+        }.let {
+            NotificationManagerCompat.from(context).notify(MISSED_PAYMENT_NOTIF_ID, it.build())
+        }
+    }
+
+    suspend fun notifyPaymentReceived(
+        context: Context,
+        paymentHash: ByteVector32,
+        amount: MilliSatoshi,
+        rates: List<ExchangeRate>
+    ) {
         val isFiat = UserPrefs.getIsAmountInFiat(context).first()
         val unit = if (isFiat) {
             UserPrefs.getFiatCurrency(context).first()
@@ -85,19 +109,18 @@ object Notifications {
         NotificationCompat.Builder(context, RECEIVED_PAYMENT_NOTIF_CHANNEL).apply {
             setContentTitle(context.getString(R.string.notif__headless_title__received, amount.toPrettyString(unit, rate, withUnit = true)))
             setSmallIcon(R.drawable.ic_phoenix_outline)
+            setContentIntent(TaskStackBuilder.create(context).run {
+                Intent(
+                    Intent.ACTION_VIEW,
+                    "phoenix:payment/${WalletPaymentId.DbType.INCOMING}/${paymentHash.toHex()}".toUri(),
+                    context,
+                    MainActivity::class.java
+                ).let { addNextIntentWithParentStack(it) }
+                getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
+            })
             setAutoCancel(true)
         }.let {
             NotificationManagerCompat.from(context).notify(RECEIVED_PAYMENT_NOTIF_ID, it.build())
-        }
-    }
-
-    fun notifyPaymentMissed(context: Context) {
-        NotificationCompat.Builder(context, MISSED_PAYMENT_NOTIF_CHANNEL).apply {
-            setContentTitle(context.getString(R.string.notif__headless_title__missed_incoming))
-            setSmallIcon(R.drawable.ic_phoenix_outline)
-            setAutoCancel(true)
-        }.let {
-            NotificationManagerCompat.from(context).notify(MISSED_PAYMENT_NOTIF_ID, it.build())
         }
     }
 }

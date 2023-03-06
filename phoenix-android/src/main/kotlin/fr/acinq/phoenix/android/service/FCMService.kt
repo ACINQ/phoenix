@@ -15,22 +15,14 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.android.utils.Notifications
 import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.secp256k1.Hex
 import kotlinx.coroutines.*
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.long
 import org.slf4j.LoggerFactory
 
 class FCMService : FirebaseMessagingService() {
     private val log = LoggerFactory.getLogger(this::class.java)
     private val serviceScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-
-    private val json = Json { ignoreUnknownKeys = true }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         log.debug("received fcm message" +
@@ -49,7 +41,6 @@ class FCMService : FirebaseMessagingService() {
         when {
             remoteMessage.priority != RemoteMessage.PRIORITY_HIGH -> {
                 log.debug("received FCM message with low/normal priority, abort processing and display notif")
-                Notifications.notifyPaymentMissed(applicationContext)
             }
             // data is an invoice request from SNS
             dataType?.equals("invoice", true) == true -> {

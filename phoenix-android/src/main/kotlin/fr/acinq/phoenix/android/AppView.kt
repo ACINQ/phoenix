@@ -87,6 +87,12 @@ fun AppView(
             navController.navigate(Screen.SwitchToLegacy.route)
         }
 
+        val paymentDetailsDeepLinks = remember {
+            listOf(
+                navDeepLink { uriPattern = "phoenix:payment/{direction}/{id}" },
+            )
+        }
+
         val scannerDeepLinks = remember {
             listOf(
                 navDeepLink { uriPattern = "lightning:{data}" },
@@ -184,19 +190,23 @@ fun AppView(
                             defaultValue = false
                         }
                     ),
+                    deepLinks = paymentDetailsDeepLinks
                 ) {
                     val direction = it.arguments?.getLong("direction")
                     val id = it.arguments?.getString("id")
-                    val paymentId = if (id != null && direction != null) WalletPaymentId.create(direction, id) else null
-                    if (paymentId != null) {
-                        PaymentDetailsView(
-                            paymentId = paymentId,
-                            onBackClick = {
-                                navController.popBackStack()
-                            },
-                            fromEvent = it.arguments?.getBoolean("fromEvent") ?: false
-                        )
-                    }
+                    val paymentId = if (id != null && direction != null) {
+                        try {
+                            WalletPaymentId.create(direction, id)
+                        } catch (e: Exception) {
+                            log.debug { "invalid payment id direction=$direction id=$id: ${e.localizedMessage}" }
+                            null
+                        }
+                    } else null
+                    PaymentDetailsView(
+                        paymentId = paymentId,
+                        onBackClick = { if (navController.previousBackStackEntry != null) navController.popBackStack() else popToHome(navController) },
+                        fromEvent = it.arguments?.getBoolean("fromEvent") ?: false
+                    )
                 }
                 composable(Screen.PaymentsHistory.route) {
                     PaymentsHistoryView(

@@ -295,6 +295,7 @@ private fun DetailsForIncoming(
     // -- details about the origin of the payment
     when (val origin = payment.origin) {
         is IncomingPayment.Origin.Invoice -> {
+            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = payment.preimage.toHex())
             InvoiceSection(paymentRequest = origin.paymentRequest)
         }
         is IncomingPayment.Origin.SwapIn -> {

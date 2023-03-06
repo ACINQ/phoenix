@@ -31,7 +31,8 @@
     <!-- //////////////// notification content //////////////// -->
 
     <string name="notif__headless_title__default">Phoenix is running in background</string>
-    <string name="notif__headless_title__missed_incoming">Missed payment</string>
+    <string name="notif__headless_title__not_received_title">Missed payment</string>
+    <string name="notif__headless_title__not_received_content">Payment was below the minimum amount for a new channel (10k sat)</string>
     <string name="notif__headless_title__received">You received %1$s</string>
 
     <!-- //////////////// init wallet / automated wallet creation //////////////// -->
@@ -342,7 +343,7 @@
 
     <string name="paymentdetails_title">Payment details</string>
     <string name="paymentdetails_loading">Loading payment details…</string>
-    <string name="paymentdetails_error">There was an error when retrieving the details for this payment:\n\nCause:%1$s</string>
+    <string name="paymentdetails_error_not_found">This payment does not exist or was deleted.</string>
 
     <string name="paymentdetails_status_sent_successful">Sent</string>
     <string name="paymentdetails_status_sent_pending">Pending…</string>
@@ -734,5 +735,10 @@
     <!-- components -->
     <string name="component_calendar_inclusive">(inclusive)</string>
     <string name="component_error_message_details">Cause: %1$s</string>
+
+    <!-- notification permission -->
+    <string name="permission_notification_request">Enable payment notifications</string>
+    <string name="permission_notification_denied">Notifications are disabled by the OS. You won\'t be notified when a payment is incoming.</string>
+    <string name="permission_notification_request_dialog">Phoenix can show notifications when you receive payments.</string>
 
 </resources>
