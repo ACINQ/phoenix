@@ -518,7 +518,7 @@ struct ReceiveLightningView: View {
 				Label {
 					Text("Background payments disabled")
 				} icon: {
-					Image(systemName: "exclamationmark.bubble.fill")
+					Image(systemName: "exclamationmark.triangle")
 						.renderingMode(.template)
 				}
 				.foregroundColor(.appNegative)
