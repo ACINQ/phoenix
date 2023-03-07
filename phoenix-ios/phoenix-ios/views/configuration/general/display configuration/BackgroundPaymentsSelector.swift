@@ -44,7 +44,8 @@ struct BackgroundPaymentsSelector: View {
 			if config == .disabled {
 				section_disabled()
 			} else {
-				section_settings()
+				section_enabled()
+				section_notifications()
 				section_privacy()
 			}
 		}
@@ -62,73 +63,55 @@ struct BackgroundPaymentsSelector: View {
 	}
 	
 	@ViewBuilder
-	func section_settings() -> some View {
+	func section_enabled() -> some View {
 		
 		Section {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-				Text("When you receive a payment:")
-					.font(.headline)
-					.padding(.bottom, 16)
 				
 				Label {
-					Text("Show in Notification Center")
+					Text("Background payments enabled")
+						.font(.headline)
 				} icon: {
-					if settings?.notificationCenterSetting == .enabled {
-						onImage()
-					} else {
-						offImage()
-					}
+					Image(systemName: "bolt.fill")
+						.imageScale(.large)
+						.font(.title)
+						.foregroundColor(.yellow)
 				}
+				.padding(.bottom, 16)
+				
+				Label {
+					Text("You can receive payments as long as your device is connected to the internet.")
+				} icon: {
+					invisibleImage()
+				}
+				.font(.callout)
 				.padding(.bottom, 8)
 				
 				Label {
-					Text("Show in lock screen")
+					Text("(even if Phoenix isn't running)").foregroundColor(.secondary)
 				} icon: {
-					if settings?.lockScreenSetting == .enabled {
-						onImage()
-					} else {
-						offImage()
-					}
+					invisibleImage()
 				}
-				.padding(.bottom, 8)
+				.font(.callout)
 				
-				Label {
-					VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
-						Text("Show banner ")
-						Text("(when screen unlocked)")
-							.font(.subheadline)
-							.foregroundColor(.secondary)
-					}
-				} icon: {
-					if settings?.alertSetting == .enabled {
-						onImage()
-					} else {
-						offImage()
-					}
-				}
-				.padding(.bottom, 8)
-				
-				Label {
-					Text("Show badges on app icon")
-				} icon: {
-					if settings?.badgeSetting == .enabled {
-						onImage()
-					} else {
-						offImage()
-					}
-				}
-				
-				Divider()
-					.padding(.top, 16)
-					.padding(.bottom, 32)
+			} // </VStack>
+		} // </Section>
+	}
+	
+	@ViewBuilder
+	func section_notifications() -> some View {
+		
+		Section(header: Text("Notifications")) {
+			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 				
 				Button {
 					customizeInIosSettings()
 				} label: {
-					HStack(alignment: VerticalAlignment.center, spacing: 0) {
-						Spacer()
+					Label {
 						Text("Customize in iOS Settings")
-						Spacer()
+					} icon: {
+						Image(systemName: "bell.badge.fill")
+							.imageScale(.large)
 					}
 					.font(.headline)
 				}
@@ -259,6 +242,15 @@ struct BackgroundPaymentsSelector: View {
 				}
 			}
 		} // </Section>
+	}
+	
+	@ViewBuilder
+	func invisibleImage() -> some View {
+		
+		Image(systemName: "checkmark.square.fill")
+			.imageScale(.large)
+			.foregroundColor(.clear)
+			.accessibilityHidden(true)
 	}
 	
 	@ViewBuilder
