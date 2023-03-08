@@ -194,6 +194,7 @@ fun LnurlPayMetadata.Companion.placeholder(description: String) = LnurlPayMetada
             longDesc = null,
             imageJpg = null,
             imagePng = null,
+            identifier = null,
             unknown = null
         ),
         maxCommentLength = null

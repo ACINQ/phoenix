@@ -47,6 +47,7 @@ sealed class LnurlPay : Lnurl.Qualified {
             val longDesc: String?,
             val imagePng: String?, // base64 encoded png
             val imageJpg: String?, // base64 encoded jpg
+            val identifier: String?,
             val unknown: JsonArray?
         )
     }
@@ -183,6 +184,7 @@ sealed class LnurlPay : Lnurl.Qualified {
             var longDesc: String? = null
             var imagePng: String? = null
             var imageJpg: String? = null
+            var identifier: String? = null
             val unknown = mutableListOf<JsonElement>()
             array.forEach {
                 try {
@@ -191,6 +193,7 @@ sealed class LnurlPay : Lnurl.Qualified {
                         "text/long-desc" -> longDesc = it.jsonArray[1].jsonPrimitive.content
                         "image/png;base64" -> imagePng = it.jsonArray[1].jsonPrimitive.content
                         "image/jpeg;base64" -> imageJpg = it.jsonArray[1].jsonPrimitive.content
+                        "text/identifier" -> identifier = it.jsonArray[1].jsonPrimitive.content
                         else -> unknown.add(it)
                     }
                 } catch (e: Exception) {
@@ -203,6 +206,7 @@ sealed class LnurlPay : Lnurl.Qualified {
                 longDesc = longDesc,
                 imagePng = imagePng,
                 imageJpg = imageJpg,
+                identifier = identifier,
                 unknown = unknown.takeIf { it.isNotEmpty() }?.let {
                     JsonArray(it.toList())
                 }
