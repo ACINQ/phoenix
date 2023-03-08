@@ -14,7 +14,6 @@ fileprivate var log = Logger(OSLog.disabled)
 
 fileprivate enum Key: String {
 	case theme
-	case pushPermissionQuery
 	case defaultPaymentDescription
 	case showChannelsRemoteBalance
 	case recentTipPercents
@@ -163,15 +162,6 @@ class Prefs {
 		
 		defaults.recentTipPercents = recents.jsonEncode()
 	}
-	
-	// --------------------------------------------------
-	// MARK: Push Notifications
-	// --------------------------------------------------
-	
-	var pushPermissionQuery: PushPermissionQuery {
-		get { defaults.pushPermissionQuery?.jsonDecode() ?? .neverAskedUser }
-		set { defaults.pushPermissionQuery = newValue.jsonEncode() }
-	}
 
 	// --------------------------------------------------
 	// MARK: Backup
@@ -230,7 +220,6 @@ class Prefs {
 
 		// Purposefully not resetting:
 		// - Key.theme: App feels weird when this changes unexpectedly.
-		// - Key.pushPermissionQuery: Not related to wallet; More so to the device.
 
 		defaults.removeObject(forKey: Key.defaultPaymentDescription.rawValue)
 		defaults.removeObject(forKey: Key.showChannelsRemoteBalance.rawValue)
@@ -291,10 +280,5 @@ extension UserDefaults {
 	@objc fileprivate var recentTipPercents: Data? {
 		get { data(forKey: Key.recentTipPercents.rawValue) }
 		set { set(newValue, forKey: Key.recentTipPercents.rawValue) }
-	}
-
-	@objc fileprivate var pushPermissionQuery: Data? {
-		get { data(forKey: Key.pushPermissionQuery.rawValue) }
-		set { set(newValue, forKey: Key.pushPermissionQuery.rawValue) }
 	}
 }

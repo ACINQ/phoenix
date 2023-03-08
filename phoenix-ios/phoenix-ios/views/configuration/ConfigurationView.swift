@@ -35,12 +35,12 @@ struct ConfigurationView: View {
 	
 	@State private var navLinkTag: NavLinkTag? = nil
 	
-	@State private var listViewId = UUID()
+	@State private var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State private var backupSeedState: BackupSeedState = .safelyBackedUp
 	let backupSeedStatePublisher: AnyPublisher<BackupSeedState, Never>
 	
-	let externalLightningUrlPublisher: PassthroughSubject<String, Never>
+	@State private var listViewId = UUID()
 	
 	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
 	@State private var swiftUiBugWorkaroundIdx = 0
@@ -58,8 +58,6 @@ struct ConfigurationView: View {
 		} else {
 			backupSeedStatePublisher = PassthroughSubject<BackupSeedState, Never>().eraseToAnyPublisher()
 		}
-		
-		externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
 	}
 	
 	// --------------------------------------------------
@@ -73,118 +71,19 @@ struct ConfigurationView: View {
 			.navigationTitle(NSLocalizedString("Settings", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 	}
-
+	
 	@ViewBuilder
 	func content() -> some View {
 
 		List {
 			let hasWallet = hasWallet()
-
-			Section(header: Text("General")) {
-				
-				navLink(.AboutView) {
-					Label { Text("About") } icon: {
-						Image(systemName: "info.circle")
-					}
-				}
 			
-				navLink(.DisplayConfigurationView) {
-					Label { Text("Display") } icon: {
-						Image(systemName: "paintbrush.pointed")
-					}
-				}
-		
-				navLink(.PaymentOptionsView) {
-					Label { Text("Payment options & fees") } icon: {
-						Image(systemName: "wrench")
-					}
-				}
-			
-				if hasWallet {
-					
-					navLink(.RecoveryPhraseView) {
-						Label {
-							switch backupSeedState {
-							case .notBackedUp:
-								HStack(alignment: VerticalAlignment.center, spacing: 0) {
-									Text("Recovery phrase")
-									Spacer()
-									Image(systemName: "exclamationmark.triangle")
-										.renderingMode(.template)
-										.foregroundColor(Color.appWarn)
-								}
-							case .backupInProgress:
-								HStack(alignment: VerticalAlignment.center, spacing: 0) {
-									Text("Recovery phrase")
-									Spacer()
-									Image(systemName: "icloud.and.arrow.up")
-								}
-							case .safelyBackedUp:
-								Text("Recovery phrase")
-							}
-						} icon: {
-							Image(systemName: "squareshape.split.3x3")
-						}
-					}
-					
-					navLink(.DrainWalletView) {
-						Label { Text("Drain wallet") } icon: {
-							Image(systemName: "xmark.circle")
-						}
-					}
-				
-				} // </if: hasWallet>
-				
-			} // </Section: General>
-
+			section_general(hasWallet)
 			if hasWallet {
-				Section(header: Text("Security")) {
-
-					navLink(.AppAccessView) {
-						Label { Text("App access") } icon: {
-							Image(systemName: isTouchID ? "touchid" : "faceid")
-						}
-					}
-
-				} // </Section: Security>
-
-			} // <if: hasWallet>
-
-			Section(header: Text("Advanced")) {
-
-				navLink(.PrivacyView) {
-					Label { Text("Privacy") } icon: {
-						Image(systemName: "eye")
-					}
-				}
-
-				if hasWallet {
-
-					navLink(.ChannelsConfigurationView) {
-						Label { Text("Payment channels") } icon: {
-							Image(systemName: "bolt")
-						}
-					}
-
-				} // </if: hasWallet>
-				
-				navLink(.LogsConfigurationView) {
-					Label { Text("Logs") } icon: {
-						Image(systemName: "doc.text")
-					}
-				}
-
-				if hasWallet {
-
-					navLink(.ResetWalletView) {
-						Label { Text("Reset wallet") } icon: {
-							Image(systemName: "trash")
-						}
-					}
-				}
-
-			} // </Section: Advanced>
-		} // </List>
+				section_security()
+			}
+			section_advanced(hasWallet)
+		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
 		.id(listViewId)
@@ -197,12 +96,140 @@ struct ConfigurationView: View {
 		.onChange(of: navLinkTag) {
 			navLinkTagChanged($0)
 		}
-		.onReceive(backupSeedStatePublisher) {(state: BackupSeedState) in
-			onBackupSeedState(state)
+		.onReceive(NotificationsManager.shared.permissions) {(permissions: NotificationPermissions) in
+			notificationPermissionsChanged(permissions)
 		}
-		.onReceive(externalLightningUrlPublisher) {(url: String) in
+		.onReceive(backupSeedStatePublisher) {(state: BackupSeedState) in
+			backupSeedStateChanged(state)
+		}
+		.onReceive(AppDelegate.get().externalLightningUrlPublisher) {(url: String) in
 			onExternalLightningUrl(url)
 		}
+	}
+	
+	@ViewBuilder
+	func section_general(_ hasWallet: Bool) -> some View {
+		
+		Section(header: Text("General")) {
+			
+			navLink(.AboutView) {
+				Label { Text("About") } icon: {
+					Image(systemName: "info.circle")
+				}
+			}
+		
+			navLink(.DisplayConfigurationView) {
+				Label {
+					switch notificationPermissions {
+					case .disabled:
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("Display")
+							Spacer()
+							Image(systemName: "exclamationmark.triangle")
+								.renderingMode(.template)
+								.foregroundColor(Color.appWarn)
+						}
+						
+					default:
+						Text("Display")
+					}
+				} icon: {
+					Image(systemName: "paintbrush.pointed")
+				}
+			}
+	
+			navLink(.PaymentOptionsView) {
+				Label { Text("Payment options & fees") } icon: {
+					Image(systemName: "wrench")
+				}
+			}
+		
+			if hasWallet {
+				
+				navLink(.RecoveryPhraseView) {
+					Label {
+						switch backupSeedState {
+						case .notBackedUp:
+							HStack(alignment: VerticalAlignment.center, spacing: 0) {
+								Text("Recovery phrase")
+								Spacer()
+								Image(systemName: "exclamationmark.triangle")
+									.renderingMode(.template)
+									.foregroundColor(Color.appWarn)
+							}
+						case .backupInProgress:
+							HStack(alignment: VerticalAlignment.center, spacing: 0) {
+								Text("Recovery phrase")
+								Spacer()
+								Image(systemName: "icloud.and.arrow.up")
+							}
+						case .safelyBackedUp:
+							Text("Recovery phrase")
+						}
+					} icon: {
+						Image(systemName: "squareshape.split.3x3")
+					}
+				}
+				
+				navLink(.DrainWalletView) {
+					Label { Text("Drain wallet") } icon: {
+						Image(systemName: "xmark.circle")
+					}
+				}
+			
+			} // </if: hasWallet>
+			
+		} // </Section: General>
+	}
+	
+	@ViewBuilder
+	func section_security() -> some View {
+		
+		Section(header: Text("Security")) {
+
+			navLink(.AppAccessView) {
+				Label { Text("App access") } icon: {
+					Image(systemName: isTouchID ? "touchid" : "faceid")
+				}
+			}
+
+		} // </Section: Security>
+	}
+	
+	@ViewBuilder
+	func section_advanced(_ hasWallet: Bool) -> some View {
+		
+		Section(header: Text("Advanced")) {
+
+			navLink(.PrivacyView) {
+				Label { Text("Privacy") } icon: {
+					Image(systemName: "eye")
+				}
+			}
+
+			if hasWallet {
+				navLink(.ChannelsConfigurationView) {
+					Label { Text("Payment channels") } icon: {
+						Image(systemName: "bolt")
+					}
+				}
+			}
+			
+			navLink(.LogsConfigurationView) {
+				Label { Text("Logs") } icon: {
+					Image(systemName: "doc.text")
+				}
+			}
+
+			if hasWallet {
+				navLink(.ResetWalletView) {
+					Label { Text("Reset wallet") } icon: {
+						Image(systemName: "trash")
+					}
+				}
+			}
+
+		} // </Section: Advanced>
 	}
 
 	@ViewBuilder
@@ -217,6 +244,16 @@ struct ConfigurationView: View {
 			selection: $navLinkTag,
 			label: label
 		)
+	}
+	
+	@ViewBuilder
+	func navLinkView() -> some View {
+		
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
 	}
 	
 	@ViewBuilder
@@ -243,20 +280,29 @@ struct ConfigurationView: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
+	private func navLinkTagBinding(_ tag: NavLinkTag?) -> Binding<Bool> {
+		
+		if let tag { // specific tag
+			return Binding<Bool>(
+				get: { navLinkTag == tag },
+				set: { if $0 { navLinkTag = tag } else if (navLinkTag == tag) { navLinkTag = nil } }
+			)
+		} else { // any tag
+			return Binding<Bool>(
+				get: { navLinkTag != nil },
+				set: { if !$0 { navLinkTag = nil }}
+			)
+		}
+	}
+	
 	func hasWallet() -> Bool {
 		
 		return Biz.business.walletManager.isLoaded()
 	}
 	
 	// --------------------------------------------------
-	// MARK: Actions
+	// MARK: Notifications
 	// --------------------------------------------------
-	
-	func popToRoot() {
-		log.trace("popToRoot")
-		
-		popToRootRequested = true
-	}
 	
 	func onAppear() {
 		log.trace("onAppear()")
@@ -278,7 +324,7 @@ struct ConfigurationView: View {
 		if !didAppear {
 			didAppear = true
 			if let deepLink = deepLinkManager.deepLink {
-				DispatchQueue.main.async { // iOS 14 issues workaround
+				DispatchQueue.main.async {
 					deepLinkChanged(deepLink)
 				}
 			}
@@ -332,24 +378,25 @@ struct ConfigurationView: View {
 			// Navigate towards deep link (if needed)
 			var newNavLinkTag: NavLinkTag? = nil
 			switch value {
-				case .paymentHistory : break
-				case .backup         : newNavLinkTag = .RecoveryPhraseView
-				case .drainWallet    : newNavLinkTag = .DrainWalletView
-				case .electrum       : newNavLinkTag = .PrivacyView
+				case .paymentHistory     : break
+				case .backup             : newNavLinkTag = .RecoveryPhraseView
+				case .drainWallet        : newNavLinkTag = .DrainWalletView
+				case .electrum           : newNavLinkTag = .PrivacyView
+				case .backgroundPayments : newNavLinkTag = .DisplayConfigurationView
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
 				
 				self.swiftUiBugWorkaround = newNavLinkTag
 				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: 5.0)
+				clearSwiftUiBugWorkaround(delay: 1.0)
 				
 				self.navLinkTag = newNavLinkTag // Trigger/push the view
 			}
 			
 		} else {
 			// We reached the final destination of the deep link
-			clearSwiftUiBugWorkaround(delay: 1.0)
+			clearSwiftUiBugWorkaround(delay: 0.0)
 		}
 	}
 	
@@ -358,25 +405,19 @@ struct ConfigurationView: View {
 		
 		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
 				
-			log.trace("Blocking SwiftUI's attempt to reset our navLinkTag")
+			log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
 			self.navLinkTag = forcedNavLinkTag
 		}
 	}
 	
-	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
+	func notificationPermissionsChanged(_ permissions: NotificationPermissions) {
+		log.trace("notificationPermissionsChanged()")
 		
-		let idx = self.swiftUiBugWorkaroundIdx
-		
-		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-			
-			if self.swiftUiBugWorkaroundIdx == idx {
-				self.swiftUiBugWorkaround = nil
-			}
-		}
+		notificationPermissions = permissions
 	}
 	
-	func onBackupSeedState(_ newState: BackupSeedState) {
-		log.trace("onBackupSeedState()")
+	func backupSeedStateChanged(_ newState: BackupSeedState) {
+		log.trace("backupSeedStateChanged()")
 		
 		backupSeedState = newState
 	}
@@ -397,6 +438,33 @@ struct ConfigurationView: View {
 			//
 			// Apple has fixed the issue in iOS 15.
 			navLinkTag = nil
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func popToRoot() {
+		log.trace("popToRoot")
+		
+		popToRootRequested = true
+	}
+	
+	// --------------------------------------------------
+	// MARK: Utilities
+	// --------------------------------------------------
+	
+	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
+		
+		let idx = self.swiftUiBugWorkaroundIdx
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+			
+			if self.swiftUiBugWorkaroundIdx == idx {
+				log.debug("swiftUiBugWorkaround = nil")
+				self.swiftUiBugWorkaround = nil
+			}
 		}
 	}
 }

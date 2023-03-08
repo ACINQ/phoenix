@@ -27,6 +27,7 @@ fileprivate enum Key: String {
 	case electrumConfig
 	case isTorEnabled
 	case badgeCount
+	case discreetNotifications
 }
 
 /// Group preferences, stored in the iOS UserDefaults system.
@@ -41,6 +42,10 @@ class GroupPrefs {
 	var defaults: UserDefaults {
 		return UserDefaults.group
 	}
+	
+	// --------------------------------------------------
+	// MARK: Currencies
+	// --------------------------------------------------
 	
 	var currencyType: CurrencyType {
 		get { defaults.currencyType?.jsonDecode() ?? .bitcoin }
@@ -113,6 +118,10 @@ class GroupPrefs {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: User Config
+	// --------------------------------------------------
+	
 	lazy private(set) var electrumConfigPublisher: AnyPublisher<ElectrumConfigPrefs?, Never> = {
 		defaults.publisher(for: \.electrumConfig, options: [.new])
 			.map({ (data: Data?) -> ElectrumConfigPrefs? in
@@ -138,9 +147,18 @@ class GroupPrefs {
 		set { defaults.isTorEnabled = newValue }
 	}
 	
+	// --------------------------------------------------
+	// MARK: Push Notifications
+	// --------------------------------------------------
+	
 	var badgeCount: Int {
 		get { defaults.badgeCount }
 		set { defaults.badgeCount = newValue }
+	}
+	
+	var discreetNotifications: Bool {
+		get { defaults.discreetNotifications }
+		set { defaults.discreetNotifications = newValue }
 	}
 	
 	// --------------------------------------------------
@@ -156,6 +174,7 @@ class GroupPrefs {
 		defaults.removeObject(forKey: Key.electrumConfig.rawValue)
 		defaults.removeObject(forKey: Key.isTorEnabled.rawValue)
 		defaults.removeObject(forKey: Key.badgeCount.rawValue)
+		defaults.removeObject(forKey: Key.discreetNotifications.rawValue)
 	}
 
 	// --------------------------------------------------
@@ -235,5 +254,10 @@ extension UserDefaults {
 	@objc fileprivate var badgeCount: Int {
 		get { integer(forKey: Key.badgeCount.rawValue) }
 		set { set(newValue, forKey: Key.badgeCount.rawValue) }
+	}
+	
+	@objc fileprivate var discreetNotifications: Bool {
+		get { bool(forKey: Key.discreetNotifications.rawValue) }
+		set { set(newValue, forKey: Key.discreetNotifications.rawValue) }
 	}
 }

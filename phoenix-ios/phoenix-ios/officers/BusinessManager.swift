@@ -473,7 +473,7 @@ class BusinessManager {
 			didReceivePayment = true
 			postPaymentTimer?.invalidate()
 			postPaymentTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false, block: Finish)
-			AppDelegate.get().displayLocalNotification_receivedPayment(payment)
+			NotificationsManager.shared.displayLocalNotification_receivedPayment(payment)
 		})
 	}
 	

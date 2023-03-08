@@ -11,15 +11,30 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+fileprivate enum NavLinkTag: String {
+	case FiatCurrencySelector
+	case BitcoinUnitSelector
+	case RecentPaymentsSelector
+	case BackgroundPaymentsSelector
+}
+
 struct DisplayConfigurationView: View {
+	
+	@State private var navLinkTag: NavLinkTag? = nil
 	
 	@State var fiatCurrency = GroupPrefs.shared.fiatCurrency
 	@State var bitcoinUnit = GroupPrefs.shared.bitcoinUnit
 	@State var theme = Prefs.shared.theme
 	@State var recentPaymentsConfig = Prefs.shared.recentPaymentsConfig
+	@State var notificationSettings = NotificationsManager.shared.settings.value
 	
 	@State var sectionId = UUID()
 	@State var firstAppearance = true
+	
+	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
+	@State private var swiftUiBugWorkaroundIdx = 0
+	
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -39,6 +54,7 @@ struct DisplayConfigurationView: View {
 			section_currency()
 			section_theme()
 			section_home()
+			section_backgroundPayments()
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
@@ -58,15 +74,19 @@ struct DisplayConfigurationView: View {
 		.onReceive(Prefs.shared.recentPaymentsConfigPublisher) {
 			recentPaymentsConfig = $0
 		}
+		.onReceive(NotificationsManager.shared.settings) {
+			notificationSettings = $0
+		}
+		.onChange(of: deepLinkManager.deepLink) {
+			deepLinkChanged($0)
+		}
 	}
 	
 	@ViewBuilder
 	func section_currency() -> some View {
 		
 		Section {
-			NavigationLink(
-				destination: FiatCurrencySelector(selectedFiatCurrency: fiatCurrency)
-			) {
+			navLink(.FiatCurrencySelector) {
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					Text("Fiat currency")
 					Spacer()
@@ -76,9 +96,7 @@ struct DisplayConfigurationView: View {
 				}
 			}
 			
-			NavigationLink(
-				destination: BitcoinUnitSelector(selectedBitcoinUnit: bitcoinUnit)
-			) {
+			navLink(.BitcoinUnitSelector) {
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					Text("Bitcoin unit")
 					Spacer()
@@ -127,9 +145,8 @@ struct DisplayConfigurationView: View {
 		
 		Section(header: Text("Home Screen")) {
 			
-			NavigationLink(
-				destination: RecentPaymentsSelector(recentPaymentsConfig: recentPaymentsConfig)
-			) {
+			navLink(.RecentPaymentsSelector) {
+				
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					switch recentPaymentsConfig {
 					case .withinTime(let seconds):
@@ -145,7 +162,7 @@ struct DisplayConfigurationView: View {
 							.fixedSize(horizontal: false, vertical: true)
 					}
 				}
-			}
+			} // </navLink>
 			
 			Text("Use the payments screen to view your full payment history.")
 				.font(.callout)
@@ -155,6 +172,89 @@ struct DisplayConfigurationView: View {
 				.padding(.bottom, 4)
 			
 		} // </Section>
+	}
+	
+	@ViewBuilder
+	func section_backgroundPayments() -> some View {
+		
+		Section(header: Text("Background Payments")) {
+			
+			let config = BackgroundPaymentsConfig.fromSettings(notificationSettings)
+			let hideAmount = NSLocalizedString("(hide amount)", comment: "Background payments configuration")
+			
+			navLink(.BackgroundPaymentsSelector) {
+				
+				Group { // Compiler workaround: Type '()' cannot conform to 'View'
+					switch config {
+					case .receiveQuietly(let discreet):
+						HStack(alignment: VerticalAlignment.center, spacing: 4) {
+							Text("Receive quietly")
+							if discreet {
+								Text(verbatim: hideAmount)
+									.font(.subheadline)
+									.foregroundColor(.secondary)
+								}
+							}
+						
+					case .fullVisibility(let discreet):
+						HStack(alignment: VerticalAlignment.center, spacing: 4) {
+							Text("Visible")
+							if discreet {
+								Text(verbatim: hideAmount)
+									.font(.subheadline)
+									.foregroundColor(.secondary)
+								}
+							}
+						
+					case .customized(let discreet):
+						HStack(alignment: VerticalAlignment.center, spacing: 4) {
+							Text("Customized")
+							if discreet {
+								Text(verbatim: hideAmount)
+									.font(.subheadline)
+									.foregroundColor(.secondary)
+								}
+							}
+						
+					case .disabled:
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("Disabled")
+							Spacer()
+							Image(systemName: "exclamationmark.triangle")
+								.renderingMode(.template)
+								.foregroundColor(Color.appWarn)
+							}
+						
+					} // </switch>
+				} // </Group>
+			} // </navLink>
+			
+		} // </Section>
+	}
+	
+	@ViewBuilder
+	private func navLink<Content>(
+		_ tag: NavLinkTag,
+		label: () -> Content
+	) -> some View where Content: View {
+		
+		NavigationLink(
+			destination: navLinkView(tag),
+			tag: tag,
+			selection: $navLinkTag,
+			label: label
+		)
+	}
+	
+	@ViewBuilder
+	private func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+		case .FiatCurrencySelector       : FiatCurrencySelector(selectedFiatCurrency: fiatCurrency)
+		case .BitcoinUnitSelector        : BitcoinUnitSelector(selectedBitcoinUnit: bitcoinUnit)
+		case .RecentPaymentsSelector     : RecentPaymentsSelector(recentPaymentsConfig: recentPaymentsConfig)
+		case .BackgroundPaymentsSelector : BackgroundPaymentsSelector()
+		}
 	}
 	
 	// --------------------------------------------------
@@ -181,8 +281,72 @@ struct DisplayConfigurationView: View {
 		if firstAppearance {
 			firstAppearance = false
 			
+			if let deepLink = deepLinkManager.deepLink {
+				DispatchQueue.main.async { // iOS 14 issues workaround
+					deepLinkChanged(deepLink)
+				}
+			}
+			
 		} else {
 			sectionId = UUID()
+		}
+	}
+	
+	func deepLinkChanged(_ value: DeepLink?) {
+		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		
+		// This is a hack, courtesy of bugs in Apple's NavigationLink:
+		// https://developer.apple.com/forums/thread/677333
+		//
+		// Summary:
+		// There's some quirky code in SwiftUI that is resetting our navLinkTag.
+		// Several bizarre workarounds have been proposed.
+		// I've tried every one of them, and none of them work (at least, without bad side-effects).
+		//
+		// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
+		// and forcibly undo it.
+		
+		if let value = value {
+			
+			// Navigate towards deep link (if needed)
+			var newNavLinkTag: NavLinkTag? = nil
+			switch value {
+				case .paymentHistory     : break
+				case .backup             : break
+				case .drainWallet        : break
+				case .electrum           : break
+				case .backgroundPayments : newNavLinkTag = NavLinkTag.BackgroundPaymentsSelector
+			}
+			
+			if let newNavLinkTag = newNavLinkTag {
+				
+				self.swiftUiBugWorkaround = newNavLinkTag
+				self.swiftUiBugWorkaroundIdx += 1
+				clearSwiftUiBugWorkaround(delay: 5.0)
+				
+				self.navLinkTag = newNavLinkTag // Trigger/push the view
+			}
+			
+		} else {
+			// We reached the final destination of the deep link
+			clearSwiftUiBugWorkaround(delay: 1.0)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Workarounds
+	// --------------------------------------------------
+	
+	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
+		
+		let idx = self.swiftUiBugWorkaroundIdx
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+			
+			if self.swiftUiBugWorkaroundIdx == idx {
+				log.trace("swiftUiBugWorkaround = nil")
+				self.swiftUiBugWorkaround = nil
+			}
 		}
 	}
 }
