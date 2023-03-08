@@ -124,7 +124,7 @@ class PaymentsViewModel(
     /** Fetches the details for a given payment and updates [paymentsFlow]. */
     fun fetchPaymentDetails(row: WalletPaymentOrderRow) {
         viewModelScope.launch(Dispatchers.Default) {
-            val paymentInfo = paymentsManager.fetcher.getPayment(row, WalletPaymentFetchOptions.Descriptions)
+            val paymentInfo = paymentsManager.fetcher.getPayment(row, WalletPaymentFetchOptions.Descriptions + WalletPaymentFetchOptions.Lnurl)
             if (paymentInfo != null) {
                 viewModelScope.launch(Dispatchers.Main) {
                     _paymentsFlow.value += (row.id.identifier to PaymentRowState(row, paymentInfo))

@@ -358,6 +358,7 @@
     <string name="paymentdetails_desc_custom_title">Add note</string>
     <string name="paymentdetails_desc_custom_info">You can attach a note to this payment.</string>
     <string name="paymentdetails_destination_label">To</string>
+    <string name="paymentdetails_lnid_label">Address</string>
     <string name="paymentdetails_fees_label">Fees</string>
     <string name="paymentdetails_funding_fees_label">Miner fees</string>
     <string name="paymentdetails_funding_fees_desc">Bitcoin network fees paid for on-chain transaction.</string>

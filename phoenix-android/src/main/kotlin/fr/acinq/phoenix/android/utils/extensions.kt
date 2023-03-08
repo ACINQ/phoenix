@@ -263,16 +263,18 @@ fun Connection.CLOSED.isBadCertificate() = this.reason?.cause is CertificateExce
  *
  * For example, a payment closing a channel has no description, and it's up to us to create one. Others like a LN
  * payment with an invoice do have a description baked in, and that's what is returned.
+ *
+ * Description hashes will return null.
  */
 fun WalletPayment.smartDescription(context: Context): String? = when (this) {
     is OutgoingPayment -> when (val details = this.details) {
-        is OutgoingPayment.Details.Normal -> details.paymentRequest.description ?: details.paymentRequest.descriptionHash?.toHex()
+        is OutgoingPayment.Details.Normal -> details.paymentRequest.description
         is OutgoingPayment.Details.ChannelClosing -> context.getString(R.string.paymentdetails_desc_closing_channel)
         is OutgoingPayment.Details.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
         is OutgoingPayment.Details.SwapOut -> context.getString(R.string.paymentdetails_desc_swapout, details.address)
     }
     is IncomingPayment -> when (val origin = this.origin) {
-        is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description ?: origin.paymentRequest.descriptionHash?.toHex()
+        is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description
         is IncomingPayment.Origin.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
         is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.DualSwapIn -> context.getString(R.string.paymentdetails_desc_swapin)
     }

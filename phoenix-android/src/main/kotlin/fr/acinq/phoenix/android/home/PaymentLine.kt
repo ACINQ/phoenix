@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -48,6 +49,7 @@ import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
+import fr.acinq.phoenix.android.utils.smartDescription
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.walletPaymentId
@@ -160,24 +162,9 @@ fun PaymentLine(
 private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifier = Modifier) {
     val payment = paymentInfo.payment
     val metadata = paymentInfo.metadata
-    val desc = metadata.userDescription ?: when (payment) {
-        is OutgoingPayment -> when (val d = payment.details) {
-            is OutgoingPayment.Details.Normal -> d.paymentRequest.description
-            is OutgoingPayment.Details.KeySend -> stringResource(id = R.string.paymentline_keysend_outgoing)
-            is OutgoingPayment.Details.SwapOut -> d.address
-            is OutgoingPayment.Details.ChannelClosing -> if (d.closingAddress.isBlank()) {
-                stringResource(R.string.paymentline_closing_desc_no_address)
-            } else {
-                stringResource(R.string.paymentline_closing_desc, d.closingAddress)
-            }
-        }
-        is IncomingPayment -> when (val o = payment.origin) {
-            is IncomingPayment.Origin.Invoice -> o.paymentRequest.description
-            is IncomingPayment.Origin.KeySend -> stringResource(id = R.string.paymentline_keysend_incoming)
-            is IncomingPayment.Origin.SwapIn -> o.address ?: stringResource(id = R.string.paymentline_swap_in_desc)
-            is IncomingPayment.Origin.DualSwapIn -> stringResource(id = R.string.paymentline_swap_in_desc)
-        }
-    }.takeIf { !it.isNullOrBlank() }
+    val context = LocalContext.current
+    val lnurlIdentifier = paymentInfo.metadata.lnurl?.pay?.metadata?.identifier
+    val desc = metadata.userDescription ?: payment.smartDescription(context) ?: lnurlIdentifier
     Text(
         text = desc ?: stringResource(id = R.string.paymentdetails_no_description),
         maxLines = 1,

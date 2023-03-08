@@ -95,10 +95,11 @@ fun PaymentDetailsSplashView(
 
             val paymentDesc = remember(payment) { payment.smartDescription(context) }
             val customDesc = remember(data) { data.metadata.userDescription?.takeIf { it.isNotBlank() } }
+            val lnurlMetaDescription = remember(data) { data.metadata.lnurl?.description }
             DetailsRow(
                 label = stringResource(id = R.string.paymentdetails_desc_label),
                 // if no default desc, show custom desc.
-                value = paymentDesc ?: customDesc ?: stringResource(id = R.string.paymentdetails_no_description),
+                value = paymentDesc ?: customDesc ?: lnurlMetaDescription ?: stringResource(id = R.string.paymentdetails_no_description),
                 additionalContent = {
                     if (paymentDesc != null && customDesc != null) {
                         Spacer(modifier = Modifier.height(8.dp))
@@ -136,6 +137,14 @@ fun PaymentDetailsSplashView(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+                val lnurlIdentifier = remember(data) { data.metadata.lnurl?.pay?.metadata?.identifier }
+                lnurlIdentifier?.takeIf { it.isNotBlank() }?.let {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    DetailsRow(
+                        label = stringResource(id = R.string.paymentdetails_lnid_label),
+                        value = it
+                    )
+                }
             }
 
             // fees
