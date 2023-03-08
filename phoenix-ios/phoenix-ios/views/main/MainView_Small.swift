@@ -28,6 +28,9 @@ struct MainView_Small: View {
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
 	@State var externalLightningRequest: AppScanController? = nil
 	
+	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
+	@State private var swiftUiBugWorkaroundIdx = 0
+	
 	@ScaledMetric var sendImageSize: CGFloat = 17
 	@ScaledMetric var receiveImageSize: CGFloat = 18
 	
@@ -136,11 +139,11 @@ struct MainView_Small: View {
 		.navigationStackDestination(isPresented: navLinkTagBinding(.CurrencyConverter)) { // For iOS 16+
 			navLinkView()
 		}
-		.onChange(of: navLinkTag) {
-			navLinkTagChanged($0)
-		}
 		.onChange(of: deepLinkManager.deepLink) {
 			deepLinkChanged($0)
+		}
+		.onChange(of: navLinkTag) {
+			navLinkTagChanged($0)
 		}
 		.onReceive(externalLightningUrlPublisher) {
 			didReceiveExternalLightningUrl($0)
@@ -519,10 +522,46 @@ struct MainView_Small: View {
 	// MARK: Notifications
 	// --------------------------------------------------
 	
+	private func deepLinkChanged(_ value: DeepLink?) {
+		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		
+		if let value = value {
+			
+			// Navigate towards deep link (if needed)
+			var newNavLinkTag: NavLinkTag? = nil
+			switch value {
+				case .paymentHistory     : newNavLinkTag = .TransactionsView
+				case .backup             : newNavLinkTag = .ConfigurationView
+				case .drainWallet        : newNavLinkTag = .ConfigurationView
+				case .electrum           : newNavLinkTag = .ConfigurationView
+				case .backgroundPayments : newNavLinkTag = .ConfigurationView
+			}
+			
+			if let newNavLinkTag = newNavLinkTag {
+				
+				self.swiftUiBugWorkaround = newNavLinkTag
+				self.swiftUiBugWorkaroundIdx += 1
+				clearSwiftUiBugWorkaround(delay: 1.0)
+				
+				self.navLinkTag = newNavLinkTag // Trigger/push the view
+			}
+			
+		} else {
+			// We reached the final destination of the deep link
+			clearSwiftUiBugWorkaround(delay: 0.0)
+		}
+	}
+	
 	private func navLinkTagChanged(_ tag: NavLinkTag?) {
 		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
 		
-		if tag == nil {
+		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
+			
+			log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
+			self.navLinkTag = forcedNavLinkTag
+			
+		} else if tag == nil {
+			
 			// If we pushed the SendView, triggered by an external lightning url,
 			// then we can nil out the associated controller now (since we handed off to SendView).
 			self.externalLightningRequest = nil
@@ -544,15 +583,19 @@ struct MainView_Small: View {
 		}
 	}
 	
-	private func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+	// --------------------------------------------------
+	// MARK: Utilities
+	// --------------------------------------------------
+	
+	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
 		
-		if let value = value {
-			switch value {
-				case .paymentHistory : self.navLinkTag = .TransactionsView
-				case .backup         : self.navLinkTag = .ConfigurationView
-				case .drainWallet    : self.navLinkTag = .ConfigurationView
-				case .electrum       : self.navLinkTag = .ConfigurationView
+		let idx = self.swiftUiBugWorkaroundIdx
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+			
+			if self.swiftUiBugWorkaroundIdx == idx {
+				log.debug("swiftUiBugWorkaround = nil")
+				self.swiftUiBugWorkaround = nil
 			}
 		}
 	}

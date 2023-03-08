@@ -28,19 +28,23 @@ extension UNMutableNotificationContent {
 		}
 		
 		if payments.count == 1 {
-			let payment = payments.first!
-			
 			self.title = NSLocalizedString("Received payment", comment: "Push notification title")
-			if let desc = payment.paymentDescription(), desc.count > 0 {
-				self.body = "\(amount): \(desc)"
-			} else {
-				self.body = amount
+			
+			if !GroupPrefs.shared.discreetNotifications {
+				let payment = payments.first!
+				if let desc = payment.paymentDescription(), desc.count > 0 {
+					self.body = "\(amount): \(desc)"
+				} else {
+					self.body = amount
+				}
 			}
 			
 		} else {
-			
 			self.title = NSLocalizedString("Received multiple payments", comment: "Push notification title")
-			self.body = amount
+			
+			if !GroupPrefs.shared.discreetNotifications {
+				self.body = amount
+			}
 		}
 		
 		// The user can independently enable/disable:

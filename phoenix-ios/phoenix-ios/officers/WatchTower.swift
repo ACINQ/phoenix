@@ -125,7 +125,7 @@ class WatchTower {
 			}
 
 			if notifyRevokedCommit {
-				AppDelegate.get().displayLocalNotification_revokedCommit()
+				NotificationsManager.shared.displayLocalNotification_revokedCommit()
 			}
 
 			self.scheduleBackgroundTasks(soon: success ? false : true)

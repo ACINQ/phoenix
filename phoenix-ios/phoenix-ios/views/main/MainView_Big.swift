@@ -862,10 +862,11 @@ struct MainView_Big: View {
 		
 		if let value = value {
 			switch value {
-				case .paymentHistory : showTransactions()
-				case .backup         : fallthrough
-				case .drainWallet    : fallthrough
-				case .electrum       : showSettings()
+				case .paymentHistory     : showTransactions()
+				case .backup             : showSettings()
+				case .drainWallet        : showSettings()
+				case .electrum           : showSettings()
+				case .backgroundPayments : showSettings()
 			}
 		}
 	}

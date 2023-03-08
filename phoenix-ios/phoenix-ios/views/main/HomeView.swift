@@ -34,6 +34,8 @@ struct HomeView : MVIView {
 	@State var isMempoolFull = false
 	@State var swapIn_minFundingSat: Int64 = 0
 	
+	@State var notificationPermissions = NotificationsManager.shared.permissions.value
+	
 	@StateObject var customElectrumServerObserver = CustomElectrumServerObserver()
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
@@ -121,6 +123,9 @@ struct HomeView : MVIView {
 		}
 		.onReceive(swapInWalletBalancePublisher) {
 			swapInWalletBalanceChanged($0)
+		}
+		.onReceive(NotificationsManager.shared.permissions) {
+			notificationPermissionsChanged($0)
 		}
 		.onReceive(backupSeed_enabled_publisher) {
 			self.backupSeed_enabled = $0
@@ -444,6 +449,42 @@ struct HomeView : MVIView {
 				
 			} // </NoticeBox>
 		}
+		
+		// === Background payments disabled ====
+		if notificationPermissions == .disabled {
+			
+			NoticeBox {
+				HStack(alignment: VerticalAlignment.top, spacing: 0) {
+					Image(systemName: "exclamationmark.triangle")
+						.imageScale(.large)
+						.padding(.trailing, 10)
+						.accessibilityLabel("Warning")
+					
+					Button {
+						navigationToBackgroundPayments()
+					} label: {
+						Group {
+							Text("Background payments disabled. ")
+								.foregroundColor(.primary)
+							+
+							Text("Fix ")
+								.foregroundColor(.appAccent)
+							+
+							Text(Image(systemName: "arrowtriangle.forward"))
+								.foregroundColor(.appAccent)
+						}
+						.multilineTextAlignment(.leading)
+						.allowsTightening(true)
+					} // </Button>
+					
+				} // </HStack>
+				.font(.caption)
+				.accessibilityElement(children: .combine)
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(47)
+				
+			} // </NoticeBox>
+		}
 	}
 	
 	@ViewBuilder
@@ -675,6 +716,12 @@ struct HomeView : MVIView {
 		swapIn_minFundingSat = context.payToOpen.v1.minFundingSat // not yet segregated for swapIn - future work
 	}
 	
+	func notificationPermissionsChanged(_ newValue: NotificationPermissions) {
+		log.trace("notificationPermissionsChanged()")
+		
+		notificationPermissions = newValue
+	}
+	
 	func swapInWalletBalanceChanged(_ walletBalance: WalletBalance) {
 		log.trace("swapInWalletBalanceChanged()")
 		
@@ -780,6 +827,12 @@ struct HomeView : MVIView {
 		log.trace("navigateToElectrumServer()")
 		
 		deepLinkManager.broadcast(DeepLink.electrum)
+	}
+	
+	func navigationToBackgroundPayments() {
+		log.trace("navigateToBackgroundPayments()")
+		
+		deepLinkManager.broadcast(DeepLink.backgroundPayments)
 	}
 	
 	func openMempoolFullURL() {
