@@ -33,6 +33,7 @@ import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
@@ -65,10 +66,10 @@ object Notifications {
         }
     }
 
-    fun notifyPaymentNotReceived(context: Context) {
+    fun notifyPaymentMissedBelowMin(context: Context, amount: MilliSatoshi, minPayToOpen: MilliSatoshi) {
         NotificationCompat.Builder(context, MISSED_PAYMENT_NOTIF_CHANNEL).apply {
-            setContentTitle(context.getString(R.string.notif__headless_title__not_received_title))
-            setContentText(context.getString(R.string.notif__headless_title__not_received_content))
+            setContentTitle(context.getString(R.string.notif__missed__title))
+            setContentText(context.getString(R.string.notif__missed__below_min, amount.toPrettyString(BitcoinUnit.Sat), minPayToOpen.toPrettyString(BitcoinUnit.Sat)))
             setSmallIcon(R.drawable.ic_phoenix_outline)
             setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE))
             setAutoCancel(true)

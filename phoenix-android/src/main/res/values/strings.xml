@@ -31,9 +31,9 @@
     <!-- //////////////// notification content //////////////// -->
 
     <string name="notif__headless_title__default">Phoenix is running in background</string>
-    <string name="notif__headless_title__not_received_title">Missed payment</string>
-    <string name="notif__headless_title__not_received_content">Payment was below the minimum amount for a new channel (10k sat)</string>
-    <string name="notif__headless_title__received">You received %1$s</string>
+    <string name="notif__headless__received">You received %1$s</string>
+    <string name="notif__missed__title">Missed payment</string>
+    <string name="notif__missed__below_min">Amount (%1$s sat) was below the minimum amount for a new channel (%2$s sat).</string>
 
     <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 

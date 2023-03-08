@@ -14,9 +14,9 @@ import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.PayToOpenEvents
 import fr.acinq.lightning.io.*
 import fr.acinq.lightning.utils.Connection
-import fr.acinq.lightning.wire.PayToOpenResponse
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
@@ -27,12 +27,11 @@ import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.managers.AppConfigurationManager
+import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapConcat
 import org.slf4j.LoggerFactory
 import java.lang.Runnable
 import java.util.concurrent.locks.ReentrantLock
@@ -224,7 +223,7 @@ class NodeService : Service() {
         )
         business.start(StartupParams(requestCheckLegacyChannels = requestCheckLegacyChannels, isTorEnabled = isTorEnabled))
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
-        monitorPaymentsWhenHeadless(business.peerManager)
+        monitorPaymentsWhenHeadless(business.peerManager, business.nodeParamsManager)
 
         serviceScope.launch {
             val token = InternalData.getFcmToken(applicationContext).first()
@@ -241,20 +240,20 @@ class NodeService : Service() {
         return WalletState.Started.Kmm(business)
     }
 
-    private fun monitorPaymentsWhenHeadless(peerManager: PeerManager) {
+    private fun monitorPaymentsWhenHeadless(peerManager: PeerManager, nodeParamsManager: NodeParamsManager) {
+        serviceScope.launch {
+            nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents.collect { event ->
+                when (event) {
+                    is PayToOpenEvents.Rejected.BelowMin -> {
+                        Notifications.notifyPaymentMissedBelowMin(applicationContext, event.payToOpenAmount, event.payToOpenMinAmount)
+                    }
+                    else -> Unit
+                }
+            }
+        }
         serviceScope.launch {
             peerManager.getPeer().eventsFlow.collect { event ->
                 when (event) {
-                    is PaymentIncoming -> Unit
-                    is PaymentNotReceived -> {
-                        if (isHeadless) {
-                            if (event.actions.any {
-                                    it is PayToOpenResponseCommand && it.payToOpenResponse.result is PayToOpenResponse.Result.Failure
-                                }) {
-                                Notifications.notifyPaymentNotReceived(applicationContext)
-                            }
-                        }
-                    }
                     is PaymentReceived -> {
                         if (isHeadless) {
                             Notifications.notifyPaymentReceived(applicationContext, paymentHash = event.incomingPayment.paymentHash, amount = event.received.amount, rates = emptyList())
