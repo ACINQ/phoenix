@@ -738,8 +738,8 @@
     <string name="component_error_message_details">Cause: %1$s</string>
 
     <!-- notification permission -->
-    <string name="permission_notification_request">Enable payment notifications</string>
-    <string name="permission_notification_denied">Notifications are disabled by the OS. You won\'t be notified when a payment is incoming.</string>
-    <string name="permission_notification_request_dialog">Phoenix can show notifications when you receive payments.</string>
+    <string name="permission_notification_dismiss">Don\'t remind me again</string>
+    <string name="permission_notification_request">Enable notifications</string>
+    <string name="permission_notification_denied">Notifications are disabled. You won\'t be notified when the app is in the background and a payment is incoming.</string>
 
 </resources>

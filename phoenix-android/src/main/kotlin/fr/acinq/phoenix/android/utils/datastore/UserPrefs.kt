@@ -182,6 +182,10 @@ object UserPrefs {
     fun getIsTorEnabled(context: Context): Flow<Boolean> = prefs(context).map { it[IS_TOR_ENABLED] ?: false }
     suspend fun saveIsTorEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[IS_TOR_ENABLED] = isEnabled }
 
+    private val SHOW_NOTIFICATION_PERMISSION_REMINDER = booleanPreferencesKey("SHOW_NOTIFICATION_PERMISSION_REMINDER")
+    fun getShowNotificationPermissionReminder(context: Context): Flow<Boolean> = prefs(context).map { it[SHOW_NOTIFICATION_PERMISSION_REMINDER] ?: true }
+    suspend fun saveShowNotificationPermissionReminder(context: Context, show: Boolean) = context.userPrefs.edit { it[SHOW_NOTIFICATION_PERMISSION_REMINDER] = show }
+
 }
 
 enum class HomeAmountDisplayMode {

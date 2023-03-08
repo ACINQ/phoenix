@@ -61,6 +61,7 @@ import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.controllers.payments.Receive
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.managers.WalletBalance
+import kotlinx.coroutines.launch
 
 sealed class ReceiveViewState {
     object Default : ReceiveViewState()
@@ -78,6 +79,7 @@ fun ReceiveView(
     val business = business
     val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(context).collectAsState(null)
     val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(context).collectAsState(null)
+    val showNotificationPermission by UserPrefs.getShowNotificationPermissionReminder(context).collectAsState(initial = false)
 
     safeLet(invoiceDefaultDesc, invoiceDefaultExpiry) { description, expiry ->
         val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(controllerFactory, CF::receive, description, expiry))
@@ -126,10 +128,18 @@ fun ReceiveView(
                         when (model) {
                             is Receive.Model.Awaiting -> {
                                 LaunchedEffect(key1 = true) { vm.generateInvoice() }
-                                GeneratingLightningInvoiceView({ vm.state = ReceiveViewState.EditInvoice }) { vm.state = ReceiveViewState.EditInvoice }
+                                GeneratingLightningInvoiceView(
+                                    onSwapInClick = { postIntent(Receive.Intent.RequestSwapIn) },
+                                    onEditClick = { vm.state = ReceiveViewState.EditInvoice },
+                                    showNotificationPermission = showNotificationPermission
+                                )
                             }
                             is Receive.Model.Generating -> {
-                                GeneratingLightningInvoiceView({ vm.state = ReceiveViewState.EditInvoice }) { vm.state = ReceiveViewState.EditInvoice }
+                                GeneratingLightningInvoiceView(
+                                    onSwapInClick = { postIntent(Receive.Intent.RequestSwapIn) },
+                                    onEditClick = { vm.state = ReceiveViewState.EditInvoice },
+                                    showNotificationPermission = showNotificationPermission
+                                )
                             }
                             is Receive.Model.Generated -> {
                                 LaunchedEffect(model.request) {
@@ -143,6 +153,7 @@ fun ReceiveView(
                                     bitmap = vm.qrBitmap,
                                     onEdit = { vm.state = ReceiveViewState.EditInvoice },
                                     onSwapInClick = { postIntent(Receive.Intent.RequestSwapIn) },
+                                    showNotificationPermission = showNotificationPermission,
                                 )
                             }
                             is Receive.Model.SwapIn -> {
@@ -163,7 +174,8 @@ fun ReceiveView(
 @Composable
 private fun GeneratingLightningInvoiceView(
     onSwapInClick: () -> Unit,
-    onEdit: () -> Unit,
+    onEditClick: () -> Unit,
+    showNotificationPermission: Boolean,
 ) {
     Spacer(modifier = Modifier.height(24.dp))
     Box(contentAlignment = Alignment.Center) {
@@ -179,7 +191,7 @@ private fun GeneratingLightningInvoiceView(
     CopyShareEditButtons(
         onCopy = { },
         onShare = { },
-        onEdit = onEdit
+        onEdit = onEditClick
     )
     Spacer(modifier = Modifier.height(24.dp))
     BorderButton(
@@ -187,7 +199,9 @@ private fun GeneratingLightningInvoiceView(
         icon = R.drawable.ic_swap,
         onClick = onSwapInClick
     )
-    NotificationPermissionButton()
+    if (showNotificationPermission) {
+        NotificationPermissionButton()
+    }
 }
 
 @Composable
@@ -198,7 +212,8 @@ private fun LightningInvoiceView(
     paymentRequest: String,
     bitmap: ImageBitmap?,
     onEdit: () -> Unit,
-    onSwapInClick: () -> Unit
+    onSwapInClick: () -> Unit,
+    showNotificationPermission: Boolean,
 ) {
     Spacer(modifier = Modifier.height(24.dp))
     QRCodeView(address = paymentRequest, bitmap = bitmap, details = {
@@ -256,7 +271,9 @@ private fun LightningInvoiceView(
         icon = R.drawable.ic_swap,
         onClick = onSwapInClick
     )
-    NotificationPermissionButton()
+    if (showNotificationPermission) {
+        NotificationPermissionButton()
+    }
 }
 
 @Composable
@@ -462,6 +479,7 @@ private fun EditInvoiceView(
 @Composable
 private fun NotificationPermissionButton() {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
     if (notificationPermission.status.isGranted) {
         // do nothing!
@@ -476,14 +494,12 @@ private fun NotificationPermissionButton() {
         ) {
             Spacer(modifier = Modifier.height(24.dp))
             HSeparator(width = 50.dp)
-            if (isDenied) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = stringResource(id = R.string.permission_notification_denied),
-                    style = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
-                    textAlign = TextAlign.Center
-                )
-            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(id = R.string.permission_notification_denied),
+                style = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+                textAlign = TextAlign.Center
+            )
             Spacer(modifier = Modifier.height(8.dp))
             FilledButton(
                 text = stringResource(id = R.string.permission_notification_request),
@@ -499,6 +515,16 @@ private fun NotificationPermissionButton() {
                     } else {
                         notificationPermission.launchPermissionRequest()
                     }
+                }
+            )
+            FilledButton(
+                text = stringResource(id = R.string.permission_notification_dismiss),
+                textStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+                icon = R.drawable.ic_cross,
+                iconTint = MaterialTheme.typography.caption.color,
+                backgroundColor = Color.Transparent,
+                onClick = {
+                    scope.launch { UserPrefs.saveShowNotificationPermissionReminder(context, false) }
                 }
             )
         }
