@@ -11,10 +11,7 @@ import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.currentTimestampSeconds
-import fr.acinq.lightning.utils.msat
-import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.TestConstants
 import fr.acinq.phoenix.data.*
 import kotlin.test.Test
@@ -337,7 +334,7 @@ class CsvWriterTests {
             amount = 10_000.msat,
             paymentHash = randomBytes32(),
             privateKey = PrivateKey(value = randomBytes32()),
-            description = "fake invoice",
+            description = Either.Left("fake invoice"),
             minFinalCltvExpiryDelta = CltvExpiryDelta(128),
             features = TestConstants.Bob.nodeParams.features,
             paymentSecret = randomBytes32(),
