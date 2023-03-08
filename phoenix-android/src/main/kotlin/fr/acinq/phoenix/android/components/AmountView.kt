@@ -69,18 +69,11 @@ fun AmountView(
         LocalBitcoinUnit.current
     }
     val inFiat = LocalShowInFiat.current
-
-    // for the press animation
     val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
 
     Row(
         horizontalArrangement = Arrangement.Center,
         modifier = modifier
-            .graphicsLayer {
-                scaleX = if (isPressed) 0.9f else 1f
-                scaleY = if (isPressed) 0.9f else 1f
-            }
             .then(if (onClick != null) Modifier.clickable(
                 interactionSource = interactionSource,
                 indication = null,

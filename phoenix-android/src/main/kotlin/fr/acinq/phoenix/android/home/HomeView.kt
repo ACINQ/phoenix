@@ -121,17 +121,20 @@ fun HomeView(
                 AmountView(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
+                        .fillMaxWidth()
                         .padding(horizontal = if (isAmountRedacted) 40.dp else 16.dp),
                     amount = balance,
                     amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 40.sp),
                     unitTextStyle = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
                     isRedacted = isAmountRedacted,
                     onClick = { context, inFiat ->
-                        when (UserPrefs.getHomeAmountDisplayMode(context).firstOrNull()) {
-                            HomeAmountDisplayMode.BTC -> { UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.FIAT) }
-                            HomeAmountDisplayMode.FIAT -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.REDACTED)
-                            HomeAmountDisplayMode.REDACTED -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.BTC)
-                            null -> Unit
+                        val mode = UserPrefs.getHomeAmountDisplayMode(context).firstOrNull()
+                        when {
+                            inFiat && mode == HomeAmountDisplayMode.BTC -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.REDACTED)
+                            mode == HomeAmountDisplayMode.BTC -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.FIAT)
+                            mode == HomeAmountDisplayMode.FIAT -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.REDACTED)
+                            mode == HomeAmountDisplayMode.REDACTED -> UserPrefs.saveHomeAmountDisplayMode(context, HomeAmountDisplayMode.BTC)
+                            else -> Unit
                         }
                     }
                 )
