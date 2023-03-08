@@ -77,6 +77,7 @@ val gray100 = Color(0xffd1d7e3)
 val gray70 = Color(0xffe1eBeD)
 val gray50 = Color(0xFFE9F1F3)
 val gray30 = Color(0xFFEFF4F5)
+val gray10 = Color(0xFFF5F8FA)
 
 private val LightColorPalette = lightColors(
     // primary
@@ -88,7 +89,7 @@ private val LightColorPalette = lightColors(
     secondaryVariant = horizon,
     onSecondary = white,
     // app background
-    background = gray30,
+    background = gray10,
     onBackground = gray900,
     // components background
     surface = white,
@@ -213,22 +214,22 @@ fun PhoenixAndroidTheme(
     CompositionLocalProvider(
         LocalTheme provides userTheme
     ) {
-        val entry = navController.currentBackStackEntryAsState()
-        val statusBarColor = systemStatusBarColor()
-        val navBarColor = systemNavBarColor(entry.value)
         val isDarkTheme = isDarkTheme
-        LaunchedEffect(navBarColor, statusBarColor) {
-            systemUiController.run {
-                setStatusBarColor(statusBarColor, darkIcons = !isDarkTheme)
-                setNavigationBarColor(navBarColor, darkIcons = !isDarkTheme)
-            }
-        }
         val palette = if (isDarkTheme) DarkColorPalette else LightColorPalette
         MaterialTheme(
             colors = palette,
             typography = typography(palette),
             shapes = shapes
         ) {
+            val entry = navController.currentBackStackEntryAsState()
+            val statusBarColor = systemStatusBarColor()
+            val navBarColor = systemNavBarColor(entry.value)
+            LaunchedEffect(navBarColor, statusBarColor) {
+                systemUiController.run {
+                    setStatusBarColor(statusBarColor, darkIcons = !isDarkTheme)
+                    setNavigationBarColor(navBarColor, darkIcons = !isDarkTheme)
+                }
+            }
             val rippleIndication = rememberRipple(color = if (isDarkTheme) gray300 else gray600)
             CompositionLocalProvider(LocalIndication provides rippleIndication) {
                 content()
@@ -259,13 +260,13 @@ fun mutedBgColor(): Color = if (isDarkTheme) gray950 else gray30
 fun borderColor(): Color = if (isDarkTheme) gray800 else gray70
 
 @Composable
-fun systemStatusBarColor() = if (isDarkTheme) black else mutedBgColor()
+fun systemStatusBarColor() = MaterialTheme.colors.background
 
 @Composable
 fun systemNavBarColor(entry: NavBackStackEntry?): Color = if (entry?.destination?.route == Screen.Home.route) {
-    if (isDarkTheme) mutedBgColor() else white
+    MaterialTheme.colors.surface
 } else {
-    if (isDarkTheme) black else mutedBgColor()
+    MaterialTheme.colors.background
 }
 
 @Composable
@@ -301,15 +302,15 @@ fun getColor(context: Context, @AttrRes attrRes: Int): Int {
 fun appBackground(): Color {
     // -- gradient Brush
     // val isDark = isDarkTheme
-    //    val topGradientColor = if (isDark) gray950 else white
-    //    val bottomGradientColor = if (isDark) black else gray70
-    //    return Brush.linearGradient(
-    //        0.2f to topGradientColor,
-    //        1.0f to bottomGradientColor,
-    //        start = Offset.Zero,
-    //        end = Offset.Infinite,
-    //    )
-    return if (isDarkTheme) black else mutedBgColor()
+    // val topGradientColor = if (isDark) gray950 else white
+    // val bottomGradientColor = if (isDark) black else gray70
+    // return Brush.linearGradient(
+    //     0.2f to topGradientColor,
+    //     1.0f to bottomGradientColor,
+    //     start = Offset.Zero,
+    //     end = Offset.Infinite,
+    // )
+    return MaterialTheme.colors.background
 }
 
 enum class UserTheme {

@@ -61,7 +61,6 @@ fun BackButton(onClick: () -> Unit) {
 @Composable
 fun DefaultScreenLayout(
     isScrollable: Boolean = true,
-    backgroundColor: Color = MaterialTheme.colors.background,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: @Composable ColumnScope.() -> Unit,
@@ -69,7 +68,6 @@ fun DefaultScreenLayout(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundColor)
             .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier),
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
