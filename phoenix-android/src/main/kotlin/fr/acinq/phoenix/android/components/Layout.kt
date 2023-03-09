@@ -138,7 +138,7 @@ fun VSeparator(
 
 @Composable
 fun PrimarySeparator(
-    modifier: Modifier = Modifier, width: Dp = 50.dp, height: Dp = 8.dp
+    modifier: Modifier = Modifier, width: Dp = 60.dp, height: Dp = 8.dp
 ) {
     Surface(
         shape = CircleShape,
