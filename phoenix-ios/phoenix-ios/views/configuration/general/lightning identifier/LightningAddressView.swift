@@ -16,8 +16,12 @@ struct LightningAddressView: View {
 	@State var username: String = ""
 	@State var registrationRowTruncated: Bool = false
 	
-	@State var isValidAddress: Bool = false
-	@State var isAvailableAddress: Bool = false
+	@State var needsCheckAvailability: Bool = false
+	@State var isCheckingAvailability: Bool = false
+	@State var checkAvailabilityTimer: Timer? = nil
+	
+	@State var isValidUsername: Bool = false
+	@State var isAvailableUsername: Bool = false
 	@State var hasInvalidCharacters: Bool = false
 	
 	enum MaxTextFieldWidth: Preference {}
@@ -49,6 +53,9 @@ struct LightningAddressView: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
+		.onChange(of: username) { text in
+			usernameChanged()
+		}
 	}
 	
 	@ViewBuilder
@@ -106,8 +113,10 @@ struct LightningAddressView: View {
 					} // </Button>
 					.buttonStyle(ScaleButtonStyle(
 						cornerRadius: 100,
-						backgroundFill: Color.appAccent
+						backgroundFill: Color.appAccent,
+						disabledBackgroundFill: Color.gray
 					))
+					.disabled(reserveButtonDisabled())
 					Spacer()
 				}
 			}
@@ -206,19 +215,164 @@ struct LightningAddressView: View {
 	@ViewBuilder
 	func availability() -> some View {
 		
-		HStack(alignment: VerticalAlignment.center, spacing: 4) {
-			Image(systemName: "circle.dotted")
-				.font(.callout)
-				.imageScale(.large)
-			Text("Start typing to check availability")
-				.font(.subheadline)
+		if username.isEmpty {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				Image(systemName: "circle.dotted")
+					.font(.callout)
+					.imageScale(.large)
+				Text("Start typing to check availability")
+					.font(.subheadline)
+			}
+			.foregroundColor(.appPositive)
+			
+		} else if !isValidUsername {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				Image(systemName: "pencil.circle")
+					.font(.callout)
+					.imageScale(.large)
+				Text("Invalid username")
+					.font(.subheadline)
+			}
+			.foregroundColor(.appNegative)
+			
+		} else if isCheckingAvailability || needsCheckAvailability {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				Image(systemName: "hourglass.circle")
+					.font(.callout)
+					.imageScale(.large)
+				Text("Checking availability...")
+					.font(.subheadline)
+			}
+			.foregroundColor(.primary)
+			
+		} else if !isAvailableUsername {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				Image(systemName: "x.circle.fill")
+					.font(.callout)
+					.imageScale(.large)
+				Text("Username taken")
+					.font(.subheadline)
+			}
+			.foregroundColor(.appNegative)
+			
+		} else {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				Image(systemName: "checkmark.circle.fill")
+					.font(.callout)
+					.imageScale(.large)
+				Text("Username available")
+					.font(.subheadline)
+			}
+			.foregroundColor(.appPositive)
 		}
-		.foregroundColor(.appPositive)
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+
+	func reserveButtonDisabled() -> Bool {
+		
+		return needsCheckAvailability || isCheckingAvailability || !isValidUsername || !isAvailableUsername
+	}
+	
+	// --------------------------------------------------
+	// MARK: Utilities
+	// --------------------------------------------------
+	
+	func checkIsValidUsername(_ str: String) -> Bool {
+		
+		let charset = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyz0123456789-_.")
+		return str.unicodeScalars.allSatisfy { charset.contains($0) }
 	}
 	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
+	
+	func usernameChanged() {
+		log.trace("usernameChanged()")
+		
+		isValidUsername = checkIsValidUsername(username.lowercased())
+		if isValidUsername {
+			
+			needsCheckAvailability = true
+			
+			if checkAvailabilityTimer != nil {
+				checkAvailabilityTimer?.invalidate()
+				checkAvailabilityTimer = nil
+			}
+			checkAvailabilityTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
+				checkAvailability()
+			}
+		}
+	}
+	
+	func checkAvailability() {
+		log.trace("checkAvailability")
+		
+		let usernameSnapshot = username.lowercased()
+		if !checkIsValidUsername(usernameSnapshot) {
+			return
+		}
+		
+		let url = URL(string: "https://phoenix.deusty.com/v1/pub/lnid/availability")
+		guard let requestUrl = url else { return }
+		
+		let body = [
+			"username": usernameSnapshot
+		]
+		let bodyData = try? JSONSerialization.data(
+			 withJSONObject: body,
+			 options: []
+		)
+		
+		var request = URLRequest(url: requestUrl)
+		request.httpMethod = "POST"
+		request.httpBody = bodyData
+		
+		struct AvailabilityResponse: Codable {
+			let available: Bool
+		}
+		
+		let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+			
+			guard self.username.lowercased() == usernameSnapshot else {
+				// TextField has changed since we sent the availability request.
+				// Ignore response.
+				return
+			}
+			
+			if let data = data, let response: AvailabilityResponse = data.jsonDecode() {
+				
+				self.isAvailableUsername = response.available
+				self.needsCheckAvailability = false
+				
+			} else {
+				
+				if let error = error {
+					log.debug("/lnid/availability: error: \(String(describing: error))")
+				}
+				if let httpResponse = response as? HTTPURLResponse {
+					log.debug("/lnid/availability: statusCode: \(httpResponse.statusCode)")
+				}
+				if let data = data, let dataString = String(data: data, encoding: .utf8) {
+					log.debug("/lnid/availability: response:\n\(dataString)")
+				}
+			}
+			
+			self.isCheckingAvailability = false
+		}
+		
+		isCheckingAvailability = true
+		log.debug("/lnid/availability ...")
+		task.resume()
+	}
 	
 	func reserveButtonTapped() {
 		log.trace("reserveButtonTapped()")
