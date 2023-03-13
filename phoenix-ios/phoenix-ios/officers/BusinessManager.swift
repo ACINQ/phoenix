@@ -262,6 +262,15 @@ class BusinessManager {
 	public var nodeIdHash: String? {
 		return walletInfo?.nodeIdHash
 	}
+	
+	/// The current nodeId (from the current unlocked wallet).
+	///
+	/// Always fetch this on demand - don't cache it.
+	/// Because it might change if the user closes his/her wallet.
+	///
+	public var nodeId: String? {
+		return walletInfo?.nodeId.toHex()
+	}
 
 	// --------------------------------------------------
 	// MARK: Push Token

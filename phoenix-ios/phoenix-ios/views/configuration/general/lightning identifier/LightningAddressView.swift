@@ -13,6 +13,8 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct LightningAddressView: View {
 	
+	@State var registration = Prefs.shared.lightningAddress
+	
 	@State var username: String = ""
 	@State var registrationRowTruncated: Bool = false
 	
@@ -20,9 +22,17 @@ struct LightningAddressView: View {
 	@State var isCheckingAvailability: Bool = false
 	@State var checkAvailabilityTimer: Timer? = nil
 	
+	@State var isRegistering: Bool = false
+	
 	@State var isValidUsername: Bool = false
 	@State var isAvailableUsername: Bool = false
 	@State var hasInvalidCharacters: Bool = false
+	
+	@State var networkError: Bool = false
+	
+	@State var lnAddrTruncated_title1: Bool = false
+	@State var lnAddrTruncated_title2: Bool = false
+	@State var lnAddrTruncated_title3: Bool = false
 	
 	enum MaxTextFieldWidth: Preference {}
 	let maxTextFieldWidthReader = GeometryPreferenceReader(
@@ -31,6 +41,10 @@ struct LightningAddressView: View {
 	)
 	@State var maxTextFieldWidth: CGFloat? = nil
 	
+	@StateObject var toast = Toast()
+	
+	@Environment(\.colorScheme) var colorScheme: ColorScheme
+	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -38,9 +52,12 @@ struct LightningAddressView: View {
 	@ViewBuilder
 	var body: some View {
 		
-		content()
-			.navigationTitle(NSLocalizedString("Lightning Address", comment: "Navigation Bar Title"))
-			.navigationBarTitleDisplayMode(.inline)
+		ZStack {
+			content()
+			toast.view()
+		}
+		.navigationTitle(NSLocalizedString("Lightning Address", comment: "Navigation Bar Title"))
+		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -48,8 +65,13 @@ struct LightningAddressView: View {
 		
 		List {
 			section_explanation()
-			section_register()
-			section_notes()
+			if let registration {
+				section_registration(registration)
+				section_remember(registration)
+			} else {
+				section_register()
+				section_notes()
+			}
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
@@ -83,6 +105,117 @@ struct LightningAddressView: View {
 				}
 			}
 		}
+	}
+	
+	@ViewBuilder
+	func section_registration(_ registration: LightningAddress) -> some View {
+		
+		Section(header: Text("Your address")) {
+			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+				
+				Label {
+					section_registration_lnAddr(registration)
+				} icon: {
+					Button {
+						copyLightningAddressToPasteboard()
+					} label: {
+						Image(systemName: "square.on.square")
+					}
+				}
+				.padding(.bottom, 40)
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					Spacer()
+					Button {
+						changeButtonTapped()
+					} label: {
+						Text("Change")
+					}
+					Spacer()
+				}
+			}
+			
+		} // </Section>
+	}
+	
+	@ViewBuilder
+	func section_registration_lnAddr(_ registration: LightningAddress) -> some View {
+		
+		if lnAddrTruncated_title3 {
+			
+			Text(verbatim: lightningAddress(registration))
+				.font(.body.weight(.semibold))
+				.multilineTextAlignment(.trailing)
+			
+		} else if lnAddrTruncated_title2 {
+			
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				Text(verbatim: lightningAddress(registration))
+					.font(.title3.weight(.semibold))
+					.lineLimit(1)
+			} wasTruncated: {
+				lnAddrTruncated_title3 = true
+			}
+			
+		} else if lnAddrTruncated_title1 {
+			
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				Text(verbatim: lightningAddress(registration))
+					.font(.title2.weight(.semibold))
+					.lineLimit(1)
+			} wasTruncated: {
+				lnAddrTruncated_title2 = true
+			}
+			
+		} else {
+			
+			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+				Text(verbatim: lightningAddress(registration))
+					.font(.title.weight(.semibold))
+					.lineLimit(1)
+			} wasTruncated: {
+				lnAddrTruncated_title1 = true
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func section_remember(_ registration: LightningAddress) -> some View {
+		
+		Section(header: Text("Remember")) {
+			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+				
+				if let altUsername = altUsername(registration) {
+					Label {
+						Text(
+							"""
+							Your username is case-insensitive:
+							\(registration.username) = \(altUsername)
+							"""
+						)
+					} icon: {
+						Image(systemName: "textformat")
+					}
+					.font(.callout)
+					.foregroundColor(.secondary)
+					.padding(.bottom, 15)
+				}
+				
+				Label {
+					Text(
+					  """
+					  Phoenix is a non-custodial wallet - payments are received directly on this device. \
+					  So your device must be on and connected to the internet to receive a payment.
+					  """
+					)
+				} icon: {
+					Image(systemName: "paperclip")
+				}
+				.font(.callout)
+				.foregroundColor(.secondary)
+				
+			} // </VStack>
+		} // </Section>
 	}
 	
 	@ViewBuilder
@@ -169,7 +302,7 @@ struct LightningAddressView: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 4) {
 			register_username_textField()
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				Text("@myphoenix.app")
+				Text(verbatim: lightningDomain())
 					.bold()
 					.lineLimit(1)
 					
@@ -188,7 +321,7 @@ struct LightningAddressView: View {
 			register_username_textField()
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				Spacer()
-				Text("@myphoenix.app")
+				Text(verbatim: lightningDomain())
 			}
 		}
 	}
@@ -202,6 +335,7 @@ struct LightningAddressView: View {
 		)
 		.textFieldAutocapitalization(.never)
 		.disableAutocorrection(true)
+		.disabled(isRegistering)
 		.padding([.leading, .vertical], 8)
 		.padding(.trailing, 4)
 		.overlay(
@@ -259,6 +393,28 @@ struct LightningAddressView: View {
 			}
 			.foregroundColor(.appNegative)
 			
+		} else if isRegistering {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				Image(systemName: "hourglass.circle")
+					.font(.callout)
+					.imageScale(.large)
+				Text("Reserving username...")
+					.font(.subheadline)
+			}
+			.foregroundColor(.primary)
+			
+		} else if networkError {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				Image(systemName: "exclamationmark.circle")
+					.font(.callout)
+					.imageScale(.large)
+				Text("Error - check network connection")
+					.font(.subheadline)
+			}
+			.foregroundColor(.appNegative)
+			
 		} else {
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 4) {
@@ -275,7 +431,7 @@ struct LightningAddressView: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
-
+	
 	func reserveButtonDisabled() -> Bool {
 		
 		return needsCheckAvailability || isCheckingAvailability || !isValidUsername || !isAvailableUsername
@@ -288,7 +444,53 @@ struct LightningAddressView: View {
 	func checkIsValidUsername(_ str: String) -> Bool {
 		
 		let charset = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyz0123456789-_.")
-		return str.unicodeScalars.allSatisfy { charset.contains($0) }
+		let lowercaseStr = str.lowercased()
+		return lowercaseStr.unicodeScalars.allSatisfy { charset.contains($0) }
+	}
+	
+	func lightningDomain() -> String {
+		
+		return "@phoenix.deusty.com"
+	}
+	
+	func lightningAddress() -> String? {
+		
+		if let registration {
+			return lightningAddress(registration)
+		} else {
+			return nil
+		}
+	}
+	
+	func lightningAddress(_ registration: LightningAddress) -> String {
+		
+		return "\(registration.username)\(lightningDomain())"
+	}
+	
+	func altUsername(_ registration: LightningAddress) -> String? {
+		
+		var idx = 0
+		let alt1 = registration.username.map { (c: Character) in
+			let altC = (idx % 2 == 0) ? c.lowercased() : c.uppercased()
+			idx += 1
+			return altC
+		}.joined()
+		
+		if alt1 != registration.username {
+			return alt1
+		}
+		
+		let alt2 = registration.username.lowercased()
+		if alt2 != registration.username {
+			return alt2
+		}
+		
+		let alt3 = registration.username.uppercased()
+		if alt3 != registration.username {
+			return alt3
+		}
+		
+		return nil
 	}
 	
 	// --------------------------------------------------
@@ -298,7 +500,7 @@ struct LightningAddressView: View {
 	func usernameChanged() {
 		log.trace("usernameChanged()")
 		
-		isValidUsername = checkIsValidUsername(username.lowercased())
+		isValidUsername = checkIsValidUsername(username)
 		if isValidUsername {
 			
 			needsCheckAvailability = true
@@ -313,11 +515,28 @@ struct LightningAddressView: View {
 		}
 	}
 	
+	func copyLightningAddressToPasteboard() {
+		log.trace("copyLightningAddressToPasteboard()")
+		
+		guard let registration else {
+			return
+		}
+		
+		let lnAddr = "\(registration.username)\(lightningDomain())"
+		
+		UIPasteboard.general.string = lnAddr
+		toast.pop(
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+			colorScheme: colorScheme.opposite,
+			alignment: .bottom
+		)
+	}
+	
 	func checkAvailability() {
 		log.trace("checkAvailability")
 		
-		let usernameSnapshot = username.lowercased()
-		if !checkIsValidUsername(usernameSnapshot) {
+		let _username = username
+		if !checkIsValidUsername(_username) {
 			return
 		}
 		
@@ -325,7 +544,7 @@ struct LightningAddressView: View {
 		guard let requestUrl = url else { return }
 		
 		let body = [
-			"username": usernameSnapshot
+			"username": _username
 		]
 		let bodyData = try? JSONSerialization.data(
 			 withJSONObject: body,
@@ -336,13 +555,9 @@ struct LightningAddressView: View {
 		request.httpMethod = "POST"
 		request.httpBody = bodyData
 		
-		struct AvailabilityResponse: Codable {
-			let available: Bool
-		}
-		
 		let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
 			
-			guard self.username.lowercased() == usernameSnapshot else {
+			guard self.username == _username else {
 				// TextField has changed since we sent the availability request.
 				// Ignore response.
 				return
@@ -352,6 +567,7 @@ struct LightningAddressView: View {
 				
 				self.isAvailableUsername = response.available
 				self.needsCheckAvailability = false
+				self.networkError = false
 				
 			} else {
 				
@@ -364,6 +580,7 @@ struct LightningAddressView: View {
 				if let data = data, let dataString = String(data: data, encoding: .utf8) {
 					log.debug("/lnid/availability: response:\n\(dataString)")
 				}
+				self.networkError = true
 			}
 			
 			self.isCheckingAvailability = false
@@ -377,6 +594,110 @@ struct LightningAddressView: View {
 	func reserveButtonTapped() {
 		log.trace("reserveButtonTapped()")
 		
+		let _username = username
+		if !checkIsValidUsername(_username) {
+			return
+		}
+		
+		guard let nodeId = Biz.nodeId else {
+			return
+		}
+		
+		let url = URL(string: "https://phoenix.deusty.com/v1/pub/lnid/register")
+		guard let requestUrl = url else { return }
+		
+		let body = [
+			"username" : _username,
+			"node_id"  : nodeId
+		]
+		let bodyData = try? JSONSerialization.data(
+			 withJSONObject: body,
+			 options: []
+		)
+		
+		var request = URLRequest(url: requestUrl)
+		request.httpMethod = "POST"
+		request.httpBody = bodyData
+		
+		let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+			
+			if let data = data, let response = RegisterResponse.decode(data) {
+				
+				switch response.result {
+					case .Left(let success):
+						let addr = LightningAddress(username: _username, created: success.createdDate)
+						Prefs.shared.lightningAddress = addr
+						self.registration = addr
+					
+					case .Right(let failure):
+						log.debug("/lnid/register: error_msg: \(failure.error)")
+						log.debug("/lnid/register: error_code: \(failure.error_code)")
+						self.isAvailableUsername = false
+				}
+				self.networkError = false
+				
+			} else {
+				
+				if let error = error {
+					log.debug("/lnid/register: error: \(String(describing: error))")
+				}
+				if let httpResponse = response as? HTTPURLResponse {
+					log.debug("/lnid/register: statusCode: \(httpResponse.statusCode)")
+				}
+				if let data = data, let dataString = String(data: data, encoding: .utf8) {
+					log.debug("/lnid/register: response:\n\(dataString)")
+				}
+				
+				self.networkError = true
+			}
+			
+			self.isRegistering = false
+		}
+		
+		isRegistering = true
+		log.debug("/lnid/register ...")
+		task.resume()
+	}
+	
+	func changeButtonTapped() {
+		log.trace("changeButtonTapped()")
+		
 		// Todo...
+	}
+}
+
+// MARK: -
+
+struct AvailabilityResponse: Codable {
+	let available: Bool
+}
+
+struct RegisterResponse {
+	let result: Either<Success, Failure>
+	
+	struct Success: Codable {
+		let message: String
+		let username: String
+		let created: Int64
+		
+		var createdDate: Date {
+			return created.toDate(from: .milliseconds)
+		}
+	}
+	
+	struct Failure: Codable {
+		let error: String
+		let error_code: Int
+	}
+	
+	static func decode(_ data: Data) -> RegisterResponse? {
+		
+		if let success: Success = data.jsonDecode() {
+			return RegisterResponse(result: Either.Left(success))
+		}
+		if let failure: Failure = data.jsonDecode() {
+			return RegisterResponse(result: Either.Right(failure))
+		}
+		return nil
 	}
 }

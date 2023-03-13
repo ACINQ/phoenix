@@ -23,6 +23,7 @@ fileprivate enum Key: String {
 	case maxFees
 	case hideAmountsOnHomeScreen
 	case recentPaymentsConfig
+	case lightningAddress
 }
 
 fileprivate enum KeyDeprecated: String {
@@ -123,6 +124,11 @@ class Prefs {
 		set { defaults.recentPaymentsConfig = newValue.jsonEncode() }
 	}
 	
+	var lightningAddress: LightningAddress? {
+		get { defaults.lightningAddress?.jsonDecode() }
+		set { defaults.lightningAddress = newValue?.jsonEncode() }
+	}
+	
 	// --------------------------------------------------
 	// MARK: Wallet State
 	// --------------------------------------------------
@@ -172,7 +178,6 @@ class Prefs {
 		get { defaults.pushTokenRegistration?.jsonDecode() }
 		set { defaults.pushTokenRegistration = newValue?.jsonEncode() }
 	}
-
 
 	// --------------------------------------------------
 	// MARK: Backup
@@ -240,6 +245,7 @@ class Prefs {
 		defaults.removeObject(forKey: Key.maxFees.rawValue)
 		defaults.removeObject(forKey: Key.hideAmountsOnHomeScreen.rawValue)
 		defaults.removeObject(forKey: Key.recentPaymentsConfig.rawValue)
+		defaults.removeObject(forKey: Key.lightningAddress.rawValue)
 		
 		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
 		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
@@ -296,5 +302,10 @@ extension UserDefaults {
 	@objc fileprivate var pushTokenRegistration: Data? {
 		get { data(forKey: Key.pushTokenRegistration.rawValue) }
 		set { set(newValue, forKey: Key.pushTokenRegistration.rawValue) }
+	}
+	
+	@objc fileprivate var lightningAddress: Data? {
+		get { data(forKey: Key.lightningAddress.rawValue) }
+		set { set(newValue, forKey: Key.lightningAddress.rawValue) }
 	}
 }

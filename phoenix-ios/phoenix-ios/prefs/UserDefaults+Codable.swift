@@ -131,3 +131,8 @@ enum RecentPaymentsConfig: Equatable, Codable, Identifiable {
 		}
 	}
 }
+
+struct LightningAddress: Equatable, Codable {
+	let username: String
+	let created: Date
+}
