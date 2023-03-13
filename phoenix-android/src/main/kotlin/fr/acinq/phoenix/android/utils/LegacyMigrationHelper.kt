@@ -31,10 +31,7 @@ import fr.acinq.eclair.wire.TemporaryNodeFailure
 import fr.acinq.eclair.wire.TrampolineFeeInsufficient
 import fr.acinq.eclair.wire.UnknownNextPeer
 import fr.acinq.lightning.*
-import fr.acinq.lightning.db.ChannelClosingType
-import fr.acinq.lightning.db.HopDesc
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.*
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.PaymentRequest
@@ -155,36 +152,36 @@ object LegacyMigrationHelper {
                 newPaymentsDb.addOutgoingPayment(payment)
                 // status must be updated separately!
                 when (val status = payment.status) {
-                    is OutgoingPayment.Status.Completed.Succeeded.OffChain -> {
+                    is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> {
                         newPaymentsDb.completeOutgoingPaymentOffchain(
                             id = payment.id,
                             preimage = status.preimage,
                             completedAt = status.completedAt
                         )
                     }
-                    is OutgoingPayment.Status.Completed.Succeeded.OnChain -> {
+                    is LightningOutgoingPayment.Status.Completed.Succeeded.OnChain -> {
                         newPaymentsDb.completeOutgoingPaymentForClosing(
                             id = payment.id,
                             parts = emptyList(), // closing tx parts have already been inserted
                             completedAt = status.completedAt
                         )
                     }
-                    is OutgoingPayment.Status.Completed.Failed -> {
+                    is LightningOutgoingPayment.Status.Completed.Failed -> {
                         newPaymentsDb.completeOutgoingPaymentOffchain(
                             id = payment.id,
                             finalFailure = status.reason,
                             completedAt = status.completedAt
                         )
                     }
-                    OutgoingPayment.Status.Pending -> {
+                    LightningOutgoingPayment.Status.Pending -> {
                         // no need to update the DB as this is the default status
                     }
                 }
-                payment.parts.filterIsInstance<OutgoingPayment.LightningPart>().forEach { part ->
+                payment.parts.filterIsInstance<LightningOutgoingPayment.LightningPart>().forEach { part ->
                     when (val status = part.status) {
-                        is OutgoingPayment.LightningPart.Status.Succeeded -> newPaymentsDb.completeOutgoingLightningPart(part.id, status.preimage, status.completedAt)
-                        is OutgoingPayment.LightningPart.Status.Failed -> newPaymentsDb.completeOutgoingLightningPartLegacy(part.id, status, status.completedAt)
-                        OutgoingPayment.LightningPart.Status.Pending -> {}
+                        is LightningOutgoingPayment.LightningPart.Status.Succeeded -> newPaymentsDb.completeOutgoingLightningPart(part.id, status.preimage, status.completedAt)
+                        is LightningOutgoingPayment.LightningPart.Status.Failed -> newPaymentsDb.completeOutgoingLightningPartLegacy(part.id, status, status.completedAt)
+                        LightningOutgoingPayment.LightningPart.Status.Pending -> {}
                     }
                 }
                 log.debug("migrated outgoing payment=$payment")
@@ -304,7 +301,7 @@ object LegacyMigrationHelper {
         parentId: UUID,
         listOfParts: List<fr.acinq.eclair.db.OutgoingPayment>,
         paymentMeta: PaymentMeta?,
-    ): OutgoingPayment {
+    ): LightningOutgoingPayment {
         val head = listOfParts.first()
         val paymentRequest = if (head.paymentRequest().isDefined) {
             PaymentRequest.read(fr.acinq.eclair.payment.PaymentRequest.write(head.paymentRequest().get()))
@@ -312,7 +309,7 @@ object LegacyMigrationHelper {
 
         // retrieve details from the first payment in the list
         val details = if (paymentMeta?.swap_out_address != null) {
-            OutgoingPayment.Details.SwapOut(
+            LightningOutgoingPayment.Details.SwapOut(
                 address = paymentMeta.swap_out_address ?: "",
                 paymentRequest = paymentRequest ?: PaymentRequest.create(
                     chainHash = chainHash,
@@ -326,22 +323,22 @@ object LegacyMigrationHelper {
                 swapOutFee = paymentMeta.swap_out_fee_sat?.sat ?: 0.sat
             )
         } else if (head.paymentType() == "ClosingChannel") {
-            OutgoingPayment.Details.ChannelClosing(
+            LightningOutgoingPayment.Details.ChannelClosing(
                 channelId = paymentMeta?.closing_channel_id?.let { ByteVector32.fromValidHex(it) } ?: Lightning.randomBytes32().sha256(),
                 closingAddress = paymentMeta?.closing_main_output_script ?: "",
                 isSentToDefaultAddress = paymentMeta?.closing_type != ClosingType.Mutual.code
             )
         } else if (paymentRequest != null) {
-            OutgoingPayment.Details.Normal(paymentRequest)
+            LightningOutgoingPayment.Details.Normal(paymentRequest)
         } else {
-            OutgoingPayment.Details.KeySend(preimage = Lightning.randomBytes32().sha256())
+            LightningOutgoingPayment.Details.KeySend(preimage = Lightning.randomBytes32().sha256())
         }
 
         // lightning parts
         val lightningParts = listOfParts.filter { it.paymentType() == PaymentType.Standard() }.map { part ->
             when (val partStatus = part.status()) {
                 is OutgoingPaymentStatus.Succeeded -> {
-                    OutgoingPayment.LightningPart(
+                    LightningOutgoingPayment.LightningPart(
                         id = UUID.fromString(part.id().toString()),
                         amount = part.amount().toLong().msat + partStatus.feesPaid().toLong().msat, // must include the fee!!!
                         route = JavaConverters.asJavaCollectionConverter(partStatus.route()).asJavaCollection().toList().map { hop ->
@@ -351,7 +348,7 @@ object LegacyMigrationHelper {
                                 shortChannelId = if (hop.shortChannelId().isDefined) ShortChannelId(hop.shortChannelId().get().toLong()) else null
                             )
                         },
-                        status = OutgoingPayment.LightningPart.Status.Succeeded(
+                        status = LightningOutgoingPayment.LightningPart.Status.Succeeded(
                             preimage = partStatus.paymentPreimage().bytes().toArray().byteVector32(),
                             completedAt = partStatus.completedAt()
                         ),
@@ -359,11 +356,11 @@ object LegacyMigrationHelper {
                     )
                 }
                 is OutgoingPaymentStatus.Failed -> {
-                    OutgoingPayment.LightningPart(
+                    LightningOutgoingPayment.LightningPart(
                         id = UUID.fromString(part.id().toString()),
                         amount = part.amount().toLong().msat + 0.msat, // must include the fee!!!
                         route = listOf(),
-                        status = OutgoingPayment.LightningPart.Status.Failed(
+                        status = LightningOutgoingPayment.LightningPart.Status.Failed(
                             remoteFailureCode = null,
                             details = JavaConverters.asJavaCollectionConverter(partStatus.failures()).asJavaCollection().toList().lastOrNull()?.failureMessage() ?: "error details unavailable",
                             completedAt = partStatus.completedAt()
@@ -372,11 +369,11 @@ object LegacyMigrationHelper {
                     )
                 }
                 else -> {
-                    OutgoingPayment.LightningPart(
+                    LightningOutgoingPayment.LightningPart(
                         id = UUID.fromString(part.id().toString()),
                         amount = part.amount().toLong().msat + 0.msat, // must include the fee!!!
                         route = listOf(),
-                        status = OutgoingPayment.LightningPart.Status.Pending,
+                        status = LightningOutgoingPayment.LightningPart.Status.Pending,
                         createdAt = part.createdAt()
                     )
                 }
@@ -386,7 +383,7 @@ object LegacyMigrationHelper {
         val closingTxs = paymentMeta?.getSpendingTxs()?.map { ByteVector32.fromValidHex(it) } ?: emptyList()
         val closingTxsParts = if (head.paymentType() == "ClosingChannel") {
             closingTxs.mapIndexed { index, tx ->
-                OutgoingPayment.ClosingTxPart(
+                LightningOutgoingPayment.ClosingTxPart(
                     id = UUID.randomUUID(),
                     claimed = if (index == 0) head.amount().truncateToSatoshi().toLong().sat else 0.sat,
                     txId = tx,
@@ -404,22 +401,22 @@ object LegacyMigrationHelper {
         }
 
         // save status
-        val status: OutgoingPayment.Status = when {
+        val status: LightningOutgoingPayment.Status = when {
             listOfParts.any { p -> p.status() is OutgoingPaymentStatus.`Pending$` } -> {
                 // pending is the default status of the payment
-                OutgoingPayment.Status.Pending
+                LightningOutgoingPayment.Status.Pending
             }
             listOfParts.any { p -> p.status() is OutgoingPaymentStatus.Succeeded } -> {
                 val statuses = listOfParts.map { it.status() }.filterIsInstance<OutgoingPaymentStatus.Succeeded>()
                 if (paymentMeta?.swap_out_address != null && paymentMeta.swap_out_fee_sat != null && paymentMeta.swap_out_feerate_per_byte != null) {
-                    OutgoingPayment.Status.Completed.Succeeded.OffChain(
+                    LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(
                         preimage = statuses.first().paymentPreimage().bytes().toArray().byteVector32(),
                         completedAt = statuses.last().completedAt()
                     )
                 } else if (head.paymentType() == "ClosingChannel") {
-                    OutgoingPayment.Status.Completed.Succeeded.OnChain(completedAt = statuses.first().completedAt())
+                    LightningOutgoingPayment.Status.Completed.Succeeded.OnChain(completedAt = statuses.first().completedAt())
                 } else {
-                    OutgoingPayment.Status.Completed.Succeeded.OffChain(
+                    LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(
                         preimage = statuses.first().paymentPreimage().bytes().toArray().byteVector32(),
                         completedAt = statuses.first().completedAt()
                     )
@@ -440,15 +437,15 @@ object LegacyMigrationHelper {
                         else -> FinalFailure.UnknownError
                     } to (it.last().status() as OutgoingPaymentStatus.Failed).completedAt()
                 }
-                OutgoingPayment.Status.Completed.Failed(reason = finalFailure, completedAt = completedAt)
+                LightningOutgoingPayment.Status.Completed.Failed(reason = finalFailure, completedAt = completedAt)
             }
 
             else -> {
-                OutgoingPayment.Status.Pending
+                LightningOutgoingPayment.Status.Pending
             }
         }
 
-        return OutgoingPayment(
+        return LightningOutgoingPayment(
             id = parentId,
             recipientAmount = head.recipientAmount().toLong().msat,
             recipient = PublicKey.fromHex(head.recipientNodeId().toString()),

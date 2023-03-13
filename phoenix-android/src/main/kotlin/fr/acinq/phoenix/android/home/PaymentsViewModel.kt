@@ -19,8 +19,6 @@ package fr.acinq.phoenix.android.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
@@ -29,7 +27,6 @@ import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.Connections
 import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.managers.PaymentsPageFetcher
-import fr.acinq.phoenix.utils.extensions.createdAt
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,7 +49,7 @@ class PaymentsViewModel(
     private val initialPaymentsCount = 15
 
     /** How many payments should be visible in the home view. */
-    private val latestPaymentsCount = 3
+    private val latestPaymentsCount = 15
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -84,17 +81,15 @@ class PaymentsViewModel(
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             log.error("failed to collect last completed payment: ", e)
         }) {
-            paymentsManager.lastCompletedPayment.collect {
+            paymentsManager.lastCompletedPayment.filterNotNull().collect {
                 // a new row object must be built to get a fresh cache key for the payment fetcher
-                if (it != null) {
-                    val row = WalletPaymentOrderRow(
-                        id = it.walletPaymentId(),
-                        createdAt = it.createdAt,
-                        completedAt = it.completedAt(),
-                        metadataModifiedAt = null
-                    )
-                    fetchPaymentDetails(row)
-                }
+                val row = WalletPaymentOrderRow(
+                    id = it.walletPaymentId(),
+                    createdAt = it.createdAt,
+                    completedAt = it.completedAt,
+                    metadataModifiedAt = null
+                )
+                fetchPaymentDetails(row)
             }
         }
 
@@ -102,11 +97,11 @@ class PaymentsViewModel(
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             log.error("failed to collect all payments page items: ", e)
         }) {
-            paymentsPageFetcher.paymentsPage.collect {
+            paymentsPageFetcher.paymentsPage.collect { page ->
                 viewModelScope.launch(Dispatchers.Default) {
                     // We must rewrite the whole payments flow map to keep payments ordering.
                     // Adding the diff would only push new elements to the bottom of the map.
-                    _paymentsFlow.value = it.rows.associate { newRow ->
+                    _paymentsFlow.value = page.rows.associate { newRow ->
                         val paymentId = newRow.id.identifier
                         val existingData = paymentsFlow.value[paymentId]
                         // We look at the row to check if the payment has changed (the row contains timestamps)

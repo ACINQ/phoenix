@@ -39,9 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -123,16 +121,26 @@ fun PaymentDetailsSplashView(
                 fallbackValue = stringResource(id = R.string.paymentdetails_no_description)
             )
 
-            if (payment is OutgoingPayment) {
+            if (payment is LightningOutgoingPayment) {
                 Spacer(modifier = Modifier.height(8.dp))
                 DetailsRow(
                     label = stringResource(id = R.string.paymentdetails_destination_label),
                     value = when (val details = payment.details) {
-                        is OutgoingPayment.Details.Normal -> details.paymentRequest.nodeId.toString()
-                        is OutgoingPayment.Details.ChannelClosing -> details.closingAddress
-                        is OutgoingPayment.Details.KeySend -> null
-                        is OutgoingPayment.Details.SwapOut -> details.address
+                        is LightningOutgoingPayment.Details.Normal -> details.paymentRequest.nodeId.toString()
+                        is LightningOutgoingPayment.Details.ChannelClosing -> details.closingAddress
+                        is LightningOutgoingPayment.Details.KeySend -> null
+                        is LightningOutgoingPayment.Details.SwapOut -> details.address
                     },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            if (payment is SpliceOutgoingPayment) {
+                Spacer(modifier = Modifier.height(8.dp))
+                DetailsRow(
+                    label = stringResource(id = R.string.paymentdetails_destination_label),
+                    value = payment.address,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -206,25 +214,40 @@ private fun PaymentStatus(
     fromEvent: Boolean,
 ) {
     when (payment) {
-        is OutgoingPayment -> when (payment.status) {
-            is OutgoingPayment.Status.Pending -> PaymentStatusIcon(
+        is LightningOutgoingPayment -> when (payment.status) {
+            is LightningOutgoingPayment.Status.Pending -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_pending),
                 imageResId = R.drawable.ic_payment_details_pending_static,
                 isAnimated = false,
                 color = mutedTextColor()
             )
-            is OutgoingPayment.Status.Completed.Failed -> PaymentStatusIcon(
+            is LightningOutgoingPayment.Status.Completed.Failed -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_failed),
                 imageResId = R.drawable.ic_payment_details_failure_static,
                 isAnimated = false,
                 color = negativeColor()
             )
-            is OutgoingPayment.Status.Completed.Succeeded -> PaymentStatusIcon(
+            is LightningOutgoingPayment.Status.Completed.Succeeded -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_successful),
                 imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
                 isAnimated = fromEvent,
                 color = positiveColor(),
-                details = payment.completedAt().toAbsoluteDateTimeString()
+                details = payment.completedAt?.toAbsoluteDateTimeString()
+            )
+        }
+        is SpliceOutgoingPayment -> when (payment.confirmedAt) {
+            null -> PaymentStatusIcon(
+                message = stringResource(id = R.string.paymentdetails_status_splice_pending),
+                imageResId = R.drawable.ic_payment_details_pending_static,
+                isAnimated = false,
+                color = mutedTextColor(),
+            )
+            else -> PaymentStatusIcon(
+                message = stringResource(id = R.string.paymentdetails_status_splice_sent),
+                imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
+                isAnimated = fromEvent,
+                color = positiveColor(),
+                details = payment.completedAt?.toAbsoluteDateTimeString()
             )
         }
         is IncomingPayment -> when {
@@ -235,6 +258,16 @@ private fun PaymentStatus(
                 color = mutedTextColor()
             )
             payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().any { !it.confirmed } -> {
+                val minDepth = business.nodeParamsManager.nodeParams.value?.minDepthBlocks
+                PaymentStatusIcon(
+                    message = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
+                    isAnimated = false,
+                    imageResId = R.drawable.ic_clock,
+                    color = mutedTextColor(),
+                    details = minDepth?.let { stringResource(id = R.string.paymentdetails_status_received_unconfirmed_details, it) }
+                )
+            }
+            payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.SpliceIn>().any { !it.confirmed } -> {
                 val minDepth = business.nodeParamsManager.nodeParams.value?.minDepthBlocks
                 PaymentStatusIcon(
                     message = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),

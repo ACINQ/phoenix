@@ -356,6 +356,8 @@
     <string name="paymentdetails_loading">Loading payment details…</string>
     <string name="paymentdetails_error">There was an error when retrieving the details for this payment:\n\nCause:%1$s</string>
 
+    <string name="paymentdetails_status_splice_pending">Splice is confirming</string>
+    <string name="paymentdetails_status_splice_sent">Splice sent</string>
     <string name="paymentdetails_status_sent_successful">Sent</string>
     <string name="paymentdetails_status_sent_pending">Pending…</string>
     <string name="paymentdetails_status_sent_failed">Failed. No money has been sent.</string>
@@ -368,7 +370,7 @@
     <string name="paymentdetails_desc_label">Desc.</string>
     <string name="paymentdetails_desc_custom_title">Add note</string>
     <string name="paymentdetails_desc_custom_info">You can attach a note to this payment.</string>
-    <string name="paymentdetails_destination_label">To</string>
+    <string name="paymentdetails_destination_label">Sent to</string>
     <string name="paymentdetails_fees_label">Fees</string>
     <string name="paymentdetails_funding_fees_label">Miner fees</string>
     <string name="paymentdetails_funding_fees_desc">Bitcoin network fees paid for on-chain transaction.</string>
@@ -378,6 +380,7 @@
     <string name="paymentdetails_no_description">No description</string>
     <string name="paymentdetails_info_uniclose">This payment happened following a conflict in a channel.</string>
 
+    <string name="paymentdetails_desc_splice_out">Splice-out to %1$s</string>
     <string name="paymentdetails_desc_closing_channel">Closing channel</string>
     <string name="paymentdetails_desc_keysend">Donation</string>
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>
@@ -396,6 +399,7 @@
     <!-- //////////////// payment details: technicals data //////////////// -->
 
     <string name="paymentdetails_payment_type_label">Type of payment</string>
+    <string name="paymentdetails_splice_outgoing">Outgoing splice payment</string>
     <string name="paymentdetails_normal_outgoing">Standard outgoing Lightning payment</string>
     <string name="paymentdetails_normal_incoming">Standard incoming Lightning payment</string>
     <string name="paymentdetails_swapin">Swap-in Bitcoin deposit</string>
@@ -404,6 +408,7 @@
     <string name="paymentdetails_keysend">Keysend (spontaneous payment)</string>
     <string name="paymentdetails_swapin_address_label">Deposit address</string>
     <string name="paymentdetails_swapout_address_label">Bitcoin address</string>
+    <string name="paymentdetails_splice_out_address_label">Splice out address</string>
     <string name="paymentdetails_dualswapin_tx_label">Transactions</string>
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
@@ -418,6 +423,7 @@
 
     <string name="paymentdetails_status_label">Payment status</string>
     <string name="paymentdetails_status_success">Successful</string>
+    <string name="paymentdetails_status_confirming">Confirming</string>
     <string name="paymentdetails_status_pending">Pending</string>
     <string name="paymentdetails_status_failed">Failed</string>
 

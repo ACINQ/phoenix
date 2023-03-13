@@ -22,9 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
@@ -265,16 +263,17 @@ fun Connection.CLOSED.isBadCertificate() = this.reason?.cause is CertificateExce
  * payment with an invoice do have a description baked in, and that's what is returned.
  */
 fun WalletPayment.smartDescription(context: Context): String? = when (this) {
-    is OutgoingPayment -> when (val details = this.details) {
-        is OutgoingPayment.Details.Normal -> details.paymentRequest.description ?: details.paymentRequest.descriptionHash?.toHex()
-        is OutgoingPayment.Details.ChannelClosing -> context.getString(R.string.paymentdetails_desc_closing_channel)
-        is OutgoingPayment.Details.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
-        is OutgoingPayment.Details.SwapOut -> context.getString(R.string.paymentdetails_desc_swapout, details.address)
+    is LightningOutgoingPayment -> when (val details = this.details) {
+        is LightningOutgoingPayment.Details.Normal -> details.paymentRequest.description ?: details.paymentRequest.descriptionHash?.toHex()
+        is LightningOutgoingPayment.Details.ChannelClosing -> context.getString(R.string.paymentdetails_desc_closing_channel)
+        is LightningOutgoingPayment.Details.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
+        is LightningOutgoingPayment.Details.SwapOut -> context.getString(R.string.paymentdetails_desc_swapout, details.address)
     }
     is IncomingPayment -> when (val origin = this.origin) {
         is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description ?: origin.paymentRequest.descriptionHash?.toHex()
         is IncomingPayment.Origin.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
-        is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.DualSwapIn -> context.getString(R.string.paymentdetails_desc_swapin)
+        is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.OnChain -> context.getString(R.string.paymentdetails_desc_swapin)
     }
+    is SpliceOutgoingPayment -> context.getString(R.string.paymentdetails_desc_splice_out, this.address)
     else -> null
 }?.takeIf { it.isNotBlank() }

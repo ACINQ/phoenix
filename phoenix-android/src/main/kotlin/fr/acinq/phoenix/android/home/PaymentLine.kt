@@ -120,14 +120,15 @@ fun PaymentLine(
             Row {
                 PaymentDescription(paymentInfo = paymentInfo, modifier = Modifier.weight(1.0f))
                 Spacer(modifier = Modifier.width(16.dp))
-                if (!isPaymentFailed(payment)) {
+                if (!isFailedOutgoingLightningPayment(payment)) {
                     val isOutgoing = payment is OutgoingPayment
                     val amount = when (payment) {
-                        is OutgoingPayment -> if (payment.details is OutgoingPayment.Details.ChannelClosing) {
+                        is LightningOutgoingPayment -> if (payment.details is LightningOutgoingPayment.Details.ChannelClosing) {
                             payment.recipientAmount
                         } else {
-                            payment.parts.filterIsInstance<OutgoingPayment.LightningPart>().map { it.amount }.sum()
+                            payment.parts.filterIsInstance<LightningOutgoingPayment.LightningPart>().map { it.amount }.sum()
                         }
+                        is SpliceOutgoingPayment -> payment.amountSatoshi.toMilliSatoshi()
                         is IncomingPayment -> payment.received?.amount ?: 0.msat
                     }
                     if (isAmountRedacted) {
@@ -144,10 +145,7 @@ fun PaymentLine(
             }
             Spacer(modifier = Modifier.height(2.dp))
             val timestamp: Long = remember {
-                payment.completedAt().takeIf { it > 0 } ?: when (payment) {
-                    is OutgoingPayment -> payment.createdAt
-                    is IncomingPayment -> payment.createdAt
-                }
+                payment.completedAt ?: payment.createdAt
             }
             Text(text = timestamp.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
         }
@@ -156,26 +154,10 @@ fun PaymentLine(
 
 @Composable
 private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
     val payment = paymentInfo.payment
     val metadata = paymentInfo.metadata
-    val desc = metadata.userDescription ?: when (payment) {
-        is OutgoingPayment -> when (val d = payment.details) {
-            is OutgoingPayment.Details.Normal -> d.paymentRequest.description
-            is OutgoingPayment.Details.KeySend -> stringResource(id = R.string.paymentline_keysend_outgoing)
-            is OutgoingPayment.Details.SwapOut -> d.address
-            is OutgoingPayment.Details.ChannelClosing -> if (d.closingAddress.isBlank()) {
-                stringResource(R.string.paymentline_closing_desc_no_address)
-            } else {
-                stringResource(R.string.paymentline_closing_desc, d.closingAddress)
-            }
-        }
-        is IncomingPayment -> when (val o = payment.origin) {
-            is IncomingPayment.Origin.Invoice -> o.paymentRequest.description
-            is IncomingPayment.Origin.KeySend -> stringResource(id = R.string.paymentline_keysend_incoming)
-            is IncomingPayment.Origin.SwapIn -> o.address ?: stringResource(id = R.string.paymentline_swap_in_desc)
-            is IncomingPayment.Origin.DualSwapIn -> stringResource(id = R.string.paymentline_swap_in_desc)
-        }
-    }.takeIf { !it.isNullOrBlank() }
+    val desc = metadata.userDescription ?: payment.smartDescription(context)
     Text(
         text = desc ?: stringResource(id = R.string.paymentdetails_no_description),
         maxLines = 1,
@@ -185,28 +167,28 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
     )
 }
 
-private fun isPaymentFailed(payment: WalletPayment) = (payment is OutgoingPayment && payment.status is OutgoingPayment.Status.Completed.Failed)
+private fun isFailedOutgoingLightningPayment(payment: WalletPayment) = (payment is LightningOutgoingPayment && payment.status is LightningOutgoingPayment.Status.Completed.Failed)
 
 @Composable
 private fun PaymentIcon(payment: WalletPayment) {
     when (payment) {
-        is OutgoingPayment -> when (payment.status) {
-            is OutgoingPayment.Status.Completed.Failed -> PaymentIconComponent(
+        is LightningOutgoingPayment -> when (payment.status) {
+            is LightningOutgoingPayment.Status.Completed.Failed -> PaymentIconComponent(
                 icon = R.drawable.ic_payment_failed,
                 description = stringResource(id = R.string.paymentdetails_status_sent_failed)
             )
-            is OutgoingPayment.Status.Pending -> PaymentIconComponent(
+            is LightningOutgoingPayment.Status.Pending -> PaymentIconComponent(
                 icon = R.drawable.ic_payment_pending,
                 description = stringResource(id = R.string.paymentdetails_status_sent_pending)
             )
-            is OutgoingPayment.Status.Completed.Succeeded.OffChain -> PaymentIconComponent(
+            is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> PaymentIconComponent(
                 icon = R.drawable.ic_payment_success,
                 description = stringResource(id = R.string.paymentdetails_status_sent_successful),
                 iconSize = 18.dp,
                 iconColor = MaterialTheme.colors.onPrimary,
                 backgroundColor = MaterialTheme.colors.primary
             )
-            is OutgoingPayment.Status.Completed.Succeeded.OnChain -> PaymentIconComponent(
+            is LightningOutgoingPayment.Status.Completed.Succeeded.OnChain -> PaymentIconComponent(
                 icon = R.drawable.ic_payment_success_onchain,
                 description = stringResource(id = R.string.paymentdetails_status_sent_successful),
                 iconSize = 14.dp,
@@ -214,6 +196,13 @@ private fun PaymentIcon(payment: WalletPayment) {
                 backgroundColor = MaterialTheme.colors.primary
             )
         }
+        is SpliceOutgoingPayment -> PaymentIconComponent(
+            icon = R.drawable.ic_payment_success_onchain,
+            description = stringResource(id = R.string.paymentdetails_status_splice_sent),
+            iconSize = 14.dp,
+            iconColor = MaterialTheme.colors.onPrimary,
+            backgroundColor = MaterialTheme.colors.primary
+        )
         is IncomingPayment -> when {
             payment.received == null -> {
                 PaymentIconComponent(
@@ -224,24 +213,24 @@ private fun PaymentIcon(payment: WalletPayment) {
                     backgroundColor = MaterialTheme.colors.primary
                 )
             }
-            payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().any { !it.confirmed } -> {
+            payment.completedAt == null -> {
                 PaymentIconComponent(
                     icon = R.drawable.ic_clock,
                     description = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
                     iconSize = 18.dp,
-                    iconColor = MaterialTheme.colors.onPrimary,
-                    backgroundColor = MaterialTheme.colors.primary
+                    iconColor = MaterialTheme.colors.primary,
+                    backgroundColor = Color.Transparent
                 )
             }
             else -> {
                 PaymentIconComponent(
-                    icon = if (payment.origin is IncomingPayment.Origin.SwapIn || payment.origin is IncomingPayment.Origin.DualSwapIn) {
+                    icon = if (payment.origin is IncomingPayment.Origin.SwapIn || payment.origin is IncomingPayment.Origin.OnChain) {
                         R.drawable.ic_payment_success_onchain
                     } else {
                         R.drawable.ic_payment_success
                     },
                     description = stringResource(id = R.string.paymentdetails_status_received_successful),
-                    iconSize = if (payment.origin is IncomingPayment.Origin.SwapIn || payment.origin is IncomingPayment.Origin.DualSwapIn) {
+                    iconSize = if (payment.origin is IncomingPayment.Origin.SwapIn || payment.origin is IncomingPayment.Origin.OnChain) {
                         14.dp
                     } else {
                         18.dp
