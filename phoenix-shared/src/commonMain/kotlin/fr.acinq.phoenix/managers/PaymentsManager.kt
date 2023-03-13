@@ -1,8 +1,5 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.lightning.ChannelEvents
-import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.SwapInEvents
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentProgress
@@ -15,8 +12,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
@@ -89,16 +84,11 @@ class PaymentsManager(
                 } else {
                     for (row in list) {
                         val paymentInfo = fetcher.getPayment(row, WalletPaymentFetchOptions.None)
-                        if (paymentInfo != null) {
-                            val completedAt = paymentInfo.payment.completedAt()
-                            if (completedAt > 0) {
-                                // This is the most recent completed payment in the database
-                                if (completedAt > appLaunch) {
-                                    _lastCompletedPayment.value = paymentInfo.payment
-                                }
-                                break
-                            }
+                        val completedAt = paymentInfo?.payment?.completedAt
+                        if (completedAt != null && completedAt > appLaunch) {
+                            _lastCompletedPayment.value = paymentInfo.payment
                         }
+                        break
                     }
                 }
             }
@@ -156,23 +146,34 @@ class PaymentsManager(
     suspend fun getPayment(
         id: WalletPaymentId,
         options: WalletPaymentFetchOptions
-    ): WalletPaymentInfo? = when (id) {
-        is WalletPaymentId.IncomingPaymentId -> {
-            paymentsDb().getIncomingPayment(id.paymentHash, options)?.let {
-                WalletPaymentInfo(
-                    payment = it.first,
-                    metadata = it.second ?: WalletPaymentMetadata(),
-                    fetchOptions = options
-                )
+    ): WalletPaymentInfo? {
+        return when (id) {
+            is WalletPaymentId.IncomingPaymentId -> {
+                paymentsDb().getIncomingPayment(id.paymentHash, options)?.let {
+                    WalletPaymentInfo(
+                        payment = it.first,
+                        metadata = it.second ?: WalletPaymentMetadata(),
+                        fetchOptions = options
+                    )
+                }
             }
-        }
-        is WalletPaymentId.OutgoingPaymentId -> {
-            paymentsDb().getOutgoingPayment(id.id, options)?.let {
-                WalletPaymentInfo(
-                    payment = it.first,
-                    metadata = it.second ?: WalletPaymentMetadata(),
-                    fetchOptions = options
-                )
+            is WalletPaymentId.OutgoingPaymentId -> {
+                paymentsDb().getLightningOutgoingPayment(id.id, options)?.let {
+                    WalletPaymentInfo(
+                        payment = it.first,
+                        metadata = it.second ?: WalletPaymentMetadata(),
+                        fetchOptions = options
+                    )
+                }
+            }
+            is WalletPaymentId.SpliceOutgoingPaymentId -> {
+                paymentsDb().getSpliceOutgoingPayment(id.id, options)?.let {
+                    WalletPaymentInfo(
+                        payment = it.first,
+                        metadata = it.second ?: WalletPaymentMetadata(),
+                        fetchOptions = options
+                    )
+                }
             }
         }
     }

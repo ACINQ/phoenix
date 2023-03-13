@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.controllers.config
 
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.controllers.MVI
 
@@ -16,7 +17,7 @@ object ChannelsConfiguration {
             val isOk: Boolean,
             val stateName: String,
             val localBalance: MilliSatoshi?,
-            val remoteBalance: MilliSatoshi?,
+            val capacity: Satoshi?,
             val json: String,
             val txId: String?
         )

@@ -89,15 +89,6 @@ ORDER BY
        coalesce(received_at, created_at) DESC,
        payment_hash DESC;
 
-listReceived:
-SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
-FROM   incoming_payments AS r
-WHERE  received_at IS NOT NULL
-ORDER BY
-       r.received_at DESC,
-       payment_hash DESC
-LIMIT :limit OFFSET :offset;
-
 listNewChannel:
 SELECT   payment_hash, received_amount_msat, received_at, received_with_type, received_with_blob, origin_type
 FROM     incoming_payments

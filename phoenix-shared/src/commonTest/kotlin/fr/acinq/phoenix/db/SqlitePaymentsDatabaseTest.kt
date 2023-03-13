@@ -54,13 +54,6 @@ class SqlitePaymentsDatabaseTest {
     val origin3 = IncomingPayment.Origin.SwapIn(address = "1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb")
 
     @Test
-    fun incoming__empty() = runTest {
-        assertNull(db.getIncomingPayment(paymentHash1))
-        assertEquals(listOf(), db.listReceivedPayments(10, 0))
-        assertFailsWith(IncomingPaymentNotFound::class) { db.receivePayment(paymentHash1, receivedWith1, 5) }
-    }
-
-    @Test
     fun incoming__receive_lightning() = runTest {
         db.addIncomingPayment(preimage1, origin1, 0)
         db.listIncomingPayments(10, 0)[0].let {

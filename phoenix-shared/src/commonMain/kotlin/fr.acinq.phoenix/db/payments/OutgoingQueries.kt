@@ -24,7 +24,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.ShortChannelId
 import fr.acinq.lightning.channel.ChannelException
 import fr.acinq.lightning.db.HopDesc
-import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.utils.Either
 import fr.acinq.lightning.utils.UUID
@@ -39,7 +39,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
 
     private val queries = database.outgoingPaymentsQueries
 
-    fun addLightningParts(parentId: UUID, parts: List<OutgoingPayment.LightningPart>) {
+    fun addLightningParts(parentId: UUID, parts: List<LightningOutgoingPayment.LightningPart>) {
         if (parts.isEmpty()) return
         database.transaction {
             parts.map {
@@ -55,7 +55,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
         }
     }
 
-    fun addPayment(payment: OutgoingPayment) {
+    fun addLightningOutgoingPayment(payment: LightningOutgoingPayment) {
         val (detailsTypeVersion, detailsData) = payment.details.mapToDb()
         database.transaction(noEnclosing = false) {
             queries.insertPayment(
@@ -69,7 +69,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
             )
             payment.parts.map {
                 when (it) {
-                    is OutgoingPayment.LightningPart -> {
+                    is LightningOutgoingPayment.LightningPart -> {
                         queries.insertLightningPart(
                             part_id = it.id.toString(),
                             part_parent_id = payment.id.toString(),
@@ -78,7 +78,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
                             part_created_at = it.createdAt
                         )
                     }
-                    is OutgoingPayment.ClosingTxPart -> {
+                    is LightningOutgoingPayment.ClosingTxPart -> {
                         val (closingInfoType, closingInfoBlob) = it.mapClosingTypeToDb()
                         queries.insertClosingTxPart(
                             id = it.id.toString(),
@@ -95,7 +95,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
         }
     }
 
-    fun completePayment(id: UUID, completed: OutgoingPayment.Status.Completed): Boolean {
+    fun completePayment(id: UUID, completed: LightningOutgoingPayment.Status.Completed): Boolean {
         var result = true
         database.transaction {
             val (statusType, statusBlob) = completed.mapToDb()
@@ -114,7 +114,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
         return result
     }
 
-    fun completePaymentForClosing(id: UUID, parts: List<OutgoingPayment.ClosingTxPart>, completed: OutgoingPayment.Status.Completed): Boolean {
+    fun completePaymentForClosing(id: UUID, parts: List<LightningOutgoingPayment.ClosingTxPart>, completed: LightningOutgoingPayment.Status.Completed): Boolean {
         var result = true
         database.transaction {
             val (statusType, statusBlob) = completed.mapToDb()
@@ -151,7 +151,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
         completedAt: Long
     ): Boolean {
         var result = true
-        val (statusTypeVersion, statusData) = OutgoingPayment.LightningPart.Status.Succeeded(preimage).mapToDb()
+        val (statusTypeVersion, statusData) = LightningOutgoingPayment.LightningPart.Status.Succeeded(preimage).mapToDb()
         database.transaction {
             queries.updateLightningPart(
                 part_id = partId.toString(),
@@ -187,11 +187,11 @@ class OutgoingQueries(val database: PaymentsDatabase) {
         return result
     }
 
-    fun getPaymentFromPartId(partId: UUID): OutgoingPayment? {
+    fun getPaymentFromPartId(partId: UUID): LightningOutgoingPayment? {
         return queries.getLightningPart(part_id = partId.toString()).executeAsOneOrNull()?.run {
-            queries.getPayment(id = part_parent_id, ::mapOutgoingPayment).executeAsList()
+            queries.getPayment(id = part_parent_id, ::mapLightningOutgoingPayment).executeAsList()
         }?.run {
-            groupByRawOutgoing(this).firstOrNull()
+            groupByRawLightningOutgoing(this).firstOrNull()
         }?.run {
             filterUselessParts(this)
                 // resulting payment must contain the request part id, or should be null
@@ -199,19 +199,19 @@ class OutgoingQueries(val database: PaymentsDatabase) {
         }
     }
 
-    fun getPaymentWithoutParts(id: UUID): OutgoingPayment? {
+    fun getPaymentWithoutParts(id: UUID): LightningOutgoingPayment? {
         return queries.getPaymentWithoutParts(
             id = id.toString(),
-            mapper = ::mapOutgoingPaymentWithoutParts
+            mapper = ::mapLightningOutgoingPaymentWithoutParts
         ).executeAsOneOrNull()
     }
 
-    fun getPayment(id: UUID): OutgoingPayment? {
+    fun getPayment(id: UUID): LightningOutgoingPayment? {
         return queries.getPayment(
             id = id.toString(),
-            mapper = ::mapOutgoingPayment
+            mapper = ::mapLightningOutgoingPayment
         ).executeAsList().run {
-            groupByRawOutgoing(this).firstOrNull()
+            groupByRawLightningOutgoing(this).firstOrNull()
         }?.run {
             filterUselessParts(this)
         }
@@ -221,23 +221,13 @@ class OutgoingQueries(val database: PaymentsDatabase) {
         return queries.getOldestCompletedDate().executeAsOneOrNull()
     }
 
-    fun listPayments(paymentHash: ByteVector32): List<OutgoingPayment> {
-        return queries.listPaymentsForPaymentHash(paymentHash.toByteArray(), ::mapOutgoingPayment).executeAsList()
-            .run { groupByRawOutgoing(this) }
-    }
-
-    fun listPayments(count: Int, skip: Int): List<OutgoingPayment> {
-        return queries.listPaymentsInOffset(
-            limit = count.toLong(),
-            offset = skip.toLong(),
-            mapper = ::mapOutgoingPayment
-        )
-            .executeAsList()
-            .run { groupByRawOutgoing(this) }
+    fun listLightningOutgoingPayments(paymentHash: ByteVector32): List<LightningOutgoingPayment> {
+        return queries.listPaymentsForPaymentHash(paymentHash.toByteArray(), ::mapLightningOutgoingPayment).executeAsList()
+            .run { groupByRawLightningOutgoing(this) }
     }
 
     /** Group a list of outgoing payments by parent id and parts. */
-    private fun groupByRawOutgoing(payments: List<OutgoingPayment>) = payments
+    private fun groupByRawLightningOutgoing(payments: List<LightningOutgoingPayment>) = payments
         .takeIf { it.isNotEmpty() }
         ?.groupBy { it.id }
         ?.values
@@ -245,11 +235,11 @@ class OutgoingQueries(val database: PaymentsDatabase) {
         ?: emptyList()
 
     /** Get a payment without its failed/pending parts. */
-    private fun filterUselessParts(payment: OutgoingPayment): OutgoingPayment = when (payment.status) {
-        is OutgoingPayment.Status.Completed.Succeeded.OffChain -> {
+    private fun filterUselessParts(payment: LightningOutgoingPayment): LightningOutgoingPayment = when (payment.status) {
+        is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> {
             payment.copy(parts = payment.parts.filter {
-                (it is OutgoingPayment.LightningPart && it.status is OutgoingPayment.LightningPart.Status.Succeeded)
-                        || it is OutgoingPayment.ClosingTxPart
+                (it is LightningOutgoingPayment.LightningPart && it.status is LightningOutgoingPayment.LightningPart.Status.Succeeded)
+                        || it is LightningOutgoingPayment.ClosingTxPart
             })
         }
         else -> payment
@@ -257,7 +247,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
 
     companion object {
         @Suppress("UNUSED_PARAMETER")
-        fun mapOutgoingPaymentWithoutParts(
+        fun mapLightningOutgoingPaymentWithoutParts(
             id: String,
             recipient_amount_msat: Long,
             recipient_node_id: String,
@@ -268,8 +258,8 @@ class OutgoingQueries(val database: PaymentsDatabase) {
             completed_at: Long?,
             status_type: OutgoingStatusTypeVersion?,
             status_blob: ByteArray?
-        ): OutgoingPayment {
-            return OutgoingPayment(
+        ): LightningOutgoingPayment {
+            return LightningOutgoingPayment(
                 id = UUID.fromString(id),
                 recipientAmount = MilliSatoshi(recipient_amount_msat),
                 recipient = PublicKey.parse(Hex.decode(recipient_node_id)),
@@ -281,7 +271,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
         }
 
         @Suppress("UNUSED_PARAMETER")
-        fun mapOutgoingPayment(
+        fun mapLightningOutgoingPayment(
             id: String,
             recipient_amount_msat: Long,
             recipient_node_id: String,
@@ -307,7 +297,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
             closingtx_part_closing_info_type: OutgoingPartClosingInfoTypeVersion?,
             closingtx_part_closing_info_blob: ByteArray?,
             closingtx_part_created_at: Long?
-        ): OutgoingPayment {
+        ): LightningOutgoingPayment {
             val lightningParts = if (lightning_part_id != null && lightning_part_amount_msat != null && lightning_part_route != null && lightning_part_created_at != null) {
                 listOf(
                     mapLightningPart(
@@ -350,7 +340,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
                 OutgoingStatusData.getClosingPartsFromV0Status(status_blob, completed_at)
             } else emptyList()
 
-            return mapOutgoingPaymentWithoutParts(
+            return mapLightningOutgoingPaymentWithoutParts(
                 id = id,
                 recipient_amount_msat = recipient_amount_msat,
                 recipient_node_id = recipient_node_id,
@@ -374,8 +364,8 @@ class OutgoingQueries(val database: PaymentsDatabase) {
             completedAt: Long?,
             statusType: OutgoingPartStatusTypeVersion?,
             statusBlob: ByteArray?
-        ): OutgoingPayment.LightningPart {
-            return OutgoingPayment.LightningPart(
+        ): LightningOutgoingPayment.LightningPart {
+            return LightningOutgoingPayment.LightningPart(
                 id = UUID.fromString(id),
                 amount = MilliSatoshi(amountMsat),
                 route = route,
@@ -395,8 +385,8 @@ class OutgoingQueries(val database: PaymentsDatabase) {
             closingInfoType: OutgoingPartClosingInfoTypeVersion,
             closingInfoBlob: ByteArray,
             createdAt: Long,
-        ): OutgoingPayment.ClosingTxPart {
-            return OutgoingPayment.ClosingTxPart(
+        ): LightningOutgoingPayment.ClosingTxPart {
+            return LightningOutgoingPayment.ClosingTxPart(
                 id = UUID.fromString(id),
                 txId = txId.toByteVector32(),
                 claimed = Satoshi(claimedSat),
@@ -409,8 +399,8 @@ class OutgoingQueries(val database: PaymentsDatabase) {
             statusType: OutgoingStatusTypeVersion?,
             statusBlob: ByteArray?,
             completedAt: Long?,
-        ): OutgoingPayment.Status = when {
-            completedAt == null && statusType == null && statusBlob == null -> OutgoingPayment.Status.Pending
+        ): LightningOutgoingPayment.Status = when {
+            completedAt == null && statusType == null && statusBlob == null -> LightningOutgoingPayment.Status.Pending
             completedAt != null && statusType != null && statusBlob != null -> OutgoingStatusData.deserialize(statusType, statusBlob, completedAt)
             else -> throw UnhandledOutgoingStatus(completedAt, statusType, statusBlob)
         }
@@ -419,8 +409,8 @@ class OutgoingQueries(val database: PaymentsDatabase) {
             statusType: OutgoingPartStatusTypeVersion?,
             statusBlob: ByteArray?,
             completedAt: Long?,
-        ): OutgoingPayment.LightningPart.Status = when {
-            completedAt == null && statusType == null && statusBlob == null -> OutgoingPayment.LightningPart.Status.Pending
+        ): LightningOutgoingPayment.LightningPart.Status = when {
+            completedAt == null && statusType == null && statusBlob == null -> LightningOutgoingPayment.LightningPart.Status.Pending
             completedAt != null && statusType != null && statusBlob != null -> OutgoingPartStatusData.deserialize(statusType, statusBlob, completedAt)
             else -> throw UnhandledOutgoingPartStatus(statusType, statusBlob, completedAt)
         }

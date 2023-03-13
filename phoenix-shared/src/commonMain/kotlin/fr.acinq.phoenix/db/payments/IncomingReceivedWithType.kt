@@ -116,6 +116,17 @@ sealed class IncomingReceivedWithData {
                 val confirmed: Boolean = true
             ) : NewChannel()
         }
+        sealed class SpliceIn : Part() {
+            @Serializable
+            data class V0(
+                @Serializable val id: UUID,
+                @Serializable val amount: MilliSatoshi,
+                @Serializable val serviceFee: MilliSatoshi,
+                @Serializable val fundingFee: Satoshi = 0.sat,
+                @Serializable val channelId: ByteVector32?,
+                val confirmed: Boolean = false
+            ) : SpliceIn()
+        }
     }
 
     companion object {
@@ -151,6 +162,7 @@ sealed class IncomingReceivedWithData {
                             IncomingPayment.ReceivedWith.NewChannel(UUID.randomUUID(),it.amount - it.fees, it.fees, 0.sat, it.channelId, confirmed = true)
                         }
                         is Part.NewChannel.V1 -> IncomingPayment.ReceivedWith.NewChannel(it.id, it.amount, it.serviceFee, it.fundingFee, it.channelId, it.confirmed)
+                        is Part.SpliceIn.V0 -> IncomingPayment.ReceivedWith.SpliceIn(it.id, it.amount, it.serviceFee, it.fundingFee, it.channelId, it.confirmed)
                     }
                 }.toSet()
                 IncomingReceivedWithTypeVersion.MULTIPARTS_V1 -> DbTypesHelper.polymorphicFormat.decodeFromString(SetSerializer(PolymorphicSerializer(Part::class)), json).map {
@@ -158,6 +170,7 @@ sealed class IncomingReceivedWithData {
                         is Part.Htlc.V0 -> IncomingPayment.ReceivedWith.LightningPayment(it.amount, it.channelId, it.htlcId)
                         is Part.NewChannel.V0 -> IncomingPayment.ReceivedWith.NewChannel(UUID.randomUUID(), it.amount, it.fees, 0.sat, it.channelId, confirmed = true)
                         is Part.NewChannel.V1 -> IncomingPayment.ReceivedWith.NewChannel(it.id, it.amount, it.serviceFee, it.fundingFee, it.channelId, it.confirmed)
+                        is Part.SpliceIn.V0 -> IncomingPayment.ReceivedWith.SpliceIn(it.id, it.amount, it.serviceFee, it.fundingFee, it.channelId, it.confirmed)
                     }
                 }.toSet()
             }
@@ -170,6 +183,7 @@ fun Set<IncomingPayment.ReceivedWith>.mapToDb(): Pair<IncomingReceivedWithTypeVe
     when (it) {
         is IncomingPayment.ReceivedWith.LightningPayment -> IncomingReceivedWithData.Part.Htlc.V0(it.amount, it.channelId, it.htlcId)
         is IncomingPayment.ReceivedWith.NewChannel -> IncomingReceivedWithData.Part.NewChannel.V1(it.id, it.amount, it.serviceFee, it.fundingFee, it.channelId, it.confirmed)
+        is IncomingPayment.ReceivedWith.SpliceIn -> IncomingReceivedWithData.Part.SpliceIn.V0(it.id, it.amount, it.serviceFee, it.fundingFee, it.channelId, it.confirmed)
     }
 }.takeIf { it.isNotEmpty() }?.toSet()?.let {
     IncomingReceivedWithTypeVersion.MULTIPARTS_V1 to DbTypesHelper.polymorphicFormat.encodeToString(

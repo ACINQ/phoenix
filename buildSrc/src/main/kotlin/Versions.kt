@@ -1,5 +1,5 @@
 object Versions {
-    const val lightningKmp = "1.5.0-SNAPSHOT"
+    const val lightningKmp = "1.5.0-splice-SNAPSHOT"
     const val secp256k1 = "0.7.0"
     const val torMobile = "0.2.0-SNAPSHOT"
 

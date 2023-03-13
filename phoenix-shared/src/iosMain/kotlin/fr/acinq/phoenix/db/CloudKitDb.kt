@@ -3,6 +3,7 @@ package fr.acinq.phoenix.db
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.currentTimestampMillis
@@ -114,6 +115,13 @@ class CloudKitDb(
                         WalletPaymentId.DbType.OUTGOING.value -> {
                             try {
                                 WalletPaymentId.OutgoingPaymentId.fromString(row.id)
+                            } catch (e: Exception) {
+                                null
+                            }
+                        }
+                        WalletPaymentId.DbType.SPLICE_OUTGOING.value -> {
+                            try {
+                                WalletPaymentId.SpliceOutgoingPaymentId.fromString(row.id)
                             } catch (e: Exception) {
                                 null
                             }
@@ -320,7 +328,8 @@ class CloudKitDb(
         // The workaround seems to be to copy the list here,
         // or otherwise process it outside of the `withContext` below.
         val incomingList = downloadedPayments.mapNotNull { it as? IncomingPayment }
-        val outgoingList = downloadedPayments.mapNotNull { it as? OutgoingPayment }
+        val outgoingList = downloadedPayments.mapNotNull { it as? LightningOutgoingPayment }
+        val spliceOutgoingList = TODO("implement cloud backup for splices")
 
         // We are seeing crashes when accessing the ByteArray values in updateMetadata.
         // So we need a workaround.
@@ -375,7 +384,7 @@ class CloudKitDb(
 
                     val existing = outQueries.getPaymentWithoutParts(
                         id = outgoingPayment.id.toString(),
-                        mapper = OutgoingQueries.Companion::mapOutgoingPaymentWithoutParts
+                        mapper = OutgoingQueries.Companion::mapLightningOutgoingPaymentWithoutParts
                     ).executeAsOneOrNull()
 
                     if (existing == null) {
@@ -393,7 +402,7 @@ class CloudKitDb(
 
                     for (part in outgoingPayment.parts) {
                         when {
-                            part is OutgoingPayment.LightningPart && outQueries.countLightningPart(part_id = part.id.toString()).executeAsOne() == 0L -> {
+                            part is LightningOutgoingPayment.LightningPart && outQueries.countLightningPart(part_id = part.id.toString()).executeAsOne() == 0L -> {
                                 outQueries.insertLightningPart(
                                     part_id = part.id.toString(),
                                     part_parent_id = outgoingPayment.id.toString(),
@@ -402,8 +411,8 @@ class CloudKitDb(
                                     part_created_at = part.createdAt
                                 )
                                 val statusInfo = when (val status = part.status) {
-                                    is OutgoingPayment.LightningPart.Status.Failed -> status.completedAt to status.mapToDb()
-                                    is OutgoingPayment.LightningPart.Status.Succeeded -> status.completedAt to status.mapToDb()
+                                    is LightningOutgoingPayment.LightningPart.Status.Failed -> status.completedAt to status.mapToDb()
+                                    is LightningOutgoingPayment.LightningPart.Status.Succeeded -> status.completedAt to status.mapToDb()
                                     else -> null
                                 }
                                 if (statusInfo != null) {
@@ -417,7 +426,7 @@ class CloudKitDb(
                                     )
                                 }
                             }
-                            part is OutgoingPayment.ClosingTxPart && outQueries.countClosingTxPart(part_id = part.id.toString()).executeAsOne() == 0L -> {
+                            part is LightningOutgoingPayment.ClosingTxPart && outQueries.countClosingTxPart(part_id = part.id.toString()).executeAsOne() == 0L -> {
                                 val (closingInfoType, closingInfoBlob) = part.mapClosingTypeToDb()
                                 outQueries.insertClosingTxPart(
                                     id = part.id.toString(),
@@ -432,8 +441,8 @@ class CloudKitDb(
                         }
                     }
 
-                    val oldCompleted = existing?.status as? OutgoingPayment.Status.Completed
-                    val completed = outgoingPayment.status as? OutgoingPayment.Status.Completed
+                    val oldCompleted = existing?.status as? LightningOutgoingPayment.Status.Completed
+                    val completed = outgoingPayment.status as? LightningOutgoingPayment.Status.Completed
 
                     if (oldCompleted == null && completed != null) {
                         val (statusType, statusBlob) = completed.mapToDb()

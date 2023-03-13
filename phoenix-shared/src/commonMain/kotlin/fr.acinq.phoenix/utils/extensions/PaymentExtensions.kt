@@ -16,12 +16,9 @@
 
 package fr.acinq.phoenix.utils.extensions
 
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.data.Chain
-import fr.acinq.phoenix.db.payments.IncomingReceivedWithData
 import org.kodein.memory.util.freeze
 
 /**
@@ -30,22 +27,21 @@ import org.kodein.memory.util.freeze
 
 enum class WalletPaymentState { Success, Pending, Failure }
 
-val WalletPayment.createdAt: Long get() = when (this) {
-    is OutgoingPayment -> this.createdAt
-    is IncomingPayment -> this.createdAt
-}
-
 fun WalletPayment.id(): String = when (this) {
     is OutgoingPayment -> this.id.toString()
     is IncomingPayment -> this.paymentHash.toHex()
 }
 
 fun WalletPayment.state(): WalletPaymentState = when (this) {
-    is OutgoingPayment -> when (status) {
-        is OutgoingPayment.Status.Pending -> WalletPaymentState.Pending
-        is OutgoingPayment.Status.Completed.Failed -> WalletPaymentState.Failure
-        is OutgoingPayment.Status.Completed.Succeeded.OnChain -> WalletPaymentState.Success
-        is OutgoingPayment.Status.Completed.Succeeded.OffChain -> WalletPaymentState.Success
+    is SpliceOutgoingPayment -> when (confirmedAt) {
+        null -> WalletPaymentState.Pending
+        else -> WalletPaymentState.Success
+    }
+    is LightningOutgoingPayment -> when (status) {
+        is LightningOutgoingPayment.Status.Pending -> WalletPaymentState.Pending
+        is LightningOutgoingPayment.Status.Completed.Failed -> WalletPaymentState.Failure
+        is LightningOutgoingPayment.Status.Completed.Succeeded.OnChain -> WalletPaymentState.Success
+        is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> WalletPaymentState.Success
     }
     is IncomingPayment -> when (val received = received) {
         null -> WalletPaymentState.Pending
@@ -61,13 +57,15 @@ fun WalletPayment.state(): WalletPaymentState = when (this) {
 }
 
 fun WalletPayment.paymentHashString(): String = when (this) {
-    is OutgoingPayment -> paymentHash.toString()
+    is SpliceOutgoingPayment -> throw NotImplementedError("no payment hash for splice-out")
+    is LightningOutgoingPayment -> paymentHash.toString()
     is IncomingPayment -> paymentHash.toString()
 }
 
 fun WalletPayment.errorMessage(): String? = when (this) {
-    is OutgoingPayment -> when (val s = status) {
-        is OutgoingPayment.Status.Completed.Failed -> s.reason.toString()
+    is SpliceOutgoingPayment -> null
+    is LightningOutgoingPayment -> when (val s = status) {
+        is LightningOutgoingPayment.Status.Completed.Failed -> s.reason.toString()
         else -> null
     }
     is IncomingPayment -> null

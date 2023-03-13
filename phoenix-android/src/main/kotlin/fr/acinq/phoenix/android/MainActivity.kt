@@ -22,15 +22,10 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.*
 import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.io.PhoenixAndroidLegacyInfoEvent
-import fr.acinq.phoenix.android.components.mvi.MockView
 import fr.acinq.phoenix.android.service.NodeService
 import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
@@ -123,10 +118,4 @@ class MainActivity : AppCompatActivity() {
         log.info("destroyed main kmp activity")
     }
 
-}
-
-@Preview(device = Devices.PIXEL_3)
-@Composable
-fun DefaultPreview() {
-    MockView { PhoenixAndroidTheme(rememberNavController()) { Text("Preview") } }
 }

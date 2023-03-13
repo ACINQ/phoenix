@@ -1,8 +1,6 @@
 package fr.acinq.phoenix.db.cloud
 
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.db.*
 import kotlinx.serialization.*
 import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
@@ -64,7 +62,10 @@ data class CloudData(
     val incoming: IncomingPaymentWrapper?,
     @ByteString
     @SerialName("o")
-    val outgoing: OutgoingPaymentWrapper?,
+    val outgoing: LightningOutgoingPaymentWrapper?,
+    @ByteString
+    @SerialName("so")
+    val spliceOutgoing: SpliceOutgoingPaymentWrapper?,
     @SerialName("v")
     val version: Int,
     @ByteString
@@ -74,13 +75,15 @@ data class CloudData(
     constructor(incoming: IncomingPayment) : this(
         incoming = IncomingPaymentWrapper(incoming),
         outgoing = null,
+        spliceOutgoing = null,
         version = CloudDataVersion.V0.value,
         padding = ByteArray(size = 0)
     )
 
     constructor(outgoing: OutgoingPayment) : this(
         incoming = null,
-        outgoing = OutgoingPaymentWrapper(outgoing),
+        outgoing = if (outgoing is LightningOutgoingPayment) LightningOutgoingPaymentWrapper(outgoing) else null,
+        spliceOutgoing = if (outgoing is SpliceOutgoingPayment) SpliceOutgoingPaymentWrapper(outgoing) else null,
         version = CloudDataVersion.V0.value,
         padding = ByteArray(size = 0)
     )
@@ -97,6 +100,7 @@ data class CloudData(
     fun unwrap(): WalletPayment? = when {
         incoming != null -> incoming.unwrap()
         outgoing != null -> outgoing.unwrap()
+        spliceOutgoing != null -> spliceOutgoing.unwrap()
         else -> null
     }
 

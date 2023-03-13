@@ -203,22 +203,6 @@ class IncomingQueries(private val database: PaymentsDatabase) {
         }
     }
 
-    fun listIncomingPayments(count: Int, skip: Int): List<IncomingPayment> {
-        return queries.listAll(
-            limit = count.toLong(),
-            offset = skip.toLong(),
-            mapper = ::mapIncomingPayment
-        ).executeAsList()
-    }
-
-    fun listReceivedPayments(count: Int, skip: Int): List<IncomingPayment> {
-        return queries.listReceived(
-            limit = count.toLong(),
-            offset = skip.toLong(),
-            mapper = ::mapIncomingPayment
-        ).executeAsList()
-    }
-
     /** Try to delete an incoming payment ; return true if an element was deleted, false otherwise. */
     fun deleteIncomingPayment(paymentHash: ByteVector32): Boolean {
         return database.transactionWithResult {

@@ -24,7 +24,7 @@ import fr.acinq.lightning.Features
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
-import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.*
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
@@ -299,7 +299,7 @@ class AppScanController(
                     paymentId = paymentId,
                     amount = amountToSend,
                     recipient = paymentRequest.nodeId,
-                    details = OutgoingPayment.Details.SwapOut(
+                    details = LightningOutgoingPayment.Details.SwapOut(
                         address = swapOutData.second,
                         paymentRequest = paymentRequest,
                         swapOutFee = swapOutData.first
@@ -311,7 +311,7 @@ class AppScanController(
                     paymentId = paymentId,
                     amount = amountToSend,
                     recipient = paymentRequest.nodeId,
-                    details = OutgoingPayment.Details.Normal(
+                    details = LightningOutgoingPayment.Details.Normal(
                         paymentRequest = paymentRequest
                     ),
                     trampolineFeesOverride = trampolineFees
@@ -585,7 +585,7 @@ class AppScanController(
         }
 
         val db = databaseManager.databases.filterNotNull().first()
-        return if (db.payments.listOutgoingPayments(paymentRequest.paymentHash).any { it.status is OutgoingPayment.Status.Completed.Succeeded }) {
+        return if (db.payments.listLightningOutgoingPayments(paymentRequest.paymentHash).any { it.status is LightningOutgoingPayment.Status.Completed.Succeeded }) {
             Scan.BadRequestReason.AlreadyPaidInvoice
         } else {
             null

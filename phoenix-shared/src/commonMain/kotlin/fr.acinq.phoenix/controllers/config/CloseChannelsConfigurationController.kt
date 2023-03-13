@@ -10,7 +10,7 @@ import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration.Model.ChannelInfoStatus
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.utils.Parser
-import fr.acinq.phoenix.utils.extensions.localCommitmentSpec
+import fr.acinq.phoenix.utils.extensions.localBalance
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 
@@ -77,7 +77,7 @@ class AppCloseChannelsConfigurationController(
                     channelInfoStatus(it.value)?.let { mappedStatus ->
                         CloseChannelsConfiguration.Model.ChannelInfo(
                             id = it.key,
-                            balance = sats(it.value),
+                            balance = it.value.localBalance()?.truncateToSatoshi(),
                             status = mappedStatus
                         )
                     }
@@ -100,10 +100,6 @@ class AppCloseChannelsConfigurationController(
                 }
             }
         }
-    }
-
-    private fun sats(channel: ChannelState): Long {
-        return channel.localCommitmentSpec?.toLocal?.truncateToSatoshi()?.toLong() ?: 0
     }
 
     override fun process(intent: CloseChannelsConfiguration.Intent) {

@@ -1,82 +1,68 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
-import fr.acinq.phoenix.utils.extensions.createdAt
 
-/* Represents a unique WalletPayment row in the database,
- * which exists in either the `incoming_payments` table,
- * or the `outgoing_payments` table.
+/**
+ * Represents a unique WalletPayment row in the database, which exists in either the `incoming_payments` table,
+ * the `outgoing_payments` table, or the `splice_outgoing_payments` table.
  *
- * It is common to reference these rows in other database tables via:
- * - type: Long (representing either incoming or outgoing)
- * - id: String (representing the appropriate id for either table)
+ * It is common to reference these rows in other database tables via [dbType] or [dbId].
  *
- * The WalletPaymentId class assists in this conversion.
+ * The [WalletPaymentId] class assists in this conversion.
+ * @param dbType Long representing either incoming or outgoing/splice-outgoing
+ * @param dbId String representing the appropriate id for either table (payment hash or UUID).
  */
 sealed class WalletPaymentId {
 
-    data class IncomingPaymentId(val paymentHash: ByteVector32): WalletPaymentId() {
-        companion object {
-            fun fromString(id: String) =
-                IncomingPaymentId(paymentHash = ByteVector32(id))
+    abstract val dbType: DbType
+    abstract val dbId: String
+    /** Use this to get a single (hashable) identifier for the row, for example within a hashmap or Cache. */
+    abstract val identifier: String
 
-            fun fromByteArray(id: ByteArray) =
-                IncomingPaymentId(paymentHash = ByteVector32(id))
+    data class IncomingPaymentId(val paymentHash: ByteVector32): WalletPaymentId() {
+        override val dbType: DbType = DbType.INCOMING
+        override val dbId: String = paymentHash.toHex()
+        override val identifier: String = "incoming|$dbId"
+        companion object {
+            fun fromString(id: String) = IncomingPaymentId(paymentHash = ByteVector32(id))
+            fun fromByteArray(id: ByteArray) = IncomingPaymentId(paymentHash = ByteVector32(id))
         }
     }
 
     data class OutgoingPaymentId(val id: UUID): WalletPaymentId() {
+        override val dbType: DbType = DbType.OUTGOING
+        override val dbId: String = id.toString()
+        override val identifier: String = "outgoing|$dbId"
         companion object {
-            fun fromString(id: String) =
-                OutgoingPaymentId(id = UUID.fromString(id))
+            fun fromString(id: String) = OutgoingPaymentId(id = UUID.fromString(id))
+        }
+    }
+
+    data class SpliceOutgoingPaymentId(val id: UUID): WalletPaymentId() {
+        override val dbType: DbType = DbType.SPLICE_OUTGOING
+        override val dbId: String = id.toString()
+        override val identifier: String = "splice_outgoing|$dbId"
+        companion object {
+            fun fromString(id: String) = SpliceOutgoingPaymentId(id = UUID.fromString(id))
         }
     }
 
     enum class DbType(val value: Long) {
         INCOMING(1),
-        OUTGOING(2)
-    }
-
-    /* Maps to database column:
-     * - type: INTEGER NOT NULL (mapped to Long via SqlDelight)
-     */
-    val dbType: DbType get() = when (this) {
-        is IncomingPaymentId -> DbType.INCOMING
-        is OutgoingPaymentId -> DbType.OUTGOING
-    }
-
-    /* Maps to database column:
-     * - id: TEXT NOT NULL (mapped to String via SqlDelight)
-     */
-    val dbId get() = when (this) {
-        is IncomingPaymentId -> this.paymentHash.toHex()
-        is OutgoingPaymentId -> this.id.toString()
-    }
-
-    /* Use `identifier` if the code requires a single (hashable) identifier for the row.
-     * For example, for use within a hashmap or Cache.
-     */
-    val identifier: String get() = when(this) {
-        is OutgoingPaymentId -> "outgoing|${this.id}"
-        is IncomingPaymentId -> "incoming|${this.paymentHash.toHex()}"
+        OUTGOING(2),
+        SPLICE_OUTGOING(3)
     }
 
     companion object {
-
         fun create(type: Long, id: String): WalletPaymentId? {
             return when(type) {
-                DbType.INCOMING.value -> {
-                    IncomingPaymentId.fromString(id)
-                }
-                DbType.OUTGOING.value -> {
-                    OutgoingPaymentId.fromString(id)
-                }
+                DbType.INCOMING.value -> IncomingPaymentId.fromString(id)
+                DbType.OUTGOING.value -> OutgoingPaymentId.fromString(id)
+                DbType.SPLICE_OUTGOING.value -> SpliceOutgoingPaymentId.fromString(id)
                 else -> null
             }
         }
@@ -85,7 +71,8 @@ sealed class WalletPaymentId {
 
 fun WalletPayment.walletPaymentId(): WalletPaymentId = when (this) {
     is IncomingPayment -> WalletPaymentId.IncomingPaymentId(paymentHash = this.paymentHash)
-    is OutgoingPayment -> WalletPaymentId.OutgoingPaymentId(id = this.id)
+    is LightningOutgoingPayment -> WalletPaymentId.OutgoingPaymentId(id = this.id)
+    is SpliceOutgoingPayment -> WalletPaymentId.SpliceOutgoingPaymentId(id = this.id)
 }
 
 /**
@@ -118,7 +105,7 @@ data class WalletPaymentInfo(
             WalletPaymentOrderRow(
                 id = payment.walletPaymentId(),
                 createdAt = payment.createdAt,
-                completedAt = payment.completedAt(),
+                completedAt = payment.completedAt,
                 metadataModifiedAt = metadata.modifiedAt
             )
         }

@@ -1,9 +1,10 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.utils.extensions.createdAt
 import kotlinx.datetime.Instant
 
 class CsvWriter {
@@ -63,8 +64,7 @@ class CsvWriter {
             config: Configuration
         ): String {
 
-            val completedAt = info.payment.completedAt()
-            val date = if (completedAt > 0) completedAt else info.payment.createdAt
+            val date = info.payment.completedAt ?: info.payment.createdAt
             val dateStr = Instant.fromEpochMilliseconds(date).toString() // ISO-8601 format
             var row = processField(dateStr)
 
@@ -126,7 +126,7 @@ class CsvWriter {
                         is IncomingPayment.Origin.Invoice -> "Incoming LN payment"
                         is IncomingPayment.Origin.KeySend -> "Incoming LN payment (keysend)"
                         is IncomingPayment.Origin.SwapIn -> "Swap-in to ${origin.address ?: "N/A"}"
-                        is IncomingPayment.Origin.DualSwapIn -> {
+                        is IncomingPayment.Origin.OnChain -> {
                             // append txs ids if any, nothing otherwise
                             val inputs = origin.localInputs.takeIf { it.isNotEmpty() }?.joinToString("\n- ") {
                                 it.txid.toHex()
@@ -134,12 +134,13 @@ class CsvWriter {
                             "Swap-in to ${config.swapInAddress}$inputs"
                         }
                     }
-                    is OutgoingPayment -> when (val details = payment.details) {
-                        is OutgoingPayment.Details.Normal -> "Outgoing LN payment to ${details.paymentRequest.nodeId.toHex()}"
-                        is OutgoingPayment.Details.KeySend -> "Outgoing LN payment (keysend)"
-                        is OutgoingPayment.Details.SwapOut -> "Swap-out to ${details.address}"
-                        is OutgoingPayment.Details.ChannelClosing -> "Channel closing to ${details.closingAddress}"
+                    is LightningOutgoingPayment -> when (val details = payment.details) {
+                        is LightningOutgoingPayment.Details.Normal -> "Outgoing LN payment to ${details.paymentRequest.nodeId.toHex()}"
+                        is LightningOutgoingPayment.Details.KeySend -> "Outgoing LN payment (keysend)"
+                        is LightningOutgoingPayment.Details.SwapOut -> "Swap-out to ${details.address}"
+                        is LightningOutgoingPayment.Details.ChannelClosing -> "Channel closing to ${details.closingAddress}"
                     }
+                    is SpliceOutgoingPayment -> "Outgoing splice to ${payment.address}"
                 }
                 row += ",${processField(details)}"
             }

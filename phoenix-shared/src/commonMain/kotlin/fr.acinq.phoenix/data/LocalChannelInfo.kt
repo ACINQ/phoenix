@@ -40,8 +40,10 @@ data class LocalChannelInfo(
     /** Smart local balance after taking the state into account. For the raw balance, see [CommitmentSpec.toLocal]. */
     val localBalance by lazy { state.localBalance() }
     /** Raw balance of the peer */
-    val remoteBalance by lazy { state.localCommitmentSpec?.toRemote }
+    val capacity by lazy {
+        (state as? ChannelStateWithCommitments)?.commitments?.latest?.fundingAmount
+    }
     val fundingTx by lazy {
-        (state as? ChannelStateWithCommitments)?.commitments?.commitInput?.outPoint?.txid?.toString()
+        (state as? ChannelStateWithCommitments)?.commitments?.latest?.fundingTxId?.toHex()
     }
 }

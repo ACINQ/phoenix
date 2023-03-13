@@ -222,38 +222,6 @@ LEFT OUTER JOIN outgoing_payment_parts AS lightning_parts ON lightning_parts.par
 LEFT OUTER JOIN outgoing_payment_closing_tx_parts AS closing_parts ON closing_parts.part_parent_id = parent.id
 WHERE payment_hash=?;
 
-listPaymentsInOffset:
-SELECT parent.id,
-       parent.recipient_amount_msat,
-       parent.recipient_node_id,
-       parent.payment_hash,
-       parent.details_type,
-       parent.details_blob,
-       parent.created_at,
-       parent.completed_at,
-       parent.status_type,
-       parent.status_blob,
-       -- lightning parts
-       lightning_parts.part_id AS lightning_part_id,
-       lightning_parts.part_amount_msat AS lightning_part_amount_msat,
-       lightning_parts.part_route AS lightning_part_route,
-       lightning_parts.part_created_at AS lightning_part_created_at,
-       lightning_parts.part_completed_at AS lightning_part_completed_at,
-       lightning_parts.part_status_type AS lightning_part_status_type,
-       lightning_parts.part_status_blob AS lightning_part_status_blob,
-       -- closing tx parts
-       closing_parts.part_id AS closingtx_part_id,
-       closing_parts.part_tx_id AS closingtx_tx_id,
-       closing_parts.part_amount_sat AS closingtx_amount_sat,
-       closing_parts.part_closing_info_type AS closingtx_info_type,
-       closing_parts.part_closing_info_blob AS closingtx_info_blob,
-       closing_parts.part_created_at AS closingtx_created_at
-FROM outgoing_payments AS parent
-LEFT OUTER JOIN outgoing_payment_parts AS lightning_parts ON lightning_parts.part_parent_id = parent.id
-LEFT OUTER JOIN outgoing_payment_closing_tx_parts AS closing_parts ON closing_parts.part_parent_id = parent.id
-ORDER BY parent.completed_at DESC, parent.id DESC
-LIMIT :limit OFFSET :offset;
-
 -- use this in a `transaction` block to know how many rows were changed after an UPDATE
 changes:
 SELECT changes();

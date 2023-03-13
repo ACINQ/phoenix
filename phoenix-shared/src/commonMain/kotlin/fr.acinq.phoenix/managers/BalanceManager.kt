@@ -96,7 +96,7 @@ class BalanceManager(
     /** Watches the channels balance, first using the channels data from our database, then the live channels. */
     private suspend fun monitorChannelsBalance(peerManager: PeerManager) {
         peerManager.channelsFlow.collect { channels ->
-            _balance.value = channels?.map { it.value.state.localBalance() }?.sum()
+            _balance.value = channels?.mapNotNull { it.value.state.localBalance() }?.sum()
         }
     }
 

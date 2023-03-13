@@ -52,7 +52,7 @@ class AppChannelsConfigurationController(
         isOk = channelInfo.isUsable,
         stateName = if (channelInfo.isBooting) "Booting" else channelInfo.state::class.simpleName ?: "Unknown",
         localBalance = channelInfo.localBalance,
-        remoteBalance = channelInfo.remoteBalance,
+        capacity = channelInfo.capacity,
         json = JsonSerializers.json.encodeToString(channelInfo.state),
         txId = channelInfo.fundingTx
     )
