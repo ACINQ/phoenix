@@ -273,13 +273,22 @@
     <!-- //////////////// list all channels //////////////// -->
 
     <string name="listallchannels_title">Payment channels</string>
+    <string name="listallchannels_tab_summary">Summary</string>
+    <string name="listallchannels_tab_json">Raw data</string>
     <string name="listallchannels_node_id">Node id:</string>
     <string name="listallchannels_no_channels">You don\'t have any channels yet.\n\nPayments channels are created when you receive a payment and a new channel is needed. This is done automatically.</string>
-    <string name="listallchannels_share">Share</string>
+    <string name="listallchannels_dialog_label">Show channel\'s details</string>
     <string name="listallchannels_channel_id">Channel id:</string>
-    <string name="listallchannels_funding_tx">Funding tx</string>
-    <string name="listallchannels_funding_tx_desc">See funding transaction</string>
+    <string name="listallchannels_state">State:</string>
+    <string name="listallchannels_spendable">Can send:</string>
+    <string name="listallchannels_commitments">Commitments (active):</string>
+    <string name="listallchannels_commitments_none">None</string>
+    <string name="listallchannels_commitment_funding_tx_id">Funding tx:</string>
+    <string name="listallchannels_commitment_funding_tx_index">Tx index:</string>
+    <string name="listallchannels_commitment_funding_capacity">Capacity:</string>
+    <string name="listallchannels_json">Json</string>
     <string name="listallchannels_close">Close</string>
+    <string name="listallchannels_share">Share</string>
     <string name="listallchannels_share_subject">Channels data</string>
     <string name="listallchannels_share_title">Share channel data</string>
 

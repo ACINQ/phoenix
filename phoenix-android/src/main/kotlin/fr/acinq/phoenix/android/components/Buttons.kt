@@ -118,10 +118,11 @@ fun FilledButton(
 @Composable
 fun InlineButton(
     text: String,
-    icon: Int,
+    icon: Int? = null,
     modifier: Modifier = Modifier,
     padding: PaddingValues = PaddingValues(horizontal = 0.dp, vertical = 8.dp),
     space: Dp = 6.dp,
+    maxLines: Int = Int.MAX_VALUE,
     onClick: () -> Unit,
 ) {
     Button(
@@ -131,6 +132,7 @@ fun InlineButton(
         padding = padding,
         space = space,
         onClick = onClick,
+        maxLines = maxLines,
         textStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary, fontSize = 14.sp, textDecoration = TextDecoration.Underline)
     )
 }
@@ -227,6 +229,7 @@ fun Button(
     space: Dp = 12.dp,
     enabled: Boolean = true,
     enabledEffect: Boolean = true,
+    maxLines: Int = Int.MAX_VALUE,
     textStyle: TextStyle = MaterialTheme.typography.button,
     padding: PaddingValues = PaddingValues(16.dp),
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Center,
@@ -286,9 +289,9 @@ fun Button(
                     verticalAlignment = Alignment.CenterVertically,
                     content = {
                         if (text != null && icon != null) {
-                            TextWithIcon(text = text, icon = icon, iconTint = iconTint, space = space, alignBaseLine = true)
+                            TextWithIcon(text = text, icon = icon, iconTint = iconTint, space = space, alignBaseLine = true, maxLines = maxLines, textOverflow = TextOverflow.Ellipsis)
                         } else if (text != null) {
-                            Text(text)
+                            Text(text, maxLines = maxLines, overflow = TextOverflow.Ellipsis)
                         } else if (icon != null) {
                             PhoenixIcon(icon, tint = iconTint)
                         }

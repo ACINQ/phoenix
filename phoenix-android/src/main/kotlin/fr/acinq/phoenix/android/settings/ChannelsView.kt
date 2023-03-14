@@ -23,18 +23,17 @@ import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
@@ -45,9 +44,10 @@ import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.utils.*
-import fr.acinq.phoenix.controllers.config.ChannelsConfiguration
+import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.data.LocalChannelInfo
 
 
 @Composable
@@ -56,7 +56,7 @@ fun ChannelsView() {
     val nc = navController
     val context = LocalContext.current
 
-    val showChannelDialog = remember { mutableStateOf<ChannelsConfiguration.Model.Channel?>(null) }
+    val showChannelDialog = remember { mutableStateOf<LocalChannelInfo?>(null) }
     showChannelDialog.value?.let {
         ChannelDialog(
             onDismiss = { showChannelDialog.value = null },
@@ -64,58 +64,70 @@ fun ChannelsView() {
         )
     }
 
+    val channelsState = business.peerManager.channelsFlow.collectAsState()
+
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.listallchannels_title),
         )
-        MVIView(CF::channelsConfiguration) { model, _ ->
-            Column(modifier = Modifier.weight(1f)) {
-                if (model.channels.isEmpty()) {
-                    Card(internalPadding = PaddingValues(16.dp)) {
-                        Text(text = stringResource(id = R.string.listallchannels_no_channels))
-                    }
-                } else {
-                    Card {
-                        LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                            items(model.channels) {
-                                ChannelLine(channel = it, onClick = { showChannelDialog.value = it })
+        when (val channels = channelsState.value) {
+            null -> {
+                Card {
+                    ProgressView(text = "loading channels...")
+                }
+            }
+            else -> {
+                Column(modifier = Modifier.weight(1f)) {
+                    if (channels.isEmpty()) {
+                        Card(internalPadding = PaddingValues(16.dp)) {
+                            Text(text = stringResource(id = R.string.listallchannels_no_channels))
+                        }
+                    } else {
+                        Card {
+                            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                                items(channels.values.toList()) {
+                                    ChannelLine(channel = it, onClick = { showChannelDialog.value = it })
+                                }
                             }
                         }
                     }
                 }
             }
+        }
+        val nodeParams by business.nodeParamsManager.nodeParams.collectAsState()
+        val nodeId = nodeParams?.nodeId?.toString()
+        if (nodeId != null) {
             Card {
                 Row {
                     Text(text = stringResource(id = R.string.listallchannels_node_id), modifier = Modifier.padding(16.dp))
                     Text(
-                        text = model.nodeId, style = MaterialTheme.typography.body2, overflow = TextOverflow.Ellipsis,
+                        text = nodeId, style = MaterialTheme.typography.body2, overflow = TextOverflow.Ellipsis,
                         maxLines = 1, modifier = Modifier
                             .padding(vertical = 16.dp)
                             .weight(1f)
                     )
                     Button(
                         icon = R.drawable.ic_copy,
-                        onClick = { copyToClipboard(context, model.nodeId, context.getString(R.string.listallchannels_node_id)) },
+                        onClick = { copyToClipboard(context, nodeId, context.getString(R.string.listallchannels_node_id)) },
                     )
                 }
             }
         }
+
     }
 }
 
 @Composable
-private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: () -> Unit) {
-    val balance = channel.localBalance ?: 0.msat
-    val capacity = channel.capacity ?: 0.sat
+private fun ChannelLine(channel: LocalChannelInfo, onClick: () -> Unit) {
     Row(modifier = Modifier
-        .clickable { onClick() }
+        .clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.listallchannels_dialog_label), onClick = onClick)
         .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
             shape = CircleShape,
-            color = if (channel.isOk) positiveColor() else negativeColor(),
+            color = if (channel.isUsable) positiveColor() else if (channel.isTerminated) negativeColor() else mutedTextColor(),
             modifier = Modifier.size(6.dp)
         ) {}
         Spacer(modifier = Modifier.width(16.dp))
@@ -138,11 +150,15 @@ private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: (
             maxLines = 1,
         )
         Spacer(modifier = Modifier.width(8.dp))
-        AmountView(amount = balance, showUnit = false)
+        channel.localBalance?.let {
+            AmountView(amount = it, showUnit = false)
+        } ?: Text("--")
         Spacer(modifier = Modifier.width(2.dp))
         Text(text = "/")
         Spacer(modifier = Modifier.width(2.dp))
-        AmountView(amount = capacity.toMilliSatoshi(), unitTextStyle = MaterialTheme.typography.caption)
+        channel.currentFundingAmount?.let {
+            AmountView(amount = it.toMilliSatoshi(), unitTextStyle = MaterialTheme.typography.caption)
+        } ?: Text("--")
     }
 }
 
@@ -150,55 +166,159 @@ private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: (
 @Composable
 private fun ChannelDialog(
     onDismiss: () -> Unit,
-    channel: ChannelsConfiguration.Model.Channel
+    channel: LocalChannelInfo
 ) {
     val context = LocalContext.current
-    val txUrl = txUrl(txId = channel.txId ?: "")
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Column {
-            Card {
-                Row(modifier = Modifier.padding(16.dp)) {
-                    Text(text = stringResource(id = R.string.listallchannels_channel_id))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    SelectionContainer {
-                        Text(
-                            text = channel.id, style = MaterialTheme.typography.body2,
-                            overflow = TextOverflow.Ellipsis, maxLines = 1, modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
-            }
-            Card {
-                Column(
-                    modifier = Modifier
-                        .background(mutedBgColor())
-                        .fillMaxWidth()
-                        .heightIn(max = 350.dp)
-                ) {
-                    SelectionContainer {
-                        Text(
-                            text = channel.json,
-                            modifier = Modifier
-                                .weight(1.0f)
-                                .horizontalScroll(rememberScrollState())
-                                .verticalScroll(rememberScrollState()),
-                            style = monoTypo(),
-                        )
-                    }
-                }
-                Row(Modifier.fillMaxWidth()) {
-                    Button(onClick = { copyToClipboard(context, channel.json, context.getString(R.string.listallchannels_share_subject)) }, icon = R.drawable.ic_copy)
-                    Button(onClick = { share(context, channel.json, subject = context.getString(R.string.listallchannels_share_subject), context.getString(R.string.listallchannels_share_title)) }, icon = R.drawable.ic_share)
-                    Button(
-                        icon = R.drawable.ic_chain,
-                        onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(txUrl))) },
-                        text = stringResource(id = R.string.listallchannels_funding_tx),
-                        onClickLabel = stringResource(id = R.string.listallchannels_funding_tx_desc)
+        var currentTab by remember { mutableStateOf(0) }
+        val tabs = listOf(
+            stringResource(R.string.listallchannels_tab_summary, channel.channelId),
+            stringResource(R.string.listallchannels_tab_json)
+        )
+        Card {
+            TabRow(
+                selectedTabIndex = currentTab,
+                backgroundColor = MaterialTheme.colors.surface,
+                contentColor = MaterialTheme.colors.onSurface,
+            ) {
+                tabs.forEachIndexed { index, label ->
+                    Tab(
+                        text = { Text(text = label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                        selected = index == currentTab,
+                        onClick = { currentTab = index },
                     )
-                    Spacer(modifier = Modifier.weight(1.0f))
-                    Button(onClick = onDismiss, text = stringResource(id = R.string.listallchannels_close))
                 }
             }
+            when (currentTab) {
+                1 -> ChannelDialogJson(json = channel.json)
+                else -> ChannelDialogSummary(channel = channel)
+            }
+            Row(Modifier.fillMaxWidth()) {
+                Button(onClick = { copyToClipboard(context, channel.json, context.getString(R.string.listallchannels_share_subject)) }, icon = R.drawable.ic_copy)
+                Button(onClick = { share(context, channel.json, subject = context.getString(R.string.listallchannels_share_subject), context.getString(R.string.listallchannels_share_title)) }, icon = R.drawable.ic_share)
+                Spacer(modifier = Modifier.weight(1.0f))
+                Button(onClick = onDismiss, text = stringResource(id = R.string.listallchannels_close))
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChannelDialogSummary(
+    channel: LocalChannelInfo
+) {
+    val context = LocalContext.current
+    val btcUnit = LocalBitcoinUnit.current
+    Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)) {
+        ChannelDialogDataRow(
+            label = stringResource(id = R.string.listallchannels_channel_id),
+            value = channel.channelId
+        )
+        ChannelDialogDataRow(
+            label = stringResource(id = R.string.listallchannels_state),
+            value = channel.stateName
+        )
+        ChannelDialogDataRow(
+            label = stringResource(id = R.string.listallchannels_spendable),
+            value = channel.localBalance?.toPrettyString(btcUnit, withUnit = true) ?: stringResource(id = R.string.utils_unknown)
+        )
+        val commitments = channel.commitmentsInfo
+        if (commitments.isEmpty()) {
+            ChannelDialogDataRow(
+                label = stringResource(id = R.string.listallchannels_commitments),
+                value = stringResource(id = R.string.listallchannels_commitments_none)
+            )
+        } else {
+            ChannelDialogDataRow(
+                label = stringResource(id = R.string.listallchannels_commitments),
+                content = {
+                    Column(
+                        modifier = Modifier
+                            .heightIn(max = 300.dp)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        commitments.forEach { commitment ->
+                            Column(modifier = Modifier
+                                .background(mutedBgColor(), shape = RoundedCornerShape(6.dp))
+                                .padding(horizontal = 12.dp, vertical = 6.dp)
+                            ) {
+                                ChannelDialogDataRow(
+                                    label = stringResource(id = R.string.listallchannels_commitment_funding_tx_index),
+                                    value = "#${commitment.fundingTxIndex}"
+                                )
+                                ChannelDialogDataRow(
+                                    label = stringResource(id = R.string.listallchannels_commitment_funding_tx_id),
+                                    content = {
+                                        val url = txUrl(txId = commitment.fundingTxId)
+                                        InlineButton(text = commitment.fundingTxId, padding = PaddingValues(0.dp), maxLines = 1) {
+                                            openLink(context, link = url)
+                                        }
+                                    }
+                                )
+                                ChannelDialogDataRow(
+                                    label = stringResource(id = R.string.listallchannels_commitment_funding_capacity),
+                                    value = commitment.fundingAmount.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE)
+                                )
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun ChannelDialogJson(
+    json: String
+) {
+    Column(
+        modifier = Modifier
+            .background(mutedBgColor())
+            .fillMaxWidth()
+            .heightIn(max = 350.dp)
+    ) {
+        SelectionContainer {
+            Text(
+                text = json,
+                modifier = Modifier
+                    .weight(1.0f)
+                    .horizontalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState()),
+                style = monoTypo(),
+            )
+        }
+    }
+}
+
+@Composable
+private fun ChannelDialogDataRow(
+    label: String,
+    value: String,
+) {
+    ChannelDialogDataRow(label = label) {
+        SelectionContainer {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ChannelDialogDataRow(
+    label: String,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Row(modifier = Modifier.padding(vertical = 3.dp)) {
+        Text(text = label, fontSize = 14.sp, modifier = Modifier.weight(1f), textAlign = TextAlign.End)
+        Spacer(modifier = Modifier.width(8.dp))
+        Column(modifier = Modifier.weight(2f)) {
+            content()
         }
     }
 }
