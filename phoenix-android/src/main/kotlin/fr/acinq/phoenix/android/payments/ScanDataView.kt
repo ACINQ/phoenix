@@ -129,13 +129,11 @@ fun ScanDataView(
             is Scan.Model.SwapOutFlow -> {
                 val paymentRequest = model.address.paymentRequest
                 if (paymentRequest == null) {
-                    SendSwapOutView(
-                        model = model,
-                        maxFees = maxFees,
+                    SendSpliceOutView(
+                        requestedAmount = model.address.amount,
+                        address = model.address.address,
                         onBackClick = onBackClick,
-                        onInvalidate = { postIntent(it) },
-                        onPrepareSwapOutClick = { postIntent(it) },
-                        onSendSwapOutClick = { postIntent(it) }
+                        onSpliceOutSuccess = onBackClick,
                     )
                 } else {
                     var hasPickedSwapOutMode by remember { mutableStateOf(false) }

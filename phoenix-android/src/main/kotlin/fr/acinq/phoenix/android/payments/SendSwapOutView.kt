@@ -34,7 +34,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.byteVector
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.blockchain.fee.FeeratePerByte
+import fr.acinq.lightning.blockchain.fee.FeeratePerKw
+import fr.acinq.lightning.channel.Command
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -44,39 +53,101 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.mutedTextColor
-import fr.acinq.phoenix.android.utils.negativeColor
-import fr.acinq.phoenix.controllers.payments.MaxFees
-import fr.acinq.phoenix.controllers.payments.Scan
-import fr.acinq.phoenix.data.WalletContext
+import fr.acinq.phoenix.data.Chain
+import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.phoenix.utils.Parser
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.slf4j.LoggerFactory
 
+private sealed class SpliceOutState {
+    object Init: SpliceOutState()
+    object Preparing: SpliceOutState()
+    sealed class ReadyToSend(val userAmount: Satoshi, val feeExpected: Satoshi): SpliceOutState()
+    object Executing: SpliceOutState()
+    sealed class Complete: SpliceOutState() {
+        data class Success(val result: Command.Splice.Response.Success): Complete()
+        data class Failure(val result: Command.Splice.Response.Failure): Complete()
+    }
+    sealed class Error(val e: Throwable): SpliceOutState()
+}
+
+private class SpliceOutViewModel(private val peerManager: PeerManager, private val chain: Chain): ViewModel() {
+    val log = LoggerFactory.getLogger(this::class.java)
+    var state by mutableStateOf<SpliceOutState>(SpliceOutState.Init)
+
+    /** Simulate splice to get the fee. */
+    fun prepareSpliceOut(
+        amount: Satoshi,
+        feeratePerByte: Satoshi,
+        address: String,
+    ) {
+        viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
+            log.error("error when preparing splice-out: ", e)
+        }) {
+            // TODO
+            // state = SpliceOutState.ReadyToSend(123_000.sat, 456.sat)
+        }
+    }
+
+    fun executeSpliceOut(
+        amount: Satoshi,
+        feeratePerByte: Satoshi,
+        address: String,
+    ) {
+        if (state is SpliceOutState.ReadyToSend) {
+            state = SpliceOutState.Executing
+            viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
+                log.error("error when executing splice-out: ", e)
+            }) {
+                val response = peerManager.getPeer().spliceOut(
+                    amount = amount,
+                    scriptPubKey = Parser.addressToPublicKeyScript(chain, address)!!.byteVector(),
+                    feeratePerKw = FeeratePerKw(FeeratePerByte(feeratePerByte))
+                )
+                when (response) {
+                    is Command.Splice.Response.Success -> {
+                        state = SpliceOutState.Complete.Success(response)
+                    }
+                    is Command.Splice.Response.Failure -> {
+                        state = SpliceOutState.Complete.Failure(response)
+                    }
+                    null -> {}
+                }
+            }
+        }
+    }
+
+    class Factory(
+        private val peerManager: PeerManager, private val chain: Chain
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            @Suppress("UNCHECKED_CAST")
+            return SpliceOutViewModel(peerManager, chain) as T
+        }
+    }
+}
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SendSwapOutView(
-    model: Scan.Model.SwapOutFlow,
-    maxFees: MaxFees?,
+fun SendSpliceOutView(
+    requestedAmount: Satoshi?,
+    address: String,
     onBackClick: () -> Unit,
-    onInvalidate: (Scan.Intent.SwapOutFlow.Invalidate) -> Unit,
-    onPrepareSwapOutClick: (Scan.Intent.SwapOutFlow.PrepareSwapOut) -> Unit,
-    onSendSwapOutClick: (Scan.Intent.SwapOutFlow.SendSwapOut) -> Unit,
+    onSpliceOutSuccess: () -> Unit,
 ) {
-    val log = logger("SendSwapOutView")
-    log.info { "init swapout amount=${model.address.amount?.toMilliSatoshi()} to=${model.address.address}" }
+    val log = logger("SendSpliceOut")
+    log.info { "init splice-out with amount=$requestedAmount address=$address" }
 
     val context = LocalContext.current
     val prefBtcUnit = LocalBitcoinUnit.current
     val keyboardManager = LocalSoftwareKeyboardController.current
 
-    val requestedAmount = model.address.amount
-    var amount by remember { mutableStateOf(model.address.amount) }
+    val vm = viewModel<SpliceOutViewModel>(factory = SpliceOutViewModel.Factory(business.peerManager, business.chain))
+    var amount by remember { mutableStateOf(requestedAmount) }
     var amountErrorMessage by remember { mutableStateOf("") }
     val balance = business.balanceManager.balance.collectAsState(null).value
-    val swapOutConfig = business.appConfigurationManager.chainContext.collectAsState(initial = null).value?.swapOut?.v1 ?: WalletContext.V0.SwapOut.V1(
-        minFeerateSatByte = 20,
-        minAmountSat = 10_000,
-        maxAmountSat = 2_000_000L,
-        _status = 0
-    )
 
     Column(
         modifier = Modifier
@@ -97,24 +168,8 @@ fun SendSwapOutView(
                 onAmountChange = {
                     amountErrorMessage = ""
                     val newAmount = it?.amount?.truncateToSatoshi()
-                    if (model !is Scan.Model.SwapOutFlow.Init && amount != newAmount) {
-                        // if amount changes after a swap-out request has already been prepared, we must start over again
-                        onInvalidate(Scan.Intent.SwapOutFlow.Invalidate(model.address))
-                    }
                     when {
                         newAmount == null -> {}
-                        newAmount < swapOutConfig.minAmountSat.sat -> {
-                            amountErrorMessage = context.getString(
-                                R.string.send_swapout_error_amount_too_small,
-                                swapOutConfig.minAmountSat.sat.toMilliSatoshi().toPrettyString(prefBtcUnit, rate = null, withUnit = true)
-                            )
-                        }
-                        newAmount > swapOutConfig.maxAmountSat.sat -> {
-                            amountErrorMessage = context.getString(
-                                R.string.send_swapout_error_amount_too_large,
-                                swapOutConfig.maxAmountSat.sat.toMilliSatoshi().toPrettyString(prefBtcUnit, rate = null, withUnit = true)
-                            )
-                        }
                         balance != null && newAmount > balance.truncateToSatoshi() -> {
                             amountErrorMessage = context.getString(R.string.send_error_amount_over_balance)
                         }
@@ -129,7 +184,9 @@ fun SendSwapOutView(
                 inputTextSize = 42.sp
             )
             Column(
-                modifier = Modifier.padding(top = 20.dp, bottom = 32.dp, start = 16.dp, end = 16.dp).sizeIn(maxWidth = 400.dp),
+                modifier = Modifier
+                    .padding(top = 20.dp, bottom = 32.dp, start = 16.dp, end = 16.dp)
+                    .sizeIn(maxWidth = 400.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Label(text = stringResource(R.string.send_destination_label)) {
@@ -139,7 +196,7 @@ fun SendSwapOutView(
                         PhoenixIcon(resourceId = R.drawable.ic_chain, modifier = Modifier.size(18.dp), tint = MaterialTheme.colors.primary)
                         Spacer(Modifier.width(4.dp))
                         SelectionContainer {
-                            Text(text = model.address.address, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(text = address, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         }
                     }
                 }
@@ -148,64 +205,66 @@ fun SendSwapOutView(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        when (model) {
-            is Scan.Model.SwapOutFlow.Init -> {
+        when (val state = vm.state) {
+            is SpliceOutState.Init, is SpliceOutState.Error -> {
+
+                if (state is SpliceOutState.Error) {
+                    ErrorMessage(errorHeader = "!! error !!", errorDetails = state.e.localizedMessage)
+                }
+
                 BorderButton(
-                    text = stringResource(id = R.string.send_swapout_prepare_button),
+                    text = stringResource(id = R.string.send_spliceout_prepare_button),
                     icon = R.drawable.ic_build,
                     enabled = amountErrorMessage.isBlank(),
                 ) {
                     amount?.let {
                         keyboardManager?.hide()
-                        onPrepareSwapOutClick(Scan.Intent.SwapOutFlow.PrepareSwapOut(address = model.address, amount = it))
+                        vm.prepareSpliceOut(it, 20.sat, address)
                     } ?: run {
                         amountErrorMessage = context.getString(R.string.send_error_amount_invalid)
                     }
                 }
             }
-            is Scan.Model.SwapOutFlow.RequestingSwapout -> {
-                Text(stringResource(id = R.string.send_swapout_prepare_in_progress))
+            is SpliceOutState.Preparing -> {
+                ProgressView(text = stringResource(id = R.string.send_spliceout_prepare_in_progress))
             }
-            is Scan.Model.SwapOutFlow.SwapOutReady -> {
-                val total = model.paymentRequest.amount?.truncateToSatoshi()
-                if (total == null || total == 0.sat || total != model.initialUserAmount + model.fee) {
-                    onInvalidate(Scan.Intent.SwapOutFlow.Invalidate(model.address))
+            is SpliceOutState.ReadyToSend -> {
+                val total = state.userAmount + state.feeExpected
+                val chain = business.chain
+                val peerManager = business.peerManager
+
+                SpliceOutFeeSummaryView(userAmount = state.userAmount, fee = state.feeExpected, total = total)
+                Spacer(modifier = Modifier.height(24.dp))
+                if (balance != null && total.toMilliSatoshi() > balance) {
+                    ErrorMessage(errorHeader = stringResource(R.string.send_spliceout_error_cannot_afford_fees))
                 } else {
-                    SwapOutFeeSummaryView(userAmount = model.initialUserAmount, fee = model.fee, total = total)
-                    Spacer(modifier = Modifier.height(24.dp))
-                    if (balance != null && total.toMilliSatoshi() > balance) {
-                        Text(
-                            text = stringResource(R.string.send_swapout_error_cannot_afford_fees),
-                            style = MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 14.sp), maxLines = 1
-                        )
-                    } else {
-                        FilledButton(
-                            text = stringResource(id = R.string.send_pay_button),
-                            icon = R.drawable.ic_send,
-                            enabled = amountErrorMessage.isBlank()
-                        ) {
-                            onSendSwapOutClick(
-                                Scan.Intent.SwapOutFlow.SendSwapOut(
-                                    amount = total,
-                                    paymentRequest = model.paymentRequest,
-                                    maxFees = maxFees,
-                                    address = model.address,
-                                    swapOutFee = model.fee
-                                )
-                            )
-                        }
+                    FilledButton(
+                        text = stringResource(id = R.string.send_pay_button),
+                        icon = R.drawable.ic_send,
+                        enabled = amountErrorMessage.isBlank()
+                    ) {
+                        vm.executeSpliceOut(state.userAmount, 20.sat, address)
                     }
                 }
             }
-            is Scan.Model.SwapOutFlow.SendingSwapOut -> {
-                LaunchedEffect(key1 = Unit) { onBackClick() }
+            is SpliceOutState.Executing -> {
+                ProgressView(text = stringResource(id = R.string.send_spliceout_prepare_in_progress))
+            }
+            is SpliceOutState.Complete.Success -> {
+                LaunchedEffect(key1 = Unit) { onSpliceOutSuccess() }
+            }
+            is SpliceOutState.Complete.Failure -> {
+                ErrorMessage(
+                    errorHeader = stringResource(id = R.string.send_spliceout_error_failure),
+                    errorDetails = state.result::class.java.simpleName // TODO handle error
+                )
             }
         }
     }
 }
 
 @Composable
-private fun SwapOutFeeSummaryView(
+private fun SpliceOutFeeSummaryView(
     userAmount: Satoshi,
     fee: Satoshi,
     total: Satoshi,
@@ -216,16 +275,16 @@ private fun SwapOutFeeSummaryView(
         withBorder = true,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        FeeSummary(label = stringResource(id = R.string.send_swapout_complete_recap_amount), amount = userAmount.toMilliSatoshi())
-        FeeSummary(label = stringResource(id = R.string.send_swapout_complete_recap_fee), amount = fee.toMilliSatoshi())
-        FeeSummary(label = stringResource(id = R.string.send_swapout_complete_recap_total), amount = total.toMilliSatoshi())
+        FeeSummary(label = stringResource(id = R.string.send_spliceout_complete_recap_amount), amount = userAmount.toMilliSatoshi())
+        FeeSummary(label = stringResource(id = R.string.send_spliceout_complete_recap_fee), amount = fee.toMilliSatoshi())
+        FeeSummary(label = stringResource(id = R.string.send_spliceout_complete_recap_total), amount = total.toMilliSatoshi())
     }
 }
 
 @Composable
 private fun FeeSummary(
     label: String,
-    amount: fr.acinq.lightning.MilliSatoshi
+    amount: MilliSatoshi
 ) {
     Row(
         modifier = Modifier.widthIn(max = 500.dp)

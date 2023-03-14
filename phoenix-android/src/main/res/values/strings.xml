@@ -135,17 +135,17 @@
     <string name="send_paymentmode_lightning">Pay with Lightning</string>
     <string name="send_paymentmode_lightning_desc">Lightning payments are fast and best suited for small payments.</string>
 
-    <string name="send_swapout_error_amount_too_small">Min. %1$s for on-chain payments</string>
-    <string name="send_swapout_error_amount_too_large">Max. %1$s for on-chain payments</string>
-    <string name="send_swapout_error_cannot_afford_fees">Total after fees exceeds your balance.\nThis payment cannot be sent.</string>
-    <string name="send_swapout_prepare_button">Prepare transaction</string>
-    <string name="send_swapout_prepare_in_progress">Preparing transaction</string>
-    <string name="send_swapout_complete_recap_amount">Amount</string>
-    <string name="send_swapout_complete_recap_fee">Miner Fee</string>
-    <string name="send_swapout_complete_recap_total">Total</string>
-    <string name="send_swapout_mining_fee_dialog_title">What are those fees?</string>
-    <string name="send_swapout_mining_fee_dialog_body">
-      Payments to on-chain addresses require a swap and incur mining fees for the Bitcoin network. The fee rate used for the transaction is fixed by the swap service.
+    <string name="send_spliceout_error_cannot_afford_fees">Total after fees exceeds your balance.\nThis payment cannot be sent.</string>
+    <string name="send_spliceout_error_failure">Splicing failure: the transaction has not been sent.</string>
+    <string name="send_spliceout_prepare_button">Prepare transaction</string>
+    <string name="send_spliceout_prepare_in_progress">Preparing transaction…</string>
+    <string name="send_spliceout_execute_in_progress">Executing splice…</string>
+    <string name="send_spliceout_complete_recap_amount">Amount</string>
+    <string name="send_spliceout_complete_recap_fee">Miner Fee</string>
+    <string name="send_spliceout_complete_recap_total">Total</string>
+    <string name="send_spliceout_mining_fee_dialog_title">What are those fees?</string>
+    <string name="send_spliceout_mining_fee_dialog_body">
+      Payments to on-chain addresses require a splice which incurs mining fees for the Bitcoin network.
     </string>
 
     <!-- //////////////// scan //////////////// -->
