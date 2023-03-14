@@ -171,9 +171,6 @@ class PhoenixBusiness(
         override fun electrumConfiguration(): ElectrumConfigurationController =
             AppElectrumConfigurationController(_this)
 
-        override fun channelsConfiguration(): ChannelsConfigurationController =
-            AppChannelsConfigurationController(_this)
-
         override fun logsConfiguration(): LogsConfigurationController =
             AppLogsConfigurationController(_this)
 

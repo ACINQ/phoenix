@@ -15,7 +15,6 @@ typealias ReceiveController = MVI.Controller<Receive.Model, Receive.Intent>
 typealias ScanController = MVI.Controller<Scan.Model, Scan.Intent>
 typealias RestoreWalletController = MVI.Controller<RestoreWallet.Model, RestoreWallet.Intent>
 
-typealias ChannelsConfigurationController = MVI.Controller<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>
 typealias CloseChannelsConfigurationController = MVI.Controller<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>
 typealias ConfigurationController = MVI.Controller<Configuration.Model, Configuration.Intent>
 typealias ElectrumConfigurationController = MVI.Controller<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>
@@ -31,7 +30,6 @@ interface ControllerFactory {
     fun restoreWallet(): RestoreWalletController
     fun configuration(): ConfigurationController
     fun electrumConfiguration(): ElectrumConfigurationController
-    fun channelsConfiguration(): ChannelsConfigurationController
     fun logsConfiguration(): LogsConfigurationController
     fun closeChannelsConfiguration(): CloseChannelsConfigurationController
     fun forceCloseChannelsConfiguration(): CloseChannelsConfigurationController

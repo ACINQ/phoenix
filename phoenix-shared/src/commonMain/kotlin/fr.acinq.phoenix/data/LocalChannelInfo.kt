@@ -16,11 +16,15 @@
 
 package fr.acinq.phoenix.data
 
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.channel.*
-import fr.acinq.lightning.transactions.*
+import fr.acinq.lightning.json.JsonSerializers
 import fr.acinq.phoenix.utils.extensions.*
+import kotlinx.serialization.encodeToString
 
 /**
+ * This class exposes a channel's more important information in an easy-to-consume format.
+ *
  * @param channelId the channel's identifier as a hexadecimal string.
  * @param state the channel's state that may contain commitments information.
  * @param isBooting if true, this data comes from the local database and the channel has not yet been reestablished
@@ -35,15 +39,34 @@ data class LocalChannelInfo(
 ) {
     /** True if the channel is terminated and will never be usable again. */
     val isTerminated by lazy { state is Closing || state is Closed || state is Aborted }
-    /** True if the channel can be used to forward payments. */
+    /** True if the channel can be used to send/receive payments. */
     val isUsable by lazy { state is Normal && !isBooting }
-    /** Smart local balance after taking the state into account. For the raw balance, see [CommitmentSpec.toLocal]. */
+    /** A string version of the state's class. */
+    val stateName by lazy { state::class.simpleName ?: "Unknown" }
+    /** The channel's spendable balance, as seen in [ChannelState.localBalance]. */
     val localBalance by lazy { state.localBalance() }
-    /** Raw balance of the peer */
-    val capacity by lazy {
-        (state as? ChannelStateWithCommitments)?.commitments?.latest?.fundingAmount
+    /** The channel's current capacity. It actually is the funding capacity of the latest commitment. */
+    val currentFundingAmount by lazy { if (state is ChannelStateWithCommitments) state.commitments.latest.fundingAmount else null }
+    /** A channel may have several active commitments. */
+    val commitmentsInfo: List<CommitmentInfo> by lazy {
+        when (state) {
+            is ChannelStateWithCommitments -> state.commitments.active.map {
+                CommitmentInfo(
+                    fundingTxId = it.fundingTxId.toHex(),
+                    fundingTxIndex = it.fundingTxIndex,
+                    fundingAmount = it.fundingAmount
+                )
+            }.sortedByDescending { it.fundingTxIndex }
+            else -> emptyList()
+        }
     }
-    val fundingTx by lazy {
-        (state as? ChannelStateWithCommitments)?.commitments?.latest?.fundingTxId?.toHex()
-    }
+    /** The channel's data serialized in a json string. */
+    val json: String by lazy { JsonSerializers.json.encodeToString(state) }
+
+    /** Stripped-down commitment, easier to consume from the frontend. */
+    data class CommitmentInfo(
+        val fundingTxId: String,
+        val fundingTxIndex: Long,
+        val fundingAmount: Satoshi,
+    )
 }
