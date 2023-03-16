@@ -200,7 +200,7 @@ class SqlitePaymentsDatabaseTest {
             amount = 150_000.msat,
             paymentHash = Crypto.sha256(expiredPreimage).toByteVector32(),
             privateKey = Lightning.randomKey(),
-            description ="invoice",
+            description = Either.Left("invoice"),
             minFinalCltvExpiryDelta = CltvExpiryDelta(16),
             features =  defaultFeatures,
             timestampSeconds = 1
@@ -461,7 +461,7 @@ class SqlitePaymentsDatabaseTest {
                 amount = msat,
                 paymentHash = Crypto.sha256(preimage).toByteVector32(),
                 privateKey = Lightning.randomKey(),
-                description = "invoice",
+                description = Either.Left("invoice"),
                 minFinalCltvExpiryDelta = CltvExpiryDelta(16),
                 features = defaultFeatures
             )
