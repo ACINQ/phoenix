@@ -277,7 +277,8 @@ object LegacyMigrationHelper {
                     amount = status.amount().toLong().msat,
                     serviceFee = payToOpenMeta?.fee_sat?.sat?.toMilliSatoshi() ?: 0.msat,
                     fundingFee = 0.sat,
-                    channelId = ByteVector32.Zeroes
+                    channelId = ByteVector32.Zeroes,
+                    confirmed = true,
                 )
             } else {
                 IncomingPayment.ReceivedWith.LightningPayment(
