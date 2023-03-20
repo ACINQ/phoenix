@@ -1,6 +1,6 @@
 package fr.acinq.phoenix.controllers.config
 
-import fr.acinq.lightning.json.JsonSerializers
+import fr.acinq.lightning.serialization.v1.Serialization.lightningSerializersModule
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.controllers.AppController
@@ -8,7 +8,7 @@ import fr.acinq.phoenix.data.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.kodein.log.LoggerFactory
 
 
@@ -24,11 +24,17 @@ class AppChannelsConfigurationController(
         peerManager = business.peerManager,
     )
 
+    private val json = Json {
+        ignoreUnknownKeys = true
+        prettyPrint = true
+        serializersModule = lightningSerializersModule
+        allowStructuredMapKeys = true
+    }
+
     init {
         launch(Dispatchers.Default) {
             val peer = peerManager.getPeer()
             val nodeId = peer.nodeParams.keyManager.nodeId.toString()
-
             peerManager.channelsFlow.filterNotNull().collect { channels ->
                 val models = channels.values.map { mapChannelInfoToModel(it) }
                 val allChannelsJson = models.associate { it.id to it.json }.toString()
@@ -53,7 +59,10 @@ class AppChannelsConfigurationController(
         stateName = if (channelInfo.isBooting) "Booting" else channelInfo.state::class.simpleName ?: "Unknown",
         localBalance = channelInfo.localBalance,
         remoteBalance = channelInfo.remoteBalance,
-        json = JsonSerializers.json.encodeToString(channelInfo.state),
+        json = json.encodeToString(
+            fr.acinq.lightning.serialization.v1.ChannelState.serializer(),
+            fr.acinq.lightning.serialization.v1.ChannelState.import(channelInfo.state)
+        ),
         txId = channelInfo.fundingTx
     )
 }

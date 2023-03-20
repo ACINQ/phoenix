@@ -93,15 +93,8 @@ extension Lightning_kmpWalletPayment {
 		
 			// An incomingPayment may have fees if a new channel was automatically opened
 			if let received = incomingPayment.received {
-				
-				let msat = received.receivedWith.map {
-					if let newChannel = $0 as? Lightning_kmpIncomingPayment.ReceivedWithNewChannel {
-						return newChannel.serviceFee.msat // exclude fundingFee (which is a minerFee)
-					} else {
-						return $0.fees.msat
-					}
-				}.reduce(0, +)
-				
+					
+				let msat = received.receivedWith.map { $0.fees.msat }.reduce(0, +)
 				if msat > 0 {
 					
 					let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
@@ -180,34 +173,7 @@ extension Lightning_kmpWalletPayment {
 	
 	func minerFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String, String)? {
 		
-		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
-			
-			if let received = incomingPayment.received {
-				
-				// An incomingPayment may have minerFees if a new channel was opened using dual-funding
-				
-				let sat = received.receivedWith.map {
-					if let newChannel = $0 as? Lightning_kmpIncomingPayment.ReceivedWithNewChannel {
-						return newChannel.fundingFee.sat
-					} else {
-						return Int64(0)
-					}
-				}.reduce(0, +)
-				
-				if sat > 0 {
-					
-					let formattedAmt = Utils.format(currencyPrefs, sat: sat)
-					let title = NSLocalizedString("Miner Fees", comment: "Label in SummaryInfoGrid")
-					let exp = NSLocalizedString(
-						"Bitcoin network fees paid for on-chain transaction.",
-						comment: "Fees explanation"
-					)
-					
-					return (formattedAmt, title, exp)
-				}
-			}
-			
-		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
+		if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
 			
 			if let _ = outgoingPayment.status.asOnChain() {
 				

@@ -139,14 +139,9 @@ class IncomingQueries(private val database: PaymentsDatabase) {
                 payment_hash = paymentHash.toByteArray(),
                 mapper = ::mapIncomingPayment
             ).executeAsOneOrNull() ?: throw IncomingPaymentNotFound(paymentHash)
-            val newReceivedWith = paymentInDb.received?.receivedWith?.map {
-                when (it) {
-                    is IncomingPayment.ReceivedWith.NewChannel -> it.copy(confirmed = true)
-                    else -> it
-                }
-            }?.toSet() ?: emptySet()
-            val (receivedWithType, receivedWithBlob) = newReceivedWith.mapToDb() ?: (null to null)
-            val receivedWithNewChannel = newReceivedWith.any {
+            val receivedWith = paymentInDb.received?.receivedWith ?: emptySet()
+            val (receivedWithType, receivedWithBlob) = receivedWith.mapToDb() ?: (null to null)
+            val receivedWithNewChannel = receivedWith.any {
                 it is IncomingPayment.ReceivedWith.NewChannel
             }
             queries.updateReceived(

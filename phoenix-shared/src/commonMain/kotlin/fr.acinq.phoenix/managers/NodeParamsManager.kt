@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.managers
 
-import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.*
 import fr.acinq.lightning.blockchain.fee.FeerateTolerance
 import fr.acinq.lightning.blockchain.fee.OnChainFeeConf
@@ -29,8 +28,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
@@ -55,11 +52,14 @@ class NodeParamsManager(
     init {
         // we listen to the wallet manager and update node params and databases when the wallet changes
         launch {
-            walletManager.keyManager.filterNotNull().collect { keyManager ->
+            walletManager.wallet.collect {
+                if (it == null) return@collect
+                log.info { "wallet available: building nodeParams..." }
+
+                val keyManager = LocalKeyManager(seed = it.seed, chainHash = chain.chainHash)
                 log.info { "nodeid=${keyManager.nodeId}" }
 
                 val nodeParams = NodeParams(
-                    loggerFactory = loggerFactory,
                     keyManager = keyManager,
                     alias = "phoenix",
                     features = Features(
@@ -76,10 +76,11 @@ class NodeParamsManager(
                         Feature.PaymentMetadata to FeatureSupport.Optional,
                         Feature.ExperimentalTrampolinePayment to FeatureSupport.Optional,
                         Feature.ZeroReserveChannels to FeatureSupport.Optional,
+                        Feature.ZeroConfChannels to FeatureSupport.Optional,
                         Feature.WakeUpNotificationClient to FeatureSupport.Optional,
                         Feature.PayToOpenClient to FeatureSupport.Optional,
+                        Feature.TrustedSwapInClient to FeatureSupport.Optional,
                         Feature.ChannelBackupClient to FeatureSupport.Optional,
-                        Feature.DualFunding to FeatureSupport.Mandatory,
                     ),
                     dustLimit = 546.sat,
                     maxRemoteDustLimit = 600.sat,
@@ -99,6 +100,8 @@ class NodeParamsManager(
                     maxToLocalDelayBlocks = CltvExpiryDelta(1008),
                     feeBase = 1000.msat,
                     feeProportionalMillionth = 100,
+                    reserveToFundingRatio = 0.01, // note: not used (overridden below)
+                    maxReserveToFundingRatio = 0.05,
                     revocationTimeoutSeconds = 20,
                     authTimeoutSeconds = 10,
                     initTimeoutSeconds = 10,
@@ -116,8 +119,6 @@ class NodeParamsManager(
                     maxFundingSatoshis = 21_000_000_000_00000.sat,
                     maxPaymentAttempts = 5,
                     enableTrampolinePayment = true,
-                    zeroConfPeers = setOf(PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134")),
-                    paymentRecipientExpiryParams = RecipientCltvExpiryParams(CltvExpiryDelta(75), CltvExpiryDelta(200)),
                 )
 
                 _nodeParams.value = nodeParams

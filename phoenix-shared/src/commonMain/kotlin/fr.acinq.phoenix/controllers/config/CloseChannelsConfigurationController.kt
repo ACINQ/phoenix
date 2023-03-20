@@ -3,9 +3,10 @@ package fr.acinq.phoenix.controllers.config
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.channel.*
-import fr.acinq.lightning.io.WrappedChannelCommand
+import fr.acinq.lightning.io.WrappedChannelEvent
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.phoenix.managers.WalletManager
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration.Model.ChannelInfoStatus
 import fr.acinq.phoenix.data.Chain
@@ -17,6 +18,7 @@ import org.kodein.log.LoggerFactory
 class AppCloseChannelsConfigurationController(
     loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
+    private val walletManager: WalletManager,
     private val chain: Chain,
     private val isForceClose: Boolean
 ) : AppController<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>(
@@ -26,6 +28,7 @@ class AppCloseChannelsConfigurationController(
     constructor(business: PhoenixBusiness, isForceClose: Boolean): this(
         loggerFactory = business.loggerFactory,
         peerManager = business.peerManager,
+        walletManager = business.walletManager,
         chain = business.chain,
         isForceClose = isForceClose
     )
@@ -92,7 +95,13 @@ class AppCloseChannelsConfigurationController(
                     val closableChannelsList = updatedChannelsList.filter {
                         isClosable(it.status)
                     }
-                    val address = peer.finalAddress
+                    val path = when (chain) {
+                        Chain.Mainnet -> "m/84'/0'/0'/0/0"
+                        else -> "m/84'/1'/0'/0/0"
+                    }
+                    val wallet = walletManager.wallet.value!!
+                    val address = wallet.onchainAddress(path)
+
                     model(CloseChannelsConfiguration.Model.Ready(
                         channels = closableChannelsList,
                         address = address
@@ -133,8 +142,8 @@ class AppCloseChannelsConfigurationController(
                 } else {
                     CMD_FORCECLOSE
                 }
-                val channelEvent = ChannelCommand.ExecuteCommand(command)
-                val peerEvent = WrappedChannelCommand(channelId, channelEvent)
+                val channelEvent = ChannelEvent.ExecuteCommand(command)
+                val peerEvent = WrappedChannelEvent(channelId, channelEvent)
                 peer.send(peerEvent)
             }
         }

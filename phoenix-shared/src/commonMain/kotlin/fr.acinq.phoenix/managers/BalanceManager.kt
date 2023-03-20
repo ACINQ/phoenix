@@ -2,12 +2,8 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.SwapInEvents
-import fr.acinq.lightning.blockchain.electrum.WalletState
-import fr.acinq.lightning.io.Peer
-import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.io.*
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.utils.extensions.*
@@ -37,59 +33,18 @@ class BalanceManager(
     val balance: StateFlow<MilliSatoshi?> = _balance
 
     /**
-     * The swap-in wallet as seen by the current Electrum server. Contains a map of utxos and parent txs. It's
-     * a copy of [Peer.swapInWallet].
-     *
-     * Since it reflects what the Electrum server sees, there can be a few seconds delay between actions initiated
-     * by Phoenix and this view of the wallet. This delay can cause confusion and that's why the UI cannot directly
-     * read [Peer.swapInWallet].walletStateFlow to get the swap-in balance. We have to ignore [_reservedUtxos] to
-     * get the actual swap-in balance.
-     *
-     * Examples of the delay:
-     * - when we consider the channel opened (+ update balance, + create IncomingPayment)
-     * - when that updated balance is bounced back from the Electrum server
-     *
-     * Even on a fast connection, that takes several seconds.
-     * And during that time, the UI is in a bad state:
-     * - the (lightning) balance has been updated to reflect the new channel;
-     * - the incoming payment is reflected in the payments list;
-     * - but the wallet incorrectly says "+ X sat incoming".
+     * Flow of map of (bitcoinAddress -> amount) swap-ins.
      */
-    private val _swapInWallet = MutableStateFlow<WalletState?>(null)
-
-    /**
-     * A map of (channelId -> List<Utxos>) representing the utxos that will be reserved to create a channel.
-     *
-     * When a channel is creating (see [ChannelEvents.Creating] in [NodeParams.nodeEvents]), this flow is updated
-     * with the channel and its utxos. When a channel has been created, it is removed from this map.
-     */
-    private val _pendingReservedUtxos = MutableStateFlow<Map<ByteVector32, List<WalletState.Utxo>>>(emptyMap())
-
-    /**
-     * A map of (channelId -> List<Utxos>) representing the utxos that are reserved to create a channel.
-     *
-     * When a channel has been created (see [ChannelEvents.Created]), it is added to this flow and the utxos are
-     * manually ignored when computing the swap-in balance.
-     *
-     * When Electrum updates its view of the swap-in wallet, this flow is updated as well.
-     */
-    private val _reservedUtxos = MutableStateFlow<Set<WalletState.Utxo>>(emptySet())
-
-    /**
-     * The wallet swap-in balance is computed manually, using the Electrum view of the swap-in wallet WITHOUT the
-     * [_reservedUtxos] for pending channels.
-     */
-    private val _swapInWalletBalance = MutableStateFlow(WalletBalance.empty())
-    val swapInWalletBalance: StateFlow<WalletBalance> = _swapInWalletBalance
+    private val _incomingSwaps = MutableStateFlow<Map<String, MilliSatoshi>>(HashMap())
+    val incomingSwaps: StateFlow<Map<String, MilliSatoshi>> = _incomingSwaps
+    private var _incomingSwapsMap by _incomingSwaps
 
     init {
         log.info { "init balance manager"}
         launch {
             val peer = peerManager.peerState.filterNotNull().first()
             launch { monitorChannelsBalance(peerManager) }
-            launch { monitorSwapInWallet(peer) }
-            launch { monitorNodeEvents(peer) }
-            launch { monitorSwapInBalance() }
+            launch { monitorIncomingSwapsMap(peer) }
         }
     }
 
@@ -100,81 +55,24 @@ class BalanceManager(
         }
     }
 
-    /**
-     * Copies [Peer.swapInWallet] changes to our own [_swapInWallet], and refreshes [_reservedUtxos] so that spent
-     * outputs are discarded.
-     */
-    private suspend fun monitorSwapInWallet(peer: Peer) {
-        peer.swapInWallet.walletStateFlow.collect { wallet ->
-            _swapInWallet.value = wallet
-            _reservedUtxos.update { it.intersect(wallet.utxos.toSet()) }
-        }
-    }
-
-    /**
-     * Monitors [NodeParams.nodeEvents] to update the incoming swap-in map as well as [_pendingReservedUtxos] and
-     * [_reservedUtxos].
-     *
-     * It also updates the confirmation status of incoming payments received via new channels.
-     */
-    private suspend fun monitorNodeEvents(peer: Peer) {
-        peer.nodeParams.nodeEvents.collect { event ->
-            when (event) {
-                is SwapInEvents.Requested -> {
-                    log.info { "swap-in requested for ${event.req.localFundingAmount} id=${event.req.requestId}" }
-                }
-                is SwapInEvents.Accepted -> {
-                    log.info { "swap-in accepted for id=${event.requestId} with funding_fee=${event.fundingFee} service_fee=${event.serviceFee}" }
-                }
-                is SwapInEvents.Rejected -> {
-                    log.error { "swap-in rejected for id=${event.requestId} with required_fee=${event.requiredFees} error=${event.failure}" }
-                }
-                is ChannelEvents.Creating -> {
-                    log.info { "channel creating with id=${event.state.channelId}" }
-                    val channelId = event.state.channelId
-                    val channelUtxos = event.state.wallet.confirmedUtxos
-                    _pendingReservedUtxos.update { it.plus(channelId to channelUtxos) }
-                }
-                is ChannelEvents.Created -> {
-                    log.info { "channel created with id=${event.state.channelId}" }
-                    val channelId = event.state.channelId
-                    _pendingReservedUtxos.value[channelId]?.let { channelUtxos ->
-                        _reservedUtxos.update { it.union(channelUtxos) }
-                        _pendingReservedUtxos.update { it.minus(channelId) }
+    private suspend fun monitorIncomingSwapsMap(peer: Peer) {
+        launch {
+            // iOS Note:
+            // If the payment was received via the notification-service-extension
+            // (which runs in a separate process), then you won't receive the
+            // corresponding notifications (PaymentReceived) thru this mechanism.
+            //
+            peer.eventsFlow.collect { event ->
+                when (event) {
+                    is SwapInPendingEvent -> {
+                        _incomingSwapsMap += (event.swapInPending.bitcoinAddress to event.swapInPending.amount.toMilliSatoshi())
                     }
-                }
-                is ChannelEvents.Confirmed -> {
-                    log.info { "channel confirmed for id=${event.state.channelId}" }
-                    databaseManager.paymentsDb().updateNewChannelConfirmed(
-                        channelId = event.state.channelId,
-                        receivedAt = currentTimestampMillis()
-                    )
+                    is SwapInConfirmedEvent -> {
+                        _incomingSwapsMap -= event.swapInConfirmed.bitcoinAddress
+                    }
+                    else -> Unit
                 }
             }
         }
-    }
-
-    /** The swap-in balance is the swap-in wallet's balance without the [_reservedUtxos]. */
-    private suspend fun monitorSwapInBalance() {
-        combine(_swapInWallet.filterNotNull(), _reservedUtxos) { swapInWallet, reservedUtxos ->
-            log.info { "monitorSwapInBalance: reserved_utxos=$reservedUtxos swapInWallet=$swapInWallet"}
-            swapInWallet.minus(reservedUtxos)
-        }.collect { availableWallet ->
-            _swapInWalletBalance.value = WalletBalance(
-                confirmed = availableWallet.confirmedBalance,
-                unconfirmed = availableWallet.unconfirmedBalance
-            )
-        }
-    }
-}
-
-data class WalletBalance(
-    val confirmed: Satoshi,
-    val unconfirmed: Satoshi
-) {
-    val total get() = confirmed + unconfirmed
-
-    companion object {
-        fun empty() = WalletBalance(0.sat, 0.sat)
     }
 }

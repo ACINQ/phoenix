@@ -10,17 +10,6 @@ extension PhoenixBusiness {
 	}
 }
 
-extension BalanceManager {
-	
-	func swapInWalletBalanceValue() -> WalletBalance {
-		if let value = swapInWalletBalance.value_ as? WalletBalance {
-			return value
-		} else {
-			return WalletBalance.companion.empty()
-		}
-	}
-}
-
 extension Lightning_kmpConnection {
 	
 	func localizedText() -> String {

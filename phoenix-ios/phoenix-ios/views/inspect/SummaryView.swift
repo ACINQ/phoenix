@@ -190,23 +190,6 @@ struct SummaryView: View {
 							.padding(.bottom, 6)
 							.accessibilityLabel("Pending payment")
 							.accessibilityHint("Waiting for confirmations")
-						if let depth = minFundingDepth() {
-							let minutes = depth * 10
-							Text("requires \(depth) confirmations")
-								.font(.footnote)
-								.multilineTextAlignment(.center)
-								.foregroundColor(.secondary)
-							Text("≈\(minutes) minutes")
-								.font(.footnote)
-								.multilineTextAlignment(.center)
-								.foregroundColor(.secondary)
-						}
-						if let broadcastDate = onChainBroadcastDate() {
-							Text(broadcastDate.format())
-								.font(.subheadline)
-								.foregroundColor(.secondary)
-								.padding(.top, 12)
-						}
 					} // </VStack>
 					.padding(.bottom, 30)
 				} else {
@@ -443,36 +426,6 @@ struct SummaryView: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
-	
-	func minFundingDepth() -> Int32? {
-		
-		guard
-			let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment,
-			let received = incomingPayment.received,
-			let newChannel = received.receivedWith.compactMap({ $0.asNewChannel() }).first,
-			let channelId = newChannel.channelId,
-			let channel = Biz.business.peerManager.getChannelWithCommitments(channelId: channelId),
-			let nodeParams = Biz.business.nodeParamsManager.nodeParams.value_ as? Lightning_kmpNodeParams
-		else {
-			return nil
-		}
-		
-		return channel.minDepthForFunding(nodeParams: nodeParams)
-	}
-	
-	func onChainBroadcastDate() -> Date? {
-		
-		if let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment {
-			
-			if let _ = incomingPayment.origin.asDualSwapIn() {
-				if let received = incomingPayment.received {
-					return received.receivedAtDate
-				}
-			}
-		}
-		
-		return nil
-	}
 	
 	// --------------------------------------------------
 	// MARK: Notifications

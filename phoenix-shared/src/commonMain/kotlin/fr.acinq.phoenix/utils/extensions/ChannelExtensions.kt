@@ -30,13 +30,6 @@ val ChannelState.localCommitmentSpec: CommitmentSpec? get() =
         else -> null
     }
 
-fun ChannelStateWithCommitments.minDepthForFunding(nodeParams: NodeParams): Int {
-    return Helpers.minDepthForFunding(
-        nodeParams = nodeParams,
-        fundingAmount = commitments.fundingAmount
-    )
-}
-
 fun ChannelState.localBalance(): MilliSatoshi {
     val channel = when (this) {
         is Offline -> this.state
@@ -54,10 +47,7 @@ fun ChannelState.localBalance(): MilliSatoshi {
         is Closed -> MilliSatoshi(0)
         is Aborted -> MilliSatoshi(0)
         is ErrorInformationLeak -> MilliSatoshi(0)
-        is WaitForChannelReady -> MilliSatoshi(0)
-        is LegacyWaitForFundingLocked -> MilliSatoshi(0)
         is WaitForFundingConfirmed -> MilliSatoshi(0)
-        is LegacyWaitForFundingConfirmed -> MilliSatoshi(0)
         else -> channel?.localCommitmentSpec?.toLocal ?: MilliSatoshi(0)
     }
 }

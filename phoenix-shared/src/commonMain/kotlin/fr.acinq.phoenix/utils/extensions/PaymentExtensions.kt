@@ -21,7 +21,6 @@ import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.data.Chain
-import fr.acinq.phoenix.db.payments.IncomingReceivedWithData
 import org.kodein.memory.util.freeze
 
 /**
@@ -47,16 +46,9 @@ fun WalletPayment.state(): WalletPaymentState = when (this) {
         is OutgoingPayment.Status.Completed.Succeeded.OnChain -> WalletPaymentState.Success
         is OutgoingPayment.Status.Completed.Succeeded.OffChain -> WalletPaymentState.Success
     }
-    is IncomingPayment -> when (val received = received) {
+    is IncomingPayment -> when (received) {
         null -> WalletPaymentState.Pending
-        else -> {
-            if (received.receivedWith.all {
-                when (it) {
-                    is IncomingPayment.ReceivedWith.NewChannel -> it.confirmed
-                    else -> true
-                }
-            }) WalletPaymentState.Success else WalletPaymentState.Pending
-        }
+        else -> WalletPaymentState.Success
     }
 }
 

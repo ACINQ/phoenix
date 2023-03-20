@@ -3,7 +3,6 @@ package fr.acinq.phoenix.controllers.main
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.managers.WalletManager
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
@@ -23,12 +22,12 @@ class AppContentController(
 
     init {
         launch {
-            if (walletManager.isLoaded()) {
+            if (walletManager.wallet.value != null) {
                 model(Content.Model.IsInitialized)
             } else {
                 model(Content.Model.NeedInitialization)
                 // Suspends until a wallet is created
-                walletManager.keyManager.filterNotNull().first()
+                walletManager.wallet.first { it != null }
                 model(Content.Model.IsInitialized)
             }
         }

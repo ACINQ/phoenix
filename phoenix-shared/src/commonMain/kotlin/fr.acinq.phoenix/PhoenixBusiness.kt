@@ -19,6 +19,7 @@ package fr.acinq.phoenix
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.utils.setLightningLoggerFactory
 import fr.acinq.phoenix.controllers.*
 import fr.acinq.phoenix.controllers.config.*
 import fr.acinq.phoenix.controllers.init.AppInitController
@@ -83,8 +84,8 @@ class PhoenixBusiness(
 
     val chain = Chain.Testnet
 
-    internal val electrumClient by lazy { ElectrumClient(null, MainScope(), loggerFactory) }
-    internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient.Caller(), MainScope(), loggerFactory) }
+    internal val electrumClient by lazy { ElectrumClient(tcpSocketBuilder, MainScope()) }
+    internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope()) }
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
 
@@ -102,6 +103,10 @@ class PhoenixBusiness(
     val lnurlManager by lazy { LnurlManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
     val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(loggerFactory)) }
+
+    init {
+        setLightningLoggerFactory(loggerFactory)
+    }
 
     fun start(startupParams: StartupParams) {
         logger.info { "starting with params=$startupParams" }

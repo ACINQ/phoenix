@@ -182,16 +182,14 @@ class BusinessManager {
 		log.trace("loadWallet()")
 		assertMainThread()
 		
-		if (business.walletManager.isLoaded()) {
-			return false
-		}
-
 		guard walletInfo == nil else {
 			return false
 		}
 		
 		let seed = knownSeed ?? business.walletManager.mnemonicsToSeed(mnemonics: mnemonics, passphrase: "")
-		let _walletInfo = business.walletManager.loadWallet(seed: seed)
+		guard let _walletInfo = business.walletManager.loadWallet(seed: seed) else {
+			return false
+		}
 		
 		self.walletInfo = _walletInfo
 		maybeRegisterFcmToken()

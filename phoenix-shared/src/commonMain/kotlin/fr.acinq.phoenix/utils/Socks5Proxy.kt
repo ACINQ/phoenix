@@ -31,8 +31,8 @@ class Socks5Proxy(
 
     val logger = newLogger(loggerFactory)
 
-    override suspend fun connect(host: String, port: Int, tls: TcpSocket.TLS, loggerFactory: LoggerFactory): TcpSocket {
-        val socket = socketBuilder.connect(proxyHost, proxyPort, TcpSocket.TLS.DISABLED, loggerFactory)
+    override suspend fun connect(host: String, port: Int, tls: TcpSocket.TLS): TcpSocket {
+        val socket = socketBuilder.connect(proxyHost, proxyPort, TcpSocket.TLS.DISABLED)
         val (cHost, cPort) = socks5Handshake(
             destinationHost = host,
             destinationPort = port,

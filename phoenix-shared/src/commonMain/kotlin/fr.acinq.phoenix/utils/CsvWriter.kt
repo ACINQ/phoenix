@@ -12,8 +12,7 @@ class CsvWriter {
         val includesFiat: Boolean,
         val includesDescription: Boolean,
         val includesNotes: Boolean,
-        val includesOriginDestination: Boolean,
-        val swapInAddress: String
+        val includesOriginDestination: Boolean
     )
 
     companion object {
@@ -126,13 +125,6 @@ class CsvWriter {
                         is IncomingPayment.Origin.Invoice -> "Incoming LN payment"
                         is IncomingPayment.Origin.KeySend -> "Incoming LN payment (keysend)"
                         is IncomingPayment.Origin.SwapIn -> "Swap-in to ${origin.address ?: "N/A"}"
-                        is IncomingPayment.Origin.DualSwapIn -> {
-                            // append txs ids if any, nothing otherwise
-                            val inputs = origin.localInputs.takeIf { it.isNotEmpty() }?.joinToString("\n- ") {
-                                it.txid.toHex()
-                            }?.let { "\n$it" } ?: ""
-                            "Swap-in to ${config.swapInAddress}$inputs"
-                        }
                     }
                     is OutgoingPayment -> when (val details = payment.details) {
                         is OutgoingPayment.Details.Normal -> "Outgoing LN payment to ${details.paymentRequest.nodeId.toHex()}"

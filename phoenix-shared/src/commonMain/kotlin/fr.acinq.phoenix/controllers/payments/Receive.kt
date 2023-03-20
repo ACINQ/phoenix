@@ -9,7 +9,11 @@ object Receive {
         object Awaiting : Model()
         object Generating: Model()
         data class Generated(val request: String, val paymentHash: String, val amount: MilliSatoshi?, val desc: String?): Model()
-        data class SwapIn(val address: String): Model()
+        sealed class SwapIn: Model() {
+            object Requesting: SwapIn()
+            data class Generated(val address: String): SwapIn()
+        }
+
     }
 
     sealed class Intent : MVI.Intent() {
