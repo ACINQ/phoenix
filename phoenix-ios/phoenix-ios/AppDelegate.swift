@@ -107,7 +107,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		}.store(in: &cancellables)
 
 		CrossProcessCommunication.shared.start(actor: .mainApp) { (_: XpcMessage) in
-			self.didReceiveMessageFromAppExtension()
+			self.didReceivePaymentViaAppExtension()
 		}
 		
 		NotificationsManager.shared.requestPermissionForProvisionalNotifications()
@@ -130,8 +130,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	func _applicationDidBecomeActive(_ application: UIApplication) {
 		log.trace("### applicationDidBecomeActive(_:)")
 		
-		UIApplication.shared.applicationIconBadgeNumber = 0
+		if GroupPrefs.shared.badgeCount > 0 {
+			didReceivePaymentViaAppExtension()
+		}
 		GroupPrefs.shared.badgeCount = 0
+		UIApplication.shared.applicationIconBadgeNumber = 0
 	}
 	
 	func _applicationWillResignActive(_ application: UIApplication) {
@@ -237,10 +240,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	// MARK: CrossProcessCommunication
 	// --------------------------------------------------
 
-	private func didReceiveMessageFromAppExtension() {
-		log.trace("didReceiveMessageFromAppExtension()")
+	private func didReceivePaymentViaAppExtension() {
+		log.trace("didReceivePaymentViaAppExtension()")
 		
-		// We received a message from the notification-service-extension.
 		// This usually happens when:
 		// - phoenix was running in the background
 		// - a received push notification launched our notification-service-extension
