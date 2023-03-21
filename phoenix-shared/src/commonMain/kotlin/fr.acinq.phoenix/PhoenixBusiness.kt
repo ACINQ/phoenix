@@ -55,13 +55,8 @@ import org.kodein.memory.file.resolve
 class PhoenixBusiness(
     internal val ctx: PlatformContext
 ) {
-    internal val logMemory = LogMemory(Path(getApplicationFilesDirectoryPath(ctx)).resolve("logs"))
-
-    val loggerFactory = LoggerFactory(
-        defaultLogFrontend.withShortPackageKeepLast(1),
-        logMemory.withShortPackageKeepLast(1)
-    )
-
+    internal val logMemory = PhoenixBusiness.getLogMemory(ctx)
+    internal val loggerFactory = PhoenixBusiness.getLoggerFactory(ctx)
     private val logger = loggerFactory.newLogger(this::class)
 
     private val tcpSocketBuilder = TcpSocket.Builder()
@@ -104,10 +99,6 @@ class PhoenixBusiness(
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
     val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(loggerFactory)) }
 
-    init {
-        setLightningLoggerFactory(loggerFactory)
-    }
-
     fun start(startupParams: StartupParams) {
         logger.info { "starting with params=$startupParams" }
         if (appConnectionsDaemon == null) {
@@ -140,7 +131,6 @@ class PhoenixBusiness(
         appConfigurationManager.cancel()
         currencyManager.cancel()
         lnurlManager.cancel()
-        logMemory.cancel()
     }
 
     // The (node_id, fcm_token) tuple only needs to be registered once.
@@ -187,5 +177,33 @@ class PhoenixBusiness(
 
         override fun forceCloseChannelsConfiguration(): CloseChannelsConfigurationController =
             AppCloseChannelsConfigurationController(_this, isForceClose = true)
+    }
+
+    companion object {
+        @Suppress("VARIABLE_IN_SINGLETON_WITHOUT_THREAD_LOCAL")
+        private var logMemory: LogMemory? = null
+
+        @Suppress("VARIABLE_IN_SINGLETON_WITHOUT_THREAD_LOCAL")
+        private var loggerFactory: LoggerFactory? = null
+
+        fun getLogMemory(ctx: PlatformContext): LogMemory {
+            if (logMemory == null) {
+                val path = Path(getApplicationFilesDirectoryPath(ctx)).resolve("logs")
+                logMemory = LogMemory(path)
+            }
+            return logMemory!!
+        }
+
+        fun getLoggerFactory(ctx: PlatformContext): LoggerFactory {
+            if (loggerFactory == null) {
+                val logMemory = getLogMemory(ctx)
+                loggerFactory = LoggerFactory(
+                    defaultLogFrontend.withShortPackageKeepLast(1),
+                    logMemory.withShortPackageKeepLast(1)
+                )
+                setLightningLoggerFactory(loggerFactory!!)
+            }
+            return loggerFactory!!
+        }
     }
 }
