@@ -76,14 +76,10 @@ class IncomingQueries(private val database: PaymentsDatabase) {
             val existingReceivedWith = paymentInDb.received?.receivedWith ?: emptySet()
             val newReceivedWith = existingReceivedWith + receivedWith
             val (receivedWithType, receivedWithBlob) = newReceivedWith.mapToDb() ?: (null to null)
-            val receivedWithNewChannel = newReceivedWith.any {
-                it is IncomingPayment.ReceivedWith.NewChannel
-            }
             queries.updateReceived(
                 received_at = receivedAt,
                 received_with_type = receivedWithType,
                 received_with_blob = receivedWithBlob,
-                received_with_new_channel = if (receivedWithNewChannel) 1 else 0,
                 payment_hash = paymentHash.toByteArray()
             )
             didCompleteWalletPayment(WalletPaymentId.IncomingPaymentId(paymentHash), database)
@@ -103,52 +99,10 @@ class IncomingQueries(private val database: PaymentsDatabase) {
                 }
             }?.toSet() ?: emptySet()
             val (receivedWithType, receivedWithBlob) = newReceivedWith.mapToDb() ?: (null to null)
-            val receivedWithNewChannel = newReceivedWith.any {
-                it is IncomingPayment.ReceivedWith.NewChannel
-            }
             queries.updateReceived(
                 received_at = paymentInDb.received?.receivedAt,
                 received_with_type = receivedWithType,
                 received_with_blob = receivedWithBlob,
-                received_with_new_channel = if (receivedWithNewChannel) 1 else 0,
-                payment_hash = paymentHash.toByteArray()
-            )
-            didCompleteWalletPayment(WalletPaymentId.IncomingPaymentId(paymentHash), database)
-        }
-    }
-
-    fun findNewChannelPayment(channelId: ByteVector32): ByteVector32? {
-        return database.transactionWithResult {
-            val query = queries.listNewChannel(mapper = ::mapListNewChannel)
-            var match: ListNewChannelRow? = null
-            query.execute { row ->
-                row.received?.receivedWith?.firstOrNull() {
-                    it is IncomingPayment.ReceivedWith.NewChannel && it.channelId == channelId
-                }?.let {
-                    match = row
-                    QueryExecution.Stop
-                } ?: QueryExecution.Continue
-            }
-            match?.paymentHash
-        }
-    }
-
-    fun updateNewChannelConfirmed(paymentHash: ByteVector32, receivedAt: Long) {
-        database.transaction {
-            val paymentInDb = queries.get(
-                payment_hash = paymentHash.toByteArray(),
-                mapper = ::mapIncomingPayment
-            ).executeAsOneOrNull() ?: throw IncomingPaymentNotFound(paymentHash)
-            val receivedWith = paymentInDb.received?.receivedWith ?: emptySet()
-            val (receivedWithType, receivedWithBlob) = receivedWith.mapToDb() ?: (null to null)
-            val receivedWithNewChannel = receivedWith.any {
-                it is IncomingPayment.ReceivedWith.NewChannel
-            }
-            queries.updateReceived(
-                received_at = receivedAt,
-                received_with_type = receivedWithType,
-                received_with_blob = receivedWithBlob,
-                received_with_new_channel = if (receivedWithNewChannel) 1 else 0,
                 payment_hash = paymentHash.toByteArray()
             )
             didCompleteWalletPayment(WalletPaymentId.IncomingPaymentId(paymentHash), database)
@@ -166,9 +120,6 @@ class IncomingQueries(private val database: PaymentsDatabase) {
             val paymentHash = Crypto.sha256(preimage).toByteVector32()
             val (originType, originData) = origin.mapToDb()
             val (receivedWithType, receivedWithBlob) = receivedWith.mapToDb() ?: (null to null)
-            val receivedWithNewChannel = receivedWith.any {
-                it is IncomingPayment.ReceivedWith.NewChannel
-            }
             queries.insertAndReceive(
                 payment_hash = paymentHash.toByteArray(),
                 preimage = preimage.toByteArray(),
@@ -177,7 +128,6 @@ class IncomingQueries(private val database: PaymentsDatabase) {
                 received_at = receivedAt,
                 received_with_type = receivedWithType,
                 received_with_blob = receivedWithBlob,
-                received_with_new_channel = if (receivedWithNewChannel) 1 else 0,
                 created_at = createdAt
             )
             didCompleteWalletPayment(WalletPaymentId.IncomingPaymentId(paymentHash), database)

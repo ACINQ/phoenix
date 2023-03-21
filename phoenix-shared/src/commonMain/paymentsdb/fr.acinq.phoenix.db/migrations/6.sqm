@@ -16,9 +16,3 @@ CREATE INDEX IF NOT EXISTS incoming_payments_filter_idx
 DROP INDEX IF EXISTS outgoing_payments_created_at_idx;
 CREATE INDEX IF NOT EXISTS outgoing_payments_filter_idx
     ON outgoing_payments(completed_at);
-
-ALTER TABLE incoming_payments ADD COLUMN received_with_new_channel INTEGER DEFAULT 0;
-
-CREATE INDEX IF NOT EXISTS incoming_payments_new_channel_idx
-    ON incoming_payments(created_at)
- WHERE received_with_new_channel = 1;

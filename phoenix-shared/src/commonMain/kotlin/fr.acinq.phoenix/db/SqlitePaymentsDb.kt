@@ -322,19 +322,6 @@ class SqlitePaymentsDb(
         }
     }
 
-    suspend fun updateNewChannelConfirmed(
-        channelId: ByteVector32,
-        receivedAt: Long
-    ) {
-        withContext(Dispatchers.Default) {
-            database.transaction {
-                inQueries.findNewChannelPayment(channelId)?.let { paymentHash ->
-                    inQueries.updateNewChannelConfirmed(paymentHash, receivedAt)
-                }
-            }
-        }
-    }
-
     override suspend fun getIncomingPayment(
         paymentHash: ByteVector32
     ): IncomingPayment? {

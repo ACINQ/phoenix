@@ -358,14 +358,10 @@ class CloudKitDb(
 
                     if (oldReceived == null && received != null) {
                         val (type, blob) = received.receivedWith.mapToDb() ?: (null to null)
-                        val receivedWithNewChannel = received.receivedWith.any {
-                            it is IncomingPayment.ReceivedWith.NewChannel
-                        }
                         inQueries.updateReceived(
                             received_at = received.receivedAt,
                             received_with_type = type,
                             received_with_blob = blob,
-                            received_with_new_channel = if (receivedWithNewChannel) 1 else 0,
                             payment_hash = incomingPayment.paymentHash.toByteArray()
                         )
                     }
