@@ -224,9 +224,8 @@ struct HomeView : MVIView {
 						.font(.largeTitle)
 				}
 				
-				Text(amount.type)
-					.font(.title2)
-					.foregroundColor(Color.appAccent)
+				Text_CurrencyName(currency: amount.currency, fontTextStyle: .title2)
+					.foregroundColor(.appAccent)
 					.padding(.bottom, 4)
 				
 			} // </HStack>

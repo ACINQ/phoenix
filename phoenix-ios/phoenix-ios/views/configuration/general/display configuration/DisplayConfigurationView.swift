@@ -90,8 +90,8 @@ struct DisplayConfigurationView: View {
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					Text("Fiat currency")
 					Spacer()
-					Text(verbatim: fiatCurrency.shortName)
-						.foregroundColor(Color.secondary)
+					Text_CurrencyName(fiatCurrency: fiatCurrency, fontTextStyle: .body)
+						.foregroundColor(.secondary)
 					Text(verbatim: "  \(fiatCurrency.flag)")
 				}
 			}

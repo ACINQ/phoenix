@@ -35,7 +35,7 @@ struct ValidateView: View {
 	@State var currency = Currency.bitcoin(.sat)
 	@State var currencyList: [Currency] = [Currency.bitcoin(.sat)]
 	
-	@State var currencyPickerChoice: String = Currency.bitcoin(.sat).abbrev
+	@State var currencyPickerChoice: String = Currency.bitcoin(.sat).shortName
 	@State var currencyConverterOpen = false
 	
 	@State var amount: String = ""
@@ -210,7 +210,7 @@ struct ValidateView: View {
 					.multilineTextAlignment(.trailing)
 					.minimumScaleFactor(0.95) // SwiftUI bugs: truncating text in RTL
 					.foregroundColor(isInvalidAmount() ? Color.appNegative : Color.primaryForeground)
-					.accessibilityHint("amount in \(currency.abbrev)")
+					.accessibilityHint("amount in \(currency.shortName)")
 			
 				Picker(selection: $currencyPickerChoice, label: Text(currencyPickerChoice).frame(minWidth: 40)) {
 					ForEach(currencyPickerOptions(), id: \.self) { option in
@@ -796,7 +796,7 @@ struct ValidateView: View {
 		
 		var options = [String]()
 		for currency in currencyList {
-			options.append(currency.abbrev)
+			options.append(currency.shortName)
 		}
 		
 		options.append(NSLocalizedString("other",
@@ -854,7 +854,7 @@ struct ValidateView: View {
 		
 		let bitcoinUnit = currencyPrefs.bitcoinUnit
 		currency = Currency.bitcoin(bitcoinUnit)
-		currencyPickerChoice = currency.abbrev
+		currencyPickerChoice = currency.shortName
 		
 		if let amount_msat = initialAmount() {
 			
@@ -940,7 +940,7 @@ struct ValidateView: View {
 	func currencyPickerDidChange() -> Void {
 		log.trace("currencyPickerDidChange()")
 		
-		if let newCurrency = currencyList.first(where: { $0.abbrev == currencyPickerChoice }) {
+		if let newCurrency = currencyList.first(where: { $0.shortName == currencyPickerChoice }) {
 			if currency != newCurrency {
 				currency = newCurrency
 				
@@ -959,7 +959,7 @@ struct ValidateView: View {
 		} else { // user selected "other"
 			
 			currencyConverterOpen = true
-			currencyPickerChoice = currency.abbrev // revert to last real currency
+			currencyPickerChoice = currency.shortName // revert to last real currency
 		}
 		
 		if !priceSliderVisible {
@@ -1350,7 +1350,7 @@ struct ValidateView: View {
 			
 			let preferredBitcoinUnit = currencyPrefs.bitcoinUnit
 			currency = Currency.bitcoin(preferredBitcoinUnit)
-			currencyPickerChoice = currency.abbrev
+			currencyPickerChoice = currency.shortName
 			
 			// The TextFieldCurrencyStyler doesn't seem to fire when we manually set the text value.
 			// So we need to do it manually here, to ensure the `parsedAmount` is properly updated.
@@ -1525,7 +1525,7 @@ struct ValidateView: View {
 			}
 
 			currency = newAmt.currency
-			currencyPickerChoice = newAmt.currency.abbrev
+			currencyPickerChoice = newAmt.currency.shortName
 
 			let formattedAmt: FormattedAmount
 			switch newAmt.currency {

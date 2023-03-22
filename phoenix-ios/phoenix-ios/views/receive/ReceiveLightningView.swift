@@ -198,7 +198,7 @@ struct ReceiveLightningView: View {
 			
 			VStack(alignment: .center) {
 			
-				Text(invoiceAmount())
+				invoiceAmount()
 					.font(.caption2)
 					.foregroundColor(.secondary)
 					.padding(.bottom, 2)
@@ -270,7 +270,7 @@ struct ReceiveLightningView: View {
 			
 				Spacer()
 				
-				Text(invoiceAmount())
+				invoiceAmount()
 					.font(.caption2)
 					.foregroundColor(.secondary)
 					.padding(.bottom, 6)
@@ -392,6 +392,31 @@ struct ReceiveLightningView: View {
 					.font(.caption)
 			}
 			.accessibilityElement(children: .combine)
+		}
+	}
+	
+	@ViewBuilder
+	func invoiceAmount() -> some View {
+		
+		if let m = mvi.model as? Receive.Model_Generated {
+			if let msat = m.amount?.msat {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+					
+					let btcAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit)
+					Text(btcAmt.string)
+					
+					if let exchangeRate = currencyPrefs.fiatExchangeRate() {
+						let fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
+						Text(verbatim: "  /  \(fiatAmt.digits) ")
+						Text_CurrencyName(currency: fiatAmt.currency, fontTextStyle: .caption2)
+					}
+				}
+				
+			} else {
+				Text("any amount")
+			}
+		} else {
+			Text("...")
 		}
 	}
 	
@@ -596,29 +621,6 @@ struct ReceiveLightningView: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
-	
-	func invoiceAmount() -> String {
-		
-		if let m = mvi.model as? Receive.Model_Generated {
-			if let msat = m.amount?.msat {
-				let btcAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit)
-				
-				if let exchangeRate = currencyPrefs.fiatExchangeRate() {
-					let fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
-					return "\(btcAmt.string)  /  \(fiatAmt.string)"
-				} else {
-					return btcAmt.string
-				}
-				
-			} else {
-				return NSLocalizedString("any amount",
-					comment: "placeholder: invoice is amount-less"
-				)
-			}
-		} else {
-			return "..."
-		}
-	}
 	
 	func invoiceDescription() -> String {
 		

@@ -764,43 +764,16 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			let display_amounts = displayAmounts(
-				msat: outgoingPayment.fees,
-				originalFiat: paymentInfo.metadata.originalFiat
+			commonValue_amounts(
+				displayAmounts: displayAmounts(
+					msat: outgoingPayment.fees,
+					originalFiat: paymentInfo.metadata.originalFiat
+			 	),
+				displayFeePercent: displayFeePercent(
+					fees: outgoingPayment.fees,
+					total: outgoingPayment.amount
+			 	)
 			)
-			let display_percent = displayFeePercent(
-				fees: outgoingPayment.fees,
-				total: outgoingPayment.amount
-			)
-			
-			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
-				
-				let display_bitcoin = display_amounts.bitcoin
-				if display_bitcoin.hasSubFractionDigits { // e.g.: has visible millisatoshi's
-					Text(verbatim: display_bitcoin.integerDigits)
-					+	Text(verbatim: display_bitcoin.decimalSeparator)
-							.foregroundColor(display_bitcoin.hasStdFractionDigits ? .primary : .secondary)
-					+	Text(verbatim: display_bitcoin.stdFractionDigits)
-					+	Text(verbatim: display_bitcoin.subFractionDigits)
-							.foregroundColor(.secondary)
-					+	Text(verbatim: " \(display_bitcoin.type)")
-				} else {
-					Text(verbatim: display_bitcoin.string)
-				}
-				
-				Text(verbatim: display_percent)
-				
-				if let display_fiatCurrent = display_amounts.fiatCurrent {
-					Text(verbatim: "≈ \(display_fiatCurrent.string)") +
-					Text(" (now)")
-						.foregroundColor(.secondary)
-				}
-				if let display_fiatOriginal = display_amounts.fiatOriginal {
-					Text("≈ \(display_fiatOriginal.string)") +
-					Text(" (original)")
-						.foregroundColor(.secondary)
-				}
-			}
 		}
 	}
 	
@@ -1066,7 +1039,10 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func commonValue_amounts(displayAmounts: DisplayAmounts) -> some View {
+	func commonValue_amounts(
+		displayAmounts: DisplayAmounts,
+		displayFeePercent: String? = nil
+	) -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 			
@@ -1092,15 +1068,25 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				Text(verbatim: display_bitcoin.string)
 			}
 			
+			if let display_feePercent = displayFeePercent {
+				Text(verbatim: display_feePercent)
+			}
+			
 			if let display_fiatCurrent = displayAmounts.fiatCurrent {
-				Text(verbatim: "≈ \(display_fiatCurrent.string)") +
-				Text(" (now)")
-					.foregroundColor(.secondary)
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+					Text(verbatim: "≈ \(display_fiatCurrent.digits) ")
+					Text_CurrencyName(currency: display_fiatCurrent.currency, fontTextStyle: .callout)
+					Text(" (now)")
+						.foregroundColor(.secondary)
+				}
 			}
 			if let display_fiatOriginal = displayAmounts.fiatOriginal {
-				Text(verbatim: "≈ \(display_fiatOriginal.string)")
-				+	Text(" (original)")
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+					Text(verbatim: "≈ \(display_fiatOriginal.digits) ")
+					Text_CurrencyName(currency: display_fiatOriginal.currency, fontTextStyle: .callout)
+					Text(" (original)")
 						.foregroundColor(.secondary)
+				}
 			}
 		}
 	}

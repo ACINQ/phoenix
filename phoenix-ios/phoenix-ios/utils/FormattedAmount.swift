@@ -38,7 +38,7 @@ struct FormattedAmount {
 	/// The currency type. E.g. "USD" or "btc"
 	///
 	var type: String {
-		return currency.abbrev
+		return currency.shortName
 	}
 	
 	/// The standard string value as typically displayed in the app. E.g.: "42,526 sat"

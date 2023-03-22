@@ -138,8 +138,7 @@ struct PaymentCell : View {
 					Text(verbatim: " ") // separate for RTL languages
 						.font(.caption)
 						.foregroundColor(.gray)
-					Text(verbatim: amount.type)
-						.font(.caption)
+					Text_CurrencyName(currency: amount.currency, fontTextStyle: .caption)
 						.foregroundColor(.gray)
 				}
 				.accessibilityElement()

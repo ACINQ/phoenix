@@ -664,7 +664,7 @@ fileprivate struct Row: View, ViewName {
 					.stroke(Color.textFieldBorder, lineWidth: 1)
 			)
 			
-			Text(currency.abbrev)
+			Text_CurrencyName(currency: currency, fontTextStyle: .body)
 				.frame(width: currencyTextWidth, alignment: .leading)
 				.padding(.leading, 10)
 			
@@ -869,7 +869,7 @@ fileprivate struct Row_iOS14: View, ViewName {
 					.stroke(Color.textFieldBorder, lineWidth: 1)
 			)
 			
-			Text(currency.abbrev)
+			Text(currency.shortName)
 				.frame(width: currencyTextWidth, alignment: .leading)
 				.padding(.leading, 10)
 			
@@ -1076,7 +1076,7 @@ fileprivate struct CurrencySelector: View, ViewName {
 					
 					ForEach(FiatCurrency.companion.values) { fiatCurrency in
 
-						Text(fiatCurrency.shortName)
+						Text_CurrencyName(fiatCurrency: fiatCurrency, fontTextStyle: .body)
 							.foregroundColor(Color.clear)
 							.read(fiatTextWidthReader)
 							.frame(width: fiatTextWidth, alignment: .leading) // required, or refreshes after display
@@ -1173,7 +1173,7 @@ fileprivate struct CurrencySelector: View, ViewName {
 		
 		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 			
-			Text(fiatCurrency.shortName)
+			Text_CurrencyName(fiatCurrency: fiatCurrency, fontTextStyle: .body)
 				.frame(width: fiatTextWidth, alignment: .leading)
 				
 			Text(fiatCurrency.flag)
