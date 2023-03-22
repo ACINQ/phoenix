@@ -24,7 +24,7 @@ struct ModifyInvoiceSheet: View {
 	
 	@State var currency: Currency = Currency.bitcoin(.sat)
 	@State var currencyList: [Currency] = [Currency.bitcoin(.sat)]
-	@State var currencyPickerChoice: String = Currency.bitcoin(.sat).abbrev
+	@State var currencyPickerChoice = CurrencyPickerOption.currency(Currency.bitcoin(.sat))
 	
 	@State var amount: String = ""
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
@@ -87,10 +87,10 @@ struct ModifyInvoiceSheet: View {
 				
 				Picker(
 					selection: $currencyPickerChoice,
-					label: Text(currencyPickerChoice).frame(minWidth: 40, alignment: Alignment.trailing)
+					label: currencyText(currencyPickerChoice).frame(minWidth: 40, alignment: Alignment.trailing)
 				) {
 					ForEach(currencyPickerOptions(), id: \.self) { option in
-						Text(option).tag(option)
+						currencyText(option).tag(option)
 					}
 				}
 				.pickerStyle(MenuPickerStyle())
@@ -156,6 +156,32 @@ struct ModifyInvoiceSheet: View {
 		
 	} // </body>
 	
+	@ViewBuilder
+	func currencyText(_ option: CurrencyPickerOption) -> some View {
+		
+		// From what I can tell, Apple won't let us do any formatting here.
+		// Things I've tried that don't work:
+		//
+		// #1
+		// ```
+		// HStack {Text("A") Text("B")}
+		// ```
+		// ^ You just get "A"
+		//
+		// #2
+		// ```
+		// Text("A") + Text("B").fontWeight(.thin)
+		// ```
+		// ^ You just get "AB" without the formatting
+		
+		switch option {
+		case .currency(let currency):
+			Text(currency.shortName)
+		case .other:
+			Text(option.description)
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: UI Content Helpers
 	// --------------------------------------------------
@@ -169,16 +195,14 @@ struct ModifyInvoiceSheet: View {
 		)
 	}
 	
-	func currencyPickerOptions() -> [String] {
+	func currencyPickerOptions() -> [CurrencyPickerOption] {
 		
-		var options = [String]()
+		var options = [CurrencyPickerOption]()
 		for currency in currencyList {
-			options.append(currency.abbrev)
+			options.append(CurrencyPickerOption.currency(currency))
 		}
 		
-		options.append(NSLocalizedString("other",
-			comment: "Option in currency picker list. Sends user to Currency Converter")
-		)
+		options.append(CurrencyPickerOption.other)
 		
 		return options
 	}
@@ -248,7 +272,7 @@ struct ModifyInvoiceSheet: View {
 		}
 		
 		currencyList = Currency.displayable(currencyPrefs: currencyPrefs, plus: currency)
-		currencyPickerChoice = currency.abbrev
+		currencyPickerChoice = CurrencyPickerOption.currency(currency)
 	}
 	
 	func amountDidChange() -> Void {
@@ -260,7 +284,9 @@ struct ModifyInvoiceSheet: View {
 	func currencyPickerDidChange() -> Void {
 		log.trace("currencyPickerDidChange()")
 		
-		if let newCurrency = currencyList.first(where: { $0.abbrev == currencyPickerChoice }) {
+		switch currencyPickerChoice {
+		case .currency(let newCurrency):
+			
 			if currency != newCurrency {
 				currency = newCurrency
 				
@@ -272,7 +298,7 @@ struct ModifyInvoiceSheet: View {
 				refreshAltAmount()
 			}
 			
-		} else { // user selected "other"
+		case .other: // user selected "other"
 			
 			if let amt = try? parsedAmount.get(), amt > 0 {
 				savedAmount = CurrencyAmount(currency: currency, amount: amt)
@@ -394,4 +420,30 @@ struct ModifyInvoiceSheet: View {
 			))
 		}
 	}	
+}
+
+enum CurrencyPickerOption: Hashable, Identifiable, CustomStringConvertible {
+	
+	case currency(Currency)
+	case other
+	
+	var id: String {
+		switch self {
+		case .currency(let currency):
+			return currency.id
+		case .other:
+			return "OtHeR"
+		}
+	}
+	
+	var description: String {
+		switch self {
+		case .currency(let currency):
+			return currency.shortName
+		case .other:
+			return NSLocalizedString("other",
+				comment: "Option in currency picker list. Sends user to Currency Converter"
+			)
+		}
+	}
 }

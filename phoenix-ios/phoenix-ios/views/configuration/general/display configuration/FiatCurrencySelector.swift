@@ -56,9 +56,9 @@ struct FiatCurrencySelector: View {
 			ScrollView {
 				VStack {
 					ForEach(FiatCurrency.companion.values) { fiatCurrency in
-
-						Text(fiatCurrency.shortName)
-							.foregroundColor(Color.clear)
+						
+						Text_CurrencyName(fiatCurrency: fiatCurrency, fontTextStyle: .body)
+							.foregroundColor(.clear)
 							.read(textWidthReader)
 							.frame(width: textWidth, alignment: .leading)
 						
@@ -108,7 +108,7 @@ struct FiatCurrencySelector: View {
 		
 		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 			
-			Text(fiatCurrency.shortName)
+			Text_CurrencyName(fiatCurrency: fiatCurrency, fontTextStyle: .body)
 				.frame(width: textWidth, alignment: .leading)
 				
 			Text(fiatCurrency.flag)

@@ -283,9 +283,8 @@ struct SummaryView: View {
 					.environment(\.layoutDirection, .leftToRight) // Issue #237
 				}
 				
-				Text(amount.type)
-					.font(.title3)
-					.foregroundColor(Color.appAccent)
+				Text_CurrencyName(currency: amount.currency, fontTextStyle: .title3)
+					.foregroundColor(.appAccent)
 					.padding(.leading, 6)
 					.padding(.bottom, 4)
 			}
@@ -877,40 +876,41 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				
 			HStack(alignment: VerticalAlignment.center, spacing: 6) {
 				
-				if amount.hasSubFractionDigits {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					
-					// We're showing sub-fractional values.
-					// For example, we're showing millisatoshis.
-					//
-					// It's helpful to downplay the sub-fractional part visually.
-					
-					let hasStdFractionDigits = amount.hasStdFractionDigits
-					
-					let styledText: Text =
+					if amount.hasSubFractionDigits {
+						
+						// We're showing sub-fractional values.
+						// For example, we're showing millisatoshis.
+						//
+						// It's helpful to downplay the sub-fractional part visually.
+						
+						let hasStdFractionDigits = amount.hasStdFractionDigits
+						
 						Text(verbatim: amount.integerDigits)
-					+	Text(verbatim: amount.decimalSeparator)
+						+	Text(verbatim: amount.decimalSeparator)
 							.foregroundColor(hasStdFractionDigits ? .primary : .secondary)
-					+	Text(verbatim: amount.stdFractionDigits)
-					+	Text(verbatim: amount.subFractionDigits)
+						+	Text(verbatim: amount.stdFractionDigits)
+						+	Text(verbatim: amount.subFractionDigits)
 							.foregroundColor(.secondary)
 							.font(.callout)
 							.fontWeight(.light)
-					+	Text(verbatim: " \(amount.type)")
+						
+					} else {
+						Text(amount.digits)
+					}
 					
-					styledText
-						.onTapGesture { toggleCurrencyType() }
-						.accessibilityLabel("\(amount.string)")
+					Text(" ")
+					Text_CurrencyName(currency: amount.currency, fontTextStyle: .body)
 					
-				} else {
-					Text(amount.string)
-						.onTapGesture { toggleCurrencyType() }
-				}
+				} // </HStack>
+				.onTapGesture { toggleCurrencyType() }
+				.accessibilityLabel("\(amount.string)")
 				
 				if !explanation.isEmpty {
 					
 					Button {
 						binding.wrappedValue.toggle()
-					//	popoverPresent_lightningFees = true
 					} label: {
 						Image(systemName: "questionmark.circle")
 							.renderingMode(.template)
