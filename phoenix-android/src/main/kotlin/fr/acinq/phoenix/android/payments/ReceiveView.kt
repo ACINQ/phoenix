@@ -90,9 +90,7 @@ fun ReceiveView(
                 when (vm.state) {
                     is ReceiveViewState.EditInvoice -> vm.state = ReceiveViewState.Default
                     else -> when (model) {
-                        is Receive.Model.SwapIn -> {
-                            vm.generateInvoice()
-                        }
+                        is Receive.Model.SwapIn -> vm.generateInvoice()
                         else -> nc.popBackStack()
                     }
                 }
@@ -234,20 +232,6 @@ private fun LightningInvoiceView(
         onEdit = onEdit
     )
     Spacer(modifier = Modifier.height(24.dp))
-    LocalWalletContext.current?.payToOpen?.v1?.minFundingSat?.sat?.let { minPayToOpenAmount ->
-        val channels by business.peerManager.channelsFlow.collectAsState(initial = null)
-        if (channels?.filter { !it.value.isUsable }.isNullOrEmpty()) {
-            Text(
-                text = annotatedStringResource(id = R.string.receive__min_amount_pay_to_open, minPayToOpenAmount.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
-                style = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .widthIn(max = 400.dp)
-                    .padding(horizontal = 32.dp)
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-    }
     BorderButton(
         text = stringResource(id = R.string.receive__swapin_button),
         icon = R.drawable.ic_swap,
