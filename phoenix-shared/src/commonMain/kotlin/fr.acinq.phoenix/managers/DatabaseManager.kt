@@ -1,10 +1,10 @@
 package fr.acinq.phoenix.managers
 
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.db.ChannelsDb
 import fr.acinq.lightning.db.Databases
 import fr.acinq.lightning.db.PaymentsDb
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.db.SqliteChannelsDb
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.phoenix.db.createChannelsDbDriver
@@ -12,7 +12,6 @@ import fr.acinq.phoenix.db.createPaymentsDbDriver
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
@@ -22,7 +21,7 @@ import org.kodein.memory.text.toHexString
 class DatabaseManager(
     loggerFactory: LoggerFactory,
     private val ctx: PlatformContext,
-    private val chain: Chain,
+    private val chain: NodeParams.Chain,
     private val nodeParamsManager: NodeParamsManager,
     private val currencyManager: CurrencyManager
 ) : CoroutineScope by MainScope() {

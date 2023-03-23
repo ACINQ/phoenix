@@ -17,14 +17,14 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.*
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.crypto.LocalKeyManager
-import fr.acinq.phoenix.data.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 
 class WalletManager(
-    private val chain: Chain
+    private val chain: NodeParams.Chain
 ) : CoroutineScope by MainScope() {
 
     private val _localKeyManager = MutableStateFlow<LocalKeyManager?>(null)
@@ -94,7 +94,7 @@ fun LocalKeyManager.cloudKeyHash(): String {
     return Crypto.hash160(cloudKey()).byteVector().toHex()
 }
 
-fun LocalKeyManager.isMainnet() = chainHash == Chain.Mainnet.chainHash
+fun LocalKeyManager.isMainnet() = chainHash == NodeParams.Chain.Mainnet.chainHash
 
 /** Get the wallet's (xpub, path) */
 fun LocalKeyManager.xpub(): Pair<String, String> {

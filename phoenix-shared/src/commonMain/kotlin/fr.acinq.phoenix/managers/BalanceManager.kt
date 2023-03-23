@@ -8,6 +8,8 @@ import fr.acinq.lightning.SwapInEvents
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.PaymentsDb
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.utils.extensions.*
@@ -82,6 +84,10 @@ class BalanceManager(
     private val _swapInWalletBalance = MutableStateFlow(WalletBalance.empty())
     val swapInWalletBalance: StateFlow<WalletBalance> = _swapInWalletBalance
 
+    /** Flow of incoming amounts of payments whose txId is not yet LOCKED. */
+    private val _unconfirmedChannelPayments = MutableStateFlow(0.msat)
+    val unconfirmedChannelPayments: StateFlow<MilliSatoshi> = _unconfirmedChannelPayments
+
     init {
         log.info { "init balance manager"}
         launch {
@@ -90,6 +96,7 @@ class BalanceManager(
             launch { monitorSwapInWallet(peer) }
             launch { monitorNodeEvents(peer) }
             launch { monitorSwapInBalance() }
+            launch { monitorIncomingPaymentNotYetConfirmed() }
         }
     }
 
@@ -124,7 +131,7 @@ class BalanceManager(
                     log.info { "swap-in requested for ${event.req.localFundingAmount} id=${event.req.requestId}" }
                 }
                 is SwapInEvents.Accepted -> {
-                    log.info { "swap-in accepted for id=${event.requestId} with funding_fee=${event.fundingFee} service_fee=${event.serviceFee}" }
+                    log.info { "swap-in accepted for id=${event.requestId} with mining_fee=${event.miningFee} service_fee=${event.serviceFee}" }
                 }
                 is SwapInEvents.Rejected -> {
                     log.error { "swap-in rejected for id=${event.requestId} with required_fee=${event.requiredFees} error=${event.failure}" }
@@ -145,12 +152,19 @@ class BalanceManager(
                 }
                 is ChannelEvents.Confirmed -> {
                     log.info { "channel confirmed for id=${event.state.channelId}" }
-                    databaseManager.paymentsDb().updateNewChannelConfirmed(
-                        channelId = event.state.channelId,
-                        receivedAt = currentTimestampMillis()
-                    )
                 }
             }
+        }
+    }
+
+    private suspend fun monitorIncomingPaymentNotYetConfirmed() {
+        databaseManager.paymentsDb().listIncomingPaymentsNotYetConfirmed().collect { payments ->
+            _unconfirmedChannelPayments.value = payments.filter {
+                it.received?.receivedWith?.any { part ->
+                    (part is IncomingPayment.ReceivedWith.NewChannel && part.status == PaymentsDb.ConfirmationStatus.NOT_LOCKED)
+                            || (part is IncomingPayment.ReceivedWith.SpliceIn && part.status == PaymentsDb.ConfirmationStatus.NOT_LOCKED)
+                } ?: false
+            }.map { it.amount }.sum()
         }
     }
 

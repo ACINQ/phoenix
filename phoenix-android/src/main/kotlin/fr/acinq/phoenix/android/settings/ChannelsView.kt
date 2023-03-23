@@ -18,15 +18,11 @@
 package fr.acinq.phoenix.android.settings
 
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -38,8 +34,6 @@ import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
 import fr.acinq.lightning.channel.*
-import fr.acinq.lightning.utils.msat
-import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
@@ -207,7 +201,6 @@ private fun ChannelDialog(
 private fun ChannelDialogSummary(
     channel: LocalChannelInfo
 ) {
-    val context = LocalContext.current
     val btcUnit = LocalBitcoinUnit.current
     Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)) {
         ChannelDialogDataRow(
@@ -222,49 +215,55 @@ private fun ChannelDialogSummary(
             label = stringResource(id = R.string.listallchannels_spendable),
             value = channel.localBalance?.toPrettyString(btcUnit, withUnit = true) ?: stringResource(id = R.string.utils_unknown)
         )
-        val commitments = channel.commitmentsInfo
-        if (commitments.isEmpty()) {
-            ChannelDialogDataRow(
-                label = stringResource(id = R.string.listallchannels_commitments),
-                value = stringResource(id = R.string.listallchannels_commitments_none)
-            )
-        } else {
-            ChannelDialogDataRow(
-                label = stringResource(id = R.string.listallchannels_commitments),
-                content = {
-                    Column(
-                        modifier = Modifier
-                            .heightIn(max = 300.dp)
-                            .verticalScroll(rememberScrollState()),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        commitments.forEach { commitment ->
-                            Column(modifier = Modifier
-                                .background(mutedBgColor(), shape = RoundedCornerShape(6.dp))
-                                .padding(horizontal = 12.dp, vertical = 6.dp)
-                            ) {
-                                ChannelDialogDataRow(
-                                    label = stringResource(id = R.string.listallchannels_commitment_funding_tx_index),
-                                    value = "#${commitment.fundingTxIndex}"
-                                )
-                                ChannelDialogDataRow(
-                                    label = stringResource(id = R.string.listallchannels_commitment_funding_tx_id),
-                                    content = {
-                                        val url = txUrl(txId = commitment.fundingTxId)
-                                        InlineButton(text = commitment.fundingTxId, padding = PaddingValues(0.dp), maxLines = 1) {
-                                            openLink(context, link = url)
-                                        }
-                                    }
-                                )
-                                ChannelDialogDataRow(
-                                    label = stringResource(id = R.string.listallchannels_commitment_funding_capacity),
-                                    value = commitment.fundingAmount.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE)
-                                )
-                            }
-                        }
+        CommitmentInfoView(label = stringResource(id = R.string.listallchannels_commitments), commitments = channel.commitmentsInfo)
+        CommitmentInfoView(label = stringResource(id = R.string.listallchannels_inactive_commitments), commitments = channel.inactiveCommitmentsInfo)
+    }
+}
+
+@Composable
+private fun CommitmentInfoView(
+    label: String,
+    commitments: List<LocalChannelInfo.CommitmentInfo>
+) {
+    val btcUnit = LocalBitcoinUnit.current
+    ChannelDialogDataRow(
+        label = label,
+        value = ""
+    )
+    Column(
+        modifier = Modifier
+            .heightIn(max = 300.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        commitments.forEach { commitment ->
+            Column(
+                modifier = Modifier
+                    .padding(start = 20.dp)
+                    .background(mutedBgColor())
+                    .padding(start = 6.dp) // small border on the left
+                    .background(MaterialTheme.colors.surface)
+                    .padding(start = 12.dp)
+            ) {
+                ChannelDialogDataRow(
+                    label = stringResource(id = R.string.listallchannels_commitment_funding_tx_index),
+                    value = "${commitment.fundingTxIndex}"
+                )
+                ChannelDialogDataRow(
+                    label = stringResource(id = R.string.listallchannels_commitment_funding_tx_id),
+                    content = {
+                        WebLink(text = commitment.fundingTxId, url = txUrl(txId = commitment.fundingTxId), maxLines = 1, fontSize = 14.sp)
                     }
-                }
-            )
+                )
+                ChannelDialogDataRow(
+                    label = stringResource(id = R.string.listallchannels_commitment_balance),
+                    value = commitment.balanceForSend.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE)
+                )
+                ChannelDialogDataRow(
+                    label = stringResource(id = R.string.listallchannels_commitment_funding_capacity),
+                    value = commitment.fundingAmount.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE)
+                )
+            }
         }
     }
 }
@@ -315,7 +314,7 @@ private fun ChannelDialogDataRow(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Row(modifier = Modifier.padding(vertical = 3.dp)) {
-        Text(text = label, fontSize = 14.sp, modifier = Modifier.weight(1f), textAlign = TextAlign.End)
+        Text(text = label, fontSize = 14.sp, modifier = Modifier.weight(1f))
         Spacer(modifier = Modifier.width(8.dp))
         Column(modifier = Modifier.weight(2f)) {
             content()

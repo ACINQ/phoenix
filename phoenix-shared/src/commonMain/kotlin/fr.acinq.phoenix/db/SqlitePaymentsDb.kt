@@ -287,6 +287,7 @@ class SqlitePaymentsDb(
         withContext(Dispatchers.Default) {
             database.transaction {
                 inQueries.receivePayment(paymentHash, receivedWith, receivedAt)
+                inQueries.linkTxIdPaymentHash(paymentHash, receivedWith)
             }
         }
     }
@@ -311,6 +312,7 @@ class SqlitePaymentsDb(
                     createdAt,
                     receivedAt
                 )
+                inQueries.linkTxIdPaymentHash(paymentHash, receivedWith)
                 // Add associated metadata within the same atomic database transaction.
                 if (!metadataRow.isEmpty()) {
                     metaQueries.addMetadata(paymentId, metadataRow)
@@ -319,25 +321,11 @@ class SqlitePaymentsDb(
         }
     }
 
-    override suspend fun updateNewChannelReceivedWithChannelId(
-        paymentHash: ByteVector32,
-        channelId: ByteVector32
-    ) {
+    override suspend fun setConfirmationStatus(txId: ByteVector32, status: PaymentsDb.ConfirmationStatus) {
         withContext(Dispatchers.Default) {
             database.transaction {
-                inQueries.updateNewChannelReceivedWithChannelId(paymentHash, channelId)
-            }
-        }
-    }
-
-    suspend fun updateNewChannelConfirmed(
-        channelId: ByteVector32,
-        receivedAt: Long
-    ) {
-        withContext(Dispatchers.Default) {
-            database.transaction {
-                inQueries.findNewChannelPayment(channelId)?.let { paymentHash ->
-                    inQueries.updateNewChannelConfirmed(paymentHash, receivedAt)
+                inQueries.listPaymentHashForTxId(txId).forEach { paymentHash ->
+                    inQueries.updateConfirmationStatus(paymentHash, status)
                 }
             }
         }
@@ -395,6 +383,13 @@ class SqlitePaymentsDb(
         }
     }
 
+    suspend fun listIncomingPaymentsNotYetConfirmed(): Flow<List<IncomingPayment>> {
+        return withContext(Dispatchers.Default) {
+            inQueries.listIncomingPaymentsNotYetConfirmed()
+        }
+    }
+
+    /** Returns a flow of incoming payments within <count, skip>. This flow is updated when the data change in the database. */
     suspend fun listPaymentsOrderFlow(
         count: Int,
         skip: Int
@@ -581,15 +576,9 @@ class SqlitePaymentsDb(
             metadata_modified_at: Long?
         ): WalletPaymentOrderRow {
             val paymentId = when (type) {
-                WalletPaymentId.DbType.OUTGOING.value -> {
-                    WalletPaymentId.OutgoingPaymentId.fromString(id)
-                }
-                WalletPaymentId.DbType.INCOMING.value -> {
-                    WalletPaymentId.IncomingPaymentId.fromString(id)
-                }
-                WalletPaymentId.DbType.SPLICE_OUTGOING.value -> {
-                    WalletPaymentId.SpliceOutgoingPaymentId.fromString(id)
-                }
+                WalletPaymentId.DbType.OUTGOING.value -> WalletPaymentId.OutgoingPaymentId.fromString(id)
+                WalletPaymentId.DbType.INCOMING.value -> WalletPaymentId.IncomingPaymentId.fromString(id)
+                WalletPaymentId.DbType.SPLICE_OUTGOING.value -> WalletPaymentId.SpliceOutgoingPaymentId.fromString(id)
                 else -> throw UnhandledPaymentType(type)
             }
             return WalletPaymentOrderRow(

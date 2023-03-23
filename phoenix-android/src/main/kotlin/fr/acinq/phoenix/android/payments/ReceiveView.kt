@@ -118,10 +118,16 @@ fun ReceiveView(
                         when (model) {
                             is Receive.Model.Awaiting -> {
                                 LaunchedEffect(key1 = true) { vm.generateInvoice() }
-                                GeneratingLightningInvoiceView({ vm.state = ReceiveViewState.EditInvoice }) { vm.state = ReceiveViewState.EditInvoice }
+                                GeneratingLightningInvoiceView(
+                                    onSwapInClick = { postIntent(Receive.Intent.RequestSwapIn) },
+                                    onEdit = { vm.state = ReceiveViewState.EditInvoice }
+                                )
                             }
                             is Receive.Model.Generating -> {
-                                GeneratingLightningInvoiceView({ vm.state = ReceiveViewState.EditInvoice }) { vm.state = ReceiveViewState.EditInvoice }
+                                GeneratingLightningInvoiceView(
+                                    onSwapInClick = { postIntent(Receive.Intent.RequestSwapIn) },
+                                    onEdit = { vm.state = ReceiveViewState.EditInvoice }
+                                )
                             }
                             is Receive.Model.Generated -> {
                                 LaunchedEffect(model.request) {

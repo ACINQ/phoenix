@@ -273,8 +273,10 @@ object LegacyMigrationHelper {
                     id = UUID.randomUUID(),
                     amount = status.amount().toLong().msat,
                     serviceFee = payToOpenMeta?.fee_sat?.sat?.toMilliSatoshi() ?: 0.msat,
-                    fundingFee = 0.sat,
-                    channelId = ByteVector32.Zeroes
+                    miningFee = 0.sat,
+                    channelId = ByteVector32.Zeroes,
+                    txId = ByteVector32.Zeroes,
+                    status = PaymentsDb.ConfirmationStatus.LOCKED
                 )
             } else {
                 IncomingPayment.ReceivedWith.LightningPayment(

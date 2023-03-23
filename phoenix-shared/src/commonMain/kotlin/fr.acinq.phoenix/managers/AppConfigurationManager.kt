@@ -1,6 +1,6 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.HeaderSubscriptionResponse
 import fr.acinq.lightning.utils.ServerAddress
@@ -19,7 +19,6 @@ import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.math.*
 import kotlin.time.*
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -30,7 +29,7 @@ class AppConfigurationManager(
     private val appDb: SqliteAppDb,
     private val httpClient: HttpClient,
     private val electrumWatcher: ElectrumWatcher,
-    private val chain: Chain,
+    private val chain: NodeParams.Chain,
     loggerFactory: LoggerFactory
 ) : CoroutineScope by MainScope() {
 
@@ -168,9 +167,9 @@ class AppConfigurationManager(
     }
 
     fun randomElectrumServer() = when (chain) {
-        Chain.Mainnet -> mainnetElectrumServers.random()
-        Chain.Testnet -> testnetElectrumServers.random()
-        Chain.Regtest -> platformElectrumRegtestConf()
+        NodeParams.Chain.Mainnet -> mainnetElectrumServers.random()
+        NodeParams.Chain.Testnet -> testnetElectrumServers.random()
+        NodeParams.Chain.Regtest -> platformElectrumRegtestConf()
     }
 
     /** The flow containing the electrum header responses messages. */

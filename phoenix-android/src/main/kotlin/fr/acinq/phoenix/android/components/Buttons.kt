@@ -38,19 +38,16 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.utils.borderColor
-import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.utils.BlockchainExplorer
 
 
@@ -119,8 +116,9 @@ fun FilledButton(
 fun InlineButton(
     text: String,
     icon: Int? = null,
+    fontSize: TextUnit = MaterialTheme.typography.body1.fontSize,
     modifier: Modifier = Modifier,
-    padding: PaddingValues = PaddingValues(horizontal = 0.dp, vertical = 8.dp),
+    padding: PaddingValues = PaddingValues(horizontal = 0.dp, vertical = 0.dp),
     space: Dp = 6.dp,
     maxLines: Int = Int.MAX_VALUE,
     onClick: () -> Unit,
@@ -133,7 +131,7 @@ fun InlineButton(
         space = space,
         onClick = onClick,
         maxLines = maxLines,
-        textStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary, fontSize = 14.sp, textDecoration = TextDecoration.Underline)
+        textStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary, fontSize = fontSize, textDecoration = TextDecoration.Underline)
     )
 }
 
@@ -185,18 +183,16 @@ fun TextWithIcon(
 ) {
     Row(
         modifier = modifier.padding(padding),
-        verticalAlignment = if (alignBaseLine) Alignment.Top else Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
             painter = painterResource(id = icon),
             contentDescription = "icon for $text",
-            modifier = Modifier
-                .size(iconSize)
-                .then(if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier),
+            modifier = Modifier.size(iconSize),
             colorFilter = iconTint?.let { ColorFilter.tint(it) }
         )
         Spacer(Modifier.width(space))
-        Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier, maxLines = maxLines, overflow = textOverflow)
+        Text(text, style = textStyle, maxLines = maxLines, overflow = textOverflow)
     }
 }
 
@@ -343,21 +339,15 @@ fun Clickable(
 fun WebLink(
     text: String,
     url: String,
-    modifier: Modifier = Modifier,
+    fontSize: TextUnit = MaterialTheme.typography.body1.fontSize,
     maxLines: Int = Int.MAX_VALUE,
-    overflow: TextOverflow = TextOverflow.Clip,
 ) {
     val context = LocalContext.current
-    Text(
-        modifier = modifier.clickable(
-            role = Role.Button,
-            onClickLabel = stringResource(id = R.string.accessibility_link),
-            onClick = { openLink(context, url) }
-        ),
+    InlineButton(
         text = text,
-        overflow = overflow,
+        icon = R.drawable.ic_external_link,
         maxLines = maxLines,
-        style = MaterialTheme.typography.body1.copy(textDecoration = TextDecoration.Underline, color = MaterialTheme.colors.primary)
+        onClick = { openLink(context, url) }
     )
 }
 

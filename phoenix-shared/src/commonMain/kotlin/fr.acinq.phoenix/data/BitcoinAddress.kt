@@ -18,6 +18,7 @@ package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.payment.PaymentRequest
 import io.ktor.http.*
 
@@ -31,7 +32,7 @@ enum class BitcoinAddressType {
 data class BitcoinAddressInfo(
     /** Actual Bitcoin address, may be different than input; e.g. when input is an URI like "bitcoin:xyz?param=123". */
     val address: String,
-    val chain: Chain,
+    val chain: NodeParams.Chain,
     val type: BitcoinAddressType,
     val hash: ByteVector,
     // Bip-21 parameters
@@ -61,7 +62,7 @@ data class BitcoinAddressInfo(
 }
 
 sealed class BitcoinAddressError {
-    data class ChainMismatch(val myChain: Chain, val addrChain: Chain): BitcoinAddressError()
+    data class ChainMismatch(val myChain: NodeParams.Chain, val addrChain: NodeParams.Chain): BitcoinAddressError()
     data class UnknownBase58Prefix(val prefix: Byte): BitcoinAddressError()
     data class UnknownBech32Prefix(val hrp: String): BitcoinAddressError()
     data class UnknownBech32Version(val version: Byte): BitcoinAddressError()

@@ -81,6 +81,7 @@ fun PaymentDetailsTechnicalView(
                         when (it) {
                             is IncomingPayment.ReceivedWith.NewChannel -> ReceivedWithNewChannel(it, rateThen)
                             is IncomingPayment.ReceivedWith.LightningPayment -> ReceivedWithLightning(it, rateThen)
+                            is IncomingPayment.ReceivedWith.SpliceIn -> ReceivedWithSpliceIn(it, rateThen)
                         }
                     }
                 }
@@ -236,9 +237,10 @@ private fun AmountSection(
         }
         is IncomingPayment -> {
             val receivedWithNewChannel = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>() ?: emptyList()
-            if (receivedWithNewChannel.isNotEmpty()) {
-                val serviceFee = receivedWithNewChannel.map { it.serviceFee }.sum()
-                val fundingFee = receivedWithNewChannel.map { it.fundingFee }.sum()
+            val receivedWithSpliceIn = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.SpliceIn>() ?: emptyList()
+            if ((receivedWithNewChannel + receivedWithSpliceIn).isNotEmpty()) {
+                val serviceFee = receivedWithNewChannel.map { it.serviceFee }.sum() +  receivedWithSpliceIn.map { it.serviceFee }.sum()
+                val fundingFee = receivedWithNewChannel.map { it.miningFee }.sum() + receivedWithSpliceIn.map { it.miningFee }.sum()
                 TechnicalRowAmount(
                     label = stringResource(id = R.string.paymentdetails_service_fees_label),
                     amount = serviceFee,
@@ -308,6 +310,11 @@ private fun DetailsForSpliceOut(
         label = stringResource(id = R.string.paymentdetails_splice_out_address_label),
         value = payment.address
     )
+
+    TechnicalRow(
+        label = stringResource(id = R.string.paymentdetails_splice_out_tx_id_label),
+        content = { WebLink(text = payment.txId.toHex(), url = txUrl(txId = payment.txId.toHex())) }
+    )
 }
 
 @Composable
@@ -331,7 +338,7 @@ private fun DetailsForIncoming(
                     Row {
                         Text(text = stringResource(id = R.string.paymentdetails_dualswapin_tx_value, index + 1))
                         Spacer(modifier = Modifier.width(4.dp))
-                        WebLink(text = outpoint.txid.toHex(), url = txUrl(txId = outpoint.txid.toHex()), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        WebLink(text = outpoint.txid.toHex(), url = txUrl(txId = outpoint.txid.toHex()), maxLines = 1)
                     }
                 }
             }
@@ -364,11 +371,36 @@ private fun ReceivedWithNewChannel(
         Text(text = stringResource(id = R.string.paymentdetails_received_with_channel))
     }
     val channelId = receivedWith.channelId
-    if (channelId != null && channelId != ByteVector32.Zeroes) {
+    if (channelId != ByteVector32.Zeroes) { // backward compat
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_channel_id_label)) {
             Text(text = channelId.toHex())
         }
     }
+    TechnicalRow(
+        label = stringResource(id = R.string.paymentdetails_tx_id_label),
+        content = { WebLink(text = receivedWith.txId.toHex(), url = txUrl(txId = receivedWith.txId.toHex())) }
+    )
+    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
+}
+
+@Composable
+private fun ReceivedWithSpliceIn(
+    receivedWith: IncomingPayment.ReceivedWith.SpliceIn,
+    rateThen: ExchangeRate.BitcoinPriceRate?
+) {
+    TechnicalRow(label = stringResource(id = R.string.paymentdetails_received_with_label)) {
+        Text(text = stringResource(id = R.string.paymentdetails_received_with_splicein))
+    }
+    val channelId = receivedWith.channelId
+    if (channelId != ByteVector32.Zeroes) { // backward compat
+        TechnicalRow(label = stringResource(id = R.string.paymentdetails_channel_id_label)) {
+            Text(text = channelId.toHex())
+        }
+    }
+    TechnicalRow(
+        label = stringResource(id = R.string.paymentdetails_tx_id_label),
+        content = { WebLink(text = receivedWith.txId.toHex(), url = txUrl(txId = receivedWith.txId.toHex())) }
+    )
     TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
 }
 

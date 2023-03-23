@@ -43,7 +43,7 @@ import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 
 // primary for testnet
 val horizon = Color(0xff91b4d1)
-val azur = Color(0xFF0E97FF)
+val azur = Color(0xff25a5ff)
 
 // primary for mainnet light / success color for light theme
 val applegreen = Color(0xff50b338)
@@ -81,12 +81,12 @@ val gray10 = Color(0xFFF5F8FA)
 
 private val LightColorPalette = lightColors(
     // primary
-    primary = horizon,
-    primaryVariant = horizon,
+    primary = azur,
+    primaryVariant = azur,
     onPrimary = white,
     // secondary = primary
-    secondary = horizon,
-    secondaryVariant = horizon,
+    secondary = azur,
+    secondaryVariant = azur,
     onSecondary = white,
     // app background
     background = gray10,

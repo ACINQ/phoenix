@@ -1,9 +1,9 @@
 package fr.acinq.phoenix.db.cloud
 
-import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.toByteVector32
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.ByteString
@@ -19,6 +19,7 @@ data class SpliceOutgoingPaymentWrapper(
     val amountSat: Long,
     val address: String,
     val miningFeeSat: Long,
+    @ByteString val txId: ByteArray,
     val createdAt: Long,
     val confirmedAt: Long?
 ) {
@@ -27,6 +28,7 @@ data class SpliceOutgoingPaymentWrapper(
         amountSat = payment.amountSatoshi.sat,
         address = payment.address,
         miningFeeSat = payment.miningFees.sat,
+        txId = payment.txId.toByteArray(),
         createdAt = payment.createdAt,
         confirmedAt = payment.confirmedAt
     )
@@ -37,6 +39,7 @@ data class SpliceOutgoingPaymentWrapper(
         amountSatoshi = amountSat.sat,
         address = address,
         miningFees = miningFeeSat.sat,
+        txId = txId.toByteVector32(),
         createdAt = createdAt,
         confirmedAt = confirmedAt
     )

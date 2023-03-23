@@ -19,9 +19,7 @@ package fr.acinq.phoenix.controllers.payments
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.utils.Either
-import fr.acinq.lightning.Feature
-import fr.acinq.lightning.Features
-import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.*
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.db.LightningOutgoingPayment
@@ -57,7 +55,7 @@ class AppScanController(
     private val lnurlManager: LnurlManager,
     private val databaseManager: DatabaseManager,
     private val appConfigManager: AppConfigurationManager,
-    private val chain: Chain
+    private val chain: NodeParams.Chain,
 ) : AppController<Scan.Model, Scan.Intent>(
     loggerFactory = loggerFactory,
     firstModel = firstModel ?: Scan.Model.Ready
@@ -293,6 +291,13 @@ class AppScanController(
             )
         }
 
+        // FIXME: use proper trampoline fees
+        val trampolineFeesOverride = listOf(
+            TrampolineFees(0.sat, 4_000 /* 4_000 = 0.4% */, CltvExpiryDelta(576)),
+            TrampolineFees(1.sat, 4_000 /* 4_000 = 0.4% */, CltvExpiryDelta(576)),
+            TrampolineFees(5.sat, 4_000 /* 4_000 = 0.4% */, CltvExpiryDelta(576)),
+        )
+
         peer.send(
             if (swapOutData != null) {
                 SendPaymentSwapOut(
@@ -304,7 +309,7 @@ class AppScanController(
                         paymentRequest = paymentRequest,
                         swapOutFee = swapOutData.first
                     ),
-                    trampolineFeesOverride = trampolineFees
+                    trampolineFeesOverride = trampolineFeesOverride
                 )
             } else {
                 SendPaymentNormal(
@@ -314,7 +319,7 @@ class AppScanController(
                     details = LightningOutgoingPayment.Details.Normal(
                         paymentRequest = paymentRequest
                     ),
-                    trampolineFeesOverride = trampolineFees
+                    trampolineFeesOverride = trampolineFeesOverride
                 )
             }
         )

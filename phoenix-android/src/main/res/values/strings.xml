@@ -15,7 +15,7 @@
   -->
 
 <resources>
-    <string name="app_name">Phoenix KMM Testnet</string>
+    <string name="app_name">Phoenix Testnet</string>
 
     <!-- //////////////// system notification channels //////////////// -->
 
@@ -126,6 +126,11 @@
     <string name="send_error_amount_over_balance">This amount exceeds your balance.</string>
     <string name="send_error_amount_overpaying">Cannot pay more than %1$s.</string>
     <string name="send_error_amount_below_requested">This amount is below the requested amount of %1$s.</string>
+    <string name="send_error_missing_feerate">Please enter a valid feerate.</string>
+    <string name="send_feerate_label">Fee rate (sat/byte)</string>
+    <string name="send_feerate_waiting_for_value">Retrieving current feerate…</string>
+    <string name="send_feerate_below_min">This feerate is too low</string>
+    <string name="send_feerate_above_max">This feerate is too large</string>
     <string name="send_destination_label">Send to</string>
     <string name="send_description_label">Payment description</string>
     <string name="send_pay_button">Pay</string>
@@ -141,7 +146,7 @@
     <string name="send_spliceout_prepare_in_progress">Preparing transaction…</string>
     <string name="send_spliceout_execute_in_progress">Executing splice…</string>
     <string name="send_spliceout_complete_recap_amount">Amount</string>
-    <string name="send_spliceout_complete_recap_fee">Miner Fee</string>
+    <string name="send_spliceout_complete_recap_fee">Fee estimation</string>
     <string name="send_spliceout_complete_recap_total">Total</string>
     <string name="send_spliceout_mining_fee_dialog_title">What are those fees?</string>
     <string name="send_spliceout_mining_fee_dialog_body">
@@ -281,10 +286,11 @@
     <string name="listallchannels_channel_id">Channel id:</string>
     <string name="listallchannels_state">State:</string>
     <string name="listallchannels_spendable">Can send:</string>
-    <string name="listallchannels_commitments">Commitments (active):</string>
-    <string name="listallchannels_commitments_none">None</string>
+    <string name="listallchannels_commitments">Active commitments:</string>
+    <string name="listallchannels_inactive_commitments">Inactive commitments:</string>
     <string name="listallchannels_commitment_funding_tx_id">Funding tx:</string>
     <string name="listallchannels_commitment_funding_tx_index">Tx index:</string>
+    <string name="listallchannels_commitment_balance">Balance:</string>
     <string name="listallchannels_commitment_funding_capacity">Capacity:</string>
     <string name="listallchannels_json">Json</string>
     <string name="listallchannels_close">Close</string>
@@ -381,7 +387,7 @@
     <string name="paymentdetails_desc_custom_info">You can attach a note to this payment.</string>
     <string name="paymentdetails_destination_label">Sent to</string>
     <string name="paymentdetails_fees_label">Fees</string>
-    <string name="paymentdetails_funding_fees_label">Miner fees</string>
+    <string name="paymentdetails_funding_fees_label">Mining fees</string>
     <string name="paymentdetails_funding_fees_desc">Bitcoin network fees paid for on-chain transaction.</string>
     <string name="paymentdetails_service_fees_label">Service fees</string>
     <string name="paymentdetails_service_fees_desc">In order to receive this payment, a new payment channel was opened. This is not always required.</string>
@@ -417,7 +423,8 @@
     <string name="paymentdetails_keysend">Keysend (spontaneous payment)</string>
     <string name="paymentdetails_swapin_address_label">Deposit address</string>
     <string name="paymentdetails_swapout_address_label">Bitcoin address</string>
-    <string name="paymentdetails_splice_out_address_label">Splice out address</string>
+    <string name="paymentdetails_splice_out_address_label">Splice-out address</string>
+    <string name="paymentdetails_splice_out_tx_id_label">Splice-out tx</string>
     <string name="paymentdetails_dualswapin_tx_label">Transactions</string>
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
@@ -449,9 +456,11 @@
     <string name="paymentdetails_part_closing_type_other">Other</string>
 
     <string name="paymentdetails_received_with_label">Received via</string>
+    <string name="paymentdetails_received_with_splicein">Splice-in (adding to existing channel)</string>
     <string name="paymentdetails_received_with_channel">New channel (automatically created)</string>
     <string name="paymentdetails_received_with_lightning">Lightning payment</string>
     <string name="paymentdetails_channel_id_label">Channel id</string>
+    <string name="paymentdetails_tx_id_label">Transaction id</string>
 
     <string name="paymentdetails_created_at_label">Created at</string>
     <string name="paymentdetails_completed_at_label">Completed at</string>

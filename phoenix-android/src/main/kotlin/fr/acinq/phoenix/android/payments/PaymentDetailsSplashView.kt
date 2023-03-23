@@ -152,14 +152,15 @@ fun PaymentDetailsSplashView(
                     Spacer(modifier = Modifier.height(8.dp))
                     DetailsRow(
                         label = stringResource(id = R.string.paymentdetails_fees_label),
-                        value = payment.fees.toPrettyString(LocalBitcoinUnit.current, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW)
+                        value = payment.fees.toPrettyString(LocalBitcoinUnit.current, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS)
                     )
                 }
                 is IncomingPayment -> {
                     val receivedWithNewChannel = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>() ?: emptyList()
-                    if (receivedWithNewChannel.isNotEmpty()) {
-                        val serviceFee = receivedWithNewChannel.map { it.serviceFee }.sum()
-                        val fundingFee = receivedWithNewChannel.map { it.fundingFee }.sum()
+                    val receivedWithSpliceIn = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.SpliceIn>() ?: emptyList()
+                    if ((receivedWithNewChannel + receivedWithSpliceIn).isNotEmpty()) {
+                        val serviceFee = receivedWithNewChannel.map { it.serviceFee }.sum() + receivedWithSpliceIn.map { it.serviceFee }.sum()
+                        val fundingFee = receivedWithNewChannel.map { it.miningFee }.sum() + receivedWithSpliceIn.map { it.miningFee }.sum()
                         Spacer(modifier = Modifier.height(8.dp))
                         DetailsRow(
                             label = stringResource(id = R.string.paymentdetails_service_fees_label),
@@ -257,7 +258,7 @@ private fun PaymentStatus(
                 isAnimated = false,
                 color = mutedTextColor()
             )
-            payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().any { !it.confirmed } -> {
+            payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().any { it.status == PaymentsDb.ConfirmationStatus.NOT_LOCKED } -> {
                 val minDepth = business.nodeParamsManager.nodeParams.value?.minDepthBlocks
                 PaymentStatusIcon(
                     message = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
@@ -267,7 +268,7 @@ private fun PaymentStatus(
                     details = minDepth?.let { stringResource(id = R.string.paymentdetails_status_received_unconfirmed_details, it) }
                 )
             }
-            payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.SpliceIn>().any { !it.confirmed } -> {
+            payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.SpliceIn>().any { it.status == PaymentsDb.ConfirmationStatus.NOT_LOCKED} -> {
                 val minDepth = business.nodeParamsManager.nodeParams.value?.minDepthBlocks
                 PaymentStatusIcon(
                     message = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
@@ -275,14 +276,23 @@ private fun PaymentStatus(
                     imageResId = R.drawable.ic_clock,
                     color = mutedTextColor(),
                     details = minDepth?.let { stringResource(id = R.string.paymentdetails_status_received_unconfirmed_details, it) }
+                )
+            }
+            payment.completedAt != null -> {
+                PaymentStatusIcon(
+                    message = stringResource(id = R.string.paymentdetails_status_received_successful),
+                    imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
+                    isAnimated = fromEvent,
+                    color = positiveColor(),
+                    details = payment.received?.receivedAt?.toAbsoluteDateTimeString()
                 )
             }
             else -> PaymentStatusIcon(
-                message = stringResource(id = R.string.paymentdetails_status_received_successful),
-                imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
-                isAnimated = fromEvent,
-                color = positiveColor(),
-                details = payment.received?.receivedAt?.toAbsoluteDateTimeString()
+                message = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
+                isAnimated = false,
+                imageResId = R.drawable.ic_clock,
+                color = mutedTextColor(),
+                details = "this payment is probably a splice from lightning?"
             )
         }
     }

@@ -4,7 +4,7 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
@@ -329,7 +329,7 @@ class CloudKitDb(
         // or otherwise process it outside of the `withContext` below.
         val incomingList = downloadedPayments.mapNotNull { it as? IncomingPayment }
         val outgoingList = downloadedPayments.mapNotNull { it as? LightningOutgoingPayment }
-        val spliceOutgoingList = TODO("implement cloud backup for splices")
+        val spliceOutgoingList = downloadedPayments.mapNotNull { it as? SpliceOutgoingPayment }
 
         // We are seeing crashes when accessing the ByteArray values in updateMetadata.
         // So we need a workaround.
@@ -367,14 +367,10 @@ class CloudKitDb(
 
                     if (oldReceived == null && received != null) {
                         val (type, blob) = received.receivedWith.mapToDb() ?: (null to null)
-                        val receivedWithNewChannel = received.receivedWith.any {
-                            it is IncomingPayment.ReceivedWith.NewChannel
-                        }
                         inQueries.updateReceived(
                             received_at = received.receivedAt,
                             received_with_type = type,
                             received_with_blob = blob,
-                            received_with_new_channel = if (receivedWithNewChannel) 1 else 0,
                             payment_hash = incomingPayment.paymentHash.toByteArray()
                         )
                     }
@@ -454,6 +450,10 @@ class CloudKitDb(
                         )
                     }
                 } // </outgoing_payments table>
+
+                spliceOutgoingList.forEach {
+                    TODO("handle splice outs")
+                }
 
                 downloadedPaymentsMetadata.forEach { (paymentId, row) ->
                     val rowExists = metaQueries.hasMetadata(

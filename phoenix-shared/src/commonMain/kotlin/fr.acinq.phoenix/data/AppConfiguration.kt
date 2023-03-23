@@ -1,23 +1,11 @@
 package fr.acinq.phoenix.data
 
-import fr.acinq.bitcoin.Block
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.InitTlv
 import kotlinx.serialization.Serializable
 
-
-sealed class Chain(val name: String, val block: Block) {
-    object Regtest : Chain("Regtest", Block.RegtestGenesisBlock)
-    object Testnet : Chain("Testnet", Block.TestnetGenesisBlock)
-    object Mainnet : Chain("Mainnet", Block.LivenetGenesisBlock)
-
-    fun isMainnet(): Boolean = this is Mainnet
-    fun isTestnet(): Boolean = this is Testnet
-
-    val chainHash by lazy { block.hash }
-}
 
 interface CurrencyUnit
 

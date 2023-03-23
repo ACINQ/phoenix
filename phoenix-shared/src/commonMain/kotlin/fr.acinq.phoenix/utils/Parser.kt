@@ -18,6 +18,7 @@ package fr.acinq.phoenix.utils
 
 import fr.acinq.bitcoin.*
 import fr.acinq.bitcoin.utils.Either
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.data.*
@@ -60,7 +61,7 @@ object Parser {
      * @param input can range from a basic bitcoin address to a sophisticated Bitcoin URI with a prefix and parameters.
      */
     fun readBitcoinAddress(
-        chain: Chain,
+        chain: NodeParams.Chain,
         input: String
     ): Either<BitcoinAddressError, BitcoinAddressInfo> {
         val cleanInput = removeExcessInput(input)
@@ -110,10 +111,10 @@ object Parser {
         try { // is Base58 ?
             val (prefix, bin) = Base58Check.decode(address)
             val (prefixChain, prefixType) = when (prefix) {
-                Base58.Prefix.PubkeyAddress -> Chain.Mainnet to BitcoinAddressType.Base58PubKeyHash
-                Base58.Prefix.ScriptAddress -> Chain.Mainnet to BitcoinAddressType.Base58ScriptHash
-                Base58.Prefix.PubkeyAddressTestnet -> Chain.Testnet to BitcoinAddressType.Base58PubKeyHash
-                Base58.Prefix.ScriptAddressTestnet -> Chain.Testnet to BitcoinAddressType.Base58ScriptHash
+                Base58.Prefix.PubkeyAddress -> NodeParams.Chain.Mainnet to BitcoinAddressType.Base58PubKeyHash
+                Base58.Prefix.ScriptAddress -> NodeParams.Chain.Mainnet to BitcoinAddressType.Base58ScriptHash
+                Base58.Prefix.PubkeyAddressTestnet -> NodeParams.Chain.Testnet to BitcoinAddressType.Base58PubKeyHash
+                Base58.Prefix.ScriptAddressTestnet -> NodeParams.Chain.Testnet to BitcoinAddressType.Base58ScriptHash
                 else -> return Either.Left(BitcoinAddressError.UnknownBase58Prefix(prefix))
             }
             if (prefixChain != chain) {
@@ -129,9 +130,9 @@ object Parser {
         try { // is Bech32 ?
             val (hrp, version, bin) = Bech32.decodeWitnessAddress(address)
             val prefixChain = when (hrp) {
-                "bc" -> Chain.Mainnet
-                "tb" -> Chain.Testnet
-                "bcrt" -> Chain.Regtest
+                "bc" -> NodeParams.Chain.Mainnet
+                "tb" -> NodeParams.Chain.Testnet
+                "bcrt" -> NodeParams.Chain.Regtest
                 else -> return Either.Left(BitcoinAddressError.UnknownBech32Prefix(hrp))
             }
 
@@ -160,7 +161,7 @@ object Parser {
     }
 
     /** Transforms a bitcoin address into a public key script if valid, otherwise returns null. */
-    fun addressToPublicKeyScript(chain: Chain, address: String): ByteArray? {
+    fun addressToPublicKeyScript(chain: NodeParams.Chain, address: String): ByteArray? {
         val info = readBitcoinAddress(chain, address).right ?: return null
         val script = when (info.type) {
             BitcoinAddressType.Base58PubKeyHash -> Script.pay2pkh(

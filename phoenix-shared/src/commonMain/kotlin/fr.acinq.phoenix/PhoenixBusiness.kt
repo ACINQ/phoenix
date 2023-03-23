@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix
 
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.TcpSocket
@@ -28,7 +29,6 @@ import fr.acinq.phoenix.controllers.main.AppHomeController
 import fr.acinq.phoenix.controllers.payments.AppReceiveController
 import fr.acinq.phoenix.controllers.payments.AppScanController
 import fr.acinq.phoenix.controllers.payments.Scan
-import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.createAppDbDriver
@@ -81,7 +81,7 @@ class PhoenixBusiness(
         }
     }
 
-    val chain = Chain.Testnet
+    val chain = NodeParams.Chain.Testnet
 
     internal val electrumClient by lazy { ElectrumClient(null, MainScope(), loggerFactory) }
     internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient.Caller(), MainScope(), loggerFactory) }

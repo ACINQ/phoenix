@@ -50,8 +50,10 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
@@ -150,6 +152,31 @@ object AmountInputHelper {
             }
         }
     }
+}
+
+@Composable
+fun FeerateInput(
+    initialFeerate: Satoshi,
+    onFeerateChange: (Satoshi) -> Unit,
+    minFeerate: Satoshi,
+    minErrorMessage: String,
+    maxFeerate: Satoshi,
+    maxErrorMessage: String,
+    enabled: Boolean = true,
+) {
+    NumberInput(
+        initialValue = initialFeerate.sat.toDouble(),
+        onValueChange = {
+            it?.toLong()?.sat?.let { sat -> onFeerateChange(sat) }
+        },
+        trailingIcon = { Text("sat/byte", modifier = Modifier.padding(horizontal = 16.dp)) },
+        minValue = minFeerate.sat.toDouble(),
+        minErrorMessage = minErrorMessage,
+        maxValue = maxFeerate.sat.toDouble(),
+        maxErrorMessage = maxErrorMessage,
+        acceptDecimal = false,
+        enabled = enabled,
+    )
 }
 
 @Composable

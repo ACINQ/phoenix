@@ -120,6 +120,7 @@ fun NumberInput(
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
     initialValue: Double?,
     onValueChange: (Double?) -> Unit,
@@ -174,6 +175,7 @@ fun NumberInput(
             enabled = enabled,
             label = label,
             placeholder = placeholder,
+            trailingIcon = trailingIcon,
             singleLine = true,
             maxLines = 1,
             keyboardOptions = KeyboardOptions.Default.copy(

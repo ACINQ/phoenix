@@ -2,13 +2,13 @@ package fr.acinq.phoenix.controllers.config
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.io.WrappedChannelCommand
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration.Model.ChannelInfoStatus
-import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.localBalance
 import kotlinx.coroutines.launch
@@ -17,7 +17,7 @@ import org.kodein.log.LoggerFactory
 class AppCloseChannelsConfigurationController(
     loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
-    private val chain: Chain,
+    private val chain: NodeParams.Chain,
     private val isForceClose: Boolean
 ) : AppController<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>(
     loggerFactory = loggerFactory,

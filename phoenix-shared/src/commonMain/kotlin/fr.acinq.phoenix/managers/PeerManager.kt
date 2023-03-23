@@ -3,6 +3,7 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
+import fr.acinq.lightning.blockchain.fee.OnChainFeerates
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.wire.InitTlv
@@ -44,6 +45,9 @@ class PeerManager(
     private val _channelsFlow = MutableStateFlow<Map<ByteVector32, LocalChannelInfo>?>(null)
     val channelsFlow: StateFlow<Map<ByteVector32, LocalChannelInfo>?> = _channelsFlow
 
+    private val _onChainFeeratesFlow = MutableStateFlow<OnChainFeerates?>(null)
+    val onChainFeeratesFlow: StateFlow<OnChainFeerates?> = _onChainFeeratesFlow
+
     init {
         launch {
             val nodeParams = nodeParamsManager.nodeParams.filterNotNull().first()
@@ -72,6 +76,12 @@ class PeerManager(
                 scope = MainScope()
             )
             _peer.value = peer
+
+            launch {
+                peer.onChainFeeratesFlow.collect {
+                    _onChainFeeratesFlow.value = it
+                }
+            }
 
             // The local channels flow must use `bootFlow` first, as `channelsFlow` is empty when the wallet starts.
             // `bootFlow` data come from the local database and will be overridden by fresh data once the connection

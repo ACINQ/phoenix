@@ -40,10 +40,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.byteVector
+import fr.acinq.eclair.BtcUnit
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
+import fr.acinq.lightning.blockchain.fee.OnChainFeerates
 import fr.acinq.lightning.channel.Command
+import fr.acinq.lightning.transactions.Transactions
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -53,41 +57,51 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.mutedTextColor
-import fr.acinq.phoenix.data.Chain
+import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.Parser
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
 private sealed class SpliceOutState {
     object Init: SpliceOutState()
-    object Preparing: SpliceOutState()
-    sealed class ReadyToSend(val userAmount: Satoshi, val feeExpected: Satoshi): SpliceOutState()
-    object Executing: SpliceOutState()
+    data class Preparing(val userAmount: Satoshi, val feeratePerByte: Satoshi): SpliceOutState()
+    data class ReadyToSend(val userAmount: Satoshi, val feeratePerByte: Satoshi, val feeExpected: Satoshi): SpliceOutState()
+    data class Executing(val userAmount: Satoshi, val feeratePerByte: Satoshi): SpliceOutState()
     sealed class Complete: SpliceOutState() {
-        data class Success(val result: Command.Splice.Response.Success): Complete()
-        data class Failure(val result: Command.Splice.Response.Failure): Complete()
+        abstract val userAmount: Satoshi
+        abstract val feeratePerByte: Satoshi
+        abstract val result: Command.Splice.Response
+        data class Success(override val userAmount: Satoshi, override val feeratePerByte: Satoshi, override val result: Command.Splice.Response.Success): Complete()
+        data class Failure(override val userAmount: Satoshi, override val feeratePerByte: Satoshi, override val result: Command.Splice.Response.Failure): Complete()
     }
-    sealed class Error(val e: Throwable): SpliceOutState()
+    sealed class Error: SpliceOutState() {
+        data class Thrown(val e: Throwable): Error()
+        object NoChannels: Error()
+    }
 }
 
-private class SpliceOutViewModel(private val peerManager: PeerManager, private val chain: Chain): ViewModel() {
+private class SpliceOutViewModel(private val peerManager: PeerManager, private val chain: NodeParams.Chain): ViewModel() {
     val log = LoggerFactory.getLogger(this::class.java)
     var state by mutableStateOf<SpliceOutState>(SpliceOutState.Init)
 
-    /** Simulate splice to get the fee. */
+    /** Estimate the fee for the splice-out, given a feerate. */
     fun prepareSpliceOut(
         amount: Satoshi,
         feeratePerByte: Satoshi,
-        address: String,
     ) {
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
             log.error("error when preparing splice-out: ", e)
+            state = SpliceOutState.Error.Thrown(e)
         }) {
-            // TODO
-            // state = SpliceOutState.ReadyToSend(123_000.sat, 456.sat)
+            val feeratePerKw = FeeratePerKw(FeeratePerByte(feeratePerByte))
+            val fee = Transactions.weight2fee(feeratePerKw, 722) // FIXME hardcoded weight!
+            state = SpliceOutState.ReadyToSend(amount, feeratePerByte, fee)
         }
     }
 
@@ -97,9 +111,10 @@ private class SpliceOutViewModel(private val peerManager: PeerManager, private v
         address: String,
     ) {
         if (state is SpliceOutState.ReadyToSend) {
-            state = SpliceOutState.Executing
+            state = SpliceOutState.Executing(amount, feeratePerByte)
             viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
                 log.error("error when executing splice-out: ", e)
+                state = SpliceOutState.Error.Thrown(e)
             }) {
                 val response = peerManager.getPeer().spliceOut(
                     amount = amount,
@@ -108,19 +123,21 @@ private class SpliceOutViewModel(private val peerManager: PeerManager, private v
                 )
                 when (response) {
                     is Command.Splice.Response.Success -> {
-                        state = SpliceOutState.Complete.Success(response)
+                        state = SpliceOutState.Complete.Success(amount, feeratePerByte, response)
                     }
                     is Command.Splice.Response.Failure -> {
-                        state = SpliceOutState.Complete.Failure(response)
+                        state = SpliceOutState.Complete.Failure(amount, feeratePerByte, response)
                     }
-                    null -> {}
+                    null -> {
+                        state = SpliceOutState.Error.NoChannels
+                    }
                 }
             }
         }
     }
 
     class Factory(
-        private val peerManager: PeerManager, private val chain: Chain
+        private val peerManager: PeerManager, private val chain: NodeParams.Chain
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
@@ -141,13 +158,23 @@ fun SendSpliceOutView(
     log.info { "init splice-out with amount=$requestedAmount address=$address" }
 
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val prefBtcUnit = LocalBitcoinUnit.current
     val keyboardManager = LocalSoftwareKeyboardController.current
 
-    val vm = viewModel<SpliceOutViewModel>(factory = SpliceOutViewModel.Factory(business.peerManager, business.chain))
+    val peerManager = business.peerManager
+    val vm = viewModel<SpliceOutViewModel>(factory = SpliceOutViewModel.Factory(peerManager, business.chain))
     var amount by remember { mutableStateOf(requestedAmount) }
     var amountErrorMessage by remember { mutableStateOf("") }
     val balance = business.balanceManager.balance.collectAsState(null).value
+    val feerateState = remember { mutableStateOf<Satoshi?>(null) }
+    scope.launch {
+        peerManager.onChainFeeratesFlow.filterNotNull().first().let {
+            if (feerateState.value == null) {
+                feerateState.value = FeeratePerByte(it.fundingFeerate).feerate
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -168,6 +195,9 @@ fun SendSpliceOutView(
                 onAmountChange = {
                     amountErrorMessage = ""
                     val newAmount = it?.amount?.truncateToSatoshi()
+                    if (vm.state != SpliceOutState.Init && amount != newAmount) {
+                        vm.state = SpliceOutState.Init
+                    }
                     when {
                         newAmount == null -> {}
                         balance != null && newAmount > balance.truncateToSatoshi() -> {
@@ -189,14 +219,29 @@ fun SendSpliceOutView(
                     .sizeIn(maxWidth = 400.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                Label(text = stringResource(id = R.string.send_feerate_label)) {
+                    val feerate = feerateState.value
+                    if (feerate == null) {
+                        ProgressView(text = stringResource(id = R.string.send_feerate_waiting_for_value))
+                    } else {
+                        Text(text = feerate.toPrettyString(BitcoinUnit.Sat, withUnit = true))
+                        // FIXME: editable feerate
+//                        FeerateInput(
+//                            initialFeerate = feerate,
+//                            onFeerateChange = { feerateState.value = it },
+//                            minFeerate = 1.sat,
+//                            minErrorMessage = stringResource(id = R.string.send_feerate_below_min),
+//                            maxFeerate = 300.sat,
+//                            maxErrorMessage = stringResource(id = R.string.send_feerate_above_max),
+//                        )
+                    }
+                }
                 Label(text = stringResource(R.string.send_destination_label)) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         PhoenixIcon(resourceId = R.drawable.ic_chain, modifier = Modifier.size(18.dp), tint = MaterialTheme.colors.primary)
                         Spacer(Modifier.width(4.dp))
                         SelectionContainer {
-                            Text(text = address, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(text = address, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.alignByBaseline())
                         }
                     }
                 }
@@ -207,43 +252,46 @@ fun SendSpliceOutView(
 
         when (val state = vm.state) {
             is SpliceOutState.Init, is SpliceOutState.Error -> {
-
-                if (state is SpliceOutState.Error) {
-                    ErrorMessage(errorHeader = "!! error !!", errorDetails = state.e.localizedMessage)
+                if (state is SpliceOutState.Error.Thrown) {
+                    ErrorMessage(errorHeader = "Placeholder error message!", errorDetails = state.e.localizedMessage, alignment = Alignment.CenterHorizontally)
+                } else if (state is SpliceOutState.Error.NoChannels) {
+                    ErrorMessage(errorHeader = "No channels available", errorDetails = "placeholder message", alignment = Alignment.CenterHorizontally)
                 }
-
                 BorderButton(
                     text = stringResource(id = R.string.send_spliceout_prepare_button),
                     icon = R.drawable.ic_build,
                     enabled = amountErrorMessage.isBlank(),
-                ) {
-                    amount?.let {
-                        keyboardManager?.hide()
-                        vm.prepareSpliceOut(it, 20.sat, address)
-                    } ?: run {
-                        amountErrorMessage = context.getString(R.string.send_error_amount_invalid)
+                    onClick = {
+                        val finalAmount = amount
+                        val finalFeerate = feerateState.value
+                        if (finalAmount == null) {
+                            amountErrorMessage = context.getString(R.string.send_error_amount_invalid)
+                        } else if (finalFeerate == null) {
+                            amountErrorMessage = context.getString(R.string.send_error_missing_feerate)
+                        } else {
+                            keyboardManager?.hide()
+                            vm.prepareSpliceOut(finalAmount, finalFeerate)
+                        }
                     }
-                }
+                )
             }
             is SpliceOutState.Preparing -> {
                 ProgressView(text = stringResource(id = R.string.send_spliceout_prepare_in_progress))
             }
             is SpliceOutState.ReadyToSend -> {
                 val total = state.userAmount + state.feeExpected
-                val chain = business.chain
-                val peerManager = business.peerManager
 
                 SpliceOutFeeSummaryView(userAmount = state.userAmount, fee = state.feeExpected, total = total)
                 Spacer(modifier = Modifier.height(24.dp))
                 if (balance != null && total.toMilliSatoshi() > balance) {
-                    ErrorMessage(errorHeader = stringResource(R.string.send_spliceout_error_cannot_afford_fees))
+                    ErrorMessage(errorHeader = stringResource(R.string.send_spliceout_error_cannot_afford_fees), alignment = Alignment.CenterHorizontally)
                 } else {
                     FilledButton(
                         text = stringResource(id = R.string.send_pay_button),
                         icon = R.drawable.ic_send,
                         enabled = amountErrorMessage.isBlank()
                     ) {
-                        vm.executeSpliceOut(state.userAmount, 20.sat, address)
+                        vm.executeSpliceOut(state.userAmount, state.feeratePerByte, address)
                     }
                 }
             }

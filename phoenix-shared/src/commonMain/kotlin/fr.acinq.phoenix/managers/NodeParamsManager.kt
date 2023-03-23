@@ -18,18 +18,13 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.*
-import fr.acinq.lightning.blockchain.fee.FeerateTolerance
-import fr.acinq.lightning.blockchain.fee.OnChainFeeConf
-import fr.acinq.lightning.crypto.LocalKeyManager
-import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.data.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
@@ -37,7 +32,7 @@ import org.kodein.log.newLogger
 
 class NodeParamsManager(
     loggerFactory: LoggerFactory,
-    chain: Chain,
+    chain: NodeParams.Chain,
     walletManager: WalletManager
 ) : CoroutineScope by MainScope() {
 
@@ -57,69 +52,16 @@ class NodeParamsManager(
         launch {
             walletManager.keyManager.filterNotNull().collect { keyManager ->
                 log.info { "nodeid=${keyManager.nodeId}" }
-
                 val nodeParams = NodeParams(
+                    chain = chain,
                     loggerFactory = loggerFactory,
                     keyManager = keyManager,
+                ).copy(
                     alias = "phoenix",
-                    features = Features(
-                        Feature.InitialRoutingSync to FeatureSupport.Optional,
-                        Feature.OptionDataLossProtect to FeatureSupport.Optional,
-                        Feature.VariableLengthOnion to FeatureSupport.Mandatory,
-                        Feature.PaymentSecret to FeatureSupport.Mandatory,
-                        Feature.BasicMultiPartPayment to FeatureSupport.Optional,
-                        Feature.Wumbo to FeatureSupport.Optional,
-                        Feature.StaticRemoteKey to FeatureSupport.Optional,
-                        Feature.AnchorOutputs to FeatureSupport.Optional,
-                        Feature.ShutdownAnySegwit to FeatureSupport.Optional,
-                        Feature.ChannelType to FeatureSupport.Mandatory,
-                        Feature.PaymentMetadata to FeatureSupport.Optional,
-                        Feature.ExperimentalTrampolinePayment to FeatureSupport.Optional,
-                        Feature.ZeroReserveChannels to FeatureSupport.Optional,
-                        Feature.WakeUpNotificationClient to FeatureSupport.Optional,
-                        Feature.PayToOpenClient to FeatureSupport.Optional,
-                        Feature.ChannelBackupClient to FeatureSupport.Optional,
-                        Feature.DualFunding to FeatureSupport.Mandatory,
-                    ),
-                    dustLimit = 546.sat,
-                    maxRemoteDustLimit = 600.sat,
-                    onChainFeeConf = OnChainFeeConf(
-                        closeOnOfflineMismatch = true,
-                        updateFeeMinDiffRatio = 0.1,
-                        feerateTolerance = FeerateTolerance(ratioLow = 0.01, ratioHigh = 100.0)
-                    ),
-                    maxHtlcValueInFlightMsat = 20000000000L,
-                    maxAcceptedHtlcs = 6,
-                    expiryDeltaBlocks = CltvExpiryDelta(144),
-                    fulfillSafetyBeforeTimeoutBlocks = CltvExpiryDelta(6),
-                    checkHtlcTimeoutAfterStartupDelaySeconds = 15,
-                    htlcMinimum = 1000.msat,
-                    minDepthBlocks = 3,
-                    toRemoteDelayBlocks = CltvExpiryDelta(2016),
-                    maxToLocalDelayBlocks = CltvExpiryDelta(1008),
-                    feeBase = 1000.msat,
-                    feeProportionalMillionth = 100,
-                    revocationTimeoutSeconds = 20,
-                    authTimeoutSeconds = 10,
-                    initTimeoutSeconds = 10,
-                    pingIntervalSeconds = 30,
-                    pingTimeoutSeconds = 10,
-                    pingDisconnect = true,
-                    autoReconnect = false,
-                    initialRandomReconnectDelaySeconds = 5,
-                    maxReconnectIntervalSeconds = 3600,
-                    chainHash = chain.chainHash,
-                    channelFlags = 1,
-                    paymentRequestExpirySeconds = 3600,
-                    multiPartPaymentExpirySeconds = 60,
-                    minFundingSatoshis = 20_000.sat,
-                    maxFundingSatoshis = 21_000_000_000_00000.sat,
-                    maxPaymentAttempts = 5,
-                    enableTrampolinePayment = true,
-                    zeroConfPeers = setOf(PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134")),
-                    paymentRecipientExpiryParams = RecipientCltvExpiryParams(CltvExpiryDelta(75), CltvExpiryDelta(200)),
+                    // FIXME: use proper liquidity policy and node
+                    zeroConfPeers = setOf(PublicKey.fromHex("025c0e9a61ea4b7ce06a6d7be46c79459c5690c093e110c243ce5424514271b903")),
+                    liquidityPolicy = LiquidityPolicy.Auto(100, 30000.sat)
                 )
-
                 _nodeParams.value = nodeParams
             }
         }

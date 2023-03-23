@@ -138,16 +138,19 @@ fun Label(
     text: String,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Row {
         Text(
             text = text.uppercase(),
             style = MaterialTheme.typography.body1.copy(color = mutedTextColor(), fontSize = 12.sp),
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.width(100.dp).alignByBaseline(),
         )
-        Spacer(modifier = Modifier.height(4.dp))
-        content()
+        Spacer(modifier = Modifier.width(8.dp))
+        Column {
+            content()
+        }
     }
 }
 

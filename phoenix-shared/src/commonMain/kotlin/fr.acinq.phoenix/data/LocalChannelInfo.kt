@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.json.JsonSerializers
 import fr.acinq.phoenix.utils.extensions.*
@@ -50,13 +51,36 @@ data class LocalChannelInfo(
     /** A channel may have several active commitments. */
     val commitmentsInfo: List<CommitmentInfo> by lazy {
         when (state) {
-            is ChannelStateWithCommitments -> state.commitments.active.map {
-                CommitmentInfo(
-                    fundingTxId = it.fundingTxId.toHex(),
-                    fundingTxIndex = it.fundingTxIndex,
-                    fundingAmount = it.fundingAmount
-                )
-            }.sortedByDescending { it.fundingTxIndex }
+            is ChannelStateWithCommitments -> {
+                val params = state.commitments.params
+                val changes = state.commitments.changes
+                state.commitments.active.map {
+                    CommitmentInfo(
+                        fundingTxId = it.fundingTxId.toHex(),
+                        fundingTxIndex = it.fundingTxIndex,
+                        fundingAmount = it.fundingAmount,
+                        balanceForSend = it.availableBalanceForSend(params, changes)
+                    )
+                }.sortedByDescending { it.fundingTxIndex }
+            }
+            else -> emptyList()
+        }
+    }
+    /** A channel may have several inactive commitments. */
+    val inactiveCommitmentsInfo: List<CommitmentInfo> by lazy {
+        when (state) {
+            is ChannelStateWithCommitments -> {
+                val params = state.commitments.params
+                val changes = state.commitments.changes
+                state.commitments.inactive.map {
+                    CommitmentInfo(
+                        fundingTxId = it.fundingTxId.toHex(),
+                        fundingTxIndex = it.fundingTxIndex,
+                        fundingAmount = it.fundingAmount,
+                        balanceForSend = it.availableBalanceForSend(params, changes)
+                    )
+                }.sortedByDescending { it.fundingTxIndex }
+            }
             else -> emptyList()
         }
     }
@@ -68,5 +92,6 @@ data class LocalChannelInfo(
         val fundingTxId: String,
         val fundingTxIndex: Long,
         val fundingAmount: Satoshi,
+        val balanceForSend: MilliSatoshi,
     )
 }

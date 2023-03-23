@@ -16,9 +16,9 @@
 
 package fr.acinq.phoenix.utils.extensions
 
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.phoenix.data.Chain
 import org.kodein.memory.util.freeze
 
 /**
@@ -43,16 +43,9 @@ fun WalletPayment.state(): WalletPaymentState = when (this) {
         is LightningOutgoingPayment.Status.Completed.Succeeded.OnChain -> WalletPaymentState.Success
         is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> WalletPaymentState.Success
     }
-    is IncomingPayment -> when (val received = received) {
+    is IncomingPayment -> when (completedAt) {
         null -> WalletPaymentState.Pending
-        else -> {
-            if (received.receivedWith.all {
-                when (it) {
-                    is IncomingPayment.ReceivedWith.NewChannel -> it.confirmed
-                    else -> true
-                }
-            }) WalletPaymentState.Success else WalletPaymentState.Pending
-        }
+        else -> WalletPaymentState.Success
     }
 }
 
@@ -72,13 +65,6 @@ fun WalletPayment.errorMessage(): String? = when (this) {
 }
 
 /**
- * This function exists because the `freeze()` function isn't exposed to iOS.
- */
-fun WalletPayment.copyAndFreeze(): WalletPayment {
-    return this.freeze()
-}
-
-/**
  * In Objective-C, the function name `description()` is already in use (part of NSObject).
  * So we need to alias it.
  */
@@ -91,9 +77,9 @@ fun PaymentRequest.expiryTimestampSeconds(): Long? = this.expirySeconds?.let {
     this.timestampSeconds + it
 }
 
-fun PaymentRequest.chain(): Chain? = when (this.prefix) {
-    "lnbc" -> Chain.Mainnet
-    "lntb" -> Chain.Testnet
-    "lnbcrt" -> Chain.Regtest
+fun PaymentRequest.chain(): NodeParams.Chain? = when (this.prefix) {
+    "lnbc" -> NodeParams.Chain.Mainnet
+    "lntb" -> NodeParams.Chain.Testnet
+    "lnbcrt" -> NodeParams.Chain.Regtest
     else -> null
 }
