@@ -188,21 +188,15 @@ class SqlitePaymentsDb(
         }
     }
 
-    override suspend fun getOutgoingPaymentFromPartId(
-        partId: UUID
-    ): LightningOutgoingPayment? {
-
+    override suspend fun getLightningOutgoingPayment(id: UUID): LightningOutgoingPayment? {
         return withContext(Dispatchers.Default) {
-            outQueries.getPaymentFromPartId(partId)
+            outQueries.getPayment(id)
         }
     }
 
-    override suspend fun getOutgoingPayment(
-        id: UUID
-    ): OutgoingPayment? {
-
+    override suspend fun getLightningOutgoingPaymentFromPartId(partId: UUID): LightningOutgoingPayment? {
         return withContext(Dispatchers.Default) {
-            outQueries.getPayment(id)
+            outQueries.getPaymentFromPartId(partId)
         }
     }
 
