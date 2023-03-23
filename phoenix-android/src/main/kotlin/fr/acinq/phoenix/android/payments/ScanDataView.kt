@@ -126,26 +126,26 @@ fun ScanDataView(
             Scan.Model.InvoiceFlow.Sending -> {
                 LaunchedEffect(key1 = Unit) { onBackClick() }
             }
-            is Scan.Model.SwapOutFlow -> {
-                val paymentRequest = model.address.paymentRequest
+            is Scan.Model.OnchainFlow -> {
+                val paymentRequest = model.uri.paymentRequest
                 if (paymentRequest == null) {
                     SendSpliceOutView(
-                        requestedAmount = model.address.amount,
-                        address = model.address.address,
+                        requestedAmount = model.uri.amount,
+                        address = model.uri.address,
                         onBackClick = onBackClick,
                         onSpliceOutSuccess = onBackClick,
                     )
                 } else {
-                    var hasPickedSwapOutMode by remember { mutableStateOf(false) }
-                    if (!hasPickedSwapOutMode) {
-                        ChooseSwapOutOrLightningDialog(
-                            onPayWithLightningClick = {
-                                hasPickedSwapOutMode = true
+                    var showPaymentModeDialog by remember { mutableStateOf(false) }
+                    if (!showPaymentModeDialog) {
+                        ChoosePaymentModeDialog(
+                            onPayOffchainClick = {
+                                showPaymentModeDialog = true
                                 postIntent(Scan.Intent.Parse(request = paymentRequest.write()))
                             },
-                            onPayWithSwapOutClick = {
-                                hasPickedSwapOutMode = true
-                                postIntent(Scan.Intent.Parse(request = model.address.copy(paymentRequest = null).write()))
+                            onPayOnchainClick = {
+                                showPaymentModeDialog = true
+                                postIntent(Scan.Intent.Parse(request = model.uri.copy(paymentRequest = null).write()))
                             }
                         )
                     }
@@ -343,12 +343,12 @@ private fun DangerousRequestDialog(
 }
 
 @Composable
-private fun ChooseSwapOutOrLightningDialog(
-    onPayWithSwapOutClick: () -> Unit,
-    onPayWithLightningClick: () -> Unit,
+private fun ChoosePaymentModeDialog(
+    onPayOnchainClick: () -> Unit,
+    onPayOffchainClick: () -> Unit,
 ) {
     Dialog(onDismiss = {}, properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false), isScrollable = true) {
-        Clickable(onClick = { onPayWithSwapOutClick() }) {
+        Clickable(onClick = onPayOnchainClick) {
             Row(modifier = Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
                 PhoenixIcon(resourceId = R.drawable.ic_chain)
                 Spacer(Modifier.width(16.dp))
@@ -358,7 +358,7 @@ private fun ChooseSwapOutOrLightningDialog(
                 }
             }
         }
-        Clickable(onClick = { onPayWithLightningClick() }) {
+        Clickable(onClick = onPayOffchainClick) {
             Row(modifier = Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
                 PhoenixIcon(resourceId = R.drawable.ic_zap)
                 Spacer(Modifier.width(16.dp))

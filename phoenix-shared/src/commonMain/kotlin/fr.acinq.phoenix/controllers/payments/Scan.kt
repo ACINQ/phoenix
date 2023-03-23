@@ -21,7 +21,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.controllers.MVI
-import fr.acinq.phoenix.data.BitcoinAddressInfo
+import fr.acinq.phoenix.data.BitcoinUri
 import fr.acinq.phoenix.data.lnurl.*
 import io.ktor.http.*
 
@@ -85,14 +85,7 @@ object Scan {
             object Sending: InvoiceFlow()
         }
 
-        sealed class SwapOutFlow: Model() {
-            abstract val address: BitcoinAddressInfo
-            data class Init(override val address: BitcoinAddressInfo): SwapOutFlow()
-            data class RequestingSwapout(override val address: BitcoinAddressInfo): SwapOutFlow()
-            /** The swap-out is ready to be settled with a Lightning payment. The user must confirm the swap (the fee should be shown prominently). */
-            data class SwapOutReady(override val address: BitcoinAddressInfo, val initialUserAmount: Satoshi, val fee: Satoshi, val paymentRequest: PaymentRequest): SwapOutFlow()
-            data class SendingSwapOut(override val address: BitcoinAddressInfo, val paymentRequest: PaymentRequest): SwapOutFlow()
-        }
+        data class OnchainFlow(val uri: BitcoinUri): Model()
 
         object LnurlServiceFetch : Model()
 
@@ -168,27 +161,6 @@ object Scan {
             ) : InvoiceFlow()
         }
 
-        sealed class SwapOutFlow: Intent() {
-            /**
-             * Use this to go back to the initial state [Model.SwapOutFlow.Init], when the swap-out
-             * amount has been edited by the user, which invalidates the current model.
-             */
-            data class Invalidate(val address: BitcoinAddressInfo): SwapOutFlow()
-
-            data class PrepareSwapOut(
-                val address: BitcoinAddressInfo,
-                val amount: Satoshi,
-            ): SwapOutFlow()
-
-            data class SendSwapOut(
-                val amount: Satoshi,
-                val swapOutFee: Satoshi,
-                val address: BitcoinAddressInfo,
-                val paymentRequest: PaymentRequest,
-                val maxFees: MaxFees?,
-            ): SwapOutFlow()
-        }
-
         object CancelLnurlServiceFetch : Intent()
 
         sealed class LnurlPayFlow : Intent() {
@@ -231,7 +203,7 @@ object Scan {
         ): ClipboardContent()
 
         data class BitcoinRequest(
-            val address: BitcoinAddressInfo
+            val address: BitcoinUri
         ): ClipboardContent()
 
         data class LnurlRequest(

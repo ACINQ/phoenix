@@ -29,8 +29,8 @@ enum class BitcoinAddressType {
     SegWitScriptHash
 }
 
-data class BitcoinAddressInfo(
-    /** Actual Bitcoin address, may be different than input; e.g. when input is an URI like "bitcoin:xyz?param=123". */
+data class BitcoinUri(
+    /** Actual Bitcoin address; may be different than the source, e.g. if the source is an URI like "bitcoin:xyz?param=123". */
     val address: String,
     val chain: NodeParams.Chain,
     val type: BitcoinAddressType,

@@ -4,6 +4,7 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumMiniWallet
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.io.NativeSocketException
 import fr.acinq.lightning.io.TcpSocket
@@ -32,8 +33,8 @@ fun IncomingPayment.Origin.asSwapIn(): IncomingPayment.Origin.SwapIn? = when (th
     else -> null
 }
 
-fun IncomingPayment.Origin.asDualSwapIn(): IncomingPayment.Origin.DualSwapIn? = when (this) {
-    is IncomingPayment.Origin.DualSwapIn -> this
+fun IncomingPayment.Origin.asOnchain(): IncomingPayment.Origin.OnChain? = when (this) {
+    is IncomingPayment.Origin.OnChain -> this
     else -> null
 }
 
@@ -47,48 +48,48 @@ fun IncomingPayment.ReceivedWith.asNewChannel(): IncomingPayment.ReceivedWith.Ne
     else -> null
 }
 
-fun OutgoingPayment.Details.asNormal(): OutgoingPayment.Details.Normal? = when (this) {
-    is OutgoingPayment.Details.Normal -> this
+fun LightningOutgoingPayment.Details.asNormal(): LightningOutgoingPayment.Details.Normal? = when (this) {
+    is LightningOutgoingPayment.Details.Normal -> this
     else -> null
 }
 
-fun OutgoingPayment.Details.asKeySend(): OutgoingPayment.Details.KeySend? = when (this) {
-    is OutgoingPayment.Details.KeySend -> this
+fun LightningOutgoingPayment.Details.asKeySend(): LightningOutgoingPayment.Details.KeySend? = when (this) {
+    is LightningOutgoingPayment.Details.KeySend -> this
     else -> null
 }
 
-fun OutgoingPayment.Details.asSwapOut(): OutgoingPayment.Details.SwapOut? = when (this) {
-    is OutgoingPayment.Details.SwapOut -> this
+fun LightningOutgoingPayment.Details.asSwapOut(): LightningOutgoingPayment.Details.SwapOut? = when (this) {
+    is LightningOutgoingPayment.Details.SwapOut -> this
     else -> null
 }
 
-fun OutgoingPayment.Details.asChannelClosing(): OutgoingPayment.Details.ChannelClosing? = when (this) {
-    is OutgoingPayment.Details.ChannelClosing -> this
+fun LightningOutgoingPayment.Details.asChannelClosing(): LightningOutgoingPayment.Details.ChannelClosing? = when (this) {
+    is LightningOutgoingPayment.Details.ChannelClosing -> this
     else -> null
 }
 
-fun OutgoingPayment.Status.asPending(): OutgoingPayment.Status.Pending? = when (this) {
-    is OutgoingPayment.Status.Pending -> this
+fun LightningOutgoingPayment.Status.asPending(): LightningOutgoingPayment.Status.Pending? = when (this) {
+    is LightningOutgoingPayment.Status.Pending -> this
     else -> null
 }
 
-fun OutgoingPayment.Status.asFailed(): OutgoingPayment.Status.Completed.Failed? = when (this) {
-    is OutgoingPayment.Status.Completed.Failed -> this
+fun LightningOutgoingPayment.Status.asFailed(): LightningOutgoingPayment.Status.Completed.Failed? = when (this) {
+    is LightningOutgoingPayment.Status.Completed.Failed -> this
     else -> null
 }
 
-fun OutgoingPayment.Status.asSucceeded(): OutgoingPayment.Status.Completed.Succeeded? = when (this) {
-    is OutgoingPayment.Status.Completed.Succeeded -> this
+fun LightningOutgoingPayment.Status.asSucceeded(): LightningOutgoingPayment.Status.Completed.Succeeded? = when (this) {
+    is LightningOutgoingPayment.Status.Completed.Succeeded -> this
     else -> null
 }
 
-fun OutgoingPayment.Status.asOffChain(): OutgoingPayment.Status.Completed.Succeeded.OffChain? = when (this) {
-    is OutgoingPayment.Status.Completed.Succeeded.OffChain -> this
+fun LightningOutgoingPayment.Status.asOffChain(): LightningOutgoingPayment.Status.Completed.Succeeded.OffChain? = when (this) {
+    is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> this
     else -> null
 }
 
-fun OutgoingPayment.Status.asOnChain(): OutgoingPayment.Status.Completed.Succeeded.OnChain? = when (this) {
-    is OutgoingPayment.Status.Completed.Succeeded.OnChain -> this
+fun LightningOutgoingPayment.Status.asOnChain(): LightningOutgoingPayment.Status.Completed.Succeeded.OnChain? = when (this) {
+    is LightningOutgoingPayment.Status.Completed.Succeeded.OnChain -> this
     else -> null
 }
 

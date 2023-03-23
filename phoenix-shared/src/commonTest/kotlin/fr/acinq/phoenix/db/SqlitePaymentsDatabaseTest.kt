@@ -49,19 +49,15 @@ class SqlitePaymentsDatabaseTest {
     private val preimage2 = randomBytes32()
     private val paymentHash2 = Crypto.sha256(preimage2).toByteVector32()
     private val origin2 = IncomingPayment.Origin.KeySend
-    private val receivedWith2 = setOf(IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 1_995_000.msat, serviceFee = 5_000.msat, channelId = randomBytes32()))
+    private val receivedWith2 = setOf(
+        IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 1_995_000.msat, serviceFee = 5_000.msat, channelId = randomBytes32(), txId = randomBytes32())
+    )
 
     val origin3 = IncomingPayment.Origin.SwapIn(address = "1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb")
 
     @Test
     fun incoming__receive_lightning() = runTest {
         db.addIncomingPayment(preimage1, origin1, 0)
-        db.listIncomingPayments(10, 0)[0].let {
-            assertEquals(paymentHash1, it.paymentHash)
-            assertEquals(preimage1, it.preimage)
-            assertEquals(origin1, it.origin)
-            assertNull(it.received)
-        }
         db.receivePayment(paymentHash1, receivedWith1, 10)
         db.getIncomingPayment(paymentHash1)!!.let {
             assertEquals(paymentHash1, it.paymentHash)
@@ -77,12 +73,6 @@ class SqlitePaymentsDatabaseTest {
     @Test
     fun incoming__receive_new_channel() = runTest {
         db.addIncomingPayment(preimage1, origin3, 0)
-        db.listIncomingPayments(10, 0)[0].let {
-            assertEquals(paymentHash1, it.paymentHash)
-            assertEquals(preimage1, it.preimage)
-            assertEquals(origin3, it.origin)
-            assertNull(it.received)
-        }
         db.receivePayment(paymentHash1, receivedWith2, 15)
         db.getIncomingPayment(paymentHash1)!!.let {
             assertEquals(paymentHash1, it.paymentHash)
@@ -101,8 +91,9 @@ class SqlitePaymentsDatabaseTest {
         val paymentHash = Crypto.sha256(preimage).toByteVector32()
         val origin = IncomingPayment.Origin.Invoice(createInvoice(preimage, 1_000_000_000.msat))
         val channelId = randomBytes32()
-        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 600_000_000.msat, serviceFee = 5_000.msat, channelId = channelId)
-        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 400_000_000.msat, serviceFee = 5_000.msat, channelId = channelId)
+        val txId = randomBytes32()
+        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 600_000_000.msat, serviceFee = 5_000.msat, channelId = channelId, txId = txId)
+        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 400_000_000.msat, serviceFee = 5_000.msat, channelId = channelId, txId = txId)
         val receivedWith = setOf(mppPart1, mppPart2)
 
         db.addIncomingPayment(preimage, origin, 0)

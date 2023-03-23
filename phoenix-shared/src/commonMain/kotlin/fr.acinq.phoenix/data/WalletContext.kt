@@ -90,7 +90,6 @@ object WalletContext {
             val trampoline: TrampolineParams,
             @SerialName("pay_to_open") val payToOpen: PayToOpen,
             @SerialName("swap_in") val swapIn: SwapIn,
-            @SerialName("swap_out") val swapOut: SwapOut,
             val mempool: Mempool
         ) {
             fun walletParams(): WalletParams = trampoline.v2.run {
@@ -183,21 +182,6 @@ object WalletContext {
                 @SerialName("min_funding_sat") val minFundingSat: Long,
                 @SerialName("min_fee_sat") val minFeeSat: Long,
                 @SerialName("fee_percent") val feePercent: Double,
-                @SerialName("status") private val _status: Int
-            ) {
-                @Transient
-                val status: ServiceStatus = ServiceStatus.valueOf(_status)
-            }
-        }
-
-        @Serializable
-        data class SwapOut(val v1: V1) {
-
-            @Serializable
-            data class V1(
-                @SerialName("min_feerate_sat_byte") val minFeerateSatByte: Int,
-                @SerialName("min_amount_sat") val minAmountSat: Long,
-                @SerialName("max_amount_sat") val maxAmountSat: Long,
                 @SerialName("status") private val _status: Int
             ) {
                 @Transient

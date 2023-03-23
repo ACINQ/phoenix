@@ -55,7 +55,7 @@ object Parser {
     }
 
     /**
-     * Parses an input and returns a [BitcoinAddressInfo] if it is valid, or a typed error otherwise.
+     * Parses an input and returns a [BitcoinUri] if it is valid, or a typed error otherwise.
      *
      * @param chain the chain this parser expects the address to be valid on.
      * @param input can range from a basic bitcoin address to a sophisticated Bitcoin URI with a prefix and parameters.
@@ -63,7 +63,7 @@ object Parser {
     fun readBitcoinAddress(
         chain: NodeParams.Chain,
         input: String
-    ): Either<BitcoinAddressError, BitcoinAddressInfo> {
+    ): Either<BitcoinAddressError, BitcoinUri> {
         val cleanInput = removeExcessInput(input)
         val url = try {
             Url(cleanInput)
@@ -121,7 +121,7 @@ object Parser {
                 return Either.Left(BitcoinAddressError.ChainMismatch(chain, prefixChain))
             }
             return Either.Right(
-                BitcoinAddressInfo(address, prefixChain, prefixType, bin.byteVector(), label, message, amount, lightning, otherParams)
+                BitcoinUri(address, prefixChain, prefixType, bin.byteVector(), label, message, amount, lightning, otherParams)
             )
         } catch (e: Exception) {
             // Not Base58
@@ -147,7 +147,7 @@ object Parser {
                     else -> return Either.Left(BitcoinAddressError.UnknownFormat)
                 }
                 return Either.Right(
-                    BitcoinAddressInfo(address, prefixChain, type, bin.byteVector(), label, message, amount, lightning, otherParams)
+                    BitcoinUri(address, prefixChain, type, bin.byteVector(), label, message, amount, lightning, otherParams)
                 )
             } else {
                 // Unknown version - we don't have any validation logic in place for it

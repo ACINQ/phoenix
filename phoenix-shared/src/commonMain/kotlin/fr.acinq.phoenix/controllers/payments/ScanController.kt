@@ -17,16 +17,12 @@
 package fr.acinq.phoenix.controllers.payments
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.*
-import fr.acinq.lightning.blockchain.fee.FeeratePerByte
-import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.*
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
-import fr.acinq.lightning.wire.SwapOutRequest
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.data.*
@@ -54,7 +50,6 @@ class AppScanController(
     private val peerManager: PeerManager,
     private val lnurlManager: LnurlManager,
     private val databaseManager: DatabaseManager,
-    private val appConfigManager: AppConfigurationManager,
     private val chain: NodeParams.Chain,
 ) : AppController<Scan.Model, Scan.Intent>(
     loggerFactory = loggerFactory,
@@ -79,32 +74,8 @@ class AppScanController(
         peerManager = business.peerManager,
         lnurlManager = business.lnurlManager,
         databaseManager = business.databaseManager,
-        appConfigManager = business.appConfigurationManager,
         chain = business.chain,
     )
-
-    init {
-        launch {
-            peerManager.getPeer().eventsFlow.collect { event ->
-                when (event) {
-                    is SwapOutResponseEvent -> {
-                        val currentModel = models.value
-                        if (currentModel is Scan.Model.SwapOutFlow.RequestingSwapout) {
-                            model(
-                                Scan.Model.SwapOutFlow.SwapOutReady(
-                                    address = currentModel.address,
-                                    initialUserAmount = event.swapOutResponse.amount,
-                                    fee = event.swapOutResponse.fee,
-                                    paymentRequest = PaymentRequest.read(event.swapOutResponse.paymentRequest)
-                                )
-                            )
-                        }
-                    }
-                    else -> {}
-                }
-            }
-        }
-    }
 
     override fun process(intent: Scan.Intent) {
         when (intent) {
@@ -117,7 +88,6 @@ class AppScanController(
                     paymentRequest = intent.paymentRequest,
                     customMaxFees = intent.maxFees,
                     metadata = null,
-                    swapOutData = null
                 )
                 model(Scan.Model.InvoiceFlow.Sending)
             }
@@ -127,23 +97,6 @@ class AppScanController(
             is Scan.Intent.LnurlWithdrawFlow.SendLnurlWithdraw -> launch { processLnurlWithdraw(intent) }
             is Scan.Intent.LnurlWithdrawFlow.CancelLnurlWithdraw -> launch { cancelLnurlWithdraw(intent) }
             is Scan.Intent.LnurlAuthFlow.Login -> launch { processLnurlAuth(intent) }
-            is Scan.Intent.SwapOutFlow.Invalidate -> launch { model(Scan.Model.SwapOutFlow.Init(intent.address)) }
-            is Scan.Intent.SwapOutFlow.PrepareSwapOut -> launch { prepareSwapOutTransaction(intent) }
-            is Scan.Intent.SwapOutFlow.SendSwapOut -> launch {
-                sendPayment(
-                    amountToSend = intent.amount.toMilliSatoshi(),
-                    paymentRequest = intent.paymentRequest,
-                    customMaxFees = intent.maxFees,
-                    metadata = null,
-                    swapOutData = intent.swapOutFee to intent.address.address
-                )
-                model(
-                    Scan.Model.SwapOutFlow.SendingSwapOut(
-                        address = intent.address,
-                        paymentRequest = intent.paymentRequest
-                    )
-                )
-            }
         }
     }
 
@@ -181,10 +134,10 @@ class AppScanController(
     /** Return the adequate model for a Bitcoin address result. */
     private suspend fun processBitcoinAddress(
         input: String,
-        result: Either<BitcoinAddressError, BitcoinAddressInfo>
+        result: Either<BitcoinAddressError, BitcoinUri>
     ) {
-        val model = when (result) {
-            is Either.Right -> Scan.Model.SwapOutFlow.Init(address = result.value)
+        model(when (result) {
+            is Either.Right -> Scan.Model.OnchainFlow(uri = result.value)
             is Either.Left -> {
                 val error = result.value
                 if (error is BitcoinAddressError.ChainMismatch) {
@@ -193,8 +146,7 @@ class AppScanController(
                     Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.UnknownFormat)
                 }
             }
-        }
-        model(model)
+        })
     }
 
     /** Utility method wrapping a cancellable lnurl task and updating the requestId field. */
@@ -270,7 +222,6 @@ class AppScanController(
         paymentRequest: PaymentRequest,
         customMaxFees: MaxFees?,
         metadata: WalletPaymentMetadata?,
-        swapOutData: Pair<Satoshi, String>?,
     ) {
         val paymentId = UUID.randomUUID()
         val peer = peerManager.getPeer()
@@ -299,29 +250,15 @@ class AppScanController(
         )
 
         peer.send(
-            if (swapOutData != null) {
-                SendPaymentSwapOut(
-                    paymentId = paymentId,
-                    amount = amountToSend,
-                    recipient = paymentRequest.nodeId,
-                    details = LightningOutgoingPayment.Details.SwapOut(
-                        address = swapOutData.second,
-                        paymentRequest = paymentRequest,
-                        swapOutFee = swapOutData.first
-                    ),
-                    trampolineFeesOverride = trampolineFeesOverride
-                )
-            } else {
-                SendPaymentNormal(
-                    paymentId = paymentId,
-                    amount = amountToSend,
-                    recipient = paymentRequest.nodeId,
-                    details = LightningOutgoingPayment.Details.Normal(
-                        paymentRequest = paymentRequest
-                    ),
-                    trampolineFeesOverride = trampolineFeesOverride
-                )
-            }
+            SendPaymentNormal(
+                paymentId = paymentId,
+                amount = amountToSend,
+                recipient = paymentRequest.nodeId,
+                details = LightningOutgoingPayment.Details.Normal(
+                    paymentRequest = paymentRequest
+                ),
+                trampolineFeesOverride = trampolineFeesOverride
+            )
         )
     }
 
@@ -394,7 +331,6 @@ class AppScanController(
                         ),
                         userNotes = intent.comment
                     ),
-                    swapOutData = null,
                 )
                 model(Scan.Model.LnurlPayFlow.Sending(intent.paymentIntent))
             }
@@ -534,21 +470,6 @@ class AppScanController(
         }
     }
 
-    private suspend fun prepareSwapOutTransaction(
-        intent: Scan.Intent.SwapOutFlow.PrepareSwapOut
-    ) {
-        val feeRate = FeeratePerKw(FeeratePerByte((appConfigManager.chainContext.value?.swapOut?.v1?.minFeerateSatByte ?: 20).sat))
-        peerManager.getPeer().sendToPeer(
-            SwapOutRequest(
-                chainHash = chain.chainHash,
-                amount = intent.amount,
-                bitcoinAddress = intent.address.address,
-                feePerKw = feeRate.toLong()
-            )
-        )
-        model(Scan.Model.SwapOutFlow.RequestingSwapout(intent.address))
-    }
-
     /** Directly called by swift code in iOS app. Parses the data looking for a Lightning invoice, Lnurl, or Bitcoin address. */
     fun inspectClipboard(data: String): Scan.ClipboardContent? {
         val input = Parser.removeExcessInput(data)
@@ -615,7 +536,7 @@ class AppScanController(
      * Invokes `Parser.readBitcoinAddress`, but maps the
      * generic `BitcoinAddressError.UnknownFormat` to a null result instead.
      */
-    private fun readBitcoinAddress(input: String): Either<BitcoinAddressError, BitcoinAddressInfo>? {
+    private fun readBitcoinAddress(input: String): Either<BitcoinAddressError, BitcoinUri>? {
         return when (val result = Parser.readBitcoinAddress(chain, input)) {
             is Either.Left -> when (result.left) {
                 is BitcoinAddressError.UnknownFormat -> null

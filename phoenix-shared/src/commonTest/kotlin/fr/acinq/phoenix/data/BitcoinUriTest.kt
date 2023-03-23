@@ -31,7 +31,7 @@ class BitcoinAddressTest {
     fun test_bitcoin_address_info_write_read() {
 
         val testCases = listOf(
-            BitcoinAddressInfo(
+            BitcoinUri(
                 address = "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7",
                 chain = Chain.Testnet,
                 type = BitcoinAddressType.SegWitScriptHash,
@@ -45,7 +45,7 @@ class BitcoinAddressTest {
                     append("foo2", 1234L.toString())
                 }
             ),
-            BitcoinAddressInfo(
+            BitcoinUri(
                 address = "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7",
                 chain = Chain.Testnet,
                 type = BitcoinAddressType.SegWitScriptHash,
@@ -56,7 +56,7 @@ class BitcoinAddressTest {
                 paymentRequest = null,
                 ignoredParams = Parameters.Empty
             ),
-            BitcoinAddressInfo(
+            BitcoinUri(
                 address = "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7",
                 chain = Chain.Testnet,
                 type = BitcoinAddressType.SegWitScriptHash,
@@ -67,7 +67,7 @@ class BitcoinAddressTest {
                 paymentRequest = null,
                 ignoredParams = Parameters.Empty
             ),
-            BitcoinAddressInfo(
+            BitcoinUri(
                 address = "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7",
                 chain = Chain.Testnet,
                 type = BitcoinAddressType.SegWitScriptHash,
