@@ -2,17 +2,17 @@ package fr.acinq.phoenix.data.lnurl
 
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 
 class LnurlPayTest {
@@ -36,8 +36,8 @@ class LnurlPayTest {
     """.trimIndent()
 
     private fun fakeClient(engine: MockEngine) = HttpClient(engine) {
-        install(JsonFeature) {
-            serializer = KotlinxSerializer()
+        install(ContentNegotiation) {
+            json(json = Json { ignoreUnknownKeys = true })
             expectSuccess = false
         }
     }
@@ -78,8 +78,8 @@ class LnurlPayTest {
     fun execute_internet_identifier() {
         runBlocking {
             val client = HttpClient {
-                install(JsonFeature) {
-                    serializer = KotlinxSerializer()
+                install(ContentNegotiation) {
+                    json(json = Json { ignoreUnknownKeys = true })
                 }
             }
             val lnurl = Lnurl.extractLnurl("acinq@zbd.gg")

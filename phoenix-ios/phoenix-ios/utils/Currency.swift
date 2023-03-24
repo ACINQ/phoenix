@@ -9,6 +9,15 @@ enum Currency: Hashable, Identifiable, CustomStringConvertible {
 	case bitcoin(BitcoinUnit)
 	case fiat(FiatCurrency)
 	
+	var type: CurrencyType {
+		switch self {
+		case .bitcoin(_):
+			return .bitcoin
+		case .fiat(_):
+			return .fiat
+		}
+	}
+	
 	var abbrev: String {
 		switch self {
 		case .bitcoin(let unit):

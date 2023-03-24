@@ -12,31 +12,35 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+fileprivate enum Key: String {
+	case theme
+	case defaultPaymentDescription
+	case showChannelsRemoteBalance
+	case recentTipPercents
+	case isNewWallet
+	case invoiceExpirationDays
+	case maxFees
+	case hideAmountsOnHomeScreen
+	case recentPaymentsConfig
+}
 
+fileprivate enum KeyDeprecated: String {
+	case recentPaymentSeconds
+}
+
+/// Standard app preferences, stored in the iOS UserDefaults system.
+///
+/// Note that the values here are NOT shared with other extensions bundled in the app,
+/// such as the notification-service-extension. For preferences shared with extensions, see GroupPrefs.
+///
 class Prefs {
-	
-	fileprivate enum Key: String {
-		case theme
-		case pushPermissionQuery
-		case pushTokenRegistration
-		case isTorEnabled
-		case defaultPaymentDescription
-		case showChannelsRemoteBalance
-		case recentTipPercents
-		case isNewWallet
-		case invoiceExpirationDays
-		case maxFees
-		case hideAmountsOnHomeScreen
-		case recentPaymentSeconds
-	}
 	
 	public static let shared = Prefs()
 	
 	private init() {
 		UserDefaults.standard.register(defaults: [
 			Key.isNewWallet.rawValue: true,
-			Key.invoiceExpirationDays.rawValue: 7,
-			Key.recentPaymentSeconds.rawValue: (60 * 60 * 24 * 3)
+			Key.invoiceExpirationDays.rawValue: 7
 		])
 	}
 	
@@ -48,108 +52,74 @@ class Prefs {
 	// MARK: User Options
 	// --------------------------------------------------
 	
-	lazy private(set) var themePublisher: CurrentValueSubject<Theme, Never> = {
-		return CurrentValueSubject<Theme, Never>(self.theme)
+	lazy private(set) var themePublisher: AnyPublisher<Theme, Never> = {
+		defaults.publisher(for: \.theme, options: [.new])
+			.map({ (data: Data?) -> Theme in
+				data?.jsonDecode() ?? self.defaultTheme
+			})
+			.removeDuplicates()
+			.eraseToAnyPublisher()
 	}()
-	
+
+	private let defaultTheme = Theme.system
+
 	var theme: Theme {
-		get {
-			let key = Key.theme.rawValue
-			let saved: Theme? = defaults.getCodable(forKey: key)
-			return saved ?? Theme.system
-		}
-		set {
-			let key = Key.theme.rawValue
-			defaults.setCodable(value: newValue, forKey: key)
-			themePublisher.send(newValue)
-		}
-	}
-
-	lazy private(set) var isTorEnabledPublisher: CurrentValueSubject<Bool, Never> = {
-		return CurrentValueSubject<Bool, Never>(self.isTorEnabled)
-	}()
-
-	var isTorEnabled: Bool {
-		get {
-			 defaults.bool(forKey: Key.isTorEnabled.rawValue)
-		}
-		set {
-			defaults.set(newValue, forKey: Key.isTorEnabled.rawValue)
-			isTorEnabledPublisher.send(newValue)
-		}
+		get { defaults.theme?.jsonDecode() ?? defaultTheme }
+		set { defaults.theme = newValue.jsonEncode() }
 	}
 	
 	var defaultPaymentDescription: String? {
-		get {
-			let key = Key.defaultPaymentDescription.rawValue
-			let saved: String? = defaults.string(forKey: key)
-			return saved
-		}
-		set {
-			let key = Key.defaultPaymentDescription.rawValue
-			defaults.setValue(newValue, forKey: key)
-		}
+		get { defaults.defaultPaymentDescription }
+		set { defaults.defaultPaymentDescription = newValue }
 	}
 	
 	var showChannelsRemoteBalance: Bool {
-		get {
-			defaults.bool(forKey: Key.showChannelsRemoteBalance.rawValue)
-		}
-		set {
-			defaults.set(newValue, forKey: Key.showChannelsRemoteBalance.rawValue)
-		}
+		get { defaults.showChannelsRemoteBalance }
+		set { defaults.showChannelsRemoteBalance = newValue }
 	}
 	
 	var invoiceExpirationDays: Int {
-		get {
-			defaults.integer(forKey: Key.invoiceExpirationDays.rawValue)
-		}
-		set {
-			defaults.set(newValue, forKey: Key.invoiceExpirationDays.rawValue)
-		}
+		get { defaults.invoiceExpirationDays }
+		set { defaults.invoiceExpirationDays = newValue	}
 	}
 	
-	lazy private(set) var maxFeesPublisher: CurrentValueSubject<MaxFees?, Never> = {
-		return CurrentValueSubject<MaxFees?, Never>(self.maxFees)
+	var invoiceExpirationSeconds: Int64 {
+		return Int64(invoiceExpirationDays) * Int64(60 * 60 * 24)
+	}
+	
+	lazy private(set) var maxFeesPublisher: AnyPublisher<MaxFees?, Never> = {
+		defaults.publisher(for: \.maxFees, options: [.new])
+			.map({ (data: Data?) -> MaxFees? in
+				data?.jsonDecode()
+			})
+			.removeDuplicates()
+			.eraseToAnyPublisher()
 	}()
 	
 	var maxFees: MaxFees? {
-		get {
-			let key = Key.maxFees.rawValue
-			let result: MaxFees? = defaults.getCodable(forKey: key)
-			return result
-		}
-		set {
-			let key = Key.maxFees.rawValue
-			defaults.setCodable(value: newValue, forKey: key)
-			maxFeesPublisher.send(newValue)
-		}
+		get { defaults.maxFees?.jsonDecode() }
+		set { defaults.maxFees = newValue?.jsonEncode() }
 	}
 	
 	var hideAmountsOnHomeScreen: Bool {
-		get {
-			 defaults.bool(forKey: Key.hideAmountsOnHomeScreen.rawValue)
-		}
-		set {
-			defaults.set(newValue, forKey: Key.hideAmountsOnHomeScreen.rawValue)
-		}
+		get { defaults.hideAmountsOnHomeScreen }
+		set { defaults.hideAmountsOnHomeScreen = newValue }
 	}
 	
-	lazy private(set) var recentPaymentSecondsPublisher: CurrentValueSubject<Int, Never> = {
-		return CurrentValueSubject<Int, Never>(self.recentPaymentSeconds)
+	lazy private(set) var recentPaymentsConfigPublisher: AnyPublisher<RecentPaymentsConfig, Never> = {
+		defaults.publisher(for: \.recentPaymentsConfig, options: [.new])
+			.map({ (data: Data?) -> RecentPaymentsConfig in
+				data?.jsonDecode() ?? self.defaultRecentPaymentsConfig
+			})
+			.removeDuplicates()
+			.eraseToAnyPublisher()
 	}()
 	
-	var recentPaymentSeconds: Int {
-		get {
-			return defaults.integer(forKey: Key.recentPaymentSeconds.rawValue)
-		}
-		set {
-			let oldValue = recentPaymentSeconds
-			if oldValue != newValue {
-				defaults.set(newValue, forKey: Key.recentPaymentSeconds.rawValue)
-				recentPaymentSecondsPublisher.send(newValue)
-			}
-		}
+	let defaultRecentPaymentsConfig = RecentPaymentsConfig.mostRecent(count: 3)
+	
+	var recentPaymentsConfig: RecentPaymentsConfig {
+		get { defaults.recentPaymentsConfig?.jsonDecode() ?? defaultRecentPaymentsConfig }
+		set { defaults.recentPaymentsConfig = newValue.jsonEncode() }
 	}
 	
 	// --------------------------------------------------
@@ -162,12 +132,8 @@ class Prefs {
 	 * Just that the wallet had either a non-zero balance, or a transaction, at least once.
 	 */
 	var isNewWallet: Bool {
-		get {
-			 defaults.bool(forKey: Key.isNewWallet.rawValue)
-		}
-		set {
-			defaults.set(newValue, forKey: Key.isNewWallet.rawValue)
-		}
+		get { defaults.isNewWallet }
+		set { defaults.isNewWallet = newValue }
 	}
 	
 	// --------------------------------------------------
@@ -181,15 +147,11 @@ class Prefs {
 	
 	/// Most recent is at index 0
 	var recentTipPercents: [Int] {
-		get {
-			let key = Key.recentTipPercents.rawValue
-			let saved: [Int]? = defaults.getCodable(forKey: key)
-			return saved ?? []
-		}
+		get { defaults.recentTipPercents?.jsonDecode() ?? [] }
 	}
 	
 	func addRecentTipPercent(_ percent: Int) {
-		var recents = recentTipPercents
+		var recents = self.recentTipPercents
 		if let idx = recents.firstIndex(of: percent) {
 			recents.remove(at: idx)
 		}
@@ -198,38 +160,9 @@ class Prefs {
 			recents.removeLast()
 		}
 		
-		let key = Key.recentTipPercents.rawValue
-		defaults.setCodable(value: recents, forKey: key)
+		defaults.recentTipPercents = recents.jsonEncode()
 	}
-	
-	// --------------------------------------------------
-	// MARK: Push Notifications
-	// --------------------------------------------------
-	
-	var pushPermissionQuery: PushPermissionQuery {
-		get {
-			let key = Key.pushPermissionQuery.rawValue
-			let saved: PushPermissionQuery? = defaults.getCodable(forKey: key)
-			return saved ?? .neverAskedUser
-		}
-		set {
-			let key = Key.pushPermissionQuery.rawValue
-			defaults.setCodable(value: newValue, forKey: key)
-		}
-	}
-	
-	var pushTokenRegistration: PushTokenRegistration? {
-		get {
-			let key = Key.pushTokenRegistration.rawValue
-			let result: PushTokenRegistration? = defaults.getCodable(forKey: key)
-			return result
-		}
-		set {
-			let key = Key.pushTokenRegistration.rawValue
-			defaults.setCodable(value: newValue, forKey: key)
-		}
-	}
-	
+
 	// --------------------------------------------------
 	// MARK: Backup
 	// --------------------------------------------------
@@ -241,4 +174,111 @@ class Prefs {
 	lazy private(set) var backupSeed: Prefs_BackupSeed = {
 		return Prefs_BackupSeed()
 	}()
+
+	// --------------------------------------------------
+	// MARK: Migration
+	// --------------------------------------------------
+	
+	public func performMigration(
+		_ targetBuild: String,
+		_ completionPublisher: CurrentValueSubject<Int, Never>
+	) -> Void {
+		log.trace("performMigration(to: \(targetBuild))")
+		
+		// NB: The first version released in the App Store was version 1.0.0 (build 17)
+		
+		if targetBuild.isVersion(equalTo: "44") {
+			performMigration_toBuild44()
+		}
+	}
+	
+	private func performMigration_toBuild44() {
+		log.trace("performMigration_toBuild44()")
+		
+		let oldKey = KeyDeprecated.recentPaymentSeconds.rawValue
+		let newKey = Key.recentPaymentsConfig.rawValue
+		
+		if defaults.object(forKey: oldKey) != nil {
+			let seconds = defaults.integer(forKey: oldKey)
+			if seconds <= 0 {
+				let newValue = RecentPaymentsConfig.inFlightOnly
+				defaults.set(newValue.jsonEncode(), forKey: newKey)
+			} else {
+				let newValue = RecentPaymentsConfig.withinTime(seconds: seconds)
+				defaults.set(newValue.jsonEncode(), forKey: newKey)
+			}
+			
+			defaults.removeObject(forKey: oldKey)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Reset Wallet
+	// --------------------------------------------------
+
+	func resetWallet(encryptedNodeId: String) {
+
+		// Purposefully not resetting:
+		// - Key.theme: App feels weird when this changes unexpectedly.
+
+		defaults.removeObject(forKey: Key.defaultPaymentDescription.rawValue)
+		defaults.removeObject(forKey: Key.showChannelsRemoteBalance.rawValue)
+		defaults.removeObject(forKey: Key.recentTipPercents.rawValue)
+		defaults.removeObject(forKey: Key.isNewWallet.rawValue)
+		defaults.removeObject(forKey: Key.invoiceExpirationDays.rawValue)
+		defaults.removeObject(forKey: Key.maxFees.rawValue)
+		defaults.removeObject(forKey: Key.hideAmountsOnHomeScreen.rawValue)
+		defaults.removeObject(forKey: Key.recentPaymentsConfig.rawValue)
+		
+		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
+		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
+	}
+}
+
+extension UserDefaults {
+
+	@objc fileprivate var theme: Data? {
+		get { data(forKey: Key.theme.rawValue) }
+		set { set(newValue, forKey: Key.theme.rawValue) }
+	}
+
+	@objc fileprivate var defaultPaymentDescription: String? {
+		get { string(forKey: Key.defaultPaymentDescription.rawValue) }
+		set { setValue(newValue, forKey: Key.defaultPaymentDescription.rawValue) }
+	}
+
+	@objc fileprivate var showChannelsRemoteBalance: Bool {
+		get { bool(forKey: Key.showChannelsRemoteBalance.rawValue) }
+		set { set(newValue, forKey: Key.showChannelsRemoteBalance.rawValue) }
+	}
+
+	@objc fileprivate var invoiceExpirationDays: Int {
+		get { integer(forKey: Key.invoiceExpirationDays.rawValue) }
+		set { set(newValue, forKey: Key.invoiceExpirationDays.rawValue) }
+	}
+
+	@objc fileprivate var maxFees: Data? {
+		get { data(forKey: Key.maxFees.rawValue) }
+		set { set(newValue, forKey: Key.maxFees.rawValue) }
+	}
+
+	@objc fileprivate var hideAmountsOnHomeScreen: Bool {
+		get { bool(forKey: Key.hideAmountsOnHomeScreen.rawValue) }
+		set { set(newValue, forKey: Key.hideAmountsOnHomeScreen.rawValue) }
+	}
+	
+	@objc fileprivate var recentPaymentsConfig: Data? {
+		get { data(forKey: Key.recentPaymentsConfig.rawValue) }
+		set { set(newValue, forKey: Key.recentPaymentsConfig.rawValue) }
+	}
+
+	@objc fileprivate var isNewWallet: Bool {
+		get { bool(forKey: Key.isNewWallet.rawValue) }
+		set { set(newValue, forKey: Key.isNewWallet.rawValue) }
+	}
+
+	@objc fileprivate var recentTipPercents: Data? {
+		get { data(forKey: Key.recentTipPercents.rawValue) }
+		set { set(newValue, forKey: Key.recentTipPercents.rawValue) }
+	}
 }

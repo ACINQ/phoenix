@@ -34,7 +34,7 @@ struct InitializationView: MVIView {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 			
-			if AppDelegate.showTestnetBackground {
+			if BusinessManager.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -137,7 +137,7 @@ struct InitializationView: MVIView {
 	}
 	
 	var logoImageName: String {
-		if AppDelegate.isTestnet {
+		if BusinessManager.isTestnet {
 			return "logo_blue"
 		} else {
 			return "logo_green"
@@ -167,7 +167,7 @@ struct InitializationView: MVIView {
 		
 		AppSecurity.shared.addKeychainEntry(mnemonics: model.mnemonics) { (error: Error?) in
 			if error == nil {
-				AppDelegate.get().loadWallet(mnemonics: model.mnemonics, seed: model.seed)
+				Biz.loadWallet(mnemonics: model.mnemonics, seed: model.seed)
 			}
 		}
 	}

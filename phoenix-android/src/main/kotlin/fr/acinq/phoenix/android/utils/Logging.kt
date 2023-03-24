@@ -33,6 +33,7 @@ import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy
 import ch.qos.logback.core.util.FileSize
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
+import org.kodein.log.frontend.defaultLogFrontend
 import org.kodein.log.frontend.slf4jFrontend
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -46,7 +47,7 @@ fun logger(name: String? = null): org.kodein.log.Logger {
     return if (application !is PhoenixApplication) { // Preview mode
         remember(tag) { org.kodein.log.LoggerFactory(slf4jFrontend).newLogger(tag) }
     } else {
-        remember(tag) { application.business.loggerFactory.newLogger(tag) }
+        remember(tag) { org.kodein.log.LoggerFactory(defaultLogFrontend).newLogger(tag) }
     }
 }
 

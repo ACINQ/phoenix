@@ -114,7 +114,7 @@ private fun DisclaimerView(
             onCheckedChange = { hasCheckedWarning = it },
         )
         BorderButton(
-            text = R.string.restore_disclaimer_next,
+            text = stringResource(id = R.string.restore_disclaimer_next),
             icon = R.drawable.ic_arrow_next,
             onClick = (onClickNext),
             enabled = hasCheckedWarning,
@@ -194,7 +194,7 @@ private fun SeedInputView(
                 }
                 is WritingSeedState.Init -> {
                     BorderButton(
-                        text = R.string.restore_import_button,
+                        text = stringResource(id = R.string.restore_import_button),
                         icon = R.drawable.ic_check_circle,
                         onClick = {
                             focusManager.clearFocus()

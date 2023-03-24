@@ -3,11 +3,10 @@ package fr.acinq.phoenix.controllers.config
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.WalletManager
 import fr.acinq.phoenix.controllers.AppController
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 
-@OptIn(ExperimentalCoroutinesApi::class)
+
 class AppConfigurationController(
     loggerFactory: LoggerFactory,
     private val walletManager: WalletManager

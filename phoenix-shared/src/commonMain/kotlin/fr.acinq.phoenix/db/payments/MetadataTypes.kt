@@ -2,6 +2,7 @@ package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.phoenix.db.cloud.cborSerializer
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.data.lnurl.LnurlPay
 import io.ktor.http.*
@@ -52,7 +53,7 @@ sealed class LnurlBase {
         fun deserialize(typeVersion: TypeVersion, blob: ByteArray): LnurlBase {
             return when (typeVersion) {
                 TypeVersion.PAY_V0 -> {
-                    Cbor.decodeFromByteArray<Pay>(blob)
+                    cborSerializer().decodeFromByteArray<Pay>(blob)
                 }
             }
         }
@@ -95,7 +96,7 @@ sealed class LnurlMetadata {
         fun deserialize(typeVersion: TypeVersion, blob: ByteArray): LnurlMetadata {
             return when (typeVersion) {
                 TypeVersion.PAY_V0 -> {
-                    Cbor.decodeFromByteArray<PayMetadata>(blob)
+                    cborSerializer().decodeFromByteArray<PayMetadata>(blob)
                 }
             }
         }
@@ -181,13 +182,13 @@ sealed class LnurlSuccessAction {
         ): LnurlPay.Invoice.SuccessAction {
             return when (typeVersion) {
                 TypeVersion.MESSAGE_V0 -> {
-                    Cbor.decodeFromByteArray<Message>(blob).unwrap()
+                    cborSerializer().decodeFromByteArray<Message>(blob).unwrap()
                 }
                 TypeVersion.URL_V0 -> {
-                    Cbor.decodeFromByteArray<Url>(blob).unwrap()
+                    cborSerializer().decodeFromByteArray<Url>(blob).unwrap()
                 }
                 TypeVersion.AES_V0 -> {
-                    Cbor.decodeFromByteArray<Aes>(blob).unwrap()
+                    cborSerializer().decodeFromByteArray<Aes>(blob).unwrap()
                 }
             }
         }

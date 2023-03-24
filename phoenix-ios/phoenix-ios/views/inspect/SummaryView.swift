@@ -49,7 +49,7 @@ struct SummaryView: View {
 		// If we get a cache hit, we can skip the UI refresh/flicker.
 		if let row = paymentInfo.toOrderRow() {
 			
-			let fetcher = AppDelegate.get().business.paymentsManager.fetcher
+			let fetcher = Biz.business.paymentsManager.fetcher
 			let options = WalletPaymentFetchOptions.companion.All
 			
 			if let result = fetcher.getCachedPayment(row: row, options: options) {
@@ -69,6 +69,10 @@ struct SummaryView: View {
 			self._paymentInfoIsStale = State(initialValue: true)
 		}
 	}
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	var body: some View {
@@ -162,24 +166,45 @@ struct SummaryView: View {
 					.font(Font.title2.bold())
 					.padding(.bottom, 2)
 					
-					Text(payment.completedAt().formatDateMS())
-						.font(.subheadline)
-						.foregroundColor(.secondary)
+					if let completedAtDate = payment.completedAtDate() {
+						Text(completedAtDate.format())
+							.font(.subheadline)
+							.foregroundColor(.secondary)
+					}
 				}
 				.padding(.bottom, 30)
 				
 			case .pending:
-				Image("ic_payment_sending")
-					.renderingMode(.template)
-					.resizable()
-					.foregroundColor(Color.borderColor)
-					.frame(width: 100, height: 100)
-					.padding(.bottom, 16)
-					.accessibilityHidden(true)
-				Text("PENDING")
-					.font(Font.title2.bold())
+				if payment.isOnChain() {
+					Image(systemName: "hourglass.circle")
+						.renderingMode(.template)
+						.resizable()
+						.foregroundColor(Color.borderColor)
+						.frame(width: 100, height: 100)
+						.padding(.bottom, 16)
+						.accessibilityHidden(true)
+					VStack(alignment: HorizontalAlignment.center, spacing: 2) {
+						Text("WAITING FOR CONFIRMATIONS")
+							.font(.title2.uppercaseSmallCaps())
+							.multilineTextAlignment(.center)
+							.padding(.bottom, 6)
+							.accessibilityLabel("Pending payment")
+							.accessibilityHint("Waiting for confirmations")
+					} // </VStack>
 					.padding(.bottom, 30)
-					.accessibilityLabel("Pending payment")
+				} else {
+					Image("ic_payment_sending")
+						.renderingMode(.template)
+						.resizable()
+						.foregroundColor(Color.borderColor)
+						.frame(width: 100, height: 100)
+						.padding(.bottom, 16)
+						.accessibilityHidden(true)
+					Text("PENDING")
+						.font(.title2.bold())
+						.padding(.bottom, 30)
+						.accessibilityLabel("Pending payment")
+				}
 				
 			case .failure:
 				Image(systemName: "xmark.circle")
@@ -191,19 +216,21 @@ struct SummaryView: View {
 					.accessibilityHidden(true)
 				VStack {
 					Text("FAILED")
-						.font(Font.title2.bold())
+						.font(.title2.bold())
 						.padding(.bottom, 2)
 						.accessibilityLabel("Failed payment")
 					
 					Text("NO FUNDS HAVE BEEN SENT")
-						.font(Font.title2.uppercaseSmallCaps())
+						.font(.title2.uppercaseSmallCaps())
 						.padding(.bottom, 6)
 					
-					Text(payment.completedAt().formatDateMS())
-						.font(Font.subheadline)
-						.foregroundColor(.secondary)
+					if let completedAtDate = payment.completedAtDate() {
+						Text(completedAtDate.format())
+							.font(Font.subheadline)
+							.foregroundColor(.secondary)
+					}
 					
-				}
+				} // </VStack>
 				.padding(.bottom, 30)
 				
 			default:
@@ -283,12 +310,12 @@ struct SummaryView: View {
 			
 			if #available(iOS 15.0, *) {
 				if payment.state() == WalletPaymentState.failure {
-					buttonList_withDeleteOption
+					buttonList_withDeleteOption()
 				} else {
-					buttonList
+					buttonList()
 				}
 			} else {
-				buttonList
+				buttonList()
 			}
 			
 			Spacer(minLength: 25)
@@ -296,7 +323,7 @@ struct SummaryView: View {
 	}
 	
 	@ViewBuilder
-	var buttonList: some View {
+	func buttonList() -> some View {
 		
 		// Details | Edit
 		//         ^
@@ -304,10 +331,7 @@ struct SummaryView: View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 		
-			NavigationLink(destination: DetailsView(
-				type: type,
-				paymentInfo: $paymentInfo
-			)) {
+			NavigationLink(destination: detailsView()) {
 				Text("Details")
 					.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
 					.read(buttonWidthReader)
@@ -318,10 +342,7 @@ struct SummaryView: View {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			NavigationLink(destination: EditInfoView(
-				type: type,
-				paymentInfo: $paymentInfo
-			)) {
+			NavigationLink(destination: editInfoView()) {
 				Text("Edit")
 					.frame(minWidth: buttonWidth, alignment: Alignment.leading)
 					.read(buttonWidthReader)
@@ -335,16 +356,13 @@ struct SummaryView: View {
 	
 	@ViewBuilder
 	@available(iOS 15.0, *)
-	var buttonList_withDeleteOption: some View {
+	func buttonList_withDeleteOption() -> some View {
 		
 		// Details | Edit | Delete
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 			
-			NavigationLink(destination: DetailsView(
-				type: type,
-				paymentInfo: $paymentInfo
-			)) {
+			NavigationLink(destination: detailsView()) {
 				Text("Details")
 					.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
 					.read(buttonWidthReader)
@@ -355,10 +373,7 @@ struct SummaryView: View {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			NavigationLink(destination: EditInfoView(
-				type: type,
-				paymentInfo: $paymentInfo
-			)) {
+			NavigationLink(destination: editInfoView()) {
 				Text("Edit")
 					.frame(minWidth: buttonWidth, alignment: Alignment.center)
 					.read(buttonWidthReader)
@@ -392,14 +407,34 @@ struct SummaryView: View {
 		.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
 	}
 	
-	func toggleCurrencyType() -> Void {
-		currencyPrefs.toggleCurrencyType()
+	@ViewBuilder
+	func detailsView() -> some View {
+		DetailsView(
+			type: type,
+			paymentInfo: $paymentInfo
+		)
 	}
+	
+	@ViewBuilder
+	func editInfoView() -> some View {
+		EditInfoView(
+			type: type,
+			paymentInfo: $paymentInfo
+		)
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
 	
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		let business = AppDelegate.get().business
+		let business = Biz.business
 		let options = WalletPaymentFetchOptions.companion.All
 		
 		if !didAppear {
@@ -447,11 +482,18 @@ struct SummaryView: View {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func toggleCurrencyType() -> Void {
+		currencyPrefs.toggleCurrencyType()
+	}
+	
 	func deletePayment() {
 		log.trace("deletePayment()")
 		
-		let business = AppDelegate.get().business
-		business.databaseManager.paymentsDb { paymentsDb, _ in
+		Biz.business.databaseManager.paymentsDb { paymentsDb, _ in
 			
 			paymentsDb?.deletePayment(paymentId: paymentInfo.id(), completionHandler: { _, error in
 				
@@ -493,6 +535,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	private let horizontalSpacingBetweenColumns: CGFloat = 8
 	
 	@State var popoverPresent_standardFees = false
+	@State var popoverPresent_minerFees = false
 	@State var popoverPresent_swapFees = false
 	
 	@Environment(\.openURL) var openURL
@@ -516,26 +559,27 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			paymentTypeRow()
 			channelClosingRow()
 			
-			let standardFees = paymentInfo.payment.standardFees(currencyPrefs: currencyPrefs)
-			let swapOutFees = paymentInfo.payment.swapOutFees(currencyPrefs: currencyPrefs)
-			
-			if let standardFees = standardFees {
-				let title = swapOutFees == nil
-				  ? NSLocalizedString("Fees", comment: "Label in SummaryInfoGrid")
-				  : NSLocalizedString("Lightning Fees", comment: "Label in SummaryInfoGrid")
-				
+			if let standardFees = paymentInfo.payment.standardFees(currencyPrefs: currencyPrefs) {
 				paymentFeesRow(
-					title: title,
+					title: standardFees.1,
 					amount: standardFees.0,
-					explanation: standardFees.1,
+					explanation: standardFees.2,
 					binding: $popoverPresent_standardFees
 				)
 			}
-			if let swapOutFees = swapOutFees {
+			if let minerFees = paymentInfo.payment.minerFees(currencyPrefs: currencyPrefs) {
 				paymentFeesRow(
-					title: NSLocalizedString("Swap Fees", comment: "Label in SummaryInfoGrid"),
+					title: minerFees.1,
+					amount: minerFees.0,
+					explanation: minerFees.2,
+					binding: $popoverPresent_minerFees
+				)
+			}
+			if let swapOutFees = paymentInfo.payment.swapOutFees(currencyPrefs: currencyPrefs) {
+				paymentFeesRow(
+					title: swapOutFees.1,
 					amount: swapOutFees.0,
-					explanation: swapOutFees.1,
+					explanation: swapOutFees.2,
 					binding: $popoverPresent_swapFees
 				)
 			}
@@ -588,8 +632,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			let description = paymentInfo.paymentDescription() ??
-			                  NSLocalizedString("No description", comment: "placeholder text")
+			let description = paymentInfo.paymentDescription() ?? paymentInfo.defaultPaymentDescription()
 			Text(description)
 				.contextMenu {
 					Button(action: {

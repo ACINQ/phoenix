@@ -1,10 +1,14 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.ElectrumConfig
+import fr.acinq.phoenix.utils.TorHelper.connectionState
+import fr.acinq.tor.Tor
+import fr.acinq.tor.TorState
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -13,10 +17,9 @@ import kotlinx.coroutines.flow.*
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.seconds
 
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class AppConnectionsDaemon(
     loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,
@@ -24,6 +27,8 @@ class AppConnectionsDaemon(
     private val peerManager: PeerManager,
     private val currencyManager: CurrencyManager,
     private val networkMonitor: NetworkMonitor,
+    private val tcpSocketBuilder: suspend () -> TcpSocket.Builder,
+    private val tor: Tor,
     private val electrumClient: ElectrumClient,
 ) : CoroutineScope by MainScope() {
 
@@ -34,6 +39,8 @@ class AppConnectionsDaemon(
         peerManager = business.peerManager,
         currencyManager = business.currencyManager,
         networkMonitor = business.networkMonitor,
+        tcpSocketBuilder = business.tcpSocketBuilderFactory,
+        tor = business.tor,
         electrumClient = business.electrumClient
     )
 
@@ -41,28 +48,54 @@ class AppConnectionsDaemon(
 
     private var peerConnectionJob: Job? = null
     private var electrumConnectionJob: Job? = null
+    private var torConnectionJob: Job? = null
     private var httpControlFlowEnabled: Boolean = false
 
-    private var networkStatus = MutableStateFlow(NetworkState.NotAvailable)
-
     private data class TrafficControl(
-        val networkIsAvailable: Boolean = false,
+        val walletIsAvailable: Boolean = false,
+        val internetIsAvailable: Boolean = false,
+        val torIsEnabled: Boolean = false,
+        val torIsAvailable: Boolean = false,
 
         // Under normal circumstances, the connections are automatically managed based on whether
-        // or not an Internet connection is available. However, the app may need to influence
-        // this in one direction or another.
-        // For example, the app may want us to disconnect.
-        // This variable allows different parts of the app to "vote" towards various overrides.
+        // or not the network connection is available. However, the app may need to influence
+        // this decision.
         //
-        // if > 0, triggers disconnect & prevents future connection attempts.
-        // if <= 0, allows connection based on available Internet connection (as usual).
+        // For example, on iOS:
+        // - When the app goes into background mode, it wants to force a disconnect.
+        // - Unless a payment is in-flight, in which case it wants to stay connected until
+        //   the payment completes.
+        // - And if the app is backgrounded, but the app receives a push notification,
+        //   then it wants to re-connect and handle the incoming payment,
+        //   and disconnect again afterwards.
+        //
+        // This complexity is handled by a simple voting mechanism.
+        // (Think: retainCount from manual memory-management systems)
+        //
+        // The rules are:
+        // - if disconnectCount > 0 => triggers disconnect & prevents future connection attempts
+        // - if disconnectCount <= 0 => allows connection based on network availability (as usual)
+        //
         // Any part of the app that "votes" is expected to properly balance their calls.
-        // For example, on iOS, when the app goes into background mode,
-        // it votes by incrementing this value. Therefore it must balance that call by
-        // decrementing the value when the app goes into the foreground again.
-        val disconnectCount: Int = 0
+        // For example, on iOS:
+        // - When the app goes into the background, it increments the count (vote to disconnect)
+        //   And when the app returns to the foreground, it decrements the count (undo vote)
+        // - When an in-flight payment is detected, it decrements the count (vote to remain connected).
+        //   And when the payment completes, it increments the count (undo vote).
+        // - When a push notifications wakes the app, in decrements the count (vote to connect).
+        //   And when it finishes processing, it increments the count (undo vote).
+        //
+        val disconnectCount: Int = 0,
+
+        // If a configuration value changes, this value can be incremented to
+        // force a disconnect & reconnect.
+        val configVersion: Int = 0
     ) {
-        val canConnect get() = networkIsAvailable && disconnectCount <= 0
+        val canConnect get() = if (walletIsAvailable && internetIsAvailable && disconnectCount <= 0) {
+            if (torIsEnabled) torIsAvailable else true
+        } else {
+            false
+        }
 
         fun incrementDisconnectCount(): TrafficControl {
             val safeInc = disconnectCount.let { if (it == Int.MAX_VALUE) it else it + 1 }
@@ -73,6 +106,9 @@ class AppConnectionsDaemon(
             return copy(disconnectCount = safeDec)
         }
     }
+
+    private val torControlFlow = MutableStateFlow(TrafficControl())
+    private val torControlChanges = Channel<TrafficControl.() -> TrafficControl>()
 
     private val peerControlFlow = MutableStateFlow(TrafficControl())
     private val peerControlChanges = Channel<TrafficControl.() -> TrafficControl>()
@@ -94,83 +130,188 @@ class AppConnectionsDaemon(
         ) = launch {
             controlChanges.consumeEach { change ->
                 val newState = controlFlow.value.change()
-                logger.debug { "$label = $newState" }
+                logger.info { "$label = $newState" }
                 controlFlow.value = newState
             }
         }
 
+        enableControlFlow("torControlFlow", torControlFlow, torControlChanges)
         enableControlFlow("peerControlFlow", peerControlFlow, peerControlChanges)
         enableControlFlow("electrumControlFlow", electrumControlFlow, electrumControlChanges)
         enableControlFlow("httpApiControlFlow", httpApiControlFlow, httpApiControlChanges)
 
-        // Electrum
+        // Wallet monitor
         launch {
-            electrumControlFlow.collect {
+            // Suspends until the wallet is initialized
+            walletManager.keyManager.filterNotNull().first()
+            logger.debug { "walletIsAvailable = true" }
+            torControlChanges.send { copy(walletIsAvailable = true) }
+            peerControlChanges.send { copy(walletIsAvailable = true) }
+            electrumControlChanges.send { copy(walletIsAvailable = true) }
+            httpApiControlChanges.send { copy(walletIsAvailable = true) }
+        }
+
+        // Internet monitor
+        launch {
+            networkMonitor.start()
+            networkMonitor.networkState.collect {
+                val newValue = it == NetworkState.Available
+                logger.debug { "internetIsAvailable = $newValue" }
+                torControlChanges.send { copy(internetIsAvailable = newValue) }
+                peerControlChanges.send { copy(internetIsAvailable = newValue) }
+                electrumControlChanges.send { copy(internetIsAvailable = newValue) }
+                httpApiControlChanges.send { copy(internetIsAvailable = newValue) }
+            }
+        }
+
+        // Tor enabled monitor
+        launch {
+            configurationManager.isTorEnabled.filterNotNull().collect { newValue ->
+                logger.debug { "torIsEnabled = $newValue" }
+                torControlChanges.send { copy(torIsEnabled = newValue) }
+                peerControlChanges.send { copy(torIsEnabled = newValue) }
+                electrumControlChanges.send { copy(torIsEnabled = newValue) }
+                httpApiControlChanges.send { copy(torIsEnabled = newValue) }
+            }
+        }
+
+        // Tor state monitor
+        launch {
+            tor.state.collect {
+                val newValue = it == TorState.RUNNING
+                logger.debug { "torIsAvailable = $newValue" }
+                torControlChanges.send { copy(torIsAvailable = newValue) }
+                peerControlChanges.send { copy(torIsAvailable = newValue) }
+                electrumControlChanges.send { copy(torIsAvailable = newValue) }
+                httpApiControlChanges.send { copy(torIsAvailable = newValue) }
+            }
+        }
+
+        // Tor
+        launch {
+            torControlFlow.collect {
                 when {
-                    it.canConnect -> {
-                        if (electrumConnectionJob == null) {
-                            electrumConnectionJob = connectionLoop(
-                                name = "Electrum",
-                                statusStateFlow = electrumClient.connectionState
+                    it.internetIsAvailable && it.disconnectCount <= 0 && it.torIsEnabled -> {
+                        if (torConnectionJob == null) {
+                            logger.info { "starting tor" }
+                            torConnectionJob = connectionLoop(
+                                "Tor",
+                                tor.state.connectionState(this)
                             ) {
-                                val electrumServerAddress : ServerAddress? = configurationManager.electrumConfig.value?.let { electrumConfig ->
-                                    when (electrumConfig) {
-                                        is ElectrumConfig.Custom -> electrumConfig.server
-                                        is ElectrumConfig.Random -> configurationManager.randomElectrumServer()
-                                    }
+                                try {
+                                    tor.startInProperScope(this)
+                                } catch (t: Throwable) {
+                                    logger.error(t) { "tor cannot be started: ${t.message}" }
                                 }
-                                if (electrumServerAddress == null) {
-                                    logger.info { "ignored electrum connection opportunity because no server is configured yet" }
-                                } else {
-                                    logger.info { "connecting to electrum server=$electrumServerAddress" }
-                                    electrumClient.connect(electrumServerAddress)
-                                }
-                                _lastElectrumServerAddress.value = electrumServerAddress
                             }
                         }
                     }
                     else -> {
-                        electrumConnectionJob?.let { job ->
-                            logger.debug { "disconnecting from electrum" }
-                            job.cancel()
-                            electrumClient.disconnect()
+                        torConnectionJob?.let {
+                            logger.info { "shutting down tor" }
+                            it.cancel()
+                            tor.stop()
+                            torConnectionJob = null
+                            // Tor runs it's own process, and needs time to shutdown before restarting.
+                            delay(500)
                         }
+                    }
+                }
+            }
+        }
+
+        // Peer
+        launch {
+            var configVersion = 0
+            var torIsEnabled = false
+            peerControlFlow.collect {
+                val peer = peerManager.getPeer()
+                val forceDisconnect: Boolean =
+                    if (configVersion != it.configVersion || torIsEnabled != it.torIsEnabled) {
+                        configVersion = it.configVersion
+                        torIsEnabled = it.torIsEnabled
+                        true
+                    } else {
+                        false
+                    }
+                if (forceDisconnect || !it.canConnect) {
+                    peerConnectionJob?.let { job ->
+                        logger.info { "disconnecting from peer" }
+                        job.cancel()
+                        peer.disconnect()
+                        peerConnectionJob = null
+                    }
+
+                }
+                if (it.canConnect) {
+                    if (peerConnectionJob == null) {
+                        logger.info { "connecting to peer" }
+                        peerConnectionJob = connectionLoop(
+                            name = "Peer",
+                            statusStateFlow = peer.connectionState
+                        ) {
+                            peer.socketBuilder = tcpSocketBuilder()
+                            peer.connect()
+                        }
+                    }
+                }
+            }
+        }
+
+        // Electrum
+        launch {
+            var configVersion = 0
+            var torIsEnabled = false
+            electrumControlFlow.collect {
+                val forceDisconnect: Boolean =
+                    if (configVersion != it.configVersion || torIsEnabled != it.torIsEnabled) {
+                        configVersion = it.configVersion
+                        torIsEnabled = it.torIsEnabled
+                        true
+                    } else {
+                        false
+                    }
+                if (forceDisconnect || !it.canConnect) {
+                    electrumConnectionJob?.let { job ->
+                        logger.info { "disconnecting from electrum" }
+                        job.cancel()
+                        electrumClient.disconnect()
                         electrumConnectionJob = null
                     }
                 }
-            }
-        }
-        // Peer
-        launch {
-            peerControlFlow.collect {
-                val peer = peerManager.getPeer()
-                when {
-                    it.canConnect -> {
-                        if (peerConnectionJob == null) {
-                            peerConnectionJob = connectionLoop(
-                                name = "Peer",
-                                statusStateFlow = peer.connectionState
-                            ) {
-                                peer.connect()
+                if (it.canConnect) {
+                    if (electrumConnectionJob == null) {
+                        logger.info { "connecting to electrum" }
+                        logger.info { "electrum socket builder=${electrumClient.socketBuilder}" }
+                        electrumConnectionJob = connectionLoop(
+                            name = "Electrum",
+                            statusStateFlow = electrumClient.connectionState
+                        ) {
+                            val electrumServerAddress : ServerAddress? = configurationManager.electrumConfig.value?.let { electrumConfig ->
+                                when (electrumConfig) {
+                                    is ElectrumConfig.Custom -> electrumConfig.server
+                                    is ElectrumConfig.Random -> configurationManager.randomElectrumServer()
+                                }
                             }
+                            if (electrumServerAddress == null) {
+                                logger.info { "ignored electrum connection opportunity because no server is configured yet" }
+                            } else {
+                                logger.info { "connecting to electrum server=$electrumServerAddress" }
+                                electrumClient.socketBuilder = tcpSocketBuilder()
+                                electrumClient.connect(electrumServerAddress)
+                            }
+                            _lastElectrumServerAddress.value = electrumServerAddress
                         }
-                    }
-                    else -> {
-                        peerConnectionJob?.let { job ->
-                            logger.debug { "disconnecting from peer" }
-                            job.cancel()
-                            peer.disconnect()
-                        }
-                        peerConnectionJob = null
                     }
                 }
             }
         }
+
         // HTTP APIs
         launch {
             httpApiControlFlow.collect {
                 when {
-                    it.canConnect -> {
+                    it.internetIsAvailable && it.disconnectCount <= 0 -> {
                         if (!httpControlFlowEnabled) {
                             httpControlFlowEnabled = true
                             configurationManager.enableNetworkAccess()
@@ -187,85 +328,19 @@ class AppConnectionsDaemon(
                 }
             }
         }
-        // Internet connection monitor
-        launch {
-            networkMonitor.start()
-            networkMonitor.networkState.filter { it != networkStatus.value }.collect {
-                logger.info { "network state=$it" }
-                networkStatus.value = it
-            }
-        }
-        // Internet dependent flows - related to the app configuration
-        launch {
-            networkStatus.collect {
-                when(it) {
-                    NetworkState.Available -> httpApiControlChanges.send { copy(networkIsAvailable = true) }
-                    NetworkState.NotAvailable -> httpApiControlChanges.send { copy(networkIsAvailable = false) }
-                }
-            }
-        }
-        // Internet dependent flows - related to the Wallet
-        launch {
-            // Suspends until the wallet is initialized
-            walletManager.keyManager.filterNotNull().first()
-            networkStatus.collect {
-                when (it) {
-                    NetworkState.Available -> {
-                        peerControlChanges.send { copy(networkIsAvailable = true) }
-                        electrumControlChanges.send { copy(networkIsAvailable = true) }
-                    }
-                    NetworkState.NotAvailable -> {
-                        peerControlChanges.send { copy(networkIsAvailable = false) }
-                        electrumControlChanges.send { copy(networkIsAvailable = false) }
-                    }
-                }
-            }
-        }
-        // TODO Tor usage
-        launch { configurationManager.subscribeToIsTorEnabled().collect {
-            logger.info { "Tor is ${if (it) "enabled" else "disabled"}." }
-        } }
-        // listen to electrum configuration changes and reconnect when needed.
+
+        // Listen to electrum configuration changes and reconnect when needed.
         launch {
             var previousElectrumConfig: ElectrumConfig? = null
             configurationManager.electrumConfig.collect { newElectrumConfig ->
                 logger.info { "electrum config changed from=$previousElectrumConfig to $newElectrumConfig" }
                 val changed = when (val oldElectrumConfig = previousElectrumConfig) {
-                    is ElectrumConfig.Custom -> {
-                        when (newElectrumConfig) {
-                            is ElectrumConfig.Custom -> { // custom -> custom
-                                newElectrumConfig != oldElectrumConfig
-                            }
-                            is ElectrumConfig.Random -> true // custom -> random
-                            else -> true // custom -> null
-                        }
-                    }
-                    is ElectrumConfig.Random -> {
-                        when (newElectrumConfig) {
-                            is ElectrumConfig.Custom -> true // random -> custom
-                            is ElectrumConfig.Random -> false // random -> random
-                            else -> true // random -> null
-                        }
-                    }
-                    else -> {
-                        when (newElectrumConfig) {
-                            null -> false // null -> null
-                            else -> true // null -> (custom || random)
-                        }
-                    }
+                    null -> newElectrumConfig != null
+                    else -> newElectrumConfig != oldElectrumConfig
                 }
                 if (changed) {
                     logger.info { "electrum config changed: reconnecting..." }
-                    electrumControlChanges.send { incrementDisconnectCount() }
-                    if (previousElectrumConfig != null) {
-                        // The electrumConfig is only null on app launch.
-                        // It gets set by the client app during launch,
-                        // and from that point forward it's either Custom or Random.
-                        delay(500)
-                    }
-                    // We need to delay the next connection vote because the collector WILL skip fast updates (see documentation)
-                    // and ignore the change since the TrafficControl object would not have changed.
-                    electrumControlChanges.send { decrementDisconnectCount() }
+                    electrumControlChanges.send { copy(configVersion = configVersion + 1) }
                 } else {
                     logger.info { "electrum config: no changes" }
                 }
@@ -277,10 +352,11 @@ class AppConnectionsDaemon(
     data class ControlTarget(val flags: Int) { // <- bitmask
 
         companion object {
-            val Peer = ControlTarget(0b001)
-            val Electrum = ControlTarget(0b010)
-            val Http = ControlTarget(0b100)
-            val All = ControlTarget(0b111)
+            val Peer = ControlTarget(0b0001)
+            val Electrum = ControlTarget(0b0010)
+            val Http = ControlTarget(0b0100)
+            val Tor = ControlTarget(0b1000)
+            val All = ControlTarget(0b1111)
         }
 
         /* The `+` operator is implemented, so it can be used like so:
@@ -297,6 +373,7 @@ class AppConnectionsDaemon(
         val containsPeer get() = contains(Peer)
         val containsElectrum get() = contains(Electrum)
         val containsHttp get() = contains(Http)
+        val containsTor get() = contains(Tor)
     }
 
     fun incrementDisconnectCount(target: ControlTarget = ControlTarget.All) {
@@ -309,6 +386,9 @@ class AppConnectionsDaemon(
             }
             if (target.containsHttp) {
                 httpApiControlChanges.send { incrementDisconnectCount() }
+            }
+            if (target.containsTor) {
+                torControlChanges.send { incrementDisconnectCount() }
             }
         }
     }
@@ -324,26 +404,32 @@ class AppConnectionsDaemon(
             if (target.containsHttp) {
                 httpApiControlChanges.send { decrementDisconnectCount() }
             }
+            if (target.containsTor) {
+                torControlChanges.send { decrementDisconnectCount() }
+            }
         }
     }
 
     private fun connectionLoop(
         name: String,
         statusStateFlow: StateFlow<Connection>,
-        connect: () -> Unit
+        connect: suspend () -> Unit
     ) = launch {
-        var pause = Duration.seconds(0)
+        var pause = Duration.ZERO
         statusStateFlow.collect {
             if (it is Connection.CLOSED) {
-                logger.debug { "next $name connection attempt in $pause" }
+                logger.info { "next $name connection attempt in $pause" }
                 delay(pause)
-                val minPause = Duration.seconds(0.25)
-                val maxPause = Duration.seconds(8)
+                val minPause = 0.25.seconds
+                val maxPause = 60.seconds
                 pause = (pause.coerceAtLeast(minPause) * 2).coerceAtMost(maxPause)
                 connect()
             } else if (it == Connection.ESTABLISHED) {
-                pause = Duration.seconds(0.5)
+                pause = 0.5.seconds
             }
         }
     }
 }
+
+/** The start function must run on a different dispatcher depending on the platform. */
+expect suspend fun Tor.startInProperScope(scope: CoroutineScope)

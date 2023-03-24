@@ -7,7 +7,6 @@ import kotlinx.serialization.*
 import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.json.Json
-import org.kodein.memory.util.freeze
 
 // Architecture & Notes:
 //
@@ -46,12 +45,10 @@ import org.kodein.memory.util.freeze
 //
 // OPTIMIZATION #2:
 //
-// UUID is serialized as: {
-//   mostSignificantBits: Long,
-//   leastSignificantBits: Long
-// }
-// This is improved using a custom serializer.
-//
+// We use custom serializers when the other versions are found to
+// be inefficient (in terms of space).
+// For example, we supply an alternative UUIDSerializer.
+
 
 enum class CloudDataVersion(val value: Int) {
     // Initial version
@@ -60,7 +57,8 @@ enum class CloudDataVersion(val value: Int) {
 }
 
 @Serializable
-data class CloudData @OptIn(ExperimentalSerializationApi::class) constructor(
+@OptIn(ExperimentalSerializationApi::class)
+data class CloudData(
     @ByteString
     @SerialName("i")
     val incoming: IncomingPaymentWrapper?,
@@ -73,17 +71,17 @@ data class CloudData @OptIn(ExperimentalSerializationApi::class) constructor(
     @SerialName("p")
     val padding: ByteArray?,
 ) {
-    constructor(incoming: IncomingPayment, version: CloudDataVersion) : this(
+    constructor(incoming: IncomingPayment) : this(
         incoming = IncomingPaymentWrapper(incoming),
         outgoing = null,
-        version = version.value,
+        version = CloudDataVersion.V0.value,
         padding = ByteArray(size = 0)
     )
 
-    constructor(outgoing: OutgoingPayment, version: CloudDataVersion) : this(
+    constructor(outgoing: OutgoingPayment) : this(
         incoming = null,
         outgoing = OutgoingPaymentWrapper(outgoing),
-        version = version.value,
+        version = CloudDataVersion.V0.value,
         padding = ByteArray(size = 0)
     )
 
@@ -95,6 +93,7 @@ data class CloudData @OptIn(ExperimentalSerializationApi::class) constructor(
         return this.copy(padding = padding)
     }
 
+    @Throws(Exception::class)
     fun unwrap(): WalletPayment? = when {
         incoming != null -> incoming.unwrap()
         outgoing != null -> outgoing.unwrap()
@@ -110,24 +109,22 @@ fun CloudData.cborSerialize(): ByteArray {
 }
 
 @OptIn(ExperimentalSerializationApi::class)
-fun CloudData.Companion.cborDeserialize(blob: ByteArray): CloudData? {
-    var result: CloudData? = null
-    try {
-        result = Cbor.decodeFromByteArray(blob)
-    } catch (e: Throwable) {
-    }
-
-    return result
+@Throws(Exception::class)
+fun CloudData.Companion.cborDeserialize(
+    blob: ByteArray
+): CloudData {
+    return cborSerializer().decodeFromByteArray(blob)
 }
 
-// For DEBUGGING:
-//
-// You can use the jsonSerializer to see what the data looks like.
-// Just keep in mind that the ByteArray's will be encoded super-inefficiently.
-// That's because we're optimizing for Cbor.
-// To optimize for JSON, you would use ByteVector's,
-// and encode the data as Base64 via ByteVectorJsonSerializer.
-
+/**
+ * For DEBUGGING:
+ *
+ * You can use the jsonSerializer to see what the data looks like.
+ * Just keep in mind that the ByteArray's will be encoded super-inefficiently.
+ * That's because we're optimizing for Cbor.
+ * To optimize for JSON, you would use ByteVector's,
+ * and encode the data as Base64 via ByteVectorJsonSerializer.
+ */
 fun CloudData.jsonSerialize(): ByteArray {
     return Json.encodeToString(this).encodeToByteArray()
 }

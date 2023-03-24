@@ -1,19 +1,30 @@
+import java.io.ByteArrayOutputStream
+
 plugins {
     id("com.android.application")
     kotlin("android")
     id("com.google.gms.google-services")
 }
 
+fun gitCommitHash(): String {
+    val stream = ByteArrayOutputStream()
+    project.exec {
+        commandLine = "git rev-parse --verify --short HEAD".split(" ")
+        standardOutput = stream
+    }
+    return String(stream.toByteArray()).split("\n").first()
+}
+
 val chain: String by project
 
 android {
-    compileSdk = 31
+    compileSdk = 33
     defaultConfig {
-        applicationId = "fr.acinq.phoenix.android"
+        applicationId = "fr.acinq.phoenix.testnet"
         minSdk = 24
-        targetSdk = 31
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 33
+        versionCode = 40
+        versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -33,18 +44,21 @@ android {
                 "proguard-rules.pro"
             )
         }
+        applicationVariants.all {
+            outputs.forEach {
+                val apkName = "phoenix-${defaultConfig.versionCode}-${defaultConfig.versionName}-${chain.drop(1).dropLast(1)}-${buildType.name}.apk"
+                (it as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName = apkName
+            }
+        }
     }
 
     compileOptions {
-        // Flag to enable support for the new language APIs
-        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
         jvmTarget = "1.8"
-        useIR = true
     }
 
     buildFeatures {
@@ -54,8 +68,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerVersion = Versions.kotlin
-        kotlinCompilerExtensionVersion = Versions.Android.compose
+        kotlinCompilerExtensionVersion = Versions.Android.composeCompiler
     }
 
     packagingOptions {
@@ -66,7 +79,7 @@ android {
 kotlin {
     target {
         compilations.all {
-            kotlinOptions.freeCompilerArgs += listOf("-Xskip-metadata-version-check", "-Xinline-classes")
+            kotlinOptions.freeCompilerArgs += listOf("-Xskip-metadata-version-check", "-Xinline-classes", "-Xopt-in=kotlin.RequiresOptIn")
         }
     }
 }
@@ -75,19 +88,24 @@ dependencies {
     implementation(project(":phoenix-shared"))
     api(project(":phoenix-legacy"))
 
-    implementation("com.google.android.material:material:1.4.0")
+    implementation("com.google.android.material:material:1.7.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
         version { strictly(Versions.coroutines) }
     }
 
     // -- AndroidX
-    implementation("androidx.core:core-ktx:${Versions.Android.ktx}")
+    implementation("androidx.core:core-ktx:${Versions.Android.coreKtx}")
     // -- AndroidX: livedata
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.Android.lifecycle}")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:${Versions.Android.lifecycle}")
     // -- AndroidX: preferences datastore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+    // -- AndroidX: biometric
+    implementation("androidx.biometric:biometric:${Versions.Android.biometrics}")
+    // -- AndroidX: work manager
+    implementation("androidx.work:work-runtime-ktx:${Versions.AndroidLegacy.work}")
+
 
     // -- jetpack compose
     implementation("androidx.compose.ui:ui:${Versions.Android.compose}")
@@ -97,18 +115,14 @@ dependencies {
     implementation("androidx.compose.ui:ui-viewbinding:${Versions.Android.compose}")
     implementation("androidx.compose.runtime:runtime-livedata:${Versions.Android.compose}")
     implementation("androidx.compose.material:material:${Versions.Android.compose}")
-    // -- jetpack compose: constraint layout
-    implementation("androidx.constraintlayout:constraintlayout-compose:${Versions.Android.constraintLayoutCompose}")
+    implementation("androidx.compose.animation:animation:${Versions.Android.compose}")
+    implementation("androidx.compose.animation:animation-graphics:${Versions.Android.compose}")
     // -- jetpack compose: navigation
     implementation("androidx.navigation:navigation-compose:${Versions.Android.navCompose}")
     // -- jetpack compose: accompanist (utility library for compose)
     implementation("com.google.accompanist:accompanist-systemuicontroller:${Versions.Android.accompanist}")
-    // -- AndroidX: biometric
-    implementation("androidx.biometric:biometric:${Versions.Android.biometrics}")
-
-    implementation("androidx.work:work-runtime-ktx:${Versions.AndroidLegacy.work}") {
-        exclude(group = "com.google.guava", module = "listenablefuture")
-    }
+    implementation("com.google.accompanist:accompanist-permissions:${Versions.Android.accompanist}")
+    implementation("com.google.accompanist:accompanist-pager:${Versions.Android.accompanist}")
 
     // -- scanner zxing
     implementation("com.journeyapps:zxing-android-embedded:${Versions.Android.zxing}")
@@ -120,13 +134,10 @@ dependencies {
     // firebase cloud messaging
     implementation("com.google.firebase:firebase-messaging:${Versions.Android.fcm}")
 
-    // guava, because of https://groups.google.com/g/guava-discuss/c/AKBGPca9unw
-    implementation("com.google.guava:guava:31.0.1-android")
+    implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
 
     testImplementation("junit:junit:${Versions.junit}")
     testImplementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
-    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test.ext:junit:1.1.4")
     androidTestImplementation("androidx.test.espresso:espresso-core:${Versions.Android.espresso}")
-
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
 }

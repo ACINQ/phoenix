@@ -2,25 +2,31 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import kotlinx.coroutines.*
-import kotlin.time.Duration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.seconds
 
 data class PaymentsPage(
+    /** The offset value you passed to the `subscribeToX()` function. */
     val offset: Int,
+    /** The count value you passed to the `subscribeToX()` function. */
     val count: Int,
+    /**
+     * The rows fetched from the database.
+     * If there are fewer items in the database than requested,
+     * then PaymentsPage.rows.count will be less than PaymentsPage.count.
+     *
+     * Use PaymentsFetcher to fetch more information about the row.
+     */
     val rows: List<WalletPaymentOrderRow>
 ) {
     constructor(): this(0, 0, emptyList())
 }
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class PaymentsPageFetcher(
     loggerFactory: LoggerFactory,
     private val databaseManager: DatabaseManager
@@ -63,8 +69,8 @@ class PaymentsPageFetcher(
         // and receiving the list. So the offset/count are used to track
         // the current request, even if it hasn't completed yet.
 
-        this.offset = offset
-        this.count = count
+        this.offset = offset.coerceAtLeast(minimumValue = 0)
+        this.count = count.coerceAtLeast(minimumValue = 1)
         this.seconds = Int.MIN_VALUE
         this.subscriptionIdx += 1
 
@@ -85,8 +91,8 @@ class PaymentsPageFetcher(
         }
     }
 
-    fun subscribeToRecent(offset: Int, count: Int, seconds: Int) {
-        log.debug { "subscribeToRecent(offset=$offset, count=$count, seconds=$seconds)" }
+    fun subscribeToInFlight(offset: Int, count: Int) {
+        log.debug { "subscribeToInFlight(offset=$offset, count=$count)" }
 
         if (this.offset == offset && this.count == count && this.seconds == seconds) {
             log.debug { "ignoring: no changes" }
@@ -94,19 +100,54 @@ class PaymentsPageFetcher(
             return
         }
 
-        this.offset = offset
-        this.count = count
+        this.offset = offset.coerceAtLeast(minimumValue = 0)
+        this.count = count.coerceAtLeast(minimumValue = 1)
+        this.seconds = 0
+        this.subscriptionIdx += 1
+
+        val offsetSnapshot = offset
+        val countSnapshot = count
+        this.job = launch {
+            val db = databaseManager.paymentsDb()
+            db.listOutgoingInFlightPaymentsOrderFlow(
+                count = countSnapshot,
+                skip = offsetSnapshot
+            ).collect { rows ->
+                _paymentsPage.value = PaymentsPage(
+                    offset = offsetSnapshot,
+                    count = countSnapshot,
+                    rows = rows
+                )
+            }
+        }
+    }
+
+    fun subscribeToRecent(offset: Int, count: Int, seconds: Int) {
+        log.debug { "subscribeToRecent(offset=$offset, count=$count, seconds=$seconds)" }
+
+        if (seconds <= 0) {
+            subscribeToInFlight(offset = offset, count = count)
+            return
+        }
+        if (this.offset == offset && this.count == count && this.seconds == seconds) {
+            log.debug { "ignoring: no changes" }
+            // No changes
+            return
+        }
+
+        this.offset = offset.coerceAtLeast(minimumValue = 0)
+        this.count = count.coerceAtLeast(minimumValue = 1)
         this.seconds = seconds
         this.subscriptionIdx += 1
 
-        resetJob(subscriptionIdx)
+        resetSubscribeToRecentJob(subscriptionIdx)
     }
 
-    private fun resetJob(idx: Int) {
-        log.debug { "resetJob(idx=$idx)" }
+    private fun resetSubscribeToRecentJob(idx: Int) {
+        log.debug { "resetSubscribeToRecentJob(idx=$idx)" }
 
         if (idx != subscriptionIdx) {
-            log.debug { "resetJob: ignoring: idx mismatch"}
+            log.debug { "resetSubscribeToRecentJob: ignoring: idx mismatch"}
             return
         }
         job?.let {
@@ -119,34 +160,19 @@ class PaymentsPageFetcher(
         val secondsSnapshot = seconds
         job = launch {
             val db = databaseManager.paymentsDb()
-            if (secondsSnapshot > 0) {
-                val date = Clock.System.now() - Duration.seconds(secondsSnapshot)
-                db.listRecentPaymentsOrderFlow(
-                    date = date.toEpochMilliseconds(),
+            val date = Clock.System.now() - secondsSnapshot.seconds
+            db.listRecentPaymentsOrderFlow(
+                date = date.toEpochMilliseconds(),
+                count = countSnapshot,
+                skip = offsetSnapshot
+            ).collect { rows ->
+                _paymentsPage.value = PaymentsPage(
+                    offset = offsetSnapshot,
                     count = countSnapshot,
-                    skip = offsetSnapshot
-                ).collect { rows ->
-                    _paymentsPage.value = PaymentsPage(
-                        offset = offsetSnapshot,
-                        count = countSnapshot,
-                        rows = rows
-                    )
-                    resetRefreshJob(idx, rows)
-                }
-            } else {
-                db.listOutgoingInFlightPaymentsOrderFlow(
-                    count = countSnapshot,
-                    skip = offsetSnapshot
-                ).collect { rows ->
-                    _paymentsPage.value = PaymentsPage(
-                        offset = offsetSnapshot,
-                        count = countSnapshot,
-                        rows = rows
-                    )
-                    resetRefreshJob(idx, rows)
-                }
+                    rows = rows
+                )
+                resetRefreshJob(idx, rows)
             }
-
         }
     }
 
@@ -169,16 +195,16 @@ class PaymentsPageFetcher(
         val oldestCompleted = rows.lastOrNull { it.completedAt != null } ?: return
         val oldestTimestamp = Instant.fromEpochMilliseconds(oldestCompleted.completedAt!!)
 
-        val refreshTimestamp = oldestTimestamp + Duration.seconds(this.seconds)
+        val refreshTimestamp = oldestTimestamp + this.seconds.seconds
         val diff = refreshTimestamp - Clock.System.now()
 
-        log.debug { "oldestTimestamp: ${oldestTimestamp.toEpochMilliseconds()}"}
-        log.debug { "refreshTimestamp: ${refreshTimestamp.toEpochMilliseconds()}"}
-        log.debug { "diff=${diff}"}
+    //  log.debug { "oldestTimestamp: ${oldestTimestamp.toEpochMilliseconds()}"}
+    //  log.debug { "refreshTimestamp: ${refreshTimestamp.toEpochMilliseconds()}"}
+    //  log.debug { "diff=${diff}"}
 
         this.refreshJob = launch {
             delay(diff)
-            resetJob(idx)
+            resetSubscribeToRecentJob(idx)
         }
     }
 }

@@ -13,7 +13,7 @@ struct CheckboxToggleStyle<Img1, Img2>: ToggleStyle where Img1: View, Img2: View
 	
 	func makeBody(configuration: Configuration) -> some View {
 		Button(action: {
-				configuration.isOn.toggle()
+			configuration.isOn.toggle()
 		}, label: {
 			Label {
 				configuration.label

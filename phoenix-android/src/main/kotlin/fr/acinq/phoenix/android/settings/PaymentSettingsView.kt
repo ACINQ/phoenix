@@ -30,7 +30,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
@@ -78,7 +77,6 @@ fun PaymentSettingsView(
         DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.paymentsettings_title),
-            subtitle = stringResource(id = R.string.paymentsettings_subtitle)
         )
         Card {
             SettingInteractive(
@@ -98,15 +96,16 @@ fun PaymentSettingsView(
             )
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_trampoline_fees_title),
-                description = trampolineFees?.let { stringResource(id = R.string.paymentsettings_trampoline_fees_desc,
-                    trampolineFees.feeBase, trampolineFees.proportionalFeeAsPercentageString) },
+                description = trampolineFees?.let {
+                    stringResource(id = R.string.paymentsettings_trampoline_fees_desc, trampolineFees.feeBase, trampolineFees.proportionalFeeAsPercentageString)
+                } ?: stringResource(R.string.utils_unknown),
                 onClick = { showTrampolineMaxFeeDialog = true }
             )
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_paytoopen_fees_title),
                 description = walletContext?.let {
                     stringResource(id = R.string.paymentsettings_paytoopen_fees_desc, String.format("%.2f", 100 * (it.payToOpen.v1.feePercent)), it.payToOpen.v1.minFeeSat)
-                },
+                } ?: stringResource(id = R.string.utils_unknown),
                 onClick = { showPayToOpenDialog = true }
             )
         }
@@ -123,14 +122,16 @@ fun PaymentSettingsView(
                         item = LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME,
                         title = stringResource(id = R.string.lnurl_auth_scheme_legacy),
                         description = stringResource(id = R.string.lnurl_auth_scheme_legacy_desc)
-                    )
+                    ),
                 )
                 ListPreferenceButton(
                     title = stringResource(id = R.string.paymentsettings_lnurlauth_scheme_title),
-                    subtitle = when (prefLnurlAuthScheme) {
-                        LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME -> stringResource(id = R.string.lnurl_auth_scheme_legacy)
-                        LnurlAuth.Scheme.DEFAULT_SCHEME -> stringResource(id = R.string.lnurl_auth_scheme_default)
-                        else -> stringResource(id = R.string.utils_unknown)
+                    subtitle = {
+                        when (prefLnurlAuthScheme) {
+                            LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME -> Text(text = stringResource(id = R.string.lnurl_auth_scheme_legacy))
+                            LnurlAuth.Scheme.DEFAULT_SCHEME -> Text(text = stringResource(id = R.string.lnurl_auth_scheme_default))
+                            else -> Text(text = stringResource(id = R.string.utils_unknown))
+                        }
                     },
                     enabled = true,
                     selectedItem = prefLnurlAuthScheme,
@@ -314,11 +315,15 @@ private fun TrampolineMaxFeesDialog(
                 initialValue = feeBase?.toDouble(),
                 onValueChange = { feeBase = it?.toLong() },
                 enabled = useCustomMaxFee,
-                minErrorMessage = stringResource(R.string.paymentsettings_trampoline_fees_dialog_base_below_min,
-                    PaymentOptionsConstants.minBaseFee.toMilliSatoshi().toPrettyString(BitcoinUnit.Sat, withUnit = true)),
+                minErrorMessage = stringResource(
+                    R.string.paymentsettings_trampoline_fees_dialog_base_below_min,
+                    PaymentOptionsConstants.minBaseFee.toMilliSatoshi().toPrettyString(BitcoinUnit.Sat, withUnit = true)
+                ),
                 minValue = PaymentOptionsConstants.minBaseFee.toLong().toDouble(),
-                maxErrorMessage = stringResource(R.string.paymentsettings_trampoline_fees_dialog_base_above_max,
-                    PaymentOptionsConstants.maxBaseFee.toMilliSatoshi().toPrettyString(BitcoinUnit.Sat, withUnit = true)),
+                maxErrorMessage = stringResource(
+                    R.string.paymentsettings_trampoline_fees_dialog_base_above_max,
+                    PaymentOptionsConstants.maxBaseFee.toMilliSatoshi().toPrettyString(BitcoinUnit.Sat, withUnit = true)
+                ),
                 maxValue = PaymentOptionsConstants.maxBaseFee.toLong().toDouble(),
                 acceptDecimal = false
             )
@@ -331,11 +336,15 @@ private fun TrampolineMaxFeesDialog(
                 onValueChange = { feeProportional = it },
                 enabled = useCustomMaxFee,
                 minValue = PaymentOptionsConstants.minProportionalFeePercent,
-                minErrorMessage = stringResource(R.string.paymentsettings_trampoline_fees_dialog_proportional_below_min,
-                    PaymentOptionsConstants.minProportionalFeePercent),
+                minErrorMessage = stringResource(
+                    R.string.paymentsettings_trampoline_fees_dialog_proportional_below_min,
+                    PaymentOptionsConstants.minProportionalFeePercent
+                ),
                 maxValue = PaymentOptionsConstants.maxProportionalFeePercent,
-                maxErrorMessage = stringResource(R.string.paymentsettings_trampoline_fees_dialog_proportional_above_max,
-                    PaymentOptionsConstants.maxProportionalFeePercent),
+                maxErrorMessage = stringResource(
+                    R.string.paymentsettings_trampoline_fees_dialog_proportional_above_max,
+                    PaymentOptionsConstants.maxProportionalFeePercent
+                ),
             )
         }
     }

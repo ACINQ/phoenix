@@ -2,7 +2,6 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +12,6 @@ import platform.Network.*
 import platform.darwin.dispatch_get_main_queue
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 actual class NetworkMonitor actual constructor(
     loggerFactory: LoggerFactory,
     ctx: PlatformContext

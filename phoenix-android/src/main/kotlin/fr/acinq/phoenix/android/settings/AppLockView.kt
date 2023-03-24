@@ -28,26 +28,22 @@ import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.SettingSwitch
-import fr.acinq.phoenix.android.utils.BiometricsHelper
+import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.android.utils.logger
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalCoroutinesApi::class)
+
 @Composable
-fun AppLockView(
-    mainActivity: MainActivity,
-    appVM: AppViewModel,
-) {
+fun AppLockView() {
     val log = logger("AppLockView")
     val context = LocalContext.current
+    val activity = context.findActivity()
     val scope = rememberCoroutineScope()
     val isScreenLockActive = UserPrefs.getIsScreenLockActive(context).collectAsState(initial = false)
     val nc = navController
 
     DefaultScreenLayout {
-        DefaultScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.accessctrl_title), subtitle = stringResource(id = R.string.accessctrl_subtitle))
+        DefaultScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.accessctrl_title))
         Card {
             SettingSwitch(
                 title = stringResource(id = R.string.accessctrl_screen_lock_switch),
@@ -67,7 +63,7 @@ fun AppLockView(
                                 setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL or BiometricManager.Authenticators.BIOMETRIC_WEAK)
                             }.build()
                             BiometricsHelper.getPrompt(
-                                activity = mainActivity,
+                                activity = activity,
                                 onSuccess = {
                                     scope.launch { UserPrefs.saveIsScreenLockActive(context, false) }
                                 },

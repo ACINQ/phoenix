@@ -1,5 +1,16 @@
 import SwiftUI
 import PhoenixShared
+import os.log
+
+#if DEBUG && true
+fileprivate var log = Logger(
+	subsystem: Bundle.main.bundleIdentifier!,
+	category: "LogsConfigurationView"
+)
+#else
+fileprivate var log = Logger(OSLog.disabled)
+#endif
+
 
 struct LogsConfigurationView: MVIView {
 	
@@ -13,57 +24,66 @@ struct LogsConfigurationView: MVIView {
 	@ViewBuilder
 	var view: some View {
 		
+		content()
+			.navigationTitle(NSLocalizedString("Logs", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			Text("Here you can extract and visualize application logs, as well as share them.")
+			Text("Here you can export the application logs, or share them.")
 				.foregroundColor(Color.primary)
 				.frame(maxWidth: .infinity)
 				.padding()
 				.background(Color.primaryBackground)
 			
 			List {
-				if let model = mvi.model as? LogsConfiguration.ModelReady {
-					Button {
-						share = NSURL(fileURLWithPath: model.path)
-					} label: {
-						Label {
+				Button {
+					export()
+				} label: {
+					Label {
+						HStack(alignment: VerticalAlignment.center, spacing: 4) {
 							Text("Share the logs")
-						} icon: {
-							Image(systemName: "square.and.arrow.up")
+							if isExporting() {
+								Spacer()
+								ProgressView().progressViewStyle(CircularProgressViewStyle())
+							}
 						}
-					}
-					.sharing($share)
-					
-					NavigationLink(destination: LogsConfigurationViewerView(filePath: model.path)) {
-						Label {
-							Text("Look at the logs")
-						} icon: {
-							Image(systemName: "eye")
-						}
+					} icon: {
+						Image(systemName: "square.and.arrow.up")
 					}
 				}
+				.disabled(isExporting())
+				.sharing($share)
+				
 			} // </List>
+			.listStyle(.insetGrouped)
+			.listBackgroundColor(.primaryBackground)
 			
 		} // </VStack>
-		.navigationTitle(NSLocalizedString("Logs", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
+		.onChange(of: mvi.model) { newModel in
+			mviModelDidChange(model: newModel)
+		}
 	}
-}
-
-class LogsConfigurationView_Previews: PreviewProvider {
-
-	static var previews: some View {
+	
+	private func isExporting() -> Bool {
+		return mvi.model is LogsConfiguration.Model_Exporting
+	}
+	
+	func mviModelDidChange(model newModel: LogsConfiguration.Model) {
+		log.trace("mviModelDidChange()")
 		
-		NavigationView {
-			LogsConfigurationView().mock(LogsConfiguration.ModelLoading())
+		if let model = newModel as? LogsConfiguration.Model_Ready {
+			share = NSURL(fileURLWithPath: model.path)
 		}
-		.previewDevice("iPhone 11")
+	}
+	
+	private func export() {
+		log.trace("export()")
 		
-		NavigationView {
-			LogsConfigurationView().mock(LogsConfiguration.ModelReady(
-				path: "/tmp/fake-logs-file"
-			))
-		}
-		.previewDevice("iPhone 11")
+		mvi.intent(LogsConfiguration.Intent_Export())
 	}
 }

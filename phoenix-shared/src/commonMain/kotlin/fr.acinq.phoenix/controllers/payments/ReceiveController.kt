@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022 ACINQ SAS
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package fr.acinq.phoenix.controllers.payments
 
 import fr.acinq.bitcoin.ByteVector32
@@ -10,12 +26,11 @@ import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.data.Chain
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.collect
 import org.kodein.log.LoggerFactory
 import kotlin.random.Random
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class AppReceiveController(
     loggerFactory: LoggerFactory,
     private val chain: Chain,
@@ -34,7 +49,7 @@ class AppReceiveController(
 
     init {
         launch {
-            peerManager.getPeer().openListenerEventSubscription().consumeEach { event ->
+            peerManager.getPeer().eventsFlow.collect { event ->
                 if (event is SwapInResponseEvent && models.value is Receive.Model.SwapIn.Requesting) {
                     logger.debug { "received swap-in response=$event" }
                     model(Receive.Model.SwapIn.Generated(event.swapInResponse.bitcoinAddress))

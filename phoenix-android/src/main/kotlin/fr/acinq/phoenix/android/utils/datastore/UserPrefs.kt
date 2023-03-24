@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.android.utils.datastore
 
 import android.content.Context
+import android.text.format.DateUtils
 import androidx.datastore.preferences.core.*
 import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.TrampolineFees
@@ -25,6 +26,7 @@ import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
+import fr.acinq.phoenix.data.CurrencyUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.legacy.userPrefs
@@ -62,6 +64,19 @@ object UserPrefs {
     fun getIsAmountInFiat(context: Context): Flow<Boolean> = prefs(context).map { it[SHOW_AMOUNT_IN_FIAT] ?: false }
     suspend fun saveIsAmountInFiat(context: Context, inFiat: Boolean) = context.userPrefs.edit { it[SHOW_AMOUNT_IN_FIAT] = inFiat }
 
+    private val HOME_AMOUNT_DISPLAY_MODE = stringPreferencesKey("HOME_AMOUNT_DISPLAY_MODE")
+    fun getHomeAmountDisplayMode(context: Context): Flow<HomeAmountDisplayMode> = prefs(context).map {
+        HomeAmountDisplayMode.safeValueOf(it[HOME_AMOUNT_DISPLAY_MODE])
+    }
+    suspend fun saveHomeAmountDisplayMode(context: Context, displayMode: HomeAmountDisplayMode) = context.userPrefs.edit {
+        it[HOME_AMOUNT_DISPLAY_MODE] = displayMode.name
+        when (displayMode) {
+            HomeAmountDisplayMode.FIAT -> it[SHOW_AMOUNT_IN_FIAT] = true
+            HomeAmountDisplayMode.BTC -> it[SHOW_AMOUNT_IN_FIAT] = false
+            else -> Unit
+        }
+    }
+
     private val THEME = stringPreferencesKey("THEME")
     fun getUserTheme(context: Context): Flow<UserTheme> = prefs(context).map { UserTheme.safeValueOf(it[THEME]) }
     suspend fun saveUserTheme(context: Context, theme: UserTheme) = context.userPrefs.edit { it[THEME] = theme.name }
@@ -74,14 +89,17 @@ object UserPrefs {
 
     val PREFS_ELECTRUM_ADDRESS_HOST = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS_HOST")
     val PREFS_ELECTRUM_ADDRESS_PORT = intPreferencesKey("PREFS_ELECTRUM_ADDRESS_PORT")
-    const val PREFS_ELECTRUM_FORCE_SSL = "PREFS_ELECTRUM_FORCE_SSL"
+    val PREFS_ELECTRUM_ADDRESS_PINNED_KEY = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS_PINNED_KEY")
 
     fun getElectrumServer(context: Context): Flow<ServerAddress?> = prefs(context).map {
         val host = it[PREFS_ELECTRUM_ADDRESS_HOST]?.takeIf { it.isNotBlank() }
         val port = it[PREFS_ELECTRUM_ADDRESS_PORT]
-        log.info("retrieved preferred electrum host=$host port=$port from datastore")
-        if (host != null && port != null) {
+        val pinnedKey = it[PREFS_ELECTRUM_ADDRESS_PINNED_KEY]?.takeIf { it.isNotBlank() }
+        log.info("retrieved electrum address from datastore, host=$host port=$port key=$pinnedKey")
+        if (host != null && port != null && pinnedKey == null) {
             ServerAddress(host, port, TcpSocket.TLS.TRUSTED_CERTIFICATES)
+        } else if (host != null && port != null && pinnedKey != null) {
+            ServerAddress(host, port, TcpSocket.TLS.PINNED_PUBLIC_KEY(pinnedKey))
         } else {
             null
         }
@@ -91,9 +109,16 @@ object UserPrefs {
         if (address == null) {
             it.remove(PREFS_ELECTRUM_ADDRESS_HOST)
             it.remove(PREFS_ELECTRUM_ADDRESS_PORT)
+            it.remove(PREFS_ELECTRUM_ADDRESS_PINNED_KEY)
         } else {
             it[PREFS_ELECTRUM_ADDRESS_HOST] = address.host
             it[PREFS_ELECTRUM_ADDRESS_PORT] = address.port
+            val tls = address.tls
+            if (tls is TcpSocket.TLS.PINNED_PUBLIC_KEY) {
+                it[PREFS_ELECTRUM_ADDRESS_PINNED_KEY] =  tls.pubKey
+            } else {
+                it.remove(PREFS_ELECTRUM_ADDRESS_PINNED_KEY)
+            }
         }
     }
 
@@ -110,7 +135,7 @@ object UserPrefs {
     suspend fun saveInvoiceDefaultDesc(context: Context, description: String) = context.userPrefs.edit { it[INVOICE_DEFAULT_DESC] = description }
 
     private val INVOICE_DEFAULT_EXPIRY = longPreferencesKey("INVOICE_DEFAULT_EXPIRY")
-    fun getInvoiceDefaultExpiry(context: Context): Flow<Long> = prefs(context).map { it[INVOICE_DEFAULT_EXPIRY] ?: 60 * 60 * 24 * 7 }
+    fun getInvoiceDefaultExpiry(context: Context): Flow<Long> = prefs(context).map { it[INVOICE_DEFAULT_EXPIRY] ?: (7 * DateUtils.WEEK_IN_MILLIS / 1000) }
     suspend fun saveInvoiceDefaultExpiry(context: Context, expirySeconds: Long) = context.userPrefs.edit { it[INVOICE_DEFAULT_EXPIRY] = expirySeconds }
 
     private val TRAMPOLINE_MAX_BASE_FEE = longPreferencesKey("TRAMPOLINE_MAX_BASE_FEE")
@@ -137,7 +162,6 @@ object UserPrefs {
     fun getIsAutoPayToOpenEnabled(context: Context): Flow<Boolean> = prefs(context).map { it[AUTO_PAY_TO_OPEN] ?: true }
     suspend fun saveIsAutoPayToOpenEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[AUTO_PAY_TO_OPEN] = isEnabled }
 
-    // -- lnurl authentication key
     private val LNURL_AUTH_SCHEME = intPreferencesKey("LNURL_AUTH_SCHEME")
     fun getLnurlAuthScheme(context: Context): Flow<LnurlAuth.Scheme?> = prefs(context).map {
         when (it[LNURL_AUTH_SCHEME]) {
@@ -154,4 +178,21 @@ object UserPrefs {
         }
     }
 
+    private val IS_TOR_ENABLED = booleanPreferencesKey("IS_TOR_ENABLED")
+    fun getIsTorEnabled(context: Context): Flow<Boolean> = prefs(context).map { it[IS_TOR_ENABLED] ?: false }
+    suspend fun saveIsTorEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[IS_TOR_ENABLED] = isEnabled }
+
 }
+
+enum class HomeAmountDisplayMode {
+    BTC, FIAT, REDACTED;
+    companion object {
+        fun safeValueOf(mode: String?) = when(mode) {
+            FIAT.name -> FIAT
+            REDACTED.name -> REDACTED
+            else -> BTC
+        }
+    }
+}
+
+object Redacted : CurrencyUnit

@@ -13,15 +13,12 @@ fileprivate var log = Logger(OSLog.disabled)
 
 
 struct PaymentCell : View {
-
-	static private let appDelegate = AppDelegate.get()
-	static private let phoenixBusiness = appDelegate.business
-	static private let paymentsManager = phoenixBusiness.paymentsManager
 	
-	private let paymentsManager = PaymentCell.paymentsManager
+	private let paymentsManager = Biz.business.paymentsManager
 	
 	let row: WalletPaymentOrderRow
 	let didAppearCallback: ((WalletPaymentOrderRow) -> Void)?
+	let didDisappearCallback: ((WalletPaymentOrderRow) -> Void)?
 	
 	@State var fetched: WalletPaymentInfo?
 	@State var fetchedIsStale: Bool
@@ -32,10 +29,12 @@ struct PaymentCell : View {
 
 	init(
 		row: WalletPaymentOrderRow,
-		didAppearCallback: ((WalletPaymentOrderRow) -> Void)?
+		didAppearCallback: ((WalletPaymentOrderRow) -> Void)?,
+		didDisappearCallback: ((WalletPaymentOrderRow) -> Void)? = nil
 	) {
 		self.row = row
 		self.didAppearCallback = didAppearCallback
+		self.didDisappearCallback = didDisappearCallback
 		
 		let options = WalletPaymentFetchOptions.companion.Descriptions
 		var result = paymentsManager.fetcher.getCachedPayment(row: row, options: options)
@@ -59,7 +58,15 @@ struct PaymentCell : View {
 			if let payment = fetched?.payment {
 				
 				switch payment.state() {
-					case .success:
+				case .success:
+					if payment.isOnChain() {
+						Image(systemName: "link.circle.fill")
+							.resizable()
+							.frame(width: 26, height: 26)
+							.foregroundColor(Color.appAccent)
+							.padding(.vertical, 4)
+						
+					} else {
 						Image("payment_holder_def_success")
 							.foregroundColor(Color.accentColor)
 							.padding(4)
@@ -67,18 +74,20 @@ struct PaymentCell : View {
 								RoundedRectangle(cornerRadius: .infinity)
 									.fill(Color.appAccent)
 							)
-					case .pending:
-						Image("payment_holder_def_pending")
-							.foregroundColor(Color.appAccent)
-							.padding(4)
-					case .failure:
-						Image("payment_holder_def_failed")
-							.foregroundColor(Color.appAccent)
-							.padding(4)
-					default:
-						Image(systemName: "doc.text.magnifyingglass")
-							.padding(4)
+					}
+				case .pending:
+					Image("payment_holder_def_pending")
+						.foregroundColor(Color.appAccent)
+						.padding(4)
+				case .failure:
+					Image("payment_holder_def_failed")
+						.foregroundColor(Color.appAccent)
+						.padding(4)
+				default:
+					Image(systemName: "doc.text.magnifyingglass")
+						.padding(4)
 				}
+				
 			} else {
 				
 				Image(systemName: "doc.text.magnifyingglass")
@@ -144,12 +153,15 @@ struct PaymentCell : View {
 		.onAppear {
 			onAppear()
 		}
+		.onDisappear {
+			onDisappear()
+		}
 	}
 
 	func paymentDescription() -> String {
 
 		if let fetched = fetched {
-			return fetched.paymentDescription() ?? NSLocalizedString("No description", comment: "placeholder text")
+			return fetched.paymentDescription() ?? fetched.defaultPaymentDescription()
 		} else {
 			return ""
 		}
@@ -162,7 +174,11 @@ struct PaymentCell : View {
 		}
 		let timestamp = payment.completedAt()
 		guard timestamp > 0 else {
-			return NSLocalizedString("pending", comment: "timestamp string for pending transaction")
+			if payment.isOnChain() {
+				return NSLocalizedString("waiting for confirmations", comment: "explanation for pending transaction")
+			} else {
+				return NSLocalizedString("pending", comment: "timestamp string for pending transaction")
+			}
 		}
 			
 		let date = timestamp.toDate(from: .milliseconds)
@@ -203,7 +219,7 @@ struct PaymentCell : View {
 		}
 	}
 	
-	func onAppear() -> Void {
+	func onAppear() {
 		
 		if fetched == nil || fetchedIsStale {
 			
@@ -215,6 +231,13 @@ struct PaymentCell : View {
 		
 		if let didAppearCallback = didAppearCallback {
 			didAppearCallback(row)
+		}
+	}
+	
+	func onDisappear() {
+		
+		if let didDisappearCallback = didDisappearCallback {
+			didDisappearCallback(row)
 		}
 	}
 }

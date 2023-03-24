@@ -16,14 +16,14 @@ struct ElectrumConfigurationView: MVIView {
 	
 	@StateObject var mvi = MVIState({ $0.electrumConfiguration() })
 	
+	@Environment(\.controllerFactory) var factoryEnv
+	var factory: ControllerFactory { return factoryEnv }
+	
 	@StateObject var customElectrumServerObserver = CustomElectrumServerObserver()
 	
 	@State var didAppear = false
 	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
-	
-	@Environment(\.controllerFactory) var factoryEnv
-	var factory: ControllerFactory { return factoryEnv }
 	
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
@@ -66,81 +66,114 @@ struct ElectrumConfigurationView: MVIView {
 	@ViewBuilder
 	var view: some View {
 
-		main
+		content()
 			.navigationTitle(NSLocalizedString("Electrum server", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 	}
 
 	@ViewBuilder
-	var main: some View {
+	func content() -> some View {
 		
 		List {
-				
-			Section(header: ListHeader(), content: {}).textCase(nil)
-			
-			Section(header: Text("Configuration")) {
-			
-				VStack(alignment: .leading) {
-					
-					let (status, address) = connectionInfo()
-					
-					HStack {
-						Text(status)
-							.foregroundColor(Color.secondary)
-						
-						Spacer()
-						Button {
-							didTapModify()
-						} label: {
-							HStack {
-								Image(systemName: "square.and.pencil").imageScale(.small)
-								Text("Modify")
-							}
-						}
-					}
-					
-					Text(address).bold()
-						.padding(.top, 2)
-					
-					if customElectrumServerObserver.problem == .badCertificate {
-						Text("Bad certificate !")
-							.foregroundColor(Color.appNegative)
-							.padding(.top, 2)
-					}
-				}
-				
-			} // </Section: Configuration>
-			
-			Section(header: Text("Status")) {
-				
-				ListItem(header: Text("Block height")) {
-
-					let height = mvi.model.blockHeight
-					Text(verbatim: height > 0 ? height.formatInDecimalStyle() : "-")
-				}
-				
-				ListItem(header: Text("Tip timestamp")) {
-					
-					let time = mvi.model.tipTimestamp
-					Text(verbatim: time > 0 ? time.formatDateS() : "-")
-				}
-				
-				ListItem(header: Text("Fee rate")) {
-					
-					if mvi.model.feeRate > 0 {
-						Text("\(mvi.model.feeRate.formatInDecimalStyle()) sat/byte")
-					} else {
-						Text(verbatim: "-")
-					}
-				}
-				
-			} // </Section: Status>
-			
-		} // </List>
+			section_header()
+			section_configuration()
+			section_status()
+		}
 		.listStyle(GroupedListStyle())
+		.listBackgroundColor(.primaryBackground)
 		.onAppear() {
 			onAppear()
 		}
+	}
+	
+	@ViewBuilder
+	func section_header() -> some View {
+		
+		Section(header: ListHeader(), content: {}).textCase(nil)
+	}
+	
+	@ViewBuilder
+	func section_configuration() -> some View {
+		
+		Section(header: Text("Configuration")) {
+		
+			VStack(alignment: .leading) {
+				
+				let (status, address) = connectionInfo()
+				
+				HStack {
+					Text(status)
+						.foregroundColor(Color.secondary)
+					
+					Spacer()
+					Button {
+						didTapModify()
+					} label: {
+						HStack {
+							Image(systemName: "square.and.pencil").imageScale(.small)
+							Text("Modify")
+						}
+					}
+				}
+				
+				Text(address).bold()
+					.padding(.top, 2)
+				
+				if customElectrumServerObserver.problem == .badCertificate {
+					Text("Bad certificate !")
+						.foregroundColor(Color.appNegative)
+						.padding(.top, 2)
+				}
+			} // </VStack>
+		} // </Section>
+	}
+	
+	@ViewBuilder
+	func section_status() -> some View {
+		
+		Section(header: Text("Status")) {
+			
+			ListItem(header: Text("Block height")) {
+
+				let height = mvi.model.blockHeight
+				Text(verbatim: height > 0 ? formatInDecimalStyle(height) : "-")
+			}
+			
+			ListItem(header: Text("Tip timestamp")) {
+				
+				let time = mvi.model.tipTimestamp
+				if time > 0 {
+					Text(verbatim: time.toDate(from: .seconds).format(date: .long, time: .short))
+				} else {
+					Text(verbatim: "-")
+				}
+			}
+			
+			ListItem(header: Text("Fee rate")) {
+				
+				if mvi.model.feeRate > 0 {
+					Text("\(formatInDecimalStyle(mvi.model.feeRate)) sat/byte")
+				} else {
+					Text(verbatim: "-")
+				}
+			}
+			
+		} // </Section>
+	}
+	
+	func formatInDecimalStyle(_ value: Int32) -> String {
+		return formatInDecimalStyle(NSNumber(value: value))
+	}
+	
+	func formatInDecimalStyle(_ value: Int64) -> String {
+		return formatInDecimalStyle(NSNumber(value: value))
+	}
+	
+	func formatInDecimalStyle(_ value: NSNumber) -> String {
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .decimal
+		formatter.usesGroupingSeparator = true
+		return formatter.string(from: value)!
 	}
 	
 	func onAppear() {

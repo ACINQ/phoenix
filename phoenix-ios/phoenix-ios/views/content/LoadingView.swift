@@ -80,24 +80,16 @@ struct LoadingView: View {
 			
 			if !lockState.migrationStepsCompleted {
 				Text("Updating internals…")
-				
 			} else if !lockState.protectedDataAvailable {
 				Text("Waiting for keychain…")
-				
-			} else if !lockState.firstUnlockAttempted {
-				Text("Loading…")
-				
-			} else if lockState.firstUnlockFoundMnemonics {
-				Text("Decrypting wallet…")
-				
 			} else {
-				Text("…")
+				Text("Loading…")
 			}
 		}
 	}
 	
 	var logoImageName: String {
-		if AppDelegate.isTestnet {
+		if BusinessManager.isTestnet {
 			return "logo_blue"
 		} else {
 			return "logo_green"

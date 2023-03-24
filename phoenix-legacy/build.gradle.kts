@@ -23,15 +23,15 @@ fun gitCommitHash(): String {
 val chain: String by project
 
 android {
-  compileSdk = 31
+  compileSdk = 33
   ndkVersion = "23.1.7779620"
   defaultConfig {
     minSdk = 24
-    targetSdk = 31
+    targetSdk = 33
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
-    val libCode = 36
+    val libCode = 40
     getByName("debug") {
       resValue("string", "CHAIN", chain)
       buildConfigField("String", "CHAIN", chain)
@@ -81,7 +81,7 @@ dependencies {
   implementation("com.google.android.material:material:${Versions.AndroidLegacy.material}")
 
   // ANDROIDX
-  implementation("androidx.core:core-ktx:${Versions.Android.ktx}")
+  implementation("androidx.core:core-ktx:${Versions.Android.coreKtx}")
   implementation("androidx.appcompat:appcompat:${Versions.AndroidLegacy.appCompat}")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.serialization}")
   // ANDROIDX - navigation
@@ -99,14 +99,14 @@ dependencies {
   // ANDROIDX - preferences
   implementation("androidx.preference:preference-ktx:${Versions.Android.prefs}")
   // ANDROIDX - work manager
-  implementation("androidx.work:work-runtime-ktx:${Versions.AndroidLegacy.work}") {
-    exclude(group = "com.google.guava", module = "listenablefuture")
-  }
+  implementation("androidx.work:work-runtime-ktx:${Versions.AndroidLegacy.work}")
   // ANDROIDX - view pager 2
   implementation("androidx.viewpager2:viewpager2:${Versions.AndroidLegacy.viewpager}")
 
   // -- AndroidX: preferences datastore
   implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+  implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
 
   // SQLDelight
   implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")

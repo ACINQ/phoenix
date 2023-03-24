@@ -35,42 +35,50 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
+import fr.acinq.phoenix.utils.BlockchainExplorer
 
 
 /** A rounded button with a solid surface background and a muted outline. */
 @Composable
 fun BorderButton(
     modifier: Modifier = Modifier,
-    text: Int? = null,
+    text: String? = null,
     icon: Int? = null,
+    iconTint: Color = MaterialTheme.colors.primary,
+    backgroundColor: Color = MaterialTheme.colors.surface,
+    borderColor: Color = MaterialTheme.colors.primary,
     enabled: Boolean = true,
-    space: Dp = 16.dp,
+    space: Dp = 12.dp,
     textStyle: TextStyle = MaterialTheme.typography.button,
-    padding: PaddingValues = PaddingValues(12.dp),
-    isPrimary: Boolean = true,
+    padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     onClick: () -> Unit,
 ) {
     Button(
-        text = text?.run { stringResource(this) },
+        text = text,
         icon = icon,
+        iconTint = iconTint,
         enabled = enabled,
         space = space,
         onClick = onClick,
         shape = CircleShape,
-        backgroundColor = MaterialTheme.colors.surface,
-        border = BorderStroke(ButtonDefaults.OutlinedBorderSize, if (isPrimary) MaterialTheme.colors.primary else borderColor()),
+        backgroundColor = backgroundColor,
+        border = BorderStroke(ButtonDefaults.OutlinedBorderSize, borderColor),
         textStyle = textStyle,
         padding = padding,
         modifier = modifier
@@ -81,23 +89,25 @@ fun BorderButton(
 @Composable
 fun FilledButton(
     modifier: Modifier = Modifier,
-    text: Int? = null,
+    text: String? = null,
     icon: Int? = null,
+    iconTint: Color = MaterialTheme.colors.onPrimary,
     enabled: Boolean = true,
-    space: Dp = 16.dp,
+    space: Dp = 12.dp,
+    shape: Shape = CircleShape,
     textStyle: TextStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.onPrimary),
-    padding: PaddingValues = PaddingValues(12.dp),
+    padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     backgroundColor: Color = MaterialTheme.colors.primary,
     onClick: () -> Unit,
 ) {
     Button(
-        text = text?.run { stringResource(this) },
+        text = text,
         icon = icon,
-        iconTint = textStyle.color, // icon has the same colors as the text
+        iconTint = iconTint,
         enabled = enabled,
         space = space,
         onClick = onClick,
-        shape = CircleShape,
+        shape = shape,
         backgroundColor = backgroundColor,
         textStyle = textStyle,
         padding = padding,
@@ -127,10 +137,65 @@ fun InlineButton(
 
 /** For annotated string text param. */
 @Composable
-fun IconWithText(icon: Int, text: String, iconTint: Color = LocalContentColor.current, space: Dp = 16.dp) {
-    PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize), iconTint)
-    Spacer(Modifier.width(space))
-    Text(text)
+fun TextWithIcon(
+    text: AnnotatedString,
+    icon: Int,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = LocalTextStyle.current,
+    maxLines: Int = Int.MAX_VALUE,
+    textOverflow: TextOverflow = TextOverflow.Clip,
+    iconTint: Color = LocalContentColor.current,
+    iconSize: Dp = ButtonDefaults.IconSize,
+    padding: PaddingValues = PaddingValues(0.dp),
+    space: Dp = 6.dp,
+    alignBaseLine: Boolean = false
+) {
+    Row(
+        modifier = modifier.padding(padding),
+        verticalAlignment = if (alignBaseLine) Alignment.Top else Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = icon),
+            contentDescription = "icon for $text",
+            modifier = Modifier
+                .size(iconSize)
+                .then(if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier),
+            colorFilter = ColorFilter.tint(iconTint)
+        )
+        Spacer(Modifier.width(space))
+        Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier, maxLines = maxLines, overflow = textOverflow)
+    }
+}
+
+@Composable
+fun TextWithIcon(
+    text: String,
+    icon: Int,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = LocalTextStyle.current,
+    maxLines: Int = Int.MAX_VALUE,
+    textOverflow: TextOverflow = TextOverflow.Clip,
+    iconTint: Color? = null,
+    iconSize: Dp = ButtonDefaults.IconSize,
+    padding: PaddingValues = PaddingValues(0.dp),
+    space: Dp = 6.dp,
+    alignBaseLine: Boolean = false
+) {
+    Row(
+        modifier = modifier.padding(padding),
+        verticalAlignment = if (alignBaseLine) Alignment.Top else Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = icon),
+            contentDescription = "icon for $text",
+            modifier = Modifier
+                .size(iconSize)
+                .then(if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier),
+            colorFilter = iconTint?.let { ColorFilter.tint(it) }
+        )
+        Spacer(Modifier.width(space))
+        Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier, maxLines = maxLines, overflow = textOverflow)
+    }
 }
 
 @Composable
@@ -159,33 +224,34 @@ fun Button(
     text: String? = null,
     icon: Int? = null,
     iconTint: Color = MaterialTheme.colors.primary,
-    space: Dp = 16.dp,
+    space: Dp = 12.dp,
     enabled: Boolean = true,
+    enabledEffect: Boolean = true,
     textStyle: TextStyle = MaterialTheme.typography.button,
     padding: PaddingValues = PaddingValues(16.dp),
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Center,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = RectangleShape,
-    border: BorderStroke? = null, // ButtonDefaults.outlinedBorder,
+    border: BorderStroke? = null,
     elevation: ButtonElevation? = null,
     backgroundColor: Color = Color.Unspecified, // transparent by default!
+    onClickLabel: String? = null,
 ) {
     val colors = ButtonDefaults.buttonColors(
         backgroundColor = backgroundColor,
-        disabledBackgroundColor = backgroundColor.copy(alpha = 0.5f),
-        contentColor = LocalContentColor.current,
-        disabledContentColor = mutedTextColor(),
+        disabledBackgroundColor = if (enabledEffect && backgroundColor != Color.Unspecified) backgroundColor.copy(alpha = 0.4f) else backgroundColor,
     )
     val contentColor by colors.contentColor(true)
     Surface(
         shape = shape,
-        color = colors.backgroundColor(true).value,
-        contentColor = colors.contentColor(true).value, //contentColor.copy(1f),
+        color = colors.backgroundColor(enabled).value,
+        contentColor = colors.contentColor(enabled).value,
         border = border,
         elevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp,
         modifier = modifier
             .clickable(
                 onClick = onClick,
+                onClickLabel = onClickLabel,
                 enabled = enabled,
                 role = Role.Button,
                 interactionSource = interactionSource,
@@ -209,12 +275,18 @@ fun Button(
                         )
                         .indication(interactionSource, LocalIndication.current)
                         .padding(padding)
-                        .alpha(if (enabled) 1f else 0.5f),
+                        .alpha(
+                            if (!enabled && enabledEffect) {
+                                if (backgroundColor == Color.Unspecified) 0.3f else 0.8f
+                            } else {
+                                1f
+                            }
+                        ),
                     horizontalArrangement = horizontalArrangement,
                     verticalAlignment = Alignment.CenterVertically,
                     content = {
                         if (text != null && icon != null) {
-                            IconWithText(icon, text, iconTint, space)
+                            TextWithIcon(text = text, icon = icon, iconTint = iconTint, space = space, alignBaseLine = true)
                         } else if (text != null) {
                             Text(text)
                         } else if (icon != null) {
@@ -265,18 +337,30 @@ fun Clickable(
 }
 
 @Composable
-fun WebLink(text: String, url: String) {
+fun WebLink(
+    text: String,
+    url: String,
+    modifier: Modifier = Modifier,
+    maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.Clip,
+) {
     val context = LocalContext.current
     Text(
-        modifier = Modifier.clickable(
+        modifier = modifier.clickable(
             role = Role.Button,
-            onClickLabel = stringResource(id = R.string.accessibility_link)
-        ) {
-            openLink(context, url)
-        },
+            onClickLabel = stringResource(id = R.string.accessibility_link),
+            onClick = { openLink(context, url) }
+        ),
         text = text,
+        overflow = overflow,
+        maxLines = maxLines,
         style = MaterialTheme.typography.body1.copy(textDecoration = TextDecoration.Underline, color = MaterialTheme.colors.primary)
     )
+}
+
+@Composable
+fun txUrl(txId: String): String {
+    return business.blockchainExplorer.txUrl(txId = txId, website = BlockchainExplorer.Website.MempoolSpace)
 }
 
 fun openLink(context: Context, link: String) {

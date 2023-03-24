@@ -16,26 +16,22 @@
 
 package fr.acinq.phoenix.android
 
+import android.net.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavType
+import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import fr.acinq.phoenix.android.home.*
 import fr.acinq.phoenix.android.init.*
-import fr.acinq.phoenix.android.payments.PaymentDetailsView
-import fr.acinq.phoenix.android.payments.ReceiveView
-import fr.acinq.phoenix.android.payments.ScanDataView
+import fr.acinq.phoenix.android.intro.IntroView
+import fr.acinq.phoenix.android.payments.*
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.utils.appBackground
@@ -47,18 +43,16 @@ import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
+
 @Composable
 fun AppView(
-    mainActivity: MainActivity,
     appVM: AppViewModel,
+    navController: NavHostController,
 ) {
     val log = logger("AppView")
     log.debug { "init app view composition" }
 
-    val navController = rememberNavController()
     val fiatRates = application.business.currencyManager.ratesFlow.collectAsState(listOf())
     val walletContext = application.business.appConfigurationManager.chainContext.collectAsState(initial = null)
     val context = LocalContext.current
@@ -80,13 +74,11 @@ fun AppView(
         LocalElectrumServer provides electrumServer.value,
     ) {
 
-        // this view model should not be tied to the HomeView composition because it contains a dynamic payments list that must not be lost when switching to another view
-        val homeViewModel: HomeViewModel = viewModel(
-            factory = HomeViewModel.Factory(
+        // we keep a view model storing payments so that we don't have to fetch them every time
+        val paymentsViewModel: PaymentsViewModel = viewModel(
+            factory = PaymentsViewModel.Factory(
                 connectionsFlow = business.connectionsManager.connections,
                 paymentsManager = business.paymentsManager,
-                controllerFactory = controllerFactory,
-                getController = CF::home
             )
         )
 
@@ -95,20 +87,51 @@ fun AppView(
             navController.navigate(Screen.SwitchToLegacy.route)
         }
 
+        val scannerDeepLinks = remember {
+            listOf(
+                navDeepLink { uriPattern = "lightning:{data}" },
+                navDeepLink { uriPattern = "bitcoin:{data}" },
+                navDeepLink { uriPattern = "lnurl:{data}" },
+                navDeepLink { uriPattern = "lnurlp:{data}" },
+                navDeepLink { uriPattern = "lnurlw:{data}" },
+                navDeepLink { uriPattern = "keyauth:{data}" },
+                navDeepLink { uriPattern = "phoenix:lightning:{data}" },
+                navDeepLink { uriPattern = "phoenix:bitcoin:{data}" },
+                navDeepLink { uriPattern = "scanview:{data}" },
+            )
+        }
+
         Column(
             Modifier
                 .background(appBackground())
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
-            NavHost(navController = navController, startDestination = Screen.Startup.route) {
-                composable(Screen.Startup.route) {
+            NavHost(navController = navController, startDestination = "${Screen.Startup.route}?next={next}") {
+                composable(
+                    route = "${Screen.Startup.route}?next={next}",
+                    arguments = listOf(
+                        navArgument("next") { type = NavType.StringType ; nullable = true }
+                    ),
+                ) {
+                    val nextScreenLink = it.arguments?.getString("next")
+                    log.debug { "navigating to startup with next=$nextScreenLink" }
                     StartupView(
-                        mainActivity,
-                        appVM,
+                        appVM = appVM,
+                        onShowIntro = { navController.navigate(Screen.Intro.route) },
                         onKeyAbsent = { navController.navigate(Screen.InitWallet.route) },
-                        onBusinessStarted = { navController.navigate(Screen.Home.route) }
+                        onBusinessStarted = {
+                            val next = nextScreenLink?.takeIf { it.isNotBlank() }?.let { Uri.parse(it) }
+                            if (next == null) {
+                                popToHome(navController)
+                            } else {
+                                navController.navigate(next, navOptions = navOptions { popUpTo(Screen.Home.route) { inclusive = true } })
+                            }
+                        }
                     )
+                }
+                composable(Screen.Intro.route) {
+                    IntroView(onFinishClick = { navController.navigate(Screen.Startup.route) })
                 }
                 composable(Screen.InitWallet.route) {
                     InitWallet(
@@ -123,30 +146,43 @@ fun AppView(
                     RestoreWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
                 }
                 composable(Screen.Home.route) {
-                    RequireKey(appVM.walletState.value) {
+                    RequireStarted(appVM.walletState.value) {
                         HomeView(
-                            homeViewModel = homeViewModel,
-                            onPaymentClick = { navigateToPaymentDetails(navController, it) },
+                            paymentsViewModel = paymentsViewModel,
+                            onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },
                             onSettingsClick = { navController.navigate(Screen.Settings.route) },
                             onReceiveClick = { navController.navigate(Screen.Receive.route) },
-                            onSendClick = { navController.navigate(Screen.ScanData.route) { launchSingleTop = true } }
+                            onSendClick = { navController.navigate(Screen.ScanData.route) { launchSingleTop = true } },
+                            onPaymentsHistoryClick = { navController.navigate(Screen.PaymentsHistory.route) },
+                            onTorClick = { navController.navigate(Screen.TorConfig) },
+                            onElectrumClick = { navController.navigate(Screen.ElectrumServer) }
                         )
                     }
                 }
                 composable(Screen.Receive.route) {
-                    ReceiveView()
-                }
-                composable(Screen.ScanData.route) {
-                    ScanDataView(
-                        onBackClick = { navController.navigate(Screen.Home.route) { popUpTo(Screen.Home.route) { inclusive = true } } },
-                        onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") }
+                    ReceiveView(
+                        onSwapInReceived = { popToHome(navController) },
                     )
                 }
+                composable(Screen.ScanData.route, deepLinks = scannerDeepLinks) {
+                    val input = it.arguments?.getString("data")
+                    RequireStarted(appVM.walletState.value, nextUri = "scanview:$input") {
+                        ScanDataView(
+                            input = input,
+                            onBackClick = { popToHome(navController) },
+                            onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") }
+                        )
+                    }
+                }
                 composable(
-                    route = "${Screen.PaymentDetails.route}/{direction}/{id}",
+                    route = "${Screen.PaymentDetails.route}?direction={direction}&id={id}&fromEvent={fromEvent}",
                     arguments = listOf(
                         navArgument("direction") { type = NavType.LongType },
-                        navArgument("id") { type = NavType.StringType }
+                        navArgument("id") { type = NavType.StringType },
+                        navArgument("fromEvent") {
+                            type = NavType.BoolType
+                            defaultValue = false
+                        }
                     ),
                 ) {
                     val direction = it.arguments?.getLong("direction")
@@ -155,9 +191,23 @@ fun AppView(
                     if (paymentId != null) {
                         PaymentDetailsView(
                             paymentId = paymentId,
-                            onBackClick = { navController.navigate(Screen.Home.route) }
+                            onBackClick = {
+                                navController.popBackStack()
+                            },
+                            fromEvent = it.arguments?.getBoolean("fromEvent") ?: false
                         )
                     }
+                }
+                composable(Screen.PaymentsHistory.route) {
+                    PaymentsHistoryView(
+                        onBackClick = { popToHome(navController) },
+                        paymentsViewModel = paymentsViewModel,
+                        onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },
+                        onCsvExportClick = { navController.navigate(Screen.PaymentsCsvExport) },
+                    )
+                }
+                composable(Screen.PaymentsCsvExport.route) {
+                    CsvExportView(onBackClick = { navController.navigate(Screen.PaymentsHistory.route) })
                 }
                 composable(Screen.Settings.route) {
                     SettingsView()
@@ -168,11 +218,17 @@ fun AppView(
                 composable(Screen.ElectrumServer.route) {
                     ElectrumView()
                 }
+                composable(Screen.TorConfig.route) {
+                    TorConfigView()
+                }
                 composable(Screen.Channels.route) {
                     ChannelsView()
                 }
                 composable(Screen.MutualClose.route) {
-                    MutualCloseView()
+                    MutualCloseView(onBackClick = { navController.popBackStack() })
+                }
+                composable(Screen.ForceClose.route) {
+                    ForceCloseView(onBackClick = { navController.popBackStack() })
                 }
                 composable(Screen.Preferences.route) {
                     DisplayPrefsView()
@@ -190,16 +246,13 @@ fun AppView(
                     PaymentSettingsView(showAuthSchemeDialog)
                 }
                 composable(Screen.AppLock.route) {
-                    AppLockView(
-                        mainActivity = mainActivity,
-                        appVM = appVM
-                    )
+                    AppLockView()
                 }
                 composable(Screen.Logs.route) {
                     LogsView()
                 }
                 composable(Screen.SwitchToLegacy.route) {
-                    LegacySwitcherView(onLegacyFinished = { navController.navigate(Screen.Startup.route) })
+                    LegacySwitcherView(onProceedNormally = { navController.navigate(Screen.Startup.route) })
                 }
             }
         }
@@ -210,24 +263,31 @@ fun AppView(
     if (lastCompletedPayment != null) {
         log.debug { "completed payment=${lastCompletedPayment}" }
         LaunchedEffect(key1 = lastCompletedPayment.walletPaymentId()) {
-            navigateToPaymentDetails(navController, lastCompletedPayment.walletPaymentId())
+            navigateToPaymentDetails(navController, id = lastCompletedPayment.walletPaymentId(), isFromEvent = true)
         }
     }
 }
 
-private fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId) {
-    navController.navigate("${Screen.PaymentDetails.route}/${id.dbType.value}/${id.dbId}")
+/** Navigates to Home and pops everything from the backstack up to Home. This effectively resets the nav stack. */
+private fun popToHome(navController: NavHostController) {
+    navController.navigate(Screen.Home.route) {
+        popUpTo(Screen.Home.route) { inclusive = true }
+    }
+}
+
+private fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId, isFromEvent: Boolean) {
+    navController.navigate("${Screen.PaymentDetails.route}?direction=${id.dbType.value}&id=${id.dbId}&fromEvent=${isFromEvent}")
 }
 
 @Composable
-private fun RequireKey(
-    walletState: WalletState?, // TODO: replace by UI lock state
+private fun RequireStarted(
+    walletState: WalletState?,
+    nextUri: String? = null,
     children: @Composable () -> Unit
 ) {
+    val log = logger("RequireStarted")
     if (walletState !is WalletState.Started) {
-        logger().warning { "rejecting access to screen with wallet in state=$walletState" }
-        navController.navigate(Screen.Startup)
-        Text("redirecting...")
+        navController.navigate("${Screen.Startup.route}?next=$nextUri")
     } else {
         logger().debug { "access to screen granted" }
         children()

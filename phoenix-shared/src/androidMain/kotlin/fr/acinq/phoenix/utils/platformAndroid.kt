@@ -10,5 +10,8 @@ actual fun getApplicationFilesDirectoryPath(ctx: PlatformContext): String =
 
 actual fun getDatabaseFilesDirectoryPath(ctx: PlatformContext): String? = null
 
+actual fun getApplicationCacheDirectoryPath(ctx: PlatformContext): String =
+    ctx.applicationContext.cacheDir.absolutePath
+
 actual fun getTemporaryDirectoryPath(ctx: PlatformContext): String =
     ctx.applicationContext.cacheDir.absolutePath

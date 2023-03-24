@@ -39,12 +39,14 @@ fun Checkbox(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     padding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 0.dp)
 ) {
     var internalChecked by rememberSaveable { mutableStateOf(checked) }
     val interactionSource = remember { MutableInteractionSource() }
     Row(
         modifier = modifier
+            .enableOrFade(enabled)
             .clickable(interactionSource = interactionSource, indication = null, role = Role.Checkbox) {
                 internalChecked = !internalChecked
                 onCheckedChange(internalChecked)
@@ -55,7 +57,10 @@ fun Checkbox(
         Checkbox(
             checked = internalChecked,
             onCheckedChange = null,
-            modifier = Modifier.indication(interactionSource = interactionSource, indication = rememberRipple(bounded = false, color = if (isDarkTheme) gray300 else gray600, radius = 28.dp))
+            modifier = Modifier.indication(
+                interactionSource = interactionSource,
+                indication = rememberRipple(bounded = false, color = if (isDarkTheme) gray300 else gray600, radius = 28.dp)
+            )
         )
         Spacer(Modifier.width(12.dp))
         Text(text)

@@ -8,8 +8,14 @@ object CloseChannelsConfiguration {
     sealed class Model : MVI.Model() {
 
         object Loading : Model()
-        data class Ready(val channels: List<ChannelInfo>, val address: String) : Model()
-        data class ChannelsClosed(val channels: List<ChannelInfo>) : Model()
+        data class Ready(
+            val channels: List<ChannelInfo>,
+            val address: String // this wallet's bitcoin address
+        ) : Model()
+        data class ChannelsClosed(
+            val channels: List<ChannelInfo>,
+            val closing: Set<ByteVector32> // list of channel ids to close
+        ) : Model()
 
         data class ChannelInfo(
             val id: ByteVector32,

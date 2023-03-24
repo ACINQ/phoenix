@@ -2,53 +2,51 @@ import SwiftUI
 
 struct TorConfigurationView: View {
 
-	@State var isTorEnabled = Prefs.shared.isTorEnabled
-	@State var theme = Prefs.shared.theme
+	@State var isTorEnabled = GroupPrefs.shared.isTorEnabled
 
+	@ViewBuilder
 	var body: some View {
-		Form {
-			Section(header: TorFormHeader(), content: {}).textCase(nil)
+		
+		content()
+			.navigationTitle(NSLocalizedString("Tor", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
+		List {
+			Section {
 
-			Toggle(isOn: $isTorEnabled.animation()) {
-				if isTorEnabled {
-					Text("Tor is enabled")
-				} else {
-					Text("Tor is disabled")
+				Toggle(isOn: $isTorEnabled.animation()) {
+					if isTorEnabled {
+						Text("Tor is enabled")
+					} else {
+						Text("Tor is disabled")
+					}
+				}.onChange(of: isTorEnabled) { newValue in
+					self.toggleTor(newValue)
 				}
-			}.onChange(of: isTorEnabled) { newValue in
-				self.toggleTor(newValue)
+
+				Text(
+					"""
+					You can improve your privacy by only using Tor when connecting to an Electrum server or \
+					to your Lightning peer. This will slightly slow down your transactions.
+					"""
+				)
+				.font(.callout)
+				.lineLimit(nil)          // SwiftUI bugs
+				.minimumScaleFactor(0.5) // Truncating text
+				.foregroundColor(Color.secondary)
+				.padding(.top, 8)
+				.padding(.bottom, 4)
 			}
 		}
-		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.edgesIgnoringSafeArea(.bottom)
-		.navigationTitle(NSLocalizedString("Tor Settings", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
-	}
-
-	struct TorFormHeader: View {
-		
-		var body: some View {
-			Text(
-				"""
-				You can improve your privacy by only using Tor when connecting to an Electrum server or \
-				to your Lightning peer. This will slightly slow down your transactions.
-				"""
-			)
-			.font(.body)
-			.foregroundColor(Color.primary)
-			.padding(.top, 10)
-		}
+		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 	}
 
 	func toggleTor(_ isEnabled: Bool) {
-		Prefs.shared.isTorEnabled = isEnabled
+		GroupPrefs.shared.isTorEnabled = isEnabled
 	}
-}
-
-class TorConfigurationView_Previews: PreviewProvider {
-
-    static var previews: some View {
-        TorConfigurationView()
-                .previewDevice("iPhone 11")
-    }
 }

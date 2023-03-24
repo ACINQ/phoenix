@@ -4,15 +4,13 @@ import fr.acinq.bitcoin.*
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.phoenix.data.Chain
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 
-@OptIn(ExperimentalCoroutinesApi::class)
+
 class WalletManager(
     private val chain: Chain
 ) : CoroutineScope by MainScope() {
@@ -38,11 +36,12 @@ class WalletManager(
         val km = keyManager.value ?: LocalKeyManager(seed.byteVector(), chain.chainHash).also {
             _localKeyManager.value = it
         }
-        val (cloudKey, encryptedNodeId) = cloudKeyAndEncryptedNodeId()
+        val (cloudKey, cloudKeyHash) = cloudKeyAndEncryptedNodeId()
         return WalletInfo(
             nodeId = km.nodeId,
+            nodeIdHash = km.nodeId.hash160().byteVector().toHex(),
             cloudKey = cloudKey,
-            encryptedNodeId = encryptedNodeId
+            cloudKeyHash = cloudKeyHash,
         )
     }
 
@@ -98,7 +97,8 @@ class WalletManager(
      */
     data class WalletInfo(
         val nodeId: PublicKey,
+        val nodeIdHash: String,     // used for local storage
         val cloudKey: ByteVector32, // used for cloud storage
-        val encryptedNodeId: String // used for cloud storage
+        val cloudKeyHash: String, // used for cloud storage
     )
 }

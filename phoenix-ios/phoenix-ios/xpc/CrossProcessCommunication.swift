@@ -11,6 +11,24 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+enum XpcActor {
+	case mainApp
+	case notifySrvExt
+}
+
+enum XpcMessage {
+	case available
+	case unavailable
+}
+
+fileprivate let msgPing_mainApp: Int32 = 1
+fileprivate let msgPong_mainApp: Int32 = 2
+fileprivate let msgUnavailable_mainApp: Int32 = 3
+
+fileprivate let msgPing_notifySrvExt: Int32 = 4
+fileprivate let msgPong_notifySrvExt: Int32 = 5
+fileprivate let msgUnavailable_notifySrvExt: Int32 = 6
+
 
 class CrossProcessCommunication {
 	
@@ -20,25 +38,24 @@ class CrossProcessCommunication {
 	private let channelPrefix = "co.acinq.phoenix"
 	private let groupIdentifier = "group.co.acinq.phoenix"
 	
-	private let ping: Int32
-	private let pong: Int32
-	
-	private var receivedMessage: (() -> Void)? = nil
+	private var actor: XpcActor? = nil
+	private var receivedMessage: ((XpcMessage) -> Void)? = nil
+	private var channel: String? = nil
 	
 	private var notifyToken: Int32 = NOTIFY_TOKEN_INVALID
 	private var suspendCount: Int32 = 0
 	
 	/// Must use static `shared` instance
-	private init() {
-		
-		ping = abs(ProcessInfo.processInfo.processIdentifier)
-		pong = ping * -1
-	}
+	private init() {}
 	
-	func start(receivedMessage: (() -> Void)?) {
+	public func start(actor: XpcActor, receivedMessage: @escaping (XpcMessage) -> Void) {
+		log.trace("start()")
 		
-		self.receivedMessage = receivedMessage
 		queue.async {
+			self.actor = actor
+			self.receivedMessage = receivedMessage
+		}
+		DispatchQueue.global(qos: .utility).async {
 			self.readChannelID()
 		}
 	}
@@ -56,6 +73,11 @@ class CrossProcessCommunication {
 		
 		var uuid = UUID()
 		var error: NSError? = nil
+		
+		// `NSFileCoordinator.coordinate()`:
+		// This method executes **synchronously**,
+		// blocking the current thread until the reader/write block finishes executing.
+		//
 		fileCoordinator.coordinate(readingItemAt: fileURL, writingItemAt: fileURL, error: &error) { readURL, writeURL in
 			
 			var fileContent: String? = nil
@@ -96,11 +118,13 @@ class CrossProcessCommunication {
 		}
 		
 		let channelID = uuid.uuidString
-		register(channelID: channelID)
+		queue.async {
+			self.register(channelID)
+		}
 	}
 	
-	private func register(channelID: String) {
-		log.trace("register(channelID:)")
+	private func register(_ channelID: String) {
+		log.trace("register()")
 		
 		guard !notify_is_valid_token(notifyToken) else {
 			log.debug("ignoring: channel is already registered")
@@ -108,6 +132,7 @@ class CrossProcessCommunication {
 		}
 		
 		let channel = "\(channelPrefix).\(channelID)"
+		self.channel = channel
 		
 		notify_register_dispatch(
 			/* name      :*/ (channel as NSString).utf8String,
@@ -118,6 +143,7 @@ class CrossProcessCommunication {
 			guard let self = self else {
 				return
 			}
+			let actor = self.actor
 			
 			var state: UInt64 = 0
 			notify_get_state(token, &state)
@@ -125,15 +151,55 @@ class CrossProcessCommunication {
 			// Convert from UInt64 to Int32 and extract proper sign (positive/negative)
 			let signal = Int32(truncatingIfNeeded: Int64(bitPattern: state))
 			
-			if (signal == self.ping) || (signal == self.pong) {
-				// ignoring signal from self
-			} else if signal > 0 {
-				log.debug("receivedPing(\(signal))")
-				self.notifyReceivedMessage()
-				self.sendSignal(self.pong, channel)
-			} else {
-				log.debug("receivedPong(\(signal))")
-				self.notifyReceivedMessage()
+			if actor == .mainApp {
+				
+				if signal == msgPing_mainApp ||
+				   signal == msgPong_mainApp ||
+				   signal == msgUnavailable_mainApp {
+					
+					log.debug("ignorning own message")
+					
+				} else if signal == msgPing_notifySrvExt {
+					
+					log.debug("received message: ping (from notifySrvExt)")
+					self.notifyReceivedMessage(.available)
+					self.sendMessage(msgPong_mainApp)
+					
+				} else if signal == msgPong_notifySrvExt {
+					
+					log.debug("received message: pong (from notifySrvExt)")
+					self.notifyReceivedMessage(.available)
+					
+				} else if signal == msgUnavailable_notifySrvExt {
+					
+					log.debug("received message: unavailable (from notifySrvExt)")
+					self.notifyReceivedMessage(.unavailable)
+				}
+				
+			} else if actor == .notifySrvExt {
+				
+				if signal == msgPing_notifySrvExt ||
+				   signal == msgPong_notifySrvExt ||
+				   signal == msgUnavailable_notifySrvExt {
+					
+					log.debug("ignorning own message")
+					
+				} else if signal == msgPing_mainApp {
+					
+					log.debug("received message: ping (from mainApp)")
+					self.notifyReceivedMessage(.available)
+					self.sendMessage(msgPong_notifySrvExt)
+					
+				} else if signal == msgPong_mainApp {
+					
+					log.debug("received message: pong (from mainApp)")
+					self.notifyReceivedMessage(.available)
+					
+				} else if signal == msgUnavailable_mainApp {
+					
+					log.debug("received message: unavailable (from mainApp)")
+					self.notifyReceivedMessage(.unavailable)
+				}
 			}
 		}
 		
@@ -148,31 +214,45 @@ class CrossProcessCommunication {
 				suspendCount = 0
 				
 			} else {
-				sendSignal(self.ping, channel)
+				
+				if actor == .mainApp {
+					sendMessage(msgPing_mainApp)
+				} else {
+					sendMessage(msgPing_notifySrvExt)
+				}
 			}
 		}
 	}
 	
-	private func sendSignal(_ signal: Int32, _ channel: String) {
-		log.trace("sendSignal(\(signal))")
+	private func sendMessage(_ msg: Int32) {
 		
-		guard notify_is_valid_token(notifyToken) else {
+		switch msg {
+			case msgPing_mainApp             : log.trace("sendMessage(ping_mainApp)")
+			case msgPong_mainApp             : log.trace("sendMessage(pong_mainApp)")
+			case msgUnavailable_mainApp      : log.trace("sendMessage(unavailable_mainApp)")
+			case msgPing_notifySrvExt        : log.trace("sendMessage(ping_notifySrvExt)")
+			case msgPong_notifySrvExt        : log.trace("sendMessage(pong_notifySrvExt)")
+			case msgUnavailable_notifySrvExt : log.trace("sendMessage(unavailable_notifySrvExt)")
+			default                          : log.trace("sendMessage(unknown)")
+		}
+		
+		guard notify_is_valid_token(notifyToken), let channel = channel else {
 			return
 		}
 		
 		// Convert Int32 into UInt64 without losing sign
-		let state = UInt64(UInt32(bitPattern: signal))
+		let state = UInt64(UInt32(bitPattern: msg))
 		
 		notify_set_state(notifyToken, state)
 		notify_post((channel as NSString).utf8String)
 	}
 	
-	private func notifyReceivedMessage() {
+	private func notifyReceivedMessage(_ msg: XpcMessage) {
 		log.trace("notifyReceivedMessage()")
 		
-		if let receivedMessage = receivedMessage {
+		if let receivedMessage {
 			DispatchQueue.main.async {
-				receivedMessage()
+				receivedMessage(msg)
 			}
 		}
 	}
@@ -182,6 +262,11 @@ class CrossProcessCommunication {
 		queue.async {
 			
 			if notify_is_valid_token(self.notifyToken) {
+				switch self.actor {
+					case .mainApp      : self.sendMessage(msgUnavailable_mainApp)
+					case .notifySrvExt : self.sendMessage(msgUnavailable_notifySrvExt)
+					default            : break
+				}
 				log.debug("notify_suspend()")
 				notify_suspend(self.notifyToken)
 			} else {

@@ -18,17 +18,11 @@ fileprivate let PAGE_COUNT_INCREMENT = 25
 
 
 struct HomeView : MVIView {
-
-	static private let appDelegate = AppDelegate.get()
-	static private let phoenixBusiness = appDelegate.business
-	static private let encryptedNodeId = appDelegate.encryptedNodeId!
-	static private let paymentsManager = phoenixBusiness.paymentsManager
-	static private let paymentsPageFetcher = paymentsManager.makePageFetcher()
 	
-	private let phoenixBusiness = HomeView.phoenixBusiness
-	private let encryptedNodeId = HomeView.encryptedNodeId
-	private let paymentsManager = HomeView.paymentsManager
-	private let paymentsPageFetcher = HomeView.paymentsPageFetcher
+	private let phoenixBusiness = Biz.business
+	private let encryptedNodeId = Biz.encryptedNodeId!
+	private let paymentsManager = Biz.business.paymentsManager
+	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "HomeView")
 	
 	@StateObject var mvi = MVIState({ $0.home() })
 
@@ -38,24 +32,26 @@ struct HomeView : MVIView {
 	@State var selectedItem: WalletPaymentInfo? = nil
 	@State var isMempoolFull = false
 	
+	@State var notificationPermissions = NotificationsManager.shared.permissions.value
+	
 	@StateObject var customElectrumServerObserver = CustomElectrumServerObserver()
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
-	let recentPaymentSecondsPublisher = Prefs.shared.recentPaymentSecondsPublisher
-	@State var recentPaymentSeconds = Prefs.shared.recentPaymentSeconds
+	let recentPaymentsConfigPublisher = Prefs.shared.recentPaymentsConfigPublisher
+	@State var recentPaymentsConfig = Prefs.shared.recentPaymentsConfig
 	
-	let paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
+	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	
 	@StateObject var syncState = DownloadMonitor()
 	
-	let lastCompletedPaymentPublisher = paymentsManager.lastCompletedPaymentPublisher()
-	let chainContextPublisher = phoenixBusiness.appConfigurationManager.chainContextPublisher()
+	let lastCompletedPaymentPublisher = Biz.business.paymentsManager.lastCompletedPaymentPublisher()
+	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
-	let incomingSwapsPublisher = paymentsManager.incomingSwapsPublisher()
+	let incomingSwapsPublisher = Biz.business.balanceManager.incomingSwapsPublisher()
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 	@State var lastIncomingSwaps = [String: Lightning_kmpMilliSatoshi]()
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
@@ -69,16 +65,33 @@ struct HomeView : MVIView {
 	@Environment(\.colorScheme) var colorScheme
 	
 	@State var didAppear = false
-	@State var didPreFetch = false
 	
 	let backupSeed_enabled_publisher = Prefs.shared.backupSeed.isEnabled_publisher
 	let manualBackup_taskDone_publisher = Prefs.shared.backupSeed.manualBackup_taskDone_publisher
 	@State var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
-	@State var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
+	@State var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(
+		encryptedNodeId: Biz.encryptedNodeId!
+	)
+	
+	// --------------------------------------------------
+	// MARK: Init
+	// --------------------------------------------------
+	
+	init() {
+		paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
+	}
 	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
+	
+	/* Accessibility sort priority:
+	 *
+	 * - Total balance    = 49
+	 * - Incoming balance = 48
+	 * - Notice boxes     = 47
+	 * - Footer cell      = 10
+	 */
 	
 	@ViewBuilder
 	var view: some View {
@@ -93,8 +106,8 @@ struct HomeView : MVIView {
 		.onChange(of: currencyPrefs.hideAmountsOnHomeScreen) { _ in
 			hideAmountsOnHomeScreenChanged()
 		}
-		.onReceive(recentPaymentSecondsPublisher) {
-			recentPaymentSecondsChanged($0)
+		.onReceive(recentPaymentsConfigPublisher) {
+			recentPaymentsConfigChanged($0)
 		}
 		.onReceive(paymentsPagePublisher) {
 			paymentsPageChanged($0)
@@ -107,6 +120,9 @@ struct HomeView : MVIView {
 		}
 		.onReceive(incomingSwapsPublisher) {
 			onIncomingSwapsChanged($0)
+		}
+		.onReceive(NotificationsManager.shared.permissions) {
+			notificationPermissionsChanged($0)
 		}
 		.onReceive(backupSeed_enabled_publisher) {
 			self.backupSeed_enabled = $0
@@ -145,46 +161,9 @@ struct HomeView : MVIView {
 	func balance() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			
 			totalBalance()
-			
-			if let incoming = incomingAmount() {
-			
-				if #available(iOS 15.0, *) {
-					
-					incomingBalance(incoming)
-						.onTapGesture { showBlockchainExplorerOptions = true }
-						.confirmationDialog("Blockchain Explorer",
-							isPresented: $showBlockchainExplorerOptions,
-							titleVisibility: .automatic
-						) {
-							Button("Mempool.space") {
-								exploreIncomingSwap(website: BlockchainExplorer.WebsiteMempoolSpace())
-							}
-							Button("Blockstream.info") {
-								exploreIncomingSwap(website: BlockchainExplorer.WebsiteBlockstreamInfo())
-							}
-							
-							let addrCount = lastIncomingSwaps.count
-							if addrCount >= 2 {
-								Button("Copy bitcoin addresses (\(addrCount)") {
-									copyIncomingSwap()
-								}
-							} else {
-								Button("Copy bitcoin address") {
-									copyIncomingSwap()
-								}
-							}
-						} // </confirmationDialog>
-					
-				} else /* iOS 14 */ { // same functionality as before
-					
-					incomingBalance(incoming)
-						.onTapGesture { toggleCurrencyType() }
-				}
-			}
-			
-		} // </VStack>
+			incomingBalance()
+		}
 		.padding([.top, .leading, .trailing])
 		.padding(.bottom, 30)
 		.background(
@@ -201,9 +180,13 @@ struct HomeView : MVIView {
 	func totalBalance() -> some View {
 		
 		ZStack(alignment: Alignment.center) {
-				
+			
+			let balanceMsats = mvi.model.balance?.msat
+			let unknownBalance = balanceMsats == nil
+			let hiddenBalance = currencyPrefs.hideAmountsOnHomeScreen
+			
 			let amount = Utils.format( currencyPrefs,
-			                     msat: mvi.model.balance.msat,
+			                     msat: balanceMsats ?? 0,
 			                   policy: .showMsatsIfZeroSats)
 			
 			HStack(alignment: VerticalAlignment.firstTextBaseline) {
@@ -251,18 +234,19 @@ struct HomeView : MVIView {
 			.accessibilityLabel("Total balance is \(amount.string)")
 			.accessibilityAddTraits(.isButton)
 			.accessibilitySortPriority(49)
-			.if(currencyPrefs.hideAmountsOnHomeScreen) { view in
+			.if(unknownBalance || hiddenBalance) { view in
 				view
 					.opacity(0.0)
 					.accessibility(hidden: true)
 			}
 			
-			if currencyPrefs.hideAmountsOnHomeScreen {
+			if unknownBalance || hiddenBalance {
 				
+				let imgName = unknownBalance ? "circle.dotted" : "circle.fill"
 				Group {
-					Text(Image(systemName: "circle.fill")) + Text("\u{202f}") +
-					Text(Image(systemName: "circle.fill")) + Text("\u{202f}") +
-					Text(Image(systemName: "circle.fill"))
+					Text(Image(systemName: imgName)) + Text("\u{202f}") +
+					Text(Image(systemName: imgName)) + Text("\u{202f}") +
+					Text(Image(systemName: imgName))
 				}
 				.font(.body)
 				.if(colorScheme == .dark) { view in
@@ -274,6 +258,50 @@ struct HomeView : MVIView {
 				.accessibilityLabel("Hidden balance")
 				.accessibilityAddTraits(.isButton)
 				.accessibilitySortPriority(49)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func incomingBalance() -> some View {
+		
+		if let incoming = incomingAmount() {
+		
+			if #available(iOS 15.0, *) {
+				
+				incomingBalance(incoming)
+					.onTapGesture { showBlockchainExplorerOptions = true }
+					.confirmationDialog("Blockchain Explorer",
+						isPresented: $showBlockchainExplorerOptions,
+						titleVisibility: .automatic
+					) {
+						Button {
+							exploreIncomingSwap(website: BlockchainExplorer.WebsiteMempoolSpace())
+						} label: {
+							Text(verbatim: "Mempool.space") // no localization needed
+						}
+						Button {
+							exploreIncomingSwap(website: BlockchainExplorer.WebsiteBlockstreamInfo())
+						} label: {
+							Text(verbatim: "Blockstream.info") // no localization needed
+						}
+						
+						let addrCount = lastIncomingSwaps.count
+						if addrCount >= 2 {
+							Button("Copy bitcoin addresses (\(addrCount)") {
+								copyIncomingSwap()
+							}
+						} else {
+							Button("Copy bitcoin address") {
+								copyIncomingSwap()
+							}
+						}
+					} // </confirmationDialog>
+				
+			} else /* iOS 14 */ { // same functionality as before
+				
+				incomingBalance(incoming)
+					.onTapGesture { toggleCurrencyType() }
 			}
 		}
 	}
@@ -311,7 +339,7 @@ struct HomeView : MVIView {
 	func notices() -> some View {
 		
 		// === Welcome / Backup Seed ====
-		if mvi.model.balance.msat == 0 && Prefs.shared.isNewWallet {
+		if mvi.model.balance?.msat == 0 && Prefs.shared.isNewWallet {
 
 			// Reserved for potential "welcome" message.
 			EmptyView()
@@ -323,6 +351,8 @@ struct HomeView : MVIView {
 					Image(systemName: "exclamationmark.triangle")
 						.imageScale(.large)
 						.padding(.trailing, 10)
+						.accessibilityLabel("Warning")
+					
 					Button {
 						navigateToBackup()
 					} label: {
@@ -338,11 +368,14 @@ struct HomeView : MVIView {
 						}
 						.multilineTextAlignment(.leading)
 						.allowsTightening(true)
-					}
+					} // </Button>
 				} // </HStack>
 				.font(.caption)
+				.accessibilityElement(children: .combine)
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(47)
+				
 			} // </NoticeBox>
-			
 		}
 		
 		// === Custom Electrum Server Problems ====
@@ -353,24 +386,32 @@ struct HomeView : MVIView {
 					Image(systemName: "exclamationmark.shield")
 						.imageScale(.large)
 						.padding(.trailing, 10)
-				}
+						.accessibilityHidden(true)
+						.accessibilityLabel("Warning")
+					
+					Button {
+						navigationToElecrumServer()
+					} label: {
+						Group {
+							Text("Custom electrum server: bad certificate ! ")
+								.foregroundColor(.primary)
+							+
+							Text("Check it ")
+								.foregroundColor(.appAccent)
+							+
+							Text(Image(systemName: "arrowtriangle.forward"))
+								.foregroundColor(.appAccent)
+						}
+						.multilineTextAlignment(.leading)
+						.allowsTightening(true)
+					} // </Button>
+					
+				} // </HStack>
 				.font(.caption)
-				Button {
-					navigationToElecrumServer()
-				} label: {
-					Group {
-						Text("Custom electrum server: bad certificate ! ")
-							.foregroundColor(.primary)
-						+
-						Text("Check it ")
-							.foregroundColor(.appAccent)
-						+
-						Text(Image(systemName: "arrowtriangle.forward"))
-							.foregroundColor(.appAccent)
-					}
-					.multilineTextAlignment(.leading)
-					.allowsTightening(true)
-				}
+				.accessibilityElement(children: .combine)
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(47)
+				
 			} // </NoticeBox>
 		}
 		
@@ -382,6 +423,9 @@ struct HomeView : MVIView {
 					Image(systemName: "tray.full")
 						.imageScale(.large)
 						.padding(.trailing, 10)
+						.accessibilityHidden(true)
+						.accessibilityLabel("Warning")
+					
 					VStack(alignment: HorizontalAlignment.leading, spacing: 5) {
 						Text("Bitcoin mempool is full and fees are high.")
 						Button {
@@ -389,10 +433,50 @@ struct HomeView : MVIView {
 						} label: {
 							Text("See how Phoenix is affected".uppercased())
 						}
-					}
-				}
+					} // </VStack>
+				} // </HStack>
 				.font(.caption)
-			}
+				.accessibilityElement(children: .combine)
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(47)
+				
+			} // </NoticeBox>
+		}
+		
+		// === Background payments disabled ====
+		if notificationPermissions == .disabled {
+			
+			NoticeBox {
+				HStack(alignment: VerticalAlignment.top, spacing: 0) {
+					Image(systemName: "exclamationmark.triangle")
+						.imageScale(.large)
+						.padding(.trailing, 10)
+						.accessibilityLabel("Warning")
+					
+					Button {
+						navigationToBackgroundPayments()
+					} label: {
+						Group {
+							Text("Background payments disabled. ")
+								.foregroundColor(.primary)
+							+
+							Text("Fix ")
+								.foregroundColor(.appAccent)
+							+
+							Text(Image(systemName: "arrowtriangle.forward"))
+								.foregroundColor(.appAccent)
+						}
+						.multilineTextAlignment(.leading)
+						.allowsTightening(true)
+					} // </Button>
+					
+				} // </HStack>
+				.font(.caption)
+				.accessibilityElement(children: .combine)
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(47)
+				
+			} // </NoticeBox>
 		}
 	}
 	
@@ -423,14 +507,12 @@ struct HomeView : MVIView {
 					}
 				}
 				
-				let totalPaymentCount: Int? = paymentsPage.rows.count < paymentsPage.count
-				  ? paymentsPage.rows.count + Int(paymentsPage.offset)
-				  : nil
-				
+				let totalPaymentCount = paymentsPage.rows.count + Int(paymentsPage.offset)
 				FooterCell(
 					totalPaymentCount: totalPaymentCount,
-					recentPaymentSeconds: recentPaymentSeconds,
-					isDownloadingRecentTxs: isDownloadingRecentTxs(),
+					recentPaymentsConfig: recentPaymentsConfig,
+					isDownloadingMoreTxs: isDownloadingMoreTxs(),
+					isFetchingMoreTxs: isFetchingMoreTxs(),
 					didAppearCallback: footerCellDidAppear
 				)
 				.accessibilitySortPriority(10)
@@ -457,32 +539,111 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func isDownloadingRecentTxs() -> Bool {
+	func isDownloadingMoreTxs() -> Bool {
 		
 		guard syncState.isDownloading else {
 			return false
 		}
 		
-		if let oldest = syncState.oldestCompletedDownload {
-			log.debug("oldest = \(oldest.description)")
+		switch recentPaymentsConfig {
+		case .withinTime(let seconds):
 			
-			// We've downloaded one or more batches from the cloud.
-			// Let's check to see if we expect to download any more "recent" payments.
-			let cutoff = Date().addingTimeInterval(Double(recentPaymentSeconds * -1))
-			log.debug("cutoff = \(cutoff.description)")
+			// We're displaying all "recent" payments within a given time period.
+			//
+			// So we may still be downloading these payments until `syncState.oldestCompletedDownload`
+			// shows a date older than our "recent" range.
 			
-			if oldest < cutoff {
-				// Already downloaded all the tx's that could be considered "recent"
-				return false
+			if let oldest = syncState.oldestCompletedDownload {
+				log.debug("oldest = \(oldest.description)")
+				
+				// We've downloaded one or more batches from the cloud.
+				// Let's check to see if we expect to download any more "recent" payments.
+				let cutoff = Date().addingTimeInterval(Double(seconds * -1))
+				log.debug("cutoff = \(cutoff.description)")
+				
+				if oldest < cutoff {
+					// Already downloaded all the tx's that could be considered "recent"
+					return false
+				} else {
+					// May have more "recent" tx's to download
+					return true
+				}
+				
 			} else {
-				// May have more "recent" tx's to download
+				// We're downloading the first batch from the cloud
+				log.debug("oldest = nil")
 				return true
 			}
 			
-		} else {
-			// We're downloading the first batch from the cloud
-			log.debug("oldest = nil")
-			return true
+		case .mostRecent(let count):
+			
+			// We're displaying the most recent X payments.
+			//
+			// So we may still be downloading these payments until either:
+			// - we have X payments in the database (we always download from newest to oldest)
+			// - we're no longer downloading from the cloud
+			
+			if paymentsPage.count >= count {
+				return false
+			} else {
+				return true
+			}
+			
+		case .inFlightOnly:
+			
+			// We're only displaying (outgoing) in-flight payments.
+			// So there's no need to show the "still downloading" notice.
+			return false
+		}
+	}
+	
+	func isFetchingMoreTxs() -> Bool {
+		
+		switch recentPaymentsConfig {
+		case .withinTime(_):
+			// For this config, we increase the fetchCount when we scroll to the bottom:
+			//
+			// paymentsPageFetcher.subscribeToRecent(
+			//   offset: 0,
+			//   count: Int32(PAGE_COUNT_START), <-- value gets increased
+			//   seconds: Int32(seconds)
+			// )
+			//
+			// So we fetch more when we get to the end, if there might be more.
+			
+			if paymentsPage.rows.count < paymentsPage.count {
+				return false // done
+			} else {
+				return true // might be more
+			}
+			
+		case .mostRecent(_):
+			// For this config, we the fetchCount matches the recentCount:
+			//
+			// paymentsPageFetcher.subscribeToAll(
+			//   offset: 0,
+			//   count: Int32(count) <-- max value; doesn't change
+			// )
+			//
+			// So we don't ever have more to fetch from the database.
+			
+			return false
+			
+		case .inFlightOnly:
+			// For this config, we increase the fetchCount when we scroll to the bottom:
+			//
+			// paymentsPageFetcher.subscribeToInFlight(
+			//   offset: 0,
+			//   count: Int32(PAGE_COUNT_START) <-- value gets increased
+			// )
+			//
+			// So we fetch more when we get to the end, if there might be more.
+			
+			if paymentsPage.rows.count < paymentsPage.count {
+				return false // done
+			} else {
+				return true // might be more
+			}
 		}
 	}
 	
@@ -496,11 +657,7 @@ struct HomeView : MVIView {
 		// Careful: this function may be called when returning from the Receive/Send view
 		if !didAppear {
 			didAppear = true
-			paymentsPageFetcher.subscribeToRecent(
-				offset: 0,
-				count: Int32(PAGE_COUNT_START),
-				seconds: Int32(recentPaymentSeconds)
-			)
+			paymentsPageFetcher_subscribe()
 		}
 	}
 	
@@ -511,7 +668,12 @@ struct HomeView : MVIView {
 	func onModelChange(model: Home.Model) -> Void {
 		log.trace("onModelChange()")
 		
-		if model.balance.msat > 0 || model.incomingBalance?.msat ?? 0 > 0 || model.paymentsCount > 0 {
+		let balance = model.balance?.msat ?? 0
+		let incomingBalance = lastIncomingSwaps.values.reduce(Int64(0)) {(sum, item) -> Int64 in
+			return sum + item.msat
+		}
+		
+		if balance > 0 || incomingBalance > 0 || model.paymentsCount > 0 {
 			if Prefs.shared.isNewWallet {
 				Prefs.shared.isNewWallet = false
 			}
@@ -526,22 +688,17 @@ struct HomeView : MVIView {
 		UIAccessibility.post(notification: .screenChanged, argument: nil)
 	}
 
-	func recentPaymentSecondsChanged(_ seconds: Int) {
-		log.trace("recentPaymentSecondsChanged()")
+	func recentPaymentsConfigChanged(_ value: RecentPaymentsConfig) {
+		log.trace("recentPaymentsConfigChanged()")
 		
-		recentPaymentSeconds = seconds
-		paymentsPageFetcher.subscribeToRecent(
-			offset: 0,
-			count: Int32(PAGE_COUNT_START),
-			seconds: Int32(seconds)
-		)
+		recentPaymentsConfig = value
+		paymentsPageFetcher_subscribe()
 	}
 	
 	func paymentsPageChanged(_ page: PaymentsPage) {
 		log.trace("paymentsPageChanged()")
 		
 		paymentsPage = page
-		maybePreFetchPaymentsFromDatabase()
 	}
 	
 	func lastCompletedPaymentChanged(_ payment: Lightning_kmpWalletPayment) {
@@ -561,10 +718,16 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
+	func chainContextChanged(_ context: WalletContext.V0ChainContext) {
 		log.trace("chainContextChanged()")
 		
 		isMempoolFull = context.mempool.v1.highUsage
+	}
+	
+	func notificationPermissionsChanged(_ newValue: NotificationPermissions) {
+		log.trace("notificationPermissionsChanged()")
+		
+		notificationPermissions = newValue
 	}
 	
 	func onIncomingSwapsChanged(_ incomingSwaps: [String: Lightning_kmpMilliSatoshi]) -> Void {
@@ -609,24 +772,29 @@ struct HomeView : MVIView {
 		
 		let maybeHasMoreRowsInDatabase = paymentsPage.rows.count == paymentsPage.count
 		if maybeHasMoreRowsInDatabase {
-			log.trace("maybeHasMoreRowsInDatabase")
+			log.debug("maybeHasMoreRowsInDatabase")
 			
-			// increase paymentsPage.count
-			
-			let prvOffset = paymentsPage.offset
-			let newCount = paymentsPage.count + Int32(PAGE_COUNT_INCREMENT)
-			
-			log.debug("increasing page.count: Page(offset=\(prvOffset), count=\(newCount)")
-			
-			paymentsPageFetcher.subscribeToRecent(
-				offset: prvOffset,
-				count: newCount,
-				seconds: Int32(recentPaymentSeconds)
-			)
+			if case let .withinTime(recentPaymentSeconds) = recentPaymentsConfig {
+				
+				// increase paymentsPage.count
+				
+				let prvOffset = paymentsPage.offset
+				let newCount = paymentsPage.count + Int32(PAGE_COUNT_INCREMENT)
+				
+				log.debug("increasing page.count: Page(offset=\(prvOffset), count=\(newCount)")
+				
+				paymentsPageFetcher.subscribeToRecent(
+					offset: prvOffset,
+					count: newCount,
+					seconds: Int32(recentPaymentSeconds)
+				)
+			} else {
+				log.debug("!recentPayments.withinTime(X)")
+			}
 			
 		} else {
 			
-			log.trace("!maybeHasMoreRowsInDatabase")
+			log.debug("!maybeHasMoreRowsInDatabase")
 		}
 	}
 	
@@ -660,8 +828,7 @@ struct HomeView : MVIView {
 			return
 		}
 		
-		let business = AppDelegate.get().business
-		let txUrlStr = business.blockchainExplorer.addressUrl(addr: addr, website: website)
+		let txUrlStr = Biz.business.blockchainExplorer.addressUrl(addr: addr, website: website)
 		if let txUrl = URL(string: txUrlStr) {
 			UIApplication.shared.open(txUrl)
 		}
@@ -692,6 +859,12 @@ struct HomeView : MVIView {
 		deepLinkManager.broadcast(DeepLink.electrum)
 	}
 	
+	func navigationToBackgroundPayments() {
+		log.trace("navigateToBackgroundPayments()")
+		
+		deepLinkManager.broadcast(DeepLink.backgroundPayments)
+	}
+	
 	func openMempoolFullURL() {
 		log.trace("openMempoolFullURL()")
 		
@@ -715,34 +888,28 @@ struct HomeView : MVIView {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Prefetch
+	// MARK: PaymentsFetcher
 	// --------------------------------------------------
 	
-	func maybePreFetchPaymentsFromDatabase() -> Void {
+	func paymentsPageFetcher_subscribe() {
 		
-		if !didPreFetch && paymentsPage.rows.count > 0 {
-			didPreFetch = true
-			
-			// Delay the pre-fetch process a little bit, to give priority to other app-startup tasks.
-			DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-				prefetchPaymentsFromDatabase(idx: 0)
-			}
-		}
-	}
-	
-	func prefetchPaymentsFromDatabase(idx: Int) {
-
-		guard idx < paymentsPage.rows.count else {
-			// recursion complete
-			return
-		}
-
-		let row = paymentsPage.rows[idx]
-		log.debug("Pre-fetching: \(row.id)")
-
-		let options = WalletPaymentFetchOptions.companion.Descriptions
-		paymentsManager.fetcher.getPayment(row: row, options: options) { (_, _) in
-			prefetchPaymentsFromDatabase(idx: idx + 1)
+		switch recentPaymentsConfig {
+		case .withinTime(let seconds):
+			paymentsPageFetcher.subscribeToRecent(
+				offset: 0,
+				count: Int32(PAGE_COUNT_START),
+				seconds: Int32(seconds)
+			)
+		case .mostRecent(let count):
+			paymentsPageFetcher.subscribeToAll(
+				offset: 0,
+				count: Int32(count)
+			)
+		case .inFlightOnly:
+			paymentsPageFetcher.subscribeToInFlight(
+				offset: 0,
+				count: Int32(PAGE_COUNT_START)
+			)
 		}
 	}
 	
@@ -857,9 +1024,10 @@ fileprivate struct NoticeBox<Content: View>: View {
 
 fileprivate struct FooterCell: View {
 	
-	let totalPaymentCount: Int?
-	let recentPaymentSeconds: Int
-	let isDownloadingRecentTxs: Bool
+	let totalPaymentCount: Int
+	let recentPaymentsConfig: RecentPaymentsConfig
+	let isDownloadingMoreTxs: Bool
+	let isFetchingMoreTxs: Bool
 	let didAppearCallback: () -> Void
 	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -867,12 +1035,12 @@ fileprivate struct FooterCell: View {
 	@ViewBuilder
 	var body: some View {
 		Group {
-			if isDownloadingRecentTxs {
+			if isDownloadingMoreTxs {
 				body_downloading()
-			} else if let totalPaymentCount = totalPaymentCount {
-				body_ready(totalPaymentCount)
+			} else if isFetchingMoreTxs {
+				body_fetching()
 			} else {
-				body_pending()
+				body_ready()
 			}
 		}
 		.onAppear {
@@ -895,13 +1063,20 @@ fileprivate struct FooterCell: View {
 	}
 	
 	@ViewBuilder
-	func body_ready(_ totalPaymentCount: Int) -> some View {
+	func body_fetching() -> some View {
+		
+		Text("fetching more rows...")
+			.font(.footnote)
+			.foregroundColor(.secondary)
+			.padding(.vertical, 10)
+	}
+	
+	@ViewBuilder
+	func body_ready() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			let option = RecentPaymentsOption.closest(seconds: recentPaymentSeconds).1
-			let localizedString = option.homeDisplay(paymentCount: totalPaymentCount)
 			
-			Text(verbatim: localizedString)
+			Text(verbatim: limitedPaymentsText())
 				.font(.subheadline)
 				.multilineTextAlignment(.center)
 				.foregroundColor(.secondary)
@@ -918,13 +1093,27 @@ fileprivate struct FooterCell: View {
 		.padding(.vertical, 10)
 	}
 	
-	@ViewBuilder
-	func body_pending() -> some View {
+	func limitedPaymentsText() -> String {
 		
-		Text("fetching more rows...")
-			.font(.footnote)
-			.foregroundColor(.secondary)
-			.padding(.vertical, 10)
+		switch recentPaymentsConfig {
+		case .withinTime(let seconds):
+			let option = RecentPaymentsConfig_WithinTime.closest(seconds: seconds).1
+			return option.homeDisplay(paymentCount: totalPaymentCount)
+			
+		case .mostRecent(_):
+			if totalPaymentCount == 1 {
+				return NSLocalizedString("1 recent payment", comment: "Recent payments footer")
+			} else {
+				return NSLocalizedString("\(totalPaymentCount) recent payments", comment: "Recent payments footer")
+			}
+			
+		case .inFlightOnly:
+			if totalPaymentCount == 1 {
+				return NSLocalizedString("1 in-flight payment", comment: "Recent payments footer")
+			} else {
+				return NSLocalizedString("\(totalPaymentCount) in-flight payments", comment: "Recent payments footer")
+			}
+		}
 	}
 	
 	func onAppear() {
@@ -946,8 +1135,8 @@ class DownloadMonitor: ObservableObject {
 	private var cancellables = Set<AnyCancellable>()
 	
 	init() {
-		let appDelegate = AppDelegate.get()
-		let syncStatePublisher = appDelegate.syncManager!.syncTxManager.statePublisher
+		let syncManager = Biz.syncManager!
+		let syncStatePublisher = syncManager.syncTxManager.statePublisher
 		
 		syncStatePublisher.sink {[weak self](state: SyncTxManager_State) in
 			self?.update(state)

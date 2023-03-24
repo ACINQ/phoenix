@@ -28,8 +28,7 @@ import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.secp256k1.Hex
 import kotlinx.coroutines.*
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
+import kotlin.time.Duration.Companion.seconds
 
 object TestConstants {
     object Bob {
@@ -245,7 +244,6 @@ val rawWalletParams = """
 }
 """
 
-@OptIn(ExperimentalTime::class)
 fun runTest(timeout: Duration = 30.seconds, test: suspend CoroutineScope.() -> Unit) {
     runBlocking {
         withTimeout(timeout) {

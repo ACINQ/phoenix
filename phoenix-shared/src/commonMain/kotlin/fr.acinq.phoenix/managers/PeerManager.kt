@@ -1,33 +1,26 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
+import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.io.Peer
-import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.wire.InitTlv
 import fr.acinq.lightning.wire.TlvStream
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.utils.calculateBalance
+import fr.acinq.phoenix.data.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class PeerManager(
     loggerFactory: LoggerFactory,
     private val nodeParamsManager: NodeParamsManager,
     private val databaseManager: DatabaseManager,
     private val configurationManager: AppConfigurationManager,
-    private val tcpSocketBuilder: TcpSocket.Builder,
     private val electrumWatcher: ElectrumWatcher,
 ) : CoroutineScope by MainScope() {
 
@@ -36,7 +29,6 @@ class PeerManager(
         nodeParamsManager = business.nodeParamsManager,
         databaseManager = business.databaseManager,
         configurationManager = business.appConfigurationManager,
-        tcpSocketBuilder = business.tcpSocketBuilder,
         electrumWatcher = business.electrumWatcher
     )
 
@@ -45,8 +37,12 @@ class PeerManager(
     private val _peer = MutableStateFlow<Peer?>(null)
     val peerState: StateFlow<Peer?> = _peer
 
-    private val _balance = MutableStateFlow<MilliSatoshi?>(null)
-    val balance: StateFlow<MilliSatoshi?> = _balance
+    /**
+     * Our local view of our channels. It is initialized with data from the local db, then with the actual
+     * channels once they have been reestablished.
+     */
+    private val _channelsFlow = MutableStateFlow<Map<ByteVector32, LocalChannelInfo>?>(null)
+    val channelsFlow: StateFlow<Map<ByteVector32, LocalChannelInfo>?> = _channelsFlow
 
     init {
         launch {
@@ -68,19 +64,51 @@ class PeerManager(
 
             val peer = Peer(
                 initTlvStream = initTlvs,
-                nodeParams = nodeParamsManager.nodeParams.filterNotNull().first(),
-                walletParams = configurationManager.chainContext.filterNotNull().first().walletParams(),
+                nodeParams = nodeParams,
+                walletParams = walletParams,
                 watcher = electrumWatcher,
                 db = databaseManager.databases.filterNotNull().first(),
-                socketBuilder = tcpSocketBuilder,
+                socketBuilder = null,
                 scope = MainScope()
             )
             _peer.value = peer
-            peer.channelsFlow.collect { channels ->
-                _balance.value = calculateBalance(channels)
+
+            // The local channels flow must use `bootFlow` first, as `channelsFlow` is empty when the wallet starts.
+            // `bootFlow` data come from the local database and will be overridden by fresh data once the connection
+            // with the peer has been established.
+            val bootFlow = peer.bootChannelsFlow.filterNotNull()
+            val channelsFlow = peer.channelsFlow
+            var isBoot = true
+            combine(bootFlow, channelsFlow) { bootChannels, channels ->
+                // bootFlow will fire once, after the channels have been read from the database.
+                if (isBoot) {
+                    isBoot = false
+                    bootChannels.entries.associate { it.key to LocalChannelInfo(it.key.toHex(), it.value, isBooting = true) }
+                } else {
+                    channels.entries.associate { it.key to LocalChannelInfo(it.key.toHex(),it.value, isBooting = false) }
+                }
+            }.collect {
+                _channelsFlow.value = it
             }
         }
     }
 
     suspend fun getPeer() = peerState.filterNotNull().first()
+
+    /**
+     * Returns the underlying channel, if it's of type ChannelStateWithCommitments.
+     * Note that Offline channels are automatically unwrapped.
+     */
+    fun getChannelWithCommitments(channelId: ByteVector32): ChannelStateWithCommitments? {
+        val peer = peerState.value ?: return null
+        var channel = peer.channels[channelId] ?: return null
+        channel = when (channel) {
+            is Offline -> channel.state
+            else -> channel
+        }
+        return when (channel) {
+            is ChannelStateWithCommitments -> channel
+            else -> null
+        }
+    }
 }

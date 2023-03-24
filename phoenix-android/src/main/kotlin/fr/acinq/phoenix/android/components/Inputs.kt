@@ -17,10 +17,7 @@
 package fr.acinq.phoenix.android.components
 
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,8 +25,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -38,8 +35,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.utils.negativeColor
-import fr.acinq.phoenix.android.utils.outlinedTextFieldColors
+import fr.acinq.phoenix.android.utils.*
 
 @Composable
 fun TextInput(
@@ -50,6 +46,8 @@ fun TextInput(
     maxChars: Int? = null,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    errorMessage: String? = null,
     enabled: Boolean = true,
     onTextChange: (String) -> Unit,
 ) {
@@ -71,19 +69,45 @@ fun TextInput(
             ),
             label = label,
             placeholder = placeholder,
+            trailingIcon = {
+                Row {
+                    if (text.isNotBlank()) {
+                        FilledButton(
+                            onClick = { onTextChange("") },
+                            icon = R.drawable.ic_cross,
+                            backgroundColor = Color.Transparent,
+                            iconTint = MaterialTheme.colors.onSurface,
+                            padding = PaddingValues(12.dp),
+                        )
+                        Spacer(Modifier.width(8.dp))
+                    }
+                    trailingIcon?.let { it() }
+                }
+            },
             enabled = enabled,
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             colors = outlinedTextFieldColors(),
             shape = RoundedCornerShape(8.dp),
             modifier = modifier.enableOrFade(enabled)
         )
-        if (maxChars != null) {
-            Spacer(Modifier.height(4.dp))
-            Text("$charsCount/$maxChars", style = MaterialTheme.typography.caption.copy(fontSize = 12.sp), modifier = Modifier.align(Alignment.End))
+        Spacer(Modifier.height(4.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            if (!errorMessage.isNullOrBlank() && enabled) {
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 13.sp),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            if (maxChars != null) {
+                Text(
+                    text = "$charsCount/$maxChars",
+                    style = MaterialTheme.typography.caption.copy(fontSize = 13.sp),
+                )
+            }
         }
     }
 }
-
 
 /**
  * @param onValueChange the value in this callback will be null if the input is not valid and an error is

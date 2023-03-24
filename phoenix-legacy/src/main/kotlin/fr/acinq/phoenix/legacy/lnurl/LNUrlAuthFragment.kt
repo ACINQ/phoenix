@@ -78,7 +78,7 @@ class LNUrlAuthFragment : BaseFragment() {
       return
     }
     model = ViewModelProvider(this, LNUrlAuthViewModel.Factory(url)).get(LNUrlAuthViewModel::class.java)
-    model.state.observe(viewLifecycleOwner, { state ->
+    model.state.observe(viewLifecycleOwner) { state ->
       when (state) {
         is LNUrlAuthState.Error -> {
           val details = when (state.cause) {
@@ -96,7 +96,7 @@ class LNUrlAuthFragment : BaseFragment() {
         }, 3000)
         else -> Unit
       }
-    })
+    }
     mBinding.instructions.text = Converter.html(getString(R.string.lnurl_auth_instructions, model.domainToSignIn))
     mBinding.progress.setText(Converter.html(getString(R.string.lnurl_auth_in_progress, model.domainToSignIn)))
     mBinding.model = model
@@ -239,7 +239,7 @@ class LNUrlAuthViewModel(val url: HttpUrl) : ViewModel() {
 
   class Factory(private val url: HttpUrl) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
       return LNUrlAuthViewModel(url) as T
     }
   }

@@ -24,9 +24,10 @@ CREATE TABLE IF NOT EXISTS outgoing_payments (
     status_blob BLOB DEFAULT NULL
 );
 
--- The created_at column is used by AggregatedQueries.listAllPaymentsOrder for sorting.
--- And that query is used constantly by the app.
-CREATE INDEX IF NOT EXISTS outgoing_payments_created_at_idx ON outgoing_payments(created_at);
+-- Create indexes to optimize the queries in AggregatedQueries.
+-- Tip: Use "explain query plan" to ensure they're actually being used.
+CREATE INDEX IF NOT EXISTS outgoing_payments_filter_idx
+    ON outgoing_payments(completed_at);
 
 -- Stores the lightning parts that make up a lightning payment
 CREATE TABLE IF NOT EXISTS outgoing_payment_parts (
@@ -151,6 +152,13 @@ SELECT id,
        status_blob
 FROM outgoing_payments
 WHERE id=?;
+
+getOldestCompletedDate:
+SELECT   completed_at
+FROM     outgoing_payments AS o
+WHERE    completed_at IS NOT NULL
+ORDER BY o.completed_at ASC
+LIMIT 1;
 
 getPayment:
 SELECT parent.id,

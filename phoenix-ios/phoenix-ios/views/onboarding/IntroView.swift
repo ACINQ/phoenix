@@ -28,7 +28,7 @@ struct IntroView: View {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 			
-			if AppDelegate.showTestnetBackground {
+			if BusinessManager.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -160,7 +160,7 @@ struct IntroView2: View, ViewName {
 	@State var payToOpen_feePercent: Double = 0.0
 	@State var payToOpen_minFeeSat: Int64 = 0
 	
-	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
+	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	

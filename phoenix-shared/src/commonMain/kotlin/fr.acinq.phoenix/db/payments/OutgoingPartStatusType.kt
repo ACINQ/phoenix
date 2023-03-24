@@ -21,7 +21,6 @@ import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.serialization.v1.ByteVector32KSerializer
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -59,9 +58,8 @@ sealed class OutgoingPartStatusData {
     }
 }
 
-@OptIn(ExperimentalSerializationApi::class)
 fun OutgoingPayment.LightningPart.Status.Succeeded.mapToDb() = OutgoingPartStatusTypeVersion.SUCCEEDED_V0 to
         Json.encodeToString(OutgoingPartStatusData.Succeeded.V0(preimage)).toByteArray(Charsets.UTF_8)
-@OptIn(ExperimentalSerializationApi::class)
+
 fun OutgoingPayment.LightningPart.Status.Failed.mapToDb() = OutgoingPartStatusTypeVersion.FAILED_V0 to
         Json.encodeToString(OutgoingPartStatusData.Failed.V0(remoteFailureCode, details)).toByteArray(Charsets.UTF_8)

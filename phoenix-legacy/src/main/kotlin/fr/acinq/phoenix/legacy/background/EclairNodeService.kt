@@ -171,7 +171,7 @@ class EclairNodeService : Service() {
     notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline)
       .setOnlyAlertOnce(true)
       .setContentTitle(getString(R.string.notif__headless_title__default))
-      .setContentIntent(PendingIntent.getActivity(this, Constants.NOTIF_ID__HEADLESS, intent, PendingIntent.FLAG_IMMUTABLE))
+      .setContentIntent(PendingIntent.getActivity(this, Constants.NOTIF_ID__HEADLESS, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT))
     log.info("service created")
   }
 
@@ -257,7 +257,7 @@ class EclairNodeService : Service() {
   // ============================================================= //
 
   /** Close database connections opened by the node */
-  private fun closeConnections() {
+  internal fun closeConnections() {
     kit?.run {
       system().shutdown()
       nodeParams().db().audit().close()
@@ -653,16 +653,6 @@ class EclairNodeService : Service() {
     } ?: throw KitNotInitialized
   }
 
-  /** Send message to the peer to prepare migration. */
-  fun sendLegacyMigrationSignal() = serviceScope.launch(Dispatchers.Default) {
-    kit?.run { doSendLegacyMigrationSignal(this) } ?: throw KitNotInitialized
-  }
-
-  private fun doSendLegacyMigrationSignal(kit: Kit) {
-    val newNodeId = kit.nodeParams().keyManager().kmpNodeKey().publicKey()
-    kit.switchboard().tell(Peer.SendPhoenixAndroidLegacyMigrate(Wallet.ACINQ.nodeId(), newNodeId), ActorRef.noSender())
-  }
-
   /** Generate a BOLT 11 payment request. */
   @UiThread
   suspend fun generatePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>, expirySeconds: Long): PaymentRequest = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
@@ -717,7 +707,7 @@ class EclairNodeService : Service() {
   suspend fun getPayments(): List<PaymentWithMeta> = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
     kit?.let {
       val t = System.currentTimeMillis()
-      JavaConverters.seqAsJavaListConverter(it.nodeParams().db().payments().listPaymentsOverview(50)).asJava().map { p ->
+      JavaConverters.seqAsJavaListConverter(it.nodeParams().db().payments().listPaymentsOverview(Option.apply(50))).asJava().map { p ->
         val id = when {
           p is PlainOutgoingPayment && p.parentId().isDefined -> p.parentId().get().toString()
           else -> p.paymentHash().toString()
@@ -897,7 +887,7 @@ class EclairNodeService : Service() {
       .setContentText(message)
       .setStyle(NotificationCompat.BigTextStyle().bigText(message))
       .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__MISSED_PAY_TO_OPEN,
-        Intent(applicationContext, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP }, PendingIntent.FLAG_UPDATE_CURRENT))
+        Intent(applicationContext, MainActivity::class.java).apply { Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP }, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
       .setAutoCancel(true)
       .build())
   }
@@ -921,25 +911,6 @@ class EclairNodeService : Service() {
         }
       }
     } ?: log.info("could not refresh fcm token because kit is not ready yet")
-  }
-
-  @Subscribe(threadMode = ThreadMode.BACKGROUND)
-  fun handleEvent(event: CheckHasActiveChannels) {
-    checkActiveChannelsForMigration()
-  }
-
-  private fun checkActiveChannelsForMigration() {
-    serviceScope.launch {
-      kit?.run {
-        if (nodeParams().db().channels().listLocalChannels().isEmpty) {
-//          doSendLegacyMigrationSignal(this)
-          delay(1000)
-          // FIXME we should not move to KMP automatically because this method can be triggered for many cases
-          // migration should be manually triggered.
-          // PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.NotRequired)
-        }
-      }
-    }
   }
 
   // =========================================================== //
@@ -1070,9 +1041,22 @@ sealed class KitState {
   } else null
 
   /** Get node's current feerate per Kw */
-  fun getFeeratePerKw(target: Int): Long? = kit()?.run {
-    nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(target)
-  }
+  fun getFeeratePerKw(target: Int): Long? = kit()?.nodeParams()?.onChainFeeConf()?.feeEstimator()?.getFeeratePerKw(target)
+
+  /** Get node public key */
+  internal fun getKmpNodeId(): Crypto.PublicKey? = if (this is Started) {
+    kit.nodeParams().keyManager().kmpNodeKey().publicKey()
+  } else null
+
+  /** Get a dual-funding swap-in address usable by the modern KMP application. */
+  internal fun getKmpSwapInAddress(): String? = if (this is Started) {
+    try {
+      val master = kit.nodeParams().keyManager().master()
+      Wallet.buildKmpSwapInAddress(master)
+    } catch (e: Exception) {
+      null
+    }
+  } else null
 
   fun kit(): Kit? = if (this is Started) kit else null
   fun api(): Eclair? = if (this is Started) _api else null

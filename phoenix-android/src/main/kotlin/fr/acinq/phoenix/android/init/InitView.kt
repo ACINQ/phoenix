@@ -24,13 +24,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
@@ -57,13 +57,15 @@ fun InitWallet(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         FilledButton(
-            text = R.string.initwallet_create,
+            text = stringResource(id = R.string.initwallet_create),
             icon = R.drawable.ic_fire,
             onClick = onCreateWalletClick
         )
         Spacer(modifier = Modifier.height(16.dp))
+        HSeparator(width = 80.dp)
+        Spacer(modifier = Modifier.height(16.dp))
         BorderButton(
-            text = R.string.initwallet_restore,
+            text = stringResource(id = R.string.initwallet_restore),
             icon = R.drawable.ic_restore,
             onClick = onRestoreWalletClick
         )

@@ -54,7 +54,7 @@ class LNObjectParserTest {
     Wallet.parseLNObject("foobar://test?lightning=LNURL1DP68GURN8GHJ7MRWW4EXCTNXD9SHG6NPVCHXXMMD9AKXUATJDSKHW6T5DPJ8YCTH8AEK2UMND9HKU0FCV3JKGVRXVFJRXE33X93RXCECVVUXXCTRV43R2VFEXVERZEPSVVUXZVE5VDJXZERRVDNRXEP4VFNRQDRRXSURQWPCX5MN2WR9X4NRG65RLR9") as LNUrlWithdraw
 
     // non bech32 lnurl
-//    var url = Wallet.parseLNObject("lnurlp:lnurl-toolbox.degreesofzero.com/u?q=a07d243eb98af499b538e0b6ad387b014b48181b04a5feb6e55d30993f96635a")
+//    val url = Wallet.parseLNObject("lnurlp:lnurl-toolbox.degreesofzero.com/u?q=a07d243eb98af499b538e0b6ad387b014b48181b04a5feb6e55d30993f96635a")
 //    Assert.assertTrue(url is LNUrlPay)
 //    Assert.assertEquals(MilliSatoshi(10_000), (url as LNUrlPay).minSendable)
 //    Assert.assertEquals(MilliSatoshi(20_000), url.maxSendable)
