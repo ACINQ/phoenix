@@ -147,25 +147,7 @@ fun PaymentDetailsSplashView(
                         value = payment.fees.toPrettyString(LocalBitcoinUnit.current, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW)
                     )
                 }
-                is IncomingPayment -> {
-                    val receivedWithNewChannel = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>() ?: emptyList()
-                    if (receivedWithNewChannel.isNotEmpty()) {
-                        val serviceFee = receivedWithNewChannel.map { it.serviceFee }.sum()
-                        val fundingFee = receivedWithNewChannel.map { it.fundingFee }.sum()
-                        Spacer(modifier = Modifier.height(8.dp))
-                        DetailsRow(
-                            label = stringResource(id = R.string.paymentdetails_service_fees_label),
-                            value = serviceFee.toPrettyString(LocalBitcoinUnit.current, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW),
-                            helpMessage = stringResource(R.string.paymentdetails_service_fees_desc)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        DetailsRow(
-                            label = stringResource(id = R.string.paymentdetails_funding_fees_label),
-                            value = fundingFee.toMilliSatoshi().toPrettyString(LocalBitcoinUnit.current, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE),
-                            helpMessage = stringResource(R.string.paymentdetails_funding_fees_desc)
-                        )
-                    }
-                }
+                is IncomingPayment -> {}
             }
 
             payment.errorMessage()?.let { errorMessage ->
@@ -234,7 +216,7 @@ private fun PaymentStatus(
                 isAnimated = false,
                 color = mutedTextColor()
             )
-            payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().any { !it.confirmed } -> {
+            payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().any() -> {
                 val minDepth = business.nodeParamsManager.nodeParams.value?.minDepthBlocks
                 PaymentStatusIcon(
                     message = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),

@@ -126,7 +126,7 @@ private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: (
                 Offline::class.simpleName -> stringResource(id = R.string.state_offline)
                 ShuttingDown::class.simpleName -> stringResource(id = R.string.state_shutdown)
                 WaitForFundingConfirmed::class.simpleName, WaitForAcceptChannel::class.simpleName,
-                WaitForChannelReady::class.simpleName, WaitForFundingSigned::class.simpleName,
+                WaitForFundingSigned::class.simpleName,
                 WaitForFundingCreated::class.simpleName -> stringResource(id = R.string.state_wait_confirmed)
                 WaitForOpenChannel::class.simpleName -> stringResource(id = R.string.state_wait_open)
                 else -> channel.stateName

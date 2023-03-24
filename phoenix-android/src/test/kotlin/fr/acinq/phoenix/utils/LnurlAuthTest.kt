@@ -26,6 +26,7 @@ class LnurlAuthTest {
         val seed = `MnemonicCode$`.`MODULE$`.toSeed("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about", "")
         val legacyKeyManager = fr.acinq.eclair.crypto.LocalKeyManager(seed, Block.TestnetGenesisBlock().hash())
         val kmpKeyManager = LocalKeyManager(seed = seed.toArray().byteVector64(), Chain.Testnet.chainHash)
+        val master = DeterministicWallet.generate(seed.toArray())
 
         val k1 = "179062fdf971ec045883a6297fb1d260333358905086c33a9f44ff26f63bb425"
         val url = Url("https://api.lnmarkets.com/v1/lnurl/auth?tag=login&k1=$k1&hmac=75344d9151fe788345e620aa3de0e69b51698e759fd667272e3ea682a2bbcd12")
@@ -33,10 +34,10 @@ class LnurlAuthTest {
         // legacy key
         val (legacySignedK1, legacyAuthKey) = LNUrlAuthFragment.signLnurlAuthK1WithKey(legacyKeyManager, k1, url.toString().toHttpUrlOrNull()!!)
         // kmp key when using the legacy friendly scheme
-        val kmpLegacyAuthKey = LnurlAuth.getAuthLinkingKey(kmpKeyManager, url, LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME)
+        val kmpLegacyAuthKey = LnurlAuth.getAuthLinkingKey(kmpKeyManager, master, url, LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME)
         val kmpLegacySignedK1 = Crypto.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(k1), privateKey = kmpLegacyAuthKey)).toHex()
         // kmp key when using the default scheme
-        val kmpNewAuthKey = LnurlAuth.getAuthLinkingKey(kmpKeyManager, url, LnurlAuth.Scheme.DEFAULT_SCHEME)
+        val kmpNewAuthKey = LnurlAuth.getAuthLinkingKey(kmpKeyManager, master, url, LnurlAuth.Scheme.DEFAULT_SCHEME)
         val kmpNewSignedK1 = Crypto.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(k1), privateKey = kmpNewAuthKey)).toHex()
 
         val expectedLegacyPubkey = "024d82b199464c9568f5cce92cf7370a8154d9ec0571905b596a4e9dcae69136d8"
@@ -61,6 +62,7 @@ class LnurlAuthTest {
         val seed = `MnemonicCode$`.`MODULE$`.toSeed("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about", "")
         val legacyKeyManager = fr.acinq.eclair.crypto.LocalKeyManager(seed, Block.LivenetGenesisBlock().hash())
         val kmpKeyManager = LocalKeyManager(seed = seed.toArray().byteVector64(), Chain.Mainnet.chainHash)
+        val master = DeterministicWallet.generate(seed.toArray())
 
         val k1 = "32c56da24a28e09d24832e1cba0cc391049c48036c197e228c7656d022a5eb1f"
         val url = Url("https://foo.bar.com/auth?tag=login&k1=$k1")
@@ -68,10 +70,10 @@ class LnurlAuthTest {
         // legacy key
         val (legacySignedK1, legacyAuthKey) = LNUrlAuthFragment.signLnurlAuthK1WithKey(legacyKeyManager, k1, url.toString().toHttpUrlOrNull()!!)
         // kmp key when using the legacy friendly scheme
-        val kmpLegacyAuthKey = LnurlAuth.getAuthLinkingKey(kmpKeyManager, url, LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME)
+        val kmpLegacyAuthKey = LnurlAuth.getAuthLinkingKey(kmpKeyManager, master, url, LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME)
         val kmpLegacySignedK1 = Crypto.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(k1), privateKey = kmpLegacyAuthKey)).toHex()
         // kmp key when using the default scheme
-        val kmpNewAuthKey = LnurlAuth.getAuthLinkingKey(kmpKeyManager, url, LnurlAuth.Scheme.DEFAULT_SCHEME)
+        val kmpNewAuthKey = LnurlAuth.getAuthLinkingKey(kmpKeyManager, master, url, LnurlAuth.Scheme.DEFAULT_SCHEME)
         val kmpNewSignedK1 = Crypto.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(k1), privateKey = kmpNewAuthKey)).toHex()
 
         val expectedPubkey = "02ebfff275eccdd929a3843eff9481a53b0445cdae9a931fd43baa91dcd35836e9"

@@ -21,7 +21,6 @@ import fr.acinq.bitcoin.crypto.Digest
 import fr.acinq.bitcoin.crypto.Pack
 import fr.acinq.bitcoin.crypto.hmac
 import fr.acinq.lightning.crypto.LocalKeyManager
-import fr.acinq.phoenix.data.Wallet
 import fr.acinq.phoenix.data.lnurl.Lnurl.Companion.log
 import io.ktor.http.*
 
@@ -83,7 +82,8 @@ data class LnurlAuth(
          * @param scheme This type helps with backward compatibility. We use compatibility keys on some domains, see [LegacyDomain].
          */
         fun getAuthLinkingKey(
-            wallet: Wallet,
+            localKeyManager: LocalKeyManager,
+            master: DeterministicWallet.ExtendedPrivateKey,
             serviceUrl: Url,
             scheme: Scheme
         ): PrivateKey {
@@ -91,9 +91,9 @@ data class LnurlAuth(
             val useAndroidLegacyScheme = scheme == Scheme.ANDROID_LEGACY_SCHEME && LegacyDomain.isEligible(serviceUrl)
             val hashingKeyPath = KeyPath("m/138'/0")
             val hashingKey = if (useAndroidLegacyScheme) {
-                DeterministicWallet.derivePrivateKey(wallet.legacyNodeKey, hashingKeyPath)
+                DeterministicWallet.derivePrivateKey(localKeyManager.legacyNodeKey, hashingKeyPath)
             } else {
-                DeterministicWallet.derivePrivateKey(wallet.master, hashingKeyPath)
+                DeterministicWallet.derivePrivateKey(master, hashingKeyPath)
             }
             // the domain used for the derivation path may not be the full domain name.
             val path = getDerivationPathForDomain(
@@ -103,7 +103,7 @@ data class LnurlAuth(
             return if (useAndroidLegacyScheme) {
                 DeterministicWallet.derivePrivateKey(hashingKey, path).privateKey
             } else {
-                DeterministicWallet.derivePrivateKey(wallet.master, path).privateKey
+                DeterministicWallet.derivePrivateKey(master, path).privateKey
             }
         }
 

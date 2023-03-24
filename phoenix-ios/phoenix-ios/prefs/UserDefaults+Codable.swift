@@ -113,7 +113,7 @@ enum RecentPaymentsConfig: Equatable, Codable, Identifiable {
 	case withinTime(seconds: Int)
 	case mostRecent(count: Int)
 	case inFlightOnly
-	
+
 	var id: String {
 		switch self {
 		case .withinTime(let seconds):

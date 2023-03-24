@@ -116,6 +116,6 @@ extension LogsConfiguration {
 	typealias Model_Awaiting = ModelAwaiting
 	typealias Model_Exporting = ModelExporting
 	typealias Model_Ready = ModelReady
-	
+
 	typealias Intent_Export = IntentExport
 }

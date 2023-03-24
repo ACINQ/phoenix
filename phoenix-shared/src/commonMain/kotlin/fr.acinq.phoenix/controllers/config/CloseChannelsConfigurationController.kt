@@ -2,6 +2,7 @@ package fr.acinq.phoenix.controllers.config
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.KeyPath
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.io.WrappedChannelEvent
 import fr.acinq.phoenix.PhoenixBusiness
@@ -96,11 +97,10 @@ class AppCloseChannelsConfigurationController(
                         isClosable(it.status)
                     }
                     val path = when (chain) {
-                        Chain.Mainnet -> "m/84'/0'/0'/0/0"
-                        else -> "m/84'/1'/0'/0/0"
+                        Chain.Mainnet -> KeyPath("m/84'/0'/0'/0/0")
+                        else -> KeyPath("m/84'/1'/0'/0/0")
                     }
-                    val wallet = walletManager.wallet.value!!
-                    val address = wallet.onchainAddress(path)
+                    val address = walletManager.onchainAddress(path)
 
                     model(CloseChannelsConfiguration.Model.Ready(
                         channels = closableChannelsList,

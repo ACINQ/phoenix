@@ -61,7 +61,6 @@ import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.legacy.utils.MigrationResult
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import fr.acinq.phoenix.managers.Connections
-import fr.acinq.phoenix.managers.WalletBalance
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
@@ -91,7 +90,7 @@ fun HomeView(
     }
 
     val payments by paymentsViewModel.latestPaymentsFlow.collectAsState()
-    val swapInBalance = business.balanceManager.swapInWalletBalance.collectAsState()
+    val swapInBalance = business.balanceManager.incomingSwaps.collectAsState()
 
     // controls for the migration dialog
     val migrationResult = PrefsDatastore.getMigrationResult(context).collectAsState(initial = null).value
@@ -136,7 +135,7 @@ fun HomeView(
                     }
                 )
             }
-            IncomingAmountNotif(walletContext.value?.swapIn?.v1, swapInBalance.value)
+//            IncomingAmountNotif(walletContext.value?.swapIn?.v1, swapInBalance.value)
             Column(modifier = Modifier.weight(1f, fill = true), horizontalAlignment = Alignment.CenterHorizontally) {
                 LatestPaymentsList(
                     payments = payments,
@@ -306,7 +305,6 @@ private fun ConnectionDialogLine(
 @Composable
 private fun IncomingAmountNotif(
     swapInParams: WalletContext.V0.SwapIn.V1?,
-    swapInBalance: WalletBalance
 ) {
     Column(modifier = Modifier.heightIn(min = 54.dp), verticalArrangement = Arrangement.Top) {
         var showValidSwapInInfoDialog by remember { mutableStateOf(false) }
@@ -327,37 +325,6 @@ private fun IncomingAmountNotif(
                 swapInFeePercent = swapInParams.feePercent,
                 swapInMinFee = swapInParams.minFeeSat.sat
             )
-        }
-
-        if (swapInBalance != WalletBalance.empty()) {
-            val balance = swapInBalance.total
-            // swap-in is invalid if amount < min_funding
-            val isInvalid = swapInParams?.let { balance < it.minFundingSat.sat } ?: false
-            if (isInvalid) {
-                FilledButton(
-                    text = stringResource(id = R.string.home__swapin_incoming, balance.toMilliSatoshi().toPrettyString(preferredAmountUnit, fiatRate, withUnit = true)),
-                    textStyle = MaterialTheme.typography.caption.copy(color = negativeColor()),
-                    icon = R.drawable.ic_alert_triangle,
-                    iconTint = negativeColor(),
-                    padding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    backgroundColor = Color.Transparent,
-                    onClick = {
-                        showValidSwapInInfoDialog = false
-                        showInvalidSwapInInfoDialog = true
-                    }
-                )
-            } else {
-                FilledButton(
-                    text = stringResource(id = R.string.home__swapin_incoming, balance.toMilliSatoshi().toPrettyString(preferredAmountUnit, fiatRate, withUnit = true)),
-                    textStyle = MaterialTheme.typography.caption,
-                    padding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    backgroundColor = Color.Transparent,
-                    onClick = {
-                        showValidSwapInInfoDialog = true
-                        showInvalidSwapInInfoDialog = false
-                    }
-                )
-            }
         }
     }
 }

@@ -79,14 +79,12 @@ class CsvExportViewModel(
         }) {
             if (state is CsvExportState.Generating) return@launch
             if (startTimestampMillis == null) throw IllegalArgumentException("start timestamp is undefined")
-            val swapInAddress = peerManager.getPeer().swapInAddress
             state = CsvExportState.Generating(exportedCount = 0)
             val csvConfig = CsvWriter.Configuration(
                 includesFiat = includesFiat,
                 includesDescription = includesDescription,
                 includesNotes = includesNotes,
                 includesOriginDestination = includesOriginDestination,
-                swapInAddress = swapInAddress
             )
             log.debug("exporting payments data between start=${startTimestampMillis?.toAbsoluteDateTimeString()} end=${endTimestampMillis.toAbsoluteDateTimeString()} config=$csvConfig")
             val batchSize = 32

@@ -161,7 +161,6 @@ private fun HeaderForIncoming(
                 is IncomingPayment.Origin.Invoice -> stringResource(R.string.paymentdetails_normal_incoming)
                 is IncomingPayment.Origin.KeySend -> stringResource(R.string.paymentdetails_keysend)
                 is IncomingPayment.Origin.SwapIn -> stringResource(R.string.paymentdetails_swapin)
-                is IncomingPayment.Origin.DualSwapIn -> stringResource(R.string.paymentdetails_swapin)
             }
         )
     }
@@ -222,25 +221,7 @@ private fun AmountSection(
                 mSatDisplayPolicy = if (hideMsat) MSatDisplayPolicy.HIDE else MSatDisplayPolicy.SHOW
             )
         }
-        is IncomingPayment -> {
-            val receivedWithNewChannel = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>() ?: emptyList()
-            if (receivedWithNewChannel.isNotEmpty()) {
-                val serviceFee = receivedWithNewChannel.map { it.serviceFee }.sum()
-                val fundingFee = receivedWithNewChannel.map { it.fundingFee }.sum()
-                TechnicalRowAmount(
-                    label = stringResource(id = R.string.paymentdetails_service_fees_label),
-                    amount = serviceFee,
-                    rateThen = rateThen,
-                    mSatDisplayPolicy = MSatDisplayPolicy.SHOW
-                )
-                TechnicalRowAmount(
-                    label = stringResource(id = R.string.paymentdetails_funding_fees_label),
-                    amount = fundingFee.toMilliSatoshi(),
-                    rateThen = rateThen,
-                    mSatDisplayPolicy = MSatDisplayPolicy.HIDE
-                )
-            }
-        }
+        is IncomingPayment -> {}
     }
 }
 
@@ -303,17 +284,6 @@ private fun DetailsForIncoming(
             }
         }
         is IncomingPayment.Origin.KeySend -> {}
-        is IncomingPayment.Origin.DualSwapIn -> {
-            TechnicalRow(label = stringResource(id = R.string.paymentdetails_dualswapin_tx_label)) {
-                origin.localInputs.mapIndexed { index, outpoint ->
-                    Row {
-                        Text(text = stringResource(id = R.string.paymentdetails_dualswapin_tx_value, index + 1))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        WebLink(text = outpoint.txid.toHex(), url = txUrl(txId = outpoint.txid.toHex()), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    }
-                }
-            }
-        }
     }
 }
 

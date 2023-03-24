@@ -47,11 +47,11 @@ struct ConfigurationView: View {
 	
 	@State var didAppear = false
 	@State var popToRootRequested = false
-	
+
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	
+
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
-	
+
 	init() {
 		if let encryptedNodeId = Biz.encryptedNodeId {
 			backupSeedStatePublisher = Prefs.shared.backupSeedStatePublisher(encryptedNodeId)
@@ -59,11 +59,11 @@ struct ConfigurationView: View {
 			backupSeedStatePublisher = PassthroughSubject<BackupSeedState, Never>().eraseToAnyPublisher()
 		}
 	}
-	
+
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
-	
+
 	@ViewBuilder
 	var body: some View {
 
@@ -71,13 +71,13 @@ struct ConfigurationView: View {
 			.navigationTitle(NSLocalizedString("Settings", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 	}
-	
+
 	@ViewBuilder
 	func content() -> some View {
 
 		List {
 			let hasWallet = hasWallet()
-			
+
 			section_general(hasWallet)
 			if hasWallet {
 				section_security()
@@ -106,18 +106,18 @@ struct ConfigurationView: View {
 			onExternalLightningUrl(url)
 		}
 	}
-	
+
 	@ViewBuilder
 	func section_general(_ hasWallet: Bool) -> some View {
-		
+
 		Section(header: Text("General")) {
-			
+
 			navLink(.AboutView) {
 				Label { Text("About") } icon: {
 					Image(systemName: "info.circle")
 				}
 			}
-		
+
 			navLink(.DisplayConfigurationView) {
 				Label {
 					switch notificationPermissions {
@@ -129,7 +129,7 @@ struct ConfigurationView: View {
 								.renderingMode(.template)
 								.foregroundColor(Color.appWarn)
 						}
-						
+
 					default:
 						Text("Display")
 					}
@@ -137,15 +137,15 @@ struct ConfigurationView: View {
 					Image(systemName: "paintbrush.pointed")
 				}
 			}
-	
+
 			navLink(.PaymentOptionsView) {
 				Label { Text("Payment options & fees") } icon: {
 					Image(systemName: "wrench")
 				}
 			}
-		
+
 			if hasWallet {
-				
+
 				navLink(.RecoveryPhraseView) {
 					Label {
 						switch backupSeedState {
@@ -170,21 +170,21 @@ struct ConfigurationView: View {
 						Image(systemName: "squareshape.split.3x3")
 					}
 				}
-				
+
 				navLink(.DrainWalletView) {
 					Label { Text("Drain wallet") } icon: {
 						Image(systemName: "xmark.circle")
 					}
 				}
-			
+
 			} // </if: hasWallet>
-			
+
 		} // </Section: General>
 	}
-	
+
 	@ViewBuilder
 	func section_security() -> some View {
-		
+
 		Section(header: Text("Security")) {
 
 			navLink(.AppAccessView) {
@@ -195,10 +195,10 @@ struct ConfigurationView: View {
 
 		} // </Section: Security>
 	}
-	
+
 	@ViewBuilder
 	func section_advanced(_ hasWallet: Bool) -> some View {
-		
+
 		Section(header: Text("Advanced")) {
 
 			navLink(.PrivacyView) {
@@ -214,7 +214,7 @@ struct ConfigurationView: View {
 					}
 				}
 			}
-			
+
 			navLink(.LogsConfigurationView) {
 				Label { Text("Logs") } icon: {
 					Image(systemName: "doc.text")
@@ -237,7 +237,7 @@ struct ConfigurationView: View {
 		_ tag: NavLinkTag,
 		label: () -> Content
 	) -> some View where Content: View {
-		
+
 		NavigationLink(
 			destination: navLinkView(tag),
 			tag: tag,
@@ -245,20 +245,20 @@ struct ConfigurationView: View {
 			label: label
 		)
 	}
-	
+
 	@ViewBuilder
 	func navLinkView() -> some View {
-		
+
 		if let tag = self.navLinkTag {
 			navLinkView(tag)
 		} else {
 			EmptyView()
 		}
 	}
-	
+
 	@ViewBuilder
 	private func navLinkView(_ tag: NavLinkTag) -> some View {
-		
+
 		switch tag {
 		// General
 			case .AboutView                 : AboutView()
@@ -275,13 +275,13 @@ struct ConfigurationView: View {
 			case .ResetWalletView           : ResetWalletView()
 		}
 	}
-	
+
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
 	private func navLinkTagBinding(_ tag: NavLinkTag?) -> Binding<Bool> {
-		
+
 		if let tag { // specific tag
 			return Binding<Bool>(
 				get: { navLinkTag == tag },
@@ -294,23 +294,16 @@ struct ConfigurationView: View {
 			)
 		}
 	}
-	
+
 	func hasWallet() -> Bool {
-		
-		let walletManager = Biz.business.walletManager
-		let hasWalletFlow = SwiftStateFlow<NSNumber>(origin: walletManager.hasWallet)
-		
-		if let value = hasWalletFlow.value_ {
-			return value.boolValue
-		} else {
-			return false
-		}
+			
+		return Biz.business.walletManager.isLoaded()
 	}
 	
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
-	
+
 	func onAppear() {
 		log.trace("onAppear()")
 		
@@ -342,7 +335,7 @@ struct ConfigurationView: View {
 				popToRootRequested = false
 				presentationMode.wrappedValue.dismiss()
 			}
-				
+
 			if #unavailable(iOS 15.0) {
 				// iOS 14 BUG and workaround.
 				//
@@ -447,27 +440,27 @@ struct ConfigurationView: View {
 			navLinkTag = nil
 		}
 	}
-	
+
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
-	
+
 	func popToRoot() {
 		log.trace("popToRoot")
-		
+
 		popToRootRequested = true
 	}
-	
+
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
-	
+
 	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
-		
+
 		let idx = self.swiftUiBugWorkaroundIdx
-		
+
 		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-			
+
 			if self.swiftUiBugWorkaroundIdx == idx {
 				log.debug("swiftUiBugWorkaround = nil")
 				self.swiftUiBugWorkaround = nil

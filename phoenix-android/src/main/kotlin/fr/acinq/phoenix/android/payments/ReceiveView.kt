@@ -52,7 +52,6 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.controllers.payments.Receive
 import fr.acinq.phoenix.data.BitcoinUnit
-import fr.acinq.phoenix.managers.WalletBalance
 
 sealed class ReceiveViewState {
     object Default : ReceiveViewState()
@@ -74,17 +73,6 @@ fun ReceiveView(
     safeLet(invoiceDefaultDesc, invoiceDefaultExpiry) { description, expiry ->
         val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(controllerFactory, CF::receive, description, expiry))
         MVIView(vm) { model, postIntent ->
-            // effect when a swap-in is received
-            LaunchedEffect(key1 = Unit) {
-                var previousBalance: WalletBalance? = null
-                business.balanceManager.swapInWalletBalance.collect {
-                    if (previousBalance != null && it.total > 0.sat && it != previousBalance) {
-                        onSwapInReceived()
-                    } else {
-                        previousBalance = it
-                    }
-                }
-            }
             // back action handler
             val onBack: () -> Unit = {
                 when (vm.state) {
@@ -137,7 +125,7 @@ fun ReceiveView(
                                     onSwapInClick = { postIntent(Receive.Intent.RequestSwapIn) },
                                 )
                             }
-                            is Receive.Model.SwapIn -> {
+                            is Receive.Model.SwapIn.Generated -> {
                                 LaunchedEffect(model.address) {
                                     vm.generateQrCodeBitmap(invoice = model.address)
                                 }

@@ -275,8 +275,7 @@ object LegacyMigrationHelper {
                 IncomingPayment.ReceivedWith.NewChannel(
                     id = UUID.randomUUID(),
                     amount = status.amount().toLong().msat,
-                    serviceFee = payToOpenMeta?.fee_sat?.sat?.toMilliSatoshi() ?: 0.msat,
-                    fundingFee = 0.sat,
+                    fees = payToOpenMeta?.fee_sat?.sat?.toMilliSatoshi() ?: 0.msat,
                     channelId = ByteVector32.Zeroes
                 )
             } else {
@@ -319,7 +318,7 @@ object LegacyMigrationHelper {
                     amount = head.recipientAmount().toLong().msat,
                     paymentHash = head.paymentHash().bytes().toArray().byteVector32(),
                     privateKey = Lightning.randomKey(),
-                    description = Either.Left("swap-out to ${paymentMeta.swap_out_address} for ${paymentMeta.swap_out_feerate_per_byte} sat/b"),
+                    description = "swap-out to ${paymentMeta.swap_out_address} for ${paymentMeta.swap_out_feerate_per_byte} sat/b",
                     minFinalCltvExpiryDelta = PaymentRequest.DEFAULT_MIN_FINAL_EXPIRY_DELTA,
                     features = Features.empty
                 ),

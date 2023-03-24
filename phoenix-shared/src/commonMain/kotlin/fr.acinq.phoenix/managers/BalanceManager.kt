@@ -1,7 +1,5 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.io.*
 import fr.acinq.lightning.utils.*

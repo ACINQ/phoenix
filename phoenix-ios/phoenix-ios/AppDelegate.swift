@@ -71,7 +71,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			// And we prefer to have more fine-grained control.
 			// For example, in the CurrencyConverterView we're instead using
 			// .listBackgroundColor(Color(.systemBackground))
-			
+
 		} else {
 			// iOS 15 & 14
 			UITableView.appearance().backgroundColor = .primaryBackground
@@ -109,7 +109,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		CrossProcessCommunication.shared.start(actor: .mainApp) { (_: XpcMessage) in
 			self.didReceiveMessageFromAppExtension()
 		}
-		
+
 		NotificationsManager.shared.requestPermissionForProvisionalNotifications()
 		
 		return true
@@ -225,7 +225,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	) {
 		log.trace("messaging(_:didReceiveRegistrationToken:)")
 		log.debug("Firebase registration token: \(String(describing: fcmToken))")
-		
+
 		assertMainThread()
 		
 		if let fcmToken = fcmToken {

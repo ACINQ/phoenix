@@ -175,7 +175,6 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
             is IncomingPayment.Origin.Invoice -> o.paymentRequest.description
             is IncomingPayment.Origin.KeySend -> stringResource(id = R.string.paymentline_keysend_incoming)
             is IncomingPayment.Origin.SwapIn -> o.address ?: stringResource(id = R.string.paymentline_swap_in_desc)
-            is IncomingPayment.Origin.DualSwapIn -> stringResource(id = R.string.paymentline_swap_in_desc)
         }
     }.takeIf { !it.isNullOrBlank() }
     Text(
@@ -226,7 +225,7 @@ private fun PaymentIcon(payment: WalletPayment) {
                     backgroundColor = MaterialTheme.colors.primary
                 )
             }
-            payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().any { !it.confirmed } -> {
+            payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().any() -> {
                 PaymentIconComponent(
                     icon = R.drawable.ic_clock,
                     description = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
@@ -237,13 +236,13 @@ private fun PaymentIcon(payment: WalletPayment) {
             }
             else -> {
                 PaymentIconComponent(
-                    icon = if (payment.origin is IncomingPayment.Origin.SwapIn || payment.origin is IncomingPayment.Origin.DualSwapIn) {
+                    icon = if (payment.origin is IncomingPayment.Origin.SwapIn) {
                         R.drawable.ic_payment_success_onchain
                     } else {
                         R.drawable.ic_payment_success
                     },
                     description = stringResource(id = R.string.paymentdetails_status_received_successful),
-                    iconSize = if (payment.origin is IncomingPayment.Origin.SwapIn || payment.origin is IncomingPayment.Origin.DualSwapIn) {
+                    iconSize = if (payment.origin is IncomingPayment.Origin.SwapIn) {
                         14.dp
                     } else {
                         18.dp
