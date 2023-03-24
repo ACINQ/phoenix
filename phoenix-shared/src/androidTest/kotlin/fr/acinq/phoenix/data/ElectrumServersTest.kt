@@ -43,8 +43,8 @@ actual suspend fun connect(server: ServerAddress) {
                         }
 
                         override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {
-                            val serverKey = JvmTcpSocket.buildPublicKey(chain?.asList()?.firstOrNull()?.publicKey?.encoded ?: throw CertificateException("certificate missing"), logger)
-                            val pinnedKey = JvmTcpSocket.buildPublicKey(Base64.getDecoder().decode(expectedPubkey), logger)
+                            val serverKey = JvmTcpSocket.buildPublicKey(chain?.asList()?.firstOrNull()?.publicKey?.encoded ?: throw CertificateException("certificate missing"))
+                            val pinnedKey = JvmTcpSocket.buildPublicKey(Base64.getDecoder().decode(expectedPubkey))
 
                             if (serverKey != pinnedKey) {
                                 throw BadCertificate(expectedPubkey, actualPubkey = Base64.getEncoder().encodeToString(serverKey.encoded))

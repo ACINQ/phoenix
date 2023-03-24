@@ -34,10 +34,8 @@ class CsvWriterTests {
                     IncomingPayment.ReceivedWith.NewChannel(
                         id = UUID.randomUUID(),
                         amount = 12_000_000.msat,
-                        serviceFee = 3_000_000.msat,
-                        fundingFee = 0.sat,
+                        fees = 3_000_000.msat,
                         channelId = randomBytes32(),
-                        confirmed = true
                     )
                 ),
                 receivedAt = 1675270272445
@@ -219,41 +217,6 @@ class CsvWriterTests {
     }
 
     @Test
-    fun testRow_Incoming_NewChannel_DualSwapIn() {
-        val payment = IncomingPayment(
-            preimage = randomBytes32(),
-            origin = IncomingPayment.Origin.DualSwapIn(localInputs = setOf()),
-            received = IncomingPayment.Received(
-                receivedWith = setOf(
-                    IncomingPayment.ReceivedWith.NewChannel(
-                        id = UUID.randomUUID(),
-                        amount = 12_000_000.msat,
-                        serviceFee = 2_931_000.msat,
-                        fundingFee = 69.sat,
-                        channelId = randomBytes32(),
-                        confirmed = true
-                    )
-                ),
-                receivedAt = 1675271683668
-            ),
-            createdAt = 0
-        )
-        val metadata = makeMetadata(
-            exchangeRate = 22999.83,
-            userNotes = "Via dual-funding flow"
-        )
-
-        val expected = "2023-02-01T17:14:43.668Z,12000000,-3000000,2.7599 USD,-0.6899 USD,Swap-in to tb1qf72v4qyczf7ymmqtr8z3vfqn6dapzl3e7l6tjv,L1 Top-up,Via dual-funding flow\r\n"
-        val actual = CsvWriter.makeRow(
-            info = WalletPaymentInfo(payment, metadata, WalletPaymentFetchOptions.All),
-            localizedDescription = "L1 Top-up",
-            config = makeConfig()
-        )
-
-        assertEquals(expected, actual)
-    }
-
-    @Test
     fun testRow_Outgoing_SwapOut() {
         val payment = OutgoingPayment(
             id = UUID.randomUUID(),
@@ -379,6 +342,5 @@ class CsvWriterTests {
             includesDescription = true,
             includesNotes = true,
             includesOriginDestination = true,
-            swapInAddress = swapInAddress
         )
 }
