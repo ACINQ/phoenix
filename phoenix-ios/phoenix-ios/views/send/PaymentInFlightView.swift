@@ -14,7 +14,7 @@ struct PaymentInFlightView: View {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 			
-			if AppDelegate.showTestnetBackground {
+			if BusinessManager.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.ignoresSafeArea(.all, edges: .all)

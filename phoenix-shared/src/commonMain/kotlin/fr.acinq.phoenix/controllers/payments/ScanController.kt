@@ -27,10 +27,7 @@ import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.io.*
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.utils.secure
-import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.SwapOutRequest
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
@@ -39,24 +36,19 @@ import fr.acinq.phoenix.data.lnurl.*
 import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.Parser
-import fr.acinq.phoenix.utils.chain
+import fr.acinq.phoenix.utils.extensions.chain
 import fr.acinq.phoenix.utils.createTrampolineFees
+import io.ktor.http.Url
 import kotlinx.coroutines.*
-import io.ktor.http.*
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
 import org.kodein.log.LoggerFactory
 import kotlin.random.Random
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
-import kotlin.time.seconds
 
 class AppScanController(
     loggerFactory: LoggerFactory,
@@ -71,7 +63,7 @@ class AppScanController(
     firstModel = firstModel ?: Scan.Model.Ready
 ) {
 
-    /** Arbitraty identifier used to track the current lnurl task. Those tasks are asynchronous and can be cancelled. We use this field to track which one is in progress. */
+    /** Arbitrary identifier used to track the current lnurl task. Those tasks are asynchronous and can be cancelled. We use this field to track which one is in progress. */
     private var lnurlRequestId = 1
 
     /** Tracks the task fetching information for a given lnurl. Use this field to cancel the task (see [cancelLnurlFetch]). */
@@ -95,7 +87,7 @@ class AppScanController(
 
     init {
         launch {
-            peerManager.getPeer().openListenerEventSubscription().consumeEach { event ->
+            peerManager.getPeer().eventsFlow.collect { event ->
                 when (event) {
                     is SwapOutResponseEvent -> {
                         val currentModel = models.value
@@ -110,7 +102,7 @@ class AppScanController(
                             )
                         }
                     }
-                    else -> Unit
+                    else -> {}
                 }
             }
         }
@@ -118,6 +110,7 @@ class AppScanController(
 
     override fun process(intent: Scan.Intent) {
         when (intent) {
+            is Scan.Intent.Reset -> launch { model(Scan.Model.Ready) }
             is Scan.Intent.Parse -> launch { processScannedInput(intent) }
             is Scan.Intent.InvoiceFlow.ConfirmDangerousRequest -> launch { confirmAmountlessInvoice(intent) }
             is Scan.Intent.InvoiceFlow.SendInvoicePayment -> launch {
@@ -165,15 +158,19 @@ class AppScanController(
             processLightningInvoice(it)
         } ?: readLnurl(input)?.let {
             processLnurl(it)
-        } ?: Parser.readBitcoinAddress(chain, input).let {
-            processBitcoinAddress(it)
+        } ?: readBitcoinAddress(input)?.let {
+            processBitcoinAddress(input, it)
+        } ?: readLNURLFallback(input)?.let {
+            processLnurl(it)
+        } ?: run {
+            model(Scan.Model.BadRequest(request = intent.request, reason = Scan.BadRequestReason.UnknownFormat))
         }
     }
 
     /** Inspects the Lightning invoice for errors and update the model with the adequate value. */
     private suspend fun processLightningInvoice(paymentRequest: PaymentRequest) {
         val model = checkForBadRequest(paymentRequest)?.let {
-            Scan.Model.BadRequest(it)
+            Scan.Model.BadRequest(request = paymentRequest.write(), reason = it)
         } ?: checkForDangerousRequest(paymentRequest)?.let {
             Scan.Model.InvoiceFlow.DangerousRequest(paymentRequest.write(), paymentRequest, it)
         } ?: Scan.Model.InvoiceFlow.InvoiceRequest(
@@ -184,16 +181,18 @@ class AppScanController(
     }
 
     /** Return the adequate model for a Bitcoin address result. */
-    private suspend fun processBitcoinAddress(data: Either<BitcoinAddressError, BitcoinAddressInfo>) {
-        logger.info { "processing bitcoin address=$data" }
-        val model = when (data) {
-            is Either.Right -> Scan.Model.SwapOutFlow.Init(address = data.value)
+    private suspend fun processBitcoinAddress(
+        input: String,
+        result: Either<BitcoinAddressError, BitcoinAddressInfo>
+    ) {
+        val model = when (result) {
+            is Either.Right -> Scan.Model.SwapOutFlow.Init(address = result.value)
             is Either.Left -> {
-                val error = data.value
+                val error = result.value
                 if (error is BitcoinAddressError.ChainMismatch) {
-                    Scan.Model.BadRequest(reason = Scan.BadRequestReason.ChainMismatch(myChain = error.myChain, requestChain = error.addrChain))
+                    Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.ChainMismatch(myChain = error.myChain, requestChain = error.addrChain))
                 } else {
-                    Scan.Model.BadRequest(reason = Scan.BadRequestReason.UnknownFormat)
+                    Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.UnknownFormat)
                 }
             }
         }
@@ -227,6 +226,7 @@ class AppScanController(
                     try {
                         Either.Right(task.await())
                     } catch (e: Exception) {
+                        logger.error(e) { "failed to process lnurl=$lnurl" }
                         when (e) {
                             is LnurlError.RemoteFailure -> Either.Left(Scan.BadRequestReason.ServiceError(url, e))
                             else -> Either.Left(Scan.BadRequestReason.InvalidLnurl(url))
@@ -235,7 +235,7 @@ class AppScanController(
                 }
                 when (result) {
                     null -> Unit
-                    is Either.Left -> model(Scan.Model.BadRequest(result.value))
+                    is Either.Left -> model(Scan.Model.BadRequest(request = url.toString(), reason = result.value))
                     is Either.Right -> { // result: Lnurl
                         when (val res = result.value) {
                             is LnurlPay.Intent -> {
@@ -245,7 +245,7 @@ class AppScanController(
                                 model(Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(lnurlWithdraw = res, error = null))
                             }
                             else -> {
-                                model(Scan.Model.BadRequest(Scan.BadRequestReason.UnsupportedLnurl(url)))
+                                model(Scan.Model.BadRequest(request = url.toString(), reason = Scan.BadRequestReason.UnsupportedLnurl(url)))
                             }
                         }
                     }
@@ -368,6 +368,7 @@ class AppScanController(
         when (result) {
             null -> Unit
             is Either.Left -> {
+                logger.info { "lnurl-pay has failed with result=$result" }
                 model(
                     Scan.Model.LnurlPayFlow.LnurlPayRequest(
                         paymentIntent = intent.paymentIntent,
@@ -500,29 +501,31 @@ class AppScanController(
     private suspend fun processLnurlAuth(
         intent: Scan.Intent.LnurlAuthFlow.Login
     ) {
-        model(Scan.Model.LnurlAuthFlow.LoggingIn(auth = intent.auth))
-        val start = TimeSource.Monotonic.markNow()
-        val error = try {
-            lnurlManager.signAndSendAuthRequest(
-                auth = intent.auth,
-                scheme = intent.scheme
-            )
-            null
-        } catch (e: LnurlError.RemoteFailure.CouldNotConnect) {
-            Scan.LoginError.NetworkError(details = e)
-        } catch (e: LnurlError.RemoteFailure) {
-            Scan.LoginError.ServerError(details = e)
-        } catch (e: Throwable) {
-            Scan.LoginError.OtherError(details = e)
-        }
-        if (error != null) {
-            model(Scan.Model.LnurlAuthFlow.LoginResult(auth = intent.auth, error = error))
-        } else {
-            val pending = Duration.seconds(intent.minSuccessDelaySeconds) - start.elapsedNow()
-            if (pending > Duration.ZERO) {
-                delay(pending)
+        withContext(Dispatchers.Default) {
+            model(Scan.Model.LnurlAuthFlow.LoggingIn(auth = intent.auth))
+            val start = TimeSource.Monotonic.markNow()
+            val error = try {
+                lnurlManager.signAndSendAuthRequest(
+                    auth = intent.auth,
+                    scheme = intent.scheme
+                )
+                null
+            } catch (e: LnurlError.RemoteFailure.CouldNotConnect) {
+                Scan.LoginError.NetworkError(details = e)
+            } catch (e: LnurlError.RemoteFailure) {
+                Scan.LoginError.ServerError(details = e)
+            } catch (e: Throwable) {
+                Scan.LoginError.OtherError(details = e)
             }
-            model(Scan.Model.LnurlAuthFlow.LoginResult(auth = intent.auth, error = error))
+            if (error != null) {
+                model(Scan.Model.LnurlAuthFlow.LoginResult(auth = intent.auth, error = error))
+            } else {
+                val pending = intent.minSuccessDelaySeconds.seconds - start.elapsedNow()
+                if (pending > Duration.ZERO) {
+                    delay(pending)
+                }
+                model(Scan.Model.LnurlAuthFlow.LoginResult(auth = intent.auth, error = error))
+            }
         }
     }
 
@@ -553,10 +556,16 @@ class AppScanController(
                 is Lnurl.Request -> Scan.ClipboardContent.LnurlRequest(it.initialUrl)
                 else -> null
             }
-        } ?: Parser.readBitcoinAddress(chain, input).let {
+        } ?: readBitcoinAddress(input)?.let {
             when (it) {
                 is Either.Left -> null
                 is Either.Right -> Scan.ClipboardContent.BitcoinRequest(it.value)
+            }
+        } ?: readLNURLFallback(input)?.let {
+            when (it) {
+                is LnurlAuth -> Scan.ClipboardContent.LoginRequest(it)
+                is Lnurl.Request -> Scan.ClipboardContent.LnurlRequest(it.initialUrl)
+                else -> null
             }
         }
     }
@@ -569,6 +578,10 @@ class AppScanController(
         val requestChain = paymentRequest.chain()
         if (chain != requestChain) {
             return Scan.BadRequestReason.ChainMismatch(chain, requestChain)
+        }
+
+        if (paymentRequest.isExpired(currentTimestampSeconds())) {
+            return Scan.BadRequestReason.Expired(paymentRequest.timestampSeconds, paymentRequest.expirySeconds ?: PaymentRequest.DEFAULT_EXPIRY_SECONDS.toLong())
         }
 
         val db = databaseManager.databases.filterNotNull().first()
@@ -589,6 +602,34 @@ class AppScanController(
     /** Reads a lnurl and return either a lnurl-auth (i.e. a http query that must not be called automatically), or the actual url embedded in the lnurl (that can be called afterwards). */
     private fun readLnurl(input: String): Lnurl? = try {
         Lnurl.extractLnurl(input)
+    } catch (t: Throwable) {
+        null
+    }
+
+    /**
+     * Invokes `Parser.readBitcoinAddress`, but maps the
+     * generic `BitcoinAddressError.UnknownFormat` to a null result instead.
+     */
+    private fun readBitcoinAddress(input: String): Either<BitcoinAddressError, BitcoinAddressInfo>? {
+        return when (val result = Parser.readBitcoinAddress(chain, input)) {
+            is Either.Left -> when (result.left) {
+                is BitcoinAddressError.UnknownFormat -> null
+                else -> result
+            }
+            is Either.Right -> result
+        }
+    }
+
+    /**
+     * Support for LNURL Fallback Scheme,
+     * e.g. as used by Bitcoin Beach Wallet's static Paycode QR.
+     * https://github.com/ACINQ/phoenix/issues/323
+     */
+    private fun readLNURLFallback(input: String): Lnurl? = try {
+        val url = Url(input)
+        url.parameters["lightning"]?.let { fallback ->
+            Lnurl.extractLnurl(fallback)
+        }
     } catch (t: Throwable) {
         null
     }

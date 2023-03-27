@@ -6,7 +6,6 @@ import android.net.Network
 import android.net.NetworkRequest
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +14,6 @@ import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
 
-@ExperimentalCoroutinesApi
 actual class NetworkMonitor actual constructor(loggerFactory: LoggerFactory, val ctx: PlatformContext) : CoroutineScope by MainScope() {
 
     val logger = newLogger(loggerFactory)

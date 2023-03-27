@@ -17,6 +17,9 @@
 package fr.acinq.phoenix.android.payments
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -31,13 +34,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.android.utils.mutedItalicTypo
 import fr.acinq.phoenix.android.utils.mutedTextColor
-import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.controllers.payments.MaxFees
 import fr.acinq.phoenix.controllers.payments.Scan
 
@@ -53,53 +56,73 @@ fun SendLightningPaymentView(
     log.info { "init sendview amount=${paymentRequest.amount} desc=${paymentRequest.description}" }
 
     val context = LocalContext.current
-    val balance = business.peerManager.balance.collectAsState(null).value
+    val balance = business.balanceManager.balance.collectAsState(null).value
+    val prefBitcoinUnit = LocalBitcoinUnit.current
 
     val requestedAmount = paymentRequest.amount
     var amount by remember { mutableStateOf(requestedAmount) }
     var amountErrorMessage by remember { mutableStateOf("") }
 
-    BackButtonWithBalance(onBackClick = onBackClick, balance = balance)
     Column(
-        modifier = Modifier.padding(horizontal = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(PaddingValues(bottom = 50.dp)),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
-        Spacer(modifier = Modifier.height(110.dp))
-        AmountHeroInput(
-            initialAmount = amount,
-            onAmountChange = { newAmount ->
-                amountErrorMessage = ""
-                when {
-                    newAmount == null -> {}
-                    balance != null && newAmount.amount > balance -> {
-                        amountErrorMessage = context.getString(R.string.send_error_amount_over_balance)
+        BackButtonWithBalance(onBackClick = onBackClick, balance = balance)
+        Spacer(Modifier.height(16.dp))
+        Card(
+            externalPadding = PaddingValues(horizontal = 16.dp),
+            internalPadding = PaddingValues(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Spacer(modifier = Modifier.height(48.dp))
+            AmountHeroInput(
+                initialAmount = amount,
+                onAmountChange = { newAmount ->
+                    amountErrorMessage = ""
+                    when {
+                        newAmount == null -> {}
+                        balance != null && newAmount.amount > balance -> {
+                            amountErrorMessage = context.getString(R.string.send_error_amount_over_balance)
+                        }
+                        requestedAmount != null && newAmount.amount < requestedAmount -> {
+                            amountErrorMessage = context.getString(R.string.send_error_amount_below_requested,
+                                (requestedAmount).toPrettyString(prefBitcoinUnit, withUnit = true))
+                        }
+                        requestedAmount != null && newAmount.amount > requestedAmount * 2 -> {
+                            amountErrorMessage = context.getString(R.string.send_error_amount_overpaying,
+                                (requestedAmount * 2).toPrettyString(prefBitcoinUnit, withUnit = true))
+                        }
                     }
-                    requestedAmount != null && newAmount.amount < requestedAmount -> {
-                        amountErrorMessage = context.getString(R.string.send_error_amount_below_requested)
+                    amount = newAmount?.amount
+                },
+                validationErrorMessage = amountErrorMessage,
+                inputTextSize = 42.sp,
+            )
+            Column(
+                modifier = Modifier
+                    .padding(top = 20.dp, bottom = 32.dp, start = 16.dp, end = 16.dp)
+                    .sizeIn(maxWidth = 400.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                val description = remember { paymentRequest.description ?: paymentRequest.descriptionHash?.toHex() }
+                if (!description.isNullOrBlank()) {
+                    Label(text = stringResource(R.string.send_description_label)) {
+                        Text(text = description)
                     }
-                    requestedAmount != null && newAmount.amount > requestedAmount * 2 -> {
-                        amountErrorMessage = context.getString(R.string.send_error_amount_overpaying)
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+                Label(text = stringResource(R.string.send_destination_label)) {
+                    SelectionContainer {
+                        Text(text = paymentRequest.nodeId.toHex(), maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
-                amount = newAmount?.amount
-            },
-            inputTextSize = 48.sp,
-        )
-        Text(amountErrorMessage, style = MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 14.sp), maxLines = 1)
-        Spacer(modifier = Modifier.height(24.dp))
-
-        SendBasicDetailsRow(label = stringResource(R.string.send_destination_label)) {
-            Text(text = paymentRequest.nodeId.toHex(), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        SendBasicDetailsRow(label = stringResource(R.string.send_description_label)) {
-            val description = (paymentRequest.description ?: paymentRequest.descriptionHash?.toHex())?.takeIf { it.isNotBlank() }
-            Text(text = description ?: stringResource(id = R.string.paymentdetails_no_description), style = if (description != null) MaterialTheme.typography.body1 else mutedItalicTypo())
-        }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(36.dp))
         FilledButton(
-            text = R.string.send_pay_button,
+            text = stringResource(id = R.string.send_pay_button),
             icon = R.drawable.ic_send,
             enabled = amount != null && amountErrorMessage.isBlank(),
         ) {
@@ -111,31 +134,20 @@ fun SendLightningPaymentView(
 }
 
 @Composable
-fun SendBasicDetailsRow(
-    label: String,
-    labelWeight: Float = 1f,
-    contentWeight: Float = 3f,
-    content: @Composable () -> Unit
+fun Label(
+    text: String,
+    content: @Composable ColumnScope.() -> Unit
 ) {
-    Row(
-        modifier = Modifier.widthIn(max = 500.dp)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = label.uppercase(),
+            text = text.uppercase(),
             style = MaterialTheme.typography.body1.copy(color = mutedTextColor(), fontSize = 12.sp),
-            textAlign = TextAlign.End,
-            modifier = Modifier
-                .alignBy(FirstBaseline)
-                .weight(labelWeight)
+            textAlign = TextAlign.Center,
         )
-        Spacer(modifier = Modifier.width(8.dp))
-        Column(
-            modifier = Modifier
-                .alignBy(FirstBaseline)
-                .weight(contentWeight)
-        ) {
-            content()
-        }
+        Spacer(modifier = Modifier.height(4.dp))
+        content()
     }
 }
 

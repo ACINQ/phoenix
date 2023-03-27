@@ -33,10 +33,11 @@ import fr.acinq.lightning.wire.TemporaryNodeFailure
 import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.runTest
 import fr.acinq.secp256k1.Hex
+import org.kodein.log.LoggerFactory
 import kotlin.test.*
 
 class SqlitePaymentsDatabaseTest {
-    private val db = SqlitePaymentsDb(testPaymentsDriver())
+    private val db = SqlitePaymentsDb(LoggerFactory.default, testPaymentsDriver())
 
     private val preimage1 = randomBytes32()
     private val paymentHash1 = Crypto.sha256(preimage1).toByteVector32()
@@ -306,8 +307,8 @@ class SqlitePaymentsDatabaseTest {
         p.parts.forEach { assertEquals(onePartFailed, db.getOutgoingPaymentFromPartId(it.id)) }
 
         // Updating non-existing parts should fail.
-        assertFalse { db._doNotFreezeMe.outQueries.updateLightningPart(UUID.randomUUID(), Either.Right(TemporaryNodeFailure), 110) }
-        assertFalse { db._doNotFreezeMe.outQueries.updateLightningPart(UUID.randomUUID(), randomBytes32(), 110) }
+        assertFalse { db.outQueries.updateLightningPart(UUID.randomUUID(), Either.Right(TemporaryNodeFailure), 110) }
+        assertFalse { db.outQueries.updateLightningPart(UUID.randomUUID(), randomBytes32(), 110) }
 
         // Additional parts must have a unique id.
         val newParts = listOf(
@@ -366,7 +367,7 @@ class SqlitePaymentsDatabaseTest {
 
         // Should not be able to complete a payment that does not exist
         assertFalse {
-            db._doNotFreezeMe.outQueries.completePayment(
+            db.outQueries.completePayment(
                 id = UUID.randomUUID(),
                 completed = paymentStatus
             )
@@ -447,7 +448,7 @@ class SqlitePaymentsDatabaseTest {
         p.parts.forEach { assertEquals(paymentFailed, db.getOutgoingPaymentFromPartId(it.id)) }
 
         // Cannot fail a payment that does not exist
-        assertFalse { db._doNotFreezeMe.outQueries.completePayment(UUID.randomUUID(), paymentStatus) }
+        assertFalse { db.outQueries.completePayment(UUID.randomUUID(), paymentStatus) }
     }
 
     companion object {

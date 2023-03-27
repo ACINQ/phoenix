@@ -10,17 +10,22 @@ import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
 import io.ktor.client.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.datetime.Clock
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.math.*
 import kotlin.time.*
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class, ExperimentalStdlibApi::class)
+
 class AppConfigurationManager(
     private val appDb: SqliteAppDb,
     private val httpClient: HttpClient,
@@ -64,13 +69,13 @@ class AppConfigurationManager(
     private fun initWalletContext() = launch {
         val (timestamp, localContext) = appDb.getWalletContextOrNull(currentWalletContextVersion)
 
-        val freshness = Duration.milliseconds(Clock.System.now().toEpochMilliseconds() - timestamp)
+        val freshness = (currentTimestampMillis() - timestamp).milliseconds
         logger.info { "local context was updated $freshness ago" }
 
-        val timeout = if (freshness < Duration.hours(48)) {
-            Duration.seconds(2)
+        val timeout = if (freshness < 48.hours) {
+            2.seconds
         } else {
-            Duration.seconds(2) * max(freshness.inWholeDays.toInt(), 5)
+            2.seconds * max(freshness.inWholeDays.toInt(), 5)
         } // max=10s
 
         // TODO are we using TOR? -> increase timeout
@@ -107,15 +112,14 @@ class AppConfigurationManager(
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun updateWalletContextLoop() = launch {
-        var pause = Duration.seconds(0.5)
+        var pause = 0.5.seconds
         while (isActive) {
-            pause = (pause * 2).coerceAtMost(Duration.minutes(5))
+            pause = (pause * 2).coerceAtMost(5.minutes)
             fetchAndStoreWalletContext()?.let {
                 val chainContext = it.export(chain)
                 _chainContext.value = chainContext
-                pause = Duration.minutes(60)
+                pause = 60.minutes
             }
             delay(pause)
         }
@@ -123,16 +127,16 @@ class AppConfigurationManager(
 
     private suspend fun fetchAndStoreWalletContext(): WalletContext.V0? {
         return try {
-            httpClient.get<String>("https://acinq.co/phoenix/walletcontext.json")
+            httpClient.get("https://acinq.co/phoenix/walletcontext.json")
         } catch (e1: Exception) {
             try {
-                httpClient.get<String>("https://s3.eu-west-1.amazonaws.com/acinq.co/phoenix/walletcontext.json")
+                httpClient.get("https://s3.eu-west-1.amazonaws.com/acinq.co/phoenix/walletcontext.json")
             } catch (e2: Exception) {
                 logger.error { "failed to fetch wallet context: ${e2.message?.take(200)}" }
                 null
             }
         }?.let {
-            appDb.setWalletContext(currentWalletContextVersion, it)
+            appDb.setWalletContext(currentWalletContextVersion, it.bodyAsText())
         }
     }
 
@@ -145,6 +149,7 @@ class AppConfigurationManager(
     val startupParams: StateFlow<StartupParams?> by lazy { _startupParams }
     internal fun setStartupParams(params: StartupParams) {
         if (_startupParams.value == null) _startupParams.value = params
+        if (_isTorEnabled.value == null) _isTorEnabled.value = params.isTorEnabled
     }
 
     /**
@@ -173,17 +178,16 @@ class AppConfigurationManager(
     fun electrumMessages(): StateFlow<HeaderSubscriptionResponse?> = _electrumMessages
 
     private fun watchElectrumMessages() = launch {
-        electrumClient.openNotificationsSubscription().consumeAsFlow().filterIsInstance<HeaderSubscriptionResponse>()
-            .collect {
-                _electrumMessages.value = it
-            }
+        electrumClient.notifications.filterIsInstance<HeaderSubscriptionResponse>().collect {
+            _electrumMessages.value = it
+        }
     }
 
     // Tor configuration
-    private val isTorEnabled = MutableStateFlow(false)
-    fun subscribeToIsTorEnabled(): StateFlow<Boolean> = isTorEnabled
+    private val _isTorEnabled = MutableStateFlow<Boolean?>(null)
+    val isTorEnabled get(): StateFlow<Boolean?> = _isTorEnabled.asStateFlow()
     fun updateTorUsage(enabled: Boolean): Unit {
-        isTorEnabled.value = enabled
+        _isTorEnabled.value = enabled
     }
 
     // Fiat preferences
@@ -191,16 +195,17 @@ class AppConfigurationManager(
         val primary: FiatCurrency,
         val others: Set<FiatCurrency>
     ) {
-        constructor(primary: FiatCurrency, others: List<FiatCurrency>):
-            this(primary = primary, others = others.toSet())
+        constructor(primary: FiatCurrency, others: List<FiatCurrency>) :
+                this(primary = primary, others = others.toSet())
 
-        val all: Set<FiatCurrency> get() {
-            return if (others.contains(primary)) {
-                others
-            } else {
-                others.toMutableSet().apply { add(primary) }
+        val all: Set<FiatCurrency>
+            get() {
+                return if (others.contains(primary)) {
+                    others
+                } else {
+                    others.toMutableSet().apply { add(primary) }
+                }
             }
-        }
     }
 
     private val _preferredFiatCurrencies by lazy { MutableStateFlow<PreferredFiatCurrencies?>(null) }

@@ -6,14 +6,12 @@ import fr.acinq.phoenix.controllers.MVI
 object Home {
 
     data class Model(
-        val balance: MilliSatoshi,
-        val incomingBalance: MilliSatoshi?,
+        val balance: MilliSatoshi?,
         val paymentsCount: Long
     ) : MVI.Model()
 
     val emptyModel = Model(
-        balance = MilliSatoshi(0),
-        incomingBalance = null,
+        balance = null,
         paymentsCount = 0
     )
 

@@ -65,7 +65,7 @@ extension Lightning_kmpWalletPayment {
 		
 		if let address = address {
 			let str: String
-			if AppDelegate.get().business.chain.isTestnet() {
+			if BusinessManager.isTestnet {
 				str = "https://mempool.space/testnet/address/\(address)"
 			} else {
 				str = "https://mempool.space/address/\(address)"
@@ -87,7 +87,7 @@ extension Lightning_kmpWalletPayment {
 		return nil
 	}
 	
-	func standardFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String)? {
+	func standardFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String, String)? {
 		
 		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
 		
@@ -98,6 +98,7 @@ extension Lightning_kmpWalletPayment {
 				if msat > 0 {
 					
 					let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
+					let title = NSLocalizedString("Service Fees", comment: "Label in SummaryInfoGrid")
 					let exp = NSLocalizedString(
 						"""
 						In order to receive this payment, a new payment channel was opened. \
@@ -106,49 +107,22 @@ extension Lightning_kmpWalletPayment {
 						comment: "Fees explanation"
 					)
 					
-					return (formattedAmt, exp)
+					return (formattedAmt, title, exp)
 				}
 				else {
 					// I think it's nice to see "Fees: 0 sat" :)
 					
 					let formattedAmt = Utils.format(currencyPrefs, msat: 0, policy: .hideMsats)
+					let title = NSLocalizedString("Fees", comment: "Label in SummaryInfoGrid")
 					let exp = ""
 					
-					return (formattedAmt, exp)
+					return (formattedAmt, title, exp)
 				}
 			}
 			
 		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
 		
-			if let _ = outgoingPayment.status.asFailed() {
-				
-				// no fees for failed payments
-				return nil
-				
-			} else if let _ = outgoingPayment.status.asOnChain() {
-				
-				// for on-chain payments, the fees are extracted from the mined transaction(s)
-				
-				let fees = outgoingPayment.fees
-				let formattedAmt = Utils.format(currencyPrefs, msat: fees, policy: .showMsatsIfNonZero)
-				
-				let txCount = outgoingPayment.closingTxParts().count
-				let exp: String
-				if txCount == 1 {
-					exp = NSLocalizedString(
-						"Bitcoin network fees paid for on-chain transaction. Payment required 1 transaction.",
-						comment: "Fees explanation"
-					)
-				} else {
-					exp = NSLocalizedString(
-						"Bitcoin network fees paid for on-chain transactions. Payment required \(txCount) transactions.",
-						comment: "Fees explanation"
-					)
-				}
-				
-				return (formattedAmt, exp)
-				
-			} else if let _ = outgoingPayment.status.asOffChain() {
+			if let _ = outgoingPayment.status.asOffChain() {
 				
 				let msat = outgoingPayment.routingFee.msat // excludes swapOutFee
 				if msat == 0 {
@@ -166,6 +140,7 @@ extension Lightning_kmpWalletPayment {
 					}
 				}
 				
+				let title = NSLocalizedString("Lightning Fees", comment: "Label in SummaryInfoGrid")
 				let exp: String
 				if parts == 1 {
 					if hops == 1 {
@@ -189,35 +164,65 @@ extension Lightning_kmpWalletPayment {
 					)
 				}
 				
-				return (formattedAmt, exp)
+				return (formattedAmt, title, exp)
 			}
 		}
 		
 		return nil
 	}
 	
-	func swapOutFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String)? {
+	func minerFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String, String)? {
 		
-		guard let outgoingPayment = self as? Lightning_kmpOutgoingPayment else {
-			return nil
+		if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
+			
+			if let _ = outgoingPayment.status.asOnChain() {
+				
+				// For on-chain payments, the fees are extracted from the mined transaction(s)
+				
+				let fees = outgoingPayment.fees
+				let formattedAmt = Utils.format(currencyPrefs, msat: fees, policy: .showMsatsIfNonZero)
+				
+				let title = NSLocalizedString("Miner Fees", comment: "Label in SummaryInfoGrid")
+				
+				let txCount = outgoingPayment.closingTxParts().count
+				let exp: String
+				if txCount == 1 {
+					exp = NSLocalizedString(
+						"Bitcoin network fees paid for on-chain transaction. Payment required 1 transaction.",
+						comment: "Fees explanation"
+					)
+				} else {
+					exp = NSLocalizedString(
+						"Bitcoin network fees paid for on-chain transactions. Payment required \(txCount) transactions.",
+						comment: "Fees explanation"
+					)
+				}
+				
+				return (formattedAmt, title, exp)
+			}
 		}
 		
-		if let _ = outgoingPayment.details.asSwapOut() {
+		return nil
+	}
+	
+	func swapOutFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String, String)? {
+		
+		if let outgoingPayment = self as? Lightning_kmpOutgoingPayment,
+		   let _ = outgoingPayment.details.asSwapOut() {
 			
 			let msat = outgoingPayment.fees.msat - outgoingPayment.routingFee.msat
 			let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
 			
+			let title = NSLocalizedString("Swap Fees", comment: "Label in SummaryInfoGrid")
 			let exp = NSLocalizedString(
 				"Includes Bitcoin network miner fees, and the fee for the Swap-Out service.",
 				comment: "Fees explanation"
 			)
 			
-			return (formattedAmt, exp)
-			
-		} else {
-			
-			return nil
+			return (formattedAmt, title, exp)
 		}
+		
+		return nil
 	}
 	
 	/// If the OutgoingPayment succeeded or failed, reports the total elapsed time.

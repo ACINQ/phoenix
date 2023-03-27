@@ -15,7 +15,6 @@ import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class PaymentsManager(
     private val loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
@@ -37,11 +36,6 @@ class PaymentsManager(
     private val _paymentsCount = MutableStateFlow<Long>(0)
     val paymentsCount: StateFlow<Long> = _paymentsCount
 
-    /** Flow of map of (bitcoinAddress -> amount) swap-ins. */
-    private val _incomingSwaps = MutableStateFlow<Map<String, MilliSatoshi>>(HashMap())
-    val incomingSwaps: StateFlow<Map<String, MilliSatoshi>> = _incomingSwaps
-    private var _incomingSwapsMap by _incomingSwaps
-
     /**
      * Broadcasts the most recently completed payment since the app was launched.
      * This includes incoming & outgoing payments (both successful & failed).
@@ -51,24 +45,20 @@ class PaymentsManager(
     private val _lastCompletedPayment = MutableStateFlow<WalletPayment?>(null)
     val lastCompletedPayment: StateFlow<WalletPayment?> = _lastCompletedPayment
 
+    private val _inFlightOutgoingPayments = MutableStateFlow<Set<UUID>>(setOf())
+    val inFlightOutgoingPayments: StateFlow<Set<UUID>> = _inFlightOutgoingPayments
+
     /**
      * Provides a default PaymentsFetcher for use by the app.
      * (You can also create your own instances if needed.)
      */
     val fetcher: PaymentsFetcher by lazy {
-        PaymentsFetcher(paymentsManager = this, cacheSizeLimit = 250)
-    }
-
-    fun makeFetcher(cacheSizeLimit: Int = 250): PaymentsFetcher {
-        return PaymentsFetcher(this, cacheSizeLimit)
+        PaymentsFetcher(loggerFactory = loggerFactory, paymentsManager = this, cacheSizeLimit = 250)
     }
 
     fun makePageFetcher(): PaymentsPageFetcher {
         return PaymentsPageFetcher(loggerFactory, databaseManager)
     }
-    
-    private val _inFlightOutgoingPayments = MutableStateFlow<Set<UUID>>(setOf())
-    val inFlightOutgoingPayments: StateFlow<Set<UUID>> = _inFlightOutgoingPayments
 
     init {
         launch {
@@ -78,7 +68,7 @@ class PaymentsManager(
         }
 
         launch {
-            var appLaunch: Long = currentTimestampMillis()
+            val appLaunch: Long = currentTimestampMillis()
             var isFirstCollection = true
 
             paymentsDb().listPaymentsOrderFlow(count = 25, skip = 0).collect { list ->
@@ -113,7 +103,7 @@ class PaymentsManager(
             // (which runs in a separate process), then you won't receive the
             // corresponding notifications (PaymentReceived) thru this mechanism.
             //
-            peerManager.getPeer().openListenerEventSubscription().consumeEach { event ->
+            peerManager.getPeer().eventsFlow.collect { event ->
                 when (event) {
                     is PaymentProgress -> {
                         addToInFlightOutgoingPayments(event.request.paymentId)
@@ -124,26 +114,20 @@ class PaymentsManager(
                     is PaymentNotSent -> {
                         removeFromInFlightOutgoingPayments(event.request.paymentId)
                     }
-                    is SwapInPendingEvent -> {
-                        _incomingSwapsMap += (event.swapInPending.bitcoinAddress to event.swapInPending.amount.toMilliSatoshi())
-                    }
-                    is SwapInConfirmedEvent -> {
-                        _incomingSwapsMap -= event.swapInConfirmed.bitcoinAddress
-                    }
                     else -> Unit
                 }
             }
         }
     }
 
-    /// Adds to StateFlow<Set<UUID>>
+    /** Adds to StateFlow<Set<UUID>> */
     private fun addToInFlightOutgoingPayments(id: UUID) {
         val oldSet = _inFlightOutgoingPayments.value
         val newSet = oldSet.plus(id)
         _inFlightOutgoingPayments.value = newSet
     }
 
-    /// Removes from StateFlow<Set<UUID>>
+    /** Removes from StateFlow<Set<UUID>> */
     private fun removeFromInFlightOutgoingPayments(id: UUID) {
         val oldSet = _inFlightOutgoingPayments.value
         val newSet = oldSet.minus(id)
@@ -152,6 +136,14 @@ class PaymentsManager(
 
     private suspend fun paymentsDb(): SqlitePaymentsDb {
         return databaseManager.paymentsDb()
+    }
+
+    suspend fun updateMetadata(id: WalletPaymentId, userDescription: String?) {
+        paymentsDb().updateMetadata(
+            id = id,
+            userDescription = userDescription,
+            userNotes = null
+        )
     }
 
     suspend fun getPayment(

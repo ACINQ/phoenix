@@ -34,7 +34,7 @@ struct PaymentView : View {
 		
 		switch type {
 		case .sheet:
-			NavigationView {
+			NavigationWrapper {
 				SummaryView(type: type, paymentInfo: paymentInfo)
 			}
 			.edgesIgnoringSafeArea(.all)

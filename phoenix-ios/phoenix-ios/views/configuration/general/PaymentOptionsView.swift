@@ -28,9 +28,18 @@ struct PaymentOptionsView: View {
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	let maxFeesPublisher = Prefs.shared.maxFeesPublisher
-	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
+	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
+	@ViewBuilder
 	var body: some View {
+		
+		content()
+			.navigationTitle(NSLocalizedString("Payment Options", comment: "Navigation Bar Title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
 		
 		List {
 			
@@ -157,8 +166,7 @@ struct PaymentOptionsView: View {
 			} // </Section>
 		} // </List>
 		.listStyle(.insetGrouped)
-		.navigationTitle(NSLocalizedString("Payment Options", comment: "Navigation Bar Title"))
-		.navigationBarTitleDisplayMode(.inline)
+		.listBackgroundColor(.primaryBackground)
 		.onReceive(maxFeesPublisher) {
 			maxFeesChanged($0)
 		}
@@ -582,14 +590,14 @@ struct MaxFeeConfiguration: View, ViewName {
 				Button {
 					decrementExamplePaymentsIdx()
 				} label: {
-					Text("-")
+					Text(verbatim: "-")
 				}
 				.disabled(examplePaymentsIdx == 0)
 				
 				Button {
 					incrementExamplePaymentsIdx()
 				} label: {
-					Text("+")
+					Text(verbatim: "+")
 				}
 				.disabled(examplePaymentsIdx+1 == examplePayments.count)
 				
@@ -924,7 +932,7 @@ struct MaxFeeConfiguration: View, ViewName {
 
 fileprivate func defaultMaxFees() -> MaxFees {
 	
-	let peer = AppDelegate.get().business.getPeer()
+	let peer = Biz.business.getPeer()
 	if let defaultMaxFees = peer?.walletParams.trampolineFees.last {
 		return MaxFees.fromTrampolineFees(defaultMaxFees)
 	} else {
@@ -949,7 +957,7 @@ class PaymentOptionsView_Previews: PreviewProvider {
 	
 	static var previews: some View {
 		
-		NavigationView {
+		NavigationWrapper {
 			PaymentOptionsView()
 		}
 		.preferredColorScheme(.light)

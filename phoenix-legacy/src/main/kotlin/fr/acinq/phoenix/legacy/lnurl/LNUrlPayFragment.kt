@@ -364,7 +364,7 @@ class LNUrlPayViewModel(
     val paymentMetaRepository: PaymentMetaRepository,
   ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
       return LNUrlPayViewModel(url, minSendable, maxSendable, metadata, maxCommentLength, paymentMetaRepository) as T
     }
   }

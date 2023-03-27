@@ -123,6 +123,6 @@ object AuthHelper {
         onSuccess(result.cryptoObject)
       }
     }
-    return BiometricPrompt(fragment, ContextCompat.getMainExecutor(fragment.context), callback)
+    return BiometricPrompt(fragment, ContextCompat.getMainExecutor(fragment.requireContext()), callback)
   }
 }

@@ -9,7 +9,6 @@ import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 abstract class AppController<M : MVI.Model, I : MVI.Intent>(loggerFactory: LoggerFactory, firstModel: M) : MVI.Controller<M, I>(firstModel), CoroutineScope {
 
     private val job = Job()

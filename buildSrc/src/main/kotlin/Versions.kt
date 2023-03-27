@@ -1,12 +1,13 @@
 object Versions {
-    const val lightningKmp = "1.4.2"
-    const val secp256k1 = "0.6.4"
+    const val lightningKmp = "1.4.3"
+    const val secp256k1 = "0.7.0"
+    const val torMobile = "0.2.0"
 
-    const val kotlin = "1.5.31"
-    const val coroutines = "1.5.2-native-mt"
-    const val serialization = "1.2.2"
+    const val kotlin = "1.6.21"
+    const val coroutines = "1.6.3"
+    const val serialization = "1.3.3"
 
-    const val ktor = "1.6.3"
+    const val ktor = "2.0.3"
     const val sqlDelight = "1.5.3"
     const val kodeinMemory = "0.8.0"
 
@@ -16,14 +17,14 @@ object Versions {
     const val fcmPlugin = "4.3.10"
 
     object Android {
-        const val ktx = "1.5.0"
-        const val lifecycle = "2.4.1"
+        const val coreKtx = "1.9.0"
+        const val lifecycle = "2.5.1"
         const val prefs = "1.2.0"
         const val datastore = "1.0.0"
-        const val compose = "1.1.0-beta03"
-        const val navCompose = "2.4.2"
-        const val constraintLayoutCompose = "1.0.1"
-        const val accompanist = "0.23.1"
+        const val compose = "1.3.1"
+        const val composeCompiler = "1.2.0-rc02"
+        const val navCompose = "2.5.3"
+        const val accompanist = "0.27.1"
         const val biometrics = "1.1.0"
 
         const val zxing = "4.1.0"
@@ -35,15 +36,15 @@ object Versions {
     }
 
     object AndroidLegacy {
-        const val eclair = "0.4.18-android-phoenix"
+        const val eclair = "0.4.19-android-phoenix"
 
-        const val safeArgs = "2.3.5"
+        const val safeArgs = "2.4.2"
         const val appCompat = "1.3.0"
-        const val material = "1.4.0-alpha02"
-        const val navigation = "2.3.5"
+        const val material = "1.7.0"
+        const val navigation = "2.4.2"
         const val constraint = "2.0.4"
         const val lifecycleExtensions = "2.2.0"
-        const val lifecycle = "2.3.1"
+        const val lifecycle = "2.4.0"
         const val work = "2.7.0"
         const val viewpager = "1.0.0"
         const val eventbus = "3.1.1"

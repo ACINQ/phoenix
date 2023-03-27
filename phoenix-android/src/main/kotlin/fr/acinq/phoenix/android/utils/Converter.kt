@@ -22,9 +22,11 @@ import android.text.Spanned
 import android.text.format.DateUtils
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.data.*
 import org.slf4j.LoggerFactory
@@ -33,6 +35,7 @@ import java.math.RoundingMode
 import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
 
@@ -110,10 +113,22 @@ object Converter {
         if (withUnit) "$this $unit" else this
     }
 
+    fun MilliSatoshi.toPrettyStringWithFallback(unit: CurrencyUnit, rate: ExchangeRate.BitcoinPriceRate? = null, withUnit: Boolean = false, mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE): String {
+        return if (rate == null) {
+            toPrettyString(BitcoinUnit.Sat, null, withUnit, mSatDisplayPolicy)
+        } else {
+            toPrettyString(unit, rate, withUnit, mSatDisplayPolicy)
+        }
+    }
+
     fun MilliSatoshi.toPrettyString(unit: CurrencyUnit, rate: ExchangeRate.BitcoinPriceRate? = null, withUnit: Boolean = false, mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE): String = when {
         unit is BitcoinUnit -> this.toUnit(unit).toPrettyString(unit, withUnit, mSatDisplayPolicy)
         unit is FiatCurrency && rate != null -> this.toFiat(rate.price).toPrettyString(unit, withUnit)
         else -> "?!"
+    }
+
+    fun Satoshi.toPrettyString(unit: CurrencyUnit, rate: ExchangeRate.BitcoinPriceRate? = null, withUnit: Boolean = false, mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE): String {
+        return this.toMilliSatoshi().toPrettyString(unit, rate, withUnit, mSatDisplayPolicy)
     }
 
     /** Converts this millis timestamp into a relative string date. */
@@ -128,8 +143,14 @@ object Converter {
         }
     }
 
-    /** Converts this millis timestamp into an absolute string date using the locale format. */
-    fun Long.toAbsoluteDateString(): String = DateFormat.getDateTimeInstance().format(Date(this))
+    /** Converts this millis timestamp into a pretty, absolute string date time using the locale format. */
+    fun Long.toAbsoluteDateTimeString(): String = DateFormat.getDateTimeInstance().format(Date(this))
+
+    /** Converts this millis timestamp into a pretty, absolute string date using the locale format. */
+    fun Long.toAbsoluteDateString(): String = DateFormat.getDateInstance().format(Date(this))
+
+    /** Converts this millis timestamp into an year-month-day string. */
+    fun Long.toBasicAbsoluteDateString(): String = SimpleDateFormat("yyyy-MM-dd").format(Date(this))
 
     @Composable
     public fun html(id: Int): Spanned {

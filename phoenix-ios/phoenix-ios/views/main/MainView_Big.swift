@@ -321,46 +321,44 @@ struct MainView_Big: View {
 	@ViewBuilder
 	func leadingSidebar_settings() -> some View {
 		
-		NavigationView {
+		NavigationWrapper {
 			ConfigurationView()
 		}
-		.navigationViewStyle(.stack)
 		.padding(.top, navigationViewPaddingTop)
 	}
 	
 	@ViewBuilder
 	func leadingSidebar_transactions() -> some View {
 		
-		NavigationView {
+		NavigationWrapper {
 			TransactionsView()
 		}
-		.navigationViewStyle(.stack)
 		.padding(.top, navigationViewPaddingTop)
 	}
 	
 	@ViewBuilder
 	func primary() -> some View {
 		
-		NavigationView {
+		NavigationWrapper {
 			ZStack {
-				// iOS 14 & 15 have bugs when using NavigationLink.
-				// The suggested workarounds include using only a single NavigationLink.
-				//
-				NavigationLink(
-					destination: primary_navLinkView(),
-					isActive: Binding(
-						get: { navLinkTag != nil },
-						set: { if !$0 { navLinkTag = nil }}
-					)
-				) {
-					EmptyView()
-				}
-				.isDetailLink(false)
+				if #unavailable(iOS 16.0) {
+					// iOS 14 & 15 have bugs when using NavigationLink.
+					// The suggested workarounds include using only a single NavigationLink.
+					//
+					NavigationLink(
+						destination: primary_navLinkView(),
+						isActive: navLinkTagBinding(nil)
+					) {
+						EmptyView()
+					}
+					.isDetailLink(false)
+					
+				} // else: uses.navigationStackDestination()
 				
 				Color.primaryBackground
 					.ignoresSafeArea()
 
-				if AppDelegate.showTestnetBackground {
+				if BusinessManager.showTestnetBackground {
 					Image("testnet_bg")
 						.resizable(resizingMode: .tile)
 						.ignoresSafeArea()
@@ -372,9 +370,14 @@ struct MainView_Big: View {
 			.navigationTitle("")
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarHidden(true)
+			.navigationStackDestination(isPresented: navLinkTagBinding(.SendView)) { // For iOS 16+
+				primary_navLinkView()
+			}
+			.navigationStackDestination(isPresented: navLinkTagBinding(.ReceiveView)) { // For iOS 16+
+				primary_navLinkView()
+			}
 			
-		} // </NavigationView>
-		.navigationViewStyle(.stack)
+		} // </NavigationWrapper>
 		.padding(.top, navigationViewPaddingTop)
 	}
 	
@@ -494,16 +497,30 @@ struct MainView_Big: View {
 	@ViewBuilder
 	func trailingSidebar_currencyConverter() -> some View {
 		
-		NavigationView {
+		NavigationWrapper {
 			CurrencyConverterView()
 		}
-		.navigationViewStyle(.stack)
 		.padding(.top, navigationViewPaddingTop)
 	}
 	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	private func navLinkTagBinding(_ tag: NavLinkTag?) -> Binding<Bool> {
+		
+		if let tag { // specific tag
+			return Binding<Bool>(
+				get: { navLinkTag == tag },
+				set: { if $0 { navLinkTag = tag } else if (navLinkTag == tag) { navLinkTag = nil } }
+			)
+		} else { // any tag
+			return Binding<Bool>(
+				get: { navLinkTag != nil },
+				set: { if !$0 { navLinkTag = nil }}
+			)
+		}
+	}
 	
 	var isShowingLeadingSidebar: Bool {
 		return leadingSidebarContent != nil
@@ -845,10 +862,11 @@ struct MainView_Big: View {
 		
 		if let value = value {
 			switch value {
-				case .paymentHistory : showTransactions()
-				case .backup         : fallthrough
-				case .drainWallet    : fallthrough
-				case .electrum       : showSettings()
+				case .paymentHistory     : showTransactions()
+				case .backup             : showSettings()
+				case .drainWallet        : showSettings()
+				case .electrum           : showSettings()
+				case .backgroundPayments : showSettings()
 			}
 		}
 	}

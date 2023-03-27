@@ -42,7 +42,7 @@ struct CurrencyConverterView: View {
 	@State var isRefreshingExchangeRates = false
 	
 	let refreshingExchangeRatesPublisher =
-		AppDelegate.get().business.currencyManager.refreshPublisher()
+		Biz.business.currencyManager.refreshPublisher()
 	
 	let timer = Timer.publish(every: 15 /* seconds */, on: .current, in: .common).autoconnect()
 	@State var currentDate = Date()
@@ -87,17 +87,25 @@ struct CurrencyConverterView: View {
 	@ViewBuilder
 	var body: some View {
 		
+		layers()
+			.navigationTitle(NSLocalizedString("Currency Converter", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
+		
 		ZStack {
-			
-			NavigationLink(destination: CurrencySelector(
-					selectedCurrencies: $currencies,
-					replacingCurrency: $replacingCurrency,
-					didSelectCurrency: didSelectCurrency
-				),
-				isActive: $currencySelectorOpen
-			) {
-				EmptyView()
-			}
+			if #unavailable(iOS 16.0) {
+				NavigationLink(
+					destination: currencySelectorView(),
+					isActive: $currencySelectorOpen
+				) {
+					EmptyView()
+				}
+				.accessibilityHidden(true)
+				
+			} // else: uses.navigationStackDestination()
 			
 			// We want to measure various items within the List.
 			// But we need to measure ALL of them.
@@ -134,7 +142,7 @@ struct CurrencyConverterView: View {
 				.assignMaxPreference(for: flagWidthReader.key, to: $flagWidth)
 			} // </ScrollView>
 			
-			content
+			content()
 			
 		} // </ZStack>
 		.onAppear {
@@ -143,6 +151,10 @@ struct CurrencyConverterView: View {
 		.onDisappear {
 			onDisappear()
 		}
+		.navigationStackDestination( // For iOS 16+
+			isPresented: $currencySelectorOpen,
+			destination: currencySelectorView
+		)
 		.onChange(of: currencies) { _ in
 			currenciesDidChange()
 		}
@@ -158,7 +170,7 @@ struct CurrencyConverterView: View {
 	}
 	
 	@ViewBuilder
-	var content: some View {
+	func content() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
@@ -183,13 +195,12 @@ struct CurrencyConverterView: View {
 			.toolbar {
 				EditButton()
 			}
-			.listStyle(PlainListStyle())
+			.listStyle(.plain)
+			.listBackgroundColor(Color(.systemBackground)) // For iOS 16
 			
 			footer()
 			
 		} // </VStack>
-		.navigationTitle(NSLocalizedString("Currency Converter", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
@@ -268,8 +279,8 @@ struct CurrencyConverterView: View {
 					.font(.title)
 					.foregroundColor(.appPositive)
 			}
+			.buttonStyle(PlainButtonStyle())
 		}
-		.buttonStyle(PlainButtonStyle())
 		.padding(.trailing, 8)
 	}
 	
@@ -313,6 +324,16 @@ struct CurrencyConverterView: View {
 				: UIColor.secondarySystemGroupedBackground
 			)
 			.edgesIgnoringSafeArea(.bottom) // background color should extend to bottom of screen
+		)
+	}
+	
+	@ViewBuilder
+	func currencySelectorView() -> some View {
+		
+		CurrencySelector(
+			selectedCurrencies: $currencies,
+			replacingCurrency: $replacingCurrency,
+			didSelectCurrency: didSelectCurrency
 		)
 	}
 	
@@ -417,7 +438,7 @@ struct CurrencyConverterView: View {
 	}
 	
 	private func currenciesDidChange() {
-		log.trace("currenciesDidChange(): \(Currency.serializeList(currencies))")
+		log.trace("currenciesDidChange(): \(Currency.serializeList(currencies) ?? "<empty>")")
 		
 		if currencies == defaultCurrencies() {
 			GroupPrefs.shared.currencyConverterList = []
@@ -564,7 +585,7 @@ struct CurrencyConverterView: View {
 	private func refreshRates() {
 		log.trace("refreshRates()")
 		
-		AppDelegate.get().business.currencyManager.refreshAll(
+		Biz.business.currencyManager.refreshAll(
 			targets : FiatCurrency.companion.values,
 			force   : true
 		)
@@ -673,6 +694,9 @@ fileprivate struct Row: View, ViewName {
 		.onChange(of: parsedRow) { _ in
 			parsedRowDidChange()
 		}
+		.onChange(of: currencyPrefs.fiatExchangeRates) { _ in
+			exchangeRatesDidChange()
+		}
 	}
 	
 	func currencyStyler() -> TextFieldCurrencyStyler {
@@ -688,6 +712,16 @@ fileprivate struct Row: View, ViewName {
 		log.trace("[Row:\(currency)] onAppear()")
 		
 		parsedRowDidChange(forceRefresh: true)
+	}
+	
+	func exchangeRatesDidChange() {
+		log.trace("[Row:\(currency)] exchangeRatesDidChange()")
+		
+		if focusedField != .amountTextfield {
+			// The exchangeRates changed, and the user is modifying the value of some other currency.
+			// Which means we may need to recalculate and update our amount.
+			parsedRowDidChange(forceRefresh: true)
+		}
 	}
 	
 	func clearTextField() {
@@ -865,6 +899,9 @@ fileprivate struct Row_iOS14: View, ViewName {
 		.onChange(of: parsedRow) { _ in
 			parsedRowDidChange()
 		}
+		.onChange(of: currencyPrefs.fiatExchangeRates) { _ in
+			exchangeRatesDidChange()
+		}
 	}
 	
 	func currencyStyler() -> TextFieldCurrencyStyler {
@@ -880,6 +917,16 @@ fileprivate struct Row_iOS14: View, ViewName {
 		log.trace("[Row:\(currency)] onAppear()")
 		
 		parsedRowDidChange()
+	}
+	
+	func exchangeRatesDidChange() {
+		log.trace("[Row:\(currency)] exchangeRatesDidChange()")
+		
+		if focusedField != .amountTextfield {
+			// The exchangeRates changed, and the user is modifying the value of some other currency.
+			// Which means we may need to recalculate and update our amount.
+			parsedRowDidChange()
+		}
 	}
 	
 	func clearTextField() {

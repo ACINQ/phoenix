@@ -48,7 +48,7 @@ struct ManualRestoreView: MVIView {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 
-			if AppDelegate.showTestnetBackground {
+			if BusinessManager.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -95,7 +95,7 @@ struct ManualRestoreView: MVIView {
 		
 		AppSecurity.shared.addKeychainEntry(mnemonics: mnemonics) { (error: Error?) in
 			if error == nil {
-				AppDelegate.get().loadWallet(
+				Biz.loadWallet(
 					mnemonics: mnemonics,
 					seed: model.seed,
 					walletRestoreType: .fromManualEntry
@@ -511,7 +511,7 @@ struct EnterSeedView: View {
 							.accessibilityLabel("#\(idx+1): \(word)")
 							.accessibilitySortPriority(Double(wordPriority))
 					} else {
-						Text(" ")
+						Text(verbatim: " ")
 							.font(.headline)
 							.frame(maxWidth: .infinity, alignment: .leading)
 							.accessibilityHidden(true)

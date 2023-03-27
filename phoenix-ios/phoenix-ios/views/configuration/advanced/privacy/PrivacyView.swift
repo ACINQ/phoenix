@@ -32,6 +32,14 @@ struct PrivacyView: View {
 	@ViewBuilder
 	var body: some View {
 		
+		content()
+			.navigationTitle(NSLocalizedString("Privacy", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+
+	@ViewBuilder
+	func content() -> some View {
+
 		let hasWallet = hasWallet()
 		
 		List {
@@ -46,7 +54,7 @@ struct PrivacyView: View {
 			}
 
 			NavigationLink(
-				destination: ComingSoonView(title: "Tor"),
+				destination: TorConfigurationView(),
 				tag: NavLinkTag.TorView,
 				selection: $navLinkTag
 			) {
@@ -69,8 +77,7 @@ struct PrivacyView: View {
 			
 		} // </List>
 		.listStyle(.insetGrouped)
-		.navigationTitle(NSLocalizedString("Privacy", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
+		.listBackgroundColor(.primaryBackground)
 		.onAppear() {
 			onAppear()
 		}
@@ -84,7 +91,7 @@ struct PrivacyView: View {
 	
 	func hasWallet() -> Bool {
 		
-		return AppDelegate.get().business.walletManager.isLoaded()
+		return Biz.business.walletManager.isLoaded()
 	}
 	
 	func onAppear() {
@@ -120,24 +127,25 @@ struct PrivacyView: View {
 			// Navigate towards deep link (if needed)
 			var newNavLinkTag: NavLinkTag? = nil
 			switch value {
-				case .paymentHistory : break
-				case .backup         : break
-				case .drainWallet    : break
-				case .electrum       : newNavLinkTag = NavLinkTag.ElectrumConfigurationView
+				case .paymentHistory     : break
+				case .backup             : break
+				case .drainWallet        : break
+				case .backgroundPayments : break
+				case .electrum           : newNavLinkTag = NavLinkTag.ElectrumConfigurationView
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
 				
 				self.swiftUiBugWorkaround = newNavLinkTag
 				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: 5.0)
+				clearSwiftUiBugWorkaround(delay: 1.0)
 				
 				self.navLinkTag = newNavLinkTag // Trigger/push the view
 			}
 			
 		} else {
 			// We reached the final destination of the deep link
-			clearSwiftUiBugWorkaround(delay: 1.0)
+			clearSwiftUiBugWorkaround(delay: 0.0)
 		}
 	}
 	

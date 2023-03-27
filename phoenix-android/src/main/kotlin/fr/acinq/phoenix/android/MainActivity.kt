@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -24,35 +23,33 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.*
+import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.io.PhoenixAndroidLegacyInfoEvent
 import fr.acinq.phoenix.android.components.mvi.MockView
 import fr.acinq.phoenix.android.service.NodeService
+import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
-import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import fr.acinq.phoenix.legacy.utils.*
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
-@ExperimentalCoroutinesApi
 class MainActivity : AppCompatActivity() {
 
     val log: Logger = LoggerFactory.getLogger(MainActivity::class.java)
     private val appViewModel by viewModels<AppViewModel>()
+    private var navController: NavController? = null
 
-    @OptIn(InternalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.CAMERA), 1234)
         appViewModel.walletState.observe(this) {
             log.debug("wallet state update=${it.name}")
         }
@@ -64,10 +61,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // migrate legacy data if needed
+        lifecycleScope.launch {
+            val doDataMigration = PrefsDatastore.getDataMigrationExpected(applicationContext).first()
+            if (doDataMigration == true) {
+                LegacyMigrationHelper.migrateLegacyPreferences(applicationContext)
+                LegacyMigrationHelper.migrateLegacyPayments(applicationContext)
+                PrefsDatastore.saveDataMigrationExpected(applicationContext, false)
+            }
+        }
+
         // listen to legacy channels events on the peer's event bus
         lifecycleScope.launch {
             val application = (application as PhoenixApplication)
-            application.business.peerManager.getPeer().openListenerEventSubscription().receiveAsFlow().collect {
+            application.business.peerManager.getPeer().eventsFlow.collect {
                 if (it is PhoenixAndroidLegacyInfoEvent) {
                     if (it.info.hasChannels) {
                         log.info("legacy channels have been found")
@@ -81,10 +88,22 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContent {
-            PhoenixAndroidTheme {
-                AppView(this@MainActivity, appViewModel)
+            rememberNavController().let {
+                navController = it
+                PhoenixAndroidTheme(it) {
+                    AppView(appViewModel, it)
+                }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        // force the intent flag to single top, in order to avoid [handleDeepLink] to finish the current activity.
+        // this would otherwise clear the app view model, i.e. loose the state which virtually reboots the app
+        // TODO: look into detaching the app state from the activity
+        intent!!.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        this.navController?.handleDeepLink(intent)
     }
 
     override fun onStart() {
@@ -94,12 +113,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        // (application as? PhoenixApplication)?.business?.incrementDisconnectCount()
-        log.info("stopping kmp activity")
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         try {
@@ -107,7 +120,7 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             log.error("failed to unbind activity from node service: {}", e.localizedMessage)
         }
-        log.info("main kmp activity destroyed")
+        log.info("destroyed main kmp activity")
     }
 
 }
@@ -115,5 +128,5 @@ class MainActivity : AppCompatActivity() {
 @Preview(device = Devices.PIXEL_3)
 @Composable
 fun DefaultPreview() {
-    MockView { PhoenixAndroidTheme { Text("Preview") } }
+    MockView { PhoenixAndroidTheme(rememberNavController()) { Text("Preview") } }
 }

@@ -40,12 +40,7 @@ struct ReceiveLightningView: View {
 	
 	@State var channelsCount = 0
 	
-	@State var pushPermissionRequestedFromOS = true
-	@State var bgAppRefreshDisabled = false
-	@State var notificationsDisabled = false
-	@State var alertsDisabled = false
-	@State var badgesDisabled = false
-	@State var showRequestPushPermissionPopoverTimer: Timer? = nil
+	@State var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State var modificationAmount: CurrencyAmount? = nil
 	@State var currencyConverterOpen = false
@@ -58,16 +53,13 @@ struct ReceiveLightningView: View {
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
-	let lastIncomingPaymentPublisher = AppDelegate.get().business.paymentsManager.lastIncomingPaymentPublisher()
-	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
+	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
+	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	// Saving custom publisher in @State since otherwise it fires on every render
-	@State var channelsPublisher = AppDelegate.get().business.peerPublisher().flatMap { $0.channelsPublisher() }
-	
-	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
-		UIApplication.willEnterForegroundNotification
-	)
+	@State var channelsPublisher = Biz.business.peerManager.peerStatePublisher().flatMap { $0.channelsPublisher() }
 	
 	// For the cicular buttons: [copy, share, edit]
 	enum MaxButtonWidth: Preference {}
@@ -85,26 +77,26 @@ struct ReceiveLightningView: View {
 	var body: some View {
 		
 		ZStack {
-			NavigationLink(
-				destination: CurrencyConverterView(
-					initialAmount: modificationAmount,
-					didChange: currencyConverterDidChange,
-					didClose: currencyConvertDidClose
-				),
-				isActive: $currencyConverterOpen
-			) {
-				EmptyView()
-			}
-			.accessibilityHidden(true)
+			if #unavailable(iOS 16.0) {
+				NavigationLink(
+					destination: currencyConverterView(),
+					isActive: $currencyConverterOpen
+				) {
+					EmptyView()
+				}
+				.accessibilityHidden(true)
+				
+			} // else: uses.navigationStackDestination()
 			
 			content()
 		}
 		.onAppear {
 			onAppear()
 		}
-		.onDisappear {
-			onDisappear()
-		}
+		.navigationStackDestination( // For iOS 16+
+			isPresented: $currencyConverterOpen,
+			destination: currencyConverterView
+		)
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
@@ -117,8 +109,8 @@ struct ReceiveLightningView: View {
 		.onReceive(channelsPublisher) {
 			channelsChanged($0)
 		}
-		.onReceive(willEnterForegroundPublisher) { _ in
-			willEnterForeground()
+		.onReceive(NotificationsManager.shared.permissions) {
+			notificationPermissionsChanged($0)
 		}
 		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
 			get: { sheet != nil },
@@ -227,7 +219,7 @@ struct ReceiveLightningView: View {
 			}
 			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			
-			warningButton(paddingTop: 8)
+			warningButton()
 			
 			Button {
 				didTapSwapInButton()
@@ -514,70 +506,25 @@ struct ReceiveLightningView: View {
 	}
 	
 	@ViewBuilder
-	func warningButton(paddingTop: CGFloat) -> some View {
+	func warningButton(paddingTop: CGFloat? = nil) -> some View {
 		
-		// There are several warnings we may want to display.
-		
-		if bgAppRefreshDisabled {
+		if notificationPermissions == .disabled {
 			
-			// The user has disabled Background App Refresh.
-			// In this case, we won't be able to receive payments
-		 	// while the app is in the background.
+			// The user has disabled "background payments"
 			
 			Button {
-				showBgAppRefreshDisabledPopover()
+				navigationToBackgroundPayments()
 			} label: {
-				Image(systemName: "exclamationmark.octagon.fill")
-					.renderingMode(.template)
-					.resizable()
-					.aspectRatio(contentMode: .fit)
-					.foregroundColor(Color.appNegative)
-					.frame(width: 32, height: 32)
+				Label {
+					Text("Background payments disabled")
+				} icon: {
+					Image(systemName: "exclamationmark.triangle")
+						.renderingMode(.template)
+				}
+				.foregroundColor(.appNegative)
 			}
 			.padding(.top, paddingTop)
-			.accessibilityLabel("Warning: background app refresh disabled")
-			.accessibilityHint("Tap for more info")
-		}
-		else if !pushPermissionRequestedFromOS {
-			
-			// When we first prompted them to enable push notifications,
-			// the user said "no". Or they otherwise dismissed the popover window.
-			// Thus we have never tried to enable push notifications.
-			
-			Button {
-				showRequestPushPermissionPopover()
-			} label: {
-				Image(systemName: "exclamationmark.bubble.fill")
-					.renderingMode(.template)
-					.resizable()
-					.aspectRatio(contentMode: .fit)
-					.frame(width: 32, height: 32)
-			}
-			.padding(.top, paddingTop)
-			.accessibilityLabel("Warning: notifications disabled")
-			.accessibilityHint("Tap for more info")
-		}
-		else if notificationsDisabled || (alertsDisabled && badgesDisabled) {
-			
-			// The user has totally disabled notifications for our app.
-			// So if a payment is received while the app is in the background,
-		 	// we won't be able to notify them (in any way, shape or form).
-		 	//
-		 	// Or the user didn't totally disable notifications,
-		 	// but they effectively did. Because they disabled all alerts & badges.
-			
-			Button {
-				showNotificationsDisabledPopover()
-			} label: {
-				Image(systemName: "exclamationmark.triangle.fill")
-					.renderingMode(.template)
-					.resizable()
-					.aspectRatio(contentMode: .fit)
-					.foregroundColor(Color.appWarn)
-					.frame(width: 32, height: 32)
-			}
-			.padding(.top, paddingTop)
-			.accessibilityLabel("Warning: notifications disabled")
+			.accessibilityLabel("Warning: background payments disabled")
 			.accessibilityHint("Tap for more info")
 		}
 	}
@@ -634,6 +581,16 @@ struct ReceiveLightningView: View {
 				.stroke(Color.appAccent, lineWidth: 1)
 		)
 		.padding([.leading, .trailing], 10)
+	}
+	
+	@ViewBuilder
+	func currencyConverterView() -> some View {
+		
+		CurrencyConverterView(
+			initialAmount: modificationAmount,
+			didChange: currencyConverterDidChange,
+			didClose: currencyConvertDidClose
+		)
 	}
 	
 	// --------------------------------------------------
@@ -695,43 +652,8 @@ struct ReceiveLightningView: View {
 		mvi.intent(Receive.IntentAsk(
 			amount: nil,
 			desc: defaultDesc,
-			expirySeconds: Int64(60 * 60 * 24 * Prefs.shared.invoiceExpirationDays)
+			expirySeconds: Prefs.shared.invoiceExpirationSeconds
 		))
-		
-		let query = Prefs.shared.pushPermissionQuery
-		if query == .neverAskedUser {
-			
-			// We want to ask the user:
-			// "Do you want to be notified when you've received a payment?"
-			//
-			// But let's show the popup after a brief delay,
-			// to allow the user to see what this view is about.
-			
-			showRequestPushPermissionPopoverTimer =
-				Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { _ in
-					showRequestPushPermissionPopover()
-				}
-			
-		} else {
-			
-			checkPushPermissions()
-		}
-	}
-	
-	func onDisappear() -> Void {
-		log.trace("onDisappear()")
-		
-		showRequestPushPermissionPopoverTimer?.invalidate()
-	}
-	
-	func willEnterForeground() -> Void {
-		log.trace("willEnterForeground()")
-		
-		let query = Prefs.shared.pushPermissionQuery
-		if query != .neverAskedUser {
-			
-			checkPushPermissions()
-		}
 	}
 	
 	// --------------------------------------------------
@@ -771,7 +693,7 @@ struct ReceiveLightningView: View {
 		payToOpen_minFundingSat = context.payToOpen.v1.minFundingSat
 	}
 	
-	func channelsChanged(_ channels: Lightning_kmpPeer.ChannelsMap) -> Void {
+	func channelsChanged(_ channels: Lightning_kmpPeer.ChannelsMap) {
 		log.trace("channelsChanged()")
 		
 		var availableCount = 0
@@ -785,10 +707,15 @@ struct ReceiveLightningView: View {
 			} else {
 				availableCount += 1
 			}
-			
 		}
 		
 		channelsCount = availableCount
+	}
+	
+	func notificationPermissionsChanged(_ newValue: NotificationPermissions) {
+		log.trace("notificationPermissionsChanged()")
+		
+		notificationPermissions = newValue
 	}
 	
 	func currencyConverterDidChange(_ amount: CurrencyAmount?) {
@@ -894,117 +821,15 @@ struct ReceiveLightningView: View {
 		}
 	}
 	
+	func navigationToBackgroundPayments() {
+		log.trace("navigateToBackgroundPayments()")
+		
+		deepLinkManager.broadcast(DeepLink.backgroundPayments)
+	}
+	
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
-	
-	func requestPushPermission() -> Void {
-		log.trace("requestPushPermission()")
-		
-		AppDelegate.get().requestPermissionForLocalNotifications { (granted: Bool) in
-			
-			let block = { checkPushPermissions() }
-			if Thread.isMainThread {
-				block()
-			} else {
-				DispatchQueue.main.async { block() }
-			}
-		}
-	}
-	
-	func checkPushPermissions() -> Void {
-		log.trace("checkPushPermission()")
-		assert(Thread.isMainThread, "invoked from non-main thread")
-		
-		let query = Prefs.shared.pushPermissionQuery
-		if query == .userAccepted {
-			pushPermissionRequestedFromOS = true
-		} else {
-			// user denied or ignored, which means we haven't asked the OS for permission yet
-			pushPermissionRequestedFromOS = false
-		}
-		
-		bgAppRefreshDisabled = (UIApplication.shared.backgroundRefreshStatus != .available)
-		
-		let center = UNUserNotificationCenter.current()
-		center.getNotificationSettings { settings in
-			
-			notificationsDisabled = (settings.authorizationStatus != .authorized)
-			
-			// Are we able to display notifications to the user ?
-			// That is, can we display a message that says, "Payment received" ?
-			//
-			// Within Settings -> Notifications, there are 3 options
-			// that can be enabled/disabled independently of each other:
-			//
-			// - Lock Screen
-			// - Notification Center
-			// - Banners
-			//
-			// If the user has disabled ALL of them, then we consider notifications to be disabled.
-			// If the user has only disabled one, such as the Lock Screen,
-			// we consider that an understandable privacy choice,
-			// and don't highlight it in the UI.
-			
-			var count = 0
-			if settings.lockScreenSetting == .enabled {
-				count += 1
-			}
-			if settings.notificationCenterSetting == .enabled {
-				count += 1
-			}
-			if settings.alertSetting == .enabled {
-				count += 1
-			}
-			
-			alertsDisabled = (count == 0)
-			badgesDisabled = (settings.badgeSetting != .enabled)
-		}
-		
-	}
-	
-	func showBgAppRefreshDisabledPopover() -> Void {
-		log.trace("showBgAppRefreshDisabledPopover()")
-		
-		popoverState.display(dismissable: false) {
-			BgAppRefreshDisabledPopover()
-		}
-	}
-	
-	func showNotificationsDisabledPopover() -> Void {
-		log.trace("showNotificationsDisabledPopover()")
-		
-		popoverState.display(dismissable: false) {
-			NotificationsDisabledPopover()
-		}
-	}
-	
-	func showRequestPushPermissionPopover() -> Void {
-		log.trace("showRequestPushPermissionPopover()")
-		
-		let callback = {(response: PushPermissionPopoverResponse) -> Void in
-			
-			log.debug("PushPermissionPopupResponse: \(response.rawValue)")
-			
-			switch response {
-			case .accepted :
-				Prefs.shared.pushPermissionQuery = .userAccepted
-				requestPushPermission()
-				
-			case .denied:
-				Prefs.shared.pushPermissionQuery = .userDeclined
-				checkPushPermissions()
-				
-			case .ignored:
-				// Ask again next time
-				checkPushPermissions()
-			}
-		}
-		
-		popoverState.display(dismissable: true) {
-			RequestPushPermissionPopover(callback: callback)
-		}
-	}
 	
 	func copyTextToPasteboard() -> Void {
 		log.trace("copyTextToPasteboard()")

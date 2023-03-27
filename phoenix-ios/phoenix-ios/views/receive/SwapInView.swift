@@ -32,12 +32,12 @@ struct SwapInView: View {
 	@State var swapIn_minFeeSat: Int64 = 0
 	@State var swapIn_minFundingSat: Int64 = 0
 	
+	let incomingSwapsPublisher = Biz.business.balanceManager.incomingSwapsPublisher()
+	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
+	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
-	
-	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
-	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
 	
 	// For the cicular buttons: [copy, share]
 	enum MaxButtonWidth: Preference {}
@@ -129,6 +129,9 @@ struct SwapInView: View {
 		}
 		.navigationTitle(NSLocalizedString("Swap In", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
+		.onAppear {
+			onAppear()
+		}
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
@@ -385,6 +388,17 @@ struct SwapInView: View {
 	// MARK: Notifications
 	// --------------------------------------------------
 	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		// If the model updates before the view finishes drawing,
+		// we might need to manually invoke onModelChange.
+		//
+		if mvi.model is Receive.Model_SwapIn_Generated {
+			onModelChange(model: mvi.model)
+		}
+	}
+	
 	func onModelChange(model: Receive.Model) -> Void {
 		log.trace("onModelChange()")
 		
@@ -471,7 +485,7 @@ struct SwapInView: View {
 		mvi.intent(Receive.IntentAsk(
 			amount: lastAmount,
 			desc: lastDescription,
-			expirySeconds: Int64(60 * 60 * 24 * Prefs.shared.invoiceExpirationDays)
+			expirySeconds: Prefs.shared.invoiceExpirationSeconds
 		))
 	}
 	

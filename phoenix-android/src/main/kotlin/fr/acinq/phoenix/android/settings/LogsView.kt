@@ -18,11 +18,13 @@ package fr.acinq.phoenix.android.settings
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.FileProvider
+import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
@@ -31,18 +33,19 @@ import fr.acinq.phoenix.android.components.SettingButton
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.shareFile
 
 @Composable
 fun LogsView() {
     val log = logger("LogsView")
     val nc = navController
     val context = LocalContext.current
+    val authority = remember { "${BuildConfig.APPLICATION_ID}.provider" }
 
     DefaultScreenLayout {
         DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.logs_title),
-            subtitle = stringResource(id = R.string.logs_subtitle)
         )
         Card {
 
@@ -50,10 +53,7 @@ fun LogsView() {
                 text = R.string.logs_view_button,
                 icon = R.drawable.ic_eye,
                 onClick = {
-
                     val logFile = Logging.getLastLogFile(context)
-                    val authority = "fr.acinq.phoenix.android.provider"
-
                     val uri = FileProvider.getUriForFile(context, authority, logFile)
                     val localViewIntent: Intent = Intent().apply {
                         action = Intent.ACTION_VIEW
@@ -68,21 +68,14 @@ fun LogsView() {
             SettingButton(
                 text = R.string.logs_share_button,
                 icon = R.drawable.ic_share,
-
                 onClick = {
-
                     val logFile = Logging.getLastLogFile(context)
-                    val authority = "fr.acinq.phoenix.android.provider"
-
-                    val uri = FileProvider.getUriForFile(context, authority, logFile)
-                    val sendIntent: Intent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        type = "text/plain"
-                        putExtra(Intent.EXTRA_STREAM, uri)
-                        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.logs_share_subject))
-                    }
-                    val shareIntent = Intent.createChooser(sendIntent, null)
-                    context.startActivity(shareIntent)
+                    shareFile(
+                        context = context,
+                        data = FileProvider.getUriForFile(context, authority, logFile),
+                        subject = context.getString(R.string.logs_share_subject),
+                        chooserTitle = context.getString(R.string.logs_share_title)
+                    )
                 }
             )
         }

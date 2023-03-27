@@ -15,6 +15,12 @@ extension WalletPaymentId: Identifiable {
 
 extension WalletPaymentOrderRow: Identifiable {
 	
+	/// Because we're forced to override the existing `id` property,
+	/// we'll provide an alternative property name.
+	public var walletPaymentId: WalletPaymentId {
+		return self.component1()
+	}
+	
 	/// Returns a unique identifier, in the form of:
 	/// - "outgoing|id|createdAt|completedAt|metadataModifiedAt"
 	/// - "incoming|paymentHash|createdAt|completedAt|metadataModifiedAt"

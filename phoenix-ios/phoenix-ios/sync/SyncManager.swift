@@ -53,6 +53,10 @@ class SyncManager {
 		
 		networkMonitor.pathUpdateHandler = {[weak self](path: NWPath) -> Void in
 			
+			guard let self = self else {
+				return
+			}
+			
 			let hasInternet: Bool
 			switch path.status {
 				case .satisfied:
@@ -72,8 +76,8 @@ class SyncManager {
 					hasInternet = false
 			}
 			
-			self?.syncSeedManager.networkStatusChanged(hasInternet: hasInternet)
-			self?.syncTxManager.networkStatusChanged(hasInternet: hasInternet)
+			self.syncSeedManager.networkStatusChanged(hasInternet: hasInternet)
+			self.syncTxManager.networkStatusChanged(hasInternet: hasInternet)
 		}
 		
 		networkMonitor.start(queue: DispatchQueue.main)
@@ -94,10 +98,17 @@ class SyncManager {
 		}.store(in: &cancellables)
 	}
 	
+	/// May also be called by `SyncTxManager` or `SyncSeedManager` if they encounter
+	/// errors related to iCloud credential problems.
+	///
 	func checkForCloudCredentials() {
-		log.trace("checkForCloudCredentials")
+		log.trace("checkForCloudCredentials()")
 		
 		CKContainer.default().accountStatus {[weak self](accountStatus: CKAccountStatus, error: Error?) in
+			
+			guard let self = self else {
+				return
+			}
 			
 			if let error = error {
 				log.warning("Error fetching CKAccountStatus: \(String(describing: error))")
@@ -130,9 +141,19 @@ class SyncManager {
 				hasCloudCredentials = false
 			}
 			
-			self?.syncSeedManager.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials)
-			self?.syncTxManager.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials)
+			self.syncSeedManager.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials)
+			self.syncTxManager.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials)
 		}
+	}
+	
+	func shutdown() {
+		log.trace("shutdown()")
+		
+		networkMonitor.cancel()
+		cancellables.removeAll()
+		
+		syncSeedManager.shutdown()
+		syncTxManager.shutdown()
 	}
 }
 

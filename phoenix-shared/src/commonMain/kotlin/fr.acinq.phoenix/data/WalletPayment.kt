@@ -7,7 +7,7 @@ import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
-import fr.acinq.phoenix.utils.createdAt
+import fr.acinq.phoenix.utils.extensions.createdAt
 
 /* Represents a unique WalletPayment row in the database,
  * which exists in either the `incoming_payments` table,

@@ -91,6 +91,8 @@ class SyncTxManager {
 	public let statePublisher: CurrentValueSubject<SyncTxManager_State, Never>
 	
 	/// Informs the user interface about a pending change to the SyncTxManager's global settings.
+	///
+	/// Changes to this publisher will always occur on the main thread.
 	/// 
 	public let pendingSettingsPublisher = CurrentValueSubject<SyncTxManager_PendingSettings?, Never>(nil)
 	
@@ -136,7 +138,7 @@ class SyncTxManager {
 	private func startQueueCountMonitor() {
 		log.trace("setupQueueCountMonitor()")
 		
-		// Kotlin will crash if we try to use multiple threads (like a real app)
+		// Kotlin suspend functions are currently only supported on the main thread
 		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 		
 		self.cloudKitDb.fetchQueueCountPublisher().sink {[weak self] (queueCount: Int64) in
@@ -202,10 +204,10 @@ class SyncTxManager {
 	private func publishNewState(_ state: SyncTxManager_State) {
 		log.trace("publishNewState()")
 		
+		// Contract: Changes to this publisher will always occur on the main thread.
 		let block = {
 			self.statePublisher.value = state
 		}
-		
 		if Thread.isMainThread {
 			block()
 		} else {
@@ -216,10 +218,10 @@ class SyncTxManager {
 	private func publishPendingSettings(_ pending: SyncTxManager_PendingSettings?) {
 		log.trace("publishPendingSettings()")
 		
+		// Contract: Changes to this publisher will always occur on the main thread.
 		let block = {
 			self.pendingSettingsPublisher.value = pending
 		}
-		
 		if Thread.isMainThread {
 			block()
 		} else {
@@ -228,9 +230,35 @@ class SyncTxManager {
 	}
 	
 	// ----------------------------------------
-	// MARK: State Machine
+	// MARK: External Control
 	// ----------------------------------------
 	
+	/// Called from SyncManager; part of SyncManagerProtocol
+	///
+	func networkStatusChanged(hasInternet: Bool) {
+		log.trace("networkStatusChanged(hasInternet: \(hasInternet))")
+		
+		Task {
+			if let newState = await self.actor.networkStatusChanged(hasInternet: hasInternet) {
+				self.handleNewState(newState)
+			}
+		}
+	}
+	
+	/// Called from SyncManager; part of SyncManagerProtocol
+	///
+	func cloudCredentialsChanged(hasCloudCredentials: Bool) {
+		log.trace("cloudCredentialsChanged(hasCloudCredentials: \(hasCloudCredentials))")
+		
+		Task {
+			if let newState = await self.actor.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials) {
+				self.handleNewState(newState)
+			}
+		}
+	}
+	
+	/// Called from `SyncTxManager_PendingSettings`
+	///
 	func dequeuePendingSettings(_ pending: SyncTxManager_PendingSettings, approved: Bool) {
 		log.trace("dequeuePendingSettings(_, approved: \(approved ? "true" : "false"))")
 		
@@ -258,6 +286,8 @@ class SyncTxManager {
 		}
 	}
 	
+	/// Called from `SyncTxManager_State_Waiting`
+	///
 	func finishWaiting(_ waiting: SyncTxManager_State_Waiting) {
 		log.trace("finishWaiting()")
 		
@@ -267,6 +297,25 @@ class SyncTxManager {
 			}
 		}
 	}
+	
+	/// Used when closing the corresponding wallet.
+	/// We transition to a terminal state.
+	///
+	func shutdown() {
+		log.trace("shutdown()")
+		
+		Task {
+			if let newState = await self.actor.shutdown() {
+				self.handleNewState(newState)
+			}
+		}
+		
+		cancellables.removeAll()
+	}
+	
+	// ----------------------------------------
+	// MARK: Flow
+	// ----------------------------------------
 	
 	private func handleNewState(_ newState: SyncTxManager_State) {
 		
@@ -290,10 +339,6 @@ class SyncTxManager {
 		publishNewState(newState)
 	}
 	
-	// ----------------------------------------
-	// MARK: Flow
-	// ----------------------------------------
-	
 	/// We have to wait until the databases are setup and ready.
 	/// This may take a moment if a migration is triggered.
 	///
@@ -310,7 +355,7 @@ class SyncTxManager {
 					self.handleNewState(newState)
 				}
 				
-				// Kotlin will crash if we try to use multiple threads (like a real app)
+				// Kotlin suspend functions are currently only supported on the main thread
 				DispatchQueue.main.async {
 					self.startQueueCountMonitor()
 					self.startPreferencesMonitor()
@@ -318,10 +363,10 @@ class SyncTxManager {
 			}
 		}
 		
-		// Kotlin will crash if we try to use multiple threads (like a real app)
+		// Kotlin suspend functions are currently only supported on the main thread
 		DispatchQueue.main.async {
 			
-			let databaseManager = AppDelegate.get().business.databaseManager
+			let databaseManager = Biz.business.databaseManager
 			databaseManager.getDatabases().sink { databases in
 				
 				if let paymentsDb = databases.payments as? SqlitePaymentsDb,
@@ -337,30 +382,6 @@ class SyncTxManager {
 				}
 				
 			}.store(in: &cancellables)
-		}
-	}
-	
-	/// Called from SyncManager; part of SyncManagerProtocol
-	///
-	func networkStatusChanged(hasInternet: Bool) {
-		log.trace("networkStatusChanged(hasInternet: \(hasInternet))")
-		
-		Task {
-			if let newState = await self.actor.networkStatusChanged(hasInternet: hasInternet) {
-				self.handleNewState(newState)
-			}
-		}
-	}
-	
-	/// Called from SyncManager; part of SyncManagerProtocol
-	///
-	func cloudCredentialsChanged(hasCloudCredentials: Bool) {
-		log.trace("cloudCredentialsChanged(hasCloudCredentials: \(hasCloudCredentials))")
-		
-		Task {
-			if let newState = await self.actor.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials) {
-				self.handleNewState(newState)
-			}
 		}
 	}
 	
@@ -494,7 +515,7 @@ class SyncTxManager {
 		step2 = {
 			log.trace("deleteRecordZone(): step2()")
 			
-			// Kotlin will crash if we try to use multiple threads (like a real app)
+			// Kotlin suspend functions are currently only supported on the main thread
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
 			self.cloudKitDb.clearDatabaseTables { (_, error) in
@@ -550,7 +571,7 @@ class SyncTxManager {
 		checkDatabase = {
 			log.trace("downloadPayments(): checkDatabase()")
 			
-			// Kotlin will crash if we try to use multiple threads (like a real app)
+			// Kotlin suspend functions are currently only supported on the main thread
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
 			self.cloudKitDb.fetchOldestCreation() { (millis: KotlinLong?, error: Error?) in
@@ -658,84 +679,7 @@ class SyncTxManager {
 			
 			operation.recordFetchedBlock = { (record: CKRecord) in
 				
-				log.debug("Received record:")
-				log.debug(" - recordID: \(record.recordID)")
-				log.debug(" - creationDate: \(record.creationDate ?? Date.distantPast)")
-				
-				var unpaddedSize: Int = 0
-				var payment: Lightning_kmpWalletPayment? = nil
-				var metadata: WalletPaymentMetadataRow? = nil
-				
-				// Reminder: Kotlin-MPP has horrible multithreading support.
-				// It basically doesn't allow you to use multiple threads.
-				// Any Kotlin objects we create here will be tied to this background thread.
-				// And when we attempt to use them from another thread,
-				// Kotlin will throw an exception:
-				//
-				// > kotlin.native.IncorrectDereferenceException:
-				// >   illegal attempt to access non-shared
-				// >   fr.acinq.phoenix.db.WalletPaymentId.IncomingPaymentId@2881e28 from other thread
-				//
-				// We are working around this restriction by freezing objects via `doCopyAndFreeze()`.
-				
-				if let ciphertext = record[record_column_data] as? Data {
-					log.debug(" - data.count: \(ciphertext.count)")
-					
-					do {
-						let box = try ChaChaPoly.SealedBox(combined: ciphertext)
-						let cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
-						
-						let cleartext_kotlin = cleartext.toKotlinByteArray()
-						let wrapper = CloudData.companion.cborDeserialize(blob: cleartext_kotlin)
-						
-						if let wrapper = wrapper {
-							
-							#if DEBUG
-						//	let jsonData = wrapper.jsonSerialize().toSwiftData()
-						//	let jsonStr = String(data: jsonData, encoding: .utf8)
-						//	log.debug("Downloaded record (JSON representation):\n\(jsonStr ?? "<nil>")")
-							#endif
-							
-							let paddedSize = cleartext.count
-							let paddingSize = Int(wrapper.padding?.size ?? 0)
-							unpaddedSize = paddedSize - paddingSize
-							
-							payment = wrapper.unwrap()?.doCopyAndFreeze()
-						}
-						
-					} catch {
-						log.error("data decryption error: \(String(describing: error))")
-					}
-				}
-				
-				if let asset = record[record_column_meta] as? CKAsset {
-					
-					var ciphertext: Data? = nil
-					if let fileURL = asset.fileURL {
-						
-						do {
-							ciphertext = try Data(contentsOf: fileURL)
-						} catch {
-							log.error("asset read error: \(String(describing: error))")
-						}
-						
-						if let ciphertext = ciphertext {
-							do {
-								let box = try ChaChaPoly.SealedBox(combined: ciphertext)
-								let cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
-								
-								let cleartext_kotlin = cleartext.toKotlinByteArray()
-								let row = CloudAsset.companion.cloudDeserialize(blob: cleartext_kotlin)
-								
-								metadata = row?.doCopyAndFreeze()
-								
-							} catch {
-								log.error("meta decryption error: \(String(describing: error))")
-							}
-						}
-					}
-				}
-				
+				let (payment, metadata, unpaddedSize) = self.decryptAndDeserializePayment(record)
 				if let payment = payment {
 					items.append(DownloadedItem(
 						record: record,
@@ -744,7 +688,6 @@ class SyncTxManager {
 						metadata: metadata
 					))
 				}
-				
 			}
 			
 			operation.queryCompletionBlock = { (cursor: CKQueryOperation.Cursor?, error: Error?) in
@@ -781,7 +724,7 @@ class SyncTxManager {
 		) -> Void in
 			log.trace("downloadPayments(): updateDatabase()")
 			
-			// Kotlin will crash if we try to use multiple threads (like a real app)
+			// Kotlin suspend functions are currently only supported on the main thread
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
 			var oldest: Date? = nil
@@ -837,7 +780,9 @@ class SyncTxManager {
 						
 					} else {
 						log.debug("downloadPayments(): updateDatabase(): moreInCloud = false")
-						enqueueMissing()
+						DispatchQueue.main.async { // Kotlin completion may or may not be on main thread
+							enqueueMissing()
+						}
 					}
 				}
 			}
@@ -846,7 +791,7 @@ class SyncTxManager {
 		enqueueMissing = { () -> Void in
 			log.trace("downloadPayments(): enqueueMissing()")
 			
-			// Kotlin will crash if we try to use multiple threads (like a real app)
+			// Kotlin suspend functions are currently only supported on the main thread
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
 			self.cloudKitDb.enqueueMissingItems { (_, error) in
@@ -911,7 +856,7 @@ class SyncTxManager {
 		checkDatabase = { () -> Void in
 			log.trace("uploadPayments(): checkDatabase()")
 			
-			// Kotlin will crash if we try to use multiple threads (like a real app)
+			// Kotlin suspend functions are currently only supported on the main thread
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
 			self.cloudKitDb.fetchQueueBatch(limit: 20) {
@@ -1232,7 +1177,7 @@ class SyncTxManager {
 		updateDatabase = { (opInfo: UploadOperationInfo) -> Void in
 			log.trace("uploadPayments(): updateDatabase()")
 			
-			// Kotlin will crash if we try to use multiple threads (like a real app)
+			// Kotlin suspend functions are currently only supported on the main thread
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
 			var deleteFromQueue = [KotlinLong]()
@@ -1272,7 +1217,6 @@ class SyncTxManager {
 			log.debug("deleteFromQueue.count = \(deleteFromQueue.count)")
 			log.debug("deleteFromMetadata.count = \(deleteFromMetadata.count)")
 			log.debug("updateMetadata.count = \(updateMetadata.count)")
-			log.debug("updateMetadata: \(updateMetadata)")
 			
 			self.cloudKitDb.updateRows(
 				deleteFromQueue: deleteFromQueue,
@@ -1290,7 +1234,9 @@ class SyncTxManager {
 					
 					// Check to see if there are more items to upload.
 					// Perhaps items were added to the database while we were uploading.
-					checkDatabase()
+					DispatchQueue.main.async { // Kotlin completion may or may not be on main threadru
+						checkDatabase()
+					}
 				}
 			}
 			
@@ -1381,10 +1327,10 @@ class SyncTxManager {
 		var wrapper: CloudData? = nil
 		
 		if let incoming = row as? Lightning_kmpIncomingPayment {
-			wrapper = CloudData(incoming: incoming, version: CloudDataVersion.v0)
+			wrapper = CloudData(incoming: incoming)
 			
 		} else if let outgoing = row as? Lightning_kmpOutgoingPayment {
-			wrapper = CloudData(outgoing: outgoing, version: CloudDataVersion.v0)
+			wrapper = CloudData(outgoing: outgoing)
 		}
 		
 		var cleartext: Data? = nil
@@ -1508,7 +1454,7 @@ class SyncTxManager {
 			return nil
 		}
 		
-		let cleartext = row.cloudSerialize().toSwiftData()
+		let cleartext = CloudAsset(row: row).cborSerialize().toSwiftData()
 		
 		let ciphertext: Data
 		do {
@@ -1534,7 +1480,112 @@ class SyncTxManager {
 		return filePath
 	}
 	
-	func createProgress(for operation: CKModifyRecordsOperation) -> (Progress, [CKRecord.ID: Progress]) {
+	private func decryptAndDeserializePayment(
+		_ record: CKRecord
+	) -> (Lightning_kmpWalletPayment?, WalletPaymentMetadataRow?, Int) {
+		
+		log.debug("Received record:")
+		log.debug(" - recordID: \(record.recordID)")
+		log.debug(" - creationDate: \(record.creationDate ?? Date.distantPast)")
+		
+		var unpaddedSize: Int = 0
+		var payment: Lightning_kmpWalletPayment? = nil
+		var metadata: WalletPaymentMetadataRow? = nil
+		
+		if let ciphertext = record[record_column_data] as? Data {
+		//	log.debug(" - data.count: \(ciphertext.count)")
+			
+			var cleartext: Data? = nil
+			do {
+				let box = try ChaChaPoly.SealedBox(combined: ciphertext)
+				cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
+				
+			//	#if DEBUG
+			//	log.debug(" - raw payment: \(cleartext.toHex())")
+			//	#endif
+			} catch {
+				log.error("Error decrypting record.data: skipping \(record.recordID)")
+			}
+			
+			var wrapper: CloudData? = nil
+			if let cleartext {
+				do {
+					let cleartext_kotlin = cleartext.toKotlinByteArray()
+					wrapper = try CloudData.companion.cborDeserialize(blob: cleartext_kotlin)
+					
+				//	#if DEBUG
+				//	let jsonData = wrapper.jsonSerialize().toSwiftData()
+				//	let jsonStr = String(data: jsonData, encoding: .utf8)
+				//	log.debug(" - raw JSON:\n\(jsonStr ?? "<nil>")")
+				//	#endif
+
+					let paddedSize = cleartext.count
+					let paddingSize = Int(wrapper!.padding?.size ?? 0)
+					unpaddedSize = paddedSize - paddingSize
+				} catch {
+					log.error("Error deserializing record.data: skipping \(record.recordID)")
+				}
+			}
+			
+			if let wrapper {
+				do {
+					payment = try wrapper.unwrap()
+				} catch {
+					log.error("Error unwrapping record.data: skipping \(record.recordID)")
+				}
+			}
+		}
+		
+		if let asset = record[record_column_meta] as? CKAsset {
+			
+			var ciphertext: Data? = nil
+			if let fileURL = asset.fileURL {
+				do {
+					ciphertext = try Data(contentsOf: fileURL)
+				} catch {
+					log.error("Error reading record.asset: \(String(describing: error))")
+				}
+			}
+			
+			var cleartext: Data? = nil
+			if let ciphertext {
+				do {
+					let box = try ChaChaPoly.SealedBox(combined: ciphertext)
+					cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
+					
+				//	#if DEBUG
+				//	log.debug(" - raw metadata: \(cleartext.toHex())")
+				//	#endif
+				} catch {
+					log.error("Error decrypting record.asset: \(String(describing: error))")
+				}
+			}
+			
+			var cloudAsset: CloudAsset? = nil
+			if let cleartext {
+				do {
+					let cleartext_kotlin = cleartext.toKotlinByteArray()
+					cloudAsset = try CloudAsset.companion.cborDeserialize(blob: cleartext_kotlin)
+				} catch {
+					log.error("Error deserializing record.asset: \(String(describing: error))")
+				}
+			}
+			
+			if let cloudAsset {
+				do {
+					metadata = try cloudAsset.unwrap()
+				} catch {
+					log.error("Error unwrapping record.asset: \(String(describing: error))")
+				}
+			}
+		}
+		
+		return (payment, metadata, unpaddedSize)
+	}
+	
+	private func createProgress(
+		for operation: CKModifyRecordsOperation
+	) -> (Progress, [CKRecord.ID: Progress]) {
 		
 		// A CKModifyRecordsOperation consists of uploading:
 		// - zero or more CKRecords (with a serialized & encrypted payment)
@@ -1571,7 +1622,7 @@ class SyncTxManager {
 		return (parentProgress, children)
 	}
 	
-	func genRandomBytes(_ count: Int) -> Data {
+	private func genRandomBytes(_ count: Int) -> Data {
 
 		var data = Data(count: count)
 		let _ = data.withUnsafeMutableBytes { (ptr: UnsafeMutableRawBufferPointer) in
@@ -1583,7 +1634,9 @@ class SyncTxManager {
 	/// Incorporates failures from the last CKModifyRecordsOperation,
 	/// and returns a list of permanently failed items.
 	///
-	func updateConsecutivePartialFailures(_ partialFailures: [WalletPaymentId: CKError?]) -> [WalletPaymentId] {
+	private func updateConsecutivePartialFailures(
+		_ partialFailures: [WalletPaymentId: CKError?]
+	) -> [WalletPaymentId] {
 		
 		// Handle partial failures.
 		// The rules are:

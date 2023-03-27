@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="fr.acinq.phoenix.android">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -7,6 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".PhoenixApplication"
@@ -16,17 +18,35 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:hardwareAccelerated="true"
         android:theme="@style/default_theme">
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/Theme.PhoenixAndroid.NoActionBar">
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.PhoenixAndroid.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- support for lightning/bitcoin/lnurl schemes -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <!-- bitcoin & lightning schemes -->
+                <data android:scheme="bitcoin" />
+                <data android:scheme="lightning" />
+                <!-- lnurl schemes -->
+                <data android:scheme="lnurl" />
+                <data android:scheme="lnurlw" />
+                <data android:scheme="lnurlp" />
+                <data android:scheme="keyauth" />
+                <!-- phoenix specific scheme, for apps who specifically want to open phoenix -->
+                <data android:scheme="phoenix" />
             </intent-filter>
         </activity>
 

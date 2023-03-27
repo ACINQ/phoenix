@@ -25,7 +25,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
@@ -36,7 +35,7 @@ internal data class PreferenceItem<T>(val item: T, val title: String, val descri
 @Composable
 internal fun <T> ListPreferenceButton(
     title: String,
-    subtitle: String,
+    subtitle: @Composable () -> Unit = {},
     enabled: Boolean,
     selectedItem: T,
     preferences: List<PreferenceItem<T>>,
@@ -79,7 +78,7 @@ private fun <T> ListPreferenceDialog(
         title = title,
         onDismiss = onCancel,
         isScrollable = false,
-        buttons = { Button(onClick = onCancel, text = stringResource(id = R.string.btn_cancel), padding = PaddingValues(16.dp)) }
+        buttons = null // we add buttons manually as they would otherwise be pushed below the column which is not good ux in this case
     ) {
         Column(
             modifier = Modifier
@@ -90,7 +89,7 @@ private fun <T> ListPreferenceDialog(
                 Text(text = description, modifier = Modifier.padding(horizontal = 32.dp))
                 Spacer(modifier = Modifier.height(16.dp))
             }
-            LazyColumn {
+            LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
                 itemsIndexed(preferences) { index, item ->
                     PreferenceDialogItem(
                         item = item,
@@ -99,6 +98,11 @@ private fun <T> ListPreferenceDialog(
                     )
                 }
             }
+            Button(
+                onClick = onCancel,
+                text = stringResource(id = R.string.btn_cancel),
+                modifier = Modifier.align(Alignment.End)
+            )
         }
     }
 }
@@ -113,10 +117,10 @@ private fun <T> PreferenceDialogItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .padding(horizontal = 8.dp, vertical = 3.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            RadioButton(selected = selected, onClick = { })
+            RadioButton(selected = selected, onClick = { onClick(item) })
             Spacer(modifier = Modifier.width(2.dp))
             Column {
                 Text(text = item.title)

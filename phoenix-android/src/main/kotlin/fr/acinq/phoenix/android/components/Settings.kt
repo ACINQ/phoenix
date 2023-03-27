@@ -18,29 +18,17 @@ package fr.acinq.phoenix.android.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Switch
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 
-
-@Composable
-fun SettingCategory(textResId: Int) {
-    Text(
-        text = stringResource(id = textResId),
-        style = MaterialTheme.typography.subtitle1.copy(fontSize = 14.sp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 62.dp, top = 24.dp, end = 0.dp, bottom = 4.dp)
-    )
-}
 
 @Composable
 fun Setting(modifier: Modifier = Modifier, title: String, description: String?) {
@@ -56,11 +44,62 @@ fun Setting(modifier: Modifier = Modifier, title: String, description: String?) 
 }
 
 @Composable
+fun SettingWithDecoration(
+    modifier: Modifier = Modifier,
+    title: String,
+    description: @Composable () -> Unit = {},
+    decoration: (@Composable ()-> Unit)?,
+) {
+    Column(
+        modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+    ) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (decoration != null) {
+                decoration()
+                Spacer(Modifier.width(12.dp))
+            }
+            Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
+        }
+        Spacer(modifier = Modifier.height(2.dp))
+        Row(Modifier.fillMaxWidth()) {
+            if (decoration != null) {
+                Spacer(modifier = Modifier.width(30.dp))
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.subtitle2) {
+                    description()
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun SettingInteractive(
     modifier: Modifier = Modifier,
     title: String,
-    description: String?,
+    description: String,
     icon: Int? = null,
+    enabled: Boolean = true,
+    onClick: (() -> Unit)
+) {
+    SettingInteractive(modifier = modifier, title = title, icon = icon, enabled = enabled, onClick = onClick,
+        description = { Text(description) })
+}
+
+@Composable
+fun SettingInteractive(
+    modifier: Modifier = Modifier,
+    title: String,
+    description: @Composable () -> Unit = {},
+    icon: Int? = null,
+    iconTint: Color? = null,
+    maxTitleLines: Int = Int.MAX_VALUE,
     enabled: Boolean = true,
     onClick: (() -> Unit)
 ) {
@@ -76,17 +115,27 @@ fun SettingInteractive(
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (icon != null) {
-                PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize))
+                PhoenixIcon(icon, tint = iconTint ?: LocalContentColor.current, modifier = Modifier.size(ButtonDefaults.IconSize))
                 Spacer(Modifier.width(16.dp))
             }
-            Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.body2,
+                modifier = Modifier.weight(1f),
+                maxLines = maxTitleLines,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
         Spacer(modifier = Modifier.height(2.dp))
         Row(Modifier.fillMaxWidth()) {
             if (icon != null) {
                 Spacer(modifier = Modifier.width(34.dp))
             }
-            Text(text = description ?: "", style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f))
+            Column(modifier = Modifier.weight(1f)) {
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.subtitle2) {
+                    description()
+                }
+            }
         }
     }
 }
@@ -95,7 +144,7 @@ fun SettingInteractive(
 fun SettingSwitch(
     modifier: Modifier = Modifier,
     title: String,
-    description: String?,
+    description: String? = null,
     icon: Int = R.drawable.ic_blank,
     enabled: Boolean,
     isChecked: Boolean,
@@ -110,16 +159,18 @@ fun SettingSwitch(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize))
-            Spacer(Modifier.width(16.dp))
+            Spacer(Modifier.width(12.dp))
             Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
             Spacer(Modifier.width(16.dp))
             Switch(checked = isChecked, onCheckedChange = null)
         }
-        Spacer(modifier = Modifier.height(2.dp))
-        Row(Modifier.fillMaxWidth()) {
-            Spacer(modifier = Modifier.width(34.dp))
-            Text(text = description ?: "", style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f))
-            Spacer(Modifier.width(48.dp))
+        if (description != null) {
+            Spacer(modifier = Modifier.height(2.dp))
+            Row(Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.width(30.dp))
+                Text(text = description, style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f))
+                Spacer(Modifier.width(48.dp))
+            }
         }
     }
 }

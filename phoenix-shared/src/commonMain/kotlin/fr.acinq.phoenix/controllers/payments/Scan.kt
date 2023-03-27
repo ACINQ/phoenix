@@ -19,24 +19,24 @@ package fr.acinq.phoenix.controllers.payments
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.controllers.MVI
 import fr.acinq.phoenix.data.BitcoinAddressInfo
 import fr.acinq.phoenix.data.lnurl.*
 import io.ktor.http.*
-import kotlin.time.ExperimentalTime
 
 data class MaxFees(
     val feeBase: Satoshi,
     val feeProportionalMillionths: Long
 )
 
-@OptIn(ExperimentalTime::class)
 object Scan {
 
     sealed class BadRequestReason {
         object UnknownFormat : BadRequestReason()
         object AlreadyPaidInvoice : BadRequestReason()
+        data class Expired(val timestampSeconds: Long, val expirySeconds: Long) : BadRequestReason()
         data class ChainMismatch(val myChain: Chain, val requestChain: Chain?) : BadRequestReason()
         data class ServiceError(val url: Url, val error: LnurlError.RemoteFailure) : BadRequestReason()
         data class InvalidLnurl(val url: Url) : BadRequestReason()
@@ -69,6 +69,7 @@ object Scan {
         object Ready : Model()
 
         data class BadRequest(
+            val request: String,
             val reason: BadRequestReason
         ) : Model()
 
@@ -149,6 +150,8 @@ object Scan {
     }
 
     sealed class Intent : MVI.Intent() {
+        object Reset: Intent()
+
         data class Parse(
             val request: String
         ) : Intent()

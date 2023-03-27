@@ -1,7 +1,5 @@
 package fr.acinq.phoenix.utils
 
-import io.ktor.utils.io.*
-import io.ktor.utils.io.core.internal.*
 import kotlinx.coroutines.*
 import kotlinx.datetime.*
 import org.kodein.log.LogFrontend
@@ -14,31 +12,27 @@ import org.kodein.memory.file.openWriteableFile
 import org.kodein.memory.file.resolve
 import org.kodein.memory.text.putString
 import org.kodein.memory.use
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.seconds
 
 
-@OptIn(DangerousInternalIoApi::class, ExperimentalTime::class)
-class LogMemory(val directory: Path) : LogFrontend {
+class LogMemory(val directory: Path) : LogFrontend, CoroutineScope by MainScope() {
 
     data class Line(val instant: Instant, val tag: Logger.Tag, val entry: Logger.Entry, val message: String?)
 
-    private var lines = ArrayList<Line>().also { it.preventFreeze() }
+    private var lines = ArrayList<Line>()
 
     private fun currentDate() = Clock.System.now().toLocalDateTime(TimeZone.UTC).date
 
     val file get() = directory.resolve(toFileName(currentDate()) + ".txt")
 
     private val threshold = 20
-    private val every = Duration.seconds(10)
+    private val every = 10.seconds
     private var lastRotate = Clock.System.now()
 
     init {
         directory.createDirs()
 
-        preventFreeze()
-
-        MainScope().launch {
+        launch {
             while (true) {
                 delay(every)
                 if (Clock.System.now() - lastRotate >= (every / 2)) {
@@ -63,9 +57,9 @@ class LogMemory(val directory: Path) : LogFrontend {
         }
 
         val localLines = this.lines
-        this.lines = ArrayList<Line>().also { it.preventFreeze() }
+        this.lines = ArrayList()
 
-        return writeLogs(ArrayList(localLines).also { it.makeShared() }, file)
+        return writeLogs(ArrayList(localLines), file)
     }
 
 
@@ -79,6 +73,7 @@ class LogMemory(val directory: Path) : LogFrontend {
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 private fun writeLogs(lines: List<LogMemory.Line>, file: Path): Job = GlobalScope.launch(Dispatchers.Default) {
     val allLines = buildString {
         lines.forEach { line ->

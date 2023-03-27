@@ -1,19 +1,15 @@
 import SwiftUI
 import PhoenixShared
 
-extension UserDefaults {
-	
-	func getCodable<Element: Codable>(forKey key: String) -> Element? {
-		guard let data = self.data(forKey: key) else {
-			return nil
-		}
-		let element = try? JSONDecoder().decode(Element.self, from: data)
-		return element
+extension Encodable {
+	func jsonEncode() -> Data? {
+		return try? JSONEncoder().encode(self)
 	}
-	
-	func setCodable<Element: Codable>(value: Element, forKey key: String) {
-		let data = try? JSONEncoder().encode(value)
-		self.setValue(data, forKey: key)
+}
+
+extension Data {
+	func jsonDecode<Element: Decodable>() -> Element? {
+		return try? JSONDecoder().decode(Element.self, from: self)
 	}
 }
 
@@ -62,13 +58,7 @@ enum PushPermissionQuery: String, Codable {
 	case userAccepted
 }
 
-struct PushTokenRegistration: Equatable, Codable {
-	let pushToken: String
-	let nodeIdHash: String
-	let registrationDate: Date
-}
-
-struct ElectrumConfigPrefs: Codable {
+struct ElectrumConfigPrefs: Equatable, Codable {
 	let host: String
 	let port: UInt16
 	let pinnedPubKey: String?
@@ -100,7 +90,7 @@ struct ElectrumConfigPrefs: Codable {
 
 }
 
-struct MaxFees: Codable {
+struct MaxFees: Equatable, Codable {
 	let feeBaseSat: Int64
 	let feeProportionalMillionths: Int64
 	
@@ -116,5 +106,22 @@ struct MaxFees: Codable {
 			feeBase: Bitcoin_kmpSatoshi(sat: self.feeBaseSat),
 			feeProportionalMillionths: self.feeProportionalMillionths
 		)
+	}
+}
+
+enum RecentPaymentsConfig: Equatable, Codable, Identifiable {
+	case withinTime(seconds: Int)
+	case mostRecent(count: Int)
+	case inFlightOnly
+
+	var id: String {
+		switch self {
+		case .withinTime(let seconds):
+			return "withinTime(seconds=\(seconds))"
+		case .mostRecent(let count):
+			return "mostRecent(count=\(count)"
+		case .inFlightOnly:
+			return "inFlightOnly"
+		}
 	}
 }

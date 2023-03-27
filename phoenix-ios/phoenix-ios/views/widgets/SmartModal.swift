@@ -33,6 +33,15 @@ public class SmartModalState: ObservableObject {
 		return UIDevice.current.userInterfaceIdiom == .pad
 	}
 	
+	var currentItem: SmartModalItem? {
+		
+		if isIPad {
+			return PopoverState.shared.publisher.value
+		} else {
+			return ShortSheetState.shared.publisher.value
+		}
+	}
+	
 	func display<Content: View>(
 		dismissable: Bool,
 		@ViewBuilder builder: () -> Content,
@@ -84,6 +93,12 @@ public class SmartModalState: ObservableObject {
 			ShortSheetState.shared.onNextDidDisappear(action)
 		}
 	}
+}
+
+protocol SmartModalItem {
+	
+	/// Whether or not the item is dimissable by tapping outside the item's view.
+	var dismissable: Bool { get }
 }
 
 struct SmartModalEnvironmentKey: EnvironmentKey {

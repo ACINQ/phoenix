@@ -77,6 +77,15 @@ object Wallet {
     return SingleAddressEclairWallet(getChainHash(), DeterministicWallet.derivePrivateKey(master, path).publicKey())
   }
 
+  fun buildKmpSwapInAddress(master: DeterministicWallet.ExtendedPrivateKey): String {
+    val path = if (isMainnet()) {
+      DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/1'/0/0")
+    } else {
+      DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/1'/0/0")
+    }
+    return fr.acinq.bitcoin.scala.`package$`.`MODULE$`.computeP2WpkhAddress(DeterministicWallet.derivePrivateKey(master, path).publicKey(), getChainHash())
+  }
+
   fun buildXpub(master: DeterministicWallet.ExtendedPrivateKey): Xpub {
     val path = if (isMainnet()) {
       DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/0'")

@@ -1,5 +1,7 @@
 package fr.acinq.phoenix.db.payments
 
+import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.byteVector32
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.*

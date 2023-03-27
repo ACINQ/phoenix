@@ -21,17 +21,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,23 +44,21 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountView
+import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
-import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.walletPaymentId
-import kotlinx.coroutines.launch
 
 
 @Composable
 fun PaymentLineLoading(
     paymentId: WalletPaymentId,
-    timestamp: Long,
     onPaymentClick: (WalletPaymentId) -> Unit
 ) {
+    val backgroundColor = MaterialTheme.colors.background.copy(alpha = 0.65f)
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -69,20 +66,38 @@ fun PaymentLineLoading(
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         PaymentIconComponent(
-            icon = R.drawable.ic_payment_pending,
+            icon = null,
+            backgroundColor = backgroundColor,
             description = stringResource(id = R.string.paymentdetails_status_sent_pending)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
+            Row {
+                Text(
+                    text = "",
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(backgroundColor)
+                )
+                Spacer(modifier = Modifier.width(24.dp))
+                Text(
+                    text = "",
+                    modifier = Modifier
+                        .width(80.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(backgroundColor)
+                )
+            }
+            Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = stringResource(id = R.string.paymentline_loading),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.body1.copy(color = mutedTextColor()),
-                modifier = Modifier.fillMaxWidth()
+                text = "",
+                fontSize = 12.sp,
+                modifier = Modifier
+                    .width(80.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(backgroundColor)
             )
-            Spacer(modifier = Modifier.width(2.dp))
-            Text(text = timestamp.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
         }
     }
 }
@@ -90,7 +105,8 @@ fun PaymentLineLoading(
 @Composable
 fun PaymentLine(
     paymentInfo: WalletPaymentInfo,
-    onPaymentClick: (WalletPaymentId) -> Unit
+    onPaymentClick: (WalletPaymentId) -> Unit,
+    isAmountRedacted: Boolean = false,
 ) {
     val payment = paymentInfo.payment
 
@@ -116,15 +132,19 @@ fun PaymentLine(
                         }
                         is IncomingPayment -> payment.received?.amount ?: 0.msat
                     }
-                    AmountView(
-                        amount = amount,
-                        amountTextStyle = MaterialTheme.typography.body1.copy(color = if (isOutgoing) negativeColor() else positiveColor()),
-                        unitTextStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
-                        isOutgoing = isOutgoing
-                    )
+                    if (isAmountRedacted) {
+                        Text(text = "****")
+                    } else {
+                        AmountView(
+                            amount = amount,
+                            amountTextStyle = MaterialTheme.typography.body1.copy(color = if (isOutgoing) negativeColor() else positiveColor()),
+                            unitTextStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
+                            prefix = stringResource(if (isOutgoing) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received)
+                        )
+                    }
                 }
             }
-            Spacer(modifier = Modifier.width(2.dp))
+            Spacer(modifier = Modifier.height(2.dp))
             val timestamp: Long = remember {
                 payment.completedAt().takeIf { it > 0 } ?: when (payment) {
                     is OutgoingPayment -> payment.createdAt
@@ -145,7 +165,11 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
             is OutgoingPayment.Details.Normal -> d.paymentRequest.description
             is OutgoingPayment.Details.KeySend -> stringResource(id = R.string.paymentline_keysend_outgoing)
             is OutgoingPayment.Details.SwapOut -> d.address
-            is OutgoingPayment.Details.ChannelClosing -> stringResource(R.string.paymentline_closing_desc, d.closingAddress)
+            is OutgoingPayment.Details.ChannelClosing -> if (d.closingAddress.isBlank()) {
+                stringResource(R.string.paymentline_closing_desc_no_address)
+            } else {
+                stringResource(R.string.paymentline_closing_desc, d.closingAddress)
+            }
         }
         is IncomingPayment -> when (val o = payment.origin) {
             is IncomingPayment.Origin.Invoice -> o.paymentRequest.description
@@ -186,29 +210,59 @@ private fun PaymentIcon(payment: WalletPayment) {
             is OutgoingPayment.Status.Completed.Succeeded.OnChain -> PaymentIconComponent(
                 icon = R.drawable.ic_payment_success_onchain,
                 description = stringResource(id = R.string.paymentdetails_status_sent_successful),
-                iconSize = 12.dp,
+                iconSize = 14.dp,
                 iconColor = MaterialTheme.colors.onPrimary,
                 backgroundColor = MaterialTheme.colors.primary
             )
         }
-        is IncomingPayment -> when (payment.received) {
-            null -> PaymentIconComponent(
-                icon = R.drawable.ic_payment_pending,
-                description = stringResource(id = R.string.paymentdetails_status_received_pending)
-            )
-            else -> PaymentIconComponent(
-                icon = R.drawable.ic_payment_success,
-                description = stringResource(id = R.string.paymentdetails_status_received_successful),
-                iconSize = 18.dp,
-                iconColor = MaterialTheme.colors.onPrimary,
-                backgroundColor = MaterialTheme.colors.primary
-            )
+        is IncomingPayment -> when {
+            payment.received == null -> {
+                PaymentIconComponent(
+                    icon = R.drawable.ic_payment_pending,
+                    description = stringResource(id = R.string.paymentdetails_status_received_pending),
+                    iconSize = 18.dp,
+                    iconColor = MaterialTheme.colors.onPrimary,
+                    backgroundColor = MaterialTheme.colors.primary
+                )
+            }
+            payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().any() -> {
+                PaymentIconComponent(
+                    icon = R.drawable.ic_clock,
+                    description = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
+                    iconSize = 18.dp,
+                    iconColor = MaterialTheme.colors.onPrimary,
+                    backgroundColor = MaterialTheme.colors.primary
+                )
+            }
+            else -> {
+                PaymentIconComponent(
+                    icon = if (payment.origin is IncomingPayment.Origin.SwapIn) {
+                        R.drawable.ic_payment_success_onchain
+                    } else {
+                        R.drawable.ic_payment_success
+                    },
+                    description = stringResource(id = R.string.paymentdetails_status_received_successful),
+                    iconSize = if (payment.origin is IncomingPayment.Origin.SwapIn) {
+                        14.dp
+                    } else {
+                        18.dp
+                    },
+                    iconColor = MaterialTheme.colors.onPrimary,
+                    backgroundColor = MaterialTheme.colors.primary
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun PaymentIconComponent(icon: Int, description: String, iconSize: Dp = 18.dp, iconColor: Color = MaterialTheme.colors.primary, backgroundColor: Color = Color.Unspecified) {
+private fun PaymentIconComponent(
+    icon: Int?,
+    description: String,
+    iconSize: Dp = 18.dp,
+    iconColor: Color = MaterialTheme.colors.primary,
+    backgroundColor: Color = Color.Unspecified
+) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -217,11 +271,13 @@ private fun PaymentIconComponent(icon: Int, description: String, iconSize: Dp = 
             .background(color = backgroundColor)
             .padding(4.dp)
     ) {
-        Image(
-            painter = painterResource(icon),
-            contentDescription = description,
-            modifier = Modifier.size(iconSize),
-            colorFilter = ColorFilter.tint(iconColor)
-        )
+        if (icon != null) {
+            Image(
+                painter = painterResource(icon),
+                contentDescription = description,
+                modifier = Modifier.size(iconSize),
+                colorFilter = ColorFilter.tint(iconColor)
+            )
+        }
     }
 }

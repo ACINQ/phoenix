@@ -42,6 +42,46 @@
 				<string>phoenix</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>co.acinq.phoenix.url.bitcoin</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>bitcoin</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>co.acinq.phoenix.url.keyauth</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>keyauth</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>co.acinq.phoenix.url.lnurlp</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>lnurlp</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>co.acinq.phoenix.url.lnurlw</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>lnurlw</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>

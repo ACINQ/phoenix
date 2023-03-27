@@ -17,7 +17,11 @@
 
 package fr.acinq.phoenix.android.payments
 
+import android.*
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.*
+import android.provider.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,9 +39,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.app.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.permissions.*
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.ResultPoint
 import com.google.zxing.client.android.Intents
@@ -45,6 +51,7 @@ import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
@@ -52,11 +59,8 @@ import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.databinding.ScanViewBinding
-import fr.acinq.phoenix.android.utils.annotatedStringResource
+import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.android.utils.readClipboard
-import fr.acinq.phoenix.android.utils.whiteLowOp
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ScanController
 import fr.acinq.phoenix.controllers.payments.MaxFees
@@ -75,21 +79,38 @@ class ScanDataViewModel(controller: ScanController) : MVIControllerViewModel<Sca
     }
 }
 
+/**
+ * @param input External input, for example a deeplink from another app, which needs to be parsed and validated.
+ *              When not null, the camera should not be initialized at first as we already have a data input.
+ */
 @Composable
 fun ScanDataView(
+    input: String? = null,
     onBackClick: () -> Unit,
     onAuthSchemeInfoClick: () -> Unit,
 ) {
+    val log = logger("ScanDataView")
+    var initialInput = remember { input }
     val trampolineMaxFees by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(null)
     val maxFees = trampolineMaxFees?.let { MaxFees(it.feeBase, it.feeProportional) }
     val vm: ScanDataViewModel = viewModel(factory = ScanDataViewModel.Factory(controllerFactory, CF::scan))
+
     MVIView(vm) { model, postIntent ->
+        LaunchedEffect(key1 = initialInput) {
+            initialInput?.takeIf { it.isNotBlank() }?.let {
+                postIntent(Scan.Intent.Parse(it))
+            }
+        }
         when (model) {
             Scan.Model.Ready, is Scan.Model.BadRequest, is Scan.Model.InvoiceFlow.DangerousRequest, is Scan.Model.LnurlServiceFetch -> {
                 ReadDataView(
+                    initialInput = initialInput,
                     model = model,
                     onBackClick = onBackClick,
-                    onFeedbackDismiss = { vm.model = Scan.Model.Ready },
+                    onFeedbackDismiss = {
+                        initialInput = ""
+                        postIntent(Scan.Intent.Reset)
+                    },
                     onConfirmDangerousRequest = { request, invoice -> postIntent(Scan.Intent.InvoiceFlow.ConfirmDangerousRequest(request, invoice)) },
                     onScannedText = { postIntent(Scan.Intent.Parse(request = it)) }
                 )
@@ -152,45 +173,30 @@ fun ScanDataView(
 
 @Composable
 fun ReadDataView(
+    initialInput: String?,
     model: Scan.Model,
     onFeedbackDismiss: () -> Unit,
     onBackClick: () -> Unit,
     onConfirmDangerousRequest: (String, PaymentRequest) -> Unit,
     onScannedText: (String) -> Unit,
 ) {
-    val context = LocalContext.current.applicationContext
     val log = logger("ReadDataView")
+    val context = LocalContext.current.applicationContext
 
-    var _scanView by remember { mutableStateOf<DecoratedBarcodeView?>(null) }
+    var showManualInputDialog by remember { mutableStateOf(false) }
+    var scanView by remember { mutableStateOf<DecoratedBarcodeView?>(null) }
 
-    Box {
+    Box(Modifier.fillMaxSize()) {
 
-        ScannerView(
-            onScanViewBinding = { _scanView = it },
-            onScannedText = onScannedText
-        )
-
-        // visor
-        Box(
-            Modifier
-                .width(dimensionResource(id = R.dimen.scanner_size))
-                .height(dimensionResource(id = R.dimen.scanner_size))
-                .clip(RoundedCornerShape(24.dp))
-                .background(whiteLowOp())
-                .align(Alignment.Center)
-        )
-
-        if (model is Scan.Model.BadRequest) {
-            ScanErrorView(model, onFeedbackDismiss)
-        }
-
-        if (model is Scan.Model.InvoiceFlow.DangerousRequest) {
-            DangerousRequestDialog(request = model.request, paymentRequest = model.paymentRequest, onDismiss = onFeedbackDismiss, onConfirmDangerousRequest = onConfirmDangerousRequest)
-        }
-
-        if (model is Scan.Model.LnurlServiceFetch) {
-            Card(modifier = Modifier.align(Alignment.Center), internalPadding = PaddingValues(24.dp)) {
-                Text(text = stringResource(R.string.scan_lnurl_fetching))
+        if (initialInput.isNullOrBlank()) {
+            ScannerView(
+                onScanViewBinding = { scanView = it },
+                onScannedText = onScannedText
+            )
+            CameraPermissionsView {
+                LaunchedEffect(key1 = model, key2 = initialInput) {
+                    if (model is Scan.Model.Ready && initialInput.isNullOrBlank()) scanView?.resume()
+                }
             }
         }
 
@@ -203,11 +209,16 @@ fun ReadDataView(
                 .background(MaterialTheme.colors.surface)
         ) {
             if (model is Scan.Model.Ready) {
-                LaunchedEffect(key1 = model) { _scanView?.resume() }
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    icon = R.drawable.ic_input,
+                    text = stringResource(id = R.string.scan_manual_input_button),
+                    onClick = { showManualInputDialog = true },
+                )
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     icon = R.drawable.ic_clipboard,
-                    text = stringResource(id = R.string.send_init_paste),
+                    text = stringResource(id = R.string.scan_paste_button),
                     onClick = { readClipboard(context)?.let { onScannedText(it) } },
                 )
             }
@@ -218,11 +229,33 @@ fun ReadDataView(
                 onClick = onBackClick
             )
         }
+
+        if (model is Scan.Model.BadRequest) {
+            ScanErrorView(model, onFeedbackDismiss)
+        }
+
+        if (model is Scan.Model.BadRequest) {
+            ScanErrorView(model, onFeedbackDismiss)
+        }
+
+        if (model is Scan.Model.InvoiceFlow.DangerousRequest) {
+            DangerousRequestDialog(request = model.request, paymentRequest = model.paymentRequest, onDismiss = onFeedbackDismiss, onConfirmDangerousRequest = onConfirmDangerousRequest)
+        }
+
+        if (model is Scan.Model.LnurlServiceFetch) {
+            Card(modifier = Modifier.align(Alignment.Center), internalPadding = PaddingValues(24.dp)) {
+                ProgressView(text = stringResource(R.string.scan_lnurl_fetching))
+            }
+        }
+
+        if (showManualInputDialog) {
+            ManualInputDialog(onInputConfirm = onScannedText, onDismiss = { showManualInputDialog = false })
+        }
     }
 }
 
 @Composable
-private fun ScannerView(
+fun BoxScope.ScannerView(
     onScanViewBinding: (DecoratedBarcodeView) -> Unit,
     onScannedText: (String) -> Unit
 ) {
@@ -251,9 +284,18 @@ private fun ScannerView(
                 scanView.resume()
             }
             binding
-        })
+        }
+    )
+    // visor
+    Box(
+        Modifier
+            .width(dimensionResource(id = R.dimen.scanner_size))
+            .height(dimensionResource(id = R.dimen.scanner_size))
+            .clip(RoundedCornerShape(24.dp))
+            .background(whiteLowOp())
+            .align(Alignment.Center)
+    )
 }
-
 
 @Composable
 private fun ScanErrorView(
@@ -261,8 +303,9 @@ private fun ScanErrorView(
     onErrorDialogDismiss: () -> Unit,
 ) {
     val errorMessage = when (model.reason) {
+        is Scan.BadRequestReason.Expired -> stringResource(R.string.scan_error_expired)
         is Scan.BadRequestReason.ChainMismatch -> stringResource(R.string.scan_error_invalid_chain)
-        is Scan.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.scan_error_pay_to_self)
+        is Scan.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.scan_error_already_paid)
         is Scan.BadRequestReason.ServiceError -> stringResource(R.string.scan_error_lnurl_service_error)
         is Scan.BadRequestReason.InvalidLnurl -> stringResource(R.string.scan_error_lnurl_invalid)
         is Scan.BadRequestReason.UnsupportedLnurl -> stringResource(R.string.scan_error_lnurl_unsupported)
@@ -326,6 +369,69 @@ private fun ChooseSwapOutOrLightningDialog(
                     Text(text = stringResource(id = R.string.send_paymentmode_lightning_desc), style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ManualInputDialog(
+    onInputConfirm: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var input by remember { mutableStateOf("") }
+    Dialog(
+        onDismiss = onDismiss,
+        title = stringResource(id = R.string.scan_manual_input_title),
+        buttons = {
+            Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel), padding = PaddingValues(16.dp))
+            Button(onClick = { onInputConfirm(input); onDismiss() }, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(16.dp))
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+        ) {
+            Text(text = stringResource(id = R.string.scan_manual_input_instructions))
+            Spacer(Modifier.height(16.dp))
+            TextInput(
+                text = input,
+                onTextChange = { input = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text(text = stringResource(id = R.string.scan_manual_input_hint)) },
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun BoxScope.CameraPermissionsView(
+    onPermissionGranted: @Composable () -> Unit
+) {
+    val context = LocalContext.current
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+    if (cameraPermissionState.status.isGranted) {
+        onPermissionGranted()
+    } else {
+        Card(
+            modifier = Modifier.align(Alignment.Center),
+        ) {
+            // if user has denied permission, open the system settings for Phoenix
+            val isDenied = cameraPermissionState.status.shouldShowRationale
+            Button(
+                icon = R.drawable.ic_camera,
+                text = stringResource(id = if (isDenied) R.string.scan_request_camera_access_denied else R.string.scan_request_camera_access),
+                onClick = {
+                    if (isDenied) {
+                        context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        })
+                    } else {
+                        cameraPermissionState.launchPermissionRequest()
+                    }
+                }
+            )
         }
     }
 }

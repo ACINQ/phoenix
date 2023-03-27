@@ -2,84 +2,6 @@ import fr.acinq.phoenix.db.payments.OutgoingDetailsTypeVersion;
 import fr.acinq.phoenix.db.payments.OutgoingStatusTypeVersion;
 import fr.acinq.phoenix.db.payments.OutgoingPartStatusTypeVersion;
 
-listAllPayments:
-SELECT *
-FROM (
-    SELECT
-        'outgoing'              AS direction,
-        id                      AS outgoing_payment_id,
-        payment_hash            AS payment_hash,
-
-        SUM(CASE
-                WHEN parts.part_status_type = "SUCCEEDED_V0" THEN parts.part_amount_msat
-                ELSE 0
-            END)                AS parts_total_succeeded,
-        recipient_amount_msat   AS amount,
-
-        recipient_node_id       AS outgoing_recipient,
-        details_type            AS outgoing_details_type,
-        details_blob            AS outgoing_details_blob,
-        status_type             AS outgoing_status_type,
-        status_blob             AS outgoing_status_blob,
-
-        NULL                    AS incoming_preimage,
-        NULL                    AS incoming_origin_type,
-        NULL                    AS incoming_origin_blob,
-        NULL                    AS incoming_received_with_type,
-        NULL                    AS incoming_received_with_blob,
-
-        created_at              AS created_at,
-        completed_at            AS completed_at
-    FROM outgoing_payments
-    LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.part_parent_id = id
-    GROUP BY id
-UNION ALL
-    SELECT
-        'incoming'              AS direction,
-        NULL                    AS outgoing_payment_id,
-        payment_hash            AS payment_hash,
-        NULL                    AS parts_total_succeeded,
-        received_amount_msat    AS amount,
-
-        NULL                    AS outgoing_recipient,
-        NULL                    AS outgoing_details_type,
-        NULL                    AS outgoing_details_blob,
-        NULL                    AS outgoing_status_type,
-        NULL                    AS outgoing_status_blob,
-
-        preimage                AS incoming_preimage,
-        origin_type             AS incoming_origin_type,
-        origin_blob             AS incoming_origin_blob,
-        received_with_type      AS incoming_payment_request,
-        received_with_blob      AS incoming_payment_request,
-
-        created_at              AS created_at,
-        received_at             AS completed_at
-    FROM incoming_payments
-    WHERE received_amount_msat > 0
-)
-ORDER BY COALESCE(completed_at, created_at) DESC
-LIMIT :limit OFFSET :offset;
-
---  0: ['outgoing', 'incoming']
---  1: outgoing_payment_id              a UUID identifying an functional outgoing payment (made of parts)
---  2: payment_hash                     serves as the identifier for incoming payments
---  3: parts_amount                     the total amount successfully sent by the outgoing payment parts
---  4: amount                           the amount received by the node (if incoming) or received by the recipient (if outgoing)
---  5: outgoing_recipient
---  6: outgoing_details_type
---  7: outgoing_details
---  8: outgoing_status_type
---  9: outgoing_status
--- 10: incoming_preimage
--- 11: incoming_payment_type
--- 12: incoming_payment_request
--- 13: incoming_swap_address
--- 14: incoming_received_with
--- 15: incoming_received_with_fees
--- 16: created_at                       payment creation timestamp
--- 17: completed_at                     payment completion timestamp
-
 listAllPaymentsOrder:
 SELECT
     combined_payments.type         AS type,
@@ -175,3 +97,45 @@ LEFT OUTER JOIN payments_metadata ON
     payments_metadata.id = combined_payments.id
 ORDER BY COALESCE(combined_payments.completed_at, combined_payments.created_at) DESC
 LIMIT :limit OFFSET :offset;
+
+listRangeSuccessfulPaymentsOrder:
+SELECT
+    combined_payments.type         AS type,
+    combined_payments.id           AS id,
+    combined_payments.created_at   AS created_at,
+    combined_payments.completed_at AS completed_at,
+    payments_metadata.modified_at  AS metadata_modified_at
+FROM (
+    SELECT
+        2            AS type,
+        id           AS id,
+        created_at   AS created_at,
+        completed_at AS completed_at
+    FROM outgoing_payments
+    WHERE outgoing_payments.status_type LIKE 'SUCCEEDED_%'
+    AND   completed_at BETWEEN :startDate AND :endDate
+UNION ALL
+    SELECT
+        1                        AS type,
+        lower(hex(payment_hash)) AS id,
+        created_at               AS created_at,
+        received_at              AS completed_at
+    FROM incoming_payments
+    WHERE incoming_payments.received_at BETWEEN :startDate AND :endDate
+) combined_payments
+LEFT OUTER JOIN payments_metadata ON
+    payments_metadata.type = combined_payments.type AND
+    payments_metadata.id = combined_payments.id
+ORDER BY COALESCE(combined_payments.completed_at, combined_payments.created_at) DESC
+LIMIT :limit OFFSET :offset;
+
+listRangeSuccessfulPaymentsCount:
+SELECT SUM(result) AS result FROM (
+    SELECT COUNT(*) AS result
+    FROM outgoing_payments
+    WHERE outgoing_payments.status_type LIKE 'SUCCEEDED_%'
+    AND   completed_at BETWEEN :startDate AND :endDate
+UNION ALL
+    SELECT COUNT(*) AS result FROM incoming_payments
+    WHERE incoming_payments.received_at BETWEEN :startDate AND :endDate
+);

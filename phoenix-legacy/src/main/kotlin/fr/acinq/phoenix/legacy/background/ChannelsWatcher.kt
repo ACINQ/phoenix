@@ -147,7 +147,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker
       .setContentTitle(title)
       .setContentText(message)
       .setStyle(NotificationCompat.BigTextStyle().bigText(message))
-      .setContentIntent(PendingIntent.getActivity(context, Constants.NOTIF_ID__CHANNELS_WATCHER, startIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+      .setContentIntent(PendingIntent.getActivity(context, Constants.NOTIF_ID__CHANNELS_WATCHER, startIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
       .setOngoing(isAlert)
       .setPriority(if (isAlert) NotificationCompat.PRIORITY_MAX else NotificationCompat.PRIORITY_DEFAULT)
       .setAutoCancel(true)

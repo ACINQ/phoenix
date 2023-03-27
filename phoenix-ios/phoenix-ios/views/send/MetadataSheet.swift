@@ -25,7 +25,10 @@ struct MetadataSheet: View {
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				Text("Metadata")
 					.font(.title3)
+					.accessibilityAddTraits(.isHeader)
+				
 				Spacer()
+				
 				Button {
 					closeButtonTapped()
 				} label: {
@@ -33,6 +36,8 @@ struct MetadataSheet: View {
 						.resizable()
 						.frame(width: 30, height: 30)
 				}
+				.accessibilityLabel("Close")
+				.accessibilityHidden(smartModalState.currentItem?.dismissable ?? false)
 			}
 			.padding(.horizontal)
 			.padding(.vertical, 8)

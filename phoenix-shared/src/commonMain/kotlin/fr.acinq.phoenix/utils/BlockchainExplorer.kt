@@ -4,27 +4,25 @@ import fr.acinq.phoenix.data.Chain
 
 class BlockchainExplorer(private val chain: Chain) {
 
-    sealed class Website {
-        object MempoolSpace: Website()
-        object BlockstreamInfo: Website()
+    sealed class Website(val base: String) {
+        object MempoolSpace: Website("https://mempool.space")
+        object BlockstreamInfo: Website("https://blockstream.info")
     }
 
     fun txUrl(txId: String, website: Website = Website.MempoolSpace): String {
         return when (website) {
             Website.MempoolSpace -> {
-                val base = "https://mempool.space"
                 when (chain) {
-                    Chain.Mainnet -> "$base/tx/$txId"
-                    Chain.Testnet -> "$base/testnet/tx/$txId"
-                    Chain.Regtest -> "$base/_REGTEST_/tx/$txId"
+                    Chain.Mainnet -> "${website.base}/tx/$txId"
+                    Chain.Testnet -> "${website.base}/testnet/tx/$txId"
+                    Chain.Regtest -> "${website.base}/_REGTEST_/tx/$txId"
                 }
             }
             Website.BlockstreamInfo -> {
-                val base = "https://blockstream.info"
                 when (chain) {
-                    Chain.Mainnet -> "$base/tx/$txId"
-                    Chain.Testnet -> "$base/testnet/tx/$txId"
-                    Chain.Regtest -> "$base/_REGTEST_/tx/$txId"
+                    Chain.Mainnet -> "${website.base}/tx/$txId"
+                    Chain.Testnet -> "${website.base}/testnet/tx/$txId"
+                    Chain.Regtest -> "${website.base}/_REGTEST_/tx/$txId"
                 }
             }
         }
@@ -33,19 +31,17 @@ class BlockchainExplorer(private val chain: Chain) {
     fun addressUrl(addr: String, website: Website = Website.MempoolSpace): String {
         return when (website) {
             Website.MempoolSpace -> {
-                val base = "https://mempool.space"
                 when (chain) {
-                    Chain.Mainnet -> "$base/address/$addr"
-                    Chain.Testnet -> "$base/testnet/address/$addr"
-                    Chain.Regtest -> "$base/_REGTEST_/address/$addr"
+                    Chain.Mainnet -> "${website.base}/address/$addr"
+                    Chain.Testnet -> "${website.base}/testnet/address/$addr"
+                    Chain.Regtest -> "${website.base}/_REGTEST_/address/$addr"
                 }
             }
             Website.BlockstreamInfo -> {
-                val base = "https://blockstream.info"
                 when (chain) {
-                    Chain.Mainnet -> "$base/address/$addr"
-                    Chain.Testnet -> "$base/testnet/address/$addr"
-                    Chain.Regtest -> "$base/_REGTEST_/address/$addr"
+                    Chain.Mainnet -> "${website.base}/address/$addr"
+                    Chain.Testnet -> "${website.base}/testnet/address/$addr"
+                    Chain.Regtest -> "${website.base}/_REGTEST_/address/$addr"
                 }
             }
         }

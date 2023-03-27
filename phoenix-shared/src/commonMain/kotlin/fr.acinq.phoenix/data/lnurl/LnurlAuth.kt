@@ -44,13 +44,17 @@ data class LnurlAuth(
     }
 
     /**
-     * Early versions of our lnurl-auth implementation used non-standard keys. For domains that existed then,
-     * Phoenix will use legacy key computation.
+     * Early versions of our lnurl-auth implementation used non-standard keys on Android. We define a legacy-friendly
+     * scheme to let the user switch to that old behaviour when needed. The default scheme is the recommended
+     * one and is compliant with the specifications.
+     *
+     * Note: this does **not** affect the [LnurlAuth.LegacyDomain.filterDomain] method for the key derivation path,
+     * which will apply in both cases.
      */
     sealed class Scheme(val id: Int) {
         /**
-         * The default scheme is spec compliant and that's what should be used on new services.
-         * The hashing key and the linking key are computed by deriving the master key.
+         * The default scheme is spec compliant and that's what should be used on new service. The hashing key and
+         * the linking key are computed by deriving the master key. The iOS app should always use that scheme.
          */
         object DEFAULT_SCHEME : Scheme(0)
 

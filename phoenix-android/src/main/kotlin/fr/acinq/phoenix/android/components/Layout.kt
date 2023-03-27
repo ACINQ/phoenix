@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android.components
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -23,18 +24,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
@@ -43,10 +39,11 @@ import fr.acinq.phoenix.android.utils.mutedTextColor
 /** Button for navigation purpose, with the back arrow. */
 @Composable
 fun BackButton(onClick: () -> Unit) {
+    BackHandler(onBack = onClick)
     Button(
         onClick = onClick,
         shape = RoundedCornerShape(topStart = 0.dp, topEnd = 50.dp, bottomEnd = 50.dp, bottomStart = 0.dp),
-        contentPadding = PaddingValues(start = 20.dp, top = 8.dp, bottom = 8.dp, end = 16.dp),
+        contentPadding = PaddingValues(start = 20.dp, top = 8.dp, bottom = 8.dp, end = 12.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color.Unspecified,
             disabledBackgroundColor = Color.Unspecified,
@@ -54,88 +51,53 @@ fun BackButton(onClick: () -> Unit) {
             disabledContentColor = mutedTextColor(),
         ),
         elevation = null,
-        modifier = Modifier.size(width = 62.dp, height = 52.dp)
+        modifier = Modifier.size(width = 58.dp, height = 52.dp)
     ) {
         PhoenixIcon(resourceId = R.drawable.ic_arrow_back, Modifier.width(24.dp))
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun Dialog(
-    onDismiss: () -> Unit,
-    title: String? = null,
-    properties: DialogProperties = DialogProperties(usePlatformDefaultWidth = false),
-    isScrollable: Boolean = true,
-    buttons: (@Composable RowScope.() -> Unit)? = null,
-    content: @Composable ColumnScope.() -> Unit,
-) {
-    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = properties) {
-        DialogBody(isScrollable) {
-            // optional title
-            title?.run {
-                Text(text = title, modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 12.dp), style = MaterialTheme.typography.h4)
-            }
-            // content, must set the padding etc...
-            content()
-            Spacer(Modifier.height(24.dp))
-            // buttons
-            Row(
-                modifier = Modifier
-                    .align(Alignment.End)
-            ) {
-                if (buttons != null) {
-                    buttons()
-                } else {
-                    Button(onClick = onDismiss, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(16.dp))
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun DialogBody(
-    isScrollable: Boolean = true,
-    content: @Composable ColumnScope.() -> Unit,
-) {
-    Column(
-        Modifier
-            .padding(vertical = 50.dp, horizontal = 16.dp) // min padding for tall/wide dialogs
-            .clip(MaterialTheme.shapes.large)
-            .background(MaterialTheme.colors.surface)
-            .widthIn(max = 600.dp)
-            .then(
-                if (isScrollable) {
-                    Modifier.verticalScroll(rememberScrollState())
-                } else {
-                    Modifier
-                }
-            )
-    ) {
-        content()
-    }
-}
-
 /** The default screen is a full-height, full-width column with the material theme's background color. It is scrollable by default. */
 @Composable
-fun DefaultScreenLayout(isScrollable: Boolean = true, backgroundColor: Color = MaterialTheme.colors.background, content: @Composable ColumnScope.() -> Unit) {
+fun DefaultScreenLayout(
+    isScrollable: Boolean = true,
+    backgroundColor: Color = MaterialTheme.colors.background,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+            .fillMaxSize()
             .background(backgroundColor)
-            .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier)
+            .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier),
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
     ) {
         content()
     }
 }
 
-/** The default header of a screen contains a back button, an optional title and an optional subtitle (which uses a muted typo style). */
+/** The default header of a screen contains a back button and an optional title. */
 @Composable
 fun DefaultScreenHeader(
     title: String? = null,
-    subtitle: String? = null,
+    onBackClick: () -> Unit,
+    backgroundColor: Color = MaterialTheme.colors.background,
+) {
+    DefaultScreenHeader(
+        content = {
+            title?.let { Text(text = it) }
+        },
+        onBackClick = onBackClick,
+        backgroundColor = backgroundColor
+    )
+}
+
+/** The default header of a screen contains a back button and some content. */
+@Composable
+fun DefaultScreenHeader(
+    content: @Composable RowScope.() -> Unit,
     onBackClick: () -> Unit,
     backgroundColor: Color = MaterialTheme.colors.background,
 ) {
@@ -143,19 +105,11 @@ fun DefaultScreenHeader(
         modifier = Modifier
             .fillMaxWidth()
             .background(backgroundColor)
-            .padding(horizontal = 0.dp, vertical = 6.dp),
+            .padding(start = 0.dp, top = 2.dp, bottom = 2.dp, end = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         BackButton(onClick = onBackClick)
-        Column(
-            modifier = Modifier.padding(start = 0.dp, top = 14.dp, end = 16.dp, bottom = 14.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
-            title?.run { Text(text = this) }
-            subtitle?.run {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = this, style = TextStyle(color = mutedTextColor(), fontSize = 14.sp))
-            }
-        }
+        content()
     }
 }
 
@@ -202,16 +156,17 @@ fun Card(
     modifier: Modifier = Modifier,
     externalPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
     internalPadding: PaddingValues = PaddingValues(0.dp),
-    shape: Shape = RoundedCornerShape(16.dp),
+    shape: Shape = RoundedCornerShape(24.dp),
     withBorder: Boolean = false,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    maxWidth: Dp = 500.dp,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
         modifier = modifier
             .padding(externalPadding)
-            .widthIn(max = 500.dp)
+            .widthIn(max = maxWidth)
             .clip(shape)
             .then(
                 if (withBorder) Modifier.border(BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary), shape) else Modifier

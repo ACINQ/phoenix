@@ -61,7 +61,7 @@ struct CloudBackupView: View {
 		self._legal_appleRisk = State<Bool>(initialValue: enabled)
 		self._legal_governmentRisk = State<Bool>(initialValue: enabled)
 		
-		let encryptedNodeId = AppDelegate.get().encryptedNodeId!
+		let encryptedNodeId = Biz.encryptedNodeId!
 		let originalName = Prefs.shared.backupSeed.name(encryptedNodeId: encryptedNodeId) ?? ""
 		
 		self.encryptedNodeId = encryptedNodeId
@@ -72,16 +72,11 @@ struct CloudBackupView: View {
 	@ViewBuilder
 	var body: some View {
 		
-		List {
-			section_toggle()
-			section_legal()
-			section_name()
-		}
-		.listStyle(.insetGrouped)
-		.navigationTitle("iCloud Backup")
-		.navigationBarTitleDisplayMode(.inline)
-		.navigationBarBackButtonHidden(true)
-		.navigationBarItems(leading: backButton())
+		content()
+			.navigationTitle("iCloud Backup")
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarBackButtonHidden(true)
+			.navigationBarItems(leading: backButton())
 	}
 	
 	@ViewBuilder
@@ -111,6 +106,18 @@ struct CloudBackupView: View {
 				}
 			}
 		}
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
+		List {
+			section_toggle()
+			section_legal()
+			section_name()
+		}
+		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 	}
 	
 	@ViewBuilder

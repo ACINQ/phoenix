@@ -2,10 +2,13 @@
 name: Build
 
 on:
+  workflow_dispatch:
   push:
-    branches: [ master ]
+    branches: [ master, test-ci-build ]
     paths:
       - 'phoenix-legacy/**'
+      - 'phoenix-android/**'
+      - '.github/workflows/**'
 
 jobs:
   build:
@@ -19,6 +22,13 @@ jobs:
       with:
         path: phoenix
 
+    - name: Checkout lightning-kmp
+      uses: actions/checkout@v2
+      with:
+        repository: ACINQ/lightning-kmp
+        ref: master
+        path: lightning-kmp
+
     - name: Checkout eclair-core
       uses: actions/checkout@v2
       with:
@@ -26,7 +36,7 @@ jobs:
         ref: android-phoenix
         path: eclair-core
 
-    - name: Checkout Tor_Onion_Proxy_Library
+    - name: Checkout Tor_Onion_Proxy_Library (Tor for legacy android app)
       uses: actions/checkout@v2
       with:
         repository: ACINQ/Tor_Onion_Proxy_Library
@@ -41,12 +51,24 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
 
+    - name: Cached Konan
+      uses: actions/cache@v2
+      with:
+        path: ~/.konan
+        key: ${{ runner.os }}-konan-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
+        restore-keys: ${{ runner.os }}-konan-
+
     - name: Set up jdk 1.11
       uses: actions/setup-java@v1
       with:
          java-version: 11
 
     # 3 - build dependencies & app
+
+    - name: Build lightning-kmp and install to local maven repo
+      run: |
+        cd lightning-kmp
+        ./gradlew clean build publishToMavenLocal -x check
 
     - name: Build eclair-core and install to local maven repo
       run: |
@@ -61,9 +83,44 @@ jobs:
         ./gradlew :android:build
         ./gradlew :android:publishToMaven
 
-    - name: Assemble legacy app debug apk
+    - name: Assemble new android app apk
       run: |
         cd phoenix
         ./gradlew clean
         printf "\nskip.android=false" >> local.properties
-        ./gradlew :phoenix-legacy:assembleDebug --stacktrace
+        ./gradlew :phoenix-android:assembleRelease --stacktrace
+
+      # 4 - sign apk
+
+    - name: Retrieve signing key
+      run: 'echo "$TESTNET_KEY_HEX" | xxd -r -p > signingkey'
+      shell: bash
+      env:
+        TESTNET_KEY_HEX: ${{secrets.TESTNET_KEY_HEX}}
+
+    - name: Sign artifact
+      run: |
+        mkdir upload
+        mv phoenix/phoenix-android/build/outputs/apk/release/phoenix-*.apk upload/phoenix-testnet-latest.apk
+        /usr/local/lib/android/sdk/build-tools/29.0.3/apksigner sign --ks signingkey --ks-pass pass:$TESTNET_STORE_PASS --ks-key-alias $TESTNET_ALIAS --key-pass pass:$TESTNET_KEY_PASS upload/phoenix-testnet-latest.apk
+      shell: bash
+      env:
+        TESTNET_STORE_PASS: ${{secrets.TESTNET_STORE_PASS}}
+        TESTNET_ALIAS: ${{secrets.TESTNET_ALIAS}}
+        TESTNET_KEY_PASS: ${{secrets.TESTNET_KEY_PASS}}
+
+      # 5 - upload apk
+
+    - name: Upload apk as artifact for this action
+      uses: actions/upload-artifact@v2
+      with:
+        name: phoenix-testnet
+        path: upload/phoenix-testnet-latest.apk
+
+    - name: Upload to acinq.co
+      run: |
+        aws s3 cp ./upload/phoenix-testnet-latest.apk s3://acinq.co/pub/phoenix/
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: 'eu-west-1'

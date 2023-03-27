@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LegacySwitcherView(
-    onLegacyFinished: () -> Unit
+    onProceedNormally: () -> Unit
 ) {
     val log = logger("LegacySwitcherView")
     val context = LocalContext.current
@@ -89,14 +89,14 @@ fun LegacySwitcherView(
                 // just wait
             }
             LegacyAppStatus.Required.Interrupted -> {
-                BorderButton(text = R.string.legacyswitch_restart, onClick = {
+                BorderButton(text = stringResource(id = R.string.legacyswitch_restart), onClick = {
                     scope.launch {
                         PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
                     }
                 })
             }
-            LegacyAppStatus.NotRequired -> onLegacyFinished()
-            LegacyAppStatus.Unknown -> onLegacyFinished()
+            LegacyAppStatus.NotRequired -> onProceedNormally()
+            LegacyAppStatus.Unknown -> onProceedNormally()
         }
     }
 }

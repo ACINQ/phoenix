@@ -57,10 +57,9 @@ struct RecoveryPhraseList: View {
 	init(scrollViewProxy: ScrollViewProxy) {
 		self.scrollViewProxy = scrollViewProxy
 		
-		let appDelegate = AppDelegate.get()
-		let encryptedNodeId = appDelegate.encryptedNodeId! 
+		let encryptedNodeId = Biz.encryptedNodeId!
 		self.encryptedNodeId = encryptedNodeId
-		self.syncSeedManager = appDelegate.syncManager!.syncSeedManager
+		self.syncSeedManager = Biz.syncManager!.syncSeedManager
 		
 		let manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
 		self._manualBackup_taskDone = State<Bool>(initialValue: manualBackup_taskDone)
@@ -72,7 +71,16 @@ struct RecoveryPhraseList: View {
 		self._legal_lossRisk = State<Bool>(initialValue: manualBackup_taskDone)
 	}
 	
+	@ViewBuilder
 	var body: some View {
+		
+		content()
+			.navigationTitle(NSLocalizedString("Recovery Phrase", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
 		
 		List {
 			if !backupSeed_enabled && !(legal_taskDone && legal_lossRisk) {
@@ -95,6 +103,7 @@ struct RecoveryPhraseList: View {
 			.id(sectionID_cloudBackup)
 		}
 		.listStyle(.insetGrouped)
+		.listBackgroundColor(.primaryBackground)
 		.sheet(isPresented: $revealSeed) {
 			
 			RecoveryPhraseReveal(
@@ -102,8 +111,6 @@ struct RecoveryPhraseList: View {
 				mnemonics: $mnemonics
 			)
 		}
-		.navigationTitle(NSLocalizedString("Recovery Phrase", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
 		.onAppear {
 			onAppear()
 		}
@@ -216,7 +223,7 @@ struct RecoveryPhraseList: View {
 				.disabled(isDecrypting)
 				.padding(.vertical, 5)
 				
-				let enabledSecurity = AppSecurity.shared.enabledSecurity.value
+				let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
 				if enabledSecurity != .none {
 					Text("(requires authentication)")
 						.font(.footnote)
@@ -344,7 +351,7 @@ struct RecoveryPhraseList: View {
 			isDecrypting = false
 		}
 		
-		let enabledSecurity = AppSecurity.shared.enabledSecurity.value
+		let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
 		if enabledSecurity == .none {
 			AppSecurity.shared.tryUnlockWithKeychain { (mnemonics, _, _) in
 				
