@@ -33,14 +33,16 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:padding="@dimen/space_lg">
+      android:layout_height="wrap_content">
 
       <TextView
         android:id="@+id/title"
         style="@style/dialog_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginTop="@dimen/space_lg"
+        android:layout_marginEnd="@dimen/space_lg"
         android:text="@string/migration_title"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -48,7 +50,10 @@
         android:id="@+id/step1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_lg"
         android:layout_marginTop="@dimen/space_md"
+        android:layout_marginEnd="@dimen/space_md"
+        android:paddingBottom="@dimen/space_md"
         android:visibility="@{model.state instanceof MigrationScreenState.Ready}"
         app:layout_constraintTop_toBottomOf="@id/title">
 
@@ -74,18 +79,50 @@
           android:id="@+id/dismiss_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_no_border"
           android:layout_marginTop="@dimen/space_md"
-          app:layout_constraintTop_toBottomOf="@id/upgrade_button"
+          android:background="@drawable/button_bg_no_border"
           app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/upgrade_button"
           app:text="@string/migration_dismiss_button" />
+      </androidx.constraintlayout.widget.ConstraintLayout>
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/step_migration_paused"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginTop="@dimen/space_md"
+        android:layout_marginEnd="@dimen/space_md"
+        android:paddingBottom="@dimen/space_md"
+        android:visibility="@{model.state instanceof MigrationScreenState.Paused}"
+        app:layout_constraintTop_toBottomOf="@id/title">
+
+        <TextView
+          android:id="@+id/paused_message"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/migration_paused_swap_in"
+          app:layout_constraintTop_toTopOf="parent" />
+
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+          android:id="@+id/paused_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md"
+          android:background="@drawable/button_bg_no_border"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/paused_message"
+          app:text="@string/btn_close" />
       </androidx.constraintlayout.widget.ConstraintLayout>
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/step3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_lg"
         android:layout_marginTop="@dimen/space_md"
+        android:layout_marginEnd="@dimen/space_lg"
+        android:paddingBottom="@dimen/space_lg"
         android:visibility="@{model.state instanceof MigrationScreenState.RequestingKmpSwapInAddress}"
         app:layout_constraintTop_toBottomOf="@id/title">
 
@@ -100,7 +137,10 @@
         android:id="@+id/step4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_lg"
         android:layout_marginTop="@dimen/space_md"
+        android:layout_marginEnd="@dimen/space_lg"
+        android:paddingBottom="@dimen/space_lg"
         android:visibility="@{model.state instanceof MigrationScreenState.ReadyToClose || model.state instanceof MigrationScreenState.ClosingChannels || model.state instanceof MigrationScreenState.ChannelsClosed}"
         app:layout_constraintTop_toBottomOf="@id/title">
 

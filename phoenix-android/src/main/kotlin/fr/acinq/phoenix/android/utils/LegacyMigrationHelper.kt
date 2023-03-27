@@ -120,7 +120,7 @@ object LegacyMigrationHelper {
     suspend fun migrateLegacyPayments(
         context: Context,
     ) {
-        val eclairDbBackupFile = File(Wallet.getChainDatadir(context), "eclair.sqlite.bak")
+        val eclairDbBackupFile = File(Wallet.getChainDatadir(context), "eclair.sqlite")
         if (!eclairDbBackupFile.exists()) {
             log.info("no legacy database backup file found, no migration needed.")
             return

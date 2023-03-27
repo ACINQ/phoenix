@@ -262,6 +262,7 @@ class EclairNodeService : Service() {
       system().shutdown()
       nodeParams().db().audit().close()
       nodeParams().db().channels().close()
+      nodeParams().db().payments().close()
       nodeParams().db().network().close()
       nodeParams().db().peers().close()
       nodeParams().db().pendingRelay().close()

@@ -796,6 +796,7 @@
   <string name="migration_prepare_button">Upgrade</string>
   <string name="migration_dismiss_button">Skip for now</string>
   <string name="migration_notifying_message">Initiating migration…</string>
+  <string name="migration_paused_swap_in">Upgrade is not available: an on-chain deposit to your wallet is pending.\n\nTry again later when this deposit has confirmed.</string>
   <string name="migration_swapin">Getting new address…</string>
   <string name="migration_closing_channels">Moving funds to new address…</string>
 

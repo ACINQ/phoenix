@@ -25,19 +25,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import fr.acinq.eclair.db.Databases.FileBackup
 import fr.acinq.phoenix.legacy.AppViewModel
 import fr.acinq.phoenix.legacy.databinding.FragmentMigrationBinding
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.MigrationResult
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
-import fr.acinq.phoenix.legacy.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.File
 
 class MigrationFragmentDialog : DialogFragment() {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -58,6 +55,14 @@ class MigrationFragmentDialog : DialogFragment() {
       app = ViewModelProvider(activity)[AppViewModel::class.java]
     } ?: dismiss()
 
+    app.pendingSwapIns.observe(viewLifecycleOwner) {
+      val migrationState = model.state.value
+      if (it.isNotEmpty() && migrationState == MigrationScreenState.Ready) {
+        log.info("there are ${it.size} pending swap-ins, disabling migration...")
+        model.state.value = MigrationScreenState.Paused.PendingSwapIn
+      }
+    }
+
     val context = requireContext()
     isCancelable = false
 
@@ -77,9 +82,7 @@ class MigrationFragmentDialog : DialogFragment() {
               app.requireService.mutualCloseAllChannels(it.address)
               log.info("(migration) channels successfully closed to ${state.address}")
               model.state.value = MigrationScreenState.ClosingChannels(state.address)
-              // force db backup that will be used later for the the payments data migration
-              val db = app.service?.state?.value?.kit()?.nodeParams()?.db()
-              (db as? FileBackup)?.backup(File(Wallet.getChainDatadir(context), "eclair.sqlite.back"))
+              delay(1000)
               PrefsDatastore.saveDataMigrationExpected(context, true)
               PrefsDatastore.saveMigrationResult(
                 context, MigrationResult(
@@ -102,6 +105,7 @@ class MigrationFragmentDialog : DialogFragment() {
 
   override fun onStart() {
     super.onStart()
+    mBinding.pausedButton.setOnClickListener { dismiss() }
     mBinding.dismissButton.setOnClickListener { dismiss() }
     mBinding.upgradeButton.setOnClickListener {
       if (model.state.value is MigrationScreenState.Ready) {
@@ -119,6 +123,9 @@ class MigrationFragmentDialog : DialogFragment() {
 
 sealed class MigrationScreenState {
   object Ready : MigrationScreenState()
+  sealed class Paused : MigrationScreenState() {
+    object PendingSwapIn: Paused()
+  }
   object RequestingKmpSwapInAddress: MigrationScreenState()
   data class ReadyToClose(val address: String): MigrationScreenState()
   data class ClosingChannels(val address: String) : MigrationScreenState()
