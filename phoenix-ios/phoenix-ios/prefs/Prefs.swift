@@ -53,7 +53,7 @@ class Prefs {
 	// --------------------------------------------------
 	
 	lazy private(set) var themePublisher: AnyPublisher<Theme, Never> = {
-		defaults.publisher(for: \.theme, options: [.new])
+		defaults.publisher(for: \.theme, options: [.initial, .new])
 			.map({ (data: Data?) -> Theme in
 				data?.jsonDecode() ?? self.defaultTheme
 			})
@@ -88,7 +88,7 @@ class Prefs {
 	}
 	
 	lazy private(set) var maxFeesPublisher: AnyPublisher<MaxFees?, Never> = {
-		defaults.publisher(for: \.maxFees, options: [.new])
+		defaults.publisher(for: \.maxFees, options: [.initial, .new])
 			.map({ (data: Data?) -> MaxFees? in
 				data?.jsonDecode()
 			})
@@ -107,7 +107,7 @@ class Prefs {
 	}
 	
 	lazy private(set) var recentPaymentsConfigPublisher: AnyPublisher<RecentPaymentsConfig, Never> = {
-		defaults.publisher(for: \.recentPaymentsConfig, options: [.new])
+		defaults.publisher(for: \.recentPaymentsConfig, options: [.initial, .new])
 			.map({ (data: Data?) -> RecentPaymentsConfig in
 				data?.jsonDecode() ?? self.defaultRecentPaymentsConfig
 			})
