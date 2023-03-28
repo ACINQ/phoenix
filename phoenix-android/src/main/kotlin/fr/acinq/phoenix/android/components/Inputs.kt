@@ -95,7 +95,7 @@ fun TextInput(
             if (!errorMessage.isNullOrBlank() && enabled) {
                 Text(
                     text = errorMessage,
-                    style = MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 13.sp),
+                    style = MaterialTheme.typography.body1.copy(color = negativeColor, fontSize = 13.sp),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -192,7 +192,7 @@ fun NumberInput(
         Spacer(Modifier.height(4.dp))
         Text(
             text = if (enabled) errorMessage else "",
-            style = MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 13.sp),
+            style = MaterialTheme.typography.body1.copy(color = negativeColor, fontSize = 13.sp),
             modifier = Modifier.padding(horizontal = 16.dp)
         )
     }

@@ -121,7 +121,7 @@ private fun ChannelLine(channel: LocalChannelInfo, onClick: () -> Unit) {
     ) {
         Surface(
             shape = CircleShape,
-            color = if (channel.isUsable) positiveColor() else if (channel.isTerminated) negativeColor() else mutedTextColor(),
+            color = if (channel.isUsable) positiveColor else if (channel.isTerminated) negativeColor else mutedTextColor,
             modifier = Modifier.size(6.dp)
         ) {}
         Spacer(modifier = Modifier.width(16.dp))
@@ -240,7 +240,7 @@ private fun CommitmentInfoView(
             Column(
                 modifier = Modifier
                     .padding(start = 20.dp)
-                    .background(mutedBgColor())
+                    .background(mutedBgColor)
                     .padding(start = 6.dp) // small border on the left
                     .background(MaterialTheme.colors.surface)
                     .padding(start = 12.dp)
@@ -274,7 +274,7 @@ private fun ChannelDialogJson(
 ) {
     Column(
         modifier = Modifier
-            .background(mutedBgColor())
+            .background(mutedBgColor)
             .fillMaxWidth()
             .heightIn(max = 350.dp)
     ) {
@@ -285,7 +285,7 @@ private fun ChannelDialogJson(
                     .weight(1.0f)
                     .horizontalScroll(rememberScrollState())
                     .verticalScroll(rememberScrollState()),
-                style = monoTypo(),
+                style = monoTypo,
             )
         }
     }

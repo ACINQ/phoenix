@@ -43,7 +43,7 @@ fun ErrorMessage(
         TextWithIcon(
             text = errorHeader,
             icon = R.drawable.ic_alert_triangle,
-            iconTint = negativeColor(),
+            iconTint = negativeColor,
             maxLines = 1,
             textOverflow = TextOverflow.Ellipsis
         )

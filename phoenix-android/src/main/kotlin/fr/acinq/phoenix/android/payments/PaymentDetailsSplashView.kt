@@ -220,19 +220,19 @@ private fun PaymentStatus(
                 message = stringResource(id = R.string.paymentdetails_status_sent_pending),
                 imageResId = R.drawable.ic_payment_details_pending_static,
                 isAnimated = false,
-                color = mutedTextColor()
+                color = mutedTextColor
             )
             is LightningOutgoingPayment.Status.Completed.Failed -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_failed),
                 imageResId = R.drawable.ic_payment_details_failure_static,
                 isAnimated = false,
-                color = negativeColor()
+                color = negativeColor
             )
             is LightningOutgoingPayment.Status.Completed.Succeeded -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_successful),
                 imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
                 isAnimated = fromEvent,
-                color = positiveColor(),
+                color = positiveColor,
                 details = payment.completedAt?.toAbsoluteDateTimeString()
             )
         }
@@ -241,13 +241,13 @@ private fun PaymentStatus(
                 message = stringResource(id = R.string.paymentdetails_status_splice_pending),
                 imageResId = R.drawable.ic_payment_details_pending_static,
                 isAnimated = false,
-                color = mutedTextColor(),
+                color = mutedTextColor,
             )
             else -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_splice_sent),
                 imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
                 isAnimated = fromEvent,
-                color = positiveColor(),
+                color = positiveColor,
                 details = payment.completedAt?.toAbsoluteDateTimeString()
             )
         }
@@ -256,7 +256,7 @@ private fun PaymentStatus(
                 message = stringResource(id = R.string.paymentdetails_status_received_pending),
                 imageResId = R.drawable.ic_payment_details_pending_static,
                 isAnimated = false,
-                color = mutedTextColor()
+                color = mutedTextColor
             )
             payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().any { it.status == PaymentsDb.ConfirmationStatus.NOT_LOCKED } -> {
                 val minDepth = business.nodeParamsManager.nodeParams.value?.minDepthBlocks
@@ -264,7 +264,7 @@ private fun PaymentStatus(
                     message = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
                     isAnimated = false,
                     imageResId = R.drawable.ic_clock,
-                    color = mutedTextColor(),
+                    color = mutedTextColor,
                     details = minDepth?.let { stringResource(id = R.string.paymentdetails_status_received_unconfirmed_details, it) }
                 )
             }
@@ -274,7 +274,7 @@ private fun PaymentStatus(
                     message = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
                     isAnimated = false,
                     imageResId = R.drawable.ic_clock,
-                    color = mutedTextColor(),
+                    color = mutedTextColor,
                     details = minDepth?.let { stringResource(id = R.string.paymentdetails_status_received_unconfirmed_details, it) }
                 )
             }
@@ -283,7 +283,7 @@ private fun PaymentStatus(
                     message = stringResource(id = R.string.paymentdetails_status_received_successful),
                     imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
                     isAnimated = fromEvent,
-                    color = positiveColor(),
+                    color = positiveColor,
                     details = payment.received?.receivedAt?.toAbsoluteDateTimeString()
                 )
             }
@@ -291,7 +291,7 @@ private fun PaymentStatus(
                 message = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
                 isAnimated = false,
                 imageResId = R.drawable.ic_clock,
-                color = mutedTextColor(),
+                color = mutedTextColor,
                 details = "this payment is probably a splice from lightning?"
             )
         }

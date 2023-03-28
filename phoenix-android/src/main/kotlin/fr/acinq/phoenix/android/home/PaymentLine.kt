@@ -136,7 +136,7 @@ fun PaymentLine(
                     } else {
                         AmountView(
                             amount = amount,
-                            amountTextStyle = MaterialTheme.typography.body1.copy(color = if (isOutgoing) negativeColor() else positiveColor()),
+                            amountTextStyle = MaterialTheme.typography.body1.copy(color = if (isOutgoing) negativeColor else positiveColor),
                             unitTextStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
                             prefix = stringResource(if (isOutgoing) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received)
                         )
@@ -162,7 +162,7 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
         text = desc ?: stringResource(id = R.string.paymentdetails_no_description),
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        style = if (desc != null) MaterialTheme.typography.body1 else MaterialTheme.typography.body1.copy(color = mutedTextColor()),
+        style = if (desc != null) MaterialTheme.typography.body1 else MaterialTheme.typography.body1.copy(color = mutedTextColor),
         modifier = modifier
     )
 }

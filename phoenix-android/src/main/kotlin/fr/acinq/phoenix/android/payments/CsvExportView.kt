@@ -136,7 +136,7 @@ fun CsvExportView(
                     TextWithIcon(
                         text = stringResource(id = R.string.payments_export_success, state.paymentsCount),
                         icon = R.drawable.ic_check,
-                        iconTint = positiveColor(),
+                        iconTint = positiveColor,
                         modifier = Modifier.padding(16.dp)
                     )
                     Button(

@@ -137,7 +137,7 @@ private fun SeedDialog(words: List<String>, onDismiss: () -> Unit) {
                     }.filterNotNull()
                 }
                 val typo = MaterialTheme.typography.body1
-                val indexColor = mutedTextColor()
+                val indexColor = mutedTextColor
                 val indexStyle = remember(typo) { typo.copy(fontSize = 12.sp, textAlign = TextAlign.End, color = indexColor) }
                 val wordStyle = remember(typo) { typo.copy(fontWeight = FontWeight.Bold) }
 
@@ -161,7 +161,7 @@ private fun SeedDialog(words: List<String>, onDismiss: () -> Unit) {
             Spacer(modifier = Modifier.height(32.dp))
             Text(
                 text = stringResource(id = R.string.displayseed_derivation_path),
-                style = TextStyle(textAlign = TextAlign.Center, color = mutedTextColor())
+                style = TextStyle(textAlign = TextAlign.Center, color = mutedTextColor)
             )
         }
     }

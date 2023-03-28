@@ -141,7 +141,7 @@ fun Label(
     Row {
         Text(
             text = text.uppercase(),
-            style = MaterialTheme.typography.body1.copy(color = mutedTextColor(), fontSize = 12.sp),
+            style = MaterialTheme.typography.body1.copy(color = mutedTextColor, fontSize = 12.sp),
             textAlign = TextAlign.End,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -170,7 +170,7 @@ fun BackButtonWithBalance(
         Row(modifier = Modifier.padding(horizontal = 16.dp)) {
             Text(
                 text = stringResource(id = R.string.send_balance_prefix).uppercase(),
-                style = MaterialTheme.typography.body1.copy(color = mutedTextColor(), fontSize = 12.sp),
+                style = MaterialTheme.typography.body1.copy(color = mutedTextColor, fontSize = 12.sp),
                 modifier = Modifier.alignBy(FirstBaseline)
             )
             Spacer(modifier = Modifier.width(4.dp))

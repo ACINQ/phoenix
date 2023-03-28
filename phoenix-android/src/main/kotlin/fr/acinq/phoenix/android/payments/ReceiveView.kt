@@ -102,7 +102,6 @@ fun ReceiveView(
                         else -> null
                     },
                     onBackClick = onBack,
-                    backgroundColor = Color.Unspecified,
                 )
                 when (vm.state) {
                     is ReceiveViewState.EditInvoice -> EditInvoiceView(

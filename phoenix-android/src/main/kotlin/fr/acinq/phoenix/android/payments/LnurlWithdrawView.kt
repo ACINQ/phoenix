@@ -149,7 +149,7 @@ private fun RemoteErrorResponseView(
     Spacer(Modifier.height(8.dp))
     Text(
         text = getRemoteErrorMessage(error = error),
-        style = MaterialTheme.typography.body1.copy(color = negativeColor(), textAlign = TextAlign.Center),
+        style = MaterialTheme.typography.body1.copy(color = negativeColor, textAlign = TextAlign.Center),
         modifier = Modifier.padding(horizontal = 16.dp)
     )
     Spacer(Modifier.height(24.dp))

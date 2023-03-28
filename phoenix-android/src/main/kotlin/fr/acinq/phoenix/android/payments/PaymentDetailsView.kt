@@ -115,7 +115,6 @@ fun PaymentDetailsView(
     DefaultScreenLayout {
         DefaultScreenHeader(
             onBackClick = onBack,
-            backgroundColor = Color.Unspecified,
             title = if (state is PaymentDetailsState.Success.TechnicalDetails) stringResource(id = R.string.paymentdetails_title) else null
         )
         when (state) {

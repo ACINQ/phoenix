@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -290,7 +291,7 @@ fun BoxScope.ScannerView(
             .width(dimensionResource(id = R.dimen.scanner_size))
             .height(dimensionResource(id = R.dimen.scanner_size))
             .clip(RoundedCornerShape(24.dp))
-            .background(whiteLowOp())
+            .background(Color(0x33ffffff))
             .align(Alignment.Center)
     )
 }

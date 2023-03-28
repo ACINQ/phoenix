@@ -129,7 +129,7 @@ fun HomeView(
                         .padding(horizontal = if (isAmountRedacted) 40.dp else 16.dp),
                     amount = balance,
                     amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 40.sp),
-                    unitTextStyle = MaterialTheme.typography.h3.copy(color = mutedTextColor()),
+                    unitTextStyle = MaterialTheme.typography.h3.copy(color = mutedTextColor),
                     isRedacted = isAmountRedacted,
                     onClick = { context, inFiat ->
                         val mode = UserPrefs.getHomeAmountDisplayMode(context).firstOrNull()
@@ -201,9 +201,9 @@ fun TopBar(
             FilledButton(
                 text = stringResource(id = if (isBadElectrumCert) R.string.home__connection__bad_cert else R.string.home__connection__connecting),
                 icon = if (isBadElectrumCert) R.drawable.ic_alert_triangle else R.drawable.ic_connection_lost,
-                iconTint = if (isBadElectrumCert) negativeColor() else LocalContentColor.current,
+                iconTint = if (isBadElectrumCert) negativeColor else LocalContentColor.current,
                 onClick = onConnectionsStateButtonClick,
-                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = if (isBadElectrumCert) negativeColor() else LocalContentColor.current),
+                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = if (isBadElectrumCert) negativeColor else LocalContentColor.current),
                 backgroundColor = MaterialTheme.colors.surface,
                 space = 8.dp,
                 padding = PaddingValues(8.dp),
@@ -214,10 +214,10 @@ fun TopBar(
                 FilledButton(
                     text = stringResource(id = R.string.home__connection__tor_active),
                     icon = R.drawable.ic_tor_shield_ok,
-                    iconTint = positiveColor(),
+                    iconTint = positiveColor,
                     onClick = onTorClick,
                     textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = LocalContentColor.current),
-                    backgroundColor = mutedBgColor(),
+                    backgroundColor = mutedBgColor,
                     space = 8.dp,
                     padding = PaddingValues(8.dp)
                 )
@@ -295,8 +295,8 @@ private fun ConnectionDialogLine(
             shape = CircleShape,
             color = when (connection) {
                 Connection.ESTABLISHING -> orange
-                Connection.ESTABLISHED -> positiveColor()
-                else -> negativeColor()
+                Connection.ESTABLISHED -> positiveColor
+                else -> negativeColor
             },
             modifier = Modifier.size(8.dp)
         ) {}
@@ -311,7 +311,7 @@ private fun ConnectionDialogLine(
                 } else {
                     stringResource(R.string.conndialog_closed)
                 }
-            }, style = monoTypo()
+            }, style = monoTypo
         )
     }
 }
@@ -348,9 +348,9 @@ private fun IncomingAmountNotif(
         if (isInvalid) {
             FilledButton(
                 text = stringResource(id = R.string.home__swapin_incoming, balance.toMilliSatoshi().toPrettyString(preferredAmountUnit, fiatRate, withUnit = true)),
-                textStyle = MaterialTheme.typography.caption.copy(color = negativeColor()),
+                textStyle = MaterialTheme.typography.caption.copy(color = negativeColor),
                 icon = R.drawable.ic_alert_triangle,
-                iconTint = negativeColor(),
+                iconTint = negativeColor,
                 padding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 backgroundColor = Color.Transparent,
                 onClick = {

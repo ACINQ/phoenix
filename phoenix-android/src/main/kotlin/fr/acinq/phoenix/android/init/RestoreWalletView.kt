@@ -69,7 +69,6 @@ fun RestoreWalletView(
         DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.restore_title),
-            backgroundColor = Color.Unspecified
         )
         when (keyState.value) {
             is KeyState.Absent -> {
@@ -180,7 +179,7 @@ private fun SeedInputView(
                 )
                 if (errorMessage.isNotBlank()) {
                     Spacer(modifier = Modifier.height(24.dp))
-                    Text(text = errorMessage, style = MaterialTheme.typography.body1.copy(color = negativeColor(), textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
+                    Text(text = errorMessage, style = MaterialTheme.typography.body1.copy(color = negativeColor, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
                 }
             }
 
@@ -189,7 +188,7 @@ private fun SeedInputView(
                 is WritingSeedState.Error -> {
                     Text(
                         text = stringResource(id = R.string.autocreate_error, writingState.e.localizedMessage ?: writingState.e::class.java.simpleName),
-                        style = MaterialTheme.typography.body1.copy(color = negativeColor())
+                        style = MaterialTheme.typography.body1.copy(color = negativeColor)
                     )
                 }
                 is WritingSeedState.Init -> {
@@ -245,7 +244,7 @@ private fun WordInputView(
     if (filteredWords.isEmpty()) {
         Text(
             text = if (inputValue.length > 2) stringResource(id = R.string.restore_input_invalid) else "",
-            style = MaterialTheme.typography.body1.copy(color = negativeColor()),
+            style = MaterialTheme.typography.body1.copy(color = negativeColor),
             modifier = Modifier.padding(4.dp)
         )
     } else {

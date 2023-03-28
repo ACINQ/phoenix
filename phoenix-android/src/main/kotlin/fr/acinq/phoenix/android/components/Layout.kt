@@ -48,7 +48,7 @@ fun BackButton(onClick: () -> Unit) {
             backgroundColor = Color.Unspecified,
             disabledBackgroundColor = Color.Unspecified,
             contentColor = MaterialTheme.colors.onSurface,
-            disabledContentColor = mutedTextColor(),
+            disabledContentColor = mutedTextColor,
         ),
         elevation = null,
         modifier = Modifier.size(width = 58.dp, height = 52.dp)
@@ -81,7 +81,7 @@ fun DefaultScreenLayout(
 fun DefaultScreenHeader(
     title: String? = null,
     onBackClick: () -> Unit,
-    backgroundColor: Color = MaterialTheme.colors.background,
+    backgroundColor: Color = Color.Transparent,
 ) {
     DefaultScreenHeader(
         content = {
@@ -95,9 +95,9 @@ fun DefaultScreenHeader(
 /** The default header of a screen contains a back button and some content. */
 @Composable
 fun DefaultScreenHeader(
-    content: @Composable RowScope.() -> Unit,
     onBackClick: () -> Unit,
-    backgroundColor: Color = MaterialTheme.colors.background,
+    backgroundColor: Color = Color.Transparent,
+    content: @Composable RowScope.() -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -119,7 +119,7 @@ fun HSeparator(
     Box(
         (width?.run { modifier.width(width) } ?: modifier.fillMaxWidth())
             .height(1.dp)
-            .background(color = borderColor())
+            .background(color = borderColor)
     )
 }
 
@@ -132,7 +132,7 @@ fun VSeparator(
             .fillMaxHeight()
             .width(1.dp)
             .padding(padding)
-            .background(color = borderColor())
+            .background(color = borderColor)
     )
 }
 
@@ -154,7 +154,7 @@ fun Card(
     modifier: Modifier = Modifier,
     externalPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
     internalPadding: PaddingValues = PaddingValues(0.dp),
-    shape: Shape = RoundedCornerShape(24.dp),
+    shape: Shape = RoundedCornerShape(20.dp),
     withBorder: Boolean = false,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,

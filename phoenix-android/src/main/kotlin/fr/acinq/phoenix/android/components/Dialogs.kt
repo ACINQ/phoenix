@@ -155,9 +155,9 @@ fun RowScope.HelpPopup(
     Spacer(Modifier.width(8.dp))
     BorderButton(
         icon = R.drawable.ic_help,
-        iconTint = if (showHelpPopup) MaterialTheme.colors.onPrimary else mutedTextColor(),
+        iconTint = if (showHelpPopup) MaterialTheme.colors.onPrimary else mutedTextColor,
         backgroundColor = if (showHelpPopup) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
-        borderColor = if (showHelpPopup) MaterialTheme.colors.primary else mutedTextColor(),
+        borderColor = if (showHelpPopup) MaterialTheme.colors.primary else mutedTextColor,
         padding = PaddingValues(2.dp),
         modifier = Modifier.size(20.dp),
         onClick = { showHelpPopup = true }

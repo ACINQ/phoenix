@@ -339,7 +339,7 @@ private fun FeeSummary(
     ) {
         Text(
             text = label.uppercase(),
-            style = MaterialTheme.typography.body1.copy(color = mutedTextColor(), fontSize = 12.sp),
+            style = MaterialTheme.typography.body1.copy(color = mutedTextColor, fontSize = 12.sp),
             textAlign = TextAlign.End,
             modifier = Modifier
                 .alignBy(FirstBaseline)

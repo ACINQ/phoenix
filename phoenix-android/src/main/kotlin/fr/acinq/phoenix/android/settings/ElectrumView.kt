@@ -120,7 +120,7 @@ fun ElectrumView() {
                                 if (connection is Connection.CLOSED && connection.isBadCertificate()) {
                                     Text(
                                         text = stringResource(id = R.string.electrum_description_bad_certificate),
-                                        style = MaterialTheme.typography.subtitle2.copy(color = negativeColor())
+                                        style = MaterialTheme.typography.subtitle2.copy(color = negativeColor)
                                     )
                                 } else {
                                     Text(text = stringResource(id = R.string.electrum_description_custom))
@@ -131,9 +131,9 @@ fun ElectrumView() {
                     },
                     icon = R.drawable.ic_server,
                     iconTint = when (connection) {
-                        is Connection.ESTABLISHED -> positiveColor()
+                        is Connection.ESTABLISHED -> positiveColor
                         is Connection.ESTABLISHING -> orange
-                        else -> negativeColor()
+                        else -> negativeColor
                     },
                     maxTitleLines = 1
                 ) { showCustomServerDialog = true }
@@ -268,7 +268,7 @@ private fun ElectrumServerDialog(
                     val cert = check.certificate
                     Column(
                         Modifier
-                            .background(mutedBgColor())
+                            .background(mutedBgColor)
                             .padding(horizontal = 24.dp, vertical = 12.dp)
                     ) {
                         TextWithIcon(
@@ -319,7 +319,7 @@ private fun ElectrumServerDialog(
                         Button(
                             text = stringResource(id = R.string.electrum_dialog_cert_accept),
                             icon = R.drawable.ic_check_circle,
-                            iconTint = positiveColor(),
+                            iconTint = positiveColor,
                             space = 8.dp,
                             onClick = { onConfirm(ServerAddress(check.host, check.port, TcpSocket.TLS.PINNED_PUBLIC_KEY(Base64.encodeToString(cert.publicKey.encoded, Base64.NO_WRAP)))) },
                         )
@@ -334,6 +334,6 @@ private fun ElectrumServerDialog(
 private fun CertDetail(label: String, value: String) {
     Text(text = label, style = MaterialTheme.typography.body2)
     Spacer(modifier = Modifier.height(2.dp))
-    Text(text = value, style = monoTypo(), maxLines = 1)
+    Text(text = value, style = monoTypo, maxLines = 1)
     Spacer(modifier = Modifier.height(4.dp))
 }

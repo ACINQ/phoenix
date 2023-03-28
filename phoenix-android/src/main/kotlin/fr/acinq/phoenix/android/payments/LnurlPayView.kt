@@ -179,7 +179,7 @@ private fun RemoteErrorResponseView(
             }
             is Scan.LnurlPayError.RemoteError -> getRemoteErrorMessage(error = error.err)
         },
-        style = MaterialTheme.typography.body1.copy(color = negativeColor(), textAlign = TextAlign.Center),
+        style = MaterialTheme.typography.body1.copy(color = negativeColor, textAlign = TextAlign.Center),
         modifier = Modifier.padding(horizontal = 48.dp)
     )
     Spacer(Modifier.height(24.dp))

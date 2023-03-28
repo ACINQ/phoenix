@@ -262,7 +262,7 @@ fun AmountInput(
                 convertedValue.takeIf { it.isNotBlank() }?.let { stringResource(id = R.string.utils_converted_amount, it) } ?: ""
             },
             maxLines = 1,
-            style = if (errorMessage.isNotBlank()) MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 14.sp) else MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+            style = if (errorMessage.isNotBlank()) MaterialTheme.typography.body1.copy(color = negativeColor, fontSize = 14.sp) else MaterialTheme.typography.caption.copy(fontSize = 14.sp),
             modifier = convertedValueModifier.padding(horizontal = 8.dp)
         )
     }
@@ -424,7 +424,7 @@ fun AmountHeroInput(
                 text = errorMessage,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 14.sp, textAlign = TextAlign.Center),
+                style = MaterialTheme.typography.body1.copy(color = negativeColor, fontSize = 14.sp, textAlign = TextAlign.Center),
                 modifier = Modifier.sizeIn(maxWidth = 300.dp, minHeight = 28.dp)
             )
         } else {
