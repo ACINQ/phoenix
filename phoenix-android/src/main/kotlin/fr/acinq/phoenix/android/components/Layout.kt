@@ -33,7 +33,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.borderColor
+import fr.acinq.phoenix.android.utils.green
 import fr.acinq.phoenix.android.utils.mutedTextColor
+import fr.acinq.phoenix.android.utils.red50
 
 
 /** Button for navigation purpose, with the back arrow. */
@@ -67,7 +69,7 @@ fun DefaultScreenLayout(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize() // cancelled if scrollable!
             .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier),
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,

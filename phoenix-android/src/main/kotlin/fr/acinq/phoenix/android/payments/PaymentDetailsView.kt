@@ -24,7 +24,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -104,58 +103,54 @@ fun PaymentDetailsView(
     LaunchedEffect(key1 = paymentId) {
         vm.getPayment(paymentId)
     }
-    val state = vm.state
-    val onBack = {
-        if (state is PaymentDetailsState.Success.TechnicalDetails) {
-            vm.state = PaymentDetailsState.Success.Splash(state.payment)
-        } else {
-            onBackClick()
+
+    when (val state = vm.state) {
+        is PaymentDetailsState.Loading -> CenterContentView(onBackClick) {
+            Text(
+                text = stringResource(id = R.string.paymentdetails_loading),
+                modifier = Modifier.padding(16.dp)
+            )
         }
-    }
-    DefaultScreenLayout {
-        DefaultScreenHeader(
-            onBackClick = onBack,
-            title = if (state is PaymentDetailsState.Success.TechnicalDetails) stringResource(id = R.string.paymentdetails_title) else null
-        )
-        when (state) {
-            is PaymentDetailsState.Loading -> CenterContentView {
-                Text(
-                    text = stringResource(id = R.string.paymentdetails_loading),
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-            is PaymentDetailsState.Failure -> CenterContentView {
-                Text(
-                    text = stringResource(id = R.string.paymentdetails_error, state.error.message ?: stringResource(id = R.string.utils_unknown)),
-                    modifier = Modifier.padding(16.dp),
-                )
-            }
-            is PaymentDetailsState.Success.Splash -> {
-                PaymentDetailsSplashView(
-                    data = state.payment,
-                    onDetailsClick = { vm.state = PaymentDetailsState.Success.TechnicalDetails(state.payment) },
-                    onMetadataDescriptionUpdate = { id, description -> vm.updateMetadata(id, description) },
-                    fromEvent = fromEvent,
-                )
-            }
-            is PaymentDetailsState.Success.TechnicalDetails -> {
-                PaymentDetailsTechnicalView(data = state.payment)
-            }
+        is PaymentDetailsState.Failure -> CenterContentView(onBackClick) {
+            Text(
+                text = stringResource(id = R.string.paymentdetails_error, state.error.message ?: stringResource(id = R.string.utils_unknown)),
+                modifier = Modifier.padding(16.dp),
+            )
+        }
+        is PaymentDetailsState.Success.Splash -> DefaultScreenLayout(isScrollable = false) {
+            DefaultScreenHeader(onBackClick = onBackClick)
+            PaymentDetailsSplashView(
+                data = state.payment,
+                onDetailsClick = { vm.state = PaymentDetailsState.Success.TechnicalDetails(state.payment) },
+                onMetadataDescriptionUpdate = { id, description -> vm.updateMetadata(id, description) },
+                fromEvent = fromEvent,
+            )
+        }
+        is PaymentDetailsState.Success.TechnicalDetails -> DefaultScreenLayout {
+            DefaultScreenHeader(
+                title = stringResource(id = R.string.paymentdetails_technicals_title),
+                onBackClick = { vm.state = PaymentDetailsState.Success.Splash(state.payment) }
+            )
+            PaymentDetailsTechnicalView(data = state.payment)
         }
     }
 }
 
 @Composable
 private fun CenterContentView(
+    onBackClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Card(modifier = Modifier) {
-            content()
+    DefaultScreenLayout(isScrollable = false) {
+        DefaultScreenHeader(onBackClick = onBackClick)
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Card(modifier = Modifier) {
+                content()
+            }
         }
     }
 }
