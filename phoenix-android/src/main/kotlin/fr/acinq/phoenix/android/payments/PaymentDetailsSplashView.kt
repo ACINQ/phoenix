@@ -144,12 +144,20 @@ private fun PaymentStatus(
 ) {
     when (payment) {
         is LightningOutgoingPayment -> when (payment.status) {
-            is LightningOutgoingPayment.Status.Pending -> PaymentStatusIcon(
-                message = stringResource(id = R.string.paymentdetails_status_sent_pending),
-                imageResId = R.drawable.ic_payment_details_pending_static,
-                isAnimated = false,
-                color = mutedTextColor
-            )
+            is LightningOutgoingPayment.Status.Pending -> when {
+                payment.details is LightningOutgoingPayment.Details.ChannelClosing -> PaymentStatusIcon(
+                    message = stringResource(id = R.string.paymentdetails_status_sent_confirming),
+                    imageResId = R.drawable.ic_clock,
+                    isAnimated = false,
+                    color = mutedTextColor
+                )
+                else -> PaymentStatusIcon(
+                    message = stringResource(id = R.string.paymentdetails_status_sent_pending),
+                    imageResId = R.drawable.ic_payment_details_pending_static,
+                    isAnimated = false,
+                    color = mutedTextColor
+                )
+            }
             is LightningOutgoingPayment.Status.Completed.Failed -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_failed),
                 imageResId = R.drawable.ic_payment_details_failure_static,

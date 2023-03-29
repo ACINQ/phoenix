@@ -371,9 +371,10 @@
     <string name="paymentdetails_loading">Loading payment details…</string>
     <string name="paymentdetails_error">There was an error when retrieving the details for this payment:\n\nCause:%1$s</string>
 
-    <string name="paymentdetails_status_splice_pending">Splice is confirming</string>
+    <string name="paymentdetails_status_splice_pending">Splice is confirming…</string>
     <string name="paymentdetails_status_splice_sent">Splice sent</string>
     <string name="paymentdetails_status_sent_successful">Sent</string>
+    <string name="paymentdetails_status_sent_confirming">Closing is confirming…</string>
     <string name="paymentdetails_status_sent_pending">Pending…</string>
     <string name="paymentdetails_status_sent_failed">Failed. No money has been sent.</string>
 
@@ -732,11 +733,10 @@
 
     <!-- ////////////// payments history ////////////// -->
 
-    <string name="payments_history_title">My payments (%1$d)</string>
-    <string name="payments_history_backup_notavailable">Payments backup is not available yet.</string>
+    <string name="payments_history_title">Local payments (%1$d)</string>
     <string name="payments_history_export_button">Export</string>
-    <string name="payments_export_title">Export Payments</string>
-    <string name="payments_export_instructions">Export your payment history in CSV (comma separated value) format.</string>
+    <string name="payments_export_title">Export payments</string>
+    <string name="payments_export_instructions">Export your local successful payments in CSV (comma separated value) format.</string>
     <string name="payments_export_start_label">Start date</string>
     <string name="payments_export_end_label">End date</string>
     <string name="payments_export_context_label">Include origin/destination</string>

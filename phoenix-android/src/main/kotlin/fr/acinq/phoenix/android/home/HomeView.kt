@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -129,7 +130,7 @@ fun HomeView(
                         .padding(horizontal = if (isAmountRedacted) 40.dp else 16.dp),
                     amount = balance,
                     amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 40.sp),
-                    unitTextStyle = MaterialTheme.typography.h3.copy(color = mutedTextColor),
+                    unitTextStyle = MaterialTheme.typography.h3.copy(fontWeight = FontWeight.Normal, color = mutedTextColor),
                     isRedacted = isAmountRedacted,
                     onClick = { context, inFiat ->
                         val mode = UserPrefs.getHomeAmountDisplayMode(context).firstOrNull()
@@ -482,7 +483,8 @@ private fun ColumnScope.LatestPaymentsList(
                 } else {
                     PaymentLine(item.paymentInfo, onPaymentClick, isAmountRedacted)
                 }
-                if (index == payments.size - 1) {
+                if (payments.isNotEmpty() && index == payments.size - 1) {
+                    Spacer(Modifier.height(16.dp))
                     morePaymentsButton()
                     Spacer(Modifier.height(80.dp))
                 }
