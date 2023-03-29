@@ -373,7 +373,7 @@
 
     <string name="paymentdetails_status_received_pending">Not received yet.</string>
     <string name="paymentdetails_status_received_unconfirmed">Waiting for confirmations</string>
-    <string name="paymentdetails_status_received_unconfirmed_details">requires %1$d confirmations</string>
+    <string name="paymentdetails_status_received_unconfirmed_details">requires %1$d confirmations (≈ %2$d minutes)</string>
     <string name="paymentdetails_status_received_successful">Received</string>
 
     <string name="paymentdetails_desc_label">Desc.</string>

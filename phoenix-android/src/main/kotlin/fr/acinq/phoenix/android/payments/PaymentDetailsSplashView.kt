@@ -55,6 +55,7 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.utils.extensions.errorMessage
+import fr.acinq.phoenix.utils.extensions.minDepthForFunding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -91,7 +92,7 @@ fun PaymentDetailsSplashView(
         }
 
         // actual content
-        Column(horizontalAlignment = Alignment.CenterHorizontally,) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Spacer(modifier = Modifier.height(40.dp))
             PaymentStatus(data.payment, fromEvent)
             Spacer(modifier = Modifier.height(40.dp))
@@ -111,7 +112,7 @@ fun PaymentDetailsSplashView(
                 )
 
                 Spacer(modifier = Modifier.height(36.dp))
-                PrimarySeparator()
+                PrimarySeparator(height = 6.dp)
                 Spacer(modifier = Modifier.height(36.dp))
 
                 PaymentDescriptionView(data = data, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
@@ -142,6 +143,8 @@ private fun PaymentStatus(
     payment: WalletPayment,
     fromEvent: Boolean,
 ) {
+    val scope = rememberCoroutineScope()
+    val peerManager = business.peerManager
     when (payment) {
         is LightningOutgoingPayment -> when (payment.status) {
             is LightningOutgoingPayment.Status.Pending -> when {
@@ -195,23 +198,39 @@ private fun PaymentStatus(
                 color = mutedTextColor
             )
             payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().any { it.status == PaymentsDb.ConfirmationStatus.NOT_LOCKED } -> {
-                val minDepth = business.nodeParamsManager.nodeParams.value?.minDepthBlocks
+                val nodeParams = business.nodeParamsManager.nodeParams.value
+                val channelMinDepth by produceState<Int?>(initialValue = null, key1 = Unit) {
+                    nodeParams?.let { params ->
+                        val channelId = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>()?.firstOrNull()?.channelId
+                        channelId?.let { peerManager.getChannelWithCommitments(it)?.minDepthForFunding(params) }
+                    }
+                }
                 PaymentStatusIcon(
                     message = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
                     isAnimated = false,
                     imageResId = R.drawable.ic_clock,
                     color = mutedTextColor,
-                    details = minDepth?.let { stringResource(id = R.string.paymentdetails_status_received_unconfirmed_details, it) }
+                    details = channelMinDepth?.let { minDepth ->
+                        stringResource(id = R.string.paymentdetails_status_received_unconfirmed_details, minDepth, 10 * minDepth)
+                    }
                 )
             }
             payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.SpliceIn>().any { it.status == PaymentsDb.ConfirmationStatus.NOT_LOCKED } -> {
-                val minDepth = business.nodeParamsManager.nodeParams.value?.minDepthBlocks
+                val nodeParams = business.nodeParamsManager.nodeParams.value
+                val channelMinDepth by produceState<Int?>(initialValue = null, key1 = Unit) {
+                    nodeParams?.let { params ->
+                        val channelId = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>()?.firstOrNull()?.channelId
+                        channelId?.let { peerManager.getChannelWithCommitments(it)?.minDepthForFunding(params) }
+                    }
+                }
                 PaymentStatusIcon(
                     message = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
                     isAnimated = false,
                     imageResId = R.drawable.ic_clock,
                     color = mutedTextColor,
-                    details = minDepth?.let { stringResource(id = R.string.paymentdetails_status_received_unconfirmed_details, it) }
+                    details = channelMinDepth?.let { minDepth ->
+                        stringResource(id = R.string.paymentdetails_status_received_unconfirmed_details, minDepth, 10 * minDepth)
+                    }
                 )
             }
             payment.completedAt != null -> {

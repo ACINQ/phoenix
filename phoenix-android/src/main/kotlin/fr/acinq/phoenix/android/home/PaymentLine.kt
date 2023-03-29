@@ -178,7 +178,11 @@ private fun PaymentIcon(payment: WalletPayment) {
                 description = stringResource(id = R.string.paymentdetails_status_sent_failed)
             )
             is LightningOutgoingPayment.Status.Pending -> PaymentIconComponent(
-                icon = R.drawable.ic_payment_pending,
+                icon = if (payment.details is LightningOutgoingPayment.Details.ChannelClosing) {
+                    R.drawable.ic_clock
+                } else {
+                    R.drawable.ic_payment_pending
+                },
                 description = stringResource(id = R.string.paymentdetails_status_sent_pending)
             )
             is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> PaymentIconComponent(
