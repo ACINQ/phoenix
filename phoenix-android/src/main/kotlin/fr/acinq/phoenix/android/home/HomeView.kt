@@ -527,7 +527,7 @@ private fun BottomBar(
             VSeparator(PaddingValues(top = 20.dp, bottom = 20.dp))
             Button(
                 text = stringResource(id = R.string.menu_send),
-                icon = R.drawable.ic_send,
+                icon = R.drawable.ic_scan_qr,
                 onClick = onSendClick,
                 iconTint = MaterialTheme.colors.onSurface,
                 modifier = Modifier

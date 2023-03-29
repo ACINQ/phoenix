@@ -298,13 +298,6 @@
     <string name="listallchannels_share_subject">Channels data</string>
     <string name="listallchannels_share_title">Share channel data</string>
 
-    <!-- //////////////// channel details //////////////// -->
-
-    <string name="channel_loading">Retrieving channel data…</string>
-    <string name="channel_error">Could not retrieve the details for this channel. Please try again later.</string>
-    <string name="channel_send">Send</string>
-    <string name="channel_receive">Receive</string>
-
     <!-- //////////////// menu //////////////// -->
 
     <string name="menu_settings">Settings</string>
