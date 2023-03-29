@@ -79,7 +79,11 @@ class NotificationService: UNNotificationServiceExtension {
 		// Use this as an opportunity to deliver your "best attempt" at modified content,
 		// otherwise the original push payload will be used.
 		
-		displayPushNotification()
+		// IMPORTANT: This function is called on a NON-main thread.
+		DispatchQueue.main.async {
+			
+			self.displayPushNotification()
+		}
 	}
 	
 	// --------------------------------------------------
