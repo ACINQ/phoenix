@@ -106,6 +106,7 @@ extension FiatCurrency {
 		case .kzt   : return "Kazakhstani Tenge"
 		case .lak   : return "Laotian Kip"
 		case .lbp   : return "Lebanese Pound"
+		case .lbpBm : return "Lebanese Pound (black market)"
 		case .lkr   : return "Sri Lankan Rupee"
 		case .lrd   : return "Liberian Dollar"
 		case .lsl   : return "Lesotho Loti"
@@ -263,6 +264,7 @@ extension FiatCurrency {
 		case .kzt   : return NSLocalizedString("KZT", tableName: "Currencies", comment: "Kazakhstani Tenge")
 		case .lak   : return NSLocalizedString("LAK", tableName: "Currencies", comment: "Laotian Kip")
 		case .lbp   : return NSLocalizedString("LBP", tableName: "Currencies", comment: "Lebanese Pound")
+		case .lbpBm : return NSLocalizedString("LBPbm", tableName: "Currencies", comment: "Lebanese Pound (black market)")
 		case .lkr   : return NSLocalizedString("LKR", tableName: "Currencies", comment: "Sri Lankan Rupee")
 		case .lrd   : return NSLocalizedString("LRD", tableName: "Currencies", comment: "Liberian Dollar")
 		case .lsl   : return NSLocalizedString("LSL", tableName: "Currencies", comment: "Lesotho Loti")
@@ -436,6 +438,7 @@ extension FiatCurrency {
 		case .kzt   : return "🇰🇿" // Kazakhstani Tenge
 		case .lak   : return "🇱🇦" // Laotian Kip
 		case .lbp   : return "🇱🇧" // Lebanese Pound
+		case .lbpBm : return "🇱🇧" // Lebanese Pound (black market)
 		case .lkr   : return "🇱🇰" // Sri Lankan Rupee
 		case .lrd   : return "🇱🇷" // Liberian Dollar
 		case .lsl   : return "🇱🇸" // Lesotho Loti

@@ -68,7 +68,8 @@ class CurrencyManager(
 
     private val specialMarkets = setOf(
         FiatCurrency.ARS_BM, // Argentine Peso (blue market)
-        FiatCurrency.CUP_FM  // Cuban Peso (free market)
+        FiatCurrency.CUP_FM, // Cuban Peso (free market)
+        FiatCurrency.LBP_BM  // Lebanese Pound (black market)
     )
 
     private val missingFromCoinbase = setOf(
@@ -105,8 +106,8 @@ class CurrencyManager(
     }
 
     /**
-     * The blockchain.info API is used to refresh the BitcoinPriceRates, using high liquidity markets
-     * currencies (i.e. USD/EUR).
+     * The blockchain.info API is used to refresh the BitcoinPriceRates
+     * for currencies with "high-liquidity markets" (i.e. USD/EUR).
      * Since bitcoin prices are volatile, we refresh them often.
      */
     private val blockchainInfoAPI = object : API {
@@ -156,14 +157,15 @@ class CurrencyManager(
     }
 
     /**
-     * The yadio API is used to fetch the "free market" price for the Cuban Peso.
+     * The yadio API is used to fetch various "free market" prices.
+     * For example:
      * - CUP => government controlled exchange rate
      * - CUP_FM => free market exchange rate
      */
     private val yadioAPI = object : API {
         override val name = "yadio"
         override val refreshDelay = 120.minutes
-        override val fiatCurrencies = setOf(FiatCurrency.CUP_FM)
+        override val fiatCurrencies = setOf(FiatCurrency.CUP_FM, FiatCurrency.LBP_BM)
     }
 
     /** Public consumable flow that includes the most recent exchange rates */
@@ -814,10 +816,11 @@ class CurrencyManager(
 
         val timestampMillis = Clock.System.now().toEpochMilliseconds()
         val fetchedRates: List<ExchangeRate> = parsedResponse?.let {
-            targets.filter { it == FiatCurrency.CUP_FM }.mapNotNull {
-                parsedResponse.usdRates["CUP"]?.let { valueAsDouble ->
+            targets.mapNotNull { fiatCurrency ->
+                val name = fiatCurrency.name.take(3)
+                parsedResponse.usdRates[name]?.let { valueAsDouble ->
                     ExchangeRate.UsdPriceRate(
-                        fiatCurrency = FiatCurrency.CUP_FM,
+                        fiatCurrency = fiatCurrency,
                         price = valueAsDouble,
                         source = "yadio.io",
                         timestampMillis = timestampMillis
