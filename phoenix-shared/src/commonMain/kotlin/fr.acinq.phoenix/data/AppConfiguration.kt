@@ -117,6 +117,7 @@ enum class FiatCurrency : CurrencyUnit {
     KZT, // Kazakhstani Tenge
     LAK, // Laotian Kip
     LBP, // Lebanese Pound
+    LBP_BM, // Lebanese Pound (black market)
     LKR, // Sri Lankan Rupee
     LRD, // Liberian Dollar
     LSL, // Lesotho Loti
