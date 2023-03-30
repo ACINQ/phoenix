@@ -35,6 +35,7 @@ struct HomeView : MVIView {
 	@State var swapIn_minFundingSat: Int64 = 0
 	
 	@State var notificationPermissions = NotificationsManager.shared.permissions.value
+	@State var bgAppRefreshDisabled = NotificationsManager.shared.backgroundRefreshStatus.value != .available
 	
 	@StateObject var customElectrumServerObserver = CustomElectrumServerObserver()
 	
@@ -126,6 +127,9 @@ struct HomeView : MVIView {
 		}
 		.onReceive(NotificationsManager.shared.permissions) {
 			notificationPermissionsChanged($0)
+		}
+		.onReceive(NotificationsManager.shared.backgroundRefreshStatus) {
+			backgroundRefreshStatusChanged($0)
 		}
 		.onReceive(backupSeed_enabled_publisher) {
 			self.backupSeed_enabled = $0
@@ -484,6 +488,42 @@ struct HomeView : MVIView {
 				
 			} // </NoticeBox>
 		}
+		
+		// === Background App Refresh Disabled ====
+		if bgAppRefreshDisabled {
+			
+			NoticeBox {
+				HStack(alignment: VerticalAlignment.top, spacing: 0) {
+					Image(systemName: "exclamationmark.triangle")
+						.imageScale(.large)
+						.padding(.trailing, 10)
+						.accessibilityLabel("Warning")
+					
+					Button {
+						fixBackgroundAppRefreshDisabled()
+					} label: {
+						Group {
+							Text("Watchtower disabled. ")
+								.foregroundColor(.primary)
+							+
+							Text("Fix ")
+								.foregroundColor(.appAccent)
+							+
+							Text(Image(systemName: "arrowtriangle.forward"))
+								.foregroundColor(.appAccent)
+						}
+						.multilineTextAlignment(.leading)
+						.allowsTightening(true)
+					} // </Button>
+					
+				} // </HStack>
+				.font(.caption)
+				.accessibilityElement(children: .combine)
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(47)
+				
+			} // </NoticeBox>
+		}
 	}
 	
 	@ViewBuilder
@@ -720,6 +760,12 @@ struct HomeView : MVIView {
 		
 		notificationPermissions = newValue
 	}
+
+	func backgroundRefreshStatusChanged(_ newValue: UIBackgroundRefreshStatus) {
+		log.trace("backgroundRefreshStatusChanged()")
+		
+		bgAppRefreshDisabled = newValue != .available
+	}
 	
 	func swapInWalletBalanceChanged(_ walletBalance: WalletBalance) {
 		log.trace("swapInWalletBalanceChanged()")
@@ -839,6 +885,14 @@ struct HomeView : MVIView {
 		
 		if let url = URL(string: "https://phoenix.acinq.co/faq#high-mempool-size-impacts") {
 			openURL(url)
+		}
+	}
+	
+	func fixBackgroundAppRefreshDisabled() {
+		log.trace("fixBackgroundAppRefreshDisabled()")
+		
+		popoverState.display(dismissable: true) {
+			BgRefreshDisabledPopover()
 		}
 	}
 	
