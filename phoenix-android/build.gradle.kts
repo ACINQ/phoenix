@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     id("com.google.gms.google-services")
+    id("kotlinx-serialization")
 }
 
 fun gitCommitHash(): String {

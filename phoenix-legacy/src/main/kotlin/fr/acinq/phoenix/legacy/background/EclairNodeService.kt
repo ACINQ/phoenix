@@ -338,7 +338,7 @@ class EclairNodeService : Service() {
         Migration.doMigration(applicationContext)
         val (_kit, xpub) = doStartNode(applicationContext, seed)
         updateState(KitState.Started(_kit, xpub))
-        ChannelsWatcher.schedule(applicationContext)
+        LegacyChannelsWatcher.schedule(applicationContext)
       }
     }
   }
@@ -348,7 +348,7 @@ class EclairNodeService : Service() {
   private fun cancelBackgroundJobs(context: Context) {
     val workManager = WorkManager.getInstance(context)
     try {
-      val jobs = workManager.getWorkInfosByTag(ChannelsWatcher.WATCHER_WORKER_TAG).get()
+      val jobs = workManager.getWorkInfosByTag(LegacyChannelsWatcher.WATCHER_WORKER_TAG).get()
       if (jobs.isEmpty()) {
         log.info("no background jobs found")
       } else {

@@ -231,7 +231,7 @@ class NodeService : Service() {
                 }
             }
         }
-
+        ChannelsWatcher.schedule(applicationContext)
         return WalletState.Started.Kmm(business)
     }
 

@@ -18,16 +18,21 @@ package fr.acinq.phoenix.android.utils.datastore
 
 import android.content.Context
 import androidx.datastore.preferences.core.*
+import fr.acinq.phoenix.android.service.ChannelsWatcher
 import fr.acinq.phoenix.legacy.internalData
 import fr.acinq.phoenix.legacy.utils.Prefs as LegacyPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.io.IOException
 
 object InternalData {
     private val log = LoggerFactory.getLogger(this::class.java)
+    private val json = Json { ignoreUnknownKeys = true }
 
     // -- Firebase Cloud Messaging token.
     private val FCM_TOKEN = stringPreferencesKey("FCM_TOKEN")
@@ -53,6 +58,15 @@ object InternalData {
     private val SHOW_INTRO = booleanPreferencesKey("SHOW_INTRO")
     fun getShowIntro(context: Context): Flow<Boolean> = prefs(context).map { it[SHOW_INTRO] ?: LegacyPrefs.showFTUE(context) }
     suspend fun saveShowIntro(context: Context, showIntro: Boolean) = context.internalData.edit { it[SHOW_INTRO] = showIntro }
+
+    // -- Channels-watcher job result
+    private val CHANNELS_WATCHER_OUTCOME = stringPreferencesKey("CHANNELS_WATCHER_RESULT")
+    fun getChannelsWatcherOutcome(context: Context): Flow<ChannelsWatcher.Outcome?> = prefs(context).map {
+        it[CHANNELS_WATCHER_OUTCOME]?.let { json.decodeFromString(it) }
+    }
+    suspend fun saveChannelsWatcherOutcome(context: Context, outcome: ChannelsWatcher.Outcome) = context.internalData.edit {
+        it[CHANNELS_WATCHER_OUTCOME] = json.encodeToString(outcome)
+    }
 
     private fun prefs(context: Context): Flow<Preferences> {
         return context.internalData.data.catch { exception ->

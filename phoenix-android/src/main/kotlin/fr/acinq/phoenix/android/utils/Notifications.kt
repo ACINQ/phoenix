@@ -20,12 +20,17 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.R
 
 object Notifications {
     const val HEADLESS_NOTIF_ID = 354321
     const val HEADLESS_NOTIF_CHANNEL_ID = "${BuildConfig.APPLICATION_ID}.FCM_NOTIF"
+
+    const val CHANNELS_WATCHER_ALERT_ID = 354324
+    const val CHANNELS_WATCHER_ALERT_CHANNEL = "${BuildConfig.APPLICATION_ID}.CHANNELS_WATCHER"
 
     fun registerNotificationChannels(context: Context) {
         // notification channels (android 8+)
@@ -37,6 +42,17 @@ object Notifications {
                     },
                 )
             )
+        }
+    }
+
+    fun notifyRevokedCommits(context: Context) {
+        NotificationCompat.Builder(context, CHANNELS_WATCHER_ALERT_CHANNEL).apply {
+            setContentTitle(context.getString(R.string.notif_watcher_revoked_commit_title))
+            setContentText(context.getString(R.string.notif_watcher_revoked_commit_message))
+            setSmallIcon(R.drawable.ic_phoenix_outline)
+            setAutoCancel(true)
+        }.let {
+            NotificationManagerCompat.from(context).notify(CHANNELS_WATCHER_ALERT_ID, it.build())
         }
     }
 }

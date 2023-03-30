@@ -30,11 +30,10 @@ import fr.acinq.eclair.WatchListener
 import fr.acinq.eclair.db.Databases
 import fr.acinq.phoenix.legacy.BuildConfig
 import fr.acinq.phoenix.legacy.MainActivity
-import fr.acinq.phoenix.legacy.utils.Constants
-import fr.acinq.phoenix.legacy.utils.Prefs
-import fr.acinq.phoenix.legacy.utils.Transcriber
-import fr.acinq.phoenix.legacy.utils.Wallet
 import fr.acinq.phoenix.legacy.R
+import fr.acinq.phoenix.legacy.utils.*
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 import scala.Option
 import scala.concurrent.Await
@@ -44,15 +43,10 @@ import java.util.concurrent.TimeUnit
 /**
  * Background job watching the node's channels to detect cheating attempts. A notification will be shown in that case.
  */
-class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
+class LegacyChannelsWatcher(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
   private val system = ActorSystem.apply("channels-watcher-system")
   private var setup: CheckElectrumSetup? = null
-
-  override fun onStopped() {
-    super.onStopped()
-    cleanup()
-  }
 
   private fun cleanup() {
     if (!system.isTerminated) {
@@ -72,15 +66,22 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker
     }
   }
 
-  override fun doWork(): Result {
+  override suspend fun doWork(): Result {
     log.info("channels watcher has started")
-    if (!Wallet.getEclairDBFile(applicationContext).exists()) {
-      log.info("no eclair db file yet...")
-      Prefs.saveWatcherAttemptOutcome(applicationContext, WatchListener.`Ok$`.`MODULE$`)
-      return Result.success()
-    }
-
     try {
+      val legacyAppStatus = PrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
+      if (legacyAppStatus !is LegacyAppStatus.Required) {
+        log.info("abort legacy channels-watcher service in state=${legacyAppStatus.name()}")
+        Prefs.saveWatcherAttemptOutcome(applicationContext, WatchListener.`Ok$`.`MODULE$`)
+        return Result.success()
+      }
+
+      if (!Wallet.getEclairDBFile(applicationContext).exists()) {
+        log.info("no eclair db file yet...")
+        Prefs.saveWatcherAttemptOutcome(applicationContext, WatchListener.`Ok$`.`MODULE$`)
+        return Result.success()
+      }
+
       val result = startElectrumCheck(applicationContext)
       log.info("check has completed with result {}", result)
       if (result is WatchListener.`NotOk$`) {
@@ -155,8 +156,8 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker
   }
 
   companion object {
-    private val log = LoggerFactory.getLogger(ChannelsWatcher::class.java)
-    public const val WATCHER_WORKER_TAG = BuildConfig.LIBRARY_PACKAGE_NAME + ".ChannelsWatcher"
+    private val log = LoggerFactory.getLogger(LegacyChannelsWatcher::class.java)
+    const val WATCHER_WORKER_TAG = BuildConfig.LIBRARY_PACKAGE_NAME + ".ChannelsWatcher"
 
     /**
      * Time window in milliseconds in which the last channels watch result can be considered fresh enough that the user
@@ -171,14 +172,14 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker
 
     fun schedule(context: Context) {
       log.info("scheduling channels watcher")
-      val work = PeriodicWorkRequest.Builder(ChannelsWatcher::class.java, 23, TimeUnit.HOURS, 12, TimeUnit.HOURS)
+      val work = PeriodicWorkRequest.Builder(LegacyChannelsWatcher::class.java, 23, TimeUnit.HOURS, 12, TimeUnit.HOURS)
         .addTag(WATCHER_WORKER_TAG)
-      WorkManager.getInstance(context).enqueueUniquePeriodicWork(WATCHER_WORKER_TAG, ExistingPeriodicWorkPolicy.REPLACE, work.build())
+      WorkManager.getInstance(context).enqueueUniquePeriodicWork(WATCHER_WORKER_TAG, ExistingPeriodicWorkPolicy.UPDATE, work.build())
     }
 
-    fun scheduleASAP() {
-      val work = OneTimeWorkRequest.Builder(ChannelsWatcher::class.java).addTag(WATCHER_WORKER_TAG).build()
-      WorkManager.getInstance().enqueueUniqueWork(WATCHER_WORKER_TAG, ExistingWorkPolicy.REPLACE, work)
+    fun scheduleASAP(context: Context) {
+      val work = OneTimeWorkRequest.Builder(LegacyChannelsWatcher::class.java).addTag(WATCHER_WORKER_TAG).build()
+      WorkManager.getInstance(context).enqueueUniqueWork(WATCHER_WORKER_TAG, ExistingWorkPolicy.REPLACE, work)
     }
   }
 }

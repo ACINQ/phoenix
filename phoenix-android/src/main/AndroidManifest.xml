@@ -76,6 +76,16 @@
             android:exported="false"
             android:stopWithTask="false" />
 
+        <!-- broadcast receivers -->
+        <receiver
+            android:name="fr.acinq.phoenix.android.service.BootReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <!-- Set custom default icon for notifications -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

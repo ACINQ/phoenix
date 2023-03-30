@@ -105,6 +105,7 @@ dependencies {
 
   // -- AndroidX: preferences datastore
   implementation("androidx.datastore:datastore-preferences:1.0.0")
+  implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor}")
 
   implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
 

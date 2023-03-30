@@ -55,7 +55,7 @@
 
     <!-- broadcast receivers -->
     <receiver
-      android:name="fr.acinq.phoenix.legacy.background.BootReceiver"
+      android:name="fr.acinq.phoenix.legacy.background.LegacyBootReceiver"
       android:enabled="true"
       android:exported="false">
       <intent-filter>
@@ -65,7 +65,7 @@
 
     <!-- firebase cloud messaging -->
     <service
-      android:name="fr.acinq.phoenix.legacy.background.FCMService"
+      android:name="fr.acinq.phoenix.legacy.background.LegacyFCMService"
       android:exported="false">
       <intent-filter>
         <action android:name="com.google.firebase.MESSAGING_EVENT" />

@@ -45,7 +45,7 @@ object Versions {
         const val constraint = "2.0.4"
         const val lifecycleExtensions = "2.2.0"
         const val lifecycle = "2.4.0"
-        const val work = "2.7.0"
+        const val work = "2.8.1"
         const val viewpager = "1.0.0"
         const val eventbus = "3.1.1"
         const val torWrapper = "0.0.5"
