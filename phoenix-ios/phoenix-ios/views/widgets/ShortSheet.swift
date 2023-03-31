@@ -60,8 +60,12 @@ public class ShortSheetState: ObservableObject {
 		var cancellables = Set<AnyCancellable>()
 		publisher.sink { (item: ShortSheetItem?) in
 			
-			animationCompletion()
-			cancellables.removeAll()
+			// NB: This fires right away because publisher is CurrentValueSubject.
+			// It only means `onDidDisappear` if item is nil.
+			if item == nil {
+				animationCompletion()
+				cancellables.removeAll()
+			}
 			
 		}.store(in: &cancellables)
 		
