@@ -25,6 +25,7 @@ struct DisplayConfigurationView: View {
 	@State var fiatCurrency = GroupPrefs.shared.fiatCurrency
 	@State var bitcoinUnit = GroupPrefs.shared.bitcoinUnit
 	@State var theme = Prefs.shared.theme
+	@State var showOriginalFiatAmount = Prefs.shared.showOriginalFiatAmount
 	@State var recentPaymentsConfig = Prefs.shared.recentPaymentsConfig
 	@State var notificationSettings = NotificationsManager.shared.settings.value
 	
@@ -53,6 +54,7 @@ struct DisplayConfigurationView: View {
 		List {
 			section_currency()
 			section_theme()
+			section_paymentHistory()
 			section_home()
 			section_backgroundPayments()
 		}
@@ -136,6 +138,41 @@ struct DisplayConfigurationView: View {
 				}
 			}
 			.pickerStyle(SegmentedPickerStyle())
+			
+		} // </Section>
+	}
+	
+	@ViewBuilder
+	func section_paymentHistory() -> some View {
+		
+		Section(header: Text("Payment History")) {
+			
+			Toggle(isOn: $showOriginalFiatAmount) {
+				Text("Show original fiat amount")
+			}
+			.onChange(of: showOriginalFiatAmount) { newValue in
+				Prefs.shared.showOriginalFiatAmount = newValue
+			}
+			
+			Group {
+				if showOriginalFiatAmount {
+					Text(
+						"The displayed fiat value will be the price you paid at the time of the payment."
+					)
+				} else {
+					Text(
+						"""
+						The displayed fiat value will be the current price, \
+						based on the current fiat/bitcoin exchange rate.
+						"""
+					)
+				}
+			}
+			.font(.callout)
+			.fixedSize(horizontal: false, vertical: true) // SwiftUI truncation bugs
+			.foregroundColor(Color.secondary)
+			.padding(.top, 8)
+			.padding(.bottom, 4)
 			
 		} // </Section>
 	}

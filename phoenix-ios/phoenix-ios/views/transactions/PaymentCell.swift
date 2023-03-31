@@ -197,9 +197,21 @@ struct PaymentCell : View {
 
 		if let payment = fetched?.payment {
 
-			let amount = currencyPrefs.hideAmounts
-				? Utils.hiddenAmount(currencyPrefs)
-				: Utils.format(currencyPrefs, msat: payment.amount)
+			let amount: FormattedAmount
+			if currencyPrefs.hideAmounts {
+				amount = Utils.hiddenAmount(currencyPrefs)
+				
+			} else if currencyPrefs.showOriginalFiatValue && currencyPrefs.currencyType == .fiat {
+				
+				if let originalExchangeRate = fetched?.metadata.originalFiat {
+					amount = Utils.formatFiat(msat: payment.amount, exchangeRate: originalExchangeRate)
+				} else {
+					amount = Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+				}
+			} else {
+				
+				amount = Utils.format(currencyPrefs, msat: payment.amount)
+			}
 
 			let isFailure = payment.state() == WalletPaymentState.failure
 			let isOutgoing = payment is Lightning_kmpOutgoingPayment
@@ -222,7 +234,9 @@ struct PaymentCell : View {
 		
 		if fetched == nil || fetchedIsStale {
 			
-			let options = WalletPaymentFetchOptions.companion.Descriptions
+			let options = WalletPaymentFetchOptions.companion.Descriptions.plus(
+				other: WalletPaymentFetchOptions.companion.OriginalFiat
+			)
 			paymentsManager.fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
 				self.fetched = result
 			}
