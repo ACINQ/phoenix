@@ -39,10 +39,7 @@ import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.AmountView
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.WebLink
-import fr.acinq.phoenix.android.components.txUrl
+import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toFiat
@@ -313,7 +310,7 @@ private fun DetailsForSpliceOut(
 
     TechnicalRow(
         label = stringResource(id = R.string.paymentdetails_splice_out_tx_id_label),
-        content = { WebLink(text = payment.txId.toHex(), url = txUrl(txId = payment.txId.toHex())) }
+        content = { TransactionLinkButton(txId = payment.txId.toHex()) }
     )
 }
 
@@ -338,7 +335,7 @@ private fun DetailsForIncoming(
                     Row {
                         Text(text = stringResource(id = R.string.paymentdetails_dualswapin_tx_value, index + 1))
                         Spacer(modifier = Modifier.width(4.dp))
-                        WebLink(text = outpoint.txid.toHex(), url = txUrl(txId = outpoint.txid.toHex()), maxLines = 1)
+                        TransactionLinkButton(txId = outpoint.txid.toHex())
                     }
                 }
             }
@@ -378,7 +375,7 @@ private fun ReceivedWithNewChannel(
     }
     TechnicalRow(
         label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { WebLink(text = receivedWith.txId.toHex(), url = txUrl(txId = receivedWith.txId.toHex())) }
+        content = { TransactionLinkButton(txId = receivedWith.txId.toHex()) }
     )
     TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
 }
@@ -399,7 +396,7 @@ private fun ReceivedWithSpliceIn(
     }
     TechnicalRow(
         label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { WebLink(text = receivedWith.txId.toHex(), url = txUrl(txId = receivedWith.txId.toHex())) }
+        content = { TransactionLinkButton(txId = receivedWith.txId.toHex()) }
     )
     TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
 }

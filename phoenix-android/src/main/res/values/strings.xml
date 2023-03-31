@@ -454,7 +454,7 @@
     <string name="paymentdetails_received_with_channel">New channel (automatically created)</string>
     <string name="paymentdetails_received_with_lightning">Lightning payment</string>
     <string name="paymentdetails_channel_id_label">Channel id</string>
-    <string name="paymentdetails_tx_id_label">Transaction id</string>
+    <string name="paymentdetails_tx_id_label">Transaction</string>
 
     <string name="paymentdetails_created_at_label">Created at</string>
     <string name="paymentdetails_completed_at_label">Completed at</string>

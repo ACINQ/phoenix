@@ -23,11 +23,9 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -46,8 +44,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.utils.BlockchainExplorer
 
 
@@ -112,24 +112,31 @@ fun FilledButton(
     )
 }
 
+/** Button that looks like an inline link, should fit in with regular text views. */
 @Composable
 fun InlineButton(
     text: String,
     icon: Int? = null,
     fontSize: TextUnit = MaterialTheme.typography.body1.fontSize,
+    iconSize: Dp = ButtonDefaults.IconSize,
     modifier: Modifier = Modifier,
-    padding: PaddingValues = PaddingValues(horizontal = 0.dp, vertical = 0.dp),
+    padding: PaddingValues = PaddingValues(horizontal = 2.dp, vertical = 1.dp),
     space: Dp = 6.dp,
     maxLines: Int = Int.MAX_VALUE,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
 ) {
     Button(
         text = text,
         icon = icon,
+        iconSize = iconSize,
         modifier = modifier,
         padding = padding,
         space = space,
         onClick = onClick,
+        onLongClick = onLongClick,
+        backgroundColor = Color.Transparent,
+        shape = RoundedCornerShape(6.dp),
         maxLines = maxLines,
         textStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary, fontSize = fontSize, textDecoration = TextDecoration.Underline)
     )
@@ -179,7 +186,6 @@ fun TextWithIcon(
     iconSize: Dp = ButtonDefaults.IconSize,
     padding: PaddingValues = PaddingValues(0.dp),
     space: Dp = 6.dp,
-    alignBaseLine: Boolean = false
 ) {
     Row(
         modifier = modifier.padding(padding),
@@ -215,13 +221,16 @@ fun PhoenixIcon(
  *
  * Most of the code is directly taken from Material's implementation of contained button: cf: [androidx.compose.material.ButtonKt.Button]
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Button(
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     text: String? = null,
     icon: Int? = null,
     iconTint: Color = MaterialTheme.colors.primary,
+    iconSize: Dp = ButtonDefaults.IconSize,
     space: Dp = 12.dp,
     enabled: Boolean = true,
     enabledEffect: Boolean = true,
@@ -248,9 +257,12 @@ fun Button(
         border = border,
         elevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp,
         modifier = modifier
-            .clickable(
+            .combinedClickable(
                 onClick = onClick,
                 onClickLabel = onClickLabel,
+                onLongClick = onLongClick,
+                onLongClickLabel = null,
+                onDoubleClick = null,
                 enabled = enabled,
                 role = Role.Button,
                 interactionSource = interactionSource,
@@ -285,11 +297,16 @@ fun Button(
                     verticalAlignment = Alignment.CenterVertically,
                     content = {
                         if (text != null && icon != null) {
-                            TextWithIcon(text = text, icon = icon, iconTint = iconTint, space = space, alignBaseLine = true, maxLines = maxLines, textOverflow = TextOverflow.Ellipsis)
+                            TextWithIcon(
+                                text = text,
+                                icon = icon, iconTint = iconTint, iconSize = iconSize,
+                                space = space,
+                                maxLines = maxLines, textOverflow = TextOverflow.Ellipsis
+                            )
                         } else if (text != null) {
-                            Text(text, maxLines = maxLines, overflow = TextOverflow.Ellipsis)
+                            Text(text = text, maxLines = maxLines, overflow = TextOverflow.Ellipsis)
                         } else if (icon != null) {
-                            PhoenixIcon(icon, tint = iconTint)
+                            PhoenixIcon(resourceId = icon, tint = iconTint, modifier = Modifier.padding(vertical = 1.dp))
                         }
                     }
                 )
@@ -340,19 +357,39 @@ fun WebLink(
     text: String,
     url: String,
     fontSize: TextUnit = MaterialTheme.typography.body1.fontSize,
+    iconSize: Dp = ButtonDefaults.IconSize,
+    space: Dp = 8.dp,
     maxLines: Int = Int.MAX_VALUE,
 ) {
     val context = LocalContext.current
     InlineButton(
         text = text,
         icon = R.drawable.ic_external_link,
+        fontSize = fontSize,
+        iconSize = iconSize,
+        space = space,
         maxLines = maxLines,
-        onClick = { openLink(context, url) }
+        onClick = { openLink(context, url) },
+        onLongClick = { copyToClipboard(context, url) },
     )
 }
 
 @Composable
-fun txUrl(txId: String): String {
+fun TransactionLinkButton(
+    txId: String,
+) {
+    WebLink(
+        text = txId,
+        url = txUrl(txId = txId),
+        space = 4.dp,
+        maxLines = 1,
+        fontSize = 15.sp,
+        iconSize = 14.dp,
+    )
+}
+
+@Composable
+private fun txUrl(txId: String): String {
     return business.blockchainExplorer.txUrl(txId = txId, website = BlockchainExplorer.Website.MempoolSpace)
 }
 

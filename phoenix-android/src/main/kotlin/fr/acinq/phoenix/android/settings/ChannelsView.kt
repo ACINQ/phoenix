@@ -251,9 +251,7 @@ private fun CommitmentInfoView(
                 )
                 ChannelDialogDataRow(
                     label = stringResource(id = R.string.listallchannels_commitment_funding_tx_id),
-                    content = {
-                        WebLink(text = commitment.fundingTxId, url = txUrl(txId = commitment.fundingTxId), maxLines = 1, fontSize = 14.sp)
-                    }
+                    content = { TransactionLinkButton(txId = commitment.fundingTxId) }
                 )
                 ChannelDialogDataRow(
                     label = stringResource(id = R.string.listallchannels_commitment_balance),
@@ -314,9 +312,9 @@ private fun ChannelDialogDataRow(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Row(modifier = Modifier.padding(vertical = 3.dp)) {
-        Text(text = label, fontSize = 14.sp, modifier = Modifier.weight(1f))
+        Text(text = label, fontSize = 14.sp, modifier = Modifier.weight(1f).alignByBaseline())
         Spacer(modifier = Modifier.width(8.dp))
-        Column(modifier = Modifier.weight(2f)) {
+        Column(modifier = Modifier.weight(2f).alignByBaseline()) {
             content()
         }
     }
