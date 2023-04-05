@@ -87,8 +87,8 @@ class NotificationsManager {
 	public static let shared = NotificationsManager()
 	
 	/// The current notification settings assigned to our app from iOS.
-	/// This is based on how the configurable settings within iOS,
-	/// for the Phoenix app under "Notifications".
+	/// This is based on the user-configurable settings within iOS,
+	/// for the Phoenix app, under the "Notifications" section.
 	///
 	public var settings = CurrentValueSubject<UNNotificationSettings?, Never>(nil)
 	
@@ -96,6 +96,11 @@ class NotificationsManager {
 	///
 	public var permissions = CurrentValueSubject<NotificationPermissions, Never>(.neverRequested)
 	
+	/// The current "background app refresh" permissions assigend to our app from iOS.
+	/// This is based on the user-configurable settings within iOS,
+	/// for the Phoenix app.
+	///
+	public var backgroundRefreshStatus = CurrentValueSubject<UIBackgroundRefreshStatus, Never>(.available)
 	
 	private var cancellables = Set<AnyCancellable>()
 	
@@ -116,7 +121,12 @@ class NotificationsManager {
 			self.applicationWillEnterForeground()
 		}.store(in: &cancellables)
 		
+		NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification).sink { _ in
+			self.didBecomeActiveNotification()
+		}.store(in: &cancellables)
+		
 		refreshSettings()
+		refreshBackgroundRefreshStatus()
 	}
 	
 	// --------------------------------------------------
@@ -128,6 +138,51 @@ class NotificationsManager {
 		
 		// User may have changed notification permissions.
 		refreshSettings()
+	}
+	
+	func didBecomeActiveNotification() {
+		log.trace("didBecomeActiveNotification()")
+		
+		// Accessing `UIApplication.shared.backgroundRefreshStatus` within
+		// `applicationWillEnterForeground` results in a stale value.
+		// We actually need to wait until `didBecomeActiveNotification` to get an updated value.
+		refreshBackgroundRefreshStatus()
+	}
+	
+	// --------------------------------------------------
+	// MARK: Refresh
+	// --------------------------------------------------
+	
+	private func refreshSettings() {
+		log.trace("refreshSettings()")
+		
+		UNUserNotificationCenter.current().getNotificationSettings { (settings: UNNotificationSettings) in
+			
+			log.debug("UNNotificationSettings: \(settings)")
+			
+			// We're not on the main thread right now
+			DispatchQueue.main.async {
+				self.settings.send(settings)
+			}
+		}
+	}
+	
+	private func refreshBackgroundRefreshStatus() {
+		log.trace("refreshBackgroundRefreshStatus()")
+		
+		let refreshBlock = {
+			// iOS displays a warning if we access `UIApplication.shared` from a background thread
+			
+			let newStatus = UIApplication.shared.backgroundRefreshStatus
+			log.debug("backgroundRefreshStatus = \(newStatus.rawValue)")
+			self.backgroundRefreshStatus.send(newStatus)
+		}
+		
+		if Thread.isMainThread {
+			refreshBlock()
+		} else {
+			DispatchQueue.main.async { refreshBlock() }
+		}
 	}
 	
 	// --------------------------------------------------
@@ -195,20 +250,6 @@ class NotificationsManager {
 			}
 			
 			self.refreshSettings()
-		}
-	}
-	
-	private func refreshSettings() {
-		log.trace("refreshSettings()")
-		
-		UNUserNotificationCenter.current().getNotificationSettings { (settings: UNNotificationSettings) in
-			
-			log.debug("UNNotificationSettings: \(settings)")
-			
-			// We're not on the main thread right now
-			DispatchQueue.main.async {
-				self.settings.send(settings)
-			}
 		}
 	}
 	
