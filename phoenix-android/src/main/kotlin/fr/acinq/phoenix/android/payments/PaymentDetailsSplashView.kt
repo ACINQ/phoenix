@@ -437,7 +437,7 @@ private fun DetailsRow(
                     overflow = overflow,
                 )
                 if (helpMessage != null) {
-                    HelpPopup(message = helpMessage)
+                    HelpPopup(helpMessage = helpMessage)
                 }
             }
             if (additionalContent != null) {

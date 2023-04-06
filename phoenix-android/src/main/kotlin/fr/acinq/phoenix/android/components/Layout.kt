@@ -18,24 +18,25 @@ package fr.acinq.phoenix.android.components
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.borderColor
-import fr.acinq.phoenix.android.utils.green
 import fr.acinq.phoenix.android.utils.mutedTextColor
-import fr.acinq.phoenix.android.utils.red50
 
 
 /** Button for navigation purpose, with the back arrow. */
@@ -88,6 +89,28 @@ fun DefaultScreenHeader(
     DefaultScreenHeader(
         content = {
             title?.let { Text(text = it) }
+        },
+        onBackClick = onBackClick,
+        backgroundColor = backgroundColor
+    )
+}
+
+/** A header with a back button, a title, and a help button. */
+@Composable
+fun DefaultScreenHeader(
+    title: String,
+    helpMessage: String,
+    helpMessageLink: Pair<String, String>? = null,
+    onBackClick: () -> Unit,
+    backgroundColor: Color = Color.Transparent,
+) {
+    DefaultScreenHeader(
+        content = {
+            Row {
+                Text(text = title)
+                Spacer(modifier = Modifier.width(4.dp))
+                HelpPopup(helpMessage = helpMessage, helpMessageLink = helpMessageLink)
+            }
         },
         onBackClick = onBackClick,
         backgroundColor = backgroundColor
@@ -156,11 +179,12 @@ fun Card(
     modifier: Modifier = Modifier,
     externalPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
     internalPadding: PaddingValues = PaddingValues(0.dp),
-    shape: Shape = RoundedCornerShape(20.dp),
+    shape: Shape = RoundedCornerShape(10.dp),
     withBorder: Boolean = false,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     maxWidth: Dp = 500.dp,
+    onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
@@ -171,12 +195,60 @@ fun Card(
             .then(
                 if (withBorder) Modifier.border(BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary), shape) else Modifier
             )
+            .then(
+                if (onClick != null) {
+                    Modifier.clickable(
+                        onClick = onClick,
+                        role = Role.Button,
+                        onClickLabel = null,
+                    )
+                } else {
+                    Modifier
+                }
+            )
             .background(MaterialTheme.colors.surface)
             .padding(internalPadding),
         horizontalAlignment = horizontalAlignment,
         verticalArrangement = verticalArrangement
     ) {
         content()
+    }
+}
+
+@Composable
+fun CardHeader(
+    text: String,
+    padding: PaddingValues = PaddingValues(horizontal = 28.dp)
+) {
+    Spacer(Modifier.height(12.dp))
+    Text(
+        text = text.uppercase(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(padding),
+        style = MaterialTheme.typography.subtitle1
+    )
+}
+
+@Composable
+fun CardHeaderWithHelp(
+    text: String,
+    helpMessage: String,
+    padding: PaddingValues = PaddingValues(start = 28.dp)
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    Spacer(Modifier.height(12.dp))
+    Row(
+        modifier = Modifier
+            .indication(
+                interactionSource = interactionSource,
+                indication = LocalIndication.current
+            )
+            .padding(padding),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = text.uppercase(), style = MaterialTheme.typography.subtitle1)
+        HelpPopup(helpMessage = helpMessage)
     }
 }
 

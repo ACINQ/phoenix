@@ -31,8 +31,10 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.TrampolineFees
+import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalWalletContext
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
@@ -52,24 +54,26 @@ import java.text.NumberFormat
 
 @Composable
 fun PaymentSettingsView(
-    initialShowLnurlAuthSchemeDialog: Boolean = false
+    initialShowLnurlAuthSchemeDialog: Boolean = false,
+    onLiquidityPolicyClick: () -> Unit,
 ) {
     val log = logger("PaymentSettingsView")
     val nc = navController
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val btcUnit = LocalBitcoinUnit.current
 
     var showDescriptionDialog by rememberSaveable { mutableStateOf(false) }
     var showExpiryDialog by rememberSaveable { mutableStateOf(false) }
     var showTrampolineMaxFeeDialog by rememberSaveable { mutableStateOf(false) }
-    var showPayToOpenDialog by rememberSaveable { mutableStateOf(false) }
 
     val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(LocalContext.current).collectAsState(initial = "")
     val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState(initial = -1L)
 
     val walletContext = LocalWalletContext.current
-    val prefsTrampolineMaxFee by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(null)
+    val prefsTrampolineMaxFee by UserPrefs.getTrampolineMaxFee(context).collectAsState(null)
     val trampolineFees = prefsTrampolineMaxFee ?: walletContext?.trampoline?.v2?.attempts?.last()?.export()
+    val prefLiquidityPolicy by UserPrefs.getLiquidityPolicy(context).collectAsState(null)
 
     val prefLnurlAuthSchemeState = UserPrefs.getLnurlAuthScheme(context).collectAsState(initial = null)
 
@@ -78,6 +82,8 @@ fun PaymentSettingsView(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.paymentsettings_title),
         )
+
+        CardHeader(text = stringResource(id = R.string.paymentsettings_category_incoming))
         Card {
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_defaultdesc_title),
@@ -95,22 +101,30 @@ fun PaymentSettingsView(
                 onClick = { showExpiryDialog = true }
             )
             SettingInteractive(
+                title = stringResource(id = R.string.paymentsettings_liquidity_policy),
+                description = when (val policy = prefLiquidityPolicy) {
+                    is LiquidityPolicy.Auto -> stringResource(id = R.string.paymentsettings_liquidity_policy_auto, policy.maxFeeFloor.toPrettyString(btcUnit, withUnit = true))
+                    is LiquidityPolicy.Disable -> stringResource(id = R.string.paymentsettings_liquidity_policy_disabled)
+                    null -> stringResource(id = R.string.utils_loading_data)
+                },
+                onClick = onLiquidityPolicyClick
+            )
+        }
+
+        CardHeader(text = stringResource(id = R.string.paymentsettings_category_outgoing))
+        Card {
+            SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_trampoline_fees_title),
                 description = trampolineFees?.let {
                     stringResource(id = R.string.paymentsettings_trampoline_fees_desc, trampolineFees.feeBase, trampolineFees.proportionalFeeAsPercentageString)
                 } ?: stringResource(R.string.utils_unknown),
                 onClick = { showTrampolineMaxFeeDialog = true }
             )
-            SettingInteractive(
-                title = stringResource(id = R.string.paymentsettings_paytoopen_fees_title),
-                description = walletContext?.let {
-                    stringResource(id = R.string.paymentsettings_paytoopen_fees_desc, String.format("%.2f", 100 * (it.payToOpen.v1.feePercent)), it.payToOpen.v1.minFeeSat)
-                } ?: stringResource(id = R.string.utils_unknown),
-                onClick = { showPayToOpenDialog = true }
-            )
         }
+
         val prefLnurlAuthScheme = prefLnurlAuthSchemeState.value
         if (prefLnurlAuthScheme != null) {
+            CardHeader(text = stringResource(id = R.string.paymentsettings_category_lnurl))
             Card {
                 val schemes = listOf<PreferenceItem<LnurlAuth.Scheme>>(
                     PreferenceItem(
@@ -179,9 +193,6 @@ fun PaymentSettingsView(
         )
     }
 
-    if (showPayToOpenDialog) {
-        PayToOpenDialog(onDismiss = { showPayToOpenDialog = false })
-    }
 }
 
 @Composable
@@ -350,28 +361,8 @@ private fun TrampolineMaxFeesDialog(
     }
 }
 
-@Composable
-private fun PayToOpenDialog(
-    onDismiss: () -> Unit
-) {
-    Dialog(
-        title = stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_title),
-        onDismiss = onDismiss,
-        buttons = { },
-    ) {
-        Column(Modifier.padding(horizontal = 24.dp)) {
-            Text(text = stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_message))
-            Spacer(Modifier.height(8.dp))
-            WebLink(
-                text = stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_message_clickable),
-                url = "https://phoenix.acinq.co/faq#what-are-the-fees"
-            )
-        }
-    }
-}
-
 @Preview(device = Devices.PIXEL_3A)
 @Composable
 private fun Preview() {
-    PaymentSettingsView()
+    PaymentSettingsView(onLiquidityPolicyClick = {})
 }

@@ -49,6 +49,7 @@ class NodeService : Service() {
     /** State of the wallet, provides access to the business when started. Private so that it's not mutated from the outside. */
     private val _state = MutableLiveData<WalletState>(WalletState.Off)
     val state: LiveData<WalletState> get() = _state
+
     /** Lock for state updates */
     private val stateLock = ReentrantLock()
 
@@ -210,6 +211,7 @@ class NodeService : Service() {
         val business = (applicationContext as? PhoenixApplication)?.business ?: throw RuntimeException("invalid context type, should be PhoenixApplication")
         val electrumServer = UserPrefs.getElectrumServer(applicationContext).first()
         val isTorEnabled = UserPrefs.getIsTorEnabled(applicationContext).first()
+        val liquidityPolicy = UserPrefs.getLiquidityPolicy(applicationContext).first()
         val preferredFiatCurrency = UserPrefs.getFiatCurrency(applicationContext).first()
         val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(decryptedPayload))
 
@@ -217,7 +219,13 @@ class NodeService : Service() {
         business.appConfigurationManager.updatePreferredFiatCurrencies(
             AppConfigurationManager.PreferredFiatCurrencies(primary = preferredFiatCurrency, others = emptySet())
         )
-        business.start(StartupParams(requestCheckLegacyChannels = requestCheckLegacyChannels, isTorEnabled = isTorEnabled))
+        business.start(
+            StartupParams(
+                requestCheckLegacyChannels = requestCheckLegacyChannels,
+                isTorEnabled = isTorEnabled,
+                liquidityPolicy = liquidityPolicy
+            )
+        )
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
 
         serviceScope.launch {

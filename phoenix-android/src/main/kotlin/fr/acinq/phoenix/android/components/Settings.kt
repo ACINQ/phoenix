@@ -35,7 +35,7 @@ fun Setting(modifier: Modifier = Modifier, title: String, description: String?) 
     Column(
         modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Text(title, style = MaterialTheme.typography.body2)
         Spacer(modifier = Modifier.height(2.dp))
@@ -53,7 +53,7 @@ fun SettingWithDecoration(
     Column(
         modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Row(
             Modifier.fillMaxWidth(),
@@ -108,7 +108,7 @@ fun SettingInteractive(
             .fillMaxWidth()
             .clickable(onClick = { if (enabled) onClick() })
             .enableOrFade(enabled)
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Row(
             Modifier.fillMaxWidth(),
@@ -116,7 +116,7 @@ fun SettingInteractive(
         ) {
             if (icon != null) {
                 PhoenixIcon(icon, tint = iconTint ?: LocalContentColor.current, modifier = Modifier.size(ButtonDefaults.IconSize))
-                Spacer(Modifier.width(16.dp))
+                Spacer(Modifier.width(12.dp))
             }
             Text(
                 text = title,
@@ -155,7 +155,7 @@ fun SettingSwitch(
             .fillMaxWidth()
             .clickable(onClick = { if (enabled) onCheckChangeAttempt(!isChecked) })
             .enableOrFade(enabled)
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize))

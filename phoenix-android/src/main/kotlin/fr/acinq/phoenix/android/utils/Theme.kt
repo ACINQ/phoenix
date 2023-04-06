@@ -125,14 +125,15 @@ private val DarkColorPalette = darkColors(
 
 @Composable
 private fun typography(palette: Colors) = Typography(
-    // used for highlighting sections
+    // used for all-caps labels/headers
     subtitle1 = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
-        color = palette.primary
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        letterSpacing = 0.5.sp,
+        color = if (isDarkTheme) gray500 else gray300
     ),
-    // used for values of settings
+    // used for settings' values
     subtitle2 = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
@@ -187,7 +188,7 @@ private fun typography(palette: Colors) = Typography(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        letterSpacing = 1.15.sp,
+        //letterSpacing = 1.15.sp,
         color = palette.onSurface,
     ),
     // basic text but muted

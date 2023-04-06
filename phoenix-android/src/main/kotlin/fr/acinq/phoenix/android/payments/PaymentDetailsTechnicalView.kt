@@ -72,7 +72,7 @@ fun PaymentDetailsTechnicalView(
 
             val receivedWith = payment.received?.receivedWith
             if (!receivedWith.isNullOrEmpty()) {
-                Text(text = stringResource(id = R.string.paymentdetails_parts_label, receivedWith.size), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, style = MaterialTheme.typography.subtitle1)
+                CardHeader(text = stringResource(id = R.string.paymentdetails_parts_label, receivedWith.size))
                 receivedWith.forEach {
                     TechnicalCard {
                         when (it) {
@@ -104,7 +104,7 @@ fun PaymentDetailsTechnicalView(
                 val lightningParts = payment.parts.filterIsInstance<LightningOutgoingPayment.LightningPart>().filter { it.status is LightningOutgoingPayment.LightningPart.Status.Succeeded }
                 val closingTxsParts = payment.parts.filterIsInstance<LightningOutgoingPayment.ClosingTxPart>()
                 if (lightningParts.isNotEmpty() || closingTxsParts.isNotEmpty()) {
-                    Text(text = stringResource(id = R.string.paymentdetails_parts_label, payment.parts.size), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, style = MaterialTheme.typography.subtitle1)
+                    CardHeader(text = stringResource(id = R.string.paymentdetails_parts_label, payment.parts.size))
                 }
                 lightningParts.forEachIndexed { index, part ->
                     TechnicalCard {

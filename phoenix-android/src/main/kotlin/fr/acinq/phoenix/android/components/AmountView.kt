@@ -104,6 +104,7 @@ fun AmountView(
     }
 }
 
+/** Outputs a column with the amount in fiat or btc on top, and the reverse below. Can switch by clicking on top amount. */
 @Composable
 fun AmountWithAltView(
     amount: MilliSatoshi,
@@ -143,22 +144,32 @@ fun AmountWithAltView(
     }
 }
 
+/** Outputs a column with the amount in bitcoin always on top, and the conversion fiat below. */
 @Composable
 fun AmountWithFiatView(
     amount: MilliSatoshi,
     modifier: Modifier = Modifier,
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
     unitTextStyle: TextStyle = MaterialTheme.typography.body1,
-    altTextStyle: TextStyle = MaterialTheme.typography.caption,
+    fiatTextStyle: TextStyle = MaterialTheme.typography.caption,
     separatorSpace: Dp = 4.dp,
 ) {
     val prefBtcUnit = LocalBitcoinUnit.current
+    Column {
+        AmountView(amount = amount, amountTextStyle = amountTextStyle, unitTextStyle = unitTextStyle, separatorSpace = separatorSpace, modifier = modifier, forceUnit = prefBtcUnit, onClick = null)
+        AmountInFiatView(amount = amount, style = fiatTextStyle)
+    }
+}
+
+/** Creates a Text component with [amount] converted to fiat and properly formatted. */
+@Composable
+fun AmountInFiatView(
+    amount: MilliSatoshi,
+    modifier: Modifier = Modifier,
+    style: TextStyle = MaterialTheme.typography.caption
+) {
     val prefFiatCurrency = LocalFiatCurrency.current
     val rate = fiatRate
     val fiatAmount = remember(amount) { amount.toPrettyString(prefFiatCurrency, rate, withUnit = true) }
-
-    Column {
-        AmountView(amount = amount, amountTextStyle = amountTextStyle, unitTextStyle = unitTextStyle, separatorSpace = separatorSpace, modifier = modifier, forceUnit = prefBtcUnit, onClick = null)
-        Text(text = stringResource(id = R.string.utils_converted_amount, fiatAmount), style = altTextStyle)
-    }
+    Text(text = stringResource(id = R.string.utils_converted_amount, fiatAmount), style = style, modifier = modifier)
 }

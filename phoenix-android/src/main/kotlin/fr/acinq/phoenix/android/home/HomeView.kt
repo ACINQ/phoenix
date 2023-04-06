@@ -94,6 +94,7 @@ fun HomeView(
         ConnectionDialog(connections = connectionsState, onClose = { showConnectionsDialog = false }, onTorClick = onTorClick, onElectrumClick = onElectrumClick)
     }
 
+    val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
     val payments by paymentsViewModel.latestPaymentsFlow.collectAsState()
     val swapInBalance = business.balanceManager.swapInWalletBalance.collectAsState()
     val unconfirmedChannelsBalance = business.balanceManager.unconfirmedChannelPayments.collectAsState()
@@ -153,6 +154,7 @@ fun HomeView(
             Spacer(Modifier.height(24.dp))
             Column(modifier = Modifier.weight(1f, fill = true), horizontalAlignment = Alignment.CenterHorizontally) {
                 LatestPaymentsList(
+                    allPaymentsCount = allPaymentsCount,
                     payments = payments,
                     onPaymentClick = onPaymentClick,
                     onPaymentsHistoryClick = onPaymentsHistoryClick,
@@ -443,6 +445,7 @@ private fun UnconfirmedChannelsBalanceDialog(
 
 @Composable
 private fun ColumnScope.LatestPaymentsList(
+    allPaymentsCount: Long,
     payments: List<PaymentRowState>,
     onPaymentClick: (WalletPaymentId) -> Unit,
     onPaymentsHistoryClick: () -> Unit,
@@ -465,8 +468,6 @@ private fun ColumnScope.LatestPaymentsList(
             style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center),
             modifier = Modifier.padding(horizontal = 32.dp)
         )
-        Spacer(Modifier.height(16.dp))
-        morePaymentsButton()
     } else {
         LazyColumn(
             modifier = Modifier.weight(1f, fill = false),
@@ -483,7 +484,7 @@ private fun ColumnScope.LatestPaymentsList(
                 } else {
                     PaymentLine(item.paymentInfo, onPaymentClick, isAmountRedacted)
                 }
-                if (payments.isNotEmpty() && index == payments.size - 1) {
+                if (payments.isNotEmpty() && allPaymentsCount > PaymentsViewModel.latestPaymentsCount && index == payments.size - 1) {
                     Spacer(Modifier.height(16.dp))
                     morePaymentsButton()
                     Spacer(Modifier.height(80.dp))

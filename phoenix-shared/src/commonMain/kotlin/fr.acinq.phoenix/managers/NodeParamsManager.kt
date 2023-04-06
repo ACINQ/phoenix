@@ -17,7 +17,7 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.PublicKey
-import fr.acinq.lightning.*
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
@@ -25,6 +25,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
@@ -33,13 +34,15 @@ import org.kodein.log.newLogger
 class NodeParamsManager(
     loggerFactory: LoggerFactory,
     chain: NodeParams.Chain,
-    walletManager: WalletManager
+    walletManager: WalletManager,
+    appConfigurationManager: AppConfigurationManager,
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness): this(
         loggerFactory = business.loggerFactory,
         chain = business.chain,
-        walletManager = business.walletManager
+        walletManager = business.walletManager,
+        appConfigurationManager = business.appConfigurationManager,
     )
 
     private val log = newLogger(loggerFactory)
@@ -48,22 +51,28 @@ class NodeParamsManager(
     val nodeParams: StateFlow<NodeParams?> = _nodeParams
 
     init {
-        // we listen to the wallet manager and update node params and databases when the wallet changes
         launch {
-            walletManager.keyManager.filterNotNull().collect { keyManager ->
-                log.info { "nodeid=${keyManager.nodeId}" }
-                val nodeParams = NodeParams(
+            combine(
+                walletManager.keyManager.filterNotNull(),
+                appConfigurationManager.startupParams.filterNotNull(),
+            ) { keyManager, startupParams ->
+                NodeParams(
                     chain = chain,
                     loggerFactory = loggerFactory,
                     keyManager = keyManager,
                 ).copy(
                     alias = "phoenix",
-                    // FIXME: use proper liquidity policy and node
                     zeroConfPeers = setOf(PublicKey.fromHex("025c0e9a61ea4b7ce06a6d7be46c79459c5690c093e110c243ce5424514271b903")),
-                    liquidityPolicy = LiquidityPolicy.Auto(100, 30000.sat)
+                    liquidityPolicy = startupParams.liquidityPolicy
                 )
-                _nodeParams.value = nodeParams
+            }.collect {
+                log.info { "nodeid=${it.nodeId}" }
+                _nodeParams.value = it
             }
         }
+    }
+
+    companion object {
+        val defaultLiquidityPolicy = LiquidityPolicy.Auto(maxFeeBasisPoints = 10_00 /* 10 % */, maxFeeFloor = 10_000.sat)
     }
 }

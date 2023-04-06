@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.InitTlv
@@ -218,6 +219,8 @@ data class StartupParams(
     val requestCheckLegacyChannels: Boolean = false,
     /** Tor state must be defined before the node starts. */
     val isTorEnabled: Boolean,
+    /** The liquidity policy must be injected into the node params manager. */
+    val liquidityPolicy: LiquidityPolicy,
     // TODO: add custom electrum address, fiat currencies, ...
 )
 

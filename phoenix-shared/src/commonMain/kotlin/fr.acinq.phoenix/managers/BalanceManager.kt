@@ -58,6 +58,7 @@ class BalanceManager(
      * - but the wallet incorrectly says "+ X sat incoming".
      */
     private val _swapInWallet = MutableStateFlow<WalletState?>(null)
+    val swapInWallet: StateFlow<WalletState?> = _swapInWallet
 
     /**
      * A map of (channelId -> List<Utxos>) representing the utxos that will be reserved to create a channel.
@@ -88,8 +89,11 @@ class BalanceManager(
     private val _unconfirmedChannelPayments = MutableStateFlow(0.msat)
     val unconfirmedChannelPayments: StateFlow<MilliSatoshi> = _unconfirmedChannelPayments
 
+    /** Flow of balance in the fallback wallet (where channel get closed by default). */
+    private val _finalWallet = MutableStateFlow<WalletState?>(null)
+    val finalWallet: StateFlow<WalletState?> = _finalWallet
+
     init {
-        log.info { "init balance manager"}
         launch {
             val peer = peerManager.peerState.filterNotNull().first()
             launch { monitorChannelsBalance(peerManager) }
@@ -97,6 +101,7 @@ class BalanceManager(
             launch { monitorNodeEvents(peer) }
             launch { monitorSwapInBalance() }
             launch { monitorIncomingPaymentNotYetConfirmed() }
+            launch { monitorFinalWallet(peer) }
         }
     }
 
@@ -115,6 +120,13 @@ class BalanceManager(
         peer.swapInWallet.walletStateFlow.collect { wallet ->
             _swapInWallet.value = wallet
             _reservedUtxos.update { it.intersect(wallet.utxos.toSet()) }
+        }
+    }
+
+    /** Fallback balance is the balance found in the default wallet. */
+    private suspend fun monitorFinalWallet(peer: Peer) {
+        peer.finalWallet.walletStateFlow.collect { wallet ->
+            _finalWallet.value = wallet
         }
     }
 
@@ -171,7 +183,7 @@ class BalanceManager(
     /** The swap-in balance is the swap-in wallet's balance without the [_reservedUtxos]. */
     private suspend fun monitorSwapInBalance() {
         combine(_swapInWallet.filterNotNull(), _reservedUtxos) { swapInWallet, reservedUtxos ->
-            log.info { "monitorSwapInBalance: reserved_utxos=$reservedUtxos swapInWallet=$swapInWallet"}
+            log.debug { "monitorSwapInBalance: reserved_utxos=$reservedUtxos swapInWallet=$swapInWallet"}
             swapInWallet.minus(reservedUtxos)
         }.collect { availableWallet ->
             _swapInWalletBalance.value = WalletBalance(

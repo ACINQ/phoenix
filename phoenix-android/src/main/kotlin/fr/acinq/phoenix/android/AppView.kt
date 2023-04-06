@@ -34,6 +34,9 @@ import fr.acinq.phoenix.android.intro.IntroView
 import fr.acinq.phoenix.android.payments.*
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
+import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
+import fr.acinq.phoenix.android.settings.walletinfo.SwapInWalletInfo
+import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
 import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
@@ -43,7 +46,6 @@ import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -238,13 +240,19 @@ fun AppView(
                     AboutView()
                 }
                 composable(Screen.PaymentSettings.route) {
-                    PaymentSettingsView(initialShowLnurlAuthSchemeDialog = false)
+                    PaymentSettingsView(
+                        initialShowLnurlAuthSchemeDialog = false,
+                        onLiquidityPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
+                    )
                 }
                 composable("${Screen.PaymentSettings.route}/{showAuthSchemeDialog}", arguments = listOf(
                     navArgument("showAuthSchemeDialog") { type = NavType.BoolType }
                 )) {
                     val showAuthSchemeDialog = it.arguments?.getBoolean("showAuthSchemeDialog") ?: false
-                    PaymentSettingsView(showAuthSchemeDialog)
+                    PaymentSettingsView(
+                        initialShowLnurlAuthSchemeDialog = showAuthSchemeDialog,
+                        onLiquidityPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
+                    )
                 }
                 composable(Screen.AppLock.route) {
                     AppLockView()
@@ -254,6 +262,26 @@ fun AppView(
                 }
                 composable(Screen.SwitchToLegacy.route) {
                     LegacySwitcherView(onProceedNormally = { navController.navigate(Screen.Startup.route) })
+                }
+                composable(Screen.WalletInfo.route) {
+                    WalletInfoView(
+                        onBackClick = { navController.popBackStack() },
+                        onLightningWalletClick = { navController.navigate(Screen.Channels.route) },
+                        onSwapInWalletClick = { navController.navigate(Screen.WalletInfo.SwapInWallet.route) },
+                        onFinalWalletClick = { navController.navigate(Screen.WalletInfo.FinalWallet.route) },
+                    )
+                }
+                composable(Screen.WalletInfo.SwapInWallet.route) {
+                    SwapInWalletInfo(
+                        onBackClick = { navController.popBackStack() },
+                        onChangeChannelPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
+                    )
+                }
+                composable(Screen.WalletInfo.FinalWallet.route) {
+                    FinalWalletInfo(onBackClick = { navController.popBackStack() })
+                }
+                composable(Screen.LiquidityPolicy.route) {
+                    LiquidityPolicyView(onBackClick = { navController.popBackStack() })
                 }
             }
         }

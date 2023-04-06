@@ -193,6 +193,7 @@
     <string name="utils_cancel">Cancel</string>
     <string name="utils_date_just_now">just now</string>
     <string name="utils_unknown">N/A</string>
+    <string name="utils_loading_data">Loading data…</string>
     <string name="utils_copied">Copied to clipboard!</string>
 
     <string name="accessibility_link">Open a link in a browser</string>
@@ -218,6 +219,7 @@
     <string name="settings_general_title">General</string>
     <string name="settings_display_prefs">Display</string>
     <string name="settings_security_title">Privacy &amp; Security</string>
+    <string name="settings_wallet_info">My wallet</string>
     <string name="settings_display_seed">Recovery phrase</string>
     <string name="settings_access_control">Access control</string>
     <string name="settings_advanced_title">Advanced</string>
@@ -229,7 +231,7 @@
     <string name="settings_force_close">Danger zone</string>
     <string name="settings_tor">Tor</string>
     <string name="settings_about">About</string>
-    <string name="settings_payment_settings">Payment options</string>
+    <string name="settings_payment_settings">Options &amp; fees</string>
 
     <!-- //////////////// notification - watcher //////////////// -->
 
@@ -275,28 +277,30 @@
     <string name="forceclose_address_label">Funds will eventually be sent to:</string>
     <string name="forceclose_button">Force-close all my channels</string>
 
-    <!-- //////////////// list all channels //////////////// -->
+    <!-- channels view and channel details dialog -->
+    <string name="channelsview_title">Payment channels</string>
+    <string name="channelsview_tab_summary">Summary</string>
+    <string name="channelsview_tab_json">Raw data</string>
+    <string name="channelsview_balance">Balance</string>
+    <string name="channelsview_balance_about">This balance is the aggregated balance of your active channels. It\'s what you can spend over Lightning.</string>
+    <string name="channelsview_loading_channels">Loading channels data…</string>
+    <string name="channelsview_no_channels">You don\'t have any channels yet.\n\nPayments channels are created when you receive a payment and a new channel is needed. This is done automatically.</string>
 
-    <string name="listallchannels_title">Payment channels</string>
-    <string name="listallchannels_tab_summary">Summary</string>
-    <string name="listallchannels_tab_json">Raw data</string>
-    <string name="listallchannels_node_id">Node id:</string>
-    <string name="listallchannels_no_channels">You don\'t have any channels yet.\n\nPayments channels are created when you receive a payment and a new channel is needed. This is done automatically.</string>
-    <string name="listallchannels_dialog_label">Show channel\'s details</string>
-    <string name="listallchannels_channel_id">Channel id:</string>
-    <string name="listallchannels_state">State:</string>
-    <string name="listallchannels_spendable">Can send:</string>
-    <string name="listallchannels_commitments">Active commitments:</string>
-    <string name="listallchannels_inactive_commitments">Inactive commitments:</string>
-    <string name="listallchannels_commitment_funding_tx_id">Funding tx:</string>
-    <string name="listallchannels_commitment_funding_tx_index">Tx index:</string>
-    <string name="listallchannels_commitment_balance">Balance:</string>
-    <string name="listallchannels_commitment_funding_capacity">Capacity:</string>
-    <string name="listallchannels_json">Json</string>
-    <string name="listallchannels_close">Close</string>
-    <string name="listallchannels_share">Share</string>
-    <string name="listallchannels_share_subject">Channels data</string>
-    <string name="listallchannels_share_title">Share channel data</string>
+    <string name="channelsview_dialog_label">Show channel\'s details</string>
+    <string name="channelsview_channel_id">Channel id:</string>
+    <string name="channelsview_state">State:</string>
+    <string name="channelsview_spendable">Can send:</string>
+    <string name="channelsview_commitments">Active commitments:</string>
+    <string name="channelsview_inactive_commitments">Inactive commitments:</string>
+    <string name="channelsview_commitment_funding_tx_id">Funding tx:</string>
+    <string name="channelsview_commitment_funding_tx_index">Tx index:</string>
+    <string name="channelsview_commitment_balance">Balance:</string>
+    <string name="channelsview_commitment_funding_capacity">Capacity:</string>
+    <string name="channelsview_json">Json</string>
+    <string name="channelsview_close">Close</string>
+    <string name="channelsview_share">Share</string>
+    <string name="channelsview_share_subject">Channels data</string>
+    <string name="channelsview_share_title">Share channel data</string>
 
     <!-- //////////////// menu //////////////// -->
 
@@ -676,22 +680,29 @@
 
     <!-- //////////////// settings: options for payments //////////////// -->
 
-    <string name="paymentsettings_title">Payment settings</string>
+    <string name="paymentsettings_title">Options &amp; fees</string>
 
-    <string name="paymentsettings_defaultdesc_title">Incoming payment description</string>
+    <string name="paymentsettings_category_incoming">Incoming payments</string>
+    <string name="paymentsettings_category_outgoing">Outgoing payments</string>
+    <string name="paymentsettings_category_lnurl">LNURL</string>
+
+    <string name="paymentsettings_defaultdesc_title">Invoice description</string>
     <string name="paymentsettings_defaultdesc_none">No description set…</string>
     <string name="paymentsettings_defaultdesc_dialog_title">Default description</string>
-    <string name="paymentsettings_defaultdesc_dialog_description">Payment requests that you create will use this description. You can override it on a case-by-case basis.</string>
+    <string name="paymentsettings_defaultdesc_dialog_description">Invoices that you create will use this description. You can override it on a case-by-case basis.</string>
     <string name="paymentsettings_defaultdesc_dialog_hint">Enter a description</string>
 
-    <string name="paymentsettings_expiry_title">Incoming payment expiry</string>
-    <string name="paymentsettings_expiry_dialog_title">Payment expiry</string>
-    <string name="paymentsettings_expiry_dialog_description">Payment requests generated by your wallet are stale after this delay. Default value is 1 week.</string>
-
+    <string name="paymentsettings_expiry_title">Invoice expiry</string>
+    <string name="paymentsettings_expiry_dialog_title">Invoice expiry</string>
+    <string name="paymentsettings_expiry_dialog_description">Invoices that you create are stale after this delay. Default value is 1 week.</string>
     <string name="paymentsettings_expiry_one_week">1 week</string>
     <string name="paymentsettings_expiry_two_weeks">2 weeks</string>
     <string name="paymentsettings_expiry_three_weeks">3 weeks</string>
     <string name="paymentsettings_expiry_value">%1$s seconds</string>
+
+    <string name="paymentsettings_liquidity_policy">Liquidity policy and fees</string>
+    <string name="paymentsettings_liquidity_policy_auto">Automated (max %1$s)</string>
+    <string name="paymentsettings_liquidity_policy_disabled">Disabled</string>
 
     <string name="paymentsettings_trampoline_fees_title">Maximum fee for outgoing Lightning payments</string>
     <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
@@ -705,12 +716,6 @@
     <string name="paymentsettings_trampoline_fees_dialog_base_above_max">Base fee cannot exceed %1$s.</string>
     <string name="paymentsettings_trampoline_fees_dialog_proportional_below_min">Proportional fee must be at least %1$s%%.</string>
     <string name="paymentsettings_trampoline_fees_dialog_proportional_above_max">Proportional fee cannot exceed %1$s%%.</string>
-
-    <string name="paymentsettings_paytoopen_fees_title">Fee for on-the-fly channel creation</string>
-    <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s sat minimum)</string>
-    <string name="paymentsettings_paytoopen_fees_dialog_title">On-the-fly channels</string>
-    <string name="paymentsettings_paytoopen_fees_dialog_message">This fee applies when you receive a payment over Lightning and a new channel needs to be created.</string>
-    <string name="paymentsettings_paytoopen_fees_dialog_message_clickable">See the FAQ for more information</string>
 
     <string name="paymentsettings_lnurlauth_scheme_title">LNURL authentication scheme</string>
 
@@ -763,5 +768,49 @@
     <!-- components -->
     <string name="component_calendar_inclusive">(inclusive)</string>
     <string name="component_error_message_details">Cause: %1$s</string>
+
+    <!-- settings: wallet info -->
+    <string name="walletinfo_title">Wallet info</string>
+    <string name="walletinfo_import_instruction">You can import this xpub in any on-chain Bitcoin wallet, like Electrum.</string>
+    <string name="walletinfo_xpub">Master public key</string>
+    <string name="walletinfo_path">(Path: %1$s)</string>
+    <string name="walletinfo_confirmed_title">Confirmed balance</string>
+    <string name="walletinfo_unconfirmed_title">Unconfirmed balance</string>
+    <string name="walletinfo_loading_data">Loading wallet data…</string>
+
+    <string name="walletinfo_lightning">Lightning</string>
+    <string name="walletinfo_nodeid">Node id</string>
+    <string name="walletinfo_offchain_balance">Balance</string>
+    <string name="walletinfo_offchain_channels">Payment channels</string>
+
+    <string name="walletinfo_onchain_swapin">Swap-in wallet</string>
+    <string name="walletinfo_onchain_swapin_about">An on-chain wallet derived from your seed.\n\nThe swap-in wallet is a bridge to Lightning. Funds on this wallet will automatically be moved to Lightning when above a given threshold.</string>
+    <string name="walletinfo_onchain_swapin_policy_auto">This balance will be moved to Lightning automatically when above 10k sat.</string>
+    <string name="walletinfo_onchain_swapin_policy_check_fee">This balance will be moved to Lightning automatically when above 10k sat and fee is less than 2k sat.</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled">Automated channel opening has been disabled. These funds will not be touched.</string>
+
+    <string name="walletinfo_onchain_final">Final wallet</string>
+    <string name="walletinfo_onchain_final_about">An on-chain wallet derived from your seed.\n\nThe final wallet is where funds are sent by default when your Lightning channels are closed.</string>
+    <string name="walletinfo_onchain_final_insight_balance">This wallet is the default closing address for your Lightning channels. If you force-close channels, funds will end up here.</string>
+
+    <!-- settings: liquidity policy for channels creation -->
+    <string name="liquiditypolicy_title">Incoming liquidity policy</string>
+    <string name="liquiditypolicy_help">Incoming payments sometimes need more liquidity than you currently have in order to be received.\n\nThis incurs a fee. You can configure the fee policy in this screen, or even disable it completely.</string>
+    <string name="liquiditypolicy_help_link">Know more…</string>
+    <string name="liquiditypolicy_loading">Retrieving policy…</string>
+
+    <string name="liquiditypolicy_auto_title">Max fee</string>
+    <string name="liquiditypolicy_auto_description">Incoming payments will be accepted as long as the fee is less than <b>%1$s</b>.\n\nThis fee does not always happen, only when needed, and goes to the Bitcoin miners.</string>
+
+    <string name="liquiditypolicy_trustless_title">Fully trustless</string>
+    <string name="liquiditypolicy_trustless_description">Same as above, payments are rejected when above the max.\n\nAdditionally, liquidity is not automated for Lightning payments. They will be rejected if liquidity is insufficient. On-chain deposits are preferred.</string>
+
+    <string name="liquiditypolicy_disabled">Disabled</string>
+    <string name="liquiditypolicy_disabled_description">Phoenix will NOT manage your liquidity automatically. Incoming payments will be rejected if you don\'t have enough liquidity.</string>
+
+    <string name="liquiditypolicy_fee_max">Max. %1$s</string>
+    <string name="liquiditypolicy_fee_sanity_check">Fee cap</string>
+    <string name="liquiditypolicy_fee_sanity_check_enabled">The fee cannot exceed %1$d%% of the amount received whatsoever.</string>
+    <string name="liquiditypolicy_fee_sanity_check_disabled">The fee is unchecked and could consume a significant part of the incoming amount.</string>
 
 </resources>

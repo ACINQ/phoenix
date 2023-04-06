@@ -19,6 +19,7 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.*
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.crypto.LocalKeyManager
+import fr.acinq.lightning.io.Peer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
@@ -28,7 +29,7 @@ class WalletManager(
 ) : CoroutineScope by MainScope() {
 
     private val _localKeyManager = MutableStateFlow<LocalKeyManager?>(null)
-    internal val keyManager: StateFlow<LocalKeyManager?> = _localKeyManager
+    val keyManager: StateFlow<LocalKeyManager?> = _localKeyManager
 
     fun isLoaded(): Boolean = keyManager.value != null
 
@@ -53,8 +54,6 @@ class WalletManager(
             cloudKeyHash = km.cloudKeyHash()
         )
     }
-
-    fun getXpub(): Pair<String, String>? = keyManager.value?.xpub()
 
     /**
      * TODO: Remove this object and and use keyManager methods directly.
@@ -96,13 +95,8 @@ fun LocalKeyManager.cloudKeyHash(): String {
 
 fun LocalKeyManager.isMainnet() = chainHash == NodeParams.Chain.Mainnet.chainHash
 
-/** Get the wallet's (xpub, path) */
-fun LocalKeyManager.xpub(): Pair<String, String> {
-    val masterPubkeyPath = KeyPath(if (isMainnet()) "m/84'/0'/0'" else "m/84'/1'/0'")
-    val publicKey = DeterministicWallet.publicKey(privateKey(masterPubkeyPath))
+fun LocalKeyManager.finalWalletPath(): String = KeyPath(LocalKeyManager.bip84BasePath(chainHash) + DeterministicWallet.hardened(Peer.finalWalletAccount)).toString()
+fun LocalKeyManager.finalWalletXpub(): String = bip84Xpub(Peer.finalWalletAccount)
 
-    return DeterministicWallet.encode(
-        input = publicKey,
-        prefix = if (isMainnet()) DeterministicWallet.zpub else DeterministicWallet.vpub
-    ) to masterPubkeyPath.toString()
-}
+fun LocalKeyManager.swapInWalletPath(): String = KeyPath(LocalKeyManager.bip84BasePath(chainHash) + DeterministicWallet.hardened(Peer.swapInWalletAccount)).toString()
+fun LocalKeyManager.swapInWalletXpub(): String = bip84Xpub(Peer.swapInWalletAccount)

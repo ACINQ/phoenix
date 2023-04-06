@@ -16,7 +16,9 @@
 
 package fr.acinq.phoenix.android.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -131,7 +133,9 @@ fun FullScreenDialog(
 
 @Composable
 fun RowScope.HelpPopup(
-    message: String
+    helpMessage: String,
+    helpMessageLink: Pair<String, String>? = null,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     var showHelpPopup by remember { mutableStateOf(false) }
     if (showHelpPopup) {
@@ -140,15 +144,21 @@ fun RowScope.HelpPopup(
             offset = IntOffset(x = 0, y = 68)
         ) {
             Surface(
-                modifier = Modifier.widthIn(min = 140.dp, max = 250.dp),
+                modifier = Modifier.widthIn(min = 140.dp, max = 280.dp),
                 shape = RoundedCornerShape(8.dp),
-                elevation = 4.dp,
+                border = BorderStroke(1.dp, MaterialTheme.colors.primary),
+                elevation = 6.dp,
             ) {
-                Text(
-                    text = message,
-                    modifier = Modifier.padding(8.dp),
-                    style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
-                )
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Text(
+                        text = helpMessage,
+                        style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
+                    )
+                    helpMessageLink?.let { (text, link) ->
+                        Spacer(modifier = Modifier.height(8.dp))
+                        WebLink(text = text, url = link, fontSize = 14.sp)
+                    }
+                }
             }
         }
     }
@@ -160,6 +170,7 @@ fun RowScope.HelpPopup(
         borderColor = if (showHelpPopup) MaterialTheme.colors.primary else mutedTextColor,
         padding = PaddingValues(2.dp),
         modifier = Modifier.size(20.dp),
+        interactionSource = interactionSource,
         onClick = { showHelpPopup = true }
     )
 }

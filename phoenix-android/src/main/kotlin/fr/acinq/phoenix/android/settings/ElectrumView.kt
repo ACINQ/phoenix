@@ -152,8 +152,8 @@ fun ElectrumView() {
                 }
 
                 // xpub
-                val xpub = remember { business?.walletManager?.getXpub() ?: "" to "" }
-                Setting(title = stringResource(id = R.string.electrum_xpub_label), description = stringResource(id = R.string.electrum_xpub_value, xpub.first, xpub.second))
+//                val xpub = remember { business?.walletManager?.getXpub() ?: "" to "" }
+//                Setting(title = stringResource(id = R.string.electrum_xpub_label), description = stringResource(id = R.string.electrum_xpub_value, xpub.first, xpub.second))
             }
         }
     }

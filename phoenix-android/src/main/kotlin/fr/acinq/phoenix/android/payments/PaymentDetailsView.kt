@@ -66,7 +66,7 @@ class PaymentDetailsViewModel(
     var state by mutableStateOf<PaymentDetailsState>(PaymentDetailsState.Loading)
 
     suspend fun getPayment(id: WalletPaymentId) {
-        log.info("getting payment details for id=$id")
+        log.debug("getting payment details for id=$id")
         state = paymentsManager.getPayment(id, WalletPaymentFetchOptions.All)?.let {
             PaymentDetailsState.Success.Splash(it)
         } ?: PaymentDetailsState.Failure(NoSuchElementException("no payment found for id=$id"))

@@ -34,6 +34,7 @@ import fr.acinq.lightning.*
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.FinalFailure
+import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.android.PhoenixApplication
@@ -113,7 +114,9 @@ object LegacyMigrationHelper {
             UserPrefs.saveTrampolineMaxFee(context, it)
         }
 
-        UserPrefs.saveIsAutoPayToOpenEnabled(context, Prefs.isAutoPayToOpenEnabled(context))
+        if (Prefs.isAutoPayToOpenEnabled(context)) {
+            UserPrefs.saveLiquidityPolicy(context, LiquidityPolicy.Disable)
+        }
         log.info("finished migration of legacy user preferences")
     }
 

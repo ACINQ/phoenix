@@ -45,11 +45,13 @@ class PaymentsViewModel(
     private val paymentsManager: PaymentsManager,
 ) : ViewModel() {
 
-    /** How many payments should be fetched by the initial subscription. */
-    private val initialPaymentsCount = 15
+    companion object {
+        /** How many payments should be fetched by the initial subscription. */
+        private const val initialPaymentsCount = 15
 
-    /** How many payments should be visible in the home view. */
-    private val latestPaymentsCount = 15
+        /** How many payments should be visible in the home view. */
+        const val latestPaymentsCount = 15
+    }
 
     private val log = LoggerFactory.getLogger(this::class.java)
 

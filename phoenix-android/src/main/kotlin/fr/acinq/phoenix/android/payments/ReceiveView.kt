@@ -210,7 +210,7 @@ private fun LightningInvoiceView(
                         AmountWithFiatView(
                             amount = amount,
                             amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
-                            altTextStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+                            fiatTextStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
                         )
                     }
                 }

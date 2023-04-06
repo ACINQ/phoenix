@@ -64,6 +64,7 @@ fun BorderButton(
     space: Dp = 12.dp,
     textStyle: TextStyle = MaterialTheme.typography.button,
     padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     onClick: () -> Unit,
 ) {
     Button(
@@ -78,6 +79,7 @@ fun BorderButton(
         border = BorderStroke(ButtonDefaults.OutlinedBorderSize, borderColor),
         textStyle = textStyle,
         padding = padding,
+        interactionSource = interactionSource,
         modifier = modifier
     )
 }
@@ -360,6 +362,7 @@ fun WebLink(
     iconSize: Dp = ButtonDefaults.IconSize,
     space: Dp = 8.dp,
     maxLines: Int = Int.MAX_VALUE,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     InlineButton(
@@ -371,11 +374,13 @@ fun WebLink(
         maxLines = maxLines,
         onClick = { openLink(context, url) },
         onLongClick = { copyToClipboard(context, url) },
+        modifier = modifier,
     )
 }
 
 @Composable
 fun TransactionLinkButton(
+    modifier: Modifier = Modifier,
     txId: String,
 ) {
     WebLink(
@@ -385,11 +390,12 @@ fun TransactionLinkButton(
         maxLines = 1,
         fontSize = 15.sp,
         iconSize = 14.dp,
+        modifier = modifier,
     )
 }
 
 @Composable
-private fun txUrl(txId: String): String {
+fun txUrl(txId: String): String {
     return business.blockchainExplorer.txUrl(txId = txId, website = BlockchainExplorer.Website.MempoolSpace)
 }
 

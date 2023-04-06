@@ -17,16 +17,11 @@
 package fr.acinq.phoenix.android.settings
 
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.components.*
@@ -40,17 +35,18 @@ fun SettingsView() {
     DefaultScreenLayout {
         DefaultScreenHeader(title = stringResource(id = R.string.menu_settings), onBackClick = { nc.popBackStack() })
         // -- general
-        Category(R.string.settings_general_title)
+        CardHeader(text = stringResource(id = R.string.settings_general_title))
         Card {
             SettingButton(text = R.string.settings_about, icon = R.drawable.ic_help_circle, onClick = { nc.navigate(Screen.About) })
             SettingButton(text = R.string.settings_display_prefs, icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences) })
+            SettingButton(text = R.string.settings_wallet_info, icon = R.drawable.ic_box, onClick = { nc.navigate(Screen.WalletInfo) })
             SettingButton(text = R.string.settings_display_seed, icon = R.drawable.ic_key, onClick = { nc.navigate(Screen.DisplaySeed) })
             SettingButton(text = R.string.settings_payment_settings, icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings)})
             SettingButton(text = R.string.settings_mutual_close, icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose) })
         }
 
         // -- privacy & security
-        Category(R.string.settings_security_title)
+        CardHeader(text = stringResource(id = R.string.settings_security_title))
         Card {
             SettingButton(text = R.string.settings_access_control, icon = R.drawable.ic_unlock, onClick = { nc.navigate(Screen.AppLock) })
             SettingButton(text = R.string.settings_electrum, icon = R.drawable.ic_chain, onClick = { nc.navigate(Screen.ElectrumServer) })
@@ -58,7 +54,7 @@ fun SettingsView() {
         }
 
         // -- advanced
-        Category(R.string.settings_advanced_title)
+        CardHeader(text = stringResource(id = R.string.settings_advanced_title))
         Card {
             SettingButton(text = R.string.settings_list_channels, icon = R.drawable.ic_zap, onClick = { nc.navigate(Screen.Channels) })
             SettingButton(text = R.string.settings_logs, icon = R.drawable.ic_text, onClick = { nc.navigate(Screen.Logs)})
@@ -66,14 +62,4 @@ fun SettingsView() {
         }
         Spacer(Modifier.height(32.dp))
     }
-}
-
-@Composable
-private fun Category(textResId: Int) {
-    Spacer(modifier = Modifier.height(8.dp))
-    Text(
-        text = stringResource(id = textResId),
-        style = MaterialTheme.typography.subtitle1.copy(fontSize = 14.sp, textAlign = TextAlign.Center),
-        modifier = Modifier.fillMaxWidth()
-    )
 }

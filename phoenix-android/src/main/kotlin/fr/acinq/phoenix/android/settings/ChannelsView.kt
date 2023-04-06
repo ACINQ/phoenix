@@ -33,12 +33,15 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
+import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.settings.walletinfo.BalanceWithContent
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.LocalChannelInfo
@@ -48,7 +51,36 @@ import fr.acinq.phoenix.data.LocalChannelInfo
 fun ChannelsView() {
     val log = logger("ChannelsView")
     val nc = navController
-    val context = LocalContext.current
+
+    val channelsState = business.peerManager.channelsFlow.collectAsState()
+    val balance by business.balanceManager.balance.collectAsState()
+
+    DefaultScreenLayout(isScrollable = false) {
+        DefaultScreenHeader(
+            onBackClick = { nc.popBackStack() },
+            title = stringResource(id = R.string.channelsview_title),
+        )
+        LightningBalanceView(balance = balance)
+        ChannelsList(channels = channelsState.value)
+    }
+}
+
+@Composable
+private fun LightningBalanceView(
+    balance: MilliSatoshi?
+) {
+    val btcUnit = LocalBitcoinUnit.current
+    CardHeader(text = stringResource(id = R.string.channelsview_balance))
+    Card {
+        BalanceWithContent(balance = balance) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = stringResource(id = R.string.channelsview_balance_about), style = MaterialTheme.typography.subtitle2)
+        }
+    }
+}
+
+@Composable
+private fun ColumnScope.ChannelsList(channels: Map<ByteVector32, LocalChannelInfo>?) {
 
     val showChannelDialog = remember { mutableStateOf<LocalChannelInfo?>(null) }
     showChannelDialog.value?.let {
@@ -58,64 +90,36 @@ fun ChannelsView() {
         )
     }
 
-    val channelsState = business.peerManager.channelsFlow.collectAsState()
-
-    DefaultScreenLayout(isScrollable = false) {
-        DefaultScreenHeader(
-            onBackClick = { nc.popBackStack() },
-            title = stringResource(id = R.string.listallchannels_title),
-        )
-        when (val channels = channelsState.value) {
-            null -> {
-                Card {
-                    ProgressView(text = "loading channels...")
-                }
+    when (channels) {
+        null -> {
+            Card {
+                ProgressView(text = stringResource(id = R.string.channelsview_loading_channels))
             }
-            else -> {
-                Column(modifier = Modifier.weight(1f)) {
-                    if (channels.isEmpty()) {
-                        Card(internalPadding = PaddingValues(16.dp)) {
-                            Text(text = stringResource(id = R.string.listallchannels_no_channels))
-                        }
-                    } else {
-                        Card {
-                            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                                items(channels.values.toList()) {
-                                    ChannelLine(channel = it, onClick = { showChannelDialog.value = it })
-                                }
+        }
+        else -> {
+            Column(modifier = Modifier.weight(1f)) {
+                if (channels.isEmpty()) {
+                    Card(internalPadding = PaddingValues(16.dp)) {
+                        Text(text = stringResource(id = R.string.channelsview_no_channels))
+                    }
+                } else {
+                    Card {
+                        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                            items(channels.values.toList()) {
+                                ChannelLine(channel = it, onClick = { showChannelDialog.value = it })
                             }
                         }
                     }
                 }
             }
         }
-        val nodeParams by business.nodeParamsManager.nodeParams.collectAsState()
-        val nodeId = nodeParams?.nodeId?.toString()
-        if (nodeId != null) {
-            Card {
-                Row {
-                    Text(text = stringResource(id = R.string.listallchannels_node_id), modifier = Modifier.padding(16.dp))
-                    Text(
-                        text = nodeId, style = MaterialTheme.typography.body2, overflow = TextOverflow.Ellipsis,
-                        maxLines = 1, modifier = Modifier
-                            .padding(vertical = 16.dp)
-                            .weight(1f)
-                    )
-                    Button(
-                        icon = R.drawable.ic_copy,
-                        onClick = { copyToClipboard(context, nodeId, context.getString(R.string.listallchannels_node_id)) },
-                    )
-                }
-            }
-        }
-
     }
 }
 
 @Composable
 private fun ChannelLine(channel: LocalChannelInfo, onClick: () -> Unit) {
     Row(modifier = Modifier
-        .clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.listallchannels_dialog_label), onClick = onClick)
+        .clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.channelsview_dialog_label), onClick = onClick)
         .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -166,8 +170,8 @@ private fun ChannelDialog(
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         var currentTab by remember { mutableStateOf(0) }
         val tabs = listOf(
-            stringResource(R.string.listallchannels_tab_summary, channel.channelId),
-            stringResource(R.string.listallchannels_tab_json)
+            stringResource(R.string.channelsview_tab_summary, channel.channelId),
+            stringResource(R.string.channelsview_tab_json)
         )
         Card {
             TabRow(
@@ -188,10 +192,10 @@ private fun ChannelDialog(
                 else -> ChannelDialogSummary(channel = channel)
             }
             Row(Modifier.fillMaxWidth()) {
-                Button(onClick = { copyToClipboard(context, channel.json, context.getString(R.string.listallchannels_share_subject)) }, icon = R.drawable.ic_copy)
-                Button(onClick = { share(context, channel.json, subject = context.getString(R.string.listallchannels_share_subject), context.getString(R.string.listallchannels_share_title)) }, icon = R.drawable.ic_share)
+                Button(onClick = { copyToClipboard(context, channel.json, context.getString(R.string.channelsview_share_subject)) }, icon = R.drawable.ic_copy)
+                Button(onClick = { share(context, channel.json, subject = context.getString(R.string.channelsview_share_subject), context.getString(R.string.channelsview_share_title)) }, icon = R.drawable.ic_share)
                 Spacer(modifier = Modifier.weight(1.0f))
-                Button(onClick = onDismiss, text = stringResource(id = R.string.listallchannels_close))
+                Button(onClick = onDismiss, text = stringResource(id = R.string.channelsview_close))
             }
         }
     }
@@ -204,19 +208,19 @@ private fun ChannelDialogSummary(
     val btcUnit = LocalBitcoinUnit.current
     Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)) {
         ChannelDialogDataRow(
-            label = stringResource(id = R.string.listallchannels_channel_id),
+            label = stringResource(id = R.string.channelsview_channel_id),
             value = channel.channelId
         )
         ChannelDialogDataRow(
-            label = stringResource(id = R.string.listallchannels_state),
+            label = stringResource(id = R.string.channelsview_state),
             value = channel.stateName
         )
         ChannelDialogDataRow(
-            label = stringResource(id = R.string.listallchannels_spendable),
+            label = stringResource(id = R.string.channelsview_spendable),
             value = channel.localBalance?.toPrettyString(btcUnit, withUnit = true) ?: stringResource(id = R.string.utils_unknown)
         )
-        CommitmentInfoView(label = stringResource(id = R.string.listallchannels_commitments), commitments = channel.commitmentsInfo)
-        CommitmentInfoView(label = stringResource(id = R.string.listallchannels_inactive_commitments), commitments = channel.inactiveCommitmentsInfo)
+        CommitmentInfoView(label = stringResource(id = R.string.channelsview_commitments), commitments = channel.commitmentsInfo)
+        CommitmentInfoView(label = stringResource(id = R.string.channelsview_inactive_commitments), commitments = channel.inactiveCommitmentsInfo)
     }
 }
 
@@ -246,19 +250,19 @@ private fun CommitmentInfoView(
                     .padding(start = 12.dp)
             ) {
                 ChannelDialogDataRow(
-                    label = stringResource(id = R.string.listallchannels_commitment_funding_tx_index),
+                    label = stringResource(id = R.string.channelsview_commitment_funding_tx_index),
                     value = "${commitment.fundingTxIndex}"
                 )
                 ChannelDialogDataRow(
-                    label = stringResource(id = R.string.listallchannels_commitment_funding_tx_id),
+                    label = stringResource(id = R.string.channelsview_commitment_funding_tx_id),
                     content = { TransactionLinkButton(txId = commitment.fundingTxId) }
                 )
                 ChannelDialogDataRow(
-                    label = stringResource(id = R.string.listallchannels_commitment_balance),
+                    label = stringResource(id = R.string.channelsview_commitment_balance),
                     value = commitment.balanceForSend.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE)
                 )
                 ChannelDialogDataRow(
-                    label = stringResource(id = R.string.listallchannels_commitment_funding_capacity),
+                    label = stringResource(id = R.string.channelsview_commitment_funding_capacity),
                     value = commitment.fundingAmount.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE)
                 )
             }
@@ -312,9 +316,13 @@ private fun ChannelDialogDataRow(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Row(modifier = Modifier.padding(vertical = 3.dp)) {
-        Text(text = label, fontSize = 14.sp, modifier = Modifier.weight(1f).alignByBaseline())
+        Text(text = label, fontSize = 14.sp, modifier = Modifier
+            .weight(1f)
+            .alignByBaseline())
         Spacer(modifier = Modifier.width(8.dp))
-        Column(modifier = Modifier.weight(2f).alignByBaseline()) {
+        Column(modifier = Modifier
+            .weight(2f)
+            .alignByBaseline()) {
             content()
         }
     }
