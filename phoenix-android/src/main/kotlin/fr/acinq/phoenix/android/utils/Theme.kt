@@ -129,7 +129,7 @@ private fun typography(palette: Colors) = Typography(
     subtitle1 = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,
+        fontSize = 16.sp,
         letterSpacing = 0.5.sp,
         color = if (isDarkTheme) gray500 else gray300
     ),

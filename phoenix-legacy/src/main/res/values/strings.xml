@@ -110,7 +110,7 @@
   <string name="receive_in_progress_message">Please hold…</string>
   <string name="receive_error_message">There was an error when generating the invoice…\n\nPlease try again.</string>
   <string name="receive_amount_label">Amount (optional)</string>
-  <string name="receive_desc_label">Payment description (optional):</string>
+  <string name="receive_desc_label">Payment description (optional)</string>
   <string name="receive_default_desc">Phoenix payment</string>
   <string name="receive_generate_button">Create invoice</string>
 

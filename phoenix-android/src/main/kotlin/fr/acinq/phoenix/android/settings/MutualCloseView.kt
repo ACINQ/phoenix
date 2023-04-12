@@ -140,9 +140,10 @@ fun MutualCloseView(
                         }
                         Card {
                             val chain = business.chain
-                            SettingButton(
-                                text = R.string.mutualclose_button,
+                            Button(
+                                text = stringResource(id = R.string.mutualclose_button),
                                 icon = R.drawable.ic_cross_circle,
+                                modifier = Modifier.fillMaxWidth(),
                                 enabled = address.isNotBlank() && model.channels.isNotEmpty(),
                                 onClick = {
                                     when (val validation = Parser.readBitcoinAddress(chain, address)) {

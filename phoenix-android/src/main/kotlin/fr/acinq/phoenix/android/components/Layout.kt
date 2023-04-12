@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
@@ -226,7 +227,7 @@ fun CardHeader(
         modifier = Modifier
             .fillMaxWidth()
             .padding(padding),
-        style = MaterialTheme.typography.subtitle1
+        style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp)
     )
 }
 
@@ -247,7 +248,7 @@ fun CardHeaderWithHelp(
             .padding(padding),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = text.uppercase(), style = MaterialTheme.typography.subtitle1)
+        Text(text = text.uppercase(), style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp))
         HelpPopup(helpMessage = helpMessage)
     }
 }

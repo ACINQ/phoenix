@@ -429,10 +429,11 @@ private fun EditInvoiceView(
         )
     }
     Card {
-        SettingButton(
-            text = R.string.receive__edit__generate_button,
+        Button(
+            text = stringResource(id = R.string.receive__edit__generate_button),
             icon = R.drawable.ic_qrcode,
-            onClick = onSubmit
+            modifier = Modifier.fillMaxWidth(),
+            onClick = onSubmit,
         )
     }
 }

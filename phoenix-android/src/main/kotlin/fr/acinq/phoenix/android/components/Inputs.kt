@@ -25,6 +25,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.platform.LocalContext
@@ -70,7 +71,7 @@ fun TextInput(
             label = label,
             placeholder = placeholder,
             trailingIcon = {
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     if (text.isNotBlank()) {
                         FilledButton(
                             onClick = { onTextChange("") },
@@ -79,7 +80,6 @@ fun TextInput(
                             iconTint = MaterialTheme.colors.onSurface,
                             padding = PaddingValues(12.dp),
                         )
-                        Spacer(Modifier.width(8.dp))
                     }
                     trailingIcon?.let { it() }
                 }
