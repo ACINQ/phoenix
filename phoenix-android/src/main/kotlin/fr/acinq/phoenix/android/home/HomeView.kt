@@ -131,7 +131,7 @@ fun HomeView(
                         .padding(horizontal = if (isAmountRedacted) 40.dp else 16.dp),
                     amount = balance,
                     amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 40.sp),
-                    unitTextStyle = MaterialTheme.typography.h3.copy(fontWeight = FontWeight.Normal, color = mutedTextColor),
+                    unitTextStyle = MaterialTheme.typography.h3.copy(fontWeight = FontWeight.Light, color = mutedTextColor),
                     isRedacted = isAmountRedacted,
                     onClick = { context, inFiat ->
                         val mode = UserPrefs.getHomeAmountDisplayMode(context).firstOrNull()

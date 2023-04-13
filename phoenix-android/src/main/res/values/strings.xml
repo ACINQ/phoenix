@@ -19,12 +19,32 @@
 
     <!-- //////////////// system notification channels //////////////// -->
 
-    <string name="notification_channels_watcher_title">Background watcher</string>
-    <string name="notification_channels_watcher_desc">Alerts you if you need to start the app. Should be high priority.</string>
-    <string name="notification_pay_to_open_title">Accept incoming payment</string>
-    <string name="notification_pay_to_open_desc">Pops up when someone sends you a payment and you need to accept it manually.</string>
-    <string name="notification_headless_title">Phoenix running in background</string>
-    <string name="notification_headless_desc">Notifies you that Phoenix is running in background. This happens when someone is sending you money and the app is not already started.</string>
+    <string name="notification_channels_watcher_title">Channels watcher</string>
+    <string name="notification_channels_watcher_desc">Shows up when you need to start Phoenix.</string>
+
+    <string name="notification_missed_payment_title">Missed payment notification</string>
+    <string name="notification_missed_payment_desc">Shows up when Phoenix is not able to receive a payment for some reason.</string>
+
+    <string name="notification_received_payment_title">Received payment notification</string>
+    <string name="notification_received_payment_desc">Shows up when you receive a payment while the app is in the background.</string>
+
+    <string name="notification_headless_title">Background notification</string>
+    <string name="notification_headless_desc">Tells you when Phoenix is running in the background, usually because you have a payment incoming.</string>
+
+    <!-- //////////////// notification content //////////////// -->
+
+    <string name="notif__headless_title__default">Phoenix is running in the background</string>
+    <string name="notif__headless__received">You received %1$s</string>
+
+    <string name="notif__missed__title">Missed incoming payment</string>
+    <string name="notif__rejected__title">Rejected incoming payment</string>
+    <string name="notif__missed__rejected_by_user">You have rejected the payment</string>
+    <string name="notif__missed__policy_disabled">Automated liquidity policy is disabled. You can change that in the app settings.</string>
+    <string name="notif__missed__policy_too_expensive">Payment fee (%1$s) would have exceeded the maximum (%2$s). You can change that in the app settings.</string>
+    <string name="notif__missed__below_min">Amount (%1$s sat) was below the minimum amount for a new channel (%2$s sat).</string>
+
+    <string name="notif_watcher_revoked_commit_title">Some of your channels have closed</string>
+    <string name="notif_watcher_revoked_commit_message">Please start Phoenix to review your channels.</string>
 
     <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
@@ -232,26 +252,6 @@
     <string name="settings_tor">Tor</string>
     <string name="settings_about">About</string>
     <string name="settings_payment_settings">Options &amp; fees</string>
-
-    <!-- //////////////// notification - watcher //////////////// -->
-
-    <string name="notif_watcher_revoked_commit_title">Some of your channels have closed</string>
-    <string name="notif_watcher_revoked_commit_message">Please start Phoenix to review your channels.</string>
-
-    <string name="notif_watcher_no_connectivity_title">No connection for a while</string>
-    <string name="notif_watcher_no_connectivity_message">Phoenix needs internet access to monitor your channels in the background.</string>
-
-    <string name="notif__headless_title__default">Phoenix is running in background</string>
-    <string name="notif__headless_title__missed_incoming">Missed incoming payment</string>
-    <string name="notif__headless_title__missed_fulfill">A pending payment has been fulfilled</string>
-    <string name="notif__headless_title__received">Payment received</string>
-    <string name="notif__headless_message__app_locked">App is locked</string>
-    <string name="notif__headless_message__pending_fulfill">Tap to start the app</string>
-    <string name="notif__headless_message__manual_pay_to_open">Channel creation requires manual approval</string>
-    <string name="notif__headless_message__received_payment">Received %1$s (%2$s)</string>
-
-    <string name="notif_pay_to_open_title">Accept incoming payment</string>
-    <string name="notif_pay_to_open_message">Tap to open the app</string>
 
     <!-- //////////////// close all channels //////////////// -->
 

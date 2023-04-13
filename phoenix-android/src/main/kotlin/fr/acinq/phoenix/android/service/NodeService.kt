@@ -14,7 +14,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
+import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.io.PaymentReceived
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
@@ -26,7 +28,10 @@ import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.managers.AppConfigurationManager
+import fr.acinq.phoenix.managers.NodeParamsManager
+import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 import java.lang.Runnable
@@ -44,7 +49,7 @@ class NodeService : Service() {
 
     // Notifications
     private lateinit var notificationManager: NotificationManagerCompat
-    private val notificationBuilder = NotificationCompat.Builder(this, Notifications.HEADLESS_NOTIF_CHANNEL_ID)
+    private val notificationBuilder = NotificationCompat.Builder(this, Notifications.BACKGROUND_NOTIF_CHANNEL)
 
     /** State of the wallet, provides access to the business when started. Private so that it's not mutated from the outside. */
     private val _state = MutableLiveData<WalletState>(WalletState.Off)
@@ -83,7 +88,7 @@ class NodeService : Service() {
         // UI is binding to the service. The service is not headless anymore and we can remove the notification.
         isHeadless = false
         stopForeground(STOP_FOREGROUND_REMOVE)
-        notificationManager.cancel(Notifications.HEADLESS_NOTIF_ID)
+        notificationManager.cancel(Notifications.BACKGROUND_NOTIF_ID)
         return binder
     }
 
@@ -101,7 +106,7 @@ class NodeService : Service() {
                 stopForeground(STOP_FOREGROUND_REMOVE)
             } else {
                 stopForeground(STOP_FOREGROUND_DETACH)
-                notificationManager.notify(Notifications.HEADLESS_NOTIF_ID, notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline).setAutoCancel(true).build())
+                notificationManager.notify(Notifications.BACKGROUND_NOTIF_ID, notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline).setAutoCancel(true).build())
             }
             shutdown()
         }
@@ -215,6 +220,7 @@ class NodeService : Service() {
         val preferredFiatCurrency = UserPrefs.getFiatCurrency(applicationContext).first()
         val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(decryptedPayload))
 
+        monitorPaymentsWhenHeadless(business.peerManager, business.nodeParamsManager)
         business.walletManager.loadWallet(seed)
         business.appConfigurationManager.updatePreferredFiatCurrencies(
             AppConfigurationManager.PreferredFiatCurrencies(primary = preferredFiatCurrency, others = emptySet())
@@ -243,6 +249,42 @@ class NodeService : Service() {
         return WalletState.Started.Kmm(business)
     }
 
+    private fun monitorPaymentsWhenHeadless(peerManager: PeerManager, nodeParamsManager: NodeParamsManager) {
+        serviceScope.launch {
+            nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents.collect { event ->
+                when (event) {
+                    is LiquidityEvents.Rejected -> {
+                        log.info("processing liquidity_event=$event")
+                        when (val reason = event.reason) {
+                            is LiquidityEvents.Rejected.Reason.RejectedByUser -> {
+                                Notifications.notifyPaymentMissedRejectedByUser(applicationContext)
+                            }
+                            is LiquidityEvents.Rejected.Reason.PolicySetToDisabled -> {
+                                Notifications.notifyPaymentMissedPolicyDisabled(applicationContext)
+                            }
+                            is LiquidityEvents.Rejected.Reason.TooExpensive -> {
+                                Notifications.notifyPaymentMissedTooExpensive(applicationContext, reason.maxAllowed, reason.actual)
+                            }
+                        }
+                    }
+                    else -> Unit
+                }
+            }
+        }
+        serviceScope.launch {
+            peerManager.getPeer().eventsFlow.collect { event ->
+                when (event) {
+                    is PaymentReceived -> {
+                        if (isHeadless) {
+                            Notifications.notifyPaymentReceived(applicationContext, paymentHash = event.incomingPayment.paymentHash, amount = event.received.amount, rates = emptyList())
+                        }
+                    }
+                    else -> Unit
+                }
+            }
+        }
+    }
+
     // =========================================================== //
     //                 STATE UPDATE & NOTIFICATIONS                //
     // =========================================================== //
@@ -269,7 +311,7 @@ class NodeService : Service() {
     /** Display a blocking notification and set the service as being foregrounded. */
     private fun notifyForegroundService(title: String?, message: String?) {
         log.debug("notifying foreground service with msg=$message")
-        updateNotification(title, message).also { startForeground(Notifications.HEADLESS_NOTIF_ID, it) }
+        updateNotification(title, message).also { startForeground(Notifications.BACKGROUND_NOTIF_ID, it) }
     }
 
     private fun updateNotification(title: String?, message: String?): Notification {
@@ -282,7 +324,7 @@ class NodeService : Service() {
         }
         notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline)
         return notificationBuilder.build().apply {
-            notificationManager.notify(Notifications.HEADLESS_NOTIF_ID, this)
+            notificationManager.notify(Notifications.BACKGROUND_NOTIF_ID, this)
         }
     }
 

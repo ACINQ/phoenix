@@ -165,7 +165,7 @@ private fun FeePolicyEditor(
             Slider(
                 value = maxFeeFloor.sat.toFloat(),
                 onValueChange = { onFeeFloorChange(it.toLong().sat) },
-                valueRange = 500f..10_000f, // max 10k sat
+                valueRange = 300f..10_000f, // max 10k sat
                 modifier = Modifier.weight(1f),
             )
         }
