@@ -1,7 +1,15 @@
 import SwiftUI
 import PhoenixShared
 
-
+/// Standardized display of the currency name.
+///
+/// For most currencies, this is just simple text:
+/// - "EUR"
+///
+/// But some currencies have special handling:
+/// - "ARSbm"
+///       ^^ we want to display this part with a condensed font
+///
 struct Text_CurrencyName: View {
 	let currency: Currency
 	let fontTextStyle: Font.TextStyle

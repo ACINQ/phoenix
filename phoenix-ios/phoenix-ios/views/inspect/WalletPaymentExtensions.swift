@@ -87,7 +87,7 @@ extension Lightning_kmpWalletPayment {
 		return nil
 	}
 	
-	func standardFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String, String)? {
+	func standardFees() -> (Int64, String, String)? {
 		
 		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
 		
@@ -104,7 +104,6 @@ extension Lightning_kmpWalletPayment {
 				
 				if msat > 0 {
 					
-					let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
 					let title = NSLocalizedString("Service Fees", comment: "Label in SummaryInfoGrid")
 					let exp = NSLocalizedString(
 						"""
@@ -114,16 +113,16 @@ extension Lightning_kmpWalletPayment {
 						comment: "Fees explanation"
 					)
 					
-					return (formattedAmt, title, exp)
+					return (msat, title, exp)
 				}
 				else {
 					// I think it's nice to see "Fees: 0 sat" :)
 					
-					let formattedAmt = Utils.format(currencyPrefs, msat: 0, policy: .hideMsats)
+					let msat = Int64(0)
 					let title = NSLocalizedString("Fees", comment: "Label in SummaryInfoGrid")
 					let exp = ""
 					
-					return (formattedAmt, title, exp)
+					return (msat, title, exp)
 				}
 			}
 			
@@ -135,8 +134,6 @@ extension Lightning_kmpWalletPayment {
 				if msat == 0 {
 					return nil
 				}
-				
-				let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
 				
 				var parts = 0
 				var hops = 0
@@ -171,14 +168,14 @@ extension Lightning_kmpWalletPayment {
 					)
 				}
 				
-				return (formattedAmt, title, exp)
+				return (msat, title, exp)
 			}
 		}
 		
 		return nil
 	}
 	
-	func minerFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String, String)? {
+	func minerFees() -> (Int64, String, String)? {
 		
 		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
 			
@@ -196,14 +193,14 @@ extension Lightning_kmpWalletPayment {
 				
 				if sat > 0 {
 					
-					let formattedAmt = Utils.format(currencyPrefs, sat: sat)
+					let msat = Utils.toMsat(sat: sat)
 					let title = NSLocalizedString("Miner Fees", comment: "Label in SummaryInfoGrid")
 					let exp = NSLocalizedString(
 						"Bitcoin network fees paid for on-chain transaction.",
 						comment: "Fees explanation"
 					)
 					
-					return (formattedAmt, title, exp)
+					return (msat, title, exp)
 				}
 			}
 			
@@ -213,9 +210,7 @@ extension Lightning_kmpWalletPayment {
 				
 				// For on-chain payments, the fees are extracted from the mined transaction(s)
 				
-				let fees = outgoingPayment.fees
-				let formattedAmt = Utils.format(currencyPrefs, msat: fees, policy: .showMsatsIfNonZero)
-				
+				let msat = outgoingPayment.fees.msat
 				let title = NSLocalizedString("Miner Fees", comment: "Label in SummaryInfoGrid")
 				
 				let txCount = outgoingPayment.closingTxParts().count
@@ -232,20 +227,19 @@ extension Lightning_kmpWalletPayment {
 					)
 				}
 				
-				return (formattedAmt, title, exp)
+				return (msat, title, exp)
 			}
 		}
 		
 		return nil
 	}
 	
-	func swapOutFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String, String)? {
+	func swapOutFees() -> (Int64, String, String)? {
 		
 		if let outgoingPayment = self as? Lightning_kmpOutgoingPayment,
 		   let _ = outgoingPayment.details.asSwapOut() {
 			
 			let msat = outgoingPayment.fees.msat - outgoingPayment.routingFee.msat
-			let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
 			
 			let title = NSLocalizedString("Swap Fees", comment: "Label in SummaryInfoGrid")
 			let exp = NSLocalizedString(
@@ -253,7 +247,7 @@ extension Lightning_kmpWalletPayment {
 				comment: "Fees explanation"
 			)
 			
-			return (formattedAmt, title, exp)
+			return (msat, title, exp)
 		}
 		
 		return nil

@@ -551,7 +551,7 @@ struct TransactionsView: View {
 		
 		// pretty much guaranteed to be in the cache
 		let fetcher = Biz.business.paymentsManager.fetcher
-		let options = WalletPaymentFetchOptions.companion.Descriptions
+		let options = PaymentCell.fetchOptions
 		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
 			
 			if let result = result {
