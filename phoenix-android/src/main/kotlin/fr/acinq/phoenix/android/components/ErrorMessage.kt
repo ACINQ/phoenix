@@ -23,9 +23,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.negativeColor
 
 @Composable
@@ -52,8 +55,38 @@ fun ErrorMessage(
             Text(
                 text = stringResource(id = R.string.component_error_message_details, errorDetails),
                 modifier = Modifier.padding(start = 24.dp),
-                style = MaterialTheme.typography.caption
+                style = MaterialTheme.typography.caption,
+                textAlign = if (alignment == Alignment.Start) TextAlign.Start else TextAlign.Center
             )
         }
+    }
+}
+
+@Composable
+fun ErrorMessage(
+    errorHeader: String,
+    annotatedDetails: AnnotatedString,
+    padding: PaddingValues = PaddingValues(16.dp),
+    modifier: Modifier = Modifier,
+    alignment: Alignment.Horizontal = Alignment.Start,
+) {
+    Column(
+        modifier = modifier.padding(padding),
+        horizontalAlignment = alignment
+    ) {
+        TextWithIcon(
+            text = errorHeader,
+            icon = R.drawable.ic_alert_triangle,
+            iconTint = negativeColor,
+            maxLines = 1,
+            textOverflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = annotatedStringResource(id = R.string.component_error_message_details, annotatedDetails),
+            modifier = Modifier.padding(start = 24.dp),
+            style = MaterialTheme.typography.caption,
+            textAlign = if (alignment == Alignment.Start) TextAlign.Start else TextAlign.Center
+        )
     }
 }

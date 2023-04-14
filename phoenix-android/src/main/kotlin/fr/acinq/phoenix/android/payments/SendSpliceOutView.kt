@@ -16,22 +16,18 @@
 
 package fr.acinq.phoenix.android.payments
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -40,15 +36,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.byteVector
-import fr.acinq.eclair.BtcUnit
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
-import fr.acinq.lightning.blockchain.fee.OnChainFeerates
 import fr.acinq.lightning.channel.Command
 import fr.acinq.lightning.transactions.Transactions
-import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
@@ -56,13 +49,11 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.Parser
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -176,20 +167,9 @@ fun SendSpliceOutView(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .padding(PaddingValues(bottom = 50.dp)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        BackButtonWithBalance(onBackClick = onBackClick, balance = balance)
-        Spacer(Modifier.height(16.dp))
-        Card(
-            externalPadding = PaddingValues(horizontal = 16.dp),
-            internalPadding = PaddingValues(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Spacer(modifier = Modifier.height(48.dp))
+    SplashLayout(
+        header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
+        topContent = {
             AmountHeroInput(
                 initialAmount = amount?.toMilliSatoshi(),
                 onAmountChange = {
@@ -213,19 +193,15 @@ fun SendSpliceOutView(
                 validationErrorMessage = amountErrorMessage,
                 inputTextSize = 42.sp
             )
-            Column(
-                modifier = Modifier
-                    .padding(top = 20.dp, bottom = 32.dp, start = 16.dp, end = 16.dp)
-                    .sizeIn(maxWidth = 400.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Label(text = stringResource(id = R.string.send_feerate_label)) {
-                    val feerate = feerateState.value
-                    if (feerate == null) {
-                        ProgressView(text = stringResource(id = R.string.send_feerate_waiting_for_value))
-                    } else {
-                        Text(text = feerate.toPrettyString(BitcoinUnit.Sat, withUnit = true))
-                        // FIXME: editable feerate
+        }
+    ) {
+        SplashLabelRow(label = stringResource(id = R.string.send_feerate_label)) {
+            val feerate = feerateState.value
+            if (feerate == null) {
+                ProgressView(text = stringResource(id = R.string.send_feerate_waiting_for_value))
+            } else {
+                Text(text = "${feerate.toPrettyString(BitcoinUnit.Sat, withUnit = false)} sat/byte")
+                // FIXME: editable feerate
 //                        FeerateInput(
 //                            initialFeerate = feerate,
 //                            onFeerateChange = { feerateState.value = it },
@@ -234,24 +210,17 @@ fun SendSpliceOutView(
 //                            maxFeerate = 300.sat,
 //                            maxErrorMessage = stringResource(id = R.string.send_feerate_above_max),
 //                        )
-                    }
-                }
-                Label(text = stringResource(R.string.send_destination_label)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        PhoenixIcon(resourceId = R.drawable.ic_chain, modifier = Modifier.size(18.dp), tint = MaterialTheme.colors.primary)
-                        Spacer(Modifier.width(4.dp))
-                        SelectionContainer {
-                            Text(text = address, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.alignByBaseline())
-                        }
-                    }
-                }
+            }
+        }
+        SplashLabelRow(label = stringResource(R.string.send_destination_label), icon = R.drawable.ic_chain) {
+            SelectionContainer {
+                Text(text = address)
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
         when (val state = vm.state) {
             is SpliceOutState.Init, is SpliceOutState.Error -> {
+                Spacer(modifier = Modifier.height(24.dp))
                 if (state is SpliceOutState.Error.Thrown) {
                     ErrorMessage(errorHeader = "Placeholder error message!", errorDetails = state.e.localizedMessage, alignment = Alignment.CenterHorizontally)
                 } else if (state is SpliceOutState.Error.NoChannels) {
@@ -276,12 +245,17 @@ fun SendSpliceOutView(
                 )
             }
             is SpliceOutState.Preparing -> {
+                Spacer(modifier = Modifier.height(24.dp))
                 ProgressView(text = stringResource(id = R.string.send_spliceout_prepare_in_progress))
             }
             is SpliceOutState.ReadyToSend -> {
+                SplashLabelRow(label = "") {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    HSeparator(width = 50.dp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
                 val total = state.userAmount + state.feeExpected
-
-                SpliceOutFeeSummaryView(userAmount = state.userAmount, fee = state.feeExpected, total = total)
+                SpliceOutFeeSummaryView(fee = state.feeExpected, total = total)
                 Spacer(modifier = Modifier.height(24.dp))
                 if (balance != null && total.toMilliSatoshi() > balance) {
                     ErrorMessage(errorHeader = stringResource(R.string.send_spliceout_error_cannot_afford_fees), alignment = Alignment.CenterHorizontally)
@@ -313,20 +287,11 @@ fun SendSpliceOutView(
 
 @Composable
 private fun SpliceOutFeeSummaryView(
-    userAmount: Satoshi,
     fee: Satoshi,
     total: Satoshi,
 ) {
-    Card(
-        internalPadding = PaddingValues(16.dp),
-        modifier = Modifier.widthIn(max = 300.dp),
-        withBorder = true,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        FeeSummary(label = stringResource(id = R.string.send_spliceout_complete_recap_amount), amount = userAmount.toMilliSatoshi())
-        FeeSummary(label = stringResource(id = R.string.send_spliceout_complete_recap_fee), amount = fee.toMilliSatoshi())
-        FeeSummary(label = stringResource(id = R.string.send_spliceout_complete_recap_total), amount = total.toMilliSatoshi())
-    }
+    FeeSummary(label = stringResource(id = R.string.send_spliceout_complete_recap_fee), amount = fee.toMilliSatoshi())
+    FeeSummary(label = stringResource(id = R.string.send_spliceout_complete_recap_total), amount = total.toMilliSatoshi())
 }
 
 @Composable
@@ -334,24 +299,7 @@ private fun FeeSummary(
     label: String,
     amount: MilliSatoshi
 ) {
-    Row(
-        modifier = Modifier.widthIn(max = 500.dp)
-    ) {
-        Text(
-            text = label.uppercase(),
-            style = MaterialTheme.typography.body1.copy(color = mutedTextColor, fontSize = 12.sp),
-            textAlign = TextAlign.End,
-            modifier = Modifier
-                .alignBy(FirstBaseline)
-                .weight(1f)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Column(
-            modifier = Modifier
-                .alignBy(FirstBaseline)
-                .weight(2f)
-        ) {
-            AmountWithFiatView(amount = amount, amountTextStyle = MaterialTheme.typography.body2)
-        }
+    SplashLabelRow(label = label) {
+        AmountWithFiatView(amount = amount, amountTextStyle = MaterialTheme.typography.body2)
     }
 }

@@ -31,10 +31,13 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
@@ -58,6 +61,33 @@ fun BackButton(onClick: () -> Unit) {
         modifier = Modifier.size(width = 58.dp, height = 52.dp)
     ) {
         PhoenixIcon(resourceId = R.drawable.ic_arrow_back, Modifier.width(24.dp))
+    }
+}
+
+@Composable
+fun BackButtonWithBalance(
+    onBackClick: () -> Unit,
+    balance: MilliSatoshi?,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 0.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        BackButton(onClick = onBackClick)
+        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+            Text(
+                text = stringResource(id = R.string.send_balance_prefix).uppercase(),
+                style = MaterialTheme.typography.body1.copy(color = mutedTextColor, fontSize = 12.sp),
+                modifier = Modifier.alignBy(FirstBaseline)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            balance?.let {
+                AmountView(amount = it, modifier = Modifier.alignBy(FirstBaseline))
+            }
+        }
     }
 }
 

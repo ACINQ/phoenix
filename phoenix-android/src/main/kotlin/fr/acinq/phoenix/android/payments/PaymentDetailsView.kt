@@ -118,8 +118,8 @@ fun PaymentDetailsView(
             )
         }
         is PaymentDetailsState.Success.Splash -> DefaultScreenLayout(isScrollable = false) {
-            DefaultScreenHeader(onBackClick = onBackClick)
             PaymentDetailsSplashView(
+                onBackClick = onBackClick,
                 data = state.payment,
                 onDetailsClick = { vm.state = PaymentDetailsState.Success.TechnicalDetails(state.payment) },
                 onMetadataDescriptionUpdate = { id, description -> vm.updateMetadata(id, description) },

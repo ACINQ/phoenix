@@ -56,7 +56,7 @@ fun PaymentLineLoading(
     paymentId: WalletPaymentId,
     onPaymentClick: (WalletPaymentId) -> Unit
 ) {
-    val backgroundColor = MaterialTheme.colors.background.copy(alpha = 0.65f)
+    val backgroundColor = mutedBgColor.copy(alpha = 0.9f)
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier

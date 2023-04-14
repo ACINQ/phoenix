@@ -133,6 +133,7 @@ fun FullScreenDialog(
 
 @Composable
 fun RowScope.HelpPopup(
+    modifier: Modifier = Modifier,
     helpMessage: String,
     helpMessageLink: Pair<String, String>? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
@@ -169,7 +170,7 @@ fun RowScope.HelpPopup(
         backgroundColor = if (showHelpPopup) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
         borderColor = if (showHelpPopup) MaterialTheme.colors.primary else mutedTextColor,
         padding = PaddingValues(2.dp),
-        modifier = Modifier.size(20.dp),
+        modifier = modifier.size(20.dp),
         interactionSource = interactionSource,
         onClick = { showHelpPopup = true }
     )
