@@ -112,8 +112,6 @@ class NodeParamsManager(
                     channelFlags = 1,
                     paymentRequestExpirySeconds = 3600,
                     multiPartPaymentExpirySeconds = 60,
-                    minFundingSatoshis = 20_000.sat,
-                    maxFundingSatoshis = 21_000_000_000_00000.sat,
                     maxPaymentAttempts = 5,
                     enableTrampolinePayment = true,
                     zeroConfPeers = setOf(PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134")),

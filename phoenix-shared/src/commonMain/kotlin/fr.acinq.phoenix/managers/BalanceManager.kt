@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.MilliSatoshi
@@ -8,6 +9,7 @@ import fr.acinq.lightning.SwapInEvents
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.channel.InteractiveTxInput
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.utils.extensions.*
@@ -42,7 +44,7 @@ class BalanceManager(
      *
      * Since it reflects what the Electrum server sees, there can be a few seconds delay between actions initiated
      * by Phoenix and this view of the wallet. This delay can cause confusion and that's why the UI cannot directly
-     * read [Peer.swapInWallet].walletStateFlow to get the swap-in balance. We have to ignore [_reservedUtxos] to
+     * read [Peer.swapInWallet].walletStateFlow to get the swap-in balance. We have to ignore [_reservedOutpoints] to
      * get the actual swap-in balance.
      *
      * Examples of the delay:
@@ -58,26 +60,26 @@ class BalanceManager(
     private val _swapInWallet = MutableStateFlow<WalletState?>(null)
 
     /**
-     * A map of (channelId -> List<Utxos>) representing the utxos that will be reserved to create a channel.
+     * A map of (channelId -> List<[OutPoint]>) representing the utxos that will be reserved to create a channel.
      *
      * When a channel is creating (see [ChannelEvents.Creating] in [NodeParams.nodeEvents]), this flow is updated
-     * with the channel and its utxos. When a channel has been created, it is removed from this map.
+     * with the channel and its outpoints. When a channel has been created, it is removed from this map.
      */
-    private val _pendingReservedUtxos = MutableStateFlow<Map<ByteVector32, List<WalletState.Utxo>>>(emptyMap())
+    private val _pendingReservedOutpoints = MutableStateFlow<Map<ByteVector32, List<OutPoint>>>(emptyMap())
 
     /**
-     * A map of (channelId -> List<Utxos>) representing the utxos that are reserved to create a channel.
+     * A map of (channelId -> List<[OutPoint]>) representing the utxos that are reserved to create a channel.
      *
      * When a channel has been created (see [ChannelEvents.Created]), it is added to this flow and the utxos are
      * manually ignored when computing the swap-in balance.
      *
      * When Electrum updates its view of the swap-in wallet, this flow is updated as well.
      */
-    private val _reservedUtxos = MutableStateFlow<Set<WalletState.Utxo>>(emptySet())
+    private val _reservedOutpoints = MutableStateFlow<Set<OutPoint>>(emptySet())
 
     /**
      * The wallet swap-in balance is computed manually, using the Electrum view of the swap-in wallet WITHOUT the
-     * [_reservedUtxos] for pending channels.
+     * [_reservedOutpoints] for pending channels.
      */
     private val _swapInWalletBalance = MutableStateFlow(WalletBalance.empty())
     val swapInWalletBalance: StateFlow<WalletBalance> = _swapInWalletBalance
@@ -101,19 +103,19 @@ class BalanceManager(
     }
 
     /**
-     * Copies [Peer.swapInWallet] changes to our own [_swapInWallet], and refreshes [_reservedUtxos] so that spent
+     * Copies [Peer.swapInWallet] changes to our own [_swapInWallet], and refreshes [_reservedOutpoints] so that spent
      * outputs are discarded.
      */
     private suspend fun monitorSwapInWallet(peer: Peer) {
         peer.swapInWallet.walletStateFlow.collect { wallet ->
             _swapInWallet.value = wallet
-            _reservedUtxos.update { it.intersect(wallet.utxos.toSet()) }
+            _reservedOutpoints.update { it.intersect(wallet.utxos.map { it.outPoint }.toSet()) }
         }
     }
 
     /**
-     * Monitors [NodeParams.nodeEvents] to update the incoming swap-in map as well as [_pendingReservedUtxos] and
-     * [_reservedUtxos].
+     * Monitors [NodeParams.nodeEvents] to update the incoming swap-in map as well as [_pendingReservedOutpoints] and
+     * [_reservedOutpoints].
      *
      * It also updates the confirmation status of incoming payments received via new channels.
      */
@@ -132,15 +134,15 @@ class BalanceManager(
                 is ChannelEvents.Creating -> {
                     log.info { "channel creating with id=${event.state.channelId}" }
                     val channelId = event.state.channelId
-                    val channelUtxos = event.state.wallet.confirmedUtxos
-                    _pendingReservedUtxos.update { it.plus(channelId to channelUtxos) }
+                    val channelOutpoints = event.state.interactiveTxSession.localInputs.filterIsInstance<InteractiveTxInput.Local>().map { it.outPoint }
+                    _pendingReservedOutpoints.update { it.plus(channelId to channelOutpoints) }
                 }
                 is ChannelEvents.Created -> {
                     log.info { "channel created with id=${event.state.channelId}" }
                     val channelId = event.state.channelId
-                    _pendingReservedUtxos.value[channelId]?.let { channelUtxos ->
-                        _reservedUtxos.update { it.union(channelUtxos) }
-                        _pendingReservedUtxos.update { it.minus(channelId) }
+                    _pendingReservedOutpoints.value[channelId]?.let { outpoints ->
+                        _reservedOutpoints.update { it.union(outpoints) }
+                        _pendingReservedOutpoints.update { it.minus(channelId) }
                     }
                 }
                 is ChannelEvents.Confirmed -> {
@@ -154,11 +156,14 @@ class BalanceManager(
         }
     }
 
-    /** The swap-in balance is the swap-in wallet's balance without the [_reservedUtxos]. */
+    /** The swap-in balance is the swap-in wallet's balance without the [_reservedOutpoints]. */
     private suspend fun monitorSwapInBalance() {
-        combine(_swapInWallet.filterNotNull(), _reservedUtxos) { swapInWallet, reservedUtxos ->
-            log.info { "monitorSwapInBalance: reserved_utxos=$reservedUtxos swapInWallet=$swapInWallet"}
-            swapInWallet.minus(reservedUtxos)
+        combine(_swapInWallet.filterNotNull(), _reservedOutpoints) { swapInWallet, reservedOutpoints ->
+            log.info { "monitorSwapInBalance: reserved_outpoints=$reservedOutpoints swapInWallet=$swapInWallet"}
+            val addressMinusReserved = swapInWallet.addresses.mapValues { (_, unspent) ->
+                unspent.filterNot { reservedOutpoints.contains(it.outPoint) }
+            }
+            swapInWallet.copy(addresses = addressMinusReserved)
         }.collect { availableWallet ->
             _swapInWalletBalance.value = WalletBalance(
                 confirmed = availableWallet.confirmedBalance,

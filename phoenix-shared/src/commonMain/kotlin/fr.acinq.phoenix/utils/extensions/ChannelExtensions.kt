@@ -24,7 +24,7 @@ import fr.acinq.lightning.transactions.CommitmentSpec
 
 val ChannelState.localCommitmentSpec: CommitmentSpec? get() =
     when (this) {
-        is ChannelStateWithCommitments -> commitments.localCommit.spec
+        is ChannelStateWithCommitments -> commitments.latest.localCommit.spec
         is Offline -> state.localCommitmentSpec
         is Syncing -> state.localCommitmentSpec
         else -> null
@@ -33,7 +33,7 @@ val ChannelState.localCommitmentSpec: CommitmentSpec? get() =
 fun ChannelStateWithCommitments.minDepthForFunding(nodeParams: NodeParams): Int {
     return Helpers.minDepthForFunding(
         nodeParams = nodeParams,
-        fundingAmount = commitments.fundingAmount
+        fundingAmount = commitments.latest.fundingAmount
     )
 }
 

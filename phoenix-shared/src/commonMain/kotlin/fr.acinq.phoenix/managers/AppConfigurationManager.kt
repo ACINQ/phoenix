@@ -178,7 +178,7 @@ class AppConfigurationManager(
     fun electrumMessages(): StateFlow<HeaderSubscriptionResponse?> = _electrumMessages
 
     private fun watchElectrumMessages() = launch {
-        electrumWatcher.notificationsFlow.filterIsInstance<HeaderSubscriptionResponse>().collect {
+        electrumWatcher.client.notifications.filterIsInstance<HeaderSubscriptionResponse>().collect {
             _electrumMessages.value = it
         }
     }

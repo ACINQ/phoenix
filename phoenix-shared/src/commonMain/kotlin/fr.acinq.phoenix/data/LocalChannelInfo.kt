@@ -41,7 +41,5 @@ data class LocalChannelInfo(
     val localBalance by lazy { state.localBalance() }
     /** Raw balance of the peer */
     val remoteBalance by lazy { state.localCommitmentSpec?.toRemote }
-    val fundingTx by lazy {
-        (state as? ChannelStateWithCommitments)?.commitments?.commitInput?.outPoint?.txid?.toString()
-    }
+    val fundingTx by lazy { (state as? ChannelStateWithCommitments)?.commitments?.latest?.fundingTxId?.toHex() }
 }
