@@ -97,7 +97,7 @@ object UserPrefs {
         val pinnedKey = it[PREFS_ELECTRUM_ADDRESS_PINNED_KEY]?.takeIf { it.isNotBlank() }
         log.info("retrieved electrum address from datastore, host=$host port=$port key=$pinnedKey")
         if (host != null && port != null && pinnedKey == null) {
-            ServerAddress(host, port, TcpSocket.TLS.TRUSTED_CERTIFICATES)
+            ServerAddress(host, port, TcpSocket.TLS.TRUSTED_CERTIFICATES())
         } else if (host != null && port != null && pinnedKey != null) {
             ServerAddress(host, port, TcpSocket.TLS.PINNED_PUBLIC_KEY(pinnedKey))
         } else {

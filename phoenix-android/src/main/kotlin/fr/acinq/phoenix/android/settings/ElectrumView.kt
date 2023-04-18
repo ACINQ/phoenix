@@ -261,7 +261,7 @@ private fun ElectrumServerDialog(
                 }
                 is ElectrumViewModel.CertificateCheckState.Valid -> {
                     LaunchedEffect(Unit) {
-                        onConfirm(ServerAddress(check.host, check.port, TcpSocket.TLS.TRUSTED_CERTIFICATES))
+                        onConfirm(ServerAddress(check.host, check.port, TcpSocket.TLS.TRUSTED_CERTIFICATES()))
                     }
                 }
                 is ElectrumViewModel.CertificateCheckState.Rejected -> {
