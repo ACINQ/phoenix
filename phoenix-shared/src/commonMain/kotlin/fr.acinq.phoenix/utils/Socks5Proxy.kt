@@ -40,7 +40,12 @@ class Socks5Proxy(
             send = { socket.send(it, offset = 0, length = it.size, flush = true) }
         )
         logger.info { "connected through socks5 to $cHost:$cPort" }
-        return socket.startTls(tls)
+        val updatedTls = when (tls) {
+            is TcpSocket.TLS.TRUSTED_CERTIFICATES ->
+                TcpSocket.TLS.TRUSTED_CERTIFICATES(tls.expectedHostName ?: host)
+            else -> tls
+        }
+        return socket.startTls(updatedTls)
     }
 }
 
