@@ -24,7 +24,7 @@ private object ElectrumServersTestHelper {
 actual suspend fun connect(server: ServerAddress) {
     val socket = aSocket(ElectrumServersTestHelper.selectorManager).tcp().connect(server.host, server.port).let { socket ->
         when (val tls = server.tls) {
-            TcpSocket.TLS.TRUSTED_CERTIFICATES -> socket.tls(Dispatchers.IO)
+            is TcpSocket.TLS.TRUSTED_CERTIFICATES -> socket.tls(Dispatchers.IO)
             is TcpSocket.TLS.PINNED_PUBLIC_KEY -> socket.tls(
                 coroutineContext = Dispatchers.IO,
                 config = TLSConfigBuilder().apply {
