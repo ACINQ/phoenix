@@ -9,10 +9,11 @@ CREATE TABLE IF NOT EXISTS incoming_payments (
     -- origin
     origin_type TEXT AS IncomingOriginTypeVersion NOT NULL,
     origin_blob BLOB NOT NULL,
-    -- received
+    -- this field is legacy, the amount received is the sum of the received-with parts
     received_amount_msat INTEGER DEFAULT NULL,
+    -- timestamp when the payment has been received
     received_at INTEGER DEFAULT NULL,
-    -- received with
+    -- received-with parts
     received_with_type TEXT AS IncomingReceivedWithTypeVersion DEFAULT NULL,
     received_with_blob BLOB DEFAULT NULL
 );
