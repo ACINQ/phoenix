@@ -24,6 +24,7 @@ class CurrencyPrefs: ObservableObject {
 	@Published private(set) var fiatCurrency: FiatCurrency
 	@Published private(set) var bitcoinUnit: BitcoinUnit
 	@Published private(set) var hideAmounts: Bool
+	@Published private(set) var showOriginalFiatValue: Bool
 	
 	@Published var fiatExchangeRates: [ExchangeRate] = []
 	
@@ -44,6 +45,7 @@ class CurrencyPrefs: ObservableObject {
 		fiatCurrency = GroupPrefs.shared.fiatCurrency
 		bitcoinUnit = GroupPrefs.shared.bitcoinUnit
 		hideAmounts = Prefs.shared.hideAmounts
+		showOriginalFiatValue = Prefs.shared.showOriginalFiatAmount
 		
 		GroupPrefs.shared.fiatCurrencyPublisher.sink {[weak self](newValue: FiatCurrency) in
 			self?.fiatCurrency = newValue
@@ -51,6 +53,10 @@ class CurrencyPrefs: ObservableObject {
 		
 		GroupPrefs.shared.bitcoinUnitPublisher.sink {[weak self](newValue: BitcoinUnit) in
 			self?.bitcoinUnit = newValue
+		}.store(in: &cancellables)
+		
+		Prefs.shared.showOriginalFiatAmountPublisher.sink {[weak self](newValue: Bool) in
+			self?.showOriginalFiatValue = newValue
 		}.store(in: &cancellables)
 		
 		let business = Biz.business
@@ -63,13 +69,13 @@ class CurrencyPrefs: ObservableObject {
 		currencyType: CurrencyType,
 		fiatCurrency: FiatCurrency,
 		bitcoinUnit: BitcoinUnit,
-		exchangeRate: Double,
-		hideAmounts: Bool
+		exchangeRate: Double
 	) {
 		self.currencyType = currencyType
 		self.fiatCurrency = fiatCurrency
 		self.bitcoinUnit = bitcoinUnit
-		self.hideAmounts = hideAmounts
+		self.hideAmounts = false
+		self.showOriginalFiatValue = false
 		
 		let exchangeRate = ExchangeRate.BitcoinPriceRate(
 			fiatCurrency: fiatCurrency,
@@ -161,8 +167,7 @@ class CurrencyPrefs: ObservableObject {
 			currencyType: .bitcoin,
 			fiatCurrency: .usd,
 			bitcoinUnit: .sat,
-			exchangeRate: 20_000.00,
-			hideAmounts: false
+			exchangeRate: 20_000.00
 		)
 	}
 	
@@ -171,8 +176,7 @@ class CurrencyPrefs: ObservableObject {
 			currencyType: .bitcoin,
 			fiatCurrency: .eur,
 			bitcoinUnit: .sat,
-			exchangeRate: 17_000.00,
-			hideAmounts: false
+			exchangeRate: 17_000.00
 		)
 	}
 }
