@@ -103,8 +103,8 @@ struct HomeView : MVIView {
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
-		.onChange(of: currencyPrefs.hideAmountsOnHomeScreen) { _ in
-			hideAmountsOnHomeScreenChanged()
+		.onChange(of: currencyPrefs.hideAmounts) { _ in
+			hideAmountsChanged()
 		}
 		.onReceive(recentPaymentsConfigPublisher) {
 			recentPaymentsConfigChanged($0)
@@ -183,7 +183,7 @@ struct HomeView : MVIView {
 			
 			let balanceMsats = mvi.model.balance?.msat
 			let unknownBalance = balanceMsats == nil
-			let hiddenBalance = currencyPrefs.hideAmountsOnHomeScreen
+			let hiddenBalance = currencyPrefs.hideAmounts
 			
 			let amount = Utils.format( currencyPrefs,
 			                     msat: balanceMsats ?? 0,
@@ -313,7 +313,7 @@ struct HomeView : MVIView {
 			Image(systemName: "link")
 				.padding(.trailing, 2)
 			
-			if currencyPrefs.hideAmountsOnHomeScreen {
+			if currencyPrefs.hideAmounts {
 				Text("+\(incoming.digits) incoming".lowercased()) // digits => "***"
 					.accessibilityLabel("plus hidden amount incoming")
 				
@@ -530,7 +530,7 @@ struct HomeView : MVIView {
 			return sum + item.msat
 		}
 		if msatTotal > 0 {
-			return currencyPrefs.hideAmountsOnHomeScreen
+			return currencyPrefs.hideAmounts
 				? Utils.hiddenAmount(currencyPrefs)
 				: Utils.format(currencyPrefs, msat: msatTotal)
 		} else {
@@ -679,8 +679,8 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func hideAmountsOnHomeScreenChanged() {
-		log.trace("hideAmountsOnHomeScreenChanged()")
+	func hideAmountsChanged() {
+		log.trace("hideAmountsChanged()")
 		
 		// Without this, VoiceOver re-reads the previous text/button,
 		// before reading the new text/button that replaces it.
@@ -806,8 +806,8 @@ struct HomeView : MVIView {
 		
 		// bitcoin -> fiat -> hidden
 		
-		if currencyPrefs.hideAmountsOnHomeScreen {
-			currencyPrefs.toggleHideAmountsOnHomeScreen()
+		if currencyPrefs.hideAmounts {
+			currencyPrefs.toggleHideAmounts()
 			if currencyPrefs.currencyType == .fiat {
 				currencyPrefs.toggleCurrencyType()
 			}
@@ -816,7 +816,7 @@ struct HomeView : MVIView {
 			currencyPrefs.toggleCurrencyType()
 			
 		} else if currencyPrefs.currencyType == .fiat {
-			currencyPrefs.toggleHideAmountsOnHomeScreen()
+			currencyPrefs.toggleHideAmounts()
 		}
 	}
 	
