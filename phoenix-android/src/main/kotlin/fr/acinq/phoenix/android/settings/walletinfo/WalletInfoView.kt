@@ -136,7 +136,9 @@ private fun LightningNodeIdView(
     } else {
         Clickable(onClick = onClick) {
             Row {
-                Column(modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp).weight(1f)) {
+                Column(modifier = Modifier
+                    .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+                    .weight(1f)) {
                     Text(
                         text = stringResource(id = R.string.walletinfo_nodeid),
                         style = MaterialTheme.typography.body2,
@@ -181,31 +183,11 @@ private fun OnchainBalanceView(
 
 @Composable
 private fun XpubView(xpub: String, path: String) {
-    val context = LocalContext.current
-    Row {
-        Column(modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp).weight(1f)) {
-            Row {
-                Text(
-                    text = stringResource(id = R.string.walletinfo_xpub),
-                    style = MaterialTheme.typography.body2,
-                    modifier = Modifier.alignByBaseline(),
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(
-                    text = stringResource(id = R.string.walletinfo_path, path),
-                    style = MaterialTheme.typography.subtitle2.copy(fontSize = 12.sp),
-                    modifier = Modifier
-                        .alignByBaseline(),
-                )
-            }
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(text = xpub, style = MaterialTheme.typography.subtitle2)
-        }
-        Button(
-            icon = R.drawable.ic_copy,
-            onClick = { copyToClipboard(context, xpub, context.getString(R.string.walletinfo_xpub)) }
-        )
-    }
+    SettingWithCopy(
+        title = stringResource(id = R.string.walletinfo_xpub),
+        titleMuted = stringResource(id = R.string.walletinfo_path, path),
+        value = xpub,
+    )
 }
 
 @Composable

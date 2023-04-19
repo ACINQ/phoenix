@@ -277,7 +277,7 @@
     <string name="forceclose_address_label">Funds will eventually be sent to:</string>
     <string name="forceclose_button">Force-close all my channels</string>
 
-    <!-- channels view and channel details dialog -->
+    <!-- channels view -->
     <string name="channelsview_title">Payment channels</string>
     <string name="channelsview_tab_summary">Summary</string>
     <string name="channelsview_tab_json">Raw data</string>
@@ -286,21 +286,22 @@
     <string name="channelsview_loading_channels">Loading channels data…</string>
     <string name="channelsview_no_channels">You don\'t have any channels yet.\n\nPayments channels are created when you receive a payment and a new channel is needed. This is done automatically.</string>
 
-    <string name="channelsview_dialog_label">Show channel\'s details</string>
-    <string name="channelsview_channel_id">Channel id:</string>
-    <string name="channelsview_state">State:</string>
-    <string name="channelsview_spendable">Can send:</string>
-    <string name="channelsview_commitments">Active commitments:</string>
-    <string name="channelsview_inactive_commitments">Inactive commitments:</string>
-    <string name="channelsview_commitment_funding_tx_id">Funding tx:</string>
-    <string name="channelsview_commitment_funding_tx_index">Tx index:</string>
-    <string name="channelsview_commitment_balance">Balance:</string>
-    <string name="channelsview_commitment_funding_capacity">Capacity:</string>
-    <string name="channelsview_json">Json</string>
-    <string name="channelsview_close">Close</string>
-    <string name="channelsview_share">Share</string>
-    <string name="channelsview_share_subject">Channels data</string>
-    <string name="channelsview_share_title">Share channel data</string>
+    <!-- channels details -->
+    <string name="channeldetails_title">Channel details</string>
+    <string name="channeldetails_channel_id">Channel id</string>
+    <string name="channeldetails_state">State</string>
+    <string name="channeldetails_spendable">Can send</string>
+    <string name="channeldetails_commitments">Active commitments:</string>
+    <string name="channeldetails_inactive_commitments">Inactive commitments:</string>
+    <string name="channeldetails_commitment_funding_tx_id">Funding tx:</string>
+    <string name="channeldetails_commitment_funding_tx_index">Tx index:</string>
+    <string name="channeldetails_commitment_balance">Balance:</string>
+    <string name="channeldetails_commitment_funding_capacity">Capacity:</string>
+    <string name="channeldetails_json">Json</string>
+    <string name="channeldetails_close">Close</string>
+    <string name="channeldetails_share">Share</string>
+    <string name="channeldetails_share_subject">Channels data</string>
+    <string name="channeldetails_share_title">Share channel data</string>
 
     <!-- //////////////// menu //////////////// -->
 

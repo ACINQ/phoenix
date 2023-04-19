@@ -24,10 +24,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.utils.copyToClipboard
 
 
 @Composable
@@ -40,6 +43,42 @@ fun Setting(modifier: Modifier = Modifier, title: String, description: String?) 
         Text(title, style = MaterialTheme.typography.body2)
         Spacer(modifier = Modifier.height(2.dp))
         Text(description ?: "", style = MaterialTheme.typography.subtitle2)
+    }
+}
+
+@Composable
+fun SettingWithCopy(
+    title: String,
+    titleMuted: String? = null,
+    value: String,
+) {
+    val context = LocalContext.current
+    Row {
+        Column(modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp).weight(1f)) {
+            Row {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier.alignByBaseline(),
+                )
+                if (titleMuted != null) {
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = titleMuted,
+                        style = MaterialTheme.typography.subtitle2.copy(fontSize = 12.sp),
+                        modifier = Modifier
+                            .alignByBaseline(),
+                    )
+                }
+
+            }
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(text = value, style = MaterialTheme.typography.subtitle2)
+        }
+        Button(
+            icon = R.drawable.ic_copy,
+            onClick = { copyToClipboard(context, value, title) }
+        )
     }
 }
 
