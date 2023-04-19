@@ -54,7 +54,7 @@ fun SettingWithCopy(
 ) {
     val context = LocalContext.current
     Row {
-        Column(modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp).weight(1f)) {
+        Column(modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp).weight(1f)) {
             Row {
                 Text(
                     text = title,

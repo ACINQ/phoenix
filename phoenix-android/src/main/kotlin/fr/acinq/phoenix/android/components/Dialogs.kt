@@ -32,6 +32,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,6 +48,7 @@ fun Dialog(
     title: String? = null,
     properties: DialogProperties = DialogProperties(usePlatformDefaultWidth = false),
     isScrollable: Boolean = true,
+    buttonsTopMargin: Dp = 24.dp,
     buttons: (@Composable RowScope.() -> Unit)? = { Button(onClick = onDismiss, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(16.dp)) },
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -60,7 +62,7 @@ fun Dialog(
             content()
             // buttons
             if (buttons != null) {
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(buttonsTopMargin))
                 Row(
                     modifier = Modifier
                         .align(Alignment.End)

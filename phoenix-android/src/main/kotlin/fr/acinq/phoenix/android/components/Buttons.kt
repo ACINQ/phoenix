@@ -373,7 +373,7 @@ fun WebLink(
         space = space,
         maxLines = maxLines,
         onClick = { openLink(context, url) },
-        onLongClick = { copyToClipboard(context, url) },
+        onLongClick = { copyToClipboard(context, text) },
         modifier = modifier,
     )
 }

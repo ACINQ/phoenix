@@ -225,7 +225,17 @@ fun AppView(
                     TorConfigView()
                 }
                 composable(Screen.Channels.route) {
-                    ChannelsView()
+                    ChannelsView(
+                        onBackClick = { navController.popBackStack() },
+                        onChannelClick = { navController.navigate("${Screen.ChannelDetails.route}?id=$it")}
+                    )
+                }
+                composable(
+                    route = "${Screen.ChannelDetails.route}?id={id}",
+                    arguments = listOf(navArgument("id") { type = NavType.StringType })
+                ) {
+                    val channelId = it.arguments?.getString("id")
+                    ChannelDetailsView(onBackClick = { navController.popBackStack() }, channelId = channelId)
                 }
                 composable(Screen.MutualClose.route) {
                     MutualCloseView(onBackClick = { navController.popBackStack() })
