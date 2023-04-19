@@ -114,7 +114,6 @@ class BusinessManager {
 		paymentsPageFetchers.removeAll()
 
 		start()
-		registerForNotifications()
 	}
 	
 	// --------------------------------------------------

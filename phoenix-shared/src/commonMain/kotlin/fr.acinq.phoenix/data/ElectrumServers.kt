@@ -5,7 +5,7 @@ import fr.acinq.lightning.utils.ServerAddress
 
 
 private fun electrumServer(host: String, port: Int = 50002): ServerAddress =
-    ServerAddress(host = host, port = port, tls = TcpSocket.TLS.TRUSTED_CERTIFICATES)
+    ServerAddress(host = host, port = port, tls = TcpSocket.TLS.TRUSTED_CERTIFICATES())
 
 private fun electrumServer(host: String, port: Int = 50002, publicKey: String): ServerAddress =
     ServerAddress(host = host, port = port, tls = TcpSocket.TLS.PINNED_PUBLIC_KEY(publicKey))

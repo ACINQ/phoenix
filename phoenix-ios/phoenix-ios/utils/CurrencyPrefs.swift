@@ -23,7 +23,8 @@ class CurrencyPrefs: ObservableObject {
 	@Published private(set) var currencyType: CurrencyType
 	@Published private(set) var fiatCurrency: FiatCurrency
 	@Published private(set) var bitcoinUnit: BitcoinUnit
-	@Published private(set) var hideAmountsOnHomeScreen: Bool
+	@Published private(set) var hideAmounts: Bool
+	@Published private(set) var showOriginalFiatValue: Bool
 	
 	@Published var fiatExchangeRates: [ExchangeRate] = []
 	
@@ -37,13 +38,14 @@ class CurrencyPrefs: ObservableObject {
 	}
 	
 	private var cancellables = Set<AnyCancellable>()
-	private var currencyTypeDelayedSave = DelayedSave()
+	private var delayedSave = DelayedSave()
 
 	init() {
 		currencyType = GroupPrefs.shared.currencyType
 		fiatCurrency = GroupPrefs.shared.fiatCurrency
 		bitcoinUnit = GroupPrefs.shared.bitcoinUnit
-		hideAmountsOnHomeScreen = Prefs.shared.hideAmountsOnHomeScreen
+		hideAmounts = Prefs.shared.hideAmounts
+		showOriginalFiatValue = Prefs.shared.showOriginalFiatAmount
 		
 		GroupPrefs.shared.fiatCurrencyPublisher.sink {[weak self](newValue: FiatCurrency) in
 			self?.fiatCurrency = newValue
@@ -51,6 +53,10 @@ class CurrencyPrefs: ObservableObject {
 		
 		GroupPrefs.shared.bitcoinUnitPublisher.sink {[weak self](newValue: BitcoinUnit) in
 			self?.bitcoinUnit = newValue
+		}.store(in: &cancellables)
+		
+		Prefs.shared.showOriginalFiatAmountPublisher.sink {[weak self](newValue: Bool) in
+			self?.showOriginalFiatValue = newValue
 		}.store(in: &cancellables)
 		
 		let business = Biz.business
@@ -63,13 +69,13 @@ class CurrencyPrefs: ObservableObject {
 		currencyType: CurrencyType,
 		fiatCurrency: FiatCurrency,
 		bitcoinUnit: BitcoinUnit,
-		exchangeRate: Double,
-		hideAmountsOnHomeScreen: Bool
+		exchangeRate: Double
 	) {
 		self.currencyType = currencyType
 		self.fiatCurrency = fiatCurrency
 		self.bitcoinUnit = bitcoinUnit
-		self.hideAmountsOnHomeScreen = hideAmountsOnHomeScreen
+		self.hideAmounts = false
+		self.showOriginalFiatValue = false
 		
 		let exchangeRate = ExchangeRate.BitcoinPriceRate(
 			fiatCurrency: fiatCurrency,
@@ -85,22 +91,30 @@ class CurrencyPrefs: ObservableObject {
 		assert(Thread.isMainThread, "This function is restricted to the main-thread")
 		
 		currencyType = (currencyType == .fiat) ? .bitcoin : .fiat
-		
-		// I don't really want to save the currencyType to disk everytime the user changes it.
-		// Because users tend to toggle back and forth often.
-		// So we're using a timer, plus a listener on applicationWillResignActive.
-		//
-		currencyTypeDelayedSave.save(withDelay: 10.0) {
-			GroupPrefs.shared.currencyType = self.currencyType
-		}
+		triggerDelayedSave()
 	}
 	
-	func toggleHideAmountsOnHomeScreen() {
+	func toggleHideAmounts() {
 		
 		assert(Thread.isMainThread, "This function is restricted to the main-thread")
 		
-		hideAmountsOnHomeScreen.toggle()
-		Prefs.shared.hideAmountsOnHomeScreen = self.hideAmountsOnHomeScreen
+		hideAmounts.toggle()
+		triggerDelayedSave()
+	}
+	
+	private func triggerDelayedSave() {
+		
+		// We don't really want to save the settings to disk everytime the user changes it.
+		// Because users tend to toggle back and forth often.
+		// So we're using a timer to save the end result.
+		//
+		// Note that the DelaySave class also has a listener on applicationWillResignActive,
+		// which automatically triggers a save too.
+		
+		delayedSave.save(withDelay: 10.0) {
+			GroupPrefs.shared.currencyType = self.currencyType
+			Prefs.shared.hideAmounts = self.hideAmounts
+		}
 	}
 	
 	/// Returns the exchangeRate for the currently set fiatCurrency.
@@ -153,8 +167,7 @@ class CurrencyPrefs: ObservableObject {
 			currencyType: .bitcoin,
 			fiatCurrency: .usd,
 			bitcoinUnit: .sat,
-			exchangeRate: 20_000.00,
-			hideAmountsOnHomeScreen: false
+			exchangeRate: 20_000.00
 		)
 	}
 	
@@ -163,8 +176,7 @@ class CurrencyPrefs: ObservableObject {
 			currencyType: .bitcoin,
 			fiatCurrency: .eur,
 			bitcoinUnit: .sat,
-			exchangeRate: 17_000.00,
-			hideAmountsOnHomeScreen: false
+			exchangeRate: 17_000.00
 		)
 	}
 }

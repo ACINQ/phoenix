@@ -14,6 +14,10 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct PaymentCell : View {
 	
+	static let fetchOptions = WalletPaymentFetchOptions.companion.Descriptions.plus(
+		other: WalletPaymentFetchOptions.companion.OriginalFiat
+	)
+	
 	private let paymentsManager = Biz.business.paymentsManager
 	
 	let row: WalletPaymentOrderRow
@@ -36,15 +40,14 @@ struct PaymentCell : View {
 		self.didAppearCallback = didAppearCallback
 		self.didDisappearCallback = didDisappearCallback
 		
-		let options = WalletPaymentFetchOptions.companion.Descriptions
-		var result = paymentsManager.fetcher.getCachedPayment(row: row, options: options)
+		var result = paymentsManager.fetcher.getCachedPayment(row: row, options: PaymentCell.fetchOptions)
 		if let _ = result {
 			
 			self._fetched = State(initialValue: result)
 			self._fetchedIsStale = State(initialValue: false)
 		} else {
 			
-			result = paymentsManager.fetcher.getCachedStalePayment(row: row, options: options)
+			result = paymentsManager.fetcher.getCachedStalePayment(row: row, options: PaymentCell.fetchOptions)
 			
 			self._fetched = State(initialValue: result)
 			self._fetchedIsStale = State(initialValue: true)
@@ -109,7 +112,7 @@ struct PaymentCell : View {
 
 			let (amount, isFailure, isOutgoing) = paymentAmountInfo()
 			
-			if currencyPrefs.hideAmountsOnHomeScreen {
+			if currencyPrefs.hideAmounts {
 				
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					
@@ -138,8 +141,7 @@ struct PaymentCell : View {
 					Text(verbatim: " ") // separate for RTL languages
 						.font(.caption)
 						.foregroundColor(.gray)
-					Text(verbatim: amount.type)
-						.font(.caption)
+					Text_CurrencyName(currency: amount.currency, fontTextStyle: .caption)
 						.foregroundColor(.gray)
 				}
 				.accessibilityElement()
@@ -198,9 +200,21 @@ struct PaymentCell : View {
 
 		if let payment = fetched?.payment {
 
-			let amount = currencyPrefs.hideAmountsOnHomeScreen
-				? Utils.hiddenAmount(currencyPrefs)
-				: Utils.format(currencyPrefs, msat: payment.amount)
+			let amount: FormattedAmount
+			if currencyPrefs.hideAmounts {
+				amount = Utils.hiddenAmount(currencyPrefs)
+				
+			} else if currencyPrefs.showOriginalFiatValue && currencyPrefs.currencyType == .fiat {
+				
+				if let originalExchangeRate = fetched?.metadata.originalFiat {
+					amount = Utils.formatFiat(msat: payment.amount, exchangeRate: originalExchangeRate)
+				} else {
+					amount = Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+				}
+			} else {
+				
+				amount = Utils.format(currencyPrefs, msat: payment.amount)
+			}
 
 			let isFailure = payment.state() == WalletPaymentState.failure
 			let isOutgoing = payment is Lightning_kmpOutgoingPayment
@@ -223,8 +237,11 @@ struct PaymentCell : View {
 		
 		if fetched == nil || fetchedIsStale {
 			
-			let options = WalletPaymentFetchOptions.companion.Descriptions
-			paymentsManager.fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
+			paymentsManager.fetcher.getPayment(
+				row: row,
+				options: PaymentCell.fetchOptions
+			) { (result: WalletPaymentInfo?, _) in
+				
 				self.fetched = result
 			}
 		}

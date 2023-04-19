@@ -702,7 +702,7 @@ struct ElectrumAddressSheet: View {
 				tls = Lightning_kmpTcpSocketTLS.PINNED_PUBLIC_KEY(pubKey: pubKey)
 			} else {
 				pinnedPubKey = nil
-				tls = Lightning_kmpTcpSocketTLS.TRUSTED_CERTIFICATES()
+				tls = Lightning_kmpTcpSocketTLS.TRUSTED_CERTIFICATES(expectedHostName: nil)
 			}
 			
 			GroupPrefs.shared.electrumConfig = ElectrumConfigPrefs(

@@ -83,7 +83,7 @@ struct ElectrumConfigPrefs: Equatable, Codable {
 			return Lightning_kmpServerAddress(
 				host : host,
 				port : Int32(port),
-				tls  : Lightning_kmpTcpSocketTLS.TRUSTED_CERTIFICATES()
+				tls  : Lightning_kmpTcpSocketTLS.TRUSTED_CERTIFICATES(expectedHostName: nil)
 			)
 		}
 	}

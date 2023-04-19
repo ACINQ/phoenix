@@ -33,6 +33,7 @@ struct HomeView : MVIView {
 	@State var isMempoolFull = false
 	
 	@State var notificationPermissions = NotificationsManager.shared.permissions.value
+	@State var bgAppRefreshDisabled = NotificationsManager.shared.backgroundRefreshStatus.value != .available
 	
 	@StateObject var customElectrumServerObserver = CustomElectrumServerObserver()
 	
@@ -103,8 +104,8 @@ struct HomeView : MVIView {
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
-		.onChange(of: currencyPrefs.hideAmountsOnHomeScreen) { _ in
-			hideAmountsOnHomeScreenChanged()
+		.onChange(of: currencyPrefs.hideAmounts) { _ in
+			hideAmountsChanged()
 		}
 		.onReceive(recentPaymentsConfigPublisher) {
 			recentPaymentsConfigChanged($0)
@@ -123,6 +124,9 @@ struct HomeView : MVIView {
 		}
 		.onReceive(NotificationsManager.shared.permissions) {
 			notificationPermissionsChanged($0)
+		}
+		.onReceive(NotificationsManager.shared.backgroundRefreshStatus) {
+			backgroundRefreshStatusChanged($0)
 		}
 		.onReceive(backupSeed_enabled_publisher) {
 			self.backupSeed_enabled = $0
@@ -183,7 +187,7 @@ struct HomeView : MVIView {
 			
 			let balanceMsats = mvi.model.balance?.msat
 			let unknownBalance = balanceMsats == nil
-			let hiddenBalance = currencyPrefs.hideAmountsOnHomeScreen
+			let hiddenBalance = currencyPrefs.hideAmounts
 			
 			let amount = Utils.format( currencyPrefs,
 			                     msat: balanceMsats ?? 0,
@@ -221,9 +225,8 @@ struct HomeView : MVIView {
 						.font(.largeTitle)
 				}
 				
-				Text(amount.type)
-					.font(.title2)
-					.foregroundColor(Color.appAccent)
+				Text_CurrencyName(currency: amount.currency, fontTextStyle: .title2)
+					.foregroundColor(.appAccent)
 					.padding(.bottom, 4)
 				
 			} // </HStack>
@@ -314,7 +317,7 @@ struct HomeView : MVIView {
 			Image(systemName: "link")
 				.padding(.trailing, 2)
 			
-			if currencyPrefs.hideAmountsOnHomeScreen {
+			if currencyPrefs.hideAmounts {
 				Text("+\(incoming.digits) incoming".lowercased()) // digits => "***"
 					.accessibilityLabel("plus hidden amount incoming")
 				
@@ -478,6 +481,42 @@ struct HomeView : MVIView {
 				
 			} // </NoticeBox>
 		}
+		
+		// === Background App Refresh Disabled ====
+		if bgAppRefreshDisabled {
+			
+			NoticeBox {
+				HStack(alignment: VerticalAlignment.top, spacing: 0) {
+					Image(systemName: "exclamationmark.triangle")
+						.imageScale(.large)
+						.padding(.trailing, 10)
+						.accessibilityLabel("Warning")
+					
+					Button {
+						fixBackgroundAppRefreshDisabled()
+					} label: {
+						Group {
+							Text("Watchtower disabled. ")
+								.foregroundColor(.primary)
+							+
+							Text("Fix ")
+								.foregroundColor(.appAccent)
+							+
+							Text(Image(systemName: "arrowtriangle.forward"))
+								.foregroundColor(.appAccent)
+						}
+						.multilineTextAlignment(.leading)
+						.allowsTightening(true)
+					} // </Button>
+					
+				} // </HStack>
+				.font(.caption)
+				.accessibilityElement(children: .combine)
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(47)
+				
+			} // </NoticeBox>
+		}
 	}
 	
 	@ViewBuilder
@@ -531,7 +570,7 @@ struct HomeView : MVIView {
 			return sum + item.msat
 		}
 		if msatTotal > 0 {
-			return currencyPrefs.hideAmountsOnHomeScreen
+			return currencyPrefs.hideAmounts
 				? Utils.hiddenAmount(currencyPrefs)
 				: Utils.format(currencyPrefs, msat: msatTotal)
 		} else {
@@ -680,8 +719,8 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func hideAmountsOnHomeScreenChanged() {
-		log.trace("hideAmountsOnHomeScreenChanged()")
+	func hideAmountsChanged() {
+		log.trace("hideAmountsChanged()")
 		
 		// Without this, VoiceOver re-reads the previous text/button,
 		// before reading the new text/button that replaces it.
@@ -728,6 +767,12 @@ struct HomeView : MVIView {
 		log.trace("notificationPermissionsChanged()")
 		
 		notificationPermissions = newValue
+	}
+
+	func backgroundRefreshStatusChanged(_ newValue: UIBackgroundRefreshStatus) {
+		log.trace("backgroundRefreshStatusChanged()")
+		
+		bgAppRefreshDisabled = newValue != .available
 	}
 	
 	func onIncomingSwapsChanged(_ incomingSwaps: [String: Lightning_kmpMilliSatoshi]) -> Void {
@@ -807,8 +852,8 @@ struct HomeView : MVIView {
 		
 		// bitcoin -> fiat -> hidden
 		
-		if currencyPrefs.hideAmountsOnHomeScreen {
-			currencyPrefs.toggleHideAmountsOnHomeScreen()
+		if currencyPrefs.hideAmounts {
+			currencyPrefs.toggleHideAmounts()
 			if currencyPrefs.currencyType == .fiat {
 				currencyPrefs.toggleCurrencyType()
 			}
@@ -817,7 +862,7 @@ struct HomeView : MVIView {
 			currencyPrefs.toggleCurrencyType()
 			
 		} else if currencyPrefs.currencyType == .fiat {
-			currencyPrefs.toggleHideAmountsOnHomeScreen()
+			currencyPrefs.toggleHideAmounts()
 		}
 	}
 	
@@ -873,12 +918,20 @@ struct HomeView : MVIView {
 		}
 	}
 	
+	func fixBackgroundAppRefreshDisabled() {
+		log.trace("fixBackgroundAppRefreshDisabled()")
+		
+		popoverState.display(dismissable: true) {
+			BgRefreshDisabledPopover()
+		}
+	}
+	
 	func didSelectPayment(row: WalletPaymentOrderRow) -> Void {
 		log.trace("didSelectPayment()")
 		
 		// pretty much guaranteed to be in the cache
 		let fetcher = paymentsManager.fetcher
-		let options = WalletPaymentFetchOptions.companion.Descriptions
+		let options = PaymentCell.fetchOptions
 		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
 			
 			if let result = result {
