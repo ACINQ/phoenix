@@ -265,7 +265,7 @@ fun AppView(
                     )
                 }
                 composable(Screen.AppLock.route) {
-                    AppLockView()
+                    AppLockView(onBackClick = { navController.popBackStack() })
                 }
                 composable(Screen.Logs.route) {
                     LogsView()

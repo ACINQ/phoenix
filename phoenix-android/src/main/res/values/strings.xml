@@ -486,13 +486,20 @@
     <!-- //////////////// access control //////////////// -->
 
     <string name="accessctrl_title">Application access</string>
+    <string name="accessctrl_loading">Retrieving data…</string>
 
-    <string name="accessctrl_auth_no_hw">Your device does not support hardware backed user authentication.</string>
-    <string name="accessctrl_auth_hw_unavailable">Your biometric hardware is not available.</string>
-    <string name="accessctrl_auth_none_enrolled">Please enroll a PIN/Schema/Fingerprint in Android first.</string>
-    <string name="accessctrl_auth_update_required">An Android security update is required.</string>
-    <string name="accessctrl_auth_unsupported">Not supported by your version of Android.</string>
-    <string name="accessctrl_auth_lockout">Too many attempts, try again later.</string>
+    <string name="accessctrl_auth_error_header">Screen lock cannot be enabled</string>
+    <string name="accessctrl_auth_error_no_hw">No suitable authentication hardware on this device.</string>
+    <string name="accessctrl_auth_error_hw_unavailable">The biometric hardware is not available. Try again later.</string>
+    <string name="accessctrl_auth_error_none_enrolled">Please enroll a PIN/Schema/Fingerprint in Android first.</string>
+    <string name="accessctrl_auth_error_update_required">The hardware is unsafe. An Android security update is required.</string>
+    <string name="accessctrl_auth_error_unsupported">Not supported by this version of Android.</string>
+    <string name="accessctrl_auth_error_lockout">Too many attempts, try again later.</string>
+    <string name="accessctrl_auth_error_vendor">Unhandled hardware vendor error</string>
+    <string name="accessctrl_auth_error_timeout">Authentication attempt timed out</string>
+    <string name="accessctrl_auth_error_cancelled">Authentication has been cancelled</string>
+    <string name="accessctrl_auth_error_too_old">This version of Android is not compatible.</string>
+    <string name="accessctrl_auth_error_unhandled">Unhandled error code: %1$d</string>
 
     <string name="accessctrl_error_cipher">Unable to get cipher: %1$s</string>
     <string name="accessctrl_error_auth">Authentication failed.</string>

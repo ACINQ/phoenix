@@ -107,13 +107,13 @@ private fun LoadOrUnlock(
     val log = logger("StartupView")
     val context = LocalContext.current
     val activity = context.findActivity()
-    if (isLockActive) {
+    if (isLockActive && BiometricsHelper.canAuthenticate(context)) {
         when (lockState) {
             is LockState.Locked -> {
                 LaunchedEffect(key1 = true) {
                     val promptInfo = BiometricPrompt.PromptInfo.Builder().apply {
                         setTitle(context.getString(R.string.authprompt_title))
-                        setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL or BiometricManager.Authenticators.BIOMETRIC_WEAK)
+                        setAllowedAuthenticators(BiometricsHelper.authCreds)
                     }.build()
                     BiometricsHelper.getPrompt(
                         activity = activity,
