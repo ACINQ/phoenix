@@ -35,6 +35,7 @@ struct HomeView : MVIView {
 	@State var swapIn_minFundingSat: Int64 = 0
 	
 	@State var notificationPermissions = NotificationsManager.shared.permissions.value
+	@State var bgAppRefreshDisabled = NotificationsManager.shared.backgroundRefreshStatus.value != .available
 	
 	@StateObject var customElectrumServerObserver = CustomElectrumServerObserver()
 	
@@ -106,8 +107,8 @@ struct HomeView : MVIView {
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
-		.onChange(of: currencyPrefs.hideAmountsOnHomeScreen) { _ in
-			hideAmountsOnHomeScreenChanged()
+		.onChange(of: currencyPrefs.hideAmounts) { _ in
+			hideAmountsChanged()
 		}
 		.onReceive(recentPaymentsConfigPublisher) {
 			recentPaymentsConfigChanged($0)
@@ -126,6 +127,9 @@ struct HomeView : MVIView {
 		}
 		.onReceive(NotificationsManager.shared.permissions) {
 			notificationPermissionsChanged($0)
+		}
+		.onReceive(NotificationsManager.shared.backgroundRefreshStatus) {
+			backgroundRefreshStatusChanged($0)
 		}
 		.onReceive(backupSeed_enabled_publisher) {
 			self.backupSeed_enabled = $0
@@ -186,7 +190,7 @@ struct HomeView : MVIView {
 			
 			let balanceMsats = mvi.model.balance?.msat
 			let unknownBalance = balanceMsats == nil
-			let hiddenBalance = currencyPrefs.hideAmountsOnHomeScreen
+			let hiddenBalance = currencyPrefs.hideAmounts
 			
 			let amount = Utils.format( currencyPrefs,
 			                     msat: balanceMsats ?? 0,
@@ -224,9 +228,8 @@ struct HomeView : MVIView {
 						.font(.largeTitle)
 				}
 				
-				Text(amount.type)
-					.font(.title2)
-					.foregroundColor(Color.appAccent)
+				Text_CurrencyName(currency: amount.currency, fontTextStyle: .title2)
+					.foregroundColor(.appAccent)
 					.padding(.bottom, 4)
 				
 			} // </HStack>
@@ -270,7 +273,7 @@ struct HomeView : MVIView {
 		
 		let incomingSat = swapInWalletBalance.total.sat
 		if incomingSat > 0 {
-			let formattedAmount = currencyPrefs.hideAmountsOnHomeScreen
+			let formattedAmount = currencyPrefs.hideAmounts
 				? Utils.hiddenAmount(currencyPrefs)
 				: Utils.format(currencyPrefs, sat: incomingSat)
 			
@@ -292,7 +295,7 @@ struct HomeView : MVIView {
 			Image(systemName: "link")
 				.padding(.trailing, 2)
 			
-			if currencyPrefs.hideAmountsOnHomeScreen {
+			if currencyPrefs.hideAmounts {
 				Text("+\(incoming.digits) incoming".lowercased()) // digits => "***"
 					.accessibilityLabel("plus hidden amount incoming")
 				
@@ -321,7 +324,7 @@ struct HomeView : MVIView {
 			Image(systemName: "exclamationmark.triangle")
 				.padding(.trailing, 2)
 			
-			if currencyPrefs.hideAmountsOnHomeScreen {
+			if currencyPrefs.hideAmounts {
 				Text("+\(incoming.digits) incoming".lowercased()) // digits => "***"
 					.accessibilityLabel("plus hidden amount incoming")
 				
@@ -465,6 +468,42 @@ struct HomeView : MVIView {
 					} label: {
 						Group {
 							Text("Background payments disabled. ")
+								.foregroundColor(.primary)
+							+
+							Text("Fix ")
+								.foregroundColor(.appAccent)
+							+
+							Text(Image(systemName: "arrowtriangle.forward"))
+								.foregroundColor(.appAccent)
+						}
+						.multilineTextAlignment(.leading)
+						.allowsTightening(true)
+					} // </Button>
+					
+				} // </HStack>
+				.font(.caption)
+				.accessibilityElement(children: .combine)
+				.accessibilityAddTraits(.isButton)
+				.accessibilitySortPriority(47)
+				
+			} // </NoticeBox>
+		}
+		
+		// === Background App Refresh Disabled ====
+		if bgAppRefreshDisabled {
+			
+			NoticeBox {
+				HStack(alignment: VerticalAlignment.top, spacing: 0) {
+					Image(systemName: "exclamationmark.triangle")
+						.imageScale(.large)
+						.padding(.trailing, 10)
+						.accessibilityLabel("Warning")
+					
+					Button {
+						fixBackgroundAppRefreshDisabled()
+					} label: {
+						Group {
+							Text("Watchtower disabled. ")
 								.foregroundColor(.primary)
 							+
 							Text("Fix ")
@@ -671,8 +710,8 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func hideAmountsOnHomeScreenChanged() {
-		log.trace("hideAmountsOnHomeScreenChanged()")
+	func hideAmountsChanged() {
+		log.trace("hideAmountsChanged()")
 		
 		// Without this, VoiceOver re-reads the previous text/button,
 		// before reading the new text/button that replaces it.
@@ -720,6 +759,12 @@ struct HomeView : MVIView {
 		log.trace("notificationPermissionsChanged()")
 		
 		notificationPermissions = newValue
+	}
+
+	func backgroundRefreshStatusChanged(_ newValue: UIBackgroundRefreshStatus) {
+		log.trace("backgroundRefreshStatusChanged()")
+		
+		bgAppRefreshDisabled = newValue != .available
 	}
 	
 	func swapInWalletBalanceChanged(_ walletBalance: WalletBalance) {
@@ -795,8 +840,8 @@ struct HomeView : MVIView {
 		
 		// bitcoin -> fiat -> hidden
 		
-		if currencyPrefs.hideAmountsOnHomeScreen {
-			currencyPrefs.toggleHideAmountsOnHomeScreen()
+		if currencyPrefs.hideAmounts {
+			currencyPrefs.toggleHideAmounts()
 			if currencyPrefs.currencyType == .fiat {
 				currencyPrefs.toggleCurrencyType()
 			}
@@ -805,7 +850,7 @@ struct HomeView : MVIView {
 			currencyPrefs.toggleCurrencyType()
 			
 		} else if currencyPrefs.currencyType == .fiat {
-			currencyPrefs.toggleHideAmountsOnHomeScreen()
+			currencyPrefs.toggleHideAmounts()
 		}
 	}
 	
@@ -840,6 +885,14 @@ struct HomeView : MVIView {
 		
 		if let url = URL(string: "https://phoenix.acinq.co/faq#high-mempool-size-impacts") {
 			openURL(url)
+		}
+	}
+	
+	func fixBackgroundAppRefreshDisabled() {
+		log.trace("fixBackgroundAppRefreshDisabled()")
+		
+		popoverState.display(dismissable: true) {
+			BgRefreshDisabledPopover()
 		}
 	}
 	

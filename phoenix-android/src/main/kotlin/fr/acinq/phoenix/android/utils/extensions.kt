@@ -76,6 +76,7 @@ fun FiatCurrency.labels(): Pair<String, String> {
             }
             code == "ARS_BM" -> context.getString(R.string.currency_ars_bm)
             code == "CUP_FM" -> context.getString(R.string.currency_cup_fm)
+            code == "LBP_BM" -> context.getString(R.string.currency_lbp_bm)
             else -> "N/A"
         }
         val flag = getFlag(code)
@@ -166,6 +167,7 @@ private fun getFlag(code: String): String {
         "KZT" -> "🇰🇿" // Kazakhstani Tenge
         "LAK" -> "🇱🇦" // Laotian Kip
         "LBP" -> "🇱🇧" // Lebanese Pound
+        "LBP_BM" -> "🇱🇧" // Lebanese Pound
         "LKR" -> "🇱🇰" // Sri Lankan Rupee
         "LRD" -> "🇱🇷" // Liberian Dollar
         "LSL" -> "🇱🇸" // Lesotho Loti

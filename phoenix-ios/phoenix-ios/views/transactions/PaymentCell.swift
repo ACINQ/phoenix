@@ -109,7 +109,7 @@ struct PaymentCell : View {
 
 			let (amount, isFailure, isOutgoing) = paymentAmountInfo()
 			
-			if currencyPrefs.hideAmountsOnHomeScreen {
+			if currencyPrefs.hideAmounts {
 				
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					
@@ -138,8 +138,7 @@ struct PaymentCell : View {
 					Text(verbatim: " ") // separate for RTL languages
 						.font(.caption)
 						.foregroundColor(.gray)
-					Text(verbatim: amount.type)
-						.font(.caption)
+					Text_CurrencyName(currency: amount.currency, fontTextStyle: .caption)
 						.foregroundColor(.gray)
 				}
 				.accessibilityElement()
@@ -198,7 +197,7 @@ struct PaymentCell : View {
 
 		if let payment = fetched?.payment {
 
-			let amount = currencyPrefs.hideAmountsOnHomeScreen
+			let amount = currencyPrefs.hideAmounts
 				? Utils.hiddenAmount(currencyPrefs)
 				: Utils.format(currencyPrefs, msat: payment.amount)
 

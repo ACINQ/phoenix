@@ -23,7 +23,7 @@ class CurrencyPrefs: ObservableObject {
 	@Published private(set) var currencyType: CurrencyType
 	@Published private(set) var fiatCurrency: FiatCurrency
 	@Published private(set) var bitcoinUnit: BitcoinUnit
-	@Published private(set) var hideAmountsOnHomeScreen: Bool
+	@Published private(set) var hideAmounts: Bool
 	
 	@Published var fiatExchangeRates: [ExchangeRate] = []
 	
@@ -37,13 +37,13 @@ class CurrencyPrefs: ObservableObject {
 	}
 	
 	private var cancellables = Set<AnyCancellable>()
-	private var currencyTypeDelayedSave = DelayedSave()
+	private var delayedSave = DelayedSave()
 
 	init() {
 		currencyType = GroupPrefs.shared.currencyType
 		fiatCurrency = GroupPrefs.shared.fiatCurrency
 		bitcoinUnit = GroupPrefs.shared.bitcoinUnit
-		hideAmountsOnHomeScreen = Prefs.shared.hideAmountsOnHomeScreen
+		hideAmounts = Prefs.shared.hideAmounts
 		
 		GroupPrefs.shared.fiatCurrencyPublisher.sink {[weak self](newValue: FiatCurrency) in
 			self?.fiatCurrency = newValue
@@ -64,12 +64,12 @@ class CurrencyPrefs: ObservableObject {
 		fiatCurrency: FiatCurrency,
 		bitcoinUnit: BitcoinUnit,
 		exchangeRate: Double,
-		hideAmountsOnHomeScreen: Bool
+		hideAmounts: Bool
 	) {
 		self.currencyType = currencyType
 		self.fiatCurrency = fiatCurrency
 		self.bitcoinUnit = bitcoinUnit
-		self.hideAmountsOnHomeScreen = hideAmountsOnHomeScreen
+		self.hideAmounts = hideAmounts
 		
 		let exchangeRate = ExchangeRate.BitcoinPriceRate(
 			fiatCurrency: fiatCurrency,
@@ -85,22 +85,30 @@ class CurrencyPrefs: ObservableObject {
 		assert(Thread.isMainThread, "This function is restricted to the main-thread")
 		
 		currencyType = (currencyType == .fiat) ? .bitcoin : .fiat
-		
-		// I don't really want to save the currencyType to disk everytime the user changes it.
-		// Because users tend to toggle back and forth often.
-		// So we're using a timer, plus a listener on applicationWillResignActive.
-		//
-		currencyTypeDelayedSave.save(withDelay: 10.0) {
-			GroupPrefs.shared.currencyType = self.currencyType
-		}
+		triggerDelayedSave()
 	}
 	
-	func toggleHideAmountsOnHomeScreen() {
+	func toggleHideAmounts() {
 		
 		assert(Thread.isMainThread, "This function is restricted to the main-thread")
 		
-		hideAmountsOnHomeScreen.toggle()
-		Prefs.shared.hideAmountsOnHomeScreen = self.hideAmountsOnHomeScreen
+		hideAmounts.toggle()
+		triggerDelayedSave()
+	}
+	
+	private func triggerDelayedSave() {
+		
+		// We don't really want to save the settings to disk everytime the user changes it.
+		// Because users tend to toggle back and forth often.
+		// So we're using a timer to save the end result.
+		//
+		// Note that the DelaySave class also has a listener on applicationWillResignActive,
+		// which automatically triggers a save too.
+		
+		delayedSave.save(withDelay: 10.0) {
+			GroupPrefs.shared.currencyType = self.currencyType
+			Prefs.shared.hideAmounts = self.hideAmounts
+		}
 	}
 	
 	/// Returns the exchangeRate for the currently set fiatCurrency.
@@ -154,7 +162,7 @@ class CurrencyPrefs: ObservableObject {
 			fiatCurrency: .usd,
 			bitcoinUnit: .sat,
 			exchangeRate: 20_000.00,
-			hideAmountsOnHomeScreen: false
+			hideAmounts: false
 		)
 	}
 	
@@ -164,7 +172,7 @@ class CurrencyPrefs: ObservableObject {
 			fiatCurrency: .eur,
 			bitcoinUnit: .sat,
 			exchangeRate: 17_000.00,
-			hideAmountsOnHomeScreen: false
+			hideAmounts: false
 		)
 	}
 }

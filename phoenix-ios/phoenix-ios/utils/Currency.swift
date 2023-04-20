@@ -18,12 +18,21 @@ enum Currency: Hashable, Identifiable, CustomStringConvertible {
 		}
 	}
 	
-	var abbrev: String {
+	var shortName: String {
 		switch self {
 		case .bitcoin(let unit):
 			return unit.shortName
 		case .fiat(let currency):
 			return currency.shortName
+		}
+	}
+	
+	var splitShortName: (String, String) {
+		switch self {
+		case .bitcoin(let unit):
+			return (unit.shortName, "")
+		case .fiat(let currency):
+			return currency.splitShortName
 		}
 	}
 	

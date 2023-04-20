@@ -10,10 +10,7 @@ import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.msat
-import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.utils.toByteVector32
+import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.runTest
 import fr.acinq.secp256k1.Hex
 import kotlin.test.*
@@ -428,7 +425,7 @@ class CloudDataTest {
                 amount = amount,
                 paymentHash = Crypto.sha256(preimage).toByteVector32(),
                 privateKey = randomKey(),
-                description = "invoice",
+                description = Either.Left("invoice"),
                 minFinalCltvExpiryDelta = CltvExpiryDelta(16),
                 features = defaultFeatures
             )

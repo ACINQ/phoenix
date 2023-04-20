@@ -68,7 +68,8 @@ class CurrencyManager(
 
     private val specialMarkets = setOf(
         FiatCurrency.ARS_BM, // Argentine Peso (blue market)
-        FiatCurrency.CUP_FM  // Cuban Peso (free market)
+        FiatCurrency.CUP_FM, // Cuban Peso (free market)
+        FiatCurrency.LBP_BM  // Lebanese Pound (black market)
     )
 
     private val missingFromCoinbase = setOf(
@@ -105,8 +106,8 @@ class CurrencyManager(
     }
 
     /**
-     * The blockchain.info API is used to refresh the BitcoinPriceRates, using high liquidity markets
-     * currencies (i.e. USD/EUR).
+     * The blockchain.info API is used to refresh the BitcoinPriceRates
+     * for currencies with "high-liquidity markets" (i.e. USD/EUR).
      * Since bitcoin prices are volatile, we refresh them often.
      */
     private val blockchainInfoAPI = object : API {
@@ -156,14 +157,15 @@ class CurrencyManager(
     }
 
     /**
-     * The yadio API is used to fetch the "free market" price for the Cuban Peso.
+     * The yadio API is used to fetch various "free market" prices.
+     * For example:
      * - CUP => government controlled exchange rate
      * - CUP_FM => free market exchange rate
      */
     private val yadioAPI = object : API {
         override val name = "yadio"
         override val refreshDelay = 120.minutes
-        override val fiatCurrencies = setOf(FiatCurrency.CUP_FM)
+        override val fiatCurrencies = setOf(FiatCurrency.CUP_FM, FiatCurrency.LBP_BM)
     }
 
     /** Public consumable flow that includes the most recent exchange rates */
@@ -295,101 +297,73 @@ class CurrencyManager(
 
     fun refreshAll(targets: List<FiatCurrency>, force: Boolean = true) = launch {
         stopAutoRefresh().join()
-
-        // All non-high-liquidity currencies require USD to perform proper conversions.
-        // E.g. COP => USD => BTC
-        // So if the given list includes any non-high-liquidity currencies,
-        // then we need to make sure we append USD to the list.
-        val requiresUsd = targets.any { !highLiquidityMarkets.contains(it) }
-        val targetSet = if (requiresUsd) {
-            targets.plus(FiatCurrency.USD).toSet()
-        } else targets.toSet()
+        val targetSet = prepTargets(targets)
 
         val deferred1 = async {
-            refreshFromBlockchainInfo(targetSet, forceRefresh = force)
+            refresh(targetSet, blockchainInfoAPI, forceRefresh = force)
         }
         val deferred2 = async {
-            refreshFromCoinbase(targetSet, forceRefresh = force)
+            refresh(targetSet, coinbaseAPI, forceRefresh = force)
         }
         val deferred3 = async {
-            refreshFromCoinDesk(targetSet, forceRefresh = force)
+            refresh(targetSet, coindeskAPI, forceRefresh = force)
         }
         val deferred4 = async {
-            refreshFromBluelytics(targetSet, forceRefresh = force)
+            refresh(targetSet, bluelyticsAPI, forceRefresh = force)
         }
         val deferred5 = async {
-            refreshFromYadio(targetSet, forceRefresh = force)
+            refresh(targetSet, yadioAPI, forceRefresh = force)
         }
         listOf(deferred1, deferred2, deferred3, deferred4, deferred5).awaitAll()
         maybeStartAutoRefresh()
     }
 
     private fun launchAutoRefreshJob() = launch {
-        launch {
-            // This Job refreshes the BitcoinPriceRates from the blockchain.info API.
-            val api = blockchainInfoAPI
-            while (isActive) {
-                delay(api).let { nextDelay ->
-                    log.debug { "API(${api.name}): Next BitcoinPriceRate refresh: $nextDelay" }
-                    delay(nextDelay)
-                }
-                refreshFromBlockchainInfo(api.fiatCurrencies, forceRefresh = false)
-            }
+        var blockchainInfoJob: Job? = null
+        var coinbaseJob: Job? = null
+        var coindeskJob: Job? = null
+        var bluelyticsJob: Job? = null
+        var yadioJob: Job? = null
+
+        // There's no reason to refresh ALL the currencies.
+        // This is just unnecessary network and disk IO.
+        // The `preferredFiatCurrencies` tells us which currencies are being used in the app.
+        // So we can just refresh those.
+
+        configurationManager.preferredFiatCurrencies.filterNotNull().collect { preferredFiatCurrencies ->
+
+            val targetSet = prepTargets(preferredFiatCurrencies.all)
+
+            blockchainInfoJob?.cancel()
+            blockchainInfoJob = launchAutoRefreshJob(targetSet, blockchainInfoAPI)
+
+            coinbaseJob?.cancel()
+            coinbaseJob = launchAutoRefreshJob(targetSet, coinbaseAPI)
+
+            coindeskJob?.cancel()
+            coindeskJob = launchAutoRefreshJob(targetSet, coindeskAPI)
+
+            bluelyticsJob?.cancel()
+            bluelyticsJob = launchAutoRefreshJob(targetSet, bluelyticsAPI)
+
+            yadioJob?.cancel()
+            yadioJob = launchAutoRefreshJob(targetSet, yadioAPI)
         }
-        launch {
-            // This Job refreshes the UsdPriceRates from the coinbase API
-            val api = coinbaseAPI
-            while (isActive) {
-                delay(api).let { nextDelay ->
-                    log.debug { "API(${api.name}): Next UsdPriceRate refresh: $nextDelay" }
-                    delay(nextDelay)
-                }
-                refreshFromCoinbase(api.fiatCurrencies, forceRefresh = false)
-            }
+    }
+
+    private fun launchAutoRefreshJob(allTargets: Set<FiatCurrency>, api: API) = launch {
+
+        val targets = allTargets.filter { api.fiatCurrencies.contains(it) }.toSet()
+        if (targets.isEmpty()) {
+            log.debug { "API(${api.name}): Nothing to refresh" }
+            return@launch
         }
-        launch {
-            // This Job refreshes the UsdPriceRates from the coindesk.com API.
-            val api = coindeskAPI
-            while (isActive) {
-                delay(api).let { nextDelay ->
-                    log.debug { "API(${api.name}): Next UsdPriceRate refresh: $nextDelay" }
-                    delay(nextDelay)
-                }
-                val preferredFiatCurrencies = configurationManager.preferredFiatCurrencies.value
-                val (preferred, remaining) = preferredFiatCurrencies?.let { pfc ->
-                    val preferred = pfc.all
-                    val remaining = api.fiatCurrencies.filter { !preferred.contains(it) }
-                    Pair(preferred, remaining)
-                } ?: run {
-                    val preferred = setOf<FiatCurrency>()
-                    val remaining = api.fiatCurrencies.toList()
-                    Pair(preferred, remaining)
-                }
-                refreshFromCoinDesk(preferred, forceRefresh = false)
-                refreshFromCoinDesk(remaining, forceRefresh = false)
-            }
-        }
-        launch {
-            // This Job refreshes the UsdPriceRates from the bluelytics.com.ar API.
-            val api = bluelyticsAPI
-            while (isActive) {
-                delay(api).let { nextDelay ->
-                    log.debug { "API(${api.name}): Next UsdPriceRate refresh: $nextDelay" }
-                    delay(nextDelay)
-                }
-                refreshFromBluelytics(api.fiatCurrencies, forceRefresh = false)
-            }
-        }
-        launch {
-            // This Job refreshes the UsdPriceRates from the yadio.io API.
-            val api = yadioAPI
-            while (isActive) {
-                delay(api).let { nextDelay ->
-                    log.debug { "API(${api.name}): Next UsdPriceRate refresh: $nextDelay" }
-                    delay(nextDelay)
-                }
-                refreshFromYadio(api.fiatCurrencies, forceRefresh = false)
-            }
+
+        while (isActive) {
+            val nextDelay = calculateDelay(targets, api.refreshDelay)
+            log.debug { "API(${api.name}): Next refresh: $nextDelay" }
+            delay(nextDelay)
+            refresh(targets, api, forceRefresh = false)
         }
     }
 
@@ -419,14 +393,31 @@ class CurrencyManager(
         }
     }
 
-    private suspend fun delay(api: API): Duration {
+    private fun prepTargets(targets: Collection<FiatCurrency>): Set<FiatCurrency> {
 
-        val initialized = api.fiatCurrencies.all { refreshList.containsKey(it) }
+        // All non-high-liquidity currencies require USD to perform proper conversions.
+        // E.g. COP => USD => BTC
+        // So if the given list includes any non-high-liquidity currencies,
+        // then we need to make sure we append USD to the list.
+        val requiresUsd = targets.any { !highLiquidityMarkets.contains(it) }
+        return if (requiresUsd) {
+            targets.plus(FiatCurrency.USD).toSet()
+        } else {
+            targets.toSet()
+        }
+    }
+
+    private suspend fun calculateDelay(
+        targets: Set<FiatCurrency>,
+        refreshDelay: Duration
+    ): Duration {
+
+        val initialized = targets.all { refreshList.containsKey(it) }
         if (!initialized) {
             // Initialize the refreshList with the information from the database.
             val dbValues = ratesFlow.filterNotNull().first()
-                .filter { api.fiatCurrencies.contains(it.fiatCurrency) }
-            for (fiatCurrency in api.fiatCurrencies) {
+                .filter { targets.contains(it.fiatCurrency) }
+            for (fiatCurrency in targets) {
                 val lastRefresh = dbValues.firstOrNull { it.fiatCurrency == fiatCurrency }?.let {
                     Instant.fromEpochMilliseconds(it.timestampMillis)
                 } ?: run {
@@ -434,13 +425,13 @@ class CurrencyManager(
                 }
                 refreshList[fiatCurrency] = RefreshInfo(
                     lastRefresh = lastRefresh,
-                    nextRefresh = lastRefresh + api.refreshDelay,
+                    nextRefresh = lastRefresh + refreshDelay,
                     failCount = 0
                 )
             }
         }
 
-        val nextRefresh = api.fiatCurrencies.mapNotNull { fiatCurrency ->
+        val nextRefresh = targets.mapNotNull { fiatCurrency ->
             refreshList[fiatCurrency]
         }.minByOrNull {
             it.nextRefresh
@@ -452,32 +443,6 @@ class CurrencyManager(
         } else {
             nextRefresh - now
         }
-    }
-
-    /**
-     * Given a list of targets, filters the set to only include:
-     * - those in the given api
-     * - those that actually need to be refreshed (unless forceRefresh is true)
-     */
-    private fun filterTargets(
-        targets: Collection<FiatCurrency>,
-        forceRefresh: Boolean,
-        api: API,
-        now: Instant = Clock.System.now()
-    ): Set<FiatCurrency> {
-        return targets.filter { fiatCurrency ->
-            if (!api.fiatCurrencies.contains(fiatCurrency)) {
-                false
-            } else if (forceRefresh) {
-                true
-            } else {
-                // Only include those that need to be refreshed
-                refreshList[fiatCurrency]?.let {
-                    val result: Boolean = it.nextRefresh <= now // < Android studio bug
-                    result
-                } ?: true
-            }
-        }.toSet()
     }
 
     /**
@@ -506,55 +471,34 @@ class CurrencyManager(
         val reason: String
     ) : Exception("$fiatCurrency: $reason: $inner")
 
-    private suspend fun refreshFromBlockchainInfo(
-        targets: Collection<FiatCurrency>,
-        forceRefresh: Boolean
-    ) {
-        val api = blockchainInfoAPI
-        val fiatCurrencies = filterTargets(targets, forceRefresh, api)
-        refresh(api, fiatCurrencies)
-    }
-
-    private suspend fun refreshFromCoinbase(
-        targets: Collection<FiatCurrency>,
-        forceRefresh: Boolean
-    ) {
-        val api = coinbaseAPI
-        val fiatCurrencies = filterTargets(targets, forceRefresh, api)
-        refresh(api, fiatCurrencies)
-    }
-
-    private suspend fun refreshFromCoinDesk(
-        targets: Collection<FiatCurrency>,
-        forceRefresh: Boolean
-    ) {
-        val api = coindeskAPI
-        val fiatCurrencies = filterTargets(targets, forceRefresh, api)
-        refresh(api, fiatCurrencies)
-    }
-
-    private suspend fun refreshFromBluelytics(
-        targets: Collection<FiatCurrency>,
-        forceRefresh: Boolean
-    ) {
-        val api = bluelyticsAPI
-        val fiatCurrencies = filterTargets(targets, forceRefresh, api)
-        refresh(api, fiatCurrencies)
-    }
-
-    private suspend fun refreshFromYadio(
-        targets: Collection<FiatCurrency>,
-        forceRefresh: Boolean
-    ) {
-        val api = yadioAPI
-        val fiatCurrencies = filterTargets(targets, forceRefresh, api)
-        refresh(api, fiatCurrencies)
-    }
-
+    /**
+     * Standard routine to refresh a list of currencies for a given API.
+     * The given `allTargets` parameter will automatically be filtered,
+     * and only the necessary currencies will be updated.
+     */
     private suspend fun refresh(
+        allTargets: Set<FiatCurrency>,
         api: API,
-        targets: Set<FiatCurrency>
+        forceRefresh: Boolean
     ) {
+        // Filter the `allTargets` set to only include:
+        // - those in the given api
+        // - those that actually need to be refreshed (unless forceRefresh is true)
+        val now = Clock.System.now()
+        val targets = allTargets.filter { fiatCurrency ->
+            if (!api.fiatCurrencies.contains(fiatCurrency)) {
+                false
+            } else if (forceRefresh) {
+                true
+            } else {
+                // Only include those that need to be refreshed
+                refreshList[fiatCurrency]?.let {
+                    val result: Boolean = it.nextRefresh <= now // < Android studio bug
+                    result
+                } ?: true
+            }
+        }.toSet()
+
         if (targets.isEmpty()) {
             return
         } else {
@@ -719,7 +663,7 @@ class CurrencyManager(
                     throw WrappedException(e, fiatCurrency, "failed to fetch price from api.coindesk.com")
                 }
                 val parsedResponse: CoinDeskResponse = try {
-                    json.decodeFromString<CoinDeskResponse>(httpResponse.body())
+                    json.decodeFromString(httpResponse.body())
                 } catch (e: Exception) {
                     throw WrappedException(e, fiatCurrency, "failed to parse price from api.coindesk.com")
                 }
@@ -814,10 +758,11 @@ class CurrencyManager(
 
         val timestampMillis = Clock.System.now().toEpochMilliseconds()
         val fetchedRates: List<ExchangeRate> = parsedResponse?.let {
-            targets.filter { it == FiatCurrency.CUP_FM }.mapNotNull {
-                parsedResponse.usdRates["CUP"]?.let { valueAsDouble ->
+            targets.mapNotNull { fiatCurrency ->
+                val name = fiatCurrency.name.take(3)
+                parsedResponse.usdRates[name]?.let { valueAsDouble ->
                     ExchangeRate.UsdPriceRate(
-                        fiatCurrency = FiatCurrency.CUP_FM,
+                        fiatCurrency = fiatCurrency,
                         price = valueAsDouble,
                         source = "yadio.io",
                         timestampMillis = timestampMillis

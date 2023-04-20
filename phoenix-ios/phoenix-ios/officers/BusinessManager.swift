@@ -114,7 +114,6 @@ class BusinessManager {
 		paymentsPageFetchers.removeAll()
 
 		start()
-		registerForNotifications()
 	}
 	
 	// --------------------------------------------------
@@ -312,19 +311,7 @@ class BusinessManager {
 			return
 		}
 		
-		// It's possible for the user to disable "background app refresh".
-		// This is done via:
-		// Settings -> General -> Background App Refresh
-		//
-		// If the user turns this off for Phoenix,
-		// then the OS won't deliver silent push notifications.
-		// So in this case, we want to register a "null" with the server.
-		
-		var token = self.fcmToken
-		if UIApplication.shared.backgroundRefreshStatus != .available {
-			token = nil
-		}
-
+		let token = self.fcmToken
 		log.debug("registering fcm token: \(token?.description ?? "<nil>")")
 		business.registerFcmToken(token: token) { result, error in
 			if let e = error {

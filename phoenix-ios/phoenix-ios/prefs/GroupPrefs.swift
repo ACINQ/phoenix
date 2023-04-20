@@ -53,7 +53,7 @@ class GroupPrefs {
 	}
 	
 	lazy private(set) var fiatCurrencyPublisher: AnyPublisher<FiatCurrency, Never> = {
-		defaults.publisher(for: \.fiatCurrency, options: [.new])
+		defaults.publisher(for: \.fiatCurrency, options: [.initial, .new])
 			.map({ (str: String?) -> FiatCurrency in
 				FiatCurrency.deserialize(str) ?? self.defaultFiatCurrency()
 			})
@@ -71,7 +71,7 @@ class GroupPrefs {
 	}
 	
 	lazy private(set) var bitcoinUnitPublisher: AnyPublisher<BitcoinUnit, Never> = {
-		defaults.publisher(for: \.bitcoinUnit, options: [.new])
+		defaults.publisher(for: \.bitcoinUnit, options: [.initial, .new])
 			.map({ (str: String?) -> BitcoinUnit in
 				BitcoinUnit.deserialize(str) ?? self.defaultBitcoinUnit
 			})
@@ -87,7 +87,7 @@ class GroupPrefs {
 	}
 	
 	lazy private(set) var currencyConverterListPublisher: AnyPublisher<[Currency], Never> = {
-		defaults.publisher(for: \.currencyConverterList, options: [.new])
+		defaults.publisher(for: \.currencyConverterList, options: [.initial, .new])
 			.map({ (str: String?) -> [Currency] in
 				Currency.deserializeList(str)
 			})
@@ -123,7 +123,7 @@ class GroupPrefs {
 	// --------------------------------------------------
 	
 	lazy private(set) var electrumConfigPublisher: AnyPublisher<ElectrumConfigPrefs?, Never> = {
-		defaults.publisher(for: \.electrumConfig, options: [.new])
+		defaults.publisher(for: \.electrumConfig, options: [.initial, .new])
 			.map({ (data: Data?) -> ElectrumConfigPrefs? in
 				data?.jsonDecode()
 			})
@@ -137,7 +137,7 @@ class GroupPrefs {
 	}
 
 	lazy private(set) var isTorEnabledPublisher: AnyPublisher<Bool, Never> = {
-		defaults.publisher(for: \.isTorEnabled, options: [.new])
+		defaults.publisher(for: \.isTorEnabled, options: [.initial, .new])
 			.removeDuplicates()
 			.eraseToAnyPublisher()
 	}()
