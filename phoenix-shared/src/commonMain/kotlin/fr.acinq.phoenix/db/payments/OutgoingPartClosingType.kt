@@ -16,7 +16,7 @@
 
 package fr.acinq.phoenix.db.payments
 
-import fr.acinq.lightning.db.ChannelClosingType
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
@@ -34,10 +34,10 @@ enum class OutgoingPartClosingInfoTypeVersion {
 sealed class OutgoingPartClosingInfoData {
 
     @Serializable
-    data class V0(val closingType: ChannelClosingType)
+    data class V0(val closingType: ChannelCloseOutgoingPayment.ChannelClosingType)
 
     companion object {
-        fun deserialize(typeVersion: OutgoingPartClosingInfoTypeVersion, blob: ByteArray): ChannelClosingType = DbTypesHelper.decodeBlob(blob) { json, format ->
+        fun deserialize(typeVersion: OutgoingPartClosingInfoTypeVersion, blob: ByteArray): ChannelCloseOutgoingPayment.ChannelClosingType = DbTypesHelper.decodeBlob(blob) { json, format ->
             when (typeVersion) {
                 OutgoingPartClosingInfoTypeVersion.CLOSING_INFO_V0 -> format.decodeFromString<OutgoingPartClosingInfoData.V0>(json).closingType
             }
@@ -45,5 +45,5 @@ sealed class OutgoingPartClosingInfoData {
     }
 }
 
-fun LightningOutgoingPayment.ClosingTxPart.mapClosingTypeToDb() = OutgoingPartClosingInfoTypeVersion.CLOSING_INFO_V0 to
+fun ChannelCloseOutgoingPayment.mapClosingTypeToDb() = OutgoingPartClosingInfoTypeVersion.CLOSING_INFO_V0 to
         Json.encodeToString(OutgoingPartClosingInfoData.V0(this.closingType)).toByteArray(Charsets.UTF_8)

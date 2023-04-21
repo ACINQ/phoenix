@@ -1,9 +1,6 @@
 package fr.acinq.phoenix.utils
 
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.lightning.db.SpliceOutgoingPayment
+import fr.acinq.lightning.db.*
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import kotlinx.datetime.Instant
 
@@ -138,9 +135,9 @@ class CsvWriter {
                         is LightningOutgoingPayment.Details.Normal -> "Outgoing LN payment to ${details.paymentRequest.nodeId.toHex()}"
                         is LightningOutgoingPayment.Details.KeySend -> "Outgoing LN payment (keysend)"
                         is LightningOutgoingPayment.Details.SwapOut -> "Swap-out to ${details.address}"
-                        is LightningOutgoingPayment.Details.ChannelClosing -> "Channel closing to ${details.closingAddress}"
                     }
                     is SpliceOutgoingPayment -> "Outgoing splice to ${payment.address}"
+                    is ChannelCloseOutgoingPayment -> "Channel closing to ${payment.address}"
                 }
                 row += ",${processField(details)}"
             }

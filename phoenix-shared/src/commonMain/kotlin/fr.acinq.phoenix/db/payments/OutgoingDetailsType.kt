@@ -75,7 +75,7 @@ sealed class OutgoingDetailsData {
                 OutgoingDetailsTypeVersion.NORMAL_V0 -> format.decodeFromString<Normal.V0>(json).let { LightningOutgoingPayment.Details.Normal(PaymentRequest.read(it.paymentRequest)) }
                 OutgoingDetailsTypeVersion.KEYSEND_V0 -> format.decodeFromString<KeySend.V0>(json).let { LightningOutgoingPayment.Details.KeySend(it.preimage) }
                 OutgoingDetailsTypeVersion.SWAPOUT_V0 -> format.decodeFromString<SwapOut.V0>(json).let { LightningOutgoingPayment.Details.SwapOut(it.address, PaymentRequest.read(it.paymentRequest), it.swapOutFee) }
-                OutgoingDetailsTypeVersion.CLOSING_V0 -> format.decodeFromString<Closing.V0>(json).let { LightningOutgoingPayment.Details.ChannelClosing(it.channelId, it.closingAddress, it.isSentToDefaultAddress) }
+                OutgoingDetailsTypeVersion.CLOSING_V0 -> TODO("return ChannelCloseOutgoingPayment")
             }
         }
     }
@@ -88,6 +88,4 @@ fun LightningOutgoingPayment.Details.mapToDb(): Pair<OutgoingDetailsTypeVersion,
             Json.encodeToString(OutgoingDetailsData.KeySend.V0(preimage)).toByteArray(Charsets.UTF_8)
     is LightningOutgoingPayment.Details.SwapOut -> OutgoingDetailsTypeVersion.SWAPOUT_V0 to
             Json.encodeToString(OutgoingDetailsData.SwapOut.V0(address, paymentRequest.write(), swapOutFee)).toByteArray(Charsets.UTF_8)
-    is LightningOutgoingPayment.Details.ChannelClosing -> OutgoingDetailsTypeVersion.CLOSING_V0 to
-            Json.encodeToString(OutgoingDetailsData.Closing.V0(channelId, closingAddress, isSentToDefaultAddress)).toByteArray(Charsets.UTF_8)
 }

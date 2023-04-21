@@ -1,10 +1,12 @@
 package fr.acinq.phoenix.db.cloud
 
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.db.ChannelClosingType
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.phoenix.db.payments.*
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -22,20 +24,17 @@ data class LightningOutgoingClosingTxPartWrapper(
     val createdAt: Long
 ) {
 
-    constructor(part: LightningOutgoingPayment.ClosingTxPart) : this(
-        id = part.id,
-        txId = part.txId.toByteArray(),
-        sat = part.claimed.sat,
-        info = ClosingInfoWrapper(part),
-        createdAt = part.createdAt
-    )
-
-    fun unwrap() = LightningOutgoingPayment.ClosingTxPart(
+    fun unwrap() = ChannelCloseOutgoingPayment(
         id = id,
+        amountSatoshi = sat.sat,
+        address = "",
+        isSentToDefaultAddress = false,
+        miningFees = 0.sat,
         txId = txId.toByteVector32(),
-        claimed = Satoshi(sat),
-        closingType = info.unwrap(),
-        createdAt = createdAt
+        createdAt = createdAt,
+        confirmedAt = createdAt,
+        channelId = ByteVector32.Zeroes,
+        closingType = info.unwrap()
     )
 
     /** Wrapper for the closing info data object. */
@@ -46,18 +45,8 @@ data class LightningOutgoingClosingTxPartWrapper(
         @ByteString
         val blob: ByteArray
     ) {
-        companion object {
-            // constructor
-            operator fun invoke(txPart: LightningOutgoingPayment.ClosingTxPart): ClosingInfoWrapper {
-                val (type, blob) = txPart.mapClosingTypeToDb()
-                return ClosingInfoWrapper(
-                    type = type.name,
-                    blob = blob
-                )
-            }
-        }
 
-        fun unwrap(): ChannelClosingType {
+        fun unwrap(): ChannelCloseOutgoingPayment.ChannelClosingType {
             return OutgoingPartClosingInfoData.deserialize(
                 typeVersion = OutgoingPartClosingInfoTypeVersion.valueOf(type),
                 blob = blob
@@ -75,7 +64,7 @@ data class LightningOutgoingPartWrapper(
     val status: StatusWrapper?,
     val createdAt: Long
 ) {
-    constructor(part: LightningOutgoingPayment.LightningPart) : this(
+    constructor(part: LightningOutgoingPayment.Part) : this(
         id = part.id,
         msat = part.amount.msat,
         route = OutgoingQueries.hopDescAdapter.encode(part.route),
@@ -83,11 +72,11 @@ data class LightningOutgoingPartWrapper(
         createdAt = part.createdAt
     )
 
-    fun unwrap() = LightningOutgoingPayment.LightningPart(
+    fun unwrap() = LightningOutgoingPayment.Part(
         id = id,
         amount = MilliSatoshi(msat = msat),
         route = OutgoingQueries.hopDescAdapter.decode(route),
-        status = status?.unwrap() ?: LightningOutgoingPayment.LightningPart.Status.Pending,
+        status = status?.unwrap() ?: LightningOutgoingPayment.Part.Status.Pending,
         createdAt = createdAt
     )
 
@@ -101,10 +90,10 @@ data class LightningOutgoingPartWrapper(
     ) {
         companion object {
             // constructor
-            operator fun invoke(status: LightningOutgoingPayment.LightningPart.Status): StatusWrapper? {
+            operator fun invoke(status: LightningOutgoingPayment.Part.Status): StatusWrapper? {
                 return when (status) {
-                    is LightningOutgoingPayment.LightningPart.Status.Pending -> null
-                    is LightningOutgoingPayment.LightningPart.Status.Failed -> {
+                    is LightningOutgoingPayment.Part.Status.Pending -> null
+                    is LightningOutgoingPayment.Part.Status.Failed -> {
                         val (type, blob) = status.mapToDb()
                         StatusWrapper(
                             ts = status.completedAt,
@@ -112,7 +101,7 @@ data class LightningOutgoingPartWrapper(
                             blob = blob
                         )
                     }
-                    is LightningOutgoingPayment.LightningPart.Status.Succeeded -> {
+                    is LightningOutgoingPayment.Part.Status.Succeeded -> {
                         val (type, blob) = status.mapToDb()
                         StatusWrapper(
                             ts = status.completedAt,
@@ -124,7 +113,7 @@ data class LightningOutgoingPartWrapper(
             }
         } // </companion object>
 
-        fun unwrap(): LightningOutgoingPayment.LightningPart.Status {
+        fun unwrap(): LightningOutgoingPayment.Part.Status {
             return OutgoingPartStatusData.deserialize(
                 typeVersion = OutgoingPartStatusTypeVersion.valueOf(type),
                 blob = blob,

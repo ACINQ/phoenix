@@ -15,6 +15,9 @@ INSERT INTO splice_outgoing_payments (
     id, amount_sat, address, mining_fees_sat, tx_id, created_at, confirmed_at
 ) VALUES (?, ?, ?, ?, ?, ?, ?);
 
+setConfirmed:
+UPDATE splice_outgoing_payments SET confirmed_at=? WHERE id=?;
+
 getSpliceOutgoing:
 SELECT id, amount_sat, address, mining_fees_sat, tx_id, created_at, confirmed_at
 FROM splice_outgoing_payments

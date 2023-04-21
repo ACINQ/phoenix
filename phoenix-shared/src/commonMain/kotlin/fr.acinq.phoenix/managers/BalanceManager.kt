@@ -175,8 +175,7 @@ class BalanceManager(
         databaseManager.paymentsDb().listIncomingPaymentsNotYetConfirmed().collect { payments ->
             _unconfirmedChannelPayments.value = payments.filter {
                 it.received?.receivedWith?.any { part ->
-                    (part is IncomingPayment.ReceivedWith.NewChannel && part.status == PaymentsDb.ConfirmationStatus.NOT_LOCKED)
-                            || (part is IncomingPayment.ReceivedWith.SpliceIn && part.status == PaymentsDb.ConfirmationStatus.NOT_LOCKED)
+                    part is IncomingPayment.ReceivedWith.OnChainIncomingPayment && part.confirmedAt == null
                 } ?: false
             }.map { it.amount }.sum()
         }

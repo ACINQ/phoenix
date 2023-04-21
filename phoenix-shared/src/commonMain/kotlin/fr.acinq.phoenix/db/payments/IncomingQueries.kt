@@ -22,7 +22,6 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.PaymentsDb
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.*
@@ -31,24 +30,6 @@ import kotlinx.coroutines.flow.Flow
 class IncomingQueries(private val database: PaymentsDatabase) {
 
     private val queries = database.incomingPaymentsQueries
-
-    /**
-     * @return The paymentHash (= SHA256(preimage))
-     */
-    fun addIncomingPayment(
-        preimage: ByteVector32,
-        origin: IncomingPayment.Origin,
-        createdAt: Long
-    ): ByteVector32 {
-        val paymentHash = Crypto.sha256(preimage).toByteVector32()
-        addIncomingPayment(
-            preimage = preimage,
-            paymentHash = paymentHash,
-            origin = origin,
-            createdAt = createdAt
-        )
-        return paymentHash
-    }
 
     fun addIncomingPayment(
         preimage: ByteVector32,
@@ -68,7 +49,7 @@ class IncomingQueries(private val database: PaymentsDatabase) {
 
     fun receivePayment(
         paymentHash: ByteVector32,
-        receivedWith: Set<IncomingPayment.ReceivedWith>,
+        receivedWith: List<IncomingPayment.ReceivedWith>,
         receivedAt: Long
     ) {
         database.transaction {
@@ -89,41 +70,19 @@ class IncomingQueries(private val database: PaymentsDatabase) {
         }
     }
 
-    /** Associates the relevant received-with txid with their payment hash, for indexing. Useful for [updateConfirmationStatus] */
-    fun linkTxIdPaymentHash(paymentHash: ByteVector32, receivedWith: Set<IncomingPayment.ReceivedWith>) {
-        receivedWith.forEach { part ->
-            when (part) {
-                is IncomingPayment.ReceivedWith.NewChannel -> {
-                    queries.insertTxIdPaymentHash(tx_id = part.txId.toByteArray(), payment_hash = paymentHash.toByteArray())
-                }
-                is IncomingPayment.ReceivedWith.SpliceIn -> {
-                    queries.insertTxIdPaymentHash(tx_id = part.txId.toByteArray(), payment_hash = paymentHash.toByteArray())
-                }
-                is IncomingPayment.ReceivedWith.LightningPayment -> Unit
-            }
-        }
-    }
-
-    fun listPaymentHashForTxId(txId: ByteVector32): Set<ByteVector32> {
-        return queries.listPaymentHashForTxId(tx_id = txId.toByteArray(), mapper = ::mapTxIdPaymentHash)
-            .executeAsList()
-            .map { it.second }
-            .toSet()
-    }
-
-    fun updateConfirmationStatus(paymentHash: ByteVector32, status: PaymentsDb.ConfirmationStatus) {
+    fun setConfirmed(paymentHash: ByteVector32, confirmedAt: Long) {
         val paymentInDb = queries.get(
             payment_hash = paymentHash.toByteArray(),
             mapper = ::mapIncomingPayment
         ).executeAsOneOrNull() ?: throw IncomingPaymentNotFound(paymentHash)
         val newReceivedWith = paymentInDb.received?.receivedWith?.map {
             when (it) {
-                is IncomingPayment.ReceivedWith.NewChannel -> it.copy(status = status)
-                is IncomingPayment.ReceivedWith.SpliceIn -> it.copy(status = status)
+                is IncomingPayment.ReceivedWith.NewChannel -> it.copy(confirmedAt = confirmedAt)
+                is IncomingPayment.ReceivedWith.SpliceIn -> it.copy(confirmedAt = confirmedAt)
                 else -> it
             }
-        }?.toSet() ?: emptySet()
-        val (newReceivedWithType, newReceivedWithBlob) = newReceivedWith.mapToDb() ?: (null to null)
+        }
+        val (newReceivedWithType, newReceivedWithBlob) = newReceivedWith?.mapToDb() ?: (null to null)
         queries.updateReceived(
             received_at = paymentInDb.received?.receivedAt,
             received_with_type = newReceivedWithType,
@@ -136,7 +95,7 @@ class IncomingQueries(private val database: PaymentsDatabase) {
     fun addAndReceivePayment(
         preimage: ByteVector32,
         origin: IncomingPayment.Origin,
-        receivedWith: Set<IncomingPayment.ReceivedWith>,
+        receivedWith: List<IncomingPayment.ReceivedWith>,
         createdAt: Long,
         receivedAt: Long
     ) {
@@ -166,9 +125,8 @@ class IncomingQueries(private val database: PaymentsDatabase) {
         return queries.getOldestReceivedDate().executeAsOneOrNull()
     }
 
-    fun listIncomingPaymentsNotYetConfirmed(): Flow<List<IncomingPayment>> {
-        // FIXME: this query actually fetches all payments linked to a tx, including those confirmed
-        return queries.listAllIncomingPaymentsNotConfirmed(::mapIncomingPayment).asFlow().mapToList()
+    fun listAllNotConfirmed(): Flow<List<IncomingPayment>> {
+        return queries.listAllNotConfirmed(::mapIncomingPayment).asFlow().mapToList()
     }
 
     fun listExpiredPayments(fromCreatedAt: Long, toCreatedAt: Long): List<IncomingPayment> {
@@ -222,7 +180,7 @@ class IncomingQueries(private val database: PaymentsDatabase) {
                 }
                 received_at != null -> {
                     IncomingPayment.Received(
-                        receivedWith = emptySet(),
+                        receivedWith = emptyList(),
                         receivedAt = received_at
                     )
                 }

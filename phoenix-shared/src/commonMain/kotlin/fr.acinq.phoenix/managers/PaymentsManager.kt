@@ -148,33 +148,16 @@ class PaymentsManager(
         options: WalletPaymentFetchOptions
     ): WalletPaymentInfo? {
         return when (id) {
-            is WalletPaymentId.IncomingPaymentId -> {
-                paymentsDb().getIncomingPayment(id.paymentHash, options)?.let {
-                    WalletPaymentInfo(
-                        payment = it.first,
-                        metadata = it.second ?: WalletPaymentMetadata(),
-                        fetchOptions = options
-                    )
-                }
-            }
-            is WalletPaymentId.OutgoingPaymentId -> {
-                paymentsDb().getLightningOutgoingPayment(id.id, options)?.let {
-                    WalletPaymentInfo(
-                        payment = it.first,
-                        metadata = it.second ?: WalletPaymentMetadata(),
-                        fetchOptions = options
-                    )
-                }
-            }
-            is WalletPaymentId.SpliceOutgoingPaymentId -> {
-                paymentsDb().getSpliceOutgoingPayment(id.id, options)?.let {
-                    WalletPaymentInfo(
-                        payment = it.first,
-                        metadata = it.second ?: WalletPaymentMetadata(),
-                        fetchOptions = options
-                    )
-                }
-            }
+            is WalletPaymentId.IncomingPaymentId -> paymentsDb().getIncomingPayment(id.paymentHash, options)
+            is WalletPaymentId.OutgoingPaymentId -> paymentsDb().getLightningOutgoingPayment(id.id, options)
+            is WalletPaymentId.SpliceOutgoingPaymentId -> paymentsDb().getSpliceOutgoingPayment(id.id, options)
+            is WalletPaymentId.ChannelCloseOutgoingPaymentId -> paymentsDb().getChannelCloseOutgoingPayment(id.id, options)
+        }?.let {
+            WalletPaymentInfo(
+                payment = it.first,
+                metadata = it.second ?: WalletPaymentMetadata(),
+                fetchOptions = options
+            )
         }
     }
 }

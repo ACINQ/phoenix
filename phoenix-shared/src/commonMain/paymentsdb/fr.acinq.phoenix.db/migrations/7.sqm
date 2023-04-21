@@ -1,7 +1,10 @@
+import fr.acinq.phoenix.db.payments.OutgoingPartClosingInfoTypeVersion;
+
 -- Migration: v7 -> v8
 --
 -- Changes:
 -- * add a new splice_outgoing_payments table to store outgoing splices
+-- * add a new channel_close_outgoing_payments table to store channel closings
 
 CREATE TABLE IF NOT EXISTS splice_outgoing_payments (
     id TEXT NOT NULL PRIMARY KEY,
@@ -12,3 +15,27 @@ CREATE TABLE IF NOT EXISTS splice_outgoing_payments (
     created_at INTEGER NOT NULL,
     confirmed_at INTEGER DEFAULT NULL
 );
+
+CREATE TABLE IF NOT EXISTS channel_close_outgoing_payments (
+    id TEXT NOT NULL PRIMARY KEY,
+    amount_sat INTEGER NOT NULL,
+    address TEXT NOT NULL,
+    is_default_address INTEGER NOT NULL,
+    mining_fees_sat INTEGER NOT NULL,
+    tx_id BLOB NOT NULL,
+    created_at INTEGER NOT NULL,
+    confirmed_at INTEGER DEFAULT NULL,
+    channel_id BLOB NOT NULL,
+    closing_info_type TEXT AS OutgoingPartClosingInfoTypeVersion NOT NULL,
+    closing_info_blob BLOB NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS link_tx_to_payments (
+    tx_id BLOB NOT NULL,
+    type INTEGER NOT NULL,
+    id TEXT NOT NULL,
+    confirmed_at INTEGER DEFAULT NULL,
+    PRIMARY KEY (tx_id, type, id)
+);
+
+CREATE INDEX IF NOT EXISTS link_tx_to_payments_txid ON link_tx_to_payments(tx_id);

@@ -20,6 +20,7 @@ import com.squareup.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.CltvExpiry
 import fr.acinq.lightning.channel.ChannelStateWithCommitments
+import fr.acinq.lightning.channel.PersistedChannelState
 import fr.acinq.lightning.db.ChannelsDb
 import fr.acinq.lightning.serialization.Serialization
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +31,7 @@ internal class SqliteChannelsDb(private val driver: SqlDriver) : ChannelsDb {
     private val database = ChannelsDatabase(driver)
     private val queries = database.channelsDatabaseQueries
 
-    override suspend fun addOrUpdateChannel(state: ChannelStateWithCommitments) {
+    override suspend fun addOrUpdateChannel(state: PersistedChannelState) {
         val channelId = state.channelId.toByteArray()
         val data = Serialization.serialize(state)
         withContext(Dispatchers.Default) {
@@ -51,7 +52,7 @@ internal class SqliteChannelsDb(private val driver: SqlDriver) : ChannelsDb {
         }
     }
 
-    override suspend fun listLocalChannels(): List<ChannelStateWithCommitments> {
+    override suspend fun listLocalChannels(): List<PersistedChannelState> {
         val bytes = withContext(Dispatchers.Default) {
             queries.listLocalChannels().executeAsList()
         }

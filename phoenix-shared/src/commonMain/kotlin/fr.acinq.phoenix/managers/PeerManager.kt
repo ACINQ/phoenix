@@ -56,7 +56,7 @@ class PeerManager(
 
             var initTlvs = TlvStream.empty<InitTlv>()
             if (startupParams.requestCheckLegacyChannels) {
-                val legacyKey = nodeParams.keyManager.legacyNodeKey
+                val legacyKey = nodeParams.keyManager.nodeKeys.legacyNodeKey
                 val signature = Crypto.sign(
                     data = Crypto.sha256(legacyKey.publicKey.toUncompressedBin()),
                     privateKey = legacyKey.privateKey

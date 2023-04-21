@@ -33,14 +33,13 @@ fun WalletPayment.id(): String = when (this) {
 }
 
 fun WalletPayment.state(): WalletPaymentState = when (this) {
-    is SpliceOutgoingPayment -> when (confirmedAt) {
+    is OnChainOutgoingPayment -> when (confirmedAt) {
         null -> WalletPaymentState.Pending
         else -> WalletPaymentState.Success
     }
     is LightningOutgoingPayment -> when (status) {
         is LightningOutgoingPayment.Status.Pending -> WalletPaymentState.Pending
         is LightningOutgoingPayment.Status.Completed.Failed -> WalletPaymentState.Failure
-        is LightningOutgoingPayment.Status.Completed.Succeeded.OnChain -> WalletPaymentState.Success
         is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> WalletPaymentState.Success
     }
     is IncomingPayment -> when (completedAt) {
@@ -50,13 +49,13 @@ fun WalletPayment.state(): WalletPaymentState = when (this) {
 }
 
 fun WalletPayment.paymentHashString(): String = when (this) {
-    is SpliceOutgoingPayment -> throw NotImplementedError("no payment hash for splice-out")
+    is OnChainOutgoingPayment -> throw NotImplementedError("no payment hash for on-chain outgoing")
     is LightningOutgoingPayment -> paymentHash.toString()
     is IncomingPayment -> paymentHash.toString()
 }
 
 fun WalletPayment.errorMessage(): String? = when (this) {
-    is SpliceOutgoingPayment -> null
+    is OnChainOutgoingPayment -> null
     is LightningOutgoingPayment -> when (val s = status) {
         is LightningOutgoingPayment.Status.Completed.Failed -> s.reason.toString()
         else -> null

@@ -51,10 +51,20 @@ sealed class WalletPaymentId {
         }
     }
 
+    data class ChannelCloseOutgoingPaymentId(val id: UUID): WalletPaymentId() {
+        override val dbType: DbType = DbType.CHANNEL_CLOSE_OUTGOING
+        override val dbId: String = id.toString()
+        override val identifier: String = "channel_close_outgoing|$dbId"
+        companion object {
+            fun fromString(id: String) = ChannelCloseOutgoingPaymentId(id = UUID.fromString(id))
+        }
+    }
+
     enum class DbType(val value: Long) {
         INCOMING(1),
         OUTGOING(2),
-        SPLICE_OUTGOING(3)
+        SPLICE_OUTGOING(3),
+        CHANNEL_CLOSE_OUTGOING(4),
     }
 
     companion object {
@@ -63,6 +73,7 @@ sealed class WalletPaymentId {
                 DbType.INCOMING.value -> IncomingPaymentId.fromString(id)
                 DbType.OUTGOING.value -> OutgoingPaymentId.fromString(id)
                 DbType.SPLICE_OUTGOING.value -> SpliceOutgoingPaymentId.fromString(id)
+                DbType.CHANNEL_CLOSE_OUTGOING.value -> ChannelCloseOutgoingPaymentId.fromString(id)
                 else -> null
             }
         }
@@ -73,6 +84,7 @@ fun WalletPayment.walletPaymentId(): WalletPaymentId = when (this) {
     is IncomingPayment -> WalletPaymentId.IncomingPaymentId(paymentHash = this.paymentHash)
     is LightningOutgoingPayment -> WalletPaymentId.OutgoingPaymentId(id = this.id)
     is SpliceOutgoingPayment -> WalletPaymentId.SpliceOutgoingPaymentId(id = this.id)
+    is ChannelCloseOutgoingPayment -> WalletPaymentId.ChannelCloseOutgoingPaymentId(id = this.id)
 }
 
 /**

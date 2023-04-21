@@ -18,6 +18,8 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.*
 import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.crypto.I
+import fr.acinq.lightning.crypto.KeyManager
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.io.Peer
 import kotlinx.coroutines.CoroutineScope
@@ -44,11 +46,11 @@ class WalletManager(
 
     /** Loads a seed and creates the key manager. Returns an objet containing some keys for the iOS app. */
     fun loadWallet(seed: ByteArray): WalletInfo {
-        val km = keyManager.value ?: LocalKeyManager(seed.byteVector(), chain.chainHash).also {
+        val km = keyManager.value ?: LocalKeyManager(seed.byteVector(), chain).also {
             _localKeyManager.value = it
         }
         return WalletInfo(
-            nodeId = km.nodeId,
+            nodeId = km.nodeKeys.nodeKey.publicKey,
             nodeIdHash = km.nodeIdHash(),
             cloudKey = km.cloudKey(),
             cloudKeyHash = km.cloudKeyHash()
@@ -81,22 +83,22 @@ class WalletManager(
     )
 }
 
-fun LocalKeyManager.nodeIdHash(): String = this.nodeId.hash160().byteVector().toHex()
+fun LocalKeyManager.nodeIdHash(): String = this.nodeKeys.nodeKey.publicKey.hash160().byteVector().toHex()
 
 /** Key used to encrypt/decrypt blobs we store in the cloud. */
 fun LocalKeyManager.cloudKey(): ByteVector32 {
     val path = KeyPath(if (isMainnet()) "m/51'/0'/0'/0" else "m/51'/1'/0'/0")
-    return privateKey(path).privateKey.value
+    return derivePrivateKey(path).privateKey.value
 }
 
 fun LocalKeyManager.cloudKeyHash(): String {
     return Crypto.hash160(cloudKey()).byteVector().toHex()
 }
 
-fun LocalKeyManager.isMainnet() = chainHash == NodeParams.Chain.Mainnet.chainHash
+fun LocalKeyManager.isMainnet() = chain == NodeParams.Chain.Mainnet
 
-fun LocalKeyManager.finalWalletPath(): String = KeyPath(LocalKeyManager.bip84BasePath(chainHash) + DeterministicWallet.hardened(Peer.finalWalletAccount)).toString()
-fun LocalKeyManager.finalWalletXpub(): String = bip84Xpub(Peer.finalWalletAccount)
+val LocalKeyManager.finalOnChainWalletPath: String
+    get() = (KeyManager.Bip84OnChainKeys.bip84BasePath(chain) I finalOnChainWallet.account).toString()
 
-fun LocalKeyManager.swapInWalletPath(): String = KeyPath(LocalKeyManager.bip84BasePath(chainHash) + DeterministicWallet.hardened(Peer.swapInWalletAccount)).toString()
-fun LocalKeyManager.swapInWalletXpub(): String = bip84Xpub(Peer.swapInWalletAccount)
+val LocalKeyManager.swapInOnChainWalletPath: String
+    get() = (KeyManager.Bip84OnChainKeys.bip84BasePath(chain) I swapInOnChainWallet.account).toString()

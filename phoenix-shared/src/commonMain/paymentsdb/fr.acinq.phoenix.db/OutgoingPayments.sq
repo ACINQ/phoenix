@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS outgoing_payment_parts (
     FOREIGN KEY(part_parent_id) REFERENCES outgoing_payments(id)
 );
 
+-- !! This table is legacy, and will only contain old payments. See ChannelCloseOutgoingPayment.sq for the new table.
 -- Stores the transactions that close a channel
 CREATE TABLE IF NOT EXISTS outgoing_payment_closing_tx_parts (
     part_id TEXT NOT NULL PRIMARY KEY,
