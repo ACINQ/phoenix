@@ -2,10 +2,7 @@ package fr.acinq.phoenix.db
 
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.db.SpliceOutgoingPayment
-import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentId
@@ -159,7 +156,7 @@ class CloudKitDb(
                 } // </incoming_payments>
 
                 uniquePaymentIds.filterIsInstance<WalletPaymentId.OutgoingPaymentId>().forEach { paymentId ->
-                    outQueries.getPayment(
+                    outQueries.getPaymentRelaxed(
                         id = paymentId.id
                     )?.let { payment ->
                         rowMap[paymentId] = WalletPaymentInfo(
@@ -329,7 +326,8 @@ class CloudKitDb(
         // or otherwise process it outside of the `withContext` below.
         val incomingList = downloadedPayments.mapNotNull { it as? IncomingPayment }
         val outgoingList = downloadedPayments.mapNotNull { it as? LightningOutgoingPayment }
-        val spliceOutgoingList = downloadedPayments.mapNotNull { it as? SpliceOutgoingPayment }
+        val spliceOutList = downloadedPayments.filterIsInstance<SpliceOutgoingPayment>()
+        val channelCloseList = downloadedPayments.filterIsInstance<ChannelCloseOutgoingPayment>()
 
         // We are seeing crashes when accessing the ByteArray values in updateMetadata.
         // So we need a workaround.
@@ -398,7 +396,7 @@ class CloudKitDb(
 
                     for (part in outgoingPayment.parts) {
                         when {
-                            part is LightningOutgoingPayment.LightningPart && outQueries.countLightningPart(part_id = part.id.toString()).executeAsOne() == 0L -> {
+                            outQueries.countLightningPart(part_id = part.id.toString()).executeAsOne() == 0L -> {
                                 outQueries.insertLightningPart(
                                     part_id = part.id.toString(),
                                     part_parent_id = outgoingPayment.id.toString(),
@@ -407,8 +405,8 @@ class CloudKitDb(
                                     part_created_at = part.createdAt
                                 )
                                 val statusInfo = when (val status = part.status) {
-                                    is LightningOutgoingPayment.LightningPart.Status.Failed -> status.completedAt to status.mapToDb()
-                                    is LightningOutgoingPayment.LightningPart.Status.Succeeded -> status.completedAt to status.mapToDb()
+                                    is LightningOutgoingPayment.Part.Status.Failed -> status.completedAt to status.mapToDb()
+                                    is LightningOutgoingPayment.Part.Status.Succeeded -> status.completedAt to status.mapToDb()
                                     else -> null
                                 }
                                 if (statusInfo != null) {
@@ -421,18 +419,6 @@ class CloudKitDb(
                                         part_completed_at = completedAt
                                     )
                                 }
-                            }
-                            part is LightningOutgoingPayment.ClosingTxPart && outQueries.countClosingTxPart(part_id = part.id.toString()).executeAsOne() == 0L -> {
-                                val (closingInfoType, closingInfoBlob) = part.mapClosingTypeToDb()
-                                outQueries.insertClosingTxPart(
-                                    id = part.id.toString(),
-                                    parent_id = outgoingPayment.id.toString(),
-                                    tx_id = part.txId.toByteArray(),
-                                    amount_msat = part.claimed.sat,
-                                    closing_info_type = closingInfoType,
-                                    closing_info_blob = closingInfoBlob,
-                                    created_at = part.createdAt
-                                )
                             }
                         }
                     }
@@ -451,8 +437,12 @@ class CloudKitDb(
                     }
                 } // </outgoing_payments table>
 
-                spliceOutgoingList.forEach {
+                spliceOutList.forEach {
                     TODO("handle splice outs")
+                }
+
+                channelCloseList.forEach {
+                    TODO("handle closing")
                 }
 
                 downloadedPaymentsMetadata.forEach { (paymentId, row) ->
