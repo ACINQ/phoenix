@@ -25,10 +25,7 @@ import fr.acinq.bitcoin.byteVector32
 import fr.acinq.eclair.db.sqlite.SqlitePaymentsDb
 import fr.acinq.lightning.Features
 import fr.acinq.lightning.ShortChannelId
-import fr.acinq.lightning.db.ChannelClosingType
-import fr.acinq.lightning.db.HopDesc
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.UUID
@@ -111,7 +108,7 @@ class LegacyMigrationHelperTest {
                 recipient = PublicKey.fromHex("020ec0c6a0c4fe5d8a79928ead294c36234a76f6e0dca896c35413612a3fd8dbf8"),
                 details = OutgoingPayment.Details.Normal(PaymentRequest.read("lntb10n1p3tnfjkpp5rrmp00akdvl35nnhh4gqfp5rhuaa0kryhkz0ky5z78u82c2p2tlqdqqcqzpgxqyz5vqsp5xmvvr6sfrxs5vjpqgxq5p7aznd2eusxmgcj9hag8d06lxmdwxe8s9qyyssqttpwlngy7qaj7jg0xa2uae2gcm9zp9g5ly3yp6gxyh0zlrw2pun4tlsw2mfjwt0vsjwhtmvvn6tl0u9fg5jfle0jvxtd59h82kfff4qqefnasg")),
                 parts = listOf(
-                    OutgoingPayment.LightningPart(
+                    LightningOutgoingPayment.Part(
                         id = UUID.fromString("91018192-5eeb-4e23-a494-8579009a6117"),
                         amount = 2000.msat,
                         route = listOf(
@@ -125,7 +122,7 @@ class LegacyMigrationHelperTest {
                                 nextNodeId = PublicKey.fromHex("020ec0c6a0c4fe5d8a79928ead294c36234a76f6e0dca896c35413612a3fd8dbf8"),
                             )
                         ),
-                        status = OutgoingPayment.LightningPart.Status.Succeeded(
+                        status = LightningOutgoingPayment.Part.Status.Succeeded(
                             preimage = ByteVector32.fromValidHex("47a406e1c82bb11d70e62da0a25252fdd3ed1ebf5232581009cbce7fd8da1648"),
                             completedAt = 1656336182723
                         ),

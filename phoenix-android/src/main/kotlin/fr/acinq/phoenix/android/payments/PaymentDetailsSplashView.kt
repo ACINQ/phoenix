@@ -106,20 +106,12 @@ private fun PaymentStatus(
     val peerManager = business.peerManager
     when (payment) {
         is LightningOutgoingPayment -> when (payment.status) {
-            is LightningOutgoingPayment.Status.Pending -> when {
-                payment.details is LightningOutgoingPayment.Details.ChannelClosing -> PaymentStatusIcon(
-                    message = stringResource(id = R.string.paymentdetails_status_sent_confirming),
-                    imageResId = R.drawable.ic_clock,
-                    isAnimated = false,
-                    color = mutedTextColor
-                )
-                else -> PaymentStatusIcon(
-                    message = stringResource(id = R.string.paymentdetails_status_sent_pending),
-                    imageResId = R.drawable.ic_payment_details_pending_static,
-                    isAnimated = false,
-                    color = mutedTextColor
-                )
-            }
+            is LightningOutgoingPayment.Status.Pending -> PaymentStatusIcon(
+                message = stringResource(id = R.string.paymentdetails_status_sent_pending),
+                imageResId = R.drawable.ic_payment_details_pending_static,
+                isAnimated = false,
+                color = mutedTextColor
+            )
             is LightningOutgoingPayment.Status.Completed.Failed -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_failed),
                 imageResId = R.drawable.ic_payment_details_failure_static,
@@ -134,6 +126,21 @@ private fun PaymentStatus(
                 details = payment.completedAt?.toAbsoluteDateTimeString()
             )
         }
+        is ChannelCloseOutgoingPayment -> when (payment.confirmedAt) {
+            null -> PaymentStatusIcon(
+                message = stringResource(id = R.string.paymentdetails_status_channelclose_confirming),
+                imageResId = R.drawable.ic_payment_details_pending_static,
+                isAnimated = false,
+                color = mutedTextColor,
+            )
+            else -> PaymentStatusIcon(
+                message = stringResource(id = R.string.paymentdetails_status_channelclose_confirmed),
+                imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
+                isAnimated = fromEvent,
+                color = positiveColor,
+                details = payment.completedAt?.toAbsoluteDateTimeString()
+            )
+        }
         is SpliceOutgoingPayment -> when (payment.confirmedAt) {
             null -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_splice_pending),
@@ -142,7 +149,7 @@ private fun PaymentStatus(
                 color = mutedTextColor,
             )
             else -> PaymentStatusIcon(
-                message = stringResource(id = R.string.paymentdetails_status_splice_sent),
+                message = stringResource(id = R.string.paymentdetails_status_splice_confirmed),
                 imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
                 isAnimated = fromEvent,
                 color = positiveColor,
@@ -156,25 +163,7 @@ private fun PaymentStatus(
                 isAnimated = false,
                 color = mutedTextColor
             )
-            payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().any { it.status == PaymentsDb.ConfirmationStatus.NOT_LOCKED } -> {
-                val nodeParams = business.nodeParamsManager.nodeParams.value
-                val channelMinDepth by produceState<Int?>(initialValue = null, key1 = Unit) {
-                    nodeParams?.let { params ->
-                        val channelId = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>()?.firstOrNull()?.channelId
-                        channelId?.let { peerManager.getChannelWithCommitments(it)?.minDepthForFunding(params) }
-                    }
-                }
-                PaymentStatusIcon(
-                    message = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
-                    isAnimated = false,
-                    imageResId = R.drawable.ic_clock,
-                    color = mutedTextColor,
-                    details = channelMinDepth?.let { minDepth ->
-                        stringResource(id = R.string.paymentdetails_status_received_unconfirmed_details, minDepth, 10 * minDepth)
-                    }
-                )
-            }
-            payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.SpliceIn>().any { it.status == PaymentsDb.ConfirmationStatus.NOT_LOCKED } -> {
+            payment.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>().any { it.confirmedAt == null } -> {
                 val nodeParams = business.nodeParamsManager.nodeParams.value
                 val channelMinDepth by produceState<Int?>(initialValue = null, key1 = Unit) {
                     nodeParams?.let { params ->
@@ -313,14 +302,13 @@ private fun PaymentDestinationView(payment: WalletPayment) {
                 Text(
                     text = when (val details = payment.details) {
                         is LightningOutgoingPayment.Details.Normal -> details.paymentRequest.nodeId.toString()
-                        is LightningOutgoingPayment.Details.ChannelClosing -> details.closingAddress
                         is LightningOutgoingPayment.Details.KeySend -> "Keysend"
                         is LightningOutgoingPayment.Details.SwapOut -> details.address
                     }
                 )
             }
         }
-        is SpliceOutgoingPayment -> {
+        is OnChainOutgoingPayment -> {
             Spacer(modifier = Modifier.height(8.dp))
             SplashLabelRow(label = stringResource(id = R.string.paymentdetails_destination_label)) {
                 Text(text = payment.address)

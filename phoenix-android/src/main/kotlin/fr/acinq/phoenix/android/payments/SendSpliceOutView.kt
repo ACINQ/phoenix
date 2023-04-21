@@ -68,7 +68,7 @@ private sealed class SpliceOutState {
         abstract val userAmount: Satoshi
         abstract val feeratePerByte: Satoshi
         abstract val result: Command.Splice.Response
-        data class Success(override val userAmount: Satoshi, override val feeratePerByte: Satoshi, override val result: Command.Splice.Response.Success): Complete()
+        data class Success(override val userAmount: Satoshi, override val feeratePerByte: Satoshi, override val result: Command.Splice.Response.Created): Complete()
         data class Failure(override val userAmount: Satoshi, override val feeratePerByte: Satoshi, override val result: Command.Splice.Response.Failure): Complete()
     }
     sealed class Error: SpliceOutState() {
@@ -113,7 +113,7 @@ private class SpliceOutViewModel(private val peerManager: PeerManager, private v
                     feeratePerKw = FeeratePerKw(FeeratePerByte(feeratePerByte))
                 )
                 when (response) {
-                    is Command.Splice.Response.Success -> {
+                    is Command.Splice.Response.Created -> {
                         state = SpliceOutState.Complete.Success(amount, feeratePerByte, response)
                     }
                     is Command.Splice.Response.Failure -> {

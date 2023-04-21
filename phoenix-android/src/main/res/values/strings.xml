@@ -370,9 +370,10 @@
     <string name="paymentdetails_error">There was an error when retrieving the details for this payment:\n\nCause:%1$s</string>
 
     <string name="paymentdetails_status_splice_pending">Splice is confirming…</string>
-    <string name="paymentdetails_status_splice_sent">Splice sent</string>
+    <string name="paymentdetails_status_splice_confirmed">Splice sent</string>
+    <string name="paymentdetails_status_channelclose_confirming">Channel closing is confirming…</string>
+    <string name="paymentdetails_status_channelclose_confirmed">Channel closing complete</string>
     <string name="paymentdetails_status_sent_successful">Sent</string>
-    <string name="paymentdetails_status_sent_confirming">Closing is confirming…</string>
     <string name="paymentdetails_status_sent_pending">Pending…</string>
     <string name="paymentdetails_status_sent_failed">Failed. No money has been sent.</string>
 
@@ -413,22 +414,30 @@
     <!-- //////////////// payment details: technicals data //////////////// -->
 
     <string name="paymentdetails_payment_type_label">Type of payment</string>
+    <string name="paymentdetails_closing">Channel closing payment</string>
     <string name="paymentdetails_splice_outgoing">Outgoing splice payment</string>
     <string name="paymentdetails_normal_outgoing">Standard outgoing Lightning payment</string>
     <string name="paymentdetails_normal_incoming">Standard incoming Lightning payment</string>
     <string name="paymentdetails_swapin">Swap-in Bitcoin deposit</string>
     <string name="paymentdetails_swapout">Swap-out to Bitcoin address</string>
-    <string name="paymentdetails_closing">Closing channel</string>
     <string name="paymentdetails_keysend">Keysend (spontaneous payment)</string>
     <string name="paymentdetails_swapin_address_label">Deposit address</string>
     <string name="paymentdetails_swapout_address_label">Bitcoin address</string>
-    <string name="paymentdetails_splice_out_address_label">Splice-out address</string>
-    <string name="paymentdetails_splice_out_tx_id_label">Splice-out tx</string>
+
+    <string name="paymentdetails_splice_out_address_label">Splice address</string>
+    <string name="paymentdetails_splice_out_tx_label">Splice transaction</string>
     <string name="paymentdetails_dualswapin_tx_label">Transactions</string>
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
-    <string name="paymentdetails_closing_channel_label">Id of the channel</string>
+    <string name="paymentdetails_closing_channel_label">Id of channel closing</string>
     <string name="paymentdetails_closing_address_label">Closing address</string>
+    <string name="paymentdetails_closing_tx_label">Closing transaction</string>
+    <string name="paymentdetails_closing_type_label">Closing type</string>
+    <string name="paymentdetails_closing_type_mutual">Mutual</string>
+    <string name="paymentdetails_closing_type_local">Local</string>
+    <string name="paymentdetails_closing_type_remote">Remote</string>
+    <string name="paymentdetails_closing_type_revoked">Revoked</string>
+    <string name="paymentdetails_closing_type_other">Other</string>
 
     <string name="paymentdetails_pubkey_label">Target public key</string>
     <string name="paymentdetails_payment_request_description_label">Invoice description</string>
@@ -447,12 +456,6 @@
     <string name="paymentdetails_part_hops_label">Hops</string>
     <string name="paymentdetails_part_transaction_label">Transaction id</string>
     <string name="paymentdetails_part_claimed_label">Claimed</string>
-    <string name="paymentdetails_part_closing_type_label">Closing type</string>
-    <string name="paymentdetails_part_closing_type_mutual">Mutual</string>
-    <string name="paymentdetails_part_closing_type_local">Local</string>
-    <string name="paymentdetails_part_closing_type_remote">Remote</string>
-    <string name="paymentdetails_part_closing_type_revoked">Revoked</string>
-    <string name="paymentdetails_part_closing_type_other">Other</string>
 
     <string name="paymentdetails_received_with_label">Received via</string>
     <string name="paymentdetails_received_with_splicein">Splice-in (adding to existing channel)</string>

@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.channel.ClosingType
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.currentTimestampMillis
@@ -100,20 +101,13 @@ fun PaymentDetailsTechnicalView(
             }
 
             if (payment is LightningOutgoingPayment) {
-                // show successful LN parts and closing txs
-                val lightningParts = payment.parts.filterIsInstance<LightningOutgoingPayment.LightningPart>().filter { it.status is LightningOutgoingPayment.LightningPart.Status.Succeeded }
-                val closingTxsParts = payment.parts.filterIsInstance<LightningOutgoingPayment.ClosingTxPart>()
-                if (lightningParts.isNotEmpty() || closingTxsParts.isNotEmpty()) {
-                    CardHeader(text = stringResource(id = R.string.paymentdetails_parts_label, payment.parts.size))
+                val successfulParts = payment.parts.filter { it.status is LightningOutgoingPayment.Part.Status.Succeeded }
+                if (successfulParts.isNotEmpty()) {
+                    CardHeader(text = stringResource(id = R.string.paymentdetails_parts_label, successfulParts.size))
                 }
-                lightningParts.forEachIndexed { index, part ->
+                successfulParts.forEachIndexed { index, part ->
                     TechnicalCard {
                         LightningPart(index, part, rateThen)
-                    }
-                }
-                closingTxsParts.forEachIndexed { index, part ->
-                    TechnicalCard {
-                        ClosingTxPart(index, part, rateThen)
                     }
                 }
             }
@@ -129,11 +123,11 @@ private fun HeaderForOutgoing(
     TechnicalRow(label = stringResource(id = R.string.paymentdetails_payment_type_label)) {
         Text(
             when (payment) {
+                is ChannelCloseOutgoingPayment -> stringResource(id = R.string.paymentdetails_closing)
                 is SpliceOutgoingPayment -> stringResource(id = R.string.paymentdetails_splice_outgoing)
                 is LightningOutgoingPayment -> when (payment.details) {
                     is LightningOutgoingPayment.Details.Normal -> stringResource(R.string.paymentdetails_normal_outgoing)
                     is LightningOutgoingPayment.Details.SwapOut -> stringResource(R.string.paymentdetails_swapout)
-                    is LightningOutgoingPayment.Details.ChannelClosing -> stringResource(R.string.paymentdetails_closing)
                     is LightningOutgoingPayment.Details.KeySend -> stringResource(R.string.paymentdetails_keysend)
                 }
             }
@@ -145,7 +139,7 @@ private fun HeaderForOutgoing(
     TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
         Text(
             when (payment) {
-                is SpliceOutgoingPayment -> when (payment.confirmedAt) {
+                is OnChainOutgoingPayment -> when (payment.confirmedAt) {
                     null -> stringResource(R.string.paymentdetails_status_pending)
                     else -> stringResource(R.string.paymentdetails_status_success)
                 }
@@ -191,18 +185,17 @@ private fun HeaderForIncoming(
 private fun TimestampSection(
     payment: WalletPayment
 ) {
+    TechnicalRow(label = stringResource(id = R.string.paymentdetails_created_at_label)) {
+        Text(text = payment.createdAt.toAbsoluteDateTimeString())
+    }
+    // completion date when relevant
     payment.completedAt?.let {
         TechnicalRow(label = stringResource(id = R.string.paymentdetails_completed_at_label)) {
             Text(text = it.toAbsoluteDateTimeString())
         }
     }
-
-    // show time to completion for lightning outgoing payments, when relevant
-    if (payment is LightningOutgoingPayment && (payment.details is LightningOutgoingPayment.Details.Normal || payment.details is LightningOutgoingPayment.Details.ChannelClosing)) {
-        TechnicalRow(label = stringResource(id = R.string.paymentdetails_created_at_label)) {
-            Text(text = payment.createdAt.toAbsoluteDateTimeString())
-        }
-
+    // time to completion for lightning outgoing payments
+    if (payment is LightningOutgoingPayment && payment.details is LightningOutgoingPayment.Details.Normal) {
         payment.completedAt?.let {
             TechnicalRow(label = stringResource(id = R.string.paymentdetails_elapsed_label)) {
                 Text(text = stringResource(id = R.string.paymentdetails_elapsed, (it - payment.createdAt).toString()))
@@ -216,12 +209,12 @@ private fun AmountSection(
     payment: WalletPayment,
     rateThen: ExchangeRate.BitcoinPriceRate?
 ) {
-    val hideMsat = payment is LightningOutgoingPayment && payment.details is LightningOutgoingPayment.Details.ChannelClosing
+    val mSatDisplayPolicy = if (payment is OutgoingPayment) MSatDisplayPolicy.HIDE else MSatDisplayPolicy.SHOW
     TechnicalRowAmount(
         label = stringResource(id = if (payment is OutgoingPayment) R.string.paymentdetails_amount_sent_label else R.string.paymentdetails_amount_received_label),
         amount = payment.amount,
         rateThen = rateThen,
-        mSatDisplayPolicy = if (hideMsat) MSatDisplayPolicy.HIDE else MSatDisplayPolicy.SHOW
+        mSatDisplayPolicy = mSatDisplayPolicy
     )
     when (payment) {
         is OutgoingPayment -> {
@@ -229,7 +222,7 @@ private fun AmountSection(
                 label = stringResource(id = R.string.paymentdetails_fees_label),
                 amount = payment.fees,
                 rateThen = rateThen,
-                mSatDisplayPolicy = if (hideMsat) MSatDisplayPolicy.HIDE else MSatDisplayPolicy.SHOW
+                mSatDisplayPolicy = mSatDisplayPolicy
             )
         }
         is IncomingPayment -> {
@@ -277,12 +270,6 @@ private fun DetailsForLightningOutgoingPayment(
         is LightningOutgoingPayment.Details.KeySend -> {
             TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = details.paymentHash.toHex())
         }
-        is LightningOutgoingPayment.Details.ChannelClosing -> {
-            if (details.channelId != ByteVector32.Zeroes) {
-                TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_closing_channel_label), value = details.channelId.toHex())
-            }
-            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_closing_address_label), value = details.closingAddress)
-        }
     }
 
     // -- status details
@@ -300,6 +287,34 @@ private fun DetailsForLightningOutgoingPayment(
 }
 
 @Composable
+private fun DetailsForClosing(
+    payment: ChannelCloseOutgoingPayment
+) {
+    TechnicalRowSelectable(
+        label = stringResource(id = R.string.paymentdetails_closing_channel_label),
+        value = "channel id placeholder" // payment.channelId.toHex()
+    )
+    TechnicalRowSelectable(
+        label = stringResource(id = R.string.paymentdetails_closing_address_label),
+        value = payment.address
+    )
+    TechnicalRow(
+        label = stringResource(id = R.string.paymentdetails_closing_tx_label),
+        content = { TransactionLinkButton(txId = payment.txId.toHex()) }
+    )
+    TechnicalRowSelectable(
+        label = stringResource(id = R.string.paymentdetails_closing_type_label),
+        value = when (payment.closingType) {
+            ChannelCloseOutgoingPayment.ChannelClosingType.Mutual -> stringResource(id = R.string.paymentdetails_closing_type_mutual)
+            ChannelCloseOutgoingPayment.ChannelClosingType.Local -> stringResource(id = R.string.paymentdetails_closing_type_local)
+            ChannelCloseOutgoingPayment.ChannelClosingType.Remote -> stringResource(id = R.string.paymentdetails_closing_type_remote)
+            ChannelCloseOutgoingPayment.ChannelClosingType.Revoked -> stringResource(id = R.string.paymentdetails_closing_type_revoked)
+            ChannelCloseOutgoingPayment.ChannelClosingType.Other -> stringResource(id = R.string.paymentdetails_closing_type_other)
+        }
+    )
+}
+
+@Composable
 private fun DetailsForSpliceOut(
     payment: SpliceOutgoingPayment
 ) {
@@ -307,9 +322,8 @@ private fun DetailsForSpliceOut(
         label = stringResource(id = R.string.paymentdetails_splice_out_address_label),
         value = payment.address
     )
-
     TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_splice_out_tx_id_label),
+        label = stringResource(id = R.string.paymentdetails_splice_out_tx_label),
         content = { TransactionLinkButton(txId = payment.txId.toHex()) }
     )
 }
@@ -404,7 +418,7 @@ private fun ReceivedWithSpliceIn(
 @Composable
 private fun LightningPart(
     index: Int,
-    part: LightningOutgoingPayment.LightningPart,
+    part: LightningOutgoingPayment.Part,
     rateThen: ExchangeRate.BitcoinPriceRate?
 ) {
     TechnicalRow(label = stringResource(id = R.string.paymentdetails_part_label)) {
@@ -416,30 +430,6 @@ private fun LightningPart(
         }
     }
     TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_sent_label), amount = part.amount, rateThen = rateThen)
-}
-
-@Composable
-private fun ClosingTxPart(
-    index: Int,
-    part: LightningOutgoingPayment.ClosingTxPart,
-    rateThen: ExchangeRate.BitcoinPriceRate?
-) {
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_part_label)) {
-        Text("#$index")
-    }
-    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_part_transaction_label), value = part.txId.toHex())
-    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_part_claimed_label), amount = part.claimed.toMilliSatoshi(), rateThen = rateThen, mSatDisplayPolicy = MSatDisplayPolicy.HIDE)
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_part_closing_type_label)) {
-        Text(
-            when (part.closingType) {
-                ChannelClosingType.Mutual -> stringResource(R.string.paymentdetails_part_closing_type_mutual)
-                ChannelClosingType.Local -> stringResource(R.string.paymentdetails_part_closing_type_local)
-                ChannelClosingType.Remote -> stringResource(R.string.paymentdetails_part_closing_type_remote)
-                ChannelClosingType.Revoked -> stringResource(R.string.paymentdetails_part_closing_type_revoked)
-                ChannelClosingType.Other -> stringResource(R.string.paymentdetails_part_closing_type_other)
-            }
-        )
-    }
 }
 
 @Composable

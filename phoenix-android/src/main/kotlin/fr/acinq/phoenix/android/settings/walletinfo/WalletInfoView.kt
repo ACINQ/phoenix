@@ -42,10 +42,8 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.mutedTextColor
-import fr.acinq.phoenix.managers.finalWalletPath
-import fr.acinq.phoenix.managers.finalWalletXpub
-import fr.acinq.phoenix.managers.swapInWalletPath
-import fr.acinq.phoenix.managers.swapInWalletXpub
+import fr.acinq.phoenix.managers.finalOnChainWalletPath
+import fr.acinq.phoenix.managers.swapInOnChainWalletPath
 
 @Composable
 fun WalletInfoView(
@@ -97,7 +95,7 @@ private fun SwapInWalletView(onSwapInWalletClick: () -> Unit) {
         } ?: ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
         keyManager?.let {
             HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
-            XpubView(xpub = it.swapInWalletXpub(), path = it.swapInWalletPath())
+            XpubView(xpub = it.swapInOnChainWallet.xpub, path = it.swapInOnChainWalletPath)
         }
     }
 }
@@ -120,7 +118,7 @@ private fun FinalWalletView(onFinalWalletClick: () -> Unit) {
         } ?: ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
         keyManager?.let {
             HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
-            XpubView(xpub = it.finalWalletXpub(), path = it.finalWalletPath())
+            XpubView(xpub = it.finalOnChainWallet.xpub, path = it.finalOnChainWalletPath)
         }
     }
 }
