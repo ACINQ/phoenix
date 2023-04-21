@@ -250,13 +250,11 @@ class AppScanController(
         )
 
         peer.send(
-            SendPaymentNormal(
+            SendPayment(
                 paymentId = paymentId,
                 amount = amountToSend,
                 recipient = paymentRequest.nodeId,
-                details = LightningOutgoingPayment.Details.Normal(
-                    paymentRequest = paymentRequest
-                ),
+                paymentRequest = paymentRequest,
                 trampolineFeesOverride = trampolineFeesOverride
             )
         )
