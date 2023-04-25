@@ -48,7 +48,7 @@ class LogsSettingsFragment : BaseFragment(stayIfNotStarted = true) {
       context?.let {
         try {
           val logFile = Logging.getLastLogFile(it)
-          val uri = FileProvider.getUriForFile(it, BuildConfig.LIBRARY_PACKAGE_NAME + ".provider", logFile)
+          val uri = FileProvider.getUriForFile(it, "fr.acinq.phoenix.testnet.provider", logFile)
           val viewIntent = Intent(Intent.ACTION_VIEW)
           viewIntent.setDataAndType(uri, "text/plain").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
           val externalAppIntent = Intent.createChooser(viewIntent, getString(R.string.logs_view_with))
@@ -62,7 +62,7 @@ class LogsSettingsFragment : BaseFragment(stayIfNotStarted = true) {
       context?.let {
         try {
           val logFile = Logging.getLastLogFile(it)
-          val uri = FileProvider.getUriForFile(it, BuildConfig.LIBRARY_PACKAGE_NAME + ".provider", logFile)
+          val uri = FileProvider.getUriForFile(it, "fr.acinq.phoenix.testnet.provider", logFile)
           val shareIntent = Intent(Intent.ACTION_SEND)
           shareIntent.type = "text/plain"
           shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
