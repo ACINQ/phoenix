@@ -22,3 +22,6 @@ getSpliceOutgoing:
 SELECT id, amount_sat, address, mining_fees_sat, tx_id, created_at, confirmed_at
 FROM splice_outgoing_payments
 WHERE id=?;
+
+deleteSpliceOutgoing:
+DELETE FROM splice_outgoing_payments WHERE id=?;

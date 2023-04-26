@@ -39,7 +39,7 @@ sealed class OutgoingPartClosingInfoData {
     companion object {
         fun deserialize(typeVersion: OutgoingPartClosingInfoTypeVersion, blob: ByteArray): ChannelCloseOutgoingPayment.ChannelClosingType = DbTypesHelper.decodeBlob(blob) { json, format ->
             when (typeVersion) {
-                OutgoingPartClosingInfoTypeVersion.CLOSING_INFO_V0 -> format.decodeFromString<OutgoingPartClosingInfoData.V0>(json).closingType
+                OutgoingPartClosingInfoTypeVersion.CLOSING_INFO_V0 -> format.decodeFromString<V0>(json).closingType
             }
         }
     }

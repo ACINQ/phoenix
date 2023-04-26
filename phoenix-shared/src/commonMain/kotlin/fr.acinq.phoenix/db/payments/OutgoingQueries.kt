@@ -19,7 +19,6 @@ package fr.acinq.phoenix.db.payments
 import com.squareup.sqldelight.ColumnAdapter
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.ShortChannelId
 import fr.acinq.lightning.channel.ChannelException
@@ -28,13 +27,12 @@ import fr.acinq.lightning.db.HopDesc
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
-import fr.acinq.lightning.utils.Either
-import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.toByteVector32
+import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.FailureMessage
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.PaymentsDatabase
 import fr.acinq.phoenix.db.didCompleteWalletPayment
+import fr.acinq.phoenix.utils.migrations.LegacyChannelCloseHelper
 import fr.acinq.secp256k1.Hex
 
 class OutgoingQueries(val database: PaymentsDatabase) {
@@ -242,15 +240,18 @@ class OutgoingQueries(val database: PaymentsDatabase) {
             status_type: OutgoingStatusTypeVersion?,
             status_blob: ByteArray?
         ): LightningOutgoingPayment {
-            return LightningOutgoingPayment(
-                id = UUID.fromString(id),
-                recipientAmount = MilliSatoshi(recipient_amount_msat),
-                recipient = PublicKey.parse(Hex.decode(recipient_node_id)),
-                details = OutgoingDetailsData.deserialize(details_type, details_blob),
-                parts = listOf(),
-                status = mapPaymentStatus(status_type, status_blob, completed_at),
-                createdAt = created_at
-            )
+            val details = OutgoingDetailsData.deserialize(details_type, details_blob)
+            return if (details != null) {
+                LightningOutgoingPayment(
+                    id = UUID.fromString(id),
+                    recipientAmount = MilliSatoshi(recipient_amount_msat),
+                    recipient = PublicKey.parse(Hex.decode(recipient_node_id)),
+                    details = details,
+                    parts = listOf(),
+                    status = mapPaymentStatus(status_type, status_blob, completed_at),
+                    createdAt = created_at
+                )
+            } else TODO("channel close")
         }
 
         @Suppress("UNUSED_PARAMETER")
@@ -281,21 +282,23 @@ class OutgoingQueries(val database: PaymentsDatabase) {
             closingtx_part_closing_info_blob: ByteArray?,
             closingtx_part_created_at: Long?
         ): OutgoingPayment {
-            if (
-                (status_type == OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0 || status_type == OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V1) &&
-                status_blob != null &&
-                closingtx_part_id != null &&
-                closingtx_part_tx_id != null &&
-                closingtx_part_amount_sat != null &&
-                closingtx_part_closing_info_type != null &&
-                closingtx_part_closing_info_blob != null &&
-                closingtx_part_created_at != null
-            ) {
-                if (status_type == OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0) {
-                    return OutgoingStatusData.getChannelClosePaymentFromV0Status(status_blob, completed_at ?: 0)
-                } else {
-                    TODO()
-                }
+
+            // handle legacy cases where the outgoing_payments tables would contain the details for channel closing.
+            // we map these legacy data to the new ChannelCloseOutgoingPayment object, using placeholders when needed.
+            if (details_type == OutgoingDetailsTypeVersion.CLOSING_V0 || closingtx_part_id != null) {
+                 try {
+                     return LegacyChannelCloseHelper.convertLegacyToChannelClose(
+                         id = UUID.fromString(id),
+                         recipientAmount = recipient_amount_msat.msat,
+                         detailsBlob = if (details_type == OutgoingDetailsTypeVersion.CLOSING_V0) details_blob else null,
+                         statusBlob = if (status_type == OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0) status_blob else null,
+                         partsAmount = closingtx_part_amount_sat?.sat,
+                         partsTxId = closingtx_part_tx_id?.toByteVector32(),
+                         partsClosingTypeBlob = closingtx_part_closing_info_blob,
+                         confirmedAt = completed_at ?: created_at,
+                         createdAt = created_at,
+                     )
+                 } catch (_: Exception) { }
             }
 
             val parts = if (lightning_part_id != null && lightning_part_amount_msat != null && lightning_part_route != null && lightning_part_created_at != null) {

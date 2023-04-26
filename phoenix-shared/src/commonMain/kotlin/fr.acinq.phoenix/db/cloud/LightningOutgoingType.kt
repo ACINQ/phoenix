@@ -1,14 +1,21 @@
 package fr.acinq.phoenix.db.cloud
 
 import fr.acinq.bitcoin.PublicKey
-import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.bitcoin.byteVector32
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.db.payments.*
-import kotlinx.serialization.*
+import fr.acinq.phoenix.utils.migrations.LegacyChannelCloseHelper
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.encodeToByteArray
 
 @Serializable
 @OptIn(ExperimentalSerializationApi::class)
@@ -35,17 +42,43 @@ data class LightningOutgoingPaymentWrapper(
         createdAt = payment.createdAt
     )
 
+    /**
+     * Unwraps a cbor-serialized outgoing payment. Should return a [LightningOutgoingPayment], but on may also return a
+     * [ChannelCloseOutgoingPayment] in case the data are legacy and actually contain data for a channel closing.
+     */
     @Throws(Exception::class)
-    fun unwrap() = LightningOutgoingPayment(
-        id = id,
-        amount = MilliSatoshi(msat = msat),
-        recipient = PublicKey.parse(recipient),
-        details = details.unwrap()
-    ).copy(
-        parts = parts.map { it.unwrap() },
-        status = status?.unwrap() ?: LightningOutgoingPayment.Status.Pending,
-        createdAt = createdAt
-    )
+    fun unwrap(): OutgoingPayment? {
+        val details = details.unwrap()
+        return if (details != null) {
+            val status = status?.unwrap() ?: LightningOutgoingPayment.Status.Pending
+            val parts = parts.map { it.unwrap() }
+            LightningOutgoingPayment(
+                id = id,
+                recipientAmount = msat.msat,
+                recipient = PublicKey.parse(recipient),
+                status = status,
+                parts = parts,
+                details = details,
+                createdAt = createdAt
+            )
+        } else {
+            try {
+                LegacyChannelCloseHelper.convertLegacyToChannelClose(
+                    id = id,
+                    recipientAmount = msat.msat,
+                    partsAmount = closingTxsParts.sumOf { it.sat }.sat,
+                    partsTxId = closingTxsParts.firstOrNull()?.txId?.byteVector32(),
+                    detailsBlob = this.details.blob,
+                    statusBlob = this.status?.blob,
+                    partsClosingTypeBlob = closingTxsParts.firstOrNull()?.info?.blob,
+                    createdAt = createdAt,
+                    confirmedAt = this.status?.ts ?: createdAt,
+                )
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
 
     @Serializable
     @OptIn(ExperimentalSerializationApi::class)
@@ -65,7 +98,7 @@ data class LightningOutgoingPaymentWrapper(
             }
         }
 
-        fun unwrap(): LightningOutgoingPayment.Details {
+        fun unwrap(): LightningOutgoingPayment.Details? {
             return OutgoingDetailsData.deserialize(
                 typeVersion = OutgoingDetailsTypeVersion.valueOf(type),
                 blob = blob
@@ -112,16 +145,6 @@ data class LightningOutgoingPaymentWrapper(
                 blob = blob,
                 completedAt = ts
             )
-        }
-
-        /** The status blob may contain closing transaction data, when type is [OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0]. */
-        private fun getClosingPartsFromV0OnchainStatus(): ChannelCloseOutgoingPayment? {
-            @Suppress("DEPRECATION")
-            return if (OutgoingStatusTypeVersion.valueOf(type) == OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0) {
-                OutgoingStatusData.getChannelClosePaymentFromV0Status(blob, ts)
-            } else {
-                null
-            }
         }
 
     } // </StatusWrapper>

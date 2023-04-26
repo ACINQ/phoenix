@@ -75,29 +75,10 @@ sealed class OutgoingStatusData {
 
     companion object {
 
-        /**
-         * This method is for backward-compatibility with old outgoing payments that represent closing transactions, and
-         * using the deprecated status [OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0]. We try to map this to a modern
-         * [ChannelCloseOutgoingPayment] object.
-         */
-        fun getChannelClosePaymentFromV0Status(blob: ByteArray, completedAt: Long): ChannelCloseOutgoingPayment = decodeBlob(blob) { json, format ->
+        /** Extract valuable data from old outgoing payments status that represent closing transactions. */
+        fun deserializeLegacyClosingStatus(blob: ByteArray): SucceededOnChain.V0 = decodeBlob(blob) { json, format ->
             val data = format.decodeFromString<SucceededOnChain.V0>(json)
-            ChannelCloseOutgoingPayment(
-                id = UUID.randomUUID(),
-                amountSatoshi = data.claimed,
-                address = "",
-                isSentToDefaultAddress = false,
-                miningFees = 0.sat,
-                txId = data.txIds.firstOrNull() ?: ByteVector32.Zeroes,
-                createdAt = completedAt,
-                confirmedAt = completedAt,
-                channelId = ByteVector32.Zeroes,
-                closingType = try {
-                    ChannelCloseOutgoingPayment.ChannelClosingType.valueOf(data.closingType)
-                } catch (e: Exception) {
-                    ChannelCloseOutgoingPayment.ChannelClosingType.Other
-                }
-            )
+            data
         }
 
         fun deserialize(typeVersion: OutgoingStatusTypeVersion, blob: ByteArray, completedAt: Long): LightningOutgoingPayment.Status = decodeBlob(blob) { json, format ->

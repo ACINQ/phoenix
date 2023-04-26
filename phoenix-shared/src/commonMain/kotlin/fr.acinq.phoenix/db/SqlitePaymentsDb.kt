@@ -113,8 +113,20 @@ class SqlitePaymentsDb(
             database.transaction {
                 when (outgoingPayment) {
                     is LightningOutgoingPayment -> outQueries.addLightningOutgoingPayment(outgoingPayment)
-                    is SpliceOutgoingPayment -> spliceOutQueries.addSpliceOutgoingPayment(outgoingPayment)
-                    is ChannelCloseOutgoingPayment -> channelCloseQueries.addChannelCloseOutgoingPayment(outgoingPayment)
+                    is SpliceOutgoingPayment -> {
+                        spliceOutQueries.addSpliceOutgoingPayment(outgoingPayment)
+                        linkTxToPaymentQueries.linkTxToPayment(
+                            txId = outgoingPayment.txId,
+                            walletPaymentId = outgoingPayment.walletPaymentId()
+                        )
+                    }
+                    is ChannelCloseOutgoingPayment -> {
+                        channelCloseQueries.addChannelCloseOutgoingPayment(outgoingPayment)
+                        linkTxToPaymentQueries.linkTxToPayment(
+                            txId = outgoingPayment.txId,
+                            walletPaymentId = outgoingPayment.walletPaymentId()
+                        )
+                    }
                 }
                 // Add associated metadata within the same atomic database transaction.
                 if (!metadataRow.isEmpty()) {
@@ -168,7 +180,7 @@ class SqlitePaymentsDb(
      * Should only be used for migrating legacy payments, where mapping old error messages to new
      * error types is not possible.
      */
-    @Deprecated("only use this method for migrating legacy payments")
+    @Deprecated("only use this method for migrating legacy payments from android-eclair")
     suspend fun completeOutgoingLightningPartLegacy(
         partId: UUID,
         failedStatus: LightningOutgoingPayment.Part.Status.Failed,
@@ -269,7 +281,7 @@ class SqlitePaymentsDb(
                 inQueries.receivePayment(paymentHash, receivedWith, receivedAt)
                 // if one received-with is on-chain, save the tx id to the db
                 receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>().firstOrNull()?.let {
-                    linkTxToPaymentQueries.linkTxToIncomingPayment(it.txId, WalletPaymentId.IncomingPaymentId(paymentHash))
+                    linkTxToPaymentQueries.linkTxToPayment(it.txId, WalletPaymentId.IncomingPaymentId(paymentHash))
                 }
             }
         }
@@ -291,7 +303,7 @@ class SqlitePaymentsDb(
                 inQueries.addAndReceivePayment(preimage, origin, receivedWith, createdAt, receivedAt)
                 // if one received-with is on-chain, save the tx id to the db
                 receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>().firstOrNull()?.let {
-                    linkTxToPaymentQueries.linkTxToIncomingPayment(it.txId, paymentId)
+                    linkTxToPaymentQueries.linkTxToPayment(it.txId, paymentId)
                 }
                 if (!metadataRow.isEmpty()) {
                     metaQueries.addMetadata(paymentId, metadataRow)
@@ -302,19 +314,21 @@ class SqlitePaymentsDb(
 
     override suspend fun setConfirmed(txId: ByteVector32) = withContext(Dispatchers.Default) {
         database.transaction {
+            val completedAt = currentTimestampMillis()
+            linkTxToPaymentQueries.setConfirmed(txId, completedAt)
             linkTxToPaymentQueries.listWalletPaymentIdsForTx(txId).forEach { walletPaymentId ->
                 when (walletPaymentId) {
                     is WalletPaymentId.IncomingPaymentId -> {
-                        inQueries.setConfirmed(walletPaymentId.paymentHash, currentTimestampMillis())
+                        inQueries.setConfirmed(walletPaymentId.paymentHash, completedAt)
                     }
                     is WalletPaymentId.OutgoingPaymentId -> {
                         // LN payments need not be confirmed
                     }
                     is WalletPaymentId.SpliceOutgoingPaymentId -> {
-                        spliceOutQueries.setConfirmed(walletPaymentId.id, currentTimestampMillis())
+                        spliceOutQueries.setConfirmed(walletPaymentId.id, completedAt)
                     }
                     is WalletPaymentId.ChannelCloseOutgoingPaymentId -> {
-                        channelCloseQueries.setConfirmed(walletPaymentId.id, currentTimestampMillis())
+                        channelCloseQueries.setConfirmed(walletPaymentId.id, completedAt)
                     }
                 }
             }
@@ -506,8 +520,16 @@ class SqlitePaymentsDb(
                         id = paymentId.dbId
                     )
                 }
-                is WalletPaymentId.ChannelCloseOutgoingPaymentId -> TODO()
-                is WalletPaymentId.SpliceOutgoingPaymentId -> TODO()
+                is WalletPaymentId.ChannelCloseOutgoingPaymentId -> {
+                    database.channelCloseOutgoingPaymentQueries.deleteChannelCloseOutgoing(
+                        id = paymentId.dbId
+                    )
+                }
+                is WalletPaymentId.SpliceOutgoingPaymentId -> {
+                    database.spliceOutgoingPaymentsQueries.deleteSpliceOutgoing(
+                        id = paymentId.dbId
+                    )
+                }
             }
             didDeleteWalletPayment(paymentId, database)
         }
@@ -533,6 +555,7 @@ class SqlitePaymentsDb(
                 WalletPaymentId.DbType.OUTGOING.value -> WalletPaymentId.OutgoingPaymentId.fromString(id)
                 WalletPaymentId.DbType.INCOMING.value -> WalletPaymentId.IncomingPaymentId.fromString(id)
                 WalletPaymentId.DbType.SPLICE_OUTGOING.value -> WalletPaymentId.SpliceOutgoingPaymentId.fromString(id)
+                WalletPaymentId.DbType.CHANNEL_CLOSE_OUTGOING.value -> WalletPaymentId.ChannelCloseOutgoingPaymentId.fromString(id)
                 else -> throw UnhandledPaymentType(type)
             }
             return WalletPaymentOrderRow(

@@ -20,7 +20,9 @@ import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
+import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.PaymentsDatabase
+import fr.acinq.phoenix.db.didCompleteWalletPayment
 
 class SpliceOutgoingQueries(val database: PaymentsDatabase) {
     private val spliceOutQueries = database.spliceOutgoingPaymentsQueries
@@ -46,6 +48,7 @@ class SpliceOutgoingQueries(val database: PaymentsDatabase) {
 
     fun setConfirmed(id: UUID, confirmedAt: Long) {
         spliceOutQueries.setConfirmed(confirmed_at = confirmedAt, id = id.toString())
+        didCompleteWalletPayment(WalletPaymentId.SpliceOutgoingPaymentId(id), database)
     }
 
     companion object {

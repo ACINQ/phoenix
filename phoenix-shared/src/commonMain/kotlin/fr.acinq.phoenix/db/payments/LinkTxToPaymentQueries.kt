@@ -17,10 +17,8 @@
 package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.PaymentsDatabase
-import kotlinx.coroutines.flow.Flow
 
 class LinkTxToPaymentQueries(val database: PaymentsDatabase) {
     private val linkTxQueries = database.linkTxToPaymentQueries
@@ -30,7 +28,7 @@ class LinkTxToPaymentQueries(val database: PaymentsDatabase) {
             .mapNotNull { WalletPaymentId.create(it.type, it.id) }
     }
 
-    fun linkTxToIncomingPayment(txId: ByteVector32, walletPaymentId: WalletPaymentId) {
+    fun linkTxToPayment(txId: ByteVector32, walletPaymentId: WalletPaymentId) {
         linkTxQueries.linkTxToPayment(tx_id = txId.toByteArray(), type = walletPaymentId.dbType.value, id = walletPaymentId.dbId)
     }
 

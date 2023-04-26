@@ -40,6 +40,7 @@ enum class OutgoingDetailsTypeVersion {
     NORMAL_V0,
     KEYSEND_V0,
     SWAPOUT_V0,
+    @Deprecated("channel close are now stored in their own table")
     CLOSING_V0,
 }
 
@@ -60,6 +61,7 @@ sealed class OutgoingDetailsData {
         data class V0(val address: String, val paymentRequest: String, @Serializable val swapOutFee: Satoshi) : SwapOut()
     }
 
+    @Deprecated("channel close are now stored in their own table")
     sealed class Closing : OutgoingDetailsData() {
         @Serializable
         data class V0(
@@ -70,13 +72,19 @@ sealed class OutgoingDetailsData {
     }
 
     companion object {
-        fun deserialize(typeVersion: OutgoingDetailsTypeVersion, blob: ByteArray): LightningOutgoingPayment.Details = DbTypesHelper.decodeBlob(blob) { json, format ->
+        /** Deserialize the details of an outgoing payment. Return null if the details is for a legacy channel closing payment (see [deserializeLegacyClosingDetails]). */
+        fun deserialize(typeVersion: OutgoingDetailsTypeVersion, blob: ByteArray): LightningOutgoingPayment.Details? = DbTypesHelper.decodeBlob(blob) { json, format ->
             when (typeVersion) {
                 OutgoingDetailsTypeVersion.NORMAL_V0 -> format.decodeFromString<Normal.V0>(json).let { LightningOutgoingPayment.Details.Normal(PaymentRequest.read(it.paymentRequest)) }
                 OutgoingDetailsTypeVersion.KEYSEND_V0 -> format.decodeFromString<KeySend.V0>(json).let { LightningOutgoingPayment.Details.KeySend(it.preimage) }
                 OutgoingDetailsTypeVersion.SWAPOUT_V0 -> format.decodeFromString<SwapOut.V0>(json).let { LightningOutgoingPayment.Details.SwapOut(it.address, PaymentRequest.read(it.paymentRequest), it.swapOutFee) }
-                OutgoingDetailsTypeVersion.CLOSING_V0 -> TODO("return ChannelCloseOutgoingPayment")
+                OutgoingDetailsTypeVersion.CLOSING_V0 -> null
             }
+        }
+
+        /** Returns the channel closing details from a blob, for backward-compatibility purposes. */
+        fun deserializeLegacyClosingDetails(blob: ByteArray): Closing.V0 = DbTypesHelper.decodeBlob(blob) { json, format ->
+            format.decodeFromString(json)
         }
     }
 }

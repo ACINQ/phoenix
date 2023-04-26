@@ -21,7 +21,9 @@ import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
+import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.PaymentsDatabase
+import fr.acinq.phoenix.db.didCompleteWalletPayment
 
 class ChannelCloseOutgoingQueries(val database: PaymentsDatabase) {
     private val channelCloseQueries = database.channelCloseOutgoingPaymentQueries
@@ -49,6 +51,7 @@ class ChannelCloseOutgoingQueries(val database: PaymentsDatabase) {
 
     fun setConfirmed(id: UUID, confirmedAt: Long) {
         channelCloseQueries.setConfirmed(confirmed_at = confirmedAt, id = id.toString())
+        didCompleteWalletPayment(WalletPaymentId.ChannelCloseOutgoingPaymentId(id), database)
     }
 
     companion object {

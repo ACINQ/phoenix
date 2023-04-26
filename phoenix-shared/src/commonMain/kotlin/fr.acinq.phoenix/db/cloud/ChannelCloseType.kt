@@ -1,0 +1,71 @@
+package fr.acinq.phoenix.db.cloud
+
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
+import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.toByteVector32
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.cbor.ByteString
+import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.encodeToByteArray
+
+@Serializable
+@OptIn(ExperimentalSerializationApi::class)
+data class ChannelClosePaymentWrapper(
+    @Serializable(with = UUIDSerializer::class)
+    val id: UUID,
+    val amountSat: Long,
+    val address: String,
+    val isSentToDefaultAddress: Boolean,
+    val miningFeeSat: Long,
+    @ByteString val txId: ByteArray,
+    val createdAt: Long,
+    val confirmedAt: Long?,
+    @ByteString val channelId: ByteArray,
+    val closingType: ChannelCloseOutgoingPayment.ChannelClosingType,
+) {
+    constructor(payment: ChannelCloseOutgoingPayment) : this(
+        id = payment.id,
+        amountSat = payment.amountSatoshi.sat,
+        address = payment.address,
+        isSentToDefaultAddress = payment.isSentToDefaultAddress,
+        miningFeeSat = payment.miningFees.sat,
+        txId = payment.txId.toByteArray(),
+        createdAt = payment.createdAt,
+        confirmedAt = payment.confirmedAt,
+        channelId = payment.channelId.toByteArray(),
+        closingType = payment.closingType,
+    )
+
+    @Throws(Exception::class)
+    fun unwrap() = ChannelCloseOutgoingPayment(
+        id = id,
+        amountSatoshi = amountSat.sat,
+        address = address,
+        isSentToDefaultAddress = isSentToDefaultAddress,
+        miningFees = miningFeeSat.sat,
+        txId = txId.toByteVector32(),
+        createdAt = createdAt,
+        confirmedAt = confirmedAt,
+        channelId = channelId.toByteVector32(),
+        closingType = closingType
+    )
+
+    companion object
+}
+
+@OptIn(ExperimentalSerializationApi::class)
+fun ChannelCloseOutgoingPayment.cborSerialize(): ByteArray {
+    val wrapper = ChannelClosePaymentWrapper(payment = this)
+    return Cbor.encodeToByteArray(wrapper)
+}
+
+@OptIn(ExperimentalSerializationApi::class)
+@Throws(Exception::class)
+fun ChannelClosePaymentWrapper.cborDeserialize(
+    blob: ByteArray
+): ChannelClosePaymentWrapper {
+    return cborSerializer().decodeFromByteArray(blob)
+}

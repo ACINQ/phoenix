@@ -29,3 +29,6 @@ getChannelCloseOutgoing:
 SELECT id, amount_sat, address, is_default_address, mining_fees_sat, tx_id, created_at, confirmed_at, channel_id, closing_info_type, closing_info_blob
 FROM channel_close_outgoing_payments
 WHERE id=?;
+
+deleteChannelCloseOutgoing:
+DELETE FROM channel_close_outgoing_payments WHERE id=?;

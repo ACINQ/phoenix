@@ -121,14 +121,9 @@ object WalletContext {
                 fun export(): fr.acinq.lightning.NodeUri {
                     val parts = uri.split("@", ":")
 
-                    // FIXME: switch back to endurance when ready
-//                    val publicKey = PublicKey.fromHex(parts[0])
-//                    val host = parts[1]
-//                    val port = parts[2].toInt()
-
-                    val publicKey = PublicKey.fromHex("025c0e9a61ea4b7ce06a6d7be46c79459c5690c093e110c243ce5424514271b903")
-                    val host = "34.232.66.232"
-                    val port = 9735
+                    val publicKey = PublicKey.fromHex(parts[0])
+                    val host = parts[1]
+                    val port = parts[2].toInt()
 
                     return fr.acinq.lightning.NodeUri(publicKey, host, port)
                 }

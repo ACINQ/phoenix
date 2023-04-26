@@ -1,19 +1,18 @@
 package fr.acinq.phoenix.db.cloud
 
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.utils.toByteVector32
-import fr.acinq.phoenix.db.payments.*
+import fr.acinq.phoenix.db.payments.OutgoingPartStatusData
+import fr.acinq.phoenix.db.payments.OutgoingPartStatusTypeVersion
+import fr.acinq.phoenix.db.payments.OutgoingQueries
+import fr.acinq.phoenix.db.payments.mapToDb
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.ByteString
 
 
+/** Legacy object used when channel closing were stored as outgoing-payments parts. */
 @Serializable
 @OptIn(ExperimentalSerializationApi::class)
 data class LightningOutgoingClosingTxPartWrapper(
@@ -23,36 +22,12 @@ data class LightningOutgoingClosingTxPartWrapper(
     val info: ClosingInfoWrapper,
     val createdAt: Long
 ) {
-
-    fun unwrap() = ChannelCloseOutgoingPayment(
-        id = id,
-        amountSatoshi = sat.sat,
-        address = "",
-        isSentToDefaultAddress = false,
-        miningFees = 0.sat,
-        txId = txId.toByteVector32(),
-        createdAt = createdAt,
-        confirmedAt = createdAt,
-        channelId = ByteVector32.Zeroes,
-        closingType = info.unwrap()
-    )
-
-    /** Wrapper for the closing info data object. */
     @Serializable
     @OptIn(ExperimentalSerializationApi::class)
     data class ClosingInfoWrapper(
         val type: String,
-        @ByteString
-        val blob: ByteArray
-    ) {
-
-        fun unwrap(): ChannelCloseOutgoingPayment.ChannelClosingType {
-            return OutgoingPartClosingInfoData.deserialize(
-                typeVersion = OutgoingPartClosingInfoTypeVersion.valueOf(type),
-                blob = blob
-            )
-        }
-    }
+        @ByteString val blob: ByteArray
+    )
 }
 
 @Serializable
