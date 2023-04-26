@@ -30,17 +30,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.payments.CameraPermissionsView
 import fr.acinq.phoenix.android.payments.ScannerView
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration
+import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.BitcoinAddressError
 import fr.acinq.phoenix.utils.Parser
 
@@ -60,19 +63,26 @@ fun MutualCloseView(
 
     MVIView(CF::closeChannelsConfiguration) { model, postIntent ->
         if (showScannerView) {
+            var scanView by remember { mutableStateOf<DecoratedBarcodeView?>(null) }
             Box(
                 Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
             ) {
                 ScannerView(
-                    onScanViewBinding = { },
+                    onScanViewBinding = { scanView = it },
                     onScannedText = {
                         address = it
                         addressErrorMessage = ""
                         showScannerView = false
                     }
                 )
+
+                CameraPermissionsView {
+                    LaunchedEffect(key1 = model) {
+                        if (showScannerView) scanView?.resume()
+                    }
+                }
 
                 // buttons at the bottom of the screen
                 Column(
@@ -163,7 +173,7 @@ fun MutualCloseView(
                             )
                             if (showConfirmationDialog) {
                                 ConfirmDialog(
-                                    message = stringResource(R.string.mutualclose_confirm),
+                                    message = stringResource(R.string.mutualclose_confirm, address),
                                     onDismiss = { showConfirmationDialog = false },
                                     onConfirm = {
                                         addressErrorMessage = ""

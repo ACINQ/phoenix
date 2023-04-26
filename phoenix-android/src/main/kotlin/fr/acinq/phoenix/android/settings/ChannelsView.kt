@@ -68,7 +68,7 @@ fun ChannelsView(
         if (!channelsState.value.isNullOrEmpty()) {
             LightningBalanceView(balance = balance)
         }
-        ChannelsList(channels = emptyMap(), onChannelClick = onChannelClick)
+        ChannelsList(channels = channelsState.value, onChannelClick = onChannelClick)
     }
 }
 
@@ -90,7 +90,6 @@ private fun ChannelsList(
     channels: Map<ByteVector32, LocalChannelInfo>?,
     onChannelClick: (String) -> Unit,
 ) {
-    CardHeader(text = stringResource(id = R.string.channelsview_title))
     when (channels) {
         null -> ProgressView(text = stringResource(id = R.string.channelsview_loading_channels))
         else -> {
@@ -99,6 +98,7 @@ private fun ChannelsList(
                     Text(text = stringResource(id = R.string.channelsview_no_channels))
                 }
             } else {
+                CardHeader(text = stringResource(id = R.string.channelsview_title))
                 Card {
                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
                         items(channels.values.toList()) {

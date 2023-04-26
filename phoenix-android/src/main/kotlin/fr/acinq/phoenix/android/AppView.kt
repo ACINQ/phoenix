@@ -158,7 +158,8 @@ fun AppView(
                             onSendClick = { navController.navigate(Screen.ScanData.route) { launchSingleTop = true } },
                             onPaymentsHistoryClick = { navController.navigate(Screen.PaymentsHistory.route) },
                             onTorClick = { navController.navigate(Screen.TorConfig) },
-                            onElectrumClick = { navController.navigate(Screen.ElectrumServer) }
+                            onElectrumClick = { navController.navigate(Screen.ElectrumServer) },
+                            onShowSwapInWallet = { navController.navigate(Screen.WalletInfo.SwapInWallet) }
                         )
                     }
                 }

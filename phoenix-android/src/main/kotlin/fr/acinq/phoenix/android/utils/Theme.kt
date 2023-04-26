@@ -81,7 +81,7 @@ val gray70 = Color(0xffe1eBeD)
 val gray50 = Color(0xFFE9F1F3)
 val gray30 = Color(0xFFEFF4F5)
 val gray20 = Color(0xFFF4F7F9)
-val gray10 = Color(0xFFFBFCFF)
+val gray10 = Color(0xFFF9FAFC)
 
 private val LightColorPalette = lightColors(
     // primary
@@ -125,7 +125,7 @@ private val DarkColorPalette = darkColors(
 
 @Composable
 private fun typography(palette: Colors) = Typography(
-    // used for all-caps labels/headers
+    // used by placeholders in input, and for all-caps labels/headers
     subtitle1 = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
@@ -264,10 +264,12 @@ private val topGradientColor @Composable get() = if (isDarkTheme) gray1000 else 
 private val bottomGradientColor @Composable get() = MaterialTheme.colors.background
 
 @Composable
-fun systemNavBarColor(entry: NavBackStackEntry?): Color = if (entry?.destination?.route == Screen.Home.route) {
-    MaterialTheme.colors.surface
-} else {
-    MaterialTheme.colors.background
+fun systemNavBarColor(entry: NavBackStackEntry?): Color {
+    return when {
+        entry?.destination?.route == Screen.Home.route -> MaterialTheme.colors.surface
+        entry?.destination?.route?.startsWith(Screen.PaymentDetails.route) ?: false -> MaterialTheme.colors.surface
+        else -> MaterialTheme.colors.background
+    }
 }
 
 @Composable

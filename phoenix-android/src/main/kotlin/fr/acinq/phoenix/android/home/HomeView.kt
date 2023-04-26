@@ -80,6 +80,7 @@ fun HomeView(
     onPaymentsHistoryClick: () -> Unit,
     onTorClick: () -> Unit,
     onElectrumClick: () -> Unit,
+    onShowSwapInWallet: () -> Unit,
 ) {
     val log = logger("HomeView")
     val context = LocalContext.current
@@ -146,7 +147,7 @@ fun HomeView(
                 )
             }
             Column(modifier = Modifier.heightIn(min = 54.dp), verticalArrangement = Arrangement.Top) {
-                IncomingAmountNotif(walletContext.value?.swapIn?.v1, swapInBalance.value)
+                IncomingAmountNotif(walletContext.value?.swapIn?.v1, swapInBalance.value, onShowSwapInWallet)
                 Spacer(modifier = Modifier.height(8.dp))
                 UnconfirmedChannelsAmountView(unconfirmedChannelsBalance.value)
             }
@@ -322,7 +323,8 @@ private fun ConnectionDialogLine(
 @Composable
 private fun IncomingAmountNotif(
     swapInParams: WalletContext.V0.SwapIn.V1?,
-    swapInBalance: WalletBalance
+    swapInBalance: WalletBalance,
+    onShowSwapInWallet: () -> Unit,
 ) {
     var showValidSwapInInfoDialog by remember { mutableStateOf(false) }
     var showInvalidSwapInInfoDialog by remember { mutableStateOf(false) }
@@ -330,8 +332,7 @@ private fun IncomingAmountNotif(
     if (showValidSwapInInfoDialog && swapInParams != null) {
         ValidSwapInInfoDialog(
             onDismiss = { showValidSwapInInfoDialog = false },
-            swapInFeePercent = swapInParams.feePercent,
-            swapInMinFee = swapInParams.minFeeSat.sat
+            onShowSwapInWallet = onShowSwapInWallet,
         )
     }
 
@@ -339,8 +340,7 @@ private fun IncomingAmountNotif(
         InvalidSwapInInfoDialog(
             onDismiss = { showInvalidSwapInInfoDialog = false },
             minFundingAmount = swapInParams.minFundingSat.sat,
-            swapInFeePercent = swapInParams.feePercent,
-            swapInMinFee = swapInParams.minFeeSat.sat
+            onShowSwapInWallet = onShowSwapInWallet,
         )
     }
 
@@ -379,14 +379,14 @@ private fun IncomingAmountNotif(
 @Composable
 private fun ValidSwapInInfoDialog(
     onDismiss: () -> Unit,
-    swapInFeePercent: Double,
-    swapInMinFee: Satoshi,
+    onShowSwapInWallet: () -> Unit,
 ) {
     Dialog(onDismiss = onDismiss, title = stringResource(id = R.string.home__swapin_dialog_valid_title)) {
-        Text(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            text = stringResource(R.string.home__swapin_dialog_valid_body, String.format("%.2f", 100 * (swapInFeePercent)), swapInMinFee)
-        )
+        Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+            Text(text = stringResource(R.string.home__swapin_dialog_valid_body))
+            Spacer(modifier = Modifier.height(8.dp))
+            InlineButton(text = stringResource(id = R.string.home__swapin_dialog_button_to_wallet), onClick = onShowSwapInWallet)
+        }
     }
 }
 
@@ -394,14 +394,14 @@ private fun ValidSwapInInfoDialog(
 private fun InvalidSwapInInfoDialog(
     onDismiss: () -> Unit,
     minFundingAmount: Satoshi,
-    swapInFeePercent: Double,
-    swapInMinFee: Satoshi,
+    onShowSwapInWallet: () -> Unit,
 ) {
     Dialog(onDismiss = onDismiss, title = stringResource(id = R.string.home__swapin_dialog_invalid_title)) {
-        Text(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            text = annotatedStringResource(R.string.home__swapin_dialog_invalid_body, minFundingAmount, String.format("%.2f", 100 * (swapInFeePercent)), swapInMinFee)
-        )
+        Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+            Text(text = annotatedStringResource(R.string.home__swapin_dialog_invalid_body, minFundingAmount))
+            Spacer(modifier = Modifier.height(8.dp))
+            InlineButton(text = stringResource(id = R.string.home__swapin_dialog_button_to_wallet), onClick = onShowSwapInWallet)
+        }
     }
 }
 

@@ -267,7 +267,7 @@
     <string name="mutualclose_error_chain_mismatch">This address uses a different blockchain</string>
     <string name="mutualclose_error_chain_reqparams">This address uses unsupported features</string>
     <string name="mutualclose_error_chain_generic">This address is not supported</string>
-    <string name="mutualclose_confirm">Are you sure you want to proceed?</string>
+    <string name="mutualclose_confirm">Are you sure you want to proceed?\n\nAll your funds will be sent to the address %1$s.</string>
     <string name="mutualclose_done">%1$d channel(s) have been closed. You can find the details in the home screen.</string>
     <string name="mutualclose_inprogress">Please wait…</string>
 
@@ -280,7 +280,7 @@
     <!-- channels view -->
     <string name="channelsview_title">Payment channels</string>
     <string name="channelsview_balance">Balance</string>
-    <string name="channelsview_balance_about">This balance is the aggregated balance of your active channels. It\'s what you can spend over Lightning.</string>
+    <string name="channelsview_balance_about">This is the aggregated balance of your active channels. It\'s what you can spend over Lightning.</string>
     <string name="channelsview_loading_channels">Loading channel data…</string>
     <string name="channelsview_no_channels">You don\'t have any channels yet.\n\nPayments channels are created when you receive a payment and a new channel is needed. This is done automatically.</string>
 
@@ -318,10 +318,11 @@
 
     <string name="home__balance_loading">Loading…</string>
     <string name="home__swapin_incoming">+%1$s incoming</string>
+    <string name="home__swapin_dialog_button_to_wallet">Show incoming payments</string>
     <string name="home__swapin_dialog_valid_title">Incoming deposit</string>
-    <string name="home__swapin_dialog_valid_body">Once the incoming payment is confirmed, Phoenix will use the funds to open a payment channel.\n\nThe fee is %1$s%% (%2$s sat minimum).</string>
+    <string name="home__swapin_dialog_valid_body">Once the incoming payment is confirmed, Phoenix will use the funds to open a payment channel.</string>
     <string name="home__swapin_dialog_invalid_title">Deposit below minimum</string>
-    <string name="home__swapin_dialog_invalid_body">Deposits must be at least <b>%1$s</b>. Please make additional deposits to use the funds inside Phoenix.\n\nOnce the minimum amount is reached, Phoenix will use the funds to open a payment channel.\n\nThe fee is %2$s%% (%3$s sat minimum).</string>
+    <string name="home__swapin_dialog_invalid_body">Deposits must be at least <b>%1$s</b>. Please make additional deposits to use the funds inside Phoenix.\n\nOnce the minimum amount is reached, Phoenix will use the funds to open a payment channel.</string>
 
     <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">You have not made any payments recently.\n\nUse the Receive and Send buttons at the bottom of this screen to get started!</string>

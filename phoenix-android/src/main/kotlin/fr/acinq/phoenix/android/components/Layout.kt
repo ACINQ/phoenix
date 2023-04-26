@@ -257,7 +257,7 @@ fun CardHeader(
         modifier = Modifier
             .fillMaxWidth()
             .padding(padding),
-        style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp)
+        style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp, color = MaterialTheme.colors.primary)
     )
 }
 
@@ -278,9 +278,12 @@ fun CardHeaderWithHelp(
             .padding(padding),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = text.uppercase(), style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp))
+        Text(
+            text = text.uppercase(),
+            style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp, color = MaterialTheme.colors.primary)
+        )
         HelpPopup(helpMessage = helpMessage)
     }
 }
 
-fun Modifier.enableOrFade(enabled: Boolean): Modifier = this.then(Modifier.alpha(if (enabled) 1f else 0.3f))
+fun Modifier.enableOrFade(enabled: Boolean): Modifier = this.then(Modifier.alpha(if (enabled) 1f else 0.5f))

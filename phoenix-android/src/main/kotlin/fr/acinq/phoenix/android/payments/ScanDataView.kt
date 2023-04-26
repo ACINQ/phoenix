@@ -405,7 +405,7 @@ private fun ManualInputDialog(
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-private fun BoxScope.CameraPermissionsView(
+fun BoxScope.CameraPermissionsView(
     onPermissionGranted: @Composable () -> Unit
 ) {
     val context = LocalContext.current

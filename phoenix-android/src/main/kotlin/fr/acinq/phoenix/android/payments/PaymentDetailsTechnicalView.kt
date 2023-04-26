@@ -25,12 +25,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.channel.ClosingType
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.currentTimestampMillis
@@ -40,7 +38,10 @@ import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.AmountView
+import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.components.CardHeader
+import fr.acinq.phoenix.android.components.TransactionLinkButton
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toFiat
@@ -77,8 +78,8 @@ fun PaymentDetailsTechnicalView(
                 receivedWith.forEach {
                     TechnicalCard {
                         when (it) {
-                            is IncomingPayment.ReceivedWith.NewChannel -> ReceivedWithNewChannel(it, rateThen)
                             is IncomingPayment.ReceivedWith.LightningPayment -> ReceivedWithLightning(it, rateThen)
+                            is IncomingPayment.ReceivedWith.NewChannel -> ReceivedWithNewChannel(it, rateThen)
                             is IncomingPayment.ReceivedWith.SpliceIn -> ReceivedWithSpliceIn(it, rateThen)
                         }
                     }
@@ -97,6 +98,7 @@ fun PaymentDetailsTechnicalView(
                 when (payment) {
                     is LightningOutgoingPayment -> DetailsForLightningOutgoingPayment(payment)
                     is SpliceOutgoingPayment -> DetailsForSpliceOut(payment)
+                    is ChannelCloseOutgoingPayment -> DetailsForChannelClose(payment)
                 }
             }
 
@@ -287,12 +289,12 @@ private fun DetailsForLightningOutgoingPayment(
 }
 
 @Composable
-private fun DetailsForClosing(
+private fun DetailsForChannelClose(
     payment: ChannelCloseOutgoingPayment
 ) {
     TechnicalRowSelectable(
         label = stringResource(id = R.string.paymentdetails_closing_channel_label),
-        value = "channel id placeholder" // payment.channelId.toHex()
+        value = payment.channelId.toHex()
     )
     TechnicalRowSelectable(
         label = stringResource(id = R.string.paymentdetails_closing_address_label),
