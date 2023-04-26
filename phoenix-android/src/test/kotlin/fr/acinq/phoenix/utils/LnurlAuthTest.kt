@@ -2,12 +2,11 @@ package fr.acinq.phoenix.utils
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
-import fr.acinq.bitcoin.DeterministicWallet
 import fr.acinq.bitcoin.byteVector64
 import fr.acinq.bitcoin.scala.Block
 import fr.acinq.bitcoin.scala.`MnemonicCode$`
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.crypto.LocalKeyManager
-import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.legacy.lnurl.LNUrlAuthFragment
 import io.ktor.http.*
@@ -25,7 +24,7 @@ class LnurlAuthTest {
     fun legacy_domain_different_keys() {
         val seed = `MnemonicCode$`.`MODULE$`.toSeed("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about", "")
         val legacyKeyManager = fr.acinq.eclair.crypto.LocalKeyManager(seed, Block.TestnetGenesisBlock().hash())
-        val kmpKeyManager = LocalKeyManager(seed = seed.toArray().byteVector64(), Chain.Testnet.chainHash)
+        val kmpKeyManager = LocalKeyManager(seed = seed.toArray().byteVector64(), NodeParams.Chain.Testnet)
 
         val k1 = "179062fdf971ec045883a6297fb1d260333358905086c33a9f44ff26f63bb425"
         val url = Url("https://api.lnmarkets.com/v1/lnurl/auth?tag=login&k1=$k1&hmac=75344d9151fe788345e620aa3de0e69b51698e759fd667272e3ea682a2bbcd12")
@@ -60,7 +59,7 @@ class LnurlAuthTest {
     fun standard_domain_same_key() {
         val seed = `MnemonicCode$`.`MODULE$`.toSeed("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about", "")
         val legacyKeyManager = fr.acinq.eclair.crypto.LocalKeyManager(seed, Block.LivenetGenesisBlock().hash())
-        val kmpKeyManager = LocalKeyManager(seed = seed.toArray().byteVector64(), Chain.Mainnet.chainHash)
+        val kmpKeyManager = LocalKeyManager(seed = seed.toArray().byteVector64(), NodeParams.Chain.Mainnet)
 
         val k1 = "32c56da24a28e09d24832e1cba0cc391049c48036c197e228c7656d022a5eb1f"
         val url = Url("https://foo.bar.com/auth?tag=login&k1=$k1")

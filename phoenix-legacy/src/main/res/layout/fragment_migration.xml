@@ -151,6 +151,54 @@
           app:layout_constraintTop_toTopOf="parent" />
       </androidx.constraintlayout.widget.ConstraintLayout>
 
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/step_failure"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="@{model.state instanceof MigrationScreenState.Failure.SwapInError || model.state instanceof MigrationScreenState.Failure.ClosingError}"
+        app:layout_constraintTop_toBottomOf="@id/title">
+
+        <TextView
+          android:id="@+id/error_message_swap"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_lg"
+          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginEnd="@dimen/space_lg"
+          android:text="@string/migration_failure_swapin_address_error"
+          android:visibility="@{model.state instanceof MigrationScreenState.Failure.SwapInError}"
+          app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+          android:id="@+id/error_message_closing"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_lg"
+          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginEnd="@dimen/space_lg"
+          android:text="@string/migration_failure_closing_error"
+          android:visibility="@{model.state instanceof MigrationScreenState.Failure.ClosingError}"
+          app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.Barrier
+          android:id="@+id/error_message_barrier"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          app:barrierDirection="bottom"
+          app:constraint_referenced_ids="error_message_swap,error_message_closing" />
+
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+          android:id="@+id/failure_dismiss_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md"
+          android:padding="24dp"
+          android:background="@drawable/button_bg_square"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/error_message_barrier"
+          app:text="@string/btn_ok" />
+      </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>
 </layout>

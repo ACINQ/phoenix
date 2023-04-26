@@ -38,6 +38,7 @@ object Wallet {
   private const val ECLAIR_BASE_DATADIR = "node-data"
   internal const val SEED_FILE = "seed.dat"
   private const val ECLAIR_DB_FILE = "eclair.sqlite"
+  const val ECLAIR_DB_FILE_MIGRATION = "eclair.domigration.sqlite"
   private val acceptedLightningPrefix by lazy { PaymentRequest.prefixes().get(getChainHash()) }
 
   fun getDatadir(context: Context): File {
@@ -50,6 +51,10 @@ object Wallet {
 
   fun getEclairDBFile(context: Context): File {
     return File(getChainDatadir(context), ECLAIR_DB_FILE)
+  }
+
+  fun getEclairDBMigrationFile(context: Context): File {
+    return File(getChainDatadir(context), ECLAIR_DB_FILE_MIGRATION)
   }
 
   fun hasWalletBeenSetup(context: Context): Boolean {

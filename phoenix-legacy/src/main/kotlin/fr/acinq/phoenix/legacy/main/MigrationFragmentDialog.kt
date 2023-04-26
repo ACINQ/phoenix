@@ -30,11 +30,13 @@ import fr.acinq.phoenix.legacy.databinding.FragmentMigrationBinding
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.MigrationResult
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.File
 
 class MigrationFragmentDialog : DialogFragment() {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -70,7 +72,7 @@ class MigrationFragmentDialog : DialogFragment() {
       when (it) {
         is MigrationScreenState.ReadyToClose -> {
           lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
-            log.error("migration failed, error in mutal close: ", exception)
+            log.error("migration failed, error in mutual close: ", exception)
             model.state.value = MigrationScreenState.Failure.ClosingError
           }) {
             delay(500)
@@ -83,6 +85,9 @@ class MigrationFragmentDialog : DialogFragment() {
               log.info("(migration) channels successfully closed to ${state.address}")
               model.state.value = MigrationScreenState.ClosingChannels(state.address)
               delay(1000)
+              val dbFile = Wallet.getEclairDBFile(context)
+              dbFile.copyTo(Wallet.getEclairDBMigrationFile(context))
+              delay(500)
               PrefsDatastore.saveDataMigrationExpected(context, true)
               PrefsDatastore.saveMigrationResult(
                 context, MigrationResult(
@@ -106,6 +111,7 @@ class MigrationFragmentDialog : DialogFragment() {
   override fun onStart() {
     super.onStart()
     mBinding.pausedButton.setOnClickListener { dismiss() }
+    mBinding.failureDismissButton.setOnClickListener { dismiss() }
     mBinding.dismissButton.setOnClickListener { dismiss() }
     mBinding.upgradeButton.setOnClickListener {
       if (model.state.value is MigrationScreenState.Ready) {

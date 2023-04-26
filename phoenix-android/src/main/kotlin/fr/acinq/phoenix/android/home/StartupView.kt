@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.android.home
 
 import android.content.Context
-import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -82,7 +81,7 @@ fun StartupView(
                     isLockActive = isLockActive,
                     lockState = appVM.lockState,
                     walletState = walletState,
-                    startBusiness = { seed, checkLegacyChannels -> appVM.service?.startBusiness(seed, checkLegacyChannels) },
+                    onStartBusiness = { seed, checkLegacyChannels -> appVM.service?.startBusiness(seed, checkLegacyChannels) },
                     onUnlockSuccess = { appVM.lockState = LockState.Unlocked },
                     onUnlockFailure = { appVM.lockState = LockState.Locked.WithError(it) },
                     onKeyAbsent = onKeyAbsent,
@@ -98,7 +97,7 @@ private fun LoadOrUnlock(
     isLockActive: Boolean,
     lockState: LockState,
     walletState: WalletState?,
-    startBusiness: (ByteArray, Boolean) -> Unit,
+    onStartBusiness: (ByteArray, Boolean) -> Unit,
     onUnlockSuccess: (cryptoObject: BiometricPrompt.CryptoObject?) -> Unit,
     onUnlockFailure: (Int?) -> Unit,
     onKeyAbsent: () -> Unit,
@@ -127,7 +126,7 @@ private fun LoadOrUnlock(
                 LoadingView(
                     context = context,
                     walletState = walletState,
-                    startBusiness = startBusiness,
+                    onStartBusiness = onStartBusiness,
                     onKeyAbsent = onKeyAbsent,
                     onBusinessStarted = onBusinessStarted
                 )
@@ -137,7 +136,7 @@ private fun LoadOrUnlock(
         LoadingView(
             context = context,
             walletState = walletState,
-            startBusiness = startBusiness,
+            onStartBusiness = onStartBusiness,
             onKeyAbsent = onKeyAbsent,
             onBusinessStarted = onBusinessStarted
         )
@@ -148,7 +147,7 @@ private fun LoadOrUnlock(
 private fun LoadingView(
     context: Context,
     walletState: WalletState?,
-    startBusiness: (ByteArray, Boolean) -> Unit,
+    onStartBusiness: (ByteArray, Boolean) -> Unit,
     onKeyAbsent: () -> Unit,
     onBusinessStarted: () -> Unit,
 ) {
@@ -179,14 +178,14 @@ private fun LoadingView(
                             } else {
                                 Text(stringResource(id = R.string.startup_checking_seed))
                                 LaunchedEffect(keyState.encryptedSeed) {
-                                    startBusiness(scope, keyState.encryptedSeed, doStartBusiness = { startBusiness(it, true) })
+                                    decryptSeedAndStartBusiness(scope, keyState.encryptedSeed, doStartBusiness = { onStartBusiness(it, true) })
                                 }
                             }
                         }
                         LegacyAppStatus.NotRequired -> {
                             Text(stringResource(id = R.string.startup_checking_seed))
                             LaunchedEffect(keyState.encryptedSeed) {
-                                startBusiness(scope, keyState.encryptedSeed, doStartBusiness = { startBusiness(it, false) })
+                                decryptSeedAndStartBusiness(scope, keyState.encryptedSeed, doStartBusiness = { onStartBusiness(it, false) })
                             }
                         }
                         else -> Text(stringResource(id = R.string.startup_wait))
@@ -213,7 +212,7 @@ private fun LoadingView(
     }
 }
 
-private fun startBusiness(
+private fun decryptSeedAndStartBusiness(
     scope: CoroutineScope,
     encryptedSeed: EncryptedSeed.V2,
     doStartBusiness: (ByteArray) -> Unit

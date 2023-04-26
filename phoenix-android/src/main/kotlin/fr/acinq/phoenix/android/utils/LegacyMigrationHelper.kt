@@ -123,14 +123,14 @@ object LegacyMigrationHelper {
     suspend fun migrateLegacyPayments(
         context: Context,
     ) {
-        val eclairDbBackupFile = File(Wallet.getChainDatadir(context), "eclair.sqlite")
-        if (!eclairDbBackupFile.exists()) {
-            log.info("no legacy database backup file found, no migration needed.")
+        val eclairDbMigrationFile = Wallet.getEclairDBMigrationFile(context)
+        if (!eclairDbMigrationFile.exists()) {
+            log.info("no legacy database migration file found, no migration needed.")
             return
         }
 
         // 1 - create a copy of the eclair database backup file we can safely work on
-        eclairDbBackupFile.copyTo(File(Wallet.getChainDatadir(context), "eclair-migration.sqlite"), overwrite = true)
+        eclairDbMigrationFile.copyTo(File(Wallet.getChainDatadir(context), "eclair-migration.sqlite"), overwrite = true)
         log.info("legacy database backup file has been copied")
 
         val legacyMetaRepository = PaymentMetaRepository.getInstance(AppDb.getInstance(context).paymentMetaQueries)
@@ -237,10 +237,10 @@ object LegacyMigrationHelper {
             }
         }
 
-        log.info("moving eclair.sqlite legacy database to finalize migration...")
+        log.info("moving legacy eclair-migration database file to finalize migration...")
         legacyPaymentsDb.close()
-        // move the db backup file so that when a migration successfully completes, the process will not repeat
-        eclairDbBackupFile.renameTo(File(Wallet.getChainDatadir(context), "eclair.sqlite.bak.migrated"))
+        // move the db migration file so that when a migration successfully completes, the process will not repeat
+        eclairDbMigrationFile.renameTo(File(Wallet.getChainDatadir(context), "${Wallet.ECLAIR_DB_FILE_MIGRATION}.done"))
     }
 
     fun modernizeLegacyIncomingPayment(
@@ -274,7 +274,7 @@ object LegacyMigrationHelper {
                     miningFee = 0.sat,
                     channelId = ByteVector32.Zeroes,
                     txId = ByteVector32.Zeroes,
-                    confirmedAt = payment.createdAt()
+                    confirmedAt = status.receivedAt()
                 )
             } else {
                 IncomingPayment.ReceivedWith.LightningPayment(
@@ -306,7 +306,7 @@ object LegacyMigrationHelper {
 
         if (head.paymentType() == "ClosingChannel") {
             return ChannelCloseOutgoingPayment(
-                id = UUID.randomUUID(),
+                id = parentId,
                 amountSatoshi = head.amount().truncateToSatoshi().toLong().sat,
                 address = paymentMeta?.closing_main_output_script ?: "",
                 isSentToDefaultAddress = paymentMeta?.closing_type != ClosingType.Mutual.code,

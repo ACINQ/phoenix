@@ -799,6 +799,8 @@
   <string name="migration_paused_swap_in">Upgrade is not available: an on-chain deposit to your wallet is pending.\n\nTry again later when this deposit has confirmed.</string>
   <string name="migration_swapin">Getting new address…</string>
   <string name="migration_closing_channels">Moving funds to new address…</string>
+  <string name="migration_failure_swapin_address_error">Upgrade has failed. Phoenix could not generate a valid deposit address for the migration.\n\nPlease try again.</string>
+  <string name="migration_failure_closing_error">Upgrade has failed. Some channels could not be migrated.\n\nPlease try again.</string>
 
   <string name="finish_legacy_app">Switching to new app…</string>
 
