@@ -103,7 +103,7 @@ fun PaymentSettingsView(
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_liquidity_policy),
                 description = when (val policy = prefLiquidityPolicy) {
-                    is LiquidityPolicy.Auto -> stringResource(id = R.string.paymentsettings_liquidity_policy_auto, policy.maxFeeFloor.toPrettyString(btcUnit, withUnit = true))
+                    is LiquidityPolicy.Auto -> stringResource(id = R.string.paymentsettings_liquidity_policy_auto, policy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true))
                     is LiquidityPolicy.Disable -> stringResource(id = R.string.paymentsettings_liquidity_policy_disabled)
                     null -> stringResource(id = R.string.utils_loading_data)
                 },

@@ -74,12 +74,12 @@ fun LiquidityPolicyView(
                 )
             }
 
-            var maxFeeBasisPoints by remember { mutableStateOf(defaultFee.maxFeeBasisPoints) }
-            var maxFeeFloor by remember { mutableStateOf(defaultFee.maxFeeFloor) }
+            var maxRelativeFeeBasisPoints by remember { mutableStateOf(defaultFee.maxRelativeFeeBasisPoints) }
+            var maxAbsoluteFee by remember { mutableStateOf(defaultFee.maxAbsoluteFee) }
             val feeEditor: @Composable () -> Unit = {
                 FeePolicyEditor(
-                    maxFeeBasisPoints = maxFeeBasisPoints, maxFeeFloor = maxFeeFloor,
-                    onFeeBasisChange = { maxFeeBasisPoints = it }, onFeeFloorChange = { maxFeeFloor = it }
+                    maxRelativeFeeBasisPoints = maxRelativeFeeBasisPoints, maxAbsoluteFee = maxAbsoluteFee,
+                    onMaxRelativeFeeBasisPointsChange = { maxRelativeFeeBasisPoints = it }, onMaxAbsoluteFeeChange = { maxAbsoluteFee = it }
                 )
             }
 
@@ -88,7 +88,7 @@ fun LiquidityPolicyView(
                     Column {
                         PolicyRow(
                             title = stringResource(id = R.string.liquiditypolicy_auto_title),
-                            description = stringResource(id = R.string.liquiditypolicy_auto_description, maxFeeFloor.toPrettyString(btcUnit, withUnit = true)),
+                            description = stringResource(id = R.string.liquiditypolicy_auto_description, maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true)),
                             isActive = policyInPrefs is LiquidityPolicy.Auto,
                             isSelected = visiblePolicy == LiquidityPolicyOptions.AUTO,
                         )
@@ -118,8 +118,8 @@ fun LiquidityPolicyView(
 
             Card {
                 val newPolicy = when (visiblePolicy) {
-                    LiquidityPolicyOptions.AUTO -> LiquidityPolicy.Auto(maxFeeBasisPoints = maxFeeBasisPoints, maxFeeFloor = maxFeeFloor)
-                    LiquidityPolicyOptions.TRUSTLESS -> LiquidityPolicy.Auto(maxFeeBasisPoints = maxFeeBasisPoints, maxFeeFloor = maxFeeFloor)
+                    LiquidityPolicyOptions.AUTO -> LiquidityPolicy.Auto(maxRelativeFeeBasisPoints = maxRelativeFeeBasisPoints, maxAbsoluteFee = maxAbsoluteFee)
+                    LiquidityPolicyOptions.TRUSTLESS -> LiquidityPolicy.Auto(maxRelativeFeeBasisPoints = maxRelativeFeeBasisPoints, maxAbsoluteFee = maxAbsoluteFee)
                     LiquidityPolicyOptions.DISABLED -> LiquidityPolicy.Disable
                 }
                 val isEnabled = policyInPrefs != newPolicy
@@ -143,10 +143,10 @@ fun LiquidityPolicyView(
 
 @Composable
 private fun FeePolicyEditor(
-    maxFeeBasisPoints: Int,
-    maxFeeFloor: Satoshi,
-    onFeeBasisChange: (Int) -> Unit,
-    onFeeFloorChange: (Satoshi) -> Unit,
+    maxRelativeFeeBasisPoints: Int,
+    maxAbsoluteFee: Satoshi,
+    onMaxRelativeFeeBasisPointsChange: (Int) -> Unit,
+    onMaxAbsoluteFeeChange: (Satoshi) -> Unit,
 ) {
     val log = logger("FeePolicyEditor")
     val btcUnit = LocalBitcoinUnit.current
@@ -157,29 +157,29 @@ private fun FeePolicyEditor(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(id = R.string.liquiditypolicy_fee_max, maxFeeFloor.toPrettyString(btcUnit, withUnit = true)),
+                text = stringResource(id = R.string.liquiditypolicy_fee_max, maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true)),
                 modifier = Modifier.width(120.dp),
                 style = MaterialTheme.typography.body2.copy(fontSize = 14.sp)
             )
             Spacer(Modifier.width(16.dp))
             Slider(
-                value = maxFeeFloor.sat.toFloat(),
-                onValueChange = { onFeeFloorChange(it.toLong().sat) },
+                value = maxAbsoluteFee.sat.toFloat(),
+                onValueChange = { onMaxAbsoluteFeeChange(it.toLong().sat) },
                 valueRange = 300f..10_000f, // max 10k sat
                 modifier = Modifier.weight(1f),
             )
         }
-        val isSanityCheckEnabled = maxFeeBasisPoints == 10_00
+        val isSanityCheckEnabled = maxRelativeFeeBasisPoints == 30_00
         SwitchView(
             text = stringResource(id = R.string.liquiditypolicy_fee_sanity_check),
             textStyle = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
             description = if (isSanityCheckEnabled) {
-                stringResource(id = R.string.liquiditypolicy_fee_sanity_check_enabled, maxFeeBasisPoints / 100)
+                stringResource(id = R.string.liquiditypolicy_fee_sanity_check_enabled, maxRelativeFeeBasisPoints / 100)
             } else {
                 stringResource(id = R.string.liquiditypolicy_fee_sanity_check_disabled)
             },
             checked = isSanityCheckEnabled,
-            onCheckedChange = { onFeeBasisChange(if (it) 10_00 else 100_00) }
+            onCheckedChange = { onMaxRelativeFeeBasisPointsChange(if (it) 30_00 else 100_00) }
         )
     }
 }

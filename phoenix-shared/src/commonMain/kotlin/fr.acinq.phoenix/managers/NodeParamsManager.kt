@@ -73,6 +73,6 @@ class NodeParamsManager(
     }
 
     companion object {
-        val defaultLiquidityPolicy = LiquidityPolicy.Auto(maxFeeBasisPoints = 10_00 /* 10 % */, maxFeeFloor = 10_000.sat)
+        val defaultLiquidityPolicy = LiquidityPolicy.Auto(maxAbsoluteFee = 3_000.sat /* 10 % */, maxRelativeFeeBasisPoints = 30_00)
     }
 }

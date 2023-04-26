@@ -171,7 +171,7 @@ object UserPrefs {
         try {
             it[LIQUIDITY_POLICY]?.let { policy ->
                 when (val res = json.decodeFromString<InternalLiquidityPolicy>(policy)) {
-                    is InternalLiquidityPolicy.Auto -> LiquidityPolicy.Auto(res.maxFeeBasisPoints, res.maxFeeFloor)
+                    is InternalLiquidityPolicy.Auto -> LiquidityPolicy.Auto(res.maxAbsoluteFee, res.maxRelativeFeeBasisPoints)
                     is InternalLiquidityPolicy.Disable -> LiquidityPolicy.Disable
                 }
             }
@@ -183,13 +183,13 @@ object UserPrefs {
 
     suspend fun saveLiquidityPolicy(context: Context, policy: LiquidityPolicy) = context.userPrefs.edit {
         val serialisable = when (policy) {
-            is LiquidityPolicy.Auto -> InternalLiquidityPolicy.Auto(policy.maxFeeBasisPoints, policy.maxFeeFloor)
+            is LiquidityPolicy.Auto -> InternalLiquidityPolicy.Auto(policy.maxRelativeFeeBasisPoints, policy.maxAbsoluteFee)
             is LiquidityPolicy.Disable -> InternalLiquidityPolicy.Disable
         }
         it[LIQUIDITY_POLICY] = json.encodeToString(serialisable)
         // also save the fee so that we don't lose the user fee preferences even when using a disabled policy
         if (policy is LiquidityPolicy.Auto) {
-            it[LIQUIDITY_PREFERRED_FEE] = json.encodeToString(LiquidityPreferredFee(maxFeeBasisPoints = policy.maxFeeBasisPoints, maxFeeFloor = policy.maxFeeFloor))
+            it[LIQUIDITY_PREFERRED_FEE] = json.encodeToString(LiquidityPreferredFee(maxRelativeFeeBasisPoints = policy.maxRelativeFeeBasisPoints, maxAbsoluteFee = policy.maxAbsoluteFee))
         }
     }
 
@@ -236,15 +236,15 @@ sealed class InternalLiquidityPolicy {
 
     @Serializable
     data class Auto(
-        val maxFeeBasisPoints: Int,
-        @Serializable(with = SatoshiSerializer::class) val maxFeeFloor: Satoshi
+        val maxRelativeFeeBasisPoints: Int,
+        @Serializable(with = SatoshiSerializer::class) val maxAbsoluteFee: Satoshi
     ) : InternalLiquidityPolicy()
 }
 
 @Serializable
-data class LiquidityPreferredFee(val maxFeeBasisPoints: Int, @Serializable(with = SatoshiSerializer::class) val maxFeeFloor: Satoshi) {
+data class LiquidityPreferredFee(val maxRelativeFeeBasisPoints: Int, @Serializable(with = SatoshiSerializer::class) val maxAbsoluteFee: Satoshi) {
     companion object {
-        val default = NodeParamsManager.defaultLiquidityPolicy.let { LiquidityPreferredFee(it.maxFeeBasisPoints, it.maxFeeFloor) }
+        val default = NodeParamsManager.defaultLiquidityPolicy.let { LiquidityPreferredFee(it.maxRelativeFeeBasisPoints, it.maxAbsoluteFee) }
     }
 }
 
