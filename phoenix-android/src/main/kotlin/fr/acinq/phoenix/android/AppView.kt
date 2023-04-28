@@ -285,7 +285,7 @@ fun AppView(
                 composable(Screen.WalletInfo.SwapInWallet.route) {
                     SwapInWalletInfo(
                         onBackClick = { navController.popBackStack() },
-                        onChangeChannelPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
+                        onViewChannelPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
                     )
                 }
                 composable(Screen.WalletInfo.FinalWallet.route) {

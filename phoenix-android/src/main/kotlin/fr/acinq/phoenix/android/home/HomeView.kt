@@ -147,9 +147,11 @@ fun HomeView(
                 )
             }
             Column(modifier = Modifier.heightIn(min = 54.dp), verticalArrangement = Arrangement.Top) {
-                IncomingAmountNotif(walletContext.value?.swapIn?.v1, swapInBalance.value, onShowSwapInWallet)
-                Spacer(modifier = Modifier.height(8.dp))
-                UnconfirmedChannelsAmountView(unconfirmedChannelsBalance.value)
+                IncomingAmountNotif(
+                    swapInBalance = swapInBalance.value,
+                    channelConfirmationBalance = unconfirmedChannelsBalance.value,
+                    onShowSwapInWallet = onShowSwapInWallet
+                )
             }
             PrimarySeparator()
             Spacer(Modifier.height(24.dp))
@@ -322,111 +324,57 @@ private fun ConnectionDialogLine(
 
 @Composable
 private fun IncomingAmountNotif(
-    swapInParams: WalletContext.V0.SwapIn.V1?,
     swapInBalance: WalletBalance,
+    channelConfirmationBalance: MilliSatoshi,
     onShowSwapInWallet: () -> Unit,
 ) {
-    var showValidSwapInInfoDialog by remember { mutableStateOf(false) }
-    var showInvalidSwapInInfoDialog by remember { mutableStateOf(false) }
+    var showSwapInInfoDialog by remember { mutableStateOf(false) }
 
-    if (showValidSwapInInfoDialog && swapInParams != null) {
-        ValidSwapInInfoDialog(
-            onDismiss = { showValidSwapInInfoDialog = false },
-            onShowSwapInWallet = onShowSwapInWallet,
-        )
-    }
-
-    if (showInvalidSwapInInfoDialog && swapInParams != null) {
-        InvalidSwapInInfoDialog(
-            onDismiss = { showInvalidSwapInInfoDialog = false },
-            minFundingAmount = swapInParams.minFundingSat.sat,
+    if (showSwapInInfoDialog) {
+        OnChainInfoDialog(
+            swapInBalance = swapInBalance,
+            channelConfirmationBalance = channelConfirmationBalance,
+            onDismiss = { showSwapInInfoDialog = false },
             onShowSwapInWallet = onShowSwapInWallet,
         )
     }
 
     if (swapInBalance != WalletBalance.empty()) {
-        val balance = swapInBalance.total
-        // swap-in is invalid if amount < min_funding
-        val isInvalid = swapInParams?.let { balance < it.minFundingSat.sat } ?: false
-        if (isInvalid) {
-            FilledButton(
-                text = stringResource(id = R.string.home__swapin_incoming, balance.toMilliSatoshi().toPrettyString(preferredAmountUnit, fiatRate, withUnit = true)),
-                textStyle = MaterialTheme.typography.caption.copy(color = negativeColor),
-                icon = R.drawable.ic_alert_triangle,
-                iconTint = negativeColor,
-                padding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                backgroundColor = Color.Transparent,
-                onClick = {
-                    showValidSwapInInfoDialog = false
-                    showInvalidSwapInInfoDialog = true
-                }
-            )
-        } else {
-            FilledButton(
-                text = stringResource(id = R.string.home__swapin_incoming, balance.toMilliSatoshi().toPrettyString(preferredAmountUnit, fiatRate, withUnit = true)),
-                textStyle = MaterialTheme.typography.caption,
-                padding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                backgroundColor = Color.Transparent,
-                onClick = {
-                    showValidSwapInInfoDialog = true
-                    showInvalidSwapInInfoDialog = false
-                }
-            )
-        }
-    }
-}
-
-@Composable
-private fun ValidSwapInInfoDialog(
-    onDismiss: () -> Unit,
-    onShowSwapInWallet: () -> Unit,
-) {
-    Dialog(onDismiss = onDismiss, title = stringResource(id = R.string.home__swapin_dialog_valid_title)) {
-        Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-            Text(text = stringResource(R.string.home__swapin_dialog_valid_body))
-            Spacer(modifier = Modifier.height(8.dp))
-            InlineButton(text = stringResource(id = R.string.home__swapin_dialog_button_to_wallet), onClick = onShowSwapInWallet)
-        }
-    }
-}
-
-@Composable
-private fun InvalidSwapInInfoDialog(
-    onDismiss: () -> Unit,
-    minFundingAmount: Satoshi,
-    onShowSwapInWallet: () -> Unit,
-) {
-    Dialog(onDismiss = onDismiss, title = stringResource(id = R.string.home__swapin_dialog_invalid_title)) {
-        Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-            Text(text = annotatedStringResource(R.string.home__swapin_dialog_invalid_body, minFundingAmount))
-            Spacer(modifier = Modifier.height(8.dp))
-            InlineButton(text = stringResource(id = R.string.home__swapin_dialog_button_to_wallet), onClick = onShowSwapInWallet)
-        }
-    }
-}
-
-@Composable
-private fun UnconfirmedChannelsAmountView(
-    amount: MilliSatoshi
-) {
-    var showUnconfirmedChannelsDialog by remember { mutableStateOf(false) }
-    if (amount > 0.msat) {
+        val balance = swapInBalance.total.toMilliSatoshi() + channelConfirmationBalance
         FilledButton(
-            text = stringResource(id = R.string.home__swapin_incoming, amount.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true)),
-            textStyle = MaterialTheme.typography.caption.copy(color = orange),
+            icon = R.drawable.ic_chain,
+            iconTint = MaterialTheme.typography.caption.color,
+            text = stringResource(id = R.string.home__onchain_incoming, balance.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true)),
+            textStyle = MaterialTheme.typography.caption,
             padding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             backgroundColor = Color.Transparent,
-            onClick = {
-                showUnconfirmedChannelsDialog = true
-            }
+            onClick = { showSwapInInfoDialog = true }
         )
     }
+}
 
-    if (showUnconfirmedChannelsDialog) {
-        UnconfirmedChannelsBalanceDialog(
-            amount = amount,
-            onDismiss = { showUnconfirmedChannelsDialog = false }
-        )
+@Composable
+private fun OnChainInfoDialog(
+    onDismiss: () -> Unit,
+    swapInBalance: WalletBalance,
+    channelConfirmationBalance: MilliSatoshi,
+    onShowSwapInWallet: () -> Unit,
+) {
+    val btcUnit = LocalBitcoinUnit.current
+    Dialog(onDismiss = onDismiss, title = stringResource(id = R.string.home__onchain_dialog_title)) {
+        Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+            Text(text = stringResource(R.string.home__onchain_dialog_header))
+            if (swapInBalance.total > 0.sat) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = annotatedStringResource(R.string.home__onchain_dialog_swap_in, swapInBalance.total.toPrettyString(btcUnit, withUnit = true)))
+            }
+            if (channelConfirmationBalance > 0.msat) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = annotatedStringResource(R.string.home__onchain_dialog_channel_confirming, channelConfirmationBalance.toPrettyString(btcUnit, withUnit = true)))
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            InlineButton(text = stringResource(id = R.string.home__onchain_dialog_button_to_wallet), onClick = onShowSwapInWallet)
+        }
     }
 }
 

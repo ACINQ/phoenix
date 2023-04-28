@@ -317,12 +317,12 @@
     <!-- //////////////// home //////////////////// -->
 
     <string name="home__balance_loading">Loading…</string>
-    <string name="home__swapin_incoming">+%1$s incoming</string>
-    <string name="home__swapin_dialog_button_to_wallet">Show incoming payments</string>
-    <string name="home__swapin_dialog_valid_title">Incoming deposit</string>
-    <string name="home__swapin_dialog_valid_body">Once the incoming payment is confirmed, Phoenix will use the funds to open a payment channel.</string>
-    <string name="home__swapin_dialog_invalid_title">Deposit below minimum</string>
-    <string name="home__swapin_dialog_invalid_body">Deposits must be at least <b>%1$s</b>. Please make additional deposits to use the funds inside Phoenix.\n\nOnce the minimum amount is reached, Phoenix will use the funds to open a payment channel.</string>
+    <string name="home__onchain_incoming">%1$s</string>
+    <string name="home__onchain_dialog_button_to_wallet">Show incoming on-chain payments</string>
+    <string name="home__onchain_dialog_title">Incoming payments</string>
+    <string name="home__onchain_dialog_header">You have some incoming funds waiting for confirmation.</string>
+    <string name="home__onchain_dialog_swap_in">- <b>%1$s</b> on-chain deposit.</string>
+    <string name="home__onchain_dialog_channel_confirming">- <b>%1$s</b> waiting for the channel to confirm.</string>
 
     <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">You have not made any payments recently.\n\nUse the Receive and Send buttons at the bottom of this screen to get started!</string>
@@ -798,10 +798,12 @@
     <string name="walletinfo_offchain_channels">Payment channels</string>
 
     <string name="walletinfo_onchain_swapin">Swap-in wallet</string>
-    <string name="walletinfo_onchain_swapin_about">An on-chain wallet derived from your seed.\n\nThe swap-in wallet is a bridge to Lightning. Funds on this wallet will automatically be moved to Lightning when above a given threshold.</string>
-    <string name="walletinfo_onchain_swapin_policy_auto">This balance will be moved to Lightning automatically when above 10k sat.</string>
-    <string name="walletinfo_onchain_swapin_policy_check_fee">This balance will be moved to Lightning automatically when above 10k sat and fee is less than 2k sat.</string>
-    <string name="walletinfo_onchain_swapin_policy_disabled">Automated channel opening has been disabled. These funds will not be touched.</string>
+    <string name="walletinfo_onchain_swapin_help">An on-chain wallet derived from your seed.\n\nThe swap-in wallet is a bridge to Lightning. Funds on this wallet will automatically be moved to Lightning according to your liquidity policy setting.</string>
+    <string name="walletinfo_onchain_swapin_about">This wallet serves as a bridge to Lightning.</string>
+    <string name="walletinfo_onchain_swapin_about_unconfirmed">Placeholder message for unconfirmed balance?</string>
+    <string name="walletinfo_onchain_swapin_policy_view_button">View liquidity policy</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details">These funds will be moved to Lightning automatically if the mining fee is <b>below %1$s</b>.</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled_details">Automated channel opening <b>has been disabled</b>. These funds will remain here.</string>
 
     <string name="walletinfo_onchain_final">Final wallet</string>
     <string name="walletinfo_onchain_final_about">An on-chain wallet derived from your seed.\n\nThe final wallet is where funds are sent by default when your Lightning channels are closed.</string>

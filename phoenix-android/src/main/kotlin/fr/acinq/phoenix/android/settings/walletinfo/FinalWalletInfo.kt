@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -58,6 +59,20 @@ private fun ConfirmedBalanceView(
         BalanceWithContent(balance = balance) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = stringResource(id = R.string.walletinfo_onchain_final_about), style = MaterialTheme.typography.subtitle2)
+        }
+    }
+}
+
+@Composable
+private fun UnconfirmedWalletView(
+    wallet: WalletState?
+) {
+    CardHeader(text = stringResource(id = R.string.walletinfo_unconfirmed_title))
+    Card {
+        BalanceWithContent(balance = wallet?.unconfirmedBalance?.toMilliSatoshi())
+        if (!wallet?.unconfirmedUtxos.isNullOrEmpty()) {
+            HSeparator()
+            wallet?.unconfirmedUtxos?.forEach { UtxoRow(it, false) }
         }
     }
 }

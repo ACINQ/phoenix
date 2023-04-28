@@ -23,6 +23,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -84,7 +85,7 @@ private fun SwapInWalletView(onSwapInWalletClick: () -> Unit) {
 
     CardHeaderWithHelp(
         text = stringResource(id = R.string.walletinfo_onchain_swapin),
-        helpMessage = stringResource(id = R.string.walletinfo_onchain_swapin_about)
+        helpMessage = stringResource(id = R.string.walletinfo_onchain_swapin_help)
     )
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -189,21 +190,7 @@ private fun XpubView(xpub: String, path: String) {
 }
 
 @Composable
-fun UnconfirmedWalletView(
-    wallet: WalletState?
-) {
-    CardHeader(text = stringResource(id = R.string.walletinfo_unconfirmed_title))
-    Card {
-        BalanceWithContent(balance = wallet?.unconfirmedBalance?.toMilliSatoshi())
-        if (!wallet?.unconfirmedUtxos.isNullOrEmpty()) {
-            HSeparator()
-            wallet?.unconfirmedUtxos?.forEach { UtxoRow(it, false) }
-        }
-    }
-}
-
-@Composable
-private fun UtxoRow(utxo: WalletState.Utxo, isConfirmed: Boolean) {
+fun UtxoRow(utxo: WalletState.Utxo, isConfirmed: Boolean) {
     val context = LocalContext.current
     val txUrl = txUrl(txId = utxo.outPoint.txid.toHex())
     Row(
@@ -211,13 +198,13 @@ private fun UtxoRow(utxo: WalletState.Utxo, isConfirmed: Boolean) {
             .clickable(role = Role.Button, onClickLabel = "open link in explorer") {
                 openLink(context, link = txUrl)
             }
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         PhoenixIcon(
             resourceId = if (isConfirmed) { R.drawable.ic_chain } else { R.drawable.ic_clock },
             tint = MaterialTheme.colors.primary,
-            modifier = Modifier.alignByBaseline(),
         )
         Text(
             text = utxo.outPoint.txid.toHex(),
@@ -227,7 +214,7 @@ private fun UtxoRow(utxo: WalletState.Utxo, isConfirmed: Boolean) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-        AmountView(amount = utxo.amount.toMilliSatoshi(), modifier = Modifier.alignByBaseline())
+        AmountView(amount = utxo.amount.toMilliSatoshi())
     }
 }
 
