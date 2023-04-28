@@ -112,6 +112,7 @@ fun AmountWithAltView(
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
     unitTextStyle: TextStyle = MaterialTheme.typography.body1,
     separatorSpace: Dp = 4.dp,
+    spaceBetweenAmounts: Dp = 4.dp,
     isOutgoing: Boolean? = null,
 ) {
     val (topUnit, bottomUnit) = if (LocalShowInFiat.current) {
@@ -132,6 +133,7 @@ fun AmountWithAltView(
             forceUnit = topUnit,
             prefix = isOutgoing?.let { stringResource(id = if (it) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received) }
         )
+        Spacer(modifier = Modifier.height(spaceBetweenAmounts))
         AmountView(
             amount = amount,
             amountTextStyle = MaterialTheme.typography.caption,

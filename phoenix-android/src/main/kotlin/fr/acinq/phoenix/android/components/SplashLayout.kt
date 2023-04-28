@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.HelpPopup
 
 
 @Composable
@@ -58,9 +57,9 @@ fun SplashLayout(
         Image(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(240.dp)
+                .height(200.dp)
                 .constrainAs(decorCurveConstraint) {
-                    top.linkTo(parent.top, margin = 170.dp)
+                    top.linkTo(parent.top, margin = 180.dp)
                 },
             painter = painterResource(id = R.drawable.payment_splash_curve),
             contentDescription = null,
@@ -93,7 +92,7 @@ fun SplashLayout(
             header()
             Column(
                 modifier = Modifier
-                    .heightIn(min = 250.dp)
+                    .heightIn(min = 260.dp)
                     .padding(bottom = 30.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -120,7 +119,7 @@ fun SplashLabelRow(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Row(
-        modifier = Modifier.padding(vertical = 4.dp)
+        modifier = Modifier.padding(vertical = 3.dp)
     ) {
         Row(modifier = Modifier
             .weight(1f)

@@ -369,18 +369,17 @@
     <string name="paymentdetails_loading">Loading payment details…</string>
     <string name="paymentdetails_error">There was an error when retrieving the details for this payment:\n\nCause:%1$s</string>
 
-    <string name="paymentdetails_status_splice_pending">Splice is confirming…</string>
-    <string name="paymentdetails_status_splice_confirmed">Splice sent</string>
-    <string name="paymentdetails_status_channelclose_confirming">Channel closing is confirming…</string>
-    <string name="paymentdetails_status_channelclose_confirmed">Channel closing complete</string>
-    <string name="paymentdetails_status_sent_successful">Sent</string>
+    <string name="paymentdetails_status_channelclose_confirmed"><b>COMPLETE</b> %1$s</string>
+    <string name="paymentdetails_status_sent_successful"><b>SENT</b> %1$s</string>
     <string name="paymentdetails_status_sent_pending">Pending…</string>
-    <string name="paymentdetails_status_sent_failed">Failed. No money has been sent.</string>
+    <string name="paymentdetails_status_sent_failed"><b>Failed.</b>\nNo money has been sent.</string>
 
     <string name="paymentdetails_status_received_pending">Not received yet.</string>
-    <string name="paymentdetails_status_received_unconfirmed">Waiting for confirmations</string>
-    <string name="paymentdetails_status_received_unconfirmed_details">requires %1$d confirmations (≈ %2$d minutes)</string>
-    <string name="paymentdetails_status_received_successful">Received</string>
+    <string name="paymentdetails_status_received_paytoopen_pending">Waiting for channel to open</string>
+    <string name="paymentdetails_status_received_successful"><b>RECEIVED</b> %1$s</string>
+
+    <string name="paymentdetails_status_unconfirmed">Waiting for confirmations</string>
+    <string name="paymentdetails_status_unconfirmed_details">requires %1$d confirmations (≈ %2$d minutes)</string>
 
     <string name="paymentdetails_desc_label">Desc.</string>
     <string name="paymentdetails_desc_custom_title">Add note</string>
@@ -388,14 +387,14 @@
     <string name="paymentdetails_destination_label">Sent to</string>
     <string name="paymentdetails_fees_label">Fees</string>
     <string name="paymentdetails_funding_fees_label">Mining fees</string>
-    <string name="paymentdetails_funding_fees_desc">Bitcoin network fees paid for on-chain transaction.</string>
+    <string name="paymentdetails_funding_fees_desc">Fees paid to the Bitcoin network miners to process the on-chain transaction.</string>
     <string name="paymentdetails_service_fees_label">Service fees</string>
-    <string name="paymentdetails_service_fees_desc">In order to receive this payment, a new payment channel was opened. This is not always required.</string>
+    <string name="paymentdetails_service_fees_desc">Fees paid for the creation of a new payment channel. This is not always required.</string>
     <string name="paymentdetails_error_label">Error</string>
     <string name="paymentdetails_no_description">No description</string>
     <string name="paymentdetails_info_uniclose">This payment happened following a conflict in a channel.</string>
 
-    <string name="paymentdetails_desc_splice_out">Splice-out to %1$s</string>
+    <string name="paymentdetails_desc_splice_out">On-chain payment</string>
     <string name="paymentdetails_desc_closing_channel">Closing channel</string>
     <string name="paymentdetails_desc_keysend">Donation</string>
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>

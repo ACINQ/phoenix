@@ -40,7 +40,7 @@ fun WalletPayment.state(): WalletPaymentState = when (this) {
         is LightningOutgoingPayment.Status.Completed.Failed -> WalletPaymentState.Failure
     }
     is IncomingPayment -> when (val r = received) {
-        null -> WalletPaymentState.PendingOnChain
+        null -> WalletPaymentState.PendingOffChain
         else -> when {
             r.receivedWith.isEmpty() -> WalletPaymentState.PendingOnChain
             r.receivedWith.any { it is IncomingPayment.ReceivedWith.OnChainIncomingPayment } -> when (completedAt) {
