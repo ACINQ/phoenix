@@ -101,15 +101,13 @@
 
     <!-- //////////////// payment holder //////////////// -->
 
-    <string name="paymentline_loading">Loading…</string>
     <string name="paymentline_prefix_sent">-</string>
     <string name="paymentline_prefix_received">+</string>
-    <string name="paymentline_prefix_rounded">≈</string>
-    <string name="paymentline_keysend_outgoing">Donation</string>
-    <string name="paymentline_keysend_incoming">Spontaneous payment</string>
-    <string name="paymentline_closing_desc_no_address">Channel closing</string>
-    <string name="paymentline_closing_desc">Channel closing to %1$s</string>
-    <string name="paymentline_swap_in_desc">On-chain deposit</string>
+    <string name="paymentline_desc_pending_onchain">Waiting for confirmation</string>
+    <string name="paymentline_desc_pending_offchain">Payment pending</string>
+    <string name="paymentline_desc_success_onchain">Payment confirmed</string>
+    <string name="paymentline_desc_success_offchain">Payment complete</string>
+    <string name="paymentline_desc_failed">Payment has failed</string>
 
     <!-- //////////////// receive //////////////// -->
 
@@ -204,6 +202,7 @@
     <!-- //////////////// utility strings //////////////// -->
 
     <!-- #1: sign / #2: integer part / #3: decimal part / #4: unit -->
+    <string name="utils_rounded">≈</string>
     <string name="utils_converted_amount">≈ %1$s</string>
     <string name="utils_unknown_amount" translatable="false">!?</string>
     <string name="utils_no_conversion">BTC exchange rate unavailable</string>
@@ -289,7 +288,7 @@
     <string name="channeldetails_not_found">No active channel exists for that identifier.</string>
     <string name="channeldetails_channel_id">Channel id</string>
     <string name="channeldetails_state">State</string>
-    <string name="channeldetails_spendable">Can send</string>
+    <string name="channeldetails_spendable">Balance</string>
 
     <string name="channeldetails_commitments">Active commitments</string>
     <string name="channeldetails_inactive_commitments">Inactive commitments</string>
@@ -392,7 +391,7 @@
     <string name="paymentdetails_funding_fees_desc">Bitcoin network fees paid for on-chain transaction.</string>
     <string name="paymentdetails_service_fees_label">Service fees</string>
     <string name="paymentdetails_service_fees_desc">In order to receive this payment, a new payment channel was opened. This is not always required.</string>
-    \<string name="paymentdetails_error_label">Error</string>
+    <string name="paymentdetails_error_label">Error</string>
     <string name="paymentdetails_no_description">No description</string>
     <string name="paymentdetails_info_uniclose">This payment happened following a conflict in a channel.</string>
 

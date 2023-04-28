@@ -49,6 +49,8 @@ import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.data.walletPaymentId
+import fr.acinq.phoenix.utils.extensions.WalletPaymentState
+import fr.acinq.phoenix.utils.extensions.state
 
 
 @Composable
@@ -120,18 +122,13 @@ fun PaymentLine(
             Row {
                 PaymentDescription(paymentInfo = paymentInfo, modifier = Modifier.weight(1.0f))
                 Spacer(modifier = Modifier.width(16.dp))
-                if (!isFailedOutgoingLightningPayment(payment)) {
+                if (payment.state() != WalletPaymentState.Failure) {
                     val isOutgoing = payment is OutgoingPayment
-                    val amount = when (payment) {
-                        is LightningOutgoingPayment -> payment.parts.filterIsInstance<LightningOutgoingPayment.Part>().map { it.amount }.sum()
-                        is OnChainOutgoingPayment -> payment.amountSatoshi.toMilliSatoshi()
-                        is IncomingPayment -> payment.received?.amount ?: 0.msat
-                    }
                     if (isAmountRedacted) {
                         Text(text = "****")
                     } else {
                         AmountView(
-                            amount = amount,
+                            amount = payment.amount,
                             amountTextStyle = MaterialTheme.typography.body1.copy(color = if (isOutgoing) negativeColor else positiveColor),
                             unitTextStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
                             prefix = stringResource(if (isOutgoing) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received)
@@ -140,9 +137,7 @@ fun PaymentLine(
                 }
             }
             Spacer(modifier = Modifier.height(2.dp))
-            val timestamp: Long = remember {
-                payment.completedAt ?: payment.createdAt
-            }
+            val timestamp: Long = remember { payment.completedAt ?: payment.createdAt }
             Text(text = timestamp.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
         }
     }
@@ -163,84 +158,42 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
     )
 }
 
-private fun isFailedOutgoingLightningPayment(payment: WalletPayment) = (payment is LightningOutgoingPayment && payment.status is LightningOutgoingPayment.Status.Completed.Failed)
-
 @Composable
 private fun PaymentIcon(payment: WalletPayment) {
-    when (payment) {
-        is LightningOutgoingPayment -> when (payment.status) {
-            is LightningOutgoingPayment.Status.Pending -> PaymentIconComponent(
+    when (payment.state()) {
+        WalletPaymentState.PendingOnChain -> {
+            PaymentIconComponent(
+                icon = R.drawable.ic_clock,
+                description = stringResource(id = R.string.paymentline_desc_pending_onchain),
+            )
+        }
+        WalletPaymentState.PendingOffChain -> {
+            PaymentIconComponent(
                 icon = R.drawable.ic_payment_pending,
-                description = stringResource(id = R.string.paymentdetails_status_sent_pending)
+                description = stringResource(id = R.string.paymentline_desc_pending_offchain),
             )
-            is LightningOutgoingPayment.Status.Completed.Failed -> PaymentIconComponent(
-                icon = R.drawable.ic_payment_failed,
-                description = stringResource(id = R.string.paymentdetails_status_sent_failed)
+        }
+        WalletPaymentState.SuccessOnChain -> {
+            PaymentIconComponent(
+                icon = R.drawable.ic_payment_success_onchain,
+                description = stringResource(id = R.string.paymentline_desc_success_onchain),
+                iconColor = MaterialTheme.colors.onPrimary,
+                backgroundColor = MaterialTheme.colors.primary
             )
-            is LightningOutgoingPayment.Status.Completed.Succeeded -> PaymentIconComponent(
+        }
+        WalletPaymentState.SuccessOffChain -> {
+            PaymentIconComponent(
                 icon = R.drawable.ic_payment_success,
-                description = stringResource(id = R.string.paymentdetails_status_sent_successful),
+                description = stringResource(id = R.string.paymentline_desc_success_offchain),
                 iconColor = MaterialTheme.colors.onPrimary,
                 backgroundColor = MaterialTheme.colors.primary
             )
         }
-        is SpliceOutgoingPayment -> when (payment.confirmedAt) {
-            null -> PaymentIconComponent(
-                icon = R.drawable.ic_clock,
-                description = stringResource(id = R.string.paymentdetails_status_splice_confirmed),
+        WalletPaymentState.Failure -> {
+            PaymentIconComponent(
+                icon = R.drawable.ic_payment_failed,
+                description = stringResource(id = R.string.paymentline_desc_failed)
             )
-            else -> PaymentIconComponent(
-                icon = R.drawable.ic_payment_success_onchain,
-                description = stringResource(id = R.string.paymentdetails_status_splice_confirmed),
-                iconSize = 14.dp,
-                iconColor = MaterialTheme.colors.onPrimary,
-                backgroundColor = MaterialTheme.colors.primary
-            )
-        }
-        is ChannelCloseOutgoingPayment -> when (payment.confirmedAt) {
-            null -> PaymentIconComponent(
-                icon = R.drawable.ic_clock,
-                description = stringResource(id = R.string.paymentdetails_status_channelclose_confirming),
-            )
-            else -> PaymentIconComponent(
-                icon = R.drawable.ic_payment_success_onchain,
-                description = stringResource(id = R.string.paymentdetails_status_channelclose_confirmed),
-                iconColor = MaterialTheme.colors.onPrimary,
-                backgroundColor = MaterialTheme.colors.primary
-            )
-        }
-        is IncomingPayment -> when {
-            payment.received == null -> {
-                PaymentIconComponent(
-                    icon = R.drawable.ic_payment_pending,
-                    description = stringResource(id = R.string.paymentdetails_status_received_pending),
-                    iconColor = MaterialTheme.colors.onPrimary,
-                    backgroundColor = MaterialTheme.colors.primary
-                )
-            }
-            payment.completedAt == null -> {
-                PaymentIconComponent(
-                    icon = R.drawable.ic_clock,
-                    description = stringResource(id = R.string.paymentdetails_status_received_unconfirmed),
-                )
-            }
-            else -> {
-                PaymentIconComponent(
-                    icon = if (payment.origin is IncomingPayment.Origin.SwapIn || payment.origin is IncomingPayment.Origin.OnChain) {
-                        R.drawable.ic_payment_success_onchain
-                    } else {
-                        R.drawable.ic_payment_success
-                    },
-                    description = stringResource(id = R.string.paymentdetails_status_received_successful),
-                    iconSize = if (payment.origin is IncomingPayment.Origin.SwapIn || payment.origin is IncomingPayment.Origin.OnChain) {
-                        14.dp
-                    } else {
-                        18.dp
-                    },
-                    iconColor = MaterialTheme.colors.onPrimary,
-                    backgroundColor = MaterialTheme.colors.primary
-                )
-            }
         }
     }
 }

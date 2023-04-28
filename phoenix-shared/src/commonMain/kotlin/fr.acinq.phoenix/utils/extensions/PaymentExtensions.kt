@@ -21,11 +21,8 @@ import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.PaymentRequest
 import org.kodein.memory.util.freeze
 
-/**
- * Standardized location for extending types from: fr.acinq.lightning
- */
-
-enum class WalletPaymentState { Success, Pending, Failure }
+/** Standardized location for extending types from: fr.acinq.lightning. */
+enum class WalletPaymentState { SuccessOnChain, SuccessOffChain, PendingOnChain, PendingOffChain, Failure }
 
 fun WalletPayment.id(): String = when (this) {
     is OutgoingPayment -> this.id.toString()
@@ -34,17 +31,27 @@ fun WalletPayment.id(): String = when (this) {
 
 fun WalletPayment.state(): WalletPaymentState = when (this) {
     is OnChainOutgoingPayment -> when (confirmedAt) {
-        null -> WalletPaymentState.Pending
-        else -> WalletPaymentState.Success
+        null -> WalletPaymentState.PendingOnChain
+        else -> WalletPaymentState.SuccessOnChain
     }
     is LightningOutgoingPayment -> when (status) {
-        is LightningOutgoingPayment.Status.Pending -> WalletPaymentState.Pending
+        is LightningOutgoingPayment.Status.Pending -> WalletPaymentState.PendingOffChain
+        is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> WalletPaymentState.SuccessOffChain
         is LightningOutgoingPayment.Status.Completed.Failed -> WalletPaymentState.Failure
-        is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> WalletPaymentState.Success
     }
-    is IncomingPayment -> when (completedAt) {
-        null -> WalletPaymentState.Pending
-        else -> WalletPaymentState.Success
+    is IncomingPayment -> when (val r = received) {
+        null -> WalletPaymentState.PendingOnChain
+        else -> when {
+            r.receivedWith.isEmpty() -> WalletPaymentState.PendingOnChain
+            r.receivedWith.any { it is IncomingPayment.ReceivedWith.OnChainIncomingPayment } -> when (completedAt) {
+                null -> WalletPaymentState.PendingOnChain
+                else -> WalletPaymentState.SuccessOnChain
+            }
+            else -> when (completedAt) {
+                null -> WalletPaymentState.PendingOffChain
+                else -> WalletPaymentState.SuccessOffChain
+            }
+        }
     }
 }
 

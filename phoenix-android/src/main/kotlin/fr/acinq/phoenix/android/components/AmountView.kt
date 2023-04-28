@@ -139,7 +139,7 @@ fun AmountWithAltView(
             separatorSpace = separatorSpace,
             modifier = modifier,
             forceUnit = bottomUnit,
-            prefix = if (bottomUnit is FiatCurrency) stringResource(R.string.paymentline_prefix_rounded) else null
+            prefix = if (bottomUnit is FiatCurrency) stringResource(R.string.utils_rounded) else null
         )
     }
 }
