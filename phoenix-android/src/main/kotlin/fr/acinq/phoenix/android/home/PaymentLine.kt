@@ -163,7 +163,8 @@ private fun PaymentIcon(payment: WalletPayment) {
     when (payment.state()) {
         WalletPaymentState.PendingOnChain -> {
             PaymentIconComponent(
-                icon = R.drawable.ic_clock,
+                icon = R.drawable.ic_payment_pending_onchain,
+                iconSize = 20.dp,
                 description = stringResource(id = R.string.paymentline_desc_pending_onchain),
             )
         }
@@ -171,6 +172,7 @@ private fun PaymentIcon(payment: WalletPayment) {
             PaymentIconComponent(
                 icon = R.drawable.ic_payment_pending,
                 description = stringResource(id = R.string.paymentline_desc_pending_offchain),
+                backgroundColor = Color.Transparent
             )
         }
         WalletPaymentState.SuccessOnChain -> {
@@ -204,15 +206,18 @@ private fun PaymentIconComponent(
     description: String,
     iconSize: Dp = 18.dp,
     iconColor: Color = MaterialTheme.colors.primary,
-    backgroundColor: Color = Color.Transparent
+    backgroundColor: Color? = null
 ) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .clip(CircleShape)
             .size(24.dp)
-            .background(color = backgroundColor)
-            .padding(4.dp)
+            .then(
+                if (backgroundColor != null) {
+                    Modifier.background(backgroundColor).padding(4.dp)
+                } else Modifier
+            )
     ) {
         if (icon != null) {
             Image(
