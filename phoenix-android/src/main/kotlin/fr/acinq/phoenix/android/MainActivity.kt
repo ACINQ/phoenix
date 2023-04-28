@@ -26,10 +26,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.*
 import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.io.PhoenixAndroidLegacyInfoEvent
+import fr.acinq.lightning.utils.Connection
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.service.NodeService
 import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
 import fr.acinq.phoenix.legacy.utils.*
+import fr.acinq.phoenix.managers.AppConnectionsDaemon
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -108,6 +112,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        val business = (application as? PhoenixApplication)?.business
+        val daemon = business?.appConnectionsDaemon
+        if (daemon != null) {
+            tryReconnect(business, daemon)
+        }
+    }
+
+    private fun tryReconnect(business: PhoenixBusiness, daemon: AppConnectionsDaemon) {
+        val connections = business.connectionsManager.connections.value
+        if (connections.electrum !is Connection.ESTABLISHED) {
+            lifecycleScope.launch {
+                log.debug("resuming app with electrum conn=${connections.electrum}, reconnecting...")
+                daemon.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Electrum)
+                delay(500)
+                daemon.decrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Electrum)
+            }
+        }
+        if (connections.peer !is Connection.ESTABLISHED) {
+            lifecycleScope.launch {
+                log.info("resuming app with peer conn=${connections.peer}, reconnecting...")
+                business.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Peer)
+                delay(500)
+                business.appConnectionsDaemon?.decrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Peer)
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         try {
@@ -115,7 +148,7 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             log.error("failed to unbind activity from node service: {}", e.localizedMessage)
         }
-        log.info("destroyed main kmp activity")
+        log.info("destroyed main activity")
     }
 
 }
