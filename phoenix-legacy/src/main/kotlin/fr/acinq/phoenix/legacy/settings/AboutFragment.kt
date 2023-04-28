@@ -46,11 +46,11 @@ class AboutFragment : BaseFragment(stayIfNotStarted = true) {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    mBinding.general.text = Converter.html(getString(R.string.about_general))
+    mBinding.general.text = Converter.html(getString(R.string.legacy_about_general))
     mBinding.general.movementMethod = LinkMovementMethod.getInstance()
-    mBinding.fiatRates.text = Converter.html(getString(R.string.about_fiat_rates))
+    mBinding.fiatRates.text = Converter.html(getString(R.string.legacy_about_fiat_rates))
     mBinding.fiatRates.movementMethod = LinkMovementMethod.getInstance()
-    mBinding.actionBar.setSubtitle(getString(R.string.about_version, BuildConfig.LIB_COMMIT, BuildConfig.LIB_CODE))
+    mBinding.actionBar.setSubtitle(getString(R.string.legacy_about_version, BuildConfig.LIB_COMMIT, BuildConfig.LIB_CODE))
     mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
     mBinding.terms.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/terms"))) }
     mBinding.privacy.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/privacy"))) }

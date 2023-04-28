@@ -43,7 +43,7 @@
         android:layout_marginStart="@dimen/space_lg"
         android:layout_marginTop="@dimen/space_lg"
         android:layout_marginEnd="@dimen/space_lg"
-        android:text="@string/migration_title"
+        android:text="@string/legacy_migration_title"
         app:layout_constraintTop_toTopOf="parent" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
@@ -61,7 +61,7 @@
           android:id="@+id/message"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="@string/migration_prepare_message"
+          android:text="@string/legacy_migration_prepare_message"
           app:layout_constraintTop_toTopOf="parent" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
@@ -73,7 +73,7 @@
           app:icon="@drawable/ic_arrow_right_circle"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintTop_toBottomOf="@id/message"
-          app:text="@string/migration_prepare_button" />
+          app:text="@string/legacy_migration_prepare_button" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/dismiss_button"
@@ -83,7 +83,7 @@
           android:background="@drawable/button_bg_no_border"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintTop_toBottomOf="@id/upgrade_button"
-          app:text="@string/migration_dismiss_button" />
+          app:text="@string/legacy_migration_dismiss_button" />
       </androidx.constraintlayout.widget.ConstraintLayout>
 
       <androidx.constraintlayout.widget.ConstraintLayout
@@ -101,7 +101,7 @@
           android:id="@+id/paused_message"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="@string/migration_paused_swap_in"
+          android:text="@string/legacy_migration_paused_swap_in"
           app:layout_constraintTop_toTopOf="parent" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
@@ -112,7 +112,7 @@
           android:background="@drawable/button_bg_no_border"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintTop_toBottomOf="@id/paused_message"
-          app:text="@string/btn_close" />
+          app:text="@string/legacy_btn_close" />
       </androidx.constraintlayout.widget.ConstraintLayout>
 
       <androidx.constraintlayout.widget.ConstraintLayout
@@ -129,7 +129,7 @@
         <TextView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="@string/migration_swapin"
+          android:text="@string/legacy_migration_swapin"
           app:layout_constraintTop_toTopOf="parent" />
       </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -147,7 +147,7 @@
         <TextView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="@string/migration_closing_channels"
+          android:text="@string/legacy_migration_closing_channels"
           app:layout_constraintTop_toTopOf="parent" />
       </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -165,7 +165,7 @@
           android:layout_marginStart="@dimen/space_lg"
           android:layout_marginTop="@dimen/space_md"
           android:layout_marginEnd="@dimen/space_lg"
-          android:text="@string/migration_failure_swapin_address_error"
+          android:text="@string/legacy_migration_failure_swapin_address_error"
           android:visibility="@{model.state instanceof MigrationScreenState.Failure.SwapInError}"
           app:layout_constraintTop_toTopOf="parent" />
 
@@ -176,7 +176,7 @@
           android:layout_marginStart="@dimen/space_lg"
           android:layout_marginTop="@dimen/space_md"
           android:layout_marginEnd="@dimen/space_lg"
-          android:text="@string/migration_failure_closing_error"
+          android:text="@string/legacy_migration_failure_closing_error"
           android:visibility="@{model.state instanceof MigrationScreenState.Failure.ClosingError}"
           app:layout_constraintTop_toTopOf="parent" />
 
@@ -196,7 +196,7 @@
           android:background="@drawable/button_bg_square"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintTop_toBottomOf="@id/error_message_barrier"
-          app:text="@string/btn_ok" />
+          app:text="@string/legacy_btn_ok" />
       </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

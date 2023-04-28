@@ -61,7 +61,7 @@
         android:layout_marginTop="@dimen/space_md_p"
         android:layout_marginStart="@dimen/space_lg"
         android:layout_marginEnd="@dimen/space_lg"
-        android:text="@string/lnurl_pay_domain"
+        android:text="@string/legacy_lnurl_pay_domain"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/action_bar" />
@@ -155,7 +155,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_xs"
-            android:text="@string/lnurl_pay_amount_invalid"
+            android:text="@string/legacy_lnurl_pay_amount_invalid"
             android:textAlignment="center"
             android:textColor="?attr/negativeColor"
             android:textSize="@dimen/text_md"
@@ -185,7 +185,7 @@
           android:layout_marginTop="@dimen/space_md_p"
           android:layout_marginStart="@dimen/space_lg"
           android:layout_marginEnd="@dimen/space_lg"
-          android:text="@string/lnurl_pay_meta_description"
+          android:text="@string/legacy_lnurl_pay_meta_description"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/metadata_image" />
@@ -215,8 +215,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/form_layout"
         app:layout_goneMarginTop="@dimen/space_lg"
-        app:paused_text="@string/btn_pause_connecting"
-        app:text="@string/lnurl_pay_pay_button"
+        app:paused_text="@string/legacy_btn_pause_connecting"
+        app:text="@string/legacy_lnurl_pay_pay_button"
         app:text_color="?attr/altTextColor" />
 
       <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
@@ -229,7 +229,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/form_layout"
-        app:text="@string/lnurl_pay_requesting_invoice" />
+        app:text="@string/legacy_lnurl_pay_requesting_invoice" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/error_layout"
@@ -264,7 +264,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginStart="@dimen/space_sm"
-          android:text="@string/lnurl_pay_error_header"
+          android:text="@string/legacy_lnurl_pay_error_header"
           android:fontFamily="sans-serif-medium"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
@@ -291,7 +291,7 @@
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/error_message"
-          app:text="@string/lnurl_pay_error_try_again_button" />
+          app:text="@string/legacy_lnurl_pay_error_try_again_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

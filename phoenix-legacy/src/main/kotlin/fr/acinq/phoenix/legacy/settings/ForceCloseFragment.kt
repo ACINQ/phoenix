@@ -53,17 +53,17 @@ class ForceCloseFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(ForceCloseViewModel::class.java)
     mBinding.model = model
-    mBinding.instructions.text = Converter.html(getString(R.string.closechannels_force_instructions))
-    mBinding.destinationValue.text = app.state.value?.getFinalAddress() ?: getString(R.string.utils_unknown)
+    mBinding.instructions.text = Converter.html(getString(R.string.legacy_closechannels_force_instructions))
+    mBinding.destinationValue.text = app.state.value?.getFinalAddress() ?: getString(R.string.legacy_utils_unknown)
   }
 
   override fun onStart() {
     super.onStart()
     getChannels()
     mBinding.forceConfirmButton.setOnClickListener {
-      AlertHelper.build(layoutInflater, null, R.string.closechannels_confirm_dialog_message)
-        .setPositiveButton(R.string.btn_confirm) { _, _ -> doForceClose() }
-        .setNegativeButton(R.string.btn_cancel, null)
+      AlertHelper.build(layoutInflater, null, R.string.legacy_closechannels_confirm_dialog_message)
+        .setPositiveButton(R.string.legacy_btn_confirm) { _, _ -> doForceClose() }
+        .setNegativeButton(R.string.legacy_btn_cancel, null)
         .show()
     }
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })

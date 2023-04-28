@@ -90,23 +90,23 @@ class ReadInputFragment : BaseFragment() {
         }
         is ReadInputState.Error -> {
           mBinding.errorMessage.text = when (it) {
-            is ReadInputState.Error.PayToSelf -> getString(R.string.scan_error_pay_to_self)
-            is ReadInputState.Error.InvalidChain -> getString(R.string.scan_error_invalid_chain)
-            is ReadInputState.Error.PaymentExpired -> getString(R.string.scan_error_expired)
+            is ReadInputState.Error.PayToSelf -> getString(R.string.legacy_scan_error_pay_to_self)
+            is ReadInputState.Error.InvalidChain -> getString(R.string.legacy_scan_error_invalid_chain)
+            is ReadInputState.Error.PaymentExpired -> getString(R.string.legacy_scan_error_expired)
             is ReadInputState.Error.ErrorInLNURLResponse -> when (it.error) {
               is LNUrlError.RemoteFailure.Code -> if (it.error.code == 404) {
-                Converter.html(getString(R.string.scan_error_lnurl_failure_code_404, it.error.origin, it.error.code))
+                Converter.html(getString(R.string.legacy_scan_error_lnurl_failure_code_404, it.error.origin, it.error.code))
               } else {
-                Converter.html(getString(R.string.scan_error_lnurl_failure_code, it.error.origin, it.error.code))
+                Converter.html(getString(R.string.legacy_scan_error_lnurl_failure_code, it.error.origin, it.error.code))
               }
-              is LNUrlError.RemoteFailure.Detailed -> Converter.html(getString(R.string.scan_error_lnurl_failure_detailed, it.error.origin, it.error.reason))
-              is LNUrlError.RemoteFailure.Unreadable -> Converter.html(getString(R.string.scan_error_lnurl_failure_unreadable, it.error.origin))
-              is LNUrlError.RemoteFailure -> Converter.html(getString(R.string.scan_error_lnurl_failure_generic, it.error.origin))
-              is LNUrlError.UnhandledTag -> getString(R.string.scan_error_lnurl_unsupported)
-              else -> getString(R.string.scan_error_invalid_scan)
+              is LNUrlError.RemoteFailure.Detailed -> Converter.html(getString(R.string.legacy_scan_error_lnurl_failure_detailed, it.error.origin, it.error.reason))
+              is LNUrlError.RemoteFailure.Unreadable -> Converter.html(getString(R.string.legacy_scan_error_lnurl_failure_unreadable, it.error.origin))
+              is LNUrlError.RemoteFailure -> Converter.html(getString(R.string.legacy_scan_error_lnurl_failure_generic, it.error.origin))
+              is LNUrlError.UnhandledTag -> getString(R.string.legacy_scan_error_lnurl_unsupported)
+              else -> getString(R.string.legacy_scan_error_invalid_scan)
             }
-            is ReadInputState.Error.UnhandledLNURL -> getString(R.string.scan_error_lnurl_unsupported)
-            is ReadInputState.Error.UnhandledInput -> getString(R.string.scan_error_invalid_scan)
+            is ReadInputState.Error.UnhandledLNURL -> getString(R.string.legacy_scan_error_lnurl_unsupported)
+            is ReadInputState.Error.UnhandledInput -> getString(R.string.legacy_scan_error_invalid_scan)
           }
           mBinding.scanView.pause()
         }
@@ -121,10 +121,10 @@ class ReadInputFragment : BaseFragment() {
             model.inputState.value = ReadInputState.Error.InvalidChain
           } else if (it.pr.amount().isEmpty && !it.pr.features().allowTrampoline()) {
             // Payment request is pre-trampoline and SHOULD specify an amount. Show warning to user.
-            AlertHelper.build(layoutInflater, Converter.html(getString(R.string.scan_amountless_legacy_title)), Converter.html(getString(R.string.scan_amountless_legacy_message)))
+            AlertHelper.build(layoutInflater, Converter.html(getString(R.string.legacy_scan_amountless_legacy_title)), Converter.html(getString(R.string.legacy_scan_amountless_legacy_message)))
               .setCancelable(false)
-              .setPositiveButton(R.string.scan_amountless_legacy_confirm_button) { _, _ -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(it.pr))) }
-              .setNegativeButton(R.string.scan_amountless_legacy_cancel_button) { _, _ ->
+              .setPositiveButton(R.string.legacy_scan_amountless_legacy_confirm_button) { _, _ -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(it.pr))) }
+              .setNegativeButton(R.string.legacy_scan_amountless_legacy_cancel_button) { _, _ ->
                 mBinding.scanView.resume()
                 model.inputState.value = ReadInputState.Scanning
               }
@@ -186,15 +186,15 @@ class ReadInputFragment : BaseFragment() {
 
     mBinding.inputButton.setOnClickListener {
       manualInputDialog = AlertHelper.buildWithInput(layoutInflater,
-        title = getString(R.string.send_input_dialog_title),
-        message = getString(R.string.send_input_dialog_message),
+        title = getString(R.string.legacy_send_input_dialog_title),
+        message = getString(R.string.legacy_send_input_dialog_message),
         callback = {
           if (it.isNotBlank()) {
             model.readInput(it)
           }
         },
         defaultValue = "",
-        hint = getString(R.string.send_input_dialog_hint)
+        hint = getString(R.string.legacy_send_input_dialog_hint)
       ).show()
     }
 

@@ -65,11 +65,11 @@ class LegacyFCMService : FirebaseMessagingService() {
             setOnlyAlertOnce(true)
             setAutoCancel(true)
             if (reason == "IncomingPayment") {
-              setContentTitle(getString(R.string.notif__headless_title__missed_incoming))
-              setContentText(getString(R.string.notif__headless_message__app_locked))
+              setContentTitle(getString(R.string.legacy_notif__headless_title__missed_incoming))
+              setContentText(getString(R.string.legacy_notif__headless_message__app_locked))
             } else {
-              setContentTitle(getString(R.string.notif__headless_title__missed_fulfill))
-              setContentText(getString(R.string.notif__headless_message__pending_fulfill))
+              setContentTitle(getString(R.string.legacy_notif__headless_title__missed_fulfill))
+              setContentText(getString(R.string.legacy_notif__headless_message__pending_fulfill))
             }
             setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__HEADLESS, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT))
           }.build().run {

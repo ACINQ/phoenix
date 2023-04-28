@@ -88,14 +88,14 @@ abstract class AppContext : Application() {
     // notification channels (android 8+)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       getSystemService(NotificationManager::class.java)?.createNotificationChannels(listOf(
-        NotificationChannel(Constants.NOTIF_CHANNEL_ID__CHANNELS_WATCHER, getString(R.string.notification_channels_watcher_title), NotificationManager.IMPORTANCE_HIGH).apply {
-          description = getString(R.string.notification_channels_watcher_desc)
+        NotificationChannel(Constants.NOTIF_CHANNEL_ID__CHANNELS_WATCHER, getString(R.string.legacy_notification_channels_watcher_title), NotificationManager.IMPORTANCE_HIGH).apply {
+          description = getString(R.string.legacy_notification_channels_watcher_desc)
         },
-        NotificationChannel(Constants.NOTIF_CHANNEL_ID__MISSED_PAY_TO_OPEN, getString(R.string.notification_pay_to_open_missed_title), NotificationManager.IMPORTANCE_DEFAULT).apply {
-          description = getString(R.string.notification_pay_to_open_missed_desc)
+        NotificationChannel(Constants.NOTIF_CHANNEL_ID__MISSED_PAY_TO_OPEN, getString(R.string.legacy_notification_pay_to_open_missed_title), NotificationManager.IMPORTANCE_DEFAULT).apply {
+          description = getString(R.string.legacy_notification_pay_to_open_missed_desc)
         },
-        NotificationChannel(Constants.NOTIF_CHANNEL_ID__HEADLESS, getString(R.string.notification_headless_title), NotificationManager.IMPORTANCE_DEFAULT).apply {
-          description = getString(R.string.notification_headless_desc)
+        NotificationChannel(Constants.NOTIF_CHANNEL_ID__HEADLESS, getString(R.string.legacy_notification_headless_title), NotificationManager.IMPORTANCE_DEFAULT).apply {
+          description = getString(R.string.legacy_notification_headless_desc)
         }
       ))
     }

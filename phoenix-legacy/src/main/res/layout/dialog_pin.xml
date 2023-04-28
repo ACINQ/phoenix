@@ -44,7 +44,7 @@
         android:id="@+id/pin_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/pindialog_title_default"
+        android:text="@string/legacy_pindialog_title_default"
         android:textAlignment="center"
         android:textAppearance="@style/default_textAppearance"
         android:textSize="@dimen/text_xl"
@@ -57,7 +57,7 @@
         android:layout_height="wrap_content"
         android:alpha=".3"
         android:letterSpacing="0.2"
-        android:text="@string/pindialog_pwd_placeholder"
+        android:text="@string/legacy_pindialog_pwd_placeholder"
         android:textColor="?attr/mutedTextColor"
         android:textSize="@dimen/text_xl"
         tools:ignore="MissingConstraints" />

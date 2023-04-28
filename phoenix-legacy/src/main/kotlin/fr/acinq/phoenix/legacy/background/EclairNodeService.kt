@@ -170,7 +170,7 @@ class EclairNodeService : Service() {
     val intent = Intent(this, MainActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) }
     notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline)
       .setOnlyAlertOnce(true)
-      .setContentTitle(getString(R.string.notif__headless_title__default))
+      .setContentTitle(getString(R.string.legacy_notif__headless_title__default))
       .setContentIntent(PendingIntent.getActivity(this, Constants.NOTIF_ID__HEADLESS, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT))
     log.info("service created")
   }
@@ -212,30 +212,30 @@ class EclairNodeService : Service() {
     val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(applicationContext))
     when {
       state.value is KitState.Started -> {
-        notifyForegroundService(getString(R.string.notif__headless_title__default), null)
+        notifyForegroundService(getString(R.string.legacy_notif__headless_title__default), null)
       }
       encryptedSeed is EncryptedSeed.V2.NoAuth -> {
         try {
           EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt()).run {
             log.info("starting kit from intent")
-            notifyForegroundService(getString(R.string.notif__headless_title__default), null)
+            notifyForegroundService(getString(R.string.legacy_notif__headless_title__default), null)
             startKit(this)
           }
         } catch (e: Exception) {
           log.info("failed to read encrypted seed=${encryptedSeed.name()}: ", e)
           if (reason == "IncomingPayment") {
-            notifyForegroundService(getString(R.string.notif__headless_title__missed_incoming), getString(R.string.notif__headless_message__app_locked))
+            notifyForegroundService(getString(R.string.legacy_notif__headless_title__missed_incoming), getString(R.string.legacy_notif__headless_message__app_locked))
           } else {
-            notifyForegroundService(getString(R.string.notif__headless_title__missed_fulfill), getString(R.string.notif__headless_message__pending_fulfill))
+            notifyForegroundService(getString(R.string.legacy_notif__headless_title__missed_fulfill), getString(R.string.legacy_notif__headless_message__pending_fulfill))
           }
         }
       }
       else -> {
         log.info("unhandled incoming payment with seed=${encryptedSeed?.name()}")
         if (reason == "IncomingPayment") {
-          notifyForegroundService(getString(R.string.notif__headless_title__missed_incoming), getString(R.string.notif__headless_message__app_locked))
+          notifyForegroundService(getString(R.string.legacy_notif__headless_title__missed_incoming), getString(R.string.legacy_notif__headless_message__app_locked))
         } else {
-          notifyForegroundService(getString(R.string.notif__headless_title__missed_fulfill), getString(R.string.notif__headless_message__pending_fulfill))
+          notifyForegroundService(getString(R.string.legacy_notif__headless_title__missed_fulfill), getString(R.string.legacy_notif__headless_message__pending_fulfill))
         }
       }
     }
@@ -855,7 +855,7 @@ class EclairNodeService : Service() {
         log.info("saving swap-in=$event as incoming payment")
 
         // 1 - generate fake invoice
-        val description = applicationContext.getString(R.string.paymentholder_swap_in_desc, event.bitcoinAddress())
+        val description = applicationContext.getString(R.string.legacy_paymentholder_swap_in_desc, event.bitcoinAddress())
         val pr = doGeneratePaymentRequest(
           description = description,
           amount_opt = Option.apply(event.amount()),
@@ -880,11 +880,11 @@ class EclairNodeService : Service() {
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
   fun handleEvent(event: MissedPayToOpenPayment) {
-    val message = getString(R.string.notif__pay_to_open_missed_too_small_message)
+    val message = getString(R.string.legacy_notif__pay_to_open_missed_too_small_message)
     notificationManager.notify(
       Constants.NOTIF_ID__MISSED_PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__MISSED_PAY_TO_OPEN)
       .setSmallIcon(R.drawable.ic_phoenix_outline)
-      .setContentTitle(getString(R.string.notif__pay_to_open_missed_too_small_title, Converter.printAmountPretty(event.amount(), applicationContext, withUnit = true)))
+      .setContentTitle(getString(R.string.legacy_notif__pay_to_open_missed_too_small_title, Converter.printAmountPretty(event.amount(), applicationContext, withUnit = true)))
       .setContentText(message)
       .setStyle(NotificationCompat.BigTextStyle().bigText(message))
       .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__MISSED_PAY_TO_OPEN,
@@ -966,10 +966,10 @@ class EclairNodeService : Service() {
       this + amount
     }.let {
       val total = it.reduce { acc, amount -> acc.`$plus`(amount) }
-      val message = getString(R.string.notif__headless_message__received_payment,
+      val message = getString(R.string.legacy_notif__headless_message__received_payment,
         Converter.printAmountPretty(total, applicationContext, withSign = false, withUnit = true),
         Converter.printFiatPretty(applicationContext, total, withSign = false, withUnit = true))
-      updateNotification(getString(R.string.notif__headless_title__received), message)
+      updateNotification(getString(R.string.legacy_notif__headless_title__received), message)
       receivedInBackground.postValue(it)
       shutdownHandler.removeCallbacksAndMessages(null)
       shutdownHandler.postDelayed(shutdownRunnable, 60 * 1000)

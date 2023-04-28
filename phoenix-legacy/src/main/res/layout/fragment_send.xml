@@ -100,7 +100,7 @@
         <TextView
           android:id="@+id/balance_prefix"
           style="@style/MutedLabelView"
-          android:text="@string/send_balance_prefix"
+          android:text="@string/legacy_send_balance_prefix"
           app:layout_constraintBaseline_toBaselineOf="@id/balance_value"
           app:layout_constraintStart_toStartOf="parent" />
 
@@ -129,7 +129,7 @@
         android:visibility="@{model.state instanceof SendState.CheckingInvoice}"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balance_section"
-        app:text="@string/send_loading"
+        app:text="@string/legacy_send_loading"
         app:text_size="@dimen/text_lg" />
 
       <TextView
@@ -138,7 +138,7 @@
         android:layout_marginTop="@dimen/space_md"
         android:background="@drawable/rounded"
         android:padding="@dimen/space_lg"
-        android:text="@string/send_invalid_pr_generic"
+        android:text="@string/legacy_send_invalid_pr_generic"
         android:visibility="@{model.state instanceof SendState.InvalidInvoice.Generic}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -163,7 +163,7 @@
           android:id="@+id/already_paid_layout_message"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="@string/send_invalid_pr_already_paid"
+          android:text="@string/legacy_send_invalid_pr_already_paid"
           app:layout_constraintTop_toTopOf="parent" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
@@ -173,7 +173,7 @@
           android:layout_marginTop="@dimen/space_md"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/already_paid_layout_message"
-          app:text="@string/send_invalid_pr_already_paid_button" />
+          app:text="@string/legacy_send_invalid_pr_already_paid_button" />
       </androidx.constraintlayout.widget.ConstraintLayout>
 
       <androidx.constraintlayout.widget.ConstraintLayout
@@ -251,7 +251,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_xs"
-          android:text="@string/send_amount_error"
+          android:text="@string/legacy_send_amount_error"
           android:textAlignment="center"
           android:textColor="?attr/negativeColor"
           android:textSize="@dimen/text_md"
@@ -280,7 +280,7 @@
           style="@style/MutedLabelView"
           android:layout_width="wrap_content"
           android:layout_marginStart="@dimen/space_md"
-          android:text="@string/send_destination_label"
+          android:text="@string/legacy_send_destination_label"
           android:textAlignment="viewEnd"
           app:layout_constraintBaseline_toBaselineOf="@id/destination_value"
           app:layout_constraintEnd_toStartOf="@id/payment_labels_guideline"
@@ -310,7 +310,7 @@
           style="@style/MutedLabelView"
           android:layout_width="wrap_content"
           android:layout_marginStart="@dimen/space_md"
-          android:text="@string/send_description_label"
+          android:text="@string/legacy_send_description_label"
           android:textAlignment="viewEnd"
           android:visibility="@{model.description.length() > 0}"
           app:layout_constraintBaseline_toBaselineOf="@id/description_value"
@@ -356,8 +356,8 @@
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent"
-          app:paused_text="@string/btn_pause_connecting"
-          app:text="@string/send_swap_required_button" />
+          app:paused_text="@string/legacy_btn_pause_connecting"
+          app:text="@string/legacy_send_swap_required_button" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
           android:layout_width="wrap_content"
@@ -369,7 +369,7 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent"
           app:progress_tint="?attr/colorPrimary"
-          app:text="@string/send_swap_in_progress" />
+          app:text="@string/legacy_send_swap_in_progress" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
           android:id="@+id/swap_recap"
@@ -398,7 +398,7 @@
             style="@style/MutedLabelView"
             android:layout_width="wrap_content"
             android:layout_marginEnd="@dimen/space_xs"
-            android:text="@string/send_swap_complete_recap_amount"
+            android:text="@string/legacy_send_swap_complete_recap_amount"
             app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_amount_value"
             app:layout_constraintEnd_toStartOf="@id/swap_mid_guideline"
             app:layout_constraintHorizontal_bias="1"
@@ -435,7 +435,7 @@
             android:clickable="true"
             android:drawablePadding="@dimen/space_xs"
             android:focusable="true"
-            android:text="@string/send_swap_complete_recap_fee"
+            android:text="@string/legacy_send_swap_complete_recap_fee"
             app:drawableStartCompat="@drawable/ic_info"
             app:drawableTint="?attr/colorPrimary"
             app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_fee_value"
@@ -481,7 +481,7 @@
             style="@style/MutedLabelView"
             android:layout_width="wrap_content"
             android:layout_marginEnd="@dimen/space_xs"
-            android:text="@string/send_swap_complete_recap_total"
+            android:text="@string/legacy_send_swap_complete_recap_total"
             app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_total_value"
             app:layout_constraintEnd_toStartOf="@id/swap_mid_guideline"
             app:layout_constraintHorizontal_bias="1"
@@ -511,7 +511,7 @@
           android:drawableStart="@drawable/ic_alert_triangle"
           android:drawableTint="?attr/negativeColor"
           android:maxWidth="260dp"
-          android:text="@string/send_swap_complete_cannot_afford"
+          android:text="@string/legacy_send_swap_complete_cannot_afford"
           android:visibility="@{model.state instanceof SendState.Onchain.Error.ExceedsBalance}"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
@@ -540,7 +540,7 @@
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/swap_recap_pay_separator"
-          app:text="@string/send_pay_button"
+          app:text="@string/legacy_send_pay_button"
           app:text_color="?attr/altTextColor" />
 
         <TextView
@@ -550,7 +550,7 @@
           android:layout_marginStart="@dimen/space_lg"
           android:layout_marginEnd="@dimen/space_lg"
           android:padding="@dimen/space_sm"
-          android:text="@string/send_error_sending"
+          android:text="@string/legacy_send_error_sending"
           android:textAlignment="center"
           android:visibility="@{model.state instanceof SendState.Lightning.Error.SendingFailure || model.state instanceof SendState.Onchain.Error.SendingFailure}"
           app:layout_constrainedWidth="true"

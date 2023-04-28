@@ -41,7 +41,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:spacer_size="@dimen/space_xs"
-        app:text="@string/main_faq_button"
+        app:text="@string/legacy_main_faq_button"
         app:text_size="@dimen/text_sm" />
 
       <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
@@ -56,7 +56,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/help_button"
         app:spacer_size="@dimen/space_xxs"
-        app:text="@string/main_tor_connected_button"
+        app:text="@string/legacy_main_tor_connected_button"
         app:text_size="@dimen/text_sm" />
 
       <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
@@ -70,7 +70,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/help_button"
         app:spacer_size="@dimen/space_xs"
-        app:text="@string/main_connectivity_button"
+        app:text="@string/legacy_main_connectivity_button"
         app:text_size="@dimen/text_sm" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -93,7 +93,7 @@
       android:layout_height="wrap_content"
       android:drawablePadding="@dimen/space_xxs"
       android:layout_marginTop="@dimen/space_xs"
-      android:text="@string/main_swapin_incoming"
+      android:text="@string/legacy_main_swapin_incoming"
       android:textColor="?attr/onMutedBgTextColor"
       android:textSize="@dimen/text_sm"
       app:drawableStartCompat="@drawable/ic_chain"
@@ -193,7 +193,7 @@
         app:layout_constraintEnd_toStartOf="@id/send_button"
         app:layout_constraintStart_toEndOf="@id/settings_button"
         app:spacer_size="@dimen/space_xs"
-        app:text="@string/menu_receive"
+        app:text="@string/legacy_menu_receive"
         app:text_size="@dimen/text_md" />
 
       <View
@@ -217,7 +217,7 @@
         app:layout_constraintStart_toEndOf="@id/receive_button"
         app:layout_constraintTop_toTopOf="parent"
         app:spacer_size="@dimen/space_xs"
-        app:text="@string/menu_send"
+        app:text="@string/legacy_menu_send"
         app:text_size="@dimen/text_md" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

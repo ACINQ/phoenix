@@ -77,8 +77,8 @@ class ListChannelsFragment : BaseFragment(), OnRefreshListener {
     model.channels.observe(viewLifecycleOwner, Observer {
       val channelsCount = it.count()
       when {
-        channelsCount > 0 -> mBinding.channelsFoundHeader.text = resources.getQuantityString(R.plurals.listallchannels_channels_header, channelsCount, channelsCount)
-        else -> mBinding.channelsFoundHeader.text = getString(R.string.listallchannels_no_channels)
+        channelsCount > 0 -> mBinding.channelsFoundHeader.text = resources.getQuantityString(R.plurals.legacy_listallchannels_channels_header, channelsCount, channelsCount)
+        else -> mBinding.channelsFoundHeader.text = getString(R.string.legacy_listallchannels_no_channels)
       }
     })
     mBinding.model = model
@@ -88,7 +88,7 @@ class ListChannelsFragment : BaseFragment(), OnRefreshListener {
     super.onStart()
     getChannels()
     mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
-    mBinding.actionBar.setSubtitle(getString(R.string.listallchannels_node_id, app.state.value?.getNodeId()?.toString() ?: getString(R.string.utils_unknown)))
+    mBinding.actionBar.setSubtitle(getString(R.string.legacy_listallchannels_node_id, app.state.value?.getNodeId()?.toString() ?: getString(R.string.legacy_utils_unknown)))
     mBinding.shareButton.setOnClickListener {
       model.channels.value?.let { list ->
         shareChannelsData(list)
@@ -102,15 +102,15 @@ class ListChannelsFragment : BaseFragment(), OnRefreshListener {
   private fun shareChannelsData(list: MutableList<RES_GETINFO>) {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when serializing channels: ", exception)
-      context?.run { Toast.makeText(this, R.string.listallchannels_serialization_error, Toast.LENGTH_SHORT).show() }
+      context?.run { Toast.makeText(this, R.string.legacy_listallchannels_serialization_error, Toast.LENGTH_SHORT).show() }
     }) {
       withContext(this.coroutineContext + Dispatchers.Default) {
         val data = list.joinToString("\n\n", "", "", -1) { `default$`.`MODULE$`.write(it, 1, `JsonSerializers$`.`MODULE$`.cmdResGetinfoReadWriter()) }
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "text/plain"
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.listallchannels_share_subject))
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.legacy_listallchannels_share_subject))
         shareIntent.putExtra(Intent.EXTRA_TEXT, data)
-        startActivity(Intent.createChooser(shareIntent, getString(R.string.listallchannels_share_title)))
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.legacy_listallchannels_share_title)))
       }
     }
   }

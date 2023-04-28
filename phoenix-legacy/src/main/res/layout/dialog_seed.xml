@@ -31,7 +31,7 @@
       android:layout_marginStart="@dimen/space_md_p"
       android:layout_marginTop="@dimen/space_md_p"
       android:layout_marginEnd="@dimen/space_md_p"
-      android:text="@string/displayseed_dialog_header"
+      android:text="@string/legacy_displayseed_dialog_header"
       app:layout_constraintTop_toTopOf="parent" />
 
     <TableLayout
@@ -54,7 +54,7 @@
       android:layout_marginStart="@dimen/space_md_p"
       android:layout_marginEnd="@dimen/space_md_p"
       android:textAlignment="center"
-      android:text="@string/displayseed_derivation_path"
+      android:text="@string/legacy_displayseed_derivation_path"
       android:textColor="?attr/mutedTextColor"
       android:textSize="@dimen/text_sm"
       app:layout_constraintTop_toBottomOf="@id/seed_dialog_words_table" />
@@ -65,7 +65,7 @@
       android:layout_height="wrap_content"
       android:layout_marginTop="@dimen/space_lg"
       android:drawablePadding="@dimen/space_xs"
-      android:text="@string/displayseed_has_saved_seed_checkbox"
+      android:text="@string/legacy_displayseed_has_saved_seed_checkbox"
       android:layout_marginStart="@dimen/space_md_p"
       android:layout_marginEnd="@dimen/space_md_p"
       app:layout_constraintEnd_toEndOf="parent"

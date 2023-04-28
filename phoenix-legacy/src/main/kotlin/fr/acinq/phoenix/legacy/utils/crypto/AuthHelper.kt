@@ -36,13 +36,13 @@ object AuthHelper {
   fun authState(context: Context?) = context?.let { BiometricManager.from(it).canAuthenticate(hardAuthCreds) } ?: BiometricManager.BIOMETRIC_STATUS_UNKNOWN
 
   fun translateAuthState(context: Context, code: Int?): String? = when (code) {
-    BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> context.getString(R.string.accessctrl_auth_none_enrolled)
-    BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> context.getString(R.string.accessctrl_auth_hw_unavailable)
-    BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> context.getString(R.string.accessctrl_auth_no_hw)
-    BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED -> context.getString(R.string.accessctrl_auth_update_required)
-    BiometricManager.BIOMETRIC_STATUS_UNKNOWN -> context.getString(R.string.accessctrl_auth_hw_unavailable)
-    BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> context.getString(R.string.accessctrl_auth_unsupported)
-    BiometricPrompt.ERROR_LOCKOUT, BiometricPrompt.ERROR_LOCKOUT_PERMANENT -> context.getString(R.string.accessctrl_auth_lockout)
+    BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> context.getString(R.string.legacy_accessctrl_auth_none_enrolled)
+    BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> context.getString(R.string.legacy_accessctrl_auth_hw_unavailable)
+    BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> context.getString(R.string.legacy_accessctrl_auth_no_hw)
+    BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED -> context.getString(R.string.legacy_accessctrl_auth_update_required)
+    BiometricManager.BIOMETRIC_STATUS_UNKNOWN -> context.getString(R.string.legacy_accessctrl_auth_hw_unavailable)
+    BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> context.getString(R.string.legacy_accessctrl_auth_unsupported)
+    BiometricPrompt.ERROR_LOCKOUT, BiometricPrompt.ERROR_LOCKOUT_PERMANENT -> context.getString(R.string.legacy_accessctrl_auth_lockout)
     else -> null
   }
 
@@ -59,7 +59,7 @@ object AuthHelper {
     if (canUseSoftAuth(fragment.context)) {
       getAuthPrompt(fragment, { onSuccess() }, onFailure, onCancel).authenticate(
         BiometricPrompt.PromptInfo.Builder().apply {
-          setTitle(fragment.getString(R.string.authprompt_title))
+          setTitle(fragment.getString(R.string.legacy_authprompt_title))
           setAllowedAuthenticators(softAuthCreds)
         }.build())
     } else {
@@ -81,8 +81,8 @@ object AuthHelper {
     if (canUseHardAuth(fragment.context)) {
       getAuthPrompt(fragment, onSuccess, onFailure, onCancel).authenticate(
         BiometricPrompt.PromptInfo.Builder().apply {
-          setTitle(fragment.getString(R.string.authprompt_title))
-          setNegativeButtonText(fragment.getString(R.string.authprompt_hard_negative))
+          setTitle(fragment.getString(R.string.legacy_authprompt_title))
+          setNegativeButtonText(fragment.getString(R.string.legacy_authprompt_hard_negative))
           setAllowedAuthenticators(hardAuthCreds)
         }.build(),
         BiometricPrompt.CryptoObject(cipher))

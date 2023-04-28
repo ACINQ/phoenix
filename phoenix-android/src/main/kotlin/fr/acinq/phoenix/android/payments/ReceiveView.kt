@@ -227,7 +227,7 @@ private fun LightningInvoiceView(
     Spacer(modifier = Modifier.height(24.dp))
     CopyShareEditButtons(
         onCopy = { copyToClipboard(context, data = paymentRequest) },
-        onShare = { share(context, "lightning:$paymentRequest", context.getString(R.string.receive__share__subject), context.getString(R.string.receive_share_title)) },
+        onShare = { share(context, "lightning:$paymentRequest", context.getString(R.string.receive__share__subject), context.getString(R.string.receive__share__title)) },
         onEdit = onEdit
     )
     Spacer(modifier = Modifier.height(24.dp))
@@ -252,7 +252,7 @@ private fun SwapInView(
     Spacer(modifier = Modifier.height(24.dp))
     CopyShareEditButtons(
         onCopy = { copyToClipboard(context, data = address) },
-        onShare = { share(context, "bitcoin:$address", context.getString(R.string.receive__share__subject), context.getString(R.string.receive_share_title)) },
+        onShare = { share(context, "bitcoin:$address", context.getString(R.string.receive__share__subject), context.getString(R.string.receive__share__title)) },
         onEdit = null
     )
     LocalWalletContext.current?.swapIn?.v1?.let { swapInConfig ->

@@ -38,8 +38,8 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"
-      app:subtitle="@string/accessctrl_subtitle"
-      app:title="@string/accessctrl_title" />
+      app:subtitle="@string/legacy_accessctrl_subtitle"
+      app:title="@string/legacy_accessctrl_title" />
 
     <ScrollView
       android:layout_width="match_parent"
@@ -61,7 +61,7 @@
           android:visibility="@{!model.canUseSoftAuth}"
           app:icon="@drawable/ic_alert_triangle"
           app:layout_constraintTop_toTopOf="parent"
-          app:text="@string/accessctrl_auth_none_enrolled" />
+          app:text="@string/legacy_accessctrl_auth_none_enrolled" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.SwitchView
           android:id="@+id/screen_lock_switch"
@@ -71,8 +71,8 @@
           app:enableOrFade="@{!(model.isUpdatingState || model.state instanceof AccessLockState.Done.FullLock)}"
           app:icon="@drawable/ic_lock"
           app:layout_constraintTop_toBottomOf="@id/soft_auth_unavailable"
-          app:subtitle="@string/accessctrl_screen_lock_switch_desc"
-          app:text="@string/accessctrl_screen_lock_switch" />
+          app:subtitle="@string/legacy_accessctrl_screen_lock_switch_desc"
+          app:text="@string/legacy_accessctrl_screen_lock_switch" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.SwitchView
           android:id="@+id/full_lock_switch"
@@ -82,8 +82,8 @@
           app:enableOrFade="@{!model.isUpdatingState}"
           app:icon="@drawable/ic_shield"
           app:layout_constraintTop_toBottomOf="@id/screen_lock_switch"
-          app:subtitle="@string/accessctrl_full_lock_switch_desc"
-          app:text="@string/accessctrl_full_lock_switch"
+          app:subtitle="@string/legacy_accessctrl_full_lock_switch_desc"
+          app:text="@string/legacy_accessctrl_full_lock_switch"
           tools:layout_editor_absoluteX="0dp" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>

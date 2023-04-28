@@ -159,12 +159,12 @@ class EclairSupervisor(val applicationContext: Context) : UntypedActor() {
           )
         } else if (result && !isAutoChannelEnabled) {
           log.info("rejected pay-to-open channel opening")
-          val message = applicationContext.getString(R.string.notif_pay_to_open_missed_message)
+          val message = applicationContext.getString(R.string.legacy_notif_pay_to_open_missed_message)
           if (System.currentTimeMillis() - Prefs.getMissedPayToOpenNotifTimestamp(applicationContext) > 20 * DateUtils.MINUTE_IN_MILLIS) {
             notificationManager.notify(
               Constants.NOTIF_ID__MISSED_PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__MISSED_PAY_TO_OPEN)
                 .setSmallIcon(R.drawable.ic_phoenix_outline)
-                .setContentTitle(applicationContext.getString(R.string.notif_pay_to_open_missed_title))
+                .setContentTitle(applicationContext.getString(R.string.legacy_notif_pay_to_open_missed_title))
                 .setContentText(message)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(message))
                 .setContentIntent(

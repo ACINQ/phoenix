@@ -141,8 +141,8 @@ class LegacyChannelsWatcher(context: Context, workerParams: WorkerParameters) : 
   private fun showNotification(context: Context, isAlert: Boolean) {
     val startIntent = Intent(context, MainActivity::class.java)
     startIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-    val title = context.getString(if (isAlert) R.string.notif_watcher_cheating_title else R.string.notif_watcher_connection_title)
-    val message = context.getString(if (isAlert) R.string.notif_watcher_cheating_message else R.string.notif_watcher_connection_message)
+    val title = context.getString(if (isAlert) R.string.legacy_notif_watcher_cheating_title else R.string.legacy_notif_watcher_connection_title)
+    val message = context.getString(if (isAlert) R.string.legacy_notif_watcher_cheating_message else R.string.legacy_notif_watcher_connection_message)
     val builder = NotificationCompat.Builder(context, Constants.NOTIF_CHANNEL_ID__CHANNELS_WATCHER)
       .setSmallIcon(R.drawable.ic_phoenix_outline)
       .setContentTitle(title)

@@ -33,7 +33,7 @@ import fr.acinq.phoenix.legacy.utils.Converter
 import fr.acinq.phoenix.legacy.utils.Prefs
 
 class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, private val pinCallback: PinDialogCallback,
-  titleResId: Int = R.string.pindialog_title_default, cancelable: Boolean = true) : Dialog(context, themeResId) {
+  titleResId: Int = R.string.legacy_pindialog_title_default, cancelable: Boolean = true) : Dialog(context, themeResId) {
 
   private val mBinding: DialogPinBinding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.dialog_pin, null, false)
   private var mPinValue: String = ""

@@ -69,7 +69,7 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginEnd="@dimen/space_xs"
-      android:text="@string/channel_balance"
+      android:text="@string/legacy_channel_balance"
       app:layout_constraintBaseline_toBaselineOf="@id/channel_balance_value"
       app:layout_constraintEnd_toStartOf="@id/channel_value_barrier" />
 
@@ -91,7 +91,7 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginEnd="@dimen/space_xs"
-      android:text="@string/channel_capacity"
+      android:text="@string/legacy_channel_capacity"
       app:layout_constraintBaseline_toBaselineOf="@id/channel_capacity_value"
       app:layout_constraintEnd_toStartOf="@id/channel_value_barrier" />
 

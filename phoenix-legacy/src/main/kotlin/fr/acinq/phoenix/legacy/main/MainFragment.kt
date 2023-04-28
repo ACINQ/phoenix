@@ -245,7 +245,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   private fun refreshIncomingFundsAmountField() {
     model.incomingFunds.value?.let { amount ->
       context?.let { ctx ->
-        mBinding.incomingFundsNotif.text = getString(R.string.main_swapin_incoming,
+        mBinding.incomingFundsNotif.text = getString(R.string.legacy_main_swapin_incoming,
           if (Prefs.getShowAmountInFiat(ctx)) {
             Converter.printFiatPretty(ctx, amount, withUnit = true)
           } else {

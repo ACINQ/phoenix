@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Phoenix Testnet</string>
 
     <!-- //////////////// system notification channels //////////////// -->
@@ -37,11 +37,12 @@
     <string name="notif__headless__received">You received %1$s</string>
 
     <string name="notif__missed__title">Missed incoming payment</string>
+    <string name="notif__missed__locked">Application was locked</string>
     <string name="notif__rejected__title">Rejected incoming payment</string>
-    <string name="notif__missed__rejected_by_user">You have rejected the payment</string>
-    <string name="notif__missed__policy_disabled">Automated liquidity policy is disabled. You can change that in the app settings.</string>
-    <string name="notif__missed__policy_too_expensive">Payment fee (%1$s) would have exceeded the maximum (%2$s). You can change that in the app settings.</string>
-    <string name="notif__missed__below_min">Amount (%1$s sat) was below the minimum amount for a new channel (%2$s sat).</string>
+    <string name="notif__rejected__by_user">You have rejected the payment</string>
+    <string name="notif__rejected__policy_disabled">Automated liquidity policy is disabled. You can change that in the app settings.</string>
+    <string name="notif__rejected__policy_too_expensive">Payment fee (%1$s) would have exceeded the maximum (%2$s). You can change that in the app settings.</string>
+    <string name="notif__rejected__below_min">Amount (%1$s sat) was below the minimum amount for a new channel (%2$s sat).</string>
 
     <string name="notif_watcher_revoked_commit_title">Some of your channels have closed</string>
     <string name="notif_watcher_revoked_commit_message">Please start Phoenix to review your channels.</string>
@@ -412,6 +413,7 @@
 
     <!-- //////////////// payment details: technicals data //////////////// -->
 
+    <string name="paymentdetails_technical_title">Technical details</string>
     <string name="paymentdetails_payment_type_label">Type of payment</string>
     <string name="paymentdetails_closing">Channel closing payment</string>
     <string name="paymentdetails_splice_outgoing">Outgoing splice payment</string>
@@ -615,7 +617,7 @@
 
     <string name="electrum_connection_closed_with_random">Disconnected from Electrum</string>
     <string name="electrum_connection_closed_with_custom">Disconnected from %1$s</string>
-    <string name="electrum_connection_connecting_to_random">Connecting to Electrum</string>
+    <string name="electrum_connection_connecting_to_random">Connecting to (random) %1$s</string>
     <string name="electrum_connection_connecting_to_custom">Connecting to %1$s</string>
     <string name="electrum_connection_connected">Connected to %1$s</string>
 
@@ -650,6 +652,7 @@
     <string name="tor_settings_unknown">Checking preferences…</string>
     <string name="tor_settings_enabled">Tor is enabled</string>
     <string name="tor_settings_enabled_description">Connections to the Lightning network and Electrum servers will be protected.</string>
+    <string name="tor_settings_disabled">Tor is disabled</string>
     <string name="tor_settings_confirm_disable_title">Are you sure you want to disable Tor?</string>
     <string name="tor_settings_confirm_enable_title">Are you sure you want to enable Tor? Note that for best result, it\'s recommended to start a new wallet as well.</string>
     <string name="tor_settings_state_unknown">The Tor proxy is not started yet.</string>

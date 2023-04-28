@@ -53,9 +53,9 @@ class FtueFragment : BaseFragment(stayIfNotStarted = true) {
         override fun onPageSelected(position: Int) {
           super.onPageSelected(position)
           mBinding.indicators.text = getString(when (position) {
-            0 -> R.string.ftue__bullet_1
-            1 -> R.string.ftue__bullet_2
-            else -> R.string.ftue__bullet_3
+            0 -> R.string.legacy_ftue__bullet_1
+            1 -> R.string.legacy_ftue__bullet_2
+            else -> R.string.legacy_ftue__bullet_3
           })
         }
       })
@@ -132,9 +132,9 @@ class FtueLightningFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     val payToOpenSettings = (parentFragment as? FtueFragment)?.appContext()?.payToOpenSettings?.value
-    val prettyPayToOpenPercentFee = payToOpenSettings?.let { String.format("%.2f", 100 * (it.feePercent)) } ?: getString(R.string.utils_unknown)
-    val prettyPayToOpenMinFee = payToOpenSettings?.let { Converter.printAmountPretty(it.minFee, requireContext(), withUnit = true) } ?: getString(R.string.utils_unknown)
-    mBinding.body.text = Converter.html(getString(R.string.ftue__pay_to_open__body, prettyPayToOpenPercentFee, prettyPayToOpenMinFee))
+    val prettyPayToOpenPercentFee = payToOpenSettings?.let { String.format("%.2f", 100 * (it.feePercent)) } ?: getString(R.string.legacy_utils_unknown)
+    val prettyPayToOpenMinFee = payToOpenSettings?.let { Converter.printAmountPretty(it.minFee, requireContext(), withUnit = true) } ?: getString(R.string.legacy_utils_unknown)
+    mBinding.body.text = Converter.html(getString(R.string.legacy_ftue__pay_to_open__body, prettyPayToOpenPercentFee, prettyPayToOpenMinFee))
     mBinding.nextButton.setOnClickListener { (parentFragment as? FtueFragment)?.goToPage3() }
   }
 }

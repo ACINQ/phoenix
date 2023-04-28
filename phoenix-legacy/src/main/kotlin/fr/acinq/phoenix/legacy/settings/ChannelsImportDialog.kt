@@ -58,11 +58,11 @@ class ChannelsImportDialog : DialogFragment() {
 
       model.state.observe(viewLifecycleOwner) { state ->
         when (state) {
-          is ChannelsImportState.Error.Default -> mBinding.errorMessage.text = getString(R.string.channels_import_failure, state.message)
-          is ChannelsImportState.Error.InvalidInput -> mBinding.errorMessage.text = getString(R.string.channels_import_failure, getString(R.string.channels_import_failure_invalid))
-          is ChannelsImportState.Error.DecryptionFailure -> mBinding.errorMessage.text = getString(R.string.channels_import_failure, getString(R.string.channels_import_failure_decryption))
-          is ChannelsImportState.Error.DbFailure -> mBinding.errorMessage.text = getString(R.string.channels_import_failure, getString(R.string.channels_import_failure_db))
-          is ChannelsImportState.Success -> mBinding.successMessage.text = getString(R.string.channels_import_success, state.channelsCount)
+          is ChannelsImportState.Error.Default -> mBinding.errorMessage.text = getString(R.string.legacy_channels_import_failure, state.message)
+          is ChannelsImportState.Error.InvalidInput -> mBinding.errorMessage.text = getString(R.string.legacy_channels_import_failure, getString(R.string.legacy_channels_import_failure_invalid))
+          is ChannelsImportState.Error.DecryptionFailure -> mBinding.errorMessage.text = getString(R.string.legacy_channels_import_failure, getString(R.string.legacy_channels_import_failure_decryption))
+          is ChannelsImportState.Error.DbFailure -> mBinding.errorMessage.text = getString(R.string.legacy_channels_import_failure, getString(R.string.legacy_channels_import_failure_db))
+          is ChannelsImportState.Success -> mBinding.successMessage.text = getString(R.string.legacy_channels_import_success, state.channelsCount)
           else -> {}
         }
       }

@@ -107,7 +107,7 @@ class PaymentDetailsFragment : BaseFragment() {
             mBinding.lnurlPayServiceValue.text = try {
               HttpUrl.parse(meta.lnurlpay_url)?.topPrivateDomain()
             } catch (e: Exception) {
-              getString(R.string.utils_unknown)
+              getString(R.string.legacy_utils_unknown)
             }
           }
           if (meta?.lnurlpay_meta_description != null) {
@@ -118,20 +118,20 @@ class PaymentDetailsFragment : BaseFragment() {
           }
           when (state) {
             is PaymentDetailsState.Outgoing.Pending -> {
-              mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_pending))
+              mBinding.statusText.text = Converter.html(getString(R.string.legacy_paymentdetails_status_sent_pending))
               mBinding.amountValue.setAmount(state.amountToRecipient)
               showStatusIconAndDetails(R.drawable.ic_send_lg, R.attr.mutedTextColor)
             }
             is PaymentDetailsState.Outgoing.Failed -> {
-              mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_failed))
+              mBinding.statusText.text = Converter.html(getString(R.string.legacy_paymentdetails_status_sent_failed))
               // use error of the last subpayment as it's probably the most pertinent
               when (state.failureType) {
                 is OutgoingFailure.Generic -> mBinding.errorValue.text = state.failureType.message
-                is OutgoingFailure.IncorrectPaymentDetails -> mBinding.errorValue.text = getString(R.string.paymentdetails_failure_invalid_details)
-                is OutgoingFailure.RecipientUnknownOrNeedsLiquidity -> mBinding.errorValue.text = getString(R.string.paymentdetails_failure_recipient_unknown_or_liquidity)
+                is OutgoingFailure.IncorrectPaymentDetails -> mBinding.errorValue.text = getString(R.string.legacy_paymentdetails_failure_invalid_details)
+                is OutgoingFailure.RecipientUnknownOrNeedsLiquidity -> mBinding.errorValue.text = getString(R.string.legacy_paymentdetails_failure_recipient_unknown_or_liquidity)
                 is OutgoingFailure.TrampolineFee -> {
-                  mBinding.errorValue.text = getString(R.string.paymentdetails_failure_trampoline_fees)
-                  mBinding.errorAction.setText(getString(R.string.paymentdetails_failure_trampoline_fees_action))
+                  mBinding.errorValue.text = getString(R.string.legacy_paymentdetails_failure_trampoline_fees)
+                  mBinding.errorAction.setText(getString(R.string.legacy_paymentdetails_failure_trampoline_fees_action))
                   mBinding.errorAction.setOnClickListener {
                     findNavController().navigate(R.id.global_payment_details_to_payment_settings_fragment)
                   }
@@ -141,21 +141,21 @@ class PaymentDetailsFragment : BaseFragment() {
               showStatusIconAndDetails(R.drawable.ic_cross, R.attr.negativeColor)
             }
             is PaymentDetailsState.Outgoing.Sent -> {
-              mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(requireContext(), state.completedAt)))
+              mBinding.statusText.text = Converter.html(getString(R.string.legacy_paymentdetails_status_sent_successful, Transcriber.relativeTime(requireContext(), state.completedAt)))
               mBinding.feesValue.setAmount(state.fees)
               mBinding.amountValue.setAmount(state.amountToRecipient)
               showStatusIconAndDetails(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, R.attr.positiveColor)
               if (state is PaymentDetailsState.Outgoing.Sent.Closing) {
                 if (meta?.closing_type != ClosingType.Mutual.code) {
                   val address = app.state.value?.getFinalAddress() ?: meta?.closing_main_output_script ?: ""
-                  mBinding.infoBody.text = Converter.html(getString(R.string.paymentdetails_info_uniclose, address))
+                  mBinding.infoBody.text = Converter.html(getString(R.string.legacy_paymentdetails_info_uniclose, address))
                   mBinding.infoLayout.visibility = View.VISIBLE
                 }
               }
               when (val successAction = meta?.getSuccessAction()) {
                 is LNUrlPayActionData.Message.V0 -> mBinding.lnurlPaySuccessActionValue.text = successAction.message
                 is LNUrlPayActionData.Url.V0 -> {
-                  mBinding.lnurlPaySuccessActionValue.text = Converter.html(getString(R.string.paymentdetails_lnurlpay_success_action_url, successAction.description, successAction.url))
+                  mBinding.lnurlPaySuccessActionValue.text = Converter.html(getString(R.string.legacy_paymentdetails_lnurlpay_success_action_url, successAction.description, successAction.url))
                   mBinding.lnurlPaySuccessActionValue.movementMethod = LinkMovementMethod.getInstance()
                 }
                 is LNUrlPayActionData.Aes.V0 -> decryptLNUrlPayAes(successAction)
@@ -165,12 +165,12 @@ class PaymentDetailsFragment : BaseFragment() {
           }
         }
         is PaymentDetailsState.Incoming.Pending -> {
-          mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_received_pending))
+          mBinding.statusText.text = Converter.html(getString(R.string.legacy_paymentdetails_status_received_pending))
           mBinding.amountValue.setAmount(MilliSatoshi(0))
           showStatusIconAndDetails(R.drawable.ic_clock, R.attr.positiveColor)
         }
         is PaymentDetailsState.Incoming.Received -> {
-          mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_received_successful, Transcriber.relativeTime(requireContext(), state.getStatus().receivedAt())))
+          mBinding.statusText.text = Converter.html(getString(R.string.legacy_paymentdetails_status_received_successful, Transcriber.relativeTime(requireContext(), state.getStatus().receivedAt())))
           mBinding.amountValue.setAmount(state.getStatus().amount())
           showStatusIconAndDetails(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, R.attr.positiveColor)
         }
@@ -196,12 +196,12 @@ class PaymentDetailsFragment : BaseFragment() {
   }
 
   private fun handleEdit() {
-    AlertHelper.buildWithInput(inflater = layoutInflater, title = getString(R.string.paymentdetails_desc_custom_title),
-      message = getString(R.string.paymentdetails_desc_custom_info),
+    AlertHelper.buildWithInput(inflater = layoutInflater, title = getString(R.string.legacy_paymentdetails_desc_custom_title),
+      message = getString(R.string.legacy_paymentdetails_desc_custom_info),
       defaultValue = model.paymentMeta.value?.custom_desc ?: "",
       callback = { newDescription -> model.saveCustomDescription(newDescription) },
       inputType = InputType.TYPE_TEXT_FLAG_MULTI_LINE)
-      .setNegativeButton(getString(R.string.btn_cancel), null)
+      .setNegativeButton(getString(R.string.legacy_btn_cancel), null)
       .show()
   }
 
@@ -257,7 +257,7 @@ class PaymentDetailsFragment : BaseFragment() {
     lifecycleScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, exception ->
       log.error("failed to decrypt lnurl_pay aes action=$data: ", exception)
       lifecycleScope.launch(Dispatchers.Main) {
-        mBinding.lnurlPaySuccessActionValue.text = getString(R.string.paymentdetails_lnurlpay_success_action_aes_failure)
+        mBinding.lnurlPaySuccessActionValue.text = getString(R.string.legacy_paymentdetails_lnurlpay_success_action_aes_failure)
       }
     }) {
       val preimage = ByteVector32.fromValidHex(model.preimage.value)
@@ -266,7 +266,7 @@ class PaymentDetailsFragment : BaseFragment() {
       } else {
         val text = data.decrypt(preimage)
         lifecycleScope.launch(Dispatchers.Main) {
-          mBinding.lnurlPaySuccessActionValue.text = Converter.html(getString(R.string.paymentdetails_lnurlpay_success_action_aes, data.description, text))
+          mBinding.lnurlPaySuccessActionValue.text = Converter.html(getString(R.string.legacy_paymentdetails_lnurlpay_success_action_aes, data.description, text))
         }
       }
     }
@@ -371,10 +371,10 @@ class PaymentDetailsViewModel(
 
   val closingType: LiveData<String> = Transformations.map(paymentMeta) {
     when (it?.closing_type) {
-      ClosingType.Mutual.code -> appContext.getString(R.string.paymentdetails_closing_type_mutual)
-      ClosingType.Local.code -> appContext.getString(R.string.paymentdetails_closing_type_local)
-      ClosingType.Remote.code -> appContext.getString(R.string.paymentdetails_closing_type_remote)
-      ClosingType.Other.code -> appContext.getString(R.string.paymentdetails_closing_type_other)
+      ClosingType.Mutual.code -> appContext.getString(R.string.legacy_paymentdetails_closing_type_mutual)
+      ClosingType.Local.code -> appContext.getString(R.string.legacy_paymentdetails_closing_type_local)
+      ClosingType.Remote.code -> appContext.getString(R.string.legacy_paymentdetails_closing_type_remote)
+      ClosingType.Other.code -> appContext.getString(R.string.legacy_paymentdetails_closing_type_other)
       else -> ""
     }
   }
@@ -485,11 +485,11 @@ class PaymentDetailsViewModel(
           val head = it.first()
           if (paymentMeta?.swap_out_address != null && paymentMeta.swap_out_fee_sat != null && paymentMeta.swap_out_feerate_per_byte != null) {
             val feeSwapOut = Satoshi(paymentMeta.swap_out_fee_sat)
-            val descSwapOut = appContext.getString(R.string.paymentdetails_swap_out_desc)
+            val descSwapOut = appContext.getString(R.string.legacy_paymentdetails_swap_out_desc)
             state.postValue(PaymentDetailsState.Outgoing.Sent.SwapOut(head.paymentType(), it, descSwapOut, amountToRecipient.`$minus`(feeSwapOut), Converter.any2Msat(feeSwapOut), completedAt,
               paymentMeta.swap_out_feerate_per_byte))
           } else if (head.paymentType() == "ClosingChannel" || (head.paymentRequest().isEmpty && head.externalId().isDefined && head.externalId().get().startsWith("closing-"))) {
-            val descClosing = appContext.getString(R.string.paymentdetails_closing_desc, paymentMeta?.closing_channel_id?.take(10) ?: "")
+            val descClosing = appContext.getString(R.string.legacy_paymentdetails_closing_desc, paymentMeta?.closing_channel_id?.take(10) ?: "")
             state.postValue(PaymentDetailsState.Outgoing.Sent.Closing(head.paymentType(), it, descClosing, amountToRecipient, fees, completedAt))
           } else {
             state.postValue(PaymentDetailsState.Outgoing.Sent.Normal(head.paymentType(), it, description, amountToRecipient, fees, completedAt))

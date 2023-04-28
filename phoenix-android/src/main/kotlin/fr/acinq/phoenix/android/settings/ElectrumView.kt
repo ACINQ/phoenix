@@ -102,10 +102,10 @@ fun ElectrumView() {
                             stringResource(id = R.string.electrum_connection_connected, "${model.currentServer?.host}:${model.currentServer?.port}")
                         }
                         connection is Connection.ESTABLISHING && config is ElectrumConfig.Random -> {
-                            stringResource(id = R.string.electrum_connecting, "${model.currentServer?.host}:${model.currentServer?.port}")
+                            stringResource(id = R.string.electrum_connection_connecting_to_random, "${model.currentServer?.host}:${model.currentServer?.port}")
                         }
                         connection is Connection.ESTABLISHING && config is ElectrumConfig.Custom -> {
-                            stringResource(id = R.string.electrum_connecting, config.server.host)
+                            stringResource(id = R.string.electrum_connection_connecting_to_custom, config.server.host)
                         }
                         connection is Connection.CLOSED && config is ElectrumConfig.Custom -> {
                             stringResource(id = R.string.electrum_connection_closed_with_custom, config.server.host)

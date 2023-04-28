@@ -144,11 +144,7 @@ class NodeService : Service() {
             }
             else -> {
                 log.info("unhandled incoming payment with seed=${encryptedSeed?.name()}")
-                if (reason == "IncomingPayment") {
-                    notifyForegroundService(getString(R.string.notif__headless_title__missed_incoming), getString(R.string.notif__headless_message__app_locked))
-                } else {
-                    notifyForegroundService(getString(R.string.notif__headless_title__missed_fulfill), getString(R.string.notif__headless_message__pending_fulfill))
-                }
+                notifyForegroundService(getString(R.string.notif__missed__title), getString(R.string.notif__missed__locked))
             }
         }
         shutdownHandler.removeCallbacksAndMessages(null)

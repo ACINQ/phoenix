@@ -28,13 +28,13 @@ import kotlin.math.abs
 object Transcriber {
   fun readableState(context: Context, state: State): String {
     return when {
-      state is `CLOSING$` -> context.getString(R.string.state_closing)
-      state is `CLOSED$` -> context.getString(R.string.state_closed)
-      state is `NORMAL$` -> context.getString(R.string.state_normal)
-      state is `SYNCING$` -> context.getString(R.string.state_sync)
-      state is `SHUTDOWN$` -> context.getString(R.string.state_shutdown)
-      state is `OFFLINE$` -> context.getString(R.string.state_offline)
-      state.toString().startsWith("WAIT_") -> context.getString(R.string.state_wait_confirmed)
+      state is `CLOSING$` -> context.getString(R.string.legacy_state_closing)
+      state is `CLOSED$` -> context.getString(R.string.legacy_state_closed)
+      state is `NORMAL$` -> context.getString(R.string.legacy_state_normal)
+      state is `SYNCING$` -> context.getString(R.string.legacy_state_sync)
+      state is `SHUTDOWN$` -> context.getString(R.string.legacy_state_shutdown)
+      state is `OFFLINE$` -> context.getString(R.string.legacy_state_offline)
+      state.toString().startsWith("WAIT_") -> context.getString(R.string.legacy_state_wait_confirmed)
       else -> state.toString()
     }
   }
@@ -52,13 +52,13 @@ object Transcriber {
   }
 
   fun relativeTime(context: Context, optionalDateMillis: Option<Any>): String {
-    return if (optionalDateMillis.isDefined && optionalDateMillis.get() is Long) relativeTime(context, optionalDateMillis.get() as Long) else context.getString(R.string.utils_unknown)
+    return if (optionalDateMillis.isDefined && optionalDateMillis.get() is Long) relativeTime(context, optionalDateMillis.get() as Long) else context.getString(R.string.legacy_utils_unknown)
   }
 
   fun relativeTime(context: Context, dateMillis: Long): String {
     val delay: Long = dateMillis - System.currentTimeMillis()
     return if (abs(delay) < 60 * 1000L) {
-      context.getString(R.string.utils_date_just_now)
+      context.getString(R.string.legacy_utils_date_just_now)
     } else {
       DateUtils.getRelativeTimeSpanString(dateMillis, System.currentTimeMillis(), delay).toString()
     }

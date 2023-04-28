@@ -14,89 +14,89 @@
   ~ limitations under the License.
   -->
 
-<resources>
-  <string name="app_name">Phoenix (Testnet)</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+  <string name="legacy_app_name">Phoenix (Testnet)</string>
 
   <!-- //////////////// system notification channels //////////////// -->
 
-  <string name="notification_channels_watcher_title">Sledování na pozadí</string>
-  <string name="notification_channels_watcher_desc">Upozorní vás, pokud je potřeba spustit aplikaci. Má velkou prioritu.</string>
+  <string name="legacy_notification_channels_watcher_title">Sledování na pozadí</string>
+  <string name="legacy_notification_channels_watcher_desc">Upozorní vás, pokud je potřeba spustit aplikaci. Má velkou prioritu.</string>
 
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
-  <string name="autocreate_generating">Vytváření peněženky…</string>
-  <string name="autocreate_error">Nepodařilo se vytvořit peněženku.\nDůvod: %1$s</string>
+  <string name="legacy_autocreate_generating">Vytváření peněženky…</string>
+  <string name="legacy_autocreate_error">Nepodařilo se vytvořit peněženku.\nDůvod: %1$s</string>
 
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
-  <string name="restore_disclaimer_message">Neimportujte seed, který NEBYL vytvořen v této aplikaci. \n\nZároveň se ujistěte že nemáte spuštěnou jinou Phoenix peněženku se stejným seedem.</string>
-  <string name="restore_disclaimer_checkbox">Ano, rozumím.</string>
-  <string name="restore_disclaimer_next">Další</string>
-  <string name="restore_instructions">Seed vaší peněženky je seznam 12 anglických slov.</string>
-  <string name="restore_mnemonics_label">Použijte klávesnici k zadání seedu:</string>
-  <string name="restore_in_progress">Obnovování peněženky…</string>
-  <string name="restore_import_button">Importovat</string>
-  <string name="restore_error">Tento seed je neplatný a nelze ho importovat.\n\nProsím, zkuste to znovu</string>
+  <string name="legacy_restore_disclaimer_message">Neimportujte seed, který NEBYL vytvořen v této aplikaci. \n\nZároveň se ujistěte že nemáte spuštěnou jinou Phoenix peněženku se stejným seedem.</string>
+  <string name="legacy_restore_disclaimer_checkbox">Ano, rozumím.</string>
+  <string name="legacy_restore_disclaimer_next">Další</string>
+  <string name="legacy_restore_instructions">Seed vaší peněženky je seznam 12 anglických slov.</string>
+  <string name="legacy_restore_mnemonics_label">Použijte klávesnici k zadání seedu:</string>
+  <string name="legacy_restore_in_progress">Obnovování peněženky…</string>
+  <string name="legacy_restore_import_button">Importovat</string>
+  <string name="legacy_restore_error">Tento seed je neplatný a nelze ho importovat.\n\nProsím, zkuste to znovu</string>
 
   <!-- //////////////// Pin dialog //////////////////// -->
 
-  <string name="pindialog_title_default">Prosím, zadejte váš PIN</string>
-  <string name="pindialog_pwd_placeholder">●●●●●●</string>
-  <string name="pindialog_error">PIN kód musí být 6ciferné číslo.</string>
-  <string name="pindialog_error_donotmatch">PIN kódy se neshodují.</string>
+  <string name="legacy_pindialog_title_default">Prosím, zadejte váš PIN</string>
+  <string name="legacy_pindialog_pwd_placeholder">●●●●●●</string>
+  <string name="legacy_pindialog_error">PIN kód musí být 6ciferné číslo.</string>
+  <string name="legacy_pindialog_error_donotmatch">PIN kódy se neshodují.</string>
 
   <!-- //////////////// Biometric dialog //////////////////// -->
 
-  <string name="biometricprompt_title">Peněženka je uzamčena</string>
-  <string name="biometricprompt_negative">Odemknout pomocí PIN kódu</string>
+  <string name="legacy_biometricprompt_title">Peněženka je uzamčena</string>
+  <string name="legacy_biometricprompt_negative">Odemknout pomocí PIN kódu</string>
 
   <!-- //////////////// Startup //////////////////// -->
 
-  <string name="startup_wait">Nahrávám…</string>
-  <string name="startup_wait_tor">Spouštím Tor…</string>
-  <string name="startup_start_button">Restartovat</string>
-  <string name="startup_settings_button">Nastavení</string>
-  <string name="startup_error_tor">Nepodařilo se spustit Tor. Zkontrolujte, že je vaše připojení funkční a zkuste to znovu.\n\nDetail chyby: %1$s</string>
-  <string name="startup_error_wrong_pwd">Chybný PIN kód</string>
-  <string name="startup_error_unreadable">Peněženku se nepodařilo načíst, prosím, restartujte aplikaci</string>
-  <string name="startup_error_network">Vaše připojení k internetu není funkční. Prosím, zkontrolujte WiFi nebo mobilní síť.</string>
-  <string name="startup_error_generic">Aplikaci se nepodařilo spustit. Prosím, zkuste to znovu.\n\nPodrobnosti: %1$s</string>
-  <string name="startup_error_biometrics">Nepodařilo se přihlásit uživatele.</string>
+  <string name="legacy_startup_wait">Nahrávám…</string>
+  <string name="legacy_startup_wait_tor">Spouštím Tor…</string>
+  <string name="legacy_startup_start_button">Restartovat</string>
+  <string name="legacy_startup_settings_button">Nastavení</string>
+  <string name="legacy_startup_error_tor">Nepodařilo se spustit Tor. Zkontrolujte, že je vaše připojení funkční a zkuste to znovu.\n\nDetail chyby: %1$s</string>
+  <string name="legacy_startup_error_wrong_pwd">Chybný PIN kód</string>
+  <string name="legacy_startup_error_unreadable">Peněženku se nepodařilo načíst, prosím, restartujte aplikaci</string>
+  <string name="legacy_startup_error_network">Vaše připojení k internetu není funkční. Prosím, zkontrolujte WiFi nebo mobilní síť.</string>
+  <string name="legacy_startup_error_generic">Aplikaci se nepodařilo spustit. Prosím, zkuste to znovu.\n\nPodrobnosti: %1$s</string>
+  <string name="legacy_startup_error_biometrics">Nepodařilo se přihlásit uživatele.</string>
 
   <!-- //////////////// payment holder //////////////// -->
 
-  <string name="paymentholder_sending">Odesílám…</string>
-  <string name="paymentholder_processing">Zpracovávám…</string>
-  <string name="paymentholder_waiting">Čekám…</string>
-  <string name="paymentholder_failed">Selhalo</string>
-  <string name="paymentholder_sent_prefix">-</string>
-  <string name="paymentholder_received_prefix">+</string>
-  <string name="paymentholder_no_desc">Žádný popis</string>
-  <string name="paymentholder_closing_desc">Uzavírám #%1$s</string>
+  <string name="legacy_paymentholder_sending">Odesílám…</string>
+  <string name="legacy_paymentholder_processing">Zpracovávám…</string>
+  <string name="legacy_paymentholder_waiting">Čekám…</string>
+  <string name="legacy_paymentholder_failed">Selhalo</string>
+  <string name="legacy_paymentholder_sent_prefix">-</string>
+  <string name="legacy_paymentholder_received_prefix">+</string>
+  <string name="legacy_paymentholder_no_desc">Žádný popis</string>
+  <string name="legacy_paymentholder_closing_desc">Uzavírám #%1$s</string>
 
   <!-- //////////////// receive //////////////// -->
 
-  <string name="receive_edit_title">Upravit požadavek</string>
-  <string name="receive_edit_subtitle">Popis požadavku a vyžádané množství lze změnit.</string>
-  <string name="receive_in_progress_message">Prosím vyčkejte…</string>
-  <string name="receive_error_message">Nastala chyba při vytváření požadavku…\n\nProsím, zkuste to znovu.</string>
-  <string name="receive_amount_label">Množství (nepovinný)</string>
-  <string name="receive_desc_label">Popis platby (nepovinný):</string>
-  <string name="receive_default_desc">Phoenix platba</string>
-  <string name="receive_generate_button">Vytvořit požadavek</string>
+  <string name="legacy_receive_edit_title">Upravit požadavek</string>
+  <string name="legacy_receive_edit_subtitle">Popis požadavku a vyžádané množství lze změnit.</string>
+  <string name="legacy_receive_in_progress_message">Prosím vyčkejte…</string>
+  <string name="legacy_receive_error_message">Nastala chyba při vytváření požadavku…\n\nProsím, zkuste to znovu.</string>
+  <string name="legacy_receive_amount_label">Množství (nepovinný)</string>
+  <string name="legacy_receive_desc_label">Popis platby (nepovinný):</string>
+  <string name="legacy_receive_default_desc">Phoenix platba</string>
+  <string name="legacy_receive_generate_button">Vytvořit požadavek</string>
 
-  <string name="receive_share_subject">Platba vyžádána</string>
-  <string name="receive_share_title">Sdílet tento požadavek pomocí…</string>
-  <string name="receive_share_button">Sdílet…</string>
+  <string name="legacy_receive_share_subject">Platba vyžádána</string>
+  <string name="legacy_receive_share_title">Sdílet tento požadavek pomocí…</string>
+  <string name="legacy_receive_share_button">Sdílet…</string>
 
-  <string name="receive_address_label">Adresa</string>
-  <string name="receive_withdraw_button">Použít LNURL odkaz</string>
+  <string name="legacy_receive_address_label">Adresa</string>
+  <string name="legacy_receive_withdraw_button">Použít LNURL odkaz</string>
 
-  <string name="receive_swap_in_button">Zobrazit Bitcoinovou adresu</string>
-  <string name="receive_swap_in_error_message">Nastala chyba při směně na on-chain transakci.…\n\nProsím, zkuste to znovu.</string>
-  <string name="receive_swap_in_progress_message">Požaduji směnu na Bitcoinovou adresu…</string>
-  <string name="receive_swap_in_disclaimer_title">Přijmout on-chain</string>
-  <string name="receive_swap_in_disclaimer_message"><![CDATA[
+  <string name="legacy_receive_swap_in_button">Zobrazit Bitcoinovou adresu</string>
+  <string name="legacy_receive_swap_in_error_message">Nastala chyba při směně na on-chain transakci.…\n\nProsím, zkuste to znovu.</string>
+  <string name="legacy_receive_swap_in_progress_message">Požaduji směnu na Bitcoinovou adresu…</string>
+  <string name="legacy_receive_swap_in_disclaimer_title">Přijmout on-chain</string>
+  <string name="legacy_receive_swap_in_disclaimer_message"><![CDATA[
   Bude zobrazena standardní Bitcoinová adresa.
   <br /><br />
   Finance poslané na tuto adresu se zobrazí po jednom potvrzení.
@@ -106,106 +106,106 @@
 
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_balance_prefix">Zůstatek:</string>
-  <string name="send_use_all_balance">Poslat vše</string>
-  <string name="send_loading">Kontroluji platbu…</string>
-  <string name="send_invalid_pr_generic">Tato platba není platná. Musel jste naskenovat neplatný požadavek.\n\nProsím, zkuste to znovu.</string>
-  <string name="send_amount_error">Prosím, zadejte platné množství.</string>
-  <string name="send_amount_error_balance">Množství je vyšší než váš zůstatek.</string>
-  <string name="send_amount_error_swap_out_too_small">Minimálně %1$s za on-chain platbu.</string>
-  <string name="send_destination_label">Odeslat na</string>
-  <string name="send_description_label">Popis</string>
-  <string name="send_error_sending">Nastala chyba při odesílání platby. Žádné peníze nebyly odeslány.</string>
-  <string name="send_pay_button">Zaplatit</string>
-  <string name="send_swap_in_progress">Probíhá směna…</string>
-  <string name="send_swap_error">Směna selhala. Prosím, zkuste to znovu.</string>
-  <string name="send_swap_required_button">Vyžádat směnu</string>
-  <string name="send_swap_complete_recap_amount">Množství</string>
-  <string name="send_swap_complete_recap_fee">Poplatek pro težaře</string>
-  <string name="send_swap_complete_recap_total">Celkem</string>
-  <string name="send_swap_complete_cannot_afford">Celkové množství převyšuje váš zůstatek.\n\nSnižte množství, nebo to zkuste později až se sníží poplatky.</string>
+  <string name="legacy_send_balance_prefix">Zůstatek:</string>
+  <string name="legacy_send_use_all_balance">Poslat vše</string>
+  <string name="legacy_send_loading">Kontroluji platbu…</string>
+  <string name="legacy_send_invalid_pr_generic">Tato platba není platná. Musel jste naskenovat neplatný požadavek.\n\nProsím, zkuste to znovu.</string>
+  <string name="legacy_send_amount_error">Prosím, zadejte platné množství.</string>
+  <string name="legacy_send_amount_error_balance">Množství je vyšší než váš zůstatek.</string>
+  <string name="legacy_send_amount_error_swap_out_too_small">Minimálně %1$s za on-chain platbu.</string>
+  <string name="legacy_send_destination_label">Odeslat na</string>
+  <string name="legacy_send_description_label">Popis</string>
+  <string name="legacy_send_error_sending">Nastala chyba při odesílání platby. Žádné peníze nebyly odeslány.</string>
+  <string name="legacy_send_pay_button">Zaplatit</string>
+  <string name="legacy_send_swap_in_progress">Probíhá směna…</string>
+  <string name="legacy_send_swap_error">Směna selhala. Prosím, zkuste to znovu.</string>
+  <string name="legacy_send_swap_required_button">Vyžádat směnu</string>
+  <string name="legacy_send_swap_complete_recap_amount">Množství</string>
+  <string name="legacy_send_swap_complete_recap_fee">Poplatek pro težaře</string>
+  <string name="legacy_send_swap_complete_recap_total">Celkem</string>
+  <string name="legacy_send_swap_complete_cannot_afford">Celkové množství převyšuje váš zůstatek.\n\nSnižte množství, nebo to zkuste později až se sníží poplatky.</string>
 
   <!-- //////////////// scan //////////////// -->
 
-  <string name="readinput_paste">Vložit platební požadavek</string>
-  <string name="readinput_extracting">Zpracovávám sken…</string>
+  <string name="legacy_readinput_paste">Vložit platební požadavek</string>
+  <string name="legacy_readinput_extracting">Zpracovávám sken…</string>
 
-  <string name="scan_request_camera_access">Povolit přístup ke kameře</string>
-  <string name="scan_instructions">Umístěte QR kód platebního požadavku dovnitř obdélníčku, aby mohl být přečten</string>
-  <string name="scan_state_reading">Čtení platebního požadavku</string>
+  <string name="legacy_scan_request_camera_access">Povolit přístup ke kameře</string>
+  <string name="legacy_scan_instructions">Umístěte QR kód platebního požadavku dovnitř obdélníčku, aby mohl být přečten</string>
+  <string name="legacy_scan_state_reading">Čtení platebního požadavku</string>
 
-  <string name="scan_error_expired">Platba vypršela.</string>
-  <string name="scan_error_pay_to_self">Nemůžete platit sám sobě.</string>
-  <string name="scan_error_invalid_chain">Tento požadavek nepoužívá stejný blockchain jako vaše peněženka.</string>
-  <string name="scan_error_lnurl_unsupported">Tato LNURL není zatím podporována!</string>
+  <string name="legacy_scan_error_expired">Platba vypršela.</string>
+  <string name="legacy_scan_error_pay_to_self">Nemůžete platit sám sobě.</string>
+  <string name="legacy_scan_error_invalid_chain">Tento požadavek nepoužívá stejný blockchain jako vaše peněženka.</string>
+  <string name="legacy_scan_error_lnurl_unsupported">Tato LNURL není zatím podporována!</string>
 
-  <string name="scan_amountless_legacy_title">Varování</string>
-  <string name="scan_amountless_legacy_message"><![CDATA[
+  <string name="legacy_scan_amountless_legacy_title">Varování</string>
+  <string name="legacy_scan_amountless_legacy_message"><![CDATA[
     Tento požadavek neobsahuje množství. To může být nebezpečné: zlomyslné uzly se mohou pokusit ukrást vaší platbu. Z hlediska bezpečnosti bystě měli <b>požádat placeného, aby stanovil množství</b> v platebním požadavku.
     <br /><br />
     Jste si jistí, že chcete zaplatit tento požadavek?
   ]]></string>
-  <string name="scan_amountless_legacy_confirm_button">Potvrdit</string>
-  <string name="scan_amountless_legacy_cancel_button">Zrušit</string>
+  <string name="legacy_scan_amountless_legacy_confirm_button">Potvrdit</string>
+  <string name="legacy_scan_amountless_legacy_cancel_button">Zrušit</string>
 
   <!-- //////////////// utilities strings //////////////// -->
 
   <!-- #1: sign / #2: integer part / #3: decimal part / #4: unit -->
-  <string name="utils_converted_amount">≈ %1$s</string>
-  <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
-  <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
+  <string name="legacy_utils_converted_amount">≈ %1$s</string>
+  <string name="legacy_utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
+  <string name="legacy_utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
 
-  <string name="utils_ok">Ok</string>
-  <string name="utils_proceed">Pokračovat</string>
-  <string name="utils_cancel">Zrušit</string>
-  <string name="utils_date_just_now">Právě teď</string>
-  <string name="utils_unknown">N/A</string>
-  <string name="utils_copied">Zkopírováno do schránky!</string>
-  <string name="btn_back">Zpět</string>
-  <string name="btn_ok">OK</string>
-  <string name="btn_confirm">Potvrdit</string>
-  <string name="btn_cancel">Zrušit</string>
-  <string name="btn_close">Zavřít</string>
+  <string name="legacy_utils_ok">Ok</string>
+  <string name="legacy_utils_proceed">Pokračovat</string>
+  <string name="legacy_utils_cancel">Zrušit</string>
+  <string name="legacy_utils_date_just_now">Právě teď</string>
+  <string name="legacy_utils_unknown">N/A</string>
+  <string name="legacy_utils_copied">Zkopírováno do schránky!</string>
+  <string name="legacy_btn_back">Zpět</string>
+  <string name="legacy_btn_ok">OK</string>
+  <string name="legacy_btn_confirm">Potvrdit</string>
+  <string name="legacy_btn_cancel">Zrušit</string>
+  <string name="legacy_btn_close">Zavřít</string>
 
   <!-- //////////////// settings //////////////// -->
 
-  <string name="settings_general_title">Obecné</string>
-  <string name="settings_display_prefs">Zobrazení</string>
-  <string name="settings_security_title">Bezpečnost</string>
-  <string name="settings_display_seed">Obnovovací fráze</string>
-  <string name="settings_access_control">Nastavení přístupu</string>
-  <string name="settings_advanced_title">Pokročilé</string>
-  <string name="settings_fees">Nastavení poplatků</string>
-  <string name="settings_list_channels">Seznam kanálů</string>
-  <string name="settings_logs">Logy</string>
-  <string name="settings_electrum">Electrum server</string>
-  <string name="settings_mutual_close">Uzavřít všechny kanály</string>
-  <string name="settings_force_close">Nebezpečná zóna</string>
-  <string name="settings_tor">Tor</string>
+  <string name="legacy_settings_general_title">Obecné</string>
+  <string name="legacy_settings_display_prefs">Zobrazení</string>
+  <string name="legacy_settings_security_title">Bezpečnost</string>
+  <string name="legacy_settings_display_seed">Obnovovací fráze</string>
+  <string name="legacy_settings_access_control">Nastavení přístupu</string>
+  <string name="legacy_settings_advanced_title">Pokročilé</string>
+  <string name="legacy_settings_fees">Nastavení poplatků</string>
+  <string name="legacy_settings_list_channels">Seznam kanálů</string>
+  <string name="legacy_settings_logs">Logy</string>
+  <string name="legacy_settings_electrum">Electrum server</string>
+  <string name="legacy_settings_mutual_close">Uzavřít všechny kanály</string>
+  <string name="legacy_settings_force_close">Nebezpečná zóna</string>
+  <string name="legacy_settings_tor">Tor</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
-  <string name="notif_watcher_cheating_title">Prosím, zapněte Phoenix</string>
-  <string name="notif_watcher_cheating_message">Byl zjištěn pokus o podvod.</string>
+  <string name="legacy_notif_watcher_cheating_title">Prosím, zapněte Phoenix</string>
+  <string name="legacy_notif_watcher_cheating_message">Byl zjištěn pokus o podvod.</string>
 
-  <string name="notif_watcher_connection_title">Phoenix potřebuje přístup k internetu</string>
-  <string name="notif_watcher_connection_message">Sledování na pozadí potřebuje přístup k internetu.</string>
+  <string name="legacy_notif_watcher_connection_title">Phoenix potřebuje přístup k internetu</string>
+  <string name="legacy_notif_watcher_connection_message">Sledování na pozadí potřebuje přístup k internetu.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
-  <string name="closechannels_title">Uzavřít kanály</string>
-  <string name="closechannels_checking_channels">Kontroluji kanály, prosím vyčkejte…</string>
-  <string name="closechannels_channels_recap">Právě teď máte %1$d Lightning kanálů s agregovaným zůstatkem %2$s.</string>
-  <string name="closechannels_channels_none">Právě nemáte žádné kanály, které by mohly být vyprázdněny.\n\nJděte do \'Seznam kanálů\' k zobrazení stavu vašich kanálů.</string>
-  <string name="closechannels_mutual_title">Vyprázdnit peněženku</string>
-  <string name="closechannels_mutual_instructions"><![CDATA[
+  <string name="legacy_closechannels_title">Uzavřít kanály</string>
+  <string name="legacy_closechannels_checking_channels">Kontroluji kanály, prosím vyčkejte…</string>
+  <string name="legacy_closechannels_channels_recap">Právě teď máte %1$d Lightning kanálů s agregovaným zůstatkem %2$s.</string>
+  <string name="legacy_closechannels_channels_none">Právě nemáte žádné kanály, které by mohly být vyprázdněny.\n\nJděte do \'Seznam kanálů\' k zobrazení stavu vašich kanálů.</string>
+  <string name="legacy_closechannels_mutual_title">Vyprázdnit peněženku</string>
+  <string name="legacy_closechannels_mutual_instructions"><![CDATA[
     Použijte tuto stránku k vyprázdnění vaší peněženky na Bitcoinovou adresu.
   ]]></string>
-  <string name="closechannels_mutual_input_instructions">Finance mohou být odeslány do Bitcoinové peněženky. Před odesláním se ujistěte se, že je adresa správná.</string>
-  <string name="closechannels_mutual_input_hint">Zadejte Bitcoinovou adresu</string>
-  <string name="closechannels_mutual_button">Vyprázdnit peněženku</string>
-  <string name="closechannels_force_title">Vynutit uzavření</string>
-  <string name="closechannels_force_instructions"><![CDATA[
+  <string name="legacy_closechannels_mutual_input_instructions">Finance mohou být odeslány do Bitcoinové peněženky. Před odesláním se ujistěte se, že je adresa správná.</string>
+  <string name="legacy_closechannels_mutual_input_hint">Zadejte Bitcoinovou adresu</string>
+  <string name="legacy_closechannels_mutual_button">Vyprázdnit peněženku</string>
+  <string name="legacy_closechannels_force_title">Vynutit uzavření</string>
+  <string name="legacy_closechannels_force_instructions"><![CDATA[
     Vynucené uzavření umožňuje jednostranné uzavření vašich kanálů.
     <br/><br/>
     Tato funkce není magické tlačítko na spravení všech problémů. Je zde jako bezpečností opatření a <b>mělo by být použito jen v extrémních případech</b>. Například pokud druhá strana kanálu (ACINQ) permanentně zmizí, což by vám zabránilo v utrácení vašich peněz. Ve všech ostatních případech <b>kontaktujte podporu, pokud nacházíte jakékoliv problémy</b>.
@@ -214,206 +214,206 @@
     <br/><br/>
     <b>Nepoužívejte tuto funkci, pokud plně nechápete, jak funguje.</b>
   ]]></string>
-  <string name="closechannels_force_destination">Finance budou odeslány na:</string>
-  <string name="closechannels_force_button">Vynutit uzavření kanálů</string>
-  <string name="closechannels_confirm_dialog_message">Jste si jistí, že chcete pokračovat?</string>
-  <string name="closechannels_message_error">Nastala chyba. Prosím, zkuste to znovu později.</string>
-  <string name="closechannels_message_done">Finance odeslány.</string>
-  <string name="closechannels_message_in_progress">Prosím čekejte…</string>
+  <string name="legacy_closechannels_force_destination">Finance budou odeslány na:</string>
+  <string name="legacy_closechannels_force_button">Vynutit uzavření kanálů</string>
+  <string name="legacy_closechannels_confirm_dialog_message">Jste si jistí, že chcete pokračovat?</string>
+  <string name="legacy_closechannels_message_error">Nastala chyba. Prosím, zkuste to znovu později.</string>
+  <string name="legacy_closechannels_message_done">Finance odeslány.</string>
+  <string name="legacy_closechannels_message_in_progress">Prosím čekejte…</string>
 
   <!-- //////////////// list all channels //////////////// -->
 
-  <string name="listallchannels_title">Seznam kanálů</string>
-  <string name="listallchannels_in_progress">Prosím vyčkejte…</string>
-  <string name="listallchannels_error">Nastala chyba při získávání seznamu kanálů. Prosím, zkuste to znovu.</string>
-  <string name="listallchannels_node_id">Node id: %1$s</string>
-  <string name="listallchannels_no_channels">Zatím nemáte žádné kanály.</string>
-  <plurals name="listallchannels_channels_header">
+  <string name="legacy_listallchannels_title">Seznam kanálů</string>
+  <string name="legacy_listallchannels_in_progress">Prosím vyčkejte…</string>
+  <string name="legacy_listallchannels_error">Nastala chyba při získávání seznamu kanálů. Prosím, zkuste to znovu.</string>
+  <string name="legacy_listallchannels_node_id">Node id: %1$s</string>
+  <string name="legacy_listallchannels_no_channels">Zatím nemáte žádné kanály.</string>
+  <plurals name="legacy_listallchannels_channels_header" tools:ignore="MissingQuantity">
     <item quantity="one">Máte %1$d kanál.</item>
     <item quantity="other">Máte %1$d kanálů.</item>
   </plurals>
-  <string name="listallchannels_copy">Zkopírovat</string>
-  <string name="listallchannels_share_all">Sdílet všechny kanály…</string>
-  <string name="listallchannels_share">Sdílet</string>
-  <string name="listallchannels_funding_tx">Transakce</string>
-  <string name="listallchannels_funding_tx_desc">Zobrazit spojovací transakci</string>
-  <string name="listallchannels_close">Zavřít</string>
-  <string name="listallchannels_share_subject">Data kanálu</string>
-  <string name="listallchannels_share_title">Sdílet data kanálu</string>
-  <string name="listallchannels_serialization_error">Nepodařilo se získat data kanálu</string>
+  <string name="legacy_listallchannels_copy">Zkopírovat</string>
+  <string name="legacy_listallchannels_share_all">Sdílet všechny kanály…</string>
+  <string name="legacy_listallchannels_share">Sdílet</string>
+  <string name="legacy_listallchannels_funding_tx">Transakce</string>
+  <string name="legacy_listallchannels_funding_tx_desc">Zobrazit spojovací transakci</string>
+  <string name="legacy_listallchannels_close">Zavřít</string>
+  <string name="legacy_listallchannels_share_subject">Data kanálu</string>
+  <string name="legacy_listallchannels_share_title">Sdílet data kanálu</string>
+  <string name="legacy_listallchannels_serialization_error">Nepodařilo se získat data kanálu</string>
 
   <!-- //////////////// channel details //////////////// -->
 
-  <string name="channel_loading">Získávám data o kanálu…</string>
-  <string name="channel_error">Nepodařilo se zíkat detaily o tomto kanálu. Prosím, zkuste to znovu později.</string>
+  <string name="legacy_channel_loading">Získávám data o kanálu…</string>
+  <string name="legacy_channel_error">Nepodařilo se zíkat detaily o tomto kanálu. Prosím, zkuste to znovu později.</string>
 
   <!-- //////////////// menu //////////////// -->
 
-  <string name="menu_settings">Nastavení</string>
-  <string name="menu_send">Odeslat</string>
-  <string name="menu_receive">Přijmout</string>
+  <string name="legacy_menu_settings">Nastavení</string>
+  <string name="legacy_menu_send">Odeslat</string>
+  <string name="legacy_menu_receive">Přijmout</string>
 
   <!-- //////////////// init wallet //////////////// -->
 
-  <string name="initwallet_create">Nová peněženka</string>
-  <string name="initwallet_restore">Obnovit peněženku</string>
+  <string name="legacy_initwallet_create">Nová peněženka</string>
+  <string name="legacy_initwallet_restore">Obnovit peněženku</string>
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_swapin_incoming">Příchozí +%1$s</string>
-  <string name="main_faq_button">FAQ</string>
-  <string name="main_tor_connected_button">Tor aktivní</string>
-  <string name="main_stores_button">Obchody</string>
+  <string name="legacy_main_swapin_incoming">Příchozí +%1$s</string>
+  <string name="legacy_main_faq_button">FAQ</string>
+  <string name="legacy_main_tor_connected_button">Tor aktivní</string>
+  <string name="legacy_main_stores_button">Obchody</string>
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="inappnotif_mnemonics_never_seen">Děkujeme za používání Phoenix. Udělali jste zálohu vaší peněženky?</string>
-  <string name="inappnotif_mnemonics_never_seen_action">Zálohovat peněženku</string>
-  <string name="inappnotif_background_worker_cannot_run">Phoenix potřebuje běžet na pozadí čas od času. Ujistěte se, že vaše zařízení neukončuje agresivně tuto aplikaci kvůli šetření baterie.</string>
-  <string name="inappnotif_upgrade">Je dostupná nová aktualizace.</string>
-  <string name="inappnotif_upgrade_critical">Je dostupná kritická aktualizace. Peněženka nemusí fungovat správně pokud nebude aktualizována.</string>
+  <string name="legacy_inappnotif_mnemonics_never_seen">Děkujeme za používání Phoenix. Udělali jste zálohu vaší peněženky?</string>
+  <string name="legacy_inappnotif_mnemonics_never_seen_action">Zálohovat peněženku</string>
+  <string name="legacy_inappnotif_background_worker_cannot_run">Phoenix potřebuje běžet na pozadí čas od času. Ujistěte se, že vaše zařízení neukončuje agresivně tuto aplikaci kvůli šetření baterie.</string>
+  <string name="legacy_inappnotif_upgrade">Je dostupná nová aktualizace.</string>
+  <string name="legacy_inappnotif_upgrade_critical">Je dostupná kritická aktualizace. Peněženka nemusí fungovat správně pokud nebude aktualizována.</string>
 
   <!-- //////////////// display seed //////////////// -->
 
-  <string name="displayseed_title">Seznam slov k obnovení peněženky</string>
-  <string name="displayseed_authenticate_button">Zobrazit seed</string>
-  <string name="displayseed_loading">Odemykám seed…</string>
-  <string name="displayseed_error_generic">Seed nemohl být načten. Prosím, zkuste to znovu.</string>
-  <string name="displayseed_error_wrong_password">Chybný PIN kód.</string>
-  <string name="displayseed_instructions"><![CDATA[
+  <string name="legacy_displayseed_title">Seznam slov k obnovení peněženky</string>
+  <string name="legacy_displayseed_authenticate_button">Zobrazit seed</string>
+  <string name="legacy_displayseed_loading">Odemykám seed…</string>
+  <string name="legacy_displayseed_error_generic">Seed nemohl být načten. Prosím, zkuste to znovu.</string>
+  <string name="legacy_displayseed_error_wrong_password">Chybný PIN kód.</string>
+  <string name="legacy_displayseed_instructions"><![CDATA[
     Tento seznam slov je záloha vaší peněženky. Uložte je někam bezpečně (ne do tohoto telefonu)!
     <br /><br />
     <b>Nesdílejte jej s nikým.</b>
     <b>Neztraťte ho.</b> Pokud ztratíte tento seznam slov a váš telefon, přijdete o všechny finance.
   ]]></string>
-  <string name="displayseed_derivation_path">BIP39 seed se standardní BIP84 cestou derivace</string>
-  <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
-  <string name="displayseed_has_saved_seed_checkbox">Udělal jsem zálohu svého seedu</string>
+  <string name="legacy_displayseed_derivation_path">BIP39 seed se standardní BIP84 cestou derivace</string>
+  <string name="legacy_displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
+  <string name="legacy_displayseed_has_saved_seed_checkbox">Udělal jsem zálohu svého seedu</string>
 
   <!-- //////////////// logs settings //////////////// -->
 
-  <string name="logs_title">Aplikační logy</string>
-  <string name="logs_subtitle">Můžete získat a sdílet aplikační logy z této stránky.</string>
-  <string name="logs_view_button">Zobrazit logy…</string>
-  <string name="logs_view_with">Zobrazit logy pomocí…</string>
-  <string name="logs_share_button">Sdílet logy…</string>
-  <string name="logs_share_subject">Phoenix App logy</string>
-  <string name="logs_share_title">Sdílet Phoenix logy…</string>
+  <string name="legacy_logs_title">Aplikační logy</string>
+  <string name="legacy_logs_subtitle">Můžete získat a sdílet aplikační logy z této stránky.</string>
+  <string name="legacy_logs_view_button">Zobrazit logy…</string>
+  <string name="legacy_logs_view_with">Zobrazit logy pomocí…</string>
+  <string name="legacy_logs_share_button">Sdílet logy…</string>
+  <string name="legacy_logs_share_subject">Phoenix App logy</string>
+  <string name="legacy_logs_share_title">Sdílet Phoenix logy…</string>
 
   <!-- //////////////// payment details //////////////// -->
 
-  <string name="paymentdetails_loading">Získávání detailů platby…</string>
-  <string name="paymentdetails_error">Nastala chyba při získávání detailů platby.\n\nProsím, zkuste to znovu.</string>
+  <string name="legacy_paymentdetails_loading">Získávání detailů platby…</string>
+  <string name="legacy_paymentdetails_error">Nastala chyba při získávání detailů platby.\n\nProsím, zkuste to znovu.</string>
 
-  <string name="paymentdetails_status_sent_successful"><![CDATA[<b>Odesláno</b> %1$s]]></string>
-  <string name="paymentdetails_status_sent_pending"><![CDATA[<b>Čekám…</b>]]></string>
-  <string name="paymentdetails_status_sent_failed"><![CDATA[Platba <b>selhala</b>.<br />Žádné peníze nebyly odeslány.]]></string>
+  <string name="legacy_paymentdetails_status_sent_successful"><![CDATA[<b>Odesláno</b> %1$s]]></string>
+  <string name="legacy_paymentdetails_status_sent_pending"><![CDATA[<b>Čekám…</b>]]></string>
+  <string name="legacy_paymentdetails_status_sent_failed"><![CDATA[Platba <b>selhala</b>.<br />Žádné peníze nebyly odeslány.]]></string>
 
-  <string name="paymentdetails_status_received_pending">Platba zatím nebyla obdržena.</string>
-  <string name="paymentdetails_status_received_successful"><![CDATA[<b>Obdrženo</b> %1$s]]></string>
+  <string name="legacy_paymentdetails_status_received_pending">Platba zatím nebyla obdržena.</string>
+  <string name="legacy_paymentdetails_status_received_successful"><![CDATA[<b>Obdrženo</b> %1$s]]></string>
 
-  <string name="paymentdetails_desc_label">Popis</string>
-  <string name="paymentdetails_destination_label">Odesláno k</string>
-  <string name="paymentdetails_fees_label">Poplatky</string>
-  <string name="paymentdetails_error_label">Chyba</string>
-  <string name="paymentdetails_closing_desc">Platba k uzavření kanálu #%1$s</string>
-  <string name="paymentdetails_no_description">Žádný popis</string>
+  <string name="legacy_paymentdetails_desc_label">Popis</string>
+  <string name="legacy_paymentdetails_destination_label">Odesláno k</string>
+  <string name="legacy_paymentdetails_fees_label">Poplatky</string>
+  <string name="legacy_paymentdetails_error_label">Chyba</string>
+  <string name="legacy_paymentdetails_closing_desc">Platba k uzavření kanálu #%1$s</string>
+  <string name="legacy_paymentdetails_no_description">Žádný popis</string>
 
-  <string name="paymentdetails_technicals_button">Zobrazit technická data</string>
-
-  <!-- //////////////// payment details: technicals data //////////////// -->
-
-  <string name="paymentdetails_technicals_title">Platební data</string>
-  <string name="paymentdetails_payment_hash_label">Platební Hash</string>
-  <string name="paymentdetails_payment_request_label">Platební Požadavek</string>
-  <string name="paymentdetails_preimage_label">Preimage</string>
-  <string name="paymentdetails_created_at_label">Vytvořeno v</string>
-  <string name="paymentdetails_completed_at_label">Dokončeno v</string>
+  <string name="legacy_paymentdetails_technicals_button">Zobrazit technická data</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
 
-  <string name="state_wait_confirmed">Spojovací transakce čeká na potvrzení</string>
-  <string name="state_closing">Kanál se uzavírá</string>
-  <string name="state_closed">Kanál byl uzavřen</string>
-  <string name="state_normal">Běží v pořádku</string>
-  <string name="state_sync">Synchronizuji s uzlem</string>
-  <string name="state_offline">Uzel je offline</string>
-  <string name="state_shutdown">Vypnuto</string>
+  <string name="legacy_paymentdetails_technicals_title">Platební data</string>
+  <string name="legacy_paymentdetails_payment_hash_label">Platební Hash</string>
+  <string name="legacy_paymentdetails_payment_request_label">Platební Požadavek</string>
+  <string name="legacy_paymentdetails_preimage_label">Preimage</string>
+  <string name="legacy_paymentdetails_created_at_label">Vytvořeno v</string>
+  <string name="legacy_paymentdetails_completed_at_label">Dokončeno v</string>
+
+  <!-- //////////////// payment details: technicals data //////////////// -->
+
+  <string name="legacy_state_wait_confirmed">Spojovací transakce čeká na potvrzení</string>
+  <string name="legacy_state_closing">Kanál se uzavírá</string>
+  <string name="legacy_state_closed">Kanál byl uzavřen</string>
+  <string name="legacy_state_normal">Běží v pořádku</string>
+  <string name="legacy_state_sync">Synchronizuji s uzlem</string>
+  <string name="legacy_state_offline">Uzel je offline</string>
+  <string name="legacy_state_shutdown">Vypnuto</string>
 
   <!-- //////////////// access control //////////////// -->
 
-  <string name="accessctrl_title">Bezpečnost</string>
+  <string name="legacy_accessctrl_title">Bezpečnost</string>
 
-  <string name="accessctrl_auth_no_hw">Vaše zařízení nepodporuje biometrické přihlášení.</string>
-  <string name="accessctrl_auth_hw_unavailable">Biometrický hardware není dostupný. Prosím, zkuste to znovu později.</string>
-  <string name="accessctrl_auth_none_enrolled">Prosím, nejdříve nastavte biometrii.</string>
+  <string name="legacy_accessctrl_auth_no_hw">Vaše zařízení nepodporuje biometrické přihlášení.</string>
+  <string name="legacy_accessctrl_auth_hw_unavailable">Biometrický hardware není dostupný. Prosím, zkuste to znovu později.</string>
+  <string name="legacy_accessctrl_auth_none_enrolled">Prosím, nejdříve nastavte biometrii.</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 
-  <string name="lnurl_withdraw_amount_label">Množství k přijetí</string>
-  <string name="lnurl_withdraw_description_label">Detaily</string>
-  <string name="lnurl_withdraw_service_host_label"><![CDATA[Vybrat finance z<br/><b>%1$s</b>.]]></string>
-  <string name="lnurl_withdraw_confirm_button">Vybrat</string>
-  <string name="lnurl_withdraw_wait">Požadování financí…</string>
-  <string name="lnurl_withdraw_success">Prosím, vyčkejte, zatímco %1$s posílá finance.\n\nUdržujte aplikaci online.</string>
-  <string name="lnurl_withdraw_error_internal">Nelze zpracovat požadavek na výběr. Prosím, zkuste to znovu.</string>
-  <string name="lnurl_withdraw_error_invalid">Požadavek na výběr je neplatný. Prosím, zkuste to znovu.</string>
-  <string name="lnurl_withdraw_error_amount">Neplatné množství.</string>
-  <string name="lnurl_withdraw_error_amount_min">Množství musí být alespoň %1$s.</string>
-  <string name="lnurl_withdraw_error_amount_max">Množství nesmí překročit %1$s.</string>
+  <string name="legacy_lnurl_withdraw_amount_label">Množství k přijetí</string>
+  <string name="legacy_lnurl_withdraw_description_label">Detaily</string>
+  <string name="legacy_lnurl_withdraw_service_host_label"><![CDATA[Vybrat finance z<br/><b>%1$s</b>.]]></string>
+  <string name="legacy_lnurl_withdraw_confirm_button">Vybrat</string>
+  <string name="legacy_lnurl_withdraw_wait">Požadování financí…</string>
+  <string name="legacy_lnurl_withdraw_success">Prosím, vyčkejte, zatímco %1$s posílá finance.\n\nUdržujte aplikaci online.</string>
+  <string name="legacy_lnurl_withdraw_error_internal">Nelze zpracovat požadavek na výběr. Prosím, zkuste to znovu.</string>
+  <string name="legacy_lnurl_withdraw_error_invalid">Požadavek na výběr je neplatný. Prosím, zkuste to znovu.</string>
+  <string name="legacy_lnurl_withdraw_error_amount">Neplatné množství.</string>
+  <string name="legacy_lnurl_withdraw_error_amount_min">Množství musí být alespoň %1$s.</string>
+  <string name="legacy_lnurl_withdraw_error_amount_max">Množství nesmí překročit %1$s.</string>
 
   <!-- //////////////// display preferences //////////////// -->
 
-  <string name="prefs_display_title">Nastavení zobrazení</string>
-  <string name="prefs_display_coin_label">Jednotka Bitcoinu</string>
-  <string name="prefs_display_fiat_label">Fiat měna</string>
-  <string name="prefs_display_theme_label">Barevné téma aplikace</string>
+  <string name="legacy_prefs_display_title">Nastavení zobrazení</string>
+  <string name="legacy_prefs_display_coin_label">Jednotka Bitcoinu</string>
+  <string name="legacy_prefs_display_fiat_label">Fiat měna</string>
+  <string name="legacy_prefs_display_theme_label">Barevné téma aplikace</string>
 
   <!-- //////////////// electrum server //////////////// -->
 
-  <string name="electrum_title">Electrum server</string>
-  <string name="electrum_subtitle">Ve výchozím nastavení se Phoenix připojuje k náhodným electrum serverům kvůli přístupu k Bitcoinovému blockchainu. Můžete zvolit i připojení k vlastnímu Electrum serveru.</string>
-  <string name="electrum_change_button">Nastavit server…</string>
+  <string name="legacy_electrum_title">Electrum server</string>
+  <string name="legacy_electrum_subtitle">Ve výchozím nastavení se Phoenix připojuje k náhodným electrum serverům kvůli přístupu k Bitcoinovému blockchainu. Můžete zvolit i připojení k vlastnímu Electrum serveru.</string>
+  <string name="legacy_electrum_change_button">Nastavit server…</string>
 
-  <string name="electrum_block_height_label">Výška bloku</string>
-  <string name="electrum_tip_label">Čas vrcholu</string>
-  <string name="electrum_fee_rate_label">Sazba poplatků</string>
-  <string name="electrum_xpub_label">Hlavní veřejný klíč</string>
-  <string name="electrum_xpub_value">%1$s\n\nCesta: %2$s</string>
-  <string name="electrum_fee_rate">%1$s sat/byte</string>
-  <string name="electrum_connection_label">Server</string>
-  <string name="electrum_connecting">Navazování spojení…</string>
-  <string name="electrum_connecting_to_custom"><![CDATA[Navazování spojení s <b>%1$s…</b>]]></string>
-  <string name="electrum_connected"><![CDATA[Připojeno k: <b>%1$s</b>]]></string>
+  <string name="legacy_electrum_block_height_label">Výška bloku</string>
+  <string name="legacy_electrum_tip_label">Čas vrcholu</string>
+  <string name="legacy_electrum_fee_rate_label">Sazba poplatků</string>
+  <string name="legacy_electrum_xpub_label">Hlavní veřejný klíč</string>
+  <string name="legacy_electrum_xpub_value">%1$s\n\nCesta: %2$s</string>
+  <string name="legacy_electrum_fee_rate">%1$s sat/byte</string>
+  <string name="legacy_electrum_connection_label">Server</string>
+  <string name="legacy_electrum_connecting">Navazování spojení…</string>
+  <string name="legacy_electrum_connecting_to_custom"><![CDATA[Navazování spojení s <b>%1$s…</b>]]></string>
+  <string name="legacy_electrum_connected"><![CDATA[Připojeno k: <b>%1$s</b>]]></string>
 
-  <string name="electrum_dialog_checkbox">Použít vlastní Electrum server</string>
-  <string name="electrum_dialog_ssl">Server musí mít platný certifikát</string>
-  <string name="electrum_dialog_input">Adresa serveru (host:port).</string>
-  <string name="electrum_empty_custom_address">Prosím, vložte adresu electrum serveru</string>
+  <string name="legacy_electrum_dialog_checkbox">Použít vlastní Electrum server</string>
+  <string name="legacy_electrum_dialog_ssl">Server musí mít platný certifikát</string>
+  <string name="legacy_electrum_dialog_input">Adresa serveru (host:port).</string>
+  <string name="legacy_electrum_empty_custom_address">Prosím, vložte adresu electrum serveru</string>
 
   <!-- ////////////// virtual keyboard hints //////////////// -->
 
-  <string name="key_space_desc">Přidat mezeru</string>
-  <string name="key_delete_desc">Smazat poslední znak</string>
+  <string name="legacy_key_space_desc">Přidat mezeru</string>
+  <string name="legacy_key_delete_desc">Smazat poslední znak</string>
 
   <!-- //////////////// Tor setting //////////////// -->
 
-  <string name="tor_settings_title">Nastavení Tor</string>
-  <string name="tor_settings_subtitle">Pro ještě lepší soukromí můžete použít Tor i pro připojení k Electrum serveru nebo k vašemu Lightning uzlu. Toto drobně zpomalí start aplikace.</string>
-  <string name="tor_settings_enabled">Tor je aktivní</string>
-  <string name="tor_settings_disabled">Tor není aktivní</string>
-  <string name="tor_settings_confirm_disable_title">Jste si jist, že chcete deaktivovat Tor?</string>
-  <string name="tor_settings_confirm_enable_title">Jste si jist, že chcete aktivovat Tor? Pro nejlepší výsledky je doporučeno začít rovněž s novou peněženkou.</string>
+  <string name="legacy_tor_settings_title">Nastavení Tor</string>
+  <string name="legacy_tor_settings_subtitle">Pro ještě lepší soukromí můžete použít Tor i pro připojení k Electrum serveru nebo k vašemu Lightning uzlu. Toto drobně zpomalí start aplikace.</string>
+  <string name="legacy_tor_settings_enabled">Tor je aktivní</string>
+  <string name="legacy_tor_settings_disabled">Tor není aktivní</string>
+  <string name="legacy_tor_settings_confirm_disable_title">Jste si jist, že chcete deaktivovat Tor?</string>
+  <string name="legacy_tor_settings_confirm_enable_title">Jste si jist, že chcete aktivovat Tor? Pro nejlepší výsledky je doporučeno začít rovněž s novou peněženkou.</string>
 
   <!-- ////////////// connection issues dialog //////////////// -->
 
-  <string name="conndialog_title">Stav připojení</string>
-  <string name="conndialog_summary_not_ok">Jsou problémy s vaším připojením. Aplikace nebude fungovat správně.</string>
-  <string name="conndialog_network">Internet</string>
-  <string name="conndialog_electrum">Electrum</string>
-  <string name="conndialog_tor">Tor</string>
-  <string name="conndialog_lightning">Lightning Peer</string>
-  <string name="conndialog_ok">Připojen</string>
-  <string name="conndialog_not_ok">Připojuji…</string>
+  <string name="legacy_conndialog_title">Stav připojení</string>
+  <string name="legacy_conndialog_summary_not_ok">Jsou problémy s vaším připojením. Aplikace nebude fungovat správně.</string>
+  <string name="legacy_conndialog_network">Internet</string>
+  <string name="legacy_conndialog_electrum">Electrum</string>
+  <string name="legacy_conndialog_tor">Tor</string>
+  <string name="legacy_conndialog_lightning">Lightning Peer</string>
+  <string name="legacy_conndialog_ok">Připojen</string>
+  <string name="legacy_conndialog_not_ok">Připojuji…</string>
 
 </resources>

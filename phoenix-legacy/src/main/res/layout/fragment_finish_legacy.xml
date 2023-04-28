@@ -36,14 +36,14 @@
         style="@style/dialog_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/migration_title"
+        android:text="@string/legacy_migration_title"
         app:layout_constraintTop_toTopOf="parent" />
 
       <TextView
         android:id="@+id/message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/finish_legacy_app"
+        android:text="@string/legacy_finish_legacy_app"
         app:layout_constraintTop_toBottomOf="@id/title" />
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>

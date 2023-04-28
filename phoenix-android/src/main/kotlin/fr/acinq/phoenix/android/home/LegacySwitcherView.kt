@@ -17,13 +17,11 @@
 package fr.acinq.phoenix.android.home
 
 import android.app.Activity
-import android.app.LocalActivityManager
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,7 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.legacy.MainActivity

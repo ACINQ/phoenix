@@ -55,7 +55,7 @@
         android:layout_marginTop="@dimen/space_md"
         android:layout_marginStart="@dimen/space_lg"
         android:layout_marginEnd="@dimen/space_lg"
-        android:text="@string/lnurl_auth_instructions"
+        android:text="@string/legacy_lnurl_auth_instructions"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/action_bar" />
@@ -80,7 +80,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/instructions_sep"
-        app:text="@string/lnurl_auth_button"
+        app:text="@string/legacy_lnurl_auth_button"
         app:text_color="?attr/colorOnPrimary" />
 
       <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
@@ -96,7 +96,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/instructions_sep"
-        app:text="@string/lnurl_auth_in_progress" />
+        app:text="@string/legacy_lnurl_auth_in_progress" />
 
       <ImageView
         android:id="@+id/success_image"
@@ -116,7 +116,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_sm"
-        android:text="@string/lnurl_auth_success"
+        android:text="@string/legacy_lnurl_auth_success"
         android:layout_marginStart="@dimen/space_lg"
         android:layout_marginEnd="@dimen/space_lg"
         android:textAlignment="center"
@@ -124,7 +124,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/success_image"
-        app:text="@string/lnurl_auth_success" />
+        app:text="@string/legacy_lnurl_auth_success" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/error_layout"
@@ -160,7 +160,7 @@
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toEndOf="@id/error_icon"
-          android:text="@string/lnurl_auth_failure"
+          android:text="@string/legacy_lnurl_auth_failure"
           app:layout_constraintTop_toTopOf="parent" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>

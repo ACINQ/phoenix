@@ -60,13 +60,13 @@ class ElectrumServerFragment : BaseFragment(stayIfNotStarted = true) {
     context?.let { ctx ->
       // xpub
       mBinding.xpub.text = app.state.value?.getXpub()?.let { xpub ->
-        getString(R.string.electrum_xpub_value, xpub.xpub, xpub.path)
-      } ?: getString(R.string.utils_unknown)
+        getString(R.string.legacy_electrum_xpub_value, xpub.xpub, xpub.path)
+      } ?: getString(R.string.legacy_utils_unknown)
 
       // feerate
       mBinding.feeRate.text = app.state.value?.getFeeratePerKw(1)?.let { feerate ->
-        getString(R.string.electrum_fee_rate, NumberFormat.getInstance().format(`package$`.`MODULE$`.feerateKw2Byte(feerate)))
-      } ?: getString(R.string.utils_unknown)
+        getString(R.string.legacy_electrum_fee_rate, NumberFormat.getInstance().format(`package$`.`MODULE$`.feerateKw2Byte(feerate)))
+      } ?: getString(R.string.legacy_utils_unknown)
 
       app.networkInfo.observe(viewLifecycleOwner, Observer { info ->
         val electrumServer = info?.electrumServer
@@ -76,20 +76,20 @@ class ElectrumServerFragment : BaseFragment(stayIfNotStarted = true) {
           mBinding.connectionStateValue.text = Converter.html(
             if (app.state.value is KitState.Started) {
               if (Strings.isNullOrEmpty(prefElectrumAddress)) {
-                resources.getString(R.string.electrum_connecting)
+                resources.getString(R.string.legacy_electrum_connecting)
               } else {
-                resources.getString(R.string.electrum_connecting_to_custom, prefElectrumAddress)
+                resources.getString(R.string.legacy_electrum_connecting_to_custom, prefElectrumAddress)
               }
             } else {
               if (Strings.isNullOrEmpty(prefElectrumAddress)) {
-                resources.getString(R.string.electrum_not_connected)
+                resources.getString(R.string.legacy_electrum_not_connected)
               } else {
-                resources.getString(R.string.electrum_not_connected_to_custom, prefElectrumAddress)
+                resources.getString(R.string.legacy_electrum_not_connected_to_custom, prefElectrumAddress)
               }
             })
         } else {
           // -- successfully connected to electrum
-          mBinding.connectionStateValue.text = Converter.html(resources.getString(R.string.electrum_connected, electrumServer.electrumAddress))
+          mBinding.connectionStateValue.text = Converter.html(resources.getString(R.string.legacy_electrum_connected, electrumServer.electrumAddress))
           mBinding.tipTime.text = Transcriber.plainTime(electrumServer.tipTime * 1000L)
           mBinding.blockHeight.text = NumberFormat.getInstance().format(electrumServer.blockHeight)
         }
@@ -148,8 +148,8 @@ class ElectrumServerFragment : BaseFragment(stayIfNotStarted = true) {
 
     val dialog = AlertDialog.Builder(context, R.style.default_dialogTheme)
       .setView(view)
-      .setPositiveButton(R.string.btn_confirm, null)
-      .setNegativeButton(R.string.btn_cancel) { _, _ -> }
+      .setPositiveButton(R.string.legacy_btn_confirm, null)
+      .setNegativeButton(R.string.legacy_btn_cancel) { _, _ -> }
       .create()
 
     dialog.setOnShowListener {
@@ -157,7 +157,7 @@ class ElectrumServerFragment : BaseFragment(stayIfNotStarted = true) {
       confirmButton.setOnClickListener {
         val address = addressInput.text.toString()
         if (useCustomElectrumBox.isChecked && address.isBlank()) {
-          Toast.makeText(context, R.string.electrum_empty_custom_address, Toast.LENGTH_SHORT).show()
+          Toast.makeText(context, R.string.legacy_electrum_empty_custom_address, Toast.LENGTH_SHORT).show()
         } else {
           Prefs.saveElectrumServer(context, if (useCustomElectrumBox.isChecked) address else "")
           if (isOnion(address)) {

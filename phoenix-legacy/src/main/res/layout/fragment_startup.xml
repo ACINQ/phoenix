@@ -68,7 +68,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:maxWidth="400dp"
-          android:text="@string/startup_error_generic"
+          android:text="@string/legacy_startup_error_generic"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
@@ -94,7 +94,7 @@
           app:layout_constraintHorizontal_bias="1"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/error_separator"
-          app:text="@string/startup_start_button" />
+          app:text="@string/legacy_startup_start_button" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/error_settings_button"
@@ -107,7 +107,7 @@
           app:layout_constraintHorizontal_bias="1"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/error_restart_button"
-          app:text="@string/startup_settings_button" />
+          app:text="@string/legacy_startup_settings_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -120,7 +120,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/icon"
-        app:text="@string/startup_binding_service" />
+        app:text="@string/legacy_startup_binding_service" />
 
       <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
         android:id="@+id/starting"
@@ -131,7 +131,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/icon"
-        app:text="@string/startup_wait" />
+        app:text="@string/legacy_startup_wait" />
 
       <ImageView
         android:id="@+id/starting_tor_animation"
@@ -152,7 +152,7 @@
         android:padding="@dimen/space_sm"
         android:layout_marginStart="@dimen/space_xs"
         android:visibility="@{appModel.state instanceof KitState.Bootstrap.Tor}"
-        android:text="@string/startup_wait_tor"
+        android:text="@string/legacy_startup_wait_tor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/starting_tor_animation"
         app:layout_constraintTop_toBottomOf="@id/icon" />
@@ -175,7 +175,7 @@
           android:id="@+id/authentication_message"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="@string/startup_unlock_required"
+          android:text="@string/legacy_startup_unlock_required"
           android:textAlignment="center"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
@@ -196,7 +196,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/icon"
         app:layout_goneMarginTop="0dp"
-        app:text="@string/startup_unlock_button" />
+        app:text="@string/legacy_startup_unlock_button" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>

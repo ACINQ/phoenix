@@ -69,9 +69,9 @@ class TorSettingFragment : BaseFragment(stayIfNotStarted = true), SharedPreferen
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
     mBinding.torSwitch.setOnClickListener {
       val isChecked = mBinding.torSwitch.isChecked()
-      AlertHelper.build(layoutInflater, getString(R.string.tor_settings_title),
-        getString(if (isChecked) R.string.tor_settings_confirm_disable_title else R.string.tor_settings_confirm_enable_title))
-        .setPositiveButton(R.string.utils_proceed) { _, _ ->
+      AlertHelper.build(layoutInflater, getString(R.string.legacy_tor_settings_title),
+        getString(if (isChecked) R.string.legacy_tor_settings_confirm_disable_title else R.string.legacy_tor_settings_confirm_enable_title))
+        .setPositiveButton(R.string.legacy_utils_proceed) { _, _ ->
           context?.let {
             Prefs.saveTorEnabled(it, !isChecked)
             if (app.state.value is KitState.Started) {
@@ -80,7 +80,7 @@ class TorSettingFragment : BaseFragment(stayIfNotStarted = true), SharedPreferen
             }
           }
         }
-        .setNegativeButton(R.string.btn_cancel, null)
+        .setNegativeButton(R.string.legacy_btn_cancel, null)
         .show()
     }
   }
@@ -99,7 +99,7 @@ class TorSettingFragment : BaseFragment(stayIfNotStarted = true), SharedPreferen
   private fun refreshUIState(context: Context) {
     val isTorEnabled = Prefs.isTorEnabled(context)
     mBinding.torSwitch.setChecked(isTorEnabled)
-    mBinding.torSwitch.setText(context.getString(if (isTorEnabled) R.string.tor_settings_enabled else R.string.tor_settings_disabled))
+    mBinding.torSwitch.setText(context.getString(if (isTorEnabled) R.string.legacy_tor_settings_enabled else R.string.legacy_tor_settings_disabled))
     if (app.state.value is KitState.Started) {
       if (isTorEnabled) {
         getInfo()

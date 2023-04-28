@@ -27,7 +27,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.MainActivity
@@ -87,7 +86,7 @@ object Notifications {
         notifyPaymentMissed(
             context = context,
             title = context.getString(R.string.notif__missed__title),
-            message = context.getString(R.string.notif__missed__below_min, amount.toPrettyString(BitcoinUnit.Sat), minPayToOpen.toPrettyString(BitcoinUnit.Sat))
+            message = context.getString(R.string.notif__rejected__below_min, amount.toPrettyString(BitcoinUnit.Sat), minPayToOpen.toPrettyString(BitcoinUnit.Sat))
         )
     }
 
@@ -95,7 +94,7 @@ object Notifications {
         notifyPaymentMissed(
             context = context,
             title = context.getString(R.string.notif__rejected__title),
-            message = context.getString(R.string.notif__missed__rejected_by_user),
+            message = context.getString(R.string.notif__rejected__by_user),
         )
     }
 
@@ -103,7 +102,7 @@ object Notifications {
         notifyPaymentMissed(
             context = context,
             title = context.getString(R.string.notif__rejected__title),
-            message = context.getString(R.string.notif__missed__policy_disabled),
+            message = context.getString(R.string.notif__rejected__policy_disabled),
         )
     }
 
@@ -111,7 +110,7 @@ object Notifications {
         notifyPaymentMissed(
             context = context,
             title = context.getString(R.string.notif__rejected__title),
-            message = context.getString(R.string.notif__missed__policy_too_expensive,
+            message = context.getString(R.string.notif__rejected__policy_too_expensive,
                 actual.toPrettyString(BitcoinUnit.Sat, withUnit = true),
                 maxAllowed.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
         )
@@ -147,7 +146,7 @@ object Notifications {
             }
         } else null
         NotificationCompat.Builder(context, RECEIVED_PAYMENT_NOTIF_CHANNEL).apply {
-            setContentTitle(context.getString(R.string.notif__headless_title__received, amount.toPrettyString(unit, rate, withUnit = true)))
+            setContentTitle(context.getString(R.string.notif__headless__received, amount.toPrettyString(unit, rate, withUnit = true)))
             setSmallIcon(R.drawable.ic_phoenix_outline)
             setContentIntent(TaskStackBuilder.create(context).run {
                 Intent(

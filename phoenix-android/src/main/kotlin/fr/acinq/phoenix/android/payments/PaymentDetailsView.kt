@@ -128,7 +128,7 @@ fun PaymentDetailsView(
         }
         is PaymentDetailsState.Success.TechnicalDetails -> DefaultScreenLayout {
             DefaultScreenHeader(
-                title = stringResource(id = R.string.paymentdetails_technicals_title),
+                title = stringResource(id = R.string.paymentdetails_technical_title),
                 onBackClick = { vm.state = PaymentDetailsState.Success.Splash(state.payment) }
             )
             PaymentDetailsTechnicalView(data = state.payment)
