@@ -23,6 +23,7 @@ import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.channel.ChannelException
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.FinalFailure
@@ -255,58 +256,35 @@ class SqlitePaymentsDb(
         preimage: ByteVector32,
         origin: IncomingPayment.Origin,
         createdAt: Long
-    ) {
+    ): IncomingPayment {
         val paymentHash = Crypto.sha256(preimage).toByteVector32()
         val paymentId = WalletPaymentId.IncomingPaymentId(paymentHash)
         val metadataRow = dequeueMetadata(paymentId)
 
-        withContext(Dispatchers.Default) {
-            database.transaction {
+        return withContext(Dispatchers.Default) {
+            database.transactionWithResult {
                 inQueries.addIncomingPayment(preimage, paymentHash, origin, createdAt)
                 // Add associated metadata within the same atomic database transaction.
                 if (!metadataRow.isEmpty()) {
                     metaQueries.addMetadata(paymentId, metadataRow)
                 }
+                inQueries.getIncomingPayment(paymentHash)!!
             }
         }
     }
 
     override suspend fun receivePayment(
         paymentHash: ByteVector32,
+        expectedAmount: MilliSatoshi,
         receivedWith: List<IncomingPayment.ReceivedWith>,
         receivedAt: Long
     ) {
         withContext(Dispatchers.Default) {
             database.transaction {
-                inQueries.receivePayment(paymentHash, receivedWith, receivedAt)
+                inQueries.receivePayment(paymentHash, expectedAmount, receivedWith, receivedAt)
                 // if one received-with is on-chain, save the tx id to the db
                 receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>().firstOrNull()?.let {
                     linkTxToPaymentQueries.linkTxToPayment(it.txId, WalletPaymentId.IncomingPaymentId(paymentHash))
-                }
-            }
-        }
-    }
-
-    override suspend fun addAndReceivePayment(
-        preimage: ByteVector32,
-        origin: IncomingPayment.Origin,
-        receivedWith: List<IncomingPayment.ReceivedWith>,
-        createdAt: Long,
-        receivedAt: Long
-    ) {
-        val paymentHash = Crypto.sha256(preimage).toByteVector32()
-        val paymentId = WalletPaymentId.IncomingPaymentId(paymentHash)
-        val metadataRow = dequeueMetadata(paymentId)
-
-        withContext(Dispatchers.Default) {
-            database.transaction {
-                inQueries.addAndReceivePayment(preimage, origin, receivedWith, createdAt, receivedAt)
-                // if one received-with is on-chain, save the tx id to the db
-                receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>().firstOrNull()?.let {
-                    linkTxToPaymentQueries.linkTxToPayment(it.txId, paymentId)
-                }
-                if (!metadataRow.isEmpty()) {
-                    metaQueries.addMetadata(paymentId, metadataRow)
                 }
             }
         }

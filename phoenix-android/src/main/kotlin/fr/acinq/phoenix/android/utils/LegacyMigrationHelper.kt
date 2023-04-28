@@ -213,11 +213,15 @@ object LegacyMigrationHelper {
                     payment = it
                 )
                 if (payment?.received != null) {
-                    newPaymentsDb.addAndReceivePayment(
+                    newPaymentsDb.addIncomingPayment(
                         preimage = payment.preimage,
                         origin = payment.origin,
+                        createdAt = it.createdAt()
+                    )
+                    newPaymentsDb.receivePayment(
+                        paymentHash = payment.paymentHash,
+                        expectedAmount = payment.received!!.expectedAmount,
                         receivedWith = payment.received!!.receivedWith,
-                        createdAt = it.createdAt(),
                         receivedAt = payment.received!!.receivedAt
                     )
                     log.debug("migrated incoming payment=$payment")
@@ -287,7 +291,7 @@ object LegacyMigrationHelper {
             IncomingPayment(
                 preimage = payment.paymentPreimage().bytes().toArray().byteVector32(),
                 origin = origin,
-                received = IncomingPayment.Received(listOf(receivedWith), status.receivedAt()),
+                received = IncomingPayment.Received(expectedAmount = 0.msat, listOf(receivedWith), status.receivedAt()),
                 createdAt = payment.createdAt()
             )
         }

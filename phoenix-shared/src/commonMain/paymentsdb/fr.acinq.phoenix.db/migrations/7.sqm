@@ -5,6 +5,8 @@ import fr.acinq.phoenix.db.payments.OutgoingPartClosingInfoTypeVersion;
 -- Changes:
 -- * add a new splice_outgoing_payments table to store outgoing splices
 -- * add a new channel_close_outgoing_payments table to store channel closings
+-- * add a new link_tx_to_payments table that links payments to on-chain transactions
+-- * add a new expected_amount_msat column in the incoming_payments table
 
 CREATE TABLE IF NOT EXISTS splice_outgoing_payments (
     id TEXT NOT NULL PRIMARY KEY,
@@ -37,5 +39,7 @@ CREATE TABLE IF NOT EXISTS link_tx_to_payments (
     confirmed_at INTEGER DEFAULT NULL,
     PRIMARY KEY (tx_id, type, id)
 );
+
+ALTER TABLE incoming_payments ADD COLUMN expected_amount_msat INTEGER DEFAULT NULL;
 
 CREATE INDEX IF NOT EXISTS link_tx_to_payments_txid ON link_tx_to_payments(tx_id);

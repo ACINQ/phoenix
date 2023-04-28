@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS incoming_payments (
     received_amount_msat INTEGER DEFAULT NULL,
     -- timestamp when the payment has been received
     received_at INTEGER DEFAULT NULL,
+    -- used when the payment is set as received, but the parts have not yet been created
+    expected_amount_msat INTEGER DEFAULT NULL,
     -- received-with parts
     received_with_type TEXT AS IncomingReceivedWithTypeVersion DEFAULT NULL,
     received_with_blob BLOB DEFAULT NULL
@@ -38,6 +40,7 @@ VALUES (?, ?, ?, ?, ?);
 updateReceived:
 UPDATE incoming_payments
 SET    received_at=?,
+       expected_amount_msat=?,
        received_with_type=?,
        received_with_blob=?
 WHERE  payment_hash = ?;
@@ -49,12 +52,13 @@ INSERT INTO incoming_payments (
             created_at,
             origin_type, origin_blob,
             received_at,
+            expected_amount_msat,
             received_with_type,
             received_with_blob)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 get:
-SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
+SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, expected_amount_msat, received_with_type, received_with_blob
 FROM   incoming_payments
 WHERE  payment_hash=?;
 
@@ -66,7 +70,7 @@ ORDER BY r.received_at ASC
 LIMIT 1;
 
 listAllWithin:
-SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
+SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, expected_amount_msat, received_with_type, received_with_blob
 FROM   incoming_payments
 WHERE  created_at BETWEEN :from AND :to
 ORDER BY
@@ -74,7 +78,7 @@ ORDER BY
        payment_hash DESC;
 
 listAllNotConfirmed:
-SELECT incoming_payments.payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
+SELECT incoming_payments.payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, expected_amount_msat, received_with_type, received_with_blob
 FROM   incoming_payments
 LEFT OUTER JOIN link_tx_to_payments
     ON link_tx_to_payments.type = 1
