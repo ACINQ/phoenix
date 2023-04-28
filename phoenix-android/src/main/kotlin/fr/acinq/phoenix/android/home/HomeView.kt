@@ -346,6 +346,7 @@ private fun IncomingAmountNotif(
             iconTint = MaterialTheme.typography.caption.color,
             text = stringResource(id = R.string.home__onchain_incoming, balance.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true)),
             textStyle = MaterialTheme.typography.caption,
+            space = 4.dp,
             padding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             backgroundColor = Color.Transparent,
             onClick = { showSwapInInfoDialog = true }

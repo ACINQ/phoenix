@@ -317,7 +317,7 @@
     <!-- //////////////// home //////////////////// -->
 
     <string name="home__balance_loading">Loading…</string>
-    <string name="home__onchain_incoming">%1$s</string>
+    <string name="home__onchain_incoming">+%1$s</string>
     <string name="home__onchain_dialog_button_to_wallet">Show incoming on-chain payments</string>
     <string name="home__onchain_dialog_title">Incoming payments</string>
     <string name="home__onchain_dialog_header">You have some incoming funds waiting for confirmation.</string>

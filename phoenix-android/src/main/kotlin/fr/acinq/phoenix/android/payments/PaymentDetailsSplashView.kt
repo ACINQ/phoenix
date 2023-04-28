@@ -374,7 +374,7 @@ private fun PaymentFeeView(payment: WalletPayment) {
                 val serviceFee = receivedWithNewChannel.map { it.serviceFee }.sum() + receivedWithSpliceIn.map { it.serviceFee }.sum()
                 val fundingFee = receivedWithNewChannel.map { it.miningFee }.sum() + receivedWithSpliceIn.map { it.miningFee }.sum()
                 Spacer(modifier = Modifier.height(8.dp))
-                if (serviceFee == 0.msat) {
+                if (serviceFee > 0.msat) {
                     SplashLabelRow(
                         label = stringResource(id = R.string.paymentdetails_service_fees_label),
                         helpMessage = stringResource(R.string.paymentdetails_service_fees_desc)
