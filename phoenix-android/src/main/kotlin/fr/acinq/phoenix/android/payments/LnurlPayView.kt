@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.TrampolineFees
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
@@ -40,14 +41,14 @@ import fr.acinq.phoenix.android.utils.BitmapHelper
 import fr.acinq.phoenix.android.utils.Converter.toPrettyStringWithFallback
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.controllers.payments.MaxFees
+import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.lnurl.LnurlError
 
 @Composable
 fun LnurlPayView(
     model: Scan.Model.LnurlPayFlow,
-    trampolineMaxFees: MaxFees?,
+    trampolineFees: TrampolineFees?,
     onBackClick: () -> Unit,
     onSendLnurlPayClick: (Scan.Intent.LnurlPayFlow) -> Unit
 ) {
@@ -129,15 +130,15 @@ fun LnurlPayView(
                 FilledButton(
                     text = stringResource(id = R.string.lnurl_pay_pay_button),
                     icon = R.drawable.ic_send,
-                    enabled = amount != null && amountErrorMessage.isBlank(),
+                    enabled = amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
                 ) {
-                    amount?.let {
+                    safeLet(trampolineFees, amount) { fees, amt ->
                         onSendLnurlPayClick(
                             Scan.Intent.LnurlPayFlow.RequestInvoice(
                                 paymentIntent = model.paymentIntent,
-                                amount = it,
-                                maxFees = trampolineMaxFees,
-                                comment = null
+                                amount = amt,
+                                trampolineFees = fees,
+                                comment = null,
                             )
                         )
                     }

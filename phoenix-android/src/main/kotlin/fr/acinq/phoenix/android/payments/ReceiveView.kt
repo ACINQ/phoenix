@@ -207,7 +207,7 @@ private fun LightningInvoiceView(
             ) {
                 if (amount != null) {
                     QRCodeDetail(label = stringResource(id = R.string.receive__qr_amount_label)) {
-                        AmountWithFiatView(
+                        AmountWithFiatColumnView(
                             amount = amount,
                             amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
                             fiatTextStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),

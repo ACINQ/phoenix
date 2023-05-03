@@ -18,6 +18,7 @@
 package fr.acinq.phoenix.android.payments
 
 import android.*
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.*
@@ -52,13 +53,11 @@ import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.phoenix.android.BuildConfig
-import fr.acinq.phoenix.android.CF
+import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.databinding.ScanViewBinding
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
@@ -92,8 +91,8 @@ fun ScanDataView(
 ) {
     val log = logger("ScanDataView")
     var initialInput = remember { input }
-    val trampolineMaxFees by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(null)
-    val maxFees = trampolineMaxFees?.let { MaxFees(it.feeBase, it.feeProportional) }
+    val peer by business.peerManager.peerState.collectAsState()
+    val trampolineFees = peer?.walletParams?.trampolineFees?.firstOrNull()
     val vm: ScanDataViewModel = viewModel(factory = ScanDataViewModel.Factory(controllerFactory, CF::scan))
 
     MVIView(vm) { model, postIntent ->
@@ -103,7 +102,7 @@ fun ScanDataView(
             }
         }
         when (model) {
-            Scan.Model.Ready, is Scan.Model.BadRequest, is Scan.Model.InvoiceFlow.DangerousRequest, is Scan.Model.LnurlServiceFetch -> {
+            Scan.Model.Ready, is Scan.Model.BadRequest, is Scan.Model.LnurlServiceFetch -> {
                 ReadDataView(
                     initialInput = initialInput,
                     model = model,
@@ -112,14 +111,13 @@ fun ScanDataView(
                         initialInput = ""
                         postIntent(Scan.Intent.Reset)
                     },
-                    onConfirmDangerousRequest = { request, invoice -> postIntent(Scan.Intent.InvoiceFlow.ConfirmDangerousRequest(request, invoice)) },
                     onScannedText = { postIntent(Scan.Intent.Parse(request = it)) }
                 )
             }
             is Scan.Model.InvoiceFlow.InvoiceRequest -> {
                 SendLightningPaymentView(
                     paymentRequest = model.paymentRequest,
-                    trampolineMaxFees = maxFees,
+                    trampolineFees = trampolineFees,
                     onBackClick = onBackClick,
                     onPayClick = { postIntent(it) }
                 )
@@ -155,7 +153,7 @@ fun ScanDataView(
             is Scan.Model.LnurlPayFlow -> {
                 LnurlPayView(
                     model = model,
-                    trampolineMaxFees = maxFees,
+                    trampolineFees = trampolineFees,
                     onBackClick = onBackClick,
                     onSendLnurlPayClick = { postIntent(it) }
                 )
@@ -176,7 +174,6 @@ fun ReadDataView(
     model: Scan.Model,
     onFeedbackDismiss: () -> Unit,
     onBackClick: () -> Unit,
-    onConfirmDangerousRequest: (String, PaymentRequest) -> Unit,
     onScannedText: (String) -> Unit,
 ) {
     val log = logger("ReadDataView")
@@ -235,10 +232,6 @@ fun ReadDataView(
 
         if (model is Scan.Model.BadRequest) {
             ScanErrorView(model, onFeedbackDismiss)
-        }
-
-        if (model is Scan.Model.InvoiceFlow.DangerousRequest) {
-            DangerousRequestDialog(request = model.request, paymentRequest = model.paymentRequest, onDismiss = onFeedbackDismiss, onConfirmDangerousRequest = onConfirmDangerousRequest)
         }
 
         if (model is Scan.Model.LnurlServiceFetch) {
@@ -313,33 +306,6 @@ private fun ScanErrorView(
     Dialog(
         onDismiss = onErrorDialogDismiss,
         content = { Text(errorMessage, modifier = Modifier.padding(top = 24.dp, start = 24.dp, end = 24.dp)) }
-    )
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-private fun DangerousRequestDialog(
-    request: String,
-    paymentRequest: PaymentRequest,
-    onDismiss: () -> Unit,
-    onConfirmDangerousRequest: (String, PaymentRequest) -> Unit
-) {
-    Dialog(
-        onDismiss = {},
-        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false, usePlatformDefaultWidth = false),
-        title = stringResource(id = R.string.scan_amountless_legacy_title),
-        buttons = {
-            Button(
-                onClick = onDismiss,
-                text = stringResource(id = R.string.btn_cancel)
-            )
-            Spacer(Modifier.width(8.dp))
-            Button(
-                onClick = { onConfirmDangerousRequest(request, paymentRequest) },
-                text = stringResource(id = R.string.btn_confirm)
-            )
-        },
-        content = { Text(annotatedStringResource(id = R.string.scan_amountless_legacy_message), modifier = Modifier.padding(horizontal = 24.dp)) }
     )
 }
 

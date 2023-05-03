@@ -300,6 +300,6 @@ private fun FeeSummary(
     amount: MilliSatoshi
 ) {
     SplashLabelRow(label = label) {
-        AmountWithFiatView(amount = amount, amountTextStyle = MaterialTheme.typography.body2)
+        AmountWithFiatColumnView(amount = amount, amountTextStyle = MaterialTheme.typography.body2)
     }
 }

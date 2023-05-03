@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.db.*
@@ -116,7 +117,7 @@ private fun PaymentStatus(
                 color = mutedTextColor
             )
             is LightningOutgoingPayment.Status.Completed.Failed -> PaymentStatusIcon(
-                message = { Text(text = annotatedStringResource(id = R.string.paymentdetails_status_sent_failed)) },
+                message = { Text(text = annotatedStringResource(id = R.string.paymentdetails_status_sent_failed), textAlign = TextAlign.Center) },
                 imageResId = R.drawable.ic_payment_details_failure_static,
                 isAnimated = false,
                 color = negativeColor
@@ -208,7 +209,8 @@ private fun PaymentStatus(
                             channelMinDepth?.let { minDepth ->
                                 Text(
                                     text = stringResource(id = R.string.paymentdetails_status_unconfirmed_details, minDepth, 10 * minDepth),
-                                    style = MaterialTheme.typography.caption
+                                    style = MaterialTheme.typography.caption,
+                                    textAlign = TextAlign.Center,
                                 )
                             }
                         },

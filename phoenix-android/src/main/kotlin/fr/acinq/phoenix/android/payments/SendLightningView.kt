@@ -16,17 +16,19 @@
 
 package fr.acinq.phoenix.android.payments
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
@@ -34,14 +36,15 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.controllers.payments.MaxFees
+import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.controllers.payments.Scan
+import fr.acinq.phoenix.utils.extensions.isNoAmountTrampoline
 
 
 @Composable
 fun SendLightningPaymentView(
     paymentRequest: PaymentRequest,
-    trampolineMaxFees: MaxFees?,
+    trampolineFees: TrampolineFees?,
     onBackClick: () -> Unit,
     onPayClick: (Scan.Intent.InvoiceFlow.SendInvoicePayment) -> Unit
 ) {
@@ -88,21 +91,42 @@ fun SendLightningPaymentView(
             SplashLabelRow(label = stringResource(R.string.send_description_label)) {
                 Text(text = it)
             }
-            Spacer(modifier = Modifier.height(24.dp))
         }
         SplashLabelRow(label = stringResource(R.string.send_destination_label), icon = R.drawable.ic_zap) {
             SelectionContainer {
-                Text(text = paymentRequest.nodeId.toHex(), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(text = paymentRequest.nodeId.toHex(), maxLines = 2, overflow = TextOverflow.Ellipsis)
+            }
+        }
+        SplashLabelRow(label = stringResource(id = R.string.send_trampoline_fee_label)) {
+            val amt = amount
+            val fees = trampolineFees
+            if (amt == null) {
+                Text(stringResource(id = R.string.send_trampoline_fee_no_amount), style = MaterialTheme.typography.caption)
+            } else if (fees == null) {
+                Text(stringResource(id = R.string.send_trampoline_fee_loading))
+            } else {
+                AmountWithFiatRowView(amount = fees.calculateFees(amt))
             }
         }
         Spacer(modifier = Modifier.height(36.dp))
-        FilledButton(
-            text = stringResource(id = R.string.send_pay_button),
-            icon = R.drawable.ic_send,
-            enabled = amount != null && amountErrorMessage.isBlank(),
-        ) {
-            amount?.let {
-                onPayClick(Scan.Intent.InvoiceFlow.SendInvoicePayment(paymentRequest = paymentRequest, amount = it, maxFees = trampolineMaxFees))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            FilledButton(
+                text = stringResource(id = R.string.send_pay_button),
+                icon = R.drawable.ic_send,
+                enabled = amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
+            ) {
+                safeLet(amount, trampolineFees) { amt, fees ->
+                    onPayClick(Scan.Intent.InvoiceFlow.SendInvoicePayment(paymentRequest = paymentRequest, amount = amt, trampolineFees = fees))
+                }
+            }
+            if (paymentRequest.isNoAmountTrampoline()) {
+                Row {
+                    IconPopup(
+                        icon = R.drawable.ic_exclamation,
+                        popupMessage = stringResource(id = R.string.send_trampoline_amountless_warning_details),
+                        spaceLeft = 16.dp
+                    )
+                }
             }
         }
     }

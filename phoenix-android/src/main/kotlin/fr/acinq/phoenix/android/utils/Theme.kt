@@ -268,6 +268,7 @@ fun systemNavBarColor(entry: NavBackStackEntry?): Color {
     return when {
         entry?.destination?.route == Screen.Home.route -> MaterialTheme.colors.surface
         entry?.destination?.route?.startsWith(Screen.PaymentDetails.route) ?: false -> MaterialTheme.colors.surface
+        entry?.destination?.route?.startsWith(Screen.ScanData.route) ?: false -> MaterialTheme.colors.surface
         else -> MaterialTheme.colors.background
     }
 }

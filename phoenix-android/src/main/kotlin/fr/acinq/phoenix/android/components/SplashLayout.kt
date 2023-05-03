@@ -134,14 +134,16 @@ fun SplashLabelRow(
             if (icon != null) {
                 Spacer(modifier = Modifier.width(6.dp))
                 Image(
-                    painter = painterResource(id = icon), contentDescription = null,
+                    painter = painterResource(id = icon),
+                    colorFilter = ColorFilter.tint(MaterialTheme.typography.subtitle1.color),
+                    contentDescription = null,
                     modifier = Modifier
                         .size(ButtonDefaults.IconSize)
                         .offset(y = (-2).dp)
                 )
             }
             if (helpMessage != null) {
-                HelpPopup(modifier = Modifier.offset(y = (-2).dp), helpMessage = helpMessage)
+                IconPopup(modifier = Modifier.offset(y = (-2).dp), popupMessage = helpMessage)
             }
         }
         Spacer(Modifier.width(8.dp))

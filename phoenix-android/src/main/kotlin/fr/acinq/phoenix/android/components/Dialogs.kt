@@ -134,16 +134,19 @@ fun FullScreenDialog(
 }
 
 @Composable
-fun RowScope.HelpPopup(
+fun RowScope.IconPopup(
     modifier: Modifier = Modifier,
-    helpMessage: String,
-    helpMessageLink: Pair<String, String>? = null,
+    icon: Int = R.drawable.ic_help,
+    popupMessage: String,
+    popupLink: Pair<String, String>? = null,
+    spaceLeft: Dp? = 8.dp,
+    spaceRight: Dp? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
-    var showHelpPopup by remember { mutableStateOf(false) }
-    if (showHelpPopup) {
+    var showPopup by remember { mutableStateOf(false) }
+    if (showPopup) {
         Popup(
-            onDismissRequest = { showHelpPopup = false },
+            onDismissRequest = { showPopup = false },
             offset = IntOffset(x = 0, y = 68)
         ) {
             Surface(
@@ -154,10 +157,10 @@ fun RowScope.HelpPopup(
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
                     Text(
-                        text = helpMessage,
+                        text = popupMessage,
                         style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
                     )
-                    helpMessageLink?.let { (text, link) ->
+                    popupLink?.let { (text, link) ->
                         Spacer(modifier = Modifier.height(8.dp))
                         WebLink(text = text, url = link, fontSize = 14.sp)
                     }
@@ -165,15 +168,16 @@ fun RowScope.HelpPopup(
             }
         }
     }
-    Spacer(Modifier.width(8.dp))
+    spaceLeft?.let { Spacer(Modifier.width(it)) }
     BorderButton(
-        icon = R.drawable.ic_help,
-        iconTint = if (showHelpPopup) MaterialTheme.colors.onPrimary else mutedTextColor,
-        backgroundColor = if (showHelpPopup) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
-        borderColor = if (showHelpPopup) MaterialTheme.colors.primary else mutedTextColor,
+        icon = icon,
+        iconTint = if (showPopup) MaterialTheme.colors.onPrimary else mutedTextColor,
+        backgroundColor = if (showPopup) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
+        borderColor = if (showPopup) MaterialTheme.colors.primary else mutedTextColor,
         padding = PaddingValues(2.dp),
         modifier = modifier.size(20.dp),
         interactionSource = interactionSource,
-        onClick = { showHelpPopup = true }
+        onClick = { showPopup = true }
     )
+    spaceRight?.let { Spacer(Modifier.width(it)) }
 }

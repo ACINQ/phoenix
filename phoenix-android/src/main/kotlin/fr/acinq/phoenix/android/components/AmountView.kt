@@ -19,17 +19,14 @@ package fr.acinq.phoenix.android.components
 import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -146,9 +143,9 @@ fun AmountWithAltView(
     }
 }
 
-/** Outputs a column with the amount in bitcoin always on top, and the conversion fiat below. */
+/** Outputs a column with the amount in bitcoin on top, and the fiat amount below. */
 @Composable
-fun AmountWithFiatView(
+fun AmountWithFiatColumnView(
     amount: MilliSatoshi,
     modifier: Modifier = Modifier,
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
@@ -159,6 +156,24 @@ fun AmountWithFiatView(
     val prefBtcUnit = LocalBitcoinUnit.current
     Column {
         AmountView(amount = amount, amountTextStyle = amountTextStyle, unitTextStyle = unitTextStyle, separatorSpace = separatorSpace, modifier = modifier, forceUnit = prefBtcUnit, onClick = null)
+        AmountInFiatView(amount = amount, style = fiatTextStyle)
+    }
+}
+
+/** Outputs a row with the amount in bitcoin on the left, and the fiat amount on the right. */
+@Composable
+fun AmountWithFiatRowView(
+    amount: MilliSatoshi,
+    modifier: Modifier = Modifier,
+    amountTextStyle: TextStyle = MaterialTheme.typography.body1,
+    unitTextStyle: TextStyle = MaterialTheme.typography.body1,
+    fiatTextStyle: TextStyle = MaterialTheme.typography.caption,
+    separatorSpace: Dp = 4.dp,
+) {
+    val prefBtcUnit = LocalBitcoinUnit.current
+    Row {
+        AmountView(amount = amount, amountTextStyle = amountTextStyle, unitTextStyle = unitTextStyle, separatorSpace = separatorSpace, modifier = modifier, forceUnit = prefBtcUnit, onClick = null)
+        Spacer(modifier = Modifier.width(4.dp))
         AmountInFiatView(amount = amount, style = fiatTextStyle)
     }
 }

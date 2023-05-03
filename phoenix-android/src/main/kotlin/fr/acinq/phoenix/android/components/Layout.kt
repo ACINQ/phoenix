@@ -140,7 +140,7 @@ fun DefaultScreenHeader(
             Row {
                 Text(text = title)
                 Spacer(modifier = Modifier.width(4.dp))
-                HelpPopup(helpMessage = helpMessage, helpMessageLink = helpMessageLink)
+                IconPopup(popupMessage = helpMessage, popupLink = helpMessageLink)
             }
         },
         onBackClick = onBackClick,
@@ -282,7 +282,7 @@ fun CardHeaderWithHelp(
             text = text.uppercase(),
             style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp, color = MaterialTheme.colors.primary)
         )
-        HelpPopup(helpMessage = helpMessage)
+        IconPopup(popupMessage = helpMessage)
     }
 }
 
