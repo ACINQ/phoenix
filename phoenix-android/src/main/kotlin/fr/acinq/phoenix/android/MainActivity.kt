@@ -125,7 +125,7 @@ class MainActivity : AppCompatActivity() {
         val connections = business.connectionsManager.connections.value
         if (connections.electrum !is Connection.ESTABLISHED) {
             lifecycleScope.launch {
-                log.debug("resuming app with electrum conn=${connections.electrum}, reconnecting...")
+                log.info("resuming app with electrum conn=${connections.electrum}, reconnecting...")
                 daemon.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Electrum)
                 delay(500)
                 daemon.decrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Electrum)

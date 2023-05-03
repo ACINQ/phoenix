@@ -16,6 +16,10 @@
 
 package fr.acinq.phoenix.android.home
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import androidx.activity.compose.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -25,10 +29,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,7 +44,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.msat
@@ -90,9 +90,31 @@ fun HomeView(
     val walletContext = business.appConfigurationManager.chainContext.collectAsState()
     val balanceDisplayMode by UserPrefs.getHomeAmountDisplayMode(context).collectAsState(initial = null)
 
+
+    val connectivityManager = remember { context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
+    var netwCaps by remember { mutableStateOf<NetworkCapabilities?>(null) }
+
+    LaunchedEffect(key1 = Unit) {
+
+        connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                netwCaps = connectivityManager.getNetworkCapabilities(network)
+            }
+            override fun onCapabilitiesChanged(network : Network, networkCapabilities : NetworkCapabilities) {
+                netwCaps = networkCapabilities
+            }
+
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                netwCaps = null
+            }
+        })
+    }
+
     var showConnectionsDialog by remember { mutableStateOf(false) }
     if (showConnectionsDialog) {
-        ConnectionDialog(connections = connectionsState, onClose = { showConnectionsDialog = false }, onTorClick = onTorClick, onElectrumClick = onElectrumClick)
+        ConnectionDialog(connections = connectionsState, onClose = { showConnectionsDialog = false }, onTorClick = onTorClick, onElectrumClick = onElectrumClick, netwCaps)
     }
 
     val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
@@ -228,6 +250,17 @@ fun TopBar(
                     padding = PaddingValues(8.dp)
                 )
             }
+        } else {
+            FilledButton(
+                text = "connected!",
+                icon = R.drawable.ic_check,
+                iconTint = positiveColor,
+                onClick = onConnectionsStateButtonClick,
+                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = LocalContentColor.current),
+                backgroundColor = mutedBgColor,
+                space = 8.dp,
+                padding = PaddingValues(8.dp)
+            )
         }
         Spacer(modifier = Modifier.weight(1f))
         FilledButton(
@@ -249,7 +282,11 @@ private fun ConnectionDialog(
     onClose: () -> Unit,
     onTorClick: () -> Unit,
     onElectrumClick: () -> Unit,
+    networkCapabilities: NetworkCapabilities?
 ) {
+    val context = LocalContext.current
+    val connectivityManager = remember { context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
+
     Dialog(title = stringResource(id = R.string.conndialog_title), onDismiss = onClose) {
         Column {
             if (connections?.internet != Connection.ESTABLISHED) {
@@ -266,7 +303,6 @@ private fun ConnectionDialog(
                 ConnectionDialogLine(label = stringResource(id = R.string.conndialog_internet), connection = connections.internet)
                 HSeparator()
 
-                val context = LocalContext.current
                 val isTorEnabled = UserPrefs.getIsTorEnabled(context).collectAsState(initial = null).value
                 if (isTorEnabled != null && isTorEnabled) {
                     ConnectionDialogLine(label = stringResource(id = R.string.conndialog_tor), connection = connections.tor, onClick = onTorClick)
@@ -279,6 +315,33 @@ private fun ConnectionDialog(
                 HSeparator()
                 Spacer(Modifier.height(16.dp))
             }
+
+            networkCapabilities?.let { caps ->
+                CompositionLocalProvider(LocalTextStyle provides monoTypo.copy(fontSize = 10.sp)) {
+                    Text(text = "tranport: ${caps.transportInfo}")
+                    Text(text = "metered background restrictions: ${
+                        when (val s = connectivityManager.restrictBackgroundStatus) {
+                            ConnectivityManager.RESTRICT_BACKGROUND_STATUS_DISABLED -> "not restricted"
+                            ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED -> "restricted"
+                            ConnectivityManager.RESTRICT_BACKGROUND_STATUS_WHITELISTED -> "not restricted (whitelisted)"
+                            else -> s
+                        }
+                    }")
+                    Text(text = "enterprise use: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_ENTERPRISE)}")
+                    Text(text = "internet capable: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)}")
+                    Text(text = "internet connectivity: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)}")
+                    Text(text = "not congested: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_CONGESTED)}")
+                    Text(text = "not metered: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)}")
+                    Text(text = "not restricted: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)}")
+                    Text(text = "not roaming: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_ROAMING)}")
+                    Text(text = "not suspended: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)}")
+                    Text(text = "cellular: ${caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)}")
+                    Text(text = "ethernet: ${caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)}")
+                    Text(text = "vpn: ${caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)}")
+                    Text(text = "wifi: ${caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)}")
+
+                }
+            } ?: Text(text = "no network")
         }
     }
 }

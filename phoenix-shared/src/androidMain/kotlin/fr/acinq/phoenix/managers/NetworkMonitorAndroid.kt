@@ -1,67 +1,79 @@
 package fr.acinq.phoenix.managers
 
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkRequest
+import android.net.*
 import fr.acinq.phoenix.utils.PlatformContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
 
-actual class NetworkMonitor actual constructor(loggerFactory: LoggerFactory, val ctx: PlatformContext) : CoroutineScope by MainScope() {
+actual class NetworkMonitor actual constructor(loggerFactory: LoggerFactory, val ctx: PlatformContext) : CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.Default) {
 
     val logger = newLogger(loggerFactory)
 
     private val _networkState = MutableStateFlow(NetworkState.NotAvailable)
     actual val networkState: StateFlow<NetworkState> = _networkState
 
-    private var enabled = true
-    private var started = false
+    init {
+        launch {
+            val connectivityManager = ctx.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            connectivityManager.registerDefaultNetworkCallback(
+                object : ConnectivityManager.NetworkCallback() {
+
+                    override fun onAvailable(network: Network) {
+                        super.onAvailable(network)
+                        logger.info { "network is now $network" }
+                        connectivityManager.isDefaultNetworkActive
+                        _networkState.value = NetworkState.Available
+                    }
+
+                    override fun onBlockedStatusChanged(network: Network, blocked: Boolean) {
+                        super.onBlockedStatusChanged(network, blocked)
+                        logger.info { "block status change to $blocked for network=$network"}
+                    }
+
+                    override fun onCapabilitiesChanged(network : Network, networkCapabilities : NetworkCapabilities) {
+                        logger.info { "default network changed capabilities to $networkCapabilities" }
+                    }
+
+                    override fun onLinkPropertiesChanged(network : Network, linkProperties : LinkProperties) {
+                        logger.info { "default network changed link properties to $linkProperties" }
+                    }
+
+                    override fun onLosing(network: Network, maxMsToLive: Int) {
+                        super.onLosing(network, maxMsToLive)
+                        logger.info { "losing network in ${maxMsToLive}ms..." }
+                    }
+
+                    override fun onLost(network: Network) {
+                        super.onLost(network)
+                        logger.info { "network lost, last default was $network" }
+                        _networkState.value = NetworkState.NotAvailable
+                    }
+
+                    override fun onUnavailable() {
+                        super.onUnavailable()
+                        logger.info { "network unavailable" }
+                        _networkState.value = NetworkState.NotAvailable
+                    }
+                }
+            )
+        }
+    }
+
 
     actual fun enable() {
-        enabled = true
-        start()
     }
 
     actual fun disable() {
-        enabled = false
-        stop()
     }
 
     actual fun start() {
-        if (!enabled || started) {
-            return
-        }
-        val connectivityManager = ctx.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
-        connectivityManager?.registerNetworkCallback(NetworkRequest.Builder().build(), object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                super.onAvailable(network)
-                logger.info { "network available" }
-                launch { _networkState.value = NetworkState.Available }
-            }
-
-            override fun onLost(network: Network) {
-                super.onLost(network)
-                logger.info { "network lost" }
-                launch { _networkState.value = NetworkState.NotAvailable }
-            }
-
-            override fun onUnavailable() {
-                super.onUnavailable()
-                logger.info { "network unavailable" }
-                launch { _networkState.value = NetworkState.NotAvailable }
-            }
-        })
-        started = true
     }
 
     actual fun stop() {
-        logger.error { "Not yet implemented!" }
     }
 }
