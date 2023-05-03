@@ -50,12 +50,12 @@ class AppConfigurationManager(
 
     // Called from AppConnectionsDaemon
     internal fun enableNetworkAccess() {
-        startWalletContextLoop()
+        startWalletContextJob()
     }
 
     // Called from AppConnectionsDaemon
     internal fun disableNetworkAccess() {
-        stopWalletContextLoop()
+        stopWalletContextJob()
     }
 
     private val currentWalletContextVersion = WalletContext.Version.V0
@@ -71,56 +71,58 @@ class AppConfigurationManager(
         val freshness = (currentTimestampMillis() - timestamp).milliseconds
         logger.info { "local context was updated $freshness ago" }
 
-        val timeout = if (freshness < 48.hours) {
-            2.seconds
-        } else {
-            2.seconds * max(freshness.inWholeDays.toInt(), 5)
-        } // max=10s
+//        val timeout = if (freshness < 48.hours) {
+//            2.seconds
+//        } else {
+//            2.seconds * max(freshness.inWholeDays.toInt(), 5)
+//        } // max=10s
 
         // TODO are we using TOR? -> increase timeout
 
-        val walletContext = try {
-            withTimeout(timeout) {
-                fetchAndStoreWalletContext() ?: localContext
-            }
-        } catch (t: TimeoutCancellationException) {
-            logger.warning { "unable to refresh context from remote, using local fallback" }
-            localContext
-        }
+//        val walletContext = try {
+//            withTimeout(timeout) {
+//                fetchAndStoreWalletContext() ?: localContext
+//            }
+//        } catch (t: TimeoutCancellationException) {
+//            logger.warning { "unable to refresh context from remote, using local fallback" }
+//            localContext
+//        }
 
-        _chainContext.value = walletContext?.export(chain)
+        _chainContext.value = localContext?.export(chain)
         logger.info { "chainContext=$chainContext" }
 
         _walletContextInitialized.value = true
     }
 
-    private var updateWalletContextJob: Job? = null
-    private fun startWalletContextLoop() {
+    /** Track the job that polls the wallet-context endpoint, so that we can cancel/restart it when needed. */
+    private var walletContextPollingJob: Job? = null
+
+    /** Starts a coroutine that continuously polls the wallet-context endpoint. The coroutine is tracked in [walletContextPollingJob]. */
+    private fun startWalletContextJob() {
         launch {
             // suspend until `initWalletContext()` is complete
-            _walletContextInitialized.filter { it == true }.first()
-            updateWalletContextJob = updateWalletContextLoop()
-        }
-    }
-
-    private fun stopWalletContextLoop() {
-        launch {
-            // suspend until `initWalletContext()` is complete
-            _walletContextInitialized.filter { it == true }.first()
-            updateWalletContextJob?.cancelAndJoin()
-        }
-    }
-
-    private fun updateWalletContextLoop() = launch {
-        var pause = 0.5.seconds
-        while (isActive) {
-            pause = (pause * 2).coerceAtMost(5.minutes)
-            fetchAndStoreWalletContext()?.let {
-                val chainContext = it.export(chain)
-                _chainContext.value = chainContext
-                pause = 60.minutes
+            _walletContextInitialized.filter { it }.first()
+            walletContextPollingJob = launch {
+                var pause = 0.5.seconds
+                while (isActive) {
+                    pause = (pause * 2).coerceAtMost(5.minutes)
+                    fetchAndStoreWalletContext()?.let {
+                        val chainContext = it.export(chain)
+                        _chainContext.value = chainContext
+                        pause = 60.minutes
+                    }
+                    delay(pause)
+                }
             }
-            delay(pause)
+        }
+    }
+
+    /** Cancel the [walletContextPollingJob] job. */
+    private fun stopWalletContextJob() {
+        launch {
+            // suspend until `initWalletContext()` is complete
+            _walletContextInitialized.filter { it }.first()
+            walletContextPollingJob?.cancelAndJoin()
         }
     }
 

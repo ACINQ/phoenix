@@ -2,6 +2,7 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
+import fr.acinq.lightning.WalletParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.fee.OnChainFeerates
 import fr.acinq.lightning.channel.*
@@ -45,6 +46,7 @@ class PeerManager(
     private val _channelsFlow = MutableStateFlow<Map<ByteVector32, LocalChannelInfo>?>(null)
     val channelsFlow: StateFlow<Map<ByteVector32, LocalChannelInfo>?> = _channelsFlow
 
+    /** Feerate used by the peer. Data fed by Electrum under the hood. */
     private val _onChainFeeratesFlow = MutableStateFlow<OnChainFeerates?>(null)
     val onChainFeeratesFlow: StateFlow<OnChainFeerates?> = _onChainFeeratesFlow
 

@@ -63,7 +63,7 @@ class ApiWalletParamsTest {
                 "13.248.222.197",
                 9735
             ),
-            apiWalletParams.export(Chain.Testnet).walletParams().trampolineNode)
+            apiWalletParams.export(NodeParams.Chain.Testnet).walletParams().trampolineNode)
     }
 
 }

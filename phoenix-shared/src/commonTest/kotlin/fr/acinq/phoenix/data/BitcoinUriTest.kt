@@ -18,6 +18,7 @@ package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.utils.Either
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.utils.Parser
@@ -33,7 +34,7 @@ class BitcoinAddressTest {
         val testCases = listOf(
             BitcoinUri(
                 address = "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7",
-                chain = Chain.Testnet,
+                chain = NodeParams.Chain.Testnet,
                 type = BitcoinAddressType.SegWitScriptHash,
                 hash = ByteVector.fromHex("1863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262"),
                 label = "lorem ipsum",
@@ -47,7 +48,7 @@ class BitcoinAddressTest {
             ),
             BitcoinUri(
                 address = "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7",
-                chain = Chain.Testnet,
+                chain = NodeParams.Chain.Testnet,
                 type = BitcoinAddressType.SegWitScriptHash,
                 hash = ByteVector.fromHex("1863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262"),
                 label = "",
@@ -58,7 +59,7 @@ class BitcoinAddressTest {
             ),
             BitcoinUri(
                 address = "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7",
-                chain = Chain.Testnet,
+                chain = NodeParams.Chain.Testnet,
                 type = BitcoinAddressType.SegWitScriptHash,
                 hash = ByteVector.fromHex("1863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262"),
                 label = "max amount",
@@ -69,7 +70,7 @@ class BitcoinAddressTest {
             ),
             BitcoinUri(
                 address = "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7",
-                chain = Chain.Testnet,
+                chain = NodeParams.Chain.Testnet,
                 type = BitcoinAddressType.SegWitScriptHash,
                 hash = ByteVector.fromHex("1863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262"),
                 label = null,
@@ -82,7 +83,7 @@ class BitcoinAddressTest {
 
         testCases.forEach {
             val serialized = it.write()
-            val decoded = Parser.readBitcoinAddress(Chain.Testnet, serialized)
+            val decoded = Parser.readBitcoinAddress(NodeParams.Chain.Testnet, serialized)
             assertTrue { decoded is Either.Right }
             assertEquals(it, decoded.right!!)
         }

@@ -1,10 +1,7 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.PublicKey
-import fr.acinq.lightning.CltvExpiryDelta
-import fr.acinq.lightning.InvoiceDefaultRoutingFees
-import fr.acinq.lightning.NodeParams
-import fr.acinq.lightning.WalletParams
+import fr.acinq.lightning.*
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import kotlin.Double
@@ -92,28 +89,26 @@ object WalletContext {
             @SerialName("swap_in") val swapIn: SwapIn,
             val mempool: Mempool
         ) {
-            fun walletParams(): WalletParams = trampoline.v2.run {
-                WalletParams(
-                    trampolineNode = nodes.first().export(),
-                    trampolineFees = attempts.map { it.export() },
-                    invoiceDefaultRoutingFees = InvoiceDefaultRoutingFees(
-                        feeBase = 1000.msat,
-                        feeProportional = 100,
-                        cltvExpiryDelta = CltvExpiryDelta(144)
-                    )
+            fun walletParams(): WalletParams = WalletParams(
+                trampolineNode = trampoline.v2.nodes.first().export(),
+                trampolineFees = trampoline.v3.map { it.export() },
+                invoiceDefaultRoutingFees = InvoiceDefaultRoutingFees(
+                    feeBase = 1000.msat,
+                    feeProportional = 100,
+                    cltvExpiryDelta = CltvExpiryDelta(144)
                 )
-            }
+            )
         }
 
         @Serializable
-        data class TrampolineParams(val v2: V2) {
+        data class TrampolineParams(val v2: V2, val v3: List<TrampolineFees>) {
             @Serializable
             data class TrampolineFees(
                 @SerialName("fee_base_sat") val feeBaseSat: Long,
                 @SerialName("fee_per_millionths") val feePerMillionths: Long,
                 @SerialName("cltv_expiry") val cltvExpiry: Int,
             ) {
-                fun export(): fr.acinq.lightning.TrampolineFees = fr.acinq.lightning.TrampolineFees(feeBaseSat.sat, feePerMillionths, CltvExpiryDelta(cltvExpiry))
+                fun export(): fr.acinq.lightning.TrampolineFees = TrampolineFees(feeBaseSat.sat, feePerMillionths, CltvExpiryDelta(cltvExpiry))
             }
 
             @Serializable
@@ -125,7 +120,7 @@ object WalletContext {
                     val host = parts[1]
                     val port = parts[2].toInt()
 
-                    return fr.acinq.lightning.NodeUri(publicKey, host, port)
+                    return NodeUri(publicKey, host, port)
                 }
             }
 

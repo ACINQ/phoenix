@@ -19,6 +19,7 @@ package fr.acinq.phoenix.controllers.payments
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.controllers.MVI
 import fr.acinq.phoenix.data.BitcoinUri
@@ -40,11 +41,6 @@ object Scan {
         data class ServiceError(val url: Url, val error: LnurlError.RemoteFailure) : BadRequestReason()
         data class InvalidLnurl(val url: Url) : BadRequestReason()
         data class UnsupportedLnurl(val url: Url) : BadRequestReason()
-    }
-
-    sealed class DangerousRequestReason {
-        object IsAmountlessInvoice : DangerousRequestReason()
-        object IsOwnInvoice : DangerousRequestReason()
     }
 
     sealed class LnurlPayError {
@@ -73,14 +69,9 @@ object Scan {
         ) : Model()
 
         sealed class InvoiceFlow : Model() {
-            data class DangerousRequest(
-                val request: String,
-                val paymentRequest: PaymentRequest,
-                val reason: DangerousRequestReason
-            ): InvoiceFlow()
             data class InvoiceRequest(
                 val request: String,
-                val paymentRequest: PaymentRequest
+                val paymentRequest: PaymentRequest,
             ): InvoiceFlow()
             object Sending: InvoiceFlow()
         }
@@ -149,15 +140,10 @@ object Scan {
         ) : Intent()
 
         sealed class InvoiceFlow : Intent() {
-            data class ConfirmDangerousRequest(
-                val request: String,
-                val paymentRequest: PaymentRequest
-            ) : InvoiceFlow()
-
             data class SendInvoicePayment(
                 val paymentRequest: PaymentRequest,
                 val amount: MilliSatoshi,
-                val maxFees: MaxFees?
+                val trampolineFees: TrampolineFees
             ) : InvoiceFlow()
         }
 
@@ -167,7 +153,7 @@ object Scan {
             data class RequestInvoice(
                 val paymentIntent: LnurlPay.Intent,
                 val amount: MilliSatoshi,
-                val maxFees: MaxFees?,
+                val trampolineFees: TrampolineFees,
                 val comment: String?
             ) : LnurlPayFlow()
 

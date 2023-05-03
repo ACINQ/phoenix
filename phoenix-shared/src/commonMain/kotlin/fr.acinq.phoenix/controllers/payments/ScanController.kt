@@ -31,7 +31,6 @@ import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.chain
-import fr.acinq.phoenix.utils.createTrampolineFees
 import io.ktor.http.Url
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
@@ -81,12 +80,11 @@ class AppScanController(
         when (intent) {
             is Scan.Intent.Reset -> launch { model(Scan.Model.Ready) }
             is Scan.Intent.Parse -> launch { processScannedInput(intent) }
-            is Scan.Intent.InvoiceFlow.ConfirmDangerousRequest -> launch { confirmAmountlessInvoice(intent) }
             is Scan.Intent.InvoiceFlow.SendInvoicePayment -> launch {
                 sendPayment(
                     amountToSend = intent.amount,
+                    trampolineFees = intent.trampolineFees,
                     paymentRequest = intent.paymentRequest,
-                    customMaxFees = intent.maxFees,
                     metadata = null,
                 )
                 model(Scan.Model.InvoiceFlow.Sending)
@@ -122,11 +120,9 @@ class AppScanController(
     private suspend fun processLightningInvoice(paymentRequest: PaymentRequest) {
         val model = checkForBadRequest(paymentRequest)?.let {
             Scan.Model.BadRequest(request = paymentRequest.write(), reason = it)
-        } ?: checkForDangerousRequest(paymentRequest)?.let {
-            Scan.Model.InvoiceFlow.DangerousRequest(paymentRequest.write(), paymentRequest, it)
         } ?: Scan.Model.InvoiceFlow.InvoiceRequest(
             request = paymentRequest.write(),
-            paymentRequest = paymentRequest
+            paymentRequest = paymentRequest,
         )
         model(model)
     }
@@ -205,22 +201,11 @@ class AppScanController(
         }
     }
 
-    private suspend fun confirmAmountlessInvoice(
-        intent: Scan.Intent.InvoiceFlow.ConfirmDangerousRequest
-    ) {
-        model(
-            Scan.Model.InvoiceFlow.InvoiceRequest(
-                request = intent.request,
-                paymentRequest = intent.paymentRequest,
-            )
-        )
-    }
-
     /** Extract invoice and send it to the Peer to make the payment, attaching custom trampoline fees if needed. */
     private suspend fun sendPayment(
         amountToSend: MilliSatoshi,
+        trampolineFees: TrampolineFees,
         paymentRequest: PaymentRequest,
-        customMaxFees: MaxFees?,
         metadata: WalletPaymentMetadata?,
     ) {
         val paymentId = UUID.randomUUID()
@@ -234,28 +219,13 @@ class AppScanController(
             )
         }
 
-        // compute new trampoline fees if a custom max has been set
-        val trampolineFees = customMaxFees?.let {
-            createTrampolineFees(
-                defaultFees = peer.walletParams.trampolineFees,
-                maxFees = it
-            )
-        }
-
-        // FIXME: use proper trampoline fees
-        val trampolineFeesOverride = listOf(
-            TrampolineFees(0.sat, 4_000 /* 4_000 = 0.4% */, CltvExpiryDelta(576)),
-            TrampolineFees(1.sat, 4_000 /* 4_000 = 0.4% */, CltvExpiryDelta(576)),
-            TrampolineFees(5.sat, 4_000 /* 4_000 = 0.4% */, CltvExpiryDelta(576)),
-        )
-
         peer.send(
             SendPayment(
                 paymentId = paymentId,
                 amount = amountToSend,
                 recipient = paymentRequest.nodeId,
                 paymentRequest = paymentRequest,
-                trampolineFeesOverride = trampolineFeesOverride
+                trampolineFeesOverride = listOf(trampolineFees)
             )
         )
     }
@@ -319,8 +289,8 @@ class AppScanController(
             is Either.Right -> {
                 sendPayment(
                     amountToSend = intent.amount,
+                    trampolineFees = intent.trampolineFees,
                     paymentRequest = result.value.paymentRequest,
-                    customMaxFees = intent.maxFees,
                     metadata = WalletPaymentMetadata(
                         lnurl = LnurlPayMetadata(
                             pay = intent.paymentIntent,
@@ -514,13 +484,6 @@ class AppScanController(
         } else {
             null
         }
-    }
-
-    /** Checks for payment request that should not be made: amountless invoice without trampoline ; pay-to-self... */
-    private suspend fun checkForDangerousRequest(pr: PaymentRequest): Scan.DangerousRequestReason? = when {
-        pr.amount == null && !Features(pr.features).hasFeature(Feature.TrampolinePayment) -> Scan.DangerousRequestReason.IsAmountlessInvoice
-        pr.nodeId == peerManager.getPeer().nodeParams.nodeId -> Scan.DangerousRequestReason.IsOwnInvoice
-        else -> null
     }
 
     /** Reads a lnurl and return either a lnurl-auth (i.e. a http query that must not be called automatically), or the actual url embedded in the lnurl (that can be called afterwards). */
