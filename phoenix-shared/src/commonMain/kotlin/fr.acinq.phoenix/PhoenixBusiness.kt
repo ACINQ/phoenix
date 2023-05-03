@@ -118,7 +118,7 @@ class PhoenixBusiness(
      * BEFORE invoking this function, to ensure a clean disconnect from the server.
      */
     fun stop() {
-        electrumClient.stop()
+//        electrumClient.stop()
         electrumClient.cancel()
         electrumWatcher.stop()
         electrumWatcher.cancel()
