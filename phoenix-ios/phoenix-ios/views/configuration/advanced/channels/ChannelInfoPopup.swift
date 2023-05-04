@@ -191,7 +191,6 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 	@State var showBlockchainExplorerOptions = false
 	
 	private let verticalSpacingBetweenRows: CGFloat = 12
-	private let horizontalSpacingBetweenColumns: CGFloat = 8
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
@@ -218,17 +217,17 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 	}
 	
 	@ViewBuilder
-	func keyColumn_standard(_ title: String) -> some View {
+	func keyColumn_standard(_ title: LocalizedStringKey) -> some View {
 		
-		Text(title.lowercased())
-			.font(.subheadline)
-			.fontWeight(.thin)
+		Text(title)
+			.textCase(.lowercase)
+			.font(.subheadline.weight(.thin))
 			.multilineTextAlignment(.trailing)
 			.foregroundColor(.secondary)
 	}
 	
 	@ViewBuilder
-	func keyColumn_indented(identifier: String, title: String) -> some View {
+	func keyColumn_indented(_ title: LocalizedStringKey) -> some View {
 		
 		HStack(alignment: VerticalAlignment.top, spacing: 0) {
 			Divider()
@@ -254,16 +253,11 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 	func channelIdRow() -> some View {
 		let identifier: String = #function
 		
-		InfoGridRow(
+		InfoGridRowWrapper(
 			identifier: identifier,
-			vAlignment: .firstTextBaseline,
-			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier),
-			keyColumnAlignment: .leading
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
-			keyColumn_standard(
-				NSLocalizedString("channel id", comment: "Label in ChannelInfoPopup_Summary")
-			)
+			keyColumn_standard("channel id")
 		} valueColumn: {
 			
 			let text = channel.channelId
@@ -285,16 +279,11 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 	func stateRow() -> some View {
 		let identifier: String = #function
 		
-		InfoGridRow(
+		InfoGridRowWrapper(
 			identifier: identifier,
-			vAlignment: .firstTextBaseline,
-			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier),
-			keyColumnAlignment: .leading
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
-			keyColumn_standard(
-				NSLocalizedString("state", comment: "Label in ChannelInfoPopup_Summary")
-			)
+			keyColumn_standard("state")
 		} valueColumn: {
 			
 			Text(channel.stateName)
@@ -307,16 +296,11 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 		
 		if let localBalance = channel.localBalance {
 			
-			InfoGridRow(
+			InfoGridRowWrapper(
 				identifier: identifier,
-				vAlignment: .firstTextBaseline,
-				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier),
-				keyColumnAlignment: .leading
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
 			) {
-				keyColumn_standard(
-					NSLocalizedString("can send", comment: "Label in ChannelInfoPopup_Summary")
-				)
+				keyColumn_standard("can send")
 			} valueColumn: {
 				
 				let sats = Utils.formatBitcoin(
@@ -338,16 +322,11 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 				
-				InfoGridRow(
+				InfoGridRowWrapper(
 					identifier: identifier,
-					vAlignment: .firstTextBaseline,
-					hSpacing: horizontalSpacingBetweenColumns,
-					keyColumnWidth: keyColumnWidth(identifier: identifier),
-					keyColumnAlignment: .leading
+					keyColumnWidth: keyColumnWidth(identifier: identifier)
 				) {
-					keyColumn_standard(
-						NSLocalizedString("active commitments", comment: "Label in ChannelInfoPopup_Summary")
-					)
+					keyColumn_standard("active commitments")
 				} valueColumn: {
 					Text(verbatim: "")
 				}
@@ -371,16 +350,11 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 				
-				InfoGridRow(
+				InfoGridRowWrapper(
 					identifier: identifier,
-					vAlignment: .firstTextBaseline,
-					hSpacing: horizontalSpacingBetweenColumns,
-					keyColumnWidth: keyColumnWidth(identifier: identifier),
-					keyColumnAlignment: .leading
+					keyColumnWidth: keyColumnWidth(identifier: identifier)
 				) {
-					keyColumn_standard(
-						NSLocalizedString("inactive commitments", comment: "Label in ChannelInfoPopup_Summary")
-					)
+					keyColumn_standard("inactive commitments")
 				} valueColumn: {
 					Text(verbatim: "")
 				}
@@ -400,17 +374,11 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 	func commitment_txIndex(_ commitment: LocalChannelInfo.CommitmentInfo) -> some View {
 		let identifier: String = "\(#function)|\(commitment.fundingTxId)"
 		
-		InfoGridRow(
+		InfoGridRowWrapper(
 			identifier: identifier,
-			vAlignment: .firstTextBaseline,
-			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier),
-			keyColumnAlignment: .leading
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
-			keyColumn_indented(
-				identifier: identifier,
-				title: NSLocalizedString("tx index", comment: "Label in ChannelInfoPopup_Summary")
-			)
+			keyColumn_indented("tx index")
 		} valueColumn: {
 			
 			Text(commitment.fundingTxIndex.description)
@@ -424,17 +392,11 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 	func commitment_fundingTx(_ commitment: LocalChannelInfo.CommitmentInfo) -> some View {
 		let identifier: String = "\(#function)|\(commitment.fundingTxId)"
 
-		InfoGridRow(
+		InfoGridRowWrapper(
 			identifier: identifier,
-			vAlignment: .firstTextBaseline,
-			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier),
-			keyColumnAlignment: .leading
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
-			keyColumn_indented(
-				identifier: identifier,
-				title: NSLocalizedString("funding tx", comment: "Label in ChannelInfoPopup_Summary")
-			)
+			keyColumn_indented("funding tx")
 		} valueColumn: {
 
 			let txId = commitment.fundingTxId
@@ -474,17 +436,11 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 	func commitment_balance(_ commitment: LocalChannelInfo.CommitmentInfo) -> some View {
 		let identifier: String = "\(#function)|\(commitment.fundingTxId)"
 
-		InfoGridRow(
+		InfoGridRowWrapper(
 			identifier: identifier,
-			vAlignment: .firstTextBaseline,
-			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier),
-			keyColumnAlignment: .leading
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
-			keyColumn_indented(
-				identifier: identifier,
-				title: NSLocalizedString("balance", comment: "Label in ChannelInfoPopup_Summary")
-			)
+			keyColumn_indented("balance")
 		} valueColumn: {
 
 			let amt = Utils.formatBitcoin(
@@ -503,17 +459,11 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 	func commitment_capacity(_ commitment: LocalChannelInfo.CommitmentInfo) -> some View {
 		let identifier: String = "\(#function)|\(commitment.fundingTxId)"
 
-		InfoGridRow(
+		InfoGridRowWrapper(
 			identifier: identifier,
-			vAlignment: .firstTextBaseline,
-			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier),
-			keyColumnAlignment: .leading
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
-			keyColumn_indented(
-				identifier: identifier,
-				title: NSLocalizedString("capacity", comment: "Label in ChannelInfoPopup_Summary")
-			)
+			keyColumn_indented("capacity")
 		} valueColumn: {
 
 			let amt = Utils.formatBitcoin(
@@ -543,5 +493,45 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 		log.trace("copyTxId()")
 		
 		UIPasteboard.general.string = txId
+	}
+	
+	// --------------------------------------------------
+	// MARK: Helpers
+	// --------------------------------------------------
+	
+	struct InfoGridRowWrapper<KeyColumn: View, ValueColumn: View>: View {
+		
+		let identifier: String
+		let keyColumnWidth: CGFloat
+		let keyColumn: KeyColumn
+		let valueColumn: ValueColumn
+		
+		init(
+			identifier: String,
+			keyColumnWidth: CGFloat,
+			@ViewBuilder keyColumn keyColumnBuilder: () -> KeyColumn,
+			@ViewBuilder valueColumn valueColumnBuilder: () -> ValueColumn
+		) {
+			self.identifier = identifier
+			self.keyColumnWidth = keyColumnWidth
+			self.keyColumn = keyColumnBuilder()
+			self.valueColumn = valueColumnBuilder()
+		}
+		
+		@ViewBuilder
+		var body: some View {
+			
+			InfoGridRow(
+				identifier: identifier,
+				vAlignment: .firstTextBaseline,
+				hSpacing: 8,
+				keyColumnWidth: keyColumnWidth,
+				keyColumnAlignment: .leading
+			) {
+				keyColumn
+			} valueColumn: {
+				valueColumn.font(.callout)
+			}
+		}
 	}
 }

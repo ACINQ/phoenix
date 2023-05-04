@@ -720,9 +720,15 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func keyColumn(_ str: String) -> some View {
+	func keyColumn(_ title: LocalizedStringKey) -> some View {
 		
-		Text(str).foregroundColor(.secondary)
+		Text(title).foregroundColor(.secondary)
+	}
+	
+	@ViewBuilder
+	func keyColumn(verbatim title: String) -> some View {
+		
+		Text(title).foregroundColor(.secondary)
 	}
 	
 	@ViewBuilder
@@ -739,7 +745,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Service", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Service")
 				
 			} valueColumn: {
 				
@@ -761,7 +767,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			keyColumnAlignment: .trailing
 		) {
 			
-			keyColumn(NSLocalizedString("Desc", comment: "Label in SummaryInfoGrid"))
+			keyColumn("Desc")
 				.accessibilityLabel("Description")
 			
 		} valueColumn: {
@@ -794,7 +800,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Message", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Message")
 				
 			} valueColumn: {
 				
@@ -819,7 +825,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Message", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Message")
 				
 			} valueColumn: {
 				
@@ -855,7 +861,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Message", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Message")
 				
 			} valueColumn: {
 				
@@ -912,7 +918,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Notes", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Notes")
 				
 			} valueColumn: {
 				
@@ -936,7 +942,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Type", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Type")
 				
 			} valueColumn: {
 				
@@ -975,7 +981,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Output", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Output")
 				
 			} valueColumn: {
 				
@@ -1020,7 +1026,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			keyColumnAlignment: .trailing
 		) {
 			
-			keyColumn(title)
+			keyColumn(verbatim: title)
 			
 		} valueColumn: {
 				
@@ -1094,7 +1100,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Error", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Error")
 				
 			} valueColumn: {
 				
