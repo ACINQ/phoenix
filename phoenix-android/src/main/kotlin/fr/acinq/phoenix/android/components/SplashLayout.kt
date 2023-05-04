@@ -132,7 +132,7 @@ fun SplashLabelRow(
                 textAlign = TextAlign.End,
             )
             if (icon != null) {
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 Image(
                     painter = painterResource(id = icon),
                     colorFilter = ColorFilter.tint(MaterialTheme.typography.subtitle1.color),
@@ -143,7 +143,7 @@ fun SplashLabelRow(
                 )
             }
             if (helpMessage != null) {
-                IconPopup(modifier = Modifier.offset(y = (-2).dp), popupMessage = helpMessage)
+                IconPopup(modifier = Modifier.offset(y = (-3).dp), popupMessage = helpMessage)
             }
         }
         Spacer(Modifier.width(8.dp))

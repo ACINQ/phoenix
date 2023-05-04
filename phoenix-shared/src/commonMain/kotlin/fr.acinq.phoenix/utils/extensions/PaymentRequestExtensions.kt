@@ -20,4 +20,4 @@ import fr.acinq.lightning.Feature
 import fr.acinq.lightning.Features
 import fr.acinq.lightning.payment.PaymentRequest
 
-fun PaymentRequest.isNoAmountTrampoline() = amount == null && !Features(features).hasFeature(Feature.TrampolinePayment)
+fun PaymentRequest.isAmountlessTrampoline() = amount == null && !Features(features).hasFeature(Feature.TrampolinePayment)

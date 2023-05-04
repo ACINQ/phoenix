@@ -153,10 +153,10 @@
     <string name="send_destination_label">Send to</string>
     <string name="send_description_label">Payment description</string>
     <string name="send_trampoline_fee_label">Fee</string>
-    <string name="send_trampoline_fee_no_amount">None</string>
+    <string name="send_trampoline_fee_no_amount">N/A</string>
     <string name="send_trampoline_fee_loading">Loading fee…</string>
     <string name="send_trampoline_fee_help">This fee covers the cost of routing the payment</string>
-    <string name="send_trampoline_amountless_warning_label">Invoice with no amount</string>
+    <string name="send_trampoline_amountless_warning_label">Amountless invoice</string>
     <string name="send_trampoline_amountless_warning_details">The invoice for this payment does not request a specific amount. This may be exploited by malicious nodes during the payment.\n\nTo be safe, <b>ask the recipient to specify an amount</b> when generating the invoice.</string>
     <string name="send_pay_button">Pay</string>
 

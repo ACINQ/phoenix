@@ -16,7 +16,9 @@
 
 package fr.acinq.phoenix.android.payments
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -38,7 +40,7 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.controllers.payments.Scan
-import fr.acinq.phoenix.utils.extensions.isNoAmountTrampoline
+import fr.acinq.phoenix.utils.extensions.isAmountlessTrampoline
 
 
 @Composable
@@ -72,12 +74,16 @@ fun SendLightningPaymentView(
                             amountErrorMessage = context.getString(R.string.send_error_amount_over_balance)
                         }
                         requestedAmount != null && newAmount.amount < requestedAmount -> {
-                            amountErrorMessage = context.getString(R.string.send_error_amount_below_requested,
-                                (requestedAmount).toPrettyString(prefBitcoinUnit, withUnit = true))
+                            amountErrorMessage = context.getString(
+                                R.string.send_error_amount_below_requested,
+                                (requestedAmount).toPrettyString(prefBitcoinUnit, withUnit = true)
+                            )
                         }
                         requestedAmount != null && newAmount.amount > requestedAmount * 2 -> {
-                            amountErrorMessage = context.getString(R.string.send_error_amount_overpaying,
-                                (requestedAmount * 2).toPrettyString(prefBitcoinUnit, withUnit = true))
+                            amountErrorMessage = context.getString(
+                                R.string.send_error_amount_overpaying,
+                                (requestedAmount * 2).toPrettyString(prefBitcoinUnit, withUnit = true)
+                            )
                         }
                     }
                     amount = newAmount?.amount
@@ -95,6 +101,11 @@ fun SendLightningPaymentView(
         SplashLabelRow(label = stringResource(R.string.send_destination_label), icon = R.drawable.ic_zap) {
             SelectionContainer {
                 Text(text = paymentRequest.nodeId.toHex(), maxLines = 2, overflow = TextOverflow.Ellipsis)
+            }
+        }
+        if (paymentRequest.isAmountlessTrampoline()) {
+            SplashLabelRow(label = "", helpMessage = stringResource(id = R.string.send_trampoline_amountless_warning_details)) {
+                Text(text = stringResource(id = R.string.send_trampoline_amountless_warning_label))
             }
         }
         SplashLabelRow(label = stringResource(id = R.string.send_trampoline_fee_label)) {
@@ -117,15 +128,6 @@ fun SendLightningPaymentView(
             ) {
                 safeLet(amount, trampolineFees) { amt, fees ->
                     onPayClick(Scan.Intent.InvoiceFlow.SendInvoicePayment(paymentRequest = paymentRequest, amount = amt, trampolineFees = fees))
-                }
-            }
-            if (paymentRequest.isNoAmountTrampoline()) {
-                Row {
-                    IconPopup(
-                        icon = R.drawable.ic_exclamation,
-                        popupMessage = stringResource(id = R.string.send_trampoline_amountless_warning_details),
-                        spaceLeft = 16.dp
-                    )
                 }
             }
         }
