@@ -129,7 +129,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		if let paymentRequest = incomingPayment.origin.asInvoice()?.paymentRequest {
 			
 			header(NSLocalizedString("Payment Request", comment: "Title in DetailsView_IncomingPayment"))
-		
+			
 			paymentRequest_invoiceCreated(paymentRequest)
 			paymentRequest_amountRequested(paymentRequest)
 			paymentRequest_paymentHash(paymentRequest)
@@ -140,14 +140,23 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			// There's usually just one receivedWith instance.
 			// But there could technically be multiple, so we'll show a section for each if that's the case.
 			
+			header(NSLocalizedString("Payment Received", comment: "Title in DetailsView_IncomingPayment"))
+			
+			paymentReceived_receivedAt(received)
+			paymentReceived_amountReceived(received)
+			payment_standardFees(incomingPayment)
+			payment_minerFees(incomingPayment)
+			
 			let receivedWithArray = received.receivedWith.sorted { $0.hash < $1.hash }
-			ForEach(receivedWithArray.indices, id: \.self) { index in
+			ForEach(receivedWithArray.indices, id: \.self) { idx in
 				
-				let receivedWith = receivedWithArray[index]
-				header(NSLocalizedString("Payment Received", comment: "Title in DetailsView_IncomingPayment"))
+				header(NSLocalizedString(
+					"Payment Part #\(idx+1)",
+					comment: "Title in DetailsView_IncomingPayment"
+				))
 				
-				paymentReceived_receivedAt(received)
-				paymentReceived_amountReceived(receivedWith)
+				let receivedWith = receivedWithArray[idx]
+				
 				paymentReceived_via(receivedWith)
 				paymentReceived_channelId(receivedWith)
 				paymentReceived_fundingTxId(receivedWith)
@@ -388,7 +397,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
 			
-			keyColumn(NSLocalizedString("invoice created", comment: "Label in DetailsView_IncomingPayment"))
+			keyColumn(NSLocalizedString(
+				"invoice created", comment: "Label in DetailsView_IncomingPayment"))
 			
 		} valueColumn: {
 			
@@ -448,7 +458,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func paymentReceived_receivedAt(_ received: Lightning_kmpIncomingPayment.Received) -> some View {
+	func paymentReceived_receivedAt(
+		_ received: Lightning_kmpIncomingPayment.Received
+	) -> some View {
 		let identifier: String = #function
 		
 		InfoGridRowWrapper(
@@ -466,7 +478,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func paymentReceived_amountReceived(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
+	func paymentReceived_amountReceived(
+		_ received: Lightning_kmpIncomingPayment.Received
+	) -> some View {
 		let identifier: String = #function
 		
 		InfoGridRowWrapper(
@@ -479,8 +493,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
+			let msat = received.receivedWith.map { $0.amount.msat }.reduce(0, +)
 			commonValue_amounts(displayAmounts: displayAmounts(
-				msat: receivedWith.amount,
+				msat: Lightning_kmpMilliSatoshi(msat: msat),
 				originalFiat: paymentInfo.metadata.originalFiat
 			))
 		}
@@ -523,7 +538,10 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 			} else if let _ = receivedWith.asNewChannel() {
 				Text("New Channel (auto-created)")
-		
+				
+			} else if let _ = receivedWith.asSpliceIn() {
+				Text("Splice-In")
+			
 			} else {
 				Text("")
 			}
@@ -586,6 +604,58 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 							Text("Copy")
 						}
 					}
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func payment_standardFees(
+		_ payment: Lightning_kmpWalletPayment
+	) -> some View {
+		let identifier: String = #function
+		
+		if let standardFees = payment.standardFees(), standardFees.0 > 0 {
+			
+			InfoGridRowWrapper(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				
+				keyColumn(standardFees.1)
+				
+			} valueColumn: {
+				
+				commonValue_amounts(displayAmounts: displayAmounts(
+					msat: Lightning_kmpMilliSatoshi(msat: standardFees.0),
+					originalFiat: paymentInfo.metadata.originalFiat
+				))
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func payment_minerFees(
+		_ payment: Lightning_kmpWalletPayment
+	) -> some View {
+		let identifier: String = #function
+		
+		if let minerFees = payment.minerFees(), minerFees.0 > 0 {
+			
+			InfoGridRowWrapper(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				
+				keyColumn(minerFees.1)
+				
+			} valueColumn: {
+				
+				commonValue_amounts(displayAmounts: displayAmounts(
+					msat: Lightning_kmpMilliSatoshi(msat: minerFees.0),
+					originalFiat: paymentInfo.metadata.originalFiat
+			 	))
 			}
 		}
 	}

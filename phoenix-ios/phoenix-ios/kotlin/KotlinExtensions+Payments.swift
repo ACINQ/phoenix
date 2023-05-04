@@ -163,6 +163,24 @@ extension Lightning_kmpIncomingPayment {
 	var createdAtDate: Date {
 		return createdAt.toDate(from: .milliseconds)
 	}
+	
+	var isSpliceIn: Bool {
+		
+		guard
+			let _ = self.origin.asOnChain(),
+			let received = self.received
+		else {
+			return false
+		}
+		
+		return received.receivedWith.contains {
+			if let _ = $0.asSpliceIn() {
+				return true
+			} else {
+				return false
+			}
+		}
+	}
 }
 
 extension Lightning_kmpIncomingPayment.Received {

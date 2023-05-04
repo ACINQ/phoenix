@@ -24,6 +24,11 @@ extension Lightning_kmpWalletPayment {
 				let exp = NSLocalizedString("non-invoice payment", comment: "Transaction Info: Explanation")
 				return (val, exp.lowercased())
 			}
+			if incomingPayment.isSpliceIn {
+				let val = NSLocalizedString("Splice-In", comment: "Transaction Info: Value")
+				let exp = NSLocalizedString("adding to existing channel", comment: "Transaction Info: Explanation")
+				return (val, exp.lowercased())
+			}
 			
 		} else if let outgoingPayment = self as? Lightning_kmpLightningOutgoingPayment {
 			
@@ -86,12 +91,14 @@ extension Lightning_kmpWalletPayment {
 		
 		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
 		
-			// An incomingPayment may have fees if a new channel was automatically opened
+			// An incomingPayment may have service fees if a new channel was automatically opened
 			if let received = incomingPayment.received {
 				
 				let msat = received.receivedWith.map {
 					if let newChannel = $0 as? Lightning_kmpIncomingPayment.ReceivedWithNewChannel {
-						return newChannel.serviceFee.msat // exclude fundingFee (which is a minerFee)
+						return newChannel.serviceFee.msat
+					} else if let spliceIn = $0 as? Lightning_kmpIncomingPayment.ReceivedWithSpliceIn {
+						return spliceIn.serviceFee.msat
 					} else {
 						return $0.fees.msat
 					}
@@ -110,7 +117,8 @@ extension Lightning_kmpWalletPayment {
 					
 					return (msat, title, exp)
 				}
-				else {
+				else if !incomingPayment.isSpliceIn {
+					
 					// I think it's nice to see "Fees: 0 sat" :)
 					
 					let msat = Int64(0)
@@ -179,6 +187,8 @@ extension Lightning_kmpWalletPayment {
 				let sat = received.receivedWith.map {
 					if let newChannel = $0 as? Lightning_kmpIncomingPayment.ReceivedWithNewChannel {
 						return newChannel.miningFee.sat
+					} else if let spliceIn = $0 as? Lightning_kmpIncomingPayment.ReceivedWithSpliceIn {
+						return spliceIn.miningFee.sat
 					} else {
 						return Int64(0)
 					}

@@ -48,6 +48,11 @@ fun IncomingPayment.ReceivedWith.asNewChannel(): IncomingPayment.ReceivedWith.Ne
     else -> null
 }
 
+fun IncomingPayment.ReceivedWith.asSpliceIn(): IncomingPayment.ReceivedWith.SpliceIn? = when (this) {
+    is IncomingPayment.ReceivedWith.SpliceIn -> this
+    else -> null
+}
+
 fun LightningOutgoingPayment.Details.asNormal(): LightningOutgoingPayment.Details.Normal? = when (this) {
     is LightningOutgoingPayment.Details.Normal -> this
     else -> null
