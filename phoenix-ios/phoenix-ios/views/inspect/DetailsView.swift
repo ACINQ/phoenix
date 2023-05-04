@@ -574,7 +574,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	func paymentReceived_channelId(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
 		let identifier: String = #function
 		
-		if let newChannel = receivedWith.asNewChannel() {
+		if let channelId = receivedWith.asNewChannel()?.channelId ?? receivedWith.asSpliceIn()?.channelId {
 			
 			InfoGridRowWrapper(
 				identifier: identifier,
@@ -584,7 +584,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				
 			} valueColumn: {
 				
-				let str = newChannel.channelId.toHex()
+				let str = channelId.toHex()
 				Text(str)
 					.contextMenu {
 						Button(action: {
@@ -601,10 +601,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	func paymentReceived_fundingTxId(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
 		let identifier: String = #function
 		
-		if let newChannel = receivedWith.asNewChannel(),
-			let channel = Biz.business.peerManager.getChannelWithCommitments(channelId: newChannel.channelId),
-			let active = channel.commitments.active.first
-		{
+		if let txId = self.txId(receivedWith: receivedWith) {
+			
 			InfoGridRowWrapper(
 				identifier: identifier,
 				keyColumnWidth: keyColumnWidth(identifier: identifier)
@@ -613,11 +611,11 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				
 			} valueColumn: {
 				
-				let txId = active.fundingTxId.toHex()
-				Text(txId)
+				let txIdStr = txId.toHex()
+				Text(txIdStr)
 					.contextMenu {
 						Button(action: {
-							UIPasteboard.general.string = txId
+							UIPasteboard.general.string = txIdStr
 						}) {
 							Text("Copy")
 						}
@@ -632,12 +630,12 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 						titleVisibility: .automatic
 					) {
 						Button {
-							exploreTx(txId, website: BlockchainExplorer.WebsiteMempoolSpace())
+							exploreTx(txIdStr, website: BlockchainExplorer.WebsiteMempoolSpace())
 						} label: {
 							Text(verbatim: "Mempool.space") // no localization needed
 						}
 						Button {
-							exploreTx(txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
+							exploreTx(txIdStr, website: BlockchainExplorer.WebsiteBlockstreamInfo())
 						} label: {
 							Text(verbatim: "Blockstream.info") // no localization needed
 						}
@@ -1334,6 +1332,24 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		formatter.maximumFractionDigits = 3
 		
 		return formatter.string(from: NSNumber(value: percent)) ?? "?%"
+	}
+	
+	func txId(receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> Bitcoin_kmpByteVector32? {
+		
+		if let newChannel = receivedWith.asNewChannel() {
+			
+			if let channel = Biz.business.peerManager.getChannelWithCommitments(channelId: newChannel.channelId),
+				let active = channel.commitments.active.first
+			{
+				return active.fundingTxId
+			}
+			
+		} else if let spliceIn = receivedWith.asSpliceIn() {
+			
+			return spliceIn.txId
+		}
+		
+		return nil
 	}
 	
 	func clockStateBinding() -> Binding<AnimatedClock.ClockState> {
