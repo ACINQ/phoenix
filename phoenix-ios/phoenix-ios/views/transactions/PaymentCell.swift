@@ -187,7 +187,7 @@ struct PaymentCell : View {
 			return ""
 		}
 		
-		guard let completedAtDate = payment.completedAtDate() else {
+		guard let completedAtDate = payment.completedAtDate else {
 			if payment.isOnChain() {
 				return NSLocalizedString("waiting for confirmations", comment: "explanation for pending transaction")
 			} else {

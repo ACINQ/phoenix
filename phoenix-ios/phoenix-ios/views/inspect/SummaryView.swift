@@ -181,7 +181,7 @@ struct SummaryView: View {
 				.font(Font.title2.bold())
 				.padding(.bottom, 2)
 				
-				if let completedAtDate = payment.completedAtDate() {
+				if let completedAtDate = payment.completedAtDate {
 					Text(completedAtDate.format())
 						.font(.subheadline)
 						.foregroundColor(.secondary)
@@ -258,7 +258,7 @@ struct SummaryView: View {
 					.font(.title2.uppercaseSmallCaps())
 					.padding(.bottom, 6)
 				
-				if let completedAtDate = payment.completedAtDate() {
+				if let completedAtDate = payment.completedAtDate {
 					Text(completedAtDate.format())
 						.font(Font.subheadline)
 						.foregroundColor(.secondary)
@@ -473,7 +473,9 @@ struct SummaryView: View {
 	func detailsView() -> some View {
 		DetailsView(
 			type: type,
-			paymentInfo: $paymentInfo
+			paymentInfo: $paymentInfo,
+			showOriginalFiatValue: $showOriginalFiatValue,
+			showFiatValueExplanation: $showFiatValueExplanation
 		)
 	}
 	

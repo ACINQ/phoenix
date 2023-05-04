@@ -144,25 +144,21 @@ extension Lightning_kmpWalletPayment {
 		return false
 	}
 	
-	func createdAtDate() -> Date {
-		return self.createdAt.toDate(from: .milliseconds)
+	var createdAtDate: Date {
+		return createdAt.toDate(from: .milliseconds)
 	}
 	
-	func completedAtDate() -> Date? {
+	var completedAtDate: Date? {
 		
 		if let millis = completedAt?.int64Value {
 			return millis.toDate(from: .milliseconds)
 		} else {
 			return nil
 		}
-	}	
+	}
 }
 
 extension Lightning_kmpIncomingPayment {
-	
-	var createdAtDate: Date {
-		return createdAt.toDate(from: .milliseconds)
-	}
 	
 	var isSpliceIn: Bool {
 		
@@ -187,13 +183,6 @@ extension Lightning_kmpIncomingPayment.Received {
 	
 	var receivedAtDate: Date {
 		return receivedAt.toDate(from: .milliseconds)
-	}
-}
-
-extension Lightning_kmpOutgoingPayment {
-	
-	var createdAtDate: Date {
-		return createdAt.toDate(from: .milliseconds)
 	}
 }
 
