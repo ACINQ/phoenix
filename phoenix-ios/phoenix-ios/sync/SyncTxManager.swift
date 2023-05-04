@@ -825,7 +825,7 @@ class SyncTxManager {
 	private func uploadPayments(_ uploadProgress: SyncTxManager_State_Uploading) {
 		log.trace("uploadPayments()")
 		
-		let finish = { (result: Result<Void, Error>) in
+		let finish = { (result: Result<Void, Error>) -> Void in
 			
 			switch result {
 			case .success:
@@ -841,6 +841,28 @@ class SyncTxManager {
 			case .failure(let error):
 				log.trace("uploadPayments(): finish(): failure")
 				self.handleError(error)
+			}
+		}
+		
+		let finish_nothingToUpload = { (result: Result<Void, Error>) -> Void in
+			
+			// The fetchQueueCountPublisher isn't firing reliably, and I'm not sure why...
+			//
+			// This can lead to the following infinite loop:
+			// - fetchQueueCountPublisher fires and reports a non-zero count
+			// - the actor.queueCount is updated
+			// - the uploadTask is evetually triggered
+			// - the item(s) are properly uploaded, and the rows are deleted from the queue
+			// - fetchQueueCountPublisher does NOT properly fire
+			// - the uploadTask is triggered again
+			// - it finds zero rows to upload, but actor.queueCount remains unchanged
+			// - the uploadTask is triggered again
+			// - ...
+			Task {
+				if let newState = await self.actor.queueCountChanged(0, wait: nil) {
+					self.handleNewState(newState)
+				}
+				finish(result)
 			}
 		}
 		
@@ -876,7 +898,7 @@ class SyncTxManager {
 					
 					if batch.rowids.count == 0 {
 						// There's nothing queued for upload, so we're done.
-						finish(.success)
+						finish_nothingToUpload(.success)
 					} else {
 						// Perform serialization & encryption on a background thread.
 						DispatchQueue.global(qos: .utility).async {

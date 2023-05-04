@@ -264,9 +264,13 @@ extension CloudKitDb {
 			/// Transforming from Kotlin:
 			/// `queueCount: StateFlow<Long>`
 			///
-			KotlinCurrentValueSubject<KotlinLong, Int64>(
+			KotlinCurrentValueSubject<KotlinLong, KotlinLong>(
 				self.queueCount
-			).eraseToAnyPublisher()
+			)
+			.map {
+				$0.int64Value
+			}
+			.eraseToAnyPublisher()
 		}
 	}
 }
