@@ -63,11 +63,6 @@ fun LightningOutgoingPayment.Details.asSwapOut(): LightningOutgoingPayment.Detai
     else -> null
 }
 
-fun LightningOutgoingPayment.Details.asChannelClosing(): LightningOutgoingPayment.Details.ChannelClosing? = when (this) {
-    is LightningOutgoingPayment.Details.ChannelClosing -> this
-    else -> null
-}
-
 fun LightningOutgoingPayment.Status.asPending(): LightningOutgoingPayment.Status.Pending? = when (this) {
     is LightningOutgoingPayment.Status.Pending -> this
     else -> null
@@ -85,11 +80,6 @@ fun LightningOutgoingPayment.Status.asSucceeded(): LightningOutgoingPayment.Stat
 
 fun LightningOutgoingPayment.Status.asOffChain(): LightningOutgoingPayment.Status.Completed.Succeeded.OffChain? = when (this) {
     is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> this
-    else -> null
-}
-
-fun LightningOutgoingPayment.Status.asOnChain(): LightningOutgoingPayment.Status.Completed.Succeeded.OnChain? = when (this) {
-    is LightningOutgoingPayment.Status.Completed.Succeeded.OnChain -> this
     else -> null
 }
 
