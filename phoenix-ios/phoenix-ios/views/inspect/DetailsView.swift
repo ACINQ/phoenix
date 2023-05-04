@@ -1184,13 +1184,22 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 				
-				if showOriginalFiatValue {
+				// If we know the original fiat exchange rate, then we can switch back and forth
+				// between the original & current fiat value.
+				//
+				// However, if we do NOT know the original fiat value,
+				// then we simply show the current fiat value (without the clock button)
+				//
+				let canShowOriginalFiatValue = displayAmounts.fiatOriginal != nil
+				
+				if showOriginalFiatValue && canShowOriginalFiatValue {
 					
 					let display_fiatOriginal = displayAmounts.fiatOriginal ??
 						Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
 					
 					Text(verbatim: "≈ \(display_fiatOriginal.digits) ")
 					Text_CurrencyName(currency: display_fiatOriginal.currency, fontTextStyle: .callout)
+					Text(" (original)").foregroundColor(.secondary)
 					
 				} else {
 					
@@ -1199,17 +1208,15 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				
 					Text(verbatim: "≈ \(display_fiatCurrent.digits) ")
 					Text_CurrencyName(currency: display_fiatCurrent.currency, fontTextStyle: .callout)
-				}
-				
-				if showOriginalFiatValue {
-					Text(" (original)").foregroundColor(.secondary)
-				} else {
 					Text(" (now)").foregroundColor(.secondary)
 				}
 				
-				AnimatedClock(state: clockStateBinding(), size: 14, animationDuration: 0.0)
-					.padding(.leading, 4)
-					.offset(y: 1)
+				if canShowOriginalFiatValue {
+					
+					AnimatedClock(state: clockStateBinding(), size: 14, animationDuration: 0.0)
+						.padding(.leading, 4)
+						.offset(y: 1)
+				}
 				
 			} // </HStack>
 		} // </VStack>
