@@ -33,7 +33,7 @@ fun IncomingPayment.Origin.asSwapIn(): IncomingPayment.Origin.SwapIn? = when (th
     else -> null
 }
 
-fun IncomingPayment.Origin.asOnchain(): IncomingPayment.Origin.OnChain? = when (this) {
+fun IncomingPayment.Origin.asOnChain(): IncomingPayment.Origin.OnChain? = when (this) {
     is IncomingPayment.Origin.OnChain -> this
     else -> null
 }

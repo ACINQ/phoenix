@@ -116,13 +116,7 @@ struct ValidateView: View {
 				}
 			}
 			
-			if mvi.model is Scan.Model_SwapOutFlow_Requesting {
-				FetchActivityNotice(
-					title: NSLocalizedString("Fetching Invoice", comment: "Progress title"),
-					onCancel: { didCancelSwapOutRequest() }
-				)
-			}
-			else if mvi.model is Scan.Model_LnurlPayFlow_LnurlPayFetch {
+			if mvi.model is Scan.Model_LnurlPayFlow_LnurlPayFetch {
 				FetchActivityNotice(
 					title: NSLocalizedString("Fetching Invoice", comment: "Progress title"),
 					onCancel: { didCancelLnurlPayFetch() }
@@ -306,19 +300,10 @@ struct ValidateView: View {
 	func paymentButton(_ isDisconnected: Bool) -> some View {
 		
 		Button {
-			if mvi.model is Scan.Model_SwapOutFlow_Init {
-				prepareTransaction()
-			} else {
-				sendPayment()
-			}
+			sendPayment()
 		} label: {
 			HStack {
-				if mvi.model is Scan.Model_SwapOutFlow_Init {
-					Image(systemName: "hammer")
-						.renderingMode(.template)
-					Text("Prepare Transaction")
-				}
-				else if mvi.model is Scan.Model_LnurlWithdrawFlow {
+				if mvi.model is Scan.Model_LnurlWithdrawFlow {
 					Image("ic_receive")
 						.renderingMode(.template)
 						.resizable()
@@ -497,10 +482,7 @@ struct ValidateView: View {
 	
 	func requestDescription() -> String? {
 		
-		if mvi.model is Scan.Model_SwapOutFlow {
-			return NSLocalizedString("On-Chain Payment", comment: "Generic description for L1 payment")
-			
-		} else if let paymentRequest = paymentRequest() {
+		if let paymentRequest = paymentRequest() {
 			return paymentRequest.desc()
 			
 		} else if let lnurlPay = lnurlPay() {
@@ -560,10 +542,7 @@ struct ValidateView: View {
 	
 	func showTipButton() -> Bool {
 		
-		if mvi.model is Scan.Model_SwapOutFlow {
-			return true
-			
-		} else if let _ = paymentRequest() {
+		if let _ = paymentRequest() {
 			return true
 			
 		} else if let _ = lnurlPay() {
@@ -609,29 +588,22 @@ struct ValidateView: View {
 	
 	func paymentButtonHint() -> String {
 		
-		if mvi.model is Scan.Model_SwapOutFlow_Init {
+		guard let msat = parsedAmountMsat() else {
+			return ""
+		}
+		
+		let btcnAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit)
+		
+		if let exchangeRate = currencyPrefs.fiatExchangeRate() {
+			let fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
 			
-			return NSLocalizedString("fetches the swap-out fee", comment: "VoiceOver hint")
-			
+			return NSLocalizedString("total amount: \(btcnAmt.string), ≈\(fiatAmt.string)",
+				comment: "VoiceOver hint"
+			)
 		} else {
-			
-			guard let msat = parsedAmountMsat() else {
-				return ""
-			}
-			
-			let btcnAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit)
-			
-			if let exchangeRate = currencyPrefs.fiatExchangeRate() {
-				let fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
-				
-				return NSLocalizedString("total amount: \(btcnAmt.string), ≈\(fiatAmt.string)",
-					comment: "VoiceOver hint"
-				)
-			} else {
-				return NSLocalizedString("total amount: ≈\(btcnAmt.string)",
-					comment: "VoiceOver hint"
-				)
-			}
+			return NSLocalizedString("total amount: ≈\(btcnAmt.string)",
+				comment: "VoiceOver hint"
+			)
 		}
 	}
 	
@@ -652,14 +624,6 @@ struct ValidateView: View {
 			
 		} else if let lnurlWithdraw = lnurlWithdraw() {
 			return lnurlWithdraw.maxWithdrawable
-			
-		} else if let model = mvi.model as? Scan.Model_SwapOutFlow_Init {
-			
-			if let amount_sat = model.address.amount {
-				return Lightning_kmpMilliSatoshi(sat: amount_sat)
-			} else if let paymentRequest = model.address.paymentRequest {
-				return paymentRequest.amount
-			}
 		}
 		
 		return nil
@@ -704,9 +668,7 @@ struct ValidateView: View {
 	///
 	func isAmountlessInvoice() -> Bool {
 		
-		if mvi.model is Scan.Model_SwapOutFlow {
-			return true
-		} else if let paymentRequest = paymentRequest() {
+		if let paymentRequest = paymentRequest() {
 			return paymentRequest.amount == nil
 		} else {
 			return false
@@ -740,15 +702,8 @@ struct ValidateView: View {
 	}
 	
 	func swapOutRange() -> MsatRange? {
-		
-		guard let chainContext = chainContext, mvi.model is Scan.Model_SwapOutFlow else {
-			return nil
-		}
-
-		return MsatRange(
-			min: Utils.toMsat(sat: chainContext.swapOut.v1.minAmountSat),
-			max: Utils.toMsat(sat: chainContext.swapOut.v1.maxAmountSat)
-		)
+	
+		return nil
 	}
 	
 	func paymentNumbers() -> PaymentNumbers? {
@@ -768,12 +723,7 @@ struct ValidateView: View {
 		let tipMsat = preMinerFeeMsat - baseMsat
 		let tipPercent = Double(tipMsat) / Double(baseMsat)
 		
-		let minerFeeMsat: Int64
-		if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
-			minerFeeMsat = Utils.toMsat(sat: model.fee)
-		} else {
-			minerFeeMsat = 0
-		}
+		let minerFeeMsat: Int64 = 0
 		
 		if tipMsat <= 0 && minerFeeMsat <= 0 {
 			return nil
@@ -871,12 +821,12 @@ struct ValidateView: View {
 			problem = nil // display in gray at very beginning
 		}
 		
-		if let model = mvi.model as? Scan.Model_SwapOutFlow_Init,
-		   model.address.paymentRequest != nil,
+		if let model = mvi.model as? Scan.Model_OnChainFlow,
+		   model.uri.paymentRequest != nil,
 		   !hasPickedSwapOutMode
 		{
 			log.debug("triggering popover w/PaymentLayerChoice")
-			
+	
 			popoverState.display(dismissable: false) {
 				PaymentLayerChoice(mvi: mvi)
 			} onWillDisappear: {
@@ -896,9 +846,9 @@ struct ValidateView: View {
 		//
 		// * SwapOutFlow_Requesting -> SwapOutFlow_Ready => amount + minerFee >? balance
 		// * SwapOutFlow_Ready -> SwapOutFlow_Init       => remove minerFee from calculations
-		// * SwapOutFlow_Init -> InvoiceFlow_X           => range changed (e.g. minAmount)
+		// * OnChainFlow -> InvoiceFlow_X                => range changed (e.g. minAmount)
 		//
-		if newModel is Scan.Model_SwapOutFlow || newModel is Scan.Model_InvoiceFlow {
+		if newModel is Scan.Model_InvoiceFlow {
 			
 			refreshAltAmount()
 		}
@@ -951,9 +901,6 @@ struct ValidateView: View {
 				
 				// This seems to be needed, because `amountDidChange` isn't automatically called
 				refreshAltAmount()
-				if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
-					mvi.intent(Scan.Intent_SwapOutFlow_Invalidate(address: model.address))
-				}
 			}
 			
 		} else { // user selected "other"
@@ -998,9 +945,6 @@ struct ValidateView: View {
 		log.trace("amountDidChange()")
 		
 		refreshAltAmount()
-		if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
-			mvi.intent(Scan.Intent_SwapOutFlow_Invalidate(address: model.address))
-		}
 	}
 	
 	func refreshAltAmount() {
@@ -1048,13 +992,6 @@ struct ValidateView: View {
 				if msat > balanceMsat {
 					problem = .amountExceedsBalance
 					altAmount = NSLocalizedString("Amount exceeds your balance", comment: "error message")
-					
-				} else if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
-					let totalMsat = msat + Utils.toMsat(sat: model.fee)
-					if totalMsat > balanceMsat {
-						problem = .finalAmountExceedsBalance
-						altAmount = NSLocalizedString("Total amount exceeds your balance", comment: "error message")
-					}
 				}
 			}
 			
@@ -1386,18 +1323,11 @@ struct ValidateView: View {
 	func prepareTransaction() {
 		log.trace("prepareTransaction()")
 		
-		guard let msat = parsedAmountMsat() else {
-			return
-		}
-		
-		let amountSat = Int64(Utils.convertBitcoin(msat: msat, to: .sat))
-		
-		if let model = mvi.model as? Scan.Model_SwapOutFlow_Init {
-			mvi.intent(Scan.Intent_SwapOutFlow_Prepare(
-				address: model.address,
-				amount: Bitcoin_kmpSatoshi(sat: amountSat)
-			))
-		}
+	//	guard let msat = parsedAmountMsat() else {
+	//		return
+	//	}
+	//
+	//	let amountSat = Int64(Utils.convertBitcoin(msat: msat, to: .sat))
 	}
 	
 	func sendPayment() {
@@ -1420,17 +1350,6 @@ struct ValidateView: View {
 			mvi.intent(Scan.Intent_InvoiceFlow_SendInvoicePayment(
 				paymentRequest: model.paymentRequest,
 				amount: Lightning_kmpMilliSatoshi(msat: msat),
-				maxFees: Prefs.shared.maxFees?.toKotlin()
-			))
-			
-		} else if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
-			
-			saveTipPercentInPrefs()
-			mvi.intent(Scan.Intent_SwapOutFlow_Send(
-				amount: model.initialUserAmount.plus(other: model.fee),
-				swapOutFee: model.fee,
-				address: model.address,
-				paymentRequest: model.paymentRequest,
 				maxFees: Prefs.shared.maxFees?.toKotlin()
 			))
 			
@@ -1480,13 +1399,13 @@ struct ValidateView: View {
 	func didCancelSwapOutRequest() {
 		log.trace("didCancelSwapOutRequest()")
 		
-		guard let model = mvi.model as? Scan.Model_SwapOutFlow_Requesting else {
-			return
-		}
-		
-		mvi.intent(Scan.Intent_SwapOutFlow_Invalidate(
-			address: model.address
-		))
+	//	guard let model = mvi.model as? Scan.Model_SwapOutFlow_Requesting else {
+	//		return
+	//	}
+	//
+	//	mvi.intent(Scan.Intent_SwapOutFlow_Invalidate(
+	//		address: model.address
+	//	))
 	}
 	
 	func didCancelLnurlPayFetch() {

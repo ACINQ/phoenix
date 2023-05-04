@@ -327,7 +327,7 @@ struct ScanView: View {
 
 				} else if let content = clipboardContent as? Scan.ClipboardContent_BitcoinRequest {
 
-					let addrInfo: BitcoinAddressInfo = content.address
+					let addrInfo: BitcoinUri = content.address
 
 					let desc: String = {
 						return addrInfo.label ?? addrInfo.message

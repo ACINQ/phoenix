@@ -11,7 +11,7 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-
+/*
 struct ChannelsConfigurationView: MVIView {
 
 	@StateObject var mvi = MVIState({ $0.channelsConfiguration() })
@@ -581,58 +581,4 @@ fileprivate struct ChannelInfoPopup: View, ViewName {
 		popoverState.close()
 	}
 }
-
-
-// MARK:-
-
-class ChannelsConfigurationView_Previews : PreviewProvider {
-	
-	static let channel1 = ChannelsConfiguration.ModelChannel(
-		id: "b50bf19d16156de8231f6d3d3fb3dd105ba338de5366d0421b0954b9ceb0d4f8",
-		isOk: true,
-		stateName: "Normal",
-		localBalance: Lightning_kmpMilliSatoshi(msat: 50_000_000),
-		remoteBalance: Lightning_kmpMilliSatoshi(msat: 200_000_000),
-		json: "{Everything is normal!}",
-		txId: nil
-	)
-	
-	static let channel2 = ChannelsConfiguration.ModelChannel(
-		id: "e5366d0421b0954b9ceb0d4f8b50bf19d16156de8231f6d3d3fb3dd105ba338d",
-		isOk: false,
-		stateName: "Woops",
-		localBalance: Lightning_kmpMilliSatoshi(msat: 0),
-		remoteBalance: Lightning_kmpMilliSatoshi(msat: 0),
-		json: "{Woops!}",
-		txId: nil
-	)
-
-	static var previews: some View {
-		
-		NavigationWrapper {
-			ChannelsConfigurationView().mock(ChannelsConfiguration.Model(
-				nodeId: "03af0ed6052cf28d670665549bc86f4b721c9fdb309d40c58f5811f63966e005d0",
-				json: "{}",
-				channels: []
-			))
-		}
-		.preferredColorScheme(.light)
-		.previewDevice("iPhone 8")
-
-		NavigationWrapper {
-			ChannelsConfigurationView().mock(ChannelsConfiguration.Model(
-				nodeId: "03af0ed6052cf28d670665549bc86f4b721c9fdb309d40c58f5811f63966e005d0",
-				json: "{}",
-				channels: [channel1, channel2]
-			))
-		}
-		.preferredColorScheme(.dark)
-		.previewDevice("iPhone 8")
-	}
-
-	#if DEBUG
-	@objc class func injected() {
-		UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
-	}
-	#endif
-}
+*/

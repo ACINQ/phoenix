@@ -45,7 +45,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	
 	/// The chain in use by PhoenixBusiness (e.g. Testnet)
 	///
-	private let chain: Chain
+	private let chain: Lightning_kmpNodeParams.Chain
 	
 	/// The 12-word seed phrase for the wallet.
 	///
@@ -76,7 +76,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	
 	private var cancellables = Set<AnyCancellable>()
 	
-	init(chain: Chain, mnemonics: [String], encryptedNodeId: String) {
+	init(chain: Lightning_kmpNodeParams.Chain, mnemonics: [String], encryptedNodeId: String) {
 		log.trace("init()")
 		
 		self.chain = chain
@@ -97,7 +97,9 @@ class SyncSeedManager: SyncManagerProtcol {
 	// MARK: Fetch Seeds
 	// ----------------------------------------
 	
-	public class func fetchSeeds(chain: Chain) -> PassthroughSubject<SeedBackup, FetchSeedsError> {
+	public class func fetchSeeds(
+		chain: Lightning_kmpNodeParams.Chain
+	) -> PassthroughSubject<SeedBackup, FetchSeedsError> {
 		
 		let publisher = PassthroughSubject<SeedBackup, FetchSeedsError>()
 		
@@ -556,7 +558,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	// MARK: Utilities
 	// ----------------------------------------
 	
-	private class func record_table_name(chain: Chain) -> String {
+	private class func record_table_name(chain: Lightning_kmpNodeParams.Chain) -> String {
 		
 		// From Apple's docs:
 		// > A record type must consist of one or more alphanumeric characters
