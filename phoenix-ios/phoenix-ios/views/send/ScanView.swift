@@ -211,17 +211,6 @@ struct ScanView: View {
 				}
 				.transition(.move(edge: .bottom).combined(with: .opacity))
 			}
-			
-			if #unavailable(iOS 15.0) {
-				
-				// The bottom safe area is being ignored, so we need to add it back.
-				// This only seems to occur on iOS 14.
-				// And only on iPad, not iPhone.
-				
-				if deviceInfo.isIPad {
-					Spacer().frame(height: deviceInfo.windowSafeArea.bottom)
-				}
-			}
 		}
 		.frame(maxWidth: .infinity)
 		.background(

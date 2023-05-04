@@ -102,9 +102,6 @@ struct ConfigurationView: View {
 		.onReceive(backupSeedStatePublisher) {(state: BackupSeedState) in
 			backupSeedStateChanged(state)
 		}
-		.onReceive(AppDelegate.get().externalLightningUrlPublisher) {(url: String) in
-			onExternalLightningUrl(url)
-		}
 	}
 	
 	@ViewBuilder
@@ -335,27 +332,6 @@ struct ConfigurationView: View {
 				popToRootRequested = false
 				presentationMode.wrappedValue.dismiss()
 			}
-				
-			if #unavailable(iOS 15.0) {
-				// iOS 14 BUG and workaround.
-				//
-				// The NavigationLink remains selected after we return to the ConfigurationView.
-				// For example:
-				// - Tap on "About", to push the AboutView onto the NavigationView
-				// - Tap "<" to pop the AboutView
-				// - Notice that the "About" row is still selected (e.g. has gray background)
-				//
-				// There are several workaround for this issue:
-				// https://developer.apple.com/forums/thread/660468
-				//
-				// We are implementing the least risky solution.
-				// Which requires us to change the `List.id` property.
-				
-				if navLinkTag != nil && swiftUiBugWorkaround == nil {
-					navLinkTag = nil
-					listViewId = UUID()
-				}
-			}
 		}
 	}
 	
@@ -420,25 +396,6 @@ struct ConfigurationView: View {
 		log.trace("backupSeedStateChanged()")
 		
 		backupSeedState = newState
-	}
-	
-	func onExternalLightningUrl(_ urlStr: String) {
-		log.trace("onExternalLightningUrl()")
-		
-		if #unavailable(iOS 15.0) {
-			// iOS 14 bug workaround
-			//
-			// We previoulsy had a crash under the following conditions:
-			// - navigate to ConfigurationView
-			// - navigate to a subview (such as AboutView)
-			// - switch to another app, and open a lightning URL with Phoenix
-			// - crash !
-			//
-			// It works fine as long as the NavigationStack is popped to at least the ConfigurationView.
-			//
-			// Apple has fixed the issue in iOS 15.
-			navLinkTag = nil
-		}
 	}
 	
 	// --------------------------------------------------

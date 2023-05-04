@@ -378,12 +378,8 @@ struct SummaryView: View {
 	@ViewBuilder
 	func buttonList() -> some View {
 		
-		if #available(iOS 15.0, *) {
-			if paymentInfo.payment.state() == WalletPaymentState.failure {
-				buttonList_withDeleteOption()
-			} else {
-				buttonList_standardOptions()
-			}
+		if paymentInfo.payment.state() == WalletPaymentState.failure {
+			buttonList_withDeleteOption()
 		} else {
 			buttonList_standardOptions()
 		}
@@ -422,7 +418,6 @@ struct SummaryView: View {
 	}
 	
 	@ViewBuilder
-	@available(iOS 15.0, *)
 	func buttonList_withDeleteOption() -> some View {
 		
 		// Details | Edit | Delete

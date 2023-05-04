@@ -175,21 +175,8 @@ class SyncSeedManager: SyncManagerProtcol {
 				}
 			}
 
-			if #available(iOS 15.0, *) {
-				operation.recordMatchedBlock = recordMatchedBlock
-				operation.queryResultBlock = queryResultBlock
-			} else {
-				operation.recordFetchedBlock = {(record: CKRecord) in
-					recordMatchedBlock(record.recordID, Result.success(record))
-				}
-				operation.queryCompletionBlock = {(cursor: CKQueryOperation.Cursor?, error: Error?) in
-					if let error = error {
-						queryResultBlock(.failure(error))
-					} else {
-						queryResultBlock(.success(cursor))
-					}
-				}
-			}
+			operation.recordMatchedBlock = recordMatchedBlock
+			operation.queryResultBlock = queryResultBlock
 		
 			let configuration = CKOperation.Configuration()
 			configuration.allowsCellularAccess = true
@@ -438,17 +425,7 @@ class SyncSeedManager: SyncManagerProtcol {
 			}
 		}
 		
-		if #available(iOS 15.0, *) {
-			operation.perRecordSaveBlock = perRecordSaveBlock
-		} else {
-			operation.perRecordCompletionBlock = {(record: CKRecord, error: Error?) -> Void in
-				if let error = error {
-					perRecordSaveBlock(record.recordID, Result.failure(error))
-				} else {
-					perRecordSaveBlock(record.recordID, Result.success(record))
-				}
-			}
-		}
+		operation.perRecordSaveBlock = perRecordSaveBlock
 		
 		let configuration = CKOperation.Configuration()
 		configuration.allowsCellularAccess = true
@@ -535,17 +512,7 @@ class SyncSeedManager: SyncManagerProtcol {
 			}
 		}
 		
-		if #available(iOS 15.0, *) {
-			operation.perRecordDeleteBlock = perRecordDeleteBlock
-		} else {
-			operation.modifyRecordsCompletionBlock = {(saved: [CKRecord]?, deleted: [CKRecord.ID]?, error: Error?) in
-				if let error = error {
-					perRecordDeleteBlock(recordID, Result.failure(error))
-				} else {
-					perRecordDeleteBlock(recordID, Result.success)
-				}
-			}
-		}
+		operation.perRecordDeleteBlock = perRecordDeleteBlock
 		
 		let configuration = CKOperation.Configuration()
 		configuration.allowsCellularAccess = true
@@ -605,16 +572,11 @@ class SyncSeedManager: SyncManagerProtcol {
 				
 				case CKError.notAuthenticated.rawValue:
 					isNotAuthenticated = true
+				
+				case CKError.accountTemporarilyUnavailable.rawValue:
+					isNotAuthenticated = true
 					
 				default: break
-			}
-			if #available(iOS 15.0, *) {
-				switch ckerror.errorCode {
-					case CKError.accountTemporarilyUnavailable.rawValue:
-						isNotAuthenticated = true
-					
-					default: break
-				}
 			}
 			
 			// Sometimes a `notAuthenticated` error is hidden in a partial error.
@@ -625,11 +587,8 @@ class SyncSeedManager: SyncManagerProtcol {
 					
 					if errCode == CKError.notAuthenticated.rawValue {
 						isNotAuthenticated = true
-					}
-					if #available(iOS 15.0, *) {
-						if errCode == CKError.accountTemporarilyUnavailable.rawValue {
-							isNotAuthenticated = true
-						}
+					} else if errCode == CKError.accountTemporarilyUnavailable.rawValue {
+						isNotAuthenticated = true
 					}
 				}
 			}

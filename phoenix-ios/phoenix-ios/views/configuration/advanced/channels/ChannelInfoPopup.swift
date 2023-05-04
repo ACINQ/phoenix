@@ -66,7 +66,7 @@ struct ChannelInfoPopup: View, ViewName {
 					Color.appAccent.frame(height: 1)
 				}
 			}
-			.animation(.easeInOut(duration: 0.3))
+			.animation(.easeInOut(duration: 0.3), value: selectedTab)
 			
 			Spacer()
 		}
@@ -438,47 +438,33 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 		} valueColumn: {
 
 			let txId = commitment.fundingTxId
-			if #available(iOS 15.0, *) {
-				Button {
-					showBlockchainExplorerOptions = true
-				} label: {
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
-						Text(txId).lineLimit(1).truncationMode(.middle)
-						Image(systemName: "link").imageScale(.small)
-					}
+			Button {
+				showBlockchainExplorerOptions = true
+			} label: {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
+					Text(txId).lineLimit(1).truncationMode(.middle)
+					Image(systemName: "link").imageScale(.small)
 				}
-				.padding(.bottom, verticalSpacingBetweenRows)
-				.confirmationDialog("Blockchain Explorer",
-					isPresented: $showBlockchainExplorerOptions,
-					titleVisibility: .automatic
-				) {
-					Button {
-						exploreTx(txId, website: BlockchainExplorer.WebsiteMempoolSpace())
-					} label: {
-						Text(verbatim: "Mempool.space") // no localization needed
-					}
-					Button {
-						exploreTx(txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
-					} label: {
-						Text(verbatim: "Blockstream.info") // no localization needed
-					}
-					Button("Copy transaction id") {
-						copyTxId(txId)
-					}
-				} // </confirmationDialog>
-			} else {
-				Text(txId)
-					.lineLimit(1)
-					.truncationMode(.middle)
-					.contextMenu {
-						Button(action: {
-							UIPasteboard.general.string = txId
-						}) {
-							Text("Copy")
-						}
-					}
-					.padding(.bottom, verticalSpacingBetweenRows)
 			}
+			.padding(.bottom, verticalSpacingBetweenRows)
+			.confirmationDialog("Blockchain Explorer",
+				isPresented: $showBlockchainExplorerOptions,
+				titleVisibility: .automatic
+			) {
+				Button {
+					exploreTx(txId, website: BlockchainExplorer.WebsiteMempoolSpace())
+				} label: {
+					Text(verbatim: "Mempool.space") // no localization needed
+				}
+				Button {
+					exploreTx(txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
+				} label: {
+					Text(verbatim: "Blockstream.info") // no localization needed
+				}
+				Button("Copy transaction id") {
+					copyTxId(txId)
+				}
+			} // </confirmationDialog>
 
 		} // </InfoGridRow>
 		.background(indentedRowBackground(identifier), alignment: Alignment.topLeading)

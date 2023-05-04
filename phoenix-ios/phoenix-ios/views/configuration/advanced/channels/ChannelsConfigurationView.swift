@@ -182,25 +182,13 @@ fileprivate struct ChannelsView : View {
 					Image(systemName: "xmark.circle")
 				}
 			}
-			if #available(iOS 15.0, *) {
-				Button(role: .destructive) {
-					forceCloseAllChannels()
-				} label: {
-					Label {
-						Text(verbatim: "Force close all")
-					} icon: {
-						Image(systemName: "exclamationmark.triangle")
-					}
-				}
-			} else {
-				Button {
-					forceCloseAllChannels()
-				} label: {
-					Label {
-						Text(verbatim: "Force close all")
-					} icon: {
-						Image(systemName: "exclamationmark.triangle")
-					}
+			Button(role: .destructive) {
+				forceCloseAllChannels()
+			} label: {
+				Label {
+					Text(verbatim: "Force close all")
+				} icon: {
+					Image(systemName: "exclamationmark.triangle")
 				}
 			}
 			

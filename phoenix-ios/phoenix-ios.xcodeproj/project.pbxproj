@@ -214,7 +214,6 @@
 		DCCD046327EE04E1007D57A5 /* WalletPaymentExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD046227EE04E1007D57A5 /* WalletPaymentExtensions.swift */; };
 		DCD1208728663F4A00EB39C5 /* TransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD1208628663F4A00EB39C5 /* TransactionsView.swift */; };
 		DCD5FF4326A0D34B009CC666 /* EqualSizes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD5FF4226A0D34B009CC666 /* EqualSizes.swift */; };
-		DCD71A79273987FE00B9A1EF /* Focuser in Frameworks */ = {isa = PBXBuildFile; productRef = DCD71A78273987FE00B9A1EF /* Focuser */; };
 		DCD777D226DE9FE800979A12 /* DelayedSave.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD777D126DE9FE800979A12 /* DelayedSave.swift */; };
 		DCD7E0AC28EC32CB009C30E5 /* BusinessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD7E0AB28EC32CB009C30E5 /* BusinessManager.swift */; };
 		DCD7E0AF28EC3C0D009C30E5 /* WatchTower.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD7E0AE28EC3C0D009C30E5 /* WatchTower.swift */; };
@@ -556,7 +555,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DCD71A79273987FE00B9A1EF /* Focuser in Frameworks */,
 				DCA5391A29F1DDE7001BD3D5 /* SegmentedPicker in Frameworks */,
 				DC46BAE426C6FDD300E760A6 /* CircularCheckmarkProgress in Frameworks */,
 				DCC9D99C267BEB3D00EA36DD /* CloudKit.framework in Frameworks */,
@@ -1176,7 +1174,6 @@
 			packageProductDependencies = (
 				DC72C31825A3CF87008A927A /* FirebaseMessaging */,
 				DC46BAE326C6FDD300E760A6 /* CircularCheckmarkProgress */,
-				DCD71A78273987FE00B9A1EF /* Focuser */,
 				DC39D4E4286B4A7E0030F18D /* Popovers */,
 				DCA5391929F1DDE7001BD3D5 /* SegmentedPicker */,
 			);
@@ -1302,7 +1299,6 @@
 			packageReferences = (
 				DC72C2EA25A3CADC008A927A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				DC46BAE226C6FDD300E760A6 /* XCRemoteSwiftPackageReference "CircularCheckmarkProgress" */,
-				DCD71A752739864400B9A1EF /* XCRemoteSwiftPackageReference "swift-focuser" */,
 				DC39D4E3286B4A7E0030F18D /* XCRemoteSwiftPackageReference "Popovers" */,
 				DCA5391729F1DAA3001BD3D5 /* XCRemoteSwiftPackageReference "SwiftySegmentedPicker" */,
 			);
@@ -1795,7 +1791,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1852,7 +1848,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -1881,10 +1877,6 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.0.1;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"\"-Xlinker -interposable\"",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = co.acinq.phoenix;
 				PRODUCT_NAME = Phoenix;
 				SWIFT_VERSION = 5.0;
@@ -1910,10 +1902,6 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.0.1;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"\"-Xlinker -interposable\"",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = co.acinq.phoenix;
 				PRODUCT_NAME = Phoenix;
 				SWIFT_VERSION = 5.0;
@@ -2205,14 +2193,6 @@
 				minimumVersion = 0.0.2;
 			};
 		};
-		DCD71A752739864400B9A1EF /* XCRemoteSwiftPackageReference "swift-focuser" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:art-technologies/swift-focuser.git";
-			requirement = {
-				kind = exactVersion;
-				version = 0.2.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -2240,11 +2220,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DCA5391729F1DAA3001BD3D5 /* XCRemoteSwiftPackageReference "SwiftySegmentedPicker" */;
 			productName = SegmentedPicker;
-		};
-		DCD71A78273987FE00B9A1EF /* Focuser */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DCD71A752739864400B9A1EF /* XCRemoteSwiftPackageReference "swift-focuser" */;
-			productName = Focuser;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
