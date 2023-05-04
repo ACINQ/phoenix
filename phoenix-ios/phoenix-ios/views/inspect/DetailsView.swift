@@ -81,15 +81,23 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	@Binding var paymentInfo: WalletPaymentInfo
 	
 	// <InfoGridView Protocol>
-	@State var keyColumnWidths: [InfoGridRow_KeyColumn_Width] = []
 	let minKeyColumnWidth: CGFloat = 50
 	let maxKeyColumnWidth: CGFloat = 140
 	
-	func setKeyColumnWidths(_ value: [InfoGridRow_KeyColumn_Width]) {
-		keyColumnWidths = value
+	@State var keyColumnSizes: [InfoGridRow_KeyColumn_Size] = []
+	func setKeyColumnSizes(_ value: [InfoGridRow_KeyColumn_Size]) {
+		keyColumnSizes = value
 	}
-	func getKeyColumnWidths() -> [InfoGridRow_KeyColumn_Width] {
-		return keyColumnWidths
+	func getKeyColumnSizes() -> [InfoGridRow_KeyColumn_Size] {
+		return keyColumnSizes
+	}
+	
+	@State var rowSizes: [InfoGridRow_Size] = []
+	func setRowSizes(_ sizes: [InfoGridRow_Size]) {
+		rowSizes = sizes
+	}
+	func getRowSizes() -> [InfoGridRow_Size] {
+		return rowSizes
 	}
 	// </InfoGridView Protocol>
 	
@@ -1263,7 +1271,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		var body: some View {
 			
-			InfoGridRow(identifier: identifier, hSpacing: hSpacing, keyColumnWidth: keyColumnWidth) {
+			InfoGridRow(
+				identifier: identifier,
+				vAlignment: .firstTextBaseline,
+				hSpacing: hSpacing,
+				keyColumnWidth: keyColumnWidth,
+				keyColumnAlignment: .trailing
+			) {
 				
 				keyColumn
 				

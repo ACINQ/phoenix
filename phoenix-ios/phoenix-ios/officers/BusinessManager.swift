@@ -261,6 +261,10 @@ class BusinessManager {
 	public var nodeIdHash: String? {
 		return walletInfo?.nodeIdHash
 	}
+	
+	public var nodeId: String? {
+		return walletInfo?.nodeId.toHex()
+	}
 
 	// --------------------------------------------------
 	// MARK: Push Token

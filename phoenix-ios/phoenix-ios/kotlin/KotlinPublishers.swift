@@ -16,6 +16,7 @@ extension PeerManager {
 	
 	fileprivate struct _Key {
 		static var peerStatePublisher = 0
+		static var channelsPublisher = 0
 	}
 	
 	func peerStatePublisher() -> AnyPublisher<Lightning_kmpPeer, Never> {
@@ -30,6 +31,23 @@ extension PeerManager {
 				self.peerState
 			)
 			.compactMap { $0 }
+			.eraseToAnyPublisher()
+		}
+	}
+	
+	func channelsPublisher() -> AnyPublisher<[LocalChannelInfo], Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.channelsPublisher) {
+			
+			// Transforming from Kotlin:
+			// ```
+			// channelsFlow: StateFlow<Map<ByteVector32, LocalChannelInfo>?>
+			// ```
+			KotlinCurrentValueSubject<NSDictionary, [Bitcoin_kmpByteVector32: LocalChannelInfo]?>(
+				self.channelsFlow
+			)
+			.compactMap { $0 }
+			.map { Array($0.values) }
 			.eraseToAnyPublisher()
 		}
 	}

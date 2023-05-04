@@ -270,7 +270,7 @@ struct ConfigurationView: View {
 			case .AppAccessView             : AppAccessView()
 		// Advanced
 			case .PrivacyView               : PrivacyView()
-			case .ChannelsConfigurationView : ComingSoonView() // ChannelsConfigurationView()
+			case .ChannelsConfigurationView : ChannelsConfigurationView()
 			case .LogsConfigurationView     : LogsConfigurationView()
 			case .ResetWalletView           : ResetWalletView()
 		}

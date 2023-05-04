@@ -644,15 +644,23 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	@Binding var showOriginalFiatValue: Bool
 	
 	// <InfoGridView Protocol>
-	@State var keyColumnWidths: [InfoGridRow_KeyColumn_Width] = []
 	let minKeyColumnWidth: CGFloat = 50
 	let maxKeyColumnWidth: CGFloat = 200
 	
-	func setKeyColumnWidths(_ value: [InfoGridRow_KeyColumn_Width]) {
-		keyColumnWidths = value
+	@State var keyColumnSizes: [InfoGridRow_KeyColumn_Size] = []
+	func setKeyColumnSizes(_ value: [InfoGridRow_KeyColumn_Size]) {
+		keyColumnSizes = value
 	}
-	func getKeyColumnWidths() -> [InfoGridRow_KeyColumn_Width] {
-		return keyColumnWidths
+	func getKeyColumnSizes() -> [InfoGridRow_KeyColumn_Size] {
+		return keyColumnSizes
+	}
+	
+	@State var rowSizes: [InfoGridRow_Size] = []
+	func setRowSizes(_ sizes: [InfoGridRow_Size]) {
+		rowSizes = sizes
+	}
+	func getRowSizes() -> [InfoGridRow_Size] {
+		return rowSizes
 	}
 	// </InfoGridView Protocol>
 	
@@ -728,8 +736,10 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
 				keyColumn(NSLocalizedString("Service", comment: "Label in SummaryInfoGrid"))
@@ -748,8 +758,10 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 		
 		InfoGridRow(
 			identifier: identifier,
+			vAlignment: .firstTextBaseline,
 			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
+			keyColumnWidth: keyColumnWidth(identifier: identifier),
+			keyColumnAlignment: .trailing
 		) {
 			
 			keyColumn(NSLocalizedString("Desc", comment: "Label in SummaryInfoGrid"))
@@ -779,8 +791,10 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
 				keyColumn(NSLocalizedString("Message", comment: "Label in SummaryInfoGrid"))
@@ -802,8 +816,10 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
 				keyColumn(NSLocalizedString("Message", comment: "Label in SummaryInfoGrid"))
@@ -836,8 +852,10 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
 				keyColumn(NSLocalizedString("Message", comment: "Label in SummaryInfoGrid"))
@@ -891,8 +909,10 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
 				keyColumn(NSLocalizedString("Notes", comment: "Label in SummaryInfoGrid"))
@@ -913,8 +933,10 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
 				keyColumn(NSLocalizedString("Type", comment: "Label in SummaryInfoGrid"))
@@ -950,8 +972,10 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
 				keyColumn(NSLocalizedString("Output", comment: "Label in SummaryInfoGrid"))
@@ -993,8 +1017,10 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 		
 		InfoGridRow(
 			identifier: identifier,
+			vAlignment: .firstTextBaseline,
 			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
+			keyColumnWidth: keyColumnWidth(identifier: identifier),
+			keyColumnAlignment: .trailing
 		) {
 			
 			keyColumn(title)
@@ -1065,8 +1091,10 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
 				keyColumn(NSLocalizedString("Error", comment: "Label in SummaryInfoGrid"))

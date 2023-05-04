@@ -143,6 +143,15 @@
         "revision" : "f2616860a41f9d9932da412a8978fec79c06fe24",
         "version" : "0.1.4"
       }
+    },
+    {
+      "identity" : "swiftysegmentedpicker",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/KazaiMazai/SwiftySegmentedPicker.git",
+      "state" : {
+        "revision" : "c3c63962939c161aeef1bcef40ee97bd57eca943",
+        "version" : "0.0.2"
+      }
     }
   ],
   "version" : 2
