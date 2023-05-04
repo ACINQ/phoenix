@@ -74,6 +74,7 @@ struct SendView: MVIView {
 				.zIndex(4)
 
 		case _ as Scan.Model_InvoiceFlow_InvoiceRequest,
+		     _ as Scan.Model_OnChainFlow,
 		     _ as Scan.Model_LnurlPayFlow_LnurlPayRequest,
 		     _ as Scan.Model_LnurlPayFlow_LnurlPayFetch,
 		     _ as Scan.Model_LnurlWithdrawFlow_LnurlWithdrawRequest,
