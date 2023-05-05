@@ -178,14 +178,25 @@ fun HomeView(
             PrimarySeparator()
             Spacer(Modifier.height(24.dp))
             Column(modifier = Modifier.weight(1f, fill = true), horizontalAlignment = Alignment.CenterHorizontally) {
-                LatestPaymentsList(
-                    allPaymentsCount = allPaymentsCount,
-                    payments = payments,
-                    onPaymentClick = onPaymentClick,
-                    onPaymentsHistoryClick = onPaymentsHistoryClick,
-                    fetchPaymentDetails = { paymentsViewModel.fetchPaymentDetails(it) },
-                    isAmountRedacted = balanceDisplayMode == HomeAmountDisplayMode.REDACTED,
-                )
+                if (payments.isEmpty()) {
+                    Text(
+                        text = when {
+                            swapInBalance.value.total > 0.sat -> stringResource(id = R.string.home__payments_none_incoming)
+                            else -> stringResource(id = R.string.home__payments_none)
+                        },
+                        style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center),
+                        modifier = Modifier.padding(horizontal = 32.dp).widthIn(max = 250.dp)
+                    )
+                } else {
+                    LatestPaymentsList(
+                        allPaymentsCount = allPaymentsCount,
+                        payments = payments,
+                        onPaymentClick = onPaymentClick,
+                        onPaymentsHistoryClick = onPaymentsHistoryClick,
+                        fetchPaymentDetails = { paymentsViewModel.fetchPaymentDetails(it) },
+                        isAmountRedacted = balanceDisplayMode == HomeAmountDisplayMode.REDACTED,
+                    )
+                }
             }
             Spacer(modifier = Modifier.heightIn(min = 8.dp))
             BottomBar(onSettingsClick, onReceiveClick, onSendClick)
@@ -402,8 +413,8 @@ private fun IncomingAmountNotif(
         )
     }
 
-    if (swapInBalance != WalletBalance.empty()) {
-        val balance = swapInBalance.total.toMilliSatoshi() + channelConfirmationBalance
+    val balance = swapInBalance.total.toMilliSatoshi() + channelConfirmationBalance
+    if (balance > 0.msat) {
         FilledButton(
             icon = R.drawable.ic_chain,
             iconTint = MaterialTheme.typography.caption.color,
@@ -474,33 +485,26 @@ private fun ColumnScope.LatestPaymentsList(
             textStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
         )
     }
-    if (payments.isEmpty()) {
-        Text(
-            text = stringResource(id = R.string.home__payments_none),
-            style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center),
-            modifier = Modifier.padding(horizontal = 32.dp)
-        )
-    } else {
-        LazyColumn(
-            modifier = Modifier.weight(1f, fill = false),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            itemsIndexed(
-                items = payments,
-            ) { index, item ->
-                if (item.paymentInfo == null) {
-                    LaunchedEffect(key1 = item.orderRow.identifier) {
-                        fetchPaymentDetails(item.orderRow)
-                    }
-                    PaymentLineLoading(item.orderRow.id, onPaymentClick)
-                } else {
-                    PaymentLine(item.paymentInfo, onPaymentClick, isAmountRedacted)
+
+    LazyColumn(
+        modifier = Modifier.weight(1f, fill = false),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        itemsIndexed(
+            items = payments,
+        ) { index, item ->
+            if (item.paymentInfo == null) {
+                LaunchedEffect(key1 = item.orderRow.identifier) {
+                    fetchPaymentDetails(item.orderRow)
                 }
-                if (payments.isNotEmpty() && allPaymentsCount > PaymentsViewModel.latestPaymentsCount && index == payments.size - 1) {
-                    Spacer(Modifier.height(16.dp))
-                    morePaymentsButton()
-                    Spacer(Modifier.height(80.dp))
-                }
+                PaymentLineLoading(item.orderRow.id, onPaymentClick)
+            } else {
+                PaymentLine(item.paymentInfo, onPaymentClick, isAmountRedacted)
+            }
+            if (payments.isNotEmpty() && allPaymentsCount > PaymentsViewModel.latestPaymentsCount && index == payments.size - 1) {
+                Spacer(Modifier.height(16.dp))
+                morePaymentsButton()
+                Spacer(Modifier.height(80.dp))
             }
         }
     }

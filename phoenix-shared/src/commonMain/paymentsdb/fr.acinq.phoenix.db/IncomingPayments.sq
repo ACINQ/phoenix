@@ -84,6 +84,7 @@ LEFT OUTER JOIN link_tx_to_payments
     ON link_tx_to_payments.type = 1
     AND link_tx_to_payments.confirmed_at IS NULL
     AND link_tx_to_payments.id = incoming_payments.payment_hash
+WHERE received_at IS NOT NULL
 ;
 
 scanCompleted:

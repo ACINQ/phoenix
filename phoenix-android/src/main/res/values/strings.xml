@@ -208,6 +208,7 @@
     <!-- #1: sign / #2: integer part / #3: decimal part / #4: unit -->
     <string name="utils_rounded">≈</string>
     <string name="utils_converted_amount">≈ %1$s</string>
+    <string name="utils_fee_rate">%1$s sat/byte</string>
     <string name="utils_unknown_amount" translatable="false">!?</string>
     <string name="utils_no_conversion">BTC exchange rate unavailable</string>
     <string name="utils_amount_hint">Amount</string>
@@ -220,9 +221,9 @@
     <string name="utils_loading_prefs">Loading preferences…</string>
     <string name="utils_copied">Copied to clipboard!</string>
 
-    <string name="accessibility_link">Open a link in a browser</string>
+    <string name="accessibility_link">Open link in a browser</string>
     <string name="validation_empty">This field cannot be blank</string>
-    <string name="validation_invalid_number">Please enter a valid amount</string>
+    <string name="validation_invalid_number">Please enter a valid number</string>
     <string name="validation_no_decimal">This field must be an integer</string>
     <string name="validation_below_min">Must be at least %1$s</string>
     <string name="validation_above_max">Must be no more than %1$s</string>
@@ -330,6 +331,7 @@
 
     <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">You have not made any payments recently.\n\nUse the Receive and Send buttons at the bottom of this screen to get started!</string>
+    <string name="home__payments_none_incoming">You have some payments incoming.\n\nOnce they are confirmed, you will see them here.</string>
     <string name="home__payments_header">Recent payments</string>
     <string name="home__payments_more_button">Show all payments…</string>
     <string name="home__connection__bad_cert">Electrum certificate</string>
@@ -398,6 +400,8 @@
     <string name="paymentdetails_error_label">Error</string>
     <string name="paymentdetails_no_description">No description</string>
     <string name="paymentdetails_info_uniclose">This payment happened following a conflict in a channel.</string>
+
+    <string name="paymentdetails_onchain_confirmation">Confirmations</string>
 
     <string name="paymentdetails_desc_splice_out">On-chain payment</string>
     <string name="paymentdetails_desc_closing_channel">Closing channel</string>
@@ -616,7 +620,6 @@
     <string name="electrum_fee_rate_label">Fee rate</string>
     <string name="electrum_xpub_label">Master public key</string>
     <string name="electrum_xpub_value">%1$s\n\nPath: %2$s</string>
-    <string name="electrum_fee_rate">%1$s sat/byte</string>
     <string name="electrum_connection_label">Server</string>
 
     <string name="electrum_connection_closed_with_random">Disconnected from Electrum</string>

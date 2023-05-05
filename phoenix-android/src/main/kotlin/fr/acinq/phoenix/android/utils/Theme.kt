@@ -247,6 +247,8 @@ fun mutedItalicTypo(): TextStyle = MaterialTheme.typography.body1.copy(fontStyle
 
 val monoTypo @Composable get() = MaterialTheme.typography.body1.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp)
 
+val warningColor @Composable get() = orange
+
 val negativeColor @Composable get() = if (isDarkTheme) red500 else red300
 
 val positiveColor @Composable get() = if (isDarkTheme) green else applegreen

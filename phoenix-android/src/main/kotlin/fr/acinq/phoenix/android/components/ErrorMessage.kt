@@ -22,6 +22,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
@@ -35,6 +36,7 @@ import fr.acinq.phoenix.android.utils.negativeColor
 fun ErrorMessage(
     errorHeader: String,
     errorDetails: String? = null,
+    errorColor: Color = negativeColor,
     padding: PaddingValues = PaddingValues(16.dp),
     modifier: Modifier = Modifier,
     alignment: Alignment.Horizontal = Alignment.Start,
@@ -46,7 +48,7 @@ fun ErrorMessage(
         TextWithIcon(
             text = errorHeader,
             icon = R.drawable.ic_alert_triangle,
-            iconTint = negativeColor,
+            iconTint = errorColor,
             maxLines = 1,
             textOverflow = TextOverflow.Ellipsis
         )
@@ -62,6 +64,7 @@ fun ErrorMessage(
     }
 }
 
+// Same as above, but with annotated-string details that supports html markups.
 @Composable
 fun ErrorMessage(
     errorHeader: String,

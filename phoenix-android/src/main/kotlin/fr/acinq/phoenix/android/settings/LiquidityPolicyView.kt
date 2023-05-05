@@ -19,7 +19,6 @@ package fr.acinq.phoenix.android.settings
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
-import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -162,10 +161,11 @@ private fun FeePolicyEditor(
                 style = MaterialTheme.typography.body2.copy(fontSize = 14.sp)
             )
             Spacer(Modifier.width(16.dp))
-            Slider(
-                value = maxAbsoluteFee.sat.toFloat(),
-                onValueChange = { onMaxAbsoluteFeeChange(it.toLong().sat) },
-                valueRange = 300f..10_000f, // max 10k sat
+            SatoshiSlider(
+                amount = maxAbsoluteFee,
+                onAmountChange = onMaxAbsoluteFeeChange,
+                minAmount = 300.sat,
+                maxAmount = 10_000.sat,
                 modifier = Modifier.weight(1f),
             )
         }

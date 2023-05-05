@@ -38,15 +38,20 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.blockchain.electrum.getConfirmations
+import fr.acinq.lightning.blockchain.fee.FeeratePerByte
+import fr.acinq.lightning.blockchain.fee.FeeratePerKw
+import fr.acinq.lightning.channel.Command
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.*
-import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.data.WalletPaymentId
@@ -65,15 +70,16 @@ fun PaymentDetailsSplashView(
     onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
     fromEvent: Boolean,
 ) {
+    val payment = data.payment
     SplashLayout(
         header = { DefaultScreenHeader(onBackClick = onBackClick) },
         topContent = { PaymentStatus(data.payment, fromEvent) }
     ) {
         AmountWithAltView(
-            amount = data.payment.amount,
+            amount = payment.amount,
             amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 30.sp),
             separatorSpace = 4.dp,
-            isOutgoing = data.payment is OutgoingPayment
+            isOutgoing = payment is OutgoingPayment
         )
 
         Spacer(modifier = Modifier.height(36.dp))
@@ -81,8 +87,24 @@ fun PaymentDetailsSplashView(
         Spacer(modifier = Modifier.height(36.dp))
 
         PaymentDescriptionView(data = data, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
-        PaymentDestinationView(payment = data.payment)
-        PaymentFeeView(payment = data.payment)
+        PaymentDestinationView(payment = payment)
+        PaymentFeeView(payment = payment)
+
+        when (payment) {
+            is ChannelCloseOutgoingPayment -> {
+                ConfirmationView(payment.txId, payment.channelId)
+            }
+            is SpliceOutgoingPayment -> {
+                ConfirmationView(payment.txId, payment.channelId)
+            }
+            is IncomingPayment -> {
+//                Text(text = "${payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>()}")
+                payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>()?.map { it.txId to it.channelId }?.firstOrNull()?.let { (txId, channelId) ->
+                    ConfirmationView(txId = txId, channelId = channelId)
+                }
+            }
+            else -> {}
+        }
 
         data.payment.errorMessage()?.let { errorMessage ->
             Spacer(modifier = Modifier.height(8.dp))
@@ -133,7 +155,6 @@ private fun PaymentStatus(
         }
         is ChannelCloseOutgoingPayment -> when (payment.confirmedAt) {
             null -> {
-
                 val nodeParams = business.nodeParamsManager.nodeParams.value
                 // TODO get depth for closing
                 PaymentStatusIcon(
@@ -427,5 +448,63 @@ private fun EditPaymentDetails(
                 onTextChange = { description = it.takeIf { it.isNotBlank() } },
             )
         }
+    }
+}
+
+@Composable
+private fun ConfirmationView(
+    txId: ByteVector32,
+    channelId: ByteVector32,
+) {
+    val electrumClient = business.electrumClient
+    var confirmation by remember { mutableStateOf<Int?>(null) }
+    LaunchedEffect(key1 = txId) {
+        confirmation = electrumClient.getConfirmations(txId)
+    }
+    SplashLabelRow(
+        label = stringResource(id = R.string.paymentdetails_onchain_confirmation),
+        helpMessage = "How many confirmations the on-chain transaction for this payment has"
+    ) {
+        confirmation?.let { conf ->
+            Text(text = "$conf")
+
+            if (conf == 0) {
+                var showBumpTxDialog by remember { mutableStateOf(false) }
+                val scope = rememberCoroutineScope()
+                val peerManager = business.peerManager
+
+                if (showBumpTxDialog) {
+                    Dialog(
+                        onDismiss = { showBumpTxDialog = false },
+                        title = "Bump transaction",
+                        buttons = null,
+                    ) {
+//                        var estimateRes by remember { mutableStateOf<Command.Splice.Response?>(null)}
+                        var spliceRes by remember { mutableStateOf<Command.Splice.Response?>(null)}
+                        Text(text = "This transaction is unconfirmed. You can bump it with CPFP.")
+                        Text(text = "**** splice-res=$spliceRes")
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(text= "Do it for 50 sat/b", onClick = {
+                            scope.launch {
+                                val peer = peerManager.getPeer()
+                                val res = peer.estimateFeeForSpliceCpfp(
+                                    channelId = channelId,
+                                    targetFeerate = FeeratePerKw(FeeratePerByte(50.sat))
+                                )
+                                if (res != null) {
+                                    val (actualFeerate, fee) = res
+                                    spliceRes = peer.spliceCpfp(channelId, actualFeerate)
+                                }
+                            }
+                        })
+                    }
+                }
+
+                Button(
+                    text = "Bump transaction",
+                    onClick = { showBumpTxDialog = true }
+                )
+            }
+        } ?: ProgressView(text = "getting transaction details...", padding = PaddingValues(0.dp))
     }
 }

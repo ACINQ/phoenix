@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS splice_outgoing_payments (
     address TEXT NOT NULL,
     mining_fees_sat INTEGER NOT NULL,
     tx_id BLOB NOT NULL,
+    channel_id BLOB NOT NULL,
     created_at INTEGER NOT NULL,
     confirmed_at INTEGER DEFAULT NULL
 );

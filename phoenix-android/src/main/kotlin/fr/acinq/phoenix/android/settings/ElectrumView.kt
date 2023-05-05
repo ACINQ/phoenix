@@ -148,7 +148,7 @@ fun ElectrumView() {
 
                 // fee rate
                 if (model.feeRate > 0) {
-                    Setting(title = stringResource(id = R.string.electrum_fee_rate_label), description = stringResource(id = R.string.electrum_fee_rate, model.feeRate.toString()))
+                    Setting(title = stringResource(id = R.string.electrum_fee_rate_label), description = stringResource(id = R.string.utils_fee_rate, model.feeRate.toString()))
                 }
 
                 // xpub

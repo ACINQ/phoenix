@@ -43,7 +43,6 @@ fun ChannelState.localBalance(): MilliSatoshi? {
         is Closed -> 0.msat
         is Aborted -> null
         // balance is unknown
-        is ErrorInformationLeak -> null
         is LegacyWaitForFundingLocked -> null
         is LegacyWaitForFundingConfirmed -> null
         is WaitForAcceptChannel -> null

@@ -20,6 +20,7 @@ data class SpliceOutgoingPaymentWrapper(
     val address: String,
     val miningFeeSat: Long,
     @ByteString val txId: ByteArray,
+    @ByteString val channelId: ByteArray,
     val createdAt: Long,
     val confirmedAt: Long?
 ) {
@@ -29,6 +30,7 @@ data class SpliceOutgoingPaymentWrapper(
         address = payment.address,
         miningFeeSat = payment.miningFees.sat,
         txId = payment.txId.toByteArray(),
+        channelId = payment.channelId.toByteArray(),
         createdAt = payment.createdAt,
         confirmedAt = payment.confirmedAt
     )
@@ -40,6 +42,7 @@ data class SpliceOutgoingPaymentWrapper(
         address = address,
         miningFees = miningFeeSat.sat,
         txId = txId.toByteVector32(),
+        channelId = channelId.toByteVector32(),
         createdAt = createdAt,
         confirmedAt = confirmedAt
     )

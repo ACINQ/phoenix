@@ -83,7 +83,7 @@ class PhoenixBusiness(
 
     val chain = NodeParams.Chain.Testnet
 
-    internal val electrumClient by lazy { ElectrumClient(null, MainScope(), loggerFactory) }
+    val electrumClient by lazy { ElectrumClient(null, MainScope(), loggerFactory) }
     internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope(), loggerFactory) }
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
