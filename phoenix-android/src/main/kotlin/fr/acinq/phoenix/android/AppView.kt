@@ -124,8 +124,8 @@ fun AppView(
                         onShowIntro = { navController.navigate(Screen.Intro.route) },
                         onKeyAbsent = { navController.navigate(Screen.InitWallet.route) },
                         onBusinessStarted = {
-                            val next = nextScreenLink?.takeIf { it.isNotBlank() }?.let { Uri.parse(it) }
-                            if (next == null) {
+                            val next = nextScreenLink?.takeUnless { it.isBlank() }?.let { Uri.parse(it) }
+                            if (next == null || !navController.graph.hasDeepLink(next)) {
                                 popToHome(navController)
                             } else {
                                 navController.navigate(next, navOptions = navOptions { popUpTo(Screen.Home.route) { inclusive = true } })
