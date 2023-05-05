@@ -16,14 +16,11 @@
 
 package fr.acinq.phoenix.android.payments
 
-import android.content.Context
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,239 +38,276 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.sat
-import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.utils.*
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.controllers.payments.Receive
-import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.managers.WalletBalance
 
-sealed class ReceiveViewState {
-    object Default : ReceiveViewState()
-    object EditInvoice : ReceiveViewState()
-    data class Error(val e: Throwable) : ReceiveViewState()
-}
 
 @Composable
 fun ReceiveView(
+    onBackClick: () -> Unit,
     onSwapInReceived: () -> Unit
 ) {
-    val log = logger("ReceiveView")
-    val nc = navController
     val context = LocalContext.current
-    val business = business
-    val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(context).collectAsState(null)
-    val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(context).collectAsState(null)
+    val balanceManager = business.balanceManager
+    val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(business.peerManager))
+    val defaultInvoiceExpiry by UserPrefs.getInvoiceDefaultExpiry(context).collectAsState(null)
+    val defaultInvoiceDesc by UserPrefs.getInvoiceDefaultDesc(context).collectAsState(null)
 
-    safeLet(invoiceDefaultDesc, invoiceDefaultExpiry) { description, expiry ->
-        val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(controllerFactory, CF::receive, description, expiry))
-        MVIView(vm) { model, postIntent ->
-            // effect when a swap-in is received
-            LaunchedEffect(key1 = Unit) {
-                var previousBalance: WalletBalance? = null
-                business.balanceManager.swapInWalletBalance.collect {
-                    if (previousBalance != null && it.total > 0.sat && it != previousBalance) {
-                        onSwapInReceived()
-                    } else {
-                        previousBalance = it
-                    }
-                }
+    // When a on-chain payment has been received, go back to the home screen (via the onSwapInReceived callback)
+    LaunchedEffect(key1 = Unit) {
+        var previousBalance: WalletBalance? = null
+        balanceManager.swapInWalletBalance.collect {
+            if (previousBalance != null && it.total > 0.sat && it != previousBalance) {
+                onSwapInReceived()
+            } else {
+                previousBalance = it
             }
-            // back action handler
-            val onBack: () -> Unit = {
-                when (vm.state) {
-                    is ReceiveViewState.EditInvoice -> vm.state = ReceiveViewState.Default
-                    else -> when (model) {
-                        is Receive.Model.SwapIn -> vm.generateInvoice()
-                        else -> nc.popBackStack()
-                    }
+        }
+    }
+
+    DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally, isScrollable = false) {
+        DefaultScreenHeader(
+            title = if (vm.isEditingLightningInvoice) {
+                stringResource(id = R.string.receive_lightning_edit_title)
+            } else null,
+            onBackClick = {
+                if (vm.isEditingLightningInvoice) {
+                    vm.isEditingLightningInvoice = false
+                } else {
+                    onBackClick()
                 }
-            }
-            DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally) {
-                DefaultScreenHeader(
-                    title = when (vm.state) {
-                        is ReceiveViewState.EditInvoice -> stringResource(id = R.string.receive__edit__title)
-                        else -> null
-                    },
-                    onBackClick = onBack,
-                )
-                when (vm.state) {
-                    is ReceiveViewState.EditInvoice -> EditInvoiceView(
-                        amount = vm.customAmount,
-                        description = vm.customDesc,
-                        onDescriptionChange = { vm.customDesc = it },
-                        onAmountChange = { vm.customAmount = it },
-                        onSubmit = { vm.generateInvoice() },
-                    )
-                    is ReceiveViewState.Default -> {
-                        when (model) {
-                            is Receive.Model.Awaiting -> {
-                                LaunchedEffect(key1 = true) { vm.generateInvoice() }
-                                GeneratingLightningInvoiceView(
-                                    onSwapInClick = { postIntent(Receive.Intent.RequestSwapIn) },
-                                    onEdit = { vm.state = ReceiveViewState.EditInvoice }
-                                )
-                            }
-                            is Receive.Model.Generating -> {
-                                GeneratingLightningInvoiceView(
-                                    onSwapInClick = { postIntent(Receive.Intent.RequestSwapIn) },
-                                    onEdit = { vm.state = ReceiveViewState.EditInvoice }
-                                )
-                            }
-                            is Receive.Model.Generated -> {
-                                LaunchedEffect(model.request) {
-                                    vm.generateQrCodeBitmap(invoice = model.request)
-                                }
-                                LightningInvoiceView(
-                                    context = context,
-                                    amount = model.amount,
-                                    description = model.desc,
-                                    paymentRequest = model.request,
-                                    bitmap = vm.qrBitmap,
-                                    onEdit = { vm.state = ReceiveViewState.EditInvoice },
-                                    onSwapInClick = { postIntent(Receive.Intent.RequestSwapIn) },
-                                )
-                            }
-                            is Receive.Model.SwapIn -> {
-                                LaunchedEffect(model.address) {
-                                    vm.generateQrCodeBitmap(invoice = model.address)
-                                }
-                                SwapInView(context = context, address = model.address, bitmap = vm.qrBitmap)
-                            }
-                        }
-                    }
-                    is ReceiveViewState.Error -> Text("Failed to generate an invoice. Please try again.")
-                }
+            },
+        )
+        safeLet(defaultInvoiceDesc, defaultInvoiceExpiry) { desc, exp ->
+            ReceiveViewPages(vm = vm, defaultInvoiceDescription = desc, defaultInvoiceExpiry = exp)
+        } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
+    }
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun ReceiveViewPages(
+    vm: ReceiveViewModel,
+    defaultInvoiceDescription: String,
+    defaultInvoiceExpiry: Long,
+) {
+    val pagerState = rememberPagerState()
+    HorizontalPager(
+        modifier = Modifier.fillMaxHeight(),
+        count = 2,
+        state = pagerState,
+        contentPadding = PaddingValues(horizontal = 44.dp),
+        verticalAlignment = Alignment.Top
+    ) { index ->
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 48.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            when (index) {
+                0 -> LightningInvoiceView(vm = vm, defaultDescription = defaultInvoiceDescription, expiry = defaultInvoiceExpiry)
+                1 -> BitcoinAddressView(state = vm.bitcoinAddressState)
             }
         }
     }
 }
 
 @Composable
-private fun GeneratingLightningInvoiceView(
-    onSwapInClick: () -> Unit,
-    onEdit: () -> Unit,
+private fun InvoiceHeader(
+    label: String,
+    helpMessage: String,
+    icon: Int
 ) {
-    Spacer(modifier = Modifier.height(24.dp))
-    Box(contentAlignment = Alignment.Center) {
-        QRCodeView(bitmap = null, address = null)
-        ProgressView(
-            text = stringResource(id = R.string.receive__generating),
-            modifier = Modifier
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colors.surface),
+    Row {
+        IconPopup(
+            icon = icon,
+            iconSize = 24.dp,
+            iconPadding = 4.dp,
+            colorAtRest = MaterialTheme.colors.primary,
+            spaceRight = 8.dp,
+            spaceLeft = null,
+            popupMessage = helpMessage
         )
+        Text(text = label)
     }
-    Spacer(modifier = Modifier.height(24.dp))
-    CopyShareEditButtons(
-        onCopy = { },
-        onShare = { },
-        onEdit = onEdit
-    )
-    Spacer(modifier = Modifier.height(24.dp))
-    BorderButton(
-        text = stringResource(id = R.string.receive__swapin_button),
-        icon = R.drawable.ic_swap,
-        onClick = onSwapInClick
-    )
+    Spacer(modifier = Modifier.height(16.dp))
 }
 
 @Composable
 private fun LightningInvoiceView(
-    context: Context,
-    amount: MilliSatoshi?,
-    description: String?,
-    paymentRequest: String,
-    bitmap: ImageBitmap?,
-    onEdit: () -> Unit,
-    onSwapInClick: () -> Unit
+    vm: ReceiveViewModel,
+    defaultDescription: String,
+    expiry: Long,
 ) {
-    Spacer(modifier = Modifier.height(24.dp))
-    QRCodeView(address = paymentRequest, bitmap = bitmap, details = {
-        if (amount != null || !description.isNullOrBlank()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = onEdit)
-                    .padding(bottom = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                if (amount != null) {
-                    QRCodeDetail(label = stringResource(id = R.string.receive__qr_amount_label)) {
-                        AmountWithFiatColumnView(
-                            amount = amount,
-                            amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
-                            fiatTextStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
-                        )
-                    }
-                }
-                if (!description.isNullOrBlank()) {
-                    QRCodeDetail(
-                        label = stringResource(id = R.string.receive__qr_desc_label),
-                        value = description,
-                        maxLines = 2
-                    )
-                }
+    val paymentsManager = business.paymentsManager
+    var customDesc by remember { mutableStateOf(defaultDescription) }
+    var customAmount by remember { mutableStateOf<MilliSatoshi?>(null) }
+
+    // refresh LN invoice when it has been paid
+    LaunchedEffect(key1 = Unit) {
+        paymentsManager.lastCompletedPayment.collect {
+            val state = vm.lightningInvoiceState
+            if (state is ReceiveViewModel.LightningInvoiceState.Show && it is IncomingPayment && state.paymentRequest.paymentHash == it.paymentHash) {
+                vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = expiry)
             }
         }
-    })
-    Spacer(modifier = Modifier.height(24.dp))
-    CopyShareEditButtons(
-        onCopy = { copyToClipboard(context, data = paymentRequest) },
-        onShare = { share(context, "lightning:$paymentRequest", context.getString(R.string.receive__share__subject), context.getString(R.string.receive__share__title)) },
-        onEdit = onEdit
+    }
+
+    val onEdit = { vm.isEditingLightningInvoice = true }
+
+    InvoiceHeader(
+        label = stringResource(id = R.string.receive_lightning_title),
+        helpMessage = stringResource(id = R.string.receive_lightning_help),
+        icon = R.drawable.ic_zap
     )
-    Spacer(modifier = Modifier.height(24.dp))
-    BorderButton(
-        text = stringResource(id = R.string.receive__swapin_button),
-        icon = R.drawable.ic_swap,
-        onClick = onSwapInClick
-    )
+
+    val state = vm.lightningInvoiceState
+    val isEditing = vm.isEditingLightningInvoice
+    when {
+        state is ReceiveViewModel.LightningInvoiceState.Init -> {
+            LaunchedEffect(key1 = Unit) {
+                vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = expiry)
+            }
+            GeneratingLightningInvoice(bitmap = vm.lightningQRBitmap)
+            CopyShareEditButtons(onCopy = { }, onShare = { }, onEdit = onEdit)
+        }
+        isEditing -> {
+            EditInvoiceView(
+                amount = customAmount,
+                description = customDesc,
+                onAmountChange = { customAmount = it },
+                onDescriptionChange = { customDesc = it },
+                onCancel = { vm.isEditingLightningInvoice = false },
+                onSubmit = { vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = expiry) }
+            )
+        }
+        state is ReceiveViewModel.LightningInvoiceState.Generating -> {
+            GeneratingLightningInvoice(bitmap = vm.lightningQRBitmap)
+            CopyShareEditButtons(onCopy = { }, onShare = { }, onEdit = onEdit)
+        }
+        state is ReceiveViewModel.LightningInvoiceState.Show -> {
+            DisplayLightningInvoice(
+                paymentRequest = state.paymentRequest,
+                bitmap = vm.lightningQRBitmap,
+                onEdit = onEdit
+            )
+        }
+        state is ReceiveViewModel.LightningInvoiceState.Error -> {
+            ErrorMessage(
+                errorHeader = "Failed to generate invoice",
+                errorDetails = state.e.localizedMessage
+            )
+        }
+    }
 }
 
 @Composable
-private fun SwapInView(
-    context: Context,
-    address: String,
-    bitmap: ImageBitmap?
-) {
-    Spacer(modifier = Modifier.height(24.dp))
-    QRCodeView(address = address, bitmap = bitmap) {
-        QRCodeDetail(label = stringResource(id = R.string.receive__swapin__address_label), value = address)
-        Spacer(modifier = Modifier.height(16.dp))
+private fun GeneratingLightningInvoice(bitmap: ImageBitmap?) {
+    Box(contentAlignment = Alignment.Center) {
+        QRCodeView(bitmap = bitmap, data = null)
+        Card(shape = RoundedCornerShape(16.dp)) { ProgressView(text = stringResource(id = R.string.receive_lightning_generating)) }
     }
-    Spacer(modifier = Modifier.height(24.dp))
+}
+
+@Composable
+private fun DisplayLightningInvoice(
+    paymentRequest: PaymentRequest,
+    bitmap: ImageBitmap?,
+    onEdit: () -> Unit,
+) {
+    val context = LocalContext.current
+    val prString = remember(paymentRequest) { paymentRequest.write() }
+    val amount = paymentRequest.amount
+    val description = paymentRequest.description.takeUnless { it.isNullOrBlank() }
+
+    QRCodeView(data = prString, bitmap = bitmap)
+
     CopyShareEditButtons(
-        onCopy = { copyToClipboard(context, data = address) },
-        onShare = { share(context, "bitcoin:$address", context.getString(R.string.receive__share__subject), context.getString(R.string.receive__share__title)) },
-        onEdit = null
+        onCopy = { copyToClipboard(context, data = prString) },
+        onShare = { share(context, "lightning:$prString", context.getString(R.string.receive_lightning_share_subject), context.getString(R.string.receive_lightning_share_title)) },
+        onEdit = onEdit
     )
-    LocalWalletContext.current?.swapIn?.v1?.let { swapInConfig ->
-        val minFunding = swapInConfig.minFundingSat.sat
-        val feePercent = String.format("%.2f", 100 * (swapInConfig.feePercent))
-        val minFee = swapInConfig.minFeeSat
+
+    if (amount != null || description != null) {
         Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = annotatedStringResource(id = R.string.receive__swapin__disclaimer, minFunding.toPrettyString(BitcoinUnit.Sat, withUnit = true), feePercent, minFee),
-            style = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
-            textAlign = TextAlign.Center,
+        HSeparator(width = 50.dp)
+        Column(
             modifier = Modifier
-                .widthIn(max = 400.dp)
-                .padding(horizontal = 32.dp)
-        )
+                .clickable(onClick = onEdit, role = Role.Button, onClickLabel = stringResource(id = R.string.receive_lightning_edit_title))
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            if (amount != null) {
+                QRCodeDetail(label = stringResource(id = R.string.receive_lightning_amount_label)) {
+                    AmountWithFiatColumnView(
+                        amount = amount,
+                        amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
+                        fiatTextStyle = MaterialTheme.typography.caption.copy(fontSize = 13.sp),
+                    )
+                }
+            }
+            if (!description.isNullOrBlank()) {
+                QRCodeDetail(
+                    label = stringResource(id = R.string.receive_lightning_desc_label),
+                    value = description,
+                    maxLines = 2
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BitcoinAddressView(
+    state: ReceiveViewModel.BitcoinAddressState,
+) {
+    val context = LocalContext.current
+
+    InvoiceHeader(
+        label = stringResource(id = R.string.receive_bitcoin_title),
+        helpMessage = stringResource(id = R.string.receive_bitcoin_help),
+        icon = R.drawable.ic_chain
+    )
+
+    when (state) {
+        is ReceiveViewModel.BitcoinAddressState.Init -> {
+            QRCodeView(data = null, bitmap = null)
+            CopyShareEditButtons(onCopy = { }, onShare = { }, onEdit = null)
+        }
+        is ReceiveViewModel.BitcoinAddressState.Show -> {
+            QRCodeView(data = state.address, bitmap = state.image)
+            CopyShareEditButtons(
+                onCopy = { copyToClipboard(context, data = state.address) },
+                onShare = { share(context, "bitcoin:${state.address}", context.getString(R.string.receive_bitcoin_share_subject), context.getString(R.string.receive_bitcoin_share_title)) },
+                onEdit = null
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            HSeparator(width = 50.dp)
+            Spacer(modifier = Modifier.height(16.dp))
+            QRCodeDetail(label = stringResource(id = R.string.receive_bitcoin_address_label), value = state.address)
+        }
+        is ReceiveViewModel.BitcoinAddressState.Error -> {
+            ErrorMessage(errorHeader = stringResource(id = R.string.receive_bitcoin_error), errorDetails = state.e.localizedMessage)
+        }
     }
 }
 
 @Composable
 private fun QRCodeView(
-    address: String?,
+    data: String?,
     bitmap: ImageBitmap?,
     details: @Composable () -> Unit = {},
 ) {
@@ -289,7 +323,7 @@ private fun QRCodeView(
             .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        QRCodeImage(bitmap) { address?.let { copyToClipboard(context, it) } }
+        QRCodeImage(bitmap) { data?.let { copyToClipboard(context, it) } }
         details()
     }
 }
@@ -304,7 +338,7 @@ private fun QRCodeImage(
     val image: @Composable () -> Unit = {
         if (bitmap == null) {
             Image(
-                painter = painterResource(id = R.drawable.qrcode_placeholder),
+                painter = painterResource(id = R.drawable.ic_white),
                 contentDescription = null,
                 alignment = Alignment.Center,
                 contentScale = ContentScale.FillWidth,
@@ -312,7 +346,7 @@ private fun QRCodeImage(
         } else {
             Image(
                 bitmap = bitmap,
-                contentDescription = stringResource(id = R.string.receive__qr_about),
+                contentDescription = stringResource(id = R.string.receive_help_qr),
                 alignment = Alignment.Center,
                 contentScale = ContentScale.FillWidth,
             )
@@ -360,8 +394,8 @@ private fun QRCodeDetail(label: String, value: String, maxLines: Int = Int.MAX_V
 private fun QRCodeDetail(label: String, content: @Composable () -> Unit) {
     Row(modifier = Modifier.padding(horizontal = 24.dp)) {
         Text(
-            text = label,
-            style = MaterialTheme.typography.caption.copy(fontSize = 14.sp, textAlign = TextAlign.End),
+            text = label.uppercase(),
+            style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp, textAlign = TextAlign.Start),
             modifier = Modifier.alignBy(FirstBaseline)
         )
         Spacer(modifier = Modifier.width(8.dp))
@@ -377,20 +411,15 @@ private fun CopyShareEditButtons(
     onShare: () -> Unit,
     onEdit: (() -> Unit)?,
 ) {
+    Spacer(modifier = Modifier.height(32.dp))
     Row(modifier = Modifier.padding(horizontal = 32.dp)) {
-        BorderButton(
-            icon = R.drawable.ic_copy,
-            onClick = onCopy
-        )
+        BorderButton(icon = R.drawable.ic_copy, onClick = onCopy)
         Spacer(modifier = Modifier.width(16.dp))
-        BorderButton(
-            icon = R.drawable.ic_share,
-            onClick = onShare
-        )
+        BorderButton(icon = R.drawable.ic_share, onClick = onShare)
         if (onEdit != null) {
             Spacer(modifier = Modifier.width(16.dp))
             BorderButton(
-                text = stringResource(id = R.string.receive__edit_button),
+                text = stringResource(id = R.string.receive_lightning_edit_button),
                 icon = R.drawable.ic_edit,
                 onClick = onEdit
             )
@@ -401,39 +430,57 @@ private fun CopyShareEditButtons(
 @Composable
 private fun EditInvoiceView(
     amount: MilliSatoshi?,
-    description: String,
+    description: String?,
     onDescriptionChange: (String) -> Unit,
     onAmountChange: (MilliSatoshi?) -> Unit,
+    onCancel: () -> Unit,
     onSubmit: () -> Unit,
 ) {
     val log = logger("EditInvoiceView")
-    Card(internalPadding = PaddingValues(16.dp)) {
-        AmountInput(
-            initialAmount = amount,
-            label = { Text(text = stringResource(id = R.string.receive__edit__amount_label)) },
-            placeholder = { Text(text = stringResource(id = R.string.receive__edit__amount_placeholder)) },
-            onAmountChange = { complexAmount ->
-                log.debug { "invoice amount update amount=$complexAmount" }
-                onAmountChange(complexAmount?.amount)
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(Modifier.height(8.dp))
-        TextInput(
-            text = description,
-            onTextChange = onDescriptionChange,
-            label = { Text(stringResource(id = R.string.receive__edit__desc_label)) },
-            maxLines = 3,
-            maxChars = 180,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-    Card {
-        Button(
-            text = stringResource(id = R.string.receive__edit__generate_button),
-            icon = R.drawable.ic_qrcode,
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onSubmit,
-        )
+    Column(
+        modifier = Modifier
+            .width(320.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .border(
+                border = BorderStroke(1.dp, MaterialTheme.colors.primary),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .background(MaterialTheme.colors.surface),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            AmountInput(
+                initialAmount = amount,
+                label = { Text(text = stringResource(id = R.string.receive_lightning_edit_amount_label)) },
+                placeholder = { Text(text = stringResource(id = R.string.receive_lightning_edit_amount_placeholder)) },
+                onAmountChange = { complexAmount ->
+                    log.debug { "invoice amount update amount=$complexAmount" }
+                    onAmountChange(complexAmount?.amount)
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(8.dp))
+            TextInput(
+                text = description ?: "",
+                onTextChange = onDescriptionChange,
+                label = { Text(stringResource(id = R.string.receive_lightning_edit_desc_label)) },
+                maxChars = 180,
+                maxLines = Int.MAX_VALUE,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        Row {
+            Button(
+                icon = R.drawable.ic_arrow_back,
+                onClick = onCancel,
+            )
+            Button(
+                text = stringResource(id = R.string.receive_lightning_edit_generate_button),
+                icon = R.drawable.ic_qrcode,
+                modifier = Modifier.weight(1f),
+                onClick = onSubmit,
+            )
+        }
+
     }
 }

@@ -244,6 +244,7 @@ fun Button(
     shape: Shape = RectangleShape,
     border: BorderStroke? = null,
     elevation: ButtonElevation? = null,
+    role: Role = Role.Button,
     backgroundColor: Color = Color.Unspecified, // transparent by default!
     onClickLabel: String? = null,
 ) {
@@ -266,7 +267,7 @@ fun Button(
                 onLongClickLabel = null,
                 onDoubleClick = null,
                 enabled = enabled,
-                role = Role.Button,
+                role = role,
                 interactionSource = interactionSource,
                 indication = null, // use [LocalIndication.current] to ignore the button's shape.
             )

@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -137,6 +138,9 @@ fun FullScreenDialog(
 fun RowScope.IconPopup(
     modifier: Modifier = Modifier,
     icon: Int = R.drawable.ic_help,
+    iconSize: Dp = 20.dp,
+    iconPadding: Dp = 2.dp,
+    colorAtRest: Color = mutedTextColor,
     popupMessage: String,
     popupLink: Pair<String, String>? = null,
     spaceLeft: Dp? = 8.dp,
@@ -147,10 +151,10 @@ fun RowScope.IconPopup(
     if (showPopup) {
         Popup(
             onDismissRequest = { showPopup = false },
-            offset = IntOffset(x = 0, y = 68)
+            offset = IntOffset(x = -240, y = 68)
         ) {
             Surface(
-                modifier = Modifier.widthIn(min = 140.dp, max = 280.dp),
+                modifier = Modifier.widthIn(min = 220.dp, max = 270.dp),
                 shape = RoundedCornerShape(8.dp),
                 border = BorderStroke(1.dp, MaterialTheme.colors.primary),
                 elevation = 6.dp,
@@ -171,11 +175,11 @@ fun RowScope.IconPopup(
     spaceLeft?.let { Spacer(Modifier.width(it)) }
     BorderButton(
         icon = icon,
-        iconTint = if (showPopup) MaterialTheme.colors.onPrimary else mutedTextColor,
+        iconTint = if (showPopup) MaterialTheme.colors.onPrimary else colorAtRest,
         backgroundColor = if (showPopup) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
-        borderColor = if (showPopup) MaterialTheme.colors.primary else mutedTextColor,
-        padding = PaddingValues(2.dp),
-        modifier = modifier.size(20.dp),
+        borderColor = if (showPopup) MaterialTheme.colors.primary else colorAtRest,
+        padding = PaddingValues(iconPadding),
+        modifier = modifier.size(iconSize),
         interactionSource = interactionSource,
         onClick = { showPopup = true }
     )

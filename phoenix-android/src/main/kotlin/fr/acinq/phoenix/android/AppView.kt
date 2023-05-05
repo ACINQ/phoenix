@@ -166,6 +166,7 @@ fun AppView(
                 composable(Screen.Receive.route) {
                     ReceiveView(
                         onSwapInReceived = { popToHome(navController) },
+                        onBackClick = { navController.popBackStack() }
                     )
                 }
                 composable(Screen.ScanData.route, deepLinks = scannerDeepLinks) {

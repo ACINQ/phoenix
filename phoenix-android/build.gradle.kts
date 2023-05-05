@@ -113,6 +113,7 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:${Versions.Android.compose}")
     implementation("androidx.compose.foundation:foundation-layout:${Versions.Android.compose}")
     implementation("androidx.compose.ui:ui-tooling:${Versions.Android.compose}")
+    implementation("androidx.compose.ui:ui-util:${Versions.Android.compose}")
     implementation("androidx.compose.ui:ui-viewbinding:${Versions.Android.compose}")
     implementation("androidx.compose.runtime:runtime-livedata:${Versions.Android.compose}")
     implementation("androidx.compose.material:material:${Versions.Android.compose}")

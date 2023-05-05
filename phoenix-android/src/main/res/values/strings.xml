@@ -96,11 +96,11 @@
     <string name="startup_starting">Starting…</string>
     <string name="startup_error_generic">The application could not start.\n\nError details: %1$s</string>
 
-    <!-- -->
+    <!-- Switch between legacy/modern apps -->
     <string name="legacyswitch_title">Legacy app</string>
     <string name="legacyswitch_restart">Restart legacy app</string>
 
-    <!-- //////////////// payment holder //////////////// -->
+    <!-- Payment line -->
 
     <string name="paymentline_prefix_sent">-</string>
     <string name="paymentline_prefix_received">+</string>
@@ -110,30 +110,32 @@
     <string name="paymentline_desc_success_offchain">Payment complete</string>
     <string name="paymentline_desc_failed">Payment has failed</string>
 
-    <!-- //////////////// receive //////////////// -->
+    <!-- Receive screen -->
 
-    <string name="receive__generating">Generating invoice…</string>
-    <string name="receive__qr_about">QR Code of the invoice</string>
-    <string name="receive__qr_amount_label">Amount:</string>
-    <string name="receive__qr_desc_label">Desc:</string>
-    <string name="receive__min_amount_pay_to_open">Your wallet is empty. First incoming payment must be at least <b>%1$s</b>.</string>
-    <string name="receive__edit_button">Edit</string>
-    <string name="receive__share_button">Share</string>
-    <string name="receive__swapin_button">Show a Bitcoin address</string>
-    <string name="receive__lnurl_withdraw">Deposit via LNURL</string>
+    <string name="receive_help_qr">QR Code of the invoice/address</string>
 
-    <string name="receive__share__subject">Payment requested</string>
-    <string name="receive__share__title">Share this payment request with…</string>
-    <string name="receive__share__button">Share…</string>
+    <string name="receive_bitcoin_title">Bitcoin</string>
+    <string name="receive_bitcoin_help">This QR code is a classic Bitcoin address.\n\nIt can be read by almost any Bitcoin service/wallet, but payments will be slower to arrive.</string>
+    <string name="receive_bitcoin_address_label">Address</string>
+    <string name="receive_bitcoin_error">Could not generate a bitcoin address</string>
+    <string name="receive_bitcoin_share_title">Bitcoin address</string>
+    <string name="receive_bitcoin_share_subject">Share this Bitcoin address with…</string>
 
-    <string name="receive__edit__title">Edit my invoice</string>
-    <string name="receive__edit__amount_label">Amount (optional)</string>
-    <string name="receive__edit__amount_placeholder">Any amount</string>
-    <string name="receive__edit__desc_label">Description (optional):</string>
-    <string name="receive__edit__generate_button">Create invoice</string>
+    <string name="receive_lightning_title">Lightning</string>
+    <string name="receive_lightning_help">This QR code is a Lightning invoice.\n\nLightning payments are very fast and usually cheaper, but some wallets and services may not support them yet.\n\nIn that case, swipe to the right to get a regular Bitcoin address.</string>
+    <string name="receive_lightning_generating">Generating…</string>
+    <string name="receive_lightning_amount_label">Amount</string>
+    <string name="receive_lightning_desc_label">Desc</string>
+    <string name="receive_lightning_error">Could not generate an invoice</string>
+    <string name="receive_lightning_share_subject">Lightning invoice</string>
+    <string name="receive_lightning_share_title">Share this Lightning invoice with…</string>
 
-    <string name="receive__swapin__address_label">Address</string>
-    <string name="receive__swapin__disclaimer">Deposits will be converted to Lightning channels.\n\nTotal deposits must be at least <b>%1$s</b>.\nThe fee is<b>%2$s%%</b> (%3$s sat minimum).</string>
+    <string name="receive_lightning_edit_button">Edit</string>
+    <string name="receive_lightning_edit_title">Edit my invoice</string>
+    <string name="receive_lightning_edit_amount_label">Amount (optional)</string>
+    <string name="receive_lightning_edit_amount_placeholder">Any amount</string>
+    <string name="receive_lightning_edit_desc_label">Description (optional):</string>
+    <string name="receive_lightning_edit_generate_button">Create invoice</string>
 
     <!-- //////////////// send //////////////// -->
 
@@ -215,6 +217,7 @@
     <string name="utils_date_just_now">just now</string>
     <string name="utils_unknown">N/A</string>
     <string name="utils_loading_data">Loading data…</string>
+    <string name="utils_loading_prefs">Loading preferences…</string>
     <string name="utils_copied">Copied to clipboard!</string>
 
     <string name="accessibility_link">Open a link in a browser</string>

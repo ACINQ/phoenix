@@ -57,11 +57,7 @@ fun TextInput(
     Column {
         OutlinedTextField(
             value = text,
-            onValueChange = { newValue ->
-                if (maxChars == null || newValue.length <= maxChars) {
-                    onTextChange(newValue)
-                }
-            },
+            onValueChange = { newValue -> onTextChange(newValue.take(maxChars ?: Int.MAX_VALUE)) },
             maxLines = maxLines,
             singleLine = singleLine,
             keyboardOptions = KeyboardOptions.Default.copy(
