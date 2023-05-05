@@ -14,6 +14,10 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct PaymentCell : View {
 	
+	static let fetchOptions = WalletPaymentFetchOptions.companion.Descriptions.plus(
+		other: WalletPaymentFetchOptions.companion.OriginalFiat
+	)
+	
 	private let paymentsManager = Biz.business.paymentsManager
 	
 	let row: WalletPaymentOrderRow
@@ -36,15 +40,14 @@ struct PaymentCell : View {
 		self.didAppearCallback = didAppearCallback
 		self.didDisappearCallback = didDisappearCallback
 		
-		let options = WalletPaymentFetchOptions.companion.Descriptions
-		var result = paymentsManager.fetcher.getCachedPayment(row: row, options: options)
+		var result = paymentsManager.fetcher.getCachedPayment(row: row, options: PaymentCell.fetchOptions)
 		if let _ = result {
 			
 			self._fetched = State(initialValue: result)
 			self._fetchedIsStale = State(initialValue: false)
 		} else {
 			
-			result = paymentsManager.fetcher.getCachedStalePayment(row: row, options: options)
+			result = paymentsManager.fetcher.getCachedStalePayment(row: row, options: PaymentCell.fetchOptions)
 			
 			self._fetched = State(initialValue: result)
 			self._fetchedIsStale = State(initialValue: true)
@@ -58,35 +61,47 @@ struct PaymentCell : View {
 			if let payment = fetched?.payment {
 				
 				switch payment.state() {
-				case .success:
-					if payment.isOnChain() {
-						Image(systemName: "link.circle.fill")
-							.resizable()
-							.frame(width: 26, height: 26)
-							.foregroundColor(Color.appAccent)
-							.padding(.vertical, 4)
-						
-					} else {
-						Image("payment_holder_def_success")
-							.foregroundColor(Color.accentColor)
-							.padding(4)
-							.background(
-								RoundedRectangle(cornerRadius: .infinity)
-									.fill(Color.appAccent)
-							)
-					}
-				case .pending:
+				case WalletPaymentState.successonchain:
+					
+					Image(systemName: "link.circle.fill")
+						.resizable()
+						.frame(width: 26, height: 26)
+						.foregroundColor(Color.appAccent)
+						.padding(.vertical, 4)
+					
+				case WalletPaymentState.successoffchain:
+					
+					Image("payment_holder_def_success")
+						.foregroundColor(Color.accentColor)
+						.padding(4)
+						.background(
+							RoundedRectangle(cornerRadius: .infinity)
+								.fill(Color.appAccent)
+						)
+					
+				case WalletPaymentState.pendingonchain:
+					
 					Image("payment_holder_def_pending")
 						.foregroundColor(Color.appAccent)
 						.padding(4)
-				case .failure:
+					
+				case WalletPaymentState.pendingoffchain:
+					
+					Image("payment_holder_def_pending")
+						.foregroundColor(Color.appAccent)
+						.padding(4)
+					
+				case WalletPaymentState.failure:
+					
 					Image("payment_holder_def_failed")
 						.foregroundColor(Color.appAccent)
 						.padding(4)
+					
 				default:
 					Image(systemName: "doc.text.magnifyingglass")
 						.padding(4)
-				}
+					
+				} // </switch>
 				
 			} else {
 				
@@ -171,16 +186,14 @@ struct PaymentCell : View {
 		guard let payment = fetched?.payment else {
 			return ""
 		}
-		let timestamp = payment.completedAt()
-		guard timestamp > 0 else {
+		
+		guard let completedAtDate = payment.completedAtDate else {
 			if payment.isOnChain() {
 				return NSLocalizedString("waiting for confirmations", comment: "explanation for pending transaction")
 			} else {
 				return NSLocalizedString("pending", comment: "timestamp string for pending transaction")
 			}
 		}
-			
-		let date = timestamp.toDate(from: .milliseconds)
 		
 		let formatter = DateFormatter()
 		if textScaling > 100 {
@@ -190,16 +203,28 @@ struct PaymentCell : View {
 		}
 		formatter.timeStyle = .short
 		
-		return formatter.string(from: date)
+		return formatter.string(from: completedAtDate)
 	}
 	
 	func paymentAmountInfo() -> (FormattedAmount, Bool, Bool) {
 
 		if let payment = fetched?.payment {
 
-			let amount = currencyPrefs.hideAmounts
-				? Utils.hiddenAmount(currencyPrefs)
-				: Utils.format(currencyPrefs, msat: payment.amount)
+			let amount: FormattedAmount
+			if currencyPrefs.hideAmounts {
+				amount = Utils.hiddenAmount(currencyPrefs)
+				
+			} else if currencyPrefs.showOriginalFiatValue && currencyPrefs.currencyType == .fiat {
+				
+				if let originalExchangeRate = fetched?.metadata.originalFiat {
+					amount = Utils.formatFiat(msat: payment.amount, exchangeRate: originalExchangeRate)
+				} else {
+					amount = Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+				}
+			} else {
+				
+				amount = Utils.format(currencyPrefs, msat: payment.amount)
+			}
 
 			let isFailure = payment.state() == WalletPaymentState.failure
 			let isOutgoing = payment is Lightning_kmpOutgoingPayment
@@ -222,8 +247,11 @@ struct PaymentCell : View {
 		
 		if fetched == nil || fetchedIsStale {
 			
-			let options = WalletPaymentFetchOptions.companion.Descriptions
-			paymentsManager.fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
+			paymentsManager.fetcher.getPayment(
+				row: row,
+				options: PaymentCell.fetchOptions
+			) { (result: WalletPaymentInfo?, _) in
+				
 				self.fetched = result
 			}
 		}

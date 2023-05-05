@@ -52,24 +52,30 @@ import SwiftUI
 protocol InfoGridView: View {
 	
 	// Add this to your implementation:
-	// @State var keyColumnWidths: [CGFloat] = []
+	// @State var keyColumnSizes: [InfoGridRow_KeyColumn_Size] = []
 	//
 	// And then implement these methods to get/set the @State property.
 	//
-	func setKeyColumnWidths(_ value: [InfoGridRow_KeyColumn_Width]) -> Void
-	func getKeyColumnWidths() -> [InfoGridRow_KeyColumn_Width]
-	
-	// Do NOT override this.
-	// It has a default implementation which is correct.
-	//
-	func keyColumnWidth(identifier: String) -> CGFloat
+	func setKeyColumnSizes(_ value: [InfoGridRow_KeyColumn_Size]) -> Void
+	func getKeyColumnSizes() -> [InfoGridRow_KeyColumn_Size]
 	
 	var minKeyColumnWidth: CGFloat { get }
 	var maxKeyColumnWidth: CGFloat { get }
-	//  ^^^^^^^^^^^^^^^^^
-	// Possible solution if we don't know the max value, or don't want to hardcode it:
-	// https://finestructure.co/blog/2020/1/20/swiftui-equal-widths-view-constraints
-	// https://betterprogramming.pub/using-the-preferencekey-protocol-to-align-views-7f3ae32f60fc
+	
+	// Add this to your implementation:
+	// @State var rowSizes: [InfoGridRow_Size] = []
+	//
+	// And then implement these methods to get/set the @State property.
+	//
+	func setRowSizes(_ value: [InfoGridRow_Size]) -> Void
+	func getRowSizes() -> [InfoGridRow_Size]
+	
+	// Do not override these.
+	// They have a default implementation which is correct.
+	//
+	func rowSize(identifier: String) -> CGSize?
+	func keyColumnSize(identifier: String) -> CGSize?
+	func keyColumnWidth(identifier: String) -> CGFloat
 	
 	associatedtype Rows: View
 	@ViewBuilder var infoGridRows: Self.Rows { get }
@@ -77,6 +83,16 @@ protocol InfoGridView: View {
 
 
 extension InfoGridView {
+	
+	func rowSize(identifier: String) -> CGSize? {
+		
+		return getRowSizes().first { $0.identifier == identifier }?.size
+	}
+	
+	func keyColumnSize(identifier: String) -> CGSize? {
+		
+		return getKeyColumnSizes().first { $0.identifier == identifier }?.size
+	}
 	
 	func keyColumnWidth(identifier: String) -> CGFloat {
 		// Normally what happens is:
@@ -98,7 +114,7 @@ extension InfoGridView {
 		// So during the first rendering pass, we need to ensure
 		// that the proposed size.width is big enough to achieve our goals.
 		
-		let values = getKeyColumnWidths()
+		let values = getKeyColumnSizes()
 		
 		// If we recently added a new row, then it's identifier won't be in the list.
 		// In this case, we must not use the calculated value, since it might be too small.
@@ -108,18 +124,21 @@ extension InfoGridView {
 		}
 		
 		let calculatedMaxWidth = values.reduce(0) { partialResult, value in
-			max(partialResult, value.width)
+			max(partialResult, value.size.width)
 		}
 		return min(max(calculatedMaxWidth, minKeyColumnWidth), maxKeyColumnWidth)
 	}
 	
+	@ViewBuilder
 	var body: some View {
 		
-		infoGridRows.onPreferenceChange(InfoGridRow_KeyColumn_MeasuredWidth.self) {
-			(values: [InfoGridRow_KeyColumn_Width]) in
-			
-			setKeyColumnWidths(values)
-		}
+		infoGridRows
+			.onPreferenceChange(InfoGridRow_KeyColumn_MeasuredSize.self) {(sizes: [InfoGridRow_KeyColumn_Size]) in
+				setKeyColumnSizes(sizes)
+			}
+			.onPreferenceChange(InfoGridRow_MeasuredSize.self) {(sizes: [InfoGridRow_Size]) in
+				setRowSizes(sizes)
+			}
 	}
 }
 
@@ -127,57 +146,63 @@ extension InfoGridView {
 struct InfoGridRow<KeyColumn: View, ValueColumn: View>: View {
 	
 	let identifier: String
+	let vAlignment: VerticalAlignment
+	let hSpacing: CGFloat
 	let keyColumnWidth: CGFloat
+	let keyColumnAlignment: Alignment
 	let keyColumn: KeyColumn
 	let valueColumn: ValueColumn
 	
-	private let horizontalSpacingBetweenColumns: CGFloat // = 8
-	
 	init(
 		identifier: String,
+		vAlignment: VerticalAlignment,
 		hSpacing: CGFloat,
 		keyColumnWidth: CGFloat,
+		keyColumnAlignment: Alignment,
 		@ViewBuilder keyColumn keyColumnBuilder: () -> KeyColumn,
 		@ViewBuilder valueColumn valueColumnBuilder: () -> ValueColumn
 	) {
 		self.identifier = identifier
-		self.horizontalSpacingBetweenColumns = hSpacing
+		self.vAlignment = vAlignment
+		self.hSpacing = hSpacing
 		self.keyColumnWidth = keyColumnWidth
+		self.keyColumnAlignment = keyColumnAlignment
 		self.keyColumn = keyColumnBuilder()
 		self.valueColumn = valueColumnBuilder()
 	}
 	
 	var body: some View {
 		
-		HStack(
-			alignment : VerticalAlignment.firstTextBaseline,
-			spacing   : horizontalSpacingBetweenColumns
-		) {
-			HStack(alignment: VerticalAlignment.top, spacing: 0) {
-				Spacer(minLength: 0) // => HorizontalAlignment.trailing
-				keyColumn.background(GeometryReader { proxy in
-				
+		HStack(alignment: vAlignment, spacing: hSpacing) {
+			
+			keyColumn
+				.background(GeometryReader { proxy in
 					Color.clear.preference(
-						key: InfoGridRow_KeyColumn_MeasuredWidth.self,
-						value: [InfoGridRow_KeyColumn_Width(identifier: identifier, width: proxy.size.width)]
+						key: InfoGridRow_KeyColumn_MeasuredSize.self,
+						value: [InfoGridRow_KeyColumn_Size(identifier: identifier, size: proxy.size)]
 					)
 				})
-			}
-			.frame(width: keyColumnWidth)
+				.frame(width: keyColumnWidth, alignment: keyColumnAlignment)
 
 			valueColumn
 		}
 		.accessibilityElement(children: .combine)
+		.background(GeometryReader { proxy in
+			Color.clear.preference(
+				key: InfoGridRow_MeasuredSize.self,
+				value: [InfoGridRow_Size(identifier: identifier, size: proxy.size)]
+			)
+		})
 	}
 }
 
-struct InfoGridRow_KeyColumn_Width: Equatable {
+struct InfoGridRow_KeyColumn_Size: Equatable {
 	let identifier: String
-	let width: CGFloat
+	let size: CGSize
 }
 
-fileprivate struct InfoGridRow_KeyColumn_MeasuredWidth: PreferenceKey {
-	typealias Value = [InfoGridRow_KeyColumn_Width]
+fileprivate struct InfoGridRow_KeyColumn_MeasuredSize: PreferenceKey {
+	typealias Value = [InfoGridRow_KeyColumn_Size]
 	static let defaultValue: Value = []
 	
 	static func reduce(value: inout Value, nextValue: () -> Value) {
@@ -185,3 +210,16 @@ fileprivate struct InfoGridRow_KeyColumn_MeasuredWidth: PreferenceKey {
 	}
 }
 
+struct InfoGridRow_Size: Equatable {
+	let identifier: String
+	let size: CGSize
+}
+
+fileprivate struct InfoGridRow_MeasuredSize: PreferenceKey {
+	typealias Value = [InfoGridRow_Size]
+	static let defaultValue: Value = []
+	
+	static func reduce(value: inout Value, nextValue: () -> Value) {
+		value.append(contentsOf: nextValue())
+	}
+}

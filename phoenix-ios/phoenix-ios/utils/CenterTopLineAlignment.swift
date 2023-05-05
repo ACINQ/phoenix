@@ -13,8 +13,8 @@ import SwiftUI
 // |line2| |switch|
 // |line3|
 //
-// This isn't what we want.
-// So we use a custom VerticalAlignment to achieve our desired result:
+// This isn't always what we want.
+// Instead we can use a custom VerticalAlignment to achieve this:
 //
 // |line1| |switch|
 // |line2|

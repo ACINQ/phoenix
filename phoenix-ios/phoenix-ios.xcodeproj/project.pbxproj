@@ -59,6 +59,7 @@
 		DC18C418256FE22300A2D083 /* Prefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC18C417256FE22300A2D083 /* Prefs.swift */; };
 		DC18C41D256FF91100A2D083 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC18C41C256FF91100A2D083 /* Utils.swift */; };
 		DC1916B029CB6C1D00917F06 /* Text_CurrencyName.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1916AF29CB6C1D00917F06 /* Text_CurrencyName.swift */; };
+		DC1B325029FC3D5900F7F45F /* OnChainDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B324F29FC3D5900F7F45F /* OnChainDetails.swift */; };
 		DC1D2B4B2593EB860036AD38 /* Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1D2B4A2593EB850036AD38 /* Currency.swift */; };
 		DC1D2B502594CE900036AD38 /* FormattedAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1D2B4F2594CE900036AD38 /* FormattedAmount.swift */; };
 		DC27E4C22791C00F00C777CC /* PrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27E4C12791C00F00C777CC /* PrivacyView.swift */; };
@@ -138,6 +139,7 @@
 		DC67E40B27F3798600496C04 /* AnimatedMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC67E40A27F3798600496C04 /* AnimatedMenu.swift */; };
 		DC682FE8258175CE00CA1114 /* Popover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC682FE7258175CE00CA1114 /* Popover.swift */; };
 		DC6CF35B2938F32E001837EE /* ListBackgroundColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6CF35A2938F32E001837EE /* ListBackgroundColor.swift */; };
+		DC6D26E329E76557006A7814 /* AnimatedClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6D26E229E76557006A7814 /* AnimatedClock.swift */; };
 		DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E72F2723240E0063613D /* KotlinObservables.swift */; };
 		DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E7322728645B0063613D /* CurrencyConverterView.swift */; };
 		DC71E7352728A5720063613D /* KotlinIdentifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E7342728A5720063613D /* KotlinIdentifiable.swift */; };
@@ -158,6 +160,9 @@
 		DC99E94D25BA258C00FB20F7 /* about.html in Resources */ = {isa = PBXBuildFile; fileRef = DC99E94825BA258C00FB20F7 /* about.html */; };
 		DC99E95825BA2BA800FB20F7 /* about.css in Resources */ = {isa = PBXBuildFile; fileRef = DC99E95625BA2BA800FB20F7 /* about.css */; };
 		DC9B8EE225D72CC200E13818 /* ForceCloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */; };
+		DCA5391629F047C6001BD3D5 /* ComingSoonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA5391529F047C6001BD3D5 /* ComingSoonView.swift */; };
+		DCA5391A29F1DDE7001BD3D5 /* SegmentedPicker in Frameworks */ = {isa = PBXBuildFile; productRef = DCA5391929F1DDE7001BD3D5 /* SegmentedPicker */; };
+		DCA5391C29F7202F001BD3D5 /* ChannelInfoPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA5391B29F7202F001BD3D5 /* ChannelInfoPopup.swift */; };
 		DCA6DEC62829BDEB0073C658 /* CrossProcessCommunication.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA6DEC52829BDEB0073C658 /* CrossProcessCommunication.swift */; };
 		DCA6DEC72829BFD70073C658 /* CrossProcessCommunication.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA6DEC52829BDEB0073C658 /* CrossProcessCommunication.swift */; };
 		DCA6DEC82829C3150073C658 /* GenericPasswordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F62566D0BA0009B01E /* GenericPasswordStore.swift */; };
@@ -210,7 +215,6 @@
 		DCCD046327EE04E1007D57A5 /* WalletPaymentExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD046227EE04E1007D57A5 /* WalletPaymentExtensions.swift */; };
 		DCD1208728663F4A00EB39C5 /* TransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD1208628663F4A00EB39C5 /* TransactionsView.swift */; };
 		DCD5FF4326A0D34B009CC666 /* EqualSizes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD5FF4226A0D34B009CC666 /* EqualSizes.swift */; };
-		DCD71A79273987FE00B9A1EF /* Focuser in Frameworks */ = {isa = PBXBuildFile; productRef = DCD71A78273987FE00B9A1EF /* Focuser */; };
 		DCD777D226DE9FE800979A12 /* DelayedSave.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD777D126DE9FE800979A12 /* DelayedSave.swift */; };
 		DCD7E0AC28EC32CB009C30E5 /* BusinessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD7E0AB28EC32CB009C30E5 /* BusinessManager.swift */; };
 		DCD7E0AF28EC3C0D009C30E5 /* WatchTower.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD7E0AE28EC3C0D009C30E5 /* WatchTower.swift */; };
@@ -377,6 +381,7 @@
 		DC18C417256FE22300A2D083 /* Prefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prefs.swift; sourceTree = "<group>"; };
 		DC18C41C256FF91100A2D083 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		DC1916AF29CB6C1D00917F06 /* Text_CurrencyName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Text_CurrencyName.swift; sourceTree = "<group>"; };
+		DC1B324F29FC3D5900F7F45F /* OnChainDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnChainDetails.swift; sourceTree = "<group>"; };
 		DC1D2B4A2593EB850036AD38 /* Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Currency.swift; sourceTree = "<group>"; };
 		DC1D2B4F2594CE900036AD38 /* FormattedAmount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattedAmount.swift; sourceTree = "<group>"; };
 		DC27E4C12791C00F00C777CC /* PrivacyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyView.swift; sourceTree = "<group>"; };
@@ -444,6 +449,7 @@
 		DC67E40A27F3798600496C04 /* AnimatedMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedMenu.swift; sourceTree = "<group>"; };
 		DC682FE7258175CE00CA1114 /* Popover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Popover.swift; sourceTree = "<group>"; };
 		DC6CF35A2938F32E001837EE /* ListBackgroundColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListBackgroundColor.swift; sourceTree = "<group>"; };
+		DC6D26E229E76557006A7814 /* AnimatedClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedClock.swift; sourceTree = "<group>"; };
 		DC71E72F2723240E0063613D /* KotlinObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinObservables.swift; sourceTree = "<group>"; };
 		DC71E7322728645B0063613D /* CurrencyConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterView.swift; sourceTree = "<group>"; };
 		DC71E7342728A5720063613D /* KotlinIdentifiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinIdentifiable.swift; sourceTree = "<group>"; };
@@ -464,6 +470,8 @@
 		DC99E94925BA258C00FB20F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/about.html; sourceTree = "<group>"; };
 		DC99E95625BA2BA800FB20F7 /* about.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = about.css; sourceTree = "<group>"; };
 		DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForceCloseChannelsView.swift; sourceTree = "<group>"; };
+		DCA5391529F047C6001BD3D5 /* ComingSoonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComingSoonView.swift; sourceTree = "<group>"; };
+		DCA5391B29F7202F001BD3D5 /* ChannelInfoPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelInfoPopup.swift; sourceTree = "<group>"; };
 		DCA6DEC52829BDEB0073C658 /* CrossProcessCommunication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossProcessCommunication.swift; sourceTree = "<group>"; };
 		DCA6DECB282AAA740073C658 /* SharedSecurity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSecurity.swift; sourceTree = "<group>"; };
 		DCA6DECF282AB7E20073C658 /* KeychainConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainConstants.swift; sourceTree = "<group>"; };
@@ -549,7 +557,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DCD71A79273987FE00B9A1EF /* Focuser in Frameworks */,
+				DCA5391A29F1DDE7001BD3D5 /* SegmentedPicker in Frameworks */,
 				DC46BAE426C6FDD300E760A6 /* CircularCheckmarkProgress in Frameworks */,
 				DCC9D99C267BEB3D00EA36DD /* CloudKit.framework in Frameworks */,
 				DC39D4E5286B4A7E0030F18D /* Popovers in Frameworks */,
@@ -608,6 +616,7 @@
 				DC08A51927FB6C5F0041603B /* TopTab.swift */,
 				DC39D4EE287497440030F18D /* SmartModal.swift */,
 				DC39D4F02874DDF40030F18D /* View+If.swift */,
+				DC6D26E229E76557006A7814 /* AnimatedClock.swift */,
 			);
 			path = widgets;
 			sourceTree = "<group>";
@@ -755,6 +764,7 @@
 			isa = PBXGroup;
 			children = (
 				C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */,
+				DCA5391529F047C6001BD3D5 /* ComingSoonView.swift */,
 				DCACF6E02566CEC40009B01E /* general */,
 				DCACF6E42566CF850009B01E /* security */,
 				DCACF6DF2566CEC40009B01E /* advanced */,
@@ -769,6 +779,7 @@
 				DC118BFB27B4504B0080BBAC /* ScanView.swift */,
 				DC118C0527B4557D0080BBAC /* ValidateView.swift */,
 				DC39D4E6286BB2120030F18D /* PaymentLayerChoice.swift */,
+				DC1B324F29FC3D5900F7F45F /* OnChainDetails.swift */,
 				DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */,
 				DCEAE5B62943CC7400320C46 /* RangeSheet.swift */,
 				DC118BF927B44F840080BBAC /* PriceSliderSheet.swift */,
@@ -1137,6 +1148,7 @@
 			isa = PBXGroup;
 			children = (
 				53BEF648B3A03C66B611BC06 /* ChannelsConfigurationView.swift */,
+				DCA5391B29F7202F001BD3D5 /* ChannelInfoPopup.swift */,
 				DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */,
 			);
 			path = channels;
@@ -1165,8 +1177,8 @@
 			packageProductDependencies = (
 				DC72C31825A3CF87008A927A /* FirebaseMessaging */,
 				DC46BAE326C6FDD300E760A6 /* CircularCheckmarkProgress */,
-				DCD71A78273987FE00B9A1EF /* Focuser */,
 				DC39D4E4286B4A7E0030F18D /* Popovers */,
+				DCA5391929F1DDE7001BD3D5 /* SegmentedPicker */,
 			);
 			productName = "phoenix-ios";
 			productReference = 7555FF7B242A565900829871 /* Phoenix.app */;
@@ -1221,6 +1233,7 @@
 			);
 			name = "phoenix-ios-framework";
 			packageProductDependencies = (
+				DCA5391829F1DAA3001BD3D5 /* SegmentedPicker */,
 			);
 			productName = "phoenix-ios-framework";
 			productReference = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */;
@@ -1289,8 +1302,8 @@
 			packageReferences = (
 				DC72C2EA25A3CADC008A927A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				DC46BAE226C6FDD300E760A6 /* XCRemoteSwiftPackageReference "CircularCheckmarkProgress" */,
-				DCD71A752739864400B9A1EF /* XCRemoteSwiftPackageReference "swift-focuser" */,
 				DC39D4E3286B4A7E0030F18D /* XCRemoteSwiftPackageReference "Popovers" */,
+				DCA5391729F1DAA3001BD3D5 /* XCRemoteSwiftPackageReference "SwiftySegmentedPicker" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -1465,10 +1478,12 @@
 				DC1916B029CB6C1D00917F06 /* Text_CurrencyName.swift in Sources */,
 				DCD7E0AF28EC3C0D009C30E5 /* WatchTower.swift in Sources */,
 				DCB493CB269F3B06001B0F09 /* Result+Deugly.swift in Sources */,
+				DCA5391629F047C6001BD3D5 /* ComingSoonView.swift in Sources */,
 				DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */,
 				DC0D2EA52939269800284608 /* KotlinExtensions+CloudKit.swift in Sources */,
 				DC384D7F265BF36600131772 /* StyledString.swift in Sources */,
 				DC5F1C4A28DDAA49007A55ED /* ResetWalletView_Confirm.swift in Sources */,
+				DC1B325029FC3D5900F7F45F /* OnChainDetails.swift in Sources */,
 				DC39D4E7286BB2130030F18D /* PaymentLayerChoice.swift in Sources */,
 				DCAC9FC6296879770098D769 /* NavigationStackDestination.swift in Sources */,
 				DC27E4C22791C00F00C777CC /* PrivacyView.swift in Sources */,
@@ -1550,6 +1565,7 @@
 				DCAEF8D9275E69B000015993 /* SyncSeedManager_State.swift in Sources */,
 				DCB04685260D162C007FDA37 /* ViewName.swift in Sources */,
 				DCFA876D260E91E600AE8953 /* IntroContainer.swift in Sources */,
+				DCA5391C29F7202F001BD3D5 /* ChannelInfoPopup.swift in Sources */,
 				DCB4108729028EF900CE4FF9 /* Prefs+BackupSeed.swift in Sources */,
 				DCEC6A1827A82A98002C20BA /* ImagePicker.swift in Sources */,
 				DC5EE4C927679C6300A3035C /* RestoreView.swift in Sources */,
@@ -1561,6 +1577,7 @@
 				DC0D2EA72939273B00284608 /* KotlinExtensions+Payments.swift in Sources */,
 				DC72C33925A663CA008A927A /* QRCode.swift in Sources */,
 				DC5CA4ED28F83C3B0048A737 /* DrainWalletView.swift in Sources */,
+				DC6D26E329E76557006A7814 /* AnimatedClock.swift in Sources */,
 				DCAC9FC329675E1A0098D769 /* NavigationWrapper.swift in Sources */,
 				DC65D86428E2F7D700686355 /* ResetWalletView_Action.swift in Sources */,
 				DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */,
@@ -1778,7 +1795,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1835,7 +1852,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -1864,10 +1881,6 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.0.1;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"\"-Xlinker -interposable\"",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = co.acinq.phoenix;
 				PRODUCT_NAME = Phoenix;
 				SWIFT_VERSION = 5.0;
@@ -1893,10 +1906,6 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.0.1;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"\"-Xlinker -interposable\"",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = co.acinq.phoenix;
 				PRODUCT_NAME = Phoenix;
 				SWIFT_VERSION = 5.0;
@@ -2180,12 +2189,12 @@
 				version = 9.1.0;
 			};
 		};
-		DCD71A752739864400B9A1EF /* XCRemoteSwiftPackageReference "swift-focuser" */ = {
+		DCA5391729F1DAA3001BD3D5 /* XCRemoteSwiftPackageReference "SwiftySegmentedPicker" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:art-technologies/swift-focuser.git";
+			repositoryURL = "https://github.com/KazaiMazai/SwiftySegmentedPicker.git";
 			requirement = {
-				kind = exactVersion;
-				version = 0.2.0;
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -2206,10 +2215,15 @@
 			package = DC72C2EA25A3CADC008A927A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
 		};
-		DCD71A78273987FE00B9A1EF /* Focuser */ = {
+		DCA5391829F1DAA3001BD3D5 /* SegmentedPicker */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = DCD71A752739864400B9A1EF /* XCRemoteSwiftPackageReference "swift-focuser" */;
-			productName = Focuser;
+			package = DCA5391729F1DAA3001BD3D5 /* XCRemoteSwiftPackageReference "SwiftySegmentedPicker" */;
+			productName = SegmentedPicker;
+		};
+		DCA5391929F1DDE7001BD3D5 /* SegmentedPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DCA5391729F1DAA3001BD3D5 /* XCRemoteSwiftPackageReference "SwiftySegmentedPicker" */;
+			productName = SegmentedPicker;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

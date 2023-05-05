@@ -262,11 +262,11 @@ struct PriceSliderSheet: View {
 					
 					// Column 1: (center)
 					// - Vertical slider
-					if #available(iOS 15.0, *) {
-						vslider_iOS15(vsliderWidth)
-					} else {
-						vslider_iOS14(vsliderWidth)
-					}
+					VSlider(value: $sliderValue, in: sliderRange, step: 1.0)
+						.frame(width: vsliderWidth, height: contentHeight, alignment: .center)
+						.accessibilityRepresentation {
+							Slider(value: $sliderValue, in: sliderRange, step: 1.0)
+						}
 					
 					// Column 2: (right)
 					// - Amounts in fiat
@@ -326,7 +326,7 @@ struct PriceSliderSheet: View {
 				.accessibilityLabel("Increase value")
 			
 			} // </HStack>
-			.accessibilityHidden(isIOS15()) // duplicate functionality; available via Slider
+			.accessibilityHidden(true) // duplicate functionality; available via Slider
 			
 		} // </VStack>
 		.padding()
@@ -335,24 +335,6 @@ struct PriceSliderSheet: View {
 		.onChange(of: sliderValue) {
 			sliderValueChanged($0)
 		}
-	}
-	
-	@ViewBuilder
-	@available(iOS 15.0, *)
-	func vslider_iOS15(_ vsliderWidth: CGFloat) -> some View {
-		
-		VSlider(value: $sliderValue, in: sliderRange, step: 1.0)
-			.frame(width: vsliderWidth, height: contentHeight, alignment: .center)
-			.accessibilityRepresentation {
-				Slider(value: $sliderValue, in: sliderRange, step: 1.0)
-			}
-	}
-	
-	@ViewBuilder
-	func vslider_iOS14(_ vsliderWidth: CGFloat) -> some View {
-		
-		VSlider(value: $sliderValue, in: sliderRange, step: 1.0)
-			.frame(width: vsliderWidth, height: contentHeight, alignment: .center)
 	}
 	
 	@ViewBuilder
@@ -646,15 +628,6 @@ struct PriceSliderSheet: View {
 	// --------------------------------------------------
 	// MARK: Accessibility
 	// --------------------------------------------------
-	
-	func isIOS15() -> Bool {
-		
-		if #available(iOS 15.0, *) {
-			return true
-		} else {
-			return false
-		}
-	}
 	
 	func announceMin() -> Bool {
 		

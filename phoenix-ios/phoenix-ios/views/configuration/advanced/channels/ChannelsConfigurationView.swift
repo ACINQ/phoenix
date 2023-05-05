@@ -1,4 +1,5 @@
 import SwiftUI
+import SegmentedPicker
 import PhoenixShared
 import os.log
 
@@ -12,24 +13,25 @@ fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 
-struct ChannelsConfigurationView: MVIView {
-
-	@StateObject var mvi = MVIState({ $0.channelsConfiguration() })
-	
-	@Environment(\.controllerFactory) var factoryEnv
-	var factory: ControllerFactory { return factoryEnv }
+struct ChannelsConfigurationView: View {
 	
 	@State var sharing: String? = nil
 	@State var showChannelsRemoteBalance = Prefs.shared.showChannelsRemoteBalance
 	
 	@StateObject var toast = Toast()
 	
+	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
+	@State var channels: [LocalChannelInfo] = []
+	
 	@ViewBuilder
-	var view: some View {
+	var body: some View {
 		
 		content()
 			.sharing($sharing)
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
+			.onReceive(channelsPublisher) {
+				channels = $0
+			}
 			.onDisappear {
 				onDisappear()
 			}
@@ -40,16 +42,16 @@ struct ChannelsConfigurationView: MVIView {
 	@ViewBuilder
 	func content() -> some View {
 		
-		if (mvi.model.channels.isEmpty) {
+		if (channels.isEmpty) {
 			NoChannelsView(
-				mvi: mvi,
+				channels: $channels,
 				sharing: $sharing,
 				showChannelsRemoteBalance: $showChannelsRemoteBalance,
 				toast: toast
 			)
 		} else {
 			ChannelsView(
-				mvi: mvi,
+				channels: $channels,
 				sharing: $sharing,
 				showChannelsRemoteBalance: $showChannelsRemoteBalance,
 				toast: toast
@@ -66,7 +68,7 @@ struct ChannelsConfigurationView: MVIView {
 
 fileprivate struct NoChannelsView : View {
 	
-	@ObservedObject var mvi: MVIState<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>
+	@Binding var channels: [LocalChannelInfo]
 	@Binding var sharing: String?
 	@Binding var showChannelsRemoteBalance: Bool
 	@ObservedObject var toast: Toast
@@ -88,7 +90,6 @@ fileprivate struct NoChannelsView : View {
 			Spacer(minLength: 0)
 			
 			FooterView(
-				mvi: mvi,
 				showChannelsRemoteBalance: $showChannelsRemoteBalance,
 				toast: toast
 			)
@@ -98,7 +99,7 @@ fileprivate struct NoChannelsView : View {
 
 fileprivate struct ChannelsView : View {
 	
-	@ObservedObject var mvi: MVIState<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>
+	@Binding var channels: [LocalChannelInfo]
 	@Binding var sharing: String?
 	@Binding var showChannelsRemoteBalance: Bool
 	@ObservedObject var toast: Toast
@@ -131,7 +132,7 @@ fileprivate struct ChannelsView : View {
 				ScrollView {
 					LazyVStack(pinnedViews: [.sectionHeaders]) {
 						Section(header: header()) {
-							ForEach(mvi.model.channels, id: \.id) { channel in
+							ForEach(channels, id: \.channelId) { channel in
 								row(channel: channel)
 							}
 						}
@@ -139,7 +140,6 @@ fileprivate struct ChannelsView : View {
 				}
 				
 				FooterView(
-					mvi: mvi,
 					showChannelsRemoteBalance: $showChannelsRemoteBalance,
 					toast: toast
 				)
@@ -164,15 +164,15 @@ fileprivate struct ChannelsView : View {
 	func menuButton() -> some View {
 		
 		Menu {
-			Button {
-				sharing = mvi.model.json
-			} label: {
-				Label {
-					Text(verbatim: "Share all")
-				} icon: {
-					Image(systemName: "square.and.arrow.up")
-				}
-			}
+		//	Button {
+		//		sharing = mvi.model.json
+		//	} label: {
+		//		Label {
+		//			Text(verbatim: "Share all")
+		//		} icon: {
+		//			Image(systemName: "square.and.arrow.up")
+		//		}
+		//	}
 			Button {
 				closeAllChannels()
 			} label: {
@@ -182,25 +182,13 @@ fileprivate struct ChannelsView : View {
 					Image(systemName: "xmark.circle")
 				}
 			}
-			if #available(iOS 15.0, *) {
-				Button(role: .destructive) {
-					forceCloseAllChannels()
-				} label: {
-					Label {
-						Text(verbatim: "Force close all")
-					} icon: {
-						Image(systemName: "exclamationmark.triangle")
-					}
-				}
-			} else {
-				Button {
-					forceCloseAllChannels()
-				} label: {
-					Label {
-						Text(verbatim: "Force close all")
-					} icon: {
-						Image(systemName: "exclamationmark.triangle")
-					}
+			Button(role: .destructive) {
+				forceCloseAllChannels()
+			} label: {
+				Label {
+					Text(verbatim: "Force close all")
+				} icon: {
+					Image(systemName: "exclamationmark.triangle")
 				}
 			}
 			
@@ -213,14 +201,14 @@ fileprivate struct ChannelsView : View {
 	func header() -> some View {
 		
 		ChannelHeaderView(
-			mvi: mvi,
+			channels: $channels,
 			sharing: $sharing,
 			showChannelsRemoteBalance: $showChannelsRemoteBalance
 		)
 	}
 	
 	@ViewBuilder
-	func row(channel: ChannelsConfiguration.ModelChannel) -> some View {
+	func row(channel: LocalChannelInfo) -> some View {
 		
 		ChannelRowView(
 			channel: channel,
@@ -248,7 +236,7 @@ fileprivate struct ChannelsView : View {
 
 struct ChannelHeaderView: View {
 	
-	@ObservedObject var mvi: MVIState<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>
+	@Binding var channels: [LocalChannelInfo]
 	@Binding var sharing: String?
 	@Binding var showChannelsRemoteBalance: Bool
 	
@@ -257,13 +245,13 @@ struct ChannelHeaderView: View {
 	var body: some View {
 		HStack {
 			
-			if mvi.model.channels.count == 1 {
+			if channels.count == 1 {
 				Text("1 channel")
 			} else {
 				Text(String(format: NSLocalizedString(
 					"%d channels",
 					comment: "Count != 1"),
-					mvi.model.channels.count
+					channels.count
 				))
 			}
 			
@@ -279,24 +267,34 @@ struct ChannelHeaderView: View {
 	
 	func balances() -> (FormattedAmount, FormattedAmount) {
 		
-		let localMsats = mvi.model.channels.map { channel in
+		let localMsats = channels.map { channel in
 			channel.localBalance?.msat ?? Int64(0)
 		}
 		.reduce(into: Int64(0)) { result, next in
 			result += next
 		}
-		let remoteMsats = mvi.model.channels.map { channel in
-			channel.remoteBalance?.msat ?? Int64(0)
+		let totalSats = channels.map { channel in
+			channel.currentFundingAmount?.sat ?? Int64(0)
 		}
 		.reduce(into: Int64(0)) { result, next in
 			result += next
 		}
 		
-		let numerator_msats = localMsats
-		let denominator_msats = showChannelsRemoteBalance ? remoteMsats : (localMsats + remoteMsats)
+		let totalMsats = Utils.toMsat(sat: totalSats)
 		
-		let numerator = Utils.formatBitcoin(msat: numerator_msats, bitcoinUnit: .sat, policy: .showMsatsIfZeroSats)
-		let denominator = Utils.formatBitcoin(msat: denominator_msats, bitcoinUnit: .sat, policy: .hideMsats)
+		let numerator_msats = localMsats
+		let denominator_msats = showChannelsRemoteBalance ? (totalMsats - localMsats) : totalMsats
+		
+		let numerator = Utils.formatBitcoin(
+			msat: numerator_msats,
+			bitcoinUnit: .sat,
+			policy: .showMsatsIfZeroSats
+		)
+		let denominator = Utils.formatBitcoin(
+			msat: denominator_msats,
+			bitcoinUnit: .sat,
+			policy: .hideMsats
+		)
 		
 		return (numerator, denominator)
 	}
@@ -304,7 +302,7 @@ struct ChannelHeaderView: View {
 
 fileprivate struct ChannelRowView: View {
 	
-	let channel: ChannelsConfiguration.ModelChannel
+	let channel: LocalChannelInfo
 	@Binding var sharing: String?
 	@Binding var showChannelsRemoteBalance: Bool
 	@ObservedObject var toast: Toast
@@ -324,7 +322,7 @@ fileprivate struct ChannelRowView: View {
 						.resizable()
 						.aspectRatio(contentMode: .fit)
 						.frame(width: 10, height: 10)
-						.foregroundColor(channel.isOk ? .appPositive : .appNegative)
+						.foregroundColor(channel.isUsable ? .appPositive : .appNegative)
 				
 					Text(channel.stateName)
 						.foregroundColor(Color.primary)
@@ -348,16 +346,26 @@ fileprivate struct ChannelRowView: View {
 	func balances() -> (FormattedAmount, FormattedAmount)? {
 		
 		guard let localMsats = channel.localBalance?.msat,
-				let remoteMsats = channel.remoteBalance?.msat
+				let totalSats = channel.currentFundingAmount?.sat
 		else {
 			return nil
 		}
 		
-		let numerator_msats = localMsats
-		let denominator_msats = showChannelsRemoteBalance ? remoteMsats : (localMsats + remoteMsats)
+		let totalMsats = Utils.toMsat(sat: totalSats)
 		
-		let numerator = Utils.formatBitcoin(msat: numerator_msats, bitcoinUnit: .sat, policy: .showMsatsIfZeroSats)
-		let denominator = Utils.formatBitcoin(msat: denominator_msats, bitcoinUnit: .sat, policy: .hideMsats)
+		let numerator_msats = localMsats
+		let denominator_msats = showChannelsRemoteBalance ? (totalMsats - localMsats) : totalMsats
+		
+		let numerator = Utils.formatBitcoin(
+			msat: numerator_msats,
+			bitcoinUnit: .sat,
+			policy: .showMsatsIfZeroSats
+		)
+		let denominator = Utils.formatBitcoin(
+			msat: denominator_msats,
+			bitcoinUnit: .sat,
+			policy: .hideMsats
+		)
 		
 		return (numerator, denominator)
 	}
@@ -377,7 +385,6 @@ fileprivate struct ChannelRowView: View {
 
 fileprivate struct FooterView: View, ViewName {
 	
-	@ObservedObject var mvi: MVIState<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>
 	@Binding var showChannelsRemoteBalance: Bool
 	@ObservedObject var toast: Toast
 	
@@ -419,11 +426,12 @@ fileprivate struct FooterView: View, ViewName {
 				
 				Spacer()
 				
+				let nodeId = Biz.nodeId ?? "?"
 				Button {
-					copyNodeID(mvi.model.nodeId)
+					copyNodeID(nodeId)
 				} label: {
 					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
-						Text(mvi.model.nodeId)
+						Text(nodeId)
 							.lineLimit(1)
 							.truncationMode(.middle)
 						
@@ -457,182 +465,4 @@ fileprivate struct FooterView: View, ViewName {
 			colorScheme: colorScheme.opposite
 		)
 	}
-}
-
-fileprivate struct ChannelInfoPopup: View, ViewName {
-	
-	let channel: ChannelsConfiguration.ModelChannel
-	@Binding var sharing: String?
-	@ObservedObject var toast: Toast
-	
-	@State var showBlockchainExplorerOptions = false
-	
-	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	@Environment(\.popoverState) var popoverState: PopoverState
-	
-	var body: some View {
-		
-		VStack {
-			ScrollView {
-				Text(channel.json)
-					.font(.caption)
-					.padding()
-			}
-			.environment(\.layoutDirection, .leftToRight) // issue #237
-			.frame(height: 300)
-			.frame(maxWidth: .infinity, alignment: .leading)
-			
-			HStack {
-				Button {
-					UIPasteboard.general.string = channel.json
-					toast.pop(
-						NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
-						colorScheme: colorScheme.opposite
-					)
-				} label: {
-					Image(systemName: "square.on.square")
-						.resizable()
-						.scaledToFit()
-						.frame(width: 22, height: 22)
-				}
-
-				Divider()
-					.frame(height: 30)
-					.padding([.leading, .trailing], 8)
-
-				Button {
-					sharing = channel.json
-				} label: {
-					Image(systemName: "square.and.arrow.up")
-						.resizable()
-						.scaledToFit()
-						.frame(width: 22, height: 22)
-				}
-
-				if let txId = channel.txId {
-					Divider()
-						.frame(height: 30)
-						.padding([.leading, .trailing], 8)
-
-					if #available(iOS 15.0, *) {
-						Button {
-							showBlockchainExplorerOptions = true
-						} label: {
-							Text("Tx").font(.title2)
-						}
-						.confirmationDialog("Blockchain Explorer",
-							isPresented: $showBlockchainExplorerOptions,
-							titleVisibility: .automatic
-						) {
-							Button("Mempool.space") {
-								exploreTx(txId: txId, website: BlockchainExplorer.WebsiteMempoolSpace())
-							}
-							Button("Blockstream.info") {
-								exploreTx(txId: txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
-							}
-							Button("Copy transaction id") {
-								copyTxId(txId: txId)
-							}
-						}
-					} else { // same functionality as before
-						Button {
-							exploreTx(txId: txId, website: BlockchainExplorer.WebsiteMempoolSpace())
-						} label: {
-							Text("Tx").font(.title2)
-						}
-					}
-				}
-
-				Spacer()
-				Button("OK") {
-					closePopover()
-				}
-				.font(.title2)
-			}
-			.padding(.top, 10)
-			.padding([.leading, .trailing])
-			.padding(.bottom, 10)
-			.background(
-				Color(UIColor.secondarySystemBackground)
-			)
-			
-		} // </VStack>
-	}
-	
-	func exploreTx(txId: String, website: BlockchainExplorer.Website) {
-		log.trace("[\(viewName)] exploreTx()")
-		
-		let business = Biz.business
-		let txUrlStr = business.blockchainExplorer.txUrl(txId: txId, website: website)
-		if let txUrl = URL(string: txUrlStr) {
-			UIApplication.shared.open(txUrl)
-		}
-	}
-	
-	func copyTxId(txId: String) {
-		log.trace("[\(viewName)] copyTxId()")
-		
-		UIPasteboard.general.string = txId
-	}
-	
-	func closePopover() -> Void {
-		log.trace("[\(viewName)] closePopover()")
-		
-		popoverState.close()
-	}
-}
-
-
-// MARK:-
-
-class ChannelsConfigurationView_Previews : PreviewProvider {
-	
-	static let channel1 = ChannelsConfiguration.ModelChannel(
-		id: "b50bf19d16156de8231f6d3d3fb3dd105ba338de5366d0421b0954b9ceb0d4f8",
-		isOk: true,
-		stateName: "Normal",
-		localBalance: Lightning_kmpMilliSatoshi(msat: 50_000_000),
-		remoteBalance: Lightning_kmpMilliSatoshi(msat: 200_000_000),
-		json: "{Everything is normal!}",
-		txId: nil
-	)
-	
-	static let channel2 = ChannelsConfiguration.ModelChannel(
-		id: "e5366d0421b0954b9ceb0d4f8b50bf19d16156de8231f6d3d3fb3dd105ba338d",
-		isOk: false,
-		stateName: "Woops",
-		localBalance: Lightning_kmpMilliSatoshi(msat: 0),
-		remoteBalance: Lightning_kmpMilliSatoshi(msat: 0),
-		json: "{Woops!}",
-		txId: nil
-	)
-
-	static var previews: some View {
-		
-		NavigationWrapper {
-			ChannelsConfigurationView().mock(ChannelsConfiguration.Model(
-				nodeId: "03af0ed6052cf28d670665549bc86f4b721c9fdb309d40c58f5811f63966e005d0",
-				json: "{}",
-				channels: []
-			))
-		}
-		.preferredColorScheme(.light)
-		.previewDevice("iPhone 8")
-
-		NavigationWrapper {
-			ChannelsConfigurationView().mock(ChannelsConfiguration.Model(
-				nodeId: "03af0ed6052cf28d670665549bc86f4b721c9fdb309d40c58f5811f63966e005d0",
-				json: "{}",
-				channels: [channel1, channel2]
-			))
-		}
-		.preferredColorScheme(.dark)
-		.previewDevice("iPhone 8")
-	}
-
-	#if DEBUG
-	@objc class func injected() {
-		UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
-	}
-	#endif
 }

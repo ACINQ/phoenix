@@ -122,31 +122,29 @@ struct IncomingDepositPopover: View {
 	func footer() -> some View {
 		
 		HStack {
-			if #available(iOS 15.0, *) {
+			Button {
+				showBlockchainExplorerOptions = true
+			} label: {
+				Text("Explore").font(.title2)
+			}
+			.confirmationDialog("Blockchain Explorer",
+				isPresented: $showBlockchainExplorerOptions,
+				titleVisibility: .automatic
+			) {
 				Button {
-					showBlockchainExplorerOptions = true
+					exploreIncomingDeposit(website: BlockchainExplorer.WebsiteMempoolSpace())
 				} label: {
-					Text("Explore").font(.title2)
+					Text(verbatim: "Mempool.space") // no localization needed
 				}
-				.confirmationDialog("Blockchain Explorer",
-					isPresented: $showBlockchainExplorerOptions,
-					titleVisibility: .automatic
-				) {
-					Button {
-						exploreIncomingDeposit(website: BlockchainExplorer.WebsiteMempoolSpace())
-					} label: {
-						Text(verbatim: "Mempool.space") // no localization needed
-					}
-					Button {
-						exploreIncomingDeposit(website: BlockchainExplorer.WebsiteBlockstreamInfo())
-					} label: {
-						Text(verbatim: "Blockstream.info") // no localization needed
-					}
-					Button("Copy bitcoin address") {
-						copySwapInAddress()
-					}
-				} // </confirmationDialog>
-			} // </if #available(iOS 15.0, *)>
+				Button {
+					exploreIncomingDeposit(website: BlockchainExplorer.WebsiteBlockstreamInfo())
+				} label: {
+					Text(verbatim: "Blockstream.info") // no localization needed
+				}
+				Button("Copy bitcoin address") {
+					copySwapInAddress()
+				}
+			} // </confirmationDialog>
 			
 			Spacer()
 			

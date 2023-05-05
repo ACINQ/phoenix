@@ -73,7 +73,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			// .listBackgroundColor(Color(.systemBackground))
 			
 		} else {
-			// iOS 15 & 14
+			// iOS 15
 			UITableView.appearance().backgroundColor = .primaryBackground
 			UICollectionView.appearance().backgroundColor = .primaryBackground
 		}

@@ -1,6 +1,5 @@
 import SwiftUI
 import PhoenixShared
-import Focuser
 import os.log
 
 #if DEBUG && false
@@ -177,20 +176,11 @@ struct CurrencyConverterView: View {
 			Color.primaryBackground.frame(height: 25)
 			
 			List {
-				if #available(iOS 15.0, *) {
-					currencyRows()
-					lastRow()
-						.listRowInsets(EdgeInsets()) // remove extra padding space in rows
-						.listRowSeparator(.hidden)   // remove lines between items
-						.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-					
-				} else {
-					currencyRows_iOS14()
-					lastRow()
-						.listRowInsets(EdgeInsets(top: -1, leading: 0, bottom: 0, trailing: 0))
-						.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-						.background(Color(.systemBackground))
-				}
+				currencyRows()
+				lastRow()
+					.listRowInsets(EdgeInsets()) // remove extra padding space in rows
+					.listRowSeparator(.hidden)   // remove lines between items
+					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
 			}
 			.toolbar {
 				EditButton()
@@ -204,7 +194,6 @@ struct CurrencyConverterView: View {
 	}
 	
 	@ViewBuilder
-	@available(iOS 15.0, *)
 	func currencyRows() -> some View {
 		
 		ForEach(currencies) { currency in
@@ -238,31 +227,6 @@ struct CurrencyConverterView: View {
 		}
 		.listRowInsets(EdgeInsets()) // remove extra padding space in rows
 		.listRowSeparator(.hidden)   // remove lines between items
-	}
-	
-	@ViewBuilder
-	func currencyRows_iOS14() -> some View {
-		
-		ForEach(currencies) { currency in
-			
-			Row_iOS14(
-				currency: currency,
-				parsedRow: $parsedRow,
-				currencyTextWidth: $currencyTextWidth,
-				flagWidth: $flagWidth
-			)
-			.listRowInsets(EdgeInsets(top: -1, leading: 0, bottom: 0, trailing: 0))
-			.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-			.background(Color(.systemBackground))
-			.buttonStyle(PlainButtonStyle())
-		}
-		.onDelete { (indexSet: IndexSet) in
-			deleteRow_iOS14(indexSet)
-		}
-		.onMove { indexSet, index in
-			moveRow(indexSet, to: index)
-		}
-		.listRowInsets(EdgeInsets()) // remove extra padding space in rows
 	}
 	
 	@ViewBuilder
@@ -367,22 +331,12 @@ struct CurrencyConverterView: View {
 	private func onAppear() {
 		log.trace("onAppear()")
 		
-		if #unavailable(iOS 15.0) {
-			// iOS 14 workaround
-			log.debug("Setting UITableView.background = .systemBackground")
-			UITableView.appearance().backgroundColor = .systemBackground
-		}
-		
 		// Careful: this function may be called when returning from the Receive/Send view
 		if !didAppear {
 			didAppear = true
 			
 			UIScrollView.appearance().keyboardDismissMode = .interactive
 			
-			if #unavailable(iOS 15.0) {
-				// iOS 14 bug workaround
-				currencies = GroupPrefs.shared.currencyConverterList
-			}
 			if currencies.isEmpty {
 				currencies = defaultCurrencies()
 			}
@@ -416,14 +370,6 @@ struct CurrencyConverterView: View {
 	
 	private func onDisappear() {
 		log.trace("onDisappear()")
-		
-		if #unavailable(iOS 15.0) {
-			// iOS 14 workaround
-			if !currencySelectorOpen {
-				log.debug("Setting UITableView.background = .primaryBackground")
-				UITableView.appearance().backgroundColor = .primaryBackground
-			}
-		}
 		
 		if !currencySelectorOpen, let didClose = didClose {
 			didClose()
@@ -613,7 +559,6 @@ struct CurrencyConverterView: View {
 
 // MARK: -
 
-@available(iOS 15.0, *)
 fileprivate struct Row: View, ViewName {
 	
 	let currency: Currency
@@ -808,211 +753,6 @@ fileprivate struct Row: View, ViewName {
 	}
 }
 
-// iOS 14 hack
-enum FormFields {
-	case amountTextfield
-}
-extension FormFields: FocusStateCompliant {
-	static var last: FormFields {
-		.amountTextfield
-	}
-	var next: FormFields? {
-		switch self {
-			default: return nil
-		}
-	}
-}
-
-fileprivate struct Row_iOS14: View, ViewName {
-	
-	let currency: Currency
-	
-	@Binding var parsedRow: ParsedRow?
-	@Binding var currencyTextWidth: CGFloat?
-	@Binding var flagWidth: CGFloat?
-	
-	@State var amount: String = ""
-	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
-	
-	@State var isInvalidAmount: Bool = false
-	
-	@FocusStateLegacy var focusedField: FormFields?
-	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	
-	@ViewBuilder
-	var body: some View {
-		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				
-				TextField("amount", text: currencyStyler().amountProxy)
-					.keyboardType(.decimalPad)
-					.disableAutocorrection(true)
-					.focusedLegacy($focusedField, equals: .amountTextfield)
-					.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
-				
-				// Clear button (appears when TextField's text is non-empty)
-				Button {
-					clearTextField()
-				} label: {
-					Image(systemName: "multiply.circle.fill")
-						.foregroundColor(Color(UIColor.tertiaryLabel))
-				}
-				.isHidden(amount == "")
-			}
-			.padding(.vertical, 8)
-			.padding(.horizontal, 12)
-			.overlay(
-				RoundedRectangle(cornerRadius: 8)
-					.stroke(Color.textFieldBorder, lineWidth: 1)
-			)
-			
-			Text(currency.shortName)
-				.frame(width: currencyTextWidth, alignment: .leading)
-				.padding(.leading, 10)
-			
-			switch currency {
-			case .bitcoin:
-				let fontHeight = UIFont.preferredFont(forTextStyle: .body).pointSize
-				Image("bitcoin")
-					.resizable()
-					.aspectRatio(contentMode: .fit)
-					.frame(width: flagWidth, height: fontHeight, alignment: .center)
-					.padding(.leading, 3)
-					.offset(x: 0, y: 2)
-				
-			case .fiat(let fiatCurrency):
-				Text(fiatCurrency.flag)
-					.frame(width: flagWidth, alignment: .center)
-					.padding(.leading, 3)
-			}
-		}
-		.padding()
-		.onAppear {
-			onAppear()
-		}
-		.onChange(of: amount) { _ in
-			amountDidChange()
-		}
-		.onChange(of: parsedRow) { _ in
-			parsedRowDidChange()
-		}
-		.onChange(of: currencyPrefs.fiatExchangeRates) { _ in
-			exchangeRatesDidChange()
-		}
-	}
-	
-	func currencyStyler() -> TextFieldCurrencyStyler {
-		return TextFieldCurrencyStyler(
-			currency: currency,
-			amount: $amount,
-			parsedAmount: $parsedAmount,
-			hideMsats: false
-		)
-	}
-	
-	func onAppear() {
-		log.trace("[Row:\(currency)] onAppear()")
-		
-		parsedRowDidChange()
-	}
-	
-	func exchangeRatesDidChange() {
-		log.trace("[Row:\(currency)] exchangeRatesDidChange()")
-		
-		if focusedField != .amountTextfield {
-			// The exchangeRates changed, and the user is modifying the value of some other currency.
-			// Which means we may need to recalculate and update our amount.
-			parsedRowDidChange()
-		}
-	}
-	
-	func clearTextField() {
-		log.trace("[Row:\(currency)] clearTextField()")
-		
-		focusedField = .amountTextfield
-		parsedAmount = Result.failure(.emptyInput)
-		amount = ""
-		parsedRow = ParsedRow(currency: currency, parsedAmount: Result.failure(.emptyInput))
-	}
-	
-	func amountDidChange() {
-		log.trace("[Row:\(currency)] amountDidChange()")
-		
-		if focusedField == .amountTextfield {
-			switch parsedAmount {
-				case .failure(_): isInvalidAmount = true
-				case .success(_): isInvalidAmount = false
-			}
-			parsedRow = ParsedRow(currency: currency, parsedAmount: parsedAmount)
-		} else {
-			log.trace("[Row:\(currency)] ignoring self-triggered event")
-		}
-	}
-	
-	func parsedRowDidChange() {
-		log.trace("[Row:\(currency)] parsedRowDidChange()")
-		
-		guard let parsedRow = parsedRow else {
-			return
-		}
-		
-		if parsedRow.currency == currency {
-			log.trace("[Row:\(currency)] ignoring self-triggered event")
-			return
-		}
-		
-		var srcMsat: Int64? = nil
-		var newParsedAmount: Result<Double, TextFieldCurrencyStylerError>? = nil
-		var newAmount: String? = nil
-		
-		if case .success(let srcAmt) = parsedRow.parsedAmount {
-			
-			switch parsedRow.currency {
-			case .bitcoin(let srcBitcoinUnit):
-				srcMsat = Utils.toMsat(from: srcAmt, bitcoinUnit: srcBitcoinUnit)
-				
-			case .fiat(let srcFiatCurrency):
-				if let srcExchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: srcFiatCurrency) {
-					srcMsat = Utils.toMsat(fromFiat: srcAmt, exchangeRate: srcExchangeRate)
-				}
-			}
-		}
-		
-		if let srcMsat = srcMsat {
-			
-			switch currency {
-			case .bitcoin(let dstBitcoinUnit):
-					
-				let dstFormattedAmt = Utils.formatBitcoin(msat: srcMsat, bitcoinUnit: dstBitcoinUnit, policy: .hideMsats)
-				newParsedAmount = Result.success(dstFormattedAmt.amount)
-				newAmount = dstFormattedAmt.digits
-			
-			case .fiat(let dstFiatCurrency):
-				
-				if let dstExchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: dstFiatCurrency) {
-					
-					let dstFormattedAmt = Utils.formatFiat(msat: srcMsat, exchangeRate: dstExchangeRate)
-					newParsedAmount = Result.success(dstFormattedAmt.amount)
-					newAmount = dstFormattedAmt.digits
-				}
-			}
-		}
-		
-		if let newParsedAmount = newParsedAmount, let newAmount = newAmount {
-			isInvalidAmount = false
-			parsedAmount = newParsedAmount
-			amount = newAmount
-		} else {
-			isInvalidAmount = true
-			parsedAmount = Result.failure(.emptyInput)
-			amount = ""
-		}
-	}
-}
-
 // MARK: -
 
 
@@ -1092,15 +832,11 @@ fileprivate struct CurrencySelector: View, ViewName {
 				.assignMaxPreference(for: flagWidthReader.key, to: $flagWidth)
 			}
 			
-			if #available(iOS 15.0, *) {
-				content
-					.searchable(text: $searchText)
-					.onChange(of: searchText) { _ in
-						searchTextDidChange()
-					}
-			} else {
-				content
-			}
+			content
+				.searchable(text: $searchText)
+				.onChange(of: searchText) { _ in
+					searchTextDidChange()
+				}
 		}
 		.navigationTitle(NSLocalizedString("Fiat currency", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)

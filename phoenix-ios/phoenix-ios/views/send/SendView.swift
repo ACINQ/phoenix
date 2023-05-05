@@ -74,9 +74,7 @@ struct SendView: MVIView {
 				.zIndex(4)
 
 		case _ as Scan.Model_InvoiceFlow_InvoiceRequest,
-		     _ as Scan.Model_SwapOutFlow_Init,
-		     _ as Scan.Model_SwapOutFlow_Ready,
-		     _ as Scan.Model_SwapOutFlow_Requesting,
+		     _ as Scan.Model_OnChainFlow,
 		     _ as Scan.Model_LnurlPayFlow_LnurlPayRequest,
 		     _ as Scan.Model_LnurlPayFlow_LnurlPayFetch,
 		     _ as Scan.Model_LnurlWithdrawFlow_LnurlWithdrawRequest,
@@ -86,7 +84,6 @@ struct SendView: MVIView {
 				.zIndex(3)
 
 		case _ as Scan.Model_InvoiceFlow_Sending,
-		     _ as Scan.Model_SwapOutFlow_Sending,
 		     _ as Scan.Model_LnurlPayFlow_Sending:
 
 			PaymentInFlightView(mvi: mvi)
@@ -118,7 +115,6 @@ struct SendView: MVIView {
 			showErrorToast(model)
 			
 		case is Scan.Model_InvoiceFlow_Sending,
-		     is Scan.Model_SwapOutFlow_Sending,
 		     is Scan.Model_LnurlPayFlow_Sending:
 			
 			// Pop self from NavigationStack; Back to HomeView

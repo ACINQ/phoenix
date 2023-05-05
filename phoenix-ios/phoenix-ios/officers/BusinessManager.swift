@@ -91,7 +91,8 @@ class BusinessManager {
 
 		let startupParams = StartupParams(
 			requestCheckLegacyChannels: false,
-			isTorEnabled: GroupPrefs.shared.isTorEnabled
+			isTorEnabled: GroupPrefs.shared.isTorEnabled,
+			liquidityPolicy: NodeParamsManager.companion.defaultLiquidityPolicy
 		)
 		business.start(startupParams: startupParams)
 		
@@ -259,6 +260,10 @@ class BusinessManager {
 	///
 	public var nodeIdHash: String? {
 		return walletInfo?.nodeIdHash
+	}
+	
+	public var nodeId: String? {
+		return walletInfo?.nodeId.toHex()
 	}
 
 	// --------------------------------------------------

@@ -19,6 +19,11 @@ struct SummaryView: View {
 	@State var paymentInfo: WalletPaymentInfo
 	@State var paymentInfoIsStale: Bool
 	
+	let fetchOptions = WalletPaymentFetchOptions.companion.All
+	
+	@State var showOriginalFiatValue = GlobalEnvironment.currencyPrefs.showOriginalFiatValue
+	@State var showFiatValueExplanation = false
+	
 	@State var showDeletePaymentConfirmationDialog = false
 	
 	@State var didAppear = false
@@ -50,9 +55,7 @@ struct SummaryView: View {
 		if let row = paymentInfo.toOrderRow() {
 			
 			let fetcher = Biz.business.paymentsManager.fetcher
-			let options = WalletPaymentFetchOptions.companion.All
-			
-			if let result = fetcher.getCachedPayment(row: row, options: options) {
+			if let result = fetcher.getCachedPayment(row: row, options: fetchOptions) {
 				
 				self._paymentInfo = State(initialValue: result)
 				self._paymentInfoIsStale = State(initialValue: false)
@@ -138,208 +141,252 @@ struct SummaryView: View {
 	@ViewBuilder
 	func content() -> some View {
 		
-		let payment = paymentInfo.payment
-		
 		VStack {
 			Spacer(minLength: 25)
-			
-			switch payment.state() {
-			case .success:
-				Image("ic_payment_sent")
-					.renderingMode(.template)
-					.resizable()
-					.frame(width: 100, height: 100)
-					.aspectRatio(contentMode: .fit)
-					.foregroundColor(Color.appPositive)
-					.padding(.bottom, 16)
-					.accessibilityHidden(true)
-				VStack {
-					Group {
-						if payment is Lightning_kmpOutgoingPayment {
-							Text("SENT")
-								.accessibilityLabel("Payment sent")
-						} else {
-							Text("RECEIVED")
-								.accessibilityLabel("Payment received")
-						}
-					}
-					.font(Font.title2.bold())
-					.padding(.bottom, 2)
-					
-					if let completedAtDate = payment.completedAtDate() {
-						Text(completedAtDate.format())
-							.font(.subheadline)
-							.foregroundColor(.secondary)
-					}
-				}
-				.padding(.bottom, 30)
-				
-			case .pending:
-				if payment.isOnChain() {
-					Image(systemName: "hourglass.circle")
-						.renderingMode(.template)
-						.resizable()
-						.foregroundColor(Color.borderColor)
-						.frame(width: 100, height: 100)
-						.padding(.bottom, 16)
-						.accessibilityHidden(true)
-					VStack(alignment: HorizontalAlignment.center, spacing: 2) {
-						Text("WAITING FOR CONFIRMATIONS")
-							.font(.title2.uppercaseSmallCaps())
-							.multilineTextAlignment(.center)
-							.padding(.bottom, 6)
-							.accessibilityLabel("Pending payment")
-							.accessibilityHint("Waiting for confirmations")
-						if let depth = minFundingDepth() {
-							let minutes = depth * 10
-							Text("requires \(depth) confirmations")
-								.font(.footnote)
-								.multilineTextAlignment(.center)
-								.foregroundColor(.secondary)
-							Text("≈\(minutes) minutes")
-								.font(.footnote)
-								.multilineTextAlignment(.center)
-								.foregroundColor(.secondary)
-						}
-						if let broadcastDate = onChainBroadcastDate() {
-							Text(broadcastDate.format())
-								.font(.subheadline)
-								.foregroundColor(.secondary)
-								.padding(.top, 12)
-						}
-					} // </VStack>
-					.padding(.bottom, 30)
-				} else {
-					Image("ic_payment_sending")
-						.renderingMode(.template)
-						.resizable()
-						.foregroundColor(Color.borderColor)
-						.frame(width: 100, height: 100)
-						.padding(.bottom, 16)
-						.accessibilityHidden(true)
-					Text("PENDING")
-						.font(.title2.bold())
-						.padding(.bottom, 30)
-						.accessibilityLabel("Pending payment")
-				}
-				
-			case .failure:
-				Image(systemName: "xmark.circle")
-					.renderingMode(.template)
-					.resizable()
-					.frame(width: 100, height: 100)
-					.foregroundColor(.appNegative)
-					.padding(.bottom, 16)
-					.accessibilityHidden(true)
-				VStack {
-					Text("FAILED")
-						.font(.title2.bold())
-						.padding(.bottom, 2)
-						.accessibilityLabel("Failed payment")
-					
-					Text("NO FUNDS HAVE BEEN SENT")
-						.font(.title2.uppercaseSmallCaps())
-						.padding(.bottom, 6)
-					
-					if let completedAtDate = payment.completedAtDate() {
-						Text(completedAtDate.format())
-							.font(Font.subheadline)
-							.foregroundColor(.secondary)
-					}
-					
-				} // </VStack>
-				.padding(.bottom, 30)
-				
-			default:
-				EmptyView()
-			}
-
-			let isOutgoing = payment is Lightning_kmpOutgoingPayment
-			let amount = Utils.format(currencyPrefs, msat: payment.amount, policy: .showMsatsIfNonZero)
-			
-			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-				
-				if amount.hasSubFractionDigits {
-					
-					// We're showing sub-fractional values.
-					// For example, we're showing millisatoshis.
-					//
-					// It's helpful to downplay the sub-fractional part visually.
-					
-					let hasStdFractionDigits = amount.hasStdFractionDigits
-					
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-						Text(verbatim: isOutgoing ? "-" : "+")
-							.font(.largeTitle)
-							.foregroundColor(Color.secondary)
-						Text(verbatim: amount.integerDigits)
-							.font(.largeTitle)
-						Text(verbatim: amount.decimalSeparator)
-							.font(hasStdFractionDigits ? .largeTitle : .title)
-							.foregroundColor(hasStdFractionDigits ? Color.primary : Color.secondary)
-						if hasStdFractionDigits {
-							Text(verbatim: amount.stdFractionDigits)
-								.font(.largeTitle)
-								.foregroundColor(Color.primary)
-						}
-						Text(verbatim: amount.subFractionDigits)
-							.font(.title)
-							.foregroundColor(Color.secondary)
-					}
-					.environment(\.layoutDirection, .leftToRight) // Issue #237
-					
-				} else {
-					
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-						Text(verbatim: isOutgoing ? "-" : "+")
-							.font(.largeTitle)
-							.foregroundColor(Color.secondary)
-						Text(amount.digits)
-							.font(.largeTitle)
-					}
-					.environment(\.layoutDirection, .leftToRight) // Issue #237
-				}
-				
-				Text_CurrencyName(currency: amount.currency, fontTextStyle: .title3)
-					.foregroundColor(.appAccent)
-					.padding(.leading, 6)
-					.padding(.bottom, 4)
-			}
-			.lineLimit(1)              // SwiftUI truncation bugs
-			.minimumScaleFactor(0.5)   // SwiftUI truncation bugs
-			.onTapGesture { toggleCurrencyType() }
-			.padding([.top, .leading, .trailing], 8)
-			.padding(.bottom, 33)
-			.background(
-				VStack {
-					Spacer()
-					RoundedRectangle(cornerRadius: 10)
-						.frame(width: 70, height: 6, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
-						.foregroundColor(Color.appAccent)
-				}
-			)
-			.padding(.bottom, 24)
-			.accessibilityElement()
-			.accessibilityLabel("\(isOutgoing ? "-" : "+")\(amount.string)")
-			
-			SummaryInfoGrid(paymentInfo: $paymentInfo)
-			
-			if #available(iOS 15.0, *) {
-				if payment.state() == WalletPaymentState.failure {
-					buttonList_withDeleteOption()
-				} else {
-					buttonList()
-				}
-			} else {
-				buttonList()
-			}
-			
+			header_status()
+			header_amount()
+			SummaryInfoGrid(paymentInfo: $paymentInfo, showOriginalFiatValue: $showOriginalFiatValue)
+			buttonList()
 			Spacer(minLength: 25)
 		}
 	}
 	
 	@ViewBuilder
+	func header_status() -> some View {
+		
+		let payment = paymentInfo.payment
+		let paymentState = payment.state()
+		
+		if paymentState == WalletPaymentState.successonchain ||
+		   paymentState == WalletPaymentState.successoffchain
+		{
+			Image("ic_payment_sent")
+				.renderingMode(.template)
+				.resizable()
+				.frame(width: 100, height: 100)
+				.aspectRatio(contentMode: .fit)
+				.foregroundColor(Color.appPositive)
+				.padding(.bottom, 16)
+				.accessibilityHidden(true)
+			VStack {
+				Group {
+					if payment is Lightning_kmpOutgoingPayment {
+						Text("SENT")
+							.accessibilityLabel("Payment sent")
+					} else {
+						Text("RECEIVED")
+							.accessibilityLabel("Payment received")
+					}
+				}
+				.font(Font.title2.bold())
+				.padding(.bottom, 2)
+				
+				if let completedAtDate = payment.completedAtDate {
+					Text(completedAtDate.format())
+						.font(.subheadline)
+						.foregroundColor(.secondary)
+				}
+			}
+			.padding(.bottom, 30)
+			
+		} else if paymentState == WalletPaymentState.pendingonchain {
+			
+			Image(systemName: "hourglass.circle")
+				.renderingMode(.template)
+				.resizable()
+				.foregroundColor(Color.borderColor)
+				.frame(width: 100, height: 100)
+				.padding(.bottom, 16)
+				.accessibilityHidden(true)
+			VStack(alignment: HorizontalAlignment.center, spacing: 2) {
+				Text("WAITING FOR CONFIRMATIONS")
+					.font(.title2.uppercaseSmallCaps())
+					.multilineTextAlignment(.center)
+					.padding(.bottom, 6)
+					.accessibilityLabel("Pending payment")
+					.accessibilityHint("Waiting for confirmations")
+				if let depth = minFundingDepth() {
+					let minutes = depth * 10
+					Text("requires \(depth) confirmations")
+						.font(.footnote)
+						.multilineTextAlignment(.center)
+						.foregroundColor(.secondary)
+					Text("≈\(minutes) minutes")
+						.font(.footnote)
+						.multilineTextAlignment(.center)
+						.foregroundColor(.secondary)
+				}
+				if let broadcastDate = onChainBroadcastDate() {
+					Text(broadcastDate.format())
+						.font(.subheadline)
+						.foregroundColor(.secondary)
+						.padding(.top, 12)
+				}
+			} // </VStack>
+			.padding(.bottom, 30)
+			
+		} else if paymentState == WalletPaymentState.pendingoffchain {
+			
+			Image("ic_payment_sending")
+				.renderingMode(.template)
+				.resizable()
+				.foregroundColor(Color.borderColor)
+				.frame(width: 100, height: 100)
+				.padding(.bottom, 16)
+				.accessibilityHidden(true)
+			Text("PENDING")
+				.font(.title2.bold())
+				.padding(.bottom, 30)
+				.accessibilityLabel("Pending payment")
+			
+		} else if paymentState == WalletPaymentState.failure {
+			
+			Image(systemName: "xmark.circle")
+				.renderingMode(.template)
+				.resizable()
+				.frame(width: 100, height: 100)
+				.foregroundColor(.appNegative)
+				.padding(.bottom, 16)
+				.accessibilityHidden(true)
+			VStack {
+				Text("FAILED")
+					.font(.title2.bold())
+					.padding(.bottom, 2)
+					.accessibilityLabel("Failed payment")
+				
+				Text("NO FUNDS HAVE BEEN SENT")
+					.font(.title2.uppercaseSmallCaps())
+					.padding(.bottom, 6)
+				
+				if let completedAtDate = payment.completedAtDate {
+					Text(completedAtDate.format())
+						.font(Font.subheadline)
+						.foregroundColor(.secondary)
+				}
+				
+			} // </VStack>
+			.padding(.bottom, 30)
+			
+		} else {
+			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func header_amount() -> some View {
+		
+		let isOutgoing = paymentInfo.payment is Lightning_kmpOutgoingPayment
+		let amount = formattedAmount()
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 10) {
+			
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+			
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+					
+					if amount.hasSubFractionDigits {
+						
+						// We're showing sub-fractional values.
+						// For example, we're showing millisatoshis.
+						//
+						// It's helpful to downplay the sub-fractional part visually.
+						
+						let hasStdFractionDigits = amount.hasStdFractionDigits
+						
+						HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+							Text(verbatim: isOutgoing ? "-" : "+")
+								.font(.largeTitle)
+								.foregroundColor(Color.secondary)
+							Text(verbatim: amount.integerDigits)
+								.font(.largeTitle)
+							Text(verbatim: amount.decimalSeparator)
+								.font(hasStdFractionDigits ? .largeTitle : .title)
+								.foregroundColor(hasStdFractionDigits ? Color.primary : Color.secondary)
+							if hasStdFractionDigits {
+								Text(verbatim: amount.stdFractionDigits)
+									.font(.largeTitle)
+									.foregroundColor(Color.primary)
+							}
+							Text(verbatim: amount.subFractionDigits)
+								.font(.title)
+								.foregroundColor(Color.secondary)
+						}
+						.environment(\.layoutDirection, .leftToRight) // Issue #237
+						
+					} else {
+						
+						HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+							Text(verbatim: isOutgoing ? "-" : "+")
+								.font(.largeTitle)
+								.foregroundColor(Color.secondary)
+							Text(amount.digits)
+								.font(.largeTitle)
+						}
+						.environment(\.layoutDirection, .leftToRight) // Issue #237
+					}
+					
+					Text_CurrencyName(currency: amount.currency, fontTextStyle: .title3)
+						.foregroundColor(.appAccent)
+						.padding(.leading, 6)
+						.padding(.bottom, 4)
+					
+				} // </HStack>
+				.onTapGesture { toggleCurrencyType() }
+				
+				if currencyPrefs.currencyType == .fiat {
+					
+					AnimatedClock(state: clockStateBinding(), size: 20, animationDuration: 1.25)
+						.padding(.leading, 8)
+				}
+				
+			} // </HStack>
+			.lineLimit(1)            // SwiftUI truncation bugs
+			.minimumScaleFactor(0.5) // SwiftUI truncation bugs
+			
+			Group {
+				if currencyPrefs.currencyType == .fiat && showFiatValueExplanation {
+					if showOriginalFiatValue {
+						Text("amount at time of payment")
+					} else {
+						Text("amount based on current exchange rate")
+					}
+				} else {
+					Text(verbatim: "sats are the standard")
+						.hidden()
+						.accessibilityHidden(true)
+				}
+			}
+			.font(.caption)
+			.foregroundColor(.secondary)
+			
+		} // </VStack>
+		.padding([.top, .leading, .trailing], 8)
+		.padding(.bottom, 13)
+		.background(
+			VStack {
+				Spacer()
+				RoundedRectangle(cornerRadius: 10)
+					.frame(width: 70, height: 6, alignment: .center)
+					.foregroundColor(Color.appAccent)
+			}
+		)
+		.padding(.bottom, 24)
+		.accessibilityElement()
+		.accessibilityLabel("\(isOutgoing ? "-" : "+")\(amount.string)")
+	}
+	
+	@ViewBuilder
 	func buttonList() -> some View {
+		
+		if paymentInfo.payment.state() == WalletPaymentState.failure {
+			buttonList_withDeleteOption()
+		} else {
+			buttonList_standardOptions()
+		}
+	}
+	
+	@ViewBuilder
+	func buttonList_standardOptions() -> some View {
 		
 		// Details | Edit
 		//         ^
@@ -371,7 +418,6 @@ struct SummaryView: View {
 	}
 	
 	@ViewBuilder
-	@available(iOS 15.0, *)
 	func buttonList_withDeleteOption() -> some View {
 		
 		// Details | Edit | Delete
@@ -427,7 +473,9 @@ struct SummaryView: View {
 	func detailsView() -> some View {
 		DetailsView(
 			type: type,
-			paymentInfo: $paymentInfo
+			paymentInfo: $paymentInfo,
+			showOriginalFiatValue: $showOriginalFiatValue,
+			showFiatValueExplanation: $showFiatValueExplanation
 		)
 	}
 	
@@ -449,8 +497,7 @@ struct SummaryView: View {
 			let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment,
 			let received = incomingPayment.received,
 			let newChannel = received.receivedWith.compactMap({ $0.asNewChannel() }).first,
-			let channelId = newChannel.channelId,
-			let channel = Biz.business.peerManager.getChannelWithCommitments(channelId: channelId),
+			let channel = Biz.business.peerManager.getChannelWithCommitments(channelId: newChannel.channelId),
 			let nodeParams = Biz.business.nodeParamsManager.nodeParams.value_ as? Lightning_kmpNodeParams
 		else {
 			return nil
@@ -463,7 +510,7 @@ struct SummaryView: View {
 		
 		if let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment {
 			
-			if let _ = incomingPayment.origin.asDualSwapIn() {
+			if let _ = incomingPayment.origin.asOnChain() {
 				if let received = incomingPayment.received {
 					return received.receivedAtDate
 				}
@@ -471,6 +518,35 @@ struct SummaryView: View {
 		}
 		
 		return nil
+	}
+	
+	func formattedAmount() -> FormattedAmount {
+		
+		let msat = paymentInfo.payment.amount
+		if showOriginalFiatValue && currencyPrefs.currencyType == .fiat {
+			
+			if let originalExchangeRate = paymentInfo.metadata.originalFiat {
+				return Utils.formatFiat(msat: msat, exchangeRate: originalExchangeRate)
+			} else {
+				return Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+			}
+			
+		} else {
+			return Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
+		}
+	}
+	
+	func clockStateBinding() -> Binding<AnimatedClock.ClockState> {
+		
+		return Binding {
+			showOriginalFiatValue ? .past : .present
+		} set: { value in
+			switch value {
+				case .past    : showOriginalFiatValue = true
+				case .present : showOriginalFiatValue = false
+			}
+			showFiatValueExplanation = true
+		}
 	}
 	
 	// --------------------------------------------------
@@ -481,7 +557,6 @@ struct SummaryView: View {
 		log.trace("onAppear()")
 		
 		let business = Biz.business
-		let options = WalletPaymentFetchOptions.companion.All
 		
 		if !didAppear {
 			didAppear = true
@@ -495,7 +570,7 @@ struct SummaryView: View {
 				
 				if let row = paymentInfo.toOrderRow() {
 
-					business.paymentsManager.fetcher.getPayment(row: row, options: options) { (result, _) in
+					business.paymentsManager.fetcher.getPayment(row: row, options: fetchOptions) { (result, _) in
 
 						if let result = result {
 							paymentInfo = result
@@ -504,7 +579,7 @@ struct SummaryView: View {
 
 				} else {
 				
-					business.paymentsManager.getPayment(id: paymentInfo.id(), options: options) { (result, _) in
+					business.paymentsManager.getPayment(id: paymentInfo.id(), options: fetchOptions) { (result, _) in
 						
 						if let result = result {
 							paymentInfo = result
@@ -519,7 +594,7 @@ struct SummaryView: View {
 			// The payment metadata may have changed (e.g. description/notes modified).
 			// So we need to refresh the payment info.
 			
-			business.paymentsManager.getPayment(id: paymentInfo.id(), options: options) { (result, _) in
+			business.paymentsManager.getPayment(id: paymentInfo.id(), options: fetchOptions) { (result, _) in
 				
 				if let result = result {
 					paymentInfo = result
@@ -563,17 +638,26 @@ struct SummaryView: View {
 fileprivate struct SummaryInfoGrid: InfoGridView {
 	
 	@Binding var paymentInfo: WalletPaymentInfo
+	@Binding var showOriginalFiatValue: Bool
 	
 	// <InfoGridView Protocol>
-	@State var keyColumnWidths: [InfoGridRow_KeyColumn_Width] = []
 	let minKeyColumnWidth: CGFloat = 50
 	let maxKeyColumnWidth: CGFloat = 200
 	
-	func setKeyColumnWidths(_ value: [InfoGridRow_KeyColumn_Width]) {
-		keyColumnWidths = value
+	@State var keyColumnSizes: [InfoGridRow_KeyColumn_Size] = []
+	func setKeyColumnSizes(_ value: [InfoGridRow_KeyColumn_Size]) {
+		keyColumnSizes = value
 	}
-	func getKeyColumnWidths() -> [InfoGridRow_KeyColumn_Width] {
-		return keyColumnWidths
+	func getKeyColumnSizes() -> [InfoGridRow_KeyColumn_Size] {
+		return keyColumnSizes
+	}
+	
+	@State var rowSizes: [InfoGridRow_Size] = []
+	func setRowSizes(_ sizes: [InfoGridRow_Size]) {
+		rowSizes = sizes
+	}
+	func getRowSizes() -> [InfoGridRow_Size] {
+		return rowSizes
 	}
 	// </InfoGridView Protocol>
 	
@@ -605,26 +689,26 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			paymentTypeRow()
 			channelClosingRow()
 			
-			if let standardFees = paymentInfo.payment.standardFees(currencyPrefs: currencyPrefs) {
+			if let standardFees = paymentInfo.payment.standardFees() {
 				paymentFeesRow(
+					msat: standardFees.0,
 					title: standardFees.1,
-					amount: standardFees.0,
 					explanation: standardFees.2,
 					binding: $popoverPresent_standardFees
 				)
 			}
-			if let minerFees = paymentInfo.payment.minerFees(currencyPrefs: currencyPrefs) {
+			if let minerFees = paymentInfo.payment.minerFees() {
 				paymentFeesRow(
+					msat: minerFees.0,
 					title: minerFees.1,
-					amount: minerFees.0,
 					explanation: minerFees.2,
 					binding: $popoverPresent_minerFees
 				)
 			}
-			if let swapOutFees = paymentInfo.payment.swapOutFees(currencyPrefs: currencyPrefs) {
+			if let swapOutFees = paymentInfo.payment.swapOutFees() {
 				paymentFeesRow(
+					msat: swapOutFees.0,
 					title: swapOutFees.1,
-					amount: swapOutFees.0,
 					explanation: swapOutFees.2,
 					binding: $popoverPresent_swapFees
 				)
@@ -636,9 +720,15 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func keyColumn(_ str: String) -> some View {
+	func keyColumn(_ title: LocalizedStringKey) -> some View {
 		
-		Text(str).foregroundColor(.secondary)
+		Text(title).foregroundColor(.secondary)
+	}
+	
+	@ViewBuilder
+	func keyColumn(verbatim title: String) -> some View {
+		
+		Text(title).foregroundColor(.secondary)
 	}
 	
 	@ViewBuilder
@@ -649,11 +739,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Service", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Service")
 				
 			} valueColumn: {
 				
@@ -669,11 +761,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 		
 		InfoGridRow(
 			identifier: identifier,
+			vAlignment: .firstTextBaseline,
 			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
+			keyColumnWidth: keyColumnWidth(identifier: identifier),
+			keyColumnAlignment: .trailing
 		) {
 			
-			keyColumn(NSLocalizedString("Desc", comment: "Label in SummaryInfoGrid"))
+			keyColumn("Desc")
 				.accessibilityLabel("Description")
 			
 		} valueColumn: {
@@ -700,11 +794,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Message", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Message")
 				
 			} valueColumn: {
 				
@@ -723,11 +819,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Message", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Message")
 				
 			} valueColumn: {
 				
@@ -757,11 +855,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Message", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Message")
 				
 			} valueColumn: {
 				
@@ -812,11 +912,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Notes", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Notes")
 				
 			} valueColumn: {
 				
@@ -830,22 +932,25 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	func paymentTypeRow() -> some View {
 		let identifier: String = #function
 		
-		if let pType = paymentInfo.payment.paymentType() {
+		if let paymentTypeTuple = paymentInfo.payment.paymentType() {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Type", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Type")
 				
 			} valueColumn: {
 				
 				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 					
-					Text(pType.0)
-					+ Text(verbatim: " (\(pType.1))")
+					let (type, explanation) = paymentTypeTuple
+					Text(type)
+					+ Text(verbatim: " (\(explanation))")
 						.font(.footnote)
 						.foregroundColor(.secondary)
 					
@@ -870,21 +975,23 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Output", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Output")
 				
 			} valueColumn: {
 				
 				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 					
 					// Bitcoin address (copyable)
-					Text(pClosingInfo.closingAddress)
+					Text(pClosingInfo.address)
 						.contextMenu {
 							Button(action: {
-								UIPasteboard.general.string = pClosingInfo.closingAddress
+								UIPasteboard.general.string = pClosingInfo.address
 							}) {
 								Text("Copy")
 							}
@@ -904,8 +1011,8 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func paymentFeesRow(
+		msat: Int64,
 		title: String,
-		amount: FormattedAmount,
 		explanation: String,
 		binding: Binding<Bool>
 	) -> some View {
@@ -913,16 +1020,19 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 		
 		InfoGridRow(
 			identifier: identifier,
+			vAlignment: .firstTextBaseline,
 			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
+			keyColumnWidth: keyColumnWidth(identifier: identifier),
+			keyColumnAlignment: .trailing
 		) {
 			
-			keyColumn(title)
+			keyColumn(verbatim: title)
 			
 		} valueColumn: {
 				
 			HStack(alignment: VerticalAlignment.center, spacing: 6) {
 				
+				let amount = formattedAmount(msat: msat)
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					
 					if amount.hasSubFractionDigits {
@@ -971,7 +1081,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 						}
 					}
 				}
-			}
+			} // </HStack>
 			
 		} // </InfoGridRow>
 	}
@@ -984,11 +1094,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Error", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Error")
 				
 			} valueColumn: {
 				
@@ -997,11 +1109,27 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			} // </InfoGridRow>
 		}
 	}
+	
+	func formattedAmount(msat: Int64) -> FormattedAmount {
+		
+		if showOriginalFiatValue && currencyPrefs.currencyType == .fiat {
+			
+			if let originalExchangeRate = paymentInfo.metadata.originalFiat {
+				return Utils.formatFiat(msat: msat, exchangeRate: originalExchangeRate)
+			} else {
+				return Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+			}
+			
+		} else {
+			
+			return Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
+		}
+	}
 
 	func decrypt(aes sa_aes: LnurlPay.Invoice_SuccessAction_Aes) -> LnurlPay.Invoice_SuccessAction_Aes_Decrypted? {
 		
 		guard
-			let outgoingPayment = paymentInfo.payment as? Lightning_kmpOutgoingPayment,
+			let outgoingPayment = paymentInfo.payment as? Lightning_kmpLightningOutgoingPayment,
 			let offchainSuccess = outgoingPayment.status.asOffChain()
 		else {
 			return nil
