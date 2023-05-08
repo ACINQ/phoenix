@@ -15,7 +15,6 @@ extension Scan {
 	typealias Model_BadRequest = ModelBadRequest
 
 	typealias Model_InvoiceFlow = ModelInvoiceFlow
-	typealias Model_InvoiceFlow_DangerousRequest = ModelInvoiceFlowDangerousRequest
 	typealias Model_InvoiceFlow_InvoiceRequest = ModelInvoiceFlowInvoiceRequest
 	typealias Model_InvoiceFlow_Sending = ModelInvoiceFlowSending
 
@@ -40,7 +39,6 @@ extension Scan {
 
 	typealias Intent_Parse = IntentParse
 
-	typealias Intent_InvoiceFlow_ConfirmDangerousRequest = IntentInvoiceFlowConfirmDangerousRequest
 	typealias Intent_InvoiceFlow_SendInvoicePayment = IntentInvoiceFlowSendInvoicePayment
 
 	typealias Intent_CancelLnurlServiceFetch = IntentCancelLnurlServiceFetch

@@ -185,7 +185,7 @@ struct ValidateView: View {
 			onChainDetails()
 			
 			paymentButton()
-			disconnectedWarning()
+			otherWarning()
 			
 			paymentSummary()
 				.padding(.top)
@@ -446,26 +446,34 @@ struct ValidateView: View {
 			backgroundFill: Color.appAccent,
 			disabledBackgroundFill: Color.gray
 		))
-		.disabled(problem != nil || isDisconnected)
+		.disabled(problem != nil || isDisconnected || chainContext == nil)
 		.accessibilityHint(paymentButtonHint())
 	}
 	
 	@ViewBuilder
-	func disconnectedWarning() -> some View {
+	func otherWarning() -> some View {
 		
-		if problem == nil && isDisconnected {
+		if problem == nil {
 			
-			Button {
-				showAppStatusPopover()
-			} label: {
-				HStack {
-					ProgressView()
-						.progressViewStyle(CircularProgressViewStyle())
-						.padding(.trailing, 1)
-					Text(disconnectedText())
+			if isDisconnected {
+				
+				Button {
+					showAppStatusPopover()
+				} label: {
+					HStack {
+						ProgressView()
+							.progressViewStyle(CircularProgressViewStyle())
+							.padding(.trailing, 1)
+						Text(disconnectedText())
+					}
 				}
+				.padding(.top, 4)
+				
+			} else if chainContext == nil {
+				
+				Text("Unable to fetch fees")
+					.foregroundColor(.appNegative)
 			}
-			.padding(.top, 4)
 		}
 	}
 	
@@ -1407,7 +1415,10 @@ struct ValidateView: View {
 	func sendPayment() {
 		log.trace("sendPayment()")
 		
-		guard let msat = parsedAmountMsat() else {
+		guard
+			let msat = parsedAmountMsat(),
+			let trampolineFees = chainContext?.walletParams().trampolineFees.first
+		else {
 			return
 		}
 		
@@ -1424,7 +1435,7 @@ struct ValidateView: View {
 			mvi.intent(Scan.Intent_InvoiceFlow_SendInvoicePayment(
 				paymentRequest: model.paymentRequest,
 				amount: Lightning_kmpMilliSatoshi(msat: msat),
-				maxFees: Prefs.shared.maxFees?.toKotlin()
+				trampolineFees: trampolineFees
 			))
 			
 		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
@@ -1454,7 +1465,7 @@ struct ValidateView: View {
 				mvi.intent(Scan.Intent_LnurlPayFlow_RequestInvoice(
 					paymentIntent: model.paymentIntent,
 					amount: Lightning_kmpMilliSatoshi(msat: msat),
-					maxFees: Prefs.shared.maxFees?.toKotlin(),
+					trampolineFees: trampolineFees,
 					comment: comment
 				))
 			}

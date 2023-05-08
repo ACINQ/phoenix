@@ -25,7 +25,6 @@ struct ScanView: View {
 	@State var showingImagePicker = false
 	@State var imagePickerSelection: UIImage? = nil
 	
-	@State var displayWarning: Bool = false
 	@State var ignoreScanner: Bool = false
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
@@ -102,11 +101,6 @@ struct ScanView: View {
 		}
 		.onChange(of: mvi.model) { newModel in
 			modelDidChange(newModel)
-		}
-		.onChange(of: displayWarning) { newValue in
-			if newValue {
-				showWarning()
-			}
 		}
 	}
 	
@@ -443,10 +437,6 @@ struct ScanView: View {
 			//
 			ignoreScanner = false
 		}
-		
-		if let _ = newModel as? Scan.Model_InvoiceFlow_DangerousRequest {
-			displayWarning = true
-		}
 	}
 	
 	func didScanQRCode(_ request: String) {
@@ -522,25 +512,6 @@ struct ScanView: View {
 		smartModalState.display(dismissable: true) {
 			
 			ManualInput(mvi: mvi, ignoreScanner: $ignoreScanner)
-		}
-	}
-
-	func showWarning() {
-		log.trace("showWarning()")
-		
-		guard let model = mvi.model as? Scan.Model_InvoiceFlow_DangerousRequest else {
-			return
-		}
-		
-		displayWarning = false
-		ignoreScanner = true
-		popoverState.display(dismissable: false) {
-			
-			DangerousInvoiceAlert(
-				model: model,
-				intent: mvi.intent,
-				ignoreScanner: $ignoreScanner
-			)
 		}
 	}
 	
@@ -679,125 +650,5 @@ struct ManualInput: View, ViewName {
 		}
 		
 		smartModalState.close()
-	}
-}
-
-// --------------------------------------------------
-// MARK: -
-// --------------------------------------------------
-
-struct DangerousInvoiceAlert: View, ViewName {
-
-	let model: Scan.Model_InvoiceFlow_DangerousRequest
-	let intent: (Scan.Intent) -> Void
-
-	@Binding var ignoreScanner: Bool
-	
-	@Environment(\.popoverState) var popoverState: PopoverState
-
-	@ViewBuilder
-	var body: some View {
-		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-
-			Text("Warning")
-				.font(.title2)
-				.padding(.bottom)
-				.accessibilityAddTraits(.isHeader)
-			
-			if model.reason is Scan.DangerousRequestReasonIsAmountlessInvoice {
-				content_amountlessInvoice
-			} else if model.reason is Scan.DangerousRequestReasonIsOwnInvoice {
-				content_ownInvoice
-			} else {
-				content_unknown
-			}
-
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				
-				Spacer()
-				
-				Button("Cancel") {
-					didCancel()
-				}
-				.font(.title3)
-				.padding(.trailing)
-					
-				Button("Continue") {
-					didConfirm()
-				}
-				.font(.title3)
-				.disabled(isUnknownType())
-			}
-			.padding(.top, 30)
-			
-		} // </VStack>
-		.padding()
-	}
-	
-	@ViewBuilder
-	var content_amountlessInvoice: some View {
-		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-			
-			Text(styled: NSLocalizedString(
-				"""
-				The invoice doesn't include an amount. This can be dangerous: \
-				malicious nodes may be able to steal your payment. To be safe, \
-				**ask the payee to specify an amount** in the payment request.
-				""",
-				comment: "SendView"
-			))
-			.padding(.bottom)
-
-			Text("Are you sure you want to pay this invoice?")
-		}
-	}
-	
-	@ViewBuilder
-	var content_ownInvoice: some View {
-		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-			
-			Text("The invoice is for you. You are about to pay yourself.")
-		}
-	}
-	
-	@ViewBuilder
-	var content_unknown: some View {
-		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-			
-			Text("Something is amiss with this invoice...")
-		}
-	}
-	
-	func isUnknownType() -> Bool {
-		
-		if model.reason is Scan.DangerousRequestReasonIsAmountlessInvoice {
-			return false
-		} else if model.reason is Scan.DangerousRequestReasonIsOwnInvoice {
-			return false
-		} else {
-			return true
-		}
-	}
-	
-	func didCancel() -> Void {
-		log.trace("[\(viewName)] didCancel()")
-		
-		popoverState.close {
-			ignoreScanner = false
-		}
-	}
-	
-	func didConfirm() -> Void {
-		log.trace("[\(viewName)] didConfirm()")
-		
-		intent(Scan.Intent_InvoiceFlow_ConfirmDangerousRequest(
-			request: model.request,
-			paymentRequest: model.paymentRequest
-		))
-		popoverState.close()
 	}
 }

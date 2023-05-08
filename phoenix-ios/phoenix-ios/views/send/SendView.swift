@@ -67,7 +67,6 @@ struct SendView: MVIView {
 		switch mvi.model {
 		case _ as Scan.Model_Ready,
 		     _ as Scan.Model_BadRequest,
-		     _ as Scan.Model_InvoiceFlow_DangerousRequest,
 		     _ as Scan.Model_LnurlServiceFetch:
 
 			ScanView(mvi: mvi, toast: toast)
