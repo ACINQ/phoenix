@@ -119,7 +119,6 @@ struct IntroView1: View, ViewName {
 				.padding(.vertical, 8)
 			}
 			.buttonStyle(.borderedProminent)
-			.tint(Color.blue)
 			.buttonBorderShape(.capsule)
 			.padding(.bottom)
 		}
@@ -170,7 +169,6 @@ struct IntroView2: View, ViewName {
 				.padding(.vertical, 8)
 			}
 			.buttonStyle(.borderedProminent)
-			.tint(Color.blue)
 			.buttonBorderShape(.capsule)
 			.padding(.bottom)
 		}
@@ -227,7 +225,6 @@ struct IntroView3: View, ViewName {
 				.padding(.vertical, 8)
 			}
 			.buttonStyle(.borderedProminent)
-			.tint(Color.blue)
 			.buttonBorderShape(.capsule)
 			.padding(.bottom)
 		}
