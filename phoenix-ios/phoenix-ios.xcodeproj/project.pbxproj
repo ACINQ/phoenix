@@ -192,6 +192,8 @@
 		DCB04685260D162C007FDA37 /* ViewName.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB04684260D162C007FDA37 /* ViewName.swift */; };
 		DCB0DB8A255AE42F005B29C8 /* PhoenixShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */; };
 		DCB0DBB1255AEE22005B29C8 /* PhoenixShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DCB30E522A0A948000E7D7A2 /* WalletInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB30E512A0A948000E7D7A2 /* WalletInfoView.swift */; };
+		DCB30E542A0AABAF00E7D7A2 /* InfoPopoverWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB30E532A0AABAF00E7D7A2 /* InfoPopoverWindow.swift */; };
 		DCB4108729028EF900CE4FF9 /* Prefs+BackupSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB4108629028EF900CE4FF9 /* Prefs+BackupSeed.swift */; };
 		DCB410892902D5BF00CE4FF9 /* PaymentsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB410882902D5BF00CE4FF9 /* PaymentsSection.swift */; };
 		DCB493CB269F3B06001B0F09 /* Result+Deugly.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB493CA269F3B05001B0F09 /* Result+Deugly.swift */; };
@@ -494,6 +496,8 @@
 		DCAEF8F627628BEB00015993 /* Either.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Either.swift; sourceTree = "<group>"; };
 		DCB04684260D162C007FDA37 /* ViewName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewName.swift; sourceTree = "<group>"; };
 		DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PhoenixShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DCB30E512A0A948000E7D7A2 /* WalletInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletInfoView.swift; sourceTree = "<group>"; };
+		DCB30E532A0AABAF00E7D7A2 /* InfoPopoverWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoPopoverWindow.swift; sourceTree = "<group>"; };
 		DCB4108629028EF900CE4FF9 /* Prefs+BackupSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+BackupSeed.swift"; sourceTree = "<group>"; };
 		DCB410882902D5BF00CE4FF9 /* PaymentsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentsSection.swift; sourceTree = "<group>"; };
 		DCB493CA269F3B05001B0F09 /* Result+Deugly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Deugly.swift"; sourceTree = "<group>"; };
@@ -617,6 +621,7 @@
 				DC39D4EE287497440030F18D /* SmartModal.swift */,
 				DC39D4F02874DDF40030F18D /* View+If.swift */,
 				DC6D26E229E76557006A7814 /* AnimatedClock.swift */,
+				DCB30E532A0AABAF00E7D7A2 /* InfoPopoverWindow.swift */,
 			);
 			path = widgets;
 			sourceTree = "<group>";
@@ -1000,6 +1005,7 @@
 			children = (
 				C8D7A2327BC90150A3E1493D /* AboutView.swift */,
 				DC0732EB263CA6C3004CB88D /* PaymentOptionsView.swift */,
+				DCB30E512A0A948000E7D7A2 /* WalletInfoView.swift */,
 				DC2DC8662906ABE70079E570 /* display configuration */,
 				DC27E4CD2791D18600C777CC /* recovery phrase */,
 				DC5CA4EB28F83C260048A737 /* drain wallet */,
@@ -1439,6 +1445,7 @@
 				DCEE3E542931446A00EB4DFF /* Collections+AsInt.swift in Sources */,
 				DCACF70E256701870009B01E /* LockView.swift in Sources */,
 				DC63BDF929AEB8180067A361 /* BackgroundPaymentsSelector.swift in Sources */,
+				DCB30E542A0AABAF00E7D7A2 /* InfoPopoverWindow.swift in Sources */,
 				DCA6DEC62829BDEB0073C658 /* CrossProcessCommunication.swift in Sources */,
 				DC682FE8258175CE00CA1114 /* Popover.swift in Sources */,
 				DCACF6FA2566D0BA0009B01E /* KeyStoreError.swift in Sources */,
@@ -1564,6 +1571,7 @@
 				DC87806F292D69C90061715B /* IncomingDepositPopover.swift in Sources */,
 				DCAEF8D9275E69B000015993 /* SyncSeedManager_State.swift in Sources */,
 				DCB04685260D162C007FDA37 /* ViewName.swift in Sources */,
+				DCB30E522A0A948000E7D7A2 /* WalletInfoView.swift in Sources */,
 				DCFA876D260E91E600AE8953 /* IntroContainer.swift in Sources */,
 				DCA5391C29F7202F001BD3D5 /* ChannelInfoPopup.swift in Sources */,
 				DCB4108729028EF900CE4FF9 /* Prefs+BackupSeed.swift in Sources */,

@@ -1075,9 +1075,8 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 							.font(.body)
 					}
 					.popover(present: binding) {
-						Templates.Container {
+						InfoPopoverWindow {
 							Text(verbatim: explanation)
-								.padding(.all, 4)
 						}
 					}
 				}

@@ -16,8 +16,9 @@ fileprivate enum NavLinkTag: String {
 	// General
 	case AboutView
 	case DisplayConfigurationView
-	case PaymentOptionsView
+	case MyWalletView
 	case RecoveryPhraseView
+	case PaymentOptionsView
 	case DrainWalletView
 	// Security
 	case AppAccessView
@@ -134,15 +135,18 @@ struct ConfigurationView: View {
 					Image(systemName: "paintbrush.pointed")
 				}
 			}
-	
-			navLink(.PaymentOptionsView) {
-				Label { Text("Payment options & fees") } icon: {
-					Image(systemName: "wrench")
+			
+			if hasWallet {
+				navLink(.MyWalletView) {
+					Label {
+						Text("My wallet")
+					} icon: {
+						Image(systemName: "person")
+					}
 				}
 			}
-		
+			
 			if hasWallet {
-				
 				navLink(.RecoveryPhraseView) {
 					Label {
 						switch backupSeedState {
@@ -167,14 +171,21 @@ struct ConfigurationView: View {
 						Image(systemName: "squareshape.split.3x3")
 					}
 				}
-				
+			}
+	
+			navLink(.PaymentOptionsView) {
+				Label { Text("Options & fees") } icon: {
+					Image(systemName: "wrench")
+				}
+			}
+		
+			if hasWallet {
 				navLink(.DrainWalletView) {
 					Label { Text("Drain wallet") } icon: {
 						Image(systemName: "xmark.circle")
 					}
 				}
-			
-			} // </if: hasWallet>
+			}
 			
 		} // </Section: General>
 	}
@@ -260,8 +271,9 @@ struct ConfigurationView: View {
 		// General
 			case .AboutView                 : AboutView()
 			case .DisplayConfigurationView  : DisplayConfigurationView()
-			case .PaymentOptionsView        : PaymentOptionsView()
+			case .MyWalletView              : WalletInfoView()
 			case .RecoveryPhraseView        : RecoveryPhraseView()
+			case .PaymentOptionsView        : PaymentOptionsView()
 			case .DrainWalletView           : DrainWalletView(popToRoot: popToRoot)
 		// Security
 			case .AppAccessView             : AppAccessView()
