@@ -22,14 +22,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.Command
-import fr.acinq.lightning.transactions.Transactions
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.Parser
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -70,6 +68,7 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
             log.error("error when preparing splice-out: ", e)
             state = SpliceOutState.Error.Thrown(e)
         }) {
+            state = SpliceOutState.Preparing(userAmount = amount, feeratePerByte = feeratePerByte)
             val userFeerate = FeeratePerKw(FeeratePerByte(feeratePerByte))
             val scriptPubKey = Parser.addressToPublicKeyScript(chain, address)!!.byteVector()
             val res = peerManager.getPeer().estimateFeeForSpliceOut(

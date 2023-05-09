@@ -31,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -56,8 +55,10 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.errorMessage
 import fr.acinq.phoenix.utils.extensions.minDepthForFunding
+import fr.acinq.phoenix.utils.extensions.state
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -75,36 +76,27 @@ fun PaymentDetailsSplashView(
         header = { DefaultScreenHeader(onBackClick = onBackClick) },
         topContent = { PaymentStatus(data.payment, fromEvent) }
     ) {
-        AmountWithAltView(
-            amount = payment.amount,
+        AmountView(
+            amount = payment.amount - payment.fees,
             amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 30.sp),
             separatorSpace = 4.dp,
-            isOutgoing = payment is OutgoingPayment
+            prefix = stringResource(id = if (payment is OutgoingPayment) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received)
         )
 
         Spacer(modifier = Modifier.height(36.dp))
-        PrimarySeparator(height = 6.dp)
+        PrimarySeparator(
+            height = 6.dp,
+            color = when (payment.state()) {
+                WalletPaymentState.Failure -> negativeColor
+                WalletPaymentState.SuccessOffChain, WalletPaymentState.SuccessOnChain -> positiveColor
+                else -> mutedBgColor
+            }
+        )
         Spacer(modifier = Modifier.height(36.dp))
 
         PaymentDescriptionView(data = data, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
         PaymentDestinationView(payment = payment)
         PaymentFeeView(payment = payment)
-
-        when (payment) {
-            is ChannelCloseOutgoingPayment -> {
-                ConfirmationView(payment.txId, payment.channelId)
-            }
-            is SpliceOutgoingPayment -> {
-                ConfirmationView(payment.txId, payment.channelId)
-            }
-            is IncomingPayment -> {
-//                Text(text = "${payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>()}")
-                payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>()?.map { it.txId to it.channelId }?.firstOrNull()?.let { (txId, channelId) ->
-                    ConfirmationView(txId = txId, channelId = channelId)
-                }
-            }
-            else -> {}
-        }
 
         data.payment.errorMessage()?.let { errorMessage ->
             Spacer(modifier = Modifier.height(8.dp))
@@ -171,31 +163,41 @@ private fun PaymentStatus(
                     isAnimated = false,
                     color = mutedTextColor,
                 )
+                ConfirmationView(payment.txId, payment.channelId)
             }
-            else -> PaymentStatusIcon(
-                message = {
-                    Text(text = annotatedStringResource(id = R.string.paymentdetails_status_channelclose_confirmed, payment.completedAt?.toRelativeDateString() ?: ""))
-                },
-                imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
-                isAnimated = fromEvent,
-                color = positiveColor,
-            )
+            else -> {
+                PaymentStatusIcon(
+                    message = {
+                        Text(text = annotatedStringResource(id = R.string.paymentdetails_status_channelclose_confirmed, payment.completedAt?.toRelativeDateString() ?: ""))
+                    },
+                    imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
+                    isAnimated = fromEvent,
+                    color = positiveColor,
+                )
+                ConfirmationView(payment.txId, payment.channelId)
+            }
         }
         is SpliceOutgoingPayment -> when (payment.confirmedAt) {
-            null -> PaymentStatusIcon(
-                message = { Text(text = stringResource(id = R.string.paymentdetails_status_unconfirmed)) },
-                imageResId = R.drawable.ic_payment_details_pending_onchain_static,
-                isAnimated = false,
-                color = mutedTextColor,
-            )
-            else -> PaymentStatusIcon(
-                message = {
-                    Text(text = annotatedStringResource(id = R.string.paymentdetails_status_sent_successful, payment.completedAt!!.toRelativeDateString()))
-                },
-                imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
-                isAnimated = fromEvent,
-                color = positiveColor,
-            )
+            null -> {
+                PaymentStatusIcon(
+                    message = { Text(text = stringResource(id = R.string.paymentdetails_status_unconfirmed)) },
+                    imageResId = R.drawable.ic_payment_details_pending_onchain_static,
+                    isAnimated = false,
+                    color = mutedTextColor,
+                )
+                ConfirmationView(payment.txId, payment.channelId)
+            }
+            else -> {
+                PaymentStatusIcon(
+                    message = {
+                        Text(text = annotatedStringResource(id = R.string.paymentdetails_status_sent_successful, payment.completedAt!!.toRelativeDateString()))
+                    },
+                    imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
+                    isAnimated = fromEvent,
+                    color = positiveColor,
+                )
+                ConfirmationView(payment.txId, payment.channelId)
+            }
         }
         is IncomingPayment -> {
             val received = payment.received
@@ -261,6 +263,9 @@ private fun PaymentStatus(
                     )
                 }
             }
+            received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>()?.firstOrNull()?.let {
+                ConfirmationView(it.txId, it.channelId)
+            }
         }
     }
 }
@@ -310,9 +315,14 @@ private fun PaymentDescriptionView(
     onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
 ) {
     var showEditDescriptionDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-    val payment = data.payment
-    val paymentDesc = remember(payment) { payment.smartDescription(context) }
+
+    val paymentDesc = when (val payment = data.payment) {
+        is LightningOutgoingPayment -> when (val details = payment.details) {
+            is LightningOutgoingPayment.Details.Normal -> details.paymentRequest.description?.takeUnless { it.isBlank() }
+            else -> null
+        }
+        else -> null
+    }
     val customDesc = remember(data) { data.metadata.userDescription?.takeIf { it.isNotBlank() } }
     SplashLabelRow(label = stringResource(id = R.string.paymentdetails_desc_label)) {
         val finalDesc = paymentDesc ?: customDesc
@@ -333,9 +343,10 @@ private fun PaymentDescriptionView(
                     else -> R.string.paymentdetails_edit_desc_button
                 }
             ),
-            textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
+            textStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
             modifier = Modifier.offset(x = (-8).dp),
             icon = R.drawable.ic_text,
+            iconTint = MaterialTheme.typography.caption.color,
             space = 6.dp,
             shape = CircleShape,
             padding = PaddingValues(8.dp),
@@ -358,21 +369,9 @@ private fun PaymentDescriptionView(
 @Composable
 private fun PaymentDestinationView(payment: WalletPayment) {
     when (payment) {
-        is LightningOutgoingPayment -> {
-            Spacer(modifier = Modifier.height(8.dp))
-            SplashLabelRow(label = stringResource(id = R.string.paymentdetails_destination_label)) {
-                Text(
-                    text = when (val details = payment.details) {
-                        is LightningOutgoingPayment.Details.Normal -> details.paymentRequest.nodeId.toString()
-                        is LightningOutgoingPayment.Details.KeySend -> "Keysend"
-                        is LightningOutgoingPayment.Details.SwapOut -> details.address
-                    }
-                )
-            }
-        }
         is OnChainOutgoingPayment -> {
             Spacer(modifier = Modifier.height(8.dp))
-            SplashLabelRow(label = stringResource(id = R.string.paymentdetails_destination_label)) {
+            SplashLabelRow(label = stringResource(id = R.string.paymentdetails_destination_label), icon = R.drawable.ic_chain) {
                 Text(text = payment.address)
             }
         }
@@ -383,14 +382,14 @@ private fun PaymentDestinationView(payment: WalletPayment) {
 @Composable
 private fun PaymentFeeView(payment: WalletPayment) {
     val btcUnit = LocalBitcoinUnit.current
-    when (payment) {
-        is OutgoingPayment -> {
+    when {
+        payment is OutgoingPayment && (payment.state() == WalletPaymentState.SuccessOffChain || payment.state() == WalletPaymentState.SuccessOnChain) -> {
             Spacer(modifier = Modifier.height(8.dp))
             SplashLabelRow(label = stringResource(id = R.string.paymentdetails_fees_label)) {
                 Text(text = payment.fees.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
             }
         }
-        is IncomingPayment -> {
+        payment is IncomingPayment -> {
             val receivedWithNewChannel = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>() ?: emptyList()
             val receivedWithSpliceIn = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.SpliceIn>() ?: emptyList()
             if ((receivedWithNewChannel + receivedWithSpliceIn).isNotEmpty()) {
@@ -415,6 +414,7 @@ private fun PaymentFeeView(payment: WalletPayment) {
                 }
             }
         }
+        else -> {}
     }
 }
 
@@ -446,6 +446,8 @@ private fun EditPaymentDetails(
                 modifier = Modifier.fillMaxWidth(),
                 text = description ?: "",
                 onTextChange = { description = it.takeIf { it.isNotBlank() } },
+                maxLines = 6,
+                maxChars = 280,
             )
         }
     }
@@ -457,54 +459,51 @@ private fun ConfirmationView(
     channelId: ByteVector32,
 ) {
     val electrumClient = business.electrumClient
-    var confirmation by remember { mutableStateOf<Int?>(null) }
+    var confirmations by remember { mutableStateOf<Int?>(null) }
     LaunchedEffect(key1 = txId) {
-        confirmation = electrumClient.getConfirmations(txId)
+        confirmations = electrumClient.getConfirmations(txId)
     }
-    SplashLabelRow(
-        label = stringResource(id = R.string.paymentdetails_onchain_confirmation),
-        helpMessage = "How many confirmations the on-chain transaction for this payment has"
-    ) {
-        confirmation?.let { conf ->
-            Text(text = "$conf")
+    confirmations?.let { conf ->
+        Text(text = "${confirmations ?: "??"} confirmations")
+    }
+    if (confirmations == 0) {
+        var showBumpTxDialog by remember { mutableStateOf(false) }
+        val scope = rememberCoroutineScope()
+        val peerManager = business.peerManager
 
-            if (conf == 0) {
-                var showBumpTxDialog by remember { mutableStateOf(false) }
-                val scope = rememberCoroutineScope()
-                val peerManager = business.peerManager
-
-                if (showBumpTxDialog) {
-                    Dialog(
-                        onDismiss = { showBumpTxDialog = false },
-                        title = "Bump transaction",
-                        buttons = null,
-                    ) {
-//                        var estimateRes by remember { mutableStateOf<Command.Splice.Response?>(null)}
-                        var spliceRes by remember { mutableStateOf<Command.Splice.Response?>(null)}
-                        Text(text = "This transaction is unconfirmed. You can bump it with CPFP.")
-                        Text(text = "**** splice-res=$spliceRes")
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(text= "Do it for 50 sat/b", onClick = {
-                            scope.launch {
-                                val peer = peerManager.getPeer()
-                                val res = peer.estimateFeeForSpliceCpfp(
-                                    channelId = channelId,
-                                    targetFeerate = FeeratePerKw(FeeratePerByte(50.sat))
-                                )
-                                if (res != null) {
-                                    val (actualFeerate, fee) = res
-                                    spliceRes = peer.spliceCpfp(channelId, actualFeerate)
-                                }
-                            }
-                        })
-                    }
+        if (showBumpTxDialog) {
+            Dialog(
+                onDismiss = { showBumpTxDialog = false },
+                title = "Bump transaction",
+                buttons = null,
+            ) {
+                var spliceRes by remember { mutableStateOf<Command.Splice.Response?>(null) }
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Text(text = "This transaction is unconfirmed. You can bump it with CPFP.")
+                    Text(text = "**** splice-res=$spliceRes")
                 }
-
-                Button(
-                    text = "Bump transaction",
-                    onClick = { showBumpTxDialog = true }
-                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(text = "Bump (50 sat/vb)", onClick = {
+                    scope.launch {
+                        val peer = peerManager.getPeer()
+                        val res = peer.estimateFeeForSpliceCpfp(
+                            channelId = channelId,
+                            targetFeerate = FeeratePerKw(FeeratePerByte(50.sat))
+                        )
+                        if (res != null) {
+                            val (actualFeerate, fee) = res
+                            spliceRes = peer.spliceCpfp(channelId, actualFeerate)
+                        }
+                    }
+                })
             }
-        } ?: ProgressView(text = "getting transaction details...", padding = PaddingValues(0.dp))
+        }
+
+        FilledButton(
+            text = "Bump",
+            onClick = { showBumpTxDialog = true },
+            padding = PaddingValues(8.dp),
+            textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp)
+        )
     }
 }

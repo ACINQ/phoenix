@@ -32,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -125,11 +124,14 @@ fun SplashLabelRow(
             .weight(1f)
             .alignByBaseline(),
         ) {
+            Spacer(modifier = Modifier.weight(1f))
+            if (helpMessage != null) {
+                IconPopup(modifier = Modifier.offset(y = (-3).dp), popupMessage = helpMessage, spaceLeft = 0.dp, spaceRight = 4.dp)
+            }
             Text(
                 text = label.uppercase(),
                 style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp),
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.End,
+                maxLines = if (helpMessage != null) 1 else 2,
             )
             if (icon != null) {
                 Spacer(modifier = Modifier.width(4.dp))
@@ -142,14 +144,11 @@ fun SplashLabelRow(
                         .offset(y = (-2).dp)
                 )
             }
-            if (helpMessage != null) {
-                IconPopup(modifier = Modifier.offset(y = (-3).dp), popupMessage = helpMessage)
-            }
         }
         Spacer(Modifier.width(8.dp))
         Column(
             modifier = Modifier
-                .weight(2f)
+                .weight(1.6f)
                 .alignByBaseline(),
         ) {
             content()

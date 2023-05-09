@@ -194,11 +194,11 @@ fun VSeparator(
 
 @Composable
 fun PrimarySeparator(
-    modifier: Modifier = Modifier, width: Dp = 60.dp, height: Dp = 8.dp
+    modifier: Modifier = Modifier, width: Dp = 60.dp, height: Dp = 8.dp, color: Color = MaterialTheme.colors.primary
 ) {
     Surface(
         shape = CircleShape,
-        color = MaterialTheme.colors.primary,
+        color = color,
         modifier = modifier
             .width(width)
             .height(height)

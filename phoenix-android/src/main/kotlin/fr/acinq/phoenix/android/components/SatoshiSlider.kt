@@ -25,6 +25,7 @@ import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.Satoshi
@@ -69,9 +70,9 @@ fun SatoshiSlider(
             enabled = enabled,
             colors = SliderDefaults.colors(
                 activeTrackColor = MaterialTheme.colors.primary,
-                inactiveTrackColor = MaterialTheme.typography.caption.color,
+                inactiveTrackColor = MaterialTheme.colors.primary.copy(alpha = 0.4f),
                 activeTickColor = MaterialTheme.colors.primary,
-                inactiveTickColor = MaterialTheme.typography.caption.color,
+                inactiveTickColor = Color.Transparent,
             )
         )
 

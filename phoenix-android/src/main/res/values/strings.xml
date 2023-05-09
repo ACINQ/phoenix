@@ -140,18 +140,12 @@
     <!-- //////////////// send //////////////// -->
 
     <string name="send_balance_prefix">Balance:</string>
-    <string name="send_use_all_balance">Send all</string>
     <string name="send_error_amount_too_large">Amount is too large.</string>
     <string name="send_error_amount_negative">Amount cannot be negative.</string>
     <string name="send_error_amount_invalid">This is not a valid amount.</string>
     <string name="send_error_amount_over_balance">This amount exceeds your balance.</string>
     <string name="send_error_amount_overpaying">Cannot pay more than %1$s.</string>
     <string name="send_error_amount_below_requested">This amount is below the requested amount of %1$s.</string>
-    <string name="send_error_missing_feerate">Please enter a valid feerate.</string>
-    <string name="send_feerate_label">Fee rate</string>
-    <string name="send_feerate_waiting_for_value">Retrieving current feerate…</string>
-    <string name="send_feerate_below_min">This feerate is too low</string>
-    <string name="send_feerate_above_max">This feerate is too large</string>
     <string name="send_destination_label">Send to</string>
     <string name="send_description_label">Payment description</string>
     <string name="send_trampoline_fee_label">Fee</string>
@@ -167,18 +161,20 @@
     <string name="send_paymentmode_lightning">Pay with Lightning</string>
     <string name="send_paymentmode_lightning_desc">Lightning payments are fast and best suited for small payments.</string>
 
-    <string name="send_spliceout_error_cannot_afford_fees">Total after fees exceeds your balance.\nThis payment cannot be sent.</string>
-    <string name="send_spliceout_error_failure">Splicing failure: the transaction has not been sent.</string>
+    <string name="send_spliceout_address_label">Address</string>
+    <string name="send_spliceout_feerate_label">Fee rate</string>
+    <string name="send_spliceout_feerate_waiting_for_value">Retrieving current feerate…</string>
+
+    <string name="send_spliceout_error_invalid_feerate">Please enter a valid feerate.</string>
+    <string name="send_spliceout_error_cannot_afford_fees">Total exceeds your balance</string>
+    <string name="send_spliceout_error_failure">Payment failed</string>
+
     <string name="send_spliceout_prepare_button">Prepare transaction</string>
     <string name="send_spliceout_prepare_in_progress">Preparing transaction…</string>
     <string name="send_spliceout_execute_in_progress">Executing splice…</string>
     <string name="send_spliceout_complete_recap_amount">Amount</string>
-    <string name="send_spliceout_complete_recap_fee">Fee estimation</string>
+    <string name="send_spliceout_complete_recap_fee">Miner fee</string>
     <string name="send_spliceout_complete_recap_total">Total</string>
-    <string name="send_spliceout_mining_fee_dialog_title">What are those fees?</string>
-    <string name="send_spliceout_mining_fee_dialog_body">
-      Payments to on-chain addresses require a splice which incurs mining fees for the Bitcoin network.
-    </string>
 
     <!-- //////////////// scan //////////////// -->
 
@@ -433,12 +429,13 @@
     <string name="paymentdetails_swapin_address_label">Deposit address</string>
     <string name="paymentdetails_swapout_address_label">Bitcoin address</string>
 
+    <string name="paymentdetails_splice_out_channel_label">Spliced channel</string>
     <string name="paymentdetails_splice_out_address_label">Splice address</string>
     <string name="paymentdetails_splice_out_tx_label">Splice transaction</string>
     <string name="paymentdetails_dualswapin_tx_label">Transactions</string>
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
-    <string name="paymentdetails_closing_channel_label">Id of channel closing</string>
+    <string name="paymentdetails_closing_channel_label">Closing channel</string>
     <string name="paymentdetails_closing_address_label">Closing address</string>
     <string name="paymentdetails_closing_tx_label">Closing transaction</string>
     <string name="paymentdetails_closing_type_label">Closing type</string>
@@ -479,7 +476,7 @@
     <string name="paymentdetails_elapsed">%1$s ms</string>
 
     <string name="paymentdetails_invoice_requested_label">Amount requested</string>
-    <string name="paymentdetails_amount_sent_label">Amount sent</string>
+    <string name="paymentdetails_amount_sent_label">Amount sent (fees included)</string>
     <string name="paymentdetails_amount_received_label">Amount received</string>
     <string name="paymentdetails_amount_rate_now">≈ %1$s (now)</string>
     <string name="paymentdetails_amount_rate_then">≈ %1$s (then)</string>

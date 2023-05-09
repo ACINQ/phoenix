@@ -212,14 +212,14 @@ private fun AmountSection(
     rateThen: ExchangeRate.BitcoinPriceRate?
 ) {
     val mSatDisplayPolicy = if (payment is OutgoingPayment) MSatDisplayPolicy.HIDE else MSatDisplayPolicy.SHOW
-    TechnicalRowAmount(
-        label = stringResource(id = if (payment is OutgoingPayment) R.string.paymentdetails_amount_sent_label else R.string.paymentdetails_amount_received_label),
-        amount = payment.amount,
-        rateThen = rateThen,
-        mSatDisplayPolicy = mSatDisplayPolicy
-    )
     when (payment) {
         is OutgoingPayment -> {
+            TechnicalRowAmount(
+                label = stringResource(id = R.string.paymentdetails_amount_sent_label),
+                amount = payment.amount,
+                rateThen = rateThen,
+                mSatDisplayPolicy = mSatDisplayPolicy
+            )
             TechnicalRowAmount(
                 label = stringResource(id = R.string.paymentdetails_fees_label),
                 amount = payment.fees,
@@ -228,6 +228,12 @@ private fun AmountSection(
             )
         }
         is IncomingPayment -> {
+            TechnicalRowAmount(
+                label = stringResource(R.string.paymentdetails_amount_received_label),
+                amount = payment.amount,
+                rateThen = rateThen,
+                mSatDisplayPolicy = mSatDisplayPolicy
+            )
             val receivedWithNewChannel = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>() ?: emptyList()
             val receivedWithSpliceIn = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.SpliceIn>() ?: emptyList()
             if ((receivedWithNewChannel + receivedWithSpliceIn).isNotEmpty()) {
@@ -321,6 +327,10 @@ private fun DetailsForSpliceOut(
     payment: SpliceOutgoingPayment
 ) {
     TechnicalRowSelectable(
+        label = stringResource(id = R.string.paymentdetails_splice_out_channel_label),
+        value = payment.channelId.toHex()
+    )
+    TechnicalRowSelectable(
         label = stringResource(id = R.string.paymentdetails_splice_out_address_label),
         value = payment.address
     )
@@ -328,6 +338,7 @@ private fun DetailsForSpliceOut(
         label = stringResource(id = R.string.paymentdetails_splice_out_tx_label),
         content = { TransactionLinkButton(txId = payment.txId.toHex()) }
     )
+
 }
 
 @Composable
@@ -338,6 +349,7 @@ private fun DetailsForIncoming(
     when (val origin = payment.origin) {
         is IncomingPayment.Origin.Invoice -> {
             InvoiceSection(paymentRequest = origin.paymentRequest)
+            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_preimage_label), value = payment.preimage.toHex())
         }
         is IncomingPayment.Origin.SwapIn -> {
             TechnicalRow(label = stringResource(id = R.string.paymentdetails_swapin_address_label)) {

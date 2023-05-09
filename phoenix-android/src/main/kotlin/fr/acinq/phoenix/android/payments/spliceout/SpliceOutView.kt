@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.utils.toMilliSatoshi
@@ -109,21 +108,26 @@ fun SendSpliceOutView(
             )
         }
     ) {
-        SplashLabelRow(label = stringResource(id = R.string.send_feerate_label)) {
+        SplashLabelRow(label = stringResource(id = R.string.send_spliceout_feerate_label)) {
             feerate?.let {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("") // trick to force baseline alignment with label in the container's row
                     SatoshiSlider(
-                        modifier = Modifier.widthIn(max = 150.dp),
+                        modifier = Modifier.widthIn(max = 130.dp),
                         amount = it,
-                        onAmountChange = { feerate = it },
+                        onAmountChange = { newFeerate ->
+                            if (vm.state != SpliceOutState.Init && feerate != newFeerate) {
+                                vm.state = SpliceOutState.Init
+                            }
+                            feerate = newFeerate
+                        },
                     )
                 }
-                Text(text = stringResource(id = R.string.utils_fee_rate,it.toPrettyString(BitcoinUnit.Sat, withUnit = false)))
+                Text(text = stringResource(id = R.string.utils_fee_rate,it.toPrettyString(BitcoinUnit.Sat, withUnit = false)), modifier = Modifier.offset(y = (-12).dp))
                 // TODO if fee too big, warning
-            } ?: ProgressView(text = stringResource(id = R.string.send_feerate_waiting_for_value), padding = PaddingValues(0.dp))
+            } ?: ProgressView(text = stringResource(id = R.string.send_spliceout_feerate_waiting_for_value), padding = PaddingValues(0.dp))
         }
-        SplashLabelRow(label = stringResource(R.string.send_destination_label), icon = R.drawable.ic_chain) {
+        SplashLabelRow(label = stringResource(R.string.send_spliceout_address_label), icon = R.drawable.ic_chain) {
             SelectionContainer {
                 Text(text = address)
             }
@@ -147,7 +151,7 @@ fun SendSpliceOutView(
                         if (finalAmount == null) {
                             amountErrorMessage = context.getString(R.string.send_error_amount_invalid)
                         } else if (finalFeerate == null) {
-                            amountErrorMessage = context.getString(R.string.send_error_missing_feerate)
+                            amountErrorMessage = context.getString(R.string.send_spliceout_error_invalid_feerate)
                         } else {
                             keyboardManager?.hide()
                             vm.prepareSpliceOut(finalAmount, finalFeerate, address)
@@ -161,9 +165,9 @@ fun SendSpliceOutView(
             }
             is SpliceOutState.ReadyToSend -> {
                 SplashLabelRow(label = "") {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    HSeparator(width = 50.dp)
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    HSeparator(width = 60.dp)
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
                 val total = state.userAmount + state.estimatedFee
                 SpliceOutFeeSummaryView(fee = state.estimatedFee, total = total, userFeerate = state.userFeerate, actualFeerate = state.actualFeerate)
@@ -210,12 +214,4 @@ private fun SpliceOutFeeSummaryView(
     SplashLabelRow(label = stringResource(id = R.string.send_spliceout_complete_recap_total)) {
         AmountWithFiatColumnView(amount = total.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
     }
-}
-
-@Composable
-private fun FeeSummary(
-    label: String,
-    amount: MilliSatoshi
-) {
-
 }

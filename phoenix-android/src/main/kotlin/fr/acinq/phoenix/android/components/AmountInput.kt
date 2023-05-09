@@ -343,7 +343,7 @@ fun AmountHeroInput(
                 end = Offset(x = size.width, y = 0f),
                 cap = StrokeCap.Round,
                 color = dotColor,
-                strokeWidth = 10f
+                strokeWidth = 7f
             )
         }
     }

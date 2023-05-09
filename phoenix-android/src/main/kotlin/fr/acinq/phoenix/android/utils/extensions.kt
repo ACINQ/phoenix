@@ -266,12 +266,12 @@ fun Connection.CLOSED.isBadCertificate() = this.reason?.cause is CertificateExce
  */
 fun WalletPayment.smartDescription(context: Context): String? = when (this) {
     is LightningOutgoingPayment -> when (val details = this.details) {
-        is LightningOutgoingPayment.Details.Normal -> details.paymentRequest.description ?: details.paymentRequest.descriptionHash?.toHex()
+        is LightningOutgoingPayment.Details.Normal -> details.paymentRequest.description
         is LightningOutgoingPayment.Details.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
         is LightningOutgoingPayment.Details.SwapOut -> context.getString(R.string.paymentdetails_desc_swapout, details.address)
     }
     is IncomingPayment -> when (val origin = this.origin) {
-        is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description ?: origin.paymentRequest.descriptionHash?.toHex()
+        is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description
         is IncomingPayment.Origin.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
         is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.OnChain -> context.getString(R.string.paymentdetails_desc_swapin)
     }
