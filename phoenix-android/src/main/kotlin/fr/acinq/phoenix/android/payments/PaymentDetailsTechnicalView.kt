@@ -211,20 +211,19 @@ private fun AmountSection(
     payment: WalletPayment,
     rateThen: ExchangeRate.BitcoinPriceRate?
 ) {
-    val mSatDisplayPolicy = if (payment is OutgoingPayment) MSatDisplayPolicy.HIDE else MSatDisplayPolicy.SHOW
     when (payment) {
         is OutgoingPayment -> {
             TechnicalRowAmount(
                 label = stringResource(id = R.string.paymentdetails_amount_sent_label),
                 amount = payment.amount,
                 rateThen = rateThen,
-                mSatDisplayPolicy = mSatDisplayPolicy
+                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
             )
             TechnicalRowAmount(
                 label = stringResource(id = R.string.paymentdetails_fees_label),
                 amount = payment.fees,
                 rateThen = rateThen,
-                mSatDisplayPolicy = mSatDisplayPolicy
+                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
             )
         }
         is IncomingPayment -> {
@@ -232,7 +231,7 @@ private fun AmountSection(
                 label = stringResource(R.string.paymentdetails_amount_received_label),
                 amount = payment.amount,
                 rateThen = rateThen,
-                mSatDisplayPolicy = mSatDisplayPolicy
+                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
             )
             val receivedWithNewChannel = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>() ?: emptyList()
             val receivedWithSpliceIn = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.SpliceIn>() ?: emptyList()

@@ -84,10 +84,7 @@ class MigrationFragmentDialog : DialogFragment() {
               app.requireService.mutualCloseAllChannels(it.address)
               log.info("(migration) channels successfully closed to ${state.address}")
               model.state.value = MigrationScreenState.ClosingChannels(state.address)
-              delay(1000)
-              val dbFile = Wallet.getEclairDBFile(context)
-              dbFile.copyTo(Wallet.getEclairDBMigrationFile(context))
-              delay(500)
+              delay(3_000)
               PrefsDatastore.saveDataMigrationExpected(context, true)
               PrefsDatastore.saveMigrationResult(
                 context, MigrationResult(

@@ -65,7 +65,7 @@ object PrefsDatastore {
   }
 
   private val DATA_MIGRATION_EXPECTED = booleanPreferencesKey("DATA_MIGRATION_EXPECTED")
-  fun getDataMigrationExpected(context: Context): Flow<Boolean?> = prefs(context).map { it[DATA_MIGRATION_EXPECTED] }
+  fun getDataMigrationExpected(context: Context): Flow<Boolean> = prefs(context).map { it[DATA_MIGRATION_EXPECTED] ?: false }
   suspend fun saveDataMigrationExpected(context: Context, isExpected: Boolean) = context.internalData.edit {
     it[DATA_MIGRATION_EXPECTED] = isExpected
   }

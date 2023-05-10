@@ -123,19 +123,19 @@ object LegacyMigrationHelper {
     suspend fun migrateLegacyPayments(
         context: Context,
     ) {
-        val eclairDbMigrationFile = Wallet.getEclairDBMigrationFile(context)
-        if (!eclairDbMigrationFile.exists()) {
-            log.info("no legacy database migration file found, no migration needed.")
+        val eclairDbFile = Wallet.getEclairDBFile(context)
+        if (!eclairDbFile.exists()) {
+            log.info("no legacy database file found, no data migration needed.")
             return
         }
 
-        // 1 - create a copy of the eclair database backup file we can safely work on
-        eclairDbMigrationFile.copyTo(File(Wallet.getChainDatadir(context), "eclair-migration.sqlite"), overwrite = true)
-        log.info("legacy database backup file has been copied")
+        // 1 - create a copy of the eclair database file we can safely work on
+        eclairDbFile.copyTo(Wallet.getEclairDBMigrationFile(context), overwrite = true)
+        log.info("legacy database file has been copied")
 
         val legacyMetaRepository = PaymentMetaRepository.getInstance(AppDb.getInstance(context).paymentMetaQueries)
         val legacyPayToOpenMetaRepository = PayToOpenMetaRepository.getInstance(AppDb.getInstance(context).payToOpenMetaQueries)
-        val legacyPaymentsDb = SqlitePaymentsDb(SqliteUtils.openSqliteFile(Wallet.getChainDatadir(context), "eclair-migration.sqlite", true, "wal", "normal"))
+        val legacyPaymentsDb = SqlitePaymentsDb(SqliteUtils.openSqliteFile(Wallet.getChainDatadir(context), Wallet.ECLAIR_DB_FILE_MIGRATION, true, "wal", "normal"))
         log.info("opened legacy payments db")
 
         // 2 - get the new payments database
@@ -196,7 +196,7 @@ object LegacyMigrationHelper {
                 }
                 log.info("successfully migrated ${outgoing.size} outgoing payments")
             } catch (e: Exception) {
-                log.error("payment migration: failed to save payment=$it: ", e)
+                log.error("payment migration: failed to save outgoing payment=$it: ${e.localizedMessage}")
             }
         }
 
@@ -237,14 +237,11 @@ object LegacyMigrationHelper {
                 }
                 log.info("successfully migrated ${incoming.size} incoming payments")
             } catch (e: Exception) {
-                log.error("payment migration: failed to save payment=$it: ", e)
+                log.error("payment migration: failed to save incoming payment=$it: ${e.localizedMessage}")
             }
         }
 
-        log.info("moving legacy eclair-migration database file to finalize migration...")
         legacyPaymentsDb.close()
-        // move the db migration file so that when a migration successfully completes, the process will not repeat
-        eclairDbMigrationFile.renameTo(File(Wallet.getChainDatadir(context), "${Wallet.ECLAIR_DB_FILE_MIGRATION}.done"))
     }
 
     fun modernizeLegacyIncomingPayment(

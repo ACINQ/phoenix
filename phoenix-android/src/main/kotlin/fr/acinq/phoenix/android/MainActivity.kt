@@ -62,8 +62,8 @@ class MainActivity : AppCompatActivity() {
 
         // migrate legacy data if needed
         lifecycleScope.launch {
-            val doDataMigration = PrefsDatastore.getDataMigrationExpected(applicationContext).first()
-            if (doDataMigration == true) {
+            val doDataMigration = PrefsDatastore.getDataMigrationExpected(applicationContext).filterNotNull().first()
+            if (doDataMigration) {
                 LegacyMigrationHelper.migrateLegacyPreferences(applicationContext)
                 LegacyMigrationHelper.migrateLegacyPayments(applicationContext)
                 PrefsDatastore.saveDataMigrationExpected(applicationContext, false)

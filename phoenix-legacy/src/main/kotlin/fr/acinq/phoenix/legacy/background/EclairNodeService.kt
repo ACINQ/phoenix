@@ -259,13 +259,13 @@ class EclairNodeService : Service() {
   /** Close database connections opened by the node */
   internal fun closeConnections() {
     kit?.run {
-      system().shutdown()
       nodeParams().db().audit().close()
       nodeParams().db().channels().close()
       nodeParams().db().payments().close()
       nodeParams().db().network().close()
       nodeParams().db().peers().close()
       nodeParams().db().pendingRelay().close()
+      system().shutdown()
     } ?: log.warn("could not close kit connections because kit is not initialized!")
   }
 

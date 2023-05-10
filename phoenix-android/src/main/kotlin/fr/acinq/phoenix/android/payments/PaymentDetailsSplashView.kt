@@ -77,7 +77,7 @@ fun PaymentDetailsSplashView(
         topContent = { PaymentStatus(data.payment, fromEvent) }
     ) {
         AmountView(
-            amount = payment.amount - payment.fees,
+            amount = if (payment is OutgoingPayment) payment.amount - payment.fees else payment.amount,
             amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 30.sp),
             separatorSpace = 4.dp,
             prefix = stringResource(id = if (payment is OutgoingPayment) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received)
