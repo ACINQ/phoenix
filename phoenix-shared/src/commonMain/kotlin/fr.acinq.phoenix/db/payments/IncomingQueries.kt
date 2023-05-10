@@ -86,7 +86,9 @@ class IncomingQueries(private val database: PaymentsDatabase) {
         }
         val (newReceivedWithType, newReceivedWithBlob) = newReceivedWith?.mapToDb() ?: (null to null)
         queries.updateReceived(
-            received_at = paymentInDb.received?.receivedAt,
+            // we override the previous received_at timestamp to trigger a refresh of the payment's cache data
+            // because the list-all query feeding the cache uses `received_at` for incoming payments
+            received_at = confirmedAt,
             expected_amount_msat = paymentInDb.received?.expectedAmount?.msat,
             received_with_type = newReceivedWithType,
             received_with_blob = newReceivedWithBlob,
