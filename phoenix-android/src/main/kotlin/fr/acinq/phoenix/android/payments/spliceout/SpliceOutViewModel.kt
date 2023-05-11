@@ -69,6 +69,7 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
             state = SpliceOutState.Error.Thrown(e)
         }) {
             state = SpliceOutState.Preparing(userAmount = amount, feeratePerByte = feeratePerByte)
+            log.info("preparing splice-out for amount=$amount feerate=${feeratePerByte}sat/vb address=$address")
             val userFeerate = FeeratePerKw(FeeratePerByte(feeratePerByte))
             val scriptPubKey = Parser.addressToPublicKeyScript(chain, address)!!.byteVector()
             val res = peerManager.getPeer().estimateFeeForSpliceOut(
@@ -78,7 +79,7 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
             )
             if (res != null) {
                 val (actualFeerate, fee) = res
-                log.info("got feerate=$actualFeerate from estimate fee")
+                log.info("received actual feerate=$actualFeerate from splice-out estimate fee")
                 state = SpliceOutState.ReadyToSend(amount, userFeerate, actualFeerate, estimatedFee = fee)
             } else {
                 state = SpliceOutState.Error.NoChannels
@@ -93,6 +94,7 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
     ) {
         if (state is SpliceOutState.ReadyToSend) {
             state = SpliceOutState.Executing(amount, feerate)
+            log.info("executing splice-out with for=$amount feerate=${feerate}sat/vb address=$address")
             viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
                 log.error("error when executing splice-out: ", e)
                 state = SpliceOutState.Error.Thrown(e)
@@ -104,12 +106,15 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
                 )
                 when (response) {
                     is Command.Splice.Response.Created -> {
+                        log.info("successfully executed splice-out: $response")
                         state = SpliceOutState.Complete.Success(amount, feerate, response)
                     }
                     is Command.Splice.Response.Failure -> {
+                        log.info("failed to execut splice-out: $response")
                         state = SpliceOutState.Complete.Failure(amount, feerate, response)
                     }
                     null -> {
+                        log.info("failed to execute splice-out: assuming no channels available")
                         state = SpliceOutState.Error.NoChannels
                     }
                 }
