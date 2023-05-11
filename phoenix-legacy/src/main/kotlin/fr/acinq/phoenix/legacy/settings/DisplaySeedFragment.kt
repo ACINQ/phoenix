@@ -71,6 +71,7 @@ class DisplaySeedFragment : BaseFragment() {
         is DisplaySeedState.Done -> {
           context?.run { getSeedDialog(this, state.words) }?.show()
         }
+        else -> {}
       }
     })
   }

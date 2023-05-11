@@ -3,12 +3,9 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.lightning.ChannelEvents
-import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.SwapInEvents
+import fr.acinq.lightning.*
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.io.Peer
-import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.channel.InteractiveTxInput
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.PaymentsDb
@@ -166,6 +163,12 @@ class BalanceManager(
                 }
                 is ChannelEvents.Confirmed -> {
                     log.info { "channel confirmed for id=${event.state.channelId}" }
+                }
+                is LiquidityEvents.ApprovalRequested -> {
+                    log.info { "liquidity event=$event" }
+                }
+                is LiquidityEvents.Rejected -> {
+                    log.info { "liquidity event=$event" }
                 }
             }
         }

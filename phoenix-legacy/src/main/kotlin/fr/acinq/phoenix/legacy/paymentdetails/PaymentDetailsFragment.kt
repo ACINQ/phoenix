@@ -159,6 +159,7 @@ class PaymentDetailsFragment : BaseFragment() {
                   mBinding.lnurlPaySuccessActionValue.movementMethod = LinkMovementMethod.getInstance()
                 }
                 is LNUrlPayActionData.Aes.V0 -> decryptLNUrlPayAes(successAction)
+                else -> {}
               }
             }
             else -> Unit
@@ -174,6 +175,7 @@ class PaymentDetailsFragment : BaseFragment() {
           mBinding.amountValue.setAmount(state.getStatus().amount())
           showStatusIconAndDetails(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, R.attr.positiveColor)
         }
+        else -> {}
       }
     })
 

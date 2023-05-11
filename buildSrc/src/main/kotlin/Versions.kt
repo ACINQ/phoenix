@@ -3,12 +3,12 @@ object Versions {
     const val secp256k1 = "0.7.0"
     const val torMobile = "0.2.0"
 
-    const val kotlin = "1.6.21"
-    const val coroutines = "1.6.3"
-    const val serialization = "1.3.3"
+    const val kotlin = "1.8.21"
+    const val coroutines = "1.7.0"
+    const val serialization = "1.5.0"
 
     const val ktor = "2.0.3"
-    const val sqlDelight = "1.5.3"
+    const val sqlDelight = "1.5.5"
     const val kodeinMemory = "0.8.0"
 
     const val slf4j = "1.7.30"
@@ -21,8 +21,8 @@ object Versions {
         const val lifecycle = "2.5.1"
         const val prefs = "1.2.0"
         const val datastore = "1.0.0"
-        const val compose = "1.3.1"
-        const val composeCompiler = "1.2.0-rc02"
+        const val compose = "1.4.3"
+        const val composeCompiler = "1.4.7"
         const val navCompose = "2.5.3"
         const val accompanist = "0.27.1"
         const val composeConstraintLayout = "1.0.1"

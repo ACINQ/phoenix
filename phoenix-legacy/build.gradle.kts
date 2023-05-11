@@ -4,7 +4,7 @@ plugins {
   id("com.android.library")
   kotlin("android")
   id("kotlin-kapt")
-  id("kotlin-android-extensions")
+  id("kotlin-parcelize")
   id("androidx.navigation.safeargs.kotlin")
   id("com.google.gms.google-services")
   id("com.squareup.sqldelight")
@@ -59,6 +59,7 @@ android {
   }
   buildFeatures {
     dataBinding = true
+    viewBinding = true
   }
   externalNativeBuild {
     cmake {

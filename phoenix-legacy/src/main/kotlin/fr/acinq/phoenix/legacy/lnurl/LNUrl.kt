@@ -24,7 +24,7 @@ import android.util.Patterns
 import fr.acinq.bitcoin.scala.Bech32
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.legacy.utils.Wallet
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import okhttp3.HttpUrl
 import okhttp3.Request
 import okhttp3.Response

@@ -29,7 +29,6 @@ import fr.acinq.phoenix.legacy.AppViewModel
 import fr.acinq.phoenix.legacy.R
 import fr.acinq.phoenix.legacy.databinding.FragmentSettingsChannelsImportBinding
 import fr.acinq.secp256k1.Hex
-import kotlinx.android.synthetic.main.custom_button_view.view.*
 import kotlinx.coroutines.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
