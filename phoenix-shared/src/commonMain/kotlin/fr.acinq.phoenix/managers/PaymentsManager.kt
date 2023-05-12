@@ -149,9 +149,10 @@ class PaymentsManager(
     ): WalletPaymentInfo? {
         return when (id) {
             is WalletPaymentId.IncomingPaymentId -> paymentsDb().getIncomingPayment(id.paymentHash, options)
-            is WalletPaymentId.OutgoingPaymentId -> paymentsDb().getLightningOutgoingPayment(id.id, options)
+            is WalletPaymentId.LightningOutgoingPaymentId -> paymentsDb().getLightningOutgoingPayment(id.id, options)
             is WalletPaymentId.SpliceOutgoingPaymentId -> paymentsDb().getSpliceOutgoingPayment(id.id, options)
             is WalletPaymentId.ChannelCloseOutgoingPaymentId -> paymentsDb().getChannelCloseOutgoingPayment(id.id, options)
+            is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> paymentsDb().getSpliceCpfpOutgoingPayment(id.id, options)
         }?.let {
             WalletPaymentInfo(
                 payment = it.first,

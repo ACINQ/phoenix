@@ -113,7 +113,9 @@ class SqlitePaymentsDb(
         withContext(Dispatchers.Default) {
             database.transaction {
                 when (outgoingPayment) {
-                    is LightningOutgoingPayment -> outQueries.addLightningOutgoingPayment(outgoingPayment)
+                    is LightningOutgoingPayment -> {
+                        outQueries.addLightningOutgoingPayment(outgoingPayment)
+                    }
                     is SpliceOutgoingPayment -> {
                         spliceOutQueries.addSpliceOutgoingPayment(outgoingPayment)
                         linkTxToPaymentQueries.linkTxToPayment(
@@ -127,6 +129,9 @@ class SqlitePaymentsDb(
                             txId = outgoingPayment.txId,
                             walletPaymentId = outgoingPayment.walletPaymentId()
                         )
+                    }
+                    is SpliceCpfpOutgoingPayment -> {
+                        TODO()
                     }
                 }
                 // Add associated metadata within the same atomic database transaction.
@@ -242,6 +247,15 @@ class SqlitePaymentsDb(
         }
     }
 
+    suspend fun getSpliceCpfpOutgoingPayment(
+        id: UUID,
+        options: WalletPaymentFetchOptions
+    ): Pair<SpliceCpfpOutgoingPayment, WalletPaymentMetadata?>? = withContext(Dispatchers.Default) {
+        database.transactionWithResult {
+            TODO()
+        }
+    }
+
     // ---- list outgoing
 
     override suspend fun listLightningOutgoingPayments(
@@ -275,13 +289,12 @@ class SqlitePaymentsDb(
 
     override suspend fun receivePayment(
         paymentHash: ByteVector32,
-        expectedAmount: MilliSatoshi,
         receivedWith: List<IncomingPayment.ReceivedWith>,
         receivedAt: Long
     ) {
         withContext(Dispatchers.Default) {
             database.transaction {
-                inQueries.receivePayment(paymentHash, expectedAmount, receivedWith, receivedAt)
+                inQueries.receivePayment(paymentHash, receivedWith, receivedAt)
                 // if one received-with is on-chain, save the tx id to the db
                 receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>().firstOrNull()?.let {
                     linkTxToPaymentQueries.linkTxToPayment(it.txId, WalletPaymentId.IncomingPaymentId(paymentHash))
@@ -290,7 +303,11 @@ class SqlitePaymentsDb(
         }
     }
 
-    override suspend fun setConfirmed(txId: ByteVector32) = withContext(Dispatchers.Default) {
+    override suspend fun setLocked(txId: ByteVector32) {
+        TODO("Not yet implemented")
+    }
+
+    suspend fun setConfirmed(txId: ByteVector32) = withContext(Dispatchers.Default) {
         database.transaction {
             val completedAt = currentTimestampMillis()
             linkTxToPaymentQueries.setConfirmed(txId, completedAt)
@@ -299,7 +316,7 @@ class SqlitePaymentsDb(
                     is WalletPaymentId.IncomingPaymentId -> {
                         inQueries.setConfirmed(walletPaymentId.paymentHash, completedAt)
                     }
-                    is WalletPaymentId.OutgoingPaymentId -> {
+                    is WalletPaymentId.LightningOutgoingPaymentId -> {
                         // LN payments need not be confirmed
                     }
                     is WalletPaymentId.SpliceOutgoingPaymentId -> {
@@ -307,6 +324,9 @@ class SqlitePaymentsDb(
                     }
                     is WalletPaymentId.ChannelCloseOutgoingPaymentId -> {
                         channelCloseQueries.setConfirmed(walletPaymentId.id, completedAt)
+                    }
+                    is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> {
+                        TODO()
                     }
                 }
             }
@@ -490,7 +510,7 @@ class SqlitePaymentsDb(
                         payment_hash = paymentId.paymentHash.toByteArray()
                     )
                 }
-                is WalletPaymentId.OutgoingPaymentId -> {
+                is WalletPaymentId.LightningOutgoingPaymentId -> {
                     database.outgoingPaymentsQueries.deleteLightningPartsForParentId(
                         part_parent_id = paymentId.dbId
                     )
@@ -507,6 +527,9 @@ class SqlitePaymentsDb(
                     database.spliceOutgoingPaymentsQueries.deleteSpliceOutgoing(
                         id = paymentId.dbId
                     )
+                }
+                is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> {
+                    TODO()
                 }
             }
             didDeleteWalletPayment(paymentId, database)
@@ -530,7 +553,7 @@ class SqlitePaymentsDb(
             metadata_modified_at: Long?
         ): WalletPaymentOrderRow {
             val paymentId = when (type) {
-                WalletPaymentId.DbType.OUTGOING.value -> WalletPaymentId.OutgoingPaymentId.fromString(id)
+                WalletPaymentId.DbType.OUTGOING.value -> WalletPaymentId.LightningOutgoingPaymentId.fromString(id)
                 WalletPaymentId.DbType.INCOMING.value -> WalletPaymentId.IncomingPaymentId.fromString(id)
                 WalletPaymentId.DbType.SPLICE_OUTGOING.value -> WalletPaymentId.SpliceOutgoingPaymentId.fromString(id)
                 WalletPaymentId.DbType.CHANNEL_CLOSE_OUTGOING.value -> WalletPaymentId.ChannelCloseOutgoingPaymentId.fromString(id)

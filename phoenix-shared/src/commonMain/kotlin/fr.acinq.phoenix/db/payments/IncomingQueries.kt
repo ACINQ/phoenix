@@ -49,7 +49,6 @@ class IncomingQueries(private val database: PaymentsDatabase) {
 
     fun receivePayment(
         paymentHash: ByteVector32,
-        expectedAmount: MilliSatoshi,
         receivedWith: List<IncomingPayment.ReceivedWith>,
         receivedAt: Long
     ) {
@@ -63,7 +62,6 @@ class IncomingQueries(private val database: PaymentsDatabase) {
             val (receivedWithType, receivedWithBlob) = newReceivedWith.mapToDb() ?: (null to null)
             queries.updateReceived(
                 received_at = receivedAt,
-                expected_amount_msat = expectedAmount.msat,
                 received_with_type = receivedWithType,
                 received_with_blob = receivedWithBlob,
                 payment_hash = paymentHash.toByteArray()
@@ -89,7 +87,6 @@ class IncomingQueries(private val database: PaymentsDatabase) {
             // we override the previous received_at timestamp to trigger a refresh of the payment's cache data
             // because the list-all query feeding the cache uses `received_at` for incoming payments
             received_at = confirmedAt,
-            expected_amount_msat = paymentInDb.received?.expectedAmount?.msat,
             received_with_type = newReceivedWithType,
             received_with_blob = newReceivedWithBlob,
             payment_hash = paymentHash.toByteArray()
@@ -132,14 +129,13 @@ class IncomingQueries(private val database: PaymentsDatabase) {
             origin_blob: ByteArray,
             received_amount_msat: Long?,
             received_at: Long?,
-            expected_amount_msat: Long?,
             received_with_type: IncomingReceivedWithTypeVersion?,
             received_with_blob: ByteArray?,
         ): IncomingPayment {
             return IncomingPayment(
                 preimage = ByteVector32(preimage),
                 origin = IncomingOriginData.deserialize(origin_type, origin_blob),
-                received = mapIncomingReceived(received_amount_msat, received_at, expected_amount_msat, received_with_type, received_with_blob, origin_type),
+                received = mapIncomingReceived(received_amount_msat, received_at, received_with_type, received_with_blob, origin_type),
                 createdAt = created_at
             )
         }
@@ -147,7 +143,6 @@ class IncomingQueries(private val database: PaymentsDatabase) {
         private fun mapIncomingReceived(
             received_amount_msat: Long?,
             received_at: Long?,
-            expected_amount_msat: Long?,
             received_with_type: IncomingReceivedWithTypeVersion?,
             received_with_blob: ByteArray?,
             origin_type: IncomingOriginTypeVersion
@@ -156,14 +151,12 @@ class IncomingQueries(private val database: PaymentsDatabase) {
                 received_at == null && received_with_type == null && received_with_blob == null -> null
                 received_at != null && received_with_type != null && received_with_blob != null -> {
                     IncomingPayment.Received(
-                        expectedAmount = expected_amount_msat?.msat ?: 0.msat,
                         receivedWith = IncomingReceivedWithData.deserialize(received_with_type, received_with_blob, received_amount_msat?.msat, origin_type),
                         receivedAt = received_at
                     )
                 }
                 received_at != null -> {
                     IncomingPayment.Received(
-                        expectedAmount = expected_amount_msat?.msat ?: 0.msat,
                         receivedWith = emptyList(),
                         receivedAt = received_at
                     )

@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.db.cloud
 
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
+import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
@@ -23,18 +24,20 @@ data class ChannelClosePaymentWrapper(
     @ByteString val txId: ByteArray,
     val createdAt: Long,
     val confirmedAt: Long?,
+    val lockedAt: Long?,
     @ByteString val channelId: ByteArray,
-    val closingType: ChannelCloseOutgoingPayment.ChannelClosingType,
+    val closingType: ChannelClosingType,
 ) {
     constructor(payment: ChannelCloseOutgoingPayment) : this(
         id = payment.id,
-        amountSat = payment.amountSatoshi.sat,
+        amountSat = payment.recipientAmount.sat,
         address = payment.address,
         isSentToDefaultAddress = payment.isSentToDefaultAddress,
         miningFeeSat = payment.miningFees.sat,
         txId = payment.txId.toByteArray(),
         createdAt = payment.createdAt,
         confirmedAt = payment.confirmedAt,
+        lockedAt = payment.lockedAt,
         channelId = payment.channelId.toByteArray(),
         closingType = payment.closingType,
     )
@@ -42,13 +45,14 @@ data class ChannelClosePaymentWrapper(
     @Throws(Exception::class)
     fun unwrap() = ChannelCloseOutgoingPayment(
         id = id,
-        amountSatoshi = amountSat.sat,
+        recipientAmount = amountSat.sat,
         address = address,
         isSentToDefaultAddress = isSentToDefaultAddress,
         miningFees = miningFeeSat.sat,
         txId = txId.toByteVector32(),
         createdAt = createdAt,
         confirmedAt = confirmedAt,
+        lockedAt = lockedAt,
         channelId = channelId.toByteVector32(),
         closingType = closingType
     )

@@ -94,7 +94,6 @@ data class IncomingPaymentWrapper(
                 originTypeVersion = originTypeVersion
             )
             return IncomingPayment.Received(
-                expectedAmount = 0.msat, // expected amount does not need to be saved to the cloud
                 receivedWith = receivedWith,
                 receivedAt = ts
             )

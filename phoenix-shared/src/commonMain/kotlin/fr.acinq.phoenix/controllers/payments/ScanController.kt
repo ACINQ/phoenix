@@ -215,7 +215,7 @@ class AppScanController(
         metadata?.let { WalletPaymentMetadataRow.serialize(it) }?.let { row ->
             databaseManager.paymentsDb().enqueueMetadata(
                 row = row,
-                id = WalletPaymentId.OutgoingPaymentId(paymentId)
+                id = WalletPaymentId.LightningOutgoingPaymentId(paymentId)
             )
         }
 

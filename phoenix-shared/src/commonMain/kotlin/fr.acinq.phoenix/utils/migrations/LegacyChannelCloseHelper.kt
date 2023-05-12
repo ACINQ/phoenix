@@ -20,6 +20,7 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
+import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.db.payments.OutgoingDetailsData
@@ -66,26 +67,27 @@ object LegacyChannelCloseHelper {
             )
         } ?: statusInfoV0?.closingType?.let {
             try {
-                ChannelCloseOutgoingPayment.ChannelClosingType.valueOf(it)
+                ChannelClosingType.valueOf(it)
             } catch (e: Exception) {
                 null
             }
         }
         return ChannelCloseOutgoingPayment(
             id = id,
-            amountSatoshi = recipientAmount.truncateToSatoshi(),
+            recipientAmount = recipientAmount.truncateToSatoshi(),
             address = closingDetails?.closingAddress ?: "",
             isSentToDefaultAddress = closingDetails?.isSentToDefaultAddress
-                ?: (closingType == ChannelCloseOutgoingPayment.ChannelClosingType.Local
-                        || closingType == ChannelCloseOutgoingPayment.ChannelClosingType.Revoked
-                        || closingType == ChannelCloseOutgoingPayment.ChannelClosingType.Remote
-                        || closingType == ChannelCloseOutgoingPayment.ChannelClosingType.Other),
+                ?: (closingType == ChannelClosingType.Local
+                        || closingType == ChannelClosingType.Revoked
+                        || closingType == ChannelClosingType.Remote
+                        || closingType == ChannelClosingType.Other),
             miningFees = fees,
             txId = closingTxId ?: ByteVector32.Zeroes,
             createdAt = createdAt,
             confirmedAt = confirmedAt ?: createdAt,
+            lockedAt = confirmedAt ?: createdAt,
             channelId = closingDetails?.channelId ?: ByteVector32.Zeroes,
-            closingType = closingType ?: ChannelCloseOutgoingPayment.ChannelClosingType.Mutual,
+            closingType = closingType ?: ChannelClosingType.Mutual,
         )
     }
 }

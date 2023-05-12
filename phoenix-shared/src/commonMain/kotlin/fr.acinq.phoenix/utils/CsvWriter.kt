@@ -138,6 +138,7 @@ class CsvWriter {
                     }
                     is SpliceOutgoingPayment -> "Outgoing splice to ${payment.address}"
                     is ChannelCloseOutgoingPayment -> "Channel closing to ${payment.address}"
+                    is SpliceCpfpOutgoingPayment -> "Accelerate transactions with CPFP"
                 }
                 row += ",${processField(details)}"
             }

@@ -22,29 +22,32 @@ data class SpliceOutgoingPaymentWrapper(
     @ByteString val txId: ByteArray,
     @ByteString val channelId: ByteArray,
     val createdAt: Long,
-    val confirmedAt: Long?
+    val confirmedAt: Long?,
+    val lockedAt: Long?,
 ) {
     constructor(payment: SpliceOutgoingPayment) : this(
         id = payment.id,
-        amountSat = payment.amountSatoshi.sat,
+        amountSat = payment.recipientAmount.sat,
         address = payment.address,
         miningFeeSat = payment.miningFees.sat,
         txId = payment.txId.toByteArray(),
         channelId = payment.channelId.toByteArray(),
         createdAt = payment.createdAt,
-        confirmedAt = payment.confirmedAt
+        confirmedAt = payment.confirmedAt,
+        lockedAt = payment.lockedAt
     )
 
     @Throws(Exception::class)
     fun unwrap() = SpliceOutgoingPayment(
         id = id,
-        amountSatoshi = amountSat.sat,
+        recipientAmount = amountSat.sat,
         address = address,
         miningFees = miningFeeSat.sat,
         txId = txId.toByteVector32(),
         channelId = channelId.toByteVector32(),
         createdAt = createdAt,
-        confirmedAt = confirmedAt
+        confirmedAt = confirmedAt,
+        lockedAt = lockedAt,
     )
 
     companion object

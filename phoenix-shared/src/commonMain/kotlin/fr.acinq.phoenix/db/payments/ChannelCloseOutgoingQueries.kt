@@ -36,13 +36,14 @@ class ChannelCloseOutgoingQueries(val database: PaymentsDatabase) {
         val (closingInfoType, closingInfoBlob) = payment.mapClosingTypeToDb()
         channelCloseQueries.insertChannelCloseOutgoing(
             id = payment.id.toString(),
-            amount_sat = payment.amountSatoshi.sat,
+            recipient_amount_sat = payment.recipientAmount.sat,
             address = payment.address,
             is_default_address = if (payment.isSentToDefaultAddress) 1 else 0,
             mining_fees_sat = payment.miningFees.sat,
             tx_id = payment.txId.toByteArray(),
             created_at = payment.createdAt,
             confirmed_at = payment.confirmedAt,
+            locked_at = payment.lockedAt,
             channel_id = payment.channelId.toByteArray(),
             closing_info_type = closingInfoType,
             closing_info_blob = closingInfoBlob,
@@ -64,19 +65,21 @@ class ChannelCloseOutgoingQueries(val database: PaymentsDatabase) {
             tx_id: ByteArray,
             created_at: Long,
             confirmed_at: Long?,
+            locked_at: Long?,
             channel_id: ByteArray,
             closing_info_type: OutgoingPartClosingInfoTypeVersion,
             closing_info_blob: ByteArray
         ): ChannelCloseOutgoingPayment {
             return ChannelCloseOutgoingPayment(
                 id = UUID.fromString(id),
-                amountSatoshi = amount_sat.sat,
+                recipientAmount = amount_sat.sat,
                 address = address,
                 isSentToDefaultAddress = is_default_address == 1L,
                 miningFees = mining_fees_sat.sat,
                 txId = tx_id.toByteVector32(),
                 createdAt = created_at,
                 confirmedAt = confirmed_at,
+                lockedAt = locked_at,
                 channelId = channel_id.toByteVector32(),
                 closingType = OutgoingPartClosingInfoData.deserialize(closing_info_type, closing_info_blob),
             )

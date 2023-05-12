@@ -96,7 +96,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
             if (queries.changes().executeAsOne() != 1L) {
                 result = false
             } else {
-                didCompleteWalletPayment(WalletPaymentId.OutgoingPaymentId(id), database)
+                didCompleteWalletPayment(WalletPaymentId.LightningOutgoingPaymentId(id), database)
             }
         }
         return result

@@ -105,7 +105,7 @@ sealed class IncomingReceivedWithData {
                 @Serializable val channelId: ByteVector32?
             ) : NewChannel()
 
-            /** V2 supports dual funding. New fields: service/miningFees, channel id, funding tx id, and the confirmation timestamp. Id is removed. */
+            /** V2 supports dual funding. New fields: service/miningFees, channel id, funding tx id, and the confirmation/lock timestamps. Id is removed. */
             @Serializable
             data class V2(
                 @Serializable val amount: MilliSatoshi,
@@ -113,7 +113,8 @@ sealed class IncomingReceivedWithData {
                 @Serializable val miningFee: Satoshi,
                 @Serializable val channelId: ByteVector32,
                 @Serializable val txId: ByteVector32,
-                @Serializable val confirmedAt: Long?
+                @Serializable val confirmedAt: Long?,
+                @Serializable val lockedAt: Long?,
             ) : NewChannel()
         }
 
@@ -125,7 +126,8 @@ sealed class IncomingReceivedWithData {
                 @Serializable val miningFee: Satoshi,
                 @Serializable val channelId: ByteVector32,
                 @Serializable val txId: ByteVector32,
-                @Serializable val confirmedAt: Long?
+                @Serializable val confirmedAt: Long?,
+                @Serializable val lockedAt: Long?,
             ) : SpliceIn()
         }
     }
@@ -159,6 +161,7 @@ sealed class IncomingReceivedWithData {
                         channelId = it.channelId ?: ByteVector32.Zeroes,
                         txId = ByteVector32.Zeroes,
                         confirmedAt = 0,
+                        lockedAt = 0,
                     )
                 })
                 IncomingReceivedWithTypeVersion.MULTIPARTS_V0 -> DbTypesHelper.polymorphicFormat.decodeFromString(SetSerializer(PolymorphicSerializer(Part::class)), json).map {
@@ -172,6 +175,7 @@ sealed class IncomingReceivedWithData {
                                 channelId = it.channelId ?: ByteVector32.Zeroes,
                                 txId = it.channelId ?: ByteVector32.Zeroes,
                                 confirmedAt = 0,
+                                lockedAt = 0,
                             )
                         } else {
                             IncomingPayment.ReceivedWith.NewChannel(
@@ -181,6 +185,7 @@ sealed class IncomingReceivedWithData {
                                 channelId = it.channelId ?: ByteVector32.Zeroes,
                                 txId = it.channelId ?: ByteVector32.Zeroes,
                                 confirmedAt = 0,
+                                lockedAt = 0,
                             )
                         }
                         else -> null // does not apply, MULTIPARTS_V0 only uses V0 parts
@@ -196,7 +201,8 @@ sealed class IncomingReceivedWithData {
                             miningFee = 0.sat,
                             channelId = it.channelId ?: ByteVector32.Zeroes,
                             txId = ByteVector32.Zeroes,
-                            confirmedAt = 0
+                            confirmedAt = 0,
+                            lockedAt = 0,
                         )
                         is Part.NewChannel.V2 -> IncomingPayment.ReceivedWith.NewChannel(
                             amount = it.amount,
@@ -204,7 +210,8 @@ sealed class IncomingReceivedWithData {
                             miningFee = it.miningFee,
                             channelId = it.channelId,
                             txId = it.txId,
-                            confirmedAt = it.confirmedAt
+                            confirmedAt = it.confirmedAt,
+                            lockedAt = it.lockedAt,
                         )
                         is Part.SpliceIn.V0 -> IncomingPayment.ReceivedWith.SpliceIn(
                             amount = it.amount,
@@ -212,7 +219,8 @@ sealed class IncomingReceivedWithData {
                             miningFee = it.miningFee,
                             channelId = it.channelId,
                             txId = it.txId,
-                            confirmedAt = it.confirmedAt
+                            confirmedAt = it.confirmedAt,
+                            lockedAt = it.lockedAt,
                         )
                     }
                 }.filterNotNull() // null elements are discarded!
@@ -232,6 +240,7 @@ fun List<IncomingPayment.ReceivedWith>.mapToDb(): Pair<IncomingReceivedWithTypeV
             channelId = it.channelId,
             txId = it.txId,
             confirmedAt = it.confirmedAt,
+            lockedAt = it.lockedAt,
         )
         is IncomingPayment.ReceivedWith.SpliceIn -> IncomingReceivedWithData.Part.SpliceIn.V0(
             amount = it.amount,
@@ -240,6 +249,7 @@ fun List<IncomingPayment.ReceivedWith>.mapToDb(): Pair<IncomingReceivedWithTypeV
             channelId = it.channelId,
             txId = it.txId,
             confirmedAt = it.confirmedAt,
+            lockedAt = it.lockedAt,
         )
     }
 }.takeIf { it.isNotEmpty() }?.toSet()?.let {

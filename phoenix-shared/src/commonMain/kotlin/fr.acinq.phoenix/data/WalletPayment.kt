@@ -8,11 +8,12 @@ import fr.acinq.phoenix.db.WalletPaymentOrderRow
 
 /**
  * Represents a unique WalletPayment row in the database, which exists in either the `incoming_payments` table,
- * the `outgoing_payments` table, or the `splice_outgoing_payments` table.
+ * the `outgoing_payments` table, the `splice_outgoing_payments` table, the `channel_close_outgoing_payments`, ...
  *
  * It is common to reference these rows in other database tables via [dbType] or [dbId].
  *
  * The [WalletPaymentId] class assists in this conversion.
+ *
  * @param dbType Long representing either incoming or outgoing/splice-outgoing
  * @param dbId String representing the appropriate id for either table (payment hash or UUID).
  */
@@ -33,12 +34,12 @@ sealed class WalletPaymentId {
         }
     }
 
-    data class OutgoingPaymentId(val id: UUID): WalletPaymentId() {
+    data class LightningOutgoingPaymentId(val id: UUID): WalletPaymentId() {
         override val dbType: DbType = DbType.OUTGOING
         override val dbId: String = id.toString()
         override val identifier: String = "outgoing|$dbId"
         companion object {
-            fun fromString(id: String) = OutgoingPaymentId(id = UUID.fromString(id))
+            fun fromString(id: String) = LightningOutgoingPaymentId(id = UUID.fromString(id))
         }
     }
 
@@ -60,20 +61,31 @@ sealed class WalletPaymentId {
         }
     }
 
+    data class SpliceCpfpOutgoingPaymentId(val id: UUID): WalletPaymentId() {
+        override val dbType: DbType = DbType.SPLICE_CPFP_OUTGOING
+        override val dbId: String = id.toString()
+        override val identifier: String = "splice_cpfp_outgoing|$dbId"
+        companion object {
+            fun fromString(id: String) = SpliceCpfpOutgoingPaymentId(id = UUID.fromString(id))
+        }
+    }
+
     enum class DbType(val value: Long) {
         INCOMING(1),
         OUTGOING(2),
         SPLICE_OUTGOING(3),
         CHANNEL_CLOSE_OUTGOING(4),
+        SPLICE_CPFP_OUTGOING(5),
     }
 
     companion object {
         fun create(type: Long, id: String): WalletPaymentId? {
             return when(type) {
                 DbType.INCOMING.value -> IncomingPaymentId.fromString(id)
-                DbType.OUTGOING.value -> OutgoingPaymentId.fromString(id)
+                DbType.OUTGOING.value -> LightningOutgoingPaymentId.fromString(id)
                 DbType.SPLICE_OUTGOING.value -> SpliceOutgoingPaymentId.fromString(id)
                 DbType.CHANNEL_CLOSE_OUTGOING.value -> ChannelCloseOutgoingPaymentId.fromString(id)
+                DbType.SPLICE_CPFP_OUTGOING.value -> ChannelCloseOutgoingPaymentId.fromString(id)
                 else -> null
             }
         }
@@ -82,9 +94,10 @@ sealed class WalletPaymentId {
 
 fun WalletPayment.walletPaymentId(): WalletPaymentId = when (this) {
     is IncomingPayment -> WalletPaymentId.IncomingPaymentId(paymentHash = this.paymentHash)
-    is LightningOutgoingPayment -> WalletPaymentId.OutgoingPaymentId(id = this.id)
+    is LightningOutgoingPayment -> WalletPaymentId.LightningOutgoingPaymentId(id = this.id)
     is SpliceOutgoingPayment -> WalletPaymentId.SpliceOutgoingPaymentId(id = this.id)
     is ChannelCloseOutgoingPayment -> WalletPaymentId.ChannelCloseOutgoingPaymentId(id = this.id)
+    is SpliceCpfpOutgoingPayment -> WalletPaymentId.SpliceCpfpOutgoingPaymentId(id = this.id)
 }
 
 /**

@@ -30,13 +30,14 @@ class SpliceOutgoingQueries(val database: PaymentsDatabase) {
     fun addSpliceOutgoingPayment(payment: SpliceOutgoingPayment) {
         spliceOutQueries.insertSpliceOutgoing(
             id = payment.id.toString(),
-            amount_sat = payment.amountSatoshi.sat,
+            recipient_amount_sat = payment.recipientAmount.sat,
             address = payment.address,
             mining_fees_sat = payment.miningFees.sat,
             channel_id = payment.channelId.toByteArray(),
             tx_id = payment.txId.toByteArray(),
             created_at = payment.createdAt,
             confirmed_at = payment.confirmedAt,
+            locked_at = payment.lockedAt
         )
     }
 
@@ -55,23 +56,25 @@ class SpliceOutgoingQueries(val database: PaymentsDatabase) {
     companion object {
         fun mapSpliceOutgoingPayment(
             id: String,
-            amount_sat: Long,
+            recipient_amount_sat: Long,
             address: String,
             mining_fees_sat: Long,
             tx_id: ByteArray,
             channel_id: ByteArray,
             created_at: Long,
-            confirmed_at: Long?
+            confirmed_at: Long?,
+            locked_at: Long?
         ): SpliceOutgoingPayment {
             return SpliceOutgoingPayment(
                 id = UUID.fromString(id),
-                amountSatoshi = amount_sat.sat,
+                recipientAmount = recipient_amount_sat.sat,
                 address = address,
                 miningFees = mining_fees_sat.sat,
                 txId = tx_id.toByteVector32(),
                 channelId = channel_id.toByteVector32(),
                 createdAt = created_at,
-                confirmedAt = confirmed_at
+                confirmedAt = confirmed_at,
+                lockedAt = locked_at
             )
         }
     }

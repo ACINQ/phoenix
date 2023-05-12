@@ -111,7 +111,7 @@ class CloudKitDb(
                         }
                         WalletPaymentId.DbType.OUTGOING.value -> {
                             try {
-                                WalletPaymentId.OutgoingPaymentId.fromString(row.id)
+                                WalletPaymentId.LightningOutgoingPaymentId.fromString(row.id)
                             } catch (e: Exception) {
                                 null
                             }
@@ -155,7 +155,7 @@ class CloudKitDb(
                     }
                 } // </incoming_payments>
 
-                uniquePaymentIds.filterIsInstance<WalletPaymentId.OutgoingPaymentId>().forEach { paymentId ->
+                uniquePaymentIds.filterIsInstance<WalletPaymentId.LightningOutgoingPaymentId>().forEach { paymentId ->
                     outQueries.getPaymentRelaxed(
                         id = paymentId.id
                     )?.let { payment ->
@@ -543,7 +543,7 @@ class CloudKitDb(
                 }
 
                 outQueries.scanCompleted().executeAsList().forEach { row ->
-                    val rowId = WalletPaymentId.OutgoingPaymentId.fromString(row.id)
+                    val rowId = WalletPaymentId.LightningOutgoingPaymentId.fromString(row.id)
                     if (!existing.contains(rowId)) {
                         missing.add(MissingItem(rowId, row.completed_at))
                     }
