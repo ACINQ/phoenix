@@ -253,13 +253,16 @@ class NodeService : Service() {
                         log.info("processing liquidity_event=$event")
                         when (val reason = event.reason) {
                             is LiquidityEvents.Rejected.Reason.RejectedByUser -> {
-                                Notifications.notifyPaymentMissedRejectedByUser(applicationContext)
+                                Notifications.notifyPaymentMissedRejectedByUser(applicationContext, event.amount)
                             }
                             is LiquidityEvents.Rejected.Reason.PolicySetToDisabled -> {
-                                Notifications.notifyPaymentMissedPolicyDisabled(applicationContext)
+                                Notifications.notifyPaymentMissedPolicyDisabled(applicationContext, event.amount)
                             }
                             is LiquidityEvents.Rejected.Reason.TooExpensive -> {
-                                Notifications.notifyPaymentMissedTooExpensive(applicationContext, reason.maxAllowed, reason.actual)
+                                Notifications.notifyPaymentMissedTooExpensive(applicationContext, event.amount, reason.maxAllowed, reason.actual)
+                            }
+                            LiquidityEvents.Rejected.Reason.ChannelInitializing -> {
+                                Notifications.notifyPaymentMissedChannelsInitializing(applicationContext, event.amount)
                             }
                         }
                     }

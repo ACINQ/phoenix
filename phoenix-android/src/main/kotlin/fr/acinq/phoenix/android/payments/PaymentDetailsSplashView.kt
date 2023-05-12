@@ -199,6 +199,9 @@ private fun PaymentStatus(
                 ConfirmationView(payment.txId, payment.channelId)
             }
         }
+        is SpliceCpfpOutgoingPayment -> {
+            TODO()
+        }
         is IncomingPayment -> {
             val received = payment.received
             when {
@@ -372,7 +375,11 @@ private fun PaymentDestinationView(payment: WalletPayment) {
         is OnChainOutgoingPayment -> {
             Spacer(modifier = Modifier.height(8.dp))
             SplashLabelRow(label = stringResource(id = R.string.paymentdetails_destination_label), icon = R.drawable.ic_chain) {
-                Text(text = payment.address)
+                Text(text = when (payment) {
+                    is SpliceOutgoingPayment -> payment.address
+                    is ChannelCloseOutgoingPayment -> payment.address
+                    is SpliceCpfpOutgoingPayment -> stringResource(id = R.string.paymentdetails_destination_cpfp_value)
+                })
             }
         }
         else -> Unit

@@ -53,7 +53,6 @@ import org.slf4j.LoggerFactory
 import scala.collection.JavaConversions
 import scala.collection.JavaConverters
 import scala.collection.Seq
-import java.io.File
 
 object LegacyMigrationHelper {
 
@@ -188,7 +187,7 @@ object LegacyMigrationHelper {
                 // save metadata
                 if (paymentMeta?.custom_desc != null) {
                     newPaymentsDb.updateMetadata(
-                        id = WalletPaymentId.OutgoingPaymentId(parentId),
+                        id = WalletPaymentId.LightningOutgoingPaymentId(parentId),
                         userDescription = paymentMeta.custom_desc,
                         userNotes = null
                     )
@@ -220,7 +219,6 @@ object LegacyMigrationHelper {
                     )
                     newPaymentsDb.receivePayment(
                         paymentHash = payment.paymentHash,
-                        expectedAmount = payment.received!!.expectedAmount,
                         receivedWith = payment.received!!.receivedWith,
                         receivedAt = payment.received!!.receivedAt
                     )
@@ -275,7 +273,8 @@ object LegacyMigrationHelper {
                     miningFee = 0.sat,
                     channelId = ByteVector32.Zeroes,
                     txId = ByteVector32.Zeroes,
-                    confirmedAt = status.receivedAt()
+                    confirmedAt = status.receivedAt(),
+                    lockedAt = status.receivedAt()
                 )
             } else {
                 IncomingPayment.ReceivedWith.LightningPayment(
@@ -288,7 +287,7 @@ object LegacyMigrationHelper {
             IncomingPayment(
                 preimage = payment.paymentPreimage().bytes().toArray().byteVector32(),
                 origin = origin,
-                received = IncomingPayment.Received(expectedAmount = 0.msat, listOf(receivedWith), status.receivedAt()),
+                received = IncomingPayment.Received(listOf(receivedWith), status.receivedAt()),
                 createdAt = payment.createdAt()
             )
         }
@@ -306,25 +305,27 @@ object LegacyMigrationHelper {
         val head = listOfParts.first()
 
         if (head.paymentType() == "ClosingChannel") {
+            val closedAt = when (val status = head.status()) {
+                is OutgoingPaymentStatus.Failed -> status.completedAt()
+                is OutgoingPaymentStatus.Succeeded -> status.completedAt()
+                else -> head.createdAt()
+            }
             return ChannelCloseOutgoingPayment(
                 id = parentId,
-                amountSatoshi = head.amount().truncateToSatoshi().toLong().sat,
+                recipientAmount = head.amount().truncateToSatoshi().toLong().sat,
                 address = paymentMeta?.closing_main_output_script ?: "",
                 isSentToDefaultAddress = paymentMeta?.closing_type != ClosingType.Mutual.code,
                 miningFees = 0.sat,
                 txId = paymentMeta?.getSpendingTxs()?.firstOrNull()?.let { ByteVector32.fromValidHex(it) } ?: ByteVector32.Zeroes,
                 createdAt = head.createdAt(),
-                confirmedAt = when (val status = head.status()) {
-                    is OutgoingPaymentStatus.Failed -> status.completedAt()
-                    is OutgoingPaymentStatus.Succeeded -> status.completedAt()
-                    else -> head.createdAt()
-                },
+                confirmedAt = closedAt,
+                lockedAt = closedAt,
                 channelId = paymentMeta?.closing_channel_id?.let { ByteVector32.fromValidHex(it) } ?: ByteVector32.Zeroes,
                 closingType = when (paymentMeta?.closing_type) {
-                    ClosingType.Mutual.code -> ChannelCloseOutgoingPayment.ChannelClosingType.Mutual
-                    ClosingType.Local.code -> ChannelCloseOutgoingPayment.ChannelClosingType.Local
-                    ClosingType.Remote.code -> ChannelCloseOutgoingPayment.ChannelClosingType.Remote
-                    else -> ChannelCloseOutgoingPayment.ChannelClosingType.Other
+                    ClosingType.Mutual.code -> ChannelClosingType.Mutual
+                    ClosingType.Local.code -> ChannelClosingType.Local
+                    ClosingType.Remote.code -> ChannelClosingType.Remote
+                    else -> ChannelClosingType.Other
                 },
             )
         }

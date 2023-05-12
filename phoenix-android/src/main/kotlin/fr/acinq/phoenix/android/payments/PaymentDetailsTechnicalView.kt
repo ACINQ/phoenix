@@ -99,6 +99,7 @@ fun PaymentDetailsTechnicalView(
                     is LightningOutgoingPayment -> DetailsForLightningOutgoingPayment(payment)
                     is SpliceOutgoingPayment -> DetailsForSpliceOut(payment)
                     is ChannelCloseOutgoingPayment -> DetailsForChannelClose(payment)
+                    is SpliceCpfpOutgoingPayment -> DetailsForCpfp(payment)
                 }
             }
 
@@ -132,6 +133,7 @@ private fun HeaderForOutgoing(
                     is LightningOutgoingPayment.Details.SwapOut -> stringResource(R.string.paymentdetails_swapout)
                     is LightningOutgoingPayment.Details.KeySend -> stringResource(R.string.paymentdetails_keysend)
                 }
+                is SpliceCpfpOutgoingPayment -> stringResource(id = R.string.paymentdetails_splice_cpfp_outgoing)
             }
 
         )
@@ -312,13 +314,20 @@ private fun DetailsForChannelClose(
     TechnicalRowSelectable(
         label = stringResource(id = R.string.paymentdetails_closing_type_label),
         value = when (payment.closingType) {
-            ChannelCloseOutgoingPayment.ChannelClosingType.Mutual -> stringResource(id = R.string.paymentdetails_closing_type_mutual)
-            ChannelCloseOutgoingPayment.ChannelClosingType.Local -> stringResource(id = R.string.paymentdetails_closing_type_local)
-            ChannelCloseOutgoingPayment.ChannelClosingType.Remote -> stringResource(id = R.string.paymentdetails_closing_type_remote)
-            ChannelCloseOutgoingPayment.ChannelClosingType.Revoked -> stringResource(id = R.string.paymentdetails_closing_type_revoked)
-            ChannelCloseOutgoingPayment.ChannelClosingType.Other -> stringResource(id = R.string.paymentdetails_closing_type_other)
+            ChannelClosingType.Mutual -> stringResource(id = R.string.paymentdetails_closing_type_mutual)
+            ChannelClosingType.Local -> stringResource(id = R.string.paymentdetails_closing_type_local)
+            ChannelClosingType.Remote -> stringResource(id = R.string.paymentdetails_closing_type_remote)
+            ChannelClosingType.Revoked -> stringResource(id = R.string.paymentdetails_closing_type_revoked)
+            ChannelClosingType.Other -> stringResource(id = R.string.paymentdetails_closing_type_other)
         }
     )
+}
+
+@Composable
+private fun DetailsForCpfp(
+    payment: SpliceCpfpOutgoingPayment
+) {
+    Text("TODO")
 }
 
 @Composable

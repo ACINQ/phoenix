@@ -74,6 +74,7 @@ object Notifications {
         NotificationCompat.Builder(context, MISSED_PAYMENT_NOTIF_CHANNEL).apply {
             setContentTitle(title)
             setContentText(message)
+            setStyle(NotificationCompat.BigTextStyle().bigText(message))
             setSmallIcon(R.drawable.ic_phoenix_outline)
             setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE))
             setAutoCancel(true)
@@ -90,26 +91,34 @@ object Notifications {
         )
     }
 
-    fun notifyPaymentMissedRejectedByUser(context: Context) {
+    fun notifyPaymentMissedRejectedByUser(context: Context, amountIncoming: MilliSatoshi) {
         notifyPaymentMissed(
             context = context,
-            title = context.getString(R.string.notif__rejected__title),
+            title = context.getString(R.string.notif__rejected__title, amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
             message = context.getString(R.string.notif__rejected__by_user),
         )
     }
 
-    fun notifyPaymentMissedPolicyDisabled(context: Context) {
+    fun notifyPaymentMissedPolicyDisabled(context: Context, amountIncoming: MilliSatoshi) {
         notifyPaymentMissed(
             context = context,
-            title = context.getString(R.string.notif__rejected__title),
+            title = context.getString(R.string.notif__rejected__title, amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
             message = context.getString(R.string.notif__rejected__policy_disabled),
         )
     }
 
-    fun notifyPaymentMissedTooExpensive(context: Context, maxAllowed: MilliSatoshi, actual: MilliSatoshi) {
+    fun notifyPaymentMissedChannelsInitializing(context: Context, amountIncoming: MilliSatoshi) {
         notifyPaymentMissed(
             context = context,
-            title = context.getString(R.string.notif__rejected__title),
+            title = context.getString(R.string.notif__rejected__title, amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
+            message = context.getString(R.string.notif__rejected__channels_initializing),
+        )
+    }
+
+    fun notifyPaymentMissedTooExpensive(context: Context, amountIncoming: MilliSatoshi, maxAllowed: MilliSatoshi, actual: MilliSatoshi) {
+        notifyPaymentMissed(
+            context = context,
+            title = context.getString(R.string.notif__rejected__title, amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
             message = context.getString(R.string.notif__rejected__policy_too_expensive,
                 actual.toPrettyString(BitcoinUnit.Sat, withUnit = true),
                 maxAllowed.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
