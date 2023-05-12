@@ -28,12 +28,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.*
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.LocalChannelInfo
+import fr.acinq.phoenix.data.WalletPaymentId
 
 
 @Composable
@@ -44,7 +46,7 @@ fun ChannelDetailsView(
     val log = logger("ChannelDetailsView")
     val channelsState = business.peerManager.channelsFlow.collectAsState()
 
-    DefaultScreenLayout(isScrollable = false) {
+    DefaultScreenLayout(isScrollable = true) {
         DefaultScreenHeader(
             onBackClick = onBackClick,
             title = stringResource(id = R.string.channeldetails_title),
@@ -117,6 +119,11 @@ private fun CommitmentDetailsView(
     commitment: LocalChannelInfo.CommitmentInfo
 ) {
     val btcUnit = LocalBitcoinUnit.current
+    val paymentsManager = business.paymentsManager
+    val linkedPayments by produceState<List<WalletPaymentId>>(initialValue = emptyList()) {
+        value = paymentsManager.listPaymentsForTxId(ByteVector32.fromValidHex(commitment.fundingTxId))
+    }
+
     SettingWithDecoration(
         title = "Index ${commitment.fundingTxIndex}",
         description = {
@@ -140,6 +147,30 @@ private fun CommitmentDetailsView(
                     text = commitment.fundingAmount.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.HIDE),
                     style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.onSurface)
                 )
+            }
+            if (linkedPayments.isNotEmpty()) {
+                Row {
+                    Text(text = stringResource(id = R.string.channeldetails_commitment_linked_payments), modifier = Modifier.alignByBaseline())
+                    Spacer(modifier = Modifier.width(4.dp))
+                    val navController = navController
+                    Column(modifier = Modifier.alignByBaseline()) {
+                        linkedPayments.forEach { paymentId ->
+                            InlineButton(
+                                text = when (paymentId.dbType) {
+                                    WalletPaymentId.DbType.OUTGOING -> "LN payment"
+                                    WalletPaymentId.DbType.INCOMING -> "Incoming payment"
+                                    WalletPaymentId.DbType.SPLICE_OUTGOING -> "Splice out"
+                                    WalletPaymentId.DbType.SPLICE_CPFP_OUTGOING -> "Fee bumping"
+                                    WalletPaymentId.DbType.CHANNEL_CLOSE_OUTGOING -> "Channel closing"
+                                },
+                                onClick = {
+                                    navigateToPaymentDetails(navController, paymentId, isFromEvent = false)
+                                },
+                                fontSize = 14.sp,
+                            )
+                        }
+                    }
+                }
             }
         },
         decoration = null

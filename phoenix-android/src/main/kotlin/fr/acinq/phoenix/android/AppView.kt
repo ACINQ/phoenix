@@ -316,7 +316,7 @@ private fun popToHome(navController: NavHostController) {
     }
 }
 
-private fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId, isFromEvent: Boolean) {
+fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId, isFromEvent: Boolean) {
     navController.navigate("${Screen.PaymentDetails.route}?direction=${id.dbType.value}&id=${id.dbId}&fromEvent=${isFromEvent}")
 }
 

@@ -299,6 +299,7 @@
     <string name="channeldetails_commitment_funding_tx_index">Tx index:</string>
     <string name="channeldetails_commitment_balance">Balance:</string>
     <string name="channeldetails_commitment_funding_capacity">Capacity:</string>
+    <string name="channeldetails_commitment_linked_payments">Triggered by:</string>
 
     <string name="channeldetails_json">Display raw data</string>
     <string name="channeldetails_share">Share</string>

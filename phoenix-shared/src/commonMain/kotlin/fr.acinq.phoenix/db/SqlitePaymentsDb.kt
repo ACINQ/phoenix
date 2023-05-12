@@ -360,6 +360,12 @@ class SqlitePaymentsDb(
         }
     }
 
+    suspend fun listPaymentsIdForTxId(
+        txId: ByteVector32
+    ): List<WalletPaymentId> = withContext(Dispatchers.Default) {
+        linkTxToPaymentQueries.listWalletPaymentIdsForTx(txId)
+    }
+
     override suspend fun getIncomingPayment(
         paymentHash: ByteVector32
     ): IncomingPayment? = withContext(Dispatchers.Default) {

@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.managers
 
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentProgress
@@ -141,6 +142,12 @@ class PaymentsManager(
             userDescription = userDescription,
             userNotes = null
         )
+    }
+
+    suspend fun listPaymentsForTxId(
+        txId: ByteVector32
+    ): List<WalletPaymentId> {
+        return paymentsDb().listPaymentsIdForTxId(txId)
     }
 
     suspend fun getPayment(
