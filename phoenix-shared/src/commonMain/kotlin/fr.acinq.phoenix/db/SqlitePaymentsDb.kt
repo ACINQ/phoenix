@@ -81,8 +81,9 @@ class SqlitePaymentsDb(
 
     internal val inQueries = IncomingQueries(database)
     internal val outQueries = OutgoingQueries(database)
-    internal val spliceOutQueries = SpliceOutgoingQueries(database)
-    internal val channelCloseQueries = ChannelCloseOutgoingQueries(database)
+    private val spliceOutQueries = SpliceOutgoingQueries(database)
+    private val channelCloseQueries = ChannelCloseOutgoingQueries(database)
+    private val cpfpQueries = SpliceCpfpOutgoingQueries(database)
     private val aggrQueries = database.aggregatedQueriesQueries
     private val metaQueries = MetadataQueries(database)
     private val linkTxToPaymentQueries = LinkTxToPaymentQueries(database)
@@ -131,7 +132,8 @@ class SqlitePaymentsDb(
                         )
                     }
                     is SpliceCpfpOutgoingPayment -> {
-                        TODO()
+                        cpfpQueries.addCpfpPayment(outgoingPayment)
+                        linkTxToPaymentQueries.linkTxToPayment(outgoingPayment.txId, outgoingPayment.walletPaymentId())
                     }
                 }
                 // Add associated metadata within the same atomic database transaction.
@@ -252,7 +254,10 @@ class SqlitePaymentsDb(
         options: WalletPaymentFetchOptions
     ): Pair<SpliceCpfpOutgoingPayment, WalletPaymentMetadata?>? = withContext(Dispatchers.Default) {
         database.transactionWithResult {
-            TODO()
+            cpfpQueries.getCpfp(id)?.let {
+                val metadata = metaQueries.getMetadata(id = it.walletPaymentId(), options)
+                it to metadata
+            }
         }
     }
 
@@ -304,29 +309,51 @@ class SqlitePaymentsDb(
     }
 
     override suspend fun setLocked(txId: ByteVector32) {
-        TODO("Not yet implemented")
+        database.transaction {
+            val lockedAt = currentTimestampMillis()
+            linkTxToPaymentQueries.setLocked(txId, lockedAt)
+            linkTxToPaymentQueries.listWalletPaymentIdsForTx(txId).forEach { walletPaymentId ->
+                when (walletPaymentId) {
+                    is WalletPaymentId.IncomingPaymentId -> {
+                        inQueries.setLocked(walletPaymentId.paymentHash, lockedAt)
+                    }
+                    is WalletPaymentId.LightningOutgoingPaymentId -> {
+                        // LN payments need not be locked
+                    }
+                    is WalletPaymentId.SpliceOutgoingPaymentId -> {
+                        spliceOutQueries.setLocked(walletPaymentId.id, lockedAt)
+                    }
+                    is WalletPaymentId.ChannelCloseOutgoingPaymentId -> {
+                        channelCloseQueries.setLocked(walletPaymentId.id, lockedAt)
+                    }
+                    is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> {
+                        cpfpQueries.setLocked(walletPaymentId.id, lockedAt)
+                    }
+                }
+            }
+        }
     }
 
     suspend fun setConfirmed(txId: ByteVector32) = withContext(Dispatchers.Default) {
         database.transaction {
-            val completedAt = currentTimestampMillis()
-            linkTxToPaymentQueries.setConfirmed(txId, completedAt)
+            val confirmedAt = currentTimestampMillis()
+            linkTxToPaymentQueries.setConfirmed(txId, confirmedAt)
             linkTxToPaymentQueries.listWalletPaymentIdsForTx(txId).forEach { walletPaymentId ->
                 when (walletPaymentId) {
                     is WalletPaymentId.IncomingPaymentId -> {
-                        inQueries.setConfirmed(walletPaymentId.paymentHash, completedAt)
+                        inQueries.setConfirmed(walletPaymentId.paymentHash, confirmedAt)
                     }
                     is WalletPaymentId.LightningOutgoingPaymentId -> {
                         // LN payments need not be confirmed
                     }
                     is WalletPaymentId.SpliceOutgoingPaymentId -> {
-                        spliceOutQueries.setConfirmed(walletPaymentId.id, completedAt)
+                        spliceOutQueries.setConfirmed(walletPaymentId.id, confirmedAt)
                     }
                     is WalletPaymentId.ChannelCloseOutgoingPaymentId -> {
-                        channelCloseQueries.setConfirmed(walletPaymentId.id, completedAt)
+                        channelCloseQueries.setConfirmed(walletPaymentId.id, confirmedAt)
                     }
                     is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> {
-                        TODO()
+                        cpfpQueries.setConfirmed(walletPaymentId.id, confirmedAt)
                     }
                 }
             }
@@ -529,7 +556,9 @@ class SqlitePaymentsDb(
                     )
                 }
                 is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> {
-                    TODO()
+                    database.spliceCpfpOutgoingPaymentsQueries.deleteCpfp(
+                        id = paymentId.dbId
+                    )
                 }
             }
             didDeleteWalletPayment(paymentId, database)

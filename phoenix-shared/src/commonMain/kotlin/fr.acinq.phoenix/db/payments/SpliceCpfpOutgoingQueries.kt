@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.db.payments
 
+import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
@@ -24,14 +25,12 @@ import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.PaymentsDatabase
 import fr.acinq.phoenix.db.didCompleteWalletPayment
 
-class SpliceOutgoingQueries(val database: PaymentsDatabase) {
-    private val spliceOutQueries = database.spliceOutgoingPaymentsQueries
+class SpliceCpfpOutgoingQueries(val database: PaymentsDatabase) {
+    private val cpfpQueries = database.spliceCpfpOutgoingPaymentsQueries
 
-    fun addSpliceOutgoingPayment(payment: SpliceOutgoingPayment) {
-        spliceOutQueries.insertSpliceOutgoing(
+    fun addCpfpPayment(payment: SpliceCpfpOutgoingPayment) {
+        cpfpQueries.insertCpfp(
             id = payment.id.toString(),
-            recipient_amount_sat = payment.recipientAmount.sat,
-            address = payment.address,
             mining_fees_sat = payment.miningFees.sat,
             channel_id = payment.channelId.toByteArray(),
             tx_id = payment.txId.toByteArray(),
@@ -41,42 +40,38 @@ class SpliceOutgoingQueries(val database: PaymentsDatabase) {
         )
     }
 
-    fun getSpliceOutPayment(id: UUID): SpliceOutgoingPayment? {
-        return spliceOutQueries.getSpliceOutgoing(
+    fun getCpfp(id: UUID): SpliceCpfpOutgoingPayment? {
+        return cpfpQueries.getCpfp(
             id = id.toString(),
-            mapper = ::mapSpliceOutgoingPayment
+            mapper = ::mapCpfp
         ).executeAsOneOrNull()
     }
 
     fun setConfirmed(id: UUID, confirmedAt: Long) {
-        spliceOutQueries.setConfirmed(confirmed_at = confirmedAt, id = id.toString())
-        didCompleteWalletPayment(WalletPaymentId.SpliceOutgoingPaymentId(id), database)
+        cpfpQueries.setConfirmed(confirmed_at = confirmedAt, id = id.toString())
+        didCompleteWalletPayment(WalletPaymentId.SpliceCpfpOutgoingPaymentId(id), database)
     }
 
     fun setLocked(id: UUID, lockedAt: Long) {
-        spliceOutQueries.setLocked(locked_at = lockedAt, id = id.toString())
-        didCompleteWalletPayment(WalletPaymentId.SpliceOutgoingPaymentId(id), database)
+        cpfpQueries.setLocked(locked_at = lockedAt, id = id.toString())
+        didCompleteWalletPayment(WalletPaymentId.SpliceCpfpOutgoingPaymentId(id), database)
     }
 
-    companion object {
-        fun mapSpliceOutgoingPayment(
+    private companion object {
+        fun mapCpfp(
             id: String,
-            recipient_amount_sat: Long,
-            address: String,
             mining_fees_sat: Long,
-            tx_id: ByteArray,
             channel_id: ByteArray,
+            tx_id: ByteArray,
             created_at: Long,
             confirmed_at: Long?,
             locked_at: Long?
-        ): SpliceOutgoingPayment {
-            return SpliceOutgoingPayment(
+        ): SpliceCpfpOutgoingPayment {
+            return SpliceCpfpOutgoingPayment(
                 id = UUID.fromString(id),
-                recipientAmount = recipient_amount_sat.sat,
-                address = address,
                 miningFees = mining_fees_sat.sat,
-                txId = tx_id.toByteVector32(),
                 channelId = channel_id.toByteVector32(),
+                txId = tx_id.toByteVector32(),
                 createdAt = created_at,
                 confirmedAt = confirmed_at,
                 lockedAt = locked_at

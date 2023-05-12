@@ -35,4 +35,8 @@ class LinkTxToPaymentQueries(val database: PaymentsDatabase) {
     fun setConfirmed(txId: ByteVector32, confirmedAt: Long) {
         linkTxQueries.setConfirmed(tx_id = txId.toByteArray(), confirmed_at = confirmedAt)
     }
+
+    fun setLocked(txId: ByteVector32, lockedAt: Long) {
+        linkTxQueries.setLocked(tx_id = txId.toByteArray(), locked_at = lockedAt)
+    }
 }

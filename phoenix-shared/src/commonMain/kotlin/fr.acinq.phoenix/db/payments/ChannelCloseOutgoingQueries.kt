@@ -55,6 +55,11 @@ class ChannelCloseOutgoingQueries(val database: PaymentsDatabase) {
         didCompleteWalletPayment(WalletPaymentId.ChannelCloseOutgoingPaymentId(id), database)
     }
 
+    fun setLocked(id: UUID, lockedAt: Long) {
+        channelCloseQueries.setLocked(locked_at = lockedAt, id = id.toString())
+        didCompleteWalletPayment(WalletPaymentId.ChannelCloseOutgoingPaymentId(id), database)
+    }
+
     companion object {
         fun mapChannelCloseOutgoingPayment(
             id: String,

@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS link_tx_to_payments (
     type INTEGER NOT NULL,
     id TEXT NOT NULL,
     confirmed_at INTEGER DEFAULT NULL,
+    locked_at INTEGER DEFAULT NULL,
     PRIMARY KEY (tx_id, type, id)
 );
 
@@ -20,3 +21,6 @@ INSERT INTO link_tx_to_payments(tx_id, type, id) VALUES (?, ?, ?);
 
 setConfirmed:
 UPDATE link_tx_to_payments SET confirmed_at=? WHERE tx_id=?;
+
+setLocked:
+UPDATE link_tx_to_payments SET locked_at=? WHERE tx_id=?;

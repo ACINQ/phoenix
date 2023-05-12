@@ -70,12 +70,36 @@ class IncomingQueries(private val database: PaymentsDatabase) {
         }
     }
 
+    fun setLocked(paymentHash: ByteVector32, lockedAt: Long) {
+        val paymentInDb = queries.get(
+            payment_hash = paymentHash.toByteArray(),
+            mapper = ::mapIncomingPayment
+        ).executeAsOneOrNull()
+        val newReceivedWith = paymentInDb?.received?.receivedWith?.map {
+            when (it) {
+                is IncomingPayment.ReceivedWith.NewChannel -> it.copy(lockedAt = lockedAt)
+                is IncomingPayment.ReceivedWith.SpliceIn -> it.copy(lockedAt = lockedAt)
+                else -> it
+            }
+        }
+        val (newReceivedWithType, newReceivedWithBlob) = newReceivedWith?.mapToDb() ?: (null to null)
+        queries.updateReceived(
+            // we override the previous received_at timestamp to trigger a refresh of the payment's cache data
+            // because the list-all query feeding the cache uses `received_at` for incoming payments
+            received_at = lockedAt,
+            received_with_type = newReceivedWithType,
+            received_with_blob = newReceivedWithBlob,
+            payment_hash = paymentHash.toByteArray()
+        )
+        didCompleteWalletPayment(WalletPaymentId.IncomingPaymentId(paymentHash), database)
+    }
+
     fun setConfirmed(paymentHash: ByteVector32, confirmedAt: Long) {
         val paymentInDb = queries.get(
             payment_hash = paymentHash.toByteArray(),
             mapper = ::mapIncomingPayment
-        ).executeAsOneOrNull() ?: throw IncomingPaymentNotFound(paymentHash)
-        val newReceivedWith = paymentInDb.received?.receivedWith?.map {
+        ).executeAsOneOrNull()
+        val newReceivedWith = paymentInDb?.received?.receivedWith?.map {
             when (it) {
                 is IncomingPayment.ReceivedWith.NewChannel -> it.copy(confirmedAt = confirmedAt)
                 is IncomingPayment.ReceivedWith.SpliceIn -> it.copy(confirmedAt = confirmedAt)
@@ -84,9 +108,7 @@ class IncomingQueries(private val database: PaymentsDatabase) {
         }
         val (newReceivedWithType, newReceivedWithBlob) = newReceivedWith?.mapToDb() ?: (null to null)
         queries.updateReceived(
-            // we override the previous received_at timestamp to trigger a refresh of the payment's cache data
-            // because the list-all query feeding the cache uses `received_at` for incoming payments
-            received_at = confirmedAt,
+            received_at = paymentInDb?.received?.receivedAt,
             received_with_type = newReceivedWithType,
             received_with_blob = newReceivedWithBlob,
             payment_hash = paymentHash.toByteArray()

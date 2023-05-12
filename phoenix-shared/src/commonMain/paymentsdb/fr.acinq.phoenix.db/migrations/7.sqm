@@ -40,9 +40,18 @@ CREATE TABLE IF NOT EXISTS link_tx_to_payments (
     type INTEGER NOT NULL,
     id TEXT NOT NULL,
     confirmed_at INTEGER DEFAULT NULL,
+    locked_at INTEGER DEFAULT NULL,
     PRIMARY KEY (tx_id, type, id)
 );
 
-ALTER TABLE incoming_payments ADD COLUMN expected_amount_msat INTEGER DEFAULT NULL;
+CREATE TABLE IF NOT EXISTS splice_cpfp_outgoing_payments (
+    id TEXT NOT NULL PRIMARY KEY,
+    mining_fees_sat INTEGER NOT NULL,
+    channel_id BLOB NOT NULL,
+    tx_id BLOB NOT NULL,
+    created_at INTEGER NOT NULL,
+    confirmed_at INTEGER DEFAULT NULL,
+    locked_at INTEGER DEFAULT NULL
+);
 
 CREATE INDEX IF NOT EXISTS link_tx_to_payments_txid ON link_tx_to_payments(tx_id);
