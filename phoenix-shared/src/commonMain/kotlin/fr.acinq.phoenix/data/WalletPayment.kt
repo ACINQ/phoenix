@@ -85,7 +85,7 @@ sealed class WalletPaymentId {
                 DbType.OUTGOING.value -> LightningOutgoingPaymentId.fromString(id)
                 DbType.SPLICE_OUTGOING.value -> SpliceOutgoingPaymentId.fromString(id)
                 DbType.CHANNEL_CLOSE_OUTGOING.value -> ChannelCloseOutgoingPaymentId.fromString(id)
-                DbType.SPLICE_CPFP_OUTGOING.value -> ChannelCloseOutgoingPaymentId.fromString(id)
+                DbType.SPLICE_CPFP_OUTGOING.value -> SpliceCpfpOutgoingPaymentId.fromString(id)
                 else -> null
             }
         }

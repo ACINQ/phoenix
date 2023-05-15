@@ -592,6 +592,7 @@ class SqlitePaymentsDb(
                 WalletPaymentId.DbType.INCOMING.value -> WalletPaymentId.IncomingPaymentId.fromString(id)
                 WalletPaymentId.DbType.SPLICE_OUTGOING.value -> WalletPaymentId.SpliceOutgoingPaymentId.fromString(id)
                 WalletPaymentId.DbType.CHANNEL_CLOSE_OUTGOING.value -> WalletPaymentId.ChannelCloseOutgoingPaymentId.fromString(id)
+                WalletPaymentId.DbType.SPLICE_CPFP_OUTGOING.value -> WalletPaymentId.SpliceCpfpOutgoingPaymentId.fromString(id)
                 else -> throw UnhandledPaymentType(type)
             }
             return WalletPaymentOrderRow(

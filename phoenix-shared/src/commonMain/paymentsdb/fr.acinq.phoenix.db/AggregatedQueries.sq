@@ -32,6 +32,13 @@ UNION ALL
     FROM channel_close_outgoing_payments
 UNION ALL
     SELECT
+        5            AS type,
+        id           AS id,
+        created_at   AS created_at,
+        confirmed_at AS completed_at
+    FROM splice_cpfp_outgoing_payments
+UNION ALL
+    SELECT
         1                        AS type,
         lower(hex(payment_hash)) AS id,
         created_at               AS created_at,
@@ -51,7 +58,11 @@ SELECT SUM(result) AS result FROM (
     UNION ALL
     SELECT COUNT(*) AS result FROM splice_outgoing_payments
     UNION ALL
-    SELECT COUNT(*) AS result FROM incoming_payments WHERE received_at IS NOT NULL
+    SELECT COUNT(*) AS result FROM channel_close_outgoing_payments
+    UNION ALL
+    SELECT COUNT(*) AS result FROM splice_cpfp_outgoing_payments
+    UNION ALL
+    SELECT COUNT(*) AS result FROM incoming_payments WHERE received_at IS NOT NULL AND received_with_blob IS NOT NULL
 );
 
 listRecentPaymentsOrder:
@@ -92,6 +103,14 @@ UNION ALL
         created_at   AS created_at,
         confirmed_at AS completed_at
     FROM channel_close_outgoing_payments
+    WHERE confirmed_at >= :date
+UNION ALL
+    SELECT
+        5            AS type,
+        id           AS id,
+        created_at   AS created_at,
+        confirmed_at AS completed_at
+    FROM splice_cpfp_outgoing_payments
     WHERE confirmed_at >= :date
 UNION ALL
     SELECT
@@ -166,6 +185,15 @@ UNION ALL
     AND   channel_close_outgoing_payments.confirmed_at BETWEEN :startDate AND :endDate
 UNION ALL
     SELECT
+        5            AS type,
+        id           AS id,
+        created_at   AS created_at,
+        confirmed_at AS completed_at
+    FROM splice_cpfp_outgoing_payments
+    WHERE splice_cpfp_outgoing_payments.confirmed_at IS NOT NULL
+    AND   splice_cpfp_outgoing_payments.confirmed_at BETWEEN :startDate AND :endDate
+UNION ALL
+    SELECT
         1                        AS type,
         lower(hex(payment_hash)) AS id,
         created_at               AS created_at,
@@ -195,6 +223,11 @@ UNION ALL
     FROM channel_close_outgoing_payments
     WHERE channel_close_outgoing_payments.confirmed_at IS NOT NULL
     AND   channel_close_outgoing_payments.confirmed_at BETWEEN :startDate AND :endDate
+UNION ALL
+    SELECT COUNT(*) AS result
+    FROM splice_cpfp_outgoing_payments
+    WHERE splice_cpfp_outgoing_payments.confirmed_at IS NOT NULL
+    AND   splice_cpfp_outgoing_payments.confirmed_at BETWEEN :startDate AND :endDate
 UNION ALL
     SELECT COUNT(*) AS result FROM incoming_payments
     WHERE incoming_payments.received_at BETWEEN :startDate AND :endDate
