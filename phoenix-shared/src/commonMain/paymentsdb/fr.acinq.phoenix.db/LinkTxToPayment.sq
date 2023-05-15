@@ -13,6 +13,9 @@ CREATE TABLE IF NOT EXISTS link_tx_to_payments (
 
 CREATE INDEX IF NOT EXISTS link_tx_to_payments_txid ON link_tx_to_payments(tx_id);
 
+listUnconfirmed:
+SELECT DISTINCT(tx_id) FROM link_tx_to_payments WHERE confirmed_at IS NULL;
+
 getPaymentIdForTx:
 SELECT tx_id, type, id FROM link_tx_to_payments WHERE tx_id=?;
 

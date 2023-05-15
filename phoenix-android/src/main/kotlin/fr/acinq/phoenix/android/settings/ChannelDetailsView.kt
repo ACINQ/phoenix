@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.*
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.db.*
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
@@ -36,6 +37,7 @@ import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.data.walletPaymentId
 
 
 @Composable
@@ -120,7 +122,7 @@ private fun CommitmentDetailsView(
 ) {
     val btcUnit = LocalBitcoinUnit.current
     val paymentsManager = business.paymentsManager
-    val linkedPayments by produceState<List<WalletPaymentId>>(initialValue = emptyList()) {
+    val linkedPayments by produceState<List<WalletPayment>>(initialValue = emptyList()) {
         value = paymentsManager.listPaymentsForTxId(ByteVector32.fromValidHex(commitment.fundingTxId))
     }
 
@@ -154,17 +156,17 @@ private fun CommitmentDetailsView(
                     Spacer(modifier = Modifier.width(4.dp))
                     val navController = navController
                     Column(modifier = Modifier.alignByBaseline()) {
-                        linkedPayments.forEach { paymentId ->
+                        linkedPayments.forEach { payment ->
                             InlineButton(
-                                text = when (paymentId.dbType) {
-                                    WalletPaymentId.DbType.OUTGOING -> "LN payment"
-                                    WalletPaymentId.DbType.INCOMING -> "Incoming payment"
-                                    WalletPaymentId.DbType.SPLICE_OUTGOING -> "Splice out"
-                                    WalletPaymentId.DbType.SPLICE_CPFP_OUTGOING -> "Fee bumping"
-                                    WalletPaymentId.DbType.CHANNEL_CLOSE_OUTGOING -> "Channel closing"
+                                text = when {
+                                    payment is IncomingPayment && payment.origin is IncomingPayment.Origin.Invoice -> "pay-to-open"
+                                    payment is IncomingPayment && payment.origin is IncomingPayment.Origin.OnChain -> "swap-in"
+                                    payment is SpliceOutgoingPayment -> "swap-out"
+                                    payment is SpliceCpfpOutgoingPayment -> "cpfp"
+                                    else -> "other"
                                 },
                                 onClick = {
-                                    navigateToPaymentDetails(navController, paymentId, isFromEvent = false)
+                                    navigateToPaymentDetails(navController, payment.walletPaymentId(), isFromEvent = false)
                                 },
                                 fontSize = 14.sp,
                             )

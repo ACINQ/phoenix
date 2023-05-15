@@ -360,10 +360,24 @@ class SqlitePaymentsDb(
         }
     }
 
-    suspend fun listPaymentsIdForTxId(
+    suspend fun listUnconfirmedTransactions(): Flow<List<ByteArray>> = withContext(Dispatchers.Default) {
+        linkTxToPaymentQueries.listUnconfirmedTxs()
+    }
+
+    suspend fun listPaymentsForTxId(
         txId: ByteVector32
-    ): List<WalletPaymentId> = withContext(Dispatchers.Default) {
-        linkTxToPaymentQueries.listWalletPaymentIdsForTx(txId)
+    ): List<WalletPayment> = withContext(Dispatchers.Default) {
+        database.transactionWithResult {
+            linkTxToPaymentQueries.listWalletPaymentIdsForTx(txId).mapNotNull {
+                when (it) {
+                    is WalletPaymentId.IncomingPaymentId -> inQueries.getIncomingPayment(it.paymentHash)
+                    is WalletPaymentId.LightningOutgoingPaymentId -> outQueries.getPaymentRelaxed(it.id)
+                    is WalletPaymentId.ChannelCloseOutgoingPaymentId -> channelCloseQueries.getChannelCloseOutgoingPayment(it.id)
+                    is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> cpfpQueries.getCpfp(it.id)
+                    is WalletPaymentId.SpliceOutgoingPaymentId -> spliceOutQueries.getSpliceOutPayment(it.id)
+                }
+            }
+        }
     }
 
     override suspend fun getIncomingPayment(
