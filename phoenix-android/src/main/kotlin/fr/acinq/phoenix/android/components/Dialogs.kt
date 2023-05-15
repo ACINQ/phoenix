@@ -82,7 +82,7 @@ fun DialogBody(
 ) {
     Column(
         Modifier
-            .padding(vertical = 50.dp, horizontal = 16.dp) // min padding for tall/wide dialogs
+            .padding(vertical = 16.dp, horizontal = 16.dp) // min padding for tall/wide dialogs
             .clip(MaterialTheme.shapes.large)
             .background(MaterialTheme.colors.surface)
             .widthIn(max = 600.dp)

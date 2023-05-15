@@ -43,7 +43,7 @@ fun SatoshiSlider(
     minAmount: Satoshi = 1.sat,
     maxAmount: Satoshi = 500.sat,
     enabled: Boolean = true,
-    steps: Int = 20,
+    steps: Int = 30,
 ) {
     val context = LocalContext.current
     val minFeerateLog = remember { log10(minAmount.sat.toFloat()) }

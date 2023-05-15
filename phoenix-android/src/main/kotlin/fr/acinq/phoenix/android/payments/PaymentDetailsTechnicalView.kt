@@ -327,7 +327,10 @@ private fun DetailsForChannelClose(
 private fun DetailsForCpfp(
     payment: SpliceCpfpOutgoingPayment
 ) {
-    Text("TODO")
+    TechnicalRow(
+        label = stringResource(id = R.string.paymentdetails_splice_cpfp_transaction_label),
+        content = { TransactionLinkButton(txId = payment.txId.toHex()) }
+    )
 }
 
 @Composable

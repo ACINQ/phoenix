@@ -384,7 +384,9 @@
     <string name="paymentdetails_status_received_successful"><b>RECEIVED</b> %1$s</string>
 
     <string name="paymentdetails_status_unconfirmed">Waiting for confirmations</string>
-    <string name="paymentdetails_status_unconfirmed_details">requires %1$d confirmations (≈ %2$d minutes)</string>
+    <string name="paymentdetails_status_unconfirmed_fetching">Fetching status…</string>
+    <string name="paymentdetails_status_confirmation_basic">%1$d confirmation(s)</string>
+    <string name="paymentdetails_status_confirmation_details">%1$d/%2$d confirmation(s)</string>
 
     <string name="paymentdetails_desc_label">Desc.</string>
     <string name="paymentdetails_desc_custom_title">Add note</string>
@@ -392,7 +394,7 @@
     <string name="paymentdetails_destination_label">Sent to</string>
     <string name="paymentdetails_destination_cpfp_value">Bitcoin miners</string>
     <string name="paymentdetails_fees_label">Fees</string>
-    <string name="paymentdetails_funding_fees_label">Mining fees</string>
+    <string name="paymentdetails_funding_fees_label">Miner fees</string>
     <string name="paymentdetails_funding_fees_desc">Fees paid to the Bitcoin network miners to process the on-chain transaction.</string>
     <string name="paymentdetails_service_fees_label">Service fees</string>
     <string name="paymentdetails_service_fees_desc">Fees paid for the creation of a new payment channel. This is not always required.</string>
@@ -404,6 +406,7 @@
 
     <string name="paymentdetails_desc_splice_out">On-chain payment</string>
     <string name="paymentdetails_desc_closing_channel">Closing channel</string>
+    <string name="paymentdetails_desc_cpfp">Bump transactions</string>
     <string name="paymentdetails_desc_keysend">Donation</string>
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>
     <string name="paymentdetails_desc_swapin">On-chain deposit</string>
@@ -432,6 +435,8 @@
     <string name="paymentdetails_keysend">Keysend (spontaneous payment)</string>
     <string name="paymentdetails_swapin_address_label">Deposit address</string>
     <string name="paymentdetails_swapout_address_label">Bitcoin address</string>
+
+    <string name="paymentdetails_splice_cpfp_transaction_label">Bump transaction</string>
 
     <string name="paymentdetails_splice_out_channel_label">Spliced channel</string>
     <string name="paymentdetails_splice_out_address_label">Splice address</string>
@@ -836,5 +841,40 @@
     <string name="liquiditypolicy_fee_sanity_check">Fee cap</string>
     <string name="liquiditypolicy_fee_sanity_check_enabled">The fee cannot exceed %1$d%% of the amount received whatsoever.</string>
     <string name="liquiditypolicy_fee_sanity_check_disabled">The fee is unchecked and could consume a significant part of the incoming amount.</string>
+
+
+    <!-- CPFP splices -->
+    <string name="cpfp_instructions">You can make all your unconfirmed transactions use a higher effective feerate to encourage miners to favour your payments.</string>
+    <string name="cpfp_feerate_label">Feerate</string>
+    <string name="cpfp_feerate_value">%1$s sat/vbyte</string>
+
+    <string name="mempool_unknown_feerate_title">Unknown mempool state</string>
+    <string name="mempool_unknown_feerate_details">Phoenix was unable to retrieve the current state of the mempool and cannot estimate the speed of your transactions.\n\nCheck the mempool manually on an explorer, and use a adequate value!</string>
+    <string name="mempool_fastest">≈ Next block</string>
+    <string name="mempool_halfhour">≈ 30 minutes</string>
+    <string name="mempool_hour">≈ 1 hour</string>
+    <string name="mempool_eco">More than 1 hour</string>
+    <string name="mempool_slow">No priority</string>
+
+    <string name="cpfp_prepare_button">Prepare payment</string>
+    <string name="cpfp_estimating">Estimating fees…</string>
+    <string name="cpfp_estimation">You will pay <b>%1$s</b> to the Bitcoin miners</string>
+    <string name="cpfp_execute_button">Execute payment</string>
+    <string name="cpfp_executing">Executing payment…</string>
+    <string name="cpfp_success">Payment complete</string>
+
+    <string name="cpfp_error_title">Payment has failed</string>
+    <string name="cpfp_error_nochannels">You don\'t have any channels</string>
+    <string name="cpfp_error_aborted_by_peer">Aborted by peer [%1$s]</string>
+    <string name="cpfp_error_cannot_create_commit">Unable to create a new commitment</string>
+    <string name="cpfp_error_channel_not_idle">Channel is not available</string>
+    <string name="cpfp_error_disconnected">Channel is disconnected</string>
+    <string name="cpfp_error_funding_error">Funding has failed [%1$s]</string>
+    <string name="cpfp_error_insufficient_funds">Not enough funds</string>
+    <string name="cpfp_error_cannot_start_session">Cannot start transaction session with the peer</string>
+    <string name="cpfp_error_interactive_session">Interactive tx session failed [%1$s]</string>
+    <string name="cpfp_error_invalid_pubkey">Invalid splice-out pubkey script</string>
+    <string name="cpfp_error_splice_in_progress">A splice payment is already in progress</string>
+
 
 </resources>

@@ -277,5 +277,5 @@ fun WalletPayment.smartDescription(context: Context): String? = when (this) {
     }
     is SpliceOutgoingPayment -> context.getString(R.string.paymentdetails_desc_splice_out)
     is ChannelCloseOutgoingPayment -> context.getString(R.string.paymentdetails_desc_closing_channel)
-    else -> null
+    is SpliceCpfpOutgoingPayment -> context.getString(R.string.paymentdetails_desc_cpfp)
 }?.takeIf { it.isNotBlank() }

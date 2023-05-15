@@ -60,25 +60,17 @@ fun SendSpliceOutView(
     log.info { "init splice-out with amount=$requestedAmount address=$address" }
 
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val prefBtcUnit = LocalBitcoinUnit.current
     val keyboardManager = LocalSoftwareKeyboardController.current
 
     val peerManager = business.peerManager
+    val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
     val balance = business.balanceManager.balance.collectAsState(null).value
     val vm = viewModel<SpliceOutViewModel>(factory = SpliceOutViewModel.Factory(peerManager, business.chain))
 
-    var feerate by remember { mutableStateOf<Satoshi?>(null) }
+    var feerate by remember { mutableStateOf<Satoshi?>(mempoolFeerate?.halfHour?.feerate) }
     var amount by remember { mutableStateOf(requestedAmount) }
     var amountErrorMessage by remember { mutableStateOf("") }
-
-    scope.launch {
-        peerManager.onChainFeeratesFlow.filterNotNull().first().let {
-            if (feerate == null) {
-                feerate = FeeratePerByte(it.fundingFeerate).feerate
-            }
-        }
-    }
 
     SplashLayout(
         header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
@@ -110,21 +102,16 @@ fun SendSpliceOutView(
     ) {
         SplashLabelRow(label = stringResource(id = R.string.send_spliceout_feerate_label)) {
             feerate?.let {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("") // trick to force baseline alignment with label in the container's row
-                    SatoshiSlider(
-                        modifier = Modifier.widthIn(max = 130.dp),
-                        amount = it,
-                        onAmountChange = { newFeerate ->
-                            if (vm.state != SpliceOutState.Init && feerate != newFeerate) {
-                                vm.state = SpliceOutState.Init
-                            }
-                            feerate = newFeerate
-                        },
-                    )
-                }
-                Text(text = stringResource(id = R.string.utils_fee_rate,it.toPrettyString(BitcoinUnit.Sat, withUnit = false)), modifier = Modifier.offset(y = (-12).dp))
-                // TODO if fee too big, warning
+                FeerateSlider(
+                    feerate = it,
+                    onFeerateChange = { newFeerate ->
+                        if (vm.state != SpliceOutState.Init && feerate != newFeerate) {
+                            vm.state = SpliceOutState.Init
+                        }
+                        feerate = newFeerate
+                    },
+                    mempoolFeerate = mempoolFeerate
+                )
             } ?: ProgressView(text = stringResource(id = R.string.send_spliceout_feerate_waiting_for_value), padding = PaddingValues(0.dp))
         }
         SplashLabelRow(label = stringResource(R.string.send_spliceout_address_label), icon = R.drawable.ic_chain) {
@@ -135,9 +122,9 @@ fun SendSpliceOutView(
 
         when (val state = vm.state) {
             is SpliceOutState.Init, is SpliceOutState.Error -> {
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(32.dp))
                 if (state is SpliceOutState.Error.Thrown) {
-                    ErrorMessage(errorHeader = "Placeholder error message!", errorDetails = state.e.localizedMessage, alignment = Alignment.CenterHorizontally)
+                    ErrorMessage(errorHeader = stringResource(id = R.string.send_spliceout_error_failure), errorDetails = state.e.localizedMessage, alignment = Alignment.CenterHorizontally)
                 } else if (state is SpliceOutState.Error.NoChannels) {
                     ErrorMessage(errorHeader = "No channels available", errorDetails = "placeholder message", alignment = Alignment.CenterHorizontally)
                 }
@@ -160,7 +147,7 @@ fun SendSpliceOutView(
                 )
             }
             is SpliceOutState.Preparing -> {
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(32.dp))
                 ProgressView(text = stringResource(id = R.string.send_spliceout_prepare_in_progress))
             }
             is SpliceOutState.ReadyToSend -> {
@@ -171,7 +158,8 @@ fun SendSpliceOutView(
                 }
                 val total = state.userAmount + state.estimatedFee
                 SpliceOutFeeSummaryView(fee = state.estimatedFee, total = total, userFeerate = state.userFeerate, actualFeerate = state.actualFeerate)
-                Spacer(modifier = Modifier.height(24.dp))
+
+                Spacer(modifier = Modifier.height(32.dp))
 
                 if (balance != null && total.toMilliSatoshi() > balance) {
                     ErrorMessage(errorHeader = stringResource(R.string.send_spliceout_error_cannot_afford_fees), alignment = Alignment.CenterHorizontally)
@@ -186,12 +174,14 @@ fun SendSpliceOutView(
                 }
             }
             is SpliceOutState.Executing -> {
-                ProgressView(text = stringResource(id = R.string.send_spliceout_prepare_in_progress))
+                Spacer(modifier = Modifier.height(32.dp))
+                ProgressView(text = stringResource(id = R.string.send_spliceout_execute_in_progress))
             }
             is SpliceOutState.Complete.Success -> {
                 LaunchedEffect(key1 = Unit) { onSpliceOutSuccess() }
             }
             is SpliceOutState.Complete.Failure -> {
+                Spacer(modifier = Modifier.height(24.dp))
                 ErrorMessage(
                     errorHeader = stringResource(id = R.string.send_spliceout_error_failure),
                     errorDetails = state.result::class.java.simpleName // TODO handle error
@@ -214,4 +204,5 @@ private fun SpliceOutFeeSummaryView(
     SplashLabelRow(label = stringResource(id = R.string.send_spliceout_complete_recap_total)) {
         AmountWithFiatColumnView(amount = total.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
     }
+    // TODO: show a warning if the fee is too large
 }
