@@ -221,7 +221,7 @@ private fun PaymentStatus(
                         color = mutedTextColor,
                     )
                 }
-                received.receivedWith.any { it is IncomingPayment.ReceivedWith.OnChainIncomingPayment && it.confirmedAt == null } -> {
+                received.receivedWith.any { it is IncomingPayment.ReceivedWith.OnChainIncomingPayment && it.lockedAt == null } -> {
                     val nodeParams = business.nodeParamsManager.nodeParams.value
                     val channelMinDepth by produceState<Int?>(initialValue = null, key1 = Unit) {
                         nodeParams?.let { params ->
