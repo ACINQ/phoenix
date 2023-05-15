@@ -3,23 +3,30 @@ package fr.acinq.phoenix.managers
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.HeaderSubscriptionResponse
+import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.http.*
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.math.*
 import kotlin.time.*
-import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -51,11 +58,12 @@ class AppConfigurationManager(
     // Called from AppConnectionsDaemon
     internal fun enableNetworkAccess() {
         startWalletContextJob()
+        monitorMempoolFeerate()
     }
 
     // Called from AppConnectionsDaemon
     internal fun disableNetworkAccess() {
-        stopWalletContextJob()
+        stopJobs()
     }
 
     private val currentWalletContextVersion = WalletContext.Version.V0
@@ -117,11 +125,12 @@ class AppConfigurationManager(
         }
     }
 
-    /** Cancel the [walletContextPollingJob] job. */
-    private fun stopWalletContextJob() {
+    /** Cancels [walletContextPollingJob] and [mempoolFeerateJob]. */
+    private fun stopJobs() {
         launch {
             // suspend until `initWalletContext()` is complete
             _walletContextInitialized.filter { it }.first()
+            mempoolFeerateJob?.cancelAndJoin()
             walletContextPollingJob?.cancelAndJoin()
         }
     }
@@ -181,6 +190,45 @@ class AppConfigurationManager(
     private fun watchElectrumMessages() = launch {
         electrumWatcher.client.notifications.filterIsInstance<HeaderSubscriptionResponse>().collect {
             _electrumMessages.value = it
+        }
+    }
+
+    private var mempoolFeerateJob: Job? = null
+    private val _mempoolFeerate by lazy { MutableStateFlow<MempoolFeerate?>(null) }
+    val mempoolFeerate by lazy { _mempoolFeerate.asStateFlow() }
+
+    /**  Polls an HTTP endpoint every X seconds to get an estimation of the mempool feerate. */
+    private fun monitorMempoolFeerate() {
+        mempoolFeerateJob = launch {
+            while (isActive) {
+                try {
+                    logger.debug { "fetching mempool feerate" }
+                    // FIXME: use our own endpoint
+                    val response = httpClient.get(
+                        when (chain) {
+                            is NodeParams.Chain.Mainnet -> "https://mempool.space/api/v1/fees/recommended"
+                            else -> "https://mempool.space/testnet/api/v1/fees/recommended"
+                        }
+                    )
+                    if (response.status.isSuccess()) {
+                        val json = Json.decodeFromString<JsonObject>(response.bodyAsText(Charsets.UTF_8))
+                        logger.debug { "mempool feerate endpoint returned json=$json" }
+                        val feerate = MempoolFeerate(
+                            fastest = FeeratePerByte(json["fastestFee"]!!.jsonPrimitive.long.sat),
+                            halfHour = FeeratePerByte(json["halfHourFee"]!!.jsonPrimitive.long.sat),
+                            hour = FeeratePerByte(json["hourFee"]!!.jsonPrimitive.long.sat),
+                            economy = FeeratePerByte(json["economyFee"]!!.jsonPrimitive.long.sat),
+                            minimum = FeeratePerByte(json["minimumFee"]!!.jsonPrimitive.long.sat),
+                            timestamp = currentTimestampMillis()
+                        )
+                        _mempoolFeerate.value = feerate
+                    }
+                } catch (e: Exception) {
+                    logger.error { "could not fetch/read data from mempool feerate endpoint: ${e.message}" }
+                } finally {
+                    delay(10 * 60 * 1_000) // pause for 10 min
+                }
+            }
         }
     }
 
