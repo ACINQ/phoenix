@@ -86,6 +86,7 @@
 		DC384D7F265BF36600131772 /* StyledString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D7E265BF36600131772 /* StyledString.swift */; };
 		DC384D81265C12B700131772 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D80265C12B700131772 /* Cache.swift */; };
 		DC384D83265C32F100131772 /* TextField+Verbatim.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D82265C32F100131772 /* TextField+Verbatim.swift */; };
+		DC39A2662A12C04D00F59E39 /* LiquidityPolicyHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC39A2652A12C04D00F59E39 /* LiquidityPolicyHelp.swift */; };
 		DC39D4E5286B4A7E0030F18D /* Popovers in Frameworks */ = {isa = PBXBuildFile; productRef = DC39D4E4286B4A7E0030F18D /* Popovers */; };
 		DC39D4E7286BB2130030F18D /* PaymentLayerChoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC39D4E6286BB2120030F18D /* PaymentLayerChoice.swift */; };
 		DC39D4EF287497440030F18D /* SmartModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC39D4EE287497440030F18D /* SmartModal.swift */; };
@@ -158,7 +159,7 @@
 		DC99E90925B78FA800FB20F7 /* EnabledSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E90825B78FA800FB20F7 /* EnabledSecurity.swift */; };
 		DC99E94025BA141000FB20F7 /* LocalWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E93F25BA141000FB20F7 /* LocalWebView.swift */; };
 		DC99E94D25BA258C00FB20F7 /* about.html in Resources */ = {isa = PBXBuildFile; fileRef = DC99E94825BA258C00FB20F7 /* about.html */; };
-		DC99E95825BA2BA800FB20F7 /* about.css in Resources */ = {isa = PBXBuildFile; fileRef = DC99E95625BA2BA800FB20F7 /* about.css */; };
+		DC99E95825BA2BA800FB20F7 /* common.css in Resources */ = {isa = PBXBuildFile; fileRef = DC99E95625BA2BA800FB20F7 /* common.css */; };
 		DC9B8EE225D72CC200E13818 /* ForceCloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */; };
 		DC9E7EC32A12955300A5F1D0 /* LiquidityHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */; };
 		DC9E7EC62A1295B100A5F1D0 /* liquidity.html in Resources */ = {isa = PBXBuildFile; fileRef = DC9E7EC82A1295B100A5F1D0 /* liquidity.html */; };
@@ -414,6 +415,7 @@
 		DC384D7E265BF36600131772 /* StyledString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyledString.swift; sourceTree = "<group>"; };
 		DC384D80265C12B700131772 /* Cache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		DC384D82265C32F100131772 /* TextField+Verbatim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextField+Verbatim.swift"; sourceTree = "<group>"; };
+		DC39A2652A12C04D00F59E39 /* LiquidityPolicyHelp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiquidityPolicyHelp.swift; sourceTree = "<group>"; };
 		DC39D4E6286BB2120030F18D /* PaymentLayerChoice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentLayerChoice.swift; sourceTree = "<group>"; };
 		DC39D4EE287497440030F18D /* SmartModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartModal.swift; sourceTree = "<group>"; };
 		DC39D4F02874DDF40030F18D /* View+If.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+If.swift"; sourceTree = "<group>"; };
@@ -474,7 +476,7 @@
 		DC99E90825B78FA800FB20F7 /* EnabledSecurity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnabledSecurity.swift; sourceTree = "<group>"; };
 		DC99E93F25BA141000FB20F7 /* LocalWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalWebView.swift; sourceTree = "<group>"; };
 		DC99E94925BA258C00FB20F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/about.html; sourceTree = "<group>"; };
-		DC99E95625BA2BA800FB20F7 /* about.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = about.css; sourceTree = "<group>"; };
+		DC99E95625BA2BA800FB20F7 /* common.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = common.css; sourceTree = "<group>"; };
 		DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForceCloseChannelsView.swift; sourceTree = "<group>"; };
 		DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityHTML.swift; sourceTree = "<group>"; };
 		DC9E7EC72A1295B100A5F1D0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/liquidity.html; sourceTree = "<group>"; };
@@ -976,7 +978,7 @@
 				DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */,
 				DC99E94825BA258C00FB20F7 /* about.html */,
 				DC9E7EC82A1295B100A5F1D0 /* liquidity.html */,
-				DC99E95625BA2BA800FB20F7 /* about.css */,
+				DC99E95625BA2BA800FB20F7 /* common.css */,
 			);
 			path = html;
 			sourceTree = "<group>";
@@ -1079,6 +1081,7 @@
 				DC0732EB263CA6C3004CB88D /* PaymentOptionsView.swift */,
 				DCB30E562A0C2FF900E7D7A2 /* MaxFeeConfiguration.swift */,
 				DCB30E582A0C3F8200E7D7A2 /* LiquidityPolicyView.swift */,
+				DC39A2652A12C04D00F59E39 /* LiquidityPolicyHelp.swift */,
 			);
 			path = "payment options";
 			sourceTree = "<group>";
@@ -1354,7 +1357,7 @@
 				DC5AF4572677BBF7003C911B /* Localizable.strings in Resources */,
 				7555FF8B242A565B00829871 /* LaunchScreen.storyboard in Resources */,
 				DC9E7EC62A1295B100A5F1D0 /* liquidity.html in Resources */,
-				DC99E95825BA2BA800FB20F7 /* about.css in Resources */,
+				DC99E95825BA2BA800FB20F7 /* common.css in Resources */,
 				7555FF88242A565B00829871 /* Preview Assets.xcassets in Resources */,
 				DC67654E25655D93004D4263 /* Colors.xcassets in Resources */,
 				DC72C2F125A3CBD6008A927A /* GoogleService-Info.plist in Resources */,
@@ -1470,6 +1473,7 @@
 				DCB30E542A0AABAF00E7D7A2 /* InfoPopoverWindow.swift in Sources */,
 				DCA6DEC62829BDEB0073C658 /* CrossProcessCommunication.swift in Sources */,
 				DC682FE8258175CE00CA1114 /* Popover.swift in Sources */,
+				DC39A2662A12C04D00F59E39 /* LiquidityPolicyHelp.swift in Sources */,
 				DCACF6FA2566D0BA0009B01E /* KeyStoreError.swift in Sources */,
 				DC0E31BB26EFDED4002071C6 /* VSlider.swift in Sources */,
 				DC27E4CB2791D17A00C777CC /* RecoveryPhraseView.swift in Sources */,

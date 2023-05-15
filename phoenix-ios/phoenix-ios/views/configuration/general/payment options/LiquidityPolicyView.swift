@@ -22,18 +22,21 @@ struct LiquidityPolicyView: View {
 	@State var mode_automatic: Bool = true
 	@State var mode_manual: Bool = false
 	
+	@State var showHelpSheet = false
+	
 	init() {
-	//	if let liquidityPolicy = Prefs.shared.liquidityPolicy {
-			
-	//	} else {
-			let sats = LiquidityPolicyView.defaultMaxFeeSats()
-			maxFeeAmt = LiquidityPolicyView.formattedMaxFeeAmt(sat: sats)
-			parsedMaxFeeAmt = .success(NSNumber(value: sats))
 		
-			let percent = LiquidityPolicyView.defaultMaxFeePrcnt()
-			maxFeePrcnt = LiquidityPolicyView.formattedMaxFeePrcnt(percent: percent)
-			parsedMaxFeePrcnt = .success(NSNumber(value: percent))
-	//	}
+		let defaultLp = NodeParamsManager.companion.defaultLiquidityPolicy
+		let userLp = Prefs.shared.liquidityPolicy
+		
+		let sats = userLp.maxFeeSats ?? defaultLp.maxAbsoluteFee.sat
+		maxFeeAmt = LiquidityPolicyView.formattedMaxFeeAmt(sat: sats)
+		parsedMaxFeeAmt = .success(NSNumber(value: sats))
+		
+		let basisPoints = userLp.maxFeeBasisPoints ?? defaultLp.maxRelativeFeeBasisPoints
+		let percent = Double(basisPoints) / Double(100)
+		maxFeePrcnt = LiquidityPolicyView.formattedMaxFeePrcnt(percent: percent)
+		parsedMaxFeePrcnt = .success(NSNumber(value: percent))
 	}
 	
 	// --------------------------------------------------
@@ -58,6 +61,22 @@ struct LiquidityPolicyView: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
+		.toolbar {
+			ToolbarItem(placement: .navigationBarTrailing) {
+				Button {
+					showHelpSheet = true
+				} label: {
+					Image(systemName: "questionmark.circle") //.imageScale(.large)
+				}
+			}
+		}
+		.sheet(isPresented: $showHelpSheet) {
+			
+			LiquidityPolicyHelp(isShowing: $showHelpSheet)
+		}
+		.onDisappear {
+			onDisappear()
+		}
 	}
 	
 	@ViewBuilder
@@ -97,12 +116,14 @@ struct LiquidityPolicyView: View {
 		
 		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 			Text("Max fee amount: ")
+				.padding(.trailing, 8)
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				TextField(
 					defaultMaxFeeAmt(),
 					text: maxFeeAmtStyler().amountProxy
 				)
+				.keyboardType(.numberPad)
 				
 				Text("sat")
 					.padding(.leading, 4)
@@ -110,11 +131,12 @@ struct LiquidityPolicyView: View {
 				
 				// Clear button
 				Button {
-					maxFeeAmt = ""
+					clearMaxFeeAmt()
 				} label: {
 					Image(systemName: "multiply.circle.fill")
 						.foregroundColor(maxFeeAmt.isEmpty ? Color(UIColor.quaternaryLabel) : .secondary)
 				}
+				.buttonStyle(BorderlessButtonStyle()) // prevents trigger when row tapped
 				.disabled(maxFeeAmt.isEmpty)
 				
 			} // </HStack>
@@ -132,12 +154,14 @@ struct LiquidityPolicyView: View {
 		
 		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 			Text("Max fee percent: ")
+				.padding(.trailing, 8)
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				TextField(
 					defaultMaxFeePrcnt(),
 					text: maxFeePrcntStyler().amountProxy
 				)
+				.keyboardType(.numberPad)
 				
 				Text("%")
 					.padding(.leading, 4)
@@ -145,11 +169,12 @@ struct LiquidityPolicyView: View {
 				
 				// Clear button
 				Button {
-					maxFeePrcnt = ""
+					clearMaxFeePrcnt()
 				} label: {
 					Image(systemName: "multiply.circle.fill")
 						.foregroundColor(maxFeePrcnt.isEmpty ? Color(UIColor.quaternaryLabel) : .secondary)
 				}
+				.buttonStyle(BorderlessButtonStyle()) // prevents trigger when row tapped
 				.disabled(maxFeePrcnt.isEmpty)
 				
 			} // </HStack>
@@ -238,15 +263,28 @@ struct LiquidityPolicyView: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
+	func defaultMaxFeeSats() -> Int64 {
+		
+		let defaultLp = NodeParamsManager.companion.defaultLiquidityPolicy
+		return defaultLp.maxAbsoluteFee.sat
+	}
+	
+	func defaultMaxFeeBasisPoints() -> Int32 {
+		
+		let defaultLp = NodeParamsManager.companion.defaultLiquidityPolicy
+		return defaultLp.maxRelativeFeeBasisPoints
+	}
+	
 	func defaultMaxFeeAmt() -> String {
 		
-		let sats = LiquidityPolicyView.defaultMaxFeeSats()
+		let sats = defaultMaxFeeSats()
 		return LiquidityPolicyView.formattedMaxFeeAmt(sat: sats)
 	}
 	
 	func defaultMaxFeePrcnt() -> String {
 		
-		let percent = LiquidityPolicyView.defaultMaxFeePrcnt()
+		let basisPoints = defaultMaxFeeBasisPoints()
+		let percent = Double(basisPoints) / Double(100)
 		return LiquidityPolicyView.formattedMaxFeePrcnt(percent: percent)
 	}
 					 
@@ -257,7 +295,7 @@ struct LiquidityPolicyView: View {
 		case .success(let number):
 			sats = number.int64Value
 		case .failure(_):
-			sats = LiquidityPolicyView.defaultMaxFeeSats()
+			sats = defaultMaxFeeSats()
 		}
 		
 		return Utils.formatBitcoin(sat: sats, bitcoinUnit: .sat).string
@@ -337,24 +375,6 @@ struct LiquidityPolicyView: View {
 		return nf
 	}
 	
-	static func defaultMaxFeeSats() -> Int64 {
-		
-		let defaultPolicy = NodeParamsManager.companion.defaultLiquidityPolicy
-		let sats = defaultPolicy.maxAbsoluteFee.toLong()
-		
-		return sats
-	}
-	
-	static func defaultMaxFeePrcnt() -> Double {
-		
-		let defaultPolicy = NodeParamsManager.companion.defaultLiquidityPolicy
-		let basisPoints = defaultPolicy.maxRelativeFeeBasisPoints
-		
-		let percent = Double(basisPoints) / Double(100)
-		
-		return percent
-	}
-	
 	static func formattedMaxFeeAmt(sat: Int64) -> String {
 		
 		let nf = maxFeeAmtFormater()
@@ -370,6 +390,20 @@ struct LiquidityPolicyView: View {
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
+	
+	func clearMaxFeeAmt() {
+		log.trace("clearMaxFeeAmt()")
+		
+		maxFeeAmt = ""
+		parsedMaxFeeAmt = .failure(.emptyInput)
+	}
+	
+	func clearMaxFeePrcnt() {
+		log.trace("clearMaxFeePrcnt()")
+		
+		maxFeePrcnt = ""
+		parsedMaxFeePrcnt = .failure(.emptyInput)
+	}
 	
 	func automaticModeOptionTapped() {
 		log.trace("automaticModeOptionTapped()")
@@ -389,5 +423,14 @@ struct LiquidityPolicyView: View {
 		} else {
 			mode_manual = true
 		}
+	}
+	
+	func onDisappear() {
+		log.trace("onDisappear()")
+		
+	//	let defaultSats = defaultMaxFeeSats()
+	//	let defaultBasisPoints = defaultMaxFeeBasisPoints()
+		
+		// Todo...
 	}
 }
