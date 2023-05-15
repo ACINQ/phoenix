@@ -45,6 +45,7 @@ UNION ALL
         received_at              AS completed_at
     FROM incoming_payments
     WHERE incoming_payments.received_at IS NOT NULL
+    AND   incoming_payments.received_with_blob IS NOT NULL
 ) combined_payments
 LEFT OUTER JOIN payments_metadata ON
     payments_metadata.type = combined_payments.type AND
@@ -120,6 +121,7 @@ UNION ALL
         received_at              AS completed_at
     FROM incoming_payments
     WHERE incoming_payments.received_at >= :date
+    AND incoming_payments.received_with_blob IS NOT NULL
 ) combined_payments
 LEFT OUTER JOIN payments_metadata ON
     payments_metadata.type = combined_payments.type AND
@@ -200,6 +202,7 @@ UNION ALL
         received_at              AS completed_at
     FROM incoming_payments
     WHERE incoming_payments.received_at BETWEEN :startDate AND :endDate
+    AND   incoming_payments.received_with_blob IS NOT NULL
 ) combined_payments
 LEFT OUTER JOIN payments_metadata ON
     payments_metadata.type = combined_payments.type AND
@@ -231,4 +234,5 @@ UNION ALL
 UNION ALL
     SELECT COUNT(*) AS result FROM incoming_payments
     WHERE incoming_payments.received_at BETWEEN :startDate AND :endDate
+    AND   incoming_payments.received_with_blob IS NOT NULL
 );
