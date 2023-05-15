@@ -25,6 +25,8 @@ struct WalletInfoView: View {
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -91,14 +93,24 @@ struct WalletInfoView: View {
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 				
-				let keyManager = Biz.business.walletManager.getKeyManager()
-				masterPublicKey(
-					keyPath: keyManager?.swapInOnChainWalletPath ?? "?",
-					xpub: keyManager?.swapInOnChainWallet.xpub ?? "?",
-					truncationDetected: $swapIn_mpk_truncationDetected
-				)
+				let balances_confirmed = swapInBalance_confirmed()
 				
+				Text(balances_confirmed.0.string) +
+				Text(verbatim: " ≈ \(balances_confirmed.1.string)").foregroundColor(.secondary)
+				
+				if let balances_unconfirmed = swapInBalance_unconfirmed() {
+					
+					Text("+ \(balances_unconfirmed.0.string) unconfirmed") +
+					Text(verbatim: " ≈ \(balances_unconfirmed.1.string)").foregroundColor(.secondary)
+				}
 			} // </VStack>
+			
+			let keyManager = Biz.business.walletManager.getKeyManager()
+			masterPublicKey(
+				keyPath: keyManager?.swapInOnChainWalletPath ?? "?",
+				xpub: keyManager?.swapInOnChainWallet.xpub ?? "?",
+				truncationDetected: $swapIn_mpk_truncationDetected
+			)
 			
 		} /*Section.*/header: {
 			
@@ -133,6 +145,20 @@ struct WalletInfoView: View {
 	func section_finalWallet() -> some View {
 		
 		Section {
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
+				
+				let balances_confirmed = finalBalance_confirmed()
+				
+				Text(balances_confirmed.0.string) +
+				Text(verbatim: " ≈ \(balances_confirmed.1.string)").foregroundColor(.secondary)
+			
+				if let balances_unconfirmed = finalBalance_unconfirmed() {
+					
+					Text("+ \(balances_unconfirmed.0.string) unconfirmed") +
+					Text(verbatim: " ≈ \(balances_unconfirmed.1.string)").foregroundColor(.secondary)
+				}
+			} // </VStack>
 			
 			let keyManager = Biz.business.walletManager.getKeyManager()
 			masterPublicKey(
@@ -175,53 +201,58 @@ struct WalletInfoView: View {
 		truncationDetected: Binding<Bool>
 	) -> some View {
 		
-		if !truncationDetected.wrappedValue {
+		VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 			
-			// All on one line:
-			// Master public key (Path m/x/y/z)  <img>
-			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+			if !truncationDetected.wrappedValue {
+				
+				// All on one line:
+				// Master public key (Path m/x/y/z)  <img>
+				
+				TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+					
+					HStack(alignment: VerticalAlignment.center, spacing: 0) {
+						Text("Master public key")
+							.font(.headline.bold())
+						Text(" (Path \(keyPath))")
+							.font(.subheadline)
+							.foregroundColor(.secondary)
+						Spacer()
+						copyButton(xpub)
+					} // </HStack>
+					
+				} wasTruncated: {
+					truncationDetected.wrappedValue = true
+					
+				} // </TruncatableView>
+				
+			} else /* if truncationDetected */ {
+				
+				// Too big to fit on one line => switch to two lines:
+				// Master public key   <img>
+				// Path: m/x/y/z
 				
 				HStack(alignment: VerticalAlignment.center, spacing: 0) {
 					Text("Master public key")
 						.font(.headline.bold())
-					Text(" (Path \(keyPath))")
-						.font(.subheadline)
-						.foregroundColor(.secondary)
 					Spacer()
 					copyButton(xpub)
-				} // </HStack>
+				}
 				
-			} wasTruncated: {
-				truncationDetected.wrappedValue = true
+				Text("Path: \(keyPath)")
+					.font(.callout)
+					.foregroundColor(.secondary)
 				
-			} // </TruncatableView>
-			
-		} else /* if truncationDetected */ {
-			
-			// Too big to fit on one line => switch to two lines:
-			// Master public key   <img>
-			// Path: m/x/y/z
+			} // </else>
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				Text("Master public key")
-					.font(.headline.bold())
-				Spacer()
-				copyButton(xpub)
+				Text(xpub)
+					.font(.callout.weight(.light))
+					.foregroundColor(.secondary)
+				Spacer(minLength: 0)
+				invisibleImage()
 			}
 			
-			Text("Path: \(keyPath)")
-				.font(.callout)
-				.foregroundColor(.secondary)
-		}
-		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Text(xpub)
-				.font(.callout.weight(.light))
-				.foregroundColor(.secondary)
-			Spacer(minLength: 0)
-			invisibleImage()
-		}
+		} // </VStack>
 	}
 	
 	@ViewBuilder
@@ -241,6 +272,50 @@ struct WalletInfoView: View {
 		Image(systemName: "square.on.square")
 			.foregroundColor(.clear)
 			.accessibilityHidden(true)
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	func swapInBalance_confirmed() -> (FormattedAmount, FormattedAmount) {
+		
+		let sats = Biz.business.balanceManager.swapInWalletBalanceValue().confirmed
+		return formattedBalances(sats)
+	}
+	
+	func swapInBalance_unconfirmed() -> (FormattedAmount, FormattedAmount)? {
+		
+		let sats = Biz.business.balanceManager.swapInWalletBalanceValue().unconfirmed
+		if sats.toLong() > 0 {
+			return formattedBalances(sats)
+		} else {
+			return nil
+		}
+	}
+	
+	func finalBalance_confirmed() -> (FormattedAmount, FormattedAmount) {
+		
+		let sats = Biz.business.balanceManager.finalWalletBalance().confirmed
+		return formattedBalances(sats)
+	}
+	
+	func finalBalance_unconfirmed() -> (FormattedAmount, FormattedAmount)? {
+		
+		let sats = Biz.business.balanceManager.finalWalletBalance().unconfirmed
+		if sats.toLong() > 0 {
+			return formattedBalances(sats)
+		} else {
+			return nil
+		}
+	}
+	
+	func formattedBalances(_ sats: Bitcoin_kmpSatoshi) -> (FormattedAmount, FormattedAmount) {
+		
+		let btcAmt = Utils.formatBitcoin(currencyPrefs, sat: sats)
+		let fiatAmt = Utils.formatFiat(currencyPrefs, sat: sats)
+		
+		return (btcAmt, fiatAmt)
 	}
 	
 	// --------------------------------------------------

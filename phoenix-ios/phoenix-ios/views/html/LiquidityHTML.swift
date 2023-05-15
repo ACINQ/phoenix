@@ -1,11 +1,12 @@
 import SwiftUI
 
-class AboutHTML: AnyHTML {
+class LiquidityHTML: AnyHTML {
 	
 	init() {
-		super.init(htmlFilename: "about")
+		super.init(htmlFilename: "liquidity", cssFilename: "about")
 	}
 	
 	// Nothing else to override here.
 	// The defaults work fine for us.
 }
+

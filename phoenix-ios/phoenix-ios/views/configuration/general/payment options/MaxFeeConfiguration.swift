@@ -5,238 +5,14 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "PaymentOptionsView"
+	category: "MaxFeeConfiguration"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 
-struct PaymentOptionsView: View {
-
-	@State var defaultPaymentDescription: String = Prefs.shared.defaultPaymentDescription ?? ""
-	
-	@State var invoiceExpirationDays: Int = Prefs.shared.invoiceExpirationDays
-	let invoiceExpirationDaysOptions = [7, 30, 60]
-
-	@State var userDefinedMaxFees: MaxFees? = Prefs.shared.maxFees
-	
-	@State var payToOpen_feePercent: Double = 0.0
-	@State var payToOpen_minFeeSat: Int64 = 0
-	
-	@Environment(\.openURL) var openURL
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
-	
-	let maxFeesPublisher = Prefs.shared.maxFeesPublisher
-	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
-	
-	@ViewBuilder
-	var body: some View {
-		
-		content()
-			.navigationTitle(NSLocalizedString("Payment Options", comment: "Navigation Bar Title"))
-			.navigationBarTitleDisplayMode(.inline)
-	}
-	
-	@ViewBuilder
-	func content() -> some View {
-		
-		List {
-			
-			Section {
-				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-					Text("Default payment description")
-						.padding(.bottom, 8)
-					
-					HStack {
-						TextField(
-							NSLocalizedString("None", comment: "TextField placeholder"),
-							text: $defaultPaymentDescription
-						)
-						.onChange(of: defaultPaymentDescription) { _ in
-							defaultPaymentDescriptionChanged()
-						}
-						
-						Button {
-							defaultPaymentDescription = ""
-						} label: {
-							Image(systemName: "multiply.circle.fill")
-								.foregroundColor(.secondary)
-						}
-						.isHidden(defaultPaymentDescription == "")
-					}
-					.padding(.all, 8)
-					.overlay(
-						RoundedRectangle(cornerRadius: 4)
-							.stroke(Color.textFieldBorder, lineWidth: 1)
-					)
-				} // </VStack>
-				.padding([.top, .bottom], 8)
-			} // </Section>
-			
-			Section {
-				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-					Text("Incoming payment expiry")
-						.padding(.bottom, 8)
-					
-					Picker(
-						selection: Binding(
-							get: { invoiceExpirationDays },
-							set: { invoiceExpirationDays = $0 }
-						), label: Text("Invoice expiration")
-					) {
-						ForEach(invoiceExpirationDaysOptions, id: \.self) { days in
-							Text("\(days) days").tag(days)
-						}
-					}
-					.pickerStyle(SegmentedPickerStyle())
-					.onChange(of: invoiceExpirationDays) { _ in
-						invoiceExpirationDaysChanged()
-					}
-					
-				} // </VStack>
-				.padding([.top, .bottom], 8)
-				
-			} // </Section>
-
-			Section {
-				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-					Text("Maximum fee for outgoing Lightning payments")
-						.padding(.bottom, 8)
-					
-					Button {
-						showMaxFeeSheet()
-					} label: {
-						Text(maxFeesString())
-					}
-					
-				} // </VStack>
-				.padding([.top, .bottom], 8)
-				
-				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-					Text("Phoenix will try to make the payment using the minimum fee possible.")
-				}
-				.font(.callout)
-				.foregroundColor(Color.secondary)
-				.padding([.top, .bottom], 8)
-				
-			} // </Section>
-			
-			Section {
-				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-					Text("Fee for on-the-fly channel creation:")
-						.padding(.bottom, 8)
-					
-					let feePercent = formatFeePercent()
-					let minFee = Utils.formatBitcoin(sat: payToOpen_minFeeSat, bitcoinUnit: .sat)
-					
-					// This doesn't get translated properly. SwiftUI localization bug ?
-				//	Text("\(feePercent)% (\(minFee.string) minimum)")
-					
-					Text(String(format: NSLocalizedString(
-						"%@%% (%@ minimum)",
-						comment: "Minimum fee information. E.g.: 1% (3,000 sats minimum)"),
-						feePercent, minFee.string
-					))
-				}
-				.padding([.top, .bottom], 8)
-				
-				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-					Text("This fee applies when you receive a payment over Lightning and a new channel needs to be created.")
-						.padding(.bottom, 12)
-					
-					Text("This fee is dynamic, and may change depending on the conditions of the bitcoin network.")
-						.padding(.bottom, 12)
-					
-					HStack(alignment: VerticalAlignment.center, spacing: 0) {
-						Text("For more information, see the FAQ")
-							.padding(.trailing, 6)
-						Button {
-							openFaqButtonTapped()
-						} label: {
-							Image(systemName: "link.circle.fill")
-								.imageScale(.medium)
-						}
-					}
-				}
-				.font(.callout)
-				.foregroundColor(Color.secondary)
-				.padding([.top, .bottom], 8)
-			
-			} // </Section>
-		} // </List>
-		.listStyle(.insetGrouped)
-		.listBackgroundColor(.primaryBackground)
-		.onReceive(maxFeesPublisher) {
-			maxFeesChanged($0)
-		}
-		.onReceive(chainContextPublisher) {
-			chainContextChanged($0)
-		}
-	}
-	
-	func maxFeesString() -> String {
-		
-		let currentFees = userDefinedMaxFees ?? defaultMaxFees()
-		
-		let base = Utils.formatBitcoin(sat: currentFees.feeBaseSat, bitcoinUnit: .sat)
-		let proportional = formatProportionalFee(currentFees.feeProportionalMillionths)
-		
-		return "\(base.string) + \(proportional)%"
-	}
-	
-	func formatFeePercent() -> String {
-		
-		let formatter = NumberFormatter()
-		formatter.minimumFractionDigits = 0
-		formatter.maximumFractionDigits = 3
-		
-		return formatter.string(from: NSNumber(value: payToOpen_feePercent))!
-	}
-	
-	func defaultPaymentDescriptionChanged() {
-		log.trace("defaultPaymentDescriptionChanged(): \(defaultPaymentDescription)")
-		
-		Prefs.shared.defaultPaymentDescription = self.defaultPaymentDescription
-	}
-	
-	func invoiceExpirationDaysChanged() {
-		log.trace("invoiceExpirationDaysChanged(): \(invoiceExpirationDays)")
-		
-		Prefs.shared.invoiceExpirationDays = self.invoiceExpirationDays
-	}
-	
-	func showMaxFeeSheet() {
-		log.trace("showMaxFeeSheet()")
-		
-		smartModalState.display(dismissable: false) {
-			MaxFeeConfiguration()
-		}
-	}
-	
-	func openFaqButtonTapped() -> Void {
-		log.trace("openFaqButtonTapped()")
-		
-		if let url = URL(string: "https://phoenix.acinq.co/faq") {
-			openURL(url)
-		}
-	}
-	
-	func maxFeesChanged(_ newMaxFees: MaxFees?) {
-		log.trace("maxFeesChanged()")
-		
-		userDefinedMaxFees = newMaxFees
-	}
-	
-	func chainContextChanged(_ context: WalletContext.V0ChainContext) {
-		log.trace("chainContextChanged()")
-		
-		payToOpen_feePercent = context.payToOpen.v1.feePercent * 100 // 0.01 => 1%
-		payToOpen_minFeeSat = context.payToOpen.v1.minFeeSat
-	}
-}
-
-struct MaxFeeConfiguration: View, ViewName {
+struct MaxFeeConfiguration: View {
 	
 	let minimumBaseFee = Double(0)       // sat
 	let maximumBaseFee = Double(100_000) // sat
@@ -262,7 +38,7 @@ struct MaxFeeConfiguration: View, ViewName {
 	@State var baseFeeProblem: FeeProblem?
 	
 	@State var proportionalFee: String
-	@State var parsedProportionalFee: Result<NSNumber, TextFieldNumberParserError>
+	@State var parsedProportionalFee: Result<NSNumber, TextFieldNumberStylerError>
 	@State var proportionalFeeProblem: FeeProblem?
 	
 	let examplePayments: [Int64] = [1_000, 10_000, 100_000, 1_000_000]
@@ -736,8 +512,8 @@ struct MaxFeeConfiguration: View, ViewName {
 		)
 	}
 	
-	func percentParser() -> TextFieldNumberParser {
-		return TextFieldNumberParser(
+	func percentParser() -> TextFieldNumberStyler {
+		return TextFieldNumberStyler(
 			formatter: NumberFormatter(),
 			amount: $proportionalFee,
 			parsedAmount: $parsedProportionalFee
@@ -745,7 +521,7 @@ struct MaxFeeConfiguration: View, ViewName {
 	}
 	
 	func baseFeeDidChange() {
-		log.trace("[\(viewName)] baseFeeDidChange()")
+		log.trace("baseFeeDidChange()")
 		
 		switch parsedBaseFee {
 		case .failure:
@@ -767,7 +543,7 @@ struct MaxFeeConfiguration: View, ViewName {
 	}
 	
 	func proportionalFeeDidChange() {
-		log.trace("[\(viewName)] proportionalFeeDidChange()")
+		log.trace("proportionalFeeDidChange()")
 		
 		switch parsedProportionalFee {
 		case .failure:
@@ -792,7 +568,7 @@ struct MaxFeeConfiguration: View, ViewName {
 	
 	func checkForWarnings() {
 		
-		log.trace("[\(viewName)] clearBaseFee()")
+		log.trace("clearBaseFee()")
 		
 		guard
 			invalidBaseFee == nil,
@@ -840,21 +616,21 @@ struct MaxFeeConfiguration: View, ViewName {
 	}
 	
 	func clearBaseFee() {
-		log.trace("[\(viewName)] clearBaseFee()")
+		log.trace("clearBaseFee()")
 		
 		parsedBaseFee = .failure(.emptyInput)
 		baseFee = "" // triggers `baseFeeDidChange()`
 	}
 	
 	func clearProportionalFee() {
-		log.trace("[\(viewName)] clearProportionalFee()")
+		log.trace("clearProportionalFee()")
 		
 		parsedProportionalFee = .failure(.emptyInput)
 		proportionalFee = "" // triggers `proportionalFeeDidChange()`
 	}
 	
 	func decrementExamplePaymentsIdx() {
-		log.trace("[\(viewName)] decrementExamplePaymentsIdx")
+		log.trace("decrementExamplePaymentsIdx")
 		
 		guard examplePaymentsIdx > 0 else {
 			return
@@ -863,7 +639,7 @@ struct MaxFeeConfiguration: View, ViewName {
 	}
 	
 	func incrementExamplePaymentsIdx() {
-		log.trace("[\(viewName)] incrementExamplePaymentsIdx")
+		log.trace("incrementExamplePaymentsIdx")
 		
 		guard examplePaymentsIdx + 1 < examplePayments.count else {
 			return
@@ -872,13 +648,13 @@ struct MaxFeeConfiguration: View, ViewName {
 	}
 	
 	func didTapCancelButton() {
-		log.trace("[\(viewName)] didTapCancelButton()")
+		log.trace("didTapCancelButton()")
 		
 		smartModalState.close()
 	}
 	
 	func didTapSaveButton() {
-		log.trace("[\(viewName)] didTapSaveButton()")
+		log.trace("didTapSaveButton()")
 		
 		// Reminder: Our state variables:
 		//
@@ -927,40 +703,5 @@ struct MaxFeeConfiguration: View, ViewName {
 		}
 		
 		smartModalState.close()
-	}
-}
-
-fileprivate func defaultMaxFees() -> MaxFees {
-	
-	let peer = Biz.business.getPeer()
-	if let defaultMaxFees = peer?.walletParams.trampolineFees.last {
-		return MaxFees.fromTrampolineFees(defaultMaxFees)
-	} else {
-		return MaxFees(feeBaseSat: 0, feeProportionalMillionths: 0)
-	}
-}
-
-fileprivate func formatProportionalFee(_ feeProportionalMillionths: Int64) -> String {
-	
-	let percent = Double(feeProportionalMillionths) / Double(1_000_000)
-	
-	let formatter = NumberFormatter()
-	formatter.numberStyle = .percent
-	formatter.percentSymbol = ""
-	formatter.paddingCharacter = ""
-	formatter.minimumFractionDigits = 2
-	
-	return formatter.string(from: NSNumber(value: percent))!
-}
-
-class PaymentOptionsView_Previews: PreviewProvider {
-	
-	static var previews: some View {
-		
-		NavigationWrapper {
-			PaymentOptionsView()
-		}
-		.preferredColorScheme(.light)
-		.previewDevice("iPhone 8")
 	}
 }

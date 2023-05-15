@@ -215,7 +215,7 @@ class Utils {
 		locale      : Locale? = nil
 	) -> FormattedAmount {
 		
-		let msat = sat * Int64(Millisatoshis_Per_Satoshi)
+		let msat = toMsat(sat: sat)
 		return formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit, locale: locale)
 	}
 	
@@ -402,7 +402,7 @@ class Utils {
 		locale       : Locale? = nil
 	) -> FormattedAmount {
 		
-		let msat = sat * Int64(Millisatoshis_Per_Satoshi)
+		let msat = toMsat(sat: sat)
 		return formatFiat(msat: msat, exchangeRate: exchangeRate, locale: locale)
 	}
 	

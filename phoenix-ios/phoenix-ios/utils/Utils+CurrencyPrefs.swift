@@ -64,6 +64,67 @@ extension Utils {
 	}
 	
 	// --------------------------------------------------
+	// MARK: Bitcoin Formatting
+	// --------------------------------------------------
+	
+	static func formatBitcoin(
+		_ currencyPrefs : CurrencyPrefs,
+		sat             : Bitcoin_kmpSatoshi
+	) -> FormattedAmount {
+		
+		return formatBitcoin(sat: sat, bitcoinUnit: currencyPrefs.bitcoinUnit)
+	}
+	
+	static func formatBitcoin(
+		_ currencyPrefs : CurrencyPrefs,
+		sat             : Int64
+	) -> FormattedAmount {
+		
+		return formatBitcoin(sat: sat, bitcoinUnit: currencyPrefs.bitcoinUnit)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Fiat Formatting
+	// --------------------------------------------------
+	
+	static func formatFiat(
+		_ currencyPrefs : CurrencyPrefs,
+		sat             : Bitcoin_kmpSatoshi
+	) -> FormattedAmount {
+		
+		return formatFiat(currencyPrefs, sat: sat.toLong())
+	}
+	
+	static func formatFiat(
+		_ currencyPrefs : CurrencyPrefs,
+		sat             : Int64
+	) -> FormattedAmount {
+		
+		let msat = toMsat(sat: sat)
+		return formatFiat(currencyPrefs, msat: msat)
+	}
+	
+	static func formatFiat(
+		_ currencyPrefs : CurrencyPrefs,
+		msat            : Lightning_kmpMilliSatoshi
+	) -> FormattedAmount {
+		
+		return formatFiat(currencyPrefs, msat: msat.toLong())
+	}
+	
+	static func formatFiat(
+		_ currencyPrefs : CurrencyPrefs,
+		msat            : Int64
+	) -> FormattedAmount {
+		
+		if let exchangeRate = currencyPrefs.fiatExchangeRate() {
+			return formatFiat(msat: msat, exchangeRate: exchangeRate)
+		} else {
+			return unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+		}
+	}
+	
+	// --------------------------------------------------
 	// MARK: Alt Formatting
 	// --------------------------------------------------
 	
