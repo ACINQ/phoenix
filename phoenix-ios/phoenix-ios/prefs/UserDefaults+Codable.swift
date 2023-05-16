@@ -101,12 +101,18 @@ struct LiquidityPolicy: Equatable, Codable {
 		)
 	}
 	
+	var effectiveMaxFeeSats: Int64 {
+		return maxFeeSats ?? NodeParamsManager.companion.defaultLiquidityPolicy.maxAbsoluteFee.sat
+	}
+	
+	var effectiveMaxFeeBasisPoints: Int32 {
+		return maxFeeBasisPoints ?? NodeParamsManager.companion.defaultLiquidityPolicy.maxRelativeFeeBasisPoints
+	}
+	
 	func toKotlin() -> Lightning_kmpLiquidityPolicy {
 		
-		let dlp = NodeParamsManager.companion.defaultLiquidityPolicy
-		
-		let sats = maxFeeSats ?? dlp.maxAbsoluteFee.sat
-		let basisPoints = maxFeeBasisPoints ?? dlp.maxRelativeFeeBasisPoints
+		let sats = effectiveMaxFeeSats
+		let basisPoints = effectiveMaxFeeBasisPoints
 		
 		return Lightning_kmpLiquidityPolicy.Auto(
 			maxAbsoluteFee: Bitcoin_kmpSatoshi(sat: sats),

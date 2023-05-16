@@ -92,7 +92,7 @@ class BusinessManager {
 		let startupParams = StartupParams(
 			requestCheckLegacyChannels: false,
 			isTorEnabled: GroupPrefs.shared.isTorEnabled,
-			liquidityPolicy: NodeParamsManager.companion.defaultLiquidityPolicy
+			liquidityPolicy: Prefs.shared.liquidityPolicy.toKotlin()
 		)
 		business.start(startupParams: startupParams)
 		

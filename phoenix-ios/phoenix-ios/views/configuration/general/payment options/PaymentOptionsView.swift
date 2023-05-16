@@ -135,7 +135,18 @@ struct PaymentOptionsView: View {
 	@ViewBuilder
 	func subsection_liquidityPolicy() -> some View {
 		
-		NavigationLink("Liquidity policy", destination: LiquidityPolicyView())
+		NavigationLink(destination: LiquidityPolicyView()) {
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
+				Text("Miner fee policy")
+				
+				let numSats = liquidityPolicyMaxSats()
+				Text("Automated (max \(numSats))")
+					.font(.callout)
+					.foregroundColor(.secondary)
+			}
+		}
+		.padding([.top, .bottom], 8)
 	}
 	
 	@ViewBuilder
@@ -172,6 +183,12 @@ struct PaymentOptionsView: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	func liquidityPolicyMaxSats() -> String {
+		
+		let sats = Prefs.shared.liquidityPolicy.effectiveMaxFeeSats
+		return Utils.formatBitcoin(sat: sats, bitcoinUnit: .sat).string
+	}
 	
 	func maxFeesString() -> String {
 		
