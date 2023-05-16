@@ -323,9 +323,11 @@
     <string name="home__onchain_incoming">+%1$s</string>
     <string name="home__onchain_dialog_button_to_wallet">Show incoming on-chain payments</string>
     <string name="home__onchain_dialog_title">Incoming payments</string>
-    <string name="home__onchain_dialog_header">You have some incoming funds waiting for confirmation.</string>
-    <string name="home__onchain_dialog_swap_in">- <b>%1$s</b> on-chain deposit.</string>
-    <string name="home__onchain_dialog_channel_confirming">- <b>%1$s</b> waiting for the channel to confirm.</string>
+    <string name="home__onchain_dialog_header">These funds will appear on your balance once swapped to Lightning, according to your fee settings.</string>
+    <string name="home__onchain_dialog_swap_in">+%1$s on-chain deposit</string>
+    <string name="home__onchain_dialog_swap_in_sub">Tap to see my wallet</string>
+    <string name="home__onchain_dialog_channel_confirming">+%1$s swapping to Lightning</string>
+    <string name="home__onchain_dialog_channel_confirming_sub">Tap to see my channels</string>
 
     <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">You have not made any payments recently.\n\nUse the Receive and Send buttons at the bottom of this screen to get started!</string>

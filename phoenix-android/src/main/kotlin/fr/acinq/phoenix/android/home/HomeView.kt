@@ -52,6 +52,7 @@ import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
@@ -59,7 +60,6 @@ import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.BitcoinUnit
-import fr.acinq.phoenix.data.WalletContext
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.legacy.utils.MigrationResult
@@ -81,6 +81,7 @@ fun HomeView(
     onTorClick: () -> Unit,
     onElectrumClick: () -> Unit,
     onShowSwapInWallet: () -> Unit,
+    onShowChannels: () -> Unit,
 ) {
     val log = logger("HomeView")
     val context = LocalContext.current
@@ -170,7 +171,8 @@ fun HomeView(
                 IncomingAmountNotif(
                     swapInBalance = swapInBalance.value,
                     channelConfirmationBalance = unconfirmedChannelsBalance.value,
-                    onShowSwapInWallet = onShowSwapInWallet
+                    onShowSwapInWallet = onShowSwapInWallet,
+                    onShowChannels = onShowChannels,
                 )
             }
             PrimarySeparator()
@@ -183,7 +185,9 @@ fun HomeView(
                             else -> stringResource(id = R.string.home__payments_none)
                         },
                         style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center),
-                        modifier = Modifier.padding(horizontal = 32.dp).widthIn(max = 250.dp)
+                        modifier = Modifier
+                            .padding(horizontal = 32.dp)
+                            .widthIn(max = 250.dp)
                     )
                 } else {
                     LatestPaymentsList(
@@ -388,6 +392,7 @@ private fun IncomingAmountNotif(
     swapInBalance: WalletBalance,
     channelConfirmationBalance: MilliSatoshi,
     onShowSwapInWallet: () -> Unit,
+    onShowChannels: () -> Unit,
 ) {
     var showSwapInInfoDialog by remember { mutableStateOf(false) }
 
@@ -397,13 +402,14 @@ private fun IncomingAmountNotif(
             channelConfirmationBalance = channelConfirmationBalance,
             onDismiss = { showSwapInInfoDialog = false },
             onShowSwapInWallet = onShowSwapInWallet,
+            onShowChannels = onShowChannels,
         )
     }
 
     val balance = swapInBalance.total.toMilliSatoshi() + channelConfirmationBalance
     if (balance > 0.msat) {
         FilledButton(
-            icon = R.drawable.ic_chain,
+            icon = R.drawable.ic_clock,
             iconTint = MaterialTheme.typography.caption.color,
             text = stringResource(id = R.string.home__onchain_incoming, balance.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true)),
             textStyle = MaterialTheme.typography.caption,
@@ -421,35 +427,49 @@ private fun OnChainInfoDialog(
     swapInBalance: WalletBalance,
     channelConfirmationBalance: MilliSatoshi,
     onShowSwapInWallet: () -> Unit,
+    onShowChannels: () -> Unit,
 ) {
     val btcUnit = LocalBitcoinUnit.current
     Dialog(onDismiss = onDismiss, title = stringResource(id = R.string.home__onchain_dialog_title)) {
-        Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-            Text(text = stringResource(R.string.home__onchain_dialog_header))
+        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+            Text(text = stringResource(R.string.home__onchain_dialog_header), modifier = Modifier.padding(horizontal = 8.dp))
             if (swapInBalance.total > 0.sat) {
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = annotatedStringResource(R.string.home__onchain_dialog_swap_in, swapInBalance.total.toPrettyString(btcUnit, withUnit = true)))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    externalPadding = PaddingValues(0.dp),
+                    internalPadding = PaddingValues(8.dp),
+                    onClick = onShowSwapInWallet
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.home__onchain_dialog_swap_in, swapInBalance.total.toPrettyString(btcUnit, withUnit = true)),
+                        style = MaterialTheme.typography.h5
+                    )
+                    Text(
+                        text = stringResource(id = R.string.home__onchain_dialog_swap_in_sub),
+                        style = MaterialTheme.typography.caption.copy(fontSize = 14.sp)
+                    )
+                }
             }
             if (channelConfirmationBalance > 0.msat) {
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = annotatedStringResource(R.string.home__onchain_dialog_channel_confirming, channelConfirmationBalance.toPrettyString(btcUnit, withUnit = true)))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    externalPadding = PaddingValues(0.dp),
+                    internalPadding = PaddingValues(8.dp),
+                    onClick = onShowChannels
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.home__onchain_dialog_channel_confirming, channelConfirmationBalance.toPrettyString(btcUnit, withUnit = true)),
+                        style = MaterialTheme.typography.h5
+                    )
+                    Text(
+                        text = stringResource(id = R.string.home__onchain_dialog_channel_confirming_sub),
+                        style = MaterialTheme.typography.caption.copy(fontSize = 14.sp)
+                    )
+                }
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            InlineButton(text = stringResource(id = R.string.home__onchain_dialog_button_to_wallet), onClick = onShowSwapInWallet)
         }
-    }
-}
-
-@Composable
-private fun UnconfirmedChannelsBalanceDialog(
-    amount: MilliSatoshi,
-    onDismiss: () -> Unit,
-) {
-    Dialog(onDismiss = onDismiss, title = "${amount.toPrettyString(BitcoinUnit.Sat, withUnit = true)} waiting for channels to confirm") {
-        Text(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            text = "The incoming amount display and this message are placeholders."
-        )
     }
 }
 

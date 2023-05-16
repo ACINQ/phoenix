@@ -66,10 +66,6 @@ private fun ConfirmedBalanceView(
     Card(modifier = Modifier.fillMaxWidth()) {
         BalanceWithContent(balance = balance) {
             Spacer(modifier = Modifier.height(8.dp))
-//            Text(
-//                text = stringResource(id = R.string.walletinfo_onchain_swapin_about),
-//                style = MaterialTheme.typography.subtitle2
-//            )
             Spacer(modifier = Modifier.height(8.dp))
             when (val policy = liquidityPolicyInPrefs) {
                 is LiquidityPolicy.Disable -> {
@@ -102,10 +98,7 @@ private fun UnconfirmedBalanceView(
 ) {
     CardHeader(text = stringResource(id = R.string.walletinfo_unconfirmed_title))
     Card(modifier = Modifier.fillMaxWidth()) {
-        BalanceWithContent(balance = wallet?.unconfirmedBalance?.toMilliSatoshi()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = stringResource(id = R.string.walletinfo_onchain_swapin_about_unconfirmed), style = MaterialTheme.typography.subtitle2)
-        }
+        BalanceWithContent(balance = wallet?.unconfirmedBalance?.toMilliSatoshi()) {}
         if (!wallet?.unconfirmedUtxos.isNullOrEmpty()) {
             HSeparator(modifier = Modifier.padding(horizontal = 16.dp))
             wallet?.unconfirmedUtxos?.forEach { UtxoRow(it, false) }

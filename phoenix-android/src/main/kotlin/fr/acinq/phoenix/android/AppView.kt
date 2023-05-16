@@ -159,7 +159,8 @@ fun AppView(
                             onPaymentsHistoryClick = { navController.navigate(Screen.PaymentsHistory.route) },
                             onTorClick = { navController.navigate(Screen.TorConfig) },
                             onElectrumClick = { navController.navigate(Screen.ElectrumServer) },
-                            onShowSwapInWallet = { navController.navigate(Screen.WalletInfo.SwapInWallet) }
+                            onShowSwapInWallet = { navController.navigate(Screen.WalletInfo.SwapInWallet) },
+                            onShowChannels = { navController.navigate(Screen.Channels) },
                         )
                     }
                 }
