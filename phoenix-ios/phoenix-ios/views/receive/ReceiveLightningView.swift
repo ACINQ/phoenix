@@ -680,10 +680,11 @@ struct ReceiveLightningView: View {
 			return
 		}
 		
-		if lastIncomingPayment.state() == WalletPaymentState.success &&
-			lastIncomingPayment.paymentHash.toHex() == model.paymentHash
-		{
-			presentationMode.wrappedValue.dismiss()
+		let state = lastIncomingPayment.state()
+		if state == WalletPaymentState.successonchain || state == WalletPaymentState.successoffchain {
+			if lastIncomingPayment.paymentHash.toHex() == model.paymentHash {
+				presentationMode.wrappedValue.dismiss()
+			}
 		}
 	}
 	

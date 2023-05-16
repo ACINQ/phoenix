@@ -66,7 +66,8 @@ class PhoenixManager {
 		
 		let startupParams = StartupParams(
 			requestCheckLegacyChannels: false,
-			isTorEnabled: GroupPrefs.shared.isTorEnabled
+			isTorEnabled: GroupPrefs.shared.isTorEnabled,
+			liquidityPolicy: NodeParamsManager.companion.defaultLiquidityPolicy
 		)
 		business.start(startupParams: startupParams)
 	}

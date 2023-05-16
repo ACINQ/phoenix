@@ -91,7 +91,8 @@ class BusinessManager {
 
 		let startupParams = StartupParams(
 			requestCheckLegacyChannels: false,
-			isTorEnabled: GroupPrefs.shared.isTorEnabled
+			isTorEnabled: GroupPrefs.shared.isTorEnabled,
+			liquidityPolicy: NodeParamsManager.companion.defaultLiquidityPolicy
 		)
 		business.start(startupParams: startupParams)
 		
@@ -155,6 +156,16 @@ class BusinessManager {
 				others: GroupPrefs.shared.preferredFiatCurrencies
 			)
 			self.business.appConfigurationManager.updatePreferredFiatCurrencies(current: current)
+		}
+		.store(in: &cancellables)
+		
+		// Liquidity policy
+		Prefs.shared.liquidityPolicyPublisher.dropFirst().sink { (policy: LiquidityPolicy) in
+			
+		//	let foo = policy.toKotlin()
+		//	self.business.appConfigurationManager. ???
+		//
+		//	It's not possible to change the liquidity policy on-the-fly yet ?
 		}
 		.store(in: &cancellables)
 	}
@@ -259,6 +270,10 @@ class BusinessManager {
 	///
 	public var nodeIdHash: String? {
 		return walletInfo?.nodeIdHash
+	}
+	
+	public var nodeId: String? {
+		return walletInfo?.nodeId.toHex()
 	}
 
 	// --------------------------------------------------

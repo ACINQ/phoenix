@@ -15,15 +15,10 @@ extension Scan {
 	typealias Model_BadRequest = ModelBadRequest
 
 	typealias Model_InvoiceFlow = ModelInvoiceFlow
-	typealias Model_InvoiceFlow_DangerousRequest = ModelInvoiceFlowDangerousRequest
 	typealias Model_InvoiceFlow_InvoiceRequest = ModelInvoiceFlowInvoiceRequest
 	typealias Model_InvoiceFlow_Sending = ModelInvoiceFlowSending
 
-	typealias Model_SwapOutFlow = ModelSwapOutFlow
-	typealias Model_SwapOutFlow_Init = ModelSwapOutFlowInit
-	typealias Model_SwapOutFlow_Requesting = ModelSwapOutFlowRequestingSwapout
-	typealias Model_SwapOutFlow_Ready = ModelSwapOutFlowSwapOutReady
-	typealias Model_SwapOutFlow_Sending = ModelSwapOutFlowSendingSwapOut
+	typealias Model_OnChainFlow = ModelOnchainFlow
 
 	typealias Model_LnurlServiceFetch = ModelLnurlServiceFetch
 
@@ -44,12 +39,7 @@ extension Scan {
 
 	typealias Intent_Parse = IntentParse
 
-	typealias Intent_InvoiceFlow_ConfirmDangerousRequest = IntentInvoiceFlowConfirmDangerousRequest
 	typealias Intent_InvoiceFlow_SendInvoicePayment = IntentInvoiceFlowSendInvoicePayment
-
-	typealias Intent_SwapOutFlow_Invalidate = IntentSwapOutFlowInvalidate
-	typealias Intent_SwapOutFlow_Prepare = IntentSwapOutFlowPrepareSwapOut
-	typealias Intent_SwapOutFlow_Send = IntentSwapOutFlowSendSwapOut
 
 	typealias Intent_CancelLnurlServiceFetch = IntentCancelLnurlServiceFetch
 

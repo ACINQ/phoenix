@@ -19,8 +19,10 @@ fileprivate enum Key: String {
 	case recentTipPercents
 	case isNewWallet
 	case invoiceExpirationDays
+	case liquidityPolicy
 	case maxFees
 	case hideAmounts = "hideAmountsOnHomeScreen"
+	case showOriginalFiatAmount
 	case recentPaymentsConfig
 }
 
@@ -40,7 +42,8 @@ class Prefs {
 	private init() {
 		UserDefaults.standard.register(defaults: [
 			Key.isNewWallet.rawValue: true,
-			Key.invoiceExpirationDays.rawValue: 7
+			Key.invoiceExpirationDays.rawValue: 7,
+			Key.showOriginalFiatAmount.rawValue: true
 		])
 	}
 	
@@ -87,6 +90,20 @@ class Prefs {
 		return Int64(invoiceExpirationDays) * Int64(60 * 60 * 24)
 	}
 	
+	lazy private(set) var liquidityPolicyPublisher: AnyPublisher<LiquidityPolicy, Never> = {
+		defaults.publisher(for: \.liquidityPolicy, options: [.initial, .new])
+			.map({ (data: Data?) -> LiquidityPolicy in
+				data?.jsonDecode() ?? LiquidityPolicy.emptyPolicy()
+			})
+			.removeDuplicates()
+			.eraseToAnyPublisher()
+	}()
+	
+	var liquidityPolicy: LiquidityPolicy {
+		get { defaults.liquidityPolicy?.jsonDecode() ?? LiquidityPolicy.emptyPolicy() }
+		set { defaults.liquidityPolicy = newValue.jsonEncode() }
+	}
+	
 	lazy private(set) var maxFeesPublisher: AnyPublisher<MaxFees?, Never> = {
 		defaults.publisher(for: \.maxFees, options: [.initial, .new])
 			.map({ (data: Data?) -> MaxFees? in
@@ -104,6 +121,17 @@ class Prefs {
 	var hideAmounts: Bool {
 		get { defaults.hideAmounts }
 		set { defaults.hideAmounts = newValue }
+	}
+	
+	lazy private(set) var showOriginalFiatAmountPublisher: AnyPublisher<Bool, Never> = {
+		defaults.publisher(for: \.showOriginalFiatAmount, options: [.initial, .new])
+			.removeDuplicates()
+			.eraseToAnyPublisher()
+	}()
+	
+	var showOriginalFiatAmount: Bool {
+		get { defaults.showOriginalFiatAmount }
+		set { defaults.showOriginalFiatAmount = newValue }
 	}
 	
 	lazy private(set) var recentPaymentsConfigPublisher: AnyPublisher<RecentPaymentsConfig, Never> = {
@@ -226,8 +254,10 @@ class Prefs {
 		defaults.removeObject(forKey: Key.recentTipPercents.rawValue)
 		defaults.removeObject(forKey: Key.isNewWallet.rawValue)
 		defaults.removeObject(forKey: Key.invoiceExpirationDays.rawValue)
+		defaults.removeObject(forKey: Key.liquidityPolicy.rawValue)
 		defaults.removeObject(forKey: Key.maxFees.rawValue)
 		defaults.removeObject(forKey: Key.hideAmounts.rawValue)
+		defaults.removeObject(forKey: Key.showOriginalFiatAmount.rawValue)
 		defaults.removeObject(forKey: Key.recentPaymentsConfig.rawValue)
 		
 		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
@@ -256,6 +286,11 @@ extension UserDefaults {
 		get { integer(forKey: Key.invoiceExpirationDays.rawValue) }
 		set { set(newValue, forKey: Key.invoiceExpirationDays.rawValue) }
 	}
+	
+	@objc fileprivate var liquidityPolicy: Data? {
+		get { data(forKey: Key.liquidityPolicy.rawValue) }
+		set { set(newValue, forKey: Key.liquidityPolicy.rawValue) }
+	}
 
 	@objc fileprivate var maxFees: Data? {
 		get { data(forKey: Key.maxFees.rawValue) }
@@ -265,6 +300,11 @@ extension UserDefaults {
 	@objc fileprivate var hideAmounts: Bool {
 		get { bool(forKey: Key.hideAmounts.rawValue) }
 		set { set(newValue, forKey: Key.hideAmounts.rawValue) }
+	}
+	
+	@objc fileprivate var showOriginalFiatAmount: Bool {
+		get { bool(forKey: Key.showOriginalFiatAmount.rawValue) }
+		set { set(newValue, forKey: Key.showOriginalFiatAmount.rawValue) }
 	}
 	
 	@objc fileprivate var recentPaymentsConfig: Data? {

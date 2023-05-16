@@ -107,7 +107,7 @@ struct ValidateView: View {
 			
 			GeometryReader { geometry in
 				ScrollView(.vertical) {
-					content
+					content()
 						.frame(width: geometry.size.width)
 						.frame(minHeight: geometry.size.height)
 				}
@@ -116,13 +116,7 @@ struct ValidateView: View {
 				}
 			}
 			
-			if mvi.model is Scan.Model_SwapOutFlow_Requesting {
-				FetchActivityNotice(
-					title: NSLocalizedString("Fetching Invoice", comment: "Progress title"),
-					onCancel: { didCancelSwapOutRequest() }
-				)
-			}
-			else if mvi.model is Scan.Model_LnurlPayFlow_LnurlPayFetch {
+			if mvi.model is Scan.Model_LnurlPayFlow_LnurlPayFetch {
 				FetchActivityNotice(
 					title: NSLocalizedString("Fetching Invoice", comment: "Progress title"),
 					onCancel: { didCancelLnurlPayFetch() }
@@ -173,71 +167,11 @@ struct ValidateView: View {
 	}
 	
 	@ViewBuilder
-	var content: some View {
+	func content() -> some View {
 	
-		let isDisconnected = !(connectionsMonitor.connections.global is Lightning_kmpConnection.ESTABLISHED)
 		VStack {
-			
-			Spacer().frame(height: 20)
-	
-			if let host = paymentHost() {
-				VStack(alignment: HorizontalAlignment.center, spacing: 10) {
-					if mvi.model is Scan.Model_LnurlWithdrawFlow {
-						Text("You are redeeming funds from")
-					} else {
-						Text("Payment requested by")
-					}
-					Text(host).bold()
-				}
-				.padding(.bottom)
-				.padding(.bottom)
-				.accessibilityElement(children: .combine)
-			}
-			
-			if mvi.model is Scan.Model_LnurlWithdrawFlow {
-				Text(verbatim: NSLocalizedString("amount to receive", comment: "SendView: lnurl-withdraw flow")
-						.uppercased()
-				)
-				.padding(.bottom, 4)
-			}
-			
-			HStack(alignment: VerticalAlignment.firstTextBaseline) {
-				TextField(verbatim: "123", text: currencyStyler().amountProxy)
-					.keyboardType(.decimalPad)
-					.disableAutocorrection(true)
-					.fixedSize()
-					.font(.title)
-					.multilineTextAlignment(.trailing)
-					.minimumScaleFactor(0.95) // SwiftUI bugs: truncating text in RTL
-					.foregroundColor(isInvalidAmount() ? Color.appNegative : Color.primaryForeground)
-					.accessibilityHint("amount in \(currency.shortName)")
-			
-				Picker(selection: $currencyPickerChoice, label: Text(currencyPickerChoice).frame(minWidth: 40)) {
-					ForEach(currencyPickerOptions(), id: \.self) { option in
-						Text(option).tag(option)
-					}
-				}
-				.pickerStyle(MenuPickerStyle())
-				.accessibilityLabel("") // see below
-				.accessibilityHint("Currency picker")
-				
-				// For a Picker, iOS is setting the VoiceOver text twice:
-				// > "sat sat, Button"
-				//
-				// If we change the accessibilityLabel to "foobar", then we get:
-				// > "sat foobar, Button"
-				//
-				// So we have to set it to the empty string to avoid the double-word.
-
-			} // </HStack>
-			.padding([.leading, .trailing])
-			.background(
-				VStack {
-					Spacer()
-					Line().stroke(Color.appAccent, style: StrokeStyle(lineWidth: 2, dash: [3]))
-						.frame(height: 1)
-				}
-			)
+			header()
+			amountField()
 			
 			Text(altAmount)
 				.font(.caption)
@@ -245,108 +179,110 @@ struct ValidateView: View {
 				.padding(.top, 4)
 				.padding(.bottom)
 			
-			if showMetadataButton() || showRangeButton() || showTipButton() || showCommentButton() {
-				HStack(alignment: VerticalAlignment.center, spacing: 20) {
-					if showMetadataButton() {
-						metadataButton()
-					}
-					if showRangeButton() {
-						rangeButton()
-					}
-					if showTipButton() {
-						tipButton()
-					}
-					if showCommentButton() {
-						commentButton()
-					}
-				}
-				.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
-				.padding(.horizontal)
-			}
+			optionalButtons()
 			
-			if let description = requestDescription() {
-				Text(description)
-					.padding()
-					.padding(.bottom)
-					.accessibilityHint("payment description")
-			} else {
-				Text("No description")
-					.foregroundColor(.secondary)
-					.padding()
-					.padding(.bottom)
-			}
+			paymentDescription()
+			onChainDetails()
 			
-			paymentButton(isDisconnected)
-		
-			if problem == nil && isDisconnected {
-				
-				Button {
-					showAppStatusPopover()
-				} label: {
-					HStack {
-						ProgressView()
-							.progressViewStyle(CircularProgressViewStyle())
-							.padding(.trailing, 1)
-						Text(disconnectedText())
-					}
-				}
-				.padding(.top, 4)
-			}
+			paymentButton()
+			otherWarning()
 			
-			PaymentSummaryView(
-				problem: $problem,
-				paymentNumbers: paymentNumbers()
-			)
-			.padding(.top)
-			.padding(.top)
+			paymentSummary()
+				.padding(.top)
+				.padding(.top)
+			
 		} // </VStack>
 	}
 	
 	@ViewBuilder
-	func paymentButton(_ isDisconnected: Bool) -> some View {
+	func header() -> some View {
 		
-		Button {
-			if mvi.model is Scan.Model_SwapOutFlow_Init {
-				prepareTransaction()
-			} else {
-				sendPayment()
-			}
-		} label: {
-			HStack {
-				if mvi.model is Scan.Model_SwapOutFlow_Init {
-					Image(systemName: "hammer")
-						.renderingMode(.template)
-					Text("Prepare Transaction")
-				}
-				else if mvi.model is Scan.Model_LnurlWithdrawFlow {
-					Image("ic_receive")
-						.renderingMode(.template)
-						.resizable()
-						.aspectRatio(contentMode: .fit)
-						.frame(width: 22, height: 22)
-					Text("Redeem")
+		Spacer().frame(height: 20)
+
+		if let host = paymentHost() {
+			VStack(alignment: HorizontalAlignment.center, spacing: 10) {
+				if mvi.model is Scan.Model_LnurlWithdrawFlow {
+					Text("You are redeeming funds from")
 				} else {
-					Image("ic_send")
-						.renderingMode(.template)
-						.resizable()
-						.aspectRatio(contentMode: .fit)
-						.frame(width: 22, height: 22)
-					Text("Pay")
+					Text("Payment requested by")
+				}
+				Text(host).bold()
+			}
+			.padding(.bottom)
+			.padding(.bottom)
+			.accessibilityElement(children: .combine)
+		}
+		
+		if mvi.model is Scan.Model_LnurlWithdrawFlow {
+			Text("amount to receive")
+				.textCase(.uppercase)
+				.padding(.bottom, 4)
+		}
+	}
+	
+	@ViewBuilder
+	func amountField() -> some View {
+		
+		HStack(alignment: VerticalAlignment.firstTextBaseline) {
+			TextField(verbatim: "123", text: currencyStyler().amountProxy)
+				.keyboardType(.decimalPad)
+				.disableAutocorrection(true)
+				.fixedSize()
+				.font(.title)
+				.multilineTextAlignment(.trailing)
+				.minimumScaleFactor(0.95) // SwiftUI bugs: truncating text in RTL
+				.foregroundColor(isInvalidAmount() ? Color.appNegative : Color.primaryForeground)
+				.accessibilityHint("amount in \(currency.shortName)")
+		
+			Picker(selection: $currencyPickerChoice, label: Text(currencyPickerChoice).frame(minWidth: 40)) {
+				ForEach(currencyPickerOptions(), id: \.self) { option in
+					Text(option).tag(option)
 				}
 			}
-			.font(.title2)
-			.foregroundColor(Color.white)
-			.padding(.top, 4)
-			.padding(.bottom, 5)
-			.padding([.leading, .trailing], 24)
+			.pickerStyle(MenuPickerStyle())
+			.accessibilityLabel("") // see below
+			.accessibilityHint("Currency picker")
+			
+			// For a Picker, iOS is setting the VoiceOver text twice:
+			// > "sat sat, Button"
+			//
+			// If we change the accessibilityLabel to "foobar", then we get:
+			// > "sat foobar, Button"
+			//
+			// So we have to set it to the empty string to avoid the double-word.
+
+		} // </HStack>
+		.padding([.leading, .trailing])
+		.background(
+			VStack {
+				Spacer()
+				Line().stroke(Color.appAccent, style: StrokeStyle(lineWidth: 2, dash: [3]))
+					.frame(height: 1)
+			}
+		)
+	}
+	
+	@ViewBuilder
+	func optionalButtons() -> some View {
+		
+		if showMetadataButton() || showRangeButton() || showTipButton() || showCommentButton() {
+			HStack(alignment: VerticalAlignment.center, spacing: 20) {
+				if showMetadataButton() {
+					metadataButton()
+				}
+				if showRangeButton() {
+					rangeButton()
+				}
+				if showTipButton() {
+					tipButton()
+				}
+				if showCommentButton() {
+					commentButton()
+				}
+			}
+			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
+			.padding(.horizontal)
 		}
-		.buttonStyle(ScaleButtonStyle(
-			cornerRadius: 100,
-			backgroundFill: Color.appAccent,
-			disabledBackgroundFill: Color.gray
-		))
-		.disabled(problem != nil || isDisconnected)
-		.accessibilityHint(paymentButtonHint())
 	}
 	
 	@ViewBuilder
@@ -443,6 +379,114 @@ struct ValidateView: View {
 	}
 	
 	@ViewBuilder
+	func paymentDescription() -> some View {
+		
+		if let description = requestDescription() {
+			Text(description)
+				.padding()
+				.padding(.bottom)
+				.accessibilityHint("payment description")
+		} else {
+			Text("No description")
+				.foregroundColor(.secondary)
+				.padding()
+				.padding(.bottom)
+		}
+	}
+	
+	@ViewBuilder
+	func onChainDetails() -> some View {
+		
+		if let model = mvi.model as? Scan.Model_OnChainFlow {
+			OnChainDetails(model: model)
+				.padding(.horizontal, 60)
+				.padding(.bottom)
+		}
+	}
+	
+	@ViewBuilder
+	func paymentButton() -> some View {
+		
+		Button {
+			if mvi.model is Scan.Model_OnChainFlow {
+				prepareTransaction()
+			} else {
+				sendPayment()
+			}
+		} label: {
+			HStack {
+				if mvi.model is Scan.Model_OnChainFlow {
+					Image(systemName: "hammer")
+						.renderingMode(.template)
+					Text("Prepare Transaction")
+				} else if mvi.model is Scan.Model_LnurlWithdrawFlow {
+					Image("ic_receive")
+						.renderingMode(.template)
+						.resizable()
+						.aspectRatio(contentMode: .fit)
+						.frame(width: 22, height: 22)
+					Text("Redeem")
+				} else {
+					Image("ic_send")
+						.renderingMode(.template)
+						.resizable()
+						.aspectRatio(contentMode: .fit)
+						.frame(width: 22, height: 22)
+					Text("Pay")
+				}
+			}
+			.font(.title2)
+			.foregroundColor(Color.white)
+			.padding(.top, 4)
+			.padding(.bottom, 5)
+			.padding([.leading, .trailing], 24)
+		}
+		.buttonStyle(ScaleButtonStyle(
+			cornerRadius: 100,
+			backgroundFill: Color.appAccent,
+			disabledBackgroundFill: Color.gray
+		))
+		.disabled(problem != nil || isDisconnected || chainContext == nil)
+		.accessibilityHint(paymentButtonHint())
+	}
+	
+	@ViewBuilder
+	func otherWarning() -> some View {
+		
+		if problem == nil {
+			
+			if isDisconnected {
+				
+				Button {
+					showAppStatusPopover()
+				} label: {
+					HStack {
+						ProgressView()
+							.progressViewStyle(CircularProgressViewStyle())
+							.padding(.trailing, 1)
+						Text(disconnectedText())
+					}
+				}
+				.padding(.top, 4)
+				
+			} else if chainContext == nil {
+				
+				Text("Unable to fetch fees")
+					.foregroundColor(.appNegative)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func paymentSummary() -> some View {
+		
+		PaymentSummaryView(
+			problem: $problem,
+			paymentNumbers: paymentNumbers()
+		)
+	}
+	
+	@ViewBuilder
 	func currencyConverterView() -> some View {
 		
 		CurrencyConverterView(
@@ -456,6 +500,10 @@ struct ValidateView: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 
+	var isDisconnected: Bool {
+		return !(connectionsMonitor.connections.global is Lightning_kmpConnection.ESTABLISHED)
+	}
+	
 	func currencyStyler() -> TextFieldCurrencyStyler {
 		return TextFieldCurrencyStyler(
 			currency: currency,
@@ -497,7 +545,7 @@ struct ValidateView: View {
 	
 	func requestDescription() -> String? {
 		
-		if mvi.model is Scan.Model_SwapOutFlow {
+		if mvi.model is Scan.Model_OnChainFlow {
 			return NSLocalizedString("On-Chain Payment", comment: "Generic description for L1 payment")
 			
 		} else if let paymentRequest = paymentRequest() {
@@ -560,7 +608,7 @@ struct ValidateView: View {
 	
 	func showTipButton() -> Bool {
 		
-		if mvi.model is Scan.Model_SwapOutFlow {
+		if mvi.model is Scan.Model_OnChainFlow {
 			return true
 			
 		} else if let _ = paymentRequest() {
@@ -609,9 +657,9 @@ struct ValidateView: View {
 	
 	func paymentButtonHint() -> String {
 		
-		if mvi.model is Scan.Model_SwapOutFlow_Init {
+		if mvi.model is Scan.Model_OnChainFlow {
 			
-			return NSLocalizedString("fetches the swap-out fee", comment: "VoiceOver hint")
+			return NSLocalizedString("continue to next step", comment: "VoiceOver hint")
 			
 		} else {
 			
@@ -653,11 +701,11 @@ struct ValidateView: View {
 		} else if let lnurlWithdraw = lnurlWithdraw() {
 			return lnurlWithdraw.maxWithdrawable
 			
-		} else if let model = mvi.model as? Scan.Model_SwapOutFlow_Init {
+		} else if let model = mvi.model as? Scan.Model_OnChainFlow {
 			
-			if let amount_sat = model.address.amount {
+			if let amount_sat = model.uri.amount {
 				return Lightning_kmpMilliSatoshi(sat: amount_sat)
-			} else if let paymentRequest = model.address.paymentRequest {
+			} else if let paymentRequest = model.uri.paymentRequest {
 				return paymentRequest.amount
 			}
 		}
@@ -700,11 +748,11 @@ struct ValidateView: View {
 	
 	/// Returns true if:
 	/// - this is a normal lightning invoice without a set amount
-	/// - this is an on-chain payment (i.e. swap-out)
+	/// - this is an on-chain payment (i.e. splice-out)
 	///
 	func isAmountlessInvoice() -> Bool {
 		
-		if mvi.model is Scan.Model_SwapOutFlow {
+		if mvi.model is Scan.Model_OnChainFlow {
 			return true
 		} else if let paymentRequest = paymentRequest() {
 			return paymentRequest.amount == nil
@@ -739,18 +787,6 @@ struct ValidateView: View {
 		return nil
 	}
 	
-	func swapOutRange() -> MsatRange? {
-		
-		guard let chainContext = chainContext, mvi.model is Scan.Model_SwapOutFlow else {
-			return nil
-		}
-
-		return MsatRange(
-			min: Utils.toMsat(sat: chainContext.swapOut.v1.minAmountSat),
-			max: Utils.toMsat(sat: chainContext.swapOut.v1.maxAmountSat)
-		)
-	}
-	
 	func paymentNumbers() -> PaymentNumbers? {
 		
 		guard let preMinerFeeMsat = parsedAmountMsat() else {
@@ -768,12 +804,8 @@ struct ValidateView: View {
 		let tipMsat = preMinerFeeMsat - baseMsat
 		let tipPercent = Double(tipMsat) / Double(baseMsat)
 		
-		let minerFeeMsat: Int64
-		if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
-			minerFeeMsat = Utils.toMsat(sat: model.fee)
-		} else {
-			minerFeeMsat = 0
-		}
+		// Todo...
+		let minerFeeMsat: Int64 = 0
 		
 		if tipMsat <= 0 && minerFeeMsat <= 0 {
 			return nil
@@ -871,12 +903,12 @@ struct ValidateView: View {
 			problem = nil // display in gray at very beginning
 		}
 		
-		if let model = mvi.model as? Scan.Model_SwapOutFlow_Init,
-		   model.address.paymentRequest != nil,
+		if let model = mvi.model as? Scan.Model_OnChainFlow,
+		   model.uri.paymentRequest != nil,
 		   !hasPickedSwapOutMode
 		{
 			log.debug("triggering popover w/PaymentLayerChoice")
-			
+	
 			popoverState.display(dismissable: false) {
 				PaymentLayerChoice(mvi: mvi)
 			} onWillDisappear: {
@@ -896,9 +928,9 @@ struct ValidateView: View {
 		//
 		// * SwapOutFlow_Requesting -> SwapOutFlow_Ready => amount + minerFee >? balance
 		// * SwapOutFlow_Ready -> SwapOutFlow_Init       => remove minerFee from calculations
-		// * SwapOutFlow_Init -> InvoiceFlow_X           => range changed (e.g. minAmount)
+		// * OnChainFlow -> InvoiceFlow_X                => range changed (e.g. minAmount)
 		//
-		if newModel is Scan.Model_SwapOutFlow || newModel is Scan.Model_InvoiceFlow {
+		if newModel is Scan.Model_InvoiceFlow {
 			
 			refreshAltAmount()
 		}
@@ -951,9 +983,6 @@ struct ValidateView: View {
 				
 				// This seems to be needed, because `amountDidChange` isn't automatically called
 				refreshAltAmount()
-				if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
-					mvi.intent(Scan.Intent_SwapOutFlow_Invalidate(address: model.address))
-				}
 			}
 			
 		} else { // user selected "other"
@@ -998,9 +1027,6 @@ struct ValidateView: View {
 		log.trace("amountDidChange()")
 		
 		refreshAltAmount()
-		if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
-			mvi.intent(Scan.Intent_SwapOutFlow_Invalidate(address: model.address))
-		}
 	}
 	
 	func refreshAltAmount() {
@@ -1048,19 +1074,12 @@ struct ValidateView: View {
 				if msat > balanceMsat {
 					problem = .amountExceedsBalance
 					altAmount = NSLocalizedString("Amount exceeds your balance", comment: "error message")
-					
-				} else if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
-					let totalMsat = msat + Utils.toMsat(sat: model.fee)
-					if totalMsat > balanceMsat {
-						problem = .finalAmountExceedsBalance
-						altAmount = NSLocalizedString("Total amount exceeds your balance", comment: "error message")
-					}
 				}
 			}
 			
 			if problem == nil,
 			   let msat = msat,
-			   let range = priceRange() ?? swapOutRange()
+			   let range = priceRange()
 			{
 				let minMsat = range.min.msat
 				let maxMsat = range.max.msat
@@ -1386,24 +1405,20 @@ struct ValidateView: View {
 	func prepareTransaction() {
 		log.trace("prepareTransaction()")
 		
-		guard let msat = parsedAmountMsat() else {
-			return
-		}
-		
-		let amountSat = Int64(Utils.convertBitcoin(msat: msat, to: .sat))
-		
-		if let model = mvi.model as? Scan.Model_SwapOutFlow_Init {
-			mvi.intent(Scan.Intent_SwapOutFlow_Prepare(
-				address: model.address,
-				amount: Bitcoin_kmpSatoshi(sat: amountSat)
-			))
-		}
+	//	guard let msat = parsedAmountMsat() else {
+	//		return
+	//	}
+	//
+	//	let amountSat = Int64(Utils.convertBitcoin(msat: msat, to: .sat))
 	}
 	
 	func sendPayment() {
 		log.trace("sendPayment()")
 		
-		guard let msat = parsedAmountMsat() else {
+		guard
+			let msat = parsedAmountMsat(),
+			let trampolineFees = chainContext?.walletParams().trampolineFees.first
+		else {
 			return
 		}
 		
@@ -1420,18 +1435,7 @@ struct ValidateView: View {
 			mvi.intent(Scan.Intent_InvoiceFlow_SendInvoicePayment(
 				paymentRequest: model.paymentRequest,
 				amount: Lightning_kmpMilliSatoshi(msat: msat),
-				maxFees: Prefs.shared.maxFees?.toKotlin()
-			))
-			
-		} else if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
-			
-			saveTipPercentInPrefs()
-			mvi.intent(Scan.Intent_SwapOutFlow_Send(
-				amount: model.initialUserAmount.plus(other: model.fee),
-				swapOutFee: model.fee,
-				address: model.address,
-				paymentRequest: model.paymentRequest,
-				maxFees: Prefs.shared.maxFees?.toKotlin()
+				trampolineFees: trampolineFees
 			))
 			
 		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
@@ -1461,7 +1465,7 @@ struct ValidateView: View {
 				mvi.intent(Scan.Intent_LnurlPayFlow_RequestInvoice(
 					paymentIntent: model.paymentIntent,
 					amount: Lightning_kmpMilliSatoshi(msat: msat),
-					maxFees: Prefs.shared.maxFees?.toKotlin(),
+					trampolineFees: trampolineFees,
 					comment: comment
 				))
 			}
@@ -1475,18 +1479,6 @@ struct ValidateView: View {
 				description: nil
 			))
 		}
-	}
-	
-	func didCancelSwapOutRequest() {
-		log.trace("didCancelSwapOutRequest()")
-		
-		guard let model = mvi.model as? Scan.Model_SwapOutFlow_Requesting else {
-			return
-		}
-		
-		mvi.intent(Scan.Intent_SwapOutFlow_Invalidate(
-			address: model.address
-		))
 	}
 	
 	func didCancelLnurlPayFetch() {

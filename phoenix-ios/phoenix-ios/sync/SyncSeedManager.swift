@@ -45,7 +45,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	
 	/// The chain in use by PhoenixBusiness (e.g. Testnet)
 	///
-	private let chain: Chain
+	private let chain: Lightning_kmpNodeParams.Chain
 	
 	/// The 12-word seed phrase for the wallet.
 	///
@@ -76,7 +76,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	
 	private var cancellables = Set<AnyCancellable>()
 	
-	init(chain: Chain, mnemonics: [String], encryptedNodeId: String) {
+	init(chain: Lightning_kmpNodeParams.Chain, mnemonics: [String], encryptedNodeId: String) {
 		log.trace("init()")
 		
 		self.chain = chain
@@ -97,7 +97,9 @@ class SyncSeedManager: SyncManagerProtcol {
 	// MARK: Fetch Seeds
 	// ----------------------------------------
 	
-	public class func fetchSeeds(chain: Chain) -> PassthroughSubject<SeedBackup, FetchSeedsError> {
+	public class func fetchSeeds(
+		chain: Lightning_kmpNodeParams.Chain
+	) -> PassthroughSubject<SeedBackup, FetchSeedsError> {
 		
 		let publisher = PassthroughSubject<SeedBackup, FetchSeedsError>()
 		
@@ -173,21 +175,8 @@ class SyncSeedManager: SyncManagerProtcol {
 				}
 			}
 
-			if #available(iOS 15.0, *) {
-				operation.recordMatchedBlock = recordMatchedBlock
-				operation.queryResultBlock = queryResultBlock
-			} else {
-				operation.recordFetchedBlock = {(record: CKRecord) in
-					recordMatchedBlock(record.recordID, Result.success(record))
-				}
-				operation.queryCompletionBlock = {(cursor: CKQueryOperation.Cursor?, error: Error?) in
-					if let error = error {
-						queryResultBlock(.failure(error))
-					} else {
-						queryResultBlock(.success(cursor))
-					}
-				}
-			}
+			operation.recordMatchedBlock = recordMatchedBlock
+			operation.queryResultBlock = queryResultBlock
 		
 			let configuration = CKOperation.Configuration()
 			configuration.allowsCellularAccess = true
@@ -436,17 +425,7 @@ class SyncSeedManager: SyncManagerProtcol {
 			}
 		}
 		
-		if #available(iOS 15.0, *) {
-			operation.perRecordSaveBlock = perRecordSaveBlock
-		} else {
-			operation.perRecordCompletionBlock = {(record: CKRecord, error: Error?) -> Void in
-				if let error = error {
-					perRecordSaveBlock(record.recordID, Result.failure(error))
-				} else {
-					perRecordSaveBlock(record.recordID, Result.success(record))
-				}
-			}
-		}
+		operation.perRecordSaveBlock = perRecordSaveBlock
 		
 		let configuration = CKOperation.Configuration()
 		configuration.allowsCellularAccess = true
@@ -533,17 +512,7 @@ class SyncSeedManager: SyncManagerProtcol {
 			}
 		}
 		
-		if #available(iOS 15.0, *) {
-			operation.perRecordDeleteBlock = perRecordDeleteBlock
-		} else {
-			operation.modifyRecordsCompletionBlock = {(saved: [CKRecord]?, deleted: [CKRecord.ID]?, error: Error?) in
-				if let error = error {
-					perRecordDeleteBlock(recordID, Result.failure(error))
-				} else {
-					perRecordDeleteBlock(recordID, Result.success)
-				}
-			}
-		}
+		operation.perRecordDeleteBlock = perRecordDeleteBlock
 		
 		let configuration = CKOperation.Configuration()
 		configuration.allowsCellularAccess = true
@@ -556,7 +525,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	// MARK: Utilities
 	// ----------------------------------------
 	
-	private class func record_table_name(chain: Chain) -> String {
+	private class func record_table_name(chain: Lightning_kmpNodeParams.Chain) -> String {
 		
 		// From Apple's docs:
 		// > A record type must consist of one or more alphanumeric characters
@@ -603,16 +572,11 @@ class SyncSeedManager: SyncManagerProtcol {
 				
 				case CKError.notAuthenticated.rawValue:
 					isNotAuthenticated = true
+				
+				case CKError.accountTemporarilyUnavailable.rawValue:
+					isNotAuthenticated = true
 					
 				default: break
-			}
-			if #available(iOS 15.0, *) {
-				switch ckerror.errorCode {
-					case CKError.accountTemporarilyUnavailable.rawValue:
-						isNotAuthenticated = true
-					
-					default: break
-				}
 			}
 			
 			// Sometimes a `notAuthenticated` error is hidden in a partial error.
@@ -623,11 +587,8 @@ class SyncSeedManager: SyncManagerProtcol {
 					
 					if errCode == CKError.notAuthenticated.rawValue {
 						isNotAuthenticated = true
-					}
-					if #available(iOS 15.0, *) {
-						if errCode == CKError.accountTemporarilyUnavailable.rawValue {
-							isNotAuthenticated = true
-						}
+					} else if errCode == CKError.accountTemporarilyUnavailable.rawValue {
+						isNotAuthenticated = true
 					}
 				}
 			}

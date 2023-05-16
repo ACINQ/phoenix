@@ -226,11 +226,6 @@ extension EnvironmentValues {
 /// The real ControllerFactory gets injected via the GlobalEnvironment.
 ///
 class FakeControllerFactory: ControllerFactory {
-	
-	func channelsConfiguration()
-		-> MVIController<ChannelsConfiguration.Model, ChannelsConfiguration.Intent> {
-			fatalError("Missing @Environment: ControllerFactory")
-		}
 
 	func closeChannelsConfiguration() ->
 		MVIController<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent> {

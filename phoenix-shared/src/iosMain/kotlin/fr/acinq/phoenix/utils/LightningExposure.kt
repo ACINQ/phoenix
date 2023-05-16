@@ -33,7 +33,7 @@ fun IncomingPayment.Origin.asSwapIn(): IncomingPayment.Origin.SwapIn? = when (th
     else -> null
 }
 
-fun IncomingPayment.Origin.asOnchain(): IncomingPayment.Origin.OnChain? = when (this) {
+fun IncomingPayment.Origin.asOnChain(): IncomingPayment.Origin.OnChain? = when (this) {
     is IncomingPayment.Origin.OnChain -> this
     else -> null
 }
@@ -45,6 +45,11 @@ fun IncomingPayment.ReceivedWith.asLightningPayment(): IncomingPayment.ReceivedW
 
 fun IncomingPayment.ReceivedWith.asNewChannel(): IncomingPayment.ReceivedWith.NewChannel? = when (this) {
     is IncomingPayment.ReceivedWith.NewChannel -> this
+    else -> null
+}
+
+fun IncomingPayment.ReceivedWith.asSpliceIn(): IncomingPayment.ReceivedWith.SpliceIn? = when (this) {
+    is IncomingPayment.ReceivedWith.SpliceIn -> this
     else -> null
 }
 
@@ -60,11 +65,6 @@ fun LightningOutgoingPayment.Details.asKeySend(): LightningOutgoingPayment.Detai
 
 fun LightningOutgoingPayment.Details.asSwapOut(): LightningOutgoingPayment.Details.SwapOut? = when (this) {
     is LightningOutgoingPayment.Details.SwapOut -> this
-    else -> null
-}
-
-fun LightningOutgoingPayment.Details.asChannelClosing(): LightningOutgoingPayment.Details.ChannelClosing? = when (this) {
-    is LightningOutgoingPayment.Details.ChannelClosing -> this
     else -> null
 }
 
@@ -85,11 +85,6 @@ fun LightningOutgoingPayment.Status.asSucceeded(): LightningOutgoingPayment.Stat
 
 fun LightningOutgoingPayment.Status.asOffChain(): LightningOutgoingPayment.Status.Completed.Succeeded.OffChain? = when (this) {
     is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> this
-    else -> null
-}
-
-fun LightningOutgoingPayment.Status.asOnChain(): LightningOutgoingPayment.Status.Completed.Succeeded.OnChain? = when (this) {
-    is LightningOutgoingPayment.Status.Completed.Succeeded.OnChain -> this
     else -> null
 }
 

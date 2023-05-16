@@ -72,15 +72,11 @@ struct FiatCurrencySelector: View {
 				.assignMaxPreference(for: flagWidthReader.key, to: $flagWidth)
 			}
 			
-			if #available(iOS 15.0, *) {
-				content
-					.searchable(text: $searchText)
-					.onChange(of: searchText) { _ in
-						searchTextDidChange()
-					}
-			} else {
-				content
-			}
+			content
+				.searchable(text: $searchText)
+				.onChange(of: searchText) { _ in
+					searchTextDidChange()
+				}
 		}
 		.navigationTitle(NSLocalizedString("Fiat currency", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)

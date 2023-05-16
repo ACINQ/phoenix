@@ -19,6 +19,28 @@ extension BalanceManager {
 			return WalletBalance.companion.empty()
 		}
 	}
+	
+	func finalWalletBalance() -> WalletBalance {
+		if let wallet = finalWallet.value_ as? Lightning_kmpWalletState {
+			return WalletBalance(
+				confirmed: wallet.confirmedBalance,
+				unconfirmed: wallet.unconfirmedBalance
+			)
+		} else {
+			return WalletBalance.companion.empty()
+		}
+	}
+}
+
+extension WalletManager {
+	
+	func getKeyManager() -> Lightning_kmpLocalKeyManager? {
+		if let value = keyManager.value_ as? Lightning_kmpLocalKeyManager {
+			return value
+		} else {
+			return nil
+		}
+	}
 }
 
 extension Lightning_kmpConnection {

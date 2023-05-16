@@ -88,79 +88,48 @@ struct IntroView1: View, ViewName {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			GeometryReader { geometry in
-				ScrollView(.vertical) {
-					content()
-						.frame(width: geometry.size.width)
-						.frame(minHeight: geometry.size.height)
-				}
-			}
+			Spacer()
 			
-			button()
-		}
-		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
-	}
-	
-	@ViewBuilder
-	func content() -> some View {
-		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			Image("intro_btc")
+				.resizable()
+				.scaledToFit()
+				.frame(maxWidth: 250, maxHeight: 250)
+			
+			Spacer()
 			
 			Text("Welcome!")
 				.font(.title)
 				.multilineTextAlignment(.center)
 				.accessibilityAddTraits(.isHeader)
 			
-			VStack(alignment: HorizontalAlignment.center, spacing: 25) {
-				
-				Text("With Phoenix, receiving and sending bitcoin is safe, easy, and fast.")
-			}
-			.multilineTextAlignment(.center)
-			.padding(.top, 30)
-			.padding(.horizontal, 20) // 20+20=40
-			.padding(.bottom, 40)
+			Text("With Phoenix, sending and receiving bitcoins is easy and safe.")
+				.multilineTextAlignment(.center)
+				.padding(.vertical, 30)
 			
-			if !deviceInfo.isShortHeight {
-				Spacer().frame(height: 40) // move center upwards (for tall devices)
+			Button {
+				advance()
+			} label: {
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
+					Text("Next")
+					Image(systemName: "arrow.forward")
+						.imageScale(.medium)
+				}
+				.font(.title3)
+				.frame(maxWidth: .infinity)
+				.padding(.vertical, 8)
 			}
+			.buttonStyle(.borderedProminent)
+			.buttonBorderShape(.capsule)
+			.padding(.bottom)
 		}
+		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 		.padding(.horizontal)
-	}
-	
-	@ViewBuilder
-	func button() -> some View {
-			
-		Button {
-			advance()
-		} label: {
-			HStack(alignment: VerticalAlignment.center, spacing: 4) {
-				Text("Next")
-				Image(systemName: "arrow.forward")
-					.imageScale(.medium)
-			}
-			.foregroundColor(Color.white)
-			.frame(maxWidth: .infinity)
-			.padding([.top, .bottom], 8)
-			.padding([.leading, .trailing], 16)
-		}
-		.buttonStyle(
-			ScaleButtonStyle(
-				cornerRadius: 100,
-				backgroundFill: Color.appAccent
-			)
-		)
-		.padding()
 	}
 }
 
 struct IntroView2: View, ViewName {
 	
 	let advance: () -> Void
-	
-	@State var payToOpen_feePercent: Double = 0.0
-	@State var payToOpen_minFeeSat: Int64 = 0
-	
-	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	
@@ -169,105 +138,42 @@ struct IntroView2: View, ViewName {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			GeometryReader { geometry in
-				ScrollView(.vertical) {
-					content()
-						.frame(width: geometry.size.width)
-						.frame(minHeight: geometry.size.height)
-				}
-			}
+			Spacer()
 			
-			button()
-		}
-		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
-	}
-	
-	@ViewBuilder
-	func content() -> some View {
-		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			Image("intro_ln")
+				.resizable()
+				.scaledToFit()
+				.frame(maxWidth: 250, maxHeight: 250)
 			
-			Text("Automatic Channel Creation")
+			Spacer()
+			
+			Text("Bitcoin supercharged")
 				.font(.title)
 				.multilineTextAlignment(.center)
 				.accessibilityAddTraits(.isHeader)
 			
-			VStack(alignment: HorizontalAlignment.center, spacing: 25) {
-				
-				Text("Payment channels are automatically created when needed.")
-				
-				let percent = formatFeePercent()
-				let min = Utils.formatBitcoin(sat: payToOpen_minFeeSat, bitcoinUnit: .sat)
-				
-				Text(styled: String(format: NSLocalizedString(
-					"The fee is **%@%%** with a minimum fee of **%@**.",
-					comment: "IntroView"),
-					percent, min.string
-				))
-				
-				Text(
-					"""
-					This fee only applies when a new channel needs to be created. \
-					Payments that use existing channels don't pay this fee. \
-					The fee is dynamic and may change depending on bitcoin network conditions.
-					"""
-				)
-				.font(.footnote)
-			}
-			.multilineTextAlignment(.center)
-			.padding(.top, 30)
-			.padding(.horizontal, 20) // 20+20=40
-			.padding(.bottom, 40)
+			Text("Phoenix uses payment channels to make Bitcoin fast and private.")
+				.multilineTextAlignment(.center)
+				.padding(.vertical, 30)
 			
-			if !deviceInfo.isShortHeight {
-				Spacer().frame(height: 40) // move center upwards (for tall devices)
+			Button {
+				advance()
+			} label: {
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
+					Text("Next")
+					Image(systemName: "arrow.forward")
+						.imageScale(.medium)
+				}
+				.font(.title3)
+				.frame(maxWidth: .infinity)
+				.padding(.vertical, 8)
 			}
+			.buttonStyle(.borderedProminent)
+			.buttonBorderShape(.capsule)
+			.padding(.bottom)
 		}
+		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 		.padding(.horizontal)
-		.onReceive(chainContextPublisher) {
-			chainContextChanged($0)
-		}
-	}
-	
-	@ViewBuilder
-	func button() -> some View {
-		
-		Button {
-			advance()
-		} label: {
-			HStack(alignment: VerticalAlignment.center, spacing: 4) {
-				Text("I understand")
-				Image(systemName: "arrow.forward")
-					.imageScale(.medium)
-			}
-			.foregroundColor(Color.white)
-			.frame(maxWidth: .infinity)
-			.padding([.top, .bottom], 8)
-			.padding([.leading, .trailing], 16)
-		}
-		.buttonStyle(
-			ScaleButtonStyle(
-				cornerRadius: 100,
-				backgroundFill: Color.appAccent
-			)
-		)
-		.padding()
-	}
-	
-	func formatFeePercent() -> String {
-		
-		let formatter = NumberFormatter()
-		formatter.minimumFractionDigits = 0
-		formatter.maximumFractionDigits = 3
-		
-		return formatter.string(from: NSNumber(value: payToOpen_feePercent))!
-	}
-	
-	func chainContextChanged(_ context: WalletContext.V0ChainContext) {
-		log.trace("[\(viewName)] chainContextChanged()")
-		
-		payToOpen_feePercent = context.payToOpen.v1.feePercent * 100 // 0.01 => 1%
-		payToOpen_minFeeSat = context.payToOpen.v1.minFeeSat
 	}
 }
 
@@ -282,69 +188,47 @@ struct IntroView3: View, ViewName {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			GeometryReader { geometry in
-				ScrollView(.vertical) {
-					content()
-						.frame(width: geometry.size.width)
-						.frame(minHeight: geometry.size.height)
-				}
-			}
+			Spacer()
 			
-			button()
-		}
-		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
-	}
-	
-	@ViewBuilder
-	func content() -> some View {
-		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			Image("intro_cust")
+				.resizable()
+				.scaledToFit()
+				.frame(maxWidth: 250, maxHeight: 250)
 			
-			Text("Keep Control")
+			Spacer()
+			
+			Text("Your key, your bitcoins")
 				.font(.title)
 				.multilineTextAlignment(.center)
 				.accessibilityAddTraits(.isHeader)
 			
-			VStack(alignment: HorizontalAlignment.center, spacing: 25) {
-				
-				Text("A backup phrase is generated, storing all the information needed to restore your Bitcoin funds.")
-				
-				Text("Keep it safe and secret!")
-			}
-			.multilineTextAlignment(.center)
-			.padding(.top, 30)
-			.padding(.horizontal, 20) // 20+20=40
-			.padding(.bottom, 40)
+			Text("Phoenix is self-custodial. You take control.")
+				.multilineTextAlignment(.center)
+				.padding(.top, 30)
+				.padding(.bottom, 15)
 			
-			if !deviceInfo.isShortHeight {
-				Spacer().frame(height: 40) // move center upwards (for tall devices)
+			Text("You can restore your wallet at anytime using your secret key. Keep it safe!")
+				.multilineTextAlignment(.center)
+				.padding(.top, 15)
+				.padding(.bottom, 30)
+			
+			Button {
+				finish()
+			} label: {
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
+					Text("Get started")
+					Image(systemName: "bolt.fill")
+						.imageScale(.medium)
+				}
+				.font(.title3)
+				.frame(maxWidth: .infinity)
+				.padding(.vertical, 8)
 			}
+			.buttonStyle(.borderedProminent)
+			.buttonBorderShape(.capsule)
+			.padding(.bottom)
 		}
+		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
 		.padding(.horizontal)
-	}
-	
-	@ViewBuilder
-	func button() -> some View {
-		
-		Button {
-			finish()
-		} label: {
-			HStack(alignment: VerticalAlignment.center, spacing: 4) {
-				Text("Get started")
-				Image(systemName: "bolt.fill")
-					.imageScale(.medium)
-			}
-			.foregroundColor(Color.white)
-			.frame(maxWidth: .infinity)
-			.padding([.top, .bottom], 8)
-			.padding([.leading, .trailing], 16)
-		}
-		.buttonStyle(
-			ScaleButtonStyle(
-				cornerRadius: 100,
-				backgroundFill: Color.appAccent
-			)
-		)
-		.padding()
 	}
 }

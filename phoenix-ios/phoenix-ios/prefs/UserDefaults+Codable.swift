@@ -90,6 +90,31 @@ struct ElectrumConfigPrefs: Equatable, Codable {
 
 }
 
+struct LiquidityPolicy: Equatable, Codable {
+	let maxFeeSats: Int64?
+	let maxFeeBasisPoints: Int32?
+	
+	static func emptyPolicy() -> LiquidityPolicy {
+		return LiquidityPolicy(
+			maxFeeSats: nil,
+			maxFeeBasisPoints: nil
+		)
+	}
+	
+	func toKotlin() -> Lightning_kmpLiquidityPolicy {
+		
+		let dlp = NodeParamsManager.companion.defaultLiquidityPolicy
+		
+		let sats = maxFeeSats ?? dlp.maxAbsoluteFee.sat
+		let basisPoints = maxFeeBasisPoints ?? dlp.maxRelativeFeeBasisPoints
+		
+		return Lightning_kmpLiquidityPolicy.Auto(
+			maxAbsoluteFee: Bitcoin_kmpSatoshi(sat: sats),
+			maxRelativeFeeBasisPoints: basisPoints
+		)
+	}
+}
+
 struct MaxFees: Equatable, Codable {
 	let feeBaseSat: Int64
 	let feeProportionalMillionths: Int64

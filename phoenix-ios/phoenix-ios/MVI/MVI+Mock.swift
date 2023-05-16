@@ -3,9 +3,6 @@ import PhoenixShared
 
 
 extension View {
-	func mock(_ mock: ChannelsConfiguration.Model) -> some View {
-		environment(\.controllerFactory, MockControllerFactory(mock))
-	}
 	func mock(_ mock: CloseChannelsConfiguration.Model) -> some View {
 		environment(\.controllerFactory, MockControllerFactory(mock))
 	}
@@ -41,18 +38,6 @@ extension View {
 class MockControllerFactory : ControllerFactory {
 	
 	let base: ControllerFactory = Biz.business.controllers
-	
-	var mock_channelsConfiguration: ChannelsConfiguration.Model? = nil
-	init(_ mock: ChannelsConfiguration.Model) {
-		mock_channelsConfiguration = mock
-	}
-	func channelsConfiguration() -> MVIController<ChannelsConfiguration.Model, ChannelsConfiguration.Intent> {
-		if let mock = mock_channelsConfiguration {
-			return MVIControllerMock(model: mock)
-		} else {
-			return base.channelsConfiguration()
-		}
-	}
 	
 	var mock_closeChannelsConfiguration: CloseChannelsConfiguration.Model? = nil
 	init(_ mock: CloseChannelsConfiguration.Model) {

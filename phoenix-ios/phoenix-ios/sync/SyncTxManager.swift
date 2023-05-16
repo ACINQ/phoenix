@@ -419,18 +419,18 @@ class SyncTxManager {
 			recordZoneIDsToDelete: nil
 		)
 		
-		operation.modifyRecordZonesCompletionBlock =
-		{ (added: [CKRecordZone]?, deleted: [CKRecordZone.ID]?, error: Error?) in
+		operation.modifyRecordZonesResultBlock = {(result: Result<Void, Error>) in
 			
-			log.trace("operation.modifyRecordZonesCompletionBlock()")
+			log.trace("operation.modifyRecordZonesResultBlock()")
 			
-			if let error = error {
-				log.error("Error creating CKRecordZone: \(String(describing: error))")
-				finish(.failure(error))
-				
-			} else {
+			switch result {
+			case .success(_):
 				log.error("Success creating CKRecordZone")
 				finish(.success)
+				
+			case .failure(let error):
+				log.error("Error creating CKRecordZone: \(String(describing: error))")
+				finish(.failure(error))
 			}
 		}
 		
@@ -482,20 +482,20 @@ class SyncTxManager {
 				recordZoneIDsToDelete: [recordZone.zoneID]
 			)
 			
-			operation.modifyRecordZonesCompletionBlock =
-			{ (added: [CKRecordZone]?, deleted: [CKRecordZone.ID]?, error: Error?) in
+			operation.modifyRecordZonesResultBlock = {(result: Result<Void, Error>) in
 				
-				log.trace("operation.modifyRecordZonesCompletionBlock()")
+				log.trace("operation.modifyRecordZonesResultBlock()")
 				
-				if let error = error {
-					log.error("Error deleting CKRecordZone: \(String(describing: error))")
-					finish(.failure(error))
-					
-				} else {
+				switch result {
+				case .success(_):
 					log.error("Success deleting CKRecordZone")
 					DispatchQueue.main.async {
 						step2()
 					}
+					
+				case .failure(let error):
+					log.error("Error deleting CKRecordZone: \(String(describing: error))")
+					finish(.failure(error))
 				}
 			}
 			
@@ -677,30 +677,34 @@ class SyncTxManager {
 				default : operation.resultsLimit = 8
 			}
 			
-			operation.recordFetchedBlock = { (record: CKRecord) in
+			operation.recordMatchedBlock = {(recordID: CKRecord.ID, result: Result<CKRecord, Error>) in
 				
-				let (payment, metadata, unpaddedSize) = self.decryptAndDeserializePayment(record)
-				if let payment = payment {
-					items.append(DownloadedItem(
-						record: record,
-						unpaddedSize: unpaddedSize,
-						payment: payment,
-						metadata: metadata
-					))
+				if let record = try? result.get() {
+					
+					let (payment, metadata, unpaddedSize) = self.decryptAndDeserializePayment(record)
+					if let payment = payment {
+						items.append(DownloadedItem(
+							record: record,
+							unpaddedSize: unpaddedSize,
+							payment: payment,
+							metadata: metadata
+						))
+					}
 				}
 			}
 			
-			operation.queryCompletionBlock = { (cursor: CKQueryOperation.Cursor?, error: Error?) in
+			operation.queryResultBlock = {(result: Result<CKQueryOperation.Cursor?, Error>) in
 				
-				if let error = error {
-					log.debug("downloadPayments(): performBatchFetch(): error: \(String(describing: error))")
-					finish(.failure(error))
-					
-				} else {
+				switch result {
+				case .success(let cursor):
 					log.debug("downloadPayments(): performBatchFetch(): complete")
 					DispatchQueue.main.async {
 						updateDatabase(items, cursor, batch)
 					}
+					
+				case .failure(let error):
+					log.debug("downloadPayments(): performBatchFetch(): error: \(String(describing: error))")
+					finish(.failure(error))
 				}
 			}
 			
@@ -821,7 +825,7 @@ class SyncTxManager {
 	private func uploadPayments(_ uploadProgress: SyncTxManager_State_Uploading) {
 		log.trace("uploadPayments()")
 		
-		let finish = { (result: Result<Void, Error>) in
+		let finish = { (result: Result<Void, Error>) -> Void in
 			
 			switch result {
 			case .success:
@@ -837,6 +841,28 @@ class SyncTxManager {
 			case .failure(let error):
 				log.trace("uploadPayments(): finish(): failure")
 				self.handleError(error)
+			}
+		}
+		
+		let finish_nothingToUpload = { (result: Result<Void, Error>) -> Void in
+			
+			// The fetchQueueCountPublisher isn't firing reliably, and I'm not sure why...
+			//
+			// This can lead to the following infinite loop:
+			// - fetchQueueCountPublisher fires and reports a non-zero count
+			// - the actor.queueCount is updated
+			// - the uploadTask is evetually triggered
+			// - the item(s) are properly uploaded, and the rows are deleted from the queue
+			// - fetchQueueCountPublisher does NOT properly fire
+			// - the uploadTask is triggered again
+			// - it finds zero rows to upload, but actor.queueCount remains unchanged
+			// - the uploadTask is triggered again
+			// - ...
+			Task {
+				if let newState = await self.actor.queueCountChanged(0, wait: nil) {
+					self.handleNewState(newState)
+				}
+				finish(result)
 			}
 		}
 		
@@ -872,7 +898,7 @@ class SyncTxManager {
 					
 					if batch.rowids.count == 0 {
 						// There's nothing queued for upload, so we're done.
-						finish(.success)
+						finish_nothingToUpload(.success)
 					} else {
 						// Perform serialization & encryption on a background thread.
 						DispatchQueue.global(qos: .utility).async {
@@ -1005,47 +1031,60 @@ class SyncTxManager {
 			
 			uploadProgress.setInFlight(count: inFlightCount, progress: parentProgress)
 			
-			operation.modifyRecordsCompletionBlock = {
-				(savedRecords: [CKRecord]?, deletedRecordIds: [CKRecord.ID]?, error: Error?) -> Void in
+			var savedRecords: [CKRecord] = []
+			var deletedRecordIds: [CKRecord.ID] = []
+			
+			operation.perRecordSaveBlock = {(recordID: CKRecord.ID, result: Result<CKRecord, Error>) in
+				if case .success(let record) = result {
+					savedRecords.append(record)
+				}
+			}
+			
+			operation.perRecordDeleteBlock = {(recordID: CKRecord.ID, result: Result<Void, Error>) in
+				if case .success(_) = result {
+					deletedRecordIds.append(recordID)
+				}
+			}
+			
+			operation.modifyRecordsResultBlock = {(result: Result<Void, Error>) in
 				
 				log.trace("operation.modifyRecordsCompletionBlock()")
 				
 				var partialFailure: CKError? = nil
-				
-				if let ckerror = error as? CKError,
-				   ckerror.errorCode == CKError.partialFailure.rawValue
-				{
-					// If we receive a partial error, it's because we've already uploaded these items before.
-					// We need to handle this case differently.
-					partialFailure = ckerror
-				}
-				
-				if let error = error, partialFailure == nil {
-					log.error("Error modifying records: \(String(describing: error))")
-					finish(.failure(error))
+				if case .failure(let error) = result {
 					
-				} else {
-					
-					var nextOpInfo = opInfo
-					nextOpInfo.savedRecords = savedRecords ?? []
-					nextOpInfo.deletedRecordIds = deletedRecordIds ?? []
-					
-					if let partialFailure = partialFailure {
-						// Not every payment in the batch was successful.
-						// We may have to fetch metadata & redo some operations.
-						handlePartialError(nextOpInfo, partialFailure)
+					if let ckerror = error as? CKError, ckerror.errorCode == CKError.partialFailure.rawValue {
+						
+						// If we receive a partial error, it's because we've already uploaded these items before.
+						// We need to handle this case differently.
+						partialFailure = ckerror
 						
 					} else {
-						// Every payment in the batch was successful.
-						parentProgress.completedUnitCount = parentProgress.totalUnitCount
-						for (_, paymentRowId) in opInfo.reverseMap {
-							for rowid in opInfo.batch.rowidsMatching(paymentRowId) {
-								nextOpInfo.completedRowids.append(rowid)
-							}
+						
+						log.error("Error modifying records: \(String(describing: error))")
+						return finish(.failure(error))
+					}
+				}
+				
+				var nextOpInfo = opInfo
+				nextOpInfo.savedRecords = savedRecords
+				nextOpInfo.deletedRecordIds = deletedRecordIds
+				
+				if let partialFailure = partialFailure {
+					// Not every payment in the batch was successful.
+					// We may have to fetch metadata & redo some operations.
+					handlePartialError(nextOpInfo, partialFailure)
+					
+				} else {
+					// Every payment in the batch was successful.
+					parentProgress.completedUnitCount = parentProgress.totalUnitCount
+					for (_, paymentRowId) in opInfo.reverseMap {
+						for rowid in opInfo.batch.rowidsMatching(paymentRowId) {
+							nextOpInfo.completedRowids.append(rowid)
 						}
-						DispatchQueue.main.async {
-							updateDatabase(nextOpInfo)
-						}
+					}
+					DispatchQueue.main.async {
+						updateDatabase(nextOpInfo)
 					}
 				}
 			}
@@ -1103,11 +1142,8 @@ class SyncTxManager {
 						if let recordError = value as? CKError {
 							if recordError.errorCode == CKError.serverRecordChanged.rawValue {
 								recordIDsToFetch.append(recordID)
-							}
-							if #available(iOS 15.0, *) {
-								if recordError.errorCode == CKError.accountTemporarilyUnavailable.rawValue {
-									isAccountFailure = true
-								}
+							} else if recordError.errorCode == CKError.accountTemporarilyUnavailable.rawValue {
+								isAccountFailure = true
 							}
 						}
 					}
@@ -1129,29 +1165,35 @@ class SyncTxManager {
 			
 			let operation = CKFetchRecordsOperation(recordIDs: recordIDsToFetch)
 			
-			operation.fetchRecordsCompletionBlock = { (results: [CKRecord.ID : CKRecord]?, error: Error?) in
+			var fetchedRecords: [CKRecord] = []
+			operation.perRecordResultBlock = {(recordID: CKRecord.ID, result: Result<CKRecord, Error>) in
 				
-				log.trace("operation.fetchRecordsCompletionBlock()")
+				if case .success(let record) = result {
+					fetchedRecords.append(record)
+				}
+			}
+			
+			operation.fetchRecordsResultBlock = {(result: Result<Void, Error>) in
 				
-				if let error = error {
-					log.debug("Error fetching records: \(String(describing: error))")
-					finish(.failure(error))
+				log.trace("operation.fetchRecordsResultBlock()")
+				
+				switch result {
+				case .success(_):
+					log.debug("fetchedRecords.count = \(fetchedRecords.count)")
 					
-				} else {
-					log.debug("results.count = \(results?.count ?? 0)")
-					
-					for (_, record) in (results ?? [:]) {
-						
-						// We successfully fetched the latest CKRecord from the server.
-						// We add to nextOpInfo.savedRecords, which will write the CKRecord to the database.
-						// So on the next upload attempt, we should have the latest version.
-						//
-						nextOpInfo.savedRecords.append(record)
-					}
+					// We successfully fetched the latest CKRecord(s) from the server.
+					// We add to nextOpInfo.savedRecords, which will write the CKRecord to the database.
+					// So on the next upload attempt, we should have the latest version.
+					//
+					nextOpInfo.savedRecords.append(contentsOf: fetchedRecords)
 					
 					DispatchQueue.main.async {
 						updateDatabase(nextOpInfo)
 					}
+					
+				case .failure(let error):
+					log.debug("Error fetching records: \(String(describing: error))")
+					finish(.failure(error))
 				}
 			}
 			
@@ -1274,30 +1316,36 @@ class SyncTxManager {
 	private func recursiveListBatch(operation: CKQueryOperation) -> Void {
 		log.trace("recursiveListBatch()")
 		
-		operation.recordFetchedBlock = { (record: CKRecord) in
+		operation.recordMatchedBlock = {(recordID: CKRecord.ID, result: Result<CKRecord, Error>) in
 			
-			log.debug("Received record:")
-			log.debug(" - recordID: \(record.recordID)")
-			log.debug(" - creationDate: \(record.creationDate ?? Date.distantPast)")
-			
-			if let data = record[record_column_data] as? Data {
-				log.debug(" - data.count: \(data.count)")
-			} else {
-				log.debug(" - data: ?")
+			if let record = try? result.get() {
+				
+				log.debug("Received record:")
+				log.debug(" - recordID: \(record.recordID)")
+				log.debug(" - creationDate: \(record.creationDate ?? Date.distantPast)")
+				
+				if let data = record[record_column_data] as? Data {
+					log.debug(" - data.count: \(data.count)")
+				} else {
+					log.debug(" - data: ?")
+				}
 			}
 		}
 		
-		operation.queryCompletionBlock = { (cursor: CKQueryOperation.Cursor?, error: Error?) in
+		operation.queryResultBlock = {(result: Result<CKQueryOperation.Cursor?, Error>) in
 			
-			if let error = error {
+			switch result {
+			case .success(let cursor):
+				if let cursor = cursor {
+					log.debug("Fetch batch complete. Continuing with cursor...")
+					self.recursiveListBatch(operation: CKQueryOperation(cursor: cursor))
+					
+				} else {
+					log.debug("Fetch batch complete.")
+				}
+				
+			case .failure(let error):
 				log.debug("Error fetching batch: \(String(describing: error))")
-				
-			} else if let cursor = cursor {
-				log.debug("Fetch batch complete. Continuing with cursor...")
-				self.recursiveListBatch(operation: CKQueryOperation(cursor: cursor))
-				
-			} else {
-				log.debug("Fetch batch complete.")
 			}
 		}
 		
@@ -1790,19 +1838,14 @@ class SyncTxManager {
 				case CKError.notAuthenticated.rawValue:
 					isNotAuthenticated = true
 			
+				case CKError.accountTemporarilyUnavailable.rawValue:
+					isNotAuthenticated = true
+				
 				case CKError.userDeletedZone.rawValue: fallthrough
 				case CKError.zoneNotFound.rawValue:
 					isZoneNotFound = true
 				
 				default: break
-			}
-			if #available(iOS 15.0, *) {
-				switch ckerror.errorCode {
-					case CKError.accountTemporarilyUnavailable.rawValue:
-						isNotAuthenticated = true
-					
-					default: break
-				}
 			}
 			
 			// Sometimes a `notAuthenticated` error is hidden in a partial error.
@@ -1813,11 +1856,8 @@ class SyncTxManager {
 					
 					if errCode == CKError.notAuthenticated.rawValue {
 						isNotAuthenticated = true
-					}
-					if #available(iOS 15.0, *) {
-						if errCode == CKError.accountTemporarilyUnavailable.rawValue {
-							isNotAuthenticated = true
-						}
+					} else if errCode == CKError.accountTemporarilyUnavailable.rawValue {
+						isNotAuthenticated = true
 					}
 				}
 			}

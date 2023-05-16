@@ -78,15 +78,7 @@ class TLSConnectionCheck {
 				// - a parent cert in the chain is self-signed
 				// - [... very long list of possible reasons ...]
 				
-				let certs: [SecCertificate]
-				if #available(iOS 15, macOS 12, tvOS 15, watchOS 8, *) {
-					certs = SecTrustCopyCertificateChain(sec_trust) as? [SecCertificate] ?? []
-					
-				} else {
-					certs = (0 ..< SecTrustGetCertificateCount(sec_trust)).compactMap { index in
-						SecTrustGetCertificateAtIndex(sec_trust, index)
-					}
-				}
+				let certs = SecTrustCopyCertificateChain(sec_trust) as? [SecCertificate] ?? []
 				untrustedCert = certs.first
 			}
 			

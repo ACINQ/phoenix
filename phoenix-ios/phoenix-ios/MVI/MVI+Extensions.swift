@@ -25,7 +25,7 @@ extension MVIState where Model: CloseChannelsConfiguration.Model, Intent: CloseC
 		// For this reason, there could be a small difference.
 		
 		if let channels = channels() {
-			return channels.map { $0.balance }.reduce(0, +)
+			return channels.map { $0.balance?.sat ?? 0 }.reduce(0, +)
 		} else {
 			return 0
 		}
