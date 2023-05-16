@@ -151,18 +151,12 @@ private fun PaymentStatus(
                 PaymentStatusIcon(
                     message = {
                         Text(text = stringResource(id = R.string.paymentdetails_status_unconfirmed))
-//                        closingDepth?.let { minDepth ->
-//                            Text(
-//                                text = stringResource(id = R.string.paymentdetails_status_unconfirmed_details, minDepth, 10 * minDepth),
-//                                style = MaterialTheme.typography.caption
-//                            )
-//                        }
                     },
                     imageResId = R.drawable.ic_payment_details_pending_onchain_static,
                     isAnimated = false,
                     color = mutedTextColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, onCpfpSuccess)
             }
             else -> {
                 PaymentStatusIcon(
@@ -173,7 +167,7 @@ private fun PaymentStatus(
                     isAnimated = fromEvent,
                     color = positiveColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, onCpfpSuccess)
             }
         }
         is SpliceOutgoingPayment -> when (payment.confirmedAt) {
@@ -184,7 +178,7 @@ private fun PaymentStatus(
                     isAnimated = false,
                     color = mutedTextColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, onCpfpSuccess)
             }
             else -> {
                 PaymentStatusIcon(
@@ -195,7 +189,7 @@ private fun PaymentStatus(
                     isAnimated = fromEvent,
                     color = positiveColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, onCpfpSuccess)
             }
         }
         is SpliceCpfpOutgoingPayment -> when (payment.confirmedAt) {
@@ -206,7 +200,7 @@ private fun PaymentStatus(
                     isAnimated = false,
                     color = mutedTextColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, onCpfpSuccess)
             }
             else -> {
                 PaymentStatusIcon(
@@ -217,7 +211,7 @@ private fun PaymentStatus(
                     isAnimated = fromEvent,
                     color = positiveColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, onCpfpSuccess)
             }
         }
         is IncomingPayment -> {
@@ -278,7 +272,7 @@ private fun PaymentStatus(
                         channelId?.let { peerManager.getChannelWithCommitments(it)?.minDepthForFunding(params) }
                     }
                 }
-                ConfirmationView(it.txId, it.channelId, onCpfpSuccess, channelMinDepth)
+                ConfirmationView(it.txId, it.channelId, isConfirmed = it.confirmedAt != null, onCpfpSuccess, channelMinDepth)
             }
         }
     }
@@ -489,6 +483,7 @@ private fun EditPaymentDetails(
 private fun ConfirmationView(
     txId: ByteVector32,
     channelId: ByteVector32,
+    isConfirmed: Boolean,
     onCpfpSuccess: () -> Unit,
     minDepth: Int? = null, // sometimes we know how many confirmations are needed
 ) {
@@ -496,42 +491,55 @@ private fun ConfirmationView(
     val context = LocalContext.current
     val electrumClient = business.electrumClient
     var showBumpTxDialog by remember { mutableStateOf(false) }
-    val confirmations by produceState<Int?>(initialValue = null) {
-        value = electrumClient.getConfirmations(txId)
-    }
 
-    confirmations?.let { conf ->
+    if (isConfirmed) {
         FilledButton(
-            text = when (minDepth) {
-                null -> stringResource(R.string.paymentdetails_status_confirmation_basic, conf)
-                else -> stringResource(R.string.paymentdetails_status_confirmation_basic, conf, minDepth)
-            },
-            icon = when (conf) {
-                0 -> R.drawable.ic_rocket
-                else -> R.drawable.ic_chain
-            },
-            onClick = {
-                if (conf == 0) {
-                    showBumpTxDialog = true
-                }  else {
-                    openLink(context, txUrl)
-                }
-            },
+            text = stringResource(id = R.string.paymentdetails_status_confirmed),
+            icon = R.drawable.ic_chain,
             backgroundColor = Color.Transparent,
             padding = PaddingValues(8.dp),
             textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp),
             iconTint = MaterialTheme.colors.primary,
-            space = 8.dp,
+            space = 6.dp,
+            onClick = { openLink(context, txUrl) }
         )
-        if (conf == 0 && showBumpTxDialog) {
-            BumpTransactionDialog(channelId = channelId, onSuccess = onCpfpSuccess, onDismiss = { showBumpTxDialog = false })
+    } else {
+        val confirmations by produceState<Int?>(initialValue = null) {
+            value = electrumClient.getConfirmations(txId)
         }
-    } ?: ProgressView(
-        text = stringResource(id = R.string.paymentdetails_status_unconfirmed_fetching),
-        textStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
-        padding = PaddingValues(8.dp),
-        progressCircleSize = 16.dp,
-    )
+        confirmations?.let { conf ->
+            FilledButton(
+                text = when (minDepth) {
+                    null -> stringResource(R.string.paymentdetails_status_unconfirmed_default, conf)
+                    else -> stringResource(R.string.paymentdetails_status_unconfirmed_with_depth, conf, minDepth)
+                },
+                icon = when (conf) {
+                    0 -> R.drawable.ic_rocket
+                    else -> R.drawable.ic_chain
+                },
+                onClick = {
+                    if (conf == 0) {
+                        showBumpTxDialog = true
+                    }  else {
+                        openLink(context, txUrl)
+                    }
+                },
+                backgroundColor = Color.Transparent,
+                padding = PaddingValues(8.dp),
+                textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp),
+                iconTint = MaterialTheme.colors.primary,
+                space = 6.dp,
+            )
+            if (conf == 0 && showBumpTxDialog) {
+                BumpTransactionDialog(channelId = channelId, onSuccess = onCpfpSuccess, onDismiss = { showBumpTxDialog = false })
+            }
+        } ?: ProgressView(
+            text = stringResource(id = R.string.paymentdetails_status_unconfirmed_fetching),
+            textStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
+            padding = PaddingValues(8.dp),
+            progressCircleSize = 16.dp,
+        )
+    }
 }
 
 @Composable

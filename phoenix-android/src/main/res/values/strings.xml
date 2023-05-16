@@ -385,8 +385,9 @@
 
     <string name="paymentdetails_status_unconfirmed">Waiting for confirmations</string>
     <string name="paymentdetails_status_unconfirmed_fetching">Fetching status…</string>
-    <string name="paymentdetails_status_confirmation_basic">%1$d confirmation(s)</string>
-    <string name="paymentdetails_status_confirmation_details">%1$d/%2$d confirmation(s)</string>
+    <string name="paymentdetails_status_unconfirmed_default">%1$d confirmation(s)</string>
+    <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d confirmation(s)</string>
+    <string name="paymentdetails_status_confirmed">Confirmed on-chain</string>
 
     <string name="paymentdetails_desc_label">Desc.</string>
     <string name="paymentdetails_desc_custom_title">Add note</string>
