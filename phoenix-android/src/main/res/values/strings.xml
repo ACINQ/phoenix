@@ -168,7 +168,7 @@
 
     <string name="send_spliceout_error_invalid_feerate">Please enter a valid feerate.</string>
     <string name="send_spliceout_error_cannot_afford_fees">Total exceeds your balance</string>
-    <string name="send_spliceout_error_failure">Payment failed</string>
+    <string name="send_spliceout_error_failure">Payment has failed</string>
 
     <string name="send_spliceout_prepare_button">Prepare transaction</string>
     <string name="send_spliceout_prepare_in_progress">Preparing transaction…</string>
@@ -848,6 +848,15 @@
     <string name="cpfp_feerate_label">Feerate</string>
     <string name="cpfp_feerate_value">%1$s sat/vbyte</string>
 
+    <string name="cpfp_prepare_button">Prepare payment</string>
+    <string name="cpfp_estimating">Estimating fees…</string>
+    <string name="cpfp_estimation">You will pay <b>%1$s</b> to the Bitcoin miners</string>
+    <string name="cpfp_execute_button">Execute payment</string>
+    <string name="cpfp_executing">Executing payment…</string>
+    <string name="cpfp_success">Payment complete</string>
+    <string name="cpfp_error_title">Payment has failed</string>
+
+    <!-- mempool -->
     <string name="mempool_unknown_feerate_title">Unknown mempool state</string>
     <string name="mempool_unknown_feerate_details">Phoenix was unable to retrieve the current state of the mempool and cannot estimate the speed of your transactions.\n\nCheck the mempool manually on an explorer, and use a adequate value!</string>
     <string name="mempool_fastest">≈ Next block</string>
@@ -856,25 +865,18 @@
     <string name="mempool_eco">More than 1 hour</string>
     <string name="mempool_slow">No priority</string>
 
-    <string name="cpfp_prepare_button">Prepare payment</string>
-    <string name="cpfp_estimating">Estimating fees…</string>
-    <string name="cpfp_estimation">You will pay <b>%1$s</b> to the Bitcoin miners</string>
-    <string name="cpfp_execute_button">Execute payment</string>
-    <string name="cpfp_executing">Executing payment…</string>
-    <string name="cpfp_success">Payment complete</string>
-
-    <string name="cpfp_error_title">Payment has failed</string>
-    <string name="cpfp_error_nochannels">You don\'t have any channels</string>
-    <string name="cpfp_error_aborted_by_peer">Aborted by peer [%1$s]</string>
-    <string name="cpfp_error_cannot_create_commit">Unable to create a new commitment</string>
-    <string name="cpfp_error_channel_not_idle">Channel is not available</string>
-    <string name="cpfp_error_disconnected">Channel is disconnected</string>
-    <string name="cpfp_error_funding_error">Funding has failed [%1$s]</string>
-    <string name="cpfp_error_insufficient_funds">Not enough funds</string>
-    <string name="cpfp_error_cannot_start_session">Cannot start transaction session with the peer</string>
-    <string name="cpfp_error_interactive_session">Interactive tx session failed [%1$s]</string>
-    <string name="cpfp_error_invalid_pubkey">Invalid splice-out pubkey script</string>
-    <string name="cpfp_error_splice_in_progress">A splice payment is already in progress</string>
+    <!-- splice errors -->
+    <string name="splice_error_nochannels">You don\'t have any channels</string>
+    <string name="splice_error_aborted_by_peer">Aborted by peer [%1$s]</string>
+    <string name="splice_error_cannot_create_commit">Unable to create a new commitment</string>
+    <string name="splice_error_channel_not_idle">Channel is not available</string>
+    <string name="splice_error_disconnected">Channel is disconnected</string>
+    <string name="splice_error_funding_error">Funding has failed [%1$s]</string>
+    <string name="splice_error_insufficient_funds">Not enough funds</string>
+    <string name="splice_error_cannot_start_session">Cannot start transaction session with the peer</string>
+    <string name="splice_error_interactive_session">Interactive tx session failed [%1$s]</string>
+    <string name="splice_error_invalid_pubkey">Invalid splice-out pubkey script</string>
+    <string name="splice_error_splice_in_progress">A splice payment is already in progress</string>
 
 
 </resources>

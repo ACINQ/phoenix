@@ -33,11 +33,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
+import fr.acinq.lightning.channel.Command
+import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.payments.cpfp.CpfpState
 import fr.acinq.phoenix.android.payments.spliceout.SpliceOutState
 import fr.acinq.phoenix.android.payments.spliceout.SpliceOutViewModel
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
@@ -92,6 +95,9 @@ fun SendSpliceOutView(
                             amountErrorMessage = context.getString(R.string.send_error_amount_below_requested,
                                 (requestedAmount).toMilliSatoshi().toPrettyString(prefBtcUnit, withUnit = true))
                         }
+                        newAmount <= 540.sat -> {
+                            amountErrorMessage = context.getString(R.string.validation_below_min, 546.sat.toPrettyString(BitcoinUnit.Sat, withUnit = true))
+                        }
                     }
                     amount = newAmount
                 },
@@ -126,7 +132,7 @@ fun SendSpliceOutView(
                 if (state is SpliceOutState.Error.Thrown) {
                     ErrorMessage(errorHeader = stringResource(id = R.string.send_spliceout_error_failure), errorDetails = state.e.localizedMessage, alignment = Alignment.CenterHorizontally)
                 } else if (state is SpliceOutState.Error.NoChannels) {
-                    ErrorMessage(errorHeader = "No channels available", errorDetails = "placeholder message", alignment = Alignment.CenterHorizontally)
+                    ErrorMessage(errorHeader = stringResource(id = R.string.send_spliceout_error_failure), errorDetails = stringResource(id = R.string.splice_error_nochannels), alignment = Alignment.CenterHorizontally)
                 }
                 BorderButton(
                     text = stringResource(id = R.string.send_spliceout_prepare_button),
@@ -184,7 +190,19 @@ fun SendSpliceOutView(
                 Spacer(modifier = Modifier.height(24.dp))
                 ErrorMessage(
                     errorHeader = stringResource(id = R.string.send_spliceout_error_failure),
-                    errorDetails = state.result::class.java.simpleName // TODO handle error
+                    errorDetails = when (state.result) {
+                        is Command.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, state.result.reason)
+                        is Command.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
+                        is Command.Splice.Response.Failure.ChannelNotIdle -> stringResource(id = R.string.splice_error_channel_not_idle)
+                        is Command.Splice.Response.Failure.Disconnected -> stringResource(id = R.string.splice_error_disconnected)
+                        is Command.Splice.Response.Failure.FundingFailure -> stringResource(id = R.string.splice_error_funding_error, state.result.reason.javaClass.simpleName)
+                        is Command.Splice.Response.Failure.InsufficientFunds -> stringResource(id = R.string.splice_error_insufficient_funds)
+                        is Command.Splice.Response.Failure.CannotStartSession -> stringResource(id = R.string.splice_error_cannot_start_session)
+                        is Command.Splice.Response.Failure.InteractiveTxSessionFailed -> stringResource(id = R.string.splice_error_interactive_session, state.result.reason.javaClass.simpleName)
+                        is Command.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> stringResource(id = R.string.splice_error_invalid_pubkey)
+                        is Command.Splice.Response.Failure.SpliceAlreadyInProgress -> stringResource(id = R.string.splice_error_splice_in_progress)
+                    },
+                    alignment = Alignment.CenterHorizontally
                 )
             }
         }

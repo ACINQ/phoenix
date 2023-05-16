@@ -116,29 +116,32 @@ fun CpfpView(
                 ErrorMessage(
                     errorHeader = stringResource(id = R.string.cpfp_error_title),
                     errorDetails = when (state.failure) {
-                        is Command.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.cpfp_error_aborted_by_peer, state.failure.reason)
-                        is Command.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.cpfp_error_cannot_create_commit)
-                        is Command.Splice.Response.Failure.ChannelNotIdle -> stringResource(id = R.string.cpfp_error_channel_not_idle)
-                        is Command.Splice.Response.Failure.Disconnected -> stringResource(id = R.string.cpfp_error_disconnected)
-                        is Command.Splice.Response.Failure.FundingFailure -> stringResource(id = R.string.cpfp_error_funding_error, state.failure.reason.javaClass.simpleName)
-                        is Command.Splice.Response.Failure.InsufficientFunds -> stringResource(id = R.string.cpfp_error_insufficient_funds)
-                        is Command.Splice.Response.Failure.CannotStartSession -> stringResource(id = R.string.cpfp_error_cannot_start_session)
-                        is Command.Splice.Response.Failure.InteractiveTxSessionFailed -> stringResource(id = R.string.cpfp_error_interactive_session, state.failure.reason.javaClass.simpleName)
-                        is Command.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> stringResource(id = R.string.cpfp_error_invalid_pubkey)
-                        is Command.Splice.Response.Failure.SpliceAlreadyInProgress -> stringResource(id = R.string.cpfp_error_splice_in_progress)
-                    }
+                        is Command.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, state.failure.reason)
+                        is Command.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
+                        is Command.Splice.Response.Failure.ChannelNotIdle -> stringResource(id = R.string.splice_error_channel_not_idle)
+                        is Command.Splice.Response.Failure.Disconnected -> stringResource(id = R.string.splice_error_disconnected)
+                        is Command.Splice.Response.Failure.FundingFailure -> stringResource(id = R.string.splice_error_funding_error, state.failure.reason.javaClass.simpleName)
+                        is Command.Splice.Response.Failure.InsufficientFunds -> stringResource(id = R.string.splice_error_insufficient_funds)
+                        is Command.Splice.Response.Failure.CannotStartSession -> stringResource(id = R.string.splice_error_cannot_start_session)
+                        is Command.Splice.Response.Failure.InteractiveTxSessionFailed -> stringResource(id = R.string.splice_error_interactive_session, state.failure.reason.javaClass.simpleName)
+                        is Command.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> stringResource(id = R.string.splice_error_invalid_pubkey)
+                        is Command.Splice.Response.Failure.SpliceAlreadyInProgress -> stringResource(id = R.string.splice_error_splice_in_progress)
+                    },
+                    alignment = Alignment.CenterHorizontally
                 )
             }
             is CpfpState.Error.NoChannels -> {
                 ErrorMessage(
                     errorHeader = stringResource(id = R.string.cpfp_error_title),
-                    errorDetails = stringResource(id = R.string.cpfp_error_nochannels)
+                    errorDetails = stringResource(id = R.string.splice_error_nochannels),
+                    alignment = Alignment.CenterHorizontally
                 )
             }
             is CpfpState.Error.Thrown -> {
                 ErrorMessage(
                     errorHeader = stringResource(id = R.string.cpfp_error_title),
-                    errorDetails = state.e.localizedMessage
+                    errorDetails = state.e.localizedMessage,
+                    alignment = Alignment.CenterHorizontally
                 )
             }
         }

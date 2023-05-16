@@ -87,7 +87,6 @@ fun HomeView(
     val scope = rememberCoroutineScope()
     val torEnabledState = UserPrefs.getIsTorEnabled(context).collectAsState(initial = null)
     val connectionsState by paymentsViewModel.connectionsFlow.collectAsState(null)
-    val walletContext = business.appConfigurationManager.chainContext.collectAsState()
     val balanceDisplayMode by UserPrefs.getHomeAmountDisplayMode(context).collectAsState(initial = null)
 
 
@@ -95,7 +94,6 @@ fun HomeView(
     var netwCaps by remember { mutableStateOf<NetworkCapabilities?>(null) }
 
     LaunchedEffect(key1 = Unit) {
-
         connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
@@ -154,7 +152,7 @@ fun HomeView(
                         .padding(horizontal = if (isAmountRedacted) 40.dp else 16.dp),
                     amount = balance,
                     amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 40.sp),
-                    unitTextStyle = MaterialTheme.typography.h3.copy(fontWeight = FontWeight.Light, color = mutedTextColor),
+                    unitTextStyle = MaterialTheme.typography.h3.copy(fontWeight = FontWeight.Light, color = MaterialTheme.colors.primary),
                     isRedacted = isAmountRedacted,
                     onClick = { context, inFiat ->
                         val mode = UserPrefs.getHomeAmountDisplayMode(context).firstOrNull()
@@ -261,17 +259,6 @@ fun TopBar(
                     padding = PaddingValues(8.dp)
                 )
             }
-        } else {
-            FilledButton(
-                text = "connected!",
-                icon = R.drawable.ic_check,
-                iconTint = positiveColor,
-                onClick = onConnectionsStateButtonClick,
-                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = LocalContentColor.current),
-                backgroundColor = mutedBgColor,
-                space = 8.dp,
-                padding = PaddingValues(8.dp)
-            )
         }
         Spacer(modifier = Modifier.weight(1f))
         FilledButton(
