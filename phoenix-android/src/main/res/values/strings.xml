@@ -733,7 +733,7 @@
     <string name="paymentsettings_liquidity_policy_auto">Automated (max %1$s)</string>
     <string name="paymentsettings_liquidity_policy_disabled">Disabled</string>
 
-    <string name="paymentsettings_trampoline_fees_title">Maximum fee for outgoing Lightning payments</string>
+    <string name="paymentsettings_trampoline_fees_title">Fee for outgoing Lightning payments</string>
     <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
     <string name="paymentsettings_trampoline_fees_dialog_override_default_checkbox">Override default fee for outgoing payments</string>
     <string name="paymentsettings_trampoline_fees_dialog_base_fee_label">Base fee (satoshi)</string>
