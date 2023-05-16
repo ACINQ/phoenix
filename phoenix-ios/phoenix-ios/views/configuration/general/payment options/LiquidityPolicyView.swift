@@ -236,18 +236,6 @@ struct LiquidityPolicyView: View {
 	}
 	
 	@ViewBuilder
-	func checkboxOnImage() -> some View {
-		Image(systemName: "checkmark.square.fill")
-			.imageScale(.large)
-	}
-		
-	@ViewBuilder
-	func checkboxOffImage() -> some View {
-		Image(systemName: "square")
-			.imageScale(.large)
-	}
-	
-	@ViewBuilder
 	func radioOnImage() -> some View {
 		Image(systemName: "record.circle")
 			.imageScale(.large)
@@ -287,17 +275,30 @@ struct LiquidityPolicyView: View {
 		let percent = Double(basisPoints) / Double(100)
 		return LiquidityPolicyView.formattedMaxFeePrcnt(percent: percent)
 	}
+	
+	func currentMaxFeeSats() -> Int64 {
+		
+		switch parsedMaxFeeAmt {
+			case .success(let number):
+				return number.int64Value
+			case .failure(_):
+				return defaultMaxFeeSats()
+		}
+	}
+	
+	func currentMaxFeeBasisPoints() -> Int32 {
+		
+		switch parsedMaxFeePrcnt {
+			case .success(let number):
+				return Int32(number.doubleValue * Double(100))
+			case .failure(_):
+				return defaultMaxFeeBasisPoints()
+		}
+	}
 					 
 	func currentFeeAmt() -> String {
 		
-		let sats: Int64
-		switch parsedMaxFeeAmt {
-		case .success(let number):
-			sats = number.int64Value
-		case .failure(_):
-			sats = defaultMaxFeeSats()
-		}
-		
+		let sats = currentMaxFeeSats()
 		return Utils.formatBitcoin(sat: sats, bitcoinUnit: .sat).string
 	}
 	
@@ -428,9 +429,19 @@ struct LiquidityPolicyView: View {
 	func onDisappear() {
 		log.trace("onDisappear()")
 		
-	//	let defaultSats = defaultMaxFeeSats()
-	//	let defaultBasisPoints = defaultMaxFeeBasisPoints()
+		let defaultSats = defaultMaxFeeSats()
+		let defaultBasisPoints = defaultMaxFeeBasisPoints()
 		
-		// Todo...
+		let currentSats = currentMaxFeeSats()
+		let currentBasisPoints = currentMaxFeeBasisPoints()
+		
+		let sats: Int64? = (currentSats == defaultSats) ? nil : currentSats
+		let basisPoints: Int32? = (currentBasisPoints == defaultBasisPoints) ? nil : currentBasisPoints
+		
+		log.info("updated.maxFeeSats: \(sats?.description ?? "nil")")
+		log.info("updated.maxFeeBasisPoints: \(basisPoints?.description ?? "nil")")
+				
+		let updated = LiquidityPolicy(maxFeeSats: sats, maxFeeBasisPoints: basisPoints)
+		Prefs.shared.liquidityPolicy = updated
 	}
 }

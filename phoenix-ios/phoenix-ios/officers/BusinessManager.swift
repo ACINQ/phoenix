@@ -158,6 +158,16 @@ class BusinessManager {
 			self.business.appConfigurationManager.updatePreferredFiatCurrencies(current: current)
 		}
 		.store(in: &cancellables)
+		
+		// Liquidity policy
+		Prefs.shared.liquidityPolicyPublisher.dropFirst().sink { (policy: LiquidityPolicy) in
+			
+		//	let foo = policy.toKotlin()
+		//	self.business.appConfigurationManager. ???
+		//
+		//	It's not possible to change the liquidity policy on-the-fly yet ?
+		}
+		.store(in: &cancellables)
 	}
 	
 	// --------------------------------------------------
