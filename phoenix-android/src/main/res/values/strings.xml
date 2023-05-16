@@ -826,25 +826,21 @@
     <string name="walletinfo_onchain_final_insight_balance">This wallet is the default closing address for your Lightning channels. If you force-close channels, funds will end up here.</string>
 
     <!-- settings: liquidity policy for channels creation -->
-    <string name="liquiditypolicy_title">Incoming liquidity policy</string>
-    <string name="liquiditypolicy_help">Incoming payments sometimes need more liquidity than you currently have in order to be received.\n\nThis incurs a fee. You can configure the fee policy in this screen, or even disable it completely.</string>
+    <string name="liquiditypolicy_title">Incoming fee policy</string>
+    <string name="liquiditypolicy_instructions">Incoming payments sometimes requires on-chain transactions. This does not always happen, only when needed.\n\nThose fees go to <b>bitcoin miners</b>, except for a 1000 sat service fee in the initial payment.</string>
+    <string name="liquiditypolicy_fees_header">Fees</string>
+    <string name="liquiditypolicy_fees_base_label">Max fee amount</string>
+    <string name="liquiditypolicy_fees_base_help">Incoming fees will never exceed that value whatsoever.</string>
+    <string name="liquiditypolicy_fees_prop_label">Tiny payments</string>
+    <string name="liquiditypolicy_fees_prop_help">To accept tiny payments that would otherwise be rejected.</string>
+    <string name="liquiditypolicy_modes_header">Lightning on-the-fly</string>
+    <string name="liquiditypolicy_modes_pay_to_open_label">Manual Lightning management</string>
+    <string name="liquiditypolicy_modes_pay_to_open_description">When enabled, incoming Lightning payments will be rejected when your liquidity is insufficient.\n\nDOES NOT DO ANYTHING YET</string>
+    <string name="liquiditypolicy_save_button">Save policy</string>
+
+    <string name="liquiditypolicy_help">Lorem ipsum dolor sit amet.</string>
     <string name="liquiditypolicy_help_link">Know more…</string>
     <string name="liquiditypolicy_loading">Retrieving policy…</string>
-
-    <string name="liquiditypolicy_auto_title">Max fee</string>
-    <string name="liquiditypolicy_auto_description">Incoming payments will be accepted as long as the fee is less than <b>%1$s</b>.\n\nThis fee does not always happen, only when needed, and goes to the Bitcoin miners.</string>
-
-    <string name="liquiditypolicy_trustless_title">Fully trustless</string>
-    <string name="liquiditypolicy_trustless_description">Same as above, payments are rejected when above the max.\n\nAdditionally, liquidity is not automated for Lightning payments. They will be rejected if liquidity is insufficient. On-chain deposits are preferred.</string>
-
-    <string name="liquiditypolicy_disabled">Disabled</string>
-    <string name="liquiditypolicy_disabled_description">Phoenix will NOT manage your liquidity automatically. Incoming payments will be rejected if you don\'t have enough liquidity.</string>
-
-    <string name="liquiditypolicy_fee_max">Max. %1$s</string>
-    <string name="liquiditypolicy_fee_sanity_check">Fee cap</string>
-    <string name="liquiditypolicy_fee_sanity_check_enabled">The fee cannot exceed %1$d%% of the amount received whatsoever.</string>
-    <string name="liquiditypolicy_fee_sanity_check_disabled">The fee is unchecked and could consume a significant part of the incoming amount.</string>
-
 
     <!-- CPFP splices -->
     <string name="cpfp_instructions">You can make all your unconfirmed transactions use a higher effective feerate to encourage miners to favour your payments.</string>

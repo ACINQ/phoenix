@@ -23,6 +23,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -30,14 +31,19 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.safeLet
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 private enum class LiquidityPolicyOptions {
     AUTO, TRUSTLESS, DISABLED
@@ -47,7 +53,7 @@ private enum class LiquidityPolicyOptions {
 fun LiquidityPolicyView(
     onBackClick: () -> Unit,
 ) {
-    val log = logger("ChannelsPolicyView")
+    val log = logger("LiquidityPolicyView")
     val context = LocalContext.current
     val btcUnit = LocalBitcoinUnit.current
     val scope = rememberCoroutineScope()
@@ -62,152 +68,111 @@ fun LiquidityPolicyView(
             helpMessageLink = stringResource(id = R.string.liquiditypolicy_help_link) to "https://phoenix.acinq.co/faq",
         )
 
+        Card(internalPadding = PaddingValues(16.dp)) {
+            Text(text = annotatedStringResource(id = R.string.liquiditypolicy_instructions))
+        }
+
         safeLet(liquidityPreferredFees, liquidityPolicyInPrefs) { defaultFee, policyInPrefs ->
 
-            var visiblePolicy by remember {
-                mutableStateOf(
-                    when (policyInPrefs) {
-                        is LiquidityPolicy.Auto -> LiquidityPolicyOptions.AUTO
-                        is LiquidityPolicy.Disable -> LiquidityPolicyOptions.DISABLED
-                    }
-                )
-            }
+            val business = business
 
+            var isPayToOpenDisabled by remember { mutableStateOf(false) }
             var maxRelativeFeeBasisPoints by remember { mutableStateOf(defaultFee.maxRelativeFeeBasisPoints) }
             var maxAbsoluteFee by remember { mutableStateOf(defaultFee.maxAbsoluteFee) }
-            val feeEditor: @Composable () -> Unit = {
-                FeePolicyEditor(
-                    maxRelativeFeeBasisPoints = maxRelativeFeeBasisPoints, maxAbsoluteFee = maxAbsoluteFee,
-                    onMaxRelativeFeeBasisPointsChange = { maxRelativeFeeBasisPoints = it }, onMaxAbsoluteFeeChange = { maxAbsoluteFee = it }
-                )
-            }
 
-            Card {
-                Clickable(onClick = { visiblePolicy = LiquidityPolicyOptions.AUTO }) {
-                    Column {
-                        PolicyRow(
-                            title = stringResource(id = R.string.liquiditypolicy_auto_title),
-                            description = stringResource(id = R.string.liquiditypolicy_auto_description, maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true)),
-                            isActive = policyInPrefs is LiquidityPolicy.Auto,
-                            isSelected = visiblePolicy == LiquidityPolicyOptions.AUTO,
-                        )
-                        if (visiblePolicy == LiquidityPolicyOptions.AUTO) { feeEditor() }
-                    }
+            CardHeader(text = stringResource(id = R.string.liquiditypolicy_fees_header))
+            Card(
+                internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    var isError by remember { mutableStateOf(false) }
+                    Text(
+                        text = stringResource(id = R.string.liquiditypolicy_fees_base_label),
+                        modifier = Modifier.alignByBaseline()
+                    )
+                    IconPopup(popupMessage = stringResource(id = R.string.liquiditypolicy_fees_base_help), spaceLeft = 8.dp, spaceRight = 0.dp)
+                    Spacer(Modifier.weight(1f))
+                    InlineNumberInput(
+                        value = maxAbsoluteFee.sat.toDouble(),
+                        onValueChange = {
+                            when {
+                                it == null -> isError = true
+                                it < 0 -> isError = true
+                                it > 100_000 -> isError = true
+                                else -> {
+                                    isError = false
+                                    it.toLong().sat.let { maxAbsoluteFee = it }
+                                }
+                            }
+                        },
+                        isError = isError,
+                        acceptDecimal = false,
+                        trailingIcon = { Text(text = "sat") },
+                        modifier = Modifier.width(150.dp),
+                    )
                 }
-                Clickable(onClick = { visiblePolicy = LiquidityPolicyOptions.TRUSTLESS }) {
-                    Column {
-                        PolicyRow(
-                            title = stringResource(id = R.string.liquiditypolicy_trustless_title),
-                            description = stringResource(id = R.string.liquiditypolicy_trustless_description),
-                            isActive = false, // TODO: add trustless policy
-                            isSelected = visiblePolicy == LiquidityPolicyOptions.TRUSTLESS,
-                        )
-                        if (visiblePolicy == LiquidityPolicyOptions.TRUSTLESS) { feeEditor() }
-                    }
-                }
-                Clickable(onClick = { visiblePolicy = LiquidityPolicyOptions.DISABLED }) {
-                    PolicyRow(
-                        title = stringResource(id = R.string.liquiditypolicy_disabled),
-                        description = stringResource(id = R.string.liquiditypolicy_disabled_description),
-                        isActive = policyInPrefs is LiquidityPolicy.Disable,
-                        isSelected = visiblePolicy == LiquidityPolicyOptions.DISABLED,
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    var isError by remember { mutableStateOf(false) }
+                    Text(
+                        text = stringResource(id = R.string.liquiditypolicy_fees_prop_label),
+                        modifier = Modifier.alignByBaseline()
+                    )
+                    IconPopup(popupMessage = stringResource(id = R.string.liquiditypolicy_fees_prop_help), spaceLeft = 8.dp, spaceRight = 0.dp)
+                    Spacer(Modifier.weight(1f))
+                    InlineNumberInput(
+                        value = maxRelativeFeeBasisPoints.toDouble() / 100,
+                        onValueChange = {
+                            when {
+                                it == null -> isError = true
+                                it < 0 -> isError = true
+                                it > 100 -> isError = true
+                                else -> {
+                                    isError = false
+                                    it.let { maxRelativeFeeBasisPoints = (it * 100).roundToInt() }
+                                }
+                            }
+                        },
+                        acceptDecimal = false,
+                        isError = isError,
+                        trailingIcon = { Text(text = "%") },
+                        modifier = Modifier.width(150.dp)
                     )
                 }
             }
 
+            CardHeader(text = stringResource(id = R.string.liquiditypolicy_modes_header))
+            Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)) {
+                SwitchView(
+                    text = stringResource(id = R.string.liquiditypolicy_modes_pay_to_open_label),
+                    description = stringResource(id = R.string.liquiditypolicy_modes_pay_to_open_description),
+                    checked = isPayToOpenDisabled,
+                    onCheckedChange = { isPayToOpenDisabled = it }
+                )
+            }
+
             Card {
-                val newPolicy = when (visiblePolicy) {
-                    LiquidityPolicyOptions.AUTO -> LiquidityPolicy.Auto(maxRelativeFeeBasisPoints = maxRelativeFeeBasisPoints, maxAbsoluteFee = maxAbsoluteFee)
-                    LiquidityPolicyOptions.TRUSTLESS -> LiquidityPolicy.Auto(maxRelativeFeeBasisPoints = maxRelativeFeeBasisPoints, maxAbsoluteFee = maxAbsoluteFee)
-                    LiquidityPolicyOptions.DISABLED -> LiquidityPolicy.Disable
+                val newPolicy = when {
+                    maxAbsoluteFee == 0.sat && maxRelativeFeeBasisPoints == 0 -> LiquidityPolicy.Disable
+                    else -> LiquidityPolicy.Auto(maxRelativeFeeBasisPoints = maxRelativeFeeBasisPoints, maxAbsoluteFee = maxAbsoluteFee)
                 }
                 val isEnabled = policyInPrefs != newPolicy
                 Button(
-                    text = "Save policy",
+                    text = stringResource(id = R.string.liquiditypolicy_save_button),
                     icon = R.drawable.ic_check,
                     modifier = Modifier
                         .fillMaxWidth()
                         .enableOrFade(isEnabled),
                     enabled = isEnabled,
                     onClick = {
-                        scope.launch { UserPrefs.saveLiquidityPolicy(context, newPolicy) }
+                        scope.launch {
+                            UserPrefs.saveLiquidityPolicy(context, newPolicy)
+                        }
                     },
                 )
             }
         } ?: Card {
             ProgressView(text = stringResource(id = R.string.liquiditypolicy_loading))
-        }
-    }
-}
-
-@Composable
-private fun FeePolicyEditor(
-    maxRelativeFeeBasisPoints: Int,
-    maxAbsoluteFee: Satoshi,
-    onMaxRelativeFeeBasisPointsChange: (Int) -> Unit,
-    onMaxAbsoluteFeeChange: (Satoshi) -> Unit,
-) {
-    val log = logger("FeePolicyEditor")
-    val btcUnit = LocalBitcoinUnit.current
-    Column(
-        modifier = Modifier.padding(start = 50.dp, end = 16.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(id = R.string.liquiditypolicy_fee_max, maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true)),
-                modifier = Modifier.width(120.dp),
-                style = MaterialTheme.typography.body2.copy(fontSize = 14.sp)
-            )
-            Spacer(Modifier.width(16.dp))
-            SatoshiSlider(
-                amount = maxAbsoluteFee,
-                onAmountChange = onMaxAbsoluteFeeChange,
-                minAmount = 300.sat,
-                maxAmount = 10_000.sat,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        val isSanityCheckEnabled = maxRelativeFeeBasisPoints == 30_00
-        SwitchView(
-            text = stringResource(id = R.string.liquiditypolicy_fee_sanity_check),
-            textStyle = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
-            description = if (isSanityCheckEnabled) {
-                stringResource(id = R.string.liquiditypolicy_fee_sanity_check_enabled, maxRelativeFeeBasisPoints / 100)
-            } else {
-                stringResource(id = R.string.liquiditypolicy_fee_sanity_check_disabled)
-            },
-            checked = isSanityCheckEnabled,
-            onCheckedChange = { onMaxRelativeFeeBasisPointsChange(if (it) 30_00 else 100_00) }
-        )
-    }
-}
-
-@Composable
-private fun PolicyRow(
-    title: String,
-    description: String,
-    isActive: Boolean,
-    isSelected: Boolean,
-) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp)) {
-        RadioButton(selected = isSelected, onClick = null)
-        Spacer(modifier = Modifier.width(10.dp))
-        Column {
-            Row {
-                Text(text = title, style = MaterialTheme.typography.h4, modifier = Modifier.alignByBaseline())
-                if (isActive) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "[Current]", color = MaterialTheme.colors.primary, modifier = Modifier.alignByBaseline())
-                }
-            }
-            if (isSelected) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = description, style = MaterialTheme.typography.subtitle2)
-            }
         }
     }
 }
