@@ -616,7 +616,7 @@ struct SummaryView: View {
 		
 		Biz.business.databaseManager.paymentsDb { paymentsDb, _ in
 			
-			paymentsDb?.deletePayment(paymentId: paymentInfo.id(), completionHandler: { _, error in
+			paymentsDb?.deletePayment(paymentId: paymentInfo.id(), completionHandler: { error in
 				
 				if let error = error {
 					log.error("Error deleting payment: \(String(describing: error))")

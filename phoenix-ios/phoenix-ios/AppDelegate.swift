@@ -274,11 +274,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		business.databaseManager.paymentsDb { paymentsDb, _ in
 		
 			let fakePaymentId = WalletPaymentId.IncomingPaymentId(paymentHash: Bitcoin_kmpByteVector32.random())
-			paymentsDb?.deletePayment(paymentId: fakePaymentId) { _, _ in
+			paymentsDb?.deletePayment(paymentId: fakePaymentId) { _ in
 				// Nothing is actually deleted
 			}
 		}
-		business.appDb.deleteBitcoinRate(fiat: "FakeFiatCurrency") { _, _ in
+		business.appDb.deleteBitcoinRate(fiat: "FakeFiatCurrency") { _ in
 			// Nothing is actually deleted
 		}
 	}

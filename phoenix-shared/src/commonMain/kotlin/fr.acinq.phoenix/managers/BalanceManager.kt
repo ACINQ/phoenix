@@ -144,9 +144,6 @@ class BalanceManager(
                 is SwapInEvents.Accepted -> {
                     log.info { "swap-in accepted for id=${event.requestId} with mining_fee=${event.miningFee} service_fee=${event.serviceFee}" }
                 }
-                is SwapInEvents.Rejected -> {
-                    log.error { "swap-in rejected for id=${event.requestId} with required_fee=${event.requiredFees} error=${event.failure}" }
-                }
                 is ChannelEvents.Creating -> {
                     log.info { "channel creating with id=${event.state.channelId}" }
                     val channelId = event.state.channelId

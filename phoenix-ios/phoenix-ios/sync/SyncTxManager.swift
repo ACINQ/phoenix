@@ -518,7 +518,7 @@ class SyncTxManager {
 			// Kotlin suspend functions are currently only supported on the main thread
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
-			self.cloudKitDb.clearDatabaseTables { (_, error) in
+			self.cloudKitDb.clearDatabaseTables { error in
 				
 				if let error = error {
 					log.error("Error clearing database tables: \(String(describing: error))")
@@ -768,7 +768,7 @@ class SyncTxManager {
 				downloadedPayments: paymentRows,
 				downloadedPaymentsMetadata: paymentMetadataRows,
 				updateMetadata: metadataMap
-			) { (_: KotlinUnit?, error: Error?) in
+			) { (error: Error?) in
 		
 				log.trace("downloadPayments(): updateDatabase(): completion")
 		
@@ -798,7 +798,7 @@ class SyncTxManager {
 			// Kotlin suspend functions are currently only supported on the main thread
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
-			self.cloudKitDb.enqueueMissingItems { (_, error) in
+			self.cloudKitDb.enqueueMissingItems { error in
 				
 				if let error = error {
 					log.error("downloadPayments(): enqueueMissingItems(): error: \(String(describing: error))")
@@ -1264,7 +1264,7 @@ class SyncTxManager {
 				deleteFromQueue: deleteFromQueue,
 				deleteFromMetadata: deleteFromMetadata,
 				updateMetadata: updateMetadata
-			) { (_: KotlinUnit?, error: Error?) in
+			) { (error: Error?) in
 				
 				log.trace("cloudKitDb.updateRows().completion()")
 				

@@ -5,11 +5,9 @@ import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.io.NativeSocketException
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.Connection
-import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Class types from lightning-kmp & bitcoin-kmp are not exported to iOS unless we explicitly

@@ -294,7 +294,7 @@ struct EditInfoView: View {
 			let business = Biz.business
 			business.databaseManager.paymentsDb { (paymentsDb: SqlitePaymentsDb?, _) in
 				
-				paymentsDb?.updateMetadata(id: paymentId, userDescription: newDesc, userNotes: newNotes) { (_, err) in
+				paymentsDb?.updateMetadata(id: paymentId, userDescription: newDesc, userNotes: newNotes) { (err) in
 					
 					if let err = err {
 						log.error("paymentsDb.updateMetadata: \(String(describing: err))")

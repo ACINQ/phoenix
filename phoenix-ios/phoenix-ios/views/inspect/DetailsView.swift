@@ -735,11 +735,11 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 			
 			switch channelClosing.closingType {
-				case Lightning_kmpChannelCloseOutgoingPayment.ChannelClosingType.local   : Text(verbatim: "Local")
-				case Lightning_kmpChannelCloseOutgoingPayment.ChannelClosingType.mutual  : Text(verbatim: "Mutual")
-				case Lightning_kmpChannelCloseOutgoingPayment.ChannelClosingType.remote  : Text(verbatim: "Remote")
-				case Lightning_kmpChannelCloseOutgoingPayment.ChannelClosingType.revoked : Text(verbatim: "Revoked")
-				case Lightning_kmpChannelCloseOutgoingPayment.ChannelClosingType.other   : Text(verbatim: "Other")
+				case Lightning_kmpChannelClosingType.local   : Text(verbatim: "Local")
+				case Lightning_kmpChannelClosingType.mutual  : Text(verbatim: "Mutual")
+				case Lightning_kmpChannelClosingType.remote  : Text(verbatim: "Remote")
+				case Lightning_kmpChannelClosingType.revoked : Text(verbatim: "Revoked")
+				case Lightning_kmpChannelClosingType.other   : Text(verbatim: "Other")
 				default                                                                  : Text(verbatim: "?")
 			}
 		}
@@ -965,7 +965,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 			
 			commonValue_amounts(displayAmounts: displayAmounts(
-				sat: onChain.amountSatoshi,
+				sat: onChain.amount.truncateToSatoshi(),
 				originalFiat: paymentInfo.metadata.originalFiat
 			))
 		}

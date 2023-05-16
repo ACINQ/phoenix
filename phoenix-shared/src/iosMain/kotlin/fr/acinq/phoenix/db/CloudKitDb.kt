@@ -367,7 +367,6 @@ class CloudKitDb(
                         val (type, blob) = received.receivedWith.mapToDb() ?: (null to null)
                         inQueries.updateReceived(
                             received_at = received.receivedAt,
-                            expected_amount_msat = received.expectedAmount.msat,
                             received_with_type = type,
                             received_with_blob = blob,
                             payment_hash = incomingPayment.paymentHash.toByteArray()
