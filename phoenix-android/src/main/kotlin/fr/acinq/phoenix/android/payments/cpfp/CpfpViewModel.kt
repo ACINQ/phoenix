@@ -46,6 +46,7 @@ sealed class CpfpState {
     sealed class Error: CpfpState() {
         data class Thrown(val e: Throwable): Error()
         object NoChannels: Error()
+        data class FeerateTooLow(val userFeerate: FeeratePerKw, val actualFeerate: FeeratePerKw): Error()
     }
 }
 
@@ -71,6 +72,8 @@ class CpfpViewModel(val peerManager: PeerManager) : ViewModel() {
             )
             if (res == null) {
                 state = CpfpState.Error.NoChannels
+            } else if (res.first <= userFeerate * 1.10) {
+                state = CpfpState.Error.FeerateTooLow(userFeerate = userFeerate, actualFeerate = res.first)
             } else {
                 state = CpfpState.ReadyToExecute(userFeerate = userFeerate, actualFeerate = res.first, fee = res.second)
             }

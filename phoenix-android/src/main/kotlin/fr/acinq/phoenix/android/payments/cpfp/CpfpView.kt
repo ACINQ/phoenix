@@ -114,7 +114,7 @@ fun CpfpView(
             }
             is CpfpState.Complete.Failed -> {
                 ErrorMessage(
-                    errorHeader = stringResource(id = R.string.cpfp_error_title),
+                    errorHeader = stringResource(id = R.string.cpfp_failure_title),
                     errorDetails = when (state.failure) {
                         is Command.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, state.failure.reason)
                         is Command.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
@@ -127,21 +127,32 @@ fun CpfpView(
                         is Command.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> stringResource(id = R.string.splice_error_invalid_pubkey)
                         is Command.Splice.Response.Failure.SpliceAlreadyInProgress -> stringResource(id = R.string.splice_error_splice_in_progress)
                     },
-                    alignment = Alignment.CenterHorizontally
+                    alignment = Alignment.CenterHorizontally,
+                    padding = PaddingValues(0.dp)
                 )
             }
             is CpfpState.Error.NoChannels -> {
                 ErrorMessage(
                     errorHeader = stringResource(id = R.string.cpfp_error_title),
                     errorDetails = stringResource(id = R.string.splice_error_nochannels),
-                    alignment = Alignment.CenterHorizontally
+                    alignment = Alignment.CenterHorizontally,
+                    padding = PaddingValues(0.dp)
                 )
             }
             is CpfpState.Error.Thrown -> {
                 ErrorMessage(
                     errorHeader = stringResource(id = R.string.cpfp_error_title),
                     errorDetails = state.e.localizedMessage,
-                    alignment = Alignment.CenterHorizontally
+                    alignment = Alignment.CenterHorizontally,
+                    padding = PaddingValues(0.dp)
+                )
+            }
+            is CpfpState.Error.FeerateTooLow -> {
+                ErrorMessage(
+                    errorHeader = stringResource(id = R.string.cpfp_error_title),
+                    errorDetails = stringResource(id = R.string.splice_error_actual_below_user),
+                    alignment = Alignment.CenterHorizontally,
+                    padding = PaddingValues(0.dp)
                 )
             }
         }

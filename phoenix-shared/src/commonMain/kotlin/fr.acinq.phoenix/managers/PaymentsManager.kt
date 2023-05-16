@@ -132,8 +132,8 @@ class PaymentsManager(
             log.info { "monitoring unconfirmed txs=$txs" }
             txs.forEach { txId ->
                 electrumClient.getConfirmations(txId)?.let { conf ->
-                    log.info { "transaction $txId has $conf confirmations" }
                     if (conf > 0) {
+                        log.info { "transaction $txId has $conf confirmations, updating database" }
                         paymentsDb.setConfirmed(txId)
                     }
                 }

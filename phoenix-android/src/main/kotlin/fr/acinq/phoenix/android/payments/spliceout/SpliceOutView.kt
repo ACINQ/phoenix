@@ -95,7 +95,7 @@ fun SendSpliceOutView(
                             amountErrorMessage = context.getString(R.string.send_error_amount_below_requested,
                                 (requestedAmount).toMilliSatoshi().toPrettyString(prefBtcUnit, withUnit = true))
                         }
-                        newAmount <= 540.sat -> {
+                        newAmount <= 546.sat -> {
                             amountErrorMessage = context.getString(R.string.validation_below_min, 546.sat.toPrettyString(BitcoinUnit.Sat, withUnit = true))
                         }
                     }

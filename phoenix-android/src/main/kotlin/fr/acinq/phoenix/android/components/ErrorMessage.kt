@@ -57,7 +57,7 @@ fun ErrorMessage(
             Text(
                 text = stringResource(id = R.string.component_error_message_details, errorDetails),
                 modifier = Modifier.padding(start = 24.dp),
-                style = MaterialTheme.typography.caption,
+                style = MaterialTheme.typography.subtitle2,
                 textAlign = if (alignment == Alignment.Start) TextAlign.Start else TextAlign.Center
             )
         }

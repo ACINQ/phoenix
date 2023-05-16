@@ -854,7 +854,8 @@
     <string name="cpfp_execute_button">Execute payment</string>
     <string name="cpfp_executing">Executing payment…</string>
     <string name="cpfp_success">Payment complete</string>
-    <string name="cpfp_error_title">Payment has failed</string>
+    <string name="cpfp_failure_title">Payment failed</string>
+    <string name="cpfp_error_title">Cannot proceed</string>
 
     <!-- mempool -->
     <string name="mempool_unknown_feerate_title">Unknown mempool state</string>
@@ -866,6 +867,7 @@
     <string name="mempool_slow">No priority</string>
 
     <!-- splice errors -->
+    <string name="splice_error_actual_below_user">This feerate is below what your transactions are already using. It should be higher to have any effects.</string>
     <string name="splice_error_nochannels">You don\'t have any channels</string>
     <string name="splice_error_aborted_by_peer">Aborted by peer [%1$s]</string>
     <string name="splice_error_cannot_create_commit">Unable to create a new commitment</string>
