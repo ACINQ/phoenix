@@ -883,5 +883,9 @@
     <string name="splice_error_invalid_pubkey">Invalid splice-out pubkey script</string>
     <string name="splice_error_splice_in_progress">A splice payment is already in progress</string>
 
+    <!-- notification permission -->
+    <string name="permission_notification_dismiss">Don\'t remind me</string>
+    <string name="permission_notification_request">Tap to enable</string>
+    <string name="permission_notification_denied">Payment notifications are disabled.</string>
 
 </resources>

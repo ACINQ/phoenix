@@ -24,7 +24,7 @@ object Versions {
         const val compose = "1.4.3"
         const val composeCompiler = "1.4.7"
         const val navCompose = "2.5.3"
-        const val accompanist = "0.27.1"
+        const val accompanist = "0.30.1"
         const val composeConstraintLayout = "1.0.1"
         const val biometrics = "1.1.0"
 

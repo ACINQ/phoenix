@@ -17,10 +17,14 @@
 package fr.acinq.phoenix.android.home
 
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import androidx.activity.compose.*
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,6 +48,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.msat
@@ -52,14 +60,12 @@ import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.legacy.utils.MigrationResult
@@ -89,31 +95,11 @@ fun HomeView(
     val torEnabledState = UserPrefs.getIsTorEnabled(context).collectAsState(initial = null)
     val connectionsState by paymentsViewModel.connectionsFlow.collectAsState(null)
     val balanceDisplayMode by UserPrefs.getHomeAmountDisplayMode(context).collectAsState(initial = null)
-
-
-    val connectivityManager = remember { context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
-    var netwCaps by remember { mutableStateOf<NetworkCapabilities?>(null) }
-
-    LaunchedEffect(key1 = Unit) {
-        connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                super.onAvailable(network)
-                netwCaps = connectivityManager.getNetworkCapabilities(network)
-            }
-            override fun onCapabilitiesChanged(network : Network, networkCapabilities : NetworkCapabilities) {
-                netwCaps = networkCapabilities
-            }
-
-            override fun onLost(network: Network) {
-                super.onLost(network)
-                netwCaps = null
-            }
-        })
-    }
+    val showNotificationPermission by UserPrefs.getShowNotificationPermissionReminder(context).collectAsState(initial = false)
 
     var showConnectionsDialog by remember { mutableStateOf(false) }
     if (showConnectionsDialog) {
-        ConnectionDialog(connections = connectionsState, onClose = { showConnectionsDialog = false }, onTorClick = onTorClick, onElectrumClick = onElectrumClick, netwCaps)
+        ConnectionDialog(connections = connectionsState, onClose = { showConnectionsDialog = false }, onTorClick = onTorClick, onElectrumClick = onElectrumClick)
     }
 
     val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
@@ -176,7 +162,10 @@ fun HomeView(
                 )
             }
             PrimarySeparator()
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
+            if (showNotificationPermission) {
+                NotificationPermissionButton()
+            }
             Column(modifier = Modifier.weight(1f, fill = true), horizontalAlignment = Alignment.CenterHorizontally) {
                 if (payments.isEmpty()) {
                     Text(
@@ -284,10 +273,8 @@ private fun ConnectionDialog(
     onClose: () -> Unit,
     onTorClick: () -> Unit,
     onElectrumClick: () -> Unit,
-    networkCapabilities: NetworkCapabilities?
 ) {
     val context = LocalContext.current
-    val connectivityManager = remember { context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
 
     Dialog(title = stringResource(id = R.string.conndialog_title), onDismiss = onClose) {
         Column {
@@ -317,33 +304,6 @@ private fun ConnectionDialog(
                 HSeparator()
                 Spacer(Modifier.height(16.dp))
             }
-
-            networkCapabilities?.let { caps ->
-                CompositionLocalProvider(LocalTextStyle provides monoTypo.copy(fontSize = 10.sp)) {
-                    Text(text = "tranport: ${caps.transportInfo}")
-                    Text(text = "metered background restrictions: ${
-                        when (val s = connectivityManager.restrictBackgroundStatus) {
-                            ConnectivityManager.RESTRICT_BACKGROUND_STATUS_DISABLED -> "not restricted"
-                            ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED -> "restricted"
-                            ConnectivityManager.RESTRICT_BACKGROUND_STATUS_WHITELISTED -> "not restricted (whitelisted)"
-                            else -> s
-                        }
-                    }")
-                    Text(text = "enterprise use: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_ENTERPRISE)}")
-                    Text(text = "internet capable: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)}")
-                    Text(text = "internet connectivity: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)}")
-                    Text(text = "not congested: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_CONGESTED)}")
-                    Text(text = "not metered: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)}")
-                    Text(text = "not restricted: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)}")
-                    Text(text = "not roaming: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_ROAMING)}")
-                    Text(text = "not suspended: ${caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)}")
-                    Text(text = "cellular: ${caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)}")
-                    Text(text = "ethernet: ${caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)}")
-                    Text(text = "vpn: ${caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)}")
-                    Text(text = "wifi: ${caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)}")
-
-                }
-            } ?: Text(text = "no network")
         }
     }
 }
@@ -571,6 +531,69 @@ private fun BottomBar(
                     .fillMaxWidth()
                     .height(3.dp)
             ) { }
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun NotificationPermissionButton() {
+    val log = logger("notifpermission")
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val notificationPermission = rememberPermissionState(permission = android.Manifest.permission.POST_NOTIFICATIONS)
+    if (notificationPermission.status.isGranted) {
+        // do nothing!
+    } else {
+        // if notification permission has been denied, display a different message and open the app system settings
+        val isDenied = notificationPermission.status.shouldShowRationale
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            externalPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+            internalPadding = PaddingValues(0.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            withBorder = true,
+        ) {
+            Row {
+                PhoenixIcon(resourceId = R.drawable.ic_notification, modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(top = 8.dp)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.permission_notification_denied),
+                        style = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
+                    )
+                    Button(
+                        text = stringResource(id = R.string.permission_notification_request),
+                        textStyle = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
+                        backgroundColor = Color.Transparent,
+                        space = 8.dp,
+                        padding = PaddingValues(8.dp),
+                        modifier = Modifier.offset(x = (-8).dp),
+                        onClick = {
+                            log.info { "isdenied=$isDenied" }
+                            if (isDenied || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                                context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                    data = Uri.fromParts("package", context.packageName, null)
+                                })
+                            } else {
+                                notificationPermission.launchPermissionRequest()
+                            }
+                        }
+                    )
+                }
+                Button(
+                    icon = R.drawable.ic_cross,
+                    backgroundColor = Color.Transparent,
+                    space = 8.dp,
+                    padding = PaddingValues(8.dp),
+                    onClick = {
+                        scope.launch { UserPrefs.saveShowNotificationPermissionReminder(context, false) }
+                    }
+                )
+            }
         }
     }
 }
