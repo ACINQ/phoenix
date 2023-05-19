@@ -32,6 +32,8 @@ import fr.acinq.phoenix.android.home.*
 import fr.acinq.phoenix.android.init.*
 import fr.acinq.phoenix.android.intro.IntroView
 import fr.acinq.phoenix.android.payments.*
+import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
+import fr.acinq.phoenix.android.payments.details.PaymentsViewModel
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo

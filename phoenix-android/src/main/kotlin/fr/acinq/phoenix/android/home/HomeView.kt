@@ -61,6 +61,10 @@ import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.payments.details.PaymentLine
+import fr.acinq.phoenix.android.payments.details.PaymentLineLoading
+import fr.acinq.phoenix.android.payments.details.PaymentRowState
+import fr.acinq.phoenix.android.payments.details.PaymentsViewModel
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
