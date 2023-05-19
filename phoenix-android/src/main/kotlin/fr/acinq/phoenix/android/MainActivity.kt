@@ -126,17 +126,13 @@ class MainActivity : AppCompatActivity() {
         if (connections.electrum !is Connection.ESTABLISHED) {
             lifecycleScope.launch {
                 log.info("resuming app with electrum conn=${connections.electrum}, reconnecting...")
-                daemon.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Electrum)
-                delay(500)
-                daemon.decrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Electrum)
+                daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Electrum)
             }
         }
         if (connections.peer !is Connection.ESTABLISHED) {
             lifecycleScope.launch {
                 log.info("resuming app with peer conn=${connections.peer}, reconnecting...")
-                business.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Peer)
-                delay(500)
-                business.appConnectionsDaemon?.decrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Peer)
+                daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
             }
         }
     }
