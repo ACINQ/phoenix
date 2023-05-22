@@ -36,7 +36,6 @@ struct ReceiveLightningView: View {
 	
 	@State var swapIn_enabled = true
 	@State var payToOpen_enabled = true
-	@State var payToOpen_minFundingSat: Int64 = 0
 	
 	@State var channelsCount = 0
 	
@@ -57,9 +56,6 @@ struct ReceiveLightningView: View {
 	
 	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
 	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
-	
-	// Saving custom publisher in @State since otherwise it fires on every render
-	@State var channelsPublisher = Biz.business.peerManager.peerStatePublisher().flatMap { $0.channelsPublisher() }
 	
 	// For the cicular buttons: [copy, share, edit]
 	enum MaxButtonWidth: Preference {}
@@ -105,9 +101,6 @@ struct ReceiveLightningView: View {
 		}
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
-		}
-		.onReceive(channelsPublisher) {
-			channelsChanged($0)
 		}
 		.onReceive(NotificationsManager.shared.permissions) {
 			notificationPermissionsChanged($0)
@@ -190,9 +183,6 @@ struct ReceiveLightningView: View {
 			
 			if !payToOpen_enabled {
 				payToOpenDisabledWarning()
-					.padding(.top, 8)
-			} else if channelsCount == 0 {
-				payToOpenMinimumWarning()
 					.padding(.top, 8)
 			}
 			
@@ -584,31 +574,6 @@ struct ReceiveLightningView: View {
 	}
 	
 	@ViewBuilder
-	func payToOpenMinimumWarning() -> some View {
-		
-		let minFunding = Utils.formatBitcoin(sat: payToOpen_minFundingSat, bitcoinUnit: .sat)
-		
-		HStack(alignment: VerticalAlignment.top, spacing: 0) {
-			Text(styled: String(format: NSLocalizedString(
-				"""
-				Your wallet is empty. The first payment you \
-				receive must be at least **%@**.
-				""",
-				comment:	"Minimum amount description."),
-				minFunding.string
-			))
-			.multilineTextAlignment(.center)
-		}
-		.font(.caption)
-		.padding(12)
-		.background(
-			RoundedRectangle(cornerRadius: 8)
-				.stroke(Color.appAccent, lineWidth: 1)
-		)
-		.padding([.leading, .trailing], 10)
-	}
-	
-	@ViewBuilder
 	func currencyConverterView() -> some View {
 		
 		CurrencyConverterView(
@@ -693,26 +658,6 @@ struct ReceiveLightningView: View {
 		
 		swapIn_enabled = context.swapIn.v1.status is WalletContext.V0ServiceStatusActive
 		payToOpen_enabled = context.payToOpen.v1.status is WalletContext.V0ServiceStatusActive
-		payToOpen_minFundingSat = context.payToOpen.v1.minFundingSat
-	}
-	
-	func channelsChanged(_ channels: Lightning_kmpPeer.ChannelsMap) {
-		log.trace("channelsChanged()")
-		
-		var availableCount = 0
-		for (_, channel) in channels {
-			
-			if channel.asClosing() != nil ||
-				channel.asClosed() != nil ||
-				channel.asAborted() != nil
-			{
-				// ignore - channel isn't usable for incoming payments
-			} else {
-				availableCount += 1
-			}
-		}
-		
-		channelsCount = availableCount
 	}
 	
 	func notificationPermissionsChanged(_ newValue: NotificationPermissions) {

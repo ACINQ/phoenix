@@ -32,7 +32,6 @@ struct HomeView : MVIView {
 	@State var selectedItem: WalletPaymentInfo? = nil
 	
 	@State var isMempoolFull = false
-	@State var swapIn_minFundingSat: Int64 = 0
 	
 	@State var notificationPermissions = NotificationsManager.shared.permissions.value
 	@State var bgAppRefreshDisabled = NotificationsManager.shared.backgroundRefreshStatus.value != .available
@@ -56,6 +55,9 @@ struct HomeView : MVIView {
 	
 	let swapInWalletBalancePublisher = Biz.business.balanceManager.swapInWalletBalancePublisher()
 	@State var swapInWalletBalance: WalletBalance = WalletBalance.companion.empty()
+	
+	let swapInRejectedPublisher = Biz.swapInRejectedPublisher
+	@State var swapInRejected: Lightning_kmpLiquidityEventsRejected? = nil
 	
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
@@ -124,6 +126,9 @@ struct HomeView : MVIView {
 		}
 		.onReceive(swapInWalletBalancePublisher) {
 			swapInWalletBalanceChanged($0)
+		}
+		.onReceive(swapInRejectedPublisher) {
+			swapInRejectedStateChange($0)
 		}
 		.onReceive(NotificationsManager.shared.permissions) {
 			notificationPermissionsChanged($0)
@@ -277,7 +282,7 @@ struct HomeView : MVIView {
 				? Utils.hiddenAmount(currencyPrefs)
 				: Utils.format(currencyPrefs, sat: incomingSat)
 			
-			if incomingSat >= swapIn_minFundingSat {
+			if swapInRejected == nil {
 				incomingBalance_sufficient(formattedAmount)
 					.onTapGesture { showIncomingDepositPopover() }
 			} else {
@@ -752,7 +757,6 @@ struct HomeView : MVIView {
 		log.trace("chainContextChanged()")
 		
 		isMempoolFull = context.mempool.v1.highUsage
-		swapIn_minFundingSat = context.payToOpen.v1.minFundingSat // not yet segregated for swapIn - future work
 	}
 	
 	func notificationPermissionsChanged(_ newValue: NotificationPermissions) {
@@ -780,6 +784,12 @@ struct HomeView : MVIView {
 			// So let's add a little animation to draw the user's attention to it.
 			startAnimatingIncomingSwapText()
 		}
+	}
+	
+	func swapInRejectedStateChange(_ state: Lightning_kmpLiquidityEventsRejected?) {
+		log.trace("swapInRejectedStateChange()")
+		
+		swapInRejected = state
 	}
 	
 	fileprivate func footerCellDidAppear() {

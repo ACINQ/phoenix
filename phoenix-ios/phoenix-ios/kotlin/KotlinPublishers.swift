@@ -127,9 +127,9 @@ extension CurrencyManager {
 		self.getSetAssociatedObject(storageKey: &_Key.ratesPublisher) {
 			
 			// Transforming from Kotlin:
-			// `ratesFlow: Flow<List<ExchangeRate>>`
+			// `ratesFlow: StateFlow<List<ExchangeRate>>`
 			//
-			KotlinPassthroughSubject<NSArray, [ExchangeRate]>(
+			KotlinCurrentValueSubject<NSArray, [ExchangeRate]>(
 				self.ratesFlow
 			)
 			.eraseToAnyPublisher()
@@ -153,6 +153,30 @@ extension CurrencyManager {
 		}
 	}
 }
+
+// MARK: -
+extension NodeParamsManager {
+	
+	fileprivate struct _Key {
+		static var nodeParamsPublisher = 0
+	}
+	
+	func nodeParamsPublisher() -> AnyPublisher<Lightning_kmpNodeParams, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.nodeParamsPublisher) {
+			
+			// Transforming from Kotlin:
+			// `nodeParams: StateFlow<NodeParams?>`
+			//
+			KotlinCurrentValueSubject<Lightning_kmpNodeParams, Lightning_kmpNodeParams?>(
+				self.nodeParams
+			)
+			.compactMap { $0 }
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
 
 // MARK: -
 extension PaymentsManager {
@@ -250,6 +274,7 @@ extension PaymentsPageFetcher {
 	}
 }
 
+
 // MARK: -
 extension CloudKitDb {
 	
@@ -316,6 +341,29 @@ extension Lightning_kmpElectrumWatcher {
 			KotlinPassthroughSubject<KotlinLong, Int64>(
 				self.openUpToDateFlow()
 			)
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+// MARK: -
+extension Lightning_kmpNodeParams {
+	
+	fileprivate struct _Key {
+		static var nodeEventsPublisher = 0
+	}
+	
+	func nodeEventsPublisher() -> AnyPublisher<Lightning_kmpNodeEvents, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.nodeEventsPublisher) {
+			
+			/// Transforming from Kotlin:
+			/// `nodeEvents: SharedFlow<NodeEvents>`
+			///
+			KotlinPassthroughSubject<Lightning_kmpNodeEvents, Lightning_kmpNodeEvents?>(
+				self.nodeEvents
+			)
+			.compactMap { $0 }
 			.eraseToAnyPublisher()
 		}
 	}

@@ -1,5 +1,8 @@
 package fr.acinq.phoenix.utils
 
+import fr.acinq.lightning.ChannelEvents
+import fr.acinq.lightning.LiquidityEvents
+import fr.acinq.lightning.NodeEvents
 import fr.acinq.lightning.blockchain.electrum.ElectrumMiniWallet
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.channel.*
@@ -154,3 +157,28 @@ fun NativeSocketException.asTLS(): NativeSocketException.TLS? = when (this) {
 }
 
 fun ElectrumMiniWallet.currentWalletState(): WalletState = this.walletStateFlow.value
+
+fun NodeEvents.asChannelEvents(): ChannelEvents? = when (this) {
+    is ChannelEvents -> this
+    else -> null
+}
+
+fun ChannelEvents.asCreating(): ChannelEvents.Creating? = when (this) {
+    is ChannelEvents.Creating -> this
+    else -> null
+}
+
+fun ChannelEvents.asCreated(): ChannelEvents.Created? = when (this) {
+    is ChannelEvents.Created -> this
+    else -> null
+}
+
+fun ChannelEvents.asConfirmed(): ChannelEvents.Confirmed? = when (this) {
+    is ChannelEvents.Confirmed -> this
+    else -> null
+}
+
+fun LiquidityEvents.isAccepted(): LiquidityEvents.Accepted? = when (this) {
+    is LiquidityEvents.Accepted -> this
+    else -> null
+}

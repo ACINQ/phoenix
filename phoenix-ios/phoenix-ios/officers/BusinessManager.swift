@@ -53,6 +53,12 @@ class BusinessManager {
 	/// Because it might change if the user closes his/her wallet.
 	///
 	public private(set) var syncManager: SyncManager? = nil
+	
+	/// Reports the most recent `LiquidityEvents.Rejected` event.
+	/// An incoming `LiquidityEvents.Accepted` automatically cancels the most recent rejected event.
+	/// This only includes events in which source == onchain
+	///
+	public let swapInRejectedPublisher = CurrentValueSubject<Lightning_kmpLiquidityEventsRejected?, Never>(nil)
 
 	private var walletInfo: WalletManager.WalletInfo? = nil
 	private var pushToken: String? = nil
@@ -89,10 +95,14 @@ class BusinessManager {
 		)
 		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
 
+		let lp = Prefs.shared.liquidityPolicy
+		log.debug("lp.effectiveMaxFeeSats = \(lp.effectiveMaxFeeSats)")
+		log.debug("lp.effectiveMaxFeeBasisPoints = \(lp.effectiveMaxFeeBasisPoints)")
+		
 		let startupParams = StartupParams(
 			requestCheckLegacyChannels: false,
 			isTorEnabled: GroupPrefs.shared.isTorEnabled,
-			liquidityPolicy: Prefs.shared.liquidityPolicy.toKotlin()
+			liquidityPolicy: lp.toKotlin()
 		)
 		business.start(startupParams: startupParams)
 		
@@ -168,6 +178,29 @@ class BusinessManager {
 		//	It's not possible to change the liquidity policy on-the-fly yet ?
 		}
 		.store(in: &cancellables)
+		
+		// NodeEvents
+		business.nodeParamsManager.nodeParamsPublisher()
+			.flatMap { $0.nodeEventsPublisher() }
+			.sink { (event: Lightning_kmpNodeEvents) in
+				
+				if let rejected = event as? Lightning_kmpLiquidityEventsRejected {
+					log.debug("Received Lightning_kmpLiquidityEventsRejected: \(rejected)")
+					if rejected.source == Lightning_kmpLiquidityEventsSource.onchainwallet {
+						self.swapInRejectedPublisher.value = rejected
+					}
+					
+				} else if let accepted = event as? Lightning_kmpLiquidityEventsAccepted {
+					log.debug("Received Lightning_kmpLiquidityEventsAccepted: \(accepted)")
+					if accepted.source == Lightning_kmpLiquidityEventsSource.onchainwallet {
+						self.swapInRejectedPublisher.value = nil
+					}
+					
+				} else {
+					log.debug("Received Lightning_iDontKnow: !!!")
+				}
+			}
+			.store(in: &cancellables)
 	}
 	
 	// --------------------------------------------------
