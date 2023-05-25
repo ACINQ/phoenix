@@ -136,7 +136,7 @@ class SyncTxManager {
 	// ----------------------------------------
 	
 	private func startQueueCountMonitor() {
-		log.trace("setupQueueCountMonitor()")
+		log.trace("startQueueCountMonitor()")
 		
 		// Kotlin suspend functions are currently only supported on the main thread
 		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
@@ -345,194 +345,159 @@ class SyncTxManager {
 	private func waitForDatabases() {
 		log.trace("waitForDatabases()")
 		
-		var cancellables = Set<AnyCancellable>()
-		let finish = {
-			log.trace("waitForDatabases(): finish()")
+		Task { @MainActor in
 			
-			cancellables.removeAll()
-			Task {
+			let databaseManager = Biz.business.databaseManager
+			do {
+				let paymentsDb = try await databaseManager.paymentsDb()
+				let cloudKitDb = paymentsDb.getCloudKitDb() as! CloudKitDb
+				
+				self._paymentsDb = paymentsDb
+				self._cloudKitDb = cloudKitDb
+				
 				if let newState = await self.actor.markDatabasesReady() {
 					self.handleNewState(newState)
 				}
 				
-				// Kotlin suspend functions are currently only supported on the main thread
 				DispatchQueue.main.async {
 					self.startQueueCountMonitor()
 					self.startPreferencesMonitor()
 				}
+				
+			} catch {
+				
+				assertionFailure("Unable to extract paymentsDb or cloudKitDb")
 			}
-		}
-		
-		// Kotlin suspend functions are currently only supported on the main thread
-		DispatchQueue.main.async {
 			
-			let databaseManager = Biz.business.databaseManager
-			databaseManager.getDatabases().sink { databases in
-				
-				if let paymentsDb = databases.payments as? SqlitePaymentsDb,
-					let cloudKitDb = paymentsDb.getCloudKitDb() as? CloudKitDb
-				{
-					self._paymentsDb = paymentsDb
-					self._cloudKitDb = cloudKitDb
-					
-					finish()
-					
-				} else {
-					assertionFailure("Unable to extract paymentsDb ")
-				}
-				
-			}.store(in: &cancellables)
-		}
+		} // </MainActor.run>
 	}
 	
 	/// We create a dedicated CKRecordZone for each wallet.
 	/// This allows us to properly segregate transactions between multiple wallets.
 	/// Before we can interact with the RecordZone we have to explicitly create it.
 	///
-	private func createRecordZone(_ updatingCloud: SyncTxManager_State_UpdatingCloud) {
+	private func createRecordZone(_ state: SyncTxManager_State_UpdatingCloud) {
 		log.trace("createRecordZone()")
 		
-		let finish = { (result: Result<Void, Error>) in
+		state.task = Task {
+			log.trace("createRecordZone(): starting task")
 			
-			switch result {
-			case .success:
-				log.trace("createZone(): finish(): success")
-				
-				Prefs.shared.backupTransactions.setRecordZoneCreated(true, encryptedNodeId: self.encryptedNodeId)
-				self.consecutiveErrorCount = 0
-				Task {
-					if let newState = await self.actor.didCreateRecordZone() {
-						self.handleNewState(newState)
-					}
-				}
-				
-			case .failure(let error):
-				log.trace("createZone(): finish(): failure")
-				self.handleError(error)
-			}
-		}
-		
-		let recordZone = CKRecordZone(zoneName: encryptedNodeId)
-		
-		let operation = CKModifyRecordZonesOperation(
-			recordZonesToSave: [recordZone],
-			recordZoneIDsToDelete: nil
-		)
-		
-		operation.modifyRecordZonesResultBlock = {(result: Result<Void, Error>) in
-			
-			log.trace("operation.modifyRecordZonesResultBlock()")
-			
-			switch result {
-			case .success(_):
-				log.error("Success creating CKRecordZone")
-				finish(.success)
-				
-			case .failure(let error):
-				log.error("Error creating CKRecordZone: \(String(describing: error))")
-				finish(.failure(error))
-			}
-		}
-		
-		let configuration = CKOperation.Configuration()
-		configuration.allowsCellularAccess = true
-		
-		operation.configuration = configuration
-		
-		if updatingCloud.register(operation) {
-			CKContainer.default().privateCloudDatabase.add(operation)
-		} else {
-			finish(.failure(CKError(.operationCancelled)))
-		}
-	}
-	
-	private func deleteRecordZone(_ updatingCloud: SyncTxManager_State_UpdatingCloud) {
-		log.debug("deleteRecordZone()")
-		
-		let finish = { (result: Result<Void, Error>) in
-			
-			switch result {
-			case .success:
-				log.trace("deleteRecordZone(): finish(): success")
-				
-				Prefs.shared.backupTransactions.setRecordZoneCreated(false, encryptedNodeId: self.encryptedNodeId)
-				self.consecutiveErrorCount = 0
-				Task {
-					if let newState = await self.actor.didDeleteRecordZone() {
-						self.handleNewState(newState)
-					}
-				}
-				
-			case .failure(let error):
-				log.trace("deleteRecordZone(): finish(): failure")
-				self.handleError(error)
-			}
-		}
-		
-		var step1 : (() -> Void)!
-		var step2 : (() -> Void)!
-		
-		step1 = {
-			log.trace("deleteRecordZone(): step1()")
-		
-			let recordZone = CKRecordZone(zoneName: self.encryptedNodeId)
-			
-			let operation = CKModifyRecordZonesOperation(
-				recordZonesToSave: nil,
-				recordZoneIDsToDelete: [recordZone.zoneID]
-			)
-			
-			operation.modifyRecordZonesResultBlock = {(result: Result<Void, Error>) in
-				
-				log.trace("operation.modifyRecordZonesResultBlock()")
-				
-				switch result {
-				case .success(_):
-					log.error("Success deleting CKRecordZone")
-					DispatchQueue.main.async {
-						step2()
-					}
-					
-				case .failure(let error):
-					log.error("Error deleting CKRecordZone: \(String(describing: error))")
-					finish(.failure(error))
-				}
-			}
+			let container = CKContainer.default()
 			
 			let configuration = CKOperation.Configuration()
 			configuration.allowsCellularAccess = true
-		
-			operation.configuration = configuration
 			
-			if updatingCloud.register(operation) {
-				CKContainer.default().privateCloudDatabase.add(operation)
-			} else {
-				finish(.failure(CKError(.operationCancelled)))
-			}
-			
-		} // </step1>
-		
-		step2 = {
-			log.trace("deleteRecordZone(): step2()")
-			
-			// Kotlin suspend functions are currently only supported on the main thread
-			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
-			
-			self.cloudKitDb.clearDatabaseTables { error in
+			do {
+				try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
 				
-				if let error = error {
-					log.error("Error clearing database tables: \(String(describing: error))")
-					finish(.failure(error))
+					log.debug("createRecordZone(): configured")
 					
-				} else {
-					finish(.success)
-				}
+					if state.isCancelled {
+						throw CKError(.operationCancelled)
+					}
+					
+					let recordZone = CKRecordZone(zoneName: encryptedNodeId)
+					
+					let (saveResults, _) = try await database.modifyRecordZones(
+						saving: [recordZone],
+						deleting: []
+					)
+					
+					// saveResults: [CKRecordZone.ID : Result<CKRecordZone, Error>]
+					
+					let result = saveResults[recordZone.zoneID]!
+					
+					if case let .failure(error) = result {
+						log.trace("createRecordZone(): perZoneResult: failure")
+						throw error
+					}
+					
+					log.trace("createRecordZone(): perZoneResult: success")
+					
+					Prefs.shared.backupTransactions.setRecordZoneCreated(true, encryptedNodeId: self.encryptedNodeId)
+					self.consecutiveErrorCount = 0
+						
+					Task {
+						if let newState = await self.actor.didCreateRecordZone() {
+							self.handleNewState(newState)
+						}
+					}
+					
+				} // </configuredWith>
+				
+			} catch {
+				
+				log.error("createRecordZone(): error = \(String(describing: error))")
+				self.handleError(error)
 			}
-			
-		} // </step2>
+		} // </Task>
+	}
+	
+	private func deleteRecordZone(_ state: SyncTxManager_State_UpdatingCloud) {
+		log.debug("deleteRecordZone()")
 		
-		// Go!
-		step1()
+		state.task = Task {
+			log.debug("deleteRecordZone(): starting task")
+			
+			let container = CKContainer.default()
+			
+			let configuration = CKOperation.Configuration()
+			configuration.allowsCellularAccess = true
+			
+			do {
+				try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
+				
+					log.debug("deleteRecordZone(): configured")
+					
+					if state.isCancelled {
+						throw CKError(.operationCancelled)
+					}
+					
+					// Step 1 of 2:
+					
+					let recordZoneID = CKRecordZone(zoneName: self.encryptedNodeId).zoneID
+					
+					let (_, deleteResults) = try await database.modifyRecordZones(
+						saving: [],
+						deleting: [recordZoneID]
+					)
+					
+					// deleteResults: [CKRecordZone.ID : Result<Void, Error>]
+					
+					let result = deleteResults[recordZoneID]!
+					
+					if case let .failure(error) = result {
+						log.trace("deleteRecordZone(): perZoneResult: failure")
+						throw error
+					}
+					
+					log.trace("deleteRecordZone(): perZoneResult: success")
+					
+					// Step 2 of 2:
+					
+					try await Task { @MainActor in
+						try await self.cloudKitDb.clearDatabaseTables()
+					}.value
+					
+					// Done !
+					
+					Prefs.shared.backupTransactions.setRecordZoneCreated(false, encryptedNodeId: self.encryptedNodeId)
+					self.consecutiveErrorCount = 0
+					
+					Task {
+						if let newState = await self.actor.didDeleteRecordZone() {
+							self.handleNewState(newState)
+						}
+					}
+					
+				} // </configuredWith>
+				
+			} catch {
+				
+				log.error("deleteRecordZone(): error = \(String(describing: error))")
+				self.handleError(error)
+			}
+		} // </Task>
 	}
 	
 	private func downloadPayments(_ downloadProgress: SyncTxManager_State_Downloading) {
