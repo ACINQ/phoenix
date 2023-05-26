@@ -139,10 +139,7 @@ class SyncSeedManager: SyncManagerProtcol {
 							(results, cursor) = try await database.records(matching: query, inZoneWith: zoneID)
 						}
 						
-						for tuple in results {
-							
-							let recordID = tuple.0
-							let result = tuple.1
+						for (recordID, result) in results {
 							
 							if case .success(let record) = result {
 								

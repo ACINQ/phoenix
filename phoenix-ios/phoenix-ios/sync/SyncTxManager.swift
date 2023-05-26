@@ -41,8 +41,11 @@ fileprivate struct DownloadedItem {
 fileprivate struct UploadOperationInfo {
 	let batch: FetchQueueBatchResult
 	
-	var reverseMap: [CKRecord.ID: WalletPaymentId] = [:]
-	var unpaddedMap: [WalletPaymentId: Int] = [:]
+	let recordsToSave: [CKRecord]
+	let recordIDsToDelete: [CKRecord.ID]
+	
+	let reverseMap: [CKRecord.ID: WalletPaymentId]
+	let unpaddedMap: [WalletPaymentId: Int]
 	
 	var completedRowids: [Int64] = []
 	
@@ -319,7 +322,7 @@ class SyncTxManager {
 	
 	private func handleNewState(_ newState: SyncTxManager_State) {
 		
-		log.debug("state = \(newState)")
+		log.trace("state = \(newState)")
 		switch newState {
 			case .updatingCloud(let details):
 				switch details.kind {
@@ -369,7 +372,7 @@ class SyncTxManager {
 				assertionFailure("Unable to extract paymentsDb or cloudKitDb")
 			}
 			
-		} // </MainActor.run>
+		} // </Task>
 	}
 	
 	/// We create a dedicated CKRecordZone for each wallet.
@@ -390,7 +393,7 @@ class SyncTxManager {
 			do {
 				try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
 				
-					log.debug("createRecordZone(): configured")
+					log.trace("createRecordZone(): configured")
 					
 					if state.isCancelled {
 						throw CKError(.operationCancelled)
@@ -417,27 +420,25 @@ class SyncTxManager {
 					Prefs.shared.backupTransactions.setRecordZoneCreated(true, encryptedNodeId: self.encryptedNodeId)
 					self.consecutiveErrorCount = 0
 						
-					Task {
-						if let newState = await self.actor.didCreateRecordZone() {
-							self.handleNewState(newState)
-						}
+					if let newState = await self.actor.didCreateRecordZone() {
+						self.handleNewState(newState)
 					}
 					
 				} // </configuredWith>
 				
 			} catch {
 				
-				log.error("createRecordZone(): error = \(String(describing: error))")
+				log.error("createRecordZone(): error = \(error)")
 				self.handleError(error)
 			}
 		} // </Task>
 	}
 	
 	private func deleteRecordZone(_ state: SyncTxManager_State_UpdatingCloud) {
-		log.debug("deleteRecordZone()")
+		log.trace("deleteRecordZone()")
 		
 		state.task = Task {
-			log.debug("deleteRecordZone(): starting task")
+			log.trace("deleteRecordZone(): starting task")
 			
 			let container = CKContainer.default()
 			
@@ -447,7 +448,7 @@ class SyncTxManager {
 			do {
 				try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
 				
-					log.debug("deleteRecordZone(): configured")
+					log.trace("deleteRecordZone(): configured")
 					
 					if state.isCancelled {
 						throw CKError(.operationCancelled)
@@ -484,17 +485,15 @@ class SyncTxManager {
 					Prefs.shared.backupTransactions.setRecordZoneCreated(false, encryptedNodeId: self.encryptedNodeId)
 					self.consecutiveErrorCount = 0
 					
-					Task {
-						if let newState = await self.actor.didDeleteRecordZone() {
-							self.handleNewState(newState)
-						}
+					if let newState = await self.actor.didDeleteRecordZone() {
+						self.handleNewState(newState)
 					}
 					
 				} // </configuredWith>
 				
 			} catch {
 				
-				log.error("deleteRecordZone(): error = \(String(describing: error))")
+				log.error("deleteRecordZone(): error = \(error)")
 				self.handleError(error)
 			}
 		} // </Task>
@@ -503,281 +502,219 @@ class SyncTxManager {
 	private func downloadPayments(_ downloadProgress: SyncTxManager_State_Downloading) {
 		log.trace("downloadPayments()")
 		
-		let finish = { (result: Result<Void, Error>) in
+		Task {
 			
-			switch result {
-			case .success:
-				log.trace("downloadPayments(): finish(): success")
-				
-				Prefs.shared.backupTransactions.setHasDownloadedRecords(true, encryptedNodeId: self.encryptedNodeId)
-				self.consecutiveErrorCount = 0
-				Task {
-					if let newState = await self.actor.didDownloadPayments() {
-						self.handleNewState(newState)
-					}
-				}
-				
-			case .failure(let error):
-				log.trace("downloadPayments(): finish(): failure")
-				self.handleError(error)
-			}
-		}
-		
-		var checkDatabase     : (() -> Void)!
-		var fetchTotalCount   : ((Date?) -> Void)!
-		var startBatchFetch   : ((Date?) -> Void)!
-		var performBatchFetch : ((CKQueryOperation, Int) -> Void)!
-		var updateDatabase    : (([DownloadedItem], CKQueryOperation.Cursor?, Int) -> Void)!
-		var enqueueMissing    : (() -> Void)!
-		
-		// Step 1 of 6:
-		//
-		//
-		checkDatabase = {
-			log.trace("downloadPayments(): checkDatabase()")
-			
-			// Kotlin suspend functions are currently only supported on the main thread
-			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
-			
-			self.cloudKitDb.fetchOldestCreation() { (millis: KotlinLong?, error: Error?) in
-				
-				if let error = error {
-					finish(.failure(error))
-				} else {
-					
-					let oldestCreationDate = self.millisToDate(millis)
-					downloadProgress.setOldestCompletedDownload(oldestCreationDate)
-					
-					DispatchQueue.global(qos: .utility).async {
-						fetchTotalCount(oldestCreationDate)
-					}
-				}
-			}
-		}
-		
-		// Step 2 of 6:
-		//
-		// In order to properly track the progress, we need to know the total count.
-		// So we start the process by sending a querying for the count.
-		//
-		fetchTotalCount = { (oldestCreationDate: Date?) in
-			log.trace("downloadPayments(): fetchTotalCount()")
-			
-			// If we want to report proper progress (via `SyncTxManager_State_UpdatingCloud`),
-			// then we need to know the total number of records to be downloaded from the cloud.
+			// Step 1 of 4:
 			//
-			// However, there's a minor problem here:
-			// CloudKit doesn't support aggregate queries !
-			//
-			// So we cannot simply say: SELECT COUNT(*)
-			//
-			// Our only option (as far as I'm aware of),
-			// is to fetch the metadata for every record in the cloud.
-			// We would have to do this via recursive batch fetching,
-			// and counting the downloaded records as they stream in.
-			//
-			// The big downfall of this approach is that we end up downloading
-			// the CKRecord metadata 2 times for every record :(
-			//
-			// - first just to count the number of records
-			// - and again when we fetch the full record (with encrypted blob)
-			//
-			// Given this bad situation (Bad Apple),
-			// our current choice is to sacrifice the progress details.
+			// We are downloading payments from newest to oldest.
+			// So first we fetch the oldest payment date in the table (if there is one)
 			
-			startBatchFetch(oldestCreationDate)
+			let millis: KotlinLong? = try await Task { @MainActor in
+				return try await self.cloudKitDb.fetchOldestCreation()
+			}.value
 			
-		} // </fetchTotalCount>
-		
-		// Step 3 of 6:
-		//
-		// Prepares the first CKQueryOperation to download a batch of payments from the cloud.
-		// There may be multiple batches available for download.
-		//
-		startBatchFetch = { (oldestCreationDate: Date?) in
-			log.trace("downloadPayments(): startBatchFetch()")
+			let oldestCreationDate = millis?.int64Value.toDate(from: .milliseconds)
+			downloadProgress.setOldestCompletedDownload(oldestCreationDate)
 			
-			let predicate: NSPredicate
-			if let oldestCreationDate = oldestCreationDate {
-				predicate = NSPredicate(format: "creationDate < %@", oldestCreationDate as CVarArg)
-			} else {
-				predicate = NSPredicate(format: "TRUEPREDICATE")
-			}
+			/**
+			 * NOTE:
+			 * If we want to report proper progress (via `SyncTxManager_State_Downloading`),
+			 * then we need to know the total number of records to be downloaded from the cloud.
+			 *
+			 * However, there's a minor problem here:
+			 * CloudKit doesn't support aggregate queries !
+			 *
+			 * So we cannot simply say: SELECT COUNT(*)
+			 *
+			 * Our only option (as far as I'm aware of),
+			 * is to fetch the metadata for every record in the cloud.
+			 * we would have to do this via recursive batch fetching,
+			 * and counting the downloaded records as they stream in.
+			 *
+			 * The big downfall of this approach is that we end up downloading
+			 * the CKRecord metadata 2 times for every record :(
+			 *
+			 * - first just to count the number of records
+			 * - and again when we fetch the full record (with encrypted blob)
+			 *
+			 * Given this bad situation (Bad Apple),
+			 * our current choice is to sacrifice the progress details.
+			 */
 			
-			let query = CKQuery(
-				recordType: record_table_name,
-				predicate: predicate
-			)
-			query.sortDescriptors = [
-				NSSortDescriptor(key: "creationDate", ascending: false)
-			]
-			
-			let operation = CKQueryOperation(query: query)
-			operation.zoneID = self.recordZoneID()
-			
-			performBatchFetch(operation, 0)
-		
-		} // </startBatchFetch>
-		
-		// Step 4 of 6:
-		//
-		// Perform the CKQueryOperation to download a batch of payments from the cloud.
-		//
-		performBatchFetch = { (operation: CKQueryOperation, batch: Int) in
-			log.trace("downloadPayments(): performBatchFetch()")
-			
-			var items: [DownloadedItem] = []
-			
-			// For the first batch, we want to quickly fetch an item from the cloud,
-			// and add it to the database. The faster the better, this way the user
-			// knows the app is restoring his/her transactions.
-			//
-			// After that, we can slowly increase the batch size,
-			// as the user becomes aware of what's happening.
-			switch batch {
-				case 0  : operation.resultsLimit = 1
-				case 1  : operation.resultsLimit = 2
-				case 2  : operation.resultsLimit = 3
-				case 3  : operation.resultsLimit = 4
-				default : operation.resultsLimit = 8
-			}
-			
-			operation.recordMatchedBlock = {(recordID: CKRecord.ID, result: Result<CKRecord, Error>) in
-				
-				if let record = try? result.get() {
-					
-					let (payment, metadata, unpaddedSize) = self.decryptAndDeserializePayment(record)
-					if let payment = payment {
-						items.append(DownloadedItem(
-							record: record,
-							unpaddedSize: unpaddedSize,
-							payment: payment,
-							metadata: metadata
-						))
-					}
-				}
-			}
-			
-			operation.queryResultBlock = {(result: Result<CKQueryOperation.Cursor?, Error>) in
-				
-				switch result {
-				case .success(let cursor):
-					log.debug("downloadPayments(): performBatchFetch(): complete")
-					DispatchQueue.main.async {
-						updateDatabase(items, cursor, batch)
-					}
-					
-				case .failure(let error):
-					log.debug("downloadPayments(): performBatchFetch(): error: \(String(describing: error))")
-					finish(.failure(error))
-				}
-			}
+			let container = CKContainer.default()
+			let zoneID = self.recordZoneID()
 			
 			let configuration = CKOperation.Configuration()
 			configuration.allowsCellularAccess = true
 			
-			operation.configuration = configuration
-			
-			CKContainer.default().privateCloudDatabase.add(operation)
-		
-		} // </performBatchFetch>
-		
-		// Step 5 of 6:
-		//
-		// Save the downloaded results to the database.
-		//
-		updateDatabase = { (
-			items: [DownloadedItem],
-			cursor: CKQueryOperation.Cursor?,
-			batch: Int
-		) -> Void in
-			log.trace("downloadPayments(): updateDatabase()")
-			
-			// Kotlin suspend functions are currently only supported on the main thread
-			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
-			
-			var oldest: Date? = nil
-			
-			var paymentRows: [Lightning_kmpWalletPayment] = []
-			var paymentMetadataRows: [WalletPaymentId: WalletPaymentMetadataRow] = [:]
-			var metadataMap: [WalletPaymentId: CloudKitDb.MetadataRow] = [:]
-			
-			for item in items {
-				
-				paymentRows.append(item.payment)
-				
-				let paymentId = item.payment.walletPaymentId()
-				paymentMetadataRows[paymentId] = item.metadata
-				
-				let creationDate = item.record.creationDate ?? Date()
-				
-				let creation = self.dateToMillis(creationDate)
-				let metadata = self.metadataForRecord(item.record)
-				
-				metadataMap[paymentId] = CloudKitDb.MetadataRow(
-					unpaddedSize: Int64(item.unpaddedSize),
-					recordCreation: creation,
-					recordBlob: metadata.toKotlinByteArray()
-				)
-				
-				if let prv = oldest {
-					if creationDate < prv {
-						oldest = creationDate
-					}
-				} else {
-					oldest = creationDate
-				}
-			}
-			
-			self.cloudKitDb.updateRows(
-				downloadedPayments: paymentRows,
-				downloadedPaymentsMetadata: paymentMetadataRows,
-				updateMetadata: metadataMap
-			) { (error: Error?) in
-		
-				log.trace("downloadPayments(): updateDatabase(): completion")
-		
-				if let error = error {
-					log.error("downloadPayments(): updateDatabase(): error: \(String(describing: error))")
-					finish(.failure(error))
-				} else {
-					downloadProgress.finishBatch(completed: items.count, oldest: oldest)
+			do {
+				try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
 					
-					if let cursor = cursor {
-						log.debug("downloadPayments(): updateDatabase(): moreInCloud = true")
-						performBatchFetch(CKQueryOperation(cursor: cursor), batch+1)
-						
+					// Step 2 of 4:
+					//
+					// Execute a CKQuery to download a batch of payments from the cloud.
+					// There may be multiple batches available for download.
+					
+					let predicate: NSPredicate
+					if let oldestCreationDate {
+						predicate = NSPredicate(format: "creationDate < %@", oldestCreationDate as CVarArg)
 					} else {
-						log.debug("downloadPayments(): updateDatabase(): moreInCloud = false")
-						DispatchQueue.main.async { // Kotlin completion may or may not be on main thread
-							enqueueMissing()
-						}
+						predicate = NSPredicate(format: "TRUEPREDICATE")
 					}
-				}
-			}
-		} // </updateDatabase>
-		
-		enqueueMissing = { () -> Void in
-			log.trace("downloadPayments(): enqueueMissing()")
-			
-			// Kotlin suspend functions are currently only supported on the main thread
-			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
-			
-			self.cloudKitDb.enqueueMissingItems { error in
+					
+					let query = CKQuery(
+						recordType: record_table_name,
+						predicate: predicate
+					)
+					query.sortDescriptors = [
+						NSSortDescriptor(key: "creationDate", ascending: false)
+					]
+					
+					var done = false
+					var batch = 1
+					var cursor: CKQueryOperation.Cursor? = nil
+					
+					while !done {
+						
+						// For the first batch, we want to quickly fetch an item from the cloud,
+						// and add it to the database. The faster the better, this way the user
+						// knows the app is restoring his/her transactions.
+						//
+						// After that, we can slowly increase the batch size,
+						// as the user becomes aware of what's happening.
+						
+						let resultsLimit: Int
+						switch batch {
+							case 0  : resultsLimit = 1
+							case 1  : resultsLimit = 2
+							case 2  : resultsLimit = 3
+							case 3  : resultsLimit = 4
+							default : resultsLimit = 8
+						}
+						
+						log.trace("downloadPayments(): batchFetch: requesting \(resultsLimit)")
+						
+						let results: [(CKRecord.ID, Result<CKRecord, Error>)]
+						if let prvCursor = cursor {
+							(results, cursor) = try await database.records(
+								continuingMatchFrom: prvCursor,
+								resultsLimit: resultsLimit
+							)
+						} else {
+							(results, cursor) = try await database.records(
+								matching: query,
+								inZoneWith: zoneID,
+								resultsLimit: resultsLimit
+							)
+						}
+						
+						var items: [DownloadedItem] = []
+						for (_, result) in results {
+							if case .success(let record) = result {
+								let (payment, metadata, unpaddedSize) = self.decryptAndDeserializePayment(record)
+								if let payment {
+									items.append(DownloadedItem(
+										record: record,
+										unpaddedSize: unpaddedSize,
+										payment: payment,
+										metadata: metadata
+									))
+								}
+							}
+						}
+						
+						log.trace("downloadPayments(): batchFetch: received \(items.count)")
+						
+						// Step 3 of 4:
+						//
+						// Save the downloaded results to the database.
+						
+						try await Task { @MainActor [items] in
+							
+							var oldest: Date? = nil
+							
+							var paymentRows: [Lightning_kmpWalletPayment] = []
+							var paymentMetadataRows: [WalletPaymentId: WalletPaymentMetadataRow] = [:]
+							var metadataMap: [WalletPaymentId: CloudKitDb.MetadataRow] = [:]
+							
+							for item in items {
+								
+								paymentRows.append(item.payment)
+								
+								let paymentId = item.payment.walletPaymentId()
+								paymentMetadataRows[paymentId] = item.metadata
+								
+								let creationDate = item.record.creationDate ?? Date()
+								
+								let creation = self.dateToMillis(creationDate)
+								let metadata = self.metadataForRecord(item.record)
+								
+								metadataMap[paymentId] = CloudKitDb.MetadataRow(
+									unpaddedSize: Int64(item.unpaddedSize),
+									recordCreation: creation,
+									recordBlob: metadata.toKotlinByteArray()
+								)
+								
+								if let prv = oldest {
+									if creationDate < prv {
+										oldest = creationDate
+									}
+								} else {
+									oldest = creationDate
+								}
+							}
+							
+							log.trace("downloadPayments(): cloudKitDb.updateRows()...")
+							
+							try await self.cloudKitDb.updateRows(
+								downloadedPayments: paymentRows,
+								downloadedPaymentsMetadata: paymentMetadataRows,
+								updateMetadata: metadataMap
+							)
+							
+							downloadProgress.finishBatch(completed: items.count, oldest: oldest)
+							
+						}.value
+						// </Task @MainActor>
+						
+						if (cursor == nil) {
+							log.trace("downloadPayments(): moreInCloud = false")
+							done = true
+						} else {
+							log.trace("downloadPayments(): moreInCloud = true")
+							batch += 1
+						}
+						
+					} // </while !done>
+					
+				} // </configuredWith>
 				
-				if let error = error {
-					log.error("downloadPayments(): enqueueMissingItems(): error: \(String(describing: error))")
-					finish(.failure(error))
-				} else {
-					finish(.success)
+				log.trace("downloadPayments(): enqueueMissingItems()...")
+				
+				// Step 4 of 4:
+				//
+				// There may be payments that we've added to the database since we started the download process.
+				// So we enqueue these for upload now.
+				
+				try await Task { @MainActor in
+					try await self.cloudKitDb.enqueueMissingItems()
+				}.value
+				
+				log.trace("downloadPayments(): finish: success")
+				
+				Prefs.shared.backupTransactions.setHasDownloadedRecords(true, encryptedNodeId: self.encryptedNodeId)
+				self.consecutiveErrorCount = 0
+				
+				if let newState = await self.actor.didDownloadPayments() {
+					self.handleNewState(newState)
 				}
+				
+			} catch {
+				
+				log.error("downloadPayments(): error: \(error)")
+				self.handleError(error)
 			}
-		}
-		
-		// Go!
-		DispatchQueue.main.async {
-			checkDatabase()
-		}
+		} // </Task>
 	}
 	
 	/// The upload task performs the following tasks:
@@ -790,107 +727,11 @@ class SyncTxManager {
 	private func uploadPayments(_ uploadProgress: SyncTxManager_State_Uploading) {
 		log.trace("uploadPayments()")
 		
-		let finish = { (result: Result<Void, Error>) -> Void in
+		let prepareUpload = {(
+			batch: FetchQueueBatchResult
+		) -> UploadOperationInfo in
 			
-			switch result {
-			case .success:
-				log.trace("uploadPayments(): finish(): success")
-				
-				self.consecutiveErrorCount = 0
-				Task {
-					if let newState = await self.actor.didUploadPayments() {
-						self.handleNewState(newState)
-					}
-				}
-				
-			case .failure(let error):
-				log.trace("uploadPayments(): finish(): failure")
-				self.handleError(error)
-			}
-		}
-		
-		let finish_nothingToUpload = { (result: Result<Void, Error>) -> Void in
-			
-			// The fetchQueueCountPublisher isn't firing reliably, and I'm not sure why...
-			//
-			// This can lead to the following infinite loop:
-			// - fetchQueueCountPublisher fires and reports a non-zero count
-			// - the actor.queueCount is updated
-			// - the uploadTask is evetually triggered
-			// - the item(s) are properly uploaded, and the rows are deleted from the queue
-			// - fetchQueueCountPublisher does NOT properly fire
-			// - the uploadTask is triggered again
-			// - it finds zero rows to upload, but actor.queueCount remains unchanged
-			// - the uploadTask is triggered again
-			// - ...
-			Task {
-				if let newState = await self.actor.queueCountChanged(0, wait: nil) {
-					self.handleNewState(newState)
-				}
-				finish(result)
-			}
-		}
-		
-		var checkDatabase      : (() -> Void)!
-		var prepareUpload      : ((UploadOperationInfo) -> Void)!
-		var performUpload      : ((UploadOperationInfo, CKModifyRecordsOperation) -> Void)!
-		var handlePartialError : ((UploadOperationInfo, CKError) -> Void)!
-		var updateDatabase     : ((UploadOperationInfo) -> Void)!
-		
-		// Step 1 of 4:
-		//
-		// Check the `cloudkit_payments_queue` table, to see if there's anything we need to upload.
-		// If the queue is non-empty, we will also receive:
-		// - the corresponding payment information that needs to be uploaded
-		// - the corresponding CKRecord metadata from previous upload for the payment (if present)
-		//
-		checkDatabase = { () -> Void in
-			log.trace("uploadPayments(): checkDatabase()")
-			
-			// Kotlin suspend functions are currently only supported on the main thread
-			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
-			
-			self.cloudKitDb.fetchQueueBatch(limit: 20) {
-				(result: CloudKitDb.FetchQueueBatchResult?, error: Error?) in
-				
-				if let error = error {
-					log.error("uploadPayments(): checkDatabase(): error: \(String(describing: error))")
-					finish(.failure(error))
-					
-				} else {
-					let batch = result?.convertToSwift() ?? FetchQueueBatchResult.empty()
-					log.trace("uploadPayments(): checkDatabase(): success: \(batch.rowids.count)")
-					
-					if batch.rowids.count == 0 {
-						// There's nothing queued for upload, so we're done.
-						finish_nothingToUpload(.success)
-					} else {
-						// Perform serialization & encryption on a background thread.
-						DispatchQueue.global(qos: .utility).async {
-							prepareUpload(UploadOperationInfo(batch: batch))
-						}
-					}
-				}
-			}
-			
-		} // </checkDatabase>
-		
-		
-		// Step 2 of 4:
-		//
-		// Serialize and encrypt the payment information.
-		// Then encapsulate the encrypted blob into a CKRecord.
-		// And prepare a full CKModifyRecordsOperation for upload.
-		//
-		prepareUpload = { (opInfo: UploadOperationInfo) -> Void in
 			log.trace("uploadPayments(): prepareUpload()")
-			
-			let batch = opInfo.batch
-			
-			log.debug("batch.rowids.count = \(batch.rowids.count)")
-			log.debug("batch.rowidMap.count = \(batch.rowidMap.count)")
-			log.debug("batch.rowMap.count = \(batch.rowMap.count)")
-			log.debug("batch.metadataMap.count = \(batch.metadataMap.count)")
 			
 			var recordsToSave = [CKRecord]()
 			var recordIDsToDelete = [CKRecord.ID]()
@@ -943,249 +784,133 @@ class SyncTxManager {
 				}
 			}
 			
-			let operation = CKModifyRecordsOperation(
+			return UploadOperationInfo(
+				batch: batch,
 				recordsToSave: recordsToSave,
-				recordIDsToDelete: recordIDsToDelete
+				recordIDsToDelete: recordIDsToDelete,
+				reverseMap: reverseMap,
+				unpaddedMap: unpaddedMap
 			)
-			
-			var nextOpInfo = opInfo
-			nextOpInfo.reverseMap = reverseMap
-			nextOpInfo.unpaddedMap = unpaddedMap
-			
-			if recordsToSave.count == 0 && recordIDsToDelete.count == 0 {
-			
-				// CKModifyRecordsOperation will fail if given an empty task.
-				// So we need to skip ahead.
-				DispatchQueue.main.async {
-					updateDatabase(nextOpInfo)
-				}
-				
-			} else {
-				performUpload(nextOpInfo, operation)
-			}
 		
-		} // </prepareUpload>
+		} // </prepareUpload()>
 		
-		
-		// Step 3 of 4:
-		//
-		// Perform the upload to the cloud.
-		//
-		performUpload = { (opInfo: UploadOperationInfo, operation: CKModifyRecordsOperation) -> Void in
+		let performUpload = {(
+			opInfo: UploadOperationInfo
+		) async throws -> UploadOperationInfo in
+			
 			log.trace("uploadPayments(): performUpload()")
+			log.trace("opInfo.recordsToSave.count = \(opInfo.recordsToSave.count)")
+			log.trace("opInfo.recordIDsToDelete.count = \(opInfo.recordIDsToDelete.count)")
 			
-			log.debug("operation.recordsToSave.count = \(operation.recordsToSave?.count ?? 0)")
-			log.debug("operation.recordIDsToDelete.count = \(operation.recordIDsToDelete?.count ?? 0)")
-			
-			operation.isAtomic = false
-			operation.savePolicy = .ifServerRecordUnchanged
-			
-			let (parentProgress, childrenProgress) = self.createProgress(for: operation)
-			
-			operation.perRecordProgressBlock = { (record: CKRecord, percent: Double) -> Void in
-				
-				if let child = childrenProgress[record.recordID] {
-					let completed = Double(child.totalUnitCount) * percent
-					child.completedUnitCount = Int64(completed)
-				}
+			if Task.isCancelled {
+				throw CKError(.operationCancelled)
 			}
 			
-			var inFlightCount = 0
-			inFlightCount += operation.recordsToSave?.count ?? 0
-			inFlightCount += operation.recordIDsToDelete?.count ?? 0
-			
-			uploadProgress.setInFlight(count: inFlightCount, progress: parentProgress)
-			
-			var savedRecords: [CKRecord] = []
-			var deletedRecordIds: [CKRecord.ID] = []
-			
-			operation.perRecordSaveBlock = {(recordID: CKRecord.ID, result: Result<CKRecord, Error>) in
-				if case .success(let record) = result {
-					savedRecords.append(record)
-				}
-			}
-			
-			operation.perRecordDeleteBlock = {(recordID: CKRecord.ID, result: Result<Void, Error>) in
-				if case .success(_) = result {
-					deletedRecordIds.append(recordID)
-				}
-			}
-			
-			operation.modifyRecordsResultBlock = {(result: Result<Void, Error>) in
-				
-				log.trace("operation.modifyRecordsCompletionBlock()")
-				
-				var partialFailure: CKError? = nil
-				if case .failure(let error) = result {
-					
-					if let ckerror = error as? CKError, ckerror.errorCode == CKError.partialFailure.rawValue {
-						
-						// If we receive a partial error, it's because we've already uploaded these items before.
-						// We need to handle this case differently.
-						partialFailure = ckerror
-						
-					} else {
-						
-						log.error("Error modifying records: \(String(describing: error))")
-						return finish(.failure(error))
-					}
-				}
-				
-				var nextOpInfo = opInfo
-				nextOpInfo.savedRecords = savedRecords
-				nextOpInfo.deletedRecordIds = deletedRecordIds
-				
-				if let partialFailure = partialFailure {
-					// Not every payment in the batch was successful.
-					// We may have to fetch metadata & redo some operations.
-					handlePartialError(nextOpInfo, partialFailure)
-					
-				} else {
-					// Every payment in the batch was successful.
-					parentProgress.completedUnitCount = parentProgress.totalUnitCount
-					for (_, paymentRowId) in opInfo.reverseMap {
-						for rowid in opInfo.batch.rowidsMatching(paymentRowId) {
-							nextOpInfo.completedRowids.append(rowid)
-						}
-					}
-					DispatchQueue.main.async {
-						updateDatabase(nextOpInfo)
-					}
-				}
-			}
+			let container = CKContainer.default()
 			
 			let configuration = CKOperation.Configuration()
 			configuration.allowsCellularAccess = Prefs.shared.backupTransactions.useCellular
 			
-			operation.configuration = configuration
-			
-			if uploadProgress.register(operation) {
-				CKContainer.default().privateCloudDatabase.add(operation)
-			} else {
-				finish(.failure(CKError(.operationCancelled)))
-			}
-		
-		} // </performUpload>
-		
-		// Step 3.B of 4:
-		//
-		// If the upload encounters a partial error,
-		// we have special handling we need to perform.
-		//
-		handlePartialError = { (opInfo: UploadOperationInfo, ckerror: CKError) -> Void in
-			log.trace("uploadPayments(): handlePartialError()")
-			
-			var nextOpInfo = opInfo
-			var isAccountFailure = false
-			var recordIDsToFetch: [CKRecord.ID] = []
-			
-			if let map = ckerror.partialErrorsByItemID {
+			return try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
 				
-				// Defined as:
-				// - map: [AnyHashable: Error]
-				//
-				// Expected types:
-				// - key: CKRecord.ID
-				// - value: CKError
+				let (saveResults, deleteResults) = try await database.modifyRecords(
+					saving: opInfo.recordsToSave,
+					deleting: opInfo.recordIDsToDelete,
+					savePolicy: CKModifyRecordsOperation.RecordSavePolicy.ifServerRecordUnchanged,
+					atomically: false
+				)
 				
-				for (key, value) in map {
+				// saveResults: [CKRecord.ID : Result<CKRecord, Error>]
+				// deleteResults: [CKRecord.ID : Result<Void, Error>]
+				
+				var nextOpInfo = opInfo
+				
+				var accountFailure: CKError? = nil
+				var recordIDsToFetch: [CKRecord.ID] = []
+				
+				for (recordID, result) in saveResults {
 					
-					if let recordID = key as? CKRecord.ID,
-					   let paymentRowId = opInfo.reverseMap[recordID]
-					{
-						// Remove corresponding rowid(s) from list of completed
-						for rowid in opInfo.batch.rowidsMatching(paymentRowId) {
-							nextOpInfo.completedRowids.removeAll(where: { $0 == rowid })
+					guard let paymentId = opInfo.reverseMap[recordID] else {
+						continue
+					}
+					
+					switch result {
+					case .success(let record):
+						nextOpInfo.savedRecords.append(record)
+						
+						for rowid in nextOpInfo.batch.rowidsMatching(paymentId) {
+							nextOpInfo.completedRowids.append(rowid)
 						}
-						
-						// Add to list of failed
-						nextOpInfo.partialFailures[paymentRowId] = value as? CKError
-						
-						// If this is a standard your-changetag-was-out-of-date message from the server,
-						// then we just need to fetch the latest CKRecord metadata from the cloud,
-						// and then re-try our upload.
-						if let recordError = value as? CKError {
+
+					case .failure(let error):
+						if let recordError = error as? CKError {
+							
+							nextOpInfo.partialFailures[paymentId] = recordError
+
+							// If this is a standard your-changetag-was-out-of-date message from the server,
+							// then we just need to fetch the latest CKRecord metadata from the cloud,
+							// and then re-try our upload.
 							if recordError.errorCode == CKError.serverRecordChanged.rawValue {
 								recordIDsToFetch.append(recordID)
 							} else if recordError.errorCode == CKError.accountTemporarilyUnavailable.rawValue {
-								isAccountFailure = true
+								accountFailure = recordError
 							}
 						}
+					} // </switch>
+				} // </for>
+				
+				for (recordID, result) in deleteResults {
+					switch result {
+						case .success(_): nextOpInfo.deletedRecordIds.append(recordID)
+						case .failure(_): break
 					}
 				}
-			}
-			
-			if isAccountFailure {
-				log.debug("uploadPayments(): handlePartialError(): isAccountFailure")
-		
-				return finish(.failure(ckerror))
-			}
-			if recordIDsToFetch.count == 0 {
-				log.debug("uploadPayments(): handlePartialError(): No outdated records")
 				
-				return DispatchQueue.main.async {
-					updateDatabase(nextOpInfo)
-				}
-			}
-			
-			let operation = CKFetchRecordsOperation(recordIDs: recordIDsToFetch)
-			
-			var fetchedRecords: [CKRecord] = []
-			operation.perRecordResultBlock = {(recordID: CKRecord.ID, result: Result<CKRecord, Error>) in
-				
-				if case .success(let record) = result {
-					fetchedRecords.append(record)
-				}
-			}
-			
-			operation.fetchRecordsResultBlock = {(result: Result<Void, Error>) in
-				
-				log.trace("operation.fetchRecordsResultBlock()")
-				
-				switch result {
-				case .success(_):
-					log.debug("fetchedRecords.count = \(fetchedRecords.count)")
+				if let accountFailure {
+					// We received one or more `accountTemporarilyUnavailable` errors.
+					// We have special error handling code for this.
+					throw accountFailure
+					
+				} else if !recordIDsToFetch.isEmpty {
+					// One or more records was out-of-date (as compared with the server version).
+					// So we need to refetch those records from the server.
+					
+					if Task.isCancelled {
+						throw CKError(.operationCancelled)
+					}
+					
+					let results: [CKRecord.ID : Result<CKRecord, Error>] = try await database.records(
+						for: recordIDsToFetch,
+						desiredKeys: [] // fetch only basic CKRecord metadata
+					)
+					
+					// results: [CKRecord.ID : Result<CKRecord, Error>]
+					
+					let fetchedRecords: [CKRecord] = results.values.compactMap { result in
+						return try? result.get()
+					}
 					
 					// We successfully fetched the latest CKRecord(s) from the server.
 					// We add to nextOpInfo.savedRecords, which will write the CKRecord to the database.
 					// So on the next upload attempt, we should have the latest version.
-					//
+					
 					nextOpInfo.savedRecords.append(contentsOf: fetchedRecords)
 					
-					DispatchQueue.main.async {
-						updateDatabase(nextOpInfo)
-					}
-					
-				case .failure(let error):
-					log.debug("Error fetching records: \(String(describing: error))")
-					finish(.failure(error))
+				} else {
+					// Every payment in the batch was successful
 				}
-			}
-			
-			operation.desiredKeys = [] // fetch only basic CKRecord metadata
-			
-			let configuration = CKOperation.Configuration()
-			configuration.allowsCellularAccess = true
-			
-			operation.configuration = configuration
-			
-			if uploadProgress.register(operation) {
-				CKContainer.default().privateCloudDatabase.add(operation)
-			} else {
-				finish(.failure(CKError(.operationCancelled)))
-			}
+				
+				return nextOpInfo
+				
+			} // </configuredWith>
 		
-		} // </handlePartialError>
+		} // </performUpload()>
 		
-		
-		// Step 4 of 4:
-		//
-		// Process the upload results.
-		updateDatabase = { (opInfo: UploadOperationInfo) -> Void in
+		let updateDatabase = {(
+			opInfo: UploadOperationInfo
+		) async throws -> Void in
+			
 			log.trace("uploadPayments(): updateDatabase()")
-			
-			// Kotlin suspend functions are currently only supported on the main thread
-			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
 			var deleteFromQueue = [KotlinLong]()
 			var deleteFromMetadata = [WalletPaymentId]()
@@ -1224,36 +949,118 @@ class SyncTxManager {
 			log.debug("deleteFromQueue.count = \(deleteFromQueue.count)")
 			log.debug("deleteFromMetadata.count = \(deleteFromMetadata.count)")
 			log.debug("updateMetadata.count = \(updateMetadata.count)")
-			
-			self.cloudKitDb.updateRows(
-				deleteFromQueue: deleteFromQueue,
-				deleteFromMetadata: deleteFromMetadata,
-				updateMetadata: updateMetadata
-			) { (error: Error?) in
-				
-				log.trace("cloudKitDb.updateRows().completion()")
-				
-				if let error = error {
-					log.error("cloudKitDb.updateRows(): error: \(String(describing: error))")
-					finish(.failure(error))
-				} else {
-					uploadProgress.completeInFlight(completed: deleteFromQueue.count)
-					
-					// Check to see if there are more items to upload.
-					// Perhaps items were added to the database while we were uploading.
-					DispatchQueue.main.async { // Kotlin completion may or may not be on main threadru
-						checkDatabase()
-					}
-				}
-			}
+		
+			try await Task { @MainActor [deleteFromQueue, deleteFromMetadata, updateMetadata] in
+				try await self.cloudKitDb.updateRows(
+					deleteFromQueue: deleteFromQueue,
+					deleteFromMetadata: deleteFromMetadata,
+					updateMetadata: updateMetadata
+				)
+			}.value
 			
 		} // </updateDatabase>
 		
+		let finish = {(
+			result: Result<Void, Error>
+		) async -> Void in
+			
+			switch result {
+			case .success:
+				log.trace("uploadPayments(): finish(): success")
+				
+				self.consecutiveErrorCount = 0
+				if let newState = await self.actor.didUploadPayments() {
+					self.handleNewState(newState)
+				}
+				
+			case .failure(let error):
+				log.trace("uploadPayments(): finish(): failure")
+				self.handleError(error)
+			}
+			
+		} // </finish()>
 		
-		// Go!
-		DispatchQueue.main.async {
-			checkDatabase()
-		}
+		Task {
+			log.trace("uploadPayments(): starting task...")
+			
+			do {
+				// Step 1 of 4:
+				//
+				// Check the `cloudkit_payments_queue` table, to see if there's anything we need to upload.
+				// If the queue is non-empty, we will also receive:
+				// - the corresponding payment information that needs to be uploaded
+				// - the corresponding CKRecord metadata from previous upload for the payment (if present)
+				
+				let result: CloudKitDb.FetchQueueBatchResult = try await Task { @MainActor in
+					return try await self.cloudKitDb.fetchQueueBatch(limit: 20)
+				}.value
+				
+				let batch = result.convertToSwift()
+				
+				log.debug("uploadPayments(): batch.rowids.count = \(batch.rowids.count)")
+				log.debug("uploadPayments(): batch.rowidMap.count = \(batch.rowidMap.count)")
+				log.debug("uploadPayments(): batch.rowMap.count = \(batch.rowMap.count)")
+				log.debug("uploadPayments(): batch.metadataMap.count = \(batch.metadataMap.count)")
+				
+				if batch.rowids.isEmpty {
+					// There's nothing queued for upload, so we're done.
+					
+					// Bug Fix / Workaround:
+					// The fetchQueueCountPublisher isn't firing reliably, and I'm not sure why...
+					//
+					// This can lead to the following infinite loop:
+					// - fetchQueueCountPublisher fires and reports a non-zero count
+					// - the actor.queueCount is updated
+					// - the uploadTask is evetually triggered
+					// - the item(s) are properly uploaded, and the rows are deleted from the queue
+					// - fetchQueueCountPublisher does NOT properly fire
+					// - the uploadTask is triggered again
+					// - it finds zero rows to upload, but actor.queueCount remains unchanged
+					// - the uploadTask is triggered again
+					// - ...
+					//
+					if let newState = await self.actor.queueCountChanged(0, wait: nil) {
+						self.handleNewState(newState)
+					}
+					return await finish(.success)
+				}
+				
+				// Step 2 of 4:
+				//
+				// Serialize and encrypt the payment information.
+				// Then encapsulate the encrypted blob into a CKRecord.
+				// And prepare a full CKModifyRecordsOperation for upload.
+				
+				var opInfo = prepareUpload(batch)
+				
+				// Step 3 of 4:
+				//
+				// Perform the cloud operation.
+				
+				let inFlightCount = opInfo.recordsToSave.count + opInfo.recordIDsToDelete.count
+				if inFlightCount == 0 {
+					// Edge case: there are no cloud tasks to perform.
+					// We have to skip the upload, because it will fail if given an empty set of tasks.
+				} else {
+				//	uploadProgress.setInFlight(count: inFlightCount, progress: parentProgress)
+					opInfo = try await performUpload(opInfo)
+				}
+				
+				// Step 4 of 4:
+				//
+				// Process the upload results.
+				
+				try await updateDatabase(opInfo)
+				
+				// Done !
+				
+				uploadProgress.completeInFlight(completed: inFlightCount)
+				return await finish(.success)
+				
+			} catch {
+				return await finish(.failure(error))
+			}
+		} // </Task>
 	}
 	
 	// ----------------------------------------
@@ -1596,45 +1403,6 @@ class SyncTxManager {
 		return (payment, metadata, unpaddedSize)
 	}
 	
-	private func createProgress(
-		for operation: CKModifyRecordsOperation
-	) -> (Progress, [CKRecord.ID: Progress]) {
-		
-		// A CKModifyRecordsOperation consists of uploading:
-		// - zero or more CKRecords (with a serialized & encrypted payment)
-		// - zero or more CKRecord.ID's
-		//
-		// From the perspective of monitoring the upload progress,
-		// we only have visibility concerning the upload of the CKRecords.
-		// So that will be the basis of our progress.
-		
-		var totalUnitCount: Int64 = 0
-		var children: [CKRecord.ID: Progress] = [:]
-		
-		for record in (operation.recordsToSave ?? []) {
-			
-			if let blob = record[record_column_data] as? Data {
-				
-				let numBytes = Int64(blob.count)
-				
-				children[record.recordID] = Progress(totalUnitCount: numBytes)
-				totalUnitCount += numBytes
-			}
-		}
-		
-		if totalUnitCount == 0 {
-			totalUnitCount = 1
-		}
-		
-		let parentProgress = Progress(totalUnitCount: totalUnitCount)
-		for (_, child) in children {
-			
-			parentProgress.addChild(child, withPendingUnitCount: child.totalUnitCount)
-		}
-		
-		return (parentProgress, children)
-	}
-	
 	private func genRandomBytes(_ count: Int) -> Data {
 
 		var data = Data(count: count)
@@ -1768,16 +1536,6 @@ class SyncTxManager {
 	private func dateToMillis(_ date: Date) -> Int64 {
 		
 		return Int64(date.timeIntervalSince1970 * 1_000)
-	}
-	
-	private func millisToDate(_ millis: KotlinLong?) -> Date? {
-		
-		if let millis = millis {
-			let seconds: TimeInterval = millis.doubleValue / Double(1_000)
-			return Date(timeIntervalSince1970: seconds)
-		} else {
-			return nil
-		}
 	}
 	
 	// ----------------------------------------
