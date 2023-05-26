@@ -40,10 +40,9 @@
     <string name="notif__missed__locked">Application was locked</string>
     <string name="notif__rejected__title">Rejected incoming payment (+%1$s)</string>
     <string name="notif__rejected__by_user">You have rejected the payment</string>
-    <string name="notif__rejected__policy_disabled">Automated liquidity policy is disabled. You can change that in the app settings.</string>
-    <string name="notif__rejected__policy_too_expensive">Payment fee (%1$s) would have exceeded the maximum (%2$s). You can change that in the app settings.</string>
-    <string name="notif__rejected__below_min">Amount (%1$s sat) was below the minimum amount for a new channel (%2$s sat).</string>
-    <string name="notif__rejected__channels_initializing">Your channels are still initializing and cannot accept that payment. Try again later.</string>
+    <string name="notif__rejected__policy_disabled">Automated liquidity policy is disabled. You can change that in the settings.</string>
+    <string name="notif__rejected__policy_too_expensive">The fee was %1$s, but your max fee was set to %2$s. You can tweak that in the settings.</string>
+    <string name="notif__rejected__channels_initializing">Your channels were initializing and could not accept that payment. Try again later.</string>
 
     <string name="notif_watcher_revoked_commit_title">Some of your channels have closed</string>
     <string name="notif_watcher_revoked_commit_message">Please start Phoenix to review your channels.</string>
@@ -340,13 +339,32 @@
 
     <!-- //////////////// notifications //////////////////// -->
 
-    <string name="inappnotif_mnemonics_never_seen">Thanks for using Phoenix. Please backup your wallet so that you don\'t lose your bitcoins.</string>
-    <string name="inappnotif_mnemonics_never_seen_action">Backup my wallet</string>
-    <string name="inappnotif_background_worker_cannot_run">Phoenix needs to be able to run in background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
-    <string name="inappnotif_upgrade">An update for this app is available.</string>
-    <string name="inappnotif_upgrade_critical">A critical update is available. The wallet may malfunction if not updated.</string>
-    <string name="inappnotif_mempool_high_usage">Bitcoin mempool is full and fees are high.</string>
-    <string name="inappnotif_mempool_high_usage_action">See how Phoenix is affected</string>
+    <string name="inappnotif_title">Notifications</string>
+    <string name="inappnotif_notices_title">Important messages</string>
+    <string name="inappnotif_payments_title">Recent payment failures</string>
+
+    <string name="inappnotif_backup_seed_message">Backup your wallet so that you don\'t lose your bitcoins.</string>
+    <string name="inappnotif_backup_seed_action">Backup my wallet</string>
+
+    <string name="inappnotif_notification_permission_message">Notifications are disabled in Android settings. Phoenix won\'t be able to notify you when a payment is processing.</string>
+    <string name="inappnotif_notification_permission_enable">Enable</string>
+
+    <string name="inappnotif_background_worker_cannot_run_message">Phoenix needs to run in the background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
+
+    <string name="inappnotif_upgrade_message">An update is available</string>
+    <string name="inappnotif_upgrade_critical_message">A critical update is available. You should update Phoenix as soon as possible.</string>
+    <string name="inappnotif_upgrade_button">Update on Google Play</string>
+
+    <string name="inappnotif_mempool_full_message">The Bitcoin mempool is full and on-chain fees are high.</string>
+    <string name="inappnotif_mempool_full_action">See how Phoenix is affected</string>
+
+    <string name="inappnotif_payment_rejected_title">Payment rejected (+%1$s)</string>
+    <string name="inappnotif_payment_rejected_by_user">You rejected that payment manually.</string>
+    <string name="inappnotif_payment_rejected_disabled">Automated incoming liquidity is disabled in your incoming fee setting.</string>
+    <string name="inappnotif_payment_rejected_too_expensive">The fee was %1$s, but your max fee was set to %2$s.</string>
+    <string name="inappnotif_payment_rejected_channel_initializing">Your channels are still initializing and could not receive that payment.</string>
+    <string name="inappnotif_payment_rejected_tweak_setting">Tap here to tweak your settings.</string>
+    <string name="inappnotif_payment_rejected_try_again">Try again later.</string>
 
     <!-- //////////////// display seed //////////////// -->
 
@@ -827,12 +845,15 @@
 
     <!-- settings: liquidity policy for channels creation -->
     <string name="liquiditypolicy_title">Incoming fee policy</string>
-    <string name="liquiditypolicy_instructions">Incoming payments sometimes requires on-chain transactions. This does not always happen, only when needed.\n\nThose fees go to <b>bitcoin miners</b>, except for a 1000 sat service fee in the initial payment.</string>
-    <string name="liquiditypolicy_fees_header">Fees</string>
+    <string name="liquiditypolicy_instructions">Incoming payments sometimes requires on-chain transactions. This does not always happen, only when needed.</string>
+    <string name="liquiditypolicy_fees_estimation">The miner fee is currently estimated to be around <b>%1$s</b> (≈%2$s).</string>
+    <string name="liquiditypolicy_fees_estimation_feerate">Feerate %1$s from Electrum</string>
+    <string name="liquiditypolicy_fees_header">My fee setting</string>
     <string name="liquiditypolicy_fees_base_label">Max fee amount</string>
-    <string name="liquiditypolicy_fees_base_help">Incoming fees will never exceed that value whatsoever.</string>
-    <string name="liquiditypolicy_fees_prop_label">Tiny payments</string>
-    <string name="liquiditypolicy_fees_prop_help">To accept tiny payments that would otherwise be rejected.</string>
+    <string name="liquiditypolicy_fees_base_help">Incoming payments are rejected when the fee is above that value.</string>
+    <string name="liquiditypolicy_fees_prop_label">Tiny payments ceiling</string>
+    <string name="liquiditypolicy_fees_prop_help">Helps accepting tiny payments that would otherwise be rejected by the maximum fee setting.</string>
+    <string name="liquiditypolicy_modes_advanced">Advanced options</string>
     <string name="liquiditypolicy_modes_header">Lightning on-the-fly</string>
     <string name="liquiditypolicy_modes_pay_to_open_label">Manual Lightning management</string>
     <string name="liquiditypolicy_modes_pay_to_open_description">When enabled, incoming Lightning payments will be rejected when your liquidity is insufficient.\n\nDOES NOT DO ANYTHING YET</string>
@@ -878,10 +899,5 @@
     <string name="splice_error_interactive_session">Interactive tx session failed [%1$s]</string>
     <string name="splice_error_invalid_pubkey">Invalid splice-out pubkey script</string>
     <string name="splice_error_splice_in_progress">A splice payment is already in progress</string>
-
-    <!-- notification permission -->
-    <string name="permission_notification_dismiss">Don\'t remind me</string>
-    <string name="permission_notification_request">Tap to enable</string>
-    <string name="permission_notification_denied">Payment notifications are disabled.</string>
 
 </resources>

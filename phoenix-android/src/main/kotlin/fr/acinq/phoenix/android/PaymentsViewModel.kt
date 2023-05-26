@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.payments.details
+package fr.acinq.phoenix.android
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

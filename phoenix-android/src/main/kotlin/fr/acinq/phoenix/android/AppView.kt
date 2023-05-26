@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android
 
+import android.Manifest
 import android.net.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -28,18 +29,22 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.home.*
 import fr.acinq.phoenix.android.init.*
 import fr.acinq.phoenix.android.intro.IntroView
 import fr.acinq.phoenix.android.payments.*
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
-import fr.acinq.phoenix.android.payments.details.PaymentsViewModel
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
 import fr.acinq.phoenix.android.utils.appBackground
+import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -87,6 +92,9 @@ fun AppView(
             )
         )
 
+        val noticesViewModel = viewModel<NoticesViewModel>(factory = NoticesViewModel.Factory(appConfigurationManager = business.appConfigurationManager))
+        monitorNotices(vm = noticesViewModel)
+
         val legacyAppStatus = PrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
         if (legacyAppStatus.value is LegacyAppStatus.Required && navController.currentDestination?.route != Screen.SwitchToLegacy.route) {
             navController.navigate(Screen.SwitchToLegacy.route)
@@ -116,7 +124,7 @@ fun AppView(
                 composable(
                     route = "${Screen.Startup.route}?next={next}",
                     arguments = listOf(
-                        navArgument("next") { type = NavType.StringType ; nullable = true }
+                        navArgument("next") { type = NavType.StringType; nullable = true }
                     ),
                 ) {
                     val nextScreenLink = it.arguments?.getString("next")
@@ -154,6 +162,7 @@ fun AppView(
                     RequireStarted(appVM.walletState.value) {
                         HomeView(
                             paymentsViewModel = paymentsViewModel,
+                            noticesViewModel = noticesViewModel,
                             onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },
                             onSettingsClick = { navController.navigate(Screen.Settings.route) },
                             onReceiveClick = { navController.navigate(Screen.Receive.route) },
@@ -163,6 +172,7 @@ fun AppView(
                             onElectrumClick = { navController.navigate(Screen.ElectrumServer) },
                             onShowSwapInWallet = { navController.navigate(Screen.WalletInfo.SwapInWallet) },
                             onShowChannels = { navController.navigate(Screen.Channels) },
+                            onShowNotifications = { navController.navigate(Screen.Notifications) }
                         )
                     }
                 }
@@ -232,7 +242,7 @@ fun AppView(
                 composable(Screen.Channels.route) {
                     ChannelsView(
                         onBackClick = { navController.popBackStack() },
-                        onChannelClick = { navController.navigate("${Screen.ChannelDetails.route}?id=$it")}
+                        onChannelClick = { navController.navigate("${Screen.ChannelDetails.route}?id=$it") }
                     )
                 }
                 composable(
@@ -298,6 +308,22 @@ fun AppView(
                 composable(Screen.LiquidityPolicy.route) {
                     LiquidityPolicyView(onBackClick = { navController.popBackStack() })
                 }
+                composable(Screen.Notifications.route) {
+                    NotificationsView(
+                        noticesViewModel = noticesViewModel,
+                        onBackClick = { navController.popBackStack() }
+                    )
+                }
+                composable(
+                    route = "${Screen.PaymentRejectedDetails.route}?id={id}",
+                    arguments = listOf(navArgument("id") { type = NavType.StringType })
+                ) {
+                    val id = it.arguments?.getString("id")?.let { UUID.fromString(it) }
+                    PaymentRejectedDetailsView(
+                        id = id,
+                        onBackClick = { navController.popBackStack() }
+                    )
+                }
             }
         }
     }
@@ -321,6 +347,35 @@ private fun popToHome(navController: NavHostController) {
 
 fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId, isFromEvent: Boolean) {
     navController.navigate("${Screen.PaymentDetails.route}?direction=${id.dbType.value}&id=${id.dbId}&fromEvent=${isFromEvent}")
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun monitorNotices(
+    vm: NoticesViewModel
+) {
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        InternalData.isMnemonicsChecked(context).collect {
+            if (!it) {
+                vm.addNotice(Notice.BackupSeedReminder)
+            } else {
+                vm.removeNotice(Notice.BackupSeedReminder)
+            }
+        }
+    }
+
+    val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+    LaunchedEffect(Unit) {
+        UserPrefs.getShowNotificationPermissionReminder(context).collect {
+            if (it && !notificationPermission.status.isGranted) {
+                vm.addNotice(Notice.NotificationPermission)
+            } else {
+                vm.removeNotice(Notice.NotificationPermission)
+            }
+        }
+    }
 }
 
 @Composable

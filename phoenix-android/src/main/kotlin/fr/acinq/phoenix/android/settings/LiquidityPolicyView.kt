@@ -17,64 +17,134 @@
 package fr.acinq.phoenix.android.settings
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.RadioButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.payment.LiquidityPolicy
+import fr.acinq.lightning.transactions.Transactions
 import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.utils.toMilliSatoshi
-import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.orange
 import fr.acinq.phoenix.android.utils.safeLet
+import fr.acinq.phoenix.data.BitcoinUnit
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.roundToInt
 
-private enum class LiquidityPolicyOptions {
-    AUTO, TRUSTLESS, DISABLED
+private sealed class RetrievingFeerateState {
+    object Init : RetrievingFeerateState()
+    object InProgress : RetrievingFeerateState()
+    data class Found(val feerate: FeeratePerKw, val estimatedFee: Satoshi) : RetrievingFeerateState()
+    object Failed : RetrievingFeerateState()
 }
 
+private sealed class LiquidityViewMode {
+    object Basic : LiquidityViewMode()
+    object Advanced : LiquidityViewMode()
+}
+
+private class LiquidityPolicyViewModel(val electrumClient: ElectrumClient) : ViewModel() {
+    val feerateState = mutableStateOf<RetrievingFeerateState>(RetrievingFeerateState.Init)
+
+    val viewMode = mutableStateOf<LiquidityViewMode>(LiquidityViewMode.Basic)
+
+    init {
+        viewModelScope.launch { pollFeerate() }
+    }
+
+    private suspend fun pollFeerate() {
+        while (viewModelScope.isActive) {
+            withTimeoutOrNull(5000) {
+                electrumClient.estimateFees(1)
+            }?.feerate?.let {
+                feerateState.value = RetrievingFeerateState.Found(it, Transactions.weight2fee(it, 992))
+                delay(5 * 60 * 1000)
+            } ?: run {
+                delay(2_000)
+                feerateState.value = RetrievingFeerateState.Failed
+            }
+        }
+    }
+
+    class Factory(
+        private val electrumClient: ElectrumClient
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            @Suppress("UNCHECKED_CAST")
+            return LiquidityPolicyViewModel(electrumClient) as T
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LiquidityPolicyView(
     onBackClick: () -> Unit,
 ) {
     val log = logger("LiquidityPolicyView")
     val context = LocalContext.current
-    val btcUnit = LocalBitcoinUnit.current
     val scope = rememberCoroutineScope()
     val liquidityPreferredFees by UserPrefs.getLiquidityPreferredFee(context).collectAsState(null)
     val liquidityPolicyInPrefs by UserPrefs.getLiquidityPolicy(context).collectAsState(null)
+
+    val vm = viewModel<LiquidityPolicyViewModel>(factory = LiquidityPolicyViewModel.Factory(business.electrumClient))
 
     DefaultScreenLayout {
         DefaultScreenHeader(
             onBackClick = onBackClick,
             title = stringResource(id = R.string.liquiditypolicy_title),
-            helpMessage = stringResource(id = R.string.liquiditypolicy_help),
+            helpMessage = stringResource(id = R.string.lipsum_short),
             helpMessageLink = stringResource(id = R.string.liquiditypolicy_help_link) to "https://phoenix.acinq.co/faq",
         )
 
-        Card(internalPadding = PaddingValues(16.dp)) {
-            Text(text = annotatedStringResource(id = R.string.liquiditypolicy_instructions))
+        Card(internalPadding = PaddingValues(16.dp), modifier = Modifier.fillMaxWidth()) {
+            Text(text = stringResource(id = R.string.liquiditypolicy_instructions))
+            Spacer(modifier = Modifier.height(16.dp))
+            when (val feerateState = vm.feerateState.value) {
+                is RetrievingFeerateState.Found -> {
+                    val fiatCurrency = LocalFiatCurrency.current
+                    Text(
+                        text = annotatedStringResource(
+                            id = R.string.liquiditypolicy_fees_estimation,
+                            feerateState.estimatedFee.toPrettyString(BitcoinUnit.Sat, withUnit = true),
+                            feerateState.estimatedFee.toPrettyString(fiatCurrency, fiatRate, withUnit = true)
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = stringResource(id = R.string.liquiditypolicy_fees_estimation_feerate, feerateState.feerate),
+                        style = MaterialTheme.typography.subtitle2
+                    )
+                }
+                RetrievingFeerateState.Failed -> Text("Failed to retrieve feerate, trying again...")
+                else -> ProgressView(text = "Retrieving feerate...", padding = PaddingValues(0.dp))
+            }
         }
 
         safeLet(liquidityPreferredFees, liquidityPolicyInPrefs) { defaultFee, policyInPrefs ->
-
-            val business = business
 
             var isPayToOpenDisabled by remember { mutableStateOf(false) }
             var maxRelativeFeeBasisPoints by remember { mutableStateOf(defaultFee.maxRelativeFeeBasisPoints) }
@@ -86,12 +156,16 @@ fun LiquidityPolicyView(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     var isError by remember { mutableStateOf(false) }
-                    Text(
-                        text = stringResource(id = R.string.liquiditypolicy_fees_base_label),
-                        modifier = Modifier.alignByBaseline()
-                    )
-                    IconPopup(popupMessage = stringResource(id = R.string.liquiditypolicy_fees_base_help), spaceLeft = 8.dp, spaceRight = 0.dp)
-                    Spacer(Modifier.weight(1f))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(id = R.string.liquiditypolicy_fees_base_label),
+                        )
+                        Text(
+                            text = stringResource(id = R.string.liquiditypolicy_fees_base_help),
+                            style = MaterialTheme.typography.subtitle2
+                        )
+                    }
+                    Spacer(Modifier.width(10.dp))
                     InlineNumberInput(
                         value = maxAbsoluteFee.sat.toDouble(),
                         onValueChange = {
@@ -108,50 +182,49 @@ fun LiquidityPolicyView(
                         isError = isError,
                         acceptDecimal = false,
                         trailingIcon = { Text(text = "sat") },
-                        modifier = Modifier.width(150.dp),
+                        modifier = Modifier.width(130.dp),
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    var isError by remember { mutableStateOf(false) }
-                    Text(
-                        text = stringResource(id = R.string.liquiditypolicy_fees_prop_label),
-                        modifier = Modifier.alignByBaseline()
-                    )
-                    IconPopup(popupMessage = stringResource(id = R.string.liquiditypolicy_fees_prop_help), spaceLeft = 8.dp, spaceRight = 0.dp)
-                    Spacer(Modifier.weight(1f))
-                    InlineNumberInput(
-                        value = maxRelativeFeeBasisPoints.toDouble() / 100,
-                        onValueChange = {
-                            when {
-                                it == null -> isError = true
-                                it < 0 -> isError = true
-                                it > 100 -> isError = true
-                                else -> {
-                                    isError = false
-                                    it.let { maxRelativeFeeBasisPoints = (it * 100).roundToInt() }
-                                }
+                when (val state = vm.feerateState.value) {
+                    is RetrievingFeerateState.Found -> {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                            if (maxAbsoluteFee < 100.sat) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                TextWithIcon(
+                                    text = "This fee is very low ; many incoming payments will fail.",
+                                    textStyle = MaterialTheme.typography.subtitle2.copy(fontSize = 14.sp),
+                                    icon = R.drawable.ic_info,
+                                    iconTint = MaterialTheme.typography.subtitle2.color,
+                                    space = 10.dp,
+                                )
+                            } else if (maxAbsoluteFee < state.estimatedFee) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                TextWithIcon(
+                                    text = "Incoming payments that need additional liquidity are expected to fail or remain on-chain",
+                                    textStyle = MaterialTheme.typography.subtitle2.copy(fontSize = 14.sp),
+                                    icon = R.drawable.ic_info,
+                                    iconTint = MaterialTheme.typography.subtitle2.color,
+                                    space = 10.dp,
+                                )
+                            } else if (maxAbsoluteFee > state.estimatedFee.times(3)) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                TextWithIcon(
+                                    text = "It's a bit high! Lorem ipsum dolor sit amet.",
+                                    textStyle = MaterialTheme.typography.subtitle2.copy(fontSize = 14.sp),
+                                    icon = R.drawable.ic_info,
+                                    iconTint = MaterialTheme.typography.subtitle2.color,
+                                    space = 10.dp,
+                                )
                             }
-                        },
-                        acceptDecimal = false,
-                        isError = isError,
-                        trailingIcon = { Text(text = "%") },
-                        modifier = Modifier.width(150.dp)
-                    )
+                        }
+                    }
+                    else -> {}
                 }
-            }
-
-            CardHeader(text = stringResource(id = R.string.liquiditypolicy_modes_header))
-            Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)) {
-                SwitchView(
-                    text = stringResource(id = R.string.liquiditypolicy_modes_pay_to_open_label),
-                    description = stringResource(id = R.string.liquiditypolicy_modes_pay_to_open_description),
-                    checked = isPayToOpenDisabled,
-                    onCheckedChange = { isPayToOpenDisabled = it }
-                )
             }
 
             Card {
+                val peerManager = business.peerManager
+                val notificationsManager = business.notificationsManager
                 val newPolicy = when {
                     maxAbsoluteFee == 0.sat && maxRelativeFeeBasisPoints == 0 -> LiquidityPolicy.Disable
                     else -> LiquidityPolicy.Auto(maxRelativeFeeBasisPoints = maxRelativeFeeBasisPoints, maxAbsoluteFee = maxAbsoluteFee)
@@ -167,10 +240,89 @@ fun LiquidityPolicyView(
                     onClick = {
                         scope.launch {
                             UserPrefs.saveLiquidityPolicy(context, newPolicy)
+                            peerManager.updatePeerLiquidityPolicy(newPolicy)
+                            notificationsManager.dismissAllNotifications()
                         }
                     },
                 )
             }
+
+            when (vm.viewMode.value) {
+                LiquidityViewMode.Basic -> {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(
+                            text = stringResource(id = R.string.liquiditypolicy_modes_advanced),
+                            icon = R.drawable.ic_chevron_down,
+                            textStyle = MaterialTheme.typography.caption,
+                            iconTint = MaterialTheme.typography.caption.color,
+                            padding = PaddingValues(8.dp),
+                            space = 8.dp,
+                            onClick = { vm.viewMode.value = LiquidityViewMode.Advanced }
+                        )
+                    }
+                }
+                LiquidityViewMode.Advanced -> {
+                    val dismissState = rememberDismissState(
+                        confirmStateChange = {
+                            if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
+                                vm.viewMode.value = LiquidityViewMode.Basic
+                            }
+                            true
+                        }
+                    )
+                    SwipeToDismiss(
+                        state = dismissState,
+                        background = {},
+                        dismissThresholds = { FractionalThreshold(0.8f) }
+                    ) {
+                        Column {
+                            CardHeader(text = stringResource(id = R.string.liquiditypolicy_modes_advanced))
+                            Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    var isError by remember { mutableStateOf(false) }
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = stringResource(id = R.string.liquiditypolicy_fees_prop_label),
+                                        )
+                                        Text(
+                                            text = stringResource(id = R.string.liquiditypolicy_fees_prop_help),
+                                            style = MaterialTheme.typography.subtitle2
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    InlineNumberInput(
+                                        value = maxRelativeFeeBasisPoints.toDouble() / 100,
+                                        onValueChange = {
+                                            when {
+                                                it == null -> isError = true
+                                                it < 0 -> isError = true
+                                                it > 100 -> isError = true
+                                                else -> {
+                                                    isError = false
+                                                    it.let { maxRelativeFeeBasisPoints = (it * 100).roundToInt() }
+                                                }
+                                            }
+                                        },
+                                        acceptDecimal = false,
+                                        isError = isError,
+                                        trailingIcon = { Text(text = "%") },
+                                        modifier = Modifier.width(130.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(16.dp))
+                                SwitchView(
+                                    text = stringResource(id = R.string.liquiditypolicy_modes_pay_to_open_label),
+                                    description = stringResource(id = R.string.liquiditypolicy_modes_pay_to_open_description),
+                                    checked = isPayToOpenDisabled,
+                                    onCheckedChange = { isPayToOpenDisabled = it }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
         } ?: Card {
             ProgressView(text = stringResource(id = R.string.liquiditypolicy_loading))
         }

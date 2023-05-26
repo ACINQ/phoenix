@@ -18,12 +18,10 @@ package fr.acinq.phoenix.android
 
 import android.content.Intent
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.Logging
-import fr.acinq.phoenix.android.utils.Notifications
+import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.legacy.AppContext
 import fr.acinq.phoenix.utils.PlatformContext
-import kotlinx.coroutines.*
 
 class PhoenixApplication : AppContext() {
     val business by lazy { PhoenixBusiness(PlatformContext(this)) }
@@ -31,7 +29,7 @@ class PhoenixApplication : AppContext() {
     override fun onCreate() {
         super.onCreate()
         Logging.setupLogger(applicationContext)
-        Notifications.registerNotificationChannels(applicationContext)
+        SystemNotificationHelper.registerNotificationChannels(applicationContext)
     }
 
     override fun onLegacyFinish() {

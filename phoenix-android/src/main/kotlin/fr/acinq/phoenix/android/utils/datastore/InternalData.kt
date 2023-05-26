@@ -46,7 +46,7 @@ object InternalData {
 
     // -- Timestamp of the last time the user has checked his mnemonics. Used to display notifications and messages.
     private val MNEMONICS_CHECK_TIMESTAMP = longPreferencesKey("MNEMONICS_CHECK_TIMESTAMP")
-    fun getMnemonicsCheckTimestamp(context: Context): Flow<Long?> = prefs(context).map { it[MNEMONICS_CHECK_TIMESTAMP] }
+    fun isMnemonicsChecked(context: Context): Flow<Boolean> = prefs(context).map { it[MNEMONICS_CHECK_TIMESTAMP] != null }
     suspend fun saveMnemonicsCheckTimestamp(context: Context, timestamp: Long) = context.internalData.edit { it[MNEMONICS_CHECK_TIMESTAMP] = timestamp }
 
     // -- Show a message summing up the migration result.

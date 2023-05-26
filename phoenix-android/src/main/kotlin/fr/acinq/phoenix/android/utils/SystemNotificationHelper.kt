@@ -39,7 +39,7 @@ import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
 import kotlinx.coroutines.flow.first
 
-object Notifications {
+object SystemNotificationHelper {
     const val MISSED_PAYMENT_NOTIF_ID = 354319
     const val MISSED_PAYMENT_NOTIF_CHANNEL = "${BuildConfig.APPLICATION_ID}.MISSED_PAYMENT_NOTIF"
     const val RECEIVED_PAYMENT_NOTIF_ID = 354320
@@ -81,14 +81,6 @@ object Notifications {
         }.let {
             NotificationManagerCompat.from(context).notify(MISSED_PAYMENT_NOTIF_ID, it.build())
         }
-    }
-
-    fun notifyPaymentMissedBelowMin(context: Context, amount: MilliSatoshi, minPayToOpen: MilliSatoshi) {
-        notifyPaymentMissed(
-            context = context,
-            title = context.getString(R.string.notif__missed__title),
-            message = context.getString(R.string.notif__rejected__below_min, amount.toPrettyString(BitcoinUnit.Sat), minPayToOpen.toPrettyString(BitcoinUnit.Sat))
-        )
     }
 
     fun notifyPaymentMissedRejectedByUser(context: Context, amountIncoming: MilliSatoshi) {

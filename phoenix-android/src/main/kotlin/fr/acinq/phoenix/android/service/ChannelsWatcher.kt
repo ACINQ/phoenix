@@ -24,7 +24,7 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
-import fr.acinq.phoenix.android.utils.Notifications
+import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
@@ -91,7 +91,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             if (hasUnknownRevokedAfterWatching) {
                 log.info("new revoked commits found, notifying user")
                 InternalData.saveChannelsWatcherOutcome(applicationContext, Outcome.RevokedFound(currentTimestampMillis()))
-                Notifications.notifyRevokedCommits(applicationContext)
+                SystemNotificationHelper.notifyRevokedCommits(applicationContext)
             } else {
                 InternalData.saveChannelsWatcherOutcome(applicationContext, Outcome.Nominal(currentTimestampMillis()))
                 log.info("channels-watcher job completed, no revoked commit found")

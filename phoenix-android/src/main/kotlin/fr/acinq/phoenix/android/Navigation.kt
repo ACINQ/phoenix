@@ -59,6 +59,8 @@ sealed class Screen(val route: String) {
         object FinalWallet: Screen("settings/walletinfo/final")
     }
     object LiquidityPolicy: Screen("settings/liquiditypolicy")
+    object Notifications: Screen("notifications")
+    object PaymentRejectedDetails: Screen("paymentrejected")
 }
 
 fun NavController.navigate(screen: Screen, arg: List<Any> = emptyList(), builder: NavOptionsBuilder.() -> Unit = {}) {

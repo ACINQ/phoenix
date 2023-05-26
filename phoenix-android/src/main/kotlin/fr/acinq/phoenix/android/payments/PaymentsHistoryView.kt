@@ -30,12 +30,12 @@ import androidx.compose.ui.*
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.payments.details.PaymentLine
 import fr.acinq.phoenix.android.payments.details.PaymentLineLoading
-import fr.acinq.phoenix.android.payments.details.PaymentsViewModel
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.WalletPaymentId
 import kotlinx.coroutines.flow.distinctUntilChanged
