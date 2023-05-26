@@ -23,10 +23,7 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
@@ -63,7 +60,7 @@ class NodeParamsManager(
                 ).copy(
                     alias = "phoenix",
                     zeroConfPeers = setOf(PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134")),
-                    liquidityPolicy = startupParams.liquidityPolicy
+                    liquidityPolicy = MutableStateFlow(startupParams.liquidityPolicy),
                 )
             }.collect {
                 log.info { "nodeid=${it.nodeId}" }

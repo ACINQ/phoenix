@@ -5,13 +5,13 @@ import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.*
 import fr.acinq.lightning.blockchain.electrum.WalletState
-import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.channel.InteractiveTxInput
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.PaymentsDb
-import fr.acinq.lightning.utils.*
+import fr.acinq.lightning.io.Peer
+import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.utils.extensions.*
+import fr.acinq.phoenix.utils.extensions.localBalance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
@@ -143,9 +143,6 @@ class BalanceManager(
                 }
                 is SwapInEvents.Accepted -> {
                     log.info { "swap-in accepted for id=${event.requestId} with mining_fee=${event.miningFee} service_fee=${event.serviceFee}" }
-                }
-                is SwapInEvents.Rejected -> {
-                    log.error { "swap-in rejected for id=${event.requestId} with required_fee=${event.requiredFees} error=${event.failure}" }
                 }
                 is ChannelEvents.Creating -> {
                     log.info { "channel creating with id=${event.state.channelId}" }

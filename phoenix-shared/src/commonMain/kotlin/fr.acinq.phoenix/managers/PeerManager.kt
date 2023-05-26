@@ -2,15 +2,18 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
-import fr.acinq.lightning.WalletParams
+import fr.acinq.lightning.LiquidityEvents
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.fee.OnChainFeerates
-import fr.acinq.lightning.channel.*
+import fr.acinq.lightning.channel.ChannelStateWithCommitments
+import fr.acinq.lightning.channel.Offline
 import fr.acinq.lightning.io.Peer
+import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.wire.InitTlv
 import fr.acinq.lightning.wire.TlvStream
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.data.*
+import fr.acinq.phoenix.data.LocalChannelInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
@@ -23,6 +26,7 @@ class PeerManager(
     private val nodeParamsManager: NodeParamsManager,
     private val databaseManager: DatabaseManager,
     private val configurationManager: AppConfigurationManager,
+    private val notificationsManager: NotificationsManager,
     private val electrumWatcher: ElectrumWatcher,
 ) : CoroutineScope by MainScope() {
 
@@ -31,6 +35,7 @@ class PeerManager(
         nodeParamsManager = business.nodeParamsManager,
         databaseManager = business.databaseManager,
         configurationManager = business.appConfigurationManager,
+        notificationsManager = business.notificationsManager,
         electrumWatcher = business.electrumWatcher
     )
 
@@ -80,10 +85,10 @@ class PeerManager(
             _peer.value = peer
 
             launch {
-                peer.onChainFeeratesFlow.collect {
-                    _onChainFeeratesFlow.value = it
-                }
+                peer.onChainFeeratesFlow.collect { _onChainFeeratesFlow.value = it }
             }
+
+            launch { monitorNodeEvents(nodeParams) }
 
             // The local channels flow must use `bootFlow` first, as `channelsFlow` is empty when the wallet starts.
             // `bootFlow` data come from the local database and will be overridden by fresh data once the connection
@@ -91,6 +96,7 @@ class PeerManager(
             val bootFlow = peer.bootChannelsFlow.filterNotNull()
             val channelsFlow = peer.channelsFlow
             var isBoot = true
+
             combine(bootFlow, channelsFlow) { bootChannels, channels ->
                 // bootFlow will fire once, after the channels have been read from the database.
                 if (isBoot) {
@@ -121,6 +127,23 @@ class PeerManager(
         return when (channel) {
             is ChannelStateWithCommitments -> channel
             else -> null
+        }
+    }
+
+    /** Override the liquidity policy setting used by the node. */
+    suspend fun updatePeerLiquidityPolicy(newPolicy: LiquidityPolicy) {
+        getPeer().nodeParams.liquidityPolicy.value = newPolicy
+    }
+
+    private suspend fun monitorNodeEvents(nodeParams: NodeParams) {
+        nodeParams.nodeEvents.collect { event ->
+            logger.info { "collecting node_event=$event" }
+            when (event) {
+                is LiquidityEvents.Rejected -> {
+                    notificationsManager.saveLiquidityEventNotification(event)
+                }
+                else -> {}
+            }
         }
     }
 }
