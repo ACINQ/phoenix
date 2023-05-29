@@ -44,13 +44,8 @@ import fr.acinq.phoenix.data.BitcoinUnit
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-private sealed class LiquidityViewMode {
-    object Basic : LiquidityViewMode()
-    object Advanced : LiquidityViewMode()
-}
-
-private class LiquidityPolicyViewModel() : ViewModel() {
-    val viewMode = mutableStateOf<LiquidityViewMode>(LiquidityViewMode.Basic)
+class LiquidityPolicyViewModel : ViewModel() {
+    val showAdvanced = mutableStateOf(false)
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -198,8 +193,8 @@ fun LiquidityPolicyView(
                 )
             }
 
-            when (vm.viewMode.value) {
-                LiquidityViewMode.Basic -> {
+            when (vm.showAdvanced.value) {
+                false -> {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(
@@ -209,15 +204,15 @@ fun LiquidityPolicyView(
                             iconTint = MaterialTheme.typography.caption.color,
                             padding = PaddingValues(8.dp),
                             space = 8.dp,
-                            onClick = { vm.viewMode.value = LiquidityViewMode.Advanced }
+                            onClick = { vm.showAdvanced.value = true }
                         )
                     }
                 }
-                LiquidityViewMode.Advanced -> {
+                 true -> {
                     val dismissState = rememberDismissState(
                         confirmStateChange = {
                             if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
-                                vm.viewMode.value = LiquidityViewMode.Basic
+                                vm.showAdvanced.value = false
                             }
                             true
                         }
