@@ -26,14 +26,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.acinq.bitcoin.Satoshi
-import fr.acinq.lightning.blockchain.electrum.ElectrumClient
-import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.payment.LiquidityPolicy
-import fr.acinq.lightning.transactions.Transactions
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
@@ -45,58 +39,18 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.android.utils.orange
 import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.data.BitcoinUnit
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.roundToInt
-
-private sealed class RetrievingFeerateState {
-    object Init : RetrievingFeerateState()
-    object InProgress : RetrievingFeerateState()
-    data class Found(val feerate: FeeratePerKw, val estimatedFee: Satoshi) : RetrievingFeerateState()
-    object Failed : RetrievingFeerateState()
-}
 
 private sealed class LiquidityViewMode {
     object Basic : LiquidityViewMode()
     object Advanced : LiquidityViewMode()
 }
 
-private class LiquidityPolicyViewModel(val electrumClient: ElectrumClient) : ViewModel() {
-    val feerateState = mutableStateOf<RetrievingFeerateState>(RetrievingFeerateState.Init)
-
+private class LiquidityPolicyViewModel() : ViewModel() {
     val viewMode = mutableStateOf<LiquidityViewMode>(LiquidityViewMode.Basic)
-
-    init {
-        viewModelScope.launch { pollFeerate() }
-    }
-
-    private suspend fun pollFeerate() {
-        while (viewModelScope.isActive) {
-            withTimeoutOrNull(5000) {
-                electrumClient.estimateFees(1)
-            }?.feerate?.let {
-                feerateState.value = RetrievingFeerateState.Found(it, Transactions.weight2fee(it, 992))
-                delay(5 * 60 * 1000)
-            } ?: run {
-                delay(2_000)
-                feerateState.value = RetrievingFeerateState.Failed
-            }
-        }
-    }
-
-    class Factory(
-        private val electrumClient: ElectrumClient
-    ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            @Suppress("UNCHECKED_CAST")
-            return LiquidityPolicyViewModel(electrumClient) as T
-        }
-    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -110,7 +64,8 @@ fun LiquidityPolicyView(
     val liquidityPreferredFees by UserPrefs.getLiquidityPreferredFee(context).collectAsState(null)
     val liquidityPolicyInPrefs by UserPrefs.getLiquidityPolicy(context).collectAsState(null)
 
-    val vm = viewModel<LiquidityPolicyViewModel>(factory = LiquidityPolicyViewModel.Factory(business.electrumClient))
+    val vm = viewModel<LiquidityPolicyViewModel>()
+    val electrumFeerate by business.peerManager.electrumFeerate.collectAsState()
 
     DefaultScreenLayout {
         DefaultScreenHeader(
@@ -123,24 +78,23 @@ fun LiquidityPolicyView(
         Card(internalPadding = PaddingValues(16.dp), modifier = Modifier.fillMaxWidth()) {
             Text(text = stringResource(id = R.string.liquiditypolicy_instructions))
             Spacer(modifier = Modifier.height(16.dp))
-            when (val feerateState = vm.feerateState.value) {
-                is RetrievingFeerateState.Found -> {
+            when (val feerate = electrumFeerate) {
+                null -> ProgressView(text = "Retrieving feerate...", padding = PaddingValues(0.dp))
+                else -> {
                     val fiatCurrency = LocalFiatCurrency.current
                     Text(
                         text = annotatedStringResource(
                             id = R.string.liquiditypolicy_fees_estimation,
-                            feerateState.estimatedFee.toPrettyString(BitcoinUnit.Sat, withUnit = true),
-                            feerateState.estimatedFee.toPrettyString(fiatCurrency, fiatRate, withUnit = true)
+                            feerate.swapEstimationFee.toPrettyString(BitcoinUnit.Sat, withUnit = true),
+                            feerate.swapEstimationFee.toPrettyString(fiatCurrency, fiatRate, withUnit = true)
                         )
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = stringResource(id = R.string.liquiditypolicy_fees_estimation_feerate, feerateState.feerate),
+                        text = stringResource(id = R.string.liquiditypolicy_fees_estimation_feerate, feerate.nextBlock),
                         style = MaterialTheme.typography.subtitle2
                     )
                 }
-                RetrievingFeerateState.Failed -> Text("Failed to retrieve feerate, trying again...")
-                else -> ProgressView(text = "Retrieving feerate...", padding = PaddingValues(0.dp))
             }
         }
 
@@ -185,40 +139,37 @@ fun LiquidityPolicyView(
                         modifier = Modifier.width(130.dp),
                     )
                 }
-                when (val state = vm.feerateState.value) {
-                    is RetrievingFeerateState.Found -> {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                            if (maxAbsoluteFee < 100.sat) {
-                                Spacer(modifier = Modifier.height(16.dp))
-                                TextWithIcon(
-                                    text = "This fee is very low ; many incoming payments will fail.",
-                                    textStyle = MaterialTheme.typography.subtitle2.copy(fontSize = 14.sp),
-                                    icon = R.drawable.ic_info,
-                                    iconTint = MaterialTheme.typography.subtitle2.color,
-                                    space = 10.dp,
-                                )
-                            } else if (maxAbsoluteFee < state.estimatedFee) {
-                                Spacer(modifier = Modifier.height(16.dp))
-                                TextWithIcon(
-                                    text = "Incoming payments that need additional liquidity are expected to fail or remain on-chain",
-                                    textStyle = MaterialTheme.typography.subtitle2.copy(fontSize = 14.sp),
-                                    icon = R.drawable.ic_info,
-                                    iconTint = MaterialTheme.typography.subtitle2.color,
-                                    space = 10.dp,
-                                )
-                            } else if (maxAbsoluteFee > state.estimatedFee.times(3)) {
-                                Spacer(modifier = Modifier.height(16.dp))
-                                TextWithIcon(
-                                    text = "It's a bit high! Lorem ipsum dolor sit amet.",
-                                    textStyle = MaterialTheme.typography.subtitle2.copy(fontSize = 14.sp),
-                                    icon = R.drawable.ic_info,
-                                    iconTint = MaterialTheme.typography.subtitle2.color,
-                                    space = 10.dp,
-                                )
-                            }
+                electrumFeerate?.let { feerate ->
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                        if (maxAbsoluteFee < 100.sat) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            TextWithIcon(
+                                text = "This fee is very low ; many incoming payments will fail.",
+                                textStyle = MaterialTheme.typography.subtitle2.copy(fontSize = 14.sp),
+                                icon = R.drawable.ic_info,
+                                iconTint = MaterialTheme.typography.subtitle2.color,
+                                space = 10.dp,
+                            )
+                        } else if (maxAbsoluteFee < feerate.swapEstimationFee) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            TextWithIcon(
+                                text = "Incoming payments that need additional liquidity are expected to fail or remain on-chain",
+                                textStyle = MaterialTheme.typography.subtitle2.copy(fontSize = 14.sp),
+                                icon = R.drawable.ic_info,
+                                iconTint = MaterialTheme.typography.subtitle2.color,
+                                space = 10.dp,
+                            )
+                        } else if (maxAbsoluteFee > (feerate.swapEstimationFee + 1000.sat).times(3)) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            TextWithIcon(
+                                text = "It's a bit high! Lorem ipsum dolor sit amet.",
+                                textStyle = MaterialTheme.typography.subtitle2.copy(fontSize = 14.sp),
+                                icon = R.drawable.ic_info,
+                                iconTint = MaterialTheme.typography.subtitle2.color,
+                                space = 10.dp,
+                            )
                         }
                     }
-                    else -> {}
                 }
             }
 

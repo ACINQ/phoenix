@@ -2,22 +2,23 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
-import fr.acinq.lightning.blockchain.fee.OnChainFeerates
+import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.Offline
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.payment.LiquidityPolicy
+import fr.acinq.lightning.transactions.Transactions
 import fr.acinq.lightning.wire.InitTlv
 import fr.acinq.lightning.wire.TlvStream
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LocalChannelInfo
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
@@ -28,6 +29,7 @@ class PeerManager(
     private val configurationManager: AppConfigurationManager,
     private val notificationsManager: NotificationsManager,
     private val electrumWatcher: ElectrumWatcher,
+    private val electrumClient: ElectrumClient,
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness) : this(
@@ -36,7 +38,8 @@ class PeerManager(
         databaseManager = business.databaseManager,
         configurationManager = business.appConfigurationManager,
         notificationsManager = business.notificationsManager,
-        electrumWatcher = business.electrumWatcher
+        electrumWatcher = business.electrumWatcher,
+        electrumClient = business.electrumClient,
     )
 
     private val logger = newLogger(loggerFactory)
@@ -52,8 +55,8 @@ class PeerManager(
     val channelsFlow: StateFlow<Map<ByteVector32, LocalChannelInfo>?> = _channelsFlow
 
     /** Feerate used by the peer. Data fed by Electrum under the hood. */
-    private val _onChainFeeratesFlow = MutableStateFlow<OnChainFeerates?>(null)
-    val onChainFeeratesFlow: StateFlow<OnChainFeerates?> = _onChainFeeratesFlow
+    private val _electrumFeerate = MutableStateFlow<ElectrumFeerate?>(null)
+    val electrumFeerate: StateFlow<ElectrumFeerate?> = _electrumFeerate
 
     init {
         launch {
@@ -84,11 +87,8 @@ class PeerManager(
             )
             _peer.value = peer
 
-            launch {
-                peer.onChainFeeratesFlow.collect { _onChainFeeratesFlow.value = it }
-            }
-
             launch { monitorNodeEvents(nodeParams) }
+            launch { pollElectrumFeerate() }
 
             // The local channels flow must use `bootFlow` first, as `channelsFlow` is empty when the wallet starts.
             // `bootFlow` data come from the local database and will be overridden by fresh data once the connection
@@ -135,6 +135,23 @@ class PeerManager(
         getPeer().nodeParams.liquidityPolicy.value = newPolicy
     }
 
+    /** Temporary method that polls the electrum client for an estimation of a 1-block target feerate. Should be done in lightning-kmp. */
+    private suspend fun pollElectrumFeerate() {
+        while (this.isActive) {
+            try {
+                withTimeout(5000) {
+                    val res = electrumClient.estimateFees(1)
+                    logger.info { "current 1 block target fee estimation=$res" }
+                    _electrumFeerate.value = res.feerate?.let { ElectrumFeerate(it) } ?: _electrumFeerate.value
+                }
+                delay(5 * 60 * 1000)
+            } catch (e: Exception) {
+                logger.debug { "electrum fee estimation timeout" }
+                delay(2000)
+            }
+        }
+    }
+
     private suspend fun monitorNodeEvents(nodeParams: NodeParams) {
         nodeParams.nodeEvents.collect { event ->
             logger.info { "collecting node_event=$event" }
@@ -146,4 +163,9 @@ class PeerManager(
             }
         }
     }
+}
+
+data class ElectrumFeerate(val nextBlock: FeeratePerKw) {
+    /** Rough estimation of the cost of a swap-in (splicing/opening), using a hard-coded weight. */
+    val swapEstimationFee: Satoshi by lazy { Transactions.weight2fee(feerate = nextBlock, weight = 992) }
 }

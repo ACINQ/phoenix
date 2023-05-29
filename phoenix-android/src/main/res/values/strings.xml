@@ -204,7 +204,6 @@
     <!-- #1: sign / #2: integer part / #3: decimal part / #4: unit -->
     <string name="utils_rounded">≈</string>
     <string name="utils_converted_amount">≈ %1$s</string>
-    <string name="utils_fee_rate">%1$s sat/byte</string>
     <string name="utils_unknown_amount" translatable="false">!?</string>
     <string name="utils_no_conversion">BTC exchange rate unavailable</string>
     <string name="utils_amount_hint">Amount</string>

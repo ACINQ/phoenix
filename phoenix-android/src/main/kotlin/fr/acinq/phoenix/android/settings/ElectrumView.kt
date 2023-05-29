@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.ServerAddress
@@ -59,10 +60,11 @@ fun ElectrumView() {
     val nc = navController
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val business = LocalBusiness.current
     val prefElectrumServer = LocalElectrumServer.current
     var showCustomServerDialog by rememberSaveable { mutableStateOf(false) }
     val vm = viewModel<ElectrumViewModel>()
+
+    val electrumFeerate by business.peerManager.electrumFeerate.collectAsState()
 
     DefaultScreenLayout {
         DefaultScreenHeader(
@@ -147,8 +149,8 @@ fun ElectrumView() {
                 }
 
                 // fee rate
-                if (model.feeRate > 0) {
-                    Setting(title = stringResource(id = R.string.electrum_fee_rate_label), description = stringResource(id = R.string.utils_fee_rate, model.feeRate.toString()))
+                electrumFeerate?.let {
+                    Setting(title = stringResource(id = R.string.electrum_fee_rate_label), description = "${it.nextBlock} (${FeeratePerByte(it.nextBlock)})")
                 }
 
                 // xpub
