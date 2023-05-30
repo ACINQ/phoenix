@@ -33,13 +33,11 @@ import org.kodein.log.newLogger
 class NotificationsManager(
     private val loggerFactory: LoggerFactory,
     private val appDb: SqliteAppDb,
-    private val nodeParamsManager: NodeParamsManager
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
         appDb = business.appDb,
-        nodeParamsManager = business.nodeParamsManager,
     )
 
     private val log = newLogger(loggerFactory)
@@ -71,6 +69,7 @@ class NotificationsManager(
                         createdAt = currentTimestampMillis(),
                         readAt = null,
                         amount = event.amount,
+                        source = event.source,
                         expectedFee = reason.actual,
                         maxAllowedFee = reason.maxAllowed
                     )
@@ -79,18 +78,21 @@ class NotificationsManager(
                         createdAt = currentTimestampMillis(),
                         readAt = null,
                         amount = event.amount,
+                        source = event.source,
                     )
                     is LiquidityEvents.Rejected.Reason.RejectedByUser -> Notification.RejectedManually(
                         id = UUID.randomUUID(),
                         createdAt = currentTimestampMillis(),
                         readAt = null,
                         amount = event.amount,
+                        source = event.source,
                     )
                     is LiquidityEvents.Rejected.Reason.ChannelInitializing -> Notification.ChannelsInitializing(
                         id = UUID.randomUUID(),
                         createdAt = currentTimestampMillis(),
                         readAt = null,
                         amount = event.amount,
+                        source = event.source,
                     )
                 }
                 appDb.saveNotification(notification)

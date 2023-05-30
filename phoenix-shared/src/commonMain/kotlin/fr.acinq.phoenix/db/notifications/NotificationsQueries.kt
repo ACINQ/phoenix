@@ -23,12 +23,15 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.Notification
 import fr.acinq.phoenix.db.AppDatabase
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class NotificationsQueries(val database: AppDatabase) {
     private val queries = database.notificationsQueries
 
     fun get(id: UUID): Notification? {
-        return queries.get(id.toString(), mapper = ::mapToNotification).executeAsOneOrNull()
+        return queries.get(id.toString()).executeAsOneOrNull()?.let { row ->
+            mapToNotification(row.id, row.type_version, row.data_json, row.created_at, row.read_at)
+        }
     }
 
     fun save(notification: Notification) {
@@ -56,19 +59,30 @@ class NotificationsQueries(val database: AppDatabase) {
      * used to execute an action on all the actual relevant data in the database (for example, to mark those notifications as read).
      */
     fun listUnread(): Flow<List<Pair<Set<UUID>, Notification>>> {
-        return queries.listUnread(mapper = { id, group_concat, type_version, data_json, max ->
-            group_concat.split(";").map { UUID.fromString(it) }.toSet() to mapToNotification(id, type_version, data_json, max ?: 0, null)
-        }).asFlow().mapToList()
+        return queries.listUnread().asFlow().mapToList().map {
+            it.mapNotNull { row ->
+                val ids = row.grouped_ids.split(";").map { UUID.fromString(it) }.toSet()
+                val notif = mapToNotification(row.id, row.type_version, row.data_json, row.max ?: 0, null)
+                if (notif != null) {
+                    ids to notif
+                } else {
+                    // invalid notifications are marked as read so that they are filtered by the SQL query next time
+                    markAsRead(ids)
+                    null
+                }
+            }
+        }
     }
 
     companion object {
+        /** Map columns to a [Notification] object. If the [data_json] column is unreadable, return null. */
         fun mapToNotification(
             id: String,
             type_version: NotificationTypeVersion,
             data_json: ByteArray,
             created_at: Long,
             read_at: Long?,
-        ): Notification {
+        ): Notification? {
             return when (val data = NotificationData.deserialize(type_version, data_json)) {
                 is NotificationData.PaymentRejected.TooExpensive.V0 -> {
                     Notification.FeeTooExpensive(
@@ -76,6 +90,7 @@ class NotificationsQueries(val database: AppDatabase) {
                         createdAt = created_at,
                         readAt = read_at,
                         amount = data.amount,
+                        source = data.source,
                         expectedFee = data.expectedFee,
                         maxAllowedFee = data.maxAllowedFee
                     )
@@ -85,7 +100,8 @@ class NotificationsQueries(val database: AppDatabase) {
                         id = UUID.fromString(id),
                         createdAt = created_at,
                         readAt = read_at,
-                        amount = data.amount
+                        amount = data.amount,
+                        source = data.source,
                     )
                 }
                 is NotificationData.PaymentRejected.ByUser.V0 -> {
@@ -93,7 +109,8 @@ class NotificationsQueries(val database: AppDatabase) {
                         id = UUID.fromString(id),
                         createdAt = created_at,
                         readAt = read_at,
-                        amount = data.amount
+                        amount = data.amount,
+                        source = data.source,
                     )
                 }
                 is NotificationData.PaymentRejected.ChannelsInitializing.V0 -> {
@@ -101,9 +118,11 @@ class NotificationsQueries(val database: AppDatabase) {
                         id = UUID.fromString(id),
                         createdAt = created_at,
                         readAt = read_at,
-                        amount = data.amount
+                        amount = data.amount,
+                        source = data.source,
                     )
                 }
+                null -> null
             }
         }
     }

@@ -357,6 +357,7 @@
     <string name="inappnotif_mempool_full_message">The Bitcoin mempool is full and on-chain fees are high.</string>
     <string name="inappnotif_mempool_full_action">See how Phoenix is affected</string>
 
+    <string name="inappnotif_payment_onchain_pending_title">On-chain funds pending (+%1$s)</string>
     <string name="inappnotif_payment_rejected_title">Payment rejected (+%1$s)</string>
     <string name="inappnotif_payment_rejected_by_user">You rejected that payment manually.</string>
     <string name="inappnotif_payment_rejected_disabled">Automated incoming liquidity is disabled in your incoming fee setting.</string>

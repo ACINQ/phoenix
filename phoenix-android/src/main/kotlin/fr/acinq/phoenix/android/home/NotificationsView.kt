@@ -38,6 +38,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
@@ -187,9 +188,9 @@ private fun PaymentNotification(
     val btcUnit = LocalBitcoinUnit.current
     when (notification) {
         is Notification.PaymentRejected -> {
-            val btcUnit = LocalBitcoinUnit.current
             PaymentRejectedNotification(
-                title = stringResource(id = R.string.inappnotif_payment_rejected_title, notification.amount.toPrettyString(btcUnit, withUnit = true)),
+                title = stringResource(id = if (notification.source == LiquidityEvents.Source.OnChainWallet) R.string.inappnotif_payment_onchain_pending_title else R.string.inappnotif_payment_rejected_title,
+                    notification.amount.toPrettyString(btcUnit, withUnit = true)),
                 body = when (notification) {
                     is Notification.RejectedManually -> stringResource(id = R.string.inappnotif_payment_rejected_by_user)
                     is Notification.FeePolicyDisabled -> stringResource(id = R.string.inappnotif_payment_rejected_disabled)
@@ -218,7 +219,7 @@ private fun PaymentNotification(
                 }
             )
         }
-        else -> TODO()
+        else -> {}
     }
 }
 
@@ -284,10 +285,8 @@ private fun PaymentRejectedNotification(
             onClick = extraActionClick
         ) {
             Row {
-                Text(text = title, style = MaterialTheme.typography.body2)
-                Spacer(modifier = Modifier
-                    .widthIn(min = 8.dp)
-                    .weight(1f))
+                Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(text = timestamp.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
             }
             Spacer(modifier = Modifier.height(3.dp))

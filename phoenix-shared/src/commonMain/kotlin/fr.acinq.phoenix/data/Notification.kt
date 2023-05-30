@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.data
 
+import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.UUID
 
@@ -28,6 +29,7 @@ sealed class Notification {
 
     sealed class PaymentRejected : Notification() {
         abstract val amount: MilliSatoshi
+        abstract val source: LiquidityEvents.Source
     }
 
     data class FeeTooExpensive(
@@ -35,6 +37,7 @@ sealed class Notification {
         override val createdAt: Long,
         override val readAt: Long?,
         override val amount: MilliSatoshi,
+        override val source: LiquidityEvents.Source,
         val expectedFee: MilliSatoshi,
         val maxAllowedFee: MilliSatoshi,
     ) : PaymentRejected()
@@ -43,7 +46,8 @@ sealed class Notification {
         override val id: UUID,
         override val createdAt: Long,
         override val readAt: Long?,
-        override val amount: MilliSatoshi
+        override val amount: MilliSatoshi,
+        override val source: LiquidityEvents.Source
     ) : PaymentRejected()
 
     data class FeePolicyDisabled(
@@ -51,6 +55,7 @@ sealed class Notification {
         override val createdAt: Long,
         override val readAt: Long?,
         override val amount: MilliSatoshi,
+        override val source: LiquidityEvents.Source,
     ) : PaymentRejected()
 
     data class ChannelsInitializing(
@@ -58,5 +63,6 @@ sealed class Notification {
         override val createdAt: Long,
         override val readAt: Long?,
         override val amount: MilliSatoshi,
+        override val source: LiquidityEvents.Source,
     ) : PaymentRejected()
 }
