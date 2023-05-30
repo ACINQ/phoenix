@@ -72,7 +72,7 @@ fun ElectrumView() {
             title = stringResource(id = R.string.electrum_title),
         )
         Card(internalPadding = PaddingValues(16.dp)) {
-            Text(text = stringResource(R.string.electrum_about)) //, style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
+            Text(text = stringResource(R.string.electrum_about))
         }
         MVIView(CF::electrumConfiguration) { model, postIntent ->
             Card {
@@ -150,12 +150,9 @@ fun ElectrumView() {
 
                 // fee rate
                 electrumFeerate?.let {
-                    Setting(title = stringResource(id = R.string.electrum_fee_rate_label), description = "${it.nextBlock} (${FeeratePerByte(it.nextBlock)})")
+                    Setting(title = stringResource(id = R.string.electrum_fee_rate_next_label), description = "${it.nextBlockFeerate} (${FeeratePerByte(it.nextBlockFeerate)})")
+                    Setting(title = stringResource(id = R.string.electrum_fee_rate_funding_label), description = "${it.fundingFeerate} (${FeeratePerByte(it.fundingFeerate)})")
                 }
-
-                // xpub
-//                val xpub = remember { business?.walletManager?.getXpub() ?: "" to "" }
-//                Setting(title = stringResource(id = R.string.electrum_xpub_label), description = stringResource(id = R.string.electrum_xpub_value, xpub.first, xpub.second))
             }
         }
     }

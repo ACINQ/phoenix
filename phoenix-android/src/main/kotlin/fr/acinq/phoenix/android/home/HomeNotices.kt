@@ -78,8 +78,8 @@ fun NoticesButtonRow(
                     NoticeView(text = stringResource(id = R.string.inappnotif_notification_permission_message), icon = R.drawable.ic_notification)
                 }
             }
-        } ?: notifications.let {
-            NoticeView(text = "${notifications.size} incoming payments rejected")
+        } ?: notifications.firstOrNull()?.let {
+            NoticeView(text = "An incoming payment was rejected")
         }
 
         if (elementsCount > 1) {

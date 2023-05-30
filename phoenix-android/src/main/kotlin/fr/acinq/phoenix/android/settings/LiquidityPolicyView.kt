@@ -86,7 +86,7 @@ fun LiquidityPolicyView(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = stringResource(id = R.string.liquiditypolicy_fees_estimation_feerate, feerate.nextBlock),
+                        text = stringResource(id = R.string.liquiditypolicy_fees_estimation_feerate, feerate.fundingFeerate),
                         style = MaterialTheme.typography.subtitle2
                     )
                 }

@@ -140,14 +140,17 @@ class PeerManager(
         while (this.isActive) {
             try {
                 withTimeout(5000) {
-                    val res = electrumClient.estimateFees(1)
-                    logger.info { "current 1 block target fee estimation=$res" }
-                    _electrumFeerate.value = res.feerate?.let { ElectrumFeerate(it) } ?: _electrumFeerate.value
+                    val nextBlock = electrumClient.estimateFees(1)
+                    val funding = electrumClient.estimateFees(144)
+                    logger.info { "electrum fee estimation for target 1 block=$nextBlock 144 blocks=$funding" }
+                    if (nextBlock.feerate != null && funding.feerate != null) {
+                        _electrumFeerate.value = ElectrumFeerate(nextBlock.feerate!!, funding.feerate!!)
+                    }
                 }
-                delay(5 * 60 * 1000)
+                delay(2 * 60 * 60 * 1000)
             } catch (e: Exception) {
                 logger.debug { "electrum fee estimation timeout" }
-                delay(2000)
+                delay(5 * 1000)
             }
         }
     }
@@ -165,7 +168,7 @@ class PeerManager(
     }
 }
 
-data class ElectrumFeerate(val nextBlock: FeeratePerKw) {
+data class ElectrumFeerate(val nextBlockFeerate: FeeratePerKw, val fundingFeerate: FeeratePerKw) {
     /** Rough estimation of the cost of a swap-in (splicing/opening), using a hard-coded weight. */
-    val swapEstimationFee: Satoshi by lazy { Transactions.weight2fee(feerate = nextBlock, weight = 992) }
+    val swapEstimationFee: Satoshi by lazy { Transactions.weight2fee(feerate = fundingFeerate, weight = 992) }
 }
