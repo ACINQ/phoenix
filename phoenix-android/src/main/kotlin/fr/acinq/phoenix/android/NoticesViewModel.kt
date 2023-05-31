@@ -25,11 +25,17 @@ import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
 sealed class Notice {
-    object NotificationPermission : Notice()
-    object BackupSeedReminder : Notice()
-    object UpdateAvailable : Notice()
-    object CriticalUpdateAvailable : Notice()
-    object MempoolFull : Notice()
+    sealed class ShowInHome: Notice()
+    sealed class DoNotShowInHome: Notice()
+
+    object NotificationPermission : ShowInHome()
+    object BackupSeedReminder : ShowInHome()
+    object UpdateAvailable : ShowInHome()
+    object CriticalUpdateAvailable : ShowInHome()
+    object MempoolFull : ShowInHome()
+
+    // less important notices
+    object WatchTowerLate : DoNotShowInHome()
 }
 
 class NoticesViewModel(val appConfigurationManager: AppConfigurationManager) : ViewModel() {

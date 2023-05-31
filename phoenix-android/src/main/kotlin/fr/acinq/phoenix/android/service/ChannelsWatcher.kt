@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.android.service
 
 import android.content.Context
-import android.text.format.DateUtils
 import androidx.work.*
 import fr.acinq.lightning.channel.Closing
 import fr.acinq.lightning.utils.currentTimestampMillis
@@ -26,9 +25,11 @@ import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalData
+import fr.acinq.phoenix.data.WatchTowerOutcome
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
+import fr.acinq.phoenix.managers.NotificationsManager
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeout
@@ -41,6 +42,7 @@ import java.util.concurrent.TimeUnit
 class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
+        var notificationsManager: NotificationsManager? = null
         try {
 
             val legacyAppStatus = PrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
@@ -56,11 +58,13 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
                 return Result.failure()
             }
 
+            notificationsManager = business.notificationsManager
+
             val peer = withTimeout(60_000) {
                 business.peerManager.getPeer()
             }
 
-            val channelsBeforeWatching = peer.channels
+            val channelsBeforeWatching = peer.bootChannelsFlow.filterNotNull().first()
             if (channelsBeforeWatching.isEmpty()) {
                 log.info("no channels found, nothing to watch")
                 InternalData.saveChannelsWatcherOutcome(applicationContext, Outcome.Nominal(currentTimestampMillis()))
@@ -80,19 +84,25 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
                 (state as? Closing)?.revokedCommitPublished?.let { channelId to it }
             }.filterNotNull().toMap()
 
-            val hasUnknownRevokedAfterWatching = peer.channels.any { (channelId, state) ->
+            log.debug("there were initially ${revokedCommitsBeforeWatching.size} channel(s) with revoked commitments")
+            log.debug("checking for new revoked commitments on ${peer.channels} channels")
+            val unknownRevokedAfterWatching = peer.channels.filter { (channelId, state) ->
                 state is Closing && state.revokedCommitPublished.any {
                     val isKnown = revokedCommitsBeforeWatching[channelId]?.contains(it) ?: false
-                    if (!isKnown) log.info("found unknown revoked commit for channel=${channelId.toHex()}, tx=${it.commitTx}")
+                    if (!isKnown) {
+                        log.warn("found unknown revoked commit for channel=${channelId.toHex()}, tx=${it.commitTx}")
+                    }
                     !isKnown
                 }
-            }
+            }.keys
 
-            if (hasUnknownRevokedAfterWatching) {
-                log.info("new revoked commits found, notifying user")
+            if (unknownRevokedAfterWatching.isNotEmpty()) {
+                log.warn("new revoked commits found, notifying user")
+                notificationsManager.saveWatchTowerOutcome(WatchTowerOutcome.RevokedFound(channels = unknownRevokedAfterWatching))
                 InternalData.saveChannelsWatcherOutcome(applicationContext, Outcome.RevokedFound(currentTimestampMillis()))
                 SystemNotificationHelper.notifyRevokedCommits(applicationContext)
             } else {
+                notificationsManager.saveWatchTowerOutcome(WatchTowerOutcome.Nominal(channelsWatchedCount = peer.channels.size))
                 InternalData.saveChannelsWatcherOutcome(applicationContext, Outcome.Nominal(currentTimestampMillis()))
                 log.info("channels-watcher job completed, no revoked commit found")
             }
@@ -100,6 +110,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             return Result.success()
         } catch (e: Exception) {
             log.error("failed to run channels-watcher job: ", e)
+            notificationsManager?.saveWatchTowerOutcome(WatchTowerOutcome.Unknown())
             InternalData.saveChannelsWatcherOutcome(applicationContext, Outcome.Unknown(currentTimestampMillis()))
             return Result.failure()
         } finally {
@@ -112,20 +123,9 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
         private const val WATCHER_WORKER_TAG = BuildConfig.APPLICATION_ID + ".ChannelsWatcher"
         private val ELECTRUM_TIMEOUT_MILLIS = 5 * 60_000L
 
-        /**
-         * Time window in milliseconds in which the last channels watch result can be considered fresh enough that the user
-         * does not need to be reminded that phoenix needs a working connection.
-         */
-        private const val MAX_FRESH_WINDOW = DateUtils.DAY_IN_MILLIS * 3
-
-        /**
-         * Time window similar to [MAX_FRESH_WINDOW], but only if the last result was [Outcome.Nominal].
-         */
-        private const val MAX_FRESH_WINDOW_IF_OK = DateUtils.DAY_IN_MILLIS * 5
-
         fun schedule(context: Context) {
             log.info("scheduling channels watcher")
-            val work = PeriodicWorkRequest.Builder(ChannelsWatcher::class.java, 23, TimeUnit.HOURS, 12, TimeUnit.HOURS)
+            val work = PeriodicWorkRequest.Builder(ChannelsWatcher::class.java, 60, TimeUnit.HOURS, 12, TimeUnit.HOURS)
                 .addTag(WATCHER_WORKER_TAG)
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(WATCHER_WORKER_TAG, ExistingPeriodicWorkPolicy.UPDATE, work.build())
         }
@@ -139,8 +139,12 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
     @Serializable
     sealed class Outcome {
         abstract val timestamp: Long
-        @Serializable data class Unknown(override val timestamp: Long): Outcome()
-        @Serializable data class Nominal(override val timestamp: Long): Outcome()
-        @Serializable data class RevokedFound(override val timestamp: Long): Outcome()
+
+        @Serializable
+        data class Unknown(override val timestamp: Long) : Outcome()
+        @Serializable
+        data class Nominal(override val timestamp: Long) : Outcome()
+        @Serializable
+        data class RevokedFound(override val timestamp: Long) : Outcome()
     }
 }

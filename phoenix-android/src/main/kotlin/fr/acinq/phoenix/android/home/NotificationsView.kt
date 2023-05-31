@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,15 +41,20 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.service.ChannelsWatcher
+import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
+import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.data.Notification
+import fr.acinq.phoenix.data.WatchTowerOutcome
 import kotlinx.coroutines.launch
 
 
@@ -148,7 +154,7 @@ private fun PermamentNotice(
                 SwipeToDismiss(
                     state = dismissState,
                     background = {},
-                    dismissThresholds = { FractionalThreshold(0.8f) }
+                    dismissThresholds = { FractionalThreshold(0.8f) },
                 ) {
                     ImportantNotification(
                         icon = R.drawable.ic_notification,
@@ -165,7 +171,6 @@ private fun PermamentNotice(
                         }
                     )
                 }
-
             }
         }
         Notice.MempoolFull -> {
@@ -173,7 +178,18 @@ private fun PermamentNotice(
                 icon = R.drawable.ic_alert_triangle,
                 message = stringResource(id = R.string.inappnotif_mempool_full_message),
                 actionText = stringResource(id = R.string.inappnotif_mempool_full_action),
-                onActionClick = { openLink(context, "https://phoenix.acinq.co/faq#high-mempool-size-impacts") }
+                onActionClick = { openLink(context, "https://phoenix.acinq.co/faq#high-mempool-size-impacts") },
+            )
+        }
+        Notice.WatchTowerLate -> {
+            val scope = rememberCoroutineScope()
+            ImportantNotification(
+                icon = R.drawable.ic_eye,
+                message = stringResource(id = R.string.inappnotif_watchtower_late_message),
+                actionText = stringResource(id = R.string.inappnotif_watchtower_late_action),
+                onActionClick = {
+                    scope.launch { InternalData.saveChannelsWatcherOutcome(context, ChannelsWatcher.Outcome.Nominal(currentTimestampMillis())) }
+                }
             )
         }
     }
@@ -188,7 +204,7 @@ private fun PaymentNotification(
     val btcUnit = LocalBitcoinUnit.current
     when (notification) {
         is Notification.PaymentRejected -> {
-            PaymentRejectedNotification(
+            DimissibleNotification(
                 title = stringResource(id = if (notification.source == LiquidityEvents.Source.OnChainWallet) R.string.inappnotif_payment_onchain_pending_title else R.string.inappnotif_payment_rejected_title,
                     notification.amount.toPrettyString(btcUnit, withUnit = true)),
                 body = when (notification) {
@@ -219,7 +235,24 @@ private fun PaymentNotification(
                 }
             )
         }
-        else -> {}
+        is WatchTowerOutcome.Nominal -> DimissibleNotification(
+            title = stringResource(id = R.string.inappnotif_watchtower_nominal_title),
+            body = pluralStringResource(id = R.plurals.inappnotif_watchtower_nominal_description, count = notification.channelsWatchedCount, notification.channelsWatchedCount, notification.createdAt.toAbsoluteDateTimeString()),
+            timestamp = notification.createdAt,
+            onRead = { onNotificationRead(notification.id) },
+        )
+        is WatchTowerOutcome.RevokedFound -> DimissibleNotification(
+            title = stringResource(id = R.string.inappnotif_watchtower_revokedfound_title),
+            body = stringResource(id = R.string.inappnotif_watchtower_revokedfound_description, notification.createdAt.toAbsoluteDateTimeString(), notification.channels.joinToString { it.toHex() }),
+            timestamp = notification.createdAt,
+            onRead = { onNotificationRead(notification.id) },
+        )
+        is WatchTowerOutcome.Unknown -> DimissibleNotification(
+            title = stringResource(id = R.string.inappnotif_watchtower_unknown_title),
+            body = stringResource(id = R.string.inappnotif_watchtower_unknown_description),
+            timestamp = notification.createdAt,
+            onRead = { onNotificationRead(notification.id) },
+        )
     }
 }
 
@@ -257,7 +290,7 @@ private fun ImportantNotification(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun PaymentRejectedNotification(
+private fun DimissibleNotification(
     title: String,
     timestamp: Long,
     body: String,

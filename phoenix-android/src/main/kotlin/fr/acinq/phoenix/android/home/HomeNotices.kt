@@ -45,6 +45,10 @@ fun NoticesButtonRow(
     notifications: List<Pair<Set<UUID>, Notification>>,
     onClick: () -> Unit,
 ) {
+    val filteredNotices = notices.filterIsInstance<Notice.ShowInHome>()
+    // don't display anything if there are no permanent notices
+    if (filteredNotices.isEmpty()) return
+
     Row(
         modifier = modifier
             .padding(horizontal = 16.dp)
@@ -60,7 +64,7 @@ fun NoticesButtonRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         val elementsCount = notices.size + notifications.size
-        notices.firstOrNull()?.let { notice ->
+        filteredNotices.firstOrNull()?.let { notice ->
             when (notice) {
                 Notice.MempoolFull -> {
                     NoticeView(text = stringResource(id = R.string.inappnotif_mempool_full_message), icon = R.drawable.ic_alert_triangle)
@@ -78,8 +82,6 @@ fun NoticesButtonRow(
                     NoticeView(text = stringResource(id = R.string.inappnotif_notification_permission_message), icon = R.drawable.ic_notification)
                 }
             }
-        } ?: notifications.firstOrNull()?.let {
-            NoticeView(text = "An incoming payment was rejected")
         }
 
         if (elementsCount > 1) {
@@ -93,7 +95,6 @@ fun NoticesButtonRow(
             Spacer(modifier = Modifier.width(12.dp))
             Text(
                 text = "+${elementsCount - 1}",
-
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colors.primary)

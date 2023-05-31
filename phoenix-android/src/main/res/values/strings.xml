@@ -348,7 +348,8 @@
     <string name="inappnotif_notification_permission_message">Notifications are disabled in Android settings. Phoenix won\'t be able to notify you when a payment is processing.</string>
     <string name="inappnotif_notification_permission_enable">Enable</string>
 
-    <string name="inappnotif_background_worker_cannot_run_message">Phoenix needs to run in the background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
+    <string name="inappnotif_watchtower_late_message">Phoenix regularly monitors the blockchain when in the background, but was unable to do so the last few days.\n\nMake sure Android does not block Phoenix, and that it can connect to Electrum.</string>
+    <string name="inappnotif_watchtower_late_action">Dismiss</string>
 
     <string name="inappnotif_upgrade_message">An update is available</string>
     <string name="inappnotif_upgrade_critical_message">A critical update is available. You should update Phoenix as soon as possible.</string>
@@ -365,6 +366,16 @@
     <string name="inappnotif_payment_rejected_channel_initializing">Your channels are still initializing and could not receive that payment.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Tap here to tweak your settings.</string>
     <string name="inappnotif_payment_rejected_try_again">Try again later.</string>
+
+    <string name="inappnotif_watchtower_unknown_title">Watchtower unable to complete</string>
+    <string name="inappnotif_watchtower_unknown_description">A new attempt is scheduled in a few days.</string>
+    <string name="inappnotif_watchtower_nominal_title">Watchtower report</string>
+    <plurals name="inappnotif_watchtower_nominal_description">
+        <item quantity="one">%1$d channel was successfully checked on %2$s. No issues were found.</item>
+        <item quantity="other">%1$d channels were successfully checked on %2$s. No issues were found.</item>
+    </plurals>
+    <string name="inappnotif_watchtower_revokedfound_title">Watchtower alert</string>
+    <string name="inappnotif_watchtower_revokedfound_description">Revoked commitments found on %1$s for channel(s): %2$s.\n\nContact support if needed.</string>
 
     <!-- //////////////// display seed //////////////// -->
 

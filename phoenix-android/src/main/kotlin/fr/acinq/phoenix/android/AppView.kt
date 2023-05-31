@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android
 
 import android.Manifest
 import android.net.*
+import android.text.format.DateUtils
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -53,6 +54,8 @@ import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import kotlinx.coroutines.flow.filterNotNull
+import org.kodein.memory.util.currentTimestampMillis
 
 
 @Composable
@@ -373,6 +376,16 @@ private fun monitorNotices(
                 vm.addNotice(Notice.NotificationPermission)
             } else {
                 vm.removeNotice(Notice.NotificationPermission)
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        InternalData.getChannelsWatcherOutcome(context).filterNotNull().collect {
+            if (currentTimestampMillis() - it.timestamp > 6 * DateUtils.DAY_IN_MILLIS) {
+                vm.addNotice(Notice.WatchTowerLate)
+            } else {
+                vm.removeNotice(Notice.WatchTowerLate)
             }
         }
     }
