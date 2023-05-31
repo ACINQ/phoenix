@@ -196,7 +196,7 @@ struct PaymentSummaryView: View {
 	
 	func paymentSummaryStrings() -> PaymentSummaryStrings {
 		
-		// Note: All these calculations are done here,and not in init(),
+		// Note: All these calculations are done here, and not in init(),
 		// because we need access to `currencyPrefs`.
 		
 		let shouldDisplay: Bool

@@ -23,17 +23,3 @@ struct MsatRange {
 		return msat >= min.msat && msat <= max.msat
 	}
 }
-
-enum FlowType {
-	case pay(range: MsatRange)
-	case withdraw(range: MsatRange)
-	
-	var range: MsatRange {
-		switch self {
-		case .pay(let range):
-			return range
-		case .withdraw(let range):
-			return range
-		}
-	}
-}

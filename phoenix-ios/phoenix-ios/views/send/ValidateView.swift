@@ -46,7 +46,12 @@ struct ValidateView: View {
 	
 	@State var preTipAmountMsat: Int64? = nil
 	@State var postTipAmountMsat: Int64? = nil
-	@State var priceSliderVisible: Bool = false
+	@State var tipSliderSheetVisible: Bool = false
+	
+	@State var satsPerByte: String = ""
+	@State var parsedSatsPerByte: Result<NSNumber, TextFieldNumberStylerError> = Result.failure(.emptyInput)
+	
+	@State var mempoolRecommendedResponse: MempoolRecommendedResponse? = nil
 	
 	@State var comment: String = ""
 	@State var hasPromptedForComment = false
@@ -63,7 +68,6 @@ struct ValidateView: View {
 	
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
-	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.popoverState) var popoverState: PopoverState
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
@@ -164,6 +168,16 @@ struct ValidateView: View {
 		.onReceive(chainContextPublisher) {
 			chainContextDidChange($0)
 		}
+		.task {
+			let result = await MempoolRecommendedResponse.fetch()
+			switch result {
+			case .success(let response):
+				mempoolRecommendedResponse = response
+			case .failure(let reason):
+				log.error("Errror fetching mempool.space/recommended: \(reason)")
+				mempoolRecommendedResponse = nil
+			}
+		}
 	}
 	
 	@ViewBuilder
@@ -181,8 +195,11 @@ struct ValidateView: View {
 			
 			optionalButtons()
 			
-			paymentDescription()
-			onChainDetails()
+			if mvi.model is Scan.Model_OnChainFlow {
+				onChainDetails()
+			} else {
+				paymentDescription()
+			}
 			
 			paymentButton()
 			otherWarning()
@@ -400,6 +417,7 @@ struct ValidateView: View {
 		if let model = mvi.model as? Scan.Model_OnChainFlow {
 			OnChainDetails(model: model)
 				.padding(.horizontal, 60)
+				.padding(.vertical)
 				.padding(.bottom)
 		}
 	}
@@ -545,10 +563,7 @@ struct ValidateView: View {
 	
 	func requestDescription() -> String? {
 		
-		if mvi.model is Scan.Model_OnChainFlow {
-			return NSLocalizedString("On-Chain Payment", comment: "Generic description for L1 payment")
-			
-		} else if let paymentRequest = paymentRequest() {
+		if let paymentRequest = paymentRequest() {
 			return paymentRequest.desc()
 			
 		} else if let lnurlPay = lnurlPay() {
@@ -991,7 +1006,7 @@ struct ValidateView: View {
 			currencyPickerChoice = currency.shortName // revert to last real currency
 		}
 		
-		if !priceSliderVisible {
+		if !tipSliderSheetVisible {
 			preTipAmountMsat = nil
 			postTipAmountMsat = nil
 		}
@@ -1223,28 +1238,20 @@ struct ValidateView: View {
 	func rangeButtonTapped() {
 		log.trace("rangeButtonTapped()")
 		
-		var flow: FlowType? = nil
-		if let range = priceRange() {
-			
-			if lnurlWithdraw() != nil {
-				flow = FlowType.withdraw(range: range)
-			} else {
-				flow = FlowType.pay(range: range)
-			}
-			
-		} else if isAmountlessInvoice() {
-			
+		var range: MsatRange? = priceRange()
+		
+		if range == nil && isAmountlessInvoice() {
 			if let parsedAmtMst = parsedAmountMsat() {
-				flow = FlowType.pay(range: MsatRange(min: parsedAmtMst, max: parsedAmtMst + parsedAmtMst))
+				range = MsatRange(min: parsedAmtMst, max: parsedAmtMst + parsedAmtMst)
 			}
 		}
 		
-		if let flow {
+		if let range {
 			
 			dismissKeyboardIfVisible()
 			smartModalState.display(dismissable: true) {
 				
-				RangeSheet(flow: flow, valueChanged: amountChanged_rangeSheet)
+				RangeSheet(range: range, valueChanged: amountChanged_rangeSheet)
 			}
 		}
 	}
@@ -1279,60 +1286,37 @@ struct ValidateView: View {
 			maxMsat = msat * 2
 			preTipAmountMsat = msat
 			
-			if let range = priceRange() {
-				if range.contains(msat: msat) {
-					maxMsat = min(maxMsat, range.max.msat)
-				} else {
-					// User typed in an invalid amount.
-					// So we're just going to show them the whole range.
-					minMsat = range.min.msat
-					maxMsat = range.max.msat
-				}
-			}
+			// There are edge-cases with lnurl-pay here:
+			// - user may have typed in an amount that's out-of-bounds of the accepted range
+			// - our calculated maxMsat may be out-of-bounds of the accepted range
+			//
+			// From a UI perspective, it's more important that the TipSliderSheet is consistent.
+			// So we prefer to handle the out-of-range problems via `refreshAltAmount`,
+			// which will disable the pay button and display the proper error message.
 		}
 		
-		let isRange = maxMsat > minMsat
-		if isRange {
-			
-			// A range of valid amounts are possible.
-			// Show the PriceSliderSheet.
-			
-			let range = MsatRange(min: minMsat, max: maxMsat)
-			
-			if msat < minMsat {
-				msat = minMsat
-			} else if msat > maxMsat {
-				msat = maxMsat
-			}
-			
-			let flow: FlowType
-			if lnurlWithdraw() != nil {
-				flow = FlowType.withdraw(range: range)
-			} else {
-				flow = FlowType.pay(range: range)
-			}
-			
-			priceSliderVisible = true
-			dismissKeyboardIfVisible()
-			smartModalState.display(dismissable: true) {
-				
-				PriceSliderSheet(
-					flow: flow,
-					msat: msat,
-					valueChanged: amountChanged_priceSliderSheet
-				)
-				
-			} onWillDisappear: {
-				priceSliderVisible = false
-			}
-			
-		} else if msat != minMsat {
+		// Show the TipSliderSheet.
+		
+		let range = MsatRange(min: minMsat, max: maxMsat)
+		
+		if msat < minMsat {
 			msat = minMsat
+		} else if msat > maxMsat {
+			msat = maxMsat
+		}
+		
+		tipSliderSheetVisible = true
+		dismissKeyboardIfVisible()
+		smartModalState.display(dismissable: true) {
 			
-			// There is only one valid amount.
-			// We set the amount directly via the button tap.
+			TipSliderSheet(
+				range: range,
+				msat: msat,
+				valueChanged: amountChanged_priceSliderSheet
+			)
 			
-			amountChangedExternally(minMsat)
+		} onWillDisappear: {
+			tipSliderSheetVisible = false
 		}
 	}
 	
@@ -1346,6 +1330,12 @@ struct ValidateView: View {
 	func amountChanged_priceSliderSheet(_ msat: Int64) {
 		log.trace("amountChanged_priceSliderSheet()")
 		amountChangedExternally(msat)
+	}
+	
+	func amountChanged_minerFeeSheet(_ fee: Double) {
+		log.trace("amountChanged_minerFeeSheet()")
+		
+		// Todo...
 	}
 	
 	func amountChangedExternally(_ msat: Int64) {
@@ -1405,11 +1395,23 @@ struct ValidateView: View {
 	func prepareTransaction() {
 		log.trace("prepareTransaction()")
 		
-	//	guard let msat = parsedAmountMsat() else {
-	//		return
-	//	}
-	//
-	//	let amountSat = Int64(Utils.convertBitcoin(msat: msat, to: .sat))
+		guard let _ = parsedAmountMsat() else {
+			return
+		}
+		
+	//	minerFeeSheetVisible = true
+		dismissKeyboardIfVisible()
+		smartModalState.display(dismissable: true) {
+			
+			MinerFeeSheet(
+				satsPerByte: $satsPerByte,
+				parsedSatsPerByte: $parsedSatsPerByte,
+				mempoolRecommendedResponse: $mempoolRecommendedResponse
+			)
+			
+		} onWillDisappear: {
+	//		minerFeeSheetVisible = false
+		}
 	}
 	
 	func sendPayment() {

@@ -5,16 +5,16 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "PriceSliderSheet"
+	category: "TipSliderSheet"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 
-struct PriceSliderSheet: View {
+struct TipSliderSheet: View {
 	
-	let flow: FlowType
+	let range: MsatRange
 	let valueChanged: (Int64) -> Void
 	
 	// The Slider family works with `BinaryFloatingPoint`, thus we're using `Double` here.
@@ -42,97 +42,68 @@ struct PriceSliderSheet: View {
 	)
 	@State var contentHeight: CGFloat? = nil
 	
-	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
-	// There are 4 scenarios:
+	// There are 3 scenarios:
 	//
 	// 1) This is a standard lightning invoice with an amount.
 	//    The range is calculated by doubling the invoice amount
 	//    (i.e. the max acceptable payment according to Bolt specs).
-	//    Therefore this can be thought of as a tip.
 	//
 	// 2) This is an amountless lightning invoice.
 	//    The user typed in an amount, and then selected the tip button.
-	//    So we know this is meant to be a tip.
-	//    The range is calculated by doubling the invoice amount
-	//    (simply to be consistent with standard tip operations).
+	//    The range is calculated by doubling the amount (to be consistent with standard tip operations).
 	//
 	// 3) This is a lnurlPay operation.
-	//    The range is coming from the lnurlPay options.
-	//    This could be a range of things, from a payment at a restaurant to a donation.
-	//
-	// 4) This is a lnurlWithdraw operation.
-	//    The range is coming from the lnurlWithdraw options.
-	//    This is typically a withdrawl from a personal account at an exchange or service.
+	//    The user typed in an amount (or left the default minimum value), and then selected the tip button.
+	//    The range is generally calculated by doubling the amount,
+	//    but may be less depending on the lnurlPay options.
 	//
 	// The UI setup:
 	//
 	// We always configure the slider as a percent, from 0% to X%, where X <= 100%.
-	// Why have we made this decision ?
-	//
-	// - The most common scenario is a tip, and so it's common to make a tip based on a percent of the bill.
-	//
-	// - In the case of a lnurlWithdraw operation, the percentage makes it easy to quickly withdraw
-	//   a fraction of your account. If the user wants to withdraw a specific amount, then they can simply
-	//   type it into the amount TextField on the ValidateView screen.
-	//
-	// - In the case of a lnurlPay operation, it could be a donation with a very large range.
-	//   In this case, the slider is probably not helpful regardless of how you configure it.
-	//   Most likely the user will simply type in the amount they want to donate in the ValidateView screen.
 	
 	// --------------------------------------------------
 	// MARK: Init
 	// --------------------------------------------------
 	
 	init(
-		flow: FlowType,
+		range: MsatRange,
 		msat: Int64,
 		valueChanged: @escaping (Int64) -> Void
 	) {
-		self.flow = flow
+		self.range = range
 		self.valueChanged = valueChanged
 		
-		switch flow {
-		case .pay(let range):
+		let dblMin = range.min.msat + range.min.msat
+		if range.max.msat == dblMin {
 			
-			let dblMin = range.min.msat + range.min.msat
-			if range.max.msat == dblMin {
-				
-				// Standard tip
-				
-				self.sliderRange = Double(0)...Double(100)
-				
-				let percent = Double(msat - range.min.msat) / Double(range.max.msat - range.min.msat)
-				self._sliderValue = State<Double>(initialValue: (percent * 100))
-				
-			} else if range.max.msat < dblMin {
-				
-				// This is similar to a standard tip, but the max percent is below 100%.
-				// For example, a lnurlPay for a restaurant, where the min amount is equal to the bill,
-				// and the max amount includes a 30% tip.
-				// So we'll still treat it like a standard tip, but with a lower max.
-				
-				let maxTipPercent = Double(range.max.msat - range.min.msat) / Double(range.min.msat)
-				self.sliderRange = Double(0)...Double(maxTipPercent * 100)
-				
-				let percent = Double(msat - range.min.msat) / Double(dblMin - range.min.msat) // different
-				self._sliderValue = State<Double>(initialValue: (percent * 100))
-				
-			} else /* range.max.msat > dblMin */ {
-				
-				// This is a lnurlPay operation.
-				// It might be something like a donation, where the minimum is like 1 sat,
-				// and the maximum is some big number.
-				
-				self.sliderRange = Double(0)...Double(100)
-				
-				let percent = Double(msat - range.min.msat) / Double(range.max.msat - range.min.msat)
-				self._sliderValue = State<Double>(initialValue: (percent * 100))
-			}
+			// Standard tip
 			
-		case .withdraw(let range):
+			self.sliderRange = Double(0)...Double(100)
+			
+			let percent = Double(msat - range.min.msat) / Double(range.max.msat - range.min.msat)
+			self._sliderValue = State<Double>(initialValue: (percent * 100))
+			
+		} else if range.max.msat < dblMin {
+			
+			// This is similar to a standard tip, but the max percent is below 100%.
+			// For example, a lnurlPay for a restaurant, where the min amount is equal to the bill,
+			// and the max amount includes a 30% tip.
+			// So we'll still treat it like a standard tip, but with a lower max.
+			
+			let maxTipPercent = Double(range.max.msat - range.min.msat) / Double(range.min.msat)
+			self.sliderRange = Double(0)...Double(maxTipPercent * 100)
+			
+			let percent = Double(msat - range.min.msat) / Double(dblMin - range.min.msat) // different
+			self._sliderValue = State<Double>(initialValue: (percent * 100))
+			
+		} else /* range.max.msat > dblMin */ {
+			
+			// This is a lnurlPay operation.
+			// It might be something like a donation, where the minimum is like 1 sat,
+			// and the maximum is some big number.
 			
 			self.sliderRange = Double(0)...Double(100)
 			
@@ -167,17 +138,10 @@ struct PriceSliderSheet: View {
 	func header() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			if isTip() {
-				Text("Customize tip")
-					.font(.title3)
-					.accessibilityAddTraits(.isHeader)
-					.accessibilitySortPriority(100)
-			} else {
-				Text("Customize amount")
-					.font(.title3)
-					.accessibilityAddTraits(.isHeader)
-					.accessibilitySortPriority(100)
-			}
+			Text("Customize tip")
+				.font(.title3)
+				.accessibilityAddTraits(.isHeader)
+				.accessibilitySortPriority(100)
 			Spacer()
 			Button {
 				closeButtonTapped()
@@ -341,7 +305,7 @@ struct PriceSliderSheet: View {
 	func footer() -> some View {
 		
 		let recentTipPercents = recentTipPercents()
-		if isTip() && !recentTipPercents.isEmpty {
+		if !recentTipPercents.isEmpty {
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				ForEach(recentTipPercents.indices, id: \.self) { idx in
@@ -383,34 +347,19 @@ struct PriceSliderSheet: View {
 		// Reminder: percent != sliderValue
 		// 0.0 <= percent <= 1.0
 		
-		switch flow {
-		case .pay(let range):
+		let dblMin = range.min.msat + range.min.msat
+		if range.max.msat <= dblMin {
 			
-			let dblMin = range.min.msat + range.min.msat
-			if range.max.msat <= dblMin {
-				
-				// For tips:
-				// - 0 % => range.min
-				// - X % => treated like a tip
-				
-				let msat: Double = Double(range.min.msat) * percent
-				return Int64(msat.rounded())
-				
-			} else /* range.max.msat > dblMin */ {
-				
-				// For lnurlPay:
-				// -   0 % => range.min
-				// - 100 % => range.max
-				
-				let diff: Int64 = range.max.msat - range.min.msat
-				let msat: Double = Double(diff) * percent
-				
-				return Int64(msat.rounded())
-			}
+			// For tips:
+			// - 0 % => range.min
+			// - X % => treated like a tip
 			
-		case .withdraw(let range):
+			let msat: Double = Double(range.min.msat) * percent
+			return Int64(msat.rounded())
 			
-			// For withdraws:
+		} else /* range.max.msat > dblMin */ {
+			
+			// For lnurlPay:
 			// -   0 % => range.min
 			// - 100 % => range.max
 			
@@ -426,7 +375,7 @@ struct PriceSliderSheet: View {
 		// Reminder: percent != sliderValue
 		// 0.0 <= percent <= 1.0
 		
-		return flow.range.min.msat + percentToTipMsat(percent)
+		return range.min.msat + percentToTipMsat(percent)
 	}
 	
 	func tipMsat() -> Int64 {
@@ -499,42 +448,12 @@ struct PriceSliderSheet: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func isTip() -> Bool {
-		
-		// Can we treat this as a tip ?
-		
-		switch flow {
-		case .pay(let range):
-			
-			// There are 3 scenarios:
-			//
-			// 1) This is a standard lightning invoice.
-			//    The range is calculated by doubling the invoice amount.
-			//    So we can treat this as a tip.
-			//
-			// 2) This is an amountless lightning invoice.
-			//    The user typed in an amount, and then selected the tip button.
-			//    The range is calculated by doubling the invoice amount.
-			//    So we can treat this as a tip.
-			//
-			// 3) This is a lnurlPay operation.
-			//    The range is coming from the lnurlPay options.
-			//    We can only treat this as a tip if the max is no more than double the min.
-			
-			return range.max.msat <= (range.min.msat + range.min.msat)
-			
-		case .withdraw(_):
-			
-			return false
-		}
-	}
-	
 	func formatBitcoinAmount(msat: Int64) -> FormattedAmount {
 		return Utils.formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit)
 	}
 	
 	func maxBitcoinAmount() -> FormattedAmount {
-		return formatBitcoinAmount(msat: flow.range.max.msat)
+		return formatBitcoinAmount(msat: range.max.msat)
 	}
 	
 	func bitcoinAmount() -> FormattedAmount {
@@ -542,7 +461,7 @@ struct PriceSliderSheet: View {
 	}
 	
 	func minBitcoinAmount() -> FormattedAmount {
-		return formatBitcoinAmount(msat: flow.range.min.msat)
+		return formatBitcoinAmount(msat: range.min.msat)
 	}
 	
 	func formatFiatAmount(msat: Int64) -> FormattedAmount {
@@ -554,7 +473,7 @@ struct PriceSliderSheet: View {
 	}
 	
 	func maxFiatAmount() -> FormattedAmount {
-		return formatFiatAmount(msat: flow.range.max.msat)
+		return formatFiatAmount(msat: range.max.msat)
 	}
 	
 	func fiatAmount() -> FormattedAmount {
@@ -562,7 +481,7 @@ struct PriceSliderSheet: View {
 	}
 	
 	func minFiatAmount() -> FormattedAmount {
-		return formatFiatAmount(msat: flow.range.min.msat)
+		return formatFiatAmount(msat: range.min.msat)
 	}
 	
 	func formatPercent(_ percent: Double) -> String {
@@ -632,50 +551,28 @@ struct PriceSliderSheet: View {
 	func announceMin() -> Bool {
 		
 		// When VoiceOver is enabled, do we announce the minimum amount ?
-		//
-		// Generally this makes sense if this isn't a tip.
-		// For example:
-		// - lnurlPay for a donation
-		// - lnurlWithdraw
-		
-		return !isTip()
+		return false
 	}
 	
 	func announceMax() -> Bool {
 		
 		// When VoiceOver is enabled, do we announce the maximum amount ?
-		//
-		// Generally this makes sense if this isn't a tip,
-		// or if the maximum tip is less than 100%.
-		
-		switch flow {
-		case .pay(let range):
-			return (range.min.msat + range.min.msat) != range.max.msat
-			
-		case .withdraw(_):
-			return true
-		}
+		return (range.min.msat + range.min.msat) != range.max.msat
 	}
 	
 	func summaryLabel() -> String {
+		
+		let tipMsat = tipMsat()
+		let tipBtcn = formatBitcoinAmount(msat: tipMsat).string
+		let tipFiat = formatFiatAmount(msat: tipMsat).string
 		
 		let ttlMsat = totalMsat()
 		let ttlBtcn = formatBitcoinAmount(msat: ttlMsat).string
 		let ttlFiat = formatFiatAmount(msat: ttlMsat).string
 		
-		if isTip() {
-			let tipMsat = tipMsat()
-			let tipBtcn = formatBitcoinAmount(msat: tipMsat).string
-			let tipFiat = formatFiatAmount(msat: tipMsat).string
-			
-			return NSLocalizedString("tip amount: \(tipBtcn), ≈\(tipFiat), total amount: \(ttlBtcn), ≈\(ttlFiat)",
-				comment: "VoiceOver information: Customize tip sheet"
-			)
-		} else {
-			return NSLocalizedString("total amount: \(ttlBtcn) ≈\(ttlFiat)",
-				comment: "VoiceOver information: Customize tip sheet"
-			)
-		}
+		return NSLocalizedString("tip amount: \(tipBtcn), ≈\(tipFiat), total amount: \(ttlBtcn), ≈\(ttlFiat)",
+			comment: "VoiceOver information: Customize tip sheet"
+		)
 	}
 	
 	// --------------------------------------------------
@@ -747,10 +644,7 @@ struct PriceSliderSheet: View {
 	func recentButtonTapped(_ percent: Int) {
 		log.trace("recentButtonTapped()")
 		
-		if case .pay(_) = flow {
-
-			self.sliderValue = Double(percent)
-		}
+		self.sliderValue = Double(percent)
 	}
 	
 	func closeButtonTapped() {

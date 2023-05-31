@@ -31,15 +31,15 @@ struct OnChainDetails: View {
 		
 		Grid(horizontalSpacing: 8, verticalSpacing: 12) {
 			GridRow(alignment: VerticalAlignment.firstTextBaseline) {
-				Text("Fee Rate")
+				Text("Desc")
 					.textCase(.uppercase)
 					.font(.subheadline)
 					.foregroundColor(.secondary)
-					.gridColumnAlignment(HorizontalAlignment.trailing)
+					.gridColumnAlignment(.trailing)
 				
-				Text("1 sat/vByte")
+				Text("On-Chain Payment")
 					.font(.subheadline)
-					.gridColumnAlignment(HorizontalAlignment.leading)
+					.gridColumnAlignment(.leading)
 			}
 			GridRow(alignment: VerticalAlignment.firstTextBaseline) {
 				Text("Send To")
@@ -47,8 +47,16 @@ struct OnChainDetails: View {
 					.font(.subheadline)
 					.foregroundColor(.secondary)
 				
-				Text(model.uri.address)
+				let btcAddr = model.uri.address
+				Text(btcAddr)
 					.font(.subheadline)
+					.contextMenu {
+						Button {
+							UIPasteboard.general.string = btcAddr
+						} label: {
+							Text("Copy")
+						}
+					}
 			}
 		}
 	}
@@ -95,7 +103,7 @@ fileprivate struct OnChainDetails_Grid: InfoGridView {
 			alignment : HorizontalAlignment.leading,
 			spacing   : verticalSpacingBetweenRows
 		) {
-			feeRate()
+			description()
 			sendTo()
 		}
 	}
@@ -110,7 +118,7 @@ fileprivate struct OnChainDetails_Grid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func feeRate() -> some View {
+	func description() -> some View {
 		let identifier: String = #function
 		
 		InfoGridRow(
@@ -120,10 +128,10 @@ fileprivate struct OnChainDetails_Grid: InfoGridView {
 			keyColumnWidth: keyColumnWidth(identifier: identifier),
 			keyColumnAlignment: .trailing
 		) {
-			keyColumn("Fee Rate")
+			keyColumn("Desc")
 		} valueColumn: {
 			
-			Text("1 sat/vByte")
+			Text("On-Chain Payment")
 				.font(.subheadline)
 			
 		} // </InfoGridRow>
@@ -143,8 +151,16 @@ fileprivate struct OnChainDetails_Grid: InfoGridView {
 			keyColumn("Send To")
 		} valueColumn: {
 			
-			Text(model.uri.address)
+			let btcAddr = model.uri.address
+			Text(btcAddr)
 				.font(.subheadline)
+				.contextMenu {
+					Button {
+						UIPasteboard.general.string = btcAddr
+					} label: {
+						Text("Copy")
+					}
+				}
 			
 		} // </InfoGridRow>
 	}
