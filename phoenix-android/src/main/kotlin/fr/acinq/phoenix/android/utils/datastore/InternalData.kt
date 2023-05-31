@@ -44,10 +44,18 @@ object InternalData {
     fun getLastUsedAppCode(context: Context): Flow<Int?> = prefs(context).map { it[LAST_USED_APP_CODE] }
     suspend fun saveLastUsedAppCode(context: Context, code: Int) = context.internalData.edit { it[LAST_USED_APP_CODE] = code }
 
-    // -- Timestamp of the last time the user has checked his mnemonics. Used to display notifications and messages.
-    private val MNEMONICS_CHECK_TIMESTAMP = longPreferencesKey("MNEMONICS_CHECK_TIMESTAMP")
-    fun isMnemonicsChecked(context: Context): Flow<Boolean> = prefs(context).map { it[MNEMONICS_CHECK_TIMESTAMP] != null }
-    suspend fun saveMnemonicsCheckTimestamp(context: Context, timestamp: Long) = context.internalData.edit { it[MNEMONICS_CHECK_TIMESTAMP] = timestamp }
+    // -- When the user states that he made a manual backup of the seed
+    private val SEED_MANUAL_BACKUP_DONE = booleanPreferencesKey("SEED_MANUAL_BACKUP_DONE")
+    fun isManualSeedBackupDone(context: Context): Flow<Boolean> = prefs(context).map { it[SEED_MANUAL_BACKUP_DONE] ?: false }
+    suspend fun saveManualSeedBackupDone(context: Context, isDone: Boolean) = context.internalData.edit { it[SEED_MANUAL_BACKUP_DONE] = isDone }
+
+    // -- When the user has read the seed loss disclaimer
+    private val SEED_LOSS_DISCLAIMER_READ = booleanPreferencesKey("SEED_LOSS_DISCLAIMER_READ")
+    fun isSeedLossDisclaimerRead(context: Context): Flow<Boolean> = prefs(context).map { it[SEED_LOSS_DISCLAIMER_READ] ?: false }
+    suspend fun saveSeedLossDisclaimerRead(context: Context, isRead: Boolean) = context.internalData.edit { it[SEED_LOSS_DISCLAIMER_READ] = isRead }
+
+    // -- Whether a seed backup warning should be displayed - computed from SEED_MANUAL_BACKUP_DONE & SEED_LOSS_DISCLAIMER_READ
+    fun showSeedBackupNotice(context: Context) = prefs(context).map { it[SEED_MANUAL_BACKUP_DONE] != true || it[SEED_LOSS_DISCLAIMER_READ] != true }
 
     // -- Show a message summing up the migration result.
     private val MIGRATION_RESULT_SHOWN = booleanPreferencesKey("MIGRATION_RESULT_SHOWN")

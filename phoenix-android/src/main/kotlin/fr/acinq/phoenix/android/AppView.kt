@@ -41,6 +41,7 @@ import fr.acinq.phoenix.android.payments.*
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
+import fr.acinq.phoenix.android.settings.displayseed.DisplaySeedView
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
@@ -234,7 +235,7 @@ fun AppView(
                     SettingsView()
                 }
                 composable(Screen.DisplaySeed.route) {
-                    SeedView()
+                    DisplaySeedView()
                 }
                 composable(Screen.ElectrumServer.route) {
                     ElectrumView()
@@ -360,8 +361,8 @@ private fun monitorNotices(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        InternalData.isMnemonicsChecked(context).collect {
-            if (!it) {
+        InternalData.showSeedBackupNotice(context).collect {
+            if (it) {
                 vm.addNotice(Notice.BackupSeedReminder)
             } else {
                 vm.removeNotice(Notice.BackupSeedReminder)
