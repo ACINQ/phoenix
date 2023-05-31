@@ -23,11 +23,11 @@ import fr.acinq.phoenix.utils.PlatformContext
 import java.util.*
 
 actual fun createChannelsDbDriver(ctx: PlatformContext, chain: NodeParams.Chain, nodeIdHash: String): SqlDriver {
-    return AndroidSqliteDriver(ChannelsDatabase.Schema, ctx.applicationContext, "channels-${chain.name.toLowerCase(Locale.ROOT)}-$nodeIdHash.sqlite")
+    return AndroidSqliteDriver(ChannelsDatabase.Schema, ctx.applicationContext, "channels-${chain.name.lowercase()}-$nodeIdHash.sqlite")
 }
 
 actual fun createPaymentsDbDriver(ctx: PlatformContext, chain: NodeParams.Chain, nodeIdHash: String): SqlDriver {
-    return AndroidSqliteDriver(PaymentsDatabase.Schema, ctx.applicationContext, "payments-${chain.name.toLowerCase(Locale.ROOT)}-$nodeIdHash.sqlite")
+    return AndroidSqliteDriver(PaymentsDatabase.Schema, ctx.applicationContext, "payments-${chain.name.lowercase()}-$nodeIdHash.sqlite")
 }
 
 actual fun createAppDbDriver(ctx: PlatformContext): SqlDriver {

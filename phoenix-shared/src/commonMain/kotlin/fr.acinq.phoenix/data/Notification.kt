@@ -16,9 +16,11 @@
 
 package fr.acinq.phoenix.data
 
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.currentTimestampMillis
 
 /** Notification object, typically regarding missed payments. */
 sealed class Notification {
@@ -65,4 +67,16 @@ sealed class Notification {
         override val amount: MilliSatoshi,
         override val source: LiquidityEvents.Source,
     ) : PaymentRejected()
+}
+
+sealed class WatchTowerOutcome : Notification() {
+    data class Unknown(override val id: UUID, override val createdAt: Long, override val readAt: Long?): WatchTowerOutcome() {
+        constructor() : this(UUID.randomUUID(), currentTimestampMillis(), null)
+    }
+    data class Nominal(override val id: UUID, override val createdAt: Long, override val readAt: Long?, val channelsWatchedCount: Int): WatchTowerOutcome() {
+        constructor(channelsWatchedCount: Int) : this(UUID.randomUUID(), currentTimestampMillis(), null, channelsWatchedCount)
+    }
+    data class RevokedFound(override val id: UUID, override val createdAt: Long, override val readAt: Long?, val channels: Set<ByteVector32>): WatchTowerOutcome() {
+        constructor(channels: Set<ByteVector32>) : this(UUID.randomUUID(), currentTimestampMillis(), null, channels)
+    }
 }

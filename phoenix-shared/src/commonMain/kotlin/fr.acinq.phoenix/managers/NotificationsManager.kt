@@ -21,6 +21,7 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.Notification
+import fr.acinq.phoenix.data.WatchTowerOutcome
 import fr.acinq.phoenix.db.SqliteAppDb
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -59,7 +60,12 @@ class NotificationsManager(
         return appDb.getNotification(id)
     }
 
-    suspend fun saveLiquidityEventNotification(event: LiquidityEvents) {
+    suspend fun saveWatchTowerOutcome(outcome: WatchTowerOutcome) {
+        log.debug { "persisting watch-tower-outcome=$outcome" }
+        appDb.saveNotification(outcome)
+    }
+
+    internal suspend fun saveLiquidityEventNotification(event: LiquidityEvents) {
         log.debug { "persisting to db liquidity_event=$event" }
         when (event) {
             is LiquidityEvents.Rejected -> {

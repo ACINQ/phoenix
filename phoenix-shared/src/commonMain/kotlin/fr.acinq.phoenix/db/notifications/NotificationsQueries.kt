@@ -21,11 +21,12 @@ import com.squareup.sqldelight.runtime.coroutines.mapToList
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.Notification
+import fr.acinq.phoenix.data.WatchTowerOutcome
 import fr.acinq.phoenix.db.AppDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class NotificationsQueries(val database: AppDatabase) {
+internal class NotificationsQueries(val database: AppDatabase) {
     private val queries = database.notificationsQueries
 
     fun get(id: UUID): Notification? {
@@ -76,7 +77,7 @@ class NotificationsQueries(val database: AppDatabase) {
 
     companion object {
         /** Map columns to a [Notification] object. If the [data_json] column is unreadable, return null. */
-        fun mapToNotification(
+        internal fun mapToNotification(
             id: String,
             type_version: NotificationTypeVersion,
             data_json: ByteArray,
@@ -120,6 +121,29 @@ class NotificationsQueries(val database: AppDatabase) {
                         readAt = read_at,
                         amount = data.amount,
                         source = data.source,
+                    )
+                }
+                is NotificationData.WatchTowerOutcome.Nominal.V0 -> {
+                    WatchTowerOutcome.Nominal(
+                        id = UUID.fromString(id),
+                        createdAt = created_at,
+                        readAt = read_at,
+                        channelsWatchedCount = data.channelsWatchedCount
+                    )
+                }
+                is NotificationData.WatchTowerOutcome.RevokedFound.V0 -> {
+                    WatchTowerOutcome.RevokedFound(
+                        id = UUID.fromString(id),
+                        createdAt = created_at,
+                        readAt = read_at,
+                        channels = data.channels
+                    )
+                }
+                NotificationData.WatchTowerOutcome.Unknown.V0 -> {
+                    WatchTowerOutcome.Unknown(
+                        id = UUID.fromString(id),
+                        createdAt = created_at,
+                        readAt = read_at,
                     )
                 }
                 null -> null
