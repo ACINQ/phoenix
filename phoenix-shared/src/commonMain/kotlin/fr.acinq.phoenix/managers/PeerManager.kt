@@ -8,8 +8,8 @@ import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
-import fr.acinq.lightning.channel.ChannelStateWithCommitments
-import fr.acinq.lightning.channel.Offline
+import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
+import fr.acinq.lightning.channel.states.Offline
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.transactions.Transactions

@@ -24,10 +24,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
-import fr.acinq.lightning.channel.Command
+import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +40,7 @@ sealed class CpfpState {
     data class Executing(val actualFeerate: FeeratePerKw) : CpfpState()
     sealed class Complete : CpfpState() {
         object Success: Complete()
-        data class Failed(val failure: Command.Splice.Response.Failure): Complete()
+        data class Failed(val failure: ChannelCommand.Splice.Response.Failure): Complete()
     }
     sealed class Error: CpfpState() {
         data class Thrown(val e: Throwable): Error()
@@ -95,11 +94,11 @@ class CpfpViewModel(val peerManager: PeerManager) : ViewModel() {
                         log.info("failed to execute cpfp splice: assuming no channels")
                         state = CpfpState.Error.NoChannels
                     }
-                    is Command.Splice.Response.Created -> {
+                    is ChannelCommand.Splice.Response.Created -> {
                         log.info("successfully executed cpfp splice: $res")
                         state = CpfpState.Complete.Success
                     }
-                    is Command.Splice.Response.Failure -> {
+                    is ChannelCommand.Splice.Response.Failure -> {
                         log.info("failed to execute cpfp splice: $res")
                         state = CpfpState.Complete.Failed(res)
                     }

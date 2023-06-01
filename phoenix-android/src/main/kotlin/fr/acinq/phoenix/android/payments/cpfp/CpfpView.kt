@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.android.payments.cpfp
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -30,20 +29,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Satoshi
-import fr.acinq.lightning.channel.Command
+import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.horizon
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.BitcoinUnit
-import fr.acinq.phoenix.data.CurrencyUnit
-import fr.acinq.phoenix.data.MempoolFeerate
 
 
 @Composable
@@ -116,16 +111,16 @@ fun CpfpView(
                 ErrorMessage(
                     errorHeader = stringResource(id = R.string.cpfp_failure_title),
                     errorDetails = when (state.failure) {
-                        is Command.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, state.failure.reason)
-                        is Command.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
-                        is Command.Splice.Response.Failure.ChannelNotIdle -> stringResource(id = R.string.splice_error_channel_not_idle)
-                        is Command.Splice.Response.Failure.Disconnected -> stringResource(id = R.string.splice_error_disconnected)
-                        is Command.Splice.Response.Failure.FundingFailure -> stringResource(id = R.string.splice_error_funding_error, state.failure.reason.javaClass.simpleName)
-                        is Command.Splice.Response.Failure.InsufficientFunds -> stringResource(id = R.string.splice_error_insufficient_funds)
-                        is Command.Splice.Response.Failure.CannotStartSession -> stringResource(id = R.string.splice_error_cannot_start_session)
-                        is Command.Splice.Response.Failure.InteractiveTxSessionFailed -> stringResource(id = R.string.splice_error_interactive_session, state.failure.reason.javaClass.simpleName)
-                        is Command.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> stringResource(id = R.string.splice_error_invalid_pubkey)
-                        is Command.Splice.Response.Failure.SpliceAlreadyInProgress -> stringResource(id = R.string.splice_error_splice_in_progress)
+                        is ChannelCommand.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, state.failure.reason)
+                        is ChannelCommand.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
+                        is ChannelCommand.Splice.Response.Failure.ChannelNotIdle -> stringResource(id = R.string.splice_error_channel_not_idle)
+                        is ChannelCommand.Splice.Response.Failure.Disconnected -> stringResource(id = R.string.splice_error_disconnected)
+                        is ChannelCommand.Splice.Response.Failure.FundingFailure -> stringResource(id = R.string.splice_error_funding_error, state.failure.reason.javaClass.simpleName)
+                        is ChannelCommand.Splice.Response.Failure.InsufficientFunds -> stringResource(id = R.string.splice_error_insufficient_funds)
+                        is ChannelCommand.Splice.Response.Failure.CannotStartSession -> stringResource(id = R.string.splice_error_cannot_start_session)
+                        is ChannelCommand.Splice.Response.Failure.InteractiveTxSessionFailed -> stringResource(id = R.string.splice_error_interactive_session, state.failure.reason.javaClass.simpleName)
+                        is ChannelCommand.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> stringResource(id = R.string.splice_error_invalid_pubkey)
+                        is ChannelCommand.Splice.Response.Failure.SpliceAlreadyInProgress -> stringResource(id = R.string.splice_error_splice_in_progress)
                     },
                     alignment = Alignment.CenterHorizontally,
                     padding = PaddingValues(0.dp)

@@ -27,7 +27,7 @@ import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
-import fr.acinq.lightning.channel.Command
+import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.Parser
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -44,9 +44,9 @@ sealed class SpliceOutState {
     sealed class Complete: SpliceOutState() {
         abstract val userAmount: Satoshi
         abstract val feerate: FeeratePerKw
-        abstract val result: Command.Splice.Response
-        data class Success(override val userAmount: Satoshi, override val feerate: FeeratePerKw, override val result: Command.Splice.Response.Created): Complete()
-        data class Failure(override val userAmount: Satoshi, override val feerate: FeeratePerKw, override val result: Command.Splice.Response.Failure): Complete()
+        abstract val result: ChannelCommand.Splice.Response
+        data class Success(override val userAmount: Satoshi, override val feerate: FeeratePerKw, override val result: ChannelCommand.Splice.Response.Created): Complete()
+        data class Failure(override val userAmount: Satoshi, override val feerate: FeeratePerKw, override val result: ChannelCommand.Splice.Response.Failure): Complete()
     }
     sealed class Error: SpliceOutState() {
         data class Thrown(val e: Throwable): Error()
@@ -105,12 +105,12 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
                     feerate = feerate,
                 )
                 when (response) {
-                    is Command.Splice.Response.Created -> {
+                    is ChannelCommand.Splice.Response.Created -> {
                         log.info("successfully executed splice-out: $response")
                         state = SpliceOutState.Complete.Success(amount, feerate, response)
                     }
-                    is Command.Splice.Response.Failure -> {
-                        log.info("failed to execut splice-out: $response")
+                    is ChannelCommand.Splice.Response.Failure -> {
+                        log.info("failed to execute splice-out: $response")
                         state = SpliceOutState.Complete.Failure(amount, feerate, response)
                     }
                     null -> {

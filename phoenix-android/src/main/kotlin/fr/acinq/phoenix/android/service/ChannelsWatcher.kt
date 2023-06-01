@@ -18,7 +18,7 @@ package fr.acinq.phoenix.android.service
 
 import android.content.Context
 import androidx.work.*
-import fr.acinq.lightning.channel.Closing
+import fr.acinq.lightning.channel.states.Closing
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication

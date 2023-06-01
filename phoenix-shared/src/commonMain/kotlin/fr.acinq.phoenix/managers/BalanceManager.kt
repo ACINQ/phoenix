@@ -167,6 +167,9 @@ class BalanceManager(
                 is LiquidityEvents.Rejected -> {
                     log.info { "liquidity event=$event" }
                 }
+                is UpgradeRequired -> {
+                    // handled by the front
+                }
             }
         }
     }

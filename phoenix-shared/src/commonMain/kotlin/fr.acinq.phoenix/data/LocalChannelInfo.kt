@@ -19,6 +19,7 @@ package fr.acinq.phoenix.data
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.channel.*
+import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.json.JsonSerializers
 import fr.acinq.phoenix.utils.extensions.*
 import kotlinx.serialization.encodeToString

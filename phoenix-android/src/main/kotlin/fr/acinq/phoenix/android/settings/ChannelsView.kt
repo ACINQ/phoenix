@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.channel.*
+import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
