@@ -17,7 +17,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Phoenix Testnet</string>
 
-    <!-- //////////////// system notification channels //////////////// -->
+    <!-- system notification channels -->
 
     <string name="notification_channels_watcher_title">Channels watcher</string>
     <string name="notification_channels_watcher_desc">Shows up when you need to start Phoenix.</string>
@@ -31,7 +31,7 @@
     <string name="notification_headless_title">Background notification</string>
     <string name="notification_headless_desc">Tells you when Phoenix is running in the background, usually because you have a payment incoming.</string>
 
-    <!-- //////////////// notification content //////////////// -->
+    <!-- system notifications -->
 
     <string name="notif__headless_title__default">Phoenix is running in the background</string>
     <string name="notif__headless__received">You received %1$s</string>
@@ -47,12 +47,13 @@
     <string name="notif_watcher_revoked_commit_title">Some of your channels have closed</string>
     <string name="notif_watcher_revoked_commit_message">Please start Phoenix to review your channels.</string>
 
-    <!-- //////////////// init wallet / automated wallet creation //////////////// -->
+    <!-- init wallet / automated wallet creation -->
+
+    <string name="initwallet_create">Create new wallet</string>
+    <string name="initwallet_restore">Restore my wallet</string>
 
     <string name="autocreate_generating">Creating your wallet…</string>
     <string name="autocreate_error">Failed to write wallet keys.\nReason: %1$s</string>
-
-    <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
     <string name="restore_title">Restore my wallet</string>
     <string name="restore_disclaimer_message">Do not import a seed that was NOT created by this application.\n\nAlso, make sure you are not already running another Phoenix wallet with the same seed.</string>
@@ -76,7 +77,7 @@
     <string name="authprompt_title">Unlock to continue</string>
     <string name="authprompt_error_unsecure">Device is not secure (code: %1$d)</string>
 
-    <!-- //////////////// placeholders ////////////////-->
+    <!-- utils: placeholders -->
 
     <string name="lipsum_short" translatable="false">Etiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas.</string>
     <string name="lipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut facilisis lectus. Integer massa tellus, suscipit sit amet felis vitae, blandit consectetur dolor. Fusce volutpat id magna id vestibulum. Integer a erat lacinia, placerat risus a, fermentum justo. Etiam euismod tincidunt dolor vel posuere. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur non euismod dui. Morbi enim dui, blandit sed erat sit amet, porta pulvinar odio. Cras metus felis, vestibulum eu consequat vitae, consectetur quis nulla. Fusce vulputate, elit et luctus sodales, metus metus elementum sem, eget commodo nunc nunc in ex. Sed aliquam eros nibh, ac volutpat turpis accumsan vitae. Cras suscipit ipsum accumsan aliquam interdum.</string>
@@ -87,7 +88,7 @@
     \nNam felis felix, tristique commodo odio eget, imperdiet viverra erat. Donec venenatis magna pulvinar, finibus leo id, gravida augue. Integer ante leo, bibendum ac nibh quis, auctor commodo quam. Sed luctus vitae quam vel condimentum. Mauris eu rhoncus mauris. Fusce enim diam, consequat a odio sit amet, accumsan cursus nisl. Etiam lectus nunc, lacinia id purus sit amet, pulvinar auctor odio. Maecenas vitae arcu sit amet est cursus maximus. Nullam ac sapien non nibh tempor rhoncus. Mauris dignissim cursus libero quis egestas.
   </string>
 
-    <!-- //////////////// Startup //////////////////// -->
+    <!-- Startup -->
 
     <string name="startup_wait_prefs">Initializing…</string>
     <string name="startup_binding_service">Binding service…</string>
@@ -138,7 +139,7 @@
     <string name="receive_lightning_edit_desc_label">Description (optional):</string>
     <string name="receive_lightning_edit_generate_button">Create invoice</string>
 
-    <!-- //////////////// send //////////////// -->
+    <!-- send -->
 
     <string name="send_balance_prefix">Balance:</string>
     <string name="send_error_amount_too_large">Amount is too large.</string>
@@ -177,7 +178,7 @@
     <string name="send_spliceout_complete_recap_fee">Miner fee</string>
     <string name="send_spliceout_complete_recap_total">Total</string>
 
-    <!-- //////////////// scan //////////////// -->
+    <!-- scan -->
 
     <string name="scan_reading">Reading scan…</string>
     <string name="scan_manual_input_button">Manual input</string>
@@ -200,9 +201,8 @@
     <string name="scan_manual_input_instructions">Enter a Lightning invoice, LNURL, or Lightning address you want to send money to.</string>
     <string name="scan_manual_input_hint">Enter an invoice or a LN address</string>
 
-    <!-- //////////////// utility strings //////////////// -->
+    <!-- utils: misc strings -->
 
-    <!-- #1: sign / #2: integer part / #3: decimal part / #4: unit -->
     <string name="utils_rounded">≈</string>
     <string name="utils_converted_amount">≈ %1$s</string>
     <string name="utils_unknown_amount" translatable="false">!?</string>
@@ -235,7 +235,7 @@
     <string name="btn_pause_connecting">Connecting to peer…</string>
     <string name="btn_pause_connecting_electrum">Connecting to electrum…</string>
 
-    <!-- //////////////// settings //////////////// -->
+    <!-- settings list -->
 
     <string name="settings_general_title">General</string>
     <string name="settings_display_prefs">Display</string>
@@ -254,7 +254,7 @@
     <string name="settings_about">About</string>
     <string name="settings_payment_settings">Options &amp; fees</string>
 
-    <!-- //////////////// close all channels //////////////// -->
+    <!-- mutual close -->
 
     <string name="mutualclose_title">Drain my wallet</string>
     <string name="mutualclose_loading">Loading…</string>
@@ -279,6 +279,7 @@
     <string name="forceclose_button">Force-close all my channels</string>
 
     <!-- channels view -->
+
     <string name="channelsview_title">Payment channels</string>
     <string name="channelsview_balance">Balance</string>
     <string name="channelsview_balance_about">This is the aggregated balance of your active channels. It\'s what you can spend over Lightning.</string>
@@ -286,6 +287,7 @@
     <string name="channelsview_no_channels">You don\'t have any channels yet.\n\nPayments channels are created when you receive a payment and a new channel is needed. This is done automatically.</string>
 
     <!-- channels details -->
+
     <string name="channeldetails_title">Channel details</string>
     <string name="channeldetails_not_found">No active channel exists for that identifier.</string>
     <string name="channeldetails_channel_id">Channel id</string>
@@ -305,18 +307,13 @@
     <string name="channeldetails_share_subject">Channels data</string>
     <string name="channeldetails_share_title">Share channel data</string>
 
-    <!-- //////////////// menu //////////////// -->
+    <!-- home: bottom menu -->
 
     <string name="menu_settings">Settings</string>
     <string name="menu_send">Send</string>
     <string name="menu_receive">Receive</string>
 
-    <!-- //////////////// init wallet //////////////// -->
-
-    <string name="initwallet_create">Create new wallet</string>
-    <string name="initwallet_restore">Restore my wallet</string>
-
-    <!-- //////////////// home //////////////////// -->
+    <!-- home: balance section & misc -->
 
     <string name="home__balance_loading">Loading…</string>
     <string name="home__onchain_incoming">+%1$s</string>
@@ -337,7 +334,7 @@
     <string name="home__connection__connecting">Connecting…</string>
     <string name="home__connection__tor_active">Tor enabled</string>
 
-    <!-- //////////////// notifications //////////////////// -->
+    <!-- in-app notifications -->
 
     <string name="inappnotif_title">Notifications</string>
     <string name="inappnotif_notices_title">Important messages</string>
@@ -378,7 +375,7 @@
     <string name="inappnotif_watchtower_revokedfound_title">Watchtower alert</string>
     <string name="inappnotif_watchtower_revokedfound_description">Revoked commitments found on %1$s for channel(s): %2$s.\n\nContact support if needed.</string>
 
-    <!-- //////////////// display seed //////////////// -->
+    <!-- settings: display seed -->
 
     <string name="displayseed_title">Recovery phrase</string>
     <string name="displayseed_backup_notice_header">You have not backed up your recovery phrase!</string>
@@ -396,7 +393,7 @@
     <string name="displayseed_backup_checkbox">I have saved my recovery phrase somewhere safe.</string>
     <string name="displayseed_loss_disclaimer_checkbox">I understand that if I lose my phone and my recovery phrase, then I will lose the funds in my wallet.</string>
 
-    <!-- //////////////// logs settings //////////////// -->
+    <!-- settings: logs -->
 
     <string name="logs_title">Application logs</string>
     <string name="logs_view_button">View logs…</string>
@@ -405,7 +402,7 @@
     <string name="logs_share_subject">Phoenix App logs</string>
     <string name="logs_share_title">Share Phoenix logs…</string>
 
-    <!-- //////////////// payment details //////////////// -->
+    <!-- payment details -->
 
     <string name="paymentdetails_title">Payment details</string>
     <string name="paymentdetails_loading">Loading payment details…</string>
@@ -459,7 +456,7 @@
     <string name="paymentdetails_failure_trampoline_fees">No route found with current fee setting. Try with higher fees.</string>
     <string name="paymentdetails_failure_trampoline_fees_action">Edit my fee setting</string>
 
-    <!-- //////////////// payment details: technicals data //////////////// -->
+    <!-- payment details: technicals data -->
 
     <string name="paymentdetails_technical_title">Technical details</string>
     <string name="paymentdetails_payment_type_label">Type of payment</string>
@@ -528,7 +525,7 @@
     <string name="paymentdetails_amount_rate_now">≈ %1$s (now)</string>
     <string name="paymentdetails_amount_rate_then">≈ %1$s (then)</string>
 
-    <!-- //////////////// channel state state //////////////// -->
+    <!-- human-readable channel states -->
 
     <string name="state_wait_confirmed">Waiting for confirmation</string>
     <string name="state_wait_open">Waiting for peer</string>
@@ -539,7 +536,7 @@
     <string name="state_offline">Peer is offline</string>
     <string name="state_shutdown">Shutdown</string>
 
-    <!-- //////////////// access control //////////////// -->
+    <!-- settings: access control -->
 
     <string name="accessctrl_title">Application access</string>
     <string name="accessctrl_loading">Retrieving data…</string>
@@ -563,7 +560,7 @@
     <string name="accessctrl_screen_lock_switch">Screen lock</string>
     <string name="accessctrl_screen_lock_switch_desc">Lock access to the app with Android\'s screen lock/fingerprint</string>
 
-    <!-- //////////////// ln url auth //////////////// -->
+    <!-- lnurl-auth -->
 
     <string name="lnurl_auth_instructions">You can anonymously sign-in and authorize an action on:</string>
     <string name="lnurl_auth_legacy_notice">Legacy mode</string>
@@ -583,14 +580,14 @@
     <string name="lnurl_auth_error_network">Network error. Check your internet connection and try again.</string>
     <string name="lnurl_auth_error_other">An unknown error occurred. Try again.</string>
 
-    <!-- //////////////// lnurl auth scheme types //////////////// -->
+    <!-- lnurl-auth settings: scheme types -->
 
     <string name="lnurl_auth_scheme_default">Compliant (recommended)</string>
     <string name="lnurl_auth_scheme_default_desc">Use the standard LNURL\'s specifications scheme. This is the recommended option, especially for new wallets.</string>
     <string name="lnurl_auth_scheme_legacy">Legacy friendly</string>
     <string name="lnurl_auth_scheme_legacy_desc">Use a legacy scheme on some services to let you use accounts that were created with the old Phoenix Android app.</string>
 
-    <!-- //////////////// lnurl withdraw //////////////// -->
+    <!-- lnurl-withdraw -->
 
     <string name="lnurl_withdraw_header">You can redeem funds from\n<b>%1$s</b>.</string>
     <string name="lnurl_withdraw_amount_label">Amount to receive</string>
@@ -603,14 +600,14 @@
     <string name="lnurl_withdraw_amount_above_max">Amount cannot exceed %1$s.</string>
     <string name="lnurl_withdraw_error_header">Withdrawal has failed:</string>
 
-    <!-- //////////////// lnurl remote error messages //////////////// -->
+    <!-- lnurl: common remote error messages -->
 
     <string name="lnurl_error_remote_details">The service <b>%1$s</b> responded with an error:\n\n<i>%2$s</i>.\n\nContact their support if needed.</string>
     <string name="lnurl_error_remote_code">The service <b>%1$s</b> returned an HTTP error (%2$s).\n\nContact their support if needed.</string>
     <string name="lnurl_error_remote_unreadable">The service <b>%1$s</b> returned a malformed message.</string>
     <string name="lnurl_error_remote_connection">Could not connect to service <b>%1$s</b>.</string>
 
-    <!-- //////////////// lnurl pay //////////////// -->
+    <!-- lnurl-pay -->
 
     <string name="lnurl_pay_domain">Served by</string>
     <string name="lnurl_pay_meta_description">Payment description</string>
@@ -635,7 +632,7 @@
     <string name="lnurl_pay_error_invalid_hash">The invoice returned by <b>%1$s</b> does not match the request details.</string>
     <string name="lnurl_pay_error_invalid_malformed">The invoice returned by <b>%1$s</b> is malformed.</string>
 
-    <!-- //////////////// display preferences //////////////// -->
+    <!-- settings: display preferences -->
 
     <string name="prefs_display_title">Display options</string>
     <string name="prefs_display_coin_label">Bitcoin unit</string>
@@ -655,7 +652,7 @@
     <string name="prefs_display_balance_display">Show balance in home</string>
     <string name="prefs_display_balance_display_desc">Hiding balance helps against prying eyes</string>
 
-    <!-- //////////////// electrum server //////////////// -->
+    <!-- settings: electrum server -->
 
     <string name="electrum_title">Electrum server</string>
     <string name="electrum_about">To secure your payment channels Phoenix monitors the Bitcoin blockchain through Electrum servers.\n\nBy default, random servers are used. You can also configure Phoenix to connect only to your own server.</string>
@@ -690,12 +687,7 @@
     <string name="electrum_dialog_cert_copy">Copy certificate</string>
     <string name="electrum_dialog_cert_accept">Trust certificate</string>
 
-    <!-- ////////////// virtual keyboard hints //////////////// -->
-
-    <string name="key_space_desc">Add whitespace</string>
-    <string name="key_delete_desc">Delete last character</string>
-
-    <!-- //////////////// Tor setting //////////////// -->
+    <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
     <string name="tor_settings_subtitle">Phoenix can use Tor to shield your IP from the other nodes in the Lightning Network and Electrum servers. This improves your privacy but makes the app slower.</string>
@@ -711,7 +703,7 @@
     <string name="tor_settings_state_started">Tor is online</string>
     <string name="tor_settings_state_about_perfs">Note that the Tor network is an open project running on donations. It can sometimes be very slow, which will affect the app\'s performances.</string>
 
-    <!-- ////////////// connection issues dialog //////////////// -->
+    <!-- home: connectivity dialog -->
 
     <string name="conndialog_title">Connections status</string>
     <string name="conndialog_summary_not_ok">The app will not function correctly until all connections are established.</string>
@@ -726,7 +718,7 @@
     <string name="conndialog_closed">Disconnected</string>
     <string name="conndialog_closed_bad_cert">Bad certificate</string>
 
-    <!-- //////////////// about screen //////////////// -->
+    <!-- settings: about -->
 
     <string name="about_title">About Phoenix</string>
     <string name="about_general_title">About</string>
@@ -741,7 +733,7 @@
     <string name="about_privacy_link">Privacy</string>
     <string name="about_terms_link">Terms</string>
 
-    <!-- //////////////// settings: options for payments //////////////// -->
+    <!-- settings: options for payments -->
 
     <string name="paymentsettings_title">Options &amp; fees</string>
 
@@ -782,18 +774,18 @@
 
     <string name="paymentsettings_lnurlauth_scheme_title">LNURL authentication scheme</string>
 
-    <!-- ////////////// migration result dialog //////////////// -->
+    <!-- home: migration result dialog -->
 
     <string name="migration_dialog_title">Congratulations!</string>
     <string name="migration_dialog_message">You are now using the new Phoenix version. Your channels are being migrated and will be ready soon.</string>
 
-    <!-- ////////////// currencies ////////////// -->
+    <!-- settings: currencies -->
 
     <string name="currency_ars_bm">Argentine Peso (blue market)</string>
     <string name="currency_cup_fm">Cuban Peso (free market)</string>
     <string name="currency_lbp_bm">Lebanese Pound (black market)</string>
 
-    <!-- ////////////// payments history ////////////// -->
+    <!-- payments history -->
 
     <string name="payments_history_title">Local payments (%1$d)</string>
     <string name="payments_history_export_button">Export</string>
@@ -814,7 +806,7 @@
     <string name="payments_export_error">Export has failed.</string>
     <string name="payments_export_no_data">No payments found.</string>
 
-    <!-- ////////////// currencies ////////////// -->
+    <!-- introduction screens -->
 
     <string name="intro_welcome_title">Welcome!</string>
     <string name="intro_welcome_sub1">With Phoenix, sending and receiving bitcoins is easy and safe.</string>
@@ -830,10 +822,12 @@
     <string name="intro_selfcustody_next_button">Get started</string>
 
     <!-- components -->
+
     <string name="component_calendar_inclusive">(inclusive)</string>
     <string name="component_error_message_details">Cause: %1$s</string>
 
     <!-- settings: wallet info -->
+
     <string name="walletinfo_title">Wallet info</string>
     <string name="walletinfo_import_instruction">You can import this xpub in any on-chain Bitcoin wallet, like Electrum.</string>
     <string name="walletinfo_xpub">Master public key</string>
@@ -860,6 +854,7 @@
     <string name="walletinfo_onchain_final_insight_balance">This wallet is the default closing address for your Lightning channels. If you force-close channels, funds will end up here.</string>
 
     <!-- settings: liquidity policy for channels creation -->
+
     <string name="liquiditypolicy_title">Incoming fee policy</string>
     <string name="liquiditypolicy_instructions">Incoming payments sometimes requires on-chain transactions. This does not always happen, only when needed.</string>
     <string name="liquiditypolicy_fees_estimation">The miner fee is currently estimated to be around <b>%1$s</b> (≈%2$s).</string>
@@ -880,6 +875,7 @@
     <string name="liquiditypolicy_loading">Retrieving policy…</string>
 
     <!-- CPFP splices -->
+
     <string name="cpfp_instructions">You can make all your unconfirmed transactions use a higher effective feerate to encourage miners to favour your payments.</string>
     <string name="cpfp_feerate_label">Feerate</string>
     <string name="cpfp_feerate_value">%1$s sat/vbyte</string>
@@ -894,6 +890,7 @@
     <string name="cpfp_error_title">Cannot proceed</string>
 
     <!-- mempool -->
+
     <string name="mempool_unknown_feerate_title">Unknown mempool state</string>
     <string name="mempool_unknown_feerate_details">Phoenix was unable to retrieve the current state of the mempool and cannot estimate the speed of your transactions.\n\nCheck the mempool manually on an explorer, and use a adequate value!</string>
     <string name="mempool_fastest">≈ Next block</string>
@@ -903,6 +900,7 @@
     <string name="mempool_slow">No priority</string>
 
     <!-- splice errors -->
+
     <string name="splice_error_actual_below_user">This feerate is below what your transactions are already using. It should be higher to have any effects.</string>
     <string name="splice_error_nochannels">You don\'t have any channels</string>
     <string name="splice_error_aborted_by_peer">Aborted by peer [%1$s]</string>
