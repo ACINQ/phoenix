@@ -5,6 +5,7 @@ import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.UpgradeRequired
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
@@ -57,6 +58,10 @@ class PeerManager(
     /** Feerate used by the peer. Data fed by Electrum under the hood. */
     private val _electrumFeerate = MutableStateFlow<ElectrumFeerate?>(null)
     val electrumFeerate: StateFlow<ElectrumFeerate?> = _electrumFeerate
+
+    /** Forward compatibility check. [UpgradeRequired] is sent by the peer when an old version of Phoenix restores a wallet that has been used with new channel types. */
+    private val _upgradeRequired = MutableStateFlow(false)
+    val upgradeRequired = _upgradeRequired.asStateFlow()
 
     init {
         launch {
@@ -161,6 +166,9 @@ class PeerManager(
             when (event) {
                 is LiquidityEvents.Rejected -> {
                     notificationsManager.saveLiquidityEventNotification(event)
+                }
+                is UpgradeRequired -> {
+                    _upgradeRequired.value = true
                 }
                 else -> {}
             }

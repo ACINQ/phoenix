@@ -20,12 +20,15 @@ import android.Manifest
 import android.net.*
 import android.text.format.DateUtils
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
@@ -34,6 +37,9 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.home.*
 import fr.acinq.phoenix.android.init.*
 import fr.acinq.phoenix.android.intro.IntroView
@@ -333,12 +339,16 @@ fun AppView(
     }
 
     val lastCompletedPayment = business.paymentsManager.lastCompletedPayment.collectAsState().value
-
     if (lastCompletedPayment != null) {
         log.debug { "completed payment=${lastCompletedPayment}" }
         LaunchedEffect(key1 = lastCompletedPayment.walletPaymentId()) {
             navigateToPaymentDetails(navController, id = lastCompletedPayment.walletPaymentId(), isFromEvent = true)
         }
+    }
+
+    val isUpgradeRequired by business.peerManager.upgradeRequired.collectAsState(false)
+    if (isUpgradeRequired) {
+        UpgradeRequiredBlockingDialog()
     }
 }
 
@@ -414,4 +424,33 @@ sealed class LockState {
     }
 
     object Unlocked : LockState()
+}
+
+@Composable
+private fun UpgradeRequiredBlockingDialog() {
+    val context = LocalContext.current
+    Dialog(
+        onDismiss = {},
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false, usePlatformDefaultWidth = false),
+        title = stringResource(id = R.string.upgraderequired_title),
+        buttons = null
+    ) {
+        Text(
+            text = stringResource(id = R.string.upgraderequired_message, BuildConfig.VERSION_NAME),
+            modifier = Modifier.padding(horizontal = 24.dp),
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(
+            text = stringResource(id = R.string.upgraderequired_button),
+            icon = R.drawable.ic_external_link,
+            space = 8.dp,
+            shape = RoundedCornerShape(12.dp),
+            onClick = { openLink(context = context, link = "https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet") },
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .fillMaxWidth(),
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+    }
 }

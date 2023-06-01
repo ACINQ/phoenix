@@ -65,15 +65,16 @@
     <string name="restore_in_progress">Restoring your wallet…</string>
     <string name="restore_import_button">Import</string>
 
-    <!-- //////////////// Auth prompt (v2) //////////////////// -->
+    <!-- upgrade required dialog -->
+
+    <string name="upgraderequired_title">Update required</string>
+    <string name="upgraderequired_message">This version of Phoenix (v%1$s) is not compatible with your wallet. Please update, or use a compatible version.</string>
+    <string name="upgraderequired_button">Update on Google Play</string>
+
+    <!-- Auth prompt (v2) -->
 
     <string name="authprompt_title">Unlock to continue</string>
     <string name="authprompt_error_unsecure">Device is not secure (code: %1$d)</string>
-
-    <!-- //////////////// Biometric dialog //////////////////// -->
-
-    <string name="biometricprompt_title">Wallet is locked</string>
-    <string name="biometricprompt_negative">Unlock with PIN</string>
 
     <!-- //////////////// placeholders ////////////////-->
 
