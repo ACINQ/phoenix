@@ -50,8 +50,7 @@ fun FeedbackMessage(
             iconSize = 20.dp,
             iconTint = iconColor,
             space = 8.dp,
-            maxLines = 1,
-            textOverflow = TextOverflow.Ellipsis
+            modifier = if (alignment == Alignment.CenterHorizontally) Modifier.widthIn(max = 250.dp) else Modifier,
         )
         if (details != null) {
             Spacer(modifier = Modifier.height(2.dp))

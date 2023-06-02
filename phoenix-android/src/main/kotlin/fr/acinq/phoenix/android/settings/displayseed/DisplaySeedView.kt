@@ -61,16 +61,6 @@ fun DisplaySeedView() {
 
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.displayseed_title))
-        if (showBackupNotice) {
-            WarningMessage(
-                header = stringResource(id = R.string.displayseed_backup_notice_header),
-                details = stringResource(id = R.string.displayseed_backup_notice_details),
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .widthIn(max = 400.dp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
         Card(internalPadding = PaddingValues(16.dp)) {
             Text(text = annotatedStringResource(id = R.string.displayseed_instructions))
         }
@@ -103,7 +93,21 @@ fun DisplaySeedView() {
             }
         }
 
-        CardHeader(text = "Backup confirmation")
+        if (showBackupNotice) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 8.dp),
+            ) {
+                WarningMessage(
+                    header = stringResource(id = R.string.displayseed_backup_notice_header),
+                    details = stringResource(id = R.string.displayseed_backup_notice_details),
+                    alignment = Alignment.CenterHorizontally
+                )
+            }
+        }
+
+        CardHeader(text = stringResource(id = R.string.displayseed_backup_title))
         Card {
             safeLet(isBackupDone, isDisclaimerRead) { backupChecked, disclaimerChecked ->
                 Checkbox(

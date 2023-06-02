@@ -381,8 +381,6 @@
     <!-- settings: display seed -->
 
     <string name="displayseed_title">Recovery phrase</string>
-    <string name="displayseed_backup_notice_header">You have not backed up your recovery phrase!</string>
-    <string name="displayseed_backup_notice_details">If you do not back it up and you lose access to Phoenix, you will lose your funds!</string>
     <string name="displayseed_instructions">The recovery phrase (sometimes called a seed), is a list of 12 English words. It allows you to recover full access to your funds if needed.\n\n<b>Only you alone possess this seed. Keep it private.</b>\n\n<b>Do not share this seed with anyone</b>.\nBeware of phishing. The developers of Phoenix will never ask for your seed.\n\n<b>Do not lose this seed</b>.\nSave it somewhere safe (not on this phone). If you lose your seed and your phone, you\'ve lost your funds.</string>
 
     <string name="displayseed_authenticate_button">Display seed</string>
@@ -393,6 +391,9 @@
     <string name="displayseed_dialog_header">KEEP THIS SEED SAFE.\nDO NOT SHARE.</string>
     <string name="displayseed_loading_prefs">Loading preferences…</string>
 
+    <string name="displayseed_backup_notice_header">You have not backed up your recovery phrase!</string>
+    <string name="displayseed_backup_notice_details">If you do not back it up and you lose access to Phoenix, you will lose your funds!</string>
+    <string name="displayseed_backup_title">Backup confirmation</string>
     <string name="displayseed_backup_checkbox">I have saved my recovery phrase somewhere safe.</string>
     <string name="displayseed_loss_disclaimer_checkbox">I understand that if I lose my phone and my recovery phrase, then I will lose the funds in my wallet.</string>
 

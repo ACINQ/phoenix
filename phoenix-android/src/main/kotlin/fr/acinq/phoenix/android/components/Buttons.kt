@@ -192,15 +192,16 @@ fun TextWithIcon(
     iconSize: Dp = ButtonDefaults.IconSize,
     padding: PaddingValues = PaddingValues(0.dp),
     space: Dp = 6.dp,
+    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
 ) {
     Row(
         modifier = modifier.padding(padding),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = verticalAlignment
     ) {
         Image(
             painter = painterResource(id = icon),
             contentDescription = "icon for $text",
-            modifier = Modifier.size(iconSize),
+            modifier = Modifier.size(iconSize).then(if (verticalAlignment == Alignment.Top) Modifier.offset(y = 2.dp) else Modifier),
             colorFilter = iconTint?.let { ColorFilter.tint(it) }
         )
         Spacer(Modifier.width(space))
