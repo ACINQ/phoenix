@@ -35,6 +35,7 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.ErrorMessage
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
@@ -112,9 +113,11 @@ fun PaymentDetailsView(
             )
         }
         is PaymentDetailsState.Failure -> CenterContentView(onBackClick) {
-            Text(
-                text = stringResource(id = R.string.paymentdetails_error, state.error.message ?: stringResource(id = R.string.utils_unknown)),
+            ErrorMessage(
+                header = stringResource(id = R.string.paymentdetails_error),
+                details = state.error.message ?: stringResource(id = R.string.utils_unknown),
                 modifier = Modifier.padding(16.dp),
+                alignment = Alignment.CenterHorizontally,
             )
         }
         is PaymentDetailsState.Success.Splash -> DefaultScreenLayout(isScrollable = false) {

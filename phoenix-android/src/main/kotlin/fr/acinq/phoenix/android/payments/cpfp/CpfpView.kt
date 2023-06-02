@@ -109,8 +109,8 @@ fun CpfpView(
             }
             is CpfpState.Complete.Failed -> {
                 ErrorMessage(
-                    errorHeader = stringResource(id = R.string.cpfp_failure_title),
-                    errorDetails = when (state.failure) {
+                    header = stringResource(id = R.string.cpfp_failure_title),
+                    details = when (state.failure) {
                         is ChannelCommand.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, state.failure.reason)
                         is ChannelCommand.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
                         is ChannelCommand.Splice.Response.Failure.ChannelNotIdle -> stringResource(id = R.string.splice_error_channel_not_idle)
@@ -128,24 +128,24 @@ fun CpfpView(
             }
             is CpfpState.Error.NoChannels -> {
                 ErrorMessage(
-                    errorHeader = stringResource(id = R.string.cpfp_error_title),
-                    errorDetails = stringResource(id = R.string.splice_error_nochannels),
+                    header = stringResource(id = R.string.cpfp_error_title),
+                    details = stringResource(id = R.string.splice_error_nochannels),
                     alignment = Alignment.CenterHorizontally,
                     padding = PaddingValues(0.dp)
                 )
             }
             is CpfpState.Error.Thrown -> {
                 ErrorMessage(
-                    errorHeader = stringResource(id = R.string.cpfp_error_title),
-                    errorDetails = state.e.localizedMessage,
+                    header = stringResource(id = R.string.cpfp_error_title),
+                    details = state.e.localizedMessage,
                     alignment = Alignment.CenterHorizontally,
                     padding = PaddingValues(0.dp)
                 )
             }
             is CpfpState.Error.FeerateTooLow -> {
                 ErrorMessage(
-                    errorHeader = stringResource(id = R.string.cpfp_error_title),
-                    errorDetails = stringResource(id = R.string.splice_error_actual_below_user),
+                    header = stringResource(id = R.string.cpfp_error_title),
+                    details = stringResource(id = R.string.splice_error_actual_below_user),
                     alignment = Alignment.CenterHorizontally,
                     padding = PaddingValues(0.dp)
                 )

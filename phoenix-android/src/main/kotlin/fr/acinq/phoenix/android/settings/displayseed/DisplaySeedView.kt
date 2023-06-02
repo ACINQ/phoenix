@@ -95,8 +95,8 @@ fun DisplaySeedView() {
                 }
                 is DisplaySeedViewModel.ReadingSeedState.Error -> {
                     ErrorMessage(
-                        errorHeader = stringResource(id = R.string.displayseed_error_details),
-                        errorDetails = state.message,
+                        header = stringResource(id = R.string.displayseed_error_details),
+                        details = state.message,
                         alignment = Alignment.CenterHorizontally,
                     )
                 }

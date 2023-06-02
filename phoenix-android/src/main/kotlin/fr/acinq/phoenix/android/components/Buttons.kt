@@ -78,7 +78,7 @@ fun BorderButton(
         onClick = onClick,
         shape = CircleShape,
         backgroundColor = backgroundColor,
-        border = BorderStroke(ButtonDefaults.OutlinedBorderSize, borderColor),
+        border = BorderStroke(ButtonDefaults.OutlinedBorderSize, if (enabled) borderColor else borderColor.copy(alpha = 0.4f)),
         textStyle = textStyle,
         padding = padding,
         interactionSource = interactionSource,

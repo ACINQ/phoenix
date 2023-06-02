@@ -33,6 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.Lightning
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.ErrorMessage
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.security.KeyState
@@ -76,7 +77,11 @@ fun CreateWalletView(
                         is Initialization.Model.GeneratedWallet -> {
                             val writingState = vm.writingState
                             if (writingState is WritingSeedState.Error) {
-                                Text(stringResource(id = R.string.autocreate_error, writingState.e.localizedMessage ?: writingState.e::class.java.simpleName))
+                                ErrorMessage(
+                                    header = stringResource(id = R.string.autocreate_error),
+                                    details = writingState.e.localizedMessage ?: writingState.e::class.java.simpleName,
+                                    alignment = Alignment.CenterHorizontally,
+                                )
                             }
                             LaunchedEffect(true) {
                                 vm.writeSeed(context, model.mnemonics, true, onSeedWritten)

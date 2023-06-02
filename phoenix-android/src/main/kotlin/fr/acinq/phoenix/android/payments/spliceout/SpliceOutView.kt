@@ -125,9 +125,17 @@ fun SendSpliceOutView(
             is SpliceOutState.Init, is SpliceOutState.Error -> {
                 Spacer(modifier = Modifier.height(32.dp))
                 if (state is SpliceOutState.Error.Thrown) {
-                    ErrorMessage(errorHeader = stringResource(id = R.string.send_spliceout_error_failure), errorDetails = state.e.localizedMessage, alignment = Alignment.CenterHorizontally)
+                    ErrorMessage(
+                        header = stringResource(id = R.string.send_spliceout_error_failure),
+                        details = state.e.localizedMessage,
+                        alignment = Alignment.CenterHorizontally,
+                    )
                 } else if (state is SpliceOutState.Error.NoChannels) {
-                    ErrorMessage(errorHeader = stringResource(id = R.string.send_spliceout_error_failure), errorDetails = stringResource(id = R.string.splice_error_nochannels), alignment = Alignment.CenterHorizontally)
+                    ErrorMessage(
+                        header = stringResource(id = R.string.send_spliceout_error_failure),
+                        details = stringResource(id = R.string.splice_error_nochannels),
+                        alignment = Alignment.CenterHorizontally,
+                    )
                 }
                 BorderButton(
                     text = stringResource(id = R.string.send_spliceout_prepare_button),
@@ -163,7 +171,10 @@ fun SendSpliceOutView(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 if (balance != null && total.toMilliSatoshi() > balance) {
-                    ErrorMessage(errorHeader = stringResource(R.string.send_spliceout_error_cannot_afford_fees), alignment = Alignment.CenterHorizontally)
+                    ErrorMessage(
+                        header = stringResource(R.string.send_spliceout_error_cannot_afford_fees),
+                        alignment = Alignment.CenterHorizontally,
+                    )
                 } else {
                     FilledButton(
                         text = stringResource(id = R.string.send_pay_button),
@@ -184,8 +195,8 @@ fun SendSpliceOutView(
             is SpliceOutState.Complete.Failure -> {
                 Spacer(modifier = Modifier.height(24.dp))
                 ErrorMessage(
-                    errorHeader = stringResource(id = R.string.send_spliceout_error_failure),
-                    errorDetails = when (state.result) {
+                    header = stringResource(id = R.string.send_spliceout_error_failure),
+                    details = when (state.result) {
                         is ChannelCommand.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, state.result.reason)
                         is ChannelCommand.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
                         is ChannelCommand.Splice.Response.Failure.ChannelNotIdle -> stringResource(id = R.string.splice_error_channel_not_idle)

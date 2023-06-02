@@ -112,8 +112,8 @@ fun LnurlPayView(
                 val error = model.error
                 if (error != null) {
                     ErrorMessage(
-                        errorHeader = stringResource(id = R.string.lnurl_pay_error_header),
-                        annotatedDetails = when (error) {
+                        header = stringResource(id = R.string.lnurl_pay_error_header),
+                        details = when (error) {
                             is Scan.LnurlPayError.AlreadyPaidInvoice -> annotatedStringResource(R.string.lnurl_pay_error_already_paid, model.paymentIntent.callback.host)
                             is Scan.LnurlPayError.ChainMismatch -> annotatedStringResource(R.string.lnurl_pay_error_invalid_chain, model.paymentIntent.callback.host)
                             is Scan.LnurlPayError.BadResponseError -> when (val errorDetail = error.err) {

@@ -78,7 +78,7 @@ fun SatoshiSlider(
 
         errorMessage.takeUnless { it.isBlank() }?.let {
             Spacer(Modifier.height(4.dp))
-            ErrorMessage(errorHeader = it, padding = PaddingValues(0.dp))
+            ErrorMessage(header = it, padding = PaddingValues(0.dp))
         }
     }
 }
