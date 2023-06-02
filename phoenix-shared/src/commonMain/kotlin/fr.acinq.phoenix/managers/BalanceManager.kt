@@ -193,7 +193,7 @@ class BalanceManager(
             swapInWallet.copy(addresses = addressMinusReserved)
         }.collect { availableWallet ->
             _swapInWalletBalance.value = WalletBalance(
-                confirmed = availableWallet.confirmedBalance,
+                confirmed = availableWallet.weaklyConfirmedBalance + availableWallet.deeplyConfirmedBalance,
                 unconfirmed = availableWallet.unconfirmedBalance
             )
         }
