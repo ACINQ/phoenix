@@ -14,9 +14,11 @@ fileprivate var log = Logger(OSLog.disabled)
 struct PaymentNumbers {
 	let baseMsat: Int64
 	let tipMsat: Int64
+	let lightningFeeMsat: Int64
 	let minerFeeMsat: Int64
 	let totalMsat: Int64
 	let tipPercent: Double
+	let lightningFeePercent: Double
 	let minerFeePercent: Double
 }
 
@@ -48,6 +50,7 @@ struct ValidateView: View {
 	@State var postTipAmountMsat: Int64? = nil
 	@State var tipSliderSheetVisible: Bool = false
 	
+	@State var minerFeeSats: Int64? = nil
 	@State var satsPerByte: String = ""
 	@State var parsedSatsPerByte: Result<NSNumber, TextFieldNumberStylerError> = Result.failure(.emptyInput)
 	
@@ -425,15 +428,17 @@ struct ValidateView: View {
 	@ViewBuilder
 	func paymentButton() -> some View {
 		
+		let needsPrepare = (mvi.model is Scan.Model_OnChainFlow) && (minerFeeSats == nil)
+		
 		Button {
-			if mvi.model is Scan.Model_OnChainFlow {
-				prepareTransaction()
+			if needsPrepare {
+				showMinerFeeSheet()
 			} else {
 				sendPayment()
 			}
 		} label: {
 			HStack {
-				if mvi.model is Scan.Model_OnChainFlow {
+				if needsPrepare {
 					Image(systemName: "hammer")
 						.renderingMode(.template)
 					Text("Prepare Transaction")
@@ -500,7 +505,8 @@ struct ValidateView: View {
 		
 		PaymentSummaryView(
 			problem: $problem,
-			paymentNumbers: paymentNumbers()
+			paymentNumbers: paymentNumbers(),
+			showMinerFeeSheet: showMinerFeeSheet
 		)
 	}
 	
@@ -804,7 +810,7 @@ struct ValidateView: View {
 	
 	func paymentNumbers() -> PaymentNumbers? {
 		
-		guard let preMinerFeeMsat = parsedAmountMsat() else {
+		guard let recipientAmountMsat = parsedAmountMsat() else {
 			return nil
 		}
 		
@@ -814,28 +820,41 @@ struct ValidateView: View {
 		} else if let preTipAmountMsat = preTipAmountMsat {
 			preTipMsat = preTipAmountMsat
 		}
-		let baseMsat = preTipMsat ?? preMinerFeeMsat
+		let baseMsat = preTipMsat ?? recipientAmountMsat
+		let tipMsat = recipientAmountMsat - baseMsat
 		
-		let tipMsat = preMinerFeeMsat - baseMsat
-		let tipPercent = Double(tipMsat) / Double(baseMsat)
+		let lightningFeeMsat: Int64
+		if mvi.model is Scan.Model_OnChainFlow {
+			lightningFeeMsat = 0
+		} else {
+			lightningFeeMsat = 40_000 // Todo...
+		}
 		
-		// Todo...
-		let minerFeeMsat: Int64 = 0
+		let minerFeeMsat: Int64
+		if let minerFeeSats {
+			minerFeeMsat = Utils.toMsat(sat: minerFeeSats)
+		} else {
+			minerFeeMsat = 0
+		}
 		
-		if tipMsat <= 0 && minerFeeMsat <= 0 {
+		if tipMsat <= 0 && lightningFeeMsat <= 0 && minerFeeMsat <= 0 {
 			return nil
 		}
 		
-		let minerFeePercent = Double(minerFeeMsat) / Double(preMinerFeeMsat)
-		let totalMsat = preMinerFeeMsat + minerFeeMsat
+		let totalMsat = recipientAmountMsat + lightningFeeMsat + minerFeeMsat
+		let tipPercent = Double(tipMsat) / Double(baseMsat)
+		let lightningFeePercent = Double(lightningFeeMsat) / Double(recipientAmountMsat)
+		let minerFeePercent = Double(minerFeeMsat) / Double(recipientAmountMsat)
 		
 		return PaymentNumbers(
-			baseMsat        : baseMsat,
-			tipMsat         : tipMsat,
-			minerFeeMsat    : minerFeeMsat,
-			totalMsat       : totalMsat,
-			tipPercent      : tipPercent,
-			minerFeePercent : minerFeePercent
+			baseMsat            : baseMsat,
+			tipMsat             : tipMsat,
+			lightningFeeMsat    : lightningFeeMsat,
+			minerFeeMsat        : minerFeeMsat,
+			totalMsat           : totalMsat,
+			tipPercent          : tipPercent,
+			lightningFeePercent : lightningFeePercent,
+			minerFeePercent     : minerFeePercent
 		)
 	}
 	
@@ -1259,7 +1278,7 @@ struct ValidateView: View {
 	func tipButtonTapped() {
 		log.trace("tipButtonTapped()")
 		
-		guard var msat = preTipAmountMsat ?? parsedAmountMsat() else {
+		guard var currentMsat = parsedAmountMsat() else {
 			return
 		}
 		
@@ -1282,9 +1301,10 @@ struct ValidateView: View {
 			// Either way, the user is typing in an amount, and then tapping the "tip" button.
 			// So the base amount is what they typed in, and they are using the tip screen to do the math.
 			
-			minMsat = msat
-			maxMsat = msat * 2
-			preTipAmountMsat = msat
+			let baseMsat = preTipAmountMsat ?? currentMsat
+			minMsat = baseMsat
+			maxMsat = baseMsat * 2
+			preTipAmountMsat = baseMsat
 			
 			// There are edge-cases with lnurl-pay here:
 			// - user may have typed in an amount that's out-of-bounds of the accepted range
@@ -1299,10 +1319,10 @@ struct ValidateView: View {
 		
 		let range = MsatRange(min: minMsat, max: maxMsat)
 		
-		if msat < minMsat {
-			msat = minMsat
-		} else if msat > maxMsat {
-			msat = maxMsat
+		if currentMsat < minMsat {
+			currentMsat = minMsat
+		} else if currentMsat > maxMsat {
+			currentMsat = maxMsat
 		}
 		
 		tipSliderSheetVisible = true
@@ -1311,7 +1331,7 @@ struct ValidateView: View {
 			
 			TipSliderSheet(
 				range: range,
-				msat: msat,
+				msat: currentMsat,
 				valueChanged: amountChanged_priceSliderSheet
 			)
 			
@@ -1330,12 +1350,6 @@ struct ValidateView: View {
 	func amountChanged_priceSliderSheet(_ msat: Int64) {
 		log.trace("amountChanged_priceSliderSheet()")
 		amountChangedExternally(msat)
-	}
-	
-	func amountChanged_minerFeeSheet(_ fee: Double) {
-		log.trace("amountChanged_minerFeeSheet()")
-		
-		// Todo...
 	}
 	
 	func amountChangedExternally(_ msat: Int64) {
@@ -1392,25 +1406,29 @@ struct ValidateView: View {
 		}
 	}
 	
-	func prepareTransaction() {
-		log.trace("prepareTransaction()")
+	func showMinerFeeSheet() {
+		log.trace("showMinerFeeSheet()")
 		
-		guard let _ = parsedAmountMsat() else {
+		guard
+			let msat = parsedAmountMsat(),
+			let model = mvi.model as? Scan.Model_OnChainFlow
+		else {
 			return
 		}
 		
-	//	minerFeeSheetVisible = true
+		let sat = Utils.truncateToSat(msat: msat)
+		
 		dismissKeyboardIfVisible()
 		smartModalState.display(dismissable: true) {
 			
 			MinerFeeSheet(
+				amount: Bitcoin_kmpSatoshi(sat: sat),
+				btcAddress: model.uri.address,
+				minerFeeSats: $minerFeeSats,
 				satsPerByte: $satsPerByte,
 				parsedSatsPerByte: $parsedSatsPerByte,
 				mempoolRecommendedResponse: $mempoolRecommendedResponse
 			)
-			
-		} onWillDisappear: {
-	//		minerFeeSheetVisible = false
 		}
 	}
 	

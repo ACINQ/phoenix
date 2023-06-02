@@ -140,11 +140,10 @@ extension Utils {
 	
 	static func hiddenBitcoinAmount(_ currencyPrefs: CurrencyPrefs) -> FormattedAmount {
 		
-		let formatter = NumberFormatter()
-		formatter.numberStyle = .decimal
-		
-		let decimalSeparator: String = formatter.currencyDecimalSeparator ?? formatter.decimalSeparator ?? "."
 		let digits = "\(hiddenCharacter)\(hiddenCharacter)\(hiddenCharacter)"
+		
+		let formatter = bitcoinFormatter(bitcoinUnit: currencyPrefs.bitcoinUnit)
+		let decimalSeparator: String = formatter.currencyDecimalSeparator ?? formatter.decimalSeparator ?? "."
 		
 		return FormattedAmount(
 			amount: 0.0,
@@ -156,11 +155,10 @@ extension Utils {
 	
 	static func hiddenFiatAmount(_ currencyPrefs: CurrencyPrefs) -> FormattedAmount {
 		
-		let formatter = NumberFormatter()
-		formatter.numberStyle = .currency
-		
-		let decimalSeparator: String = formatter.currencyDecimalSeparator ?? formatter.decimalSeparator ?? "."
 		let digits = "\(hiddenCharacter)\(hiddenCharacter)\(hiddenCharacter)"
+		
+		let formatter = fiatFormatter(fiatCurrency: currencyPrefs.fiatCurrency)
+		let decimalSeparator: String = formatter.currencyDecimalSeparator ?? formatter.decimalSeparator ?? "."
 		
 		return FormattedAmount(
 			amount: 0.0,

@@ -15,6 +15,10 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct MinerFeeSheet: View {
 	
+	let amount: Bitcoin_kmpSatoshi
+	let btcAddress: String
+	
+	@Binding var minerFeeSats: Int64?
 	@Binding var satsPerByte: String
 	@Binding var parsedSatsPerByte: Result<NSNumber, TextFieldNumberStylerError>
 	@Binding var mempoolRecommendedResponse: MempoolRecommendedResponse?
@@ -52,6 +56,10 @@ struct MinerFeeSheet: View {
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			header()
 			content()
+			footer()
+		}
+		.onChange(of: satsPerByte) { _ in
+			satsPerByteChanged()
 		}
 	}
 	
@@ -155,7 +163,12 @@ struct MinerFeeSheet: View {
 	func priorityBox_economy() -> some View {
 		
 		GroupBox {
-			Text("≈ 1+ days")
+			VStack(alignment: HorizontalAlignment.center, spacing: 4) {
+				Text("\(satsPerByteString(.none)) sats/vByte")
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+				Text("≈ 1+ days")
+			}
 		} label: {
 			Text("No Priority")
 		}
@@ -172,7 +185,12 @@ struct MinerFeeSheet: View {
 	func priorityBox_low() -> some View {
 		
 		GroupBox {
-			Text("≈ 1 hour")
+			VStack(alignment: HorizontalAlignment.center, spacing: 4) {
+				Text("\(satsPerByteString(.low)) sats/vByte")
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+				Text("≈ 1 hour")
+			}
 		} label: {
 			Text("Low Priority")
 		}
@@ -189,7 +207,12 @@ struct MinerFeeSheet: View {
 	func priorityBox_medium() -> some View {
 		
 		GroupBox {
-			Text("≈ 30 minutes")
+			VStack(alignment: HorizontalAlignment.center, spacing: 4) {
+				Text("\(satsPerByteString(.medium)) sats/vByte")
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+				Text("≈ 30 minutes")
+			}
 		} label: {
 			Text("Medium Priority")
 		}
@@ -206,7 +229,12 @@ struct MinerFeeSheet: View {
 	func priorityBox_high() -> some View {
 		
 		GroupBox {
-			Text("≈ 10 minutes")
+			VStack(alignment: HorizontalAlignment.center, spacing: 4) {
+				Text("\(satsPerByteString(.high)) sats/vByte")
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+				Text("≈ 10 minutes")
+			}
 		} label: {
 			Text("High Priority")
 		}
@@ -222,7 +250,7 @@ struct MinerFeeSheet: View {
 	@ViewBuilder
 	func minerFeeFormula() -> some View {
 		
-		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 8) {
+		HStack(alignment: VerticalAlignment.center, spacing: 12) {
 			satsPerByteTextField()
 			minerFeeAmounts()
 		}
@@ -238,7 +266,7 @@ struct MinerFeeSheet: View {
 				TextField("", text: satsPerByteStyler().amountProxy)
 					.keyboardType(.numberPad)
 					.focused($focusedField, equals: .satsPerByteTextField)
-					.frame(maxWidth: 60)
+					.frame(maxWidth: 40)
 			}
 			.padding(.vertical, 8)
 			.padding(.horizontal, 12)
@@ -258,10 +286,31 @@ struct MinerFeeSheet: View {
 	func minerFeeAmounts() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
-			Text("= 1,142 sat")
-			Text("≈ 1,200 COP")
+			
+			let (btc, fiat) = minerFeeStrings()
+			
+			Text(verbatim: "= \(btc.string)")
+			Text(verbatim: "≈ \(fiat.string)")
 		}
 		.font(.callout)
+	}
+	
+	@ViewBuilder
+	func footer() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			Spacer()
+			Button {
+				reviewTransactionButtonTapped()
+			} label: {
+				Text("Review Transaction")
+			}
+			.font(.title3)
+			.disabled(minerFeeSats == nil)
+			Spacer()
+		}
+		.padding()
+		.padding(.top)
 	}
 	
 	// --------------------------------------------------
@@ -281,20 +330,40 @@ struct MinerFeeSheet: View {
 		}
 	}
 	
-	func satsPerByteFormater() -> NumberFormatter {
-		
-		let nf = NumberFormatter()
-		nf.numberStyle = .decimal
-		
-		return nf
-	}
-	
 	func satsPerByteStyler() -> TextFieldNumberStyler {
+		
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .decimal
+		
 		return TextFieldNumberStyler(
-			formatter: satsPerByteFormater(),
+			formatter: formatter,
 			amount: $satsPerByte,
 			parsedAmount: $parsedSatsPerByte
 		)
+	}
+	
+	func satsPerByte(_ priority: MinerFeePriority) -> (Double, String)? {
+		
+		guard let mempoolRecommendedResponse else {
+			return nil
+		}
+		
+		let doubleValue = mempoolRecommendedResponse.feeForPriority(priority)
+			
+		let nf = NumberFormatter()
+		nf.numberStyle = .decimal
+		nf.minimumFractionDigits = 0
+		nf.maximumFractionDigits = 1
+		
+		let stringValue = nf.string(from: NSNumber(value: doubleValue)) ?? "?"
+		
+		return (doubleValue, stringValue)
+	}
+	
+	func satsPerByteString(_ priority: MinerFeePriority) -> String {
+		
+		let tuple = satsPerByte(priority)
+		return tuple?.1 ?? "?"
 	}
 	
 	func isPriorityDisabled() -> Bool {
@@ -304,8 +373,9 @@ struct MinerFeeSheet: View {
 	
 	func isPrioritySelected(_ priority: MinerFeePriority) -> Bool {
 		
-		if let mempoolRecommendedResponse {
 		
+		if let mempoolRecommendedResponse {
+			
 			switch parsedSatsPerByte {
 			case .success(let amount):
 				return amount.doubleValue == mempoolRecommendedResponse.feeForPriority(priority)
@@ -318,6 +388,19 @@ struct MinerFeeSheet: View {
 		}
 	}
 	
+	func minerFeeStrings() -> (FormattedAmount, FormattedAmount) {
+		
+		guard let minerFeeSats else {
+			let btc = Utils.unknownBitcoinAmount(bitcoinUnit: currencyPrefs.bitcoinUnit)
+			let fiat = Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+			return (btc, fiat)
+		}
+		
+		let btc = Utils.formatBitcoin(currencyPrefs, sat: minerFeeSats)
+		let fiat = Utils.formatFiat(currencyPrefs, sat: minerFeeSats)
+		return (btc, fiat)
+	}
+	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
@@ -325,19 +408,64 @@ struct MinerFeeSheet: View {
 	func priorityTapped(_ priority: MinerFeePriority) {
 		log.trace("priorityTapped()")
 		
-		guard let mempoolRecommendedResponse else {
+		guard let tuple = satsPerByte(priority) else {
 			return
 		}
 		
-		let fee = mempoolRecommendedResponse.feeForPriority(priority)
+		parsedSatsPerByte = .success(NSNumber(value: tuple.0))
+		satsPerByte = tuple.1
+	}
+	
+	func satsPerByteChanged() {
+		log.trace("satsPerByteChanged(): \(satsPerByte)")
 		
-		parsedSatsPerByte = .success(NSNumber(value: fee))
-		satsPerByte = fee.description
+		guard
+			let satsPerByte_number = try? parsedSatsPerByte.get(),
+			let peer = Biz.business.getPeer(),
+			let scriptBytes = Parser.shared.addressToPublicKeyScript(chain: Biz.business.chain, address: btcAddress)
+		else {
+			minerFeeSats = nil
+			return
+		}
+		
+		let originalSatsPerByte = satsPerByte
+		let scriptVector = Bitcoin_kmpByteVector(bytes: scriptBytes)
+		
+		let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
+		let feePerKw = Lightning_kmpFeeratePerKw(feerate: satsPerByte_satoshi)
+		
+		minerFeeSats = nil
+		Task { @MainActor in
+			do {
+				let pair = try await peer.estimateFeeForSpliceOut(
+					amount: amount,
+					scriptPubKey: scriptVector,
+					targetFeerate: feePerKw
+				)
+				
+				let _: Lightning_kmpFeeratePerKw = pair!.first!
+				let fee: Bitcoin_kmpSatoshi = pair!.second!
+				
+				
+				if self.satsPerByte == originalSatsPerByte {
+					self.minerFeeSats = fee.sat
+				}
+				
+			} catch {
+				log.error("Error: \(error)")
+				self.minerFeeSats = nil
+			}
+			
+		} // </Task>
 	}
 	
 	func closeButtonTapped() {
 		log.trace("closeButtonTapped()")
-		
+		smartModalState.close()
+	}
+	
+	func reviewTransactionButtonTapped() {
+		log.trace("reviewTransactionButtonTapped()")
 		smartModalState.close()
 	}
 }

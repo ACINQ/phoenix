@@ -30,6 +30,21 @@ struct OnChainDetails: View {
 	func details_ios16() -> some View {
 		
 		Grid(horizontalSpacing: 8, verticalSpacing: 12) {
+			
+			let message = bitcoinUriMessage()
+			if message != nil {
+				GridRow(alignment: VerticalAlignment.firstTextBaseline) {
+					Text("Type")
+						.textCase(.uppercase)
+						.font(.subheadline)
+						.foregroundColor(.secondary)
+						.gridColumnAlignment(.trailing)
+					
+					Text("On-Chain Payment")
+						.font(.subheadline)
+						.gridColumnAlignment(.leading)
+				}
+			}
 			GridRow(alignment: VerticalAlignment.firstTextBaseline) {
 				Text("Desc")
 					.textCase(.uppercase)
@@ -37,9 +52,15 @@ struct OnChainDetails: View {
 					.foregroundColor(.secondary)
 					.gridColumnAlignment(.trailing)
 				
-				Text("On-Chain Payment")
-					.font(.subheadline)
-					.gridColumnAlignment(.leading)
+				if let message {
+					Text(message)
+						.font(.subheadline)
+						.gridColumnAlignment(.leading)
+				} else {
+					Text("On-Chain Payment")
+						.font(.subheadline)
+						.gridColumnAlignment(.leading)
+				}
 			}
 			GridRow(alignment: VerticalAlignment.firstTextBaseline) {
 				Text("Send To")
@@ -64,13 +85,24 @@ struct OnChainDetails: View {
 	@ViewBuilder
 	func details_ios15() -> some View {
 		
-		OnChainDetails_Grid(model: model)
+		OnChainDetails_Grid(model: model, bitcoinUriMessage: bitcoinUriMessage())
+	}
+	
+	func bitcoinUriMessage() -> String? {
+		
+		guard let message = model.uri.message else {
+			return nil
+		}
+		
+		let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
+		return trimmedMessage.isEmpty ? nil : trimmedMessage
 	}
 }
 
 fileprivate struct OnChainDetails_Grid: InfoGridView {
 	
 	let model: Scan.Model_OnChainFlow
+	let bitcoinUriMessage: String?
 	
 	// <InfoGridView Protocol>
 	let minKeyColumnWidth: CGFloat = 50
@@ -103,6 +135,9 @@ fileprivate struct OnChainDetails_Grid: InfoGridView {
 			alignment : HorizontalAlignment.leading,
 			spacing   : verticalSpacingBetweenRows
 		) {
+			if bitcoinUriMessage != nil {
+				type()
+			}
 			description()
 			sendTo()
 		}
@@ -115,6 +150,26 @@ fileprivate struct OnChainDetails_Grid: InfoGridView {
 			.textCase(.uppercase)
 			.font(.subheadline)
 			.foregroundColor(.secondary)
+	}
+	
+	@ViewBuilder
+	func type() -> some View {
+		let identifier: String = #function
+		
+		InfoGridRow(
+			identifier: identifier,
+			vAlignment: .firstTextBaseline,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier),
+			keyColumnAlignment: .trailing
+		) {
+			keyColumn("Type")
+		} valueColumn: {
+			
+			Text("On-Chain Payment")
+				.font(.subheadline)
+			
+		} // </InfoGridRow>
 	}
 	
 	@ViewBuilder
@@ -131,8 +186,13 @@ fileprivate struct OnChainDetails_Grid: InfoGridView {
 			keyColumn("Desc")
 		} valueColumn: {
 			
-			Text("On-Chain Payment")
-				.font(.subheadline)
+			if let message = bitcoinUriMessage {
+				Text(message)
+					.font(.subheadline)
+			} else {
+				Text("On-Chain Payment")
+					.font(.subheadline)
+			}
 			
 		} // </InfoGridRow>
 	}
