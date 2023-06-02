@@ -48,7 +48,7 @@ fun SwapInWalletInfo(
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.walletinfo_onchain_swapin))
-        ConfirmedBalanceView(balance = swapInWallet?.confirmedBalance?.toMilliSatoshi(), onViewChannelPolicyClick = onViewChannelPolicyClick)
+        ConfirmedBalanceView(balance = swapInWallet?.let { it.weaklyConfirmedBalance + it.deeplyConfirmedBalance }?.toMilliSatoshi(), onViewChannelPolicyClick = onViewChannelPolicyClick)
         UnconfirmedBalanceView(wallet = swapInWallet)
     }
 }

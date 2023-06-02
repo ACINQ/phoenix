@@ -44,7 +44,6 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.managers.finalOnChainWalletPath
-import fr.acinq.phoenix.managers.swapInOnChainWalletPath
 
 @Composable
 fun WalletInfoView(
@@ -92,11 +91,14 @@ private fun SwapInWalletView(onSwapInWalletClick: () -> Unit) {
         onClick = onSwapInWalletClick,
     ) {
         swapInWallet?.let { wallet ->
-            OnchainBalanceView(confirmed = wallet.confirmedBalance, unconfirmed = wallet.unconfirmedBalance)
+            OnchainBalanceView(confirmed = wallet.weaklyConfirmedBalance + wallet.deeplyConfirmedBalance, unconfirmed = wallet.unconfirmedBalance)
         } ?: ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
         keyManager?.let {
             HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
-            XpubView(xpub = it.swapInOnChainWallet.xpub, path = it.swapInOnChainWalletPath)
+            SettingWithCopy(
+                title = stringResource(id = R.string.walletinfo_descriptor),
+                value = stringResource(id = R.string.lipsum_short),
+            )
         }
     }
 }
@@ -115,11 +117,15 @@ private fun FinalWalletView(onFinalWalletClick: () -> Unit) {
         onClick = onFinalWalletClick,
     ) {
         finalWallet?.let { wallet ->
-            OnchainBalanceView(confirmed = wallet.confirmedBalance, unconfirmed = wallet.unconfirmedBalance)
+            OnchainBalanceView(confirmed = wallet.weaklyConfirmedBalance + wallet.deeplyConfirmedBalance, unconfirmed = wallet.unconfirmedBalance)
         } ?: ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
         keyManager?.let {
             HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
-            XpubView(xpub = it.finalOnChainWallet.xpub, path = it.finalOnChainWalletPath)
+            SettingWithCopy(
+                title = stringResource(id = R.string.walletinfo_xpub),
+                titleMuted = stringResource(id = R.string.walletinfo_path, it.finalOnChainWalletPath),
+                value = it.finalOnChainWallet.xpub,
+            )
         }
     }
 }
@@ -181,21 +187,12 @@ private fun OnchainBalanceView(
 }
 
 @Composable
-private fun XpubView(xpub: String, path: String) {
-    SettingWithCopy(
-        title = stringResource(id = R.string.walletinfo_xpub),
-        titleMuted = stringResource(id = R.string.walletinfo_path, path),
-        value = xpub,
-    )
-}
-
-@Composable
 fun UtxoRow(utxo: WalletState.Utxo, isConfirmed: Boolean) {
     val context = LocalContext.current
     val txUrl = txUrl(txId = utxo.outPoint.txid.toHex())
     Row(
         modifier = Modifier
-            .clickable(role = Role.Button, onClickLabel = "open link in explorer") {
+            .clickable(role = Role.Button, onClickLabel = "open transaction in an explorer") {
                 openLink(context, link = txUrl)
             }
             .padding(horizontal = 16.dp, vertical = 12.dp),

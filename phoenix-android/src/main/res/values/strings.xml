@@ -834,6 +834,7 @@
 
     <string name="walletinfo_title">Wallet info</string>
     <string name="walletinfo_import_instruction">You can import this xpub in any on-chain Bitcoin wallet, like Electrum.</string>
+    <string name="walletinfo_descriptor">Descriptor</string>
     <string name="walletinfo_xpub">Master public key</string>
     <string name="walletinfo_path">(Path: %1$s)</string>
     <string name="walletinfo_confirmed_title">Confirmed balance</string>

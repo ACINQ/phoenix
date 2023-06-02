@@ -43,7 +43,7 @@ fun FinalWalletInfo(
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.walletinfo_onchain_final))
-        ConfirmedBalanceView(balance = finalWallet?.confirmedBalance?.toMilliSatoshi())
+        ConfirmedBalanceView(balance = finalWallet?.let { it.weaklyConfirmedBalance + it.deeplyConfirmedBalance }?.toMilliSatoshi())
         if (finalWallet?.unconfirmedBalance?.takeIf { it > 0.sat } != null) {
             UnconfirmedWalletView(wallet = finalWallet)
         }
