@@ -120,14 +120,14 @@ class AppCloseChannelsConfigurationController(
                 isClosable(it.value)
             }
 
-            closingChannelIds = closingChannelIds?.let {
-                it.plus(filteredChannels.keys)
-            } ?: filteredChannels.keys
+            closingChannelIds = closingChannelIds?.plus(filteredChannels.keys) ?: filteredChannels.keys
 
             filteredChannels.keys.forEach { channelId ->
                 val command: ChannelCommand = if (scriptPubKey != null) {
+                    logger.info { "(mutual) closing channel=${channelId.toHex()}" }
                     ChannelCommand.Close.MutualClose(scriptPubKey = ByteVector(scriptPubKey), feerates = null)
                 } else {
+                    logger.info { "(force) closing channel=${channelId.toHex()}" }
                     ChannelCommand.Close.ForceClose
                 }
                 val peerEvent = WrappedChannelCommand(channelId, command)
