@@ -790,18 +790,31 @@ legacy_
 
   <!-- //////////////// Migration to KMP //////////////// -->
 
-  <string name="legacy_migration_title">Upgrading Phoenix</string>
-  <string name="legacy_migration_prepare_message">You can upgrade to the next version of Phoenix, with a modern Lightning engine and improved features.\n\nThe process will take some time during which your channels and balance are moved to this new version.\n\nThe downtime should not take more than 1 hour. There is no cost involved.</string>
+  <string name="legacy_migration_title">Phoenix upgrade</string>
+  <string name="legacy_migration_init_message">Checking your channels, please hold…</string>
+  <string name="legacy_migration_ready_message">You can upgrade to the next version of Phoenix, with a modern Lightning engine and improved features.\n\nThe process will take some time during which your channels and balance are moved to this new version.\n\nThe downtime should not take more than 1 hour. There is no cost involved.</string>
   <string name="legacy_migration_more_info_button">Learn more…</string>
   <string name="legacy_migration_prepare_button">Upgrade</string>
-  <string name="legacy_migration_dismiss_button">Skip for now</string>
-  <string name="legacy_migration_notifying_message">Initiating migration…</string>
-  <string name="legacy_migration_paused_swap_in">Upgrade is not available: an on-chain deposit to your wallet is pending.\n\nTry again later when this deposit has confirmed.</string>
-  <string name="legacy_migration_swapin">Getting new address…</string>
-  <string name="legacy_migration_closing_channels">Moving funds to new address…</string>
-  <string name="legacy_migration_failure_swapin_address_error">Upgrade has failed. Phoenix could not generate a valid deposit address for the migration.\n\nPlease try again.</string>
-  <string name="legacy_migration_failure_closing_error">Upgrade has failed. Some channels could not be migrated.\n\nPlease try again.</string>
+  <string name="legacy_migration_prepare_button_disconnected">Connecting…</string>
+  <string name="legacy_migration_dismiss_button">Not now</string>
 
-  <string name="legacy_finish_legacy_app">Switching to new app…</string>
+  <string name="legacy_migration_paused_swap_in">You cannot upgrade now: an on-chain deposit to your wallet is pending.\n\nTry again later when this deposit has confirmed.</string>
+  <string name="legacy_migration_paused_force_close">You cannot upgrade now: one of your channels is being force-closed.\n\nTry again later when this channel has been completely closed. Note that force-close can take several days to complete.</string>
+  <string name="legacy_migration_paused_disconnected">You cannot upgrade now because you are disconnecting from Lightning or Electrum.\n\nTry again later when connection has been established.</string>
+
+  <string name="legacy_migration_processing_title">Processing migration…</string>
+  <string name="legacy_migration_processing_disconnected">Connection lost.\nKeep the app in the foreground.</string>
+  <string name="legacy_migration_swap_address">Getting migration address</string>
+  <string name="legacy_migration_listing_channels">Reviewing channels</string>
+  <string name="legacy_migration_closing_channels">Closing channels (%1$d/%2$d)</string>
+  <string name="legacy_migration_monitoring_channels_publish">Publishing transactions (%1$s/%2$d)</string>
+
+  <string name="legacy_migration_complete_title">Migration complete</string>
+  <string name="legacy_migration_complete_details">Switching to the new app…</string>
+
+  <string name="legacy_migration_failure_title">Upgrade has failed</string>
+  <string name="legacy_migration_failure_generic">Some or all channels may not have been migrated.\n\nThe upgrade process must be started again.</string>
+  <string name="legacy_migration_failure_swapin_address_error">Phoenix could not generate a valid address for the migration.\n\nThe upgrade process must be started again.</string>
+  <string name="legacy_migration_failure_closing_error">Some channels could not be migrated.\n\nThe upgrade process must be started again to migrate the remaining channels.</string>
 
 </resources>

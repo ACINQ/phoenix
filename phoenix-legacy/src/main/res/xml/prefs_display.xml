@@ -19,49 +19,49 @@
 
   <ListPreference
     android:defaultValue="USD"
-    android:dialogTitle="@string/prefs_display_fiat_label"
+    android:dialogTitle="@string/legacy_prefs_display_fiat_label"
     android:entries="@array/fiat_labels"
     android:entryValues="@array/fiat_values"
     android:key="PREFS_FIAT_CURRENCY"
     android:summary="%s"
-    android:title="@string/prefs_display_fiat_label"
+    android:title="@string/legacy_prefs_display_fiat_label"
     app:iconSpaceReserved="false" />
 
   <ListPreference
     android:defaultValue="sat"
-    android:dialogTitle="@string/prefs_display_coin_label"
+    android:dialogTitle="@string/legacy_prefs_display_coin_label"
     android:entries="@array/btc_unit_labels"
     android:entryValues="@array/btc_unit_values"
     android:key="PREFS_COIN_UNIT"
     android:summary="%s"
-    android:title="@string/prefs_display_coin_label"
+    android:title="@string/legacy_prefs_display_coin_label"
     app:iconSpaceReserved="false" />
 
   <ListPreference
     android:defaultValue="default"
-    android:dialogTitle="@string/prefs_display_theme_label"
+    android:dialogTitle="@string/legacy_prefs_display_theme_label"
     android:entries="@array/theme_labels"
     android:entryValues="@array/theme_values"
     android:key="PREFS_THEME"
     android:summary="%s"
-    android:title="@string/prefs_display_theme_label"
+    android:title="@string/legacy_prefs_display_theme_label"
     app:iconSpaceReserved="false" />
 
   <ListPreference
     android:defaultValue="Mempool.space"
-    android:dialogTitle="@string/prefs_display_explorer_label"
+    android:dialogTitle="@string/legacy_prefs_display_explorer_label"
     android:entries="@array/explorer_labels"
     android:entryValues="@array/explorer_values"
     android:key="PREFS_EXPLORER"
     android:summary="%s"
-    android:title="@string/prefs_display_explorer_label"
+    android:title="@string/legacy_prefs_display_explorer_label"
     app:iconSpaceReserved="false" />
 
   <SwitchPreference
     android:defaultValue="true"
-    app:summary="@string/prefs_display_balance_display_desc"
+    app:summary="@string/legacy_prefs_display_balance_display_desc"
     android:key="PREFS_SHOW_BALANCE_HOME"
-    android:title="@string/prefs_display_balance_display"
+    android:title="@string/legacy_prefs_display_balance_display"
     app:iconSpaceReserved="false" />
 
 </PreferenceScreen>

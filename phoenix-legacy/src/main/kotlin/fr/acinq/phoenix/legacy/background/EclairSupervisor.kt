@@ -82,7 +82,7 @@ class EclairSupervisor(val applicationContext: Context) : UntypedActor() {
           val ourSpendingAddress = spendingTxs.map { JavaConverters.seqAsJavaListConverter(it.txOut()).asJava() }.flatten()
             .firstOrNull {
               log.debug("txout with amount=${it.amount()} to script=${it.publicKeyScript().toBase58()}, against balance=${balance}")
-              it.amount() == balance && Script.isPayToScript(it.publicKeyScript())
+              it.amount() == balance
             }?.let {
               val address = Base58Check.encode(Wallet.getScriptHashVersion(), Script.publicKeyHash(it.publicKeyScript()))
               log.info("found closing txOut sending to script=${it.publicKeyScript().toBase58()} address=$address")
