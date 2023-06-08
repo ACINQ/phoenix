@@ -96,7 +96,8 @@ object WalletContext {
                     feeBase = 1000.msat,
                     feeProportional = 100,
                     cltvExpiryDelta = CltvExpiryDelta(144)
-                )
+                ),
+                swapInConfirmations = 3,
             )
         }
 

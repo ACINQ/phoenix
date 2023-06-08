@@ -7,7 +7,9 @@ import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.UpgradeRequired
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.lightning.blockchain.electrum.ElectrumMiniWallet
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
+import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.states.Offline
@@ -63,6 +65,36 @@ class PeerManager(
     private val _upgradeRequired = MutableStateFlow(false)
     val upgradeRequired = _upgradeRequired.asStateFlow()
 
+    /** Flow of the peer's final wallet [WalletState.WalletWithConfirmations]. */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val finalWallet = peerState.filterNotNull().flatMapLatest { peer ->
+        combine(peer.currentTipFlow.filterNotNull(), peer.finalWallet.walletStateFlow) { (currentBlockHeight, _), wallet ->
+            wallet.withConfirmations(
+                currentBlockHeight = currentBlockHeight,
+                minConfirmations = 0 // the final wallet does not need to distinguish between weakly/deeply confirmed txs
+            )
+        }
+    }.stateIn(
+        scope = this,
+        started = SharingStarted.Lazily,
+        initialValue = null,
+    )
+
+    /** Flow of the peer's swap-in wallet [WalletState.WalletWithConfirmations]. */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val swapInWallet = peerState.filterNotNull().flatMapLatest { peer ->
+        combine(peer.currentTipFlow.filterNotNull(), peer.swapInWallet.walletStateFlow) { (currentBlockHeight, _), wallet ->
+            wallet.withConfirmations(
+                currentBlockHeight = currentBlockHeight,
+                minConfirmations = peer.walletParams.swapInConfirmations
+            )
+        }
+    }.stateIn(
+        scope = this,
+        started = SharingStarted.Lazily,
+        initialValue = null,
+    )
+
     init {
         launch {
             val nodeParams = nodeParamsManager.nodeParams.filterNotNull().first()
@@ -108,7 +140,7 @@ class PeerManager(
                     isBoot = false
                     bootChannels.entries.associate { it.key to LocalChannelInfo(it.key.toHex(), it.value, isBooting = true) }
                 } else {
-                    channels.entries.associate { it.key to LocalChannelInfo(it.key.toHex(),it.value, isBooting = false) }
+                    channels.entries.associate { it.key to LocalChannelInfo(it.key.toHex(), it.value, isBooting = false) }
                 }
             }.collect {
                 _channelsFlow.value = it
