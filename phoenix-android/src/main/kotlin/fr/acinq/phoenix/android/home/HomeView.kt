@@ -44,7 +44,6 @@ import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.findActivity
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.android.utils.orange
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.legacy.utils.MigrationResult
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
@@ -81,7 +80,7 @@ fun HomeView(
     val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
     val payments by paymentsViewModel.latestPaymentsFlow.collectAsState()
     val swapInBalance = business.balanceManager.swapInWalletBalance.collectAsState()
-    val unconfirmedChannelsBalance = business.balanceManager.unconfirmedChannelPayments.collectAsState()
+    val pendingChannelsBalance = business.balanceManager.pendingChannelsBalance.collectAsState()
 
     // controls for the migration dialog
     val migrationResult = PrefsDatastore.getMigrationResult(context).collectAsState(initial = null).value
@@ -205,7 +204,7 @@ fun HomeView(
                     balance = balance,
                     balanceDisplayMode = balanceDisplayMode,
                     swapInBalance = swapInBalance.value,
-                    unconfirmedChannelsBalance = unconfirmedChannelsBalance.value,
+                    unconfirmedChannelsBalance = pendingChannelsBalance.value,
                     onShowSwapInWallet = onShowSwapInWallet,
                     onShowChannels = onShowChannels,
                 )

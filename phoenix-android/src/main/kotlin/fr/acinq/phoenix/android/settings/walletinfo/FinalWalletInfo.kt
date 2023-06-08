@@ -34,19 +34,21 @@ import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.utils.extensions.totalConfirmedBalance
+import fr.acinq.phoenix.utils.extensions.unconfirmedBalance
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.mapLatest
 
 @Composable
 fun FinalWalletInfo(
     onBackClick: () -> Unit
 ) {
-    val finalWallet by business.balanceManager.finalWallet.collectAsState()
+    val finalWallet by business.peerManager.finalWallet.collectAsState()
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.walletinfo_onchain_final))
-        ConfirmedBalanceView(balance = finalWallet?.let { it.weaklyConfirmedBalance + it.deeplyConfirmedBalance }?.toMilliSatoshi())
-        if (finalWallet?.unconfirmedBalance?.takeIf { it > 0.sat } != null) {
-            UnconfirmedWalletView(wallet = finalWallet)
-        }
+        ConfirmedBalanceView(balance = finalWallet?.totalConfirmedBalance()?.toMilliSatoshi())
+        UnconfirmedWalletView(wallet = finalWallet)
     }
 }
 
@@ -65,14 +67,18 @@ private fun ConfirmedBalanceView(
 
 @Composable
 private fun UnconfirmedWalletView(
-    wallet: WalletState?
+    wallet: WalletState.WalletWithConfirmations?
 ) {
-    CardHeader(text = stringResource(id = R.string.walletinfo_unconfirmed_title))
-    Card {
-        BalanceWithContent(balance = wallet?.unconfirmedBalance?.toMilliSatoshi())
-        if (!wallet?.unconfirmedUtxos.isNullOrEmpty()) {
-            HSeparator()
-            wallet?.unconfirmedUtxos?.forEach { UtxoRow(it, false) }
+    if (wallet != null && wallet.unconfirmedBalance() > 0.sat) {
+        CardHeader(text = stringResource(id = R.string.walletinfo_unconfirmed_title))
+        Card {
+            BalanceWithContent(balance = wallet.unconfirmedBalance().toMilliSatoshi())
+            if (wallet.unconfirmed.isNotEmpty()) {
+                HSeparator()
+                wallet.unconfirmed.forEach {
+                    UtxoRow(it, null)
+                }
+            }
         }
     }
 }

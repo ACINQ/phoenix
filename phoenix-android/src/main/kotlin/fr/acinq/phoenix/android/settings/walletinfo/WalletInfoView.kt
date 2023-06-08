@@ -44,6 +44,10 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.managers.finalOnChainWalletPath
+import fr.acinq.phoenix.utils.extensions.deeplyConfirmedBalance
+import fr.acinq.phoenix.utils.extensions.totalConfirmedBalance
+import fr.acinq.phoenix.utils.extensions.unconfirmedBalance
+import fr.acinq.phoenix.utils.extensions.weaklyConfirmedBalance
 
 @Composable
 fun WalletInfoView(
@@ -79,7 +83,7 @@ private fun OffChainWalletView(onLightningWalletClick: () -> Unit) {
 
 @Composable
 private fun SwapInWalletView(onSwapInWalletClick: () -> Unit) {
-    val swapInWallet by business.balanceManager.swapInWallet.collectAsState()
+    val swapInWallet by business.peerManager.swapInWallet.collectAsState()
     val keyManager by business.walletManager.keyManager.collectAsState()
 
     CardHeaderWithHelp(
@@ -91,7 +95,7 @@ private fun SwapInWalletView(onSwapInWalletClick: () -> Unit) {
         onClick = onSwapInWalletClick,
     ) {
         swapInWallet?.let { wallet ->
-            OnchainBalanceView(confirmed = wallet.weaklyConfirmedBalance + wallet.deeplyConfirmedBalance, unconfirmed = wallet.unconfirmedBalance)
+            OnchainBalanceView(confirmed = wallet.deeplyConfirmedBalance(), unconfirmed = wallet.unconfirmedBalance() + wallet.weaklyConfirmedBalance())
         } ?: ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
         keyManager?.let {
             HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
@@ -105,7 +109,7 @@ private fun SwapInWalletView(onSwapInWalletClick: () -> Unit) {
 
 @Composable
 private fun FinalWalletView(onFinalWalletClick: () -> Unit) {
-    val finalWallet by business.balanceManager.finalWallet.collectAsState()
+    val finalWallet by business.peerManager.finalWallet.collectAsState()
     val keyManager by business.walletManager.keyManager.collectAsState()
 
     CardHeaderWithHelp(
@@ -117,7 +121,7 @@ private fun FinalWalletView(onFinalWalletClick: () -> Unit) {
         onClick = onFinalWalletClick,
     ) {
         finalWallet?.let { wallet ->
-            OnchainBalanceView(confirmed = wallet.weaklyConfirmedBalance + wallet.deeplyConfirmedBalance, unconfirmed = wallet.unconfirmedBalance)
+            OnchainBalanceView(confirmed = wallet.totalConfirmedBalance(), unconfirmed = wallet.unconfirmedBalance())
         } ?: ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
         keyManager?.let {
             HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
@@ -187,22 +191,28 @@ private fun OnchainBalanceView(
 }
 
 @Composable
-fun UtxoRow(utxo: WalletState.Utxo, isConfirmed: Boolean) {
+fun UtxoRow(utxo: WalletState.Utxo, confirmationNeeded: Int?) {
     val context = LocalContext.current
     val txUrl = txUrl(txId = utxo.outPoint.txid.toHex())
     Row(
         modifier = Modifier
-            .clickable(role = Role.Button, onClickLabel = "open transaction in an explorer") {
+            .clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.accessibility_explorer_link)) {
                 openLink(context, link = txUrl)
             }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        PhoenixIcon(
-            resourceId = if (isConfirmed) { R.drawable.ic_chain } else { R.drawable.ic_clock },
-            tint = MaterialTheme.colors.primary,
-        )
+        Box(modifier = Modifier.size(width = 36.dp, height = 24.dp), contentAlignment = Alignment.Center) {
+            if (confirmationNeeded != null) {
+                Text(text = "+$confirmationNeeded", fontSize = 14.sp, color = MaterialTheme.colors.primary)
+            } else {
+                PhoenixIcon(
+                    resourceId = R.drawable.ic_clock,
+                    tint = MaterialTheme.colors.primary,
+                )
+            }
+        }
         Text(
             text = utxo.outPoint.txid.toHex(),
             modifier = Modifier

@@ -24,9 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
@@ -89,7 +87,7 @@ fun HomeBalance(
 @Composable
 private fun IncomingBalance(
     swapInBalance: WalletBalance,
-    unconfirmedChannelsBalance: MilliSatoshi,
+    pendingChannelsBalance: MilliSatoshi,
     onShowSwapInWallet: () -> Unit,
     onShowChannels: () -> Unit,
     balanceDisplayMode: HomeAmountDisplayMode,
@@ -99,17 +97,17 @@ private fun IncomingBalance(
     if (showSwapInInfoDialog) {
         OnChainInfoDialog(
             swapInBalance = swapInBalance,
-            unconfirmedChannelsBalance = unconfirmedChannelsBalance,
+            pendingChannelsBalance = pendingChannelsBalance,
             onDismiss = { showSwapInInfoDialog = false },
             onShowSwapInWallet = onShowSwapInWallet,
             onShowChannels = onShowChannels,
         )
     }
 
-    val balance = swapInBalance.total.toMilliSatoshi() + unconfirmedChannelsBalance
+    val balance = swapInBalance.total.toMilliSatoshi() + pendingChannelsBalance
     if (balance > 0.msat) {
         FilledButton(
-            icon = if (swapInBalance.unconfirmed == 0.sat && unconfirmedChannelsBalance == 0.msat) R.drawable.ic_sleep else R.drawable.ic_clock,
+            icon = if (swapInBalance.unconfirmed + (swapInBalance.weaklyConfirmed?.second ?: 0.sat) == 0.sat && pendingChannelsBalance == 0.msat) R.drawable.ic_sleep else R.drawable.ic_clock,
             iconTint = MaterialTheme.typography.caption.color,
             text = if (balanceDisplayMode == HomeAmountDisplayMode.REDACTED) "****" else {
                 stringResource(id = R.string.home__onchain_incoming, balance.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true))
@@ -127,7 +125,7 @@ private fun IncomingBalance(
 private fun OnChainInfoDialog(
     onDismiss: () -> Unit,
     swapInBalance: WalletBalance,
-    unconfirmedChannelsBalance: MilliSatoshi,
+    pendingChannelsBalance: MilliSatoshi,
     onShowSwapInWallet: () -> Unit,
     onShowChannels: () -> Unit,
 ) {
@@ -152,11 +150,11 @@ private fun OnChainInfoDialog(
                         style = MaterialTheme.typography.caption.copy(fontSize = 14.sp)
                     )
                 }
-                if (unconfirmedChannelsBalance > 0.msat) {
+                if (pendingChannelsBalance > 0.msat) {
                     Spacer(modifier = Modifier.height(4.dp))
                 }
             }
-            if (unconfirmedChannelsBalance > 0.msat) {
+            if (pendingChannelsBalance > 0.msat) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     externalPadding = PaddingValues(0.dp),
@@ -164,7 +162,7 @@ private fun OnChainInfoDialog(
                     onClick = onShowChannels
                 ) {
                     Text(
-                        text = stringResource(id = R.string.home__onchain_dialog_channel_confirming, unconfirmedChannelsBalance.toPrettyString(btcUnit, withUnit = true)),
+                        text = stringResource(id = R.string.home__onchain_dialog_channel_confirming, pendingChannelsBalance.toPrettyString(btcUnit, withUnit = true)),
                         style = MaterialTheme.typography.h5
                     )
                     Text(

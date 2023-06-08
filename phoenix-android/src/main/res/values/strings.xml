@@ -221,6 +221,7 @@
     <string name="utils_copied">Copied to clipboard!</string>
 
     <string name="accessibility_link">Open link in a browser</string>
+    <string name="accessibility_explorer_link">Open transaction in an explorer</string>
     <string name="validation_empty">This field cannot be blank</string>
     <string name="validation_invalid_number">Please enter a valid number</string>
     <string name="validation_no_decimal">This field must be an integer</string>
@@ -837,6 +838,9 @@
     <string name="walletinfo_descriptor">Descriptor</string>
     <string name="walletinfo_xpub">Master public key</string>
     <string name="walletinfo_path">(Path: %1$s)</string>
+    <string name="walletinfo_swappable_title">Waiting for swap</string>
+    <string name="walletinfo_not_swappable_title">Waiting for confirmations</string>
+    <string name="walletinfo_not_swappable_details">The transactions below need <b>%1$s confirmations</b> before they can be considered for a swap.</string>
     <string name="walletinfo_confirmed_title">Confirmed balance</string>
     <string name="walletinfo_unconfirmed_title">Unconfirmed balance</string>
     <string name="walletinfo_loading_data">Loading wallet data…</string>

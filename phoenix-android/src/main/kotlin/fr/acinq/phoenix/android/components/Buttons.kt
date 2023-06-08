@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -131,6 +132,7 @@ fun InlineButton(
     maxLines: Int = Int.MAX_VALUE,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
+    onClickLabel: String? = null,
 ) {
     Button(
         text = text,
@@ -139,6 +141,7 @@ fun InlineButton(
         modifier = modifier,
         padding = padding,
         space = space,
+        onClickLabel = onClickLabel,
         onClick = onClick,
         onLongClick = onLongClick,
         backgroundColor = Color.Transparent,
@@ -201,7 +204,9 @@ fun TextWithIcon(
         Image(
             painter = painterResource(id = icon),
             contentDescription = "icon for $text",
-            modifier = Modifier.size(iconSize).then(if (verticalAlignment == Alignment.Top) Modifier.offset(y = 2.dp) else Modifier),
+            modifier = Modifier
+                .size(iconSize)
+                .then(if (verticalAlignment == Alignment.Top) Modifier.offset(y = 2.dp) else Modifier),
             colorFilter = iconTint?.let { ColorFilter.tint(it) }
         )
         Spacer(Modifier.width(space))
@@ -369,6 +374,7 @@ fun WebLink(
     space: Dp = 8.dp,
     maxLines: Int = Int.MAX_VALUE,
     modifier: Modifier = Modifier,
+    onClickLabel: String = stringResource(id = R.string.accessibility_link),
 ) {
     val context = LocalContext.current
     InlineButton(
@@ -378,6 +384,7 @@ fun WebLink(
         iconSize = iconSize,
         space = space,
         maxLines = maxLines,
+        onClickLabel = onClickLabel,
         onClick = { openLink(context, url) },
         onLongClick = { copyToClipboard(context, text) },
         modifier = modifier,
@@ -396,6 +403,7 @@ fun TransactionLinkButton(
         maxLines = 1,
         fontSize = 15.sp,
         iconSize = 14.dp,
+        onClickLabel = stringResource(id = R.string.accessibility_explorer_link),
         modifier = modifier,
     )
 }

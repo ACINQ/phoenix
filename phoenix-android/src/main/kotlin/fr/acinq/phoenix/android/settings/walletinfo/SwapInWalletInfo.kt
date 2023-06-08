@@ -38,23 +38,27 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.utils.extensions.deeplyConfirmedBalance
+import fr.acinq.phoenix.utils.extensions.totalConfirmedBalance
+import fr.acinq.phoenix.utils.extensions.unconfirmedBalance
+import fr.acinq.phoenix.utils.extensions.weaklyConfirmedBalance
 
 @Composable
 fun SwapInWalletInfo(
     onBackClick: () -> Unit,
     onViewChannelPolicyClick: () -> Unit,
 ) {
-    val swapInWallet by business.balanceManager.swapInWallet.collectAsState()
+    val swapInWallet by business.peerManager.swapInWallet.collectAsState()
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.walletinfo_onchain_swapin))
-        ConfirmedBalanceView(balance = swapInWallet?.let { it.weaklyConfirmedBalance + it.deeplyConfirmedBalance }?.toMilliSatoshi(), onViewChannelPolicyClick = onViewChannelPolicyClick)
-        UnconfirmedBalanceView(wallet = swapInWallet)
+        SwappableBalanceView(balance = swapInWallet?.deeplyConfirmedBalance()?.toMilliSatoshi(), onViewChannelPolicyClick = onViewChannelPolicyClick)
+        NotSwappableWalletView(wallet = swapInWallet)
     }
 }
 
 @Composable
-private fun ConfirmedBalanceView(
+private fun SwappableBalanceView(
     balance: MilliSatoshi?,
     onViewChannelPolicyClick: () -> Unit,
 ) {
@@ -62,7 +66,7 @@ private fun ConfirmedBalanceView(
     val btcUnit = LocalBitcoinUnit.current
     val liquidityPolicyInPrefs by UserPrefs.getLiquidityPolicy(context).collectAsState(null)
 
-    CardHeader(text = stringResource(id = R.string.walletinfo_confirmed_title))
+    CardHeader(text = stringResource(id = R.string.walletinfo_swappable_title))
     Card(modifier = Modifier.fillMaxWidth()) {
         BalanceWithContent(balance = balance) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -71,13 +75,13 @@ private fun ConfirmedBalanceView(
                 is LiquidityPolicy.Disable -> {
                     Text(
                         text = stringResource(id = R.string.walletinfo_onchain_swapin_policy_disabled_details),
-                        style = MaterialTheme.typography.subtitle2
+                        style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
                     )
                 }
                 is LiquidityPolicy.Auto -> {
                     Text(
                         text = annotatedStringResource(id = R.string.walletinfo_onchain_swapin_policy_auto_details, policy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true)),
-                        style = MaterialTheme.typography.subtitle2
+                        style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
                     )
                 }
                 null -> {}
@@ -93,15 +97,27 @@ private fun ConfirmedBalanceView(
 }
 
 @Composable
-private fun UnconfirmedBalanceView(
-    wallet: WalletState?,
+private fun NotSwappableWalletView(
+    wallet: WalletState.WalletWithConfirmations?
 ) {
-    CardHeader(text = stringResource(id = R.string.walletinfo_unconfirmed_title))
-    Card(modifier = Modifier.fillMaxWidth()) {
-        BalanceWithContent(balance = wallet?.unconfirmedBalance?.toMilliSatoshi()) {}
-        if (!wallet?.unconfirmedUtxos.isNullOrEmpty()) {
-            HSeparator(modifier = Modifier.padding(horizontal = 16.dp))
-            wallet?.unconfirmedUtxos?.forEach { UtxoRow(it, false) }
+    if (wallet != null && (wallet.unconfirmed.isNotEmpty() || wallet.weaklyConfirmed.isNotEmpty())) {
+        CardHeader(text = stringResource(id = R.string.walletinfo_not_swappable_title))
+        Card {
+            val swapInConfirmations = business.peerManager.peerState.collectAsState().value?.walletParams?.swapInConfirmations
+            BalanceWithContent(balance = wallet.weaklyConfirmedBalance().toMilliSatoshi())
+            Text(
+                text = annotatedStringResource(id = R.string.walletinfo_not_swappable_details, swapInConfirmations ?: "??"),
+                style = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            HSeparator()
+            wallet.weaklyConfirmed.forEach {
+                UtxoRow(it, 1)
+            }
+            wallet.unconfirmed.forEach {
+                UtxoRow(it, null)
+            }
         }
     }
 }
