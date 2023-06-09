@@ -18,25 +18,67 @@
 package fr.acinq.phoenix.android.settings
 
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.selection.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.lightning.db.*
-import fr.acinq.phoenix.android.*
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
+import fr.acinq.lightning.db.SpliceOutgoingPayment
+import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.utils.*
+import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.components.CardHeader
+import fr.acinq.phoenix.android.components.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.InlineButton
+import fr.acinq.phoenix.android.components.ItemCard
+import fr.acinq.phoenix.android.components.ProgressView
+import fr.acinq.phoenix.android.components.Setting
+import fr.acinq.phoenix.android.components.SettingInteractive
+import fr.acinq.phoenix.android.components.SettingWithCopy
+import fr.acinq.phoenix.android.components.SettingWithDecoration
+import fr.acinq.phoenix.android.components.TransactionLinkButton
+import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.navigateToPaymentDetails
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
+import fr.acinq.phoenix.android.utils.copyToClipboard
+import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.monoTypo
+import fr.acinq.phoenix.android.utils.mutedBgColor
+import fr.acinq.phoenix.android.utils.share
 import fr.acinq.phoenix.data.LocalChannelInfo
-import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.walletPaymentId
 
 
@@ -48,7 +90,7 @@ fun ChannelDetailsView(
     val log = logger("ChannelDetailsView")
     val channelsState = business.peerManager.channelsFlow.collectAsState()
 
-    DefaultScreenLayout(isScrollable = true) {
+    DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(
             onBackClick = onBackClick,
             title = stringResource(id = R.string.channeldetails_title),
@@ -82,37 +124,46 @@ private fun ChannelSummaryView(
         JsonDialog(onDismiss = { showJsonDialog = false }, json = channel.json)
     }
 
-    Card {
-        SettingWithCopy(title = stringResource(id = R.string.channeldetails_channel_id), value = channel.channelId)
-        Setting(title = stringResource(id = R.string.channeldetails_state), description = channel.stateName)
-        Setting(
-            title = stringResource(id = R.string.channeldetails_spendable),
-            description = channel.localBalance?.toPrettyString(btcUnit, withUnit = true) ?: stringResource(id = R.string.utils_unknown)
-        )
-        SettingInteractive(
-            title = stringResource(id = R.string.channeldetails_json),
-            icon = R.drawable.ic_curly_braces,
-            iconTint = MaterialTheme.colors.primary,
-            onClick = { showJsonDialog = true }
-        )
-    }
-
-    if (channel.commitmentsInfo.isNotEmpty()) {
-        CardHeader(text = stringResource(id = R.string.channeldetails_commitments))
-        Card {
-            channel.commitmentsInfo.forEach {
-                CommitmentDetailsView(commitment = it)
+    LazyColumn {
+        item {
+            Card {
+                SettingWithCopy(title = stringResource(id = R.string.channeldetails_channel_id), value = channel.channelId)
+                Setting(title = stringResource(id = R.string.channeldetails_state), description = channel.stateName)
+                Setting(
+                    title = stringResource(id = R.string.channeldetails_spendable),
+                    description = channel.localBalance?.toPrettyString(btcUnit, withUnit = true) ?: stringResource(id = R.string.utils_unknown)
+                )
+                SettingInteractive(
+                    title = stringResource(id = R.string.channeldetails_json),
+                    icon = R.drawable.ic_curly_braces,
+                    iconTint = MaterialTheme.colors.primary,
+                    onClick = { showJsonDialog = true }
+                )
             }
         }
-    }
-
-    if (channel.inactiveCommitmentsInfo.isNotEmpty()) {
-        CardHeader(text = stringResource(id = R.string.channeldetails_inactive_commitments))
-        Card {
-            channel.inactiveCommitmentsInfo.forEach {
-                CommitmentDetailsView(commitment = it)
+        if (channel.commitmentsInfo.isNotEmpty()) {
+            item {
+                CardHeader(text = stringResource(id = R.string.channeldetails_commitments))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            itemsIndexed(channel.commitmentsInfo) { index, commitment ->
+                ItemCard(index = index, maxItemsCount = channel.commitmentsInfo.size) {
+                    CommitmentDetailsView(commitment)
+                }
             }
         }
+        if (channel.inactiveCommitmentsInfo.isNotEmpty()) {
+            item {
+                CardHeader(text = stringResource(id = R.string.channeldetails_inactive_commitments))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            itemsIndexed(channel.inactiveCommitmentsInfo) { index, commitment ->
+                ItemCard(index = index, maxItemsCount = channel.inactiveCommitmentsInfo.size) {
+                    CommitmentDetailsView(commitment)
+                }
+            }
+        }
+        item { Spacer(modifier = Modifier.height(32.dp)) }
     }
 }
 

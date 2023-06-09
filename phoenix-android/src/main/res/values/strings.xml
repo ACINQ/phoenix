@@ -794,6 +794,9 @@
 
     <string name="payments_history_title">Local payments (%1$d)</string>
     <string name="payments_history_export_button">Export</string>
+    <string name="payments_history_today">Today</string>
+    <string name="payments_history_thisweek">This week</string>
+    <string name="payments_history_thismonth">This month</string>
     <string name="payments_export_title">Export payments</string>
     <string name="payments_export_instructions">Export your local successful payments in CSV (comma separated value) format.</string>
     <string name="payments_export_start_label">Start date</string>
