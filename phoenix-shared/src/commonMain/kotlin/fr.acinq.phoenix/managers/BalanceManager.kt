@@ -3,16 +3,16 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.*
 import fr.acinq.lightning.blockchain.electrum.WalletState
+import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.channel.Helpers
+import fr.acinq.lightning.channel.states.ChannelState
 import fr.acinq.lightning.channel.states.PersistedChannelState
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.utils.extensions.deeplyConfirmedBalance
 import fr.acinq.phoenix.utils.extensions.localBalance
-import fr.acinq.phoenix.utils.extensions.unconfirmedBalance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
@@ -34,18 +34,15 @@ class BalanceManager(
 
     private val log = newLogger(loggerFactory)
 
-    /** This balance is the sum of the channels' balance. This is the user's LN funds in the wallet. */
+    /** The aggregated channels' balance. This is the user's LN funds in the wallet. See [ChannelState.localBalance] */
     private val _balance = MutableStateFlow<MilliSatoshi?>(null)
     val balance: StateFlow<MilliSatoshi?> = _balance
 
-    /**
-     * The wallet swap-in balance is computed manually, using the Electrum view of the swap-in wallet WITHOUT the
-     * [_reservedOutpoints] for pending channels.
-     */
+    /** The swap-in wallet balance, grouped by its utxos' confirmation status. Reserved utxos are filtered out. */
     private val _swapInWalletBalance = MutableStateFlow(WalletBalance.empty())
     val swapInWalletBalance: StateFlow<WalletBalance> = _swapInWalletBalance
 
-    /** Flow of incoming payment whose funding tx is not yet confirmed - as seen from the database. */
+    /** The balance of incoming payments whose funding tx is not yet confirmed - as seen from the database. */
     private val _pendingChannelsBalance = MutableStateFlow(0.msat)
     val pendingChannelsBalance: StateFlow<MilliSatoshi> = _pendingChannelsBalance
 
@@ -58,14 +55,14 @@ class BalanceManager(
         }
     }
 
-    /** Watches the channels balance, first using the channels data from our database, then the live channels. */
+    /** Monitors the channels' balance, first using the channels data from our database, then the live channels. */
     private suspend fun monitorChannelsBalance(peerManager: PeerManager) {
         peerManager.channelsFlow.collect { channels ->
             _balance.value = channels?.mapNotNull { it.value.state.localBalance() }?.sum()
         }
     }
 
-    /** Monitors the database for incoming payments that are received but funds are not yet usable (e.g., need confirmation). */
+    /** Monitors the database for incoming payments that are received but whose funds are not yet usable (e.g., need confirmation). */
     private suspend fun monitorIncomingPaymentNotYetConfirmed() {
         databaseManager.paymentsDb().listIncomingPaymentsNotYetConfirmed().collect { payments ->
             log.info { "unconfirmed payments=$payments" }
@@ -98,13 +95,12 @@ class BalanceManager(
                 minConfirmations = swapInConfirmations
             )
             WalletBalance(
-                deeplyConfirmed = withConfirmations.deeplyConfirmedBalance(),
-                weaklyConfirmed = withConfirmations.weaklyConfirmed.map {
-                    it.blockHeight.toInt() + swapInConfirmations - currentBlockHeight to it.amount
-                }.reduceOrNull { (height1, amount1), (height2, amount2) ->
-                    minOf(height1, height2) to amount1 + amount2
+                deeplyConfirmed = withConfirmations.deeplyConfirmed.balance,
+                weaklyConfirmed = withConfirmations.weaklyConfirmed.balance,
+                weaklyConfirmedMinBlockNeeded = withConfirmations.weaklyConfirmed.minOfOrNull {
+                    withConfirmations.confirmationsNeeded(it)
                 },
-                unconfirmed = withConfirmations.unconfirmedBalance(),
+                unconfirmed = withConfirmations.unconfirmed.balance,
             )
         }.collect { balance ->
             _swapInWalletBalance.value = balance
@@ -113,21 +109,23 @@ class BalanceManager(
 }
 
 /**
- * Represents the balance of the swap-in wallet.
- * @param deeplyConfirmed the amount that is confirmed and that can be used for a swap. This amount would always be 0 if we were to
- *      accept swaps. But swaps can be rejected (e.g. the fee is too high) or can fail.
- * @param weaklyConfirmed the amount that is confirmed but not deep enough that a swap will be attempted. The first element of the
- *      pair is the minimum number of blocks that need to be added to the chain before the amount (or at least a part of it) is
- *      deemed safe enough to be considered as deeply confirmed, and hence can be swapped.
- * @param unconfirmed the amount that is not confirmed yet.
+ * Helper class representing the balance of the swap-in wallet. See [WalletState.WalletWithConfirmations].
+ *
+ * @param deeplyConfirmed amount that is confirmed and that can be used for a swap. This amount would always be 0 if we were to
+ *      systematically accept swaps. But swaps can fail, or be rejected (fee too high).
+ * @param weaklyConfirmed  amount that is confirmed but not deep enough for a swap.
+ * @param weaklyConfirmedMinBlockNeeded minimum depth that the wallet's weakly confirmed utxos must reach.
+ * @param unconfirmed amount that is not confirmed yet.
  */
 data class WalletBalance(
     val deeplyConfirmed: Satoshi,
-    val weaklyConfirmed: Pair<Int, Satoshi>?,
+    val weaklyConfirmed: Satoshi,
+    val weaklyConfirmedMinBlockNeeded: Int?,
     val unconfirmed: Satoshi,
 ) {
-    val total get() = deeplyConfirmed + (weaklyConfirmed?.second ?: 0.sat) + unconfirmed
+    val total get() = deeplyConfirmed + weaklyConfirmed + unconfirmed
+
     companion object {
-        fun empty() = WalletBalance(0.sat, null, 0.sat)
+        fun empty() = WalletBalance(0.sat, 0.sat, null, 0.sat)
     }
 }
