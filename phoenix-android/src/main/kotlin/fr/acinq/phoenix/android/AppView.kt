@@ -45,9 +45,12 @@ import fr.acinq.phoenix.android.init.*
 import fr.acinq.phoenix.android.intro.IntroView
 import fr.acinq.phoenix.android.payments.*
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
+import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.settings.displayseed.DisplaySeedView
+import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
+import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
@@ -316,7 +319,10 @@ fun AppView(
                     FinalWalletInfo(onBackClick = { navController.popBackStack() })
                 }
                 composable(Screen.LiquidityPolicy.route) {
-                    LiquidityPolicyView(onBackClick = { navController.popBackStack() })
+                    LiquidityPolicyView(onBackClick = { navController.popBackStack() }, onAdvancedClick = { navController.navigate(Screen.AdvancedLiquidityPolicy.route) })
+                }
+                composable(Screen.AdvancedLiquidityPolicy.route) {
+                    AdvancedIncomingFeePolicy(onBackClick = { navController.popBackStack() })
                 }
                 composable(Screen.Notifications.route) {
                     NotificationsView(

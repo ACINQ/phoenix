@@ -869,17 +869,17 @@
 
     <string name="liquiditypolicy_title">Incoming fee policy</string>
     <string name="liquiditypolicy_instructions">Incoming payments sometimes requires on-chain transactions. This does not always happen, only when needed.</string>
-    <string name="liquiditypolicy_fees_estimation">The miner fee is currently estimated to be around <b>%1$s</b> (≈%2$s).</string>
+    <string name="liquiditypolicy_fees_estimation_loading">Retrieving feerate…</string>
+    <string name="liquiditypolicy_fees_estimation">Currently, we estimate the fee to be around <b>%1$s</b> (≈%2$s).</string>
     <string name="liquiditypolicy_fees_estimation_feerate">Feerate %1$s from Electrum</string>
     <string name="liquiditypolicy_fees_header">My fee setting</string>
     <string name="liquiditypolicy_fees_base_label">Max fee amount</string>
-    <string name="liquiditypolicy_fees_base_help">Incoming payments are rejected when the fee is above that value.</string>
+    <string name="liquiditypolicy_fees_base_help">Payments are rejected if the fee exceeds that value</string>
     <string name="liquiditypolicy_fees_prop_label">Tiny payments ceiling</string>
     <string name="liquiditypolicy_fees_prop_help">Helps accepting tiny payments that would otherwise be rejected by the maximum fee setting.</string>
     <string name="liquiditypolicy_modes_advanced">Advanced options</string>
-    <string name="liquiditypolicy_modes_header">Lightning on-the-fly</string>
-    <string name="liquiditypolicy_modes_pay_to_open_label">Manual Lightning management</string>
-    <string name="liquiditypolicy_modes_pay_to_open_description">When enabled, incoming Lightning payments will be rejected when your liquidity is insufficient.\n\nDOES NOT DO ANYTHING YET</string>
+    <string name="liquiditypolicy_modes_pay_to_open_label">Always accept Lightning payments</string>
+    <string name="liquiditypolicy_modes_pay_to_open_description">When enabled, Lightning payments will always be accepted, regardless of the max fee setting. Does not do anything yet.</string>
     <string name="liquiditypolicy_save_button">Save policy</string>
 
     <string name="liquiditypolicy_help">Lorem ipsum dolor sit amet.</string>
