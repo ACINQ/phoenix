@@ -16,6 +16,7 @@ import fr.acinq.lightning.channel.states.Offline
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.transactions.Transactions
+import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.InitTlv
 import fr.acinq.lightning.wire.TlvStream
 import fr.acinq.phoenix.PhoenixBusiness
@@ -177,11 +178,12 @@ class PeerManager(
         while (this.isActive) {
             try {
                 withTimeout(5000) {
+                    val currentChannels = channelsFlow.filterNotNull().first()
                     val nextBlock = electrumClient.estimateFees(1)
                     val funding = electrumClient.estimateFees(144)
                     logger.info { "electrum fee estimation for target 1 block=$nextBlock 144 blocks=$funding" }
                     if (nextBlock.feerate != null && funding.feerate != null) {
-                        _electrumFeerate.value = ElectrumFeerate(nextBlock.feerate!!, funding.feerate!!)
+                        _electrumFeerate.value = ElectrumFeerate(nextBlock.feerate!!, funding.feerate!!, currentChannels.isNotEmpty())
                     }
                 }
                 delay(2 * 60 * 60 * 1000)
@@ -208,7 +210,10 @@ class PeerManager(
     }
 }
 
-data class ElectrumFeerate(val nextBlockFeerate: FeeratePerKw, val fundingFeerate: FeeratePerKw) {
+data class ElectrumFeerate(val nextBlockFeerate: FeeratePerKw, val fundingFeerate: FeeratePerKw, val hasChannelsAlready: Boolean) {
     /** Rough estimation of the cost of a swap-in (splicing/opening), using a hard-coded weight. */
-    val swapEstimationFee: Satoshi by lazy { Transactions.weight2fee(feerate = fundingFeerate, weight = 992) }
+    val swapEstimationFee: Satoshi by lazy {
+        // TODO not use hardcoded values
+        Transactions.weight2fee(feerate = fundingFeerate, weight = 992) + if (hasChannelsAlready) 0.sat else 1000.sat // the service fee is expected if no channels
+    }
 }
