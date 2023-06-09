@@ -18,9 +18,11 @@ package fr.acinq.phoenix.android.settings.walletinfo
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -34,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.blockchain.electrum.WalletState
+import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -42,12 +45,9 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.copyToClipboard
+import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.managers.finalOnChainWalletPath
-import fr.acinq.phoenix.utils.extensions.deeplyConfirmedBalance
-import fr.acinq.phoenix.utils.extensions.totalConfirmedBalance
-import fr.acinq.phoenix.utils.extensions.unconfirmedBalance
-import fr.acinq.phoenix.utils.extensions.weaklyConfirmedBalance
 
 @Composable
 fun WalletInfoView(
@@ -70,14 +70,6 @@ private fun OffChainWalletView(onLightningWalletClick: () -> Unit) {
     CardHeader(text = stringResource(id = R.string.walletinfo_lightning))
     Card {
         LightningNodeIdView(nodeId = nodeParams?.nodeId?.toString(), onLightningWalletClick)
-//        InlineButton(
-//            text = "View channels",
-//            icon = R.drawable.ic_arrow_next,
-//            fontSize = 12.sp,
-//            iconSize = 14.dp,
-//            onClick = onLightningWalletClick,
-//            modifier = Modifier.padding(start = 16.dp, bottom = 12.dp),
-//        )
     }
 }
 
@@ -95,7 +87,7 @@ private fun SwapInWalletView(onSwapInWalletClick: () -> Unit) {
         onClick = onSwapInWalletClick,
     ) {
         swapInWallet?.let { wallet ->
-            OnchainBalanceView(confirmed = wallet.deeplyConfirmedBalance(), unconfirmed = wallet.unconfirmedBalance() + wallet.weaklyConfirmedBalance())
+            OnchainBalanceView(confirmed = wallet.deeplyConfirmed.balance, unconfirmed = wallet.unconfirmed.balance + wallet.weaklyConfirmed.balance)
         } ?: ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
         keyManager?.let {
             HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
@@ -121,7 +113,7 @@ private fun FinalWalletView(onFinalWalletClick: () -> Unit) {
         onClick = onFinalWalletClick,
     ) {
         finalWallet?.let { wallet ->
-            OnchainBalanceView(confirmed = wallet.totalConfirmedBalance(), unconfirmed = wallet.unconfirmedBalance())
+            OnchainBalanceView(confirmed = wallet.deeplyConfirmed.balance, unconfirmed = wallet.unconfirmed.balance)
         } ?: ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
         keyManager?.let {
             HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
@@ -191,56 +183,52 @@ private fun OnchainBalanceView(
 }
 
 @Composable
-fun UtxoRow(utxo: WalletState.Utxo, confirmationNeeded: Int?) {
+fun UtxoRow(utxo: WalletState.Utxo, progress: Pair<Int?, Int>?) {
     val context = LocalContext.current
     val txUrl = txUrl(txId = utxo.outPoint.txid.toHex())
-    Row(
-        modifier = Modifier
-            .clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.accessibility_explorer_link)) {
-                openLink(context, link = txUrl)
-            }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(modifier = Modifier.size(width = 36.dp, height = 24.dp), contentAlignment = Alignment.Center) {
-            if (confirmationNeeded != null) {
-                Text(text = "+$confirmationNeeded", fontSize = 14.sp, color = MaterialTheme.colors.primary)
+    val typo = monoTypo.copy(fontSize = 13.sp)
+    CompositionLocalProvider(LocalTextStyle provides typo) {
+        Row(
+            modifier = Modifier
+                .clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.accessibility_explorer_link)) {
+                    openLink(context, link = txUrl)
+                }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (progress != null) {
+                Text(
+                    text = "${progress.first ?: "-"}/${progress.second}",
+                    color = if (progress.first == null) mutedTextColor else MaterialTheme.colors.primary,
+                )
             } else {
                 PhoenixIcon(
                     resourceId = R.drawable.ic_clock,
                     tint = MaterialTheme.colors.primary,
                 )
             }
+            Text(
+                text = utxo.outPoint.txid.toHex(),
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            AmountView(amount = utxo.amount.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp), unitTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp), prefix = "+")
         }
-        Text(
-            text = utxo.outPoint.txid.toHex(),
-            modifier = Modifier
-                .weight(1f)
-                .alignByBaseline(),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-        AmountView(amount = utxo.amount.toMilliSatoshi())
     }
 }
 
 @Composable
-internal fun BalanceWithContent(
-    balance: MilliSatoshi?,
-    content: @Composable () -> Unit = {},
-) {
+internal fun BalanceRow(balance: MilliSatoshi?) {
     val btcUnit = LocalBitcoinUnit.current
-    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-        if (balance == null) {
-            ProgressView(text = stringResource(id = R.string.walletinfo_loading_data), padding = PaddingValues(0.dp))
-        } else {
-            Row {
-                AmountView(amount = balance, amountTextStyle = MaterialTheme.typography.h4, forceUnit = btcUnit, modifier = Modifier.alignByBaseline(), onClick = null)
-                Spacer(modifier = Modifier.width(4.dp))
-                AmountInFiatView(amount = balance, modifier = Modifier.alignByBaseline())
-            }
+    if (balance == null) {
+        ProgressView(text = stringResource(id = R.string.walletinfo_loading_data), padding = PaddingValues(0.dp))
+    } else {
+        Row {
+            AmountView(amount = balance, amountTextStyle = MaterialTheme.typography.h4, forceUnit = btcUnit, modifier = Modifier.alignByBaseline(), onClick = null)
+            Spacer(modifier = Modifier.width(4.dp))
+            AmountInFiatView(amount = balance, modifier = Modifier.alignByBaseline())
         }
-        content()
     }
 }

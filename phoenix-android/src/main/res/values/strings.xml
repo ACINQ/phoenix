@@ -840,7 +840,7 @@
     <string name="walletinfo_path">(Path: %1$s)</string>
     <string name="walletinfo_swappable_title">Waiting for swap</string>
     <string name="walletinfo_not_swappable_title">Waiting for confirmations</string>
-    <string name="walletinfo_not_swappable_details">The transactions below need <b>%1$s confirmations</b> before they can be considered for a swap.</string>
+    <string name="walletinfo_not_swappable_details">Transactions need <b>%1$s confirmations</b> before they can be considered for a swap.</string>
     <string name="walletinfo_confirmed_title">Confirmed balance</string>
     <string name="walletinfo_unconfirmed_title">Unconfirmed balance</string>
     <string name="walletinfo_loading_data">Loading wallet data…</string>
@@ -854,8 +854,8 @@
     <string name="walletinfo_onchain_swapin_help">An on-chain wallet derived from your seed.\n\nThe swap-in wallet is a bridge to Lightning. Funds on this wallet will automatically be moved to Lightning according to your liquidity policy setting.</string>
     <string name="walletinfo_onchain_swapin_about">This wallet serves as a bridge to Lightning.</string>
     <string name="walletinfo_onchain_swapin_about_unconfirmed">Placeholder message for unconfirmed balance?</string>
-    <string name="walletinfo_onchain_swapin_policy_view_button">View liquidity policy</string>
-    <string name="walletinfo_onchain_swapin_policy_auto_details">These funds will be moved to Lightning automatically if the mining fee is <b>below %1$s</b>.</string>
+    <string name="walletinfo_onchain_swapin_policy_view_button">View incoming fee policy</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details">Funds here will be automatically moved to Lightning if the incoming fee is <b>less than %1$s</b>.</string>
     <string name="walletinfo_onchain_swapin_policy_disabled_details">Automated channel opening <b>has been disabled</b>. These funds will remain here.</string>
 
     <string name="walletinfo_onchain_final">Final wallet</string>

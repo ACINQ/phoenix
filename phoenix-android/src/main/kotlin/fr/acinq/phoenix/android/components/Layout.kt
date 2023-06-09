@@ -170,12 +170,13 @@ fun DefaultScreenHeader(
 @Composable
 fun HSeparator(
     modifier: Modifier = Modifier,
+    color: Color = borderColor,
     width: Dp? = null,
 ) {
     Box(
         (width?.run { modifier.width(width) } ?: modifier.fillMaxWidth())
             .height(1.dp)
-            .background(color = borderColor)
+            .background(color = color)
     )
 }
 

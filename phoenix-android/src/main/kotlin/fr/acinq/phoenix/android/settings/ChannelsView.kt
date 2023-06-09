@@ -37,13 +37,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.settings.walletinfo.BalanceWithContent
+import fr.acinq.phoenix.android.settings.walletinfo.BalanceRow
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
@@ -78,11 +77,12 @@ private fun LightningBalanceView(
     balance: MilliSatoshi?
 ) {
     CardHeader(text = stringResource(id = R.string.channelsview_balance))
-    Card {
-        BalanceWithContent(balance = balance) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = stringResource(id = R.string.channelsview_balance_about), style = MaterialTheme.typography.subtitle2)
-        }
+    Card(
+        internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        BalanceRow(balance = balance)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = stringResource(id = R.string.channelsview_balance_about), style = MaterialTheme.typography.subtitle2)
     }
 }
 
