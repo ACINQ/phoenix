@@ -162,7 +162,7 @@ fun DefaultScreenHeader(
         modifier = Modifier
             .fillMaxWidth()
             .background(backgroundColor)
-            .padding(start = 0.dp, top = 2.dp, bottom = 2.dp, end = 16.dp),
+            .padding(start = 0.dp, top = 2.dp, bottom = 2.dp, end = 0.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         BackButton(onClick = onBackClick)
@@ -209,4 +209,4 @@ fun PrimarySeparator(
     ) { }
 }
 
-fun Modifier.enableOrFade(enabled: Boolean): Modifier = this.then(Modifier.alpha(if (enabled) 1f else 0.5f))
+fun Modifier.enableOrFade(enabled: Boolean): Modifier = this.then(Modifier.alpha(if (enabled) 1f else 0.65f))
