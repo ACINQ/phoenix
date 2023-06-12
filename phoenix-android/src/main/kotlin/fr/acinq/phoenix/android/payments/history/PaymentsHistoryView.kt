@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -72,6 +73,10 @@ private sealed class PaymentsGroup {
         override fun hashCode(): Int = "thisweek".hashCode()
     }
 
+    object LastWeek : PaymentsGroup() {
+        override fun hashCode(): Int = "lastweek".hashCode()
+    }
+
     object ThisMonth : PaymentsGroup() {
         override fun hashCode(): Int = "thismonth".hashCode()
     }
@@ -102,17 +107,20 @@ fun PaymentsHistoryView(
     val listState = rememberLazyListState()
     val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
     val payments by paymentsViewModel.paymentsFlow.collectAsState()
-    val groupedPayments = payments.values.groupBy {
-        val timezone = TimeZone.currentSystemDefault()
-        val today = Clock.System.now() //.toLocalDateTime(timezone)
-        val paymentInstant = Instant.fromEpochMilliseconds(it.orderRow.completedAt ?: it.orderRow.createdAt)//.toLocalDateTime(timezone)
-        val daysElapsed = paymentInstant.daysUntil(today, timezone)
-        val monthElapsed = paymentInstant.monthsUntil(today, timezone)
-        when {
-            daysElapsed == 0 -> PaymentsGroup.Today
-            daysElapsed < today.toLocalDateTime(timezone).dayOfWeek.value - 1 -> PaymentsGroup.ThisWeek
-            monthElapsed == 0 -> PaymentsGroup.ThisMonth
-            else -> paymentInstant.toLocalDateTime(timezone).let { PaymentsGroup.Other(it.month, it.year) }
+    val groupedPayments = remember(payments) {
+        payments.values.groupBy {
+            val timezone = TimeZone.currentSystemDefault()
+            val today = Clock.System.now()
+            val paymentInstant = Instant.fromEpochMilliseconds(it.orderRow.completedAt ?: it.orderRow.createdAt)
+            val daysElapsed = paymentInstant.daysUntil(today, timezone)
+            val monthElapsed = paymentInstant.monthsUntil(today, timezone)
+            when {
+                daysElapsed == 0 -> PaymentsGroup.Today
+                daysElapsed < today.toLocalDateTime(timezone).dayOfWeek.value - 1 -> PaymentsGroup.ThisWeek
+                daysElapsed < today.toLocalDateTime(timezone).dayOfWeek.value + 7 -> PaymentsGroup.LastWeek
+                monthElapsed == 0 -> PaymentsGroup.ThisMonth
+                else -> paymentInstant.toLocalDateTime(timezone).let { PaymentsGroup.Other(it.month, it.year) }
+            }
         }
     }
 
@@ -167,6 +175,7 @@ fun PaymentsHistoryView(
                             text = when (header) {
                                 PaymentsGroup.Today -> stringResource(id = R.string.payments_history_today)
                                 PaymentsGroup.ThisWeek -> stringResource(id = R.string.payments_history_thisweek)
+                                PaymentsGroup.LastWeek -> stringResource(id = R.string.payments_history_lastweek)
                                 PaymentsGroup.ThisMonth -> stringResource(id = R.string.payments_history_thismonth)
                                 is PaymentsGroup.Other -> "${header.month.getDisplayName(TextStyle.FULL, Locale.getDefault()).uppercase()} ${header.year}"
                             },
