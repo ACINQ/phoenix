@@ -79,7 +79,7 @@ class NotificationsManager(
                         expectedFee = reason.actual,
                         maxAllowedFee = reason.maxAllowed
                     )
-                    is LiquidityEvents.Rejected.Reason.PolicySetToDisabled -> Notification.RejectedManually(
+                    is LiquidityEvents.Rejected.Reason.PolicySetToDisabled -> Notification.FeePolicyDisabled(
                         id = UUID.randomUUID(),
                         createdAt = currentTimestampMillis(),
                         readAt = null,
