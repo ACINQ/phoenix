@@ -184,7 +184,7 @@ class LegacyMigrationHelperTest {
         Assert.assertEquals(
             ChannelCloseOutgoingPayment(
                 id = UUID.fromString("a7f837c1-0e8d-434c-8a12-d68780f2c0d0"),
-                amountSatoshi = 30_123.sat,
+                recipientAmount = 30_123.sat,
                 address = "2NBPdqEiX2Wb9VNTqNBXBjgCAnHvhBD8sc3",
                 isSentToDefaultAddress = false,
                 miningFees = 0.sat,
@@ -192,7 +192,8 @@ class LegacyMigrationHelperTest {
                 createdAt = 1656403710302,
                 confirmedAt = 1656403710302,
                 channelId = ByteVector32.fromValidHex("3749642f6caa1a13a9026f966eb13bd5a970ee237fb173d78602b2b31b7bc804"),
-                closingType = ChannelCloseOutgoingPayment.ChannelClosingType.Mutual,
+                closingType = ChannelClosingType.Mutual,
+                lockedAt = 1656403710302,
             ),
             newOutgoingPayments[7]
         )
@@ -246,6 +247,7 @@ class LegacyMigrationHelperTest {
                             channelId = ByteVector32.Zeroes,
                             txId = ByteVector32.Zeroes,
                             confirmedAt = 1656333657766,
+                            lockedAt = 1656333657766,
                         )
                     ),
                     receivedAt = 1656333657766
@@ -317,6 +319,7 @@ class LegacyMigrationHelperTest {
                             miningFee = 0.sat,
                             txId = ByteVector32.Zeroes,
                             confirmedAt = 1656341949234,
+                            lockedAt = 1656341949234,
                         )
                     ),
                     receivedAt = 1656341949234
@@ -343,6 +346,7 @@ class LegacyMigrationHelperTest {
                             serviceFee = 5_678_000.msat,
                             miningFee = 0.sat,
                             confirmedAt = 1656403752448,
+                            lockedAt = 1656403752448,
                         )
                     ),
                     receivedAt = 1656403752448

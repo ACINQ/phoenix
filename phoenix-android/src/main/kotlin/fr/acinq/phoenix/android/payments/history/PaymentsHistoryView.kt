@@ -53,12 +53,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
-import kotlinx.datetime.monthsUntil
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toKotlinLocalDateTime
 import kotlinx.datetime.toLocalDateTime
 import java.time.format.TextStyle
 import java.util.*
@@ -69,16 +69,16 @@ private sealed class PaymentsGroup {
         override fun hashCode(): Int = "today".hashCode()
     }
 
+    object Yesterday : PaymentsGroup() {
+        override fun hashCode(): Int = "yesterday".hashCode()
+    }
+
     object ThisWeek : PaymentsGroup() {
         override fun hashCode(): Int = "thisweek".hashCode()
     }
 
     object LastWeek : PaymentsGroup() {
         override fun hashCode(): Int = "lastweek".hashCode()
-    }
-
-    object ThisMonth : PaymentsGroup() {
-        override fun hashCode(): Int = "thismonth".hashCode()
     }
 
     data class Other(val month: Month, val year: Int) : PaymentsGroup() {
@@ -108,17 +108,16 @@ fun PaymentsHistoryView(
     val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
     val payments by paymentsViewModel.paymentsFlow.collectAsState()
     val groupedPayments = remember(payments) {
+        val timezone = TimeZone.currentSystemDefault()
+        val (todaysDayOfWeek, today) = java.time.LocalDate.now().atTime(23, 59, 59).toKotlinLocalDateTime().let { it.dayOfWeek to it.toInstant(timezone) }
         payments.values.groupBy {
-            val timezone = TimeZone.currentSystemDefault()
-            val today = Clock.System.now()
-            val paymentInstant = Instant.fromEpochMilliseconds(it.orderRow.completedAt ?: it.orderRow.createdAt)
+            val paymentInstant = Instant.fromEpochMilliseconds(it.orderRow.createdAt)
             val daysElapsed = paymentInstant.daysUntil(today, timezone)
-            val monthElapsed = paymentInstant.monthsUntil(today, timezone)
             when {
                 daysElapsed == 0 -> PaymentsGroup.Today
-                daysElapsed < today.toLocalDateTime(timezone).dayOfWeek.value - 1 -> PaymentsGroup.ThisWeek
-                daysElapsed < today.toLocalDateTime(timezone).dayOfWeek.value + 7 -> PaymentsGroup.LastWeek
-                monthElapsed == 0 -> PaymentsGroup.ThisMonth
+                todaysDayOfWeek.value != 1 && daysElapsed == 1 -> PaymentsGroup.Yesterday
+                todaysDayOfWeek.value - 1 - daysElapsed >= 0 -> PaymentsGroup.ThisWeek
+                todaysDayOfWeek.value + 7 - 1 - daysElapsed >= 0 -> PaymentsGroup.LastWeek
                 else -> paymentInstant.toLocalDateTime(timezone).let { PaymentsGroup.Other(it.month, it.year) }
             }
         }
@@ -174,9 +173,9 @@ fun PaymentsHistoryView(
                         CardHeader(
                             text = when (header) {
                                 PaymentsGroup.Today -> stringResource(id = R.string.payments_history_today)
+                                PaymentsGroup.Yesterday -> stringResource(id = R.string.payments_history_yesterday)
                                 PaymentsGroup.ThisWeek -> stringResource(id = R.string.payments_history_thisweek)
                                 PaymentsGroup.LastWeek -> stringResource(id = R.string.payments_history_lastweek)
-                                PaymentsGroup.ThisMonth -> stringResource(id = R.string.payments_history_thismonth)
                                 is PaymentsGroup.Other -> "${header.month.getDisplayName(TextStyle.FULL, Locale.getDefault()).uppercase()} ${header.year}"
                             },
                         )

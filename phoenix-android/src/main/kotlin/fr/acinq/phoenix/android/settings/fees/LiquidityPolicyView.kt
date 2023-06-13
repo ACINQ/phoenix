@@ -106,6 +106,7 @@ fun LiquidityPolicyView(
                         }
                         Button(
                             icon = R.drawable.ic_menu_dots,
+                            iconTint = MaterialTheme.colors.onSurface,
                             padding = PaddingValues(12.dp),
                             onClick = { showAdvancedMenuPopIn = true }
                         )
