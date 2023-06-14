@@ -105,10 +105,10 @@ struct WalletInfoView: View {
 				}
 			} // </VStack>
 			
-			let keyManager = Biz.business.walletManager.getKeyManager()
+		//	let swapInWallet = Biz.business.walletManager.getKeyManager()?.swapInOnChainWallet
 			masterPublicKey(
-				keyPath: keyManager?.swapInOnChainWalletPath ?? "?",
-				xpub: keyManager?.swapInOnChainWallet.xpub ?? "?",
+				keyPath: "?", // swapInOnChainWallet?.path ?? "?",
+				xpub: "?",    // swapInOnChainWallet?.xpub ?? "?",
 				truncationDetected: $swapIn_mpk_truncationDetected
 			)
 			
@@ -296,13 +296,13 @@ struct WalletInfoView: View {
 	
 	func finalBalance_confirmed() -> (FormattedAmount, FormattedAmount) {
 		
-		let sats = Biz.business.balanceManager.finalWalletBalance().confirmed
+		let sats = Biz.business.peerManager.finalWalletBalance().confirmedBalance
 		return formattedBalances(sats)
 	}
 	
 	func finalBalance_unconfirmed() -> (FormattedAmount, FormattedAmount)? {
 		
-		let sats = Biz.business.balanceManager.finalWalletBalance().unconfirmed
+		let sats = Biz.business.peerManager.finalWalletBalance().unconfirmedBalance
 		if sats.toLong() > 0 {
 			return formattedBalances(sats)
 		} else {

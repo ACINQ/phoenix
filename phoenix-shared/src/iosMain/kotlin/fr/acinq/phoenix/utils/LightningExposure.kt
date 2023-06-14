@@ -6,6 +6,11 @@ import fr.acinq.lightning.NodeEvents
 import fr.acinq.lightning.blockchain.electrum.ElectrumMiniWallet
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.channel.*
+import fr.acinq.lightning.channel.states.Aborted
+import fr.acinq.lightning.channel.states.ChannelState
+import fr.acinq.lightning.channel.states.Closed
+import fr.acinq.lightning.channel.states.Closing
+import fr.acinq.lightning.channel.states.Offline
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.NativeSocketException
@@ -175,10 +180,5 @@ fun ChannelEvents.asCreated(): ChannelEvents.Created? = when (this) {
 
 fun ChannelEvents.asConfirmed(): ChannelEvents.Confirmed? = when (this) {
     is ChannelEvents.Confirmed -> this
-    else -> null
-}
-
-fun LiquidityEvents.isAccepted(): LiquidityEvents.Accepted? = when (this) {
-    is LiquidityEvents.Accepted -> this
     else -> null
 }
