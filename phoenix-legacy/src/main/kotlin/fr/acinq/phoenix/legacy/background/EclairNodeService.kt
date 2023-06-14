@@ -46,6 +46,7 @@ import fr.acinq.eclair.*
 import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.channel.*
+import fr.acinq.eclair.crypto.LocalKeyManager
 import fr.acinq.eclair.db.*
 import fr.acinq.eclair.io.*
 import fr.acinq.eclair.payment.*
@@ -54,16 +55,10 @@ import fr.acinq.eclair.payment.relay.Relayer
 import fr.acinq.eclair.payment.send.PaymentInitiator
 import fr.acinq.eclair.wire.*
 import fr.acinq.phoenix.legacy.*
-import fr.acinq.phoenix.legacy.AppContext
-import fr.acinq.phoenix.legacy.MainActivity
-import fr.acinq.phoenix.legacy.PaymentWithMeta
 import fr.acinq.phoenix.legacy.db.AppDb
 import fr.acinq.phoenix.legacy.db.Database
 import fr.acinq.phoenix.legacy.db.PayToOpenMetaRepository
 import fr.acinq.phoenix.legacy.db.PaymentMetaRepository
-import fr.acinq.phoenix.legacy.utils.Constants
-import fr.acinq.phoenix.legacy.utils.Migration
-import fr.acinq.phoenix.legacy.utils.Prefs
 import fr.acinq.phoenix.legacy.utils.*
 import fr.acinq.phoenix.legacy.utils.crypto.EncryptedSeed
 import fr.acinq.phoenix.legacy.utils.crypto.SeedManager
@@ -71,6 +66,7 @@ import fr.acinq.phoenix.legacy.utils.tor.TorConnectionStatus
 import fr.acinq.phoenix.legacy.utils.tor.TorEventHandler
 import fr.acinq.phoenix.legacy.utils.tor.TorHelper
 import kotlinx.coroutines.*
+import org.bouncycastle.util.encoders.Hex
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -84,13 +80,30 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.Either
 import scala.util.Left
+import scala.util.Right
 import scodec.bits.ByteVector
+import scodec.bits.`ByteVector$`
 import java.io.IOException
 import java.lang.Runnable
 import java.net.UnknownHostException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.collections.Iterable
+import kotlin.collections.List
+import kotlin.collections.Map
+import kotlin.collections.any
+import kotlin.collections.emptyList
+import kotlin.collections.filter
+import kotlin.collections.filterNot
+import kotlin.collections.fold
+import kotlin.collections.forEach
+import kotlin.collections.map
+import kotlin.collections.maxOrNull
+import kotlin.collections.plus
+import kotlin.collections.reduce
+import kotlin.collections.set
+import kotlin.collections.toList
 import scala.collection.immutable.List as ScalaList
 
 /**
@@ -488,6 +501,21 @@ class EclairNodeService : Service() {
     }
   }
 
+  suspend fun migrateChannels(address: String, channels: List<ByteVector32>): Map<Either<ByteVector32, ShortChannelId>, Either<Throwable, ChannelCommandResponse>> {
+    return withContext(serviceScope.coroutineContext + Dispatchers.Default) {
+      if (api == null || kit == null) throw KitNotInitialized
+      val channelsId = channels.map { val id: Either<ByteVector32, ShortChannelId> = Left.apply(it); id }.let {
+        JavaConverters.asScalaIteratorConverter(it.iterator()).asScala().toList()
+      }
+
+      val script = Script.write(`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash()))
+      log.info("(migration) requesting to *mutual* close channels=$channels to address=${script.toHex()}")
+
+      val result = Await.result(api!!.close(channelsId, Option.apply(script), Timeout(Duration.create(300, TimeUnit.SECONDS))), Duration.Inf())
+      JavaConverters.mapAsJavaMapConverter(result).asJava()
+    }
+  }
+
   /** Mutual close all channels. Will throw if one channel closing does not work correctly. */
   @UiThread
   suspend fun mutualCloseAllChannels(address: String) = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
@@ -565,7 +593,8 @@ class EclairNodeService : Service() {
       }
     // return (max of fee, max of cltv expiry delta)
     return Pair(MilliSatoshi(aggregateByRoutes.map { p -> p.first.toLong() }.maxOrNull() ?: 0),
-      CltvExpiryDelta(aggregateByRoutes.map { p -> p.second.toInt() }.maxOrNull() ?: 0))
+      CltvExpiryDelta(aggregateByRoutes.map { p -> p.second.toInt() }.maxOrNull() ?: 0)
+    )
   }
 
   @UiThread
@@ -603,7 +632,8 @@ class EclairNodeService : Service() {
           /* trampoline node public key */ Wallet.ACINQ.nodeId(),
           /* fees and expiry delta for the trampoline node */ finalTrampolineFeesList,
           /* final cltv expiry delta */ cltvExpiryDelta,
-          /* route params */ Option.apply(null))
+          /* route params */ Option.apply(null)
+        )
       } else {
         log.info("sending payment (direct) [ amount=$amount ] for pr=${PaymentRequest.write(paymentRequest)}")
         val customTlvs = `Seq$`.`MODULE$`.empty<Any>() as Seq<GenericTlv>
@@ -617,7 +647,8 @@ class EclairNodeService : Service() {
           /* external id */ Option.empty(),
           /* assisted routes */ paymentRequest.routingInfo(),
           /* route params */ Option.apply(null),
-          /* custom cltvs */ customTlvs)
+          /* custom cltvs */ customTlvs
+        )
       }
 
       val res = Await.result(Patterns.ask(paymentInitiator(), sendRequest, shortTimeout), Duration.Inf())
@@ -674,7 +705,8 @@ class EclairNodeService : Service() {
     expirySeconds: Long
   ): PaymentRequest {
     return kit?.run {
-      val f = Patterns.ask(paymentHandler(),
+      val f = Patterns.ask(
+        paymentHandler(),
         MultiPartHandler.ReceivePayment(
           /* amount */ amount_opt,
           /* description */ description,
@@ -682,7 +714,9 @@ class EclairNodeService : Service() {
           /* extra routing info */ routes,
           /* fallback onchain address */ Option.empty(),
           /* payment preimage */ Option.empty(),
-          /* Standard, SwapIn,... */ paymentType), timeout)
+          /* Standard, SwapIn,... */ paymentType
+        ), timeout
+      )
       Await.result(f, Duration.Inf()) as PaymentRequest
     } ?: throw KitNotInitialized
   }
@@ -813,8 +847,8 @@ class EclairNodeService : Service() {
       serviceScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
         log.error("failed to save closing event=$event: ", e)
       }) {
-        if (event.balance == MilliSatoshi(0)) {
-          log.info("ignore closing channel event=$event because our balance is empty")
+        if (event.balance < MilliSatoshi(546_000)) {
+          log.info("ignore closing channel event=$event because our balance is too small (${event.balance})")
         } else {
           log.info("save closing channel event=$event")
           val id = UUID.randomUUID()
@@ -832,12 +866,15 @@ class EclairNodeService : Service() {
             /* fake recipient id */ fakeRecipientId,
             /* creation date */ date,
             /* payment request */ Option.empty(),
-            /* payment is always successful */ OutgoingPaymentStatus.`Pending$`.`MODULE$`)
+            /* payment is always successful */ OutgoingPaymentStatus.`Pending$`.`MODULE$`
+          )
           nodeParams().db().payments().addOutgoingPayment(paymentCounterpart)
           paymentMetaRepository.insertClosing(id.toString(), event.closingType, event.channelId.toString(), event.spendingTxs, event.scriptDestMainOutput)
           val partialPayment = PaymentSent.PartialPayment(id, event.balance, MilliSatoshi(0), ByteVector32.Zeroes(), Option.empty(), date)
-          val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, event.balance, fakeRecipientId,
-            ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))
+          val paymentCounterpartSent = PaymentSent(
+            id, paymentHash, preimage, event.balance, fakeRecipientId,
+            ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment)
+          )
           nodeParams().db().payments().updateOutgoingPayment(paymentCounterpartSent)
           EventBus.getDefault().post(PaymentPending())
         }
@@ -872,8 +909,12 @@ class EclairNodeService : Service() {
 
         // 3 - notify UI
         EventBus.getDefault().post(RemovePendingSwapIn(event.bitcoinAddress()))
-        EventBus.getDefault().post(PaymentReceived(pr.paymentHash(),
-          ScalaList.empty<PaymentReceived.PartialPayment>().`$colon$colon`(PaymentReceived.PartialPayment(event.amount(), ByteVector32.Zeroes(), System.currentTimeMillis()))))
+        EventBus.getDefault().post(
+          PaymentReceived(
+            pr.paymentHash(),
+            ScalaList.empty<PaymentReceived.PartialPayment>().`$colon$colon`(PaymentReceived.PartialPayment(event.amount(), ByteVector32.Zeroes(), System.currentTimeMillis()))
+          )
+        )
       }
     } ?: log.error("could not create and settle placeholder for on-chain payment because kit is not initialized")
   }
@@ -883,14 +924,17 @@ class EclairNodeService : Service() {
     val message = getString(R.string.legacy_notif__pay_to_open_missed_too_small_message)
     notificationManager.notify(
       Constants.NOTIF_ID__MISSED_PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__MISSED_PAY_TO_OPEN)
-      .setSmallIcon(R.drawable.ic_phoenix_outline)
-      .setContentTitle(getString(R.string.legacy_notif__pay_to_open_missed_too_small_title, Converter.printAmountPretty(event.amount(), applicationContext, withUnit = true)))
-      .setContentText(message)
-      .setStyle(NotificationCompat.BigTextStyle().bigText(message))
-      .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__MISSED_PAY_TO_OPEN,
-        Intent(applicationContext, MainActivity::class.java).apply { Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP }, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
-      .setAutoCancel(true)
-      .build())
+        .setSmallIcon(R.drawable.ic_phoenix_outline)
+        .setContentTitle(getString(R.string.legacy_notif__pay_to_open_missed_too_small_title, Converter.printAmountPretty(event.amount(), applicationContext, withUnit = true)))
+        .setContentText(message)
+        .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+        .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__MISSED_PAY_TO_OPEN,
+          Intent(applicationContext, MainActivity::class.java).apply { Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP }, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        )
+        .setAutoCancel(true)
+        .build()
+    )
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -966,9 +1010,11 @@ class EclairNodeService : Service() {
       this + amount
     }.let {
       val total = it.reduce { acc, amount -> acc.`$plus`(amount) }
-      val message = getString(R.string.legacy_notif__headless_message__received_payment,
+      val message = getString(
+        R.string.legacy_notif__headless_message__received_payment,
         Converter.printAmountPretty(total, applicationContext, withSign = false, withUnit = true),
-        Converter.printFiatPretty(applicationContext, total, withSign = false, withUnit = true))
+        Converter.printFiatPretty(applicationContext, total, withSign = false, withUnit = true)
+      )
       updateNotification(getString(R.string.legacy_notif__headless_title__received), message)
       receivedInBackground.postValue(it)
       shutdownHandler.removeCallbacksAndMessages(null)
@@ -1050,10 +1096,12 @@ sealed class KitState {
   } else null
 
   /** Get a dual-funding swap-in address usable by the modern KMP application. */
-  internal fun getKmpSwapInAddress(): String? = if (this is Started) {
+  internal suspend fun getKmpSwapInAddress(): String? = if (this is Started) {
     try {
-      val master = kit.nodeParams().keyManager().master()
-      Wallet.buildKmpSwapInAddress(master)
+      val remoteServerPublicKey = `ByteVector$`.`MODULE$`.apply(Hex.decode("03d9adb7022fb59a73a0e4eba9b94dadddbf6e1c298c8ed76594e98f8805659eea")).let {
+        Crypto.PublicKey(it)
+      }
+      (kit.nodeParams().keyManager() as LocalKeyManager).multisigSwapInAddress(remoteServerPublicKey, 144 * 30 * 6)
     } catch (e: Exception) {
       null
     }

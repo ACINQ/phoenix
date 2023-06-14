@@ -19,6 +19,7 @@ package fr.acinq.phoenix.data
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.channel.*
+import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.json.JsonSerializers
 import fr.acinq.phoenix.utils.extensions.*
 import kotlinx.serialization.encodeToString
@@ -44,6 +45,7 @@ data class LocalChannelInfo(
     val isUsable by lazy { state is Normal && !isBooting }
     /** A string version of the state's class. */
     val stateName by lazy { state::class.simpleName ?: "Unknown" }
+    // FIXME: we should also expose the raw channel's balance, which is what should be used in the channel's details screen, rather than the "smart" spendable balance returned by `localBalance()`
     /** The channel's spendable balance, as seen in [ChannelState.localBalance]. */
     val localBalance by lazy { state.localBalance() }
     /** The channel's current capacity. It actually is the funding capacity of the latest commitment. */

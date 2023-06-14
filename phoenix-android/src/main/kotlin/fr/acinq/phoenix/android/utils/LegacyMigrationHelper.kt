@@ -65,7 +65,9 @@ object LegacyMigrationHelper {
         // -- utils
 
         InternalData.saveLastUsedAppCode(context, Prefs.getLastVersionUsed(context))
-        InternalData.saveMnemonicsCheckTimestamp(context, Prefs.getMnemonicsSeenTimestamp(context))
+        val backupWasDone = Prefs.getMnemonicsSeenTimestamp(context) > 0
+        InternalData.saveManualSeedBackupDone(context, backupWasDone)
+        InternalData.saveSeedLossDisclaimerRead(context, backupWasDone)
         Prefs.getFCMToken(context)?.let { InternalData.saveFcmToken(context, it) }
         InternalData.saveShowIntro(context, Prefs.showFTUE(context))
 

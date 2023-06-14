@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android.settings.walletinfo
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.MaterialTheme
@@ -28,9 +29,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.blockchain.electrum.WalletState
+import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
-import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
@@ -39,14 +40,12 @@ import fr.acinq.phoenix.android.components.*
 fun FinalWalletInfo(
     onBackClick: () -> Unit
 ) {
-    val finalWallet by business.balanceManager.finalWallet.collectAsState()
+    val finalWallet by business.peerManager.finalWallet.collectAsState()
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.walletinfo_onchain_final))
-        ConfirmedBalanceView(balance = finalWallet?.confirmedBalance?.toMilliSatoshi())
-        if (finalWallet?.unconfirmedBalance?.takeIf { it > 0.sat } != null) {
-            UnconfirmedWalletView(wallet = finalWallet)
-        }
+        ConfirmedBalanceView(balance = finalWallet?.all?.balance?.toMilliSatoshi())
+        UnconfirmedWalletView(wallet = finalWallet)
     }
 }
 
@@ -55,24 +54,29 @@ private fun ConfirmedBalanceView(
     balance: MilliSatoshi?
 ) {
     CardHeader(text = stringResource(id = R.string.walletinfo_confirmed_title))
-    Card {
-        BalanceWithContent(balance = balance) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = stringResource(id = R.string.walletinfo_onchain_final_about), style = MaterialTheme.typography.subtitle2)
-        }
+    Card(
+        internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        BalanceRow(balance = balance)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = stringResource(id = R.string.walletinfo_onchain_final_about), style = MaterialTheme.typography.subtitle2)
     }
 }
 
 @Composable
 private fun UnconfirmedWalletView(
-    wallet: WalletState?
+    wallet: WalletState.WalletWithConfirmations?
 ) {
-    CardHeader(text = stringResource(id = R.string.walletinfo_unconfirmed_title))
-    Card {
-        BalanceWithContent(balance = wallet?.unconfirmedBalance?.toMilliSatoshi())
-        if (!wallet?.unconfirmedUtxos.isNullOrEmpty()) {
-            HSeparator()
-            wallet?.unconfirmedUtxos?.forEach { UtxoRow(it, false) }
+    if (wallet != null && wallet.unconfirmed.balance > 0.sat) {
+        CardHeader(text = stringResource(id = R.string.walletinfo_unconfirmed_title))
+        Card {
+            BalanceRow(balance = wallet.unconfirmed.balance.toMilliSatoshi())
+            if (wallet.unconfirmed.isNotEmpty()) {
+                HSeparator()
+                wallet.unconfirmed.forEach {
+                    UtxoRow(it, null)
+                }
+            }
         }
     }
 }

@@ -415,6 +415,24 @@ class AppConnectionsDaemon(
         }
     }
 
+    /** Vote to connect the target. */
+    fun forceReconnect(target: ControlTarget = ControlTarget.All) {
+        launch {
+            if (target.containsPeer) {
+                peerControlChanges.send { copy(disconnectCount = -1) }
+            }
+            if (target.containsElectrum) {
+                electrumControlChanges.send { copy(disconnectCount = -1) }
+            }
+            if (target.containsHttp) {
+                httpApiControlChanges.send { copy(disconnectCount = -1) }
+            }
+            if (target.containsTor) {
+                torControlChanges.send { copy(disconnectCount = -1) }
+            }
+        }
+    }
+
     /**
      * Attempts to connect to [name] everytime the connection changes to [Connection.CLOSED]. Repeated failed attempts
      * are throttled with an exponential backoff. This pause cannot be cancelled, which can be an issue if the network

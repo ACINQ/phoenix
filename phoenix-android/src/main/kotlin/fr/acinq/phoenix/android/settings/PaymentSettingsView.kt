@@ -72,7 +72,7 @@ fun PaymentSettingsView(
 
     val walletContext = LocalWalletContext.current
     val prefsTrampolineMaxFee by UserPrefs.getTrampolineMaxFee(context).collectAsState(null)
-    val trampolineFees = prefsTrampolineMaxFee ?: walletContext?.trampoline?.v2?.attempts?.last()?.export()
+    val trampolineFees = walletContext?.trampoline?.v3?.first()?.export()
     val prefLiquidityPolicy by UserPrefs.getLiquidityPolicy(context).collectAsState(null)
 
     val prefLnurlAuthSchemeState = UserPrefs.getLnurlAuthScheme(context).collectAsState(initial = null)
@@ -113,12 +113,11 @@ fun PaymentSettingsView(
 
         CardHeader(text = stringResource(id = R.string.paymentsettings_category_outgoing))
         Card {
-            SettingInteractive(
+            Setting(
                 title = stringResource(id = R.string.paymentsettings_trampoline_fees_title),
                 description = trampolineFees?.let {
                     stringResource(id = R.string.paymentsettings_trampoline_fees_desc, trampolineFees.feeBase, trampolineFees.proportionalFeeAsPercentageString)
-                } ?: stringResource(R.string.utils_unknown),
-                onClick = { showTrampolineMaxFeeDialog = true }
+                } ?: stringResource(R.string.utils_unknown)
             )
         }
 
@@ -288,6 +287,8 @@ private fun TrampolineMaxFeesDialog(
     onDismiss: () -> Unit,
     onConfirm: (TrampolineFees?) -> Unit,
 ) {
+    // TODO - rework to be at least the base trampoline fee
+
     var useCustomMaxFee by rememberSaveable { mutableStateOf(isCustom) }
     var feeBase by rememberSaveable { mutableStateOf<Long?>(initialTrampolineMaxFee.feeBase.toLong()) }
     var feeProportional by rememberSaveable { mutableStateOf<Double?>(initialTrampolineMaxFee.proportionalFeeAsPercentage) }

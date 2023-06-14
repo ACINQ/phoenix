@@ -45,7 +45,11 @@ class WalletManager(
 
     /** Loads a seed and creates the key manager. Returns an objet containing some keys for the iOS app. */
     fun loadWallet(seed: ByteArray): WalletInfo {
-        val km = keyManager.value ?: LocalKeyManager(seed.byteVector(), chain).also {
+        val km = keyManager.value ?: LocalKeyManager(
+            seed = seed.byteVector(),
+            chain = chain,
+            remoteSwapInServerKey = PublicKey.fromHex("03d9adb7022fb59a73a0e4eba9b94dadddbf6e1c298c8ed76594e98f8805659eea")
+        ).also {
             _localKeyManager.value = it
         }
         return WalletInfo(
@@ -98,6 +102,3 @@ fun LocalKeyManager.isMainnet() = chain == NodeParams.Chain.Mainnet
 
 val LocalKeyManager.finalOnChainWalletPath: String
     get() = (KeyManager.Bip84OnChainKeys.bip84BasePath(chain) / finalOnChainWallet.account).toString()
-
-val LocalKeyManager.swapInOnChainWalletPath: String
-    get() = (KeyManager.Bip84OnChainKeys.bip84BasePath(chain) / swapInOnChainWallet.account).toString()

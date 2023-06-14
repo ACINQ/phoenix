@@ -19,8 +19,7 @@ package fr.acinq.phoenix.db
 import com.squareup.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.CltvExpiry
-import fr.acinq.lightning.channel.ChannelStateWithCommitments
-import fr.acinq.lightning.channel.PersistedChannelState
+import fr.acinq.lightning.channel.states.PersistedChannelState
 import fr.acinq.lightning.db.ChannelsDb
 import fr.acinq.lightning.serialization.Serialization
 import kotlinx.coroutines.Dispatchers
@@ -52,11 +51,14 @@ internal class SqliteChannelsDb(private val driver: SqlDriver) : ChannelsDb {
         }
     }
 
-    override suspend fun listLocalChannels(): List<PersistedChannelState> {
-        val bytes = withContext(Dispatchers.Default) {
-            queries.listLocalChannels().executeAsList()
+    override suspend fun listLocalChannels(): List<PersistedChannelState> = withContext(Dispatchers.Default) {
+        val bytes = queries.listLocalChannels().executeAsList()
+        bytes.mapNotNull {
+            when (val res = Serialization.deserialize(it)) {
+                is Serialization.DeserializationResult.Success -> res.state
+                is Serialization.DeserializationResult.UnknownVersion -> null
+            }
         }
-        return bytes.map { Serialization.deserialize(it) }
     }
 
     override suspend fun addHtlcInfo(channelId: ByteVector32, commitmentNumber: Long, paymentHash: ByteVector32, cltvExpiry: CltvExpiry) {

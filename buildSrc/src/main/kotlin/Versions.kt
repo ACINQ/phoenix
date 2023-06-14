@@ -24,8 +24,8 @@ object Versions {
         const val compose = "1.4.3"
         const val composeCompiler = "1.4.7"
         const val navCompose = "2.5.3"
-        const val accompanist = "0.27.1"
-        const val composeConstraintLayout = "1.0.1"
+        const val accompanist = "0.30.1"
+        const val composeConstraintLayout = "1.1.0-alpha09"
         const val biometrics = "1.1.0"
 
         const val zxing = "4.1.0"
@@ -37,7 +37,7 @@ object Versions {
     }
 
     object AndroidLegacy {
-        const val eclair = "0.4.19-android-phoenix"
+        const val eclair = "0.4.20-android-phoenix"
 
         const val safeArgs = "2.4.2"
         const val appCompat = "1.3.0"

@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.ServerAddress
@@ -59,10 +60,11 @@ fun ElectrumView() {
     val nc = navController
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val business = LocalBusiness.current
     val prefElectrumServer = LocalElectrumServer.current
     var showCustomServerDialog by rememberSaveable { mutableStateOf(false) }
     val vm = viewModel<ElectrumViewModel>()
+
+    val electrumFeerate by business.peerManager.electrumFeerate.collectAsState()
 
     DefaultScreenLayout {
         DefaultScreenHeader(
@@ -70,7 +72,7 @@ fun ElectrumView() {
             title = stringResource(id = R.string.electrum_title),
         )
         Card(internalPadding = PaddingValues(16.dp)) {
-            Text(text = stringResource(R.string.electrum_about)) //, style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
+            Text(text = stringResource(R.string.electrum_about))
         }
         MVIView(CF::electrumConfiguration) { model, postIntent ->
             Card {
@@ -147,13 +149,10 @@ fun ElectrumView() {
                 }
 
                 // fee rate
-                if (model.feeRate > 0) {
-                    Setting(title = stringResource(id = R.string.electrum_fee_rate_label), description = stringResource(id = R.string.utils_fee_rate, model.feeRate.toString()))
+                electrumFeerate?.let {
+                    Setting(title = stringResource(id = R.string.electrum_fee_rate_next_label), description = "${it.nextBlockFeerate} (${FeeratePerByte(it.nextBlockFeerate)})")
+                    Setting(title = stringResource(id = R.string.electrum_fee_rate_funding_label), description = "${it.fundingFeerate} (${FeeratePerByte(it.fundingFeerate)})")
                 }
-
-                // xpub
-//                val xpub = remember { business?.walletManager?.getXpub() ?: "" to "" }
-//                Setting(title = stringResource(id = R.string.electrum_xpub_label), description = stringResource(id = R.string.electrum_xpub_value, xpub.first, xpub.second))
             }
         }
     }

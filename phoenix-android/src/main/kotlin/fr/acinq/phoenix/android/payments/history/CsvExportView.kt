@@ -29,6 +29,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.payments.history.CsvExportState
+import fr.acinq.phoenix.android.payments.history.CsvExportViewModel
 import fr.acinq.phoenix.android.utils.Converter.toBasicAbsoluteDateString
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.positiveColor
@@ -108,17 +110,17 @@ fun CsvExportView(
             when (val state = vm.state) {
                 CsvExportState.Init, is CsvExportState.Failed, is CsvExportState.NoData -> {
                     if (startTimestamp == null) {
-                        ErrorMessage(errorHeader = stringResource(id = R.string.payments_export_no_payments))
+                        ErrorMessage(header = stringResource(id = R.string.payments_export_no_payments))
                     } else if (startTimestamp > endTimestamp) {
-                        ErrorMessage(errorHeader = stringResource(id = R.string.payments_export_invalid_timestamps))
+                        ErrorMessage(header = stringResource(id = R.string.payments_export_invalid_timestamps))
                     } else {
                         if (state is CsvExportState.Failed) {
                             ErrorMessage(
-                                errorHeader = stringResource(id = R.string.payments_export_error),
-                                errorDetails = state.error.localizedMessage,
+                                header = stringResource(id = R.string.payments_export_error),
+                                details = state.error.localizedMessage,
                             )
                         } else if (state is CsvExportState.NoData) {
-                            ErrorMessage(errorHeader = stringResource(id = R.string.payments_export_no_data))
+                            ErrorMessage(header = stringResource(id = R.string.payments_export_no_data))
                         }
                         Button(
                             text = stringResource(id = R.string.payments_export_generate_button),

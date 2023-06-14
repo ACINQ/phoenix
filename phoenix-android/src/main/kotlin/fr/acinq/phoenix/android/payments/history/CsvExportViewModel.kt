@@ -14,23 +14,30 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.payments
+package fr.acinq.phoenix.android.payments.history
 
 
 import android.content.Context
 import android.net.Uri
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.content.FileProvider
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.smartDescription
-import fr.acinq.phoenix.data.*
-import fr.acinq.phoenix.db.*
-import fr.acinq.phoenix.managers.*
-import fr.acinq.phoenix.utils.*
-import kotlinx.coroutines.*
+import fr.acinq.phoenix.data.WalletPaymentFetchOptions
+import fr.acinq.phoenix.db.SqlitePaymentsDb
+import fr.acinq.phoenix.managers.PaymentsFetcher
+import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.phoenix.utils.CsvWriter
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileWriter

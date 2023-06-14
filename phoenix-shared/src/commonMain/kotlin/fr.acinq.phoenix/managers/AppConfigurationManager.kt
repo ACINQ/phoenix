@@ -18,7 +18,6 @@ import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -74,7 +73,7 @@ class AppConfigurationManager(
     val chainContext: StateFlow<WalletContext.V0.ChainContext?> = _chainContext
 
     private fun initWalletContext() = launch {
-        val (timestamp, localContext) = appDb.getWalletContextOrNull(currentWalletContextVersion)
+        val (timestamp, localContext) = appDb.getWalletContextOrNull(WalletContext.Version.V0)
 
         val freshness = (currentTimestampMillis() - timestamp).milliseconds
         logger.info { "local context was updated $freshness ago" }

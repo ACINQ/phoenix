@@ -22,14 +22,14 @@
     <path
         android:fillColor="#00000000"
         android:pathData="M18,8A6,6 0,0 0,6 8c0,7 -3,9 -3,9h18s-3,-2 -3,-9"
-        android:strokeWidth="1"
+        android:strokeWidth="1.5"
         android:strokeColor="?attr/colorPrimary"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
     <path
         android:fillColor="#00000000"
         android:pathData="M13.73,21a2,2 0,0 1,-3.46 0"
-        android:strokeWidth="1"
+        android:strokeWidth="1.5"
         android:strokeColor="?attr/colorPrimary"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />

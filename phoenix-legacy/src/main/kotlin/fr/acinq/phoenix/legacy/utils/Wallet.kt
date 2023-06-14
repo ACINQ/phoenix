@@ -26,7 +26,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
-import java.util.*
 
 object Wallet {
 
@@ -80,15 +79,6 @@ object Wallet {
       DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'/0/0")
     }
     return SingleAddressEclairWallet(getChainHash(), DeterministicWallet.derivePrivateKey(master, path).publicKey())
-  }
-
-  fun buildKmpSwapInAddress(master: DeterministicWallet.ExtendedPrivateKey): String {
-    val path = if (isMainnet()) {
-      DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/1'/0/0")
-    } else {
-      DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/1'/0/0")
-    }
-    return fr.acinq.bitcoin.scala.`package$`.`MODULE$`.computeP2WpkhAddress(DeterministicWallet.derivePrivateKey(master, path).publicKey(), getChainHash())
   }
 
   fun buildXpub(master: DeterministicWallet.ExtendedPrivateKey): Xpub {

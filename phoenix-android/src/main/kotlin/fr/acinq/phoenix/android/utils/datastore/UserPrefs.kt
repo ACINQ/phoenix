@@ -189,18 +189,21 @@ object UserPrefs {
         it[LIQUIDITY_POLICY] = json.encodeToString(serialisable)
         // also save the fee so that we don't lose the user fee preferences even when using a disabled policy
         if (policy is LiquidityPolicy.Auto) {
-            it[LIQUIDITY_PREFERRED_FEE] = json.encodeToString(LiquidityPreferredFee(maxRelativeFeeBasisPoints = policy.maxRelativeFeeBasisPoints, maxAbsoluteFee = policy.maxAbsoluteFee))
+            it[INCOMING_MAX_SAT_FEE_INTERNAL_TRACKER] = policy.maxAbsoluteFee.sat
+            it[INCOMING_MAX_PROP_FEE_INTERNAL_TRACKER] = policy.maxRelativeFeeBasisPoints
         }
     }
 
-    /** This is used to keep track of the user's preferences, even if he's not currently using a relevant liquidity policy. */
-    private val LIQUIDITY_PREFERRED_FEE = stringPreferencesKey("LIQUIDITY_PREFERRED_FEE")
-    fun getLiquidityPreferredFee(context: Context): Flow<LiquidityPreferredFee> = prefs(context).map {
-        try {
-            it[LIQUIDITY_PREFERRED_FEE]?.let { json.decodeFromString(it) }
-        } catch (e: Exception) {
-            null
-        } ?: LiquidityPreferredFee.default
+    /** This is used to keep track of the user's max fee preferences, even if he's not currently using a relevant liquidity policy. */
+    private val INCOMING_MAX_SAT_FEE_INTERNAL_TRACKER = longPreferencesKey("INCOMING_MAX_SAT_FEE_INTERNAL_TRACKER")
+    fun getIncomingMaxSatFeeInternal(context: Context): Flow<Satoshi?> = prefs(context).map {
+        it[INCOMING_MAX_SAT_FEE_INTERNAL_TRACKER]?.sat ?: NodeParamsManager.defaultLiquidityPolicy.maxAbsoluteFee
+    }
+
+    /** This is used to keep track of the user's proportional fee preferences, even if he's not currently using a relevant liquidity policy. */
+    private val INCOMING_MAX_PROP_FEE_INTERNAL_TRACKER = intPreferencesKey("INCOMING_MAX_PROP_FEE_INTERNAL_TRACKER")
+    fun getIncomingMaxPropFeeInternal(context: Context): Flow<Int?> = prefs(context).map {
+        it[INCOMING_MAX_PROP_FEE_INTERNAL_TRACKER] ?: NodeParamsManager.defaultLiquidityPolicy.maxRelativeFeeBasisPoints
     }
 
     // -- lnurl
@@ -226,6 +229,10 @@ object UserPrefs {
     fun getIsTorEnabled(context: Context): Flow<Boolean> = prefs(context).map { it[IS_TOR_ENABLED] ?: false }
     suspend fun saveIsTorEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[IS_TOR_ENABLED] = isEnabled }
 
+    private val SHOW_NOTIFICATION_PERMISSION_REMINDER = booleanPreferencesKey("SHOW_NOTIFICATION_PERMISSION_REMINDER")
+    fun getShowNotificationPermissionReminder(context: Context): Flow<Boolean> = prefs(context).map { it[SHOW_NOTIFICATION_PERMISSION_REMINDER] ?: true }
+    suspend fun saveShowNotificationPermissionReminder(context: Context, show: Boolean) = context.userPrefs.edit { it[SHOW_NOTIFICATION_PERMISSION_REMINDER] = show }
+
 }
 
 /** Our own format for [LiquidityPolicy], serializable and decoupled from lightning-kmp. */
@@ -239,13 +246,6 @@ sealed class InternalLiquidityPolicy {
         val maxRelativeFeeBasisPoints: Int,
         @Serializable(with = SatoshiSerializer::class) val maxAbsoluteFee: Satoshi
     ) : InternalLiquidityPolicy()
-}
-
-@Serializable
-data class LiquidityPreferredFee(val maxRelativeFeeBasisPoints: Int, @Serializable(with = SatoshiSerializer::class) val maxAbsoluteFee: Satoshi) {
-    companion object {
-        val default = NodeParamsManager.defaultLiquidityPolicy.let { LiquidityPreferredFee(it.maxRelativeFeeBasisPoints, it.maxAbsoluteFee) }
-    }
 }
 
 enum class HomeAmountDisplayMode {

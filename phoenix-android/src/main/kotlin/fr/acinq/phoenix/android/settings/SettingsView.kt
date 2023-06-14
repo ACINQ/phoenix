@@ -16,10 +16,14 @@
 
 package fr.acinq.phoenix.android.settings
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
@@ -27,6 +31,9 @@ import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigate
+import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
+import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -34,6 +41,19 @@ fun SettingsView() {
     val nc = navController
     DefaultScreenLayout {
         DefaultScreenHeader(title = stringResource(id = R.string.menu_settings), onBackClick = { nc.popBackStack() })
+        val scope = rememberCoroutineScope()
+        val context = LocalContext.current
+
+        // -- general
+        CardHeader(text = "DEBUG")
+        Card {
+            Button(text = "Switch to Legacy app", icon = R.drawable.ic_user, onClick = {
+                scope.launch {
+                    PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
+                }
+            }, modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start)
+        }
+
         // -- general
         CardHeader(text = stringResource(id = R.string.settings_general_title))
         Card {

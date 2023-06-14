@@ -207,8 +207,8 @@ private fun LightningInvoiceView(
         }
         state is ReceiveViewModel.LightningInvoiceState.Error -> {
             ErrorMessage(
-                errorHeader = "Failed to generate invoice",
-                errorDetails = state.e.localizedMessage
+                header = "Failed to generate invoice",
+                details = state.e.localizedMessage
             )
         }
     }
@@ -300,7 +300,10 @@ private fun BitcoinAddressView(
             QRCodeDetail(label = stringResource(id = R.string.receive_bitcoin_address_label), value = state.address)
         }
         is ReceiveViewModel.BitcoinAddressState.Error -> {
-            ErrorMessage(errorHeader = stringResource(id = R.string.receive_bitcoin_error), errorDetails = state.e.localizedMessage)
+            ErrorMessage(
+                header = stringResource(id = R.string.receive_bitcoin_error),
+                details = state.e.localizedMessage
+            )
         }
     }
 }

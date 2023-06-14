@@ -4,17 +4,18 @@ import com.squareup.sqldelight.EnumColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
-import fr.acinq.lightning.utils.Either
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.phoenix.data.WalletContext
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.data.Notification
+import fr.acinq.phoenix.data.WalletContext
+import fr.acinq.phoenix.db.notifications.NotificationsQueries
 import fracinqphoenixdb.Exchange_rates
-import io.ktor.util.date.*
+import fracinqphoenixdb.Notifications
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -26,12 +27,16 @@ class SqliteAppDb(private val driver: SqlDriver) {
         driver = driver,
         exchange_ratesAdapter = Exchange_rates.Adapter(
             typeAdapter = EnumColumnAdapter()
+        ),
+        notificationsAdapter = Notifications.Adapter(
+            type_versionAdapter = EnumColumnAdapter()
         )
     )
 
     private val paramsQueries = database.walletParamsQueries
     private val priceQueries = database.exchangeRatesQueries
     private val keyValueStoreQueries = database.keyValueStoreQueries
+    private val notificationsQueries = NotificationsQueries(database)
     private val json = Json { ignoreUnknownKeys = true }
 
     /**
@@ -185,6 +190,26 @@ class SqliteAppDb(private val driver: SqlDriver) {
             }
             now
         }
+    }
+
+    suspend fun getNotification(id: UUID): Notification? = withContext(Dispatchers.Default) {
+        notificationsQueries.get(id)
+    }
+
+    suspend fun saveNotification(notification: Notification) = withContext(Dispatchers.Default) {
+        notificationsQueries.save(notification)
+    }
+
+    suspend fun dismissNotifications(ids: Set<UUID>) = withContext(Dispatchers.Default) {
+        notificationsQueries.markAsRead(ids)
+    }
+
+    suspend fun dimissAllNotifications() {
+        notificationsQueries.markAllAsRead()
+    }
+
+    suspend fun listUnreadNotification(): Flow<List<Pair<Set<UUID>, Notification>>> = withContext(Dispatchers.Default) {
+        notificationsQueries.listUnread()
     }
 
     fun close() {

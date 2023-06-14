@@ -31,24 +31,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
-import fr.acinq.lightning.channel.Command
+import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.payments.cpfp.CpfpState
 import fr.acinq.phoenix.android.payments.spliceout.SpliceOutState
 import fr.acinq.phoenix.android.payments.spliceout.SpliceOutViewModel
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -130,9 +125,17 @@ fun SendSpliceOutView(
             is SpliceOutState.Init, is SpliceOutState.Error -> {
                 Spacer(modifier = Modifier.height(32.dp))
                 if (state is SpliceOutState.Error.Thrown) {
-                    ErrorMessage(errorHeader = stringResource(id = R.string.send_spliceout_error_failure), errorDetails = state.e.localizedMessage, alignment = Alignment.CenterHorizontally)
+                    ErrorMessage(
+                        header = stringResource(id = R.string.send_spliceout_error_failure),
+                        details = state.e.localizedMessage,
+                        alignment = Alignment.CenterHorizontally,
+                    )
                 } else if (state is SpliceOutState.Error.NoChannels) {
-                    ErrorMessage(errorHeader = stringResource(id = R.string.send_spliceout_error_failure), errorDetails = stringResource(id = R.string.splice_error_nochannels), alignment = Alignment.CenterHorizontally)
+                    ErrorMessage(
+                        header = stringResource(id = R.string.send_spliceout_error_failure),
+                        details = stringResource(id = R.string.splice_error_nochannels),
+                        alignment = Alignment.CenterHorizontally,
+                    )
                 }
                 BorderButton(
                     text = stringResource(id = R.string.send_spliceout_prepare_button),
@@ -168,7 +171,10 @@ fun SendSpliceOutView(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 if (balance != null && total.toMilliSatoshi() > balance) {
-                    ErrorMessage(errorHeader = stringResource(R.string.send_spliceout_error_cannot_afford_fees), alignment = Alignment.CenterHorizontally)
+                    ErrorMessage(
+                        header = stringResource(R.string.send_spliceout_error_cannot_afford_fees),
+                        alignment = Alignment.CenterHorizontally,
+                    )
                 } else {
                     FilledButton(
                         text = stringResource(id = R.string.send_pay_button),
@@ -189,18 +195,18 @@ fun SendSpliceOutView(
             is SpliceOutState.Complete.Failure -> {
                 Spacer(modifier = Modifier.height(24.dp))
                 ErrorMessage(
-                    errorHeader = stringResource(id = R.string.send_spliceout_error_failure),
-                    errorDetails = when (state.result) {
-                        is Command.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, state.result.reason)
-                        is Command.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
-                        is Command.Splice.Response.Failure.ChannelNotIdle -> stringResource(id = R.string.splice_error_channel_not_idle)
-                        is Command.Splice.Response.Failure.Disconnected -> stringResource(id = R.string.splice_error_disconnected)
-                        is Command.Splice.Response.Failure.FundingFailure -> stringResource(id = R.string.splice_error_funding_error, state.result.reason.javaClass.simpleName)
-                        is Command.Splice.Response.Failure.InsufficientFunds -> stringResource(id = R.string.splice_error_insufficient_funds)
-                        is Command.Splice.Response.Failure.CannotStartSession -> stringResource(id = R.string.splice_error_cannot_start_session)
-                        is Command.Splice.Response.Failure.InteractiveTxSessionFailed -> stringResource(id = R.string.splice_error_interactive_session, state.result.reason.javaClass.simpleName)
-                        is Command.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> stringResource(id = R.string.splice_error_invalid_pubkey)
-                        is Command.Splice.Response.Failure.SpliceAlreadyInProgress -> stringResource(id = R.string.splice_error_splice_in_progress)
+                    header = stringResource(id = R.string.send_spliceout_error_failure),
+                    details = when (state.result) {
+                        is ChannelCommand.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, state.result.reason)
+                        is ChannelCommand.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
+                        is ChannelCommand.Splice.Response.Failure.ChannelNotIdle -> stringResource(id = R.string.splice_error_channel_not_idle)
+                        is ChannelCommand.Splice.Response.Failure.Disconnected -> stringResource(id = R.string.splice_error_disconnected)
+                        is ChannelCommand.Splice.Response.Failure.FundingFailure -> stringResource(id = R.string.splice_error_funding_error, state.result.reason.javaClass.simpleName)
+                        is ChannelCommand.Splice.Response.Failure.InsufficientFunds -> stringResource(id = R.string.splice_error_insufficient_funds)
+                        is ChannelCommand.Splice.Response.Failure.CannotStartSession -> stringResource(id = R.string.splice_error_cannot_start_session)
+                        is ChannelCommand.Splice.Response.Failure.InteractiveTxSessionFailed -> stringResource(id = R.string.splice_error_interactive_session, state.result.reason.javaClass.simpleName)
+                        is ChannelCommand.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> stringResource(id = R.string.splice_error_invalid_pubkey)
+                        is ChannelCommand.Splice.Response.Failure.SpliceAlreadyInProgress -> stringResource(id = R.string.splice_error_splice_in_progress)
                     },
                     alignment = Alignment.CenterHorizontally
                 )

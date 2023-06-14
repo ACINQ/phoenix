@@ -193,3 +193,44 @@ fun NumberInput(
         )
     }
 }
+
+
+@Composable
+fun RowScope.InlineNumberInput(
+    modifier: Modifier = Modifier,
+    placeholder: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    enabled: Boolean = true,
+    value: Double?,
+    onValueChange: (Double?) -> Unit,
+    isError: Boolean,
+    acceptDecimal: Boolean = true,
+) {
+    val focusManager = LocalFocusManager.current
+    var internalText by remember { mutableStateOf(value?.let { if (acceptDecimal) it.toString() else it.toLong().toString() } ?: "") }
+
+    OutlinedTextField(
+        value = internalText,
+        onValueChange = {
+            internalText = it
+            onValueChange(it.toDoubleOrNull())
+        },
+        isError = isError,
+        enabled = enabled,
+        label = null,
+        placeholder = placeholder,
+        trailingIcon = trailingIcon,
+        singleLine = true,
+        maxLines = 1,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Number,
+            capitalization = KeyboardCapitalization.None,
+            autoCorrect = false,
+        ),
+        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+        colors = outlinedTextFieldColors(),
+        shape = RoundedCornerShape(8.dp),
+        modifier = modifier.alignByBaseline().enableOrFade(enabled)
+    )
+}

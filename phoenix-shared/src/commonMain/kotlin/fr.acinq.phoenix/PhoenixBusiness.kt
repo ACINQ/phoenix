@@ -100,6 +100,7 @@ class PhoenixBusiness(
     val currencyManager by lazy { CurrencyManager(this) }
     val connectionsManager by lazy { ConnectionsManager(this) }
     val lnurlManager by lazy { LnurlManager(this) }
+    val notificationsManager by lazy { NotificationsManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
     val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(loggerFactory)) }
 
@@ -118,7 +119,7 @@ class PhoenixBusiness(
      * BEFORE invoking this function, to ensure a clean disconnect from the server.
      */
     fun stop() {
-//        electrumClient.stop()
+        electrumClient.stop()
         electrumClient.cancel()
         electrumWatcher.stop()
         electrumWatcher.cancel()
@@ -135,6 +136,7 @@ class PhoenixBusiness(
         appConfigurationManager.cancel()
         currencyManager.cancel()
         lnurlManager.cancel()
+        notificationsManager.cancel()
         logMemory.cancel()
     }
 

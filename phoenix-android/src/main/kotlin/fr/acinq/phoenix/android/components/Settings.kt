@@ -184,7 +184,7 @@ fun SettingSwitch(
     modifier: Modifier = Modifier,
     title: String,
     description: String? = null,
-    icon: Int = R.drawable.ic_blank,
+    icon: Int? = null,
     enabled: Boolean,
     isChecked: Boolean,
     onCheckChangeAttempt: ((Boolean) -> Unit)
@@ -197,8 +197,10 @@ fun SettingSwitch(
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize))
-            Spacer(Modifier.width(12.dp))
+            icon?.let {
+                PhoenixIcon(it, Modifier.size(ButtonDefaults.IconSize))
+                Spacer(Modifier.width(12.dp))
+            }
             Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
             Spacer(Modifier.width(16.dp))
             Switch(checked = isChecked, onCheckedChange = null)
@@ -206,7 +208,9 @@ fun SettingSwitch(
         if (description != null) {
             Spacer(modifier = Modifier.height(2.dp))
             Row(Modifier.fillMaxWidth()) {
-                Spacer(modifier = Modifier.width(30.dp))
+                icon?.let {
+                    Spacer(modifier = Modifier.width(30.dp))
+                }
                 Text(text = description, style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f))
                 Spacer(Modifier.width(48.dp))
             }

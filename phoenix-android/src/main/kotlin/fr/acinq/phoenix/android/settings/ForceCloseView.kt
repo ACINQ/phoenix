@@ -45,7 +45,7 @@ fun ForceCloseView(
     val log = logger("ForceCloseView")
     var showConfirmationDialog by remember { mutableStateOf(false) }
 
-    MVIView(CF::closeChannelsConfiguration) { model, postIntent ->
+    MVIView(CF::forceCloseChannelsConfiguration) { model, postIntent ->
         DefaultScreenLayout {
             DefaultScreenHeader(
                 onBackClick = onBackClick,
@@ -87,7 +87,7 @@ fun ForceCloseView(
                     }
                     if (showConfirmationDialog) {
                         ConfirmDialog(
-                            message = stringResource(R.string.mutualclose_confirm),
+                            message = stringResource(R.string.mutualclose_confirm, model.address),
                             onDismiss = { showConfirmationDialog = false },
                             onConfirm = {
                                 postIntent(CloseChannelsConfiguration.Intent.ForceCloseAllChannels)

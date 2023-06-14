@@ -4,6 +4,7 @@ import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.channel.*
+import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.io.WrappedChannelCommand
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.PeerManager
@@ -119,18 +120,17 @@ class AppCloseChannelsConfigurationController(
                 isClosable(it.value)
             }
 
-            closingChannelIds = closingChannelIds?.let {
-                it.plus(filteredChannels.keys)
-            } ?: filteredChannels.keys
+            closingChannelIds = closingChannelIds?.plus(filteredChannels.keys) ?: filteredChannels.keys
 
             filteredChannels.keys.forEach { channelId ->
-                val command: CloseCommand = if (scriptPubKey != null) {
-                    CMD_CLOSE(scriptPubKey = ByteVector(scriptPubKey), feerates = null)
+                val command: ChannelCommand = if (scriptPubKey != null) {
+                    logger.info { "(mutual) closing channel=${channelId.toHex()}" }
+                    ChannelCommand.Close.MutualClose(scriptPubKey = ByteVector(scriptPubKey), feerates = null)
                 } else {
-                    CMD_FORCECLOSE
+                    logger.info { "(force) closing channel=${channelId.toHex()}" }
+                    ChannelCommand.Close.ForceClose
                 }
-                val channelEvent = ChannelCommand.ExecuteCommand(command)
-                val peerEvent = WrappedChannelCommand(channelId, channelEvent)
+                val peerEvent = WrappedChannelCommand(channelId, command)
                 peer.send(peerEvent)
             }
         }

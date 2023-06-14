@@ -16,28 +16,46 @@
 
 package fr.acinq.phoenix.android
 
+import android.Manifest
 import android.net.*
+import android.text.format.DateUtils
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.Dialog
+import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.home.*
 import fr.acinq.phoenix.android.init.*
 import fr.acinq.phoenix.android.intro.IntroView
 import fr.acinq.phoenix.android.payments.*
+import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
+import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
+import fr.acinq.phoenix.android.settings.displayseed.DisplaySeedView
+import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
+import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
 import fr.acinq.phoenix.android.utils.appBackground
+import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -46,6 +64,8 @@ import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import kotlinx.coroutines.flow.filterNotNull
+import org.kodein.memory.util.currentTimestampMillis
 
 
 @Composable
@@ -85,6 +105,9 @@ fun AppView(
             )
         )
 
+        val noticesViewModel = viewModel<NoticesViewModel>(factory = NoticesViewModel.Factory(appConfigurationManager = business.appConfigurationManager))
+        monitorNotices(vm = noticesViewModel)
+
         val legacyAppStatus = PrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
         if (legacyAppStatus.value is LegacyAppStatus.Required && navController.currentDestination?.route != Screen.SwitchToLegacy.route) {
             navController.navigate(Screen.SwitchToLegacy.route)
@@ -114,7 +137,7 @@ fun AppView(
                 composable(
                     route = "${Screen.Startup.route}?next={next}",
                     arguments = listOf(
-                        navArgument("next") { type = NavType.StringType ; nullable = true }
+                        navArgument("next") { type = NavType.StringType; nullable = true }
                     ),
                 ) {
                     val nextScreenLink = it.arguments?.getString("next")
@@ -152,6 +175,7 @@ fun AppView(
                     RequireStarted(appVM.walletState.value) {
                         HomeView(
                             paymentsViewModel = paymentsViewModel,
+                            noticesViewModel = noticesViewModel,
                             onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },
                             onSettingsClick = { navController.navigate(Screen.Settings.route) },
                             onReceiveClick = { navController.navigate(Screen.Receive.route) },
@@ -159,7 +183,9 @@ fun AppView(
                             onPaymentsHistoryClick = { navController.navigate(Screen.PaymentsHistory.route) },
                             onTorClick = { navController.navigate(Screen.TorConfig) },
                             onElectrumClick = { navController.navigate(Screen.ElectrumServer) },
-                            onShowSwapInWallet = { navController.navigate(Screen.WalletInfo.SwapInWallet) }
+                            onShowSwapInWallet = { navController.navigate(Screen.WalletInfo.SwapInWallet) },
+                            onShowChannels = { navController.navigate(Screen.Channels) },
+                            onShowNotifications = { navController.navigate(Screen.Notifications) }
                         )
                     }
                 }
@@ -218,7 +244,7 @@ fun AppView(
                     SettingsView()
                 }
                 composable(Screen.DisplaySeed.route) {
-                    SeedView()
+                    DisplaySeedView()
                 }
                 composable(Screen.ElectrumServer.route) {
                     ElectrumView()
@@ -229,7 +255,7 @@ fun AppView(
                 composable(Screen.Channels.route) {
                     ChannelsView(
                         onBackClick = { navController.popBackStack() },
-                        onChannelClick = { navController.navigate("${Screen.ChannelDetails.route}?id=$it")}
+                        onChannelClick = { navController.navigate("${Screen.ChannelDetails.route}?id=$it") }
                     )
                 }
                 composable(
@@ -293,19 +319,42 @@ fun AppView(
                     FinalWalletInfo(onBackClick = { navController.popBackStack() })
                 }
                 composable(Screen.LiquidityPolicy.route) {
-                    LiquidityPolicyView(onBackClick = { navController.popBackStack() })
+                    LiquidityPolicyView(onBackClick = { navController.popBackStack() }, onAdvancedClick = { navController.navigate(Screen.AdvancedLiquidityPolicy.route) })
+                }
+                composable(Screen.AdvancedLiquidityPolicy.route) {
+                    AdvancedIncomingFeePolicy(onBackClick = { navController.popBackStack() })
+                }
+                composable(Screen.Notifications.route) {
+                    NotificationsView(
+                        noticesViewModel = noticesViewModel,
+                        onBackClick = { navController.popBackStack() }
+                    )
+                }
+                composable(
+                    route = "${Screen.PaymentRejectedDetails.route}?id={id}",
+                    arguments = listOf(navArgument("id") { type = NavType.StringType })
+                ) {
+                    val id = it.arguments?.getString("id")?.let { UUID.fromString(it) }
+                    PaymentRejectedDetailsView(
+                        id = id,
+                        onBackClick = { navController.popBackStack() }
+                    )
                 }
             }
         }
     }
 
     val lastCompletedPayment = business.paymentsManager.lastCompletedPayment.collectAsState().value
-
     if (lastCompletedPayment != null) {
         log.debug { "completed payment=${lastCompletedPayment}" }
         LaunchedEffect(key1 = lastCompletedPayment.walletPaymentId()) {
             navigateToPaymentDetails(navController, id = lastCompletedPayment.walletPaymentId(), isFromEvent = true)
         }
+    }
+
+    val isUpgradeRequired by business.peerManager.upgradeRequired.collectAsState(false)
+    if (isUpgradeRequired) {
+        UpgradeRequiredBlockingDialog()
     }
 }
 
@@ -318,6 +367,45 @@ private fun popToHome(navController: NavHostController) {
 
 fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId, isFromEvent: Boolean) {
     navController.navigate("${Screen.PaymentDetails.route}?direction=${id.dbType.value}&id=${id.dbId}&fromEvent=${isFromEvent}")
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun monitorNotices(
+    vm: NoticesViewModel
+) {
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        InternalData.showSeedBackupNotice(context).collect {
+            if (it) {
+                vm.addNotice(Notice.BackupSeedReminder)
+            } else {
+                vm.removeNotice(Notice.BackupSeedReminder)
+            }
+        }
+    }
+
+    val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+    LaunchedEffect(Unit) {
+        UserPrefs.getShowNotificationPermissionReminder(context).collect {
+            if (it && !notificationPermission.status.isGranted) {
+                vm.addNotice(Notice.NotificationPermission)
+            } else {
+                vm.removeNotice(Notice.NotificationPermission)
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        InternalData.getChannelsWatcherOutcome(context).filterNotNull().collect {
+            if (currentTimestampMillis() - it.timestamp > 6 * DateUtils.DAY_IN_MILLIS) {
+                vm.addNotice(Notice.WatchTowerLate)
+            } else {
+                vm.removeNotice(Notice.WatchTowerLate)
+            }
+        }
+    }
 }
 
 @Composable
@@ -342,4 +430,33 @@ sealed class LockState {
     }
 
     object Unlocked : LockState()
+}
+
+@Composable
+private fun UpgradeRequiredBlockingDialog() {
+    val context = LocalContext.current
+    Dialog(
+        onDismiss = {},
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false, usePlatformDefaultWidth = false),
+        title = stringResource(id = R.string.upgraderequired_title),
+        buttons = null
+    ) {
+        Text(
+            text = stringResource(id = R.string.upgraderequired_message, BuildConfig.VERSION_NAME),
+            modifier = Modifier.padding(horizontal = 24.dp),
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(
+            text = stringResource(id = R.string.upgraderequired_button),
+            icon = R.drawable.ic_external_link,
+            space = 8.dp,
+            shape = RoundedCornerShape(12.dp),
+            onClick = { openLink(context = context, link = "https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet") },
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .fillMaxWidth(),
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+    }
 }

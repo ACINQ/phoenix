@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 ACINQ SAS
+ * Copyright 2023 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.payments
+package fr.acinq.phoenix.android.payments.details
 
 import android.text.format.DateUtils
 import androidx.compose.foundation.layout.*

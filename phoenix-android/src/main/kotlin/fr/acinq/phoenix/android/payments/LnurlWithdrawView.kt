@@ -90,8 +90,8 @@ fun LnurlWithdrawView(
                 val error = model.error
                 if (error != null && error is Scan.LnurlWithdrawError.RemoteError) {
                     ErrorMessage(
-                        errorHeader = stringResource(id = R.string.lnurl_withdraw_error_header),
-                        annotatedDetails = getRemoteErrorMessage(error = error.err)
+                        header = stringResource(id = R.string.lnurl_withdraw_error_header),
+                        details = getRemoteErrorMessage(error = error.err)
                     )
                     Spacer(modifier = Modifier.height(32.dp))
                 }
