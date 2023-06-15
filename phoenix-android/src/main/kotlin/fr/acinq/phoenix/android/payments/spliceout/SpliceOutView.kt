@@ -39,6 +39,7 @@ import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.payments.spliceout.SpliceOutState
 import fr.acinq.phoenix.android.payments.spliceout.SpliceOutViewModel
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
@@ -223,10 +224,10 @@ private fun SpliceOutFeeSummaryView(
     total: Satoshi,
 ) {
     SplashLabelRow(label = stringResource(id = R.string.send_spliceout_complete_recap_fee), helpMessage = "Uses an actual feerate of ${actualFeerate}. Takes into account the chain of unconfirmed txs.") {
-        AmountWithFiatColumnView(amount = fee.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
+        AmountWithFiatBelow(amount = fee.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
     }
     SplashLabelRow(label = stringResource(id = R.string.send_spliceout_complete_recap_total)) {
-        AmountWithFiatColumnView(amount = total.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
+        AmountWithFiatBelow(amount = total.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
     }
     // TODO: show a warning if the fee is too large
 }

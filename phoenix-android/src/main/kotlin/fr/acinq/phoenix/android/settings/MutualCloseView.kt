@@ -131,8 +131,7 @@ fun MutualCloseView(
                                 TextInput(
                                     text = address,
                                     onTextChange = { addressErrorMessage = ""; address = it },
-                                    label = { Text(text = stringResource(id = R.string.mutualclose_input_hint)) },
-                                    placeholder = { Text(text = stringResource(id = R.string.mutualclose_input_placeholder)) },
+                                    staticLabel = stringResource(id = R.string.mutualclose_input_label),
                                     trailingIcon = {
                                         Button(
                                             onClick = { showScannerView = true },

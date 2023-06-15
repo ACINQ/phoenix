@@ -14,25 +14,30 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components
+package fr.acinq.phoenix.android.components.feedback
 
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.feedback.FeedbackMessage
 import fr.acinq.phoenix.android.utils.orange
 
 @Composable
 fun WarningMessage(
     header: String,
     details: String,
+    headerStyle: TextStyle = MaterialTheme.typography.body2,
+    detailsStyle: TextStyle = MaterialTheme.typography.subtitle2,
     modifier: Modifier = Modifier,
     alignment: Alignment.Horizontal = Alignment.Start,
 ) {
     FeedbackMessage(
         header = header,
         details = details,
+        headerStyle = headerStyle,
+        detailsStyle = detailsStyle,
         icon = R.drawable.ic_alert_triangle,
         iconColor = orange,
         modifier = modifier,

@@ -16,16 +16,7 @@
 
 package fr.acinq.phoenix.android.settings.fees
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.MaterialTheme
@@ -48,17 +39,7 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.CardHeader
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.HSeparator
-import fr.acinq.phoenix.android.components.InlineNumberInput
-import fr.acinq.phoenix.android.components.PhoenixIcon
-import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.SettingSwitch
-import fr.acinq.phoenix.android.components.enableOrFade
+import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
@@ -182,7 +163,7 @@ private fun EditMaxFee(
     electrumFeerate: ElectrumFeerate?,
 ) {
     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.Top) {
             var isError by remember { mutableStateOf(false) }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -193,7 +174,7 @@ private fun EditMaxFee(
                 when {
                     maxAbsoluteFee == null -> {
                         Text(
-                            text = stringResource(id = R.string.validation_invalid_number),
+                            text = stringResource(id = R.string.validation_invalid_amount),
                             style = MaterialTheme.typography.subtitle2.copy(color = negativeColor),
                         )
                     }
@@ -219,11 +200,11 @@ private fun EditMaxFee(
 
             }
             Spacer(Modifier.width(12.dp))
-            InlineNumberInput(
-                value = maxAbsoluteFee?.sat?.toDouble(),
-                onValueChange = {
+            InlineSatoshiInput(
+                amount = maxAbsoluteFee,
+                onAmountChange = {
                     when {
-                        it == null || it < 0 || it > 500_000 -> {
+                        it == null || it < 0.sat || it > 500_000.sat -> {
                             isError = true
                             onMaxFeeChange(null)
                         }
@@ -234,9 +215,8 @@ private fun EditMaxFee(
                     }
                 },
                 isError = isError,
-                acceptDecimal = false,
                 trailingIcon = { Text(text = "sat") },
-                modifier = Modifier.width(130.dp),
+                modifier = Modifier.width(150.dp),
             )
         }
         Spacer(modifier = Modifier.height(16.dp))

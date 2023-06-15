@@ -131,16 +131,26 @@
     <string name="receive_lightning_generating">Generating…</string>
     <string name="receive_lightning_amount_label">Amount</string>
     <string name="receive_lightning_desc_label">Desc</string>
-    <string name="receive_lightning_error">Could not generate an invoice</string>
+    <string name="receive_lightning_error">Could not generate invoice</string>
     <string name="receive_lightning_share_subject">Lightning invoice</string>
     <string name="receive_lightning_share_title">Share this Lightning invoice with…</string>
 
     <string name="receive_lightning_edit_button">Edit</string>
-    <string name="receive_lightning_edit_title">Edit my invoice</string>
+    <string name="receive_lightning_edit_title">Edit invoice</string>
     <string name="receive_lightning_edit_amount_label">Amount (optional)</string>
-    <string name="receive_lightning_edit_amount_placeholder">Any amount</string>
-    <string name="receive_lightning_edit_desc_label">Description (optional):</string>
+    <string name="receive_lightning_edit_amount_placeholder">Amount to receive</string>
+    <string name="receive_lightning_edit_desc_label">Description (optional)</string>
+    <string name="receive_lightning_edit_desc_placeholder">Payment description</string>
     <string name="receive_lightning_edit_generate_button">Create invoice</string>
+
+    <string name="receive_lightning_warning_surefail">Payment will fail.</string>
+    <string name="receive_lightning_warning_mayfail">Payment may fail.</string>
+    <string name="receive_lightning_warning_fee_expected">Fee expected.</string>
+    <string name="receive_lightning_warning_fee_no_liquidity">Channels liquidity is low.</string>
+    <string name="receive_lightning_warning_fee_policy_disabled_no_channels">Tap to enable incoming fees.</string>
+    <string name="receive_lightning_warning_fee_policy_disabled_no_liquidity">Liquidity is low. Tap to enable incoming fees.</string>
+    <string name="receive_lightning_warning_fee_within_policy">A %1$s (≈ %2$s) mining fee may be needed to receive this payment. Tap to configure.</string>
+    <string name="receive_lightning_warning_fee_exceeds_policy">The fee will probably be above your max limit (%1$s). Tap to configure.</string>
 
     <!-- send -->
 
@@ -202,7 +212,7 @@
 
     <string name="scan_manual_input_title">Manual input</string>
     <string name="scan_manual_input_instructions">Enter a Lightning invoice, LNURL, or Lightning address you want to send money to.</string>
-    <string name="scan_manual_input_hint">Enter an invoice or a LN address</string>
+    <string name="scan_manual_input_label">Invoice or LN address</string>
 
     <!-- utils: misc strings -->
 
@@ -223,6 +233,7 @@
     <string name="accessibility_link">Open link in a browser</string>
     <string name="accessibility_explorer_link">Open transaction in an explorer</string>
     <string name="validation_empty">This field cannot be blank</string>
+    <string name="validation_invalid_amount">Please enter a valid amount</string>
     <string name="validation_invalid_number">Please enter a valid number</string>
     <string name="validation_no_decimal">This field must be an integer</string>
     <string name="validation_below_min">Must be at least %1$s</string>
@@ -266,7 +277,7 @@
     <string name="mutualclose_balance">Balance: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">The wallet does not have any channels and cannot be drained.</string>
     <string name="mutualclose_input_instructions">Send all funds to a Bitcoin wallet. All payments channels will be closed.</string>
-    <string name="mutualclose_input_hint">Bitcoin address</string>
+    <string name="mutualclose_input_label">Bitcoin address</string>
     <string name="mutualclose_input_placeholder">Enter a Bitcoin address here</string>
     <string name="mutualclose_button">Drain my wallet</string>
     <string name="mutualclose_error_chain_mismatch">This address uses a different blockchain</string>
@@ -452,6 +463,7 @@
     <string name="paymentdetails_desc_swapin">On-chain deposit</string>
 
     <string name="paymentdetails_edit_dialog_title">Add a custom description to this payment</string>
+    <string name="paymentdetails_edit_dialog_input_label">Description</string>
     <string name="paymentdetails_attach_desc_button">Attach note</string>
     <string name="paymentdetails_edit_desc_button">Edit note</string>
     <string name="paymentdetails_details_button">Technical details</string>
@@ -749,8 +761,8 @@
     <string name="paymentsettings_defaultdesc_title">Invoice description</string>
     <string name="paymentsettings_defaultdesc_none">No description set…</string>
     <string name="paymentsettings_defaultdesc_dialog_title">Default description</string>
-    <string name="paymentsettings_defaultdesc_dialog_description">Invoices that you create will use this description. You can override it on a case-by-case basis.</string>
-    <string name="paymentsettings_defaultdesc_dialog_hint">Enter a description</string>
+    <string name="paymentsettings_defaultdesc_dialog_description">Your invoices will use this description by default. You can override it on a case-by-case basis.</string>
+    <string name="paymentsettings_defaultdesc_dialog_label">Invoice description</string>
 
     <string name="paymentsettings_expiry_title">Invoice expiry</string>
     <string name="paymentsettings_expiry_dialog_title">Invoice expiry</string>

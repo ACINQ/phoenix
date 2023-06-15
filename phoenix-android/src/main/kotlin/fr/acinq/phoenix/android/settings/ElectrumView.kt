@@ -206,7 +206,8 @@ private fun ElectrumServerDialog(
                         }
                         address = it
                     },
-                    label = { Text(stringResource(id = R.string.electrum_dialog_input)) },
+                    maxLines = 4,
+                    staticLabel = stringResource(id = R.string.electrum_dialog_input),
                     enabled = useCustomServer && connectionCheck != ElectrumViewModel.CertificateCheckState.Checking
                 )
                 if (addressError) {

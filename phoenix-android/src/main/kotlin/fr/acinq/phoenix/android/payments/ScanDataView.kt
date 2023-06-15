@@ -17,10 +17,8 @@
 
 package fr.acinq.phoenix.android.payments
 
-import android.*
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.*
 import android.provider.*
 import androidx.compose.foundation.background
@@ -30,7 +28,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -41,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.app.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -52,7 +48,6 @@ import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
-import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
@@ -60,10 +55,8 @@ import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.databinding.ScanViewBinding
 import fr.acinq.phoenix.android.utils.*
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ScanController
-import fr.acinq.phoenix.controllers.payments.MaxFees
 import fr.acinq.phoenix.controllers.payments.Scan
 
 
@@ -363,7 +356,7 @@ private fun ManualInputDialog(
                 text = input,
                 onTextChange = { input = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(text = stringResource(id = R.string.scan_manual_input_hint)) },
+                staticLabel = stringResource(id = R.string.scan_manual_input_label),
             )
         }
     }

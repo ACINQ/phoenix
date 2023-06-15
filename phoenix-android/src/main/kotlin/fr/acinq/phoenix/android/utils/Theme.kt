@@ -284,13 +284,13 @@ fun textFieldColors() = TextFieldDefaults.textFieldColors(
 @Composable
 fun outlinedTextFieldColors() = TextFieldDefaults.outlinedTextFieldColors(
     focusedLabelColor = MaterialTheme.colors.primary,
-    unfocusedLabelColor = MaterialTheme.typography.caption.color,
+    unfocusedLabelColor = MaterialTheme.typography.body1.color,
     focusedBorderColor = MaterialTheme.colors.primary,
-    unfocusedBorderColor = borderColor,
+    unfocusedBorderColor = MaterialTheme.colors.primary, //MaterialTheme.typography.body1.color,
     disabledTextColor = MaterialTheme.colors.onSurface,
-    disabledBorderColor = MaterialTheme.colors.onSurface,
-    disabledLabelColor = MaterialTheme.colors.onSurface,
-    disabledPlaceholderColor = MaterialTheme.colors.onSurface,
+    disabledBorderColor = mutedBgColor,
+    disabledLabelColor = mutedTextColor,
+    disabledPlaceholderColor = mutedTextColor,
 )
 
 /** Get a color using the old way. Use in legacy AndroidView. */

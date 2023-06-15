@@ -474,6 +474,7 @@ private fun EditPaymentDetails(
                 onTextChange = { description = it.takeIf { it.isNotBlank() } },
                 maxLines = 6,
                 maxChars = 280,
+                staticLabel = stringResource(id = R.string.paymentdetails_edit_dialog_input_label)
             )
         }
     }

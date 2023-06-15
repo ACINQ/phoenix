@@ -16,24 +16,29 @@
 
 package fr.acinq.phoenix.android.components.feedback
 
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.utils.positiveColor
 
 @Composable
-fun SuccessMessage(
+fun InfoMessage(
     header: String,
     details: String,
+    headerStyle: TextStyle = MaterialTheme.typography.body2,
+    detailsStyle: TextStyle = MaterialTheme.typography.subtitle2,
     modifier: Modifier = Modifier,
-    alignment: Alignment.Horizontal
+    alignment: Alignment.Horizontal = Alignment.Start,
 ) {
     FeedbackMessage(
         header = header,
         details = details,
-        icon = R.drawable.ic_check_circle,
-        iconColor = positiveColor,
+        headerStyle = headerStyle,
+        detailsStyle = detailsStyle,
+        icon = R.drawable.ic_info,
+        iconColor = MaterialTheme.colors.primary,
         modifier = modifier,
         alignment = alignment,
     )

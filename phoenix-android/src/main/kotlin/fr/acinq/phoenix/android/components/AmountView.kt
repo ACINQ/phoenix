@@ -145,19 +145,21 @@ fun AmountWithAltView(
 
 /** Outputs a column with the amount in bitcoin on top, and the fiat amount below. */
 @Composable
-fun AmountWithFiatColumnView(
+fun ColumnScope.AmountWithFiatBelow(
     amount: MilliSatoshi,
-    modifier: Modifier = Modifier,
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
-    unitTextStyle: TextStyle = MaterialTheme.typography.body1,
     fiatTextStyle: TextStyle = MaterialTheme.typography.caption,
-    separatorSpace: Dp = 4.dp,
 ) {
     val prefBtcUnit = LocalBitcoinUnit.current
-    Column {
-        AmountView(amount = amount, amountTextStyle = amountTextStyle, unitTextStyle = unitTextStyle, separatorSpace = separatorSpace, modifier = modifier, forceUnit = prefBtcUnit, onClick = null)
-        AmountInFiatView(amount = amount, style = fiatTextStyle)
-    }
+    val prefFiatCurrency = LocalFiatCurrency.current
+    Text(
+        text = amount.toPrettyString(prefBtcUnit, withUnit = true),
+        style = amountTextStyle,
+    )
+    Text(
+        text = stringResource(id = R.string.utils_converted_amount, amount.toPrettyString(prefFiatCurrency, fiatRate, withUnit = true)),
+        style = fiatTextStyle,
+    )
 }
 
 /** Outputs a row with the amount in bitcoin on the left, and the fiat amount on the right. */

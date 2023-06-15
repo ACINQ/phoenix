@@ -346,6 +346,7 @@ fun Clickable(
     val contentColor by colors.contentColor(true)
     Surface(
         shape = RectangleShape,
+        color = backgroundColor,
         contentColor = contentColor,
         elevation = 0.dp,
         modifier = modifier

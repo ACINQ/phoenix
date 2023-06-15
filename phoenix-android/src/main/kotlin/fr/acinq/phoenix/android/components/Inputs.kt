@@ -17,6 +17,9 @@
 package fr.acinq.phoenix.android.components
 
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -27,6 +30,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -45,7 +49,7 @@ fun TextInput(
     maxLines: Int = 1,
     singleLine: Boolean = false,
     maxChars: Int? = null,
-    label: @Composable (() -> Unit)? = null,
+    staticLabel: String?,
     placeholder: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     errorMessage: String? = null,
@@ -54,7 +58,11 @@ fun TextInput(
 ) {
     val charsCount by remember(text) { mutableStateOf(text.length) }
     val focusManager = LocalFocusManager.current
-    Column {
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    Box(modifier = modifier.enableOrFade(enabled)) {
         OutlinedTextField(
             value = text,
             onValueChange = { newValue -> onTextChange(newValue.take(maxChars ?: Int.MAX_VALUE)) },
@@ -64,7 +72,7 @@ fun TextInput(
                 imeAction = ImeAction.Done,
                 keyboardType = KeyboardType.Text
             ),
-            label = label,
+            label = null,
             placeholder = placeholder,
             trailingIcon = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -72,6 +80,7 @@ fun TextInput(
                         FilledButton(
                             onClick = { onTextChange("") },
                             icon = R.drawable.ic_cross,
+                            enabled = enabled,
                             backgroundColor = Color.Transparent,
                             iconTint = MaterialTheme.colors.onSurface,
                             padding = PaddingValues(12.dp),
@@ -84,23 +93,46 @@ fun TextInput(
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             colors = outlinedTextFieldColors(),
             shape = RoundedCornerShape(8.dp),
-            modifier = modifier.enableOrFade(enabled)
+            interactionSource = interactionSource,
+            modifier = Modifier.padding(bottom = 8.dp, top = if (staticLabel != null) 14.dp else 0.dp)
         )
-        Spacer(Modifier.height(4.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            if (!errorMessage.isNullOrBlank() && enabled) {
-                Text(
-                    text = errorMessage,
-                    style = MaterialTheme.typography.body1.copy(color = negativeColor, fontSize = 13.sp),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            if (maxChars != null) {
-                Text(
-                    text = "$charsCount/$maxChars",
-                    style = MaterialTheme.typography.caption.copy(fontSize = 13.sp),
-                )
-            }
+
+        staticLabel?.let {
+            Text(
+                text = staticLabel,
+                maxLines = 1,
+                style = when {
+                    !errorMessage.isNullOrBlank() -> MaterialTheme.typography.body2.copy(color = negativeColor, fontSize = 14.sp)
+                    isFocused -> MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary, fontSize = 14.sp)
+                    else -> MaterialTheme.typography.body1.copy(fontSize = 14.sp)
+                },
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(start = 8.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colors.surface)
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
+            )
+        }
+
+        val subMessage = errorMessage?.takeIf { it.isNotBlank() } ?: if (maxChars != null && charsCount > 0) {
+            "$charsCount/$maxChars"
+        } else ""
+        if (subMessage.isNotBlank()) {
+            Text(
+                text = subMessage,
+                maxLines = 1,
+                style = when {
+                    !errorMessage.isNullOrBlank() -> MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.onPrimary, fontSize = 13.sp)
+                    else -> MaterialTheme.typography.subtitle2.copy(fontSize = 13.sp)
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 10.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(if (!errorMessage.isNullOrBlank()) negativeColor else MaterialTheme.colors.surface)
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
+            )
         }
     }
 }

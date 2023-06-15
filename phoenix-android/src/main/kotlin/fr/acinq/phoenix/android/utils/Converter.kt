@@ -106,7 +106,7 @@ object Converter {
                 SAT_FORMAT_WITH_MILLIS.format(amount)
             }
             unit is BitcoinUnit -> getCoinFormat(unit, withMillis = mSatDisplayPolicy == MSatDisplayPolicy.SHOW).format(amount)
-            unit is FiatCurrency -> FIAT_FORMAT.format(amount)
+            unit is FiatCurrency -> amount.takeIf { it >= 0 }?.let { FIAT_FORMAT.format(it) }
             else -> "?!"
         }
     } ?: "N/A").run {

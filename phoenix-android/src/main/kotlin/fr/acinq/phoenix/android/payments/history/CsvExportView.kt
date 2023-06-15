@@ -29,6 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.payments.history.CsvExportState
 import fr.acinq.phoenix.android.payments.history.CsvExportViewModel
 import fr.acinq.phoenix.android.utils.Converter.toBasicAbsoluteDateString

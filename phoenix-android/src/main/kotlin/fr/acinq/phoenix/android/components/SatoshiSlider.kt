@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import kotlin.math.log10
 import kotlin.math.pow
 

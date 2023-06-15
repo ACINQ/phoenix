@@ -16,7 +16,12 @@
 
 package fr.acinq.phoenix.android.components.feedback
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -24,8 +29,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.components.TextWithIcon
 
@@ -35,6 +40,8 @@ fun FeedbackMessage(
     details: CharSequence? = null,
     icon: Int,
     iconColor: Color,
+    headerStyle: TextStyle = MaterialTheme.typography.body2,
+    detailsStyle: TextStyle = MaterialTheme.typography.subtitle2,
     padding: PaddingValues = PaddingValues(16.dp),
     modifier: Modifier = Modifier,
     alignment: Alignment.Horizontal = Alignment.Start,
@@ -45,7 +52,7 @@ fun FeedbackMessage(
     ) {
         TextWithIcon(
             text = header,
-            textStyle = MaterialTheme.typography.body2,
+            textStyle = headerStyle,
             icon = icon,
             iconSize = 20.dp,
             iconTint = iconColor,
@@ -64,7 +71,7 @@ fun FeedbackMessage(
                     Text(
                         text = details,
                         modifier = mod,
-                        style = MaterialTheme.typography.subtitle2,
+                        style = detailsStyle,
                         textAlign = if (alignment == Alignment.Start) TextAlign.Start else TextAlign.Center
                     )
                 }
@@ -72,12 +79,11 @@ fun FeedbackMessage(
                     Text(
                         text = details.toString(),
                         modifier = mod,
-                        style = MaterialTheme.typography.subtitle2,
+                        style = detailsStyle,
                         textAlign = if (alignment == Alignment.Start) TextAlign.Start else TextAlign.Center
                     )
                 }
             }
-
         }
     }
 }

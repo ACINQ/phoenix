@@ -18,10 +18,20 @@ package fr.acinq.phoenix.android.payments
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,19 +48,31 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.sum
+import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.utils.*
+import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.components.feedback.InfoMessage
+import fr.acinq.phoenix.android.components.feedback.WarningMessage
+import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.safeLet
+import fr.acinq.phoenix.android.utils.share
 import fr.acinq.phoenix.managers.WalletBalance
 
 
@@ -96,7 +118,7 @@ fun ReceiveView(
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ReceiveViewPages(
     vm: ReceiveViewModel,
@@ -106,7 +128,7 @@ private fun ReceiveViewPages(
     val pagerState = rememberPagerState()
     HorizontalPager(
         modifier = Modifier.fillMaxHeight(),
-        count = 2,
+        pageCount = 2,
         state = pagerState,
         contentPadding = PaddingValues(horizontal = 44.dp),
         verticalAlignment = Alignment.Top
@@ -152,6 +174,7 @@ private fun LightningInvoiceView(
     defaultDescription: String,
     expiry: Long,
 ) {
+    val context = LocalContext.current
     val paymentsManager = business.paymentsManager
     var customDesc by remember { mutableStateOf(defaultDescription) }
     var customAmount by remember { mutableStateOf<MilliSatoshi?>(null) }
@@ -166,6 +189,11 @@ private fun LightningInvoiceView(
         }
     }
 
+    val channels by business.peerManager.channelsFlow.collectAsState()
+    val availableForReceive = remember(channels) { channels?.values?.map { it.availableForReceive ?: 0.msat }?.sum() }
+    val electrumFeerate by business.peerManager.electrumFeerate.collectAsState()
+    val liquidityPolicy by UserPrefs.getLiquidityPolicy(context).collectAsState(null)
+
     val onEdit = { vm.isEditingLightningInvoice = true }
 
     InvoiceHeader(
@@ -174,6 +202,7 @@ private fun LightningInvoiceView(
         icon = R.drawable.ic_zap
     )
 
+    val navController = navController
     val state = vm.lightningInvoiceState
     val isEditing = vm.isEditingLightningInvoice
     when {
@@ -207,11 +236,20 @@ private fun LightningInvoiceView(
         }
         state is ReceiveViewModel.LightningInvoiceState.Error -> {
             ErrorMessage(
-                header = "Failed to generate invoice",
+                header = stringResource(id = R.string.receive_lightning_error),
                 details = state.e.localizedMessage
             )
         }
     }
+
+    IncomingLiquidityWarning(
+        swapFee = electrumFeerate?.swapEstimationFee,
+        liquidityPolicy = liquidityPolicy,
+        availableForReceive = availableForReceive,
+        hasChannels = channels?.isNotEmpty(),
+        amount = customAmount,
+        onMessageClick = { navController.navigate(Screen.LiquidityPolicy.route) },
+    )
 }
 
 @Composable
@@ -250,21 +288,21 @@ private fun DisplayLightningInvoice(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            if (amount != null) {
-                QRCodeDetail(label = stringResource(id = R.string.receive_lightning_amount_label)) {
-                    AmountWithFiatColumnView(
-                        amount = amount,
-                        amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
-                        fiatTextStyle = MaterialTheme.typography.caption.copy(fontSize = 13.sp),
-                    )
-                }
-            }
             if (!description.isNullOrBlank()) {
                 QRCodeDetail(
                     label = stringResource(id = R.string.receive_lightning_desc_label),
                     value = description,
                     maxLines = 2
                 )
+            }
+            if (amount != null) {
+                QRCodeDetail(label = stringResource(id = R.string.receive_lightning_amount_label)) {
+                    AmountWithFiatBelow(
+                        amount = amount,
+                        amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 14.sp),
+                        fiatTextStyle = MaterialTheme.typography.subtitle2,
+                    )
+                }
             }
         }
     }
@@ -317,6 +355,7 @@ private fun QRCodeView(
     val context = LocalContext.current
     Column(
         modifier = Modifier
+            .padding(horizontal = 4.dp)
             .width(270.dp)
             .clip(RoundedCornerShape(16.dp))
             .border(
@@ -398,11 +437,13 @@ private fun QRCodeDetail(label: String, content: @Composable () -> Unit) {
     Row(modifier = Modifier.padding(horizontal = 24.dp)) {
         Text(
             text = label.uppercase(),
-            style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp, textAlign = TextAlign.Start),
-            modifier = Modifier.alignBy(FirstBaseline)
+            style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp, textAlign = TextAlign.End),
+            modifier = Modifier
+                .alignBy(FirstBaseline)
+                .width(80.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Column(modifier = Modifier.alignBy(FirstBaseline)) {
+        Column(modifier = Modifier.alignBy(FirstBaseline).widthIn(min = 100.dp)) {
             content()
         }
     }
@@ -451,39 +492,122 @@ private fun EditInvoiceView(
             .background(MaterialTheme.colors.surface),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            AmountInput(
-                initialAmount = amount,
-                label = { Text(text = stringResource(id = R.string.receive_lightning_edit_amount_label)) },
-                placeholder = { Text(text = stringResource(id = R.string.receive_lightning_edit_amount_placeholder)) },
-                onAmountChange = { complexAmount ->
-                    log.debug { "invoice amount update amount=$complexAmount" }
-                    onAmountChange(complexAmount?.amount)
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(8.dp))
-            TextInput(
-                text = description ?: "",
-                onTextChange = onDescriptionChange,
-                label = { Text(stringResource(id = R.string.receive_lightning_edit_desc_label)) },
-                maxChars = 180,
-                maxLines = Int.MAX_VALUE,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+        Spacer(modifier = Modifier.height(12.dp))
+
+        TextInput(
+            text = description ?: "",
+            onTextChange = onDescriptionChange,
+            staticLabel = stringResource(id = R.string.receive_lightning_edit_desc_label),
+            placeholder = { Text(text = stringResource(id = R.string.receive_lightning_edit_desc_placeholder), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            maxChars = 140,
+            maxLines = Int.MAX_VALUE,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp),
+        )
+        Spacer(Modifier.height(16.dp))
+
+        AmountInput(
+            amount = amount,
+            staticLabel = stringResource(id = R.string.receive_lightning_edit_amount_label),
+            placeholder = { Text(text = stringResource(id = R.string.receive_lightning_edit_amount_placeholder), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            onAmountChange = { complexAmount -> onAmountChange(complexAmount?.amount) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp),
+        )
+
         Row {
             Button(
                 icon = R.drawable.ic_arrow_back,
                 onClick = onCancel,
             )
+            Spacer(modifier = Modifier.weight(1f))
             Button(
                 text = stringResource(id = R.string.receive_lightning_edit_generate_button),
                 icon = R.drawable.ic_qrcode,
-                modifier = Modifier.weight(1f),
                 onClick = onSubmit,
+                horizontalArrangement = Arrangement.End,
             )
         }
+    }
+}
 
+@Composable
+private fun IncomingLiquidityWarning(
+    swapFee: Satoshi?,
+    liquidityPolicy: LiquidityPolicy?,
+    availableForReceive: MilliSatoshi?,
+    hasChannels: Boolean?,
+    amount: MilliSatoshi?,
+    onMessageClick: () -> Unit
+) {
+    val btcUnit = LocalBitcoinUnit.current
+    val fiatUnit = LocalFiatCurrency.current
+    Spacer(modifier = Modifier.height(8.dp))
+    when {
+        // strong warning => no channels + fee policy is disabled
+        hasChannels == false && liquidityPolicy is LiquidityPolicy.Disable -> {
+            Clickable(onClick = onMessageClick) {
+                WarningMessage(
+                    header = stringResource(id = R.string.receive_lightning_warning_surefail),
+                    details = stringResource(id = R.string.receive_lightning_warning_fee_policy_disabled_no_channels),
+                    headerStyle = MaterialTheme.typography.body2.copy(fontSize = 15.sp),
+                    alignment = Alignment.CenterHorizontally,
+                )
+            }
+        }
+        // warning: liquidity is short => message depends on the fee policy used
+        hasChannels == false || (availableForReceive != null && amount != null && amount >= availableForReceive) -> {
+            when {
+                // no fee policy => strong warning
+                liquidityPolicy is LiquidityPolicy.Disable -> {
+                    Clickable(onClick = onMessageClick, internalPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)) {
+                        InfoMessage(
+                            header = stringResource(id = R.string.receive_lightning_warning_mayfail),
+                            details = stringResource(id = R.string.receive_lightning_warning_fee_policy_disabled_no_liquidity),
+                            headerStyle = MaterialTheme.typography.body1.copy(fontSize = 15.sp),
+                            alignment = Alignment.CenterHorizontally,
+                        )
+                    }
+                }
+                // no fee information available => basic warning
+                swapFee == null -> {
+                    Clickable(onClick = onMessageClick) {
+                        InfoMessage(
+                            header = stringResource(id = R.string.receive_lightning_warning_fee_expected),
+                            details = stringResource(id = R.string.receive_lightning_warning_fee_no_liquidity),
+                            headerStyle = MaterialTheme.typography.body1.copy(fontSize = 15.sp),
+                            alignment = Alignment.CenterHorizontally,
+                        )
+                    }
+                }
+                // fee policy is short => light warning
+                liquidityPolicy is LiquidityPolicy.Auto && swapFee > liquidityPolicy.maxAbsoluteFee -> {
+                    Clickable(onClick = onMessageClick) {
+                        InfoMessage(
+                            header = stringResource(id = R.string.receive_lightning_warning_mayfail),
+                            details = stringResource(id = R.string.receive_lightning_warning_fee_exceeds_policy, liquidityPolicy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true)),
+                            headerStyle = MaterialTheme.typography.body1.copy(fontSize = 15.sp),
+                            alignment = Alignment.CenterHorizontally,
+                        )
+                    }
+                }
+                // fee policy is within bounds => light warning
+                liquidityPolicy is LiquidityPolicy.Auto -> {
+                    Clickable(onClick = onMessageClick) {
+                        InfoMessage(
+                            header = stringResource(id = R.string.receive_lightning_warning_fee_expected),
+                            details = stringResource(
+                                id = R.string.receive_lightning_warning_fee_within_policy, swapFee.toPrettyString(btcUnit, withUnit = true),
+                                swapFee.toPrettyString(fiatUnit, fiatRate, withUnit = true)
+                            ),
+                            headerStyle = MaterialTheme.typography.body1.copy(fontSize = 15.sp),
+                            alignment = Alignment.CenterHorizontally,
+                        )
+                    }
+                }
+            }
+        }
     }
 }
