@@ -4,6 +4,7 @@ import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.*
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.managers.NodeParamsManager
 import kotlin.Double
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -90,14 +91,14 @@ object WalletContext {
             val mempool: Mempool
         ) {
             fun walletParams(): WalletParams = WalletParams(
-                trampolineNode = trampoline.v2.nodes.first().export(),
+                trampolineNode = NodeParamsManager.trampolineNodeUri,
                 trampolineFees = trampoline.v3.map { it.export() },
                 invoiceDefaultRoutingFees = InvoiceDefaultRoutingFees(
                     feeBase = 1000.msat,
                     feeProportional = 100,
                     cltvExpiryDelta = CltvExpiryDelta(144)
                 ),
-                swapInConfirmations = 3,
+                swapInConfirmations = NodeParamsManager.swapInConfirmations,
             )
         }
 
@@ -113,20 +114,7 @@ object WalletContext {
             }
 
             @Serializable
-            data class NodeUri(val name: String, val uri: String) {
-                fun export(): fr.acinq.lightning.NodeUri {
-                    val parts = uri.split("@", ":")
-
-                    val publicKey = PublicKey.fromHex(parts[0])
-                    val host = parts[1]
-                    val port = parts[2].toInt()
-
-                    return NodeUri(publicKey, host, port)
-                }
-            }
-
-            @Serializable
-            data class V2(val attempts: List<TrampolineFees>, val nodes: List<NodeUri> = emptyList())
+            data class V2(val attempts: List<TrampolineFees>)
         }
 
         /**

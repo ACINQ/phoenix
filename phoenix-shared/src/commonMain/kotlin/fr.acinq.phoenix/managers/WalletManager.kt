@@ -48,7 +48,7 @@ class WalletManager(
         val km = keyManager.value ?: LocalKeyManager(
             seed = seed.byteVector(),
             chain = chain,
-            remoteSwapInExtendedPublicKey = "tpubDAmCFB21J9ExKBRPDcVxSvGs9jtcf8U1wWWbS1xTYmnUsuUHPCoFdCnEGxLE3THSWcQE48GHJnyz8XPbYUivBMbLSMBifFd3G9KmafkM9og"
+            remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub,
         ).also {
             _localKeyManager.value = it
         }
