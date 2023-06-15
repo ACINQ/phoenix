@@ -155,8 +155,11 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				header("Payment Request")
 			} content: {
 				paymentRequest_invoiceCreated(paymentRequest)
+				paymentRequest_invoiceDescription(paymentRequest)
 				paymentRequest_amountRequested(paymentRequest)
 				paymentRequest_paymentHash(paymentRequest)
+				paymentRequest_preimage()
+				paymentRequest_invoice(paymentRequest)
 			}
 		}
 
@@ -208,8 +211,11 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 					header("Payment Request")
 				} content: {
 					paymentRequest_invoiceCreated(normal.paymentRequest)
+					paymentRequest_invoiceDescription(normal.paymentRequest)
 					paymentRequest_amountRequested(normal.paymentRequest)
 					paymentRequest_paymentHash(normal.paymentRequest)
+					paymentRequest_preimage()
+					paymentRequest_invoice(normal.paymentRequest)
 				}
 				
 			} else if let swapOut = lightningPayment.details.asSwapOut() {
@@ -441,6 +447,27 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
+	func paymentRequest_invoiceDescription(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("invoice description")
+			
+		} valueColumn: {
+			
+			let description = (paymentRequest.description_ ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+			if description.isEmpty {
+				Text("empty").foregroundColor(.secondary)
+			} else {
+				Text(description)
+			}
+		}
+	}
+	
+	@ViewBuilder
 	func paymentRequest_amountRequested(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
 		let identifier: String = #function
 		
@@ -485,6 +512,58 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 					}
 				}
 		}
+	}
+	
+	@ViewBuilder
+	func paymentRequest_preimage() -> some View {
+		let identifier: String = #function
+		
+		if let preimage = paymentPreimage() {
+			
+			InfoGridRowWrapper(
+				identifier: identifier,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				keyColumn("payment preimage")
+				
+			} valueColumn: {
+				
+				Text(preimage)
+					.contextMenu {
+						Button(action: {
+							UIPasteboard.general.string = preimage
+						}) {
+							Text("Copy")
+						}
+					}
+			} // </InfoGridRowWrapper>
+		}
+	}
+	
+	@ViewBuilder
+	func paymentRequest_invoice(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("invoice")
+			
+		} valueColumn: {
+			
+			let invoice = paymentRequest.write()
+			Text(invoice)
+				.lineLimit(5)
+				.truncationMode(.tail)
+				.contextMenu {
+					Button(action: {
+						UIPasteboard.general.string = invoice
+					}) {
+						Text("Copy")
+					}
+				}
+		} // </InfoGridRowWrapper>
 	}
 	
 	@ViewBuilder
@@ -1339,6 +1418,22 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		formatter.maximumFractionDigits = 3
 		
 		return formatter.string(from: NSNumber(value: percent)) ?? "?%"
+	}
+	
+	func paymentPreimage() -> String? {
+		
+		if let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment {
+			return incomingPayment.preimage.toHex()
+		}
+		
+		if let outgoingPayment = paymentInfo.payment as? Lightning_kmpOutgoingPayment,
+		   let lightningPayment = outgoingPayment as? Lightning_kmpLightningOutgoingPayment,
+		   let offChain = lightningPayment.status.asOffChain()
+		{
+			return offChain.preimage.toHex()
+		}
+		
+		return nil
 	}
 	
 	func txId(receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> Bitcoin_kmpByteVector32? {
