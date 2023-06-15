@@ -1098,10 +1098,9 @@ sealed class KitState {
   /** Get a dual-funding swap-in address usable by the modern KMP application. */
   internal suspend fun getKmpSwapInAddress(): String? = if (this is Started) {
     try {
-      val remoteServerPublicKey = `ByteVector$`.`MODULE$`.apply(Hex.decode("03d9adb7022fb59a73a0e4eba9b94dadddbf6e1c298c8ed76594e98f8805659eea")).let {
-        Crypto.PublicKey(it)
-      }
-      (kit.nodeParams().keyManager() as LocalKeyManager).multisigSwapInAddress(remoteServerPublicKey, 144 * 30 * 6)
+      val nodeId = kit.nodeParams().keyManager().kmpNodeKey().publicKey()
+      val remoteExtendedPublicKey = "tpubDAmCFB21J9ExKBRPDcVxSvGs9jtcf8U1wWWbS1xTYmnUsuUHPCoFdCnEGxLE3THSWcQE48GHJnyz8XPbYUivBMbLSMBifFd3G9KmafkM9og"
+      (kit.nodeParams().keyManager() as LocalKeyManager).multisigSwapInAddress(nodeId, remoteExtendedPublicKey, 144 * 30 * 6)
     } catch (e: Exception) {
       null
     }
