@@ -19,8 +19,9 @@ import kotlin.coroutines.suspendCoroutine
  * - paymentId: [IncomingPaymentId || OutgoingPaymentId]
  * - created: Date
  * - completed: Date
+ * - metadataModifiedAt: Date
  *
- * Thus, since the key changes when the row is updated, the fetcher (and built-in cache)
+ * Thus, since the key changes whenever the payment is updated, the fetcher (and built-in cache)
  * always provide an up-to-date WalletPayment instance in response to your query.
  */
 class PaymentsFetcher(

@@ -64,6 +64,15 @@ SELECT lnurl_description,
 FROM   payments_metadata
 WHERE  type = ? AND id = ?;
 
+fetchDescriptionsAndOriginalFiat:
+SELECT lnurl_description,
+       user_description,
+       modified_at,
+       original_fiat_type,
+       original_fiat_rate
+FROM   payments_metadata
+WHERE  type = ? AND id = ?;
+
 fetchMetadata:
 SELECT * FROM payments_metadata
 WHERE type = ? AND id = ?;
