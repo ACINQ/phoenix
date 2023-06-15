@@ -18,7 +18,6 @@ package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.json.JsonSerializers
 import fr.acinq.phoenix.utils.extensions.*
@@ -48,6 +47,13 @@ data class LocalChannelInfo(
     // FIXME: we should also expose the raw channel's balance, which is what should be used in the channel's details screen, rather than the "smart" spendable balance returned by `localBalance()`
     /** The channel's spendable balance, as seen in [ChannelState.localBalance]. */
     val localBalance by lazy { state.localBalance() }
+    /** The channel's receive capacity - should be accurate but still depends on the network feerate. */
+    val availableForReceive by lazy {
+        when (state) {
+            is ChannelStateWithCommitments -> state.commitments.availableBalanceForReceive()
+            else -> null
+        }
+    }
     /** The channel's current capacity. It actually is the funding capacity of the latest commitment. */
     val currentFundingAmount by lazy { if (state is ChannelStateWithCommitments) state.commitments.latest.fundingAmount else null }
     /** A channel may have several active commitments. */
