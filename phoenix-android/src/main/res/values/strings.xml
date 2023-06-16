@@ -601,8 +601,8 @@
     <!-- lnurl-auth settings: scheme types -->
 
     <string name="lnurl_auth_scheme_default">Compliant (recommended)</string>
-    <string name="lnurl_auth_scheme_default_desc">Use the standard LNURL\'s specifications scheme. This is the recommended option, especially for new wallets.</string>
-    <string name="lnurl_auth_scheme_legacy">Legacy friendly</string>
+    <string name="lnurl_auth_scheme_default_desc">Use the standard LNURL\'s specifications scheme. This is the recommended option for new wallets. It\'s also what the iOS Phoenix app uses.</string>
+    <string name="lnurl_auth_scheme_legacy">Android legacy</string>
     <string name="lnurl_auth_scheme_legacy_desc">Use a legacy scheme on some services to let you use accounts that were created with the old Phoenix Android app.</string>
 
     <!-- lnurl-withdraw -->

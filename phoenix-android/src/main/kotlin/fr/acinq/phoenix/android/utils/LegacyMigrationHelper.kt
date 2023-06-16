@@ -46,6 +46,7 @@ import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.legacy.db.*
 import fr.acinq.phoenix.legacy.utils.Prefs
 import fr.acinq.phoenix.legacy.utils.ThemeHelper
@@ -121,6 +122,10 @@ object LegacyMigrationHelper {
         if (Prefs.isAutoPayToOpenEnabled(context)) {
             UserPrefs.saveLiquidityPolicy(context, LiquidityPolicy.Disable)
         }
+
+        // use the default scheme when migrating from legacy, instead of the default one
+        UserPrefs.saveLnurlAuthScheme(context, LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME)
+
         log.info("finished migration of legacy user preferences")
     }
 
