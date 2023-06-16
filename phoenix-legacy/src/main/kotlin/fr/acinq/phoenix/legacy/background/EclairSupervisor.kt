@@ -22,7 +22,6 @@ import android.text.format.DateUtils
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavDeepLinkBuilder
-import fr.acinq.bitcoin.scala.Base58Check
 import fr.acinq.bitcoin.scala.Script
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.`package$`
@@ -81,11 +80,11 @@ class EclairSupervisor(val applicationContext: Context) : UntypedActor() {
           val spendingTxs = JavaConverters.seqAsJavaListConverter(data.spendingTxes()).asJava()
           val ourSpendingAddress = spendingTxs.map { JavaConverters.seqAsJavaListConverter(it.txOut()).asJava() }.flatten()
             .firstOrNull {
-              log.debug("txout with amount=${it.amount()} to script=${it.publicKeyScript().toBase58()}, against balance=${balance}")
+              log.debug("txout with amount=${it.amount()} to script=${it.publicKeyScript().toHex()}, against balance=${balance}")
               it.amount() == balance
             }?.let {
-              val address = Base58Check.encode(Wallet.getScriptHashVersion(), Script.publicKeyHash(it.publicKeyScript()))
-              log.info("found closing txOut sending to script=${it.publicKeyScript().toBase58()} address=$address")
+              val address = `package$`.`MODULE$`.addressFromPublicKeyScript(Wallet.getChainHash(), Script.parse(it.publicKeyScript()))
+              log.info("found closing txOut sending to address=$address")
               address
             }
           val closingType = when {
