@@ -16,6 +16,11 @@
 
 package fr.acinq.phoenix.android.home
 
+import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,28 +31,67 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.Notice
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.data.Notification
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun NoticesButtonRow(
     modifier: Modifier = Modifier,
     notices: List<Notice>,
     notifications: List<Pair<Set<UUID>, Notification>>,
-    onClick: () -> Unit,
+    onNavigateToNotificationsList: () -> Unit,
 ) {
     val filteredNotices = notices.filterIsInstance<Notice.ShowInHome>()
     // don't display anything if there are no permanent notices
     if (filteredNotices.isEmpty()) return
+
+    val navController = navController
+    val context = LocalContext.current
+    val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+    val elementsCount = notices.size + notifications.size
+
+    val onClick: (() -> Unit)? = if (elementsCount == 1 && filteredNotices.isNotEmpty()) {
+        when (filteredNotices.first()) {
+            is Notice.BackupSeedReminder -> {
+                { navController.navigate(Screen.DisplaySeed.route) }
+            }
+            is Notice.CriticalUpdateAvailable, is Notice.UpdateAvailable -> {
+                { openLink(context, "https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet") }
+            }
+            is Notice.NotificationPermission -> {
+                val isPermissionDenied = notificationPermission.status.isGranted
+                if (isPermissionDenied || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                    {
+                        context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        })
+                    }
+                } else {
+                    { notificationPermission.launchPermissionRequest() }
+                }
+            }
+            else -> null
+        }
+    } else {
+        onNavigateToNotificationsList
+    }
 
     Row(
         modifier = modifier
@@ -55,15 +99,16 @@ fun NoticesButtonRow(
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colors.surface)
             .fillMaxWidth()
-            .clickable(
-                onClick = onClick,
-                role = Role.Button,
-                onClickLabel = "Show notifications",
-            )
+            .then(if (onClick != null) {
+                Modifier.clickable(
+                    onClick = onClick,
+                    role = Role.Button,
+                    onClickLabel = "Show notifications",
+                )
+            } else Modifier)
             .padding(horizontal = 12.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val elementsCount = notices.size + notifications.size
         filteredNotices.firstOrNull()?.let { notice ->
             when (notice) {
                 Notice.MempoolFull -> {
@@ -117,7 +162,5 @@ private fun RowScope.NoticeView(
     Text(text = text,
         style = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
         modifier = Modifier.weight(1f),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis
     )
 }

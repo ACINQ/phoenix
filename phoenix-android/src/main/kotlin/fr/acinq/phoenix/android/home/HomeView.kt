@@ -214,7 +214,7 @@ fun HomeView(
                         modifier = Modifier.layoutId("notices"),
                         notices = noticesViewModel.notices.values.toList(),
                         notifications = notifications,
-                        onClick = onShowNotifications,
+                        onNavigateToNotificationsList = onShowNotifications,
                     )
                 }
             }
