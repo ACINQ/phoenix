@@ -66,6 +66,7 @@ class MainActivity : AppCompatActivity() {
             if (doDataMigration) {
                 LegacyMigrationHelper.migrateLegacyPreferences(applicationContext)
                 LegacyMigrationHelper.migrateLegacyPayments(applicationContext)
+                delay(5_000)
                 PrefsDatastore.saveDataMigrationExpected(applicationContext, false)
             }
         }

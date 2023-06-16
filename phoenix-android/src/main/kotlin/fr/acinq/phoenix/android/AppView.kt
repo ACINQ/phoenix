@@ -344,11 +344,14 @@ fun AppView(
         }
     }
 
-    val lastCompletedPayment = business.paymentsManager.lastCompletedPayment.collectAsState().value
-    if (lastCompletedPayment != null) {
-        log.debug { "completed payment=${lastCompletedPayment}" }
-        LaunchedEffect(key1 = lastCompletedPayment.walletPaymentId()) {
-            navigateToPaymentDetails(navController, id = lastCompletedPayment.walletPaymentId(), isFromEvent = true)
+    val isDataMigrationExpected by PrefsDatastore.getDataMigrationExpected(context).collectAsState(initial = null)
+    val lastCompletedPayment by business.paymentsManager.lastCompletedPayment.collectAsState()
+    lastCompletedPayment?.let {
+        log.debug { "completed payment=${lastCompletedPayment} with data-migration=$isDataMigrationExpected" }
+        LaunchedEffect(key1 = it.walletPaymentId()) {
+            if (isDataMigrationExpected == false) {
+                navigateToPaymentDetails(navController, id = it.walletPaymentId(), isFromEvent = true)
+            }
         }
     }
 
