@@ -32,6 +32,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,8 +49,10 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
+import fr.acinq.phoenix.android.utils.isLegacyMigration
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
@@ -155,7 +159,15 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
     val context = LocalContext.current
     val payment = paymentInfo.payment
     val metadata = paymentInfo.metadata
-    val desc = metadata.userDescription ?: payment.smartDescription(context)
+    val peer by business.peerManager.peerState.collectAsState()
+    val isLegacyMigration = paymentInfo.isLegacyMigration(peer)
+
+    val desc = when (isLegacyMigration) {
+        null -> stringResource(id = R.string.paymentdetails_desc_closing_channel) // not sure yet, but we still know it's a closing
+        true -> stringResource(id = R.string.paymentdetails_desc_legacy_migration)
+        false -> metadata.userDescription ?: payment.smartDescription(context)
+    }
+
     Text(
         text = desc ?: stringResource(id = R.string.paymentdetails_no_description),
         maxLines = 1,
@@ -222,7 +234,9 @@ private fun PaymentIconComponent(
             .size(24.dp)
             .then(
                 if (backgroundColor != null) {
-                    Modifier.background(backgroundColor).padding(4.dp)
+                    Modifier
+                        .background(backgroundColor)
+                        .padding(4.dp)
                 } else Modifier
             )
     ) {

@@ -163,6 +163,7 @@
 
         <TextView
           android:id="@+id/migration_complete_title"
+          style="@style/dialog_title"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginStart="8dp"
@@ -214,12 +215,20 @@
           android:visibility="@{model.state instanceof MigrationScreenState.Paused.ChannelsInForceClose}"
           app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+          android:id="@+id/paused_opening_message"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/legacy_migration_paused_opening"
+          android:visibility="@{model.state instanceof MigrationScreenState.Paused.ChannelsBeingCreated}"
+          app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.constraintlayout.widget.Barrier
           android:id="@+id/paused_messages_barrier"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           app:barrierDirection="bottom"
-          app:constraint_referenced_ids="paused_swapin_message, paused_forceclose_message, paused_disconnected_message" />
+          app:constraint_referenced_ids="paused_swapin_message, paused_forceclose_message, paused_opening_message, paused_disconnected_message" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/paused_button"

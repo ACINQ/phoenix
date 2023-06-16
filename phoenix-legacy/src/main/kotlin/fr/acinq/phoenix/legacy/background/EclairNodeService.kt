@@ -55,6 +55,7 @@ import fr.acinq.eclair.payment.relay.Relayer
 import fr.acinq.eclair.payment.send.PaymentInitiator
 import fr.acinq.eclair.wire.*
 import fr.acinq.phoenix.legacy.*
+import fr.acinq.phoenix.legacy.background.KitState.Bootstrap.Node.getKmpSwapInAddress
 import fr.acinq.phoenix.legacy.db.AppDb
 import fr.acinq.phoenix.legacy.db.Database
 import fr.acinq.phoenix.legacy.db.PayToOpenMetaRepository
@@ -509,7 +510,7 @@ class EclairNodeService : Service() {
       }
 
       val script = Script.write(`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash()))
-      log.info("(migration) requesting to *mutual* close channels=$channels to address=${script.toHex()}")
+      log.info("(migration) requesting to *mutual* close channels=$channels to script=${script.toHex()}")
 
       val result = Await.result(api!!.close(channelsId, Option.apply(script), Timeout(Duration.create(300, TimeUnit.SECONDS))), Duration.Inf())
       JavaConverters.mapAsJavaMapConverter(result).asJava()
@@ -850,7 +851,10 @@ class EclairNodeService : Service() {
         if (event.balance < MilliSatoshi(546_000)) {
           log.info("ignore closing channel event=$event because our balance is too small (${event.balance})")
         } else {
-          log.info("save closing channel event=$event")
+          val kmpSwapAddress = getKmpSwapInAddress()
+          val isMigration = kmpSwapAddress == event.scriptDestMainOutput
+
+          log.info("save closing channel event=$event isMigration=$isMigration")
           val id = UUID.randomUUID()
           val preimage = `package$`.`MODULE$`.randomBytes32()
           val paymentHash = Crypto.hash256(preimage.bytes())
@@ -860,7 +864,7 @@ class EclairNodeService : Service() {
             /* id and parent id */ id, id,
             /* use arbitrary external id to designate payment as channel closing counterpart */ Option.apply("closing-${event.channelId}"),
             /* placeholder payment hash */ paymentHash,
-            /* type of payment */ "ClosingChannel",
+            /* type of payment */ if (isMigration) "KmpMigration" else "ClosingChannel",
             /* balance */ event.balance,
             /* recipient amount */ event.balance,
             /* fake recipient id */ fakeRecipientId,
@@ -1095,16 +1099,13 @@ sealed class KitState {
     kit.nodeParams().keyManager().kmpNodeKey().publicKey()
   } else null
 
-  /** Get a dual-funding swap-in address usable by the modern KMP application. */
-  internal suspend fun getKmpSwapInAddress(): String? = if (this is Started) {
-    try {
-      val nodeId = kit.nodeParams().keyManager().kmpNodeKey().publicKey()
-      val remoteExtendedPublicKey = "tpubDAmCFB21J9ExKBRPDcVxSvGs9jtcf8U1wWWbS1xTYmnUsuUHPCoFdCnEGxLE3THSWcQE48GHJnyz8XPbYUivBMbLSMBifFd3G9KmafkM9og"
-      (kit.nodeParams().keyManager() as LocalKeyManager).multisigSwapInAddress(nodeId, remoteExtendedPublicKey, 144 * 30 * 6)
-    } catch (e: Exception) {
-      null
-    }
-  } else null
+  fun Kit.getKmpSwapInAddress(): String? = try {
+    val nodeId = nodeParams().keyManager().kmpNodeKey().publicKey()
+    val remoteExtendedPublicKey = "tpubDAmCFB21J9ExKBRPDcVxSvGs9jtcf8U1wWWbS1xTYmnUsuUHPCoFdCnEGxLE3THSWcQE48GHJnyz8XPbYUivBMbLSMBifFd3G9KmafkM9og"
+    (nodeParams().keyManager() as LocalKeyManager).multisigSwapInAddress(nodeId, remoteExtendedPublicKey, 144 * 30 * 6)
+  } catch (e: Exception) {
+    null
+  }
 
   fun kit(): Kit? = if (this is Started) kit else null
   fun api(): Eclair? = if (this is Started) _api else null

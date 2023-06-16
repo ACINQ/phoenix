@@ -32,6 +32,7 @@ import fr.acinq.eclair.channel.*
 import fr.acinq.phoenix.legacy.AppViewModel
 import fr.acinq.phoenix.legacy.R
 import fr.acinq.phoenix.legacy.background.EclairNodeService
+import fr.acinq.phoenix.legacy.background.KitState.Bootstrap.Init.getKmpSwapInAddress
 import fr.acinq.phoenix.legacy.databinding.FragmentMigrationBinding
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.MigrationResult
@@ -178,7 +179,7 @@ class MigrationDialogViewModel : ViewModel() {
         }
 
         // compute the multi-sig swap-in address used by the new application
-        val swapInAddress = service.state.value!!.getKmpSwapInAddress()
+        val swapInAddress = service.state.value?.kit()?.getKmpSwapInAddress()
         if (swapInAddress == null) {
           state.value = MigrationScreenState.Failure.CannotGetSwapInAddress
         } else {

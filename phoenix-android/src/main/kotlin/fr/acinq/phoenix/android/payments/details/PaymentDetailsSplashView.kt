@@ -146,8 +146,6 @@ private fun PaymentStatus(
         }
         is ChannelCloseOutgoingPayment -> when (payment.confirmedAt) {
             null -> {
-                val nodeParams = business.nodeParamsManager.nodeParams.value
-                // TODO get depth for closing
                 PaymentStatusIcon(
                     message = {
                         Text(text = stringResource(id = R.string.paymentdetails_status_unconfirmed))
@@ -321,39 +319,50 @@ private fun PaymentStatusIcon(
 private fun PaymentDescriptionView(
     data: WalletPaymentInfo,
     onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
+
 ) {
     var showEditDescriptionDialog by remember { mutableStateOf(false) }
 
+    val peer by business.peerManager.peerState.collectAsState()
     val paymentDesc = data.payment.smartDescription(LocalContext.current)
     val customDesc = remember(data) { data.metadata.userDescription?.takeIf { it.isNotBlank() } }
     SplashLabelRow(label = stringResource(id = R.string.paymentdetails_desc_label)) {
-        val finalDesc = paymentDesc ?: customDesc
+        val isLegacyMigration = data.isLegacyMigration(peer)
+        val finalDesc = when (isLegacyMigration) {
+            null -> stringResource(id = R.string.paymentdetails_desc_closing_channel) // not sure yet, but we still know it's a closing
+            true -> stringResource(id = R.string.paymentdetails_desc_legacy_migration)
+            false -> paymentDesc ?: customDesc
+        }
+
         Text(
             text = finalDesc ?: stringResource(id = R.string.paymentdetails_no_description),
             style = if (finalDesc == null) MaterialTheme.typography.caption.copy(fontStyle = FontStyle.Italic) else MaterialTheme.typography.body1
         )
-        if (paymentDesc != null && customDesc != null) {
-            Spacer(modifier = Modifier.height(8.dp))
-            HSeparator(width = 50.dp)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = customDesc)
+
+        if (isLegacyMigration == false) {
+            if (paymentDesc != null && customDesc != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                HSeparator(width = 50.dp)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = customDesc)
+            }
+            Button(
+                text = stringResource(
+                    id = when (customDesc) {
+                        null -> R.string.paymentdetails_attach_desc_button
+                        else -> R.string.paymentdetails_edit_desc_button
+                    }
+                ),
+                textStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
+                modifier = Modifier.offset(x = (-8).dp),
+                icon = R.drawable.ic_text,
+                iconTint = MaterialTheme.typography.caption.color,
+                space = 6.dp,
+                shape = CircleShape,
+                padding = PaddingValues(8.dp),
+                onClick = { showEditDescriptionDialog = true }
+            )
         }
-        Button(
-            text = stringResource(
-                id = when (customDesc) {
-                    null -> R.string.paymentdetails_attach_desc_button
-                    else -> R.string.paymentdetails_edit_desc_button
-                }
-            ),
-            textStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
-            modifier = Modifier.offset(x = (-8).dp),
-            icon = R.drawable.ic_text,
-            iconTint = MaterialTheme.typography.caption.color,
-            space = 6.dp,
-            shape = CircleShape,
-            padding = PaddingValues(8.dp),
-            onClick = { showEditDescriptionDialog = true }
-        )
     }
 
     if (showEditDescriptionDialog) {

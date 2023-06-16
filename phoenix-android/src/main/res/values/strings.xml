@@ -457,6 +457,7 @@
 
     <string name="paymentdetails_desc_splice_out">On-chain payment</string>
     <string name="paymentdetails_desc_closing_channel">Closing channel</string>
+    <string name="paymentdetails_desc_legacy_migration">Migration from legacy app</string>
     <string name="paymentdetails_desc_cpfp">Bump transactions</string>
     <string name="paymentdetails_desc_keysend">Donation</string>
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>

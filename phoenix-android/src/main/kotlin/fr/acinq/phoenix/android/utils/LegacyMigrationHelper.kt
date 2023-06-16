@@ -32,6 +32,7 @@ import fr.acinq.eclair.wire.TrampolineFeeInsufficient
 import fr.acinq.eclair.wire.UnknownNextPeer
 import fr.acinq.lightning.*
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.LiquidityPolicy
@@ -44,6 +45,7 @@ import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.legacy.db.*
 import fr.acinq.phoenix.legacy.utils.Prefs
 import fr.acinq.phoenix.legacy.utils.ThemeHelper
@@ -57,6 +59,7 @@ import scala.collection.Seq
 object LegacyMigrationHelper {
 
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
+    val migrationDescFlag = "kmp-migration-override"
 
     /** Import the legacy app's preferences into the new app's datastores. */
     suspend fun migrateLegacyPreferences(context: Context) {
@@ -186,14 +189,22 @@ object LegacyMigrationHelper {
                 }
                 log.debug("migrated outgoing payment=$payment")
 
-                // save metadata
-                if (paymentMeta?.custom_desc != null) {
+                if (it.value.first().paymentType() == "KmpMigration") {
                     newPaymentsDb.updateMetadata(
-                        id = WalletPaymentId.LightningOutgoingPaymentId(parentId),
-                        userDescription = paymentMeta.custom_desc,
-                        userNotes = null
+                        id = WalletPaymentId.ChannelCloseOutgoingPaymentId(id = parentId),
+                        userDescription = migrationDescFlag,
+                        userNotes = migrationDescFlag
                     )
-                    log.debug("saved custom desc=${paymentMeta.custom_desc} for payment=$parentId")
+                } else {
+                    // save metadata
+                    if (paymentMeta?.custom_desc != null) {
+                        newPaymentsDb.updateMetadata(
+                            id = WalletPaymentId.LightningOutgoingPaymentId(parentId),
+                            userDescription = paymentMeta.custom_desc,
+                            userNotes = null
+                        )
+                        log.debug("saved custom desc=${paymentMeta.custom_desc} for payment=$parentId")
+                    }
                 }
                 log.info("successfully migrated ${outgoing.size} outgoing payments")
             } catch (e: Exception) {
@@ -226,6 +237,7 @@ object LegacyMigrationHelper {
                     )
                     log.debug("migrated incoming payment=$payment")
                 }
+
                 // save metadata
                 if (paymentMeta?.custom_desc != null) {
                     newPaymentsDb.updateMetadata(
@@ -306,7 +318,7 @@ object LegacyMigrationHelper {
     ): OutgoingPayment {
         val head = listOfParts.first()
 
-        if (head.paymentType() == "ClosingChannel") {
+        if (head.paymentType() == "ClosingChannel" || head.paymentType() == "KmpMigration") {
             val closedAt = when (val status = head.status()) {
                 is OutgoingPaymentStatus.Failed -> status.completedAt()
                 is OutgoingPaymentStatus.Succeeded -> status.completedAt()
@@ -454,5 +466,15 @@ object LegacyMigrationHelper {
             status = status,
             createdAt = head.createdAt()
         )
+    }
+}
+
+fun WalletPaymentInfo.isLegacyMigration(peer: Peer?): Boolean? {
+    val p = payment
+    return when {
+        p !is ChannelCloseOutgoingPayment -> false
+        peer == null -> null
+        p.address == peer.swapInAddress && metadata.userDescription == LegacyMigrationHelper.migrationDescFlag -> true
+        else -> false
     }
 }
