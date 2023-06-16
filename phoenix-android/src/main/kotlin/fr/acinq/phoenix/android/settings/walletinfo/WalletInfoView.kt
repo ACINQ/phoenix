@@ -47,6 +47,7 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.mutedTextColor
+import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import fr.acinq.phoenix.managers.finalOnChainWalletPath
 
 @Composable
@@ -66,10 +67,19 @@ fun WalletInfoView(
 
 @Composable
 private fun OffChainWalletView(onLightningWalletClick: () -> Unit) {
+    val context = LocalContext.current
     val nodeParams by business.nodeParamsManager.nodeParams.collectAsState()
     CardHeader(text = stringResource(id = R.string.walletinfo_lightning))
     Card {
         LightningNodeIdView(nodeId = nodeParams?.nodeId?.toString(), onLightningWalletClick)
+
+        val isDataMigrationExpected by PrefsDatastore.getDataMigrationExpected(context).collectAsState(initial = null)
+        if (isDataMigrationExpected != null) {
+            val keyManager by business.walletManager.keyManager.collectAsState()
+            keyManager?.let {
+                SettingWithCopy(title = stringResource(id = R.string.walletinfo_legacy_nodeid), value = it.nodeKeys.legacyNodeKey.publicKey.toHex())
+            }
+        }
     }
 }
 

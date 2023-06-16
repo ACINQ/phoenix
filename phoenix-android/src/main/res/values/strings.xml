@@ -864,6 +864,7 @@
 
     <string name="walletinfo_lightning">Lightning</string>
     <string name="walletinfo_nodeid">Node id</string>
+    <string name="walletinfo_legacy_nodeid">Legacy node id</string>
     <string name="walletinfo_offchain_balance">Balance</string>
     <string name="walletinfo_offchain_channels">Payment channels</string>
 
