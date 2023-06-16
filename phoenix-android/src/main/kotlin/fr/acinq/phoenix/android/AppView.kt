@@ -330,16 +330,6 @@ fun AppView(
                         onBackClick = { navController.popBackStack() }
                     )
                 }
-                composable(
-                    route = "${Screen.PaymentRejectedDetails.route}?id={id}",
-                    arguments = listOf(navArgument("id") { type = NavType.StringType })
-                ) {
-                    val id = it.arguments?.getString("id")?.let { UUID.fromString(it) }
-                    PaymentRejectedDetailsView(
-                        id = id,
-                        onBackClick = { navController.popBackStack() }
-                    )
-                }
             }
         }
     }
