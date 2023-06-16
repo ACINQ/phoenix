@@ -84,6 +84,16 @@ struct ReceiveLightningView: View {
 				
 			} // else: uses.navigationStackDestination()
 			
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
+			if BusinessManager.showTestnetBackground {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+					.accessibilityHidden(true)
+			}
+			
 			content()
 		}
 		.onAppear {
@@ -148,18 +158,24 @@ struct ReceiveLightningView: View {
 		// But, of course, this doesn't work properly because of a SwiftUI bug.
 		// So the current recommended workaround is to wrap everything in a GeometryReader.
 		//
-		GeometryReader { _ in
-			HStack(alignment: VerticalAlignment.top, spacing: 0) {
-				Spacer(minLength: 0)
-				if verticalSizeClass == UserInterfaceSizeClass.compact {
-					mainLandscape()
-				} else {
-					mainPortrait()
-				}
-				Spacer(minLength: 0)
-			} // </HStack>
-		} // </GeometryReader>
+		GeometryReader { geometry in
+			ScrollView(.vertical) {
+				main()
+					.frame(width: geometry.size.width)
+					.frame(minHeight: geometry.size.height)
+			}
+		}
 		.ignoresSafeArea(.keyboard)
+	}
+	
+	@ViewBuilder
+	func main() -> some View {
+		
+		if verticalSizeClass == UserInterfaceSizeClass.compact {
+			mainLandscape()
+		} else {
+			mainPortrait()
+		}
 	}
 	
 	@ViewBuilder
@@ -168,7 +184,7 @@ struct ReceiveLightningView: View {
 		VStack {
 			qrCodeView()
 				.frame(width: 200, height: 200)
-				.padding()
+				.padding(.all, 20)
 				.background(Color.white)
 				.cornerRadius(20)
 				.overlay(
@@ -210,18 +226,6 @@ struct ReceiveLightningView: View {
 			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			
 			warningButton()
-			
-			Button {
-				didTapSwapInButton()
-			} label: {
-				HStack {
-					Image(systemName: "repeat") // alt: "arrowshape.bounce.forward.fill"
-						.imageScale(.small)
-
-					Text("Show a Bitcoin address")
-				}
-			}
-			.padding(.vertical)
 			
 			Spacer()
 			
@@ -750,21 +754,6 @@ struct ReceiveLightningView: View {
 					desc: model.desc ?? "",
 					currencyConverterOpen: $currencyConverterOpen
 				)
-			}
-		}
-	}
-	
-	func didTapSwapInButton() -> Void {
-		log.trace("didTapSwapInButton()")
-		
-		if swapIn_enabled {
-			
-			mvi.intent(Receive.IntentRequestSwapIn())
-			
-		} else {
-			
-			popoverState.display(dismissable: true) {
-				SwapInDisabledPopover()
 			}
 		}
 	}

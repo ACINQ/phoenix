@@ -50,6 +50,24 @@ struct SwapInView: View {
 	@ViewBuilder
 	var body: some View {
 		
+		ZStack {
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
+			if BusinessManager.showTestnetBackground {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+					.accessibilityHidden(true)
+			}
+			
+			contentWrapper()
+		}
+	}
+	
+	@ViewBuilder
+	func contentWrapper() -> some View {
+		
 		GeometryReader { geometry in
 			ScrollView(.vertical) {
 				content()
@@ -87,18 +105,6 @@ struct SwapInView: View {
 				shareButton()
 			}
 			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
-			
-			Button {
-				didTapLightningButton()
-			} label: {
-				HStack {
-					Image(systemName: "repeat") // alt: "arrowshape.bounce.forward.fill"
-						.imageScale(.small)
-
-					Text("Show a Lightning invoice")
-				}
-			}
-			.padding(.vertical)
 			
 			Spacer()
 			
@@ -143,6 +149,7 @@ struct SwapInView: View {
 		{
 			qrCodeImage
 				.resizable()
+				.aspectRatio(contentMode: .fit)
 				.contextMenu {
 					Button(action: {
 						copyImageToPasteboard()
@@ -397,16 +404,6 @@ struct SwapInView: View {
 				shareImage: { shareImageToSystem() }
 			)
 		}
-	}
-	
-	func didTapLightningButton() {
-		log.trace("didTapLightningButton()")
-		
-		mvi.intent(Receive.IntentAsk(
-			amount: lastAmount,
-			desc: lastDescription,
-			expirySeconds: Prefs.shared.invoiceExpirationSeconds
-		))
 	}
 	
 	// --------------------------------------------------

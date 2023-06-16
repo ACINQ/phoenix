@@ -11,66 +11,115 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+enum SelectedTab {
+	case lightning
+	case blockchain
+}
 
 struct ReceiveView: MVIView {
 	
 	@StateObject var mvi = MVIState({ $0.receive() })
+	
+	@Environment(\.controllerFactory) var factoryEnv
+	var factory: ControllerFactory { return factoryEnv }
+	
+	@State var selectedTab: SelectedTab = .lightning
 	
 	@State var lastDescription: String? = nil
 	@State var lastAmount: Lightning_kmpMilliSatoshi? = nil
 	
 	@State var receiveLightningView_didAppear = false
 	
-	@Environment(\.controllerFactory) var factoryEnv
-	var factory: ControllerFactory { return factoryEnv }
+	@State var swapIn_enabled = true
 	
 	@StateObject var toast = Toast()
 	
+	@Environment(\.colorScheme) var colorScheme
+	@Environment(\.popoverState) var popoverState: PopoverState
+	
+	// --------------------------------------------------
 	// MARK: ViewBuilders
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	var view: some View {
 		
 		ZStack {
-			
-			Color.primaryBackground
-				.edgesIgnoringSafeArea(.all)
-			
-			if BusinessManager.showTestnetBackground {
-				Image("testnet_bg")
-					.resizable(resizingMode: .tile)
-					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
-					.accessibilityHidden(true)
-			}
-			
-			if mvi.model is Receive.Model_SwapIn {
-			
-				SwapInView(
-					mvi: mvi,
-					toast: toast,
-					lastDescription: $lastDescription,
-					lastAmount: $lastAmount
-				)
-				
-			} else {
-			
-				ReceiveLightningView(
-					mvi: mvi,
-					toast: toast,
-					didAppear: $receiveLightningView_didAppear
-				)
-			}
-			
+			customTabBar()
 			toast.view()
-			
-		} // </ZStack>
+		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
 	}
 	
+	@ViewBuilder
+	func customTabBar() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			switch selectedTab {
+			case .lightning:
+				ReceiveLightningView(
+					mvi: mvi,
+					toast: toast,
+					didAppear: $receiveLightningView_didAppear
+				)
+				
+			case .blockchain:
+				SwapInView(
+					mvi: mvi,
+					toast: toast,
+					lastDescription: $lastDescription,
+					lastAmount: $lastAmount
+				)
+			}
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 20) {
+				
+				Button {
+					didSelectTab(.lightning)
+				} label: {
+					HStack(alignment: VerticalAlignment.center, spacing: 4) {
+						Image(systemName: "bolt").font(.title2).imageScale(.large)
+						VStack(alignment: HorizontalAlignment.center, spacing: 4) {
+							Text("Lightning")
+							Text("(layer 2)").font(.footnote).opacity(0.7)
+						}
+					}
+				}
+				.foregroundColor(selectedTab == .lightning ? Color.appAccent : Color.primary)
+				.frame(maxWidth: .infinity)
+				
+				Button {
+					didSelectTab(.blockchain)
+				} label: {
+					HStack(alignment: VerticalAlignment.center, spacing: 4) {
+						Image(systemName: "link").font(.title2).imageScale(.large)
+						VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+							Text("Blockchain").padding(.bottom, 4)
+							Text("(layer 1)").font(.footnote).opacity(0.7)
+						}
+					}
+				}
+				.foregroundColor(selectedTab == .blockchain ? Color.appAccent : Color.primary)
+				.frame(maxWidth: .infinity)
+				
+			} // </HStack>
+			.padding(.top, 15)
+			.background(
+				Color.mutedBackground
+					.edgesIgnoringSafeArea(.bottom) // background color should extend to bottom of screen
+			)
+			
+		} // </VStack>
+		
+	}
+	
+	// --------------------------------------------------
 	// MARK: Actions
+	// --------------------------------------------------
 	
 	func onModelChange(model: Receive.Model) -> Void {
 		log.trace("onModelChange()")
@@ -81,7 +130,32 @@ struct ReceiveView: MVIView {
 		}
 	}
 	
+	func didSelectTab(_ tab: SelectedTab) {
+		
+		switch tab {
+		case .lightning:
+			mvi.intent(Receive.IntentAsk(
+				amount: lastAmount,
+				desc: lastDescription,
+				expirySeconds: Prefs.shared.invoiceExpirationSeconds
+			))
+			
+		case .blockchain:
+			if swapIn_enabled {
+				mvi.intent(Receive.IntentRequestSwapIn())
+			} else {
+				popoverState.display(dismissable: true) {
+					SwapInDisabledPopover()
+				}
+			}
+		}
+		
+		selectedTab = tab
+	}
+	
+	// --------------------------------------------------
 	// MARK: Static Shared
+	// --------------------------------------------------
 	
 	/// Shared logic. Used by:
 	/// - ReceiveLightningView
