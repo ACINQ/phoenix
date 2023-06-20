@@ -112,6 +112,6 @@ class NotificationsManager(
     }
 
     fun dismissAllNotifications() {
-        launch { appDb.dimissAllNotifications() }
+        launch { appDb.dismissAllNotifications() }
     }
 }

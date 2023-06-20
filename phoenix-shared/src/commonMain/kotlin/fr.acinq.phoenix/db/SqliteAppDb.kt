@@ -80,10 +80,10 @@ class SqliteAppDb(private val driver: SqlDriver) {
      */
     fun listBitcoinRates(): Flow<List<ExchangeRate>> {
         // Here's what we want:
-        // - we should be able to **REMOVE** fiat currencies from the list in the future
+        // - we should be able to **REMOVE** fiat currencies from the codebase in the future
         //   (e.g. after it collapses due to hyperinflation)
-        // - however, after we do, the corresponding row will remain in the database
-        // - attempting to force-decode it via FiatCurrency.valueOf(code) will cause a crash
+        // - however, after we do, the corresponding row will remain in the user's database
+        // - attempting to force-decode it via FiatCurrency.valueOf(code) will throw an exception
         // - so we use FiatCurrency.valueOfOrNull, and workaround potential null values
         //
         return priceQueries.list(mapper = { fiat, price, type, source, updated_at ->
@@ -145,7 +145,7 @@ class SqliteAppDb(private val driver: SqlDriver) {
     suspend fun getWalletContextOrNull(version: WalletContext.Version): Pair<Long, WalletContext.V0?> =
         withContext(Dispatchers.Default) {
             paramsQueries.get(version.name, ::mapWalletContext).executeAsOneOrNull()
-        } ?: Instant.DISTANT_PAST.toEpochMilliseconds() to null
+        } ?: (Instant.DISTANT_PAST.toEpochMilliseconds() to null)
 
     private fun mapWalletContext(
         version: String,
@@ -204,7 +204,7 @@ class SqliteAppDb(private val driver: SqlDriver) {
         notificationsQueries.markAsRead(ids)
     }
 
-    suspend fun dimissAllNotifications() {
+    suspend fun dismissAllNotifications() {
         notificationsQueries.markAllAsRead()
     }
 
