@@ -17,33 +17,55 @@
 package fr.acinq.phoenix.android
 
 import android.Manifest
-import android.net.*
+import android.net.Uri
 import android.text.format.DateUtils
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.*
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+import androidx.navigation.navOptions
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.openLink
-import fr.acinq.phoenix.android.home.*
-import fr.acinq.phoenix.android.init.*
+import fr.acinq.phoenix.android.home.HomeView
+import fr.acinq.phoenix.android.home.LegacySwitcherView
+import fr.acinq.phoenix.android.home.NotificationsView
+import fr.acinq.phoenix.android.home.StartupView
+import fr.acinq.phoenix.android.init.CreateWalletView
+import fr.acinq.phoenix.android.init.InitWallet
+import fr.acinq.phoenix.android.init.RestoreWalletView
 import fr.acinq.phoenix.android.intro.IntroView
-import fr.acinq.phoenix.android.payments.*
+import fr.acinq.phoenix.android.payments.CsvExportView
+import fr.acinq.phoenix.android.payments.ReceiveView
+import fr.acinq.phoenix.android.payments.ScanDataView
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
 import fr.acinq.phoenix.android.service.WalletState
@@ -73,7 +95,7 @@ fun AppView(
     appVM: AppViewModel,
     navController: NavHostController,
 ) {
-    val log = logger("AppView")
+    val log = logger("Navigation")
     log.debug { "init app view composition" }
 
     val fiatRates = application.business.currencyManager.ratesFlow.collectAsState(listOf())
@@ -113,19 +135,7 @@ fun AppView(
             navController.navigate(Screen.SwitchToLegacy.route)
         }
 
-        val scannerDeepLinks = remember {
-            listOf(
-                navDeepLink { uriPattern = "lightning:{data}" },
-                navDeepLink { uriPattern = "bitcoin:{data}" },
-                navDeepLink { uriPattern = "lnurl:{data}" },
-                navDeepLink { uriPattern = "lnurlp:{data}" },
-                navDeepLink { uriPattern = "lnurlw:{data}" },
-                navDeepLink { uriPattern = "keyauth:{data}" },
-                navDeepLink { uriPattern = "phoenix:lightning:{data}" },
-                navDeepLink { uriPattern = "phoenix:bitcoin:{data}" },
-                navDeepLink { uriPattern = "scanview:{data}" },
-            )
-        }
+        val walletState by appVM.walletState.observeAsState(null)
 
         Column(
             Modifier
@@ -151,7 +161,9 @@ fun AppView(
                             if (next == null || !navController.graph.hasDeepLink(next)) {
                                 popToHome(navController)
                             } else {
-                                navController.navigate(next, navOptions = navOptions { popUpTo(Screen.Home.route) { inclusive = true } })
+                                navController.navigate(next, navOptions = navOptions {
+                                    popUpTo(navController.graph.id) { inclusive = true }
+                                })
                             }
                         }
                     )
@@ -172,7 +184,7 @@ fun AppView(
                     RestoreWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
                 }
                 composable(Screen.Home.route) {
-                    RequireStarted(appVM.walletState.value) {
+                    RequireStarted(walletState) {
                         HomeView(
                             paymentsViewModel = paymentsViewModel,
                             noticesViewModel = noticesViewModel,
@@ -195,9 +207,19 @@ fun AppView(
                         onBackClick = { navController.popBackStack() }
                     )
                 }
-                composable(Screen.ScanData.route, deepLinks = scannerDeepLinks) {
+                composable(Screen.ScanData.route, deepLinks = listOf(
+                    navDeepLink { uriPattern = "lightning:{data}" },
+                    navDeepLink { uriPattern = "bitcoin:{data}" },
+                    navDeepLink { uriPattern = "lnurl:{data}" },
+                    navDeepLink { uriPattern = "lnurlp:{data}" },
+                    navDeepLink { uriPattern = "lnurlw:{data}" },
+                    navDeepLink { uriPattern = "keyauth:{data}" },
+                    navDeepLink { uriPattern = "phoenix:lightning:{data}" },
+                    navDeepLink { uriPattern = "phoenix:bitcoin:{data}" },
+                    navDeepLink { uriPattern = "scanview:{data}" },
+                )) {
                     val input = it.arguments?.getString("data")
-                    RequireStarted(appVM.walletState.value, nextUri = "scanview:$input") {
+                    RequireStarted(walletState, nextUri = "scanview:$input") {
                         ScanDataView(
                             input = input,
                             onBackClick = { popToHome(navController) },
@@ -215,18 +237,25 @@ fun AppView(
                             defaultValue = false
                         }
                     ),
+                    deepLinks = listOf(navDeepLink { uriPattern = "phoenix:payments/{direction}/{id}" })
                 ) {
                     val direction = it.arguments?.getLong("direction")
                     val id = it.arguments?.getString("id")
+
                     val paymentId = if (id != null && direction != null) WalletPaymentId.create(direction, id) else null
                     if (paymentId != null) {
-                        PaymentDetailsView(
-                            paymentId = paymentId,
-                            onBackClick = {
-                                navController.popBackStack()
-                            },
-                            fromEvent = it.arguments?.getBoolean("fromEvent") ?: false
-                        )
+                        RequireStarted(walletState, nextUri = "phoenix:payments/${direction}/${id}") {
+                            log.info { "navigating to payment-details id=$id" }
+                            PaymentDetailsView(
+                                paymentId = paymentId,
+                                onBackClick = {
+                                    if (!navController.popBackStack()) {
+                                        popToHome(navController)
+                                    }
+                                },
+                                fromEvent = it.arguments?.getBoolean("fromEvent") ?: false
+                            )
+                        }
                     }
                 }
                 composable(Screen.PaymentsHistory.route) {
@@ -354,7 +383,7 @@ fun AppView(
 /** Navigates to Home and pops everything from the backstack up to Home. This effectively resets the nav stack. */
 private fun popToHome(navController: NavHostController) {
     navController.navigate(Screen.Home.route) {
-        popUpTo(Screen.Home.route) { inclusive = true }
+        popUpTo(navController.graph.id) { inclusive = true }
     }
 }
 
@@ -407,11 +436,16 @@ private fun RequireStarted(
     nextUri: String? = null,
     children: @Composable () -> Unit
 ) {
-    val log = logger("RequireStarted")
-    if (walletState !is WalletState.Started) {
-        navController.navigate("${Screen.Startup.route}?next=$nextUri")
+    val log = logger("Navigation")
+    if (walletState == null) {
+        // do nothing
+    } else if (walletState !is WalletState.Started) {
+        log.debug { "access to screen has been denied (state=${walletState.name})" }
+        val nc = navController
+        nc.navigate("${Screen.Startup.route}?next=$nextUri") {
+            popUpTo(nc.graph.id) { inclusive = true }
+        }
     } else {
-        logger().debug { "access to screen granted" }
         children()
     }
 }

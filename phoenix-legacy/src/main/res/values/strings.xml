@@ -19,11 +19,11 @@
 
   <!-- //////////////// system notification channels //////////////// -->
 
-  <string name="legacy_notification_channels_watcher_title">Background watcher</string>
+  <string name="legacy_notification_channels_watcher_title">(Legacy) Background watcher</string>
   <string name="legacy_notification_channels_watcher_desc">Alerts you if you need to start the app. Should be high priority.</string>
-  <string name="legacy_notification_pay_to_open_missed_title">Missed payment notifications</string>
+  <string name="legacy_notification_pay_to_open_missed_title">(Legacy) Missed payment notifications</string>
   <string name="legacy_notification_pay_to_open_missed_desc">Notifies you when an incoming payment has failed because automatic on-the-fly channel creation has been disabled.</string>
-  <string name="legacy_notification_headless_title">Phoenix running in background</string>
+  <string name="legacy_notification_headless_title">(Legacy) Phoenix running in background</string>
   <string name="legacy_notification_headless_desc">Notifies you that Phoenix is running in background. This happens when someone is sending you money and the app is not already started.</string>
 
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->

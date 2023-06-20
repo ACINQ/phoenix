@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
     val log: Logger = LoggerFactory.getLogger(MainActivity::class.java)
     private val appViewModel by viewModels<AppViewModel>()
-    private var navController: NavController? = null
+    private var navController: NavHostController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,8 +88,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContent {
-            rememberNavController().let {
-                navController = it
+
+            navController = rememberNavController()
+            navController?.let {
                 PhoenixAndroidTheme(it) {
                     AppView(appViewModel, it)
                 }
@@ -102,6 +103,7 @@ class MainActivity : AppCompatActivity() {
         // force the intent flag to single top, in order to avoid [handleDeepLink] to finish the current activity.
         // this would otherwise clear the app view model, i.e. loose the state which virtually reboots the app
         // TODO: look into detaching the app state from the activity
+        log.info("receive new_intent=$intent")
         intent!!.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         this.navController?.handleDeepLink(intent)
     }

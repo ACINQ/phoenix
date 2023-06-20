@@ -22,27 +22,37 @@
     <string name="notification_channels_watcher_title">Channels watcher</string>
     <string name="notification_channels_watcher_desc">Shows up when you need to start Phoenix.</string>
 
-    <string name="notification_missed_payment_title">Missed payment notification</string>
-    <string name="notification_missed_payment_desc">Shows up when Phoenix is not able to receive a payment for some reason.</string>
+    <string name="notification_pending_settlement_title">Settlement pending</string>
+    <string name="notification_pending_settlement_desc">Tells you when Phoenix needs to be started to settle a payment.</string>
 
-    <string name="notification_received_payment_title">Received payment notification</string>
+    <string name="notification_missed_payment_title">Payment rejected</string>
+    <string name="notification_missed_payment_desc">Shows up when Phoenix cannot receive a payment because of a liquidity issue.</string>
+
+    <string name="notification_received_payment_title">Payment received</string>
     <string name="notification_received_payment_desc">Shows up when you receive a payment while the app is in the background.</string>
 
-    <string name="notification_headless_title">Background notification</string>
-    <string name="notification_headless_desc">Tells you when Phoenix is running in the background, usually because you have a payment incoming.</string>
+    <string name="notification_headless_title">Running in the background</string>
+    <string name="notification_headless_desc">Tells you when Phoenix is running in the background.</string>
 
     <!-- system notifications -->
 
-    <string name="notif__headless_title__default">Phoenix is running in the background</string>
-    <string name="notif__headless__received">You received %1$s</string>
+    <string name="notif_headless_title_default">Phoenix is running in the background</string>
+    <string name="notif_headless_received">Received +%1$s</string>
+    <string name="notif_headless_received_several_payments">Received over %1$d payments</string>
 
-    <string name="notif__missed__title">Missed incoming payment</string>
-    <string name="notif__missed__locked">Application was locked</string>
-    <string name="notif__rejected__title">Rejected incoming payment (+%1$s)</string>
-    <string name="notif__rejected__by_user">You have rejected the payment</string>
-    <string name="notif__rejected__policy_disabled">Automated liquidity policy is disabled. You can change that in the settings.</string>
-    <string name="notif__rejected__policy_too_expensive">The fee was %1$s, but your max fee was set to %2$s. You can tweak that in the settings.</string>
-    <string name="notif__rejected__channels_initializing">Your channels were initializing and could not accept that payment. Try again later.</string>
+    <string name="notif_pending_settlement_title">Please start Phoenix</string>
+    <string name="notif_pending_settlement_message">A incoming settlement is pending and should complete ASAP.</string>
+
+    <string name="notif_missed_title">Missed incoming payment</string>
+    <string name="notif_missed_unavailable">Phoenix was unable to start in the background.</string>
+    <string name="notif_missed_locked">Application was locked</string>
+
+    <string name="notif_rejected_deposit_title">On-chain deposit pending (+%1$s)</string>
+    <string name="notif_rejected_payment_title">Rejected incoming payment (+%1$s)</string>
+    <string name="notif_rejected_by_user">You have rejected the payment</string>
+    <string name="notif_rejected_policy_disabled">Automated liquidity policy is disabled. You can change that in the settings.</string>
+    <string name="notif_rejected_policy_too_expensive">The fee was %1$s, but your max fee was set to %2$s. You can tweak that in the settings.</string>
+    <string name="notif_rejected_channels_initializing">Your channels were initializing and could not accept that payment. Try again later.</string>
 
     <string name="notif_watcher_revoked_commit_title">Some of your channels have closed</string>
     <string name="notif_watcher_revoked_commit_message">Please start Phoenix to review your channels.</string>

@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android.utils
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -27,6 +28,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.MainActivity
@@ -38,31 +40,39 @@ import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
 import kotlinx.coroutines.flow.first
+import org.slf4j.LoggerFactory
+import java.util.Random
 
 object SystemNotificationHelper {
-    const val MISSED_PAYMENT_NOTIF_ID = 354319
-    const val MISSED_PAYMENT_NOTIF_CHANNEL = "${BuildConfig.APPLICATION_ID}.MISSED_PAYMENT_NOTIF"
-    const val RECEIVED_PAYMENT_NOTIF_ID = 354320
-    const val RECEIVED_PAYMENT_NOTIF_CHANNEL = "${BuildConfig.APPLICATION_ID}.INCOMING_PAYMENT_NOTIF"
+    private const val PAYMENT_FAILED_NOTIF_ID = 354319
+    private const val PAYMENT_FAILED_NOTIF_CHANNEL = "${BuildConfig.APPLICATION_ID}.PAYMENT_FAILED_NOTIF"
+    private const val PAYMENT_RECEIVED_NOTIF_CHANNEL = "${BuildConfig.APPLICATION_ID}.PAYMENT_RECEIVED_NOTIF"
+    private const val SETTLEMENT_PENDING_NOTIF_ID = 354322
+    private const val SETTLEMENT_PENDING_NOTIF_CHANNEL = "${BuildConfig.APPLICATION_ID}.SETTLEMENT_PENDING_NOTIF"
 
-    const val BACKGROUND_NOTIF_ID = 354321
-    const val BACKGROUND_NOTIF_CHANNEL = "${BuildConfig.APPLICATION_ID}.BACKGROUND_PROCESSING"
+    const val HEADLESS_NOTIF_ID = 354321
+    const val HEADLESS_NOTIF_CHANNEL = "${BuildConfig.APPLICATION_ID}.BACKGROUND_PROCESSING"
 
-    const val CHANNELS_WATCHER_ALERT_ID = 354324
-    const val CHANNELS_WATCHER_ALERT_CHANNEL = "${BuildConfig.APPLICATION_ID}.CHANNELS_WATCHER"
+    private const val CHANNELS_WATCHER_ALERT_ID = 354324
+    private const val CHANNELS_WATCHER_ALERT_CHANNEL = "${BuildConfig.APPLICATION_ID}.CHANNELS_WATCHER"
+
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     fun registerNotificationChannels(context: Context) {
         // notification channels (android 8+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.getSystemService(NotificationManager::class.java)?.createNotificationChannels(
                 listOf(
-                    NotificationChannel(BACKGROUND_NOTIF_CHANNEL, context.getString(R.string.notification_headless_title), NotificationManager.IMPORTANCE_HIGH).apply {
+                    NotificationChannel(HEADLESS_NOTIF_CHANNEL, context.getString(R.string.notification_headless_title), NotificationManager.IMPORTANCE_DEFAULT).apply {
                         description = context.getString(R.string.notification_headless_desc)
                     },
-                    NotificationChannel(RECEIVED_PAYMENT_NOTIF_CHANNEL, context.getString(R.string.notification_received_payment_title), NotificationManager.IMPORTANCE_HIGH).apply {
+                    NotificationChannel(PAYMENT_RECEIVED_NOTIF_CHANNEL, context.getString(R.string.notification_pending_settlement_title), NotificationManager.IMPORTANCE_HIGH).apply {
+                        description = context.getString(R.string.notification_pending_settlement_desc)
+                    },
+                    NotificationChannel(PAYMENT_RECEIVED_NOTIF_CHANNEL, context.getString(R.string.notification_received_payment_title), NotificationManager.IMPORTANCE_LOW).apply {
                         description = context.getString(R.string.notification_received_payment_desc)
                     },
-                    NotificationChannel(MISSED_PAYMENT_NOTIF_CHANNEL, context.getString(R.string.notification_missed_payment_title), NotificationManager.IMPORTANCE_HIGH).apply {
+                    NotificationChannel(PAYMENT_FAILED_NOTIF_CHANNEL, context.getString(R.string.notification_missed_payment_title), NotificationManager.IMPORTANCE_DEFAULT).apply {
                         description = context.getString(R.string.notification_missed_payment_desc)
                     },
                 )
@@ -70,60 +80,95 @@ object SystemNotificationHelper {
         }
     }
 
-    private fun notifyPaymentMissed(context: Context, title: String, message: String) {
-        NotificationCompat.Builder(context, MISSED_PAYMENT_NOTIF_CHANNEL).apply {
+    fun notifyRunningHeadless(context: Context): Notification {
+        return NotificationCompat.Builder(context, HEADLESS_NOTIF_CHANNEL).apply {
+            setContentTitle(context.getString(R.string.notif_headless_title_default))
+            setSmallIcon(R.drawable.ic_phoenix_outline)
+        }.build().also {
+            NotificationManagerCompat.from(context).notify(HEADLESS_NOTIF_ID, it)
+        }
+    }
+
+    private fun notifyPaymentFailed(context: Context, title: String, message: String): Notification {
+        return NotificationCompat.Builder(context, PAYMENT_FAILED_NOTIF_CHANNEL).apply {
             setContentTitle(title)
             setContentText(message)
             setStyle(NotificationCompat.BigTextStyle().bigText(message))
             setSmallIcon(R.drawable.ic_phoenix_outline)
             setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE))
             setAutoCancel(true)
-        }.let {
-            NotificationManagerCompat.from(context).notify(MISSED_PAYMENT_NOTIF_ID, it.build())
+        }.build().also {
+            NotificationManagerCompat.from(context).notify(PAYMENT_FAILED_NOTIF_ID, it)
         }
     }
 
-    fun notifyPaymentMissedRejectedByUser(context: Context, amountIncoming: MilliSatoshi) {
-        notifyPaymentMissed(
+    fun notifyPaymentRejectedByUser(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi): Notification {
+        return notifyPaymentFailed(
             context = context,
-            title = context.getString(R.string.notif__rejected__title, amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
-            message = context.getString(R.string.notif__rejected__by_user),
+            title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
+                amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
+            message = context.getString(R.string.notif_rejected_by_user),
         )
     }
 
-    fun notifyPaymentMissedPolicyDisabled(context: Context, amountIncoming: MilliSatoshi) {
-        notifyPaymentMissed(
+    fun notifyPaymentRejectedPolicyDisabled(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi): Notification {
+        return notifyPaymentFailed(
             context = context,
-            title = context.getString(R.string.notif__rejected__title, amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
-            message = context.getString(R.string.notif__rejected__policy_disabled),
+            title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
+                amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
+            message = context.getString(R.string.notif_rejected_policy_disabled),
         )
     }
 
-    fun notifyPaymentMissedChannelsInitializing(context: Context, amountIncoming: MilliSatoshi) {
-        notifyPaymentMissed(
+    fun notifyPaymentRejectedChannelsInitializing(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi): Notification {
+        return notifyPaymentFailed(
             context = context,
-            title = context.getString(R.string.notif__rejected__title, amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
-            message = context.getString(R.string.notif__rejected__channels_initializing),
+            title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
+                amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
+            message = context.getString(R.string.notif_rejected_channels_initializing),
         )
     }
 
-    fun notifyPaymentMissedTooExpensive(context: Context, amountIncoming: MilliSatoshi, maxAllowed: MilliSatoshi, actual: MilliSatoshi) {
-        notifyPaymentMissed(
+    fun notifyPaymentRejectedTooExpensive(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, maxAllowed: MilliSatoshi, actual: MilliSatoshi): Notification {
+        return notifyPaymentFailed(
             context = context,
-            title = context.getString(R.string.notif__rejected__title, amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
-            message = context.getString(R.string.notif__rejected__policy_too_expensive,
+            title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
+                amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
+            message = context.getString(R.string.notif_rejected_policy_too_expensive,
                 actual.toPrettyString(BitcoinUnit.Sat, withUnit = true),
                 maxAllowed.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
         )
     }
 
-    suspend fun notifyPaymentReceived(
+    fun notifyPaymentMissedAppUnavailable(context: Context): Notification {
+        return notifyPaymentFailed(
+            context = context,
+            title = context.getString(R.string.notif_missed_title),
+            message = context.getString(R.string.notif_missed_unavailable),
+        )
+    }
+
+    fun notifyPendingSettlement(context: Context): Notification {
+        return NotificationCompat.Builder(context, SETTLEMENT_PENDING_NOTIF_CHANNEL).apply {
+            setContentTitle(context.getString(R.string.notif_pending_settlement_title))
+            setContentText(context.getString(R.string.notif_pending_settlement_message))
+            setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(R.string.notif_pending_settlement_message)))
+            setSmallIcon(R.drawable.ic_phoenix_outline)
+            setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE))
+            setAutoCancel(true)
+        }.build().also {
+            NotificationManagerCompat.from(context).notify(SETTLEMENT_PENDING_NOTIF_ID, it)
+        }
+    }
+
+    suspend fun notifyPaymentsReceived(
         context: Context,
         paymentHash: ByteVector32,
         amount: MilliSatoshi,
-        rates: List<ExchangeRate>
-    ) {
-        val isFiat = UserPrefs.getIsAmountInFiat(context).first()
+        rates: List<ExchangeRate>,
+        isHeadless: Boolean,
+    ): Notification {
+        val isFiat = UserPrefs.getIsAmountInFiat(context).first() && rates.isNotEmpty()
         val unit = if (isFiat) {
             UserPrefs.getFiatCurrency(context).first()
         } else {
@@ -146,21 +191,24 @@ object SystemNotificationHelper {
                 else -> null
             }
         } else null
-        NotificationCompat.Builder(context, RECEIVED_PAYMENT_NOTIF_CHANNEL).apply {
-            setContentTitle(context.getString(R.string.notif__headless__received, amount.toPrettyString(unit, rate, withUnit = true)))
+
+        return NotificationCompat.Builder(context, PAYMENT_RECEIVED_NOTIF_CHANNEL).apply {
+            setContentTitle(context.getString(R.string.notif_headless_received, amount.toPrettyString(unit, rate, withUnit = true)))
             setSmallIcon(R.drawable.ic_phoenix_outline)
             setContentIntent(TaskStackBuilder.create(context).run {
-                Intent(
-                    Intent.ACTION_VIEW,
-                    "phoenix:payment/${WalletPaymentId.DbType.INCOMING}/${paymentHash.toHex()}".toUri(),
-                    context,
-                    MainActivity::class.java
-                ).let { addNextIntentWithParentStack(it) }
-                getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
+                addNextIntentWithParentStack(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        "phoenix:payments/${WalletPaymentId.DbType.INCOMING.value}/${paymentHash.toHex()}".toUri(),
+                        context,
+                        MainActivity::class.java
+                    )
+                )
+                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             })
             setAutoCancel(true)
-        }.let {
-            NotificationManagerCompat.from(context).notify(RECEIVED_PAYMENT_NOTIF_ID, it.build())
+        }.build().also {
+            NotificationManagerCompat.from(context).notify(if (isHeadless) HEADLESS_NOTIF_ID else Random().nextInt(), it)
         }
     }
 

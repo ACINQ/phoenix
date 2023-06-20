@@ -1,6 +1,5 @@
 package fr.acinq.phoenix.android.service
 
-import android.app.Notification
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
@@ -8,7 +7,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import androidx.annotation.WorkerThread
-import androidx.core.app.NotificationCompat
+import androidx.compose.runtime.mutableStateListOf
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -20,7 +19,6 @@ import fr.acinq.lightning.io.PaymentReceived
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
-import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
@@ -28,6 +26,7 @@ import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.managers.AppConfigurationManager
+import fr.acinq.phoenix.managers.CurrencyManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.*
@@ -49,7 +48,6 @@ class NodeService : Service() {
 
     // Notifications
     private lateinit var notificationManager: NotificationManagerCompat
-    private val notificationBuilder = NotificationCompat.Builder(this, SystemNotificationHelper.BACKGROUND_NOTIF_CHANNEL)
 
     /** State of the wallet, provides access to the business when started. Private so that it's not mutated from the outside. */
     private val _state = MutableLiveData<WalletState>(WalletState.Off)
@@ -59,7 +57,7 @@ class NodeService : Service() {
     private val stateLock = ReentrantLock()
 
     /** List of payments received while the app is in the background */
-    private val receivedInBackground: MutableLiveData<List<MilliSatoshi>> = MutableLiveData(emptyList())
+    private val receivedInBackground = mutableStateListOf<MilliSatoshi>()
 
     override fun onCreate() {
         super.onCreate()
@@ -87,8 +85,9 @@ class NodeService : Service() {
         log.info("binding node service from intent=$intent")
         // UI is binding to the service. The service is not headless anymore and we can remove the notification.
         isHeadless = false
+        receivedInBackground.clear()
         stopForeground(STOP_FOREGROUND_REMOVE)
-        notificationManager.cancel(SystemNotificationHelper.BACKGROUND_NOTIF_ID)
+        notificationManager.cancel(SystemNotificationHelper.HEADLESS_NOTIF_ID)
         return binder
     }
 
@@ -101,12 +100,11 @@ class NodeService : Service() {
     private val shutdownHandler = Handler(Looper.getMainLooper())
     private val shutdownRunnable: Runnable = Runnable {
         if (isHeadless) {
-            log.info("reached scheduled shutdown...")
-            if (receivedInBackground.value == null || receivedInBackground.value!!.isEmpty()) {
+            log.debug("reached scheduled shutdown...")
+            if (receivedInBackground.isEmpty()) {
                 stopForeground(STOP_FOREGROUND_REMOVE)
             } else {
                 stopForeground(STOP_FOREGROUND_DETACH)
-                notificationManager.notify(SystemNotificationHelper.BACKGROUND_NOTIF_ID, notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline).setAutoCancel(true).build())
             }
             shutdown()
         }
@@ -128,23 +126,31 @@ class NodeService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         log.info("start service from intent [ intent=$intent, flag=$flags, startId=$startId ]")
-        val reason = intent?.getStringExtra(EXTRA_REASON) // ?.also { spawnReason = it }
+        val reason = intent?.getStringExtra(EXTRA_REASON)
 
         val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext)
         when {
             state.value is WalletState.Started -> {
-                notifyForegroundService(getString(R.string.notif__headless_title__default), null)
+                // NOTE: the notification will NOT be shown if the app is already running
+                val notif = SystemNotificationHelper.notifyRunningHeadless(applicationContext)
+                startForeground(SystemNotificationHelper.HEADLESS_NOTIF_ID, notif)
             }
             encryptedSeed is EncryptedSeed.V2.NoAuth -> {
                 encryptedSeed.decrypt().let {
                     log.info("successfully decrypted seed in the background, starting wallet...")
-                    notifyForegroundService(getString(R.string.notif__headless_title__default), null)
+                    val notif = SystemNotificationHelper.notifyRunningHeadless(applicationContext)
+                    startForeground(SystemNotificationHelper.HEADLESS_NOTIF_ID, notif)
                     startBusiness(it, requestCheckLegacyChannels = false)
                 }
             }
             else -> {
-                log.info("unhandled incoming payment with seed=${encryptedSeed?.name()}")
-                notifyForegroundService(getString(R.string.notif__missed__title), getString(R.string.notif__missed__locked))
+                log.info("unhandled incoming payment with seed=${encryptedSeed?.name()} reason=$reason")
+                val notif = when (reason) {
+                    "IncomingPayment" -> SystemNotificationHelper.notifyPaymentMissedAppUnavailable(applicationContext)
+                    "PendingSettlement" -> SystemNotificationHelper.notifyPendingSettlement(applicationContext)
+                    else -> SystemNotificationHelper.notifyRunningHeadless(applicationContext)
+                }
+                startForeground(SystemNotificationHelper.HEADLESS_NOTIF_ID, notif)
             }
         }
         shutdownHandler.removeCallbacksAndMessages(null)
@@ -216,7 +222,7 @@ class NodeService : Service() {
         val preferredFiatCurrency = UserPrefs.getFiatCurrency(applicationContext).first()
         val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(decryptedPayload))
 
-        monitorPaymentsWhenHeadless(business.peerManager, business.nodeParamsManager)
+        monitorPaymentsWhenHeadless(business.peerManager, business.nodeParamsManager, business.currencyManager)
         business.walletManager.loadWallet(seed)
         business.appConfigurationManager.updatePreferredFiatCurrencies(
             AppConfigurationManager.PreferredFiatCurrencies(primary = preferredFiatCurrency, others = emptySet())
@@ -245,7 +251,8 @@ class NodeService : Service() {
         return WalletState.Started.Kmm(business)
     }
 
-    private fun monitorPaymentsWhenHeadless(peerManager: PeerManager, nodeParamsManager: NodeParamsManager) {
+    private fun monitorPaymentsWhenHeadless(peerManager: PeerManager, nodeParamsManager: NodeParamsManager, currencyManager: CurrencyManager) {
+
         serviceScope.launch {
             nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents.collect { event ->
                 // TODO: click on notif must deeplink to the notification screen
@@ -254,16 +261,16 @@ class NodeService : Service() {
                         log.debug("processing liquidity_event=$event")
                         when (val reason = event.reason) {
                             is LiquidityEvents.Rejected.Reason.RejectedByUser -> {
-                                SystemNotificationHelper.notifyPaymentMissedRejectedByUser(applicationContext, event.amount)
+                                SystemNotificationHelper.notifyPaymentRejectedByUser(applicationContext, event.source, event.amount)
                             }
                             is LiquidityEvents.Rejected.Reason.PolicySetToDisabled -> {
-                                SystemNotificationHelper.notifyPaymentMissedPolicyDisabled(applicationContext, event.amount)
+                                SystemNotificationHelper.notifyPaymentRejectedPolicyDisabled(applicationContext, event.source, event.amount)
                             }
                             is LiquidityEvents.Rejected.Reason.TooExpensive -> {
-                                SystemNotificationHelper.notifyPaymentMissedTooExpensive(applicationContext, event.amount, reason.maxAllowed, reason.actual)
+                                SystemNotificationHelper.notifyPaymentRejectedTooExpensive(applicationContext, event.source, event.amount, reason.maxAllowed, reason.actual)
                             }
                             LiquidityEvents.Rejected.Reason.ChannelInitializing -> {
-                                SystemNotificationHelper.notifyPaymentMissedChannelsInitializing(applicationContext, event.amount)
+                                SystemNotificationHelper.notifyPaymentRejectedChannelsInitializing(applicationContext, event.source, event.amount)
                             }
                         }
                     }
@@ -276,7 +283,18 @@ class NodeService : Service() {
                 when (event) {
                     is PaymentReceived -> {
                         if (isHeadless) {
-                            SystemNotificationHelper.notifyPaymentReceived(applicationContext, paymentHash = event.incomingPayment.paymentHash, amount = event.received.amount, rates = emptyList())
+                            receivedInBackground.add(event.received.amount)
+                            SystemNotificationHelper.notifyPaymentsReceived(
+                                context = applicationContext,
+                                paymentHash = event.incomingPayment.paymentHash,
+                                amount = event.received.amount,
+                                rates = currencyManager.ratesFlow.value,
+                                isHeadless = isHeadless && receivedInBackground.size == 1
+                            )
+
+                            // push back service shutdown by 60s - maybe we'll receive more payments?
+                            shutdownHandler.removeCallbacksAndMessages(null)
+                            shutdownHandler.postDelayed(shutdownRunnable, 60 * 1000)
                         }
                     }
                     else -> Unit
@@ -305,26 +323,6 @@ class NodeService : Service() {
             }
         } else {
             log.debug("ignored attempt to update state=${_state.value} to state=$newState")
-        }
-    }
-
-    /** Display a blocking notification and set the service as being foregrounded. */
-    private fun notifyForegroundService(title: String?, message: String?) {
-        log.debug("notifying foreground service with msg=$message")
-        updateNotification(title, message).also { startForeground(SystemNotificationHelper.BACKGROUND_NOTIF_ID, it) }
-    }
-
-    private fun updateNotification(title: String?, message: String?): Notification {
-        title?.let {
-            notificationBuilder.setContentTitle(it)
-        }
-        message?.let {
-            notificationBuilder.setContentText(message)
-            notificationBuilder.setStyle(NotificationCompat.BigTextStyle().bigText(message))
-        }
-        notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline)
-        return notificationBuilder.build().apply {
-            notificationManager.notify(SystemNotificationHelper.BACKGROUND_NOTIF_ID, this)
         }
     }
 

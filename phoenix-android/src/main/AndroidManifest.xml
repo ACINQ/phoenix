@@ -21,6 +21,17 @@
         android:supportsRtl="true"
         android:hardwareAccelerated="true"
         android:theme="@style/default_theme">
+
+        <!-- Set custom default icon for notifications -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:value="@drawable/ic_phoenix_outline" />
+        <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
+             notification message. See README(https://goo.gl/6BKBk7) for more. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:value="#ff0000" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -34,7 +45,6 @@
             <!-- support for lightning/bitcoin/lnurl schemes -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
 
@@ -86,16 +96,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
-        <!-- Set custom default icon for notifications -->
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
-            android:value="@drawable/ic_phoenix_outline" />
-        <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
-             notification message. See README(https://goo.gl/6BKBk7) for more. -->
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_color"
-            android:value="?attr/colorPrimary" />
 
     </application>
 </manifest>
