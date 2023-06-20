@@ -86,7 +86,7 @@ internal sealed class NotificationData {
         }
         sealed class RevokedFound : WatchTowerOutcome() {
             @Serializable
-            data class V0(@Serializable val channels: Set<@Serializable ByteVector32>): Nominal()
+            data class V0(@Serializable val channels: Set<@Serializable ByteVector32>): RevokedFound()
         }
     }
 
