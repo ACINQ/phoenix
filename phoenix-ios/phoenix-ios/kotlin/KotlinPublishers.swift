@@ -177,6 +177,45 @@ extension NodeParamsManager {
 	}
 }
 
+// MARK: -
+extension PhoenixShared.NotificationsManager {
+
+	fileprivate struct _Key {
+		static var notificationsPublisher = 0
+	}
+
+	struct NotificationItem {
+		let ids: Set<String>
+		let notification: PhoenixShared.Notification
+	}
+
+	func notificationsPublisher() -> AnyPublisher<[NotificationItem], Never> {
+
+		self.getSetAssociatedObject(storageKey: &_Key.notificationsPublisher) {
+
+			// Transforming from Kotlin:
+			// `notifications = StateFlow<List<Pair<Set<UUID>, Notification>>>`
+			// 
+			KotlinCurrentValueSubject<NSArray, Array<AnyObject>>(
+				self.notifications
+			)
+			.map { originalArray in
+				let transformedArray: [NotificationItem] = originalArray.compactMap { value in
+					guard
+						let pair = value as? KotlinPair<AnyObject, AnyObject>,
+						let ids = pair.first as? Set<String>,
+						let notification = pair.second as? PhoenixShared.Notification
+					else {
+						return nil
+					}
+					return NotificationItem(ids: ids, notification: notification)
+				}
+				return transformedArray
+			}
+			.eraseToAnyPublisher()
+		}
+	}
+}
 
 // MARK: -
 extension PaymentsManager {

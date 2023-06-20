@@ -130,8 +130,9 @@ struct PrivacyView: View {
 				case .paymentHistory     : break
 				case .backup             : break
 				case .drainWallet        : break
-				case .backgroundPayments : break
 				case .electrum           : newNavLinkTag = NavLinkTag.ElectrumConfigurationView
+				case .backgroundPayments : break
+				case .liquiditySettings  : break
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {

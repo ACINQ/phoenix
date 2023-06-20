@@ -371,6 +371,7 @@ struct ConfigurationView: View {
 				case .drainWallet        : newNavLinkTag = .DrainWalletView
 				case .electrum           : newNavLinkTag = .PrivacyView
 				case .backgroundPayments : newNavLinkTag = .DisplayConfigurationView
+				case .liquiditySettings  : newNavLinkTag = .PaymentOptionsView
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {

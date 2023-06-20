@@ -44,7 +44,11 @@ struct MaxFeeConfiguration: View {
 	let examplePayments: [Int64] = [1_000, 10_000, 100_000, 1_000_000]
 	@State var examplePaymentsIdx = 1
 	
+	@State var firstAppearance = true
+	
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	enum ExampleHeight: Preference {}
 	let exampleHeightReader = GeometryPreferenceReader(
@@ -108,6 +112,10 @@ struct MaxFeeConfiguration: View {
 			self.proportionalFeeProblem = .invalid(.notANumber)
 		}
 	}
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	var body: some View {
@@ -196,6 +204,9 @@ struct MaxFeeConfiguration: View {
 			.font(.title2)
 		}
 		.padding()
+		.onAppear {
+			onAppear()
+		}
 		.onChange(of: baseFee) { _ in
 			baseFeeDidChange()
 		}
@@ -384,6 +395,10 @@ struct MaxFeeConfiguration: View {
 		} // </ZStack>
 	}
 	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
 	func formatPercent_noFractionDigits(_ value: Double) -> String {
 		
 		let formatter = NumberFormatter()
@@ -519,6 +534,29 @@ struct MaxFeeConfiguration: View {
 			parsedAmount: $parsedProportionalFee
 		)
 	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		if firstAppearance {
+			firstAppearance = false
+			
+			if let deepLink = deepLinkManager.deepLink, deepLink == .liquiditySettings {
+				// Reached our destination
+				DispatchQueue.main.async { // iOS 14 issues workaround
+					deepLinkManager.unbroadcast(deepLink)
+				}
+			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
 	
 	func baseFeeDidChange() {
 		log.trace("baseFeeDidChange()")

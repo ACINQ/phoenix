@@ -353,6 +353,7 @@ struct DisplayConfigurationView: View {
 				case .drainWallet        : break
 				case .electrum           : break
 				case .backgroundPayments : newNavLinkTag = NavLinkTag.BackgroundPaymentsSelector
+				case .liquiditySettings  : break
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {

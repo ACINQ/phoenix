@@ -182,3 +182,8 @@ fun ChannelEvents.asConfirmed(): ChannelEvents.Confirmed? = when (this) {
     is ChannelEvents.Confirmed -> this
     else -> null
 }
+
+fun LiquidityEvents.Rejected.Reason.asTooExpensive(): LiquidityEvents.Rejected.Reason.TooExpensive? = when (this) {
+    is LiquidityEvents.Rejected.Reason.TooExpensive -> this
+    else -> null
+}

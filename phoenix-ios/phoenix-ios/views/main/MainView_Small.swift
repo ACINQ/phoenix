@@ -535,6 +535,7 @@ struct MainView_Small: View {
 				case .drainWallet        : newNavLinkTag = .ConfigurationView
 				case .electrum           : newNavLinkTag = .ConfigurationView
 				case .backgroundPayments : newNavLinkTag = .ConfigurationView
+				case .liquiditySettings  : newNavLinkTag = .ConfigurationView
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {

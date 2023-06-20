@@ -13,109 +13,133 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct IncomingDepositPopover: View {
 	
+	let swapInWalletBalancePublisher = Biz.business.balanceManager.swapInWalletBalancePublisher()
 	@State var swapInWalletBalance: WalletBalance = WalletBalance.companion.empty()
 	
-	@State var swapIn_minFundingSat: Int64 = 0
-	@State var swapIn_minFeeSat: Int64 = 0
-	@State var swapIn_feePercent: Double = 0.0
+	let swapInRejectedPublisher = Biz.swapInRejectedPublisher
+	@State var swapInRejected: Lightning_kmpLiquidityEventsRejected? = nil
 	
 	// Toggles confirmation dialog (used to select preferred explorer)
 	@State var showBlockchainExplorerOptions = false
 	
-	let swapInWalletBalancePublisher = Biz.business.balanceManager.swapInWalletBalancePublisher()
-	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
-	
 	@Environment(\.popoverState) var popoverState: PopoverState
+	
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	@ViewBuilder
 	var body: some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			header()
 			content()
-			footer()
 		}
 		.onReceive(swapInWalletBalancePublisher) {
 			swapInWalletBalanceChanged($0)
 		}
-		.onReceive(chainContextPublisher) {
-			chainContextChanged($0)
+		.onReceive(swapInRejectedPublisher) {
+			swapInRejectedStateChanged($0)
 		}
+	}
+	
+	@ViewBuilder
+	func header() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			
+			if showNormal() {
+				Text("Customize tip")
+					.font(.title3)
+					.accessibilityAddTraits(.isHeader)
+					.accessibilitySortPriority(100)
+			} else {
+				Text("On-chain pending funds")
+					.font(.title3)
+					.accessibilityAddTraits(.isHeader)
+					.accessibilitySortPriority(100)
+			}
+			
+			Spacer()
+			
+			Button {
+				close()
+			} label: {
+				Image("ic_cross")
+					.resizable()
+					.frame(width: 30, height: 30)
+			}
+			.accessibilityLabel("Close")
+			.accessibilityHidden(popoverState.currentItem?.dismissable ?? false)
+		}
+		.padding(.horizontal)
+		.padding(.vertical, 8)
+		.background(
+			Color(UIColor.secondarySystemBackground)
+				.cornerRadius(15, corners: [.topLeft, .topRight])
+		)
+		.padding(.bottom, 4)
 	}
 	
 	@ViewBuilder
 	func content() -> some View {
 		
-		let incomingSat = swapInWalletBalance.total.sat
-		if incomingSat >= swapIn_minFundingSat {
-			content_sufficient()
+		if showNormal() {
+			content_normal()
+			footer()
 		} else {
-			content_insufficient()
+			content_pendingFunds()
 		}
 	}
 	
 	@ViewBuilder
-	func content_sufficient() -> some View {
-		
-		let minFee = Utils.formatBitcoin(sat: swapIn_minFeeSat, bitcoinUnit: .sat)
-		let feePercent = formatFeePercent()
+	func content_normal() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 15) {
 			
 			Text(
 				"""
-				Once the incoming payment is confirmed, Phoenix will use the funds to open a payment channel.
+				These funds will appear on your balance once swapped to Lightning, according to your fee settings.
+				"""
+			)
+			.multilineTextAlignment(.leading)
+			.fixedSize(horizontal: false, vertical: true) // text truncation bugs
+		}
+		.padding(.all, 20)
+	}
+	
+	@ViewBuilder
+	func content_pendingFunds() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 15) {
+			
+			Text(
+				"""
+				You have funds that could not be swapped to Lightning.
 				"""
 			)
 			.multilineTextAlignment(.leading)
 			.fixedSize(horizontal: false, vertical: true) // text truncation bugs
 			
-			Text(styled: String(format: NSLocalizedString(
-				"""
-				The fee is **%@%%** (%@ minimum).
-				""",
-				comment:	"Minimum amount description."),
-				feePercent, minFee.string
-			))
-			.multilineTextAlignment(.leading)
-			.fixedSize(horizontal: false, vertical: true) // text truncation bugs
-		}
-		.padding([.top, .leading, .trailing], 20)
-		.padding(.bottom, 30)
-	}
-	
-	@ViewBuilder
-	func content_insufficient() -> some View {
-		
-		let minFunding = Utils.formatBitcoin(sat: swapIn_minFundingSat, bitcoinUnit: .sat)
-		
-		let minFee = Utils.formatBitcoin(sat: swapIn_minFeeSat, bitcoinUnit: .sat)
-		let feePercent = formatFeePercent()
-		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 15) {
+			if let rejected = swapInRejected, let reason = rejected.reason.asTooExpensive() {
+				
+				let maxFee = Utils.formatBitcoin(msat: reason.maxAllowed, bitcoinUnit: .sat)
+				let actualFee = Utils.formatBitcoin(msat: reason.actual, bitcoinUnit: .sat)
+				
+				Text("The fee was \(actualFee.string), but your max fee was set to \(maxFee.string)")
+					.multilineTextAlignment(.leading)
+					.fixedSize(horizontal: false, vertical: true) // text truncation bugs
+			}
 			
-			Text(styled: String(format: NSLocalizedString(
-				"""
-				Total deposits must be at least **%@**. Please make additional deposits to use the funds within Phoenix.
-				""",
-				comment:	"Minimum amount description."),
-				minFunding.string
-			))
-			.multilineTextAlignment(.leading)
-			.fixedSize(horizontal: false, vertical: true) // text truncation bugs
-			
-			Text(styled: String(format: NSLocalizedString(
-				"""
-				Once the minimum amount is reached, Phoenix will use the funds to open a payment channel. \
-				The fee is **%@%%** (%@ minimum).
-				""",
-				comment:	"Minimum amount description."),
-				feePercent, minFee.string
-			))
-			.multilineTextAlignment(.leading)
-			.fixedSize(horizontal: false, vertical: true) // text truncation bugs
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Spacer()
+				Button {
+					navigateToLiquiditySettings()
+				} label: {
+					Text("Check my settings")
+				}
+			}
+			.padding(.top, 5)
 		}
-		.padding([.top, .leading, .trailing], 20)
-		.padding(.bottom, 30)
+		.padding(.all, 20)
 	}
 	
 	@ViewBuilder
@@ -166,13 +190,17 @@ struct IncomingDepositPopover: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func formatFeePercent() -> String {
+	func showNormal() -> Bool {
 		
-		let formatter = NumberFormatter()
-		formatter.minimumFractionDigits = 0
-		formatter.maximumFractionDigits = 3
+		return !showOnChainPendingFunds()
+	}
+	
+	func showOnChainPendingFunds() -> Bool {
 		
-		return formatter.string(from: NSNumber(value: swapIn_feePercent))!
+		return swapInWalletBalance.confirmed.sat > 0 &&
+			swapInWalletBalance.unconfirmed.sat == 0 &&
+			swapInWalletBalance.weaklyConfirmed.sat == 0 &&
+			swapInRejected != nil
 	}
 	
 	// --------------------------------------------------
@@ -185,17 +213,23 @@ struct IncomingDepositPopover: View {
 		swapInWalletBalance = walletBalance
 	}
 	
-	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
-		log.trace("chainContextChanged()")
+	func swapInRejectedStateChanged(_ state: Lightning_kmpLiquidityEventsRejected?) {
+		log.trace("swapInRejectedStateChanged()")
 		
-		swapIn_minFundingSat = context.payToOpen.v1.minFundingSat // not yet segregated for swapIn - future work
-		swapIn_minFeeSat = context.payToOpen.v1.minFeeSat         // not yet segregated for swapIn - future work
-		swapIn_feePercent = context.swapIn.v1.feePercent * 100    // 0.01 => 1%
+		swapInRejected = state
 	}
 	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
+	
+	func navigateToLiquiditySettings() {
+		log.trace("navigateToLiquiditySettings()")
+		
+		popoverState.close {
+			self.deepLinkManager.broadcast(.liquiditySettings)
+		}
+	}
 	
 	func exploreIncomingDeposit(website: BlockchainExplorer.Website) {
 		log.trace("exploreIncomingDeposit()")

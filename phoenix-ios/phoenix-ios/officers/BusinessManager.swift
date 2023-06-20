@@ -180,27 +180,40 @@ class BusinessManager {
 		.store(in: &cancellables)
 		
 		// NodeEvents
-//		business.nodeParamsManager.nodeParamsPublisher()
-//			.flatMap { $0.nodeEventsPublisher() }
-//			.sink { (event: Lightning_kmpNodeEvents) in
-//				
-//				if let rejected = event as? Lightning_kmpLiquidityEventsRejected {
-//					log.debug("Received Lightning_kmpLiquidityEventsRejected: \(rejected)")
-//					if rejected.source == Lightning_kmpLiquidityEventsSource.onchainwallet {
-//						self.swapInRejectedPublisher.value = rejected
-//					}
-//					
-//				} else if let accepted = event as? Lightning_kmpLiquidityEventsAccepted {
-//					log.debug("Received Lightning_kmpLiquidityEventsAccepted: \(accepted)")
-//					if accepted.source == Lightning_kmpLiquidityEventsSource.onchainwallet {
-//						self.swapInRejectedPublisher.value = nil
-//					}
-//					
-//				} else {
-//					log.debug("Received Lightning_iDontKnow: !!!")
-//				}
-//			}
-//			.store(in: &cancellables)
+		business.nodeParamsManager.nodeParamsPublisher()
+			.flatMap { $0.nodeEventsPublisher() }
+			.sink { (event: Lightning_kmpNodeEvents) in
+				
+				if let rejected = event as? Lightning_kmpLiquidityEventsRejected,
+				   rejected.source == Lightning_kmpLiquidityEventsSource.onchainwallet
+				{
+					log.debug("Received Lightning_kmpLiquidityEventsRejected: \(rejected)")
+					self.swapInRejectedPublisher.value = rejected
+				}
+			}
+			.store(in: &cancellables)
+		
+		// LiquidityEvent.Accepted is still missing.
+		// So we're simulating it by monitoring the swapIn wallet balance.
+		// A LiquidityEvent.Rejected occurs when:
+		// - swapInWalletBalance.confirmed > 0
+		// - but the fees exceed the confirmed maxFees
+		//
+		// If the swapIn successfully occurs later,
+		// then the entire confirmed balance is consumed,
+		// and thus the confirmed balance drops to zero.
+		//
+		business.balanceManager.swapInWalletBalancePublisher()
+			.sink { (balance: WalletBalance) in
+				
+				if balance.confirmed.sat == 0 {
+					if self.swapInRejectedPublisher.value != nil {
+						log.debug("Received Lightning_kmpLiquidityEventsAccepted")
+						self.swapInRejectedPublisher.value = nil
+					}
+				}
+			}
+			.store(in: &cancellables)
 	}
 	
 	// --------------------------------------------------

@@ -867,6 +867,7 @@ struct MainView_Big: View {
 				case .drainWallet        : showSettings()
 				case .electrum           : showSettings()
 				case .backgroundPayments : showSettings()
+				case .liquiditySettings  : showSettings()
 			}
 		}
 	}

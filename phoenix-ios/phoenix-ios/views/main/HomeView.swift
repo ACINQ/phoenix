@@ -66,6 +66,9 @@ struct HomeView : MVIView {
 	// Toggles confirmation dialog (used to select preferred explorer)
 	@State var showBlockchainExplorerOptions = false
 	
+	let bizNotificationsPublisher = Biz.business.notificationsManager.notificationsPublisher()
+	@State var bizNotifications: [PhoenixShared.NotificationsManager.NotificationItem] = []
+	
 	@Environment(\.popoverState) var popoverState: PopoverState
 	@Environment(\.openURL) var openURL
 	@Environment(\.colorScheme) var colorScheme
@@ -141,6 +144,9 @@ struct HomeView : MVIView {
 		}
 		.onReceive(manualBackup_taskDone_publisher) {
 			self.manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
+		}
+		.onReceive(bizNotificationsPublisher) {
+			bizNotificationsChanged($0)
 		}
 	}
 
@@ -282,72 +288,37 @@ struct HomeView : MVIView {
 				? Utils.hiddenAmount(currencyPrefs)
 				: Utils.format(currencyPrefs, sat: incomingSat)
 			
-			if swapInRejected == nil {
-				incomingBalance_sufficient(formattedAmount)
-					.onTapGesture { showIncomingDepositPopover() }
-			} else {
-				incomingBalance_insufficient(formattedAmount)
-					.onTapGesture { showIncomingDepositPopover() }
-			}
-		}
-	}
-	
-	@ViewBuilder
-	func incomingBalance_sufficient(_ incoming: FormattedAmount) -> some View {
-		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-		
-			Image(systemName: "link")
-				.padding(.trailing, 2)
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
-			if currencyPrefs.hideAmounts {
-				Text("+\(incoming.digits) incoming".lowercased()) // digits => "***"
-					.accessibilityLabel("plus hidden amount incoming")
+				if swapInRejected != nil {
+					Image(systemName: "zzz")
+						.padding(.trailing, 2)
+				} else {
+					Image(systemName: "link")
+						.padding(.trailing, 2)
+				}
 				
-			} else {
-				Text("+\(incoming.string) incoming".lowercased())
+				if currencyPrefs.hideAmounts {
+					Text("+\(formattedAmount.digits) incoming".lowercased()) // digits => "***"
+						.accessibilityLabel("plus hidden amount incoming")
+					
+				} else {
+					Text("+\(formattedAmount.string) incoming".lowercased())
+				}
 			}
-		}
-		.font(.callout)
-		.foregroundColor(.secondary)
-		.padding(.top, 7)
-		.padding(.bottom, 2)
-		.scaleEffect(incomingSwapScaleFactor, anchor: .top)
-		.onAnimationCompleted(for: incomingSwapScaleFactor) {
-			incomingSwapAnimationCompleted()
-		}
-		.accessibilityElement(children: .combine)
-		.accessibilityHint("pending on-chain confirmation")
-		.accessibilitySortPriority(48)
-	}
-	
-	@ViewBuilder
-	func incomingBalance_insufficient(_ incoming: FormattedAmount) -> some View {
-		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-		
-			Image(systemName: "exclamationmark.triangle")
-				.padding(.trailing, 2)
-			
-			if currencyPrefs.hideAmounts {
-				Text("+\(incoming.digits) incoming".lowercased()) // digits => "***"
-					.accessibilityLabel("plus hidden amount incoming")
-				
-			} else {
-				Text("+\(incoming.string) incoming".lowercased())
+			.font(.callout)
+			.foregroundColor(.secondary)
+			.onTapGesture { showIncomingDepositPopover() }
+			.padding(.top, 7)
+			.padding(.bottom, 2)
+			.scaleEffect(incomingSwapScaleFactor, anchor: .top)
+			.onAnimationCompleted(for: incomingSwapScaleFactor) {
+				incomingSwapAnimationCompleted()
 			}
+			.accessibilityElement(children: .combine)
+			.accessibilityHint("pending on-chain confirmation")
+			.accessibilitySortPriority(48)
 		}
-		.font(.callout)
-		.foregroundColor(.appNegative)
-		.padding(.top, 7)
-		.padding(.bottom, 2)
-		.scaleEffect(incomingSwapScaleFactor, anchor: .top)
-		.onAnimationCompleted(for: incomingSwapScaleFactor) {
-			incomingSwapAnimationCompleted()
-		}
-		.accessibilityElement(children: .combine)
-		.accessibilityHint("amount insufficient")
-		.accessibilitySortPriority(48)
 	}
 	
 	@ViewBuilder
@@ -790,6 +761,12 @@ struct HomeView : MVIView {
 		log.trace("swapInRejectedStateChange()")
 		
 		swapInRejected = state
+	}
+	
+	func bizNotificationsChanged(_ list: [PhoenixShared.NotificationsManager.NotificationItem]) {
+		log.trace("bizNotificationsChanges()")
+		
+		bizNotifications = list
 	}
 	
 	fileprivate func footerCellDidAppear() {
