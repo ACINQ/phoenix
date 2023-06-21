@@ -139,7 +139,7 @@ struct PrivacyView: View {
 				
 				self.swiftUiBugWorkaround = newNavLinkTag
 				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: 1.0)
+				clearSwiftUiBugWorkaround(delay: 1.5)
 				
 				self.navLinkTag = newNavLinkTag // Trigger/push the view
 			}

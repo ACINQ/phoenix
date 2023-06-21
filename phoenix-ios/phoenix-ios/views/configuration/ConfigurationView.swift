@@ -41,8 +41,6 @@ struct ConfigurationView: View {
 	@State private var backupSeedState: BackupSeedState = .safelyBackedUp
 	let backupSeedStatePublisher: AnyPublisher<BackupSeedState, Never>
 	
-	@State private var listViewId = UUID()
-	
 	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
 	@State private var swiftUiBugWorkaroundIdx = 0
 	
@@ -87,7 +85,6 @@ struct ConfigurationView: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.id(listViewId)
 		.onAppear() {
 			onAppear()
 		}
@@ -365,20 +362,21 @@ struct ConfigurationView: View {
 			
 			// Navigate towards deep link (if needed)
 			var newNavLinkTag: NavLinkTag? = nil
+			var delay: TimeInterval = 1.5 // seconds; multiply by number of screens we need to navigate
 			switch value {
 				case .paymentHistory     : break
-				case .backup             : newNavLinkTag = .RecoveryPhraseView
-				case .drainWallet        : newNavLinkTag = .DrainWalletView
-				case .electrum           : newNavLinkTag = .PrivacyView
-				case .backgroundPayments : newNavLinkTag = .DisplayConfigurationView
-				case .liquiditySettings  : newNavLinkTag = .PaymentOptionsView
+				case .backup             : newNavLinkTag = .RecoveryPhraseView       ; delay *= 1
+				case .drainWallet        : newNavLinkTag = .DrainWalletView          ; delay *= 1
+				case .electrum           : newNavLinkTag = .PrivacyView              ; delay *= 2
+				case .backgroundPayments : newNavLinkTag = .DisplayConfigurationView ; delay *= 2
+				case .liquiditySettings  : newNavLinkTag = .PaymentOptionsView       ; delay *= 2
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
 				
 				self.swiftUiBugWorkaround = newNavLinkTag
 				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: 1.0)
+				clearSwiftUiBugWorkaround(delay: delay)
 				
 				self.navLinkTag = newNavLinkTag // Trigger/push the view
 			}

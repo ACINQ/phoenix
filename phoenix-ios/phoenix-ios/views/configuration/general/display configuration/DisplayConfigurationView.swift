@@ -20,6 +20,18 @@ fileprivate enum NavLinkTag: String {
 
 struct DisplayConfigurationView: View {
 	
+	@ViewBuilder
+	var body: some View {
+		ScrollViewReader { scrollViewProxy in
+			DisplayConfigurationList(scrollViewProxy: scrollViewProxy)
+		}
+	}
+}
+
+fileprivate struct DisplayConfigurationList: View {
+	
+	let scrollViewProxy: ScrollViewProxy
+	
 	@State private var navLinkTag: NavLinkTag? = nil
 	
 	@State var fiatCurrency = GroupPrefs.shared.fiatCurrency
@@ -29,11 +41,16 @@ struct DisplayConfigurationView: View {
 	@State var recentPaymentsConfig = Prefs.shared.recentPaymentsConfig
 	@State var notificationSettings = NotificationsManager.shared.settings.value
 	
-	@State var sectionId = UUID()
 	@State var firstAppearance = true
 	
 	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
 	@State private var swiftUiBugWorkaroundIdx = 0
+	
+	@Namespace var sectionID_currency
+	@Namespace var sectionID_theme
+	@Namespace var sectionID_paymentHistory
+	@Namespace var sectionID_home
+	@Namespace var sectionID_backgroundPayments
 	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
@@ -60,9 +77,11 @@ struct DisplayConfigurationView: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.onAppear {
 			onAppear()
+		}
+		.onChange(of: navLinkTag) {
+			navLinkTagChanged($0)
 		}
 		.onReceive(GroupPrefs.shared.fiatCurrencyPublisher) {
 			fiatCurrency = $0
@@ -119,8 +138,9 @@ struct DisplayConfigurationView: View {
 				.foregroundColor(.secondary)
 				.padding(.top, 8)
 				.padding(.bottom, 4)
-		}
-		.id(sectionId)
+			
+		} // </Section>
+		.id(sectionID_currency)
 	}
 	
 	@ViewBuilder
@@ -140,6 +160,7 @@ struct DisplayConfigurationView: View {
 			.pickerStyle(SegmentedPickerStyle())
 			
 		} // </Section>
+		.id(sectionID_theme)
 	}
 	
 	@ViewBuilder
@@ -175,6 +196,7 @@ struct DisplayConfigurationView: View {
 			.padding(.bottom, 4)
 			
 		} // </Section>
+		.id(sectionID_paymentHistory)
 	}
 	
 	@ViewBuilder
@@ -209,6 +231,7 @@ struct DisplayConfigurationView: View {
 				.padding(.bottom, 4)
 			
 		} // </Section>
+		.id(sectionID_home)
 	}
 	
 	@ViewBuilder
@@ -267,6 +290,7 @@ struct DisplayConfigurationView: View {
 			} // </navLink>
 			
 		} // </Section>
+		.id(sectionID_backgroundPayments)
 	}
 	
 	@ViewBuilder
@@ -301,20 +325,6 @@ struct DisplayConfigurationView: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		// SwiftUI BUG, and workaround.
-		//
-		// In iOS 14, the row remains selected after we return from the subview.
-		// For example:
-		// - Tap on "Fiat Currency"
-		// - Make a selection or tap "<" to pop back
-		// - Notice that the "Fiat Currency" row is still selected (e.g. has gray background)
-		//
-		// There are several workaround for this issue:
-		// https://developer.apple.com/forums/thread/660468
-		//
-		// We are implementing the least risky solution.
-		// Which requires us to change the `Section.id` property.
-		
 		if firstAppearance {
 			firstAppearance = false
 			
@@ -323,9 +333,6 @@ struct DisplayConfigurationView: View {
 					deepLinkChanged(deepLink)
 				}
 			}
-			
-		} else {
-			sectionId = UUID()
 		}
 	}
 	
@@ -352,7 +359,7 @@ struct DisplayConfigurationView: View {
 				case .backup             : break
 				case .drainWallet        : break
 				case .electrum           : break
-				case .backgroundPayments : newNavLinkTag = NavLinkTag.BackgroundPaymentsSelector
+				case .backgroundPayments : newNavLinkTag = NavLinkTag.BackgroundPaymentsSelector // RecentPaymentsSelector
 				case .liquiditySettings  : break
 			}
 			
@@ -360,14 +367,34 @@ struct DisplayConfigurationView: View {
 				
 				self.swiftUiBugWorkaround = newNavLinkTag
 				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: 5.0)
+				clearSwiftUiBugWorkaround(delay: 1.5)
 				
-				self.navLinkTag = newNavLinkTag // Trigger/push the view
+				// Interesting bug in SwiftUI:
+				// If the navLinkTag you're targetting is scrolled off the screen,
+				// the you won't be able to navigate to it.
+				// My understanding is that List is lazy, and this somehow prevents triggering the navigation.
+				// The workaround is to manually scroll to the item to ensure it's onscreen,
+				// at which point we can activate the navLinkTag trigger.
+				// 
+				scrollViewProxy.scrollTo(sectionID_backgroundPayments)
+				DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+					self.navLinkTag = newNavLinkTag // Trigger/push the view
+				}
 			}
 			
 		} else {
 			// We reached the final destination of the deep link
-			clearSwiftUiBugWorkaround(delay: 1.0)
+			clearSwiftUiBugWorkaround(delay: 0.0)
+		}
+	}
+	
+	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
+		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
+		
+		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
+				
+			log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
+			self.navLinkTag = forcedNavLinkTag
 		}
 	}
 	
