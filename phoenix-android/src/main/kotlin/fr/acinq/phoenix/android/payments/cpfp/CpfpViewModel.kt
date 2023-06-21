@@ -40,7 +40,7 @@ sealed class CpfpState {
     data class Executing(val actualFeerate: FeeratePerKw) : CpfpState()
     sealed class Complete : CpfpState() {
         object Success: Complete()
-        data class Failed(val failure: ChannelCommand.Splice.Response.Failure): Complete()
+        data class Failed(val failure: ChannelCommand.Commitment.Splice.Response.Failure): Complete()
     }
     sealed class Error: CpfpState() {
         data class Thrown(val e: Throwable): Error()
@@ -94,11 +94,11 @@ class CpfpViewModel(val peerManager: PeerManager) : ViewModel() {
                         log.info("failed to execute cpfp splice: assuming no channels")
                         state = CpfpState.Error.NoChannels
                     }
-                    is ChannelCommand.Splice.Response.Created -> {
+                    is ChannelCommand.Commitment.Splice.Response.Created -> {
                         log.info("successfully executed cpfp splice: $res")
                         state = CpfpState.Complete.Success
                     }
-                    is ChannelCommand.Splice.Response.Failure -> {
+                    is ChannelCommand.Commitment.Splice.Response.Failure -> {
                         log.info("failed to execute cpfp splice: $res")
                         state = CpfpState.Complete.Failed(res)
                     }

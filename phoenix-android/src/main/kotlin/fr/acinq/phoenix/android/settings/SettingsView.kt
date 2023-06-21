@@ -61,6 +61,7 @@ fun SettingsView() {
             SettingButton(text = R.string.settings_display_prefs, icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences) })
             SettingButton(text = R.string.settings_wallet_info, icon = R.drawable.ic_box, onClick = { nc.navigate(Screen.WalletInfo) })
             SettingButton(text = R.string.settings_payment_settings, icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings)})
+            SettingButton(text = R.string.settings_notifications, icon = R.drawable.ic_notification, onClick = { nc.navigate(Screen.Notifications)})
         }
 
         // -- privacy & security
@@ -78,6 +79,7 @@ fun SettingsView() {
             SettingButton(text = R.string.settings_list_channels, icon = R.drawable.ic_zap, onClick = { nc.navigate(Screen.Channels) })
             SettingButton(text = R.string.settings_logs, icon = R.drawable.ic_text, onClick = { nc.navigate(Screen.Logs)})
             SettingButton(text = R.string.settings_mutual_close, icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose) })
+            SettingButton(text = R.string.settings_reset_wallet, icon = R.drawable.ic_trash, onClick = { nc.navigate(Screen.ResetWallet) })
             SettingButton(text = R.string.settings_force_close, icon = R.drawable.ic_alert_triangle, onClick = { nc.navigate(Screen.ForceClose) })
         }
         Spacer(Modifier.height(32.dp))

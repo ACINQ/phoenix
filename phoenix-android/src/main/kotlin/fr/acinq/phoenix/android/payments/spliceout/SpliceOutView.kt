@@ -198,16 +198,16 @@ fun SendSpliceOutView(
                 ErrorMessage(
                     header = stringResource(id = R.string.send_spliceout_error_failure),
                     details = when (state.result) {
-                        is ChannelCommand.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, state.result.reason)
-                        is ChannelCommand.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
-                        is ChannelCommand.Splice.Response.Failure.ChannelNotIdle -> stringResource(id = R.string.splice_error_channel_not_idle)
-                        is ChannelCommand.Splice.Response.Failure.Disconnected -> stringResource(id = R.string.splice_error_disconnected)
-                        is ChannelCommand.Splice.Response.Failure.FundingFailure -> stringResource(id = R.string.splice_error_funding_error, state.result.reason.javaClass.simpleName)
-                        is ChannelCommand.Splice.Response.Failure.InsufficientFunds -> stringResource(id = R.string.splice_error_insufficient_funds)
-                        is ChannelCommand.Splice.Response.Failure.CannotStartSession -> stringResource(id = R.string.splice_error_cannot_start_session)
-                        is ChannelCommand.Splice.Response.Failure.InteractiveTxSessionFailed -> stringResource(id = R.string.splice_error_interactive_session, state.result.reason.javaClass.simpleName)
-                        is ChannelCommand.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> stringResource(id = R.string.splice_error_invalid_pubkey)
-                        is ChannelCommand.Splice.Response.Failure.SpliceAlreadyInProgress -> stringResource(id = R.string.splice_error_splice_in_progress)
+                        is ChannelCommand.Commitment.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, state.result.reason)
+                        is ChannelCommand.Commitment.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
+                        is ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotIdle -> stringResource(id = R.string.splice_error_channel_not_idle)
+                        is ChannelCommand.Commitment.Splice.Response.Failure.Disconnected -> stringResource(id = R.string.splice_error_disconnected)
+                        is ChannelCommand.Commitment.Splice.Response.Failure.FundingFailure -> stringResource(id = R.string.splice_error_funding_error, state.result.reason.javaClass.simpleName)
+                        is ChannelCommand.Commitment.Splice.Response.Failure.InsufficientFunds -> stringResource(id = R.string.splice_error_insufficient_funds)
+                        is ChannelCommand.Commitment.Splice.Response.Failure.CannotStartSession -> stringResource(id = R.string.splice_error_cannot_start_session)
+                        is ChannelCommand.Commitment.Splice.Response.Failure.InteractiveTxSessionFailed -> stringResource(id = R.string.splice_error_interactive_session, state.result.reason.javaClass.simpleName)
+                        is ChannelCommand.Commitment.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> stringResource(id = R.string.splice_error_invalid_pubkey)
+                        is ChannelCommand.Commitment.Splice.Response.Failure.SpliceAlreadyInProgress -> stringResource(id = R.string.splice_error_splice_in_progress)
                     },
                     alignment = Alignment.CenterHorizontally
                 )

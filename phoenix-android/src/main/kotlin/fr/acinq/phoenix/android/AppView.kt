@@ -348,7 +348,10 @@ fun AppView(
                     FinalWalletInfo(onBackClick = { navController.popBackStack() })
                 }
                 composable(Screen.LiquidityPolicy.route) {
-                    LiquidityPolicyView(onBackClick = { navController.popBackStack() }, onAdvancedClick = { navController.navigate(Screen.AdvancedLiquidityPolicy.route) })
+                    LiquidityPolicyView(
+                        onBackClick = { navController.popBackStack() },
+                        onAdvancedClick = { navController.navigate(Screen.AdvancedLiquidityPolicy.route) }
+                    )
                 }
                 composable(Screen.AdvancedLiquidityPolicy.route) {
                     AdvancedIncomingFeePolicy(onBackClick = { navController.popBackStack() })
@@ -356,8 +359,11 @@ fun AppView(
                 composable(Screen.Notifications.route) {
                     NotificationsView(
                         noticesViewModel = noticesViewModel,
-                        onBackClick = { navController.popBackStack() }
+                        onBackClick = { navController.popBackStack() },
                     )
+                }
+                composable(Screen.ResetWallet.route) {
+                    ResetWallet(onBackClick = { navController.popBackStack() })
                 }
             }
         }

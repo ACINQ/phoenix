@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.components.TextWithIcon
 
@@ -40,6 +41,8 @@ fun FeedbackMessage(
     details: CharSequence? = null,
     icon: Int,
     iconColor: Color,
+    iconSize: Dp = 20.dp,
+    space: Dp = 8.dp,
     headerStyle: TextStyle = MaterialTheme.typography.body2,
     detailsStyle: TextStyle = MaterialTheme.typography.subtitle2,
     padding: PaddingValues = PaddingValues(16.dp),
@@ -54,15 +57,15 @@ fun FeedbackMessage(
             text = header,
             textStyle = headerStyle,
             icon = icon,
-            iconSize = 20.dp,
+            iconSize = iconSize,
             iconTint = iconColor,
-            space = 8.dp,
+            space = space,
             modifier = if (alignment == Alignment.CenterHorizontally) Modifier.widthIn(max = 250.dp) else Modifier,
         )
         if (details != null) {
             Spacer(modifier = Modifier.height(2.dp))
             val mod = if (alignment == Alignment.Start) {
-                Modifier.padding(start = 30.dp)
+                Modifier.padding(start = space + iconSize)
             } else {
                 Modifier
             }

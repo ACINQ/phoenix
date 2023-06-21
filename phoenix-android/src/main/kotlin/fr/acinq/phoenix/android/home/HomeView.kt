@@ -180,7 +180,7 @@ fun HomeView(
     val progress = 1 - (collapsibleHeight.value - minPx) / (maxPx - minPx)
 
     MVIView(CF::home) { model, _ ->
-        val balance = remember(model) { model.balance }
+        val balance = model.balance
         val notices = noticesViewModel.notices.values.toList()
         val notifications by business.notificationsManager.notifications.collectAsState(emptyList())
 

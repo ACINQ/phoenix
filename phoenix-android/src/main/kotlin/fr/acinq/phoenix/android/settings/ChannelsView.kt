@@ -126,19 +126,7 @@ private fun ChannelLine(channel: LocalChannelInfo, onClick: () -> Unit) {
         ) {}
         Spacer(modifier = Modifier.width(16.dp))
         Text(
-            text = when (channel.stateName) {
-                Normal::class.simpleName -> stringResource(id = R.string.state_normal)
-                Closed::class.simpleName -> stringResource(id = R.string.state_closed)
-                Closing::class.simpleName -> stringResource(id = R.string.state_closing)
-                Syncing::class.simpleName -> stringResource(id = R.string.state_sync)
-                Offline::class.simpleName -> stringResource(id = R.string.state_offline)
-                ShuttingDown::class.simpleName -> stringResource(id = R.string.state_shutdown)
-                WaitForFundingConfirmed::class.simpleName, WaitForAcceptChannel::class.simpleName,
-                WaitForChannelReady::class.simpleName, WaitForFundingSigned::class.simpleName,
-                WaitForFundingCreated::class.simpleName -> stringResource(id = R.string.state_wait_confirmed)
-                WaitForOpenChannel::class.simpleName -> stringResource(id = R.string.state_wait_open)
-                else -> channel.stateName
-            },
+            text = channel.stateName,
             modifier = Modifier.weight(1.0f),
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,

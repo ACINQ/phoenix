@@ -94,7 +94,7 @@ fun TextInput(
             colors = outlinedTextFieldColors(),
             shape = RoundedCornerShape(8.dp),
             interactionSource = interactionSource,
-            modifier = Modifier.padding(bottom = 8.dp, top = if (staticLabel != null) 14.dp else 0.dp)
+            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp, top = if (staticLabel != null) 14.dp else 0.dp)
         )
 
         staticLabel?.let {

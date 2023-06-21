@@ -16,11 +16,14 @@
 
 package fr.acinq.phoenix.android.components.feedback
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.orange
 
@@ -30,6 +33,8 @@ fun WarningMessage(
     details: String,
     headerStyle: TextStyle = MaterialTheme.typography.body2,
     detailsStyle: TextStyle = MaterialTheme.typography.subtitle2,
+    space: Dp = 8.dp,
+    padding: PaddingValues = PaddingValues(16.dp),
     modifier: Modifier = Modifier,
     alignment: Alignment.Horizontal = Alignment.Start,
 ) {
@@ -40,6 +45,8 @@ fun WarningMessage(
         detailsStyle = detailsStyle,
         icon = R.drawable.ic_alert_triangle,
         iconColor = orange,
+        space = space,
+        padding = padding,
         modifier = modifier,
         alignment = alignment,
     )

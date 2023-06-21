@@ -44,9 +44,9 @@ sealed class SpliceOutState {
     sealed class Complete: SpliceOutState() {
         abstract val userAmount: Satoshi
         abstract val feerate: FeeratePerKw
-        abstract val result: ChannelCommand.Splice.Response
-        data class Success(override val userAmount: Satoshi, override val feerate: FeeratePerKw, override val result: ChannelCommand.Splice.Response.Created): Complete()
-        data class Failure(override val userAmount: Satoshi, override val feerate: FeeratePerKw, override val result: ChannelCommand.Splice.Response.Failure): Complete()
+        abstract val result: ChannelCommand.Commitment.Splice.Response
+        data class Success(override val userAmount: Satoshi, override val feerate: FeeratePerKw, override val result: ChannelCommand.Commitment.Splice.Response.Created): Complete()
+        data class Failure(override val userAmount: Satoshi, override val feerate: FeeratePerKw, override val result: ChannelCommand.Commitment.Splice.Response.Failure): Complete()
     }
     sealed class Error: SpliceOutState() {
         data class Thrown(val e: Throwable): Error()
@@ -105,11 +105,11 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
                     feerate = feerate,
                 )
                 when (response) {
-                    is ChannelCommand.Splice.Response.Created -> {
+                    is ChannelCommand.Commitment.Splice.Response.Created -> {
                         log.info("successfully executed splice-out: $response")
                         state = SpliceOutState.Complete.Success(amount, feerate, response)
                     }
-                    is ChannelCommand.Splice.Response.Failure -> {
+                    is ChannelCommand.Commitment.Splice.Response.Failure -> {
                         log.info("failed to execute splice-out: $response")
                         state = SpliceOutState.Complete.Failure(amount, feerate, response)
                     }

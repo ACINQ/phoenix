@@ -273,11 +273,13 @@
     <string name="settings_list_channels">Payment channels</string>
     <string name="settings_logs">Logs</string>
     <string name="settings_electrum">Electrum server</string>
+    <string name="settings_reset_wallet">Reset wallet</string>
     <string name="settings_mutual_close">Drain wallet</string>
     <string name="settings_force_close">Danger zone</string>
     <string name="settings_tor">Tor</string>
     <string name="settings_about">About</string>
     <string name="settings_payment_settings">Options &amp; fees</string>
+    <string name="settings_notifications">Notifications</string>
 
     <!-- mutual close -->
 
@@ -552,17 +554,6 @@
     <string name="paymentdetails_amount_received_label">Amount received</string>
     <string name="paymentdetails_amount_rate_now">≈ %1$s (now)</string>
     <string name="paymentdetails_amount_rate_then">≈ %1$s (then)</string>
-
-    <!-- human-readable channel states -->
-
-    <string name="state_wait_confirmed">Waiting for confirmation</string>
-    <string name="state_wait_open">Waiting for peer</string>
-    <string name="state_closing">Channel is closing</string>
-    <string name="state_closed">Channel has been closed</string>
-    <string name="state_normal">Up and running</string>
-    <string name="state_sync">Synchronizing</string>
-    <string name="state_offline">Peer is offline</string>
-    <string name="state_shutdown">Shutdown</string>
 
     <!-- settings: access control -->
 
@@ -961,5 +952,24 @@
     <string name="splice_error_interactive_session">Interactive tx session failed [%1$s]</string>
     <string name="splice_error_invalid_pubkey">Invalid splice-out pubkey script</string>
     <string name="splice_error_splice_in_progress">A splice payment is already in progress</string>
+
+    <!-- reset wallet -->
+
+    <string name="reset_wallet_title">Reset wallet</string>
+    <string name="reset_wallet_instructions_header">Delete all wallet data from this device</string>
+    <string name="reset_wallet_instructions_details">This will reset the app, as if you had just installed it.</string>
+    <string name="reset_wallet_review_button">Review</string>
+
+    <string name="reset_wallet_confirm_title">Confirm reset</string>
+    <string name="reset_wallet_confirm_header">The wallet will be completely deleted from <b>this device</b>.</string>
+    <string name="reset_wallet_confirm_details">This will reset the app. You will be taken to the Intro screen, and prompted to create or restore a wallet.</string>
+    <string name="reset_wallet_confirm_seed_balance">Don\'t lose your funds:\n%1$s (≈ %2$s).</string>
+    <string name="reset_wallet_confirm_seed_responsibility">You are responsible for storing your recovery phrase.</string>
+    <string name="reset_wallet_confirm_button">Delete wallet</string>
+
+    <string name="reset_wallet_deleting">Deleting wallet data…</string>
+    <string name="reset_wallet_success">Wallet has been successfully reset</string>
+    <string name="reset_wallet_success_details">Moving back to init screen…</string>
+    <string name="reset_wallet_failure_title">Reset failed</string>
 
 </resources>

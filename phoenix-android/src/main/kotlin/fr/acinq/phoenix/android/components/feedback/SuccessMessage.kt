@@ -25,9 +25,9 @@ import fr.acinq.phoenix.android.utils.positiveColor
 @Composable
 fun SuccessMessage(
     header: String,
-    details: String,
+    details: String? = null,
     modifier: Modifier = Modifier,
-    alignment: Alignment.Horizontal
+    alignment: Alignment.Horizontal = Alignment.Start,
 ) {
     FeedbackMessage(
         header = header,

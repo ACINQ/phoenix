@@ -122,7 +122,7 @@ fun DisplaySeedView() {
                 )
                 Checkbox(
                     text = stringResource(id = R.string.displayseed_loss_disclaimer_checkbox),
-                    padding = PaddingValues(16.dp),
+                    padding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                     checked = disclaimerChecked,
                     onCheckedChange = {
                         scope.launch { InternalData.saveSeedLossDisclaimerRead(context, it) }
