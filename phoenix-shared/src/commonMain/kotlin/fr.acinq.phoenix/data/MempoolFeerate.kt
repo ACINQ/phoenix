@@ -16,7 +16,11 @@
 
 package fr.acinq.phoenix.data
 
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
+import fr.acinq.lightning.blockchain.fee.FeeratePerKw
+import fr.acinq.lightning.transactions.Transactions
+import fr.acinq.lightning.utils.sat
 
 
 /** Inspired from https://mempool.space/api/v1/fees/recommended */
@@ -27,4 +31,14 @@ data class MempoolFeerate(
     val economy: FeeratePerByte,
     val minimum: FeeratePerByte,
     val timestamp: Long,
-)
+) {
+    /** A service fee is expected if no channels. */
+    fun swapEstimationFee(hasNoChannels: Boolean): Satoshi {
+        return Transactions.weight2fee(feerate = FeeratePerKw(hour), weight = DualFundingPayToSpliceWeight) + if (hasNoChannels) 1000.sat else 0.sat
+    }
+
+    companion object {
+        /** Spending a channel output and adding funds from a wpkh wallet with one change output: 2-inputs (wpkh+wsh)/2-outputs (wpkh+wsh) */
+        val DualFundingPayToSpliceWeight = 992
+    }
+}

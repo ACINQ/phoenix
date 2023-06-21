@@ -33,7 +33,6 @@ class PeerManager(
     private val configurationManager: AppConfigurationManager,
     private val notificationsManager: NotificationsManager,
     private val electrumWatcher: ElectrumWatcher,
-    private val electrumClient: ElectrumClient,
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness) : this(
@@ -43,7 +42,6 @@ class PeerManager(
         configurationManager = business.appConfigurationManager,
         notificationsManager = business.notificationsManager,
         electrumWatcher = business.electrumWatcher,
-        electrumClient = business.electrumClient,
     )
 
     private val logger = newLogger(loggerFactory)
@@ -57,10 +55,6 @@ class PeerManager(
      */
     private val _channelsFlow = MutableStateFlow<Map<ByteVector32, LocalChannelInfo>?>(null)
     val channelsFlow: StateFlow<Map<ByteVector32, LocalChannelInfo>?> = _channelsFlow
-
-    /** Feerate used by the peer. Data fed by Electrum under the hood. */
-    private val _electrumFeerate = MutableStateFlow<ElectrumFeerate?>(null)
-    val electrumFeerate: StateFlow<ElectrumFeerate?> = _electrumFeerate
 
     /** Forward compatibility check. [UpgradeRequired] is sent by the peer when an old version of Phoenix restores a wallet that has been used with new channel types. */
     private val _upgradeRequired = MutableStateFlow(false)
@@ -126,7 +120,6 @@ class PeerManager(
             _peer.value = peer
 
             launch { monitorNodeEvents(nodeParams) }
-            launch { pollElectrumFeerate() }
 
             // The local channels flow must use `bootFlow` first, as `channelsFlow` is empty when the wallet starts.
             // `bootFlow` data come from the local database and will be overridden by fresh data once the connection
@@ -173,27 +166,6 @@ class PeerManager(
         getPeer().nodeParams.liquidityPolicy.value = newPolicy
     }
 
-    /** Temporary method that polls the electrum client for an estimation of a 1-block target feerate. Should be done in lightning-kmp. */
-    private suspend fun pollElectrumFeerate() {
-        while (this.isActive) {
-            try {
-                withTimeout(5000) {
-                    val currentChannels = channelsFlow.filterNotNull().first()
-                    val nextBlock = electrumClient.estimateFees(1)
-                    val funding = electrumClient.estimateFees(144)
-                    logger.info { "electrum fee estimation for target 1 block=$nextBlock 144 blocks=$funding" }
-                    if (nextBlock.feerate != null && funding.feerate != null) {
-                        _electrumFeerate.value = ElectrumFeerate(nextBlock.feerate!!, funding.feerate!!, currentChannels.isNotEmpty())
-                    }
-                }
-                delay(2 * 60 * 60 * 1000)
-            } catch (e: Exception) {
-                logger.debug { "electrum fee estimation timeout" }
-                delay(5 * 1000)
-            }
-        }
-    }
-
     private suspend fun monitorNodeEvents(nodeParams: NodeParams) {
         nodeParams.nodeEvents.collect { event ->
             logger.info { "collecting node_event=$event" }
@@ -207,13 +179,5 @@ class PeerManager(
                 else -> {}
             }
         }
-    }
-}
-
-data class ElectrumFeerate(val nextBlockFeerate: FeeratePerKw, val fundingFeerate: FeeratePerKw, val hasChannelsAlready: Boolean) {
-    /** Rough estimation of the cost of a swap-in (splicing/opening), using a hard-coded weight. */
-    val swapEstimationFee: Satoshi by lazy {
-        // TODO not use hardcoded values
-        Transactions.weight2fee(feerate = fundingFeerate, weight = 992) + if (hasChannelsAlready) 0.sat else 1000.sat // the service fee is expected if no channels
     }
 }

@@ -203,12 +203,8 @@ class AppConfigurationManager(
                 try {
                     logger.debug { "fetching mempool feerate" }
                     // FIXME: use our own endpoint
-                    val response = httpClient.get(
-                        when (chain) {
-                            is NodeParams.Chain.Mainnet -> "https://mempool.space/api/v1/fees/recommended"
-                            else -> "https://mempool.space/testnet/api/v1/fees/recommended"
-                        }
-                    )
+                    // always use Mainnet, even on Testnet
+                    val response = httpClient.get("https://mempool.space/api/v1/fees/recommended")
                     if (response.status.isSuccess()) {
                         val json = Json.decodeFromString<JsonObject>(response.bodyAsText(Charsets.UTF_8))
                         logger.debug { "mempool feerate endpoint returned json=$json" }
@@ -218,7 +214,7 @@ class AppConfigurationManager(
                             hour = FeeratePerByte(json["hourFee"]!!.jsonPrimitive.long.sat),
                             economy = FeeratePerByte(json["economyFee"]!!.jsonPrimitive.long.sat),
                             minimum = FeeratePerByte(json["minimumFee"]!!.jsonPrimitive.long.sat),
-                            timestamp = currentTimestampMillis()
+                            timestamp = currentTimestampMillis(),
                         )
                         _mempoolFeerate.value = feerate
                     }
