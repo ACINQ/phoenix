@@ -718,7 +718,7 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
-    <string name="tor_settings_subtitle">Phoenix can use Tor to shield your IP from the other nodes in the Lightning Network and Electrum servers. This improves your privacy but makes the app slower.</string>
+    <string name="tor_settings_subtitle">Phoenix can use Tor to shield your IP from the other nodes in the Lightning Network and Electrum servers.\n\nEnabling Tor will improve your privacy, but may cause payment issues if your connection is unstable.</string>
     <string name="tor_settings_unknown">Checking preferences…</string>
     <string name="tor_settings_enabled">Tor is enabled</string>
     <string name="tor_settings_enabled_description">Connections to the Lightning network and Electrum servers will be protected.</string>

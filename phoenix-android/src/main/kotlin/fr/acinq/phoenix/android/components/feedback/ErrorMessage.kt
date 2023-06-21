@@ -39,7 +39,7 @@ fun ErrorMessage(
         header = header,
         details = when (details) {
             is AnnotatedString -> annotatedStringResource(id = R.string.component_error_message_details, details)
-            else -> stringResource(id = R.string.component_error_message_details)
+            else -> stringResource(id = R.string.component_error_message_details, details.toString())
         },
         icon = R.drawable.ic_alert_triangle,
         iconColor = negativeColor,
