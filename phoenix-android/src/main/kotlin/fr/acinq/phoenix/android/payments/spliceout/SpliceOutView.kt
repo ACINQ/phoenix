@@ -67,7 +67,7 @@ fun SendSpliceOutView(
     val balance = business.balanceManager.balance.collectAsState(null).value
     val vm = viewModel<SpliceOutViewModel>(factory = SpliceOutViewModel.Factory(peerManager, business.chain))
 
-    var feerate by remember { mutableStateOf<Satoshi?>(mempoolFeerate?.halfHour?.feerate) }
+    var feerate by remember { mutableStateOf(mempoolFeerate?.halfHour?.feerate) }
     var amount by remember { mutableStateOf(requestedAmount) }
     var amountErrorMessage by remember { mutableStateOf("") }
 

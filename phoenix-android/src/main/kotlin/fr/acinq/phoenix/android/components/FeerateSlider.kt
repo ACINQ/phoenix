@@ -97,7 +97,7 @@ fun FeerateSlider(
             amount = feerate,
             onAmountChange = onFeerateChange,
             minAmount = mempoolFeerate?.minimum?.feerate ?: 1.sat,
-            maxAmount = mempoolFeerate?.fastest?.feerate?.times(5) ?: 500.sat
+            maxAmount = mempoolFeerate?.fastest?.feerate?.times(2) ?: 500.sat
         )
     }
 }

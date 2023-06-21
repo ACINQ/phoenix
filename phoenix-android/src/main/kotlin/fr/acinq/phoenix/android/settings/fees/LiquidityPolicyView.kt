@@ -48,7 +48,7 @@ import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.orange
 import fr.acinq.phoenix.data.BitcoinUnit
-import fr.acinq.phoenix.managers.ElectrumFeerate
+import fr.acinq.phoenix.data.MempoolFeerate
 import kotlinx.coroutines.launch
 
 @Composable
@@ -66,7 +66,8 @@ fun LiquidityPolicyView(
 
     val peerManager = business.peerManager
     val notificationsManager = business.notificationsManager
-    val electrumFeerate by business.peerManager.electrumFeerate.collectAsState()
+    val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
+    val channels by business.peerManager.channelsFlow.collectAsState()
 
     val maxSatFeePrefs = maxSatFeePrefsFlow.value
     val maxPropFeePrefs = maxPropFeePrefsFlow.value
@@ -119,7 +120,7 @@ fun LiquidityPolicyView(
                     }
                 )
                 if (!isPolicyDisabled) {
-                    EditMaxFee(maxAbsoluteFee = maxAbsoluteFee, onMaxFeeChange = { maxAbsoluteFee = it }, electrumFeerate = electrumFeerate)
+                    EditMaxFee(maxAbsoluteFee = maxAbsoluteFee, onMaxFeeChange = { maxAbsoluteFee = it }, mempoolFeerate = mempoolFeerate, hasNoChannels = channels.isNullOrEmpty())
                 }
             }
 
@@ -158,9 +159,10 @@ fun LiquidityPolicyView(
 
 @Composable
 private fun EditMaxFee(
+    hasNoChannels: Boolean,
     maxAbsoluteFee: Satoshi?,
     onMaxFeeChange: (Satoshi?) -> Unit,
-    electrumFeerate: ElectrumFeerate?,
+    mempoolFeerate: MempoolFeerate?,
 ) {
     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
         Row(verticalAlignment = Alignment.Top) {
@@ -184,7 +186,7 @@ private fun EditMaxFee(
                             style = MaterialTheme.typography.subtitle2.copy(color = negativeColor),
                         )
                     }
-                    maxAbsoluteFee < (electrumFeerate?.swapEstimationFee ?: 0.sat) -> {
+                    maxAbsoluteFee < (mempoolFeerate?.swapEstimationFee(hasNoChannels) ?: 0.sat) -> {
                         Text(
                             text = stringResource(id = R.string.liquiditypolicy_fees_base_below_estimation),
                             style = MaterialTheme.typography.subtitle2.copy(color = orange),
@@ -222,7 +224,7 @@ private fun EditMaxFee(
         Spacer(modifier = Modifier.height(16.dp))
         HSeparator(width = 50.dp)
         Spacer(modifier = Modifier.height(12.dp))
-        when (val feerate = electrumFeerate) {
+        when (val feerate = mempoolFeerate) {
             null -> ProgressView(text = stringResource(id = R.string.liquiditypolicy_fees_estimation_loading), progressCircleSize = 16.dp, padding = PaddingValues(0.dp))
             else -> {
                 val fiatCurrency = LocalFiatCurrency.current
@@ -232,8 +234,8 @@ private fun EditMaxFee(
                     Text(
                         text = annotatedStringResource(
                             id = R.string.liquiditypolicy_fees_estimation,
-                            feerate.swapEstimationFee.toPrettyString(BitcoinUnit.Sat, withUnit = true),
-                            feerate.swapEstimationFee.toPrettyString(fiatCurrency, fiatRate, withUnit = true)
+                            feerate.swapEstimationFee(hasNoChannels).toPrettyString(BitcoinUnit.Sat, withUnit = true),
+                            feerate.swapEstimationFee(hasNoChannels).toPrettyString(fiatCurrency, fiatRate, withUnit = true)
                         )
                     )
                 }

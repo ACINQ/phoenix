@@ -64,8 +64,6 @@ fun ElectrumView() {
     var showCustomServerDialog by rememberSaveable { mutableStateOf(false) }
     val vm = viewModel<ElectrumViewModel>()
 
-    val electrumFeerate by business.peerManager.electrumFeerate.collectAsState()
-
     DefaultScreenLayout {
         DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
@@ -146,12 +144,6 @@ fun ElectrumView() {
                 if (model.blockHeight > 0) {
                     val height = remember { NumberFormat.getInstance().format(model.blockHeight) }
                     Setting(title = stringResource(id = R.string.electrum_block_height_label), description = height)
-                }
-
-                // fee rate
-                electrumFeerate?.let {
-                    Setting(title = stringResource(id = R.string.electrum_fee_rate_next_label), description = "${it.nextBlockFeerate} (${FeeratePerByte(it.nextBlockFeerate)})")
-                    Setting(title = stringResource(id = R.string.electrum_fee_rate_funding_label), description = "${it.fundingFeerate} (${FeeratePerByte(it.fundingFeerate)})")
                 }
             }
         }

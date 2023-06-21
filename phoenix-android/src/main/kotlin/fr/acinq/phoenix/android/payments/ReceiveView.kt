@@ -191,7 +191,7 @@ private fun LightningInvoiceView(
 
     val channels by business.peerManager.channelsFlow.collectAsState()
     val availableForReceive = remember(channels) { channels?.values?.map { it.availableForReceive ?: 0.msat }?.sum() }
-    val electrumFeerate by business.peerManager.electrumFeerate.collectAsState()
+    val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
     val liquidityPolicy by UserPrefs.getLiquidityPolicy(context).collectAsState(null)
 
     val onEdit = { vm.isEditingLightningInvoice = true }
@@ -243,7 +243,7 @@ private fun LightningInvoiceView(
     }
 
     IncomingLiquidityWarning(
-        swapFee = electrumFeerate?.swapEstimationFee,
+        swapFee = mempoolFeerate?.swapEstimationFee(hasNoChannels = channels.isNullOrEmpty()),
         liquidityPolicy = liquidityPolicy,
         availableForReceive = availableForReceive,
         hasChannels = channels?.isNotEmpty(),
