@@ -43,7 +43,7 @@ data class LocalChannelInfo(
     /** True if the channel can be used to send/receive payments. */
     val isUsable by lazy { state is Normal && !isBooting }
     /** A string version of the state's class. */
-    val stateName by lazy { state::class.simpleName ?: "Unknown" }
+    val stateName by lazy { state.stateName }
     // FIXME: we should also expose the raw channel's balance, which is what should be used in the channel's details screen, rather than the "smart" spendable balance returned by `localBalance()`
     /** The channel's spendable balance, as seen in [ChannelState.localBalance]. */
     val localBalance by lazy { state.localBalance() }
