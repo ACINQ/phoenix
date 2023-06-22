@@ -27,6 +27,28 @@ import io.ktor.util.*
 
 object Parser {
 
+    /** Order matters, as the prefixes are matched with startsWith. Longest prefixes should be at the beginning to avoid trimming only a part of the prefix. */
+    val lightningPrefixes = listOf(
+        "phoenix:lightning://",
+        "phoenix:lightning:",
+        "lightning://",
+        "lightning:",
+    )
+
+    val bitcoinPrefixes = listOf(
+        "phoenix:bitcoin://",
+        "phoenix:bitcoin:",
+        "bitcoin://",
+        "bitcoin:"
+    )
+
+    val lnurlPrefixes = listOf(
+        "phoenix:lnurl://",
+        "phoenix:lnurl:",
+        "lnurl://",
+        "lnurl:",
+    )
+
     fun removeExcessInput(input: String) = input.lines().firstOrNull { it.isNotBlank() }?.replace("\\u00A0", "")?.trim() ?: ""
 
     /**
@@ -49,7 +71,7 @@ object Parser {
     fun readPaymentRequest(
         input: String
     ): PaymentRequest? = try {
-        PaymentRequest.read(trimMatchingPrefix(removeExcessInput(input), listOf("lightning://", "lightning:", "bitcoin://", "bitcoin:")))
+        PaymentRequest.read(trimMatchingPrefix(removeExcessInput(input), lightningPrefixes))
     } catch (t: Throwable) {
         null
     }
@@ -74,7 +96,7 @@ object Parser {
         // -- get address
         // The input might look like: bitcoin:tb1qla78tll0eua3l5f4nvfq3tx58u35yc3m44flfu?time=1618931109&exp=604800
         // We want to parse the parameters and the address. However the Url api lacks a simple property to extract an address.
-        val address = trimMatchingPrefix(cleanInput, listOf("bitcoin://", "bitcoin:")).substringBefore("?")
+        val address = trimMatchingPrefix(cleanInput, bitcoinPrefixes).substringBefore("?")
 
         // -- read parameters
         val requiredParams = url.parameters.entries().filter { it.key.startsWith("req-") }.map { it.key to it.value.joinToString(";") }
