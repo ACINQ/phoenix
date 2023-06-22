@@ -45,10 +45,6 @@ class ApiWalletParamsTest {
 
         decodedParams.testnet.checkStructure()
         decodedParams.mainnet.checkStructure()
-        assertEquals("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134",
-            decodedParams.testnet.trampoline.v2.nodes.first().export().id.toString())
-        assertEquals("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134",
-            decodedParams.testnet.trampoline.v2.nodes.first().export().id.toString())
     }
 
     @Test

@@ -251,7 +251,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
                     status = mapPaymentStatus(status_type, status_blob, completed_at),
                     createdAt = created_at
                 )
-            } else TODO("channel close")
+            } else throw IllegalArgumentException("cannot handle closing payment at this stage, use LegacyChannelCloseHelper")
         }
 
         @Suppress("UNUSED_PARAMETER")

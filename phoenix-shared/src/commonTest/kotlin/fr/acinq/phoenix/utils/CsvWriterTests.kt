@@ -7,8 +7,10 @@ import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
@@ -27,14 +29,15 @@ class CsvWriterTests {
             preimage = randomBytes32(),
             origin = IncomingPayment.Origin.Invoice(makePaymentRequest()),
             received = IncomingPayment.Received(
-                receivedWith = setOf(
+                receivedWith = listOf(
                     IncomingPayment.ReceivedWith.NewChannel(
-                        id = UUID.randomUUID(),
                         amount = 12_000_000.msat,
                         serviceFee = 3_000_000.msat,
-                        fundingFee = 0.sat,
+                        miningFee = 0.sat,
                         channelId = randomBytes32(),
-                        confirmed = true
+                        txId = randomBytes32(),
+                        confirmedAt = 1000,
+                        lockedAt = 2000,
                     )
                 ),
                 receivedAt = 1675270272445
@@ -62,7 +65,7 @@ class CsvWriterTests {
             preimage = randomBytes32(),
             origin = IncomingPayment.Origin.Invoice(makePaymentRequest()),
             received = IncomingPayment.Received(
-                receivedWith = setOf(
+                receivedWith = listOf(
                     IncomingPayment.ReceivedWith.LightningPayment(
                         amount = 2_173_929.msat,
                         channelId = randomBytes32(),
@@ -91,15 +94,15 @@ class CsvWriterTests {
     @Test
     fun testRow_Outgoing_Payment() {
         val pr = makePaymentRequest()
-        val payment = OutgoingPayment(
+        val payment = LightningOutgoingPayment(
             id = UUID.randomUUID(),
             recipientAmount = 4351000.msat,
             recipient = PublicKey.Generator,
-            details = OutgoingPayment.Details.Normal(pr),
+            details = LightningOutgoingPayment.Details.Normal(pr),
             parts = listOf(
                 makeLightningPart(4_354_435.msat)
             ),
-            status = OutgoingPayment.Status.Completed.Succeeded.OffChain(
+            status = LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(
                 preimage = randomBytes32(),
                 completedAt = 1675270582248
             )
@@ -122,15 +125,15 @@ class CsvWriterTests {
     @Test
     fun testRow_Outgoing_Payment_WithCommaInNote() {
         val pr = makePaymentRequest()
-        val payment = OutgoingPayment(
+        val payment = LightningOutgoingPayment(
             id = UUID.randomUUID(),
             recipientAmount = 100_000.msat,
             recipient = PublicKey.Generator,
-            details = OutgoingPayment.Details.Normal(pr),
+            details = LightningOutgoingPayment.Details.Normal(pr),
             parts = listOf(
                 makeLightningPart(103_010.msat)
             ),
-            status = OutgoingPayment.Status.Completed.Succeeded.OffChain(
+            status = LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(
                 preimage = randomBytes32(),
                 completedAt = 1675270681099
             )
@@ -153,15 +156,15 @@ class CsvWriterTests {
     @Test
     fun testRow_Outgoing_Payment_WithQuoteInNote() {
         val pr = makePaymentRequest()
-        val payment = OutgoingPayment(
+        val payment = LightningOutgoingPayment(
             id = UUID.randomUUID(),
             recipientAmount = 100_000.msat,
             recipient = PublicKey.Generator,
-            details = OutgoingPayment.Details.Normal(pr),
+            details = LightningOutgoingPayment.Details.Normal(pr),
             parts = listOf(
                 makeLightningPart(103_010.msat)
             ),
-            status = OutgoingPayment.Status.Completed.Succeeded.OffChain(
+            status = LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(
                 preimage = randomBytes32(),
                 completedAt = 1675270740742
             )
@@ -184,15 +187,15 @@ class CsvWriterTests {
     @Test
     fun testRow_Outgoing_Payment_WithNewlineInNote() {
         val pr = makePaymentRequest()
-        val payment = OutgoingPayment(
+        val payment = LightningOutgoingPayment(
             id = UUID.randomUUID(),
             recipientAmount = 100_000.msat,
             recipient = PublicKey.Generator,
-            details = OutgoingPayment.Details.Normal(pr),
+            details = LightningOutgoingPayment.Details.Normal(pr),
             parts = listOf(
                 makeLightningPart(103_010.msat)
             ),
-            status = OutgoingPayment.Status.Completed.Succeeded.OffChain(
+            status = LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(
                 preimage = randomBytes32(),
                 completedAt = 1675270826945
             )
@@ -219,16 +222,17 @@ class CsvWriterTests {
     fun testRow_Incoming_NewChannel_DualSwapIn() {
         val payment = IncomingPayment(
             preimage = randomBytes32(),
-            origin = IncomingPayment.Origin.DualSwapIn(localInputs = setOf()),
+            origin = IncomingPayment.Origin.OnChain(txid = randomBytes32(), localInputs = setOf()),
             received = IncomingPayment.Received(
-                receivedWith = setOf(
+                receivedWith = listOf(
                     IncomingPayment.ReceivedWith.NewChannel(
-                        id = UUID.randomUUID(),
                         amount = 12_000_000.msat,
                         serviceFee = 2_931_000.msat,
-                        fundingFee = 69.sat,
+                        miningFee = 69.sat,
                         channelId = randomBytes32(),
-                        confirmed = true
+                        txId = randomBytes32(),
+                        confirmedAt = 500,
+                        lockedAt = 1000
                     )
                 ),
                 receivedAt = 1675271683668
@@ -252,11 +256,11 @@ class CsvWriterTests {
 
     @Test
     fun testRow_Outgoing_SwapOut() {
-        val payment = OutgoingPayment(
+        val payment = LightningOutgoingPayment(
             id = UUID.randomUUID(),
             recipientAmount = 12_820_000.msat,
             recipient = PublicKey.Generator,
-            details = OutgoingPayment.Details.SwapOut(
+            details = LightningOutgoingPayment.Details.SwapOut(
                 address = "tb1qlywh0dk40k87gqphpfs8kghd96hmnvus7r8hhf",
                 paymentRequest = makePaymentRequest(),
                 swapOutFee = 2_820.sat
@@ -265,7 +269,7 @@ class CsvWriterTests {
                 makeLightningPart(12_000_000.msat),
                 makeLightningPart(820_000.msat)
             ),
-            status = OutgoingPayment.Status.Completed.Succeeded.OffChain(
+            status = LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(
                 preimage = randomBytes32(),
                 completedAt = 1675289814498
             )
@@ -287,27 +291,18 @@ class CsvWriterTests {
 
     @Test
     fun testRow_Outgoing_ChannelClose() {
-        val payment = OutgoingPayment(
+        val payment = ChannelCloseOutgoingPayment(
             id = UUID.randomUUID(),
-            recipientAmount = 8_690_464.msat,
-            recipient = PublicKey.Generator,
-            details = OutgoingPayment.Details.ChannelClosing(
-                channelId = randomBytes32(),
-                closingAddress = "tb1qz5gxe2450uadavle8wwcc5ngquqfj5xp4dy0ja",
-                isSentToDefaultAddress = false
-            ),
-            parts = listOf(
-                OutgoingPayment.ClosingTxPart(
-                    id = UUID.randomUUID(),
-                    txId = randomBytes32(),
-                    claimed = 8_690.sat,
-                    closingType = ChannelClosingType.Mutual,
-                    createdAt = 0
-                )
-            ),
-            status = OutgoingPayment.Status.Completed.Succeeded.OnChain(
-                completedAt = 1675353533694
-            )
+            recipientAmount = 8_690.sat,
+            address = "tb1qz5gxe2450uadavle8wwcc5ngquqfj5xp4dy0ja",
+            isSentToDefaultAddress = false,
+            miningFees = 1400.sat,
+            channelId = randomBytes32(),
+            txId = randomBytes32(),
+            createdAt = 1675353533694,
+            confirmedAt = 1675353533694,
+            lockedAt = null,
+            closingType = ChannelClosingType.Mutual,
         )
         val metadata = makeMetadata(
             exchangeRate = 23662.59,
@@ -345,11 +340,11 @@ class CsvWriterTests {
         )
 
     private fun makeLightningPart(amount: MilliSatoshi) =
-        OutgoingPayment.LightningPart(
+        LightningOutgoingPayment.Part(
             id = UUID.randomUUID(),
             amount = amount,
             route = listOf(),
-            status = OutgoingPayment.LightningPart.Status.Succeeded(
+            status = LightningOutgoingPayment.Part.Status.Succeeded(
                 preimage = randomBytes32(),
                 completedAt = 0
             ),

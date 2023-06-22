@@ -25,7 +25,11 @@ class LnurlAuthTest {
     fun legacy_domain_different_keys() {
         val seed = `MnemonicCode$`.`MODULE$`.toSeed("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about", "")
         val legacyKeyManager = fr.acinq.eclair.crypto.LocalKeyManager(seed, Block.TestnetGenesisBlock().hash())
-        val kmpKeyManager = LocalKeyManager(seed = seed.toArray().byteVector64(), NodeParams.Chain.Testnet, remoteSwapInServerKey = PublicKey.fromHex("03d9adb7022fb59a73a0e4eba9b94dadddbf6e1c298c8ed76594e98f8805659eea"))
+        val kmpKeyManager = LocalKeyManager(
+            seed = seed.toArray().byteVector64(),
+            chain = NodeParams.Chain.Testnet,
+            remoteSwapInExtendedPublicKey = "tpubDDt5vQap1awkyDXx1z1cP7QFKSZHDCCpbU8nSq9jy7X2grTjUVZDePexf6gc6AHtRRzkgfPW87K6EKUVV6t3Hu2hg7YkHkmMeLSfrP85x41"
+        )
 
         val k1 = "179062fdf971ec045883a6297fb1d260333358905086c33a9f44ff26f63bb425"
         val url = Url("https://api.lnmarkets.com/v1/lnurl/auth?tag=login&k1=$k1&hmac=75344d9151fe788345e620aa3de0e69b51698e759fd667272e3ea682a2bbcd12")
@@ -60,7 +64,11 @@ class LnurlAuthTest {
     fun standard_domain_same_key() {
         val seed = `MnemonicCode$`.`MODULE$`.toSeed("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about", "")
         val legacyKeyManager = fr.acinq.eclair.crypto.LocalKeyManager(seed, Block.LivenetGenesisBlock().hash())
-        val kmpKeyManager = LocalKeyManager(seed = seed.toArray().byteVector64(), NodeParams.Chain.Mainnet, remoteSwapInServerKey = PublicKey.fromHex("03d9adb7022fb59a73a0e4eba9b94dadddbf6e1c298c8ed76594e98f8805659eea"))
+        val kmpKeyManager = LocalKeyManager(
+            seed = seed.toArray().byteVector64(),
+            chain = NodeParams.Chain.Mainnet,
+            remoteSwapInExtendedPublicKey = "tpubDDt5vQap1awkyDXx1z1cP7QFKSZHDCCpbU8nSq9jy7X2grTjUVZDePexf6gc6AHtRRzkgfPW87K6EKUVV6t3Hu2hg7YkHkmMeLSfrP85x41"
+        )
 
         val k1 = "32c56da24a28e09d24832e1cba0cc391049c48036c197e228c7656d022a5eb1f"
         val url = Url("https://foo.bar.com/auth?tag=login&k1=$k1")

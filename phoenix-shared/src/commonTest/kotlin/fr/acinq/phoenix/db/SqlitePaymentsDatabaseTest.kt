@@ -27,6 +27,7 @@ import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.TemporaryNodeFailure
+import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.runTest
 import fr.acinq.secp256k1.Hex
@@ -40,12 +41,12 @@ class SqlitePaymentsDatabaseTest {
     private val paymentHash1 = Crypto.sha256(preimage1).toByteVector32()
     private val origin1 = IncomingPayment.Origin.Invoice(createInvoice(preimage1))
     private val channelId1 = randomBytes32()
-    private val receivedWith1 = setOf(IncomingPayment.ReceivedWith.LightningPayment(100_000.msat, channelId1, 1L))
-    private val receivedWith3 = setOf(IncomingPayment.ReceivedWith.LightningPayment(150_000.msat, channelId1, 1L))
+    private val receivedWith1 = listOf(IncomingPayment.ReceivedWith.LightningPayment(100_000.msat, channelId1, 1L))
+    private val receivedWith3 = listOf(IncomingPayment.ReceivedWith.LightningPayment(150_000.msat, channelId1, 1L))
 
     private val preimage2 = randomBytes32()
-    private val receivedWith2 = setOf(
-        IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 1_995_000.msat, serviceFee = 5_000.msat, channelId = randomBytes32(), txId = randomBytes32(), miningFee = 100.sat, status = PaymentsDb.ConfirmationStatus.LOCKED)
+    private val receivedWith2 = listOf(
+        IncomingPayment.ReceivedWith.NewChannel(amount = 1_995_000.msat, serviceFee = 5_000.msat, channelId = randomBytes32(), txId = randomBytes32(), miningFee = 100.sat, confirmedAt = 100, lockedAt = 200)
     )
 
     val origin3 = IncomingPayment.Origin.SwapIn(address = "1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb")
@@ -87,12 +88,12 @@ class SqlitePaymentsDatabaseTest {
         val origin = IncomingPayment.Origin.Invoice(createInvoice(preimage, 1_000_000_000.msat))
         val channelId = randomBytes32()
         val txId = randomBytes32()
-        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 600_000_000.msat, serviceFee = 5_000.msat, miningFee = 100.sat, channelId = channelId, txId = txId, status = PaymentsDb.ConfirmationStatus.LOCKED)
-        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 400_000_000.msat, serviceFee = 5_000.msat, miningFee = 200.sat, channelId = channelId, txId = txId, status = PaymentsDb.ConfirmationStatus.LOCKED)
-        val receivedWith = setOf(mppPart1, mppPart2)
+        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(amount = 600_000_000.msat, serviceFee = 5_000.msat, miningFee = 100.sat, channelId = channelId, txId = txId, confirmedAt = 100, lockedAt = 50)
+        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(amount = 400_000_000.msat, serviceFee = 5_000.msat, miningFee = 200.sat, channelId = channelId, txId = txId, confirmedAt = 115, lockedAt = 75)
+        val receivedWith = listOf(mppPart1, mppPart2)
 
         db.addIncomingPayment(preimage, origin, 0)
-        db.receivePayment(paymentHash, receivedWith, 15)
+        db.receivePayment(paymentHash, receivedWith, 150)
         assertEquals(2, db.getIncomingPayment(paymentHash)!!.received?.receivedWith?.size)
     }
 
@@ -103,12 +104,12 @@ class SqlitePaymentsDatabaseTest {
         val origin = IncomingPayment.Origin.Invoice(createInvoice(preimage, 1_000_000_000.msat))
         val channelId = randomBytes32()
         val txId = randomBytes32()
-        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 500_000_000.msat, serviceFee = 5_000.msat, miningFee = 200.sat, channelId = channelId, txId = txId, status = PaymentsDb.ConfirmationStatus.LOCKED)
-        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(id = UUID.randomUUID(), amount = 500_000_000.msat, serviceFee = 5_000.msat, miningFee = 150.sat, channelId = channelId, txId = txId, status = PaymentsDb.ConfirmationStatus.LOCKED)
-        val receivedWith = setOf(mppPart1, mppPart2)
+        val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(amount = 500_000_000.msat, serviceFee = 5_000.msat, miningFee = 200.sat, channelId = channelId, txId = txId, confirmedAt = 100, lockedAt = 50)
+        val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(amount = 500_000_000.msat, serviceFee = 5_000.msat, miningFee = 150.sat, channelId = channelId, txId = txId, confirmedAt = 115, lockedAt = 75)
+        val receivedWith = listOf(mppPart1, mppPart2)
 
         db.addIncomingPayment(preimage, origin, 0)
-        db.receivePayment(paymentHash, receivedWith, 15)
+        db.receivePayment(paymentHash, receivedWith, 150)
         assertEquals(2, db.getIncomingPayment(paymentHash)!!.received?.receivedWith?.size)
     }
 
@@ -129,7 +130,8 @@ class SqlitePaymentsDatabaseTest {
 
     @Test
     fun incoming__add_and_receive() = runTest {
-        db.addAndReceivePayment(preimage1, origin3, receivedWith2)
+        db.addIncomingPayment(preimage1, origin3, createdAt = 10)
+        db.receivePayment(preimage1.sha256(), receivedWith2, receivedAt = 200)
         assertNotNull(db.getIncomingPayment(paymentHash1))
         assertEquals(1_995_000.msat, db.getIncomingPayment(paymentHash1)?.received?.amount)
         assertEquals(5_000.msat, db.getIncomingPayment(paymentHash1)!!.fees)
@@ -184,26 +186,26 @@ class SqlitePaymentsDatabaseTest {
             recipient = pr.nodeId,
             details = LightningOutgoingPayment.Details.Normal(pr),
             parts = listOf(
-                LightningOutgoingPayment.LightningPart(UUID.randomUUID(), 20_000.msat, listOf(HopDesc(a, c, ShortChannelId(42))), LightningOutgoingPayment.LightningPart.Status.Pending, 100),
-                LightningOutgoingPayment.LightningPart(UUID.randomUUID(), 30_000.msat, listOf(HopDesc(a, b), HopDesc(b, c)), LightningOutgoingPayment.LightningPart.Status.Pending, 105)
+                LightningOutgoingPayment.Part(UUID.randomUUID(), 20_000.msat, listOf(HopDesc(a, c, ShortChannelId(42))), LightningOutgoingPayment.Part.Status.Pending, 100),
+                LightningOutgoingPayment.Part(UUID.randomUUID(), 30_000.msat, listOf(HopDesc(a, b), HopDesc(b, c)), LightningOutgoingPayment.Part.Status.Pending, 105)
             ),
             status = LightningOutgoingPayment.Status.Pending,
             createdAt = 108,
         )
     }
 
-    private fun createOutgoingForClosing() = LightningOutgoingPayment(
+    private fun createOutgoingForClosing() = ChannelCloseOutgoingPayment(
         id = UUID.randomUUID(),
-        recipientAmount = 100_000_000.msat,
-        recipient = Lightning.randomKey().publicKey(),
-        details = LightningOutgoingPayment.Details.ChannelClosing(
-            channelId = randomBytes32(),
-            closingAddress = "2MuvDe2JTFhkU3DfHCnxgyX6JdP7BKVgmaS",
-            isSentToDefaultAddress = false
-        ),
-        parts = emptyList(),
-        status = LightningOutgoingPayment.Status.Pending,
-        createdAt = 120,
+        recipientAmount = 100_000.sat,
+        address = "2MuvDe2JTFhkU3DfHCnxgyX6JdP7BKVgmaS",
+        isSentToDefaultAddress = false,
+        miningFees = 500.sat,
+        channelId = randomBytes32(),
+        txId = randomBytes32(),
+        createdAt = 100,
+        confirmedAt = null,
+        lockedAt = null,
+        closingType = ChannelClosingType.Local
     )
 
     @Test
@@ -218,20 +220,22 @@ class SqlitePaymentsDatabaseTest {
 
     @Test
     fun outgoing__read_legacy_closing() = runTest {
-        val payment = OutgoingQueries.mapLightningOutgoingPaymentWithoutParts(
-            id = "ff7f08e8-89d1-4731-be7c-ad37c9d09afc",
-            recipient_amount_msat = 150_000L,
-            recipient_node_id = "0479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8",
-            payment_hash = Hex.decode("5a920fd957bb4634fb8960a8a69d401fa0fbb4ebf5c4391ba8ee2732058fefbc"),
-            details_type = OutgoingDetailsTypeVersion.CLOSING_V0,
-            details_blob = Hex.decode("7b226368616e6e656c4964223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c22636c6f73696e6741646472657373223a22666f6f626172222c22697353656e74546f44656661756c7441646472657373223a747275657d"),
-            created_at = 100,
-            completed_at = 200,
-            status_type = OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0,
-            status_blob = Hex.decode("7b227478496473223a5b2265636632623763396366613734356532336634623661343766396365623139623066363330653064373365343434326566333236643364613234633930336635225d2c22636c61696d6564223a3130302c22636c6f73696e6754797065223a224c6f63616c227d")
-        )
-        assertEquals(PublicKey.Generator, payment.recipient)
-        assertEquals(payment.status, LightningOutgoingPayment.Status.Completed.Succeeded.OnChain(200))
+
+        assertFails {
+            OutgoingQueries.mapLightningOutgoingPaymentWithoutParts(
+                id = "ff7f08e8-89d1-4731-be7c-ad37c9d09afc",
+                recipient_amount_msat = 150_000L,
+                recipient_node_id = "0479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8",
+                payment_hash = Hex.decode("5a920fd957bb4634fb8960a8a69d401fa0fbb4ebf5c4391ba8ee2732058fefbc"),
+                details_type = OutgoingDetailsTypeVersion.CLOSING_V0,
+                details_blob = Hex.decode("7b226368616e6e656c4964223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c22636c6f73696e6741646472657373223a22666f6f626172222c22697353656e74546f44656661756c7441646472657373223a747275657d"),
+                created_at = 100,
+                completed_at = 200,
+                status_type = OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0,
+                status_blob = Hex.decode("7b227478496473223a5b2265636632623763396366613734356532336634623661343766396365623139623066363330653064373365343434326566333236643364613234633930336635225d2c22636c61696d6564223a3130302c22636c6f73696e6754797065223a224c6f63616c227d")
+            )
+        }
+        TODO()// use LegacyChannelCloseHelper
     }
 
     @Test
@@ -242,8 +246,8 @@ class SqlitePaymentsDatabaseTest {
         // Test status where a part has failed.
         val onePartFailed = p.copy(
             parts = listOf(
-                (p.parts[0] as LightningOutgoingPayment.LightningPart).copy(
-                    status = LightningOutgoingPayment.LightningPart.Status.Failed(TemporaryNodeFailure.code, TemporaryNodeFailure.message, 110)
+                (p.parts[0] as LightningOutgoingPayment.Part).copy(
+                    status = LightningOutgoingPayment.Part.Status.Failed(TemporaryNodeFailure.code, TemporaryNodeFailure.message, 110)
                 ),
                 p.parts[1]
             )
@@ -258,8 +262,8 @@ class SqlitePaymentsDatabaseTest {
 
         // Additional parts must have a unique id.
         val newParts = listOf(
-            LightningOutgoingPayment.LightningPart(UUID.randomUUID(), 5_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), LightningOutgoingPayment.LightningPart.Status.Pending, 115),
-            LightningOutgoingPayment.LightningPart(UUID.randomUUID(), 10_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), LightningOutgoingPayment.LightningPart.Status.Pending, 120),
+            LightningOutgoingPayment.Part(UUID.randomUUID(), 5_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), LightningOutgoingPayment.Part.Status.Pending, 115),
+            LightningOutgoingPayment.Part(UUID.randomUUID(), 10_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), LightningOutgoingPayment.Part.Status.Pending, 120),
         )
         assertFails { db.addOutgoingLightningParts(UUID.randomUUID(), newParts) }
         assertFails {
@@ -280,9 +284,9 @@ class SqlitePaymentsDatabaseTest {
         val partsSettled = withMoreParts.copy(
             parts = listOf(
                 withMoreParts.parts[0], // this one was failed
-                (withMoreParts.parts[1] as LightningOutgoingPayment.LightningPart).copy(status = LightningOutgoingPayment.LightningPart.Status.Succeeded(preimage, 125)),
-                (withMoreParts.parts[2] as LightningOutgoingPayment.LightningPart).copy(status = LightningOutgoingPayment.LightningPart.Status.Succeeded(preimage, 126)),
-                (withMoreParts.parts[3] as LightningOutgoingPayment.LightningPart).copy(status = LightningOutgoingPayment.LightningPart.Status.Succeeded(preimage, 127)),
+                (withMoreParts.parts[1] as LightningOutgoingPayment.Part).copy(status = LightningOutgoingPayment.Part.Status.Succeeded(preimage, 125)),
+                (withMoreParts.parts[2] as LightningOutgoingPayment.Part).copy(status = LightningOutgoingPayment.Part.Status.Succeeded(preimage, 126)),
+                (withMoreParts.parts[3] as LightningOutgoingPayment.Part).copy(status = LightningOutgoingPayment.Part.Status.Succeeded(preimage, 127)),
             )
         )
         assertEquals(LightningOutgoingPayment.Status.Pending, partsSettled.status)
@@ -324,29 +328,21 @@ class SqlitePaymentsDatabaseTest {
     fun outgoing__get_status__closing_txs() = runTest {
         val p = createOutgoingForClosing()
         db.addOutgoingPayment(p)
-        assertEquals(p, db.getLightningOutgoingPayment(p.id))
-        assertTrue(db.getLightningOutgoingPayment(p.id)!!.status is LightningOutgoingPayment.Status.Pending)
-        assertTrue(db.getLightningOutgoingPayment(p.id)!!.parts.isEmpty())
+        db.getChannelCloseOutgoingPayment(p.id, WalletPaymentFetchOptions.None)!!.let { (paymentInDb, _) ->
+            assertEquals(p, paymentInDb)
+            assertEquals(null, paymentInDb.confirmedAt)
+            assertEquals(null, paymentInDb.lockedAt)
+        }
 
-        val parts = listOf(
-            LightningOutgoingPayment.ClosingTxPart(
-                id = UUID.randomUUID(),
-                txId = randomBytes32(),
-                claimed = 79_000.sat,
-                closingType = ChannelClosingType.Mutual,
-                createdAt = 100
-            ),
-            LightningOutgoingPayment.ClosingTxPart(
-                id = UUID.randomUUID(),
-                txId = randomBytes32(),
-                claimed = 19_500.sat,
-                closingType = ChannelClosingType.Local,
-                createdAt = 110
-            ),
-        )
-        db.completeOutgoingPaymentForClosing(id = p.id, parts = parts, completedAt = 200)
-        assertTrue(db.getLightningOutgoingPayment(p.id)!!.status is LightningOutgoingPayment.Status.Completed.Succeeded.OnChain)
-        assertEquals(parts, db.getLightningOutgoingPayment(p.id)!!.parts)
+        db.setLocked(p.txId)
+        db.getChannelCloseOutgoingPayment(p.id, WalletPaymentFetchOptions.None)!!.let { (paymentInDb, _) ->
+            assertNotNull(paymentInDb.lockedAt)
+        }
+
+        db.setConfirmed(p.txId)
+        db.getChannelCloseOutgoingPayment(p.id, WalletPaymentFetchOptions.None)!!.let { (paymentInDb, _) ->
+            assertNotNull(paymentInDb.confirmedAt)
+        }
     }
 
     @Test
@@ -357,7 +353,7 @@ class SqlitePaymentsDatabaseTest {
         p.copy(recipientAmount = 1000.msat).let {
             assertFails { db.addOutgoingPayment(it) }
         }
-        p.copy(id = UUID.randomUUID(), parts = p.parts.map { (it as LightningOutgoingPayment.LightningPart).copy(id = p.parts[0].id) }).let {
+        p.copy(id = UUID.randomUUID(), parts = p.parts.map { (it as LightningOutgoingPayment.Part).copy(id = p.parts[0].id) }).let {
             assertFails { db.addOutgoingPayment(it) }
         }
     }
@@ -369,8 +365,8 @@ class SqlitePaymentsDatabaseTest {
         val channelId = randomBytes32()
         val partsFailed = p.copy(
             parts = listOf(
-                (p.parts[0] as LightningOutgoingPayment.LightningPart).copy(status = OutgoingPaymentFailure.convertFailure(Either.Right(TemporaryNodeFailure), 110)),
-                (p.parts[1] as LightningOutgoingPayment.LightningPart).copy(status = OutgoingPaymentFailure.convertFailure(Either.Left(TooManyAcceptedHtlcs(channelId, 10)), 111)),
+                p.parts[0].copy(status = OutgoingPaymentFailure.convertFailure(Either.Right(TemporaryNodeFailure), 110)),
+                p.parts[1].copy(status = OutgoingPaymentFailure.convertFailure(Either.Left(TooManyAcceptedHtlcs(channelId, 10)), 111)),
             )
         )
         db.completeOutgoingLightningPart(p.parts[0].id, Either.Right(TemporaryNodeFailure), 110)
