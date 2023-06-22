@@ -69,6 +69,13 @@ object PrefsDatastore {
   suspend fun saveDataMigrationExpected(context: Context, isExpected: Boolean) = context.internalData.edit {
     it[DATA_MIGRATION_EXPECTED] = isExpected
   }
+
+  /** Used to know whether the peer has already been started with the `isMigrationFromLegacyApp` flag. */
+  private val LEGACY_MIGRATION_PEER_FLAG = booleanPreferencesKey("LEGACY_MIGRATION_PEER_FLAG")
+  fun getLegacyMigrationPeerFlag(context: Context): Flow<Boolean?> = prefs(context).map { it[LEGACY_MIGRATION_PEER_FLAG] }
+  suspend fun saveLegacyMigrationPeerFlag(context: Context, flag: Boolean) = context.internalData.edit {
+    it[LEGACY_MIGRATION_PEER_FLAG] = flag
+  }
 }
 
 /**

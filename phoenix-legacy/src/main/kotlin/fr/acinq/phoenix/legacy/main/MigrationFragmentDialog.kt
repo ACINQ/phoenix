@@ -275,6 +275,7 @@ class MigrationDialogViewModel : ViewModel() {
               address = swapInAddress
             )
           )
+          PrefsDatastore.saveLegacyMigrationPeerFlag(context, true)
           PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.NotRequired)
         }
       }

@@ -222,6 +222,8 @@ data class StartupParams(
     val isTorEnabled: Boolean,
     /** The liquidity policy must be injected into the node params manager. */
     val liquidityPolicy: LiquidityPolicy,
+    /** Should always be false for iOS. If true, the peer is initialized with a special flag used in the swap-in process. */
+    val isMigrationFromAndroidLegacyApp: Boolean = false,
     // TODO: add custom electrum address, fiat currencies, ...
 )
 

@@ -25,6 +25,7 @@ import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.StartupParams
+import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.CurrencyManager
 import fr.acinq.phoenix.managers.NodeParamsManager
@@ -219,6 +220,7 @@ class NodeService : Service() {
         val electrumServer = UserPrefs.getElectrumServer(applicationContext).first()
         val isTorEnabled = UserPrefs.getIsTorEnabled(applicationContext).first()
         val liquidityPolicy = UserPrefs.getLiquidityPolicy(applicationContext).first()
+        val isMigrationFromAndroidLegacyApp = PrefsDatastore.getLegacyMigrationPeerFlag(applicationContext).first() ?: false
         val preferredFiatCurrency = UserPrefs.getFiatCurrency(applicationContext).first()
         val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(decryptedPayload))
 
@@ -231,7 +233,8 @@ class NodeService : Service() {
             StartupParams(
                 requestCheckLegacyChannels = requestCheckLegacyChannels,
                 isTorEnabled = isTorEnabled,
-                liquidityPolicy = liquidityPolicy
+                liquidityPolicy = liquidityPolicy,
+                isMigrationFromAndroidLegacyApp = isMigrationFromAndroidLegacyApp
             )
         )
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
@@ -248,6 +251,10 @@ class NodeService : Service() {
             }
         }
         ChannelsWatcher.schedule(applicationContext)
+        // update migration flag to false, if necessary - only used once.
+        if (isMigrationFromAndroidLegacyApp) {
+            PrefsDatastore.saveLegacyMigrationPeerFlag(applicationContext, false)
+        }
         return WalletState.Started.Kmm(business)
     }
 

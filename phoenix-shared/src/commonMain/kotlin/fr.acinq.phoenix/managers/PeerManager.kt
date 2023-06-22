@@ -106,7 +106,7 @@ class PeerManager(
                 initTlvs = initTlvs.addOrUpdate(InitTlv.PhoenixAndroidLegacyNodeId(legacyNodeId = legacyKey.publicKey, signature = signature))
             }
 
-            logger.debug { "instantiating peer with nodeParams=$nodeParams walletParams=$walletParams initTlvs=$initTlvs" }
+            logger.debug { "instantiating peer with walletParams=$walletParams initTlvs=$initTlvs startupParams=$startupParams" }
 
             val peer = Peer(
                 initTlvStream = initTlvs,
@@ -114,6 +114,7 @@ class PeerManager(
                 walletParams = walletParams,
                 watcher = electrumWatcher,
                 db = databaseManager.databases.filterNotNull().first(),
+                isMigrationFromLegacyApp = startupParams.isMigrationFromAndroidLegacyApp,
                 socketBuilder = null,
                 scope = MainScope()
             )
