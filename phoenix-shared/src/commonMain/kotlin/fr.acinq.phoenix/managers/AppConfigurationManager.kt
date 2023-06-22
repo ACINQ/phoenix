@@ -201,13 +201,13 @@ class AppConfigurationManager(
         mempoolFeerateJob = launch {
             while (isActive) {
                 try {
-                    logger.debug { "fetching mempool feerate" }
+                    logger.debug { "fetching mempool.space feerate" }
                     // FIXME: use our own endpoint
                     // always use Mainnet, even on Testnet
                     val response = httpClient.get("https://mempool.space/api/v1/fees/recommended")
                     if (response.status.isSuccess()) {
                         val json = Json.decodeFromString<JsonObject>(response.bodyAsText(Charsets.UTF_8))
-                        logger.debug { "mempool feerate endpoint returned json=$json" }
+                        logger.debug { "mempool.space feerate endpoint returned json=$json" }
                         val feerate = MempoolFeerate(
                             fastest = FeeratePerByte(json["fastestFee"]!!.jsonPrimitive.long.sat),
                             halfHour = FeeratePerByte(json["halfHourFee"]!!.jsonPrimitive.long.sat),
@@ -219,7 +219,7 @@ class AppConfigurationManager(
                         _mempoolFeerate.value = feerate
                     }
                 } catch (e: Exception) {
-                    logger.error { "could not fetch/read data from mempool feerate endpoint: ${e.message}" }
+                    logger.error { "could not fetch/read data from mempool.space feerate endpoint: ${e.message}" }
                 } finally {
                     delay(10 * 60 * 1_000) // pause for 10 min
                 }

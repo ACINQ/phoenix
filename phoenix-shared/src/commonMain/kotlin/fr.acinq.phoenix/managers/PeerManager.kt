@@ -6,8 +6,6 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.UpgradeRequired
-import fr.acinq.lightning.blockchain.electrum.ElectrumClient
-import fr.acinq.lightning.blockchain.electrum.ElectrumMiniWallet
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
@@ -15,8 +13,6 @@ import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.states.Offline
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.payment.LiquidityPolicy
-import fr.acinq.lightning.transactions.Transactions
-import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.InitTlv
 import fr.acinq.lightning.wire.TlvStream
 import fr.acinq.phoenix.PhoenixBusiness
@@ -121,6 +117,7 @@ class PeerManager(
             _peer.value = peer
 
             launch { monitorNodeEvents(nodeParams) }
+            launch { updatePeerSwapInFeerate(peer) }
 
             // The local channels flow must use `bootFlow` first, as `channelsFlow` is empty when the wallet starts.
             // `bootFlow` data come from the local database and will be overridden by fresh data once the connection
@@ -165,6 +162,14 @@ class PeerManager(
     /** Override the liquidity policy setting used by the node. */
     suspend fun updatePeerLiquidityPolicy(newPolicy: LiquidityPolicy) {
         getPeer().nodeParams.liquidityPolicy.value = newPolicy
+    }
+
+    /** Update the peer's swap-in feerate with values from mempool.space estimator. */
+    private suspend fun updatePeerSwapInFeerate(peer: Peer) {
+        configurationManager.mempoolFeerate.filterNotNull().collect { feerate ->
+            logger.info { "using mempool.space feerate=$feerate" }
+            peer.swapInFeeratesFlow.value = FeeratePerKw(feerate.hour)
+        }
     }
 
     private suspend fun monitorNodeEvents(nodeParams: NodeParams) {
