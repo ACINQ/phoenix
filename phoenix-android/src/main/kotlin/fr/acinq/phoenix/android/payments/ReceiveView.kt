@@ -16,7 +16,13 @@
 
 package fr.acinq.phoenix.android.payments
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -45,6 +51,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -68,6 +75,7 @@ import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
@@ -99,7 +107,7 @@ fun ReceiveView(
         }
     }
 
-    DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally, isScrollable = false) {
+    DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally, isScrollable = true) {
         DefaultScreenHeader(
             title = if (vm.isEditingLightningInvoice) {
                 stringResource(id = R.string.receive_lightning_edit_title)
@@ -126,22 +134,40 @@ private fun ReceiveViewPages(
     defaultInvoiceExpiry: Long,
 ) {
     val pagerState = rememberPagerState()
-    HorizontalPager(
-        modifier = Modifier.fillMaxHeight(),
-        pageCount = 2,
-        state = pagerState,
-        contentPadding = PaddingValues(horizontal = 44.dp),
-        verticalAlignment = Alignment.Top
-    ) { index ->
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(vertical = 48.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            when (index) {
-                0 -> LightningInvoiceView(vm = vm, defaultDescription = defaultInvoiceDescription, expiry = defaultInvoiceExpiry)
-                1 -> BitcoinAddressView(state = vm.bitcoinAddressState)
+    // we need to be responsive in some subcomponents, like the edit-invoice buttons
+    BoxWithConstraints {
+        HorizontalPager(
+            modifier = Modifier.fillMaxHeight(),
+            pageCount = 2,
+            state = pagerState,
+            contentPadding = PaddingValues(horizontal = when {
+                maxWidth <= 240.dp -> 30.dp
+                maxWidth <= 320.dp -> 40.dp
+                maxWidth <= 480.dp -> 44.dp
+                else -> 52.dp
+            }),
+            verticalAlignment = Alignment.Top
+        ) { index ->
+            val maxWidth = maxWidth
+            Column(
+                modifier = Modifier
+                    .padding(
+                        horizontal = when {
+                            maxWidth <= 320.dp -> 6.dp
+                            maxWidth <= 480.dp -> 8.dp
+                            else -> 10.dp
+                        },
+                        vertical = when {
+                            maxHeight <= 800.dp -> 32.dp
+                            else -> 50.dp
+                        }
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                when (index) {
+                    0 -> LightningInvoiceView(vm = vm, defaultDescription = defaultInvoiceDescription, expiry = defaultInvoiceExpiry, maxWidth = maxWidth)
+                    1 -> BitcoinAddressView(state = vm.bitcoinAddressState, maxWidth = maxWidth)
+                }
             }
         }
     }
@@ -173,6 +199,7 @@ private fun LightningInvoiceView(
     vm: ReceiveViewModel,
     defaultDescription: String,
     expiry: Long,
+    maxWidth: Dp,
 ) {
     val context = LocalContext.current
     val paymentsManager = business.paymentsManager
@@ -206,13 +233,6 @@ private fun LightningInvoiceView(
     val state = vm.lightningInvoiceState
     val isEditing = vm.isEditingLightningInvoice
     when {
-        state is ReceiveViewModel.LightningInvoiceState.Init -> {
-            LaunchedEffect(key1 = Unit) {
-                vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = expiry)
-            }
-            GeneratingLightningInvoice(bitmap = vm.lightningQRBitmap)
-            CopyShareEditButtons(onCopy = { }, onShare = { }, onEdit = onEdit)
-        }
         isEditing -> {
             EditInvoiceView(
                 amount = customAmount,
@@ -223,15 +243,24 @@ private fun LightningInvoiceView(
                 onSubmit = { vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = expiry) }
             )
         }
-        state is ReceiveViewModel.LightningInvoiceState.Generating -> {
-            GeneratingLightningInvoice(bitmap = vm.lightningQRBitmap)
-            CopyShareEditButtons(onCopy = { }, onShare = { }, onEdit = onEdit)
+        state is ReceiveViewModel.LightningInvoiceState.Init || state is ReceiveViewModel.LightningInvoiceState.Generating -> {
+            if (state is ReceiveViewModel.LightningInvoiceState.Init) {
+                LaunchedEffect(key1 = Unit) {
+                    vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = expiry)
+                }
+            }
+            Box(contentAlignment = Alignment.Center) {
+                QRCodeView(bitmap = vm.lightningQRBitmap, data = null, maxWidth = maxWidth)
+                Card(shape = RoundedCornerShape(16.dp)) { ProgressView(text = stringResource(id = R.string.receive_lightning_generating)) }
+            }
+            CopyShareEditButtons(onCopy = { }, onShare = { }, onEdit = onEdit, maxWidth = maxWidth)
         }
         state is ReceiveViewModel.LightningInvoiceState.Show -> {
             DisplayLightningInvoice(
                 paymentRequest = state.paymentRequest,
                 bitmap = vm.lightningQRBitmap,
-                onEdit = onEdit
+                onEdit = onEdit,
+                maxWidth = maxWidth,
             )
         }
         state is ReceiveViewModel.LightningInvoiceState.Error -> {
@@ -253,30 +282,24 @@ private fun LightningInvoiceView(
 }
 
 @Composable
-private fun GeneratingLightningInvoice(bitmap: ImageBitmap?) {
-    Box(contentAlignment = Alignment.Center) {
-        QRCodeView(bitmap = bitmap, data = null)
-        Card(shape = RoundedCornerShape(16.dp)) { ProgressView(text = stringResource(id = R.string.receive_lightning_generating)) }
-    }
-}
-
-@Composable
 private fun DisplayLightningInvoice(
     paymentRequest: PaymentRequest,
     bitmap: ImageBitmap?,
     onEdit: () -> Unit,
+    maxWidth: Dp,
 ) {
     val context = LocalContext.current
     val prString = remember(paymentRequest) { paymentRequest.write() }
     val amount = paymentRequest.amount
     val description = paymentRequest.description.takeUnless { it.isNullOrBlank() }
 
-    QRCodeView(data = prString, bitmap = bitmap)
+    QRCodeView(data = prString, bitmap = bitmap, maxWidth = maxWidth)
 
     CopyShareEditButtons(
         onCopy = { copyToClipboard(context, data = prString) },
         onShare = { share(context, "lightning:$prString", context.getString(R.string.receive_lightning_share_subject), context.getString(R.string.receive_lightning_share_title)) },
-        onEdit = onEdit
+        onEdit = onEdit,
+        maxWidth = maxWidth
     )
 
     if (amount != null || description != null) {
@@ -311,6 +334,7 @@ private fun DisplayLightningInvoice(
 @Composable
 private fun BitcoinAddressView(
     state: ReceiveViewModel.BitcoinAddressState,
+    maxWidth: Dp
 ) {
     val context = LocalContext.current
 
@@ -322,15 +346,16 @@ private fun BitcoinAddressView(
 
     when (state) {
         is ReceiveViewModel.BitcoinAddressState.Init -> {
-            QRCodeView(data = null, bitmap = null)
-            CopyShareEditButtons(onCopy = { }, onShare = { }, onEdit = null)
+            QRCodeView(data = null, bitmap = null, maxWidth = maxWidth)
+            CopyShareEditButtons(onCopy = { }, onShare = { }, onEdit = null, maxWidth = maxWidth)
         }
         is ReceiveViewModel.BitcoinAddressState.Show -> {
-            QRCodeView(data = state.address, bitmap = state.image)
+            QRCodeView(data = state.address, bitmap = state.image, maxWidth = maxWidth)
             CopyShareEditButtons(
                 onCopy = { copyToClipboard(context, data = state.address) },
                 onShare = { share(context, "bitcoin:${state.address}", context.getString(R.string.receive_bitcoin_share_subject), context.getString(R.string.receive_bitcoin_share_title)) },
-                onEdit = null
+                onEdit = null,
+                maxWidth = maxWidth,
             )
             Spacer(modifier = Modifier.height(24.dp))
             HSeparator(width = 50.dp)
@@ -351,12 +376,20 @@ private fun QRCodeView(
     data: String?,
     bitmap: ImageBitmap?,
     details: @Composable () -> Unit = {},
+    maxWidth: Dp,
 ) {
     val context = LocalContext.current
     Column(
         modifier = Modifier
             .padding(horizontal = 4.dp)
-            .width(270.dp)
+            .width(
+                when {
+                    maxWidth <= 240.dp -> 160.dp
+                    maxWidth <= 320.dp -> 240.dp
+                    maxWidth <= 480.dp -> 270.dp
+                    else -> 320.dp
+                }
+            )
             .clip(RoundedCornerShape(16.dp))
             .border(
                 border = BorderStroke(1.dp, MaterialTheme.colors.primary),
@@ -434,7 +467,7 @@ private fun QRCodeDetail(label: String, value: String, maxLines: Int = Int.MAX_V
 
 @Composable
 private fun QRCodeDetail(label: String, content: @Composable () -> Unit) {
-    Row(modifier = Modifier.padding(horizontal = 24.dp)) {
+    Row(modifier = Modifier.padding(horizontal = 4.dp)) {
         Text(
             text = label.uppercase(),
             style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp, textAlign = TextAlign.End),
@@ -443,7 +476,9 @@ private fun QRCodeDetail(label: String, content: @Composable () -> Unit) {
                 .width(80.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Column(modifier = Modifier.alignBy(FirstBaseline).widthIn(min = 100.dp)) {
+        Column(modifier = Modifier
+            .alignBy(FirstBaseline)
+            .widthIn(min = 100.dp)) {
             content()
         }
     }
@@ -454,16 +489,18 @@ private fun CopyShareEditButtons(
     onCopy: () -> Unit,
     onShare: () -> Unit,
     onEdit: (() -> Unit)?,
+    maxWidth: Dp,
 ) {
     Spacer(modifier = Modifier.height(32.dp))
-    Row(modifier = Modifier.padding(horizontal = 32.dp)) {
+
+    Row(modifier = Modifier.padding(horizontal = 4.dp)) {
         BorderButton(icon = R.drawable.ic_copy, onClick = onCopy)
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(if (maxWidth <= 360.dp) 12.dp else 16.dp))
         BorderButton(icon = R.drawable.ic_share, onClick = onShare)
         if (onEdit != null) {
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(if (maxWidth <= 360.dp) 12.dp else 16.dp))
             BorderButton(
-                text = stringResource(id = R.string.receive_lightning_edit_button),
+                text = if (maxWidth <= 360.dp) null else stringResource(id = R.string.receive_lightning_edit_button),
                 icon = R.drawable.ic_edit,
                 onClick = onEdit
             )
@@ -486,7 +523,7 @@ private fun EditInvoiceView(
             .width(320.dp)
             .clip(RoundedCornerShape(16.dp))
             .border(
-                border = BorderStroke(1.dp, MaterialTheme.colors.primary),
+                border = BorderStroke(1.dp, borderColor),
                 shape = RoundedCornerShape(16.dp)
             )
             .background(MaterialTheme.colors.surface),
@@ -498,8 +535,9 @@ private fun EditInvoiceView(
             text = description ?: "",
             onTextChange = onDescriptionChange,
             staticLabel = stringResource(id = R.string.receive_lightning_edit_desc_label),
-            placeholder = { Text(text = stringResource(id = R.string.receive_lightning_edit_desc_placeholder), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            placeholder = { Text(text = stringResource(id = R.string.receive_lightning_edit_desc_placeholder), maxLines = 2, overflow = TextOverflow.Ellipsis) },
             maxChars = 140,
+            minLines = 2,
             maxLines = Int.MAX_VALUE,
             modifier = Modifier
                 .fillMaxWidth()

@@ -150,7 +150,7 @@
     <string name="receive_lightning_edit_amount_label">Amount (optional)</string>
     <string name="receive_lightning_edit_amount_placeholder">Amount to receive</string>
     <string name="receive_lightning_edit_desc_label">Description (optional)</string>
-    <string name="receive_lightning_edit_desc_placeholder">Payment description</string>
+    <string name="receive_lightning_edit_desc_placeholder">Enter a description for this invoice</string>
     <string name="receive_lightning_edit_generate_button">Create invoice</string>
 
     <string name="receive_lightning_warning_surefail">Payment will fail.</string>

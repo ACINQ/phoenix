@@ -46,6 +46,7 @@ import fr.acinq.phoenix.android.utils.*
 fun TextInput(
     modifier: Modifier = Modifier,
     text: String,
+    minLines: Int = 1,
     maxLines: Int = 1,
     singleLine: Boolean = false,
     maxChars: Int? = null,
@@ -66,6 +67,7 @@ fun TextInput(
         OutlinedTextField(
             value = text,
             onValueChange = { newValue -> onTextChange(newValue.take(maxChars ?: Int.MAX_VALUE)) },
+            minLines = minLines,
             maxLines = maxLines,
             singleLine = singleLine,
             keyboardOptions = KeyboardOptions.Default.copy(
