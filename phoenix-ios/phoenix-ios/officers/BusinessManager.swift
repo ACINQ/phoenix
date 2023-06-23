@@ -102,7 +102,8 @@ class BusinessManager {
 		let startupParams = StartupParams(
 			requestCheckLegacyChannels: false,
 			isTorEnabled: GroupPrefs.shared.isTorEnabled,
-			liquidityPolicy: lp.toKotlin()
+			liquidityPolicy: lp.toKotlin(),
+			isMigrationFromAndroidLegacyApp: false
 		)
 		business.start(startupParams: startupParams)
 		

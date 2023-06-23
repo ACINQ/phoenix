@@ -185,7 +185,7 @@ extension PhoenixShared.NotificationsManager {
 	}
 
 	struct NotificationItem {
-		let ids: Set<String>
+		let ids: Set<Lightning_kmpUUID>
 		let notification: PhoenixShared.Notification
 	}
 
@@ -203,7 +203,7 @@ extension PhoenixShared.NotificationsManager {
 				let transformedArray: [NotificationItem] = originalArray.compactMap { value in
 					guard
 						let pair = value as? KotlinPair<AnyObject, AnyObject>,
-						let ids = pair.first as? Set<String>,
+						let ids = pair.first as? Set<Lightning_kmpUUID>,
 						let notification = pair.second as? PhoenixShared.Notification
 					else {
 						return nil

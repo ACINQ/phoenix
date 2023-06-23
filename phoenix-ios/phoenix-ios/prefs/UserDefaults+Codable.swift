@@ -116,7 +116,8 @@ struct LiquidityPolicy: Equatable, Codable {
 		
 		return Lightning_kmpLiquidityPolicy.Auto(
 			maxAbsoluteFee: Bitcoin_kmpSatoshi(sat: sats),
-			maxRelativeFeeBasisPoints: basisPoints
+			maxRelativeFeeBasisPoints: basisPoints,
+			alwaysAllowPayToOpen: true
 		)
 	}
 }
