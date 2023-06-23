@@ -906,7 +906,7 @@
     <string name="liquiditypolicy_advanced_fees_prop_help">Also check that the fee is reasonable relative to the amount received, even when it is below %1$s.</string>
     <string name="liquiditypolicy_advanced_overrides_title">Policy overrides</string>
     <string name="liquiditypolicy_advanced_pay_to_open_label">Always accept Lightning payments</string>
-    <string name="liquiditypolicy_advanced_pay_to_open_help">When enabled, Lightning payments will always be accepted, regardless of the max fee setting. Does not affect on-chain payments.</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_help">When enabled, Lightning payments will always be accepted, regardless of the max fee setting.\n\nAttention: if the Bitcoin mempool feerate is high, incoming LN payments could be expensive if they require an on-chain operation.</string>
     <string name="liquiditypolicy_save_button">Save policy</string>
 
     <string name="liquiditypolicy_help">Lorem ipsum dolor sit amet.</string>

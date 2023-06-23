@@ -67,7 +67,7 @@ fun AdvancedIncomingFeePolicy(
 
     val maxSatFeePrefsFlow = UserPrefs.getIncomingMaxSatFeeInternal(context).collectAsState(null)
     val maxPropFeePrefsFlow = UserPrefs.getIncomingMaxPropFeeInternal(context).collectAsState(null)
-    val liquidityPolicyInPrefs = UserPrefs.getLiquidityPolicy(context).collectAsState(null)
+    val liquidityPolicyInPrefsFlow = UserPrefs.getLiquidityPolicy(context).collectAsState(null)
 
     DefaultScreenLayout {
         DefaultScreenHeader(
@@ -77,7 +77,7 @@ fun AdvancedIncomingFeePolicy(
 
         val maxSatFeePrefs = maxSatFeePrefsFlow.value
         val maxPropFeePrefs = maxPropFeePrefsFlow.value
-        val liquidityPolicyPrefs = liquidityPolicyInPrefs.value
+        val liquidityPolicyPrefs = liquidityPolicyInPrefsFlow.value
 
         if (maxSatFeePrefs != null && maxPropFeePrefs != null && liquidityPolicyPrefs != null) {
             if (liquidityPolicyPrefs is LiquidityPolicy.Disable) {
@@ -90,9 +90,9 @@ fun AdvancedIncomingFeePolicy(
                     details = stringResource(id = R.string.liquiditypolicy_advanced_disclaimer_message),
                 )
 
-                var alwaysAcceptLN by remember { mutableStateOf(false) }
                 val maxAbsoluteFee by remember { mutableStateOf(maxSatFeePrefs) }
                 var maxRelativeFeeBasisPoints by remember { mutableStateOf<Int?>(maxPropFeePrefs) }
+                var alwaysAllowPayToOpen by remember { mutableStateOf(if (liquidityPolicyPrefs is LiquidityPolicy.Auto) liquidityPolicyPrefs.alwaysAllowPayToOpen else false ) }
 
                 CardHeader(text = stringResource(id = R.string.liquiditypolicy_advanced_verifications_title))
                 Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)) {
@@ -108,14 +108,14 @@ fun AdvancedIncomingFeePolicy(
                     SettingSwitch(
                         title = stringResource(id = R.string.liquiditypolicy_advanced_pay_to_open_label),
                         description = stringResource(id = R.string.liquiditypolicy_advanced_pay_to_open_help),
-                        isChecked = alwaysAcceptLN,
-                        onCheckChangeAttempt = { alwaysAcceptLN = it },
+                        isChecked = alwaysAllowPayToOpen,
+                        onCheckChangeAttempt = { alwaysAllowPayToOpen = it },
                         enabled = true
                     )
                 }
 
                 Card {
-                    val newPolicy = maxRelativeFeeBasisPoints?.let { LiquidityPolicy.Auto(maxRelativeFeeBasisPoints = it, maxAbsoluteFee = maxAbsoluteFee) }
+                    val newPolicy = maxRelativeFeeBasisPoints?.let { LiquidityPolicy.Auto(maxRelativeFeeBasisPoints = it, maxAbsoluteFee = maxAbsoluteFee, alwaysAllowPayToOpen = alwaysAllowPayToOpen) }
                     val isEnabled = newPolicy != null && liquidityPolicyPrefs != newPolicy
                     Button(
                         text = stringResource(id = R.string.liquiditypolicy_save_button),

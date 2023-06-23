@@ -171,19 +171,21 @@ object UserPrefs {
         try {
             it[LIQUIDITY_POLICY]?.let { policy ->
                 when (val res = json.decodeFromString<InternalLiquidityPolicy>(policy)) {
-                    is InternalLiquidityPolicy.Auto -> LiquidityPolicy.Auto(res.maxAbsoluteFee, res.maxRelativeFeeBasisPoints)
+                    is InternalLiquidityPolicy.Auto -> LiquidityPolicy.Auto(res.maxAbsoluteFee, res.maxRelativeFeeBasisPoints, res.alwaysAllowPayToOpen)
                     is InternalLiquidityPolicy.Disable -> LiquidityPolicy.Disable
                 }
             }
         } catch (e: Exception) {
-            log.error("failed to read liquidity-policy preference: ${e.localizedMessage}")
+            log.error("failed to read liquidity-policy preference, replace with default: ${e.localizedMessage}")
+            saveLiquidityPolicy(context, NodeParamsManager.defaultLiquidityPolicy)
             null
         } ?: NodeParamsManager.defaultLiquidityPolicy
     }
 
     suspend fun saveLiquidityPolicy(context: Context, policy: LiquidityPolicy) = context.userPrefs.edit {
+        log.info("saving new liquidity policy=$policy")
         val serialisable = when (policy) {
-            is LiquidityPolicy.Auto -> InternalLiquidityPolicy.Auto(policy.maxRelativeFeeBasisPoints, policy.maxAbsoluteFee)
+            is LiquidityPolicy.Auto -> InternalLiquidityPolicy.Auto(policy.maxRelativeFeeBasisPoints, policy.maxAbsoluteFee, policy.alwaysAllowPayToOpen)
             is LiquidityPolicy.Disable -> InternalLiquidityPolicy.Disable
         }
         it[LIQUIDITY_POLICY] = json.encodeToString(serialisable)
@@ -244,7 +246,8 @@ sealed class InternalLiquidityPolicy {
     @Serializable
     data class Auto(
         val maxRelativeFeeBasisPoints: Int,
-        @Serializable(with = SatoshiSerializer::class) val maxAbsoluteFee: Satoshi
+        @Serializable(with = SatoshiSerializer::class) val maxAbsoluteFee: Satoshi,
+        val alwaysAllowPayToOpen: Boolean
     ) : InternalLiquidityPolicy()
 }
 
