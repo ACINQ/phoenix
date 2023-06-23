@@ -119,10 +119,6 @@ object LegacyMigrationHelper {
             UserPrefs.saveTrampolineMaxFee(context, it)
         }
 
-        if (Prefs.isAutoPayToOpenEnabled(context)) {
-            UserPrefs.saveLiquidityPolicy(context, LiquidityPolicy.Disable)
-        }
-
         // use the default scheme when migrating from legacy, instead of the default one
         UserPrefs.saveLnurlAuthScheme(context, LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME)
 
