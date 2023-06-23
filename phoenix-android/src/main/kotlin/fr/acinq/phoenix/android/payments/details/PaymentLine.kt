@@ -46,6 +46,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.phoenix.android.R
@@ -195,12 +197,21 @@ private fun PaymentIcon(payment: WalletPayment) {
             )
         }
         WalletPaymentState.SuccessOnChain -> {
-            PaymentIconComponent(
-                icon = R.drawable.ic_payment_success_onchain,
-                description = stringResource(id = R.string.paymentline_desc_success_onchain),
-                iconColor = MaterialTheme.colors.onPrimary,
-                backgroundColor = MaterialTheme.colors.primary
-            )
+            if (payment is IncomingPayment && payment.origin is IncomingPayment.Origin.Invoice) {
+                PaymentIconComponent(
+                    icon = R.drawable.ic_payment_success,
+                    description = stringResource(id = R.string.paymentline_desc_success_offchain),
+                    iconColor = MaterialTheme.colors.onPrimary,
+                    backgroundColor = MaterialTheme.colors.primary
+                )
+            } else {
+                PaymentIconComponent(
+                    icon = R.drawable.ic_payment_success_onchain,
+                    description = stringResource(id = R.string.paymentline_desc_success_onchain),
+                    iconColor = MaterialTheme.colors.onPrimary,
+                    backgroundColor = MaterialTheme.colors.primary
+                )
+            }
         }
         WalletPaymentState.SuccessOffChain -> {
             PaymentIconComponent(
