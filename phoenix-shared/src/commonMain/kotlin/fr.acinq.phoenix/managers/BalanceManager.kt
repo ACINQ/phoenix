@@ -2,6 +2,7 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.*
+import fr.acinq.lightning.blockchain.electrum.SwapInManager
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.channel.Helpers
@@ -78,12 +79,12 @@ class BalanceManager(
      * the Lightning balance is updated - but the utxos for this channel are not yet spent and are such still listed in
      * the swap-in wallet flow. The UI would be incorrect for a while.
      *
-     * See [Helpers.reservedWalletInputs] for details.
+     * See [SwapInManager.reservedWalletInputs] for details.
      */
     private suspend fun monitorSwapInBalance(peer: Peer) {
         val swapInConfirmations = peer.walletParams.swapInConfirmations
         combine(peer.currentTipFlow.filterNotNull(), peer.channelsFlow, peer.swapInWallet.walletStateFlow) { (currentBlockHeight, _), channels, swapInWallet ->
-            val reservedInputs = Helpers.reservedWalletInputs(channels.values.filterIsInstance<PersistedChannelState>())
+            val reservedInputs = SwapInManager.reservedWalletInputs(channels.values.filterIsInstance<PersistedChannelState>())
             val walletWithoutReserved = WalletState(
                 addresses = swapInWallet.addresses.map { (address, unspent) ->
                     address to unspent.filterNot { reservedInputs.contains(it.outPoint) }
