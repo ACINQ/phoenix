@@ -79,7 +79,7 @@ fun HomeBalance(
                     }
                 }
             )
-            IncomingBalance(swapInBalance, unconfirmedChannelsBalance, onShowSwapInWallet, onShowChannels, balanceDisplayMode)
+            IncomingBalance(swapInBalance, unconfirmedChannelsBalance, onShowSwapInWallet, balanceDisplayMode)
         }
     }
 }
@@ -89,21 +89,8 @@ private fun IncomingBalance(
     swapInBalance: WalletBalance,
     pendingChannelsBalance: MilliSatoshi,
     onShowSwapInWallet: () -> Unit,
-    onShowChannels: () -> Unit,
     balanceDisplayMode: HomeAmountDisplayMode,
 ) {
-    var showSwapInInfoDialog by remember { mutableStateOf(false) }
-
-    if (showSwapInInfoDialog) {
-        OnChainInfoDialog(
-            swapInBalance = swapInBalance,
-            pendingChannelsBalance = pendingChannelsBalance,
-            onDismiss = { showSwapInInfoDialog = false },
-            onShowSwapInWallet = onShowSwapInWallet,
-            onShowChannels = onShowChannels,
-        )
-    }
-
     val balance = swapInBalance.total.toMilliSatoshi() + pendingChannelsBalance
     if (balance > 0.msat) {
         val undecidedSwapBalance = swapInBalance.unconfirmed + swapInBalance.weaklyConfirmed
@@ -117,61 +104,7 @@ private fun IncomingBalance(
             space = 4.dp,
             padding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             backgroundColor = Color.Transparent,
-            onClick = { showSwapInInfoDialog = true }
+            onClick = onShowSwapInWallet,
         )
-    }
-}
-
-@Composable
-private fun OnChainInfoDialog(
-    onDismiss: () -> Unit,
-    swapInBalance: WalletBalance,
-    pendingChannelsBalance: MilliSatoshi,
-    onShowSwapInWallet: () -> Unit,
-    onShowChannels: () -> Unit,
-) {
-    val btcUnit = LocalBitcoinUnit.current
-    Dialog(onDismiss = onDismiss, title = stringResource(id = R.string.home__onchain_dialog_title)) {
-        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-            Text(text = stringResource(R.string.home__onchain_dialog_header), modifier = Modifier.padding(horizontal = 8.dp))
-            Spacer(modifier = Modifier.height(8.dp))
-            if (swapInBalance.total > 0.sat) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    externalPadding = PaddingValues(0.dp),
-                    internalPadding = PaddingValues(8.dp),
-                    onClick = onShowSwapInWallet
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.home__onchain_dialog_swap_in, swapInBalance.total.toPrettyString(btcUnit, withUnit = true)),
-                        style = MaterialTheme.typography.h5
-                    )
-                    Text(
-                        text = stringResource(id = R.string.home__onchain_dialog_swap_in_sub),
-                        style = MaterialTheme.typography.caption.copy(fontSize = 14.sp)
-                    )
-                }
-                if (pendingChannelsBalance > 0.msat) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
-            }
-            if (pendingChannelsBalance > 0.msat) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    externalPadding = PaddingValues(0.dp),
-                    internalPadding = PaddingValues(8.dp),
-                    onClick = onShowChannels
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.home__onchain_dialog_channel_confirming, pendingChannelsBalance.toPrettyString(btcUnit, withUnit = true)),
-                        style = MaterialTheme.typography.h5
-                    )
-                    Text(
-                        text = stringResource(id = R.string.home__onchain_dialog_channel_confirming_sub),
-                        style = MaterialTheme.typography.caption.copy(fontSize = 14.sp)
-                    )
-                }
-            }
-        }
     }
 }

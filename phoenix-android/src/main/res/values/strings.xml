@@ -344,13 +344,6 @@
 
     <string name="home__balance_loading">Loading…</string>
     <string name="home__onchain_incoming">+%1$s</string>
-    <string name="home__onchain_dialog_button_to_wallet">Show incoming on-chain payments</string>
-    <string name="home__onchain_dialog_title">Incoming payments</string>
-    <string name="home__onchain_dialog_header">These funds will appear on your balance once swapped to Lightning, according to your fee settings.</string>
-    <string name="home__onchain_dialog_swap_in">+%1$s on-chain deposit</string>
-    <string name="home__onchain_dialog_swap_in_sub">Tap to see my wallet</string>
-    <string name="home__onchain_dialog_channel_confirming">+%1$s swapping to Lightning</string>
-    <string name="home__onchain_dialog_channel_confirming_sub">Tap to see my channels</string>
 
     <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">You have not made any payments recently.\n\nUse the Receive and Send buttons at the bottom of this screen to get started!</string>
@@ -873,7 +866,7 @@
     <string name="walletinfo_onchain_swapin_help">An on-chain wallet derived from your seed.\n\nThe swap-in wallet is a bridge to Lightning. Funds on this wallet will automatically be moved to Lightning according to your liquidity policy setting.</string>
     <string name="walletinfo_onchain_swapin_about">This wallet serves as a bridge to Lightning.</string>
     <string name="walletinfo_onchain_swapin_about_unconfirmed">Placeholder message for unconfirmed balance?</string>
-    <string name="walletinfo_onchain_swapin_policy_view_button">View incoming fee policy</string>
+    <string name="walletinfo_onchain_swapin_policy_view">Tap to see your incoming fee policy.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">Funds here will be automatically moved to Lightning if the incoming fee is <b>less than %1$s</b>.</string>
     <string name="walletinfo_onchain_swapin_policy_disabled_details">Automated channel opening <b>has been disabled</b>. These funds will remain here.</string>
 

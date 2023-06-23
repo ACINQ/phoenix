@@ -79,9 +79,10 @@ private fun SwappableBalanceView(
     CardHeader(text = stringResource(id = R.string.walletinfo_swappable_title))
     Card(
         modifier = Modifier.fillMaxWidth(),
+        onClick = onViewChannelPolicyClick
     ) {
-        Column(modifier = Modifier.padding(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 0.dp)) {
-            BalanceRow(balance = balance)
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+            BalanceRow(balance = balance, icon = R.drawable.ic_sleep)
             Spacer(modifier = Modifier.height(8.dp))
             when (val policy = liquidityPolicyInPrefs) {
                 is LiquidityPolicy.Disable -> {
@@ -98,15 +99,9 @@ private fun SwappableBalanceView(
                 }
                 null -> {}
             }
+            Spacer(Modifier.height(8.dp))
+            Text(text = stringResource(id = R.string.walletinfo_onchain_swapin_policy_view), style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
         }
-        Button(
-            text = stringResource(id = R.string.walletinfo_onchain_swapin_policy_view_button),
-            textStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.primary, textDecoration = TextDecoration.Underline, fontSize = 14.sp),
-            padding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start,
-            onClick = onViewChannelPolicyClick
-        )
     }
 }
 
@@ -118,7 +113,8 @@ private fun NotSwappableWalletView(
         CardHeader(text = stringResource(id = R.string.walletinfo_not_swappable_title))
         Card {
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                BalanceRow(balance = wallet.weaklyConfirmed.balance.toMilliSatoshi())
+                val pendingBalance = wallet.weaklyConfirmed.balance + wallet.unconfirmed.balance
+                BalanceRow(balance = pendingBalance.toMilliSatoshi(), icon = R.drawable.ic_clock)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = annotatedStringResource(id = R.string.walletinfo_not_swappable_details, wallet.minConfirmations),

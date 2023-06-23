@@ -196,46 +196,48 @@ private fun OnchainBalanceView(
 fun UtxoRow(utxo: WalletState.Utxo, progress: Pair<Int?, Int>?) {
     val context = LocalContext.current
     val txUrl = txUrl(txId = utxo.outPoint.txid.toHex())
-    val typo = monoTypo.copy(fontSize = 13.sp)
-    CompositionLocalProvider(LocalTextStyle provides typo) {
-        Row(
-            modifier = Modifier
-                .clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.accessibility_explorer_link)) {
-                    openLink(context, link = txUrl)
-                }
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (progress != null) {
-                Text(
-                    text = "${progress.first ?: "-"}/${progress.second}",
-                    color = if (progress.first == null) mutedTextColor else MaterialTheme.colors.primary,
-                )
-            } else {
-                PhoenixIcon(
-                    resourceId = R.drawable.ic_clock,
-                    tint = MaterialTheme.colors.primary,
-                )
+    Row(
+        modifier = Modifier
+            .clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.accessibility_explorer_link)) {
+                openLink(context, link = txUrl)
             }
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (progress != null) {
             Text(
-                text = utxo.outPoint.txid.toHex(),
-                modifier = Modifier.weight(1f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                text = "${progress.first ?: "-"}/${progress.second}",
+                style = monoTypo.copy(color = if (progress.first == null) mutedTextColor else MaterialTheme.colors.primary),
             )
-            AmountView(amount = utxo.amount.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp), unitTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp), prefix = "+")
+        } else {
+            PhoenixIcon(
+                resourceId = R.drawable.ic_clock,
+                tint = MaterialTheme.colors.primary,
+            )
         }
+        Text(
+            text = utxo.outPoint.txid.toHex(),
+            modifier = Modifier.weight(1f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontSize = 14.sp
+        )
+        AmountView(amount = utxo.amount.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp), unitTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp), prefix = "+")
     }
 }
 
 @Composable
-internal fun BalanceRow(balance: MilliSatoshi?) {
+internal fun BalanceRow(balance: MilliSatoshi?, icon: Int? = null) {
     val btcUnit = LocalBitcoinUnit.current
     if (balance == null) {
         ProgressView(text = stringResource(id = R.string.walletinfo_loading_data), padding = PaddingValues(0.dp))
     } else {
         Row {
+            if (icon != null) {
+                PhoenixIcon(resourceId = icon, modifier = Modifier.align(Alignment.CenterVertically))
+                Spacer(modifier = Modifier.width(8.dp))
+            }
             AmountView(amount = balance, amountTextStyle = MaterialTheme.typography.h4, forceUnit = btcUnit, modifier = Modifier.alignByBaseline(), onClick = null)
             Spacer(modifier = Modifier.width(4.dp))
             AmountInFiatView(amount = balance, modifier = Modifier.alignByBaseline())
