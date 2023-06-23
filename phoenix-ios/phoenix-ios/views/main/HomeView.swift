@@ -28,15 +28,9 @@ struct HomeView : MVIView {
 
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
-
-	@State var selectedItem: WalletPaymentInfo? = nil
 	
-	@State var isMempoolFull = false
-	
-	@State var notificationPermissions = NotificationsManager.shared.permissions.value
-	@State var bgAppRefreshDisabled = NotificationsManager.shared.backgroundRefreshStatus.value != .available
-	
-	@StateObject var customElectrumServerObserver = CustomElectrumServerObserver()
+	@StateObject var noticeMonitor = NoticeMonitor()
+	@StateObject var syncState = DownloadMonitor()
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
@@ -48,10 +42,7 @@ struct HomeView : MVIView {
 	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	
-	@StateObject var syncState = DownloadMonitor()
-	
 	let lastCompletedPaymentPublisher = Biz.business.paymentsManager.lastCompletedPaymentPublisher()
-	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	let swapInWalletBalancePublisher = Biz.business.balanceManager.swapInWalletBalancePublisher()
 	@State var swapInWalletBalance: WalletBalance = WalletBalance.companion.empty()
@@ -69,18 +60,25 @@ struct HomeView : MVIView {
 	let bizNotificationsPublisher = Biz.business.notificationsManager.notificationsPublisher()
 	@State var bizNotifications: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	
+	@State var didAppear = false
+	
+	enum NoticeBoxContentHeight: Preference {}
+	let noticeBoxContentHeightReader = GeometryPreferenceReader(
+		key: AppendValue<NoticeBoxContentHeight>.self,
+		value: { [$0.size.height] }
+	)
+	@State var noticeBoxContentHeight: CGFloat? = nil
+	
+	enum HomeViewSheet {
+		case paymentView(payment: WalletPaymentInfo)
+		case notificationsView
+	}
+	
+	@State var activeSheet: HomeViewSheet? = nil
+	
 	@Environment(\.popoverState) var popoverState: PopoverState
 	@Environment(\.openURL) var openURL
 	@Environment(\.colorScheme) var colorScheme
-	
-	@State var didAppear = false
-	
-	let backupSeed_enabled_publisher = Prefs.shared.backupSeed.isEnabled_publisher
-	let manualBackup_taskDone_publisher = Prefs.shared.backupSeed.manualBackup_taskDone_publisher
-	@State var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
-	@State var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(
-		encryptedNodeId: Biz.encryptedNodeId!
-	)
 	
 	// --------------------------------------------------
 	// MARK: Init
@@ -124,26 +122,11 @@ struct HomeView : MVIView {
 		.onReceive(lastCompletedPaymentPublisher) {
 			lastCompletedPaymentChanged($0)
 		}
-		.onReceive(chainContextPublisher) {
-			chainContextChanged($0)
-		}
 		.onReceive(swapInWalletBalancePublisher) {
 			swapInWalletBalanceChanged($0)
 		}
 		.onReceive(swapInRejectedPublisher) {
 			swapInRejectedStateChange($0)
-		}
-		.onReceive(NotificationsManager.shared.permissions) {
-			notificationPermissionsChanged($0)
-		}
-		.onReceive(NotificationsManager.shared.backgroundRefreshStatus) {
-			backgroundRefreshStatusChanged($0)
-		}
-		.onReceive(backupSeed_enabled_publisher) {
-			self.backupSeed_enabled = $0
-		}
-		.onReceive(manualBackup_taskDone_publisher) {
-			self.manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
 		}
 		.onReceive(bizNotificationsPublisher) {
 			bizNotificationsChanged($0)
@@ -163,15 +146,26 @@ struct HomeView : MVIView {
 		.onAppear {
 			onAppear()
 		}
-		.sheet(isPresented: Binding(
-			get: { selectedItem != nil },
-			set: { if !$0 { selectedItem = nil }} // needed if user slides the sheet to dismiss
+		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
+			get: { activeSheet != nil },
+			set: { if !$0 { activeSheet = nil }}
 		)) {
-			PaymentView(
-				type: .sheet(closeAction: { self.selectedItem = nil }),
-				paymentInfo: selectedItem!
-			)
-			.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
+			switch activeSheet! {
+			case .paymentView(let selectedPayment):
+				
+				PaymentView(
+					type: .sheet(closeAction: { self.activeSheet = nil }),
+					paymentInfo: selectedPayment
+				)
+				.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
+				
+			case .notificationsView:
+				
+				NotificationsView(
+					noticeMonitor: noticeMonitor
+				)
+				.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
+			}
 		}
 	}
 	
@@ -324,182 +318,94 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	func notices() -> some View {
 		
-		// === Welcome / Backup Seed ====
-		if mvi.model.balance?.msat == 0 && Prefs.shared.isNewWallet {
-
-			// Reserved for potential "welcome" message.
-			EmptyView()
-
-		} else if !backupSeed_enabled && !manualBackup_taskDone {
-			
-			NoticeBox {
-				HStack(alignment: VerticalAlignment.top, spacing: 0) {
-					Image(systemName: "exclamationmark.triangle")
-						.imageScale(.large)
-						.padding(.trailing, 10)
-						.accessibilityLabel("Warning")
-					
-					Button {
-						navigateToBackup()
-					} label: {
-						Group {
-							Text("Backup your recovery phrase to prevent losing your funds. ")
-								.foregroundColor(.primary)
-							+
-							Text("Let's go ")
-								.foregroundColor(.appAccent)
-							+
-							Text(Image(systemName: "arrowtriangle.forward"))
-								.foregroundColor(.appAccent)
-						}
-						.multilineTextAlignment(.leading)
-						.allowsTightening(true)
-					} // </Button>
-				} // </HStack>
-				.font(.caption)
-				.accessibilityElement(children: .combine)
-				.accessibilityAddTraits(.isButton)
-				.accessibilitySortPriority(47)
-				
-			} // </NoticeBox>
+		let count = noticeCount()
+		if count > 1 {
+			notice_multiple(count: count)
+		} else if count == 1 {
+			notice_single()
 		}
+	}
+	
+	@ViewBuilder
+	func notice_multiple(count: Int) -> some View {
 		
-		// === Custom Electrum Server Problems ====
-		if customElectrumServerObserver.problem == .badCertificate {
-			
-			NoticeBox {
-				HStack(alignment: VerticalAlignment.top, spacing: 0) {
-					Image(systemName: "exclamationmark.shield")
-						.imageScale(.large)
-						.padding(.trailing, 10)
-						.accessibilityHidden(true)
-						.accessibilityLabel("Warning")
-					
-					Button {
-						navigationToElecrumServer()
-					} label: {
-						Group {
-							Text("Custom electrum server: bad certificate ! ")
-								.foregroundColor(.primary)
-							+
-							Text("Check it ")
-								.foregroundColor(.appAccent)
-							+
-							Text(Image(systemName: "arrowtriangle.forward"))
-								.foregroundColor(.appAccent)
-						}
-						.multilineTextAlignment(.leading)
-						.allowsTightening(true)
-					} // </Button>
-					
-				} // </HStack>
-				.font(.caption)
-				.accessibilityElement(children: .combine)
-				.accessibilityAddTraits(.isButton)
-				.accessibilitySortPriority(47)
+		NoticeBox {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				notice_primary(includeAction: false)
+					.read(noticeBoxContentHeightReader)
 				
-			} // </NoticeBox>
+				if let dividerHeight = noticeBoxContentHeight {
+					Spacer(minLength: 6)
+					Divider()
+						.frame(width: 1, height: dividerHeight).background(Color.borderColor)
+						.padding(.trailing, 6)
+				} else {
+					Spacer(minLength: 13)
+				}
+				
+				Group {
+					let remainingCount = count - 1
+					if remainingCount < 100 {
+						Text(verbatim: "+\(remainingCount)")
+							.padding(.top, 2)
+							.padding(.bottom, 2.5)
+							.padding(.horizontal, 7.5)
+							.foregroundColor(.white)
+							.background(Capsule().fill(Color.appAccent))
+					} else {
+						Text(verbatim: "99+")
+							.padding(.vertical, 2.5)
+							.padding(.horizontal, 7.5)
+							.foregroundColor(.white)
+							.background(Capsule().fill(Color.appAccent))
+					}
+				}
+				.read(noticeBoxContentHeightReader)
+				
+			} // </HStack>
+			.assignMaxPreference(for: noticeBoxContentHeightReader.key, to: $noticeBoxContentHeight)
+			
+		} // </NoticeBox>
+		.contentShape(Rectangle()) // make Spacer area tappable
+		.onTapGesture {
+			openNotificationsSheet()
 		}
+		.padding([.leading, .trailing, .bottom], 10)
+	}
+	
+	@ViewBuilder
+	func notice_single() -> some View {
 		
-		// === Mempool Full Warning ====
-		if isMempoolFull {
-			
-			NoticeBox {
-				HStack(alignment: VerticalAlignment.top, spacing: 0) {
-					Image(systemName: "tray.full")
-						.imageScale(.large)
-						.padding(.trailing, 10)
-						.accessibilityHidden(true)
-						.accessibilityLabel("Warning")
-					
-					VStack(alignment: HorizontalAlignment.leading, spacing: 5) {
-						Text("Bitcoin mempool is full and fees are high.")
-						Button {
-							openMempoolFullURL()
-						} label: {
-							Text("See how Phoenix is affected".uppercased())
-						}
-					} // </VStack>
-				} // </HStack>
-				.font(.caption)
-				.accessibilityElement(children: .combine)
-				.accessibilityAddTraits(.isButton)
-				.accessibilitySortPriority(47)
-				
-			} // </NoticeBox>
+		NoticeBox {
+			notice_primary(includeAction: true)
 		}
+		.padding([.leading, .trailing, .bottom], 10)
+	}
+	
+	@ViewBuilder
+	func notice_primary(includeAction flag: Bool) -> some View {
 		
-		// === Background payments disabled ====
-		if notificationPermissions == .disabled {
-			
-			NoticeBox {
-				HStack(alignment: VerticalAlignment.top, spacing: 0) {
-					Image(systemName: "exclamationmark.triangle")
-						.imageScale(.large)
-						.padding(.trailing, 10)
-						.accessibilityLabel("Warning")
-					
-					Button {
-						navigationToBackgroundPayments()
-					} label: {
-						Group {
-							Text("Background payments disabled. ")
-								.foregroundColor(.primary)
-							+
-							Text("Fix ")
-								.foregroundColor(.appAccent)
-							+
-							Text(Image(systemName: "arrowtriangle.forward"))
-								.foregroundColor(.appAccent)
-						}
-						.multilineTextAlignment(.leading)
-						.allowsTightening(true)
-					} // </Button>
-					
-				} // </HStack>
-				.font(.caption)
-				.accessibilityElement(children: .combine)
-				.accessibilityAddTraits(.isButton)
-				.accessibilitySortPriority(47)
+		Group {
+			if noticeMonitor.hasNotice_backupSeed {
+				NotificationCell.backupSeed(action: flag ? navigateToBackup : nil)
 				
-			} // </NoticeBox>
-		}
-		
-		// === Background App Refresh Disabled ====
-		if bgAppRefreshDisabled {
-			
-			NoticeBox {
-				HStack(alignment: VerticalAlignment.top, spacing: 0) {
-					Image(systemName: "exclamationmark.triangle")
-						.imageScale(.large)
-						.padding(.trailing, 10)
-						.accessibilityLabel("Warning")
-					
-					Button {
-						fixBackgroundAppRefreshDisabled()
-					} label: {
-						Group {
-							Text("Watchtower disabled. ")
-								.foregroundColor(.primary)
-							+
-							Text("Fix ")
-								.foregroundColor(.appAccent)
-							+
-							Text(Image(systemName: "arrowtriangle.forward"))
-								.foregroundColor(.appAccent)
-						}
-						.multilineTextAlignment(.leading)
-						.allowsTightening(true)
-					} // </Button>
-					
-				} // </HStack>
-				.font(.caption)
-				.accessibilityElement(children: .combine)
-				.accessibilityAddTraits(.isButton)
-				.accessibilitySortPriority(47)
+			} else if noticeMonitor.hasNotice_electrumServer {
+				NotificationCell.electrumServer(action: flag ? navigationToElecrumServer : nil)
 				
-			} // </NoticeBox>
+			} else if noticeMonitor.hasNotice_backgroundPayments {
+				NotificationCell.backgroundPayments(action: flag ? navigationToBackgroundPayments : nil)
+				
+			} else if noticeMonitor.hasNotice_watchTower {
+				NotificationCell.watchTower(action: flag ? fixBackgroundAppRefreshDisabled : nil)
+				
+			} else if noticeMonitor.hasNotice_mempoolFull {
+				NotificationCell.mempoolFull(action: flag ? openMempoolFullURL : nil)
+				
+			} else if let bizNotification = primaryBizNotification() {
+				NotificationCell.bizNotification(bizNotification, action: nil)
+			}
 		}
+		.font(.caption)
 	}
 	
 	@ViewBuilder
@@ -534,7 +440,7 @@ struct HomeView : MVIView {
 					totalPaymentCount: totalPaymentCount,
 					recentPaymentsConfig: recentPaymentsConfig,
 					isDownloadingMoreTxs: isDownloadingMoreTxs(),
-					isFetchingMoreTxs: isFetchingMoreTxs(),
+					isFetchingMoreTxsFromDb: isFetchingMoreTxsFromDb(),
 					didAppearCallback: footerCellDidAppear
 				)
 				.accessibilitySortPriority(10)
@@ -605,7 +511,7 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func isFetchingMoreTxs() -> Bool {
+	func isFetchingMoreTxsFromDb() -> Bool {
 		
 		switch recentPaymentsConfig {
 		case .withinTime(_):
@@ -653,6 +559,29 @@ struct HomeView : MVIView {
 				return true // might be more
 			}
 		}
+	}
+	
+	func noticeCount() -> Int {
+		
+		var count = 0
+		if noticeMonitor.hasNotice_backupSeed         { count += 1 }
+		if noticeMonitor.hasNotice_electrumServer     { count += 1 }
+		if noticeMonitor.hasNotice_mempoolFull        { count += 1 }
+		if noticeMonitor.hasNotice_backgroundPayments { count += 1 }
+		if noticeMonitor.hasNotice_watchTower         { count += 1 }
+		
+		count += bizNotifications.count
+		
+		return count
+	}
+	
+	func primaryBizNotification() -> PhoenixShared.NotificationsManager.NotificationItem? {
+		
+		let firstPaymentRejectedNotification = bizNotifications.first { item in
+			return item.notification is PhoenixShared.Notification.PaymentRejected
+		}
+		
+		return firstPaymentRejectedNotification ?? bizNotifications.first
 	}
 	
 	// --------------------------------------------------
@@ -718,28 +647,10 @@ struct HomeView : MVIView {
 		
 		paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
 			
-			if selectedItem == nil {
-				selectedItem = result // triggers display of PaymentView sheet
+			if activeSheet == nil, let result = result {
+				activeSheet = .paymentView(payment: result) // triggers display of PaymentView sheet
 			}
 		}
-	}
-	
-	func chainContextChanged(_ context: WalletContext.V0ChainContext) {
-		log.trace("chainContextChanged()")
-		
-		isMempoolFull = context.mempool.v1.highUsage
-	}
-	
-	func notificationPermissionsChanged(_ newValue: NotificationPermissions) {
-		log.trace("notificationPermissionsChanged()")
-		
-		notificationPermissions = newValue
-	}
-
-	func backgroundRefreshStatusChanged(_ newValue: UIBackgroundRefreshStatus) {
-		log.trace("backgroundRefreshStatusChanged()")
-		
-		bgAppRefreshDisabled = newValue != .available
 	}
 	
 	func swapInWalletBalanceChanged(_ walletBalance: WalletBalance) {
@@ -766,6 +677,9 @@ struct HomeView : MVIView {
 	func bizNotificationsChanged(_ list: [PhoenixShared.NotificationsManager.NotificationItem]) {
 		log.trace("bizNotificationsChanges()")
 		
+		if !list.isEmpty {
+			log.debug("list = \(list)")
+		}
 		bizNotifications = list
 	}
 	
@@ -849,6 +763,14 @@ struct HomeView : MVIView {
 		}
 	}
 	
+	func openNotificationsSheet() {
+		log.trace("openNotificationSheet()")
+		
+		if activeSheet == nil {
+			activeSheet = .notificationsView
+		}
+	}
+	
 	func navigateToBackup() {
 		log.trace("navigateToBackup()")
 		
@@ -891,8 +813,8 @@ struct HomeView : MVIView {
 		let options = PaymentCell.fetchOptions
 		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
 			
-			if let result = result {
-				selectedItem = result
+			if activeSheet == nil, let result = result {
+				activeSheet = .paymentView(payment: result)
 			}
 		}
 	}
@@ -1004,40 +926,12 @@ struct HomeView : MVIView {
 // MARK: -
 // --------------------------------------------------
 
-fileprivate struct NoticeBox<Content: View>: View {
-	
-	let content: Content
-	
-	init(@ViewBuilder builder: () -> Content) {
-		content = builder()
-	}
-	
-	@ViewBuilder
-	var body: some View {
-		
-		HStack(alignment: VerticalAlignment.top, spacing: 0) {
-			content
-			Spacer(minLength: 0) // ensure content takes up full width of screen
-		}
-		.padding(12)
-		.background(
-			RoundedRectangle(cornerRadius: 8)
-				.stroke(Color.appAccent, lineWidth: 1)
-		)
-		.padding([.leading, .trailing, .bottom], 10)
-	}
-}
-
-// --------------------------------------------------
-// MARK: -
-// --------------------------------------------------
-
 fileprivate struct FooterCell: View {
 	
 	let totalPaymentCount: Int
 	let recentPaymentsConfig: RecentPaymentsConfig
 	let isDownloadingMoreTxs: Bool
-	let isFetchingMoreTxs: Bool
+	let isFetchingMoreTxsFromDb: Bool
 	let didAppearCallback: () -> Void
 	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -1047,7 +941,7 @@ fileprivate struct FooterCell: View {
 		Group {
 			if isDownloadingMoreTxs {
 				body_downloading()
-			} else if isFetchingMoreTxs {
+			} else if isFetchingMoreTxsFromDb {
 				body_fetching()
 			} else {
 				body_ready()

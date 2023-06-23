@@ -154,6 +154,12 @@ class Prefs {
 	// MARK: Wallet State
 	// --------------------------------------------------
 	
+	lazy private(set) var isNewWalletPublisher: AnyPublisher<Bool, Never> = {
+		defaults.publisher(for: \.isNewWallet, options: [.initial, .new])
+			.removeDuplicates()
+			.eraseToAnyPublisher()
+	}()
+	
 	/**
 	 * Set to true, until the user has funded their wallet at least once.
 	 * A false value does NOT indicate that the wallet has funds.

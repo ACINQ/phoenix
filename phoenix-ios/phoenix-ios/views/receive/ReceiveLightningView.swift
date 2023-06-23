@@ -32,7 +32,7 @@ struct ReceiveLightningView: View {
 		case sharingUrl(url: String)
 		case sharingImg(img: UIImage)
 	}
-	@State var sheet: ReceiveViewSheet? = nil
+	@State var activeSheet: ReceiveViewSheet? = nil
 	
 	@State var swapIn_enabled = true
 	@State var payToOpen_enabled = true
@@ -116,10 +116,10 @@ struct ReceiveLightningView: View {
 			notificationPermissionsChanged($0)
 		}
 		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
-			get: { sheet != nil },
-			set: { if !$0 { sheet = nil }}
+			get: { activeSheet != nil },
+			set: { if !$0 { activeSheet = nil }}
 		)) {
-			switch sheet! {
+			switch activeSheet! {
 			case .sharingUrl(let sharingUrl):
 				
 				let items: [Any] = [sharingUrl]
@@ -804,7 +804,7 @@ struct ReceiveLightningView: View {
 		if let m = mvi.model as? Receive.Model_Generated {
 			withAnimation {
 				let url = "lightning:\(m.request)"
-				sheet = ReceiveViewSheet.sharingUrl(url: url)
+				activeSheet = ReceiveViewSheet.sharingUrl(url: url)
 			}
 		}
 	}
@@ -818,7 +818,7 @@ struct ReceiveLightningView: View {
 			let qrCodeCgImage = qrCode.cgImage
 		{
 			let uiImg = UIImage(cgImage: qrCodeCgImage)
-			sheet = ReceiveViewSheet.sharingImg(img: uiImg)
+			activeSheet = ReceiveViewSheet.sharingImg(img: uiImg)
 		}
 	}
 }

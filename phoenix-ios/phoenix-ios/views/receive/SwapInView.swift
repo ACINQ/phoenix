@@ -26,7 +26,7 @@ struct SwapInView: View {
 	
 	@StateObject var qrCode = QRCode()
 	
-	@State var sheet: ReceiveViewSheet? = nil
+	@State var activeSheet: ReceiveViewSheet? = nil
 	
 	let swapInWalletBalancePublisher = Biz.business.balanceManager.swapInWalletBalancePublisher()
 	@State var swapInWalletBalance = Biz.business.balanceManager.swapInWalletBalanceValue()
@@ -110,10 +110,10 @@ struct SwapInView: View {
 			
 		} // </VStack>
 		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
-			get: { sheet != nil },
-			set: { if !$0 { sheet = nil }}
+			get: { activeSheet != nil },
+			set: { if !$0 { activeSheet = nil }}
 		)) {
-			switch sheet! {
+			switch activeSheet! {
 			case .sharingUrl(let sharingUrl):
 
 				let items: [Any] = [sharingUrl]
@@ -444,7 +444,7 @@ struct SwapInView: View {
 		
 		if let m = mvi.model as? Receive.Model_SwapIn {
 			let url = "bitcoin:\(m.address)"
-			sheet = ReceiveViewSheet.sharingUrl(url: url)
+			activeSheet = ReceiveViewSheet.sharingUrl(url: url)
 		}
 	}
 	
@@ -457,7 +457,7 @@ struct SwapInView: View {
 			let qrCodeCgImage = qrCode.cgImage
 		{
 			let uiImg = UIImage(cgImage: qrCodeCgImage)
-			sheet = ReceiveViewSheet.sharingImg(img: uiImg)
+			activeSheet = ReceiveViewSheet.sharingImg(img: uiImg)
 		}
 	}
 }

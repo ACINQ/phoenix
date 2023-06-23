@@ -19,9 +19,6 @@ struct IncomingDepositPopover: View {
 	let swapInRejectedPublisher = Biz.swapInRejectedPublisher
 	@State var swapInRejected: Lightning_kmpLiquidityEventsRejected? = nil
 	
-	// Toggles confirmation dialog (used to select preferred explorer)
-	@State var showBlockchainExplorerOptions = false
-	
 	@Environment(\.popoverState) var popoverState: PopoverState
 	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -47,7 +44,7 @@ struct IncomingDepositPopover: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
 			if showNormal() {
-				Text("Customize tip")
+				Text("Incoming payments")
 					.font(.title3)
 					.accessibilityAddTraits(.isHeader)
 					.accessibilitySortPriority(100)
@@ -70,13 +67,12 @@ struct IncomingDepositPopover: View {
 			.accessibilityLabel("Close")
 			.accessibilityHidden(popoverState.currentItem?.dismissable ?? false)
 		}
-		.padding(.horizontal)
+		.padding(.horizontal, 15)
 		.padding(.vertical, 8)
 		.background(
 			Color(UIColor.secondarySystemBackground)
 				.cornerRadius(15, corners: [.topLeft, .topRight])
 		)
-		.padding(.bottom, 4)
 	}
 	
 	@ViewBuilder
@@ -84,7 +80,6 @@ struct IncomingDepositPopover: View {
 		
 		if showNormal() {
 			content_normal()
-			footer()
 		} else {
 			content_pendingFunds()
 		}
@@ -102,8 +97,18 @@ struct IncomingDepositPopover: View {
 			)
 			.multilineTextAlignment(.leading)
 			.fixedSize(horizontal: false, vertical: true) // text truncation bugs
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Spacer()
+				Button {
+					navigateToLiquiditySettings()
+				} label: {
+					Text("Check fee settings")
+				}
+			}
+			.padding(.top, 5)
 		}
-		.padding(.all, 20)
+		.padding(.all, 15)
 	}
 	
 	@ViewBuilder
@@ -134,56 +139,12 @@ struct IncomingDepositPopover: View {
 				Button {
 					navigateToLiquiditySettings()
 				} label: {
-					Text("Check my settings")
+					Text("Check fee settings")
 				}
 			}
 			.padding(.top, 5)
 		}
-		.padding(.all, 20)
-	}
-	
-	@ViewBuilder
-	func footer() -> some View {
-		
-		HStack {
-			Button {
-				showBlockchainExplorerOptions = true
-			} label: {
-				Text("Explore").font(.title2)
-			}
-			.confirmationDialog("Blockchain Explorer",
-				isPresented: $showBlockchainExplorerOptions,
-				titleVisibility: .automatic
-			) {
-				Button {
-					exploreIncomingDeposit(website: BlockchainExplorer.WebsiteMempoolSpace())
-				} label: {
-					Text(verbatim: "Mempool.space") // no localization needed
-				}
-				Button {
-					exploreIncomingDeposit(website: BlockchainExplorer.WebsiteBlockstreamInfo())
-				} label: {
-					Text(verbatim: "Blockstream.info") // no localization needed
-				}
-				Button("Copy bitcoin address") {
-					copySwapInAddress()
-				}
-			} // </confirmationDialog>
-			
-			Spacer()
-			
-			Button {
-				close()
-			} label: {
-				Text("Close").font(.title2)
-			}
-			.accessibilityHidden(popoverState.publisher.value?.dismissable ?? false)
-		} // </HStack>
-		.padding(.vertical, 10)
-		.padding(.horizontal, 20)
-		.background(
-			Color(UIColor.secondarySystemBackground)
-		)
+		.padding(.all, 15)
 	}
 	
 	// --------------------------------------------------
