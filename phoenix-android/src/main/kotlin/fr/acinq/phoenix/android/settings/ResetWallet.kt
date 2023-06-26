@@ -209,7 +209,7 @@ private fun ReviewReset(
             icon = R.drawable.ic_alert_triangle,
             iconTint = negativeColor,
             onClick = onConfirmClick,
-            enabled = backupChecked && disclaimerChecked,
+            enabled = /* backupChecked && disclaimerChecked */ false,
             modifier = Modifier.fillMaxWidth()
         )
     }

@@ -20,17 +20,22 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigate
+import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import kotlinx.coroutines.launch
@@ -80,7 +85,13 @@ fun SettingsView() {
             SettingButton(text = R.string.settings_logs, icon = R.drawable.ic_text, onClick = { nc.navigate(Screen.Logs)})
             SettingButton(text = R.string.settings_mutual_close, icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose) })
             SettingButton(text = R.string.settings_reset_wallet, icon = R.drawable.ic_trash, onClick = { nc.navigate(Screen.ResetWallet) })
-            SettingButton(text = R.string.settings_force_close, icon = R.drawable.ic_alert_triangle, onClick = { nc.navigate(Screen.ForceClose) })
+            SettingButton(
+                text = R.string.settings_force_close,
+                textStyle = MaterialTheme.typography.button.copy(color = negativeColor),
+                icon = R.drawable.ic_alert_triangle,
+                iconTint = negativeColor,
+                onClick = { nc.navigate(Screen.ForceClose) },
+            )
         }
         Spacer(Modifier.height(32.dp))
     }

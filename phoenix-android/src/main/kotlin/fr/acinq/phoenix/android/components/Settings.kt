@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -222,14 +223,17 @@ fun SettingSwitch(
 fun SettingButton(
     text: Int,
     icon: Int,
+    textStyle: TextStyle = MaterialTheme.typography.button,
+    iconTint: Color = MaterialTheme.colors.onSurface,
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     Button(
         onClick = onClick,
         text = stringResource(id = text),
+        textStyle = textStyle,
         icon = icon,
-        iconTint = MaterialTheme.colors.onSurface,
+        iconTint = iconTint,
         enabled = enabled,
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Start
