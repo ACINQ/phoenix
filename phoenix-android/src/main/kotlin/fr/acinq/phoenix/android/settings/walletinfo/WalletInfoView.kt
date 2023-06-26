@@ -90,7 +90,7 @@ private fun SwapInWalletView(onSwapInWalletClick: () -> Unit) {
 
     CardHeaderWithHelp(
         text = stringResource(id = R.string.walletinfo_onchain_swapin),
-        helpMessage = stringResource(id = R.string.walletinfo_onchain_swapin_help)
+        helpMessage = stringResource(id = R.string.walletinfo_onchain_swapin_help),
     )
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -103,7 +103,7 @@ private fun SwapInWalletView(onSwapInWalletClick: () -> Unit) {
             HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
             SettingWithCopy(
                 title = stringResource(id = R.string.walletinfo_descriptor),
-                value = stringResource(id = R.string.lipsum_short),
+                value = it.swapInOnChainWallet.descriptor,
             )
         }
     }
