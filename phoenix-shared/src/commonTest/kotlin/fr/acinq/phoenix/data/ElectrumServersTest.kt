@@ -1,7 +1,12 @@
 package fr.acinq.phoenix.data
 
+import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.ServerAddress
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
+import org.kodein.log.LoggerFactory
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
@@ -33,6 +38,29 @@ class ElectrumServersTest {
             testConnection(it)
         }.all { it }
         assertTrue("at least one of the mainnet servers is unreachable/misconfigured") { res }
+    }
+
+    @Test
+    fun connect_and_get_fee_mainnet() = runBlocking {
+        val res = mainnetElectrumServers.map { server ->
+            try {
+                val client = ElectrumClient(TcpSocket.Builder(), this, LoggerFactory.default).apply { connect(server) }
+
+                client.connectionState.first { it is Connection.CLOSED }
+                client.connectionState.first { it is Connection.ESTABLISHING }
+                client.connectionState.first { it is Connection.ESTABLISHED }
+                client.estimateFees(1)
+
+                client.disconnect()
+                client.stop()
+                println("✅ successfully established connection with ${server.host}:${server.port}")
+                true
+            } catch (e: Exception) {
+                println("❌ failed to establish connection with ${server.host}:${server.port} with tls=${server.tls::class.simpleName}: ${e.message}")
+                false
+            }
+        }
+        assertTrue("at least one of the mainnet servers is unreliable") { res.all { it } }
     }
 
     /** Return false if cannot connect or timeout in 5s. */

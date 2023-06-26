@@ -60,15 +60,6 @@ val mainnetElectrumServers = listOf(
                 "WYnDFMQ1p502zyRXOszEsMMQbqT8xfyE8oG+Ge6yUWeD0DDli0YRvDISxt54jE6k" +
                 "YQIDAQAB"
     ),
-    electrumServer(host = "bitcoin.aranguren.org", publicKey =
-                "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA9IpKA+SdtQIQRcXPFBp0" +
-                "XxgqOYWW6U1u7e/fOPrz+NF5gzwvhrmH7arRUrlztkhLGtUr2NmhbG6trBiQ95Ye" +
-                "+VnGfgU3IXfnpsvXMOA5PCR3tJGpf40jD1fMYtF7gjdDYQlDYOxvuZg1KkZSJK76" +
-                "Td8bGhrsDRkNMUi77dc0v+1ooTSL8Ha71aRgJzHRv4bOulxsZNteQW9nFeHnGklK" +
-                "hm5xW+uDyo+gf5+1376c2sMupFOjPTzQT3EU3NAskTrNUNqJM/aXTzU9+pKw7DZU" +
-                "e6g6ovN+mKTecFEcmLOnZOrwFDOmTP+x17gfKr/ECMgZzPhY0PiLLJKfDdEdoIiq" +
-                "gQIDAQAB"
-    ),
     electrumServer(
         host = "electrum.qtornado.com", publicKey =
                 "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAm78Y1pLds3BzsHpo9Bz2" +
