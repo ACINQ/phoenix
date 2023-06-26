@@ -18,11 +18,9 @@ package fr.acinq.phoenix.android.settings.walletinfo
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -207,7 +205,7 @@ fun UtxoRow(utxo: WalletState.Utxo, progress: Pair<Int?, Int>?) {
     ) {
         if (progress != null) {
             Text(
-                text = "${progress.first ?: "-"}/${progress.second}",
+                text = "${progress.first ?: "0"}/${progress.second}",
                 style = monoTypo.copy(color = if (progress.first == null) mutedTextColor else MaterialTheme.colors.primary),
             )
         } else {
@@ -228,16 +226,12 @@ fun UtxoRow(utxo: WalletState.Utxo, progress: Pair<Int?, Int>?) {
 }
 
 @Composable
-internal fun BalanceRow(balance: MilliSatoshi?, icon: Int? = null) {
+internal fun BalanceRow(balance: MilliSatoshi?) {
     val btcUnit = LocalBitcoinUnit.current
     if (balance == null) {
         ProgressView(text = stringResource(id = R.string.walletinfo_loading_data), padding = PaddingValues(0.dp))
     } else {
         Row {
-            if (icon != null) {
-                PhoenixIcon(resourceId = icon, modifier = Modifier.align(Alignment.CenterVertically))
-                Spacer(modifier = Modifier.width(8.dp))
-            }
             AmountView(amount = balance, amountTextStyle = MaterialTheme.typography.h4, forceUnit = btcUnit, modifier = Modifier.alignByBaseline(), onClick = null)
             Spacer(modifier = Modifier.width(4.dp))
             AmountInFiatView(amount = balance, modifier = Modifier.alignByBaseline())

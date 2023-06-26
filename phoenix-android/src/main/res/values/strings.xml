@@ -849,9 +849,8 @@
     <string name="walletinfo_descriptor">Descriptor</string>
     <string name="walletinfo_xpub">Master public key</string>
     <string name="walletinfo_path">(Path: %1$s)</string>
-    <string name="walletinfo_swappable_title">Waiting for swap</string>
-    <string name="walletinfo_not_swappable_title">Waiting for confirmations</string>
-    <string name="walletinfo_not_swappable_details">Transactions need <b>%1$s confirmations</b> before they can be considered for a swap.</string>
+    <string name="walletinfo_swappable_title">Ready for swap</string>
+    <string name="walletinfo_not_swappable_title">Waiting for %1$d confirmations</string>
     <string name="walletinfo_confirmed_title">Confirmed balance</string>
     <string name="walletinfo_unconfirmed_title">Unconfirmed balance</string>
     <string name="walletinfo_loading_data">Loading wallet data…</string>
@@ -866,8 +865,8 @@
     <string name="walletinfo_onchain_swapin_help">A "swap-in-potentiam" on-chain wallet set up between your Phoenix and your LN peer.\n\nIt is a bridge to Lightning: funds on this wallet are automatically swapped to Lightning, according to your incoming fee setting.</string>
     <string name="walletinfo_onchain_swapin_about">This wallet serves as a bridge to Lightning.</string>
     <string name="walletinfo_onchain_swapin_policy_view">Tap to see your incoming fee policy.</string>
-    <string name="walletinfo_onchain_swapin_policy_auto_details">Funds here will be automatically moved to Lightning if the incoming fee is <b>less than %1$s</b>.</string>
-    <string name="walletinfo_onchain_swapin_policy_disabled_details">Automated channel opening <b>has been disabled</b>. These funds will remain here.</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details">On-chain funds will be automatically swapped to Lightning if the incoming fee is <b>less than %1$s</b>.</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled_details">Automated fee policy <b>is disabled</b>. Funds will not be swapped. They will remain on this wallet.</string>
 
     <string name="walletinfo_onchain_final">Final wallet</string>
     <string name="walletinfo_onchain_final_about">An on-chain wallet derived from your seed.\n\nThe final wallet is where funds are sent by default when your Lightning channels are closed.</string>
