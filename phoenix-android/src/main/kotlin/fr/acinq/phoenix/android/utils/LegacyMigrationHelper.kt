@@ -96,9 +96,10 @@ object LegacyMigrationHelper {
         UserPrefs.saveIsAmountInFiat(context, Prefs.getShowAmountInFiat(context))
         UserPrefs.saveFiatCurrency(context, FiatCurrency.valueOfOrNull(Prefs.getFiatCurrency(context)) ?: FiatCurrency.USD)
 
-        // -- security
+        // -- security & tor
 
         UserPrefs.saveIsScreenLockActive(context, Prefs.isScreenLocked(context))
+        UserPrefs.saveIsTorEnabled(context, Prefs.isTorEnabled(context))
 
         // -- electrum
 
@@ -207,11 +208,11 @@ object LegacyMigrationHelper {
                         log.debug("saved custom desc=${paymentMeta.custom_desc} for payment=$parentId")
                     }
                 }
-                log.info("successfully migrated ${outgoing.size} outgoing payments")
             } catch (e: Exception) {
                 log.error("payment migration: failed to save outgoing payment=$it: ${e.localizedMessage}")
             }
         }
+        log.info("successfully migrated ${outgoing.size} outgoing payments")
 
         // 4 - extract all incoming payments from the legacy database, and save them to the new database
         val incoming = JavaConversions.asJavaCollection(legacyPaymentsDb.listAllIncomingPayments()).toList()
@@ -248,11 +249,11 @@ object LegacyMigrationHelper {
                     )
                     log.debug("saved custom desc=${paymentMeta.custom_desc} for payment=$paymentHash")
                 }
-                log.info("successfully migrated ${incoming.size} incoming payments")
             } catch (e: Exception) {
                 log.error("payment migration: failed to save incoming payment=$it: ${e.localizedMessage}")
             }
         }
+        log.info("successfully migrated ${incoming.size} incoming payments")
 
         legacyPaymentsDb.close()
     }
