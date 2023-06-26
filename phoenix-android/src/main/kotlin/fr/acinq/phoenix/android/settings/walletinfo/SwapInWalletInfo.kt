@@ -61,7 +61,7 @@ fun SwapInWalletInfo(
     val swapInWallet by business.peerManager.swapInWallet.collectAsState()
 
     DefaultScreenLayout(isScrollable = false) {
-        DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.walletinfo_onchain_swapin))
+        DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.walletinfo_onchain_swapin), helpMessage = stringResource(id = R.string.walletinfo_onchain_swapin_help))
         Card(
             internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
             onClick = onViewChannelPolicyClick,

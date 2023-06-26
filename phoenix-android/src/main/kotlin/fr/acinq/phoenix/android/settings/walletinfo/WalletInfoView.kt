@@ -102,6 +102,7 @@ private fun SwapInWalletView(onSwapInWalletClick: () -> Unit) {
             SettingWithCopy(
                 title = stringResource(id = R.string.walletinfo_descriptor),
                 value = it.swapInOnChainWallet.descriptor,
+                maxLinesValue = 2
             )
         }
     }
@@ -129,6 +130,7 @@ private fun FinalWalletView(onFinalWalletClick: () -> Unit) {
                 title = stringResource(id = R.string.walletinfo_xpub),
                 titleMuted = stringResource(id = R.string.walletinfo_path, it.finalOnChainWalletPath),
                 value = it.finalOnChainWallet.xpub,
+                maxLinesValue = 2,
             )
         }
     }

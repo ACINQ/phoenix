@@ -52,6 +52,7 @@ fun SettingWithCopy(
     title: String,
     titleMuted: String? = null,
     value: String,
+    maxLinesValue: Int = Int.MAX_VALUE,
 ) {
     val context = LocalContext.current
     Row {
@@ -74,7 +75,7 @@ fun SettingWithCopy(
 
             }
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = value, style = MaterialTheme.typography.subtitle2)
+            Text(text = value, style = MaterialTheme.typography.subtitle2, maxLines = maxLinesValue, overflow = TextOverflow.Ellipsis)
         }
         Button(
             icon = R.drawable.ic_copy,

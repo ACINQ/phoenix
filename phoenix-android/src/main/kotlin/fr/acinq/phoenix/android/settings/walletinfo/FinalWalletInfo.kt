@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android.settings.walletinfo
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -43,7 +44,7 @@ fun FinalWalletInfo(
     val finalWallet by business.peerManager.finalWallet.collectAsState()
 
     DefaultScreenLayout(isScrollable = false) {
-        DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.walletinfo_onchain_final))
+        DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.walletinfo_onchain_final), helpMessage = stringResource(id = R.string.walletinfo_onchain_final_about))
         ConfirmedBalanceView(balance = finalWallet?.all?.balance?.toMilliSatoshi())
         UnconfirmedWalletView(wallet = finalWallet)
     }
@@ -55,11 +56,10 @@ private fun ConfirmedBalanceView(
 ) {
     CardHeader(text = stringResource(id = R.string.walletinfo_confirmed_title))
     Card(
-        internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+        internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+        modifier = Modifier.fillMaxWidth()
     ) {
         BalanceRow(balance = balance)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = stringResource(id = R.string.walletinfo_onchain_final_about), style = MaterialTheme.typography.subtitle2)
     }
 }
 
@@ -70,12 +70,8 @@ private fun UnconfirmedWalletView(
     if (wallet != null && wallet.unconfirmed.balance > 0.sat) {
         CardHeader(text = stringResource(id = R.string.walletinfo_unconfirmed_title))
         Card {
-            BalanceRow(balance = wallet.unconfirmed.balance.toMilliSatoshi())
-            if (wallet.unconfirmed.isNotEmpty()) {
-                HSeparator()
-                wallet.unconfirmed.forEach {
-                    UtxoRow(it, null)
-                }
+            wallet.unconfirmed.forEach {
+                UtxoRow(it, null)
             }
         }
     }
