@@ -81,7 +81,7 @@ class PhoenixBusiness(
         }
     }
 
-    val chain = NodeParams.Chain.Testnet
+    val chain = NodeParamsManager.chain
 
     val electrumClient by lazy { ElectrumClient(null, MainScope(), loggerFactory) }
     internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope(), loggerFactory) }
