@@ -497,6 +497,7 @@ private fun ConfirmationView(
     onCpfpSuccess: () -> Unit,
     minDepth: Int? = null, // sometimes we know how many confirmations are needed
 ) {
+    val log = logger("PaymentDetailsSplashView")
     val txUrl = txUrl(txId = txId.toHex())
     val context = LocalContext.current
     val electrumClient = business.electrumClient
@@ -515,7 +516,9 @@ private fun ConfirmationView(
         )
     } else {
         val confirmations by produceState<Int?>(initialValue = null) {
-            value = electrumClient.getConfirmations(txId)
+            val confirmations = electrumClient.getConfirmations(txId)
+            log.info { "retrieved confirmations count=$confirmations from electrum for tx=${txId.toHex()}" }
+            value = confirmations
         }
         confirmations?.let { conf ->
             FilledButton(
