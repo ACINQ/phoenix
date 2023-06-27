@@ -50,7 +50,7 @@
     <string name="notif_rejected_deposit_title">On-chain deposit pending (+%1$s)</string>
     <string name="notif_rejected_payment_title">Rejected incoming payment (+%1$s)</string>
     <string name="notif_rejected_by_user">You have rejected the payment</string>
-    <string name="notif_rejected_policy_disabled">Incoming fees are disabled. You can change that in the settings.</string>
+    <string name="notif_rejected_policy_disabled">Automated channels management is disabled. You can change that in the settings.</string>
     <string name="notif_rejected_policy_too_expensive">The fee was %1$s, but your max fee was set to %2$s. You can tweak that in the settings.</string>
     <string name="notif_rejected_channels_initializing">Your channels were initializing and could not accept that payment. Try again later.</string>
 
@@ -153,14 +153,14 @@
     <string name="receive_lightning_edit_desc_placeholder">Enter a description for this invoice</string>
     <string name="receive_lightning_edit_generate_button">Create invoice</string>
 
-    <string name="receive_lightning_warning_surefail">Payment will fail.</string>
-    <string name="receive_lightning_warning_mayfail">Payment may fail.</string>
-    <string name="receive_lightning_warning_fee_expected">Fee expected.</string>
-    <string name="receive_lightning_warning_fee_no_liquidity">Channels liquidity is low.</string>
-    <string name="receive_lightning_warning_fee_policy_disabled_no_channels">Tap to enable incoming fees.</string>
-    <string name="receive_lightning_warning_fee_policy_disabled_no_liquidity">Liquidity is low. Tap to enable incoming fees.</string>
-    <string name="receive_lightning_warning_fee_within_policy">A %1$s (≈ %2$s) mining fee may be needed to receive this payment. Tap to configure.</string>
-    <string name="receive_lightning_warning_fee_exceeds_policy">The fee will probably be above your max limit (%1$s). Tap to configure.</string>
+    <string name="receive_lightning_warning_title_surefail">Payment will fail.</string>
+    <string name="receive_lightning_warning_title_mayfail">Payment may fail.</string>
+    <string name="receive_lightning_warning_title_fee_expected">Fee expected.</string>
+
+    <string name="receive_lightning_warning_fee_insufficient_liquidity">Inbound liquidity is insufficient.</string>
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Inbound liquidity is insufficient and you have disabled automated channel management.\nTap to configure.</string>
+    <string name="receive_lightning_warning_fee_within_policy">A %1$s (≈ %2$s) fee may be needed to receive this payment.\nTap to configure.</string>
+    <string name="receive_lightning_warning_fee_exceeds_policy">The fee will probably be above your max limit (%1$s).\nTap to configure.</string>
 
     <!-- send -->
 
@@ -265,22 +265,25 @@
     <!-- settings list -->
 
     <string name="settings_general_title">General</string>
-    <string name="settings_display_prefs">Display</string>
     <string name="settings_security_title">Privacy &amp; Security</string>
-    <string name="settings_wallet_info">My wallet</string>
+    <string name="settings_advanced_title">Advanced</string>
+    <string name="settings_danger_title">Danger zone</string>
+
+    <string name="settings_display_prefs">Display</string>
+    <string name="settings_wallet_info">Wallet info</string>
+    <string name="settings_liquidity_policy">Channels management</string>
     <string name="settings_display_seed">Recovery phrase</string>
     <string name="settings_access_control">Access control</string>
-    <string name="settings_advanced_title">Advanced</string>
     <string name="settings_fees">Fees Settings</string>
     <string name="settings_list_channels">Payment channels</string>
     <string name="settings_logs">Logs</string>
     <string name="settings_electrum">Electrum server</string>
     <string name="settings_reset_wallet">Reset wallet</string>
-    <string name="settings_mutual_close">Drain wallet</string>
-    <string name="settings_force_close">Danger zone</string>
+    <string name="settings_mutual_close">Close channels</string>
+    <string name="settings_force_close">Force-close channels</string>
     <string name="settings_tor">Tor</string>
     <string name="settings_about">About</string>
-    <string name="settings_payment_settings">Options &amp; fees</string>
+    <string name="settings_payment_settings">Payment options</string>
     <string name="settings_notifications">Notifications</string>
 
     <!-- mutual close -->
@@ -381,7 +384,7 @@
     <string name="inappnotif_payment_onchain_pending_title">On-chain funds pending (+%1$s)</string>
     <string name="inappnotif_payment_rejected_title">Payment rejected (+%1$s)</string>
     <string name="inappnotif_payment_rejected_by_user">You rejected that payment manually.</string>
-    <string name="inappnotif_payment_rejected_disabled">Automated incoming fees are disabled in your incoming fee setting.</string>
+    <string name="inappnotif_payment_rejected_disabled">Automated channel management is disabled.</string>
     <string name="inappnotif_payment_rejected_too_expensive">The fee was %1$s, but your max fee was set to %2$s.</string>
     <string name="inappnotif_payment_rejected_channel_initializing">Your channels are still initializing and could not receive that payment.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Tap here to tweak your settings.</string>
@@ -769,10 +772,6 @@
     <string name="paymentsettings_expiry_three_weeks">3 weeks</string>
     <string name="paymentsettings_expiry_value">%1$s seconds</string>
 
-    <string name="paymentsettings_liquidity_policy">Incoming payments fees</string>
-    <string name="paymentsettings_liquidity_policy_auto">Automated (max %1$s)</string>
-    <string name="paymentsettings_liquidity_policy_disabled">Disabled</string>
-
     <string name="paymentsettings_trampoline_fees_title">Outgoing payments fees (Lightning)</string>
     <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
     <string name="paymentsettings_trampoline_fees_dialog_override_default_checkbox">Override default fee for outgoing payments</string>
@@ -865,7 +864,7 @@
     <string name="walletinfo_offchain_channels">Payment channels</string>
 
     <string name="walletinfo_onchain_swapin">Swap-in wallet</string>
-    <string name="walletinfo_onchain_swapin_help">A \"swap-in-potentiam\" on-chain wallet set up between your Phoenix and your LN peer.\n\nIt is a bridge to Lightning: funds on this wallet are automatically swapped to Lightning, according to your incoming fee setting.</string>
+    <string name="walletinfo_onchain_swapin_help">Funds sent to this on-chain wallet are automatically swapped to Lightning.</string>
     <string name="walletinfo_onchain_swapin_policy_view">Tap to configure.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">On-chain funds will automatically be swapped to Lightning if the fee is <b>less than %1$s</b>.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_startup">Swaps are attempted at application startup.</string>
@@ -877,21 +876,21 @@
 
     <!-- settings: liquidity policy for channels creation -->
 
-    <string name="liquiditypolicy_title">Incoming fee policy</string>
+    <string name="liquiditypolicy_title">Channel management</string>
     <string name="liquiditypolicy_advanced_menu">Advanced options</string>
-    <string name="liquiditypolicy_instructions">Incoming payments sometimes requires on-chain transactions. This does not always happen, only when needed.</string>
+    <string name="liquiditypolicy_instructions">Incoming payments sometimes require on-chain transactions. This does not always happen, only when needed.</string>
     <string name="liquiditypolicy_fees_estimation_loading">Retrieving feerate…</string>
     <string name="liquiditypolicy_fees_estimation">Fees are currently estimated at around <b>%1$s</b> (≈%2$s).</string>
     <string name="liquiditypolicy_fees_header">My fee setting</string>
-    <string name="liquiditypolicy_disable_label">Automated fee policy</string>
-    <string name="liquiditypolicy_disable_desc">Incoming payments that require on-chain operations will fail.</string>
+    <string name="liquiditypolicy_disable_label">Automated channel management</string>
+    <string name="liquiditypolicy_disable_desc">Incoming payments that require on-chain operations will be rejected.</string>
     <string name="liquiditypolicy_fees_base_label">Max fee amount</string>
-    <string name="liquiditypolicy_fees_base_help">Payments whose fees exceed that value will fail.</string>
+    <string name="liquiditypolicy_fees_base_help">Payments whose fees exceed that value will be rejected.</string>
     <string name="liquiditypolicy_fees_base_too_low">This value is too low.</string>
-    <string name="liquiditypolicy_fees_base_below_estimation">Below the expected fee. Some payments may fail.</string>
+    <string name="liquiditypolicy_fees_base_below_estimation">Below the expected fee. Some payments may be rejected.</string>
 
-    <string name="liquiditypolicy_advanced_title">Advanced incoming fee options</string>
-    <string name="liquiditypolicy_advanced_disable">The incoming fee policy is disabled. It can be enabled in the incoming fee policy screen.</string>
+    <string name="liquiditypolicy_advanced_title">Advanced channels management</string>
+    <string name="liquiditypolicy_advanced_disable">Channel management is disabled. It can be enabled in the Channel management setting screen.</string>
     <string name="liquiditypolicy_advanced_disclaimer_header">Attention!</string>
     <string name="liquiditypolicy_advanced_disclaimer_message">This screen is for advanced users. Do not change these settings unless you understand their purposes.</string>
     <string name="liquiditypolicy_advanced_verifications_title">Additional verifications</string>

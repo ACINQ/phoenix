@@ -588,8 +588,8 @@ private fun IncomingLiquidityWarning(
         hasChannels == false && liquidityPolicy is LiquidityPolicy.Disable -> {
             Clickable(onClick = onMessageClick) {
                 WarningMessage(
-                    header = stringResource(id = R.string.receive_lightning_warning_surefail),
-                    details = stringResource(id = R.string.receive_lightning_warning_fee_policy_disabled_no_channels),
+                    header = stringResource(id = R.string.receive_lightning_warning_title_surefail),
+                    details = stringResource(id = R.string.receive_lightning_warning_fee_policy_disabled_insufficient_liquidity),
                     headerStyle = MaterialTheme.typography.body2.copy(fontSize = 15.sp),
                     alignment = Alignment.CenterHorizontally,
                 )
@@ -602,8 +602,8 @@ private fun IncomingLiquidityWarning(
                 liquidityPolicy is LiquidityPolicy.Disable -> {
                     Clickable(onClick = onMessageClick, internalPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)) {
                         InfoMessage(
-                            header = stringResource(id = R.string.receive_lightning_warning_mayfail),
-                            details = stringResource(id = R.string.receive_lightning_warning_fee_policy_disabled_no_liquidity),
+                            header = stringResource(id = R.string.receive_lightning_warning_title_mayfail),
+                            details = stringResource(id = R.string.receive_lightning_warning_fee_policy_disabled_insufficient_liquidity),
                             headerStyle = MaterialTheme.typography.body1.copy(fontSize = 15.sp),
                             alignment = Alignment.CenterHorizontally,
                         )
@@ -613,8 +613,8 @@ private fun IncomingLiquidityWarning(
                 swapFee == null -> {
                     Clickable(onClick = onMessageClick) {
                         InfoMessage(
-                            header = stringResource(id = R.string.receive_lightning_warning_fee_expected),
-                            details = stringResource(id = R.string.receive_lightning_warning_fee_no_liquidity),
+                            header = stringResource(id = R.string.receive_lightning_warning_title_fee_expected),
+                            details = stringResource(id = R.string.receive_lightning_warning_fee_insufficient_liquidity),
                             headerStyle = MaterialTheme.typography.body1.copy(fontSize = 15.sp),
                             alignment = Alignment.CenterHorizontally,
                         )
@@ -624,7 +624,7 @@ private fun IncomingLiquidityWarning(
                 liquidityPolicy is LiquidityPolicy.Auto && swapFee > liquidityPolicy.maxAbsoluteFee -> {
                     Clickable(onClick = onMessageClick) {
                         InfoMessage(
-                            header = stringResource(id = R.string.receive_lightning_warning_mayfail),
+                            header = stringResource(id = R.string.receive_lightning_warning_title_mayfail),
                             details = stringResource(id = R.string.receive_lightning_warning_fee_exceeds_policy, liquidityPolicy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true)),
                             headerStyle = MaterialTheme.typography.body1.copy(fontSize = 15.sp),
                             alignment = Alignment.CenterHorizontally,
@@ -635,7 +635,7 @@ private fun IncomingLiquidityWarning(
                 liquidityPolicy is LiquidityPolicy.Auto -> {
                     Clickable(onClick = onMessageClick) {
                         InfoMessage(
-                            header = stringResource(id = R.string.receive_lightning_warning_fee_expected),
+                            header = stringResource(id = R.string.receive_lightning_warning_title_fee_expected),
                             details = stringResource(
                                 id = R.string.receive_lightning_warning_fee_within_policy, swapFee.toPrettyString(btcUnit, withUnit = true),
                                 swapFee.toPrettyString(fiatUnit, fiatRate, withUnit = true)

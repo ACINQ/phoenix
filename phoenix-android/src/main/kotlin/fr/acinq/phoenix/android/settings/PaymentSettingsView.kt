@@ -55,7 +55,6 @@ import java.text.NumberFormat
 @Composable
 fun PaymentSettingsView(
     initialShowLnurlAuthSchemeDialog: Boolean = false,
-    onLiquidityPolicyClick: () -> Unit,
 ) {
     val log = logger("PaymentSettingsView")
     val nc = navController
@@ -99,25 +98,6 @@ fun PaymentSettingsView(
                     else -> stringResource(id = R.string.paymentsettings_expiry_value, NumberFormat.getInstance().format(invoiceDefaultExpiry))
                 },
                 onClick = { showExpiryDialog = true }
-            )
-            SettingInteractive(
-                title = stringResource(id = R.string.paymentsettings_liquidity_policy),
-                description = when (val policy = prefLiquidityPolicy) {
-                    is LiquidityPolicy.Auto -> stringResource(id = R.string.paymentsettings_liquidity_policy_auto, policy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true))
-                    is LiquidityPolicy.Disable -> stringResource(id = R.string.paymentsettings_liquidity_policy_disabled)
-                    null -> stringResource(id = R.string.utils_loading_data)
-                },
-                onClick = onLiquidityPolicyClick
-            )
-        }
-
-        CardHeader(text = stringResource(id = R.string.paymentsettings_category_outgoing))
-        Card {
-            Setting(
-                title = stringResource(id = R.string.paymentsettings_trampoline_fees_title),
-                description = trampolineFees?.let {
-                    stringResource(id = R.string.paymentsettings_trampoline_fees_desc, trampolineFees.feeBase, trampolineFees.proportionalFeeAsPercentageString)
-                } ?: stringResource(R.string.utils_unknown)
             )
         }
 
@@ -360,10 +340,4 @@ private fun TrampolineMaxFeesDialog(
             )
         }
     }
-}
-
-@Preview(device = Devices.PIXEL_3A)
-@Composable
-private fun Preview() {
-    PaymentSettingsView(onLiquidityPolicyClick = {})
 }

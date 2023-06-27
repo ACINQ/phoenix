@@ -309,7 +309,6 @@ fun AppView(
                 composable(Screen.PaymentSettings.route) {
                     PaymentSettingsView(
                         initialShowLnurlAuthSchemeDialog = false,
-                        onLiquidityPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
                     )
                 }
                 composable("${Screen.PaymentSettings.route}/{showAuthSchemeDialog}", arguments = listOf(
@@ -318,7 +317,6 @@ fun AppView(
                     val showAuthSchemeDialog = it.arguments?.getBoolean("showAuthSchemeDialog") ?: false
                     PaymentSettingsView(
                         initialShowLnurlAuthSchemeDialog = showAuthSchemeDialog,
-                        onLiquidityPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
                     )
                 }
                 composable(Screen.AppLock.route) {

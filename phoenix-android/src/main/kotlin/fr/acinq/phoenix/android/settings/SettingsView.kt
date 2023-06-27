@@ -64,8 +64,8 @@ fun SettingsView() {
         Card {
             SettingButton(text = R.string.settings_about, icon = R.drawable.ic_help_circle, onClick = { nc.navigate(Screen.About) })
             SettingButton(text = R.string.settings_display_prefs, icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences) })
-            SettingButton(text = R.string.settings_wallet_info, icon = R.drawable.ic_box, onClick = { nc.navigate(Screen.WalletInfo) })
             SettingButton(text = R.string.settings_payment_settings, icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings)})
+            SettingButton(text = R.string.settings_liquidity_policy, icon = R.drawable.ic_settings, onClick = { nc.navigate(Screen.LiquidityPolicy) })
             SettingButton(text = R.string.settings_notifications, icon = R.drawable.ic_notification, onClick = { nc.navigate(Screen.Notifications)})
         }
 
@@ -81,10 +81,15 @@ fun SettingsView() {
         // -- advanced
         CardHeader(text = stringResource(id = R.string.settings_advanced_title))
         Card {
+            SettingButton(text = R.string.settings_wallet_info, icon = R.drawable.ic_box, onClick = { nc.navigate(Screen.WalletInfo) })
             SettingButton(text = R.string.settings_list_channels, icon = R.drawable.ic_zap, onClick = { nc.navigate(Screen.Channels) })
-            SettingButton(text = R.string.settings_logs, icon = R.drawable.ic_text, onClick = { nc.navigate(Screen.Logs)})
-            SettingButton(text = R.string.settings_mutual_close, icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose) })
+            SettingButton(text = R.string.settings_logs, icon = R.drawable.ic_text, onClick = { nc.navigate(Screen.Logs) })
+        }
+        // -- advanced
+        CardHeader(text = stringResource(id = R.string.settings_danger_title))
+        Card {
             SettingButton(text = R.string.settings_reset_wallet, icon = R.drawable.ic_trash, onClick = { nc.navigate(Screen.ResetWallet) })
+            SettingButton(text = R.string.settings_mutual_close, icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose) })
             SettingButton(
                 text = R.string.settings_force_close,
                 textStyle = MaterialTheme.typography.button.copy(color = negativeColor),
