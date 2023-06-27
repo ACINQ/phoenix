@@ -247,12 +247,9 @@ private fun PaymentNotification(
             timestamp = notification.createdAt,
             onRead = { onNotificationRead(notification.id) },
         )
-        is WatchTowerOutcome.Unknown -> DimissibleNotification(
-            title = stringResource(id = R.string.inappnotif_watchtower_unknown_title),
-            body = stringResource(id = R.string.inappnotif_watchtower_unknown_description),
-            timestamp = notification.createdAt,
-            onRead = { onNotificationRead(notification.id) },
-        )
+        is WatchTowerOutcome.Unknown -> {
+            // ignored
+        }
     }
 }
 
