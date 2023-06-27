@@ -30,8 +30,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.acinq.lightning.NodeParams
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigate
@@ -48,15 +50,18 @@ fun SettingsView() {
         DefaultScreenHeader(title = stringResource(id = R.string.menu_settings), onBackClick = { nc.popBackStack() })
         val scope = rememberCoroutineScope()
         val context = LocalContext.current
+        val chain = business.chain
 
-        // -- general
-        CardHeader(text = "DEBUG")
-        Card {
-            Button(text = "Switch to Legacy app", icon = R.drawable.ic_user, onClick = {
-                scope.launch {
-                    PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
-                }
-            }, modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start)
+        // -- debug
+        if (chain == NodeParams.Chain.Testnet) {
+            CardHeader(text = "DEBUG")
+            Card {
+                Button(text = "Switch to Legacy app", icon = R.drawable.ic_user, onClick = {
+                    scope.launch {
+                        PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
+                    }
+                }, modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start)
+            }
         }
 
         // -- general
