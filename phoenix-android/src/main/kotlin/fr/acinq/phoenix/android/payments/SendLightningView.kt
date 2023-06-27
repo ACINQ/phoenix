@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -120,11 +121,13 @@ fun SendLightningPaymentView(
             }
         }
         Spacer(modifier = Modifier.height(36.dp))
+        val connections by business.connectionsManager.connections.collectAsState()
+        val isConnected = connections.global is Connection.ESTABLISHED
         Row(verticalAlignment = Alignment.CenterVertically) {
             FilledButton(
-                text = stringResource(id = R.string.send_pay_button),
+                text = if (!isConnected) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
                 icon = R.drawable.ic_send,
-                enabled = amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
+                enabled = isConnected && amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
             ) {
                 safeLet(amount, trampolineFees) { amt, fees ->
                     onPayClick(Scan.Intent.InvoiceFlow.SendInvoicePayment(paymentRequest = paymentRequest, amount = amt, trampolineFees = fees))

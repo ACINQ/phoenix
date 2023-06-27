@@ -31,8 +31,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
+import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -122,9 +124,12 @@ fun SendSpliceOutView(
             }
         }
 
+        val connections by business.connectionsManager.connections.collectAsState()
+        val isConnected = connections.global is Connection.ESTABLISHED
+
         when (val state = vm.state) {
             is SpliceOutState.Init, is SpliceOutState.Error -> {
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
                 if (state is SpliceOutState.Error.Thrown) {
                     ErrorMessage(
                         header = stringResource(id = R.string.send_spliceout_error_failure),
@@ -139,9 +144,9 @@ fun SendSpliceOutView(
                     )
                 }
                 BorderButton(
-                    text = stringResource(id = R.string.send_spliceout_prepare_button),
+                    text = if (!isConnected) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_spliceout_prepare_button),
                     icon = R.drawable.ic_build,
-                    enabled = amountErrorMessage.isBlank(),
+                    enabled = isConnected && amountErrorMessage.isBlank(),
                     onClick = {
                         val finalAmount = amount
                         val finalFeerate = feerate
@@ -157,7 +162,7 @@ fun SendSpliceOutView(
                 )
             }
             is SpliceOutState.Preparing -> {
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
                 ProgressView(text = stringResource(id = R.string.send_spliceout_prepare_in_progress))
             }
             is SpliceOutState.ReadyToSend -> {
@@ -169,7 +174,7 @@ fun SendSpliceOutView(
                 val total = state.userAmount + state.estimatedFee
                 SpliceOutFeeSummaryView(fee = state.estimatedFee, total = total, userFeerate = state.userFeerate, actualFeerate = state.actualFeerate)
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 if (balance != null && total.toMilliSatoshi() > balance) {
                     ErrorMessage(
@@ -178,16 +183,16 @@ fun SendSpliceOutView(
                     )
                 } else {
                     FilledButton(
-                        text = stringResource(id = R.string.send_pay_button),
+                        text = if (!isConnected) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
                         icon = R.drawable.ic_send,
-                        enabled = amountErrorMessage.isBlank()
+                        enabled = isConnected && amountErrorMessage.isBlank()
                     ) {
                         vm.executeSpliceOut(state.userAmount, state.actualFeerate, address)
                     }
                 }
             }
             is SpliceOutState.Executing -> {
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
                 ProgressView(text = stringResource(id = R.string.send_spliceout_execute_in_progress))
             }
             is SpliceOutState.Complete.Success -> {
@@ -223,7 +228,10 @@ private fun SpliceOutFeeSummaryView(
     actualFeerate: FeeratePerKw,
     total: Satoshi,
 ) {
-    SplashLabelRow(label = stringResource(id = R.string.send_spliceout_complete_recap_fee), helpMessage = "Uses an actual feerate of ${actualFeerate}. Takes into account the chain of unconfirmed txs.") {
+    SplashLabelRow(
+        label = stringResource(id = R.string.send_spliceout_complete_recap_fee),
+        helpMessage = stringResource(id = R.string.send_spliceout_complete_recap_fee_details, FeeratePerByte(actualFeerate).feerate.sat)
+    ) {
         AmountWithFiatBelow(amount = fee.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
     }
     SplashLabelRow(label = stringResource(id = R.string.send_spliceout_complete_recap_total)) {
