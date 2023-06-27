@@ -182,7 +182,7 @@ private fun OnchainBalanceView(
                 unconfirmed.takeUnless { it == 0.sat }?.let {
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = stringResource(id = R.string.walletinfo_incoming_balance, it.toPrettyString(btcUnit, withUnit = true)",
+                        text = stringResource(id = R.string.walletinfo_incoming_balance, it.toPrettyString(btcUnit, withUnit = true)),
                         style = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
                         modifier = Modifier.alignByBaseline(),
                     )
