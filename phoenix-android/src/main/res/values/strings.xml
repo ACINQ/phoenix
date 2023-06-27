@@ -271,7 +271,7 @@
 
     <string name="settings_display_prefs">Display</string>
     <string name="settings_wallet_info">Wallet info</string>
-    <string name="settings_liquidity_policy">Channels management</string>
+    <string name="settings_liquidity_policy">Channel management</string>
     <string name="settings_display_seed">Recovery phrase</string>
     <string name="settings_access_control">Access control</string>
     <string name="settings_fees">Fees Settings</string>
