@@ -72,7 +72,7 @@ fun AdvancedIncomingFeePolicy(
     DefaultScreenLayout {
         DefaultScreenHeader(
             onBackClick = onBackClick,
-            title = stringResource(id = R.string.liquiditypolicy_advanced_verifications_title),
+            title = stringResource(id = R.string.liquiditypolicy_advanced_title),
         )
 
         val maxSatFeePrefs = maxSatFeePrefsFlow.value
@@ -92,7 +92,7 @@ fun AdvancedIncomingFeePolicy(
 
                 val maxAbsoluteFee by remember { mutableStateOf(maxSatFeePrefs) }
                 var maxRelativeFeeBasisPoints by remember { mutableStateOf<Int?>(maxPropFeePrefs) }
-                var alwaysAllowPayToOpen by remember { mutableStateOf(if (liquidityPolicyPrefs is LiquidityPolicy.Auto) liquidityPolicyPrefs.alwaysAllowPayToOpen else false ) }
+                var skipAbsoluteFeeCheck by remember { mutableStateOf(if (liquidityPolicyPrefs is LiquidityPolicy.Auto) liquidityPolicyPrefs.skipAbsoluteFeeCheck else false ) }
 
                 CardHeader(text = stringResource(id = R.string.liquiditypolicy_advanced_verifications_title))
                 Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)) {
@@ -108,14 +108,14 @@ fun AdvancedIncomingFeePolicy(
                     SettingSwitch(
                         title = stringResource(id = R.string.liquiditypolicy_advanced_pay_to_open_label),
                         description = stringResource(id = R.string.liquiditypolicy_advanced_pay_to_open_help),
-                        isChecked = alwaysAllowPayToOpen,
-                        onCheckChangeAttempt = { alwaysAllowPayToOpen = it },
+                        isChecked = skipAbsoluteFeeCheck,
+                        onCheckChangeAttempt = { skipAbsoluteFeeCheck = it },
                         enabled = true
                     )
                 }
 
                 Card {
-                    val newPolicy = maxRelativeFeeBasisPoints?.let { LiquidityPolicy.Auto(maxRelativeFeeBasisPoints = it, maxAbsoluteFee = maxAbsoluteFee, alwaysAllowPayToOpen = alwaysAllowPayToOpen) }
+                    val newPolicy = maxRelativeFeeBasisPoints?.let { LiquidityPolicy.Auto(maxRelativeFeeBasisPoints = it, maxAbsoluteFee = maxAbsoluteFee, skipAbsoluteFeeCheck = skipAbsoluteFeeCheck) }
                     val isEnabled = newPolicy != null && liquidityPolicyPrefs != newPolicy
                     Button(
                         text = stringResource(id = R.string.liquiditypolicy_save_button),
@@ -159,7 +159,7 @@ private fun EditMaxPropFee(
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = stringResource(id = R.string.liquiditypolicy_advanced_fees_prop_help, maxSatFee.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
+                text = stringResource(id = R.string.liquiditypolicy_advanced_fees_prop_help),
                 style = MaterialTheme.typography.subtitle2
             )
         }

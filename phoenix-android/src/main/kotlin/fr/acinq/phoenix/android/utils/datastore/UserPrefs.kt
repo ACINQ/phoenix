@@ -171,7 +171,7 @@ object UserPrefs {
         try {
             it[LIQUIDITY_POLICY]?.let { policy ->
                 when (val res = json.decodeFromString<InternalLiquidityPolicy>(policy)) {
-                    is InternalLiquidityPolicy.Auto -> LiquidityPolicy.Auto(res.maxAbsoluteFee, res.maxRelativeFeeBasisPoints, res.alwaysAllowPayToOpen)
+                    is InternalLiquidityPolicy.Auto -> LiquidityPolicy.Auto(res.maxAbsoluteFee, res.maxRelativeFeeBasisPoints, res.skipAbsoluteFeeCheck)
                     is InternalLiquidityPolicy.Disable -> LiquidityPolicy.Disable
                 }
             }
@@ -185,7 +185,7 @@ object UserPrefs {
     suspend fun saveLiquidityPolicy(context: Context, policy: LiquidityPolicy) = context.userPrefs.edit {
         log.info("saving new liquidity policy=$policy")
         val serialisable = when (policy) {
-            is LiquidityPolicy.Auto -> InternalLiquidityPolicy.Auto(policy.maxRelativeFeeBasisPoints, policy.maxAbsoluteFee, policy.alwaysAllowPayToOpen)
+            is LiquidityPolicy.Auto -> InternalLiquidityPolicy.Auto(policy.maxRelativeFeeBasisPoints, policy.maxAbsoluteFee, policy.skipAbsoluteFeeCheck)
             is LiquidityPolicy.Disable -> InternalLiquidityPolicy.Disable
         }
         it[LIQUIDITY_POLICY] = json.encodeToString(serialisable)
@@ -247,7 +247,7 @@ sealed class InternalLiquidityPolicy {
     data class Auto(
         val maxRelativeFeeBasisPoints: Int,
         @Serializable(with = SatoshiSerializer::class) val maxAbsoluteFee: Satoshi,
-        val alwaysAllowPayToOpen: Boolean
+        val skipAbsoluteFeeCheck: Boolean
     ) : InternalLiquidityPolicy()
 }
 

@@ -126,10 +126,10 @@ fun LiquidityPolicyView(
             }
 
             Card {
-                val alwaysAllowPayToOpen = if (liquidityPolicyPrefs is LiquidityPolicy.Auto) liquidityPolicyPrefs.alwaysAllowPayToOpen else false
+                val skipAbsoluteFeeCheck = if (liquidityPolicyPrefs is LiquidityPolicy.Auto) liquidityPolicyPrefs.skipAbsoluteFeeCheck else false
                 val newPolicy = when {
                     isPolicyDisabled -> LiquidityPolicy.Disable
-                    else -> maxAbsoluteFee?.let { LiquidityPolicy.Auto(maxRelativeFeeBasisPoints = maxPropFeePrefs, maxAbsoluteFee = it, alwaysAllowPayToOpen = alwaysAllowPayToOpen) }
+                    else -> maxAbsoluteFee?.let { LiquidityPolicy.Auto(maxRelativeFeeBasisPoints = maxPropFeePrefs, maxAbsoluteFee = it, skipAbsoluteFeeCheck = skipAbsoluteFeeCheck) }
                 }
                 val isEnabled = newPolicy != null && liquidityPolicyPrefs != newPolicy
                 Button(

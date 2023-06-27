@@ -889,13 +889,13 @@
     <string name="liquiditypolicy_advanced_title">Advanced incoming fee options</string>
     <string name="liquiditypolicy_advanced_disable">The incoming fee policy is disabled. It can be enabled in the incoming fee policy screen.</string>
     <string name="liquiditypolicy_advanced_disclaimer_header">Attention!</string>
-    <string name="liquiditypolicy_advanced_disclaimer_message">This screen is for advanced users. Do not change settings unless you understand their purposes.</string>
+    <string name="liquiditypolicy_advanced_disclaimer_message">This screen is for advanced users. Do not change these settings unless you understand their purposes.</string>
     <string name="liquiditypolicy_advanced_verifications_title">Additional verifications</string>
     <string name="liquiditypolicy_advanced_fees_prop_label">Percentage check</string>
-    <string name="liquiditypolicy_advanced_fees_prop_help">Also check that the fee is reasonable relative to the amount received, even when it is below %1$s.</string>
+    <string name="liquiditypolicy_advanced_fees_prop_help">Check the fee relative to the amount received. This option is useful as a sanity check for small payments.</string>
     <string name="liquiditypolicy_advanced_overrides_title">Policy overrides</string>
     <string name="liquiditypolicy_advanced_pay_to_open_label">Skip absolute fee check for Lightning</string>
-    <string name="liquiditypolicy_advanced_pay_to_open_help">When enabled, incoming Lightning payments will ignore the absolute max fee limit. Only the percentage limit will be checked.\n\nAttention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive.</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_help">When enabled, incoming Lightning payments will ignore the absolute max fee limit. Only the percentage check will apply.\n\nAttention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive.</string>
     <string name="liquiditypolicy_save_button">Save policy</string>
 
     <string name="liquiditypolicy_help">
@@ -909,7 +909,6 @@
       \n\n
       Payments you receive on L2 can be received instantly and for zero fees. However, occasionally an L1 operation is also required in order to manage the L2 payment channel. This can be done automatically <b>IF</b> the miner fees adhere to your configured fee policy.
     </string>
-    <string name="liquiditypolicy_help_link">Know more…</string>
     <string name="liquiditypolicy_loading">Retrieving policy…</string>
 
     <!-- CPFP splices -->
