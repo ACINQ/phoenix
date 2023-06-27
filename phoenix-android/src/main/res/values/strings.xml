@@ -894,11 +894,21 @@
     <string name="liquiditypolicy_advanced_fees_prop_label">Percentage check</string>
     <string name="liquiditypolicy_advanced_fees_prop_help">Also check that the fee is reasonable relative to the amount received, even when it is below %1$s.</string>
     <string name="liquiditypolicy_advanced_overrides_title">Policy overrides</string>
-    <string name="liquiditypolicy_advanced_pay_to_open_label">Always accept Lightning payments</string>
-    <string name="liquiditypolicy_advanced_pay_to_open_help">When enabled, Lightning payments will always be accepted, regardless of the max fee setting.\n\nAttention: if the Bitcoin mempool feerate is high, incoming LN payments could be expensive if they require an on-chain operation.</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_label">Skip absolute fee check for Lightning</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_help">When enabled, incoming Lightning payments will ignore the absolute max fee limit. Only the percentage limit will be checked.\n\nAttention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive.</string>
     <string name="liquiditypolicy_save_button">Save policy</string>
 
-    <string name="liquiditypolicy_help">Lorem ipsum dolor sit amet.</string>
+    <string name="liquiditypolicy_help">
+      Phoenix allows you to receive payments on Bitcoin\'s blockchain (L1) and Bitcoin\'s Lightning layer (L2).
+      \n\n
+      - the blockchain layer (L1) is slower, and generally much more expensive (requires miner fees)
+      \n
+      - the Lightning layer (L2) is much faster, and generally much cheaper (especially for smaller payments)
+      \n\n
+      When you receive a payment on L1, Phoenix will automatically move the funds to L2 <b>IF</b> the miner fees adhere to your configured fee policy.
+      \n\n
+      Payments you receive on L2 can be received instantly and for zero fees. However, occasionally an L1 operation is also required in order to manage the L2 payment channel. This can be done automatically <b>IF</b> the miner fees adhere to your configured fee policy.
+    </string>
     <string name="liquiditypolicy_help_link">Know more…</string>
     <string name="liquiditypolicy_loading">Retrieving policy…</string>
 

@@ -151,10 +151,10 @@ fun RowScope.IconPopup(
     if (showPopup) {
         Popup(
             onDismissRequest = { showPopup = false },
-            offset = IntOffset(x = -240, y = 68)
+            offset = IntOffset(x = -200, y = 54)
         ) {
             Surface(
-                modifier = Modifier.widthIn(min = 220.dp, max = 270.dp),
+                modifier = Modifier.padding(horizontal = 4.dp).widthIn(min = 280.dp, max = 280.dp),
                 shape = RoundedCornerShape(8.dp),
                 border = BorderStroke(1.dp, MaterialTheme.colors.primary),
                 elevation = 6.dp,

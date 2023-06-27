@@ -78,6 +78,7 @@ fun LiquidityPolicyView(
         DefaultScreenHeader(
             content = {
                 Text(text = stringResource(id = R.string.liquiditypolicy_title))
+                IconPopup(popupMessage = stringResource(id = R.string.liquiditypolicy_help))
                 if (liquidityPolicyPrefs is LiquidityPolicy.Auto) {
                     Spacer(Modifier.weight(1f))
                     Box(contentAlignment = Alignment.TopEnd) {
