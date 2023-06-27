@@ -855,6 +855,7 @@
     <string name="walletinfo_not_swappable_title">Waiting for %1$d confirmations</string>
     <string name="walletinfo_confirmed_title">Confirmed balance</string>
     <string name="walletinfo_unconfirmed_title">Unconfirmed balance</string>
+    <string name="walletinfo_incoming_balance">+%1$s incoming</string>
     <string name="walletinfo_loading_data">Loading wallet data…</string>
 
     <string name="walletinfo_lightning">Lightning</string>
@@ -864,10 +865,12 @@
     <string name="walletinfo_offchain_channels">Payment channels</string>
 
     <string name="walletinfo_onchain_swapin">Swap-in wallet</string>
-    <string name="walletinfo_onchain_swapin_help">A "swap-in-potentiam" on-chain wallet set up between your Phoenix and your LN peer.\n\nIt is a bridge to Lightning: funds on this wallet are automatically swapped to Lightning, according to your incoming fee setting.</string>
-    <string name="walletinfo_onchain_swapin_policy_view">Tap to see your incoming fee policy.</string>
-    <string name="walletinfo_onchain_swapin_policy_auto_details">On-chain funds will be automatically swapped to Lightning if the incoming fee is <b>less than %1$s</b>.</string>
+    <string name="walletinfo_onchain_swapin_help">A \"swap-in-potentiam\" on-chain wallet set up between your Phoenix and your LN peer.\n\nIt is a bridge to Lightning: funds on this wallet are automatically swapped to Lightning, according to your incoming fee setting.</string>
+    <string name="walletinfo_onchain_swapin_policy_view">Tap to configure.</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details">On-chain funds will automatically be swapped to Lightning if the fee is <b>less than %1$s</b>.</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_startup">Swaps are attempted at application startup.</string>
     <string name="walletinfo_onchain_swapin_policy_disabled_details">Automated fee policy <b>is disabled</b>. Funds will not be swapped. They will remain on this wallet.</string>
+    <string name="walletinfo_onchain_swapin_empty">There are no swaps in progress.</string>
 
     <string name="walletinfo_onchain_final">Final wallet</string>
     <string name="walletinfo_onchain_final_about">An on-chain wallet derived from your seed.\n\nThe final wallet is where funds are sent by default when your Lightning channels are closed.</string>
@@ -899,6 +902,7 @@
     <string name="liquiditypolicy_advanced_pay_to_open_label">Skip absolute fee check for Lightning</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">When enabled, incoming Lightning payments will ignore the absolute max fee limit. Only the percentage check will apply.\n\nAttention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive.</string>
     <string name="liquiditypolicy_save_button">Save policy</string>
+    <string name="liquiditypolicy_save_done">Policy saved.\nSwaps will be attempted when app restarts.</string>
 
     <string name="liquiditypolicy_help">
       Phoenix allows you to receive payments on Bitcoin\'s blockchain (L1) and Bitcoin\'s Lightning layer (L2).

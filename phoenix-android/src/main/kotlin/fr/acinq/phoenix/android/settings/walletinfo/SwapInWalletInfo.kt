@@ -16,12 +16,10 @@
 
 package fr.acinq.phoenix.android.settings.walletinfo
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
@@ -45,6 +44,7 @@ import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
@@ -72,17 +72,29 @@ fun SwapInWalletInfo(
                 }
                 is LiquidityPolicy.Auto -> {
                     Text(text = annotatedStringResource(id = R.string.walletinfo_onchain_swapin_policy_auto_details, policy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true)))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(id = R.string.walletinfo_onchain_swapin_policy_auto_startup))
                 }
                 null -> {}
             }
-            Spacer(Modifier.height(8.dp))
-            Text(text = stringResource(id = R.string.walletinfo_onchain_swapin_policy_view), style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
+            Spacer(Modifier.height(12.dp))
+            TextWithIcon(text = stringResource(id = R.string.walletinfo_onchain_swapin_policy_view), textStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp), icon = R.drawable.ic_settings, iconTint = MaterialTheme.typography.caption.color)
         }
 
-        swapInWallet?.deeplyConfirmed?.balance?.takeIf { it > 0.sat }?.let {
-            SwappableBalanceView(balance = it.toMilliSatoshi())
+        swapInWallet?.let { wallet ->
+            if (wallet.all.balance == 0.sat) {
+                Spacer(modifier = Modifier.height(24.dp))
+                Text(text = stringResource(id = R.string.walletinfo_onchain_swapin_empty), style = MaterialTheme.typography.caption, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+            } else {
+                if (wallet.deeplyConfirmed.balance > 0.sat) {
+                    SwappableBalanceView(balance = wallet.deeplyConfirmed.balance.toMilliSatoshi())
+                }
+                val waitingForSwap = wallet.unconfirmed + wallet.weaklyConfirmed
+                if (waitingForSwap.isNotEmpty()) {
+                    NotSwappableWalletView(wallet = wallet)
+                }
+            }
         }
-        NotSwappableWalletView(wallet = swapInWallet)
     }
 }
 
@@ -93,26 +105,23 @@ private fun SwappableBalanceView(
     CardHeader(text = stringResource(id = R.string.walletinfo_swappable_title))
     Card(
         modifier = Modifier.fillMaxWidth(),
+        internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-            BalanceRow(balance = balance)
-        }
+        BalanceRow(balance = balance)
     }
 }
 
 @Composable
 private fun NotSwappableWalletView(
-    wallet: WalletState.WalletWithConfirmations?
+    wallet: WalletState.WalletWithConfirmations
 ) {
-    if (wallet != null && (wallet.unconfirmed.isNotEmpty() || wallet.weaklyConfirmed.isNotEmpty())) {
-        CardHeader(text = stringResource(id = R.string.walletinfo_not_swappable_title, wallet.minConfirmations))
-        Card {
-            wallet.weaklyConfirmed.forEach {
-                UtxoRow(it, (wallet.minConfirmations - wallet.confirmationsNeeded(it)) to wallet.minConfirmations)
-            }
-            wallet.unconfirmed.forEach {
-                UtxoRow(it, null to wallet.minConfirmations)
-            }
+    CardHeader(text = stringResource(id = R.string.walletinfo_not_swappable_title, wallet.minConfirmations))
+    Card {
+        wallet.weaklyConfirmed.forEach {
+            UtxoRow(it, (wallet.minConfirmations - wallet.confirmationsNeeded(it)) to wallet.minConfirmations)
+        }
+        wallet.unconfirmed.forEach {
+            UtxoRow(it, null to wallet.minConfirmations)
         }
     }
 }

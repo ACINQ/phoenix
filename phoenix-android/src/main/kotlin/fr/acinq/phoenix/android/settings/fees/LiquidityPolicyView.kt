@@ -32,7 +32,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.sat
@@ -49,6 +51,7 @@ import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.orange
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.MempoolFeerate
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -125,6 +128,7 @@ fun LiquidityPolicyView(
                 }
             }
 
+            var showSuccessFeedback by remember { mutableStateOf(false) }
             Card {
                 val skipAbsoluteFeeCheck = if (liquidityPolicyPrefs is LiquidityPolicy.Auto) liquidityPolicyPrefs.skipAbsoluteFeeCheck else false
                 val newPolicy = when {
@@ -144,13 +148,27 @@ fun LiquidityPolicyView(
                         scope.launch {
                             if (newPolicy != null) {
                                 UserPrefs.saveLiquidityPolicy(context, newPolicy)
+                                showSuccessFeedback = true
                                 peerManager.updatePeerLiquidityPolicy(newPolicy)
                                 notificationsManager.dismissAllNotifications()
+                                delay(5000)
+                                showSuccessFeedback = false
                             }
                         }
                     },
                 )
             }
+
+            if (showSuccessFeedback) {
+                Text(
+                    text = stringResource(id = R.string.liquiditypolicy_save_done),
+                    style = MaterialTheme.typography.body1.copy(fontSize = 14.sp, textAlign = TextAlign.Center),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                )
+            }
+
         } else {
             Card(modifier = Modifier.fillMaxWidth()) {
                 ProgressView(text = stringResource(id = R.string.liquiditypolicy_loading))
