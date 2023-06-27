@@ -29,8 +29,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -54,6 +56,7 @@ import fr.acinq.phoenix.data.MempoolFeerate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LiquidityPolicyView(
     onBackClick: () -> Unit,
@@ -130,6 +133,7 @@ fun LiquidityPolicyView(
 
             var showSuccessFeedback by remember { mutableStateOf(false) }
             Card {
+                val keyboardManager = LocalSoftwareKeyboardController.current
                 val skipAbsoluteFeeCheck = if (liquidityPolicyPrefs is LiquidityPolicy.Auto) liquidityPolicyPrefs.skipAbsoluteFeeCheck else false
                 val newPolicy = when {
                     isPolicyDisabled -> LiquidityPolicy.Disable
@@ -145,10 +149,11 @@ fun LiquidityPolicyView(
                         .enableOrFade(isEnabled),
                     enabled = isEnabled,
                     onClick = {
+                        keyboardManager?.hide()
                         scope.launch {
                             if (newPolicy != null) {
                                 UserPrefs.saveLiquidityPolicy(context, newPolicy)
-                                showSuccessFeedback = true
+                                if (newPolicy is LiquidityPolicy.Auto) showSuccessFeedback = true
                                 peerManager.updatePeerLiquidityPolicy(newPolicy)
                                 notificationsManager.dismissAllNotifications()
                                 delay(5000)
@@ -165,7 +170,7 @@ fun LiquidityPolicyView(
                     style = MaterialTheme.typography.body1.copy(fontSize = 14.sp, textAlign = TextAlign.Center),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(16.dp)
                 )
             }
 
