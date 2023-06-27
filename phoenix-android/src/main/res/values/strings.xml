@@ -881,15 +881,14 @@
     <string name="liquiditypolicy_advanced_menu">Advanced options</string>
     <string name="liquiditypolicy_instructions">Incoming payments sometimes requires on-chain transactions. This does not always happen, only when needed.</string>
     <string name="liquiditypolicy_fees_estimation_loading">Retrieving feerate…</string>
-    <string name="liquiditypolicy_fees_estimation">Currently, we estimate the fee to be around <b>%1$s</b> (≈%2$s).</string>
-    <string name="liquiditypolicy_fees_estimation_feerate">Feerate %1$s from Electrum</string>
+    <string name="liquiditypolicy_fees_estimation">Fees are currently estimated at around <b>%1$s</b> (≈%2$s).</string>
     <string name="liquiditypolicy_fees_header">My fee setting</string>
     <string name="liquiditypolicy_disable_label">Automated fee policy</string>
-    <string name="liquiditypolicy_disable_desc">Incoming payments that require additional liquidity will fail.</string>
+    <string name="liquiditypolicy_disable_desc">Incoming payments that require on-chain operations will fail.</string>
     <string name="liquiditypolicy_fees_base_label">Max fee amount</string>
-    <string name="liquiditypolicy_fees_base_help">Payments are rejected if the fee exceeds that value</string>
-    <string name="liquiditypolicy_fees_base_too_low">This value is very low. Expect payments to fail.</string>
-    <string name="liquiditypolicy_fees_base_below_estimation">This value is below the estimation. Some payments may be rejected.</string>
+    <string name="liquiditypolicy_fees_base_help">Payments whose fees exceed that value will fail.</string>
+    <string name="liquiditypolicy_fees_base_too_low">This value is too low.</string>
+    <string name="liquiditypolicy_fees_base_below_estimation">Below the expected fee. Some payments may fail.</string>
 
     <string name="liquiditypolicy_advanced_title">Advanced incoming fee options</string>
     <string name="liquiditypolicy_advanced_disable">The incoming fee policy is disabled. It can be enabled in the incoming fee policy screen.</string>
@@ -902,7 +901,7 @@
     <string name="liquiditypolicy_advanced_pay_to_open_label">Skip absolute fee check for Lightning</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">When enabled, incoming Lightning payments will ignore the absolute max fee limit. Only the percentage check will apply.\n\nAttention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive.</string>
     <string name="liquiditypolicy_save_button">Save policy</string>
-    <string name="liquiditypolicy_save_done">Policy saved.\nSwaps will be attempted when app restarts.</string>
+    <string name="liquiditypolicy_save_done">Policy saved.\nSwaps will be attempted at the next restart.</string>
 
     <string name="liquiditypolicy_help">
       Phoenix allows you to receive payments on Bitcoin\'s blockchain (L1) and Bitcoin\'s Lightning layer (L2).

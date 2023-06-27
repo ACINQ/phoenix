@@ -200,16 +200,16 @@ private fun EditMaxFee(
                             style = MaterialTheme.typography.subtitle2.copy(color = negativeColor),
                         )
                     }
-                    maxAbsoluteFee < 200.sat -> {
+                    maxAbsoluteFee < 150.sat -> {
                         Text(
                             text = stringResource(id = R.string.liquiditypolicy_fees_base_too_low),
-                            style = MaterialTheme.typography.subtitle2.copy(color = negativeColor),
+                            style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.onSurface),
                         )
                     }
                     maxAbsoluteFee < (mempoolFeerate?.swapEstimationFee(hasNoChannels) ?: 0.sat) -> {
                         Text(
                             text = stringResource(id = R.string.liquiditypolicy_fees_base_below_estimation),
-                            style = MaterialTheme.typography.subtitle2.copy(color = orange),
+                            style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.onSurface),
                         )
                     }
                     else -> {
@@ -249,7 +249,7 @@ private fun EditMaxFee(
             else -> {
                 val fiatCurrency = LocalFiatCurrency.current
                 Row {
-                    PhoenixIcon(resourceId = R.drawable.ic_idea, tint = orange, modifier = Modifier.offset(y = 2.dp))
+                    PhoenixIcon(resourceId = R.drawable.ic_info, modifier = Modifier.offset(y = 2.dp))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = annotatedStringResource(
