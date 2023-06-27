@@ -93,12 +93,10 @@ class NoticeMonitor: ObservableObject {
 	}
 	
 	var hasNotice_backgroundPayments: Bool {
-		return true
-	//	return notificationPermissions == .disabled
+		return notificationPermissions == .disabled
 	}
 	
 	var hasNotice_watchTower: Bool {
-		return true
-	//	return bgRefreshStatus != .available
+		return bgRefreshStatus != .available
 	}
 }

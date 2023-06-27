@@ -56,7 +56,7 @@ struct NotificationsView : View {
 			
 			Spacer(minLength: 0)
 			Button {
-				closeButtonTapped()
+				closeSheet()
 			} label: {
 				Image("ic_cross")
 					.resizable()
@@ -91,38 +91,44 @@ struct NotificationsView : View {
 		Section {
 			
 			if noticeMonitor.hasNotice_backupSeed {
-				NoticeBox {
+				NoticeBox(backgroundColor: .mutedBackground) {
 					NotificationCell.backupSeed(action: navigateToBackup)
 				}
+				.font(.callout)
 			}
 			
 			if noticeMonitor.hasNotice_electrumServer {
-				NoticeBox {
+				NoticeBox(backgroundColor: .mutedBackground) {
 					NotificationCell.electrumServer(action: navigationToElecrumServer)
 				}
+				.font(.callout)
 			}
 			
 			if noticeMonitor.hasNotice_backgroundPayments {
-				NoticeBox {
+				NoticeBox(backgroundColor: .mutedBackground) {
 					NotificationCell.backgroundPayments(action: navigationToBackgroundPayments)
 				}
+				.font(.callout)
 			}
 			
 			if noticeMonitor.hasNotice_watchTower {
-				NoticeBox {
+				NoticeBox(backgroundColor: .mutedBackground) {
 					NotificationCell.watchTower(action: fixBackgroundAppRefreshDisabled)
 				}
+				.font(.callout)
 			}
 			
 			if noticeMonitor.hasNotice_mempoolFull {
-				NoticeBox {
+				NoticeBox(backgroundColor: .mutedBackground) {
 					NotificationCell.mempoolFull(action: openMempoolFullURL)
 				}
+				.font(.callout)
 			}
 			
 		} header: {
 			Text("Important messages")
 		}
+		.listRowBackground(Color.clear)
 		.listRowInsets(EdgeInsets(top: 5, leading: 1, bottom: 5, trailing: 1))
 		.listRowSeparator(.hidden)   // remove lines between items
 	}
@@ -132,7 +138,15 @@ struct NotificationsView : View {
 		
 		Section {
 			
-			// Todo...
+			ForEach(self.bizNotifications_payment) { item in
+				BizNotificationCell(action: closeSheet, item: item)
+					.padding(12)
+					.background(
+						RoundedRectangle(cornerRadius: 8)
+							.fill(Color.mutedBackground)
+					)
+					.listRowBackground(Color.clear)
+			}
 			
 		} header: {
 			Text("Recent payment failures")
@@ -212,8 +226,8 @@ struct NotificationsView : View {
 		}
 	}
 	
-	func closeButtonTapped() {
-		log.trace("closeButtonTapped()")
+	func closeSheet() {
+		log.trace("closeSheet()")
 		
 		presentationMode.wrappedValue.dismiss()
 	}

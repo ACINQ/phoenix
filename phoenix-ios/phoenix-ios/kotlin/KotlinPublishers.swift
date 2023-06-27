@@ -184,9 +184,29 @@ extension PhoenixShared.NotificationsManager {
 		static var notificationsPublisher = 0
 	}
 
-	struct NotificationItem {
+	struct NotificationItem: Identifiable {
 		let ids: Set<Lightning_kmpUUID>
 		let notification: PhoenixShared.Notification
+		
+		public var id: String {
+			// How do we turn this into an Identifiable string ?
+			//
+			// Notifications with the same content will automatically be grouped into the
+			// same NotificationItem, with both ids present in the Set.
+			// So all we need is:
+			// - a deterministic UUID from the set (lowest in sort order)
+			// - plus the number of UUIDs in the set
+			//
+			// If these 2 items match, you know the notification content is equal,
+			// and thus the corresponding UI doesn't require a refresh.
+			
+			let firstUUID = ids.sorted { (a, b) in
+				// true if the first argument should be ordered before the second argument; otherwise, false
+				return a.compareTo(other: b) < 0
+			}.first?.description() ?? UUID().uuidString
+			
+			return "\(firstUUID)|\(ids.count)"
+		}
 	}
 
 	func notificationsPublisher() -> AnyPublisher<[NotificationItem], Never> {

@@ -13,10 +13,17 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct NoticeBox<Content: View>: View {
 	
+	let backgroundColor: Color?
 	let content: Content
 	
 	init(@ViewBuilder builder: () -> Content) {
-		content = builder()
+		self.backgroundColor = nil
+		self.content = builder()
+	}
+	
+	init(backgroundColor: Color?, @ViewBuilder builder: () -> Content) {
+		self.backgroundColor = backgroundColor
+		self.content = builder()
 	}
 	
 	@ViewBuilder
@@ -28,6 +35,10 @@ struct NoticeBox<Content: View>: View {
 		}
 		.padding(12)
 		.background(
+			RoundedRectangle(cornerRadius: 8)
+				.fill(backgroundColor ?? Color.clear)
+		)
+		.overlay(
 			RoundedRectangle(cornerRadius: 8)
 				.stroke(Color.appAccent, lineWidth: 1)
 		)

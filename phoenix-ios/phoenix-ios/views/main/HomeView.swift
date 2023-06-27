@@ -401,8 +401,8 @@ struct HomeView : MVIView {
 			} else if noticeMonitor.hasNotice_mempoolFull {
 				NotificationCell.mempoolFull(action: flag ? openMempoolFullURL : nil)
 				
-			} else if let bizNotification = primaryBizNotification() {
-				NotificationCell.bizNotification(bizNotification, action: nil)
+			} else if let item = primaryBizNotification() {
+				BizNotificationCell(action: flag ? {} : nil, item: item)
 			}
 		}
 		.font(.caption)

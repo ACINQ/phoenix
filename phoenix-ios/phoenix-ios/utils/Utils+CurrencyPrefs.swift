@@ -83,6 +83,26 @@ extension Utils {
 		return formatBitcoin(sat: sat, bitcoinUnit: currencyPrefs.bitcoinUnit)
 	}
 	
+	static func formatBitcoin(
+		_ currencyPrefs : CurrencyPrefs,
+		msat            : Lightning_kmpMilliSatoshi,
+		policy          : MsatsPolicy = .hideMsats,
+		locale          : Locale? = nil
+	) -> FormattedAmount {
+		
+		return formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit, policy: policy, locale: locale)
+	}
+	
+	static func formatBitcoin(
+		_ currencyPrefs : CurrencyPrefs,
+		msat            : Int64,
+		policy          : MsatsPolicy = .hideMsats,
+		locale          : Locale? = nil
+	) -> FormattedAmount {
+		
+		return formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit, policy: policy, locale: locale)
+	}
+	
 	// --------------------------------------------------
 	// MARK: Fiat Formatting
 	// --------------------------------------------------
