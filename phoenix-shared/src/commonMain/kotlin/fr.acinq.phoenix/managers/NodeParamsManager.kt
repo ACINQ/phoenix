@@ -75,7 +75,7 @@ class NodeParamsManager(
         val trampolineNodeId = PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134")
         val trampolineNodeUri = NodeUri(id = trampolineNodeId, "13.248.222.197", 9735)
         val remoteSwapInXpub = "tpubDAmCFB21J9ExKBRPDcVxSvGs9jtcf8U1wWWbS1xTYmnUsuUHPCoFdCnEGxLE3THSWcQE48GHJnyz8XPbYUivBMbLSMBifFd3G9KmafkM9og"
-        val defaultLiquidityPolicy = LiquidityPolicy.Auto(maxAbsoluteFee = 3_000.sat, maxRelativeFeeBasisPoints = 30_00 /* 30% */, skipAbsoluteFeeCheck = false)
+        val defaultLiquidityPolicy = LiquidityPolicy.Auto(maxAbsoluteFee = 5_000.sat, maxRelativeFeeBasisPoints = 30_00 /* 30% */, skipAbsoluteFeeCheck = false)
         val swapInConfirmations = 3
     }
 }
