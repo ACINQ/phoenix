@@ -53,7 +53,7 @@ fun SettingsView() {
         val chain = business.chain
 
         // -- debug
-        if (chain == NodeParams.Chain.Testnet) {
+        if (chain is NodeParams.Chain.Testnet) {
             CardHeader(text = "DEBUG")
             Card {
                 Button(text = "Switch to Legacy app", icon = R.drawable.ic_user, onClick = {
