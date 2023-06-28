@@ -2,11 +2,11 @@ import Foundation
 import PhoenixShared
 
 enum MsatsPolicy {
-	/// Millisatoshi amounts are never shown
+	/// Millisatoshi amounts are never shown.
 	case hideMsats
-	/// Millisatoshi amounts are shown if non-zero
+	/// Millisatoshi amounts are shown if non-zero.
 	case showMsatsIfNonZero
-	/// Millisatoshi amounts are only shown if: `0 < msats < 1,000`
+	/// Millisatoshi amounts are only shown if: `(sat == 0) && (0 < msat < 1_000)`
 	case showMsatsIfZeroSats
 }
 
