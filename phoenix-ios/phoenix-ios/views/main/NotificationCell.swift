@@ -202,16 +202,21 @@ struct BizNotificationCell: View {
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
 			let amt = Utils.formatBitcoin(currencyPrefs, msat: reason.amount)
-			Text("On-chain funds pending (+\(amt.string))")
-				.font(.headline)
+			
+			if reason.source == Lightning_kmpLiquidityEventsSource.onchainwallet {
+				Text("On-chain funds pending (+\(amt.string))")
+					.font(.headline)
+			} else {
+				Text("Payment rejected (+\(amt.string))")
+					.font(.headline)
+			}
 			
 			let expectedFee = Utils.formatBitcoin(currencyPrefs, msat: reason.expectedFee)
 			let maxAllowedFee = Utils.formatBitcoin(currencyPrefs, msat: reason.maxAllowedFee)
-			Text("The fee was \(expectedFee.string) but your max fee was set to \(maxAllowedFee.string)")
+			Text("The fee was \(expectedFee.string) but your max fee was set to \(maxAllowedFee.string).")
 				.font(.callout)
 				.fixedSize(horizontal: false, vertical: true)
 				.padding(.top, 10)
-				.padding(.bottom, 15)
 			
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
 				if action != nil {
@@ -227,6 +232,8 @@ struct BizNotificationCell: View {
 					.font(.caption)
 					.foregroundColor(.secondary)
 			} // </HStack>
+			.padding(.top, action != nil ? 15 : 5)
+			
 		} // </VStac>
 		.accessibilityElement(children: .combine)
 		.accessibilityAddTraits(.isButton)
@@ -244,19 +251,21 @@ struct BizNotificationCell: View {
 			Text("Payment rejected (+\(amt.string))")
 				.font(.headline)
 			
-			if reason is PhoenixShared.Notification.PaymentRejected.FeePolicyDisabled {
-				Text("Automated incoming liquidity is disabled in your incoming fee settings.")
-				
-			} else if reason is PhoenixShared.Notification.PaymentRejected.ChannelsInitializing {
-				Text("Channels initializing...")
-				
-			} else if reason is PhoenixShared.Notification.PaymentRejected.RejectedManually {
-				Text("Manually rejected paymented.")
-				
-			} else {
-				Text("Unknown reason.")
-				
+			Group {
+				if reason is PhoenixShared.Notification.PaymentRejected.FeePolicyDisabled {
+					Text("Automated incoming liquidity is disabled in your incoming fee settings.")
+					
+				} else if reason is PhoenixShared.Notification.PaymentRejected.ChannelsInitializing {
+					Text("Channels initializing...")
+					
+				} else if reason is PhoenixShared.Notification.PaymentRejected.RejectedManually {
+					Text("Manually rejected paymented.")
+					
+				} else {
+					Text("Unknown reason.")
+				}
 			}
+			.padding(.top, 10)
 			
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
 				if action != nil {
@@ -272,6 +281,8 @@ struct BizNotificationCell: View {
 					.font(.caption)
 					.foregroundColor(.secondary)
 			} // </HStack>
+			.padding(.top, action != nil ? 15 : 5)
+			
 		} // </VStac>
 		.accessibilityElement(children: .combine)
 		.accessibilityAddTraits(.isButton)
@@ -283,14 +294,18 @@ struct BizNotificationCell: View {
 		_ reason: PhoenixShared.WatchTowerOutcome.Nominal
 	) -> some View {
 		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+		VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 			
-			// Todo: What should this actually say ?
-			Text("Watchtower success")
+			Text("Watchtower report")
 				.font(.headline)
 			
-			Text("Your funds are safe.")
-				.font(.callout)
+			if reason.channelsWatchedCount == 1 {
+				Text("1 channel was successfully checked. No issues were found.")
+					.font(.callout)
+			} else {
+				Text("\(reason.channelsWatchedCount) channels were successfully checked. No issues were found.")
+					.font(.callout)
+			}
 			
 		} // </VStack>
 		.accessibilityElement(children: .combine)
@@ -303,13 +318,15 @@ struct BizNotificationCell: View {
 		_ reason: PhoenixShared.WatchTowerOutcome.RevokedFound
 	) -> some View {
 		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+		VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 			
-			// Todo: What should this actually say ?
-			Text("Watchtower: revoked commit found")
+			Text("Watchtower alert")
 				.font(.headline)
 			
-			Text("Your funds are being rescued...")
+			Text("Revoked commits found on \(reason.channels.count) channel(s)!")
+				.font(.callout)
+			
+			Text("Contact support if needed.")
 				.font(.callout)
 			
 		} // </VStack>
@@ -323,13 +340,12 @@ struct BizNotificationCell: View {
 		_ reason: PhoenixShared.WatchTowerOutcome.Unknown
 	) -> some View {
 		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+		VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 			
-			// Todo: What should this actually say ?
-			Text("Watchtower: process failed")
+			Text("Watchtower unable to complete")
 				.font(.headline)
 			
-			Text("Will retry again soon...")
+			Text("A new attempt is scheduled in a few hours.")
 				.font(.callout)
 			
 		} // </VStack>
@@ -341,9 +357,19 @@ struct BizNotificationCell: View {
 	func timestamp() -> String {
 		
 		let date = item.notification.createdAt.toDate(from: .milliseconds)
+		let now = Date.now
 		
-		let formatter = RelativeDateTimeFormatter()
-		return formatter.localizedString(for: date, relativeTo: Date.now)
+		if now.timeIntervalSince(date) < 1.0 {
+			// The RelativeDateTimeFormatter will say something like "in 0 seconds",
+			// which is wrong in this context.
+			
+			return NSLocalizedString("just now", comment: "Timestamp for notification")
+			
+		} else {
+			
+			let formatter = RelativeDateTimeFormatter()
+			return formatter.localizedString(for: date, relativeTo: now)
+		}
 	}
 	
 	func navigateToLiquiditySettings() {

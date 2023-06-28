@@ -80,6 +80,9 @@ struct NotificationsView : View {
 			if !bizNotifications_payment.isEmpty {
 				section_payments()
 			}
+			if !bizNotifications_watchtower.isEmpty {
+				section_watchtower()
+			}
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
@@ -146,10 +149,39 @@ struct NotificationsView : View {
 							.fill(Color.mutedBackground)
 					)
 					.listRowBackground(Color.clear)
+					.swipeActions(allowsFullSwipe: true) {
+						Button(role: .destructive) {
+							deleteNotification(item)
+						} label: {
+							Label("Delete", systemImage: "trash.fill")
+						}
+					}
 			}
 			
 		} header: {
 			Text("Recent payment failures")
+		}
+		.listRowInsets(EdgeInsets(top: 5, leading: 1, bottom: 5, trailing: 1))
+		.listRowSeparator(.hidden)   // remove lines between items
+	}
+	
+	@ViewBuilder
+	func section_watchtower() -> some View {
+		
+		Section {
+			
+			ForEach(self.bizNotifications_watchtower) { item in
+				BizNotificationCell(action: closeSheet, item: item)
+					.padding(12)
+					.background(
+						RoundedRectangle(cornerRadius: 8)
+							.fill(Color.mutedBackground)
+					)
+					.listRowBackground(Color.clear)
+			}
+			
+		} header: {
+			Text("Watchtower")
 		}
 		.listRowInsets(EdgeInsets(top: 5, leading: 1, bottom: 5, trailing: 1))
 		.listRowSeparator(.hidden)   // remove lines between items
@@ -224,6 +256,12 @@ struct NotificationsView : View {
 		popoverState.display(dismissable: true) {
 			BgRefreshDisabledPopover()
 		}
+	}
+	
+	func deleteNotification(_ item: PhoenixShared.NotificationsManager.NotificationItem) {
+		log.trace("deleteNotification()")
+		
+		Biz.business.notificationsManager.dismissNotifications(ids: item.ids)
 	}
 	
 	func closeSheet() {
