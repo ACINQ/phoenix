@@ -86,6 +86,7 @@ import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.utils.extensions.id
 import kotlinx.coroutines.flow.filterNotNull
 import org.kodein.memory.util.currentTimestampMillis
 
@@ -370,7 +371,7 @@ fun AppView(
     val isDataMigrationExpected by PrefsDatastore.getDataMigrationExpected(context).collectAsState(initial = null)
     val lastCompletedPayment by business.paymentsManager.lastCompletedPayment.collectAsState()
     lastCompletedPayment?.let {
-        log.debug { "completed payment=${lastCompletedPayment} with data-migration=$isDataMigrationExpected" }
+        log.debug { "completed payment=${lastCompletedPayment?.id()} with data-migration=$isDataMigrationExpected" }
         LaunchedEffect(key1 = it.walletPaymentId()) {
             if (isDataMigrationExpected == false) {
                 navigateToPaymentDetails(navController, id = it.walletPaymentId(), isFromEvent = true)

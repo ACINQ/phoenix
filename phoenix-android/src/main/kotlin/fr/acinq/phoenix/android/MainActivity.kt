@@ -81,6 +81,7 @@ class MainActivity : AppCompatActivity() {
                         PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
                     } else {
                         log.info("no legacy channels were found")
+                        PrefsDatastore.saveDataMigrationExpected(applicationContext, false)
                         PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.NotRequired)
                     }
                 }
@@ -88,7 +89,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContent {
-
             navController = rememberNavController()
             navController?.let {
                 PhoenixAndroidTheme(it) {
