@@ -50,12 +50,12 @@ object Converter {
     private val DECIMAL_SEPARATOR = DecimalFormat().decimalFormatSymbols.decimalSeparator.toString()
     private var SAT_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.###")
     private var SAT_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0").apply { roundingMode = RoundingMode.DOWN }
-    private var BIT_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.#####")
-    private var BIT_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.##").apply { roundingMode = RoundingMode.DOWN }
-    private var MBTC_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.########")
-    private var MBTC_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.#####").apply { roundingMode = RoundingMode.DOWN }
-    private var BTC_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.##############")
-    private var BTC_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.###########").apply { roundingMode = RoundingMode.DOWN }
+    private var BIT_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.00###")
+    private var BIT_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.00").apply { roundingMode = RoundingMode.DOWN }
+    private var MBTC_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.00000###")
+    private var MBTC_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.00000").apply { roundingMode = RoundingMode.DOWN }
+    private var BTC_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.00000000###")
+    private var BTC_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.00000000").apply { roundingMode = RoundingMode.DOWN }
     private var FIAT_FORMAT: NumberFormat = NumberFormat.getInstance().apply {
         minimumFractionDigits = 2
         maximumFractionDigits = 2
