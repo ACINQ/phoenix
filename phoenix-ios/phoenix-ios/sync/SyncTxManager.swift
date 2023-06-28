@@ -860,11 +860,30 @@ class SyncTxManager {
 				} // </for>
 				
 				for (recordID, result) in deleteResults {
-					switch result {
-						case .success(_): nextOpInfo.deletedRecordIds.append(recordID)
-						case .failure(_): break
+					
+					guard let paymentId = opInfo.reverseMap[recordID] else {
+						continue
 					}
-				}
+					
+					switch result {
+					case .success(_):
+						nextOpInfo.deletedRecordIds.append(recordID)
+						
+						for rowid in nextOpInfo.batch.rowidsMatching(paymentId) {
+							nextOpInfo.completedRowids.append(rowid)
+						}
+						
+					case .failure(let error):
+						if let recordError = error as? CKError {
+							
+							nextOpInfo.partialFailures[paymentId] = recordError
+
+							if recordError.errorCode == CKError.accountTemporarilyUnavailable.rawValue {
+								accountFailure = recordError
+							}
+						}
+					} // </switch>
+				} // </for>
 				
 				if let accountFailure {
 					// We received one or more `accountTemporarilyUnavailable` errors.
