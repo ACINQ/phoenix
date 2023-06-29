@@ -87,7 +87,8 @@ fun ForceCloseView(
                     }
                     if (showConfirmationDialog) {
                         ConfirmDialog(
-                            message = stringResource(R.string.mutualclose_confirm, model.address),
+                            title = stringResource(id = R.string.forceclose_confirm_title),
+                            message = stringResource(R.string.forceclose_confirm_details),
                             onDismiss = { showConfirmationDialog = false },
                             onConfirm = {
                                 postIntent(CloseChannelsConfiguration.Intent.ForceCloseAllChannels)

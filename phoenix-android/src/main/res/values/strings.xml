@@ -292,7 +292,7 @@
     <string name="mutualclose_loading">Loading…</string>
     <string name="mutualclose_checking_balance">Checking balance…</string>
     <string name="mutualclose_balance">Balance: <b>%1$s</b> (≈ %2$s)</string>
-    <string name="mutualclose_no_channels">The wallet does not have any channels and cannot be drained.</string>
+    <string name="mutualclose_no_channels">The wallet does not have any channels that can be closed.</string>
     <string name="mutualclose_input_instructions">Send all funds to a Bitcoin wallet. All payments channels will be closed.</string>
     <string name="mutualclose_input_label">Bitcoin address</string>
     <string name="mutualclose_input_placeholder">Enter a Bitcoin address here</string>
@@ -300,7 +300,8 @@
     <string name="mutualclose_error_chain_mismatch">This address uses a different blockchain</string>
     <string name="mutualclose_error_chain_reqparams">This address uses unsupported features</string>
     <string name="mutualclose_error_chain_generic">This address is not supported</string>
-    <string name="mutualclose_confirm">Are you sure you want to proceed?\n\nAll your funds will be sent to: %1$s.</string>
+    <string name="mutualclose_confirm_title">Confirm closing</string>
+    <string name="mutualclose_confirm_details">All the funds will be sent to:</string>
     <string name="mutualclose_done">%1$d channel(s) have been closed. You can find the details in the home screen.</string>
     <string name="mutualclose_inprogress">Please wait…</string>
 
@@ -308,6 +309,8 @@
     <string name="forceclose_no_channels">No channels to close</string>
     <string name="forceclose_instructions">This screen allows you to unilaterally close your channels.\n\nThis is not a \"fix-everything\" magic button: it is here as a safety measure and <b>should only be used in extreme scenarios</b>. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, <b>if you experience issues with Phoenix you should contact support</b>.\n\nForce closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days.\n\n<b>Do not uninstall the app until your channels are fully closed, or you will lose money.</b>\n\n<b>Do not use this feature if you don\'t fully understand what it does.</b></string>
     <string name="forceclose_address_label">Funds will eventually be sent to the final wallet:</string>
+    <string name="forceclose_confirm_title">Confirm force-closing</string>
+    <string name="forceclose_confirm_details">All the funds will be sent to your final wallet, after a delay.</string>
     <string name="forceclose_button">Force-close all my channels</string>
 
     <!-- channels view -->

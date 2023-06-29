@@ -93,7 +93,7 @@ fun TextInput(
             },
             enabled = enabled,
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-            colors = outlinedTextFieldColors(),
+            colors = if (errorMessage.isNullOrBlank()) outlinedTextFieldColors() else errorOutlinedTextFieldColors(),
             shape = RoundedCornerShape(8.dp),
             interactionSource = interactionSource,
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp, top = if (staticLabel != null) 14.dp else 0.dp)

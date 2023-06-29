@@ -42,7 +42,7 @@ import androidx.compose.ui.window.Popup
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.mutedTextColor
 
-@OptIn(ExperimentalComposeUiApi::class)
+
 @Composable
 fun Dialog(
     onDismiss: () -> Unit,
@@ -100,22 +100,41 @@ fun DialogBody(
 
 @Composable
 fun ConfirmDialog(
+    title: String?,
     message: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
+    ConfirmDialog(
+        title = title,
+        onDismiss = onDismiss,
+        onConfirm = onConfirm,
+    ) {
+        Text(text = message)
+    }
+}
+
+@Composable
+fun ConfirmDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    title: String?,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Dialog(
+        title = title,
         onDismiss = onDismiss,
         buttons = {
             Button(text = stringResource(id = R.string.btn_cancel), onClick = onDismiss)
             Button(text = stringResource(id = R.string.btn_confirm), onClick = onConfirm)
         }
     ) {
-        Text(text = message, modifier = Modifier.padding(24.dp))
+        Column(Modifier.padding(horizontal = 24.dp, vertical = if (title == null) 24.dp else 0.dp)) {
+            content()
+        }
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FullScreenDialog(
     onDismiss: () -> Unit,
@@ -154,7 +173,9 @@ fun RowScope.IconPopup(
             offset = IntOffset(x = -200, y = 54)
         ) {
             Surface(
-                modifier = Modifier.padding(horizontal = 4.dp).widthIn(min = 280.dp, max = 280.dp),
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .widthIn(min = 280.dp, max = 280.dp),
                 shape = RoundedCornerShape(8.dp),
                 border = BorderStroke(1.dp, MaterialTheme.colors.primary),
                 elevation = 6.dp,

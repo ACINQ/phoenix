@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.utils.msat
@@ -42,6 +43,8 @@ import fr.acinq.phoenix.android.payments.ScannerView
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.monoTypo
+import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration
 import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.BitcoinAddressError
@@ -72,7 +75,7 @@ fun MutualCloseView(
                 ScannerView(
                     onScanViewBinding = { scanView = it },
                     onScannedText = {
-                        address = it
+                        address = Parser.trimMatchingPrefix(Parser.removeExcessInput(it), Parser.bitcoinPrefixes)
                         addressErrorMessage = ""
                         showScannerView = false
                     }
@@ -172,7 +175,17 @@ fun MutualCloseView(
                             )
                             if (showConfirmationDialog) {
                                 ConfirmDialog(
-                                    message = stringResource(R.string.mutualclose_confirm, address),
+                                    title = stringResource(id = R.string.mutualclose_confirm_title),
+                                    content = {
+                                        Text(text = stringResource(R.string.mutualclose_confirm_details))
+                                        Spacer(modifier = Modifier.height(16.dp))
+                                        TextWithIcon(
+                                            text = address,
+                                            icon = R.drawable.ic_chain,
+                                            textStyle = monoTypo.copy(fontSize = 14.sp),
+                                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(mutedBgColor).padding(horizontal = 12.dp, vertical = 8.dp),
+                                        )
+                                    },
                                     onDismiss = { showConfirmationDialog = false },
                                     onConfirm = {
                                         addressErrorMessage = ""

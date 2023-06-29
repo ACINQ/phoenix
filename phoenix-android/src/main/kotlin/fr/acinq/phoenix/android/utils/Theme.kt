@@ -286,7 +286,19 @@ fun outlinedTextFieldColors() = TextFieldDefaults.outlinedTextFieldColors(
     focusedLabelColor = MaterialTheme.colors.primary,
     unfocusedLabelColor = MaterialTheme.typography.body1.color,
     focusedBorderColor = MaterialTheme.colors.primary,
-    unfocusedBorderColor = MaterialTheme.colors.primary, //MaterialTheme.typography.body1.color,
+    unfocusedBorderColor = MaterialTheme.colors.primary,
+    disabledTextColor = MaterialTheme.colors.onSurface,
+    disabledBorderColor = mutedBgColor,
+    disabledLabelColor = mutedTextColor,
+    disabledPlaceholderColor = mutedTextColor,
+)
+
+@Composable
+fun errorOutlinedTextFieldColors() = TextFieldDefaults.outlinedTextFieldColors(
+    focusedLabelColor = negativeColor,
+    unfocusedLabelColor = negativeColor,
+    focusedBorderColor = negativeColor.copy(alpha = 0.8f),
+    unfocusedBorderColor = negativeColor.copy(alpha = 0.8f),
     disabledTextColor = MaterialTheme.colors.onSurface,
     disabledBorderColor = mutedBgColor,
     disabledLabelColor = mutedTextColor,
