@@ -53,9 +53,9 @@ object Converter {
   fun refreshCoinPattern(context: Context) {
     when (Prefs.getCoinUnit(context)) {
       `SatUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0")
-      `BitUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0.##")
-      `MBtcUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0.#####")
-      else -> CoinUtils.setCoinPattern("###,###,###,##0.###########")
+      `BitUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0.00")
+      `MBtcUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0.00000")
+      else -> CoinUtils.setCoinPattern("###,###,###,##0.00000000###")
     }
     CoinUtils.COIN_FORMAT().roundingMode = RoundingMode.DOWN
   }
