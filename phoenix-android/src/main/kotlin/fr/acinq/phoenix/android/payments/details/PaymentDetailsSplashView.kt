@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.blockchain.electrum.getConfirmations
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -58,6 +59,8 @@ import fr.acinq.phoenix.utils.extensions.errorMessage
 import fr.acinq.phoenix.utils.extensions.minDepthForFunding
 import fr.acinq.phoenix.utils.extensions.state
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
@@ -147,9 +150,7 @@ private fun PaymentStatus(
         is ChannelCloseOutgoingPayment -> when (payment.confirmedAt) {
             null -> {
                 PaymentStatusIcon(
-                    message = {
-                        Text(text = stringResource(id = R.string.paymentdetails_status_unconfirmed))
-                    },
+                    message = null,
                     imageResId = R.drawable.ic_payment_details_pending_onchain_static,
                     isAnimated = false,
                     color = mutedTextColor,
@@ -171,7 +172,7 @@ private fun PaymentStatus(
         is SpliceOutgoingPayment -> when (payment.confirmedAt) {
             null -> {
                 PaymentStatusIcon(
-                    message = { Text(text = stringResource(id = R.string.paymentdetails_status_unconfirmed)) },
+                    message = null,
                     imageResId = R.drawable.ic_payment_details_pending_onchain_static,
                     isAnimated = false,
                     color = mutedTextColor,
@@ -193,7 +194,7 @@ private fun PaymentStatus(
         is SpliceCpfpOutgoingPayment -> when (payment.confirmedAt) {
             null -> {
                 PaymentStatusIcon(
-                    message = { Text(text = stringResource(id = R.string.paymentdetails_status_unconfirmed)) },
+                    message = null,
                     imageResId = R.drawable.ic_payment_details_pending_onchain_static,
                     isAnimated = false,
                     color = mutedTextColor,
@@ -279,7 +280,7 @@ private fun PaymentStatus(
 @OptIn(ExperimentalAnimationGraphicsApi::class)
 @Composable
 private fun PaymentStatusIcon(
-    message: @Composable ColumnScope.() -> Unit,
+    message: (@Composable ColumnScope.() -> Unit)?,
     isAnimated: Boolean,
     imageResId: Int,
     color: Color,
@@ -307,9 +308,9 @@ private fun PaymentStatusIcon(
                 }
             }
         }
-        Spacer(Modifier.height(16.dp))
-        Column {
-            message()
+        message?.let {
+            Spacer(Modifier.height(16.dp))
+            Column { it() }
         }
     }
 
@@ -515,34 +516,58 @@ private fun ConfirmationView(
             onClick = { openLink(context, txUrl) }
         )
     } else {
-        val confirmations by produceState<Int?>(initialValue = null) {
+        val connectionsManager = business.connectionsManager
+
+        suspend fun getConfirmations(): Int {
             val confirmations = electrumClient.getConfirmations(txId)
             log.info { "retrieved confirmations count=$confirmations from electrum for tx=${txId.toHex()}" }
+            return confirmations ?: run {
+                log.debug { "retrying getConfirmations from Electrum in 5 sec" }
+                delay(5_000)
+                getConfirmations()
+            }
+        }
+
+        val confirmations by produceState<Int?>(initialValue = null) {
+            connectionsManager.connections.filter { it.electrum is Connection.ESTABLISHED }.first()
+            val confirmations = getConfirmations()
             value = confirmations
         }
         confirmations?.let { conf ->
-            FilledButton(
-                text = when (minDepth) {
-                    null -> stringResource(R.string.paymentdetails_status_unconfirmed_default, conf)
-                    else -> stringResource(R.string.paymentdetails_status_unconfirmed_with_depth, conf, minDepth)
-                },
-                icon = when (conf) {
-                    0 -> R.drawable.ic_rocket
-                    else -> R.drawable.ic_chain
-                },
-                onClick = {
-                    if (conf == 0) {
-                        showBumpTxDialog = true
-                    }  else {
-                        openLink(context, txUrl)
-                    }
-                },
-                backgroundColor = Color.Transparent,
-                padding = PaddingValues(8.dp),
-                textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp),
-                iconTint = MaterialTheme.colors.primary,
-                space = 6.dp,
-            )
+            if (conf == 0) {
+                Card(
+                    internalPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                    onClick = { showBumpTxDialog = true },
+                    backgroundColor = Color.Transparent,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    TextWithIcon(
+                        text = stringResource(R.string.paymentdetails_status_unconfirmed_zero),
+                        icon = R.drawable.ic_rocket,
+                        textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp, color = MaterialTheme.colors.primary),
+                        iconTint = MaterialTheme.colors.primary
+                    )
+                    Text(
+                        text = stringResource(id = R.string.paymentdetails_status_unconfirmed_zero_bump),
+                        style = MaterialTheme.typography.caption.copy(fontSize = 14.sp)
+                    )
+                }
+            } else {
+                FilledButton(
+                    text = when (minDepth) {
+                        null -> stringResource(R.string.paymentdetails_status_unconfirmed_default, conf)
+                        else -> stringResource(R.string.paymentdetails_status_unconfirmed_with_depth, conf, minDepth)
+                    },
+                    icon = R.drawable.ic_chain,
+                    onClick = { openLink(context, txUrl) },
+                    backgroundColor = Color.Transparent,
+                    padding = PaddingValues(8.dp),
+                    textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp),
+                    iconTint = MaterialTheme.colors.primary,
+                    space = 6.dp,
+                )
+            }
+
             if (conf == 0 && showBumpTxDialog) {
                 BumpTransactionDialog(channelId = channelId, onSuccess = onCpfpSuccess, onDismiss = { showBumpTxDialog = false })
             }
@@ -563,7 +588,7 @@ private fun BumpTransactionDialog(
 ) {
     Dialog(
         onDismiss = onDismiss,
-        title = "Accelerate my transactions",
+        title = stringResource(id = R.string.cpfp_title),
         buttons = null,
     ) {
         CpfpView(channelId = channelId, onSuccess = onSuccess)

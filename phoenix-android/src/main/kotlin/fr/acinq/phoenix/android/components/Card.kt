@@ -43,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
@@ -59,6 +60,7 @@ fun Card(
     withBorder: Boolean = false,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    backgroundColor: Color = MaterialTheme.colors.surface,
     maxWidth: Dp = 500.dp,
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
@@ -82,7 +84,7 @@ fun Card(
                     Modifier
                 }
             )
-            .background(MaterialTheme.colors.surface)
+            .background(backgroundColor)
             .padding(internalPadding),
         horizontalAlignment = horizontalAlignment,
         verticalArrangement = verticalArrangement

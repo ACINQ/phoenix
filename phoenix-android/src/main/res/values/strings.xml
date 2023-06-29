@@ -448,6 +448,8 @@
 
     <string name="paymentdetails_status_unconfirmed">Waiting for confirmations</string>
     <string name="paymentdetails_status_unconfirmed_fetching">Fetching status…</string>
+    <string name="paymentdetails_status_unconfirmed_zero">0 confirmation</string>
+    <string name="paymentdetails_status_unconfirmed_zero_bump">Tap to accelerate</string>
     <string name="paymentdetails_status_unconfirmed_default">%1$d confirmation(s)</string>
     <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d confirmation(s)</string>
     <string name="paymentdetails_status_confirmed">Confirmed on-chain</string>
@@ -920,6 +922,7 @@
 
     <!-- CPFP splices -->
 
+    <string name="cpfp_title">Accelerate my transactions.</string>
     <string name="cpfp_instructions">You can make all your unconfirmed transactions use a higher effective feerate to encourage miners to favour your payments.</string>
     <string name="cpfp_feerate_label">Feerate</string>
     <string name="cpfp_feerate_value">%1$s sat/vbyte</string>
