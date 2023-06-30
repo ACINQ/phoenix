@@ -13,6 +13,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.io.PaymentReceived
@@ -220,7 +221,7 @@ class NodeService : Service() {
         val electrumServer = UserPrefs.getElectrumServer(applicationContext).first()
         val isTorEnabled = UserPrefs.getIsTorEnabled(applicationContext).first()
         val liquidityPolicy = UserPrefs.getLiquidityPolicy(applicationContext).first()
-        val isMigrationFromAndroidLegacyApp = PrefsDatastore.getLegacyMigrationPeerFlag(applicationContext).first() ?: false
+        val trustedSwapInTxs = PrefsDatastore.getMigrationTrustedSwapInTxs(applicationContext).first()
         val preferredFiatCurrency = UserPrefs.getFiatCurrency(applicationContext).first()
         val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(decryptedPayload))
 
@@ -234,7 +235,7 @@ class NodeService : Service() {
                 requestCheckLegacyChannels = requestCheckLegacyChannels,
                 isTorEnabled = isTorEnabled,
                 liquidityPolicy = liquidityPolicy,
-                isMigrationFromAndroidLegacyApp = isMigrationFromAndroidLegacyApp
+                trustedSwapInTxs = trustedSwapInTxs.map { ByteVector32.fromValidHex(it) }.toSet()
             )
         )
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
@@ -251,10 +252,6 @@ class NodeService : Service() {
             }
         }
         ChannelsWatcher.schedule(applicationContext)
-        // update migration flag to false, if necessary - only used once.
-        if (isMigrationFromAndroidLegacyApp) {
-            PrefsDatastore.saveLegacyMigrationPeerFlag(applicationContext, false)
-        }
         return WalletState.Started.Kmm(business)
     }
 

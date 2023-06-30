@@ -43,6 +43,7 @@ import kotlinx.coroutines.launch
 import org.bouncycastle.util.encoders.Hex
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import scala.collection.JavaConverters
 import scala.util.Either
 import scala.util.Left
 import scodec.bits.ByteVector
@@ -237,6 +238,7 @@ class MigrationDialogViewModel : ViewModel() {
           // wait for the closing transaction to be published for each channel
           // the verification is done every 3 seconds
           val channelsPublicationStatusMap = channelsClosed.associateWith { false }.toMutableMap()
+          val mutualClosePublishedTxs = mutableSetOf<String>()
           while (channelsPublicationStatusMap.any { !it.value }) {
             val notClosedChannels = channelsPublicationStatusMap.filter { !it.value }.keys
             log.info("(migration) checking mutual-close-publish status for ${notClosedChannels.size} channels...")
@@ -248,6 +250,10 @@ class MigrationDialogViewModel : ViewModel() {
                   log.debug("(migration) could not get publication status for channel=$it")
                 }
                 data is DATA_CLOSING && !data.mutualClosePublished().isEmpty -> {
+                  val mutualCloseTxs = JavaConverters.asJavaCollectionConverter(data.mutualClosePublished()).asJavaCollection().map {
+                    it.txid().toString()
+                  }
+                  mutualClosePublishedTxs.addAll(mutualCloseTxs)
                   log.info("(migration) mutual-close published for channel=$it")
                   channelsPublicationStatusMap[it] = true
                   state.value = MigrationScreenState.Processing.MonitoringChannelsPublication(swapInAddress, channelsClosed, channelsPublicationStatusMap.filter { it.value }.keys)
@@ -262,7 +268,7 @@ class MigrationDialogViewModel : ViewModel() {
           }
 
           // migration is successful, update state
-          log.info("(migration) ${channelsPublicationStatusMap.size} channels have been closed to $swapInAddress")
+          log.info("(migration) ${channelsPublicationStatusMap.size} channels have been closed to $swapInAddress, txs=${mutualClosePublishedTxs}")
           state.value = MigrationScreenState.Complete(swapInAddress, channelsPublicationStatusMap.keys)
 
           // pause then update preferences to switch to the new app
@@ -275,7 +281,7 @@ class MigrationDialogViewModel : ViewModel() {
               address = swapInAddress
             )
           )
-          PrefsDatastore.saveLegacyMigrationPeerFlag(context, true)
+          PrefsDatastore.saveMigrationTrustedSwapInTxs(context, mutualClosePublishedTxs)
           PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.NotRequired)
         }
       }

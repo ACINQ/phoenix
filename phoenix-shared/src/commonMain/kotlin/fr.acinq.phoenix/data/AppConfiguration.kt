@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.data
 
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.ServerAddress
@@ -201,7 +202,7 @@ sealed class ElectrumConfig {
         return when (this) {
             is Custom -> {
                 when (other) {
-                    is Custom -> this == other // custom =?= custom
+                    is Custom -> this === other // custom =?= custom
                     is Random -> false         // custom != random
                 }
             }
@@ -222,8 +223,8 @@ data class StartupParams(
     val isTorEnabled: Boolean,
     /** The liquidity policy must be injected into the node params manager. */
     val liquidityPolicy: LiquidityPolicy,
-    /** Should always be false for iOS. If true, the peer is initialized with a special flag used in the swap-in process. */
-    val isMigrationFromAndroidLegacyApp: Boolean = false,
+    /** List of transaction ids that can be used for swap-in even if they are zero-conf. */
+    val trustedSwapInTxs: Set<ByteVector32>,
     // TODO: add custom electrum address, fiat currencies, ...
 )
 

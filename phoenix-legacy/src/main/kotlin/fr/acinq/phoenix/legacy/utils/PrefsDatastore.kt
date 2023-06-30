@@ -70,11 +70,11 @@ object PrefsDatastore {
     it[DATA_MIGRATION_EXPECTED] = isExpected
   }
 
-  /** Used to know whether the peer has already been started with the `isMigrationFromLegacyApp` flag. */
-  private val LEGACY_MIGRATION_PEER_FLAG = booleanPreferencesKey("LEGACY_MIGRATION_PEER_FLAG")
-  fun getLegacyMigrationPeerFlag(context: Context): Flow<Boolean?> = prefs(context).map { it[LEGACY_MIGRATION_PEER_FLAG] }
-  suspend fun saveLegacyMigrationPeerFlag(context: Context, flag: Boolean) = context.internalData.edit {
-    it[LEGACY_MIGRATION_PEER_FLAG] = flag
+  /** List of transaction ids that can be used for swap-in, even if zero conf. Used for migration. */
+  private val MIGRATION_TRUSTED_SWAP_IN_TXS = stringSetPreferencesKey("MIGRATION_TRUSTED_SWAP_IN_TXS")
+  fun getMigrationTrustedSwapInTxs(context: Context): Flow<Set<String>> = prefs(context).map { it[MIGRATION_TRUSTED_SWAP_IN_TXS] ?: emptySet() }
+  suspend fun saveMigrationTrustedSwapInTxs(context: Context, txs: Set<String>) = context.internalData.edit {
+    it[MIGRATION_TRUSTED_SWAP_IN_TXS] = txs
   }
 }
 

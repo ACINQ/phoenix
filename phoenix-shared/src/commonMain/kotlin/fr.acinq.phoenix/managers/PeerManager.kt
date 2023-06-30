@@ -110,7 +110,7 @@ class PeerManager(
                 walletParams = walletParams,
                 watcher = electrumWatcher,
                 db = databaseManager.databases.filterNotNull().first(),
-                isMigrationFromLegacyApp = startupParams.isMigrationFromAndroidLegacyApp,
+                trustedSwapInTxs = startupParams.trustedSwapInTxs,
                 socketBuilder = null,
                 scope = MainScope()
             )
