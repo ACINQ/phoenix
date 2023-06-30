@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.UUID
@@ -34,22 +35,24 @@ sealed class Notification {
         abstract val source: LiquidityEvents.Source
     }
 
-    data class FeeTooExpensive(
+    data class OverAbsoluteFee(
         override val id: UUID,
         override val createdAt: Long,
         override val readAt: Long?,
         override val amount: MilliSatoshi,
+        val fee: MilliSatoshi,
         override val source: LiquidityEvents.Source,
-        val expectedFee: MilliSatoshi,
-        val maxAllowedFee: MilliSatoshi,
+        val maxAbsoluteFee: Satoshi,
     ) : PaymentRejected()
 
-    data class RejectedManually(
+    data class OverRelativeFee(
         override val id: UUID,
         override val createdAt: Long,
         override val readAt: Long?,
         override val amount: MilliSatoshi,
-        override val source: LiquidityEvents.Source
+        val fee: MilliSatoshi,
+        override val source: LiquidityEvents.Source,
+        val maxRelativeFeeBasisPoints: Int,
     ) : PaymentRejected()
 
     data class FeePolicyDisabled(

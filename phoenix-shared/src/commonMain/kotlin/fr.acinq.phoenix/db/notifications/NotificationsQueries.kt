@@ -85,28 +85,30 @@ internal class NotificationsQueries(val database: AppDatabase) {
             read_at: Long?,
         ): Notification? {
             return when (val data = NotificationData.deserialize(type_version, data_json)) {
-                is NotificationData.PaymentRejected.TooExpensive.V0 -> {
-                    Notification.FeeTooExpensive(
+                is NotificationData.PaymentRejected.OverAbsoluteFee.V0 -> {
+                    Notification.OverAbsoluteFee(
                         id = UUID.fromString(id),
                         createdAt = created_at,
                         readAt = read_at,
                         amount = data.amount,
                         source = data.source,
-                        expectedFee = data.expectedFee,
-                        maxAllowedFee = data.maxAllowedFee
+                        fee = data.fee,
+                        maxAbsoluteFee = data.maxAbsoluteFee
+                    )
+                }
+                is NotificationData.PaymentRejected.OverRelativeFee.V0 -> {
+                    Notification.OverRelativeFee(
+                        id = UUID.fromString(id),
+                        createdAt = created_at,
+                        readAt = read_at,
+                        amount = data.amount,
+                        source = data.source,
+                        fee = data.fee,
+                        maxRelativeFeeBasisPoints = data.maxRelativeFeeBasisPoints
                     )
                 }
                 is NotificationData.PaymentRejected.Disabled.V0 -> {
                     Notification.FeePolicyDisabled(
-                        id = UUID.fromString(id),
-                        createdAt = created_at,
-                        readAt = read_at,
-                        amount = data.amount,
-                        source = data.source,
-                    )
-                }
-                is NotificationData.PaymentRejected.ByUser.V0 -> {
-                    Notification.RejectedManually(
                         id = UUID.fromString(id),
                         createdAt = created_at,
                         readAt = read_at,

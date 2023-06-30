@@ -66,27 +66,29 @@ class NotificationsManager(
     }
 
     internal suspend fun saveLiquidityEventNotification(event: LiquidityEvents) {
-        log.debug { "persisting to db liquidity_event=$event" }
+        log.debug { "persisting liquidity_event=$event" }
         when (event) {
             is LiquidityEvents.Rejected -> {
                 val notification = when (val reason = event.reason) {
-                    is LiquidityEvents.Rejected.Reason.TooExpensive -> Notification.FeeTooExpensive(
+                    is LiquidityEvents.Rejected.Reason.TooExpensive.OverAbsoluteFee -> Notification.OverAbsoluteFee(
                         id = UUID.randomUUID(),
                         createdAt = currentTimestampMillis(),
                         readAt = null,
                         amount = event.amount,
+                        fee = event.fee,
                         source = event.source,
-                        expectedFee = reason.actual,
-                        maxAllowedFee = reason.maxAllowed
+                        maxAbsoluteFee = reason.maxAbsoluteFee
+                    )
+                    is LiquidityEvents.Rejected.Reason.TooExpensive.OverRelativeFee -> Notification.OverRelativeFee(
+                        id = UUID.randomUUID(),
+                        createdAt = currentTimestampMillis(),
+                        readAt = null,
+                        amount = event.amount,
+                        fee = event.fee,
+                        source = event.source,
+                        maxRelativeFeeBasisPoints = reason.maxRelativeFeeBasisPoints
                     )
                     is LiquidityEvents.Rejected.Reason.PolicySetToDisabled -> Notification.FeePolicyDisabled(
-                        id = UUID.randomUUID(),
-                        createdAt = currentTimestampMillis(),
-                        readAt = null,
-                        amount = event.amount,
-                        source = event.source,
-                    )
-                    is LiquidityEvents.Rejected.Reason.RejectedByUser -> Notification.RejectedManually(
                         id = UUID.randomUUID(),
                         createdAt = currentTimestampMillis(),
                         readAt = null,
