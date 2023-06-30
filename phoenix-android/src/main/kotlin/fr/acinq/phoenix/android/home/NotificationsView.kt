@@ -208,24 +208,28 @@ private fun PaymentNotification(
                 title = stringResource(id = if (notification.source == LiquidityEvents.Source.OnChainWallet) R.string.inappnotif_payment_onchain_pending_title else R.string.inappnotif_payment_rejected_title,
                     notification.amount.toPrettyString(btcUnit, withUnit = true)),
                 body = when (notification) {
-                    is Notification.RejectedManually -> stringResource(id = R.string.inappnotif_payment_rejected_by_user)
                     is Notification.FeePolicyDisabled -> stringResource(id = R.string.inappnotif_payment_rejected_disabled)
-                    is Notification.FeeTooExpensive -> stringResource(
-                        id = R.string.inappnotif_payment_rejected_too_expensive,
-                        notification.expectedFee.toPrettyString(btcUnit, withUnit = true),
-                        notification.maxAllowedFee.toPrettyString(btcUnit, withUnit = true),
+                    is Notification.OverAbsoluteFee -> stringResource(
+                        id = R.string.inappnotif_payment_rejected_over_absolute,
+                        notification.fee.toPrettyString(btcUnit, withUnit = true),
+                        notification.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true),
+                    )
+                    is Notification.OverRelativeFee -> stringResource(
+                        id = R.string.inappnotif_payment_rejected_over_relative,
+                        notification.fee.toPrettyString(btcUnit, withUnit = true),
+                        String.format("%.2f", (notification.maxRelativeFeeBasisPoints.toDouble() / 100)),
                     )
                     is Notification.ChannelsInitializing -> stringResource(id = R.string.inappnotif_payment_rejected_channel_initializing)
                 },
                 bottomText = when (notification) {
                     is Notification.ChannelsInitializing -> stringResource(id = R.string.inappnotif_payment_rejected_tweak_setting)
-                    is Notification.FeeTooExpensive, is Notification.FeePolicyDisabled -> stringResource(id = R.string.inappnotif_payment_rejected_tweak_setting)
+                    is Notification.OverAbsoluteFee, is Notification.OverRelativeFee, is Notification.FeePolicyDisabled -> stringResource(id = R.string.inappnotif_payment_rejected_tweak_setting)
                     else -> null
                 },
                 timestamp = notification.createdAt,
                 onRead = { onNotificationRead(notification.id) },
                 extraActionClick = when (notification) {
-                    is Notification.FeePolicyDisabled, is Notification.FeeTooExpensive -> {
+                    is Notification.FeePolicyDisabled, is Notification.OverAbsoluteFee, is Notification.OverRelativeFee -> {
                         if (notification.source == LiquidityEvents.Source.OnChainWallet) {
                             { nc?.navigate(Screen.WalletInfo.SwapInWallet.route) }
                         } else {

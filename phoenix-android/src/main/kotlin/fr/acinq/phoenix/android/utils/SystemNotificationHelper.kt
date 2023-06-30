@@ -28,6 +28,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.BuildConfig
@@ -129,14 +130,26 @@ object SystemNotificationHelper {
         )
     }
 
-    fun notifyPaymentRejectedTooExpensive(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, maxAllowed: MilliSatoshi, actual: MilliSatoshi): Notification {
+    fun notifyPaymentRejectedOverAbsolute(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, fee: MilliSatoshi, absoluteMax: Satoshi): Notification {
         return notifyPaymentFailed(
             context = context,
             title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
                 amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
-            message = context.getString(R.string.notif_rejected_policy_too_expensive,
-                actual.toPrettyString(BitcoinUnit.Sat, withUnit = true),
-                maxAllowed.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
+            message = context.getString(R.string.notif_rejected_over_absolute,
+                fee.toPrettyString(BitcoinUnit.Sat, withUnit = true),
+                absoluteMax.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
+        )
+    }
+
+    fun notifyPaymentRejectedOverRelative(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, fee: MilliSatoshi, percentMax: Int): Notification {
+        return notifyPaymentFailed(
+            context = context,
+            title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
+                amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
+            message = context.getString(R.string.notif_rejected_over_relative,
+                fee.toPrettyString(BitcoinUnit.Sat, withUnit = true),
+                String.format("%.2f", (percentMax.toDouble() / 100))
+            ),
         )
     }
 

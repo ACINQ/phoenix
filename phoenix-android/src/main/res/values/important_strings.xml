@@ -37,7 +37,8 @@
     <string name="notif_rejected_payment_title">Rejected incoming payment (+%1$s)</string>
     <string name="notif_rejected_by_user">You have rejected the payment</string>
     <string name="notif_rejected_policy_disabled">Automated channels management is disabled. You can change that in the settings.</string>
-    <string name="notif_rejected_policy_too_expensive">The fee was %1$s, but your max fee was set to %2$s. You can tweak that in the settings.</string>
+    <string name="notif_rejected_over_absolute">The fee was %1$s, but your max fee was set to %2$s. You can tweak that in the settings.</string>
+    <string name="notif_rejected_over_relative">The fee was %1$s which is more than %2$s%% of the amount received. You can tweak that in the settings.</string>
     <string name="notif_rejected_channels_initializing">Your channels were initializing and could not accept that payment. Try again later.</string>
 
     <string name="notif_watcher_revoked_commit_title">Please start Phoenix</string>
@@ -127,9 +128,9 @@
 
     <string name="inappnotif_payment_onchain_pending_title">On-chain funds pending (+%1$s)</string>
     <string name="inappnotif_payment_rejected_title">Payment rejected (+%1$s)</string>
-    <string name="inappnotif_payment_rejected_by_user">You rejected that payment manually.</string>
     <string name="inappnotif_payment_rejected_disabled">Automated channel management is disabled.</string>
-    <string name="inappnotif_payment_rejected_too_expensive">The fee was %1$s, but your max fee was set to %2$s.</string>
+    <string name="inappnotif_payment_rejected_over_absolute">The fee was %1$s, but your max fee was set to %2$s.</string>
+    <string name="inappnotif_payment_rejected_over_relative">The fee was %1$s which is more than %2$s%% of the amount.</string>
     <string name="inappnotif_payment_rejected_channel_initializing">Your channels are still initializing and could not receive that payment.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Tap to configure.</string>
 
