@@ -225,11 +225,12 @@ private fun PaymentNotification(
                 timestamp = notification.createdAt,
                 onRead = { onNotificationRead(notification.id) },
                 extraActionClick = when (notification) {
-                    is Notification.FeePolicyDisabled -> {
-                        { nc?.navigate(Screen.LiquidityPolicy.route) }
-                    }
-                    is Notification.FeeTooExpensive -> {
-                        { nc?.navigate(Screen.LiquidityPolicy.route) }
+                    is Notification.FeePolicyDisabled, is Notification.FeeTooExpensive -> {
+                        if (notification.source == LiquidityEvents.Source.OnChainWallet) {
+                            { nc?.navigate(Screen.WalletInfo.SwapInWallet.route) }
+                        } else {
+                            { nc?.navigate(Screen.LiquidityPolicy.route) }
+                        }
                     }
                     else -> null
                 }
@@ -314,16 +315,20 @@ private fun DimissibleNotification(
             internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
             onClick = extraActionClick
         ) {
-            Row {
-                Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = timestamp.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
-            }
+            Text(text = title, style = MaterialTheme.typography.body2)
             Spacer(modifier = Modifier.height(3.dp))
             Text(text = body, style = MaterialTheme.typography.body1.copy(fontSize = 15.sp))
-            bottomText?.let {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = it, style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
+            Spacer(modifier = Modifier.height(8.dp))
+            Row {
+                bottomText?.let {
+                    Text(text = it, style = MaterialTheme.typography.caption.copy(fontSize = 14.sp), modifier = Modifier.alignByBaseline())
+                }
+                Spacer(modifier = Modifier.weight(1f).widthIn(min = 8.dp))
+                Text(
+                    text = timestamp.toRelativeDateString(),
+                    style = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
+                    modifier = Modifier.alignByBaseline(),
+                )
             }
         }
     }

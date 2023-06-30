@@ -366,7 +366,7 @@
 
     <string name="inappnotif_title">Notifications</string>
     <string name="inappnotif_notices_title">Important messages</string>
-    <string name="inappnotif_payments_title">Recent payment failures</string>
+    <string name="inappnotif_payments_title">Recent activity</string>
 
     <string name="inappnotif_backup_seed_message">Backup your wallet so that you don\'t lose your bitcoins.</string>
     <string name="inappnotif_backup_seed_action">Backup my wallet</string>
@@ -390,7 +390,7 @@
     <string name="inappnotif_payment_rejected_disabled">Automated channel management is disabled.</string>
     <string name="inappnotif_payment_rejected_too_expensive">The fee was %1$s, but your max fee was set to %2$s.</string>
     <string name="inappnotif_payment_rejected_channel_initializing">Your channels are still initializing and could not receive that payment.</string>
-    <string name="inappnotif_payment_rejected_tweak_setting">Tap here to tweak your settings.</string>
+    <string name="inappnotif_payment_rejected_tweak_setting">Tap to configure.</string>
     <string name="inappnotif_payment_rejected_try_again">Try again later.</string>
 
     <string name="inappnotif_watchtower_unknown_title">Watchtower unable to complete</string>
