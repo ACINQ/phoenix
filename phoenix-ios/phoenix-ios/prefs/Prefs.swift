@@ -93,14 +93,14 @@ class Prefs {
 	lazy private(set) var liquidityPolicyPublisher: AnyPublisher<LiquidityPolicy, Never> = {
 		defaults.publisher(for: \.liquidityPolicy, options: [.initial, .new])
 			.map({ (data: Data?) -> LiquidityPolicy in
-				data?.jsonDecode() ?? LiquidityPolicy.emptyPolicy()
+				data?.jsonDecode() ?? LiquidityPolicy.defaultPolicy()
 			})
 			.removeDuplicates()
 			.eraseToAnyPublisher()
 	}()
 	
 	var liquidityPolicy: LiquidityPolicy {
-		get { defaults.liquidityPolicy?.jsonDecode() ?? LiquidityPolicy.emptyPolicy() }
+		get { defaults.liquidityPolicy?.jsonDecode() ?? LiquidityPolicy.defaultPolicy() }
 		set { defaults.liquidityPolicy = newValue.jsonEncode() }
 	}
 	

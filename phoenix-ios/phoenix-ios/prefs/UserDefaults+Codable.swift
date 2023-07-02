@@ -91,13 +91,18 @@ struct ElectrumConfigPrefs: Equatable, Codable {
 }
 
 struct LiquidityPolicy: Equatable, Codable {
+	
+	let enabled: Bool
 	let maxFeeSats: Int64?
 	let maxFeeBasisPoints: Int32?
+	let skipAbsoluteFeeCheck: Bool?
 	
-	static func emptyPolicy() -> LiquidityPolicy {
+	static func defaultPolicy() -> LiquidityPolicy {
 		return LiquidityPolicy(
-			maxFeeSats: nil,
-			maxFeeBasisPoints: nil
+			enabled: true,
+			maxFeeSats: nil,          // use default value defined in phoenix-shared
+			maxFeeBasisPoints: nil,   // use default value defined in phoenix-shared
+			skipAbsoluteFeeCheck: nil // use default value defined in phoenix-shared
 		)
 	}
 	
@@ -109,16 +114,24 @@ struct LiquidityPolicy: Equatable, Codable {
 		return maxFeeBasisPoints ?? NodeParamsManager.companion.defaultLiquidityPolicy.maxRelativeFeeBasisPoints
 	}
 	
+	var effectiveSkipAbsoluteFeeCheck: Bool {
+		return skipAbsoluteFeeCheck ?? NodeParamsManager.companion.defaultLiquidityPolicy.skipAbsoluteFeeCheck
+	}
+	
 	func toKotlin() -> Lightning_kmpLiquidityPolicy {
 		
-		let sats = effectiveMaxFeeSats
-		let basisPoints = effectiveMaxFeeBasisPoints
-		
-		return Lightning_kmpLiquidityPolicy.Auto(
-			maxAbsoluteFee: Bitcoin_kmpSatoshi(sat: sats),
-			maxRelativeFeeBasisPoints: basisPoints,
-			skipAbsoluteFeeCheck: false
-		)
+		if enabled {
+			
+			return Lightning_kmpLiquidityPolicy.Auto(
+				maxAbsoluteFee: Bitcoin_kmpSatoshi(sat: effectiveMaxFeeSats),
+				maxRelativeFeeBasisPoints: effectiveMaxFeeBasisPoints,
+				skipAbsoluteFeeCheck: effectiveSkipAbsoluteFeeCheck
+			)
+			
+		} else {
+			
+			return Lightning_kmpLiquidityPolicy.Disable()
+		}
 	}
 }
 

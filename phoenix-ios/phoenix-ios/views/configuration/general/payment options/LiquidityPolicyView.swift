@@ -13,21 +13,44 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct LiquidityPolicyView: View {
 	
+	@State var isEnabled: Bool
+	
 	@State var maxFeeAmt: String
 	@State var parsedMaxFeeAmt: Result<NSNumber, TextFieldNumberStylerError>
 	
 	@State var maxFeePrcnt: String
 	@State var parsedMaxFeePrcnt: Result<NSNumber, TextFieldNumberStylerError>
 	
-	@State var mode_automatic: Bool = true
-	@State var mode_manual: Bool = false
-	
+	@State var showAdvanced = false
 	@State var showHelpSheet = false
+	
+	let examplePayments: [Int64] = [2_000, 8_000, 20_000, 50_000]
+	@State var examplePaymentsIdx = 1
+	
+	@State var lightningOverride = false
+	
+	enum MaxFeeAmtFiatHeight: Preference {}
+	let maxFeeAmtFiatHeightReader = GeometryPreferenceReader(
+		key: AppendValue<MaxFeeAmtFiatHeight>.self,
+		value: { [$0.size.height] }
+	)
+	@State var maxFeeAmtFiatHeight: CGFloat? = nil
+	
+	enum ExampleHeight: Preference {}
+	let exampleHeightReader = GeometryPreferenceReader(
+		key: AppendValue<ExampleHeight>.self,
+		value: { [$0.size.height] }
+	)
+	@State var exampleHeight: CGFloat? = nil
+	
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	init() {
 		
 		let defaultLp = NodeParamsManager.companion.defaultLiquidityPolicy
 		let userLp = Prefs.shared.liquidityPolicy
+		
+		isEnabled = true
 		
 		let sats = userLp.maxFeeSats ?? defaultLp.maxAbsoluteFee.sat
 		maxFeeAmt = LiquidityPolicyView.formattedMaxFeeAmt(sat: sats)
@@ -47,7 +70,7 @@ struct LiquidityPolicyView: View {
 	var body: some View {
 		
 		content()
-			.navigationTitle(NSLocalizedString("Miner Fee Policy", comment: "Navigation Bar Title"))
+			.navigationTitle(NSLocalizedString("Channel management", comment: "Navigation Bar Title"))
 			.navigationBarTitleDisplayMode(.inline)
 	}
 	
@@ -56,8 +79,15 @@ struct LiquidityPolicyView: View {
 		
 		List {
 			section_explanation()
-			section_fees()
-			section_mode()
+			section_general()
+			if isEnabled {
+				if showAdvanced {
+					section_percentageCheck()
+					section_policyOverride()
+				} else {
+					section_showAdvancedButton()
+				}
+			}
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
@@ -79,6 +109,10 @@ struct LiquidityPolicyView: View {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: View Builders: Sections
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	func section_explanation() -> some View {
 		
@@ -88,8 +122,6 @@ struct LiquidityPolicyView: View {
 				"""
 				Incoming payments sometimes require on-chain transactions. \
 				This does not always happen, only when needed.
-				
-				All fees go to **bitcoin miners**.
 				""",
 				comment: "liquidity policy screen"
 			))
@@ -97,165 +129,437 @@ struct LiquidityPolicyView: View {
 	}
 	
 	@ViewBuilder
-	func section_fees() -> some View {
+	func section_general() -> some View {
 		
 		Section {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
-				subsection_maxFeeAmount()
-				subsection_maxFeePercent()
+				subsection_enabled()
+				if isEnabled {
+					subsection_maxFeeAmount()
+				}
 			}
 			
 		} /* Section.*/header: {
 			
-			Text("Fees")
+			Text("General")
 		}
+	}
+	
+	@ViewBuilder
+	func section_showAdvancedButton() -> some View {
+		
+		Section {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Spacer(minLength: 0)
+				
+				Button {
+					showAdvanced = true
+				} label: {
+					HStack {
+						Image(systemName: "list.bullet.clipboard")
+							.imageScale(.medium)
+						Text("Show advanced options")
+							.font(.headline)
+					}
+				}
+				.padding(.vertical, 5)
+				
+				Spacer(minLength: 0)
+			} // </HStack>
+		} // </Section>
+	}
+	
+	@ViewBuilder
+	func section_percentageCheck() -> some View {
+		
+		Section {
+			subsection_maxFeePercent()
+			
+		} /* Section.*/header: {
+			
+			Text("Percentage Check")
+		}
+	}
+
+	@ViewBuilder
+	func section_policyOverride() -> some View {
+		
+		Section {
+			subsection_skipFeeCheck()
+			
+		} /* Section.*/header: {
+			
+			Text("Policy Override")
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Builders: SubSections
+	// --------------------------------------------------
+	
+	@ViewBuilder
+	func subsection_enabled() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
+			Toggle(isOn: $isEnabled) {
+				Text("Automated channel management")
+			}
+			
+			if !isEnabled {
+				Text("Incoming payments that require on-chain operations will be rejected.")
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+					.padding(.top, 16)
+			}
+			
+		} // </VStack>
 	}
 	
 	@ViewBuilder
 	func subsection_maxFeeAmount() -> some View {
 		
-		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-			Text("Max fee amount: ")
-				.padding(.trailing, 8)
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				TextField(
-					defaultMaxFeeAmt(),
-					text: maxFeeAmtStyler().amountProxy
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+				Text("Max fee amount")
+					.padding(.trailing, 16)
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					TextField(
+						defaultMaxFeeAmountString(),
+						text: maxFeeAmtStyler().amountProxy
+					)
+					.keyboardType(.numberPad)
+					
+					Text("sat")
+						.padding(.leading, 4)
+						.padding(.trailing, 8)
+					
+					// Clear button
+					Button {
+						clearMaxFeeAmt()
+					} label: {
+						Image(systemName: "multiply.circle.fill")
+							.foregroundColor(
+								maxFeeAmt.isEmpty ? Color(UIColor.quaternaryLabel) : Color(UIColor.tertiaryLabel)
+							)
+					}
+					.buttonStyle(BorderlessButtonStyle()) // prevents trigger when row tapped
+					.disabled(maxFeeAmt.isEmpty)
+					
+				} // </HStack>
+				.padding(.horizontal, 8)
+				.padding(.top, 8)
+				.padding(.bottom, 8.0 + ((maxFeeAmtFiatHeight ?? 12.0) / 2.0))
+				.background(
+					RoundedRectangle(cornerRadius: 8)
+						.stroke(maxFeeAmountHasError() ? Color.appNegative : Color.textFieldBorder, lineWidth: 1)
 				)
-				.keyboardType(.numberPad)
-				
-				Text("sat")
-					.padding(.leading, 4)
-					.padding(.trailing, 8)
-				
-				// Clear button
-				Button {
-					clearMaxFeeAmt()
-				} label: {
-					Image(systemName: "multiply.circle.fill")
-						.foregroundColor(maxFeeAmt.isEmpty ? Color(UIColor.quaternaryLabel) : .secondary)
-				}
-				.buttonStyle(BorderlessButtonStyle()) // prevents trigger when row tapped
-				.disabled(maxFeeAmt.isEmpty)
+				.padding(.bottom, ((maxFeeAmtFiatHeight ?? 12.0) / 2.0))
+				.overlay {
+					VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+						Spacer(minLength: 0)
+						HStack(alignment: VerticalAlignment.bottom, spacing: 0) {
+							Text(verbatim: "≈ \(maxFeeAmountFiat().string)")
+								.font(.footnote)
+								.foregroundColor(.secondary)
+								.padding(.horizontal, 4)
+								.background(Color(UIColor.secondarySystemGroupedBackground))
+								.padding(.leading, 8)
+								.read(maxFeeAmtFiatHeightReader)
+							Spacer(minLength: 0)
+						} // </HStack>
+					} // </VStack>
+				} // </overlay>
 				
 			} // </HStack>
-			.padding(.all, 8)
-			.overlay(
-				RoundedRectangle(cornerRadius: 8)
-					.stroke(maxFeeAmtHasError() ? Color.appNegative : Color.textFieldBorder, lineWidth: 1)
-			)
 			
-		} // </HStack>
+			Text("Incoming payments whose fees exceed this value will be rejected.")
+				.font(.subheadline)
+				.foregroundColor(.secondary)
+				.padding(.top, 12)
+			
+		} // </VStack>
+		.padding(.top, 20)
+		.assignMaxPreference(for: maxFeeAmtFiatHeightReader.key, to: $maxFeeAmtFiatHeight)
 	}
 	
 	@ViewBuilder
 	func subsection_maxFeePercent() -> some View {
 		
-		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-			Text("Max fee percent: ")
-				.padding(.trailing, 8)
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				TextField(
-					defaultMaxFeePrcnt(),
-					text: maxFeePrcntStyler().amountProxy
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+				Text("Max fee percent")
+					.padding(.trailing, 16)
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					TextField(
+						defaultMaxFeePercentString(),
+						text: maxFeePrcntStyler().amountProxy
+					)
+					.keyboardType(.numberPad)
+					
+					Text("%")
+						.padding(.leading, 4)
+						.padding(.trailing, 8)
+					
+					// Clear button
+					Button {
+						clearMaxFeePrcnt()
+					} label: {
+						Image(systemName: "multiply.circle.fill")
+							.foregroundColor(
+								maxFeePrcnt.isEmpty ? Color(UIColor.quaternaryLabel) : Color(UIColor.tertiaryLabel)
+							)
+					}
+					.buttonStyle(BorderlessButtonStyle()) // prevents trigger when row tapped
+					.disabled(maxFeePrcnt.isEmpty)
+					
+				} // </HStack>
+				.padding(.all, 8)
+				.overlay(
+					RoundedRectangle(cornerRadius: 8)
+						.stroke(maxFeePercentHasError() ? Color.appNegative : Color.textFieldBorder, lineWidth: 1)
 				)
-				.keyboardType(.numberPad)
-				
-				Text("%")
-					.padding(.leading, 4)
-					.padding(.trailing, 8)
-				
-				// Clear button
-				Button {
-					clearMaxFeePrcnt()
-				} label: {
-					Image(systemName: "multiply.circle.fill")
-						.foregroundColor(maxFeePrcnt.isEmpty ? Color(UIColor.quaternaryLabel) : .secondary)
-				}
-				.buttonStyle(BorderlessButtonStyle()) // prevents trigger when row tapped
-				.disabled(maxFeePrcnt.isEmpty)
 				
 			} // </HStack>
-			.padding(.all, 8)
-			.overlay(
-				RoundedRectangle(cornerRadius: 8)
-					.stroke(maxFeePrcntHasError() ? Color.appNegative : Color.textFieldBorder, lineWidth: 1)
+			
+			Text(
+				"""
+				Checks the fee relative to the incoming payment amount. \
+				This is helpful for small payments.
+				"""
 			)
+			.font(.subheadline)
+			.foregroundColor(.secondary)
+			.padding(.top, 12)
 			
-		} // </HStack>
+			subsection_example()
+				.padding(.top, 36)
+			
+		} // </VStack>
 	}
 	
 	@ViewBuilder
-	func section_mode() -> some View {
+	func subsection_example() -> some View {
 		
-		Section {
+		// |    example payment :   10,000 sat     - + |
+		// |       max absolute :    5,000 sat         |
+		// |        max percent :    3,000 sat         |
+		// | ----------------------------------------- |
+		// |            max fee :    3,000 sat         |
+		
+		ZStack(alignment: Alignment.topTrailing) {
 			
-			Toggle(isOn: $mode_automatic) {
-				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
-					Text("Automatic")
-					Text(
-						"""
-						Incoming payments are automatically accepted as long as \
-						the fee doesn't exceed the settings above.
-						"""
-					)
-					.font(.subheadline)
+			GeometryReader { geometry in
+				
+				let column0Width: CGFloat = geometry.size.width / 4.0 * 2.0
+				let column1Width: CGFloat = geometry.size.width / 4.0 * 1.25
+				let column2Width: CGFloat = geometry.size.width / 4.0 * 0.75
+				
+				let columns: [GridItem] = [
+					GridItem(.fixed(column0Width), spacing: 0, alignment: .trailing),
+					GridItem(.fixed(column1Width), spacing: 0, alignment: .trailing),
+					GridItem(.fixed(column2Width), spacing: 0, alignment: .leading)
+				]
+				
+				VStack(alignment: HorizontalAlignment.center, spacing: 8) {
+					
+					LazyVGrid(columns: columns, spacing: 8) {
+						
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("example payment")
+								.multilineTextAlignment(.trailing)
+							Text(verbatim: " : ")
+						}
+						Text(examplePaymentAmountString())
+						Text(verbatim: " ")
+						
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("max absolute")
+								.multilineTextAlignment(.trailing)
+							Text(verbatim: " : ")
+						}
+						Text(exampleMaxAbsoluteString())
+						Text(verbatim: " ")
+						
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("max percent")
+								.multilineTextAlignment(.trailing)
+							Text(verbatim: " : ")
+						}
+						Text(exampleMaxPercentString())
+						Text(verbatim: " ")
+					
+					} // </LazyVGrid>
+					.font(.footnote)
 					.foregroundColor(.secondary)
-				}
-			}
-			.toggleStyle(CheckboxToggleStyle(
-				onImage: radioOnImage(),
-				offImage: radioOffImage(),
-				action: automaticModeOptionTapped
-			))
-			
-			Toggle(isOn: $mode_manual) {
-				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
-					Text("Manual")
-					Text(
-						"""
-						Incoming ***lightning*** payments are rejected when liquidity is insufficient. \
-						You must manually manage your liquidity.
-						"""
-					)
-					.font(.subheadline)
+					
+					Divider().frame(height: 2)
+					
+					LazyVGrid(columns: columns, spacing: 8) {
+						
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("max fee")
+								.multilineTextAlignment(.trailing)
+							Text(verbatim: " : ")
+						}
+						Text(exampleMaxFeeString())
+						Text(verbatim: " ")
+						
+					} // </LazyVGrid>
+					.font(.footnote)
 					.foregroundColor(.secondary)
-				}
-			}
-			.toggleStyle(CheckboxToggleStyle(
-				onImage: radioOnImage(),
-				offImage: radioOffImage(),
-				action: manualModeOptionTapped
-			))
+					
+				} // </VStack>
+				.read(exampleHeightReader)
+				
+			} // </GeometryReader>
+			.assignMaxPreference(for: exampleHeightReader.key, to: $exampleHeight)
+			.frame(height: exampleHeight)
 			
-		} /* Section.*/header: {
-			Text("Mode")
-		}
+			HStack(alignment: VerticalAlignment.top, /*horizontal-*/spacing: 25) {
+				Button {
+					decrementExamplePaymentsIdx()
+				} label: {
+					Text(verbatim: "-")
+				}
+				.buttonStyle(.borderless) // SwiftUI workaround: see explanation below
+				.disabled(examplePaymentsIdx == 0)
+				
+				Button {
+					incrementExamplePaymentsIdx()
+				} label: {
+					Text(verbatim: "+")
+				}
+				.buttonStyle(.borderless) // SwiftUI workaround: see explanation below
+				.disabled(examplePaymentsIdx+1 == examplePayments.count)
+				
+				// Within a List, if a RowItem has a button, the default interaction is
+				// a tap within any area within the RowItem will trigger the button's action.
+				// If there are multiple buttons, then a tap anywhere within the RowItem
+				// will trigger EVERY button's action.
+				//
+				// This is obviously not what we want here.
+				// So we can override the default interaction by explicitly setting
+				// a buttonStyle.
+				
+				
+			} // </HStack>
+			.font(.headline)
+			
+		} // </ZStack>
 	}
 	
 	@ViewBuilder
-	func radioOnImage() -> some View {
-		Image(systemName: "record.circle")
-			.imageScale(.large)
-	}
-	
-	@ViewBuilder
-	func radioOffImage() -> some View {
-		Image(systemName: "circle")
-			.imageScale(.large)
+	func subsection_skipFeeCheck() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
+			Toggle(isOn: $lightningOverride) {
+				Text("Skip absolute fee check for Lightning")
+			}
+			
+			Text(
+				"""
+				When enabled, incoming Lightning payments will ignore the absolute max fee limit. \
+				Only the percentage check will apply.
+				"""
+			)
+			.font(.subheadline)
+			.foregroundColor(.secondary)
+			.padding(.top, 16)
+			
+			Text(
+				"""
+				Attention: if the Bitcoin mempool feerate is high, incoming LN payments requiring \
+				an on-chain operation could be expensive.
+				"""
+			)
+			.font(.subheadline)
+			.foregroundColor(.secondary)
+			.padding(.top, 16)
+			
+		} // </VStack>
 	}
 	
 	// --------------------------------------------------
-	// MARK: View Helpers
+	// MARK: Helpers: maxFeeAmount
 	// --------------------------------------------------
 	
-	func defaultMaxFeeSats() -> Int64 {
+	func defaultMaxFeeAmountSats() -> Int64 {
 		
 		let defaultLp = NodeParamsManager.companion.defaultLiquidityPolicy
 		return defaultLp.maxAbsoluteFee.sat
 	}
+	
+	func defaultMaxFeeAmountString() -> String {
+		
+		let sats = defaultMaxFeeAmountSats()
+		return LiquidityPolicyView.formattedMaxFeeAmt(sat: sats)
+	}
+	
+	func maxFeeAmountSatsIsValid(_ sats: Int64) -> Bool {
+		
+		return sats > 0 && sats <= 500_000
+	}
+	
+	func maxFeeAmountSats() -> Int64? {
+		
+		if case .success(let number) = parsedMaxFeeAmt {
+			let sats = number.int64Value
+			if maxFeeAmountSatsIsValid(sats) {
+				return sats
+			}
+		}
+		
+		return nil
+	}
+	
+	func maxFeeAmountHasError() -> Bool {
+		
+		switch parsedMaxFeeAmt {
+		case .success(let number):
+			let sats = number.int64Value
+			return !maxFeeAmountSatsIsValid(sats)
+				
+		case .failure(let reason):
+			switch reason {
+				case .emptyInput   : return false
+				case .invalidInput : return true
+			}
+		}
+	}
+	
+	func maxFeeAmountFiat() -> FormattedAmount {
+		
+		if let sats = maxFeeAmountSats() {
+			return Utils.formatFiat(currencyPrefs, sat: sats)
+		} else {
+			return Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+		}
+	}
+	
+	func effectiveMaxFeeAmountSats() -> Int64 {
+		
+		if let sats = maxFeeAmountSats() {
+			return sats
+		} else {
+			return defaultMaxFeeAmountSats()
+		}
+	}
+	
+	func effectiveMaxFeeAmountString() -> String {
+		
+		let sats = effectiveMaxFeeAmountSats()
+		return Utils.formatBitcoin(sat: sats, bitcoinUnit: .sat).string
+	}
+	
+	// --------------------------------------------------
+	// MARK: Helpers: maxFeePercent
+	// --------------------------------------------------
 	
 	func defaultMaxFeeBasisPoints() -> Int32 {
 		
@@ -263,56 +567,136 @@ struct LiquidityPolicyView: View {
 		return defaultLp.maxRelativeFeeBasisPoints
 	}
 	
-	func defaultMaxFeeAmt() -> String {
-		
-		let sats = defaultMaxFeeSats()
-		return LiquidityPolicyView.formattedMaxFeeAmt(sat: sats)
-	}
-	
-	func defaultMaxFeePrcnt() -> String {
+	func defaultMaxFeePercent() -> Double {
 		
 		let basisPoints = defaultMaxFeeBasisPoints()
-		let percent = Double(basisPoints) / Double(100)
+		return Double(basisPoints) / Double(100)
+	}
+	
+	func defaultMaxFeePercentString() -> String {
+		
+		let percent = defaultMaxFeePercent()
 		return LiquidityPolicyView.formattedMaxFeePrcnt(percent: percent)
 	}
 	
-	func currentMaxFeeSats() -> Int64 {
+	func maxFeePercentIsValid(_ percent: Double) -> Bool {
 		
-		switch parsedMaxFeeAmt {
-			case .success(let number):
-				return number.int64Value
-			case .failure(_):
-				return defaultMaxFeeSats()
+		return percent > 0 && percent <= 100.0
+	}
+	
+	func maxFeePercent() -> Double? {
+		
+		if case .success(let number) = parsedMaxFeePrcnt {
+			let percent = number.doubleValue
+			if maxFeePercentIsValid(percent) {
+				return percent
+			}
+		}
+		
+		return nil
+	}
+	
+	func maxFeeBasisPoints() -> Int32? {
+		
+		if let percent = maxFeePercent() {
+			return Int32(percent * Double(100))
+		} else {
+			return nil
 		}
 	}
 	
-	func currentMaxFeeBasisPoints() -> Int32 {
-		
-		switch parsedMaxFeePrcnt {
-			case .success(let number):
-				return Int32(number.doubleValue * Double(100))
-			case .failure(_):
-				return defaultMaxFeeBasisPoints()
-		}
-	}
-					 
-	func currentFeeAmt() -> String {
-		
-		let sats = currentMaxFeeSats()
-		return Utils.formatBitcoin(sat: sats, bitcoinUnit: .sat).string
-	}
-	
-	func currentFeePrcnt() -> String {
+	func maxFeePercentHasError() -> Bool {
 		
 		switch parsedMaxFeePrcnt {
 		case .success(let number):
-			let percent = number.doubleValue / 100.0
-			return LiquidityPolicyView.formattedMaxFeePrcnt(percent: percent)
+			let percent = number.doubleValue
+			return !maxFeePercentIsValid(percent)
 			
-		case .failure(_):
-			return defaultMaxFeePrcnt()
+		case .failure(let reason):
+			switch reason {
+				case .emptyInput   : return false
+				case .invalidInput : return true
+			}
 		}
 	}
+	
+	func effectiveMaxFeeBasisPoints() -> Int32 {
+		
+		if let basisPoints = maxFeeBasisPoints() {
+			return basisPoints
+		} else {
+			return defaultMaxFeeBasisPoints()
+		}
+	}
+	
+	func effectiveMaxFeePercent() -> Double {
+		
+		if let percent = maxFeePercent() {
+			return percent
+		} else {
+			return defaultMaxFeePercent()
+		}
+	}
+	
+	func effectiveMaxFeePercentString() -> String {
+		
+		let percent = effectiveMaxFeePercent()
+		return LiquidityPolicyView.formattedMaxFeePrcnt(percent: percent)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Helpers: Example
+	// --------------------------------------------------
+	
+	func examplePaymentAmountMsat() -> Lightning_kmpMilliSatoshi {
+		
+		let sat = examplePayments[examplePaymentsIdx]
+		return Lightning_kmpMilliSatoshi(sat: Bitcoin_kmpSatoshi(sat: sat))
+	}
+	
+	func examplePaymentAmountString() -> String {
+		return Utils.formatBitcoin(msat: examplePaymentAmountMsat(), bitcoinUnit: .sat, policy: .hideMsats).string
+	}
+	
+	func exampleMaxAbsoluteMsat() -> Lightning_kmpMilliSatoshi {
+		
+		let sat = effectiveMaxFeeAmountSats()
+		return Lightning_kmpMilliSatoshi(sat: Bitcoin_kmpSatoshi(sat: sat))
+	}
+	
+	func exampleMaxAbsoluteString() -> String {
+		return Utils.formatBitcoin(msat: exampleMaxAbsoluteMsat(), bitcoinUnit: .sat, policy: .hideMsats).string
+	}
+	
+	func exampleMaxPercentMsat() -> Lightning_kmpMilliSatoshi {
+		
+		let paymentAmount = Double(examplePaymentAmountMsat().msat)
+		let percent = effectiveMaxFeePercent() / Double(100)
+		
+		let msat = Int64(paymentAmount * percent)
+		return Lightning_kmpMilliSatoshi(msat: msat)
+	}
+	
+	func exampleMaxPercentString() -> String {
+		return Utils.formatBitcoin(msat: exampleMaxPercentMsat(), bitcoinUnit: .sat, policy: .hideMsats).string
+	}
+	
+	func exampleMaxFee() -> Lightning_kmpMilliSatoshi {
+		
+		let msat1 = exampleMaxAbsoluteMsat().msat
+		let msat2 = exampleMaxPercentMsat().msat
+		
+		let msat = min(msat1, msat2)
+		return Lightning_kmpMilliSatoshi(msat: msat)
+	}
+	
+	func exampleMaxFeeString() -> String {
+		return Utils.formatBitcoin(msat: exampleMaxFee(), bitcoinUnit: .sat, policy: .hideMsats).string
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
 	
 	func maxFeeAmtStyler() -> TextFieldNumberStyler {
 		return TextFieldNumberStyler(
@@ -328,32 +712,6 @@ struct LiquidityPolicyView: View {
 			amount: $maxFeePrcnt,
 			parsedAmount: $parsedMaxFeePrcnt
 		)
-	}
-	
-	func maxFeeAmtHasError() -> Bool {
-		
-		switch parsedMaxFeeAmt {
-			case .success(_):
-				return false
-			case .failure(let reason):
-				switch reason {
-					case .emptyInput   : return false
-					case .invalidInput : return true
-				}
-		}
-	}
-	
-	func maxFeePrcntHasError() -> Bool {
-		
-		switch parsedMaxFeePrcnt {
-			case .success(_):
-				return false
-			case .failure(let reason):
-				switch reason {
-					case .emptyInput   : return false
-					case .invalidInput : return true
-				}
-		}
 	}
 	
 	// --------------------------------------------------
@@ -406,42 +764,62 @@ struct LiquidityPolicyView: View {
 		parsedMaxFeePrcnt = .failure(.emptyInput)
 	}
 	
-	func automaticModeOptionTapped() {
-		log.trace("automaticModeOptionTapped()")
+	func decrementExamplePaymentsIdx() {
+		log.trace("decrementExamplePaymentsIdx")
 		
-		if mode_automatic {
-			mode_manual = false
-		} else {
-			mode_automatic = true
+		guard examplePaymentsIdx > 0 else {
+			return
 		}
+		examplePaymentsIdx -= 1
 	}
 	
-	func manualModeOptionTapped() {
-		log.trace("manualModeOptionTapped()")
+	func incrementExamplePaymentsIdx() {
+		log.trace("incrementExamplePaymentsIdx")
 		
-		if mode_manual {
-			mode_automatic = false
-		} else {
-			mode_manual = true
+		guard examplePaymentsIdx + 1 < examplePayments.count else {
+			return
 		}
+		examplePaymentsIdx += 1
+	}
+	
+	func discardChanges() {
+		log.trace("discardChanges()")
+		
+		// Todo...
 	}
 	
 	func onDisappear() {
 		log.trace("onDisappear()")
 		
-		let defaultSats = defaultMaxFeeSats()
-		let defaultBasisPoints = defaultMaxFeeBasisPoints()
-		
-		let currentSats = currentMaxFeeSats()
-		let currentBasisPoints = currentMaxFeeBasisPoints()
-		
-		let sats: Int64? = (currentSats == defaultSats) ? nil : currentSats
-		let basisPoints: Int32? = (currentBasisPoints == defaultBasisPoints) ? nil : currentBasisPoints
-		
-		log.info("updated.maxFeeSats: \(sats?.description ?? "nil")")
-		log.info("updated.maxFeeBasisPoints: \(basisPoints?.description ?? "nil")")
-				
-		let updated = LiquidityPolicy(maxFeeSats: sats, maxFeeBasisPoints: basisPoints)
-		Prefs.shared.liquidityPolicy = updated
+		if isEnabled {
+			
+			let defaultSats = defaultMaxFeeAmountSats()
+			let defaultBasisPoints = defaultMaxFeeBasisPoints()
+			
+			let currentSats = effectiveMaxFeeAmountSats()
+			let currentBasisPoints = effectiveMaxFeeBasisPoints()
+			
+			let sats: Int64? = (currentSats == defaultSats) ? nil : currentSats
+			let basisPoints: Int32? = (currentBasisPoints == defaultBasisPoints) ? nil : currentBasisPoints
+			
+			log.info("updated.maxFeeSats: \(sats?.description ?? "nil")")
+			log.info("updated.maxFeeBasisPoints: \(basisPoints?.description ?? "nil")")
+					
+			Prefs.shared.liquidityPolicy = LiquidityPolicy(
+				enabled: true,
+				maxFeeSats: sats,
+				maxFeeBasisPoints: basisPoints,
+				skipAbsoluteFeeCheck: lightningOverride
+			)
+			
+		} else {
+			
+			Prefs.shared.liquidityPolicy = LiquidityPolicy(
+				enabled: false,
+				maxFeeSats: nil,
+				maxFeeBasisPoints: nil,
+				skipAbsoluteFeeCheck: LiquidityPolicy.defaultPolicy().effectiveSkipAbsoluteFeeCheck
+			)
+		}
 	}
 }
