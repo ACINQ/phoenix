@@ -103,7 +103,7 @@ class BusinessManager {
 			requestCheckLegacyChannels: false,
 			isTorEnabled: GroupPrefs.shared.isTorEnabled,
 			liquidityPolicy: lp.toKotlin(),
-			isMigrationFromAndroidLegacyApp: false
+			trustedSwapInTxs: Set()
 		)
 		business.start(startupParams: startupParams)
 		

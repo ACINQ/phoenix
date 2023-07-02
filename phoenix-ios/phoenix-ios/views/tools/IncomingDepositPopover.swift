@@ -124,14 +124,25 @@ struct IncomingDepositPopover: View {
 			.multilineTextAlignment(.leading)
 			.fixedSize(horizontal: false, vertical: true) // text truncation bugs
 			
-			if let rejected = swapInRejected, let reason = rejected.reason.asTooExpensive() {
+			if let rejected = swapInRejected, let reason = rejected.reason.asOverAbsoluteFee() {
 				
-				let maxFee = Utils.formatBitcoin(msat: reason.maxAllowed, bitcoinUnit: .sat)
-				let actualFee = Utils.formatBitcoin(msat: reason.actual, bitcoinUnit: .sat)
+				let maxFee = Utils.formatBitcoin(sat: reason.maxAbsoluteFee, bitcoinUnit: .sat)
+				let actualFee = Utils.formatBitcoin(msat: rejected.fee, bitcoinUnit: .sat)
 				
 				Text("The fee was \(actualFee.string), but your max fee was set to \(maxFee.string)")
 					.multilineTextAlignment(.leading)
 					.fixedSize(horizontal: false, vertical: true) // text truncation bugs
+				
+			} else if let rejected = swapInRejected, let _ = rejected.reason.asOverRelativeFee() {
+				
+				// Todo...
+				
+			//	let maxFee = Utils.formatBitcoin(sat: reason.maxAbsoluteFee, bitcoinUnit: .sat)
+			//	let actualFee = Utils.formatBitcoin(msat: rejected.fee, bitcoinUnit: .sat)
+				
+			//	Text("The fee was \(actualFee.string), but your max fee was set to \(maxFee.string)")
+			//		.multilineTextAlignment(.leading)
+			//		.fixedSize(horizontal: false, vertical: true) // text truncation bugs
 			}
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {

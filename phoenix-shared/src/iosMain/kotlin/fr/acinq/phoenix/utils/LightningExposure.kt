@@ -183,8 +183,13 @@ fun ChannelEvents.asConfirmed(): ChannelEvents.Confirmed? = when (this) {
     else -> null
 }
 
-fun LiquidityEvents.Rejected.Reason.asTooExpensive(): LiquidityEvents.Rejected.Reason.TooExpensive? = when (this) {
-    is LiquidityEvents.Rejected.Reason.TooExpensive -> this
+fun LiquidityEvents.Rejected.Reason.asOverAbsoluteFee(): LiquidityEvents.Rejected.Reason.TooExpensive.OverAbsoluteFee? = when (this) {
+    is LiquidityEvents.Rejected.Reason.TooExpensive.OverAbsoluteFee -> this
+    else -> null
+}
+
+fun LiquidityEvents.Rejected.Reason.asOverRelativeFee(): LiquidityEvents.Rejected.Reason.TooExpensive.OverRelativeFee? = when (this) {
+    is LiquidityEvents.Rejected.Reason.TooExpensive.OverRelativeFee -> this
     else -> null
 }
 

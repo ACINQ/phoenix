@@ -171,8 +171,8 @@ struct BizNotificationCell: View {
 		
 		if let reason = item.notification as? PhoenixShared.Notification.PaymentRejected {
 			
-			if let reason = reason as? PhoenixShared.Notification.PaymentRejected.FeeTooExpensive {
-				body_feeTooExpensive(reason)
+			if let reason = reason as? PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee {
+				body_overAbsoluteFee(reason)
 			} else {
 				body_paymentRejected(reason)
 			}
@@ -195,8 +195,8 @@ struct BizNotificationCell: View {
 	}
 	
 	@ViewBuilder
-	func body_feeTooExpensive(
-		_ reason: PhoenixShared.Notification.PaymentRejected.FeeTooExpensive
+	func body_overAbsoluteFee(
+		_ reason: PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee
 	) -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
@@ -211,8 +211,8 @@ struct BizNotificationCell: View {
 					.font(.headline)
 			}
 			
-			let expectedFee = Utils.formatBitcoin(currencyPrefs, msat: reason.expectedFee)
-			let maxAllowedFee = Utils.formatBitcoin(currencyPrefs, msat: reason.maxAllowedFee)
+			let expectedFee = Utils.formatBitcoin(currencyPrefs, msat: reason.fee)
+			let maxAllowedFee = Utils.formatBitcoin(currencyPrefs, sat: reason.maxAbsoluteFee)
 			Text("The fee was \(expectedFee.string) but your max fee was set to \(maxAllowedFee.string).")
 				.font(.callout)
 				.fixedSize(horizontal: false, vertical: true)
@@ -257,9 +257,6 @@ struct BizNotificationCell: View {
 					
 				} else if reason is PhoenixShared.Notification.PaymentRejected.ChannelsInitializing {
 					Text("Channels initializing...")
-					
-				} else if reason is PhoenixShared.Notification.PaymentRejected.RejectedManually {
-					Text("Manually rejected paymented.")
 					
 				} else {
 					Text("Unknown reason.")

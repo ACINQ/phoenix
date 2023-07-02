@@ -68,7 +68,7 @@ class PhoenixManager {
 			requestCheckLegacyChannels: false,
 			isTorEnabled: GroupPrefs.shared.isTorEnabled,
 			liquidityPolicy: NodeParamsManager.companion.defaultLiquidityPolicy,
-			isMigrationFromAndroidLegacyApp: false
+			trustedSwapInTxs: Set()
 		)
 		business.start(startupParams: startupParams)
 	}
