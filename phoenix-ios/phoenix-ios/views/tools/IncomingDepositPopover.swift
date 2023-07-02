@@ -126,23 +126,21 @@ struct IncomingDepositPopover: View {
 			
 			if let rejected = swapInRejected, let reason = rejected.reason.asOverAbsoluteFee() {
 				
-				let maxFee = Utils.formatBitcoin(sat: reason.maxAbsoluteFee, bitcoinUnit: .sat)
 				let actualFee = Utils.formatBitcoin(msat: rejected.fee, bitcoinUnit: .sat)
+				let maxFee = Utils.formatBitcoin(sat: reason.maxAbsoluteFee, bitcoinUnit: .sat)
 				
 				Text("The fee was \(actualFee.string), but your max fee was set to \(maxFee.string)")
 					.multilineTextAlignment(.leading)
 					.fixedSize(horizontal: false, vertical: true) // text truncation bugs
 				
-			} else if let rejected = swapInRejected, let _ = rejected.reason.asOverRelativeFee() {
+			} else if let rejected = swapInRejected, let reason = rejected.reason.asOverRelativeFee() {
 				
-				// Todo...
+				let actualFee = Utils.formatBitcoin(msat: rejected.fee, bitcoinUnit: .sat)
+				let percent = basisPointsAsPercent(reason.maxRelativeFeeBasisPoints)
 				
-			//	let maxFee = Utils.formatBitcoin(sat: reason.maxAbsoluteFee, bitcoinUnit: .sat)
-			//	let actualFee = Utils.formatBitcoin(msat: rejected.fee, bitcoinUnit: .sat)
-				
-			//	Text("The fee was \(actualFee.string), but your max fee was set to \(maxFee.string)")
-			//		.multilineTextAlignment(.leading)
-			//		.fixedSize(horizontal: false, vertical: true) // text truncation bugs
+				Text("The fee was \(actualFee.string) which is more than \(percent) of the amount.")
+					.multilineTextAlignment(.leading)
+					.fixedSize(horizontal: false, vertical: true) // text truncation bugs
 			}
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
@@ -173,6 +171,27 @@ struct IncomingDepositPopover: View {
 			swapInWalletBalance.unconfirmed.sat == 0 &&
 			swapInWalletBalance.weaklyConfirmed.sat == 0 &&
 			swapInRejected != nil
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func basisPointsAsPercent(_ basisPoints: Int32) -> String {
+		
+		// Example: 30% == 3,000 basis points
+		// 
+		// 3,000 / 100       => 30.0 => 3000%
+		// 3,000 / 100 / 100 =>  0.3 => 30%
+		
+		let percent = Double(basisPoints) / Double(10_000)
+		
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .percent
+		formatter.minimumFractionDigits = 0
+		formatter.maximumFractionDigits = 2
+		
+		return formatter.string(from: NSNumber(value: percent)) ?? "?%"
 	}
 	
 	// --------------------------------------------------

@@ -683,6 +683,7 @@
 			children = (
 				DC46CB1028D9AA8000C4EAC7 /* content */,
 				DCDD9ECC28637390001800A3 /* main */,
+				DCA3B41A2A5220A200E6B231 /* notifications */,
 				DC2F431227B696A40006FCC4 /* receive */,
 				DC118BF627B44E4C0080BBAC /* send */,
 				DCCD045B27EE0101007D57A5 /* inspect */,
@@ -1000,6 +1001,17 @@
 			path = html;
 			sourceTree = "<group>";
 		};
+		DCA3B41A2A5220A200E6B231 /* notifications */ = {
+			isa = PBXGroup;
+			children = (
+				DC355E1C2A4398A8008E8A8E /* NoticeBox.swift */,
+				DC355E242A45FDD3008E8A8E /* NoticeMonitor.swift */,
+				DC355E1E2A44A235008E8A8E /* NotificationCell.swift */,
+				DC355E202A44D838008E8A8E /* NotificationsView.swift */,
+			);
+			path = notifications;
+			sourceTree = "<group>";
+		};
 		DCA6DEC42829BD060073C658 /* xpc */ = {
 			isa = PBXGroup;
 			children = (
@@ -1174,10 +1186,6 @@
 				DCDD9ED528637FD7001800A3 /* AppStatusButton.swift */,
 				DCDD9ED328637EBB001800A3 /* ToolsButton.swift */,
 				DC4864D929D4E52C00ACD539 /* BgRefreshDisabledPopover.swift */,
-				DC355E1C2A4398A8008E8A8E /* NoticeBox.swift */,
-				DC355E242A45FDD3008E8A8E /* NoticeMonitor.swift */,
-				DC355E1E2A44A235008E8A8E /* NotificationCell.swift */,
-				DC355E202A44D838008E8A8E /* NotificationsView.swift */,
 			);
 			path = main;
 			sourceTree = "<group>";

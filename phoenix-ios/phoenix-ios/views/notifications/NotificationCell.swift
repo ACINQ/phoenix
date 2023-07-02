@@ -172,8 +172,10 @@ struct BizNotificationCell: View {
 		if let reason = item.notification as? PhoenixShared.Notification.PaymentRejected {
 			
 			if let reason = reason as? PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee {
-				body_overAbsoluteFee(reason)
-			} else {
+				body_overAbsoluteFee(Either.Left(reason))
+			} else if let reason = reason as? PhoenixShared.Notification.PaymentRejected.OverRelativeFee {
+				body_overAbsoluteFee(Either.Right(reason))
+			} 	else {
 				body_paymentRejected(reason)
 			}
 			
@@ -196,14 +198,17 @@ struct BizNotificationCell: View {
 	
 	@ViewBuilder
 	func body_overAbsoluteFee(
-		_ reason: PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee
+		_ either: Either<
+			PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee,
+			PhoenixShared.Notification.PaymentRejected.OverRelativeFee
+		>
 	) -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
-			let amt = Utils.formatBitcoin(currencyPrefs, msat: reason.amount)
+			let amt = Utils.formatBitcoin(currencyPrefs, msat: amount(either))
 			
-			if reason.source == Lightning_kmpLiquidityEventsSource.onchainwallet {
+			if isOnChain(either) {
 				Text("On-chain funds pending (+\(amt.string))")
 					.font(.headline)
 			} else {
@@ -211,12 +216,28 @@ struct BizNotificationCell: View {
 					.font(.headline)
 			}
 			
-			let expectedFee = Utils.formatBitcoin(currencyPrefs, msat: reason.fee)
-			let maxAllowedFee = Utils.formatBitcoin(currencyPrefs, sat: reason.maxAbsoluteFee)
-			Text("The fee was \(expectedFee.string) but your max fee was set to \(maxAllowedFee.string).")
-				.font(.callout)
-				.fixedSize(horizontal: false, vertical: true)
-				.padding(.top, 10)
+			switch either {
+			case .Left(let reason):
+				
+				let actualFee = Utils.formatBitcoin(currencyPrefs, msat: reason.fee)
+				let maxAllowedFee = Utils.formatBitcoin(currencyPrefs, sat: reason.maxAbsoluteFee)
+				
+				Text("The fee was \(actualFee.string) but your max fee was set to \(maxAllowedFee.string).")
+					.font(.callout)
+					.fixedSize(horizontal: false, vertical: true)
+					.padding(.top, 10)
+				
+			case .Right(let reason):
+				
+				let actualFee = Utils.formatBitcoin(currencyPrefs, msat: reason.fee)
+				let percent = basisPointsAsPercent(reason.maxRelativeFeeBasisPoints)
+				
+				Text("The fee was \(actualFee.string) which is more than \(percent) of the amount.")
+					.font(.callout)
+					.fixedSize(horizontal: false, vertical: true)
+					.padding(.top, 10)
+				
+			} // </switch>
 			
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
 				if action != nil {
@@ -367,6 +388,48 @@ struct BizNotificationCell: View {
 			let formatter = RelativeDateTimeFormatter()
 			return formatter.localizedString(for: date, relativeTo: now)
 		}
+	}
+	
+	func amount(_ either: Either<
+		PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee,
+		PhoenixShared.Notification.PaymentRejected.OverRelativeFee
+	>) -> Lightning_kmpMilliSatoshi {
+	
+		switch either {
+			case .Left(let reason) : return reason.amount
+			case .Right(let reason): return reason.amount
+		}
+	}
+	
+	func isOnChain(_ either: Either<
+		PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee,
+		PhoenixShared.Notification.PaymentRejected.OverRelativeFee
+	>) -> Bool {
+		
+		let source: Lightning_kmpLiquidityEventsSource
+		switch either {
+			case .Left(let reason) : source = reason.source
+			case .Right(let reason): source = reason.source
+		}
+		
+		return source == Lightning_kmpLiquidityEventsSource.onchainwallet
+	}
+	
+	func basisPointsAsPercent(_ basisPoints: Int32) -> String {
+		
+		// Example: 30% == 3,000 basis points
+		//
+		// 3,000 / 100       => 30.0 => 3000%
+		// 3,000 / 100 / 100 =>  0.3 => 30%
+		
+		let percent = Double(basisPoints) / Double(10_000)
+		
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .percent
+		formatter.minimumFractionDigits = 0
+		formatter.maximumFractionDigits = 2
+		
+		return formatter.string(from: NSNumber(value: percent)) ?? "?%"
 	}
 	
 	func navigateToLiquiditySettings() {

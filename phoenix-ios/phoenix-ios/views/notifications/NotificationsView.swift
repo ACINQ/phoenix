@@ -159,7 +159,7 @@ struct NotificationsView : View {
 			}
 			
 		} header: {
-			Text("Recent payment failures")
+			Text("Recent activity")
 		}
 		.listRowInsets(EdgeInsets(top: 5, leading: 1, bottom: 5, trailing: 1))
 		.listRowSeparator(.hidden)   // remove lines between items
