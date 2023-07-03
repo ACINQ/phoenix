@@ -14,19 +14,24 @@ fileprivate var log = Logger(OSLog.disabled)
 
 fileprivate enum NavLinkTag: String {
 	// General
-	case AboutView
-	case DisplayConfigurationView
-	case MyWalletView
-	case RecoveryPhraseView
-	case PaymentOptionsView
-	case DrainWalletView
-	// Security
-	case AppAccessView
+	case About
+	case DisplayConfiguration
+	case PaymentOptions
+	case ChannelManagement
+	// Privacy & Security
+	case AppAccess
+	case RecoveryPhrase
+	case ElectrumServer
+	case Tor
+	case PaymentsBackup
 	// Advanced
-	case PrivacyView
-	case ChannelsConfigurationView
-	case LogsConfigurationView
-	case ResetWalletView
+	case WalletInfo
+	case ChannelsConfiguration
+	case LogsConfiguration
+	// Danger Zone
+	case DrainWallet
+	case ResetWallet
+	case ForceCloseChannels
 }
 
 struct ConfigurationView: View {
@@ -78,10 +83,11 @@ struct ConfigurationView: View {
 			let hasWallet = hasWallet()
 			
 			section_general(hasWallet)
-			if hasWallet {
-				section_security()
-			}
+			section_privacyAndSecurity(hasWallet)
 			section_advanced(hasWallet)
+			if hasWallet {
+				section_dangerZone(hasWallet)
+			}
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
@@ -107,13 +113,13 @@ struct ConfigurationView: View {
 		
 		Section(header: Text("General")) {
 			
-			navLink(.AboutView) {
+			navLink(.About) {
 				Label { Text("About") } icon: {
 					Image(systemName: "info.circle")
 				}
 			}
 		
-			navLink(.DisplayConfigurationView) {
+			navLink(.DisplayConfiguration) {
 				Label {
 					switch notificationPermissions {
 					case .disabled:
@@ -132,19 +138,37 @@ struct ConfigurationView: View {
 					Image(systemName: "paintbrush.pointed")
 				}
 			}
+	
+			navLink(.PaymentOptions) {
+				Label { Text("Payment options") } icon: {
+					Image(systemName: "wrench")
+				}
+			}
 			
+			navLink(.ChannelManagement) {
+				Label { Text("Channel management") } icon: {
+					Image(systemName: "wand.and.stars")
+				}
+			}
+			
+		} // </Section: General>
+	}
+	
+	@ViewBuilder
+	func section_privacyAndSecurity(_ hasWallet: Bool) -> some View {
+		
+		Section(header: Text("Privacy & Security")) {
+
 			if hasWallet {
-				navLink(.MyWalletView) {
-					Label {
-						Text("My wallet")
-					} icon: {
-						Image(systemName: "person")
+				navLink(.AppAccess) {
+					Label { Text("App access") } icon: {
+						Image(systemName: isTouchID ? "touchid" : "faceid")
 					}
 				}
 			}
 			
 			if hasWallet {
-				navLink(.RecoveryPhraseView) {
+				navLink(.RecoveryPhrase) {
 					Label {
 						switch backupSeedState {
 						case .notBackedUp:
@@ -165,40 +189,32 @@ struct ConfigurationView: View {
 							Text("Recovery phrase")
 						}
 					} icon: {
-						Image(systemName: "squareshape.split.3x3")
-					}
-				}
-			}
-	
-			navLink(.PaymentOptionsView) {
-				Label { Text("Options & fees") } icon: {
-					Image(systemName: "wrench")
-				}
-			}
-		
-			if hasWallet {
-				navLink(.DrainWalletView) {
-					Label { Text("Drain wallet") } icon: {
-						Image(systemName: "xmark.circle")
+						Image(systemName: "key")
 					}
 				}
 			}
 			
-		} // </Section: General>
-	}
-	
-	@ViewBuilder
-	func section_security() -> some View {
-		
-		Section(header: Text("Security")) {
-
-			navLink(.AppAccessView) {
-				Label { Text("App access") } icon: {
-					Image(systemName: isTouchID ? "touchid" : "faceid")
+			navLink(.ElectrumServer) {
+				Label { Text("Electrum server") } icon: {
+					Image(systemName: "link")
+				}
+			}
+			
+			navLink(.Tor) {
+				Label { Text("Tor") } icon: {
+					Image(systemName: "shield.lefthalf.fill")
+				}
+			}
+			
+			if hasWallet {
+				navLink(.PaymentsBackup) {
+					Label { Text("Payments backup") } icon: {
+						Image(systemName: "icloud.and.arrow.up")
+					}
 				}
 			}
 
-		} // </Section: Security>
+		} // </Section: Privacy & Security>
 	}
 	
 	@ViewBuilder
@@ -206,36 +222,65 @@ struct ConfigurationView: View {
 		
 		Section(header: Text("Advanced")) {
 
-			navLink(.PrivacyView) {
-				Label { Text("Privacy") } icon: {
-					Image(systemName: "eye")
+			if hasWallet {
+				navLink(.WalletInfo) {
+					Label {
+						Text("Wallet info")
+					} icon: {
+						Image(systemName: "cube")
+					}
 				}
 			}
-
+			
 			if hasWallet {
-				navLink(.ChannelsConfigurationView) {
+				navLink(.ChannelsConfiguration) {
 					Label { Text("Payment channels") } icon: {
 						Image(systemName: "bolt")
 					}
 				}
 			}
 			
-			navLink(.LogsConfigurationView) {
+			navLink(.LogsConfiguration) {
 				Label { Text("Logs") } icon: {
 					Image(systemName: "doc.text")
 				}
 			}
 
+		} // </Section: Advanced>
+	}
+	
+	@ViewBuilder
+	func section_dangerZone(_ hasWallet: Bool) -> some View {
+		
+		Section(header: Text("Danger Zone")) {
+			
 			if hasWallet {
-				navLink(.ResetWalletView) {
+				navLink(.DrainWallet) {
+					Label { Text("Drain wallet") } icon: {
+						Image(systemName: "xmark.circle")
+					}
+				}
+			}
+			
+			if hasWallet {
+				navLink(.ResetWallet) {
 					Label { Text("Reset wallet") } icon: {
 						Image(systemName: "trash")
 					}
 				}
 			}
-
-		} // </Section: Advanced>
-	}
+			
+			if hasWallet {
+				navLink(.ForceCloseChannels) {
+					Label { Text("Force-close channels") } icon: {
+						Image(systemName: "exclamationmark.triangle")
+					}
+					.foregroundColor(.appNegative)
+				}
+			}
+		}
+		
+	} // </Section: Danger Zone>
 
 	@ViewBuilder
 	private func navLink<Content>(
@@ -266,19 +311,24 @@ struct ConfigurationView: View {
 		
 		switch tag {
 		// General
-			case .AboutView                 : AboutView()
-			case .DisplayConfigurationView  : DisplayConfigurationView()
-			case .MyWalletView              : WalletInfoView()
-			case .RecoveryPhraseView        : RecoveryPhraseView()
-			case .PaymentOptionsView        : PaymentOptionsView()
-			case .DrainWalletView           : DrainWalletView(popToRoot: popToRoot)
-		// Security
-			case .AppAccessView             : AppAccessView()
+			case .About                 : AboutView()
+			case .DisplayConfiguration  : DisplayConfigurationView()
+			case .PaymentOptions        : PaymentOptionsView()
+			case .ChannelManagement     : LiquidityPolicyView()
+		// Privacy & Security
+			case .AppAccess             : AppAccessView()
+			case .RecoveryPhrase        : RecoveryPhraseView()
+			case .ElectrumServer        : ElectrumConfigurationView()
+			case .Tor                   : TorConfigurationView()
+			case .PaymentsBackup        : PaymentsBackupView()
 		// Advanced
-			case .PrivacyView               : PrivacyView()
-			case .ChannelsConfigurationView : ChannelsConfigurationView()
-			case .LogsConfigurationView     : LogsConfigurationView()
-			case .ResetWalletView           : ResetWalletView()
+			case .WalletInfo            : WalletInfoView()
+			case .ChannelsConfiguration : ChannelsConfigurationView()
+			case .LogsConfiguration     : LogsConfigurationView()
+		// Danger Zone
+			case .DrainWallet           : DrainWalletView(popToRoot: popToRoot)
+			case .ResetWallet           : ResetWalletView()
+			case .ForceCloseChannels    : ForceCloseChannelsView()
 		}
 	}
 	
@@ -365,11 +415,11 @@ struct ConfigurationView: View {
 			var delay: TimeInterval = 1.5 // seconds; multiply by number of screens we need to navigate
 			switch value {
 				case .paymentHistory     : break
-				case .backup             : newNavLinkTag = .RecoveryPhraseView       ; delay *= 1
-				case .drainWallet        : newNavLinkTag = .DrainWalletView          ; delay *= 1
-				case .electrum           : newNavLinkTag = .PrivacyView              ; delay *= 2
-				case .backgroundPayments : newNavLinkTag = .DisplayConfigurationView ; delay *= 2
-				case .liquiditySettings  : newNavLinkTag = .PaymentOptionsView       ; delay *= 2
+				case .backup             : newNavLinkTag = .RecoveryPhrase       ; delay *= 1
+				case .drainWallet        : newNavLinkTag = .DrainWallet          ; delay *= 1
+				case .electrum           : newNavLinkTag = .ElectrumServer       ; delay *= 1
+				case .backgroundPayments : newNavLinkTag = .DisplayConfiguration ; delay *= 2
+				case .liquiditySettings  : newNavLinkTag = .PaymentOptions       ; delay *= 2
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
