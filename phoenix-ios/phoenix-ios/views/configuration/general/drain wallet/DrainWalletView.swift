@@ -332,13 +332,7 @@ struct DrainWalletView: MVIView {
 					but you're on %@
 					""",
 					comment: "Error message - parsing bitcoin address"),
-					error.addrChain.name, error.myChain.name
-				)
-			}
-			else if error is BitcoinAddressError.UnknownBech32Version {
-				detailedErrorMsg = NSLocalizedString(
-					"Unknown Bech32 version",
-					comment: "Error message - parsing bitcoin address"
+					error.actual.name, error.expected.name
 				)
 			}
 			else if isScannedValue {
