@@ -84,8 +84,8 @@ struct ReceiveView: MVIView {
 					HStack(alignment: VerticalAlignment.center, spacing: 4) {
 						Image(systemName: "bolt").font(.title2).imageScale(.large)
 						VStack(alignment: HorizontalAlignment.center, spacing: 4) {
-							Text("Lightning")
-							Text("(layer 2)").font(.footnote).opacity(0.7)
+							Text("Lightning").padding(.bottom, 4)
+							Text("(layer 2)").font(.footnote.weight(.thin)).opacity(0.7)
 						}
 					}
 				}
@@ -99,7 +99,7 @@ struct ReceiveView: MVIView {
 						Image(systemName: "link").font(.title2).imageScale(.large)
 						VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 							Text("Blockchain").padding(.bottom, 4)
-							Text("(layer 1)").font(.footnote).opacity(0.7)
+							Text("(layer 1)").font(.footnote.weight(.thin)).opacity(0.7)
 						}
 					}
 				}

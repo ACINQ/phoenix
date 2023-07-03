@@ -121,6 +121,7 @@ class BusinessManager {
 
 		business = PhoenixBusiness(ctx: PlatformContext())
 		syncManager = nil
+		swapInRejectedPublisher.send(nil)
 		walletInfo = nil
 		peerConnectionState = nil
 		paymentsPageFetchers.removeAll()
@@ -135,50 +136,61 @@ class BusinessManager {
 	private func registerForNotifications() {
 		
 		// Connection status observer
-		business.connectionsManager.publisher.sink { (connections: Connections) in
-			self.connectionsChanged(connections)
-		}
-		.store(in: &cancellables)
+		business.connectionsManager.publisher
+			.sink { (connections: Connections) in
+			
+				self.connectionsChanged(connections)
+			}
+			.store(in: &cancellables)
 		
 		// In-flight payments observer
-		business.paymentsManager.inFlightOutgoingPaymentsPublisher().sink { (count: Int) in
-			log.debug("inFlightOutgoingPaymentsPublisher: count = \(count)")
-			if count > 0 {
-				self.beginLongLivedTask()
-			} else {
-				self.endLongLivedTask()
+		business.paymentsManager.inFlightOutgoingPaymentsPublisher()
+			.sink { (count: Int) in
+				
+				log.debug("inFlightOutgoingPaymentsPublisher: count = \(count)")
+				if count > 0 {
+					self.beginLongLivedTask()
+				} else {
+					self.endLongLivedTask()
+				}
 			}
-		}
-		.store(in: &cancellables)
+			.store(in: &cancellables)
 		
 		// Tor configuration observer
-		GroupPrefs.shared.isTorEnabledPublisher.sink { (isTorEnabled: Bool) in
-			self.business.appConfigurationManager.updateTorUsage(enabled: isTorEnabled)
-		}
-		.store(in: &cancellables)
+		GroupPrefs.shared.isTorEnabledPublisher
+			.sink { (isTorEnabled: Bool) in
+				
+				self.business.appConfigurationManager.updateTorUsage(enabled: isTorEnabled)
+			}
+			.store(in: &cancellables)
 		
 		// PreferredFiatCurrenies observers
 		Publishers.CombineLatest(
-			GroupPrefs.shared.fiatCurrencyPublisher,
-			GroupPrefs.shared.currencyConverterListPublisher
-		).sink { _ in
-			let current = AppConfigurationManager.PreferredFiatCurrencies(
-				primary: GroupPrefs.shared.fiatCurrency,
-				others: GroupPrefs.shared.preferredFiatCurrencies
-			)
-			self.business.appConfigurationManager.updatePreferredFiatCurrencies(current: current)
-		}
-		.store(in: &cancellables)
+				GroupPrefs.shared.fiatCurrencyPublisher,
+				GroupPrefs.shared.currencyConverterListPublisher
+			).sink { _ in
+			
+				let current = AppConfigurationManager.PreferredFiatCurrencies(
+					primary: GroupPrefs.shared.fiatCurrency,
+					others: GroupPrefs.shared.preferredFiatCurrencies
+				)
+				self.business.appConfigurationManager.updatePreferredFiatCurrencies(current: current)
+			}
+			.store(in: &cancellables)
 		
 		// Liquidity policy
-		Prefs.shared.liquidityPolicyPublisher.dropFirst().sink { (policy: LiquidityPolicy) in
+		Prefs.shared.liquidityPolicyPublisher.dropFirst()
+			.sink { (policy: LiquidityPolicy) in
 			
-		//	let foo = policy.toKotlin()
-		//	self.business.appConfigurationManager. ???
-		//
-		//	It's not possible to change the liquidity policy on-the-fly yet ?
-		}
-		.store(in: &cancellables)
+				Task { @MainActor in
+					do {
+						try await self.business.peerManager.updatePeerLiquidityPolicy(newPolicy: policy.toKotlin())
+					} catch {
+						log.error("Error: biz.peerManager.updatePeerLiquidityPolicy: \(error)")
+					}
+				}
+			}
+			.store(in: &cancellables)
 		
 		// NodeEvents
 		business.nodeParamsManager.nodeParamsPublisher()

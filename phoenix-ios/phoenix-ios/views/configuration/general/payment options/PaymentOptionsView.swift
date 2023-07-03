@@ -11,13 +11,8 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-fileprivate enum NavLinkTag: String {
-	case LiquidityPolicy
-}
 
 struct PaymentOptionsView: View {
-
-	@State private var navLinkTag: NavLinkTag? = nil
 	
 	@State var defaultPaymentDescription: String = Prefs.shared.defaultPaymentDescription ?? ""
 	
@@ -29,18 +24,11 @@ struct PaymentOptionsView: View {
 	@State var payToOpen_feePercent: Double = 0.0
 	@State var payToOpen_minFeeSat: Int64 = 0
 	
-	@State var firstAppearance = true
-	
-	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
-	@State private var swiftUiBugWorkaroundIdx = 0
-	
 	let maxFeesPublisher = Prefs.shared.maxFeesPublisher
 	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	@Environment(\.openURL) var openURL
 	@Environment(\.smartModalState) var smartModalState: SmartModalState
-	
-	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -63,20 +51,11 @@ struct PaymentOptionsView: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onAppear {
-			onAppear()
-		}
 		.onReceive(maxFeesPublisher) {
 			maxFeesChanged($0)
 		}
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
-		}
-		.onChange(of: deepLinkManager.deepLink) {
-			deepLinkChanged($0)
-		}
-		.onChange(of: navLinkTag) {
-			navLinkTagChanged($0)
 		}
 	}
 	
@@ -86,7 +65,6 @@ struct PaymentOptionsView: View {
 		Section {
 			subsection_defaultPaymentDescription()
 			subsection_incomingPaymentExpiry()
-			subsection_liquidityPolicy()
 			
 		} /* Section.*/header: {
 			Text("Incoming payments")
@@ -154,23 +132,6 @@ struct PaymentOptionsView: View {
 	}
 	
 	@ViewBuilder
-	func subsection_liquidityPolicy() -> some View {
-		
-		navLink(.LiquidityPolicy) {
-			
-			VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
-				Text("Miner fee policy")
-				
-				let numSats = liquidityPolicyMaxSats()
-				Text("Automated (max \(numSats))")
-					.font(.callout)
-					.foregroundColor(.secondary)
-			}
-		}
-		.padding([.top, .bottom], 8)
-	}
-	
-	@ViewBuilder
 	func section_outgoingPayments() -> some View {
 		
 		Section {
@@ -201,37 +162,9 @@ struct PaymentOptionsView: View {
 		} // </Section>
 	}
 	
-	@ViewBuilder
-	private func navLink<Content>(
-		_ tag: NavLinkTag,
-		label: () -> Content
-	) -> some View where Content: View {
-		
-		NavigationLink(
-			destination: navLinkView(tag),
-			tag: tag,
-			selection: $navLinkTag,
-			label: label
-		)
-	}
-	
-	@ViewBuilder
-	private func navLinkView(_ tag: NavLinkTag) -> some View {
-		
-		switch tag {
-			case .LiquidityPolicy : LiquidityPolicyView()
-		}
-	}
-	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
-	
-	func liquidityPolicyMaxSats() -> String {
-		
-		let sats = Prefs.shared.liquidityPolicy.effectiveMaxFeeSats
-		return Utils.formatBitcoin(sat: sats, bitcoinUnit: .sat).string
-	}
 	
 	func maxFeesString() -> String {
 		
@@ -250,90 +183,6 @@ struct PaymentOptionsView: View {
 		formatter.maximumFractionDigits = 3
 		
 		return formatter.string(from: NSNumber(value: payToOpen_feePercent))!
-	}
-	
-	// --------------------------------------------------
-	// MARK: Notifications
-	// --------------------------------------------------
-	
-	func onAppear() {
-		log.trace("onAppear()")
-		
-		// SwiftUI BUG, and workaround.
-		//
-		// In iOS 14, the row remains selected after we return from the subview.
-		// For example:
-		// - Tap on "Fiat Currency"
-		// - Make a selection or tap "<" to pop back
-		// - Notice that the "Fiat Currency" row is still selected (e.g. has gray background)
-		//
-		// There are several workaround for this issue:
-		// https://developer.apple.com/forums/thread/660468
-		//
-		// We are implementing the least risky solution.
-		// Which requires us to change the `Section.id` property.
-		
-		if firstAppearance {
-			firstAppearance = false
-			
-			if let deepLink = deepLinkManager.deepLink {
-				DispatchQueue.main.async { // iOS 14 issues workaround
-					deepLinkChanged(deepLink)
-				}
-			}
-		}
-	}
-	
-	func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
-		
-		// This is a hack, courtesy of bugs in Apple's NavigationLink:
-		// https://developer.apple.com/forums/thread/677333
-		//
-		// Summary:
-		// There's some quirky code in SwiftUI that is resetting our navLinkTag.
-		// Several bizarre workarounds have been proposed.
-		// I've tried every one of them, and none of them work (at least, without bad side-effects).
-		//
-		// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
-		// and forcibly undo it.
-		
-		if let value = value {
-			
-			// Navigate towards deep link (if needed)
-			var newNavLinkTag: NavLinkTag? = nil
-			switch value {
-				case .paymentHistory     : break
-				case .backup             : break
-				case .drainWallet        : break
-				case .electrum           : break
-				case .backgroundPayments : break
-				case .liquiditySettings  : newNavLinkTag = NavLinkTag.LiquidityPolicy
-			}
-			
-			if let newNavLinkTag = newNavLinkTag {
-				
-				self.swiftUiBugWorkaround = newNavLinkTag
-				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: 1.5)
-				
-				self.navLinkTag = newNavLinkTag // Trigger/push the view
-			}
-			
-		} else {
-			// We reached the final destination of the deep link
-			clearSwiftUiBugWorkaround(delay: 0.0)
-		}
-	}
-	
-	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
-		
-		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
-				
-			log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
-			self.navLinkTag = forcedNavLinkTag
-		}
 	}
 	
 	// --------------------------------------------------
@@ -379,23 +228,6 @@ struct PaymentOptionsView: View {
 		
 		payToOpen_feePercent = context.payToOpen.v1.feePercent * 100 // 0.01 => 1%
 		payToOpen_minFeeSat = context.payToOpen.v1.minFeeSat
-	}
-	
-	// --------------------------------------------------
-	// MARK: Workarounds
-	// --------------------------------------------------
-	
-	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
-		
-		let idx = self.swiftUiBugWorkaroundIdx
-		
-		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-			
-			if self.swiftUiBugWorkaroundIdx == idx {
-				log.trace("swiftUiBugWorkaround = nil")
-				self.swiftUiBugWorkaround = nil
-			}
-		}
 	}
 }
 

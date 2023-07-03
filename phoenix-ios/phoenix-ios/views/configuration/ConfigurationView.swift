@@ -419,7 +419,7 @@ struct ConfigurationView: View {
 				case .drainWallet        : newNavLinkTag = .DrainWallet          ; delay *= 1
 				case .electrum           : newNavLinkTag = .ElectrumServer       ; delay *= 1
 				case .backgroundPayments : newNavLinkTag = .DisplayConfiguration ; delay *= 2
-				case .liquiditySettings  : newNavLinkTag = .PaymentOptions       ; delay *= 2
+				case .liquiditySettings  : newNavLinkTag = .ChannelManagement    ; delay *= 1
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {

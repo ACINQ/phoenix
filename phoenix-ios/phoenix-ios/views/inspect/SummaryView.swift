@@ -395,10 +395,14 @@ struct SummaryView: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 		
 			NavigationLink(destination: detailsView()) {
-				Text("Details")
-					.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
-					.read(buttonWidthReader)
-					.read(buttonHeightReader)
+				Label {
+					Text("Details")
+				} icon: {
+					Image(systemName: "magnifyingglass").imageScale(.small)
+				}
+				.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
+				.read(buttonWidthReader)
+				.read(buttonHeightReader)
 			}
 			
 			if let buttonHeight = buttonHeight {
@@ -406,10 +410,14 @@ struct SummaryView: View {
 			}
 			
 			NavigationLink(destination: editInfoView()) {
-				Text("Edit")
-					.frame(minWidth: buttonWidth, alignment: Alignment.leading)
-					.read(buttonWidthReader)
-					.read(buttonHeightReader)
+				Label {
+					Text("Edit")
+				} icon: {
+					Image(systemName: "pencil.line").imageScale(.small)
+				}
+				.frame(minWidth: buttonWidth, alignment: Alignment.leading)
+				.read(buttonWidthReader)
+				.read(buttonHeightReader)
 			}
 		}
 		.padding([.top, .bottom])
@@ -425,10 +433,14 @@ struct SummaryView: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 			
 			NavigationLink(destination: detailsView()) {
-				Text("Details")
-					.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
-					.read(buttonWidthReader)
-					.read(buttonHeightReader)
+				Label {
+					Text("Details")
+				} icon: {
+					Image(systemName: "magnifyingglass").imageScale(.small)
+				}
+				.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
+				.read(buttonWidthReader)
+				.read(buttonHeightReader)
 			}
 			
 			if let buttonHeight = buttonHeight {
@@ -436,10 +448,14 @@ struct SummaryView: View {
 			}
 			
 			NavigationLink(destination: editInfoView()) {
-				Text("Edit")
-					.frame(minWidth: buttonWidth, alignment: Alignment.center)
-					.read(buttonWidthReader)
-					.read(buttonHeightReader)
+				Label {
+					Text("Edit")
+				} icon: {
+					Image(systemName: "pencil.line").imageScale(.small)
+				}
+				.frame(minWidth: buttonWidth, alignment: Alignment.center)
+				.read(buttonWidthReader)
+				.read(buttonHeightReader)
 			}
 			
 			if let buttonHeight = buttonHeight {
@@ -449,11 +465,15 @@ struct SummaryView: View {
 			Button {
 				showDeletePaymentConfirmationDialog = true
 			} label: {
-				Text("Delete")
-					.foregroundColor(.appNegative)
-					.frame(minWidth: buttonWidth, alignment: Alignment.leading)
-					.read(buttonWidthReader)
-					.read(buttonHeightReader)
+				Label {
+					Text("Delete")
+				} icon: {
+					Image(systemName: "eraser.line.dashed").imageScale(.small)
+				}
+				.foregroundColor(.appNegative)
+				.frame(minWidth: buttonWidth, alignment: Alignment.leading)
+				.read(buttonWidthReader)
+				.read(buttonHeightReader)
 			}
 			.confirmationDialog("Delete payment?",
 				isPresented: $showDeletePaymentConfirmationDialog,
