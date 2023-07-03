@@ -27,7 +27,12 @@ class SyncManager {
 	
 	private var cancellables = Set<AnyCancellable>()
 	
-	init(chain: Chain, mnemonics: [String], cloudKey: Bitcoin_kmpByteVector32, encryptedNodeId: String) {
+	init(
+		chain: Lightning_kmpNodeParams.Chain,
+		mnemonics: [String],
+		cloudKey: Bitcoin_kmpByteVector32,
+		encryptedNodeId: String
+	) {
 		
 		syncSeedManager = SyncSeedManager(
 			chain: chain,

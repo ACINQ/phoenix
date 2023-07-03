@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.ServerAddress
@@ -59,7 +60,6 @@ fun ElectrumView() {
     val nc = navController
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val business = LocalBusiness.current
     val prefElectrumServer = LocalElectrumServer.current
     var showCustomServerDialog by rememberSaveable { mutableStateOf(false) }
     val vm = viewModel<ElectrumViewModel>()
@@ -70,7 +70,7 @@ fun ElectrumView() {
             title = stringResource(id = R.string.electrum_title),
         )
         Card(internalPadding = PaddingValues(16.dp)) {
-            Text(text = stringResource(R.string.electrum_about)) //, style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
+            Text(text = stringResource(R.string.electrum_about))
         }
         MVIView(CF::electrumConfiguration) { model, postIntent ->
             Card {
@@ -102,10 +102,10 @@ fun ElectrumView() {
                             stringResource(id = R.string.electrum_connection_connected, "${model.currentServer?.host}:${model.currentServer?.port}")
                         }
                         connection is Connection.ESTABLISHING && config is ElectrumConfig.Random -> {
-                            stringResource(id = R.string.electrum_connecting, "${model.currentServer?.host}:${model.currentServer?.port}")
+                            stringResource(id = R.string.electrum_connection_connecting_to_random, "${model.currentServer?.host}:${model.currentServer?.port}")
                         }
                         connection is Connection.ESTABLISHING && config is ElectrumConfig.Custom -> {
-                            stringResource(id = R.string.electrum_connecting, config.server.host)
+                            stringResource(id = R.string.electrum_connection_connecting_to_custom, config.server.host)
                         }
                         connection is Connection.CLOSED && config is ElectrumConfig.Custom -> {
                             stringResource(id = R.string.electrum_connection_closed_with_custom, config.server.host)
@@ -120,7 +120,7 @@ fun ElectrumView() {
                                 if (connection is Connection.CLOSED && connection.isBadCertificate()) {
                                     Text(
                                         text = stringResource(id = R.string.electrum_description_bad_certificate),
-                                        style = MaterialTheme.typography.subtitle2.copy(color = negativeColor())
+                                        style = MaterialTheme.typography.subtitle2.copy(color = negativeColor)
                                     )
                                 } else {
                                     Text(text = stringResource(id = R.string.electrum_description_custom))
@@ -131,9 +131,9 @@ fun ElectrumView() {
                     },
                     icon = R.drawable.ic_server,
                     iconTint = when (connection) {
-                        is Connection.ESTABLISHED -> positiveColor()
+                        is Connection.ESTABLISHED -> positiveColor
                         is Connection.ESTABLISHING -> orange
-                        else -> negativeColor()
+                        else -> negativeColor
                     },
                     maxTitleLines = 1
                 ) { showCustomServerDialog = true }
@@ -145,15 +145,6 @@ fun ElectrumView() {
                     val height = remember { NumberFormat.getInstance().format(model.blockHeight) }
                     Setting(title = stringResource(id = R.string.electrum_block_height_label), description = height)
                 }
-
-                // fee rate
-                if (model.feeRate > 0) {
-                    Setting(title = stringResource(id = R.string.electrum_fee_rate_label), description = stringResource(id = R.string.electrum_fee_rate, model.feeRate.toString()))
-                }
-
-                // xpub
-                val xpub = remember { business?.walletManager?.getXpub() ?: "" to "" }
-                Setting(title = stringResource(id = R.string.electrum_xpub_label), description = stringResource(id = R.string.electrum_xpub_value, xpub.first, xpub.second))
             }
         }
     }
@@ -207,7 +198,8 @@ private fun ElectrumServerDialog(
                         }
                         address = it
                     },
-                    label = { Text(stringResource(id = R.string.electrum_dialog_input)) },
+                    maxLines = 4,
+                    staticLabel = stringResource(id = R.string.electrum_dialog_input),
                     enabled = useCustomServer && connectionCheck != ElectrumViewModel.CertificateCheckState.Checking
                 )
                 if (addressError) {
@@ -268,7 +260,7 @@ private fun ElectrumServerDialog(
                     val cert = check.certificate
                     Column(
                         Modifier
-                            .background(mutedBgColor())
+                            .background(mutedBgColor)
                             .padding(horizontal = 24.dp, vertical = 12.dp)
                     ) {
                         TextWithIcon(
@@ -319,7 +311,7 @@ private fun ElectrumServerDialog(
                         Button(
                             text = stringResource(id = R.string.electrum_dialog_cert_accept),
                             icon = R.drawable.ic_check_circle,
-                            iconTint = positiveColor(),
+                            iconTint = positiveColor,
                             space = 8.dp,
                             onClick = { onConfirm(ServerAddress(check.host, check.port, TcpSocket.TLS.PINNED_PUBLIC_KEY(Base64.encodeToString(cert.publicKey.encoded, Base64.NO_WRAP)))) },
                         )
@@ -334,6 +326,6 @@ private fun ElectrumServerDialog(
 private fun CertDetail(label: String, value: String) {
     Text(text = label, style = MaterialTheme.typography.body2)
     Spacer(modifier = Modifier.height(2.dp))
-    Text(text = value, style = monoTypo(), maxLines = 1)
+    Text(text = value, style = monoTypo, maxLines = 1)
     Spacer(modifier = Modifier.height(4.dp))
 }

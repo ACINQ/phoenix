@@ -52,7 +52,7 @@ class DisplaySeedFragment : BaseFragment() {
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentSettingsDisplaySeedBinding.inflate(inflater, container, false)
     mBinding.lifecycleOwner = this
-    mBinding.instructions.text = Converter.html(getString(R.string.displayseed_instructions))
+    mBinding.instructions.text = Converter.html(getString(R.string.legacy_displayseed_instructions))
     return mBinding.root
   }
 
@@ -63,14 +63,15 @@ class DisplaySeedFragment : BaseFragment() {
     model.state.observe(viewLifecycleOwner, Observer { state ->
       when (state) {
         is DisplaySeedState.Error.Generic -> {
-          context?.let { Toast.makeText(it, getString(R.string.displayseed_error_generic), Toast.LENGTH_SHORT).show() }
+          context?.let { Toast.makeText(it, getString(R.string.legacy_displayseed_error_generic), Toast.LENGTH_SHORT).show() }
         }
         is DisplaySeedState.Error.InvalidAuth -> {
-          context?.let { Toast.makeText(it, getString(R.string.startup_error_auth_failed), Toast.LENGTH_SHORT).show() }
+          context?.let { Toast.makeText(it, getString(R.string.legacy_startup_error_auth_failed), Toast.LENGTH_SHORT).show() }
         }
         is DisplaySeedState.Done -> {
           context?.run { getSeedDialog(this, state.words) }?.show()
         }
+        else -> {}
       }
     })
   }
@@ -138,7 +139,7 @@ class DisplaySeedFragment : BaseFragment() {
 
     val dialog = AlertDialog.Builder(context, R.style.default_dialogTheme)
       .setView(view)
-      .setPositiveButton(R.string.btn_ok, null)
+      .setPositiveButton(R.string.legacy_btn_ok, null)
       .create()
 
     // disable screen capture
@@ -161,7 +162,7 @@ class DisplaySeedFragment : BaseFragment() {
     val rightPadding = if (hasRightPadding) resources.getDimensionPixelSize(R.dimen.space_lg) else 0
     val textView = TextView(context)
     textView.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT)
-    textView.text = Converter.html(getString(R.string.displayseed_words_td, i + 1, word))
+    textView.text = Converter.html(getString(R.string.legacy_displayseed_words_td, i + 1, word))
     textView.setPadding(0, 0, rightPadding, bottomPadding)
     return textView
   }

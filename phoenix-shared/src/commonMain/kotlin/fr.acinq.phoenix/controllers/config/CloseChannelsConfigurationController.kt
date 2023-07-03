@@ -2,22 +2,23 @@ package fr.acinq.phoenix.controllers.config
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.channel.*
+import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.io.WrappedChannelCommand
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration.Model.ChannelInfoStatus
-import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.utils.Parser
-import fr.acinq.phoenix.utils.extensions.localCommitmentSpec
+import fr.acinq.phoenix.utils.extensions.localBalance
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 
 class AppCloseChannelsConfigurationController(
     loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
-    private val chain: Chain,
+    private val chain: NodeParams.Chain,
     private val isForceClose: Boolean
 ) : AppController<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>(
     loggerFactory = loggerFactory,
@@ -77,7 +78,7 @@ class AppCloseChannelsConfigurationController(
                     channelInfoStatus(it.value)?.let { mappedStatus ->
                         CloseChannelsConfiguration.Model.ChannelInfo(
                             id = it.key,
-                            balance = sats(it.value),
+                            balance = it.value.localBalance()?.truncateToSatoshi(),
                             status = mappedStatus
                         )
                     }
@@ -102,10 +103,6 @@ class AppCloseChannelsConfigurationController(
         }
     }
 
-    private fun sats(channel: ChannelState): Long {
-        return channel.localCommitmentSpec?.toLocal?.truncateToSatoshi()?.toLong() ?: 0
-    }
-
     override fun process(intent: CloseChannelsConfiguration.Intent) {
         var scriptPubKey : ByteArray? = null
         if (intent is CloseChannelsConfiguration.Intent.MutualCloseAllChannels) {
@@ -123,18 +120,17 @@ class AppCloseChannelsConfigurationController(
                 isClosable(it.value)
             }
 
-            closingChannelIds = closingChannelIds?.let {
-                it.plus(filteredChannels.keys)
-            } ?: filteredChannels.keys
+            closingChannelIds = closingChannelIds?.plus(filteredChannels.keys) ?: filteredChannels.keys
 
             filteredChannels.keys.forEach { channelId ->
-                val command: CloseCommand = if (scriptPubKey != null) {
-                    CMD_CLOSE(scriptPubKey = ByteVector(scriptPubKey), feerates = null)
+                val command: ChannelCommand = if (scriptPubKey != null) {
+                    logger.info { "(mutual) closing channel=${channelId.toHex()}" }
+                    ChannelCommand.Close.MutualClose(scriptPubKey = ByteVector(scriptPubKey), feerates = null)
                 } else {
-                    CMD_FORCECLOSE
+                    logger.info { "(force) closing channel=${channelId.toHex()}" }
+                    ChannelCommand.Close.ForceClose
                 }
-                val channelEvent = ChannelCommand.ExecuteCommand(command)
-                val peerEvent = WrappedChannelCommand(channelId, channelEvent)
+                val peerEvent = WrappedChannelCommand(channelId, command)
                 peer.send(peerEvent)
             }
         }

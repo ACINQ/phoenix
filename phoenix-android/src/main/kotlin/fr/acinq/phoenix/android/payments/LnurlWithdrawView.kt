@@ -16,13 +16,10 @@
 
 package fr.acinq.phoenix.android.payments
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -33,13 +30,13 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.preferredAmountUnit
-import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.android.utils.negativeColor
-import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.android.utils.Converter.toPrettyStringWithFallback
 import fr.acinq.phoenix.android.utils.annotatedStringResource
+import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.lnurl.LnurlError
 
 @Composable
@@ -58,101 +55,76 @@ fun LnurlWithdrawView(
     var amount by remember { mutableStateOf<MilliSatoshi?>(model.lnurlWithdraw.minWithdrawable) }
     var amountErrorMessage by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .padding(PaddingValues(bottom = 50.dp)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        DefaultScreenHeader(onBackClick = onBackClick)
-        Spacer(Modifier.height(16.dp))
-
-        when (model) {
-            is Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest, is Scan.Model.LnurlWithdrawFlow.LnurlWithdrawFetch -> {
-
-                // withdraw details
-                Card(
-                    externalPadding = PaddingValues(horizontal = 16.dp),
-                    internalPadding = PaddingValues(vertical = 32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(text = annotatedStringResource(R.string.lnurl_withdraw_header, model.lnurlWithdraw.initialUrl.host), textAlign = TextAlign.Center)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    AmountHeroInput(
-                        initialAmount = amount,
-                        onAmountChange = { newAmount ->
-                            amountErrorMessage = ""
-                            when {
-                                newAmount == null -> {}
-                                newAmount.amount < model.lnurlWithdraw.minWithdrawable -> {
-                                    amountErrorMessage = context.getString(R.string.lnurl_withdraw_amount_below_min, model.lnurlWithdraw.minWithdrawable.toPrettyStringWithFallback(prefUnit, rate, withUnit = true))
-                                }
-                                newAmount.amount > model.lnurlWithdraw.maxWithdrawable -> {
-                                    amountErrorMessage = context.getString(R.string.lnurl_withdraw_amount_above_max, model.lnurlWithdraw.maxWithdrawable.toPrettyStringWithFallback(prefUnit, rate, withUnit = true))
-                                }
-                            }
-                            amount = newAmount?.amount
-                        },
-                        validationErrorMessage = amountErrorMessage,
-                        inputTextSize = 42.sp,
-                        enabled = model.lnurlWithdraw.minWithdrawable != model.lnurlWithdraw.maxWithdrawable
-                    )
-                    Spacer(Modifier.height(24.dp))
-                    Label(text = stringResource(R.string.lnurl_pay_meta_description)) {
-                        Text(text = model.lnurlWithdraw.defaultDescription)
-                    }
-                }
-                Spacer(Modifier.height(32.dp))
-
-                // withdraw button, progress feedback, error messages
-                if (model is Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest) {
-                    val error = model.error
-                    if (error != null && error is Scan.LnurlWithdrawError.RemoteError) {
-                        RemoteErrorResponseView(error.err)
-                    }
-                    FilledButton(
-                        text = stringResource(id = R.string.lnurl_withdraw_confirm_button),
-                        icon = R.drawable.ic_receive,
-                        enabled = amount != null && amountErrorMessage.isBlank(),
-                    ) {
-                        amount?.let {
-                            onWithdrawClick(
-                                Scan.Intent.LnurlWithdrawFlow.SendLnurlWithdraw(
-                                    lnurlWithdraw = model.lnurlWithdraw,
-                                    amount = it,
-                                    description = model.lnurlWithdraw.defaultDescription
-                                )
-                            )
+    SplashLayout(
+        header = { DefaultScreenHeader(onBackClick = onBackClick) },
+        topContent = {
+            Text(text = annotatedStringResource(R.string.lnurl_withdraw_header, model.lnurlWithdraw.initialUrl.host), textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(16.dp))
+            AmountHeroInput(
+                initialAmount = amount,
+                onAmountChange = { newAmount ->
+                    amountErrorMessage = ""
+                    when {
+                        newAmount == null -> {}
+                        newAmount.amount < model.lnurlWithdraw.minWithdrawable -> {
+                            amountErrorMessage = context.getString(R.string.lnurl_withdraw_amount_below_min, model.lnurlWithdraw.minWithdrawable.toPrettyStringWithFallback(prefUnit, rate, withUnit = true))
+                        }
+                        newAmount.amount > model.lnurlWithdraw.maxWithdrawable -> {
+                            amountErrorMessage = context.getString(R.string.lnurl_withdraw_amount_above_max, model.lnurlWithdraw.maxWithdrawable.toPrettyStringWithFallback(prefUnit, rate, withUnit = true))
                         }
                     }
-                } else {
-                    ProgressView(text = stringResource(id = R.string.lnurl_withdraw_wait))
+                    amount = newAmount?.amount
+                },
+                validationErrorMessage = amountErrorMessage,
+                inputTextSize = 42.sp,
+                enabled = model.lnurlWithdraw.minWithdrawable != model.lnurlWithdraw.maxWithdrawable
+                        && model is Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest,
+            )
+        }
+    ) {
+        SplashLabelRow(label = stringResource(R.string.lnurl_pay_meta_description)) {
+            Text(text = model.lnurlWithdraw.defaultDescription)
+        }
+        Spacer(Modifier.height(32.dp))
+        when (model) {
+            is Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest -> {
+                val error = model.error
+                if (error != null && error is Scan.LnurlWithdrawError.RemoteError) {
+                    ErrorMessage(
+                        header = stringResource(id = R.string.lnurl_withdraw_error_header),
+                        details = getRemoteErrorMessage(error = error.err)
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
-
+                FilledButton(
+                    text = stringResource(id = R.string.lnurl_withdraw_confirm_button),
+                    icon = R.drawable.ic_receive,
+                    enabled = amount != null && amountErrorMessage.isBlank(),
+                ) {
+                    amount?.let {
+                        onWithdrawClick(
+                            Scan.Intent.LnurlWithdrawFlow.SendLnurlWithdraw(
+                                lnurlWithdraw = model.lnurlWithdraw,
+                                amount = it,
+                                description = model.lnurlWithdraw.defaultDescription
+                            )
+                        )
+                    }
+                }
+            }
+            is Scan.Model.LnurlWithdrawFlow.LnurlWithdrawFetch -> {
+                ProgressView(text = stringResource(id = R.string.lnurl_withdraw_wait))
             }
             is Scan.Model.LnurlWithdrawFlow.Receiving -> {
-                Card(externalPadding = PaddingValues(horizontal = 16.dp), internalPadding = PaddingValues(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = annotatedStringResource(id = R.string.lnurl_withdraw_success, model.lnurlWithdraw.callback.host))
-                    Spacer(Modifier.height(12.dp))
-                    BorderButton(text = stringResource(id = R.string.btn_ok), icon = R.drawable.ic_check_circle, onClick = onBackClick)
-                }
+                Text(
+                    text = annotatedStringResource(id = R.string.lnurl_withdraw_success, model.lnurlWithdraw.callback.host),
+                    textAlign = TextAlign.Center
+                )
+                Spacer(Modifier.height(12.dp))
+                BorderButton(text = stringResource(id = R.string.btn_ok), icon = R.drawable.ic_check_circle, onClick = onBackClick)
             }
         }
     }
-}
-
-@Composable
-private fun RemoteErrorResponseView(
-    error: LnurlError.RemoteFailure
-) {
-    Text(text = stringResource(R.string.lnurl_withdraw_error_header), style = MaterialTheme.typography.body2)
-    Spacer(Modifier.height(8.dp))
-    Text(
-        text = getRemoteErrorMessage(error = error),
-        style = MaterialTheme.typography.body1.copy(color = negativeColor(), textAlign = TextAlign.Center),
-        modifier = Modifier.padding(horizontal = 16.dp)
-    )
-    Spacer(Modifier.height(24.dp))
 }
 
 @Composable

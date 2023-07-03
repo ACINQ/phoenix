@@ -19,6 +19,7 @@ fileprivate enum Key: String {
 	case recentTipPercents
 	case isNewWallet
 	case invoiceExpirationDays
+	case liquidityPolicy
 	case maxFees
 	case hideAmounts = "hideAmountsOnHomeScreen"
 	case showOriginalFiatAmount
@@ -89,6 +90,20 @@ class Prefs {
 		return Int64(invoiceExpirationDays) * Int64(60 * 60 * 24)
 	}
 	
+	lazy private(set) var liquidityPolicyPublisher: AnyPublisher<LiquidityPolicy, Never> = {
+		defaults.publisher(for: \.liquidityPolicy, options: [.initial, .new])
+			.map({ (data: Data?) -> LiquidityPolicy in
+				data?.jsonDecode() ?? LiquidityPolicy.defaultPolicy()
+			})
+			.removeDuplicates()
+			.eraseToAnyPublisher()
+	}()
+	
+	var liquidityPolicy: LiquidityPolicy {
+		get { defaults.liquidityPolicy?.jsonDecode() ?? LiquidityPolicy.defaultPolicy() }
+		set { defaults.liquidityPolicy = newValue.jsonEncode() }
+	}
+	
 	lazy private(set) var maxFeesPublisher: AnyPublisher<MaxFees?, Never> = {
 		defaults.publisher(for: \.maxFees, options: [.initial, .new])
 			.map({ (data: Data?) -> MaxFees? in
@@ -138,6 +153,12 @@ class Prefs {
 	// --------------------------------------------------
 	// MARK: Wallet State
 	// --------------------------------------------------
+	
+	lazy private(set) var isNewWalletPublisher: AnyPublisher<Bool, Never> = {
+		defaults.publisher(for: \.isNewWallet, options: [.initial, .new])
+			.removeDuplicates()
+			.eraseToAnyPublisher()
+	}()
 	
 	/**
 	 * Set to true, until the user has funded their wallet at least once.
@@ -239,6 +260,7 @@ class Prefs {
 		defaults.removeObject(forKey: Key.recentTipPercents.rawValue)
 		defaults.removeObject(forKey: Key.isNewWallet.rawValue)
 		defaults.removeObject(forKey: Key.invoiceExpirationDays.rawValue)
+		defaults.removeObject(forKey: Key.liquidityPolicy.rawValue)
 		defaults.removeObject(forKey: Key.maxFees.rawValue)
 		defaults.removeObject(forKey: Key.hideAmounts.rawValue)
 		defaults.removeObject(forKey: Key.showOriginalFiatAmount.rawValue)
@@ -269,6 +291,11 @@ extension UserDefaults {
 	@objc fileprivate var invoiceExpirationDays: Int {
 		get { integer(forKey: Key.invoiceExpirationDays.rawValue) }
 		set { set(newValue, forKey: Key.invoiceExpirationDays.rawValue) }
+	}
+	
+	@objc fileprivate var liquidityPolicy: Data? {
+		get { data(forKey: Key.liquidityPolicy.rawValue) }
+		set { set(newValue, forKey: Key.liquidityPolicy.rawValue) }
 	}
 
 	@objc fileprivate var maxFees: Data? {

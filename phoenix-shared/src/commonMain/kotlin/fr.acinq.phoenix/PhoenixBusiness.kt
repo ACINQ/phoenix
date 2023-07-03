@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix
 
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.TcpSocket
@@ -28,7 +29,6 @@ import fr.acinq.phoenix.controllers.main.AppHomeController
 import fr.acinq.phoenix.controllers.payments.AppReceiveController
 import fr.acinq.phoenix.controllers.payments.AppScanController
 import fr.acinq.phoenix.controllers.payments.Scan
-import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.createAppDbDriver
@@ -81,9 +81,9 @@ class PhoenixBusiness(
         }
     }
 
-    val chain = Chain.Testnet
+    val chain: NodeParams.Chain = NodeParamsManager.chain
 
-    internal val electrumClient by lazy { ElectrumClient(null, MainScope(), loggerFactory) }
+    val electrumClient by lazy { ElectrumClient(null, MainScope(), loggerFactory) }
     internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope(), loggerFactory) }
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
@@ -100,6 +100,7 @@ class PhoenixBusiness(
     val currencyManager by lazy { CurrencyManager(this) }
     val connectionsManager by lazy { ConnectionsManager(this) }
     val lnurlManager by lazy { LnurlManager(this) }
+    val notificationsManager by lazy { NotificationsManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
     val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(loggerFactory)) }
 
@@ -135,6 +136,7 @@ class PhoenixBusiness(
         appConfigurationManager.cancel()
         currencyManager.cancel()
         lnurlManager.cancel()
+        notificationsManager.cancel()
         logMemory.cancel()
     }
 
@@ -170,9 +172,6 @@ class PhoenixBusiness(
 
         override fun electrumConfiguration(): ElectrumConfigurationController =
             AppElectrumConfigurationController(_this)
-
-        override fun channelsConfiguration(): ChannelsConfigurationController =
-            AppChannelsConfigurationController(_this)
 
         override fun logsConfiguration(): LogsConfigurationController =
             AppLogsConfigurationController(_this)

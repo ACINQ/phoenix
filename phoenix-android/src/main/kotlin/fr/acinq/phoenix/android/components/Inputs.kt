@@ -17,6 +17,9 @@
 package fr.acinq.phoenix.android.components
 
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -25,7 +28,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -41,10 +46,11 @@ import fr.acinq.phoenix.android.utils.*
 fun TextInput(
     modifier: Modifier = Modifier,
     text: String,
+    minLines: Int = 1,
     maxLines: Int = 1,
     singleLine: Boolean = false,
     maxChars: Int? = null,
-    label: @Composable (() -> Unit)? = null,
+    staticLabel: String?,
     placeholder: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     errorMessage: String? = null,
@@ -53,58 +59,82 @@ fun TextInput(
 ) {
     val charsCount by remember(text) { mutableStateOf(text.length) }
     val focusManager = LocalFocusManager.current
-    Column {
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    Box(modifier = modifier.enableOrFade(enabled)) {
         OutlinedTextField(
             value = text,
-            onValueChange = { newValue ->
-                if (maxChars == null || newValue.length <= maxChars) {
-                    onTextChange(newValue)
-                }
-            },
+            onValueChange = { newValue -> onTextChange(newValue.take(maxChars ?: Int.MAX_VALUE)) },
+            minLines = minLines,
             maxLines = maxLines,
             singleLine = singleLine,
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Done,
                 keyboardType = KeyboardType.Text
             ),
-            label = label,
+            label = null,
             placeholder = placeholder,
             trailingIcon = {
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     if (text.isNotBlank()) {
                         FilledButton(
                             onClick = { onTextChange("") },
                             icon = R.drawable.ic_cross,
+                            enabled = enabled,
                             backgroundColor = Color.Transparent,
                             iconTint = MaterialTheme.colors.onSurface,
                             padding = PaddingValues(12.dp),
                         )
-                        Spacer(Modifier.width(8.dp))
                     }
                     trailingIcon?.let { it() }
                 }
             },
             enabled = enabled,
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-            colors = outlinedTextFieldColors(),
+            colors = if (errorMessage.isNullOrBlank()) outlinedTextFieldColors() else errorOutlinedTextFieldColors(),
             shape = RoundedCornerShape(8.dp),
-            modifier = modifier.enableOrFade(enabled)
+            interactionSource = interactionSource,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp, top = if (staticLabel != null) 14.dp else 0.dp)
         )
-        Spacer(Modifier.height(4.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            if (!errorMessage.isNullOrBlank() && enabled) {
-                Text(
-                    text = errorMessage,
-                    style = MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 13.sp),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            if (maxChars != null) {
-                Text(
-                    text = "$charsCount/$maxChars",
-                    style = MaterialTheme.typography.caption.copy(fontSize = 13.sp),
-                )
-            }
+
+        staticLabel?.let {
+            Text(
+                text = staticLabel,
+                maxLines = 1,
+                style = when {
+                    !errorMessage.isNullOrBlank() -> MaterialTheme.typography.body2.copy(color = negativeColor, fontSize = 14.sp)
+                    isFocused -> MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary, fontSize = 14.sp)
+                    else -> MaterialTheme.typography.body1.copy(fontSize = 14.sp)
+                },
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(start = 8.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colors.surface)
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
+            )
+        }
+
+        val subMessage = errorMessage?.takeIf { it.isNotBlank() } ?: if (maxChars != null && charsCount > 0) {
+            "$charsCount/$maxChars"
+        } else ""
+        if (subMessage.isNotBlank()) {
+            Text(
+                text = subMessage,
+                maxLines = 1,
+                style = when {
+                    !errorMessage.isNullOrBlank() -> MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.onPrimary, fontSize = 13.sp)
+                    else -> MaterialTheme.typography.subtitle2.copy(fontSize = 13.sp)
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 10.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(if (!errorMessage.isNullOrBlank()) negativeColor else MaterialTheme.colors.surface)
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
+            )
         }
     }
 }
@@ -120,6 +150,7 @@ fun NumberInput(
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
     initialValue: Double?,
     onValueChange: (Double?) -> Unit,
@@ -174,6 +205,7 @@ fun NumberInput(
             enabled = enabled,
             label = label,
             placeholder = placeholder,
+            trailingIcon = trailingIcon,
             singleLine = true,
             maxLines = 1,
             keyboardOptions = KeyboardOptions.Default.copy(
@@ -190,8 +222,49 @@ fun NumberInput(
         Spacer(Modifier.height(4.dp))
         Text(
             text = if (enabled) errorMessage else "",
-            style = MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 13.sp),
+            style = MaterialTheme.typography.body1.copy(color = negativeColor, fontSize = 13.sp),
             modifier = Modifier.padding(horizontal = 16.dp)
         )
     }
+}
+
+
+@Composable
+fun RowScope.InlineNumberInput(
+    modifier: Modifier = Modifier,
+    placeholder: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    enabled: Boolean = true,
+    value: Double?,
+    onValueChange: (Double?) -> Unit,
+    isError: Boolean,
+    acceptDecimal: Boolean = true,
+) {
+    val focusManager = LocalFocusManager.current
+    var internalText by remember { mutableStateOf(value?.let { if (acceptDecimal) it.toString() else it.toLong().toString() } ?: "") }
+
+    OutlinedTextField(
+        value = internalText,
+        onValueChange = {
+            internalText = it
+            onValueChange(it.toDoubleOrNull())
+        },
+        isError = isError,
+        enabled = enabled,
+        label = null,
+        placeholder = placeholder,
+        trailingIcon = trailingIcon,
+        singleLine = true,
+        maxLines = 1,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Number,
+            capitalization = KeyboardCapitalization.None,
+            autoCorrect = false,
+        ),
+        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+        colors = outlinedTextFieldColors(),
+        shape = RoundedCornerShape(8.dp),
+        modifier = modifier.alignByBaseline().enableOrFade(enabled)
+    )
 }

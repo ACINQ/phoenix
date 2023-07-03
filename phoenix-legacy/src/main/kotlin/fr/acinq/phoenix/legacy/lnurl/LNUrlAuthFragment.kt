@@ -82,12 +82,12 @@ class LNUrlAuthFragment : BaseFragment() {
       when (state) {
         is LNUrlAuthState.Error -> {
           val details = when (state.cause) {
-            is LNUrlError.RemoteFailure.CouldNotConnect -> getString(R.string.lnurl_auth_failure_remote_io, model.domainToSignIn)
-            is LNUrlError.RemoteFailure.Detailed -> getString(R.string.lnurl_auth_failure_remote_details, state.cause.reason)
-            is LNUrlError.RemoteFailure.Code -> getString(R.string.lnurl_auth_failure_remote_details, "HTTP ${state.cause.code}")
+            is LNUrlError.RemoteFailure.CouldNotConnect -> getString(R.string.legacy_lnurl_auth_failure_remote_io, model.domainToSignIn)
+            is LNUrlError.RemoteFailure.Detailed -> getString(R.string.legacy_lnurl_auth_failure_remote_details, state.cause.reason)
+            is LNUrlError.RemoteFailure.Code -> getString(R.string.legacy_lnurl_auth_failure_remote_details, "HTTP ${state.cause.code}")
             else -> state.cause.localizedMessage ?: state.cause.javaClass.simpleName
           }
-          mBinding.errorMessage.text = getString(R.string.lnurl_auth_failure, details)
+          mBinding.errorMessage.text = getString(R.string.legacy_lnurl_auth_failure, details)
         }
         is LNUrlAuthState.Done -> Handler().postDelayed({
           if (model.state.value is LNUrlAuthState.Done) {
@@ -97,8 +97,8 @@ class LNUrlAuthFragment : BaseFragment() {
         else -> Unit
       }
     }
-    mBinding.instructions.text = Converter.html(getString(R.string.lnurl_auth_instructions, model.domainToSignIn))
-    mBinding.progress.setText(Converter.html(getString(R.string.lnurl_auth_in_progress, model.domainToSignIn)))
+    mBinding.instructions.text = Converter.html(getString(R.string.legacy_lnurl_auth_instructions, model.domainToSignIn))
+    mBinding.progress.setText(Converter.html(getString(R.string.legacy_lnurl_auth_in_progress, model.domainToSignIn)))
     mBinding.model = model
   }
 

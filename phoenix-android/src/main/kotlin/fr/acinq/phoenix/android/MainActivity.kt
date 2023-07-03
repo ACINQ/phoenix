@@ -22,19 +22,18 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.*
 import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.io.PhoenixAndroidLegacyInfoEvent
-import fr.acinq.phoenix.android.components.mvi.MockView
+import fr.acinq.lightning.utils.Connection
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.service.NodeService
 import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
 import fr.acinq.phoenix.legacy.utils.*
+import fr.acinq.phoenix.managers.AppConnectionsDaemon
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -46,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
     val log: Logger = LoggerFactory.getLogger(MainActivity::class.java)
     private val appViewModel by viewModels<AppViewModel>()
-    private var navController: NavController? = null
+    private var navController: NavHostController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,10 +62,11 @@ class MainActivity : AppCompatActivity() {
 
         // migrate legacy data if needed
         lifecycleScope.launch {
-            val doDataMigration = PrefsDatastore.getDataMigrationExpected(applicationContext).first()
-            if (doDataMigration == true) {
+            val doDataMigration = PrefsDatastore.getDataMigrationExpected(applicationContext).filterNotNull().first()
+            if (doDataMigration) {
                 LegacyMigrationHelper.migrateLegacyPreferences(applicationContext)
                 LegacyMigrationHelper.migrateLegacyPayments(applicationContext)
+                delay(5_000)
                 PrefsDatastore.saveDataMigrationExpected(applicationContext, false)
             }
         }
@@ -81,6 +81,7 @@ class MainActivity : AppCompatActivity() {
                         PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
                     } else {
                         log.info("no legacy channels were found")
+                        PrefsDatastore.saveDataMigrationExpected(applicationContext, false)
                         PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.NotRequired)
                     }
                 }
@@ -88,8 +89,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContent {
-            rememberNavController().let {
-                navController = it
+            navController = rememberNavController()
+            navController?.let {
                 PhoenixAndroidTheme(it) {
                     AppView(appViewModel, it)
                 }
@@ -102,6 +103,7 @@ class MainActivity : AppCompatActivity() {
         // force the intent flag to single top, in order to avoid [handleDeepLink] to finish the current activity.
         // this would otherwise clear the app view model, i.e. loose the state which virtually reboots the app
         // TODO: look into detaching the app state from the activity
+        log.info("receive new_intent=$intent")
         intent!!.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         this.navController?.handleDeepLink(intent)
     }
@@ -113,6 +115,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        val business = (application as? PhoenixApplication)?.business
+        val daemon = business?.appConnectionsDaemon
+        if (daemon != null) {
+            tryReconnect(business, daemon)
+        }
+    }
+
+    private fun tryReconnect(business: PhoenixBusiness, daemon: AppConnectionsDaemon) {
+        val connections = business.connectionsManager.connections.value
+        if (connections.electrum !is Connection.ESTABLISHED) {
+            lifecycleScope.launch {
+                log.info("resuming app with electrum conn=${connections.electrum}, reconnecting...")
+                daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Electrum)
+            }
+        }
+        if (connections.peer !is Connection.ESTABLISHED) {
+            lifecycleScope.launch {
+                log.info("resuming app with peer conn=${connections.peer}, reconnecting...")
+                daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         try {
@@ -120,13 +147,7 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             log.error("failed to unbind activity from node service: {}", e.localizedMessage)
         }
-        log.info("destroyed main kmp activity")
+        log.info("destroyed main activity")
     }
 
-}
-
-@Preview(device = Devices.PIXEL_3)
-@Composable
-fun DefaultPreview() {
-    MockView { PhoenixAndroidTheme(rememberNavController()) { Text("Preview") } }
 }

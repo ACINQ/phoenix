@@ -48,7 +48,6 @@ fun LogsView() {
             title = stringResource(id = R.string.logs_title),
         )
         Card {
-
             SettingButton(
                 text = R.string.logs_view_button,
                 icon = R.drawable.ic_eye,

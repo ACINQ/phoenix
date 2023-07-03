@@ -164,9 +164,9 @@ class SyncTxManager_State_UpdatingCloud: Equatable {
 	}
 	
 	let kind: Kind
+	var task: Task<Void, Error>? = nil
 	
 	private(set) var isCancelled = false
-	private(set) var operation: CKOperation? = nil
 	
 	init(kind: Kind) {
 		self.kind = kind
@@ -174,16 +174,7 @@ class SyncTxManager_State_UpdatingCloud: Equatable {
 	
 	func cancel() {
 		isCancelled = true
-		operation?.cancel()
-	}
-	
-	func register(_ operation: CKOperation) -> Bool {
-		if isCancelled {
-			return false
-		} else {
-			self.operation = operation
-			return true
-		}
+		task?.cancel()
 	}
 	
 	static func == (lhs: SyncTxManager_State_UpdatingCloud, rhs: SyncTxManager_State_UpdatingCloud) -> Bool {

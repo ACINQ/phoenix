@@ -30,8 +30,8 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
     app:spacer_size="@dimen/space_md_p"
-    app:subtitle="@string/paymentmode_onchain_desc"
-    app:text="@string/paymentmode_onchain" />
+    app:subtitle="@string/legacy_paymentmode_onchain_desc"
+    app:text="@string/legacy_paymentmode_onchain" />
 
   <View
     android:id="@+id/paymode_sep"
@@ -53,7 +53,7 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@id/paymode_sep"
     app:spacer_size="@dimen/space_md_p"
-    app:subtitle="@string/paymentmode_lightning_desc"
-    app:text="@string/paymentmode_lightning" />
+    app:subtitle="@string/legacy_paymentmode_lightning_desc"
+    app:text="@string/legacy_paymentmode_lightning" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

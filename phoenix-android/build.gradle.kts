@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     id("com.google.gms.google-services")
+    id("kotlinx-serialization")
 }
 
 fun gitCommitHash(): String {
@@ -23,7 +24,7 @@ android {
         applicationId = "fr.acinq.phoenix.testnet"
         minSdk = 24
         targetSdk = 33
-        versionCode = 40
+        versionCode = 50
         versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -59,6 +60,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs = freeCompilerArgs + "-opt-in=androidx.constraintlayout.compose.ExperimentalMotionApi"
     }
 
     buildFeatures {
@@ -112,6 +114,7 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:${Versions.Android.compose}")
     implementation("androidx.compose.foundation:foundation-layout:${Versions.Android.compose}")
     implementation("androidx.compose.ui:ui-tooling:${Versions.Android.compose}")
+    implementation("androidx.compose.ui:ui-util:${Versions.Android.compose}")
     implementation("androidx.compose.ui:ui-viewbinding:${Versions.Android.compose}")
     implementation("androidx.compose.runtime:runtime-livedata:${Versions.Android.compose}")
     implementation("androidx.compose.material:material:${Versions.Android.compose}")
@@ -123,6 +126,8 @@ dependencies {
     implementation("com.google.accompanist:accompanist-systemuicontroller:${Versions.Android.accompanist}")
     implementation("com.google.accompanist:accompanist-permissions:${Versions.Android.accompanist}")
     implementation("com.google.accompanist:accompanist-pager:${Versions.Android.accompanist}")
+    // -- constraint layout for compose
+    implementation("androidx.constraintlayout:constraintlayout-compose:${Versions.Android.composeConstraintLayout}")
 
     // -- scanner zxing
     implementation("com.journeyapps:zxing-android-embedded:${Versions.Android.zxing}")

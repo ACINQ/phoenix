@@ -37,8 +37,8 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"
-      app:subtitle="@string/closechannels_mutual_instructions"
-      app:title="@string/closechannels_mutual_title" />
+      app:subtitle="@string/legacy_closechannels_mutual_instructions"
+      app:title="@string/legacy_closechannels_mutual_title" />
 
     <ScrollView
       android:layout_width="match_parent"
@@ -61,13 +61,13 @@
           android:layout_height="wrap_content"
           android:visibility="@{model.state == PreChannelsCloseState.CHECKING_CHANNELS}"
           app:layout_constraintTop_toTopOf="parent"
-          app:text="@string/closechannels_checking_channels" />
+          app:text="@string/legacy_closechannels_checking_channels" />
 
         <TextView
           android:id="@+id/channels_state"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="@string/closechannels_channels_none"
+          android:text="@string/legacy_closechannels_channels_none"
           app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -75,7 +75,7 @@
           android:layout_width="match_parent"
           android:layout_marginTop="@dimen/space_md"
           android:layout_height="wrap_content"
-          android:text="@string/closechannels_mutual_input_instructions"
+          android:text="@string/legacy_closechannels_mutual_input_instructions"
           app:layout_constraintTop_toBottomOf="@id/channels_state"
           app:visibility="@{model.state == PreChannelsCloseState.READY}" />
 
@@ -85,7 +85,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md"
-          android:hint="@string/closechannels_mutual_input_hint"
+          android:hint="@string/legacy_closechannels_mutual_input_hint"
           app:layout_constraintTop_toBottomOf="@id/instructions"
           app:visibility="@{model.state == PreChannelsCloseState.READY}">
 
@@ -106,7 +106,7 @@
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md_p"
           android:drawableStart="@drawable/ic_alert_triangle"
-          android:text="@string/closechannels_message_error"
+          android:text="@string/legacy_closechannels_message_error"
           android:visibility="@{model.state == MutualCloseState.ERROR}"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout" />
 
@@ -118,7 +118,7 @@
           android:drawableStart="@drawable/ic_check"
           android:drawablePadding="@dimen/space_sm"
           android:drawableTint="?attr/positiveColor"
-          android:text="@string/closechannels_message_done"
+          android:text="@string/legacy_closechannels_message_done"
           android:visibility="@{model.state == MutualCloseState.DONE}"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout" />
@@ -131,7 +131,7 @@
           android:visibility="@{model.state == MutualCloseState.IN_PROGRESS}"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout"
-          app:text="@string/closechannels_message_in_progress" />
+          app:text="@string/legacy_closechannels_message_in_progress" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/mutual_confirm_button"
@@ -145,7 +145,7 @@
           app:icon="@drawable/ic_empty"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout"
-          app:text="@string/closechannels_mutual_button" />
+          app:text="@string/legacy_closechannels_mutual_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

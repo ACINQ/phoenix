@@ -69,6 +69,13 @@ object PrefsDatastore {
   suspend fun saveDataMigrationExpected(context: Context, isExpected: Boolean) = context.internalData.edit {
     it[DATA_MIGRATION_EXPECTED] = isExpected
   }
+
+  /** List of transaction ids that can be used for swap-in, even if zero conf. Used for migration. */
+  private val MIGRATION_TRUSTED_SWAP_IN_TXS = stringSetPreferencesKey("MIGRATION_TRUSTED_SWAP_IN_TXS")
+  fun getMigrationTrustedSwapInTxs(context: Context): Flow<Set<String>> = prefs(context).map { it[MIGRATION_TRUSTED_SWAP_IN_TXS] ?: emptySet() }
+  suspend fun saveMigrationTrustedSwapInTxs(context: Context, txs: Set<String>) = context.internalData.edit {
+    it[MIGRATION_TRUSTED_SWAP_IN_TXS] = txs
+  }
 }
 
 /**

@@ -16,36 +16,20 @@
 
 package fr.acinq.phoenix.db.payments
 
+import com.squareup.sqldelight.runtime.coroutines.asFlow
+import com.squareup.sqldelight.runtime.coroutines.mapToList
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Crypto
+import fr.acinq.bitcoin.byteVector32
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.*
-import fr.acinq.phoenix.utils.extensions.execute
-import fr.acinq.phoenix.utils.extensions.QueryExecution
+import kotlinx.coroutines.flow.Flow
 
 class IncomingQueries(private val database: PaymentsDatabase) {
 
     private val queries = database.incomingPaymentsQueries
-
-    /**
-     * @return The paymentHash (= SHA256(preimage))
-     */
-    fun addIncomingPayment(
-        preimage: ByteVector32,
-        origin: IncomingPayment.Origin,
-        createdAt: Long
-    ): ByteVector32 {
-        val paymentHash = Crypto.sha256(preimage).toByteVector32()
-        addIncomingPayment(
-            preimage = preimage,
-            paymentHash = paymentHash,
-            origin = origin,
-            createdAt = createdAt
-        )
-        return paymentHash
-    }
 
     fun addIncomingPayment(
         preimage: ByteVector32,
@@ -65,7 +49,7 @@ class IncomingQueries(private val database: PaymentsDatabase) {
 
     fun receivePayment(
         paymentHash: ByteVector32,
-        receivedWith: Set<IncomingPayment.ReceivedWith>,
+        receivedWith: List<IncomingPayment.ReceivedWith>,
         receivedAt: Long
     ) {
         database.transaction {
@@ -76,117 +60,60 @@ class IncomingQueries(private val database: PaymentsDatabase) {
             val existingReceivedWith = paymentInDb.received?.receivedWith ?: emptySet()
             val newReceivedWith = existingReceivedWith + receivedWith
             val (receivedWithType, receivedWithBlob) = newReceivedWith.mapToDb() ?: (null to null)
-            val receivedWithNewChannel = newReceivedWith.any {
-                it is IncomingPayment.ReceivedWith.NewChannel
-            }
             queries.updateReceived(
                 received_at = receivedAt,
                 received_with_type = receivedWithType,
                 received_with_blob = receivedWithBlob,
-                received_with_new_channel = if (receivedWithNewChannel) 1 else 0,
                 payment_hash = paymentHash.toByteArray()
             )
             didCompleteWalletPayment(WalletPaymentId.IncomingPaymentId(paymentHash), database)
         }
     }
 
-    fun updateNewChannelReceivedWithChannelId(paymentHash: ByteVector32, channelId: ByteVector32) {
-        database.transaction {
-            val paymentInDb = queries.get(
-                payment_hash = paymentHash.toByteArray(),
-                mapper = ::mapIncomingPayment
-            ).executeAsOneOrNull() ?: throw IncomingPaymentNotFound(paymentHash)
-            val newReceivedWith = paymentInDb.received?.receivedWith?.map {
-                when (it) {
-                    is IncomingPayment.ReceivedWith.NewChannel -> it.copy(channelId = channelId)
-                    else -> it
-                }
-            }?.toSet() ?: emptySet()
-            val (receivedWithType, receivedWithBlob) = newReceivedWith.mapToDb() ?: (null to null)
-            val receivedWithNewChannel = newReceivedWith.any {
-                it is IncomingPayment.ReceivedWith.NewChannel
+    fun setLocked(paymentHash: ByteVector32, lockedAt: Long) {
+        val paymentInDb = queries.get(
+            payment_hash = paymentHash.toByteArray(),
+            mapper = ::mapIncomingPayment
+        ).executeAsOneOrNull()
+        val newReceivedWith = paymentInDb?.received?.receivedWith?.map {
+            when (it) {
+                is IncomingPayment.ReceivedWith.NewChannel -> it.copy(lockedAt = lockedAt)
+                is IncomingPayment.ReceivedWith.SpliceIn -> it.copy(lockedAt = lockedAt)
+                else -> it
             }
-            queries.updateReceived(
-                received_at = paymentInDb.received?.receivedAt,
-                received_with_type = receivedWithType,
-                received_with_blob = receivedWithBlob,
-                received_with_new_channel = if (receivedWithNewChannel) 1 else 0,
-                payment_hash = paymentHash.toByteArray()
-            )
-            didCompleteWalletPayment(WalletPaymentId.IncomingPaymentId(paymentHash), database)
         }
+        val (newReceivedWithType, newReceivedWithBlob) = newReceivedWith?.mapToDb() ?: (null to null)
+        queries.updateReceived(
+            // we override the previous received_at timestamp to trigger a refresh of the payment's cache data
+            // because the list-all query feeding the cache uses `received_at` for incoming payments
+            received_at = lockedAt,
+            received_with_type = newReceivedWithType,
+            received_with_blob = newReceivedWithBlob,
+            payment_hash = paymentHash.toByteArray()
+        )
+        didCompleteWalletPayment(WalletPaymentId.IncomingPaymentId(paymentHash), database)
     }
 
-    fun findNewChannelPayment(channelId: ByteVector32): ByteVector32? {
-        return database.transactionWithResult {
-            val query = queries.listNewChannel(mapper = ::mapListNewChannel)
-            var match: ListNewChannelRow? = null
-            query.execute { row ->
-                row.received?.receivedWith?.firstOrNull() {
-                    it is IncomingPayment.ReceivedWith.NewChannel && it.channelId == channelId
-                }?.let {
-                    match = row
-                    QueryExecution.Stop
-                } ?: QueryExecution.Continue
+    fun setConfirmed(paymentHash: ByteVector32, confirmedAt: Long) {
+        val paymentInDb = queries.get(
+            payment_hash = paymentHash.toByteArray(),
+            mapper = ::mapIncomingPayment
+        ).executeAsOneOrNull()
+        val newReceivedWith = paymentInDb?.received?.receivedWith?.map {
+            when (it) {
+                is IncomingPayment.ReceivedWith.NewChannel -> it.copy(confirmedAt = confirmedAt)
+                is IncomingPayment.ReceivedWith.SpliceIn -> it.copy(confirmedAt = confirmedAt)
+                else -> it
             }
-            match?.paymentHash
         }
-    }
-
-    fun updateNewChannelConfirmed(paymentHash: ByteVector32, receivedAt: Long) {
-        database.transaction {
-            val paymentInDb = queries.get(
-                payment_hash = paymentHash.toByteArray(),
-                mapper = ::mapIncomingPayment
-            ).executeAsOneOrNull() ?: throw IncomingPaymentNotFound(paymentHash)
-            val newReceivedWith = paymentInDb.received?.receivedWith?.map {
-                when (it) {
-                    is IncomingPayment.ReceivedWith.NewChannel -> it.copy(confirmed = true)
-                    else -> it
-                }
-            }?.toSet() ?: emptySet()
-            val (receivedWithType, receivedWithBlob) = newReceivedWith.mapToDb() ?: (null to null)
-            val receivedWithNewChannel = newReceivedWith.any {
-                it is IncomingPayment.ReceivedWith.NewChannel
-            }
-            queries.updateReceived(
-                received_at = receivedAt,
-                received_with_type = receivedWithType,
-                received_with_blob = receivedWithBlob,
-                received_with_new_channel = if (receivedWithNewChannel) 1 else 0,
-                payment_hash = paymentHash.toByteArray()
-            )
-            didCompleteWalletPayment(WalletPaymentId.IncomingPaymentId(paymentHash), database)
-        }
-    }
-
-    fun addAndReceivePayment(
-        preimage: ByteVector32,
-        origin: IncomingPayment.Origin,
-        receivedWith: Set<IncomingPayment.ReceivedWith>,
-        createdAt: Long,
-        receivedAt: Long
-    ) {
-        database.transaction {
-            val paymentHash = Crypto.sha256(preimage).toByteVector32()
-            val (originType, originData) = origin.mapToDb()
-            val (receivedWithType, receivedWithBlob) = receivedWith.mapToDb() ?: (null to null)
-            val receivedWithNewChannel = receivedWith.any {
-                it is IncomingPayment.ReceivedWith.NewChannel
-            }
-            queries.insertAndReceive(
-                payment_hash = paymentHash.toByteArray(),
-                preimage = preimage.toByteArray(),
-                origin_type = originType,
-                origin_blob = originData,
-                received_at = receivedAt,
-                received_with_type = receivedWithType,
-                received_with_blob = receivedWithBlob,
-                received_with_new_channel = if (receivedWithNewChannel) 1 else 0,
-                created_at = createdAt
-            )
-            didCompleteWalletPayment(WalletPaymentId.IncomingPaymentId(paymentHash), database)
-        }
+        val (newReceivedWithType, newReceivedWithBlob) = newReceivedWith?.mapToDb() ?: (null to null)
+        queries.updateReceived(
+            received_at = paymentInDb?.received?.receivedAt,
+            received_with_type = newReceivedWithType,
+            received_with_blob = newReceivedWithBlob,
+            payment_hash = paymentHash.toByteArray()
+        )
+        didCompleteWalletPayment(WalletPaymentId.IncomingPaymentId(paymentHash), database)
     }
 
     fun getIncomingPayment(paymentHash: ByteVector32): IncomingPayment? {
@@ -197,26 +124,14 @@ class IncomingQueries(private val database: PaymentsDatabase) {
         return queries.getOldestReceivedDate().executeAsOneOrNull()
     }
 
+    fun listAllNotConfirmed(): Flow<List<IncomingPayment>> {
+        return queries.listAllNotConfirmed(::mapIncomingPayment).asFlow().mapToList()
+    }
+
     fun listExpiredPayments(fromCreatedAt: Long, toCreatedAt: Long): List<IncomingPayment> {
         return queries.listAllWithin(fromCreatedAt, toCreatedAt, ::mapIncomingPayment).executeAsList().filter {
             it.received == null
         }
-    }
-
-    fun listIncomingPayments(count: Int, skip: Int): List<IncomingPayment> {
-        return queries.listAll(
-            limit = count.toLong(),
-            offset = skip.toLong(),
-            mapper = ::mapIncomingPayment
-        ).executeAsList()
-    }
-
-    fun listReceivedPayments(count: Int, skip: Int): List<IncomingPayment> {
-        return queries.listReceived(
-            limit = count.toLong(),
-            offset = skip.toLong(),
-            mapper = ::mapIncomingPayment
-        ).executeAsList()
     }
 
     /** Try to delete an incoming payment ; return true if an element was deleted, false otherwise. */
@@ -262,36 +177,24 @@ class IncomingQueries(private val database: PaymentsDatabase) {
                         receivedAt = received_at
                     )
                 }
+                received_at != null -> {
+                    IncomingPayment.Received(
+                        receivedWith = emptyList(),
+                        receivedAt = received_at
+                    )
+                }
                 else -> throw UnreadableIncomingReceivedWith(received_at, received_with_type, received_with_blob)
             }
         }
 
-        private fun mapListNewChannel(
-            payment_hash: ByteArray,
-            received_amount_msat: Long?,
-            received_at: Long?,
-            received_with_type: IncomingReceivedWithTypeVersion?,
-            received_with_blob: ByteArray?,
-            origin_type: IncomingOriginTypeVersion
-        ): ListNewChannelRow {
-            return ListNewChannelRow(
-                paymentHash = payment_hash.toByteVector32(),
-                received = mapIncomingReceived(
-                    received_amount_msat = received_amount_msat,
-                    received_at = received_at,
-                    received_with_type = received_with_type,
-                    received_with_blob = received_with_blob,
-                    origin_type = origin_type
-                )
-            )
+        private fun mapTxIdPaymentHash(
+            tx_id: ByteArray,
+            payment_hash: ByteArray
+        ): Pair<ByteVector32, ByteVector32> {
+            return tx_id.byteVector32() to payment_hash.byteVector32()
         }
     }
 }
-
-data class ListNewChannelRow(
-    val paymentHash: ByteVector32,
-    val received: IncomingPayment.Received?
-)
 
 class UnreadableIncomingReceivedWith(receivedAt: Long?, receivedWithTypeVersion: IncomingReceivedWithTypeVersion?, receivedWithBlob: ByteArray?) :
     RuntimeException("unreadable received with data [ receivedAt=$receivedAt, receivedWithTypeVersion=$receivedWithTypeVersion, receivedWithBlob=$receivedWithBlob ]")

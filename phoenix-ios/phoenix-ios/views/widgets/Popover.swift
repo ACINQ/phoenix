@@ -37,6 +37,13 @@ public class PopoverState: ObservableObject {
 	///
 	var closePublisher = PassthroughSubject<Void, Never>()
 	
+	/// For compatibility with SmartModal API
+	/// 
+	var currentItem: PopoverItem? {
+		
+		return publisher.value
+	}
+	
 	func display<Content: View>(
 		dismissable: Bool,
 		@ViewBuilder builder: () -> Content,

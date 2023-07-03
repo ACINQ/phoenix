@@ -13,7 +13,10 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.Duration
@@ -57,38 +60,38 @@ class AppConnectionsDaemon(
         val torIsEnabled: Boolean = false,
         val torIsAvailable: Boolean = false,
 
-        // Under normal circumstances, the connections are automatically managed based on whether
-        // or not the network connection is available. However, the app may need to influence
-        // this decision.
-        //
-        // For example, on iOS:
-        // - When the app goes into background mode, it wants to force a disconnect.
-        // - Unless a payment is in-flight, in which case it wants to stay connected until
-        //   the payment completes.
-        // - And if the app is backgrounded, but the app receives a push notification,
-        //   then it wants to re-connect and handle the incoming payment,
-        //   and disconnect again afterwards.
-        //
-        // This complexity is handled by a simple voting mechanism.
-        // (Think: retainCount from manual memory-management systems)
-        //
-        // The rules are:
-        // - if disconnectCount > 0 => triggers disconnect & prevents future connection attempts
-        // - if disconnectCount <= 0 => allows connection based on network availability (as usual)
-        //
-        // Any part of the app that "votes" is expected to properly balance their calls.
-        // For example, on iOS:
-        // - When the app goes into the background, it increments the count (vote to disconnect)
-        //   And when the app returns to the foreground, it decrements the count (undo vote)
-        // - When an in-flight payment is detected, it decrements the count (vote to remain connected).
-        //   And when the payment completes, it increments the count (undo vote).
-        // - When a push notifications wakes the app, in decrements the count (vote to connect).
-        //   And when it finishes processing, it increments the count (undo vote).
-        //
+        /**
+         * Under normal circumstances, the connections are automatically managed based on whether
+         * or not the network connection is available. However, the app may need to influence
+         * this decision.
+         *
+         * For example, on iOS:
+         * - When the app goes into background mode, it wants to force a disconnect.
+         * - Unless a payment is in-flight, in which case it wants to stay connected until
+         *   the payment completes.
+         * - And if the app is backgrounded, but the app receives a push notification,
+         *   then it wants to re-connect and handle the incoming payment,
+         *   and disconnect again afterwards.
+         *
+         * This complexity is handled by a simple voting mechanism.
+         * (Think: retainCount from manual memory-management systems)
+         *
+         * The rules are:
+         * - if disconnectCount > 0 => triggers disconnect & prevents future connection attempts
+         * - if disconnectCount <= 0 => allows connection based on network availability (as usual)
+         *
+         * Any part of the app that "votes" is expected to properly balance their calls.
+         * For example, on iOS:
+         * - When the app goes into the background, it increments the count (vote to disconnect)
+         *   And when the app returns to the foreground, it decrements the count (undo vote)
+         * - When an in-flight payment is detected, it decrements the count (vote to remain connected).
+         *   And when the payment completes, it increments the count (undo vote).
+         * - When a push notifications wakes the app, in decrements the count (vote to connect).
+         *   And when it finishes processing, it increments the count (undo vote).
+         */
         val disconnectCount: Int = 0,
 
-        // If a configuration value changes, this value can be incremented to
-        // force a disconnect & reconnect.
+        /** If a configuration value changes, this value can be incremented to force a disconnection. Only used for Electrum. */
         val configVersion: Int = 0
     ) {
         val canConnect get() = if (walletIsAvailable && internetIsAvailable && disconnectCount <= 0) {
@@ -101,6 +104,7 @@ class AppConnectionsDaemon(
             val safeInc = disconnectCount.let { if (it == Int.MAX_VALUE) it else it + 1 }
             return copy(disconnectCount = safeInc)
         }
+
         fun decrementDisconnectCount(): TrafficControl {
             val safeDec = disconnectCount.let { if (it == Int.MIN_VALUE) it else it - 1 }
             return copy(disconnectCount = safeDec)
@@ -195,8 +199,8 @@ class AppConnectionsDaemon(
                         if (torConnectionJob == null) {
                             logger.info { "starting tor" }
                             torConnectionJob = connectionLoop(
-                                "Tor",
-                                tor.state.connectionState(this)
+                                name = "Tor",
+                                statusStateFlow = tor.state.connectionState(this),
                             ) {
                                 try {
                                     tor.startInProperScope(this)
@@ -236,20 +240,20 @@ class AppConnectionsDaemon(
                     }
                 if (forceDisconnect || !it.canConnect) {
                     peerConnectionJob?.let { job ->
-                        logger.info { "disconnecting from peer" }
-                        job.cancel()
+                        logger.info { "cancel peer connection loop" }
+                        job.cancelAndJoin()
                         peer.disconnect()
                         peerConnectionJob = null
                     }
-
                 }
                 if (it.canConnect) {
                     if (peerConnectionJob == null) {
-                        logger.info { "connecting to peer" }
+                        logger.info { "starting peer connection loop" }
                         peerConnectionJob = connectionLoop(
                             name = "Peer",
-                            statusStateFlow = peer.connectionState
+                            statusStateFlow = peer.connectionState,
                         ) {
+                            logger.info { "starting actual peer connection job" }
                             peer.socketBuilder = tcpSocketBuilder()
                             peer.connect()
                         }
@@ -273,30 +277,29 @@ class AppConnectionsDaemon(
                     }
                 if (forceDisconnect || !it.canConnect) {
                     electrumConnectionJob?.let { job ->
-                        logger.info { "disconnecting from electrum" }
-                        job.cancel()
+                        logger.info { "cancel electrum connection loop" }
+                        job.cancelAndJoin()
                         electrumClient.disconnect()
                         electrumConnectionJob = null
                     }
                 }
                 if (it.canConnect) {
                     if (electrumConnectionJob == null) {
-                        logger.info { "connecting to electrum" }
-                        logger.info { "electrum socket builder=${electrumClient.socketBuilder}" }
+                        logger.info { "starting electrum connection loop" }
                         electrumConnectionJob = connectionLoop(
                             name = "Electrum",
                             statusStateFlow = electrumClient.connectionState
                         ) {
-                            val electrumServerAddress : ServerAddress? = configurationManager.electrumConfig.value?.let { electrumConfig ->
+                            val electrumServerAddress: ServerAddress? = configurationManager.electrumConfig.value?.let { electrumConfig ->
                                 when (electrumConfig) {
                                     is ElectrumConfig.Custom -> electrumConfig.server
                                     is ElectrumConfig.Random -> configurationManager.randomElectrumServer()
                                 }
                             }
                             if (electrumServerAddress == null) {
-                                logger.info { "ignored electrum connection opportunity because no server is configured yet" }
+                                logger.info { "ignoring electrum connection opportunity because no server is configured yet" }
                             } else {
-                                logger.info { "connecting to electrum server=$electrumServerAddress" }
+                                logger.info { "starting actual electrum connection job to server=$electrumServerAddress" }
                                 electrumClient.socketBuilder = tcpSocketBuilder()
                                 electrumClient.connect(electrumServerAddress)
                             }
@@ -376,6 +379,7 @@ class AppConnectionsDaemon(
         val containsTor get() = contains(Tor)
     }
 
+    /** Vote to disconnect the target. */
     fun incrementDisconnectCount(target: ControlTarget = ControlTarget.All) {
         launch {
             if (target.containsPeer) {
@@ -393,6 +397,7 @@ class AppConnectionsDaemon(
         }
     }
 
+    /** Vote to connect the target. */
     fun decrementDisconnectCount(target: ControlTarget = ControlTarget.All) {
         launch {
             if (target.containsPeer) {
@@ -410,6 +415,30 @@ class AppConnectionsDaemon(
         }
     }
 
+    /** Vote to connect the target. */
+    fun forceReconnect(target: ControlTarget = ControlTarget.All) {
+        launch {
+            if (target.containsPeer) {
+                peerControlChanges.send { copy(disconnectCount = -1) }
+            }
+            if (target.containsElectrum) {
+                electrumControlChanges.send { copy(disconnectCount = -1) }
+            }
+            if (target.containsHttp) {
+                httpApiControlChanges.send { copy(disconnectCount = -1) }
+            }
+            if (target.containsTor) {
+                torControlChanges.send { copy(disconnectCount = -1) }
+            }
+        }
+    }
+
+    /**
+     * Attempts to connect to [name] everytime the connection changes to [Connection.CLOSED]. Repeated failed attempts
+     * are throttled with an exponential backoff. This pause cannot be cancelled, which can be an issue if the network
+     * conditions have just changed and we want to reconnect immediately. In this case this job should be cancelled
+     * altogether and restarted.
+     */
     private fun connectionLoop(
         name: String,
         statusStateFlow: StateFlow<Connection>,
@@ -425,6 +454,7 @@ class AppConnectionsDaemon(
                 pause = (pause.coerceAtLeast(minPause) * 2).coerceAtMost(maxPause)
                 connect()
             } else if (it == Connection.ESTABLISHED) {
+                // reset the pause so that next disconnection is snappy
                 pause = 0.5.seconds
             }
         }

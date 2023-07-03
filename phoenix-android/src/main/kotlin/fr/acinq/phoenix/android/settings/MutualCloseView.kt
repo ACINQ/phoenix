@@ -30,17 +30,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.payments.CameraPermissionsView
 import fr.acinq.phoenix.android.payments.ScannerView
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.monoTypo
+import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration
+import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.BitcoinAddressError
 import fr.acinq.phoenix.utils.Parser
 
@@ -60,19 +66,26 @@ fun MutualCloseView(
 
     MVIView(CF::closeChannelsConfiguration) { model, postIntent ->
         if (showScannerView) {
+            var scanView by remember { mutableStateOf<DecoratedBarcodeView?>(null) }
             Box(
                 Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
             ) {
                 ScannerView(
-                    onScanViewBinding = { },
+                    onScanViewBinding = { scanView = it },
                     onScannedText = {
-                        address = it
+                        address = Parser.trimMatchingPrefix(Parser.removeExcessInput(it), Parser.bitcoinPrefixes)
                         addressErrorMessage = ""
                         showScannerView = false
                     }
                 )
+
+                CameraPermissionsView {
+                    LaunchedEffect(key1 = model) {
+                        if (showScannerView) scanView?.resume()
+                    }
+                }
 
                 // buttons at the bottom of the screen
                 Column(
@@ -121,8 +134,7 @@ fun MutualCloseView(
                                 TextInput(
                                     text = address,
                                     onTextChange = { addressErrorMessage = ""; address = it },
-                                    label = { Text(text = stringResource(id = R.string.mutualclose_input_hint)) },
-                                    placeholder = { Text(text = stringResource(id = R.string.mutualclose_input_placeholder)) },
+                                    staticLabel = stringResource(id = R.string.mutualclose_input_label),
                                     trailingIcon = {
                                         Button(
                                             onClick = { showScannerView = true },
@@ -140,9 +152,10 @@ fun MutualCloseView(
                         }
                         Card {
                             val chain = business.chain
-                            SettingButton(
-                                text = R.string.mutualclose_button,
+                            Button(
+                                text = stringResource(id = R.string.mutualclose_button),
                                 icon = R.drawable.ic_cross_circle,
+                                modifier = Modifier.fillMaxWidth(),
                                 enabled = address.isNotBlank() && model.channels.isNotEmpty(),
                                 onClick = {
                                     when (val validation = Parser.readBitcoinAddress(chain, address)) {
@@ -162,7 +175,17 @@ fun MutualCloseView(
                             )
                             if (showConfirmationDialog) {
                                 ConfirmDialog(
-                                    message = stringResource(R.string.mutualclose_confirm),
+                                    title = stringResource(id = R.string.mutualclose_confirm_title),
+                                    content = {
+                                        Text(text = stringResource(R.string.mutualclose_confirm_details))
+                                        Spacer(modifier = Modifier.height(16.dp))
+                                        TextWithIcon(
+                                            text = address,
+                                            icon = R.drawable.ic_chain,
+                                            textStyle = monoTypo.copy(fontSize = 14.sp),
+                                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(mutedBgColor).padding(horizontal = 12.dp, vertical = 8.dp),
+                                        )
+                                    },
                                     onDismiss = { showConfirmationDialog = false },
                                     onConfirm = {
                                         addressErrorMessage = ""

@@ -264,7 +264,7 @@ struct ForceCloseChannelsView : MVIView {
 	func nonZeroChannelsCount() -> Int {
 		
 		if let channels = channels() {
-			return channels.filter { $0.balance > 0 }.count
+			return channels.filter { ($0.balance?.sat ?? 0) > 0 }.count
 		} else {
 			return 0
 		}
@@ -334,70 +334,5 @@ fileprivate struct ConfirmationPopover : View {
 		log.trace("confirm()")
 		popoverState.close()
 		confirmAction()
-	}
-}
-
-class ForceCloseChannelsView_Previews: PreviewProvider {
-	
-	static var previews: some View {
-		
-		NavigationWrapper {
-			ForceCloseChannelsView().mock(
-				CloseChannelsConfiguration.ModelLoading()
-			)
-		}
-		.preferredColorScheme(.light)
-		.previewDevice("iPhone 8")
-		
-		NavigationWrapper {
-			ForceCloseChannelsView().mock(
-				CloseChannelsConfiguration.ModelReady(channels: [
-					CloseChannelsConfiguration.ModelChannelInfo(
-						id: Bitcoin_kmpByteVector32.random(),
-						balance: 500_000,
-						status: CloseChannelsConfiguration.ModelChannelInfoStatus.normal
-					)
-				], address: "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx")
-			)
-		}
-		.preferredColorScheme(.light)
-		.previewDevice("iPhone 8")
-		
-		NavigationWrapper {
-			ForceCloseChannelsView().mock(
-				CloseChannelsConfiguration.ModelChannelsClosed(channels: [
-					CloseChannelsConfiguration.ModelChannelInfo(
-						id: Bitcoin_kmpByteVector32.random(),
-						balance: 500_000,
-						status: CloseChannelsConfiguration.ModelChannelInfoStatus.closing
-					)
-				], closing: Set<Bitcoin_kmpByteVector32>())
-			)
-		}
-		.preferredColorScheme(.light)
-		.previewDevice("iPhone 8")
-		
-		NavigationWrapper {
-			ForceCloseChannelsView().mock(
-				CloseChannelsConfiguration.ModelChannelsClosed(channels: [
-					CloseChannelsConfiguration.ModelChannelInfo(
-						id: Bitcoin_kmpByteVector32.random(),
-						balance: 500_000,
-						status: CloseChannelsConfiguration.ModelChannelInfoStatus.closing
-					),
-					CloseChannelsConfiguration.ModelChannelInfo(
-						id: Bitcoin_kmpByteVector32.random(),
-						balance: 500_000,
-						status: CloseChannelsConfiguration.ModelChannelInfoStatus.closing
-					)
-				], closing: Set<Bitcoin_kmpByteVector32>())
-			)
-		}
-		.preferredColorScheme(.light)
-		.previewDevice("iPhone 8")
-		
-		ConfirmationPopover(confirmAction: {})
-			.preferredColorScheme(.light)
-			.previewDevice("iPhone 8")
 	}
 }

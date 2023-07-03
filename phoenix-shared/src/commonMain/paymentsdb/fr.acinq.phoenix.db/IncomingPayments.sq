@@ -9,13 +9,13 @@ CREATE TABLE IF NOT EXISTS incoming_payments (
     -- origin
     origin_type TEXT AS IncomingOriginTypeVersion NOT NULL,
     origin_blob BLOB NOT NULL,
-    -- received
+    -- this field is legacy, the amount received is the sum of the received-with parts
     received_amount_msat INTEGER DEFAULT NULL,
+    -- timestamp when the payment has been received
     received_at INTEGER DEFAULT NULL,
-    -- received with
+    -- received-with parts
     received_with_type TEXT AS IncomingReceivedWithTypeVersion DEFAULT NULL,
-    received_with_blob BLOB DEFAULT NULL,
-    received_with_new_channel INTEGER DEFAULT 0
+    received_with_blob BLOB DEFAULT NULL
 );
 
 -- Create indexes to optimize the queries in AggregatedQueries.
@@ -23,12 +23,6 @@ CREATE TABLE IF NOT EXISTS incoming_payments (
 CREATE INDEX IF NOT EXISTS incoming_payments_filter_idx
     ON incoming_payments(received_at)
  WHERE received_at IS NOT NULL;
-
--- Used to find payments associated with new channels.
--- That is, to assist in mapping from a channel_id to the associated initial payment.
-CREATE INDEX IF NOT EXISTS incoming_payments_new_channel_idx
-    ON incoming_payments(created_at)
- WHERE received_with_new_channel = 1;
 
 -- queries
 
@@ -45,8 +39,7 @@ updateReceived:
 UPDATE incoming_payments
 SET    received_at=?,
        received_with_type=?,
-       received_with_blob=?,
-       received_with_new_channel=?
+       received_with_blob=?
 WHERE  payment_hash = ?;
 
 insertAndReceive:
@@ -57,9 +50,8 @@ INSERT INTO incoming_payments (
             origin_type, origin_blob,
             received_at,
             received_with_type,
-            received_with_blob,
-            received_with_new_channel)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+            received_with_blob)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
 get:
 SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
@@ -73,14 +65,6 @@ WHERE    received_at IS NOT NULL
 ORDER BY r.received_at ASC
 LIMIT 1;
 
-listAll:
-SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
-FROM   incoming_payments
-ORDER BY
-       coalesce(received_at, created_at) DESC,
-       payment_hash DESC
-LIMIT :limit OFFSET :offset;
-
 listAllWithin:
 SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
 FROM   incoming_payments
@@ -89,20 +73,15 @@ ORDER BY
        coalesce(received_at, created_at) DESC,
        payment_hash DESC;
 
-listReceived:
-SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
-FROM   incoming_payments AS r
-WHERE  received_at IS NOT NULL
-ORDER BY
-       r.received_at DESC,
-       payment_hash DESC
-LIMIT :limit OFFSET :offset;
-
-listNewChannel:
-SELECT   payment_hash, received_amount_msat, received_at, received_with_type, received_with_blob, origin_type
-FROM     incoming_payments
-WHERE    received_with_new_channel = 1
-ORDER BY created_at DESC;
+listAllNotConfirmed:
+SELECT incoming_payments.payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
+FROM   incoming_payments
+LEFT OUTER JOIN link_tx_to_payments
+    ON link_tx_to_payments.type = 1
+    AND link_tx_to_payments.confirmed_at IS NULL
+    AND link_tx_to_payments.id = incoming_payments.payment_hash
+WHERE received_at IS NOT NULL
+;
 
 scanCompleted:
 SELECT payment_hash,

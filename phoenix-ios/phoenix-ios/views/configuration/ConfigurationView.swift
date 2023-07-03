@@ -16,8 +16,9 @@ fileprivate enum NavLinkTag: String {
 	// General
 	case AboutView
 	case DisplayConfigurationView
-	case PaymentOptionsView
+	case MyWalletView
 	case RecoveryPhraseView
+	case PaymentOptionsView
 	case DrainWalletView
 	// Security
 	case AppAccessView
@@ -39,8 +40,6 @@ struct ConfigurationView: View {
 	
 	@State private var backupSeedState: BackupSeedState = .safelyBackedUp
 	let backupSeedStatePublisher: AnyPublisher<BackupSeedState, Never>
-	
-	@State private var listViewId = UUID()
 	
 	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
 	@State private var swiftUiBugWorkaroundIdx = 0
@@ -86,7 +85,6 @@ struct ConfigurationView: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.id(listViewId)
 		.onAppear() {
 			onAppear()
 		}
@@ -101,9 +99,6 @@ struct ConfigurationView: View {
 		}
 		.onReceive(backupSeedStatePublisher) {(state: BackupSeedState) in
 			backupSeedStateChanged(state)
-		}
-		.onReceive(AppDelegate.get().externalLightningUrlPublisher) {(url: String) in
-			onExternalLightningUrl(url)
 		}
 	}
 	
@@ -137,15 +132,18 @@ struct ConfigurationView: View {
 					Image(systemName: "paintbrush.pointed")
 				}
 			}
-	
-			navLink(.PaymentOptionsView) {
-				Label { Text("Payment options & fees") } icon: {
-					Image(systemName: "wrench")
+			
+			if hasWallet {
+				navLink(.MyWalletView) {
+					Label {
+						Text("My wallet")
+					} icon: {
+						Image(systemName: "person")
+					}
 				}
 			}
-		
+			
 			if hasWallet {
-				
 				navLink(.RecoveryPhraseView) {
 					Label {
 						switch backupSeedState {
@@ -170,14 +168,21 @@ struct ConfigurationView: View {
 						Image(systemName: "squareshape.split.3x3")
 					}
 				}
-				
+			}
+	
+			navLink(.PaymentOptionsView) {
+				Label { Text("Options & fees") } icon: {
+					Image(systemName: "wrench")
+				}
+			}
+		
+			if hasWallet {
 				navLink(.DrainWalletView) {
 					Label { Text("Drain wallet") } icon: {
 						Image(systemName: "xmark.circle")
 					}
 				}
-			
-			} // </if: hasWallet>
+			}
 			
 		} // </Section: General>
 	}
@@ -263,8 +268,9 @@ struct ConfigurationView: View {
 		// General
 			case .AboutView                 : AboutView()
 			case .DisplayConfigurationView  : DisplayConfigurationView()
-			case .PaymentOptionsView        : PaymentOptionsView()
+			case .MyWalletView              : WalletInfoView()
 			case .RecoveryPhraseView        : RecoveryPhraseView()
+			case .PaymentOptionsView        : PaymentOptionsView()
 			case .DrainWalletView           : DrainWalletView(popToRoot: popToRoot)
 		// Security
 			case .AppAccessView             : AppAccessView()
@@ -335,27 +341,6 @@ struct ConfigurationView: View {
 				popToRootRequested = false
 				presentationMode.wrappedValue.dismiss()
 			}
-				
-			if #unavailable(iOS 15.0) {
-				// iOS 14 BUG and workaround.
-				//
-				// The NavigationLink remains selected after we return to the ConfigurationView.
-				// For example:
-				// - Tap on "About", to push the AboutView onto the NavigationView
-				// - Tap "<" to pop the AboutView
-				// - Notice that the "About" row is still selected (e.g. has gray background)
-				//
-				// There are several workaround for this issue:
-				// https://developer.apple.com/forums/thread/660468
-				//
-				// We are implementing the least risky solution.
-				// Which requires us to change the `List.id` property.
-				
-				if navLinkTag != nil && swiftUiBugWorkaround == nil {
-					navLinkTag = nil
-					listViewId = UUID()
-				}
-			}
 		}
 	}
 	
@@ -377,19 +362,21 @@ struct ConfigurationView: View {
 			
 			// Navigate towards deep link (if needed)
 			var newNavLinkTag: NavLinkTag? = nil
+			var delay: TimeInterval = 1.5 // seconds; multiply by number of screens we need to navigate
 			switch value {
 				case .paymentHistory     : break
-				case .backup             : newNavLinkTag = .RecoveryPhraseView
-				case .drainWallet        : newNavLinkTag = .DrainWalletView
-				case .electrum           : newNavLinkTag = .PrivacyView
-				case .backgroundPayments : newNavLinkTag = .DisplayConfigurationView
+				case .backup             : newNavLinkTag = .RecoveryPhraseView       ; delay *= 1
+				case .drainWallet        : newNavLinkTag = .DrainWalletView          ; delay *= 1
+				case .electrum           : newNavLinkTag = .PrivacyView              ; delay *= 2
+				case .backgroundPayments : newNavLinkTag = .DisplayConfigurationView ; delay *= 2
+				case .liquiditySettings  : newNavLinkTag = .PaymentOptionsView       ; delay *= 2
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
 				
 				self.swiftUiBugWorkaround = newNavLinkTag
 				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: 1.0)
+				clearSwiftUiBugWorkaround(delay: delay)
 				
 				self.navLinkTag = newNavLinkTag // Trigger/push the view
 			}
@@ -420,25 +407,6 @@ struct ConfigurationView: View {
 		log.trace("backupSeedStateChanged()")
 		
 		backupSeedState = newState
-	}
-	
-	func onExternalLightningUrl(_ urlStr: String) {
-		log.trace("onExternalLightningUrl()")
-		
-		if #unavailable(iOS 15.0) {
-			// iOS 14 bug workaround
-			//
-			// We previoulsy had a crash under the following conditions:
-			// - navigate to ConfigurationView
-			// - navigate to a subview (such as AboutView)
-			// - switch to another app, and open a lightning URL with Phoenix
-			// - crash !
-			//
-			// It works fine as long as the NavigationStack is popped to at least the ConfigurationView.
-			//
-			// Apple has fixed the issue in iOS 15.
-			navLinkTag = nil
-		}
 	}
 	
 	// --------------------------------------------------

@@ -37,7 +37,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"
-      app:title="@string/closechannels_force_title" />
+      app:title="@string/legacy_closechannels_force_title" />
 
     <ScrollView
       android:layout_width="match_parent"
@@ -61,7 +61,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:textIsSelectable="true"
-          android:text="@string/closechannels_force_instructions"
+          android:text="@string/legacy_closechannels_force_instructions"
           app:layout_constraintTop_toTopOf="parent" />
 
         <View
@@ -77,7 +77,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md"
-          android:text="@string/closechannels_force_destination"
+          android:text="@string/legacy_closechannels_force_destination"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/sep_1" />
 
@@ -99,7 +99,7 @@
           android:id="@+id/destination_desc"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="@string/closechannels_force_destination_desc"
+          android:text="@string/legacy_closechannels_force_destination_desc"
           android:textColor="?attr/mutedTextColor"
           android:textSize="@dimen/text_md"
           android:layout_marginTop="@dimen/space_xs"
@@ -120,7 +120,7 @@
           android:visibility="@{model.state == PreChannelsCloseState.CHECKING_CHANNELS}"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/sep_2"
-          app:text="@string/closechannels_checking_channels" />
+          app:text="@string/legacy_closechannels_checking_channels" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/force_confirm_button"
@@ -137,15 +137,15 @@
           app:is_paused="@{model.state == ForceCloseState.IN_PROGRESS}"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/sep_2"
-          app:paused_text="@string/closechannels_message_in_progress"
-          app:text="@string/closechannels_force_button"
+          app:paused_text="@string/legacy_closechannels_message_in_progress"
+          app:text="@string/legacy_closechannels_force_button"
           app:text_color="?attr/altTextColor" />
 
         <TextView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md"
-          android:text="@string/closechannels_channels_none"
+          android:text="@string/legacy_closechannels_channels_none"
           android:textSize="@dimen/text_md"
           android:visibility="@{model.state == PreChannelsCloseState.NO_CHANNELS}"
           app:layout_constraintTop_toBottomOf="@id/force_confirm_button" />
@@ -158,7 +158,7 @@
           android:drawablePadding="@dimen/space_xs"
           android:layout_marginTop="@dimen/space_md"
           android:drawableTint="?attr/positiveColor"
-          android:text="@string/closechannels_message_done"
+          android:text="@string/legacy_closechannels_message_done"
           android:visibility="@{model.state == ForceCloseState.DONE}"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/sep_2" />
@@ -169,7 +169,7 @@
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md"
           android:drawableStart="@drawable/ic_alert_triangle"
-          android:text="@string/closechannels_message_error"
+          android:text="@string/legacy_closechannels_message_error"
           android:visibility="@{model.state == ForceCloseState.ERROR}"
           app:layout_constraintTop_toBottomOf="@id/sep_2" />
 

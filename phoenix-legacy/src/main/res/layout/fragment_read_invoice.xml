@@ -50,7 +50,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:enableOrFade="@{model.inputState instanceof ReadInputState.Scanning}"
         app:icon="@drawable/ic_edit"
-        app:text="@string/readinput_manualinput" />
+        app:text="@string/legacy_readinput_manualinput" />
 
       <View
         android:id="@+id/sep_browse"
@@ -67,7 +67,7 @@
         app:enableOrFade="@{model.inputState instanceof ReadInputState.Scanning}"
         app:icon="@drawable/ic_clipboard"
         app:layout_constraintTop_toBottomOf="@id/sep_browse"
-        app:text="@string/readinput_paste" />
+        app:text="@string/legacy_readinput_paste" />
 
       <View
         android:id="@+id/sep_paste"
@@ -84,7 +84,7 @@
         app:enableOrFade="@{model.inputState instanceof ReadInputState.Scanning}"
         app:icon="@drawable/ic_image"
         app:layout_constraintTop_toBottomOf="@id/sep_paste"
-        app:text="@string/readinput_browse" />
+        app:text="@string/legacy_readinput_browse" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -118,7 +118,7 @@
       android:layout_height="wrap_content"
       android:paddingVertical="@dimen/space_sm"
       android:paddingHorizontal="@dimen/space_lg"
-      android:text="@string/scan_instructions"
+      android:text="@string/legacy_scan_instructions"
       android:textAlignment="center"
       android:textColor="@color/white_mid_op"
       android:textSize="@dimen/text_sm"
@@ -135,7 +135,7 @@
       app:icon="@drawable/ic_photo_camera"
       app:layout_constraintBottom_toBottomOf="@id/scan_view"
       app:layout_constraintTop_toTopOf="@id/scan_view"
-      app:text="@string/scan_request_camera_access"
+      app:text="@string/legacy_scan_request_camera_access"
       app:text_size="@dimen/text_lg" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -170,7 +170,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_sm"
         android:layout_marginEnd="@dimen/space_md_p"
-        android:text="@string/scan_error_invalid_scan"
+        android:text="@string/legacy_scan_error_invalid_scan"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/error_icon"
@@ -185,7 +185,7 @@
         android:layout_marginEnd="@dimen/space_xs"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/error_message"
-        app:text="@string/btn_ok" />
+        app:text="@string/legacy_btn_ok" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -200,7 +200,7 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="@id/scan_view"
-      app:text="@string/readinput_extracting" />
+      app:text="@string/legacy_readinput_extracting" />
 
     <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
       android:id="@+id/action_bar"

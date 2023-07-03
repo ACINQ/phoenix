@@ -20,11 +20,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.legacy.BaseFragment
 import fr.acinq.phoenix.legacy.R
 import fr.acinq.phoenix.legacy.background.KitState
 import fr.acinq.phoenix.legacy.databinding.FragmentSettingsBinding
+import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
+import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -68,6 +72,11 @@ class SettingsFragment : BaseFragment(stayIfNotStarted = true) {
     mBinding.torButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_tor) }
     mBinding.aboutButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_about) }
     mBinding.paymentSettingsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_payment_settings) }
+    mBinding.switchModernButton.setOnClickListener {
+      lifecycleScope.launch {
+        PrefsDatastore.saveStartLegacyApp(requireContext(), LegacyAppStatus.NotRequired)
+      }
+    }
   }
 
 }

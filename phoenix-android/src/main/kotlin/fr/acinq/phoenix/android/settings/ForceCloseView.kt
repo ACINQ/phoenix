@@ -45,7 +45,7 @@ fun ForceCloseView(
     val log = logger("ForceCloseView")
     var showConfirmationDialog by remember { mutableStateOf(false) }
 
-    MVIView(CF::closeChannelsConfiguration) { model, postIntent ->
+    MVIView(CF::forceCloseChannelsConfiguration) { model, postIntent ->
         DefaultScreenLayout {
             DefaultScreenHeader(
                 onBackClick = onBackClick,
@@ -66,7 +66,7 @@ fun ForceCloseView(
                         Text(text = stringResource(id = R.string.forceclose_address_label))
                         Spacer(modifier = Modifier.height(4.dp))
                         SelectionContainer {
-                            TextWithIcon(text = model.address, icon = R.drawable.ic_chain, textStyle = monoTypo().copy(fontSize = 14.sp))
+                            TextWithIcon(text = model.address, icon = R.drawable.ic_chain, textStyle = monoTypo.copy(fontSize = 14.sp))
                         }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -78,7 +78,7 @@ fun ForceCloseView(
                                 stringResource(id = R.string.forceclose_button)
                             },
                             icon = R.drawable.ic_cross_circle,
-                            backgroundColor = negativeColor(),
+                            backgroundColor = negativeColor,
                             shape = RectangleShape,
                             modifier = Modifier.fillMaxWidth(),
                             enabled = model.channels.isNotEmpty(),
@@ -87,7 +87,8 @@ fun ForceCloseView(
                     }
                     if (showConfirmationDialog) {
                         ConfirmDialog(
-                            message = stringResource(R.string.mutualclose_confirm),
+                            title = stringResource(id = R.string.forceclose_confirm_title),
+                            message = stringResource(R.string.forceclose_confirm_details),
                             onDismiss = { showConfirmationDialog = false },
                             onConfirm = {
                                 postIntent(CloseChannelsConfiguration.Intent.ForceCloseAllChannels)

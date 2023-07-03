@@ -26,7 +26,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URI
-import java.util.*
 
 object Wallet {
 
@@ -38,6 +37,7 @@ object Wallet {
   private const val ECLAIR_BASE_DATADIR = "node-data"
   internal const val SEED_FILE = "seed.dat"
   private const val ECLAIR_DB_FILE = "eclair.sqlite"
+  const val ECLAIR_DB_FILE_MIGRATION = "eclair-migration.sqlite"
   private val acceptedLightningPrefix by lazy { PaymentRequest.prefixes().get(getChainHash()) }
 
   fun getDatadir(context: Context): File {
@@ -50,6 +50,10 @@ object Wallet {
 
   fun getEclairDBFile(context: Context): File {
     return File(getChainDatadir(context), ECLAIR_DB_FILE)
+  }
+
+  fun getEclairDBMigrationFile(context: Context): File {
+    return File(getChainDatadir(context), ECLAIR_DB_FILE_MIGRATION)
   }
 
   fun hasWalletBeenSetup(context: Context): Boolean {
@@ -75,15 +79,6 @@ object Wallet {
       DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'/0/0")
     }
     return SingleAddressEclairWallet(getChainHash(), DeterministicWallet.derivePrivateKey(master, path).publicKey())
-  }
-
-  fun buildKmpSwapInAddress(master: DeterministicWallet.ExtendedPrivateKey): String {
-    val path = if (isMainnet()) {
-      DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/1'/0/0")
-    } else {
-      DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/1'/0/0")
-    }
-    return fr.acinq.bitcoin.scala.`package$`.`MODULE$`.computeP2WpkhAddress(DeterministicWallet.derivePrivateKey(master, path).publicKey(), getChainHash())
   }
 
   fun buildXpub(master: DeterministicWallet.ExtendedPrivateKey): Xpub {

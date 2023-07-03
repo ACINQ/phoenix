@@ -33,6 +33,8 @@ object DbTypesHelper {
             @Suppress("DEPRECATION")
             subclass(IncomingReceivedWithData.Part.NewChannel.V0::class)
             subclass(IncomingReceivedWithData.Part.NewChannel.V1::class)
+            subclass(IncomingReceivedWithData.Part.NewChannel.V2::class)
+            subclass(IncomingReceivedWithData.Part.SpliceIn.V0::class)
         }
     }
 

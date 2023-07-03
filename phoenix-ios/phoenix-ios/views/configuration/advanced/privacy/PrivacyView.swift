@@ -130,15 +130,16 @@ struct PrivacyView: View {
 				case .paymentHistory     : break
 				case .backup             : break
 				case .drainWallet        : break
-				case .backgroundPayments : break
 				case .electrum           : newNavLinkTag = NavLinkTag.ElectrumConfigurationView
+				case .backgroundPayments : break
+				case .liquiditySettings  : break
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
 				
 				self.swiftUiBugWorkaround = newNavLinkTag
 				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: 1.0)
+				clearSwiftUiBugWorkaround(delay: 1.5)
 				
 				self.navLinkTag = newNavLinkTag // Trigger/push the view
 			}

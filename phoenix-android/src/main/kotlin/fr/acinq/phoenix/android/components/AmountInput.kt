@@ -17,21 +17,39 @@
 package fr.acinq.phoenix.android.components
 
 import android.content.Context
-import android.view.ViewGroup
-import android.widget.ImageView
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clipScrollableContainer
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeLayout
@@ -49,9 +67,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
@@ -154,11 +174,10 @@ object AmountInputHelper {
 
 @Composable
 fun AmountInput(
-    initialAmount: MilliSatoshi?,
+    amount: MilliSatoshi?,
     onAmountChange: (ComplexAmount?) -> Unit,
     modifier: Modifier = Modifier,
-    convertedValueModifier: Modifier = Modifier,
-    label: @Composable (() -> Unit)? = null,
+    staticLabel: String?,
     placeholder: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
 ) {
@@ -169,75 +188,183 @@ fun AmountInput(
     val rate = fiatRate
     val units = listOf<CurrencyUnit>(BitcoinUnit.Sat, BitcoinUnit.Bit, BitcoinUnit.MBtc, BitcoinUnit.Btc, prefFiat)
     val focusManager = LocalFocusManager.current
+    val customTextSelectionColors = TextSelectionColors(
+        handleColor = MaterialTheme.colors.primary.copy(alpha = 0.7f),
+        backgroundColor = Color.Transparent
+    )
 
     var unit: CurrencyUnit by remember { mutableStateOf(prefBitcoinUnit) }
-    var inputValue: String by remember { mutableStateOf(initialAmount?.toUnit(prefBitcoinUnit).toPlainString()) }
-    var convertedValue: String by remember { mutableStateOf(initialAmount?.toPrettyString(prefFiat, rate, withUnit = true) ?: "") }
+    var inputValue: String by remember { mutableStateOf(amount?.toUnit(prefBitcoinUnit).toPlainString()) }
+    var convertedValue: String by remember { mutableStateOf(amount?.toPrettyString(prefFiat, rate, withUnit = true) ?: "") }
     var errorMessage: String by remember { mutableStateOf("") }
 
-    Column {
-        OutlinedTextField(
-            value = inputValue,
-            onValueChange = { newValue ->
-                inputValue = newValue
-                AmountInputHelper.convertToComplexAmount(
-                    context = context,
-                    input = inputValue,
-                    unit = unit,
-                    prefBitcoinUnit = prefBitcoinUnit,
-                    rate = rate,
-                    onConverted = { convertedValue = it },
-                    onError = { errorMessage = it }
-                ).let { onAmountChange(it) }
-            },
-            label = label,
-            placeholder = placeholder,
-            trailingIcon = {
-                UnitDropdown(
-                    selectedUnit = unit,
-                    units = units,
-                    onUnitChange = { newValue ->
-                        unit = newValue
-                        AmountInputHelper.convertToComplexAmount(
-                            context = context,
-                            input = inputValue,
-                            unit = unit,
-                            prefBitcoinUnit = prefBitcoinUnit,
-                            rate = rate,
-                            onConverted = { convertedValue = it },
-                            onError = { errorMessage = it }
-                        ).let { onAmountChange(it) }
-                    },
-                    onDismiss = { },
-                    internalPadding = PaddingValues(16.dp),
-                    modifier = Modifier.fillMaxHeight()
-                )
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
 
-            },
-            isError = errorMessage.isNotEmpty(),
-            enabled = enabled,
-            singleLine = true,
-            maxLines = 1,
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Number,
-                capitalization = KeyboardCapitalization.None,
-                autoCorrect = false,
-            ),
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-            colors = outlinedTextFieldColors(),
-            shape = RoundedCornerShape(8.dp),
-            modifier = modifier.enableOrFade(enabled)
-        )
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = errorMessage.ifBlank {
-                convertedValue.takeIf { it.isNotBlank() }?.let { stringResource(id = R.string.utils_converted_amount, it) } ?: ""
-            },
-            maxLines = 1,
-            style = if (errorMessage.isNotBlank()) MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 14.sp) else MaterialTheme.typography.caption.copy(fontSize = 14.sp),
-            modifier = convertedValueModifier.padding(horizontal = 8.dp)
-        )
+    Box(modifier = modifier.enableOrFade(enabled)) {
+        CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
+            OutlinedTextField(
+                value = inputValue,
+                onValueChange = { newValue ->
+                    inputValue = newValue
+                    AmountInputHelper.convertToComplexAmount(
+                        context = context,
+                        input = inputValue,
+                        unit = unit,
+                        prefBitcoinUnit = prefBitcoinUnit,
+                        rate = rate,
+                        onConverted = { convertedValue = it },
+                        onError = { errorMessage = it }
+                    ).let { onAmountChange(it) }
+                },
+                label = null,
+                placeholder = placeholder,
+                trailingIcon = {
+                    UnitDropdown(
+                        selectedUnit = unit,
+                        units = units,
+                        onUnitChange = { newValue ->
+                            unit = newValue
+                            AmountInputHelper.convertToComplexAmount(
+                                context = context,
+                                input = inputValue,
+                                unit = unit,
+                                prefBitcoinUnit = prefBitcoinUnit,
+                                rate = rate,
+                                onConverted = { convertedValue = it },
+                                onError = { errorMessage = it }
+                            ).let { onAmountChange(it) }
+                        },
+                        onDismiss = { },
+                        internalPadding = PaddingValues(start = 8.dp, top = 16.dp, bottom = 16.dp, end = 12.dp),
+                        modifier = Modifier.fillMaxHeight()
+                    )
+                },
+                isError = errorMessage.isNotEmpty(),
+                enabled = enabled,
+                singleLine = true,
+                maxLines = 1,
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done,
+                    keyboardType = KeyboardType.Number,
+                    capitalization = KeyboardCapitalization.None,
+                    autoCorrect = false,
+                ),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                colors = outlinedTextFieldColors(),
+                interactionSource = interactionSource,
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.padding(bottom = 8.dp, top = if (staticLabel != null) 14.dp else 0.dp)
+            )
+        }
+
+        staticLabel?.let {
+            Text(
+                text = staticLabel,
+                maxLines = 1,
+                style = when {
+                    errorMessage.isNotBlank() -> MaterialTheme.typography.body2.copy(color = negativeColor, fontSize = 14.sp)
+                    isFocused -> MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary, fontSize = 14.sp)
+                    else -> MaterialTheme.typography.body1.copy(fontSize = 14.sp)
+                },
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(start = 8.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colors.surface)
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
+            )
+        }
+
+        val subMessage = errorMessage.ifBlank {
+            convertedValue.takeIf { it.isNotBlank() }?.let { stringResource(id = R.string.utils_converted_amount, it) } ?: ""
+        }
+        if (subMessage.isNotBlank()) {
+            Text(
+                text = subMessage,
+                maxLines = 1,
+                style = when {
+                    errorMessage.isNotBlank() -> MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.onPrimary, fontSize = 13.sp)
+                    else -> MaterialTheme.typography.subtitle2.copy(fontSize = 13.sp)
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 10.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(if (errorMessage.isNotBlank()) negativeColor else MaterialTheme.colors.surface)
+                    .padding(horizontal = 6.dp, vertical = 1.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun InlineSatoshiInput(
+    amount: Satoshi?,
+    onAmountChange: (Satoshi?) -> Unit,
+    modifier: Modifier = Modifier,
+    placeholder: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    enabled: Boolean = true,
+    isError: Boolean,
+) {
+    val prefFiat = LocalFiatCurrency.current
+    val rate = fiatRate
+
+    val focusManager = LocalFocusManager.current
+    var internalText by remember { mutableStateOf(amount?.sat?.toString() ?: "") }
+    var convertedValue: String by remember { mutableStateOf(amount?.toPrettyString(prefFiat, rate, withUnit = true) ?: "") }
+    val customTextSelectionColors = TextSelectionColors(
+        handleColor = MaterialTheme.colors.primary.copy(alpha = 0.7f),
+        backgroundColor = Color.Transparent
+    )
+
+    Box(modifier = modifier.enableOrFade(enabled)) {
+        CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
+            OutlinedTextField(
+                value = internalText,
+                onValueChange = {
+                    internalText = it
+                    val newAmount = it.toDoubleOrNull()?.toLong()?.sat
+                    convertedValue = rate?.let { newAmount?.toMilliSatoshi()?.toFiat(rate.price)?.toPrettyString(prefFiat, withUnit = true) } ?: ""
+                    onAmountChange(newAmount)
+                },
+                isError = isError,
+                enabled = enabled,
+                label = null,
+                placeholder = placeholder,
+                trailingIcon = trailingIcon,
+                singleLine = true,
+                maxLines = 1,
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done,
+                    keyboardType = KeyboardType.Number,
+                    capitalization = KeyboardCapitalization.None,
+                    autoCorrect = false,
+                ),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                colors = outlinedTextFieldColors(),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
+            if (convertedValue.isNotBlank()) {
+                Text(
+                    text = stringResource(id = R.string.utils_converted_amount, convertedValue),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = when {
+                        isError -> MaterialTheme.typography.subtitle2.copy(color = negativeColor, fontSize = 13.sp)
+                        else -> MaterialTheme.typography.subtitle2.copy(fontSize = 13.sp)
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = 10.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colors.surface)
+                        .padding(horizontal = 6.dp, vertical = 1.dp)
+                )
+            }
+        }
     }
 }
 
@@ -271,7 +398,9 @@ fun AmountHeroInput(
     var unit: CurrencyUnit by remember { mutableStateOf(prefBitcoinUnit) }
     var inputValue by remember { mutableStateOf(TextFieldValue(initialAmount?.toUnit(prefBitcoinUnit).toPlainString())) }
     var convertedValue: String by remember { mutableStateOf(initialAmount?.toPrettyString(prefFiat, rate, withUnit = true) ?: "") }
+
     var internalErrorMessage: String by remember { mutableStateOf(validationErrorMessage) }
+    val errorMessage = validationErrorMessage.ifBlank { internalErrorMessage.ifBlank { null } }
 
     val input: @Composable () -> Unit = {
         BasicTextField(
@@ -294,7 +423,7 @@ fun AmountHeroInput(
                 .width(IntrinsicSize.Min), // make the textfield fits its content
             textStyle = MaterialTheme.typography.body1.copy(
                 fontSize = inputTextSize,
-                color = MaterialTheme.colors.primary,
+                color = if (errorMessage == null) MaterialTheme.colors.primary else negativeColor,
                 fontWeight = FontWeight.Light,
             ),
             keyboardOptions = KeyboardOptions(
@@ -332,17 +461,17 @@ fun AmountHeroInput(
     }
 
     val dashedLine: @Composable () -> Unit = {
-        AndroidView(
-            factory = {
-                ImageView(it).apply {
-                    layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    )
-                    setBackgroundResource(R.drawable.line_dots)
-                }
-            }
-        )
+        val dotColor = if (errorMessage == null) MaterialTheme.colors.primary else negativeColor
+        Canvas(modifier = Modifier.fillMaxWidth()) {
+            drawLine(
+                pathEffect = PathEffect.dashPathEffect(floatArrayOf(1f, 20f)),
+                start = Offset(x = 0f, y = 0f),
+                end = Offset(x = size.width, y = 0f),
+                cap = StrokeCap.Round,
+                color = dotColor,
+                strokeWidth = 7f
+            )
+        }
     }
 
     Column(
@@ -390,14 +519,13 @@ fun AmountHeroInput(
             }
         }
 
-        val errorMessage = validationErrorMessage.ifBlank { internalErrorMessage.ifBlank { null } }
         Spacer(Modifier.height(8.dp))
         if (errorMessage != null) {
             Text(
                 text = errorMessage,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 14.sp, textAlign = TextAlign.Center),
+                style = MaterialTheme.typography.body1.copy(color = negativeColor, fontSize = 14.sp, textAlign = TextAlign.Center),
                 modifier = Modifier.sizeIn(maxWidth = 300.dp, minHeight = 28.dp)
             )
         } else {

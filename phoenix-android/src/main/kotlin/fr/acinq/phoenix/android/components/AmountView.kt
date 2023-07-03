@@ -19,17 +19,14 @@ package fr.acinq.phoenix.android.components
 import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -104,6 +101,7 @@ fun AmountView(
     }
 }
 
+/** Outputs a column with the amount in fiat or btc on top, and the reverse below. Can switch by clicking on top amount. */
 @Composable
 fun AmountWithAltView(
     amount: MilliSatoshi,
@@ -111,6 +109,7 @@ fun AmountWithAltView(
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
     unitTextStyle: TextStyle = MaterialTheme.typography.body1,
     separatorSpace: Dp = 4.dp,
+    spaceBetweenAmounts: Dp = 4.dp,
     isOutgoing: Boolean? = null,
 ) {
     val (topUnit, bottomUnit) = if (LocalShowInFiat.current) {
@@ -131,6 +130,7 @@ fun AmountWithAltView(
             forceUnit = topUnit,
             prefix = isOutgoing?.let { stringResource(id = if (it) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received) }
         )
+        Spacer(modifier = Modifier.height(spaceBetweenAmounts))
         AmountView(
             amount = amount,
             amountTextStyle = MaterialTheme.typography.caption,
@@ -138,27 +138,57 @@ fun AmountWithAltView(
             separatorSpace = separatorSpace,
             modifier = modifier,
             forceUnit = bottomUnit,
-            prefix = if (bottomUnit is FiatCurrency) stringResource(R.string.paymentline_prefix_rounded) else null
+            prefix = if (bottomUnit is FiatCurrency) stringResource(R.string.utils_rounded) else null
         )
     }
 }
 
+/** Outputs a column with the amount in bitcoin on top, and the fiat amount below. */
 @Composable
-fun AmountWithFiatView(
+fun ColumnScope.AmountWithFiatBelow(
+    amount: MilliSatoshi,
+    amountTextStyle: TextStyle = MaterialTheme.typography.body1,
+    fiatTextStyle: TextStyle = MaterialTheme.typography.caption,
+) {
+    val prefBtcUnit = LocalBitcoinUnit.current
+    val prefFiatCurrency = LocalFiatCurrency.current
+    Text(
+        text = amount.toPrettyString(prefBtcUnit, withUnit = true),
+        style = amountTextStyle,
+    )
+    Text(
+        text = stringResource(id = R.string.utils_converted_amount, amount.toPrettyString(prefFiatCurrency, fiatRate, withUnit = true)),
+        style = fiatTextStyle,
+    )
+}
+
+/** Outputs a row with the amount in bitcoin on the left, and the fiat amount on the right. */
+@Composable
+fun AmountWithFiatRowView(
     amount: MilliSatoshi,
     modifier: Modifier = Modifier,
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
     unitTextStyle: TextStyle = MaterialTheme.typography.body1,
-    altTextStyle: TextStyle = MaterialTheme.typography.caption,
+    fiatTextStyle: TextStyle = MaterialTheme.typography.caption,
     separatorSpace: Dp = 4.dp,
 ) {
     val prefBtcUnit = LocalBitcoinUnit.current
+    Row {
+        AmountView(amount = amount, amountTextStyle = amountTextStyle, unitTextStyle = unitTextStyle, separatorSpace = separatorSpace, modifier = modifier, forceUnit = prefBtcUnit, onClick = null)
+        Spacer(modifier = Modifier.width(4.dp))
+        AmountInFiatView(amount = amount, style = fiatTextStyle)
+    }
+}
+
+/** Creates a Text component with [amount] converted to fiat and properly formatted. */
+@Composable
+fun AmountInFiatView(
+    amount: MilliSatoshi,
+    modifier: Modifier = Modifier,
+    style: TextStyle = MaterialTheme.typography.caption
+) {
     val prefFiatCurrency = LocalFiatCurrency.current
     val rate = fiatRate
     val fiatAmount = remember(amount) { amount.toPrettyString(prefFiatCurrency, rate, withUnit = true) }
-
-    Column {
-        AmountView(amount = amount, amountTextStyle = amountTextStyle, unitTextStyle = unitTextStyle, separatorSpace = separatorSpace, modifier = modifier, forceUnit = prefBtcUnit, onClick = null)
-        Text(text = stringResource(id = R.string.utils_converted_amount, fiatAmount), style = altTextStyle)
-    }
+    Text(text = stringResource(id = R.string.utils_converted_amount, fiatAmount), style = style, modifier = modifier)
 }

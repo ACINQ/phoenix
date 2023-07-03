@@ -70,7 +70,7 @@
       android:layout_width="wrap_content"
       android:layout_height="0dp"
       android:background="@drawable/button_bg_square"
-      android:contentDescription="@string/listallchannels_copy"
+      android:contentDescription="@string/legacy_listallchannels_copy"
       android:padding="@dimen/space_md"
       app:icon="@drawable/ic_copy"
       app:layout_constrainedWidth="true"
@@ -93,7 +93,7 @@
       android:layout_width="wrap_content"
       android:layout_height="0dp"
       android:background="@drawable/button_bg_square"
-      android:contentDescription="@string/listallchannels_share"
+      android:contentDescription="@string/legacy_listallchannels_share"
       android:padding="@dimen/space_md"
       app:icon="@drawable/ic_share"
       app:layout_constrainedWidth="true"
@@ -114,14 +114,14 @@
       android:layout_width="wrap_content"
       android:layout_height="0dp"
       android:background="@drawable/button_bg_square"
-      android:contentDescription="@string/listallchannels_funding_tx_desc"
+      android:contentDescription="@string/legacy_listallchannels_funding_tx_desc"
       android:padding="@dimen/space_md"
       android:visibility="@{model.fundingTxId != null &amp;&amp; !model.fundingTxId.empty}"
       app:layout_constrainedWidth="true"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintStart_toEndOf="@id/share_button"
       app:layout_constraintTop_toBottomOf="@id/raw_data_layout"
-      app:text="@string/listallchannels_funding_tx" />
+      app:text="@string/legacy_listallchannels_funding_tx" />
 
     <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
       android:id="@+id/close_button"
@@ -132,7 +132,7 @@
       app:layout_constrainedWidth="true"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintTop_toBottomOf="@id/raw_data_layout"
-      app:text="@string/listallchannels_close" />
+      app:text="@string/legacy_listallchannels_close" />
 
     <TextView
       android:layout_width="wrap_content"
@@ -140,7 +140,7 @@
       android:background="@drawable/rounded"
       android:backgroundTint="@color/white_mid_op"
       android:padding="@dimen/space_md_p"
-      android:text="@string/channel_loading"
+      android:text="@string/legacy_channel_loading"
       android:textAlignment="center"
       android:visibility="@{model.state == ChannelDetailsState.INIT || model.state == ChannelDetailsState.IN_PROGRESS}"
       app:layout_constraintBottom_toBottomOf="@id/raw_data_layout"
@@ -154,7 +154,7 @@
       android:background="@drawable/rounded"
       android:backgroundTint="@color/white_mid_op"
       android:padding="@dimen/space_md_p"
-      android:text="@string/channel_error"
+      android:text="@string/legacy_channel_error"
       android:textAlignment="center"
       android:visibility="@{model.state == ChannelDetailsState.ERROR}"
       app:layout_constraintBottom_toBottomOf="@id/raw_data_layout"

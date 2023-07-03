@@ -29,7 +29,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"
-      app:title="@string/prefs_display_title" />
+      app:title="@string/legacy_prefs_display_title" />
 
     <androidx.fragment.app.FragmentContainerView
       android:id="@+id/prefs_display_fragment_container"

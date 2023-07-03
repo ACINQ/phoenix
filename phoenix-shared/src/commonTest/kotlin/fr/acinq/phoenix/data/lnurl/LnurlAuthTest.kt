@@ -17,9 +17,9 @@
 package fr.acinq.phoenix.data.lnurl
 
 import fr.acinq.bitcoin.*
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.utils.toByteVector
-import fr.acinq.phoenix.data.Chain
 import fr.acinq.secp256k1.Hex
 import io.ktor.http.*
 import kotlin.test.Test
@@ -28,7 +28,7 @@ import kotlin.test.assertEquals
 class LnurlAuthTest {
     private val mnemonics = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
     private val seed = MnemonicCode.toSeed(mnemonics, passphrase = "").toByteVector()
-    private val keyManager = LocalKeyManager(seed, Chain.Testnet.chainHash)
+    private val keyManager = LocalKeyManager(seed, NodeParams.Chain.Testnet, remoteSwapInExtendedPublicKey = "tpubDDt5vQap1awkyDXx1z1cP7QFKSZHDCCpbU8nSq9jy7X2grTjUVZDePexf6gc6AHtRRzkgfPW87K6EKUVV6t3Hu2hg7YkHkmMeLSfrP85x41")
 
     @Test
     fun specs_test_vectors() {

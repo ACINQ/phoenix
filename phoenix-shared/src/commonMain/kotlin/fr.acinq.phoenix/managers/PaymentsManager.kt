@@ -1,8 +1,9 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.lightning.ChannelEvents
-import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.SwapInEvents
+import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.byteVector32
+import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.lightning.blockchain.electrum.getConfirmations
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentProgress
@@ -15,8 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
@@ -25,13 +25,15 @@ import org.kodein.log.newLogger
 class PaymentsManager(
     private val loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
-    private val databaseManager: DatabaseManager
+    private val databaseManager: DatabaseManager,
+    private val electrumClient: ElectrumClient,
 ) : CoroutineScope by MainScope() {
 
-    constructor(business: PhoenixBusiness): this(
+    constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
         peerManager = business.peerManager,
-        databaseManager = business.databaseManager
+        databaseManager = business.databaseManager,
+        electrumClient = business.electrumClient
     )
 
     private val log = newLogger(loggerFactory)
@@ -52,6 +54,10 @@ class PaymentsManager(
     private val _lastCompletedPayment = MutableStateFlow<WalletPayment?>(null)
     val lastCompletedPayment: StateFlow<WalletPayment?> = _lastCompletedPayment
 
+    /**
+     * The in-flight flow tracks payments that are being sent. This is used by iOS in case the app goes into the
+     * background and the iOS app needs to start a long-lived task so that the payment can still go through.
+     */
     private val _inFlightOutgoingPayments = MutableStateFlow<Set<UUID>>(setOf())
     val inFlightOutgoingPayments: StateFlow<Set<UUID>> = _inFlightOutgoingPayments
 
@@ -68,60 +74,68 @@ class PaymentsManager(
     }
 
     init {
-        launch {
-            paymentsDb().listPaymentsCountFlow().collect {
-                _paymentsCount.value = it
-            }
-        }
+        launch { monitorPaymentsCountInDb() }
 
-        launch {
-            val appLaunch: Long = currentTimestampMillis()
-            var isFirstCollection = true
+        launch { monitorLastCompletedPayment(currentTimestampMillis()) }
 
-            paymentsDb().listPaymentsOrderFlow(count = 25, skip = 0).collect { list ->
+        launch { monitorUnconfirmedTransactions() }
 
-                // NB: lastCompletedPayment should NOT fire under any of the following conditions:
-                // - relaunching app with completed payments in database
-                // - restoring old wallet and downloading transaction history
+        launch { monitorInflightOutgoingPayments() }
+    }
 
-                if (isFirstCollection) {
-                    isFirstCollection = false
-                } else {
-                    for (row in list) {
-                        val paymentInfo = fetcher.getPayment(row, WalletPaymentFetchOptions.None)
-                        if (paymentInfo != null) {
-                            val completedAt = paymentInfo.payment.completedAt()
-                            if (completedAt > 0) {
-                                // This is the most recent completed payment in the database
-                                if (completedAt > appLaunch) {
-                                    _lastCompletedPayment.value = paymentInfo.payment
-                                }
-                                break
-                            }
-                        }
+    private suspend fun monitorPaymentsCountInDb() {
+        paymentsDb().listPaymentsCountFlow().collect { _paymentsCount.value = it }
+    }
+
+    /** Monitors the payments database and push any new payments in the [_lastCompletedPayment] flow. */
+    private suspend fun monitorLastCompletedPayment(appLaunchTimestamp: Long) {
+        paymentsDb().listPaymentsOrderFlow(count = 25, skip = 0).collectIndexed { index, list ->
+            // NB: lastCompletedPayment should NOT fire under any of the following conditions:
+            // - relaunching app with completed payments in database
+            // - restoring old wallet and downloading transaction history
+            if (index > 0) {
+                for (row in list) {
+                    val paymentInfo = fetcher.getPayment(row, WalletPaymentFetchOptions.None)
+                    val completedAt = paymentInfo?.payment?.completedAt
+                    if (completedAt != null && completedAt > appLaunchTimestamp) {
+                        _lastCompletedPayment.value = paymentInfo.payment
                     }
+                    break
                 }
             }
         }
+    }
 
-        launch {
-            // iOS Note:
-            // If the payment was received via the notification-service-extension
-            // (which runs in a separate process), then you won't receive the
-            // corresponding notifications (PaymentReceived) thru this mechanism.
-            //
-            peerManager.getPeer().eventsFlow.collect { event ->
-                when (event) {
-                    is PaymentProgress -> {
-                        addToInFlightOutgoingPayments(event.request.paymentId)
+    /** Monitors in-flight outgoing payments from peer events and forward them to the [_inFlightOutgoingPayments] flow. */
+    private suspend fun monitorInflightOutgoingPayments() {
+        peerManager.getPeer().eventsFlow.collect { event ->
+            when (event) {
+                is PaymentProgress -> {
+                    addToInFlightOutgoingPayments(event.request.paymentId)
+                }
+                is PaymentSent -> {
+                    removeFromInFlightOutgoingPayments(event.request.paymentId)
+                }
+                is PaymentNotSent -> {
+                    removeFromInFlightOutgoingPayments(event.request.paymentId)
+                }
+                else -> Unit
+            }
+        }
+    }
+
+    /** Watches transactions that are unconfirmed, check their confirmation status, and update relevant payments. */
+    private suspend fun monitorUnconfirmedTransactions() {
+        val paymentsDb = paymentsDb()
+        paymentsDb.listUnconfirmedTransactions().collect {
+            val txs = it.map { it.byteVector32() }
+            log.info { "monitoring unconfirmed txs=$txs" }
+            txs.forEach { txId ->
+                electrumClient.getConfirmations(txId)?.let { conf ->
+                    if (conf > 0) {
+                        log.info { "transaction $txId has $conf confirmations, updating database" }
+                        paymentsDb.setConfirmed(txId)
                     }
-                    is PaymentSent -> {
-                        removeFromInFlightOutgoingPayments(event.request.paymentId)
-                    }
-                    is PaymentNotSent -> {
-                        removeFromInFlightOutgoingPayments(event.request.paymentId)
-                    }
-                    else -> Unit
                 }
             }
         }
@@ -153,27 +167,32 @@ class PaymentsManager(
         )
     }
 
+    /**
+     * Returns the payment(s) that are related to a transaction id. Useful to link a commitment change in a channel to the
+     * payment(s) that triggered that change.
+     */
+    suspend fun listPaymentsForTxId(
+        txId: ByteVector32
+    ): List<WalletPayment> {
+        return paymentsDb().listPaymentsForTxId(txId)
+    }
+
     suspend fun getPayment(
         id: WalletPaymentId,
         options: WalletPaymentFetchOptions
-    ): WalletPaymentInfo? = when (id) {
-        is WalletPaymentId.IncomingPaymentId -> {
-            paymentsDb().getIncomingPayment(id.paymentHash, options)?.let {
-                WalletPaymentInfo(
-                    payment = it.first,
-                    metadata = it.second ?: WalletPaymentMetadata(),
-                    fetchOptions = options
-                )
-            }
-        }
-        is WalletPaymentId.OutgoingPaymentId -> {
-            paymentsDb().getOutgoingPayment(id.id, options)?.let {
-                WalletPaymentInfo(
-                    payment = it.first,
-                    metadata = it.second ?: WalletPaymentMetadata(),
-                    fetchOptions = options
-                )
-            }
+    ): WalletPaymentInfo? {
+        return when (id) {
+            is WalletPaymentId.IncomingPaymentId -> paymentsDb().getIncomingPayment(id.paymentHash, options)
+            is WalletPaymentId.LightningOutgoingPaymentId -> paymentsDb().getLightningOutgoingPayment(id.id, options)
+            is WalletPaymentId.SpliceOutgoingPaymentId -> paymentsDb().getSpliceOutgoingPayment(id.id, options)
+            is WalletPaymentId.ChannelCloseOutgoingPaymentId -> paymentsDb().getChannelCloseOutgoingPayment(id.id, options)
+            is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> paymentsDb().getSpliceCpfpOutgoingPayment(id.id, options)
+        }?.let {
+            WalletPaymentInfo(
+                payment = it.first,
+                metadata = it.second ?: WalletPaymentMetadata(),
+                fetchOptions = options
+            )
         }
     }
 }

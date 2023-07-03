@@ -16,6 +16,7 @@ extension PeerManager {
 	
 	fileprivate struct _Key {
 		static var peerStatePublisher = 0
+		static var channelsPublisher = 0
 	}
 	
 	func peerStatePublisher() -> AnyPublisher<Lightning_kmpPeer, Never> {
@@ -30,6 +31,23 @@ extension PeerManager {
 				self.peerState
 			)
 			.compactMap { $0 }
+			.eraseToAnyPublisher()
+		}
+	}
+	
+	func channelsPublisher() -> AnyPublisher<[LocalChannelInfo], Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.channelsPublisher) {
+			
+			// Transforming from Kotlin:
+			// ```
+			// channelsFlow: StateFlow<Map<ByteVector32, LocalChannelInfo>?>
+			// ```
+			KotlinCurrentValueSubject<NSDictionary, [Bitcoin_kmpByteVector32: LocalChannelInfo]?>(
+				self.channelsFlow
+			)
+			.compactMap { $0 }
+			.map { Array($0.values) }
 			.eraseToAnyPublisher()
 		}
 	}
@@ -109,9 +127,9 @@ extension CurrencyManager {
 		self.getSetAssociatedObject(storageKey: &_Key.ratesPublisher) {
 			
 			// Transforming from Kotlin:
-			// `ratesFlow: Flow<List<ExchangeRate>>`
+			// `ratesFlow: StateFlow<List<ExchangeRate>>`
 			//
-			KotlinPassthroughSubject<NSArray, [ExchangeRate]>(
+			KotlinCurrentValueSubject<NSArray, [ExchangeRate]>(
 				self.ratesFlow
 			)
 			.eraseToAnyPublisher()
@@ -130,6 +148,89 @@ extension CurrencyManager {
 			)
 			.map { (targets: Set<FiatCurrency>) -> Bool in
 				return !targets.isEmpty
+			}
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+// MARK: -
+extension NodeParamsManager {
+	
+	fileprivate struct _Key {
+		static var nodeParamsPublisher = 0
+	}
+	
+	func nodeParamsPublisher() -> AnyPublisher<Lightning_kmpNodeParams, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.nodeParamsPublisher) {
+			
+			// Transforming from Kotlin:
+			// `nodeParams: StateFlow<NodeParams?>`
+			//
+			KotlinCurrentValueSubject<Lightning_kmpNodeParams, Lightning_kmpNodeParams?>(
+				self.nodeParams
+			)
+			.compactMap { $0 }
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+// MARK: -
+extension PhoenixShared.NotificationsManager {
+
+	fileprivate struct _Key {
+		static var notificationsPublisher = 0
+	}
+
+	struct NotificationItem: Identifiable {
+		let ids: Set<Lightning_kmpUUID>
+		let notification: PhoenixShared.Notification
+		
+		public var id: String {
+			// How do we turn this into an Identifiable string ?
+			//
+			// Notifications with the same content will automatically be grouped into the
+			// same NotificationItem, with both ids present in the Set.
+			// So all we need is:
+			// - a deterministic UUID from the set (lowest in sort order)
+			// - plus the number of UUIDs in the set
+			//
+			// If these 2 items match, you know the notification content is equal,
+			// and thus the corresponding UI doesn't require a refresh.
+			
+			let firstUUID = ids.sorted { (a, b) in
+				// true if the first argument should be ordered before the second argument; otherwise, false
+				return a.compareTo(other: b) < 0
+			}.first?.description() ?? UUID().uuidString
+			
+			return "\(firstUUID)|\(ids.count)"
+		}
+	}
+
+	func notificationsPublisher() -> AnyPublisher<[NotificationItem], Never> {
+
+		self.getSetAssociatedObject(storageKey: &_Key.notificationsPublisher) {
+
+			// Transforming from Kotlin:
+			// `notifications = StateFlow<List<Pair<Set<UUID>, Notification>>>`
+			// 
+			KotlinCurrentValueSubject<NSArray, Array<AnyObject>>(
+				self.notifications
+			)
+			.map { originalArray in
+				let transformedArray: [NotificationItem] = originalArray.compactMap { value in
+					guard
+						let pair = value as? KotlinPair<AnyObject, AnyObject>,
+						let ids = pair.first as? Set<Lightning_kmpUUID>,
+						let notification = pair.second as? PhoenixShared.Notification
+					else {
+						return nil
+					}
+					return NotificationItem(ids: ids, notification: notification)
+				}
+				return transformedArray
 			}
 			.eraseToAnyPublisher()
 		}
@@ -232,6 +333,7 @@ extension PaymentsPageFetcher {
 	}
 }
 
+
 // MARK: -
 extension CloudKitDb {
 	
@@ -246,9 +348,13 @@ extension CloudKitDb {
 			/// Transforming from Kotlin:
 			/// `queueCount: StateFlow<Long>`
 			///
-			KotlinCurrentValueSubject<KotlinLong, Int64>(
+			KotlinCurrentValueSubject<KotlinLong, KotlinLong>(
 				self.queueCount
-			).eraseToAnyPublisher()
+			)
+			.map {
+				$0.int64Value
+			}
+			.eraseToAnyPublisher()
 		}
 	}
 }
@@ -294,6 +400,29 @@ extension Lightning_kmpElectrumWatcher {
 			KotlinPassthroughSubject<KotlinLong, Int64>(
 				self.openUpToDateFlow()
 			)
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+// MARK: -
+extension Lightning_kmpNodeParams {
+	
+	fileprivate struct _Key {
+		static var nodeEventsPublisher = 0
+	}
+	
+	func nodeEventsPublisher() -> AnyPublisher<Lightning_kmpNodeEvents, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.nodeEventsPublisher) {
+			
+			/// Transforming from Kotlin:
+			/// `nodeEvents: SharedFlow<NodeEvents>`
+			///
+			KotlinPassthroughSubject<Lightning_kmpNodeEvents, Lightning_kmpNodeEvents?>(
+				self.nodeEvents
+			)
+			.compactMap { $0 }
 			.eraseToAnyPublisher()
 		}
 	}

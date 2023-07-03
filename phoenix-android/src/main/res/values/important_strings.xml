@@ -1,0 +1,255 @@
+<!--
+  ~ Copyright 2023 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ This file contains string resources related to important messages in the app, and should be translated as a priority.
+  ~ It should be kept as small as possible.
+  ~
+  ~ Most technical resource strings should stay in the default `strings.xml` file.
+-->
+<resources>
+
+    <!-- system notifications -->
+
+    <string name="notif_headless_title_default">Phoenix is running in the background</string>
+    <string name="notif_headless_received">Received +%1$s</string>
+
+    <string name="notif_pending_settlement_title">Please start Phoenix</string>
+    <string name="notif_pending_settlement_message">A incoming settlement is pending.</string>
+
+    <string name="notif_missed_title">Missed incoming payment</string>
+    <string name="notif_missed_unavailable">Phoenix was unable to start in the background.</string>
+
+    <string name="notif_rejected_deposit_title">On-chain deposit pending (+%1$s)</string>
+    <string name="notif_rejected_payment_title">Rejected incoming payment (+%1$s)</string>
+    <string name="notif_rejected_by_user">You have rejected the payment</string>
+    <string name="notif_rejected_policy_disabled">Automated channels management is disabled. You can change that in the settings.</string>
+    <string name="notif_rejected_over_absolute">The fee was %1$s, but your max fee was set to %2$s. You can tweak that in the settings.</string>
+    <string name="notif_rejected_over_relative">The fee was %1$s which is more than %2$s%% of the amount received. You can tweak that in the settings.</string>
+    <string name="notif_rejected_channels_initializing">Your channels were initializing and could not accept that payment. Try again later.</string>
+
+    <string name="notif_watcher_revoked_commit_title">Please start Phoenix</string>
+    <string name="notif_watcher_revoked_commit_message">Some of your channels may have closed.</string>
+
+    <!-- init wallet / automated wallet creation -->
+
+    <string name="initwallet_create">Create new wallet</string>
+    <string name="initwallet_restore">Restore my wallet</string>
+
+    <string name="restore_disclaimer_message">Phoenix can only restore off-chain funds that were managed by this application.\n\nImporting a seed that was NOT created by Phoenix will not restore any funds.\n\nPlease also make sure you are not already running another Phoenix wallet with the same seed.</string>
+    <string name="restore_disclaimer_checkbox">I understand.</string>
+
+    <string name="restore_instructions">Your wallet\'s seed is a list of 12 English words. Type-in each word of this list in the box below.</string>
+    <string name="restore_input_label">Enter word #%1$s</string>
+    <string name="restore_input_invalid">This is not a valid word.</string>
+    <string name="restore_seed_valid">This seed is valid</string>
+    <string name="restore_seed_valid_details">You can now proceed and restore your wallet</string>
+    <string name="restore_seed_invalid">This seed is not valid</string>
+    <string name="restore_seed_invalid_details">Make sure you entered the correct words in the right order.</string>
+    <string name="restore_import_button">Restore</string>
+
+    <!-- upgrade required dialog -->
+
+    <string name="upgraderequired_title">Update required</string>
+    <string name="upgraderequired_message">This version of Phoenix (v%1$s) is not compatible with your wallet. Please update, or use a compatible version.</string>
+    <string name="upgraderequired_button">Update on Google Play</string>
+
+    <!-- receive view: warning about fee/liquidity -->
+
+    <string name="receive_lightning_warning_title_surefail">Payment will fail.</string>
+    <string name="receive_lightning_warning_title_mayfail">Payment may fail.</string>
+    <string name="receive_lightning_warning_title_fee_expected">Fee expected.</string>
+
+    <string name="receive_lightning_warning_fee_insufficient_liquidity">Inbound liquidity is insufficient.</string>
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Inbound liquidity is insufficient and you have disabled automated channel management.\nTap to configure.</string>
+    <string name="receive_lightning_warning_fee_within_policy">A %1$s (≈ %2$s) fee may be needed to receive this payment.\nTap to configure.</string>
+    <string name="receive_lightning_warning_fee_exceeds_policy">The fee will probably be above your max limit (%1$s).\nTap to configure.</string>
+
+    <!-- scanning errors -->
+
+    <string name="scan_error_expired">This invoice is expired.</string>
+    <string name="scan_error_already_paid">This payment has already been paid.</string>
+    <string name="scan_error_invalid_chain">This payment does not use the same blockchain as your wallet.</string>
+    <string name="scan_error_lnurl_invalid">Failed to process this LNURL link. Make sure it is valid.</string>
+    <string name="scan_error_lnurl_service_error">The LNURL service returned an error.</string>
+    <string name="scan_error_lnurl_unsupported">This type of LNURL is not supported yet!</string>
+    <string name="scan_error_invalid_generic">This data uses an unknown format and cannot be processed.</string>
+
+    <!-- validation -->
+
+    <string name="validation_below_min">Must be at least %1$s</string>
+    <string name="validation_above_max">Must be no more than %1$s</string>
+
+    <!-- closing channels -->
+
+    <string name="mutualclose_input_label">Bitcoin address</string>
+    <string name="mutualclose_input_instructions">Send all funds to a Bitcoin wallet. All payments channels will be closed.</string>
+    <string name="mutualclose_confirm_title">Confirm closing</string>
+    <string name="mutualclose_confirm_details">All the funds will be sent to:</string>
+
+    <string name="forceclose_title">Force-close channels</string>
+    <string name="forceclose_instructions">This screen allows you to unilaterally close your channels.\n\nThis is not a \"fix-everything\" magic button: it is here as a safety measure and <b>should only be used in extreme scenarios</b>. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, <b>if you experience issues with Phoenix you should contact support</b>.\n\nForce closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days.\n\n<b>Do not uninstall the app until your channels are fully closed, or you will lose money.</b>\n\n<b>Do not use this feature if you don\'t fully understand what it does.</b></string>
+    <string name="forceclose_address_label">Funds will eventually be sent to the final wallet:</string>
+
+    <string name="forceclose_confirm_title">Confirm force-closing</string>
+    <string name="forceclose_confirm_details">All the funds will be sent to your final wallet, after a delay.</string>
+    <string name="forceclose_button">Force-close all my channels</string>
+
+    <!-- in-app notifications -->
+
+    <string name="inappnotif_backup_seed_message">Backup your wallet so that you don\'t lose your bitcoins.</string>
+    <string name="inappnotif_backup_seed_action">Backup my wallet</string>
+
+    <string name="inappnotif_notification_permission_message">Notifications are disabled in Android settings. Phoenix won\'t be able to notify you when a payment is processing.</string>
+    <string name="inappnotif_notification_permission_enable">Enable</string>
+
+    <string name="inappnotif_watchtower_late_message">Phoenix regularly monitors the blockchain when in the background, but was unable to do so the last few days.\n\nMake sure Android does not block Phoenix, and that it can connect to Electrum.</string>
+    <string name="inappnotif_watchtower_late_action">Dismiss</string>
+
+    <string name="inappnotif_upgrade_message">An update is available</string>
+    <string name="inappnotif_upgrade_critical_message">A critical update is available. You should update Phoenix as soon as possible.</string>
+    <string name="inappnotif_upgrade_button">Update on Google Play</string>
+
+    <string name="inappnotif_mempool_full_message">The Bitcoin mempool is full and on-chain fees are high.</string>
+    <string name="inappnotif_mempool_full_action">See how Phoenix is affected</string>
+
+    <string name="inappnotif_payment_onchain_pending_title">On-chain funds pending (+%1$s)</string>
+    <string name="inappnotif_payment_rejected_title">Payment rejected (+%1$s)</string>
+    <string name="inappnotif_payment_rejected_disabled">Automated channel management is disabled.</string>
+    <string name="inappnotif_payment_rejected_over_absolute">The fee was %1$s, but your max fee was set to %2$s.</string>
+    <string name="inappnotif_payment_rejected_over_relative">The fee was %1$s which is more than %2$s%% of the amount.</string>
+    <string name="inappnotif_payment_rejected_channel_initializing">Your channels are still initializing and could not receive that payment.</string>
+    <string name="inappnotif_payment_rejected_tweak_setting">Tap to configure.</string>
+
+    <string name="inappnotif_watchtower_nominal_title">Watchtower report</string>
+    <plurals name="inappnotif_watchtower_nominal_description">
+        <item quantity="one">%1$d channel was successfully checked on %2$s. No issues were found.</item>
+        <item quantity="other">%1$d channels were successfully checked on %2$s. No issues were found.</item>
+    </plurals>
+    <string name="inappnotif_watchtower_revokedfound_title">Watchtower alert</string>
+    <string name="inappnotif_watchtower_revokedfound_description">Revoked commitments were found on %1$s for channel(s): %2$s. This channel may be closed.</string>
+
+    <!-- settings: display seed -->
+
+    <string name="displayseed_instructions">The recovery phrase (sometimes called a seed), is a list of 12 English words. It allows you to recover full access to your funds if needed.\n\n<b>Only you alone possess this seed. Keep it private.</b>\n\n<b>Do not share this seed with anyone</b>.\nBeware of phishing. The developers of Phoenix will never ask for your seed.\n\n<b>Do not lose this seed</b>.\nSave it somewhere safe (not on this phone). If you lose your seed and your phone, you\'ve lost your funds.</string>
+    <string name="displayseed_authenticate_button">Display seed</string>
+    <string name="displayseed_dialog_header">KEEP THIS SEED SAFE.\nDO NOT SHARE.</string>
+    <string name="displayseed_backup_notice_header">You have not backed up your recovery phrase!</string>
+    <string name="displayseed_backup_notice_details">If you do not back it up and you lose access to Phoenix, you will lose your funds!</string>
+    <string name="displayseed_backup_checkbox">I have saved my recovery phrase somewhere safe.</string>
+    <string name="displayseed_loss_disclaimer_checkbox">I understand that if I lose my phone and my recovery phrase, then I will lose the funds in my wallet.</string>
+
+    <!-- payment details -->
+
+    <string name="paymentdetails_funding_fees_label">Miner fees</string>
+    <string name="paymentdetails_funding_fees_desc">Fees paid to the Bitcoin network miners to process the on-chain transaction.</string>
+    <string name="paymentdetails_service_fees_label">Service fees</string>
+    <string name="paymentdetails_service_fees_desc">Fees paid for the creation of a new payment channel. This is not always required.</string>
+
+    <!-- lnurl -->
+
+    <string name="lnurl_auth_instructions">You can anonymously sign-in and authorize an action on:</string>
+    <string name="lnurl_withdraw_header">You can redeem funds from\n<b>%1$s</b>.</string>
+    <string name="lnurl_withdraw_success">The withdrawal request has been sent to <b>%1$s</b>.\n\nIt may take some time before they send the funds. Please keep the app online in the meanwhile.</string>
+
+    <!-- Tor -->
+
+    <string name="tor_settings_subtitle">Phoenix can use Tor to shield your IP from the other nodes in the Lightning Network and Electrum servers.\n\nEnabling Tor will improve your privacy, but may cause payment issues if your connection is unstable.</string>
+
+    <!-- about -->
+
+    <string name="about_general_content">Phoenix is a Bitcoin wallet using the Lightning network for sending and receiving payments.\n\nIt is a free open source software, developed by <a href="https://phoenix.acinq.co">ACINQ</a> under the <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0 License</a>.</string>
+    <string name="about_seed_title">Safeguarding your key</string>
+    <string name="about_seed_content">This wallet is self-custodial: <b>you have sole custody of the wallet\'s 12-words seed key</b>.\n\nThis key gives access to your money. Do not reveal it to anyone, and beware of phishing.</string>
+    <string name="about_rates_title">Exchange rates</string>
+    <string name="about_rates_content">Bitcoin/fiat exchange rates are retrieved from various third-party APIs:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nThose rates may not be accurate. Always check the actual Bitcoin amount before sending a payment.</string>
+
+    <!-- home: migration result dialog -->
+
+    <string name="migration_dialog_title">Congratulations!</string>
+    <string name="migration_dialog_message">You are now using the new Phoenix version. Your channels are being migrated and will be ready soon.</string>
+
+    <!-- introduction screens -->
+
+    <string name="intro_welcome_title">Welcome!</string>
+    <string name="intro_welcome_sub1">With Phoenix, sending and receiving bitcoins is easy and safe.</string>
+    <string name="intro_welcome_next_button">Next</string>
+
+    <string name="intro_channels_title">Bitcoin supercharged</string>
+    <string name="intro_channels_sub1">Phoenix uses payment channels to make Bitcoin fast and private.</string>
+    <string name="intro_channels_next_button">Next</string>
+
+    <string name="intro_selfcustody_title">Your key, your bitcoins</string>
+    <string name="intro_selfcustody_sub1">Phoenix is self-custodial. You take control.</string>
+    <string name="intro_selfcustody_sub2">You can restore your wallet at anytime using your secret key. Keep it safe!</string>
+    <string name="intro_selfcustody_next_button">Get started</string>
+
+    <!-- wallet info -->
+
+    <string name="walletinfo_onchain_swapin">Swap-in wallet</string>
+    <string name="walletinfo_onchain_swapin_help">Funds sent to this on-chain wallet are automatically swapped to Lightning.</string>
+    <string name="walletinfo_onchain_swapin_policy_view">Tap to configure.</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details">On-chain funds will automatically be swapped to Lightning if the fee is <b>less than %1$s</b>.</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_startup">Swaps are attempted at application startup.</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled_details">Automated fee policy <b>is disabled</b>. Funds will not be swapped. They will remain on this wallet.</string>
+    <string name="walletinfo_onchain_swapin_empty">There are no swaps in progress.</string>
+
+    <string name="walletinfo_onchain_final_about">An on-chain wallet derived from your seed.\n\nThe final wallet is where funds are sent by default when your Lightning channels are closed.</string>
+
+    <!-- settings: liquidity policy for channels creation -->
+
+    <string name="liquiditypolicy_instructions">Incoming payments sometimes require on-chain transactions. This does not always happen, only when needed.</string>
+    <string name="liquiditypolicy_fees_estimation">Fees are currently estimated at around <b>%1$s</b> (≈%2$s).</string>
+    <string name="liquiditypolicy_disable_label">Automated channel management</string>
+    <string name="liquiditypolicy_disable_desc">Incoming payments that require on-chain operations will be rejected.</string>
+
+    <string name="liquiditypolicy_fees_base_label">Max fee amount</string>
+    <string name="liquiditypolicy_fees_base_help">Payments whose fees exceed that value will be rejected.</string>
+    <string name="liquiditypolicy_fees_base_too_low">This value is too low.</string>
+    <string name="liquiditypolicy_fees_base_below_estimation">Below the expected fee. Some payments may be rejected.</string>
+
+    <string name="liquiditypolicy_advanced_menu">Advanced options</string>
+    <string name="liquiditypolicy_advanced_disable">Channel management is disabled. It can be enabled in the Channel management setting screen.</string>
+    <string name="liquiditypolicy_advanced_disclaimer_header">Attention!</string>
+    <string name="liquiditypolicy_advanced_disclaimer_message">This screen is for advanced users. Do not change these settings unless you understand their purposes.</string>
+
+    <string name="liquiditypolicy_advanced_verifications_title">Additional verifications</string>
+    <string name="liquiditypolicy_advanced_fees_prop_label">Percentage check</string>
+    <string name="liquiditypolicy_advanced_fees_prop_help">Check the fee relative to the amount received. This option is useful as a sanity check for small payments.</string>
+    <string name="liquiditypolicy_advanced_overrides_title">Policy overrides</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_label">Skip absolute fee check for Lightning</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_help">When enabled, incoming Lightning payments will ignore the absolute max fee limit. Only the percentage check will apply.\n\nAttention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive.</string>
+    <string name="liquiditypolicy_save_button">Save policy</string>
+    <string name="liquiditypolicy_save_done">Policy saved.\nSwaps will be attempted at the next restart.</string>
+
+    <string name="liquiditypolicy_help">
+      Phoenix allows you to receive payments on Bitcoin\'s blockchain (L1) and Bitcoin\'s Lightning layer (L2).
+      \n\n
+      - the blockchain layer (L1) is slower, and generally much more expensive (requires miner fees)
+      \n
+      - the Lightning layer (L2) is much faster, and generally much cheaper (especially for smaller payments)
+      \n\n
+      When you receive a payment on L1, Phoenix will automatically move the funds to L2 <b>IF</b> the miner fees adhere to your configured fee policy.
+      \n\n
+      Payments you receive on L2 can be received instantly and for zero fees. However, occasionally an L1 operation is also required in order to manage the L2 payment channel. This can be done automatically <b>IF</b> the miner fees adhere to your configured fee policy.
+    </string>
+
+    <!-- CPFP -->
+
+    <string name="cpfp_title">Accelerate my transactions.</string>
+    <string name="cpfp_instructions">You can make all your unconfirmed transactions use a higher effective feerate to encourage miners to favour your payments.</string>
+
+</resources>

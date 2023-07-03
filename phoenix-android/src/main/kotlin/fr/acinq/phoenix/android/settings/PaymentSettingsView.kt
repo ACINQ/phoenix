@@ -31,8 +31,10 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.TrampolineFees
+import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalWalletContext
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
@@ -52,24 +54,19 @@ import java.text.NumberFormat
 
 @Composable
 fun PaymentSettingsView(
-    initialShowLnurlAuthSchemeDialog: Boolean = false
+    initialShowLnurlAuthSchemeDialog: Boolean = false,
 ) {
     val log = logger("PaymentSettingsView")
     val nc = navController
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val btcUnit = LocalBitcoinUnit.current
 
     var showDescriptionDialog by rememberSaveable { mutableStateOf(false) }
     var showExpiryDialog by rememberSaveable { mutableStateOf(false) }
-    var showTrampolineMaxFeeDialog by rememberSaveable { mutableStateOf(false) }
-    var showPayToOpenDialog by rememberSaveable { mutableStateOf(false) }
 
     val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(LocalContext.current).collectAsState(initial = "")
     val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState(initial = -1L)
-
-    val walletContext = LocalWalletContext.current
-    val prefsTrampolineMaxFee by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(null)
-    val trampolineFees = prefsTrampolineMaxFee ?: walletContext?.trampoline?.v2?.attempts?.last()?.export()
 
     val prefLnurlAuthSchemeState = UserPrefs.getLnurlAuthScheme(context).collectAsState(initial = null)
 
@@ -78,6 +75,8 @@ fun PaymentSettingsView(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.paymentsettings_title),
         )
+
+        CardHeader(text = stringResource(id = R.string.paymentsettings_category_incoming))
         Card {
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_defaultdesc_title),
@@ -94,23 +93,11 @@ fun PaymentSettingsView(
                 },
                 onClick = { showExpiryDialog = true }
             )
-            SettingInteractive(
-                title = stringResource(id = R.string.paymentsettings_trampoline_fees_title),
-                description = trampolineFees?.let {
-                    stringResource(id = R.string.paymentsettings_trampoline_fees_desc, trampolineFees.feeBase, trampolineFees.proportionalFeeAsPercentageString)
-                } ?: stringResource(R.string.utils_unknown),
-                onClick = { showTrampolineMaxFeeDialog = true }
-            )
-            SettingInteractive(
-                title = stringResource(id = R.string.paymentsettings_paytoopen_fees_title),
-                description = walletContext?.let {
-                    stringResource(id = R.string.paymentsettings_paytoopen_fees_desc, String.format("%.2f", 100 * (it.payToOpen.v1.feePercent)), it.payToOpen.v1.minFeeSat)
-                } ?: stringResource(id = R.string.utils_unknown),
-                onClick = { showPayToOpenDialog = true }
-            )
         }
+
         val prefLnurlAuthScheme = prefLnurlAuthSchemeState.value
         if (prefLnurlAuthScheme != null) {
+            CardHeader(text = stringResource(id = R.string.paymentsettings_category_lnurl))
             Card {
                 val schemes = listOf<PreferenceItem<LnurlAuth.Scheme>>(
                     PreferenceItem(
@@ -167,21 +154,6 @@ fun PaymentSettingsView(
         )
     }
 
-    if (showTrampolineMaxFeeDialog && trampolineFees != null) {
-        TrampolineMaxFeesDialog(
-            initialTrampolineMaxFee = trampolineFees,
-            isCustom = prefsTrampolineMaxFee != null,
-            onDismiss = { showTrampolineMaxFeeDialog = false },
-            onConfirm = {
-                scope.launch { UserPrefs.saveTrampolineMaxFee(context, it) }
-                showTrampolineMaxFeeDialog = false
-            }
-        )
-    }
-
-    if (showPayToOpenDialog) {
-        PayToOpenDialog(onDismiss = { showPayToOpenDialog = false })
-    }
 }
 
 @Composable
@@ -261,117 +233,11 @@ private fun DefaultDescriptionInvoiceDialog(
             TextInput(
                 modifier = Modifier.fillMaxWidth(),
                 text = paymentDescription,
-                label = { Text(stringResource(id = R.string.paymentsettings_defaultdesc_dialog_hint)) },
+                staticLabel = stringResource(id = R.string.paymentsettings_defaultdesc_dialog_label),
                 onTextChange = { paymentDescription = it },
                 maxLines = 3,
                 maxChars = 180,
             )
         }
     }
-}
-
-@Composable
-private fun TrampolineMaxFeesDialog(
-    initialTrampolineMaxFee: TrampolineFees,
-    isCustom: Boolean,
-    onDismiss: () -> Unit,
-    onConfirm: (TrampolineFees?) -> Unit,
-) {
-    var useCustomMaxFee by rememberSaveable { mutableStateOf(isCustom) }
-    var feeBase by rememberSaveable { mutableStateOf<Long?>(initialTrampolineMaxFee.feeBase.toLong()) }
-    var feeProportional by rememberSaveable { mutableStateOf<Double?>(initialTrampolineMaxFee.proportionalFeeAsPercentage) }
-
-    Dialog(
-        onDismiss = onDismiss,
-        title = stringResource(id = R.string.paymentsettings_trampoline_fees_title),
-        buttons = {
-            Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel))
-            Button(
-                onClick = {
-                    if (useCustomMaxFee) {
-                        safeLet(feeBase, feeProportional) { base, prop ->
-                            onConfirm(TrampolineFees(base.sat, Converter.percentageToPerMillionths(prop), initialTrampolineMaxFee.cltvExpiryDelta))
-                        }
-                    } else {
-                        onConfirm(null)
-                    }
-                },
-                modifier = Modifier.enableOrFade(!useCustomMaxFee || (feeBase != null && feeProportional != null)),
-                text = stringResource(id = R.string.btn_ok)
-            )
-        }
-    ) {
-        Column(Modifier.padding(horizontal = 24.dp)) {
-            Checkbox(
-                text = stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_override_default_checkbox),
-                checked = useCustomMaxFee,
-                onCheckedChange = { useCustomMaxFee = it },
-            )
-            Spacer(Modifier.height(8.dp))
-            NumberInput(
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_base_fee_label)) },
-                placeholder = { Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_base_fee_hint)) },
-                initialValue = feeBase?.toDouble(),
-                onValueChange = { feeBase = it?.toLong() },
-                enabled = useCustomMaxFee,
-                minErrorMessage = stringResource(
-                    R.string.paymentsettings_trampoline_fees_dialog_base_below_min,
-                    PaymentOptionsConstants.minBaseFee.toMilliSatoshi().toPrettyString(BitcoinUnit.Sat, withUnit = true)
-                ),
-                minValue = PaymentOptionsConstants.minBaseFee.toLong().toDouble(),
-                maxErrorMessage = stringResource(
-                    R.string.paymentsettings_trampoline_fees_dialog_base_above_max,
-                    PaymentOptionsConstants.maxBaseFee.toMilliSatoshi().toPrettyString(BitcoinUnit.Sat, withUnit = true)
-                ),
-                maxValue = PaymentOptionsConstants.maxBaseFee.toLong().toDouble(),
-                acceptDecimal = false
-            )
-            Spacer(Modifier.height(8.dp))
-            NumberInput(
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_proportional_fee_label)) },
-                placeholder = { Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_proportional_fee_hint)) },
-                initialValue = feeProportional,
-                onValueChange = { feeProportional = it },
-                enabled = useCustomMaxFee,
-                minValue = PaymentOptionsConstants.minProportionalFeePercent,
-                minErrorMessage = stringResource(
-                    R.string.paymentsettings_trampoline_fees_dialog_proportional_below_min,
-                    PaymentOptionsConstants.minProportionalFeePercent
-                ),
-                maxValue = PaymentOptionsConstants.maxProportionalFeePercent,
-                maxErrorMessage = stringResource(
-                    R.string.paymentsettings_trampoline_fees_dialog_proportional_above_max,
-                    PaymentOptionsConstants.maxProportionalFeePercent
-                ),
-            )
-        }
-    }
-}
-
-@Composable
-private fun PayToOpenDialog(
-    onDismiss: () -> Unit
-) {
-    Dialog(
-        title = stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_title),
-        onDismiss = onDismiss,
-        buttons = { },
-    ) {
-        Column(Modifier.padding(horizontal = 24.dp)) {
-            Text(text = stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_message))
-            Spacer(Modifier.height(8.dp))
-            WebLink(
-                text = stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_message_clickable),
-                url = "https://phoenix.acinq.co/faq#what-are-the-fees"
-            )
-        }
-    }
-}
-
-@Preview(device = Devices.PIXEL_3A)
-@Composable
-private fun Preview() {
-    PaymentSettingsView()
 }

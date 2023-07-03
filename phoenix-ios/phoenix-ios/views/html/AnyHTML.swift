@@ -28,30 +28,34 @@ fileprivate var log = Logger(OSLog.disabled)
 ///
 class AnyHTML: ObservableObject {
 	
-	let filename: String
+	let htmlFilename: String
+	let cssFilename: String?
 	@Published var htmlString: String? = nil
 	
-	init(filename: String) {
-		self.filename = filename
+	init(htmlFilename: String, cssFilename: String? = nil) {
+		self.htmlFilename = htmlFilename
+		self.cssFilename = cssFilename
+		
 		loadHTML()
 	}
 	
 	func loadHTML() -> Void {
 		
-		var resourceName = filename
-		
-		// The filename shouldn't have a file extension.
+		// The filename(s) shouldn't have a file extension.
 		// But let's guard against it just in case.
-		//
-		let pathExtension = (filename as NSString).pathExtension
-		if pathExtension.caseInsensitiveCompare("html") == .orderedSame {
-			resourceName = (filename as NSString).deletingPathExtension
+		let htmlResourceName = stripFileExtension(htmlFilename, "html")
+		
+		let cssResourceName: String
+		if let cssFilename {
+			cssResourceName = stripFileExtension(cssFilename, "css")
+		} else {
+			cssResourceName = htmlResourceName
 		}
 		
-		guard let htmlUrl = Bundle.main.url(forResource: resourceName, withExtension: "html") else {
+		guard let htmlUrl = Bundle.main.url(forResource: htmlResourceName, withExtension: "html") else {
 			return
 		}
-		let cssUrl = Bundle.main.url(forResource: resourceName, withExtension: "css")
+		let cssUrl = Bundle.main.url(forResource: cssResourceName, withExtension: "css")
 		
 		let traits = UITraitCollection.current // this is thread-local; need to fetch from main thread;
 		
@@ -72,9 +76,19 @@ class AnyHTML: ObservableObject {
 				}
 				
 			} catch {
-				log.error("Error reading resource [html|css]: \(resourceName)")
+				log.error("Error reading resource [html|css]: \(htmlResourceName), \(cssResourceName)")
 				return
 			}
+		}
+	}
+	
+	private func stripFileExtension(_ filename: String, _ ext: String) -> String {
+		
+		let pathExtension = (filename as NSString).pathExtension
+		if pathExtension.caseInsensitiveCompare(ext) == .orderedSame {
+			return (filename as NSString).deletingPathExtension
+		} else {
+			return filename
 		}
 	}
 	

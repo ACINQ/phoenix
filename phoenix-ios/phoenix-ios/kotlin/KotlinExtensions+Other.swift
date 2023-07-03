@@ -10,6 +10,17 @@ extension PhoenixBusiness {
 	}
 }
 
+extension PeerManager {
+	
+	func finalWalletBalance() -> Lightning_kmpWalletState.WalletWithConfirmations {
+		if let value = self.finalWallet.value_ as? Lightning_kmpWalletState.WalletWithConfirmations {
+			return value
+		} else {
+			return Lightning_kmpWalletState.WalletWithConfirmations(minConfirmations: 1, currentBlockHeight: 1, all: [])
+		}
+	}
+}
+
 extension BalanceManager {
 	
 	func swapInWalletBalanceValue() -> WalletBalance {
@@ -18,6 +29,24 @@ extension BalanceManager {
 		} else {
 			return WalletBalance.companion.empty()
 		}
+	}
+}
+
+extension WalletManager {
+	
+	func getKeyManager() -> Lightning_kmpLocalKeyManager? {
+		if let value = keyManager.value_ as? Lightning_kmpLocalKeyManager {
+			return value
+		} else {
+			return nil
+		}
+	}
+}
+
+extension WalletBalance {
+	
+	var confirmed: Bitcoin_kmpSatoshi {
+		return weaklyConfirmed.plus(other: deeplyConfirmed)
 	}
 }
 
@@ -30,6 +59,20 @@ extension Lightning_kmpConnection {
 		case is ESTABLISHED  : return NSLocalizedString("Connected", comment: "Connection state")
 		default              : return NSLocalizedString("Unknown", comment: "Connection state")
 		}
+	}
+}
+
+extension Lightning_kmpWalletState.WalletWithConfirmations {
+	
+	var unconfirmedBalance: Bitcoin_kmpSatoshi {
+		let balance = unconfirmed.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
+		return Bitcoin_kmpSatoshi(sat: balance)
+	}
+	
+	var confirmedBalance: Bitcoin_kmpSatoshi {
+		let anyConfirmed = weaklyConfirmed + deeplyConfirmed
+		let balance = anyConfirmed.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
+		return Bitcoin_kmpSatoshi(sat: balance)
 	}
 }
 

@@ -18,16 +18,19 @@ package fr.acinq.phoenix.android.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun ProgressView(
     text: String,
+    textStyle: TextStyle = MaterialTheme.typography.body1,
     modifier: Modifier = Modifier,
     padding: PaddingValues = PaddingValues(16.dp),
     progressCircleSize: Dp = 20.dp,
@@ -39,6 +42,6 @@ fun ProgressView(
     ) {
         CircularProgressIndicator(Modifier.size(progressCircleSize), strokeWidth = progressCircleWidth)
         Spacer(Modifier.width(space))
-        Text(text = text)
+        Text(text = text, style = textStyle)
     }
 }

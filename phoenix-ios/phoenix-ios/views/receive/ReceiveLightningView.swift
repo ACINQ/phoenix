@@ -32,11 +32,10 @@ struct ReceiveLightningView: View {
 		case sharingUrl(url: String)
 		case sharingImg(img: UIImage)
 	}
-	@State var sheet: ReceiveViewSheet? = nil
+	@State var activeSheet: ReceiveViewSheet? = nil
 	
 	@State var swapIn_enabled = true
 	@State var payToOpen_enabled = true
-	@State var payToOpen_minFundingSat: Int64 = 0
 	
 	@State var channelsCount = 0
 	
@@ -57,9 +56,6 @@ struct ReceiveLightningView: View {
 	
 	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
 	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
-	
-	// Saving custom publisher in @State since otherwise it fires on every render
-	@State var channelsPublisher = Biz.business.peerManager.peerStatePublisher().flatMap { $0.channelsPublisher() }
 	
 	// For the cicular buttons: [copy, share, edit]
 	enum MaxButtonWidth: Preference {}
@@ -88,6 +84,16 @@ struct ReceiveLightningView: View {
 				
 			} // else: uses.navigationStackDestination()
 			
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
+			if BusinessManager.showTestnetBackground {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+					.accessibilityHidden(true)
+			}
+			
 			content()
 		}
 		.onAppear {
@@ -106,17 +112,14 @@ struct ReceiveLightningView: View {
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
 		}
-		.onReceive(channelsPublisher) {
-			channelsChanged($0)
-		}
 		.onReceive(NotificationsManager.shared.permissions) {
 			notificationPermissionsChanged($0)
 		}
 		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
-			get: { sheet != nil },
-			set: { if !$0 { sheet = nil }}
+			get: { activeSheet != nil },
+			set: { if !$0 { activeSheet = nil }}
 		)) {
-			switch sheet! {
+			switch activeSheet! {
 			case .sharingUrl(let sharingUrl):
 				
 				let items: [Any] = [sharingUrl]
@@ -155,18 +158,24 @@ struct ReceiveLightningView: View {
 		// But, of course, this doesn't work properly because of a SwiftUI bug.
 		// So the current recommended workaround is to wrap everything in a GeometryReader.
 		//
-		GeometryReader { _ in
-			HStack(alignment: VerticalAlignment.top, spacing: 0) {
-				Spacer(minLength: 0)
-				if verticalSizeClass == UserInterfaceSizeClass.compact {
-					mainLandscape()
-				} else {
-					mainPortrait()
-				}
-				Spacer(minLength: 0)
-			} // </HStack>
-		} // </GeometryReader>
+		GeometryReader { geometry in
+			ScrollView(.vertical) {
+				main()
+					.frame(width: geometry.size.width)
+					.frame(minHeight: geometry.size.height)
+			}
+		}
 		.ignoresSafeArea(.keyboard)
+	}
+	
+	@ViewBuilder
+	func main() -> some View {
+		
+		if verticalSizeClass == UserInterfaceSizeClass.compact {
+			mainLandscape()
+		} else {
+			mainPortrait()
+		}
 	}
 	
 	@ViewBuilder
@@ -175,7 +184,7 @@ struct ReceiveLightningView: View {
 		VStack {
 			qrCodeView()
 				.frame(width: 200, height: 200)
-				.padding()
+				.padding(.all, 20)
 				.background(Color.white)
 				.cornerRadius(20)
 				.overlay(
@@ -190,9 +199,6 @@ struct ReceiveLightningView: View {
 			
 			if !payToOpen_enabled {
 				payToOpenDisabledWarning()
-					.padding(.top, 8)
-			} else if channelsCount == 0 {
-				payToOpenMinimumWarning()
 					.padding(.top, 8)
 			}
 			
@@ -220,18 +226,6 @@ struct ReceiveLightningView: View {
 			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			
 			warningButton()
-			
-			Button {
-				didTapSwapInButton()
-			} label: {
-				HStack {
-					Image(systemName: "repeat") // alt: "arrowshape.bounce.forward.fill"
-						.imageScale(.small)
-
-					Text("Show a Bitcoin address")
-				}
-			}
-			.padding(.vertical)
 			
 			Spacer()
 			
@@ -584,31 +578,6 @@ struct ReceiveLightningView: View {
 	}
 	
 	@ViewBuilder
-	func payToOpenMinimumWarning() -> some View {
-		
-		let minFunding = Utils.formatBitcoin(sat: payToOpen_minFundingSat, bitcoinUnit: .sat)
-		
-		HStack(alignment: VerticalAlignment.top, spacing: 0) {
-			Text(styled: String(format: NSLocalizedString(
-				"""
-				Your wallet is empty. The first payment you \
-				receive must be at least **%@**.
-				""",
-				comment:	"Minimum amount description."),
-				minFunding.string
-			))
-			.multilineTextAlignment(.center)
-		}
-		.font(.caption)
-		.padding(12)
-		.background(
-			RoundedRectangle(cornerRadius: 8)
-				.stroke(Color.appAccent, lineWidth: 1)
-		)
-		.padding([.leading, .trailing], 10)
-	}
-	
-	@ViewBuilder
 	func currencyConverterView() -> some View {
 		
 		CurrencyConverterView(
@@ -680,10 +649,11 @@ struct ReceiveLightningView: View {
 			return
 		}
 		
-		if lastIncomingPayment.state() == WalletPaymentState.success &&
-			lastIncomingPayment.paymentHash.toHex() == model.paymentHash
-		{
-			presentationMode.wrappedValue.dismiss()
+		let state = lastIncomingPayment.state()
+		if state == WalletPaymentState.successonchain || state == WalletPaymentState.successoffchain {
+			if lastIncomingPayment.paymentHash.toHex() == model.paymentHash {
+				presentationMode.wrappedValue.dismiss()
+			}
 		}
 	}
 	
@@ -692,26 +662,6 @@ struct ReceiveLightningView: View {
 		
 		swapIn_enabled = context.swapIn.v1.status is WalletContext.V0ServiceStatusActive
 		payToOpen_enabled = context.payToOpen.v1.status is WalletContext.V0ServiceStatusActive
-		payToOpen_minFundingSat = context.payToOpen.v1.minFundingSat
-	}
-	
-	func channelsChanged(_ channels: Lightning_kmpPeer.ChannelsMap) {
-		log.trace("channelsChanged()")
-		
-		var availableCount = 0
-		for (_, channel) in channels {
-			
-			if channel.asClosing() != nil ||
-				channel.asClosed() != nil ||
-				channel.asAborted() != nil
-			{
-				// ignore - channel isn't usable for incoming payments
-			} else {
-				availableCount += 1
-			}
-		}
-		
-		channelsCount = availableCount
 	}
 	
 	func notificationPermissionsChanged(_ newValue: NotificationPermissions) {
@@ -808,21 +758,6 @@ struct ReceiveLightningView: View {
 		}
 	}
 	
-	func didTapSwapInButton() -> Void {
-		log.trace("didTapSwapInButton()")
-		
-		if swapIn_enabled {
-			
-			mvi.intent(Receive.IntentRequestSwapIn())
-			
-		} else {
-			
-			popoverState.display(dismissable: true) {
-				SwapInDisabledPopover()
-			}
-		}
-	}
-	
 	func navigationToBackgroundPayments() {
 		log.trace("navigateToBackgroundPayments()")
 		
@@ -869,7 +804,7 @@ struct ReceiveLightningView: View {
 		if let m = mvi.model as? Receive.Model_Generated {
 			withAnimation {
 				let url = "lightning:\(m.request)"
-				sheet = ReceiveViewSheet.sharingUrl(url: url)
+				activeSheet = ReceiveViewSheet.sharingUrl(url: url)
 			}
 		}
 	}
@@ -883,7 +818,7 @@ struct ReceiveLightningView: View {
 			let qrCodeCgImage = qrCode.cgImage
 		{
 			let uiImg = UIImage(cgImage: qrCodeCgImage)
-			sheet = ReceiveViewSheet.sharingImg(img: uiImg)
+			activeSheet = ReceiveViewSheet.sharingImg(img: uiImg)
 		}
 	}
 }

@@ -21,7 +21,7 @@
 package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.phoenix.db.serializers.v1.ByteVector32Serializer
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
@@ -50,21 +50,24 @@ sealed class OutgoingPartStatusData {
     }
 
     companion object {
-        fun deserialize(typeVersion: OutgoingPartStatusTypeVersion, blob: ByteArray, completedAt: Long): OutgoingPayment.LightningPart.Status = DbTypesHelper.decodeBlob(blob) { json, format ->
+        fun deserialize(
+            typeVersion: OutgoingPartStatusTypeVersion,
+            blob: ByteArray, completedAt: Long
+        ): LightningOutgoingPayment.Part.Status = DbTypesHelper.decodeBlob(blob) { json, format ->
             when (typeVersion) {
                 OutgoingPartStatusTypeVersion.SUCCEEDED_V0 -> format.decodeFromString<Succeeded.V0>(json).let {
-                    OutgoingPayment.LightningPart.Status.Succeeded(it.preimage, completedAt)
+                    LightningOutgoingPayment.Part.Status.Succeeded(it.preimage, completedAt)
                 }
                 OutgoingPartStatusTypeVersion.FAILED_V0 -> format.decodeFromString<Failed.V0>(json).let {
-                    OutgoingPayment.LightningPart.Status.Failed(it.remoteFailureCode, it.details, completedAt)
+                    LightningOutgoingPayment.Part.Status.Failed(it.remoteFailureCode, it.details, completedAt)
                 }
             }
         }
     }
 }
 
-fun OutgoingPayment.LightningPart.Status.Succeeded.mapToDb() = OutgoingPartStatusTypeVersion.SUCCEEDED_V0 to
+fun LightningOutgoingPayment.Part.Status.Succeeded.mapToDb() = OutgoingPartStatusTypeVersion.SUCCEEDED_V0 to
         Json.encodeToString(OutgoingPartStatusData.Succeeded.V0(preimage)).toByteArray(Charsets.UTF_8)
 
-fun OutgoingPayment.LightningPart.Status.Failed.mapToDb() = OutgoingPartStatusTypeVersion.FAILED_V0 to
+fun LightningOutgoingPayment.Part.Status.Failed.mapToDb() = OutgoingPartStatusTypeVersion.FAILED_V0 to
         Json.encodeToString(OutgoingPartStatusData.Failed.V0(remoteFailureCode, details)).toByteArray(Charsets.UTF_8)

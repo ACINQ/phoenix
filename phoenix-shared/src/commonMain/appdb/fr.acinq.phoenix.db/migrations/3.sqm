@@ -1,0 +1,12 @@
+-- Migration: v3 -> v4
+--
+-- Changes:
+-- * add notifications table
+
+CREATE TABLE IF NOT EXISTS notifications (
+    id TEXT NOT NULL PRIMARY KEY,
+    type_version TEXT AS NotificationTypeVersion NOT NULL,
+    data_json BLOB NOT NULL,
+    created_at INTEGER NOT NULL,
+    read_at INTEGER DEFAULT NULL
+);

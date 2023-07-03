@@ -84,7 +84,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
           amountView.text = if (payment.finalAmount().isDefined) {
             printAmount(payment.finalAmount().get(), false, displayAmountAsFiat)
           } else {
-            itemView.context.getString(R.string.utils_unknown)
+            itemView.context.getString(R.string.legacy_utils_unknown)
           }
           amountView.setTextColor(positiveColor)
           handleDescription(item, descriptionView)
@@ -97,7 +97,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
           amountView.visibility = View.GONE
           unitView.visibility = View.GONE
           handleDescription(item, descriptionView)
-          detailsView.text = context.getString(R.string.paymentholder_waiting)
+          detailsView.text = context.getString(R.string.legacy_paymentholder_waiting)
           iconBgView.imageTintList = ColorStateList.valueOf(context.getColor(R.color.transparent))
           iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_pending))
         }
@@ -106,7 +106,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
           amountView.visibility = View.GONE
           unitView.visibility = View.GONE
           handleDescription(item, descriptionView)
-          detailsView.text = context.getString(R.string.paymentholder_failed)
+          detailsView.text = context.getString(R.string.legacy_paymentholder_failed)
           iconBgView.imageTintList = ColorStateList.valueOf(context.getColor(R.color.transparent))
           iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_pending))
         }
@@ -121,7 +121,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
           amountView.visibility = View.GONE
           unitView.visibility = View.GONE
           handleDescription(item, descriptionView)
-          detailsView.text = context.getString(R.string.paymentholder_processing)
+          detailsView.text = context.getString(R.string.legacy_paymentholder_processing)
           iconBgView.imageTintList = ColorStateList.valueOf(context.getColor(R.color.transparent))
           iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_pending))
         }
@@ -132,7 +132,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
           amountView.text = if (payment.finalAmount().isDefined) {
             printAmount(payment.finalAmount().get(), true, displayAmountAsFiat)
           } else {
-            context.getString(R.string.utils_unknown)
+            context.getString(R.string.legacy_utils_unknown)
           }
           amountView.setTextColor(negativeColor)
           handleDescription(item, descriptionView)
@@ -169,14 +169,14 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       if (item.meta?.closing_main_output_script?.isNotBlank() == true) {
         item.meta.closing_main_output_script
       } else {
-        descriptionView.context.getString(R.string.paymentholder_closing_desc, item.payment.externalId().get().split("-").last())
+        descriptionView.context.getString(R.string.legacy_paymentholder_closing_desc, item.payment.externalId().get().split("-").last())
       }
     } else {
       null
     }
     if (desc.isNullOrBlank()) {
       if (item.meta?.custom_desc.isNullOrBlank()) {
-        descriptionView.text = descriptionView.context.getString(R.string.paymentholder_no_desc)
+        descriptionView.text = descriptionView.context.getString(R.string.legacy_paymentholder_no_desc)
         descriptionView.setTextColor(mutedTextColor)
       } else {
         descriptionView.text = item.meta?.custom_desc

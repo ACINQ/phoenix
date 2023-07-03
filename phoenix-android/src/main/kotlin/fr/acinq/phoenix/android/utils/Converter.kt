@@ -50,12 +50,12 @@ object Converter {
     private val DECIMAL_SEPARATOR = DecimalFormat().decimalFormatSymbols.decimalSeparator.toString()
     private var SAT_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.###")
     private var SAT_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0").apply { roundingMode = RoundingMode.DOWN }
-    private var BIT_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.#####")
-    private var BIT_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.##").apply { roundingMode = RoundingMode.DOWN }
-    private var MBTC_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.########")
-    private var MBTC_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.#####").apply { roundingMode = RoundingMode.DOWN }
-    private var BTC_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.##############")
-    private var BTC_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.###########").apply { roundingMode = RoundingMode.DOWN }
+    private var BIT_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.00###")
+    private var BIT_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.00").apply { roundingMode = RoundingMode.DOWN }
+    private var MBTC_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.00000###")
+    private var MBTC_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.00000").apply { roundingMode = RoundingMode.DOWN }
+    private var BTC_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.00000000###")
+    private var BTC_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.00000000").apply { roundingMode = RoundingMode.DOWN }
     private var FIAT_FORMAT: NumberFormat = NumberFormat.getInstance().apply {
         minimumFractionDigits = 2
         maximumFractionDigits = 2
@@ -106,7 +106,7 @@ object Converter {
                 SAT_FORMAT_WITH_MILLIS.format(amount)
             }
             unit is BitcoinUnit -> getCoinFormat(unit, withMillis = mSatDisplayPolicy == MSatDisplayPolicy.SHOW).format(amount)
-            unit is FiatCurrency -> FIAT_FORMAT.format(amount)
+            unit is FiatCurrency -> amount.takeIf { it >= 0 }?.let { FIAT_FORMAT.format(it) }
             else -> "?!"
         }
     } ?: "N/A").run {

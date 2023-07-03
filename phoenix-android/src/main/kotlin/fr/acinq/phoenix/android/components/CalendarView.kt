@@ -41,7 +41,7 @@ import kotlinx.datetime.*
 @Composable
 fun CalendarView(
     label: String,
-    buttonBackgroundColor: Color = mutedBgColor(),
+    buttonBackgroundColor: Color = mutedBgColor,
     initialTimestampMillis: Long = currentTimestampMillis(),
     dialogTitle: String? = null,
     onDateSelected: (Long) -> Unit,

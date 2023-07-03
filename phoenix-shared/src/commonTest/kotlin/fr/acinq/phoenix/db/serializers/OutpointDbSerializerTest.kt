@@ -7,14 +7,10 @@ package fr.acinq.phoenix.db.serializers
 import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.lightning.Lightning.randomBytes32
-import fr.acinq.lightning.channel.ChannelState
-import fr.acinq.lightning.json.JsonSerializers
 import fr.acinq.phoenix.db.serializers.v1.OutpointSerializer
 import fr.acinq.secp256k1.Hex
 import kotlinx.serialization.*
-import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonEncoder
 import kotlinx.serialization.modules.SerializersModule
 import kotlin.test.Test
 import kotlin.test.assertEquals

@@ -40,14 +40,16 @@ class MetadataQueries(val database: PaymentsDatabase) {
         id: WalletPaymentId,
         options: WalletPaymentFetchOptions
     ): WalletPaymentMetadata? {
-        // Optimization notes:
-        // We have a reason to optimize fetching descriptions, because it's commonly used.
-        // However, at this point, other custom options are uncommon.
-        // So we're not optimizing other combinations at this point,
-        // but the possibility is there for future use.
+        // The following are commonly used, and so are optimized:
+        // - descriptions + originalFiat
+        // - descriptions
+        // Other combinations are uncommon or never used, so remain unoptimized at this point.
         return when (options) {
             WalletPaymentFetchOptions.None -> {
                 null
+            }
+            WalletPaymentFetchOptions.Descriptions + WalletPaymentFetchOptions.OriginalFiat -> {
+                getMetadataDescriptionsAndOriginalFiat(id)
             }
             WalletPaymentFetchOptions.Descriptions -> {
                 getMetadataDescriptions(id)
@@ -63,6 +65,16 @@ class MetadataQueries(val database: PaymentsDatabase) {
             type = id.dbType.value,
             id = id.dbId,
             mapper = ::mapDescriptions
+        ).executeAsOneOrNull()
+    }
+
+    private fun getMetadataDescriptionsAndOriginalFiat(
+        id: WalletPaymentId
+    ): WalletPaymentMetadata? {
+        return queries.fetchDescriptionsAndOriginalFiat(
+            type = id.dbType.value,
+            id = id.dbId,
+            mapper = ::mapDescriptionsAndOriginalFiat
         ).executeAsOneOrNull()
     }
 
@@ -127,6 +139,37 @@ class MetadataQueries(val database: PaymentsDatabase) {
             return WalletPaymentMetadata(
                 userDescription = user_description,
                 lnurl = lnurl,
+                modifiedAt = modified_at
+            )
+        }
+
+        fun mapDescriptionsAndOriginalFiat(
+            lnurl_description: String?,
+            user_description: String?,
+            modified_at: Long?,
+            original_fiat_type: String?,
+            original_fiat_rate: Double?
+        ): WalletPaymentMetadata {
+            val lnurl = if (lnurl_description != null) {
+                LnurlPayMetadata.placeholder(lnurl_description)
+            } else null
+
+            val originalFiat =
+                if (original_fiat_type != null && original_fiat_rate != null) {
+                    FiatCurrency.valueOfOrNull(original_fiat_type)?.let { fiatCurrency ->
+                        ExchangeRate.BitcoinPriceRate(
+                            fiatCurrency = fiatCurrency,
+                            price = original_fiat_rate,
+                            source = "originalFiat",
+                            timestampMillis = 0
+                        )
+                    }
+                } else null
+
+            return WalletPaymentMetadata(
+                lnurl = lnurl,
+                originalFiat = originalFiat,
+                userDescription = user_description,
                 modifiedAt = modified_at
             )
         }

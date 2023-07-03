@@ -26,16 +26,10 @@ struct SwapInView: View {
 	
 	@StateObject var qrCode = QRCode()
 	
-	@State var sheet: ReceiveViewSheet? = nil
-	
-	@State var swapIn_feePercent: Double = 0.0
-	@State var swapIn_minFeeSat: Int64 = 0
-	@State var swapIn_minFundingSat: Int64 = 0
+	@State var activeSheet: ReceiveViewSheet? = nil
 	
 	let swapInWalletBalancePublisher = Biz.business.balanceManager.swapInWalletBalancePublisher()
 	@State var swapInWalletBalance = Biz.business.balanceManager.swapInWalletBalanceValue()
-	
-	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -55,6 +49,24 @@ struct SwapInView: View {
 	
 	@ViewBuilder
 	var body: some View {
+		
+		ZStack {
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
+			if BusinessManager.showTestnetBackground {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+					.accessibilityHidden(true)
+			}
+			
+			contentWrapper()
+		}
+	}
+	
+	@ViewBuilder
+	func contentWrapper() -> some View {
 		
 		GeometryReader { geometry in
 			ScrollView(.vertical) {
@@ -94,29 +106,14 @@ struct SwapInView: View {
 			}
 			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			
-			feesInfoView()
-				.padding([.top, .leading, .trailing])
-			
-			Button {
-				didTapLightningButton()
-			} label: {
-				HStack {
-					Image(systemName: "repeat") // alt: "arrowshape.bounce.forward.fill"
-						.imageScale(.small)
-
-					Text("Show a Lightning invoice")
-				}
-			}
-			.padding(.vertical)
-			
 			Spacer()
 			
 		} // </VStack>
 		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
-			get: { sheet != nil },
-			set: { if !$0 { sheet = nil }}
+			get: { activeSheet != nil },
+			set: { if !$0 { activeSheet = nil }}
 		)) {
-			switch sheet! {
+			switch activeSheet! {
 			case .sharingUrl(let sharingUrl):
 
 				let items: [Any] = [sharingUrl]
@@ -140,9 +137,6 @@ struct SwapInView: View {
 		.onReceive(swapInWalletBalancePublisher) {
 			swapInWalletBalanceChanged($0)
 		}
-		.onReceive(chainContextPublisher) {
-			chainContextChanged($0)
-		}
 	}
 	
 	@ViewBuilder
@@ -155,6 +149,7 @@ struct SwapInView: View {
 		{
 			qrCodeImage
 				.resizable()
+				.aspectRatio(contentMode: .fit)
 				.contextMenu {
 					Button(action: {
 						copyImageToPasteboard()
@@ -313,50 +308,6 @@ struct SwapInView: View {
 		})
 	}
 	
-	@ViewBuilder
-	func feesInfoView() -> some View {
-		
-		HStack(alignment: VerticalAlignment.top, spacing: 8) {
-			
-			Image(systemName: "info.circle")
-				.imageScale(.large)
-				.accessibilityHidden(true)
-			
-			let minFunding = Utils.formatBitcoin(sat: swapIn_minFundingSat, bitcoinUnit: .sat)
-			
-			let feePercent = formatFeePercent()
-			let minFee = Utils.formatBitcoin(sat: swapIn_minFeeSat, bitcoinUnit: .sat)
-			
-			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-				
-				Text(
-					"""
-					On-chain deposits sent to this address will be converted to Lightning channels.
-					"""
-				)
-				.multilineTextAlignment(.leading)
-				.fixedSize(horizontal: false, vertical: true) // text truncation bugs
-				.padding(.bottom, 14)
-				
-				Text(styled: String(format: NSLocalizedString(
-					"""
-					Total deposits must be at least **%@**. The fee is **%@%%** (%@ minimum).
-					""",
-					comment:	"Minimum amount description."),
-					minFunding.string, feePercent, minFee.string
-				))
-				.multilineTextAlignment(.leading)
-				.fixedSize(horizontal: false, vertical: true) // text truncation bugs
-			}
-		}
-		.font(.subheadline)
-		.padding()
-		.background(
-			RoundedRectangle(cornerRadius: 10)
-				.foregroundColor(Color.mutedBackground)
-		)
-	}
-	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
@@ -368,15 +319,6 @@ struct SwapInView: View {
 		} else {
 			return nil
 		}
-	}
-	
-	func formatFeePercent() -> String {
-		
-		let formatter = NumberFormatter()
-		formatter.minimumFractionDigits = 0
-		formatter.maximumFractionDigits = 3
-		
-		return formatter.string(from: NSNumber(value: swapIn_feePercent))!
 	}
 	
 	// --------------------------------------------------
@@ -422,14 +364,6 @@ struct SwapInView: View {
 		}
 	}
 	
-	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
-		log.trace("chainContextChanged()")
-		
-		swapIn_feePercent = context.swapIn.v1.feePercent * 100    // 0.01 => 1%
-		swapIn_minFeeSat = context.payToOpen.v1.minFeeSat         // not yet segregated for swapIn - future work
-		swapIn_minFundingSat = context.payToOpen.v1.minFundingSat // not yet segregated for swapIn - future work
-	}
-	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
@@ -472,16 +406,6 @@ struct SwapInView: View {
 		}
 	}
 	
-	func didTapLightningButton() {
-		log.trace("didTapLightningButton()")
-		
-		mvi.intent(Receive.IntentAsk(
-			amount: lastAmount,
-			desc: lastDescription,
-			expirySeconds: Prefs.shared.invoiceExpirationSeconds
-		))
-	}
-	
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
@@ -520,7 +444,7 @@ struct SwapInView: View {
 		
 		if let m = mvi.model as? Receive.Model_SwapIn {
 			let url = "bitcoin:\(m.address)"
-			sheet = ReceiveViewSheet.sharingUrl(url: url)
+			activeSheet = ReceiveViewSheet.sharingUrl(url: url)
 		}
 	}
 	
@@ -533,7 +457,7 @@ struct SwapInView: View {
 			let qrCodeCgImage = qrCode.cgImage
 		{
 			let uiImg = UIImage(cgImage: qrCodeCgImage)
-			sheet = ReceiveViewSheet.sharingImg(img: uiImg)
+			activeSheet = ReceiveViewSheet.sharingImg(img: uiImg)
 		}
 	}
 }

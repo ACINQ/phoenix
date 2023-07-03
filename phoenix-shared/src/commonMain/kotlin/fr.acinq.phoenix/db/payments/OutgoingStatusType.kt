@@ -23,11 +23,12 @@ package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.lightning.db.ChannelClosingType
-import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.data.FiatCurrency.Companion.valueOfOrNull
 import fr.acinq.phoenix.db.payments.DbTypesHelper.decodeBlob
 import fr.acinq.phoenix.db.serializers.v1.ByteVector32Serializer
 import fr.acinq.phoenix.db.serializers.v1.SatoshiSerializer
@@ -41,8 +42,9 @@ import kotlinx.serialization.json.Json
 
 enum class OutgoingStatusTypeVersion {
     SUCCEEDED_OFFCHAIN_V0,
-    @Deprecated("Use the new SUCCEEDED_OFFCHAIN_V1 format. This status was used to store data about channel closing transactions.")
+    @Deprecated("Use the new SUCCEEDED_ONCHAIN_V1 format. This status was used to store data about channel closing transactions.")
     SUCCEEDED_ONCHAIN_V0,
+    @Deprecated("Starting with splices, we now use SpliceOut or ChannelClose outgoing payments type for on-chain payments")
     SUCCEEDED_ONCHAIN_V1,
     FAILED_V0,
 }
@@ -73,39 +75,23 @@ sealed class OutgoingStatusData {
 
     companion object {
 
-        /**
-         * This method is for compatibility with old outgoing payments representing closing transactions, and using
-         * the deprecated status [OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0]. Those statuses contain infirma
-         */
-        fun getClosingPartsFromV0Status(blob: ByteArray, completedAt: Long): List<OutgoingPayment.ClosingTxPart> = decodeBlob(blob) { json, format ->
-            format.decodeFromString<SucceededOnChain.V0>(json).let {
-                it.txIds.mapIndexed() { index, txId ->
-                    OutgoingPayment.ClosingTxPart(
-                        id = UUID.randomUUID(),
-                        txId = txId,
-                        claimed = if (index == 0) it.claimed else 0.sat,
-                        closingType = try {
-                            ChannelClosingType.valueOf(it.closingType)
-                        } catch (e: Exception) {
-                            ChannelClosingType.Other
-                        },
-                        createdAt = completedAt
-                    )
-                }
-            }
+        /** Extract valuable data from old outgoing payments status that represent closing transactions. */
+        fun deserializeLegacyClosingStatus(blob: ByteArray): SucceededOnChain.V0 = decodeBlob(blob) { json, format ->
+            val data = format.decodeFromString<SucceededOnChain.V0>(json)
+            data
         }
 
-        fun deserialize(typeVersion: OutgoingStatusTypeVersion, blob: ByteArray, completedAt: Long): OutgoingPayment.Status = decodeBlob(blob) { json, format ->
+        fun deserialize(typeVersion: OutgoingStatusTypeVersion, blob: ByteArray, completedAt: Long): LightningOutgoingPayment.Status = decodeBlob(blob) { json, format ->
             @Suppress("DEPRECATION")
             when (typeVersion) {
                 OutgoingStatusTypeVersion.SUCCEEDED_OFFCHAIN_V0 -> format.decodeFromString<SucceededOffChain.V0>(json).let {
-                    OutgoingPayment.Status.Completed.Succeeded.OffChain(it.preimage, completedAt)
+                    LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(it.preimage, completedAt)
                 }
                 OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0, OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V1 -> {
-                    OutgoingPayment.Status.Completed.Succeeded.OnChain(completedAt)
+                    TODO("impossible scenario")
                 }
                 OutgoingStatusTypeVersion.FAILED_V0 -> format.decodeFromString<Failed.V0>(json).let {
-                    OutgoingPayment.Status.Completed.Failed(deserializeFinalFailure(it.reason), completedAt)
+                    LightningOutgoingPayment.Status.Completed.Failed(deserializeFinalFailure(it.reason), completedAt)
                 }
             }
         }
@@ -126,11 +112,10 @@ sealed class OutgoingStatusData {
     }
 }
 
-fun OutgoingPayment.Status.Completed.mapToDb(): Pair<OutgoingStatusTypeVersion, ByteArray> = when (this) {
-    is OutgoingPayment.Status.Completed.Succeeded.OffChain -> OutgoingStatusTypeVersion.SUCCEEDED_OFFCHAIN_V0 to
+fun LightningOutgoingPayment.Status.Completed.mapToDb(): Pair<OutgoingStatusTypeVersion, ByteArray> = when (this) {
+    is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain -> OutgoingStatusTypeVersion.SUCCEEDED_OFFCHAIN_V0 to
             Json.encodeToString(OutgoingStatusData.SucceededOffChain.V0(preimage)).toByteArray(Charsets.UTF_8)
-    is OutgoingPayment.Status.Completed.Succeeded.OnChain -> OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V1 to
-            Json.encodeToString(OutgoingStatusData.SucceededOnChain.V1).toByteArray(Charsets.UTF_8)
-    is OutgoingPayment.Status.Completed.Failed -> OutgoingStatusTypeVersion.FAILED_V0 to
+    is LightningOutgoingPayment.Status.Completed.Failed -> OutgoingStatusTypeVersion.FAILED_V0 to
             Json.encodeToString(OutgoingStatusData.Failed.V0(OutgoingStatusData.serializeFinalFailure(reason))).toByteArray(Charsets.UTF_8)
 }
+

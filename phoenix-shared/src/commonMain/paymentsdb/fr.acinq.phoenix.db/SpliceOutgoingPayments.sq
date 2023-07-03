@@ -1,0 +1,32 @@
+-- store a splice-out payment in a flat row
+-- there are no complex json columns like in the outgoing_payments table
+CREATE TABLE IF NOT EXISTS splice_outgoing_payments (
+    id TEXT NOT NULL PRIMARY KEY,
+    recipient_amount_sat INTEGER NOT NULL,
+    address TEXT NOT NULL,
+    mining_fees_sat INTEGER NOT NULL,
+    tx_id BLOB NOT NULL,
+    channel_id BLOB NOT NULL,
+    created_at INTEGER NOT NULL,
+    confirmed_at INTEGER DEFAULT NULL,
+    locked_at INTEGER DEFAULT NULL
+);
+
+insertSpliceOutgoing:
+INSERT INTO splice_outgoing_payments (
+    id, recipient_amount_sat, address, mining_fees_sat, tx_id, channel_id, created_at, confirmed_at, locked_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+setConfirmed:
+UPDATE splice_outgoing_payments SET confirmed_at=? WHERE id=?;
+
+setLocked:
+UPDATE splice_outgoing_payments SET locked_at=? WHERE id=?;
+
+getSpliceOutgoing:
+SELECT id, recipient_amount_sat, address, mining_fees_sat, tx_id, channel_id, created_at, confirmed_at, locked_at
+FROM splice_outgoing_payments
+WHERE id=?;
+
+deleteSpliceOutgoing:
+DELETE FROM splice_outgoing_payments WHERE id=?;

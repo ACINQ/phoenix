@@ -529,19 +529,21 @@ struct MainView_Small: View {
 			
 			// Navigate towards deep link (if needed)
 			var newNavLinkTag: NavLinkTag? = nil
+			var delay: TimeInterval = 1.5 // seconds; multiply by number of screens we need to navigate
 			switch value {
-				case .paymentHistory     : newNavLinkTag = .TransactionsView
-				case .backup             : newNavLinkTag = .ConfigurationView
-				case .drainWallet        : newNavLinkTag = .ConfigurationView
-				case .electrum           : newNavLinkTag = .ConfigurationView
-				case .backgroundPayments : newNavLinkTag = .ConfigurationView
+				case .paymentHistory     : newNavLinkTag = .TransactionsView  ; delay *= 1
+				case .backup             : newNavLinkTag = .ConfigurationView ; delay *= 2
+				case .drainWallet        : newNavLinkTag = .ConfigurationView ; delay *= 2
+				case .electrum           : newNavLinkTag = .ConfigurationView ; delay *= 3
+				case .backgroundPayments : newNavLinkTag = .ConfigurationView ; delay *= 3
+				case .liquiditySettings  : newNavLinkTag = .ConfigurationView ; delay *= 3
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
 				
 				self.swiftUiBugWorkaround = newNavLinkTag
 				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: 1.0)
+				clearSwiftUiBugWorkaround(delay: delay)
 				
 				self.navLinkTag = newNavLinkTag // Trigger/push the view
 			}

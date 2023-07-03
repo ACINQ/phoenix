@@ -43,7 +43,7 @@ class InitWalletFragment : Fragment() {
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentInitWalletBinding.inflate(inflater, container, false)
-    mBinding.terms.text = Converter.html(getString(R.string.initwallet_terms))
+    mBinding.terms.text = Converter.html(getString(R.string.legacy_initwallet_terms))
     mBinding.terms.movementMethod = LinkMovementMethod.getInstance()
     mBinding.lifecycleOwner = this
     return mBinding.root

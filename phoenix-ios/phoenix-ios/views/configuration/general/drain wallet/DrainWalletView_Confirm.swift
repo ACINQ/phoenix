@@ -189,7 +189,7 @@ struct DrainWalletView_Confirm: MVISubView {
 	func nonZeroChannelCount() -> Int {
 		
 		if let channels = mvi.channels() {
-			return channels.filter { $0.balance > 0 }.count
+			return channels.filter { ($0.balance?.sat ?? 0) > 0 }.count
 		} else {
 			return 0
 		}

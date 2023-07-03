@@ -4,17 +4,18 @@ import com.squareup.sqldelight.EnumColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
-import fr.acinq.lightning.utils.Either
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.phoenix.data.WalletContext
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.data.Notification
+import fr.acinq.phoenix.data.WalletContext
+import fr.acinq.phoenix.db.notifications.NotificationsQueries
 import fracinqphoenixdb.Exchange_rates
-import io.ktor.util.date.*
+import fracinqphoenixdb.Notifications
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -26,12 +27,16 @@ class SqliteAppDb(private val driver: SqlDriver) {
         driver = driver,
         exchange_ratesAdapter = Exchange_rates.Adapter(
             typeAdapter = EnumColumnAdapter()
+        ),
+        notificationsAdapter = Notifications.Adapter(
+            type_versionAdapter = EnumColumnAdapter()
         )
     )
 
     private val paramsQueries = database.walletParamsQueries
     private val priceQueries = database.exchangeRatesQueries
     private val keyValueStoreQueries = database.keyValueStoreQueries
+    private val notificationsQueries = NotificationsQueries(database)
     private val json = Json { ignoreUnknownKeys = true }
 
     /**
@@ -75,10 +80,10 @@ class SqliteAppDb(private val driver: SqlDriver) {
      */
     fun listBitcoinRates(): Flow<List<ExchangeRate>> {
         // Here's what we want:
-        // - we should be able to **REMOVE** fiat currencies from the list in the future
+        // - we should be able to **REMOVE** fiat currencies from the codebase in the future
         //   (e.g. after it collapses due to hyperinflation)
-        // - however, after we do, the corresponding row will remain in the database
-        // - attempting to force-decode it via FiatCurrency.valueOf(code) will cause a crash
+        // - however, after we do, the corresponding row will remain in the user's database
+        // - attempting to force-decode it via FiatCurrency.valueOf(code) will throw an exception
         // - so we use FiatCurrency.valueOfOrNull, and workaround potential null values
         //
         return priceQueries.list(mapper = { fiat, price, type, source, updated_at ->
@@ -140,7 +145,7 @@ class SqliteAppDb(private val driver: SqlDriver) {
     suspend fun getWalletContextOrNull(version: WalletContext.Version): Pair<Long, WalletContext.V0?> =
         withContext(Dispatchers.Default) {
             paramsQueries.get(version.name, ::mapWalletContext).executeAsOneOrNull()
-        } ?: Instant.DISTANT_PAST.toEpochMilliseconds() to null
+        } ?: (Instant.DISTANT_PAST.toEpochMilliseconds() to null)
 
     private fun mapWalletContext(
         version: String,
@@ -185,6 +190,26 @@ class SqliteAppDb(private val driver: SqlDriver) {
             }
             now
         }
+    }
+
+    suspend fun getNotification(id: UUID): Notification? = withContext(Dispatchers.Default) {
+        notificationsQueries.get(id)
+    }
+
+    suspend fun saveNotification(notification: Notification) = withContext(Dispatchers.Default) {
+        notificationsQueries.save(notification)
+    }
+
+    suspend fun dismissNotifications(ids: Set<UUID>) = withContext(Dispatchers.Default) {
+        notificationsQueries.markAsRead(ids)
+    }
+
+    suspend fun dismissAllNotifications() {
+        notificationsQueries.markAllAsRead()
+    }
+
+    suspend fun listUnreadNotification(): Flow<List<Pair<Set<UUID>, Notification>>> = withContext(Dispatchers.Default) {
+        notificationsQueries.listUnread()
     }
 
     fun close() {

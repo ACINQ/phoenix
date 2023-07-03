@@ -90,6 +90,51 @@ struct ElectrumConfigPrefs: Equatable, Codable {
 
 }
 
+struct LiquidityPolicy: Equatable, Codable {
+	
+	let enabled: Bool
+	let maxFeeSats: Int64?
+	let maxFeeBasisPoints: Int32?
+	let skipAbsoluteFeeCheck: Bool?
+	
+	static func defaultPolicy() -> LiquidityPolicy {
+		return LiquidityPolicy(
+			enabled: true,
+			maxFeeSats: nil,          // use default value defined in phoenix-shared
+			maxFeeBasisPoints: nil,   // use default value defined in phoenix-shared
+			skipAbsoluteFeeCheck: nil // use default value defined in phoenix-shared
+		)
+	}
+	
+	var effectiveMaxFeeSats: Int64 {
+		return maxFeeSats ?? NodeParamsManager.companion.defaultLiquidityPolicy.maxAbsoluteFee.sat
+	}
+	
+	var effectiveMaxFeeBasisPoints: Int32 {
+		return maxFeeBasisPoints ?? NodeParamsManager.companion.defaultLiquidityPolicy.maxRelativeFeeBasisPoints
+	}
+	
+	var effectiveSkipAbsoluteFeeCheck: Bool {
+		return skipAbsoluteFeeCheck ?? NodeParamsManager.companion.defaultLiquidityPolicy.skipAbsoluteFeeCheck
+	}
+	
+	func toKotlin() -> Lightning_kmpLiquidityPolicy {
+		
+		if enabled {
+			
+			return Lightning_kmpLiquidityPolicy.Auto(
+				maxAbsoluteFee: Bitcoin_kmpSatoshi(sat: effectiveMaxFeeSats),
+				maxRelativeFeeBasisPoints: effectiveMaxFeeBasisPoints,
+				skipAbsoluteFeeCheck: effectiveSkipAbsoluteFeeCheck
+			)
+			
+		} else {
+			
+			return Lightning_kmpLiquidityPolicy.Disable()
+		}
+	}
+}
+
 struct MaxFees: Equatable, Codable {
 	let feeBaseSat: Int64
 	let feeProportionalMillionths: Int64

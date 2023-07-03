@@ -161,14 +161,9 @@ struct RestoreView: View {
 					return NSLocalizedString("iCloud service busy",
 					                comment: "reason for iCloud failure")
 				default:
-					if #available(iOS 15.0, *) {
-						if underlying.errorCode == CKError.accountTemporarilyUnavailable.rawValue {
-							return NSLocalizedString("iCloud account temporarily unavailable",
-							                comment: "reason for iCloud error")
-						} else {
-							return error.localizedDescription
-						}
-						
+					if underlying.errorCode == CKError.accountTemporarilyUnavailable.rawValue {
+						return NSLocalizedString("iCloud account temporarily unavailable",
+						                comment: "reason for iCloud error")
 					} else {
 						return error.localizedDescription
 					}

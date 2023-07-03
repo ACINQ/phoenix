@@ -23,11 +23,9 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -45,12 +43,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.utils.borderColor
-import fr.acinq.phoenix.android.utils.mutedTextColor
+import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.utils.BlockchainExplorer
 
 
@@ -64,9 +62,11 @@ fun BorderButton(
     backgroundColor: Color = MaterialTheme.colors.surface,
     borderColor: Color = MaterialTheme.colors.primary,
     enabled: Boolean = true,
+    enabledEffect: Boolean = true,
     space: Dp = 12.dp,
     textStyle: TextStyle = MaterialTheme.typography.button,
     padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     onClick: () -> Unit,
 ) {
     Button(
@@ -74,13 +74,15 @@ fun BorderButton(
         icon = icon,
         iconTint = iconTint,
         enabled = enabled,
+        enabledEffect = enabledEffect,
         space = space,
         onClick = onClick,
         shape = CircleShape,
         backgroundColor = backgroundColor,
-        border = BorderStroke(ButtonDefaults.OutlinedBorderSize, borderColor),
+        border = BorderStroke(ButtonDefaults.OutlinedBorderSize, if (enabled) borderColor else borderColor.copy(alpha = 0.4f)),
         textStyle = textStyle,
         padding = padding,
+        interactionSource = interactionSource,
         modifier = modifier
     )
 }
@@ -92,6 +94,7 @@ fun FilledButton(
     text: String? = null,
     icon: Int? = null,
     iconTint: Color = MaterialTheme.colors.onPrimary,
+    maxLines: Int = Int.MAX_VALUE,
     enabled: Boolean = true,
     space: Dp = 12.dp,
     shape: Shape = CircleShape,
@@ -104,6 +107,7 @@ fun FilledButton(
         text = text,
         icon = icon,
         iconTint = iconTint,
+        maxLines = maxLines,
         enabled = enabled,
         space = space,
         onClick = onClick,
@@ -115,23 +119,35 @@ fun FilledButton(
     )
 }
 
+/** Button that looks like an inline link, should fit in with regular text views. */
 @Composable
 fun InlineButton(
     text: String,
-    icon: Int,
+    icon: Int? = null,
+    fontSize: TextUnit = MaterialTheme.typography.body1.fontSize,
+    iconSize: Dp = ButtonDefaults.IconSize,
     modifier: Modifier = Modifier,
-    padding: PaddingValues = PaddingValues(horizontal = 0.dp, vertical = 8.dp),
+    padding: PaddingValues = PaddingValues(horizontal = 2.dp, vertical = 1.dp),
     space: Dp = 6.dp,
+    maxLines: Int = Int.MAX_VALUE,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
+    onClickLabel: String? = null,
 ) {
     Button(
         text = text,
         icon = icon,
+        iconSize = iconSize,
         modifier = modifier,
         padding = padding,
         space = space,
+        onClickLabel = onClickLabel,
         onClick = onClick,
-        textStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary, fontSize = 14.sp, textDecoration = TextDecoration.Underline)
+        onLongClick = onLongClick,
+        backgroundColor = Color.Transparent,
+        shape = RoundedCornerShape(6.dp),
+        maxLines = maxLines,
+        textStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary, fontSize = fontSize, textDecoration = TextDecoration.Underline)
     )
 }
 
@@ -179,22 +195,22 @@ fun TextWithIcon(
     iconSize: Dp = ButtonDefaults.IconSize,
     padding: PaddingValues = PaddingValues(0.dp),
     space: Dp = 6.dp,
-    alignBaseLine: Boolean = false
+    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
 ) {
     Row(
         modifier = modifier.padding(padding),
-        verticalAlignment = if (alignBaseLine) Alignment.Top else Alignment.CenterVertically
+        verticalAlignment = verticalAlignment
     ) {
         Image(
             painter = painterResource(id = icon),
             contentDescription = "icon for $text",
             modifier = Modifier
                 .size(iconSize)
-                .then(if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier),
+                .then(if (verticalAlignment == Alignment.Top) Modifier.offset(y = 2.dp) else Modifier),
             colorFilter = iconTint?.let { ColorFilter.tint(it) }
         )
         Spacer(Modifier.width(space))
-        Text(text, style = textStyle, modifier = if (alignBaseLine) Modifier.alignBy(FirstBaseline) else Modifier, maxLines = maxLines, overflow = textOverflow)
+        Text(text, style = textStyle, maxLines = maxLines, overflow = textOverflow)
     }
 }
 
@@ -217,16 +233,20 @@ fun PhoenixIcon(
  *
  * Most of the code is directly taken from Material's implementation of contained button: cf: [androidx.compose.material.ButtonKt.Button]
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Button(
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     text: String? = null,
     icon: Int? = null,
     iconTint: Color = MaterialTheme.colors.primary,
+    iconSize: Dp = ButtonDefaults.IconSize,
     space: Dp = 12.dp,
     enabled: Boolean = true,
     enabledEffect: Boolean = true,
+    maxLines: Int = Int.MAX_VALUE,
     textStyle: TextStyle = MaterialTheme.typography.button,
     padding: PaddingValues = PaddingValues(16.dp),
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Center,
@@ -234,6 +254,7 @@ fun Button(
     shape: Shape = RectangleShape,
     border: BorderStroke? = null,
     elevation: ButtonElevation? = null,
+    role: Role = Role.Button,
     backgroundColor: Color = Color.Unspecified, // transparent by default!
     onClickLabel: String? = null,
 ) {
@@ -249,11 +270,14 @@ fun Button(
         border = border,
         elevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp,
         modifier = modifier
-            .clickable(
+            .combinedClickable(
                 onClick = onClick,
                 onClickLabel = onClickLabel,
+                onLongClick = onLongClick,
+                onLongClickLabel = null,
+                onDoubleClick = null,
                 enabled = enabled,
-                role = Role.Button,
+                role = role,
                 interactionSource = interactionSource,
                 indication = null, // use [LocalIndication.current] to ignore the button's shape.
             )
@@ -286,11 +310,16 @@ fun Button(
                     verticalAlignment = Alignment.CenterVertically,
                     content = {
                         if (text != null && icon != null) {
-                            TextWithIcon(text = text, icon = icon, iconTint = iconTint, space = space, alignBaseLine = true)
+                            TextWithIcon(
+                                text = text,
+                                icon = icon, iconTint = iconTint, iconSize = iconSize,
+                                space = space,
+                                maxLines = maxLines, textOverflow = TextOverflow.Ellipsis
+                            )
                         } else if (text != null) {
-                            Text(text)
+                            Text(text = text, maxLines = maxLines, overflow = TextOverflow.Ellipsis)
                         } else if (icon != null) {
-                            PhoenixIcon(icon, tint = iconTint)
+                            PhoenixIcon(resourceId = icon, tint = iconTint, modifier = Modifier.padding(vertical = 1.dp))
                         }
                     }
                 )
@@ -317,6 +346,7 @@ fun Clickable(
     val contentColor by colors.contentColor(true)
     Surface(
         shape = RectangleShape,
+        color = backgroundColor,
         contentColor = contentColor,
         elevation = 0.dp,
         modifier = modifier
@@ -340,21 +370,42 @@ fun Clickable(
 fun WebLink(
     text: String,
     url: String,
-    modifier: Modifier = Modifier,
+    fontSize: TextUnit = MaterialTheme.typography.body1.fontSize,
+    iconSize: Dp = ButtonDefaults.IconSize,
+    space: Dp = 8.dp,
     maxLines: Int = Int.MAX_VALUE,
-    overflow: TextOverflow = TextOverflow.Clip,
+    modifier: Modifier = Modifier,
+    onClickLabel: String = stringResource(id = R.string.accessibility_link),
 ) {
     val context = LocalContext.current
-    Text(
-        modifier = modifier.clickable(
-            role = Role.Button,
-            onClickLabel = stringResource(id = R.string.accessibility_link),
-            onClick = { openLink(context, url) }
-        ),
+    InlineButton(
         text = text,
-        overflow = overflow,
+        icon = R.drawable.ic_external_link,
+        fontSize = fontSize,
+        iconSize = iconSize,
+        space = space,
         maxLines = maxLines,
-        style = MaterialTheme.typography.body1.copy(textDecoration = TextDecoration.Underline, color = MaterialTheme.colors.primary)
+        onClickLabel = onClickLabel,
+        onClick = { openLink(context, url) },
+        onLongClick = { copyToClipboard(context, text) },
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun TransactionLinkButton(
+    modifier: Modifier = Modifier,
+    txId: String,
+) {
+    WebLink(
+        text = txId,
+        url = txUrl(txId = txId),
+        space = 4.dp,
+        maxLines = 1,
+        fontSize = 15.sp,
+        iconSize = 14.dp,
+        onClickLabel = stringResource(id = R.string.accessibility_explorer_link),
+        modifier = modifier,
     )
 }
 

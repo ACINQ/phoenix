@@ -17,18 +17,20 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.*
+import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.crypto.KeyManager
 import fr.acinq.lightning.crypto.LocalKeyManager
-import fr.acinq.phoenix.data.Chain
+import fr.acinq.lightning.crypto.div
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 
 class WalletManager(
-    private val chain: Chain
+    private val chain: NodeParams.Chain
 ) : CoroutineScope by MainScope() {
 
     private val _localKeyManager = MutableStateFlow<LocalKeyManager?>(null)
-    internal val keyManager: StateFlow<LocalKeyManager?> = _localKeyManager
+    val keyManager: StateFlow<LocalKeyManager?> = _localKeyManager
 
     fun isLoaded(): Boolean = keyManager.value != null
 
@@ -43,18 +45,20 @@ class WalletManager(
 
     /** Loads a seed and creates the key manager. Returns an objet containing some keys for the iOS app. */
     fun loadWallet(seed: ByteArray): WalletInfo {
-        val km = keyManager.value ?: LocalKeyManager(seed.byteVector(), chain.chainHash).also {
+        val km = keyManager.value ?: LocalKeyManager(
+            seed = seed.byteVector(),
+            chain = chain,
+            remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub,
+        ).also {
             _localKeyManager.value = it
         }
         return WalletInfo(
-            nodeId = km.nodeId,
+            nodeId = km.nodeKeys.nodeKey.publicKey,
             nodeIdHash = km.nodeIdHash(),
             cloudKey = km.cloudKey(),
             cloudKeyHash = km.cloudKeyHash()
         )
     }
-
-    fun getXpub(): Pair<String, String>? = keyManager.value?.xpub()
 
     /**
      * TODO: Remove this object and and use keyManager methods directly.
@@ -82,27 +86,19 @@ class WalletManager(
     )
 }
 
-fun LocalKeyManager.nodeIdHash(): String = this.nodeId.hash160().byteVector().toHex()
+fun LocalKeyManager.nodeIdHash(): String = this.nodeKeys.nodeKey.publicKey.hash160().byteVector().toHex()
 
 /** Key used to encrypt/decrypt blobs we store in the cloud. */
 fun LocalKeyManager.cloudKey(): ByteVector32 {
     val path = KeyPath(if (isMainnet()) "m/51'/0'/0'/0" else "m/51'/1'/0'/0")
-    return privateKey(path).privateKey.value
+    return derivePrivateKey(path).privateKey.value
 }
 
 fun LocalKeyManager.cloudKeyHash(): String {
     return Crypto.hash160(cloudKey()).byteVector().toHex()
 }
 
-fun LocalKeyManager.isMainnet() = chainHash == Chain.Mainnet.chainHash
+fun LocalKeyManager.isMainnet() = chain == NodeParams.Chain.Mainnet
 
-/** Get the wallet's (xpub, path) */
-fun LocalKeyManager.xpub(): Pair<String, String> {
-    val masterPubkeyPath = KeyPath(if (isMainnet()) "m/84'/0'/0'" else "m/84'/1'/0'")
-    val publicKey = DeterministicWallet.publicKey(privateKey(masterPubkeyPath))
-
-    return DeterministicWallet.encode(
-        input = publicKey,
-        prefix = if (isMainnet()) DeterministicWallet.zpub else DeterministicWallet.vpub
-    ) to masterPubkeyPath.toString()
-}
+val LocalKeyManager.finalOnChainWalletPath: String
+    get() = (KeyManager.Bip84OnChainKeys.bip84BasePath(chain) / finalOnChainWallet.account).toString()

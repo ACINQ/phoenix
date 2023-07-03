@@ -107,10 +107,10 @@ class SendFragment : BaseFragment() {
                 model.state.value = SendState.Onchain.SwapRequired(state.uri)
               } else {
                 mBinding.swapRecapAmountValue.text = Converter.printAmountPretty(amountEnteredByUser.get(), ctx, withUnit = true)
-                mBinding.swapRecapAmountValueFiat.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(ctx, amountEnteredByUser.get(), withUnit = true))
+                mBinding.swapRecapAmountValueFiat.text = getString(R.string.legacy_utils_converted_amount, Converter.printFiatPretty(ctx, amountEnteredByUser.get(), withUnit = true))
                 mBinding.swapRecapFeeValue.setTextColor(ThemeHelper.color(ctx, R.attr.textColor))
                 mBinding.swapRecapFeeValue.text = Converter.printAmountPretty(state.fee, ctx, withUnit = true)
-                mBinding.swapRecapFeeValueFiat.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(ctx, Converter.any2Msat(state.fee), withUnit = true))
+                mBinding.swapRecapFeeValueFiat.text = getString(R.string.legacy_utils_converted_amount, Converter.printFiatPretty(ctx, Converter.any2Msat(state.fee), withUnit = true))
                 mBinding.swapRecapTotalValue.text = Converter.printAmountPretty(totalAfterSwap, ctx, withUnit = true)
                 val sendable = appContext(ctx).balance.value?.sendable
                 if (sendable == null || totalAfterSwap.`$greater`(sendable)) {
@@ -130,19 +130,19 @@ class SendFragment : BaseFragment() {
         if (error != null) {
           mBinding.amountConverted.text = ""
           mBinding.amountError.text = when (error) {
-            AmountError.NotEnoughBalance -> getString(R.string.send_amount_error_balance)
-            AmountError.SwapOutBelowMin -> getString(R.string.send_amount_error_swap_out_too_small, Converter.printAmountPretty(swapOutSettings.minAmount, requireContext(), withUnit = true))
-            AmountError.SwapOutAboveMax -> getString(R.string.send_amount_error_swap_out_above_max, Converter.printAmountPretty(swapOutSettings.maxAmount, requireContext(), withUnit = true))
+            AmountError.NotEnoughBalance -> getString(R.string.legacy_send_amount_error_balance)
+            AmountError.SwapOutBelowMin -> getString(R.string.legacy_send_amount_error_swap_out_too_small, Converter.printAmountPretty(swapOutSettings.minAmount, requireContext(), withUnit = true))
+            AmountError.SwapOutAboveMax -> getString(R.string.legacy_send_amount_error_swap_out_above_max, Converter.printAmountPretty(swapOutSettings.maxAmount, requireContext(), withUnit = true))
             AmountError.AboveRequestedAmount -> {
               val state = model.state.value
               val prAmount = if (state is SendState.Lightning && state.pr.amount().isDefined) state.pr.amount().get() else null
               if (prAmount != null) {
-                getString(R.string.send_amount_error_above_request, Converter.printAmountPretty(prAmount.`$times`(2), requireContext(), withUnit = true))
+                getString(R.string.legacy_send_amount_error_above_request, Converter.printAmountPretty(prAmount.`$times`(2), requireContext(), withUnit = true))
               } else {
-                getString(R.string.send_amount_error_above_request_generic)
+                getString(R.string.legacy_send_amount_error_above_request_generic)
               }
             }
-            else -> getString(R.string.send_amount_error)
+            else -> getString(R.string.legacy_send_amount_error)
           }
           mBinding.amountError.visibility = View.VISIBLE
         } else {
@@ -154,13 +154,13 @@ class SendFragment : BaseFragment() {
     app.networkInfo.observe(viewLifecycleOwner, {
       if (!it.lightningConnected) {
         mBinding.sendButton.setIsPaused(true)
-        mBinding.sendButton.setText(getString(R.string.btn_pause_connecting))
+        mBinding.sendButton.setText(getString(R.string.legacy_btn_pause_connecting))
       } else if (it.electrumServer == null) {
         mBinding.sendButton.setIsPaused(true)
-        mBinding.sendButton.setText(getString(R.string.btn_pause_connecting_electrum))
+        mBinding.sendButton.setText(getString(R.string.legacy_btn_pause_connecting_electrum))
       } else {
         mBinding.sendButton.setIsPaused(false)
-        mBinding.sendButton.setText(getString(R.string.send_pay_button))
+        mBinding.sendButton.setText(getString(R.string.legacy_send_pay_button))
       }
     })
 
@@ -215,6 +215,7 @@ class SendFragment : BaseFragment() {
         when (val state = model.state.value) {
           is SendState.Onchain.Ready -> sendSwapOut(state)
           is SendState.Lightning.Ready -> sendPaymentFinal(amount.get(), state.pr)
+          else -> {}
         }
       }
     }
@@ -228,7 +229,7 @@ class SendFragment : BaseFragment() {
     }
 
     mBinding.swapRecapFeeLabel.setOnClickListener {
-      AlertHelper.build(layoutInflater, getString(R.string.send_mining_fee_info_title), Converter.html(getString(R.string.send_mining_fee_info_message))).show()
+      AlertHelper.build(layoutInflater, getString(R.string.legacy_send_mining_fee_info_title), Converter.html(getString(R.string.legacy_send_mining_fee_info_message))).show()
     }
 
     mBinding.alreadyPaidLayoutButton.setOnClickListener {
@@ -256,7 +257,7 @@ class SendFragment : BaseFragment() {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when requesting swap-out: ", exception)
       model.state.postValue(SendState.Onchain.SwapRequired(uri))
-      Toast.makeText(context, getString(R.string.send_swap_error), Toast.LENGTH_SHORT).show()
+      Toast.makeText(context, getString(R.string.legacy_send_swap_error), Toast.LENGTH_SHORT).show()
     }) {
       model.isAmountFieldPristine.value = false
       val amount = checkAmount()
@@ -325,9 +326,9 @@ class SendFragment : BaseFragment() {
       }
       if (amount.isDefined) {
         if (unit == fiat) {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount.get(), ctx, withUnit = true))
+          mBinding.amountConverted.text = getString(R.string.legacy_utils_converted_amount, Converter.printAmountPretty(amount.get(), ctx, withUnit = true))
         } else {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(ctx, amount.get(), withUnit = true))
+          mBinding.amountConverted.text = getString(R.string.legacy_utils_converted_amount, Converter.printFiatPretty(ctx, amount.get(), withUnit = true))
         }
 
         // validate amount
@@ -349,6 +350,7 @@ class SendFragment : BaseFragment() {
               throw AmountError.AboveRequestedAmount
             }
           }
+          else -> {}
         }
       } else {
         throw RuntimeException("amount is undefined")

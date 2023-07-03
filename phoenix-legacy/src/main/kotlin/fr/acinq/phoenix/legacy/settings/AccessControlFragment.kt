@@ -91,7 +91,7 @@ class AccessControlFragment : BaseFragment(), SharedPreferences.OnSharedPreferen
               context?.let { model.enableScreenLock(it) }
             }
           }, onFailure = { code ->
-            context?.let { model.errorMessage.postValue(AuthHelper.translateAuthState(it, code) ?: it.getString(R.string.accessctrl_error_auth)) }
+            context?.let { model.errorMessage.postValue(AuthHelper.translateAuthState(it, code) ?: it.getString(R.string.legacy_accessctrl_error_auth)) }
             model.isUpdatingState.value = false
           }, onCancel = {
             model.isUpdatingState.value = false
@@ -141,7 +141,7 @@ class AccessControlFragment : BaseFragment(), SharedPreferences.OnSharedPreferen
       KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_WITH_AUTH)
     } catch (e: Exception) {
       log.error("could not get cipher: ", e)
-      model.errorMessage.postValue(getString(R.string.accessctrl_error_cipher, e.localizedMessage ?: e.javaClass.simpleName))
+      model.errorMessage.postValue(getString(R.string.legacy_accessctrl_error_cipher, e.localizedMessage ?: e.javaClass.simpleName))
       return
     }
     val onConfirm = {
@@ -151,7 +151,7 @@ class AccessControlFragment : BaseFragment(), SharedPreferences.OnSharedPreferen
         onSuccess = { crypto ->
           lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.error("failed to encrypt ${encryptedSeed.name()}: ", e)
-            model.errorMessage.postValue(getString(R.string.accessctrl_error_auth))
+            model.errorMessage.postValue(getString(R.string.legacy_accessctrl_error_auth))
             model.updateLockState(ctx)
           }) {
             encryptedSeed.decrypt().run {
@@ -163,15 +163,15 @@ class AccessControlFragment : BaseFragment(), SharedPreferences.OnSharedPreferen
             }
           }
         }, onFailure = { code ->
-          model.errorMessage.postValue(AuthHelper.translateAuthState(ctx, code) ?: ctx.getString(R.string.accessctrl_error_auth))
+          model.errorMessage.postValue(AuthHelper.translateAuthState(ctx, code) ?: ctx.getString(R.string.legacy_accessctrl_error_auth))
           model.isUpdatingState.value = false
         }, onCancel = {
           model.isUpdatingState.value = false
         })
     }
-    AlertHelper.build(layoutInflater, title = getString(R.string.accessctrl_full_lock_confirm_title), message = getString(R.string.accessctrl_full_lock_confirm_message)).apply {
-      setPositiveButton(R.string.btn_confirm) { _, _ -> onConfirm() }
-      setNegativeButton(R.string.btn_cancel, null)
+    AlertHelper.build(layoutInflater, title = getString(R.string.legacy_accessctrl_full_lock_confirm_title), message = getString(R.string.legacy_accessctrl_full_lock_confirm_message)).apply {
+      setPositiveButton(R.string.legacy_btn_confirm) { _, _ -> onConfirm() }
+      setNegativeButton(R.string.legacy_btn_cancel, null)
       show()
     }
   }
@@ -181,7 +181,7 @@ class AccessControlFragment : BaseFragment(), SharedPreferences.OnSharedPreferen
       encryptedSeed.getDecryptionCipher()
     } catch (e: Exception) {
       log.error("could not get cipher: ", e)
-      model.errorMessage.postValue(getString(R.string.accessctrl_error_cipher, e.localizedMessage ?: e.javaClass.simpleName))
+      model.errorMessage.postValue(getString(R.string.legacy_accessctrl_error_cipher, e.localizedMessage ?: e.javaClass.simpleName))
       return
     }
     model.isUpdatingState.value = true
@@ -190,7 +190,7 @@ class AccessControlFragment : BaseFragment(), SharedPreferences.OnSharedPreferen
       onSuccess = { crypto ->
         lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
           log.error("failed to decrypt ${encryptedSeed.name()}: ", e)
-          model.errorMessage.postValue(getString(R.string.accessctrl_error_auth))
+          model.errorMessage.postValue(getString(R.string.legacy_accessctrl_error_auth))
           model.updateLockState(context)
         }) {
           encryptedSeed.decrypt(crypto?.cipher).run {
@@ -202,7 +202,7 @@ class AccessControlFragment : BaseFragment(), SharedPreferences.OnSharedPreferen
           }
         }
       }, onFailure = { code ->
-        model.errorMessage.postValue(AuthHelper.translateAuthState(context, code) ?: context.getString(R.string.accessctrl_error_auth))
+        model.errorMessage.postValue(AuthHelper.translateAuthState(context, code) ?: context.getString(R.string.legacy_accessctrl_error_auth))
         model.isUpdatingState.value = false
       }, onCancel = {
         model.isUpdatingState.value = false

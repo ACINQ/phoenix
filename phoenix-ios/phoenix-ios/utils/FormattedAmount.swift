@@ -229,11 +229,24 @@ extension FormattedAmount {
 			case .fiat(_):
 				allowedFractionDigitsLength = [2]
 			case .bitcoin(let bitcoinUnit):
+				// Important: The decision to show/hide millisatoshis is **NOT** done here.
+				// That decision is made via the `MsatsPolicy` that was used to create the original FormattedAmount.
+				// So we do not trim millisatoshis here. If they are present, it's because of the policy that was
+				// explicitly specified within the UI component.
 				switch bitcoinUnit {
+					// For `.sat` we either don't show millisatoshis at all.
+					// Or, if they're present and non-zero, they are always shown with 3 fraction digits.
 					case .sat  : allowedFractionDigitsLength = [0, 3]
-					case .bit  : allowedFractionDigitsLength = [2, 5] // always display 2 decimals, like fiat
-					case .mbtc : allowedFractionDigitsLength = [0, 2, 5, 8]
-					default    : allowedFractionDigitsLength = [0, 2, 5, 8, 11]
+					
+					// For `.bit` the goal is to look like most fiat currencies.
+					// So we always show at least 2 fraction digits so it looks like cents.
+					case .bit  : allowedFractionDigitsLength = [2, 5]
+					
+					// For `.mbtc` && `.btc` we always show the full fraction digits.
+					// This is to make things easier to understand.
+					// E.g. if the user has 1_000 sat, then we show "0.00 001 000 btc" rather than "0.00 001 btc"
+					case .mbtc : allowedFractionDigitsLength = [5, 8]
+					default    : allowedFractionDigitsLength = [8, 11]
 				}
 		}
 		

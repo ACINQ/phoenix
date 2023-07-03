@@ -19,16 +19,9 @@ package fr.acinq.phoenix.utils.extensions
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.channel.*
-import fr.acinq.lightning.transactions.CommitmentSpec
+import fr.acinq.lightning.channel.states.*
+import fr.acinq.lightning.utils.msat
 
-
-val ChannelState.localCommitmentSpec: CommitmentSpec? get() =
-    when (this) {
-        is ChannelStateWithCommitments -> commitments.latest.localCommit.spec
-        is Offline -> state.localCommitmentSpec
-        is Syncing -> state.localCommitmentSpec
-        else -> null
-    }
 
 fun ChannelStateWithCommitments.minDepthForFunding(nodeParams: NodeParams): Int {
     return Helpers.minDepthForFunding(
@@ -37,27 +30,32 @@ fun ChannelStateWithCommitments.minDepthForFunding(nodeParams: NodeParams): Int 
     )
 }
 
-fun ChannelState.localBalance(): MilliSatoshi {
-    val channel = when (this) {
-        is Offline -> this.state
-        is Syncing -> {
-            // https://github.com/ACINQ/phoenix-kmm/issues/195
-            when (val underlying = this.state) {
-                is WaitForFundingConfirmed -> null
-                else -> underlying
-            }
-        }
-        else -> this
-    }
-    return when (channel) {
-        is Closing -> MilliSatoshi(0)
-        is Closed -> MilliSatoshi(0)
-        is Aborted -> MilliSatoshi(0)
-        is ErrorInformationLeak -> MilliSatoshi(0)
-        is WaitForChannelReady -> MilliSatoshi(0)
-        is LegacyWaitForFundingLocked -> MilliSatoshi(0)
-        is WaitForFundingConfirmed -> MilliSatoshi(0)
-        is LegacyWaitForFundingConfirmed -> MilliSatoshi(0)
-        else -> channel?.localCommitmentSpec?.toLocal ?: MilliSatoshi(0)
+/**
+ * The balance that we can use to spend. Uses the [Commitment.availableBalanceForSend] method under the hood.
+ * For some states, this balance is forced to null.
+ */
+fun ChannelState.localBalance(): MilliSatoshi? {
+    return when (this) {
+        // if offline or syncing, check the underlying state.
+        is Offline -> state.localBalance()
+        is Syncing -> state.localBalance()
+        // for some states the balance should be 0
+        is Closing -> 0.msat
+        is Closed -> 0.msat
+        is Aborted -> null
+        // balance is unknown
+        is LegacyWaitForFundingLocked -> null
+        is LegacyWaitForFundingConfirmed -> null
+        is WaitForAcceptChannel -> null
+        is WaitForChannelReady -> null
+        is WaitForFundingConfirmed -> null
+        is WaitForFundingCreated -> null
+        is WaitForFundingSigned -> null
+        is WaitForInit -> null
+        is WaitForOpenChannel -> null
+        is WaitForRemotePublishFutureCommitment -> null
+        // regular case
+        is ChannelStateWithCommitments -> commitments.availableBalanceForSend()
+        else -> null
     }
 }

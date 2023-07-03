@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.controllers.config
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.phoenix.controllers.MVI
 
 object CloseChannelsConfiguration {
@@ -19,7 +20,7 @@ object CloseChannelsConfiguration {
 
         data class ChannelInfo(
             val id: ByteVector32,
-            val balance: Long, // in sats
+            val balance: Satoshi?,
             val status: ChannelInfoStatus
         )
 

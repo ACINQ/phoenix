@@ -56,16 +56,16 @@ class MutualCloseFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(MutualCloseViewModel::class.java)
     mBinding.model = model
-    mBinding.actionBar.setSubtitle(Converter.html(getString(R.string.closechannels_mutual_instructions)))
+    mBinding.actionBar.setSubtitle(Converter.html(getString(R.string.legacy_closechannels_mutual_instructions)))
   }
 
   override fun onStart() {
     super.onStart()
     getChannels()
     mBinding.mutualConfirmButton.setOnClickListener {
-      AlertHelper.build(layoutInflater, null, R.string.closechannels_confirm_dialog_message)
-        .setPositiveButton(R.string.btn_confirm) { _, _ -> doMutualClose() }
-        .setNegativeButton(R.string.btn_cancel, null)
+      AlertHelper.build(layoutInflater, null, R.string.legacy_closechannels_confirm_dialog_message)
+        .setPositiveButton(R.string.legacy_btn_confirm) { _, _ -> doMutualClose() }
+        .setNegativeButton(R.string.legacy_btn_cancel, null)
         .show()
     }
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
@@ -83,7 +83,7 @@ class MutualCloseFragment : BaseFragment() {
       } else {
         context?.let {
           val balance = appContext(it).balance.value?.sendable ?: MilliSatoshi(0)
-          mBinding.channelsState.text = Converter.html(getString(R.string.closechannels_channels_recap, channels.count(), Converter.printAmountPretty(balance, it, withUnit = true)))
+          mBinding.channelsState.text = Converter.html(getString(R.string.legacy_closechannels_channels_recap, channels.count(), Converter.printAmountPretty(balance, it, withUnit = true)))
         }
         model.state.value = PreChannelsCloseState.READY
       }

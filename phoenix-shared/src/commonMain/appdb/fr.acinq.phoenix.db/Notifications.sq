@@ -1,0 +1,36 @@
+import fr.acinq.phoenix.db.notifications.NotificationTypeVersion;
+
+-- This table stores notifications of all kinds.
+-- * id             => UUID of a notification
+-- * type_version   => string tracking the type/version of a notification
+-- * data_json      => json-serialized blob containing the notification details
+-- * created_at     => when the notification was created, in millis
+-- * read_at        => when the notification was read, in millis. Read notifications are typically not shown anymore.
+CREATE TABLE IF NOT EXISTS notifications (
+    id TEXT NOT NULL PRIMARY KEY,
+    type_version TEXT AS NotificationTypeVersion NOT NULL,
+    data_json BLOB NOT NULL,
+    created_at INTEGER NOT NULL,
+    read_at INTEGER DEFAULT NULL
+);
+
+listUnread:
+SELECT id, group_concat(id, ';') AS grouped_ids, type_version, data_json, max(created_at)
+FROM notifications
+WHERE read_at IS NULL
+GROUP BY type_version, data_json
+ORDER BY created_at DESC;
+
+get:
+SELECT id, type_version, data_json, created_at, read_at FROM notifications WHERE id=?;
+
+insert:
+INSERT INTO notifications (
+    id, type_version, data_json, created_at
+) VALUES (?, ?, ?, ?);
+
+markAsRead:
+UPDATE notifications SET read_at=? WHERE id IN ?;
+
+markAllAsRead:
+UPDATE notifications SET read_at=? WHERE read_at IS NULL;

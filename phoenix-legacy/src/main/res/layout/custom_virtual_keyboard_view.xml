@@ -368,7 +368,7 @@
         app:layout_constraintTop_toTopOf="@id/key_z"
         app:layout_constraintWidth_default="percent"
         app:layout_constraintWidth_percent=".2"
-        android:contentDescription="@string/key_delete_desc"
+        android:contentDescription="@string/legacy_key_delete_desc"
         android:paddingEnd="@dimen/space_sm"
         android:paddingBottom="8dp"
         android:scaleType="center"
@@ -388,7 +388,7 @@
       app:layout_constraintTop_toBottomOf="@id/main_keyboard"
       app:layout_constraintWidth_default="percent"
       app:layout_constraintWidth_percent=".3"
-      android:contentDescription="@string/key_space_desc"
+      android:contentDescription="@string/legacy_key_space_desc"
       android:paddingTop="@dimen/space_sm"
       android:paddingBottom="@dimen/space_sm"
       android:src="@drawable/ic_spacebar" />

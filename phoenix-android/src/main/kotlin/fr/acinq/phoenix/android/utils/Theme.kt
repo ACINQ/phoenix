@@ -24,6 +24,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -43,7 +45,7 @@ import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 
 // primary for testnet
 val horizon = Color(0xff91b4d1)
-val azur = Color(0xFF0E97FF)
+val azur = Color(0xff25a5ff)
 
 // primary for mainnet light / success color for light theme
 val applegreen = Color(0xff50b338)
@@ -64,6 +66,7 @@ val red50 = Color(0xfff9e9ec)
 val white = Color.White
 val black = Color.Black
 
+val gray1000 = Color(0xFF111318)
 val gray950 = Color(0xFF171B22)
 val gray900 = Color(0xff2b313e)
 val gray800 = Color(0xff3e4556)
@@ -77,19 +80,20 @@ val gray100 = Color(0xffd1d7e3)
 val gray70 = Color(0xffe1eBeD)
 val gray50 = Color(0xFFE9F1F3)
 val gray30 = Color(0xFFEFF4F5)
-val gray10 = Color(0xFFF5F8FA)
+val gray20 = Color(0xFFF4F7F9)
+val gray10 = Color(0xFFF9FAFC)
 
 private val LightColorPalette = lightColors(
     // primary
-    primary = horizon,
-    primaryVariant = horizon,
+    primary = azur,
+    primaryVariant = azur,
     onPrimary = white,
     // secondary = primary
-    secondary = horizon,
-    secondaryVariant = horizon,
+    secondary = azur,
+    secondaryVariant = azur,
     onSecondary = white,
     // app background
-    background = gray10,
+    background = gray20,
     onBackground = gray900,
     // components background
     surface = white,
@@ -120,16 +124,16 @@ private val DarkColorPalette = darkColors(
 )
 
 @Composable
-// Set of Material typography styles to start with
-fun typography(palette: Colors) = Typography(
-    // used for highlighting sections
+private fun typography(palette: Colors) = Typography(
+    // used by placeholders in input, and for all-caps labels/headers
     subtitle1 = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        color = palette.primary
+        letterSpacing = 0.5.sp,
+        color = if (isDarkTheme) gray500 else gray300
     ),
-    // used for values of settings
+    // used for settings' values
     subtitle2 = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
@@ -184,7 +188,7 @@ fun typography(palette: Colors) = Typography(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        letterSpacing = 1.15.sp,
+        //letterSpacing = 1.15.sp,
         color = palette.onSurface,
     ),
     // basic text but muted
@@ -192,11 +196,11 @@ fun typography(palette: Colors) = Typography(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        color = mutedTextColor()
+        color = mutedTextColor
     )
 )
 
-val shapes = Shapes(
+private val shapes = Shapes(
     small = RoundedCornerShape(4.dp),
     medium = RoundedCornerShape(16.dp),
     large = RoundedCornerShape(24.dp)
@@ -222,7 +226,7 @@ fun PhoenixAndroidTheme(
             shapes = shapes
         ) {
             val entry = navController.currentBackStackEntryAsState()
-            val statusBarColor = systemStatusBarColor()
+            val statusBarColor = systemStatusBarColor
             val navBarColor = systemNavBarColor(entry.value)
             LaunchedEffect(navBarColor, statusBarColor) {
                 systemUiController.run {
@@ -239,38 +243,37 @@ fun PhoenixAndroidTheme(
 }
 
 @Composable
-fun mutedItalicTypo(): TextStyle = MaterialTheme.typography.body1.copy(fontStyle = FontStyle.Italic, color = mutedTextColor())
+fun mutedItalicTypo(): TextStyle = MaterialTheme.typography.body1.copy(fontStyle = FontStyle.Italic, color = mutedTextColor)
+
+val monoTypo @Composable get() = MaterialTheme.typography.body1.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+
+val warningColor @Composable get() = orange
+
+val negativeColor @Composable get() = if (isDarkTheme) red500 else red300
+
+val positiveColor @Composable get() = if (isDarkTheme) green else applegreen
+
+val mutedTextColor @Composable get() = if (isDarkTheme) gray600 else gray200
+
+val mutedBgColor @Composable get() = if (isDarkTheme) gray950 else gray30
+
+val borderColor @Composable get() = if (isDarkTheme) gray800 else gray70
+
+private val systemStatusBarColor @Composable get() = topGradientColor
+
+/** top gradient is darker/lighter than the background, but not quite black/white */
+private val topGradientColor @Composable get() = if (isDarkTheme) gray1000 else gray10
+private val bottomGradientColor @Composable get() = MaterialTheme.colors.background
 
 @Composable
-fun monoTypo(): TextStyle = MaterialTheme.typography.body1.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp)
-
-@Composable
-fun negativeColor(): Color = if (isDarkTheme) red500 else red300
-
-@Composable
-fun positiveColor(): Color = if (isDarkTheme) green else applegreen
-
-@Composable
-fun mutedTextColor(): Color = if (isDarkTheme) gray600 else gray200
-
-@Composable
-fun mutedBgColor(): Color = if (isDarkTheme) gray950 else gray30
-
-@Composable
-fun borderColor(): Color = if (isDarkTheme) gray800 else gray70
-
-@Composable
-fun systemStatusBarColor() = MaterialTheme.colors.background
-
-@Composable
-fun systemNavBarColor(entry: NavBackStackEntry?): Color = if (entry?.destination?.route == Screen.Home.route) {
-    MaterialTheme.colors.surface
-} else {
-    MaterialTheme.colors.background
+fun systemNavBarColor(entry: NavBackStackEntry?): Color {
+    return when {
+        entry?.destination?.route == Screen.Home.route -> MaterialTheme.colors.surface
+        entry?.destination?.route?.startsWith(Screen.PaymentDetails.route) ?: false -> MaterialTheme.colors.surface
+        entry?.destination?.route?.startsWith(Screen.ScanData.route) ?: false -> MaterialTheme.colors.surface
+        else -> MaterialTheme.colors.background
+    }
 }
-
-@Composable
-fun whiteLowOp(): Color = Color(0x33ffffff)
 
 @Composable
 fun textFieldColors() = TextFieldDefaults.textFieldColors(
@@ -281,14 +284,25 @@ fun textFieldColors() = TextFieldDefaults.textFieldColors(
 @Composable
 fun outlinedTextFieldColors() = TextFieldDefaults.outlinedTextFieldColors(
     focusedLabelColor = MaterialTheme.colors.primary,
-    unfocusedLabelColor = MaterialTheme.typography.caption.color,
+    unfocusedLabelColor = MaterialTheme.typography.body1.color,
     focusedBorderColor = MaterialTheme.colors.primary,
-    unfocusedBorderColor = borderColor(),
+    unfocusedBorderColor = MaterialTheme.colors.primary,
     disabledTextColor = MaterialTheme.colors.onSurface,
-    disabledBorderColor = MaterialTheme.colors.onSurface,
-    disabledLabelColor = MaterialTheme.colors.onSurface,
-    disabledPlaceholderColor = MaterialTheme.colors.onSurface,
+    disabledBorderColor = mutedBgColor,
+    disabledLabelColor = mutedTextColor,
+    disabledPlaceholderColor = mutedTextColor,
+)
 
+@Composable
+fun errorOutlinedTextFieldColors() = TextFieldDefaults.outlinedTextFieldColors(
+    focusedLabelColor = negativeColor,
+    unfocusedLabelColor = negativeColor,
+    focusedBorderColor = negativeColor.copy(alpha = 0.8f),
+    unfocusedBorderColor = negativeColor.copy(alpha = 0.8f),
+    disabledTextColor = MaterialTheme.colors.onSurface,
+    disabledBorderColor = mutedBgColor,
+    disabledLabelColor = mutedTextColor,
+    disabledPlaceholderColor = mutedTextColor,
 )
 
 /** Get a color using the old way. Use in legacy AndroidView. */
@@ -299,18 +313,15 @@ fun getColor(context: Context, @AttrRes attrRes: Int): Int {
 }
 
 @Composable
-fun appBackground(): Color {
+fun appBackground(): Brush {
     // -- gradient Brush
-    // val isDark = isDarkTheme
-    // val topGradientColor = if (isDark) gray950 else white
-    // val bottomGradientColor = if (isDark) black else gray70
-    // return Brush.linearGradient(
-    //     0.2f to topGradientColor,
-    //     1.0f to bottomGradientColor,
-    //     start = Offset.Zero,
-    //     end = Offset.Infinite,
-    // )
-    return MaterialTheme.colors.background
+    val isDark = isDarkTheme
+    return Brush.linearGradient(
+        0.2f to topGradientColor,
+        1.0f to bottomGradientColor,
+        start = Offset.Zero,
+        end = Offset.Infinite,
+    )
 }
 
 enum class UserTheme {

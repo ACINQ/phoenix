@@ -189,9 +189,9 @@ class ReceiveFragment : BaseFragment() {
         val source = if (model.invoice.value!!.second != null) "bitcoin:${model.invoice.value!!.second}" else "lightning:${PaymentRequest.write(model.invoice.value!!.first)}"
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "text/plain"
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.receive_share_subject))
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.legacy_receive_share_subject))
         shareIntent.putExtra(Intent.EXTRA_TEXT, source)
-        startActivity(Intent.createChooser(shareIntent, getString(R.string.receive_share_title)))
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.legacy_receive_share_title)))
       }
     }
 
@@ -237,7 +237,7 @@ class ReceiveFragment : BaseFragment() {
       val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
       val source = model.invoice.value!!.second ?: PaymentRequest.write(model.invoice.value!!.first)
       clipboard.setPrimaryClip(ClipData.newPlainText("Payment request", source))
-      Toast.makeText(this, R.string.utils_copied, Toast.LENGTH_SHORT).show()
+      Toast.makeText(this, R.string.legacy_utils_copied, Toast.LENGTH_SHORT).show()
     }
   }
 
@@ -255,13 +255,13 @@ class ReceiveFragment : BaseFragment() {
         val prettySwapInPercentFee = String.format("%.2f", 100 * (swapInSettings.feePercent))
         val prettySwapInMinFee = Converter.printAmountPretty(swapInSettings.minFee, context, withUnit = true)
 
-        mBinding.swapInInfo.text = Converter.html(getString(R.string.receive_swap_in_info, prettySwapInMinFunding, prettySwapInPercentFee, prettySwapInMinFee))
-        mBinding.minFundingPayToOpen.text = Converter.html(getString(R.string.receive_min_amount_pay_to_open, prettyPayToOpenMinFunding))
+        mBinding.swapInInfo.text = Converter.html(getString(R.string.legacy_receive_swap_in_info, prettySwapInMinFunding, prettySwapInPercentFee, prettySwapInMinFee))
+        mBinding.minFundingPayToOpen.text = Converter.html(getString(R.string.legacy_receive_min_amount_pay_to_open, prettyPayToOpenMinFunding))
         if (payToOpenSettings.status is ServiceStatus.Disabled) {
           if (channels.isEmpty()) {
-            mBinding.payToOpenDisabledMessage.text = getString(R.string.receive_paytoopen_disabled_nochannels)
+            mBinding.payToOpenDisabledMessage.text = getString(R.string.legacy_receive_paytoopen_disabled_nochannels)
           } else {
-            mBinding.payToOpenDisabledMessage.text = getString(R.string.receive_paytoopen_disabled)
+            mBinding.payToOpenDisabledMessage.text = getString(R.string.legacy_receive_paytoopen_disabled)
           }
         }
       }
@@ -285,17 +285,17 @@ class ReceiveFragment : BaseFragment() {
     when (appContext(context).swapInSettings.value?.status ?: ServiceStatus.Unknown) {
       ServiceStatus.Unknown -> {
         model.state.value = SwapInState.DISABLED
-        mBinding.swapInDisabledMessage.text = Converter.html(getString(R.string.receive_swap_in_unknown))
+        mBinding.swapInDisabledMessage.text = Converter.html(getString(R.string.legacy_receive_swap_in_unknown))
         return
       }
       ServiceStatus.Disabled.Generic -> {
         model.state.value = SwapInState.DISABLED
-        mBinding.swapInDisabledMessage.text = Converter.html(getString(R.string.receive_swap_in_disabled))
+        mBinding.swapInDisabledMessage.text = Converter.html(getString(R.string.legacy_receive_swap_in_disabled))
         return
       }
       ServiceStatus.Disabled.MempoolFull -> {
         model.state.value = SwapInState.DISABLED
-        mBinding.swapInDisabledMessage.text = Converter.html(getString(R.string.receive_swap_in_disabled_mempool))
+        mBinding.swapInDisabledMessage.text = Converter.html(getString(R.string.legacy_receive_swap_in_disabled_mempool))
         return
       }
       else -> lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
@@ -314,9 +314,9 @@ class ReceiveFragment : BaseFragment() {
         val amount = extractAmount()
         val unit = mBinding.amountUnit.selectedItem.toString()
         if (unit == Prefs.getFiatCurrency(it)) {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount.get(), it, withUnit = true))
+          mBinding.amountConverted.text = getString(R.string.legacy_utils_converted_amount, Converter.printAmountPretty(amount.get(), it, withUnit = true))
         } else {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(it, amount.get(), withUnit = true))
+          mBinding.amountConverted.text = getString(R.string.legacy_utils_converted_amount, Converter.printFiatPretty(it, amount.get(), withUnit = true))
         }
       } catch (e: Exception) {
         log.info("could not extract amount: ${e.message}")

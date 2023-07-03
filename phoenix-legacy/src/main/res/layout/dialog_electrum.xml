@@ -23,7 +23,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/space_md"
-    android:text="@string/electrum_dialog_checkbox"
+    android:text="@string/legacy_electrum_dialog_checkbox"
     android:textColor="?attr/textColor"
     app:layout_constraintTop_toTopOf="parent" />
 
@@ -34,7 +34,7 @@
     android:layout_marginStart="@dimen/space_md_p"
     android:layout_marginTop="@dimen/space_md"
     android:layout_marginEnd="@dimen/space_md"
-    android:text="@string/electrum_dialog_input"
+    android:text="@string/legacy_electrum_dialog_input"
     android:textColor="?attr/colorPrimary"
     android:textSize="@dimen/text_md"
     app:layout_constraintTop_toBottomOf="@id/elec_dialog_checkbox" />
@@ -69,7 +69,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:padding="@dimen/space_md_p"
-      android:text="@string/electrum_dialog_ssl"
+      android:text="@string/legacy_electrum_dialog_ssl"
       android:textColor="?attr/onMutedBgTextColor"
       android:textSize="@dimen/text_md" />
 
@@ -78,7 +78,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:drawablePadding="@dimen/space_md"
-      android:text="@string/electrum_dialog_ssl_tor"
+      android:text="@string/legacy_electrum_dialog_ssl_tor"
       android:minHeight="0dp"
       android:layout_marginStart="@dimen/space_md"
       android:layout_marginEnd="@dimen/space_md"

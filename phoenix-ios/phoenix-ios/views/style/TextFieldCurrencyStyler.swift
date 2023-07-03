@@ -16,9 +16,9 @@ enum TextFieldCurrencyStylerError: Error {
 	case invalidInput
 }
 
-/// This tool provides a binding for TextField's,
-/// allowing the value to be formatted according to the user's locale.
+/// This tool allows a TextField to be styled & parsed while typing.
 ///
+/// The exact format depends on the user's locale.
 /// For example, in the `en_US` locale:
 /// - user types  : "1234"
 /// - UI displays : "1,234"
@@ -47,9 +47,11 @@ struct TextFieldCurrencyStyler {
 	@Binding private var amount: String
 	@Binding private var parsedAmount: Result<Double, TextFieldCurrencyStylerError>
 	
-	private let userDidEdit: (() -> Void)?
+	private let hideMsats: Bool
 	
-	let hideMsats: Bool
+	/// This is called if the user manually edits the TextField.
+	/// Which is distinct from `.onChange(of: amount)` which may be triggered via code.
+	private let userDidEdit: (() -> Void)?
 	
 	init(
 		currency: Currency,
@@ -61,7 +63,6 @@ struct TextFieldCurrencyStyler {
 		self.currency = currency
 		self._amount = amount
 		self._parsedAmount = parsedAmount
-		
 		self.hideMsats = hideMsats
 		self.userDidEdit = userDidEdit
 	}
@@ -224,7 +225,7 @@ struct TextFieldCurrencyStyler {
 			// - formattedInput = "0.123"  <- no trailing space
 			//
 			// If this is the case, then we can assist the user by
-			// automatically removinv the trailing fractionGroupingSeparator.
+			// automatically removing the trailing fractionGroupingSeparator.
 			
 			let decimalSeparator: String
 			if isFiatCurrency {
@@ -312,7 +313,7 @@ struct TextFieldCurrencyStyler {
 			return Succeed(input, number.doubleValue)
 		}
 		
-		log.debug("sweet !")
+		log.debug("success !")
 		
 		let formattedAmount = FormattedAmount(
 			amount: number.doubleValue,

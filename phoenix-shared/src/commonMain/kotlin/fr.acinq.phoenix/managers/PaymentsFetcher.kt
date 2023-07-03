@@ -19,8 +19,9 @@ import kotlin.coroutines.suspendCoroutine
  * - paymentId: [IncomingPaymentId || OutgoingPaymentId]
  * - created: Date
  * - completed: Date
+ * - metadataModifiedAt: Date
  *
- * Thus, since the key changes when the row is updated, the fetcher (and built-in cache)
+ * Thus, since the key changes whenever the payment is updated, the fetcher (and built-in cache)
  * always provide an up-to-date WalletPayment instance in response to your query.
  */
 class PaymentsFetcher(
@@ -121,7 +122,7 @@ class PaymentsFetcher(
         val key = cacheKey(row, options)
         log.debug { "fetching payment for key=$key" }
         cache[key]?.let {
-            log.debug { "payment found in cache for key=$key" }
+            log.debug { "payment found in cache for key=$key, returning info=${it.info}" }
             continuation.resumeWith(kotlin.Result.success(it.info))
             return@suspendCoroutine
         }

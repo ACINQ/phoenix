@@ -17,18 +17,12 @@
 package fr.acinq.phoenix.controllers.payments
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.utils.Either
-import fr.acinq.lightning.Feature
-import fr.acinq.lightning.Features
-import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.blockchain.fee.FeeratePerByte
-import fr.acinq.lightning.blockchain.fee.FeeratePerKw
-import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.*
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.*
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
-import fr.acinq.lightning.wire.SwapOutRequest
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.data.*
@@ -37,7 +31,6 @@ import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.chain
-import fr.acinq.phoenix.utils.createTrampolineFees
 import io.ktor.http.Url
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
@@ -56,8 +49,7 @@ class AppScanController(
     private val peerManager: PeerManager,
     private val lnurlManager: LnurlManager,
     private val databaseManager: DatabaseManager,
-    private val appConfigManager: AppConfigurationManager,
-    private val chain: Chain
+    private val chain: NodeParams.Chain,
 ) : AppController<Scan.Model, Scan.Intent>(
     loggerFactory = loggerFactory,
     firstModel = firstModel ?: Scan.Model.Ready
@@ -81,45 +73,19 @@ class AppScanController(
         peerManager = business.peerManager,
         lnurlManager = business.lnurlManager,
         databaseManager = business.databaseManager,
-        appConfigManager = business.appConfigurationManager,
         chain = business.chain,
     )
-
-    init {
-        launch {
-            peerManager.getPeer().eventsFlow.collect { event ->
-                when (event) {
-                    is SwapOutResponseEvent -> {
-                        val currentModel = models.value
-                        if (currentModel is Scan.Model.SwapOutFlow.RequestingSwapout) {
-                            model(
-                                Scan.Model.SwapOutFlow.SwapOutReady(
-                                    address = currentModel.address,
-                                    initialUserAmount = event.swapOutResponse.amount,
-                                    fee = event.swapOutResponse.fee,
-                                    paymentRequest = PaymentRequest.read(event.swapOutResponse.paymentRequest)
-                                )
-                            )
-                        }
-                    }
-                    else -> {}
-                }
-            }
-        }
-    }
 
     override fun process(intent: Scan.Intent) {
         when (intent) {
             is Scan.Intent.Reset -> launch { model(Scan.Model.Ready) }
             is Scan.Intent.Parse -> launch { processScannedInput(intent) }
-            is Scan.Intent.InvoiceFlow.ConfirmDangerousRequest -> launch { confirmAmountlessInvoice(intent) }
             is Scan.Intent.InvoiceFlow.SendInvoicePayment -> launch {
                 sendPayment(
                     amountToSend = intent.amount,
+                    trampolineFees = intent.trampolineFees,
                     paymentRequest = intent.paymentRequest,
-                    customMaxFees = intent.maxFees,
                     metadata = null,
-                    swapOutData = null
                 )
                 model(Scan.Model.InvoiceFlow.Sending)
             }
@@ -129,23 +95,6 @@ class AppScanController(
             is Scan.Intent.LnurlWithdrawFlow.SendLnurlWithdraw -> launch { processLnurlWithdraw(intent) }
             is Scan.Intent.LnurlWithdrawFlow.CancelLnurlWithdraw -> launch { cancelLnurlWithdraw(intent) }
             is Scan.Intent.LnurlAuthFlow.Login -> launch { processLnurlAuth(intent) }
-            is Scan.Intent.SwapOutFlow.Invalidate -> launch { model(Scan.Model.SwapOutFlow.Init(intent.address)) }
-            is Scan.Intent.SwapOutFlow.PrepareSwapOut -> launch { prepareSwapOutTransaction(intent) }
-            is Scan.Intent.SwapOutFlow.SendSwapOut -> launch {
-                sendPayment(
-                    amountToSend = intent.amount.toMilliSatoshi(),
-                    paymentRequest = intent.paymentRequest,
-                    customMaxFees = intent.maxFees,
-                    metadata = null,
-                    swapOutData = intent.swapOutFee to intent.address.address
-                )
-                model(
-                    Scan.Model.SwapOutFlow.SendingSwapOut(
-                        address = intent.address,
-                        paymentRequest = intent.paymentRequest
-                    )
-                )
-            }
         }
     }
 
@@ -171,11 +120,9 @@ class AppScanController(
     private suspend fun processLightningInvoice(paymentRequest: PaymentRequest) {
         val model = checkForBadRequest(paymentRequest)?.let {
             Scan.Model.BadRequest(request = paymentRequest.write(), reason = it)
-        } ?: checkForDangerousRequest(paymentRequest)?.let {
-            Scan.Model.InvoiceFlow.DangerousRequest(paymentRequest.write(), paymentRequest, it)
         } ?: Scan.Model.InvoiceFlow.InvoiceRequest(
             request = paymentRequest.write(),
-            paymentRequest = paymentRequest
+            paymentRequest = paymentRequest,
         )
         model(model)
     }
@@ -183,20 +130,19 @@ class AppScanController(
     /** Return the adequate model for a Bitcoin address result. */
     private suspend fun processBitcoinAddress(
         input: String,
-        result: Either<BitcoinAddressError, BitcoinAddressInfo>
+        result: Either<BitcoinAddressError, BitcoinUri>
     ) {
-        val model = when (result) {
-            is Either.Right -> Scan.Model.SwapOutFlow.Init(address = result.value)
+        model(when (result) {
+            is Either.Right -> Scan.Model.OnchainFlow(uri = result.value)
             is Either.Left -> {
                 val error = result.value
                 if (error is BitcoinAddressError.ChainMismatch) {
-                    Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.ChainMismatch(myChain = error.myChain, requestChain = error.addrChain))
+                    Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.ChainMismatch(expected = error.expected, actual = error.actual))
                 } else {
                     Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.UnknownFormat)
                 }
             }
-        }
-        model(model)
+        })
     }
 
     /** Utility method wrapping a cancellable lnurl task and updating the requestId field. */
@@ -255,24 +201,12 @@ class AppScanController(
         }
     }
 
-    private suspend fun confirmAmountlessInvoice(
-        intent: Scan.Intent.InvoiceFlow.ConfirmDangerousRequest
-    ) {
-        model(
-            Scan.Model.InvoiceFlow.InvoiceRequest(
-                request = intent.request,
-                paymentRequest = intent.paymentRequest,
-            )
-        )
-    }
-
     /** Extract invoice and send it to the Peer to make the payment, attaching custom trampoline fees if needed. */
     private suspend fun sendPayment(
         amountToSend: MilliSatoshi,
+        trampolineFees: TrampolineFees,
         paymentRequest: PaymentRequest,
-        customMaxFees: MaxFees?,
         metadata: WalletPaymentMetadata?,
-        swapOutData: Pair<Satoshi, String>?,
     ) {
         val paymentId = UUID.randomUUID()
         val peer = peerManager.getPeer()
@@ -281,42 +215,18 @@ class AppScanController(
         metadata?.let { WalletPaymentMetadataRow.serialize(it) }?.let { row ->
             databaseManager.paymentsDb().enqueueMetadata(
                 row = row,
-                id = WalletPaymentId.OutgoingPaymentId(paymentId)
-            )
-        }
-
-        // compute new trampoline fees if a custom max has been set
-        val trampolineFees = customMaxFees?.let {
-            createTrampolineFees(
-                defaultFees = peer.walletParams.trampolineFees,
-                maxFees = it
+                id = WalletPaymentId.LightningOutgoingPaymentId(paymentId)
             )
         }
 
         peer.send(
-            if (swapOutData != null) {
-                SendPaymentSwapOut(
-                    paymentId = paymentId,
-                    amount = amountToSend,
-                    recipient = paymentRequest.nodeId,
-                    details = OutgoingPayment.Details.SwapOut(
-                        address = swapOutData.second,
-                        paymentRequest = paymentRequest,
-                        swapOutFee = swapOutData.first
-                    ),
-                    trampolineFeesOverride = trampolineFees
-                )
-            } else {
-                SendPaymentNormal(
-                    paymentId = paymentId,
-                    amount = amountToSend,
-                    recipient = paymentRequest.nodeId,
-                    details = OutgoingPayment.Details.Normal(
-                        paymentRequest = paymentRequest
-                    ),
-                    trampolineFeesOverride = trampolineFees
-                )
-            }
+            SendPayment(
+                paymentId = paymentId,
+                amount = amountToSend,
+                recipient = paymentRequest.nodeId,
+                paymentRequest = paymentRequest,
+                trampolineFeesOverride = listOf(trampolineFees)
+            )
         )
     }
 
@@ -343,7 +253,7 @@ class AppScanController(
                 val invoice = task.await()
                 when (val check = checkForBadRequest(invoice.paymentRequest)) {
                     is Scan.BadRequestReason.ChainMismatch -> Either.Left(
-                        Scan.LnurlPayError.ChainMismatch(chain, check.requestChain)
+                        Scan.LnurlPayError.ChainMismatch(expected = chain, actual = check.actual)
                     )
                     is Scan.BadRequestReason.AlreadyPaidInvoice -> Either.Left(
                         Scan.LnurlPayError.AlreadyPaidInvoice
@@ -379,8 +289,8 @@ class AppScanController(
             is Either.Right -> {
                 sendPayment(
                     amountToSend = intent.amount,
+                    trampolineFees = intent.trampolineFees,
                     paymentRequest = result.value.paymentRequest,
-                    customMaxFees = intent.maxFees,
                     metadata = WalletPaymentMetadata(
                         lnurl = LnurlPayMetadata(
                             pay = intent.paymentIntent,
@@ -389,7 +299,6 @@ class AppScanController(
                         ),
                         userNotes = intent.comment
                     ),
-                    swapOutData = null,
                 )
                 model(Scan.Model.LnurlPayFlow.Sending(intent.paymentIntent))
             }
@@ -529,21 +438,6 @@ class AppScanController(
         }
     }
 
-    private suspend fun prepareSwapOutTransaction(
-        intent: Scan.Intent.SwapOutFlow.PrepareSwapOut
-    ) {
-        val feeRate = FeeratePerKw(FeeratePerByte((appConfigManager.chainContext.value?.swapOut?.v1?.minFeerateSatByte ?: 20).sat))
-        peerManager.getPeer().sendToPeer(
-            SwapOutRequest(
-                chainHash = chain.chainHash,
-                amount = intent.amount,
-                bitcoinAddress = intent.address.address,
-                feePerKw = feeRate.toLong()
-            )
-        )
-        model(Scan.Model.SwapOutFlow.RequestingSwapout(intent.address))
-    }
-
     /** Directly called by swift code in iOS app. Parses the data looking for a Lightning invoice, Lnurl, or Bitcoin address. */
     fun inspectClipboard(data: String): Scan.ClipboardContent? {
         val input = Parser.removeExcessInput(data)
@@ -575,9 +469,9 @@ class AppScanController(
         paymentRequest: PaymentRequest
     ): Scan.BadRequestReason? {
 
-        val requestChain = paymentRequest.chain()
-        if (chain != requestChain) {
-            return Scan.BadRequestReason.ChainMismatch(chain, requestChain)
+        val actualChain = paymentRequest.chain
+        if (chain != actualChain) {
+            return Scan.BadRequestReason.ChainMismatch(expected = chain, actual = actualChain)
         }
 
         if (paymentRequest.isExpired(currentTimestampSeconds())) {
@@ -585,18 +479,11 @@ class AppScanController(
         }
 
         val db = databaseManager.databases.filterNotNull().first()
-        return if (db.payments.listOutgoingPayments(paymentRequest.paymentHash).any { it.status is OutgoingPayment.Status.Completed.Succeeded }) {
+        return if (db.payments.listLightningOutgoingPayments(paymentRequest.paymentHash).any { it.status is LightningOutgoingPayment.Status.Completed.Succeeded }) {
             Scan.BadRequestReason.AlreadyPaidInvoice
         } else {
             null
         }
-    }
-
-    /** Checks for payment request that should not be made: amountless invoice without trampoline ; pay-to-self... */
-    private suspend fun checkForDangerousRequest(pr: PaymentRequest): Scan.DangerousRequestReason? = when {
-        pr.amount == null && !Features(pr.features).hasFeature(Feature.TrampolinePayment) -> Scan.DangerousRequestReason.IsAmountlessInvoice
-        pr.nodeId == peerManager.getPeer().nodeParams.nodeId -> Scan.DangerousRequestReason.IsOwnInvoice
-        else -> null
     }
 
     /** Reads a lnurl and return either a lnurl-auth (i.e. a http query that must not be called automatically), or the actual url embedded in the lnurl (that can be called afterwards). */
@@ -610,7 +497,7 @@ class AppScanController(
      * Invokes `Parser.readBitcoinAddress`, but maps the
      * generic `BitcoinAddressError.UnknownFormat` to a null result instead.
      */
-    private fun readBitcoinAddress(input: String): Either<BitcoinAddressError, BitcoinAddressInfo>? {
+    private fun readBitcoinAddress(input: String): Either<BitcoinAddressError, BitcoinUri>? {
         return when (val result = Parser.readBitcoinAddress(chain, input)) {
             is Either.Left -> when (result.left) {
                 is BitcoinAddressError.UnknownFormat -> null

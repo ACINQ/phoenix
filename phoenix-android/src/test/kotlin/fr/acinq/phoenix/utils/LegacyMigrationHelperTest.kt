@@ -23,19 +23,15 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.eclair.db.sqlite.SqlitePaymentsDb
-import fr.acinq.lightning.Features
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.ShortChannelId
-import fr.acinq.lightning.db.ChannelClosingType
-import fr.acinq.lightning.db.HopDesc
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
-import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.legacy.db.Database
 import fr.acinq.phoenix.legacy.db.PayToOpenMetaRepository
 import fr.acinq.phoenix.legacy.db.PaymentMeta
@@ -94,7 +90,7 @@ class LegacyMigrationHelperTest {
         // transform legacy payments to modern OutgoingPayment objects
         val newOutgoingPayments = legacyOutgoingPayments.map {
             LegacyMigrationHelper.modernizeLegacyOutgoingPayment(
-                chainHash = Chain.Testnet.chainHash,
+                chainHash = NodeParams.Chain.Testnet.chainHash,
                 parentId = it.key,
                 listOfParts = it.value,
                 paymentMeta = paymentMetaRepository.get(it.key.toString())
@@ -103,15 +99,16 @@ class LegacyMigrationHelperTest {
 
         Assert.assertEquals(9, newOutgoingPayments.size)
 
-        // 1st outgoing payment is a LN payment for of sat, including 1 sat fee
+        // 1st outgoing payment is a LN payment for 2 sat, including 1 sat fee
+        val payment1 = newOutgoingPayments[0]
         Assert.assertEquals(
-            OutgoingPayment(
+            LightningOutgoingPayment(
                 id = UUID.fromString("5a7d44be-725b-430b-8ce3-92c5ed296074"),
                 recipientAmount = 1000.msat,
                 recipient = PublicKey.fromHex("020ec0c6a0c4fe5d8a79928ead294c36234a76f6e0dca896c35413612a3fd8dbf8"),
-                details = OutgoingPayment.Details.Normal(PaymentRequest.read("lntb10n1p3tnfjkpp5rrmp00akdvl35nnhh4gqfp5rhuaa0kryhkz0ky5z78u82c2p2tlqdqqcqzpgxqyz5vqsp5xmvvr6sfrxs5vjpqgxq5p7aznd2eusxmgcj9hag8d06lxmdwxe8s9qyyssqttpwlngy7qaj7jg0xa2uae2gcm9zp9g5ly3yp6gxyh0zlrw2pun4tlsw2mfjwt0vsjwhtmvvn6tl0u9fg5jfle0jvxtd59h82kfff4qqefnasg")),
+                details = LightningOutgoingPayment.Details.Normal(PaymentRequest.read("lntb10n1p3tnfjkpp5rrmp00akdvl35nnhh4gqfp5rhuaa0kryhkz0ky5z78u82c2p2tlqdqqcqzpgxqyz5vqsp5xmvvr6sfrxs5vjpqgxq5p7aznd2eusxmgcj9hag8d06lxmdwxe8s9qyyssqttpwlngy7qaj7jg0xa2uae2gcm9zp9g5ly3yp6gxyh0zlrw2pun4tlsw2mfjwt0vsjwhtmvvn6tl0u9fg5jfle0jvxtd59h82kfff4qqefnasg")),
                 parts = listOf(
-                    OutgoingPayment.LightningPart(
+                    LightningOutgoingPayment.Part(
                         id = UUID.fromString("91018192-5eeb-4e23-a494-8579009a6117"),
                         amount = 2000.msat,
                         route = listOf(
@@ -125,86 +122,82 @@ class LegacyMigrationHelperTest {
                                 nextNodeId = PublicKey.fromHex("020ec0c6a0c4fe5d8a79928ead294c36234a76f6e0dca896c35413612a3fd8dbf8"),
                             )
                         ),
-                        status = OutgoingPayment.LightningPart.Status.Succeeded(
+                        status = LightningOutgoingPayment.Part.Status.Succeeded(
                             preimage = ByteVector32.fromValidHex("47a406e1c82bb11d70e62da0a25252fdd3ed1ebf5232581009cbce7fd8da1648"),
                             completedAt = 1656336182723
                         ),
                         createdAt = 1656336179094
                     )
                 ),
-                status = OutgoingPayment.Status.Completed.Succeeded.OffChain(
+                status = LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(
                     preimage = ByteVector32.fromValidHex("47a406e1c82bb11d70e62da0a25252fdd3ed1ebf5232581009cbce7fd8da1648"),
                     completedAt = 1656336182723
                 ),
                 createdAt = 1656336179094
             ),
-            newOutgoingPayments.first()
+            payment1
         )
-        Assert.assertEquals(2000.msat, newOutgoingPayments.first().amount)
-        Assert.assertEquals(1000.msat, newOutgoingPayments.first().fees)
+        Assert.assertEquals(2000.msat, payment1.amount)
+        Assert.assertEquals(1000.msat, payment1.fees)
 
         // 2nd outgoing payment is a swapout
+        val payment2 = (newOutgoingPayments[1] as LightningOutgoingPayment)
         Assert.assertEquals(
-            OutgoingPayment.Details.SwapOut(
+            LightningOutgoingPayment.Details.SwapOut(
                 address = "2N1sjnTPsAaG3oGMHTHonANbHEERuiqN6k6",
                 paymentRequest = PaymentRequest.read("lntb128400n1p3tndjapp5hhluw7tvph7e7mr5qm6zyerstxmwwc6ydg3jwj2t5dyjzuvjzcdqdrhxycrqvpsypekzarnyp6x7gpjfcchx6nw23g8xstpguek736dfp2ysmmwg98xyjz9g4f826t3fcmxkd3qwa5hg6pqvejk2unpw3jn6v3sypekzap0vfuhgegsp5s55kw5r85788n2aahjqpmzanvx83a2q5ftas7h76c4ymm7cw2uvsxqzjccqzpu9q2sqqqqqysgqcd3f6mn22c5hd7c3dd96z79duczy40rgfcpfetg4ckdkghjwylcqqlesa9adhvqvvkkkz4n2tq6lvx23ju4y2wl9mluf5mheq83mecsp68xkxx"),
                 swapOutFee = 2_840.sat
             ),
-            newOutgoingPayments[1].details
+            payment2.details
         )
-        Assert.assertEquals(12_840_000.msat, newOutgoingPayments[1].amount)
-        Assert.assertEquals(2_840_000.msat, newOutgoingPayments[1].fees)
-        Assert.assertEquals(PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134"), newOutgoingPayments[1].recipient)
+        Assert.assertEquals(12_840_000.msat, payment2.amount)
+        Assert.assertEquals(2_840_000.msat, payment2.fees)
+        Assert.assertEquals(
+            PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134"),
+            payment2.recipient
+        )
 
         // 3rd outgoing payment has failed
+        val payment3 = newOutgoingPayments[2] as LightningOutgoingPayment
         Assert.assertEquals(
-            OutgoingPayment.Status.Completed.Failed(
+            LightningOutgoingPayment.Status.Completed.Failed(
                 reason = FinalFailure.NoRouteToRecipient,
                 completedAt = 1656338125658
             ),
-            newOutgoingPayments[2].status
+            payment3.status
         )
-        Assert.assertEquals(2, newOutgoingPayments[2].parts.size)
-        Assert.assertTrue(newOutgoingPayments[2].parts.all { it is OutgoingPayment.LightningPart && it.status is OutgoingPayment.LightningPart.Status.Failed })
+        Assert.assertEquals(2, payment3.parts.size)
+        Assert.assertTrue(payment3.parts.all { it.status is LightningOutgoingPayment.Part.Status.Failed })
 
         // 5th outgoing payment is successful and was split in 2 parts. 6 attempts made.
-        Assert.assertEquals(6, newOutgoingPayments[4].parts.size)
-        Assert.assertTrue(newOutgoingPayments[4].parts.takeLast(2).all {
-            it is OutgoingPayment.LightningPart && it.status is OutgoingPayment.LightningPart.Status.Succeeded
-                    && (it.status as OutgoingPayment.LightningPart.Status.Succeeded).preimage == ByteVector32("4beedef8c67733399b4d037a5bf513d7be8cce70e95e640266c1f8cdf2744a2b")
+        val payment5 = newOutgoingPayments[4] as LightningOutgoingPayment
+        Assert.assertEquals(6, payment5.parts.size)
+        Assert.assertTrue(payment5.parts.takeLast(2).all {
+            it.status is LightningOutgoingPayment.Part.Status.Succeeded
+                && (it.status as LightningOutgoingPayment.Part.Status.Succeeded).preimage == ByteVector32("4beedef8c67733399b4d037a5bf513d7be8cce70e95e640266c1f8cdf2744a2b")
         })
-        Assert.assertTrue(newOutgoingPayments[4].status is OutgoingPayment.Status.Completed.Succeeded)
-        Assert.assertEquals(70_040_000.msat, newOutgoingPayments[4].amount)
-        Assert.assertEquals(40_000.msat, newOutgoingPayments[4].fees)
+        Assert.assertTrue(payment5.status is LightningOutgoingPayment.Status.Completed.Succeeded)
+        Assert.assertEquals(70_040_000.msat, payment5.amount)
+        Assert.assertEquals(40_000.msat, payment5.fees)
 
         // 8th outgoing payments closes 1 channel mutually
         Assert.assertEquals(
-            OutgoingPayment(
+            ChannelCloseOutgoingPayment(
                 id = UUID.fromString("a7f837c1-0e8d-434c-8a12-d68780f2c0d0"),
-                recipientAmount = 30_123_365.msat,
-                recipient = PublicKey.fromHex("020209862bf287b46919902745ec441d077478ba33415c5e0c5238a3c243d550de"),
-                details = OutgoingPayment.Details.ChannelClosing(
-                    channelId = ByteVector32.fromValidHex("3749642f6caa1a13a9026f966eb13bd5a970ee237fb173d78602b2b31b7bc804"),
-                    closingAddress = "2NBPdqEiX2Wb9VNTqNBXBjgCAnHvhBD8sc3",
-                    isSentToDefaultAddress = false,
-                ),
-                parts = listOf(
-                    OutgoingPayment.ClosingTxPart(
-                        id = (newOutgoingPayments[7].parts.first() as OutgoingPayment.ClosingTxPart).id,
-                        txId = ByteVector32.fromValidHex("24893dcd47403242e86e86344acfe69042bb5c1466df11cf43696fad7d29dfe3"),
-                        claimed = 30_123.sat,
-                        closingType = ChannelClosingType.Mutual,
-                        createdAt = 1656403710302
-                    )
-                ),
-                status = OutgoingPayment.Status.Completed.Succeeded.OnChain(
-                    completedAt = 1656403710302
-                ),
-                createdAt = 1656403710302
+                recipientAmount = 30_123.sat,
+                address = "2NBPdqEiX2Wb9VNTqNBXBjgCAnHvhBD8sc3",
+                isSentToDefaultAddress = false,
+                miningFees = 0.sat,
+                txId = ByteVector32.fromValidHex("24893dcd47403242e86e86344acfe69042bb5c1466df11cf43696fad7d29dfe3"),
+                createdAt = 1656403710302,
+                confirmedAt = 1656403710302,
+                channelId = ByteVector32.fromValidHex("3749642f6caa1a13a9026f966eb13bd5a970ee237fb173d78602b2b31b7bc804"),
+                closingType = ChannelClosingType.Mutual,
+                lockedAt = 1656403710302,
             ),
             newOutgoingPayments[7]
         )
-        Assert.assertEquals(30_123_365.msat, newOutgoingPayments[7].amount)
+        Assert.assertEquals(30_123_000.msat, newOutgoingPayments[7].amount)
     }
 
     @Test
@@ -246,13 +239,15 @@ class LegacyMigrationHelperTest {
                     address = "tb1qwq05evgh9pugurpthes5wld2nuu5f2s7u9pt2q"
                 ),
                 received = IncomingPayment.Received(
-                    receivedWith = setOf(
+                    receivedWith = listOf(
                         IncomingPayment.ReceivedWith.NewChannel(
-                            id = newIncomingPayments[0]!!.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().first().id,
                             amount = 32_000_000.msat,
                             serviceFee = 0.msat,
+                            miningFee = 0.sat,
                             channelId = ByteVector32.Zeroes,
-                            confirmed = true,
+                            txId = ByteVector32.Zeroes,
+                            confirmedAt = 1656333657766,
+                            lockedAt = 1656333657766,
                         )
                     ),
                     receivedAt = 1656333657766
@@ -270,7 +265,7 @@ class LegacyMigrationHelperTest {
                     paymentRequest = PaymentRequest.read("lntb1p3tndtzpp50z03lfnmhacfhmmslwdcdkhrxcnrta7nt3vsv6nvv0n2gneqhvwqdqqxqyjw5q9qtzqqqqqq9qsqsp5x3e73hu5lz6jt8jt26hvnhdczymzmphkj9lqst6g5w626rel7uyqrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflc47j47yxdcyvqqqqlgqqqqqeqqjqhj5w494f0taflevylkhhzk0wjt7gep60zvkm7cg00vc7ql66z9xjmklquzq78ca3yfvk09vt90eqss9anvmg5ppk3nualqcex64qc3cpzz6cy8")
                 ),
                 received = IncomingPayment.Received(
-                    receivedWith = setOf(
+                    receivedWith = listOf(
                         IncomingPayment.ReceivedWith.LightningPayment(
                             amount = 55_000.msat,
                             channelId = ByteVector32.Zeroes,
@@ -292,7 +287,7 @@ class LegacyMigrationHelperTest {
                     paymentRequest = PaymentRequest.read("lntb2580n1p3tnd5cpp5vyrhevjunf4mgnc3l3lv3lvatfclju78sawspahq43dg78szr55sdz4v3jhxcmjd9c8g6t0dcsxgefqd3sjqun9w96u82n5v5sxgefqwpskjetdv4h8ggrpdfhh2axr49jjqctkv9h8gxqyjw5q9qtzqqqqqq9qsqsp5fyg2nucw7ylnxhq0tweqmayg40fpzyaam4yllgjurcp0um06l6sqrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflc47j47yxdcyvqqqqlgqqqqqeqqjqw87qyltfk38twf0duded5tcla7gyl9tftqhd50wekt2yflcq9gdsmdakwx5y8hlhzjmc8t55xcwdlc4f0qe0f2nlgkytx7u7xew9fzspse82tn")
                 ),
                 received = IncomingPayment.Received(
-                    receivedWith = setOf(
+                    receivedWith = listOf(
                         IncomingPayment.ReceivedWith.LightningPayment(
                             amount = 350_000.msat,
                             channelId = ByteVector32.Zeroes,
@@ -316,13 +311,15 @@ class LegacyMigrationHelperTest {
                     paymentRequest = PaymentRequest.read("lntb1p3tn3vvpp59ynarkswknrea32cqm9h643rfpm0qlkn3x3aywv9lmfusg3442yqdq6wpshjgr5dusx7ur9dcs0p8u3jqxqyjw5q9qtzqqqqqq9qsqsp5twl37zl60tkgdtuyztrrsn6wtku4asr5dvqavz40rynswcl4tppsrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflc47j47yxdcyvqqqqlgqqqqqeqqjq9x2drlj03tjjt3m64whev6dukrzrqr5l09edhj55g30yruqz6fw3z5zc927nwy0wld686ua2mfzgz63vlwgmcamdld8wpjzrms8m4ygphfrpe0")
                 ),
                 received = IncomingPayment.Received(
-                    receivedWith = setOf(
+                    receivedWith = listOf(
                         IncomingPayment.ReceivedWith.NewChannel(
-                            id = newIncomingPayments[3]!!.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().first().id,
                             amount = 57_000_000.msat,
                             channelId = ByteVector32.Zeroes,
                             serviceFee = 3_000_000.msat,
-                            confirmed = true,
+                            miningFee = 0.sat,
+                            txId = ByteVector32.Zeroes,
+                            confirmedAt = 1656341949234,
+                            lockedAt = 1656341949234,
                         )
                     ),
                     receivedAt = 1656341949234
@@ -341,13 +338,15 @@ class LegacyMigrationHelperTest {
                     paymentRequest = PaymentRequest.read("lntb1p3t4dcdpp58whdhw5lq62q4plz7w9z9awwwgcze27qaa052l7663w935xray5qdqqxqyjw5q9qtzqqqqqq9qsqsp5p5krwc4thmcy8ahsyrx2dfyhp7d2dxsxxsmlqxvmwstznzzmv8kqrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnflc47j47yxdcyvqqqqlgqqqqqeqqjqaednnnjuxh0kvpa8l4mtt2wsum0jxhywsu5ak4m436shxpg0cjc46y7973npskzqk4kl4lhqxr3zmqn3euzx6dy4q474awm26j9amgcpef0uwk")
                 ),
                 received = IncomingPayment.Received(
-                    receivedWith = setOf(
+                    receivedWith = listOf(
                         IncomingPayment.ReceivedWith.NewChannel(
-                            id = newIncomingPayments[6]!!.received!!.receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>().first().id,
                             amount = 562_212_000.msat,
                             channelId = ByteVector32.Zeroes,
+                            txId = ByteVector32.Zeroes,
                             serviceFee = 5_678_000.msat,
-                            confirmed = true
+                            miningFee = 0.sat,
+                            confirmedAt = 1656403752448,
+                            lockedAt = 1656403752448,
                         )
                     ),
                     receivedAt = 1656403752448

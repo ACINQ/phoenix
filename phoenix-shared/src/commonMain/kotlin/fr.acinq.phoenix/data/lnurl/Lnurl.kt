@@ -22,7 +22,6 @@ import fr.acinq.phoenix.utils.Parser
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.charsets.*
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
@@ -75,7 +74,7 @@ sealed interface Lnurl {
          * Throws an exception if the source is malformed or invalid.
          */
         fun extractLnurl(source: String): Lnurl {
-            val input = Parser.trimMatchingPrefix(source, listOf("lightning://", "lightning:", "lnurl:"))
+            val input = Parser.trimMatchingPrefix(source, Parser.lightningPrefixes + Parser.bitcoinPrefixes + Parser.lightningPrefixes)
             val url: Url = try {
                 parseBech32Url(input)
             } catch (bech32Ex: Exception) {

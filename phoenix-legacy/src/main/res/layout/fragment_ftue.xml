@@ -33,7 +33,7 @@
     <TextView
       android:id="@+id/indicators"
       android:layout_width="match_parent"
-      android:text="@string/ftue__bullet_1"
+      android:text="@string/legacy_ftue__bullet_1"
       android:letterSpacing="0.4"
       android:background="?attr/bgColor"
       android:textAlignment="center"

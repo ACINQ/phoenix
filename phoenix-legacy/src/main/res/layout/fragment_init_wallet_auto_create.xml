@@ -43,7 +43,7 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
       android:visibility="@{model.state == AutoCreateState.IN_PROGRESS}"
-      app:text="@string/autocreate_generating" />
+      app:text="@string/legacy_autocreate_generating" />
 
     <TextView
       android:id="@+id/error"
@@ -56,7 +56,7 @@
       app:layout_constraintEnd_toEndOf="parent"
       android:drawableStart="@drawable/ic_alert_triangle"
       android:visibility="@{model.state == AutoCreateState.ERROR}"
-      android:text="@string/autocreate_error" />
+      android:text="@string/legacy_autocreate_error" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
