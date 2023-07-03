@@ -129,80 +129,23 @@ object Parser {
             })
         }.build()
 
-        // -- check address type
-        try { // is Base58 ?
-            val (prefix, bin) = Base58Check.decode(address)
-            val (prefixChain, prefixType) = when (prefix) {
-                Base58.Prefix.PubkeyAddress -> NodeParams.Chain.Mainnet to BitcoinAddressType.Base58PubKeyHash
-                Base58.Prefix.ScriptAddress -> NodeParams.Chain.Mainnet to BitcoinAddressType.Base58ScriptHash
-                Base58.Prefix.PubkeyAddressTestnet -> NodeParams.Chain.Testnet to BitcoinAddressType.Base58PubKeyHash
-                Base58.Prefix.ScriptAddressTestnet -> NodeParams.Chain.Testnet to BitcoinAddressType.Base58ScriptHash
-                else -> return Either.Left(BitcoinAddressError.UnknownBase58Prefix(prefix))
-            }
-            if (prefixChain != chain) {
-                return Either.Left(BitcoinAddressError.ChainMismatch(chain, prefixChain))
-            }
-            return Either.Right(
-                BitcoinUri(address, prefixChain, prefixType, bin.byteVector(), label, message, amount, lightning, otherParams)
-            )
+        return try {
+            Bitcoin.addressToPublicKeyScript(chain.chainHash, address)
+            Either.Right(BitcoinUri(chain, address, label, message, amount, lightning, otherParams))
         } catch (e: Exception) {
-            // Not Base58
+            when (e) {
+                // TODO: handle chain mismatch
+                else -> Either.Left(BitcoinAddressError.UnknownFormat)
+            }
         }
-
-        try { // is Bech32 ?
-            val (hrp, version, bin) = Bech32.decodeWitnessAddress(address)
-            val prefixChain = when (hrp) {
-                "bc" -> NodeParams.Chain.Mainnet
-                "tb" -> NodeParams.Chain.Testnet
-                "bcrt" -> NodeParams.Chain.Regtest
-                else -> return Either.Left(BitcoinAddressError.UnknownBech32Prefix(hrp))
-            }
-
-            if (prefixChain != chain) {
-                return Either.Left(BitcoinAddressError.ChainMismatch(chain, prefixChain))
-            }
-
-            if (version == 0.toByte()) {
-                val type = when (bin.size) {
-                    20 -> BitcoinAddressType.SegWitPubKeyHash
-                    32 -> BitcoinAddressType.SegWitScriptHash
-                    else -> return Either.Left(BitcoinAddressError.UnknownFormat)
-                }
-                return Either.Right(
-                    BitcoinUri(address, prefixChain, type, bin.byteVector(), label, message, amount, lightning, otherParams)
-                )
-            } else {
-                // Unknown version - we don't have any validation logic in place for it
-                return Either.Left(BitcoinAddressError.UnknownBech32Version(version))
-            }
-        } catch (e: Throwable) {
-            // Not Bech32
-        }
-
-        return Either.Left(BitcoinAddressError.UnknownFormat)
     }
 
     /** Transforms a bitcoin address into a public key script if valid, otherwise returns null. */
     fun addressToPublicKeyScript(chain: NodeParams.Chain, address: String): ByteArray? {
-        val info = readBitcoinAddress(chain, address).right ?: return null
-        val script = when (info.type) {
-            BitcoinAddressType.Base58PubKeyHash -> Script.pay2pkh(
-                pubKeyHash = info.hash.toByteArray()
-            )
-            BitcoinAddressType.Base58ScriptHash -> {
-                // We cannot use Script.pay2sh() here, because that function expects a script.
-                // And what we have is a script hash.
-                listOf(OP_HASH160, OP_PUSHDATA(info.hash), OP_EQUAL)
-            }
-            BitcoinAddressType.SegWitPubKeyHash -> Script.pay2wpkh(
-                pubKeyHash = info.hash.toByteArray()
-            )
-            BitcoinAddressType.SegWitScriptHash -> {
-                // We cannot use Script.pay2wsh() here, because that function expects a script.
-                // And what we have is a script hash.
-                listOf(OP_0, OP_PUSHDATA(info.hash))
-            }
+        return readBitcoinAddress(chain, address).right?.let {
+            Bitcoin.addressToPublicKeyScript(chain.chainHash, it.address)
+        }?.let {
+            Script.write(it)
         }
-        return Script.write(script)
     }
 }

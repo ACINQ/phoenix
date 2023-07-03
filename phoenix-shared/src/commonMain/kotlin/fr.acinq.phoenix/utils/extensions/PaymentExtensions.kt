@@ -19,7 +19,6 @@ package fr.acinq.phoenix.utils.extensions
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.PaymentRequest
-import org.kodein.memory.util.freeze
 
 /** Standardized location for extending types from: fr.acinq.lightning. */
 enum class WalletPaymentState { SuccessOnChain, SuccessOffChain, PendingOnChain, PendingOffChain, Failure }
@@ -83,9 +82,10 @@ fun PaymentRequest.expiryTimestampSeconds(): Long? = this.expirySeconds?.let {
     this.timestampSeconds + it
 }
 
-fun PaymentRequest.chain(): NodeParams.Chain? = when (this.prefix) {
-    "lnbc" -> NodeParams.Chain.Mainnet
-    "lntb" -> NodeParams.Chain.Testnet
-    "lnbcrt" -> NodeParams.Chain.Regtest
-    else -> null
-}
+val PaymentRequest.chain: NodeParams.Chain
+    get() = when (prefix) {
+        "lnbc" -> NodeParams.Chain.Mainnet
+        "lntb" -> NodeParams.Chain.Testnet
+        "lnbcrt" -> NodeParams.Chain.Regtest
+        else -> throw IllegalArgumentException("unhandled invoice prefix=$prefix")
+    }
