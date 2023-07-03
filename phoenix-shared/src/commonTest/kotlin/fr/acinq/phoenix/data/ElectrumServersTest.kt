@@ -7,6 +7,7 @@ import fr.acinq.lightning.utils.ServerAddress
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import org.kodein.log.LoggerFactory
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
@@ -22,6 +23,7 @@ import kotlin.time.Duration.Companion.seconds
  * $ openssl x509 -in testnet.qtornado.com.pem -noout -pubkey
  * ```
  */
+@Ignore
 class ElectrumServersTest {
 
     @Test

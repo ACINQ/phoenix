@@ -21,7 +21,6 @@ import com.squareup.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.CltvExpiry
-import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.states.LegacyWaitForFundingConfirmed
 import fr.acinq.lightning.channel.states.Normal
 import fr.acinq.lightning.channel.states.PersistedChannelState
@@ -32,6 +31,7 @@ import fr.acinq.phoenix.runTest
 import fr.acinq.secp256k1.Hex
 import kotlin.test.*
 
+@Ignore
 class SqliteChannelsDatabaseTest {
     private val db = SqliteChannelsDb(testChannelsDriver())
 

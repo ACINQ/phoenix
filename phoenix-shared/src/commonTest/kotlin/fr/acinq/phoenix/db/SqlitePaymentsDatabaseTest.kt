@@ -30,6 +30,7 @@ import fr.acinq.lightning.wire.TemporaryNodeFailure
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.runTest
+import fr.acinq.phoenix.utils.migrations.LegacyChannelCloseHelper
 import fr.acinq.secp256k1.Hex
 import org.kodein.log.LoggerFactory
 import kotlin.test.*
@@ -75,7 +76,7 @@ class SqlitePaymentsDatabaseTest {
             assertEquals(preimage1, it.preimage)
             assertEquals(origin3, it.origin)
             assertEquals(1_995_000.msat, it.amount)
-            assertEquals(5_000.msat, it.fees)
+            assertEquals(105_000.msat, it.fees)
             assertEquals(15, it.received?.receivedAt)
             assertEquals(receivedWith2, it.received?.receivedWith)
         }
@@ -134,7 +135,7 @@ class SqlitePaymentsDatabaseTest {
         db.receivePayment(preimage1.sha256(), receivedWith2, receivedAt = 200)
         assertNotNull(db.getIncomingPayment(paymentHash1))
         assertEquals(1_995_000.msat, db.getIncomingPayment(paymentHash1)?.received?.amount)
-        assertEquals(5_000.msat, db.getIncomingPayment(paymentHash1)!!.fees)
+        assertEquals(105_000.msat, db.getIncomingPayment(paymentHash1)!!.fees)
         assertEquals(origin3, db.getIncomingPayment(paymentHash1)!!.origin)
         assertEquals(receivedWith2, db.getIncomingPayment(paymentHash1)!!.received!!.receivedWith)
     }
@@ -220,22 +221,27 @@ class SqlitePaymentsDatabaseTest {
 
     @Test
     fun outgoing__read_legacy_closing() = runTest {
+        val close = LegacyChannelCloseHelper.convertLegacyToChannelClose(
+            id = UUID.fromString("ff7f08e8-89d1-4731-be7c-ad37c9d09afc"),
+            recipientAmount = 150_000.msat,
+            detailsBlob = Hex.decode("7b226368616e6e656c4964223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c22636c6f73696e6741646472657373223a22666f6f626172222c22697353656e74546f44656661756c7441646472657373223a747275657d"),
+            statusBlob = Hex.decode("7b227478496473223a5b2265636632623763396366613734356532336634623661343766396365623139623066363330653064373365343434326566333236643364613234633930336635225d2c22636c61696d6564223a3130302c22636c6f73696e6754797065223a224c6f63616c227d"),
+            partsAmount = 100.sat,
+            partsTxId = null,
+            partsClosingTypeBlob = null,
+            createdAt = 100,
+            confirmedAt = 200,
+        )
 
-        assertFails {
-            OutgoingQueries.mapLightningOutgoingPaymentWithoutParts(
-                id = "ff7f08e8-89d1-4731-be7c-ad37c9d09afc",
-                recipient_amount_msat = 150_000L,
-                recipient_node_id = "0479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8",
-                payment_hash = Hex.decode("5a920fd957bb4634fb8960a8a69d401fa0fbb4ebf5c4391ba8ee2732058fefbc"),
-                details_type = OutgoingDetailsTypeVersion.CLOSING_V0,
-                details_blob = Hex.decode("7b226368616e6e656c4964223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c22636c6f73696e6741646472657373223a22666f6f626172222c22697353656e74546f44656661756c7441646472657373223a747275657d"),
-                created_at = 100,
-                completed_at = 200,
-                status_type = OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0,
-                status_blob = Hex.decode("7b227478496473223a5b2265636632623763396366613734356532336634623661343766396365623139623066363330653064373365343434326566333236643364613234633930336635225d2c22636c61696d6564223a3130302c22636c6f73696e6754797065223a224c6f63616c227d")
-            )
-        }
-        TODO()// use LegacyChannelCloseHelper
+        assertEquals("ff7f08e8-89d1-4731-be7c-ad37c9d09afc", close.id.toString())
+        assertEquals(150.sat, close.recipientAmount)
+        assertEquals("foobar", close.address)
+        assertEquals(ByteVector32.Zeroes, close.channelId)
+        assertEquals(true, close.isSentToDefaultAddress)
+        assertEquals("ecf2b7c9cfa745e23f4b6a47f9ceb19b0f630e0d73e4442ef326d3da24c903f5", close.txId.toHex())
+        assertEquals(ChannelClosingType.Local, close.closingType)
+        assertEquals(100, close.createdAt)
+        assertEquals(200, close.confirmedAt)
     }
 
     @Test

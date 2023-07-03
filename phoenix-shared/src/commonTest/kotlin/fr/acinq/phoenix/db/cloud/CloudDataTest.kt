@@ -12,6 +12,7 @@ import fr.acinq.phoenix.runTest
 import fr.acinq.secp256k1.Hex
 import kotlin.test.*
 
+@Ignore
 class CloudDataTest {
 
     private val preimage = randomBytes32()

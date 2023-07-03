@@ -1,7 +1,6 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.bitcoin.Block
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.CltvExpiryDelta
@@ -11,13 +10,21 @@ import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.lightning.utils.*
+import fr.acinq.lightning.utils.Either
+import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.currentTimestampSeconds
+import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.TestConstants
-import fr.acinq.phoenix.data.*
+import fr.acinq.phoenix.data.ExchangeRate
+import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.data.WalletPaymentFetchOptions
+import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.data.WalletPaymentMetadata
 import kotlin.test.Test
 import kotlin.test.assertEquals
+
 
 class CsvWriterTests {
 
@@ -296,7 +303,7 @@ class CsvWriterTests {
             recipientAmount = 8_690.sat,
             address = "tb1qz5gxe2450uadavle8wwcc5ngquqfj5xp4dy0ja",
             isSentToDefaultAddress = false,
-            miningFees = 1400.sat,
+            miningFees = 1_400.sat,
             channelId = randomBytes32(),
             txId = randomBytes32(),
             createdAt = 1675353533694,
@@ -309,7 +316,7 @@ class CsvWriterTests {
             userNotes = null
         )
 
-        val expected = "2023-02-02T15:58:53.694Z,-8690464,-464,-2.0563 USD,-0.0001 USD,Channel closing to tb1qz5gxe2450uadavle8wwcc5ngquqfj5xp4dy0ja,Channel closing,\r\n"
+        val expected = "2023-02-02T15:58:53.694Z,-10090000,-1400000,-2.3875 USD,-0.3312 USD,Channel closing to tb1qz5gxe2450uadavle8wwcc5ngquqfj5xp4dy0ja,Channel closing,\r\n"
         val actual = CsvWriter.makeRow(
             info = WalletPaymentInfo(payment, metadata, WalletPaymentFetchOptions.All),
             localizedDescription = "Channel closing",

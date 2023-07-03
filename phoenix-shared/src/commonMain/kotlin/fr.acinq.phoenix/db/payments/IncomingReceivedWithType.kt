@@ -173,7 +173,7 @@ sealed class IncomingReceivedWithData {
                                 serviceFee = it.fees,
                                 miningFee = 0.sat,
                                 channelId = it.channelId ?: ByteVector32.Zeroes,
-                                txId = it.channelId ?: ByteVector32.Zeroes,
+                                txId = ByteVector32.Zeroes,
                                 confirmedAt = 0,
                                 lockedAt = 0,
                             )
@@ -183,7 +183,7 @@ sealed class IncomingReceivedWithData {
                                 serviceFee = it.fees,
                                 miningFee = 0.sat,
                                 channelId = it.channelId ?: ByteVector32.Zeroes,
-                                txId = it.channelId ?: ByteVector32.Zeroes,
+                                txId = ByteVector32.Zeroes,
                                 confirmedAt = 0,
                                 lockedAt = 0,
                             )
