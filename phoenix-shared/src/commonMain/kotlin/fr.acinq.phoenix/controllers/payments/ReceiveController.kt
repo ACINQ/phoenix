@@ -16,17 +16,13 @@
 
 package fr.acinq.phoenix.controllers.payments
 
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.lightning.io.*
-import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.utils.Either
-import fr.acinq.lightning.utils.secure
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.managers.PeerManager
-import kotlinx.coroutines.*
+import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
-import kotlin.random.Random
 
 
 class AppReceiveController(
@@ -48,26 +44,13 @@ class AppReceiveController(
             is Receive.Intent.Ask -> {
                 launch {
                     model(Receive.Model.Generating)
-                    try {
-                        val deferred = CompletableDeferred<PaymentRequest>()
-                        val preimage = ByteVector32(Random.secure().nextBytes(32)) // must be different everytime
-                        peerManager.getPeer().send(
-                            ReceivePayment(
-                                paymentPreimage = preimage,
-                                amount = intent.amount,
-                                description = Either.Left(intent.description),
-                                expirySeconds = intent.expirySeconds,
-                                result = deferred
-                            )
-                        )
-                        val request = deferred.await()
-                        check(request.amount == intent.amount) { "payment request amount=${request.amount} does not match expected amount=${intent.amount}" }
-                        check(request.description == intent.description) { "payment request amount=${request.description} does not match expected amount=${intent.description}" }
-                        val paymentHash: String = request.paymentHash.toHex()
-                        model(Receive.Model.Generated(request.write(), paymentHash, request.amount, request.description))
-                    } catch (e: Throwable) {
-                        logger.error(e) { "failed to process intent=$intent" }
-                    }
+                    val paymentRequest = peerManager.getPeer().createInvoice(
+                        paymentPreimage = randomBytes32(),
+                        amount = intent.amount,
+                        description = Either.Left(intent.description),
+                        expirySeconds = intent.expirySeconds
+                    )
+                    model(Receive.Model.Generated(paymentRequest.write(), paymentRequest.paymentHash.toHex(), paymentRequest.amount, paymentRequest.description))
                 }
             }
             Receive.Intent.RequestSwapIn -> {

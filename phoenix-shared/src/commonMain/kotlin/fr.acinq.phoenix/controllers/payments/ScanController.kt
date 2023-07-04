@@ -16,11 +16,10 @@
 
 package fr.acinq.phoenix.controllers.payments
 
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.*
 import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.io.*
+import fr.acinq.lightning.io.SendPayment
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
@@ -37,7 +36,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.JsonObject
 import org.kodein.log.LoggerFactory
-import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
@@ -331,18 +329,13 @@ class AppScanController(
             )
         }
 
-        val deferred = CompletableDeferred<PaymentRequest>()
-        val preimage = ByteVector32(Random.secure().nextBytes(32))
-        peerManager.getPeer().send(
-            ReceivePayment(
-                paymentPreimage = preimage,
-                amount = intent.amount,
-                description = fr.acinq.lightning.utils.Either.Left(intent.description ?: intent.lnurlWithdraw.defaultDescription),
-                expirySeconds = (3600 * 24 * 7).toLong(), // one week
-                result = deferred
-            )
+        val paymentRequest = peerManager.getPeer().createInvoice(
+            paymentPreimage = Lightning.randomBytes32(),
+            amount = intent.amount,
+            description = fr.acinq.lightning.utils.Either.Left(intent.description ?: intent.lnurlWithdraw.defaultDescription),
+            expirySeconds = (3600 * 24 * 7).toLong(), // one week
         )
-        val paymentRequest = deferred.await()
+
         if (requestId != lnurlRequestId) {
             // Intent.LnurlWithdrawFlow.CancelLnurlWithdraw has been issued
             return

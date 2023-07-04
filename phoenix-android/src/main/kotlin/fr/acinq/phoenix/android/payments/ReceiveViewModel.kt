@@ -25,19 +25,15 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.Lightning
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.io.ReceivePayment
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.Either
-import fr.acinq.lightning.utils.secure
 import fr.acinq.phoenix.android.utils.BitmapHelper
 import fr.acinq.phoenix.managers.PeerManager
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
-import kotlin.random.Random
 
 
 class ReceiveViewModel(
@@ -86,18 +82,12 @@ class ReceiveViewModel(
         }) {
             lightningInvoiceState = LightningInvoiceState.Generating
             log.info("generating new invoice with amount=$amount desc=$description expirySec=$expirySeconds")
-            val deferred = CompletableDeferred<PaymentRequest>()
-            val preimage = ByteVector32(Random.secure().nextBytes(32)) // must be different everytime
-            peerManager.getPeer().send(
-                ReceivePayment(
-                    paymentPreimage = preimage,
-                    amount = amount,
-                    description = Either.Left(description),
-                    expirySeconds = expirySeconds,
-                    result = deferred
-                )
+            val pr = peerManager.getPeer().createInvoice(
+                paymentPreimage = Lightning.randomBytes32(),
+                amount = amount,
+                description = Either.Left(description),
+                expirySeconds = expirySeconds
             )
-            val pr = deferred.await()
             lightningQRBitmap = BitmapHelper.generateBitmap(pr.write()).asImageBitmap()
             log.info("generated new invoice=${pr.write()}")
             lightningInvoiceState = LightningInvoiceState.Show(pr)
