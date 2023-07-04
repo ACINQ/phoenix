@@ -20,16 +20,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.NodeParams
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
@@ -39,7 +36,7 @@ import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigate
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import kotlinx.coroutines.launch
 
 
@@ -59,7 +56,7 @@ fun SettingsView() {
             Card {
                 Button(text = "Switch to Legacy app", icon = R.drawable.ic_user, onClick = {
                     scope.launch {
-                        PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
+                        LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
                     }
                 }, modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start)
             }

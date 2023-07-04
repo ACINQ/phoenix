@@ -24,17 +24,19 @@ import fr.acinq.phoenix.managers.AppConfigurationManager
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
-sealed class Notice {
-    sealed class ShowInHome: Notice()
-    sealed class DoNotShowInHome: Notice()
+sealed class Notice() {
+    abstract val priority: Int
+    sealed class ShowInHome(override val priority: Int) : Notice()
 
-    object NotificationPermission : ShowInHome()
-    object BackupSeedReminder : ShowInHome()
-    object UpdateAvailable : ShowInHome()
-    object CriticalUpdateAvailable : ShowInHome()
-    object MempoolFull : ShowInHome()
+    object MigrationFromLegacy : ShowInHome(1)
+    object CriticalUpdateAvailable : ShowInHome(2)
+    object BackupSeedReminder : ShowInHome(3)
+    object MempoolFull : ShowInHome(10)
+    object UpdateAvailable : ShowInHome(20)
+    object NotificationPermission : ShowInHome(30)
 
     // less important notices
+    sealed class DoNotShowInHome(override val priority: Int = 999) : Notice()
     object WatchTowerLate : DoNotShowInHome()
 }
 

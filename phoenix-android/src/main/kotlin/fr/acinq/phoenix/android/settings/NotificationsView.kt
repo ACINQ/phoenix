@@ -67,7 +67,7 @@ fun NotificationsView(
     val log = logger("NotificationsView")
     val notificationsManager = business.notificationsManager
     // TODO: filter rejected payments where the fee policy was X, but the fee policy is now Y
-    val notices = noticesViewModel.notices.values.toList()
+    val notices = noticesViewModel.notices.values.toList().sortedBy { it.priority }
     val notifications by notificationsManager.notifications.collectAsState(emptyList())
 
     DefaultScreenLayout(isScrollable = false) {
@@ -122,7 +122,22 @@ private fun PermamentNotice(
 ) {
     val context = LocalContext.current
     val nc = LocalNavController.current
+    val scope = rememberCoroutineScope()
+
     when (notice) {
+        Notice.MigrationFromLegacy -> {
+            ImportantNotification(
+                icon = R.drawable.ic_party_popper,
+                message = stringResource(id = R.string.inappnotif_migration_from_legacy),
+                actionText = stringResource(id = R.string.inappnotif_migration_from_legacy_action),
+                onActionClick = {
+                    openLink(context, "https://acinq.co/blog/phoenix-splicing-update")
+                    scope.launch {
+                        InternalData.saveLegacyMigrationMessageShown(context, true)
+                    }
+                }
+            )
+        }
         Notice.BackupSeedReminder -> {
             ImportantNotification(
                 icon = R.drawable.ic_key,
@@ -284,7 +299,7 @@ private fun ImportantNotification(
         Row(modifier = Modifier.padding(top = 12.dp, start = 16.dp, end = 16.dp)) {
             PhoenixIcon(resourceId = icon, tint = MaterialTheme.colors.primary, modifier = Modifier
                 .size(18.dp)
-                .offset(y = 1.dp))
+                .offset(y = 2.dp))
             Spacer(modifier = Modifier.width(10.dp))
             Column(modifier = Modifier.alignByBaseline()) {
                 Text(text = message, style = MaterialTheme.typography.body1.copy(fontSize = 16.sp))

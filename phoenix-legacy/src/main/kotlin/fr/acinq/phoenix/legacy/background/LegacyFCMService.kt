@@ -42,7 +42,7 @@ class LegacyFCMService : FirebaseMessagingService() {
   /** When receiving a message over FCM, starts the eclair node service (in foreground). */
   override fun onMessageReceived(remoteMessage: RemoteMessage) {
     serviceScope.launch {
-      val legacyAppStatus = PrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
+      val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
       if (legacyAppStatus !is LegacyAppStatus.Required) {
         log.debug("cancel legacy fcm service in state=${legacyAppStatus.name()}")
         return@launch

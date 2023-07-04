@@ -34,7 +34,7 @@ import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.legacy.MainActivity
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -45,7 +45,7 @@ fun LegacySwitcherView(
     val log = logger("LegacySwitcherView")
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val legacyAppStatus by PrefsDatastore.getLegacyAppStatus(context).collectAsState(initial = null)
+    val legacyAppStatus by LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(initial = null)
     log.debug { "legacy switcher with legacyAppStatus=${legacyAppStatus}" }
 
     Column(
@@ -63,7 +63,7 @@ fun LegacySwitcherView(
             LegacyAppStatus.Required.Expected -> {
                 LaunchedEffect(key1 = true) {
                     scope.launch {
-                        PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.InitStart)
+                        LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.InitStart)
                     }
                 }
             }
@@ -71,7 +71,7 @@ fun LegacySwitcherView(
                 LaunchedEffect(key1 = true) {
                     scope.launch {
                         if (legacyAppStatus == LegacyAppStatus.Required.InitStart) {
-                            PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Running)
+                            LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Running)
                             log.info { "switching to legacy app" }
                             context.startActivity(Intent(context, MainActivity::class.java).apply {
                                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -88,7 +88,7 @@ fun LegacySwitcherView(
             LegacyAppStatus.Required.Interrupted -> {
                 BorderButton(text = stringResource(id = R.string.legacyswitch_restart), onClick = {
                     scope.launch {
-                        PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
+                        LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
                     }
                 })
             }

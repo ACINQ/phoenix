@@ -41,7 +41,7 @@ import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.legacy.utils.Wallet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -153,7 +153,7 @@ private fun LoadingView(
 ) {
     val log = logger("StartupView")
     val scope = rememberCoroutineScope()
-    val legacyAppStatus = PrefsDatastore.getLegacyAppStatus(context).collectAsState(null).value
+    val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(null).value
     when (walletState) {
         is WalletState.Off -> {
             val keyState = produceState<KeyState>(initialValue = KeyState.Unknown, true) {
@@ -173,7 +173,7 @@ private fun LoadingView(
                                 Text(stringResource(id = R.string.startup_wait_legacy_check))
                                 log.info { "found legacy database file while in unknown legacy status; switching to legacy app" }
                                 LaunchedEffect(true) {
-                                    PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
+                                    LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
                                 }
                             } else {
                                 Text(stringResource(id = R.string.startup_checking_seed))

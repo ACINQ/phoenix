@@ -18,22 +18,19 @@ package fr.acinq.phoenix.legacy.utils
 
 import android.content.Context
 import androidx.datastore.preferences.core.*
-import fr.acinq.phoenix.legacy.internalData
+import fr.acinq.phoenix.legacy.legacyPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.io.IOException
 
 
-object PrefsDatastore {
+object LegacyPrefsDatastore {
   private val log = LoggerFactory.getLogger(this::class.java)
 
   private fun prefs(context: Context): Flow<Preferences> {
-    return context.internalData.data.catch { exception ->
+    return context.legacyPrefs.data.catch { exception ->
       if (exception is IOException) {
         emit(emptyPreferences())
       } else {
@@ -54,26 +51,25 @@ object PrefsDatastore {
     }
   }
   suspend fun saveStartLegacyApp(context: Context, value: LegacyAppStatus) {
-    context.internalData.edit { it[LEGACY_APP_STATUS] = value.name() }
+    context.legacyPrefs.edit { it[LEGACY_APP_STATUS] = value.name() }
   }
 
-  private val json = Json { ignoreUnknownKeys = true }
-  private val MIGRATION_RESULT = stringPreferencesKey("MIGRATION_RESULT")
-  fun getMigrationResult(context: Context): Flow<MigrationResult?> = prefs(context).map { it[MIGRATION_RESULT]?.let { json.decodeFromString(MigrationResult.serializer(), it) } }
-  suspend fun saveMigrationResult(context: Context, result: MigrationResult) = context.internalData.edit {
-    it[MIGRATION_RESULT] = json.encodeToString(result)
+  private val HAS_MIGRATED_FROM_LEGACY = booleanPreferencesKey("HAS_MIGRATED_FROM_LEGACY")
+  fun hasMigratedFromLegacy(context: Context): Flow<Boolean> = prefs(context).map { it[HAS_MIGRATED_FROM_LEGACY] ?: false }
+  suspend fun saveHasMigratedFromLegacy(context: Context, hasMigrated: Boolean) = context.legacyPrefs.edit {
+    it[HAS_MIGRATED_FROM_LEGACY] = hasMigrated
   }
 
-  private val DATA_MIGRATION_EXPECTED = booleanPreferencesKey("DATA_MIGRATION_EXPECTED")
-  fun getDataMigrationExpected(context: Context): Flow<Boolean?> = prefs(context).map { it[DATA_MIGRATION_EXPECTED] }
-  suspend fun saveDataMigrationExpected(context: Context, isExpected: Boolean) = context.internalData.edit {
-    it[DATA_MIGRATION_EXPECTED] = isExpected
+  private val LEGACY_DATA_MIGRATION_EXPECTED = booleanPreferencesKey("LEGACY_DATA_MIGRATION_EXPECTED")
+  fun getDataMigrationExpected(context: Context): Flow<Boolean?> = prefs(context).map { it[LEGACY_DATA_MIGRATION_EXPECTED] }
+  suspend fun saveDataMigrationExpected(context: Context, isExpected: Boolean) = context.legacyPrefs.edit {
+    it[LEGACY_DATA_MIGRATION_EXPECTED] = isExpected
   }
 
   /** List of transaction ids that can be used for swap-in, even if zero conf. Used for migration. */
   private val MIGRATION_TRUSTED_SWAP_IN_TXS = stringSetPreferencesKey("MIGRATION_TRUSTED_SWAP_IN_TXS")
   fun getMigrationTrustedSwapInTxs(context: Context): Flow<Set<String>> = prefs(context).map { it[MIGRATION_TRUSTED_SWAP_IN_TXS] ?: emptySet() }
-  suspend fun saveMigrationTrustedSwapInTxs(context: Context, txs: Set<String>) = context.internalData.edit {
+  suspend fun saveMigrationTrustedSwapInTxs(context: Context, txs: Set<String>) = context.legacyPrefs.edit {
     it[MIGRATION_TRUSTED_SWAP_IN_TXS] = txs
   }
 }
@@ -102,6 +98,3 @@ sealed class LegacyAppStatus {
 
   fun name() = javaClass.canonicalName ?: javaClass.simpleName
 }
-
-@Serializable
-data class MigrationResult(val newNodeId: String, val legacyNodeId: String, val address: String)

@@ -40,7 +40,8 @@ import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.init.Initialization
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
+import kotlinx.coroutines.flow.first
 
 
 @Composable
@@ -86,7 +87,7 @@ fun CreateWalletView(
                             }
                             LaunchedEffect(true) {
                                 vm.writeSeed(context, model.mnemonics, true, onSeedWritten)
-                                PrefsDatastore.saveDataMigrationExpected(context, false)
+                                LegacyPrefsDatastore.saveDataMigrationExpected(context, false)
                             }
                         }
                     }

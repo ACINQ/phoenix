@@ -25,7 +25,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import fr.acinq.bitcoin.scala.ByteVector32
 import fr.acinq.eclair.channel.*
@@ -35,18 +34,13 @@ import fr.acinq.phoenix.legacy.background.EclairNodeService
 import fr.acinq.phoenix.legacy.background.KitState.Bootstrap.Init.getKmpSwapInAddress
 import fr.acinq.phoenix.legacy.databinding.FragmentMigrationBinding
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.MigrationResult
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.bouncycastle.util.encoders.Hex
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters
-import scala.util.Either
-import scala.util.Left
-import scodec.bits.ByteVector
 
 class MigrationFragmentDialog : DialogFragment() {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -273,16 +267,10 @@ class MigrationDialogViewModel : ViewModel() {
 
           // pause then update preferences to switch to the new app
           delay(3_000)
-          PrefsDatastore.saveDataMigrationExpected(context, true)
-          PrefsDatastore.saveMigrationResult(
-            context, MigrationResult(
-              legacyNodeId = legacyNodeId,
-              newNodeId = kmpNodeId,
-              address = swapInAddress
-            )
-          )
-          PrefsDatastore.saveMigrationTrustedSwapInTxs(context, mutualClosePublishedTxs)
-          PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.NotRequired)
+          LegacyPrefsDatastore.saveDataMigrationExpected(context, true)
+          LegacyPrefsDatastore.saveHasMigratedFromLegacy(context, true)
+          LegacyPrefsDatastore.saveMigrationTrustedSwapInTxs(context, mutualClosePublishedTxs)
+          LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.NotRequired)
         }
       }
     }

@@ -42,9 +42,8 @@ import fr.acinq.phoenix.legacy.paymentdetails.PaymentDetailsFragment
 import fr.acinq.phoenix.legacy.send.ReadInputFragmentDirections
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.Prefs
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -121,7 +120,7 @@ class MainActivity : AppCompatActivity() {
     intent?.let { saveURIIntent(intent) }
 
     lifecycleScope.launchWhenResumed {
-      PrefsDatastore.getLegacyAppStatus(applicationContext).collect {
+      LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).collect {
         delay(500)
         if (it is LegacyAppStatus.NotRequired) {
           log.info("finishing legacy activity in state=${it.name()}")

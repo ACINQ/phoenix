@@ -58,7 +58,7 @@ fun NoticesButtonRow(
     notifications: List<Pair<Set<UUID>, Notification>>,
     onNavigateToNotificationsList: () -> Unit,
 ) {
-    val filteredNotices = notices.filterIsInstance<Notice.ShowInHome>()
+    val filteredNotices = notices.filterIsInstance<Notice.ShowInHome>().sortedBy { it.priority }
     // don't display anything if there are no permanent notices
     if (filteredNotices.isEmpty()) return
 
@@ -67,8 +67,12 @@ fun NoticesButtonRow(
     val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
     val elementsCount = notices.size + notifications.size
 
+    // clicking on a notice may execute the notice's action if there are no other messages. Otherwise, redirect to the notifications page.
     val onClick: (() -> Unit)? = if (elementsCount == 1 && filteredNotices.isNotEmpty()) {
         when (filteredNotices.first()) {
+            is Notice.MigrationFromLegacy -> {
+                { openLink(context, "https://acinq.co/blog/phoenix-splicing-update") }
+            }
             is Notice.BackupSeedReminder -> {
                 { navController.navigate(Screen.DisplaySeed.route) }
             }
@@ -87,7 +91,7 @@ fun NoticesButtonRow(
                     { notificationPermission.launchPermissionRequest() }
                 }
             }
-            else -> null
+            is Notice.MempoolFull -> null
         }
     } else {
         onNavigateToNotificationsList
@@ -107,10 +111,13 @@ fun NoticesButtonRow(
                 )
             } else Modifier)
             .padding(horizontal = 12.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
         filteredNotices.firstOrNull()?.let { notice ->
             when (notice) {
+                Notice.MigrationFromLegacy -> {
+                    NoticeView(text = stringResource(id = R.string.inappnotif_migration_from_legacy), icon = R.drawable.ic_party_popper)
+                }
                 Notice.MempoolFull -> {
                     NoticeView(text = stringResource(id = R.string.inappnotif_mempool_full_message), icon = R.drawable.ic_alert_triangle)
                 }
@@ -133,6 +140,7 @@ fun NoticesButtonRow(
             Spacer(modifier = Modifier.width(12.dp))
             Box(
                 Modifier
+                    .align(Alignment.CenterVertically)
                     .height(18.dp)
                     .width(1.dp)
                     .background(color = borderColor)
@@ -141,6 +149,7 @@ fun NoticesButtonRow(
             Text(
                 text = "+${elementsCount - 1}",
                 modifier = Modifier
+                    .align(Alignment.CenterVertically)
                     .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colors.primary)
                     .padding(horizontal = 8.dp, vertical = 2.dp),
@@ -155,11 +164,12 @@ private fun RowScope.NoticeView(
     text: String,
     icon: Int? = null,
 ) {
-    if(icon != null) {
-        PhoenixIcon(resourceId = icon, tint = MaterialTheme.colors.primary)
+    if (icon != null) {
+        PhoenixIcon(resourceId = icon, tint = MaterialTheme.colors.primary, modifier = Modifier.align(Alignment.Top).offset(y = (2).dp))
         Spacer(modifier = Modifier.width(10.dp))
     }
-    Text(text = text,
+    Text(
+        text = text,
         style = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
         modifier = Modifier.weight(1f),
     )

@@ -85,7 +85,7 @@ import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.utils.extensions.id
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -132,7 +132,7 @@ fun AppView(
         val noticesViewModel = viewModel<NoticesViewModel>(factory = NoticesViewModel.Factory(appConfigurationManager = business.appConfigurationManager))
         monitorNotices(vm = noticesViewModel)
 
-        val legacyAppStatus = PrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
+        val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
         if (legacyAppStatus.value is LegacyAppStatus.Required && navController.currentDestination?.route != Screen.SwitchToLegacy.route) {
             navController.navigate(Screen.SwitchToLegacy.route)
         }
@@ -375,7 +375,7 @@ fun AppView(
         }
     }
 
-    val isDataMigrationExpected by PrefsDatastore.getDataMigrationExpected(context).collectAsState(initial = null)
+    val isDataMigrationExpected by LegacyPrefsDatastore.getDataMigrationExpected(context).collectAsState(initial = null)
     val lastCompletedPayment by business.paymentsManager.lastCompletedPayment.collectAsState()
     lastCompletedPayment?.let {
         log.debug { "completed payment=${lastCompletedPayment?.id()} with data-migration=$isDataMigrationExpected" }
@@ -446,6 +446,18 @@ private fun monitorNotices(
                 vm.addNotice(Notice.WatchTowerLate)
             } else {
                 vm.removeNotice(Notice.WatchTowerLate)
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (LegacyPrefsDatastore.hasMigratedFromLegacy(context).first()) {
+            InternalData.getLegacyMigrationMessageShown(context).collect { shown ->
+                if (!shown) {
+                    vm.addNotice(Notice.MigrationFromLegacy)
+                } else {
+                    vm.removeNotice(Notice.MigrationFromLegacy)
+                }
             }
         }
     }

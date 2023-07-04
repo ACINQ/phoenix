@@ -24,7 +24,6 @@ import fr.acinq.phoenix.legacy.utils.Prefs as LegacyPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
@@ -57,10 +56,10 @@ object InternalData {
     // -- Whether a seed backup warning should be displayed - computed from SEED_MANUAL_BACKUP_DONE & SEED_LOSS_DISCLAIMER_READ
     fun showSeedBackupNotice(context: Context) = prefs(context).map { it[SEED_MANUAL_BACKUP_DONE] != true || it[SEED_LOSS_DISCLAIMER_READ] != true }
 
-    // -- Show a message summing up the migration result.
-    private val MIGRATION_RESULT_SHOWN = booleanPreferencesKey("MIGRATION_RESULT_SHOWN")
-    fun getMigrationResultShown(context: Context): Flow<Boolean> = prefs(context).map { it[MIGRATION_RESULT_SHOWN] ?: false }
-    suspend fun saveMigrationResultShown(context: Context, isShown: Boolean) = context.internalData.edit { it[MIGRATION_RESULT_SHOWN] = isShown }
+    // -- Show a message when the migration has been done.
+    private val LEGACY_MIGRATION_MESSSAGE_SHOWN = booleanPreferencesKey("LEGACY_MIGRATION_MESSSAGE_SHOWN")
+    fun getLegacyMigrationMessageShown(context: Context): Flow<Boolean> = prefs(context).map { it[LEGACY_MIGRATION_MESSSAGE_SHOWN] ?: false }
+    suspend fun saveLegacyMigrationMessageShown(context: Context, isShown: Boolean) = context.internalData.edit { it[LEGACY_MIGRATION_MESSSAGE_SHOWN] = isShown }
 
     // -- Show introduction screen at startup. True by default.
     private val SHOW_INTRO = booleanPreferencesKey("SHOW_INTRO")

@@ -51,6 +51,8 @@ import kotlin.collections.ArrayList
 val Context.userPrefs: DataStore<Preferences> by preferencesDataStore(name = "userprefs")
 /** This datastore persists miscellaneous internal data representing various states of the app. */
 val Context.internalData: DataStore<Preferences> by preferencesDataStore(name = "internaldata")
+/** This datastore persists data for the legacy-to-kmp migration process. */
+val Context.legacyPrefs: DataStore<Preferences> by preferencesDataStore(name = "legacyprefs")
 
 abstract class AppContext : Application() {
 
