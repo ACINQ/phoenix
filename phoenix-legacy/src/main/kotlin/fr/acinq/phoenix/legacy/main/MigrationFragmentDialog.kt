@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import fr.acinq.bitcoin.scala.ByteVector32
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.channel.*
 import fr.acinq.phoenix.legacy.AppViewModel
 import fr.acinq.phoenix.legacy.R
@@ -106,8 +107,6 @@ class MigrationFragmentDialog : DialogFragment() {
         model.startMigration(
           context = requireContext(),
           service = app.requireService,
-          legacyNodeId = app.state.value?.getNodeId()?.toString()!!,
-          kmpNodeId = app.state.value?.getKmpNodeId()?.toString()!!,
         )
       }
     }
@@ -129,6 +128,7 @@ sealed class MigrationScreenState {
   sealed class Paused : MigrationScreenState() {
     object PendingSwapIn: Paused()
     object Disconnected: Paused()
+    object AllChannelsAreDust: Paused()
     object ChannelsInForceClose: Paused()
     object ChannelsBeingCreated: Paused()
   }
@@ -152,8 +152,6 @@ class MigrationDialogViewModel : ViewModel() {
   fun startMigration(
     context: Context,
     service: EclairNodeService,
-    legacyNodeId: String,
-    kmpNodeId: String,
   ) {
     val migrationState = state.value
     if (migrationState !is MigrationScreenState.Ready) {
@@ -168,29 +166,31 @@ class MigrationDialogViewModel : ViewModel() {
         }
       }) {
 
-        if (hasPendingSwapIn.value == true) {
-          state.value = MigrationScreenState.Paused.PendingSwapIn
-          return@launch
-        }
-
         // compute the multi-sig swap-in address used by the new application
         val swapInAddress = service.state.value?.kit()?.getKmpSwapInAddress()
         if (swapInAddress == null) {
           state.value = MigrationScreenState.Failure.CannotGetSwapInAddress
         } else {
           state.value = MigrationScreenState.Processing.ListingChannelsToClose(swapInAddress)
-          delay(500)
-          log.info("(migration) closing channels to $swapInAddress")
+          delay(1_200)
 
           // list all the channels and check their state
           val allChannels = service.getChannels().toList()
-          if (hasChannelsBeingCreated(allChannels)) {
+          if (hasPendingSwapIn.value == true) {
+            state.value = MigrationScreenState.Paused.PendingSwapIn
+            return@launch
+          } else if (hasChannelsBeingCreated(allChannels)) {
             state.value = MigrationScreenState.Paused.ChannelsBeingCreated
             return@launch
           } else if (hasChannelsInForceClose(allChannels)) {
             state.value = MigrationScreenState.Paused.ChannelsInForceClose
             return@launch
+          } else if (hasOnlyChannelsBelowDust(allChannels)) {
+            state.value = MigrationScreenState.Paused.AllChannelsAreDust
+            return@launch
           }
+
+          log.info("(migration) closing channels to $swapInAddress")
 
           // only close the channels in normal state
           val channels = allChannels.filter {
@@ -300,6 +300,19 @@ class MigrationDialogViewModel : ViewModel() {
         is `WAIT_FOR_FUNDING_LOCKED$`, is `WAIT_FOR_FUNDING_SIGNED$`,
         is `WAIT_FOR_INIT_INTERNAL$`, is `WAIT_FOR_OPEN_CHANNEL$`,
         is `WAIT_FOR_REMOTE_PUBLISH_FUTURE_COMMITMENT$` -> true
+        else -> false
+      }
+    }
+  }
+
+  private fun hasOnlyChannelsBelowDust(channels: List<RES_GETINFO>): Boolean {
+    return channels.isNotEmpty() && channels.all {
+      when (val data = it.data()) {
+        is DATA_NORMAL -> {
+          val balance = data.commitments().availableBalanceForSend()
+          // ignore balance less than 10 sat
+          balance > MilliSatoshi(10_000) && balance < MilliSatoshi(547_000)
+        }
         else -> false
       }
     }

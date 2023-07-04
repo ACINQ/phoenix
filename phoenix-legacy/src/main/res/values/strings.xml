@@ -801,6 +801,7 @@ legacy_
   <string name="legacy_migration_paused_swap_in">You cannot upgrade now: an on-chain deposit is pending.\n\nTry again later when this deposit has confirmed.</string>
   <string name="legacy_migration_paused_opening">You cannot upgrade now: some channels are currently being opened.\n\nTry again later when these channels have been opened and are active.</string>
   <string name="legacy_migration_paused_force_close">You cannot upgrade now: some channels are being force-closed.\n\nTry again later when these channel have been completely closed. Note that force-close can take several days to complete.</string>
+  <string name="legacy_migration_paused_dust">You cannot upgrade: the balance of some of your channels is too low (less than 546 satoshi) and they cannot be migrated.\n\nSpend those funds over Lightning, or send them to a custodial wallet, and then try again.</string>
   <string name="legacy_migration_paused_disconnected">You cannot upgrade now because you are disconnected from Lightning and/or Electrum.\n\nTry again later when connection has been established.</string>
 
   <string name="legacy_migration_processing_title">Processing migration…</string>

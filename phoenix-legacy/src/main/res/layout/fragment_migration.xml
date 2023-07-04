@@ -216,6 +216,14 @@
           app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+          android:id="@+id/paused_dust_message"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/legacy_migration_paused_dust"
+          android:visibility="@{model.state instanceof MigrationScreenState.Paused.AllChannelsAreDust}"
+          app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
           android:id="@+id/paused_opening_message"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
@@ -228,7 +236,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           app:barrierDirection="bottom"
-          app:constraint_referenced_ids="paused_swapin_message, paused_forceclose_message, paused_opening_message, paused_disconnected_message" />
+          app:constraint_referenced_ids="paused_swapin_message, paused_forceclose_message, paused_opening_message, paused_disconnected_message, paused_dust_message" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/paused_button"
