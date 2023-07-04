@@ -103,15 +103,6 @@ object SystemNotificationHelper {
         }
     }
 
-    fun notifyPaymentRejectedByUser(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi): Notification {
-        return notifyPaymentFailed(
-            context = context,
-            title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
-                amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
-            message = context.getString(R.string.notif_rejected_by_user),
-        )
-    }
-
     fun notifyPaymentRejectedPolicyDisabled(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi): Notification {
         return notifyPaymentFailed(
             context = context,
@@ -148,7 +139,7 @@ object SystemNotificationHelper {
                 amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
             message = context.getString(R.string.notif_rejected_over_relative,
                 fee.toPrettyString(BitcoinUnit.Sat, withUnit = true),
-                String.format("%.2f", (percentMax.toDouble() / 100))
+                String.format("%.0f", (percentMax.toDouble() / 100))
             ),
         )
     }

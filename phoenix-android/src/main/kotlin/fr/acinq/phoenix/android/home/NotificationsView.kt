@@ -217,7 +217,7 @@ private fun PaymentNotification(
                     is Notification.OverRelativeFee -> stringResource(
                         id = R.string.inappnotif_payment_rejected_over_relative,
                         notification.fee.toPrettyString(btcUnit, withUnit = true),
-                        String.format("%.2f", (notification.maxRelativeFeeBasisPoints.toDouble() / 100)),
+                        String.format("%.0f", (notification.maxRelativeFeeBasisPoints.toDouble() / 100)),
                     )
                     is Notification.ChannelsInitializing -> stringResource(id = R.string.inappnotif_payment_rejected_channel_initializing)
                 },

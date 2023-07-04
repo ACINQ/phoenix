@@ -35,7 +35,6 @@
 
     <string name="notif_rejected_deposit_title">On-chain deposit pending (+%1$s)</string>
     <string name="notif_rejected_payment_title">Rejected incoming payment (+%1$s)</string>
-    <string name="notif_rejected_by_user">You have rejected the payment</string>
     <string name="notif_rejected_policy_disabled">Automated channels management is disabled. You can change that in the settings.</string>
     <string name="notif_rejected_over_absolute">The fee was %1$s, but your max fee was set to %2$s. You can tweak that in the settings.</string>
     <string name="notif_rejected_over_relative">The fee was %1$s which is more than %2$s%% of the amount received. You can tweak that in the settings.</string>
