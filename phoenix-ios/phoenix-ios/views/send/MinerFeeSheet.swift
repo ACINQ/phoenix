@@ -18,7 +18,7 @@ struct MinerFeeSheet: View {
 	let amount: Bitcoin_kmpSatoshi
 	let btcAddress: String
 	
-	@Binding var minerFeeSats: Int64?
+	@Binding var minerFeeInfo: MinerFeeInfo?
 	@Binding var satsPerByte: String
 	@Binding var parsedSatsPerByte: Result<NSNumber, TextFieldNumberStylerError>
 	@Binding var mempoolRecommendedResponse: MempoolRecommendedResponse?
@@ -306,7 +306,7 @@ struct MinerFeeSheet: View {
 				Text("Review Transaction")
 			}
 			.font(.title3)
-			.disabled(minerFeeSats == nil)
+			.disabled(minerFeeInfo == nil)
 			Spacer()
 		}
 		.padding()
@@ -390,14 +390,14 @@ struct MinerFeeSheet: View {
 	
 	func minerFeeStrings() -> (FormattedAmount, FormattedAmount) {
 		
-		guard let minerFeeSats else {
+		guard let minerFeeInfo else {
 			let btc = Utils.unknownBitcoinAmount(bitcoinUnit: currencyPrefs.bitcoinUnit)
 			let fiat = Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
 			return (btc, fiat)
 		}
 		
-		let btc = Utils.formatBitcoin(currencyPrefs, sat: minerFeeSats)
-		let fiat = Utils.formatFiat(currencyPrefs, sat: minerFeeSats)
+		let btc = Utils.formatBitcoin(currencyPrefs, sat: minerFeeInfo.minerFee)
+		let fiat = Utils.formatFiat(currencyPrefs, sat: minerFeeInfo.minerFee)
 		return (btc, fiat)
 	}
 	
@@ -424,7 +424,7 @@ struct MinerFeeSheet: View {
 			let peer = Biz.business.getPeer(),
 			let scriptBytes = Parser.shared.addressToPublicKeyScript(chain: Biz.business.chain, address: btcAddress)
 		else {
-			minerFeeSats = nil
+			minerFeeInfo = nil
 			return
 		}
 		
@@ -434,7 +434,7 @@ struct MinerFeeSheet: View {
 		let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
 		let feePerKw = Lightning_kmpFeeratePerKw(feerate: satsPerByte_satoshi)
 		
-		minerFeeSats = nil
+		minerFeeInfo = nil
 		Task { @MainActor in
 			do {
 				let pair = try await peer.estimateFeeForSpliceOut(
@@ -448,12 +448,12 @@ struct MinerFeeSheet: View {
 				
 				
 				if self.satsPerByte == originalSatsPerByte {
-					self.minerFeeSats = fee.sat
+					self.minerFeeInfo = MinerFeeInfo(pubKeyScript: scriptVector, feerate: feePerKw, minerFee: fee)
 				}
 				
 			} catch {
 				log.error("Error: \(error)")
-				self.minerFeeSats = nil
+				self.minerFeeInfo = nil
 			}
 			
 		} // </Task>

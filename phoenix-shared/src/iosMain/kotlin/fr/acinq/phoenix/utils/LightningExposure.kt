@@ -5,6 +5,7 @@ import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.NodeEvents
 import fr.acinq.lightning.blockchain.electrum.ElectrumMiniWallet
 import fr.acinq.lightning.blockchain.electrum.WalletState
+import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.channel.states.Aborted
 import fr.acinq.lightning.channel.states.ChannelState
 import fr.acinq.lightning.channel.states.Closed
@@ -200,5 +201,60 @@ fun LiquidityPolicy.asDisable(): LiquidityPolicy.Disable? = when (this) {
 
 fun LiquidityPolicy.asAuto(): LiquidityPolicy.Auto? = when (this) {
     is LiquidityPolicy.Auto -> this
+    else -> null
+}
+
+fun ChannelCommand.Commitment.Splice.Response.asFailure(): ChannelCommand.Commitment.Splice.Response.Failure? = when (this) {
+    is ChannelCommand.Commitment.Splice.Response.Failure -> this
+    else -> null
+}
+
+fun ChannelCommand.Commitment.Splice.Response.Failure.asInsufficientFunds(): ChannelCommand.Commitment.Splice.Response.Failure.InsufficientFunds? = when (this) {
+    is ChannelCommand.Commitment.Splice.Response.Failure.InsufficientFunds -> this
+    else -> null
+}
+
+fun ChannelCommand.Commitment.Splice.Response.Failure.asInvalidSpliceOutPubKeyScript(): ChannelCommand.Commitment.Splice.Response.Failure.InvalidSpliceOutPubKeyScript? = when (this) {
+    is ChannelCommand.Commitment.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> this
+    else -> null
+}
+
+fun ChannelCommand.Commitment.Splice.Response.Failure.asSpliceAlreadyInProgress(): ChannelCommand.Commitment.Splice.Response.Failure.SpliceAlreadyInProgress? = when (this) {
+    is ChannelCommand.Commitment.Splice.Response.Failure.SpliceAlreadyInProgress -> this
+    else -> null
+}
+
+fun ChannelCommand.Commitment.Splice.Response.Failure.asChannelNotIdle(): ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotIdle? = when (this) {
+    is ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotIdle -> this
+    else -> null
+}
+
+fun ChannelCommand.Commitment.Splice.Response.Failure.asFundingFailure(): ChannelCommand.Commitment.Splice.Response.Failure.FundingFailure? = when (this) {
+    is ChannelCommand.Commitment.Splice.Response.Failure.FundingFailure -> this
+    else -> null
+}
+
+fun ChannelCommand.Commitment.Splice.Response.Failure.asCannotStartSession(): ChannelCommand.Commitment.Splice.Response.Failure.CannotStartSession? = when (this) {
+    is ChannelCommand.Commitment.Splice.Response.Failure.CannotStartSession -> this
+    else -> null
+}
+
+fun ChannelCommand.Commitment.Splice.Response.Failure.asInteractiveTxSessionFailed(): ChannelCommand.Commitment.Splice.Response.Failure.InteractiveTxSessionFailed? = when (this) {
+    is ChannelCommand.Commitment.Splice.Response.Failure.InteractiveTxSessionFailed -> this
+    else -> null
+}
+
+fun ChannelCommand.Commitment.Splice.Response.Failure.asCannotCreateCommitTx(): ChannelCommand.Commitment.Splice.Response.Failure.CannotCreateCommitTx? = when (this) {
+    is ChannelCommand.Commitment.Splice.Response.Failure.CannotCreateCommitTx -> this
+    else -> null
+}
+
+fun ChannelCommand.Commitment.Splice.Response.Failure.asAbortedByPeer(): ChannelCommand.Commitment.Splice.Response.Failure.AbortedByPeer? = when (this) {
+    is ChannelCommand.Commitment.Splice.Response.Failure.AbortedByPeer -> this
+    else -> null
+}
+
+fun ChannelCommand.Commitment.Splice.Response.Failure.asDisconnected(): ChannelCommand.Commitment.Splice.Response.Failure.Disconnected? = when (this) {
+    is ChannelCommand.Commitment.Splice.Response.Failure.Disconnected -> this
     else -> null
 }

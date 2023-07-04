@@ -30,6 +30,61 @@ enum Problem: Error {
 	case amountOutOfRange
 }
 
+enum SpliceOutProblem: Error {
+	case insufficientFunds
+	case spliceAlreadyInProgress
+	case channelNotIdle
+	case sessionError
+	case disconnected
+	case other
+	
+	static func fromResponse(
+		_ response: Lightning_kmpChannelCommand.CommitmentSpliceResponse?
+	) -> SpliceOutProblem? {
+		
+		guard let response else {
+			return .other
+		}
+		
+		if let failure = response.asFailure() {
+			
+			if let _ = failure.asInsufficientFunds() {
+				return .insufficientFunds
+			}
+			if let _ = failure.asSpliceAlreadyInProgress() {
+				return .spliceAlreadyInProgress
+			}
+			if let _ = failure.asChannelNotIdle() {
+				return .channelNotIdle
+			}
+			if let _ = failure.asFundingFailure() {
+				return .sessionError
+			}
+			if let _ = failure.asCannotStartSession() {
+				return .sessionError
+			}
+			if let _ = failure.asInteractiveTxSessionFailed() {
+				return .sessionError
+			}
+			if let _ = failure.asCannotCreateCommitTx() {
+				return .sessionError
+			}
+			if let _ = failure.asAbortedByPeer() {
+				return .sessionError
+			}
+			if let _ = failure.asDisconnected() {
+				return .disconnected
+			}
+			
+			return .other
+			
+		} else {
+			
+			return nil
+		}
+	}
+}
+
 struct ValidateView: View {
 	
 	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
@@ -46,11 +101,14 @@ struct ValidateView: View {
 	@State var altAmount: String = ""
 	@State var problem: Problem? = nil
 	
+	@State var spliceOutInProgress: Bool = false
+	@State var spliceOutProblem: SpliceOutProblem? = nil
+	
 	@State var preTipAmountMsat: Int64? = nil
 	@State var postTipAmountMsat: Int64? = nil
 	@State var tipSliderSheetVisible: Bool = false
 	
-	@State var minerFeeSats: Int64? = nil
+	@State var minerFeeInfo: MinerFeeInfo? = nil
 	@State var satsPerByte: String = ""
 	@State var parsedSatsPerByte: Result<NSNumber, TextFieldNumberStylerError> = Result.failure(.emptyInput)
 	
@@ -71,10 +129,6 @@ struct ValidateView: View {
 	
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	
 	// For the cicular buttons: [metadata, tip, comment]
 	enum MaxButtonWidth: Preference {}
 	let maxButtonWidthReader = GeometryPreferenceReader(
@@ -82,6 +136,12 @@ struct ValidateView: View {
 		value: { [$0.size.width] }
 	)
 	@State var maxButtonWidth: CGFloat? = nil
+	
+	@Environment(\.popoverState) var popoverState: PopoverState
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -428,7 +488,7 @@ struct ValidateView: View {
 	@ViewBuilder
 	func paymentButton() -> some View {
 		
-		let needsPrepare = (mvi.model is Scan.Model_OnChainFlow) && (minerFeeSats == nil)
+		let needsPrepare = (mvi.model is Scan.Model_OnChainFlow) && (minerFeeInfo == nil)
 		
 		Button {
 			if needsPrepare {
@@ -469,7 +529,7 @@ struct ValidateView: View {
 			backgroundFill: Color.appAccent,
 			disabledBackgroundFill: Color.gray
 		))
-		.disabled(problem != nil || isDisconnected || chainContext == nil)
+		.disabled(problem != nil || isDisconnected || chainContext == nil || spliceOutInProgress)
 		.accessibilityHint(paymentButtonHint())
 	}
 	
@@ -496,6 +556,26 @@ struct ValidateView: View {
 				
 				Text("Unable to fetch fees")
 					.foregroundColor(.appNegative)
+				
+			} else if let spliceOutProblem {
+				
+				Group {
+					switch spliceOutProblem {
+					case .insufficientFunds:
+						Text("Insufficient funds")
+					case .spliceAlreadyInProgress:
+						Text("Splice already in progress")
+					case .channelNotIdle:
+						Text("Channel not idle")
+					case .sessionError:
+						Text("Splice-out session error")
+					case .disconnected:
+						Text("Disconnected during splice-out attempt")
+					case .other:
+						Text("Unknown splice-out error")
+					}
+				}
+				.foregroundColor(.appNegative)
 			}
 		}
 	}
@@ -831,8 +911,8 @@ struct ValidateView: View {
 		}
 		
 		let minerFeeMsat: Int64
-		if let minerFeeSats {
-			minerFeeMsat = Utils.toMsat(sat: minerFeeSats)
+		if let minerFeeInfo {
+			minerFeeMsat = Utils.toMsat(sat: minerFeeInfo.minerFee)
 		} else {
 			minerFeeMsat = 0
 		}
@@ -1424,7 +1504,7 @@ struct ValidateView: View {
 			MinerFeeSheet(
 				amount: Bitcoin_kmpSatoshi(sat: sat),
 				btcAddress: model.uri.address,
-				minerFeeSats: $minerFeeSats,
+				minerFeeInfo: $minerFeeInfo,
 				satsPerByte: $satsPerByte,
 				parsedSatsPerByte: $parsedSatsPerByte,
 				mempoolRecommendedResponse: $mempoolRecommendedResponse
@@ -1457,6 +1537,47 @@ struct ValidateView: View {
 				amount: Lightning_kmpMilliSatoshi(msat: msat),
 				trampolineFees: trampolineFees
 			))
+			
+		} else if let _ = mvi.model as? Scan.Model_OnChainFlow {
+			
+			guard
+				let minerFeeInfo = minerFeeInfo,
+				let peer = Biz.business.getPeer(),
+				spliceOutInProgress == false
+			else {
+				return
+			}
+			
+			spliceOutInProgress = true
+			spliceOutProblem = nil
+			
+			let amountSat = Bitcoin_kmpSatoshi(sat: Utils.truncateToSat(msat: msat))
+			Task { @MainActor in
+				do {
+					let response = try await peer.spliceOut(
+						amount: amountSat,
+						scriptPubKey: minerFeeInfo.pubKeyScript,
+						feerate: minerFeeInfo.feerate
+					)
+					
+					self.spliceOutInProgress = false
+					
+					if let problem = SpliceOutProblem.fromResponse(response) {
+						self.spliceOutProblem = problem
+						
+					} else {
+						self.spliceOutProblem = nil
+						self.presentationMode.wrappedValue.dismiss()
+					}
+					
+				} catch {
+					log.error("peer.spliceOut(): error: \(error)")
+					
+					self.spliceOutInProgress = false
+					self.spliceOutProblem = .other
+					
+				}
+			} // </Task>
 			
 		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
 			

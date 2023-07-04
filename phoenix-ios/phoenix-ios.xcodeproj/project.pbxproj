@@ -169,6 +169,7 @@
 		DC9E7EC32A12955300A5F1D0 /* LiquidityHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */; };
 		DC9E7EC62A1295B100A5F1D0 /* liquidity.html in Resources */ = {isa = PBXBuildFile; fileRef = DC9E7EC82A1295B100A5F1D0 /* liquidity.html */; };
 		DCA125752A27EDDB00DA2F7F /* MempoolSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA125742A27EDDB00DA2F7F /* MempoolSpace.swift */; };
+		DCA3B41F2A5471C900E6B231 /* MinerFeeInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA3B41E2A5471C900E6B231 /* MinerFeeInfo.swift */; };
 		DCA5391629F047C6001BD3D5 /* ComingSoonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA5391529F047C6001BD3D5 /* ComingSoonView.swift */; };
 		DCA5391A29F1DDE7001BD3D5 /* SegmentedPicker in Frameworks */ = {isa = PBXBuildFile; productRef = DCA5391929F1DDE7001BD3D5 /* SegmentedPicker */; };
 		DCA5391C29F7202F001BD3D5 /* ChannelInfoPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA5391B29F7202F001BD3D5 /* ChannelInfoPopup.swift */; };
@@ -492,6 +493,7 @@
 		DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityHTML.swift; sourceTree = "<group>"; };
 		DC9E7EC72A1295B100A5F1D0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/liquidity.html; sourceTree = "<group>"; };
 		DCA125742A27EDDB00DA2F7F /* MempoolSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MempoolSpace.swift; sourceTree = "<group>"; };
+		DCA3B41E2A5471C900E6B231 /* MinerFeeInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinerFeeInfo.swift; sourceTree = "<group>"; };
 		DCA5391529F047C6001BD3D5 /* ComingSoonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComingSoonView.swift; sourceTree = "<group>"; };
 		DCA5391B29F7202F001BD3D5 /* ChannelInfoPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelInfoPopup.swift; sourceTree = "<group>"; };
 		DCA6DEC52829BDEB0073C658 /* CrossProcessCommunication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossProcessCommunication.swift; sourceTree = "<group>"; };
@@ -815,6 +817,7 @@
 				DC118BF927B44F840080BBAC /* TipSliderSheet.swift */,
 				DC118BFD27B451890080BBAC /* MetadataSheet.swift */,
 				DC118BFF27B4523B0080BBAC /* CommentSheet.swift */,
+				DCA3B41E2A5471C900E6B231 /* MinerFeeInfo.swift */,
 				DC1844022A2690BB004D9578 /* MinerFeeSheet.swift */,
 				DC118BF727B44E6E0080BBAC /* LoginView.swift */,
 				DC118C0327B454720080BBAC /* PaymentInFlightView.swift */,
@@ -1663,6 +1666,7 @@
 				DCAC9FC329675E1A0098D769 /* NavigationWrapper.swift in Sources */,
 				DC65D86428E2F7D700686355 /* ResetWalletView_Action.swift in Sources */,
 				DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */,
+				DCA3B41F2A5471C900E6B231 /* MinerFeeInfo.swift in Sources */,
 				DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */,
 				DCACF7092566D0F00009B01E /* AppAccessView.swift in Sources */,
 				DC27E4D1279753EC00C777CC /* TextFieldNumberStyler.swift in Sources */,
