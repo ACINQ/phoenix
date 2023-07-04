@@ -63,10 +63,10 @@ import fr.acinq.phoenix.android.init.CreateWalletView
 import fr.acinq.phoenix.android.init.InitWallet
 import fr.acinq.phoenix.android.init.RestoreWalletView
 import fr.acinq.phoenix.android.intro.IntroView
-import fr.acinq.phoenix.android.payments.CsvExportView
 import fr.acinq.phoenix.android.payments.ReceiveView
 import fr.acinq.phoenix.android.payments.ScanDataView
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
+import fr.acinq.phoenix.android.payments.history.CsvExportView
 import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
@@ -88,6 +88,7 @@ import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import fr.acinq.phoenix.utils.extensions.id
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import org.kodein.memory.util.currentTimestampMillis
 
 
@@ -208,17 +209,19 @@ fun AppView(
                         onBackClick = { navController.popBackStack() }
                     )
                 }
-                composable(Screen.ScanData.route, deepLinks = listOf(
-                    navDeepLink { uriPattern = "lightning:{data}" },
-                    navDeepLink { uriPattern = "bitcoin:{data}" },
-                    navDeepLink { uriPattern = "lnurl:{data}" },
-                    navDeepLink { uriPattern = "lnurlp:{data}" },
-                    navDeepLink { uriPattern = "lnurlw:{data}" },
-                    navDeepLink { uriPattern = "keyauth:{data}" },
-                    navDeepLink { uriPattern = "phoenix:lightning:{data}" },
-                    navDeepLink { uriPattern = "phoenix:bitcoin:{data}" },
-                    navDeepLink { uriPattern = "scanview:{data}" },
-                )) {
+                composable(
+                    Screen.ScanData.route, deepLinks = listOf(
+                        navDeepLink { uriPattern = "lightning:{data}" },
+                        navDeepLink { uriPattern = "bitcoin:{data}" },
+                        navDeepLink { uriPattern = "lnurl:{data}" },
+                        navDeepLink { uriPattern = "lnurlp:{data}" },
+                        navDeepLink { uriPattern = "lnurlw:{data}" },
+                        navDeepLink { uriPattern = "keyauth:{data}" },
+                        navDeepLink { uriPattern = "phoenix:lightning:{data}" },
+                        navDeepLink { uriPattern = "phoenix:bitcoin:{data}" },
+                        navDeepLink { uriPattern = "scanview:{data}" },
+                    )
+                ) {
                     val input = it.arguments?.getString("data")
                     RequireStarted(walletState, nextUri = "scanview:$input") {
                         ScanDataView(
@@ -261,14 +264,18 @@ fun AppView(
                 }
                 composable(Screen.PaymentsHistory.route) {
                     PaymentsHistoryView(
-                        onBackClick = { popToHome(navController) },
+                        onBackClick = { navController.popBackStack() },
                         paymentsViewModel = paymentsViewModel,
                         onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },
                         onCsvExportClick = { navController.navigate(Screen.PaymentsCsvExport) },
                     )
                 }
                 composable(Screen.PaymentsCsvExport.route) {
-                    CsvExportView(onBackClick = { navController.navigate(Screen.PaymentsHistory.route) })
+                    CsvExportView(onBackClick = {
+                        navController.navigate(Screen.PaymentsHistory.route) {
+                            popUpTo(Screen.PaymentsHistory.route) { inclusive = true }
+                        }
+                    })
                 }
                 composable(Screen.Settings.route) {
                     SettingsView()
@@ -414,6 +421,15 @@ private fun monitorNotices(
     }
 
     val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+    if (!notificationPermission.status.isGranted) {
+        LaunchedEffect(Unit) {
+            if (UserPrefs.getShowNotificationPermissionReminder(context).first()) {
+                vm.addNotice(Notice.NotificationPermission)
+            }
+        }
+    } else {
+        vm.removeNotice(Notice.NotificationPermission)
+    }
     LaunchedEffect(Unit) {
         UserPrefs.getShowNotificationPermissionReminder(context).collect {
             if (it && !notificationPermission.status.isGranted) {

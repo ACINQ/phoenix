@@ -46,11 +46,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsView() {
     val nc = navController
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val chain = business.chain
+
     DefaultScreenLayout {
         DefaultScreenHeader(title = stringResource(id = R.string.menu_settings), onBackClick = { nc.popBackStack() })
-        val scope = rememberCoroutineScope()
-        val context = LocalContext.current
-        val chain = business.chain
 
         // -- debug
         if (chain is NodeParams.Chain.Testnet) {
@@ -71,6 +72,7 @@ fun SettingsView() {
             SettingButton(text = R.string.settings_display_prefs, icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences) })
             SettingButton(text = R.string.settings_payment_settings, icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings)})
             SettingButton(text = R.string.settings_liquidity_policy, icon = R.drawable.ic_settings, onClick = { nc.navigate(Screen.LiquidityPolicy) })
+            SettingButton(text = R.string.settings_payment_history, icon = R.drawable.ic_list, onClick = { nc.navigate(Screen.PaymentsHistory)})
             SettingButton(text = R.string.settings_notifications, icon = R.drawable.ic_notification, onClick = { nc.navigate(Screen.Notifications)})
         }
 
