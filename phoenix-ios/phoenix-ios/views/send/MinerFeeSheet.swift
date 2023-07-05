@@ -457,7 +457,8 @@ struct MinerFeeSheet: View {
 		let scriptVector = Bitcoin_kmpByteVector(bytes: scriptBytes)
 		
 		let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
-		let feePerKw = Lightning_kmpFeeratePerKw(feerate: satsPerByte_satoshi)
+		let feePerByte = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)
+		let feePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: feePerByte)
 		
 		minerFeeInfo = nil
 		Task { @MainActor in
