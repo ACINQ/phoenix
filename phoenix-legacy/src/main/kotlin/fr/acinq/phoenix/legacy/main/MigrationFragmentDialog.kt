@@ -73,10 +73,12 @@ class MigrationFragmentDialog : DialogFragment() {
       model.hasPendingSwapIn.value = it.isNotEmpty()
     }
 
-    model.state.observe(viewLifecycleOwner) {
-      val migrationState = model.state.value
+    model.state.observe(viewLifecycleOwner) { migrationState ->
       val context = requireContext()
       when (migrationState) {
+        is MigrationScreenState.ConfirmMigration -> {
+          mBinding.confirmDetails.text = context.getString(R.string.legacy_migration_confirm_dust, migrationState.dustChannels.size, migrationState.allChannels.size)
+        }
         is MigrationScreenState.Processing.RequestingKmpSwapInAddress -> {
           mBinding.processingDetails.text = context.getString(R.string.legacy_migration_swap_address)
         }
@@ -91,7 +93,7 @@ class MigrationFragmentDialog : DialogFragment() {
         }
         else -> {}
       }
-      log.info("(migration) state=$it")
+      log.info("(migration) state=$migrationState")
     }
 
     mBinding.model = model
@@ -102,11 +104,23 @@ class MigrationFragmentDialog : DialogFragment() {
     mBinding.pausedButton.setOnClickListener { dismiss() }
     mBinding.failureDismissButton.setOnClickListener { dismiss() }
     mBinding.dismissButton.setOnClickListener { dismiss() }
+    mBinding.cancelConfirmButton.setOnClickListener { dismiss() }
     mBinding.upgradeButton.setOnClickListener {
       if (model.isConnected.value == true) {
         model.startMigration(
           context = requireContext(),
           service = app.requireService,
+          ignoreDust = false
+        )
+      }
+    }
+    mBinding.confirmButton.setOnClickListener {
+      if (model.isConnected.value == true) {
+        model.state.value = MigrationScreenState.Ready
+        model.startMigration(
+          context = requireContext(),
+          service = app.requireService,
+          ignoreDust = true
         )
       }
     }
@@ -115,6 +129,8 @@ class MigrationFragmentDialog : DialogFragment() {
 
 sealed class MigrationScreenState {
   object Ready : MigrationScreenState()
+
+  data class ConfirmMigration(val allChannels: Map<ByteVector32, MilliSatoshi>, val dustChannels: Map<ByteVector32, MilliSatoshi>): MigrationScreenState()
 
   sealed class Processing : MigrationScreenState() {
     object RequestingKmpSwapInAddress: Processing()
@@ -128,7 +144,6 @@ sealed class MigrationScreenState {
   sealed class Paused : MigrationScreenState() {
     object PendingSwapIn: Paused()
     object Disconnected: Paused()
-    object AllChannelsAreDust: Paused()
     object ChannelsInForceClose: Paused()
     object ChannelsBeingCreated: Paused()
   }
@@ -152,6 +167,7 @@ class MigrationDialogViewModel : ViewModel() {
   fun startMigration(
     context: Context,
     service: EclairNodeService,
+    ignoreDust: Boolean,
   ) {
     val migrationState = state.value
     if (migrationState !is MigrationScreenState.Ready) {
@@ -185,25 +201,32 @@ class MigrationDialogViewModel : ViewModel() {
           } else if (hasChannelsInForceClose(allChannels)) {
             state.value = MigrationScreenState.Paused.ChannelsInForceClose
             return@launch
-          } else if (hasOnlyChannelsBelowDust(allChannels)) {
-            state.value = MigrationScreenState.Paused.AllChannelsAreDust
-            return@launch
           }
-
-          log.info("(migration) closing channels to $swapInAddress")
 
           // only close the channels in normal state
           val channels = allChannels.filter {
             it.state() is `NORMAL$`
           }.map {
-            it.channelId()
-          }.toSet()
+            it.channelId() to (it.data() as DATA_NORMAL).commitments().availableBalanceForSend()
+          }.toMap()
 
-          state.value = MigrationScreenState.Processing.ClosingChannels(swapInAddress, channels, emptySet())
+          // checking dust
+          val dustChannels = channelsBelowDust(channels)
+          if (!ignoreDust) {
+            if (dustChannels.isNotEmpty()) {
+              state.value = MigrationScreenState.ConfirmMigration(channels, dustChannels)
+              return@launch
+            }
+          } else {
+            log.info("(migration) ${dustChannels.size}/${channels.size} dust channels are ignored by user.")
+          }
+
+          log.info("(migration) closing channels to $swapInAddress")
+          state.value = MigrationScreenState.Processing.ClosingChannels(swapInAddress, channels.keys, emptySet())
 
           // loop closing the channels one by one to prevent herd effect
-          val channelsClosingStatusMap = channels.associateWith { false }.toMutableMap()
-          channels.forEachIndexed { index, channelId ->
+          val channelsClosingStatusMap = channels.keys.associateWith { false }.toMutableMap()
+          channels.keys.forEachIndexed { index, channelId ->
             val res = service.migrateChannels(swapInAddress, listOf(channelId))
              val successfullyMigrated = res.filter { (_, result) -> result.isRight }
             val failedToMigrate = res.filter { (_, result) -> result.isLeft }
@@ -214,7 +237,7 @@ class MigrationDialogViewModel : ViewModel() {
               log.info("(migration) successfully closed channel=$channelId")
               successfullyMigrated.forEach {
                 channelsClosingStatusMap[it.key.left().get()] = true
-                state.value = MigrationScreenState.Processing.ClosingChannels(swapInAddress, channels, channelsClosingStatusMap.filter { it.value }.keys)
+                state.value = MigrationScreenState.Processing.ClosingChannels(swapInAddress, channels.keys, channelsClosingStatusMap.filter { it.value }.keys)
               }
             }
             delay(200)
@@ -305,16 +328,15 @@ class MigrationDialogViewModel : ViewModel() {
     }
   }
 
-  private fun hasOnlyChannelsBelowDust(channels: List<RES_GETINFO>): Boolean {
-    return channels.isNotEmpty() && channels.all {
-      when (val data = it.data()) {
-        is DATA_NORMAL -> {
-          val balance = data.commitments().availableBalanceForSend()
-          // ignore balance less than 10 sat
-          balance > MilliSatoshi(10_000) && balance < MilliSatoshi(547_000)
-        }
-        else -> false
+  private fun channelsBelowDust(channels: Map<ByteVector32, MilliSatoshi>): Map<ByteVector32, MilliSatoshi> {
+    val dustChannels = channels.mapNotNull { (channelId, balance) ->
+      if (balance > MilliSatoshi(999) && balance < MilliSatoshi(547_000)) {
+        channelId to balance
+      } else {
+        null
       }
-    }
+    }.toMap()
+    log.info("(migration) found ${dustChannels.size} dust channels=$dustChannels")
+    return dustChannels
   }
 }

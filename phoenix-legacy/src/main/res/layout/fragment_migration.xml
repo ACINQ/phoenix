@@ -141,6 +141,56 @@
       </androidx.constraintlayout.widget.ConstraintLayout>
 
       <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/confirm_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/space_md_p"
+        android:paddingVertical="@dimen/space_md_p"
+        android:visibility="@{model.state instanceof MigrationScreenState.ConfirmMigration}"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+          android:id="@+id/confirm_title"
+          style="@style/dialog_title"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/legacy_migration_confirm_title"
+          app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+          android:id="@+id/confirm_details"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="8dp"
+          android:text=""
+          android:textSize="14sp"
+          app:layout_constraintTop_toBottomOf="@id/confirm_title"
+          tools:ignore="RtlSymmetry" />
+
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+          android:id="@+id/confirm_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_lg"
+          android:background="@drawable/button_bg_primary_border"
+          app:icon="@drawable/ic_check_circle"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/confirm_details"
+          app:text="@string/legacy_migration_confirm_proceed" />
+
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+          android:id="@+id/cancel_confirm_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md"
+          android:background="@drawable/button_bg_no_border"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/confirm_button"
+          app:text="@string/legacy_migration_confirm_cancel" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+
+      <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/migration_complete_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -216,14 +266,6 @@
           app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-          android:id="@+id/paused_dust_message"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:text="@string/legacy_migration_paused_dust"
-          android:visibility="@{model.state instanceof MigrationScreenState.Paused.AllChannelsAreDust}"
-          app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
           android:id="@+id/paused_opening_message"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
@@ -236,7 +278,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           app:barrierDirection="bottom"
-          app:constraint_referenced_ids="paused_swapin_message, paused_forceclose_message, paused_opening_message, paused_disconnected_message, paused_dust_message" />
+          app:constraint_referenced_ids="paused_swapin_message, paused_forceclose_message, paused_opening_message, paused_disconnected_message" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/paused_button"
