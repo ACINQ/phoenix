@@ -2,7 +2,6 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.UpgradeRequired
@@ -19,6 +18,7 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LocalChannelInfo
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import org.kodein.log.Logger
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
@@ -29,7 +29,11 @@ class PeerManager(
     private val configurationManager: AppConfigurationManager,
     private val notificationsManager: NotificationsManager,
     private val electrumWatcher: ElectrumWatcher,
-) : CoroutineScope by MainScope() {
+) : CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.Main + CoroutineExceptionHandler { _, e ->
+    println("error in Peer coroutine scope: ${e.message}")
+    val logger = loggerFactory.newLogger(Logger.Tag(PeerManager::class))
+    logger.error(e) { "error in Peer scope: " }
+}) {
 
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
