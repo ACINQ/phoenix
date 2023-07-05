@@ -118,6 +118,7 @@
   <string name="legacy_send_error_sending">Nastala chyba při odesílání platby. Žádné peníze nebyly odeslány.</string>
   <string name="legacy_send_pay_button">Zaplatit</string>
   <string name="legacy_send_swap_in_progress">Probíhá směna…</string>
+  <string name="legacy_send_swap_service_disabled">Služba swap pro placení adres on-chain byla vypnuta.\n\nProsím, použijte službu třetí strany.</string>
   <string name="legacy_send_swap_error">Směna selhala. Prosím, zkuste to znovu.</string>
   <string name="legacy_send_swap_required_button">Vyžádat směnu</string>
   <string name="legacy_send_swap_complete_recap_amount">Množství</string>

@@ -119,6 +119,7 @@
   <string name="legacy_send_description_label">Desc.</string>
   <string name="legacy_send_error_sending">Ocurrió un error interno al intentar enviar este pago. No se ha enviado dinero.</string>
   <string name="legacy_send_pay_button">Pagar</string>
+  <string name="legacy_send_swap_service_disabled">El servicio de intercambio para realizar pagos en la cadena ha sido desactivado.\n\nPor favor, utilice un servicio de terceros.</string>
   <string name="legacy_send_swap_in_progress">Intercambio en progreso…</string>
   <string name="legacy_send_swap_error">El intercambio ha fallado. Por favor inténtalo de nuevo.</string>
   <string name="legacy_send_swap_required_button">Solicitar un intercambio</string>

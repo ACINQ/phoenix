@@ -97,8 +97,8 @@
   <string name="legacy_receive_share_button">Partager…</string>
 
   <string name="legacy_receive_min_amount_pay_to_open"><![CDATA[Votre portefeuille est vide. Votre premier versement doit être d\'au moins <b>%1$s</b>.]]></string>
-  <string name="legacy_receive_paytoopen_disabled">La création de canaux Lightning a été désactivée temporairement. Certains paiements ne pourront pas être reçus.</string>
-  <string name="legacy_receive_paytoopen_disabled_nochannels">La création de canaux Lightning a été désactivée temporairement. Vous ne pourrez pas recevoir de paiements.</string>
+  <string name="legacy_receive_paytoopen_disabled">La création de canaux Lightning a été désactivée. Certains paiements ne pourront pas être reçus.</string>
+  <string name="legacy_receive_paytoopen_disabled_nochannels">La création de canaux Lightning a été désactivée. Vous ne pourrez pas recevoir de paiements.</string>
   <string name="legacy_receive_address_label">Adresse</string>
   <string name="legacy_receive_withdraw_button">Utiliser un lien LNURL</string>
 
@@ -107,7 +107,7 @@
   <string name="legacy_receive_swap_in_disabled"><![CDATA[
     <b>Swap entrant désactivés</b>
     <br /><br />
-    Le service de swap vers des adresses Bitcoin a été temporairement désactivé.
+    Le service de swap vers des adresses Bitcoin a été désactivé.
     <br /><br />
     Veuillez réessayer ultérieurement.
   ]]></string>
@@ -153,6 +153,7 @@
   <string name="legacy_send_error_sending">Il y a eu une erreur lors de l\'envoi du paiement. Aucun argent n\'a été envoyé.</string>
   <string name="legacy_send_pay_button">Payer</string>
   <string name="legacy_send_swap_in_progress">Création de la transaction…</string>
+  <string name="legacy_send_swap_service_disabled">Le service de swap pour faire des paiements on-chain a été désactivé.\n\nVeuillez utiliser un service tiers.</string>
   <string name="legacy_send_swap_error">La transaction n\'a pas pu être créée. Veuillez réessayer.</string>
   <string name="legacy_send_swap_required_button">Préparer transaction</string>
   <string name="legacy_send_swap_complete_recap_amount">Montant</string>

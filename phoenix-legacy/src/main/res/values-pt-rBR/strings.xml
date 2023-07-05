@@ -119,8 +119,8 @@
   <string name="legacy_receive_share_button">Compartilhar…</string>
 
   <string name="legacy_receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de no mínimo <b>%1$s</b>.]]></string>
-  <string name="legacy_receive_paytoopen_disabled">A abertura de canais foi temporariamente desativada. Alguns pagamentos não poderão ser recebidos.</string>
-  <string name="legacy_receive_paytoopen_disabled_nochannels">A abertura de canais foi temporariamente desativada. Você não poderá receber pagamentos.</string>
+  <string name="legacy_receive_paytoopen_disabled">A abertura de canais foi desativada. Alguns pagamentos não poderão ser recebidos.</string>
+  <string name="legacy_receive_paytoopen_disabled_nochannels">A abertura de canais foi desativada. Você não poderá receber pagamentos.</string>
 
   <string name="legacy_receive_address_label">Endereço</string>
   <string name="legacy_receive_withdraw_button">Usar link LNURL</string>
@@ -140,7 +140,7 @@
   <string name="legacy_receive_swap_in_disabled"><![CDATA[
     <b>Serviço desabilitado</b>
     <br /><br />
-    O serviço de depósito via rede Bitcoin foi temporariamente desativado.
+    O serviço de depósito via rede Bitcoin foi desativado.
     <br /><br />
     Tente novamente mais tarde.
   ]]></string>
@@ -177,6 +177,7 @@
   <string name="legacy_send_error_sending">Ocorreu um erro interno ao tentar enviar este pagamento. Pagamento não realizado.</string>
   <string name="legacy_send_pay_button">Pagar</string>
   <string name="legacy_send_swap_in_progress">Preparando transação…</string>
+  <string name="legacy_send_swap_service_disabled">O serviço de swap para fazer pagamentos na cadeia foi desativado.\n\nUse um serviço de terceiros.</string>
   <string name="legacy_send_swap_error">A troca para rede Bitcoin falhou. Tente novamente.</string>
   <string name="legacy_send_swap_required_button">Preparar transação</string>
   <string name="legacy_send_swap_complete_recap_amount">Quantidade</string>

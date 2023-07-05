@@ -111,8 +111,8 @@
   <string name="legacy_receive_min_amount_pay_to_open">
     <![CDATA[Ihre Wallet ist leer. Die erste Zahlung, die Sie erhalten, muss mindestens <b>%1$s</b> betragen.]]>
   </string>
-  <string name="legacy_receive_paytoopen_disabled">Die Erstellung von Kanälen wurde vorübergehend deaktiviert. Möglicherweise können Sie einige Zahlungen nicht erhalten.</string>
-  <string name="legacy_receive_paytoopen_disabled_nochannels">Die Erstellung von Kanälen wurde vorübergehend deaktiviert. Sie werden keine Zahlungen erhalten können.</string>
+  <string name="legacy_receive_paytoopen_disabled">Die Erstellung von Kanälen wurde deaktiviert. Möglicherweise können Sie einige Zahlungen nicht erhalten.</string>
+  <string name="legacy_receive_paytoopen_disabled_nochannels">Die Erstellung von Kanälen wurde deaktiviert. Sie werden keine Zahlungen erhalten können.</string>
   <string name="legacy_receive_address_label">Adresse</string>
   <string name="legacy_receive_withdraw_button">Benutze LNURL Link</string>
 
@@ -136,7 +136,7 @@
     <![CDATA[
     <b>Dienst deaktiviert</b>
     <br /><br />
-    Der on-Chain Einzahlungs-Swap-Dienst wurde vorübergehend deaktiviert.
+    Der on-Chain Einzahlungs-Swap-Dienst wurde deaktiviert.
     <br /><br />
     Versuchen Sie es später erneut.
   ]]>
@@ -187,6 +187,7 @@
   <string name="legacy_send_error_sending">Beim Versuch, diese Zahlung zu senden, ist ein interner Fehler aufgetreten. Es wurde kein Geld gesendet.</string>
   <string name="legacy_send_pay_button">Bezahlen</string>
   <string name="legacy_send_swap_in_progress">Transaktion wird vorbereitet</string>
+  <string name="legacy_send_swap_service_disabled">Der Swap-Service für die Bezahlung von On-Chain-Adressen wurde deaktiviert.\n\nBitte verwenden Sie einen Dienst eines Drittanbieters.</string>
   <string name="legacy_send_swap_error">Swap in die Chain ist fehlgeschlagen. Bitte versuchen Sie es erneut.</string>
   <string name="legacy_send_swap_required_button">Transaktion vorbereiten</string>
   <string name="legacy_send_swap_complete_recap_amount">Betrag</string>

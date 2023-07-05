@@ -35,6 +35,7 @@ import fr.acinq.eclair.wire.SwapOutResponse
 import fr.acinq.phoenix.legacy.BaseFragment
 import fr.acinq.phoenix.legacy.NavGraphMainDirections
 import fr.acinq.phoenix.legacy.R
+import fr.acinq.phoenix.legacy.ServiceStatus
 import fr.acinq.phoenix.legacy.databinding.FragmentSendBinding
 import fr.acinq.phoenix.legacy.db.AppDb
 import fr.acinq.phoenix.legacy.paymentdetails.PaymentDetailsFragment
@@ -86,7 +87,7 @@ class SendFragment : BaseFragment() {
       mBinding.unit.setSelection(unitList.indexOf(unit.code()))
     }
 
-    model.state.observe(viewLifecycleOwner, { state ->
+    model.state.observe(viewLifecycleOwner) { state ->
       context?.let { ctx ->
         model.isAmountFieldPristine.value = true
         when {
@@ -123,9 +124,9 @@ class SendFragment : BaseFragment() {
           else -> Unit
         }
       }
-    })
+    }
 
-    model.amountError.observe(viewLifecycleOwner, { error ->
+    model.amountError.observe(viewLifecycleOwner) { error ->
       if (model.isAmountFieldPristine.value != true) {
         if (error != null) {
           mBinding.amountConverted.text = ""
@@ -149,9 +150,9 @@ class SendFragment : BaseFragment() {
           mBinding.amountError.visibility = View.GONE
         }
       }
-    })
+    }
 
-    app.networkInfo.observe(viewLifecycleOwner, {
+    app.networkInfo.observe(viewLifecycleOwner) {
       if (!it.lightningConnected) {
         mBinding.sendButton.setIsPaused(true)
         mBinding.sendButton.setText(getString(R.string.legacy_btn_pause_connecting))
@@ -162,9 +163,9 @@ class SendFragment : BaseFragment() {
         mBinding.sendButton.setIsPaused(false)
         mBinding.sendButton.setText(getString(R.string.legacy_send_pay_button))
       }
-    })
+    }
 
-    model.checkAndSetPaymentRequest(app.service, args.payload)
+    model.checkAndSetPaymentRequest(app.service, args.payload, swapOutSettings)
 
     mBinding.amount.addTextChangedListener(object : TextWatcher {
       override fun afterTextChanged(s: Editable?) {
@@ -237,6 +238,10 @@ class SendFragment : BaseFragment() {
       if (state is SendState.InvalidInvoice.AlreadyPaid) {
         findNavController().navigate(NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.OUTGOING, state.parentId.toString(), false))
       }
+    }
+
+    mBinding.swapoutServiceDisabledButton.setOnClickListener {
+      findNavController().popBackStack()
     }
   }
 

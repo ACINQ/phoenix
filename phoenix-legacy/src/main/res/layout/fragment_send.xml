@@ -177,6 +177,37 @@
       </androidx.constraintlayout.widget.ConstraintLayout>
 
       <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/swapout_service_disabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/space_lg"
+        android:background="@drawable/rounded"
+        android:padding="@dimen/space_lg"
+        android:visibility="@{model.state instanceof SendState.Onchain.SwapOutServiceDisabled}"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/balance_section"
+        app:layout_constraintWidth_max="@dimen/max_width_sm">
+
+        <TextView
+          android:id="@+id/swapout_service_disabled_message"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/legacy_send_swap_service_disabled"
+          app:layout_constraintTop_toTopOf="parent" />
+
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+          android:id="@+id/swapout_service_disabled_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/swapout_service_disabled_message"
+          app:text="@string/legacy_btn_ok" />
+      </androidx.constraintlayout.widget.ConstraintLayout>
+
+      <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/payment_section"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
