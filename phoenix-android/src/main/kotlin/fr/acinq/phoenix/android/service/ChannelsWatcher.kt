@@ -27,7 +27,7 @@ import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.data.WatchTowerOutcome
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import fr.acinq.phoenix.managers.NotificationsManager
 import kotlinx.coroutines.flow.filterNotNull
@@ -45,7 +45,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
         var notificationsManager: NotificationsManager? = null
         try {
 
-            val legacyAppStatus = PrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
+            val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
             if (legacyAppStatus !is LegacyAppStatus.NotRequired) {
                 log.info("abort channels-watcher service in state=${legacyAppStatus.name()}")
                 InternalData.saveChannelsWatcherOutcome(applicationContext, Outcome.Nominal(currentTimestampMillis()))

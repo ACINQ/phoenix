@@ -20,16 +20,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.NodeParams
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
@@ -39,18 +36,19 @@ import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigate
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun SettingsView() {
     val nc = navController
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val chain = business.chain
+
     DefaultScreenLayout {
         DefaultScreenHeader(title = stringResource(id = R.string.menu_settings), onBackClick = { nc.popBackStack() })
-        val scope = rememberCoroutineScope()
-        val context = LocalContext.current
-        val chain = business.chain
 
         // -- debug
         if (chain is NodeParams.Chain.Testnet) {
@@ -58,7 +56,7 @@ fun SettingsView() {
             Card {
                 Button(text = "Switch to Legacy app", icon = R.drawable.ic_user, onClick = {
                     scope.launch {
-                        PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
+                        LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
                     }
                 }, modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start)
             }
@@ -71,6 +69,7 @@ fun SettingsView() {
             SettingButton(text = R.string.settings_display_prefs, icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences) })
             SettingButton(text = R.string.settings_payment_settings, icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings)})
             SettingButton(text = R.string.settings_liquidity_policy, icon = R.drawable.ic_settings, onClick = { nc.navigate(Screen.LiquidityPolicy) })
+            SettingButton(text = R.string.settings_payment_history, icon = R.drawable.ic_list, onClick = { nc.navigate(Screen.PaymentsHistory)})
             SettingButton(text = R.string.settings_notifications, icon = R.drawable.ic_notification, onClick = { nc.navigate(Screen.Notifications)})
         }
 

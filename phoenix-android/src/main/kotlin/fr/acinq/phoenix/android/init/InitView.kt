@@ -38,7 +38,7 @@ import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.InitializationController
 import fr.acinq.phoenix.controllers.init.Initialization
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -127,7 +127,7 @@ internal class InitViewModel(controller: InitializationController) : MVIControll
                     val encrypted = EncryptedSeed.V2.NoAuth.encrypt(EncryptedSeed.fromMnemonics(mnemonics))
                     SeedManager.writeSeedToDisk(context, encrypted)
                     writingState = WritingSeedState.WrittenToDisk(encrypted)
-                    PrefsDatastore.saveStartLegacyApp(context, if (isNewWallet) LegacyAppStatus.NotRequired else LegacyAppStatus.Unknown)
+                    LegacyPrefsDatastore.saveStartLegacyApp(context, if (isNewWallet) LegacyAppStatus.NotRequired else LegacyAppStatus.Unknown)
                     log.info("mnemonics has been written to disk")
                 } else {
                     log.warn("cannot overwrite existing seed=${existing.name()}")

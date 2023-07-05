@@ -69,7 +69,7 @@ class LegacyChannelsWatcher(context: Context, workerParams: WorkerParameters) : 
   override suspend fun doWork(): Result {
     log.info("channels watcher has started")
     try {
-      val legacyAppStatus = PrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
+      val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
       if (legacyAppStatus !is LegacyAppStatus.Required) {
         log.info("abort legacy channels-watcher service in state=${legacyAppStatus.name()}")
         Prefs.saveWatcherAttemptOutcome(applicationContext, WatchListener.`Ok$`.`MODULE$`)

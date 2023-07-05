@@ -55,19 +55,19 @@ class MainActivity : AppCompatActivity() {
 
         // reset required status to expected if needed
         lifecycleScope.launch {
-            if (PrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first() is LegacyAppStatus.Required) {
-                PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
+            if (LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first() is LegacyAppStatus.Required) {
+                LegacyPrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
             }
         }
 
         // migrate legacy data if needed
         lifecycleScope.launch {
-            val doDataMigration = PrefsDatastore.getDataMigrationExpected(applicationContext).filterNotNull().first()
+            val doDataMigration = LegacyPrefsDatastore.getDataMigrationExpected(applicationContext).filterNotNull().first()
             if (doDataMigration) {
                 LegacyMigrationHelper.migrateLegacyPreferences(applicationContext)
                 LegacyMigrationHelper.migrateLegacyPayments(applicationContext)
                 delay(5_000)
-                PrefsDatastore.saveDataMigrationExpected(applicationContext, false)
+                LegacyPrefsDatastore.saveDataMigrationExpected(applicationContext, false)
             }
         }
 
@@ -78,11 +78,11 @@ class MainActivity : AppCompatActivity() {
                 if (it is PhoenixAndroidLegacyInfoEvent) {
                     if (it.info.hasChannels) {
                         log.info("legacy channels have been found")
-                        PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
+                        LegacyPrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
                     } else {
                         log.info("no legacy channels were found")
-                        PrefsDatastore.saveDataMigrationExpected(applicationContext, false)
-                        PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.NotRequired)
+                        LegacyPrefsDatastore.saveDataMigrationExpected(applicationContext, false)
+                        LegacyPrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.NotRequired)
                     }
                 }
             }

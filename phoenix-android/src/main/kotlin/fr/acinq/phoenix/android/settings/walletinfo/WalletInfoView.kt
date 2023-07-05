@@ -45,7 +45,7 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.mutedTextColor
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.finalOnChainWalletPath
 
 @Composable
@@ -71,7 +71,7 @@ private fun OffChainWalletView(onLightningWalletClick: () -> Unit) {
     Card {
         LightningNodeIdView(nodeId = nodeParams?.nodeId?.toString(), onLightningWalletClick)
 
-        val isDataMigrationExpected by PrefsDatastore.getDataMigrationExpected(context).collectAsState(initial = null)
+        val isDataMigrationExpected by LegacyPrefsDatastore.getDataMigrationExpected(context).collectAsState(initial = null)
         if (isDataMigrationExpected != null) {
             val keyManager by business.walletManager.keyManager.collectAsState()
             keyManager?.let {

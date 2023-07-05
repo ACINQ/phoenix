@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
@@ -66,41 +67,51 @@ fun NotificationsView(
     val log = logger("NotificationsView")
     val notificationsManager = business.notificationsManager
     // TODO: filter rejected payments where the fee policy was X, but the fee policy is now Y
+    val notices = noticesViewModel.notices.values.toList().sortedBy { it.priority }
     val notifications by notificationsManager.notifications.collectAsState(emptyList())
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.inappnotif_title))
-        LazyColumn {
-            // -- notices
-            val notices = noticesViewModel.notices.values.toList()
-            if (notices.isNotEmpty()) {
-                item {
-                    CardHeader(text = stringResource(id = R.string.inappnotif_notices_title))
+        if (notices.isEmpty() && notifications.isEmpty()) {
+            Spacer(modifier = Modifier.height(12.dp))
+            TextWithIcon(
+                text = stringResource(id = R.string.inappnotif_empty),
+                textStyle = MaterialTheme.typography.caption,
+                icon = R.drawable.ic_sleep,
+                iconTint = MaterialTheme.typography.caption.color,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        } else {
+            LazyColumn {
+                // -- notices
+                if (notices.isNotEmpty()) {
+                    item {
+                        CardHeader(text = stringResource(id = R.string.inappnotif_notices_title))
+                    }
                 }
-            }
-            items(notices) {
-                PermamentNotice(it)
-            }
+                items(notices) {
+                    PermamentNotice(it)
+                }
 
-            // -- some vertical space if needed
-            if (notices.isNotEmpty() && notifications.isNotEmpty()) {
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
+                // -- some vertical space if needed
+                if (notices.isNotEmpty() && notifications.isNotEmpty()) {
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
-            }
 
-            // -- payments notifications
-            if (notifications.isNotEmpty()) {
-                item {
-                    CardHeader(text = stringResource(id = R.string.inappnotif_payments_title))
+                // -- payments notifications
+                if (notifications.isNotEmpty()) {
+                    item {
+                        CardHeader(text = stringResource(id = R.string.inappnotif_payments_title))
+                    }
                 }
-            }
-            items(notifications) {
-                val relatedNotifications = it.first
-                PaymentNotification(it.second, onNotificationRead = { notificationsManager.dismissNotifications(relatedNotifications) })
+                items(notifications) {
+                    val relatedNotifications = it.first
+                    PaymentNotification(it.second, onNotificationRead = { notificationsManager.dismissNotifications(relatedNotifications) })
+                }
             }
         }
-
     }
 }
 
@@ -111,7 +122,22 @@ private fun PermamentNotice(
 ) {
     val context = LocalContext.current
     val nc = LocalNavController.current
+    val scope = rememberCoroutineScope()
+
     when (notice) {
+        Notice.MigrationFromLegacy -> {
+            ImportantNotification(
+                icon = R.drawable.ic_party_popper,
+                message = stringResource(id = R.string.inappnotif_migration_from_legacy),
+                actionText = stringResource(id = R.string.inappnotif_migration_from_legacy_action),
+                onActionClick = {
+                    openLink(context, "https://acinq.co/blog/phoenix-splicing-update")
+                    scope.launch {
+                        InternalData.saveLegacyMigrationMessageShown(context, true)
+                    }
+                }
+            )
+        }
         Notice.BackupSeedReminder -> {
             ImportantNotification(
                 icon = R.drawable.ic_key,
@@ -273,7 +299,7 @@ private fun ImportantNotification(
         Row(modifier = Modifier.padding(top = 12.dp, start = 16.dp, end = 16.dp)) {
             PhoenixIcon(resourceId = icon, tint = MaterialTheme.colors.primary, modifier = Modifier
                 .size(18.dp)
-                .offset(y = 1.dp))
+                .offset(y = 2.dp))
             Spacer(modifier = Modifier.width(10.dp))
             Column(modifier = Modifier.alignByBaseline()) {
                 Text(text = message, style = MaterialTheme.typography.body1.copy(fontSize = 16.sp))
@@ -327,7 +353,9 @@ private fun DimissibleNotification(
                 bottomText?.let {
                     Text(text = it, style = MaterialTheme.typography.caption.copy(fontSize = 14.sp), modifier = Modifier.alignByBaseline())
                 }
-                Spacer(modifier = Modifier.weight(1f).widthIn(min = 8.dp))
+                Spacer(modifier = Modifier
+                    .weight(1f)
+                    .widthIn(min = 8.dp))
                 Text(
                     text = timestamp.toRelativeDateString(),
                     style = MaterialTheme.typography.caption.copy(fontSize = 12.sp),

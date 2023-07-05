@@ -18,7 +18,6 @@ package fr.acinq.phoenix.android.home
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,26 +27,19 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.MotionLayout
 import androidx.constraintlayout.compose.MotionScene
 import androidx.constraintlayout.compose.layoutId
 import fr.acinq.phoenix.android.*
-import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.PrimarySeparator
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
-import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.findActivity
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.WalletPaymentId
-import fr.acinq.phoenix.legacy.utils.MigrationResult
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -81,10 +73,6 @@ fun HomeView(
     val payments by paymentsViewModel.latestPaymentsFlow.collectAsState()
     val swapInBalance = business.balanceManager.swapInWalletBalance.collectAsState()
     val pendingChannelsBalance = business.balanceManager.pendingChannelsBalance.collectAsState()
-
-    // controls for the migration dialog
-    val migrationResult = PrefsDatastore.getMigrationResult(context).collectAsState(initial = null).value
-    val migrationResultShown = InternalData.getMigrationResultShown(context).collectAsState(initial = null).value
 
     BackHandler {
         // force the back button to minimize the app
@@ -231,23 +219,5 @@ fun HomeView(
             )
             BottomBar(Modifier, onSettingsClick, onReceiveClick, onSendClick)
         }
-    }
-
-    if (migrationResultShown == false && migrationResult != null) {
-        MigrationResultDialog(migrationResult) {
-            scope.launch { InternalData.saveMigrationResultShown(context, true) }
-        }
-    }
-}
-
-
-
-@Composable
-private fun MigrationResultDialog(
-    migrationResult: MigrationResult,
-    onClose: () -> Unit
-) {
-    Dialog(title = stringResource(id = R.string.migration_dialog_title), onDismiss = onClose) {
-        Text(text = stringResource(id = R.string.migration_dialog_message), Modifier.padding(horizontal = 24.dp))
     }
 }

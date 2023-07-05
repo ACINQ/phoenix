@@ -119,8 +119,8 @@
   <string name="legacy_receive_share_button">Share…</string>
 
   <string name="legacy_receive_min_amount_pay_to_open"><![CDATA[Your wallet is empty. First payment you receive must be at least <b>%1$s</b>.]]></string>
-  <string name="legacy_receive_paytoopen_disabled">Channel creation has been temporarily disabled. You may not be able to receive some payments.</string>
-  <string name="legacy_receive_paytoopen_disabled_nochannels">Channel creation has been temporarily disabled. You will not be able to receive any payments.</string>
+  <string name="legacy_receive_paytoopen_disabled">Channel creation has been disabled. You may not be able to receive some payments.</string>
+  <string name="legacy_receive_paytoopen_disabled_nochannels">Channel creation has been disabled. You will not be able to receive any payments.</string>
   <string name="legacy_receive_address_label">Address</string>
   <string name="legacy_receive_withdraw_button">Use LNURL link</string>
 
@@ -139,7 +139,7 @@
   <string name="legacy_receive_swap_in_disabled"><![CDATA[
     <b>Service disabled</b>
     <br /><br />
-    The on-chain deposit swap service has been temporarily disabled.
+    The on-chain deposit swap service has been disabled.
     <br /><br />
     Try again later.
   ]]></string>
@@ -184,6 +184,7 @@
   ]]></string>
   <string name="legacy_send_error_sending">There was an internal error when trying to send this payment. No money was sent.</string>
   <string name="legacy_send_pay_button">Pay</string>
+  <string name="legacy_send_swap_service_disabled">The swap service for paying on-chain addresses has been disabled.\n\nPlease use a third-party service.</string>
   <string name="legacy_send_swap_in_progress">Preparing transaction</string>
   <string name="legacy_send_swap_error">Swap to chain has failed. Please try again.</string>
   <string name="legacy_send_swap_required_button">Prepare transaction</string>
@@ -791,9 +792,7 @@ legacy_
   <!-- //////////////// Migration to KMP //////////////// -->
 
   <string name="legacy_migration_title">Phoenix upgrade</string>
-  <string name="legacy_migration_init_message">Checking your channels, please hold…</string>
-  <string name="legacy_migration_ready_message">Upgrade to the latest version of Phoenix, with a cutting-edge Lightning engine and new features.\n\nYour channels will be merged together and you will keep your inbound liquidity.\n\nThe migration process is automated.</string>
-  <string name="legacy_migration_more_info_button">Learn more…</string>
+  <string name="legacy_migration_ready_message">Upgrade to the latest version of Phoenix, with a cutting-edge Lightning engine and new features.\n\nYour channels will be merged together. This process is automated.</string>
   <string name="legacy_migration_prepare_button">Upgrade</string>
   <string name="legacy_migration_prepare_button_disconnected">Connecting…</string>
   <string name="legacy_migration_dismiss_button">Not now</string>
@@ -802,6 +801,11 @@ legacy_
   <string name="legacy_migration_paused_opening">You cannot upgrade now: some channels are currently being opened.\n\nTry again later when these channels have been opened and are active.</string>
   <string name="legacy_migration_paused_force_close">You cannot upgrade now: some channels are being force-closed.\n\nTry again later when these channel have been completely closed. Note that force-close can take several days to complete.</string>
   <string name="legacy_migration_paused_disconnected">You cannot upgrade now because you are disconnected from Lightning and/or Electrum.\n\nTry again later when connection has been established.</string>
+
+  <string name="legacy_migration_confirm_title">Confirm migration</string>
+  <string name="legacy_migration_confirm_dust">%1$d of %2$d channels are holding less than the Bitcoin dust limit (546 sat). Their balance will go to the Bitcoin miners.</string>
+  <string name="legacy_migration_confirm_proceed">Proceed</string>
+  <string name="legacy_migration_confirm_cancel">Cancel</string>
 
   <string name="legacy_migration_processing_title">Processing migration…</string>
   <string name="legacy_migration_processing_disconnected">Connection lost.\nKeep the app in the foreground.</string>
@@ -816,6 +820,6 @@ legacy_
   <string name="legacy_migration_failure_title">Upgrade has failed</string>
   <string name="legacy_migration_failure_generic">Some or all channels may not have been migrated.\n\nThe upgrade process must be started again.</string>
   <string name="legacy_migration_failure_swapin_address_error">Phoenix could not generate a valid address for the migration.\n\nThe upgrade process must be started again.</string>
-  <string name="legacy_migration_failure_closing_error">Some channels could not be migrated.\n\nThe upgrade process must be started again to migrate the remaining channels.</string>
+  <string name="legacy_migration_failure_closing_error">Some channels could not be closed.\n\nThe upgrade process must be started again to migrate those.</string>
 
 </resources>

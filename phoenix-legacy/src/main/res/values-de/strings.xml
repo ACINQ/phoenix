@@ -111,8 +111,8 @@
   <string name="legacy_receive_min_amount_pay_to_open">
     <![CDATA[Ihre Wallet ist leer. Die erste Zahlung, die Sie erhalten, muss mindestens <b>%1$s</b> betragen.]]>
   </string>
-  <string name="legacy_receive_paytoopen_disabled">Die Erstellung von Kanälen wurde vorübergehend deaktiviert. Möglicherweise können Sie einige Zahlungen nicht erhalten.</string>
-  <string name="legacy_receive_paytoopen_disabled_nochannels">Die Erstellung von Kanälen wurde vorübergehend deaktiviert. Sie werden keine Zahlungen erhalten können.</string>
+  <string name="legacy_receive_paytoopen_disabled">Die Erstellung von Kanälen wurde deaktiviert. Möglicherweise können Sie einige Zahlungen nicht erhalten.</string>
+  <string name="legacy_receive_paytoopen_disabled_nochannels">Die Erstellung von Kanälen wurde deaktiviert. Sie werden keine Zahlungen erhalten können.</string>
   <string name="legacy_receive_address_label">Adresse</string>
   <string name="legacy_receive_withdraw_button">Benutze LNURL Link</string>
 
@@ -136,7 +136,7 @@
     <![CDATA[
     <b>Dienst deaktiviert</b>
     <br /><br />
-    Der on-Chain Einzahlungs-Swap-Dienst wurde vorübergehend deaktiviert.
+    Der on-Chain Einzahlungs-Swap-Dienst wurde deaktiviert.
     <br /><br />
     Versuchen Sie es später erneut.
   ]]>
@@ -187,6 +187,7 @@
   <string name="legacy_send_error_sending">Beim Versuch, diese Zahlung zu senden, ist ein interner Fehler aufgetreten. Es wurde kein Geld gesendet.</string>
   <string name="legacy_send_pay_button">Bezahlen</string>
   <string name="legacy_send_swap_in_progress">Transaktion wird vorbereitet</string>
+  <string name="legacy_send_swap_service_disabled">Der Swap-Service für die Bezahlung von On-Chain-Adressen wurde deaktiviert.\n\nBitte verwenden Sie einen Dienst eines Drittanbieters.</string>
   <string name="legacy_send_swap_error">Swap in die Chain ist fehlgeschlagen. Bitte versuchen Sie es erneut.</string>
   <string name="legacy_send_swap_required_button">Transaktion vorbereiten</string>
   <string name="legacy_send_swap_complete_recap_amount">Betrag</string>
@@ -813,5 +814,38 @@
   <string name="legacy_paymentmode_onchain_desc">On-Chain Transaktionen sind in der Regel langsamer und teurer</string>
   <string name="legacy_paymentmode_lightning">Bezahle mit Lightning</string>
   <string name="legacy_paymentmode_lightning_desc">Dies ist die empfohlene Option</string>
+
+  <!-- //////////////// Migration to KMP //////////////// -->
+
+  <string name="legacy_migration_title">Phoenix Upgrade</string>
+  <string name="legacy_migration_ready_message">Upgrade auf die neueste Version von Phoenix, mit einer hochmodernen Lightning-Engine und neuen Funktionen.\n\nIhre Kanäle werden zusammengeführt. Dieser Prozess ist automatisiert.</string>
+  <string name="legacy_migration_prepare_button">Upgrade</string>
+  <string name="legacy_migration_prepare_button_disconnected">Verbindung herstellen…</string>
+  <string name="legacy_migration_dismiss_button">Nicht jetzt</string>
+
+  <string name="legacy_migration_paused_swap_in">Sie können jetzt nicht upgraden: eine On-Chain-Hinterlegung steht noch aus.\n\nVersuchen Sie es später noch einmal, wenn diese Hinterlegung bestätigt wurde.</string>
+  <string name="legacy_migration_paused_opening">Sie können jetzt nicht upgraden: Einige Kanäle werden gerade geöffnet.\n\nVersuchen Sie es später erneut, wenn diese Kanäle geöffnet und aktiv sind.</string>
+  <string name="legacy_migration_paused_force_close">Sie können jetzt nicht aktualisieren: Einige Channels werden zwangsweise geschlossen.\n\nVersuchen Sie es später erneut, wenn diese Channels vollständig geschlossen wurden. Beachten Sie, dass es mehrere Tage dauern kann, bis die Schließung abgeschlossen ist.</string>
+  <string name="legacy_migration_paused_disconnected">Sie können jetzt nicht upgraden, weil die Verbindung zu Lightning und/oder Electrum unterbrochen wurde.\n\nVersuchen Sie es später erneut, wenn die Verbindung wieder hergestellt ist.</string>
+
+  <string name="legacy_migration_confirm_title">Bestätigen Sie die Migration</string>
+  <string name="legacy_migration_confirm_dust">%1$d von %2$d Channels halten weniger als das Bitcoin Dust Limit (546 sat). Ihr Guthaben geht an die Bitcoin Netzwerk Miners.</string>
+  <string name="legacy_migration_confirm_proceed">Fortfahren</string>
+  <string name="legacy_migration_confirm_cancel">Abbrechen</string>
+
+  <string name="legacy_migration_processing_title">Bearbeitung der Migration…</string>
+  <string name="legacy_migration_processing_disconnected">Verbindung unterbrochen.\nBitte lassen Sie die Anwendung im Vordergrund.</string>
+  <string name="legacy_migration_swap_address">Migrationsadresse erhalten</string>
+  <string name="legacy_migration_listing_channels">Kanäle überprüfen</string>
+  <string name="legacy_migration_closing_channels">Kanäle schließen (%1$d/%2$d)</string>
+  <string name="legacy_migration_monitoring_channels_publish">Veröffentlichen von Transaktionen (%1$s/%2$d)</string>
+
+  <string name="legacy_migration_complete_title">Migration abgeschlossen</string>
+  <string name="legacy_migration_complete_details">Umschaltung auf die neue Anwendung…</string>
+
+  <string name="legacy_migration_failure_title">Upgrade ist fehlgeschlagen</string>
+  <string name="legacy_migration_failure_generic">Einige oder alle Kanäle wurden möglicherweise nicht migriert.\n\nDer Upgrade-Prozess muss erneut gestartet werden.</string>
+  <string name="legacy_migration_failure_swapin_address_error">Phoenix konnte keine gültige Adresse für die Migration generieren.\n\nDer Upgrade-Prozess muss neu gestartet werden.</string>
+  <string name="legacy_migration_failure_closing_error">Einige Kanäle konnten nicht geschlossen werden.\n\nDer Upgrade-Prozess muss erneut gestartet werden, um diese zu migrieren.</string>
 
 </resources>

@@ -27,7 +27,7 @@ import fr.acinq.phoenix.legacy.R
 import fr.acinq.phoenix.legacy.background.KitState
 import fr.acinq.phoenix.legacy.databinding.FragmentSettingsBinding
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -74,7 +74,7 @@ class SettingsFragment : BaseFragment(stayIfNotStarted = true) {
     mBinding.paymentSettingsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_payment_settings) }
     mBinding.switchModernButton.setOnClickListener {
       lifecycleScope.launch {
-        PrefsDatastore.saveStartLegacyApp(requireContext(), LegacyAppStatus.NotRequired)
+        LegacyPrefsDatastore.saveStartLegacyApp(requireContext(), LegacyAppStatus.NotRequired)
       }
     }
   }

@@ -223,6 +223,7 @@
     <string name="settings_tor">Tor</string>
     <string name="settings_about">About</string>
     <string name="settings_payment_settings">Payment options</string>
+    <string name="settings_payment_history">Payment history</string>
     <string name="settings_notifications">Notifications</string>
 
     <!-- mutual close -->
@@ -296,6 +297,7 @@
     <string name="inappnotif_title">Notifications</string>
     <string name="inappnotif_notices_title">Important messages</string>
     <string name="inappnotif_payments_title">Recent activity</string>
+    <string name="inappnotif_empty">No notifications yet</string>
 
     <!-- settings: display seed -->
 

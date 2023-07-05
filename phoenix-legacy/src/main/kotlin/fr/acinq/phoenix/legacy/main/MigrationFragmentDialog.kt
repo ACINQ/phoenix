@@ -25,9 +25,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import fr.acinq.bitcoin.scala.ByteVector32
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.channel.*
 import fr.acinq.phoenix.legacy.AppViewModel
 import fr.acinq.phoenix.legacy.R
@@ -35,18 +35,13 @@ import fr.acinq.phoenix.legacy.background.EclairNodeService
 import fr.acinq.phoenix.legacy.background.KitState.Bootstrap.Init.getKmpSwapInAddress
 import fr.acinq.phoenix.legacy.databinding.FragmentMigrationBinding
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
-import fr.acinq.phoenix.legacy.utils.MigrationResult
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.bouncycastle.util.encoders.Hex
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters
-import scala.util.Either
-import scala.util.Left
-import scodec.bits.ByteVector
 
 class MigrationFragmentDialog : DialogFragment() {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -78,10 +73,12 @@ class MigrationFragmentDialog : DialogFragment() {
       model.hasPendingSwapIn.value = it.isNotEmpty()
     }
 
-    model.state.observe(viewLifecycleOwner) {
-      val migrationState = model.state.value
+    model.state.observe(viewLifecycleOwner) { migrationState ->
       val context = requireContext()
       when (migrationState) {
+        is MigrationScreenState.ConfirmMigration -> {
+          mBinding.confirmDetails.text = context.getString(R.string.legacy_migration_confirm_dust, migrationState.dustChannels.size, migrationState.allChannels.size)
+        }
         is MigrationScreenState.Processing.RequestingKmpSwapInAddress -> {
           mBinding.processingDetails.text = context.getString(R.string.legacy_migration_swap_address)
         }
@@ -96,7 +93,7 @@ class MigrationFragmentDialog : DialogFragment() {
         }
         else -> {}
       }
-      log.info("(migration) state=$it")
+      log.info("(migration) state=$migrationState")
     }
 
     mBinding.model = model
@@ -107,13 +104,23 @@ class MigrationFragmentDialog : DialogFragment() {
     mBinding.pausedButton.setOnClickListener { dismiss() }
     mBinding.failureDismissButton.setOnClickListener { dismiss() }
     mBinding.dismissButton.setOnClickListener { dismiss() }
+    mBinding.cancelConfirmButton.setOnClickListener { dismiss() }
     mBinding.upgradeButton.setOnClickListener {
       if (model.isConnected.value == true) {
         model.startMigration(
           context = requireContext(),
           service = app.requireService,
-          legacyNodeId = app.state.value?.getNodeId()?.toString()!!,
-          kmpNodeId = app.state.value?.getKmpNodeId()?.toString()!!,
+          ignoreDust = false
+        )
+      }
+    }
+    mBinding.confirmButton.setOnClickListener {
+      if (model.isConnected.value == true) {
+        model.state.value = MigrationScreenState.Ready
+        model.startMigration(
+          context = requireContext(),
+          service = app.requireService,
+          ignoreDust = true
         )
       }
     }
@@ -122,6 +129,8 @@ class MigrationFragmentDialog : DialogFragment() {
 
 sealed class MigrationScreenState {
   object Ready : MigrationScreenState()
+
+  data class ConfirmMigration(val allChannels: Map<ByteVector32, MilliSatoshi>, val dustChannels: Map<ByteVector32, MilliSatoshi>): MigrationScreenState()
 
   sealed class Processing : MigrationScreenState() {
     object RequestingKmpSwapInAddress: Processing()
@@ -158,8 +167,7 @@ class MigrationDialogViewModel : ViewModel() {
   fun startMigration(
     context: Context,
     service: EclairNodeService,
-    legacyNodeId: String,
-    kmpNodeId: String,
+    ignoreDust: Boolean,
   ) {
     val migrationState = state.value
     if (migrationState !is MigrationScreenState.Ready) {
@@ -174,23 +182,20 @@ class MigrationDialogViewModel : ViewModel() {
         }
       }) {
 
-        if (hasPendingSwapIn.value == true) {
-          state.value = MigrationScreenState.Paused.PendingSwapIn
-          return@launch
-        }
-
         // compute the multi-sig swap-in address used by the new application
         val swapInAddress = service.state.value?.kit()?.getKmpSwapInAddress()
         if (swapInAddress == null) {
           state.value = MigrationScreenState.Failure.CannotGetSwapInAddress
         } else {
           state.value = MigrationScreenState.Processing.ListingChannelsToClose(swapInAddress)
-          delay(500)
-          log.info("(migration) closing channels to $swapInAddress")
+          delay(1_200)
 
           // list all the channels and check their state
           val allChannels = service.getChannels().toList()
-          if (hasChannelsBeingCreated(allChannels)) {
+          if (hasPendingSwapIn.value == true) {
+            state.value = MigrationScreenState.Paused.PendingSwapIn
+            return@launch
+          } else if (hasChannelsBeingCreated(allChannels)) {
             state.value = MigrationScreenState.Paused.ChannelsBeingCreated
             return@launch
           } else if (hasChannelsInForceClose(allChannels)) {
@@ -202,14 +207,26 @@ class MigrationDialogViewModel : ViewModel() {
           val channels = allChannels.filter {
             it.state() is `NORMAL$`
           }.map {
-            it.channelId()
-          }.toSet()
+            it.channelId() to (it.data() as DATA_NORMAL).commitments().availableBalanceForSend()
+          }.toMap()
 
-          state.value = MigrationScreenState.Processing.ClosingChannels(swapInAddress, channels, emptySet())
+          // checking dust
+          val dustChannels = channelsBelowDust(channels)
+          if (!ignoreDust) {
+            if (dustChannels.isNotEmpty()) {
+              state.value = MigrationScreenState.ConfirmMigration(channels, dustChannels)
+              return@launch
+            }
+          } else {
+            log.info("(migration) ${dustChannels.size}/${channels.size} dust channels are ignored by user.")
+          }
+
+          log.info("(migration) closing channels to $swapInAddress")
+          state.value = MigrationScreenState.Processing.ClosingChannels(swapInAddress, channels.keys, emptySet())
 
           // loop closing the channels one by one to prevent herd effect
-          val channelsClosingStatusMap = channels.associateWith { false }.toMutableMap()
-          channels.forEachIndexed { index, channelId ->
+          val channelsClosingStatusMap = channels.keys.associateWith { false }.toMutableMap()
+          channels.keys.forEachIndexed { index, channelId ->
             val res = service.migrateChannels(swapInAddress, listOf(channelId))
              val successfullyMigrated = res.filter { (_, result) -> result.isRight }
             val failedToMigrate = res.filter { (_, result) -> result.isLeft }
@@ -220,7 +237,7 @@ class MigrationDialogViewModel : ViewModel() {
               log.info("(migration) successfully closed channel=$channelId")
               successfullyMigrated.forEach {
                 channelsClosingStatusMap[it.key.left().get()] = true
-                state.value = MigrationScreenState.Processing.ClosingChannels(swapInAddress, channels, channelsClosingStatusMap.filter { it.value }.keys)
+                state.value = MigrationScreenState.Processing.ClosingChannels(swapInAddress, channels.keys, channelsClosingStatusMap.filter { it.value }.keys)
               }
             }
             delay(200)
@@ -273,16 +290,10 @@ class MigrationDialogViewModel : ViewModel() {
 
           // pause then update preferences to switch to the new app
           delay(3_000)
-          PrefsDatastore.saveDataMigrationExpected(context, true)
-          PrefsDatastore.saveMigrationResult(
-            context, MigrationResult(
-              legacyNodeId = legacyNodeId,
-              newNodeId = kmpNodeId,
-              address = swapInAddress
-            )
-          )
-          PrefsDatastore.saveMigrationTrustedSwapInTxs(context, mutualClosePublishedTxs)
-          PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.NotRequired)
+          LegacyPrefsDatastore.saveDataMigrationExpected(context, true)
+          LegacyPrefsDatastore.saveHasMigratedFromLegacy(context, true)
+          LegacyPrefsDatastore.saveMigrationTrustedSwapInTxs(context, mutualClosePublishedTxs)
+          LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.NotRequired)
         }
       }
     }
@@ -315,5 +326,17 @@ class MigrationDialogViewModel : ViewModel() {
         else -> false
       }
     }
+  }
+
+  private fun channelsBelowDust(channels: Map<ByteVector32, MilliSatoshi>): Map<ByteVector32, MilliSatoshi> {
+    val dustChannels = channels.mapNotNull { (channelId, balance) ->
+      if (balance > MilliSatoshi(999) && balance < MilliSatoshi(547_000)) {
+        channelId to balance
+      } else {
+        null
+      }
+    }.toMap()
+    log.info("(migration) found ${dustChannels.size} dust channels=$dustChannels")
+    return dustChannels
   }
 }

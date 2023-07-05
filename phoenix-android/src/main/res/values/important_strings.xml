@@ -109,6 +109,9 @@
 
     <!-- in-app notifications -->
 
+    <string name="inappnotif_migration_from_legacy">Congratulations! Your wallet has been updated.</string>
+    <string name="inappnotif_migration_from_legacy_action">See what\'s changed</string>
+
     <string name="inappnotif_backup_seed_message">Backup your wallet to prevent losing your bitcoins.</string>
     <string name="inappnotif_backup_seed_action">Backup my wallet</string>
 

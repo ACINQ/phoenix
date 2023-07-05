@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.payments
+package fr.acinq.phoenix.android.payments.history
 
 import android.text.format.DateUtils
 import androidx.compose.foundation.layout.*
@@ -30,8 +30,6 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.payments.history.CsvExportState
-import fr.acinq.phoenix.android.payments.history.CsvExportViewModel
 import fr.acinq.phoenix.android.utils.Converter.toBasicAbsoluteDateString
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.positiveColor

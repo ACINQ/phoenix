@@ -118,6 +118,7 @@
   <string name="legacy_send_error_sending">Nastala chyba při odesílání platby. Žádné peníze nebyly odeslány.</string>
   <string name="legacy_send_pay_button">Zaplatit</string>
   <string name="legacy_send_swap_in_progress">Probíhá směna…</string>
+  <string name="legacy_send_swap_service_disabled">Služba swap pro placení adres on-chain byla vypnuta.\n\nProsím, použijte službu třetí strany.</string>
   <string name="legacy_send_swap_error">Směna selhala. Prosím, zkuste to znovu.</string>
   <string name="legacy_send_swap_required_button">Vyžádat směnu</string>
   <string name="legacy_send_swap_complete_recap_amount">Množství</string>
@@ -415,5 +416,34 @@
   <string name="legacy_conndialog_lightning">Lightning Peer</string>
   <string name="legacy_conndialog_ok">Připojen</string>
   <string name="legacy_conndialog_not_ok">Připojuji…</string>
+
+  <!-- //////////////// Migration to KMP //////////////// -->
+
+  <string name="legacy_migration_title">Phoenix upgrade</string>
+  <string name="legacy_migration_ready_message">Upgrade na nejnovější verzi Phoenixu se špičkovým Lightning enginem a novými funkcemi.\n\nVaše kanály budou sloučeny dohromady. Tento proces je automatizovaný.</string>
+  <string name="legacy_migration_prepare_button">Upgrade</string>
+  <string name="legacy_migration_prepare_button_disconnected">Připojení…</string>
+  <string name="legacy_migration_dismiss_button">Teď ne</string>
+
+  <string name="legacy_migration_paused_swap_in">Nemůžete nyní upgradovat: čeká se na vklad na řetězec.\n\nZkuste to později, až bude tento vklad potvrzen.</string>
+  <string name="legacy_migration_paused_opening">Nemůžete nyní upgradovat: některé kanály jsou právě otevřeny.\n\nZkuste to znovu později, až budou tyto kanály otevřeny a aktivní.</string>
+  <string name="legacy_migration_paused_force_close">Nemůžete nyní upgradovat: některé kanály jsou násilně uzavřeny.\n\nZkuste to znovu později, až budou tyto kanály zcela uzavřeny. Všimněte si, že nucené uzavření může trvat několik dní.</string>
+  <string name="legacy_migration_paused_disconnected">Nemůžete nyní upgradovat, protože jste odpojeni od Lightningu a/nebo Electrumu.\n\nZkuste to znovu později, až bude spojení navázáno.</string>
+
+  <string name="legacy_migration_confirm_title">Potvrzení migrace</string>
+  <string name="legacy_migration_confirm_dust">%1$d z %2$d kanálů drží méně než je limit prachu bitcoinů (546 sat). Jejich zůstatek připadne těžařům bitcoinů.</string>
+  <string name="legacy_migration_confirm_proceed">Proceed</string>
+  <string name="legacy_migration_confirm_cancel">Zrušit</string>
+
+  <string name="legacy_migration_processing_title">Zpracování migrace…</string>
+  <string name="legacy_migration_processing_disconnected">Ztráta spojení.\nZachovat aplikaci v popředí.</string>
+
+  <string name="legacy_migration_complete_title">Migrace dokončena</string>
+  <string name="legacy_migration_complete_details">Přepnutí na novou aplikaci…</string>
+
+  <string name="legacy_migration_failure_title">Upgrade selhal</string>
+  <string name="legacy_migration_failure_generic">Některé nebo všechny kanály nemusely být migrovány.\n\nProces upgradu musí být zahájen znovu.</string>
+  <string name="legacy_migration_failure_swapin_address_error">Phoenix nemohl vygenerovat platnou adresu pro migraci.\n\nProces aktualizace musí být spuštěn znovu.</string>
+  <string name="legacy_migration_failure_closing_error">Některé kanály se nepodařilo uzavřít.\n\nPro jejich migraci je nutné proces upgradu spustit znovu.</string>
 
 </resources>
