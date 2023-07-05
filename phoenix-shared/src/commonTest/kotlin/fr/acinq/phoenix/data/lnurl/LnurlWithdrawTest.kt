@@ -4,10 +4,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.msat
 import io.ktor.http.*
 import kotlinx.serialization.json.*
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class LnurlWithdrawTest {
     val format = Json { ignoreUnknownKeys = true }
@@ -68,5 +65,11 @@ class LnurlWithdrawTest {
             val json = makeJson(callback = null)
             Lnurl.parseLnurlJson(defaultLnurl, json)
         }
+    }
+
+    @Test
+    fun test_unknown_tag_lnurl() {
+        val lnurl = Lnurl.extractLnurl("${defaultLnurl}?tag=withdraw")
+        assertIs<Lnurl.Request>(lnurl)
     }
 }
