@@ -751,4 +751,32 @@
   <string name="legacy_paymentmode_lightning">Pagar usando a rede Relâmpago</string>
   <string name="legacy_paymentmode_lightning_desc">Esta é a opção recomendada</string>
 
+  <!-- //////////////// Migration to KMP //////////////// -->
+
+  <string name="legacy_migration_title">Atualização do Phoenix</string>
+  <string name="legacy_migration_ready_message">Atualize para a versão mais recente do Phoenix, com um mecanismo Lightning de ponta e novos recursos.\n\nSeus canais serão mesclados. Esse processo é automatizado.</string>
+  <string name="legacy_migration_prepare_button">Upgrade</string>
+  <string name="legacy_migration_prepare_button_disconnected">Conectando…</string>
+  <string name="legacy_migration_dismiss_button">Não agora</string>
+
+  <string name="legacy_migration_paused_swap_in">Você não pode fazer upgrade agora: um depósito na cadeia está pendente.\n\nTente novamente mais tarde quando esse depósito for confirmado.</string>
+  <string name="legacy_migration_paused_opening">Você não pode fazer upgrade agora: alguns canais estão sendo abertos no momento.\n\nTente novamente mais tarde quando esses canais tiverem sido abertos e estiverem ativos.</string>
+  <string name="legacy_migration_paused_force_close">Não é possível fazer upgrade agora: alguns canais estão sendo fechados à força.\n\nTente novamente mais tarde, quando esses canais tiverem sido completamente fechados. Observe que o fechamento forçado pode levar vários dias para ser concluído.</string>
+  <string name="legacy_migration_paused_disconnected">Você não pode fazer upgrade agora porque está desconectado do Lightning e/ou da Electrum.\n\nTente novamente mais tarde quando a conexão for estabelecida.</string>
+
+  <string name="legacy_migration_confirm_title">Confirmar migração</string>
+  <string name="legacy_migration_confirm_dust">%1$d de %2$d canais estão mantendo menos do que o limite de Bitcoin dust (546 sat). Seu saldo irá para os mineradores de Bitcoin.</string>
+  <string name="legacy_migration_confirm_proceed">Proceder</string>
+  <string name="legacy_migration_confirm_cancel">Cancelar</string>
+
+  <string name="legacy_migration_processing_disconnected">Perda de conexão.\nMantenha o aplicativo em primeiro plano.</string>
+
+  <string name="legacy_migration_complete_title">Migração concluída</string>
+  <string name="legacy_migration_complete_details">Mudança para o novo aplicativo…</string>
+
+  <string name="legacy_migration_failure_title">O upgrade falhou</string>
+  <string name="legacy_migration_failure_generic">Alguns ou todos os canais podem não ter sido migrados.\n\nO processo de atualização deve ser iniciado novamente.</string>
+  <string name="legacy_migration_failure_swapin_address_error">O Phoenix não pôde gerar um endereço válido para a migração.\n\nO processo de atualização deve ser iniciado novamente.</string>
+  <string name="legacy_migration_failure_closing_error">Não foi possível fechar alguns canais.\n\nO processo de atualização deve ser iniciado novamente para migrá-los.</string>
+
 </resources>

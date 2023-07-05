@@ -815,4 +815,37 @@
   <string name="legacy_paymentmode_lightning">Bezahle mit Lightning</string>
   <string name="legacy_paymentmode_lightning_desc">Dies ist die empfohlene Option</string>
 
+  <!-- //////////////// Migration to KMP //////////////// -->
+
+  <string name="legacy_migration_title">Phoenix Upgrade</string>
+  <string name="legacy_migration_ready_message">Upgrade auf die neueste Version von Phoenix, mit einer hochmodernen Lightning-Engine und neuen Funktionen.\n\nIhre Kanäle werden zusammengeführt. Dieser Prozess ist automatisiert.</string>
+  <string name="legacy_migration_prepare_button">Upgrade</string>
+  <string name="legacy_migration_prepare_button_disconnected">Verbindung herstellen…</string>
+  <string name="legacy_migration_dismiss_button">Nicht jetzt</string>
+
+  <string name="legacy_migration_paused_swap_in">Sie können jetzt nicht upgraden: eine On-Chain-Hinterlegung steht noch aus.\n\nVersuchen Sie es später noch einmal, wenn diese Hinterlegung bestätigt wurde.</string>
+  <string name="legacy_migration_paused_opening">Sie können jetzt nicht upgraden: Einige Kanäle werden gerade geöffnet.\n\nVersuchen Sie es später erneut, wenn diese Kanäle geöffnet und aktiv sind.</string>
+  <string name="legacy_migration_paused_force_close">Sie können jetzt nicht aktualisieren: Einige Channels werden zwangsweise geschlossen.\n\nVersuchen Sie es später erneut, wenn diese Channels vollständig geschlossen wurden. Beachten Sie, dass es mehrere Tage dauern kann, bis die Schließung abgeschlossen ist.</string>
+  <string name="legacy_migration_paused_disconnected">Sie können jetzt nicht upgraden, weil die Verbindung zu Lightning und/oder Electrum unterbrochen wurde.\n\nVersuchen Sie es später erneut, wenn die Verbindung wieder hergestellt ist.</string>
+
+  <string name="legacy_migration_confirm_title">Bestätigen Sie die Migration</string>
+  <string name="legacy_migration_confirm_dust">%1$d von %2$d Channels halten weniger als das Bitcoin Dust Limit (546 sat). Ihr Guthaben geht an die Bitcoin Netzwerk Miners.</string>
+  <string name="legacy_migration_confirm_proceed">Fortfahren</string>
+  <string name="legacy_migration_confirm_cancel">Abbrechen</string>
+
+  <string name="legacy_migration_processing_title">Bearbeitung der Migration…</string>
+  <string name="legacy_migration_processing_disconnected">Verbindung unterbrochen.\nBitte lassen Sie die Anwendung im Vordergrund.</string>
+  <string name="legacy_migration_swap_address">Migrationsadresse erhalten</string>
+  <string name="legacy_migration_listing_channels">Kanäle überprüfen</string>
+  <string name="legacy_migration_closing_channels">Kanäle schließen (%1$d/%2$d)</string>
+  <string name="legacy_migration_monitoring_channels_publish">Veröffentlichen von Transaktionen (%1$s/%2$d)</string>
+
+  <string name="legacy_migration_complete_title">Migration abgeschlossen</string>
+  <string name="legacy_migration_complete_details">Umschaltung auf die neue Anwendung…</string>
+
+  <string name="legacy_migration_failure_title">Upgrade ist fehlgeschlagen</string>
+  <string name="legacy_migration_failure_generic">Einige oder alle Kanäle wurden möglicherweise nicht migriert.\n\nDer Upgrade-Prozess muss erneut gestartet werden.</string>
+  <string name="legacy_migration_failure_swapin_address_error">Phoenix konnte keine gültige Adresse für die Migration generieren.\n\nDer Upgrade-Prozess muss neu gestartet werden.</string>
+  <string name="legacy_migration_failure_closing_error">Einige Kanäle konnten nicht geschlossen werden.\n\nDer Upgrade-Prozess muss erneut gestartet werden, um diese zu migrieren.</string>
+
 </resources>

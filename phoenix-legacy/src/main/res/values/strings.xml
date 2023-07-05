@@ -792,9 +792,7 @@ legacy_
   <!-- //////////////// Migration to KMP //////////////// -->
 
   <string name="legacy_migration_title">Phoenix upgrade</string>
-  <string name="legacy_migration_init_message">Checking your channels, please hold…</string>
   <string name="legacy_migration_ready_message">Upgrade to the latest version of Phoenix, with a cutting-edge Lightning engine and new features.\n\nYour channels will be merged together. This process is automated.</string>
-  <string name="legacy_migration_more_info_button">Learn more…</string>
   <string name="legacy_migration_prepare_button">Upgrade</string>
   <string name="legacy_migration_prepare_button_disconnected">Connecting…</string>
   <string name="legacy_migration_dismiss_button">Not now</string>
@@ -822,6 +820,6 @@ legacy_
   <string name="legacy_migration_failure_title">Upgrade has failed</string>
   <string name="legacy_migration_failure_generic">Some or all channels may not have been migrated.\n\nThe upgrade process must be started again.</string>
   <string name="legacy_migration_failure_swapin_address_error">Phoenix could not generate a valid address for the migration.\n\nThe upgrade process must be started again.</string>
-  <string name="legacy_migration_failure_closing_error">Some channels could not be migrated.\n\nThe upgrade process must be started again to migrate the remaining channels.</string>
+  <string name="legacy_migration_failure_closing_error">Some channels could not be closed.\n\nThe upgrade process must be started again to migrate those.</string>
 
 </resources>

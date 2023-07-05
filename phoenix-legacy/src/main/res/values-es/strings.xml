@@ -461,4 +461,37 @@
   Si tienes preguntas, consulta las <a href="https://phoenix.acinq.co/faq">Preguntas frecuentes</a>. También puedes contactar con el <a href="https://phoenix.acinq.co/support">soporte</a> para obtener ayuda.
   ]]></string>
 
+  <!-- //////////////// Migration to KMP //////////////// -->
+
+  <string name="legacy_migration_title">Actualización de Phoenix</string>
+  <string name="legacy_migration_ready_message">Actualízate a la última versión de Phoenix, con un motor Lightning de última generación y nuevas funciones.\n\nSus canales se fusionarán. Este proceso está automatizado.</string>
+  <string name="legacy_migration_prepare_button">Actualizar</string>
+  <string name="legacy_migration_prepare_button_disconnected">Connecting…</string>
+  <string name="legacy_migration_dismiss_button">Ahora no</string>
+
+  <string name="legacy_migration_paused_swap_in">No puede actualizar ahora: hay pendiente un depósito en la cadena.\n\nVuelva a intentarlo más tarde, cuando se haya confirmado el depósito.</string>
+  <string name="legacy_migration_paused_opening">No puede actualizar ahora: algunos canales se están abriendo en este momento.\n\nVuelve a intentarlo más tarde, cuando estos canales se hayan abierto y estén activos.</string>
+  <string name="legacy_migration_paused_force_close">No puede actualizar ahora: algunos canales están siendo cerrados a la fuerza.\n\nVuelva a intentarlo más tarde, cuando estos canales se hayan cerrado por completo. Tenga en cuenta que el cierre forzado puede tardar varios días en completarse.</string>
+  <string name="legacy_migration_paused_disconnected">No puedes actualizar ahora porque estás desconectado de Lightning y/o Electrum.\n\nVuelve a intentarlo más tarde cuando se haya establecido la conexión.</string>
+
+  <string name="legacy_migration_confirm_title">Confirmar migración</string>
+  <string name="legacy_migration_confirm_dust">%1$d de %2$d canales tienen menos del límite de polvo de Bitcoin (546 sat). Su saldo se destinará a los Bitcoin miners.</string>
+  <string name="legacy_migration_confirm_proceed">Proceda</string>
+  <string name="legacy_migration_confirm_cancel">Cancelar</string>
+
+  <string name="legacy_migration_processing_title">Procesamiento de la migración…</string>
+  <string name="legacy_migration_processing_disconnected">Conexión perdida.\nMantén la aplicación en primer plano.</string>
+  <string name="legacy_migration_swap_address">Getting migration address</string>
+  <string name="legacy_migration_listing_channels">Reviewing channels</string>
+  <string name="legacy_migration_closing_channels">Closing channels (%1$d/%2$d)</string>
+  <string name="legacy_migration_monitoring_channels_publish">Publishing transactions (%1$s/%2$d)</string>
+
+  <string name="legacy_migration_complete_title">Migración completada</string>
+  <string name="legacy_migration_complete_details">Pasar a la nueva aplicación…</string>
+
+  <string name="legacy_migration_failure_title">Actualización fallida</string>
+  <string name="legacy_migration_failure_generic">Es posible que no se hayan migrado algunos o todos los canales.\n\nEl proceso de actualización debe iniciarse de nuevo.</string>
+  <string name="legacy_migration_failure_swapin_address_error">Phoenix no pudo generar una dirección válida para la migración.\n\nEl proceso de actualización debe iniciarse de nuevo.</string>
+  <string name="legacy_migration_failure_closing_error">Algunos canales no se han podido cerrar.\n\nEl proceso de actualización debe iniciarse de nuevo para migrarlos.</string>
+
 </resources>
