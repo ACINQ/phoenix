@@ -218,7 +218,7 @@ fun TextWithIcon(
 fun PhoenixIcon(
     resourceId: Int,
     modifier: Modifier = Modifier,
-    tint: Color = LocalContentColor.current
+    tint: Color = MaterialTheme.colors.onSurface
 ) {
     Image(
         painter = painterResource(id = resourceId),
