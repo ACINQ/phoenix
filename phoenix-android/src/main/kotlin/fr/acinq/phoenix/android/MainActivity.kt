@@ -125,17 +125,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun tryReconnect(business: PhoenixBusiness, daemon: AppConnectionsDaemon) {
-        val connections = business.connectionsManager.connections.value
-        if (connections.electrum !is Connection.ESTABLISHED) {
-            lifecycleScope.launch {
-                log.info("resuming app with electrum conn=${connections.electrum}, reconnecting...")
-                daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Electrum)
-            }
-        }
-        if (connections.peer !is Connection.ESTABLISHED) {
-            lifecycleScope.launch {
-                log.info("resuming app with peer conn=${connections.peer}, reconnecting...")
-                daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
+        lifecycleScope.launch {
+            val isDataMigrationExpected = LegacyPrefsDatastore.getDataMigrationExpected(applicationContext).filterNotNull().first()
+            if (isDataMigrationExpected) {
+                log.info("ignoring tryReconnect when data migration is in progress")
+            } else {
+                val connections = business.connectionsManager.connections.value
+                if (connections.electrum !is Connection.ESTABLISHED) {
+                    lifecycleScope.launch {
+                        log.info("resuming app with electrum conn=${connections.electrum}, reconnecting...")
+                        daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Electrum)
+                    }
+                }
+                if (connections.peer !is Connection.ESTABLISHED) {
+                    lifecycleScope.launch {
+                        log.info("resuming app with peer conn=${connections.peer}, reconnecting...")
+                        daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
+                    }
+                }
             }
         }
     }

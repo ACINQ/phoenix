@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.home
+package fr.acinq.phoenix.android.startup
 
 import android.content.Context
 import androidx.biometric.BiometricPrompt

@@ -56,9 +56,9 @@ import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.home.HomeView
-import fr.acinq.phoenix.android.home.LegacySwitcherView
+import fr.acinq.phoenix.android.startup.LegacySwitcherView
 import fr.acinq.phoenix.android.home.NotificationsView
-import fr.acinq.phoenix.android.home.StartupView
+import fr.acinq.phoenix.android.startup.StartupView
 import fr.acinq.phoenix.android.init.CreateWalletView
 import fr.acinq.phoenix.android.init.InitWallet
 import fr.acinq.phoenix.android.init.RestoreWalletView

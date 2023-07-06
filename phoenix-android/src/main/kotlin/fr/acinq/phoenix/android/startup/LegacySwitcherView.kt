@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.home
+package fr.acinq.phoenix.android.startup
 
 import android.app.Activity
 import android.content.Intent
@@ -30,11 +30,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.legacy.MainActivity
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
+import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -45,6 +47,8 @@ fun LegacySwitcherView(
     val log = logger("LegacySwitcherView")
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val business = business
+    val connectionsDaemon = business.appConnectionsDaemon
     val legacyAppStatus by LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(initial = null)
     log.debug { "legacy switcher with legacyAppStatus=${legacyAppStatus}" }
 
@@ -69,6 +73,7 @@ fun LegacySwitcherView(
             }
             LegacyAppStatus.Required.InitStart -> {
                 LaunchedEffect(key1 = true) {
+                    connectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
                     scope.launch {
                         if (legacyAppStatus == LegacyAppStatus.Required.InitStart) {
                             LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Running)

@@ -39,6 +39,8 @@ import fr.acinq.phoenix.legacy.databinding.FragmentStartupBinding
 import fr.acinq.phoenix.legacy.security.PinDialog
 import fr.acinq.phoenix.legacy.send.ReadInputFragmentDirections
 import fr.acinq.phoenix.legacy.utils.Constants
+import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.legacy.utils.Migration
 import fr.acinq.phoenix.legacy.utils.Prefs
 import fr.acinq.phoenix.legacy.utils.Wallet
@@ -146,8 +148,16 @@ class StartupFragment : BaseFragment() {
         checkLock(context)
       }
       kitState is KitState.Off -> {
-        log.info("kit=${kitState.getName()} seed=${seed.name()} lock=${lockState}, unlocking wallet and starting kit")
-        unlockAndStart(context, seed)
+        lifecycleScope.launch {
+          LegacyPrefsDatastore.getLegacyAppStatus(context).collect { legacyAppStatus ->
+            if (legacyAppStatus is LegacyAppStatus.Required) {
+              log.info("kit=${kitState.getName()} seed=${seed.name()} lock=${lockState}, unlocking wallet and starting kit")
+              unlockAndStart(context, seed)
+            } else {
+              log.info("kit is off, but legacy app status=$legacyAppStatus, standing by...")
+            }
+          }
+        }
       }
       kitState is KitState.Error.Generic -> mBinding.errorMessage.text = getString(R.string.legacy_startup_error_generic, kitState.message)
       kitState is KitState.Error.InvalidElectrumAddress -> mBinding.errorMessage.text = getString(R.string.legacy_startup_error_electrum_address)

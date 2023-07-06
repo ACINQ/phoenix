@@ -51,6 +51,7 @@ import fr.acinq.phoenix.legacy.db.*
 import fr.acinq.phoenix.legacy.utils.Prefs
 import fr.acinq.phoenix.legacy.utils.ThemeHelper
 import fr.acinq.phoenix.legacy.utils.Wallet
+import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConversions
@@ -63,8 +64,13 @@ object LegacyMigrationHelper {
     val migrationDescFlag = "kmp-migration-override"
 
     /** Import the legacy app's preferences into the new app's datastores. */
-    suspend fun migrateLegacyPreferences(context: Context) {
+    suspend fun migrateLegacyPreferences(
+        context: Context
+    ) {
         log.info("started migrating legacy user preferences")
+
+        val business = (context as PhoenixApplication).business
+        val appConfigurationManager = business.appConfigurationManager
 
         // -- utils
 
@@ -99,15 +105,21 @@ object LegacyMigrationHelper {
         // -- security & tor
 
         UserPrefs.saveIsScreenLockActive(context, Prefs.isScreenLocked(context))
-        UserPrefs.saveIsTorEnabled(context, Prefs.isTorEnabled(context))
+        Prefs.isTorEnabled(context).let {
+            UserPrefs.saveIsTorEnabled(context, it)
+            appConfigurationManager.updateTorUsage(it)
+        }
 
         // -- electrum
 
-        UserPrefs.saveElectrumServer(context, Prefs.getElectrumServer(context).takeIf { it.isNotBlank() }?.let {
+        Prefs.getElectrumServer(context).takeIf { it.isNotBlank() }?.let {
             val hostPort = HostAndPort.fromString(it).withDefaultPort(50002)
             // TODO: handle onion addresses and TOR
             ServerAddress(hostPort.host, hostPort.port, TcpSocket.TLS.TRUSTED_CERTIFICATES())
-        })
+        }?.let {
+            UserPrefs.saveElectrumServer(context, it)
+            appConfigurationManager.updateElectrumConfig(it)
+        }
 
         // -- payment settings
 
@@ -122,6 +134,8 @@ object LegacyMigrationHelper {
 
         // use the default scheme when migrating from legacy, instead of the default one
         UserPrefs.saveLnurlAuthScheme(context, LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME)
+
+        business.appConnectionsDaemon?.forceReconnect(AppConnectionsDaemon.ControlTarget.All)
 
         log.info("finished migration of legacy user preferences")
     }
