@@ -213,6 +213,8 @@ fun HomeView(
                         notifications = notifications,
                         onNavigateToNotificationsList = onShowNotifications,
                     )
+                } else {
+                    Box(modifier = Modifier.layoutId("notices"))
                 }
             }
 
