@@ -255,7 +255,11 @@ class AppConnectionsDaemon(
                         ) {
                             logger.info { "starting actual peer connection job" }
                             peer.socketBuilder = tcpSocketBuilder()
-                            peer.connect()
+                            try {
+                                peer.connect()
+                            } catch (e: Exception) {
+                                logger.error(e) { "error when connecting to peer: "}
+                            }
                         }
                     }
                 }
@@ -301,7 +305,11 @@ class AppConnectionsDaemon(
                             } else {
                                 logger.info { "starting actual electrum connection job to server=$electrumServerAddress" }
                                 electrumClient.socketBuilder = tcpSocketBuilder()
-                                electrumClient.connect(electrumServerAddress)
+                                try {
+                                    electrumClient.connect(electrumServerAddress)
+                                } catch (e: Exception) {
+                                    logger.error(e) { "error when connecting to electrum: "}
+                                }
                             }
                             _lastElectrumServerAddress.value = electrumServerAddress
                         }
