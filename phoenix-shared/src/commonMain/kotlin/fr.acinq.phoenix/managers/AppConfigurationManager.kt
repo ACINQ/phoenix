@@ -4,6 +4,7 @@ import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.HeaderSubscriptionResponse
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
+import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.sat
@@ -173,7 +174,13 @@ class AppConfigurationManager(
      * If null, will connect to a random server from the hard-coded list.
      */
     fun updateElectrumConfig(server: ServerAddress?) {
-        _electrumConfig.value = server?.let { ElectrumConfig.Custom(it) } ?: ElectrumConfig.Random
+        _electrumConfig.value = server?.let {
+            if (it.host.endsWith(".onion")) {
+                ElectrumConfig.Custom(it.copy(tls = TcpSocket.TLS.DISABLED))
+            } else {
+                ElectrumConfig.Custom(it)
+            }
+        } ?: ElectrumConfig.Random
     }
 
     fun randomElectrumServer() = when (chain) {
