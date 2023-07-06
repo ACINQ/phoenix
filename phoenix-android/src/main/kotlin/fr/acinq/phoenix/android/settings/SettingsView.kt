@@ -16,50 +16,62 @@
 
 package fr.acinq.phoenix.android.settings
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.utils.mkTree
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.components.CardHeader
+import fr.acinq.phoenix.android.components.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.SettingButton
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigate
+import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun SettingsView() {
     val nc = navController
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val chain = business.chain
+    val scope = rememberCoroutineScope()
+    var debugClickCount by remember { mutableStateOf(0) }
 
     DefaultScreenLayout {
-        DefaultScreenHeader(title = stringResource(id = R.string.menu_settings), onBackClick = { nc.popBackStack() })
-
-        // -- debug
-        if (chain is NodeParams.Chain.Testnet) {
-            CardHeader(text = "DEBUG")
-            Card {
-                Button(text = "Switch to Legacy app", icon = R.drawable.ic_user, onClick = {
-                    scope.launch {
-                        LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
-                    }
-                }, modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start)
-            }
+        DefaultScreenHeader(onBackClick = { nc.popBackStack() }) {
+            Text(
+                text = stringResource(id = R.string.menu_settings),
+                modifier = Modifier.padding(vertical = 12.dp).clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = { debugClickCount += 1 }
+                )
+            )
         }
 
         // -- general
@@ -67,10 +79,10 @@ fun SettingsView() {
         Card {
             SettingButton(text = R.string.settings_about, icon = R.drawable.ic_help_circle, onClick = { nc.navigate(Screen.About) })
             SettingButton(text = R.string.settings_display_prefs, icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences) })
-            SettingButton(text = R.string.settings_payment_settings, icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings)})
+            SettingButton(text = R.string.settings_payment_settings, icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings) })
             SettingButton(text = R.string.settings_liquidity_policy, icon = R.drawable.ic_settings, onClick = { nc.navigate(Screen.LiquidityPolicy) })
-            SettingButton(text = R.string.settings_payment_history, icon = R.drawable.ic_list, onClick = { nc.navigate(Screen.PaymentsHistory)})
-            SettingButton(text = R.string.settings_notifications, icon = R.drawable.ic_notification, onClick = { nc.navigate(Screen.Notifications)})
+            SettingButton(text = R.string.settings_payment_history, icon = R.drawable.ic_list, onClick = { nc.navigate(Screen.PaymentsHistory) })
+            SettingButton(text = R.string.settings_notifications, icon = R.drawable.ic_notification, onClick = { nc.navigate(Screen.Notifications) })
         }
 
         // -- privacy & security
@@ -102,6 +114,41 @@ fun SettingsView() {
                 onClick = { nc.navigate(Screen.ForceClose) },
             )
         }
+
+        if (debugClickCount > 10) {
+            // -- debug
+            CardHeader(text = "DEBUG")
+            Card {
+                Button(
+                    text = "Switch to legacy app (DEBUG)",
+                    icon = R.drawable.ic_user,
+                    onClick = {
+                        scope.launch {
+                            LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
+                )
+                val log = logger("DEBUG")
+                val electrumClient = business.electrumClient
+                val peerManager = business.peerManager
+                Button(
+                    text = "Log coroutine tree (DEBUG)",
+                    icon = R.drawable.ic_text,
+                    onClick = {
+                        scope.launch {
+                            val peer = peerManager.getPeer()
+                            log.info { ">>>> coroutines-peer\n${peer.coroutineContext.job.mkTree()}" }
+                            log.info { ">>>> coroutines-electrum\n${electrumClient.coroutineContext.job.mkTree()}" }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
+                )
+            }
+        }
+
         Spacer(Modifier.height(32.dp))
+
+
     }
 }
