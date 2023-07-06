@@ -29,7 +29,7 @@ class PeerManager(
     private val configurationManager: AppConfigurationManager,
     private val notificationsManager: NotificationsManager,
     private val electrumWatcher: ElectrumWatcher,
-) : CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.Main + CoroutineExceptionHandler { _, e ->
+) : CoroutineScope by CoroutineScope(CoroutineName("peer") + SupervisorJob() + Dispatchers.Main + CoroutineExceptionHandler { _, e ->
     println("error in Peer coroutine scope: ${e.message}")
     val logger = loggerFactory.newLogger(Logger.Tag(PeerManager::class))
     logger.error(e) { "error in Peer scope: " }
