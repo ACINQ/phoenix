@@ -288,6 +288,7 @@
     <string name="home__payments_none_incoming">A deposit is incoming.\n\nOnce confirmed, you will see the payment here.</string>
     <string name="home__payments_header">Recent payments</string>
     <string name="home__payments_more_button">Show all payments…</string>
+    <string name="home__connection__electrum_late">Electrum late</string>
     <string name="home__connection__bad_cert">Electrum certificate</string>
     <string name="home__connection__connecting">Connecting…</string>
     <string name="home__connection__tor_active">Tor enabled</string>
@@ -613,6 +614,7 @@
     <string name="conndialog_accessibility_desc">Manage connection for %1$s</string>
     <string name="conndialog_connecting">Connecting…</string>
     <string name="conndialog_connected">Connected</string>
+    <string name="conndialog_connected_electrum_behind">Electrum server is late (block $1$d)</string>
     <string name="conndialog_closed">Disconnected</string>
     <string name="conndialog_closed_bad_cert">Bad certificate</string>
 

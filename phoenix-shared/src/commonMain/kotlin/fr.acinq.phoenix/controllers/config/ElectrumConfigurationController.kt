@@ -33,7 +33,7 @@ class AppElectrumConfigurationController(
                 configurationManager.electrumConfig,
                 appConnectionsDaemon.lastElectrumServerAddress,
                 electrumClient.connectionState,
-                configurationManager.electrumMessages(),
+                configurationManager.electrumMessages,
                 transform = { configState, currentServer, connectionState, message ->
                     ElectrumConfiguration.Model(
                         configuration = configState,

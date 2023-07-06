@@ -21,7 +21,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -45,6 +44,7 @@ import fr.acinq.phoenix.android.utils.isBadCertificate
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
+import fr.acinq.phoenix.android.utils.warningColor
 import fr.acinq.phoenix.managers.Connections
 
 @Composable
@@ -52,6 +52,7 @@ fun TopBar(
     modifier: Modifier = Modifier,
     onConnectionsStateButtonClick: () -> Unit,
     connectionsState: Connections?,
+    electrumBlockheight: Int,
     onTorClick: () -> Unit,
     isTorEnabled: Boolean?
 ) {
@@ -78,9 +79,31 @@ fun TopBar(
             FilledButton(
                 text = stringResource(id = if (isBadElectrumCert) R.string.home__connection__bad_cert else R.string.home__connection__connecting),
                 icon = if (isBadElectrumCert) R.drawable.ic_alert_triangle else R.drawable.ic_connection_lost,
-                iconTint = if (isBadElectrumCert) negativeColor else LocalContentColor.current,
+                iconTint = if (isBadElectrumCert) negativeColor else MaterialTheme.colors.onSurface,
                 onClick = onConnectionsStateButtonClick,
-                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = if (isBadElectrumCert) negativeColor else LocalContentColor.current),
+                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = if (isBadElectrumCert) negativeColor else MaterialTheme.colors.onSurface),
+                backgroundColor = MaterialTheme.colors.surface,
+                space = 8.dp,
+                padding = PaddingValues(8.dp),
+                modifier = Modifier.alpha(connectionsButtonAlpha)
+            )
+        } else if (electrumBlockheight < 795_000) {
+            // FIXME use a dynamic blockheight
+            val connectionsTransition = rememberInfiniteTransition()
+            val connectionsButtonAlpha by connectionsTransition.animateFloat(
+                initialValue = 0.3f,
+                targetValue = 1f,
+                animationSpec = infiniteRepeatable(
+                    animation = keyframes { durationMillis = 500 },
+                    repeatMode = RepeatMode.Reverse
+                )
+            )
+            FilledButton(
+                text = stringResource(id = R.string.home__connection__electrum_late),
+                icon = R.drawable.ic_alert_triangle,
+                iconTint = warningColor,
+                onClick = onConnectionsStateButtonClick,
+                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
                 backgroundColor = MaterialTheme.colors.surface,
                 space = 8.dp,
                 padding = PaddingValues(8.dp),
@@ -93,7 +116,7 @@ fun TopBar(
                     icon = R.drawable.ic_tor_shield_ok,
                     iconTint = positiveColor,
                     onClick = onTorClick,
-                    textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = LocalContentColor.current),
+                    textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
                     backgroundColor = mutedBgColor,
                     space = 8.dp,
                     padding = PaddingValues(8.dp)
@@ -104,7 +127,7 @@ fun TopBar(
         FilledButton(
             text = stringResource(R.string.home__faq_button),
             icon = R.drawable.ic_help_circle,
-            iconTint = LocalContentColor.current,
+            iconTint = MaterialTheme.colors.onSurface,
             onClick = { openLink(context, "https://phoenix.acinq.co/faq") },
             textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
             backgroundColor = MaterialTheme.colors.surface,

@@ -59,14 +59,20 @@ fun HomeView(
 ) {
     val log = logger("HomeView")
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val torEnabledState = UserPrefs.getIsTorEnabled(context).collectAsState(initial = null)
     val connectionsState by paymentsViewModel.connectionsFlow.collectAsState(null)
+    val electrumMessages by business.appConfigurationManager.electrumMessages.collectAsState()
     val balanceDisplayMode by UserPrefs.getHomeAmountDisplayMode(context).collectAsState(initial = HomeAmountDisplayMode.REDACTED)
 
     var showConnectionsDialog by remember { mutableStateOf(false) }
     if (showConnectionsDialog) {
-        ConnectionDialog(connections = connectionsState, onClose = { showConnectionsDialog = false }, onTorClick = onTorClick, onElectrumClick = onElectrumClick)
+        ConnectionDialog(
+            connections = connectionsState,
+            electrumBlockheight = electrumMessages?.blockHeight ?: 0,
+            onClose = { showConnectionsDialog = false },
+            onTorClick = onTorClick,
+            onElectrumClick = onElectrumClick
+        )
     }
 
     val allPaymentsCount by business.paymentsManager.paymentsCount.collectAsState()
@@ -177,13 +183,16 @@ fun HomeView(
                 motionScene = motionScene,
                 progress = progress
             ) {
-                Box(modifier = Modifier
-                    .layoutId("collapsible")
-                    .fillMaxWidth()) {}
+                Box(
+                    modifier = Modifier
+                        .layoutId("collapsible")
+                        .fillMaxWidth()
+                ) {}
                 TopBar(
                     modifier = Modifier.layoutId("topBar"),
                     onConnectionsStateButtonClick = { showConnectionsDialog = true },
                     connectionsState = connectionsState,
+                    electrumBlockheight = electrumMessages?.blockHeight ?: 0,
                     isTorEnabled = torEnabledState.value,
                     onTorClick = onTorClick
                 )

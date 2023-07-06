@@ -17,8 +17,15 @@
 package fr.acinq.phoenix.android.home
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -29,18 +36,25 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.HSeparator
-import fr.acinq.phoenix.android.utils.*
+import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.utils.isBadCertificate
+import fr.acinq.phoenix.android.utils.monoTypo
+import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.android.utils.orange
+import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.managers.Connections
 
 
 @Composable
 fun ConnectionDialog(
     connections: Connections?,
+    electrumBlockheight: Int,
     onClose: () -> Unit,
     onTorClick: () -> Unit,
     onElectrumClick: () -> Unit,
@@ -69,7 +83,36 @@ fun ConnectionDialog(
                     HSeparator()
                 }
 
-                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_electrum), connection = connections.electrum, onClick = onElectrumClick)
+                ConnectionDialogLine(label = stringResource(id = R.string.conndialog_electrum), connection = connections.electrum, onClick = onElectrumClick) {
+                    when (val connection = connections.electrum) {
+                        Connection.ESTABLISHING -> {
+                            Text(text = stringResource(R.string.conndialog_connecting), style = monoTypo)
+                        }
+                        Connection.ESTABLISHED -> {
+                            Column {
+                                Text(text = stringResource(R.string.conndialog_connected), style = monoTypo)
+                                if (electrumBlockheight < 795_000) { // FIXME use a dynamic blockheight
+                                    TextWithIcon(
+                                        text = stringResource(id = R.string.conndialog_connected_electrum_behind, electrumBlockheight),
+                                        textStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
+                                        icon = R.drawable.ic_alert_triangle,
+                                        iconTint = negativeColor
+                                    )
+                                }
+                            }
+                        }
+                        else -> {
+                            Text(
+                                text = if (connection is Connection.CLOSED && connection.isBadCertificate()) {
+                                    stringResource(R.string.conndialog_closed_bad_cert)
+                                } else {
+                                    stringResource(R.string.conndialog_closed)
+                                },
+                                style = monoTypo
+                            )
+                        }
+                    }
+                }
                 HSeparator()
                 ConnectionDialogLine(label = stringResource(id = R.string.conndialog_lightning), connection = connections.peer)
                 HSeparator()
@@ -84,6 +127,25 @@ private fun ConnectionDialogLine(
     label: String,
     connection: Connection?,
     onClick: (() -> Unit)? = null
+) {
+    ConnectionDialogLine(label = label, connection = connection, onClick = onClick) {
+        Text(
+            text = when (connection) {
+                Connection.ESTABLISHING -> stringResource(R.string.conndialog_connecting)
+                Connection.ESTABLISHED -> stringResource(R.string.conndialog_connected)
+                else -> stringResource(R.string.conndialog_closed)
+            },
+            style = monoTypo
+        )
+    }
+}
+
+@Composable
+private fun ConnectionDialogLine(
+    label: String,
+    connection: Connection?,
+    onClick: (() -> Unit)? = null,
+    content: @Composable () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -104,16 +166,6 @@ private fun ConnectionDialogLine(
         ) {}
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = label, modifier = Modifier.weight(1.0f))
-        Text(
-            text = when (connection) {
-                Connection.ESTABLISHING -> stringResource(R.string.conndialog_connecting)
-                Connection.ESTABLISHED -> stringResource(R.string.conndialog_connected)
-                else -> if (connection is Connection.CLOSED && connection.isBadCertificate()) {
-                    stringResource(R.string.conndialog_closed_bad_cert)
-                } else {
-                    stringResource(R.string.conndialog_closed)
-                }
-            }, style = monoTypo
-        )
+        content()
     }
 }

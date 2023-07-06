@@ -156,7 +156,7 @@ fun SettingInteractive(
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (icon != null) {
-                PhoenixIcon(icon, tint = iconTint ?: LocalContentColor.current, modifier = Modifier.size(ButtonDefaults.IconSize))
+                PhoenixIcon(icon, tint = iconTint ?: MaterialTheme.colors.onSurface, modifier = Modifier.size(ButtonDefaults.IconSize))
                 Spacer(Modifier.width(12.dp))
             }
             Text(

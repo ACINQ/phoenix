@@ -184,7 +184,7 @@ class AppConfigurationManager(
 
     /** The flow containing the electrum header responses messages. */
     private val _electrumMessages by lazy { MutableStateFlow<HeaderSubscriptionResponse?>(null) }
-    fun electrumMessages(): StateFlow<HeaderSubscriptionResponse?> = _electrumMessages
+    val electrumMessages: StateFlow<HeaderSubscriptionResponse?> = _electrumMessages
 
     private fun watchElectrumMessages() = launch {
         electrumWatcher.client.notifications.filterIsInstance<HeaderSubscriptionResponse>().collect {
