@@ -52,7 +52,7 @@ data class BitcoinUri(
 }
 
 sealed class BitcoinAddressError {
-    data class ChainMismatch(val expected: NodeParams.Chain, val actual: NodeParams.Chain): BitcoinAddressError()
+    data class ChainMismatch(val expected: NodeParams.Chain): BitcoinAddressError()
     data class UnhandledRequiredParams(val parameters: List<Pair<String, String>>): BitcoinAddressError()
     object UnknownFormat: BitcoinAddressError()
 }

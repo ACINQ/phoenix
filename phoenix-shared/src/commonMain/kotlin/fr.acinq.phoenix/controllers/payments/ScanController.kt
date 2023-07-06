@@ -135,7 +135,7 @@ class AppScanController(
             is Either.Left -> {
                 val error = result.value
                 if (error is BitcoinAddressError.ChainMismatch) {
-                    Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.ChainMismatch(expected = error.expected, actual = error.actual))
+                    Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.ChainMismatch(expected = error.expected))
                 } else {
                     Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.UnknownFormat)
                 }
@@ -251,7 +251,7 @@ class AppScanController(
                 val invoice = task.await()
                 when (val check = checkForBadRequest(invoice.paymentRequest)) {
                     is Scan.BadRequestReason.ChainMismatch -> Either.Left(
-                        Scan.LnurlPayError.ChainMismatch(expected = chain, actual = check.actual)
+                        Scan.LnurlPayError.ChainMismatch(expected = chain)
                     )
                     is Scan.BadRequestReason.AlreadyPaidInvoice -> Either.Left(
                         Scan.LnurlPayError.AlreadyPaidInvoice
@@ -464,7 +464,7 @@ class AppScanController(
 
         val actualChain = paymentRequest.chain
         if (chain != actualChain) {
-            return Scan.BadRequestReason.ChainMismatch(expected = chain, actual = actualChain)
+            return Scan.BadRequestReason.ChainMismatch(expected = chain)
         }
 
         if (paymentRequest.isExpired(currentTimestampSeconds())) {

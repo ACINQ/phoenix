@@ -37,7 +37,7 @@ object Scan {
         object UnknownFormat : BadRequestReason()
         object AlreadyPaidInvoice : BadRequestReason()
         data class Expired(val timestampSeconds: Long, val expirySeconds: Long) : BadRequestReason()
-        data class ChainMismatch(val expected: NodeParams.Chain, val actual: NodeParams.Chain) : BadRequestReason()
+        data class ChainMismatch(val expected: NodeParams.Chain) : BadRequestReason()
         data class ServiceError(val url: Url, val error: LnurlError.RemoteFailure) : BadRequestReason()
         data class InvalidLnurl(val url: Url) : BadRequestReason()
         data class UnsupportedLnurl(val url: Url) : BadRequestReason()
@@ -46,7 +46,7 @@ object Scan {
     sealed class LnurlPayError {
         data class RemoteError(val err: LnurlError.RemoteFailure) : LnurlPayError()
         data class BadResponseError(val err: LnurlError.Pay.Invoice) : LnurlPayError()
-        data class ChainMismatch(val expected: NodeParams.Chain, val actual: NodeParams.Chain) : LnurlPayError()
+        data class ChainMismatch(val expected: NodeParams.Chain) : LnurlPayError()
         object AlreadyPaidInvoice : LnurlPayError()
     }
 
