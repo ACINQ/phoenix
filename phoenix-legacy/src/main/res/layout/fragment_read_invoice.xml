@@ -33,57 +33,50 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:id="@+id/actions_layout"
-      android:layout_width="0dp"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:background="?attr/bgColor"
-      app:layout_constrainedWidth="true"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent">
 
       <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/input_button"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/button_bg_square"
         android:padding="@dimen/space_md"
-        app:layout_constraintTop_toTopOf="parent"
         app:enableOrFade="@{model.inputState instanceof ReadInputState.Scanning}"
         app:icon="@drawable/ic_edit"
-        app:text="@string/legacy_readinput_manualinput" />
-
-      <View
-        android:id="@+id/sep_browse"
-        style="@style/HLineSeparator"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/input_button" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:text="@string/legacy_readinput_manualinput" />
 
       <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/paste_button"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/button_bg_square"
         android:padding="@dimen/space_md"
         app:enableOrFade="@{model.inputState instanceof ReadInputState.Scanning}"
         app:icon="@drawable/ic_clipboard"
-        app:layout_constraintTop_toBottomOf="@id/sep_browse"
-        app:text="@string/legacy_readinput_paste" />
-
-      <View
-        android:id="@+id/sep_paste"
-        style="@style/HLineSeparator"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/paste_button" />
+        app:layout_constraintTop_toBottomOf="@id/input_button"
+        app:text="@string/legacy_readinput_paste" />
 
       <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/browse_button"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/button_bg_square"
         android:padding="@dimen/space_md"
         app:enableOrFade="@{model.inputState instanceof ReadInputState.Scanning}"
         app:icon="@drawable/ic_image"
-        app:layout_constraintTop_toBottomOf="@id/sep_paste"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/paste_button"
         app:text="@string/legacy_readinput_browse" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -116,8 +109,8 @@
       style="@style/default_textAppearance"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:paddingVertical="@dimen/space_sm"
       android:paddingHorizontal="@dimen/space_lg"
+      android:paddingVertical="@dimen/space_sm"
       android:text="@string/legacy_scan_instructions"
       android:textAlignment="center"
       android:textColor="@color/white_mid_op"
@@ -158,10 +151,10 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginStart="@dimen/space_md_p"
-        android:src="@drawable/ic_alert_triangle"
         android:contentDescription="@null"
-        app:layout_constraintStart_toStartOf="parent"
+        android:src="@drawable/ic_alert_triangle"
         app:layout_constraintBaseline_toBaselineOf="@id/error_message"
+        app:layout_constraintStart_toStartOf="parent"
         app:tint="?attr/negativeColor" />
 
       <TextView
@@ -181,11 +174,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_md"
-        android:background="@drawable/button_bg_square"
         android:layout_marginEnd="@dimen/space_xs"
+        android:background="@drawable/button_bg_square"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/error_message"
-        app:text="@string/legacy_btn_ok" />
+        app:text="@string/legacy_btn_ok"
+        tools:ignore="TouchTargetSizeCheck" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -206,10 +200,10 @@
       android:id="@+id/action_bar"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
       android:background="@null"
-      app:arrow_color="@color/white" />
+      app:arrow_color="@color/white"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

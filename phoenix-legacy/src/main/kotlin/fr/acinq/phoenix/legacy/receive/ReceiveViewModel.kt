@@ -41,8 +41,8 @@ enum class SwapInState : ReceiveState {
 class ReceiveViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(ReceiveViewModel::class.java)
 
-  val invoice = MutableLiveData<Pair<PaymentRequest, String?>>()
-  val bitmap = MutableLiveData<Bitmap>()
+  val invoice = MutableLiveData<Pair<PaymentRequest, String?>?>()
+  val bitmap = MutableLiveData<Bitmap?>()
   val state = MutableLiveData<ReceiveState>()
   val payToOpenDisabled = MutableLiveData(false)
   val showMinFundingPayToOpen = MutableLiveData(false)

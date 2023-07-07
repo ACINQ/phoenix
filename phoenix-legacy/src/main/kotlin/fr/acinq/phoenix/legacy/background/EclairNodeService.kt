@@ -740,10 +740,12 @@ class EclairNodeService : Service() {
     } ?: throw KitNotInitialized
   }
 
-  suspend fun getPayments(): List<PaymentWithMeta> = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
+  /** Fetches a list of payments from the eclair database, including metadata from the meta repository. */
+  suspend fun getPayments(limit: Int?): List<PaymentWithMeta> = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
     kit?.let {
       val t = System.currentTimeMillis()
-      JavaConverters.seqAsJavaListConverter(it.nodeParams().db().payments().listPaymentsOverview(Option.apply(50))).asJava().map { p ->
+      val limitOpt: Option<Any> = limit?.let { Option.apply(it) } ?: Option.empty()
+      JavaConverters.seqAsJavaListConverter(it.nodeParams().db().payments().listPaymentsOverview(limitOpt)).asJava().map { p ->
         val id = when {
           p is PlainOutgoingPayment && p.parentId().isDefined -> p.parentId().get().toString()
           else -> p.paymentHash().toString()
@@ -753,6 +755,10 @@ class EclairNodeService : Service() {
     } ?: throw KitNotInitialized
   }
 
+  /** Fetches a list of payments from the eclair database, including metadata from the meta repository. */
+  suspend fun getPaymentsCount(): Long = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
+    kit?.nodeParams()?.db()?.payments()?.countAllPaymentsOverview() ?: throw KitNotInitialized
+  }
 
   // =================================================== //
   //                     TOR HANDLING                    //
@@ -932,9 +938,13 @@ class EclairNodeService : Service() {
         .setContentTitle(getString(R.string.legacy_notif__pay_to_open_missed_too_small_title, Converter.printAmountPretty(event.amount(), applicationContext, withUnit = true)))
         .setContentText(message)
         .setStyle(NotificationCompat.BigTextStyle().bigText(message))
-        .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__MISSED_PAY_TO_OPEN,
-          Intent(applicationContext, MainActivity::class.java).apply { Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP }, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
+        .setContentIntent(
+          PendingIntent.getActivity(
+            applicationContext,
+            Constants.NOTIF_ID__MISSED_PAY_TO_OPEN,
+            Intent(applicationContext, MainActivity::class.java).apply { Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP },
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+          )
         )
         .setAutoCancel(true)
         .build()
