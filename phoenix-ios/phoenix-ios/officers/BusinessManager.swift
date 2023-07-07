@@ -53,6 +53,12 @@ class BusinessManager {
 	/// Because it might change if the user closes his/her wallet.
 	///
 	public private(set) var syncManager: SyncManager? = nil
+	
+	/// Reports the most recent `LiquidityEvents.Rejected` event.
+	/// An incoming `LiquidityEvents.Accepted` automatically cancels the most recent rejected event.
+	/// This only includes events in which source == onchain
+	///
+	public let swapInRejectedPublisher = CurrentValueSubject<Lightning_kmpLiquidityEventsRejected?, Never>(nil)
 
 	private var walletInfo: WalletManager.WalletInfo? = nil
 	private var pushToken: String? = nil
@@ -89,9 +95,15 @@ class BusinessManager {
 		)
 		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
 
+		let lp = Prefs.shared.liquidityPolicy
+		log.debug("lp.effectiveMaxFeeSats = \(lp.effectiveMaxFeeSats)")
+		log.debug("lp.effectiveMaxFeeBasisPoints = \(lp.effectiveMaxFeeBasisPoints)")
+		
 		let startupParams = StartupParams(
 			requestCheckLegacyChannels: false,
-			isTorEnabled: GroupPrefs.shared.isTorEnabled
+			isTorEnabled: GroupPrefs.shared.isTorEnabled,
+			liquidityPolicy: lp.toKotlin(),
+			trustedSwapInTxs: Set()
 		)
 		business.start(startupParams: startupParams)
 		
@@ -157,6 +169,52 @@ class BusinessManager {
 			self.business.appConfigurationManager.updatePreferredFiatCurrencies(current: current)
 		}
 		.store(in: &cancellables)
+		
+		// Liquidity policy
+		Prefs.shared.liquidityPolicyPublisher.dropFirst().sink { (policy: LiquidityPolicy) in
+			
+		//	let foo = policy.toKotlin()
+		//	self.business.appConfigurationManager. ???
+		//
+		//	It's not possible to change the liquidity policy on-the-fly yet ?
+		}
+		.store(in: &cancellables)
+		
+		// NodeEvents
+		business.nodeParamsManager.nodeParamsPublisher()
+			.flatMap { $0.nodeEventsPublisher() }
+			.sink { (event: Lightning_kmpNodeEvents) in
+				
+				if let rejected = event as? Lightning_kmpLiquidityEventsRejected,
+				   rejected.source == Lightning_kmpLiquidityEventsSource.onchainwallet
+				{
+					log.debug("Received Lightning_kmpLiquidityEventsRejected: \(rejected)")
+					self.swapInRejectedPublisher.value = rejected
+				}
+			}
+			.store(in: &cancellables)
+		
+		// LiquidityEvent.Accepted is still missing.
+		// So we're simulating it by monitoring the swapIn wallet balance.
+		// A LiquidityEvent.Rejected occurs when:
+		// - swapInWalletBalance.confirmed > 0
+		// - but the fees exceed the confirmed maxFees
+		//
+		// If the swapIn successfully occurs later,
+		// then the entire confirmed balance is consumed,
+		// and thus the confirmed balance drops to zero.
+		//
+		business.balanceManager.swapInWalletBalancePublisher()
+			.sink { (balance: WalletBalance) in
+				
+				if balance.confirmed.sat == 0 {
+					if self.swapInRejectedPublisher.value != nil {
+						log.debug("Received Lightning_kmpLiquidityEventsAccepted")
+						self.swapInRejectedPublisher.value = nil
+					}
+				}
+			}
+			.store(in: &cancellables)
 	}
 	
 	// --------------------------------------------------
@@ -184,7 +242,7 @@ class BusinessManager {
 		if (business.walletManager.isLoaded()) {
 			return false
 		}
-		
+
 		guard walletInfo == nil else {
 			return false
 		}
@@ -260,6 +318,10 @@ class BusinessManager {
 	public var nodeIdHash: String? {
 		return walletInfo?.nodeIdHash
 	}
+	
+	public var nodeId: String? {
+		return walletInfo?.nodeId.toHex()
+	}
 
 	// --------------------------------------------------
 	// MARK: Push Token
@@ -313,7 +375,7 @@ class BusinessManager {
 		
 		let token = self.fcmToken
 		log.debug("registering fcm token: \(token?.description ?? "<nil>")")
-		business.registerFcmToken(token: token) { result, error in
+		business.registerFcmToken(token: token) { error in
 			if let e = error {
 				log.error("failed to register fcm token: \(e.localizedDescription)")
 			}

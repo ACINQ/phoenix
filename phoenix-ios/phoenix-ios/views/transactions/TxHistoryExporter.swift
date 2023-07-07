@@ -193,41 +193,16 @@ struct TxHistoryExporter: View {
 	
 	@ViewBuilder
 	func exportButton() -> some View {
-		
-		if #available(iOS 15, *) {
 
-			Button {
-				performExport()
-			} label: {
-				Label("Export", systemImage: "square.and.arrow.up")
-					.font(.title3)
-			}
-			.buttonStyle(.borderedProminent)
-			.buttonBorderShape(.capsule)
-			.disabled(invalidDates || isExporting)
-
-		} else {
-			
-			Button {
-				performExport()
-			} label: {
-				Label("Export", systemImage: "square.and.arrow.up")
-					.font(.title3)
-					.foregroundColor(Color.white)
-					.padding([.top, .bottom], 8)
-					.padding([.leading, .trailing], 16)
-			}
-			.buttonStyle(
-				ScaleButtonStyle(
-					cornerRadius: 100,
-					backgroundFill: Color.appAccent,
-					disabledBackgroundFill: Color.appAccent.opacity(0.65),
-					pressedOpacity: 0.4,
-					disabledOpacity: 0.4
-				)
-			)
-			.disabled(invalidDates || isExporting)
+		Button {
+			performExport()
+		} label: {
+			Label("Export", systemImage: "square.and.arrow.up")
+				.font(.title3)
 		}
+		.buttonStyle(.borderedProminent)
+		.buttonBorderShape(.capsule)
+		.disabled(invalidDates || isExporting)
 	}
 	
 	@ViewBuilder
@@ -457,16 +432,19 @@ struct TxHistoryExporter: View {
 		exportedCount = 0
 		
 		let databaseManager = Biz.business.databaseManager
+		let peerManager = Biz.business.peerManager
 		let fetcher = Biz.business.paymentsManager.fetcher
 		
 		do {
 			let paymentsDb = try await databaseManager.paymentsDb()
+			let peer = try await peerManager.getPeer()
 			
 			let config = CsvWriter.Configuration(
 				includesFiat: includeFiat,
 				includesDescription: includeDescription,
 				includesNotes: includeNotes,
-				includesOriginDestination: includeOriginDestination
+				includesOriginDestination: includeOriginDestination,
+				swapInAddress: peer.swapInAddress
 			)
 			
 			var done = false

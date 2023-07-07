@@ -119,25 +119,25 @@ class LNUrlPayFragment : BaseFragment() {
         }
       }
       mBinding.metadata.text = model.metadata.plainText
-      mBinding.domain.text = Converter.html(getString(R.string.lnurl_pay_domain, callbackUrl.host()))
+      mBinding.domain.text = Converter.html(getString(R.string.legacy_lnurl_pay_domain, callbackUrl.host()))
     }
 
     model.state.observe(viewLifecycleOwner, { state ->
       when (state) {
         is LNUrlPayState.Error -> mBinding.errorMessage.text = when (state.cause) {
-          is InvoiceChainDoesNotMatch -> getString(R.string.lnurl_pay_error_invalid_invoice, model.callbackUrl.host(), getString(R.string.scan_error_invalid_chain))
-          is LNUrlPayInvalidResponse -> getString(R.string.lnurl_pay_error_invalid_invoice, model.callbackUrl.host(), state.cause.message)
-          is LNUrlError.RemoteFailure.CouldNotConnect -> getString(R.string.lnurl_pay_error_unreachable, model.callbackUrl.host())
-          is LNUrlError.RemoteFailure.Detailed -> getString(R.string.lnurl_pay_error_remote_error, model.callbackUrl.host(), state.cause.reason)
-          is LNUrlError.RemoteFailure.Code -> getString(R.string.lnurl_pay_error_remote_error, model.callbackUrl.host(), "HTTP ${state.cause.code}")
-          else -> getString(R.string.lnurl_pay_error_remote_error, model.callbackUrl.host(), state.cause.localizedMessage ?: state.cause.javaClass.simpleName)
+          is InvoiceChainDoesNotMatch -> getString(R.string.legacy_lnurl_pay_error_invalid_invoice, model.callbackUrl.host(), getString(R.string.legacy_scan_error_invalid_chain))
+          is LNUrlPayInvalidResponse -> getString(R.string.legacy_lnurl_pay_error_invalid_invoice, model.callbackUrl.host(), state.cause.message)
+          is LNUrlError.RemoteFailure.CouldNotConnect -> getString(R.string.legacy_lnurl_pay_error_unreachable, model.callbackUrl.host())
+          is LNUrlError.RemoteFailure.Detailed -> getString(R.string.legacy_lnurl_pay_error_remote_error, model.callbackUrl.host(), state.cause.reason)
+          is LNUrlError.RemoteFailure.Code -> getString(R.string.legacy_lnurl_pay_error_remote_error, model.callbackUrl.host(), "HTTP ${state.cause.code}")
+          else -> getString(R.string.legacy_lnurl_pay_error_remote_error, model.callbackUrl.host(), state.cause.localizedMessage ?: state.cause.javaClass.simpleName)
         }
-        is LNUrlPayState.RequestingInvoice -> mBinding.sendingPaymentProgress.setText(getString(R.string.lnurl_pay_sending_payment))
+        is LNUrlPayState.RequestingInvoice -> mBinding.sendingPaymentProgress.setText(getString(R.string.legacy_lnurl_pay_sending_payment))
         is LNUrlPayState.ValidInvoice -> {
-          mBinding.sendingPaymentProgress.setText(getString(R.string.lnurl_pay_checking_invoice))
+          mBinding.sendingPaymentProgress.setText(getString(R.string.legacy_lnurl_pay_checking_invoice))
           sendPayment(state.paymentRequest, state.action)
         }
-        is LNUrlPayState.SendingPayment -> mBinding.sendingPaymentProgress.setText(getString(R.string.lnurl_pay_sending_payment))
+        is LNUrlPayState.SendingPayment -> mBinding.sendingPaymentProgress.setText(getString(R.string.legacy_lnurl_pay_sending_payment))
         else -> Unit
       }
     })
@@ -146,11 +146,11 @@ class LNUrlPayFragment : BaseFragment() {
       val ctx = requireContext()
       mBinding.amountError.text = when (state) {
         LNUrlPayAmountState.Pristine -> ""
-        LNUrlPayAmountState.Error.Empty -> getString(R.string.lnurl_pay_amount_empty)
-        LNUrlPayAmountState.Error.BelowMin -> getString(R.string.lnurl_pay_amount_below_min, Converter.printAmountPretty(model.minSendable, ctx, withUnit = true))
-        LNUrlPayAmountState.Error.AboveMax -> getString(R.string.lnurl_pay_amount_above_max, Converter.printAmountPretty(model.maxSendable, ctx, withUnit = true))
-        LNUrlPayAmountState.Error.AboveBalance -> getString(R.string.lnurl_pay_amount_above_balance)
-        LNUrlPayAmountState.Error.Invalid -> getString(R.string.lnurl_pay_amount_invalid)
+        LNUrlPayAmountState.Error.Empty -> getString(R.string.legacy_lnurl_pay_amount_empty)
+        LNUrlPayAmountState.Error.BelowMin -> getString(R.string.legacy_lnurl_pay_amount_below_min, Converter.printAmountPretty(model.minSendable, ctx, withUnit = true))
+        LNUrlPayAmountState.Error.AboveMax -> getString(R.string.legacy_lnurl_pay_amount_above_max, Converter.printAmountPretty(model.maxSendable, ctx, withUnit = true))
+        LNUrlPayAmountState.Error.AboveBalance -> getString(R.string.legacy_lnurl_pay_amount_above_balance)
+        LNUrlPayAmountState.Error.Invalid -> getString(R.string.legacy_lnurl_pay_amount_invalid)
       }
     })
 
@@ -170,14 +170,14 @@ class LNUrlPayFragment : BaseFragment() {
       val maxCommentLength = model.maxCommentLength ?: 0
       if (maxCommentLength > 0) {
         AlertHelper.buildWithInput(layoutInflater,
-          title = getString(R.string.lnurl_pay_comment_title),
-          message = getString(R.string.lnurl_pay_comment_message, maxCommentLength),
+          title = getString(R.string.legacy_lnurl_pay_comment_title),
+          message = getString(R.string.legacy_lnurl_pay_comment_message, maxCommentLength),
           inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE,
           maxLines = 3,
           maxLength = maxCommentLength.toInt(),
           callback = { comment -> requestInvoice(comment) },
           defaultValue = "",
-          hint = getString(R.string.lnurl_pay_comment_hint))
+          hint = getString(R.string.legacy_lnurl_pay_comment_hint))
           .show()
       } else {
         requestInvoice(null)
@@ -208,9 +208,9 @@ class LNUrlPayFragment : BaseFragment() {
       if (amountOpt.isDefined) {
         val amount = amountOpt.get()
         if (unit == fiat) {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount, ctx, withUnit = true))
+          mBinding.amountConverted.text = getString(R.string.legacy_utils_converted_amount, Converter.printAmountPretty(amount, ctx, withUnit = true))
         } else {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(ctx, amount, withUnit = true))
+          mBinding.amountConverted.text = getString(R.string.legacy_utils_converted_amount, Converter.printFiatPretty(ctx, amount, withUnit = true))
         }
         if (balance != null && amount.`$greater`(balance.sendable)) {
           model.amountState.value = LNUrlPayAmountState.Error.AboveBalance

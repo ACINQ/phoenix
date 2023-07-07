@@ -116,8 +116,8 @@ struct PaymentLayerChoice: View {
 	func payWithL2() {
 		log.trace("payWithL2()")
 		
-		if let model = mvi.model as? Scan.Model_SwapOutFlow_Init,
-		   let paymentRequest = model.address.paymentRequest
+		if let model = mvi.model as? Scan.Model_OnChainFlow,
+		   let paymentRequest = model.uri.paymentRequest
 		{
 			mvi.intent(Scan.Intent_Parse(request: paymentRequest.write()))
 		}

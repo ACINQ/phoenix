@@ -72,13 +72,13 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = true) {
       context?.let { ctx ->
         AlertHelper.buildWithInput(
           layoutInflater,
-          title = ctx.getString(R.string.paymentsettings_defaultdesc_dialog_title),
-          message = ctx.getString(R.string.paymentsettings_defaultdesc_dialog_description),
+          title = ctx.getString(R.string.legacy_paymentsettings_defaultdesc_dialog_title),
+          message = ctx.getString(R.string.legacy_paymentsettings_defaultdesc_dialog_description),
           callback = { value -> context?.let { Prefs.setDefaultPaymentDescription(it, value) } },
           defaultValue = Prefs.getDefaultPaymentDescription(ctx),
-          hint = ctx.getString(R.string.paymentsettings_defaultdesc_dialog_hint)
+          hint = ctx.getString(R.string.legacy_paymentsettings_defaultdesc_dialog_hint)
         )
-          .setNegativeButton(getString(R.string.utils_cancel), null)
+          .setNegativeButton(getString(R.string.legacy_utils_cancel), null)
           .show()
       }
     }
@@ -86,22 +86,22 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = true) {
       context?.let { ctx ->
         AlertHelper.buildWithInput(
           layoutInflater,
-          title = ctx.getString(R.string.paymentsettings_expiry_dialog_title),
-          message = ctx.getString(R.string.paymentsettings_expiry_dialog_description),
+          title = ctx.getString(R.string.legacy_paymentsettings_expiry_dialog_title),
+          message = ctx.getString(R.string.legacy_paymentsettings_expiry_dialog_description),
           callback = { Prefs.setPaymentsExpirySeconds(ctx, it.toLongOrNull()?.coerceAtLeast(1)) },
           defaultValue = Prefs.getPaymentsExpirySeconds(ctx).toString(),
           inputType = InputType.TYPE_CLASS_NUMBER,
           maxLength = 7,
-          hint = ctx.getString(R.string.paymentsettings_expiry_dialog_hint)
+          hint = ctx.getString(R.string.legacy_paymentsettings_expiry_dialog_hint)
         )
-          .setNegativeButton(getString(R.string.utils_cancel), null)
+          .setNegativeButton(getString(R.string.legacy_utils_cancel), null)
           .show()
       }
     }
     mBinding.trampolineFeesButton.setOnClickListener { context?.let { getMaxTrampolineFeeDialog(it)?.show() } }
     mBinding.payToOpenFeesButton.setOnClickListener {
-      AlertHelper.build(layoutInflater, title = getString(R.string.paymentsettings_paytoopen_fees_dialog_title),
-        message = Converter.html(getString(R.string.paymentsettings_paytoopen_fees_dialog_message)))
+      AlertHelper.build(layoutInflater, title = getString(R.string.legacy_paymentsettings_paytoopen_fees_dialog_title),
+        message = Converter.html(getString(R.string.legacy_paymentsettings_paytoopen_fees_dialog_message)))
         .show()
     }
     mBinding.payToOpenEnableSwitch.setOnClickListener {
@@ -118,33 +118,33 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = true) {
 
   private fun refreshUI() {
     context?.let { ctx ->
-      mBinding.defaultDescriptionButton.setSubtitle(Prefs.getDefaultPaymentDescription(ctx).takeIf { it.isNotBlank() } ?: getString(R.string.paymentsettings_defaultdesc_none))
-      mBinding.paymentExpiryButton.setSubtitle(ctx.getString(R.string.paymentsettings_expiry_value, NumberFormat.getInstance().format(Prefs.getPaymentsExpirySeconds(ctx))))
+      mBinding.defaultDescriptionButton.setSubtitle(Prefs.getDefaultPaymentDescription(ctx).takeIf { it.isNotBlank() } ?: getString(R.string.legacy_paymentsettings_defaultdesc_none))
+      mBinding.paymentExpiryButton.setSubtitle(ctx.getString(R.string.legacy_paymentsettings_expiry_value, NumberFormat.getInstance().format(Prefs.getPaymentsExpirySeconds(ctx))))
 
       val isAutoPayToOpenEnabled = Prefs.isAutoPayToOpenEnabled(ctx)
       val trampolineFeeSetting = Prefs.getMaxTrampolineCustomFee(ctx) ?: appContext(ctx).trampolineFeeSettings.value?.last()
       val payToOpenSettings = appContext(ctx).payToOpenSettings.value
 
       if (trampolineFeeSetting != null) {
-        mBinding.trampolineFeesButton.setSubtitle(getString(R.string.paymentsettings_trampoline_fees_desc,
+        mBinding.trampolineFeesButton.setSubtitle(getString(R.string.legacy_paymentsettings_trampoline_fees_desc,
           Converter.printAmountPretty(trampolineFeeSetting.feeBase, ctx, withUnit = true), trampolineFeeSetting.printFeeProportional()))
       } else {
-        mBinding.trampolineFeesButton.setSubtitle(getString(R.string.utils_unavailable))
+        mBinding.trampolineFeesButton.setSubtitle(getString(R.string.legacy_utils_unavailable))
       }
 
       if (payToOpenSettings != null) {
-        mBinding.payToOpenFeesButton.setSubtitle(getString(R.string.paymentsettings_paytoopen_fees_desc,
+        mBinding.payToOpenFeesButton.setSubtitle(getString(R.string.legacy_paymentsettings_paytoopen_fees_desc,
           String.format("%.2f", 100 * (payToOpenSettings.feePercent)),
           Converter.printAmountPretty(payToOpenSettings.minFee, ctx, withUnit = true)))
       } else {
-        mBinding.payToOpenFeesButton.setSubtitle(getString(R.string.utils_unavailable))
+        mBinding.payToOpenFeesButton.setSubtitle(getString(R.string.legacy_utils_unavailable))
       }
 
       mBinding.payToOpenEnableSwitch.setChecked(isAutoPayToOpenEnabled)
       if (isAutoPayToOpenEnabled) {
-        mBinding.payToOpenEnableSwitch.setSubtitle(getString(R.string.paymentsettings_paytoopen_auto_switch_enabled))
+        mBinding.payToOpenEnableSwitch.setSubtitle(getString(R.string.legacy_paymentsettings_paytoopen_auto_switch_enabled))
       } else {
-        mBinding.payToOpenEnableSwitch.setSubtitle(getString(R.string.paymentsettings_paytoopen_auto_switch_disabled))
+        mBinding.payToOpenEnableSwitch.setSubtitle(getString(R.string.legacy_paymentsettings_paytoopen_auto_switch_disabled))
       }
     }
   }
@@ -167,7 +167,7 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = true) {
       BindingHelpers.enableOrFade(proportionalFeeInput, isChecked)
     }
 
-    overrideDefaultCheckbox.text = getString(R.string.paymentsettings_trampoline_fees_dialog_override_default_checkbox)
+    overrideDefaultCheckbox.text = getString(R.string.legacy_paymentsettings_trampoline_fees_dialog_override_default_checkbox)
     overrideDefaultCheckbox.setOnCheckedChangeListener { _, _ -> updateState() }
 
     if (prefsFeeSetting != null) {
@@ -184,8 +184,8 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = true) {
 
     val dialog = AlertDialog.Builder(context, R.style.default_dialogTheme)
       .setView(view)
-      .setPositiveButton(R.string.btn_confirm, null) // overridden below
-      .setNegativeButton(R.string.btn_cancel) { _, _ -> }
+      .setPositiveButton(R.string.legacy_btn_confirm, null) // overridden below
+      .setNegativeButton(R.string.legacy_btn_cancel) { _, _ -> }
       .create()
 
     dialog.setOnShowListener {
@@ -205,11 +205,11 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = true) {
             null
           }
           if (baseFee == null || proportionalFee == null) {
-            Toast.makeText(context, getString(R.string.paymentsettings_trampoline_fees_dialog_invalid), Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.legacy_paymentsettings_trampoline_fees_dialog_invalid), Toast.LENGTH_SHORT).show()
           } else if (baseFee.`$greater`(Satoshi(50_000L))) {
-            Toast.makeText(context, getString(R.string.paymentsettings_trampoline_fees_dialog_base_too_high), Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.legacy_paymentsettings_trampoline_fees_dialog_base_too_high), Toast.LENGTH_SHORT).show()
           } else if (proportionalFee > 1_000_000) {
-            Toast.makeText(context, getString(R.string.paymentsettings_trampoline_fees_dialog_proportional_too_high), Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.legacy_paymentsettings_trampoline_fees_dialog_proportional_too_high), Toast.LENGTH_SHORT).show()
           } else {
             log.info("update max trampoline fee to base=$baseFee proportional=$proportionalFee")
             Prefs.setMaxTrampolineCustomFee(context, baseFee, proportionalFee)

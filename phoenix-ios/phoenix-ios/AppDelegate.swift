@@ -73,7 +73,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			// .listBackgroundColor(Color(.systemBackground))
 
 		} else {
-			// iOS 15 & 14
+			// iOS 15
 			UITableView.appearance().backgroundColor = .primaryBackground
 			UICollectionView.appearance().backgroundColor = .primaryBackground
 		}
@@ -111,7 +111,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		}
 
 		NotificationsManager.shared.requestPermissionForProvisionalNotifications()
-		
+
 		return true
 	}
 	
@@ -242,7 +242,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 
 	private func didReceivePaymentViaAppExtension() {
 		log.trace("didReceivePaymentViaAppExtension()")
-		
+
 		// This usually happens when:
 		// - phoenix was running in the background
 		// - a received push notification launched our notification-service-extension
@@ -274,11 +274,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		business.databaseManager.paymentsDb { paymentsDb, _ in
 		
 			let fakePaymentId = WalletPaymentId.IncomingPaymentId(paymentHash: Bitcoin_kmpByteVector32.random())
-			paymentsDb?.deletePayment(paymentId: fakePaymentId) { _, _ in
+			paymentsDb?.deletePayment(paymentId: fakePaymentId) { _ in
 				// Nothing is actually deleted
 			}
 		}
-		business.appDb.deleteBitcoinRate(fiat: "FakeFiatCurrency") { _, _ in
+		business.appDb.deleteBitcoinRate(fiat: "FakeFiatCurrency") { _ in
 			// Nothing is actually deleted
 		}
 	}

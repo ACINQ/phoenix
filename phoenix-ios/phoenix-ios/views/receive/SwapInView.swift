@@ -26,14 +26,10 @@ struct SwapInView: View {
 	
 	@StateObject var qrCode = QRCode()
 	
-	@State var sheet: ReceiveViewSheet? = nil
+	@State var activeSheet: ReceiveViewSheet? = nil
 	
-	@State var swapIn_feePercent: Double = 0.0
-	@State var swapIn_minFeeSat: Int64 = 0
-	@State var swapIn_minFundingSat: Int64 = 0
-	
-	let incomingSwapsPublisher = Biz.business.balanceManager.incomingSwapsPublisher()
-	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
+	let swapInWalletBalancePublisher = Biz.business.balanceManager.swapInWalletBalancePublisher()
+	@State var swapInWalletBalance = Biz.business.balanceManager.swapInWalletBalanceValue()
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -53,6 +49,24 @@ struct SwapInView: View {
 	
 	@ViewBuilder
 	var body: some View {
+		
+		ZStack {
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
+			if BusinessManager.showTestnetBackground {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+					.accessibilityHidden(true)
+			}
+			
+			contentWrapper()
+		}
+	}
+	
+	@ViewBuilder
+	func contentWrapper() -> some View {
 		
 		GeometryReader { geometry in
 			ScrollView(.vertical) {
@@ -92,29 +106,14 @@ struct SwapInView: View {
 			}
 			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			
-			feesInfoView()
-				.padding([.top, .leading, .trailing])
-			
-			Button {
-				didTapLightningButton()
-			} label: {
-				HStack {
-					Image(systemName: "repeat") // alt: "arrowshape.bounce.forward.fill"
-						.imageScale(.small)
-
-					Text("Show a Lightning invoice")
-				}
-			}
-			.padding(.vertical)
-			
 			Spacer()
 			
 		} // </VStack>
 		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
-			get: { sheet != nil },
-			set: { if !$0 { sheet = nil }}
+			get: { activeSheet != nil },
+			set: { if !$0 { activeSheet = nil }}
 		)) {
-			switch sheet! {
+			switch activeSheet! {
 			case .sharingUrl(let sharingUrl):
 
 				let items: [Any] = [sharingUrl]
@@ -135,24 +134,22 @@ struct SwapInView: View {
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
-		.onReceive(incomingSwapsPublisher) {
-			onIncomingSwapsChanged($0)
-		}
-		.onReceive(chainContextPublisher) {
-			chainContextChanged($0)
+		.onReceive(swapInWalletBalancePublisher) {
+			swapInWalletBalanceChanged($0)
 		}
 	}
 	
 	@ViewBuilder
 	func qrCodeView() -> some View {
 		
-		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
+		if let m = mvi.model as? Receive.Model_SwapIn,
 		   let qrCodeValue = qrCode.value,
 		   qrCodeValue.caseInsensitiveCompare(m.address) == .orderedSame,
 			let qrCodeImage = qrCode.image
 		{
 			qrCodeImage
 				.resizable()
+				.aspectRatio(contentMode: .fit)
 				.contextMenu {
 					Button(action: {
 						copyImageToPasteboard()
@@ -184,11 +181,7 @@ struct SwapInView: View {
 					.padding(.bottom, 10)
 			
 				Group {
-					if mvi.model is Receive.Model_SwapIn_Requesting {
-						Text("Requesting Swap-In Address...")
-					} else {
-						Text("Generating QRCode...")
-					}
+					Text("Generating QRCode...")
 				}
 				.foregroundColor(Color(UIColor.darkGray))
 				.font(.caption)
@@ -280,7 +273,7 @@ struct SwapInView: View {
 		) {
 			// using simultaneousGesture's below
 		}
-		.disabled(!(mvi.model is Receive.Model_SwapIn_Generated))
+		.disabled(!(mvi.model is Receive.Model_SwapIn))
 		.simultaneousGesture(LongPressGesture().onEnded { _ in
 			didLongPressCopyButton()
 		})
@@ -306,7 +299,7 @@ struct SwapInView: View {
 		) {
 			// using simultaneousGesture's below
 		}
-		.disabled(!(mvi.model is Receive.Model_SwapIn_Generated))
+		.disabled(!(mvi.model is Receive.Model_SwapIn))
 		.simultaneousGesture(LongPressGesture().onEnded { _ in
 			didLongPressShareButton()
 		})
@@ -315,73 +308,17 @@ struct SwapInView: View {
 		})
 	}
 	
-	@ViewBuilder
-	func feesInfoView() -> some View {
-		
-		HStack(alignment: VerticalAlignment.top, spacing: 8) {
-			
-			Image(systemName: "exclamationmark.circle")
-				.imageScale(.large)
-				.accessibilityHidden(true)
-			
-			let minFunding = Utils.formatBitcoin(sat: swapIn_minFundingSat, bitcoinUnit: .sat)
-			
-			let feePercent = formatFeePercent()
-			let minFee = Utils.formatBitcoin(sat: swapIn_minFeeSat, bitcoinUnit: .sat)
-			
-			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-				
-				Text(
-					"""
-					This is a swap address. It is not controlled by your wallet. \
-					On-chain deposits sent to this address will be converted to Lightning channels.
-					"""
-				)
-				.lineLimit(nil)                               // text truncation bugs
-				.multilineTextAlignment(.leading)             // text truncation bugs
-				.fixedSize(horizontal: false, vertical: true) // text truncation bugs
-				.padding(.bottom, 14)
-				
-				Text(styled: String(format: NSLocalizedString(
-					"""
-					Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum).
-					""",
-					comment:	"Minimum amount description."),
-					minFunding.string, feePercent, minFee.string
-				))
-				.lineLimit(nil)                               // text truncation bugs
-				.multilineTextAlignment(.leading)             // text truncation bugs
-				.fixedSize(horizontal: false, vertical: true) // text truncation bugs
-			}
-		}
-		.font(.subheadline)
-		.padding()
-		.background(
-			RoundedRectangle(cornerRadius: 10)
-				.foregroundColor(Color.mutedBackground)
-		)
-	}
-	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
 	func bitcoinAddress() -> String? {
 		
-		if let m = mvi.model as? Receive.Model_SwapIn_Generated {
+		if let m = mvi.model as? Receive.Model_SwapIn {
 			return m.address
 		} else {
 			return nil
 		}
-	}
-	
-	func formatFeePercent() -> String {
-		
-		let formatter = NumberFormatter()
-		formatter.minimumFractionDigits = 0
-		formatter.maximumFractionDigits = 3
-		
-		return formatter.string(from: NSNumber(value: swapIn_feePercent))!
 	}
 	
 	// --------------------------------------------------
@@ -394,7 +331,7 @@ struct SwapInView: View {
 		// If the model updates before the view finishes drawing,
 		// we might need to manually invoke onModelChange.
 		//
-		if mvi.model is Receive.Model_SwapIn_Generated {
+		if mvi.model is Receive.Model_SwapIn {
 			onModelChange(model: mvi.model)
 		}
 	}
@@ -402,7 +339,7 @@ struct SwapInView: View {
 	func onModelChange(model: Receive.Model) -> Void {
 		log.trace("onModelChange()")
 		
-		if let m = model as? Receive.Model_SwapIn_Generated {
+		if let m = model as? Receive.Model_SwapIn {
 			log.debug("updating qr code...")
 			
 			// Issue #196: Use uppercase lettering for invoices and address QRs
@@ -410,31 +347,21 @@ struct SwapInView: View {
 		}
 	}
 	
-	func onIncomingSwapsChanged(_ incomingSwaps: [String: Lightning_kmpMilliSatoshi]) -> Void {
-		log.trace("onIncomingSwapsChanged(): \(incomingSwaps)")
+	func swapInWalletBalanceChanged(_ walletBalance: WalletBalance) {
+		log.trace("swapInWalletBalanceChanged()")
 		
-		guard let bitcoinAddress = bitcoinAddress() else {
-			return
-		}
-		
-		// incomingSwaps: [bitcoinAddress: pendingAmount]
-		//
-		// If incomingSwaps has an entry for the bitcoin address that we're displaying,
+		// If we detect a new incoming payment on the swap-in address,
 		// then let's dismiss this sheet, and show the user the home screen.
 		//
 		// Because the home screen has the "+X sat incoming" message
 		
-		if incomingSwaps[bitcoinAddress] != nil {
+		let oldBalance = swapInWalletBalance.total.sat
+		let newBalance = walletBalance.total.sat
+		
+		swapInWalletBalance = walletBalance
+		if newBalance > oldBalance {
 			presentationMode.wrappedValue.dismiss()
 		}
-	}
-	
-	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
-		log.trace("chainContextChanged()")
-		
-		swapIn_feePercent = context.swapIn.v1.feePercent * 100    // 0.01 => 1%
-		swapIn_minFeeSat = context.payToOpen.v1.minFeeSat         // not yet segregated for swapIn - future work
-		swapIn_minFundingSat = context.payToOpen.v1.minFundingSat // not yet segregated for swapIn - future work
 	}
 	
 	// --------------------------------------------------
@@ -479,16 +406,6 @@ struct SwapInView: View {
 		}
 	}
 	
-	func didTapLightningButton() {
-		log.trace("didTapLightningButton()")
-		
-		mvi.intent(Receive.IntentAsk(
-			amount: lastAmount,
-			desc: lastDescription,
-			expirySeconds: Prefs.shared.invoiceExpirationSeconds
-		))
-	}
-	
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
@@ -496,7 +413,7 @@ struct SwapInView: View {
 	func copyTextToPasteboard() -> Void {
 		log.trace("copyTextToPasteboard()")
 		
-		if let m = mvi.model as? Receive.Model_SwapIn_Generated {
+		if let m = mvi.model as? Receive.Model_SwapIn {
 			UIPasteboard.general.string = m.address
 			toast.pop(
 				NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
@@ -508,7 +425,7 @@ struct SwapInView: View {
 	func copyImageToPasteboard() -> Void {
 		log.trace("copyImageToPasteboard()")
 		
-		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
+		if let m = mvi.model as? Receive.Model_SwapIn,
 			let qrCodeValue = qrCode.value,
 			qrCodeValue.caseInsensitiveCompare(m.address) == .orderedSame,
 			let qrCodeCgImage = qrCode.cgImage
@@ -525,22 +442,22 @@ struct SwapInView: View {
 	func shareTextToSystem() {
 		log.trace("shareTextToSystem()")
 		
-		if let m = mvi.model as? Receive.Model_SwapIn_Generated {
+		if let m = mvi.model as? Receive.Model_SwapIn {
 			let url = "bitcoin:\(m.address)"
-			sheet = ReceiveViewSheet.sharingUrl(url: url)
+			activeSheet = ReceiveViewSheet.sharingUrl(url: url)
 		}
 	}
 	
 	func shareImageToSystem() {
 		log.trace("shareImageToSystem()")
 		
-		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
+		if let m = mvi.model as? Receive.Model_SwapIn,
 			let qrCodeValue = qrCode.value,
 			qrCodeValue.caseInsensitiveCompare(m.address) == .orderedSame,
 			let qrCodeCgImage = qrCode.cgImage
 		{
 			let uiImg = UIImage(cgImage: qrCodeCgImage)
-			sheet = ReceiveViewSheet.sharingImg(img: uiImg)
+			activeSheet = ReceiveViewSheet.sharingImg(img: uiImg)
 		}
 	}
 }

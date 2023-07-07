@@ -1,11 +1,10 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.PublicKey
-import fr.acinq.lightning.CltvExpiryDelta
-import fr.acinq.lightning.InvoiceDefaultRoutingFees
-import fr.acinq.lightning.WalletParams
+import fr.acinq.lightning.*
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.managers.NodeParamsManager
 import kotlin.Double
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -76,7 +75,7 @@ object WalletContext {
 
     @Serializable
     data class V0(val testnet: ChainContext, val mainnet: ChainContext) {
-        fun export(chain: Chain): ChainContext = if (chain.isMainnet()) {
+        fun export(chain: NodeParams.Chain): ChainContext = if (chain.isMainnet()) {
             mainnet
         } else {
            testnet
@@ -89,48 +88,33 @@ object WalletContext {
             val trampoline: TrampolineParams,
             @SerialName("pay_to_open") val payToOpen: PayToOpen,
             @SerialName("swap_in") val swapIn: SwapIn,
-            @SerialName("swap_out") val swapOut: SwapOut,
             val mempool: Mempool
         ) {
-            fun walletParams(): WalletParams = trampoline.v2.run {
-                WalletParams(
-                    trampolineNode = nodes.first().export(),
-                    trampolineFees = attempts.map { it.export() },
-                    invoiceDefaultRoutingFees = InvoiceDefaultRoutingFees(
-                        feeBase = 1000.msat,
-                        feeProportional = 100,
-                        cltvExpiryDelta = CltvExpiryDelta(144)
-                    )
-                )
-            }
+            fun walletParams(): WalletParams = WalletParams(
+                trampolineNode = NodeParamsManager.trampolineNodeUri,
+                trampolineFees = trampoline.v3.map { it.export() },
+                invoiceDefaultRoutingFees = InvoiceDefaultRoutingFees(
+                    feeBase = 1000.msat,
+                    feeProportional = 100,
+                    cltvExpiryDelta = CltvExpiryDelta(144)
+                ),
+                swapInConfirmations = NodeParamsManager.swapInConfirmations,
+            )
         }
 
         @Serializable
-        data class TrampolineParams(val v2: V2) {
+        data class TrampolineParams(val v2: V2, val v3: List<TrampolineFees>) {
             @Serializable
             data class TrampolineFees(
                 @SerialName("fee_base_sat") val feeBaseSat: Long,
                 @SerialName("fee_per_millionths") val feePerMillionths: Long,
                 @SerialName("cltv_expiry") val cltvExpiry: Int,
             ) {
-                fun export(): fr.acinq.lightning.TrampolineFees = fr.acinq.lightning.TrampolineFees(feeBaseSat.sat, feePerMillionths, CltvExpiryDelta(cltvExpiry))
+                fun export(): fr.acinq.lightning.TrampolineFees = TrampolineFees(feeBaseSat.sat, feePerMillionths, CltvExpiryDelta(cltvExpiry))
             }
 
             @Serializable
-            data class NodeUri(val name: String, val uri: String) {
-                fun export(): fr.acinq.lightning.NodeUri {
-                    val parts = uri.split("@", ":")
-
-                    val publicKey = PublicKey.fromHex(parts[0])
-                    val host = parts[1]
-                    val port = parts[2].toInt()
-
-                    return fr.acinq.lightning.NodeUri(publicKey, host, port)
-                }
-            }
-
-            @Serializable
-            data class V2(val attempts: List<TrampolineFees>, val nodes: List<NodeUri> = emptyList())
+            data class V2(val attempts: List<TrampolineFees>)
         }
 
         /**
@@ -177,21 +161,6 @@ object WalletContext {
                 @SerialName("min_funding_sat") val minFundingSat: Long,
                 @SerialName("min_fee_sat") val minFeeSat: Long,
                 @SerialName("fee_percent") val feePercent: Double,
-                @SerialName("status") private val _status: Int
-            ) {
-                @Transient
-                val status: ServiceStatus = ServiceStatus.valueOf(_status)
-            }
-        }
-
-        @Serializable
-        data class SwapOut(val v1: V1) {
-
-            @Serializable
-            data class V1(
-                @SerialName("min_feerate_sat_byte") val minFeerateSatByte: Int,
-                @SerialName("min_amount_sat") val minAmountSat: Long,
-                @SerialName("max_amount_sat") val maxAmountSat: Long,
                 @SerialName("status") private val _status: Int
             ) {
                 @Transient

@@ -53,7 +53,7 @@
         android:layout_marginStart="@dimen/space_lg"
         android:layout_marginTop="@dimen/space_lg"
         android:layout_marginEnd="@dimen/space_lg"
-        android:text="@string/lnurl_withdraw_service_host_label"
+        android:text="@string/legacy_lnurl_withdraw_service_host_label"
         android:textAlignment="center"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
@@ -66,7 +66,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_lg"
-        android:text="@string/lnurl_withdraw_amount_label"
+        android:text="@string/legacy_lnurl_withdraw_amount_label"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -136,7 +136,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_xs"
-        android:text="@string/send_amount_error"
+        android:text="@string/legacy_send_amount_error"
         android:textAlignment="center"
         android:textColor="?attr/negativeColor"
         android:textSize="@dimen/text_md"
@@ -164,7 +164,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/amount_feedback_barrier"
-        app:text="@string/lnurl_withdraw_confirm_button"
+        app:text="@string/legacy_lnurl_withdraw_confirm_button"
         app:text_color="?attr/colorOnPrimary" />
 
       <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
@@ -175,7 +175,7 @@
         android:padding="@dimen/space_sm"
         android:visibility="@{model.state instanceof LNUrlWithdrawState.InProgress}"
         app:layout_constraintTop_toBottomOf="@id/amount_feedback_barrier"
-        app:text="@string/lnurl_withdraw_wait" />
+        app:text="@string/legacy_lnurl_withdraw_wait" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/error_layout"
@@ -221,7 +221,7 @@
         android:layout_marginTop="@dimen/space_lg_p"
         android:layout_marginEnd="@dimen/space_lg"
         android:padding="@dimen/space_md"
-        android:text="@string/lnurl_withdraw_success"
+        android:text="@string/legacy_lnurl_withdraw_success"
         android:textAlignment="center"
         android:visibility="@{model.state instanceof LNUrlWithdrawState.Done}"
         app:layout_constrainedWidth="true"

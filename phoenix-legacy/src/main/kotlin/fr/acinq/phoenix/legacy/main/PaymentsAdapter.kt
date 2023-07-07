@@ -31,6 +31,8 @@ import fr.acinq.phoenix.legacy.utils.Prefs
 
 class PaymentsAdapter : RecyclerView.Adapter<PaymentHolder>() {
 
+  private var showFooter = false
+
   private val mPrefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
     if (key == Prefs.PREFS_SHOW_AMOUNT_IN_FIAT) {
       notifyDataSetChanged()
@@ -40,18 +42,34 @@ class PaymentsAdapter : RecyclerView.Adapter<PaymentHolder>() {
   private val mDiffer: AsyncListDiffer<PaymentWithMeta> = AsyncListDiffer(this, DIFF_CALLBACK)
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PaymentHolder {
-    val prefs = PreferenceManager.getDefaultSharedPreferences(parent.context)
-    prefs.registerOnSharedPreferenceChangeListener(mPrefsListener)
-    return PaymentHolder(LayoutInflater.from(parent.context).inflate(R.layout.holder_payment, parent, false))
+    return if (viewType == 0) {
+      val prefs = PreferenceManager.getDefaultSharedPreferences(parent.context)
+      prefs.registerOnSharedPreferenceChangeListener(mPrefsListener)
+      PaymentLineHolder(LayoutInflater.from(parent.context).inflate(R.layout.holder_payment, parent, false))
+    } else {
+      PaymentFooterHolder(LayoutInflater.from(parent.context).inflate(R.layout.holder_payment_footer, parent, false))
+    }
   }
 
   override fun onBindViewHolder(holder: PaymentHolder, position: Int) {
-    holder.bindPaymentItem(position, mDiffer.currentList[position])
+    when (holder) {
+      is PaymentLineHolder -> if (position < mDiffer.currentList.size) holder.bindPaymentItem(position, mDiffer.currentList[position])
+      is PaymentFooterHolder -> holder.bindPaymentItem()
+    }
   }
 
-  override fun getItemCount(): Int = mDiffer.currentList.size
+  override fun getItemCount(): Int = if (showFooter) mDiffer.currentList.size + 1 else mDiffer.currentList.size
 
-  fun submitList(list: List<PaymentWithMeta>) {
+  override fun getItemViewType(position: Int): Int {
+    return if (showFooter && position + 1 == itemCount) {
+      1
+    } else {
+      0
+    }
+  }
+
+  fun submitList(showFooter: Boolean, list: List<PaymentWithMeta>) {
+    this.showFooter = showFooter
     mDiffer.submitList(list)
   }
 

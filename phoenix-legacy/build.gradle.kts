@@ -4,7 +4,7 @@ plugins {
   id("com.android.library")
   kotlin("android")
   id("kotlin-kapt")
-  id("kotlin-android-extensions")
+  id("kotlin-parcelize")
   id("androidx.navigation.safeargs.kotlin")
   id("com.google.gms.google-services")
   id("com.squareup.sqldelight")
@@ -31,7 +31,7 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
-    val libCode = 40
+    val libCode = 50
     getByName("debug") {
       resValue("string", "CHAIN", chain)
       buildConfigField("String", "CHAIN", chain)
@@ -59,6 +59,7 @@ android {
   }
   buildFeatures {
     dataBinding = true
+    viewBinding = true
   }
   externalNativeBuild {
     cmake {
@@ -105,6 +106,7 @@ dependencies {
 
   // -- AndroidX: preferences datastore
   implementation("androidx.datastore:datastore-preferences:1.0.0")
+  implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor}")
 
   implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
 

@@ -42,7 +42,7 @@
         style="@style/dialog_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/channels_import_title"
+        android:text="@string/legacy_channels_import_title"
         app:layout_constraintTop_toTopOf="parent" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
@@ -57,7 +57,7 @@
           android:id="@+id/instructions"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="@string/channels_import_instructions"
+          android:text="@string/legacy_channels_import_instructions"
           app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -66,7 +66,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md"
-          android:hint="@string/channels_import_hint"
+          android:hint="@string/legacy_channels_import_hint"
           app:layout_constraintTop_toBottomOf="@id/instructions">
 
           <com.google.android.material.textfield.TextInputEditText
@@ -86,7 +86,7 @@
           app:icon="@drawable/ic_restore"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintTop_toBottomOf="@id/input_layout"
-          app:text="@string/channels_import_start_button" />
+          app:text="@string/legacy_channels_import_start_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -95,7 +95,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_md"
-        android:text="@string/channels_import_reading"
+        android:text="@string/legacy_channels_import_reading"
         android:visibility="@{model.state instanceof ChannelsImportState.Importing.Reading}"
         app:layout_constraintTop_toBottomOf="@id/title" />
 
@@ -104,7 +104,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_md"
-        android:text="@string/channels_import_decrypting"
+        android:text="@string/legacy_channels_import_decrypting"
         android:visibility="@{model.state instanceof ChannelsImportState.Importing.Decrypting}"
         app:layout_constraintTop_toBottomOf="@id/title" />
 
@@ -113,7 +113,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_md"
-        android:text="@string/channels_import_writing"
+        android:text="@string/legacy_channels_import_writing"
         android:visibility="@{model.state instanceof ChannelsImportState.Importing.Writing}"
         app:layout_constraintTop_toBottomOf="@id/title" />
 
@@ -130,7 +130,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:drawablePadding="@dimen/space_md"
-          android:text="@string/channels_import_success"
+          android:text="@string/legacy_channels_import_success"
           app:drawableStartCompat="@drawable/ic_check_circle"
           app:drawableTint="?attr/positiveColor"
           app:layout_constraintTop_toTopOf="parent" />
@@ -144,7 +144,7 @@
           app:icon="@drawable/ic_refresh"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintTop_toBottomOf="@id/success_message"
-          app:text="@string/channels_import_success_button" />
+          app:text="@string/legacy_channels_import_success_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -161,7 +161,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:drawablePadding="@dimen/space_md"
-          android:text="@string/channels_import_failure"
+          android:text="@string/legacy_channels_import_failure"
           app:layout_constraintTop_toTopOf="parent" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
@@ -182,7 +182,7 @@
         android:visibility="@{model.state instanceof ChannelsImportState.Init || model.state instanceof ChannelsImportState.Error}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dismiss_barrier"
-        app:text="@string/btn_close" />
+        app:text="@string/legacy_btn_close" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>

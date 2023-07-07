@@ -59,19 +59,19 @@ struct HorizontalActivity: View {
 						.frame(width: diameter, height: diameter)
 						.offset(x: offsetA)
 						.opacity(0.7)
-						.animation(Animation.easeInOut(duration: 1))
+						.animation(Animation.easeInOut(duration: 1), value: UUID())
 					Circle()
 						.fill(color)
 						.frame(width: diameter, height: diameter)
 						.offset(x: offsetA)
 						.opacity(0.7)
-						.animation(Animation.easeInOut(duration: 1).delay(0.2))
+						.animation(Animation.easeInOut(duration: 1).delay(0.2), value: UUID())
 					Circle()
 						.fill(color)
 						.frame(width: diameter, height: diameter)
 						.offset(x: offsetA)
 						.opacity(0.7)
-						.animation(Animation.easeInOut(duration: 1).delay(0.4))
+						.animation(Animation.easeInOut(duration: 1).delay(0.4), value: UUID())
 				}
 			}
 		}

@@ -28,7 +28,7 @@
       android:id="@+id/trampoline_fee_override_default_checkbox"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:text="@string/paymentsettings_trampoline_fees_dialog_override_default_checkbox"
+      android:text="@string/legacy_paymentsettings_trampoline_fees_dialog_override_default_checkbox"
       app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -37,7 +37,7 @@
       android:layout_height="wrap_content"
       android:layout_marginTop="@dimen/space_md"
       android:layout_marginStart="@dimen/space_sm"
-      android:text="@string/paymentsettings_trampoline_fees_dialog_base_fee_label"
+      android:text="@string/legacy_paymentsettings_trampoline_fees_dialog_base_fee_label"
       android:textColor="?attr/colorPrimary"
       android:textSize="@dimen/text_md"
       app:layout_constraintTop_toBottomOf="@id/trampoline_fee_override_default_checkbox" />
@@ -51,7 +51,7 @@
       android:maxLength="10"
       android:inputType="number"
       android:textSize="@dimen/text_lg"
-      android:hint="@string/paymentsettings_trampoline_fees_dialog_base_fee_hint"
+      android:hint="@string/legacy_paymentsettings_trampoline_fees_dialog_base_fee_hint"
       android:importantForAutofill="no"
       app:layout_constraintTop_toBottomOf="@id/trampoline_fee_max_base_fee_label" />
 
@@ -61,7 +61,7 @@
       android:layout_height="wrap_content"
       android:layout_marginTop="@dimen/space_md"
       android:layout_marginStart="@dimen/space_sm"
-      android:text="@string/paymentsettings_trampoline_fees_dialog_proportional_fee_label"
+      android:text="@string/legacy_paymentsettings_trampoline_fees_dialog_proportional_fee_label"
       android:textColor="?attr/colorPrimary"
       android:textSize="@dimen/text_md"
       app:layout_constraintTop_toBottomOf="@id/trampoline_fee_max_base_fee_value" />
@@ -74,7 +74,7 @@
       android:inputType="number|numberDecimal"
       android:layout_marginStart="@dimen/space_sm"
       android:textSize="@dimen/text_lg"
-      android:hint="@string/paymentsettings_trampoline_fees_dialog_proportional_fee_hint"
+      android:hint="@string/legacy_paymentsettings_trampoline_fees_dialog_proportional_fee_hint"
       android:importantForAutofill="no"
       app:layout_constraintTop_toBottomOf="@id/trampoline_fee_max_proportional_fee_label" />
 

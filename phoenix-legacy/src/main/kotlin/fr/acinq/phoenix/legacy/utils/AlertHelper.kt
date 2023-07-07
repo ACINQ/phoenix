@@ -65,7 +65,7 @@ object AlertHelper {
     }
     return AlertDialog.Builder(inflater.context, R.style.default_dialogTheme)
       .setView(view)
-      .setPositiveButton(inflater.context.getString(R.string.btn_ok)) { _, _ -> callback(input.text.toString()) }
+      .setPositiveButton(inflater.context.getString(R.string.legacy_btn_ok)) { _, _ -> callback(input.text.toString()) }
   }
 
   fun buildWithCheckBox(inflater: LayoutInflater, title: CharSequence?, message: CharSequence?, checkBoxLabel: CharSequence?, defaultValue: Boolean, callback: (Boolean) -> Unit): AlertDialog.Builder {
@@ -77,7 +77,7 @@ object AlertHelper {
     }
     return AlertDialog.Builder(inflater.context, R.style.default_dialogTheme)
       .setView(view)
-      .setPositiveButton(inflater.context.getString(R.string.btn_ok)) { _, _ -> callback(checkbox.isChecked) }
+      .setPositiveButton(inflater.context.getString(R.string.legacy_btn_ok)) { _, _ -> callback(checkbox.isChecked) }
   }
 
   fun buildFullScreenImage(inflater: LayoutInflater, bitmap: Bitmap): AlertDialog.Builder {

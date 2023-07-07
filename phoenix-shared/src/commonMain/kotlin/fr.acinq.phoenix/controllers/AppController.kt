@@ -37,7 +37,7 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(loggerFactory: Logge
         launch {
             modelChanges.consumeEach { change ->
                 val newModel = models.value.change()
-                logger.info { "model=${truncateLog(newModel)}" }
+                logger.debug { "model=${truncateLog(newModel)}" }
                 models.value = newModel
             }
         }
@@ -62,7 +62,7 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(loggerFactory: Logge
     protected abstract fun process(intent: I)
 
     final override fun intent(intent: I) {
-        logger.info { "intent=$intent" }
+        logger.debug { "intent=$intent" }
         process(intent)
     }
 

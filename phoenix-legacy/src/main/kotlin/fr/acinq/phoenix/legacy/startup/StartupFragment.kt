@@ -39,6 +39,8 @@ import fr.acinq.phoenix.legacy.databinding.FragmentStartupBinding
 import fr.acinq.phoenix.legacy.security.PinDialog
 import fr.acinq.phoenix.legacy.send.ReadInputFragmentDirections
 import fr.acinq.phoenix.legacy.utils.Constants
+import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.legacy.utils.Migration
 import fr.acinq.phoenix.legacy.utils.Prefs
 import fr.acinq.phoenix.legacy.utils.Wallet
@@ -88,8 +90,8 @@ class StartupFragment : BaseFragment() {
       when (lockState) {
         is AppLock.Locked.AuthFailure -> {
           mBinding.authenticationMessage.text = context?.let { AuthHelper.translateAuthState(it, lockState.code) }?.let {
-            getString(R.string.startup_error_auth_failed_with_details, it)
-          } ?: getString(R.string.startup_error_auth_failed)
+            getString(R.string.legacy_startup_error_auth_failed_with_details, it)
+          } ?: getString(R.string.legacy_startup_error_auth_failed)
           Handler().postDelayed({
             val lock = app.lockState.value
             val blockingCodes = listOf(BiometricPrompt.ERROR_LOCKOUT, BiometricPrompt.ERROR_LOCKOUT_PERMANENT, BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED)
@@ -98,7 +100,7 @@ class StartupFragment : BaseFragment() {
             }
           }, 3000)
         }
-        else -> mBinding.authenticationMessage.text = getString(R.string.startup_unlock_required)
+        else -> mBinding.authenticationMessage.text = getString(R.string.legacy_startup_unlock_required)
       }
     })
   }
@@ -146,14 +148,22 @@ class StartupFragment : BaseFragment() {
         checkLock(context)
       }
       kitState is KitState.Off -> {
-        log.info("kit=${kitState.getName()} seed=${seed.name()} lock=${lockState}, unlocking wallet and starting kit")
-        unlockAndStart(context, seed)
+        lifecycleScope.launch {
+          LegacyPrefsDatastore.getLegacyAppStatus(context).collect { legacyAppStatus ->
+            if (legacyAppStatus is LegacyAppStatus.Required) {
+              log.info("kit=${kitState.getName()} seed=${seed.name()} lock=${lockState}, unlocking wallet and starting kit")
+              unlockAndStart(context, seed)
+            } else {
+              log.info("kit is off, but legacy app status=$legacyAppStatus, standing by...")
+            }
+          }
+        }
       }
-      kitState is KitState.Error.Generic -> mBinding.errorMessage.text = getString(R.string.startup_error_generic, kitState.message)
-      kitState is KitState.Error.InvalidElectrumAddress -> mBinding.errorMessage.text = getString(R.string.startup_error_electrum_address)
-      kitState is KitState.Error.Tor -> mBinding.errorMessage.text = getString(R.string.startup_error_tor, kitState.message)
-      kitState is KitState.Error.UnreadableData -> mBinding.errorMessage.text = getString(R.string.startup_error_unreadable)
-      kitState is KitState.Error.NoConnectivity -> mBinding.errorMessage.text = getString(R.string.startup_error_network)
+      kitState is KitState.Error.Generic -> mBinding.errorMessage.text = getString(R.string.legacy_startup_error_generic, kitState.message)
+      kitState is KitState.Error.InvalidElectrumAddress -> mBinding.errorMessage.text = getString(R.string.legacy_startup_error_electrum_address)
+      kitState is KitState.Error.Tor -> mBinding.errorMessage.text = getString(R.string.legacy_startup_error_tor, kitState.message)
+      kitState is KitState.Error.UnreadableData -> mBinding.errorMessage.text = getString(R.string.legacy_startup_error_unreadable)
+      kitState is KitState.Error.NoConnectivity -> mBinding.errorMessage.text = getString(R.string.legacy_startup_error_network)
       else -> {
         log.debug("kit=${kitState?.getName()}, standing by...")
       }
@@ -297,9 +307,9 @@ class StartupFragment : BaseFragment() {
     when {
       Prefs.useBiometrics(context) && BiometricManager.from(context).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS -> {
         val biometricPromptInfo = BiometricPrompt.PromptInfo.Builder()
-          .setTitle(getString(R.string.biometricprompt_title))
+          .setTitle(getString(R.string.legacy_biometricprompt_title))
           .setDeviceCredentialAllowed(false)
-          .setNegativeButtonText(getString(R.string.biometricprompt_negative))
+          .setNegativeButtonText(getString(R.string.legacy_biometricprompt_negative))
 
         val onNegative = {
           mPinDialog?.reset()

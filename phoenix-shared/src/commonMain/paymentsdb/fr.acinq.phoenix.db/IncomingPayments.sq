@@ -9,10 +9,11 @@ CREATE TABLE IF NOT EXISTS incoming_payments (
     -- origin
     origin_type TEXT AS IncomingOriginTypeVersion NOT NULL,
     origin_blob BLOB NOT NULL,
-    -- received
+    -- this field is legacy, the amount received is the sum of the received-with parts
     received_amount_msat INTEGER DEFAULT NULL,
+    -- timestamp when the payment has been received
     received_at INTEGER DEFAULT NULL,
-    -- received with
+    -- received-with parts
     received_with_type TEXT AS IncomingReceivedWithTypeVersion DEFAULT NULL,
     received_with_blob BLOB DEFAULT NULL
 );
@@ -64,14 +65,6 @@ WHERE    received_at IS NOT NULL
 ORDER BY r.received_at ASC
 LIMIT 1;
 
-listAll:
-SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
-FROM   incoming_payments
-ORDER BY
-       coalesce(received_at, created_at) DESC,
-       payment_hash DESC
-LIMIT :limit OFFSET :offset;
-
 listAllWithin:
 SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
 FROM   incoming_payments
@@ -80,14 +73,15 @@ ORDER BY
        coalesce(received_at, created_at) DESC,
        payment_hash DESC;
 
-listReceived:
-SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
-FROM   incoming_payments AS r
-WHERE  received_at IS NOT NULL
-ORDER BY
-       r.received_at DESC,
-       payment_hash DESC
-LIMIT :limit OFFSET :offset;
+listAllNotConfirmed:
+SELECT incoming_payments.payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
+FROM   incoming_payments
+LEFT OUTER JOIN link_tx_to_payments
+    ON link_tx_to_payments.type = 1
+    AND link_tx_to_payments.confirmed_at IS NULL
+    AND link_tx_to_payments.id = incoming_payments.payment_hash
+WHERE received_at IS NOT NULL
+;
 
 scanCompleted:
 SELECT payment_hash,

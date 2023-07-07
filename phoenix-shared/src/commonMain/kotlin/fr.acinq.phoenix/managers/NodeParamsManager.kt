@@ -16,34 +16,31 @@
 
 package fr.acinq.phoenix.managers
 
-import fr.acinq.lightning.*
-import fr.acinq.lightning.blockchain.fee.FeerateTolerance
-import fr.acinq.lightning.blockchain.fee.OnChainFeeConf
-import fr.acinq.lightning.crypto.LocalKeyManager
-import fr.acinq.lightning.utils.msat
+import fr.acinq.bitcoin.PublicKey
+import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.NodeUri
+import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.data.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
 class NodeParamsManager(
     loggerFactory: LoggerFactory,
-    chain: Chain,
-    walletManager: WalletManager
+    chain: NodeParams.Chain,
+    walletManager: WalletManager,
+    appConfigurationManager: AppConfigurationManager,
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness): this(
         loggerFactory = business.loggerFactory,
         chain = business.chain,
-        walletManager = business.walletManager
+        walletManager = business.walletManager,
+        appConfigurationManager = business.appConfigurationManager,
     )
 
     private val log = newLogger(loggerFactory)
@@ -52,75 +49,33 @@ class NodeParamsManager(
     val nodeParams: StateFlow<NodeParams?> = _nodeParams
 
     init {
-        // we listen to the wallet manager and update node params and databases when the wallet changes
         launch {
-            walletManager.keyManager.filterNotNull().collect { keyManager ->
-                log.info { "nodeid=${keyManager.nodeId}" }
-
-                val nodeParams = NodeParams(
+            combine(
+                walletManager.keyManager.filterNotNull(),
+                appConfigurationManager.startupParams.filterNotNull(),
+            ) { keyManager, startupParams ->
+                NodeParams(
+                    chain = chain,
+                    loggerFactory = loggerFactory,
                     keyManager = keyManager,
+                ).copy(
                     alias = "phoenix",
-                    features = Features(
-                        Feature.InitialRoutingSync to FeatureSupport.Optional,
-                        Feature.OptionDataLossProtect to FeatureSupport.Optional,
-                        Feature.VariableLengthOnion to FeatureSupport.Mandatory,
-                        Feature.PaymentSecret to FeatureSupport.Mandatory,
-                        Feature.BasicMultiPartPayment to FeatureSupport.Optional,
-                        Feature.Wumbo to FeatureSupport.Optional,
-                        Feature.StaticRemoteKey to FeatureSupport.Optional,
-                        Feature.AnchorOutputs to FeatureSupport.Optional,
-                        Feature.ShutdownAnySegwit to FeatureSupport.Optional,
-                        Feature.ChannelType to FeatureSupport.Mandatory,
-                        Feature.PaymentMetadata to FeatureSupport.Optional,
-                        Feature.ExperimentalTrampolinePayment to FeatureSupport.Optional,
-                        Feature.ZeroReserveChannels to FeatureSupport.Optional,
-                        Feature.ZeroConfChannels to FeatureSupport.Optional,
-                        Feature.WakeUpNotificationClient to FeatureSupport.Optional,
-                        Feature.PayToOpenClient to FeatureSupport.Optional,
-                        Feature.TrustedSwapInClient to FeatureSupport.Optional,
-                        Feature.ChannelBackupClient to FeatureSupport.Optional,
-                    ),
-                    dustLimit = 546.sat,
-                    maxRemoteDustLimit = 600.sat,
-                    onChainFeeConf = OnChainFeeConf(
-                        closeOnOfflineMismatch = true,
-                        updateFeeMinDiffRatio = 0.1,
-                        feerateTolerance = FeerateTolerance(ratioLow = 0.01, ratioHigh = 100.0)
-                    ),
-                    maxHtlcValueInFlightMsat = 20000000000L,
-                    maxAcceptedHtlcs = 6,
-                    expiryDeltaBlocks = CltvExpiryDelta(144),
-                    fulfillSafetyBeforeTimeoutBlocks = CltvExpiryDelta(6),
-                    checkHtlcTimeoutAfterStartupDelaySeconds = 15,
-                    htlcMinimum = 1000.msat,
-                    minDepthBlocks = 3,
-                    toRemoteDelayBlocks = CltvExpiryDelta(2016),
-                    maxToLocalDelayBlocks = CltvExpiryDelta(1008),
-                    feeBase = 1000.msat,
-                    feeProportionalMillionth = 100,
-                    reserveToFundingRatio = 0.01, // note: not used (overridden below)
-                    maxReserveToFundingRatio = 0.05,
-                    revocationTimeoutSeconds = 20,
-                    authTimeoutSeconds = 10,
-                    initTimeoutSeconds = 10,
-                    pingIntervalSeconds = 30,
-                    pingTimeoutSeconds = 10,
-                    pingDisconnect = true,
-                    autoReconnect = false,
-                    initialRandomReconnectDelaySeconds = 5,
-                    maxReconnectIntervalSeconds = 3600,
-                    chainHash = chain.chainHash,
-                    channelFlags = 1,
-                    paymentRequestExpirySeconds = 3600,
-                    multiPartPaymentExpirySeconds = 60,
-                    minFundingSatoshis = 20_000.sat,
-                    maxFundingSatoshis = 21_000_000_000_00000.sat,
-                    maxPaymentAttempts = 5,
-                    enableTrampolinePayment = true,
+                    zeroConfPeers = setOf(trampolineNodeId),
+                    liquidityPolicy = MutableStateFlow(startupParams.liquidityPolicy),
                 )
-
-                _nodeParams.value = nodeParams
+            }.collect {
+                log.info { "nodeid=${it.nodeId}" }
+                _nodeParams.value = it
             }
         }
+    }
+
+    companion object {
+        val chain = NodeParams.Chain.Mainnet
+        val trampolineNodeId = PublicKey.fromHex("03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f")
+        val trampolineNodeUri = NodeUri(id = trampolineNodeId, "3.33.236.230", 9735)
+        const val remoteSwapInXpub = "xpub69q3sDXXsLuHVbmTrhqmEqYqTTsXJKahdfawXaYuUt6muf1PbZBnvqzFcwiT8Abpc13hY8BFafakwpPbVkatg9egwiMjed1cRrPM19b2Ma7"
+        val defaultLiquidityPolicy = LiquidityPolicy.Auto(maxAbsoluteFee = 5_000.sat, maxRelativeFeeBasisPoints = 50_00 /* 50% */, skipAbsoluteFeeCheck = false)
+        const val swapInConfirmations = 3
     }
 }

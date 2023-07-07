@@ -28,8 +28,8 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"
-      app:subtitle="@string/logs_subtitle"
-      app:title="@string/logs_title" />
+      app:subtitle="@string/legacy_logs_subtitle"
+      app:title="@string/legacy_logs_title" />
 
     <ScrollView
       android:layout_width="match_parent"
@@ -59,7 +59,7 @@
           app:hz_bias="0"
           app:icon="@drawable/ic_eye"
           app:layout_constraintTop_toBottomOf="@id/instructions_sep"
-          app:text="@string/logs_view_button" />
+          app:text="@string/legacy_logs_view_button" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/share_button"
@@ -70,7 +70,7 @@
           app:hz_bias="0"
           app:icon="@drawable/ic_share"
           app:layout_constraintTop_toBottomOf="@id/view_button"
-          app:text="@string/logs_share_button" />
+          app:text="@string/legacy_logs_share_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

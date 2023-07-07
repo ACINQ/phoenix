@@ -45,7 +45,7 @@
         android:id="@+id/header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/ftue__pay_to_open__header"
+        android:text="@string/legacy_ftue__pay_to_open__header"
         android:lineSpacingMultiplier="1"
         android:textAlignment="center"
         android:textSize="32sp"
@@ -58,7 +58,7 @@
         android:id="@+id/body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/ftue__pay_to_open__body"
+        android:text="@string/legacy_ftue__pay_to_open__body"
         android:textSize="@dimen/text_lg"
         android:textAlignment="center"
         android:layout_marginTop="@dimen/space_md_p"
@@ -78,7 +78,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/body"
-        app:text="@string/ftue__pay_to_open__button" />
+        app:text="@string/legacy_ftue__pay_to_open__button" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>

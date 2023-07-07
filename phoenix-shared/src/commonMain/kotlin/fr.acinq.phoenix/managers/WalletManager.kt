@@ -1,23 +1,36 @@
+/*
+ * Copyright 2022 ACINQ SAS
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.*
+import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.crypto.KeyManager
 import fr.acinq.lightning.crypto.LocalKeyManager
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.bitcoin.PublicKey
-import fr.acinq.phoenix.data.Chain
+import fr.acinq.lightning.crypto.div
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 
-
 class WalletManager(
-    private val chain: Chain
+    private val chain: NodeParams.Chain
 ) : CoroutineScope by MainScope() {
-    internal var _master: DeterministicWallet.ExtendedPrivateKey? = null
 
     private val _localKeyManager = MutableStateFlow<LocalKeyManager?>(null)
-    internal val keyManager: StateFlow<LocalKeyManager?> = _localKeyManager
+    val keyManager: StateFlow<LocalKeyManager?> = _localKeyManager
 
     fun isLoaded(): Boolean = keyManager.value != null
 
@@ -32,49 +45,19 @@ class WalletManager(
 
     /** Loads a seed and creates the key manager. Returns an objet containing some keys for the iOS app. */
     fun loadWallet(seed: ByteArray): WalletInfo {
-        _master = DeterministicWallet.generate(seed)
-        val km = keyManager.value ?: LocalKeyManager(seed.byteVector(), chain.chainHash).also {
+        val km = keyManager.value ?: LocalKeyManager(
+            seed = seed.byteVector(),
+            chain = chain,
+            remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub,
+        ).also {
             _localKeyManager.value = it
         }
-        val (cloudKey, cloudKeyHash) = cloudKeyAndEncryptedNodeId()
         return WalletInfo(
-            nodeId = km.nodeId,
-            nodeIdHash = km.nodeId.hash160().byteVector().toHex(),
-            cloudKey = cloudKey,
-            cloudKeyHash = cloudKeyHash,
+            nodeId = km.nodeKeys.nodeKey.publicKey,
+            nodeIdHash = km.nodeIdHash(),
+            cloudKey = km.cloudKey(),
+            cloudKeyHash = km.cloudKeyHash()
         )
-    }
-
-    fun getXpub(): Pair<String, String>? {
-        if (_master == null) return null
-        val masterPubkeyPath = KeyPath(if (isMainnet()) "m/84'/0'/0'" else "m/84'/1'/0'")
-        val publicKey = DeterministicWallet.publicKey(privateKey(masterPubkeyPath))
-
-        return DeterministicWallet.encode(
-            input = publicKey,
-            prefix = if (isMainnet()) DeterministicWallet.zpub else DeterministicWallet.vpub
-        ) to masterPubkeyPath.toString()
-    }
-
-    /** Key used to encrypt/decrypt blobs we store in the cloud. */
-    private fun cloudKeyAndEncryptedNodeId(): Pair<ByteVector32, String> {
-        val path = KeyPath(if (isMainnet()) "m/51'/0'/0'/0" else "m/51'/1'/0'/0")
-        val extPrivKey = privateKey(path)
-
-        val cloudKey = extPrivKey.privateKey.value
-        val hash = Crypto.hash160(cloudKey).byteVector().toHex()
-
-        return Pair(cloudKey, hash)
-    }
-
-    private fun isMainnet() = chain.isMainnet()
-
-    fun privateKey(keyPath: KeyPath): DeterministicWallet.ExtendedPrivateKey = DeterministicWallet.derivePrivateKey(_master!!, keyPath)
-
-    fun onchainAddress(path: KeyPath): String {
-        val chainHash = if (isMainnet()) Block.LivenetGenesisBlock.hash else Block.TestnetGenesisBlock.hash
-        val publicKey = privateKey(path).publicKey
-        return Bitcoin.computeBIP84Address(publicKey, chainHash)
     }
 
     /**
@@ -99,6 +82,23 @@ class WalletManager(
         val nodeId: PublicKey,
         val nodeIdHash: String,     // used for local storage
         val cloudKey: ByteVector32, // used for cloud storage
-        val cloudKeyHash: String, // used for cloud storage
+        val cloudKeyHash: String    // used for cloud storage
     )
 }
+
+fun LocalKeyManager.nodeIdHash(): String = this.nodeKeys.nodeKey.publicKey.hash160().byteVector().toHex()
+
+/** Key used to encrypt/decrypt blobs we store in the cloud. */
+fun LocalKeyManager.cloudKey(): ByteVector32 {
+    val path = KeyPath(if (isMainnet()) "m/51'/0'/0'/0" else "m/51'/1'/0'/0")
+    return derivePrivateKey(path).privateKey.value
+}
+
+fun LocalKeyManager.cloudKeyHash(): String {
+    return Crypto.hash160(cloudKey()).byteVector().toHex()
+}
+
+fun LocalKeyManager.isMainnet() = chain == NodeParams.Chain.Mainnet
+
+val LocalKeyManager.finalOnChainWalletPath: String
+    get() = (KeyManager.Bip84OnChainKeys.bip84BasePath(chain) / finalOnChainWallet.account).toString()

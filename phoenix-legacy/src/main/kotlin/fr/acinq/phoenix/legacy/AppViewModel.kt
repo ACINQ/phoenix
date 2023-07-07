@@ -36,6 +36,7 @@ import fr.acinq.phoenix.legacy.utils.SingleLiveEvent
 import fr.acinq.phoenix.legacy.utils.tor.TorConnectionStatus
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -74,13 +75,13 @@ class AppViewModel : ViewModel() {
   val currentURIIntent = MutableLiveData<String>()
 
   /** Id of the fragment the app currently displays. */
-  val currentNav = MutableLiveData<Int>()
+  val currentNav = MutableStateFlow(R.id.startup_fragment)
 
   /** Contains an object that will trigger a navigation change. Fire once! */
   val navigationEvent = SingleLiveEvent<Any>()
 
-  /** List of payments. */
-  val payments = MutableLiveData<List<PaymentWithMeta>>()
+  /** Total count of payments -> List of known payments. List may be less than total count. */
+  val payments = MutableLiveData<Pair<Long, List<PaymentWithMeta>>>()
 
   /** List of swap-ins waiting for confirmation. */
   val pendingSwapIns = MutableLiveData(HashMap<String, SwapInPending>())
@@ -89,9 +90,16 @@ class AppViewModel : ViewModel() {
   val networkInfo = NetworkInfoLiveData(_service)
 
   init {
-    currentNav.value = R.id.startup_fragment
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
+    }
+    viewModelScope.launch(Dispatchers.Default) {
+      currentNav.collect { navId ->
+        if(navId == R.id.main_fragment) {
+          refreshLatestPayments()
+          service?.refreshPeerConnectionState()
+        }
+      }
     }
   }
 
@@ -130,11 +138,16 @@ class AppViewModel : ViewModel() {
     navigationEvent.value = event
   }
 
-  fun refreshPayments() {
-    viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-      log.error("failed to retrieve payments: ", e)
-    }) {
-      service?.getPayments()?.also { payments.postValue(it) }
+  /** Populates [payments] with the latest payments from DB + the payments count. */
+  fun refreshLatestPayments() {
+    service?.let { service ->
+      viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+        log.error("failed to retrieve payments: ", e)
+      }) {
+        val paymentsCount = service.getPaymentsCount()
+        val latestPayments = service.getPayments(Constants.LATEST_PAYMENTS_COUNT)
+        payments.postValue(paymentsCount to latestPayments)
+      }
     }
   }
 }

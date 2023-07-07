@@ -16,7 +16,9 @@
 
 package fr.acinq.phoenix.android.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,7 +31,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,13 +42,14 @@ import androidx.compose.ui.window.Popup
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.mutedTextColor
 
-@OptIn(ExperimentalComposeUiApi::class)
+
 @Composable
 fun Dialog(
     onDismiss: () -> Unit,
     title: String? = null,
     properties: DialogProperties = DialogProperties(usePlatformDefaultWidth = false),
     isScrollable: Boolean = true,
+    buttonsTopMargin: Dp = 24.dp,
     buttons: (@Composable RowScope.() -> Unit)? = { Button(onClick = onDismiss, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(16.dp)) },
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -58,7 +63,7 @@ fun Dialog(
             content()
             // buttons
             if (buttons != null) {
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(buttonsTopMargin))
                 Row(
                     modifier = Modifier
                         .align(Alignment.End)
@@ -77,7 +82,7 @@ fun DialogBody(
 ) {
     Column(
         Modifier
-            .padding(vertical = 50.dp, horizontal = 16.dp) // min padding for tall/wide dialogs
+            .padding(vertical = 16.dp, horizontal = 16.dp) // min padding for tall/wide dialogs
             .clip(MaterialTheme.shapes.large)
             .background(MaterialTheme.colors.surface)
             .widthIn(max = 600.dp)
@@ -95,22 +100,41 @@ fun DialogBody(
 
 @Composable
 fun ConfirmDialog(
+    title: String?,
     message: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
+    ConfirmDialog(
+        title = title,
+        onDismiss = onDismiss,
+        onConfirm = onConfirm,
+    ) {
+        Text(text = message)
+    }
+}
+
+@Composable
+fun ConfirmDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    title: String?,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Dialog(
+        title = title,
         onDismiss = onDismiss,
         buttons = {
             Button(text = stringResource(id = R.string.btn_cancel), onClick = onDismiss)
             Button(text = stringResource(id = R.string.btn_confirm), onClick = onConfirm)
         }
     ) {
-        Text(text = message, modifier = Modifier.padding(24.dp))
+        Column(Modifier.padding(horizontal = 24.dp, vertical = if (title == null) 24.dp else 0.dp)) {
+            content()
+        }
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FullScreenDialog(
     onDismiss: () -> Unit,
@@ -130,36 +154,55 @@ fun FullScreenDialog(
 }
 
 @Composable
-fun RowScope.HelpPopup(
-    message: String
+fun RowScope.IconPopup(
+    modifier: Modifier = Modifier,
+    icon: Int = R.drawable.ic_help,
+    iconSize: Dp = 20.dp,
+    iconPadding: Dp = 2.dp,
+    colorAtRest: Color = mutedTextColor,
+    popupMessage: String,
+    popupLink: Pair<String, String>? = null,
+    spaceLeft: Dp? = 8.dp,
+    spaceRight: Dp? = null,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
-    var showHelpPopup by remember { mutableStateOf(false) }
-    if (showHelpPopup) {
+    var showPopup by remember { mutableStateOf(false) }
+    if (showPopup) {
         Popup(
-            onDismissRequest = { showHelpPopup = false },
-            offset = IntOffset(x = 0, y = 68)
+            onDismissRequest = { showPopup = false },
+            offset = IntOffset(x = -200, y = 54)
         ) {
             Surface(
-                modifier = Modifier.widthIn(min = 140.dp, max = 250.dp),
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .widthIn(min = 280.dp, max = 280.dp),
                 shape = RoundedCornerShape(8.dp),
-                elevation = 4.dp,
+                border = BorderStroke(1.dp, MaterialTheme.colors.primary),
+                elevation = 6.dp,
             ) {
-                Text(
-                    text = message,
-                    modifier = Modifier.padding(8.dp),
-                    style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
-                )
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Text(
+                        text = popupMessage,
+                        style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
+                    )
+                    popupLink?.let { (text, link) ->
+                        Spacer(modifier = Modifier.height(8.dp))
+                        WebLink(text = text, url = link, fontSize = 14.sp)
+                    }
+                }
             }
         }
     }
-    Spacer(Modifier.width(8.dp))
+    spaceLeft?.let { Spacer(Modifier.width(it)) }
     BorderButton(
-        icon = R.drawable.ic_help,
-        iconTint = if (showHelpPopup) MaterialTheme.colors.onPrimary else mutedTextColor(),
-        backgroundColor = if (showHelpPopup) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
-        borderColor = if (showHelpPopup) MaterialTheme.colors.primary else mutedTextColor(),
-        padding = PaddingValues(2.dp),
-        modifier = Modifier.size(20.dp),
-        onClick = { showHelpPopup = true }
+        icon = icon,
+        iconTint = if (showPopup) MaterialTheme.colors.onPrimary else colorAtRest,
+        backgroundColor = if (showPopup) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
+        borderColor = if (showPopup) MaterialTheme.colors.primary else colorAtRest,
+        padding = PaddingValues(iconPadding),
+        modifier = modifier.size(iconSize),
+        interactionSource = interactionSource,
+        onClick = { showPopup = true }
     )
+    spaceRight?.let { Spacer(Modifier.width(it)) }
 }

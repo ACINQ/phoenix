@@ -4,7 +4,6 @@
 -- * Removed index: received_amount_msat_idx
 -- * Replaced index: incoming_payments_created_at_idx -> incoming_payments_filter_idx
 -- * Replaced index: outgoing_payments_created_at_idx -> outgoing_payments_filter_idx
--- * Added column: incoming_payments.received_with_new_channel
 
 DROP INDEX IF EXISTS received_amount_msat_idx;
 

@@ -16,8 +16,9 @@
 
 package fr.acinq.phoenix.db.payments
 
+import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.ChannelClosingType
-import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
@@ -39,11 +40,11 @@ sealed class OutgoingPartClosingInfoData {
     companion object {
         fun deserialize(typeVersion: OutgoingPartClosingInfoTypeVersion, blob: ByteArray): ChannelClosingType = DbTypesHelper.decodeBlob(blob) { json, format ->
             when (typeVersion) {
-                OutgoingPartClosingInfoTypeVersion.CLOSING_INFO_V0 -> format.decodeFromString<OutgoingPartClosingInfoData.V0>(json).closingType
+                OutgoingPartClosingInfoTypeVersion.CLOSING_INFO_V0 -> format.decodeFromString<V0>(json).closingType
             }
         }
     }
 }
 
-fun OutgoingPayment.ClosingTxPart.mapClosingTypeToDb() = OutgoingPartClosingInfoTypeVersion.CLOSING_INFO_V0 to
+fun ChannelCloseOutgoingPayment.mapClosingTypeToDb() = OutgoingPartClosingInfoTypeVersion.CLOSING_INFO_V0 to
         Json.encodeToString(OutgoingPartClosingInfoData.V0(this.closingType)).toByteArray(Charsets.UTF_8)

@@ -81,21 +81,21 @@ private fun <T> ListPreferenceDialog(
         buttons = null // we add buttons manually as they would otherwise be pushed below the column which is not good ux in this case
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
-            if (description != null) {
-                Text(text = description, modifier = Modifier.padding(horizontal = 32.dp))
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-            LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
-                itemsIndexed(preferences) { index, item ->
-                    PreferenceDialogItem(
-                        item = item,
-                        selected = index == initialPrefIndex,
-                        onClick = onSubmit
-                    )
+            Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                if (description != null) {
+                    Text(text = description, modifier = Modifier.padding(horizontal = 32.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
+                    itemsIndexed(preferences) { index, item ->
+                        PreferenceDialogItem(
+                            item = item,
+                            selected = index == initialPrefIndex,
+                            onClick = onSubmit
+                        )
+                    }
                 }
             }
             Button(

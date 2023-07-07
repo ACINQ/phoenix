@@ -111,10 +111,10 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(MainViewModel::class.java)
     context?.let { ctx ->
-      appContext(ctx).notifications.observe(viewLifecycleOwner, {
+      appContext(ctx).notifications.observe(viewLifecycleOwner) {
         notificationsAdapter.update(it)
-      })
-      app.networkInfo.observe(viewLifecycleOwner, {
+      }
+      app.networkInfo.observe(viewLifecycleOwner) {
         if (it.electrumServer == null || !it.lightningConnected) {
           if (mBinding.connectivityButton.animation == null || !mBinding.connectivityButton.animation.hasStarted()) {
             mBinding.connectivityButton.startAnimation(blinkingAnimation)
@@ -122,7 +122,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
           mBinding.connectivityButton.visibility = View.VISIBLE
           mBinding.torConnectedButton.visibility = View.GONE
         } else if (Prefs.isTorEnabled(ctx)) {
-          if (it.torConnections.isNullOrEmpty()) {
+          if (it.torConnections.isEmpty()) {
             if (mBinding.connectivityButton.animation == null || !mBinding.connectivityButton.animation.hasStarted()) {
               mBinding.connectivityButton.startAnimation(blinkingAnimation)
             }
@@ -138,31 +138,28 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
           mBinding.connectivityButton.visibility = View.GONE
           mBinding.torConnectedButton.visibility = View.GONE
         }
-      })
-      appContext(ctx).balance.observe(viewLifecycleOwner, {
+      }
+      appContext(ctx).balance.observe(viewLifecycleOwner) {
         mBinding.balance.setAmount(it.sendable)
-      })
+      }
     }
-    app.pendingSwapIns.observe(viewLifecycleOwner, {
+    app.pendingSwapIns.observe(viewLifecycleOwner) {
       refreshIncomingFunds()
-    })
-    app.payments.observe(viewLifecycleOwner, {
-      paymentsAdapter.submitList(it)
-    })
-    model.incomingFunds.observe(viewLifecycleOwner, { amount ->
+    }
+    app.payments.observe(viewLifecycleOwner) { (paymentsCount, payments) ->
+      paymentsAdapter.submitList(
+        showFooter = paymentsCount > Constants.LATEST_PAYMENTS_COUNT,
+        list = payments.take(Constants.LATEST_PAYMENTS_COUNT)
+      )
+    }
+    model.incomingFunds.observe(viewLifecycleOwner) { amount ->
       if (amount.`$greater`(MilliSatoshi(0))) {
         refreshIncomingFundsAmountField()
         mBinding.incomingFundsNotif.visibility = View.VISIBLE
       } else {
-        mBinding.incomingFundsNotif.visibility = View.GONE
+        mBinding.incomingFundsNotif.visibility = View.INVISIBLE
       }
-    })
-    app.currentNav.observe(viewLifecycleOwner, {
-      if (it == R.id.main_fragment) {
-        app.service?.refreshPeerConnectionState()
-        app.refreshPayments()
-      }
-    })
+    }
   }
 
   override fun onStart() {
@@ -212,7 +209,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: PaymentPending) {
     log.debug("pending payment, refreshing list...")
-    app.refreshPayments()
+    app.refreshLatestPayments()
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -245,7 +242,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   private fun refreshIncomingFundsAmountField() {
     model.incomingFunds.value?.let { amount ->
       context?.let { ctx ->
-        mBinding.incomingFundsNotif.text = getString(R.string.main_swapin_incoming,
+        mBinding.incomingFundsNotif.text = getString(R.string.legacy_main_swapin_incoming,
           if (Prefs.getShowAmountInFiat(ctx)) {
             Converter.printFiatPretty(ctx, amount, withUnit = true)
           } else {

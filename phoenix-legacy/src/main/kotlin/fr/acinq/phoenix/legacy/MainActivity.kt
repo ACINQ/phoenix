@@ -42,9 +42,8 @@ import fr.acinq.phoenix.legacy.paymentdetails.PaymentDetailsFragment
 import fr.acinq.phoenix.legacy.send.ReadInputFragmentDirections
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.Prefs
-import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -83,7 +82,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   private val navigationCallback = NavController.OnDestinationChangedListener { _, destination, args ->
-    app.currentNav.postValue(destination.id)
+    app.currentNav.value = destination.id
   }
 
   @SuppressLint("SourceLockedOrientationActivity")
@@ -120,15 +119,14 @@ class MainActivity : AppCompatActivity() {
     // app may be started with a payment request intent
     intent?.let { saveURIIntent(intent) }
 
-    lifecycleScope.launchWhenCreated {
-      PrefsDatastore.getLegacyAppStatus(applicationContext).collect {
+    lifecycleScope.launchWhenResumed {
+      LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).collect {
         delay(500)
         if (it is LegacyAppStatus.NotRequired) {
           log.info("finishing legacy activity in state=${it.name()}")
-          app.service?.closeConnections()
-          delay(500)
+          delay(1000)
+          app.service?.shutdown()
           (application as AppContext).onLegacyFinish()
-          delay(200)
           finish()
         }
       }
@@ -152,9 +150,21 @@ class MainActivity : AppCompatActivity() {
 
   private fun saveURIIntent(intent: Intent) {
     val data = intent.data
-    log.debug("reading URI intent=$intent with data=$data")
+    log.debug("reading URI intent=$intent with scheme=${data?.scheme} data=$data")
     if (data != null && data.scheme != null) {
       when (data.scheme) {
+        "phoenix" -> {
+          if (data.schemeSpecificPart.startsWith("bitcoin", ignoreCase = true)
+            || data.schemeSpecificPart.startsWith("lightning", ignoreCase = true)
+            || data.schemeSpecificPart.startsWith("lnurl", ignoreCase = true)
+            || data.schemeSpecificPart.startsWith("lnbc", ignoreCase = true)
+            || data.schemeSpecificPart.startsWith("lntb", ignoreCase = true)
+          ) {
+            app.currentURIIntent.value = data.schemeSpecificPart
+          } else {
+            // do nothing, just let the app open
+          }
+        }
         "bitcoin", "lightning", "lnurl" -> {
           app.currentURIIntent.value = data.toString()
         }

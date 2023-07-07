@@ -138,19 +138,11 @@ struct BackgroundPaymentsSelector: View {
 					.padding(.top, 16)
 					.padding(.bottom, 32)
 				
-				if #available(iOS 15.0, *) {
-					sampleNotificationContent()
-						.background(
-							.thickMaterial,
-							in: RoundedRectangle(cornerRadius: 10, style: .continuous)
-						)
-				} else {
-					sampleNotificationContent()
-						.background(
-							VisualEffectView(style: UIBlurEffect.Style.systemThickMaterial)
-								.cornerRadius(10)
-						)
-				}
+				sampleNotificationContent()
+					.background(
+						.thickMaterial,
+						in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+					)
 			}
 		}
 	}

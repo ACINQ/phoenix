@@ -23,7 +23,7 @@
       style="@style/roundMaterial_buttonStyle"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:contentDescription="@string/btn_back"
+      android:contentDescription="@string/legacy_btn_back"
       android:paddingStart="@dimen/space_sm"
       android:paddingTop="@dimen/space_md"
       android:paddingEnd="@dimen/space_sm"

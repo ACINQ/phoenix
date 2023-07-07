@@ -20,11 +20,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.legacy.BaseFragment
 import fr.acinq.phoenix.legacy.R
 import fr.acinq.phoenix.legacy.background.KitState
 import fr.acinq.phoenix.legacy.databinding.FragmentSettingsBinding
+import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
+import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

@@ -25,74 +25,93 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import fr.acinq.lightning.Lightning
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
+import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.Either
 import fr.acinq.phoenix.android.utils.BitmapHelper
-import fr.acinq.phoenix.controllers.ControllerFactory
-import fr.acinq.phoenix.controllers.ReceiveController
-import fr.acinq.phoenix.controllers.payments.Receive
+import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.slf4j.LoggerFactory
+
 
 class ReceiveViewModel(
-    controller: ReceiveController,
-    description: String,
-    expiry: Long
-) : MVIControllerViewModel<Receive.Model, Receive.Intent>(controller) {
+    val peerManager: PeerManager
+): ViewModel() {
+    val log = LoggerFactory.getLogger(this::class.java)
 
-    /** State of the view */
-    var state by mutableStateOf<ReceiveViewState>(ReceiveViewState.Default)
+    sealed class LightningInvoiceState {
+        object Init : LightningInvoiceState()
+        object Generating : LightningInvoiceState()
+        data class Show(val paymentRequest: PaymentRequest) : LightningInvoiceState()
+        data class Error(val e: Throwable) : LightningInvoiceState()
+    }
 
-    /** Bitmap containing the invoice/address qr code */
-    var qrBitmap by mutableStateOf<ImageBitmap?>(null)
+    sealed class BitcoinAddressState {
+        object Init : BitcoinAddressState()
+        data class Show(val address: String, val image: ImageBitmap) : BitcoinAddressState()
+        data class Error(val e: Throwable) : BitcoinAddressState()
+    }
+
+    var lightningInvoiceState by mutableStateOf<LightningInvoiceState>(LightningInvoiceState.Init)
+    var bitcoinAddressState by mutableStateOf<BitcoinAddressState>(BitcoinAddressState.Init)
+
+    /** Bitmap containing the LN invoice qr code. It is not stored in the state to avoid brutal transitions and flickering. */
+    var lightningQRBitmap by mutableStateOf<ImageBitmap?>(null)
         private set
 
-    /** Custom invoice description */
-    var customDesc by mutableStateOf(description)
+    /** When true, the Lightning QR UI show the editing invoice form. Not stored in the LN invoice state, to keep a reference to the current invoice state. */
+    var isEditingLightningInvoice by mutableStateOf(false)
 
-    /** Custom invoice amount */
-    var customAmount by mutableStateOf<MilliSatoshi?>(null)
-
-    /** Custom invoice expiry */
-    var customExpiry by mutableStateOf<Long>(expiry)
+    init {
+        generateBitcoinAddress()
+    }
 
     @UiThread
-    fun generateInvoice() {
-        val amount = customAmount
-        val desc = customDesc
-        val expiry = customExpiry
-        viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
-            log.error("failed to generate invoice with amount=$amount desc=$desc :", e)
-            state = ReceiveViewState.Error(e)
+    fun generateInvoice(
+        amount: MilliSatoshi?,
+        description: String,
+        expirySeconds: Long
+    ) {
+        isEditingLightningInvoice = false
+        if (lightningInvoiceState is LightningInvoiceState.Generating) return
+        viewModelScope.launch(CoroutineExceptionHandler { _, e ->
+            log.error("failed to generate invoice :", e)
+            lightningInvoiceState = LightningInvoiceState.Error(e)
         }) {
-            log.info("generating invoice with amount=$amount desc=$desc")
-            state = ReceiveViewState.Default
-            controller.intent(Receive.Intent.Ask(amount = amount, desc = desc, expirySeconds = expiry))
+            lightningInvoiceState = LightningInvoiceState.Generating
+            log.info("generating new invoice with amount=$amount desc=$description expirySec=$expirySeconds")
+            val pr = peerManager.getPeer().createInvoice(
+                paymentPreimage = Lightning.randomBytes32(),
+                amount = amount,
+                description = Either.Left(description),
+                expirySeconds = expirySeconds
+            )
+            lightningQRBitmap = BitmapHelper.generateBitmap(pr.write()).asImageBitmap()
+            log.info("generated new invoice=${pr.write()}")
+            lightningInvoiceState = LightningInvoiceState.Show(pr)
         }
     }
 
     @UiThread
-    fun generateQrCodeBitmap(invoice: String) {
-        viewModelScope.launch(Dispatchers.Default) {
-            log.info("generating qrcode for invoice=$invoice")
-            try {
-                qrBitmap = BitmapHelper.generateBitmap(invoice).asImageBitmap()
-            } catch (e: Exception) {
-                log.error("error when generating bitmap QR for invoice=$invoice:", e)
-            }
+    private fun generateBitcoinAddress() {
+        viewModelScope.launch(CoroutineExceptionHandler { _, e ->
+            log.error("failed to generate address :", e)
+            bitcoinAddressState = BitcoinAddressState.Error(e)
+        }) {
+            val address = peerManager.getPeer().swapInAddress
+            val image = BitmapHelper.generateBitmap(address).asImageBitmap()
+            bitcoinAddressState = BitcoinAddressState.Show(address, image)
         }
     }
 
     class Factory(
-        private val controllerFactory: ControllerFactory,
-        private val getController: ControllerFactory.() -> ReceiveController,
-        private val description: String,
-        private val expiry: Long,
+        private val peerManager: PeerManager
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return ReceiveViewModel(controllerFactory.getController(), description, expiry) as T
+            return ReceiveViewModel(peerManager) as T
         }
     }
 }

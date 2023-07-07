@@ -82,12 +82,12 @@ class LNUrlAuthFragment : BaseFragment() {
       when (state) {
         is LNUrlAuthState.Error -> {
           val details = when (state.cause) {
-            is LNUrlError.RemoteFailure.CouldNotConnect -> getString(R.string.lnurl_auth_failure_remote_io, model.domainToSignIn)
-            is LNUrlError.RemoteFailure.Detailed -> getString(R.string.lnurl_auth_failure_remote_details, state.cause.reason)
-            is LNUrlError.RemoteFailure.Code -> getString(R.string.lnurl_auth_failure_remote_details, "HTTP ${state.cause.code}")
+            is LNUrlError.RemoteFailure.CouldNotConnect -> getString(R.string.legacy_lnurl_auth_failure_remote_io, model.domainToSignIn)
+            is LNUrlError.RemoteFailure.Detailed -> getString(R.string.legacy_lnurl_auth_failure_remote_details, state.cause.reason)
+            is LNUrlError.RemoteFailure.Code -> getString(R.string.legacy_lnurl_auth_failure_remote_details, "HTTP ${state.cause.code}")
             else -> state.cause.localizedMessage ?: state.cause.javaClass.simpleName
           }
-          mBinding.errorMessage.text = getString(R.string.lnurl_auth_failure, details)
+          mBinding.errorMessage.text = getString(R.string.legacy_lnurl_auth_failure, details)
         }
         is LNUrlAuthState.Done -> Handler().postDelayed({
           if (model.state.value is LNUrlAuthState.Done) {
@@ -97,8 +97,8 @@ class LNUrlAuthFragment : BaseFragment() {
         else -> Unit
       }
     }
-    mBinding.instructions.text = Converter.html(getString(R.string.lnurl_auth_instructions, model.domainToSignIn))
-    mBinding.progress.setText(Converter.html(getString(R.string.lnurl_auth_in_progress, model.domainToSignIn)))
+    mBinding.instructions.text = Converter.html(getString(R.string.legacy_lnurl_auth_instructions, model.domainToSignIn))
+    mBinding.progress.setText(Converter.html(getString(R.string.legacy_lnurl_auth_in_progress, model.domainToSignIn)))
     mBinding.model = model
   }
 
@@ -181,12 +181,12 @@ class LNUrlAuthFragment : BaseFragment() {
       ;
     }
 
-    /** Get the domain for the given [Url]. If eligible returns a legacy domain, or the full domain name otherwise (i.e. specs compliant). */
+    /** Get the domain for the given [HttpUrl]. If eligible returns a legacy domain, or the full domain name otherwise (i.e. specs compliant). */
     private fun isLegacyEligible(url: HttpUrl): Boolean {
       return LegacyDomain.values().any { it.host == url.host() }
     }
 
-    /** Get the domain for the given [Url]. If eligible returns a legacy domain, or the full domain name otherwise (i.e. specs compliant). */
+    /** Get the domain for the given [HttpUrl]. If eligible returns a legacy domain, or the full domain name otherwise (i.e. specs compliant). */
     fun filterDomain(url: HttpUrl): String {
       return LegacyDomain.values().firstOrNull { it.host == url.host() }?.legacyCompatDomain ?: url.host()
     }

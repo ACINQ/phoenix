@@ -3,7 +3,7 @@ import SwiftUI
 class AboutHTML: AnyHTML {
 	
 	init() {
-		super.init(filename: "about")
+		super.init(htmlFilename: "about", cssFilename: "common")
 	}
 	
 	// Nothing else to override here.

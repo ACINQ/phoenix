@@ -22,7 +22,6 @@ import android.text.format.DateUtils
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavDeepLinkBuilder
-import fr.acinq.bitcoin.scala.Base58Check
 import fr.acinq.bitcoin.scala.Script
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.`package$`
@@ -81,11 +80,11 @@ class EclairSupervisor(val applicationContext: Context) : UntypedActor() {
           val spendingTxs = JavaConverters.seqAsJavaListConverter(data.spendingTxes()).asJava()
           val ourSpendingAddress = spendingTxs.map { JavaConverters.seqAsJavaListConverter(it.txOut()).asJava() }.flatten()
             .firstOrNull {
-              log.debug("txout with amount=${it.amount()} to script=${it.publicKeyScript().toBase58()}, against balance=${balance}")
-              it.amount() == balance && Script.isPayToScript(it.publicKeyScript())
+              log.debug("txout with amount=${it.amount()} to script=${it.publicKeyScript().toHex()}, against balance=${balance}")
+              it.amount() == balance
             }?.let {
-              val address = Base58Check.encode(Wallet.getScriptHashVersion(), Script.publicKeyHash(it.publicKeyScript()))
-              log.info("found closing txOut sending to script=${it.publicKeyScript().toBase58()} address=$address")
+              val address = `package$`.`MODULE$`.addressFromPublicKeyScript(Wallet.getChainHash(), Script.parse(it.publicKeyScript()))
+              log.info("found closing txOut sending to address=$address")
               address
             }
           val closingType = when {
@@ -159,12 +158,12 @@ class EclairSupervisor(val applicationContext: Context) : UntypedActor() {
           )
         } else if (result && !isAutoChannelEnabled) {
           log.info("rejected pay-to-open channel opening")
-          val message = applicationContext.getString(R.string.notif_pay_to_open_missed_message)
+          val message = applicationContext.getString(R.string.legacy_notif_pay_to_open_missed_message)
           if (System.currentTimeMillis() - Prefs.getMissedPayToOpenNotifTimestamp(applicationContext) > 20 * DateUtils.MINUTE_IN_MILLIS) {
             notificationManager.notify(
               Constants.NOTIF_ID__MISSED_PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__MISSED_PAY_TO_OPEN)
                 .setSmallIcon(R.drawable.ic_phoenix_outline)
-                .setContentTitle(applicationContext.getString(R.string.notif_pay_to_open_missed_title))
+                .setContentTitle(applicationContext.getString(R.string.legacy_notif_pay_to_open_missed_title))
                 .setContentText(message)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(message))
                 .setContentIntent(

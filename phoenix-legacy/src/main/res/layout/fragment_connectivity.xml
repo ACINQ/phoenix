@@ -37,7 +37,7 @@
         android:layout_marginTop="@dimen/space_md_p"
         android:paddingStart="@dimen/space_md_p"
         android:paddingEnd="@dimen/space_md_p"
-        android:text="@string/conndialog_title"
+        android:text="@string/legacy_conndialog_title"
         app:layout_constraintTop_toTopOf="parent" />
 
       <TextView
@@ -47,7 +47,7 @@
         android:layout_marginTop="@dimen/space_xs"
         android:paddingStart="@dimen/space_md_p"
         android:paddingEnd="@dimen/space_md_p"
-        android:text="@string/conndialog_summary_not_ok"
+        android:text="@string/legacy_conndialog_summary_not_ok"
         app:layout_constraintTop_toBottomOf="@id/title" />
 
       <View
@@ -69,7 +69,7 @@
         app:icon_size="@dimen/space_xs"
         app:icon_tint="?attr/negativeColor"
         app:layout_constraintTop_toBottomOf="@id/grid_separator"
-        app:text="@string/conndialog_tor" />
+        app:text="@string/legacy_conndialog_tor" />
 
       <TextView
         android:id="@+id/tor_conn_state"
@@ -100,7 +100,7 @@
         app:icon_size="@dimen/space_xs"
         app:icon_tint="?attr/negativeColor"
         app:layout_constraintTop_toBottomOf="@id/tor_conn_label"
-        app:text="@string/conndialog_lightning" />
+        app:text="@string/legacy_conndialog_lightning" />
 
       <TextView
         android:id="@+id/lightning_conn_state"
@@ -130,7 +130,7 @@
         app:icon_size="@dimen/space_xs"
         app:icon_tint="?attr/negativeColor"
         app:layout_constraintTop_toBottomOf="@id/lightning_conn_label"
-        app:text="@string/conndialog_electrum" />
+        app:text="@string/legacy_conndialog_electrum" />
 
       <TextView
         android:id="@+id/electrum_conn_state"
@@ -155,7 +155,7 @@
         android:layout_marginTop="@dimen/space_lg"
         android:layout_marginEnd="@dimen/space_md"
         android:fontFamily="sans-serif-medium"
-        android:text="@string/btn_ok"
+        android:text="@string/legacy_btn_ok"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/electrum_conn_label" />
 

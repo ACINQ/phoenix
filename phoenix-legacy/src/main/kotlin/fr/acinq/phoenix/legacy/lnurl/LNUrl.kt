@@ -24,7 +24,7 @@ import android.util.Patterns
 import fr.acinq.bitcoin.scala.Bech32
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.legacy.utils.Wallet
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import okhttp3.HttpUrl
 import okhttp3.Request
 import okhttp3.Response
@@ -79,8 +79,8 @@ interface LNUrl {
 
     private fun decodeBech32LNUrl(source: String): HttpUrl {
       val res = Bech32.decode(source)
-      val payload = String(Bech32.five2eight(res._2), Charsets.UTF_8)
-      log.info("reading serialized lnurl with hrp=${res._1} and payload=$payload")
+      val payload = String(Bech32.five2eight(res._2()), Charsets.UTF_8)
+      log.info("reading serialized lnurl with hrp=${res._1()} and payload=$payload")
       val url = HttpUrl.get(payload)
       require(url.isHttps) { "invalid url=${url}, should be https" }
       return url

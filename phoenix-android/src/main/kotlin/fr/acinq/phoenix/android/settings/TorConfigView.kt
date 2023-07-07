@@ -95,9 +95,9 @@ fun TorConfigView(
                             Surface(
                                 shape = CircleShape,
                                 color = when (torState) {
-                                    Connection.ESTABLISHED -> positiveColor()
+                                    Connection.ESTABLISHED -> positiveColor
                                     Connection.ESTABLISHING -> orange
-                                    else -> negativeColor()
+                                    else -> negativeColor
                                 },
                                 modifier = Modifier.size(8.dp)
                             ) {}

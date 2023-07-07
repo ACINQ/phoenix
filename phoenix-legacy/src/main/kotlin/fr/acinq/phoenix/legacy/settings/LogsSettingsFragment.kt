@@ -48,10 +48,10 @@ class LogsSettingsFragment : BaseFragment(stayIfNotStarted = true) {
       context?.let {
         try {
           val logFile = Logging.getLastLogFile(it)
-          val uri = FileProvider.getUriForFile(it, BuildConfig.LIBRARY_PACKAGE_NAME + ".provider", logFile)
+          val uri = FileProvider.getUriForFile(it, "fr.acinq.phoenix.testnet.provider", logFile)
           val viewIntent = Intent(Intent.ACTION_VIEW)
           viewIntent.setDataAndType(uri, "text/plain").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-          val externalAppIntent = Intent.createChooser(viewIntent, getString(R.string.logs_view_with))
+          val externalAppIntent = Intent.createChooser(viewIntent, getString(R.string.legacy_logs_view_with))
           startActivity(externalAppIntent)
         } catch (e: Exception) {
           log.error("could not view log file: ", e)
@@ -62,12 +62,12 @@ class LogsSettingsFragment : BaseFragment(stayIfNotStarted = true) {
       context?.let {
         try {
           val logFile = Logging.getLastLogFile(it)
-          val uri = FileProvider.getUriForFile(it, BuildConfig.LIBRARY_PACKAGE_NAME + ".provider", logFile)
+          val uri = FileProvider.getUriForFile(it, "fr.acinq.phoenix.testnet.provider", logFile)
           val shareIntent = Intent(Intent.ACTION_SEND)
           shareIntent.type = "text/plain"
           shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
-          shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.logs_share_subject))
-          startActivity(Intent.createChooser(shareIntent, getString(R.string.logs_share_title)))
+          shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.legacy_logs_share_subject))
+          startActivity(Intent.createChooser(shareIntent, getString(R.string.legacy_logs_share_title)))
         } catch (e: Exception) {
           log.error("could not share log file: ", e)
         }

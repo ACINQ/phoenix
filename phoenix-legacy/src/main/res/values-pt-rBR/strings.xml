@@ -15,56 +15,56 @@
   -->
 
 <resources>
-  <string name="app_name">Phoenix</string>
+  <string name="legacy_app_name">Phoenix</string>
 
   <!-- //////////////// system notification channels //////////////// -->
 
-  <string name="notification_channels_watcher_title">Observador de segundo plano</string>
-  <string name="notification_channels_watcher_desc">Alerta você em caso de necessidade de iniciar o aplicativo. Deve ser prioridade.</string>
-  <string name="notification_pay_to_open_missed_title">Notificações de pagamentos não recebidos</string>
-  <string name="notification_pay_to_open_missed_desc">Notifica você quando há falha ao receber um pagamento devido a opção de abertura automática de canais estar desabilitada.</string>
-  <string name="notification_headless_title">A Phoenix está rodando em segundo plano</string>
-  <string name="notification_headless_desc">Notifica você que a Phoenix está sendo executada em segundo plano. Isso acontece quando alguém está enviando dinheiro para você e o aplicativo ainda não foi iniciado.</string>
+  <string name="legacy_notification_channels_watcher_title">Observador de segundo plano</string>
+  <string name="legacy_notification_channels_watcher_desc">Alerta você em caso de necessidade de iniciar o aplicativo. Deve ser prioridade.</string>
+  <string name="legacy_notification_pay_to_open_missed_title">Notificações de pagamentos não recebidos</string>
+  <string name="legacy_notification_pay_to_open_missed_desc">Notifica você quando há falha ao receber um pagamento devido a opção de abertura automática de canais estar desabilitada.</string>
+  <string name="legacy_notification_headless_title">A Phoenix está rodando em segundo plano</string>
+  <string name="legacy_notification_headless_desc">Notifica você que a Phoenix está sendo executada em segundo plano. Isso acontece quando alguém está enviando dinheiro para você e o aplicativo ainda não foi iniciado.</string>
 
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
-  <string name="autocreate_generating">Criando sua carteira…</string>
-  <string name="autocreate_error">Não foi possível criar sua carteira.\nMotivo: %1$s</string>
+  <string name="legacy_autocreate_generating">Criando sua carteira…</string>
+  <string name="legacy_autocreate_error">Não foi possível criar sua carteira.\nMotivo: %1$s</string>
 
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
-  <string name="restore_disclaimer_message">Não importe uma seed que tenha sido gerada em outro aplicativo.\n\nAlém disso, certifique-se que você não tem outra carteira Phoenix instalada com a mesma seed.</string>
-  <string name="restore_disclaimer_checkbox">Eu entendo.</string>
-  <string name="restore_disclaimer_next">Próximo</string>
-  <string name="restore_instructions">A seed da sua carteira é uma lista com 12 palavras escritas em inglês.</string>
-  <string name="restore_mnemonics_label">Use o teclado abaixo para inserir a seed:</string>
-  <string name="restore_in_progress">Restaurando sua carteira…</string>
-  <string name="restore_import_button">Importar</string>
-  <string name="restore_error">Esta seed é inválida e não pode ser importada.\n\nTente novamente.</string>
+  <string name="legacy_restore_disclaimer_message">Não importe uma seed que tenha sido gerada em outro aplicativo.\n\nAlém disso, certifique-se que você não tem outra carteira Phoenix instalada com a mesma seed.</string>
+  <string name="legacy_restore_disclaimer_checkbox">Eu entendo.</string>
+  <string name="legacy_restore_disclaimer_next">Próximo</string>
+  <string name="legacy_restore_instructions">A seed da sua carteira é uma lista com 12 palavras escritas em inglês.</string>
+  <string name="legacy_restore_mnemonics_label">Use o teclado abaixo para inserir a seed:</string>
+  <string name="legacy_restore_in_progress">Restaurando sua carteira…</string>
+  <string name="legacy_restore_import_button">Importar</string>
+  <string name="legacy_restore_error">Esta seed é inválida e não pode ser importada.\n\nTente novamente.</string>
 
   <!-- //////////////// Auth prompt (v2) //////////////////// -->
 
-  <string name="authprompt_title">Desbloquear para continuar</string>
-  <string name="authprompt_hard_negative">Cancelar</string>
-  <string name="authprompt_error_unsecure">O dispositivo não é seguro (code: %1$d)</string>
+  <string name="legacy_authprompt_title">Desbloquear para continuar</string>
+  <string name="legacy_authprompt_hard_negative">Cancelar</string>
+  <string name="legacy_authprompt_error_unsecure">O dispositivo não é seguro (code: %1$d)</string>
 
   <!-- //////////////// Pin dialog //////////////////// -->
 
-  <string name="pindialog_title_default">Insira o PIN</string>
-  <string name="pindialog_pwd_placeholder">●●●●●●</string>
-  <string name="pindialog_error">O código PIN deve conter 6 números.</string>
-  <string name="pindialog_error_donotmatch">Os códigos PIN não conferem.</string>
+  <string name="legacy_pindialog_title_default">Insira o PIN</string>
+  <string name="legacy_pindialog_pwd_placeholder">●●●●●●</string>
+  <string name="legacy_pindialog_error">O código PIN deve conter 6 números.</string>
+  <string name="legacy_pindialog_error_donotmatch">Os códigos PIN não conferem.</string>
 
   <!-- //////////////// Biometric dialog //////////////////// -->
 
-  <string name="biometricprompt_title">A carteira está bloqueada</string>
-  <string name="biometricprompt_negative">Desbloquear com PIN</string>
+  <string name="legacy_biometricprompt_title">A carteira está bloqueada</string>
+  <string name="legacy_biometricprompt_negative">Desbloquear com PIN</string>
 
    <!-- //////////////// placeholders ////////////////-->
 
-  <string name="lipsum_short" translatable="false">Etiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas.</string>
-  <string name="lipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut facilisis lectus. Integer massa tellus, suscipit sit amet felis vitae, blandit consectetur dolor. Fusce volutpat id magna id vestibulum. Integer a erat lacinia, placerat risus a, fermentum justo. Etiam euismod tincidunt dolor vel posuere. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur non euismod dui. Morbi enim dui, blandit sed erat sit amet, porta pulvinar odio. Cras metus felis, vestibulum eu consequat vitae, consectetur quis nulla. Fusce vulputate, elit et luctus sodales, metus metus elementum sem, eget commodo nunc nunc in ex. Sed aliquam eros nibh, ac volutpat turpis accumsan vitae. Cras suscipit ipsum accumsan aliquam interdum.</string>
-  <string name="lipsum_long" translatable="false">
+  <string name="legacy_lipsum_short" translatable="false">Etiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas.</string>
+  <string name="legacy_lipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut facilisis lectus. Integer massa tellus, suscipit sit amet felis vitae, blandit consectetur dolor. Fusce volutpat id magna id vestibulum. Integer a erat lacinia, placerat risus a, fermentum justo. Etiam euismod tincidunt dolor vel posuere. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur non euismod dui. Morbi enim dui, blandit sed erat sit amet, porta pulvinar odio. Cras metus felis, vestibulum eu consequat vitae, consectetur quis nulla. Fusce vulputate, elit et luctus sodales, metus metus elementum sem, eget commodo nunc nunc in ex. Sed aliquam eros nibh, ac volutpat turpis accumsan vitae. Cras suscipit ipsum accumsan aliquam interdum.</string>
+  <string name="legacy_lipsum_long" translatable="false">
     Praesent ut nisi fringilla, pharetra dui sit amet, ornare urna. Donec at ultrices nunc. Fusce gravida metus vitae viverra egestas. In hac habitasse platea dictumst. Proin consequat fringilla felis, vehicula vehicula turpis ullamcorper nec. Pellentesque urna massa, blandit cursus metus et, ultrices consectetur neque. Suspendisse hendrerit venenatis mi ac tincidunt. Morbi hendrerit orci vitae erat luctus, at dignissim turpis accumsan. Integer elementum est eu tincidunt ullamcorper. Phasellus varius porttitor vestibulum. Maecenas faucibus ullamcorper diam, ac commodo dui fringilla sed. Aliquam arcu velit, porta eu sem vel, rhoncus bibendum dolor.
     \nEtiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas. Nam tempor euismod erat eget scelerisque. Integer sit amet laoreet erat. Duis enim turpis, vehicula eu justo vitae, dapibus auctor mauris. Aenean euismod eleifend dui a aliquet. Aliquam eleifend malesuada tortor ornare volutpat. In augue tortor, gravida et volutpat elementum, iaculis non sapien. Etiam dolor nisi, pulvinar a rhoncus ac, eleifend ac libero. In lobortis enim vitae ultricies viverra. Maecenas accumsan elementum sem, nec pharetra urna maximus maximus.
     \nIn sit amet volutpat ligula, ac pretium dolor. Phasellus posuere rhoncus magna quis fermentum. Ut risus turpis, fermentum facilisis mollis in, porttitor eget erat. Donec luctus egestas ligula et interdum. Phasellus vitae hendrerit sem, at vehicula nulla. Curabitur mollis risus quis metus euismod ullamcorper. Nam eu aliquet mi. Duis id urna ac urna iaculis blandit. Morbi eros dui, congue a posuere efficitur, imperdiet a nisi. Morbi non orci non lorem aliquet tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pulvinar, mi vitae sollicitudin dignissim, nunc urna facilisis massa, ut scelerisque mi felis in sapien.
@@ -73,87 +73,87 @@
 
   <!-- //////////////// Startup //////////////////// -->
 
-  <string name="startup_unlock_required">A Phoenix está bloqueada.\nPor favor autentique para continuar.</string>
-  <string name="startup_unlock_button">Desbloquear</string>
-  <string name="startup_binding_service">Binding service…</string>
-  <string name="startup_wait">Carregando…</string>
-  <string name="startup_wait_tor">Iniciando Tor…</string>
-  <string name="startup_start_button">Reiniciar</string>
-  <string name="startup_settings_button">Configurações</string>
-  <string name="startup_error_generic">O aplicativo não pôde ser iniciado.\n\nDetalhes do erro: %1$s</string>
-  <string name="startup_error_electrum_address">Não foi possível iniciar o aplicativo. O endereço personalizado do servidor Electrum não é válido.\n\nIr para configurações > Electrum para corrigir suas configurações.</string>
-  <string name="startup_error_tor">Não foi possível iniciar o Tor. Verifique se sua conexão está funcionando e tente novamente.\n\nDetalhes do erro: %1$s</string>
-  <string name="startup_error_unreadable">Não foi possível ler os dados da carteira, favor reiniciar o aplicativo.</string>
-  <string name="startup_error_network">Sua internet não está funcionando. Favor verificar a conexão WiFi ou rede de celular.</string>
-  <string name="startup_error_wrong_pwd">PIN incorreto</string>
-  <string name="startup_error_biometrics">A autenticação biométrica falhou.</string>
-  <string name="startup_error_no_biometrics_or_key_invalidated">Primeiro registre uma biometria no Android para desbloquear a carteira.\n\nOu, restaure sua carteira usando sua seed de 12 palavras.</string>
-  <string name="startup_error_auth_failed">A autenticação falhou.</string>
-  <string name="startup_error_auth_failed_with_details">A autenticação falhou.\n—\n%1$s</string>
+  <string name="legacy_startup_unlock_required">A Phoenix está bloqueada.\nPor favor autentique para continuar.</string>
+  <string name="legacy_startup_unlock_button">Desbloquear</string>
+  <string name="legacy_startup_binding_service">Binding service…</string>
+  <string name="legacy_startup_wait">Carregando…</string>
+  <string name="legacy_startup_wait_tor">Iniciando Tor…</string>
+  <string name="legacy_startup_start_button">Reiniciar</string>
+  <string name="legacy_startup_settings_button">Configurações</string>
+  <string name="legacy_startup_error_generic">O aplicativo não pôde ser iniciado.\n\nDetalhes do erro: %1$s</string>
+  <string name="legacy_startup_error_electrum_address">Não foi possível iniciar o aplicativo. O endereço personalizado do servidor Electrum não é válido.\n\nIr para configurações > Electrum para corrigir suas configurações.</string>
+  <string name="legacy_startup_error_tor">Não foi possível iniciar o Tor. Verifique se sua conexão está funcionando e tente novamente.\n\nDetalhes do erro: %1$s</string>
+  <string name="legacy_startup_error_unreadable">Não foi possível ler os dados da carteira, favor reiniciar o aplicativo.</string>
+  <string name="legacy_startup_error_network">Sua internet não está funcionando. Favor verificar a conexão WiFi ou rede de celular.</string>
+  <string name="legacy_startup_error_wrong_pwd">PIN incorreto</string>
+  <string name="legacy_startup_error_biometrics">A autenticação biométrica falhou.</string>
+  <string name="legacy_startup_error_no_biometrics_or_key_invalidated">Primeiro registre uma biometria no Android para desbloquear a carteira.\n\nOu, restaure sua carteira usando sua seed de 12 palavras.</string>
+  <string name="legacy_startup_error_auth_failed">A autenticação falhou.</string>
+  <string name="legacy_startup_error_auth_failed_with_details">A autenticação falhou.\n—\n%1$s</string>
 
   <!-- //////////////// payment holder //////////////// -->
 
-  <string name="paymentholder_sending">Enviando…</string>
-  <string name="paymentholder_processing">Processando…</string>
-  <string name="paymentholder_waiting">Aguardando…</string>
-  <string name="paymentholder_failed">Falhou</string>
-  <string name="paymentholder_sent_prefix">-</string>
-  <string name="paymentholder_received_prefix">+</string>
-  <string name="paymentholder_no_desc">Sem descrição</string>
-  <string name="paymentholder_closing_desc">Encerrando #%1$s</string>
-  <string name="paymentholder_swap_in_desc">Pagamento pela rede Bitcoin para %1$s</string>
+  <string name="legacy_paymentholder_sending">Enviando…</string>
+  <string name="legacy_paymentholder_processing">Processando…</string>
+  <string name="legacy_paymentholder_waiting">Aguardando…</string>
+  <string name="legacy_paymentholder_failed">Falhou</string>
+  <string name="legacy_paymentholder_sent_prefix">-</string>
+  <string name="legacy_paymentholder_received_prefix">+</string>
+  <string name="legacy_paymentholder_no_desc">Sem descrição</string>
+  <string name="legacy_paymentholder_closing_desc">Encerrando #%1$s</string>
+  <string name="legacy_paymentholder_swap_in_desc">Pagamento pela rede Bitcoin para %1$s</string>
 
   <!-- //////////////// receive //////////////// -->
 
-  <string name="receive_edit_title">Fatura</string>
-  <string name="receive_edit_subtitle">Você pode alterar o valor e a descrição.</string>
-  <string name="receive_in_progress_message">Favor aguardar…</string>
-  <string name="receive_error_message">Ocorreu um erro ao gerar a fatura…\n\nTente novamente.</string>
-  <string name="receive_amount_label">Quantidade (opcional)</string>
-  <string name="receive_desc_label">Descrição do pagamento (opcional):</string>
-  <string name="receive_default_desc">Pagamento Phoenix</string>
-  <string name="receive_generate_button">Solicitar</string>
+  <string name="legacy_receive_edit_title">Fatura</string>
+  <string name="legacy_receive_edit_subtitle">Você pode alterar o valor e a descrição.</string>
+  <string name="legacy_receive_in_progress_message">Favor aguardar…</string>
+  <string name="legacy_receive_error_message">Ocorreu um erro ao gerar a fatura…\n\nTente novamente.</string>
+  <string name="legacy_receive_amount_label">Quantidade (opcional)</string>
+  <string name="legacy_receive_desc_label">Descrição do pagamento (opcional):</string>
+  <string name="legacy_receive_default_desc">Pagamento Phoenix</string>
+  <string name="legacy_receive_generate_button">Solicitar</string>
 
-  <string name="receive_share_subject">Pagamento solicitado</string>
-  <string name="receive_share_title">Compartilhe esta fatura com…</string>
-  <string name="receive_share_button">Compartilhar…</string>
+  <string name="legacy_receive_share_subject">Pagamento solicitado</string>
+  <string name="legacy_receive_share_title">Compartilhe esta fatura com…</string>
+  <string name="legacy_receive_share_button">Compartilhar…</string>
 
-  <string name="receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de no mínimo <b>%1$s</b>.]]></string>
-  <string name="receive_paytoopen_disabled">A abertura de canais foi temporariamente desativada. Alguns pagamentos não poderão ser recebidos.</string>
-  <string name="receive_paytoopen_disabled_nochannels">A abertura de canais foi temporariamente desativada. Você não poderá receber pagamentos.</string>
+  <string name="legacy_receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de no mínimo <b>%1$s</b>.]]></string>
+  <string name="legacy_receive_paytoopen_disabled">A abertura de canais foi desativada. Alguns pagamentos não poderão ser recebidos.</string>
+  <string name="legacy_receive_paytoopen_disabled_nochannels">A abertura de canais foi desativada. Você não poderá receber pagamentos.</string>
 
-  <string name="receive_address_label">Endereço</string>
-  <string name="receive_withdraw_button">Usar link LNURL</string>
+  <string name="legacy_receive_address_label">Endereço</string>
+  <string name="legacy_receive_withdraw_button">Usar link LNURL</string>
 
-  <string name="receive_swap_in_button">Mostrar endereço bitcoin</string>
-  <string name="receive_swap_in_info"><![CDATA[
+  <string name="legacy_receive_swap_in_button">Mostrar endereço bitcoin</string>
+  <string name="legacy_receive_swap_in_info"><![CDATA[
    Este endereço bitcoin é controlado pela Acinq. Valores recebidos neste endereço serão convertidos para o saldo da sua carteira Phoenix.
     <br /><br />
     O depósito precisa ser de no mínimo <b>%1$s</b>. Taxa <b>%2$s%%</b> (<b>%3$s</b> taxa mínima).
   ]]></string>
-  <string name="receive_swap_in_error_message">Não foi possível obter um endereço bitcoin do serviço de trocas.\n\nTente novamente mais tarde.</string>
-  <string name="receive_swap_in_unknown"><![CDATA[
+  <string name="legacy_receive_swap_in_error_message">Não foi possível obter um endereço bitcoin do serviço de trocas.\n\nTente novamente mais tarde.</string>
+  <string name="legacy_receive_swap_in_unknown"><![CDATA[
     <b>Indisponível</b>
     <br /><br />
     Tente novamente mais tarde.
   ]]></string>
-  <string name="receive_swap_in_disabled"><![CDATA[
+  <string name="legacy_receive_swap_in_disabled"><![CDATA[
     <b>Serviço desabilitado</b>
     <br /><br />
-    O serviço de depósito via rede Bitcoin foi temporariamente desativado.
+    O serviço de depósito via rede Bitcoin foi desativado.
     <br /><br />
     Tente novamente mais tarde.
   ]]></string>
-  <string name="receive_swap_in_disabled_mempool"><![CDATA[
+  <string name="legacy_receive_swap_in_disabled_mempool"><![CDATA[
     <b>Serviço desabilitado</b>
     <br /><br />
     O mempool do Bitcoin está cheio e as taxas muito altas. O serviço de depósito via rede Bitcoin foi temporariamente desativado.
     <br /><br />
     Tente novamente mais tarde.
   ]]></string>
-  <string name="receive_swap_in_progress_message">Solicitando um endereço bitcoin…</string>
-  <string name="receive_swap_in_disclaimer_title">Receber pela rede Bitcoin</string>
-  <string name="receive_swap_in_disclaimer_message"><![CDATA[
+  <string name="legacy_receive_swap_in_progress_message">Solicitando um endereço bitcoin…</string>
+  <string name="legacy_receive_swap_in_disclaimer_title">Receber pela rede Bitcoin</string>
+  <string name="legacy_receive_swap_in_disclaimer_message"><![CDATA[
   Um endereço bitcoin padrão será exibido a seguir.
   <br /><br />
   Os bitcoins enviados para este endereço aparecerão na sua carteira após a 1ª confirmação da rede.
@@ -163,141 +163,142 @@
 
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_balance_prefix">Saldo:</string>
-  <string name="send_use_all_balance">Enviar tudo</string>
-  <string name="send_loading">Verificando pagamento…</string>
-  <string name="send_invalid_pr_generic">Este pagamento não é válido. Você pode estar lendo um código que não representa uma fatura de bitcoins.\n\nTente novamente.</string>
-  <string name="send_invalid_pr_already_paid">Este pagamento já foi realizado.</string>
-  <string name="send_invalid_pr_already_paid_button">Abrir comprovante</string>
-  <string name="send_amount_error">Insira uma quantia válida.</string>
-  <string name="send_amount_error_balance">A quantidade excede o seu saldo.</string>
-  <string name="send_amount_error_swap_out_too_small">Mín. %1$s para pagamentos pela rede Bitcoin.</string>
-  <string name="send_destination_label">Enviar para</string>
-  <string name="send_description_label">Desc.</string>
-  <string name="send_error_sending">Ocorreu um erro interno ao tentar enviar este pagamento. Pagamento não realizado.</string>
-  <string name="send_pay_button">Pagar</string>
-  <string name="send_swap_in_progress">Preparando transação…</string>
-  <string name="send_swap_error">A troca para rede Bitcoin falhou. Tente novamente.</string>
-  <string name="send_swap_required_button">Preparar transação</string>
-  <string name="send_swap_complete_recap_amount">Quantidade</string>
-  <string name="send_swap_complete_recap_fee">Taxa de mineração</string>
-  <string name="send_swap_complete_recap_total">Total</string>
-  <string name="send_swap_complete_cannot_afford">O total após taxas excede seu saldo.</string>
+  <string name="legacy_send_balance_prefix">Saldo:</string>
+  <string name="legacy_send_use_all_balance">Enviar tudo</string>
+  <string name="legacy_send_loading">Verificando pagamento…</string>
+  <string name="legacy_send_invalid_pr_generic">Este pagamento não é válido. Você pode estar lendo um código que não representa uma fatura de bitcoins.\n\nTente novamente.</string>
+  <string name="legacy_send_invalid_pr_already_paid">Este pagamento já foi realizado.</string>
+  <string name="legacy_send_invalid_pr_already_paid_button">Abrir comprovante</string>
+  <string name="legacy_send_amount_error">Insira uma quantia válida.</string>
+  <string name="legacy_send_amount_error_balance">A quantidade excede o seu saldo.</string>
+  <string name="legacy_send_amount_error_swap_out_too_small">Mín. %1$s para pagamentos pela rede Bitcoin.</string>
+  <string name="legacy_send_destination_label">Enviar para</string>
+  <string name="legacy_send_description_label">Desc.</string>
+  <string name="legacy_send_error_sending">Ocorreu um erro interno ao tentar enviar este pagamento. Pagamento não realizado.</string>
+  <string name="legacy_send_pay_button">Pagar</string>
+  <string name="legacy_send_swap_in_progress">Preparando transação…</string>
+  <string name="legacy_send_swap_service_disabled">O serviço de swap para fazer pagamentos na cadeia foi desativado.\n\nUse um serviço de terceiros.</string>
+  <string name="legacy_send_swap_error">A troca para rede Bitcoin falhou. Tente novamente.</string>
+  <string name="legacy_send_swap_required_button">Preparar transação</string>
+  <string name="legacy_send_swap_complete_recap_amount">Quantidade</string>
+  <string name="legacy_send_swap_complete_recap_fee">Taxa de mineração</string>
+  <string name="legacy_send_swap_complete_recap_total">Total</string>
+  <string name="legacy_send_swap_complete_cannot_afford">O total após taxas excede seu saldo.</string>
 
   <!-- //////////////// scan //////////////// -->
 
-  <string name="readinput_manualinput">Inserir dados manualmente</string>
-  <string name="readinput_paste">Colar dados da área de transferência</string>
-  <string name="readinput_browse">Usar imagem salva de código QR</string>
-  <string name="readinput_extracting">Verificando…</string>
-  
-  <string name="send_input_dialog_title">Inserir manualmente</string>
-  <string name="send_input_dialog_message">Insira um endereço bitcoin, solicitação de pagamento, LNUrl, ou um endereço da rede Relâmpago que você deseja enviar dinheiro.</string>
-  <string name="send_input_dialog_hint">Insira os dados aqui</string>
+  <string name="legacy_readinput_manualinput">Inserir dados manualmente</string>
+  <string name="legacy_readinput_paste">Colar dados da área de transferência</string>
+  <string name="legacy_readinput_browse">Usar imagem salva de código QR</string>
+  <string name="legacy_readinput_extracting">Verificando…</string>
 
-  <string name="scan_request_camera_access">Permitir uso da câmera</string>
-  <string name="scan_instructions">Aponte a câmera para o código QR contendo uma solicitação de pagamento, endereço bitcoin ou LNURL</string>
-  <string name="scan_state_reading">Lendo dados</string>
+  <string name="legacy_send_input_dialog_title">Inserir manualmente</string>
+  <string name="legacy_send_input_dialog_message">Insira um endereço bitcoin, solicitação de pagamento, LNUrl, ou um endereço da rede Relâmpago que você deseja enviar dinheiro.</string>
+  <string name="legacy_send_input_dialog_hint">Insira os dados aqui</string>
 
-  <string name="scan_error_expired">O pagamento expirou.</string>
-  <string name="scan_error_pay_to_self">Você não pode pagar a si próprio.</string>
-  <string name="scan_error_invalid_chain">Este pagamento não usa o mesmo blockchain da sua carteira.</string>
-  <string name="scan_error_lnurl_unsupported">Este tipo de URL ainda não é suportada!</string>
-  <string name="scan_error_lnurl_failure_generic"><![CDATA[O serviço LNURL <b>%1$s</b> retornou um erro.]]></string>
-  <string name="scan_error_lnurl_failure_code"><![CDATA[O serviço LNURL <b>%1$s</b> retornou um código de erro HTTP %2$d.]]></string>
-  <string name="scan_error_lnurl_failure_detailed"><![CDATA[
+  <string name="legacy_scan_request_camera_access">Permitir uso da câmera</string>
+  <string name="legacy_scan_instructions">Aponte a câmera para o código QR contendo uma solicitação de pagamento, endereço bitcoin ou LNURL</string>
+  <string name="legacy_scan_state_reading">Lendo dados</string>
+
+  <string name="legacy_scan_error_expired">O pagamento expirou.</string>
+  <string name="legacy_scan_error_pay_to_self">Você não pode pagar a si próprio.</string>
+  <string name="legacy_scan_error_invalid_chain">Este pagamento não usa o mesmo blockchain da sua carteira.</string>
+  <string name="legacy_scan_error_lnurl_unsupported">Este tipo de URL ainda não é suportada!</string>
+  <string name="legacy_scan_error_lnurl_failure_generic"><![CDATA[O serviço LNURL <b>%1$s</b> retornou um erro.]]></string>
+  <string name="legacy_scan_error_lnurl_failure_code"><![CDATA[O serviço LNURL <b>%1$s</b> retornou um código de erro HTTP %2$d.]]></string>
+  <string name="legacy_scan_error_lnurl_failure_detailed"><![CDATA[
     O serviço LNURL <b>%1$s</b> retornou um erro:
     <br/><br/>
     <em>%2$s</em>
   ]]></string>
-  <string name="scan_error_lnurl_failure_unreadable"><![CDATA[O serviço LNURL <b>%1$s</b> retornou uma mensagem inválida.]]></string>
-  <string name="scan_error_invalid_scan">Dado inválido.\nPor favor tente novamente.</string>
+  <string name="legacy_scan_error_lnurl_failure_unreadable"><![CDATA[O serviço LNURL <b>%1$s</b> retornou uma mensagem inválida.]]></string>
+  <string name="legacy_scan_error_invalid_scan">Dado inválido.\nPor favor tente novamente.</string>
 
-  <string name="scan_amountless_legacy_title">Advertência</string>
-  <string name="scan_amountless_legacy_message"><![CDATA[
+  <string name="legacy_scan_amountless_legacy_title">Advertência</string>
+  <string name="legacy_scan_amountless_legacy_message"><![CDATA[
     Esta fatura não inclui um valor. Isso pode ser perigoso: servidores maliciosos podem interceptar e roubar seu pagamento. Para que a transação seja segura, você deve <b>solicitar ao recebedor que especifique um valor</b> na fatura.
     <br /><br />
     Tem certeza de que deseja pagar esta fatura?
   ]]></string>
-  <string name="scan_amountless_legacy_confirm_button">Confirmar</string>
-  <string name="scan_amountless_legacy_cancel_button">Cancelar</string>
+  <string name="legacy_scan_amountless_legacy_confirm_button">Confirmar</string>
+  <string name="legacy_scan_amountless_legacy_cancel_button">Cancelar</string>
 
   <!-- //////////////// utilities strings //////////////// -->
 
   <!-- #1: sign / #2: integer part / #3: decimal part / #4: unit -->
-  <string name="utils_converted_amount">≈ %1$s</string>
-  <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
-  <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
-  <string name="utils_unknown_amount" translatable="false">!?</string>
+  <string name="legacy_utils_converted_amount">≈ %1$s</string>
+  <string name="legacy_utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
+  <string name="legacy_utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
+  <string name="legacy_utils_unknown_amount" translatable="false">!?</string>
 
-  <string name="utils_ok">Ok</string>
-  <string name="utils_proceed">Continuar</string>
-  <string name="utils_cancel">Cancelar</string>
-  <string name="utils_next">Próximo</string>
-  <string name="utils_date_just_now">Agora</string>
-  <string name="utils_unknown">N/A</string>
-  <string name="utils_copied">Copiado!</string>
-  <string name="btn_back">Voltar</string>
-  <string name="btn_ok">OK</string>
-  <string name="btn_confirm">Confirmar</string>
-  <string name="btn_cancel">Cancelar</string>
-  <string name="btn_close">Fechar</string>
-  <string name="btn_pause_connecting">Conectando ao par…</string>
-  <string name="btn_pause_connecting_electrum">Conectando ao servidor Electrum…</string>
+  <string name="legacy_utils_ok">Ok</string>
+  <string name="legacy_utils_proceed">Continuar</string>
+  <string name="legacy_utils_cancel">Cancelar</string>
+  <string name="legacy_utils_next">Próximo</string>
+  <string name="legacy_utils_date_just_now">Agora</string>
+  <string name="legacy_utils_unknown">N/A</string>
+  <string name="legacy_utils_copied">Copiado!</string>
+  <string name="legacy_btn_back">Voltar</string>
+  <string name="legacy_btn_ok">OK</string>
+  <string name="legacy_btn_confirm">Confirmar</string>
+  <string name="legacy_btn_cancel">Cancelar</string>
+  <string name="legacy_btn_close">Fechar</string>
+  <string name="legacy_btn_pause_connecting">Conectando ao par…</string>
+  <string name="legacy_btn_pause_connecting_electrum">Conectando ao servidor Electrum…</string>
 
   <!-- //////////////// settings //////////////// -->
 
-  <string name="settings_general_title">Geral</string>
-  <string name="settings_display_prefs">Tela</string>
-  <string name="settings_security_title">Segurança</string>
-  <string name="settings_display_seed">Frase de recuperação</string>
-  <string name="settings_access_control">Configurações de acesso</string>
-  <string name="settings_advanced_title">Avançado</string>
-  <string name="settings_fees">Configurações de taxas</string>
-  <string name="settings_list_channels">Lista de canais</string>
-  <string name="settings_logs">Logs</string>
-  <string name="settings_electrum">Servidor Electrum</string>
-  <string name="settings_mutual_close">Encerrar canais</string>
-  <string name="settings_force_close">Zona de perigo</string>
-  <string name="settings_tor">Tor</string>
-  <string name="settings_about">Sobre</string>
-  <string name="settings_payment_settings">Configurações de pagamento</string>
+  <string name="legacy_settings_general_title">Geral</string>
+  <string name="legacy_settings_display_prefs">Tela</string>
+  <string name="legacy_settings_security_title">Segurança</string>
+  <string name="legacy_settings_display_seed">Frase de recuperação</string>
+  <string name="legacy_settings_access_control">Configurações de acesso</string>
+  <string name="legacy_settings_advanced_title">Avançado</string>
+  <string name="legacy_settings_fees">Configurações de taxas</string>
+  <string name="legacy_settings_list_channels">Lista de canais</string>
+  <string name="legacy_settings_logs">Logs</string>
+  <string name="legacy_settings_electrum">Servidor Electrum</string>
+  <string name="legacy_settings_mutual_close">Encerrar canais</string>
+  <string name="legacy_settings_force_close">Zona de perigo</string>
+  <string name="legacy_settings_tor">Tor</string>
+  <string name="legacy_settings_about">Sobre</string>
+  <string name="legacy_settings_payment_settings">Configurações de pagamento</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
-  <string name="notif_watcher_cheating_title">Por favor abra a Phoenix</string>
-  <string name="notif_watcher_cheating_message">Foi detectada uma tentativa de fraude.</string>
+  <string name="legacy_notif_watcher_cheating_title">Por favor abra a Phoenix</string>
+  <string name="legacy_notif_watcher_cheating_message">Foi detectada uma tentativa de fraude.</string>
 
-  <string name="notif_watcher_connection_title">A Phoenix precisa de acesso à internet</string>
-  <string name="notif_watcher_connection_message">O alerta de segundo plano precisa de internet para funcionar corretamente.</string>
+  <string name="legacy_notif_watcher_connection_title">A Phoenix precisa de acesso à internet</string>
+  <string name="legacy_notif_watcher_connection_message">O alerta de segundo plano precisa de internet para funcionar corretamente.</string>
 
-  <string name="notif__headless_title__default">A Phoenix está rodando em segundo plano</string>
-  <string name="notif__headless_title__missed_incoming">Pagamento não recebido</string>
-  <string name="notif__headless_title__missed_fulfill">Um pagamento pendente foi realizado</string>
-  <string name="notif__headless_title__received">Pagamento recebido</string>
-  <string name="notif__headless_message__app_locked">O aplicativo está bloqueado</string>
-  <string name="notif__headless_message__pending_fulfill">Toque para iniciar o aplicativo</string>
-  <string name="notif__headless_message__manual_pay_to_open">A abertura de canal requer aprovação manual</string>
-  <string name="notif__headless_message__received_payment">Recebido %1$s (%2$s)</string>
+  <string name="legacy_notif__headless_title__default">A Phoenix está rodando em segundo plano</string>
+  <string name="legacy_notif__headless_title__missed_incoming">Pagamento não recebido</string>
+  <string name="legacy_notif__headless_title__missed_fulfill">Um pagamento pendente foi realizado</string>
+  <string name="legacy_notif__headless_title__received">Pagamento recebido</string>
+  <string name="legacy_notif__headless_message__app_locked">O aplicativo está bloqueado</string>
+  <string name="legacy_notif__headless_message__pending_fulfill">Toque para iniciar o aplicativo</string>
+  <string name="legacy_notif__headless_message__manual_pay_to_open">A abertura de canal requer aprovação manual</string>
+  <string name="legacy_notif__headless_message__received_payment">Recebido %1$s (%2$s)</string>
 
-  <string name="notif__pay_to_open_missed_too_small_title">Pagamento não recebido (%1$s)</string>
-  <string name="notif__pay_to_open_missed_too_small_message">Quantidade insuficiente para criar um novo canal de pagamento.</string>
+  <string name="legacy_notif__pay_to_open_missed_too_small_title">Pagamento não recebido (%1$s)</string>
+  <string name="legacy_notif__pay_to_open_missed_too_small_message">Quantidade insuficiente para criar um novo canal de pagamento.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
-  <string name="closechannels_title">Encerrar canais</string>
-  <string name="closechannels_checking_channels">Verificando canais, aguarde…</string>
-  <string name="closechannels_channels_recap">Você atualmente possui %1$d canais na rede Relâmpago que juntos somam o total de %2$s.</string>
-  <string name="closechannels_channels_none">No momento, você não possui canais que possam ser esvaziados.\n\nEm \'Lista de canais\' você pode verificar o estado em que se encontram os seus canais.</string>
-  <string name="closechannels_mutual_title">Esvaziar carteira</string>
-  <string name="closechannels_mutual_instructions"><![CDATA[
+  <string name="legacy_closechannels_title">Encerrar canais</string>
+  <string name="legacy_closechannels_checking_channels">Verificando canais, aguarde…</string>
+  <string name="legacy_closechannels_channels_recap">Você atualmente possui %1$d canais na rede Relâmpago que juntos somam o total de %2$s.</string>
+  <string name="legacy_closechannels_channels_none">No momento, você não possui canais que possam ser esvaziados.\n\nEm \'Lista de canais\' você pode verificar o estado em que se encontram os seus canais.</string>
+  <string name="legacy_closechannels_mutual_title">Esvaziar carteira</string>
+  <string name="legacy_closechannels_mutual_instructions"><![CDATA[
     Use este recurso para esvaziar sua carteira enviando o saldo para um endereço bitcoin.
   ]]></string>
-  <string name="closechannels_mutual_input_instructions">Os valores podem ser enviados para uma carteira Bitcoin. Antes de enviar verifique se o endereço está correto.</string>
-  <string name="closechannels_mutual_input_hint">Insira um endereço bitcoin</string>
-  <string name="closechannels_mutual_button">Esvaziar minha carteira</string>
-  <string name="closechannels_force_title">Forçar encerramento</string>
-  <string name="closechannels_force_instructions"><![CDATA[
+  <string name="legacy_closechannels_mutual_input_instructions">Os valores podem ser enviados para uma carteira Bitcoin. Antes de enviar verifique se o endereço está correto.</string>
+  <string name="legacy_closechannels_mutual_input_hint">Insira um endereço bitcoin</string>
+  <string name="legacy_closechannels_mutual_button">Esvaziar minha carteira</string>
+  <string name="legacy_closechannels_force_title">Forçar encerramento</string>
+  <string name="legacy_closechannels_force_instructions"><![CDATA[
     O encerramento forçado permite encerrar seus canais de forma unilateral.
     <br/><br/>
     Esta função não é &quot;um botão mágico que resolve tudo&quot;; foi inserida como uma medida de segurança e <b>só deve ser usada em casos extremos</b>. Por exemplo, se seu parceiro (ACINQ) desaparecer permanentemente, impedindo que você gaste seus bitcoins. Em todos os outros casos, <b>se você tiver problemas com a Phoenix, entre em contato com o suporte</b>.
@@ -306,80 +307,80 @@
     <br/><br/>
     <b>Não use esse recurso se você não compreender exatamente o que ele faz.</b>
   ]]></string>
-  <string name="closechannels_force_destination">Os valores serão eventualmente enviados para:</string>
-  <string name="closechannels_force_destination_desc">Este endereço tem origem na sua seed e pertence a você.</string>
-  <string name="closechannels_force_button">Forçar encerramento de canais</string>
-  <string name="closechannels_confirm_dialog_message">Tem certeza de que deseja continuar?</string>
-  <string name="closechannels_message_error">Ocorreu um problema. Tente novamente.</string>
-  <string name="closechannels_message_done">Fundos enviados.</string>
-  <string name="closechannels_message_in_progress">Aguarde…</string>
+  <string name="legacy_closechannels_force_destination">Os valores serão eventualmente enviados para:</string>
+  <string name="legacy_closechannels_force_destination_desc">Este endereço tem origem na sua seed e pertence a você.</string>
+  <string name="legacy_closechannels_force_button">Forçar encerramento de canais</string>
+  <string name="legacy_closechannels_confirm_dialog_message">Tem certeza de que deseja continuar?</string>
+  <string name="legacy_closechannels_message_error">Ocorreu um problema. Tente novamente.</string>
+  <string name="legacy_closechannels_message_done">Fundos enviados.</string>
+  <string name="legacy_closechannels_message_in_progress">Aguarde…</string>
 
   <!-- //////////////// list all channels //////////////// -->
 
-  <string name="listallchannels_title">Lista de canais</string>
-  <string name="listallchannels_in_progress">Aguarde…</string>
-  <string name="listallchannels_error">Ocorreu um erro ao recuperar a lista de canais. Tente novamente.</string>
-  <string name="listallchannels_node_id">ID da carteira: %1$s</string>
-  <string name="listallchannels_no_channels">Você ainda não possui canais.</string>
-  <plurals name="listallchannels_channels_header">
+  <string name="legacy_listallchannels_title">Lista de canais</string>
+  <string name="legacy_listallchannels_in_progress">Aguarde…</string>
+  <string name="legacy_listallchannels_error">Ocorreu um erro ao recuperar a lista de canais. Tente novamente.</string>
+  <string name="legacy_listallchannels_node_id">ID da carteira: %1$s</string>
+  <string name="legacy_listallchannels_no_channels">Você ainda não possui canais.</string>
+  <plurals name="legacy_listallchannels_channels_header">
     <item quantity="one">Você tem %1$d canal.</item>
     <item quantity="other">Você tem %1$d canais.</item>
   </plurals>
-  <string name="listallchannels_copy">Copiar</string>
-  <string name="listallchannels_share_all">Compartilhar todos canais…</string>
-  <string name="listallchannels_share">Compartilhar</string>
-  <string name="listallchannels_funding_tx">Tx</string>
-  <string name="listallchannels_funding_tx_desc">Ver transação de abertura</string>
-  <string name="listallchannels_close">Fechar</string>
-  <string name="listallchannels_share_subject">Dados dos canais</string>
-  <string name="listallchannels_share_title">Compartilhar dados do canal</string>
-  <string name="listallchannels_serialization_error">Não foi possível recuperar os dados do canal</string>
+  <string name="legacy_listallchannels_copy">Copiar</string>
+  <string name="legacy_listallchannels_share_all">Compartilhar todos canais…</string>
+  <string name="legacy_listallchannels_share">Compartilhar</string>
+  <string name="legacy_listallchannels_funding_tx">Tx</string>
+  <string name="legacy_listallchannels_funding_tx_desc">Ver transação de abertura</string>
+  <string name="legacy_listallchannels_close">Fechar</string>
+  <string name="legacy_listallchannels_share_subject">Dados dos canais</string>
+  <string name="legacy_listallchannels_share_title">Compartilhar dados do canal</string>
+  <string name="legacy_listallchannels_serialization_error">Não foi possível recuperar os dados do canal</string>
 
   <!-- //////////////// channel details //////////////// -->
 
-  <string name="channel_loading">Recuperando dados do canal…</string>
-  <string name="channel_error">Não foi possível recuperar os detalhes deste canal. Tente novamente mais tarde.</string>
-  <string name="channel_balance">Saldo</string>
-  <string name="channel_capacity">Capacidade</string>
+  <string name="legacy_channel_loading">Recuperando dados do canal…</string>
+  <string name="legacy_channel_error">Não foi possível recuperar os detalhes deste canal. Tente novamente mais tarde.</string>
+  <string name="legacy_channel_balance">Saldo</string>
+  <string name="legacy_channel_capacity">Capacidade</string>
 
   <!-- //////////////// menu //////////////// -->
 
-  <string name="menu_settings">Configurações</string>
-  <string name="menu_send">Enviar</string>
-  <string name="menu_receive">Receber</string>
+  <string name="legacy_menu_settings">Configurações</string>
+  <string name="legacy_menu_send">Enviar</string>
+  <string name="legacy_menu_receive">Receber</string>
 
   <!-- //////////////// init wallet //////////////// -->
 
-  <string name="initwallet_terms"><![CDATA[Eu li e concordo com os <a href="https://phoenix.acinq.co/terms">termos de uso</a>.]]></string>
-  <string name="initwallet_create">Criar nova carteira</string>
-  <string name="initwallet_restore">Restaurar minha carteira</string>
+  <string name="legacy_initwallet_terms"><![CDATA[Eu li e concordo com os <a href="https://phoenix.acinq.co/terms">termos de uso</a>.]]></string>
+  <string name="legacy_initwallet_create">Criar nova carteira</string>
+  <string name="legacy_initwallet_restore">Restaurar minha carteira</string>
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_swapin_incoming">recebendo +%1$s</string>
-  <string name="main_faq_button">FAQ</string>
-  <string name="main_connectivity_button">Conectando…</string>
-  <string name="main_tor_connected_button">Tor ativado</string>
-  <string name="main_stores_button">Lojas</string>
+  <string name="legacy_main_swapin_incoming">recebendo +%1$s</string>
+  <string name="legacy_main_faq_button">FAQ</string>
+  <string name="legacy_main_connectivity_button">Conectando…</string>
+  <string name="legacy_main_tor_connected_button">Tor ativado</string>
+  <string name="legacy_main_stores_button">Lojas</string>
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="inappnotif_mnemonics_never_seen">Obrigado por usar a Phoenix. Faça o backup de sua carteira para não correr risco de perder seus bitcoins.</string>
-  <string name="inappnotif_mnemonics_never_seen_action">Fazer backup</string>
-  <string name="inappnotif_background_worker_cannot_run">De tempos em tempos a Phoenix precisa rodar em segundo plano. Verifique se ela não está sendo fechada automaticamente pelo aparelho para economizar energia.</string>
-  <string name="inappnotif_upgrade">Uma atualização para este aplicativo está disponível.</string>
-  <string name="inappnotif_upgrade_critical">Uma atualização crítica está disponível. A carteira pode apresentar mau funcionamento se não for atualizada.</string>
-  <string name="inappnotif_mempool_high_usage">O mempool da rede Bitcoin está cheio e com taxas altas.</string>
-  <string name="inappnotif_mempool_high_usage_action">Veja como a Phoenix é afetada</string>
+  <string name="legacy_inappnotif_mnemonics_never_seen">Obrigado por usar a Phoenix. Faça o backup de sua carteira para não correr risco de perder seus bitcoins.</string>
+  <string name="legacy_inappnotif_mnemonics_never_seen_action">Fazer backup</string>
+  <string name="legacy_inappnotif_background_worker_cannot_run">De tempos em tempos a Phoenix precisa rodar em segundo plano. Verifique se ela não está sendo fechada automaticamente pelo aparelho para economizar energia.</string>
+  <string name="legacy_inappnotif_upgrade">Uma atualização para este aplicativo está disponível.</string>
+  <string name="legacy_inappnotif_upgrade_critical">Uma atualização crítica está disponível. A carteira pode apresentar mau funcionamento se não for atualizada.</string>
+  <string name="legacy_inappnotif_mempool_high_usage">O mempool da rede Bitcoin está cheio e com taxas altas.</string>
+  <string name="legacy_inappnotif_mempool_high_usage_action">Veja como a Phoenix é afetada</string>
 
   <!-- //////////////// display seed //////////////// -->
 
-  <string name="displayseed_title">Frase de recuperação da carteira</string>
-  <string name="displayseed_authenticate_button">Mostrar seed</string>
-  <string name="displayseed_loading">Desbloqueando seed…</string>
-  <string name="displayseed_error_generic">A seed não pôde ser lida. Tente novamente.</string>
-  <string name="displayseed_error_wrong_password">PIN incorreto.</string>
-  <string name="displayseed_instructions"><![CDATA[
+  <string name="legacy_displayseed_title">Frase de recuperação da carteira</string>
+  <string name="legacy_displayseed_authenticate_button">Mostrar seed</string>
+  <string name="legacy_displayseed_loading">Desbloqueando seed…</string>
+  <string name="legacy_displayseed_error_generic">A seed não pôde ser lida. Tente novamente.</string>
+  <string name="legacy_displayseed_error_wrong_password">PIN incorreto.</string>
+  <string name="legacy_displayseed_instructions"><![CDATA[
     Esta lista de palavras, também conhecida como seed, é o backup da sua carteira e permite o acesso total aos fundos contidos nela.
     <br /><br />
     <strong>Somente você possui esta seed. Mantenha-a privada.</strong>
@@ -392,189 +393,189 @@
     <br />
     Salve-a em um local seguro (não neste telefone). Se você perder sua seed e seu telefone, você perderá seus fundos.
   ]]></string>
-  <string name="displayseed_derivation_path">Seed BIP39 com caminho de derivação padrão BIP84</string>
-  <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
-  <string name="displayseed_has_saved_seed_checkbox">Fiz o backup da minha seed, por exemplo, em uma folha de papel.</string>
-  <string name="displayseed_dialog_header">MANTENHA ESTA SEED SEGURA.\nNÃO COMPARTILHE.</string>
+  <string name="legacy_displayseed_derivation_path">Seed BIP39 com caminho de derivação padrão BIP84</string>
+  <string name="legacy_displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
+  <string name="legacy_displayseed_has_saved_seed_checkbox">Fiz o backup da minha seed, por exemplo, em uma folha de papel.</string>
+  <string name="legacy_displayseed_dialog_header">MANTENHA ESTA SEED SEGURA.\nNÃO COMPARTILHE.</string>
 
   <!-- //////////////// logs settings //////////////// -->
 
-  <string name="logs_title">Logs do aplicativo</string>
-  <string name="logs_subtitle">Aqui você pode extrair e compartilhar os logs do aplicativo.</string>
-  <string name="logs_view_button">Ver logs…</string>
-  <string name="logs_view_with">Ver logs com…</string>
-  <string name="logs_share_button">Compartilhar logs…</string>
-  <string name="logs_share_subject">Logs do aplicativo Phoenix</string>
-  <string name="logs_share_title">Compartilhar logs da Phoenix…</string>
+  <string name="legacy_logs_title">Logs do aplicativo</string>
+  <string name="legacy_logs_subtitle">Aqui você pode extrair e compartilhar os logs do aplicativo.</string>
+  <string name="legacy_logs_view_button">Ver logs…</string>
+  <string name="legacy_logs_view_with">Ver logs com…</string>
+  <string name="legacy_logs_share_button">Compartilhar logs…</string>
+  <string name="legacy_logs_share_subject">Logs do aplicativo Phoenix</string>
+  <string name="legacy_logs_share_title">Compartilhar logs da Phoenix…</string>
 
   <!-- //////////////// payment details //////////////// -->
 
-  <string name="paymentdetails_loading">Recuperando detalhes do pagamento…</string>
-  <string name="paymentdetails_error">Ocorreu um erro ao recuperar os detalhes deste pagamento.\n\nTente novamente.</string>
+  <string name="legacy_paymentdetails_loading">Recuperando detalhes do pagamento…</string>
+  <string name="legacy_paymentdetails_error">Ocorreu um erro ao recuperar os detalhes deste pagamento.\n\nTente novamente.</string>
 
-  <string name="paymentdetails_status_sent_successful"><![CDATA[<b>Enviado</b> %1$s]]></string>
-  <string name="paymentdetails_status_sent_pending"><![CDATA[<b>Pendente…</b>]]></string>
-  <string name="paymentdetails_status_sent_failed"><![CDATA[Pagamento <b>falhou</b>.<br />O dinheiro não foi enviado.]]></string>
+  <string name="legacy_paymentdetails_status_sent_successful"><![CDATA[<b>Enviado</b> %1$s]]></string>
+  <string name="legacy_paymentdetails_status_sent_pending"><![CDATA[<b>Pendente…</b>]]></string>
+  <string name="legacy_paymentdetails_status_sent_failed"><![CDATA[Pagamento <b>falhou</b>.<br />O dinheiro não foi enviado.]]></string>
 
-  <string name="paymentdetails_status_received_pending">O pagamento ainda não foi recebido.</string>
-  <string name="paymentdetails_status_received_successful"><![CDATA[<b>Recebido</b> %1$s]]></string>
+  <string name="legacy_paymentdetails_status_received_pending">O pagamento ainda não foi recebido.</string>
+  <string name="legacy_paymentdetails_status_received_successful"><![CDATA[<b>Recebido</b> %1$s]]></string>
 
-  <string name="paymentdetails_desc_label">Desc.</string>
-  <string name="paymentdetails_desc_custom_title">Adicionar nota</string>
-  <string name="paymentdetails_desc_custom_info">Você pode inserir uma descrição para este pagamento.</string>
-  <string name="paymentdetails_destination_label">Enviado para</string>
-  <string name="paymentdetails_relayer_label">Trasmitido por</string>
-  <string name="paymentdetails_fees_label">Taxas</string>
-  <string name="paymentdetails_pay_to_open_label">Taxas</string>
-  <string name="paymentdetails_pay_to_open_desc">Esta taxa cobre o custo de abertura de um novo canal de pagamento.</string>
-  <string name="paymentdetails_error_label">Erro</string>
-  <string name="paymentdetails_closing_desc">Pagamento pelo encerramento do canal #%1$s</string>
-  <string name="paymentdetails_swap_out_desc">Pagamento para um endereço bitcoin</string>
-  <string name="paymentdetails_no_description">Sem descrição</string>
-  <string name="paymentdetails_address_label">Endereço</string>
-  <string name="paymentdetails_address_open_explorer">Mostrar na blockchain</string>
-  <string name="paymentdetails_info_uniclose"><![CDATA[
+  <string name="legacy_paymentdetails_desc_label">Desc.</string>
+  <string name="legacy_paymentdetails_desc_custom_title">Adicionar nota</string>
+  <string name="legacy_paymentdetails_desc_custom_info">Você pode inserir uma descrição para este pagamento.</string>
+  <string name="legacy_paymentdetails_destination_label">Enviado para</string>
+  <string name="legacy_paymentdetails_relayer_label">Trasmitido por</string>
+  <string name="legacy_paymentdetails_fees_label">Taxas</string>
+  <string name="legacy_paymentdetails_pay_to_open_label">Taxas</string>
+  <string name="legacy_paymentdetails_pay_to_open_desc">Esta taxa cobre o custo de abertura de um novo canal de pagamento.</string>
+  <string name="legacy_paymentdetails_error_label">Erro</string>
+  <string name="legacy_paymentdetails_closing_desc">Pagamento pelo encerramento do canal #%1$s</string>
+  <string name="legacy_paymentdetails_swap_out_desc">Pagamento para um endereço bitcoin</string>
+  <string name="legacy_paymentdetails_no_description">Sem descrição</string>
+  <string name="legacy_paymentdetails_address_label">Endereço</string>
+  <string name="legacy_paymentdetails_address_open_explorer">Mostrar na blockchain</string>
+  <string name="legacy_paymentdetails_info_uniclose"><![CDATA[
     Este pagamento aconteceu após um conflito em um canal. Os fundos serão enviados para o seu endereço bitcoin: %1$s.
     <br /><br />
     Para recuperar seus fundos, siga <a href="https://phoenix.acinq.co/faq#my-channels-got-force-closed-how-do-i-recover-my-money">as instruções contidas no FAQ</a>.
   ]]></string>
-  <string name="paymentdetails_lnurlpay_service_label">Serviço</string>
-  <string name="paymentdetails_lnurlpay_success_action_label">Mensagem</string>
-  <string name="paymentdetails_lnurlpay_success_action_url"><![CDATA[
+  <string name="legacy_paymentdetails_lnurlpay_service_label">Serviço</string>
+  <string name="legacy_paymentdetails_lnurlpay_success_action_label">Mensagem</string>
+  <string name="legacy_paymentdetails_lnurlpay_success_action_url"><![CDATA[
     %1$s
     <br /><br />
     <a href="%2$s">Open Link</a>
   ]]></string>
-  <string translatable="false" name="paymentdetails_lnurlpay_success_action_aes"><![CDATA[
+  <string translatable="false" name="legacy_paymentdetails_lnurlpay_success_action_aes"><![CDATA[
     %1$s
     <br />
     <b>%2$s</b>
   ]]></string>
-  <string translatable="false" name="paymentdetails_lnurlpay_success_action_aes_failure">Não foi possível descriptografar a mensagem do serviço.</string>
+  <string translatable="false" name="legacy_paymentdetails_lnurlpay_success_action_aes_failure">Não foi possível descriptografar a mensagem do serviço.</string>
 
-  <string name="paymentdetails_technicals_button">Mostrar detalhes</string>
+  <string name="legacy_paymentdetails_technicals_button">Mostrar detalhes</string>
 
-  <string name="paymentdetails_failure_recipient_unknown_or_liquidity">O destinatário não está acessível ou não possui liquidez necessária para receber pagamentos.</string>
-  <string name="paymentdetails_failure_invalid_details">Pagamento rejeitado pelo destinatário.\nIsso geralmente ocorre quando a fatura já foi paga ou quando a fatura contém prazo de validade e você tentou enviar o pagamento após esse prazo.</string>
-  <string name="paymentdetails_failure_trampoline_fees">Não foi possível encontrar rota de pagamento com essa configuração de taxa. Tente com taxas mais altas.</string>
-  <string name="paymentdetails_failure_trampoline_fees_action">Mudar taxa</string>
-
-  <!-- //////////////// payment details: technicals data //////////////// -->
-
-  <string name="paymentdetails_technicals_title">Dados de pagamento</string>
-  <string name="paymentdetails_swap_out_feerate_label">Taxa de troca</string>
-  <string name="paymentdetails_closing_type_label">Tipo de encerramento</string>
-  <string name="paymentdetails_closing_type_mutual">Encerramento mútuo</string>
-  <string name="paymentdetails_closing_type_local">Local</string>
-  <string name="paymentdetails_closing_type_remote">Remoto</string>
-  <string name="paymentdetails_closing_type_other">Outro</string>
-  <string name="paymentdetails_closing_channel_label">Canal encerrado</string>
-  <string name="paymentdetails_closing_spending_txs_label">Transações de encerramento de canais</string>
-  <string name="paymentdetails_pubkey_label">Chave pública de destino</string>
-  <string name="paymentdetails_payment_hash_label">Hash do pagamento</string>
-  <string name="paymentdetails_payment_request_label">ID da fatura</string>
-  <string name="paymentdetails_preimage_label">Preimage</string>
-  <string name="paymentdetails_created_at_label">Realizado em</string>
-  <string name="paymentdetails_completed_at_label">Concluído em</string>
+  <string name="legacy_paymentdetails_failure_recipient_unknown_or_liquidity">O destinatário não está acessível ou não possui liquidez necessária para receber pagamentos.</string>
+  <string name="legacy_paymentdetails_failure_invalid_details">Pagamento rejeitado pelo destinatário.\nIsso geralmente ocorre quando a fatura já foi paga ou quando a fatura contém prazo de validade e você tentou enviar o pagamento após esse prazo.</string>
+  <string name="legacy_paymentdetails_failure_trampoline_fees">Não foi possível encontrar rota de pagamento com essa configuração de taxa. Tente com taxas mais altas.</string>
+  <string name="legacy_paymentdetails_failure_trampoline_fees_action">Mudar taxa</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
 
-  <string name="state_wait_confirmed">A transação de abertura está sendo confirmada</string>
-  <string name="state_closing">O canal está sendo encerrado</string>
-  <string name="state_closed">O canal foi encerrado</string>
-  <string name="state_normal">Funcionando</string>
-  <string name="state_sync">Sincronizando com pares</string>
-  <string name="state_offline">O par está offline</string>
-  <string name="state_shutdown">Desligar</string>
+  <string name="legacy_paymentdetails_technicals_title">Dados de pagamento</string>
+  <string name="legacy_paymentdetails_swap_out_feerate_label">Taxa de troca</string>
+  <string name="legacy_paymentdetails_closing_type_label">Tipo de encerramento</string>
+  <string name="legacy_paymentdetails_closing_type_mutual">Encerramento mútuo</string>
+  <string name="legacy_paymentdetails_closing_type_local">Local</string>
+  <string name="legacy_paymentdetails_closing_type_remote">Remoto</string>
+  <string name="legacy_paymentdetails_closing_type_other">Outro</string>
+  <string name="legacy_paymentdetails_closing_channel_label">Canal encerrado</string>
+  <string name="legacy_paymentdetails_closing_spending_txs_label">Transações de encerramento de canais</string>
+  <string name="legacy_paymentdetails_pubkey_label">Chave pública de destino</string>
+  <string name="legacy_paymentdetails_payment_hash_label">Hash do pagamento</string>
+  <string name="legacy_paymentdetails_payment_request_label">ID da fatura</string>
+  <string name="legacy_paymentdetails_preimage_label">Preimage</string>
+  <string name="legacy_paymentdetails_created_at_label">Realizado em</string>
+  <string name="legacy_paymentdetails_completed_at_label">Concluído em</string>
+
+  <!-- //////////////// payment details: technicals data //////////////// -->
+
+  <string name="legacy_state_wait_confirmed">A transação de abertura está sendo confirmada</string>
+  <string name="legacy_state_closing">O canal está sendo encerrado</string>
+  <string name="legacy_state_closed">O canal foi encerrado</string>
+  <string name="legacy_state_normal">Funcionando</string>
+  <string name="legacy_state_sync">Sincronizando com pares</string>
+  <string name="legacy_state_offline">O par está offline</string>
+  <string name="legacy_state_shutdown">Desligar</string>
 
   <!-- //////////////// access control //////////////// -->
 
-  <string name="accessctrl_title">Segurança</string>
-  <string name="accessctrl_subtitle">Recomendamos habilitar o bloqueio de tela para evitar o uso não intencional de sua carteira.</string>
+  <string name="legacy_accessctrl_title">Segurança</string>
+  <string name="legacy_accessctrl_subtitle">Recomendamos habilitar o bloqueio de tela para evitar o uso não intencional de sua carteira.</string>
 
-  <string name="accessctrl_auth_no_hw">O seu aparelho não suporta autenticação biométrica.</string>
-  <string name="accessctrl_auth_hw_unavailable">O hardware de biometria não está disponível. Tente novamente mais tarde.</string>
-  <string name="accessctrl_auth_none_enrolled">Primeiro registre a biometria.</string>
-  <string name="accessctrl_auth_update_required">É necessária uma atualização de segurança do Android.</string>
-  <string name="accessctrl_auth_unsupported">Não compatível com sua versão do Android.</string>
-  <string name="accessctrl_auth_lockout">Muitas tentativas, tente novamente mais tarde.</string>
+  <string name="legacy_accessctrl_auth_no_hw">O seu aparelho não suporta autenticação biométrica.</string>
+  <string name="legacy_accessctrl_auth_hw_unavailable">O hardware de biometria não está disponível. Tente novamente mais tarde.</string>
+  <string name="legacy_accessctrl_auth_none_enrolled">Primeiro registre a biometria.</string>
+  <string name="legacy_accessctrl_auth_update_required">É necessária uma atualização de segurança do Android.</string>
+  <string name="legacy_accessctrl_auth_unsupported">Não compatível com sua versão do Android.</string>
+  <string name="legacy_accessctrl_auth_lockout">Muitas tentativas, tente novamente mais tarde.</string>
 
-  <string name="accessctrl_error_cipher">Incapaz de obter cifra: %1$s</string>
-  <string name="accessctrl_error_auth">Falha na autenticação.</string>
+  <string name="legacy_accessctrl_error_cipher">Incapaz de obter cifra: %1$s</string>
+  <string name="legacy_accessctrl_error_auth">Falha na autenticação.</string>
 
-  <string name="accessctrl_screen_lock_switch">Bloqueio de tela</string>
-  <string name="accessctrl_screen_lock_switch_desc">Restrinja o acesso ao aplicativo com o bloqueio de tela/biometria do Android</string>
-  <string name="accessctrl_full_lock_switch_unavailable">Registre uma biometria no Android para recursos de segurança adicionais.</string>
-  <string name="accessctrl_full_lock_switch_backup_required">Confirme se você fez o backup da sua frase de recuperação para acessar recursos adicionais de segurança.</string>
-  <string name="accessctrl_full_lock_switch_backup_required_button">Acessar minha frase de recuperação</string>
-  <string name="accessctrl_full_lock_switch">Impedir a execução em segundo plano</string>
-  <string name="accessctrl_full_lock_switch_desc">O aplicativo requer desbloqueio manual do usuário para ser executado. O recebimento de pagamento em segundo plano, portanto, não é possível.\n\nSomente autenticação biométrica é compatível. Se sua biometria for modificada, você precisará reinicializar a Phoenix com sua seed. Assegure-se de ter um backup!</string>
-  <string name="accessctrl_full_lock_confirm_title">Aviso</string>
-  <string name="accessctrl_full_lock_confirm_message">Funções que exigem execução em segundo plano serão desabilitadas. Para receber pagamentos, o aplicativo deverá ser desbloqueado.</string>
+  <string name="legacy_accessctrl_screen_lock_switch">Bloqueio de tela</string>
+  <string name="legacy_accessctrl_screen_lock_switch_desc">Restrinja o acesso ao aplicativo com o bloqueio de tela/biometria do Android</string>
+  <string name="legacy_accessctrl_full_lock_switch_unavailable">Registre uma biometria no Android para recursos de segurança adicionais.</string>
+  <string name="legacy_accessctrl_full_lock_switch_backup_required">Confirme se você fez o backup da sua frase de recuperação para acessar recursos adicionais de segurança.</string>
+  <string name="legacy_accessctrl_full_lock_switch_backup_required_button">Acessar minha frase de recuperação</string>
+  <string name="legacy_accessctrl_full_lock_switch">Impedir a execução em segundo plano</string>
+  <string name="legacy_accessctrl_full_lock_switch_desc">O aplicativo requer desbloqueio manual do usuário para ser executado. O recebimento de pagamento em segundo plano, portanto, não é possível.\n\nSomente autenticação biométrica é compatível. Se sua biometria for modificada, você precisará reinicializar a Phoenix com sua seed. Assegure-se de ter um backup!</string>
+  <string name="legacy_accessctrl_full_lock_confirm_title">Aviso</string>
+  <string name="legacy_accessctrl_full_lock_confirm_message">Funções que exigem execução em segundo plano serão desabilitadas. Para receber pagamentos, o aplicativo deverá ser desbloqueado.</string>
 
   <!-- //////////////// ln url login //////////////// -->
 
-  <string name="lnurl_auth_instructions"><![CDATA[Você pode usar sua carteira de forma anônima para acessar e autorizar uma ação em:<br/><br/><b>%1$s</b><br/><br/>Nenhuma informação pessoal será compartilhada com este serviço.]]></string>
-  <string name="lnurl_auth_button">Entrar</string>
-  <string name="lnurl_auth_in_progress"><![CDATA[Acessando\n<b>%1$s</b>]]></string>
-  <string name="lnurl_auth_success">Autenticação realizada com sucesso.</string>
-  <string name="lnurl_auth_failure">Autenticação falhou.\n\nDetalhes: %1$s</string>
-  <string name="lnurl_auth_failure_remote_io">Não foi possível conectar a %1$s</string>
-  <string name="lnurl_auth_failure_remote_details">O serviço respondeu com %1$s</string>
+  <string name="legacy_lnurl_auth_instructions"><![CDATA[Você pode usar sua carteira de forma anônima para acessar e autorizar uma ação em:<br/><br/><b>%1$s</b><br/><br/>Nenhuma informação pessoal será compartilhada com este serviço.]]></string>
+  <string name="legacy_lnurl_auth_button">Entrar</string>
+  <string name="legacy_lnurl_auth_in_progress"><![CDATA[Acessando\n<b>%1$s</b>]]></string>
+  <string name="legacy_lnurl_auth_success">Autenticação realizada com sucesso.</string>
+  <string name="legacy_lnurl_auth_failure">Autenticação falhou.\n\nDetalhes: %1$s</string>
+  <string name="legacy_lnurl_auth_failure_remote_io">Não foi possível conectar a %1$s</string>
+  <string name="legacy_lnurl_auth_failure_remote_details">O serviço respondeu com %1$s</string>
 
    <!-- //////////////// ln url pay //////////////// -->
 
-  <string name="lnurl_pay_domain"><![CDATA[Cobrança solicitada por<br/><b>%1$s</b>]]></string>
-  <string name="lnurl_pay_meta_description">Descrição</string>
-  <string name="lnurl_pay_comment_title">Insira uma nota (opcional)</string>
-  <string name="lnurl_pay_comment_message">Você pode inserir uma descrição ao pagamento (max %1$d caracteres). Será enviado ao destinatário.</string>
-  <string name="lnurl_pay_comment_hint">Sem descrição</string>
-  <string name="lnurl_pay_pay_button">Pagar</string>
-  <string name="lnurl_pay_requesting_invoice">Solicitando fatura…</string>
-  <string name="lnurl_pay_checking_invoice">Verificando fatura…</string>
-  <string name="lnurl_pay_sending_payment">Enviando pagamento…</string>
+  <string name="legacy_lnurl_pay_domain"><![CDATA[Cobrança solicitada por<br/><b>%1$s</b>]]></string>
+  <string name="legacy_lnurl_pay_meta_description">Descrição</string>
+  <string name="legacy_lnurl_pay_comment_title">Insira uma nota (opcional)</string>
+  <string name="legacy_lnurl_pay_comment_message">Você pode inserir uma descrição ao pagamento (max %1$d caracteres). Será enviado ao destinatário.</string>
+  <string name="legacy_lnurl_pay_comment_hint">Sem descrição</string>
+  <string name="legacy_lnurl_pay_pay_button">Pagar</string>
+  <string name="legacy_lnurl_pay_requesting_invoice">Solicitando fatura…</string>
+  <string name="legacy_lnurl_pay_checking_invoice">Verificando fatura…</string>
+  <string name="legacy_lnurl_pay_sending_payment">Enviando pagamento…</string>
 
-  <string name="lnurl_pay_amount_empty">Insira uma quantidade</string>
-  <string name="lnurl_pay_amount_below_min">Quantidade mínima de %1$s</string>
-  <string name="lnurl_pay_amount_above_max">Quantidade máxima de %1$s</string>
-  <string name="lnurl_pay_amount_above_balance">A quantidade excede seu saldo</string>
-  <string name="lnurl_pay_amount_invalid">Quantidade inválida</string>
+  <string name="legacy_lnurl_pay_amount_empty">Insira uma quantidade</string>
+  <string name="legacy_lnurl_pay_amount_below_min">Quantidade mínima de %1$s</string>
+  <string name="legacy_lnurl_pay_amount_above_max">Quantidade máxima de %1$s</string>
+  <string name="legacy_lnurl_pay_amount_above_balance">A quantidade excede seu saldo</string>
+  <string name="legacy_lnurl_pay_amount_invalid">Quantidade inválida</string>
 
-  <string name="lnurl_pay_error_header">Pagamento não enviado.</string>
-  <string name="lnurl_pay_error_unreachable">O serviço \'%1$s\' não está acessível, por favor, verifique sua conexão.</string>
-  <string name="lnurl_pay_error_invalid_invoice">O serviço \'%1$s\' forneceu uma fatura inválida (%2$s).</string>
-  <string name="lnurl_pay_error_remote_error">O serviço \'%1$s\' retornou um erro (%2$s).</string>
-  <string name="lnurl_pay_error_try_again_button">Tente novamente.</string>
+  <string name="legacy_lnurl_pay_error_header">Pagamento não enviado.</string>
+  <string name="legacy_lnurl_pay_error_unreachable">O serviço \'%1$s\' não está acessível, por favor, verifique sua conexão.</string>
+  <string name="legacy_lnurl_pay_error_invalid_invoice">O serviço \'%1$s\' forneceu uma fatura inválida (%2$s).</string>
+  <string name="legacy_lnurl_pay_error_remote_error">O serviço \'%1$s\' retornou um erro (%2$s).</string>
+  <string name="legacy_lnurl_pay_error_try_again_button">Tente novamente.</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 
-  <string name="lnurl_withdraw_amount_label">Quantidade a receber</string>
-  <string name="lnurl_withdraw_description_label">Detalhes</string>
-  <string name="lnurl_withdraw_service_host_label"><![CDATA[Você está resgatando fundos de<br/><b>%1$s</b>.]]></string>
-  <string name="lnurl_withdraw_confirm_button">Resgatar</string>
-  <string name="lnurl_withdraw_wait">Resgatando valores…</string>
-  <string name="lnurl_withdraw_success">Aguarde enquanto %1$s está enviando os valores, pode levar algum tempo\n\nMantenha o aplicativo aberto.</string>
-  <string name="lnurl_withdraw_error_internal">Não foi possível resgatar este pagamento. Tente novamente.</string>
-  <string name="lnurl_withdraw_error_invalid">Esta solicitação para resgate de pagamento é inválida. Tente novamente.</string>
-  <string name="lnurl_withdraw_error_amount">A quantia é inválida.</string>
-  <string name="lnurl_withdraw_error_amount_min">A quantidade não pode ser menor que %1$s.</string>
-  <string name="lnurl_withdraw_error_amount_max">A quantidade não pode ser maior que %1$s.</string>
-  <string name="lnurl_withdraw_error_remote_generic"><![CDATA[
+  <string name="legacy_lnurl_withdraw_amount_label">Quantidade a receber</string>
+  <string name="legacy_lnurl_withdraw_description_label">Detalhes</string>
+  <string name="legacy_lnurl_withdraw_service_host_label"><![CDATA[Você está resgatando fundos de<br/><b>%1$s</b>.]]></string>
+  <string name="legacy_lnurl_withdraw_confirm_button">Resgatar</string>
+  <string name="legacy_lnurl_withdraw_wait">Resgatando valores…</string>
+  <string name="legacy_lnurl_withdraw_success">Aguarde enquanto %1$s está enviando os valores, pode levar algum tempo\n\nMantenha o aplicativo aberto.</string>
+  <string name="legacy_lnurl_withdraw_error_internal">Não foi possível resgatar este pagamento. Tente novamente.</string>
+  <string name="legacy_lnurl_withdraw_error_invalid">Esta solicitação para resgate de pagamento é inválida. Tente novamente.</string>
+  <string name="legacy_lnurl_withdraw_error_amount">A quantia é inválida.</string>
+  <string name="legacy_lnurl_withdraw_error_amount_min">A quantidade não pode ser menor que %1$s.</string>
+  <string name="legacy_lnurl_withdraw_error_amount_max">A quantidade não pode ser maior que %1$s.</string>
+  <string name="legacy_lnurl_withdraw_error_remote_generic"><![CDATA[
     <b>%1$s</b> retornou um erro, ou uma mensagem inválida.
     <br/><br/>
     Tente novamente mais tarde, ou entre em contato com o suporte do serviço.
   ]]></string>
-  <string name="lnurl_withdraw_error_remote_unreadable"><![CDATA[
+  <string name="legacy_lnurl_withdraw_error_remote_unreadable"><![CDATA[
     O recebimento pode ter falhado. <b>%1$s</b> retornou uma resposta desconhecida.
     <br/><br/>
     Tente novamente mais tarde, ou entre em contato com o suporte do serviço.
   ]]></string>
-  <string name="lnurl_withdraw_error_remote_code"><![CDATA[
+  <string name="legacy_lnurl_withdraw_error_remote_code"><![CDATA[
     Falha no recebimento. <b>%1$s</b> retornou o código de erro HTTP %2$d.
     <br/><br/>
      Tente novamente mais tarde, ou entre em contato com o suporte do serviço.
   ]]></string>
-  <string name="lnurl_withdraw_error_remote_detailed"><![CDATA[
+  <string name="legacy_lnurl_withdraw_error_remote_detailed"><![CDATA[
     Falha no recebimento. <b>%1$s</b> retornou o seguinte erro:
     <br/><br/>
     <em>%2$s</em>
@@ -584,69 +585,69 @@
 
   <!-- //////////////// display preferences //////////////// -->
 
-  <string name="prefs_display_title">Opções de exibição</string>
-  <string name="prefs_display_coin_label">Unidade de Bitcoin</string>
-  <string name="prefs_display_fiat_label">Moeda estatal</string>
-  <string name="prefs_display_theme_label">Tema</string>
-  <string name="prefs_display_explorer_label">Blockchain</string>
-  <string name="prefs_display_balance_display">Mostrar saldo na tela inicial</string>
-  <string name="prefs_display_balance_display_desc">Esconder o saldo ajuda a evitar olhares indiscretos</string>
+  <string name="legacy_prefs_display_title">Opções de exibição</string>
+  <string name="legacy_prefs_display_coin_label">Unidade de Bitcoin</string>
+  <string name="legacy_prefs_display_fiat_label">Moeda estatal</string>
+  <string name="legacy_prefs_display_theme_label">Tema</string>
+  <string name="legacy_prefs_display_explorer_label">Blockchain</string>
+  <string name="legacy_prefs_display_balance_display">Mostrar saldo na tela inicial</string>
+  <string name="legacy_prefs_display_balance_display_desc">Esconder o saldo ajuda a evitar olhares indiscretos</string>
 
   <!-- //////////////// electrum server //////////////// -->
 
-  <string name="electrum_title">Servidor Electrum</string>
-  <string name="electrum_subtitle">Por padrão, para acessar a blockchain do Bitcoin, a Phoenix se conecta a servidores Electrum de forma aleatória. Você pode optar por se conectar ao seu próprio servidor Electrum.</string>
-  <string name="electrum_change_button">Definir servidor…</string>
+  <string name="legacy_electrum_title">Servidor Electrum</string>
+  <string name="legacy_electrum_subtitle">Por padrão, para acessar a blockchain do Bitcoin, a Phoenix se conecta a servidores Electrum de forma aleatória. Você pode optar por se conectar ao seu próprio servidor Electrum.</string>
+  <string name="legacy_electrum_change_button">Definir servidor…</string>
 
-  <string name="electrum_block_height_label">Altura do bloco</string>
-  <string name="electrum_tip_label">Tip timestamp</string>
-  <string name="electrum_fee_rate_label">Taxa usada</string>
-  <string name="electrum_xpub_label">Chave pública Master</string>
-  <string name="electrum_xpub_value">%1$s\n\nCaminho: %2$s</string>
-  <string name="electrum_fee_rate">%1$s sat/byte</string>
-  <string name="electrum_connection_label">Servidor</string>
-  <string name="electrum_not_connected">Não conectado</string>
-  <string name="electrum_not_connected_to_custom"><![CDATA[Você se conectará a <b>%1$s</b>]]></string>
-  <string name="electrum_connecting">Estabelecendo conexão…</string>
-  <string name="electrum_connecting_to_custom"><![CDATA[Estabelecendo conexão com <b>%1$s…</b>]]></string>
-  <string name="electrum_connected"><![CDATA[Conectado a: <b>%1$s</b>]]></string>
+  <string name="legacy_electrum_block_height_label">Altura do bloco</string>
+  <string name="legacy_electrum_tip_label">Tip timestamp</string>
+  <string name="legacy_electrum_fee_rate_label">Taxa usada</string>
+  <string name="legacy_electrum_xpub_label">Chave pública Master</string>
+  <string name="legacy_electrum_xpub_value">%1$s\n\nCaminho: %2$s</string>
+  <string name="legacy_electrum_fee_rate">%1$s sat/byte</string>
+  <string name="legacy_electrum_connection_label">Servidor</string>
+  <string name="legacy_electrum_not_connected">Não conectado</string>
+  <string name="legacy_electrum_not_connected_to_custom"><![CDATA[Você se conectará a <b>%1$s</b>]]></string>
+  <string name="legacy_electrum_connecting">Estabelecendo conexão…</string>
+  <string name="legacy_electrum_connecting_to_custom"><![CDATA[Estabelecendo conexão com <b>%1$s…</b>]]></string>
+  <string name="legacy_electrum_connected"><![CDATA[Conectado a: <b>%1$s</b>]]></string>
 
-  <string name="electrum_dialog_checkbox">Usar um servidor Electrum personalizado</string>
-  <string name="electrum_dialog_ssl">O servidor deve possuir um certificado válido</string>
-  <string name="electrum_dialog_ssl_tor">Verifique também o certificado para este endereço Onion</string>
-  <string name="electrum_dialog_input">Endereço do servidor (host:port).</string>
-  <string name="electrum_empty_custom_address">Insira um endereço de servidor Electrum</string>
+  <string name="legacy_electrum_dialog_checkbox">Usar um servidor Electrum personalizado</string>
+  <string name="legacy_electrum_dialog_ssl">O servidor deve possuir um certificado válido</string>
+  <string name="legacy_electrum_dialog_ssl_tor">Verifique também o certificado para este endereço Onion</string>
+  <string name="legacy_electrum_dialog_input">Endereço do servidor (host:port).</string>
+  <string name="legacy_electrum_empty_custom_address">Insira um endereço de servidor Electrum</string>
 
   <!-- ////////////// virtual keyboard hints //////////////// -->
 
-  <string name="key_space_desc">Adicionar espaço em branco</string>
-  <string name="key_delete_desc">Excluir último caractere</string>
+  <string name="legacy_key_space_desc">Adicionar espaço em branco</string>
+  <string name="legacy_key_delete_desc">Excluir último caractere</string>
 
   <!-- //////////////// Tor setting //////////////// -->
 
-  <string name="tor_settings_title">Configurações do Tor</string>
-  <string name="tor_settings_subtitle">Você pode melhorar sua privacidade ativando o Tor ao se conectar a um servidor Electrum ou ao seu par na rede Relâmpago. Isso fará com que a Phoenix demore um pouco mais para iniciar.</string>
-  <string name="tor_settings_enabled">Tor está ativado</string>
-  <string name="tor_settings_disabled">Tor está desativado</string>
-  <string name="tor_settings_confirm_disable_title">Tem certeza de que deseja desativar o Tor?</string>
-  <string name="tor_settings_confirm_enable_title">Tem certeza de que deseja ativar o Tor? Observe que, para obter melhores resultados, também é recomendável criar uma nova carteira.</string>
+  <string name="legacy_tor_settings_title">Configurações do Tor</string>
+  <string name="legacy_tor_settings_subtitle">Você pode melhorar sua privacidade ativando o Tor ao se conectar a um servidor Electrum ou ao seu par na rede Relâmpago. Isso fará com que a Phoenix demore um pouco mais para iniciar.</string>
+  <string name="legacy_tor_settings_enabled">Tor está ativado</string>
+  <string name="legacy_tor_settings_disabled">Tor está desativado</string>
+  <string name="legacy_tor_settings_confirm_disable_title">Tem certeza de que deseja desativar o Tor?</string>
+  <string name="legacy_tor_settings_confirm_enable_title">Tem certeza de que deseja ativar o Tor? Observe que, para obter melhores resultados, também é recomendável criar uma nova carteira.</string>
 
   <!-- ////////////// connection issues dialog //////////////// -->
 
-  <string name="conndialog_title">Status da conexão</string>
-  <string name="conndialog_summary_not_ok">Você tem alguns problemas de conexão. O aplicativo não funcionará corretamente.</string>
-  <string name="conndialog_network">Internet</string>
-  <string name="conndialog_electrum">Electrum</string>
-  <string name="conndialog_tor">Tor</string>
-  <string name="conndialog_lightning">Par na rede Relâmpago</string>
-  <string name="conndialog_ok">Conectado</string>
-  <string name="conndialog_not_ok">Conectando…</string>
+  <string name="legacy_conndialog_title">Status da conexão</string>
+  <string name="legacy_conndialog_summary_not_ok">Você tem alguns problemas de conexão. O aplicativo não funcionará corretamente.</string>
+  <string name="legacy_conndialog_network">Internet</string>
+  <string name="legacy_conndialog_electrum">Electrum</string>
+  <string name="legacy_conndialog_tor">Tor</string>
+  <string name="legacy_conndialog_lightning">Par na rede Relâmpago</string>
+  <string name="legacy_conndialog_ok">Conectado</string>
+  <string name="legacy_conndialog_not_ok">Conectando…</string>
 
    <!-- //////////////// about screen //////////////// -->
 
-  <string name="about_title">Sobre</string>
-  <string name="about_version">Versão: %1$s (%2$d)</string>
-  <string name="about_general"><![CDATA[
+  <string name="legacy_about_title">Sobre</string>
+  <string name="legacy_about_version">Versão: %1$s (%2$d)</string>
+  <string name="legacy_about_general"><![CDATA[
   A Phoenix é uma carteira Bitcoin que usa a rede Relâmpago para enviar e receber pagamentos.
   <br/><br/>
   É um software livre de código aberto, desenvolvido pela <a href="https://phoenix.acinq.co">ACINQ</a> sob a <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Licença Apache 2.0</a>.
@@ -655,51 +656,51 @@
   <br/><br/>
   Se você tiver alguma dúvida, consulte o <a href="https://phoenix.acinq.co/faq">FAQ</a>. Você também pode entrar em contato com o <a href="https://phoenix.acinq.co/support">suporte</a> para ajuda.
   ]]></string>
-  <string name="about_fiat_rates"><![CDATA[
+  <string name="legacy_about_fiat_rates"><![CDATA[
     As cotações de bitcoin/moeda fiduciária são obtidas de várias APIs de terceiros:
     <br />- Blockchain.info
     <br />- Bitso
     <br />- <a href="https://www.coindesk.com/price/bitcoin">Fornecido por Coindesk</a>
   ]]></string>
-  <string name="about_terms">Termos de uso</string>
-  <string name="about_privacy">Privacidade</string>
+  <string name="legacy_about_terms">Termos de uso</string>
+  <string name="legacy_about_privacy">Privacidade</string>
 
   <!-- //////////////// background node service //////////////// -->
 
-  <string name="nodeservice_desc">Serviço contendo o servidor da carteira.</string>
+  <string name="legacy_nodeservice_desc">Serviço contendo o servidor da carteira.</string>
 
   <!-- //////////////// settings: options for payments //////////////// -->
 
-  <string name="paymentsettings_title">Configurações de pagamento</string>
-  <string name="paymentsettings_subtitle">Defina opções em relação as taxas e aos pagamentos que você envia ou recebe.</string>
+  <string name="legacy_paymentsettings_title">Configurações de pagamento</string>
+  <string name="legacy_paymentsettings_subtitle">Defina opções em relação as taxas e aos pagamentos que você envia ou recebe.</string>
 
-  <string name="paymentsettings_defaultdesc_title">Descrição de pagamento padrão</string>
-  <string name="paymentsettings_defaultdesc_none">Sem descrição definida…</string>
-  <string name="paymentsettings_defaultdesc_dialog_title">Descrição padrão</string>
-  <string name="paymentsettings_defaultdesc_dialog_description">As faturas que você gerar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
-  <string name="paymentsettings_defaultdesc_dialog_hint">Insira uma descrição</string>
-  
-  <string name="paymentsettings_expiry_title">Vencimento das faturas</string>
-  <string name="paymentsettings_expiry_dialog_title">Prazo máximo</string>
-  <string name="paymentsettings_expiry_dialog_description">As faturas que você gerar irão vencer nesse prazo (em segundos). O valor padrão é 1 semana.</string>
-  <string name="paymentsettings_expiry_dialog_hint">Insira um valor, em segundos</string>
-  <string name="paymentsettings_expiry_value">%1$s segundos</string>
+  <string name="legacy_paymentsettings_defaultdesc_title">Descrição de pagamento padrão</string>
+  <string name="legacy_paymentsettings_defaultdesc_none">Sem descrição definida…</string>
+  <string name="legacy_paymentsettings_defaultdesc_dialog_title">Descrição padrão</string>
+  <string name="legacy_paymentsettings_defaultdesc_dialog_description">As faturas que você gerar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
+  <string name="legacy_paymentsettings_defaultdesc_dialog_hint">Insira uma descrição</string>
 
-  <string name="paymentsettings_trampoline_fees_title">Taxa máxima para pagamentos pela rede Relâmpago</string>
-  <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
-  <string name="paymentsettings_trampoline_fees_dialog_override_default_checkbox">Substituir taxa padrão</string>
-  <string name="paymentsettings_trampoline_fees_dialog_base_fee_label">Taxa base (satoshi)</string>
-  <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Insira uma taxa base em satoshi</string>
-  <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">(%) de taxa em cada pagamento</string>
-  <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Insira uma taxa em %</string>
+  <string name="legacy_paymentsettings_expiry_title">Vencimento das faturas</string>
+  <string name="legacy_paymentsettings_expiry_dialog_title">Prazo máximo</string>
+  <string name="legacy_paymentsettings_expiry_dialog_description">As faturas que você gerar irão vencer nesse prazo (em segundos). O valor padrão é 1 semana.</string>
+  <string name="legacy_paymentsettings_expiry_dialog_hint">Insira um valor, em segundos</string>
+  <string name="legacy_paymentsettings_expiry_value">%1$s segundos</string>
 
-  <string name="paymentsettings_paytoopen_auto_switch_title">Abertura automática de canais</string>
-  <string name="paymentsettings_paytoopen_auto_switch_enabled">Se for necessário, novos canais serão abertos, uma taxa será cobrada (ver abaixo)</string>
-  <string name="paymentsettings_paytoopen_auto_switch_disabled">Se um pagamento enviado a você exigir a abertura de um novo canal, a transação será rejeitada e irá falhar</string>
-  <string name="paymentsettings_paytoopen_fees_title">Taxa de abertura de canal</string>
-  <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s mínimo)</string>
-  <string name="paymentsettings_paytoopen_fees_dialog_title">Abertura de canais</string>
-  <string name="paymentsettings_paytoopen_fees_dialog_message"><![CDATA[
+  <string name="legacy_paymentsettings_trampoline_fees_title">Taxa máxima para pagamentos pela rede Relâmpago</string>
+  <string name="legacy_paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
+  <string name="legacy_paymentsettings_trampoline_fees_dialog_override_default_checkbox">Substituir taxa padrão</string>
+  <string name="legacy_paymentsettings_trampoline_fees_dialog_base_fee_label">Taxa base (satoshi)</string>
+  <string name="legacy_paymentsettings_trampoline_fees_dialog_base_fee_hint">Insira uma taxa base em satoshi</string>
+  <string name="legacy_paymentsettings_trampoline_fees_dialog_proportional_fee_label">(%) de taxa em cada pagamento</string>
+  <string name="legacy_paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Insira uma taxa em %</string>
+
+  <string name="legacy_paymentsettings_paytoopen_auto_switch_title">Abertura automática de canais</string>
+  <string name="legacy_paymentsettings_paytoopen_auto_switch_enabled">Se for necessário, novos canais serão abertos, uma taxa será cobrada (ver abaixo)</string>
+  <string name="legacy_paymentsettings_paytoopen_auto_switch_disabled">Se um pagamento enviado a você exigir a abertura de um novo canal, a transação será rejeitada e irá falhar</string>
+  <string name="legacy_paymentsettings_paytoopen_fees_title">Taxa de abertura de canal</string>
+  <string name="legacy_paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s mínimo)</string>
+  <string name="legacy_paymentsettings_paytoopen_fees_dialog_title">Abertura de canais</string>
+  <string name="legacy_paymentsettings_paytoopen_fees_dialog_message"><![CDATA[
     Esta taxa se aplica quando você recebe um pagamento pela rede Relâmpago e um novo canal precisa ser aberto.
     <br /><br />
     Acesse <a href="https://phoenix.acinq.co/faq#what-are-the-fees">o FAQ</a> para mais informações.
@@ -707,27 +708,27 @@
 
   <!-- ftue -->
 
-  <string name="ftue__bullet_1" translatable="false">●○○</string>
-  <string name="ftue__bullet_2" translatable="false">○●○</string>
-  <string name="ftue__bullet_3" translatable="false">○○●</string>
-  <string name="ftue__welcome__header">Bem-vindo!</string>
-  <string name="ftue__welcome__body">Com a Phoenix, receber e enviar bitcoins é seguro, fácil e rápido.</string>
-  <string name="ftue__pay_to_open__header">Abertura automática de canais</string>
-  <string name="ftue__pay_to_open__body"><![CDATA[
+  <string name="legacy_ftue__bullet_1" translatable="false">●○○</string>
+  <string name="legacy_ftue__bullet_2" translatable="false">○●○</string>
+  <string name="legacy_ftue__bullet_3" translatable="false">○○●</string>
+  <string name="legacy_ftue__welcome__header">Bem-vindo!</string>
+  <string name="legacy_ftue__welcome__body">Com a Phoenix, receber e enviar bitcoins é seguro, fácil e rápido.</string>
+  <string name="legacy_ftue__pay_to_open__header">Abertura automática de canais</string>
+  <string name="legacy_ftue__pay_to_open__body"><![CDATA[
   Se necessário, canais de pagamento serão abertos automaticamente para você.
   <br /><br />
   A taxa é <b>%1$s%%</b><br/>taxa mínima de <b>%2$s</b>.
   <br /><br />
   Por exemplo, para receber 250 000 sat, a taxa seria de %2$s.
   ]]></string>
-  <string name="ftue__backup_seed__header">Você no controle dos seus bitcoins</string>
-  <string name="ftue__backup_seed__body">Uma frase de backup será gerada contendo todas as informações necessárias para recuperar seus bitcoins .\n\nMantenha-a segura e em local secreto!</string>
-  <string name="ftue__backup_seed__button">Começar</string>
+  <string name="legacy_ftue__backup_seed__header">Você no controle dos seus bitcoins</string>
+  <string name="legacy_ftue__backup_seed__body">Uma frase de backup será gerada contendo todas as informações necessárias para recuperar seus bitcoins .\n\nMantenha-a segura e em local secreto!</string>
+  <string name="legacy_ftue__backup_seed__button">Começar</string>
 
   <!-- patch notes -->
 
-  <string name="patchnotes_title">A Phoenix foi atualizada!</string>
-  <string name="patchnotes_v15"><![CDATA[
+  <string name="legacy_patchnotes_title">A Phoenix foi atualizada!</string>
+  <string name="legacy_patchnotes_v15"><![CDATA[
     <h4>Recebimento de pagamento em segundo plano</h4>
     <p>A Phoenix agora pode receber pagamentos mesmo se o aplicativo não estiver sido iniciado.</p>
 
@@ -740,14 +741,42 @@
     <p>O bloqueio do aplicativo agora usa o bloqueio do sistema operacional. Não há necessidade de lembrar outro PIN!</p>
     <p>Ir para Configurações > Segurança para ativar o novo recurso de bloqueio de tela.</p>
   ]]></string>
-  <string name="patchnotes_v23"><![CDATA[
+  <string name="legacy_patchnotes_v23"><![CDATA[
     <h4>Aumento de taxas para novos canais</h4>
     <p>A %% da taxa para novos canais continua a mesma (%1$s%%), mas agora a taxa mínima é de <b>%2$s</b>.</p>
   ]]></string>
 
-  <string name="paymentmode_onchain">Pagar usando a rede Bitcoin</string>
-  <string name="paymentmode_onchain_desc">Transações na rede Bitcoin geralmente são mais lentas e mais caras</string>
-  <string name="paymentmode_lightning">Pagar usando a rede Relâmpago</string>
-  <string name="paymentmode_lightning_desc">Esta é a opção recomendada</string>
+  <string name="legacy_paymentmode_onchain">Pagar usando a rede Bitcoin</string>
+  <string name="legacy_paymentmode_onchain_desc">Transações na rede Bitcoin geralmente são mais lentas e mais caras</string>
+  <string name="legacy_paymentmode_lightning">Pagar usando a rede Relâmpago</string>
+  <string name="legacy_paymentmode_lightning_desc">Esta é a opção recomendada</string>
+
+  <!-- //////////////// Migration to KMP //////////////// -->
+
+  <string name="legacy_migration_title">Atualização do Phoenix</string>
+  <string name="legacy_migration_ready_message">Atualize para a versão mais recente do Phoenix, com um mecanismo Lightning de ponta e novos recursos.\n\nSeus canais serão mesclados. Esse processo é automatizado.</string>
+  <string name="legacy_migration_prepare_button">Upgrade</string>
+  <string name="legacy_migration_prepare_button_disconnected">Conectando…</string>
+  <string name="legacy_migration_dismiss_button">Não agora</string>
+
+  <string name="legacy_migration_paused_swap_in">Você não pode fazer upgrade agora: um depósito na cadeia está pendente.\n\nTente novamente mais tarde quando esse depósito for confirmado.</string>
+  <string name="legacy_migration_paused_opening">Você não pode fazer upgrade agora: alguns canais estão sendo abertos no momento.\n\nTente novamente mais tarde quando esses canais tiverem sido abertos e estiverem ativos.</string>
+  <string name="legacy_migration_paused_force_close">Não é possível fazer upgrade agora: alguns canais estão sendo fechados à força.\n\nTente novamente mais tarde, quando esses canais tiverem sido completamente fechados. Observe que o fechamento forçado pode levar vários dias para ser concluído.</string>
+  <string name="legacy_migration_paused_disconnected">Você não pode fazer upgrade agora porque está desconectado do Lightning e/ou da Electrum.\n\nTente novamente mais tarde quando a conexão for estabelecida.</string>
+
+  <string name="legacy_migration_confirm_title">Confirmar migração</string>
+  <string name="legacy_migration_confirm_dust">%1$d de %2$d canais estão mantendo menos do que o limite de Bitcoin dust (546 sat). Seu saldo irá para os mineradores de Bitcoin.</string>
+  <string name="legacy_migration_confirm_proceed">Proceder</string>
+  <string name="legacy_migration_confirm_cancel">Cancelar</string>
+
+  <string name="legacy_migration_processing_disconnected">Perda de conexão.\nMantenha o aplicativo em primeiro plano.</string>
+
+  <string name="legacy_migration_complete_title">Migração concluída</string>
+  <string name="legacy_migration_complete_details">Mudança para o novo aplicativo…</string>
+
+  <string name="legacy_migration_failure_title">O upgrade falhou</string>
+  <string name="legacy_migration_failure_generic">Alguns ou todos os canais podem não ter sido migrados.\n\nO processo de atualização deve ser iniciado novamente.</string>
+  <string name="legacy_migration_failure_swapin_address_error">O Phoenix não pôde gerar um endereço válido para a migração.\n\nO processo de atualização deve ser iniciado novamente.</string>
+  <string name="legacy_migration_failure_closing_error">Não foi possível fechar alguns canais.\n\nO processo de atualização deve ser iniciado novamente para migrá-los.</string>
 
 </resources>

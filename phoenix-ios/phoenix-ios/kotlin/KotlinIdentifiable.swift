@@ -15,10 +15,11 @@ extension WalletPaymentId: Identifiable {
 
 extension WalletPaymentOrderRow: Identifiable {
 	
-	/// Because we're forced to override the existing `id` property,
-	/// we'll provide an alternative property name.
+	/// In kotlin the variable is called `id`, but that's a reserved property name in objective-c.
+	/// So it gets automatically overwritten, and is inaccessible to us.
+	/// Thus we'll provide an alternative property name that's easier to understand.
 	public var walletPaymentId: WalletPaymentId {
-		return self.component1()
+		return self.kotlinId() // defined in PhoenixExposure.kt
 	}
 	
 	/// Returns a unique identifier, in the form of:

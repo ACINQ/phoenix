@@ -64,6 +64,87 @@ extension Utils {
 	}
 	
 	// --------------------------------------------------
+	// MARK: Bitcoin Formatting
+	// --------------------------------------------------
+	
+	static func formatBitcoin(
+		_ currencyPrefs : CurrencyPrefs,
+		sat             : Bitcoin_kmpSatoshi
+	) -> FormattedAmount {
+		
+		return formatBitcoin(sat: sat, bitcoinUnit: currencyPrefs.bitcoinUnit)
+	}
+	
+	static func formatBitcoin(
+		_ currencyPrefs : CurrencyPrefs,
+		sat             : Int64
+	) -> FormattedAmount {
+		
+		return formatBitcoin(sat: sat, bitcoinUnit: currencyPrefs.bitcoinUnit)
+	}
+	
+	static func formatBitcoin(
+		_ currencyPrefs : CurrencyPrefs,
+		msat            : Lightning_kmpMilliSatoshi,
+		policy          : MsatsPolicy = .hideMsats,
+		locale          : Locale? = nil
+	) -> FormattedAmount {
+		
+		return formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit, policy: policy, locale: locale)
+	}
+	
+	static func formatBitcoin(
+		_ currencyPrefs : CurrencyPrefs,
+		msat            : Int64,
+		policy          : MsatsPolicy = .hideMsats,
+		locale          : Locale? = nil
+	) -> FormattedAmount {
+		
+		return formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit, policy: policy, locale: locale)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Fiat Formatting
+	// --------------------------------------------------
+	
+	static func formatFiat(
+		_ currencyPrefs : CurrencyPrefs,
+		sat             : Bitcoin_kmpSatoshi
+	) -> FormattedAmount {
+		
+		return formatFiat(currencyPrefs, sat: sat.toLong())
+	}
+	
+	static func formatFiat(
+		_ currencyPrefs : CurrencyPrefs,
+		sat             : Int64
+	) -> FormattedAmount {
+		
+		let msat = toMsat(sat: sat)
+		return formatFiat(currencyPrefs, msat: msat)
+	}
+	
+	static func formatFiat(
+		_ currencyPrefs : CurrencyPrefs,
+		msat            : Lightning_kmpMilliSatoshi
+	) -> FormattedAmount {
+		
+		return formatFiat(currencyPrefs, msat: msat.toLong())
+	}
+	
+	static func formatFiat(
+		_ currencyPrefs : CurrencyPrefs,
+		msat            : Int64
+	) -> FormattedAmount {
+		
+		if let exchangeRate = currencyPrefs.fiatExchangeRate() {
+			return formatFiat(msat: msat, exchangeRate: exchangeRate)
+		} else {
+			return unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+		}
+	}
+	
+	// --------------------------------------------------
 	// MARK: Alt Formatting
 	// --------------------------------------------------
 	
@@ -79,11 +160,10 @@ extension Utils {
 	
 	static func hiddenBitcoinAmount(_ currencyPrefs: CurrencyPrefs) -> FormattedAmount {
 		
-		let formatter = NumberFormatter()
-		formatter.numberStyle = .decimal
-		
-		let decimalSeparator: String = formatter.currencyDecimalSeparator ?? formatter.decimalSeparator ?? "."
 		let digits = "\(hiddenCharacter)\(hiddenCharacter)\(hiddenCharacter)"
+		
+		let formatter = bitcoinFormatter(bitcoinUnit: currencyPrefs.bitcoinUnit)
+		let decimalSeparator: String = formatter.currencyDecimalSeparator ?? formatter.decimalSeparator ?? "."
 		
 		return FormattedAmount(
 			amount: 0.0,
@@ -95,11 +175,10 @@ extension Utils {
 	
 	static func hiddenFiatAmount(_ currencyPrefs: CurrencyPrefs) -> FormattedAmount {
 		
-		let formatter = NumberFormatter()
-		formatter.numberStyle = .currency
-		
-		let decimalSeparator: String = formatter.currencyDecimalSeparator ?? formatter.decimalSeparator ?? "."
 		let digits = "\(hiddenCharacter)\(hiddenCharacter)\(hiddenCharacter)"
+		
+		let formatter = fiatFormatter(fiatCurrency: currencyPrefs.fiatCurrency)
+		let decimalSeparator: String = formatter.currencyDecimalSeparator ?? formatter.decimalSeparator ?? "."
 		
 		return FormattedAmount(
 			amount: 0.0,

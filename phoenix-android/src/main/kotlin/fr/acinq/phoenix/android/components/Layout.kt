@@ -17,20 +17,28 @@
 package fr.acinq.phoenix.android.components
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
@@ -48,7 +56,7 @@ fun BackButton(onClick: () -> Unit) {
             backgroundColor = Color.Unspecified,
             disabledBackgroundColor = Color.Unspecified,
             contentColor = MaterialTheme.colors.onSurface,
-            disabledContentColor = mutedTextColor(),
+            disabledContentColor = mutedTextColor,
         ),
         elevation = null,
         modifier = Modifier.size(width = 58.dp, height = 52.dp)
@@ -57,20 +65,47 @@ fun BackButton(onClick: () -> Unit) {
     }
 }
 
+@Composable
+fun BackButtonWithBalance(
+    onBackClick: () -> Unit,
+    balance: MilliSatoshi?,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 0.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        BackButton(onClick = onBackClick)
+        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+            Text(
+                text = stringResource(id = R.string.send_balance_prefix).uppercase(),
+                style = MaterialTheme.typography.body1.copy(color = mutedTextColor, fontSize = 12.sp),
+                modifier = Modifier.alignBy(FirstBaseline)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            balance?.let {
+                AmountView(amount = it, modifier = Modifier.alignBy(FirstBaseline))
+            }
+        }
+    }
+}
+
 /** The default screen is a full-height, full-width column with the material theme's background color. It is scrollable by default. */
 @Composable
 fun DefaultScreenLayout(
     isScrollable: Boolean = true,
-    backgroundColor: Color = MaterialTheme.colors.background,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    backgroundColor: Color? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .background(backgroundColor)
-            .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier),
+            .fillMaxSize() // cancelled if scrollable!
+            .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier)
+            .then(if (backgroundColor != null) Modifier.background(backgroundColor) else Modifier),
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
     ) {
@@ -83,7 +118,7 @@ fun DefaultScreenLayout(
 fun DefaultScreenHeader(
     title: String? = null,
     onBackClick: () -> Unit,
-    backgroundColor: Color = MaterialTheme.colors.background,
+    backgroundColor: Color = Color.Transparent,
 ) {
     DefaultScreenHeader(
         content = {
@@ -94,18 +129,40 @@ fun DefaultScreenHeader(
     )
 }
 
+/** A header with a back button, a title, and a help button. */
+@Composable
+fun DefaultScreenHeader(
+    title: String,
+    helpMessage: String,
+    helpMessageLink: Pair<String, String>? = null,
+    onBackClick: () -> Unit,
+    backgroundColor: Color = Color.Transparent,
+) {
+    DefaultScreenHeader(
+        content = {
+            Row {
+                Text(text = title)
+                Spacer(modifier = Modifier.width(4.dp))
+                IconPopup(popupMessage = helpMessage, popupLink = helpMessageLink)
+            }
+        },
+        onBackClick = onBackClick,
+        backgroundColor = backgroundColor
+    )
+}
+
 /** The default header of a screen contains a back button and some content. */
 @Composable
 fun DefaultScreenHeader(
-    content: @Composable RowScope.() -> Unit,
     onBackClick: () -> Unit,
-    backgroundColor: Color = MaterialTheme.colors.background,
+    backgroundColor: Color = Color.Transparent,
+    content: @Composable RowScope.() -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(backgroundColor)
-            .padding(start = 0.dp, top = 2.dp, bottom = 2.dp, end = 16.dp),
+            .padding(start = 0.dp, top = 2.dp, bottom = 2.dp, end = 0.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         BackButton(onClick = onBackClick)
@@ -116,12 +173,13 @@ fun DefaultScreenHeader(
 @Composable
 fun HSeparator(
     modifier: Modifier = Modifier,
+    color: Color = borderColor,
     width: Dp? = null,
 ) {
     Box(
         (width?.run { modifier.width(width) } ?: modifier.fillMaxWidth())
             .height(1.dp)
-            .background(color = borderColor())
+            .background(color = color)
     )
 }
 
@@ -134,50 +192,21 @@ fun VSeparator(
             .fillMaxHeight()
             .width(1.dp)
             .padding(padding)
-            .background(color = borderColor())
+            .background(color = borderColor)
     )
 }
 
 @Composable
 fun PrimarySeparator(
-    modifier: Modifier = Modifier, width: Dp = 50.dp, height: Dp = 8.dp
+    modifier: Modifier = Modifier, width: Dp = 60.dp, height: Dp = 8.dp, color: Color = MaterialTheme.colors.primary
 ) {
     Surface(
         shape = CircleShape,
-        color = MaterialTheme.colors.primary,
+        color = color,
         modifier = modifier
             .width(width)
             .height(height)
     ) { }
 }
 
-@Composable
-fun Card(
-    modifier: Modifier = Modifier,
-    externalPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-    internalPadding: PaddingValues = PaddingValues(0.dp),
-    shape: Shape = RoundedCornerShape(24.dp),
-    withBorder: Boolean = false,
-    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    maxWidth: Dp = 500.dp,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    Column(
-        modifier = modifier
-            .padding(externalPadding)
-            .widthIn(max = maxWidth)
-            .clip(shape)
-            .then(
-                if (withBorder) Modifier.border(BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary), shape) else Modifier
-            )
-            .background(MaterialTheme.colors.surface)
-            .padding(internalPadding),
-        horizontalAlignment = horizontalAlignment,
-        verticalArrangement = verticalArrangement
-    ) {
-        content()
-    }
-}
-
-fun Modifier.enableOrFade(enabled: Boolean): Modifier = this.then(Modifier.alpha(if (enabled) 1f else 0.3f))
+fun Modifier.enableOrFade(enabled: Boolean): Modifier = this.then(Modifier.alpha(if (enabled) 1f else 0.65f))

@@ -53,9 +53,9 @@ object Converter {
   fun refreshCoinPattern(context: Context) {
     when (Prefs.getCoinUnit(context)) {
       `SatUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0")
-      `BitUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0.##")
-      `MBtcUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0.#####")
-      else -> CoinUtils.setCoinPattern("###,###,###,##0.###########")
+      `BitUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0.00")
+      `MBtcUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0.00000")
+      else -> CoinUtils.setCoinPattern("###,###,###,##0.00000000###")
     }
     CoinUtils.COIN_FORMAT().roundingMode = RoundingMode.DOWN
   }
@@ -77,7 +77,7 @@ object Converter {
   }
 
   private fun printFiatRaw(context: Context, amount: MilliSatoshi): String {
-    return convertMsatToFiat(context, amount)?.let { return FIAT_FORMAT.format(it) } ?: context.getString(R.string.utils_unknown_amount)
+    return convertMsatToFiat(context, amount)?.let { return FIAT_FORMAT.format(it) } ?: context.getString(R.string.legacy_utils_unknown_amount)
   }
 
   fun printFiatPretty(context: Context, amount: MilliSatoshi, withUnit: Boolean = false, withSign: Boolean = false, isOutgoing: Boolean = true): Spanned {
@@ -87,19 +87,19 @@ object Converter {
 
   private fun formatAnyAmount(context: Context, amount: String, unit: String, withUnit: Boolean = false, withSign: Boolean = false, isOutgoing: Boolean = true): Spanned {
     val formattedParts = amount.split(Pattern.quote(DECIMAL_SEPARATOR).toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-    val prefix = if (withSign) context.getString(if (isOutgoing) R.string.paymentholder_sent_prefix else R.string.paymentholder_received_prefix) else ""
+    val prefix = if (withSign) context.getString(if (isOutgoing) R.string.legacy_paymentholder_sent_prefix else R.string.legacy_paymentholder_received_prefix) else ""
 
     val output = if (formattedParts.size == 2) {
       if (withUnit) {
-        context.getString(R.string.utils_pretty_amount_with_unit, prefix, formattedParts[0] + DECIMAL_SEPARATOR, formattedParts[1], unit)
+        context.getString(R.string.legacy_utils_pretty_amount_with_unit, prefix, formattedParts[0] + DECIMAL_SEPARATOR, formattedParts[1], unit)
       } else {
-        context.getString(R.string.utils_pretty_amount, prefix, formattedParts[0] + DECIMAL_SEPARATOR, formattedParts[1])
+        context.getString(R.string.legacy_utils_pretty_amount, prefix, formattedParts[0] + DECIMAL_SEPARATOR, formattedParts[1])
       }
     } else {
       if (withUnit) {
-        context.getString(R.string.utils_pretty_amount_with_unit, prefix, amount, "", unit)
+        context.getString(R.string.legacy_utils_pretty_amount_with_unit, prefix, amount, "", unit)
       } else {
-        context.getString(R.string.utils_pretty_amount, prefix, amount, "")
+        context.getString(R.string.legacy_utils_pretty_amount, prefix, amount, "")
       }
     }
     return html(output)

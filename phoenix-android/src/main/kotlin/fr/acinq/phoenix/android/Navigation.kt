@@ -46,6 +46,7 @@ sealed class Screen(val route: String) {
     object ElectrumServer : Screen("settings/electrum")
     object TorConfig : Screen("settings/tor")
     object Channels : Screen("settings/channels")
+    object ChannelDetails : Screen("settings/channeldetails")
     object MutualClose : Screen("settings/mutualclose")
     object ForceClose : Screen("settings/forceclose")
     object Preferences : Screen("settings/preferences")
@@ -53,6 +54,14 @@ sealed class Screen(val route: String) {
     object AppLock : Screen("settings/applock")
     object PaymentSettings : Screen("settings/paymentsettings")
     object Logs : Screen("settings/logs")
+    object WalletInfo : Screen("settings/walletinfo") {
+        object SwapInWallet: Screen("settings/walletinfo/swapin")
+        object FinalWallet: Screen("settings/walletinfo/final")
+    }
+    object LiquidityPolicy: Screen("settings/liquiditypolicy")
+    object AdvancedLiquidityPolicy: Screen("settings/advancedliquiditypolicy")
+    object Notifications: Screen("notifications")
+    object ResetWallet: Screen("resetwallet")
 }
 
 fun NavController.navigate(screen: Screen, arg: List<Any> = emptyList(), builder: NavOptionsBuilder.() -> Unit = {}) {

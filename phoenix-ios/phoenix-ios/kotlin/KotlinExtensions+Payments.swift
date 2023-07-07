@@ -56,7 +56,7 @@ extension WalletPaymentInfo {
 				return sanitize(invoice.paymentRequest.description_)
 			}
 			
-		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
+		} else if let outgoingPayment = payment as? Lightning_kmpLightningOutgoingPayment {
 			
 			if let normal = outgoingPayment.details.asNormal() {
 				return sanitize(normal.paymentRequest.desc())
@@ -76,18 +76,35 @@ extension WalletPaymentInfo {
 				return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
 			} else if let _ = incomingPayment.origin.asSwapIn() {
 				return NSLocalizedString("On-chain deposit", comment: "Payment description for received deposit")
+			} else if let _ = incomingPayment.origin.asOnChain() {
+				return NSLocalizedString("On-chain deposit", comment: "Payment description for received deposit")
 			}
 			
-		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
+		} else if let outgoingPayment = payment as? Lightning_kmpLightningOutgoingPayment {
 	
 			if let _ = outgoingPayment.details.asKeySend() {
 				return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
-			} else if let _ = outgoingPayment.details.asChannelClosing() {
-				return NSLocalizedString("Channel closing", comment: "Payment description for channel closing")
 			}
+			
+		} else if let _ = payment as? Lightning_kmpChannelCloseOutgoingPayment {
+			
+			return NSLocalizedString("Channel closing", comment: "Payment description for channel closing")
 		}
 	
 		return NSLocalizedString("No description", comment: "placeholder text")
+	}
+}
+
+extension WalletPaymentMetadata {
+	
+	static func empty() -> WalletPaymentMetadata {
+		return WalletPaymentMetadata(
+			lnurl: nil,
+			originalFiat: nil,
+			userDescription: nil,
+			userNotes: nil,
+			modifiedAt: nil
+		)
 	}
 }
 
@@ -107,55 +124,58 @@ extension Lightning_kmpWalletPayment {
 			
 			if let _ = incomingPayment.origin.asSwapIn() {
 				return true
+			} else if let _ = incomingPayment.origin.asOnChain() {
+				return true
 			}
 			
-		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
+		} else if let outgoingPayment = self as? Lightning_kmpLightningOutgoingPayment {
 			
 			if let _ = outgoingPayment.details.asSwapOut() {
 				return true
-			} else if let _ = outgoingPayment.details.asChannelClosing() {
-				return true
 			}
+			
+		} else if let _ = self as? Lightning_kmpChannelCloseOutgoingPayment {
+			return true
+			
+		} else if let _ = self as? Lightning_kmpSpliceOutgoingPayment {
+			return true
 		}
 		
 		return false
 	}
-}
-
-extension WalletPaymentMetadata {
 	
-	static func empty() -> WalletPaymentMetadata {
-		return WalletPaymentMetadata(
-			lnurl: nil,
-			originalFiat: nil,
-			userDescription: nil,
-			userNotes: nil,
-			modifiedAt: nil
-		)
-	}
-}
-
-extension Lightning_kmpWalletPayment {
-	
-	func createdAtDate() -> Date {
-		return self.createdAt.toDate(from: .milliseconds)
+	var createdAtDate: Date {
+		return createdAt.toDate(from: .milliseconds)
 	}
 	
-	func completedAtDate() -> Date? {
+	var completedAtDate: Date? {
 		
-		let millis = self.completedAt()
-		if millis > 0 {
+		if let millis = completedAt?.int64Value {
 			return millis.toDate(from: .milliseconds)
 		} else {
 			return nil
 		}
-	}	
+	}
 }
 
 extension Lightning_kmpIncomingPayment {
 	
-	var createdAtDate: Date {
-		return createdAt.toDate(from: .milliseconds)
+	var isSpliceIn: Bool {
+		
+		guard
+			let _ = self.origin.asOnChain(),
+			let received = self.received
+		else {
+			return false
+		}
+		
+		return received.receivedWith.contains {
+			if let _ = $0.asSpliceIn() {
+				return true
+			} else {
+				return false
+			}
+		}
 	}
 }
 
@@ -166,38 +186,49 @@ extension Lightning_kmpIncomingPayment.Received {
 	}
 }
 
-extension Lightning_kmpOutgoingPayment {
+extension Lightning_kmpLightningOutgoingPayment.StatusCompletedSucceededOffChain {
+	
+	var completedAtDate: Date {
+		return completedAt.toDate(from: .milliseconds)
+	}
+}
+
+extension Lightning_kmpLightningOutgoingPayment.StatusCompletedFailed {
+	
+	var completedAtDate: Date {
+		return completedAt.toDate(from: .milliseconds)
+	}
+}
+
+extension Lightning_kmpLightningOutgoingPayment.Part {
 	
 	var createdAtDate: Date {
 		return createdAt.toDate(from: .milliseconds)
 	}
 }
 
-extension Lightning_kmpOutgoingPayment.Part {
-	
-	var createdAtDate: Date {
-		return createdAt.toDate(from: .milliseconds)
-	}
-}
-
-extension Lightning_kmpOutgoingPayment.LightningPartStatusSucceeded {
+extension Lightning_kmpLightningOutgoingPayment.PartStatusSucceeded {
 	
 	var completedAtDate: Date {
 		return completedAt.toDate(from: .milliseconds)
 	}
 }
 
-extension Lightning_kmpOutgoingPayment.LightningPartStatusFailed {
+extension Lightning_kmpLightningOutgoingPayment.PartStatusFailed {
 	
 	var completedAtDate: Date {
 		return completedAt.toDate(from: .milliseconds)
 	}
 }
 
-extension Lightning_kmpOutgoingPayment.StatusCompleted {
+extension Lightning_kmpOnChainOutgoingPayment {
 	
-	var completedAtDate: Date {
-		return completedAt.toDate(from: .milliseconds)
+	var confirmedAtDate: Date? {
+		if let millis = confirmedAt?.int64Value {
+			return millis.toDate(from: .milliseconds)
+		} else {
+			return nil
+		}
 	}
 }
 

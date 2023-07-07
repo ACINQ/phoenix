@@ -18,6 +18,7 @@ package fr.acinq.phoenix
 
 import fr.acinq.bitcoin.Block
 import fr.acinq.bitcoin.MnemonicCode
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.*
 import fr.acinq.lightning.blockchain.fee.FeerateTolerance
 import fr.acinq.lightning.blockchain.fee.OnChainFeeConf
@@ -29,37 +30,22 @@ import fr.acinq.secp256k1.Hex
 import kotlinx.coroutines.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import org.kodein.log.LoggerFactory
 
 object TestConstants {
+
     object Bob {
+        const val swapInServerXpub = "tpubDDt5vQap1awkyDXx1z1cP7QFKSZHDCCpbU8nSq9jy7X2grTjUVZDePexf6gc6AHtRRzkgfPW87K6EKUVV6t3Hu2hg7YkHkmMeLSfrP85x41"
         private val entropy = Hex.decode("0202020202020202020202020202020202020202020202020202020202020202")
         val mnemonics = MnemonicCode.toMnemonics(entropy)
         val seed = MnemonicCode.toSeed(mnemonics, "").toByteVector32()
-        val keyManager = LocalKeyManager(seed, Block.RegtestGenesisBlock.hash)
+        val keyManager = LocalKeyManager(seed, NodeParams.Chain.Regtest, swapInServerXpub)
         val nodeParams = NodeParams(
+            chain = NodeParams.Chain.Regtest,
+            loggerFactory = LoggerFactory.default,
             keyManager = keyManager,
+        ).copy(
             alias = "bob",
-            features = Features(
-                Feature.InitialRoutingSync to FeatureSupport.Optional,
-                Feature.OptionDataLossProtect to FeatureSupport.Optional,
-                Feature.VariableLengthOnion to FeatureSupport.Mandatory,
-                Feature.PaymentSecret to FeatureSupport.Mandatory,
-                Feature.BasicMultiPartPayment to FeatureSupport.Optional,
-                Feature.Wumbo to FeatureSupport.Optional,
-                Feature.StaticRemoteKey to FeatureSupport.Optional,
-                Feature.AnchorOutputs to FeatureSupport.Optional,
-                Feature.ShutdownAnySegwit to FeatureSupport.Optional,
-                Feature.ChannelType to FeatureSupport.Mandatory,
-                Feature.PaymentMetadata to FeatureSupport.Optional,
-                Feature.TrampolinePayment to FeatureSupport.Optional,
-                Feature.ExperimentalTrampolinePayment to FeatureSupport.Optional,
-                Feature.ZeroReserveChannels to FeatureSupport.Optional,
-                Feature.ZeroConfChannels to FeatureSupport.Optional,
-                Feature.WakeUpNotificationClient to FeatureSupport.Optional,
-                Feature.PayToOpenClient to FeatureSupport.Optional,
-                Feature.TrustedSwapInClient to FeatureSupport.Optional,
-                Feature.ChannelBackupClient to FeatureSupport.Optional,
-            ),
             dustLimit = 1_000.sat,
             maxRemoteDustLimit = 1_500.sat,
             onChainFeeConf = OnChainFeeConf(
@@ -69,34 +55,11 @@ object TestConstants {
             ),
             maxHtlcValueInFlightMsat = 1_500_000_000L,
             maxAcceptedHtlcs = 100,
-            expiryDeltaBlocks = CltvExpiryDelta(144),
-            fulfillSafetyBeforeTimeoutBlocks = CltvExpiryDelta(6),
-            checkHtlcTimeoutAfterStartupDelaySeconds = 15,
-            htlcMinimum = 1_000.msat,
-            minDepthBlocks = 3,
             toRemoteDelayBlocks = CltvExpiryDelta(144),
             maxToLocalDelayBlocks = CltvExpiryDelta(1024),
             feeBase = 10.msat,
             feeProportionalMillionth = 10,
-            reserveToFundingRatio = 0.01, // note: not used (overridden below)
-            maxReserveToFundingRatio = 0.05,
-            revocationTimeoutSeconds = 20,
-            authTimeoutSeconds = 10,
-            initTimeoutSeconds = 10,
-            pingIntervalSeconds = 30,
-            pingTimeoutSeconds = 10,
-            pingDisconnect = true,
-            autoReconnect = false,
-            initialRandomReconnectDelaySeconds = 5,
-            maxReconnectIntervalSeconds = 3600,
-            chainHash = Block.RegtestGenesisBlock.hash,
-            channelFlags = 1,
-            paymentRequestExpirySeconds = 3600,
-            multiPartPaymentExpirySeconds = 60,
-            minFundingSatoshis = 1_000.sat,
-            maxFundingSatoshis = 25_000_000.sat,
-            maxPaymentAttempts = 5,
-            enableTrampolinePayment = true
+            paymentRecipientExpiryParams = RecipientCltvExpiryParams(CltvExpiryDelta(0), CltvExpiryDelta(0)),
         )
     }
 }
@@ -140,7 +103,14 @@ val rawWalletParams = """
           "name": "endurance",
           "uri": "03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@13.248.222.197:9735"
         }]
-      }
+      },
+      "v3": [
+      	{
+          "fee_base_sat": 4,
+          "fee_per_millionths": 4000,
+          "cltv_expiry": 576
+        }
+      ]
     },
     "pay_to_open": {
       "v1": {
@@ -209,7 +179,14 @@ val rawWalletParams = """
           "name": "ACINQ",
           "uri": "03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f@3.33.236.230:9735"
         }]
-      }
+      },
+      "v3": [
+      	{
+          "fee_base_sat": 4,
+          "fee_per_millionths": 4000,
+          "cltv_expiry": 576
+        }
+      ]
     },
     "pay_to_open": {
       "v1": {

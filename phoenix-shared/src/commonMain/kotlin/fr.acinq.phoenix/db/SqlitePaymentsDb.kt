@@ -23,6 +23,7 @@ import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.channel.ChannelException
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.payment.FinalFailure
@@ -33,6 +34,7 @@ import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.db.payments.*
+import fr.acinq.phoenix.db.payments.LinkTxToPaymentQueries
 import fr.acinq.phoenix.managers.CurrencyManager
 import fracinqphoenixdb.*
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +43,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
-import kotlin.math.min
 
 class SqlitePaymentsDb(
     loggerFactory: LoggerFactory,
@@ -72,13 +73,20 @@ class SqlitePaymentsDb(
         ),
         outgoing_payment_closing_tx_partsAdapter = Outgoing_payment_closing_tx_parts.Adapter(
             part_closing_info_typeAdapter = EnumColumnAdapter()
+        ),
+        channel_close_outgoing_paymentsAdapter = Channel_close_outgoing_payments.Adapter(
+            closing_info_typeAdapter = EnumColumnAdapter()
         )
     )
 
     internal val inQueries = IncomingQueries(database)
     internal val outQueries = OutgoingQueries(database)
+    private val spliceOutQueries = SpliceOutgoingQueries(database)
+    private val channelCloseQueries = ChannelCloseOutgoingQueries(database)
+    private val cpfpQueries = SpliceCpfpOutgoingQueries(database)
     private val aggrQueries = database.aggregatedQueriesQueries
     private val metaQueries = MetadataQueries(database)
+    private val linkTxToPaymentQueries = LinkTxToPaymentQueries(database)
 
     private val cloudKitDb = makeCloudKitDb(database)
 
@@ -90,7 +98,7 @@ class SqlitePaymentsDb(
 
     override suspend fun addOutgoingLightningParts(
         parentId: UUID,
-        parts: List<OutgoingPayment.LightningPart>
+        parts: List<LightningOutgoingPayment.Part>
     ) {
         withContext(Dispatchers.Default) {
             outQueries.addLightningParts(parentId, parts)
@@ -105,22 +113,34 @@ class SqlitePaymentsDb(
 
         withContext(Dispatchers.Default) {
             database.transaction {
-                outQueries.addPayment(outgoingPayment)
+                when (outgoingPayment) {
+                    is LightningOutgoingPayment -> {
+                        outQueries.addLightningOutgoingPayment(outgoingPayment)
+                    }
+                    is SpliceOutgoingPayment -> {
+                        spliceOutQueries.addSpliceOutgoingPayment(outgoingPayment)
+                        linkTxToPaymentQueries.linkTxToPayment(
+                            txId = outgoingPayment.txId,
+                            walletPaymentId = outgoingPayment.walletPaymentId()
+                        )
+                    }
+                    is ChannelCloseOutgoingPayment -> {
+                        channelCloseQueries.addChannelCloseOutgoingPayment(outgoingPayment)
+                        linkTxToPaymentQueries.linkTxToPayment(
+                            txId = outgoingPayment.txId,
+                            walletPaymentId = outgoingPayment.walletPaymentId()
+                        )
+                    }
+                    is SpliceCpfpOutgoingPayment -> {
+                        cpfpQueries.addCpfpPayment(outgoingPayment)
+                        linkTxToPaymentQueries.linkTxToPayment(outgoingPayment.txId, outgoingPayment.walletPaymentId())
+                    }
+                }
                 // Add associated metadata within the same atomic database transaction.
                 if (!metadataRow.isEmpty()) {
                     metaQueries.addMetadata(paymentId, metadataRow)
                 }
             }
-        }
-    }
-
-    override suspend fun completeOutgoingPaymentForClosing(
-        id: UUID,
-        parts: List<OutgoingPayment.ClosingTxPart>,
-        completedAt: Long
-    ) {
-        withContext(Dispatchers.Default) {
-            outQueries.completePaymentForClosing(id, parts, OutgoingPayment.Status.Completed.Succeeded.OnChain(completedAt))
         }
     }
 
@@ -130,7 +150,7 @@ class SqlitePaymentsDb(
         completedAt: Long
     ) {
         withContext(Dispatchers.Default) {
-            outQueries.completePayment(id, OutgoingPayment.Status.Completed.Succeeded.OffChain(preimage, completedAt))
+            outQueries.completePayment(id, LightningOutgoingPayment.Status.Completed.Succeeded.OffChain(preimage, completedAt))
         }
     }
 
@@ -140,7 +160,7 @@ class SqlitePaymentsDb(
         completedAt: Long
     ) {
         withContext(Dispatchers.Default) {
-            outQueries.completePayment(id, OutgoingPayment.Status.Completed.Failed(finalFailure, completedAt))
+            outQueries.completePayment(id, LightningOutgoingPayment.Status.Completed.Failed(finalFailure, completedAt))
         }
     }
 
@@ -168,10 +188,10 @@ class SqlitePaymentsDb(
      * Should only be used for migrating legacy payments, where mapping old error messages to new
      * error types is not possible.
      */
-    @Deprecated("only use this method for migrating legacy payments")
+    @Deprecated("only use this method for migrating legacy payments from android-eclair")
     suspend fun completeOutgoingLightningPartLegacy(
         partId: UUID,
-        failedStatus: OutgoingPayment.LightningPart.Status.Failed,
+        failedStatus: LightningOutgoingPayment.Part.Status.Failed,
         completedAt: Long
     ) {
         withContext(Dispatchers.Default) {
@@ -185,63 +205,68 @@ class SqlitePaymentsDb(
         }
     }
 
-    override suspend fun getOutgoingPaymentFromPartId(
-        partId: UUID
-    ): OutgoingPayment? {
-
-        return withContext(Dispatchers.Default) {
-            outQueries.getPaymentFromPartId(partId)
-        }
+    override suspend fun getLightningOutgoingPayment(id: UUID): LightningOutgoingPayment? = withContext(Dispatchers.Default) {
+        outQueries.getPaymentStrict(id)
     }
 
-    override suspend fun getOutgoingPayment(
-        id: UUID
-    ): OutgoingPayment? {
-
-        return withContext(Dispatchers.Default) {
-            outQueries.getPayment(id)
-        }
+    override suspend fun getLightningOutgoingPaymentFromPartId(partId: UUID): LightningOutgoingPayment? = withContext(Dispatchers.Default) {
+        outQueries.getPaymentFromPartId(partId)
     }
 
-    suspend fun getOutgoingPayment(
+    suspend fun getLightningOutgoingPayment(
         id: UUID,
         options: WalletPaymentFetchOptions
-    ): Pair<OutgoingPayment, WalletPaymentMetadata?>? {
+    ): Pair<OutgoingPayment, WalletPaymentMetadata?>? = withContext(Dispatchers.Default) {
+        database.transactionWithResult {
+            outQueries.getPaymentRelaxed(id)?.let {
+                val metadata = metaQueries.getMetadata(it.walletPaymentId(), options)
+                it to metadata
+            }
+        }
+    }
 
-        return withContext(Dispatchers.Default) {
-            database.transactionWithResult {
-                outQueries.getPayment(id)?.let { payment ->
-                    val metadata = metaQueries.getMetadata(
-                        id = WalletPaymentId.OutgoingPaymentId(id),
-                        options = options
-                    )
-                    Pair(payment, metadata)
-                }
+    suspend fun getSpliceOutgoingPayment(
+        id: UUID,
+        options: WalletPaymentFetchOptions
+    ): Pair<SpliceOutgoingPayment, WalletPaymentMetadata?>? = withContext(Dispatchers.Default) {
+        database.transactionWithResult {
+            spliceOutQueries.getSpliceOutPayment(id)?.let {
+                val metadata = metaQueries.getMetadata(id = it.walletPaymentId(), options)
+                it to metadata
+            }
+        }
+    }
+
+    suspend fun getChannelCloseOutgoingPayment(
+        id: UUID,
+        options: WalletPaymentFetchOptions
+    ): Pair<ChannelCloseOutgoingPayment, WalletPaymentMetadata?>? = withContext(Dispatchers.Default) {
+        database.transactionWithResult {
+            channelCloseQueries.getChannelCloseOutgoingPayment(id)?.let {
+                val metadata = metaQueries.getMetadata(id = it.walletPaymentId(), options)
+                it to metadata
+            }
+        }
+    }
+
+    suspend fun getSpliceCpfpOutgoingPayment(
+        id: UUID,
+        options: WalletPaymentFetchOptions
+    ): Pair<SpliceCpfpOutgoingPayment, WalletPaymentMetadata?>? = withContext(Dispatchers.Default) {
+        database.transactionWithResult {
+            cpfpQueries.getCpfp(id)?.let {
+                val metadata = metaQueries.getMetadata(id = it.walletPaymentId(), options)
+                it to metadata
             }
         }
     }
 
     // ---- list outgoing
 
-    override suspend fun listOutgoingPayments(
+    override suspend fun listLightningOutgoingPayments(
         paymentHash: ByteVector32
-    ): List<OutgoingPayment> {
-
-        return withContext(Dispatchers.Default) {
-            outQueries.listPayments(paymentHash)
-        }
-    }
-
-    @Deprecated("This method uses offset and has bad performances, use seek method instead when possible")
-    override suspend fun listOutgoingPayments(
-        count: Int,
-        skip: Int,
-        filters: Set<PaymentTypeFilter>
-    ): List<OutgoingPayment> {
-
-        return withContext(Dispatchers.Default) {
-            outQueries.listPayments(count, skip)
-        }
+    ): List<LightningOutgoingPayment> = withContext(Dispatchers.Default) {
+        outQueries.listLightningOutgoingPayments(paymentHash)
     }
 
     // ---- incoming payments
@@ -250,211 +275,188 @@ class SqlitePaymentsDb(
         preimage: ByteVector32,
         origin: IncomingPayment.Origin,
         createdAt: Long
-    ) {
+    ): IncomingPayment {
         val paymentHash = Crypto.sha256(preimage).toByteVector32()
         val paymentId = WalletPaymentId.IncomingPaymentId(paymentHash)
         val metadataRow = dequeueMetadata(paymentId)
 
-        withContext(Dispatchers.Default) {
-            database.transaction {
-                inQueries.addIncomingPayment(
-                    preimage = preimage,
-                    paymentHash = paymentHash,
-                    origin = origin,
-                    createdAt = createdAt
-                )
+        return withContext(Dispatchers.Default) {
+            database.transactionWithResult {
+                inQueries.addIncomingPayment(preimage, paymentHash, origin, createdAt)
                 // Add associated metadata within the same atomic database transaction.
                 if (!metadataRow.isEmpty()) {
                     metaQueries.addMetadata(paymentId, metadataRow)
                 }
+                inQueries.getIncomingPayment(paymentHash)!!
             }
         }
     }
 
     override suspend fun receivePayment(
         paymentHash: ByteVector32,
-        receivedWith: Set<IncomingPayment.ReceivedWith>,
+        receivedWith: List<IncomingPayment.ReceivedWith>,
         receivedAt: Long
     ) {
         withContext(Dispatchers.Default) {
             database.transaction {
                 inQueries.receivePayment(paymentHash, receivedWith, receivedAt)
-            }
-        }
-    }
-
-    override suspend fun addAndReceivePayment(
-        preimage: ByteVector32,
-        origin: IncomingPayment.Origin,
-        receivedWith: Set<IncomingPayment.ReceivedWith>,
-        createdAt: Long,
-        receivedAt: Long
-    ) {
-        val paymentHash = Crypto.sha256(preimage).toByteVector32()
-        val paymentId = WalletPaymentId.IncomingPaymentId(paymentHash)
-        val metadataRow = dequeueMetadata(paymentId)
-
-        withContext(Dispatchers.Default) {
-            database.transaction {
-                inQueries.addAndReceivePayment(
-                    preimage,
-                    origin,
-                    receivedWith,
-                    createdAt,
-                    receivedAt
-                )
-                // Add associated metadata within the same atomic database transaction.
-                if (!metadataRow.isEmpty()) {
-                    metaQueries.addMetadata(paymentId, metadataRow)
+                // if one received-with is on-chain, save the tx id to the db
+                receivedWith.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>().firstOrNull()?.let {
+                    linkTxToPaymentQueries.linkTxToPayment(it.txId, WalletPaymentId.IncomingPaymentId(paymentHash))
                 }
             }
         }
     }
 
-    override suspend fun updateNewChannelReceivedWithChannelId(
-        paymentHash: ByteVector32,
-        channelId: ByteVector32
-    ) {
-        withContext(Dispatchers.Default) {
-            database.transaction {
-                inQueries.updateNewChannelReceivedWithChannelId(paymentHash, channelId)
+    override suspend fun setLocked(txId: ByteVector32) {
+        database.transaction {
+            val lockedAt = currentTimestampMillis()
+            linkTxToPaymentQueries.setLocked(txId, lockedAt)
+            linkTxToPaymentQueries.listWalletPaymentIdsForTx(txId).forEach { walletPaymentId ->
+                when (walletPaymentId) {
+                    is WalletPaymentId.IncomingPaymentId -> {
+                        inQueries.setLocked(walletPaymentId.paymentHash, lockedAt)
+                    }
+                    is WalletPaymentId.LightningOutgoingPaymentId -> {
+                        // LN payments need not be locked
+                    }
+                    is WalletPaymentId.SpliceOutgoingPaymentId -> {
+                        spliceOutQueries.setLocked(walletPaymentId.id, lockedAt)
+                    }
+                    is WalletPaymentId.ChannelCloseOutgoingPaymentId -> {
+                        channelCloseQueries.setLocked(walletPaymentId.id, lockedAt)
+                    }
+                    is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> {
+                        cpfpQueries.setLocked(walletPaymentId.id, lockedAt)
+                    }
+                }
+            }
+        }
+    }
+
+    suspend fun setConfirmed(txId: ByteVector32) = withContext(Dispatchers.Default) {
+        database.transaction {
+            val confirmedAt = currentTimestampMillis()
+            linkTxToPaymentQueries.setConfirmed(txId, confirmedAt)
+            linkTxToPaymentQueries.listWalletPaymentIdsForTx(txId).forEach { walletPaymentId ->
+                when (walletPaymentId) {
+                    is WalletPaymentId.IncomingPaymentId -> {
+                        inQueries.setConfirmed(walletPaymentId.paymentHash, confirmedAt)
+                    }
+                    is WalletPaymentId.LightningOutgoingPaymentId -> {
+                        // LN payments need not be confirmed
+                    }
+                    is WalletPaymentId.SpliceOutgoingPaymentId -> {
+                        spliceOutQueries.setConfirmed(walletPaymentId.id, confirmedAt)
+                    }
+                    is WalletPaymentId.ChannelCloseOutgoingPaymentId -> {
+                        channelCloseQueries.setConfirmed(walletPaymentId.id, confirmedAt)
+                    }
+                    is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> {
+                        cpfpQueries.setConfirmed(walletPaymentId.id, confirmedAt)
+                    }
+                }
+            }
+        }
+    }
+
+    suspend fun listUnconfirmedTransactions(): Flow<List<ByteArray>> = withContext(Dispatchers.Default) {
+        linkTxToPaymentQueries.listUnconfirmedTxs()
+    }
+
+    suspend fun listPaymentsForTxId(
+        txId: ByteVector32
+    ): List<WalletPayment> = withContext(Dispatchers.Default) {
+        database.transactionWithResult {
+            linkTxToPaymentQueries.listWalletPaymentIdsForTx(txId).mapNotNull {
+                when (it) {
+                    is WalletPaymentId.IncomingPaymentId -> inQueries.getIncomingPayment(it.paymentHash)
+                    is WalletPaymentId.LightningOutgoingPaymentId -> outQueries.getPaymentRelaxed(it.id)
+                    is WalletPaymentId.ChannelCloseOutgoingPaymentId -> channelCloseQueries.getChannelCloseOutgoingPayment(it.id)
+                    is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> cpfpQueries.getCpfp(it.id)
+                    is WalletPaymentId.SpliceOutgoingPaymentId -> spliceOutQueries.getSpliceOutPayment(it.id)
+                }
             }
         }
     }
 
     override suspend fun getIncomingPayment(
         paymentHash: ByteVector32
-    ): IncomingPayment? {
-
-        return withContext(Dispatchers.Default) {
-            inQueries.getIncomingPayment(paymentHash)
-        }
+    ): IncomingPayment? = withContext(Dispatchers.Default) {
+        inQueries.getIncomingPayment(paymentHash)
     }
 
     suspend fun getIncomingPayment(
         paymentHash: ByteVector32,
         options: WalletPaymentFetchOptions
-    ): Pair<IncomingPayment, WalletPaymentMetadata?>? {
-
-        return withContext(Dispatchers.Default) {
-            database.transactionWithResult {
-                inQueries.getIncomingPayment(paymentHash)?.let { payment ->
-                    val metadata = metaQueries.getMetadata(
-                        id = WalletPaymentId.IncomingPaymentId(paymentHash),
-                        options = options
-                    )
-                    Pair(payment, metadata)
-                }
+    ): Pair<IncomingPayment, WalletPaymentMetadata?>? = withContext(Dispatchers.Default) {
+        database.transactionWithResult {
+            inQueries.getIncomingPayment(paymentHash)?.let { payment ->
+                val metadata = metaQueries.getMetadata(id = WalletPaymentId.IncomingPaymentId(paymentHash), options = options)
+                Pair(payment, metadata)
             }
-        }
-    }
-
-    override suspend fun listReceivedPayments(
-        count: Int,
-        skip: Int,
-        filters: Set<PaymentTypeFilter>
-    ): List<IncomingPayment> {
-
-        return withContext(Dispatchers.Default) {
-            inQueries.listReceivedPayments(count, skip)
-        }
-    }
-
-    override suspend fun listIncomingPayments(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): List<IncomingPayment> {
-
-        return withContext(Dispatchers.Default) {
-            inQueries.listIncomingPayments(count, skip)
         }
     }
 
     // ---- cleaning expired payments
 
-    override suspend fun listExpiredPayments(fromCreatedAt: Long, toCreatedAt: Long): List<IncomingPayment> {
-
-        return withContext(Dispatchers.Default) {
-            inQueries.listExpiredPayments(fromCreatedAt, toCreatedAt)
-        }
+    override suspend fun listExpiredPayments(
+        fromCreatedAt: Long,
+        toCreatedAt: Long
+    ): List<IncomingPayment> = withContext(Dispatchers.Default) {
+        inQueries.listExpiredPayments(fromCreatedAt, toCreatedAt)
     }
 
-    override suspend fun removeIncomingPayment(paymentHash: ByteVector32): Boolean {
-
-        return withContext(Dispatchers.Default) {
-            inQueries.deleteIncomingPayment(paymentHash)
-        }
+    override suspend fun removeIncomingPayment(
+        paymentHash: ByteVector32
+    ): Boolean = withContext(Dispatchers.Default) {
+        inQueries.deleteIncomingPayment(paymentHash)
     }
 
     // ---- list ALL payments
 
-    suspend fun listPaymentsCount(): Long {
-
-        return withContext(Dispatchers.Default) {
-            aggrQueries.listAllPaymentsCount(::allPaymentsCountMapper).executeAsList().first()
-        }
+    suspend fun listPaymentsCountFlow(): Flow<Long> = withContext(Dispatchers.Default) {
+        aggrQueries.listAllPaymentsCount(::allPaymentsCountMapper).asFlow().mapToOne()
     }
 
-    suspend fun listPaymentsCountFlow(): Flow<Long> {
-
-        return withContext(Dispatchers.Default) {
-            aggrQueries.listAllPaymentsCount(::allPaymentsCountMapper).asFlow().mapToOne()
-        }
+    suspend fun listIncomingPaymentsNotYetConfirmed(): Flow<List<IncomingPayment>> = withContext(Dispatchers.Default) {
+        inQueries.listAllNotConfirmed()
     }
 
-    suspend fun listPaymentsOrder(
-        count: Int,
-        skip: Int
-    ): List<WalletPaymentOrderRow> {
-
-        return withContext(Dispatchers.Default) {
-            aggrQueries.listAllPaymentsOrder(
-                limit = count.toLong(),
-                offset = skip.toLong(),
-                mapper = ::allPaymentsOrderMapper
-            ).executeAsList()
-        }
-    }
-
+    /** Returns a flow of incoming payments within <count, skip>. This flow is updated when the data change in the database. */
     suspend fun listPaymentsOrderFlow(
         count: Int,
         skip: Int
-    ): Flow<List<WalletPaymentOrderRow>> {
-
-        return withContext(Dispatchers.Default) {
-            aggrQueries.listAllPaymentsOrder(
-                limit = count.toLong(),
-                offset = skip.toLong(),
-                mapper = ::allPaymentsOrderMapper
-            ).asFlow().mapToList()
-        }
+    ): Flow<List<WalletPaymentOrderRow>> = withContext(Dispatchers.Default) {
+        aggrQueries.listAllPaymentsOrder(
+            limit = count.toLong(),
+            offset = skip.toLong(),
+            mapper = ::allPaymentsOrderMapper
+        ).asFlow().mapToList()
     }
 
     suspend fun listRecentPaymentsOrderFlow(
         date: Long,
         count: Int,
         skip: Int
-    ): Flow<List<WalletPaymentOrderRow>> {
-
-        return withContext(Dispatchers.Default) {
-            aggrQueries.listRecentPaymentsOrder(
-                date = date,
-                limit = count.toLong(),
-                offset = skip.toLong(),
-                mapper = ::allPaymentsOrderMapper
-            ).asFlow().mapToList()
-        }
+    ): Flow<List<WalletPaymentOrderRow>> = withContext(Dispatchers.Default) {
+        aggrQueries.listRecentPaymentsOrder(
+            date = date,
+            limit = count.toLong(),
+            offset = skip.toLong(),
+            mapper = ::allPaymentsOrderMapper
+        ).asFlow().mapToList()
     }
 
     suspend fun listOutgoingInFlightPaymentsOrderFlow(
         count: Int,
         skip: Int
-    ): Flow<List<WalletPaymentOrderRow>> {
-
-        return withContext(Dispatchers.Default) {
-            aggrQueries.listOutgoingInFlightPaymentsOrder(
-                limit = count.toLong(),
-                offset = skip.toLong(),
-                mapper = ::allPaymentsOrderMapper
-            ).asFlow().mapToList()
-        }
+    ): Flow<List<WalletPaymentOrderRow>> = withContext(Dispatchers.Default) {
+        aggrQueries.listOutgoingInFlightPaymentsOrder(
+            limit = count.toLong(),
+            offset = skip.toLong(),
+            mapper = ::allPaymentsOrderMapper
+        ).asFlow().mapToList()
     }
 
     /**
@@ -470,16 +472,14 @@ class SqlitePaymentsDb(
         endDate: Long,
         count: Int,
         skip: Int
-    ): List<WalletPaymentOrderRow> {
-        return withContext(Dispatchers.Default) {
-            aggrQueries.listRangeSuccessfulPaymentsOrder(
-                startDate = startDate,
-                endDate = endDate,
-                limit = count.toLong(),
-                offset = skip.toLong(),
-                mapper = ::allPaymentsOrderMapper
-            ).executeAsList()
-        }
+    ): List<WalletPaymentOrderRow> = withContext(Dispatchers.Default) {
+        aggrQueries.listRangeSuccessfulPaymentsOrder(
+            startDate = startDate,
+            endDate = endDate,
+            limit = count.toLong(),
+            offset = skip.toLong(),
+            mapper = ::allPaymentsOrderMapper
+        ).executeAsList()
     }
 
     /**
@@ -491,28 +491,18 @@ class SqlitePaymentsDb(
     suspend fun listRangeSuccessfulPaymentsCount(
         startDate: Long,
         endDate: Long
-    ): Long {
-        return withContext(Dispatchers.Default) {
-            aggrQueries.listRangeSuccessfulPaymentsCount(
-                startDate = startDate,
-                endDate = endDate,
-                mapper = ::allPaymentsCountMapper
-            ).executeAsList().first()
-        }
+    ): Long = withContext(Dispatchers.Default) {
+        aggrQueries.listRangeSuccessfulPaymentsCount(
+            startDate = startDate,
+            endDate = endDate,
+            mapper = ::allPaymentsCountMapper
+        ).executeAsList().first()
     }
 
-    override suspend fun listPayments(
-        count: Int,
-        skip: Int,
-        filters: Set<PaymentTypeFilter>
-    ): List<WalletPayment> = throw NotImplementedError("Use listPaymentsOrderFlow instead")
-
-    suspend fun getOldestCompletedDate(): Long? {
-        return withContext(Dispatchers.Default) {
-            val oldestIncoming = inQueries.getOldestReceivedDate()
-            val oldestOutgoing = outQueries.getOldestCompletedDate()
-            listOfNotNull(oldestIncoming, oldestOutgoing).minOrNull()
-        }
+    suspend fun getOldestCompletedDate(): Long? = withContext(Dispatchers.Default) {
+        val oldestIncoming = inQueries.getOldestReceivedDate()
+        val oldestOutgoing = outQueries.getOldestCompletedDate()
+        listOfNotNull(oldestIncoming, oldestOutgoing).minOrNull()
     }
 
     /**
@@ -551,44 +541,51 @@ class SqlitePaymentsDb(
         id: WalletPaymentId,
         userDescription: String?,
         userNotes: String?
-    ) {
-        withContext(Dispatchers.Default) {
-            metaQueries.updateUserInfo(
-                id = id,
-                userDescription = userDescription,
-                userNotes = userNotes
-            )
-        }
+    ) = withContext(Dispatchers.Default) {
+        metaQueries.updateUserInfo(
+            id = id,
+            userDescription = userDescription,
+            userNotes = userNotes
+        )
     }
 
-    suspend fun deletePayment(
-        paymentId: WalletPaymentId
-    ) {
-        withContext(Dispatchers.Default) {
-            database.transaction {
-                when (paymentId) {
-                    is WalletPaymentId.IncomingPaymentId -> {
-                        database.incomingPaymentsQueries.delete(
-                            payment_hash = paymentId.paymentHash.toByteArray()
-                        )
-                    }
-                    is WalletPaymentId.OutgoingPaymentId -> {
-                        database.outgoingPaymentsQueries.deleteLightningPartsForParentId(
-                            part_parent_id = paymentId.dbId
-                        )
-                        database.outgoingPaymentsQueries.deletePayment(
-                            id = paymentId.dbId
-                        )
-                    }
+    suspend fun deletePayment(paymentId: WalletPaymentId) = withContext(Dispatchers.Default) {
+        database.transaction {
+            when (paymentId) {
+                is WalletPaymentId.IncomingPaymentId -> {
+                    database.incomingPaymentsQueries.delete(
+                        payment_hash = paymentId.paymentHash.toByteArray()
+                    )
                 }
-                didDeleteWalletPayment(paymentId, database)
+                is WalletPaymentId.LightningOutgoingPaymentId -> {
+                    database.outgoingPaymentsQueries.deleteLightningPartsForParentId(
+                        part_parent_id = paymentId.dbId
+                    )
+                    database.outgoingPaymentsQueries.deletePayment(
+                        id = paymentId.dbId
+                    )
+                }
+                is WalletPaymentId.ChannelCloseOutgoingPaymentId -> {
+                    database.channelCloseOutgoingPaymentQueries.deleteChannelCloseOutgoing(
+                        id = paymentId.dbId
+                    )
+                }
+                is WalletPaymentId.SpliceOutgoingPaymentId -> {
+                    database.spliceOutgoingPaymentsQueries.deleteSpliceOutgoing(
+                        id = paymentId.dbId
+                    )
+                }
+                is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> {
+                    database.spliceCpfpOutgoingPaymentsQueries.deleteCpfp(
+                        id = paymentId.dbId
+                    )
+                }
             }
+            didDeleteWalletPayment(paymentId, database)
         }
     }
 
-    fun close() {
-        driver.close()
-    }
+    fun close() = driver.close()
 
     companion object {
         private fun allPaymentsCountMapper(
@@ -605,12 +602,11 @@ class SqlitePaymentsDb(
             metadata_modified_at: Long?
         ): WalletPaymentOrderRow {
             val paymentId = when (type) {
-                WalletPaymentId.DbType.OUTGOING.value -> {
-                    WalletPaymentId.OutgoingPaymentId.fromString(id)
-                }
-                WalletPaymentId.DbType.INCOMING.value -> {
-                    WalletPaymentId.IncomingPaymentId.fromString(id)
-                }
+                WalletPaymentId.DbType.OUTGOING.value -> WalletPaymentId.LightningOutgoingPaymentId.fromString(id)
+                WalletPaymentId.DbType.INCOMING.value -> WalletPaymentId.IncomingPaymentId.fromString(id)
+                WalletPaymentId.DbType.SPLICE_OUTGOING.value -> WalletPaymentId.SpliceOutgoingPaymentId.fromString(id)
+                WalletPaymentId.DbType.CHANNEL_CLOSE_OUTGOING.value -> WalletPaymentId.ChannelCloseOutgoingPaymentId.fromString(id)
+                WalletPaymentId.DbType.SPLICE_CPFP_OUTGOING.value -> WalletPaymentId.SpliceCpfpOutgoingPaymentId.fromString(id)
                 else -> throw UnhandledPaymentType(type)
             }
             return WalletPaymentOrderRow(
@@ -636,7 +632,7 @@ data class WalletPaymentOrderRow(
     /**
      * Returns a unique identifier, suitable for use in a HashMap.
      * Form is:
-     * - "outgoing|id|createdAt|completedAt|metadataModifiedAt"
+     * - "(splice_)outgoing|id|createdAt|completedAt|metadataModifiedAt"
      * - "incoming|paymentHash|createdAt|completedAt|metadataModifiedAt"
      */
     val identifier: String
@@ -649,7 +645,7 @@ data class WalletPaymentOrderRow(
     /**
      * Returns a prefix that can be used to detect older (stale) versions of the row.
      * Form is:
-     * - "outgoing|id|createdAt|"
+     * - "(splice_)outgoing|id|createdAt|"
      * - "incoming|paymentHash|createdAt|"
      */
     val staleIdentifierPrefix: String

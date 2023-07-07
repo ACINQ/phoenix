@@ -1,10 +1,19 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.io.*
-import fr.acinq.lightning.utils.*
+import fr.acinq.bitcoin.Satoshi
+import fr.acinq.lightning.*
+import fr.acinq.lightning.blockchain.electrum.SwapInManager
+import fr.acinq.lightning.blockchain.electrum.WalletState
+import fr.acinq.lightning.blockchain.electrum.balance
+import fr.acinq.lightning.channel.Helpers
+import fr.acinq.lightning.channel.states.ChannelState
+import fr.acinq.lightning.channel.states.PersistedChannelState
+import fr.acinq.lightning.io.Peer
+import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.utils.extensions.*
+import fr.acinq.phoenix.utils.extensions.localBalance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
@@ -26,51 +35,98 @@ class BalanceManager(
 
     private val log = newLogger(loggerFactory)
 
-    /** This balance is the sum of the channels' balance. This is the user's LN funds in the wallet. */
+    /** The aggregated channels' balance. This is the user's LN funds in the wallet. See [ChannelState.localBalance] */
     private val _balance = MutableStateFlow<MilliSatoshi?>(null)
     val balance: StateFlow<MilliSatoshi?> = _balance
 
-    /**
-     * Flow of map of (bitcoinAddress -> amount) swap-ins.
-     */
-    private val _incomingSwaps = MutableStateFlow<Map<String, MilliSatoshi>>(HashMap())
-    val incomingSwaps: StateFlow<Map<String, MilliSatoshi>> = _incomingSwaps
-    private var _incomingSwapsMap by _incomingSwaps
+    /** The swap-in wallet balance, grouped by its utxos' confirmation status. Reserved utxos are filtered out. */
+    private val _swapInWalletBalance = MutableStateFlow(WalletBalance.empty())
+    val swapInWalletBalance: StateFlow<WalletBalance> = _swapInWalletBalance
+
+    /** The balance of incoming payments whose funding tx is not yet confirmed - as seen from the database. */
+    private val _pendingChannelsBalance = MutableStateFlow(0.msat)
+    val pendingChannelsBalance: StateFlow<MilliSatoshi> = _pendingChannelsBalance
 
     init {
-        log.info { "init balance manager"}
         launch {
             val peer = peerManager.peerState.filterNotNull().first()
             launch { monitorChannelsBalance(peerManager) }
-            launch { monitorIncomingSwapsMap(peer) }
+            launch { monitorSwapInBalance(peer) }
+            launch { monitorIncomingPaymentNotYetConfirmed() }
         }
     }
 
-    /** Watches the channels balance, first using the channels data from our database, then the live channels. */
+    /** Monitors the channels' balance, first using the channels data from our database, then the live channels. */
     private suspend fun monitorChannelsBalance(peerManager: PeerManager) {
         peerManager.channelsFlow.collect { channels ->
-            _balance.value = channels?.map { it.value.state.localBalance() }?.sum()
+            _balance.value = channels?.mapNotNull { it.value.state.localBalance() }?.sum()
         }
     }
 
-    private suspend fun monitorIncomingSwapsMap(peer: Peer) {
-        launch {
-            // iOS Note:
-            // If the payment was received via the notification-service-extension
-            // (which runs in a separate process), then you won't receive the
-            // corresponding notifications (PaymentReceived) thru this mechanism.
-            //
-            peer.eventsFlow.collect { event ->
-                when (event) {
-                    is SwapInPendingEvent -> {
-                        _incomingSwapsMap += (event.swapInPending.bitcoinAddress to event.swapInPending.amount.toMilliSatoshi())
-                    }
-                    is SwapInConfirmedEvent -> {
-                        _incomingSwapsMap -= event.swapInConfirmed.bitcoinAddress
-                    }
-                    else -> Unit
-                }
-            }
+    /** Monitors the database for incoming payments that are received but whose funds are not yet usable (e.g., need confirmation). */
+    private suspend fun monitorIncomingPaymentNotYetConfirmed() {
+        databaseManager.paymentsDb().listIncomingPaymentsNotYetConfirmed().collect { payments ->
+            log.info { "unconfirmed payments=$payments" }
+            val unconfirmedOnchain = payments.filter { it.completedAt == null }
+            _pendingChannelsBalance.value = unconfirmedOnchain.map { it.amount }.sum()
         }
+    }
+
+    /**
+     * Constructs a user-friendly [WalletBalance] from [Peer.swapInWallet].
+     *
+     * Utxos that are reserved for channels are excluded. This prevents a scenario where a channel is being created - and
+     * the Lightning balance is updated - but the utxos for this channel are not yet spent and are such still listed in
+     * the swap-in wallet flow. The UI would be incorrect for a while.
+     *
+     * See [SwapInManager.reservedWalletInputs] for details.
+     */
+    private suspend fun monitorSwapInBalance(peer: Peer) {
+        val swapInConfirmations = peer.walletParams.swapInConfirmations
+        combine(peer.currentTipFlow.filterNotNull(), peer.channelsFlow, peer.swapInWallet.walletStateFlow) { (currentBlockHeight, _), channels, swapInWallet ->
+            val reservedInputs = SwapInManager.reservedWalletInputs(channels.values.filterIsInstance<PersistedChannelState>())
+            val walletWithoutReserved = WalletState(
+                addresses = swapInWallet.addresses.map { (address, unspent) ->
+                    address to unspent.filterNot { reservedInputs.contains(it.outPoint) }
+                }.toMap().filter { it.value.isNotEmpty() },
+                parentTxs = swapInWallet.parentTxs,
+            )
+            val withConfirmations = walletWithoutReserved.withConfirmations(
+                currentBlockHeight = currentBlockHeight,
+                minConfirmations = swapInConfirmations
+            )
+            WalletBalance(
+                deeplyConfirmed = withConfirmations.deeplyConfirmed.balance,
+                weaklyConfirmed = withConfirmations.weaklyConfirmed.balance,
+                weaklyConfirmedMinBlockNeeded = withConfirmations.weaklyConfirmed.minOfOrNull {
+                    withConfirmations.confirmationsNeeded(it)
+                },
+                unconfirmed = withConfirmations.unconfirmed.balance,
+            )
+        }.collect { balance ->
+            _swapInWalletBalance.value = balance
+        }
+    }
+}
+
+/**
+ * Helper class representing the balance of the swap-in wallet. See [WalletState.WalletWithConfirmations].
+ *
+ * @param deeplyConfirmed amount that is confirmed and that can be used for a swap. This amount would always be 0 if we were to
+ *      systematically accept swaps. But swaps can fail, or be rejected (fee too high).
+ * @param weaklyConfirmed  amount that is confirmed but not deep enough for a swap.
+ * @param weaklyConfirmedMinBlockNeeded minimum depth that the wallet's weakly confirmed utxos must reach.
+ * @param unconfirmed amount that is not confirmed yet.
+ */
+data class WalletBalance(
+    val deeplyConfirmed: Satoshi,
+    val weaklyConfirmed: Satoshi,
+    val weaklyConfirmedMinBlockNeeded: Int?,
+    val unconfirmed: Satoshi,
+) {
+    val total get() = deeplyConfirmed + weaklyConfirmed + unconfirmed
+
+    companion object {
+        fun empty() = WalletBalance(0.sat, 0.sat, null, 0.sat)
     }
 }

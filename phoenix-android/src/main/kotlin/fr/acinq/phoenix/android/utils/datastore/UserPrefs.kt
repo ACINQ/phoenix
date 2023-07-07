@@ -19,26 +19,31 @@ package fr.acinq.phoenix.android.utils.datastore
 import android.content.Context
 import android.text.format.DateUtils
 import androidx.datastore.preferences.core.*
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
-import fr.acinq.phoenix.data.CurrencyUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
+import fr.acinq.phoenix.db.serializers.v1.SatoshiSerializer
 import fr.acinq.phoenix.legacy.userPrefs
+import fr.acinq.phoenix.managers.NodeParamsManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.*
+import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.io.IOException
 
-
 object UserPrefs {
     private val log = LoggerFactory.getLogger(this::class.java)
+    private val json = Json { ignoreUnknownKeys = true } // some prefs are json-serialized
 
     private fun prefs(context: Context): Flow<Preferences> {
         return context.userPrefs.data.catch { exception ->
@@ -68,6 +73,7 @@ object UserPrefs {
     fun getHomeAmountDisplayMode(context: Context): Flow<HomeAmountDisplayMode> = prefs(context).map {
         HomeAmountDisplayMode.safeValueOf(it[HOME_AMOUNT_DISPLAY_MODE])
     }
+
     suspend fun saveHomeAmountDisplayMode(context: Context, displayMode: HomeAmountDisplayMode) = context.userPrefs.edit {
         it[HOME_AMOUNT_DISPLAY_MODE] = displayMode.name
         when (displayMode) {
@@ -115,7 +121,7 @@ object UserPrefs {
             it[PREFS_ELECTRUM_ADDRESS_PORT] = address.port
             val tls = address.tls
             if (tls is TcpSocket.TLS.PINNED_PUBLIC_KEY) {
-                it[PREFS_ELECTRUM_ADDRESS_PINNED_KEY] =  tls.pubKey
+                it[PREFS_ELECTRUM_ADDRESS_PINNED_KEY] = tls.pubKey
             } else {
                 it.remove(PREFS_ELECTRUM_ADDRESS_PINNED_KEY)
             }
@@ -158,18 +164,61 @@ object UserPrefs {
         }
     }
 
-    private val AUTO_PAY_TO_OPEN = booleanPreferencesKey("AUTO_PAY_TO_OPEN")
-    fun getIsAutoPayToOpenEnabled(context: Context): Flow<Boolean> = prefs(context).map { it[AUTO_PAY_TO_OPEN] ?: true }
-    suspend fun saveIsAutoPayToOpenEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[AUTO_PAY_TO_OPEN] = isEnabled }
+    // -- liquidity policy
+
+    private val LIQUIDITY_POLICY = stringPreferencesKey("LIQUIDITY_POLICY")
+    fun getLiquidityPolicy(context: Context): Flow<LiquidityPolicy> = prefs(context).map {
+        try {
+            it[LIQUIDITY_POLICY]?.let { policy ->
+                when (val res = json.decodeFromString<InternalLiquidityPolicy>(policy)) {
+                    is InternalLiquidityPolicy.Auto -> LiquidityPolicy.Auto(res.maxAbsoluteFee, res.maxRelativeFeeBasisPoints, res.skipAbsoluteFeeCheck)
+                    is InternalLiquidityPolicy.Disable -> LiquidityPolicy.Disable
+                }
+            }
+        } catch (e: Exception) {
+            log.error("failed to read liquidity-policy preference, replace with default: ${e.localizedMessage}")
+            saveLiquidityPolicy(context, NodeParamsManager.defaultLiquidityPolicy)
+            null
+        } ?: NodeParamsManager.defaultLiquidityPolicy
+    }
+
+    suspend fun saveLiquidityPolicy(context: Context, policy: LiquidityPolicy) = context.userPrefs.edit {
+        log.info("saving new liquidity policy=$policy")
+        val serialisable = when (policy) {
+            is LiquidityPolicy.Auto -> InternalLiquidityPolicy.Auto(policy.maxRelativeFeeBasisPoints, policy.maxAbsoluteFee, policy.skipAbsoluteFeeCheck)
+            is LiquidityPolicy.Disable -> InternalLiquidityPolicy.Disable
+        }
+        it[LIQUIDITY_POLICY] = json.encodeToString(serialisable)
+        // also save the fee so that we don't lose the user fee preferences even when using a disabled policy
+        if (policy is LiquidityPolicy.Auto) {
+            it[INCOMING_MAX_SAT_FEE_INTERNAL_TRACKER] = policy.maxAbsoluteFee.sat
+            it[INCOMING_MAX_PROP_FEE_INTERNAL_TRACKER] = policy.maxRelativeFeeBasisPoints
+        }
+    }
+
+    /** This is used to keep track of the user's max fee preferences, even if he's not currently using a relevant liquidity policy. */
+    private val INCOMING_MAX_SAT_FEE_INTERNAL_TRACKER = longPreferencesKey("INCOMING_MAX_SAT_FEE_INTERNAL_TRACKER")
+    fun getIncomingMaxSatFeeInternal(context: Context): Flow<Satoshi?> = prefs(context).map {
+        it[INCOMING_MAX_SAT_FEE_INTERNAL_TRACKER]?.sat ?: NodeParamsManager.defaultLiquidityPolicy.maxAbsoluteFee
+    }
+
+    /** This is used to keep track of the user's proportional fee preferences, even if he's not currently using a relevant liquidity policy. */
+    private val INCOMING_MAX_PROP_FEE_INTERNAL_TRACKER = intPreferencesKey("INCOMING_MAX_PROP_FEE_INTERNAL_TRACKER")
+    fun getIncomingMaxPropFeeInternal(context: Context): Flow<Int?> = prefs(context).map {
+        it[INCOMING_MAX_PROP_FEE_INTERNAL_TRACKER] ?: NodeParamsManager.defaultLiquidityPolicy.maxRelativeFeeBasisPoints
+    }
+
+    // -- lnurl
 
     private val LNURL_AUTH_SCHEME = intPreferencesKey("LNURL_AUTH_SCHEME")
     fun getLnurlAuthScheme(context: Context): Flow<LnurlAuth.Scheme?> = prefs(context).map {
         when (it[LNURL_AUTH_SCHEME]) {
             LnurlAuth.Scheme.DEFAULT_SCHEME.id -> LnurlAuth.Scheme.DEFAULT_SCHEME
             LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME.id -> LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME
-            else -> LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME
+            else -> LnurlAuth.Scheme.DEFAULT_SCHEME
         }
     }
+
     suspend fun saveLnurlAuthScheme(context: Context, scheme: LnurlAuth.Scheme?) = context.userPrefs.edit {
         if (scheme == null) {
             it.remove(LNURL_AUTH_SCHEME)
@@ -182,17 +231,34 @@ object UserPrefs {
     fun getIsTorEnabled(context: Context): Flow<Boolean> = prefs(context).map { it[IS_TOR_ENABLED] ?: false }
     suspend fun saveIsTorEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[IS_TOR_ENABLED] = isEnabled }
 
+    private val SHOW_NOTIFICATION_PERMISSION_REMINDER = booleanPreferencesKey("SHOW_NOTIFICATION_PERMISSION_REMINDER")
+    fun getShowNotificationPermissionReminder(context: Context): Flow<Boolean> = prefs(context).map { it[SHOW_NOTIFICATION_PERMISSION_REMINDER] ?: true }
+    suspend fun saveShowNotificationPermissionReminder(context: Context, show: Boolean) = context.userPrefs.edit { it[SHOW_NOTIFICATION_PERMISSION_REMINDER] = show }
+
+}
+
+/** Our own format for [LiquidityPolicy], serializable and decoupled from lightning-kmp. */
+@Serializable
+sealed class InternalLiquidityPolicy {
+    @Serializable
+    object Disable : InternalLiquidityPolicy()
+
+    @Serializable
+    data class Auto(
+        val maxRelativeFeeBasisPoints: Int,
+        @Serializable(with = SatoshiSerializer::class) val maxAbsoluteFee: Satoshi,
+        val skipAbsoluteFeeCheck: Boolean
+    ) : InternalLiquidityPolicy()
 }
 
 enum class HomeAmountDisplayMode {
     BTC, FIAT, REDACTED;
+
     companion object {
-        fun safeValueOf(mode: String?) = when(mode) {
+        fun safeValueOf(mode: String?) = when (mode) {
             FIAT.name -> FIAT
             REDACTED.name -> REDACTED
             else -> BTC
         }
     }
 }
-
-object Redacted : CurrencyUnit

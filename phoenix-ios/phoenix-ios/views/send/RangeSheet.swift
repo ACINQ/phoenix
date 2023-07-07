@@ -13,7 +13,7 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct RangeSheet: View {
 	
-	let flow: FlowType
+	let range: MsatRange
 	let valueChanged: (Int64) -> Void
 	
 	@State var exampleHeight: CGFloat? = nil
@@ -171,18 +171,18 @@ struct RangeSheet: View {
 	
 	func minBitcoinAmount() -> FormattedAmount {
 		
-		return Utils.formatBitcoin(msat: flow.range.min, bitcoinUnit: currencyPrefs.bitcoinUnit)
+		return Utils.formatBitcoin(msat: range.min, bitcoinUnit: currencyPrefs.bitcoinUnit)
 	}
 	
 	func maxBitcoinAmount() -> FormattedAmount {
 		
-		return Utils.formatBitcoin(msat: flow.range.max, bitcoinUnit: currencyPrefs.bitcoinUnit)
+		return Utils.formatBitcoin(msat: range.max, bitcoinUnit: currencyPrefs.bitcoinUnit)
 	}
 	
 	func minFiatAmount() -> FormattedAmount? {
 		
 		if let exchangeRate = currencyPrefs.fiatExchangeRate() {
-			return Utils.formatFiat(msat: flow.range.min, exchangeRate: exchangeRate)
+			return Utils.formatFiat(msat: range.min, exchangeRate: exchangeRate)
 		} else {
 			return nil
 		}
@@ -191,7 +191,7 @@ struct RangeSheet: View {
 	func maxFiatAmount() -> FormattedAmount? {
 		
 		if let exchangeRate = currencyPrefs.fiatExchangeRate() {
-			return Utils.formatFiat(msat: flow.range.max, exchangeRate: exchangeRate)
+			return Utils.formatFiat(msat: range.max, exchangeRate: exchangeRate)
 		} else {
 			return nil
 		}
@@ -204,13 +204,13 @@ struct RangeSheet: View {
 	func minAmountTapped() {
 		log.trace("minAmountTraced()")
 		
-		valueChanged(flow.range.min.msat)
+		valueChanged(range.min.msat)
 	}
 	
 	func maxAmountTapped() {
 		log.trace("maxAmountTraced()")
 		
-		valueChanged(flow.range.max.msat)
+		valueChanged(range.max.msat)
 	}
 	
 	func closeButtonTapped() {

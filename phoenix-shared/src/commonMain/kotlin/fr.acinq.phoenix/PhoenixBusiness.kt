@@ -16,10 +16,10 @@
 
 package fr.acinq.phoenix
 
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.TcpSocket
-import fr.acinq.lightning.utils.setLightningLoggerFactory
 import fr.acinq.phoenix.controllers.*
 import fr.acinq.phoenix.controllers.config.*
 import fr.acinq.phoenix.controllers.init.AppInitController
@@ -29,7 +29,6 @@ import fr.acinq.phoenix.controllers.main.AppHomeController
 import fr.acinq.phoenix.controllers.payments.AppReceiveController
 import fr.acinq.phoenix.controllers.payments.AppScanController
 import fr.acinq.phoenix.controllers.payments.Scan
-import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.createAppDbDriver
@@ -55,8 +54,13 @@ import org.kodein.memory.file.resolve
 class PhoenixBusiness(
     internal val ctx: PlatformContext
 ) {
-    internal val logMemory = PhoenixBusiness.getLogMemory(ctx)
-    internal val loggerFactory = PhoenixBusiness.getLoggerFactory(ctx)
+    internal val logMemory = LogMemory(Path(getApplicationFilesDirectoryPath(ctx)).resolve("logs"))
+
+    val loggerFactory = LoggerFactory(
+        defaultLogFrontend.withShortPackageKeepLast(1),
+        logMemory.withShortPackageKeepLast(1)
+    )
+
     private val logger = loggerFactory.newLogger(this::class)
 
     private val tcpSocketBuilder = TcpSocket.Builder()
@@ -77,10 +81,10 @@ class PhoenixBusiness(
         }
     }
 
-    val chain = Chain.Mainnet
+    val chain: NodeParams.Chain = NodeParamsManager.chain
 
-    internal val electrumClient by lazy { ElectrumClient(tcpSocketBuilder, MainScope()) }
-    internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope()) }
+    val electrumClient by lazy { ElectrumClient(null, MainScope(), loggerFactory) }
+    internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope(), loggerFactory) }
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
 
@@ -96,6 +100,7 @@ class PhoenixBusiness(
     val currencyManager by lazy { CurrencyManager(this) }
     val connectionsManager by lazy { ConnectionsManager(this) }
     val lnurlManager by lazy { LnurlManager(this) }
+    val notificationsManager by lazy { NotificationsManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
     val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(loggerFactory)) }
 
@@ -131,6 +136,8 @@ class PhoenixBusiness(
         appConfigurationManager.cancel()
         currencyManager.cancel()
         lnurlManager.cancel()
+        notificationsManager.cancel()
+        logMemory.cancel()
     }
 
     // The (node_id, fcm_token) tuple only needs to be registered once.
@@ -166,9 +173,6 @@ class PhoenixBusiness(
         override fun electrumConfiguration(): ElectrumConfigurationController =
             AppElectrumConfigurationController(_this)
 
-        override fun channelsConfiguration(): ChannelsConfigurationController =
-            AppChannelsConfigurationController(_this)
-
         override fun logsConfiguration(): LogsConfigurationController =
             AppLogsConfigurationController(_this)
 
@@ -177,33 +181,5 @@ class PhoenixBusiness(
 
         override fun forceCloseChannelsConfiguration(): CloseChannelsConfigurationController =
             AppCloseChannelsConfigurationController(_this, isForceClose = true)
-    }
-
-    companion object {
-        @Suppress("VARIABLE_IN_SINGLETON_WITHOUT_THREAD_LOCAL")
-        private var logMemory: LogMemory? = null
-
-        @Suppress("VARIABLE_IN_SINGLETON_WITHOUT_THREAD_LOCAL")
-        private var loggerFactory: LoggerFactory? = null
-
-        fun getLogMemory(ctx: PlatformContext): LogMemory {
-            if (logMemory == null) {
-                val path = Path(getApplicationFilesDirectoryPath(ctx)).resolve("logs")
-                logMemory = LogMemory(path)
-            }
-            return logMemory!!
-        }
-
-        fun getLoggerFactory(ctx: PlatformContext): LoggerFactory {
-            if (loggerFactory == null) {
-                val logMemory = getLogMemory(ctx)
-                loggerFactory = LoggerFactory(
-                    defaultLogFrontend.withShortPackageKeepLast(1),
-                    logMemory.withShortPackageKeepLast(1)
-                )
-                setLightningLoggerFactory(loggerFactory!!)
-            }
-            return loggerFactory!!
-        }
     }
 }

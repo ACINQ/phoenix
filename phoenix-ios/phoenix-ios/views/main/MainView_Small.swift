@@ -27,7 +27,7 @@ struct MainView_Small: View {
 	
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
 	@State var externalLightningRequest: AppScanController? = nil
-
+	
 	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
 	@State private var swiftUiBugWorkaroundIdx = 0
 	
@@ -80,7 +80,7 @@ struct MainView_Small: View {
 	 * - Header button: app status   = 21
 	 * - Header button: tools        = 20
 	 */
-
+	
 	@ViewBuilder
 	var body: some View {
 		
@@ -107,7 +107,7 @@ struct MainView_Small: View {
 					EmptyView()
 				}
 				.accessibilityHidden(true)
-
+				
 			} // else: uses.navigationStackDestination()
 			
 			Color.primaryBackground
@@ -489,7 +489,7 @@ struct MainView_Small: View {
 	
 	@ViewBuilder
 	private func navLinkView(_ tag: NavLinkTag) -> some View {
-
+		
 		switch tag {
 		case .ConfigurationView : ConfigurationView()
 		case .TransactionsView  : TransactionsView()
@@ -498,13 +498,13 @@ struct MainView_Small: View {
 		case .CurrencyConverter : CurrencyConverterView()
 		}
 	}
-
+	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
-
+	
 	private func navLinkTagBinding(_ tag: NavLinkTag?) -> Binding<Bool> {
-
+		
 		if let tag { // specific tag
 			return Binding<Bool>(
 				get: { navLinkTag == tag },
@@ -517,51 +517,53 @@ struct MainView_Small: View {
 			)
 		}
 	}
-
+	
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
 	
 	private func deepLinkChanged(_ value: DeepLink?) {
 		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
-
+		
 		if let value = value {
-
+			
 			// Navigate towards deep link (if needed)
 			var newNavLinkTag: NavLinkTag? = nil
+			var delay: TimeInterval = 1.5 // seconds; multiply by number of screens we need to navigate
 			switch value {
-				case .paymentHistory     : newNavLinkTag = .TransactionsView
-				case .backup             : newNavLinkTag = .ConfigurationView
-				case .drainWallet        : newNavLinkTag = .ConfigurationView
-				case .electrum           : newNavLinkTag = .ConfigurationView
-				case .backgroundPayments : newNavLinkTag = .ConfigurationView
+				case .paymentHistory     : newNavLinkTag = .TransactionsView  ; delay *= 1
+				case .backup             : newNavLinkTag = .ConfigurationView ; delay *= 2
+				case .drainWallet        : newNavLinkTag = .ConfigurationView ; delay *= 2
+				case .electrum           : newNavLinkTag = .ConfigurationView ; delay *= 3
+				case .backgroundPayments : newNavLinkTag = .ConfigurationView ; delay *= 3
+				case .liquiditySettings  : newNavLinkTag = .ConfigurationView ; delay *= 3
 			}
-
+			
 			if let newNavLinkTag = newNavLinkTag {
-
+				
 				self.swiftUiBugWorkaround = newNavLinkTag
 				self.swiftUiBugWorkaroundIdx += 1
-				clearSwiftUiBugWorkaround(delay: 1.0)
-
+				clearSwiftUiBugWorkaround(delay: delay)
+				
 				self.navLinkTag = newNavLinkTag // Trigger/push the view
 			}
-
+			
 		} else {
 			// We reached the final destination of the deep link
 			clearSwiftUiBugWorkaround(delay: 0.0)
 		}
 	}
-
+	
 	private func navLinkTagChanged(_ tag: NavLinkTag?) {
 		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
 		
 		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
-
+			
 			log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
 			self.navLinkTag = forcedNavLinkTag
-
+			
 		} else if tag == nil {
-
+			
 			// If we pushed the SendView, triggered by an external lightning url,
 			// then we can nil out the associated controller now (since we handed off to SendView).
 			self.externalLightningRequest = nil
@@ -577,22 +579,22 @@ struct MainView_Small: View {
 		}
 		
 		MainViewHelper.shared.processExternalLightningUrl(urlStr) { scanController in
-
+			
 			self.externalLightningRequest = scanController
 			self.navLinkTag = .SendView
 		}
 	}
-
+	
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
-
+	
 	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
-
+		
 		let idx = self.swiftUiBugWorkaroundIdx
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-
+			
 			if self.swiftUiBugWorkaroundIdx == idx {
 				log.debug("swiftUiBugWorkaround = nil")
 				self.swiftUiBugWorkaround = nil

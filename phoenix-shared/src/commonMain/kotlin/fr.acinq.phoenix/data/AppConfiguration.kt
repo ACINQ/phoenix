@@ -1,23 +1,13 @@
 package fr.acinq.phoenix.data
 
-import fr.acinq.bitcoin.Block
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.InitTlv
 import kotlinx.serialization.Serializable
 
-
-sealed class Chain(val name: String, val block: Block) {
-    object Regtest : Chain("Regtest", Block.RegtestGenesisBlock)
-    object Testnet : Chain("Testnet", Block.TestnetGenesisBlock)
-    object Mainnet : Chain("Mainnet", Block.LivenetGenesisBlock)
-
-    fun isMainnet(): Boolean = this is Mainnet
-    fun isTestnet(): Boolean = this is Testnet
-
-    val chainHash by lazy { block.hash }
-}
 
 interface CurrencyUnit
 
@@ -212,7 +202,7 @@ sealed class ElectrumConfig {
         return when (this) {
             is Custom -> {
                 when (other) {
-                    is Custom -> this == other // custom =?= custom
+                    is Custom -> this === other // custom =?= custom
                     is Random -> false         // custom != random
                 }
             }
@@ -231,6 +221,10 @@ data class StartupParams(
     val requestCheckLegacyChannels: Boolean = false,
     /** Tor state must be defined before the node starts. */
     val isTorEnabled: Boolean,
+    /** The liquidity policy must be injected into the node params manager. */
+    val liquidityPolicy: LiquidityPolicy,
+    /** List of transaction ids that can be used for swap-in even if they are zero-conf. */
+    val trustedSwapInTxs: Set<ByteVector32>,
     // TODO: add custom electrum address, fiat currencies, ...
 )
 

@@ -19,7 +19,6 @@
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
   android:background="@drawable/button_bg_square"
-  android:layout_marginTop="@dimen/space_xs"
   android:paddingLeft="@dimen/space_md"
   android:paddingTop="@dimen/space_sm"
   android:paddingRight="@dimen/space_md"
@@ -59,7 +58,7 @@
     app:layout_constraintTop_toTopOf="parent"
     android:ellipsize="end"
     android:singleLine="true"
-    android:text="@string/lipsum_short"
+    android:text="@string/legacy_lipsum_short"
     android:textSize="@dimen/text_lg" />
 
   <TextView

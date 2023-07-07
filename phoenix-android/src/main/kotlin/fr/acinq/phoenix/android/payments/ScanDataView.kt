@@ -17,9 +17,8 @@
 
 package fr.acinq.phoenix.android.payments
 
-import android.*
+import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.*
 import android.provider.*
 import androidx.compose.foundation.background
@@ -29,9 +28,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -39,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.app.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -50,20 +48,15 @@ import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
-import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.phoenix.android.BuildConfig
-import fr.acinq.phoenix.android.CF
+import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.databinding.ScanViewBinding
 import fr.acinq.phoenix.android.utils.*
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ScanController
-import fr.acinq.phoenix.controllers.payments.MaxFees
 import fr.acinq.phoenix.controllers.payments.Scan
 
 
@@ -91,8 +84,8 @@ fun ScanDataView(
 ) {
     val log = logger("ScanDataView")
     var initialInput = remember { input }
-    val trampolineMaxFees by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(null)
-    val maxFees = trampolineMaxFees?.let { MaxFees(it.feeBase, it.feeProportional) }
+    val peer by business.peerManager.peerState.collectAsState()
+    val trampolineFees = peer?.walletParams?.trampolineFees?.firstOrNull()
     val vm: ScanDataViewModel = viewModel(factory = ScanDataViewModel.Factory(controllerFactory, CF::scan))
 
     MVIView(vm) { model, postIntent ->
@@ -102,7 +95,7 @@ fun ScanDataView(
             }
         }
         when (model) {
-            Scan.Model.Ready, is Scan.Model.BadRequest, is Scan.Model.InvoiceFlow.DangerousRequest, is Scan.Model.LnurlServiceFetch -> {
+            Scan.Model.Ready, is Scan.Model.BadRequest, is Scan.Model.LnurlServiceFetch -> {
                 ReadDataView(
                     initialInput = initialInput,
                     model = model,
@@ -111,14 +104,13 @@ fun ScanDataView(
                         initialInput = ""
                         postIntent(Scan.Intent.Reset)
                     },
-                    onConfirmDangerousRequest = { request, invoice -> postIntent(Scan.Intent.InvoiceFlow.ConfirmDangerousRequest(request, invoice)) },
                     onScannedText = { postIntent(Scan.Intent.Parse(request = it)) }
                 )
             }
             is Scan.Model.InvoiceFlow.InvoiceRequest -> {
                 SendLightningPaymentView(
                     paymentRequest = model.paymentRequest,
-                    trampolineMaxFees = maxFees,
+                    trampolineFees = trampolineFees,
                     onBackClick = onBackClick,
                     onPayClick = { postIntent(it) }
                 )
@@ -126,28 +118,26 @@ fun ScanDataView(
             Scan.Model.InvoiceFlow.Sending -> {
                 LaunchedEffect(key1 = Unit) { onBackClick() }
             }
-            is Scan.Model.SwapOutFlow -> {
-                val paymentRequest = model.address.paymentRequest
+            is Scan.Model.OnchainFlow -> {
+                val paymentRequest = model.uri.paymentRequest
                 if (paymentRequest == null) {
-                    SendSwapOutView(
-                        model = model,
-                        maxFees = maxFees,
+                    SendSpliceOutView(
+                        requestedAmount = model.uri.amount,
+                        address = model.uri.address,
                         onBackClick = onBackClick,
-                        onInvalidate = { postIntent(it) },
-                        onPrepareSwapOutClick = { postIntent(it) },
-                        onSendSwapOutClick = { postIntent(it) }
+                        onSpliceOutSuccess = onBackClick,
                     )
                 } else {
-                    var hasPickedSwapOutMode by remember { mutableStateOf(false) }
-                    if (!hasPickedSwapOutMode) {
-                        ChooseSwapOutOrLightningDialog(
-                            onPayWithLightningClick = {
-                                hasPickedSwapOutMode = true
+                    var showPaymentModeDialog by remember { mutableStateOf(false) }
+                    if (!showPaymentModeDialog) {
+                        ChoosePaymentModeDialog(
+                            onPayOffchainClick = {
+                                showPaymentModeDialog = true
                                 postIntent(Scan.Intent.Parse(request = paymentRequest.write()))
                             },
-                            onPayWithSwapOutClick = {
-                                hasPickedSwapOutMode = true
-                                postIntent(Scan.Intent.Parse(request = model.address.copy(paymentRequest = null).write()))
+                            onPayOnchainClick = {
+                                showPaymentModeDialog = true
+                                postIntent(Scan.Intent.Parse(request = model.uri.copy(paymentRequest = null).write()))
                             }
                         )
                     }
@@ -156,7 +146,7 @@ fun ScanDataView(
             is Scan.Model.LnurlPayFlow -> {
                 LnurlPayView(
                     model = model,
-                    trampolineMaxFees = maxFees,
+                    trampolineFees = trampolineFees,
                     onBackClick = onBackClick,
                     onSendLnurlPayClick = { postIntent(it) }
                 )
@@ -177,7 +167,6 @@ fun ReadDataView(
     model: Scan.Model,
     onFeedbackDismiss: () -> Unit,
     onBackClick: () -> Unit,
-    onConfirmDangerousRequest: (String, PaymentRequest) -> Unit,
     onScannedText: (String) -> Unit,
 ) {
     val log = logger("ReadDataView")
@@ -238,10 +227,6 @@ fun ReadDataView(
             ScanErrorView(model, onFeedbackDismiss)
         }
 
-        if (model is Scan.Model.InvoiceFlow.DangerousRequest) {
-            DangerousRequestDialog(request = model.request, paymentRequest = model.paymentRequest, onDismiss = onFeedbackDismiss, onConfirmDangerousRequest = onConfirmDangerousRequest)
-        }
-
         if (model is Scan.Model.LnurlServiceFetch) {
             Card(modifier = Modifier.align(Alignment.Center), internalPadding = PaddingValues(24.dp)) {
                 ProgressView(text = stringResource(R.string.scan_lnurl_fetching))
@@ -292,7 +277,7 @@ fun BoxScope.ScannerView(
             .width(dimensionResource(id = R.dimen.scanner_size))
             .height(dimensionResource(id = R.dimen.scanner_size))
             .clip(RoundedCornerShape(24.dp))
-            .background(whiteLowOp())
+            .background(Color(0x33ffffff))
             .align(Alignment.Center)
     )
 }
@@ -317,40 +302,13 @@ private fun ScanErrorView(
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun DangerousRequestDialog(
-    request: String,
-    paymentRequest: PaymentRequest,
-    onDismiss: () -> Unit,
-    onConfirmDangerousRequest: (String, PaymentRequest) -> Unit
-) {
-    Dialog(
-        onDismiss = {},
-        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false, usePlatformDefaultWidth = false),
-        title = stringResource(id = R.string.scan_amountless_legacy_title),
-        buttons = {
-            Button(
-                onClick = onDismiss,
-                text = stringResource(id = R.string.btn_cancel)
-            )
-            Spacer(Modifier.width(8.dp))
-            Button(
-                onClick = { onConfirmDangerousRequest(request, paymentRequest) },
-                text = stringResource(id = R.string.btn_confirm)
-            )
-        },
-        content = { Text(annotatedStringResource(id = R.string.scan_amountless_legacy_message), modifier = Modifier.padding(horizontal = 24.dp)) }
-    )
-}
-
-@Composable
-private fun ChooseSwapOutOrLightningDialog(
-    onPayWithSwapOutClick: () -> Unit,
-    onPayWithLightningClick: () -> Unit,
+private fun ChoosePaymentModeDialog(
+    onPayOnchainClick: () -> Unit,
+    onPayOffchainClick: () -> Unit,
 ) {
     Dialog(onDismiss = {}, properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false), isScrollable = true) {
-        Clickable(onClick = { onPayWithSwapOutClick() }) {
+        Clickable(onClick = onPayOnchainClick) {
             Row(modifier = Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
                 PhoenixIcon(resourceId = R.drawable.ic_chain)
                 Spacer(Modifier.width(16.dp))
@@ -360,7 +318,7 @@ private fun ChooseSwapOutOrLightningDialog(
                 }
             }
         }
-        Clickable(onClick = { onPayWithLightningClick() }) {
+        Clickable(onClick = onPayOffchainClick) {
             Row(modifier = Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
                 PhoenixIcon(resourceId = R.drawable.ic_zap)
                 Spacer(Modifier.width(16.dp))
@@ -398,7 +356,7 @@ private fun ManualInputDialog(
                 text = input,
                 onTextChange = { input = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(text = stringResource(id = R.string.scan_manual_input_hint)) },
+                staticLabel = stringResource(id = R.string.scan_manual_input_label),
             )
         }
     }
@@ -406,7 +364,7 @@ private fun ManualInputDialog(
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-private fun BoxScope.CameraPermissionsView(
+fun BoxScope.CameraPermissionsView(
     onPermissionGranted: @Composable () -> Unit
 ) {
     val context = LocalContext.current

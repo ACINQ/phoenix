@@ -50,7 +50,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        app:text="@string/initwallet_create"
+        app:text="@string/legacy_initwallet_create"
         app:text_color="?attr/altTextColor" />
 
       <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
@@ -67,7 +67,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/create_seed"
-        app:text="@string/initwallet_restore" />
+        app:text="@string/legacy_initwallet_restore" />
 
       <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/settings"
@@ -106,7 +106,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/space_lg"
         android:layout_marginTop="@dimen/space_md_p"
-        android:text="@string/initwallet_terms"
+        android:text="@string/legacy_initwallet_terms"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/terms_checkbox"
         app:layout_constraintTop_toBottomOf="@id/terms_separator"

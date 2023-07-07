@@ -47,7 +47,7 @@
         android:paddingStart="@dimen/space_lg"
         android:paddingEnd="@dimen/space_lg"
         android:visibility="@{model.state == RestoreSeedState.INIT}"
-        android:text="@string/restore_disclaimer_message"
+        android:text="@string/legacy_restore_disclaimer_message"
         app:layout_constraintTop_toTopOf="parent" />
 
       <CheckBox
@@ -56,7 +56,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_lg"
         android:layout_marginTop="@dimen/space_md"
-        android:text="@string/restore_disclaimer_checkbox"
+        android:text="@string/legacy_restore_disclaimer_checkbox"
         android:visibility="@{model.state == RestoreSeedState.INIT}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
@@ -74,7 +74,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/disclaimer_checkbox"
-        app:text="@string/restore_disclaimer_next" />
+        app:text="@string/legacy_restore_disclaimer_next" />
 
       <TextView
         android:id="@+id/instructions"
@@ -83,7 +83,7 @@
         android:paddingStart="@dimen/space_lg"
         android:paddingEnd="@dimen/space_lg"
         android:visibility="@{model.state != RestoreSeedState.INIT}"
-        android:text="@string/restore_instructions"
+        android:text="@string/legacy_restore_instructions"
         app:layout_constrainedWidth="true"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -109,7 +109,7 @@
           android:layout_marginTop="@dimen/space_xs"
           android:paddingStart="@dimen/space_sm"
           android:paddingEnd="@dimen/space_sm"
-          android:text="@string/restore_mnemonics_label"
+          android:text="@string/legacy_restore_mnemonics_label"
           android:textColor="?attr/mutedTextColor"
           android:textSize="@dimen/text_sm"
           app:layout_constraintTop_toTopOf="parent" />
@@ -164,7 +164,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/keyboard"
-        app:text="@string/restore_import_button" />
+        app:text="@string/legacy_restore_import_button" />
 
       <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
         android:layout_width="wrap_content"
@@ -174,7 +174,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/keyboard"
-        app:text="@string/restore_in_progress" />
+        app:text="@string/legacy_restore_in_progress" />
 
       <TextView
         android:id="@+id/error"
@@ -187,7 +187,7 @@
         android:elevation="4dp"
         android:focusable="true"
         android:padding="@dimen/space_md"
-        android:text="@string/restore_error"
+        android:text="@string/legacy_restore_error"
         android:visibility="@{model.state == RestoreSeedState.ERROR}"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"

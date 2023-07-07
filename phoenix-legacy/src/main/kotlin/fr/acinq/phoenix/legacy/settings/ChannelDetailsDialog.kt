@@ -83,7 +83,7 @@ class ChannelDetailsDialog : DialogFragment() {
         try {
           val clipboard = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
           clipboard.setPrimaryClip(ClipData.newPlainText("Channel data", model.rawData.value))
-          Toast.makeText(ctx, getString(R.string.utils_copied), Toast.LENGTH_SHORT).show()
+          Toast.makeText(ctx, getString(R.string.legacy_utils_copied), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
           log.error("failed to copy raw channel data: ${e.localizedMessage}")
         }
@@ -94,9 +94,9 @@ class ChannelDetailsDialog : DialogFragment() {
       model.rawData.value?.let {
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "text/plain"
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.listallchannels_share_subject))
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.legacy_listallchannels_share_subject))
         shareIntent.putExtra(Intent.EXTRA_TEXT, it)
-        startActivity(Intent.createChooser(shareIntent, getString(R.string.listallchannels_share_title)))
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.legacy_listallchannels_share_title)))
       }
     }
 

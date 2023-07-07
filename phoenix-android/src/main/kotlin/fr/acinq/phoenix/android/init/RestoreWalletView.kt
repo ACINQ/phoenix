@@ -19,25 +19,35 @@ package fr.acinq.phoenix.android.init
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.components.feedback.SuccessMessage
+import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.navController
@@ -69,7 +79,6 @@ fun RestoreWalletView(
         DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.restore_title),
-            backgroundColor = Color.Unspecified
         )
         when (keyState.value) {
             is KeyState.Absent -> {
@@ -130,25 +139,34 @@ private fun SeedInputView(
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     var filteredWords by remember { mutableStateOf(emptyList<String>()) }
-    var errorMessage by remember { mutableStateOf("") }
     val writingState = vm.writingState
-    val isMnemonicComplete = vm.mnemonics.none { it.isNullOrBlank() }
+    val enteredWords = vm.mnemonics.filterNot { it.isNullOrBlank() }
 
     MVIView(CF::restoreWallet) { model, postIntent ->
+
+        val isSeedValid = remember(enteredWords.size, model) {
+            if (model is RestoreWallet.Model.InvalidMnemonics) {
+                false
+            } else if (enteredWords.size != 12) {
+                null
+            } else {
+                try {
+                    MnemonicCode.validate(vm.mnemonics.joinToString(" "))
+                    true
+                } catch (e: Exception) {
+                    false
+                }
+            }
+        }
+
         when (model) {
-            is RestoreWallet.Model.Ready -> {
-                errorMessage = ""
-            }
-            is RestoreWallet.Model.InvalidMnemonics -> {
-                errorMessage = stringResource(R.string.restore_seed_invalid)
-            }
+            is RestoreWallet.Model.Ready -> {}
+            is RestoreWallet.Model.InvalidMnemonics -> {}
             is RestoreWallet.Model.FilteredWordlist -> {
-                errorMessage = ""
                 filteredWords = model.words
             }
             is RestoreWallet.Model.ValidMnemonics -> {
                 LaunchedEffect(model.seed) {
-                    errorMessage = ""
                     vm.writeSeed(
                         context = context,
                         mnemonics = model.mnemonics,
@@ -162,34 +180,65 @@ private fun SeedInputView(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Card(internalPadding = PaddingValues(16.dp)) {
-                WordInputView(
-                    filteredWords = filteredWords,
-                    onInputChange = { postIntent(RestoreWallet.Intent.FilterWordList(it)) },
-                    onWordSelected = { vm.appendWordToMnemonic(it) },
-                    canAddNewWords = !isMnemonicComplete
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+            Card(
+                internalPadding = PaddingValues(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = stringResource(R.string.restore_instructions))
+                Column(
+                    modifier = Modifier.heightIn(min = 100.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    when (isSeedValid) {
+                        null -> {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            WordInputView(
+                                wordIndex = enteredWords.size + 1,
+                                filteredWords = filteredWords,
+                                onInputChange = { postIntent(RestoreWallet.Intent.FilterWordList(it)) },
+                                onWordSelected = { vm.appendWordToMnemonic(it) },
+                            )
+                        }
+                        false -> {
+                            WarningMessage(
+                                header = stringResource(id = R.string.restore_seed_invalid),
+                                details = stringResource(id = R.string.restore_seed_invalid_details),
+                                alignment = Alignment.CenterHorizontally,
+                            )
+                        }
+                        true -> {
+                            SuccessMessage(
+                                header = stringResource(id = R.string.restore_seed_valid),
+                                details = stringResource(id = R.string.restore_seed_valid_details),
+                                alignment = Alignment.CenterHorizontally,
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
                 WordsTable(
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(horizontal = 16.dp).widthIn(max = 350.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
+                        .padding(horizontal = 16.dp)
+                        .widthIn(max = 350.dp),
                     words = vm.mnemonics.toList(),
                     onRemoveWordFrom = {
-                        errorMessage = ""
-                        vm.removeWordsFromMnemonic(it)
+                        if (writingState !is WritingSeedState.Writing) {
+                            vm.removeWordsFromMnemonic(it)
+                        }
                     }
                 )
-                if (errorMessage.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Text(text = errorMessage, style = MaterialTheme.typography.body1.copy(color = negativeColor(), textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
-                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
             when (writingState) {
                 is WritingSeedState.Error -> {
-                    Text(
-                        text = stringResource(id = R.string.autocreate_error, writingState.e.localizedMessage ?: writingState.e::class.java.simpleName),
-                        style = MaterialTheme.typography.body1.copy(color = negativeColor())
+                    ErrorMessage(
+                        header = stringResource(id = R.string.autocreate_error),
+                        details = writingState.e.localizedMessage ?: writingState.e::class.java.simpleName,
+                        alignment = Alignment.CenterHorizontally,
                     )
                 }
                 is WritingSeedState.Init -> {
@@ -200,11 +249,11 @@ private fun SeedInputView(
                             focusManager.clearFocus()
                             postIntent(RestoreWallet.Intent.Validate(vm.mnemonics.filterNotNull()))
                         },
-                        enabled = isMnemonicComplete,
+                        enabled = isSeedValid == true,
                     )
                 }
                 is WritingSeedState.Writing, is WritingSeedState.WrittenToDisk -> {
-                    Text(text = stringResource(R.string.restore_in_progress))
+                    ProgressView(text = stringResource(R.string.restore_in_progress))
                 }
             }
             Spacer(modifier = Modifier.height(48.dp))
@@ -214,18 +263,15 @@ private fun SeedInputView(
 
 @Composable
 private fun WordInputView(
+    wordIndex: Int,
     filteredWords: List<String>,
     onInputChange: (String) -> Unit,
     onWordSelected: (String) -> Unit,
-    canAddNewWords: Boolean,
 ) {
     var inputValue by remember { mutableStateOf("") }
-    Text(text = stringResource(R.string.restore_instructions))
-    Spacer(modifier = Modifier.height(16.dp))
-    TextInput(
-        text = inputValue,
-        label = { Text(text = stringResource(R.string.restore_input_label)) },
-        onTextChange = { newValue ->
+    OutlinedTextField(
+        value = inputValue,
+        onValueChange = { newValue ->
             if (newValue.endsWith(" ") && filteredWords.isNotEmpty()) {
                 // hitting space acts like completing the input - we select the first word available
                 filteredWords.firstOrNull()?.let { onWordSelected(it) }
@@ -235,7 +281,19 @@ private fun WordInputView(
             }
             onInputChange(inputValue.trim())
         },
-        enabled = canAddNewWords,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.None,
+            autoCorrect = false,
+            keyboardType = KeyboardType.Password,
+            imeAction = ImeAction.None
+        ),
+        visualTransformation = VisualTransformation.None,
+        label = {
+            Text(
+                text = stringResource(R.string.restore_input_label, wordIndex),
+                style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary)
+            )
+        },
         maxLines = 1,
         singleLine = true,
         modifier = Modifier.fillMaxWidth()
@@ -245,23 +303,24 @@ private fun WordInputView(
     if (filteredWords.isEmpty()) {
         Text(
             text = if (inputValue.length > 2) stringResource(id = R.string.restore_input_invalid) else "",
-            style = MaterialTheme.typography.body1.copy(color = negativeColor()),
-            modifier = Modifier.padding(4.dp)
+            style = MaterialTheme.typography.body1.copy(color = negativeColor),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
         )
     } else {
         LazyRow(
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             items(filteredWords) {
                 Clickable(
-                    enabled = canAddNewWords,
+                    enabled = wordIndex <= 12,
                     onClick = {
                         onWordSelected(it)
                         onInputChange("")
                         inputValue = ""
                     },
                 ) {
-                    Text(text = it, style = MaterialTheme.typography.body1.copy(textDecoration = TextDecoration.Underline), modifier = Modifier.padding(4.dp))
+                    Text(text = it, style = MaterialTheme.typography.body1.copy(textDecoration = TextDecoration.Underline), modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
                 }
             }
         }
@@ -288,7 +347,7 @@ private fun WordsTable(
         Column(Modifier.weight(1f)) {
             words.subList(6, 12).forEachIndexed { index, word ->
                 WordRow(
-                    wordNumber = index + 6,
+                    wordNumber = index + 6 + 1,
                     word = word,
                     onRemoveWordClick = { onRemoveWordFrom(index + 6) }
                 )
@@ -304,6 +363,9 @@ private fun WordRow(
     onRemoveWordClick: () -> Unit
 ) {
     Clickable(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp)),
         enabled = !word.isNullOrBlank(),
         onClick = onRemoveWordClick,
         internalPadding = PaddingValues(4.dp)

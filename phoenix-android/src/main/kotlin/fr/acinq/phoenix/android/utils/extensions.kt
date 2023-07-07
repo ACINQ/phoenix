@@ -22,9 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
@@ -64,187 +62,6 @@ fun BitcoinUnit.label(): String = when (this) {
     BitcoinUnit.MBtc -> stringResource(id = R.string.prefs_display_coin_mbtc_label)
     BitcoinUnit.Btc -> stringResource(id = R.string.prefs_display_coin_btc_label)
 }
-
-/* Previous code (merge conflict):
-@Composable
-fun FiatCurrency.labels(): Pair<String, String> {
-    val code = this.name
-    val context = LocalContext.current
-    return remember(key1 = code) {
-        val fullName = when {
-            code.length == 3 -> try {
-                Currency.getInstance(code).displayName
-            } catch (e: Exception) {
-                "N/A"
-            }
-            code == "ARS_BM" -> context.getString(R.string.currency_ars_bm)
-            code == "CUP_FM" -> context.getString(R.string.currency_cup_fm)
-            else -> "N/A"
-        }
-        val flag = getFlag(code)
-        "$flag $code" to fullName
-    }
-}
-
-private fun getFlag(code: String): String {
-    return when (code) {
-        "AED" -> "🇦🇪" // United Arab Emirates Dirham
-        "AFN" -> "🇦🇫" // Afghan Afghani
-        "ALL" -> "🇦🇱" // Albanian Lek
-        "AMD" -> "🇦🇲" // Armenian Dram
-        "ANG" -> "🇳🇱" // Netherlands Antillean Guilder
-        "AOA" -> "🇦🇴" // Angolan Kwanza
-        "ARS_BM" -> "🇦🇷" // Argentine Peso (blue market)
-        "ARS" -> "🇦🇷" // Argentine Peso
-        "AUD" -> "🇦🇺" // Australian Dollar
-        "AWG" -> "🇦🇼" // Aruban Florin
-        "AZN" -> "🇦🇿" // Azerbaijani Manat
-        "BAM" -> "🇧🇦" // Bosnia-Herzegovina Convertible Mark
-        "BBD" -> "🇧🇧" // Barbadian Dollar
-        "BDT" -> "🇧🇩" // Bangladeshi Taka
-        "BGN" -> "🇧🇬" // Bulgarian Lev
-        "BHD" -> "🇧🇭" // Bahraini Dinar
-        "BIF" -> "🇧🇮" // Burundian Franc
-        "BMD" -> "🇧🇲" // Bermudan Dollar
-        "BND" -> "🇧🇳" // Brunei Dollar
-        "BOB" -> "🇧🇴" // Bolivian Boliviano
-        "BRL" -> "🇧🇷" // Brazilian Real
-        "BSD" -> "🇧🇸" // Bahamian Dollar
-        "BTN" -> "🇧🇹" // Bhutanese Ngultrum
-        "BWP" -> "🇧🇼" // Botswanan Pula
-        "BZD" -> "🇧🇿" // Belize Dollar
-        "CAD" -> "🇨🇦" // Canadian Dollar
-        "CDF" -> "🇨🇩" // Congolese Franc
-        "CHF" -> "🇨🇭" // Swiss Franc
-        "CLP" -> "🇨🇱" // Chilean Peso
-        "CNH" -> "🇨🇳" // Chinese Yuan (offshore)
-        "CNY" -> "🇨🇳" // Chinese Yuan (onshore)
-        "COP" -> "🇨🇴" // Colombian Peso
-        "CRC" -> "🇨🇷" // Costa Rican Colón
-        "CUP" -> "🇨🇺" // Cuban Peso
-        "CUP_FM" -> "🇨🇺" // Cuban Peso (free market)
-        "CVE" -> "🇨🇻" // Cape Verdean Escudo
-        "CZK" -> "🇨🇿" // Czech Koruna
-        "DJF" -> "🇩🇯" // Djiboutian Franc
-        "DKK" -> "🇩🇰" // Danish Krone
-        "DOP" -> "🇩🇴" // Dominican Peso
-        "DZD" -> "🇩🇿" // Algerian Dinar
-        "EGP" -> "🇪🇬" // Egyptian Pound
-        "ERN" -> "🇪🇷" // Eritrean Nakfa
-        "ETB" -> "🇪🇹" // Ethiopian Birr
-        "EUR" -> "🇪🇺" // Euro
-        "FJD" -> "🇫🇯" // Fijian Dollar
-        "FKP" -> "🇫🇰" // Falkland Islands Pound
-        "GBP" -> "🇬🇧" // British Pound Sterling
-        "GEL" -> "🇬🇪" // Georgian Lari
-        "GHS" -> "🇬🇭" // Ghanaian Cedi
-        "GIP" -> "🇬🇮" // Gibraltar Pound
-        "GMD" -> "🇬🇲" // Gambian Dalasi
-        "GNF" -> "🇬🇳" // Guinean Franc
-        "GTQ" -> "🇬🇹" // Guatemalan Quetzal
-        "GYD" -> "🇬🇾" // Guyanaese Dollar
-        "HKD" -> "🇭🇰" // Hong Kong Dollar
-        "HNL" -> "🇭🇳" // Honduran Lempira
-        "HRK" -> "🇭🇷" // Croatian Kuna
-        "HTG" -> "🇭🇹" // Haitian Gourde
-        "HUF" -> "🇭🇺" // Hungarian Forint
-        "IDR" -> "🇮🇩" // Indonesian Rupiah
-        "ILS" -> "🇮🇱" // Israeli New Sheqel
-        "INR" -> "🇮🇳" // Indian Rupee
-        "IQD" -> "🇮🇶" // Iraqi Dinar
-        "IRR" -> "🇮🇷" // Iranian Rial
-        "ISK" -> "🇮🇸" // Icelandic Króna
-        "JEP" -> "🇯🇪" // Jersey Pound
-        "JMD" -> "🇯🇲" // Jamaican Dollar
-        "JOD" -> "🇯🇴" // Jordanian Dinar
-        "JPY" -> "🇯🇵" // Japanese Yen
-        "KES" -> "🇰🇪" // Kenyan Shilling
-        "KGS" -> "🇰🇬" // Kyrgystani Som
-        "KHR" -> "🇰🇭" // Cambodian Riel
-        "KMF" -> "🇰🇲" // Comorian Franc
-        "KPW" -> "🇰🇵" // North Korean Won
-        "KRW" -> "🇰🇷" // South Korean Won
-        "KWD" -> "🇰🇼" // Kuwaiti Dinar
-        "KYD" -> "🇰🇾" // Cayman Islands Dollar
-        "KZT" -> "🇰🇿" // Kazakhstani Tenge
-        "LAK" -> "🇱🇦" // Laotian Kip
-        "LBP" -> "🇱🇧" // Lebanese Pound
-        "LKR" -> "🇱🇰" // Sri Lankan Rupee
-        "LRD" -> "🇱🇷" // Liberian Dollar
-        "LSL" -> "🇱🇸" // Lesotho Loti
-        "LYD" -> "🇱🇾" // Libyan Dinar
-        "MAD" -> "🇲🇦" // Moroccan Dirham
-        "MDL" -> "🇲🇩" // Moldovan Leu
-        "MGA" -> "🇲🇬" // Malagasy Ariary
-        "MKD" -> "🇲🇰" // Macedonian Denar
-        "MMK" -> "🇲🇲" // Myanmar Kyat
-        "MNT" -> "🇲🇳" // Mongolian Tugrik
-        "MOP" -> "🇲🇴" // Macanese Pataca
-        "MUR" -> "🇲🇺" // Mauritian Rupee
-        "MVR" -> "🇲🇻" // Maldivian Rufiyaa
-        "MWK" -> "🇲🇼" // Malawian Kwacha
-        "MXN" -> "🇲🇽" // Mexican Peso
-        "MYR" -> "🇲🇾" // Malaysian Ringgit
-        "MZN" -> "🇲🇿" // Mozambican Metical
-        "NAD" -> "🇳🇦" // Namibian Dollar
-        "NGN" -> "🇳🇬" // Nigerian Naira
-        "NIO" -> "🇳🇮" // Nicaraguan Córdoba
-        "NOK" -> "🇳🇴" // Norwegian Krone
-        "NPR" -> "🇳🇵" // Nepalese Rupee
-        "NZD" -> "🇳🇿" // New Zealand Dollar
-        "OMR" -> "🇴🇲" // Omani Rial
-        "PAB" -> "🇵🇦" // Panamanian Balboa
-        "PEN" -> "🇵🇪" // Peruvian Nuevo Sol
-        "PGK" -> "🇵🇬" // Papua New Guinean Kina
-        "PHP" -> "🇵🇭" // Philippine Peso
-        "PKR" -> "🇵🇰" // Pakistani Rupee
-        "PLN" -> "🇵🇱" // Polish Zloty
-        "PYG" -> "🇵🇾" // Paraguayan Guarani
-        "QAR" -> "🇶🇦" // Qatari Rial
-        "RON" -> "🇷🇴" // Romanian Leu
-        "RSD" -> "🇷🇸" // Serbian Dinar
-        "RUB" -> "🇷🇺" // Russian Ruble
-        "RWF" -> "🇷🇼" // Rwandan Franc
-        "SAR" -> "🇸🇦" // Saudi Riyal
-        "SBD" -> "🇸🇧" // Solomon Islands Dollar
-        "SCR" -> "🇸🇨" // Seychellois Rupee
-        "SDG" -> "🇸🇩" // Sudanese Pound
-        "SEK" -> "🇸🇪" // Swedish Krona
-        "SGD" -> "🇸🇬" // Singapore Dollar
-        "SHP" -> "🇸🇭" // Saint Helena Pound
-        "SLL" -> "🇸🇱" // Sierra Leonean Leone
-        "SOS" -> "🇸🇴" // Somali Shilling
-        "SRD" -> "🇸🇷" // Surinamese Dollar
-        "SYP" -> "🇸🇾" // Syrian Pound
-        "SZL" -> "🇸🇿" // Swazi Lilangeni
-        "THB" -> "🇹🇭" // Thai Baht
-        "TJS" -> "🇹🇯" // Tajikistani Somoni
-        "TMT" -> "🇹🇲" // Turkmenistani Manat
-        "TND" -> "🇹🇳" // Tunisian Dinar
-        "TOP" -> "🇹🇴" // Tongan Paʻanga
-        "TRY" -> "🇹🇷" // Turkish Lira
-        "TTD" -> "🇹🇹" // Trinidad and Tobago Dollar
-        "TWD" -> "🇹🇼" // New Taiwan Dollar
-        "TZS" -> "🇹🇿" // Tanzanian Shilling
-        "UAH" -> "🇺🇦" // Ukrainian Hryvnia
-        "UGX" -> "🇺🇬" // Ugandan Shilling
-        "USD" -> "🇺🇸" // United States Dollar
-        "UYU" -> "🇺🇾" // Uruguayan Peso
-        "UZS" -> "🇺🇿" // Uzbekistan Som
-        "VND" -> "🇻🇳" // Vietnamese Dong
-        "VUV" -> "🇻🇺" // Vanuatu Vatu
-        "WST" -> "🇼🇸" // Samoan Tala
-        "XAF" -> "🇨🇲" // CFA Franc BEAC        - multiple options, chose country with highest GDP
-        "XCD" -> "🇱🇨" // East Caribbean Dollar - multiple options, chose country with highest GDP
-        "XOF" -> "🇨🇮" // CFA Franc BCEAO       - multiple options, chose country with highest GDP
-        "XPF" -> "🇳🇨" // CFP Franc             - multiple options, chose country with highest GDP
-        "YER" -> "🇾🇪" // Yemeni Rial
-        "ZAR" -> "🇿🇦" // South African Rand
-        "ZMW" -> "🇿🇲" // Zambian Kwacha
-        else -> "🏳️"
-    }
-}
-*/
 
 @Composable
 fun FiatCurrency.labels(): Pair<String, String> {
@@ -448,16 +265,17 @@ fun Connection.CLOSED.isBadCertificate() = this.reason?.cause is CertificateExce
  * payment with an invoice do have a description baked in, and that's what is returned.
  */
 fun WalletPayment.smartDescription(context: Context): String? = when (this) {
-    is OutgoingPayment -> when (val details = this.details) {
-        is OutgoingPayment.Details.Normal -> details.paymentRequest.description ?: details.paymentRequest.descriptionHash?.toHex()
-        is OutgoingPayment.Details.ChannelClosing -> context.getString(R.string.paymentdetails_desc_closing_channel)
-        is OutgoingPayment.Details.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
-        is OutgoingPayment.Details.SwapOut -> context.getString(R.string.paymentdetails_desc_swapout, details.address)
+    is LightningOutgoingPayment -> when (val details = this.details) {
+        is LightningOutgoingPayment.Details.Normal -> details.paymentRequest.description
+        is LightningOutgoingPayment.Details.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
+        is LightningOutgoingPayment.Details.SwapOut -> context.getString(R.string.paymentdetails_desc_swapout, details.address)
     }
     is IncomingPayment -> when (val origin = this.origin) {
-        is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description ?: origin.paymentRequest.descriptionHash?.toHex()
+        is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description
         is IncomingPayment.Origin.KeySend -> context.getString(R.string.paymentdetails_desc_keysend)
-        else -> null
+        is IncomingPayment.Origin.SwapIn, is IncomingPayment.Origin.OnChain -> context.getString(R.string.paymentdetails_desc_swapin)
     }
-    else -> null
+    is SpliceOutgoingPayment -> context.getString(R.string.paymentdetails_desc_splice_out)
+    is ChannelCloseOutgoingPayment -> context.getString(R.string.paymentdetails_desc_closing_channel)
+    is SpliceCpfpOutgoingPayment -> context.getString(R.string.paymentdetails_desc_cpfp)
 }?.takeIf { it.isNotBlank() }

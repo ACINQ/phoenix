@@ -58,7 +58,7 @@ class AutoCreateFragment : Fragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(AutoCreateViewModel::class.java)
     model.errorCause.observe(viewLifecycleOwner, Observer {
-      mBinding.error.text = getString(R.string.autocreate_error, it)
+      mBinding.error.text = getString(R.string.legacy_autocreate_error, it)
     })
     model.state.observe(viewLifecycleOwner, Observer { state ->
       if (state == AutoCreateState.DONE) {

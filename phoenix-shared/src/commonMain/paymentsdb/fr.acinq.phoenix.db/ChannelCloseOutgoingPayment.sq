@@ -1,0 +1,38 @@
+import fr.acinq.phoenix.db.payments.OutgoingPartClosingInfoTypeVersion;
+
+-- Store in a flat row outgoing payments standing for channel-closing.
+-- There are no complex json columns like in the outgoing_payments table.
+-- This table replaces the legacy outgoing_payment_closing_tx_parts table.
+CREATE TABLE IF NOT EXISTS channel_close_outgoing_payments (
+    id TEXT NOT NULL PRIMARY KEY,
+    recipient_amount_sat INTEGER NOT NULL,
+    address TEXT NOT NULL,
+    is_default_address INTEGER NOT NULL,
+    mining_fees_sat INTEGER NOT NULL,
+    tx_id BLOB NOT NULL,
+    created_at INTEGER NOT NULL,
+    confirmed_at INTEGER DEFAULT NULL,
+    locked_at INTEGER DEFAULT NULL,
+    channel_id BLOB NOT NULL,
+    closing_info_type TEXT AS OutgoingPartClosingInfoTypeVersion NOT NULL,
+    closing_info_blob BLOB NOT NULL
+);
+
+insertChannelCloseOutgoing:
+INSERT INTO channel_close_outgoing_payments (
+    id, recipient_amount_sat, address, is_default_address, mining_fees_sat, tx_id, created_at, confirmed_at, locked_at, channel_id, closing_info_type, closing_info_blob
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+setConfirmed:
+UPDATE channel_close_outgoing_payments SET confirmed_at=? WHERE id=?;
+
+setLocked:
+UPDATE channel_close_outgoing_payments SET locked_at=? WHERE id=?;
+
+getChannelCloseOutgoing:
+SELECT id, recipient_amount_sat, address, is_default_address, mining_fees_sat, tx_id, created_at, confirmed_at, locked_at, channel_id, closing_info_type, closing_info_blob
+FROM channel_close_outgoing_payments
+WHERE id=?;
+
+deleteChannelCloseOutgoing:
+DELETE FROM channel_close_outgoing_payments WHERE id=?;

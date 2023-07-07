@@ -21,6 +21,8 @@ import androidx.lifecycle.*
 import fr.acinq.bitcoin.scala.Satoshi
 import fr.acinq.eclair.db.OutgoingPaymentStatus
 import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.phoenix.legacy.ServiceStatus
+import fr.acinq.phoenix.legacy.SwapOutSettings
 import fr.acinq.phoenix.legacy.background.EclairNodeService
 import fr.acinq.phoenix.legacy.utils.*
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +50,7 @@ sealed class SendState {
   sealed class Onchain : SendState() {
     abstract val uri: BitcoinURI
 
+    data class SwapOutServiceDisabled(override val uri: BitcoinURI) : Onchain()
     data class SwapRequired(override val uri: BitcoinURI) : Onchain()
     data class Swapping(override val uri: BitcoinURI, val feeratePerByte: Long) : Onchain()
     data class Ready(override val uri: BitcoinURI, val pr: PaymentRequest, val feeratePerByte: Long, val fee: Satoshi) : Onchain()
@@ -95,18 +98,24 @@ class SendViewModel : ViewModel() {
   }
 
   val isFormVisible: LiveData<Boolean> = Transformations.map(state) { state ->
-    state !is SendState.CheckingInvoice && state !is SendState.InvalidInvoice
+    state !is SendState.CheckingInvoice && state !is SendState.InvalidInvoice && state !is SendState.Onchain.SwapOutServiceDisabled
   }
 
   // ---- end of computed values
 
   @UiThread
-  fun checkAndSetPaymentRequest(service: EclairNodeService?, input: String) {
+  fun checkAndSetPaymentRequest(service: EclairNodeService?, input: String, swapOutSettings: SwapOutSettings) {
     viewModelScope.launch((Dispatchers.Default)) {
       try {
         val extract = Wallet.parseLNObject(input)
         when (extract) {
-          is BitcoinURI -> state.postValue(SendState.Onchain.SwapRequired(extract))
+          is BitcoinURI -> {
+            if (swapOutSettings.status is ServiceStatus.Disabled) {
+              state.postValue(SendState.Onchain.SwapOutServiceDisabled(extract))
+            } else {
+              state.postValue(SendState.Onchain.SwapRequired(extract))
+            }
+          }
           is PaymentRequest -> {
             val matchingPaid = (service?.getSentPaymentsFromPaymentHash(extract.paymentHash()) ?: emptyList()).filter { it.status() is OutgoingPaymentStatus.Succeeded }
             if (matchingPaid.isNotEmpty()) {

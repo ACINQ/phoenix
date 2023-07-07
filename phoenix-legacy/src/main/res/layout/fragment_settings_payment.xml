@@ -28,8 +28,8 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"
-      app:subtitle="@string/paymentsettings_subtitle"
-      app:title="@string/paymentsettings_title" />
+      app:subtitle="@string/legacy_paymentsettings_subtitle"
+      app:title="@string/legacy_paymentsettings_title" />
 
     <ScrollView
       android:layout_width="match_parent"
@@ -53,7 +53,7 @@
           app:icon="@color/transparent"
           app:layout_constraintTop_toTopOf="parent"
           app:spacer_size="@dimen/space_md"
-          app:text="@string/paymentsettings_defaultdesc_title" />
+          app:text="@string/legacy_paymentsettings_defaultdesc_title" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/payment_expiry_button"
@@ -65,7 +65,7 @@
           app:icon="@color/transparent"
           app:layout_constraintTop_toBottomOf="@id/default_description_button"
           app:spacer_size="@dimen/space_md"
-          app:text="@string/paymentsettings_expiry_title" />
+          app:text="@string/legacy_paymentsettings_expiry_title" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/trampoline_fees_button"
@@ -77,14 +77,14 @@
           app:icon="@color/transparent"
           app:layout_constraintTop_toBottomOf="@id/payment_expiry_button"
           app:spacer_size="@dimen/space_md"
-          app:text="@string/paymentsettings_trampoline_fees_title" />
+          app:text="@string/legacy_paymentsettings_trampoline_fees_title" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.SwitchView
           android:id="@+id/pay_to_open_enable_switch"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           app:icon="@drawable/ic_blank"
-          app:text="@string/paymentsettings_paytoopen_auto_switch_title"
+          app:text="@string/legacy_paymentsettings_paytoopen_auto_switch_title"
           app:layout_constraintTop_toBottomOf="@id/trampoline_fees_button" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
@@ -97,7 +97,7 @@
           app:icon="@color/transparent"
           app:layout_constraintTop_toBottomOf="@id/pay_to_open_enable_switch"
           app:spacer_size="@dimen/space_md"
-          app:text="@string/paymentsettings_paytoopen_fees_title" />
+          app:text="@string/legacy_paymentsettings_paytoopen_fees_title" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

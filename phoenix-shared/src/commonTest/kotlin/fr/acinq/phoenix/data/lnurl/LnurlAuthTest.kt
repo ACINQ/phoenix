@@ -17,9 +17,9 @@
 package fr.acinq.phoenix.data.lnurl
 
 import fr.acinq.bitcoin.*
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.utils.toByteVector
-import fr.acinq.phoenix.data.Chain
 import fr.acinq.secp256k1.Hex
 import io.ktor.http.*
 import kotlin.test.Test
@@ -28,8 +28,7 @@ import kotlin.test.assertEquals
 class LnurlAuthTest {
     private val mnemonics = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
     private val seed = MnemonicCode.toSeed(mnemonics, passphrase = "").toByteVector()
-    private val master = DeterministicWallet.generate(seed)
-    private val keyManager = LocalKeyManager(seed, Chain.Testnet.chainHash)
+    private val keyManager = LocalKeyManager(seed, NodeParams.Chain.Testnet, remoteSwapInExtendedPublicKey = "tpubDDt5vQap1awkyDXx1z1cP7QFKSZHDCCpbU8nSq9jy7X2grTjUVZDePexf6gc6AHtRRzkgfPW87K6EKUVV6t3Hu2hg7YkHkmMeLSfrP85x41")
 
     @Test
     fun specs_test_vectors() {
@@ -47,7 +46,7 @@ class LnurlAuthTest {
             initialUrl = Url("https://api.lnmarkets.com/v1/lnurl/auth?tag=login&k1=e94e9e54d97164751db976c347a1d325167d48c0f6c2e08688bec185fa5fc20a"),
             k1 = "e94e9e54d97164751db976c347a1d325167d48c0f6c2e08688bec185fa5fc20a"
         )
-        val linkingKey = LnurlAuth.getAuthLinkingKey(keyManager, master, auth.initialUrl, LnurlAuth.Scheme.DEFAULT_SCHEME)
+        val linkingKey = LnurlAuth.getAuthLinkingKey(keyManager, auth.initialUrl, LnurlAuth.Scheme.DEFAULT_SCHEME)
         assertEquals("03702494face111dcd61be4ab4a13fa4cd4ac720b2d3b47e95feee58484f573630", linkingKey.publicKey().toString())
 
         val signedChallenge = Crypto.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(auth.k1), privateKey = linkingKey)).toHex()
@@ -61,7 +60,7 @@ class LnurlAuthTest {
             initialUrl = Url("https://api.lnmarkets.com/v1/lnurl/auth?tag=login&k1=179062fdf971ec045883a6297fb1d260333358905086c33a9f44ff26f63bb425&hmac=75344d9151fe788345e620aa3de0e69b51698e759fd667272e3ea682a2bbcd12"),
             k1 = "179062fdf971ec045883a6297fb1d260333358905086c33a9f44ff26f63bb425"
         )
-        val linkingKey = LnurlAuth.getAuthLinkingKey(keyManager, master, auth.initialUrl, LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME)
+        val linkingKey = LnurlAuth.getAuthLinkingKey(keyManager, auth.initialUrl, LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME)
         assertEquals("024d82b199464c9568f5cce92cf7370a8154d9ec0571905b596a4e9dcae69136d8", linkingKey.publicKey().toString())
 
         val signedChallenge = Crypto.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(auth.k1), privateKey = linkingKey)).toHex()

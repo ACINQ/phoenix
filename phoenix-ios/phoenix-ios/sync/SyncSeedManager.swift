@@ -45,7 +45,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	
 	/// The chain in use by PhoenixBusiness (e.g. Testnet)
 	///
-	private let chain: Chain
+	private let chain: Lightning_kmpNodeParams.Chain
 	
 	/// The 12-word seed phrase for the wallet.
 	///
@@ -76,7 +76,7 @@ class SyncSeedManager: SyncManagerProtcol {
 	
 	private var cancellables = Set<AnyCancellable>()
 	
-	init(chain: Chain, mnemonics: [String], encryptedNodeId: String) {
+	init(chain: Lightning_kmpNodeParams.Chain, mnemonics: [String], encryptedNodeId: String) {
 		log.trace("init()")
 		
 		self.chain = chain
@@ -97,106 +97,94 @@ class SyncSeedManager: SyncManagerProtcol {
 	// MARK: Fetch Seeds
 	// ----------------------------------------
 	
-	public class func fetchSeeds(chain: Chain) -> PassthroughSubject<SeedBackup, FetchSeedsError> {
+	public class func fetchSeeds(
+		chain: Lightning_kmpNodeParams.Chain
+	) -> PassthroughSubject<SeedBackup, FetchSeedsError> {
 		
 		let publisher = PassthroughSubject<SeedBackup, FetchSeedsError>()
 		
-		var startBatchFetch     : (() -> Void)!
-		var recursiveBatchFetch : ((CKQueryOperation) -> Void)!
-		
-		startBatchFetch = {
-			log.trace("fetchSeeds(): startBatchFetch()")
+		Task {
+			log.trace("fetchSeeds(): starting task")
 			
-			let predicate = NSPredicate(format: "TRUEPREDICATE")
-			let query = CKQuery(
-				recordType: record_table_name(chain: chain),
-				predicate: predicate
-			)
-			query.sortDescriptors = [
-				NSSortDescriptor(key: "creationDate", ascending: false)
-			]
+			let container = CKContainer.default()
+			let zoneID = CKRecordZone.default().zoneID
 			
-			let operation = CKQueryOperation(query: query)
-			operation.zoneID = CKRecordZone.default().zoneID
-			
-			recursiveBatchFetch(operation)
-		}
-		
-		recursiveBatchFetch = { (operation: CKQueryOperation) in
-			log.trace("fetchSeeds(): recursiveBatchFetch()")
-			
-			let recordMatchedBlock = {(recordID: CKRecord.ID, result: Result<CKRecord, Error>) in
-				log.debug("fetchSeeds(): recordMatchedBlock()")
-				
-				if case .success(let record) = result {
-					
-					if let mnemonics = record[record_column_mnemonics] as? String,
-						let language = record[record_column_language] as? String,
-						let name = record[record_column_name] as? String?
-					{
-						let item = SeedBackup(
-							recordID: recordID,
-							mnemonics: mnemonics,
-							language: language,
-							name: name,
-							created: record.creationDate ?? Date.distantPast
-						)
-						
-						publisher.send(item)
-					}
-				}
-			}
-			
-			let queryResultBlock = {(result: Result<CKQueryOperation.Cursor?, Error>) in
-
-				switch result {
-				case .success(let cursor):
-
-					if let cursor = cursor {
-						log.debug("fetchSeeds(): queryResultBlock(): moreInCloud = true")
-						recursiveBatchFetch(CKQueryOperation(cursor: cursor))
-
-					} else {
-						log.debug("fetchSeeds(): queryResultBlock(): moreInCloud = false")
-						publisher.send(completion: .finished)
-					}
-
-				case .failure(let error):
-
-					if let ckerror = error as? CKError {
-						log.debug("fetchSeeds(): queryResultBlock(): ckerror = \(String(describing: ckerror))")
-						publisher.send(completion: .failure(.cloudKit(underlying: ckerror)))
-					} else {
-						log.debug("fetchSeeds(): queryResultBlock(): error = \(String(describing: error))")
-						publisher.send(completion: .failure(.unknown(underlying: error)))
-					}
-				}
-			}
-
-			if #available(iOS 15.0, *) {
-				operation.recordMatchedBlock = recordMatchedBlock
-				operation.queryResultBlock = queryResultBlock
-			} else {
-				operation.recordFetchedBlock = {(record: CKRecord) in
-					recordMatchedBlock(record.recordID, Result.success(record))
-				}
-				operation.queryCompletionBlock = {(cursor: CKQueryOperation.Cursor?, error: Error?) in
-					if let error = error {
-						queryResultBlock(.failure(error))
-					} else {
-						queryResultBlock(.success(cursor))
-					}
-				}
-			}
-		
 			let configuration = CKOperation.Configuration()
 			configuration.allowsCellularAccess = true
-			operation.configuration = configuration
-
-			CKContainer.default().privateCloudDatabase.add(operation)
-		}
+			
+			do {
+				try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
+					
+					log.trace("fetchSeeds(): configured")
+					
+					let query = CKQuery(
+						recordType: record_table_name(chain: chain),
+						predicate: NSPredicate(format: "TRUEPREDICATE")
+					)
+					query.sortDescriptors = [
+						NSSortDescriptor(key: "creationDate", ascending: false)
+					]
+					
+					var done = false
+					var cursor: CKQueryOperation.Cursor? = nil
+					
+					while !done {
+						
+						log.trace("fetchSeeds(): sending query...")
+						
+						let results: [(CKRecord.ID, Result<CKRecord, Error>)]
+						if let prvCursor = cursor {
+							(results, cursor) = try await database.records(continuingMatchFrom: prvCursor)
+						} else {
+							(results, cursor) = try await database.records(matching: query, inZoneWith: zoneID)
+						}
+						
+						for (recordID, result) in results {
+							
+							if case .success(let record) = result {
+								
+								if let mnemonics = record[record_column_mnemonics] as? String,
+									let language = record[record_column_language] as? String,
+									let name = record[record_column_name] as? String?
+								{
+									let item = SeedBackup(
+										recordID: recordID,
+										mnemonics: mnemonics,
+										language: language,
+										name: name,
+										created: record.creationDate ?? Date.distantPast
+									)
+									
+									publisher.send(item)
+								}
+							}
+						}
+						
+						if cursor == nil {
+							log.debug("fetchSeeds(): queryResultBlock(): moreInCloud = false")
+							publisher.send(completion: .finished)
+							done = true
+							
+						} else {
+							log.debug("fetchSeeds(): queryResultBlock(): moreInCloud = true")
+						}
+						
+					} // </while !done>
+					
+				} // </configuredWith>
+			} catch {
+				
+				if let ckerror = error as? CKError {
+					log.debug("fetchSeeds(): ckerror = \(String(describing: ckerror))")
+					publisher.send(completion: .failure(.cloudKit(underlying: ckerror)))
+				} else {
+					log.debug("fetchSeeds(): error = \(String(describing: error))")
+					publisher.send(completion: .failure(.unknown(underlying: error)))
+				}
+			}
+			
+		} // </Task>
 		
-		startBatchFetch()
 		return publisher
 	}
 	
@@ -344,219 +332,210 @@ class SyncSeedManager: SyncManagerProtcol {
 		log.trace("uploadSeed()")
 		
 		let uploadedName = Prefs.shared.backupSeed.name(encryptedNodeId: encryptedNodeId) ?? ""
-		
-		var cancellables = Set<AnyCancellable>()
-		let finish = { (result: Result<Void, Error>) in
+		Task {
+			log.trace("uploadSeed(): starting task")
 			
-			switch result {
-			case .success:
-				log.trace("uploadSeed(): finish(): success")
-				
-				let currentName = Prefs.shared.backupSeed.name(encryptedNodeId: self.encryptedNodeId) ?? ""
-				let needsReUpload = currentName != uploadedName
-				
-				if needsReUpload {
-					log.debug("uploadSeed(): finish(): needsReUpload")
-				} else {
-					Prefs.shared.backupSeed.setHasUploadedSeed(true, encryptedNodeId: self.encryptedNodeId)
-				}
-				self.consecutiveErrorCount = 0
-				Task {
-					if let newState = await self.actor.didUploadSeed(needsReUpload: needsReUpload) {
-						self.handleNewState(newState)
+			let container = CKContainer.default()
+			
+			let configuration = CKOperation.Configuration()
+			configuration.allowsCellularAccess = true
+			
+			do {
+				try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
+					
+					log.trace("uploadSeed(): configured")
+					
+					let record = CKRecord(
+						recordType: SyncSeedManager.record_table_name(chain: chain),
+						recordID: recordID()
+					)
+					
+					record[record_column_mnemonics] = mnemonics
+					record[record_column_language] = "en"
+					record[record_column_name] = uploadedName
+					
+					let started = Date.now
+					let (saveResults, _) = try await database.modifyRecords(
+						saving: [record],
+						deleting: [],
+						savePolicy: .changedKeys
+					)
+					
+					let result = saveResults[record.recordID]!
+					
+					if case let .failure(error) = result {
+						log.trace("uploadSeed(): perRecordResult: failure")
+						throw error
 					}
-				}
+					
+					log.trace("uploadSeed(): perRecordResult: success")
+					
+					// UI optimization:
+					// When the user enables seed-backup, they watch as the seed is uploaded.
+					// That is, the UI displays the progress to them with a little spinner.
+					//
+					// Now, when the process takes a few seconds, the user experience is pleasant:
+					// - the user sees the message "uploading to the cloud"
+					// - there's a little spinner animation
+					// - a few seconds later, the process finishes
+					// - and the UI says "your seed is stored in the cloud"
+					//
+					// Then end result is higher confidence in the user.
+					//
+					// However, if the process is too quick, the user experience is different:
+					// - the UI flickers in an unreadable way
+					// - then the UI says "your seed is stored in the cloud"
+					//
+					// The user doesn't know what the flickering UI was for.
+					// And they have to trust that their seed is, indeed, stored in the cloud.
+					//
+					// For this reason we're going to introduce a "readability" delay.
+					
+					let elapsed = abs(Date.now.timeIntervalSince(started))
+					let minElapsed: TimeInterval = 3.0 // seconds
+					
+					if elapsed < minElapsed { // seconds
+						
+						let delay: TimeInterval = minElapsed - elapsed
+						log.trace("uploadSeed(): readabilityDelay = \(delay) seconds")
+						
+						if #available(iOS 16.0, *) {
+							try await Task.sleep(for: Duration.seconds(delay))
+						} else {
+							try await Task.sleep(nanoseconds: UInt64(delay * Double(1_000_000_000)))
+						}
+					}
+					
+					// Since this is an async process, the user may have changed the seed name again
+					// while we were uploading the original name. So we need to check for that.
+					
+					let currentName = Prefs.shared.backupSeed.name(encryptedNodeId: self.encryptedNodeId) ?? ""
+					let needsReUpload = currentName != uploadedName
+					
+					if needsReUpload {
+						log.debug("uploadSeed(): finished: needsReUpload")
+					} else {
+						log.trace("uploadSeed(): finished: success")
+						Prefs.shared.backupSeed.setHasUploadedSeed(true, encryptedNodeId: self.encryptedNodeId)
+					}
+					self.consecutiveErrorCount = 0
+					
+					Task {
+						if let newState = await self.actor.didUploadSeed(needsReUpload: needsReUpload) {
+							self.handleNewState(newState)
+						}
+					}
+					
+				} // </configuredWith>
 				
-			case .failure(let error):
-				log.trace("uploadSeed(): finish(): failure")
+			} catch {
+				
+				log.debug("uploadSeed(): error = \(String(describing: error))")
 				self.handleError(error)
 			}
-			
-			cancellables.removeAll()
-		}
-		
-		// UI optimization:
-		// When the user enables seed-backup, they watch as the seed is uploaded.
-		// That is, the UI displays the progress to them with a little spinner.
-		//
-		// Now, when the process takes a few seconds, the user experience is pleasant:
-		// - the user sees the message "uploading to the cloud"
-		// - there's a little spinner animation
-		// - a few seconds later, the process finishes
-		// - and the UI says "your seed is stored in the cloud"
-		//
-		// Then end result is higher confidence in the user.
-		//
-		// However, if the process is too quick, the user experience is different:
-		// - the UI flickers in an unreadable way
-		// - then the UI says "your seed is stored in the cloud"
-		//
-		// The user doesn't know what the flickering UI was for.
-		// And they have to trust that their seed is, indeed, stored in the cloud.
-		//
-		// For this reason we're going to introduce a "readability" delay.
-		
-		let taskPublisher = PassthroughSubject<Result<Void, Error>, Never>()
-		let minDelayPublisher = PassthroughSubject<Void, Never>()
-		
-		Publishers.Zip(
-			taskPublisher,
-			minDelayPublisher.delay(for: 2.5, scheduler: RunLoop.main)
-		).sink { tuple in
-			finish(tuple.0)
-		}.store(in: &cancellables)
-		
-		minDelayPublisher.send()
-		
-		let record = CKRecord(
-			recordType: SyncSeedManager.record_table_name(chain: chain),
-			recordID: recordID()
-		)
-		
-		record[record_column_mnemonics] = mnemonics
-		record[record_column_language] = "en"
-		record[record_column_name] = uploadedName
-		
-		let operation = CKModifyRecordsOperation(
-			recordsToSave: [record],
-			recordIDsToDelete: []
-		)
-		
-		operation.savePolicy = .changedKeys
-		
-		let perRecordSaveBlock = {(recordID: CKRecord.ID, result: Result<CKRecord, Error>) -> Void in
-			
-			switch result {
-			case .success(_):
-				log.trace("uploadSeed(): perRecordSaveBlock(): success")
-				taskPublisher.send(.success)
-			case .failure(let error):
-				log.trace("uploadSeed(): perRecordSaveBlock(): failure")
-				taskPublisher.send(.failure(error))
-			}
-		}
-		
-		if #available(iOS 15.0, *) {
-			operation.perRecordSaveBlock = perRecordSaveBlock
-		} else {
-			operation.perRecordCompletionBlock = {(record: CKRecord, error: Error?) -> Void in
-				if let error = error {
-					perRecordSaveBlock(record.recordID, Result.failure(error))
-				} else {
-					perRecordSaveBlock(record.recordID, Result.success(record))
-				}
-			}
-		}
-		
-		let configuration = CKOperation.Configuration()
-		configuration.allowsCellularAccess = true
-		operation.configuration = configuration
-		
-		CKContainer.default().privateCloudDatabase.add(operation)
+		} // </Task>
 	}
 	
 	private func deleteSeed() {
 		log.trace("deleteSeed()")
 		
-		let finish = { (result: Result<Void, Error>) in
+		Task {
+			log.trace("deleteSeed(): starting task")
 			
-			switch result {
-			case .success:
-				log.trace("deleteSeed(): finish(): success")
-				
-				Prefs.shared.backupSeed.setHasUploadedSeed(false, encryptedNodeId: self.encryptedNodeId)
-				self.consecutiveErrorCount = 0
-				Task {
-					if let newState = await self.actor.didDeleteSeed() {
-						self.handleNewState(newState)
+			let container = CKContainer.default()
+			
+			let configuration = CKOperation.Configuration()
+			configuration.allowsCellularAccess = true
+			
+			do {
+				try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
+					
+					log.trace("deleteSeed(): configured")
+					
+					let recordID = recordID()
+					
+					let started = Date.now
+					let (_, deleteResults) = try await database.modifyRecords(
+						saving: [],
+						deleting: [recordID],
+						savePolicy: .changedKeys
+					)
+					
+					// deleteResults: [CKRecord.ID : Result<Void, Error>]
+					
+					let result = deleteResults[recordID]!
+					
+					if case let .failure(error) = result {
+						log.trace("deleteSeed(): perRecordResult: failure")
+						throw error
 					}
-				}
+					
+					log.trace("deleteSeed(): perRecordResult: success")
+					
+					// UI optimization:
+					// When the user disables seed-backup, they watch as the seed is deleted.
+					// That is, the UI displays the progress to them with a little spinner.
+					//
+					// Now, when the process takes a few seconds, the user experience is pleasant:
+					// - the user sees the message "deleting from the cloud"
+					// - there's a little spinner animation
+					// - a few seconds later, the process finishes
+					// - and the UI says "you are responsible for backing up your seed"
+					//
+					// Then end result is higher confidence in the user.
+					// The user knows the seed was deleted from the cloud.
+					//
+					// However, if the process is too quick, the user experience is different:
+					// - the UI flickers in an unreadable way
+					// - then the UI says "you are responsible for backing up your seed"
+					//
+					// The user doesn't know what the flickering UI was for.
+					// And they have to trust that their seed was, indeed, deleted from the cloud.
+					//
+					// For this reason we're going to introduce a "readability" delay.
+					
+					let elapsed = abs(Date.now.timeIntervalSince(started))
+					let minElapsed: TimeInterval = 3.0 // seconds
+					
+					if elapsed < minElapsed { // seconds
+						
+						let delay: TimeInterval = minElapsed - elapsed
+						log.trace("deleteSeed(): readabilityDelay = \(delay) seconds")
+						
+						if #available(iOS 16.0, *) {
+							try await Task.sleep(for: Duration.seconds(delay))
+						} else {
+							try await Task.sleep(nanoseconds: UInt64(delay * Double(1_000_000_000)))
+						}
+					}
+					
+					log.trace("deleteSeed(): finish: success")
+					
+					Prefs.shared.backupSeed.setHasUploadedSeed(false, encryptedNodeId: self.encryptedNodeId)
+					self.consecutiveErrorCount = 0
+					
+					Task {
+						if let newState = await self.actor.didDeleteSeed() {
+							self.handleNewState(newState)
+						}
+					}
+					
+				} // </configuredWith>
 				
-			case .failure(let error):
-				log.trace("deleteSeed(): finish(): failure")
+			} catch {
+				
+				log.debug("deletedSeed(): error = \(String(describing: error))")
 				self.handleError(error)
 			}
-		}
-		
-		// UI optimization:
-		// When the user disables seed-backup, they watch as the seed is deleted.
-		// That is, the UI displays the progress to them with a little spinner.
-		//
-		// Now, when the process takes a few seconds, the user experience is pleasant:
-		// - the user sees the message "deleting from the cloud"
-		// - there's a little spinner animation
-		// - a few seconds later, the process finishes
-		// - and the UI says "you are responsible for backing up your seed"
-		//
-		// Then end result is higher confidence in the user.
-		// The user knows the seed was deleted from the cloud.
-		//
-		// However, if the process is too quick, the user experience is different:
-		// - the UI flickers in an unreadable way
-		// - then the UI says "you are responsible for backing up your seed"
-		//
-		// The user doesn't know what the flickering UI was for.
-		// And they have to trust that their seed was, indeed, deleted from the cloud.
-		//
-		// For this reason we're going to introduce a "readability" delay.
-		
-		let taskPublisher = PassthroughSubject<Result<Void, Error>, Never>()
-		let minDelayPublisher = PassthroughSubject<Void, Never>()
-		
-		Publishers.Zip(
-			taskPublisher,
-			minDelayPublisher.delay(for: 2.5, scheduler: RunLoop.main)
-		).sink { tuple in
-			finish(tuple.0)
-		}.store(in: &cancellables)
-		
-		minDelayPublisher.send()
-		
-		let recordID = recordID()
-		let operation = CKModifyRecordsOperation(
-			recordsToSave: [],
-			recordIDsToDelete: [recordID]
-		)
-		
-		let perRecordDeleteBlock = {(recordID: CKRecord.ID, result: Result<Void, Error>) in
 			
-			// Note: if the record doesn't exist, and we try to delete it,
-			// CloudKit reports a success result.
-			
-			switch result {
-			case .success(_):
-				log.trace("deleteSeed(): perRecordDeleteBlock(): success")
-				taskPublisher.send(.success)
-			case .failure(let error):
-				log.trace("deleteSeed(): perRecordDeleteBlock(): failure")
-				taskPublisher.send(.failure(error))
-			}
-		}
-		
-		if #available(iOS 15.0, *) {
-			operation.perRecordDeleteBlock = perRecordDeleteBlock
-		} else {
-			operation.modifyRecordsCompletionBlock = {(saved: [CKRecord]?, deleted: [CKRecord.ID]?, error: Error?) in
-				if let error = error {
-					perRecordDeleteBlock(recordID, Result.failure(error))
-				} else {
-					perRecordDeleteBlock(recordID, Result.success)
-				}
-			}
-		}
-		
-		let configuration = CKOperation.Configuration()
-		configuration.allowsCellularAccess = true
-		operation.configuration = configuration
-		
-		CKContainer.default().privateCloudDatabase.add(operation)
+		} // </Task>
 	}
 	
 	// ----------------------------------------
 	// MARK: Utilities
 	// ----------------------------------------
 	
-	private class func record_table_name(chain: Chain) -> String {
+	private class func record_table_name(chain: Lightning_kmpNodeParams.Chain) -> String {
 		
 		// From Apple's docs:
 		// > A record type must consist of one or more alphanumeric characters
@@ -603,16 +582,11 @@ class SyncSeedManager: SyncManagerProtcol {
 				
 				case CKError.notAuthenticated.rawValue:
 					isNotAuthenticated = true
+				
+				case CKError.accountTemporarilyUnavailable.rawValue:
+					isNotAuthenticated = true
 					
 				default: break
-			}
-			if #available(iOS 15.0, *) {
-				switch ckerror.errorCode {
-					case CKError.accountTemporarilyUnavailable.rawValue:
-						isNotAuthenticated = true
-					
-					default: break
-				}
 			}
 			
 			// Sometimes a `notAuthenticated` error is hidden in a partial error.
@@ -623,11 +597,8 @@ class SyncSeedManager: SyncManagerProtcol {
 					
 					if errCode == CKError.notAuthenticated.rawValue {
 						isNotAuthenticated = true
-					}
-					if #available(iOS 15.0, *) {
-						if errCode == CKError.accountTemporarilyUnavailable.rawValue {
-							isNotAuthenticated = true
-						}
+					} else if errCode == CKError.accountTemporarilyUnavailable.rawValue {
+						isNotAuthenticated = true
 					}
 				}
 			}

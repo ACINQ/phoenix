@@ -24,8 +24,13 @@ extension Lightning_kmpWalletPayment {
 				let exp = NSLocalizedString("non-invoice payment", comment: "Transaction Info: Explanation")
 				return (val, exp.lowercased())
 			}
+			if incomingPayment.isSpliceIn {
+				let val = NSLocalizedString("Splice-In", comment: "Transaction Info: Value")
+				let exp = NSLocalizedString("adding to existing channel", comment: "Transaction Info: Explanation")
+				return (val, exp.lowercased())
+			}
 			
-		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
+		} else if let outgoingPayment = self as? Lightning_kmpLightningOutgoingPayment {
 			
 			if let _ = outgoingPayment.details.asSwapOut() {
 				let val = NSLocalizedString("Swap-Out", comment: "Transaction Info: Value")
@@ -37,11 +42,12 @@ extension Lightning_kmpWalletPayment {
 				let exp = NSLocalizedString("non-invoice payment", comment: "Transaction Info: Explanation")
 				return (val, exp.lowercased())
 			}
-			if let _ = outgoingPayment.details.asChannelClosing() {
-				let val = NSLocalizedString("Channel Closing", comment: "Transaction Info: Value")
-				let exp = NSLocalizedString("layer 2 -> 1", comment: "Transaction Info: Explanation")
-				return (val, exp.lowercased())
-			}
+			
+		} else if let _ = self as? Lightning_kmpChannelCloseOutgoingPayment {
+			
+			let val = NSLocalizedString("Channel Closing", comment: "Transaction Info: Value")
+			let exp = NSLocalizedString("layer 2 -> 1", comment: "Transaction Info: Explanation")
+			return (val, exp.lowercased())
 		}
 		
 		return nil
@@ -56,7 +62,7 @@ extension Lightning_kmpWalletPayment {
 				address = swapIn.address
 			}
 			
-		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
+		} else if let outgoingPayment = self as? Lightning_kmpLightningOutgoingPayment {
 		
 			if let swapOut = outgoingPayment.details.asSwapOut() {
 				address = swapOut.address
@@ -76,25 +82,28 @@ extension Lightning_kmpWalletPayment {
 		return nil
 	}
 	
-	func channelClosing() -> Lightning_kmpOutgoingPayment.DetailsChannelClosing? {
+	func channelClosing() -> Lightning_kmpChannelCloseOutgoingPayment? {
 		
-		if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
-			if let result = outgoingPayment.details.asChannelClosing() {
-				return result
-			}
-		}
-		
-		return nil
+		return self as? Lightning_kmpChannelCloseOutgoingPayment
 	}
 	
 	func standardFees() -> (Int64, String, String)? {
 		
 		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
 		
-			// An incomingPayment may have fees if a new channel was automatically opened
+			// An incomingPayment may have service fees if a new channel was automatically opened
 			if let received = incomingPayment.received {
-					
-				let msat = received.receivedWith.map { $0.fees.msat }.reduce(0, +)
+				
+				let msat = received.receivedWith.map {
+					if let newChannel = $0 as? Lightning_kmpIncomingPayment.ReceivedWithNewChannel {
+						return newChannel.serviceFee.msat
+					} else if let spliceIn = $0 as? Lightning_kmpIncomingPayment.ReceivedWithSpliceIn {
+						return spliceIn.serviceFee.msat
+					} else {
+						return $0.fees.msat
+					}
+				}.reduce(0, +)
+				
 				if msat > 0 {
 					
 					let title = NSLocalizedString("Service Fees", comment: "Label in SummaryInfoGrid")
@@ -108,7 +117,8 @@ extension Lightning_kmpWalletPayment {
 					
 					return (msat, title, exp)
 				}
-				else {
+				else if !incomingPayment.isSpliceIn {
+					
 					// I think it's nice to see "Fees: 0 sat" :)
 					
 					let msat = Int64(0)
@@ -119,7 +129,7 @@ extension Lightning_kmpWalletPayment {
 				}
 			}
 			
-		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
+		} else if let outgoingPayment = self as? Lightning_kmpLightningOutgoingPayment {
 		
 			if let _ = outgoingPayment.status.asOffChain() {
 				
@@ -131,10 +141,8 @@ extension Lightning_kmpWalletPayment {
 				var parts = 0
 				var hops = 0
 				for part in outgoingPayment.parts {
-					if (part is Lightning_kmpOutgoingPayment.LightningPart) {
-						parts += 1
-						hops = (part as! Lightning_kmpOutgoingPayment.LightningPart).route.count
-					}
+					parts += 1
+					hops += part.route.count
 				}
 				
 				let title = NSLocalizedString("Lightning Fees", comment: "Label in SummaryInfoGrid")
@@ -170,31 +178,47 @@ extension Lightning_kmpWalletPayment {
 	
 	func minerFees() -> (Int64, String, String)? {
 		
-		if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
+		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
 			
-			if let _ = outgoingPayment.status.asOnChain() {
+			if let received = incomingPayment.received {
 				
-				// For on-chain payments, the fees are extracted from the mined transaction(s)
+				// An incomingPayment may have minerFees if a new channel was opened using dual-funding
 				
-				let msat = outgoingPayment.fees.msat
-				let title = NSLocalizedString("Miner Fees", comment: "Label in SummaryInfoGrid")
+				let sat = received.receivedWith.map {
+					if let newChannel = $0 as? Lightning_kmpIncomingPayment.ReceivedWithNewChannel {
+						return newChannel.miningFee.sat
+					} else if let spliceIn = $0 as? Lightning_kmpIncomingPayment.ReceivedWithSpliceIn {
+						return spliceIn.miningFee.sat
+					} else {
+						return Int64(0)
+					}
+				}.reduce(0, +)
 				
-				let txCount = outgoingPayment.closingTxParts().count
-				let exp: String
-				if txCount == 1 {
-					exp = NSLocalizedString(
-						"Bitcoin network fees paid for on-chain transaction. Payment required 1 transaction.",
+				if sat > 0 {
+					
+					let msat = Utils.toMsat(sat: sat)
+					let title = NSLocalizedString("Miner Fees", comment: "Label in SummaryInfoGrid")
+					let exp = NSLocalizedString(
+						"Bitcoin network fees paid for on-chain transaction.",
 						comment: "Fees explanation"
 					)
-				} else {
-					exp = NSLocalizedString(
-						"Bitcoin network fees paid for on-chain transactions. Payment required \(txCount) transactions.",
-						comment: "Fees explanation"
-					)
+					
+					return (msat, title, exp)
 				}
-				
-				return (msat, title, exp)
 			}
+			
+		} else if let onChainOutgoingPayment = self as? Lightning_kmpOnChainOutgoingPayment {
+			
+			let sat = onChainOutgoingPayment.miningFees.sat
+			let msat = Utils.toMsat(sat: sat)
+			
+			let title = NSLocalizedString("Miner Fees", comment: "Label in SummaryInfoGrid")
+			let exp = NSLocalizedString(
+				"Bitcoin network fees paid for on-chain transaction.",
+				comment: "Fees explanation"
+			)
+			
+			return (msat, title, exp)
 		}
 		
 		return nil
@@ -202,7 +226,7 @@ extension Lightning_kmpWalletPayment {
 	
 	func swapOutFees() -> (Int64, String, String)? {
 		
-		if let outgoingPayment = self as? Lightning_kmpOutgoingPayment,
+		if let outgoingPayment = self as? Lightning_kmpLightningOutgoingPayment,
 		   let _ = outgoingPayment.details.asSwapOut() {
 			
 			let msat = outgoingPayment.fees.msat - outgoingPayment.routingFee.msat
@@ -224,7 +248,7 @@ extension Lightning_kmpWalletPayment {
 	///
 	func paymentTimeElapsed() -> Int64? {
 
-		if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
+		if let outgoingPayment = self as? Lightning_kmpLightningOutgoingPayment {
 			
 			let started = outgoingPayment.createdAt
 			var finished: Int64? = nil
@@ -246,7 +270,7 @@ extension Lightning_kmpWalletPayment {
 	
 	func paymentFinalError() -> String? {
 
-		if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
+		if let outgoingPayment = self as? Lightning_kmpLightningOutgoingPayment {
 			
 			if let failed = outgoingPayment.status.asFailed() {
 				
@@ -255,30 +279,5 @@ extension Lightning_kmpWalletPayment {
 		}
 		
 		return nil
-	}
-}
-
-extension Lightning_kmpOutgoingPayment {
-	
-	func closingTxParts() -> [Lightning_kmpOutgoingPayment.ClosingTxPart] {
-		
-		var closingTxParts = [Lightning_kmpOutgoingPayment.ClosingTxPart]()
-		for part in self.parts {
-			if let closingTxPart = part as? Lightning_kmpOutgoingPayment.ClosingTxPart {
-				closingTxParts.append(closingTxPart)
-			}
-		}
-		
-		return closingTxParts
-	}
-	
-	func claimedOnChain() -> Bitcoin_kmpSatoshi {
-		
-		var sat: Int64 = 0
-		for part in closingTxParts() {
-			sat += part.claimed.sat
-		}
-		
-		return Bitcoin_kmpSatoshi(sat: sat)
 	}
 }

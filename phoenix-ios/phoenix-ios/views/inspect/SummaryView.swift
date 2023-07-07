@@ -155,9 +155,11 @@ struct SummaryView: View {
 	func header_status() -> some View {
 		
 		let payment = paymentInfo.payment
+		let paymentState = payment.state()
 		
-		switch payment.state() {
-		case .success:
+		if paymentState == WalletPaymentState.successonchain ||
+		   paymentState == WalletPaymentState.successoffchain
+		{
 			Image("ic_payment_sent")
 				.renderingMode(.template)
 				.resizable()
@@ -179,7 +181,7 @@ struct SummaryView: View {
 				.font(Font.title2.bold())
 				.padding(.bottom, 2)
 				
-				if let completedAtDate = payment.completedAtDate() {
+				if let completedAtDate = payment.completedAtDate {
 					Text(completedAtDate.format())
 						.font(.subheadline)
 						.foregroundColor(.secondary)
@@ -187,39 +189,58 @@ struct SummaryView: View {
 			}
 			.padding(.bottom, 30)
 			
-		case .pending:
-			if payment.isOnChain() {
-				Image(systemName: "hourglass.circle")
-					.renderingMode(.template)
-					.resizable()
-					.foregroundColor(Color.borderColor)
-					.frame(width: 100, height: 100)
-					.padding(.bottom, 16)
-					.accessibilityHidden(true)
-				VStack(alignment: HorizontalAlignment.center, spacing: 2) {
-					Text("WAITING FOR CONFIRMATIONS")
-						.font(.title2.uppercaseSmallCaps())
-						.multilineTextAlignment(.center)
-						.padding(.bottom, 6)
-						.accessibilityLabel("Pending payment")
-						.accessibilityHint("Waiting for confirmations")
-				} // </VStack>
-				.padding(.bottom, 30)
-			} else {
-				Image("ic_payment_sending")
-					.renderingMode(.template)
-					.resizable()
-					.foregroundColor(Color.borderColor)
-					.frame(width: 100, height: 100)
-					.padding(.bottom, 16)
-					.accessibilityHidden(true)
-				Text("PENDING")
-					.font(.title2.bold())
-					.padding(.bottom, 30)
-					.accessibilityLabel("Pending payment")
-			}
+		} else if paymentState == WalletPaymentState.pendingonchain {
 			
-		case .failure:
+			Image(systemName: "hourglass.circle")
+				.renderingMode(.template)
+				.resizable()
+				.foregroundColor(Color.borderColor)
+				.frame(width: 100, height: 100)
+				.padding(.bottom, 16)
+				.accessibilityHidden(true)
+			VStack(alignment: HorizontalAlignment.center, spacing: 2) {
+				Text("WAITING FOR CONFIRMATIONS")
+					.font(.title2.uppercaseSmallCaps())
+					.multilineTextAlignment(.center)
+					.padding(.bottom, 6)
+					.accessibilityLabel("Pending payment")
+					.accessibilityHint("Waiting for confirmations")
+				if let depth = minFundingDepth() {
+					let minutes = depth * 10
+					Text("requires \(depth) confirmations")
+						.font(.footnote)
+						.multilineTextAlignment(.center)
+						.foregroundColor(.secondary)
+					Text("≈\(minutes) minutes")
+						.font(.footnote)
+						.multilineTextAlignment(.center)
+						.foregroundColor(.secondary)
+				}
+				if let broadcastDate = onChainBroadcastDate() {
+					Text(broadcastDate.format())
+						.font(.subheadline)
+						.foregroundColor(.secondary)
+						.padding(.top, 12)
+				}
+			} // </VStack>
+			.padding(.bottom, 30)
+			
+		} else if paymentState == WalletPaymentState.pendingoffchain {
+			
+			Image("ic_payment_sending")
+				.renderingMode(.template)
+				.resizable()
+				.foregroundColor(Color.borderColor)
+				.frame(width: 100, height: 100)
+				.padding(.bottom, 16)
+				.accessibilityHidden(true)
+			Text("PENDING")
+				.font(.title2.bold())
+				.padding(.bottom, 30)
+				.accessibilityLabel("Pending payment")
+			
+		} else if paymentState == WalletPaymentState.failure {
+			
 			Image(systemName: "xmark.circle")
 				.renderingMode(.template)
 				.resizable()
@@ -237,7 +258,7 @@ struct SummaryView: View {
 					.font(.title2.uppercaseSmallCaps())
 					.padding(.bottom, 6)
 				
-				if let completedAtDate = payment.completedAtDate() {
+				if let completedAtDate = payment.completedAtDate {
 					Text(completedAtDate.format())
 						.font(Font.subheadline)
 						.foregroundColor(.secondary)
@@ -246,7 +267,7 @@ struct SummaryView: View {
 			} // </VStack>
 			.padding(.bottom, 30)
 			
-		default:
+		} else {
 			EmptyView()
 		}
 	}
@@ -357,12 +378,8 @@ struct SummaryView: View {
 	@ViewBuilder
 	func buttonList() -> some View {
 		
-		if #available(iOS 15.0, *) {
-			if paymentInfo.payment.state() == WalletPaymentState.failure {
-				buttonList_withDeleteOption()
-			} else {
-				buttonList_standardOptions()
-			}
+		if paymentInfo.payment.state() == WalletPaymentState.failure {
+			buttonList_withDeleteOption()
 		} else {
 			buttonList_standardOptions()
 		}
@@ -401,7 +418,6 @@ struct SummaryView: View {
 	}
 	
 	@ViewBuilder
-	@available(iOS 15.0, *)
 	func buttonList_withDeleteOption() -> some View {
 		
 		// Details | Edit | Delete
@@ -457,7 +473,9 @@ struct SummaryView: View {
 	func detailsView() -> some View {
 		DetailsView(
 			type: type,
-			paymentInfo: $paymentInfo
+			paymentInfo: $paymentInfo,
+			showOriginalFiatValue: $showOriginalFiatValue,
+			showFiatValueExplanation: $showFiatValueExplanation
 		)
 	}
 	
@@ -472,6 +490,35 @@ struct SummaryView: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	func minFundingDepth() -> Int32? {
+		
+		guard
+			let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment,
+			let received = incomingPayment.received,
+			let newChannel = received.receivedWith.compactMap({ $0.asNewChannel() }).first,
+			let channel = Biz.business.peerManager.getChannelWithCommitments(channelId: newChannel.channelId),
+			let nodeParams = Biz.business.nodeParamsManager.nodeParams.value_ as? Lightning_kmpNodeParams
+		else {
+			return nil
+		}
+		
+		return channel.minDepthForFunding(nodeParams: nodeParams)
+	}
+	
+	func onChainBroadcastDate() -> Date? {
+		
+		if let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment {
+			
+			if let _ = incomingPayment.origin.asOnChain() {
+				if let received = incomingPayment.received {
+					return received.receivedAtDate
+				}
+			}
+		}
+		
+		return nil
+	}
 	
 	func formattedAmount() -> FormattedAmount {
 		
@@ -569,7 +616,7 @@ struct SummaryView: View {
 		
 		Biz.business.databaseManager.paymentsDb { paymentsDb, _ in
 			
-			paymentsDb?.deletePayment(paymentId: paymentInfo.id(), completionHandler: { _, error in
+			paymentsDb?.deletePayment(paymentId: paymentInfo.id(), completionHandler: { error in
 				
 				if let error = error {
 					log.error("Error deleting payment: \(String(describing: error))")
@@ -594,15 +641,23 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	@Binding var showOriginalFiatValue: Bool
 	
 	// <InfoGridView Protocol>
-	@State var keyColumnWidths: [InfoGridRow_KeyColumn_Width] = []
 	let minKeyColumnWidth: CGFloat = 50
 	let maxKeyColumnWidth: CGFloat = 200
 	
-	func setKeyColumnWidths(_ value: [InfoGridRow_KeyColumn_Width]) {
-		keyColumnWidths = value
+	@State var keyColumnSizes: [InfoGridRow_KeyColumn_Size] = []
+	func setKeyColumnSizes(_ value: [InfoGridRow_KeyColumn_Size]) {
+		keyColumnSizes = value
 	}
-	func getKeyColumnWidths() -> [InfoGridRow_KeyColumn_Width] {
-		return keyColumnWidths
+	func getKeyColumnSizes() -> [InfoGridRow_KeyColumn_Size] {
+		return keyColumnSizes
+	}
+	
+	@State var rowSizes: [InfoGridRow_Size] = []
+	func setRowSizes(_ sizes: [InfoGridRow_Size]) {
+		rowSizes = sizes
+	}
+	func getRowSizes() -> [InfoGridRow_Size] {
+		return rowSizes
 	}
 	// </InfoGridView Protocol>
 	
@@ -665,9 +720,15 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func keyColumn(_ str: String) -> some View {
+	func keyColumn(_ title: LocalizedStringKey) -> some View {
 		
-		Text(str).foregroundColor(.secondary)
+		Text(title).foregroundColor(.secondary)
+	}
+	
+	@ViewBuilder
+	func keyColumn(verbatim title: String) -> some View {
+		
+		Text(title).foregroundColor(.secondary)
 	}
 	
 	@ViewBuilder
@@ -678,11 +739,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Service", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Service")
 				
 			} valueColumn: {
 				
@@ -698,11 +761,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 		
 		InfoGridRow(
 			identifier: identifier,
+			vAlignment: .firstTextBaseline,
 			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
+			keyColumnWidth: keyColumnWidth(identifier: identifier),
+			keyColumnAlignment: .trailing
 		) {
 			
-			keyColumn(NSLocalizedString("Desc", comment: "Label in SummaryInfoGrid"))
+			keyColumn("Desc")
 				.accessibilityLabel("Description")
 			
 		} valueColumn: {
@@ -729,11 +794,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Message", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Message")
 				
 			} valueColumn: {
 				
@@ -752,11 +819,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Message", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Message")
 				
 			} valueColumn: {
 				
@@ -786,11 +855,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Message", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Message")
 				
 			} valueColumn: {
 				
@@ -841,11 +912,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Notes", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Notes")
 				
 			} valueColumn: {
 				
@@ -863,11 +936,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Type", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Type")
 				
 			} valueColumn: {
 				
@@ -900,21 +975,23 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Output", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Output")
 				
 			} valueColumn: {
 				
 				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 					
 					// Bitcoin address (copyable)
-					Text(pClosingInfo.closingAddress)
+					Text(pClosingInfo.address)
 						.contextMenu {
 							Button(action: {
-								UIPasteboard.general.string = pClosingInfo.closingAddress
+								UIPasteboard.general.string = pClosingInfo.address
 							}) {
 								Text("Copy")
 							}
@@ -943,11 +1020,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 		
 		InfoGridRow(
 			identifier: identifier,
+			vAlignment: .firstTextBaseline,
 			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
+			keyColumnWidth: keyColumnWidth(identifier: identifier),
+			keyColumnAlignment: .trailing
 		) {
 			
-			keyColumn(title)
+			keyColumn(verbatim: title)
 			
 		} valueColumn: {
 				
@@ -996,9 +1075,8 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 							.font(.body)
 					}
 					.popover(present: binding) {
-						Templates.Container {
+						InfoPopoverWindow {
 							Text(verbatim: explanation)
-								.padding(.all, 4)
 						}
 					}
 				}
@@ -1015,11 +1093,13 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			InfoGridRow(
 				identifier: identifier,
+				vAlignment: .firstTextBaseline,
 				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
 			) {
 				
-				keyColumn(NSLocalizedString("Error", comment: "Label in SummaryInfoGrid"))
+				keyColumn("Error")
 				
 			} valueColumn: {
 				
@@ -1048,7 +1128,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	func decrypt(aes sa_aes: LnurlPay.Invoice_SuccessAction_Aes) -> LnurlPay.Invoice_SuccessAction_Aes_Decrypted? {
 		
 		guard
-			let outgoingPayment = paymentInfo.payment as? Lightning_kmpOutgoingPayment,
+			let outgoingPayment = paymentInfo.payment as? Lightning_kmpLightningOutgoingPayment,
 			let offchainSuccess = outgoingPayment.status.asOffChain()
 		else {
 			return nil

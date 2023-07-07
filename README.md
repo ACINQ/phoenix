@@ -27,7 +27,7 @@ Phoenix is available for Android and iOS:
 
 Phoenix is currently separated into two codebases:
 - the legacy Android app, found in the `phoenix-legacy` folder, using our own Scala [eclair-core](https://github.com/ACINQ/eclair) library for Lightning. Instructions to build this app are provided [here](https://github.com/ACINQ/phoenix/blob/master/phoenix-legacy/BUILD.md)
-- the iOS app found in the `phoenix-ios` folder, using our own Kotlin MultiPlatform [lightning-kmp](https://github.com/ACINQ/eclair) library for Lightning. Instructions to build this app are provided [here](https://github.com/ACINQ/phoenix/blob/master/BUILD.md)
+- the iOS app found in the `phoenix-ios` folder, using our own Kotlin MultiPlatform [lightning-kmp](https://github.com/ACINQ/lightning-kmp) library for Lightning. Instructions to build this app are provided [here](https://github.com/ACINQ/phoenix/blob/master/BUILD.md)
 
 The `phoenix-android` folder contains the new Android app that shares code with the iOS app and use lightning-kmp. This app is not ready yet. It will eventually replace the legacy Android app.
 

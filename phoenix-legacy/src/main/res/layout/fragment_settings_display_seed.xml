@@ -37,7 +37,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"
-      app:title="@string/displayseed_title" />
+      app:title="@string/legacy_displayseed_title" />
 
     <ScrollView
       android:layout_width="match_parent"
@@ -59,7 +59,7 @@
           android:id="@+id/instructions"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="@string/displayseed_instructions"
+          android:text="@string/legacy_displayseed_instructions"
           app:layout_constraintTop_toTopOf="parent" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
@@ -77,8 +77,8 @@
           app:layout_constraintHorizontal_bias="0"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/instructions"
-          app:paused_text="@string/displayseed_loading"
-          app:text="@string/displayseed_authenticate_button" />
+          app:paused_text="@string/legacy_displayseed_loading"
+          app:text="@string/legacy_displayseed_authenticate_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

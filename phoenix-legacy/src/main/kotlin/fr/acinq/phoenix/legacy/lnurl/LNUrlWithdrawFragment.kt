@@ -70,15 +70,15 @@ class LNUrlWithdrawFragment : BaseFragment() {
 
       model.state.observe(viewLifecycleOwner, Observer { state ->
         when (state) {
-          is LNUrlWithdrawState.Error.Internal -> mBinding.errorMessage.text = getString(R.string.lnurl_withdraw_error_internal)
+          is LNUrlWithdrawState.Error.Internal -> mBinding.errorMessage.text = getString(R.string.legacy_lnurl_withdraw_error_internal)
           is LNUrlWithdrawState.Error.RemoteFailure -> mBinding.errorMessage.text = when (state.error) {
-            is LNUrlError.RemoteFailure.Code -> Converter.html(getString(R.string.lnurl_withdraw_error_remote_code, state.error.origin, state.error.code))
-            is LNUrlError.RemoteFailure.Detailed -> Converter.html(getString(R.string.lnurl_withdraw_error_remote_detailed, state.error.origin, state.error.reason))
-            is LNUrlError.RemoteFailure.Unreadable -> Converter.html(getString(R.string.lnurl_withdraw_error_remote_unreadable, state.error.origin))
-            is LNUrlError.RemoteFailure.Generic -> Converter.html(getString(R.string.lnurl_withdraw_error_remote_generic, state.error.origin))
-            else -> getString(R.string.lnurl_withdraw_error_internal)
+            is LNUrlError.RemoteFailure.Code -> Converter.html(getString(R.string.legacy_lnurl_withdraw_error_remote_code, state.error.origin, state.error.code))
+            is LNUrlError.RemoteFailure.Detailed -> Converter.html(getString(R.string.legacy_lnurl_withdraw_error_remote_detailed, state.error.origin, state.error.reason))
+            is LNUrlError.RemoteFailure.Unreadable -> Converter.html(getString(R.string.legacy_lnurl_withdraw_error_remote_unreadable, state.error.origin))
+            is LNUrlError.RemoteFailure.Generic -> Converter.html(getString(R.string.legacy_lnurl_withdraw_error_remote_generic, state.error.origin))
+            else -> getString(R.string.legacy_lnurl_withdraw_error_internal)
           }
-          is LNUrlWithdrawState.Done -> mBinding.success.text = getString(R.string.lnurl_withdraw_success, model.callback.value!!.host())
+          is LNUrlWithdrawState.Done -> mBinding.success.text = getString(R.string.legacy_lnurl_withdraw_success, model.callback.value!!.host())
           else -> {}
         }
       })
@@ -119,7 +119,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
       try {
         val url = HttpUrl.get(it.callback)
         mBinding.confirmButton.setOnClickListener { _ -> sendWithdrawToRemote(url.newBuilder().addEncodedQueryParameter("k1", it.walletIdentifier), it.description) }
-        mBinding.serviceHost.text = Converter.html(getString(R.string.lnurl_withdraw_service_host_label, model.callback.value!!.host()))
+        mBinding.serviceHost.text = Converter.html(getString(R.string.legacy_lnurl_withdraw_service_host_label, model.callback.value!!.host()))
         context?.let { ctx -> mBinding.amountValue.setText(Converter.printAmountRaw(it.maxWithdrawable, ctx)) }
         model.editableAmount.value = it.maxWithdrawable.toLong() != it.minWithdrawable.toLong()
       } catch (e: Exception) {
@@ -149,9 +149,9 @@ class LNUrlWithdrawFragment : BaseFragment() {
           throw LNUrlError.WithdrawAtMostMaxSat(args.url.maxWithdrawable)
         }
         if (unit == fiat) {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount, requireContext(), withUnit = true))
+          mBinding.amountConverted.text = getString(R.string.legacy_utils_converted_amount, Converter.printAmountPretty(amount, requireContext(), withUnit = true))
         } else {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(requireContext(), amount, withUnit = true))
+          mBinding.amountConverted.text = getString(R.string.legacy_utils_converted_amount, Converter.printFiatPretty(requireContext(), amount, withUnit = true))
         }
       } else {
         throw RuntimeException("amount is undefined")
@@ -160,9 +160,9 @@ class LNUrlWithdrawFragment : BaseFragment() {
     } catch (e: Exception) {
       mBinding.amountConverted.text = ""
       mBinding.amountError.text = when (e) {
-        is LNUrlError.WithdrawAtLeastMinSat -> getString(R.string.lnurl_withdraw_error_amount_min, context?.let { Converter.printAmountPretty(e.min, it, withUnit = true) } ?: "")
-        is LNUrlError.WithdrawAtMostMaxSat -> getString(R.string.lnurl_withdraw_error_amount_max, context?.let { Converter.printAmountPretty(e.max, it, withUnit = true) } ?: "")
-        else -> getString(R.string.lnurl_withdraw_error_amount)
+        is LNUrlError.WithdrawAtLeastMinSat -> getString(R.string.legacy_lnurl_withdraw_error_amount_min, context?.let { Converter.printAmountPretty(e.min, it, withUnit = true) } ?: "")
+        is LNUrlError.WithdrawAtMostMaxSat -> getString(R.string.legacy_lnurl_withdraw_error_amount_max, context?.let { Converter.printAmountPretty(e.max, it, withUnit = true) } ?: "")
+        else -> getString(R.string.legacy_lnurl_withdraw_error_amount)
       }
       Option.empty()
     }
@@ -180,7 +180,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
           model.state.value = LNUrlWithdrawState.InProgress
           val domain = model.callback.value!!.host()
           val pr = app.requireService.generatePaymentRequest(
-            description = if (description.isBlank()) getString(R.string.receive_default_desc) else description,
+            description = if (description.isBlank()) getString(R.string.legacy_receive_default_desc) else description,
             amount_opt = amount,
             expirySeconds = Prefs.getPaymentsExpirySeconds(requireContext()))
           val url = urlBuilder.addEncodedQueryParameter("pr", PaymentRequest.write(pr)).build()

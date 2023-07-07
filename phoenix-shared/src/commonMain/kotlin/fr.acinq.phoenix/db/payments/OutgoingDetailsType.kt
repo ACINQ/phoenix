@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
+@file:UseSerializers(
+    SatoshiSerializer::class,
+    ByteVector32Serializer::class,
+)
+
 package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.lightning.serialization.v1.ByteVector32KSerializer
-import fr.acinq.lightning.serialization.v3.SatoshiKSerializer
+import fr.acinq.phoenix.db.serializers.v1.ByteVector32Serializer
+import fr.acinq.phoenix.db.serializers.v1.SatoshiSerializer
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -34,6 +40,7 @@ enum class OutgoingDetailsTypeVersion {
     NORMAL_V0,
     KEYSEND_V0,
     SWAPOUT_V0,
+    @Deprecated("channel close are now stored in their own table")
     CLOSING_V0,
 }
 
@@ -46,42 +53,47 @@ sealed class OutgoingDetailsData {
 
     sealed class KeySend : OutgoingDetailsData() {
         @Serializable
-        data class V0(@Serializable(with = ByteVector32KSerializer::class) val preimage: ByteVector32) : KeySend()
+        data class V0(@Serializable val preimage: ByteVector32) : KeySend()
     }
 
     sealed class SwapOut : OutgoingDetailsData() {
         @Serializable
-        data class V0(val address: String, val paymentRequest: String, @Serializable(with = SatoshiKSerializer::class) val swapOutFee: Satoshi) : SwapOut()
+        data class V0(val address: String, val paymentRequest: String, @Serializable val swapOutFee: Satoshi) : SwapOut()
     }
 
+    @Deprecated("channel close are now stored in their own table")
     sealed class Closing : OutgoingDetailsData() {
         @Serializable
         data class V0(
-            @Serializable(with = ByteVector32KSerializer::class) val channelId: ByteVector32,
+            @Serializable val channelId: ByteVector32,
             val closingAddress: String,
             val isSentToDefaultAddress: Boolean
         ) : Closing()
     }
 
     companion object {
-        fun deserialize(typeVersion: OutgoingDetailsTypeVersion, blob: ByteArray): OutgoingPayment.Details = DbTypesHelper.decodeBlob(blob) { json, format ->
+        /** Deserialize the details of an outgoing payment. Return null if the details is for a legacy channel closing payment (see [deserializeLegacyClosingDetails]). */
+        fun deserialize(typeVersion: OutgoingDetailsTypeVersion, blob: ByteArray): LightningOutgoingPayment.Details? = DbTypesHelper.decodeBlob(blob) { json, format ->
             when (typeVersion) {
-                OutgoingDetailsTypeVersion.NORMAL_V0 -> format.decodeFromString<Normal.V0>(json).let { OutgoingPayment.Details.Normal(PaymentRequest.read(it.paymentRequest)) }
-                OutgoingDetailsTypeVersion.KEYSEND_V0 -> format.decodeFromString<KeySend.V0>(json).let { OutgoingPayment.Details.KeySend(it.preimage) }
-                OutgoingDetailsTypeVersion.SWAPOUT_V0 -> format.decodeFromString<SwapOut.V0>(json).let { OutgoingPayment.Details.SwapOut(it.address, PaymentRequest.read(it.paymentRequest), it.swapOutFee) }
-                OutgoingDetailsTypeVersion.CLOSING_V0 -> format.decodeFromString<Closing.V0>(json).let { OutgoingPayment.Details.ChannelClosing(it.channelId, it.closingAddress, it.isSentToDefaultAddress) }
+                OutgoingDetailsTypeVersion.NORMAL_V0 -> format.decodeFromString<Normal.V0>(json).let { LightningOutgoingPayment.Details.Normal(PaymentRequest.read(it.paymentRequest)) }
+                OutgoingDetailsTypeVersion.KEYSEND_V0 -> format.decodeFromString<KeySend.V0>(json).let { LightningOutgoingPayment.Details.KeySend(it.preimage) }
+                OutgoingDetailsTypeVersion.SWAPOUT_V0 -> format.decodeFromString<SwapOut.V0>(json).let { LightningOutgoingPayment.Details.SwapOut(it.address, PaymentRequest.read(it.paymentRequest), it.swapOutFee) }
+                OutgoingDetailsTypeVersion.CLOSING_V0 -> null
             }
+        }
+
+        /** Returns the channel closing details from a blob, for backward-compatibility purposes. */
+        fun deserializeLegacyClosingDetails(blob: ByteArray): Closing.V0 = DbTypesHelper.decodeBlob(blob) { json, format ->
+            format.decodeFromString(json)
         }
     }
 }
 
-fun OutgoingPayment.Details.mapToDb(): Pair<OutgoingDetailsTypeVersion, ByteArray> = when (this) {
-    is OutgoingPayment.Details.Normal -> OutgoingDetailsTypeVersion.NORMAL_V0 to
+fun LightningOutgoingPayment.Details.mapToDb(): Pair<OutgoingDetailsTypeVersion, ByteArray> = when (this) {
+    is LightningOutgoingPayment.Details.Normal -> OutgoingDetailsTypeVersion.NORMAL_V0 to
             Json.encodeToString(OutgoingDetailsData.Normal.V0(paymentRequest.write())).toByteArray(Charsets.UTF_8)
-    is OutgoingPayment.Details.KeySend -> OutgoingDetailsTypeVersion.KEYSEND_V0 to
+    is LightningOutgoingPayment.Details.KeySend -> OutgoingDetailsTypeVersion.KEYSEND_V0 to
             Json.encodeToString(OutgoingDetailsData.KeySend.V0(preimage)).toByteArray(Charsets.UTF_8)
-    is OutgoingPayment.Details.SwapOut -> OutgoingDetailsTypeVersion.SWAPOUT_V0 to
+    is LightningOutgoingPayment.Details.SwapOut -> OutgoingDetailsTypeVersion.SWAPOUT_V0 to
             Json.encodeToString(OutgoingDetailsData.SwapOut.V0(address, paymentRequest.write(), swapOutFee)).toByteArray(Charsets.UTF_8)
-    is OutgoingPayment.Details.ChannelClosing -> OutgoingDetailsTypeVersion.CLOSING_V0 to
-            Json.encodeToString(OutgoingDetailsData.Closing.V0(channelId, closingAddress, isSentToDefaultAddress)).toByteArray(Charsets.UTF_8)
 }

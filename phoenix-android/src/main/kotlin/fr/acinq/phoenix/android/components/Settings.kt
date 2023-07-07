@@ -24,10 +24,14 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.utils.copyToClipboard
 
 
 @Composable
@@ -35,11 +39,48 @@ fun Setting(modifier: Modifier = Modifier, title: String, description: String?) 
     Column(
         modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Text(title, style = MaterialTheme.typography.body2)
         Spacer(modifier = Modifier.height(2.dp))
         Text(description ?: "", style = MaterialTheme.typography.subtitle2)
+    }
+}
+
+@Composable
+fun SettingWithCopy(
+    title: String,
+    titleMuted: String? = null,
+    value: String,
+    maxLinesValue: Int = Int.MAX_VALUE,
+) {
+    val context = LocalContext.current
+    Row {
+        Column(modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp).weight(1f)) {
+            Row {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier.alignByBaseline(),
+                )
+                if (titleMuted != null) {
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = titleMuted,
+                        style = MaterialTheme.typography.subtitle2.copy(fontSize = 12.sp),
+                        modifier = Modifier
+                            .alignByBaseline(),
+                    )
+                }
+
+            }
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(text = value, style = MaterialTheme.typography.subtitle2, maxLines = maxLinesValue, overflow = TextOverflow.Ellipsis)
+        }
+        Button(
+            icon = R.drawable.ic_copy,
+            onClick = { copyToClipboard(context, value, title) }
+        )
     }
 }
 
@@ -53,7 +94,7 @@ fun SettingWithDecoration(
     Column(
         modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Row(
             Modifier.fillMaxWidth(),
@@ -108,15 +149,15 @@ fun SettingInteractive(
             .fillMaxWidth()
             .clickable(onClick = { if (enabled) onClick() })
             .enableOrFade(enabled)
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (icon != null) {
-                PhoenixIcon(icon, tint = iconTint ?: LocalContentColor.current, modifier = Modifier.size(ButtonDefaults.IconSize))
-                Spacer(Modifier.width(16.dp))
+                PhoenixIcon(icon, tint = iconTint ?: MaterialTheme.colors.onSurface, modifier = Modifier.size(ButtonDefaults.IconSize))
+                Spacer(Modifier.width(12.dp))
             }
             Text(
                 text = title,
@@ -145,7 +186,7 @@ fun SettingSwitch(
     modifier: Modifier = Modifier,
     title: String,
     description: String? = null,
-    icon: Int = R.drawable.ic_blank,
+    icon: Int? = null,
     enabled: Boolean,
     isChecked: Boolean,
     onCheckChangeAttempt: ((Boolean) -> Unit)
@@ -155,11 +196,13 @@ fun SettingSwitch(
             .fillMaxWidth()
             .clickable(onClick = { if (enabled) onCheckChangeAttempt(!isChecked) })
             .enableOrFade(enabled)
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize))
-            Spacer(Modifier.width(12.dp))
+            icon?.let {
+                PhoenixIcon(it, Modifier.size(ButtonDefaults.IconSize))
+                Spacer(Modifier.width(12.dp))
+            }
             Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
             Spacer(Modifier.width(16.dp))
             Switch(checked = isChecked, onCheckedChange = null)
@@ -167,7 +210,9 @@ fun SettingSwitch(
         if (description != null) {
             Spacer(modifier = Modifier.height(2.dp))
             Row(Modifier.fillMaxWidth()) {
-                Spacer(modifier = Modifier.width(30.dp))
+                icon?.let {
+                    Spacer(modifier = Modifier.width(30.dp))
+                }
                 Text(text = description, style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f))
                 Spacer(Modifier.width(48.dp))
             }
@@ -179,14 +224,17 @@ fun SettingSwitch(
 fun SettingButton(
     text: Int,
     icon: Int,
+    textStyle: TextStyle = MaterialTheme.typography.button,
+    iconTint: Color = MaterialTheme.colors.onSurface,
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     Button(
         onClick = onClick,
         text = stringResource(id = text),
+        textStyle = textStyle,
         icon = icon,
-        iconTint = MaterialTheme.colors.onSurface,
+        iconTint = iconTint,
         enabled = enabled,
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Start

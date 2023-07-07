@@ -88,8 +88,8 @@ class WatchTower {
 			}
 			upToDateListener?.cancel()
 
-			var notifyRevokedCommit = false
 			let newChannels = peer?.channels ?? [:]
+			var revokedChannelIds = Set<Bitcoin_kmpByteVector32>()
 
 			for (channelId, oldChannel) in oldChannels {
 				if let newChannel = newChannels[channelId] {
@@ -119,17 +119,39 @@ class WatchTower {
 					}
 
 					if !oldHasRevokedCommit && newHasRevokedCommit {
-						notifyRevokedCommit = true
+						revokedChannelIds.insert(channelId)
 					}
 				}
 			}
 
-			if notifyRevokedCommit {
-				NotificationsManager.shared.displayLocalNotification_revokedCommit()
-			}
-
 			self.scheduleBackgroundTasks(soon: success ? false : true)
-			task.setTaskCompleted(success: false)
+			
+			if !revokedChannelIds.isEmpty {
+				// One or more channels were force-closed, and we discovered the revoked commit(s) !
+				
+				NotificationsManager.shared.displayLocalNotification_revokedCommit()
+				
+				let outcome = WatchTowerOutcome.RevokedFound(channels: revokedChannelIds)
+				business.notificationsManager.saveWatchTowerOutcome(outcome: outcome) { _ in
+					task.setTaskCompleted(success: success)
+				}
+				
+			} else if success {
+				// WatchTower completed successfully, and no cheating by the other party was found.
+				
+				let outcome = WatchTowerOutcome.Nominal(channelsWatchedCount: Int32(newChannels.count))
+				business.notificationsManager.saveWatchTowerOutcome(outcome: outcome) { _ in
+					task.setTaskCompleted(success: success)
+				}
+				
+			} else {
+				// The BGAppRefreshTask timed out (iOS only gives us ~30 seconds)
+				
+				let outcome = WatchTowerOutcome.Unknown()
+				business.notificationsManager.saveWatchTowerOutcome(outcome: outcome) { _ in
+					task.setTaskCompleted(success: success)
+				}
+			}
 		}
 		
 		var isFinished = false

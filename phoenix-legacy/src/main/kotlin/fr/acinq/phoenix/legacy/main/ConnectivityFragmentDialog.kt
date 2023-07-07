@@ -72,13 +72,13 @@ class ConnectivityFragmentDialog : DialogFragment() {
 
 
   private fun handleLightningPeerConnection(context: Context, ni: NetworkInfo): Boolean {
-    mBinding.lightningConnState.text = context.getString(if (ni.lightningConnected) R.string.conndialog_ok else R.string.conndialog_not_ok)
+    mBinding.lightningConnState.text = context.getString(if (ni.lightningConnected) R.string.legacy_conndialog_ok else R.string.legacy_conndialog_not_ok)
     mBinding.lightningConnLabel.setIconColor(ThemeHelper.color(context, if (ni.lightningConnected) R.attr.positiveColor else R.attr.negativeColor))
     return ni.lightningConnected
   }
 
   private fun handleElectrumConnection(context: Context, ni: NetworkInfo): Boolean {
-    mBinding.electrumConnState.text = context.getString(if (ni.electrumServer != null) R.string.conndialog_ok else R.string.conndialog_not_ok)
+    mBinding.electrumConnState.text = context.getString(if (ni.electrumServer != null) R.string.legacy_conndialog_ok else R.string.legacy_conndialog_not_ok)
     mBinding.electrumConnLabel.setIconColor(ThemeHelper.color(context, if (ni.electrumServer != null) R.attr.positiveColor else R.attr.negativeColor))
     return ni.electrumServer != null
   }
@@ -89,11 +89,11 @@ class ConnectivityFragmentDialog : DialogFragment() {
       mBinding.torConnState.visibility = View.VISIBLE
       mBinding.torConnSep.visibility = View.VISIBLE
       if (ni.torConnections.isNullOrEmpty() || !ni.torConnections.values.contains(TorConnectionStatus.CONNECTED)) {
-        mBinding.torConnState.text = context.getString(R.string.conndialog_not_ok)
+        mBinding.torConnState.text = context.getString(R.string.legacy_conndialog_not_ok)
         mBinding.torConnLabel.setIconColor(ThemeHelper.color(context, R.attr.negativeColor))
         false
       } else {
-        mBinding.torConnState.text = context.getString(R.string.conndialog_ok)
+        mBinding.torConnState.text = context.getString(R.string.legacy_conndialog_ok)
         mBinding.torConnLabel.setIconColor(ThemeHelper.color(context, R.attr.positiveColor))
         true
       }
