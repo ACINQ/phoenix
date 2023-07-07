@@ -97,7 +97,7 @@ sealed interface Lnurl {
                     Tag.Auth.label -> Tag.Auth
                     Tag.Withdraw.label -> Tag.Withdraw
                     Tag.Pay.label -> Tag.Pay
-                    else -> throw LnurlError.UnhandledTag(it)
+                    else -> null // ignore unknown tags and handle the lnurl as a `request` to be executed immediately
                 }
             }
             return when (tag) {
@@ -129,14 +129,10 @@ sealed interface Lnurl {
             if (!urlBuilder.protocol.isSecure()) throw LnurlError.UnsafeResource
             val lightningParam = urlBuilder.parameters["lightning"]
             return if (!lightningParam.isNullOrBlank()) {
+                // this url contains a lnurl fallback which takes priority - and must be bech32 encoded
                 parseBech32Url(lightningParam)
             } else {
-                val tag = urlBuilder.parameters["tag"]
-                if (Tag.values().any { it.label == tag }) {
-                    urlBuilder.build()
-                } else {
-                    throw IllegalArgumentException("this url has no valid tag nor lnurl fallback")
-                }
+                urlBuilder.build()
             }
         }
 
