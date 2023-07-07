@@ -35,7 +35,6 @@
 
     <string name="notif_rejected_deposit_title">Dépôt on-chain en attente (+%1$s)</string>
     <string name="notif_rejected_payment_title">Paiement entrant refusé (+%1$s)</string>
-    <string name="notif_rejected_by_user">Vous avez rejeté le paiement</string>
     <string name="notif_rejected_policy_disabled">La gestion des channels automatisée est désactivée. Cette configuration peut être changée.</string>
     <string name="notif_rejected_over_absolute">Les frais étaient de %1$s, mais votre max est de %2$s. Cette configuration peut être changée.</string>
     <string name="notif_rejected_over_relative">Les frais étaient de %1$s et dépassent %2$s%% du montant. Cette configuration peut être changée.</string>
