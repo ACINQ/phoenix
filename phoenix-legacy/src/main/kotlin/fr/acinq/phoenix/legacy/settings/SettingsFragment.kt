@@ -72,11 +72,6 @@ class SettingsFragment : BaseFragment(stayIfNotStarted = true) {
     mBinding.torButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_tor) }
     mBinding.aboutButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_about) }
     mBinding.paymentSettingsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_payment_settings) }
-    mBinding.switchModernButton.setOnClickListener {
-      lifecycleScope.launch {
-        LegacyPrefsDatastore.saveStartLegacyApp(requireContext(), LegacyAppStatus.NotRequired)
-      }
-    }
   }
 
 }

@@ -43,30 +43,11 @@
         android:background="?attr/bgColor">
 
         <TextView
-          android:id="@+id/debug_title"
-          style="@style/SettingsCategory"
-          android:text="DEBUG"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="parent" />
-
-        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
-          android:id="@+id/switch_modern_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square"
-          android:padding="@dimen/space_md"
-          app:hz_bias="0"
-          app:icon="@drawable/ic_help_circle"
-          app:layout_constraintTop_toBottomOf="@id/debug_title"
-          app:spacer_size="@dimen/space_md"
-          app:text="Switch to modern app" />
-
-        <TextView
           android:id="@+id/general_title"
           style="@style/SettingsCategory"
           android:text="@string/legacy_settings_general_title"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/switch_modern_button" />
+          app:layout_constraintTop_toTopOf="parent" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/about_button"
