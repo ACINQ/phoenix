@@ -704,7 +704,8 @@
   <string name="legacy_migration_paused_disconnected">Vous ne pouvez pas mettre à jour car vous êtes déconnecté de votre pair Lightning/Electrum.\n\nVeuillez réessayer plus tard quand la connexion sera établie.</string>
 
   <string name="legacy_migration_confirm_title">Confirmer la migration</string>
-  <string name="legacy_migration_confirm_dust">%1$d channel(s) sur %2$d contiennent moins que la limit de dust Bitcoin (546 sat). La solde de ces channels ira aux mineurs du réseau Bitcoin.</string>
+
+  <string name="legacy_migration_confirm_dust">%1$d channel(s) sur %2$d sont vides, ou contiennent moins que la dust Bitcoin (546 sat).\n\nCes channels seront fermés, leur solde ira aux mineurs du réseau Bitcoin, et leur liquidité entrante ne sera pas préservée.</string>
   <string name="legacy_migration_confirm_proceed">Poursuivre</string>
   <string name="legacy_migration_confirm_cancel">Annuler</string>
 

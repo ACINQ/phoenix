@@ -330,7 +330,7 @@ class MigrationDialogViewModel : ViewModel() {
 
   private fun channelsBelowDust(channels: Map<ByteVector32, MilliSatoshi>): Map<ByteVector32, MilliSatoshi> {
     val dustChannels = channels.mapNotNull { (channelId, balance) ->
-      if (balance > MilliSatoshi(999) && balance < MilliSatoshi(547_000)) {
+      if (balance > MilliSatoshi(0) && balance < MilliSatoshi(546_000)) {
         channelId to balance
       } else {
         null
