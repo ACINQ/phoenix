@@ -1,10 +1,13 @@
 package fr.acinq.phoenix.utils
 
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.NodeEvents
+import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumMiniWallet
 import fr.acinq.lightning.blockchain.electrum.WalletState
+import fr.acinq.lightning.blockchain.electrum.getConfirmations
 import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.channel.states.Aborted
 import fr.acinq.lightning.channel.states.ChannelState
@@ -257,4 +260,8 @@ fun ChannelCommand.Commitment.Splice.Response.Failure.asAbortedByPeer(): Channel
 fun ChannelCommand.Commitment.Splice.Response.Failure.asDisconnected(): ChannelCommand.Commitment.Splice.Response.Failure.Disconnected? = when (this) {
     is ChannelCommand.Commitment.Splice.Response.Failure.Disconnected -> this
     else -> null
+}
+
+suspend fun ElectrumClient.kotlin_getConfirmations(txid: ByteVector32): Int? {
+    return this.getConfirmations(txid)
 }

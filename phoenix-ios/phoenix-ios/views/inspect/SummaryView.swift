@@ -3,7 +3,7 @@ import PhoenixShared
 import Popovers
 import os.log
 
-#if DEBUG && false
+#if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
 	category: "SummaryView"
@@ -20,6 +20,8 @@ struct SummaryView: View {
 	@State var paymentInfoIsStale: Bool
 	
 	let fetchOptions = WalletPaymentFetchOptions.companion.All
+	
+	@State var blockchainConfirmations: Int? = nil
 	
 	@State var showOriginalFiatValue = GlobalEnvironment.currencyPrefs.showOriginalFiatValue
 	@State var showFiatValueExplanation = false
@@ -136,6 +138,9 @@ struct SummaryView: View {
 		.onAppear {
 			onAppear()
 		}
+		.task {
+			await getConfirmations()
+		}
 	}
 	
 	@ViewBuilder
@@ -205,23 +210,32 @@ struct SummaryView: View {
 					.padding(.bottom, 6)
 					.accessibilityLabel("Pending payment")
 					.accessibilityHint("Waiting for confirmations")
-				if let depth = minFundingDepth() {
-					let minutes = depth * 10
-					Text("requires \(depth) confirmations")
-						.font(.footnote)
-						.multilineTextAlignment(.center)
-						.foregroundColor(.secondary)
-					Text("≈\(minutes) minutes")
-						.font(.footnote)
-						.multilineTextAlignment(.center)
-						.foregroundColor(.secondary)
+				
+				if payment is Lightning_kmpIncomingPayment {
+					// I'm pretty sure this stuff is outdated, and needs to be removed...
+					if let depth = minFundingDepth() {
+						let minutes = depth * 10
+						Text("requires \(depth) confirmations")
+							.font(.footnote)
+							.multilineTextAlignment(.center)
+							.foregroundColor(.secondary)
+						Text("≈\(minutes) minutes")
+							.font(.footnote)
+							.multilineTextAlignment(.center)
+							.foregroundColor(.secondary)
+					}
+					if let broadcastDate = onChainBroadcastDate() {
+						Text(broadcastDate.format())
+							.font(.subheadline)
+							.foregroundColor(.secondary)
+							.padding(.top, 12)
+					}
 				}
-				if let broadcastDate = onChainBroadcastDate() {
-					Text(broadcastDate.format())
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-						.padding(.top, 12)
+				
+				if let outgoingSplice = payment as? Lightning_kmpSpliceOutgoingPayment {
+					header_blockchainStatus(outgoingSplice)
 				}
+				
 			} // </VStack>
 			.padding(.bottom, 30)
 			
@@ -269,6 +283,83 @@ struct SummaryView: View {
 			
 		} else {
 			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func header_blockchainStatus(_ outgoingSplice: Lightning_kmpSpliceOutgoingPayment) -> some View {
+		
+		switch blockchainConfirmations {
+		case .none:
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				ProgressView()
+					.progressViewStyle(CircularProgressViewStyle(tint: Color.secondary))
+				
+				Text("Checking blockchain…")
+					.font(.callout)
+					.foregroundColor(.secondary)
+			}
+			.padding(.top, 10)
+			
+		case .some(let confirmations):
+			
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				
+				if confirmations == 1 {
+					Text("1 confirmation")
+						.font(.subheadline)
+						.foregroundColor(.secondary)
+				} else if confirmations < 7 {
+					Text("\(confirmations) confirmations")
+						.font(.subheadline)
+						.foregroundColor(.secondary)
+				} else {
+					Text("6+ confirmations")
+						.font(.subheadline)
+						.foregroundColor(.secondary)
+				}
+				
+				if confirmations == 0 {
+					Button {
+						// Todo...
+					} label: {
+						Label {
+							Text("Accelerate transaction")
+						} icon: {
+							Image(systemName: "paperplane").imageScale(.small)
+						}
+					}
+					.font(.subheadline)
+					.padding(.top, 3)
+				}
+				
+				if let confirmedAt = outgoingSplice.confirmedAt?.int64Value.toDate(from: .milliseconds) {
+				
+					Text("confirmed")
+						.font(.subheadline)
+						.foregroundColor(.secondary)
+						.padding(.top, 20)
+					
+					Text(confirmedAt.format())
+						.font(.subheadline)
+						.foregroundColor(.secondary)
+						.padding(.top, 3)
+					
+				} else {
+					
+					Text("broadcast")
+						.font(.subheadline)
+						.foregroundColor(.secondary)
+						.padding(.top, 20)
+					
+					Text(outgoingSplice.createdAt.toDate(from: .milliseconds).format())
+						.font(.subheadline)
+						.foregroundColor(.secondary)
+						.padding(.top, 3)
+				}
+			}
+			.padding(.top, 10)
 		}
 	}
 	
@@ -567,6 +658,58 @@ struct SummaryView: View {
 			}
 			showFiatValueExplanation = true
 		}
+	}
+	
+	func getConfirmations() async {
+		log.trace("getConfirmations()")
+		
+		guard let outgoingSplice = paymentInfo.payment as? Lightning_kmpSpliceOutgoingPayment else {
+			log.debug("getConfirmations: not an outgoing splice")
+			return
+		}
+		
+		var confirmations: KotlinInt? = nil
+		repeat {
+			
+			// Wait until the electrum client is connected
+			log.debug("getConfirmations: waiting for connections")
+			for await connections in Biz.business.connectionsManager.publisher.values {
+				log.debug("getConfirmations: got a connection")
+				if connections.electrum is Lightning_kmpConnection.ESTABLISHED {
+					log.debug("getConfirmations: electrum connected")
+					break
+				} else {
+					log.debug("getConfirmations: electrum not connected")
+				}
+			}
+			
+			// Abort if task is cancelled (which occurs when view is closed)
+			if Task.isCancelled {
+				break
+			}
+			
+			do {
+				confirmations = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: outgoingSplice.txId)
+			} catch {
+				log.error("electrumClient.getConfirmations(): \(error)")
+			}
+			
+			if let confirmations {
+				self.blockchainConfirmations = confirmations.intValue
+				break
+				
+			} else {
+				do {
+					let delay = 5.seconds()
+					if #available(iOS 16.0, *) {
+						try await Task.sleep(for: Duration.seconds(delay))
+					} else {
+						try await Task.sleep(nanoseconds: UInt64(delay * Double(1_000_000_000)))
+					}
+				} catch {}
+			}
+			
+		} while true
 	}
 	
 	// --------------------------------------------------
