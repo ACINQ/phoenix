@@ -62,7 +62,6 @@ class MigrationFragmentDialog : DialogFragment() {
       app = ViewModelProvider(activity)[AppViewModel::class.java]
     } ?: dismiss()
 
-    val context = requireContext()
     isCancelable = false
 
     app.networkInfo.observe(viewLifecycleOwner) {
