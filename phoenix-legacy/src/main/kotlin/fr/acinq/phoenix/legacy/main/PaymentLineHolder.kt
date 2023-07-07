@@ -40,7 +40,7 @@ import fr.acinq.phoenix.legacy.utils.Transcriber
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class PaymentLineHolder(itemView: View) : PaymentHolder(itemView) {
 
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 

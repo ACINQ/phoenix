@@ -377,6 +377,7 @@
   <string name="legacy_main_connectivity_button">Connecting…</string>
   <string name="legacy_main_tor_connected_button">Tor enabled</string>
   <string name="legacy_main_stores_button">Stores</string>
+  <string name="legacy_main_payments_history_button">Show all…</string>
 
   <!-- //////////////// notifications //////////////////// -->
 
@@ -821,5 +822,8 @@ legacy_
   <string name="legacy_migration_failure_generic">Some or all channels may not have been migrated.\n\nThe upgrade process must be started again.</string>
   <string name="legacy_migration_failure_swapin_address_error">Phoenix could not generate a valid address for the migration.\n\nThe upgrade process must be started again.</string>
   <string name="legacy_migration_failure_closing_error">Some channels could not be closed.\n\nThe upgrade process must be started again to migrate those.</string>
+
+  <!-- payments history screen -->
+  <string name="legacy_payments_history_title">My payments (%1$d)</string>
 
 </resources>

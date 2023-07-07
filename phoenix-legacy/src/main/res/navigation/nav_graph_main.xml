@@ -120,6 +120,9 @@
     <action
       android:id="@+id/action_main_to_migration"
       app:destination="@id/migration_fragment" />
+    <action
+      android:id="@+id/action_main_payments_history"
+      app:destination="@id/payments_history_fragment" />
   </fragment>
 
   <!-- init wallet -->
@@ -478,6 +481,13 @@
     <argument
       android:name="version"
       app:argType="long" />
+  </fragment>
+
+  <!-- full payments history fragment, reachable from main fragment -->
+  <fragment
+    android:id="@+id/payments_history_fragment"
+    android:name="fr.acinq.phoenix.legacy.main.PaymentsHistoryFragment"
+    android:label="PaymentsHistoryFragment">
   </fragment>
 
   <!-- settings: channels import dialog -->
