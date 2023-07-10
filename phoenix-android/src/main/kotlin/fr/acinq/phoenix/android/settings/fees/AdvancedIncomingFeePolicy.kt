@@ -97,7 +97,6 @@ fun AdvancedIncomingFeePolicy(
                 CardHeader(text = stringResource(id = R.string.liquiditypolicy_advanced_verifications_title))
                 Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)) {
                     EditMaxPropFee(
-                        maxSatFee = maxSatFeePrefs,
                         maxPropFee = maxRelativeFeeBasisPoints,
                         onMaxPropFeeChange = { maxRelativeFeeBasisPoints = it }
                     )
@@ -146,7 +145,6 @@ fun AdvancedIncomingFeePolicy(
 
 @Composable
 private fun EditMaxPropFee(
-    maxSatFee: Satoshi,
     maxPropFee: Int?,
     onMaxPropFeeChange: (Int?) -> Unit,
 ) {
@@ -165,7 +163,7 @@ private fun EditMaxPropFee(
         }
         Spacer(modifier = Modifier.width(10.dp))
         InlineNumberInput(
-            value = maxPropFee?.toDouble()?.div(100),
+            value = maxPropFee?.let { it.toDouble() / 100 },
             onValueChange = {
                 when {
                     it == null || it < 0 || it > 100 -> {
@@ -178,7 +176,7 @@ private fun EditMaxPropFee(
                     }
                 }
             },
-            acceptDecimal = false,
+            acceptDecimal = true,
             isError = isError,
             trailingIcon = { Text(text = "%") },
             modifier = Modifier.width(130.dp)
