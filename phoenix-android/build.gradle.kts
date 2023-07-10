@@ -25,7 +25,7 @@ android {
         minSdk = 24
         targetSdk = 33
         versionCode = 53
-        versionName = gitCommitHash()
+        versionName = "splices-beta4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
