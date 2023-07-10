@@ -179,11 +179,6 @@
     <string name="about_rates_title">Exchange rates</string>
     <string name="about_rates_content">Bitcoin/fiat exchange rates are retrieved from various third-party APIs:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nThose rates may not be accurate. Always check the actual Bitcoin amount before sending a payment.</string>
 
-    <!-- home: migration result dialog -->
-
-    <string name="migration_dialog_title">Congratulations!</string>
-    <string name="migration_dialog_message">You are now using the new Phoenix version. Your channels are being migrated and will be ready soon.</string>
-
     <!-- introduction screens -->
 
     <string name="intro_welcome_title">Welcome!</string>
