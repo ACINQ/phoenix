@@ -224,8 +224,12 @@ sealed interface Lnurl {
             return when (tag) {
                 Tag.Withdraw.label -> {
                     val k1 = json["k1"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() } ?: throw LnurlError.Withdraw.MissingK1
-                    val minWithdrawable = json["minWithdrawable"]?.jsonPrimitive?.long?.takeIf { it > 0 }?.msat ?: 0.msat
-                    val maxWithdrawable = json["maxWithdrawable"]?.jsonPrimitive?.long?.coerceAtLeast(minWithdrawable.msat)?.msat ?: minWithdrawable
+                    val minWithdrawable = json["minWithdrawable"]?.jsonPrimitive?.floatOrNull?.takeIf { it > 0f }?.toLong()?.msat
+                        ?: json["minWithdrawable"]?.jsonPrimitive?.long?.takeIf { it > 0 }?.msat
+                        ?: 0.msat
+                    val maxWithdrawable = json["maxWithdrawable"]?.jsonPrimitive?.floatOrNull?.takeIf { it > 0f }?.toLong()?.msat
+                        ?: json["maxWithdrawable"]?.jsonPrimitive?.long?.coerceAtLeast(minWithdrawable.msat)?.msat
+                        ?: minWithdrawable
                     val dDesc = json["defaultDescription"]?.jsonPrimitive?.content ?: ""
                     LnurlWithdraw(
                         initialUrl = url,
@@ -237,8 +241,12 @@ sealed interface Lnurl {
                     )
                 }
                 Tag.Pay.label -> {
-                    val minSendable = json["minSendable"]?.jsonPrimitive?.long?.takeIf { it > 0 }?.msat ?: throw LnurlError.Pay.Intent.InvalidMin
-                    val maxSendable = json["maxSendable"]?.jsonPrimitive?.long?.coerceAtLeast(minSendable.msat)?.msat ?: throw LnurlError.Pay.Intent.MissingMax
+                    val minSendable = json["minSendable"]?.jsonPrimitive?.floatOrNull?.takeIf { it > 0f }?.toLong()?.msat
+                        ?: json["minSendable"]?.jsonPrimitive?.longOrNull?.takeIf { it > 0 }?.msat
+                        ?: throw LnurlError.Pay.Intent.InvalidMin
+                    val maxSendable = json["maxSendable"]?.jsonPrimitive?.floatOrNull?.takeIf { it > 0f }?.toLong()?.msat
+                        ?: json["maxSendable"]?.jsonPrimitive?.longOrNull?.coerceAtLeast(minSendable.msat)?.msat
+                        ?: throw LnurlError.Pay.Intent.MissingMax
                     val metadata = LnurlPay.parseMetadata(json["metadata"]?.jsonPrimitive?.content ?: throw LnurlError.Pay.Intent.MissingMetadata)
                     val maxCommentLength = json["commentAllowed"]?.jsonPrimitive?.longOrNull?.takeIf { it > 0 }
                     LnurlPay.Intent(
