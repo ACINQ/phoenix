@@ -431,7 +431,7 @@
   <string name="legacy_migration_paused_disconnected">Nemůžete nyní upgradovat, protože jste odpojeni od Lightningu a/nebo Electrumu.\n\nZkuste to znovu později, až bude spojení navázáno.</string>
 
   <string name="legacy_migration_confirm_title">Potvrzení migrace</string>
-  <string name="legacy_migration_confirm_dust">%1$d z %2$d kanálů drží méně než je limit prachu bitcoinů (546 sat). Jejich zůstatek připadne těžařům bitcoinů.</string>
+  <string name="legacy_migration_confirm_dust">%1$d z %2$d kanálů je prázdných nebo je v nich méně než limit pro Bitcoin Dust (546 sat).\n\nBudou uzavřeny, jejich případný zůstatek připadne těžařům Bitcoinů a jejich příchozí likvidita nebude zachována.</string>
   <string name="legacy_migration_confirm_proceed">Proceed</string>
   <string name="legacy_migration_confirm_cancel">Zrušit</string>
 

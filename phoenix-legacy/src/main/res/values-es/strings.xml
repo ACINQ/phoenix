@@ -475,7 +475,7 @@
   <string name="legacy_migration_paused_disconnected">No puedes actualizar ahora porque estás desconectado de Lightning y/o Electrum.\n\nVuelve a intentarlo más tarde cuando se haya establecido la conexión.</string>
 
   <string name="legacy_migration_confirm_title">Confirmar migración</string>
-  <string name="legacy_migration_confirm_dust">%1$d de %2$d canales tienen menos del límite de polvo de Bitcoin (546 sat). Su saldo se destinará a los Bitcoin miners.</string>
+  <string name="legacy_migration_confirm_dust">%1$d de %2$d canales están vacíos, o contienen menos del Dust-Limit de Bitcoin (546 sat).\n\nSerán cerrados, su saldo si lo hubiera irá a los mineros de Bitcoin, y su liquidez entrante no será preservada.</string>
   <string name="legacy_migration_confirm_proceed">Proceda</string>
   <string name="legacy_migration_confirm_cancel">Cancelar</string>
 
