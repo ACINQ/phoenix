@@ -100,7 +100,7 @@
     <string name="mutualclose_confirm_details">Tous vos fonds seront envoyés à:</string>
 
     <string name="forceclose_title">Fermeture unilatérale</string>
-    <string name="forceclose_instructions">Cet écran vous permet de forcer la fermeture de vos canaux de paiement de façon unilatérale.\n\nCeci n\'est pas une fonctionnalité magique, mais une mesure de sécurité à <b>n'utiliser qu\'en dernier recours</b>. Par exemple si votre noeud pair (ACINQ) devait disparaître de façon permanente, vous empêchant d\'effectuer des paiements. Dans tous les autres cas, <b>si vous avez des difficultés à utiliser Phoenix, vous devriez contacter le support</b>.\n\nLa fermeture unilatérale vous coûtera de l\'argent (pour les frais on-chain), et verrouillera l\'accès aux fonds pour plusieurs jours.\n\n<b>Ne désinstallez pas l\'application tant que les canaux ne sont pas complètement fermés, ou vous perdrez l\'accès aux fonds.</b>\n\n<b>N\'utilisez pas cette fonctionnalité si vous ne comprenez pas ce qu\'elle fait.</b></string>
+    <string name="forceclose_instructions">Cet écran vous permet de forcer la fermeture de vos canaux de paiement de façon unilatérale.\n\nCeci n\'est pas une fonctionnalité magique, mais une mesure de sécurité à <b>n\'utiliser qu\'en dernier recours</b>. Par exemple si votre noeud pair (ACINQ) devait disparaître de façon permanente, vous empêchant d\'effectuer des paiements. Dans tous les autres cas, <b>si vous avez des difficultés à utiliser Phoenix, vous devriez contacter le support</b>.\n\nLa fermeture unilatérale vous coûtera de l\'argent (pour les frais on-chain), et verrouillera l\'accès aux fonds pour plusieurs jours.\n\n<b>Ne désinstallez pas l\'application tant que les canaux ne sont pas complètement fermés, ou vous perdrez l\'accès aux fonds.</b>\n\n<b>N\'utilisez pas cette fonctionnalité si vous ne comprenez pas ce qu\'elle fait.</b></string>
     <string name="forceclose_address_label">Les fonds seront envoyés au wallet final:</string>
 
     <string name="forceclose_confirm_title">Confirmation de la fermeture forcée</string>
@@ -177,7 +177,7 @@
     <string name="about_seed_title">Sauvegarde de votre clé</string>
     <string name="about_seed_content">Ce wallet est détenu en propre (aussi appelé "self-custodial"): <b>vous seul détenez la clé de 12 mots contrôlant les fonds du wallet</b>.\n\nCette clé donne accès aux fonds. Ne la révélez à personne. Faites attention aux tentatives de hameçonnage.</string>
     <string name="about_rates_title">Conversion fiduciaire</string>
-    <string name="about_rates_content">La conversion Bitcoin/monnaie fiduciaire est faite par l\'intermédiaire de plateformes tierces :\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nCes taux de conversion peuvent être imprécis. Vérifiez toujours le montant effective en Bitcoin avant d\'envoyer un paiement.</string>
+    <string name="about_rates_content">La conversion Bitcoin/monnaie fiduciaire est faite par l\'intermédiaire de plateformes tierces :\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nCes taux de conversion peuvent être imprécis. Vérifiez toujours le montant effectif en Bitcoin avant d\'envoyer un paiement.</string>
 
     <!-- introduction screens -->
 
