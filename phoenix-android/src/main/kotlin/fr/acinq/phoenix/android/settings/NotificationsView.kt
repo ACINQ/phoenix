@@ -57,6 +57,7 @@ import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.data.Notification
 import fr.acinq.phoenix.data.WatchTowerOutcome
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 
 
 @Composable
@@ -243,7 +244,7 @@ private fun PaymentNotification(
                     is Notification.OverRelativeFee -> stringResource(
                         id = R.string.inappnotif_payment_rejected_over_relative,
                         notification.fee.toPrettyString(btcUnit, withUnit = true),
-                        String.format("%.0f", (notification.maxRelativeFeeBasisPoints.toDouble() / 100)),
+                        DecimalFormat("0.##").format(notification.maxRelativeFeeBasisPoints.toDouble() / 100),
                     )
                     is Notification.ChannelsInitializing -> stringResource(id = R.string.inappnotif_payment_rejected_channel_initializing)
                 },

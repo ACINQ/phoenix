@@ -804,7 +804,7 @@ legacy_
   <string name="legacy_migration_paused_disconnected">You cannot upgrade now because you are disconnected from Lightning and/or Electrum.\n\nTry again later when connection has been established.</string>
 
   <string name="legacy_migration_confirm_title">Confirm migration</string>
-  <string name="legacy_migration_confirm_dust">%1$d of %2$d channels are empty, or hold less than the Bitcoin dust limit (546 sat).\n\nThey will be closed, their balance if any will go to the Bitcoin miners and their inbound liquidity will not be preserved.</string>
+  <string name="legacy_migration_confirm_dust">%1$d of %2$d channels are empty, or hold less than the Bitcoin dust limit (546 sat).\n\nThey will be closed, their balance if any will go to the Bitcoin miners, and their inbound liquidity will not be preserved.</string>
   <string name="legacy_migration_confirm_proceed">Proceed</string>
   <string name="legacy_migration_confirm_cancel">Cancel</string>
 

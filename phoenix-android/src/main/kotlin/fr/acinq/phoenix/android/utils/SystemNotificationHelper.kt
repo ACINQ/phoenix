@@ -42,6 +42,7 @@ import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
 import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
+import java.text.DecimalFormat
 import java.util.Random
 
 object SystemNotificationHelper {
@@ -139,7 +140,7 @@ object SystemNotificationHelper {
                 amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
             message = context.getString(R.string.notif_rejected_over_relative,
                 fee.toPrettyString(BitcoinUnit.Sat, withUnit = true),
-                String.format("%.0f", (percentMax.toDouble() / 100))
+                DecimalFormat("0.##").format(percentMax.toDouble() / 100),
             ),
         )
     }

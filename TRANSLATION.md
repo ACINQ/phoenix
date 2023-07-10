@@ -5,7 +5,7 @@ Phoenix is designed to easily support multiple localisations. The process is - f
 ## What to translate
 
 There are currently two versions of Phoenix: the Android app and the iOS app. Both apps use different string resources and are localized separately. Their localization processes are completely different.
-- follow [these instructions](https://github.com/ACINQ/phoenix/blob/master/phoenix-legacy/TRANSLATION.md) to localize the legacy Android app;
+- follow [these instructions](https://github.com/ACINQ/phoenix/blob/master/phoenix-android/TRANSLATION.md) to localize the Android app;
 - follow [these instructions](https://github.com/ACINQ/phoenix/blob/master/phoenix-ios/TRANSLATION.md) to localize the iOS app.
 
 ## General considerations

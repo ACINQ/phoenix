@@ -73,7 +73,7 @@
     <string name="receive_lightning_warning_title_fee_expected">Des frais sont attendus.</string>
 
     <string name="receive_lightning_warning_fee_insufficient_liquidity">Votre liquidité entrante est insuffisante.</string>
-    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Votre liquidité entrante est insuffisante et vous avez désactivée la gestion des channels automatisée.\nCliquez pour configurer.</string>
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Votre liquidité entrante est insuffisante et vous avez désactivé la gestion des channels automatisée.\nCliquez pour configurer.</string>
     <string name="receive_lightning_warning_fee_within_policy">Des frais de %1$s (≈ %2$s) pourraient être nécessaire pour recevoir ce paiement.\nCliquez pour configurer.</string>
     <string name="receive_lightning_warning_fee_exceeds_policy">Ces frais vont probablement excéder le max configuré dans vos préférences (%1$s).\nCliquez pour configurer.</string>
 
@@ -100,7 +100,7 @@
     <string name="mutualclose_confirm_details">Tous vos fonds seront envoyés à:</string>
 
     <string name="forceclose_title">Fermeture unilatérale</string>
-    <string name="forceclose_instructions">Cet écran vous permet de forcer la fermeture de vos canaux de paiement de façon unilatérale.\n\nCeci n\'est pas un bouton magique: il s\'agit d\'une mesure de sécurité, et <b>ne devrait être utilisée qu\'en dernier recours</b>. Par exemple si votre noeud pair (ACINQ) disparait de façon permanente, vous empêchant d\'effectuer des paiements. Dans tous les autres cas, <b>si vous avez des problèmes d\'utilisation de Phoenix, vous devriez contacter le support</b>.\n\nLa fermeture unilatérale vous coûtera de l\'argent (pour les frais on-chain), et verrouillera l\'accès aux fonds pour plusieurs jours.\n\n<b>Ne désinstallez pas l\'application tant que les canaux ne sont pas complètement fermés, ou vous perdrez l\'accès aux fonds.</b>\n\n<b>N\'utilisez pas cette fonctionnalité si vous ne comprenez pas ce qu\'elle fait.</b></string>
+    <string name="forceclose_instructions">Cet écran vous permet de forcer la fermeture de vos canaux de paiement de façon unilatérale.\n\nCeci n\'est pas une fonctionnalité magique, mais une mesure de sécurité à <b>n\'utiliser qu\'en dernier recours</b>. Par exemple si votre noeud pair (ACINQ) devait disparaître de façon permanente, vous empêchant d\'effectuer des paiements. Dans tous les autres cas, <b>si vous avez des difficultés à utiliser Phoenix, vous devriez contacter le support</b>.\n\nLa fermeture unilatérale vous coûtera de l\'argent (pour les frais on-chain), et verrouillera l\'accès aux fonds pour plusieurs jours.\n\n<b>Ne désinstallez pas l\'application tant que les canaux ne sont pas complètement fermés, ou vous perdrez l\'accès aux fonds.</b>\n\n<b>N\'utilisez pas cette fonctionnalité si vous ne comprenez pas ce qu\'elle fait.</b></string>
     <string name="forceclose_address_label">Les fonds seront envoyés au wallet final:</string>
 
     <string name="forceclose_confirm_title">Confirmation de la fermeture forcée</string>
@@ -118,12 +118,15 @@
     <string name="inappnotif_watchtower_late_message">Phoenix vérifie périodiquement la blockchain lorsque l\'application est éteinte. Ces derniers jours elle n\'a pas pu le faire. \n\nAssurez vous qu\'Android ne restreigne pas Phoenix, et que l\'application puisse se connecter à Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Fermer</string>
 
-    <string name="inappnotif_upgrade_message">Une mise à jour est disponible</string>
+    <string name="inappnotif_upgrade_message">Mise à jour disponible</string>
     <string name="inappnotif_upgrade_critical_message">Une mise à jour critique est disponible. Vous devriez mettre à jour Phoenix le plus rapidement possible..</string>
     <string name="inappnotif_upgrade_button">Mettre à jour sur Google Play</string>
 
-    <string name="inappnotif_mempool_full_message">Le mempool Bitcoin est plein, et les frais on-chain sont élevés.</string>
-    <string name="inappnotif_mempool_full_action">Cliquez pour voir comment Phoenix est affecté</string>
+    <string name="inappnotif_mempool_full_message">Le mempool Bitcoin est plein, et les frais sur la chaîne sont élevés.</string>
+    <string name="inappnotif_mempool_full_action">Voir en quoi Phoenix est affecté</string>
+
+    <string name="inappnotif_migration_from_legacy">Félicitations! Votre wallet a été mis à jour.</string>
+    <string name="inappnotif_migration_from_legacy_action">Voir les nouveautés</string>
 
     <string name="inappnotif_payment_onchain_pending_title">Dépôt on-chain en attente (+%1$s)</string>
     <string name="inappnotif_payment_rejected_title">Paiement refusé (+%1$s)</string>
@@ -133,22 +136,22 @@
     <string name="inappnotif_payment_rejected_channel_initializing">Vous canaux étaient en initialisation et n\'ont pu recevoir ce paiement.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Cliquez pour configurer.</string>
 
-    <string name="inappnotif_watchtower_nominal_title">Tour de contrôle</string>
-    <plurals name="inappnotif_watchtower_nominal_description">
-        <item quantity="one">Le canal %1$d a été vérifié le %2$s. Aucun problème trouvé.</item>
-        <item quantity="other">Les canaux %1$d ont été vérifiés le %2$s. Aucun problème trouvé.</item>
+    <string name="inappnotif_watchtower_nominal_title">Veille en arrière-plan</string>
+    <plurals name="inappnotif_watchtower_nominal_description" tools:ignore="MissingQuantity">
+        <item quantity="one">%1$d canal a été contrôlé le %2$s. Aucun problème trouvé.</item>
+        <item quantity="other">%1$d canaux ont été contrôlés le %2$s. Aucun problème trouvé.</item>
     </plurals>
-    <string name="inappnotif_watchtower_revokedfound_title">Alerte tour de contrôle</string>
+    <string name="inappnotif_watchtower_revokedfound_title">Alerte de veille</string>
     <string name="inappnotif_watchtower_revokedfound_description">Des commitments révoqués ont été détectés le %1$s sur les canaux(s): %2$s. Ces canaux pourraient fermer.</string>
 
     <!-- settings: display seed -->
 
-    <string name="displayseed_instructions">La phrase de sauvegarde (aussi appelée clé, ou \"seed\"), est une liste de 12 mots en anglais. Elle permet de restaurer un accès complet aux fonds si besoin.\n\n<b>Vous seul avez possession de cette clé. Gardez la secrète.</b>\n\n<b>Ne la partagez avec personne</b>.\nFaîtes attention au hameçonnage et imposteurs. Les développeurs de Phoenix ne vous demanderont jamais de révéler cette clé.\n\n<b>Ne perdez pas cette clé</b>.\nFaites une sauvegarde dans un endroit sûr (pas sur ce téléphone). Si vous perdez la clé et votre téléphone, vous perdez vos fonds.</string>
+    <string name="displayseed_instructions">La phrase de sauvegarde (aussi appelée clé, ou \"seed\"), est une liste de 12 mots en anglais. Elle permet de restaurer un accès complet aux fonds si besoin.\n\n<b>Vous seul avez possession de cette clé. Gardez la secrète.</b>\n\n<b>Ne la partagez avec personne</b>.\nFaîtes attention au hameçonnage et imposteurs. Les développeurs de Phoenix ne vous demanderont jamais de révéler cette clé.\n\n<b>Ne perdez pas cette clé</b>.\nSauvegardez-là en lieu sûr (pas sur ce téléphone). Si vous perdez cette clé et votre téléphone, vous perdez vos fonds.</string>
     <string name="displayseed_authenticate_button">Voir ma clé</string>
     <string name="displayseed_dialog_header">GARDEZ CETTE CLÉ SECRÈTE.\nNE LA PARTAGEZ PAS.</string>
     <string name="displayseed_backup_notice_header">Vous n\'avez pas sauvegardé votre clé!</string>
     <string name="displayseed_backup_notice_details">Si vous ne la sauvegardez pas et que vous perdez l\'accès à Phoenix, vous perdez vos fonds!</string>
-    <string name="displayseed_backup_checkbox">J\'ai bien sauvegardé ma clé dans un endroit sûr.</string>
+    <string name="displayseed_backup_checkbox">J\'ai bien sauvegardé ma clé en lieu sûr.</string>
     <string name="displayseed_loss_disclaimer_checkbox">Je comprends que si je perds mon téléphone et ma clé, je perds tous les fonds de mon wallet.</string>
 
     <!-- payment details -->
@@ -162,7 +165,7 @@
 
     <string name="lnurl_auth_instructions">Vous pouvez authentifier une action de façon anonyme sur le service:</string>
     <string name="lnurl_withdraw_header">Vous pouvez retirer des fonds du service\n<b>%1$s</b>.</string>
-    <string name="lnurl_withdraw_success">La demande de retrait a été envoyée au service <b>%1$s</b>.\n\nL\'envoi des fonds n\'est pas nécessairement immédiate. Veuillez garder Phoenix en ligne pendant ce temps.</string>
+    <string name="lnurl_withdraw_success">La demande de retrait a été envoyée au service <b>%1$s</b>.\n\nL\'envoi des fonds par ce service n\'est pas toujours immédiate. Veuillez garder Phoenix en ligne pendant ce temps.</string>
 
     <!-- Tor -->
 
@@ -174,12 +177,7 @@
     <string name="about_seed_title">Sauvegarde de votre clé</string>
     <string name="about_seed_content">Ce wallet est détenu en propre (aussi appelé "self-custodial"): <b>vous seul détenez la clé de 12 mots contrôlant les fonds du wallet</b>.\n\nCette clé donne accès aux fonds. Ne la révélez à personne. Faites attention aux tentatives de hameçonnage.</string>
     <string name="about_rates_title">Conversion fiduciaire</string>
-    <string name="about_rates_content">La conversion Bitcoin/monnaie fiduciaire est faite par l\'intermédiaires de plateformes tierces :\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nCes taux de conversion peuvent être imprécis. Vérifiez toujours le montant effective en Bitcoin avant d\'envoyer un paiement.</string>
-
-    <!-- home: migration result dialog -->
-
-    <string name="migration_dialog_title">Félicitations!</string>
-    <string name="migration_dialog_message">Vous utilisez maintenant la nouvelle version de Phoenix. Vos fonds sont en cours de migration et devraient être disponible rapidement.</string>
+    <string name="about_rates_content">La conversion Bitcoin/monnaie fiduciaire est faite par l\'intermédiaire de plateformes tierces :\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nCes taux de conversion peuvent être imprécis. Vérifiez toujours le montant effectif en Bitcoin avant d\'envoyer un paiement.</string>
 
     <!-- introduction screens -->
 
@@ -206,7 +204,7 @@
     <string name="walletinfo_onchain_swapin_policy_disabled_details">La gestion des channels automatisée <b>est désactivée</b>. Les fonds ne seront pas basculés sur Lightning et vont rester sur ce wallet.</string>
     <string name="walletinfo_onchain_swapin_empty">Il n\'y a pas de fonds en attente de swap.</string>
 
-    <string name="walletinfo_onchain_final_about">Un wallet on-chain dérivé de votre clé.\n\nLe wallet final est là où les fonds sont envoyés par défaut lorsqu\'un canal de paiement ferme.</string>
+    <string name="walletinfo_onchain_final_about">Un wallet on-chain dérivé de votre clé.\n\nLe wallet final est par défaut là où les fonds seront envoyés lorsqu\'un canal de paiement ferme.</string>
 
     <!-- settings: liquidity policy for channels creation -->
 
@@ -227,7 +225,7 @@
 
     <string name="liquiditypolicy_advanced_verifications_title">Vérifications additionnelles</string>
     <string name="liquiditypolicy_advanced_fees_prop_label">Valeur en pourcentage</string>
-    <string name="liquiditypolicy_advanced_fees_prop_help">Contrôle les frais en proportion du montant reçu. Permet d\'éviter des frais disproportionnés si le montant reçu est faible.</string>
+    <string name="liquiditypolicy_advanced_fees_prop_help">Contrôle les frais en proportion du montant reçu. Permet d\'éviter des frais disproportionnés quand le montant reçu est faible.</string>
     <string name="liquiditypolicy_advanced_overrides_title">Dérogation</string>
     <string name="liquiditypolicy_advanced_pay_to_open_label">Déroger au max pour les paiements Lightning</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">Si cette option est active, les paiements entrants Lightning seront acceptés même si les frais excèdent le maximum autorisé. Seule la valeur en pourcent ci-dessus sera vérifiée.\n\nAttention: si le mempool Bitcoin est plein, certains paiements Lightning entrants pourraient s\'avérer coûteux.</string>
@@ -235,11 +233,11 @@
     <string name="liquiditypolicy_save_done">Préférences enregistrée.\nLes swaps seront tentés de nouveau au prochain démarrage de l\'application.</string>
 
     <string name="liquiditypolicy_help">
-      Phoenix vous permet de recevoir des paiements sur la blockchain Bitcoin elle=même (L1), ainsi que sur la couche Lightning de Bitcoin (L2).
+      Phoenix vous permet de recevoir des paiements sur la blockchain Bitcoin elle-même (L1), ainsi que sur la couche Lightning de Bitcoin (L2).
       \n\n
-      - la couche blockchain (L1) est plus lente, et généralement plus chère (nécessite des frais de minage)
+      - la couche blockchain (L1) est plus lente, et généralement plus chère (nécessite des frais de minage).
       \n
-      - la couche Lightning (L2) est bien plus rapide, et généralement moins chère (surtout pour les petits paiements)
+      - la couche Lightning (L2) est bien plus rapide, et généralement moins chère (surtout pour les petits paiements).
       \n\n
       Quand vous recevez des paiements sur la couche L1, Phoenix va automatiquement les transférer sur la couche L2 <b>SI</b> les frais de minage afférents sont acceptables au vu de votre configuration des frais.
       \n\n
@@ -250,5 +248,6 @@
 
     <string name="cpfp_title">Accélérer mes transactions.</string>
     <string name="cpfp_instructions">Vous pouvez faire utiliser à vos transactions non confirmées un taux de frais effectif plus élevé afin d\'encourager les mineurs Bitcoin à les traiter préférentiellement.</string>
+    <string name="cpfp_splice_error_actual_below_user">Ces frais sont inférieurs à ceux que vos transactions non confirmées utilisent déjà. Utilisez une valeur plus élevée pour accélérer ces paiements.</string>
 
 </resources>

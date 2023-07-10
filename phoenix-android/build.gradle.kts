@@ -24,8 +24,8 @@ android {
         applicationId = "fr.acinq.phoenix.mainnet"
         minSdk = 24
         targetSdk = 33
-        versionCode = 52
-        versionName = "splices-beta3"
+        versionCode = 53
+        versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

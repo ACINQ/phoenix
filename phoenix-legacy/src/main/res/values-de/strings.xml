@@ -829,7 +829,7 @@
   <string name="legacy_migration_paused_disconnected">Sie können jetzt nicht upgraden, weil die Verbindung zu Lightning und/oder Electrum unterbrochen wurde.\n\nVersuchen Sie es später erneut, wenn die Verbindung wieder hergestellt ist.</string>
 
   <string name="legacy_migration_confirm_title">Bestätigen Sie die Migration</string>
-  <string name="legacy_migration_confirm_dust">%1$d von %2$d Channels halten weniger als das Bitcoin Dust Limit (546 sat). Ihr Guthaben geht an die Bitcoin Netzwerk Miners.</string>
+  <string name="legacy_migration_confirm_dust">%1$d von %2$d Kanälen sind leer oder enthalten weniger als das Bitcoin-Dust-Limit (546 sat).\n\nSie werden geschlossen, ihr Guthaben, falls vorhanden, geht an die Bitcoin-Miner, und ihre eingehende Liquidität wird nicht erhalten.</string>
   <string name="legacy_migration_confirm_proceed">Fortfahren</string>
   <string name="legacy_migration_confirm_cancel">Abbrechen</string>
 
