@@ -152,7 +152,7 @@ fun CpfpView(
             is CpfpState.Error.FeerateTooLow -> {
                 ErrorMessage(
                     header = stringResource(id = R.string.cpfp_error_title),
-                    details = stringResource(id = R.string.splice_error_actual_below_user),
+                    details = stringResource(id = R.string.cpfp_splice_error_actual_below_user),
                     alignment = Alignment.CenterHorizontally,
                     padding = PaddingValues(0.dp)
                 )

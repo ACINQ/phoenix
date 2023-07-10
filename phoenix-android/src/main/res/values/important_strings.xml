@@ -253,5 +253,6 @@
 
     <string name="cpfp_title">Accelerate my transactions.</string>
     <string name="cpfp_instructions">You can make all your unconfirmed transactions use a higher effective feerate to encourage miners to favour your payments.</string>
+    <string name="cpfp_splice_error_actual_below_user">This feerate is below what your unconfirmed transactions are already using. Use a higher to accelerate these payment.</string>
 
 </resources>
