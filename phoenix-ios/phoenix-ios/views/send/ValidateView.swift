@@ -30,61 +30,6 @@ enum Problem: Error {
 	case amountOutOfRange
 }
 
-enum SpliceOutProblem: Error {
-	case insufficientFunds
-	case spliceAlreadyInProgress
-	case channelNotIdle
-	case sessionError
-	case disconnected
-	case other
-	
-	static func fromResponse(
-		_ response: Lightning_kmpChannelCommand.CommitmentSpliceResponse?
-	) -> SpliceOutProblem? {
-		
-		guard let response else {
-			return .other
-		}
-		
-		if let failure = response.asFailure() {
-			
-			if let _ = failure.asInsufficientFunds() {
-				return .insufficientFunds
-			}
-			if let _ = failure.asSpliceAlreadyInProgress() {
-				return .spliceAlreadyInProgress
-			}
-			if let _ = failure.asChannelNotIdle() {
-				return .channelNotIdle
-			}
-			if let _ = failure.asFundingFailure() {
-				return .sessionError
-			}
-			if let _ = failure.asCannotStartSession() {
-				return .sessionError
-			}
-			if let _ = failure.asInteractiveTxSessionFailed() {
-				return .sessionError
-			}
-			if let _ = failure.asCannotCreateCommitTx() {
-				return .sessionError
-			}
-			if let _ = failure.asAbortedByPeer() {
-				return .sessionError
-			}
-			if let _ = failure.asDisconnected() {
-				return .disconnected
-			}
-			
-			return .other
-			
-		} else {
-			
-			return nil
-		}
-	}
-}
-
 struct ValidateView: View {
 	
 	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
@@ -552,23 +497,8 @@ struct ValidateView: View {
 				
 			} else if let spliceOutProblem {
 				
-				Group {
-					switch spliceOutProblem {
-					case .insufficientFunds:
-						Text("Insufficient funds")
-					case .spliceAlreadyInProgress:
-						Text("Splice already in progress")
-					case .channelNotIdle:
-						Text("Channel not idle")
-					case .sessionError:
-						Text("Splice-out session error")
-					case .disconnected:
-						Text("Disconnected during splice-out attempt")
-					case .other:
-						Text("Unknown splice-out error")
-					}
-				}
-				.foregroundColor(.appNegative)
+				Text(spliceOutProblem.localizedDescription())
+					.foregroundColor(.appNegative)
 			}
 		}
 	}

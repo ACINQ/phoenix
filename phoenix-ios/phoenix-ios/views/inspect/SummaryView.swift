@@ -667,17 +667,16 @@ struct SummaryView: View {
 		do {
 			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: outgoingSplice.txId)
 			
-			if let confirmations = result?.intValue {
-				log.debug("checkConfirmations(): => \(confirmations)")
-				self.blockchainConfirmations = confirmations
-				return confirmations
-			}
+			let confirmations = result?.intValue ?? 0
+			log.debug("checkConfirmations(): => \(confirmations)")
+			
+			self.blockchainConfirmations = confirmations
+			return confirmations
 			
 		} catch {
-			log.error("getConfirmations(): error: \(error)")
+			log.error("checkConfirmations(): error: \(error)")
+			return 0
 		}
-		
-		return 0
 	}
 	
 	func monitorBlockchain() async {

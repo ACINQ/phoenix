@@ -29,6 +29,7 @@ enum CpfpError: Error {
 	case feeTooLow
 	case noChannels
 	case errorThrown(message: String)
+	case executeError(problem: SpliceOutProblem)
 }
 
 
@@ -44,6 +45,7 @@ struct CpfpView: View {
 	
 	@State var cpfpError: CpfpError? = nil
 	@State var txAlreadyMined: Bool = false
+	@State var spliceInProgress: Bool = false
 	
 	@State var explicitlySelectedPriority: MinerFeePriority? = nil
 	
@@ -397,7 +399,7 @@ struct CpfpView: View {
 			}
 			.buttonStyle(.borderedProminent)
 			.buttonBorderShape(.capsule)
-			.disabled(minerFeeInfo == nil || cpfpError != nil || txAlreadyMined)
+			.disabled(minerFeeInfo == nil || cpfpError != nil || txAlreadyMined || spliceInProgress)
 			
 			if txAlreadyMined {
 				
@@ -417,10 +419,15 @@ struct CpfpView: View {
 							It should be higher to have any effects.
 							"""
 						)
+						
 					case .noChannels:
 						Text("No available channels. Please check your internet connection.")
+						
 					case .errorThrown(let message):
 						Text("Unexpected error: \(message)")
+						
+					case .executeError(let problem):
+						Text(problem.localizedDescription())
 					}
 				} // </Group>
 				.font(.callout)
@@ -714,6 +721,35 @@ struct CpfpView: View {
 	func executePayment() {
 		log.trace("executePayment()")
 		
-		// Todo...
+		guard
+			let minerFeeInfo = minerFeeInfo,
+			let peer = Biz.business.getPeer()
+		else {
+			return
+		}
+		
+		spliceInProgress = true
+		Task { @MainActor in
+			
+			do {
+				let feeratePerByte = minerFeeInfo.cpfpTxFeerate
+				let feeratePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: feeratePerByte)
+				
+				let response = try await peer.spliceCpfp(
+					channelId: outgoingSplice.channelId,
+					feerate: feeratePerKw
+				)
+				
+				if let problem = SpliceOutProblem.fromResponse(response) {
+					self.cpfpError = .executeError(problem: problem)
+				} else {
+					self.presentationMode.wrappedValue.dismiss()
+				}
+				
+			} catch {
+				log.error("peer.spliceCpfp(): error: \(error)")
+				self.spliceInProgress = false
+			}
+		} // </Task>
 	}
 }
