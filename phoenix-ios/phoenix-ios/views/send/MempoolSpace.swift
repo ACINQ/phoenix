@@ -7,7 +7,7 @@ enum MinerFeePriority {
 	case high
 }
 
-struct MempoolRecommendedResponse: Codable {
+struct MempoolRecommendedResponse: Equatable, Codable {
 	let fastestFee: Double
 	let halfHourFee: Double
 	let hourFee: Double

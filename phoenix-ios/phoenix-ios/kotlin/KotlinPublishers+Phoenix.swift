@@ -6,7 +6,7 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "KotlinPublishers"
+	category: "KotlinPublishers+Phoenix"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
@@ -354,75 +354,6 @@ extension CloudKitDb {
 			.map {
 				$0.int64Value
 			}
-			.eraseToAnyPublisher()
-		}
-	}
-}
-
-// MARK: -
-extension Lightning_kmpPeer {
-	
-	fileprivate struct _Key {
-		static var channelsPublisher = 0
-	}
-	
-	typealias ChannelsMap = [Bitcoin_kmpByteVector32: Lightning_kmpChannelState]
-	
-	func channelsPublisher() -> AnyPublisher<ChannelsMap, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.channelsPublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `channelsFlow: StateFlow<Map<ByteVector32, ChannelState>>`
-			///
-			KotlinCurrentValueSubject<NSDictionary, ChannelsMap>(
-				self.channelsFlow
-			)
-			.eraseToAnyPublisher()
-		}
-	}
-}
-
-// MARK: -
-extension Lightning_kmpElectrumWatcher {
-	
-	fileprivate struct _Key {
-		static var upToDatePublisher = 0
-	}
-	
-	func upToDatePublisher() -> AnyPublisher<Int64, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.upToDatePublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `openUpToDateFlow(): Flow<Long>`
-			///
-			KotlinPassthroughSubject<KotlinLong, Int64>(
-				self.openUpToDateFlow()
-			)
-			.eraseToAnyPublisher()
-		}
-	}
-}
-
-// MARK: -
-extension Lightning_kmpNodeParams {
-	
-	fileprivate struct _Key {
-		static var nodeEventsPublisher = 0
-	}
-	
-	func nodeEventsPublisher() -> AnyPublisher<Lightning_kmpNodeEvents, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.nodeEventsPublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `nodeEvents: SharedFlow<NodeEvents>`
-			///
-			KotlinPassthroughSubject<Lightning_kmpNodeEvents, Lightning_kmpNodeEvents?>(
-				self.nodeEvents
-			)
-			.compactMap { $0 }
 			.eraseToAnyPublisher()
 		}
 	}

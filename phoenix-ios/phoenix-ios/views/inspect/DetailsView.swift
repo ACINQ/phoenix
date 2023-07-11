@@ -55,16 +55,17 @@ struct DetailsView: View {
 					} label: {
 						Image(systemName: "chevron.backward")
 							.imageScale(.medium)
+							.font(.title3.weight(.semibold))
 					}
 					Spacer()
 					Button {
 						closeAction()
 					} label: {
-						Image(systemName: "xmark") // must match size of chevron.backward above
+						Image(systemName: "xmark")
 							.imageScale(.medium)
+							.font(.title3)
 					}
 				} // </VStack>
-				.font(.title2)
 				.padding()
 				
 			} else {

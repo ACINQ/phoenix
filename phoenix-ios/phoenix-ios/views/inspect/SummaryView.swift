@@ -33,6 +33,7 @@ struct SummaryView: View {
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	enum ButtonWidth: Preference {}
 	let buttonWidthReader = GeometryPreferenceReader(
@@ -122,9 +123,7 @@ struct SummaryView: View {
 						Button {
 							closeAction()
 						} label: {
-							Image("ic_cross")
-								.resizable()
-								.frame(width: 30, height: 30)
+							Image(systemName: "xmark").imageScale(.medium).font(.title2)
 						}
 						.padding()
 						.accessibilityLabel("Close sheet")
@@ -139,7 +138,7 @@ struct SummaryView: View {
 			onAppear()
 		}
 		.task {
-			await getConfirmations()
+			await monitorBlockchain()
 		}
 	}
 	
@@ -321,16 +320,14 @@ struct SummaryView: View {
 				}
 				
 				if confirmations == 0 {
-					Button {
-						// Todo...
-					} label: {
+					NavigationLink(destination: CpfpView(type: type, outgoingSplice: outgoingSplice)) {
 						Label {
 							Text("Accelerate transaction")
 						} icon: {
 							Image(systemName: "paperplane").imageScale(.small)
 						}
+						.font(.subheadline)
 					}
-					.font(.subheadline)
 					.padding(.top, 3)
 				}
 				
@@ -660,56 +657,67 @@ struct SummaryView: View {
 		}
 	}
 	
-	func getConfirmations() async {
-		log.trace("getConfirmations()")
+	// --------------------------------------------------
+	// MARK: Tasks
+	// --------------------------------------------------
+	
+	func checkConfirmations(_ outgoingSplice: Lightning_kmpSpliceOutgoingPayment) async -> Int {
+		log.trace("checkConfirmations()")
+		
+		do {
+			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: outgoingSplice.txId)
+			
+			if let confirmations = result?.intValue {
+				log.debug("checkConfirmations(): => \(confirmations)")
+				self.blockchainConfirmations = confirmations
+				return confirmations
+			}
+			
+		} catch {
+			log.error("getConfirmations(): error: \(error)")
+		}
+		
+		return 0
+	}
+	
+	func monitorBlockchain() async {
+		log.trace("monitorBlockchain()")
 		
 		guard let outgoingSplice = paymentInfo.payment as? Lightning_kmpSpliceOutgoingPayment else {
-			log.debug("getConfirmations: not an outgoing splice")
+			log.debug("monitorBlockchain(): not an outgoing splice")
 			return
 		}
 		
-		var confirmations: KotlinInt? = nil
-		repeat {
+		let confirmations = await checkConfirmations(outgoingSplice)
+		if confirmations > 6 {
+			// No need to continue checking confirmation count,
+			// because the UI displays "6+" from this point forward.
+			return
+		}
+		
+		for await notification in Biz.business.electrumClient.notificationsPublisher().values {
 			
-			// Wait until the electrum client is connected
-			log.debug("getConfirmations: waiting for connections")
-			for await connections in Biz.business.connectionsManager.publisher.values {
-				log.debug("getConfirmations: got a connection")
-				if connections.electrum is Lightning_kmpConnection.ESTABLISHED {
-					log.debug("getConfirmations: electrum connected")
+			if notification is Lightning_kmpHeaderSubscriptionResponse {
+				// A new block was mined !
+				// Update confirmation count if needed.
+				let confirmations = await checkConfirmations(outgoingSplice)
+				if confirmations > 6 {
+					// No need to continue checking confirmation count,
+					// because the UI displays "6+" from this point forward.
 					break
-				} else {
-					log.debug("getConfirmations: electrum not connected")
 				}
-			}
-			
-			// Abort if task is cancelled (which occurs when view is closed)
-			if Task.isCancelled {
-				break
-			}
-			
-			do {
-				confirmations = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: outgoingSplice.txId)
-			} catch {
-				log.error("electrumClient.getConfirmations(): \(error)")
-			}
-			
-			if let confirmations {
-				self.blockchainConfirmations = confirmations.intValue
-				break
 				
 			} else {
-				do {
-					let delay = 5.seconds()
-					if #available(iOS 16.0, *) {
-						try await Task.sleep(for: Duration.seconds(delay))
-					} else {
-						try await Task.sleep(nanoseconds: UInt64(delay * Double(1_000_000_000)))
-					}
-				} catch {}
+				log.debug("monitorBlockchain(): notification =!= HeaderSubscriptionResponse")
 			}
 			
-		} while true
+			if Task.isCancelled {
+				log.debug("monitorBlockchain(): Task.isCancelled")
+				break
+			} else {
+				log.debug("monitorBlockchain(): Waiting for next electrum notification...")
+			}
+		}
 	}
 	
 	// --------------------------------------------------

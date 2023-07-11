@@ -102,7 +102,7 @@
 		DC46BAE426C6FDD300E760A6 /* CircularCheckmarkProgress in Frameworks */ = {isa = PBXBuildFile; productRef = DC46BAE326C6FDD300E760A6 /* CircularCheckmarkProgress */; };
 		DC46BAF326CACCF700E760A6 /* KotlinExtensions+Other.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAED26CACCF700E760A6 /* KotlinExtensions+Other.swift */; };
 		DC46BAF426CACCF700E760A6 /* KotlinFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */; };
-		DC46BAF526CACCF700E760A6 /* KotlinPublishers.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEF26CACCF700E760A6 /* KotlinPublishers.swift */; };
+		DC46BAF526CACCF700E760A6 /* KotlinPublishers+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEF26CACCF700E760A6 /* KotlinPublishers+Phoenix.swift */; };
 		DC46BAF626CACCF700E760A6 /* KotlinFutures.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAF026CACCF700E760A6 /* KotlinFutures.swift */; };
 		DC46BAF726CACCF700E760A6 /* KotlinExtensions+Conversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAF126CACCF700E760A6 /* KotlinExtensions+Conversion.swift */; };
 		DC46BAF826CACCF700E760A6 /* KotlinAssociatedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAF226CACCF700E760A6 /* KotlinAssociatedObject.swift */; };
@@ -140,6 +140,7 @@
 		DC641C802821767D00862DCD /* Prefs+BackupTransactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC641C7F2821767D00862DCD /* Prefs+BackupTransactions.swift */; };
 		DC641C82282188E700862DCD /* Utils+CurrencyPrefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC641C81282188E700862DCD /* Utils+CurrencyPrefs.swift */; };
 		DC641C83282189AC00862DCD /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC18C41C256FF91100A2D083 /* Utils.swift */; };
+		DC65BBF22A58A40700EBA651 /* CpfpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC65BBF12A58A40700EBA651 /* CpfpView.swift */; };
 		DC65D86428E2F7D700686355 /* ResetWalletView_Action.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC65D86328E2F7D700686355 /* ResetWalletView_Action.swift */; };
 		DC67654E25655D93004D4263 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC67654D25655D93004D4263 /* Colors.xcassets */; };
 		DC67E40B27F3798600496C04 /* AnimatedMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC67E40A27F3798600496C04 /* AnimatedMenu.swift */; };
@@ -215,6 +216,7 @@
 		DCB511CA281AED58001BC525 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB511C9281AED58001BC525 /* NotificationService.swift */; };
 		DCB511CE281AED58001BC525 /* phoenix-notifySrvExt.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DCB511C7281AED58001BC525 /* phoenix-notifySrvExt.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DCB5D2DF280879460020B8F5 /* DeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB5D2DE280879460020B8F5 /* DeviceInfo.swift */; };
+		DCB62F472A5DF19D00912A71 /* KotlinPublishers+Lightning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB62F462A5DF19D00912A71 /* KotlinPublishers+Lightning.swift */; };
 		DCB876302735AA7300657570 /* UserDefaults+Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB8762F2735AA7300657570 /* UserDefaults+Serialization.swift */; };
 		DCB876322735AAB500657570 /* UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB876312735AAB500657570 /* UserDefaults+Codable.swift */; };
 		DCBA371B2758076F00610EC8 /* SyncSeedManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA371A2758076F00610EC8 /* SyncSeedManager.swift */; };
@@ -249,7 +251,7 @@
 		DCE9F95728412A9D005E03ED /* PaymentSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */; };
 		DCEAE5B72943CC7400320C46 /* RangeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAE5B62943CC7400320C46 /* RangeSheet.swift */; };
 		DCEAE5B92943D64B00320C46 /* MsatRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAE5B82943D64B00320C46 /* MsatRange.swift */; };
-		DCEB2795282D7A9F0096B87E /* KotlinPublishers.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEF26CACCF700E760A6 /* KotlinPublishers.swift */; };
+		DCEB2795282D7A9F0096B87E /* KotlinPublishers+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEF26CACCF700E760A6 /* KotlinPublishers+Phoenix.swift */; };
 		DCEB2796282D7AAB0096B87E /* KotlinTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174A270F332700F7E3E3 /* KotlinTypes.swift */; };
 		DCEB2797282D7ADC0096B87E /* KotlinFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */; };
 		DCEB2798282D7B070096B87E /* KotlinExtensions+Other.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAED26CACCF700E760A6 /* KotlinExtensions+Other.swift */; };
@@ -435,7 +437,7 @@
 		DC422F3429392B0500E72253 /* Int+ToDate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Int+ToDate.swift"; sourceTree = "<group>"; };
 		DC46BAED26CACCF700E760A6 /* KotlinExtensions+Other.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Other.swift"; sourceTree = "<group>"; };
 		DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KotlinFlow.swift; sourceTree = "<group>"; };
-		DC46BAEF26CACCF700E760A6 /* KotlinPublishers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KotlinPublishers.swift; sourceTree = "<group>"; };
+		DC46BAEF26CACCF700E760A6 /* KotlinPublishers+Phoenix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KotlinPublishers+Phoenix.swift"; sourceTree = "<group>"; };
 		DC46BAF026CACCF700E760A6 /* KotlinFutures.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KotlinFutures.swift; sourceTree = "<group>"; };
 		DC46BAF126CACCF700E760A6 /* KotlinExtensions+Conversion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Conversion.swift"; sourceTree = "<group>"; };
 		DC46BAF226CACCF700E760A6 /* KotlinAssociatedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KotlinAssociatedObject.swift; sourceTree = "<group>"; };
@@ -464,6 +466,7 @@
 		DC641C7D2821744000862DCD /* Currency+CurrencyPrefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Currency+CurrencyPrefs.swift"; sourceTree = "<group>"; };
 		DC641C7F2821767D00862DCD /* Prefs+BackupTransactions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+BackupTransactions.swift"; sourceTree = "<group>"; };
 		DC641C81282188E700862DCD /* Utils+CurrencyPrefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Utils+CurrencyPrefs.swift"; sourceTree = "<group>"; };
+		DC65BBF12A58A40700EBA651 /* CpfpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CpfpView.swift; sourceTree = "<group>"; };
 		DC65D86328E2F7D700686355 /* ResetWalletView_Action.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetWalletView_Action.swift; sourceTree = "<group>"; };
 		DC67654D25655D93004D4263 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		DC67E40A27F3798600496C04 /* AnimatedMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedMenu.swift; sourceTree = "<group>"; };
@@ -532,6 +535,7 @@
 		DCB511C9281AED58001BC525 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		DCB511CB281AED58001BC525 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DCB5D2DE280879460020B8F5 /* DeviceInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfo.swift; sourceTree = "<group>"; };
+		DCB62F462A5DF19D00912A71 /* KotlinPublishers+Lightning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinPublishers+Lightning.swift"; sourceTree = "<group>"; };
 		DCB8762F2735AA7300657570 /* UserDefaults+Serialization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Serialization.swift"; sourceTree = "<group>"; };
 		DCB876312735AAB500657570 /* UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		DCBA371A2758076F00610EC8 /* SyncSeedManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSeedManager.swift; sourceTree = "<group>"; };
@@ -880,7 +884,8 @@
 				DC46BAF026CACCF700E760A6 /* KotlinFutures.swift */,
 				DC71E7342728A5720063613D /* KotlinIdentifiable.swift */,
 				DC71E72F2723240E0063613D /* KotlinObservables.swift */,
-				DC46BAEF26CACCF700E760A6 /* KotlinPublishers.swift */,
+				DC46BAEF26CACCF700E760A6 /* KotlinPublishers+Phoenix.swift */,
+				DCB62F462A5DF19D00912A71 /* KotlinPublishers+Lightning.swift */,
 				DC74174A270F332700F7E3E3 /* KotlinTypes.swift */,
 			);
 			path = kotlin;
@@ -1178,6 +1183,7 @@
 				DCCD046027EE045C007D57A5 /* DetailsView.swift */,
 				DCCD045C27EE0173007D57A5 /* EditInfoView.swift */,
 				DCCD046227EE04E1007D57A5 /* WalletPaymentExtensions.swift */,
+				DC65BBF12A58A40700EBA651 /* CpfpView.swift */,
 			);
 			path = inspect;
 			sourceTree = "<group>";
@@ -1584,6 +1590,7 @@
 				DCE6FB8C28D0B5F200054511 /* ResetWalletView.swift in Sources */,
 				DCE7232E27AD68CD0017CF56 /* SyncTxManager_Actor.swift in Sources */,
 				DC16965F27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift in Sources */,
+				DC65BBF22A58A40700EBA651 /* CpfpView.swift in Sources */,
 				DC422F3329392ABD00E72253 /* Date+Format.swift in Sources */,
 				DCEFD922276A796800001767 /* SyncManager.swift in Sources */,
 				DC2F431C27B69BB20006FCC4 /* ReceiveLightningView.swift in Sources */,
@@ -1614,7 +1621,7 @@
 				C8D7A74B29EAFF2EBD73BC6B /* ConfigurationView.swift in Sources */,
 				DC46BAF826CACCF700E760A6 /* KotlinAssociatedObject.swift in Sources */,
 				DC0994B0263A074C003031CA /* InfoGrid.swift in Sources */,
-				DC46BAF526CACCF700E760A6 /* KotlinPublishers.swift in Sources */,
+				DC46BAF526CACCF700E760A6 /* KotlinPublishers+Phoenix.swift in Sources */,
 				C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */,
 				DCCD045F27EE0301007D57A5 /* SummaryView.swift in Sources */,
 				C8D7AA4B09B32AD99C88BB5E /* DisplayConfigurationView.swift in Sources */,
@@ -1676,6 +1683,7 @@
 				DCCCEAB528F6DA2A0047871A /* RootView.swift in Sources */,
 				DCDAA7402971C29700B406A8 /* RecentPaymentsSelector.swift in Sources */,
 				DCD5FF4326A0D34B009CC666 /* EqualSizes.swift in Sources */,
+				DCB62F472A5DF19D00912A71 /* KotlinPublishers+Lightning.swift in Sources */,
 				DC355E252A45FDD3008E8A8E /* NoticeMonitor.swift in Sources */,
 				F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */,
 				DC08A51A27FB6C5F0041603B /* TopTab.swift in Sources */,
@@ -1724,7 +1732,7 @@
 				DCA6DEC82829C3150073C658 /* GenericPasswordStore.swift in Sources */,
 				DCA6DECD282AB10C0073C658 /* SharedSecurity.swift in Sources */,
 				DCEB2799282D7B260096B87E /* KotlinExtensions+Conversion.swift in Sources */,
-				DCEB2795282D7A9F0096B87E /* KotlinPublishers.swift in Sources */,
+				DCEB2795282D7A9F0096B87E /* KotlinPublishers+Phoenix.swift in Sources */,
 				DC641C6B2820803100862DCD /* PhoenixManager.swift in Sources */,
 				DC641C7B2821726F00862DCD /* FormattedAmount.swift in Sources */,
 				DC641C77282171D200862DCD /* KotlinExtensions+Currency.swift in Sources */,

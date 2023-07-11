@@ -1,38 +1,63 @@
 import SwiftUI
-
 import PhoenixShared
 import os.log
 
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "MinerFeeSheet"
+	category: "CpfpSheet"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+struct MinerFeeCPFP {
+	
+	/// The effective feerate of the bumped transaction(s)
+	let effectiveFeerate: Lightning_kmpFeeratePerByte
+	
+	/// The feerate to use for the CPFP transaction itself.
+	/// It should be significantly higher than the effectiveFeerate since
+	/// it's only purpose is to increase the "effective" feerate of parent transaction(s).
+	let cpfpTxFeerate: Lightning_kmpFeeratePerByte
+	
+	/// The miner fee that will be incurred to execute the CPFP transaction.
+	let minerFee: Bitcoin_kmpSatoshi
+}
 
-struct MinerFeeSheet: View {
+enum CpfpError: Error {
+	case feeTooLow
+	case noChannels
+	case errorThrown(message: String)
+}
+
+
+struct CpfpView: View {
 	
-	let amount: Bitcoin_kmpSatoshi
-	let btcAddress: String
+	let type: PaymentViewType
+	let outgoingSplice: Lightning_kmpSpliceOutgoingPayment
 	
-	@Binding var minerFeeInfo: MinerFeeInfo?
-	@Binding var satsPerByte: String
-	@Binding var parsedSatsPerByte: Result<NSNumber, TextFieldNumberStylerError>
-	@Binding var mempoolRecommendedResponse: MempoolRecommendedResponse?
+	@State var minerFeeInfo: MinerFeeCPFP?
+	@State var satsPerByte: String = ""
+	@State var parsedSatsPerByte: Result<NSNumber, TextFieldNumberStylerError> = .failure(.emptyInput)
+	@State var mempoolRecommendedResponse: MempoolRecommendedResponse? = nil
+	
+	@State var cpfpError: CpfpError? = nil
+	@State var txAlreadyMined: Bool = false
 	
 	@State var explicitlySelectedPriority: MinerFeePriority? = nil
-	
-	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	enum Field: Hashable {
 		case satsPerByteTextField
 	}
 	@FocusState private var focusedField: Field?
+	
+	enum NavBarButtonWidth: Preference {}
+	let navBarButtonWidthReader = GeometryPreferenceReader(
+		key: AppendValue<NavBarButtonWidth>.self,
+		value: { [$0.size.width] }
+	)
+	@State var navBarButtonWidth: CGFloat? = nil
 	
 	enum PriorityBoxWidth: Preference {}
 	let priorityBoxWidthReader = GeometryPreferenceReader(
@@ -41,6 +66,10 @@ struct MinerFeeSheet: View {
 	)
 	@State var priorityBoxWidth: CGFloat? = nil
 	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -48,10 +77,32 @@ struct MinerFeeSheet: View {
 	@ViewBuilder
 	var body: some View {
 		
+		switch type {
+		case .sheet:
+			main()
+				.navigationTitle(NSLocalizedString("Accelerate Transactions", comment: "Navigation bar title"))
+				.navigationBarTitleDisplayMode(.inline)
+				.navigationBarHidden(true)
+			
+		case .embedded:
+			main()
+				.navigationTitle(NSLocalizedString("Accelerate Transactions", comment: "Navigation bar title"))
+				.navigationBarTitleDisplayMode(.inline)
+				.background(
+					Color.primaryBackground.ignoresSafeArea(.all, edges: .bottom)
+				)
+		}
+	}
+	
+	@ViewBuilder
+	func main() -> some View {
+		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+		
 			header()
-			content()
-			footer()
+			ScrollView {
+				content()
+			}
 		}
 		.onChange(of: satsPerByte) { _ in
 			satsPerByteChanged()
@@ -59,48 +110,77 @@ struct MinerFeeSheet: View {
 		.onChange(of: mempoolRecommendedResponse) { _ in
 			mempoolRecommendedResponseChanged()
 		}
+		.task {
+			await fetchMempoolRecommendedFees()
+		}
+		.task {
+			await monitorBlockchain()
+		}
 	}
 	
 	@ViewBuilder
 	func header() -> some View {
 		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Text("Miner fee")
-				.font(.title3)
-				.accessibilityAddTraits(.isHeader)
-				.accessibilitySortPriority(100)
-			Spacer()
-			Button {
-				closeButtonTapped()
-			} label: {
-				Image("ic_cross")
-					.resizable()
-					.frame(width: 30, height: 30)
-			}
-			.accessibilityLabel("Close")
-			.accessibilityHidden(smartModalState.currentItem?.dismissable ?? false)
+		if case .sheet(let closeAction) = type {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Button {
+					presentationMode.wrappedValue.dismiss()
+				} label: {
+					Image(systemName: "chevron.backward")
+						.imageScale(.medium)
+						.font(.title3.weight(.semibold))
+				}
+				.read(navBarButtonWidthReader)
+				.frame(width: navBarButtonWidth)
+				
+				Spacer(minLength: 0)
+				Text("Accelerate transaction")
+					.font(.headline)
+					.fontWeight(.medium)
+					.lineLimit(1)
+				Spacer(minLength: 0)
+				
+				Button {
+					closeAction()
+				} label: {
+					Image(systemName: "xmark") // must match size of chevron.backward above
+						.imageScale(.medium)
+						.font(.title3)
+				}
+				.read(navBarButtonWidthReader)
+				.frame(width: navBarButtonWidth)
+				
+			} // </HStack>
+			.padding()
+			.assignMaxPreference(for: navBarButtonWidthReader.key, to: $navBarButtonWidth)
 		}
-		.padding(.horizontal)
-		.padding(.vertical, 8)
-		.background(
-			Color(UIColor.secondarySystemBackground)
-				.cornerRadius(15, corners: [.topLeft, .topRight])
-		)
-		.padding(.bottom, 4)
 	}
 	
 	@ViewBuilder
 	func content() -> some View {
 		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+		VStack(alignment: HorizontalAlignment.center, spacing: 20) {
+			
+			Spacer().frame(height: 25)
+			
+			Text(
+				"""
+				You can make all your unconfirmed transactions use a higher effective feerate \
+				to encourage miners to favour your payments.
+				"""
+			)
+			.font(.callout)
 			
 			priorityBoxes()
-				.padding(.horizontal, 8)
 				.padding(.top)
-				.padding(.bottom, 30)
+				.padding(.bottom)
+			
 			minerFeeFormula()
-				.padding(.horizontal)
+				.padding(.bottom)
+			
+			payButton()
 		}
+		.padding(.horizontal, 40)
 	}
 	
 	@ViewBuilder
@@ -248,7 +328,7 @@ struct MinerFeeSheet: View {
 	@ViewBuilder
 	func minerFeeFormula() -> some View {
 		
-		HStack(alignment: VerticalAlignment.center, spacing: 12) {
+		VStack(alignment: HorizontalAlignment.center, spacing: 10) {
 			satsPerByteTextField()
 			minerFeeAmounts()
 		}
@@ -283,32 +363,144 @@ struct MinerFeeSheet: View {
 	@ViewBuilder
 	func minerFeeAmounts() -> some View {
 		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
-			
-			let (btc, fiat) = minerFeeStrings()
-			
-			Text(verbatim: "= \(btc.string)")
-			Text(verbatim: "≈ \(fiat.string)")
-		}
+		Group {
+			if case .failure = parsedSatsPerByte {
+				
+				Text("Select a fee to see the amount.")
+					.foregroundColor(.secondary)
+				
+			} else if minerFeeInfo == nil {
+				
+				Text("Calculating amount…")
+					.foregroundColor(cpfpError == nil ? .secondary : .clear)
+				
+			} else {
+				
+				let (btc, fiat) = minerFeeStrings()
+				Text("You will pay \(btc.string) (≈ \(fiat.string)) to the Bitcoin miners.")
+			}
+		} // </Group>
 		.font(.callout)
+		.multilineTextAlignment(.center)
 	}
 	
 	@ViewBuilder
-	func footer() -> some View {
+	func payButton() -> some View {
 		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Spacer()
+		VStack(alignment: HorizontalAlignment.center, spacing: 10) {
+			
 			Button {
-				reviewTransactionButtonTapped()
+				executePayment()
 			} label: {
-				Text("Review Transaction")
+				Label("Pay", systemImage: "paperplane")
+					.font(.title3)
 			}
-			.font(.title3)
-			.disabled(minerFeeInfo == nil)
-			Spacer()
+			.buttonStyle(.borderedProminent)
+			.buttonBorderShape(.capsule)
+			.disabled(minerFeeInfo == nil || cpfpError != nil || txAlreadyMined)
+			
+			if txAlreadyMined {
+				
+				Text("Good news! Your transaction has been mined!")
+					.foregroundColor(.appPositive)
+					.font(.callout)
+					.multilineTextAlignment(.center)
+				
+			} else if let cpfpError {
+				
+				Group {
+					switch cpfpError {
+					case .feeTooLow:
+						Text(
+							"""
+							This feerate is below what your transactions are already using. \
+							It should be higher to have any effects.
+							"""
+						)
+					case .noChannels:
+						Text("No available channels. Please check your internet connection.")
+					case .errorThrown(let message):
+						Text("Unexpected error: \(message)")
+					}
+				} // </Group>
+				.font(.callout)
+				.foregroundColor(.appNegative)
+				.multilineTextAlignment(.center)
+			}
 		}
-		.padding()
-		.padding(.top)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Tasks
+	// --------------------------------------------------
+	
+	func fetchMempoolRecommendedFees() async {
+		
+		repeat {
+			
+			let result = await MempoolRecommendedResponse.fetch()
+			let delay: TimeInterval
+			
+			switch result {
+			case .success(let response):
+				mempoolRecommendedResponse = response
+				delay = 5.minutes()
+				
+			case .failure(let reason):
+				log.error("Errror fetching mempool.space/recommended: \(reason)")
+				mempoolRecommendedResponse = nil
+				delay = 15.seconds()
+			}
+			
+			do {
+				if #available(iOS 16.0, *) {
+					try await Task.sleep(for: Duration.seconds(delay))
+				} else {
+					try await Task.sleep(nanoseconds: UInt64(delay * Double(1_000_000_000)))
+				}
+			} catch {}
+			
+		} while !Task.isCancelled
+	}
+	
+	func checkConfirmations() async {
+		log.trace("checkConfirmations()")
+		
+		do {
+			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: outgoingSplice.txId)
+			
+			let confirmations = result?.intValue ?? 0
+			log.debug("checkConfirmations(): => \(confirmations)")
+			
+			if confirmations > 0 {
+				self.txAlreadyMined = true
+			}
+			
+		} catch {
+			log.error("electrumClient.getConfirmations(): \(error)")
+		}
+	}
+	
+	func monitorBlockchain() async {
+		log.trace("monitorBlockchain()")
+		
+		for await notification in Biz.business.electrumClient.notificationsPublisher().values {
+			
+			if notification is Lightning_kmpHeaderSubscriptionResponse {
+				// A new block was mined !
+				// Check to see if our pending transaction was included in the block.
+				await checkConfirmations()
+			} else {
+				log.debug("monitorBlockchain(): notification =!= HeaderSubscriptionResponse")
+			}
+			
+			if Task.isCancelled {
+				log.debug("monitorBlockchain(): Task.isCancelled")
+				break
+			} else {
+				log.debug("monitorBlockchain(): Waiting for next electrum notification...")
+			}
+		}
 	}
 	
 	// --------------------------------------------------
@@ -390,15 +582,15 @@ struct MinerFeeSheet: View {
 			
 			case .low:
 				return amount.doubleValue == mempoolRecommendedResponse.feeForPriority(.low) &&
-				       amount.doubleValue != mempoolRecommendedResponse.feeForPriority(.none)
+						 amount.doubleValue != mempoolRecommendedResponse.feeForPriority(.none)
 			
 			case .medium:
 				return amount.doubleValue == mempoolRecommendedResponse.feeForPriority(.medium) &&
-				       amount.doubleValue != mempoolRecommendedResponse.feeForPriority(.high)
+						 amount.doubleValue != mempoolRecommendedResponse.feeForPriority(.high)
 			
 			case .high:
 				return amount.doubleValue == mempoolRecommendedResponse.feeForPriority(.high) &&
-				       amount.doubleValue != mempoolRecommendedResponse.feeForPriority(.medium)
+						 amount.doubleValue != mempoolRecommendedResponse.feeForPriority(.medium)
 		}
 	}
 	
@@ -442,39 +634,71 @@ struct MinerFeeSheet: View {
 		
 		guard
 			let satsPerByte_number = try? parsedSatsPerByte.get(),
-			let peer = Biz.business.getPeer(),
-			let scriptBytes = Parser.shared.addressToPublicKeyScript(chain: Biz.business.chain, address: btcAddress)
+			let peer = Biz.business.getPeer()
 		else {
 			minerFeeInfo = nil
 			return
 		}
 		
 		let originalSatsPerByte = satsPerByte
-		let scriptVector = Bitcoin_kmpByteVector(bytes: scriptBytes)
 		
 		let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
-		let feePerByte = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)
-		let feePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: feePerByte)
+		let effectiveFeerate = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)
+		let effectiveFeeratePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: effectiveFeerate)
 		
+		cpfpError = nil
 		minerFeeInfo = nil
+		
 		Task { @MainActor in
+			
+			var pair: KotlinPair<Lightning_kmpFeeratePerKw, Bitcoin_kmpSatoshi>? = nil
 			do {
-				let pair = try await peer.estimateFeeForSpliceOut(
-					amount: amount,
-					scriptPubKey: scriptVector,
-					targetFeerate: feePerKw
+				pair = try await peer.estimateFeeForSpliceCpfp(
+					channelId: outgoingSplice.channelId,
+					targetFeerate: effectiveFeeratePerKw
 				)
-				
-				let updatedFeePerKw: Lightning_kmpFeeratePerKw = pair!.first!
-				let fee: Bitcoin_kmpSatoshi = pair!.second!
-				
-				if self.satsPerByte == originalSatsPerByte {
-					self.minerFeeInfo = MinerFeeInfo(pubKeyScript: scriptVector, feerate: updatedFeePerKw, minerFee: fee)
-				}
-				
 			} catch {
 				log.error("Error: \(error)")
-				self.minerFeeInfo = nil
+			}
+			
+			guard self.satsPerByte == originalSatsPerByte else {
+				// Ignore: user has changed to a different rate
+				return
+			}
+				
+			if let pair {
+				
+				let cpfpFeeratePerKw: Lightning_kmpFeeratePerKw = pair.first!
+				let cpfpFeerate = Lightning_kmpFeeratePerByte(feeratePerKw: cpfpFeeratePerKw)
+				
+				let minerFee: Bitcoin_kmpSatoshi = pair.second!
+					
+				// From the docs (in lightning-kmp):
+				//
+				// > if the output feerate is equal to the input feerate then the cpfp is useless
+				// > and should not be attempted.
+				//
+				// So we check to ensure the output is larger than the input.
+				
+				let input: Int64 = effectiveFeerate.feerate.sat
+				let output: Int64 = cpfpFeerate.feerate.sat
+				
+				log.debug("effectiveFeerate(\(input)) => cpfpFeerate(\(output))")
+				
+				if Double(output) > (Double(input) * 1.1) {
+					self.minerFeeInfo = MinerFeeCPFP(
+						effectiveFeerate: effectiveFeerate,
+						cpfpTxFeerate: cpfpFeerate,
+						minerFee: minerFee
+					)
+				} else {
+					log.error("Error: peer.estimateFeeForSpliceCpfp() => too low")
+					self.cpfpError = .feeTooLow
+				}
+				
+			} else {
+				log.error("Error: peer.estimateFeeForSpliceCpfp() => nil")
+				self.cpfpError = .noChannels
 			}
 			
 		} // </Task>
@@ -487,42 +711,9 @@ struct MinerFeeSheet: View {
 		priorityBoxWidth = nil
 	}
 	
-	func closeButtonTapped() {
-		log.trace("closeButtonTapped()")
-		smartModalState.close()
-	}
-	
-	func reviewTransactionButtonTapped() {
-		log.trace("reviewTransactionButtonTapped()")
-		smartModalState.close()
-	}
-}
-
-// MARK: -
-
-struct PriorityBoxStyle: GroupBoxStyle {
-	
-	let width: CGFloat?
-	let disabled: Bool
-	let selected: Bool
-	let tapped: () -> Void
-	
-	func makeBody(configuration: GroupBoxStyleConfiguration) -> some View {
-		VStack(alignment: HorizontalAlignment.center, spacing: 4) {
-			configuration.label
-				.font(.headline)
-			configuration.content
-		}
-		.frame(width: width?.advanced(by: -16.0))
-		.padding(.all, 8)
-		.background(RoundedRectangle(cornerRadius: 8, style: .continuous)
-			.fill(Color(UIColor.quaternarySystemFill)))
-		.overlay(
-			RoundedRectangle(cornerRadius: 8)
-				.stroke(selected ? Color.appAccent : Color(UIColor.quaternarySystemFill), lineWidth: 1)
-		)
-		.onTapGesture {
-			tapped()
-		}
+	func executePayment() {
+		log.trace("executePayment()")
+		
+		// Todo...
 	}
 }
