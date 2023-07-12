@@ -784,13 +784,34 @@ class SyncTxManager {
 				}
 			}
 			
-			return UploadOperationInfo(
+			var opInfo = UploadOperationInfo(
 				batch: batch,
 				recordsToSave: recordsToSave,
 				recordIDsToDelete: recordIDsToDelete,
 				reverseMap: reverseMap,
 				unpaddedMap: unpaddedMap
 			)
+			
+			// Edge-case: A rowid wasn't able to be converted to a WalletPaymentId.
+			// This may happen when we add a new type to the database,
+			// and we don't have code in place within `cloudKitDb.fetchQueueBatch()` to handle it.
+			//
+			// So the rowid is not represented in either `rowidMap` or `uniquePaymentIds()`.
+			// Nor is it reprensented in `recordsToSave` or `recordIDsToDelete`.
+			//
+			// The end result is that we have an empty operation.
+			// And we won't remove the rowid from the database either, creating an infinite loop.
+			//
+			// So we add a sanity check here.
+			
+			for rowid in batch.rowids {
+				if batch.rowidMap[rowid] == nil {
+					log.warning("UNHANDLED ROWID TYPE")
+					opInfo.completedRowids.append(rowid)
+				}
+			}
+			
+			return opInfo
 		
 		} // </prepareUpload()>
 		
