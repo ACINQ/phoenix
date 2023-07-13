@@ -328,11 +328,10 @@ struct DrainWalletView: MVIView {
 			if let error = error as? BitcoinAddressError.ChainMismatch {
 				detailedErrorMsg = String(format: NSLocalizedString(
 					"""
-					The address is for %@, \
-					but you're on %@
+					The address is not for %@
 					""",
 					comment: "Error message - parsing bitcoin address"),
-					error.actual.name, error.expected.name
+					error.expected.name
 				)
 			}
 			else if isScannedValue {

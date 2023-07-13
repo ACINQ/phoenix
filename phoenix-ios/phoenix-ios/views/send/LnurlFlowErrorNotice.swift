@@ -119,10 +119,7 @@ struct LnurlFlowErrorNotice: View {
 			 
 			} else if let err = payError as? Scan.LnurlPay_Error_ChainMismatch {
 				
-				let lChain = err.expected.name
-				let rChain = err.actual.name
-				
-				Text("You are on bitcoin chain \(lChain), but the invoice is for \(rChain).")
+				Text("The invoice is not for \(err.expected.name)")
 				
 			} else if let _ = payError as? Scan.LnurlPay_Error_AlreadyPaidInvoice {
 				
