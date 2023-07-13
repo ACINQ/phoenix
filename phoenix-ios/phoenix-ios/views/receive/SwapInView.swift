@@ -50,24 +50,6 @@ struct SwapInView: View {
 	@ViewBuilder
 	var body: some View {
 		
-		ZStack {
-			Color.primaryBackground
-				.edgesIgnoringSafeArea(.all)
-			
-			if BusinessManager.showTestnetBackground {
-				Image("testnet_bg")
-					.resizable(resizingMode: .tile)
-					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
-					.accessibilityHidden(true)
-			}
-			
-			contentWrapper()
-		}
-	}
-	
-	@ViewBuilder
-	func contentWrapper() -> some View {
-		
 		GeometryReader { geometry in
 			ScrollView(.vertical) {
 				content()

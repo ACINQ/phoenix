@@ -84,16 +84,6 @@ struct ReceiveLightningView: View {
 				
 			} // else: uses.navigationStackDestination()
 			
-			Color.primaryBackground
-				.edgesIgnoringSafeArea(.all)
-			
-			if BusinessManager.showTestnetBackground {
-				Image("testnet_bg")
-					.resizable(resizingMode: .tile)
-					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
-					.accessibilityHidden(true)
-			}
-			
 			content()
 		}
 		.onAppear {
@@ -205,13 +195,13 @@ struct ReceiveLightningView: View {
 			VStack(alignment: .center) {
 			
 				invoiceAmount()
-					.font(.caption2)
+					.font(.footnote)
 					.foregroundColor(.secondary)
 					.padding(.bottom, 2)
 			
 				Text(invoiceDescription())
 					.lineLimit(1)
-					.font(.caption2)
+					.font(.footnote)
 					.foregroundColor(.secondary)
 					.padding(.bottom, 2)
 			}
@@ -265,13 +255,13 @@ struct ReceiveLightningView: View {
 				Spacer()
 				
 				invoiceAmount()
-					.font(.caption2)
+					.font(.footnote)
 					.foregroundColor(.secondary)
 					.padding(.bottom, 6)
 			
 				Text(invoiceDescription())
 					.lineLimit(1)
-					.font(.caption2)
+					.font(.footnote)
 					.foregroundColor(.secondary)
 				
 				warningButton(paddingTop: 8)

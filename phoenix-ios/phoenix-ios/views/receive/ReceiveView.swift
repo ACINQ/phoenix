@@ -32,6 +32,13 @@ struct ReceiveView: MVIView {
 	
 	@State var swapIn_enabled = true
 	
+	enum TabBarButtonHeight: Preference {}
+	let tabBarButtonHeightReader = GeometryPreferenceReader(
+		key: AppendValue<TabBarButtonHeight>.self,
+		value: { [$0.size.height] }
+	)
+	@State var tabBarButtonHeight: CGFloat? = nil
+	
 	@StateObject var toast = Toast()
 	
 	@Environment(\.colorScheme) var colorScheme
@@ -45,17 +52,28 @@ struct ReceiveView: MVIView {
 	var view: some View {
 		
 		ZStack {
-			customTabBar()
+			
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
+			if BusinessManager.showTestnetBackground {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+					.accessibilityHidden(true)
+			}
+			
+			customTabView()
+			
 			toast.view()
 		}
-		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
 	}
 	
 	@ViewBuilder
-	func customTabBar() -> some View {
+	func customTabView() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
@@ -76,45 +94,63 @@ struct ReceiveView: MVIView {
 				)
 			}
 			
-			HStack(alignment: VerticalAlignment.center, spacing: 20) {
-				
-				Button {
-					didSelectTab(.lightning)
-				} label: {
-					HStack(alignment: VerticalAlignment.center, spacing: 4) {
-						Image(systemName: "bolt").font(.title2).imageScale(.large)
-						VStack(alignment: HorizontalAlignment.center, spacing: 4) {
-							Text("Lightning").padding(.bottom, 4)
-							Text("(layer 2)").font(.footnote.weight(.thin)).opacity(0.7)
-						}
-					}
-				}
-				.foregroundColor(selectedTab == .lightning ? Color.appAccent : Color.primary)
-				.frame(maxWidth: .infinity)
-				
-				Button {
-					didSelectTab(.blockchain)
-				} label: {
-					HStack(alignment: VerticalAlignment.center, spacing: 4) {
-						Image(systemName: "link").font(.title2).imageScale(.large)
-						VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-							Text("Blockchain").padding(.bottom, 4)
-							Text("(layer 1)").font(.footnote.weight(.thin)).opacity(0.7)
-						}
-					}
-				}
-				.foregroundColor(selectedTab == .blockchain ? Color.appAccent : Color.primary)
-				.frame(maxWidth: .infinity)
-				
-			} // </HStack>
-			.padding(.top, 15)
-			.background(
-				Color.mutedBackground
-					.edgesIgnoringSafeArea(.bottom) // background color should extend to bottom of screen
-			)
+			customTabBar()
+				.padding(.top, 15)
+				.background(
+					Color.mutedBackground
+						.cornerRadius(15, corners: [.topLeft, .topRight])
+						.edgesIgnoringSafeArea(.bottom) // background color should extend to bottom of screen
+				)
 			
 		} // </VStack>
+	}
+	
+	@ViewBuilder
+	func customTabBar() -> some View {
 		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			
+			Spacer(minLength: 2)
+			
+			Button {
+				didSelectTab(.lightning)
+			} label: {
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
+					Image(systemName: "bolt").font(.title2).imageScale(.large)
+					VStack(alignment: HorizontalAlignment.center, spacing: 4) {
+						Text("Lightning")
+						Text("(layer 2)").font(.footnote.weight(.thin)).opacity(0.7)
+					}
+				}
+			}
+			.foregroundColor(selectedTab == .lightning ? Color.appAccent : Color.primary)
+			.read(tabBarButtonHeightReader)
+			
+			Spacer(minLength: 2)
+			if let tabBarButtonHeight {
+				Divider().frame(width: 1, height: tabBarButtonHeight).background(Color.borderColor)
+				Spacer(minLength: 2)
+			}
+			
+			Button {
+				didSelectTab(.blockchain)
+			} label: {
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
+					Image(systemName: "link").font(.title2).imageScale(.large)
+					VStack(alignment: HorizontalAlignment.center, spacing: 4) {
+						Text("Blockchain")
+						Text("(layer 1)").font(.footnote.weight(.thin)).opacity(0.7)
+					}
+				}
+			}
+			.foregroundColor(selectedTab == .blockchain ? Color.appAccent : Color.primary)
+			.read(tabBarButtonHeightReader)
+			
+			Spacer(minLength: 2)
+			
+		} // </HStack>
+		.clipped() // SwiftUI force-extends height of button to bottom of screen for some odd reason
+		.assignMaxPreference(for: tabBarButtonHeightReader.key, to: $tabBarButtonHeight)
 	}
 	
 	// --------------------------------------------------
@@ -164,32 +200,5 @@ struct ReceiveView: MVIView {
 	static func qrCodeBorderColor(_ colorScheme: ColorScheme) -> Color {
 		
 		return (colorScheme == .dark) ? Color(UIColor.separator) : Color.appAccent
-	}
-}
-
-// MARK: -
-
-class ReceiveView_Previews: PreviewProvider {
-
-	static let request = "lntb17u1p0475jgpp5f69ep0f2202rqegjeddjxa3mdre6ke6kchzhzrn4rxzhyqakzqwqdpzxysy2umswfjhxum0yppk76twypgxzmnwvycqp2xqrrss9qy9qsqsp5nhhdgpz3549mll70udxldkg48s36cj05epp2cjjv3rrvs5hptdfqlq6h3tkkaplq4au9tx2k49tcp3gx7azehseq68jums4p0gt6aeu3gprw3r7ewzl42luhc3gyexaq37h3d73wejr70nvcw036cde4ptgpckmmkm"
-
-	static var previews: some View {
-
-		NavigationWrapper {
-			ReceiveView().mock(Receive.Model_Awaiting())
-		}
-		.modifier(GlobalEnvironment())
-		.previewDevice("iPhone 11")
-
-		NavigationWrapper {
-			ReceiveView().mock(Receive.Model_Generated(
-				request: request,
-				paymentHash: "foobar",
-				amount: Lightning_kmpMilliSatoshi(msat: 170000),
-				desc: "1 Espresso Coin Panna"
-			))
-		}
-		.modifier(GlobalEnvironment())
-		.previewDevice("iPhone 11")
 	}
 }
