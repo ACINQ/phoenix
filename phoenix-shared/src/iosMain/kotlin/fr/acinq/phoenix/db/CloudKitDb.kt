@@ -262,6 +262,12 @@ class CloudKitDb(
                                     incoming.add(row.unpadded_size)
                                 WalletPaymentId.DbType.OUTGOING.value ->
                                     outgoing.add(row.unpadded_size)
+                                WalletPaymentId.DbType.SPLICE_OUTGOING.value ->
+                                    outgoing.add(row.unpadded_size)
+                                WalletPaymentId.DbType.CHANNEL_CLOSE_OUTGOING.value ->
+                                    outgoing.add(row.unpadded_size)
+                                WalletPaymentId.DbType.SPLICE_CPFP_OUTGOING.value ->
+                                    outgoing.add(row.unpadded_size)
                             }
                         }
                     }
@@ -382,6 +388,8 @@ class CloudKitDb(
             val inQueries = database.incomingPaymentsQueries
             val outQueries = database.outgoingPaymentsQueries
             val spliceOutQueries = SpliceOutgoingQueries(database)
+            val channelCloseOutQueries = ChannelCloseOutgoingQueries(database)
+            val spliceCpfpQueries = SpliceCpfpOutgoingQueries(database)
             val metaQueries = database.paymentsMetadataQueries
 
             database.transaction {
@@ -507,11 +515,53 @@ class CloudKitDb(
                 }
 
                 channelCloseList.forEach { payment ->
-                    TODO("handle closing")
+
+                    val existing = channelCloseOutQueries.getChannelCloseOutgoingPayment(id = payment.id)
+                    if (existing == null) {
+                        channelCloseOutQueries.addChannelCloseOutgoingPayment(payment = payment)
+
+                    } else {
+                        val confirmedAt = payment.confirmedAt
+                        if (existing.confirmedAt == null && confirmedAt != null) {
+                            channelCloseOutQueries.setConfirmed(
+                                id = payment.id,
+                                confirmedAt = confirmedAt
+                            )
+                        }
+
+                        val lockedAt = payment.lockedAt
+                        if (existing.lockedAt == null && lockedAt != null) {
+                            channelCloseOutQueries.setLocked(
+                                id = payment.id,
+                                lockedAt = lockedAt
+                            )
+                        }
+                    }
                 }
 
                 spliceCpfpList.forEach { payment ->
-                    TODO("handle splice cpfp")
+
+                    val existing = spliceCpfpQueries.getCpfp(id = payment.id)
+                    if (existing == null) {
+                        spliceCpfpQueries.addCpfpPayment(payment = payment)
+
+                    } else {
+                        val confirmedAt = payment.confirmedAt
+                        if (existing.confirmedAt == null && confirmedAt != null) {
+                            spliceCpfpQueries.setConfirmed(
+                                id = payment.id,
+                                confirmedAt = confirmedAt
+                            )
+                        }
+
+                        val lockedAt = payment.lockedAt
+                        if (existing.lockedAt == null && lockedAt != null) {
+                            spliceCpfpQueries.setLocked(
+                                id = payment.id,
+                                lockedAt = lockedAt
+                            )
+                        }
+                    }
                 }
 
                 downloadedPaymentsMetadata.forEach { (paymentId, row) ->
