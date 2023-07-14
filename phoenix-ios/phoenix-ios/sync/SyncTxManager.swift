@@ -571,7 +571,7 @@ class SyncTxManager {
 					]
 					
 					var done = false
-					var batch = 1
+					var batch = 0
 					var cursor: CKQueryOperation.Cursor? = nil
 					
 					while !done {

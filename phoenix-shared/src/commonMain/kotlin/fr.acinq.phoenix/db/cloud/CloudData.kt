@@ -65,10 +65,13 @@ data class CloudData(
     val outgoing: LightningOutgoingPaymentWrapper?,
     @ByteString
     @SerialName("so")
-    val spliceOutgoing: SpliceOutgoingPaymentWrapper?,
+    val spliceOutgoing: SpliceOutgoingPaymentWrapper? = null,
     @ByteString
     @SerialName("cc")
-    val channelClose: ChannelClosePaymentWrapper?,
+    val channelClose: ChannelClosePaymentWrapper? = null,
+    @ByteString
+    @SerialName("sc")
+    val spliceCpfp: SpliceCpfpPaymentWrapper? = null,
     @SerialName("v")
     val version: Int,
     @ByteString
@@ -80,6 +83,7 @@ data class CloudData(
         outgoing = null,
         spliceOutgoing = null,
         channelClose = null,
+        spliceCpfp = null,
         version = CloudDataVersion.V0.value,
         padding = ByteArray(size = 0)
     )
@@ -89,6 +93,7 @@ data class CloudData(
         outgoing = if (outgoing is LightningOutgoingPayment) LightningOutgoingPaymentWrapper(outgoing) else null,
         spliceOutgoing = if (outgoing is SpliceOutgoingPayment) SpliceOutgoingPaymentWrapper(outgoing) else null,
         channelClose = if (outgoing is ChannelCloseOutgoingPayment) ChannelClosePaymentWrapper(outgoing) else null,
+        spliceCpfp = if (outgoing is SpliceCpfpOutgoingPayment) SpliceCpfpPaymentWrapper(outgoing) else null,
         version = CloudDataVersion.V0.value,
         padding = ByteArray(size = 0)
     )
@@ -107,6 +112,7 @@ data class CloudData(
         outgoing != null -> outgoing.unwrap()
         spliceOutgoing != null -> spliceOutgoing.unwrap()
         channelClose != null -> channelClose.unwrap()
+        spliceCpfp != null -> spliceCpfp.unwrap()
         else -> null
     }
 
