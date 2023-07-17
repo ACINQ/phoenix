@@ -29,6 +29,14 @@ struct LiquidityPolicyView: View {
 	
 	@State var lightningOverride = false
 	
+	@State var mempoolRecommendedResponse: MempoolRecommendedResponse? = nil
+	
+	enum MaxFeeAmountError: Error {
+		case tooLow(sats: Int64)
+		case tooHigh(sats: Int64)
+		case invalidInput
+	}
+	
 	enum MaxFeeAmtFiatHeight: Preference {}
 	let maxFeeAmtFiatHeightReader = GeometryPreferenceReader(
 		key: AppendValue<MaxFeeAmtFiatHeight>.self,
@@ -50,16 +58,22 @@ struct LiquidityPolicyView: View {
 		let defaultLp = NodeParamsManager.companion.defaultLiquidityPolicy
 		let userLp = Prefs.shared.liquidityPolicy
 		
-		isEnabled = true
+		let __isEnabled = true
 		
 		let sats = userLp.maxFeeSats ?? defaultLp.maxAbsoluteFee.sat
-		maxFeeAmt = LiquidityPolicyView.formattedMaxFeeAmt(sat: sats)
-		parsedMaxFeeAmt = .success(NSNumber(value: sats))
+		let __maxFeeAmt = LiquidityPolicyView.formattedMaxFeeAmt(sat: sats)
+		let __parsedMaxFeeAmt: Result<NSNumber, TextFieldNumberStylerError> = .success(NSNumber(value: sats))
 		
 		let basisPoints = userLp.maxFeeBasisPoints ?? defaultLp.maxRelativeFeeBasisPoints
 		let percent = Double(basisPoints) / Double(100)
-		maxFeePrcnt = LiquidityPolicyView.formattedMaxFeePrcnt(percent: percent)
-		parsedMaxFeePrcnt = .success(NSNumber(value: percent))
+		let __maxFeePrcnt = LiquidityPolicyView.formattedMaxFeePrcnt(percent: percent)
+		let __parsedMaxFeePrcnt: Result<NSNumber, TextFieldNumberStylerError> = .success(NSNumber(value: percent))
+		
+		self._isEnabled = State(initialValue: __isEnabled)
+		self._maxFeeAmt = State(initialValue: __maxFeeAmt)
+		self._parsedMaxFeeAmt = State(initialValue: __parsedMaxFeeAmt)
+		self._maxFeePrcnt = State(initialValue: __maxFeePrcnt)
+		self._parsedMaxFeePrcnt = State(initialValue: __parsedMaxFeePrcnt)
 	}
 	
 	// --------------------------------------------------
@@ -80,6 +94,9 @@ struct LiquidityPolicyView: View {
 		List {
 			section_explanation()
 			section_general()
+			if let mempoolRecommendedResponse {
+				section_estimate(mempoolRecommendedResponse)
+			}
 			if isEnabled {
 				if showAdvanced {
 					section_percentageCheck()
@@ -106,6 +123,9 @@ struct LiquidityPolicyView: View {
 		}
 		.onDisappear {
 			onDisappear()
+		}
+		.task {
+			await fetchMempoolRecommendedFees()
 		}
 	}
 	
@@ -142,6 +162,28 @@ struct LiquidityPolicyView: View {
 		} /* Section.*/header: {
 			
 			Text("General")
+		}
+	}
+	
+	@ViewBuilder
+	func section_estimate(_ mrr: MempoolRecommendedResponse) -> some View {
+		
+		Section {
+			VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
+				
+				let sat = mrr.swapEstimationFee(hasNoChannels: true)
+				let btcAmt = Utils.formatBitcoin(currencyPrefs, sat: sat)
+				let fiatAmt = Utils.formatFiat(currencyPrefs, sat: sat)
+				
+				Text(styled: String(format: NSLocalizedString(
+					"Fees are currently estimated at around **%@** (≈%@).",
+					comment:	"Fee estimate"
+				), btcAmt.string, fiatAmt.string))
+			}
+			
+		} /* Section.*/header: {
+			
+			Text("Mempool")
 		}
 	}
 	
@@ -254,7 +296,11 @@ struct LiquidityPolicyView: View {
 				.padding(.bottom, 8.0 + ((maxFeeAmtFiatHeight ?? 12.0) / 2.0))
 				.background(
 					RoundedRectangle(cornerRadius: 8)
-						.stroke(maxFeeAmountHasError() ? Color.appNegative : Color.textFieldBorder, lineWidth: 1)
+						.stroke(
+							maxFeeAmountHasError() ? Color.appNegative :
+							maxFeeAmountHasWarning() ? Color.appWarn : Color.textFieldBorder,
+							lineWidth: 1
+						)
 				)
 				.padding(.bottom, ((maxFeeAmtFiatHeight ?? 12.0) / 2.0))
 				.overlay {
@@ -275,10 +321,33 @@ struct LiquidityPolicyView: View {
 				
 			} // </HStack>
 			
-			Text("Incoming payments whose fees exceed this value will be rejected.")
-				.font(.subheadline)
-				.foregroundColor(.secondary)
-				.padding(.top, 12)
+			Group {
+				switch maxFeeAmountSats() {
+				case .success(_):
+					if maxFeeAmountHasWarning() {
+						Text("Below the expected fee. Some payments may be rejected.")
+							.foregroundColor(.secondary) // because yellow text is too hard to read
+					} else {
+						Text("Incoming payments whose fees exceed this value will be rejected.")
+							.foregroundColor(.secondary)
+					}
+					
+				case .failure(let reason):
+					switch reason {
+					case .invalidInput:
+						Text("Please enter a valid amount.")
+							.foregroundColor(.appNegative)
+					case .tooLow(_):
+						Text("Amount is too low.")
+							.foregroundColor(.appNegative)
+					case .tooHigh(_):
+						Text("Amount is too high.")
+							.foregroundColor(.appNegative)
+					}
+				}
+			}
+			.font(.subheadline)
+			.padding(.top, 12)
 			
 		} // </VStack>
 		.padding(.top, 20)
@@ -501,53 +570,78 @@ struct LiquidityPolicyView: View {
 		return LiquidityPolicyView.formattedMaxFeeAmt(sat: sats)
 	}
 	
-	func maxFeeAmountSatsIsValid(_ sats: Int64) -> Bool {
-		
-		return sats > 0 && sats <= 500_000
-	}
-	
-	func maxFeeAmountSats() -> Int64? {
-		
-		if case .success(let number) = parsedMaxFeeAmt {
-			let sats = number.int64Value
-			if maxFeeAmountSatsIsValid(sats) {
-				return sats
-			}
-		}
-		
-		return nil
-	}
-	
-	func maxFeeAmountHasError() -> Bool {
+	func maxFeeAmountSats() -> Result<Int64, MaxFeeAmountError> {
 		
 		switch parsedMaxFeeAmt {
 		case .success(let number):
 			let sats = number.int64Value
-			return !maxFeeAmountSatsIsValid(sats)
-				
+			if sats < 0       { return .failure(.invalidInput) }
+			if sats < 150     { return .failure(.tooLow(sats: sats)) }
+			if sats > 500_000 { return .failure(.tooHigh(sats: sats)) }
+			else              { return .success(sats) }
+			
 		case .failure(let reason):
 			switch reason {
-				case .emptyInput   : return false
-				case .invalidInput : return true
+				case .emptyInput   : return .success(defaultMaxFeeAmountSats())
+				case .invalidInput : return .failure(.invalidInput)
 			}
+		}
+	}
+	
+	func maxFeeAmountHasError() -> Bool {
+		
+		switch maxFeeAmountSats() {
+			case .success(_) : return false
+			case .failure(_) : return true
+		}
+	}
+	
+	func maxFeeAmountHasWarning() -> Bool {
+		
+		guard let mrr = mempoolRecommendedResponse else {
+			return false
+		}
+		
+		let minSat = mrr.swapEstimationFee(hasNoChannels: true).sat
+		
+		switch maxFeeAmountSats() {
+			case .success(let sats) : return sats < minSat
+			case .failure(_)        : return false
 		}
 	}
 	
 	func maxFeeAmountFiat() -> FormattedAmount {
 		
-		if let sats = maxFeeAmountSats() {
+		switch maxFeeAmountSats() {
+		case .success(let sats):
 			return Utils.formatFiat(currencyPrefs, sat: sats)
-		} else {
-			return Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+			
+		case .failure(let reason):
+			switch reason {
+			case .tooLow(let sats):
+				// I think it makes sense to display the fiat currency amount in this situation.
+				// Because we're forcing the user to enter an amount in sats...
+				// And they might not be familiar with the exchange rate, so they're kinda entering values blindly.
+				// If the amount is too low, it's good that they can see why (because the fiat value is tiny).
+				return Utils.formatFiat(currencyPrefs, sat: sats)
+				
+			case .tooHigh(_):
+				// We could display the fiat amount here too, but the danger is that the value may be huge.
+				// Which means the UI text could easily overflow.
+				// So we're going to display unknown amount instead.
+				return Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+				
+			case .invalidInput:
+				return Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+			}
 		}
 	}
 	
 	func effectiveMaxFeeAmountSats() -> Int64 {
 		
-		if let sats = maxFeeAmountSats() {
-			return sats
-		} else {
-			return defaultMaxFeeAmountSats()
+		switch maxFeeAmountSats() {
+			case .success(let sats) : return sats
+			case .failure(_)        : return defaultMaxFeeAmountSats()
 		}
 	}
 	
@@ -631,11 +725,7 @@ struct LiquidityPolicyView: View {
 	
 	func effectiveMaxFeePercent() -> Double {
 		
-		if let percent = maxFeePercent() {
-			return percent
-		} else {
-			return defaultMaxFeePercent()
-		}
+		return maxFeePercent() ?? defaultMaxFeePercent()
 	}
 	
 	func effectiveMaxFeePercentString() -> String {
@@ -695,7 +785,7 @@ struct LiquidityPolicyView: View {
 	}
 	
 	// --------------------------------------------------
-	// MARK: View Helpers
+	// MARK: Helpers: Formatting
 	// --------------------------------------------------
 	
 	func maxFeeAmtStyler() -> TextFieldNumberStyler {
@@ -713,10 +803,6 @@ struct LiquidityPolicyView: View {
 			parsedAmount: $parsedMaxFeePrcnt
 		)
 	}
-	
-	// --------------------------------------------------
-	// MARK: Static Helpers
-	// --------------------------------------------------
 	
 	static func maxFeeAmtFormater() -> NumberFormatter {
 		
@@ -744,6 +830,52 @@ struct LiquidityPolicyView: View {
 		
 		let nf = maxFeePrcntFormater()
 		return nf.string(from: NSNumber(value: percent)) ?? "?"
+	}
+	
+	// --------------------------------------------------
+	// MARK: Helpers: Mempool
+	// --------------------------------------------------
+	
+	func swapEstimationFee() -> Bitcoin_kmpSatoshi? {
+		
+		guard let mempoolRecommendedResponse else {
+			return nil
+		}
+		
+		return mempoolRecommendedResponse.swapEstimationFee(hasNoChannels: true)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Tasks
+	// --------------------------------------------------
+	
+	func fetchMempoolRecommendedFees() async {
+		
+		repeat {
+			
+			let result = await MempoolRecommendedResponse.fetch()
+			let delay: TimeInterval
+			
+			switch result {
+			case .success(let response):
+				mempoolRecommendedResponse = response
+				delay = 5.minutes()
+				
+			case .failure(let reason):
+				log.error("Errror fetching mempool.space/recommended: \(reason)")
+				mempoolRecommendedResponse = nil
+				delay = 15.seconds()
+			}
+			
+			do {
+				if #available(iOS 16.0, *) {
+					try await Task.sleep(for: Duration.seconds(delay))
+				} else {
+					try await Task.sleep(nanoseconds: UInt64(delay * Double(1_000_000_000)))
+				}
+			} catch {}
+			
+		} while !Task.isCancelled
 	}
 	
 	// --------------------------------------------------
