@@ -862,8 +862,13 @@ struct ValidateView: View {
 		let lightningFeeMsat: Int64
 		if mvi.model is Scan.Model_OnChainFlow {
 			lightningFeeMsat = 0
+		} else if let chainContext, let trampolineFees = chainContext.trampoline.v3.first {
+			let p1 = Utils.toMsat(sat: trampolineFees.feeBaseSat)
+			let f2 = Double(trampolineFees.feePerMillionths) / 1_000_000
+			let p2 = Int64(Double(recipientAmountMsat) * f2)
+			lightningFeeMsat = p1 + p2
 		} else {
-			lightningFeeMsat = 40_000 // Todo...
+			lightningFeeMsat = 0
 		}
 		
 		let minerFeeMsat: Int64
