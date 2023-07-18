@@ -58,7 +58,7 @@ struct LiquidityPolicyView: View {
 		let defaultLp = NodeParamsManager.companion.defaultLiquidityPolicy
 		let userLp = Prefs.shared.liquidityPolicy
 		
-		let __isEnabled = true
+		let __isEnabled = userLp.enabled
 		
 		let sats = userLp.maxFeeSats ?? defaultLp.maxAbsoluteFee.sat
 		let __maxFeeAmt = LiquidityPolicyView.formattedMaxFeeAmt(sat: sats)
@@ -176,7 +176,7 @@ struct LiquidityPolicyView: View {
 				let fiatAmt = Utils.formatFiat(currencyPrefs, sat: sat)
 				
 				Text(styled: String(format: NSLocalizedString(
-					"Fees are currently estimated at around **%@** (≈%@).",
+					"Fees are currently estimated at around **%@** (≈ %@).",
 					comment:	"Fee estimate"
 				), btcAmt.string, fiatAmt.string))
 			}
