@@ -17,6 +17,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectIndexed
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
@@ -24,6 +25,7 @@ import org.kodein.log.newLogger
 
 class PaymentsManager(
     private val loggerFactory: LoggerFactory,
+    private val configurationManager: AppConfigurationManager,
     private val peerManager: PeerManager,
     private val databaseManager: DatabaseManager,
     private val electrumClient: ElectrumClient,
@@ -31,6 +33,7 @@ class PaymentsManager(
 
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
+        configurationManager = business.appConfigurationManager,
         peerManager = business.peerManager,
         databaseManager = business.databaseManager,
         electrumClient = business.electrumClient
@@ -127,10 +130,18 @@ class PaymentsManager(
     /** Watches transactions that are unconfirmed, check their confirmation status, and update relevant payments. */
     private suspend fun monitorUnconfirmedTransactions() {
         val paymentsDb = paymentsDb()
-        paymentsDb.listUnconfirmedTransactions().collect {
-            val txs = it.map { it.byteVector32() }
-            log.info { "monitoring unconfirmed txs=$txs" }
-            txs.forEach { txId ->
+        // We need to recheck anytime either:
+        // - the list of unconfirmed txs changes
+        // - a new block is mined
+        combine(
+            paymentsDb.listUnconfirmedTransactions(),
+            configurationManager.electrumMessages
+        ) { unconfirmedTxs, header ->
+            Pair(unconfirmedTxs, header)
+        }.collect { (unconfirmedTxs, _) ->
+            val unconfirmedTxIds = unconfirmedTxs.map { it.byteVector32() }
+            log.info { "monitoring unconfirmed txs=$unconfirmedTxIds" }
+            unconfirmedTxIds.forEach { txId ->
                 electrumClient.getConfirmations(txId)?.let { conf ->
                     if (conf > 0) {
                         log.info { "transaction $txId has $conf confirmations, updating database" }
