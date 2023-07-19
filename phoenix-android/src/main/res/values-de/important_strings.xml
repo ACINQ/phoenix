@@ -22,7 +22,7 @@
 -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
-    <string name="inappnotif_migration_from_legacy">Glückwunsche! Ihre Wallet wurde aktualisiert.</string>
+    <string name="inappnotif_migration_from_legacy">Glückwunsch! Ihre Wallet wurde aktualisiert.</string>
     <string name="inappnotif_migration_from_legacy_action">Änderungen einsehen</string>
 
 </resources>
