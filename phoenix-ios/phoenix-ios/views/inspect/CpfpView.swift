@@ -36,7 +36,7 @@ enum CpfpError: Error {
 struct CpfpView: View {
 	
 	let type: PaymentViewType
-	let outgoingSplice: Lightning_kmpSpliceOutgoingPayment
+	let onChainPayment: Lightning_kmpOnChainOutgoingPayment
 	
 	@State var minerFeeInfo: MinerFeeCPFP?
 	@State var satsPerByte: String = ""
@@ -474,7 +474,7 @@ struct CpfpView: View {
 		log.trace("checkConfirmations()")
 		
 		do {
-			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: outgoingSplice.txId)
+			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: onChainPayment.txId)
 			
 			let confirmations = result?.intValue ?? 0
 			log.debug("checkConfirmations(): => \(confirmations)")
@@ -661,7 +661,7 @@ struct CpfpView: View {
 			var pair: KotlinPair<Lightning_kmpFeeratePerKw, Bitcoin_kmpSatoshi>? = nil
 			do {
 				pair = try await peer.estimateFeeForSpliceCpfp(
-					channelId: outgoingSplice.channelId,
+					channelId: onChainPayment.channelId,
 					targetFeerate: effectiveFeeratePerKw
 				)
 			} catch {
@@ -736,7 +736,7 @@ struct CpfpView: View {
 				let feeratePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: feeratePerByte)
 				
 				let response = try await peer.spliceCpfp(
-					channelId: outgoingSplice.channelId,
+					channelId: onChainPayment.channelId,
 					feerate: feeratePerKw
 				)
 				

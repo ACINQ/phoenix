@@ -185,7 +185,10 @@ struct SummaryView: View {
 				.font(Font.title2.bold())
 				.padding(.bottom, 2)
 				
-				if let completedAtDate = payment.completedAtDate {
+				if let onChainPayment = payment as? Lightning_kmpOnChainOutgoingPayment {
+					header_blockchainStatus(onChainPayment)
+					
+				} else if let completedAtDate = payment.completedAtDate {
 					Text(completedAtDate.format())
 						.font(.subheadline)
 						.foregroundColor(.secondary)
@@ -231,8 +234,8 @@ struct SummaryView: View {
 					}
 				}
 				
-				if let outgoingSplice = payment as? Lightning_kmpSpliceOutgoingPayment {
-					header_blockchainStatus(outgoingSplice)
+				if let onChainPayment = payment as? Lightning_kmpOnChainOutgoingPayment {
+					header_blockchainStatus(onChainPayment)
 				}
 				
 			} // </VStack>
@@ -286,7 +289,7 @@ struct SummaryView: View {
 	}
 	
 	@ViewBuilder
-	func header_blockchainStatus(_ outgoingSplice: Lightning_kmpSpliceOutgoingPayment) -> some View {
+	func header_blockchainStatus(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) -> some View {
 		
 		switch blockchainConfirmations {
 		case .none:
@@ -320,7 +323,7 @@ struct SummaryView: View {
 				}
 				
 				if confirmations == 0 {
-					NavigationLink(destination: CpfpView(type: type, outgoingSplice: outgoingSplice)) {
+					NavigationLink(destination: CpfpView(type: type, onChainPayment: onChainPayment)) {
 						Label {
 							Text("Accelerate transaction")
 						} icon: {
@@ -331,7 +334,7 @@ struct SummaryView: View {
 					.padding(.top, 3)
 				}
 				
-				if let confirmedAt = outgoingSplice.confirmedAt?.int64Value.toDate(from: .milliseconds) {
+				if let confirmedAt = onChainPayment.confirmedAt?.int64Value.toDate(from: .milliseconds) {
 				
 					Text("confirmed")
 						.font(.subheadline)
@@ -350,7 +353,7 @@ struct SummaryView: View {
 						.foregroundColor(.secondary)
 						.padding(.top, 20)
 					
-					Text(outgoingSplice.createdAt.toDate(from: .milliseconds).format())
+					Text(onChainPayment.createdAt.toDate(from: .milliseconds).format())
 						.font(.subheadline)
 						.foregroundColor(.secondary)
 						.padding(.top, 3)
@@ -661,11 +664,11 @@ struct SummaryView: View {
 	// MARK: Tasks
 	// --------------------------------------------------
 	
-	func checkConfirmations(_ outgoingSplice: Lightning_kmpSpliceOutgoingPayment) async -> Int {
+	func updateConfirmations(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) async -> Int {
 		log.trace("checkConfirmations()")
 		
 		do {
-			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: outgoingSplice.txId)
+			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: onChainPayment.txId)
 			
 			let confirmations = result?.intValue ?? 0
 			log.debug("checkConfirmations(): => \(confirmations)")
@@ -682,15 +685,16 @@ struct SummaryView: View {
 	func monitorBlockchain() async {
 		log.trace("monitorBlockchain()")
 		
-		guard let outgoingSplice = paymentInfo.payment as? Lightning_kmpSpliceOutgoingPayment else {
-			log.debug("monitorBlockchain(): not an outgoing splice")
+		guard let onChainPayment = paymentInfo.payment as? Lightning_kmpOnChainOutgoingPayment else {
+			log.debug("monitorBlockchain(): not an on-chain payment")
 			return
 		}
 		
-		let confirmations = await checkConfirmations(outgoingSplice)
+		let confirmations = await updateConfirmations(onChainPayment)
 		if confirmations > 6 {
 			// No need to continue checking confirmation count,
 			// because the UI displays "6+" from this point forward.
+			log.debug("monitorBlockchain(): confirmations > 6")
 			return
 		}
 		
@@ -699,15 +703,16 @@ struct SummaryView: View {
 			if notification is Lightning_kmpHeaderSubscriptionResponse {
 				// A new block was mined !
 				// Update confirmation count if needed.
-				let confirmations = await checkConfirmations(outgoingSplice)
+				let confirmations = await updateConfirmations(onChainPayment)
 				if confirmations > 6 {
 					// No need to continue checking confirmation count,
 					// because the UI displays "6+" from this point forward.
+					log.debug("monitorBlockchain(): confirmations > 6")
 					break
 				}
 				
 			} else {
-				log.debug("monitorBlockchain(): notification =!= HeaderSubscriptionResponse")
+				log.debug("monitorBlockchain(): notification isNot HeaderSubscriptionResponse")
 			}
 			
 			if Task.isCancelled {
