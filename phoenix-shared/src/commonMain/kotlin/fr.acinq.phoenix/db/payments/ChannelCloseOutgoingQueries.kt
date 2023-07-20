@@ -17,13 +17,12 @@
 package fr.acinq.phoenix.db.payments
 
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
-import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.PaymentsDatabase
-import fr.acinq.phoenix.db.didCompleteWalletPayment
+import fr.acinq.phoenix.db.didSaveWalletPayment
 
 class ChannelCloseOutgoingQueries(val database: PaymentsDatabase) {
     private val channelCloseQueries = database.channelCloseOutgoingPaymentQueries
@@ -34,30 +33,37 @@ class ChannelCloseOutgoingQueries(val database: PaymentsDatabase) {
 
     fun addChannelCloseOutgoingPayment(payment: ChannelCloseOutgoingPayment) {
         val (closingInfoType, closingInfoBlob) = payment.mapClosingTypeToDb()
-        channelCloseQueries.insertChannelCloseOutgoing(
-            id = payment.id.toString(),
-            recipient_amount_sat = payment.recipientAmount.sat,
-            address = payment.address,
-            is_default_address = if (payment.isSentToDefaultAddress) 1 else 0,
-            mining_fees_sat = payment.miningFees.sat,
-            tx_id = payment.txId.toByteArray(),
-            created_at = payment.createdAt,
-            confirmed_at = payment.confirmedAt,
-            locked_at = payment.lockedAt,
-            channel_id = payment.channelId.toByteArray(),
-            closing_info_type = closingInfoType,
-            closing_info_blob = closingInfoBlob,
-        )
+        database.transaction {
+            channelCloseQueries.insertChannelCloseOutgoing(
+                id = payment.id.toString(),
+                recipient_amount_sat = payment.recipientAmount.sat,
+                address = payment.address,
+                is_default_address = if (payment.isSentToDefaultAddress) 1 else 0,
+                mining_fees_sat = payment.miningFees.sat,
+                tx_id = payment.txId.toByteArray(),
+                created_at = payment.createdAt,
+                confirmed_at = payment.confirmedAt,
+                locked_at = payment.lockedAt,
+                channel_id = payment.channelId.toByteArray(),
+                closing_info_type = closingInfoType,
+                closing_info_blob = closingInfoBlob,
+            )
+            didSaveWalletPayment(WalletPaymentId.ChannelCloseOutgoingPaymentId(payment.id), database)
+        }
     }
 
     fun setConfirmed(id: UUID, confirmedAt: Long) {
-        channelCloseQueries.setConfirmed(confirmed_at = confirmedAt, id = id.toString())
-        didCompleteWalletPayment(WalletPaymentId.ChannelCloseOutgoingPaymentId(id), database)
+        database.transaction {
+            channelCloseQueries.setConfirmed(confirmed_at = confirmedAt, id = id.toString())
+            didSaveWalletPayment(WalletPaymentId.ChannelCloseOutgoingPaymentId(id), database)
+        }
     }
 
     fun setLocked(id: UUID, lockedAt: Long) {
-        channelCloseQueries.setLocked(locked_at = lockedAt, id = id.toString())
-        didCompleteWalletPayment(WalletPaymentId.ChannelCloseOutgoingPaymentId(id), database)
+        database.transaction {
+            channelCloseQueries.setLocked(locked_at = lockedAt, id = id.toString())
+            didSaveWalletPayment(WalletPaymentId.ChannelCloseOutgoingPaymentId(id), database)
+        }
     }
 
     companion object {
