@@ -15,7 +15,17 @@ struct MempoolRecommendedResponse: Equatable, Codable {
 	let hourFee: Double
 	let economyFee: Double
 	let minimumFee: Double
-	let timestamp: Date = Date.now
+	
+	let timestamp: Date = Date.now // always using our own timestamp here
+	
+	// Tell compiler to ignore `timestamp` property when decoding
+	private enum CodingKeys: String, CodingKey {
+		case fastestFee
+		case halfHourFee
+		case hourFee
+		case economyFee
+		case minimumFee
+	}
 	
 	func feeForPriority(_ priority: MinerFeePriority) -> Double {
 		switch priority {

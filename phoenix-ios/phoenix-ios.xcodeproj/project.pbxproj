@@ -169,7 +169,7 @@
 		DC9B8EE225D72CC200E13818 /* ForceCloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */; };
 		DC9E7EC32A12955300A5F1D0 /* LiquidityHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */; };
 		DC9E7EC62A1295B100A5F1D0 /* liquidity.html in Resources */ = {isa = PBXBuildFile; fileRef = DC9E7EC82A1295B100A5F1D0 /* liquidity.html */; };
-		DCA125752A27EDDB00DA2F7F /* MempoolSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA125742A27EDDB00DA2F7F /* MempoolSpace.swift */; };
+		DCA125752A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA125742A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift */; };
 		DCA3B41F2A5471C900E6B231 /* MinerFeeInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA3B41E2A5471C900E6B231 /* MinerFeeInfo.swift */; };
 		DCA5391629F047C6001BD3D5 /* ComingSoonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA5391529F047C6001BD3D5 /* ComingSoonView.swift */; };
 		DCA5391A29F1DDE7001BD3D5 /* SegmentedPicker in Frameworks */ = {isa = PBXBuildFile; productRef = DCA5391929F1DDE7001BD3D5 /* SegmentedPicker */; };
@@ -244,6 +244,7 @@
 		DCDD9ED428637EBB001800A3 /* ToolsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ED328637EBB001800A3 /* ToolsButton.swift */; };
 		DCDD9ED628637FD7001800A3 /* AppStatusButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDD9ED528637FD7001800A3 /* AppStatusButton.swift */; };
 		DCE1E5FA26418183005465B8 /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE1E5F926418183005465B8 /* Toast.swift */; };
+		DCE3C7AB2A6AD3CC00F4D385 /* MempoolMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE3C7AA2A6AD3CC00F4D385 /* MempoolMonitor.swift */; };
 		DCE6FB8C28D0B5F200054511 /* ResetWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE6FB8B28D0B5F200054511 /* ResetWalletView.swift */; };
 		DCE7232E27AD68CD0017CF56 /* SyncTxManager_Actor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE7232D27AD68CD0017CF56 /* SyncTxManager_Actor.swift */; };
 		DCE7233027B167240017CF56 /* SyncSeedManager_Actor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE7232F27B167240017CF56 /* SyncSeedManager_Actor.swift */; };
@@ -496,7 +497,7 @@
 		DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForceCloseChannelsView.swift; sourceTree = "<group>"; };
 		DC9E7EC22A12955300A5F1D0 /* LiquidityHTML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityHTML.swift; sourceTree = "<group>"; };
 		DC9E7EC72A1295B100A5F1D0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/liquidity.html; sourceTree = "<group>"; };
-		DCA125742A27EDDB00DA2F7F /* MempoolSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MempoolSpace.swift; sourceTree = "<group>"; };
+		DCA125742A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MempoolRecommendedResponse.swift; sourceTree = "<group>"; };
 		DCA3B41E2A5471C900E6B231 /* MinerFeeInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinerFeeInfo.swift; sourceTree = "<group>"; };
 		DCA5391529F047C6001BD3D5 /* ComingSoonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComingSoonView.swift; sourceTree = "<group>"; };
 		DCA5391B29F7202F001BD3D5 /* ChannelInfoPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelInfoPopup.swift; sourceTree = "<group>"; };
@@ -563,6 +564,7 @@
 		DCDD9ED328637EBB001800A3 /* ToolsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsButton.swift; sourceTree = "<group>"; };
 		DCDD9ED528637FD7001800A3 /* AppStatusButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStatusButton.swift; sourceTree = "<group>"; };
 		DCE1E5F926418183005465B8 /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
+		DCE3C7AA2A6AD3CC00F4D385 /* MempoolMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MempoolMonitor.swift; sourceTree = "<group>"; };
 		DCE6FB8B28D0B5F200054511 /* ResetWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetWalletView.swift; sourceTree = "<group>"; };
 		DCE7232D27AD68CD0017CF56 /* SyncTxManager_Actor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncTxManager_Actor.swift; sourceTree = "<group>"; };
 		DCE7232F27B167240017CF56 /* SyncSeedManager_Actor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSeedManager_Actor.swift; sourceTree = "<group>"; };
@@ -766,6 +768,7 @@
 				53BEF1337AFCFF0AE82A46BD /* utils */,
 				DCACF6EE2566D0A60009B01E /* extensions */,
 				DCA6DEC42829BD060073C658 /* xpc */,
+				DCE3C7A92A6AD39E00F4D385 /* mempool */,
 			);
 			path = "phoenix-ios";
 			sourceTree = "<group>";
@@ -831,7 +834,6 @@
 				DC118C0727B457520080BBAC /* FetchActivityNotice.swift */,
 				DC118C0927B457F70080BBAC /* LnurlFlowErrorNotice.swift */,
 				DCEAE5B82943D64B00320C46 /* MsatRange.swift */,
-				DCA125742A27EDDB00DA2F7F /* MempoolSpace.swift */,
 				DCB62F482A5E09F900912A71 /* SpliceOutProblem.swift */,
 			);
 			path = send;
@@ -1214,6 +1216,15 @@
 				DC4864D929D4E52C00ACD539 /* BgRefreshDisabledPopover.swift */,
 			);
 			path = main;
+			sourceTree = "<group>";
+		};
+		DCE3C7A92A6AD39E00F4D385 /* mempool */ = {
+			isa = PBXGroup;
+			children = (
+				DCA125742A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift */,
+				DCE3C7AA2A6AD3CC00F4D385 /* MempoolMonitor.swift */,
+			);
+			path = mempool;
 			sourceTree = "<group>";
 		};
 		DCFA8757260E6DFF00AE8953 /* onboarding */ = {
@@ -1679,6 +1690,7 @@
 				DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */,
 				DCA3B41F2A5471C900E6B231 /* MinerFeeInfo.swift in Sources */,
 				DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */,
+				DCE3C7AB2A6AD3CC00F4D385 /* MempoolMonitor.swift in Sources */,
 				DCACF7092566D0F00009B01E /* AppAccessView.swift in Sources */,
 				DC27E4D1279753EC00C777CC /* TextFieldNumberStyler.swift in Sources */,
 				DC46CB1628D9F30500C4EAC7 /* LoadingView.swift in Sources */,
@@ -1698,7 +1710,7 @@
 				C8D7AB09E80CE2B6AE270A97 /* TorConfigurationView.swift in Sources */,
 				DC27E4C42791C58C00C777CC /* PaymentsBackupView.swift in Sources */,
 				DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */,
-				DCA125752A27EDDB00DA2F7F /* MempoolSpace.swift in Sources */,
+				DCA125752A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift in Sources */,
 				DC46CB1228D9AAB000C4EAC7 /* LockState.swift in Sources */,
 				DC2F431427B6972C0006FCC4 /* SwapInView.swift in Sources */,
 				DC71E7352728A5720063613D /* KotlinIdentifiable.swift in Sources */,

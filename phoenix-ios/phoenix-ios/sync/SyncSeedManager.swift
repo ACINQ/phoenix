@@ -399,11 +399,7 @@ class SyncSeedManager: SyncManagerProtcol {
 						let delay: TimeInterval = minElapsed - elapsed
 						log.trace("uploadSeed(): readabilityDelay = \(delay) seconds")
 						
-						if #available(iOS 16.0, *) {
-							try await Task.sleep(for: Duration.seconds(delay))
-						} else {
-							try await Task.sleep(nanoseconds: UInt64(delay * Double(1_000_000_000)))
-						}
+						try await Task.sleep(seconds: delay)
 					}
 					
 					// Since this is an async process, the user may have changed the seed name again

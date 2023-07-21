@@ -713,31 +713,12 @@ struct ValidateView: View {
 	
 	func fetchMempoolRecommendedFees() async {
 		
-		repeat {
-			
-			let result = await MempoolRecommendedResponse.fetch()
-			let delay: TimeInterval
-			
-			switch result {
-			case .success(let response):
-				mempoolRecommendedResponse = response
-				delay = 5.minutes()
-				
-			case .failure(let reason):
-				log.error("Errror fetching mempool.space/recommended: \(reason)")
-				mempoolRecommendedResponse = nil
-				delay = 15.seconds()
+		for try await response in MempoolMonitor.shared.stream() {
+			mempoolRecommendedResponse = response
+			if Task.isCancelled {
+				return
 			}
-			
-			do {
-				if #available(iOS 16.0, *) {
-					try await Task.sleep(for: Duration.seconds(delay))
-				} else {
-					try await Task.sleep(nanoseconds: UInt64(delay * Double(1_000_000_000)))
-				}
-			} catch {}
-			
-		} while !Task.isCancelled
+		}
 	}
 	
 	// --------------------------------------------------
