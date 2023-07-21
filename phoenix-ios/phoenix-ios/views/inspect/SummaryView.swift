@@ -690,6 +690,17 @@ struct SummaryView: View {
 			return
 		}
 		
+		if let confirmedAtDate = onChainPayment.confirmedAtDate {
+			let elapsed = confirmedAtDate.timeIntervalSinceNow * -1.0
+			if elapsed > 24.hours() {
+				// It was marked as mined more than 24 hours ago.
+				// So there's really no need to check the exact confirmation count anymore.
+				log.debug("monitorBlockchain(): confirmedAt > 24.hours.ago")
+				self.blockchainConfirmations = 7
+				return
+			}
+		}
+		
 		let confirmations = await updateConfirmations(onChainPayment)
 		if confirmations > 6 {
 			// No need to continue checking confirmation count,
