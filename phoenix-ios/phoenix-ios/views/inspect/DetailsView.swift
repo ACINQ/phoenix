@@ -170,7 +170,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				header("Payment Received")
 			} content: {
 				paymentReceived_receivedAt(received)
-				paymentReceived_amountReceived(received)
+				amountReceived(msat: received.amount)
 				payment_standardFees(incomingPayment)
 				payment_minerFees(incomingPayment)
 			}
@@ -236,9 +236,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				} content: {
 					offChain_completedAt(offChain)
 					offChain_elapsed(outgoingPayment)
-					offChain_amountSent(outgoingPayment)
+					outgoing_amountSent(outgoingPayment)
 					offChain_fees(outgoingPayment)
-					offChain_amountReceived(lightningPayment)
+					amountReceived(msat: lightningPayment.recipientAmount)
 					offChain_recipientPubkey(lightningPayment)
 				}
 			
@@ -268,8 +268,11 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			InlineSection {
 				header("Splice Out")
 			} content: {
+				onChain_broadcastAt(spliceOut)
 				onChain_confirmedAt(spliceOut)
-				onChain_claimed(spliceOut)
+				outgoing_amountSent(outgoingPayment)
+				onChain_minerFees(spliceOut)
+				amountReceived(sat: spliceOut.recipientAmount)
 				onChain_btcTxid(spliceOut)
 			}
 		
@@ -287,9 +290,23 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			InlineSection {
 				header("Closing Status")
 			} content: {
+				onChain_broadcastAt(channelClosing)
 				onChain_confirmedAt(channelClosing)
-				onChain_claimed(channelClosing)
+				outgoing_amountSent(outgoingPayment)
+				onChain_minerFees(channelClosing)
+				amountReceived(sat: channelClosing.recipientAmount)
 				onChain_btcTxid(channelClosing)
+			}
+			
+		} else if let spliceCpfp = outgoingPayment as? Lightning_kmpSpliceCpfpOutgoingPayment {
+			
+			InlineSection {
+				header("Bump Fee (CPFP)")
+			} content: {
+				onChain_broadcastAt(spliceCpfp)
+				onChain_confirmedAt(spliceCpfp)
+				onChain_minerFees(spliceCpfp)
+				onChain_btcTxid(spliceCpfp)
 			}
 		}
 	}
@@ -582,28 +599,6 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 					
 			commonValue_date(date: received.receivedAtDate)
-		}
-	}
-	
-	@ViewBuilder
-	func paymentReceived_amountReceived(
-		_ received: Lightning_kmpIncomingPayment.Received
-	) -> some View {
-		let identifier: String = #function
-		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			keyColumn("amount received")
-			
-		} valueColumn: {
-			
-			let msat = received.receivedWith.map { $0.amount.msat }.reduce(0, +)
-			commonValue_amounts(displayAmounts: displayAmounts(
-				msat: Lightning_kmpMilliSatoshi(msat: msat),
-				originalFiat: paymentInfo.metadata.originalFiat
-			))
 		}
 	}
 	
@@ -927,27 +922,6 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func offChain_amountReceived(
-		_ outgoingPayment: Lightning_kmpLightningOutgoingPayment
-	) -> some View {
-		let identifier: String = #function
-		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			keyColumn("amount received")
-			
-		} valueColumn: {
-			
-			commonValue_amounts(displayAmounts: displayAmounts(
-				msat: outgoingPayment.recipientAmount,
-				originalFiat: paymentInfo.metadata.originalFiat
-			))
-		}
-	}
-	
-	@ViewBuilder
 	func offChain_fees(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
 		let identifier: String = #function
 		
@@ -973,25 +947,6 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func offChain_amountSent(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
-		let identifier: String = #function
-		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			keyColumn("amount sent")
-			
-		} valueColumn: {
-			
-			commonValue_amounts(displayAmounts: displayAmounts(
-				msat: outgoingPayment.amount,
-				originalFiat: paymentInfo.metadata.originalFiat
-			))
-		}
-	}
-	
-	@ViewBuilder
 	func offChain_recipientPubkey(
 		_ outgoingPayment: Lightning_kmpLightningOutgoingPayment
 	) -> some View {
@@ -1006,6 +961,24 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 			
 			Text(outgoingPayment.recipient.value.toHex())
+		}
+	}
+	
+	@ViewBuilder
+	func onChain_broadcastAt(
+		_ onChain: Lightning_kmpOnChainOutgoingPayment
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("broadcast at")
+			
+		} valueColumn: {
+			
+			commonValue_date(date: onChain.createdAtDate)
 		}
 	}
 	
@@ -1031,7 +1004,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func onChain_claimed(
+	func onChain_minerFees(
 		_ onChain: Lightning_kmpOnChainOutgoingPayment
 	) -> some View {
 		let identifier: String = #function
@@ -1040,12 +1013,12 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
-			keyColumn("claimed amount")
+			keyColumn("miner fees")
 			
 		} valueColumn: {
 			
 			commonValue_amounts(displayAmounts: displayAmounts(
-				sat: onChain.amount.truncateToSatoshi(),
+				sat: onChain.miningFees,
 				originalFiat: paymentInfo.metadata.originalFiat
 			))
 		}
@@ -1076,6 +1049,67 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				}
 			
 		} // </InfoGridRowWrapper>
+	}
+	
+	@ViewBuilder
+	func outgoing_amountSent(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("amount sent")
+			
+		} valueColumn: {
+			
+			commonValue_amounts(displayAmounts: displayAmounts(
+				msat: outgoingPayment.amount,
+				originalFiat: paymentInfo.metadata.originalFiat
+			))
+		}
+	}
+	
+	@ViewBuilder
+	func amountReceived(
+		msat: Lightning_kmpMilliSatoshi
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("amount received")
+			
+		} valueColumn: {
+			
+			commonValue_amounts(displayAmounts: displayAmounts(
+				msat: msat,
+				originalFiat: paymentInfo.metadata.originalFiat
+			))
+		}
+	}
+	
+	@ViewBuilder
+	func amountReceived(
+		sat: Bitcoin_kmpSatoshi
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("amount received")
+			
+		} valueColumn: {
+			
+			commonValue_amounts(displayAmounts: displayAmounts(
+				sat: sat,
+				originalFiat: paymentInfo.metadata.originalFiat
+			))
+		}
 	}
 	
 	@ViewBuilder
