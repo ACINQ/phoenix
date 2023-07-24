@@ -22,6 +22,7 @@ struct SummaryView: View {
 	let fetchOptions = WalletPaymentFetchOptions.companion.All
 	
 	@State var blockchainConfirmations: Int? = nil
+	@State var showBlockchainExplorerOptions = false
 	
 	@State var showOriginalFiatValue = GlobalEnvironment.currencyPrefs.showOriginalFiatValue
 	@State var showFiatValueExplanation = false
@@ -308,19 +309,38 @@ struct SummaryView: View {
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 				
-				if confirmations == 1 {
-					Text("1 confirmation")
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-				} else if confirmations < 7 {
-					Text("\(confirmations) confirmations")
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-				} else {
-					Text("6+ confirmations")
-						.font(.subheadline)
-						.foregroundColor(.secondary)
+				Button {
+					showBlockchainExplorerOptions = true
+				} label: {
+					if confirmations == 1 {
+						Text("1 confirmation")
+							.font(.subheadline)
+					} else if confirmations < 7 {
+						Text("\(confirmations) confirmations")
+							.font(.subheadline)
+					} else {
+						Text("6+ confirmations")
+							.font(.subheadline)
+					}
 				}
+				.confirmationDialog("Blockchain Explorer",
+					isPresented: $showBlockchainExplorerOptions,
+					titleVisibility: .automatic
+				) {
+					Button {
+						exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteMempoolSpace())
+					} label: {
+						Text(verbatim: "Mempool.space") // no localization needed
+					}
+					Button {
+						exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
+					} label: {
+						Text(verbatim: "Blockstream.info") // no localization needed
+					}
+					Button("Copy transaction id") {
+						copyTxId(onChainPayment.txId)
+					}
+				} // </confirmationDialog>
 				
 				if confirmations == 0 {
 					NavigationLink(destination: CpfpView(type: type, onChainPayment: onChainPayment)) {
@@ -792,6 +812,22 @@ struct SummaryView: View {
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
+	
+	func exploreTx(_ txId: Bitcoin_kmpByteVector32, website: BlockchainExplorer.Website) {
+		log.trace("exploreTX()")
+		
+		let txIdStr = txId.toHex()
+		let txUrlStr = Biz.business.blockchainExplorer.txUrl(txId: txIdStr, website: website)
+		if let txUrl = URL(string: txUrlStr) {
+			UIApplication.shared.open(txUrl)
+		}
+	}
+	
+	func copyTxId(_ txId: Bitcoin_kmpByteVector32) {
+		log.trace("copyTxId()")
+		
+		UIPasteboard.general.string = txId.toHex()
+	}
 	
 	func toggleCurrencyType() -> Void {
 		currencyPrefs.toggleCurrencyType()

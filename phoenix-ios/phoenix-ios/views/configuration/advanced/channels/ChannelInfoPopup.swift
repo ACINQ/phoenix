@@ -34,7 +34,6 @@ struct ChannelInfoPopup: View, ViewName {
 	@ObservedObject var toast: Toast
 	
 	@State var selectedTab: Tab = .summary
-	@State var showBlockchainExplorerOptions = false
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@EnvironmentObject var popoverState: PopoverState
