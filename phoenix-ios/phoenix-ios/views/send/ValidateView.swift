@@ -82,11 +82,11 @@ struct ValidateView: View {
 	)
 	@State var maxButtonWidth: CGFloat? = nil
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var popoverState: PopoverState
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// --------------------------------------------------
 	// MARK: View Builders

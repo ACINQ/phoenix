@@ -21,7 +21,7 @@ struct LnurlFlowErrorNotice: View {
 	
 	let error: LnurlFlowError
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
+	@EnvironmentObject var popoverState: PopoverState
 	
 	@ViewBuilder
 	var body: some View {

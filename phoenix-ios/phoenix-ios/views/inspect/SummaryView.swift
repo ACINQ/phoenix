@@ -30,10 +30,10 @@ struct SummaryView: View {
 	
 	@State var didAppear = false
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	enum ButtonWidth: Preference {}
 	let buttonWidthReader = GeometryPreferenceReader(

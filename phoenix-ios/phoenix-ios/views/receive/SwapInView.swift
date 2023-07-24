@@ -33,7 +33,8 @@ struct SwapInView: View {
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// For the cicular buttons: [copy, share]
 	enum MaxButtonWidth: Preference {}

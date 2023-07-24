@@ -28,7 +28,7 @@ struct PaymentOptionsView: View {
 	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	@Environment(\.openURL) var openURL
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// --------------------------------------------------
 	// MARK: View Builders

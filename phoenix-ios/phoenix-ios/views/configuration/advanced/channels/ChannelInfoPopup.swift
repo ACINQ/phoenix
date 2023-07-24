@@ -37,7 +37,7 @@ struct ChannelInfoPopup: View, ViewName {
 	@State var showBlockchainExplorerOptions = false
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	@Environment(\.popoverState) var popoverState: PopoverState
+	@EnvironmentObject var popoverState: PopoverState
 	
 	@ViewBuilder
 	var body: some View {

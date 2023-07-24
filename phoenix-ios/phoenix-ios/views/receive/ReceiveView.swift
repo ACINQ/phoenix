@@ -42,7 +42,7 @@ struct ReceiveView: MVIView {
 	@StateObject var toast = Toast()
 	
 	@Environment(\.colorScheme) var colorScheme
-	@Environment(\.popoverState) var popoverState: PopoverState
+	@EnvironmentObject var popoverState: PopoverState
 	
 	// --------------------------------------------------
 	// MARK: ViewBuilders

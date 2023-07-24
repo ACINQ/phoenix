@@ -639,18 +639,14 @@
 			children = (
 				DC0E31BA26EFDED4002071C6 /* VSlider.swift */,
 				C8D7A607F036B3184C3D6EED /* QRCodeScanner.swift */,
-				DCE1E5F926418183005465B8 /* Toast.swift */,
-				DC682FE7258175CE00CA1114 /* Popover.swift */,
 				DC72C33825A663CA008A927A /* QRCode.swift */,
 				DC99E93F25BA141000FB20F7 /* LocalWebView.swift */,
 				DC0994AF263A074C003031CA /* InfoGrid.swift */,
-				DC33369726BAF721000E3F49 /* ShortSheet.swift */,
 				DCFD079026D84A380020DD8E /* HorizontalActivity.swift */,
 				DCEC6A1727A82A98002C20BA /* ImagePicker.swift */,
 				DC67E40A27F3798600496C04 /* AnimatedMenu.swift */,
 				DC08A51727FB39530041603B /* AnimatedChevron.swift */,
 				DC08A51927FB6C5F0041603B /* TopTab.swift */,
-				DC39D4EE287497440030F18D /* SmartModal.swift */,
 				DC39D4F02874DDF40030F18D /* View+If.swift */,
 				DC6D26E229E76557006A7814 /* AnimatedClock.swift */,
 				DCB30E532A0AABAF00E7D7A2 /* InfoPopoverWindow.swift */,
@@ -700,6 +696,7 @@
 				DCFA8757260E6DFF00AE8953 /* onboarding */,
 				C8D7A7335040D755924F8FFC /* configuration */,
 				DCAC9FC42968793D0098D769 /* compatibility */,
+				DCE3C7AC2A6B111A00F4D385 /* layers */,
 				53BEF0E7A62D4973FCC99476 /* widgets */,
 				DC49DA8C258BB85F005BC4BC /* style */,
 				DCB5D2DD280879160020B8F5 /* environment */,
@@ -1225,6 +1222,17 @@
 				DCE3C7AA2A6AD3CC00F4D385 /* MempoolMonitor.swift */,
 			);
 			path = mempool;
+			sourceTree = "<group>";
+		};
+		DCE3C7AC2A6B111A00F4D385 /* layers */ = {
+			isa = PBXGroup;
+			children = (
+				DCE1E5F926418183005465B8 /* Toast.swift */,
+				DC682FE7258175CE00CA1114 /* Popover.swift */,
+				DC33369726BAF721000E3F49 /* ShortSheet.swift */,
+				DC39D4EE287497440030F18D /* SmartModal.swift */,
+			);
+			path = layers;
 			sourceTree = "<group>";
 		};
 		DCFA8757260E6DFF00AE8953 /* onboarding */ = {

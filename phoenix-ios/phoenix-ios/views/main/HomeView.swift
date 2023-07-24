@@ -76,9 +76,10 @@ struct HomeView : MVIView {
 	
 	@State var activeSheet: HomeViewSheet? = nil
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
 	@Environment(\.openURL) var openURL
 	@Environment(\.colorScheme) var colorScheme
+	
+	@EnvironmentObject var popoverState: PopoverState
 	
 	// --------------------------------------------------
 	// MARK: Init
@@ -157,14 +158,14 @@ struct HomeView : MVIView {
 					type: .sheet(closeAction: { self.activeSheet = nil }),
 					paymentInfo: selectedPayment
 				)
-				.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
+				.modifier(GlobalEnvironment.sheetInstance())
 				
 			case .notificationsView:
 				
 				NotificationsView(
 					noticeMonitor: noticeMonitor
 				)
-				.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
+				.modifier(GlobalEnvironment.sheetInstance())
 			}
 		}
 	}

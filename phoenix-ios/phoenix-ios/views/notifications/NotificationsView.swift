@@ -22,9 +22,9 @@ struct NotificationsView : View {
 	@State var bizNotifications_watchtower: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	
 	@Environment(\.openURL) var openURL
-	@Environment(\.popoverState) var popoverState: PopoverState
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------

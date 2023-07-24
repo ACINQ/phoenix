@@ -106,9 +106,9 @@ fileprivate struct ChannelsView : View {
 	
 	@State var forceCloseChannelsOpen = false
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	var body: some View {
@@ -307,7 +307,7 @@ fileprivate struct ChannelRowView: View {
 	@Binding var showChannelsRemoteBalance: Bool
 	@ObservedObject var toast: Toast
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
+	@EnvironmentObject var popoverState: PopoverState
 	
 	var body: some View {
 		

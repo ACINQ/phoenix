@@ -19,7 +19,7 @@ struct ForceCloseChannelsView : MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
+	@EnvironmentObject var popoverState: PopoverState
 	
 	// --------------------------------------------------
 	// MARK: ViewBuilders
@@ -295,7 +295,7 @@ fileprivate struct ConfirmationPopover : View {
 	
 	let confirmAction: () -> Void
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
+	@EnvironmentObject var popoverState: PopoverState
 	
 	var body: some View {
 		

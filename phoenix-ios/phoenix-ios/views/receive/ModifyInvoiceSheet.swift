@@ -33,9 +33,8 @@ struct ModifyInvoiceSheet: View {
 	@State var isInvalidAmount: Bool = false
 	@State var isEmptyAmount: Bool = false
 	
-	@EnvironmentObject private var currencyPrefs: CurrencyPrefs
-	
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// Workaround for SwiftUI bug
 	enum TextHeight: Preference {}

@@ -19,8 +19,7 @@ struct IncomingDepositPopover: View {
 	let swapInRejectedPublisher = Biz.swapInRejectedPublisher
 	@State var swapInRejected: Lightning_kmpLiquidityEventsRejected? = nil
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
-	
+	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	@ViewBuilder

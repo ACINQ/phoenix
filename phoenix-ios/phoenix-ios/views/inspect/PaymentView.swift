@@ -24,7 +24,7 @@ enum PaymentViewType {
 	case embedded
 }
 
-struct PaymentView : View {
+struct PaymentView: View {
 
 	let type: PaymentViewType
 	let paymentInfo: WalletPaymentInfo
@@ -34,13 +34,61 @@ struct PaymentView : View {
 		
 		switch type {
 		case .sheet:
+			PaymentViewSheet(type: type, paymentInfo: paymentInfo)
+			
+		case .embedded:
+			SummaryView(type: type, paymentInfo: paymentInfo)
+		}
+	}
+}
+
+fileprivate struct PaymentViewSheet: View {
+	
+	let type: PaymentViewType
+	let paymentInfo: WalletPaymentInfo
+	
+	@EnvironmentObject var shortSheetState: ShortSheetState
+	@State var shortSheetItem: ShortSheetItem? = nil
+	
+	@EnvironmentObject var popoverState: PopoverState
+	@State var popoverItem: PopoverItem? = nil
+	
+	@ViewBuilder
+	var body: some View {
+		
+		ZStack {
+			
 			NavigationWrapper {
 				SummaryView(type: type, paymentInfo: paymentInfo)
 			}
 			.edgesIgnoringSafeArea(.all)
+			.zIndex(0) // needed for proper animation
+			.accessibilityHidden(shortSheetItem != nil || popoverItem != nil)
 			
-		case .embedded:
-			SummaryView(type: type, paymentInfo: paymentInfo)
+			if let shortSheetItem = shortSheetItem {
+				ShortSheetWrapper(dismissable: shortSheetItem.dismissable) {
+					shortSheetItem.view
+				}
+				.zIndex(1) // needed for proper animation
+			}
+			
+			if let popoverItem = popoverItem {
+				PopoverWrapper(dismissable: popoverItem.dismissable) {
+					popoverItem.view
+				}
+				.zIndex(2) // needed for proper animation
+			}
+			
+		} // </ZStack>
+		.onReceive(shortSheetState.publisher) { (item: ShortSheetItem?) in
+			withAnimation {
+				shortSheetItem = item
+			}
+		}
+		.onReceive(popoverState.publisher) { (item: PopoverItem?) in
+			withAnimation {
+				popoverItem = item
+			}
 		}
 	}
 }

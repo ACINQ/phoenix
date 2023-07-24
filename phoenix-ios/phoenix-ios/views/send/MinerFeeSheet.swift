@@ -26,7 +26,7 @@ struct MinerFeeSheet: View {
 	@State var explicitlySelectedPriority: MinerFeePriority? = nil
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	@EnvironmentObject var smartModalState: SmartModalState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	enum Field: Hashable {
