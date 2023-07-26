@@ -110,6 +110,7 @@ class LnurlManager(
 
         // SPECS: LN WALLET verifies that the amount in the provided invoice equals the amount previously specified by user.
         if (amount != invoice.paymentRequest.amount) {
+            log.error { "rejecting invoice from $origin with amount_invoice=${invoice.paymentRequest.amount} requested_amount=$amount" }
             throw LnurlError.Pay.Invoice.InvalidAmount(origin)
         }
 

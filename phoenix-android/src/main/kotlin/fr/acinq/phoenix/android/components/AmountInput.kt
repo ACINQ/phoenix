@@ -134,7 +134,10 @@ object AmountInputHelper {
                     onConverted(context.getString(R.string.utils_no_conversion))
                     null
                 } else {
-                    val msat = amount.toMilliSatoshi(rate.price)
+                    // convert fiat amount to millisat, but truncate the msat part to avoid issues with
+                    // services/wallets that don't understand millisats. We only do this when converting
+                    // from fiat. If amount is in btc, we use the real value entered by the user.
+                    val msat = amount.toMilliSatoshi(rate.price).truncateToSatoshi().toMilliSatoshi()
                     if (msat.toUnit(BitcoinUnit.Btc) > 21e6) {
                         onError(context.getString(R.string.send_error_amount_too_large))
                         null
