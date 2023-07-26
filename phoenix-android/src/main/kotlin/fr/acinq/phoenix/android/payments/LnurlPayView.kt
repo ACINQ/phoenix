@@ -17,9 +17,14 @@
 package fr.acinq.phoenix.android.payments
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -100,11 +105,48 @@ fun LnurlPayView(
             Image(bitmap = it, contentDescription = model.paymentIntent.metadata.plainText, modifier = Modifier.size(90.dp))
             Spacer(modifier = Modifier.height(16.dp))
         }
-        SplashLabelRow(label = stringResource(R.string.lnurl_pay_meta_description)) {
-            Text(text = model.paymentIntent.metadata.longDesc ?: model.paymentIntent.metadata.plainText, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        }
         SplashLabelRow(label = stringResource(R.string.lnurl_pay_domain)) {
             Text(text = model.paymentIntent.callback.host, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        SplashLabelRow(label = stringResource(R.string.lnurl_pay_meta_description)) {
+            Text(
+                text = model.paymentIntent.metadata.longDesc ?: model.paymentIntent.metadata.plainText,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        var comment by remember { mutableStateOf<String?>(null) }
+        val commentLength = model.paymentIntent.maxCommentLength?.toInt()
+        if (commentLength != null && commentLength > 0) {
+            var showCommentDialog by remember { mutableStateOf(false) }
+            if (showCommentDialog) {
+                EditCommentDialog(
+                    comment = comment,
+                    maxLength = commentLength,
+                    onDismiss = { showCommentDialog = false },
+                    onCommentSubmit = {
+                        comment = it
+                        showCommentDialog = false
+                    },
+                )
+            }
+            comment?.let {
+                SplashLabelRow(label = "", icon = R.drawable.ic_message_circle, iconTint = MaterialTheme.colors.primary) {
+                    Clickable(onClick = { showCommentDialog = true }) {
+                        Text(text = it)
+                    }
+                }
+            } ?: run {
+                SplashLabelRow(label = "", icon = R.drawable.ic_message_circle, iconTint = MaterialTheme.colors.primary) {
+                    Button(
+                        text = stringResource(id = R.string.lnurl_pay_comment_add_button),
+                        onClick = { showCommentDialog = true },
+                        padding = PaddingValues(horizontal = 0.dp, vertical = 8.dp),
+                        shape = RoundedCornerShape(16.dp),
+                    )
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -139,7 +181,7 @@ fun LnurlPayView(
                                 paymentIntent = model.paymentIntent,
                                 amount = amt,
                                 trampolineFees = fees,
-                                comment = null,
+                                comment = comment?.takeIf { it.isNotBlank() },
                             )
                         )
                     }
@@ -149,6 +191,33 @@ fun LnurlPayView(
                 ProgressView(text = stringResource(id = R.string.lnurl_pay_requesting_invoice))
             }
             is Scan.Model.LnurlPayFlow.Sending -> LaunchedEffect(Unit) { onBackClick() }
+        }
+    }
+}
+
+@Composable
+private fun EditCommentDialog(
+    comment: String?,
+    maxLength: Int,
+    onDismiss: () -> Unit,
+    onCommentSubmit: (String?) -> Unit,
+) {
+    var input by remember { mutableStateOf(comment ?: "") }
+    Dialog(onDismiss = onDismiss, buttons = {
+        Button(
+            onClick = { onCommentSubmit(input.takeIf { it.isNotBlank() }) },
+            text = stringResource(id = R.string.btn_ok)
+        )
+    }) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+            Text(text = stringResource(id = R.string.lnurl_pay_comment_instructions))
+            Spacer(modifier = Modifier.height(16.dp))
+            TextInput(
+                text = input,
+                onTextChange = { input = it },
+                maxChars = maxLength,
+                staticLabel = stringResource(id = R.string.lnurl_pay_comment_label),
+            )
         }
     }
 }
