@@ -22,6 +22,7 @@ import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
+import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
@@ -217,6 +218,13 @@ class NodeService : Service() {
         requestCheckLegacyChannels: Boolean,
     ): WalletState.Started {
         log.info("starting up node...")
+
+        // migrate legacy preferences if needed
+        if (LegacyPrefsDatastore.getPrefsMigrationExpected(applicationContext).first() == true) {
+            LegacyMigrationHelper.migrateLegacyPreferences(applicationContext)
+            LegacyPrefsDatastore.savePrefsMigrationExpected(applicationContext, false)
+        }
+
         val business = (applicationContext as? PhoenixApplication)?.business ?: throw RuntimeException("invalid context type, should be PhoenixApplication")
         val electrumServer = UserPrefs.getElectrumServer(applicationContext).first()
         val isTorEnabled = UserPrefs.getIsTorEnabled(applicationContext).first()
@@ -239,6 +247,17 @@ class NodeService : Service() {
             )
         )
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
+
+        // migrate legacy payments if needed
+        if (LegacyPrefsDatastore.getDataMigrationExpected(applicationContext).filterNotNull().first()) {
+            serviceScope.launch {
+                log.info("started migrating legacy data")
+                LegacyMigrationHelper.migrateLegacyPayments(applicationContext)
+                LegacyPrefsDatastore.saveDataMigrationExpected(applicationContext, false)
+                delay(10_000)
+                log.info("finished migrating legacy data")
+            }
+        }
 
         serviceScope.launch {
             val token = InternalData.getFcmToken(applicationContext).first()

@@ -66,6 +66,12 @@ object LegacyPrefsDatastore {
     it[LEGACY_DATA_MIGRATION_EXPECTED] = isExpected
   }
 
+  private val LEGACY_PREFS_MIGRATION_EXPECTED = booleanPreferencesKey("LEGACY_PREFS_MIGRATION_EXPECTED")
+  fun getPrefsMigrationExpected(context: Context): Flow<Boolean?> = prefs(context).map { it[LEGACY_PREFS_MIGRATION_EXPECTED] }
+  suspend fun savePrefsMigrationExpected(context: Context, isExpected: Boolean) = context.legacyPrefs.edit {
+    it[LEGACY_PREFS_MIGRATION_EXPECTED] = isExpected
+  }
+
   /** List of transaction ids that can be used for swap-in, even if zero conf. Used for migration. */
   private val MIGRATION_TRUSTED_SWAP_IN_TXS = stringSetPreferencesKey("MIGRATION_TRUSTED_SWAP_IN_TXS")
   fun getMigrationTrustedSwapInTxs(context: Context): Flow<Set<String>> = prefs(context).map { it[MIGRATION_TRUSTED_SWAP_IN_TXS] ?: emptySet() }
