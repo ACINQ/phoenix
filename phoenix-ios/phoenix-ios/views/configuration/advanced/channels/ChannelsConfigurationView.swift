@@ -418,30 +418,6 @@ fileprivate struct FooterView: View, ViewName {
 				}
 			}
 			
-			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-				
-				Text("Your Node ID:")
-					.font(.footnote)
-					.padding(.trailing, 4)
-				
-				Spacer()
-				
-				let nodeId = Biz.nodeId ?? "?"
-				Button {
-					copyNodeID(nodeId)
-				} label: {
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
-						Text(nodeId)
-							.lineLimit(1)
-							.truncationMode(.middle)
-						
-						Image(systemName: "square.on.square")
-							.imageScale(.medium)
-					}
-					.font(.footnote)
-				}
-			} // </HStack>
-			
 		} // </VStack>
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.padding([.top, .bottom], 10)
