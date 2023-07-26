@@ -15,7 +15,7 @@
  */
 
 
-package fr.acinq.phoenix.android.settings
+package fr.acinq.phoenix.android.settings.channels
 
 
 import androidx.compose.foundation.background

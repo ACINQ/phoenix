@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ACINQ SAS
+ * Copyright 2023 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 
-package fr.acinq.phoenix.android.settings
+package fr.acinq.phoenix.android.settings.channels
 
 
 import androidx.compose.foundation.clickable
@@ -37,7 +37,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -48,16 +47,18 @@ import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.LocalChannelInfo
+import fr.acinq.phoenix.utils.migrations.ChannelsConsolidationHelper
 
 
 @Composable
 fun ChannelsView(
     onBackClick: () -> Unit,
     onChannelClick: (String) -> Unit,
+    onConsolidateButtonClick: () -> Unit,
 ) {
     val log = logger("ChannelsView")
 
-    val channelsState = business.peerManager.channelsFlow.collectAsState()
+    val channelsState by business.peerManager.channelsFlow.collectAsState()
     val balance by business.balanceManager.balance.collectAsState()
 
     DefaultScreenLayout(isScrollable = false) {
@@ -65,10 +66,15 @@ fun ChannelsView(
             onBackClick = onBackClick,
             title = stringResource(id = R.string.channelsview_title),
         )
-        if (!channelsState.value.isNullOrEmpty()) {
+        if (!channelsState.isNullOrEmpty()) {
             LightningBalanceView(balance = balance)
         }
-        ChannelsList(channels = channelsState.value, onChannelClick = onChannelClick)
+        channelsState?.values?.toList()?.let { channels ->
+            if (ChannelsConsolidationHelper.canConsolidate(channels)) {
+                CanConsolidateView(channels, onConsolidateButtonClick)
+            }
+        }
+        ChannelsList(channels = channelsState, onChannelClick = onChannelClick)
     }
 }
 
@@ -141,5 +147,23 @@ private fun ChannelLine(channel: LocalChannelInfo, onClick: () -> Unit) {
         channel.currentFundingAmount?.let {
             AmountView(amount = it.toMilliSatoshi(), unitTextStyle = MaterialTheme.typography.caption)
         } ?: Text("--")
+    }
+}
+
+@Composable
+private fun CanConsolidateView(
+    channels: List<LocalChannelInfo>,
+    onConsolidateButtonClick: () -> Unit,
+) {
+    Card(
+        internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        Text(text = stringResource(id = R.string.channeldetails_can_consolidate))
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(
+            text = stringResource(id = R.string.channeldetails_can_consolidate_button),
+            icon = R.drawable.ic_arrow_next,
+            onClick = onConsolidateButtonClick,
+        )
     }
 }
