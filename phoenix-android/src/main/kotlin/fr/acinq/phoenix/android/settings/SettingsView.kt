@@ -104,7 +104,7 @@ fun SettingsView() {
         // -- advanced
         CardHeader(text = stringResource(id = R.string.settings_danger_title))
         Card {
-            SettingButton(text = R.string.settings_reset_wallet, icon = R.drawable.ic_trash, onClick = { nc.navigate(Screen.ResetWallet) })
+//            SettingButton(text = R.string.settings_reset_wallet, icon = R.drawable.ic_trash, onClick = { nc.navigate(Screen.ResetWallet) })
             SettingButton(text = R.string.settings_mutual_close, icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose) })
             SettingButton(
                 text = R.string.settings_force_close,
