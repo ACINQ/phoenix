@@ -105,12 +105,7 @@ struct WalletInfoView: View {
 				}
 			} // </VStack>
 			
-		//	let swapInWallet = Biz.business.walletManager.getKeyManager()?.swapInOnChainWallet
-			masterPublicKey(
-				keyPath: "?", // swapInOnChainWallet?.path ?? "?",
-				xpub: "?",    // swapInOnChainWallet?.xpub ?? "?",
-				truncationDetected: $swapIn_mpk_truncationDetected
-			)
+			subsection_swapInWallet_descriptor()
 			
 		} /*Section.*/header: {
 			
@@ -160,12 +155,7 @@ struct WalletInfoView: View {
 				}
 			} // </VStack>
 			
-			let keyManager = Biz.business.walletManager.getKeyManager()
-			masterPublicKey(
-				keyPath: keyManager?.finalOnChainWalletPath ?? "?",
-				xpub: keyManager?.finalOnChainWallet.xpub ?? "?",
-				truncationDetected: $final_mpk_truncationDetected
-			)
+			subsection_finalWallet_masterPublicKey()
 			
 		} /*Section.*/header: {
 			
@@ -195,15 +185,42 @@ struct WalletInfoView: View {
 	}
 	
 	@ViewBuilder
-	func masterPublicKey(
-		keyPath: String,
-		xpub: String,
-		truncationDetected: Binding<Bool>
-	) -> some View {
+	func subsection_swapInWallet_descriptor() -> some View {
+		
+		let keyManager = Biz.business.walletManager.getKeyManager()
+		let descriptor = keyManager?.swapInOnChainWallet.descriptor ?? "?"
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 			
-			if !truncationDetected.wrappedValue {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text("Descriptor")
+					.font(.headline.bold())
+				Spacer()
+				copyButton(descriptor)
+			}
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text(descriptor)
+					.lineLimit(2)
+					.font(.callout.weight(.light))
+					.foregroundColor(.secondary)
+				Spacer(minLength: 0)
+				invisibleImage()
+			}
+			
+		} // </VStack>
+	}
+	
+	@ViewBuilder
+	func subsection_finalWallet_masterPublicKey() -> some View {
+		
+		let keyManager = Biz.business.walletManager.getKeyManager()
+		let keyPath = keyManager?.finalOnChainWalletPath ?? "?"
+		let xpub = keyManager?.finalOnChainWallet.xpub ?? "?"
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
+			
+			if !final_mpk_truncationDetected {
 				
 				// All on one line:
 				// Master public key (Path m/x/y/z)  <img>
@@ -221,7 +238,7 @@ struct WalletInfoView: View {
 					} // </HStack>
 					
 				} wasTruncated: {
-					truncationDetected.wrappedValue = true
+					final_mpk_truncationDetected = true
 					
 				} // </TruncatableView>
 				
@@ -246,6 +263,7 @@ struct WalletInfoView: View {
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				Text(xpub)
+					.lineLimit(2)
 					.font(.callout.weight(.light))
 					.foregroundColor(.secondary)
 				Spacer(minLength: 0)
