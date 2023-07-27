@@ -24,7 +24,15 @@ enum class BitcoinUnit(override val displayCode: String) : CurrencyUnit {
 
     companion object {
         val values = values().toList()
+
+        fun valueOfOrNull(code: String): BitcoinUnit? = try {
+            valueOf(code)
+        } catch (e: Exception) {
+            null
+        }
     }
+
+
 }
 
 /**

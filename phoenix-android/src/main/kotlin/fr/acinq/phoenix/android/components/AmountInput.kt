@@ -558,7 +558,7 @@ private fun UnitDropdown(
     var selectedIndex by remember { mutableStateOf(maxOf(units.lastIndexOf(selectedUnit), 0)) }
     Box(modifier = modifier.wrapContentSize(Alignment.TopStart)) {
         Button(
-            text = units[selectedIndex].toString(),
+            text = units[selectedIndex].displayCode,
             icon = R.drawable.ic_chevron_down,
             onClick = { expanded = true },
             padding = internalPadding,
@@ -572,14 +572,14 @@ private fun UnitDropdown(
                 onDismiss()
             },
         ) {
-            units.forEachIndexed { index, s ->
+            units.forEachIndexed { index, unit ->
                 DropdownMenuItem(onClick = {
                     selectedIndex = index
                     expanded = false
                     onDismiss()
                     onUnitChange(units[index])
                 }) {
-                    Text(text = s.toString())
+                    Text(text = unit.displayCode)
                 }
             }
         }

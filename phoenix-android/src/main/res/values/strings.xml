@@ -654,9 +654,12 @@
 
     <!-- settings: currencies -->
 
-    <string name="currency_ars_bm">Argentine Peso (blue market)</string>
-    <string name="currency_cup_fm">Cuban Peso (free market)</string>
-    <string name="currency_lbp_bm">Lebanese Pound (black market)</string>
+    <string name="currency_ars_official">Argentine Peso (official rate)</string>
+    <string name="currency_ars_bm">Argentine Peso</string>
+    <string name="currency_cup_official">Cuban Peso (official rate)</string>
+    <string name="currency_cup_fm">Cuban Peso</string>
+    <string name="currency_lbp_official">Lebanese Pound (official rate)</string>
+    <string name="currency_lbp_bm">Lebanese Pound</string>
 
     <!-- payments history -->
 

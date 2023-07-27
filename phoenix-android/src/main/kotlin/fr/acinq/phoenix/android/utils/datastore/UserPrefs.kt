@@ -58,11 +58,11 @@ object UserPrefs {
     // -- unit, fiat, conversion...
 
     private val BITCOIN_UNIT = stringPreferencesKey("BITCOIN_UNIT")
-    fun getBitcoinUnit(context: Context): Flow<BitcoinUnit> = prefs(context).map { BitcoinUnit.valueOf(it[BITCOIN_UNIT] ?: BitcoinUnit.Sat.name) }
+    fun getBitcoinUnit(context: Context): Flow<BitcoinUnit> = prefs(context).map { it[BITCOIN_UNIT]?.let { BitcoinUnit.valueOfOrNull(it) } ?: BitcoinUnit.Sat }
     suspend fun saveBitcoinUnit(context: Context, coinUnit: BitcoinUnit) = context.userPrefs.edit { it[BITCOIN_UNIT] = coinUnit.name }
 
     private val FIAT_CURRENCY = stringPreferencesKey("FIAT_CURRENCY")
-    fun getFiatCurrency(context: Context): Flow<FiatCurrency> = prefs(context).map { FiatCurrency.valueOf(it[FIAT_CURRENCY] ?: FiatCurrency.USD.name) }
+    fun getFiatCurrency(context: Context): Flow<FiatCurrency> = prefs(context).map { it[FIAT_CURRENCY]?.let { FiatCurrency.valueOfOrNull(it) } ?: FiatCurrency.USD }
     suspend fun saveFiatCurrency(context: Context, currency: FiatCurrency) = context.userPrefs.edit { it[FIAT_CURRENCY] = currency.name }
 
     private val SHOW_AMOUNT_IN_FIAT = booleanPreferencesKey("SHOW_AMOUNT_IN_FIAT")
