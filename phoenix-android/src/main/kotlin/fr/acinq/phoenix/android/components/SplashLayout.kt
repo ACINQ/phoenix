@@ -29,10 +29,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -115,6 +117,7 @@ fun SplashLayout(
 fun SplashLabelRow(
     label: String,
     @DrawableRes icon: Int? = null,
+    iconTint: Color = MaterialTheme.typography.subtitle1.color,
     helpMessage: String? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -132,13 +135,14 @@ fun SplashLabelRow(
             Text(
                 text = label.uppercase(),
                 style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp, textAlign = TextAlign.End),
-                maxLines = if (helpMessage != null) 1 else 2,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
             if (icon != null) {
                 Spacer(modifier = Modifier.width(4.dp))
                 Image(
                     painter = painterResource(id = icon),
-                    colorFilter = ColorFilter.tint(MaterialTheme.typography.subtitle1.color),
+                    colorFilter = ColorFilter.tint(iconTint),
                     contentDescription = null,
                     modifier = Modifier
                         .size(ButtonDefaults.IconSize)

@@ -1,13 +1,13 @@
 # base image to build eclair-core
-FROM eclipse-temurin:11.0.16.1_1-jdk-alpine as ECLAIR_CORE_BUILD
+FROM eclipse-temurin:11.0.20_8-jdk-alpine as ECLAIR_CORE_BUILD
 
 # this is necessary to extract the eclair-core version that we need to clone for the build
 COPY ./buildSrc/src/main/kotlin/Versions.kt .
 RUN cat Versions.kt | grep "const val eclair =" | cut -d '"' -f 2 > eclair-core-version.txt
 
-ARG MAVEN_VERSION=3.6.3
+ARG MAVEN_VERSION=3.9.3
 ARG USER_HOME_DIR="/root"
-ARG SHA=c35a1803a6e70a126e80b2b3ae33eed961f83ed74d18fcd16909b2d44d7dada3203f1ffe726c17ef8dcca2dcaa9fca676987befeadc9b9f759967a8cb77181c0
+ARG SHA=400fc5b6d000c158d5ee7937543faa06b6bda8408caa2444a9c947c21472fde0f0b64ac452b8cec8855d528c0335522ed5b6c8f77085811c7e29e1bedbb5daa2
 ARG BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries
 
 RUN apk add --no-cache curl tar bash git

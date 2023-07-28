@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
@@ -32,6 +33,7 @@ import fr.acinq.phoenix.android.utils.label
 import fr.acinq.phoenix.android.utils.labels
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.managers.AppConfigurationManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -85,6 +87,8 @@ private fun FiatCurrencyPreference(context: Context, scope: CoroutineScope) {
         PreferenceItem(item = it, title = title, description = desc)
     }
 
+    val appConfigurationManager = business.appConfigurationManager
+
     val currentPref = LocalFiatCurrency.current
     ListPreferenceButton(
         title = stringResource(id = R.string.prefs_display_fiat_label),
@@ -96,6 +100,7 @@ private fun FiatCurrencyPreference(context: Context, scope: CoroutineScope) {
             prefEnabled = false
             scope.launch {
                 UserPrefs.saveFiatCurrency(context, it.item)
+                appConfigurationManager.updatePreferredFiatCurrencies(AppConfigurationManager.PreferredFiatCurrencies(primary = it.item, others = emptySet()))
                 prefEnabled = true
             }
         }

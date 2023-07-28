@@ -290,6 +290,7 @@ class MigrationDialogViewModel : ViewModel() {
 
           // pause then update preferences to switch to the new app
           delay(3_000)
+          LegacyPrefsDatastore.savePrefsMigrationExpected(context, true)
           LegacyPrefsDatastore.saveDataMigrationExpected(context, true)
           LegacyPrefsDatastore.saveHasMigratedFromLegacy(context, true)
           LegacyPrefsDatastore.saveMigrationTrustedSwapInTxs(context, mutualClosePublishedTxs)
