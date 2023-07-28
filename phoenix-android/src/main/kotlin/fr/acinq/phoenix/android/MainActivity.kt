@@ -60,6 +60,17 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // migrate legacy data if needed
+        lifecycleScope.launch {
+            val doDataMigration = LegacyPrefsDatastore.getDataMigrationExpected(applicationContext).filterNotNull().first()
+            if (doDataMigration) {
+                delay(7_000)
+                LegacyMigrationHelper.migrateLegacyPayments(applicationContext)
+                delay(5_000)
+                LegacyPrefsDatastore.saveDataMigrationExpected(applicationContext, false)
+            }
+        }
+
         // listen to legacy channels events on the peer's event bus
         lifecycleScope.launch {
             val application = (application as PhoenixApplication)

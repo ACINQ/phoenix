@@ -248,17 +248,6 @@ class NodeService : Service() {
         )
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
 
-        // migrate legacy payments if needed
-        if (LegacyPrefsDatastore.getDataMigrationExpected(applicationContext).filterNotNull().first()) {
-            serviceScope.launch {
-                log.info("started migrating legacy data")
-                LegacyMigrationHelper.migrateLegacyPayments(applicationContext)
-                LegacyPrefsDatastore.saveDataMigrationExpected(applicationContext, false)
-                delay(10_000)
-                log.info("finished migrating legacy data")
-            }
-        }
-
         serviceScope.launch {
             val token = InternalData.getFcmToken(applicationContext).first()
             log.debug("retrieved from prefs fcm token=$token")
