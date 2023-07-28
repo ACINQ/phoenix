@@ -1,18 +1,16 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.io.*
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqlitePaymentsDb
-import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.*
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
+import kotlin.time.Duration.Companion.seconds
 
 
 class PaymentsManager(
@@ -45,8 +43,8 @@ class PaymentsManager(
     private val _lastCompletedPayment = MutableStateFlow<WalletPayment?>(null)
     val lastCompletedPayment: StateFlow<WalletPayment?> = _lastCompletedPayment
 
-    private val _inFlightOutgoingPayments = MutableStateFlow<Set<UUID>>(setOf())
-    val inFlightOutgoingPayments: StateFlow<Set<UUID>> = _inFlightOutgoingPayments
+    private val _inFlightPayments = MutableStateFlow<Set<String>>(setOf())
+    val inFlightPayments: StateFlow<Set<String>> = _inFlightPayments
 
     /**
      * Provides a default PaymentsFetcher for use by the app.
@@ -106,13 +104,21 @@ class PaymentsManager(
             peerManager.getPeer().eventsFlow.collect { event ->
                 when (event) {
                     is PaymentProgress -> {
-                        addToInFlightOutgoingPayments(event.request.paymentId)
+                        addToInFlightPayments(event.request.paymentId.toString())
                     }
                     is PaymentSent -> {
-                        removeFromInFlightOutgoingPayments(event.request.paymentId)
+                        removeFromInFlightPayments(event.request.paymentId.toString())
                     }
                     is PaymentNotSent -> {
-                        removeFromInFlightOutgoingPayments(event.request.paymentId)
+                        removeFromInFlightPayments(event.request.paymentId.toString())
+                    }
+                    is PaymentReceived -> {
+                        // Temporary workaround: We don't have the full set of notifications
+                        // for incoming payments yet, so we're faking it.
+                        val id = event.incomingPayment.paymentHash.toString()
+                        addToInFlightPayments(id)
+                        delay(20.seconds)
+                        removeFromInFlightPayments(id)
                     }
                     else -> Unit
                 }
@@ -120,18 +126,18 @@ class PaymentsManager(
         }
     }
 
-    /** Adds to StateFlow<Set<UUID>> */
-    private fun addToInFlightOutgoingPayments(id: UUID) {
-        val oldSet = _inFlightOutgoingPayments.value
+    /** Adds to StateFlow<Set<String>> */
+    private fun addToInFlightPayments(id: String) {
+        val oldSet = _inFlightPayments.value
         val newSet = oldSet.plus(id)
-        _inFlightOutgoingPayments.value = newSet
+        _inFlightPayments.value = newSet
     }
 
-    /** Removes from StateFlow<Set<UUID>> */
-    private fun removeFromInFlightOutgoingPayments(id: UUID) {
-        val oldSet = _inFlightOutgoingPayments.value
+    /** Removes from StateFlow<Set<String>> */
+    private fun removeFromInFlightPayments(id: String) {
+        val oldSet = _inFlightPayments.value
         val newSet = oldSet.minus(id)
-        _inFlightOutgoingPayments.value = newSet
+        _inFlightPayments.value = newSet
     }
 
     private suspend fun paymentsDb(): SqlitePaymentsDb {

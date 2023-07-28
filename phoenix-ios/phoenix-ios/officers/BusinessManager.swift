@@ -129,8 +129,8 @@ class BusinessManager {
 		.store(in: &cancellables)
 		
 		// In-flight payments observer
-		business.paymentsManager.inFlightOutgoingPaymentsPublisher().sink { (count: Int) in
-			log.debug("inFlightOutgoingPaymentsPublisher: count = \(count)")
+		business.paymentsManager.inFlightPaymentsPublisher().sink { (count: Int) in
+			log.debug("inFlightPaymentsPublisher: count = \(count)")
 			if count > 0 {
 				self.beginLongLivedTask()
 			} else {
