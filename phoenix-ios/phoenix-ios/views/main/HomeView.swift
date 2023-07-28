@@ -54,9 +54,6 @@ struct HomeView : MVIView {
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
 	@State var incomingSwapAnimationsRemaining = 0
 	
-	// Toggles confirmation dialog (used to select preferred explorer)
-	@State var showBlockchainExplorerOptions = false
-	
 	let bizNotificationsPublisher = Biz.business.notificationsManager.notificationsPublisher()
 	@State var bizNotifications: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	

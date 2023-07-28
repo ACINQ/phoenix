@@ -48,3 +48,10 @@ extension FiatCurrency: Identifiable {
 		return self.name
 	}
 }
+
+extension Lightning_kmpWalletState.Utxo: Identifiable {
+	
+	public var id: String {
+		return "\(previousTx.txid.toHex()):\(outputIndex):\(blockHeight)"
+	}
+}
