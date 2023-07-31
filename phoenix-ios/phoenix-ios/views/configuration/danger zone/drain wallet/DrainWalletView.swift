@@ -86,6 +86,9 @@ struct DrainWalletView: MVIView {
 				//
 				section_options()
 				section_button()
+				
+			} else if mvi.model is CloseChannelsConfiguration.ModelChannelsClosed {
+				section_channelsClosed()
 			}
 		}
 		.listStyle(.insetGrouped)
@@ -100,6 +103,17 @@ struct DrainWalletView: MVIView {
 				ProgressView()
 					.progressViewStyle(CircularProgressViewStyle())
 				Text("Loading wallet...")
+			}
+		} // </Section>
+	}
+	
+	@ViewBuilder
+	func section_channelsClosed() -> some View {
+		
+		Section {
+			HStack(alignment: VerticalAlignment.center, spacing: 8) {
+				Image(systemName: "checkmark.circle.fill").foregroundColor(.appPositive)
+				Text("Channels closed")
 			}
 		} // </Section>
 	}
