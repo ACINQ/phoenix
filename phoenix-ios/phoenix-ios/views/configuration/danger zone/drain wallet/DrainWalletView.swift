@@ -19,11 +19,11 @@ struct DrainWalletView: MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
-	let popToRoot: () -> Void
+	let popTo: (PopToDestination) -> Void
 	let encryptedNodeId = Biz.encryptedNodeId!
 	
 	@State var didAppear = false
-	@State var popToRootRequested = false
+	@State var popToDestination: PopToDestination? = nil
 	
 	@State var textFieldValue: String = ""
 	@State var scannedValue: String? = nil
@@ -253,7 +253,7 @@ struct DrainWalletView: MVIView {
 			DrainWalletView_Confirm(
 				mvi: mvi,
 				bitcoinAddress: bitcoinAddress,
-				popToRoot: updatedPopToRoot
+				popTo: popToWrapper
 			)
 		}
 	}
@@ -275,11 +275,11 @@ struct DrainWalletView: MVIView {
 		return (balance_bitcoin, balance_fiat)
 	}
 	
-	func updatedPopToRoot() {
-		log.trace("updatedPopToRoot()")
+	func popToWrapper(_ destination: PopToDestination) {
+		log.trace("popToWrapper()")
 		
-		popToRootRequested = true
-		popToRoot()
+		popToDestination = destination
+		popTo(destination)
 	}
 	
 	// --------------------------------------------------
@@ -301,8 +301,8 @@ struct DrainWalletView: MVIView {
 			
 		} else {
 			
-			if popToRootRequested {
-				popToRootRequested = false
+			if popToDestination != nil {
+				popToDestination = nil
 				presentationMode.wrappedValue.dismiss()
 			}
 		}

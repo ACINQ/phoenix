@@ -34,6 +34,11 @@ fileprivate enum NavLinkTag: String {
 	case ForceCloseChannels
 }
 
+enum PopToDestination {
+	case RootView
+	case ConfigurationView
+}
+
 struct ConfigurationView: View {
 	
 	@ViewBuilder
@@ -62,7 +67,7 @@ fileprivate struct ConfigurationList: View {
 	@State private var swiftUiBugWorkaroundIdx = 0
 	
 	@State var didAppear = false
-	@State var popToRootRequested = false
+	@State var popToDestination: PopToDestination? = nil
 	
 	@Namespace var linkID_About
 	@Namespace var linkID_DisplayConfiguration
@@ -371,7 +376,7 @@ fileprivate struct ConfigurationList: View {
 			case .ChannelsConfiguration : ChannelsConfigurationView()
 			case .LogsConfiguration     : LogsConfigurationView()
 		// Danger Zone
-			case .DrainWallet           : DrainWalletView(popToRoot: popToRoot)
+			case .DrainWallet           : DrainWalletView(popTo: popTo)
 			case .ResetWallet           : ResetWalletView()
 			case .ForceCloseChannels    : ForceCloseChannelsView()
 		}
@@ -432,9 +437,11 @@ fileprivate struct ConfigurationList: View {
 			
 		} else {
 		
-			if popToRootRequested {
-				popToRootRequested = false
-				presentationMode.wrappedValue.dismiss()
+			if let destination = popToDestination {
+				popToDestination = nil
+				if destination == .RootView {
+					presentationMode.wrappedValue.dismiss()
+				}
 			}
 		}
 	}
@@ -519,10 +526,10 @@ fileprivate struct ConfigurationList: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func popToRoot() {
+	func popTo(_ destination: PopToDestination) {
 		log.trace("popToRoot")
 		
-		popToRootRequested = true
+		popToDestination = destination
 	}
 	
 	// --------------------------------------------------

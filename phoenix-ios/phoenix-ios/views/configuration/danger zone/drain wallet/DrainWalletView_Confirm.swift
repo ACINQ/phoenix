@@ -15,12 +15,12 @@ struct DrainWalletView_Confirm: MVISubView {
 	
 	@ObservedObject var mvi: MVIState<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>
 	let bitcoinAddress: String
-	let popToRoot: () -> Void
+	let popTo: (PopToDestination) -> Void
 	
 	@State var actionRequested: Bool = false
 	@State var expectedTxCount: Int = 0
 	
-	@State var popToRootRequested = false
+	@State var popToDestination: PopToDestination? = nil
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -155,7 +155,7 @@ struct DrainWalletView_Confirm: MVISubView {
 		DrainWalletView_Action(
 			mvi: mvi,
 			expectedTxCount: expectedTxCount,
-			popToRoot: updatedPopToRoot
+			popTo: popToWrapper
 		)
 	}
 	
@@ -195,11 +195,11 @@ struct DrainWalletView_Confirm: MVISubView {
 		}
 	}
 	
-	func updatedPopToRoot() {
-		log.trace("updatedPopToRoot()")
+	func popToWrapper(_ destination: PopToDestination) {
+		log.trace("popToWrapper()")
 		
-		popToRootRequested = true
-		popToRoot()
+		popToDestination = destination
+		popTo(destination)
 	}
 	
 	// --------------------------------------------------
@@ -209,8 +209,8 @@ struct DrainWalletView_Confirm: MVISubView {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		if popToRootRequested {
-			popToRootRequested = false
+		if popToDestination != nil {
+			popToDestination = nil
 			presentationMode.wrappedValue.dismiss()
 		}
 	}
