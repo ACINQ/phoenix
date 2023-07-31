@@ -15,6 +15,11 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct WalletInfoView: View {
 	
+	let popTo: (PopToDestination) -> Void
+	
+	@State var didAppear = false
+	@State var popToDestination: PopToDestination? = nil
+	
 	@State var popoverPresent_swapInWallet = false
 	@State var popoverPresent_finalWallet = false
 	
@@ -24,6 +29,7 @@ struct WalletInfoView: View {
 	@StateObject var toast = Toast()
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
@@ -52,6 +58,9 @@ struct WalletInfoView: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
+		.onAppear() {
+			onAppear()
+		}
 	}
 	
 	@ViewBuilder
@@ -95,7 +104,7 @@ struct WalletInfoView: View {
 		
 		Section {
 			
-			NavigationLink(destination: SwapInWalletDetails()) {
+			NavigationLink(destination: SwapInWalletDetails(popTo: popToWrapper)) {
 				subsection_swapInWallet_balance()
 			}
 			subsection_swapInWallet_descriptor()
@@ -433,6 +442,33 @@ struct WalletInfoView: View {
 		let fiatAmt = Utils.formatFiat(currencyPrefs, sat: sats)
 		
 		return (btcAmt, fiatAmt)
+	}
+	
+	func popToWrapper(_ destination: PopToDestination) {
+		log.trace("popToWrapper()")
+		
+		popToDestination = destination
+		popTo(destination)
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Lifecycle
+	// --------------------------------------------------
+	
+	func onAppear(){
+		log.trace("onAppear()")
+		
+		if !didAppear {
+			didAppear = true
+			
+		} else {
+			
+			if let destination = popToDestination {
+				log.debug("popToDestination: \(destination)")
+				popToDestination = nil
+				presentationMode.wrappedValue.dismiss()
+			}
+		}
 	}
 	
 	// --------------------------------------------------

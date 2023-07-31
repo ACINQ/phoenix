@@ -169,7 +169,7 @@ struct DrainWalletView_Action: MVISubView {
 	func doneButtonTapped() {
 		log.trace("doneButtonTapped()")
 		
+		popTo(.RootView(followedBy: nil))
 		presentationMode.wrappedValue.dismiss()
-		popTo(.RootView)
 	}
 }

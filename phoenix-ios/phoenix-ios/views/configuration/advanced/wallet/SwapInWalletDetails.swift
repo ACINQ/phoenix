@@ -14,6 +14,8 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct SwapInWalletDetails: View {
 	
+	let popTo: (PopToDestination) -> Void
+	
 	@State var liquidityPolicy: LiquidityPolicy = Prefs.shared.liquidityPolicy
 	
 	@State var blockchainExplorerTxid: String? = nil
@@ -24,6 +26,8 @@ struct SwapInWalletDetails: View {
 		value: { [$0.size.width] }
 	)
 	@State var iconWidth: CGFloat? = nil
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -280,7 +284,8 @@ struct SwapInWalletDetails: View {
 	func navigateToLiquiditySettings() {
 		log.trace("navigateToLiquiditySettings()")
 		
-		deepLinkManager.broadcast(.liquiditySettings)
+		popTo(.ConfigurationView(followedBy: .liquiditySettings))
+		presentationMode.wrappedValue.dismiss()
 	}
 }
 

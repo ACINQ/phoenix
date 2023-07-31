@@ -34,9 +34,16 @@ fileprivate enum NavLinkTag: String {
 	case ForceCloseChannels
 }
 
-enum PopToDestination {
-	case RootView
-	case ConfigurationView
+enum PopToDestination: CustomStringConvertible {
+	case RootView(followedBy: DeepLink? = nil)
+	case ConfigurationView(followedBy: DeepLink? = nil)
+	
+	public var description: String {
+		switch self {
+			case .RootView          : return "RootView"
+			case .ConfigurationView : return "ConfigurationView"
+		}
+	}
 }
 
 struct ConfigurationView: View {
@@ -372,7 +379,7 @@ fileprivate struct ConfigurationList: View {
 			case .Tor                   : TorConfigurationView()
 			case .PaymentsBackup        : PaymentsBackupView()
 		// Advanced
-			case .WalletInfo            : WalletInfoView()
+			case .WalletInfo            : WalletInfoView(popTo: popTo)
 			case .ChannelsConfiguration : ChannelsConfigurationView()
 			case .LogsConfiguration     : LogsConfigurationView()
 		// Danger Zone
@@ -439,8 +446,16 @@ fileprivate struct ConfigurationList: View {
 		
 			if let destination = popToDestination {
 				popToDestination = nil
-				if destination == .RootView {
+				switch destination {
+				case .RootView(let deepLink):
+					log.debug("popToDestination: \(destination), follwedBy: \(deepLink?.rawValue ?? "nil")")
 					presentationMode.wrappedValue.dismiss()
+					
+				case .ConfigurationView(let deepLink):
+					log.debug("popToDestination: \(destination), followedBy: \(deepLink?.rawValue ?? "nil")")
+					if let deepLink {
+						deepLinkManager.broadcast(deepLink)
+					}
 				}
 			}
 		}
@@ -527,7 +542,7 @@ fileprivate struct ConfigurationList: View {
 	// --------------------------------------------------
 	
 	func popTo(_ destination: PopToDestination) {
-		log.trace("popToRoot")
+		log.trace("popTo()")
 		
 		popToDestination = destination
 	}
