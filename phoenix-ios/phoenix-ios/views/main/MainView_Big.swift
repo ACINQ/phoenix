@@ -868,6 +868,7 @@ struct MainView_Big: View {
 				case .electrum           : showSettings()
 				case .backgroundPayments : showSettings()
 				case .liquiditySettings  : showSettings()
+				case .forceCloseChannels : showSettings()
 			}
 		}
 	}

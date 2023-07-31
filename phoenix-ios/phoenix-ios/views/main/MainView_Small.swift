@@ -534,9 +534,10 @@ struct MainView_Small: View {
 				case .paymentHistory     : newNavLinkTag = .TransactionsView  ; delay *= 1
 				case .backup             : newNavLinkTag = .ConfigurationView ; delay *= 2
 				case .drainWallet        : newNavLinkTag = .ConfigurationView ; delay *= 2
-				case .electrum           : newNavLinkTag = .ConfigurationView ; delay *= 3
+				case .electrum           : newNavLinkTag = .ConfigurationView ; delay *= 2
 				case .backgroundPayments : newNavLinkTag = .ConfigurationView ; delay *= 3
 				case .liquiditySettings  : newNavLinkTag = .ConfigurationView ; delay *= 3
+				case .forceCloseChannels : newNavLinkTag = .ConfigurationView ; delay *= 2
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
