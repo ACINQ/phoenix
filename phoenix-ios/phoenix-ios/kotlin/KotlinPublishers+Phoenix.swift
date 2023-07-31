@@ -81,7 +81,7 @@ extension BalanceManager {
 	
 	fileprivate struct _Key {
 		static var balancePublisher = 0
-		static var swapInWalletBalancePublisher = 0
+		static var swapInWalletPublisher = 0
 	}
 	
 	func balancePublisher() -> AnyPublisher<Lightning_kmpMilliSatoshi?, Never> {
@@ -98,17 +98,21 @@ extension BalanceManager {
 		}
 	}
 	
-	func swapInWalletBalancePublisher() -> AnyPublisher<WalletBalance, Never> {
+	func swapInWalletPublisher() -> AnyPublisher<Lightning_kmpWalletState.WalletWithConfirmations, Never> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.swapInWalletBalancePublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.swapInWalletPublisher) {
 			
 			// Transforming from Kotlin:
 			// ```
-			// swapInWalletBalance: StateFlow<WalletBalance>
+			// swapInWallet: StateFlow<WalletState.WalletWithConfirmations?>
 			// ```
-			KotlinCurrentValueSubject<WalletBalance, WalletBalance>(
-				self.swapInWalletBalance
+			KotlinCurrentValueSubject<
+				Lightning_kmpWalletState.WalletWithConfirmations,
+				Lightning_kmpWalletState.WalletWithConfirmations?
+			>(
+				self.swapInWallet
 			)
+			.map { $0 ?? Lightning_kmpWalletState.WalletWithConfirmations.empty() }
 			.eraseToAnyPublisher()
 		}
 	}

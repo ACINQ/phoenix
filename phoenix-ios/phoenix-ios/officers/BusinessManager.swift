@@ -209,17 +209,17 @@ class BusinessManager {
 		// LiquidityEvent.Accepted is still missing.
 		// So we're simulating it by monitoring the swapIn wallet balance.
 		// A LiquidityEvent.Rejected occurs when:
-		// - swapInWalletBalance.confirmed > 0
+		// - swapInWallet.deeplyConfirmedBalance > 0
 		// - but the fees exceed the confirmed maxFees
 		//
 		// If the swapIn successfully occurs later,
 		// then the entire confirmed balance is consumed,
 		// and thus the confirmed balance drops to zero.
 		//
-		business.balanceManager.swapInWalletBalancePublisher()
-			.sink { (balance: WalletBalance) in
+		business.balanceManager.swapInWalletPublisher()
+			.sink { (wallet: Lightning_kmpWalletState.WalletWithConfirmations) in
 				
-				if balance.confirmed.sat == 0 {
+				if wallet.deeplyConfirmedBalance.sat == 0 {
 					if self.swapInRejectedPublisher.value != nil {
 						log.debug("Received Lightning_kmpLiquidityEventsAccepted")
 						self.swapInRejectedPublisher.value = nil

@@ -13,8 +13,8 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct IncomingDepositPopover: View {
 	
-	let swapInWalletBalancePublisher = Biz.business.balanceManager.swapInWalletBalancePublisher()
-	@State var swapInWalletBalance: WalletBalance = WalletBalance.companion.empty()
+	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
+	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 	
 	let swapInRejectedPublisher = Biz.swapInRejectedPublisher
 	@State var swapInRejected: Lightning_kmpLiquidityEventsRejected? = nil
@@ -29,8 +29,8 @@ struct IncomingDepositPopover: View {
 			header()
 			content()
 		}
-		.onReceive(swapInWalletBalancePublisher) {
-			swapInWalletBalanceChanged($0)
+		.onReceive(swapInWalletPublisher) {
+			swapInWalletChanged($0)
 		}
 		.onReceive(swapInRejectedPublisher) {
 			swapInRejectedStateChanged($0)
@@ -166,15 +166,11 @@ struct IncomingDepositPopover: View {
 	
 	func showOnChainPendingFunds() -> Bool {
 		
-		return swapInWalletBalance.confirmed.sat > 0 &&
-			swapInWalletBalance.unconfirmed.sat == 0 &&
-			swapInWalletBalance.weaklyConfirmed.sat == 0 &&
+		return swapInWallet.deeplyConfirmedBalance.sat > 0 &&
+			swapInWallet.unconfirmedBalance.sat == 0 &&
+			swapInWallet.weaklyConfirmedBalance.sat == 0 &&
 			swapInRejected != nil
 	}
-	
-	// --------------------------------------------------
-	// MARK: Notifications
-	// --------------------------------------------------
 	
 	func basisPointsAsPercent(_ basisPoints: Int32) -> String {
 		
@@ -197,10 +193,10 @@ struct IncomingDepositPopover: View {
 	// MARK: Notifications
 	// --------------------------------------------------
 	
-	func swapInWalletBalanceChanged(_ walletBalance: WalletBalance) {
-		log.trace("swapInWalletBalanceChanged()")
+	func swapInWalletChanged(_ newWallet: Lightning_kmpWalletState.WalletWithConfirmations) {
+		log.trace("swapInWalletChanged()")
 		
-		swapInWalletBalance = walletBalance
+		swapInWallet = newWallet
 	}
 	
 	func swapInRejectedStateChanged(_ state: Lightning_kmpLiquidityEventsRejected?) {

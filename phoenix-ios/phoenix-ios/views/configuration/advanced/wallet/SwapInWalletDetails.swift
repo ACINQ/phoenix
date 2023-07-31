@@ -18,6 +18,9 @@ struct SwapInWalletDetails: View {
 	
 	@State var liquidityPolicy: LiquidityPolicy = Prefs.shared.liquidityPolicy
 	
+	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
+	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
+	
 	@State var blockchainExplorerTxid: String? = nil
 	
 	enum IconWidth: Preference {}
@@ -56,6 +59,9 @@ struct SwapInWalletDetails: View {
 		.listBackgroundColor(.primaryBackground)
 		.onReceive(Prefs.shared.liquidityPolicyPublisher) {
 			liquidityPolicyChanged($0)
+		}
+		.onReceive(swapInWalletPublisher) {
+			swapInWalletChanged($0)
 		}
 	}
 	
@@ -193,7 +199,7 @@ struct SwapInWalletDetails: View {
 		let effectiveMax: Int64
 		let absoluteMax: Int64 = liquidityPolicy.effectiveMaxFeeSats
 		
-		let swapInBalance: Int64 = Biz.business.balanceManager.swapInWalletBalanceValue().total.sat
+		let swapInBalance: Int64 = swapInWallet.totalBalance.sat
 		if swapInBalance > 0 {
 			
 			let maxPercent: Double = Double(liquidityPolicy.effectiveMaxFeeBasisPoints) / Double(10_000)
@@ -211,7 +217,7 @@ struct SwapInWalletDetails: View {
 	
 	func confirmedBalance() -> (FormattedAmount, FormattedAmount) {
 		
-		let confirmed = Biz.business.balanceManager.swapInWalletBalanceValue().deeplyConfirmed
+		let confirmed = swapInWallet.deeplyConfirmedBalance
 		
 		let btcAmt = Utils.formatBitcoin(currencyPrefs, sat: confirmed)
 		let fiatAmt = Utils.formatFiat(currencyPrefs, sat: confirmed)
@@ -221,7 +227,6 @@ struct SwapInWalletDetails: View {
 	
 	private func unconfirmedUtxos() -> [UtxoWrapper] {
 		
-		let swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 		let utxos = swapInWallet.weaklyConfirmed + swapInWallet.unconfirmed
 		
 		let wrappedUtxos = utxos.map { utxo in
@@ -260,6 +265,12 @@ struct SwapInWalletDetails: View {
 		log.trace("liquidityPolicyChanged()")
 		
 		self.liquidityPolicy = newValue
+	}
+	
+	func swapInWalletChanged(_ newValue: Lightning_kmpWalletState.WalletWithConfirmations) {
+		log.trace("swapInWalletChanged()")
+		
+		swapInWallet = newValue
 	}
 	
 	// --------------------------------------------------

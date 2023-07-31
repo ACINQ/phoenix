@@ -408,21 +408,21 @@ struct WalletInfoView: View {
 	
 	func swapInBalance_confirmed() -> Bitcoin_kmpSatoshi {
 		
-		let swapInWallet = Biz.business.balanceManager.swapInWalletBalanceValue()
-		return swapInWallet.confirmed
+		let swapInWallet = Biz.business.balanceManager.swapInWalletValue()
+		return swapInWallet.deeplyConfirmedBalance
 	}
 	
 	func swapInBalance_unconfirmed() -> Bitcoin_kmpSatoshi {
 		
-		let swapInWallet = Biz.business.balanceManager.swapInWalletBalanceValue()
-		let sats = swapInWallet.weaklyConfirmed.sat + swapInWallet.unconfirmed.sat
+		let swapInWallet = Biz.business.balanceManager.swapInWalletValue()
+		let sats = swapInWallet.weaklyConfirmedBalance.sat + swapInWallet.unconfirmedBalance.sat
 		return Bitcoin_kmpSatoshi(sat: sats)
 	}
 	
 	func finalBalance_confirmed() -> Bitcoin_kmpSatoshi {
 		
 		let finalWallet = Biz.business.peerManager.finalWalletBalance()
-		return finalWallet.confirmedBalance
+		return finalWallet.anyConfirmedBalance
 	}
 	
 	func finalBalance_unconfirmed() -> Bitcoin_kmpSatoshi {

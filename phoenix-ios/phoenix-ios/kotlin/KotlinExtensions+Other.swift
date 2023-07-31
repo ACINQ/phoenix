@@ -16,7 +16,7 @@ extension PeerManager {
 		if let value = self.finalWallet.value_ as? Lightning_kmpWalletState.WalletWithConfirmations {
 			return value
 		} else {
-			return Lightning_kmpWalletState.WalletWithConfirmations(minConfirmations: 1, currentBlockHeight: 1, all: [])
+			return Lightning_kmpWalletState.WalletWithConfirmations.empty()
 		}
 	}
 }
@@ -27,15 +27,7 @@ extension BalanceManager {
 		if let value = self.swapInWallet.value_ as? Lightning_kmpWalletState.WalletWithConfirmations {
 			return value
 		} else {
-			return Lightning_kmpWalletState.WalletWithConfirmations(minConfirmations: 1, currentBlockHeight: 1, all: [])
-		}
-	}
-	
-	func swapInWalletBalanceValue() -> WalletBalance {
-		if let value = swapInWalletBalance.value_ as? WalletBalance {
-			return value
-		} else {
-			return WalletBalance.companion.empty()
+			return Lightning_kmpWalletState.WalletWithConfirmations.empty()
 		}
 	}
 }
@@ -77,7 +69,17 @@ extension Lightning_kmpWalletState.WalletWithConfirmations {
 		return Bitcoin_kmpSatoshi(sat: balance)
 	}
 	
-	var confirmedBalance: Bitcoin_kmpSatoshi {
+	var weaklyConfirmedBalance: Bitcoin_kmpSatoshi {
+		let balance = weaklyConfirmed.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
+		return Bitcoin_kmpSatoshi(sat: balance)
+	}
+	
+	var deeplyConfirmedBalance: Bitcoin_kmpSatoshi {
+		let balance = deeplyConfirmed.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
+		return Bitcoin_kmpSatoshi(sat: balance)
+	}
+	
+	var anyConfirmedBalance: Bitcoin_kmpSatoshi {
 		let anyConfirmedTx = weaklyConfirmed + deeplyConfirmed
 		let balance = anyConfirmedTx.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
 		return Bitcoin_kmpSatoshi(sat: balance)
@@ -87,6 +89,10 @@ extension Lightning_kmpWalletState.WalletWithConfirmations {
 		let allTx = unconfirmed + weaklyConfirmed + deeplyConfirmed
 		let balance = allTx.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
 		return Bitcoin_kmpSatoshi(sat: balance)
+	}
+	
+	static func empty() -> Lightning_kmpWalletState.WalletWithConfirmations {
+		return Lightning_kmpWalletState.WalletWithConfirmations(minConfirmations: 1, currentBlockHeight: 1, all: [])
 	}
 }
 
