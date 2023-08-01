@@ -23,8 +23,13 @@ struct WalletInfoView: View {
 	@State var popoverPresent_swapInWallet = false
 	@State var popoverPresent_finalWallet = false
 	
-	@State var swapIn_mpk_truncationDetected = false
 	@State var final_mpk_truncationDetected = false
+	
+	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
+	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
+	
+	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
+	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
 	@StateObject var toast = Toast()
 	
@@ -60,6 +65,12 @@ struct WalletInfoView: View {
 		.listBackgroundColor(.primaryBackground)
 		.onAppear() {
 			onAppear()
+		}
+		.onReceive(swapInWalletPublisher) {
+			swapInWalletChanged($0)
+		}
+		.onReceive(finalWalletPublisher) {
+			finalWalletChanged($0)
 		}
 	}
 	
@@ -188,7 +199,9 @@ struct WalletInfoView: View {
 		
 		Section {
 			
-			subsection_finalWallet_balance()
+			NavigationLink(destination: FinalWalletDetails()) {
+				subsection_finalWallet_balance()
+			}
 			subsection_finalWallet_masterPublicKey()
 			
 		} header: {
@@ -408,26 +421,25 @@ struct WalletInfoView: View {
 	
 	func swapInBalance_confirmed() -> Bitcoin_kmpSatoshi {
 		
-		let swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 		return swapInWallet.deeplyConfirmedBalance
 	}
 	
 	func swapInBalance_unconfirmed() -> Bitcoin_kmpSatoshi {
 		
-		let swapInWallet = Biz.business.balanceManager.swapInWalletValue()
+		// In the context of the swap-in wallet, any tx that is weakly confirmed (< 3 confirmations),
+		// is still considered "pending" for the purposes of swapping it to lightning.
+		
 		let sats = swapInWallet.weaklyConfirmedBalance.sat + swapInWallet.unconfirmedBalance.sat
 		return Bitcoin_kmpSatoshi(sat: sats)
 	}
 	
 	func finalBalance_confirmed() -> Bitcoin_kmpSatoshi {
 		
-		let finalWallet = Biz.business.peerManager.finalWalletBalance()
 		return finalWallet.anyConfirmedBalance
 	}
 	
 	func finalBalance_unconfirmed() -> Bitcoin_kmpSatoshi {
 		
-		let finalWallet = Biz.business.peerManager.finalWalletBalance()
 		return finalWallet.unconfirmedBalance
 	}
 	
@@ -469,6 +481,22 @@ struct WalletInfoView: View {
 				presentationMode.wrappedValue.dismiss()
 			}
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func swapInWalletChanged(_ newValue: Lightning_kmpWalletState.WalletWithConfirmations) {
+		log.trace("swapInWalletChanged()")
+		
+		swapInWallet = newValue
+	}
+	
+	func finalWalletChanged(_ newValue: Lightning_kmpWalletState.WalletWithConfirmations) {
+		log.trace("finalWalletChanged()")
+		
+		finalWallet = newValue
 	}
 	
 	// --------------------------------------------------

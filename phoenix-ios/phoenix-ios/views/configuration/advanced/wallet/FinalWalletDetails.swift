@@ -5,35 +5,21 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "SwapInWalletDetails"
+	category: "FinalWalletDetails"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 
-struct SwapInWalletDetails: View {
+struct FinalWalletDetails: View {
 	
-	let popTo: (PopToDestination) -> Void
-	
-	@State var liquidityPolicy: LiquidityPolicy = Prefs.shared.liquidityPolicy
-	
-	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
-	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
+	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
+	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
 	@State var blockchainExplorerTxid: String? = nil
 	
-	enum IconWidth: Preference {}
-	let iconWidthReader = GeometryPreferenceReader(
-		key: AppendValue<IconWidth>.self,
-		value: { [$0.size.width] }
-	)
-	@State var iconWidth: CGFloat? = nil
-	
-	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -43,7 +29,7 @@ struct SwapInWalletDetails: View {
 	var body: some View {
 		
 		content()
-			.navigationTitle(NSLocalizedString("Swap-in wallet", comment: "Navigation Bar Title"))
+			.navigationTitle(NSLocalizedString("Final wallet", comment: "Navigation Bar Title"))
 			.navigationBarTitleDisplayMode(.inline)
 	}
 	
@@ -57,11 +43,8 @@ struct SwapInWalletDetails: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onReceive(Prefs.shared.liquidityPolicyPublisher) {
-			liquidityPolicyChanged($0)
-		}
-		.onReceive(swapInWalletPublisher) {
-			swapInWalletChanged($0)
+		.onReceive(finalWalletPublisher) {
+			finalWalletChanged($0)
 		}
 	}
 	
@@ -69,44 +52,8 @@ struct SwapInWalletDetails: View {
 	func section_info() -> some View {
 		
 		Section {
-			
-			VStack(alignment: HorizontalAlignment.leading, spacing: 20) {
-				
-				let maxFee = maxSwapInFee()
-				Text(styled: NSLocalizedString(
-					"""
-					On-chain funds will automatically be swapped to Lightning if the \
-					fee is **less than \(maxFee.string)**.
-					""",
-					comment: "Swap-in wallet details"
-				))
-				
-				Button {
-					navigateToLiquiditySettings()
-				} label: {
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 5) {
-						Image(systemName: "gearshape.fill")
-							.frame(minWidth: iconWidth, alignment: Alignment.leadingFirstTextBaseline)
-							.read(iconWidthReader)
-						Text("Configure fee settings")
-					}
-				}
-				
-			} // </VStack>
-			.padding(.bottom, 5)
-			
-			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 5) {
-				Image(systemName: "pipe.and.drop")
-					.frame(minWidth: iconWidth, alignment: Alignment.leadingFirstTextBaseline)
-					.read(iconWidthReader)
-				Text("Swaps are only attempted at application startup.")
-			}
-			.font(.subheadline)
-			.foregroundColor(Color(UIColor.systemOrange))
-			.padding(.top, 5)
-			
-		} // </Section>
-		.assignMaxPreference(for: iconWidthReader.key, to: $iconWidth)
+			Text("The final wallet is where funds are sent by default when your Lightning channels are closed.")
+		}
 	}
 	
 	@ViewBuilder
@@ -119,7 +66,7 @@ struct SwapInWalletDetails: View {
 			Text(verbatim: " ≈ \(confirmed.1.string)").foregroundColor(.secondary)
 			
 		} header: {
-			Text("Ready For Swap")
+			Text("Confirmed Balance")
 			
 		} // </Section>
 	}
@@ -140,9 +87,11 @@ struct SwapInWalletDetails: View {
 				ForEach(utxos) { utxo in
 					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 						
-						Text(verbatim: "\(utxo.confirmationCount) / 3")
-							.monospacedDigit()
+						Text(utxo.txid)
+							.font(.subheadline)
 							.foregroundColor(.secondary)
+							.lineLimit(1)
+							.truncationMode(.tail)
 							.padding(.trailing, 15)
 						
 						Group {
@@ -151,9 +100,11 @@ struct SwapInWalletDetails: View {
 							Text(verbatim: "\(btcAmt.string) ") +
 							Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
 						}
-						.padding(.trailing, 15)
+						.padding(.trailing, 4)
+						.layoutPriority(1)
 						
 						Spacer(minLength: 0)
+						
 						Button {
 							blockchainExplorerTxid = utxo.txid
 						} label: {
@@ -164,7 +115,7 @@ struct SwapInWalletDetails: View {
 			}
 			
 		} header: {
-			Text("Waiting For 3 Confirmations")
+			Text("Unconfirmed Balance")
 			
 		} // </Section>
 		.confirmationDialog("Blockchain Explorer",
@@ -197,30 +148,9 @@ struct SwapInWalletDetails: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func maxSwapInFee() -> FormattedAmount {
-		
-		let effectiveMax: Int64
-		let absoluteMax: Int64 = liquidityPolicy.effectiveMaxFeeSats
-		
-		let swapInBalance: Int64 = swapInWallet.totalBalance.sat
-		if swapInBalance > 0 {
-			
-			let maxPercent: Double = Double(liquidityPolicy.effectiveMaxFeeBasisPoints) / Double(10_000)
-			let percentMax: Int64 = Int64(Double(swapInBalance) * maxPercent)
-			
-			effectiveMax = min(absoluteMax, percentMax)
-			
-		} else {
-			
-			effectiveMax = absoluteMax
-		}
-		
-		return Utils.formatBitcoin(currencyPrefs, sat: effectiveMax)
-	}
-	
 	func confirmedBalance() -> (FormattedAmount, FormattedAmount) {
 		
-		let confirmed = swapInWallet.deeplyConfirmedBalance
+		let confirmed = finalWallet.anyConfirmedBalance
 		
 		let btcAmt = Utils.formatBitcoin(currencyPrefs, sat: confirmed)
 		let fiatAmt = Utils.formatFiat(currencyPrefs, sat: confirmed)
@@ -230,12 +160,12 @@ struct SwapInWalletDetails: View {
 	
 	func unconfirmedUtxos() -> [UtxoWrapper] {
 		
-		let utxos = swapInWallet.weaklyConfirmed + swapInWallet.unconfirmed
+		let utxos = finalWallet.unconfirmed
 		let wrappedUtxos = utxos.map { utxo in
 			
 			let confirmationCount = (utxo.blockHeight == 0)
 			  ? 0
-			  : Int64(swapInWallet.currentBlockHeight) - utxo.blockHeight + 1
+			  : Int64(finalWallet.currentBlockHeight) - utxo.blockHeight + 1
 			
 			return UtxoWrapper(utxo: utxo, confirmationCount: confirmationCount)
 		}
@@ -263,16 +193,10 @@ struct SwapInWalletDetails: View {
 	// MARK: Notifications
 	// --------------------------------------------------
 	
-	func liquidityPolicyChanged(_ newValue: LiquidityPolicy) {
-		log.trace("liquidityPolicyChanged()")
+	func finalWalletChanged(_ newValue: Lightning_kmpWalletState.WalletWithConfirmations) {
+		log.trace("finalWalletChanged()")
 		
-		self.liquidityPolicy = newValue
-	}
-	
-	func swapInWalletChanged(_ newValue: Lightning_kmpWalletState.WalletWithConfirmations) {
-		log.trace("swapInWalletChanged()")
-		
-		swapInWallet = newValue
+		finalWallet = newValue
 	}
 	
 	// --------------------------------------------------
@@ -292,12 +216,5 @@ struct SwapInWalletDetails: View {
 		log.trace("copyTxId()")
 		
 		UIPasteboard.general.string = txid
-	}
-	
-	func navigateToLiquiditySettings() {
-		log.trace("navigateToLiquiditySettings()")
-		
-		popTo(.ConfigurationView(followedBy: .liquiditySettings))
-		presentationMode.wrappedValue.dismiss()
 	}
 }

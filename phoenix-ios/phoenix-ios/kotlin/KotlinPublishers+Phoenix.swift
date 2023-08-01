@@ -17,6 +17,7 @@ extension PeerManager {
 	fileprivate struct _Key {
 		static var peerStatePublisher = 0
 		static var channelsPublisher = 0
+		static var finalWalletPublisher = 0
 	}
 	
 	func peerStatePublisher() -> AnyPublisher<Lightning_kmpPeer, Never> {
@@ -48,6 +49,25 @@ extension PeerManager {
 			)
 			.compactMap { $0 }
 			.map { Array($0.values) }
+			.eraseToAnyPublisher()
+		}
+	}
+	
+	func finalWalletPublisher() -> AnyPublisher<Lightning_kmpWalletState.WalletWithConfirmations, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.finalWalletPublisher) {
+			
+			// Transforming from Kotlin:
+			// ```
+			// finalWallet: StateFlow<WalletState.WalletWithConfirmations?>
+			// ```
+			KotlinCurrentValueSubject<
+				Lightning_kmpWalletState.WalletWithConfirmations,
+				Lightning_kmpWalletState.WalletWithConfirmations?
+			>(
+				self.finalWallet
+			)
+			.map { $0 ?? Lightning_kmpWalletState.WalletWithConfirmations.empty() }
 			.eraseToAnyPublisher()
 		}
 	}

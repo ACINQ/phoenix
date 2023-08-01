@@ -12,7 +12,7 @@ extension PhoenixBusiness {
 
 extension PeerManager {
 	
-	func finalWalletBalance() -> Lightning_kmpWalletState.WalletWithConfirmations {
+	func finalWalletValue() -> Lightning_kmpWalletState.WalletWithConfirmations {
 		if let value = self.finalWallet.value_ as? Lightning_kmpWalletState.WalletWithConfirmations {
 			return value
 		} else {
