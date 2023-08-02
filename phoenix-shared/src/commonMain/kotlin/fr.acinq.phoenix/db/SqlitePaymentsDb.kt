@@ -655,14 +655,14 @@ data class WalletPaymentOrderRow(
 }
 
 /**
- * Implement this function to execute platform specific code when a payment completes.
+ * Implement this function to execute platform specific code when a payment is saved to the database.
  * For example, on iOS this is used to enqueue the (encrypted) payment for upload to CloudKit.
  *
  * This function is invoked inside the same transaction used to add/modify the row.
  * This means any database operations performed in this function are atomic,
  * with respect to the referenced row.
  */
-expect fun didCompleteWalletPayment(id: WalletPaymentId, database: PaymentsDatabase)
+expect fun didSaveWalletPayment(id: WalletPaymentId, database: PaymentsDatabase)
 
 /**
  * Implement this function to execute platform specific code when a payment is deleted.

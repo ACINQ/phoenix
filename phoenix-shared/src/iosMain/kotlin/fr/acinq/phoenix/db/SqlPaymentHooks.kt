@@ -6,7 +6,7 @@ import fr.acinq.phoenix.db.payments.CloudKitInterface
 import fracinqphoenixdb.Cloudkit_payments_queue
 
 
-actual fun didCompleteWalletPayment(id: WalletPaymentId, database: PaymentsDatabase) {
+actual fun didSaveWalletPayment(id: WalletPaymentId, database: PaymentsDatabase) {
     database.cloudKitPaymentsQueries.addToQueue(
         type = id.dbType.value,
         id = id.dbId,
