@@ -37,7 +37,7 @@ extension FiatCurrency {
 		
 		for fiat in FiatCurrency.companion.values {
 			
-			let fiatCode = fiat.name // e.g. "AUD", "BRL"
+			let fiatCode = fiat.displayCode // e.g. "AUD", "BRL"
 			
 			if currencyCode.caseInsensitiveCompare(fiatCode) == .orderedSame {
 				return fiat
