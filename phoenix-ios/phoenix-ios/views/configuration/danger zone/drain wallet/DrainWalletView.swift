@@ -276,7 +276,7 @@ struct DrainWalletView: MVIView {
 	}
 	
 	func popToWrapper(_ destination: PopToDestination) {
-		log.trace("popToWrapper()")
+		log.trace("popToWrapper(\(destination))")
 		
 		popToDestination = destination
 		popTo(destination)

@@ -115,7 +115,7 @@ struct WalletInfoView: View {
 		
 		Section {
 			
-			NavigationLink(destination: SwapInWalletDetails(popTo: popToWrapper)) {
+			NavigationLink(destination: SwapInWalletDetails(location: .embedded, popTo: popToWrapper)) {
 				subsection_swapInWallet_balance()
 			}
 			subsection_swapInWallet_descriptor()
@@ -457,7 +457,7 @@ struct WalletInfoView: View {
 	}
 	
 	func popToWrapper(_ destination: PopToDestination) {
-		log.trace("popToWrapper()")
+		log.trace("popToWrapper(\(destination))")
 		
 		popToDestination = destination
 		popTo(destination)

@@ -20,11 +20,6 @@ fileprivate enum TrailingSidebarContent {
 	case currencyConverter
 }
 
-fileprivate enum NavLinkTag: String {
-	case ReceiveView
-	case SendView
-}
-
 struct MainView_Big: View {
 	
 	@Namespace var splitView_leadingSidebar
@@ -42,11 +37,6 @@ struct MainView_Big: View {
 	@State var settingsViewRendered: Bool = false
 	@State var transactionsViewRendered: Bool = false
 	
-	@State private var navLinkTag: NavLinkTag? = nil
-	
-	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
-	@State var externalLightningRequest: AppScanController? = nil
-	
 	let sidebarDividerWidth: CGFloat = 1
 	
 	let headerButtonPaddingTop: CGFloat = 15
@@ -57,16 +47,6 @@ struct MainView_Big: View {
 		value: { [$0.size.height] }
 	)
 	@State var headerButtonHeight: CGFloat? = nil
-	
-	enum FooterButtonWidth: Preference {}
-	let footerButtonWidthReader = GeometryPreferenceReader(
-		key: AppendValue<FooterButtonWidth>.self,
-		value: { [$0.size.width] }
-	)
-	@State var footerButtonWidth: CGFloat? = nil
-	
-	@ScaledMetric var sendImageSize: CGFloat = 22
-	@ScaledMetric var receiveImageSize: CGFloat = 22
 	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
@@ -86,14 +66,8 @@ struct MainView_Big: View {
 		.onChange(of: deviceInfo.windowSize) { newSize in
 			windowSizeDidChange(newSize)
 		}
-		.onChange(of: navLinkTag) {
-			navLinkTagChanged($0)
-		}
 		.onChange(of: deepLinkManager.deepLink) {
 			deepLinkChanged($0)
-		}
-		.onReceive(externalLightningUrlPublisher) {
-			didReceiveExternalLightningUrl($0)
 		}
 	}
 	
@@ -339,134 +313,8 @@ struct MainView_Big: View {
 	@ViewBuilder
 	func primary() -> some View {
 		
-		NavigationWrapper {
-			ZStack {
-				if #unavailable(iOS 16.0) {
-					// iOS 14 & 15 have bugs when using NavigationLink.
-					// The suggested workarounds include using only a single NavigationLink.
-					//
-					NavigationLink(
-						destination: primary_navLinkView(),
-						isActive: navLinkTagBinding(nil)
-					) {
-						EmptyView()
-					}
-					.isDetailLink(false)
-					
-				} // else: uses.navigationStackDestination()
-				
-				Color.primaryBackground
-					.ignoresSafeArea()
-
-				if BusinessManager.showTestnetBackground {
-					Image("testnet_bg")
-						.resizable(resizingMode: .tile)
-						.ignoresSafeArea()
-				}
-				
-				primary_body()
-			
-			} // <ZStack>
-			.navigationTitle("")
-			.navigationBarTitleDisplayMode(.inline)
-			.navigationBarHidden(true)
-			.navigationStackDestination(isPresented: navLinkTagBinding(.SendView)) { // For iOS 16+
-				primary_navLinkView()
-			}
-			.navigationStackDestination(isPresented: navLinkTagBinding(.ReceiveView)) { // For iOS 16+
-				primary_navLinkView()
-			}
-			
-		} // </NavigationWrapper>
-		.padding(.top, navigationViewPaddingTop)
-	}
-	
-	@ViewBuilder
-	func primary_body() -> some View {
-		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			HomeView()
-				.padding(.bottom, 15)
-			primary_footer()
-		}
-		.padding(.bottom, 60)
-	}
-	
-	@ViewBuilder
-	func primary_footer() -> some View {
-		
-		HStack(alignment: VerticalAlignment.center, spacing: 20) {
-			
-			Button {
-				withAnimation {
-					navLinkTag = .ReceiveView
-				}
-			} label: {
-				Label {
-					Text("Receive")
-						.font(.title2.weight(.medium))
-						.foregroundColor(.white)
-				} icon: {
-					Image("ic_receive_resized")
-						.resizable()
-						.aspectRatio(contentMode: .fit)
-						.foregroundColor(Color.white)
-						.frame(width: receiveImageSize, height: receiveImageSize, alignment: .center)
-				}
-				.padding(.leading, 16)
-				.padding(.trailing, 18)
-				.padding(.top, 9)
-				.padding(.bottom, 9)
-			} // </Button>
-			.buttonStyle(ScaleButtonStyle(
-				cornerRadius: 100,
-				backgroundFill: Color.appAccent
-			))
-			.frame(minWidth: footerButtonWidth, alignment: Alignment.center)
-			.read(footerButtonWidthReader)
-
-			Button {
-				withAnimation {
-					navLinkTag = .SendView
-				}
-			} label: {
-				Label {
-					Text("Send")
-						.font(.title2.weight(.medium))
-						.foregroundColor(.white)
-				} icon: {
-					Image("ic_scan_resized")
-						.resizable()
-						.aspectRatio(contentMode: .fit)
-						.foregroundColor(.white)
-						.frame(width: sendImageSize, height: sendImageSize, alignment: .center)
-				}
-				.padding(.leading, 26)
-				.padding(.trailing, 28)
-				.padding(.top, 9)
-				.padding(.bottom, 9)
-			} // </Button>
-			.buttonStyle(ScaleButtonStyle(
-				cornerRadius: 100,
-				backgroundFill: Color.appAccent
-			))
-			.frame(minWidth: footerButtonWidth, alignment: Alignment.center)
-			.read(footerButtonWidthReader)
-		
-		} // </HStack>
-	}
-	
-	@ViewBuilder
-	func primary_navLinkView() -> some View {
-		
-		switch navLinkTag {
-		case .ReceiveView:
-			ReceiveView()
-		case .SendView:
-			SendView(controller: externalLightningRequest)
-		default:
-			EmptyView()
-		}
+		MainView_BigPrimary()
+			.padding(.top, navigationViewPaddingTop)
 	}
 	
 	@ViewBuilder
@@ -506,21 +354,6 @@ struct MainView_Big: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
-	
-	private func navLinkTagBinding(_ tag: NavLinkTag?) -> Binding<Bool> {
-		
-		if let tag { // specific tag
-			return Binding<Bool>(
-				get: { navLinkTag == tag },
-				set: { if $0 { navLinkTag = tag } else if (navLinkTag == tag) { navLinkTag = nil } }
-			)
-		} else { // any tag
-			return Binding<Bool>(
-				get: { navLinkTag != nil },
-				set: { if !$0 { navLinkTag = nil }}
-			)
-		}
-	}
 	
 	var isShowingLeadingSidebar: Bool {
 		return leadingSidebarContent != nil
@@ -744,6 +577,50 @@ struct MainView_Big: View {
 	}
 	
 	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	private func windowSizeDidChange(_ windowSize: CGSize) {
+		log.trace("windowSizeDidChange() => w(\(windowSize.width)) height(\(windowSize.height))")
+		
+		if wasIPadLandscapeFullscreen && !deviceInfo.isIPadLandscapeFullscreen {
+			// Transitioning away from landscapeFullscreen.
+			// The common thing to do here is to hide the leading sidebar.
+			if leadingSidebarContent != nil {
+				leadingSidebarContent = nil
+			}
+		
+		} else if isShowingLeadingSidebar && isShowingTrailingSidebar {
+			let totalWidth = leadingSidebarWidth + trailingSidebarWidth
+			if (totalWidth + 10) > windowSize.width {
+				// Pop leading sidebar.
+				// This is the less destructive action,
+				// since content in the leading sidebar is simply hidden (not removed from view hierarchy),
+				// and can be restored by re-opening the leading sidebar.
+				leadingSidebarContent = nil
+			}
+		}
+		
+		wasIPadLandscapeFullscreen = deviceInfo.isIPadLandscapeFullscreen
+	}
+	
+	private func deepLinkChanged(_ value: DeepLink?) {
+		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		
+		if let value = value {
+			switch value {
+				case .paymentHistory     : showTransactions()
+				case .backup             : showSettings()
+				case .drainWallet        : showSettings()
+				case .electrum           : showSettings()
+				case .backgroundPayments : showSettings()
+				case .liquiditySettings  : showSettings()
+				case .forceCloseChannels : showSettings()
+			}
+		}
+	}
+	
+	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
 	
@@ -826,75 +703,6 @@ struct MainView_Big: View {
 		
 		withAnimation {
 			trailingSidebarContent = nil
-		}
-	}
-	
-	// --------------------------------------------------
-	// MARK: Notifications
-	// --------------------------------------------------
-	
-	private func windowSizeDidChange(_ windowSize: CGSize) {
-		log.trace("windowSizeDidChange() => w(\(windowSize.width)) height(\(windowSize.height))")
-		
-		if wasIPadLandscapeFullscreen && !deviceInfo.isIPadLandscapeFullscreen {
-			// Transitioning away from landscapeFullscreen.
-			// The common thing to do here is to hide the leading sidebar.
-			if leadingSidebarContent != nil {
-				leadingSidebarContent = nil
-			}
-		
-		} else if isShowingLeadingSidebar && isShowingTrailingSidebar {
-			let totalWidth = leadingSidebarWidth + trailingSidebarWidth
-			if (totalWidth + 10) > windowSize.width {
-				// Pop leading sidebar.
-				// This is the less destructive action,
-				// since content in the leading sidebar is simply hidden (not removed from view hierarchy),
-				// and can be restored by re-opening the leading sidebar.
-				leadingSidebarContent = nil
-			}
-		}
-		
-		wasIPadLandscapeFullscreen = deviceInfo.isIPadLandscapeFullscreen
-	}
-	
-	private func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
-		
-		if let value = value {
-			switch value {
-				case .paymentHistory     : showTransactions()
-				case .backup             : showSettings()
-				case .drainWallet        : showSettings()
-				case .electrum           : showSettings()
-				case .backgroundPayments : showSettings()
-				case .liquiditySettings  : showSettings()
-				case .forceCloseChannels : showSettings()
-			}
-		}
-	}
-	
-	private func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
-		
-		if tag == nil {
-			// If we pushed the SendView, triggered by an external lightning url,
-			// then we can nil out the associated controller now (since we handed off to SendView).
-			self.externalLightningRequest = nil
-		}
-	}
-	
-	private func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
-		log.trace("didReceiveExternalLightningUrl()")
-		
-		if navLinkTag == .SendView {
-			log.debug("Ignoring: handled by SendView")
-			return
-		}
-		
-		MainViewHelper.shared.processExternalLightningUrl(urlStr) { scanController in
-			
-			self.externalLightningRequest = scanController
-			self.navLinkTag = .SendView
 		}
 	}
 }

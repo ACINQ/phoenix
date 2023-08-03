@@ -82,6 +82,7 @@
 		DC2F432227B69FAA0006FCC4 /* SwapInDisabledPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F432127B69FAA0006FCC4 /* SwapInDisabledPopover.swift */; };
 		DC32FB3529A3D3FE009912AC /* XpcManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC32FB3429A3D3FE009912AC /* XpcManager.swift */; };
 		DC33369826BAF721000E3F49 /* ShortSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC33369726BAF721000E3F49 /* ShortSheet.swift */; };
+		DC33C5632A7C15D40053D785 /* MainView_BigPrimary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC33C5622A7C15D40053D785 /* MainView_BigPrimary.swift */; };
 		DC34399F276CEFB600CAA73A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF84242A565B00829871 /* Assets.xcassets */; };
 		DC355E1D2A4398A8008E8A8E /* NoticeBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E1C2A4398A8008E8A8E /* NoticeBox.swift */; };
 		DC355E1F2A44A235008E8A8E /* NotificationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E1E2A44A235008E8A8E /* NotificationCell.swift */; };
@@ -159,7 +160,6 @@
 		DC74174D270F455D00F7E3E3 /* AES256.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174C270F455D00F7E3E3 /* AES256.swift */; };
 		DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC81B79E25BF2AA200F5A52C /* MVI.swift */; };
 		DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC82EED529789853007A5853 /* TxHistoryExporter.swift */; };
-		DC87806F292D69C90061715B /* IncomingDepositPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC87806E292D69C90061715B /* IncomingDepositPopover.swift */; };
 		DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */; };
 		DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9473F9261270B4008D7242 /* MVI+Mock.swift */; };
 		DC9545C429490321008FCEF4 /* NotificationContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9545C329490321008FCEF4 /* NotificationContent.swift */; };
@@ -425,6 +425,7 @@
 		DC2F432127B69FAA0006FCC4 /* SwapInDisabledPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInDisabledPopover.swift; sourceTree = "<group>"; };
 		DC32FB3429A3D3FE009912AC /* XpcManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XpcManager.swift; sourceTree = "<group>"; };
 		DC33369726BAF721000E3F49 /* ShortSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortSheet.swift; sourceTree = "<group>"; };
+		DC33C5622A7C15D40053D785 /* MainView_BigPrimary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_BigPrimary.swift; sourceTree = "<group>"; };
 		DC355E1C2A4398A8008E8A8E /* NoticeBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeBox.swift; sourceTree = "<group>"; };
 		DC355E1E2A44A235008E8A8E /* NotificationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCell.swift; sourceTree = "<group>"; };
 		DC355E202A44D838008E8A8E /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
@@ -491,7 +492,6 @@
 		DC74174C270F455D00F7E3E3 /* AES256.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AES256.swift; sourceTree = "<group>"; };
 		DC81B79E25BF2AA200F5A52C /* MVI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVI.swift; sourceTree = "<group>"; };
 		DC82EED529789853007A5853 /* TxHistoryExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxHistoryExporter.swift; sourceTree = "<group>"; };
-		DC87806E292D69C90061715B /* IncomingDepositPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingDepositPopover.swift; sourceTree = "<group>"; };
 		DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplicationState+Phoenix.swift"; sourceTree = "<group>"; };
 		DC9473F9261270B4008D7242 /* MVI+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MVI+Mock.swift"; sourceTree = "<group>"; };
 		DC9545C329490321008FCEF4 /* NotificationContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationContent.swift; sourceTree = "<group>"; };
@@ -978,7 +978,6 @@
 				DC1706D826A71D8E00BAFCD0 /* UnlockErrorView.swift */,
 				DC71E7322728645B0063613D /* CurrencyConverterView.swift */,
 				DC09086225B626B300A46136 /* AppStatusPopover.swift */,
-				DC87806E292D69C90061715B /* IncomingDepositPopover.swift */,
 			);
 			path = tools;
 			sourceTree = "<group>";
@@ -1211,8 +1210,9 @@
 			isa = PBXGroup;
 			children = (
 				DCDD9ECA28637242001800A3 /* MainView.swift */,
-				DCDD9ECF286377B7001800A3 /* MainView_Big.swift */,
 				DCDD9ED1286377C5001800A3 /* MainView_Small.swift */,
+				DCDD9ECF286377B7001800A3 /* MainView_Big.swift */,
+				DC33C5622A7C15D40053D785 /* MainView_BigPrimary.swift */,
 				53BEFE171C182513A5762686 /* HomeView.swift */,
 				DCDD9ED528637FD7001800A3 /* AppStatusButton.swift */,
 				DCDD9ED328637EBB001800A3 /* ToolsButton.swift */,
@@ -1542,6 +1542,7 @@
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				DC74174B270F332700F7E3E3 /* KotlinTypes.swift in Sources */,
 				DC142135261E72320075857A /* AboutHTML.swift in Sources */,
+				DC33C5632A7C15D40053D785 /* MainView_BigPrimary.swift in Sources */,
 				DCEE8998288605FD00FE42DD /* PaymentCell.swift in Sources */,
 				DCDD9ED428637EBB001800A3 /* ToolsButton.swift in Sources */,
 				DCDD9ED0286377B7001800A3 /* MainView_Big.swift in Sources */,
@@ -1694,7 +1695,6 @@
 				DC09086325B626B300A46136 /* AppStatusPopover.swift in Sources */,
 				DC0732EC263CA6C3004CB88D /* PaymentOptionsView.swift in Sources */,
 				DC49DA8E258BB882005BC4BC /* ScaledButtonStyle.swift in Sources */,
-				DC87806F292D69C90061715B /* IncomingDepositPopover.swift in Sources */,
 				DCAEF8D9275E69B000015993 /* SyncSeedManager_State.swift in Sources */,
 				DCB04685260D162C007FDA37 /* ViewName.swift in Sources */,
 				DCB30E522A0A948000E7D7A2 /* WalletInfoView.swift in Sources */,

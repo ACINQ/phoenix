@@ -157,10 +157,9 @@ struct ValidateView: View {
 		.onAppear() {
 			onAppear()
 		}
-		.navigationStackDestination( // For iOS 16+
-			isPresented: $currencyConverterOpen,
-			destination: currencyConverterView
-		)
+		.navigationStackDestination(isPresented: $currencyConverterOpen) { // For iOS 16+
+			currencyConverterView()
+		}
 		.onChange(of: mvi.model) { newModel in
 			modelDidChange(newModel)
 		}

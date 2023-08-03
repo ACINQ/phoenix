@@ -34,18 +34,6 @@ fileprivate enum NavLinkTag: String {
 	case ForceCloseChannels
 }
 
-enum PopToDestination: CustomStringConvertible {
-	case RootView(followedBy: DeepLink? = nil)
-	case ConfigurationView(followedBy: DeepLink? = nil)
-	
-	public var description: String {
-		switch self {
-			case .RootView          : return "RootView"
-			case .ConfigurationView : return "ConfigurationView"
-		}
-	}
-}
-
 struct ConfigurationView: View {
 	
 	@ViewBuilder
@@ -393,21 +381,6 @@ fileprivate struct ConfigurationList: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	private func navLinkTagBinding(_ tag: NavLinkTag?) -> Binding<Bool> {
-		
-		if let tag { // specific tag
-			return Binding<Bool>(
-				get: { navLinkTag == tag },
-				set: { if $0 { navLinkTag = tag } else if (navLinkTag == tag) { navLinkTag = nil } }
-			)
-		} else { // any tag
-			return Binding<Bool>(
-				get: { navLinkTag != nil },
-				set: { if !$0 { navLinkTag = nil }}
-			)
-		}
-	}
-	
 	func hasWallet() -> Bool {
 		
 		return Biz.business.walletManager.isLoaded()
@@ -542,7 +515,7 @@ fileprivate struct ConfigurationList: View {
 	// --------------------------------------------------
 	
 	func popTo(_ destination: PopToDestination) {
-		log.trace("popTo()")
+		log.trace("popTo(\(destination))")
 		
 		popToDestination = destination
 	}

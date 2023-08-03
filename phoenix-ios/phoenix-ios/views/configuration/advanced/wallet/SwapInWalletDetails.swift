@@ -11,9 +11,14 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-
 struct SwapInWalletDetails: View {
 	
+	enum ViewLocation {
+		case popover
+		case embedded
+	}
+	
+	let location: ViewLocation
 	let popTo: (PopToDestination) -> Void
 	
 	@State var liquidityPolicy: LiquidityPolicy = Prefs.shared.liquidityPolicy
@@ -22,6 +27,13 @@ struct SwapInWalletDetails: View {
 	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	
 	@State var blockchainExplorerTxid: String? = nil
+	
+	enum NavBarButtonWidth: Preference {}
+	let navBarButtonWidthReader = GeometryPreferenceReader(
+		key: AppendValue<NavBarButtonWidth>.self,
+		value: { [$0.size.width] }
+	)
+	@State var navBarButtonWidth: CGFloat? = nil
 	
 	enum IconWidth: Preference {}
 	let iconWidthReader = GeometryPreferenceReader(
@@ -32,6 +44,7 @@ struct SwapInWalletDetails: View {
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
@@ -42,9 +55,48 @@ struct SwapInWalletDetails: View {
 	@ViewBuilder
 	var body: some View {
 		
-		content()
-			.navigationTitle(NSLocalizedString("Swap-in wallet", comment: "Navigation Bar Title"))
-			.navigationBarTitleDisplayMode(.inline)
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			header()
+			content()
+		}
+		.navigationTitle(NSLocalizedString("Swap-in wallet", comment: "Navigation Bar Title"))
+		.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func header() -> some View {
+		
+		if location == .popover {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				
+				Image(systemName: "xmark")
+					.imageScale(.medium)
+					.font(.title3)
+					.foregroundColor(.clear)
+					.accessibilityHidden(true)
+					.frame(width: navBarButtonWidth)
+				
+				Spacer(minLength: 0)
+				Text("Swap-in wallet")
+					.font(.headline)
+					.fontWeight(.medium)
+					.lineLimit(1)
+				Spacer(minLength: 0)
+				
+				Button {
+					closePopover()
+				} label: {
+					Image(systemName: "xmark") // must match size of chevron.backward above
+						.imageScale(.medium)
+						.font(.title3)
+				}
+				.read(navBarButtonWidthReader)
+				.frame(width: navBarButtonWidth)
+				
+			} // </HStack>
+			.padding()
+			.assignMaxPreference(for: navBarButtonWidthReader.key, to: $navBarButtonWidth)
+		}
 	}
 	
 	@ViewBuilder
@@ -299,5 +351,11 @@ struct SwapInWalletDetails: View {
 		
 		popTo(.ConfigurationView(followedBy: .liquiditySettings))
 		presentationMode.wrappedValue.dismiss()
+	}
+	
+	func closePopover() {
+		log.trace("closePopover")
+		
+		popoverState.close()
 	}
 }

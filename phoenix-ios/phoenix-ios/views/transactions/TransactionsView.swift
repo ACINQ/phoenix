@@ -75,10 +75,9 @@ struct TransactionsView: View {
 		.navigationTitle(NSLocalizedString("Payments", comment: "Navigation bar title"))
 		.navigationBarTitleDisplayMode(.inline)
 		.navigationBarItems(trailing: exportButton())
-		.navigationStackDestination( // For iOS 16+
-			isPresented: navLinkBinding(),
-			destination: navLinkView
-		)
+		.navigationStackDestination(isPresented: navLinkBinding()) { // For iOS 16+
+			navLinkView()
+		}
 	}
 	
 	@ViewBuilder

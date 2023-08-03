@@ -17,6 +17,7 @@ fileprivate enum NavLinkTag: String {
 	case ReceiveView
 	case SendView
 	case CurrencyConverter
+	case SwapInWalletDetails
 }
 
 struct MainView_Small: View {
@@ -28,14 +29,14 @@ struct MainView_Small: View {
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
 	@State var externalLightningRequest: AppScanController? = nil
 	
+	@State var didAppear = false
+	@State var popToDestination: PopToDestination? = nil
+	
 	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
 	@State private var swiftUiBugWorkaroundIdx = 0
 	
 	@ScaledMetric var sendImageSize: CGFloat = 17
 	@ScaledMetric var receiveImageSize: CGFloat = 18
-	
-	@EnvironmentObject var deviceInfo: DeviceInfo
-	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	let headerButtonHeightReader = GeometryPreferenceReader(
 		key: AppendValue<HeaderButtonHeight>.self,
@@ -61,6 +62,9 @@ struct MainView_Small: View {
 	@State var footerTruncationDetection_condensed: [ContentSizeCategory: Bool] = [:]
 	
 	@Environment(\.sizeCategory) var contentSizeCategory: ContentSizeCategory
+	
+	@EnvironmentObject var deviceInfo: DeviceInfo
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// When we drop iOS 14 support, switch to this:
 //	@State var footerTruncationDetection_standard: [DynamicTypeSize: Bool] = [:]
@@ -102,7 +106,7 @@ struct MainView_Small: View {
 				// The suggested workarounds include using only a single NavigationLink.
 				NavigationLink(
 					destination: navLinkView(),
-					isActive: navLinkTagBinding(nil)
+					isActive: navLinkTagBinding()
 				) {
 					EmptyView()
 				}
@@ -124,20 +128,11 @@ struct MainView_Small: View {
 
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationStackDestination(isPresented: navLinkTagBinding(.ConfigurationView)) { // For iOS 16+
+		.navigationStackDestination(isPresented: navLinkTagBinding()) { // For iOS 16+
 			navLinkView()
 		}
-		.navigationStackDestination(isPresented: navLinkTagBinding(.TransactionsView)) { // For iOS 16+
-			navLinkView()
-		}
-		.navigationStackDestination(isPresented: navLinkTagBinding(.ReceiveView)) { // For iOS 16+
-			navLinkView()
-		}
-		.navigationStackDestination(isPresented: navLinkTagBinding(.SendView)) { // For iOS 16+
-			navLinkView()
-		}
-		.navigationStackDestination(isPresented: navLinkTagBinding(.CurrencyConverter)) { // For iOS 16+
-			navLinkView()
+		.onAppear {
+			onAppear()
 		}
 		.onChange(of: deepLinkManager.deepLink) {
 			deepLinkChanged($0)
@@ -155,7 +150,7 @@ struct MainView_Small: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			header()
-			HomeView()
+			HomeView(showSwapInWallet: showSwapInWallet)
 			footer()
 		}
 	}
@@ -491,11 +486,12 @@ struct MainView_Small: View {
 	private func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
-		case .ConfigurationView : ConfigurationView()
-		case .TransactionsView  : TransactionsView()
-		case .ReceiveView       : ReceiveView()
-		case .SendView          : SendView(controller: externalLightningRequest)
-		case .CurrencyConverter : CurrencyConverterView()
+			case .ConfigurationView   : ConfigurationView()
+			case .TransactionsView    : TransactionsView()
+			case .ReceiveView         : ReceiveView()
+			case .SendView            : SendView(controller: externalLightningRequest)
+			case .CurrencyConverter   : CurrencyConverterView()
+			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded, popTo: popTo)
 		}
 	}
 	
@@ -503,18 +499,35 @@ struct MainView_Small: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	private func navLinkTagBinding(_ tag: NavLinkTag?) -> Binding<Bool> {
+	private func navLinkTagBinding() -> Binding<Bool> {
 		
-		if let tag { // specific tag
-			return Binding<Bool>(
-				get: { navLinkTag == tag },
-				set: { if $0 { navLinkTag = tag } else if (navLinkTag == tag) { navLinkTag = nil } }
-			)
-		} else { // any tag
-			return Binding<Bool>(
-				get: { navLinkTag != nil },
-				set: { if !$0 { navLinkTag = nil }}
-			)
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Lifecycle
+	// --------------------------------------------------
+	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		// Careful: this function may be called when returning from the Receive/Send view
+		if !didAppear {
+			didAppear = true
+			
+		} else {
+			
+			if let destination = popToDestination {
+				log.debug("popToDestination: \(destination)")
+				
+				popToDestination = nil
+				if let deepLink = destination.followedBy {
+					deepLinkManager.broadcast(deepLink)
+				}
+			}
 		}
 	}
 	
@@ -584,6 +597,22 @@ struct MainView_Small: View {
 			self.externalLightningRequest = scanController
 			self.navLinkTag = .SendView
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func showSwapInWallet() {
+		log.trace("showSwapInWallet()")
+		
+		navLinkTag = .SwapInWalletDetails
+	}
+	
+	func popTo(_ destination: PopToDestination) {
+		log.trace("popTo(\(destination))")
+		
+		popToDestination = destination
 	}
 	
 	// --------------------------------------------------

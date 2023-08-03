@@ -24,6 +24,8 @@ struct HomeView : MVIView {
 	private let paymentsManager = Biz.business.paymentsManager
 	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "HomeView")
 	
+	let showSwapInWallet: () -> Void
+	
 	@StateObject var mvi = MVIState({ $0.home() })
 
 	@Environment(\.controllerFactory) var factoryEnv
@@ -31,10 +33,6 @@ struct HomeView : MVIView {
 	
 	@StateObject var noticeMonitor = NoticeMonitor()
 	@StateObject var syncState = DownloadMonitor()
-	
-	@EnvironmentObject var deviceInfo: DeviceInfo
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	let recentPaymentsConfigPublisher = Prefs.shared.recentPaymentsConfigPublisher
 	@State var recentPaymentsConfig = Prefs.shared.recentPaymentsConfig
@@ -76,14 +74,18 @@ struct HomeView : MVIView {
 	@Environment(\.openURL) var openURL
 	@Environment(\.colorScheme) var colorScheme
 	
+	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var popoverState: PopoverState
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
 	// MARK: Init
 	// --------------------------------------------------
 	
-	init() {
-		paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
+	init(showSwapInWallet: @escaping () -> Void) {
+		self.showSwapInWallet = showSwapInWallet
+		self.paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
 	}
 	
 	// --------------------------------------------------
@@ -135,7 +137,6 @@ struct HomeView : MVIView {
 	func content() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-
 			balance()
 				.padding(.bottom, 25)
 			notices()
@@ -300,7 +301,7 @@ struct HomeView : MVIView {
 			}
 			.font(.callout)
 			.foregroundColor(.secondary)
-			.onTapGesture { showIncomingDepositPopover() }
+			.onTapGesture { showSwapInWallet() }
 			.padding(.top, 7)
 			.padding(.bottom, 2)
 			.scaleEffect(incomingSwapScaleFactor, anchor: .top)
@@ -316,12 +317,16 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	func notices() -> some View {
 		
-		let count = noticeCount()
-		if count > 1 {
-			notice_multiple(count: count)
-		} else if count == 1 {
-			notice_single()
+		Group {
+			let count = noticeCount()
+			if count > 1 {
+				notice_multiple(count: count)
+			} else if count == 1 {
+				notice_single()
+			}
 		}
+		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
+		.padding([.leading, .trailing, .bottom], 10)
 	}
 	
 	@ViewBuilder
@@ -368,7 +373,7 @@ struct HomeView : MVIView {
 		.onTapGesture {
 			openNotificationsSheet()
 		}
-		.padding([.leading, .trailing, .bottom], 10)
+		
 	}
 	
 	@ViewBuilder
@@ -377,7 +382,6 @@ struct HomeView : MVIView {
 		NoticeBox {
 			notice_primary(includeAction: true)
 		}
-		.padding([.leading, .trailing, .bottom], 10)
 	}
 	
 	@ViewBuilder
@@ -750,14 +754,6 @@ struct HomeView : MVIView {
 			
 		} else if currencyPrefs.currencyType == .fiat {
 			currencyPrefs.toggleHideAmounts()
-		}
-	}
-	
-	func showIncomingDepositPopover() {
-		log.trace("showIncomingDepositPopover()")
-		
-		popoverState.display(dismissable: true) {
-			IncomingDepositPopover()
 		}
 	}
 	
