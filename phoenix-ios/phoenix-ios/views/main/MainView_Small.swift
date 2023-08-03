@@ -58,18 +58,13 @@ struct MainView_Small: View {
 	)
 	@State var footerButtonHeight: CGFloat? = nil
 	
-	@State var footerTruncationDetection_standard: [ContentSizeCategory: Bool] = [:]
-	@State var footerTruncationDetection_condensed: [ContentSizeCategory: Bool] = [:]
+	@State var footerTruncationDetection_standard: [DynamicTypeSize: Bool] = [:]
+	@State var footerTruncationDetection_condensed: [DynamicTypeSize: Bool] = [:]
 	
-	@Environment(\.sizeCategory) var contentSizeCategory: ContentSizeCategory
+	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
-	
-	// When we drop iOS 14 support, switch to this:
-//	@State var footerTruncationDetection_standard: [DynamicTypeSize: Bool] = [:]
-//	@State var footerTruncationDetection_condensed: [DynamicTypeSize: Bool] = [:]
-//	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -245,17 +240,17 @@ struct MainView_Small: View {
 	@ViewBuilder
 	func footer() -> some View {
 		
-		let csc = contentSizeCategory
-		let footerTruncationDetected_condensed = footerTruncationDetection_condensed[csc] ?? false
-		let footerTruncationDetected_standard = footerTruncationDetection_standard[csc] ?? false
+		let dts = dynamicTypeSize
+		let footerTruncationDetected_condensed = footerTruncationDetection_condensed[dts] ?? false
+		let footerTruncationDetected_standard = footerTruncationDetection_standard[dts] ?? false
 		
 		Group {
 			if footerTruncationDetected_condensed {
 				footer_accessibility()
 			} else if footerTruncationDetected_standard {
-				footer_condensed(csc)
+				footer_condensed(dts)
 			} else {
-				footer_standard(csc)
+				footer_standard(dts)
 			}
 		}
 		.padding(.top, 20)
@@ -270,7 +265,7 @@ struct MainView_Small: View {
 	}
 	
 	@ViewBuilder
-	func footer_standard(_ csc: ContentSizeCategory) -> some View {
+	func footer_standard(_ dts: DynamicTypeSize) -> some View {
 		
 		// We're trying to center the divider:
 		//
@@ -294,8 +289,8 @@ struct MainView_Small: View {
 							.lineLimit(1)
 							.foregroundColor(.primaryForeground)
 					} wasTruncated: {
-						log.debug("footerTruncationDetected_standard(receive): \(csc)")
-						self.footerTruncationDetection_standard[csc] = true
+						log.debug("footerTruncationDetected_standard(receive): \(dts)")
+						self.footerTruncationDetection_standard[dts] = true
 					}
 				} icon: {
 					Image("ic_receive_resized")
@@ -325,8 +320,8 @@ struct MainView_Small: View {
 							.lineLimit(1)
 							.foregroundColor(.primaryForeground)
 					} wasTruncated: {
-						log.debug("footerTruncationDetected_standard(send): \(csc)")
-						self.footerTruncationDetection_standard[csc] = true
+						log.debug("footerTruncationDetected_standard(send): \(dts)")
+						self.footerTruncationDetection_standard[dts] = true
 					}
 				} icon: {
 					Image("ic_scan_resized")
@@ -347,7 +342,7 @@ struct MainView_Small: View {
 	}
 	
 	@ViewBuilder
-	func footer_condensed(_ csc: ContentSizeCategory) -> some View {
+	func footer_condensed(_ dts: DynamicTypeSize) -> some View {
 		
 		// There's a large font being used, and possibly a small screen too.
 		// Thus horizontal space is tight.
@@ -371,8 +366,8 @@ struct MainView_Small: View {
 							.lineLimit(1)
 							.foregroundColor(.primaryForeground)
 					} wasTruncated: {
-						log.debug("footerTruncationDetected_condensed(receive): \(csc)")
-						self.footerTruncationDetection_condensed[csc] = true
+						log.debug("footerTruncationDetected_condensed(receive): \(dts)")
+						self.footerTruncationDetection_condensed[dts] = true
 					}
 				} icon: {
 					Image("ic_receive_resized")
@@ -400,8 +395,8 @@ struct MainView_Small: View {
 							.lineLimit(1)
 							.foregroundColor(.primaryForeground)
 					} wasTruncated: {
-						log.debug("footerTruncationDetected_condensed(send): \(csc)")
-						self.footerTruncationDetection_condensed[csc] = true
+						log.debug("footerTruncationDetected_condensed(send): \(dts)")
+						self.footerTruncationDetection_condensed[dts] = true
 					}
 				} icon: {
 					Image("ic_scan_resized")
@@ -629,26 +624,6 @@ struct MainView_Small: View {
 				log.debug("swiftUiBugWorkaround = nil")
 				self.swiftUiBugWorkaround = nil
 			}
-		}
-	}
-}
-
-extension ContentSizeCategory: CustomStringConvertible {
-	public var description: String {
-		switch self {
-			case .extraSmall                        : return "XS"
-			case .small                             : return "S"
-			case .medium                            : return "M"
-			case .large                             : return "L"
-			case .extraLarge                        : return "XL"
-			case .extraExtraLarge                   : return "XXL"
-			case .extraExtraExtraLarge              : return "XXXL"
-			case .accessibilityMedium               : return "aM"
-			case .accessibilityLarge                : return "aL"
-			case .accessibilityExtraLarge           : return "aXL"
-			case .accessibilityExtraExtraLarge      : return "aXXL"
-			case .accessibilityExtraExtraExtraLarge : return "aXXXL"
-			@unknown default                        : return "U"
 		}
 	}
 }
