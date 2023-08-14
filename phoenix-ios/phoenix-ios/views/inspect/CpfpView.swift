@@ -724,7 +724,13 @@ struct CpfpView: View {
 				if let problem = SpliceOutProblem.fromResponse(response) {
 					self.cpfpError = .executeError(problem: problem)
 				} else {
-					self.presentationMode.wrappedValue.dismiss()
+					switch type {
+					case .sheet(let closeAction):
+						closeAction()
+					case .embedded(let popTo):
+						popTo(.TransactionsView)
+						self.presentationMode.wrappedValue.dismiss()
+					}
 				}
 				
 			} catch {

@@ -37,6 +37,7 @@ struct TransactionsView: View {
 	@State var isDownloadingTxs: Bool = false
 	
 	@State var didAppear = false
+	@State var popToDestination: PopToDestination? = nil
 	
 	@Environment(\.colorScheme) var colorScheme
 	
@@ -200,7 +201,7 @@ struct TransactionsView: View {
 		
 		if let selectedItem {
 			PaymentView(
-				type: .embedded,
+				type: .embedded(popTo: popTo),
 				paymentInfo: selectedItem
 			)
 			
@@ -234,10 +235,29 @@ struct TransactionsView: View {
 		// Careful: this function is also called when returning from subviews
 		if !didAppear {
 			didAppear = true
+			
 			paymentsPageFetcher.subscribeToAll(
 				offset: 0,
 				count: Int32(PAGE_COUNT_START)
 			)
+			
+		} else {
+			
+			if let destination = popToDestination {
+				log.debug("popToDestination: \(destination)")
+				
+				popToDestination = nil
+				switch destination {
+				case .RootView(_):
+					log.debug("Unhandled popToDestination")
+					
+				case .ConfigurationView(_):
+					log.debug("Invalid popToDestination")
+					
+				case .TransactionsView:
+					log.debug("At destination")
+				}
+			}
 		}
 		
 		if !deviceInfo.isIPad {
@@ -544,6 +564,12 @@ struct TransactionsView: View {
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
+	
+	func popTo(_ destination: PopToDestination) {
+		log.trace("popTo(\(destination))")
+		
+		popToDestination = destination
+	}
 	
 	func didSelectPayment(row: WalletPaymentOrderRow) -> Void {
 		log.trace("didSelectPayment()")

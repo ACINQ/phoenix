@@ -30,6 +30,7 @@ struct SummaryView: View {
 	@State var showDeletePaymentConfirmationDialog = false
 	
 	@State var didAppear = false
+	@State var popToDestination: PopToDestination? = nil
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -343,7 +344,7 @@ struct SummaryView: View {
 				} // </confirmationDialog>
 				
 				if confirmations == 0 {
-					NavigationLink(destination: CpfpView(type: type, onChainPayment: onChainPayment)) {
+					NavigationLink(destination: cpfpView(onChainPayment)) {
 						Label {
 							Text("Accelerate transaction")
 						} icon: {
@@ -603,7 +604,7 @@ struct SummaryView: View {
 	@ViewBuilder
 	func detailsView() -> some View {
 		DetailsView(
-			type: type,
+			type: wrappedType(),
 			paymentInfo: $paymentInfo,
 			showOriginalFiatValue: $showOriginalFiatValue,
 			showFiatValueExplanation: $showFiatValueExplanation
@@ -613,8 +614,16 @@ struct SummaryView: View {
 	@ViewBuilder
 	func editInfoView() -> some View {
 		EditInfoView(
-			type: type,
+			type: wrappedType(),
 			paymentInfo: $paymentInfo
+		)
+	}
+	
+	@ViewBuilder
+	func cpfpView(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) -> some View {
+		CpfpView(
+			type: wrappedType(),
+			onChainPayment: onChainPayment
 		)
 	}
 	
@@ -677,6 +686,16 @@ struct SummaryView: View {
 				case .present : showOriginalFiatValue = false
 			}
 			showFiatValueExplanation = true
+		}
+	}
+	
+	func wrappedType() -> PaymentViewType {
+		
+		switch type {
+		case .sheet(let closeAction):
+			return type
+		case .embedded(let popTo):
+			return .embedded(popTo: popToWrapper)
 		}
 	}
 	
@@ -806,12 +825,37 @@ struct SummaryView: View {
 					paymentInfo = result
 				}
 			}
+			
+			if let destination = popToDestination {
+				log.debug("popToDestination: \(destination)")
+				
+				popToDestination = nil
+				switch destination {
+				case .RootView(_):
+					log.debug("Unhandled popToDestination")
+					
+				case .ConfigurationView(_):
+					log.debug("Unhandled popToDestination")
+					
+				case .TransactionsView:
+					presentationMode.wrappedValue.dismiss()
+				}
+			}
 		}
 	}
 	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
+	
+	func popToWrapper(_ destination: PopToDestination) {
+		log.trace("popToWrapper(\(destination))")
+		
+		popToDestination = destination
+		if case .embedded(let popTo) = type {
+			popTo(destination)
+		}
+	}
 	
 	func exploreTx(_ txId: Bitcoin_kmpByteVector32, website: BlockchainExplorer.Website) {
 		log.trace("exploreTX()")

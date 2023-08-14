@@ -501,6 +501,9 @@ fileprivate struct ConfigurationList: View {
 					if let deepLink {
 						deepLinkManager.broadcast(deepLink)
 					}
+				
+				case .TransactionsView:
+					log.warning("Invalid popToDestination")
 				}
 			}
 		}

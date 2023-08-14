@@ -21,7 +21,7 @@ enum PaymentViewType {
 	/// - thus we cannot use the general API
 	case sheet(closeAction: () -> Void)
 	
-	case embedded
+	case embedded(popTo: (PopToDestination) -> Void)
 }
 
 struct PaymentView: View {
