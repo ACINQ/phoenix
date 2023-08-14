@@ -215,27 +215,6 @@ struct SummaryView: View {
 					.accessibilityLabel("Pending payment")
 					.accessibilityHint("Waiting for confirmations")
 				
-				if payment is Lightning_kmpIncomingPayment {
-					// I'm pretty sure this stuff is outdated, and needs to be removed...
-					if let depth = minFundingDepth() {
-						let minutes = depth * 10
-						Text("requires \(depth) confirmations")
-							.font(.footnote)
-							.multilineTextAlignment(.center)
-							.foregroundColor(.secondary)
-						Text("≈\(minutes) minutes")
-							.font(.footnote)
-							.multilineTextAlignment(.center)
-							.foregroundColor(.secondary)
-					}
-					if let broadcastDate = onChainBroadcastDate() {
-						Text(broadcastDate.format())
-							.font(.subheadline)
-							.foregroundColor(.secondary)
-							.padding(.top, 12)
-					}
-				}
-				
 				if let onChainPayment = payment as? Lightning_kmpOnChainOutgoingPayment {
 					header_blockchainStatus(onChainPayment)
 				}
@@ -631,35 +610,6 @@ struct SummaryView: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func minFundingDepth() -> Int32? {
-		
-		guard
-			let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment,
-			let received = incomingPayment.received,
-			let newChannel = received.receivedWith.compactMap({ $0.asNewChannel() }).first,
-			let channel = Biz.business.peerManager.getChannelWithCommitments(channelId: newChannel.channelId),
-			let nodeParams = Biz.business.nodeParamsManager.nodeParams.value_ as? Lightning_kmpNodeParams
-		else {
-			return nil
-		}
-		
-		return channel.minDepthForFunding(nodeParams: nodeParams)
-	}
-	
-	func onChainBroadcastDate() -> Date? {
-		
-		if let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment {
-			
-			if let _ = incomingPayment.origin.asOnChain() {
-				if let received = incomingPayment.received {
-					return received.receivedAtDate
-				}
-			}
-		}
-		
-		return nil
-	}
-	
 	func formattedAmount() -> FormattedAmount {
 		
 		let msat = paymentInfo.payment.amount
@@ -692,9 +642,9 @@ struct SummaryView: View {
 	func wrappedType() -> PaymentViewType {
 		
 		switch type {
-		case .sheet(let closeAction):
+		case .sheet(_):
 			return type
-		case .embedded(let popTo):
+		case .embedded(_):
 			return .embedded(popTo: popToWrapper)
 		}
 	}
