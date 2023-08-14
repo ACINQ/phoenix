@@ -409,26 +409,10 @@ fileprivate struct ConfigurationList: View {
 		
 		if !didAppear {
 			didAppear = true
+			
 			if let deepLink = deepLinkManager.deepLink {
 				DispatchQueue.main.async {
 					deepLinkChanged(deepLink)
-				}
-			}
-			
-		} else {
-		
-			if let destination = popToDestination {
-				popToDestination = nil
-				switch destination {
-				case .RootView(let deepLink):
-					log.debug("popToDestination: \(destination), follwedBy: \(deepLink?.rawValue ?? "nil")")
-					presentationMode.wrappedValue.dismiss()
-					
-				case .ConfigurationView(let deepLink):
-					log.debug("popToDestination: \(destination), followedBy: \(deepLink?.rawValue ?? "nil")")
-					if let deepLink {
-						deepLinkManager.broadcast(deepLink)
-					}
 				}
 			}
 		}
@@ -492,9 +476,33 @@ fileprivate struct ConfigurationList: View {
 		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
 		
 		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
-				
+			
 			log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
 			self.navLinkTag = forcedNavLinkTag
+			
+		} else if tag == nil {
+			
+			// If there's a pending popToDestination, it's now safe to continue the flow.
+			//
+			// Note that performing this operation in `onAppear` doesn't work properly:
+			// - it appears to work fine on the simulator, but isn't reliable on the actual device
+			// - it seems that, IF using a `navLinkTag`, then we need to wait for the tag to be
+			//   unset before it can be set properly again.
+			//
+			if let destination = popToDestination {
+				log.debug("popToDestination: \(destination)")
+				
+				popToDestination = nil
+				switch destination {
+				case .RootView(_):
+					presentationMode.wrappedValue.dismiss()
+					
+				case .ConfigurationView(let deepLink):
+					if let deepLink {
+						deepLinkManager.broadcast(deepLink)
+					}
+				}
+			}
 		}
 	}
 	

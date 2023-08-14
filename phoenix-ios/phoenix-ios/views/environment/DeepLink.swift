@@ -93,9 +93,9 @@ enum PopToDestination: CustomStringConvertible {
 	public var description: String {
 		switch self {
 		case .RootView(let followedBy):
-			return "RootView(followedBy: \(followedBy?.rawValue ?? "nil")"
+			return "RootView(followedBy: \(followedBy?.rawValue ?? "nil"))"
 		case .ConfigurationView(let followedBy):
-			return "ConfigurationView(follwedBy: \(followedBy?.rawValue ?? "nil")"
+			return "ConfigurationView(follwedBy: \(followedBy?.rawValue ?? "nil"))"
 		}
 	}
 }

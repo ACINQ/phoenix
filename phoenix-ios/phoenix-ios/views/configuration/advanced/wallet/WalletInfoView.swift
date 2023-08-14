@@ -477,6 +477,7 @@ struct WalletInfoView: View {
 			
 			if let destination = popToDestination {
 				log.debug("popToDestination: \(destination)")
+				
 				popToDestination = nil
 				presentationMode.wrappedValue.dismiss()
 			}

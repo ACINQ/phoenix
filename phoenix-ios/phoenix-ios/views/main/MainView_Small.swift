@@ -29,7 +29,6 @@ struct MainView_Small: View {
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
 	@State var externalLightningRequest: AppScanController? = nil
 	
-	@State var didAppear = false
 	@State var popToDestination: PopToDestination? = nil
 	
 	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
@@ -125,9 +124,6 @@ struct MainView_Small: View {
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.navigationStackDestination(isPresented: navLinkTagBinding()) { // For iOS 16+
 			navLinkView()
-		}
-		.onAppear {
-			onAppear()
 		}
 		.onChange(of: deepLinkManager.deepLink) {
 			deepLinkChanged($0)
@@ -503,30 +499,6 @@ struct MainView_Small: View {
 	}
 	
 	// --------------------------------------------------
-	// MARK: View Lifecycle
-	// --------------------------------------------------
-	
-	func onAppear() {
-		log.trace("onAppear()")
-		
-		// Careful: this function may be called when returning from the Receive/Send view
-		if !didAppear {
-			didAppear = true
-			
-		} else {
-			
-			if let destination = popToDestination {
-				log.debug("popToDestination: \(destination)")
-				
-				popToDestination = nil
-				if let deepLink = destination.followedBy {
-					deepLinkManager.broadcast(deepLink)
-				}
-			}
-		}
-	}
-	
-	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
 	
@@ -576,6 +548,22 @@ struct MainView_Small: View {
 			// If we pushed the SendView, triggered by an external lightning url,
 			// then we can nil out the associated controller now (since we handed off to SendView).
 			self.externalLightningRequest = nil
+			
+			// If there's a pending popToDestination, it's now safe to continue the flow.
+			//
+			// Note that performing this operation in `onAppear` doesn't work properly:
+			// - it appears to work fine on the simulator, but isn't reliable on the actual device
+			// - it seems that, IF using a `navLinkTag`, then we need to wait for the tag to be
+			//   unset before it can be set properly again.
+			// 
+			if let destination = popToDestination {
+				log.debug("popToDestination: \(destination)")
+				
+				popToDestination = nil
+				if let deepLink = destination.followedBy {
+					deepLinkManager.broadcast(deepLink)
+				}
+			}
 		}
 	}
 	
