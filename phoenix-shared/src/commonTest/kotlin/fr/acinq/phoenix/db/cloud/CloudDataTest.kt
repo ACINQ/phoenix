@@ -323,7 +323,7 @@ class CloudDataTest {
         val payment = cloudData.outgoing?.unwrap()
         assertNotNull(payment)
         assertIs<ChannelCloseOutgoingPayment>(payment)
-        assertEquals(54002000.msat, payment.amount)
+        assertEquals(27001000.msat, payment.amount)
         assertEquals("3GZiZZs8QGrH4za8ZrQkXdrqDj2fHd1ijy", payment.address)
         assertEquals(ByteVector32.fromValidHex("ff7f08e889d1b731be7cad37c9d09afc1515a1863979a64d0dbb652134099b89"), payment.channelId)
     }

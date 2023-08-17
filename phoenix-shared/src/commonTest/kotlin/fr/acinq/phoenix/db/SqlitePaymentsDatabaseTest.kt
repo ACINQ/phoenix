@@ -233,7 +233,8 @@ class SqlitePaymentsDatabaseTest {
         )
 
         assertEquals("ff7f08e8-89d1-4731-be7c-ad37c9d09afc", close.id.toString())
-        assertEquals(150.sat, close.recipientAmount)
+        assertEquals(100.sat, close.recipientAmount)
+        assertEquals(50_000.msat, close.fees)
         assertEquals("foobar", close.address)
         assertEquals(ByteVector32.Zeroes, close.channelId)
         assertEquals(true, close.isSentToDefaultAddress)
