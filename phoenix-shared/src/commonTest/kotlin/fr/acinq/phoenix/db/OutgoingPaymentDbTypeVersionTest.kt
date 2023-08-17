@@ -31,17 +31,9 @@ import kotlin.test.assertEquals
 
 class OutgoingPaymentDbTypeVersionTest {
 
-//    val part1 = LightningOutgoingPayment.ClosingTxPart(
-//        id = UUID.randomUUID(),
-//        txId = randomBytes32(),
-//        claimed = 123_456.sat,
-//        closingType = ChannelClosingType.Mutual,
-//        createdAt = 100
-//    )
     val channelId1 = randomBytes32()
     val address1 = "tb1q97tpc0y4rvdnu9wm7nu354lmmzdm8du228u3g4"
     val preimage1 = randomBytes32()
-    val paymentHash1 = preimage1.sha256()
     val paymentRequest1 =
         PaymentRequest.read("lntb1500n1ps9utezpp5xjfvpvgg3zykv2kdd9yws86xw5ww2kr60h9yphth2h6fly87a9gqdpzxysy2umswfjhxum0yppk76twypgxzmnwvycqp7xqrrss9qy9qsqsp5vm25lch9spq2m9fxqrgcxq0mxrgaehstd9javflyadsle5d97p9qmu9zsjn7l59lmps3568tz9ppla4xhawjptjyrw32jed84fe75z0ka0kmnntc9la95acvc0mjav6rdv5037y6zq9e0eqhenlt8y0yh8cpj467cl")
 

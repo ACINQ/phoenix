@@ -122,7 +122,6 @@ class CloudDataTest {
     @Test
     fun incoming__receivedWith_newChannel_legacy_no_uuid() = runTest {
         val blob = Hex.decode("bf6169bf68707265696d6167655820d77a5c6e17f70240c4a2aaf54fb1389188e482e85247f63c80417661e6a9b250666f726967696ebf64747970656a494e564f4943455f563064626c6f6259011b7b227061796d656e7452657175657374223a226c6e6263333530753170336464347874707035716c706868353476396e366737323439636435613463337a6735666b666b336a657377356370306b6a70393264366e377574777364717664396838766d6d6676646a73637170737370357a6a7275777a6c7677353732616e3934776b6b7630616370657077773068647a387134726466673679756b776466647032723571397179397173717738337771653868797130767061636a78336c7963777567657765787a307a3634796732343564377a717277653039676c7572716e34706466306d706539766336713065667739637533613773746575786c6a7730786e7970336d686a6565786664677a787163703564646d6b61227dff687265636569766564bf6274731b00000182172f3a3764747970656d4d554c544950415254535f563164626c6f625901ab5b7b2274797065223a2266722e6163696e712e70686f656e69782e64622e7061796d656e74732e496e636f6d696e67526563656976656457697468446174612e506172742e4e65774368616e6e656c2e5630222c22616d6f756e74223a7b226d736174223a373030303030307d2c2266656573223a7b226d736174223a333030303030307d2c226368616e6e656c4964223a2265386130653762613931613438356564363835373431356363306336306637376564613663623165626531646138343164343264376234333838636332626363227d2c7b2274797065223a2266722e6163696e712e70686f656e69782e64622e7061796d656e74732e496e636f6d696e67526563656976656457697468446174612e506172742e4e65774368616e6e656c2e5630222c22616d6f756e74223a7b226d736174223a393030303030307d2c2266656573223a7b226d736174223a363030303030307d2c226368616e6e656c4964223a2265386130653762613931613438356564363835373431356363306336306637376564613663623165626531646138343164343264376234333838636332626363227d5dff696372656174656441741b00000182172f3a37ff616ff6617600617040ff")
-
         val data = CloudData.cborDeserialize(blob)
         assertNotNull(data)
         val decoded = data.incoming?.unwrap()
@@ -132,8 +131,8 @@ class CloudDataTest {
         val expectedChannelId = Hex.decode("e8a0e7ba91a485ed6857415cc0c60f77eda6cb1ebe1da841d42d7b4388cc2bcc").byteVector32()
         val expectedReceived = IncomingPayment.Received(
             receivedWith = listOf(
-                IncomingPayment.ReceivedWith.NewChannel(amount = 7_000_000.msat, miningFee = 1000.sat, serviceFee = 3_000_000.msat, channelId = expectedChannelId, txId = randomBytes32(), confirmedAt = 1658246356984, lockedAt = 1658246356984),
-                IncomingPayment.ReceivedWith.NewChannel(amount = 9_000_000.msat, miningFee = 1000.sat, serviceFee = 6_000_000.msat, channelId = expectedChannelId, txId = randomBytes32(), confirmedAt = 1658246357123, lockedAt = 1658246357123)
+                IncomingPayment.ReceivedWith.NewChannel(amount = 7_000_000.msat, miningFee = 0.sat, serviceFee = 3_000_000.msat, channelId = expectedChannelId, txId = ByteVector32.Zeroes, confirmedAt = 0, lockedAt = 0),
+                IncomingPayment.ReceivedWith.NewChannel(amount = 9_000_000.msat, miningFee = 0.sat, serviceFee = 6_000_000.msat, channelId = expectedChannelId, txId = ByteVector32.Zeroes, confirmedAt = 0, lockedAt = 0)
             ),
             receivedAt = 1658246347319
         )
@@ -307,6 +306,8 @@ class CloudDataTest {
     /**
      * Payments for channel closings created before lightning-kmp v1.3.0 may be using [PublicKey.Generator] for the recipient field. In that case, the public key will
      * be uncompressed and will be saved as such in the cloud. We still should be able to read it.
+     *
+     * Note that with the splices update, the recipient node id has been removed from the channel-closing object. So we just check we can read the data.
      */
     @Test
     fun read_legacy_uncompressed_pubkey() {
@@ -316,9 +317,10 @@ class CloudDataTest {
         assertEquals(65, cloudData.outgoing?.recipient?.size)
         val payment = cloudData.outgoing?.unwrap()
         assertNotNull(payment)
-        assertIs<LightningOutgoingPayment>(payment)
-        assertEquals(33, payment.recipient.value.size())
-        assertEquals(33, CloudData(payment).outgoing?.recipient?.size)
+        assertIs<ChannelCloseOutgoingPayment>(payment)
+        assertEquals(54002000.msat, payment.amount)
+        assertEquals("3GZiZZs8QGrH4za8ZrQkXdrqDj2fHd1ijy", payment.address)
+        assertEquals(ByteVector32.fromValidHex("ff7f08e889d1b731be7cad37c9d09afc1515a1863979a64d0dbb652134099b89"), payment.channelId)
     }
 
     @Test
