@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val doDataMigration = LegacyPrefsDatastore.getDataMigrationExpected(applicationContext).filterNotNull().first()
             if (doDataMigration) {
-                LegacyMigrationHelper.migrateLegacyPreferences(applicationContext)
+                delay(7_000)
                 LegacyMigrationHelper.migrateLegacyPayments(applicationContext)
                 delay(5_000)
                 LegacyPrefsDatastore.saveDataMigrationExpected(applicationContext, false)
@@ -81,6 +81,7 @@ class MainActivity : AppCompatActivity() {
                         LegacyPrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
                     } else {
                         log.info("no legacy channels were found")
+                        LegacyPrefsDatastore.savePrefsMigrationExpected(applicationContext, false)
                         LegacyPrefsDatastore.saveDataMigrationExpected(applicationContext, false)
                         LegacyPrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.NotRequired)
                     }

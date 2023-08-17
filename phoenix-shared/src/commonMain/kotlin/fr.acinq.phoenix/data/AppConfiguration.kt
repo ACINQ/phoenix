@@ -9,11 +9,14 @@ import fr.acinq.lightning.wire.InitTlv
 import kotlinx.serialization.Serializable
 
 
-interface CurrencyUnit
+interface CurrencyUnit {
+    /** Code that should be displayed in the UI. */
+    val displayCode: String
+}
 
 @Serializable
-enum class BitcoinUnit : CurrencyUnit {
-    Sat, Bit, MBtc, Btc;
+enum class BitcoinUnit(override val displayCode: String) : CurrencyUnit {
+    Sat("sat"), Bit("bit"), MBtc("mbtc"), Btc("btc");
 
     override fun toString(): String {
         return super.toString().lowercase()
@@ -21,165 +24,176 @@ enum class BitcoinUnit : CurrencyUnit {
 
     companion object {
         val values = values().toList()
+
+        fun valueOfOrNull(code: String): BitcoinUnit? = try {
+            valueOf(code)
+        } catch (e: Exception) {
+            null
+        }
     }
+
+
 }
 
+/**
+ * @param flag when multiple countries use that currency, use the flag of the country with highest GDP
+ */
 @Serializable
-enum class FiatCurrency : CurrencyUnit {
-    AED, // United Arab Emirates Dirham
-    AFN, // Afghan Afghani
-    ALL, // Albanian Lek
-    AMD, // Armenian Dram
-    ANG, // Netherlands Antillean Guilder
-    AOA, // Angolan Kwanza
-    ARS, // Argentine Peso
-    ARS_BM, // Argentine Peso (blue market)
-    AUD, // Australian Dollar
-    AWG, // Aruban Florin
-    AZN, // Azerbaijani Manat
-    BAM, // Bosnia-Herzegovina Convertible Mark
-    BBD, // Barbadian Dollar
-    BDT, // Bangladeshi Taka
-    BGN, // Bulgarian Lev
-    BHD, // Bahraini Dinar
-    BIF, // Burundian Franc
-    BMD, // Bermudan Dollar
-    BND, // Brunei Dollar
-    BOB, // Bolivian Boliviano
-    BRL, // Brazilian Real
-    BSD, // Bahamian Dollar
-    BTN, // Bhutanese Ngultrum
-    BWP, // Botswanan Pula
-    BZD, // Belize Dollar
-    CAD, // Canadian Dollar
-    CDF, // Congolese Franc
-    CHF, // Swiss Franc
-    CLP, // Chilean Peso
-    CNH, // Chinese Yuan (offshore)
-    CNY, // Chinese Yuan (onshore)
-    COP, // Colombian Peso
-    CRC, // Costa Rican Colón
-    CUP, // Cuban Peso
-    CUP_FM, // Cuban Peso (free market)
-    CVE, // Cape Verdean Escudo
-    CZK, // Czech Republic Koruna
-    DJF, // Djiboutian Franc
-    DKK, // Danish Krone
-    DOP, // Dominican Peso
-    DZD, // Algerian Dinar
-    EGP, // Egyptian Pound
-    ERN, // Eritrean Nakfa
-    ETB, // Ethiopian Birr
-    EUR, // Euro
-    FJD, // Fijian Dollar
-    FKP, // Falkland Islands Pound
-    GBP, // British Pound Sterling
-    GEL, // Georgian Lari
-    GHS, // Ghanaian Cedi
-    GIP, // Gibraltar Pound
-    GMD, // Gambian Dalasi
-    GNF, // Guinean Franc
-    GTQ, // Guatemalan Quetzal
-    GYD, // Guyanaese Dollar
-    HKD, // Hong Kong Dollar
-    HNL, // Honduran Lempira
-    HRK, // Croatian Kuna
-    HTG, // Haitian Gourde
-    HUF, // Hungarian Forint
-    IDR, // Indonesian Rupiah
-    ILS, // Israeli New Sheqel
-    INR, // Indian Rupee
-    IQD, // Iraqi Dinar
-    IRR, // Iranian Rial
-    ISK, // Icelandic Króna
-    JEP, // Jersey Pound
-    JMD, // Jamaican Dollar
-    JOD, // Jordanian Dinar
-    JPY, // Japanese Yen
-    KES, // Kenyan Shilling
-    KGS, // Kyrgystani Som
-    KHR, // Cambodian Riel
-    KMF, // Comorian Franc
-    KPW, // North Korean Won
-    KRW, // South Korean Won
-    KWD, // Kuwaiti Dinar
-    KYD, // Cayman Islands Dollar
-    KZT, // Kazakhstani Tenge
-    LAK, // Laotian Kip
-    LBP, // Lebanese Pound
-    LBP_BM, // Lebanese Pound (black market)
-    LKR, // Sri Lankan Rupee
-    LRD, // Liberian Dollar
-    LSL, // Lesotho Loti
-    LYD, // Libyan Dinar
-    MAD, // Moroccan Dirham
-    MDL, // Moldovan Leu
-    MGA, // Malagasy Ariary
-    MKD, // Macedonian Denar
-    MMK, // Myanma Kyat
-    MNT, // Mongolian Tugrik
-    MOP, // Macanese Pataca
-    MUR, // Mauritian Rupee
-    MVR, // Maldivian Rufiyaa
-    MWK, // Malawian Kwacha
-    MXN, // Mexican Peso
-    MYR, // Malaysian Ringgit
-    MZN, // Mozambican Metical
-    NAD, // Namibian Dollar
-    NGN, // Nigerian Naira
-    NIO, // Nicaraguan Córdoba
-    NOK, // Norwegian Krone
-    NPR, // Nepalese Rupee
-    NZD, // New Zealand Dollar
-    OMR, // Omani Rial
-    PAB, // Panamanian Balboa
-    PEN, // Peruvian Sol
-    PGK, // Papua New Guinean Kina
-    PHP, // Philippine Peso
-    PKR, // Pakistani Rupee
-    PLN, // Polish Zloty
-    PYG, // Paraguayan Guarani
-    QAR, // Qatari Rial
-    RON, // Romanian Leu
-    RSD, // Serbian Dinar
-    RUB, // Russian Ruble
-    RWF, // Rwandan Franc
-    SAR, // Saudi Riyal
-    SBD, // Solomon Islands Dollar
-    SCR, // Seychellois Rupee
-    SDG, // Sudanese Pound
-    SEK, // Swedish Krona
-    SGD, // Singapore Dollar
-    SHP, // Saint Helena Pound
-    SLL, // Sierra Leonean Leone
-    SOS, // Somali Shilling
-    SRD, // Surinamese Dollar
-    SYP, // Syrian Pound
-    SZL, // Swazi Lilangeni
-    THB, // Thai Baht
-    TJS, // Tajikistani Somoni
-    TMT, // Turkmenistani Manat
-    TND, // Tunisian Dinar
-    TOP, // Tongan Paʻanga
-    TRY, // Turkish Lira
-    TTD, // Trinidad and Tobago Dollar
-    TWD, // Taiwan Dollar
-    TZS, // Tanzanian Shilling
-    UAH, // Ukrainian Hryvnia
-    UGX, // Ugandan Shilling
-    USD, // United States Dollar
-    UYU, // Uruguayan Peso
-    UZS, // Uzbekistan Som
-    VND, // Vietnamese Dong
-    VUV, // Vanuatu Vatu
-    WST, // Samoan Tala
-    XAF, // CFA Franc BEAC
-    XCD, // East Caribbean Dollar
-    XOF, // CFA Franc BCEAO
-    XPF, // CFP Franc
-    YER, // Yemeni Rial
-    ZAR, // South African Rand
-    ZMW; // Zambian Kwacha
+enum class FiatCurrency(override val displayCode: String, val flag: String = "🏳️") : CurrencyUnit {
+    AED(displayCode = "AED", flag = "🇦🇪"), // United Arab Emirates Dirham
+    AFN(displayCode = "AFN", flag = "🇦🇫"), // Afghan Afghani
+    ALL(displayCode = "ALL", flag = "🇦🇱"), // Albanian Lek
+    AMD(displayCode = "AMD", flag = "🇦🇲"), // Armenian Dram
+    ANG(displayCode = "ANG", flag = "🇳🇱"), // Netherlands Antillean Guilder
+    AOA(displayCode = "AOA", flag = "🇦🇴"), // Angolan Kwanza
+    ARS_BM(displayCode = "ARS", flag = "🇦🇷"), // Argentine Peso (blue market)
+    ARS(displayCode = "ARS_OFF", flag = "🇦🇷"), // Argentine Peso (official rate)
+    AUD(displayCode = "AUD", flag = "🇦🇺"), // Australian Dollar
+    AWG(displayCode = "AWG", flag = "🇦🇼"), // Aruban Florin
+    AZN(displayCode = "AZN", flag = "🇦🇿"), // Azerbaijani Manat
+    BAM(displayCode = "BAM", flag = "🇧🇦"), // Bosnia-Herzegovina Convertible Mark
+    BBD(displayCode = "BBD", flag = "🇧🇧"), // Barbadian Dollar
+    BDT(displayCode = "BDT", flag = "🇧🇩"), // Bangladeshi Taka
+    BGN(displayCode = "BGN", flag = "🇧🇬"), // Bulgarian Lev
+    BHD(displayCode = "BHD", flag = "🇧🇭"), // Bahraini Dinar
+    BIF(displayCode = "BIF", flag = "🇧🇮"), // Burundian Franc
+    BMD(displayCode = "BMD", flag = "🇧🇲"), // Bermudan Dollar
+    BND(displayCode = "BND", flag = "🇧🇳"), // Brunei Dollar
+    BOB(displayCode = "BOB", flag = "🇧🇴"), // Bolivian Boliviano
+    BRL(displayCode = "BRL", flag = "🇧🇷"), // Brazilian Real
+    BSD(displayCode = "BSD", flag = "🇧🇸"), // Bahamian Dollar
+    BTN(displayCode = "BTN", flag = "🇧🇹"), // Bhutanese Ngultrum
+    BWP(displayCode = "BWP", flag = "🇧🇼"), // Botswanan Pula
+    BZD(displayCode = "BZD", flag = "🇧🇿"), // Belize Dollar
+    CAD(displayCode = "CAD", flag = "🇨🇦"), // Canadian Dollar
+    CDF(displayCode = "CDF", flag = "🇨🇩"), // Congolese Franc
+    CHF(displayCode = "CHF", flag = "🇨🇭"), // Swiss Franc
+    CLP(displayCode = "CLP", flag = "🇨🇱"), // Chilean Peso
+    CNH(displayCode = "CNH", flag = "🇨🇳"), // Chinese Yuan (offshore)
+    CNY(displayCode = "CNY", flag = "🇨🇳"), // Chinese Yuan (onshore)
+    COP(displayCode = "COP", flag = "🇨🇴"), // Colombian Peso
+    CRC(displayCode = "CRC", flag = "🇨🇷"), // Costa Rican Colón
+    CUP_FM(displayCode = "CUP", flag = "🇨🇺"), // Cuban Peso (free market)
+    CUP(displayCode = "CUP_OFF", flag = "🇨🇺"), // Cuban Peso (official rate)
+    CVE(displayCode = "CVE", flag = "🇨🇻"), // Cape Verdean Escudo
+    CZK(displayCode = "CZK", flag = "🇨🇿"), // Czech Republic Koruna
+    DJF(displayCode = "DJF", flag = "🇩🇯"), // Djiboutian Franc
+    DKK(displayCode = "DKK", flag = "🇩🇰"), // Danish Krone
+    DOP(displayCode = "DOP", flag = "🇩🇴"), // Dominican Peso
+    DZD(displayCode = "DZD", flag = "🇩🇿"), // Algerian Dinar
+    EGP(displayCode = "EGP", flag = "🇪🇬"), // Egyptian Pound
+    ERN(displayCode = "ERN", flag = "🇪🇷"), // Eritrean Nakfa
+    ETB(displayCode = "ETB", flag = "🇪🇹"), // Ethiopian Birr
+    EUR(displayCode = "EUR", flag = "🇪🇺"), // Euro
+    FJD(displayCode = "FJD", flag = "🇫🇯"), // Fijian Dollar
+    FKP(displayCode = "FKP", flag = "🇫🇰"), // Falkland Islands Pound
+    GBP(displayCode = "GBP", flag = "🇬🇧"), // British Pound Sterling
+    GEL(displayCode = "GEL", flag = "🇬🇪"), // Georgian Lari
+    GHS(displayCode = "GHS", flag = "🇬🇭"), // Ghanaian Cedi
+    GIP(displayCode = "GIP", flag = "🇬🇮"), // Gibraltar Pound
+    GMD(displayCode = "GMD", flag = "🇬🇲"), // Gambian Dalasi
+    GNF(displayCode = "GNF", flag = "🇬🇳"), // Guinean Franc
+    GTQ(displayCode = "GTQ", flag = "🇬🇹"), // Guatemalan Quetzal
+    GYD(displayCode = "GYD", flag = "🇬🇾"), // Guyanaese Dollar
+    HKD(displayCode = "HKD", flag = "🇭🇰"), // Hong Kong Dollar
+    HNL(displayCode = "HNL", flag = "🇭🇳"), // Honduran Lempira
+    HRK(displayCode = "HRK", flag = "🇭🇷"), // Croatian Kuna
+    HTG(displayCode = "HTG", flag = "🇭🇹"), // Haitian Gourde
+    HUF(displayCode = "HUF", flag = "🇭🇺"), // Hungarian Forint
+    IDR(displayCode = "IDR", flag = "🇮🇩"), // Indonesian Rupiah
+    ILS(displayCode = "ILS", flag = "🇮🇱"), // Israeli New Sheqel
+    INR(displayCode = "INR", flag = "🇮🇳"), // Indian Rupee
+    IQD(displayCode = "IQD", flag = "🇮🇶"), // Iraqi Dinar
+    IRR(displayCode = "IRR", flag = "🇮🇷"), // Iranian Rial
+    ISK(displayCode = "ISK", flag = "🇮🇸"), // Icelandic Króna
+    JEP(displayCode = "JEP", flag = "🇯🇪"), // Jersey Pound
+    JMD(displayCode = "JMD", flag = "🇯🇲"), // Jamaican Dollar
+    JOD(displayCode = "JOD", flag = "🇯🇴"), // Jordanian Dinar
+    JPY(displayCode = "JPY", flag = "🇯🇵"), // Japanese Yen
+    KES(displayCode = "KES", flag = "🇰🇪"), // Kenyan Shilling
+    KGS(displayCode = "KGS", flag = "🇰🇬"), // Kyrgystani Som
+    KHR(displayCode = "KHR", flag = "🇰🇭"), // Cambodian Riel
+    KMF(displayCode = "KMF", flag = "🇰🇲"), // Comorian Franc
+    KPW(displayCode = "KPW", flag = "🇰🇵"), // North Korean Won
+    KRW(displayCode = "KRW", flag = "🇰🇷"), // South Korean Won
+    KWD(displayCode = "KWD", flag = "🇰🇼"), // Kuwaiti Dinar
+    KYD(displayCode = "KYD", flag = "🇰🇾"), // Cayman Islands Dollar
+    KZT(displayCode = "KZT", flag = "🇰🇿"), // Kazakhstani Tenge
+    LAK(displayCode = "LAK", flag = "🇱🇦"), // Laotian Kip
+    LBP_BM(displayCode = "LBP", flag = "🇱🇧"), // Lebanese Pound (black market)
+    LBP(displayCode = "LBP_OFF", flag = "🇱🇧"), // Lebanese Pound (official rate)
+    LKR(displayCode = "LKR", flag = "🇱🇰"), // Sri Lankan Rupee
+    LRD(displayCode = "LRD", flag = "🇱🇷"), // Liberian Dollar
+    LSL(displayCode = "LSL", flag = "🇱🇸"), // Lesotho Loti
+    LYD(displayCode = "LYD", flag = "🇱🇾"), // Libyan Dinar
+    MAD(displayCode = "MAD", flag = "🇲🇦"), // Moroccan Dirham
+    MDL(displayCode = "MDL", flag = "🇲🇩"), // Moldovan Leu
+    MGA(displayCode = "MGA", flag = "🇲🇬"), // Malagasy Ariary
+    MKD(displayCode = "MKD", flag = "🇲🇰"), // Macedonian Denar
+    MMK(displayCode = "MMK", flag = "🇲🇲"), // Myanma Kyat
+    MNT(displayCode = "MNT", flag = "🇲🇳"), // Mongolian Tugrik
+    MOP(displayCode = "MOP", flag = "🇲🇴"), // Macanese Pataca
+    MUR(displayCode = "MUR", flag = "🇲🇺"), // Mauritian Rupee
+    MVR(displayCode = "MVR", flag = "🇲🇻"), // Maldivian Rufiyaa
+    MWK(displayCode = "MWK", flag = "🇲🇼"), // Malawian Kwacha
+    MXN(displayCode = "MXN", flag = "🇲🇽"), // Mexican Peso
+    MYR(displayCode = "MYR", flag = "🇲🇾"), // Malaysian Ringgit
+    MZN(displayCode = "MZN", flag = "🇲🇿"), // Mozambican Metical
+    NAD(displayCode = "NAD", flag = "🇳🇦"), // Namibian Dollar
+    NGN(displayCode = "NGN", flag = "🇳🇬"), // Nigerian Naira
+    NIO(displayCode = "NIO", flag = "🇳🇮"), // Nicaraguan Córdoba
+    NOK(displayCode = "NOK", flag = "🇳🇴"), // Norwegian Krone
+    NPR(displayCode = "NPR", flag = "🇳🇵"), // Nepalese Rupee
+    NZD(displayCode = "NZD", flag = "🇳🇿"), // New Zealand Dollar
+    OMR(displayCode = "OMR", flag = "🇴🇲"), // Omani Rial
+    PAB(displayCode = "PAB", flag = "🇵🇦"), // Panamanian Balboa
+    PEN(displayCode = "PEN", flag = "🇵🇪"), // Peruvian Sol
+    PGK(displayCode = "PGK", flag = "🇵🇬"), // Papua New Guinean Kina
+    PHP(displayCode = "PHP", flag = "🇵🇭"), // Philippine Peso
+    PKR(displayCode = "PKR", flag = "🇵🇰"), // Pakistani Rupee
+    PLN(displayCode = "PLN", flag = "🇵🇱"), // Polish Zloty
+    PYG(displayCode = "PYG", flag = "🇵🇾"), // Paraguayan Guarani
+    QAR(displayCode = "QAR", flag = "🇶🇦"), // Qatari Rial
+    RON(displayCode = "RON", flag = "🇷🇴"), // Romanian Leu
+    RSD(displayCode = "RSD", flag = "🇷🇸"), // Serbian Dinar
+    RUB(displayCode = "RUB", flag = "🇷🇺"), // Russian Ruble
+    RWF(displayCode = "RWF", flag = "🇷🇼"), // Rwandan Franc
+    SAR(displayCode = "SAR", flag = "🇸🇦"), // Saudi Riyal
+    SBD(displayCode = "SBD", flag = "🇸🇧"), // Solomon Islands Dollar
+    SCR(displayCode = "SCR", flag = "🇸🇨"), // Seychellois Rupee
+    SDG(displayCode = "SDG", flag = "🇸🇩"), // Sudanese Pound
+    SEK(displayCode = "SEK", flag = "🇸🇪"), // Swedish Krona
+    SGD(displayCode = "SGD", flag = "🇸🇬"), // Singapore Dollar
+    SHP(displayCode = "SHP", flag = "🇸🇭"), // Saint Helena Pound
+    SLL(displayCode = "SLL", flag = "🇸🇱"), // Sierra Leonean Leone
+    SOS(displayCode = "SOS", flag = "🇸🇴"), // Somali Shilling
+    SRD(displayCode = "SRD", flag = "🇸🇷"), // Surinamese Dollar
+    SYP(displayCode = "SYP", flag = "🇸🇾"), // Syrian Pound
+    SZL(displayCode = "SZL", flag = "🇸🇿"), // Swazi Lilangeni
+    THB(displayCode = "THB", flag = "🇹🇭"), // Thai Baht
+    TJS(displayCode = "TJS", flag = "🇹🇯"), // Tajikistani Somoni
+    TMT(displayCode = "TMT", flag = "🇹🇲"), // Turkmenistani Manat
+    TND(displayCode = "TND", flag = "🇹🇳"), // Tunisian Dinar
+    TOP(displayCode = "TOP", flag = "🇹🇴"), // Tongan Paʻanga
+    TRY(displayCode = "TRY", flag = "🇹🇷"), // Turkish Lira
+    TTD(displayCode = "TTD", flag = "🇹🇹"), // Trinidad and Tobago Dollar
+    TWD(displayCode = "TWD", flag = "🇹🇼"), // Taiwan Dollar
+    TZS(displayCode = "TZS", flag = "🇹🇿"), // Tanzanian Shilling
+    UAH(displayCode = "UAH", flag = "🇺🇦"), // Ukrainian Hryvnia
+    UGX(displayCode = "UGX", flag = "🇺🇬"), // Ugandan Shilling
+    USD(displayCode = "USD", flag = "🇺🇸"), // United States Dollar
+    UYU(displayCode = "UYU", flag = "🇺🇾"), // Uruguayan Peso
+    UZS(displayCode = "UZS", flag = "🇺🇿"), // Uzbekistan Som
+    VND(displayCode = "VND", flag = "🇻🇳"), // Vietnamese Dong
+    VUV(displayCode = "VUV", flag = "🇻🇺"), // Vanuatu Vatu
+    WST(displayCode = "WST", flag = "🇼🇸"), // Samoan Tala
+    XAF(displayCode = "XAF", flag = "🇨🇲"), // CFA Franc BEAC
+    XCD(displayCode = "XCD", flag = "🇱🇨"), // East Caribbean Dollar
+    XOF(displayCode = "XOF", flag = "🇨🇮"), // CFA Franc BCEAO
+    XPF(displayCode = "XPF", flag = "🇳🇨"), // CFP Franc
+    YER(displayCode = "YER", flag = "🇾🇪"), // Yemeni Rial
+    ZAR(displayCode = "ZAR", flag = "🇿🇦"), // South African Rand
+    ZMW(displayCode = "ZMW", flag = "🇿🇲"); // Zambian Kwacha
 
     companion object {
         val values = values().toList()

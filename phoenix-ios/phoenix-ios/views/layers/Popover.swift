@@ -1,48 +1,49 @@
 import SwiftUI
 import Combine
 
-/// The ShortSheetState is exposed via an Environment variable:
+/// The PopoverState is exposed via an EnvironmentObject variable:
 /// ```
-/// @Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+/// @EnvironmentObject var popoverState: PopoverState
 /// ```
 ///
-/// When you want to display a short sheet:
+/// When you want to display a popover:
 /// ```
-/// shortSheetState.display(dismissable: false) {
-///    YourCustomView()
+/// popoverState.display.send(dismissable: false) {
+///    YourPopoverView()
 /// }
 /// ```
 ///
-/// When you want to dismiss the sheet:
+/// When you want to dismiss the popover:
 /// ```
-/// shortSheetState.close()
+/// popoverState.close()
 /// ```
 ///
-public class ShortSheetState: ObservableObject {
-
-	/// Singleton instance
-	///
-	public static let shared = ShortSheetState()
-	
-	private init() {/* must use shared instance */}
+public class PopoverState: ObservableObject {
 	
 	/// Fires when:
-	/// - sheet view will animate on screen (onWillAppear)
-	/// - sheet view has animated off screen (onDidDisappear)
+	/// - view will animate on screen (onWillAppear)
+	/// - view has animated off screen (onDidDisappear)
 	///
-	var publisher = CurrentValueSubject<ShortSheetItem?, Never>(nil)
+	var publisher = CurrentValueSubject<PopoverItem?, Never>(nil)
 	
 	/// Fires when:
-	/// - sheet view will animate off screen (onWillDisapper)
+	/// - view will animate off screen (onWillDisapper)
 	///
 	var closePublisher = PassthroughSubject<Void, Never>()
+	
+	/// For compatibility with SmartModal API
+	/// 
+	var currentItem: PopoverItem? {
+		
+		return publisher.value
+	}
 	
 	func display<Content: View>(
 		dismissable: Bool,
 		@ViewBuilder builder: () -> Content,
 		onWillDisappear: (() -> Void)? = nil
 	) {
-		publisher.send(ShortSheetItem(
+		publisher.send(PopoverItem(
 			dismissable: dismissable,
 			view: builder().anyView
 		))
@@ -58,7 +59,7 @@ public class ShortSheetState: ObservableObject {
 	func close(animationCompletion: @escaping () -> Void) {
 		
 		var cancellables = Set<AnyCancellable>()
-		publisher.sink { (item: ShortSheetItem?) in
+		publisher.sink { (item: PopoverItem?) in
 			
 			// NB: This fires right away because publisher is CurrentValueSubject.
 			// It only means `onDidDisappear` if item is nil.
@@ -86,7 +87,7 @@ public class ShortSheetState: ObservableObject {
 	func onNextDidDisappear(_ action: @escaping () -> Void) {
 		
 		var cancellables = Set<AnyCancellable>()
-		publisher.sink { (item: ShortSheetItem?) in
+		publisher.sink { (item: PopoverItem?) in
 			
 			if item == nil {
 				action()
@@ -99,37 +100,24 @@ public class ShortSheetState: ObservableObject {
 
 /// Encompasses the view & options for the popover.
 ///
-public struct ShortSheetItem: SmartModalItem {
+public struct PopoverItem: SmartModalItem {
 	
 	/// Whether or not the popover is dimissable by tapping outside the popover.
 	let dismissable: Bool
 	
-	/// The view to be displayed in the sheet.
+	/// The view to be displayed in the popover window.
 	/// (Use the View.anyView extension function.)
 	let view: AnyView
 }
 
-struct ShortSheetEnvironmentKey: EnvironmentKey {
-
-	static var defaultValue = ShortSheetState.shared
-}
-
-public extension EnvironmentValues {
-
-	var shortSheetState: ShortSheetState {
-		get { self[ShortSheetEnvironmentKey.self] }
-		set { self[ShortSheetEnvironmentKey.self] = newValue }
-	}
-}
-
-struct ShortSheetWrapper<Content: View>: View {
+struct PopoverWrapper<Content: View>: View {
 
 	let dismissable: Bool
 	let content: () -> Content
 	
 	@State var animation: CGFloat = 0.0
 	
-	@Environment(\.shortSheetState) private var shortSheetState: ShortSheetState
+	@EnvironmentObject var popoverState: PopoverState
 	
 	var body: some View {
 		
@@ -141,28 +129,36 @@ struct ShortSheetWrapper<Content: View>: View {
 					.transition(.opacity)
 					.onTapGesture {
 						if dismissable {
-							shortSheetState.close()
+							popoverState.close()
 						}
 					}
 					.accessibilityHidden(!dismissable)
-					.accessibilityLabel("Dismiss sheet")
+					.accessibilityLabel("Dismiss popover")
 					.accessibilitySortPriority(-1000)
 					.accessibilityAction {
-						shortSheetState.close()
+						popoverState.close()
 					}
 				
 				VStack {
-					Spacer()
-					content()
-						.background(
-							Color(UIColor.systemBackground)
-								.cornerRadius(15, corners: [.topLeft, .topRight])
-								.edgesIgnoringSafeArea([.horizontal, .bottom])
-						)
+					VStack {
+						VStack {
+							content()
+						}
+					//	.padding(.all, 20) // do NOT enforce padding here; not flexible enough
+						.background(Color(UIColor.systemBackground))
+						.cornerRadius(16)
+					}
+					.overlay(
+						RoundedRectangle(cornerRadius: 16)
+							.stroke(Color(UIColor.secondarySystemBackground), lineWidth: 1.0)
+					)
+					.frame(maxWidth: 600, alignment: .center)
+					.padding(.all, 20)
 				}
 				.zIndex(1)
-				.transition(.move(edge: .bottom))
-			}
+				.transition(.opacity)
+			
+			} // </if animation>
 		}
 		.transition(.identity)
 		.onAppear {
@@ -170,7 +166,7 @@ struct ShortSheetWrapper<Content: View>: View {
 				animation = 1
 			}
 		}
-		.onReceive(shortSheetState.closePublisher) { _ in
+		.onReceive(popoverState.closePublisher) { _ in
 			withAnimation {
 				animation = 2
 			}
@@ -182,13 +178,13 @@ struct ShortSheetWrapper<Content: View>: View {
 	
 	func animationCompleted() {
 		if animation == 1 {
-			// ShortSheet is now visible
+			// Popover is now visible
 			UIAccessibility.post(notification: .screenChanged, argument: nil)
-		}
-		else if animation == 2 {
-			// ShortSheet is now hidden
+		} else if animation == 2 {
+			// Popover is now hidden
 			UIAccessibility.post(notification: .screenChanged, argument: nil)
-			shortSheetState.publisher.send(nil)
+			popoverState.publisher.send(nil)
 		}
 	}
 }
+

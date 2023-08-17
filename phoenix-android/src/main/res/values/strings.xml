@@ -515,9 +515,9 @@
 
     <string name="lnurl_pay_domain">Served by</string>
     <string name="lnurl_pay_meta_description">Payment description</string>
-    <string name="lnurl_pay_comment_title">Add optional comment</string>
-    <string name="lnurl_pay_comment_message">You can attach a comment to the payment (max %1$d characters). It will be sent to the recipient.</string>
-    <string name="lnurl_pay_comment_hint">No comment</string>
+    <string name="lnurl_pay_comment_add_button">Attach a message</string>
+    <string name="lnurl_pay_comment_label">My message</string>
+    <string name="lnurl_pay_comment_instructions">You can attach a message to the payment. This message will be sent to the recipient.</string>
     <string name="lnurl_pay_pay_button">Pay</string>
     <string name="lnurl_pay_requesting_invoice">Requesting invoice…</string>
     <string name="lnurl_pay_checking_invoice">Checking invoice…</string>
@@ -656,9 +656,12 @@
 
     <!-- settings: currencies -->
 
-    <string name="currency_ars_bm">Argentine Peso (blue market)</string>
-    <string name="currency_cup_fm">Cuban Peso (free market)</string>
-    <string name="currency_lbp_bm">Lebanese Pound (black market)</string>
+    <string name="currency_ars_official">Argentine Peso (official rate)</string>
+    <string name="currency_ars_bm">Argentine Peso</string>
+    <string name="currency_cup_official">Cuban Peso (official rate)</string>
+    <string name="currency_cup_fm">Cuban Peso</string>
+    <string name="currency_lbp_official">Lebanese Pound (official rate)</string>
+    <string name="currency_lbp_bm">Lebanese Pound</string>
 
     <!-- payments history -->
 

@@ -156,9 +156,9 @@
 
     <!-- payment details -->
 
-    <string name="paymentdetails_funding_fees_label">Frais de minage</string>
+    <string name="paymentdetails_funding_fees_label">Frais de\nminage</string>
     <string name="paymentdetails_funding_fees_desc">Frais payés aux mineurs du réseau Bitcoin pour traiter la transaction on-chain.</string>
-    <string name="paymentdetails_service_fees_label">Frais de service</string>
+    <string name="paymentdetails_service_fees_label">Frais de\nservice</string>
     <string name="paymentdetails_service_fees_desc">Frais payés pour la création d\'un nouveau canal de paiement. Cette action n\'est pas toujours nécessaire.</string>
 
     <!-- lnurl -->

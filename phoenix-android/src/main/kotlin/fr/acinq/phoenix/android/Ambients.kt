@@ -69,7 +69,7 @@ val fiatRate: ExchangeRate.BitcoinPriceRate?
                     )
                 }
             }
-             else -> null
+            else -> null
         }
     }
 

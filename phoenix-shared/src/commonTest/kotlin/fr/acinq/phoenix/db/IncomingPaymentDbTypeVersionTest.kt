@@ -66,6 +66,7 @@ class IncomingPaymentDbTypeVersionTest {
     }
 
     @Test
+    @Suppress("DEPRECATION")
     fun incoming_receivedwith_multipart_v0_lightning() {
         val receivedWith = listOf(IncomingPayment.ReceivedWith.LightningPayment(100_000.msat, ByteVector32.One, 2L))
         val deserialized = IncomingReceivedWithData.deserialize(
@@ -90,6 +91,7 @@ class IncomingPaymentDbTypeVersionTest {
     }
 
     @Test
+    @Suppress("DEPRECATION")
     fun incoming_receivedwith_multipart_v0_newchannel_paytoopen() {
         // pay-to-open with MULTIPARTS_V0: amount contains the fee which is a special case that must be fixed when deserializing.
         val receivedWith = listOf(IncomingPayment.ReceivedWith.NewChannel(1_995_000.msat, 5_000.msat, 0.sat, channelId1, ByteVector32.Zeroes, confirmedAt = 0, lockedAt = 0))
@@ -116,6 +118,7 @@ class IncomingPaymentDbTypeVersionTest {
     }
 
     @Test
+    @Suppress("DEPRECATION")
     fun incoming_receivedwith_multipart_v0_newchannel_swapin_nochannel() {
         val receivedWith = listOf(IncomingPayment.ReceivedWith.NewChannel(111111111.msat, 1000.msat, 0.sat, ByteVector32.Zeroes, ByteVector32.Zeroes, confirmedAt = 0, lockedAt = 0))
         val deserialized = IncomingReceivedWithData.deserialize(
@@ -140,6 +143,7 @@ class IncomingPaymentDbTypeVersionTest {
     }
 
     @Test
+    @Suppress("DEPRECATION")
     fun incoming_receivedwith_lightning_legacy() {
         val deserialized = IncomingReceivedWithData.deserialize(
             IncomingReceivedWithTypeVersion.LIGHTNING_PAYMENT_V0,
@@ -155,6 +159,7 @@ class IncomingPaymentDbTypeVersionTest {
     }
 
     @Test
+    @Suppress("DEPRECATION")
     fun incoming_receivedwith_newchannel_legacy() {
         val deserialized = IncomingReceivedWithData.deserialize(
             IncomingReceivedWithTypeVersion.NEW_CHANNEL_V0,

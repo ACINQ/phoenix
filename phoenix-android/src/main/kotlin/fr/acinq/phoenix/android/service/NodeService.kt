@@ -22,6 +22,7 @@ import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
+import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
@@ -217,6 +218,13 @@ class NodeService : Service() {
         requestCheckLegacyChannels: Boolean,
     ): WalletState.Started {
         log.info("starting up node...")
+
+        // migrate legacy preferences if needed
+        if (LegacyPrefsDatastore.getPrefsMigrationExpected(applicationContext).first() == true) {
+            LegacyMigrationHelper.migrateLegacyPreferences(applicationContext)
+            LegacyPrefsDatastore.savePrefsMigrationExpected(applicationContext, false)
+        }
+
         val business = (applicationContext as? PhoenixApplication)?.business ?: throw RuntimeException("invalid context type, should be PhoenixApplication")
         val electrumServer = UserPrefs.getElectrumServer(applicationContext).first()
         val isTorEnabled = UserPrefs.getIsTorEnabled(applicationContext).first()

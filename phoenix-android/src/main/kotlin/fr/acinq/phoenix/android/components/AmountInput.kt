@@ -134,7 +134,10 @@ object AmountInputHelper {
                     onConverted(context.getString(R.string.utils_no_conversion))
                     null
                 } else {
-                    val msat = amount.toMilliSatoshi(rate.price)
+                    // convert fiat amount to millisat, but truncate the msat part to avoid issues with
+                    // services/wallets that don't understand millisats. We only do this when converting
+                    // from fiat. If amount is in btc, we use the real value entered by the user.
+                    val msat = amount.toMilliSatoshi(rate.price).truncateToSatoshi().toMilliSatoshi()
                     if (msat.toUnit(BitcoinUnit.Btc) > 21e6) {
                         onError(context.getString(R.string.send_error_amount_too_large))
                         null
@@ -555,7 +558,7 @@ private fun UnitDropdown(
     var selectedIndex by remember { mutableStateOf(maxOf(units.lastIndexOf(selectedUnit), 0)) }
     Box(modifier = modifier.wrapContentSize(Alignment.TopStart)) {
         Button(
-            text = units[selectedIndex].toString(),
+            text = units[selectedIndex].displayCode,
             icon = R.drawable.ic_chevron_down,
             onClick = { expanded = true },
             padding = internalPadding,
@@ -569,14 +572,14 @@ private fun UnitDropdown(
                 onDismiss()
             },
         ) {
-            units.forEachIndexed { index, s ->
+            units.forEachIndexed { index, unit ->
                 DropdownMenuItem(onClick = {
                     selectedIndex = index
                     expanded = false
                     onDismiss()
                     onUnitChange(units[index])
                 }) {
-                    Text(text = s.toString())
+                    Text(text = unit.displayCode)
                 }
             }
         }

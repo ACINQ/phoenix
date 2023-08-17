@@ -79,6 +79,9 @@ class CloudKitDb(
             val ckQueries = database.cloudKitPaymentsQueries
             val inQueries = IncomingQueries(database)
             val outQueries = OutgoingQueries(database)
+            val spliceOutgoingQueries = SpliceOutgoingQueries(database)
+            val channelCloseOutgoingQueries = ChannelCloseOutgoingQueries(database)
+            val spliceCpfpOutgoingQueries = SpliceCpfpOutgoingQueries(database)
             val metaQueries = MetadataQueries(database)
 
             val rowids = mutableListOf<Long>()
@@ -101,32 +104,29 @@ class CloudKitDb(
 
                 batch.forEach { row ->
                     rowids.add(row.rowid)
-                    when (row.type) {
-                        WalletPaymentId.DbType.INCOMING.value -> {
-                            try {
+                    try {
+                        val paymentId: WalletPaymentId? = when (row.type) {
+                            WalletPaymentId.DbType.INCOMING.value -> {
                                 WalletPaymentId.IncomingPaymentId.fromString(row.id)
-                            } catch (e: Exception) {
-                                null
                             }
-                        }
-                        WalletPaymentId.DbType.OUTGOING.value -> {
-                            try {
+                            WalletPaymentId.DbType.OUTGOING.value -> {
                                 WalletPaymentId.LightningOutgoingPaymentId.fromString(row.id)
-                            } catch (e: Exception) {
-                                null
                             }
-                        }
-                        WalletPaymentId.DbType.SPLICE_OUTGOING.value -> {
-                            try {
+                            WalletPaymentId.DbType.SPLICE_OUTGOING.value -> {
                                 WalletPaymentId.SpliceOutgoingPaymentId.fromString(row.id)
-                            } catch (e: Exception) {
-                                null
                             }
+                            WalletPaymentId.DbType.CHANNEL_CLOSE_OUTGOING.value -> {
+                                WalletPaymentId.ChannelCloseOutgoingPaymentId.fromString(row.id)
+                            }
+                            WalletPaymentId.DbType.SPLICE_CPFP_OUTGOING.value -> {
+                                WalletPaymentId.SpliceCpfpOutgoingPaymentId.fromString(row.id)
+                            }
+                            else -> null
                         }
-                        else -> null
-                    }?.let { paymentId ->
-                        rowidMap[row.rowid] = paymentId
-                    }
+                        paymentId?.let {
+                            rowidMap[row.rowid] = it
+                        }
+                    } catch (e: Exception) {}
                 } // </batch.forEach>
 
                 // Remember: there could be duplicates
@@ -134,38 +134,80 @@ class CloudKitDb(
 
                 // Step 3 of 5:
                 // Fetch the corresponding payment info from the database.
-                // Depending on the type of WalletPaymentId, this will be either:
-                // - IncomingPayment
-                // - OutgoingPayment
-                //
                 // In order to optimize disk access, we fetch from 1 table at a time.
 
                 val metadataPlaceholder = WalletPaymentMetadata()
                 val emptyOptions = WalletPaymentFetchOptions.None
 
-                uniquePaymentIds.filterIsInstance<WalletPaymentId.IncomingPaymentId>().forEach { paymentId ->
-                    inQueries.getIncomingPayment(
-                        paymentHash = paymentId.paymentHash
-                    )?.let { payment ->
-                        rowMap[paymentId] = WalletPaymentInfo(
-                            payment = payment,
-                            metadata = metadataPlaceholder,
-                            fetchOptions = emptyOptions
-                        )
-                    }
-                } // </incoming_payments>
+                uniquePaymentIds
+                    .filterIsInstance<WalletPaymentId.IncomingPaymentId>()
+                    .forEach { paymentId ->
+                        inQueries.getIncomingPayment(
+                            paymentHash = paymentId.paymentHash
+                        )?.let { payment ->
+                            rowMap[paymentId] = WalletPaymentInfo(
+                                payment = payment,
+                                metadata = metadataPlaceholder,
+                                fetchOptions = emptyOptions
+                            )
+                        }
+                    } // </incoming_payments>
 
-                uniquePaymentIds.filterIsInstance<WalletPaymentId.LightningOutgoingPaymentId>().forEach { paymentId ->
-                    outQueries.getPaymentRelaxed(
-                        id = paymentId.id
-                    )?.let { payment ->
-                        rowMap[paymentId] = WalletPaymentInfo(
-                            payment = payment,
-                            metadata = metadataPlaceholder,
-                            fetchOptions = emptyOptions
-                        )
-                    }
-                } // </outgoing_payments>
+                uniquePaymentIds
+                    .filterIsInstance<WalletPaymentId.LightningOutgoingPaymentId>()
+                    .forEach { paymentId ->
+                        outQueries.getPaymentRelaxed(
+                            id = paymentId.id
+                        )?.let { payment ->
+                            rowMap[paymentId] = WalletPaymentInfo(
+                                payment = payment,
+                                metadata = metadataPlaceholder,
+                                fetchOptions = emptyOptions
+                            )
+                        }
+                    } // </outgoing_payments>
+
+                uniquePaymentIds
+                    .filterIsInstance<WalletPaymentId.SpliceOutgoingPaymentId>()
+                    .forEach { paymentId ->
+                        spliceOutgoingQueries.getSpliceOutPayment(
+                            id = paymentId.id
+                        )?.let { payment ->
+                            rowMap[paymentId] = WalletPaymentInfo(
+                                payment = payment,
+                                metadata = metadataPlaceholder,
+                                fetchOptions = emptyOptions
+                            )
+                        }
+                    } // </outgoing_splice_payments>
+
+                uniquePaymentIds
+                    .filterIsInstance<WalletPaymentId.ChannelCloseOutgoingPaymentId>()
+                    .forEach { paymentId ->
+                        channelCloseOutgoingQueries.getChannelCloseOutgoingPayment(
+                            id = paymentId.id
+                        )?.let { payment ->
+                            rowMap[paymentId] = WalletPaymentInfo(
+                                payment = payment,
+                                metadata = metadataPlaceholder,
+                                fetchOptions = emptyOptions
+                            )
+                        }
+                    } // </outgoing_channel_close_payments>
+
+                uniquePaymentIds
+                    .filterIsInstance<WalletPaymentId.SpliceCpfpOutgoingPaymentId>()
+                    .forEach { paymentId ->
+                        spliceCpfpOutgoingQueries.getCpfp(
+                            id = paymentId.id
+                        )?.let { payment ->
+                            rowMap[paymentId] = WalletPaymentInfo(
+                                payment = payment,
+                                metadata = metadataPlaceholder,
+                                fetchOptions = emptyOptions
+                            )
+                        }
+                    } // </outgoing_splice_cpfp_payments>
 
                 val fetchOptions = WalletPaymentFetchOptions.All
                 uniquePaymentIds.forEach { paymentId ->
@@ -219,6 +261,12 @@ class CloudKitDb(
                                 WalletPaymentId.DbType.INCOMING.value ->
                                     incoming.add(row.unpadded_size)
                                 WalletPaymentId.DbType.OUTGOING.value ->
+                                    outgoing.add(row.unpadded_size)
+                                WalletPaymentId.DbType.SPLICE_OUTGOING.value ->
+                                    outgoing.add(row.unpadded_size)
+                                WalletPaymentId.DbType.CHANNEL_CLOSE_OUTGOING.value ->
+                                    outgoing.add(row.unpadded_size)
+                                WalletPaymentId.DbType.SPLICE_CPFP_OUTGOING.value ->
                                     outgoing.add(row.unpadded_size)
                             }
                         }
@@ -324,10 +372,11 @@ class CloudKitDb(
         // Perhaps because the List was created in Swift ?
         // The workaround seems to be to copy the list here,
         // or otherwise process it outside of the `withContext` below.
-        val incomingList = downloadedPayments.mapNotNull { it as? IncomingPayment }
-        val outgoingList = downloadedPayments.mapNotNull { it as? LightningOutgoingPayment }
+        val incomingList = downloadedPayments.filterIsInstance<IncomingPayment>()
+        val outgoingList = downloadedPayments.filterIsInstance<LightningOutgoingPayment>()
         val spliceOutList = downloadedPayments.filterIsInstance<SpliceOutgoingPayment>()
         val channelCloseList = downloadedPayments.filterIsInstance<ChannelCloseOutgoingPayment>()
+        val spliceCpfpList = downloadedPayments.filterIsInstance<SpliceCpfpOutgoingPayment>()
 
         // We are seeing crashes when accessing the ByteArray values in updateMetadata.
         // So we need a workaround.
@@ -338,6 +387,9 @@ class CloudKitDb(
             val ckQueries = database.cloudKitPaymentsQueries
             val inQueries = database.incomingPaymentsQueries
             val outQueries = database.outgoingPaymentsQueries
+            val spliceOutQueries = SpliceOutgoingQueries(database)
+            val channelCloseOutQueries = ChannelCloseOutgoingQueries(database)
+            val spliceCpfpQueries = SpliceCpfpOutgoingQueries(database)
             val metaQueries = database.paymentsMetadataQueries
 
             database.transaction {
@@ -437,12 +489,79 @@ class CloudKitDb(
                     }
                 } // </outgoing_payments table>
 
-                spliceOutList.forEach {
-                    TODO("handle splice outs")
+                spliceOutList.forEach { payment ->
+
+                    val existing = spliceOutQueries.getSpliceOutPayment(id = payment.id)
+                    if (existing == null) {
+                        spliceOutQueries.addSpliceOutgoingPayment(payment = payment)
+
+                    } else {
+                        val confirmedAt = payment.confirmedAt
+                        if (existing.confirmedAt == null && confirmedAt != null) {
+                            spliceOutQueries.setConfirmed(
+                                id = payment.id,
+                                confirmedAt = confirmedAt
+                            )
+                        }
+
+                        val lockedAt = payment.lockedAt
+                        if (existing.lockedAt == null && lockedAt != null) {
+                            spliceOutQueries.setLocked(
+                                id = payment.id,
+                                lockedAt = lockedAt
+                            )
+                        }
+                    }
                 }
 
-                channelCloseList.forEach {
-                    TODO("handle closing")
+                channelCloseList.forEach { payment ->
+
+                    val existing = channelCloseOutQueries.getChannelCloseOutgoingPayment(id = payment.id)
+                    if (existing == null) {
+                        channelCloseOutQueries.addChannelCloseOutgoingPayment(payment = payment)
+
+                    } else {
+                        val confirmedAt = payment.confirmedAt
+                        if (existing.confirmedAt == null && confirmedAt != null) {
+                            channelCloseOutQueries.setConfirmed(
+                                id = payment.id,
+                                confirmedAt = confirmedAt
+                            )
+                        }
+
+                        val lockedAt = payment.lockedAt
+                        if (existing.lockedAt == null && lockedAt != null) {
+                            channelCloseOutQueries.setLocked(
+                                id = payment.id,
+                                lockedAt = lockedAt
+                            )
+                        }
+                    }
+                }
+
+                spliceCpfpList.forEach { payment ->
+
+                    val existing = spliceCpfpQueries.getCpfp(id = payment.id)
+                    if (existing == null) {
+                        spliceCpfpQueries.addCpfpPayment(payment = payment)
+
+                    } else {
+                        val confirmedAt = payment.confirmedAt
+                        if (existing.confirmedAt == null && confirmedAt != null) {
+                            spliceCpfpQueries.setConfirmed(
+                                id = payment.id,
+                                confirmedAt = confirmedAt
+                            )
+                        }
+
+                        val lockedAt = payment.lockedAt
+                        if (existing.lockedAt == null && lockedAt != null) {
+                            spliceCpfpQueries.setLocked(
+                                id = payment.id,
+                                lockedAt = lockedAt
+                            )
+                        }
+                    }
                 }
 
                 downloadedPaymentsMetadata.forEach { (paymentId, row) ->

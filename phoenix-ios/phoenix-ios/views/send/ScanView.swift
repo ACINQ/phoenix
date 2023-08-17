@@ -28,11 +28,11 @@ struct ScanView: View {
 	@State var ignoreScanner: Bool = false
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
-	@Environment(\.popoverState) var popoverState: PopoverState
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deviceInfo: DeviceInfo
+	@EnvironmentObject var popoverState: PopoverState
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification
@@ -570,7 +570,7 @@ struct ManualInput: View, ViewName {
 	
 	@State var input = ""
 	
-	@Environment(\.smartModalState) private var smartModalState: SmartModalState
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	@ViewBuilder
 	var body: some View {

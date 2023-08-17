@@ -359,8 +359,9 @@ fileprivate struct DisplayConfigurationList: View {
 				case .backup             : break
 				case .drainWallet        : break
 				case .electrum           : break
-				case .backgroundPayments : newNavLinkTag = NavLinkTag.BackgroundPaymentsSelector // RecentPaymentsSelector
+				case .backgroundPayments : newNavLinkTag = NavLinkTag.BackgroundPaymentsSelector
 				case .liquiditySettings  : break
+				case .forceCloseChannels : break
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {

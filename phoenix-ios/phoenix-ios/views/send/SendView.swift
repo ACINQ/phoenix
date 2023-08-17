@@ -137,9 +137,8 @@ struct SendView: MVIView {
 			
 		} else if let reason = model.reason as? Scan.BadRequestReason_ChainMismatch {
 			
-			let requestChain = reason.actual.name
 			msg = NSLocalizedString(
-				"The invoice is for \(requestChain), but you're on \(reason.actual.name)",
+				"The invoice is not for \(reason.expected.name)",
 				comment: "Error message - scanning lightning invoice"
 			)
 		

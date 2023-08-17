@@ -21,7 +21,7 @@ struct AppStatusPopover: View {
 	@State var syncState: SyncTxManager_State = .initializing
 	@State var pendingSettings: SyncTxManager_PendingSettings? = nil
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
+	@EnvironmentObject var popoverState: PopoverState
 	
 	let syncManager = Biz.syncManager!.syncTxManager
 	

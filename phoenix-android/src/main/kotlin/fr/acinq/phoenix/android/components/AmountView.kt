@@ -93,7 +93,7 @@ fun AmountView(
         if (!isRedacted && showUnit) {
             Spacer(modifier = Modifier.width(separatorSpace))
             Text(
-                text = unit.toString(),
+                text = unit.displayCode,
                 style = unitTextStyle,
                 modifier = Modifier.alignBy(FirstBaseline)
             )

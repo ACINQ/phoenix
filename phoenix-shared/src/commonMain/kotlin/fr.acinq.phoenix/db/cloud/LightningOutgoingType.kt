@@ -66,7 +66,7 @@ data class LightningOutgoingPaymentWrapper(
                 LegacyChannelCloseHelper.convertLegacyToChannelClose(
                     id = id,
                     recipientAmount = msat.msat,
-                    partsAmount = closingTxsParts.sumOf { it.sat }.sat,
+                    partsAmount = closingTxsParts.takeIf { it.isNotEmpty() }?.sumOf { it.sat }?.sat,
                     partsTxId = closingTxsParts.firstOrNull()?.txId?.byteVector32(),
                     detailsBlob = this.details.blob,
                     statusBlob = this.status?.blob,

@@ -31,7 +31,7 @@ import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.FailureMessage
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.PaymentsDatabase
-import fr.acinq.phoenix.db.didCompleteWalletPayment
+import fr.acinq.phoenix.db.didSaveWalletPayment
 import fr.acinq.phoenix.utils.migrations.LegacyChannelCloseHelper
 import fr.acinq.secp256k1.Hex
 
@@ -96,7 +96,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
             if (queries.changes().executeAsOne() != 1L) {
                 result = false
             } else {
-                didCompleteWalletPayment(WalletPaymentId.LightningOutgoingPaymentId(id), database)
+                didSaveWalletPayment(WalletPaymentId.LightningOutgoingPaymentId(id), database)
             }
         }
         return result

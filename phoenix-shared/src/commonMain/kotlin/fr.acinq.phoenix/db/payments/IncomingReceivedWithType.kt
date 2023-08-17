@@ -194,7 +194,15 @@ sealed class IncomingReceivedWithData {
                 IncomingReceivedWithTypeVersion.MULTIPARTS_V1 -> DbTypesHelper.polymorphicFormat.decodeFromString(SetSerializer(PolymorphicSerializer(Part::class)), json).map {
                     when (it) {
                         is Part.Htlc.V0 -> IncomingPayment.ReceivedWith.LightningPayment(it.amount, it.channelId, it.htlcId)
-                        is Part.NewChannel.V0 -> null // does not apply, MULTIPARTS_V1 only use new-channel parts >= V1
+                        is Part.NewChannel.V0 -> IncomingPayment.ReceivedWith.NewChannel(
+                            amount = it.amount,
+                            serviceFee = it.fees,
+                            miningFee = 0.sat,
+                            channelId = it.channelId ?: ByteVector32.Zeroes,
+                            txId = ByteVector32.Zeroes,
+                            confirmedAt = 0,
+                            lockedAt = 0,
+                        )
                         is Part.NewChannel.V1 -> IncomingPayment.ReceivedWith.NewChannel(
                             amount = it.amount,
                             serviceFee = it.fees,

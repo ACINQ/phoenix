@@ -80,7 +80,7 @@ struct ElectrumAddressSheet: View {
 	@State var titleWidth: CGFloat? = nil
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	init(mvi: MVIState<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>) {
 		self.mvi = mvi

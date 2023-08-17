@@ -3,7 +3,7 @@ import PhoenixShared
 import Popovers
 import os.log
 
-#if DEBUG && false
+#if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
 	category: "SummaryView"
@@ -21,16 +21,21 @@ struct SummaryView: View {
 	
 	let fetchOptions = WalletPaymentFetchOptions.companion.All
 	
+	@State var blockchainConfirmations: Int? = nil
+	@State var showBlockchainExplorerOptions = false
+	
 	@State var showOriginalFiatValue = GlobalEnvironment.currencyPrefs.showOriginalFiatValue
 	@State var showFiatValueExplanation = false
 	
 	@State var showDeletePaymentConfirmationDialog = false
 	
 	@State var didAppear = false
-	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@State var popToDestination: PopToDestination? = nil
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	enum ButtonWidth: Preference {}
 	let buttonWidthReader = GeometryPreferenceReader(
@@ -120,9 +125,7 @@ struct SummaryView: View {
 						Button {
 							closeAction()
 						} label: {
-							Image("ic_cross")
-								.resizable()
-								.frame(width: 30, height: 30)
+							Image(systemName: "xmark").imageScale(.medium).font(.title2)
 						}
 						.padding()
 						.accessibilityLabel("Close sheet")
@@ -135,6 +138,9 @@ struct SummaryView: View {
 		} // </ZStack>
 		.onAppear {
 			onAppear()
+		}
+		.task {
+			await monitorBlockchain()
 		}
 	}
 	
@@ -181,7 +187,10 @@ struct SummaryView: View {
 				.font(Font.title2.bold())
 				.padding(.bottom, 2)
 				
-				if let completedAtDate = payment.completedAtDate {
+				if let onChainPayment = payment as? Lightning_kmpOnChainOutgoingPayment {
+					header_blockchainStatus(onChainPayment)
+					
+				} else if let completedAtDate = payment.completedAtDate {
 					Text(completedAtDate.format())
 						.font(.subheadline)
 						.foregroundColor(.secondary)
@@ -205,23 +214,11 @@ struct SummaryView: View {
 					.padding(.bottom, 6)
 					.accessibilityLabel("Pending payment")
 					.accessibilityHint("Waiting for confirmations")
-				if let depth = minFundingDepth() {
-					let minutes = depth * 10
-					Text("requires \(depth) confirmations")
-						.font(.footnote)
-						.multilineTextAlignment(.center)
-						.foregroundColor(.secondary)
-					Text("≈\(minutes) minutes")
-						.font(.footnote)
-						.multilineTextAlignment(.center)
-						.foregroundColor(.secondary)
+				
+				if let onChainPayment = payment as? Lightning_kmpOnChainOutgoingPayment {
+					header_blockchainStatus(onChainPayment)
 				}
-				if let broadcastDate = onChainBroadcastDate() {
-					Text(broadcastDate.format())
-						.font(.subheadline)
-						.foregroundColor(.secondary)
-						.padding(.top, 12)
-				}
+				
 			} // </VStack>
 			.padding(.bottom, 30)
 			
@@ -269,6 +266,100 @@ struct SummaryView: View {
 			
 		} else {
 			EmptyView()
+		}
+	}
+	
+	@ViewBuilder
+	func header_blockchainStatus(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) -> some View {
+		
+		switch blockchainConfirmations {
+		case .none:
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				ProgressView()
+					.progressViewStyle(CircularProgressViewStyle(tint: Color.secondary))
+				
+				Text("Checking blockchain…")
+					.font(.callout)
+					.foregroundColor(.secondary)
+			}
+			.padding(.top, 10)
+			
+		case .some(let confirmations):
+			
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				
+				Button {
+					showBlockchainExplorerOptions = true
+				} label: {
+					if confirmations == 1 {
+						Text("1 confirmation")
+							.font(.subheadline)
+					} else if confirmations < 7 {
+						Text("\(confirmations) confirmations")
+							.font(.subheadline)
+					} else {
+						Text("6+ confirmations")
+							.font(.subheadline)
+					}
+				}
+				.confirmationDialog("Blockchain Explorer",
+					isPresented: $showBlockchainExplorerOptions,
+					titleVisibility: .automatic
+				) {
+					Button {
+						exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteMempoolSpace())
+					} label: {
+						Text(verbatim: "Mempool.space") // no localization needed
+					}
+					Button {
+						exploreTx(onChainPayment.txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
+					} label: {
+						Text(verbatim: "Blockstream.info") // no localization needed
+					}
+					Button("Copy transaction id") {
+						copyTxId(onChainPayment.txId)
+					}
+				} // </confirmationDialog>
+				
+				if confirmations == 0 {
+					NavigationLink(destination: cpfpView(onChainPayment)) {
+						Label {
+							Text("Accelerate transaction")
+						} icon: {
+							Image(systemName: "paperplane").imageScale(.small)
+						}
+						.font(.subheadline)
+					}
+					.padding(.top, 3)
+				}
+				
+				if let confirmedAt = onChainPayment.confirmedAt?.int64Value.toDate(from: .milliseconds) {
+				
+					Text("confirmed")
+						.font(.subheadline)
+						.foregroundColor(.secondary)
+						.padding(.top, 20)
+					
+					Text(confirmedAt.format())
+						.font(.subheadline)
+						.foregroundColor(.secondary)
+						.padding(.top, 3)
+					
+				} else {
+					
+					Text("broadcast")
+						.font(.subheadline)
+						.foregroundColor(.secondary)
+						.padding(.top, 20)
+					
+					Text(onChainPayment.createdAt.toDate(from: .milliseconds).format())
+						.font(.subheadline)
+						.foregroundColor(.secondary)
+						.padding(.top, 3)
+				}
+			}
+			.padding(.top, 10)
 		}
 	}
 	
@@ -395,10 +486,14 @@ struct SummaryView: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 		
 			NavigationLink(destination: detailsView()) {
-				Text("Details")
-					.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
-					.read(buttonWidthReader)
-					.read(buttonHeightReader)
+				Label {
+					Text("Details")
+				} icon: {
+					Image(systemName: "magnifyingglass").imageScale(.small)
+				}
+				.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
+				.read(buttonWidthReader)
+				.read(buttonHeightReader)
 			}
 			
 			if let buttonHeight = buttonHeight {
@@ -406,10 +501,14 @@ struct SummaryView: View {
 			}
 			
 			NavigationLink(destination: editInfoView()) {
-				Text("Edit")
-					.frame(minWidth: buttonWidth, alignment: Alignment.leading)
-					.read(buttonWidthReader)
-					.read(buttonHeightReader)
+				Label {
+					Text("Edit")
+				} icon: {
+					Image(systemName: "pencil.line").imageScale(.small)
+				}
+				.frame(minWidth: buttonWidth, alignment: Alignment.leading)
+				.read(buttonWidthReader)
+				.read(buttonHeightReader)
 			}
 		}
 		.padding([.top, .bottom])
@@ -425,10 +524,14 @@ struct SummaryView: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 			
 			NavigationLink(destination: detailsView()) {
-				Text("Details")
-					.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
-					.read(buttonWidthReader)
-					.read(buttonHeightReader)
+				Label {
+					Text("Details")
+				} icon: {
+					Image(systemName: "magnifyingglass").imageScale(.small)
+				}
+				.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
+				.read(buttonWidthReader)
+				.read(buttonHeightReader)
 			}
 			
 			if let buttonHeight = buttonHeight {
@@ -436,10 +539,14 @@ struct SummaryView: View {
 			}
 			
 			NavigationLink(destination: editInfoView()) {
-				Text("Edit")
-					.frame(minWidth: buttonWidth, alignment: Alignment.center)
-					.read(buttonWidthReader)
-					.read(buttonHeightReader)
+				Label {
+					Text("Edit")
+				} icon: {
+					Image(systemName: "pencil.line").imageScale(.small)
+				}
+				.frame(minWidth: buttonWidth, alignment: Alignment.center)
+				.read(buttonWidthReader)
+				.read(buttonHeightReader)
 			}
 			
 			if let buttonHeight = buttonHeight {
@@ -449,11 +556,15 @@ struct SummaryView: View {
 			Button {
 				showDeletePaymentConfirmationDialog = true
 			} label: {
-				Text("Delete")
-					.foregroundColor(.appNegative)
-					.frame(minWidth: buttonWidth, alignment: Alignment.leading)
-					.read(buttonWidthReader)
-					.read(buttonHeightReader)
+				Label {
+					Text("Delete")
+				} icon: {
+					Image(systemName: "eraser.line.dashed").imageScale(.small)
+				}
+				.foregroundColor(.appNegative)
+				.frame(minWidth: buttonWidth, alignment: Alignment.leading)
+				.read(buttonWidthReader)
+				.read(buttonHeightReader)
 			}
 			.confirmationDialog("Delete payment?",
 				isPresented: $showDeletePaymentConfirmationDialog,
@@ -472,7 +583,7 @@ struct SummaryView: View {
 	@ViewBuilder
 	func detailsView() -> some View {
 		DetailsView(
-			type: type,
+			type: wrappedType(),
 			paymentInfo: $paymentInfo,
 			showOriginalFiatValue: $showOriginalFiatValue,
 			showFiatValueExplanation: $showFiatValueExplanation
@@ -482,43 +593,22 @@ struct SummaryView: View {
 	@ViewBuilder
 	func editInfoView() -> some View {
 		EditInfoView(
-			type: type,
+			type: wrappedType(),
 			paymentInfo: $paymentInfo
+		)
+	}
+	
+	@ViewBuilder
+	func cpfpView(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) -> some View {
+		CpfpView(
+			type: wrappedType(),
+			onChainPayment: onChainPayment
 		)
 	}
 	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
-	
-	func minFundingDepth() -> Int32? {
-		
-		guard
-			let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment,
-			let received = incomingPayment.received,
-			let newChannel = received.receivedWith.compactMap({ $0.asNewChannel() }).first,
-			let channel = Biz.business.peerManager.getChannelWithCommitments(channelId: newChannel.channelId),
-			let nodeParams = Biz.business.nodeParamsManager.nodeParams.value_ as? Lightning_kmpNodeParams
-		else {
-			return nil
-		}
-		
-		return channel.minDepthForFunding(nodeParams: nodeParams)
-	}
-	
-	func onChainBroadcastDate() -> Date? {
-		
-		if let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment {
-			
-			if let _ = incomingPayment.origin.asOnChain() {
-				if let received = incomingPayment.received {
-					return received.receivedAtDate
-				}
-			}
-		}
-		
-		return nil
-	}
 	
 	func formattedAmount() -> FormattedAmount {
 		
@@ -546,6 +636,91 @@ struct SummaryView: View {
 				case .present : showOriginalFiatValue = false
 			}
 			showFiatValueExplanation = true
+		}
+	}
+	
+	func wrappedType() -> PaymentViewType {
+		
+		switch type {
+		case .sheet(_):
+			return type
+		case .embedded(_):
+			return .embedded(popTo: popToWrapper)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Tasks
+	// --------------------------------------------------
+	
+	func updateConfirmations(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) async -> Int {
+		log.trace("checkConfirmations()")
+		
+		do {
+			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: onChainPayment.txId)
+			
+			let confirmations = result?.intValue ?? 0
+			log.debug("checkConfirmations(): => \(confirmations)")
+			
+			self.blockchainConfirmations = confirmations
+			return confirmations
+			
+		} catch {
+			log.error("checkConfirmations(): error: \(error)")
+			return 0
+		}
+	}
+	
+	func monitorBlockchain() async {
+		log.trace("monitorBlockchain()")
+		
+		guard let onChainPayment = paymentInfo.payment as? Lightning_kmpOnChainOutgoingPayment else {
+			log.debug("monitorBlockchain(): not an on-chain payment")
+			return
+		}
+		
+		if let confirmedAtDate = onChainPayment.confirmedAtDate {
+			let elapsed = confirmedAtDate.timeIntervalSinceNow * -1.0
+			if elapsed > 24.hours() {
+				// It was marked as mined more than 24 hours ago.
+				// So there's really no need to check the exact confirmation count anymore.
+				log.debug("monitorBlockchain(): confirmedAt > 24.hours.ago")
+				self.blockchainConfirmations = 7
+				return
+			}
+		}
+		
+		let confirmations = await updateConfirmations(onChainPayment)
+		if confirmations > 6 {
+			// No need to continue checking confirmation count,
+			// because the UI displays "6+" from this point forward.
+			log.debug("monitorBlockchain(): confirmations > 6")
+			return
+		}
+		
+		for await notification in Biz.business.electrumClient.notificationsPublisher().values {
+			
+			if notification is Lightning_kmpHeaderSubscriptionResponse {
+				// A new block was mined !
+				// Update confirmation count if needed.
+				let confirmations = await updateConfirmations(onChainPayment)
+				if confirmations > 6 {
+					// No need to continue checking confirmation count,
+					// because the UI displays "6+" from this point forward.
+					log.debug("monitorBlockchain(): confirmations > 6")
+					break
+				}
+				
+			} else {
+				log.debug("monitorBlockchain(): notification isNot HeaderSubscriptionResponse")
+			}
+			
+			if Task.isCancelled {
+				log.debug("monitorBlockchain(): Task.isCancelled")
+				break
+			} else {
+				log.debug("monitorBlockchain(): Waiting for next electrum notification...")
+			}
 		}
 	}
 	
@@ -600,12 +775,53 @@ struct SummaryView: View {
 					paymentInfo = result
 				}
 			}
+			
+			if let destination = popToDestination {
+				log.debug("popToDestination: \(destination)")
+				
+				popToDestination = nil
+				switch destination {
+				case .RootView(_):
+					log.debug("Unhandled popToDestination")
+					
+				case .ConfigurationView(_):
+					log.debug("Unhandled popToDestination")
+					
+				case .TransactionsView:
+					presentationMode.wrappedValue.dismiss()
+				}
+			}
 		}
 	}
 	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
+	
+	func popToWrapper(_ destination: PopToDestination) {
+		log.trace("popToWrapper(\(destination))")
+		
+		popToDestination = destination
+		if case .embedded(let popTo) = type {
+			popTo(destination)
+		}
+	}
+	
+	func exploreTx(_ txId: Bitcoin_kmpByteVector32, website: BlockchainExplorer.Website) {
+		log.trace("exploreTX()")
+		
+		let txIdStr = txId.toHex()
+		let txUrlStr = Biz.business.blockchainExplorer.txUrl(txId: txIdStr, website: website)
+		if let txUrl = URL(string: txUrlStr) {
+			UIApplication.shared.open(txUrl)
+		}
+	}
+	
+	func copyTxId(_ txId: Bitcoin_kmpByteVector32) {
+		log.trace("copyTxId()")
+		
+		UIPasteboard.general.string = txId.toHex()
+	}
 	
 	func toggleCurrencyType() -> Void {
 		currencyPrefs.toggleCurrencyType()

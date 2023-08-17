@@ -74,11 +74,11 @@ class ParserTest {
     @Ignore
     fun parse_bitcoin_uri_chain_mismatch() {
         assertEquals(
-            expected = Either.Left(BitcoinAddressError.ChainMismatch(expected = NodeParams.Chain.Testnet, actual = NodeParams.Chain.Mainnet)),
+            expected = Either.Left(BitcoinAddressError.ChainMismatch(expected = NodeParams.Chain.Testnet)),
             actual = Parser.readBitcoinAddress(NodeParams.Chain.Testnet, "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3")
         )
         assertEquals(
-            expected = Either.Left(BitcoinAddressError.ChainMismatch(expected = NodeParams.Chain.Mainnet, actual = NodeParams.Chain.Testnet)),
+            expected = Either.Left(BitcoinAddressError.ChainMismatch(expected = NodeParams.Chain.Mainnet)),
             actual = Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx")
         )
     }

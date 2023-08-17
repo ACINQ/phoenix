@@ -78,3 +78,49 @@ Make sure that the lightning-kmp version that phoenix depends on is the same tha
 Phoenix defines its lightning-kmp version in `buildSrc/src/main/kotlin/Versions.kt`, through the `val lightningKmp = "xxx"` field.
 
 If this value is `snapshot` it means that the current phoenix `master` branch is using a development version of this library. In that case, there may be API changes in lightning-kmp which are not yet supported here.
+
+## Release the Android app
+
+Phoenix releases are built using a dockerized Linux environment. The build is not deterministic yet, we are working on it.
+
+Notes:
+
+- This tool works on Linux and Windows.
+- Following instructions only work for releases after v.1.3.1 (excluded).
+
+### Prerequisites
+
+You don't have to worry about installing any development tool, except:
+1. Docker (Community Edition)
+
+Note: on Windows at least, it is strongly recommended to bump the resources allocation settings from the default values, especially for Memory.
+
+### Building the APK
+
+1. Clone the phoenix project from https://github.com/ACINQ/phoenix ;
+
+2. Open a terminal at the root of the cloned project ;
+
+3. Checkout the tag you want to build, for example:
+
+```shell
+git checkout v1.4.0
+```
+
+4. Build the docker image mirroring the release environment (this typically takes ~20min):
+
+```shell
+docker build -t phoenix_build .
+```
+
+5. Build the APKs using the docker image (takes typically ~10min):
+
+```shell
+# If you're on linux:
+docker run --rm -v $(pwd):/home/ubuntu/phoenix/phoenix-android/build/outputs -w /home/ubuntu/phoenix phoenix_build ./gradlew :phoenix-android:assemble
+
+# If you're on Windows:
+docker run --rm -v ${pwd}:/home/ubuntu/phoenix/phoenix-android/build/outputs -w //home/ubuntu/phoenix phoenix_build ./gradlew :phoenix-android:assemble
+```
+
+6. APK files are found in the `apk` folder.

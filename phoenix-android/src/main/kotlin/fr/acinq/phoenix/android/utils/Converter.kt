@@ -100,17 +100,30 @@ object Converter {
     /** Converts [MilliSatoshi] to a fiat amount. */
     fun MilliSatoshi.toFiat(rate: Double): Double = this.toUnit(BitcoinUnit.Btc) * rate
 
-    fun Double?.toPrettyString(unit: CurrencyUnit, withUnit: Boolean = false, mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE): String = (this?.let { amount ->
-        when {
-            unit == BitcoinUnit.Sat && amount < 1.0 && mSatDisplayPolicy == MSatDisplayPolicy.SHOW_IF_ZERO_SATS -> {
-                SAT_FORMAT_WITH_MILLIS.format(amount)
+    fun Double?.toPrettyString(
+        unit: CurrencyUnit,
+        withUnit: Boolean = false,
+        mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE,
+    ): String {
+        val amount = this?.let {
+            when {
+                unit == BitcoinUnit.Sat && it < 1.0 && mSatDisplayPolicy == MSatDisplayPolicy.SHOW_IF_ZERO_SATS -> {
+                    SAT_FORMAT_WITH_MILLIS.format(it)
+                }
+                unit is BitcoinUnit -> {
+                    getCoinFormat(unit, withMillis = mSatDisplayPolicy == MSatDisplayPolicy.SHOW).format(it)
+                }
+                unit is FiatCurrency -> {
+                    it.takeIf { it >= 0 }?.let { FIAT_FORMAT.format(it) }
+                }
+                else -> "?!"
             }
-            unit is BitcoinUnit -> getCoinFormat(unit, withMillis = mSatDisplayPolicy == MSatDisplayPolicy.SHOW).format(amount)
-            unit is FiatCurrency -> amount.takeIf { it >= 0 }?.let { FIAT_FORMAT.format(it) }
-            else -> "?!"
+        } ?: "N/A"
+        return if (withUnit) {
+            "$amount ${unit.displayCode}"
+        } else {
+            amount
         }
-    } ?: "N/A").run {
-        if (withUnit) "$this $unit" else this
     }
 
     fun MilliSatoshi.toPrettyStringWithFallback(unit: CurrencyUnit, rate: ExchangeRate.BitcoinPriceRate? = null, withUnit: Boolean = false, mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE): String {

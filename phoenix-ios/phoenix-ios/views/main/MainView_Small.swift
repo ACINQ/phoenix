@@ -17,6 +17,7 @@ fileprivate enum NavLinkTag: String {
 	case ReceiveView
 	case SendView
 	case CurrencyConverter
+	case SwapInWalletDetails
 }
 
 struct MainView_Small: View {
@@ -28,14 +29,13 @@ struct MainView_Small: View {
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
 	@State var externalLightningRequest: AppScanController? = nil
 	
+	@State var popToDestination: PopToDestination? = nil
+	
 	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
 	@State private var swiftUiBugWorkaroundIdx = 0
 	
 	@ScaledMetric var sendImageSize: CGFloat = 17
 	@ScaledMetric var receiveImageSize: CGFloat = 18
-	
-	@EnvironmentObject var deviceInfo: DeviceInfo
-	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	let headerButtonHeightReader = GeometryPreferenceReader(
 		key: AppendValue<HeaderButtonHeight>.self,
@@ -57,15 +57,13 @@ struct MainView_Small: View {
 	)
 	@State var footerButtonHeight: CGFloat? = nil
 	
-	@State var footerTruncationDetection_standard: [ContentSizeCategory: Bool] = [:]
-	@State var footerTruncationDetection_condensed: [ContentSizeCategory: Bool] = [:]
+	@State var footerTruncationDetection_standard: [DynamicTypeSize: Bool] = [:]
+	@State var footerTruncationDetection_condensed: [DynamicTypeSize: Bool] = [:]
 	
-	@Environment(\.sizeCategory) var contentSizeCategory: ContentSizeCategory
+	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	
-	// When we drop iOS 14 support, switch to this:
-//	@State var footerTruncationDetection_standard: [DynamicTypeSize: Bool] = [:]
-//	@State var footerTruncationDetection_condensed: [DynamicTypeSize: Bool] = [:]
-//	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
+	@EnvironmentObject var deviceInfo: DeviceInfo
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -102,7 +100,7 @@ struct MainView_Small: View {
 				// The suggested workarounds include using only a single NavigationLink.
 				NavigationLink(
 					destination: navLinkView(),
-					isActive: navLinkTagBinding(nil)
+					isActive: navLinkTagBinding()
 				) {
 					EmptyView()
 				}
@@ -124,19 +122,7 @@ struct MainView_Small: View {
 
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationStackDestination(isPresented: navLinkTagBinding(.ConfigurationView)) { // For iOS 16+
-			navLinkView()
-		}
-		.navigationStackDestination(isPresented: navLinkTagBinding(.TransactionsView)) { // For iOS 16+
-			navLinkView()
-		}
-		.navigationStackDestination(isPresented: navLinkTagBinding(.ReceiveView)) { // For iOS 16+
-			navLinkView()
-		}
-		.navigationStackDestination(isPresented: navLinkTagBinding(.SendView)) { // For iOS 16+
-			navLinkView()
-		}
-		.navigationStackDestination(isPresented: navLinkTagBinding(.CurrencyConverter)) { // For iOS 16+
+		.navigationStackDestination(isPresented: navLinkTagBinding()) { // For iOS 16+
 			navLinkView()
 		}
 		.onChange(of: deepLinkManager.deepLink) {
@@ -155,7 +141,7 @@ struct MainView_Small: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			header()
-			HomeView()
+			HomeView(showSwapInWallet: showSwapInWallet)
 			footer()
 		}
 	}
@@ -250,17 +236,17 @@ struct MainView_Small: View {
 	@ViewBuilder
 	func footer() -> some View {
 		
-		let csc = contentSizeCategory
-		let footerTruncationDetected_condensed = footerTruncationDetection_condensed[csc] ?? false
-		let footerTruncationDetected_standard = footerTruncationDetection_standard[csc] ?? false
+		let dts = dynamicTypeSize
+		let footerTruncationDetected_condensed = footerTruncationDetection_condensed[dts] ?? false
+		let footerTruncationDetected_standard = footerTruncationDetection_standard[dts] ?? false
 		
 		Group {
 			if footerTruncationDetected_condensed {
 				footer_accessibility()
 			} else if footerTruncationDetected_standard {
-				footer_condensed(csc)
+				footer_condensed(dts)
 			} else {
-				footer_standard(csc)
+				footer_standard(dts)
 			}
 		}
 		.padding(.top, 20)
@@ -275,7 +261,7 @@ struct MainView_Small: View {
 	}
 	
 	@ViewBuilder
-	func footer_standard(_ csc: ContentSizeCategory) -> some View {
+	func footer_standard(_ dts: DynamicTypeSize) -> some View {
 		
 		// We're trying to center the divider:
 		//
@@ -299,8 +285,8 @@ struct MainView_Small: View {
 							.lineLimit(1)
 							.foregroundColor(.primaryForeground)
 					} wasTruncated: {
-						log.debug("footerTruncationDetected_standard(receive): \(csc)")
-						self.footerTruncationDetection_standard[csc] = true
+						log.debug("footerTruncationDetected_standard(receive): \(dts)")
+						self.footerTruncationDetection_standard[dts] = true
 					}
 				} icon: {
 					Image("ic_receive_resized")
@@ -330,8 +316,8 @@ struct MainView_Small: View {
 							.lineLimit(1)
 							.foregroundColor(.primaryForeground)
 					} wasTruncated: {
-						log.debug("footerTruncationDetected_standard(send): \(csc)")
-						self.footerTruncationDetection_standard[csc] = true
+						log.debug("footerTruncationDetected_standard(send): \(dts)")
+						self.footerTruncationDetection_standard[dts] = true
 					}
 				} icon: {
 					Image("ic_scan_resized")
@@ -352,7 +338,7 @@ struct MainView_Small: View {
 	}
 	
 	@ViewBuilder
-	func footer_condensed(_ csc: ContentSizeCategory) -> some View {
+	func footer_condensed(_ dts: DynamicTypeSize) -> some View {
 		
 		// There's a large font being used, and possibly a small screen too.
 		// Thus horizontal space is tight.
@@ -376,8 +362,8 @@ struct MainView_Small: View {
 							.lineLimit(1)
 							.foregroundColor(.primaryForeground)
 					} wasTruncated: {
-						log.debug("footerTruncationDetected_condensed(receive): \(csc)")
-						self.footerTruncationDetection_condensed[csc] = true
+						log.debug("footerTruncationDetected_condensed(receive): \(dts)")
+						self.footerTruncationDetection_condensed[dts] = true
 					}
 				} icon: {
 					Image("ic_receive_resized")
@@ -405,8 +391,8 @@ struct MainView_Small: View {
 							.lineLimit(1)
 							.foregroundColor(.primaryForeground)
 					} wasTruncated: {
-						log.debug("footerTruncationDetected_condensed(send): \(csc)")
-						self.footerTruncationDetection_condensed[csc] = true
+						log.debug("footerTruncationDetected_condensed(send): \(dts)")
+						self.footerTruncationDetection_condensed[dts] = true
 					}
 				} icon: {
 					Image("ic_scan_resized")
@@ -491,11 +477,12 @@ struct MainView_Small: View {
 	private func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
-		case .ConfigurationView : ConfigurationView()
-		case .TransactionsView  : TransactionsView()
-		case .ReceiveView       : ReceiveView()
-		case .SendView          : SendView(controller: externalLightningRequest)
-		case .CurrencyConverter : CurrencyConverterView()
+			case .ConfigurationView   : ConfigurationView()
+			case .TransactionsView    : TransactionsView()
+			case .ReceiveView         : ReceiveView()
+			case .SendView            : SendView(controller: externalLightningRequest)
+			case .CurrencyConverter   : CurrencyConverterView()
+			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded, popTo: popTo)
 		}
 	}
 	
@@ -503,19 +490,12 @@ struct MainView_Small: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	private func navLinkTagBinding(_ tag: NavLinkTag?) -> Binding<Bool> {
+	private func navLinkTagBinding() -> Binding<Bool> {
 		
-		if let tag { // specific tag
-			return Binding<Bool>(
-				get: { navLinkTag == tag },
-				set: { if $0 { navLinkTag = tag } else if (navLinkTag == tag) { navLinkTag = nil } }
-			)
-		} else { // any tag
-			return Binding<Bool>(
-				get: { navLinkTag != nil },
-				set: { if !$0 { navLinkTag = nil }}
-			)
-		}
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
 	}
 	
 	// --------------------------------------------------
@@ -534,9 +514,10 @@ struct MainView_Small: View {
 				case .paymentHistory     : newNavLinkTag = .TransactionsView  ; delay *= 1
 				case .backup             : newNavLinkTag = .ConfigurationView ; delay *= 2
 				case .drainWallet        : newNavLinkTag = .ConfigurationView ; delay *= 2
-				case .electrum           : newNavLinkTag = .ConfigurationView ; delay *= 3
+				case .electrum           : newNavLinkTag = .ConfigurationView ; delay *= 2
 				case .backgroundPayments : newNavLinkTag = .ConfigurationView ; delay *= 3
 				case .liquiditySettings  : newNavLinkTag = .ConfigurationView ; delay *= 3
+				case .forceCloseChannels : newNavLinkTag = .ConfigurationView ; delay *= 2
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
@@ -567,6 +548,22 @@ struct MainView_Small: View {
 			// If we pushed the SendView, triggered by an external lightning url,
 			// then we can nil out the associated controller now (since we handed off to SendView).
 			self.externalLightningRequest = nil
+			
+			// If there's a pending popToDestination, it's now safe to continue the flow.
+			//
+			// Note that performing this operation in `onAppear` doesn't work properly:
+			// - it appears to work fine on the simulator, but isn't reliable on the actual device
+			// - it seems that, IF using a `navLinkTag`, then we need to wait for the tag to be
+			//   unset before it can be set properly again.
+			// 
+			if let destination = popToDestination {
+				log.debug("popToDestination: \(destination)")
+				
+				popToDestination = nil
+				if let deepLink = destination.followedBy {
+					deepLinkManager.broadcast(deepLink)
+				}
+			}
 		}
 	}
 	
@@ -586,6 +583,22 @@ struct MainView_Small: View {
 	}
 	
 	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func showSwapInWallet() {
+		log.trace("showSwapInWallet()")
+		
+		navLinkTag = .SwapInWalletDetails
+	}
+	
+	func popTo(_ destination: PopToDestination) {
+		log.trace("popTo(\(destination))")
+		
+		popToDestination = destination
+	}
+	
+	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
 	
@@ -599,26 +612,6 @@ struct MainView_Small: View {
 				log.debug("swiftUiBugWorkaround = nil")
 				self.swiftUiBugWorkaround = nil
 			}
-		}
-	}
-}
-
-extension ContentSizeCategory: CustomStringConvertible {
-	public var description: String {
-		switch self {
-			case .extraSmall                        : return "XS"
-			case .small                             : return "S"
-			case .medium                            : return "M"
-			case .large                             : return "L"
-			case .extraLarge                        : return "XL"
-			case .extraExtraLarge                   : return "XXL"
-			case .extraExtraExtraLarge              : return "XXXL"
-			case .accessibilityMedium               : return "aM"
-			case .accessibilityLarge                : return "aL"
-			case .accessibilityExtraLarge           : return "aXL"
-			case .accessibilityExtraExtraLarge      : return "aXXL"
-			case .accessibilityExtraExtraExtraLarge : return "aXXXL"
-			@unknown default                        : return "U"
 		}
 	}
 }

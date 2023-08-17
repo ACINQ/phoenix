@@ -74,7 +74,7 @@ object LegacyChannelCloseHelper {
         }
         return ChannelCloseOutgoingPayment(
             id = id,
-            recipientAmount = recipientAmount.truncateToSatoshi(),
+            recipientAmount = recipientAmount.truncateToSatoshi() - fees,
             address = closingDetails?.closingAddress ?: "",
             isSentToDefaultAddress = closingDetails?.isSentToDefaultAddress
                 ?: (closingType == ChannelClosingType.Local

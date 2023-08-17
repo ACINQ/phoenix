@@ -22,23 +22,26 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.PaymentsDatabase
-import fr.acinq.phoenix.db.didCompleteWalletPayment
+import fr.acinq.phoenix.db.didSaveWalletPayment
 
 class SpliceOutgoingQueries(val database: PaymentsDatabase) {
     private val spliceOutQueries = database.spliceOutgoingPaymentsQueries
 
     fun addSpliceOutgoingPayment(payment: SpliceOutgoingPayment) {
-        spliceOutQueries.insertSpliceOutgoing(
-            id = payment.id.toString(),
-            recipient_amount_sat = payment.recipientAmount.sat,
-            address = payment.address,
-            mining_fees_sat = payment.miningFees.sat,
-            channel_id = payment.channelId.toByteArray(),
-            tx_id = payment.txId.toByteArray(),
-            created_at = payment.createdAt,
-            confirmed_at = payment.confirmedAt,
-            locked_at = payment.lockedAt
-        )
+        database.transaction {
+            spliceOutQueries.insertSpliceOutgoing(
+                id = payment.id.toString(),
+                recipient_amount_sat = payment.recipientAmount.sat,
+                address = payment.address,
+                mining_fees_sat = payment.miningFees.sat,
+                channel_id = payment.channelId.toByteArray(),
+                tx_id = payment.txId.toByteArray(),
+                created_at = payment.createdAt,
+                confirmed_at = payment.confirmedAt,
+                locked_at = payment.lockedAt
+            )
+            didSaveWalletPayment(WalletPaymentId.SpliceOutgoingPaymentId(payment.id), database)
+        }
     }
 
     fun getSpliceOutPayment(id: UUID): SpliceOutgoingPayment? {
@@ -49,13 +52,17 @@ class SpliceOutgoingQueries(val database: PaymentsDatabase) {
     }
 
     fun setConfirmed(id: UUID, confirmedAt: Long) {
-        spliceOutQueries.setConfirmed(confirmed_at = confirmedAt, id = id.toString())
-        didCompleteWalletPayment(WalletPaymentId.SpliceOutgoingPaymentId(id), database)
+        database.transaction {
+            spliceOutQueries.setConfirmed(confirmed_at = confirmedAt, id = id.toString())
+            didSaveWalletPayment(WalletPaymentId.SpliceOutgoingPaymentId(id), database)
+        }
     }
 
     fun setLocked(id: UUID, lockedAt: Long) {
-        spliceOutQueries.setLocked(locked_at = lockedAt, id = id.toString())
-        didCompleteWalletPayment(WalletPaymentId.SpliceOutgoingPaymentId(id), database)
+        database.transaction {
+            spliceOutQueries.setLocked(locked_at = lockedAt, id = id.toString())
+            didSaveWalletPayment(WalletPaymentId.SpliceOutgoingPaymentId(id), database)
+        }
     }
 
     companion object {

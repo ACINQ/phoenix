@@ -106,9 +106,9 @@ fileprivate struct ChannelsView : View {
 	
 	@State var forceCloseChannelsOpen = false
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	var body: some View {
@@ -307,7 +307,7 @@ fileprivate struct ChannelRowView: View {
 	@Binding var showChannelsRemoteBalance: Bool
 	@ObservedObject var toast: Toast
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
+	@EnvironmentObject var popoverState: PopoverState
 	
 	var body: some View {
 		
@@ -417,30 +417,6 @@ fileprivate struct FooterView: View, ViewName {
 					.font(.footnote)
 				}
 			}
-			
-			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-				
-				Text("Your Node ID:")
-					.font(.footnote)
-					.padding(.trailing, 4)
-				
-				Spacer()
-				
-				let nodeId = Biz.nodeId ?? "?"
-				Button {
-					copyNodeID(nodeId)
-				} label: {
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
-						Text(nodeId)
-							.lineLimit(1)
-							.truncationMode(.middle)
-						
-						Image(systemName: "square.on.square")
-							.imageScale(.medium)
-					}
-					.font(.footnote)
-				}
-			} // </HStack>
 			
 		} // </VStack>
 		.frame(maxWidth: .infinity, alignment: .leading)

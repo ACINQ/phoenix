@@ -39,7 +39,11 @@ class BalanceManager(
     private val _balance = MutableStateFlow<MilliSatoshi?>(null)
     val balance: StateFlow<MilliSatoshi?> = _balance
 
-    /** The swap-in wallet balance, grouped by its utxos' confirmation status. Reserved utxos are filtered out. */
+    /** The swap-in wallet. Reserved utxos are filtered out. */
+    private val _swapInWallet = MutableStateFlow<WalletState.WalletWithConfirmations?>(null)
+    val swapInWallet: StateFlow<WalletState.WalletWithConfirmations?> = _swapInWallet
+
+    /** The swap-in wallet balance. Reserved utxos are filtered out. */
     private val _swapInWalletBalance = MutableStateFlow(WalletBalance.empty())
     val swapInWalletBalance: StateFlow<WalletBalance> = _swapInWalletBalance
 
@@ -91,20 +95,20 @@ class BalanceManager(
                 }.toMap().filter { it.value.isNotEmpty() },
                 parentTxs = swapInWallet.parentTxs,
             )
-            val withConfirmations = walletWithoutReserved.withConfirmations(
+            walletWithoutReserved.withConfirmations(
                 currentBlockHeight = currentBlockHeight,
                 minConfirmations = swapInConfirmations
             )
-            WalletBalance(
-                deeplyConfirmed = withConfirmations.deeplyConfirmed.balance,
-                weaklyConfirmed = withConfirmations.weaklyConfirmed.balance,
-                weaklyConfirmedMinBlockNeeded = withConfirmations.weaklyConfirmed.minOfOrNull {
-                    withConfirmations.confirmationsNeeded(it)
+        }.collect { wallet ->
+            _swapInWallet.value = wallet
+            _swapInWalletBalance.value = WalletBalance(
+                deeplyConfirmed = wallet.deeplyConfirmed.balance,
+                weaklyConfirmed = wallet.weaklyConfirmed.balance,
+                weaklyConfirmedMinBlockNeeded = wallet.weaklyConfirmed.minOfOrNull {
+                    wallet.confirmationsNeeded(it)
                 },
-                unconfirmed = withConfirmations.unconfirmed.balance,
+                unconfirmed = wallet.unconfirmed.balance,
             )
-        }.collect { balance ->
-            _swapInWalletBalance.value = balance
         }
     }
 }

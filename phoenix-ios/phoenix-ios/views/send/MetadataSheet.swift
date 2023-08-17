@@ -16,7 +16,7 @@ struct MetadataSheet: View {
 	
 	let lnurlPay: LnurlPay.Intent
 	
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	@ViewBuilder
 	var body: some View {
