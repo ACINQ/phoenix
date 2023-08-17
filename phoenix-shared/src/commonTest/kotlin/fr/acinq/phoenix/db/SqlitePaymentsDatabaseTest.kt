@@ -28,7 +28,6 @@ import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.TemporaryNodeFailure
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
-import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.runTest
 import fr.acinq.phoenix.utils.migrations.LegacyChannelCloseHelper
 import fr.acinq.secp256k1.Hex
@@ -252,7 +251,7 @@ class SqlitePaymentsDatabaseTest {
         // Test status where a part has failed.
         val onePartFailed = p.copy(
             parts = listOf(
-                (p.parts[0] as LightningOutgoingPayment.Part).copy(
+                p.parts[0].copy(
                     status = LightningOutgoingPayment.Part.Status.Failed(TemporaryNodeFailure.code, TemporaryNodeFailure.message, 110)
                 ),
                 p.parts[1]
@@ -290,9 +289,9 @@ class SqlitePaymentsDatabaseTest {
         val partsSettled = withMoreParts.copy(
             parts = listOf(
                 withMoreParts.parts[0], // this one was failed
-                (withMoreParts.parts[1] as LightningOutgoingPayment.Part).copy(status = LightningOutgoingPayment.Part.Status.Succeeded(preimage, 125)),
-                (withMoreParts.parts[2] as LightningOutgoingPayment.Part).copy(status = LightningOutgoingPayment.Part.Status.Succeeded(preimage, 126)),
-                (withMoreParts.parts[3] as LightningOutgoingPayment.Part).copy(status = LightningOutgoingPayment.Part.Status.Succeeded(preimage, 127)),
+                withMoreParts.parts[1].copy(status = LightningOutgoingPayment.Part.Status.Succeeded(preimage, 125)),
+                withMoreParts.parts[2].copy(status = LightningOutgoingPayment.Part.Status.Succeeded(preimage, 126)),
+                withMoreParts.parts[3].copy(status = LightningOutgoingPayment.Part.Status.Succeeded(preimage, 127)),
             )
         )
         assertEquals(LightningOutgoingPayment.Status.Pending, partsSettled.status)
@@ -359,7 +358,7 @@ class SqlitePaymentsDatabaseTest {
         p.copy(recipientAmount = 1000.msat).let {
             assertFails { db.addOutgoingPayment(it) }
         }
-        p.copy(id = UUID.randomUUID(), parts = p.parts.map { (it as LightningOutgoingPayment.Part).copy(id = p.parts[0].id) }).let {
+        p.copy(id = UUID.randomUUID(), parts = p.parts.map { it.copy(id = p.parts[0].id) }).let {
             assertFails { db.addOutgoingPayment(it) }
         }
     }
