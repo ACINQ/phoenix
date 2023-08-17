@@ -55,16 +55,17 @@ struct DetailsView: View {
 					} label: {
 						Image(systemName: "chevron.backward")
 							.imageScale(.medium)
+							.font(.title3.weight(.semibold))
 					}
 					Spacer()
 					Button {
 						closeAction()
 					} label: {
-						Image(systemName: "xmark") // must match size of chevron.backward above
+						Image(systemName: "xmark")
 							.imageScale(.medium)
+							.font(.title3)
 					}
 				} // </VStack>
-				.font(.title2)
 				.padding()
 				
 			} else {
@@ -92,6 +93,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	@Binding var showFiatValueExplanation: Bool
 	
 	@State var showBlockchainExplorerOptions = false
+	
+	@State var truncatedText: [String: Bool] = [:]
 	
 	// <InfoGridView Protocol>
 	let minKeyColumnWidth: CGFloat = 50
@@ -169,7 +172,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				header("Payment Received")
 			} content: {
 				paymentReceived_receivedAt(received)
-				paymentReceived_amountReceived(received)
+				amountReceived(msat: received.amount)
 				payment_standardFees(incomingPayment)
 				payment_minerFees(incomingPayment)
 			}
@@ -235,9 +238,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				} content: {
 					offChain_completedAt(offChain)
 					offChain_elapsed(outgoingPayment)
-					offChain_amountSent(outgoingPayment)
+					outgoing_amountSent(outgoingPayment)
 					offChain_fees(outgoingPayment)
-					offChain_amountReceived(lightningPayment)
+					amountReceived(msat: lightningPayment.recipientAmount)
 					offChain_recipientPubkey(lightningPayment)
 				}
 			
@@ -267,8 +270,11 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			InlineSection {
 				header("Splice Out")
 			} content: {
+				onChain_broadcastAt(spliceOut)
 				onChain_confirmedAt(spliceOut)
-				onChain_claimed(spliceOut)
+				outgoing_amountSent(outgoingPayment)
+				onChain_minerFees(spliceOut)
+				amountReceived(sat: spliceOut.recipientAmount)
 				onChain_btcTxid(spliceOut)
 			}
 		
@@ -286,9 +292,23 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			InlineSection {
 				header("Closing Status")
 			} content: {
+				onChain_broadcastAt(channelClosing)
 				onChain_confirmedAt(channelClosing)
-				onChain_claimed(channelClosing)
+				outgoing_amountSent(outgoingPayment)
+				onChain_minerFees(channelClosing)
+				amountReceived(sat: channelClosing.recipientAmount)
 				onChain_btcTxid(channelClosing)
+			}
+			
+		} else if let spliceCpfp = outgoingPayment as? Lightning_kmpSpliceCpfpOutgoingPayment {
+			
+			InlineSection {
+				header("Bump Fee (CPFP)")
+			} content: {
+				onChain_broadcastAt(spliceCpfp)
+				onChain_confirmedAt(spliceCpfp)
+				onChain_minerFees(spliceCpfp)
+				onChain_btcTxid(spliceCpfp)
 			}
 		}
 	}
@@ -480,10 +500,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 			
 			if let msat = paymentRequest.amount {
-				commonValue_amounts(displayAmounts: displayAmounts(
-					msat: msat,
-					originalFiat: nil // we don't have this info (at time of invoice generation)
-				))
+				commonValue_amounts(
+					identifier: identifier,
+					displayAmounts: displayAmounts(
+						msat: msat,
+						originalFiat: nil // we don't have this info (at time of invoice generation)
+					)
+				)
 			} else {
 				Text("Any amount")
 			}
@@ -581,28 +604,6 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 					
 			commonValue_date(date: received.receivedAtDate)
-		}
-	}
-	
-	@ViewBuilder
-	func paymentReceived_amountReceived(
-		_ received: Lightning_kmpIncomingPayment.Received
-	) -> some View {
-		let identifier: String = #function
-		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			keyColumn("amount received")
-			
-		} valueColumn: {
-			
-			let msat = received.receivedWith.map { $0.amount.msat }.reduce(0, +)
-			commonValue_amounts(displayAmounts: displayAmounts(
-				msat: Lightning_kmpMilliSatoshi(msat: msat),
-				originalFiat: paymentInfo.metadata.originalFiat
-			))
 		}
 	}
 	
@@ -740,10 +741,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				
 			} valueColumn: {
 				
-				commonValue_amounts(displayAmounts: displayAmounts(
-					msat: Lightning_kmpMilliSatoshi(msat: standardFees.0),
-					originalFiat: paymentInfo.metadata.originalFiat
-				))
+				commonValue_amounts(
+					identifier: identifier,
+					displayAmounts: displayAmounts(
+						msat: Lightning_kmpMilliSatoshi(msat: standardFees.0),
+						originalFiat: paymentInfo.metadata.originalFiat
+					)
+				)
 			}
 		}
 	}
@@ -765,10 +769,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				
 			} valueColumn: {
 				
-				commonValue_amounts(displayAmounts: displayAmounts(
-					msat: Lightning_kmpMilliSatoshi(msat: minerFees.0),
-					originalFiat: paymentInfo.metadata.originalFiat
-			 	))
+				commonValue_amounts(
+					identifier: identifier,
+					displayAmounts: displayAmounts(
+						msat: Lightning_kmpMilliSatoshi(msat: minerFees.0),
+						originalFiat: paymentInfo.metadata.originalFiat
+			 		)
+				)
 			}
 		}
 	}
@@ -926,27 +933,6 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func offChain_amountReceived(
-		_ outgoingPayment: Lightning_kmpLightningOutgoingPayment
-	) -> some View {
-		let identifier: String = #function
-		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			keyColumn("amount received")
-			
-		} valueColumn: {
-			
-			commonValue_amounts(displayAmounts: displayAmounts(
-				msat: outgoingPayment.recipientAmount,
-				originalFiat: paymentInfo.metadata.originalFiat
-			))
-		}
-	}
-	
-	@ViewBuilder
 	func offChain_fees(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
 		let identifier: String = #function
 		
@@ -959,6 +945,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 			
 			commonValue_amounts(
+				identifier: identifier,
 				displayAmounts: displayAmounts(
 					msat: outgoingPayment.fees,
 					originalFiat: paymentInfo.metadata.originalFiat
@@ -968,25 +955,6 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 					total: outgoingPayment.amount
 			 	)
 			)
-		}
-	}
-	
-	@ViewBuilder
-	func offChain_amountSent(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
-		let identifier: String = #function
-		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			keyColumn("amount sent")
-			
-		} valueColumn: {
-			
-			commonValue_amounts(displayAmounts: displayAmounts(
-				msat: outgoingPayment.amount,
-				originalFiat: paymentInfo.metadata.originalFiat
-			))
 		}
 	}
 	
@@ -1005,6 +973,24 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 			
 			Text(outgoingPayment.recipient.value.toHex())
+		}
+	}
+	
+	@ViewBuilder
+	func onChain_broadcastAt(
+		_ onChain: Lightning_kmpOnChainOutgoingPayment
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("broadcast at")
+			
+		} valueColumn: {
+			
+			commonValue_date(date: onChain.createdAtDate)
 		}
 	}
 	
@@ -1030,7 +1016,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func onChain_claimed(
+	func onChain_minerFees(
 		_ onChain: Lightning_kmpOnChainOutgoingPayment
 	) -> some View {
 		let identifier: String = #function
@@ -1039,14 +1025,17 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			identifier: identifier,
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
-			keyColumn("claimed amount")
+			keyColumn("miner fees")
 			
 		} valueColumn: {
 			
-			commonValue_amounts(displayAmounts: displayAmounts(
-				sat: onChain.amount.truncateToSatoshi(),
-				originalFiat: paymentInfo.metadata.originalFiat
-			))
+			commonValue_amounts(
+				identifier: identifier,
+				displayAmounts: displayAmounts(
+					sat: onChain.miningFees,
+					originalFiat: paymentInfo.metadata.originalFiat
+				)
+			)
 		}
 	}
 	
@@ -1075,6 +1064,76 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				}
 			
 		} // </InfoGridRowWrapper>
+	}
+	
+	@ViewBuilder
+	func outgoing_amountSent(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("amount sent")
+			
+		} valueColumn: {
+			
+			commonValue_amounts(
+				identifier: identifier,
+				displayAmounts: displayAmounts(
+					msat: outgoingPayment.amount,
+					originalFiat: paymentInfo.metadata.originalFiat
+				)
+			)
+		}
+	}
+	
+	@ViewBuilder
+	func amountReceived(
+		msat: Lightning_kmpMilliSatoshi
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("amount received")
+			
+		} valueColumn: {
+			
+			commonValue_amounts(
+				identifier: identifier,
+				displayAmounts: displayAmounts(
+					msat: msat,
+					originalFiat: paymentInfo.metadata.originalFiat
+				)
+			)
+		}
+	}
+	
+	@ViewBuilder
+	func amountReceived(
+		sat: Bitcoin_kmpSatoshi
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("amount received")
+			
+		} valueColumn: {
+			
+			commonValue_amounts(
+				identifier: identifier,
+				displayAmounts: displayAmounts(
+					sat: sat,
+					originalFiat: paymentInfo.metadata.originalFiat
+				)
+			)
+		}
 	}
 	
 	@ViewBuilder
@@ -1229,6 +1288,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func commonValue_amounts(
+		identifier: String,
 		displayAmounts: DisplayAmounts,
 		displayFeePercent: String? = nil
 	) -> some View {
@@ -1261,43 +1321,121 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				Text(verbatim: display_feePercent)
 			}
 			
-			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+			// If we know the original fiat exchange rate, then we can switch back and forth
+			// between the original & current fiat value.
+			//
+			// However, if we do NOT know the original fiat value,
+			// then we simply show the current fiat value (without the clock button)
+			//
+			let canShowOriginalFiatValue = displayAmounts.fiatOriginal != nil
+			let showingOriginalFiatValue = showOriginalFiatValue && canShowOriginalFiatValue
+			
+			// The preferred layout is with a single row:
+			// 1,234 USD (original) (clock)
+			//
+			// However, if the text gets truncated it looks really odd:
+			// 1,23 USD (origi (clock)
+			// 4        nal)
+			//
+			// In that case we switch to 2 rows.
+			// Note that if we detect truncation for either (original) or (now),
+			// then we keep the layout at 2 rows so it's not confusing when the user switches back and forth.
+			
+			let key = identifier
+			let isTruncated = truncatedText[key] ?? false
+			
+			if isTruncated {
 				
-				// If we know the original fiat exchange rate, then we can switch back and forth
-				// between the original & current fiat value.
-				//
-				// However, if we do NOT know the original fiat value,
-				// then we simply show the current fiat value (without the clock button)
-				//
-				let canShowOriginalFiatValue = displayAmounts.fiatOriginal != nil
+				// Two rows:
+				// 1,234 USD
+				//  (original) (clock)
 				
-				if showOriginalFiatValue && canShowOriginalFiatValue {
-					
-					let display_fiatOriginal = displayAmounts.fiatOriginal ??
-						Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
-					
-					Text(verbatim: "≈ \(display_fiatOriginal.digits) ")
-					Text_CurrencyName(currency: display_fiatOriginal.currency, fontTextStyle: .callout)
-					Text(" (original)").foregroundColor(.secondary)
-					
-				} else {
-					
-					let display_fiatCurrent = displayAmounts.fiatCurrent ??
-						Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+					if showingOriginalFiatValue {
+						
+						let display_fiatOriginal = displayAmounts.fiatOriginal ??
+							Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+						
+						Text(verbatim: "≈ \(display_fiatOriginal.digits) ")
+						Text_CurrencyName(currency: display_fiatOriginal.currency, fontTextStyle: .callout)
+						
+					} else {
+						
+						let display_fiatCurrent = displayAmounts.fiatCurrent ??
+							Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+						
+						Text(verbatim: "≈ \(display_fiatCurrent.digits) ")
+						Text_CurrencyName(currency: display_fiatCurrent.currency, fontTextStyle: .callout)
+					}
+				} // </HStack>
 				
-					Text(verbatim: "≈ \(display_fiatCurrent.digits) ")
-					Text_CurrencyName(currency: display_fiatCurrent.currency, fontTextStyle: .callout)
-					Text(" (now)").foregroundColor(.secondary)
-				}
-				
-				if canShowOriginalFiatValue {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+					if showingOriginalFiatValue {
+						Text(" (original)").foregroundColor(.secondary)
+					} else {
+						Text(" (now)").foregroundColor(.secondary)
+					}
 					
-					AnimatedClock(state: clockStateBinding(), size: 14, animationDuration: 0.0)
-						.padding(.leading, 4)
-						.offset(y: 1)
-				}
+					if canShowOriginalFiatValue {
+						
+						AnimatedClock(state: clockStateBinding(), size: 14, animationDuration: 0.0)
+							.padding(.leading, 4)
+							.offset(y: 1)
+					}
+				} // </HStack>
 				
-			} // </HStack>
+			} else {
+				
+				// Single row:
+				// 1,234 USD (original) (clock)
+				
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+					
+					if showingOriginalFiatValue {
+						
+						let display_fiatOriginal = displayAmounts.fiatOriginal ??
+							Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+						
+						TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+							Text(verbatim: "≈ \(display_fiatOriginal.digits) ")
+								.layoutPriority(0)
+						} wasTruncated: {
+							truncatedText[key] = true
+						}
+						Text_CurrencyName(currency: display_fiatOriginal.currency, fontTextStyle: .callout)
+							.layoutPriority(1)
+						Text(" (original)")
+							.layoutPriority(1)
+							.foregroundColor(.secondary)
+						
+					} else {
+						
+						let display_fiatCurrent = displayAmounts.fiatCurrent ??
+							Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+					
+						TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+							Text(verbatim: "≈ \(display_fiatCurrent.digits) ")
+								.layoutPriority(0)
+						} wasTruncated: {
+							truncatedText[key] = true
+						}
+						Text_CurrencyName(currency: display_fiatCurrent.currency, fontTextStyle: .callout)
+							.layoutPriority(1)
+						Text(" (now)")
+							.layoutPriority(1)
+							.foregroundColor(.secondary)
+					}
+					
+					if canShowOriginalFiatValue {
+						
+						AnimatedClock(state: clockStateBinding(), size: 14, animationDuration: 0.0)
+							.padding(.leading, 4)
+							.offset(y: 1)
+					}
+					
+				} // </HStack>
+			}
+			
 		} // </VStack>
 	}
 	
@@ -1479,85 +1617,85 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			UIApplication.shared.open(txUrl)
 		}
 	}
+}
+
+// --------------------------------------------------
+// MARK: -
+// --------------------------------------------------
+
+fileprivate struct DisplayAmounts {
+	let bitcoin: FormattedAmount
+	let fiatCurrent: FormattedAmount?
+	let fiatOriginal: FormattedAmount?
+}
+
+fileprivate struct InlineSection<Header: View, Content: View>: View {
 	
-	// --------------------------------------------------
-	// MARK: Helpers
-	// --------------------------------------------------
+	let header: Header
+	let content: Content
 	
-	struct DisplayAmounts {
-		let bitcoin: FormattedAmount
-		let fiatCurrent: FormattedAmount?
-		let fiatOriginal: FormattedAmount?
+	init(
+		@ViewBuilder header headerBuilder: () -> Header,
+		@ViewBuilder content contentBuilder: () -> Content
+	) {
+		header = headerBuilder()
+		content = contentBuilder()
 	}
 	
-	struct InlineSection<Header: View, Content: View>: View {
+	@ViewBuilder
+	var body: some View {
 		
-		let header: Header
-		let content: Content
-		
-		init(
-			@ViewBuilder header headerBuilder: () -> Header,
-			@ViewBuilder content contentBuilder: () -> Content
-		) {
-			header = headerBuilder()
-			content = contentBuilder()
-		}
-		
-		@ViewBuilder
-		var body: some View {
-			
-			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				header
-				HStack(alignment: VerticalAlignment.center, spacing: 0) {
-					VStack(alignment: HorizontalAlignment.leading, spacing: 12) {
-						content
-					}
-					Spacer(minLength: 0)
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			header
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				VStack(alignment: HorizontalAlignment.leading, spacing: 12) {
+					content
 				}
-				.padding(.vertical, 10)
-				.padding(.horizontal, 16)
-				.background {
-					Color.white.cornerRadius(10)
-				}
-				.padding(.horizontal, 16)
+				Spacer(minLength: 0)
 			}
-			.padding(.vertical, 16)
+			.padding(.vertical, 10)
+			.padding(.horizontal, 16)
+			.background {
+				Color.white.cornerRadius(10)
+			}
+			.padding(.horizontal, 16)
 		}
+		.padding(.vertical, 16)
+	}
+}
+
+fileprivate struct InfoGridRowWrapper<KeyColumn: View, ValueColumn: View>: View {
+	
+	let identifier: String
+	let keyColumnWidth: CGFloat
+	let keyColumn: KeyColumn
+	let valueColumn: ValueColumn
+	
+	init(
+		identifier: String,
+		keyColumnWidth: CGFloat,
+		@ViewBuilder keyColumn keyColumnBuilder: () -> KeyColumn,
+		@ViewBuilder valueColumn valueColumnBuilder: () -> ValueColumn
+	) {
+		self.identifier = identifier
+		self.keyColumnWidth = keyColumnWidth
+		self.keyColumn = keyColumnBuilder()
+		self.valueColumn = valueColumnBuilder()
 	}
 	
-	struct InfoGridRowWrapper<KeyColumn: View, ValueColumn: View>: View {
+	@ViewBuilder
+	var body: some View {
 		
-		let identifier: String
-		let keyColumnWidth: CGFloat
-		let keyColumn: KeyColumn
-		let valueColumn: ValueColumn
-		
-		init(
-			identifier: String,
-			keyColumnWidth: CGFloat,
-			@ViewBuilder keyColumn keyColumnBuilder: () -> KeyColumn,
-			@ViewBuilder valueColumn valueColumnBuilder: () -> ValueColumn
+		InfoGridRow(
+			identifier: identifier,
+			vAlignment: .firstTextBaseline,
+			hSpacing: 8,
+			keyColumnWidth: keyColumnWidth,
+			keyColumnAlignment: .trailing
 		) {
-			self.identifier = identifier
-			self.keyColumnWidth = keyColumnWidth
-			self.keyColumn = keyColumnBuilder()
-			self.valueColumn = valueColumnBuilder()
-		}
-		
-		@ViewBuilder
-		var body: some View {
-			
-			InfoGridRow(
-				identifier: identifier,
-				vAlignment: .firstTextBaseline,
-				hSpacing: 8,
-				keyColumnWidth: keyColumnWidth,
-				keyColumnAlignment: .trailing
-			) {
-				keyColumn
-			} valueColumn: {
-				valueColumn.font(.callout)
-			}
+			keyColumn
+		} valueColumn: {
+			valueColumn.font(.callout)
 		}
 	}
 }

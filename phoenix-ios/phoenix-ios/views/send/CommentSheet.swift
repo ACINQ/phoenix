@@ -21,7 +21,7 @@ struct CommentSheet: View {
 	
 	let sendButtonAction: (() -> Void)?
 	
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	init(comment: Binding<String>, maxCommentLength: Int, sendButtonAction: (() -> Void)? = nil) {
 		self._comment = comment

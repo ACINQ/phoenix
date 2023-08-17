@@ -165,9 +165,19 @@ extension Prefs {
 			// So we're taking the simplest approach, and force-firing the associated PassthroughSubject publishers.
 			
 			let prefs = Prefs.shared
-			
-			prefs.backupSeed.hasUploadedSeed_publisher.send()
-			prefs.backupSeed.manualBackup_taskDone_publisher.send()
+			if #available(iOS 16, *) {
+				
+				prefs.backupSeed.hasUploadedSeed_publisher.send()
+				prefs.backupSeed.manualBackup_taskDone_publisher.send()
+				
+			} else {
+				
+				// Workaround for iOS 15 crash: Need to delay these calls until next runloop cycle
+				DispatchQueue.main.async {
+					prefs.backupSeed.hasUploadedSeed_publisher.send()
+					prefs.backupSeed.manualBackup_taskDone_publisher.send()
+				}
+			}
 		})
 		.eraseToAnyPublisher()
 		

@@ -46,11 +46,14 @@ struct ValidateView: View {
 	@State var altAmount: String = ""
 	@State var problem: Problem? = nil
 	
+	@State var spliceOutInProgress: Bool = false
+	@State var spliceOutProblem: SpliceOutProblem? = nil
+	
 	@State var preTipAmountMsat: Int64? = nil
 	@State var postTipAmountMsat: Int64? = nil
 	@State var tipSliderSheetVisible: Bool = false
 	
-	@State var minerFeeSats: Int64? = nil
+	@State var minerFeeInfo: MinerFeeInfo? = nil
 	@State var satsPerByte: String = ""
 	@State var parsedSatsPerByte: Result<NSNumber, TextFieldNumberStylerError> = Result.failure(.emptyInput)
 	
@@ -71,10 +74,6 @@ struct ValidateView: View {
 	
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	
 	// For the cicular buttons: [metadata, tip, comment]
 	enum MaxButtonWidth: Preference {}
 	let maxButtonWidthReader = GeometryPreferenceReader(
@@ -82,6 +81,12 @@ struct ValidateView: View {
 		value: { [$0.size.width] }
 	)
 	@State var maxButtonWidth: CGFloat? = nil
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var popoverState: PopoverState
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -152,10 +157,9 @@ struct ValidateView: View {
 		.onAppear() {
 			onAppear()
 		}
-		.navigationStackDestination( // For iOS 16+
-			isPresented: $currencyConverterOpen,
-			destination: currencyConverterView
-		)
+		.navigationStackDestination(isPresented: $currencyConverterOpen) { // For iOS 16+
+			currencyConverterView()
+		}
 		.onChange(of: mvi.model) { newModel in
 			modelDidChange(newModel)
 		}
@@ -172,14 +176,7 @@ struct ValidateView: View {
 			chainContextDidChange($0)
 		}
 		.task {
-			let result = await MempoolRecommendedResponse.fetch()
-			switch result {
-			case .success(let response):
-				mempoolRecommendedResponse = response
-			case .failure(let reason):
-				log.error("Errror fetching mempool.space/recommended: \(reason)")
-				mempoolRecommendedResponse = nil
-			}
+			await fetchMempoolRecommendedFees()
 		}
 	}
 	
@@ -428,7 +425,7 @@ struct ValidateView: View {
 	@ViewBuilder
 	func paymentButton() -> some View {
 		
-		let needsPrepare = (mvi.model is Scan.Model_OnChainFlow) && (minerFeeSats == nil)
+		let needsPrepare = (mvi.model is Scan.Model_OnChainFlow) && (minerFeeInfo == nil)
 		
 		Button {
 			if needsPrepare {
@@ -469,7 +466,7 @@ struct ValidateView: View {
 			backgroundFill: Color.appAccent,
 			disabledBackgroundFill: Color.gray
 		))
-		.disabled(problem != nil || isDisconnected || chainContext == nil)
+		.disabled(problem != nil || isDisconnected || chainContext == nil || spliceOutInProgress)
 		.accessibilityHint(paymentButtonHint())
 	}
 	
@@ -495,6 +492,11 @@ struct ValidateView: View {
 			} else if chainContext == nil {
 				
 				Text("Unable to fetch fees")
+					.foregroundColor(.appNegative)
+				
+			} else if let spliceOutProblem {
+				
+				Text(spliceOutProblem.localizedDescription())
 					.foregroundColor(.appNegative)
 			}
 		}
@@ -705,6 +707,20 @@ struct ValidateView: View {
 	}
 	
 	// --------------------------------------------------
+	// MARK: Tasks
+	// --------------------------------------------------
+	
+	func fetchMempoolRecommendedFees() async {
+		
+		for try await response in MempoolMonitor.shared.stream() {
+			mempoolRecommendedResponse = response
+			if Task.isCancelled {
+				return
+			}
+		}
+	}
+	
+	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
 	
@@ -826,13 +842,18 @@ struct ValidateView: View {
 		let lightningFeeMsat: Int64
 		if mvi.model is Scan.Model_OnChainFlow {
 			lightningFeeMsat = 0
+		} else if let chainContext, let trampolineFees = chainContext.trampoline.v3.first {
+			let p1 = Utils.toMsat(sat: trampolineFees.feeBaseSat)
+			let f2 = Double(trampolineFees.feePerMillionths) / 1_000_000
+			let p2 = Int64(Double(recipientAmountMsat) * f2)
+			lightningFeeMsat = p1 + p2
 		} else {
-			lightningFeeMsat = 40_000 // Todo...
+			lightningFeeMsat = 0
 		}
 		
 		let minerFeeMsat: Int64
-		if let minerFeeSats {
-			minerFeeMsat = Utils.toMsat(sat: minerFeeSats)
+		if let minerFeeInfo {
+			minerFeeMsat = Utils.toMsat(sat: minerFeeInfo.minerFee)
 		} else {
 			minerFeeMsat = 0
 		}
@@ -1424,7 +1445,7 @@ struct ValidateView: View {
 			MinerFeeSheet(
 				amount: Bitcoin_kmpSatoshi(sat: sat),
 				btcAddress: model.uri.address,
-				minerFeeSats: $minerFeeSats,
+				minerFeeInfo: $minerFeeInfo,
 				satsPerByte: $satsPerByte,
 				parsedSatsPerByte: $parsedSatsPerByte,
 				mempoolRecommendedResponse: $mempoolRecommendedResponse
@@ -1457,6 +1478,47 @@ struct ValidateView: View {
 				amount: Lightning_kmpMilliSatoshi(msat: msat),
 				trampolineFees: trampolineFees
 			))
+			
+		} else if let _ = mvi.model as? Scan.Model_OnChainFlow {
+			
+			guard
+				let minerFeeInfo = minerFeeInfo,
+				let peer = Biz.business.getPeer(),
+				spliceOutInProgress == false
+			else {
+				return
+			}
+			
+			spliceOutInProgress = true
+			spliceOutProblem = nil
+			
+			let amountSat = Bitcoin_kmpSatoshi(sat: Utils.truncateToSat(msat: msat))
+			Task { @MainActor in
+				do {
+					let response = try await peer.spliceOut(
+						amount: amountSat,
+						scriptPubKey: minerFeeInfo.pubKeyScript,
+						feerate: minerFeeInfo.feerate
+					)
+					
+					self.spliceOutInProgress = false
+					
+					if let problem = SpliceOutProblem.fromResponse(response) {
+						self.spliceOutProblem = problem
+						
+					} else {
+						self.spliceOutProblem = nil
+						self.presentationMode.wrappedValue.dismiss()
+					}
+					
+				} catch {
+					log.error("peer.spliceOut(): error: \(error)")
+					
+					self.spliceOutInProgress = false
+					self.spliceOutProblem = .other
+					
+				}
+			} // </Task>
 			
 		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
 			

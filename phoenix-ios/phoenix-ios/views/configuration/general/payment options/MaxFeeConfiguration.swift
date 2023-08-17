@@ -46,9 +46,8 @@ struct MaxFeeConfiguration: View {
 	
 	@State var firstAppearance = true
 	
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
-	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	enum ExampleHeight: Preference {}
 	let exampleHeightReader = GeometryPreferenceReader(

@@ -11,7 +11,7 @@ struct CopyOptionsSheet: View {
 	let copyText: () -> Void
 	let copyImage: () -> Void
 	
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	@ViewBuilder
 	var body: some View {

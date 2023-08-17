@@ -150,10 +150,9 @@ struct CurrencyConverterView: View {
 		.onDisappear {
 			onDisappear()
 		}
-		.navigationStackDestination( // For iOS 16+
-			isPresented: $currencySelectorOpen,
-			destination: currencySelectorView
-		)
+		.navigationStackDestination(isPresented: $currencySelectorOpen) { // For iOS 16+
+			currencySelectorView()
+		}
 		.onChange(of: currencies) { _ in
 			currenciesDidChange()
 		}

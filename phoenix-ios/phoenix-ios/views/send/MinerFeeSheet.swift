@@ -18,13 +18,15 @@ struct MinerFeeSheet: View {
 	let amount: Bitcoin_kmpSatoshi
 	let btcAddress: String
 	
-	@Binding var minerFeeSats: Int64?
+	@Binding var minerFeeInfo: MinerFeeInfo?
 	@Binding var satsPerByte: String
 	@Binding var parsedSatsPerByte: Result<NSNumber, TextFieldNumberStylerError>
 	@Binding var mempoolRecommendedResponse: MempoolRecommendedResponse?
 	
+	@State var explicitlySelectedPriority: MinerFeePriority? = nil
+	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	@EnvironmentObject var smartModalState: SmartModalState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	enum Field: Hashable {
@@ -38,13 +40,6 @@ struct MinerFeeSheet: View {
 		value: { [$0.size.width] }
 	)
 	@State var priorityBoxWidth: CGFloat? = nil
-	
-	enum PriorityBoxHeight: Preference {}
-	let priorityBoxHeightReader = GeometryPreferenceReader(
-		key: AppendValue<PriorityBoxHeight>.self,
-		value: { [$0.size.height] }
-	)
-	@State var priorityBoxHeight: CGFloat? = nil
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -60,6 +55,9 @@ struct MinerFeeSheet: View {
 		}
 		.onChange(of: satsPerByte) { _ in
 			satsPerByteChanged()
+		}
+		.onChange(of: mempoolRecommendedResponse) { _ in
+			mempoolRecommendedResponseChanged()
 		}
 	}
 	
@@ -306,7 +304,7 @@ struct MinerFeeSheet: View {
 				Text("Review Transaction")
 			}
 			.font(.title3)
-			.disabled(minerFeeSats == nil)
+			.disabled(minerFeeInfo == nil)
 			Spacer()
 		}
 		.padding()
@@ -338,7 +336,8 @@ struct MinerFeeSheet: View {
 		return TextFieldNumberStyler(
 			formatter: formatter,
 			amount: $satsPerByte,
-			parsedAmount: $parsedSatsPerByte
+			parsedAmount: $parsedSatsPerByte,
+			userDidEdit: userDidEditSatsPerByteField
 		)
 	}
 	
@@ -373,31 +372,46 @@ struct MinerFeeSheet: View {
 	
 	func isPrioritySelected(_ priority: MinerFeePriority) -> Bool {
 		
-		
-		if let mempoolRecommendedResponse {
-			
-			switch parsedSatsPerByte {
-			case .success(let amount):
-				return amount.doubleValue == mempoolRecommendedResponse.feeForPriority(priority)
-			case .failure(_):
-				return false
-			}
-			
-		} else {
+		guard let mempoolRecommendedResponse else {
 			return false
+		}
+		
+		if let explicitlySelectedPriority {
+			return explicitlySelectedPriority == priority
+		}
+			
+		guard let amount = try? parsedSatsPerByte.get() else {
+			return false
+		}
+		
+		switch priority {
+			case .none:
+				return amount.doubleValue == mempoolRecommendedResponse.feeForPriority(.none)
+			
+			case .low:
+				return amount.doubleValue == mempoolRecommendedResponse.feeForPriority(.low) &&
+				       amount.doubleValue != mempoolRecommendedResponse.feeForPriority(.none)
+			
+			case .medium:
+				return amount.doubleValue == mempoolRecommendedResponse.feeForPriority(.medium) &&
+				       amount.doubleValue != mempoolRecommendedResponse.feeForPriority(.high)
+			
+			case .high:
+				return amount.doubleValue == mempoolRecommendedResponse.feeForPriority(.high) &&
+				       amount.doubleValue != mempoolRecommendedResponse.feeForPriority(.medium)
 		}
 	}
 	
 	func minerFeeStrings() -> (FormattedAmount, FormattedAmount) {
 		
-		guard let minerFeeSats else {
+		guard let minerFeeInfo else {
 			let btc = Utils.unknownBitcoinAmount(bitcoinUnit: currencyPrefs.bitcoinUnit)
 			let fiat = Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
 			return (btc, fiat)
 		}
 		
-		let btc = Utils.formatBitcoin(currencyPrefs, sat: minerFeeSats)
-		let fiat = Utils.formatFiat(currencyPrefs, sat: minerFeeSats)
+		let btc = Utils.formatBitcoin(currencyPrefs, sat: minerFeeInfo.minerFee)
+		let fiat = Utils.formatFiat(currencyPrefs, sat: minerFeeInfo.minerFee)
 		return (btc, fiat)
 	}
 	
@@ -412,8 +426,15 @@ struct MinerFeeSheet: View {
 			return
 		}
 		
+		explicitlySelectedPriority = priority
 		parsedSatsPerByte = .success(NSNumber(value: tuple.0))
 		satsPerByte = tuple.1
+	}
+	
+	func userDidEditSatsPerByteField() {
+		log.trace("userDidEditSatsPerByteField()")
+		
+		explicitlySelectedPriority = nil
 	}
 	
 	func satsPerByteChanged() {
@@ -424,7 +445,7 @@ struct MinerFeeSheet: View {
 			let peer = Biz.business.getPeer(),
 			let scriptBytes = Parser.shared.addressToPublicKeyScript(chain: Biz.business.chain, address: btcAddress)
 		else {
-			minerFeeSats = nil
+			minerFeeInfo = nil
 			return
 		}
 		
@@ -432,9 +453,10 @@ struct MinerFeeSheet: View {
 		let scriptVector = Bitcoin_kmpByteVector(bytes: scriptBytes)
 		
 		let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
-		let feePerKw = Lightning_kmpFeeratePerKw(feerate: satsPerByte_satoshi)
+		let feePerByte = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)
+		let feePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: feePerByte)
 		
-		minerFeeSats = nil
+		minerFeeInfo = nil
 		Task { @MainActor in
 			do {
 				let pair = try await peer.estimateFeeForSpliceOut(
@@ -443,20 +465,26 @@ struct MinerFeeSheet: View {
 					targetFeerate: feePerKw
 				)
 				
-				let _: Lightning_kmpFeeratePerKw = pair!.first!
+				let updatedFeePerKw: Lightning_kmpFeeratePerKw = pair!.first!
 				let fee: Bitcoin_kmpSatoshi = pair!.second!
 				
-				
 				if self.satsPerByte == originalSatsPerByte {
-					self.minerFeeSats = fee.sat
+					self.minerFeeInfo = MinerFeeInfo(pubKeyScript: scriptVector, feerate: updatedFeePerKw, minerFee: fee)
 				}
 				
 			} catch {
 				log.error("Error: \(error)")
-				self.minerFeeSats = nil
+				self.minerFeeInfo = nil
 			}
 			
 		} // </Task>
+	}
+	
+	func mempoolRecommendedResponseChanged() {
+		log.trace("mempoolRecommendedResponseChanged()")
+		
+		// The UI will change, so we need to reset the geometry measurements
+		priorityBoxWidth = nil
 	}
 	
 	func closeButtonTapped() {

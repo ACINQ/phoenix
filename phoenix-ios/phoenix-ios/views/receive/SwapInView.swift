@@ -28,12 +28,13 @@ struct SwapInView: View {
 	
 	@State var activeSheet: ReceiveViewSheet? = nil
 	
-	let swapInWalletBalancePublisher = Biz.business.balanceManager.swapInWalletBalancePublisher()
-	@State var swapInWalletBalance = Biz.business.balanceManager.swapInWalletBalanceValue()
+	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
+	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// For the cicular buttons: [copy, share]
 	enum MaxButtonWidth: Preference {}
@@ -49,24 +50,6 @@ struct SwapInView: View {
 	
 	@ViewBuilder
 	var body: some View {
-		
-		ZStack {
-			Color.primaryBackground
-				.edgesIgnoringSafeArea(.all)
-			
-			if BusinessManager.showTestnetBackground {
-				Image("testnet_bg")
-					.resizable(resizingMode: .tile)
-					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
-					.accessibilityHidden(true)
-			}
-			
-			contentWrapper()
-		}
-	}
-	
-	@ViewBuilder
-	func contentWrapper() -> some View {
 		
 		GeometryReader { geometry in
 			ScrollView(.vertical) {
@@ -134,8 +117,8 @@ struct SwapInView: View {
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
-		.onReceive(swapInWalletBalancePublisher) {
-			swapInWalletBalanceChanged($0)
+		.onReceive(swapInWalletPublisher) {
+			swapInWalletChanged($0)
 		}
 	}
 	
@@ -347,18 +330,18 @@ struct SwapInView: View {
 		}
 	}
 	
-	func swapInWalletBalanceChanged(_ walletBalance: WalletBalance) {
-		log.trace("swapInWalletBalanceChanged()")
+	func swapInWalletChanged(_ newWallet: Lightning_kmpWalletState.WalletWithConfirmations) {
+		log.trace("swapInWalletChanged()")
 		
 		// If we detect a new incoming payment on the swap-in address,
 		// then let's dismiss this sheet, and show the user the home screen.
 		//
 		// Because the home screen has the "+X sat incoming" message
 		
-		let oldBalance = swapInWalletBalance.total.sat
-		let newBalance = walletBalance.total.sat
+		let oldBalance = swapInWallet.totalBalance.sat
+		let newBalance = newWallet.totalBalance.sat
 		
-		swapInWalletBalance = walletBalance
+		swapInWallet = newWallet
 		if newBalance > oldBalance {
 			presentationMode.wrappedValue.dismiss()
 		}

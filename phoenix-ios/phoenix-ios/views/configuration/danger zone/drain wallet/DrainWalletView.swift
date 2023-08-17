@@ -19,11 +19,11 @@ struct DrainWalletView: MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
-	let popToRoot: () -> Void
+	let popTo: (PopToDestination) -> Void
 	let encryptedNodeId = Biz.encryptedNodeId!
 	
 	@State var didAppear = false
-	@State var popToRootRequested = false
+	@State var popToDestination: PopToDestination? = nil
 	
 	@State var textFieldValue: String = ""
 	@State var scannedValue: String? = nil
@@ -86,6 +86,9 @@ struct DrainWalletView: MVIView {
 				//
 				section_options()
 				section_button()
+				
+			} else if mvi.model is CloseChannelsConfiguration.ModelChannelsClosed {
+				section_channelsClosed()
 			}
 		}
 		.listStyle(.insetGrouped)
@@ -100,6 +103,17 @@ struct DrainWalletView: MVIView {
 				ProgressView()
 					.progressViewStyle(CircularProgressViewStyle())
 				Text("Loading wallet...")
+			}
+		} // </Section>
+	}
+	
+	@ViewBuilder
+	func section_channelsClosed() -> some View {
+		
+		Section {
+			HStack(alignment: VerticalAlignment.center, spacing: 8) {
+				Image(systemName: "checkmark.circle.fill").foregroundColor(.appPositive)
+				Text("Channels closed")
 			}
 		} // </Section>
 	}
@@ -239,7 +253,7 @@ struct DrainWalletView: MVIView {
 			DrainWalletView_Confirm(
 				mvi: mvi,
 				bitcoinAddress: bitcoinAddress,
-				popToRoot: updatedPopToRoot
+				popTo: popToWrapper
 			)
 		}
 	}
@@ -261,11 +275,11 @@ struct DrainWalletView: MVIView {
 		return (balance_bitcoin, balance_fiat)
 	}
 	
-	func updatedPopToRoot() {
-		log.trace("updatedPopToRoot()")
+	func popToWrapper(_ destination: PopToDestination) {
+		log.trace("popToWrapper(\(destination))")
 		
-		popToRootRequested = true
-		popToRoot()
+		popToDestination = destination
+		popTo(destination)
 	}
 	
 	// --------------------------------------------------
@@ -287,8 +301,8 @@ struct DrainWalletView: MVIView {
 			
 		} else {
 			
-			if popToRootRequested {
-				popToRootRequested = false
+			if popToDestination != nil {
+				popToDestination = nil
 				presentationMode.wrappedValue.dismiss()
 			}
 		}
@@ -328,11 +342,10 @@ struct DrainWalletView: MVIView {
 			if let error = error as? BitcoinAddressError.ChainMismatch {
 				detailedErrorMsg = String(format: NSLocalizedString(
 					"""
-					The address is for %@, \
-					but you're on %@
+					The address is not for %@
 					""",
 					comment: "Error message - parsing bitcoin address"),
-					error.actual.name, error.expected.name
+					error.expected.name
 				)
 			}
 			else if isScannedValue {
