@@ -45,7 +45,12 @@ class CloudDataTest {
         // attempt to deserialize & extract payment
         val data = CloudData.cborDeserialize(blob)
         assertNotNull(data)
-        val decoded = data.outgoing?.unwrap()
+        val decoded = when (outgoingPayment) {
+            is LightningOutgoingPayment -> data.outgoing?.unwrap()
+            is SpliceOutgoingPayment -> data.spliceOutgoing?.unwrap()
+            is ChannelCloseOutgoingPayment -> data.channelClose?.unwrap()
+            is SpliceCpfpOutgoingPayment -> data.spliceCpfp?.unwrap()
+        }
         assertNotNull(decoded)
 
         // test equality (no loss of information)
@@ -338,7 +343,12 @@ class CloudDataTest {
         assertIs<ChannelCloseOutgoingPayment>(decoded)
         assertEquals(50_000_000.msat, decoded.amount)
         assertEquals(2_000_000.msat, decoded.fees)
-        TODO("check mapping to ChannelCloseOutgoingPayment")
+        assertEquals("2N3mCs4rJGgwZ4h1dY38Hf7vLiwZLDVNzh4", decoded.address)
+        assertEquals(ByteVector32.fromValidHex("80cb832d2fc617db9022a3c29b42808fb2b126ec1be88bd0e480974e74c04b78"), decoded.channelId)
+        assertEquals(false, decoded.isSentToDefaultAddress)
+        assertEquals(1653500781802, decoded.createdAt)
+        assertEquals(1653500781802, decoded.confirmedAt)
+        assertEquals(1653500781802, decoded.lockedAt)
     }
 
     @Test
