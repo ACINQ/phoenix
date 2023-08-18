@@ -27,7 +27,6 @@ sealed class LnurlError(override val message: String? = null) : RuntimeException
 
     sealed class Withdraw(override val message: String?) : LnurlError(message) {
         object MissingK1 : Withdraw("missing k1 parameter in auth metadata")
-        object InvalidWithdrawalBounds : Withdraw("invalid min/maxWithdrawal amount")
     }
 
     sealed class Pay : LnurlError() {

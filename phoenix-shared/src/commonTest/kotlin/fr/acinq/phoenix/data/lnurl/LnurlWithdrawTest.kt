@@ -45,25 +45,46 @@ class LnurlWithdrawTest {
         """.trimIndent().let { Json.parseToJsonElement(it).jsonObject }
         val lnurl = Lnurl.parseLnurlJson(Url("https://acinq.co"), json)
         assertIs<LnurlWithdraw>(lnurl)
+        // min falls back to 0
         assertEquals(0.msat, lnurl.minWithdrawable)
         assertEquals(1234.msat, lnurl.maxWithdrawable)
     }
 
     @Test
-    fun test_parseJson_rejects_invalid_amount() {
-        assertFailsWith<LnurlError.Withdraw.InvalidWithdrawalBounds> {
-            val json = """
-                {
-                    "tag":"withdrawRequest",
-                    "callback":"$defaultLnurl/callback",
-                    "k1":"whatever",
-                    "defaultDescription":"",
-                    "minWithdrawable":1000,
-                    "maxWithdrawable":256
-                }
-            """.trimIndent().let { Json.parseToJsonElement(it).jsonObject }
-            Lnurl.parseLnurlJson(Url("https://acinq.co"), json)
-        }
+    fun test_parseJson_missing_maximum() {
+        val json = """
+            {
+                "tag":"withdrawRequest",
+                "callback":"$defaultLnurl/callback",
+                "k1":"whatever",
+                "defaultDescription":"",
+                "minWithdrawable":23456
+            }
+        """.trimIndent().let { Json.parseToJsonElement(it).jsonObject }
+        val lnurl = Lnurl.parseLnurlJson(Url("https://acinq.co"), json)
+        assertIs<LnurlWithdraw>(lnurl)
+        assertEquals(23456.msat, lnurl.minWithdrawable)
+        // max falls back to min
+        assertEquals(23456.msat, lnurl.maxWithdrawable)
+    }
+
+    @Test
+    fun test_parseJson_max_overrides_min() {
+        val json = """
+            {
+                "tag":"withdrawRequest",
+                "callback":"$defaultLnurl/callback",
+                "k1":"whatever",
+                "defaultDescription":"",
+                "minWithdrawable":257,
+                "maxWithdrawable":256
+            }
+        """.trimIndent().let { Json.parseToJsonElement(it).jsonObject }
+        val lnurl = Lnurl.parseLnurlJson(Url("https://acinq.co"), json)
+        assertIs<LnurlWithdraw>(lnurl)
+        // min > max => min becomes max
+        assertEquals(256.msat, lnurl.minWithdrawable)
+        assertEquals(256.msat, lnurl.maxWithdrawable)
     }
 
     @Test

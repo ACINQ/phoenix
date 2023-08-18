@@ -230,16 +230,13 @@ sealed interface Lnurl {
                     val maxWithdrawable = json["maxWithdrawable"]?.jsonPrimitive?.doubleOrNull?.takeIf { it > 0f }?.toLong()?.msat
                         ?: json["maxWithdrawable"]?.jsonPrimitive?.long?.takeIf { it > 0 }?.msat
                         ?: minWithdrawable
-                    if (minWithdrawable > maxWithdrawable) {
-                        throw LnurlError.Withdraw.InvalidWithdrawalBounds
-                    }
                     val dDesc = json["defaultDescription"]?.jsonPrimitive?.content ?: ""
                     LnurlWithdraw(
                         initialUrl = url,
                         callback = callback,
                         k1 = k1,
                         defaultDescription = dDesc,
-                        minWithdrawable = minWithdrawable,
+                        minWithdrawable = minWithdrawable.coerceAtMost(maxWithdrawable),
                         maxWithdrawable = maxWithdrawable
                     )
                 }
