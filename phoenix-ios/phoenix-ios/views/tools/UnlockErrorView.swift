@@ -15,8 +15,8 @@ struct UnlockErrorView: View {
 	
 	let danger: UnlockError
 	
-	@Environment(\.popoverState) private var popoverState: PopoverState
-	@State private var popoverItem: PopoverItem? = nil
+	@EnvironmentObject var popoverState: PopoverState
+	@State var popoverItem: PopoverItem? = nil
 	
 	@StateObject var toast = Toast()
 	
@@ -163,7 +163,7 @@ struct ErrorDetailsView: View, ViewName {
 	@State var sharing: String? = nil
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	@Environment(\.popoverState) var popoverState: PopoverState
+	@EnvironmentObject var popoverState: PopoverState
 	
 	enum ButtonHeight: Preference {}
 	let buttonHeightReader = GeometryPreferenceReader(

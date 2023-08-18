@@ -15,7 +15,7 @@ struct DrainWalletView_Action: MVISubView {
 	
 	@ObservedObject var mvi: MVIState<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>
 	let expectedTxCount: Int
-	let popToRoot: () -> Void
+	let popTo: (PopToDestination) -> Void
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -169,7 +169,7 @@ struct DrainWalletView_Action: MVISubView {
 	func doneButtonTapped() {
 		log.trace("doneButtonTapped()")
 		
+		popTo(.RootView(followedBy: nil))
 		presentationMode.wrappedValue.dismiss()
-		popToRoot()
 	}
 }

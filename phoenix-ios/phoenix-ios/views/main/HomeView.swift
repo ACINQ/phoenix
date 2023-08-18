@@ -24,6 +24,8 @@ struct HomeView : MVIView {
 	private let paymentsManager = Biz.business.paymentsManager
 	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "HomeView")
 	
+	let showSwapInWallet: () -> Void
+	
 	@StateObject var mvi = MVIState({ $0.home() })
 
 	@Environment(\.controllerFactory) var factoryEnv
@@ -31,10 +33,6 @@ struct HomeView : MVIView {
 	
 	@StateObject var noticeMonitor = NoticeMonitor()
 	@StateObject var syncState = DownloadMonitor()
-	
-	@EnvironmentObject var deviceInfo: DeviceInfo
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	let recentPaymentsConfigPublisher = Prefs.shared.recentPaymentsConfigPublisher
 	@State var recentPaymentsConfig = Prefs.shared.recentPaymentsConfig
@@ -44,8 +42,8 @@ struct HomeView : MVIView {
 	
 	let lastCompletedPaymentPublisher = Biz.business.paymentsManager.lastCompletedPaymentPublisher()
 	
-	let swapInWalletBalancePublisher = Biz.business.balanceManager.swapInWalletBalancePublisher()
-	@State var swapInWalletBalance: WalletBalance = WalletBalance.companion.empty()
+	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
+	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 	
 	let swapInRejectedPublisher = Biz.swapInRejectedPublisher
 	@State var swapInRejected: Lightning_kmpLiquidityEventsRejected? = nil
@@ -53,9 +51,6 @@ struct HomeView : MVIView {
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
 	@State var incomingSwapAnimationsRemaining = 0
-	
-	// Toggles confirmation dialog (used to select preferred explorer)
-	@State var showBlockchainExplorerOptions = false
 	
 	let bizNotificationsPublisher = Biz.business.notificationsManager.notificationsPublisher()
 	@State var bizNotifications: [PhoenixShared.NotificationsManager.NotificationItem] = []
@@ -76,16 +71,21 @@ struct HomeView : MVIView {
 	
 	@State var activeSheet: HomeViewSheet? = nil
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
 	@Environment(\.openURL) var openURL
 	@Environment(\.colorScheme) var colorScheme
+	
+	@EnvironmentObject var deviceInfo: DeviceInfo
+	@EnvironmentObject var popoverState: PopoverState
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
 	// MARK: Init
 	// --------------------------------------------------
 	
-	init() {
-		paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
+	init(showSwapInWallet: @escaping () -> Void) {
+		self.showSwapInWallet = showSwapInWallet
+		self.paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
 	}
 	
 	// --------------------------------------------------
@@ -122,8 +122,8 @@ struct HomeView : MVIView {
 		.onReceive(lastCompletedPaymentPublisher) {
 			lastCompletedPaymentChanged($0)
 		}
-		.onReceive(swapInWalletBalancePublisher) {
-			swapInWalletBalanceChanged($0)
+		.onReceive(swapInWalletPublisher) {
+			swapInWalletChanged($0)
 		}
 		.onReceive(swapInRejectedPublisher) {
 			swapInRejectedStateChange($0)
@@ -137,7 +137,6 @@ struct HomeView : MVIView {
 	func content() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-
 			balance()
 				.padding(.bottom, 25)
 			notices()
@@ -157,14 +156,14 @@ struct HomeView : MVIView {
 					type: .sheet(closeAction: { self.activeSheet = nil }),
 					paymentInfo: selectedPayment
 				)
-				.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
+				.modifier(GlobalEnvironment.sheetInstance())
 				
 			case .notificationsView:
 				
 				NotificationsView(
 					noticeMonitor: noticeMonitor
 				)
-				.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
+				.modifier(GlobalEnvironment.sheetInstance())
 			}
 		}
 	}
@@ -276,7 +275,7 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	func incomingBalance() -> some View {
 		
-		let incomingSat = swapInWalletBalance.total.sat
+		let incomingSat = swapInWallet.totalBalance.sat
 		if incomingSat > 0 {
 			let formattedAmount = currencyPrefs.hideAmounts
 				? Utils.hiddenAmount(currencyPrefs)
@@ -302,7 +301,7 @@ struct HomeView : MVIView {
 			}
 			.font(.callout)
 			.foregroundColor(.secondary)
-			.onTapGesture { showIncomingDepositPopover() }
+			.onTapGesture { showSwapInWallet() }
 			.padding(.top, 7)
 			.padding(.bottom, 2)
 			.scaleEffect(incomingSwapScaleFactor, anchor: .top)
@@ -318,12 +317,16 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	func notices() -> some View {
 		
-		let count = noticeCount()
-		if count > 1 {
-			notice_multiple(count: count)
-		} else if count == 1 {
-			notice_single()
+		Group {
+			let count = noticeCount()
+			if count > 1 {
+				notice_multiple(count: count)
+			} else if count == 1 {
+				notice_single()
+			}
 		}
+		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
+		.padding([.leading, .trailing, .bottom], 10)
 	}
 	
 	@ViewBuilder
@@ -370,7 +373,7 @@ struct HomeView : MVIView {
 		.onTapGesture {
 			openNotificationsSheet()
 		}
-		.padding([.leading, .trailing, .bottom], 10)
+		
 	}
 	
 	@ViewBuilder
@@ -379,7 +382,6 @@ struct HomeView : MVIView {
 		NoticeBox {
 			notice_primary(includeAction: true)
 		}
-		.padding([.leading, .trailing, .bottom], 10)
 	}
 	
 	@ViewBuilder
@@ -606,7 +608,7 @@ struct HomeView : MVIView {
 		log.trace("onModelChange()")
 		
 		let balance = model.balance?.msat ?? 0
-		let incomingBalance = swapInWalletBalance.total.sat
+		let incomingBalance = swapInWallet.totalBalance.sat
 		
 		if balance > 0 || incomingBalance > 0 || model.paymentsCount > 0 {
 			if Prefs.shared.isNewWallet {
@@ -653,13 +655,13 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func swapInWalletBalanceChanged(_ walletBalance: WalletBalance) {
-		log.trace("swapInWalletBalanceChanged()")
+	func swapInWalletChanged(_ newWallet: Lightning_kmpWalletState.WalletWithConfirmations) {
+		log.trace("swapInWalletChanged()")
 		
-		let oldBalance = swapInWalletBalance.total.sat
-		let newBalance = walletBalance.total.sat
+		let oldBalance = swapInWallet.totalBalance.sat
+		let newBalance = newWallet.totalBalance.sat
 		
-		swapInWalletBalance = walletBalance
+		swapInWallet = newWallet
 		if newBalance > oldBalance {
 			// Since the balance increased, there is a new utxo for the user.
 			// This isn't added to the transaction list, but is instead displayed under the balance.
@@ -752,14 +754,6 @@ struct HomeView : MVIView {
 			
 		} else if currencyPrefs.currencyType == .fiat {
 			currencyPrefs.toggleHideAmounts()
-		}
-	}
-	
-	func showIncomingDepositPopover() {
-		log.trace("showIncomingDepositPopover()")
-		
-		popoverState.display(dismissable: true) {
-			IncomingDepositPopover()
 		}
 	}
 	

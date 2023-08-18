@@ -64,6 +64,7 @@ sealed class OutgoingDetailsData {
     @Deprecated("channel close are now stored in their own table")
     sealed class Closing : OutgoingDetailsData() {
         @Serializable
+        @Suppress("DEPRECATION")
         data class V0(
             @Serializable val channelId: ByteVector32,
             val closingAddress: String,
@@ -73,6 +74,7 @@ sealed class OutgoingDetailsData {
 
     companion object {
         /** Deserialize the details of an outgoing payment. Return null if the details is for a legacy channel closing payment (see [deserializeLegacyClosingDetails]). */
+        @Suppress("DEPRECATION")
         fun deserialize(typeVersion: OutgoingDetailsTypeVersion, blob: ByteArray): LightningOutgoingPayment.Details? = DbTypesHelper.decodeBlob(blob) { json, format ->
             when (typeVersion) {
                 OutgoingDetailsTypeVersion.NORMAL_V0 -> format.decodeFromString<Normal.V0>(json).let { LightningOutgoingPayment.Details.Normal(PaymentRequest.read(it.paymentRequest)) }
@@ -83,6 +85,7 @@ sealed class OutgoingDetailsData {
         }
 
         /** Returns the channel closing details from a blob, for backward-compatibility purposes. */
+        @Suppress("DEPRECATION")
         fun deserializeLegacyClosingDetails(blob: ByteArray): Closing.V0 = DbTypesHelper.decodeBlob(blob) { json, format ->
             format.decodeFromString(json)
         }

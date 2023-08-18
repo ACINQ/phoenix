@@ -8,7 +8,7 @@ struct RootView: View {
 		GeometryReader { geometry in
 			ContentView()
 				.frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
-				.modifier(GlobalEnvironment())
+				.modifier(GlobalEnvironment.mainInstance())
 				.onAppear {
 					GlobalEnvironment.deviceInfo._windowSize = geometry.size
 					GlobalEnvironment.deviceInfo.windowSafeArea = geometry.safeAreaInsets

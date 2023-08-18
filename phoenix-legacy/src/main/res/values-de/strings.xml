@@ -818,7 +818,7 @@
   <!-- //////////////// Migration to KMP //////////////// -->
 
   <string name="legacy_migration_title">Phoenix Upgrade</string>
-  <string name="legacy_migration_ready_message">Upgrade auf die neueste Version von Phoenix, mit einer hochmodernen Lightning-Engine und neuen Funktionen.\n\nIhre Kanäle werden zusammengeführt. Dieser Prozess ist automatisiert.</string>
+  <string name="legacy_migration_ready_message">Upgrade auf die neueste Version von Phoenix, mit einer hochmodernen Lightning-Engine und neuen Funktionen.\n\nIhre Kanäle werden zusammengeführt. Dieser Prozess ist automatisiert.\n\nWenn die Migration abgeschlossen ist, sollten Sie Ihre alten Swap-Adressen nicht wieder verwenden.</string>
   <string name="legacy_migration_prepare_button">Upgrade</string>
   <string name="legacy_migration_prepare_button_disconnected">Verbindung herstellen…</string>
   <string name="legacy_migration_dismiss_button">Nicht jetzt</string>

@@ -18,6 +18,7 @@ enum DeepLink: String, Equatable {
 	case electrum
 	case backgroundPayments
 	case liquiditySettings
+	case forceCloseChannels
 }
 
 class DeepLinkManager: ObservableObject {
@@ -74,6 +75,31 @@ class DeepLinkManager: ObservableObject {
 		
 			self.deepLinkIdx += 1
 			self.deepLink = nil
+		}
+	}
+}
+
+enum PopToDestination: CustomStringConvertible {
+	case RootView(followedBy: DeepLink? = nil)
+	case ConfigurationView(followedBy: DeepLink? = nil)
+	case TransactionsView
+	
+	var followedBy: DeepLink? {
+		switch self {
+			case .RootView(let followedBy)          : return followedBy
+			case .ConfigurationView(let followedBy) : return followedBy
+			case .TransactionsView                  : return nil
+		}
+	}
+	
+	public var description: String {
+		switch self {
+		case .RootView(let followedBy):
+			return "RootView(followedBy: \(followedBy?.rawValue ?? "nil"))"
+		case .ConfigurationView(let followedBy):
+			return "ConfigurationView(follwedBy: \(followedBy?.rawValue ?? "nil"))"
+		case .TransactionsView:
+			return "TransactionsView"
 		}
 	}
 }

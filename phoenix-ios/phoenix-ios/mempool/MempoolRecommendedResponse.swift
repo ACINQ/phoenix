@@ -1,4 +1,6 @@
 import Foundation
+import PhoenixShared
+
 
 enum MinerFeePriority {
 	case none
@@ -7,11 +9,23 @@ enum MinerFeePriority {
 	case high
 }
 
-struct MempoolRecommendedResponse: Codable {
+struct MempoolRecommendedResponse: Equatable, Codable {
 	let fastestFee: Double
 	let halfHourFee: Double
 	let hourFee: Double
 	let economyFee: Double
+	let minimumFee: Double
+	
+	let timestamp: Date = Date.now // always using our own timestamp here
+	
+	// Tell compiler to ignore `timestamp` property when decoding
+	private enum CodingKeys: String, CodingKey {
+		case fastestFee
+		case halfHourFee
+		case hourFee
+		case economyFee
+		case minimumFee
+	}
 	
 	func feeForPriority(_ priority: MinerFeePriority) -> Double {
 		switch priority {
@@ -48,5 +62,22 @@ struct MempoolRecommendedResponse: Codable {
 		}
 		
 		return .success(response)
+	}
+	
+	func toKotlin() -> MempoolFeerate {
+		
+		return MempoolFeerate(
+			fastest: Lightning_kmpFeeratePerByte(feerate: Bitcoin_kmpSatoshi(sat: Int64(fastestFee))),
+			halfHour: Lightning_kmpFeeratePerByte(feerate: Bitcoin_kmpSatoshi(sat: Int64(halfHourFee))),
+			hour: Lightning_kmpFeeratePerByte(feerate: Bitcoin_kmpSatoshi(sat: Int64(hourFee))),
+			economy: Lightning_kmpFeeratePerByte(feerate: Bitcoin_kmpSatoshi(sat: Int64(economyFee))),
+			minimum: Lightning_kmpFeeratePerByte(feerate: Bitcoin_kmpSatoshi(sat: Int64(minimumFee))),
+			timestamp: timestamp.toMilliseconds()
+		)
+	}
+	
+	func swapEstimationFee(hasNoChannels: Bool) -> Bitcoin_kmpSatoshi {
+		
+		return self.toKotlin().swapEstimationFee(hasNoChannels: hasNoChannels)
 	}
 }

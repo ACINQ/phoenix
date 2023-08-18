@@ -16,7 +16,7 @@ struct PaymentLayerChoice: View {
 	
 	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
+	@EnvironmentObject var popoverState: PopoverState
 	
 	@ViewBuilder
 	var body: some View {

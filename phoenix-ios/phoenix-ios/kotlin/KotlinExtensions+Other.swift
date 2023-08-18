@@ -12,22 +12,22 @@ extension PhoenixBusiness {
 
 extension PeerManager {
 	
-	func finalWalletBalance() -> Lightning_kmpWalletState.WalletWithConfirmations {
+	func finalWalletValue() -> Lightning_kmpWalletState.WalletWithConfirmations {
 		if let value = self.finalWallet.value_ as? Lightning_kmpWalletState.WalletWithConfirmations {
 			return value
 		} else {
-			return Lightning_kmpWalletState.WalletWithConfirmations(minConfirmations: 1, currentBlockHeight: 1, all: [])
+			return Lightning_kmpWalletState.WalletWithConfirmations.empty()
 		}
 	}
 }
 
 extension BalanceManager {
 	
-	func swapInWalletBalanceValue() -> WalletBalance {
-		if let value = swapInWalletBalance.value_ as? WalletBalance {
+	func swapInWalletValue() -> Lightning_kmpWalletState.WalletWithConfirmations {
+		if let value = self.swapInWallet.value_ as? Lightning_kmpWalletState.WalletWithConfirmations {
 			return value
 		} else {
-			return WalletBalance.companion.empty()
+			return Lightning_kmpWalletState.WalletWithConfirmations.empty()
 		}
 	}
 }
@@ -69,10 +69,30 @@ extension Lightning_kmpWalletState.WalletWithConfirmations {
 		return Bitcoin_kmpSatoshi(sat: balance)
 	}
 	
-	var confirmedBalance: Bitcoin_kmpSatoshi {
-		let anyConfirmed = weaklyConfirmed + deeplyConfirmed
-		let balance = anyConfirmed.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
+	var weaklyConfirmedBalance: Bitcoin_kmpSatoshi {
+		let balance = weaklyConfirmed.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
 		return Bitcoin_kmpSatoshi(sat: balance)
+	}
+	
+	var deeplyConfirmedBalance: Bitcoin_kmpSatoshi {
+		let balance = deeplyConfirmed.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
+		return Bitcoin_kmpSatoshi(sat: balance)
+	}
+	
+	var anyConfirmedBalance: Bitcoin_kmpSatoshi {
+		let anyConfirmedTx = weaklyConfirmed + deeplyConfirmed
+		let balance = anyConfirmedTx.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
+		return Bitcoin_kmpSatoshi(sat: balance)
+	}
+	
+	var totalBalance: Bitcoin_kmpSatoshi {
+		let allTx = unconfirmed + weaklyConfirmed + deeplyConfirmed
+		let balance = allTx.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
+		return Bitcoin_kmpSatoshi(sat: balance)
+	}
+	
+	static func empty() -> Lightning_kmpWalletState.WalletWithConfirmations {
+		return Lightning_kmpWalletState.WalletWithConfirmations(minConfirmations: 1, currentBlockHeight: 1, all: [])
 	}
 }
 
@@ -106,6 +126,28 @@ extension ConnectionsManager {
 		}
 
 		return publisher
+	}
+	
+	var asyncStream: AsyncStream<Connections> {
+		
+		return AsyncStream<Connections>(bufferingPolicy: .bufferingNewest(1)) { continuation in
+			
+			let swiftFlow = SwiftFlow<Connections>(origin: self.connections)
+
+			let watcher = swiftFlow.watch {(connections: Connections?) in
+				if let connections {
+					continuation.yield(connections)
+				}
+			}
+			
+			continuation.onTermination = { _ in
+				DispatchQueue.main.async {
+					// I'm not sure what thread this will be called from.
+					// And I've witnessed crashes when invoking `watcher.close()` from  a non-main thread.
+					watcher.close()
+				}
+			}
+		}
 	}
 }
 

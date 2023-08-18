@@ -122,7 +122,7 @@
     <string name="send_error_amount_overpaying">Cannot pay more than %1$s.</string>
     <string name="send_error_amount_below_requested">This amount is below the requested amount of %1$s.</string>
     <string name="send_destination_label">Send to</string>
-    <string name="send_description_label">Payment description</string>
+    <string name="send_description_label">Description</string>
     <string name="send_trampoline_fee_label">Fee</string>
     <string name="send_trampoline_fee_no_amount">N/A</string>
     <string name="send_trampoline_fee_loading">Loading fee…</string>
@@ -512,7 +512,7 @@
     <!-- lnurl-pay -->
 
     <string name="lnurl_pay_domain">Served by</string>
-    <string name="lnurl_pay_meta_description">Payment description</string>
+    <string name="lnurl_pay_meta_description">Description</string>
     <string name="lnurl_pay_comment_add_button">Attach a message</string>
     <string name="lnurl_pay_comment_label">My message</string>
     <string name="lnurl_pay_comment_instructions">You can attach a message to the payment. This message will be sent to the recipient.</string>
@@ -654,9 +654,12 @@
 
     <!-- settings: currencies -->
 
-    <string name="currency_ars_bm">Argentine Peso (blue market)</string>
-    <string name="currency_cup_fm">Cuban Peso (free market)</string>
-    <string name="currency_lbp_bm">Lebanese Pound (black market)</string>
+    <string name="currency_ars_official">Argentine Peso (official rate)</string>
+    <string name="currency_ars_bm">Argentine Peso</string>
+    <string name="currency_cup_official">Cuban Peso (official rate)</string>
+    <string name="currency_cup_fm">Cuban Peso</string>
+    <string name="currency_lbp_official">Lebanese Pound (official rate)</string>
+    <string name="currency_lbp_bm">Lebanese Pound</string>
 
     <!-- payments history -->
 

@@ -28,8 +28,7 @@ struct AppStatusButton: View {
 	
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
-
+	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	
 	let syncTxManager = Biz.syncManager!.syncTxManager

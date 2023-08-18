@@ -42,7 +42,7 @@ struct TipSliderSheet: View {
 	)
 	@State var contentHeight: CGFloat? = nil
 	
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	@EnvironmentObject var smartModalState: SmartModalState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	// There are 3 scenarios:

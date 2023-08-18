@@ -17,11 +17,11 @@ struct ContentView: View {
 	@ObservedObject var lockState = LockState.shared
 	@State var unlockedOnce = false
 	
-	@Environment(\.shortSheetState) private var shortSheetState: ShortSheetState
-	@State private var shortSheetItem: ShortSheetItem? = nil
+	@EnvironmentObject var shortSheetState: ShortSheetState
+	@State var shortSheetItem: ShortSheetItem? = nil
 	
-	@Environment(\.popoverState) private var popoverState: PopoverState
-	@State private var popoverItem: PopoverItem? = nil
+	@EnvironmentObject var popoverState: PopoverState
+	@State var popoverItem: PopoverItem? = nil
 	
 	@ViewBuilder
 	var body: some View {

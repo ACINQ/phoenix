@@ -6,7 +6,7 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "KotlinPublishers"
+	category: "KotlinPublishers+Phoenix"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
@@ -17,6 +17,7 @@ extension PeerManager {
 	fileprivate struct _Key {
 		static var peerStatePublisher = 0
 		static var channelsPublisher = 0
+		static var finalWalletPublisher = 0
 	}
 	
 	func peerStatePublisher() -> AnyPublisher<Lightning_kmpPeer, Never> {
@@ -51,6 +52,25 @@ extension PeerManager {
 			.eraseToAnyPublisher()
 		}
 	}
+	
+	func finalWalletPublisher() -> AnyPublisher<Lightning_kmpWalletState.WalletWithConfirmations, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.finalWalletPublisher) {
+			
+			// Transforming from Kotlin:
+			// ```
+			// finalWallet: StateFlow<WalletState.WalletWithConfirmations?>
+			// ```
+			KotlinCurrentValueSubject<
+				Lightning_kmpWalletState.WalletWithConfirmations,
+				Lightning_kmpWalletState.WalletWithConfirmations?
+			>(
+				self.finalWallet
+			)
+			.map { $0 ?? Lightning_kmpWalletState.WalletWithConfirmations.empty() }
+			.eraseToAnyPublisher()
+		}
+	}
 }
 
 // MARK: -
@@ -81,7 +101,7 @@ extension BalanceManager {
 	
 	fileprivate struct _Key {
 		static var balancePublisher = 0
-		static var swapInWalletBalancePublisher = 0
+		static var swapInWalletPublisher = 0
 	}
 	
 	func balancePublisher() -> AnyPublisher<Lightning_kmpMilliSatoshi?, Never> {
@@ -98,17 +118,21 @@ extension BalanceManager {
 		}
 	}
 	
-	func swapInWalletBalancePublisher() -> AnyPublisher<WalletBalance, Never> {
+	func swapInWalletPublisher() -> AnyPublisher<Lightning_kmpWalletState.WalletWithConfirmations, Never> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.swapInWalletBalancePublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.swapInWalletPublisher) {
 			
 			// Transforming from Kotlin:
 			// ```
-			// swapInWalletBalance: StateFlow<WalletBalance>
+			// swapInWallet: StateFlow<WalletState.WalletWithConfirmations?>
 			// ```
-			KotlinCurrentValueSubject<WalletBalance, WalletBalance>(
-				self.swapInWalletBalance
+			KotlinCurrentValueSubject<
+				Lightning_kmpWalletState.WalletWithConfirmations,
+				Lightning_kmpWalletState.WalletWithConfirmations?
+			>(
+				self.swapInWallet
 			)
+			.map { $0 ?? Lightning_kmpWalletState.WalletWithConfirmations.empty() }
 			.eraseToAnyPublisher()
 		}
 	}
@@ -354,75 +378,6 @@ extension CloudKitDb {
 			.map {
 				$0.int64Value
 			}
-			.eraseToAnyPublisher()
-		}
-	}
-}
-
-// MARK: -
-extension Lightning_kmpPeer {
-	
-	fileprivate struct _Key {
-		static var channelsPublisher = 0
-	}
-	
-	typealias ChannelsMap = [Bitcoin_kmpByteVector32: Lightning_kmpChannelState]
-	
-	func channelsPublisher() -> AnyPublisher<ChannelsMap, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.channelsPublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `channelsFlow: StateFlow<Map<ByteVector32, ChannelState>>`
-			///
-			KotlinCurrentValueSubject<NSDictionary, ChannelsMap>(
-				self.channelsFlow
-			)
-			.eraseToAnyPublisher()
-		}
-	}
-}
-
-// MARK: -
-extension Lightning_kmpElectrumWatcher {
-	
-	fileprivate struct _Key {
-		static var upToDatePublisher = 0
-	}
-	
-	func upToDatePublisher() -> AnyPublisher<Int64, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.upToDatePublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `openUpToDateFlow(): Flow<Long>`
-			///
-			KotlinPassthroughSubject<KotlinLong, Int64>(
-				self.openUpToDateFlow()
-			)
-			.eraseToAnyPublisher()
-		}
-	}
-}
-
-// MARK: -
-extension Lightning_kmpNodeParams {
-	
-	fileprivate struct _Key {
-		static var nodeEventsPublisher = 0
-	}
-	
-	func nodeEventsPublisher() -> AnyPublisher<Lightning_kmpNodeEvents, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.nodeEventsPublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `nodeEvents: SharedFlow<NodeEvents>`
-			///
-			KotlinPassthroughSubject<Lightning_kmpNodeEvents, Lightning_kmpNodeEvents?>(
-				self.nodeEvents
-			)
-			.compactMap { $0 }
 			.eraseToAnyPublisher()
 		}
 	}

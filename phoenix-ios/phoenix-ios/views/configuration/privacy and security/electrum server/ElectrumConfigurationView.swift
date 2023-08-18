@@ -24,8 +24,7 @@ struct ElectrumConfigurationView: MVIView {
 	@State var didAppear = false
 	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
-	
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	func connectionInfo() -> (String, String) {
 		

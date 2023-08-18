@@ -11,6 +11,11 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+struct InboundFeeWarning {
+	let title: LocalizedStringKey
+	let message: LocalizedStringKey
+	let showButton: Bool
+}
 
 struct ReceiveLightningView: View {
 	
@@ -34,28 +39,30 @@ struct ReceiveLightningView: View {
 	}
 	@State var activeSheet: ReceiveViewSheet? = nil
 	
-	@State var swapIn_enabled = true
 	@State var payToOpen_enabled = true
 	
-	@State var channelsCount = 0
-	
+	@State var channels: [LocalChannelInfo] = []
+	@State var liquidityPolicy: LiquidityPolicy = Prefs.shared.liquidityPolicy
 	@State var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State var modificationAmount: CurrencyAmount? = nil
 	@State var currencyConverterOpen = false
 	
+	@State var mempoolRecommendedResponse: MempoolRecommendedResponse? = nil
+	
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	@Environment(\.popoverState) var popoverState: PopoverState
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	@EnvironmentObject var popoverState: PopoverState
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
 	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
+	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	
 	// For the cicular buttons: [copy, share, edit]
 	enum MaxButtonWidth: Preference {}
@@ -72,6 +79,14 @@ struct ReceiveLightningView: View {
 	@ViewBuilder
 	var body: some View {
 		
+		content()
+			.navigationTitle(NSLocalizedString("Receive", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
 		ZStack {
 			if #unavailable(iOS 16.0) {
 				NavigationLink(
@@ -84,25 +99,14 @@ struct ReceiveLightningView: View {
 				
 			} // else: uses.navigationStackDestination()
 			
-			Color.primaryBackground
-				.edgesIgnoringSafeArea(.all)
-			
-			if BusinessManager.showTestnetBackground {
-				Image("testnet_bg")
-					.resizable(resizingMode: .tile)
-					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
-					.accessibilityHidden(true)
-			}
-			
-			content()
+			mainWrapper()
 		}
 		.onAppear {
 			onAppear()
 		}
-		.navigationStackDestination( // For iOS 16+
-			isPresented: $currencyConverterOpen,
-			destination: currencyConverterView
-		)
+		.navigationStackDestination(isPresented: $currencyConverterOpen) { // For iOS 16+
+			currencyConverterView()
+		}
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
@@ -111,6 +115,12 @@ struct ReceiveLightningView: View {
 		}
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
+		}
+		.onReceive(channelsPublisher) {
+			channelsChanged($0)
+		}
+		.onReceive(Prefs.shared.liquidityPolicyPublisher) {
+			liquidityPolicyChanged($0)
 		}
 		.onReceive(NotificationsManager.shared.permissions) {
 			notificationPermissionsChanged($0)
@@ -132,40 +142,36 @@ struct ReceiveLightningView: View {
 			
 			} // </switch>
 		}
-		.navigationTitle(NSLocalizedString("Receive", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
-	}
-	
-	@ViewBuilder
-	func content() -> some View {
-		
-		if isFullScreenQrcode {
-			fullScreenQrcode()
-		} else {
-			mainWrapper()
+		.task {
+			await fetchMempoolRecommendedFees()
 		}
 	}
 	
 	@ViewBuilder
 	func mainWrapper() -> some View {
 		
-		// SwiftUI BUG workaround:
-		//
-		// When the keyboard appears, the main view shouldn't move. At all.
-		// It should perform ZERO keyboard avoidance.
-		// Which means we need to use: `.ignoresSafeArea(.keyboard)`
-		//
-		// But, of course, this doesn't work properly because of a SwiftUI bug.
-		// So the current recommended workaround is to wrap everything in a GeometryReader.
-		//
-		GeometryReader { geometry in
-			ScrollView(.vertical) {
-				main()
-					.frame(width: geometry.size.width)
-					.frame(minHeight: geometry.size.height)
+		if isFullScreenQrcode {
+			fullScreenQrcode()
+		} else {
+			
+			// SwiftUI BUG workaround:
+			//
+			// When the keyboard appears, the main view shouldn't move. At all.
+			// It should perform ZERO keyboard avoidance.
+			// Which means we need to use: `.ignoresSafeArea(.keyboard)`
+			//
+			// But, of course, this doesn't work properly because of a SwiftUI bug.
+			// So the current recommended workaround is to wrap everything in a GeometryReader.
+			//
+			GeometryReader { geometry in
+				ScrollView(.vertical) {
+					main()
+						.frame(width: geometry.size.width)
+						.frame(minHeight: geometry.size.height)
+				}
 			}
+			.ignoresSafeArea(.keyboard)
 		}
-		.ignoresSafeArea(.keyboard)
 	}
 	
 	@ViewBuilder
@@ -204,14 +210,14 @@ struct ReceiveLightningView: View {
 			
 			VStack(alignment: .center) {
 			
-				invoiceAmount()
-					.font(.caption2)
+				invoiceAmountView()
+					.font(.footnote)
 					.foregroundColor(.secondary)
 					.padding(.bottom, 2)
 			
 				Text(invoiceDescription())
 					.lineLimit(1)
-					.font(.caption2)
+					.font(.footnote)
 					.foregroundColor(.secondary)
 					.padding(.bottom, 2)
 			}
@@ -225,7 +231,8 @@ struct ReceiveLightningView: View {
 			}
 			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			
-			warningButton()
+			backgroundPaymentsDisabledWarning()
+			inboundFeeWarnings()
 			
 			Spacer()
 			
@@ -264,17 +271,18 @@ struct ReceiveLightningView: View {
 			
 				Spacer()
 				
-				invoiceAmount()
-					.font(.caption2)
+				invoiceAmountView()
+					.font(.footnote)
 					.foregroundColor(.secondary)
 					.padding(.bottom, 6)
 			
 				Text(invoiceDescription())
 					.lineLimit(1)
-					.font(.caption2)
+					.font(.footnote)
 					.foregroundColor(.secondary)
 				
-				warningButton(paddingTop: 8)
+				backgroundPaymentsDisabledWarning(paddingTop: 8)
+				inboundFeeWarnings(paddingTop: 8)
 				
 				Spacer()
 			}
@@ -390,7 +398,7 @@ struct ReceiveLightningView: View {
 	}
 	
 	@ViewBuilder
-	func invoiceAmount() -> some View {
+	func invoiceAmountView() -> some View {
 		
 		if let m = mvi.model as? Receive.Model_Generated {
 			if let msat = m.amount?.msat {
@@ -525,30 +533,6 @@ struct ReceiveLightningView: View {
 	}
 	
 	@ViewBuilder
-	func warningButton(paddingTop: CGFloat? = nil) -> some View {
-		
-		if notificationPermissions == .disabled {
-			
-			// The user has disabled "background payments"
-			
-			Button {
-				navigationToBackgroundPayments()
-			} label: {
-				Label {
-					Text("Background payments disabled")
-				} icon: {
-					Image(systemName: "exclamationmark.triangle")
-						.renderingMode(.template)
-				}
-				.foregroundColor(.appNegative)
-			}
-			.padding(.top, paddingTop)
-			.accessibilityLabel("Warning: background payments disabled")
-			.accessibilityHint("Tap for more info")
-		}
-	}
-	
-	@ViewBuilder
 	func payToOpenDisabledWarning() -> some View {
 		
 		HStack(alignment: VerticalAlignment.top, spacing: 0) {
@@ -578,6 +562,62 @@ struct ReceiveLightningView: View {
 	}
 	
 	@ViewBuilder
+	func backgroundPaymentsDisabledWarning(paddingTop: CGFloat? = nil) -> some View {
+		
+		if notificationPermissions == .disabled {
+			
+			// The user has disabled "background payments"
+			
+			Button {
+				navigationToBackgroundPayments()
+			} label: {
+				Label {
+					Text("Background payments disabled")
+				} icon: {
+					Image(systemName: "exclamationmark.triangle")
+						.renderingMode(.template)
+				}
+				.foregroundColor(.appNegative)
+			}
+			.padding(.top, paddingTop)
+			.accessibilityLabel("Warning: background payments disabled")
+			.accessibilityHint("Tap for more info")
+		}
+	}
+	
+	@ViewBuilder
+	func inboundFeeWarnings(paddingTop: CGFloat? = nil) -> some View {
+		
+		
+		if let warning = inboundFeeWarning() {
+			
+			VStack(alignment: HorizontalAlignment.center, spacing: 10) {
+				Label {
+					Text(warning.title)
+				} icon: {
+					Image(systemName: "info.circle").foregroundColor(.appAccent)
+				}
+				.font(.headline)
+				
+				Text(warning.message)
+					.multilineTextAlignment(.center)
+					.font(.callout)
+				
+				if warning.showButton {
+					Button {
+						navigateToLiquiditySettings()
+					} label: {
+						Text("Check fee settings")
+							.font(.callout)
+					}
+				}
+			}
+			.padding(.horizontal)
+			.padding(.top, paddingTop)
+		}
+	}
+	
+	@ViewBuilder
 	func currencyConverterView() -> some View {
 		
 		CurrencyConverterView(
@@ -590,6 +630,15 @@ struct ReceiveLightningView: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	func invoiceAmountMsat() -> Int64? {
+		
+		if let model = mvi.model as? Receive.Model_Generated {
+			return model.amount?.msat
+		} else {
+			return nil
+		}
+	}
 	
 	func invoiceDescription() -> String {
 		
@@ -604,6 +653,75 @@ struct ReceiveLightningView: View {
 		} else {
 			return "..."
 		}
+	}
+	
+	func inboundFeeWarning() -> InboundFeeWarning? {
+		
+		let hasNoChannels = channels.filter { !$0.isTerminated }.isEmpty
+		if hasNoChannels && !liquidityPolicy.enabled {
+			
+			// strong warning => no channels + fee policy is disabled
+			return InboundFeeWarning(
+				title: "Payment will fail",
+				message: "Inbound liquidity is insufficient and you have disabled automated channel management.",
+				showButton: true
+			)
+		}
+		
+		let availableForReceive = channels.map { $0.availableForReceive?.msat ?? Int64(0) }.sum()
+		var liquidityIsShort = false
+		if let invoiceAmount = invoiceAmountMsat() {
+			liquidityIsShort = invoiceAmount >= availableForReceive
+		}
+		
+		if hasNoChannels || liquidityIsShort {
+			
+			if !liquidityPolicy.enabled {
+				
+				// no fee policy => strong warning
+				return InboundFeeWarning(
+					title: "Payment may fail",
+					message: "Inbound liquidity is insufficient and you have disabled automated channel management.",
+					showButton: true
+				)
+			}
+			
+			guard let swapFee = mempoolRecommendedResponse?.swapEstimationFee(hasNoChannels: hasNoChannels) else {
+				
+				// no fee information available => basic warning
+				return InboundFeeWarning(
+					title: "Fee expected",
+					message: "Inbound liquidity is insufficient.",
+					showButton: true // mostly because the message is hard to understand
+				)
+			}
+			
+			if swapFee.sat > liquidityPolicy.effectiveMaxFeeSats {
+				
+				let limit = Utils.format(currencyPrefs, sat: liquidityPolicy.effectiveMaxFeeSats)
+				
+				// fee policy is short => light warning
+				return InboundFeeWarning(
+					title: "Payment may fail",
+					message: "The fee will probably be above your max limit (\(limit.string)).",
+					showButton: true
+				)
+				
+			} else {
+				
+				let btcAmt = Utils.formatBitcoin(currencyPrefs, sat: swapFee)
+				let fiatAmt = Utils.formatFiat(currencyPrefs, sat: swapFee)
+				
+				// fee policy is within bounds => light warning
+				return InboundFeeWarning(
+					title: "Fee expected",
+					message: "A fee of \(btcAmt.string) (≈ \(fiatAmt.string)) may be needed to receive this payment.",
+					showButton: false
+				)
+			}
+		}
+		
+		return nil
 	}
 	
 	// --------------------------------------------------
@@ -660,8 +778,19 @@ struct ReceiveLightningView: View {
 	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
 		log.trace("chainContextChanged()")
 		
-		swapIn_enabled = context.swapIn.v1.status is WalletContext.V0ServiceStatusActive
 		payToOpen_enabled = context.payToOpen.v1.status is WalletContext.V0ServiceStatusActive
+	}
+	
+	func channelsChanged(_ channels: [LocalChannelInfo]) {
+		log.trace("channelsChanged()")
+		
+		self.channels = channels
+	}
+	
+	func liquidityPolicyChanged(_ newValue: LiquidityPolicy) {
+		log.trace("liquidityPolicyChanged()")
+		
+		self.liquidityPolicy = newValue
 	}
 	
 	func notificationPermissionsChanged(_ newValue: NotificationPermissions) {
@@ -695,6 +824,20 @@ struct ReceiveLightningView: View {
 				desc: desc ?? "",
 				currencyConverterOpen: $currencyConverterOpen
 			)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Tasks
+	// --------------------------------------------------
+	
+	func fetchMempoolRecommendedFees() async {
+		
+		for try await response in MempoolMonitor.shared.stream() {
+			mempoolRecommendedResponse = response
+			if Task.isCancelled {
+				return
+			}
 		}
 	}
 	
@@ -762,6 +905,12 @@ struct ReceiveLightningView: View {
 		log.trace("navigateToBackgroundPayments()")
 		
 		deepLinkManager.broadcast(DeepLink.backgroundPayments)
+	}
+	
+	func navigateToLiquiditySettings() {
+		log.trace("navigateToLiquiditySettings()")
+		
+		deepLinkManager.broadcast(DeepLink.liquiditySettings)
 	}
 	
 	// --------------------------------------------------

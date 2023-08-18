@@ -23,7 +23,7 @@ struct RangeSheet: View {
 		value: { [$0.size.height] }
 	)
 	
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	@EnvironmentObject var smartModalState: SmartModalState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	// --------------------------------------------------

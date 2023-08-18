@@ -4,9 +4,9 @@ import SwiftUI
 /// - iPhone => ShortSheet
 /// - iPad   => Popover
 ///
-/// The SmartModalState is exposed via an Environment variable:
+/// The SmartModalState is exposed via an EnvironmentObject variable:
 /// ```
-/// @Environment(\.smartModalState) var smartModalState: SmartModalState
+/// @EnvironmentObject var smartModalState: SmartModalState
 /// ```
 ///
 /// When you want to display a modeal:
@@ -23,11 +23,13 @@ import SwiftUI
 ///
 public class SmartModalState: ObservableObject {
 
-	/// Singleton instance
-	///
-	public static let shared = SmartModalState()
+	private let popoverState: PopoverState
+	private let shortSheetState: ShortSheetState
 	
-	private init() {/* must use shared instance */}
+	init(popoverState: PopoverState, shortSheetState: ShortSheetState) {
+		self.popoverState = popoverState
+		self.shortSheetState = shortSheetState
+	}
 	
 	private var isIPad: Bool {
 		return UIDevice.current.userInterfaceIdiom == .pad
@@ -36,9 +38,9 @@ public class SmartModalState: ObservableObject {
 	var currentItem: SmartModalItem? {
 		
 		if isIPad {
-			return PopoverState.shared.publisher.value
+			return popoverState.publisher.value
 		} else {
-			return ShortSheetState.shared.publisher.value
+			return shortSheetState.publisher.value
 		}
 	}
 	
@@ -48,13 +50,13 @@ public class SmartModalState: ObservableObject {
 		onWillDisappear: (() -> Void)? = nil
 	) {
 		if isIPad {
-			PopoverState.shared.display(
+			popoverState.display(
 				dismissable: dismissable,
 				builder: builder,
 				onWillDisappear: onWillDisappear
 			)
 		} else {
-			ShortSheetState.shared.display(
+			shortSheetState.display(
 				dismissable: dismissable,
 				builder: builder,
 				onWillDisappear: onWillDisappear
@@ -64,33 +66,33 @@ public class SmartModalState: ObservableObject {
 	
 	func close() {
 		if isIPad {
-			PopoverState.shared.close()
+			popoverState.close()
 		} else {
-			ShortSheetState.shared.close()
+			shortSheetState.close()
 		}
 	}
 	
 	func close(animationCompletion: @escaping () -> Void) {
 		if isIPad {
-			PopoverState.shared.close(animationCompletion: animationCompletion)
+			popoverState.close(animationCompletion: animationCompletion)
 		} else {
-			ShortSheetState.shared.close(animationCompletion: animationCompletion)
+			shortSheetState.close(animationCompletion: animationCompletion)
 		}
 	}
 	
 	func onNextWillDisappear(_ action: @escaping () -> Void) {
 		if isIPad {
-			PopoverState.shared.onNextWillDisappear(action)
+			popoverState.onNextWillDisappear(action)
 		} else {
-			ShortSheetState.shared.onNextWillDisappear(action)
+			shortSheetState.onNextWillDisappear(action)
 		}
 	}
 	
 	func onNextDidDisappear(_ action: @escaping () -> Void) {
 		if isIPad {
-			PopoverState.shared.onNextDidDisappear(action)
+			popoverState.onNextDidDisappear(action)
 		} else {
-			ShortSheetState.shared.onNextDidDisappear(action)
+			shortSheetState.onNextDidDisappear(action)
 		}
 	}
 }
@@ -99,17 +101,4 @@ protocol SmartModalItem {
 	
 	/// Whether or not the item is dimissable by tapping outside the item's view.
 	var dismissable: Bool { get }
-}
-
-struct SmartModalEnvironmentKey: EnvironmentKey {
-
-	static var defaultValue = SmartModalState.shared
-}
-
-public extension EnvironmentValues {
-
-	var smartModalState: SmartModalState {
-		get { self[SmartModalEnvironmentKey.self] }
-		set { self[SmartModalEnvironmentKey.self] = newValue }
-	}
 }

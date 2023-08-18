@@ -8,16 +8,42 @@ extension FiatCurrency {
 		return code + mkt
 	}
 	
-	var splitShortName: (String, String) {
+	var splitShortName: (String, String) { // e.g. ("ARS", "off")
 		
-		if name.count <= 3 {
-			return (name.uppercased(), "")
+		return FiatCurrency.shortNameComponents(displayCode)
+	}
+	
+	var shortPreciseName: String {
+		let (code, mkt) = splitShortPreciseName
+		return code + mkt
+	}
+	
+	var splitShortPreciseName: (String, String) { // e.g. ("ARM", "bm")
+		
+		let precise: String
+		switch self {
+			case .ars   : precise = "ARS_OFF"
+			case .arsBm : precise = "ARS_BM"
+			case .cup   : precise = "CUP_OFF"
+			case .cupFm : precise = "CUP_FM"
+			case .lbp   : precise = "LBP_OFF"
+			case .lbpBm : precise = "LBP_BM"
+			default     : precise = self.displayCode
+		}
+		
+		return FiatCurrency.shortNameComponents(precise)
+	}
+	
+	private static func shortNameComponents(_ input: String) -> (String, String) {
+		
+		if input.count <= 3 {
+			return (input.uppercased(), "")
 			
 		} else { // E.g. "ARS_BM"
-			let splitIdx = name.index(name.startIndex, offsetBy: 3)
+			let splitIdx = input.index(input.startIndex, offsetBy: 3)
 			
-			let code = name[name.startIndex ..< splitIdx]
-			let mkt = name[splitIdx ..< name.endIndex]
+			let code = input[input.startIndex ..< splitIdx]
+			let mkt = input[splitIdx ..< input.endIndex]
 				.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
 			
 			return (code.uppercased(), mkt.lowercased())
@@ -31,8 +57,8 @@ extension FiatCurrency {
 		case .amd   : return "Armenian Dram"
 		case .ang   : return "Netherlands Antillean Guilder"
 		case .aoa   : return "Angolan Kwanza"
-		case .arsBm : return "Argentine Peso (blue market)"
-		case .ars   : return "Argentine Peso"
+		case .ars   : fallthrough
+		case .arsBm : return "Argentine Peso"
 		case .aud   : return "Australian Dollar"
 		case .awg   : return "Aruban Florin"
 		case .azn   : return "Azerbaijani Manat"
@@ -58,8 +84,8 @@ extension FiatCurrency {
 		case .cny   : return "Chinese Yuan"
 		case .cop   : return "Colombian Peso"
 		case .crc   : return "Costa Rican Colón"
-		case .cup   : return "Cuban Peso"
-		case .cupFm : return "Cuban Peso (free market)"
+		case .cup   : fallthrough
+		case .cupFm : return "Cuban Peso"
 		case .cve   : return "Cape Verdean Escudo"
 		case .czk   : return "Czech Koruna"
 		case .djf   : return "Djiboutian Franc"
@@ -105,8 +131,8 @@ extension FiatCurrency {
 		case .kyd   : return "Cayman Islands Dollar"
 		case .kzt   : return "Kazakhstani Tenge"
 		case .lak   : return "Laotian Kip"
-		case .lbp   : return "Lebanese Pound"
-		case .lbpBm : return "Lebanese Pound (black market)"
+		case .lbp   : fallthrough
+		case .lbpBm : return "Lebanese Pound"
 		case .lkr   : return "Sri Lankan Rupee"
 		case .lrd   : return "Liberian Dollar"
 		case .lsl   : return "Lesotho Loti"
@@ -189,8 +215,8 @@ extension FiatCurrency {
 		case .amd   : return NSLocalizedString("AMD", tableName: "Currencies", comment: "Armenian Dram")
 		case .ang   : return NSLocalizedString("ANG", tableName: "Currencies", comment: "Netherlands Antillean Guilder")
 		case .aoa   : return NSLocalizedString("AOA", tableName: "Currencies", comment: "Angolan Kwanza")
-		case .arsBm : return NSLocalizedString("ARSbm", tableName: "Currencies", comment: "Argentine Peso (blue market)")
-		case .ars   : return NSLocalizedString("ARS", tableName: "Currencies", comment: "Argentine Peso")
+		case .ars   : fallthrough
+		case .arsBm : return NSLocalizedString("ARS", tableName: "Currencies", comment: "Argentine Peso")
 		case .aud   : return NSLocalizedString("AUD", tableName: "Currencies", comment: "Australian Dollar")
 		case .awg   : return NSLocalizedString("AWG", tableName: "Currencies", comment: "Aruban Florin")
 		case .azn   : return NSLocalizedString("AZN", tableName: "Currencies", comment: "Azerbaijani Manat")
@@ -216,8 +242,8 @@ extension FiatCurrency {
 		case .cny   : return NSLocalizedString("CNY", tableName: "Currencies", comment: "Chinese Yuan (onshore)")
 		case .cop   : return NSLocalizedString("COP", tableName: "Currencies", comment: "Colombian Peso")
 		case .crc   : return NSLocalizedString("CRC", tableName: "Currencies", comment: "Costa Rican Colón")
-		case .cup   : return NSLocalizedString("CUP", tableName: "Currencies", comment: "Cuban Peso")
-		case .cupFm : return NSLocalizedString("CUPfm", tableName: "Currencies", comment: "Cuban Peso (free market)")
+		case .cup   : fallthrough
+		case .cupFm : return NSLocalizedString("CUP", tableName: "Currencies", comment: "Cuban Peso")
 		case .cve   : return NSLocalizedString("CVE", tableName: "Currencies", comment: "Cape Verdean Escudo")
 		case .czk   : return NSLocalizedString("CZK", tableName: "Currencies", comment: "Czech Koruna")
 		case .djf   : return NSLocalizedString("DJF", tableName: "Currencies", comment: "Djiboutian Franc")
@@ -263,8 +289,8 @@ extension FiatCurrency {
 		case .kyd   : return NSLocalizedString("KYD", tableName: "Currencies", comment: "Cayman Islands Dollar")
 		case .kzt   : return NSLocalizedString("KZT", tableName: "Currencies", comment: "Kazakhstani Tenge")
 		case .lak   : return NSLocalizedString("LAK", tableName: "Currencies", comment: "Laotian Kip")
-		case .lbp   : return NSLocalizedString("LBP", tableName: "Currencies", comment: "Lebanese Pound")
-		case .lbpBm : return NSLocalizedString("LBPbm", tableName: "Currencies", comment: "Lebanese Pound (black market)")
+		case .lbp   : fallthrough
+		case .lbpBm : return NSLocalizedString("LBP", tableName: "Currencies", comment: "Lebanese Pound")
 		case .lkr   : return NSLocalizedString("LKR", tableName: "Currencies", comment: "Sri Lankan Rupee")
 		case .lrd   : return NSLocalizedString("LRD", tableName: "Currencies", comment: "Liberian Dollar")
 		case .lsl   : return NSLocalizedString("LSL", tableName: "Currencies", comment: "Lesotho Loti")
@@ -340,179 +366,51 @@ extension FiatCurrency {
 		default     : return ""
 	}}
 	
+	private var longName_marketTranslation: String { switch self {
+		case .ars   : return NSLocalizedString("official rate", tableName: "Currencies", comment: "")
+		case .arsBm : return NSLocalizedString("blue market",   tableName: "Currencies", comment: "")
+		case .cup   : return NSLocalizedString("official rate", tableName: "Currencies", comment: "")
+		case .cupFm : return NSLocalizedString("free market",   tableName: "Currencies", comment: "")
+		case .lbp   : return NSLocalizedString("official rate", tableName: "Currencies", comment: "")
+		case .lbpBm : return NSLocalizedString("black market",  tableName: "Currencies", comment: "")
+		default     : return ""
+	}}
+	
 	var longName: String {
-		let manualTranslation = longName_manualTranslation
-		if !manualTranslation.isEmpty && manualTranslation != self.shortName {
-			return manualTranslation
+		let (name, mkt) = splitLongName
+		
+		if mkt.isEmpty {
+			return name
+		} else {
+			return "\(name) (\(mkt))"
 		}
-		
-		var autoTranslation: String? = nil
-		
-		let currentLocale = Locale.current
-		if currentLocale.languageCode != "en" {
-			autoTranslation = currentLocale.localizedString(forCurrencyCode: self.shortName)
-		}
-		
-		return autoTranslation ?? longName_englishTranslation
 	}
 	
-	var flag: String { switch self {
-		case .aed   : return "🇦🇪" // United Arab Emirates Dirham
-		case .afn   : return "🇦🇫" // Afghan Afghani
-		case .all   : return "🇦🇱" // Albanian Lek
-		case .amd   : return "🇦🇲" // Armenian Dram
-		case .ang   : return "🇳🇱" // Netherlands Antillean Guilder
-		case .aoa   : return "🇦🇴" // Angolan Kwanza
-		case .arsBm : return "🇦🇷" // Argentine Peso (blue market)
-		case .ars   : return "🇦🇷" // Argentine Peso
-		case .aud   : return "🇦🇺" // Australian Dollar
-		case .awg   : return "🇦🇼" // Aruban Florin
-		case .azn   : return "🇦🇿" // Azerbaijani Manat
-		case .bam   : return "🇧🇦" // Bosnia-Herzegovina Convertible Mark
-		case .bbd   : return "🇧🇧" // Barbadian Dollar
-		case .bdt   : return "🇧🇩" // Bangladeshi Taka
-		case .bgn   : return "🇧🇬" // Bulgarian Lev
-		case .bhd   : return "🇧🇭" // Bahraini Dinar
-		case .bif   : return "🇧🇮" // Burundian Franc
-		case .bmd   : return "🇧🇲" // Bermudan Dollar
-		case .bnd   : return "🇧🇳" // Brunei Dollar
-		case .bob   : return "🇧🇴" // Bolivian Boliviano
-		case .brl   : return "🇧🇷" // Brazilian Real
-		case .bsd   : return "🇧🇸" // Bahamian Dollar
-		case .btn   : return "🇧🇹" // Bhutanese Ngultrum
-		case .bwp   : return "🇧🇼" // Botswanan Pula
-		case .bzd   : return "🇧🇿" // Belize Dollar
-		case .cad   : return "🇨🇦" // Canadian Dollar
-		case .cdf   : return "🇨🇩" // Congolese Franc
-		case .chf   : return "🇨🇭" // Swiss Franc
-		case .clp   : return "🇨🇱" // Chilean Peso
-		case .cnh   : return "🇨🇳" // Chinese Yuan (offshore)
-		case .cny   : return "🇨🇳" // Chinese Yuan (onshore)
-		case .cop   : return "🇨🇴" // Colombian Peso
-		case .crc   : return "🇨🇷" // Costa Rican Colón
-		case .cup   : return "🇨🇺" // Cuban Peso
-		case .cupFm : return "🇨🇺" // Cuban Peso (free market)
-		case .cve   : return "🇨🇻" // Cape Verdean Escudo
-		case .czk   : return "🇨🇿" // Czech Koruna
-		case .djf   : return "🇩🇯" // Djiboutian Franc
-		case .dkk   : return "🇩🇰" // Danish Krone
-		case .dop   : return "🇩🇴" // Dominican Peso
-		case .dzd   : return "🇩🇿" // Algerian Dinar
-		case .egp   : return "🇪🇬" // Egyptian Pound
-		case .ern   : return "🇪🇷" // Eritrean Nakfa
-		case .etb   : return "🇪🇹" // Ethiopian Birr
-		case .eur   : return "🇪🇺" // Euro
-		case .fjd   : return "🇫🇯" // Fijian Dollar
-		case .fkp   : return "🇫🇰" // Falkland Islands Pound
-		case .gbp   : return "🇬🇧" // British Pound Sterling
-		case .gel   : return "🇬🇪" // Georgian Lari
-		case .ghs   : return "🇬🇭" // Ghanaian Cedi
-		case .gip   : return "🇬🇮" // Gibraltar Pound
-		case .gmd   : return "🇬🇲" // Gambian Dalasi
-		case .gnf   : return "🇬🇳" // Guinean Franc
-		case .gtq   : return "🇬🇹" // Guatemalan Quetzal
-		case .gyd   : return "🇬🇾" // Guyanaese Dollar
-		case .hkd   : return "🇭🇰" // Hong Kong Dollar
-		case .hnl   : return "🇭🇳" // Honduran Lempira
-		case .hrk   : return "🇭🇷" // Croatian Kuna
-		case .htg   : return "🇭🇹" // Haitian Gourde
-		case .huf   : return "🇭🇺" // Hungarian Forint
-		case .idr   : return "🇮🇩" // Indonesian Rupiah
-		case .ils   : return "🇮🇱" // Israeli New Sheqel
-		case .inr   : return "🇮🇳" // Indian Rupee
-		case .iqd   : return "🇮🇶" // Iraqi Dinar
-		case .irr   : return "🇮🇷" // Iranian Rial
-		case .isk   : return "🇮🇸" // Icelandic Króna
-		case .jep   : return "🇯🇪" // Jersey Pound
-		case .jmd   : return "🇯🇲" // Jamaican Dollar
-		case .jod   : return "🇯🇴" // Jordanian Dinar
-		case .jpy   : return "🇯🇵" // Japanese Yen
-		case .kes   : return "🇰🇪" // Kenyan Shilling
-		case .kgs   : return "🇰🇬" // Kyrgystani Som
-		case .khr   : return "🇰🇭" // Cambodian Riel
-		case .kmf   : return "🇰🇲" // Comorian Franc
-		case .kpw   : return "🇰🇵" // North Korean Won
-		case .krw   : return "🇰🇷" // South Korean Won
-		case .kwd   : return "🇰🇼" // Kuwaiti Dinar
-		case .kyd   : return "🇰🇾" // Cayman Islands Dollar
-		case .kzt   : return "🇰🇿" // Kazakhstani Tenge
-		case .lak   : return "🇱🇦" // Laotian Kip
-		case .lbp   : return "🇱🇧" // Lebanese Pound
-		case .lbpBm : return "🇱🇧" // Lebanese Pound (black market)
-		case .lkr   : return "🇱🇰" // Sri Lankan Rupee
-		case .lrd   : return "🇱🇷" // Liberian Dollar
-		case .lsl   : return "🇱🇸" // Lesotho Loti
-		case .lyd   : return "🇱🇾" // Libyan Dinar
-		case .mad   : return "🇲🇦" // Moroccan Dirham
-		case .mdl   : return "🇲🇩" // Moldovan Leu
-		case .mga   : return "🇲🇬" // Malagasy Ariary
-		case .mkd   : return "🇲🇰" // Macedonian Denar
-		case .mmk   : return "🇲🇲" // Myanmar Kyat
-		case .mnt   : return "🇲🇳" // Mongolian Tugrik
-		case .mop   : return "🇲🇴" // Macanese Pataca
-		case .mur   : return "🇲🇺" // Mauritian Rupee
-		case .mvr   : return "🇲🇻" // Maldivian Rufiyaa
-		case .mwk   : return "🇲🇼" // Malawian Kwacha
-		case .mxn   : return "🇲🇽" // Mexican Peso
-		case .myr   : return "🇲🇾" // Malaysian Ringgit
-		case .mzn   : return "🇲🇿" // Mozambican Metical
-		case .nad   : return "🇳🇦" // Namibian Dollar
-		case .ngn   : return "🇳🇬" // Nigerian Naira
-		case .nio   : return "🇳🇮" // Nicaraguan Córdoba
-		case .nok   : return "🇳🇴" // Norwegian Krone
-		case .npr   : return "🇳🇵" // Nepalese Rupee
-		case .nzd   : return "🇳🇿" // New Zealand Dollar
-		case .omr   : return "🇴🇲" // Omani Rial
-		case .pab   : return "🇵🇦" // Panamanian Balboa
-		case .pen   : return "🇵🇪" // Peruvian Nuevo Sol
-		case .pgk   : return "🇵🇬" // Papua New Guinean Kina
-		case .php   : return "🇵🇭" // Philippine Peso
-		case .pkr   : return "🇵🇰" // Pakistani Rupee
-		case .pln   : return "🇵🇱" // Polish Zloty
-		case .pyg   : return "🇵🇾" // Paraguayan Guarani
-		case .qar   : return "🇶🇦" // Qatari Rial
-		case .ron   : return "🇷🇴" // Romanian Leu
-		case .rsd   : return "🇷🇸" // Serbian Dinar
-		case .rub   : return "🇷🇺" // Russian Ruble
-		case .rwf   : return "🇷🇼" // Rwandan Franc
-		case .sar   : return "🇸🇦" // Saudi Riyal
-		case .sbd   : return "🇸🇧" // Solomon Islands Dollar
-		case .scr   : return "🇸🇨" // Seychellois Rupee
-		case .sdg   : return "🇸🇩" // Sudanese Pound
-		case .sek   : return "🇸🇪" // Swedish Krona
-		case .sgd   : return "🇸🇬" // Singapore Dollar
-		case .shp   : return "🇸🇭" // Saint Helena Pound
-		case .sll   : return "🇸🇱" // Sierra Leonean Leone
-		case .sos   : return "🇸🇴" // Somali Shilling
-		case .srd   : return "🇸🇷" // Surinamese Dollar
-		case .syp   : return "🇸🇾" // Syrian Pound
-		case .szl   : return "🇸🇿" // Swazi Lilangeni
-		case .thb   : return "🇹🇭" // Thai Baht
-		case .tjs   : return "🇹🇯" // Tajikistani Somoni
-		case .tmt   : return "🇹🇲" // Turkmenistani Manat
-		case .tnd   : return "🇹🇳" // Tunisian Dinar
-		case .top   : return "🇹🇴" // Tongan Paʻanga
-		case .try_  : return "🇹🇷" // Turkish Lira
-		case .ttd   : return "🇹🇹" // Trinidad and Tobago Dollar
-		case .twd   : return "🇹🇼" // New Taiwan Dollar
-		case .tzs   : return "🇹🇿" // Tanzanian Shilling
-		case .uah   : return "🇺🇦" // Ukrainian Hryvnia
-		case .ugx   : return "🇺🇬" // Ugandan Shilling
-		case .usd   : return "🇺🇸" // United States Dollar
-		case .uyu   : return "🇺🇾" // Uruguayan Peso
-		case .uzs   : return "🇺🇿" // Uzbekistan Som
-		case .vnd   : return "🇻🇳" // Vietnamese Dong
-		case .vuv   : return "🇻🇺" // Vanuatu Vatu
-		case .wst   : return "🇼🇸" // Samoan Tala
-		case .xaf   : return "🇨🇲" // CFA Franc BEAC        - multiple options, chose country with highest GDP
-		case .xcd   : return "🇱🇨" // East Caribbean Dollar - multiple options, chose country with highest GDP
-		case .xof   : return "🇨🇮" // CFA Franc BCEAO       - multiple options, chose country with highest GDP
-		case .xpf   : return "🇳🇨" // CFP Franc             - multiple options, chose country with highest GDP
-		case .yer   : return "🇾🇪" // Yemeni Rial
-		case .zar   : return "🇿🇦" // South African Rand
-		case .zmw   : return "🇿🇲" // Zambian Kwacha
-		default     : return "🏳️"
-	}}
+	var splitLongName: (String, String) { // e.g. ("Argentine Peso", "blue market")
+		
+		let (code, _) = splitShortName
+		
+		let manualTranslation = longName_manualTranslation
+		if !manualTranslation.isEmpty && manualTranslation != code {
+			return (manualTranslation, longName_marketTranslation)
+		}
+
+		var autoTranslation: String? = nil
+
+		let currentLocale = Locale.current
+		if currentLocale.languageCode != "en" {
+			let (code, mkt) = splitShortPreciseName
+			if mkt.isEmpty {
+				autoTranslation = currentLocale.localizedString(forCurrencyCode: code)
+			}
+		}
+
+		if let autoTranslation {
+			return (autoTranslation, longName_marketTranslation)
+		} else {
+			return (longName_englishTranslation, longName_marketTranslation)
+		}
+	}
 	
 	fileprivate struct _Key {
 		static var matchingLocales = 0
@@ -521,6 +419,8 @@ extension FiatCurrency {
 	
 	func matchingLocales() -> [Locale] {
 		
+		let (selfCurrencyCode, _) = self.splitShortName
+		
 		return self.getSetAssociatedObject(storageKey: &_Key.matchingLocales) {
 			
 			var matchingLocales = [Locale]()
@@ -528,7 +428,7 @@ extension FiatCurrency {
 			
 				let locale = Locale(identifier: identifier)
 				if let currencyCode = locale.currencyCode,
-					currencyCode.caseInsensitiveCompare(self.name) == .orderedSame
+					currencyCode.caseInsensitiveCompare(selfCurrencyCode) == .orderedSame
 				{
 					matchingLocales.append(locale)
 				}

@@ -14,22 +14,39 @@ fileprivate var log = Logger(OSLog.disabled)
 
 fileprivate enum NavLinkTag: String {
 	// General
-	case AboutView
-	case DisplayConfigurationView
-	case MyWalletView
-	case RecoveryPhraseView
-	case PaymentOptionsView
-	case DrainWalletView
-	// Security
-	case AppAccessView
+	case About
+	case DisplayConfiguration
+	case PaymentOptions
+	case ChannelManagement
+	// Privacy & Security
+	case AppAccess
+	case RecoveryPhrase
+	case ElectrumServer
+	case Tor
+	case PaymentsBackup
 	// Advanced
-	case PrivacyView
-	case ChannelsConfigurationView
-	case LogsConfigurationView
-	case ResetWalletView
+	case WalletInfo
+	case ChannelsConfiguration
+	case LogsConfiguration
+	// Danger Zone
+	case DrainWallet
+	case ResetWallet
+	case ForceCloseChannels
 }
 
 struct ConfigurationView: View {
+	
+	@ViewBuilder
+	var body: some View {
+		ScrollViewReader { scrollViewProxy in
+			ConfigurationList(scrollViewProxy: scrollViewProxy)
+		}
+	}
+}
+
+fileprivate struct ConfigurationList: View {
+	
+	let scrollViewProxy: ScrollViewProxy
 	
 	@State var isFaceID = true
 	@State var isTouchID = false
@@ -45,13 +62,31 @@ struct ConfigurationView: View {
 	@State private var swiftUiBugWorkaroundIdx = 0
 	
 	@State var didAppear = false
-	@State var popToRootRequested = false
+	@State var popToDestination: PopToDestination? = nil
+	
+	@Namespace var linkID_About
+	@Namespace var linkID_DisplayConfiguration
+	@Namespace var linkID_PaymentOptions
+	@Namespace var linkID_ChannelManagement
+	@Namespace var linkID_AppAccess
+	@Namespace var linkID_RecoveryPhrase
+	@Namespace var linkID_ElectrumServer
+	@Namespace var linkID_Tor
+	@Namespace var linkID_PaymentsBackup
+	@Namespace var linkID_WalletInfo
+	@Namespace var linkID_ChannelsConfiguration
+	@Namespace var linkID_LogsConfiguration
+	@Namespace var linkID_DrainWallet
+	@Namespace var linkID_ResetWallet
+	@Namespace var linkID_ForceCloseChannels
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
-	init() {
+	init(scrollViewProxy: ScrollViewProxy) {
+		
+		self.scrollViewProxy = scrollViewProxy
 		if let encryptedNodeId = Biz.encryptedNodeId {
 			backupSeedStatePublisher = Prefs.shared.backupSeedStatePublisher(encryptedNodeId)
 		} else {
@@ -78,10 +113,11 @@ struct ConfigurationView: View {
 			let hasWallet = hasWallet()
 			
 			section_general(hasWallet)
-			if hasWallet {
-				section_security()
-			}
+			section_privacyAndSecurity(hasWallet)
 			section_advanced(hasWallet)
+			if hasWallet {
+				section_dangerZone(hasWallet)
+			}
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
@@ -107,13 +143,14 @@ struct ConfigurationView: View {
 		
 		Section(header: Text("General")) {
 			
-			navLink(.AboutView) {
+			navLink(.About) {
 				Label { Text("About") } icon: {
 					Image(systemName: "info.circle")
 				}
 			}
+			.id(linkID_About)
 		
-			navLink(.DisplayConfigurationView) {
+			navLink(.DisplayConfiguration) {
 				Label {
 					switch notificationPermissions {
 					case .disabled:
@@ -132,19 +169,41 @@ struct ConfigurationView: View {
 					Image(systemName: "paintbrush.pointed")
 				}
 			}
-			
-			if hasWallet {
-				navLink(.MyWalletView) {
-					Label {
-						Text("My wallet")
-					} icon: {
-						Image(systemName: "person")
-					}
+			.id(linkID_DisplayConfiguration)
+	
+			navLink(.PaymentOptions) {
+				Label { Text("Payment options") } icon: {
+					Image(systemName: "wrench")
 				}
 			}
+			.id(linkID_PaymentOptions)
+			
+			navLink(.ChannelManagement) {
+				Label { Text("Channel management") } icon: {
+					Image(systemName: "wand.and.stars")
+				}
+			}
+			.id(linkID_ChannelManagement)
+			
+		} // </Section: General>
+	}
+	
+	@ViewBuilder
+	func section_privacyAndSecurity(_ hasWallet: Bool) -> some View {
+		
+		Section(header: Text("Privacy & Security")) {
+
+			if hasWallet {
+				navLink(.AppAccess) {
+					Label { Text("App access") } icon: {
+						Image(systemName: isTouchID ? "touchid" : "faceid")
+					}
+				}
+				.id(linkID_AppAccess)
+			} // </if hasWallet>
 			
 			if hasWallet {
-				navLink(.RecoveryPhraseView) {
+				navLink(.RecoveryPhrase) {
 					Label {
 						switch backupSeedState {
 						case .notBackedUp:
@@ -165,40 +224,36 @@ struct ConfigurationView: View {
 							Text("Recovery phrase")
 						}
 					} icon: {
-						Image(systemName: "squareshape.split.3x3")
+						Image(systemName: "key")
 					}
 				}
-			}
-	
-			navLink(.PaymentOptionsView) {
-				Label { Text("Options & fees") } icon: {
-					Image(systemName: "wrench")
-				}
-			}
-		
-			if hasWallet {
-				navLink(.DrainWalletView) {
-					Label { Text("Drain wallet") } icon: {
-						Image(systemName: "xmark.circle")
-					}
-				}
-			}
+				.id(linkID_RecoveryPhrase)
+			} // </if hasWallet>
 			
-		} // </Section: General>
-	}
-	
-	@ViewBuilder
-	func section_security() -> some View {
-		
-		Section(header: Text("Security")) {
-
-			navLink(.AppAccessView) {
-				Label { Text("App access") } icon: {
-					Image(systemName: isTouchID ? "touchid" : "faceid")
+			navLink(.ElectrumServer) {
+				Label { Text("Electrum server") } icon: {
+					Image(systemName: "link")
 				}
 			}
+			.id(linkID_ElectrumServer)
+			
+			navLink(.Tor) {
+				Label { Text("Tor") } icon: {
+					Image(systemName: "shield.lefthalf.fill")
+				}
+			}
+			.id(linkID_Tor)
+			
+			if hasWallet {
+				navLink(.PaymentsBackup) {
+					Label { Text("Payments backup") } icon: {
+						Image(systemName: "icloud.and.arrow.up")
+					}
+				}
+				.id(linkID_PaymentsBackup)
+			} // </if hasWallet>
 
-		} // </Section: Security>
+		} // </Section: Privacy & Security>
 	}
 	
 	@ViewBuilder
@@ -206,35 +261,69 @@ struct ConfigurationView: View {
 		
 		Section(header: Text("Advanced")) {
 
-			navLink(.PrivacyView) {
-				Label { Text("Privacy") } icon: {
-					Image(systemName: "eye")
-				}
-			}
-
 			if hasWallet {
-				navLink(.ChannelsConfigurationView) {
+				navLink(.WalletInfo) {
+					Label {
+						Text("Wallet info")
+					} icon: {
+						Image(systemName: "cube")
+					}
+				}
+				.id(linkID_WalletInfo)
+			}
+			
+			if hasWallet {
+				navLink(.ChannelsConfiguration) {
 					Label { Text("Payment channels") } icon: {
 						Image(systemName: "bolt")
 					}
 				}
+				.id(linkID_ChannelManagement)
 			}
 			
-			navLink(.LogsConfigurationView) {
+			navLink(.LogsConfiguration) {
 				Label { Text("Logs") } icon: {
 					Image(systemName: "doc.text")
 				}
 			}
+			.id(linkID_LogsConfiguration)
 
+		} // </Section: Advanced>
+	}
+	
+	@ViewBuilder
+	func section_dangerZone(_ hasWallet: Bool) -> some View {
+		
+		Section(header: Text("Danger Zone")) {
+			
 			if hasWallet {
-				navLink(.ResetWalletView) {
+				navLink(.DrainWallet) {
+					Label { Text("Drain wallet") } icon: {
+						Image(systemName: "xmark.circle")
+					}
+				}
+				.id(linkID_DrainWallet)
+			}
+			
+			if hasWallet {
+				navLink(.ResetWallet) {
 					Label { Text("Reset wallet") } icon: {
 						Image(systemName: "trash")
 					}
 				}
+				.id(linkID_ResetWallet)
 			}
-
-		} // </Section: Advanced>
+			
+			if hasWallet {
+				navLink(.ForceCloseChannels) {
+					Label { Text("Force-close channels") } icon: {
+						Image(systemName: "exclamationmark.triangle")
+					}
+					.foregroundColor(.appNegative)
+				}
+				.id(linkID_ForceCloseChannels)
+			}
+		} // </Section: Danger Zone>
 	}
 
 	@ViewBuilder
@@ -249,6 +338,7 @@ struct ConfigurationView: View {
 			selection: $navLinkTag,
 			label: label
 		)
+	//	.id(linkID(for: tag)) // doesn't compile - don't understand why
 	}
 	
 	@ViewBuilder
@@ -266,40 +356,30 @@ struct ConfigurationView: View {
 		
 		switch tag {
 		// General
-			case .AboutView                 : AboutView()
-			case .DisplayConfigurationView  : DisplayConfigurationView()
-			case .MyWalletView              : WalletInfoView()
-			case .RecoveryPhraseView        : RecoveryPhraseView()
-			case .PaymentOptionsView        : PaymentOptionsView()
-			case .DrainWalletView           : DrainWalletView(popToRoot: popToRoot)
-		// Security
-			case .AppAccessView             : AppAccessView()
+			case .About                 : AboutView()
+			case .DisplayConfiguration  : DisplayConfigurationView()
+			case .PaymentOptions        : PaymentOptionsView()
+			case .ChannelManagement     : LiquidityPolicyView()
+		// Privacy & Security
+			case .AppAccess             : AppAccessView()
+			case .RecoveryPhrase        : RecoveryPhraseView()
+			case .ElectrumServer        : ElectrumConfigurationView()
+			case .Tor                   : TorConfigurationView()
+			case .PaymentsBackup        : PaymentsBackupView()
 		// Advanced
-			case .PrivacyView               : PrivacyView()
-			case .ChannelsConfigurationView : ChannelsConfigurationView()
-			case .LogsConfigurationView     : LogsConfigurationView()
-			case .ResetWalletView           : ResetWalletView()
+			case .WalletInfo            : WalletInfoView(popTo: popTo)
+			case .ChannelsConfiguration : ChannelsConfigurationView()
+			case .LogsConfiguration     : LogsConfigurationView()
+		// Danger Zone
+			case .DrainWallet           : DrainWalletView(popTo: popTo)
+			case .ResetWallet           : ResetWalletView()
+			case .ForceCloseChannels    : ForceCloseChannelsView()
 		}
 	}
 	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
-	
-	private func navLinkTagBinding(_ tag: NavLinkTag?) -> Binding<Bool> {
-		
-		if let tag { // specific tag
-			return Binding<Bool>(
-				get: { navLinkTag == tag },
-				set: { if $0 { navLinkTag = tag } else if (navLinkTag == tag) { navLinkTag = nil } }
-			)
-		} else { // any tag
-			return Binding<Bool>(
-				get: { navLinkTag != nil },
-				set: { if !$0 { navLinkTag = nil }}
-			)
-		}
-	}
 	
 	func hasWallet() -> Bool {
 		
@@ -329,17 +409,11 @@ struct ConfigurationView: View {
 		
 		if !didAppear {
 			didAppear = true
+			
 			if let deepLink = deepLinkManager.deepLink {
 				DispatchQueue.main.async {
 					deepLinkChanged(deepLink)
 				}
-			}
-			
-		} else {
-		
-			if popToRootRequested {
-				popToRootRequested = false
-				presentationMode.wrappedValue.dismiss()
 			}
 		}
 	}
@@ -365,11 +439,12 @@ struct ConfigurationView: View {
 			var delay: TimeInterval = 1.5 // seconds; multiply by number of screens we need to navigate
 			switch value {
 				case .paymentHistory     : break
-				case .backup             : newNavLinkTag = .RecoveryPhraseView       ; delay *= 1
-				case .drainWallet        : newNavLinkTag = .DrainWalletView          ; delay *= 1
-				case .electrum           : newNavLinkTag = .PrivacyView              ; delay *= 2
-				case .backgroundPayments : newNavLinkTag = .DisplayConfigurationView ; delay *= 2
-				case .liquiditySettings  : newNavLinkTag = .PaymentOptionsView       ; delay *= 2
+				case .backup             : newNavLinkTag = .RecoveryPhrase       ; delay *= 1
+				case .drainWallet        : newNavLinkTag = .DrainWallet          ; delay *= 1
+				case .electrum           : newNavLinkTag = .ElectrumServer       ; delay *= 1
+				case .backgroundPayments : newNavLinkTag = .DisplayConfiguration ; delay *= 2
+				case .liquiditySettings  : newNavLinkTag = .ChannelManagement    ; delay *= 1
+				case .forceCloseChannels : newNavLinkTag = .ForceCloseChannels   ; delay *= 1
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
@@ -378,7 +453,17 @@ struct ConfigurationView: View {
 				self.swiftUiBugWorkaroundIdx += 1
 				clearSwiftUiBugWorkaround(delay: delay)
 				
-				self.navLinkTag = newNavLinkTag // Trigger/push the view
+				// Interesting bug in SwiftUI:
+				// If the navLinkTag you're targetting is scrolled off the screen,
+				// the you won't be able to navigate to it.
+				// My understanding is that List is lazy, and this somehow prevents triggering the navigation.
+				// The workaround is to manually scroll to the item to ensure it's onscreen,
+				// at which point we can activate the navLinkTag trigger.
+				//
+				scrollViewProxy.scrollTo(linkID(for: newNavLinkTag))
+				DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+					self.navLinkTag = newNavLinkTag // Trigger/push the view
+				}
 			}
 			
 		} else {
@@ -391,9 +476,36 @@ struct ConfigurationView: View {
 		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
 		
 		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
-				
+			
 			log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
 			self.navLinkTag = forcedNavLinkTag
+			
+		} else if tag == nil {
+			
+			// If there's a pending popToDestination, it's now safe to continue the flow.
+			//
+			// Note that performing this operation in `onAppear` doesn't work properly:
+			// - it appears to work fine on the simulator, but isn't reliable on the actual device
+			// - it seems that, IF using a `navLinkTag`, then we need to wait for the tag to be
+			//   unset before it can be set properly again.
+			//
+			if let destination = popToDestination {
+				log.debug("popToDestination: \(destination)")
+				
+				popToDestination = nil
+				switch destination {
+				case .RootView(_):
+					presentationMode.wrappedValue.dismiss()
+					
+				case .ConfigurationView(let deepLink):
+					if let deepLink {
+						deepLinkManager.broadcast(deepLink)
+					}
+				
+				case .TransactionsView:
+					log.warning("Invalid popToDestination")
+				}
+			}
 		}
 	}
 	
@@ -413,15 +525,39 @@ struct ConfigurationView: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func popToRoot() {
-		log.trace("popToRoot")
+	func popTo(_ destination: PopToDestination) {
+		log.trace("popTo(\(destination))")
 		
-		popToRootRequested = true
+		popToDestination = destination
 	}
 	
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
+	
+	func linkID(for navLinkTag: NavLinkTag) -> any Hashable {
+		
+		switch navLinkTag {
+			case .About                 : return linkID_About
+			case .DisplayConfiguration  : return linkID_DisplayConfiguration
+			case .PaymentOptions        : return linkID_PaymentOptions
+			case .ChannelManagement     : return linkID_ChannelManagement
+			
+			case .AppAccess             : return linkID_AppAccess
+			case .RecoveryPhrase        : return linkID_RecoveryPhrase
+			case .ElectrumServer        : return linkID_ElectrumServer
+			case .Tor                   : return linkID_Tor
+			case .PaymentsBackup        : return linkID_PaymentsBackup
+		
+			case .WalletInfo            : return linkID_WalletInfo
+			case .ChannelsConfiguration : return linkID_ChannelsConfiguration
+			case .LogsConfiguration     : return linkID_LogsConfiguration
+			
+			case .DrainWallet           : return linkID_DrainWallet
+			case .ResetWallet           : return linkID_ResetWallet
+			case .ForceCloseChannels    : return linkID_ForceCloseChannels
+		}
+	}
 	
 	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
 		

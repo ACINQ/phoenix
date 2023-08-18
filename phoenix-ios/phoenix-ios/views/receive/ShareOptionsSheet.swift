@@ -11,7 +11,7 @@ struct ShareOptionsSheet: View {
 	let shareText: () -> Void
 	let shareImage: () -> Void
 	
-	@Environment(\.smartModalState) var smartModalState: SmartModalState
+	@EnvironmentObject var smartModalState: SmartModalState
 	
 	@ViewBuilder
 	var body: some View {

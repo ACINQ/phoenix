@@ -2,7 +2,7 @@ import SwiftUI
 
 struct SwapInDisabledPopover: View {
 	
-	@Environment(\.popoverState) var popoverState: PopoverState
+	@EnvironmentObject var popoverState: PopoverState
 	
 	@ViewBuilder
 	var body: some View {

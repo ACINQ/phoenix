@@ -23,21 +23,24 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.PaymentsDatabase
-import fr.acinq.phoenix.db.didCompleteWalletPayment
+import fr.acinq.phoenix.db.didSaveWalletPayment
 
 class SpliceCpfpOutgoingQueries(val database: PaymentsDatabase) {
     private val cpfpQueries = database.spliceCpfpOutgoingPaymentsQueries
 
     fun addCpfpPayment(payment: SpliceCpfpOutgoingPayment) {
-        cpfpQueries.insertCpfp(
-            id = payment.id.toString(),
-            mining_fees_sat = payment.miningFees.sat,
-            channel_id = payment.channelId.toByteArray(),
-            tx_id = payment.txId.toByteArray(),
-            created_at = payment.createdAt,
-            confirmed_at = payment.confirmedAt,
-            locked_at = payment.lockedAt
-        )
+        database.transaction {
+            cpfpQueries.insertCpfp(
+                id = payment.id.toString(),
+                mining_fees_sat = payment.miningFees.sat,
+                channel_id = payment.channelId.toByteArray(),
+                tx_id = payment.txId.toByteArray(),
+                created_at = payment.createdAt,
+                confirmed_at = payment.confirmedAt,
+                locked_at = payment.lockedAt
+            )
+            didSaveWalletPayment(WalletPaymentId.SpliceCpfpOutgoingPaymentId(payment.id), database)
+        }
     }
 
     fun getCpfp(id: UUID): SpliceCpfpOutgoingPayment? {
@@ -48,13 +51,17 @@ class SpliceCpfpOutgoingQueries(val database: PaymentsDatabase) {
     }
 
     fun setConfirmed(id: UUID, confirmedAt: Long) {
-        cpfpQueries.setConfirmed(confirmed_at = confirmedAt, id = id.toString())
-        didCompleteWalletPayment(WalletPaymentId.SpliceCpfpOutgoingPaymentId(id), database)
+        database.transaction {
+            cpfpQueries.setConfirmed(confirmed_at = confirmedAt, id = id.toString())
+            didSaveWalletPayment(WalletPaymentId.SpliceCpfpOutgoingPaymentId(id), database)
+        }
     }
 
     fun setLocked(id: UUID, lockedAt: Long) {
-        cpfpQueries.setLocked(locked_at = lockedAt, id = id.toString())
-        didCompleteWalletPayment(WalletPaymentId.SpliceCpfpOutgoingPaymentId(id), database)
+        database.transaction {
+            cpfpQueries.setLocked(locked_at = lockedAt, id = id.toString())
+            didSaveWalletPayment(WalletPaymentId.SpliceCpfpOutgoingPaymentId(id), database)
+        }
     }
 
     private companion object {

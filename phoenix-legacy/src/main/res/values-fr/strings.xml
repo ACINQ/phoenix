@@ -693,7 +693,7 @@
   <!-- //////////////// Migration to KMP //////////////// -->
 
   <string name="legacy_migration_title">Mise à niveau de Phoenix</string>
-  <string name="legacy_migration_ready_message">Passez à la nouvelle version de Phoenix, utilisant un moteur Lightning de dernière génération et de nouvelles fonctionnalités.\n\nLes canaux existants seront fusionnés. Ce processus de migration est automatisé.</string>
+  <string name="legacy_migration_ready_message">Passez à la nouvelle version de Phoenix, utilisant un moteur Lightning de dernière génération et de nouvelles fonctionnalités.\n\nLes canaux existants seront fusionnés. Ce processus de migration est automatisé.\n\nUne fois la migration faite, ne réutilisez pas vos anciennes adresses de swap.</string>
   <string name="legacy_migration_prepare_button">Mettre à jour</string>
   <string name="legacy_migration_prepare_button_disconnected">Connexion…</string>
   <string name="legacy_migration_dismiss_button">Plus tard</string>

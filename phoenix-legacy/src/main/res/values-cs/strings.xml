@@ -420,7 +420,7 @@
   <!-- //////////////// Migration to KMP //////////////// -->
 
   <string name="legacy_migration_title">Phoenix upgrade</string>
-  <string name="legacy_migration_ready_message">Upgrade na nejnovější verzi Phoenixu se špičkovým Lightning enginem a novými funkcemi.\n\nVaše kanály budou sloučeny dohromady. Tento proces je automatizovaný.</string>
+  <string name="legacy_migration_ready_message">Upgrade na nejnovější verzi Phoenixu se špičkovým Lightning enginem a novými funkcemi.\n\nVaše kanály budou sloučeny dohromady. Tento proces je automatizovaný.\n\nPo dokončení migrace již nepoužívejte staré výměnné adresy.</string>
   <string name="legacy_migration_prepare_button">Upgrade</string>
   <string name="legacy_migration_prepare_button_disconnected">Připojení…</string>
   <string name="legacy_migration_dismiss_button">Teď ne</string>
