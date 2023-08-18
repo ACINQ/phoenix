@@ -464,7 +464,7 @@
   <!-- //////////////// Migration to KMP //////////////// -->
 
   <string name="legacy_migration_title">Actualización de Phoenix</string>
-  <string name="legacy_migration_ready_message">Actualízate a la última versión de Phoenix, con un motor Lightning de última generación y nuevas funciones.\n\nSus canales se fusionarán. Este proceso está automatizado.</string>
+  <string name="legacy_migration_ready_message">Actualízate a la última versión de Phoenix, con un motor Lightning de última generación y nuevas funciones.\n\nSus canales se fusionarán. Este proceso está automatizado.\n\nUna vez finalizada la migración, no vuelva a utilizar sus antiguas direcciones de intercambio.</string>
   <string name="legacy_migration_prepare_button">Actualizar</string>
   <string name="legacy_migration_prepare_button_disconnected">Connecting…</string>
   <string name="legacy_migration_dismiss_button">Ahora no</string>
