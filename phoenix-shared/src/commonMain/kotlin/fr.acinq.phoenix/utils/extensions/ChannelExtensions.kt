@@ -32,7 +32,8 @@ fun ChannelStateWithCommitments.minDepthForFunding(nodeParams: NodeParams): Int 
 
 fun ChannelState.isTerminated(): Boolean {
     return when (this) {
-        is Syncing, is Offline -> this.isTerminated()
+        is Syncing -> state.isTerminated()
+        is Offline -> state.isTerminated()
         is Closing, is Closed, is Aborted -> true
         else -> false
     }
@@ -40,7 +41,8 @@ fun ChannelState.isTerminated(): Boolean {
 
 fun ChannelState.isBeingCreated(): Boolean {
     return when (this) {
-        is Syncing, is Offline -> this.isBeingCreated()
+        is Syncing -> state.isBeingCreated()
+        is Offline -> state.isBeingCreated()
         is LegacyWaitForFundingLocked,
         is LegacyWaitForFundingConfirmed,
         is WaitForAcceptChannel,
