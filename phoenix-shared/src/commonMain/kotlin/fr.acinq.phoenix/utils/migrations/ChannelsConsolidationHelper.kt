@@ -47,7 +47,7 @@ object ChannelsConsolidationHelper {
     fun canConsolidate(channels: List<LocalChannelInfo>): Boolean {
         val activeChannels = channels.filter { it.isUsable }
         return when {
-            activeChannels.size == 1 && !isDualFunding(channels.first()) -> true
+            activeChannels.size == 1 && !isDualFunding(activeChannels.first()) -> true
             activeChannels.size > 1 -> true
             else -> false
         }
