@@ -154,7 +154,7 @@ if (includeAndroid) {
         namespace = "fr.acinq.phoenix.shared"
         compileSdk = 33
         defaultConfig {
-            minSdk = 24
+            minSdk = 26
             targetSdk = 33
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }

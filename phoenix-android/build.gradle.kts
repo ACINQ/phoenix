@@ -22,7 +22,7 @@ android {
     compileSdk = 33
     defaultConfig {
         applicationId = "fr.acinq.phoenix.testnet"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 33
         versionCode = 55
         versionName = gitCommitHash()
