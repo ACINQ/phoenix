@@ -26,6 +26,7 @@ import fr.acinq.lightning.channel.states.Closing
 import fr.acinq.lightning.channel.states.Normal
 import fr.acinq.lightning.io.WrappedChannelCommand
 import fr.acinq.lightning.utils.msat
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.Parser
@@ -61,6 +62,18 @@ object ChannelsConsolidationHelper {
                 false
             }
         }
+    }
+
+    suspend fun consolidateChannels(
+        biz: PhoenixBusiness,
+        ignoreDust: Boolean
+    ): ChannelsConsolidationResult {
+        return consolidateChannels(
+            loggerFactory = biz.loggerFactory,
+            chain = biz.chain,
+            peerManager = biz.peerManager,
+            ignoreDust = ignoreDust
+        )
     }
 
     suspend fun consolidateChannels(
