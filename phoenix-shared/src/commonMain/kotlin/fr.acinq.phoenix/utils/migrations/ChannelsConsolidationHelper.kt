@@ -91,7 +91,10 @@ object ChannelsConsolidationHelper {
 
             // check dust
             val channelsToConsolidate = allChannels.filter { it.state is Normal }
-            val dustChannels = channelsToConsolidate.filter { (it.localBalance ?: 0.msat) < 546_000.msat }
+            val dustChannels = channelsToConsolidate.filter {
+                val balance = it.localBalance ?: 0.msat
+                balance > 0.msat && balance < 546_000.msat
+            }
             if (!ignoreDust) {
                 if (dustChannels.isNotEmpty()) {
                     log.info { "aborting: ${dustChannels.size}/${channelsToConsolidate.size} dust channels" }
