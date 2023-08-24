@@ -26,6 +26,9 @@ struct MainView_Small: View {
 	
 	@State private var navLinkTag: NavLinkTag? = nil
 	
+	@State var canMergeChannelsForSplicing = Biz.canMergeChannelsForSplicingPublisher.value
+	@State var showingMergeChannelsView = false
+	
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
 	@State var externalLightningRequest: AppScanController? = nil
 	
@@ -88,6 +91,9 @@ struct MainView_Small: View {
 				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarHidden(true)
 		}
+		.sheet(isPresented: $showingMergeChannelsView) {
+			MergeChannelsView(type: .sheet)
+		}
 	}
 	
 	@ViewBuilder
@@ -130,6 +136,9 @@ struct MainView_Small: View {
 		}
 		.onChange(of: navLinkTag) {
 			navLinkTagChanged($0)
+		}
+		.onReceive(Biz.canMergeChannelsForSplicingPublisher) {
+			canMergeChannelsForSplicingChanged($0)
 		}
 		.onReceive(externalLightningUrlPublisher) {
 			didReceiveExternalLightningUrl($0)
@@ -240,13 +249,15 @@ struct MainView_Small: View {
 		let footerTruncationDetected_condensed = footerTruncationDetection_condensed[dts] ?? false
 		let footerTruncationDetected_standard = footerTruncationDetection_standard[dts] ?? false
 		
+		let buttonTextColor = canMergeChannelsForSplicing ? Color.appNegative : Color.primaryForeground
+		
 		Group {
 			if footerTruncationDetected_condensed {
-				footer_accessibility()
+				footer_accessibility(buttonTextColor: buttonTextColor)
 			} else if footerTruncationDetected_standard {
-				footer_condensed(dts)
+				footer_condensed(buttonTextColor: buttonTextColor, dts: dts)
 			} else {
-				footer_standard(dts)
+				footer_standard(buttonTextColor: buttonTextColor, dts: dts)
 			}
 		}
 		.padding(.top, 20)
@@ -261,7 +272,7 @@ struct MainView_Small: View {
 	}
 	
 	@ViewBuilder
-	func footer_standard(_ dts: DynamicTypeSize) -> some View {
+	func footer_standard(buttonTextColor: Color, dts: DynamicTypeSize) -> some View {
 		
 		// We're trying to center the divider:
 		//
@@ -277,13 +288,13 @@ struct MainView_Small: View {
 			Spacer(minLength: 2)
 			
 			Button {
-				navLinkTag = .ReceiveView
+				didTapReceiveButton()
 			} label: {
 				Label {
 					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
 						Text("Receive")
 							.lineLimit(1)
-							.foregroundColor(.primaryForeground)
+							.foregroundColor(buttonTextColor)
 					} wasTruncated: {
 						log.debug("footerTruncationDetected_standard(receive): \(dts)")
 						self.footerTruncationDetection_standard[dts] = true
@@ -308,13 +319,13 @@ struct MainView_Small: View {
 			}
 
 			Button {
-				navLinkTag = .SendView
+				didTapSendButton()
 			} label: {
 				Label {
 					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
 						Text("Send")
 							.lineLimit(1)
-							.foregroundColor(.primaryForeground)
+							.foregroundColor(buttonTextColor)
 					} wasTruncated: {
 						log.debug("footerTruncationDetected_standard(send): \(dts)")
 						self.footerTruncationDetection_standard[dts] = true
@@ -338,7 +349,7 @@ struct MainView_Small: View {
 	}
 	
 	@ViewBuilder
-	func footer_condensed(_ dts: DynamicTypeSize) -> some View {
+	func footer_condensed(buttonTextColor: Color, dts: DynamicTypeSize) -> some View {
 		
 		// There's a large font being used, and possibly a small screen too.
 		// Thus horizontal space is tight.
@@ -354,13 +365,13 @@ struct MainView_Small: View {
 			Spacer(minLength: 0)
 			
 			Button {
-				navLinkTag = .ReceiveView
+				didTapReceiveButton()
 			} label: {
 				Label {
 					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
 						Text("Receive")
 							.lineLimit(1)
-							.foregroundColor(.primaryForeground)
+							.foregroundColor(buttonTextColor)
 					} wasTruncated: {
 						log.debug("footerTruncationDetected_condensed(receive): \(dts)")
 						self.footerTruncationDetection_condensed[dts] = true
@@ -383,13 +394,13 @@ struct MainView_Small: View {
 			}
 
 			Button {
-				navLinkTag = .SendView
+				didTapSendButton()
 			} label: {
 				Label {
 					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
 						Text("Send")
 							.lineLimit(1)
-							.foregroundColor(.primaryForeground)
+							.foregroundColor(buttonTextColor)
 					} wasTruncated: {
 						log.debug("footerTruncationDetected_condensed(send): \(dts)")
 						self.footerTruncationDetection_condensed[dts] = true
@@ -411,19 +422,19 @@ struct MainView_Small: View {
 	}
 	
 	@ViewBuilder
-	func footer_accessibility() -> some View {
+	func footer_accessibility(buttonTextColor: Color) -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			Spacer()
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 				
 				Button {
-					navLinkTag = .ReceiveView
+					didTapReceiveButton()
 				} label: {
 					Label {
 						Text("Receive")
 							.lineLimit(1)
-							.foregroundColor(.primaryForeground)
+							.foregroundColor(buttonTextColor)
 					} icon: {
 						Image("ic_receive_resized")
 							.resizable()
@@ -439,12 +450,12 @@ struct MainView_Small: View {
 				Divider().frame(height: 1).background(Color.borderColor)
 				
 				Button {
-					navLinkTag = .SendView
+					didTapSendButton()
 				} label: {
 					Label {
 						Text("Send")
 							.lineLimit(1)
-							.foregroundColor(.primaryForeground)
+							.foregroundColor(buttonTextColor)
 					} icon: {
 						Image("ic_scan_resized")
 							.resizable()
@@ -567,7 +578,13 @@ struct MainView_Small: View {
 		}
 	}
 	
-	private func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
+	private func canMergeChannelsForSplicingChanged(_ value: Bool) {
+		log.trace("canMergeChannelsForSplicingChanged()")
+		
+		canMergeChannelsForSplicing = value
+	}
+	
+	private func didReceiveExternalLightningUrl(_ urlStr: String) {
 		log.trace("didReceiveExternalLightningUrl()")
 	
 		if navLinkTag == .SendView {
@@ -585,6 +602,26 @@ struct MainView_Small: View {
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
+	
+	func didTapSendButton() {
+		log.trace("didTapSendButton()")
+		
+		if canMergeChannelsForSplicing {
+			showingMergeChannelsView = true
+		} else {
+			navLinkTag = .SendView
+		}
+	}
+	
+	func didTapReceiveButton() {
+		log.trace("didTapReceiveButton()")
+		
+		if canMergeChannelsForSplicing {
+			showingMergeChannelsView = true
+		} else {
+			navLinkTag = .ReceiveView
+		}
+	}
 	
 	func showSwapInWallet() {
 		log.trace("showSwapInWallet()")

@@ -24,6 +24,7 @@ fileprivate enum Key: String {
 	case hideAmounts = "hideAmountsOnHomeScreen"
 	case showOriginalFiatAmount
 	case recentPaymentsConfig
+	case hasMergedChannelsForSplicing
 }
 
 fileprivate enum KeyDeprecated: String {
@@ -150,6 +151,17 @@ class Prefs {
 		set { defaults.recentPaymentsConfig = newValue.jsonEncode() }
 	}
 	
+	lazy private(set) var hasMergedChannelsForSplicingPublisher: AnyPublisher<Bool, Never> = {
+		defaults.publisher(for: \.hasMergedChannelsForSplicing, options: [.initial, .new])
+			.removeDuplicates()
+			.eraseToAnyPublisher()
+	}()
+	
+	var hasMergedChannelsForSplicing: Bool {
+		get { defaults.hasMergedChannelsForSplicing }
+		set { defaults.hasMergedChannelsForSplicing = newValue }
+	}
+	
 	// --------------------------------------------------
 	// MARK: Wallet State
 	// --------------------------------------------------
@@ -265,6 +277,7 @@ class Prefs {
 		defaults.removeObject(forKey: Key.hideAmounts.rawValue)
 		defaults.removeObject(forKey: Key.showOriginalFiatAmount.rawValue)
 		defaults.removeObject(forKey: Key.recentPaymentsConfig.rawValue)
+		defaults.removeObject(forKey: Key.hasMergedChannelsForSplicing.rawValue)
 		
 		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
 		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
@@ -326,5 +339,10 @@ extension UserDefaults {
 	@objc fileprivate var recentTipPercents: Data? {
 		get { data(forKey: Key.recentTipPercents.rawValue) }
 		set { set(newValue, forKey: Key.recentTipPercents.rawValue) }
+	}
+	
+	@objc fileprivate var hasMergedChannelsForSplicing: Bool {
+		get { bool(forKey: Key.hasMergedChannelsForSplicing.rawValue) }
+		set { set(newValue, forKey: Key.hasMergedChannelsForSplicing.rawValue) }
 	}
 }

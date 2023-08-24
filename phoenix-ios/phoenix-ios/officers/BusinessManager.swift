@@ -60,6 +60,11 @@ class BusinessManager {
 	///
 	public let swapInRejectedPublisher = CurrentValueSubject<Lightning_kmpLiquidityEventsRejected?, Never>(nil)
 
+	/// Reports the most recent state of `ChannelsConsolidationHelper.canConsolidate()`.
+	/// When true, the (blocking) upgrade mechanism must be re-run.
+	///
+	public let canMergeChannelsForSplicingPublisher = CurrentValueSubject<Bool, Never>(false)
+	
 	private var walletInfo: WalletManager.WalletInfo? = nil
 	private var pushToken: String? = nil
 	private var fcmToken: String? = nil
@@ -225,6 +230,16 @@ class BusinessManager {
 						self.swapInRejectedPublisher.value = nil
 					}
 				}
+			}
+			.store(in: &cancellables)
+		
+		// Monitor for unfinished "merge-channels for splicing" upgrade.
+		//
+		business.peerManager.channelsPublisher()
+			.sink { (channels: [LocalChannelInfo]) in
+				
+				let canConsolidate = ChannelsConsolidationHelper.shared.canConsolidate(channels: channels)
+				self.canMergeChannelsForSplicingPublisher.send(canConsolidate)
 			}
 			.store(in: &cancellables)
 	}

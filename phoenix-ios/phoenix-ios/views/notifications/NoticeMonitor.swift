@@ -21,6 +21,8 @@ class NoticeMonitor: ObservableObject {
 		encryptedNodeId: Biz.encryptedNodeId!
 	)
 	
+	// Raw publisher for all WalletContext settings fetched from the cloud.
+	// See specific functions below for simple getters. E.g.: `hasNotice_mempoolFull`
 	@Published var chainContext: WalletContext.V0ChainContext? = nil
 	
 	@Published var notificationPermissions = NotificationsManager.shared.permissions.value

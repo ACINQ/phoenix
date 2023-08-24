@@ -12,6 +12,14 @@ extension PhoenixBusiness {
 
 extension PeerManager {
 	
+	func channelsFlowValue() -> [Bitcoin_kmpByteVector32: LocalChannelInfo] {
+		if let value = self.channelsFlow.value_ as? [Bitcoin_kmpByteVector32: LocalChannelInfo] {
+			return value
+		} else {
+			return [:]
+		}
+	}
+	
 	func finalWalletValue() -> Lightning_kmpWalletState.WalletWithConfirmations {
 		if let value = self.finalWallet.value_ as? Lightning_kmpWalletState.WalletWithConfirmations {
 			return value

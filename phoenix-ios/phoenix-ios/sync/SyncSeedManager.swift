@@ -498,11 +498,7 @@ class SyncSeedManager: SyncManagerProtcol {
 						let delay: TimeInterval = minElapsed - elapsed
 						log.trace("deleteSeed(): readabilityDelay = \(delay) seconds")
 						
-						if #available(iOS 16.0, *) {
-							try await Task.sleep(for: Duration.seconds(delay))
-						} else {
-							try await Task.sleep(nanoseconds: UInt64(delay * Double(1_000_000_000)))
-						}
+						try await Task.sleep(seconds: delay)
 					}
 					
 					log.trace("deleteSeed(): finish: success")

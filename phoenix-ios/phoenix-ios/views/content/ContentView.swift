@@ -17,6 +17,8 @@ struct ContentView: View {
 	@ObservedObject var lockState = LockState.shared
 	@State var unlockedOnce = false
 	
+	@State var hasMergedChannelsForSplicing = Prefs.shared.hasMergedChannelsForSplicing
+	
 	@EnvironmentObject var shortSheetState: ShortSheetState
 	@State var shortSheetItem: ShortSheetItem? = nil
 	
@@ -62,6 +64,12 @@ struct ContentView: View {
 			}
 			
 		} // </ZStack>
+		.onChange(of: lockState.walletExistence) { (newValue: WalletExistence) in
+			walletExistenceChanged(newValue)
+		}
+		.onReceive(Prefs.shared.hasMergedChannelsForSplicingPublisher) { (newValue: Bool) in
+			hasMergedChannelsForSplicing = newValue
+		}
 		.onReceive(shortSheetState.publisher) { (item: ShortSheetItem?) in
 			withAnimation {
 				shortSheetItem = item
@@ -78,9 +86,36 @@ struct ContentView: View {
 	func primaryView() -> some View {
 
 		switch lockState.walletExistence {
-			case .exists       : MainView()
-			case .doesNotExist : IntroContainer()
-			case .unknown      : LoadingView()
+		case .exists:
+			if !hasMergedChannelsForSplicing {
+				MergeChannelsView(type: .standalone)
+			} else {
+				MainView()
+			}
+			
+		case .doesNotExist:
+			IntroContainer()
+			
+		case .unknown:
+			LoadingView()
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func walletExistenceChanged(_ value: WalletExistence) {
+		log.trace("walletExistenceChanged(value = \(value))")
+		
+		if value == .doesNotExist {
+			Prefs.shared.hasMergedChannelsForSplicing = true
+		}
+	}
+	
+	func hasMergedChannelsForSplicingChanged(_ value: Bool) {
+		log.trace("hasMergedChannelsForSplicingChanged(value = \(value))")
+		
+		hasMergedChannelsForSplicing = value
 	}
 }

@@ -23,6 +23,9 @@ struct MainView_BigPrimary: View {
 	
 	@State var didAppear = false
 	
+	@State var canMergeChannelsForSplicing = Biz.canMergeChannelsForSplicingPublisher.value
+	@State var showingMergeChannelsView = false
+	
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
 	@State var externalLightningRequest: AppScanController? = nil
 	
@@ -51,6 +54,9 @@ struct MainView_BigPrimary: View {
 				.navigationTitle("")
 				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarHidden(true)
+		}
+		.sheet(isPresented: $showingMergeChannelsView) {
+			MergeChannelsView(type: .sheet)
 		}
 	}
 	
@@ -93,6 +99,9 @@ struct MainView_BigPrimary: View {
 		.onChange(of: navLinkTag) {
 			navLinkTagChanged($0)
 		}
+		.onReceive(Biz.canMergeChannelsForSplicingPublisher) {
+			canMergeChannelsForSplicingChanged($0)
+		}
 		.onReceive(externalLightningUrlPublisher) {
 			didReceiveExternalLightningUrl($0)
 		}
@@ -115,19 +124,17 @@ struct MainView_BigPrimary: View {
 		HStack(alignment: VerticalAlignment.center, spacing: 20) {
 			
 			Button {
-				withAnimation {
-					navLinkTag = .ReceiveView
-				}
+				didTapReceiveButton()
 			} label: {
 				Label {
 					Text("Receive")
 						.font(.title2.weight(.medium))
-						.foregroundColor(.white)
+						.foregroundColor(canMergeChannelsForSplicing ? .appNegative : .white)
 				} icon: {
 					Image("ic_receive_resized")
 						.resizable()
 						.aspectRatio(contentMode: .fit)
-						.foregroundColor(Color.white)
+						.foregroundColor(.white)
 						.frame(width: receiveImageSize, height: receiveImageSize, alignment: .center)
 				}
 				.padding(.leading, 16)
@@ -143,14 +150,12 @@ struct MainView_BigPrimary: View {
 			.read(footerButtonWidthReader)
 
 			Button {
-				withAnimation {
-					navLinkTag = .SendView
-				}
+				didTapSendButton()
 			} label: {
 				Label {
 					Text("Send")
 						.font(.title2.weight(.medium))
-						.foregroundColor(.white)
+						.foregroundColor(canMergeChannelsForSplicing ? .appNegative : .white)
 				} icon: {
 					Image("ic_scan_resized")
 						.resizable()
@@ -227,6 +232,12 @@ struct MainView_BigPrimary: View {
 		}
 	}
 	
+	private func canMergeChannelsForSplicingChanged(_ value: Bool) {
+		log.trace("canMergeChannelsForSplicingChanged()")
+		
+		canMergeChannelsForSplicing = value
+	}
+	
 	private func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
 		log.trace("didReceiveExternalLightningUrl()")
 		
@@ -245,6 +256,30 @@ struct MainView_BigPrimary: View {
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
+	
+	func didTapSendButton() {
+		log.trace("didTapSendButton()")
+		
+		if canMergeChannelsForSplicing {
+			showingMergeChannelsView = true
+		} else {
+			withAnimation {
+				navLinkTag = .SendView
+			}
+		}
+	}
+	
+	func didTapReceiveButton() {
+		log.trace("didTapReceiveButton()")
+		
+		if canMergeChannelsForSplicing {
+			showingMergeChannelsView = true
+		} else {
+			withAnimation {
+				navLinkTag = .ReceiveView
+			}
+		}
+	}
 	
 	func showSwapInWallet() {
 		log.trace("showSwapInWallet()")
