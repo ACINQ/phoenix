@@ -85,7 +85,8 @@ object ChannelsConsolidationHelper {
         try {
             val log = loggerFactory.newLogger(this::class)
 
-            val swapInAddress = peerManager.getPeer().swapInAddress
+            val peer = peerManager.getPeer()
+            val swapInAddress = peer.swapInAddress
             val closingScript = Parser.addressToPublicKeyScript(chain, swapInAddress)
             if (closingScript == null) {
                 log.info { "aborting: could not get a valid closing script" }
@@ -118,9 +119,13 @@ object ChannelsConsolidationHelper {
                 }
             }
 
-            // migrate channels
+            // Tell the swap-in wallet to "pause".
+            // That is: don't try to use any of the UTXOs until we're done with our migration.
+            peer.stopWatchSwapInWallet()
+            val finalUtxoCount = peer.swapInWallet.walletStateFlow.value.utxos.size + channelsToConsolidate.size
+
+            // Migrate channels
             log.info { "consolidating ${channelsToConsolidate.size} channels to $swapInAddress" }
-            val peer = peerManager.getPeer()
             val command = ChannelCommand.Close.MutualClose(
                 scriptPubKey = ByteVector(closingScript),
                 feerates = null
@@ -129,27 +134,34 @@ object ChannelsConsolidationHelper {
                 peer.send(WrappedChannelCommand(ByteVector32.fromValidHex(it.channelId), command))
             }
 
-            // checking every 3s the closing tx publication for each consolidated channel (map of channelId -> isPublished)
-            val closingPublishedMap = channelsToConsolidate.map { ByteVector32.fromValidHex(it.channelId) }.associateWith { false }.toMutableMap()
-            val mutualClosePublishedTxs = mutableSetOf<ByteVector32>()
-            while (closingPublishedMap.any { !it.value }) {
-                val notPublished = closingPublishedMap.filter { !it.value }.keys
-                log.info { "checking closing status of ${notPublished.size}/${closingPublishedMap.size} channels" }
+            // Wait for the closing tx publication for each consolidated channel (map of channelId -> isPublished)
+            val closingTxs: MutableMap<ByteVector32, ByteVector32> = mutableMapOf()
+            val notPublished = channelsToConsolidate.map { ByteVector32.fromValidHex(it.channelId) }.toMutableSet()
+            while (notPublished.isNotEmpty()) {
+                log.info { "checking closing status of ${notPublished.size} channel(s)" }
+                val channels = peer.channels
                 notPublished.forEach { channelId ->
-                    val channel = peer.channels[channelId]
+                    val channel = channels[channelId]
                     if (channel is Closing && channel.mutualClosePublished.isNotEmpty()) {
                         log.info { "mutual-close published for channel=$channelId" }
-                        mutualClosePublishedTxs.add(channel.mutualClosePublished.first().tx.txid)
-                        closingPublishedMap[channelId] = true
+                        closingTxs[channelId] = channel.mutualClosePublished.first().tx.txid
+                        notPublished.remove(channelId)
                     } else {
                         log.info { "ignore channel=$channelId in state=${channel?.stateName}" }
                     }
                 }
-                log.info { "${closingPublishedMap.filter { it.value }.size}/${closingPublishedMap.size} closing published" }
-                delay(3000)
+                log.info { "${channelsToConsolidate.size - notPublished.size}/${channelsToConsolidate.size} closing published" }
+                if (notPublished.isNotEmpty()) {
+                    peer.channelsFlow.first { it != channels }
+                }
             }
-            log.info { "${closingPublishedMap.size} channels closed to $closingScript" }
-            return ChannelsConsolidationResult.Success(closingPublishedMap.keys, mutualClosePublishedTxs)
+            log.info { "${closingTxs.size} channels closed to $closingScript" }
+
+            // Wait for UTXOs to arrive in swap-in wallet before resuming.
+            peer.swapInWallet.walletStateFlow.first { it.utxos.size == finalUtxoCount }
+            peer.startWatchSwapInWallet()
+
+            return ChannelsConsolidationResult.Success(closingTxs)
         } catch (e: Exception) {
             return ChannelsConsolidationResult.Failure.Generic(e)
         }
@@ -157,7 +169,7 @@ object ChannelsConsolidationHelper {
 }
 
 sealed class ChannelsConsolidationResult {
-    data class Success(val channels: Set<ByteVector32>, val closingTxs: Set<ByteVector32>) : ChannelsConsolidationResult()
+    data class Success(val closingTxs: Map<ByteVector32, ByteVector32>) : ChannelsConsolidationResult()
     sealed class Failure : ChannelsConsolidationResult() {
         data class Generic(val error: Throwable) : Failure()
         object InvalidClosingScript : Failure()
