@@ -99,15 +99,11 @@ class BusinessManager {
 			others: GroupPrefs.shared.preferredFiatCurrencies
 		)
 		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
-
-		let lp = Prefs.shared.liquidityPolicy
-		log.debug("lp.effectiveMaxFeeSats = \(lp.effectiveMaxFeeSats)")
-		log.debug("lp.effectiveMaxFeeBasisPoints = \(lp.effectiveMaxFeeBasisPoints)")
 		
 		let startupParams = StartupParams(
 			requestCheckLegacyChannels: false,
 			isTorEnabled: GroupPrefs.shared.isTorEnabled,
-			liquidityPolicy: lp.toKotlin(),
+			liquidityPolicy: Prefs.shared.liquidityPolicy.toKotlin(),
 			trustedSwapInTxs: Set()
 		)
 		business.start(startupParams: startupParams)
@@ -139,9 +135,10 @@ class BusinessManager {
 	// --------------------------------------------------
 	
 	private func registerForNotifications() {
+		log.trace("registerForNotifications()")
 		
 		// Connection status observer
-		business.connectionsManager.publisher
+		business.connectionsManager.publisher()
 			.sink { (connections: Connections) in
 			
 				self.connectionsChanged(connections)

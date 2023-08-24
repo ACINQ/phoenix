@@ -20,6 +20,10 @@ extension PeerManager {
 		}
 	}
 	
+	func channelsValue() -> [LocalChannelInfo] {
+		return channelsFlowValue().map { $1 }
+	}
+	
 	func finalWalletValue() -> Lightning_kmpWalletState.WalletWithConfirmations {
 		if let value = self.finalWallet.value_ as? Lightning_kmpWalletState.WalletWithConfirmations {
 			return value
@@ -122,18 +126,6 @@ extension ConnectionsManager {
 	
 	var currentValue: Connections {
 		return connections.value_ as! Connections
-	}
-	
-	var publisher: CurrentValueSubject<Connections, Never> {
-
-		let publisher = CurrentValueSubject<Connections, Never>(currentValue)
-
-		let swiftFlow = SwiftFlow<Connections>(origin: connections)
-		swiftFlow.watch {[weak publisher](connections: Connections?) in
-			publisher?.send(connections!)
-		}
-
-		return publisher
 	}
 	
 	var asyncStream: AsyncStream<Connections> {

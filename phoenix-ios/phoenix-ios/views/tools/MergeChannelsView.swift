@@ -28,6 +28,9 @@ struct MergeChannelsView: View {
 	@State var ignoreDust = false
 	@State var allowAbortOverride = false // e.g. allows user to go force-close channels
 	
+	@State var connections: Connections = Biz.business.connectionsManager.currentValue
+	@State var channels = Biz.business.peerManager.channelsValue()
+	
 	@State var initialButtonsRow_truncated_title3 = false
 	@State var initialButtonsRow_truncated_headline = false
 	
@@ -73,6 +76,12 @@ struct MergeChannelsView: View {
 			
 		} // </VStack>
 		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
+		.onReceive(Biz.business.connectionsManager.publisher()) {
+			connectionsChanged($0)
+		}
+		.onReceive(Biz.business.peerManager.channelsPublisher()) {
+			channelsChanged($0)
+		}
 	}
 	
 	@ViewBuilder
@@ -96,7 +105,7 @@ struct MergeChannelsView: View {
 				.foregroundColor(.secondary)
 				.padding(.bottom, 20)
 			
-			bulletRows()
+			info_bulletRows()
 				.padding(.bottom, 40)
 			
 			Text("Learn more from our [blog post](https://acinq.co/blog/phoenix-splicing-update).")
@@ -104,27 +113,27 @@ struct MergeChannelsView: View {
 	}
 	
 	@ViewBuilder
-	func bulletRows() -> some View {
+	func info_bulletRows() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
 			
-			bulletRow(
+			info_bulletRow(
 				title: "Splicing",
 				subtitle: "3rd generation lightning tech"
 			)
-			bulletRow(
+			info_bulletRow(
 				title: "Trustless swaps",
 				subtitle: "on-chain <-> lightning"
 			)
-			bulletRow(
+			info_bulletRow(
 				title: "Control on-chain fees",
 				subtitle: "select miner fee when sending on-chain"
 			)
-			bulletRow(
+			info_bulletRow(
 				title: "Bump fess",
 				subtitle: "to speed up on-chain payments"
 			)
-			bulletRow(
+			info_bulletRow(
 				title: "Better predictability",
 				subtitle: "know when fees may occur"
 			)
@@ -133,7 +142,7 @@ struct MergeChannelsView: View {
 	}
 	
 	@ViewBuilder
-	func bulletRow(title: LocalizedStringKey, subtitle: LocalizedStringKey) -> some View {
+	func info_bulletRow(title: LocalizedStringKey, subtitle: LocalizedStringKey) -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
@@ -164,86 +173,93 @@ struct MergeChannelsView: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			if operationInProgress {
-				
-				HStack(alignment: VerticalAlignment.center, spacing: 4) {
-					ProgressView()
-						.progressViewStyle(CircularProgressViewStyle(tint: Color.appAccent))
-					Text("Upgrading channels...")
-					
-				} // </HStack>
-				
-			} else if operationCompleted {
-					
-				HStack(alignment: VerticalAlignment.center, spacing: 4) {
-					Image(systemName: "checkmark.circle")
-					Text("Upgraded channels!")
-					
-				} // </HStack>
-				.foregroundColor(.appPositive)
-				
-			} else if let _ = consolidationResult as? ChannelsConsolidationResult.Failure {
-				
-				if let failure = consolidationResult as? ChannelsConsolidationResult.FailureDustChannels {
-					let (btcAmt, fiatAmt) = dustAmount(failure)
-					
-					HStack(alignment: VerticalAlignment.center, spacing: 4) {
-						Image(systemName: "wrench.adjustable")
-						Text("Operation will cost \(btcAmt.string) (≈ \(fiatAmt.string))")
-					}
-					
-				} else {
-					
-					HStack(alignment: VerticalAlignment.center, spacing: 4) {
-						Image(systemName: "wrench.adjustable")
-						
-						if let _ = consolidationResult as? ChannelsConsolidationResult.FailureChannelsBeingCreated {
-							Text("Failed: Existing channels found in mid-creation state")
-						} else if let _ = consolidationResult as? ChannelsConsolidationResult.FailureInvalidClosingScript {
-							Text("Failed: Invalid closing script")
-						} else if let failure = consolidationResult as? ChannelsConsolidationResult.FailureGeneric {
-							Text("Failure: \(failure.error.message ?? "Generic error")")
-						} else {
-							Text("Failure: Unknown error")
-						}
-					}
-					.foregroundColor(.appNegative)
-				}
-				
-			} else {
-				
-				Text("Upgrade your channels to get started now.")
-			}
-			
-			buttonsRow()
+			footer_operationStatus()
+				.padding(.bottom, 16)
+			footer_buttonsRow()
+				.padding(.bottom, 16)
+			footer_connectionStatus()
 			
 		} // </VStack>
 	}
 	
 	@ViewBuilder
-	func buttonsRow() -> some View {
+	func footer_operationStatus() -> some View {
 		
-		Group {
-			if operationFailedAtLeastOnce {
-				subsequentButtonsRow()
+		if operationInProgress {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				ProgressView()
+					.progressViewStyle(CircularProgressViewStyle(tint: Color.appAccent))
+				Text("Upgrading channels...")
+				
+			} // </HStack>
+			
+		} else if operationCompleted {
+				
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				Image(systemName: "checkmark.circle")
+				Text("Upgraded channels!")
+				
+			} // </HStack>
+			.foregroundColor(.appPositive)
+			
+		} else if let _ = consolidationResult as? ChannelsConsolidationResult.Failure {
+			
+			if let failure = consolidationResult as? ChannelsConsolidationResult.FailureDustChannels {
+				let (btcAmt, fiatAmt) = dustAmount(failure)
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
+					Image(systemName: "wrench.adjustable")
+					Text("Operation will cost \(btcAmt.string) (≈ \(fiatAmt.string))")
+				}
+				
 			} else {
-				initialButtonsRow()
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
+					Image(systemName: "wrench.adjustable")
+					
+					if let _ = consolidationResult as? ChannelsConsolidationResult.FailureChannelsBeingCreated {
+						Text("Failed: Existing channels found in mid-creation state")
+					} else if let _ = consolidationResult as? ChannelsConsolidationResult.FailureInvalidClosingScript {
+						Text("Failed: Invalid closing script")
+					} else if let failure = consolidationResult as? ChannelsConsolidationResult.FailureGeneric {
+						Text("Failure: \(failure.error.message ?? "Generic error")")
+					} else {
+						Text("Failure: Unknown error")
+					}
+				}
+				.foregroundColor(.appNegative)
 			}
+			
+		} else {
+			
+			Text("Upgrade your channels to get started now.")
 		}
-		.disabled(operationInProgress || operationCompleted)
 	}
 	
 	@ViewBuilder
-	func initialButtonsRow() -> some View {
+	func footer_buttonsRow() -> some View {
+		
+		Group {
+			if operationFailedAtLeastOnce {
+				footer_subsequentButtonsRow()
+			} else {
+				footer_initialButtonsRow()
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func footer_initialButtonsRow() -> some View {
 		
 		if initialButtonsRow_truncated_headline {
 
-			initialButtonsRow(buttonFont: .callout, lineLimit: nil)
+			footer_initialButtonsRow(buttonFont: .callout, lineLimit: nil)
 
 		} else if initialButtonsRow_truncated_title3 {
 
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				initialButtonsRow(buttonFont: .headline, lineLimit: 1)
+				footer_initialButtonsRow(buttonFont: .headline, lineLimit: 1)
 			} wasTruncated: {
 				initialButtonsRow_truncated_headline = true
 			}
@@ -251,7 +267,7 @@ struct MergeChannelsView: View {
 		} else {
 
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				initialButtonsRow(buttonFont: .title3, lineLimit: 1)
+				footer_initialButtonsRow(buttonFont: .title3, lineLimit: 1)
 			} wasTruncated: {
 				initialButtonsRow_truncated_title3 = true
 			}
@@ -259,7 +275,7 @@ struct MergeChannelsView: View {
 	}
 	
 	@ViewBuilder
-	func initialButtonsRow(buttonFont: Font, lineLimit: Int?) -> some View {
+	func footer_initialButtonsRow(buttonFont: Font, lineLimit: Int?) -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			Spacer(minLength: 0)
@@ -273,6 +289,7 @@ struct MergeChannelsView: View {
 			}
 			.buttonStyle(.borderedProminent)
 			.buttonBorderShape(.capsule)
+			.disabled(startRetryButtonDisabled())
 			
 			if allowAbortOverride {
 				Spacer(minLength: 0)
@@ -287,24 +304,24 @@ struct MergeChannelsView: View {
 				.buttonStyle(.borderedProminent)
 				.buttonBorderShape(.capsule)
 				.tint(.appNegative)
+				.disabled(skipAbortButtonDisabled())
 			}
 			
 			Spacer(minLength: 0)
 		} // </HStack>
-		.padding(.top, 16)
 	}
 	
 	@ViewBuilder
-	func subsequentButtonsRow() -> some View {
+	func footer_subsequentButtonsRow() -> some View {
 		
 		if subsequentButtonsRow_truncated_headline {
 
-			subsequentButtonsRow(buttonFont: .callout, lineLimit: nil)
+			footer_subsequentButtonsRow(buttonFont: .callout, lineLimit: nil)
 
 		} else if subsequentButtonsRow_truncated_title3 {
 
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				subsequentButtonsRow(buttonFont: .headline, lineLimit: 1)
+				footer_subsequentButtonsRow(buttonFont: .headline, lineLimit: 1)
 			} wasTruncated: {
 				subsequentButtonsRow_truncated_headline = true
 			}
@@ -312,7 +329,7 @@ struct MergeChannelsView: View {
 		} else {
 
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				subsequentButtonsRow(buttonFont: .title3, lineLimit: 1)
+				footer_subsequentButtonsRow(buttonFont: .title3, lineLimit: 1)
 			} wasTruncated: {
 				subsequentButtonsRow_truncated_title3 = true
 			}
@@ -320,7 +337,7 @@ struct MergeChannelsView: View {
 	}
 	
 	@ViewBuilder
-	func subsequentButtonsRow(buttonFont: Font, lineLimit: Int?) -> some View {
+	func footer_subsequentButtonsRow(buttonFont: Font, lineLimit: Int?) -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			Spacer(minLength: 0)
@@ -334,6 +351,7 @@ struct MergeChannelsView: View {
 			}
 			.buttonStyle(.borderedProminent)
 			.buttonBorderShape(.capsule)
+			.disabled(startRetryButtonDisabled())
 			
 			Spacer(minLength: 0)
 			
@@ -347,10 +365,35 @@ struct MergeChannelsView: View {
 			.buttonStyle(.borderedProminent)
 			.buttonBorderShape(.capsule)
 			.tint(.appNegative)
+			.disabled(skipAbortButtonDisabled())
 			
 			Spacer(minLength: 0)
 		} // </HStack>
-		.padding(.top, 16)
+	}
+	
+	@ViewBuilder
+	func footer_connectionStatus() -> some View {
+		
+		if let pendingStatus = notReadyString() {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				ProgressView()
+					.progressViewStyle(CircularProgressViewStyle(tint: Color.appAccent))
+				Text(verbatim: pendingStatus)
+				
+			} // </HStack>
+			
+		} else {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				ProgressView()
+					.progressViewStyle(CircularProgressViewStyle(tint: Color.clear))
+				
+				Text(verbatim: "")
+				
+			} // </HStack>
+			.accessibilityHidden(true)
+		}
 	}
 	
 	// --------------------------------------------------
@@ -368,6 +411,94 @@ struct MergeChannelsView: View {
 		let btc = Utils.formatBitcoin(currencyPrefs, msat: dustChannelsMsat)
 		let fiat = Utils.formatFiat(currencyPrefs, msat: dustChannelsMsat)
 		return (btc, fiat)
+	}
+	
+	func startRetryButtonDisabled() -> Bool {
+		
+		return operationInProgress || operationCompleted || pendingConnectionsOrChannels()
+	}
+	
+	func skipAbortButtonDisabled() -> Bool {
+		
+		return operationInProgress || operationCompleted
+	}
+	
+	func pendingConnectionsOrChannels() -> Bool {
+		
+		return notReadyString() != nil
+	}
+	
+	func notReadyString() -> String? {
+		
+		if !(connections.internet is Lightning_kmpConnection.ESTABLISHED) {
+			return NSLocalizedString("waiting for internet", comment: "")
+		}
+		if !(connections.peer is Lightning_kmpConnection.ESTABLISHED) {
+			return NSLocalizedString("connecting to peer", comment: "")
+		}
+		if !(connections.electrum is Lightning_kmpConnection.ESTABLISHED) {
+			return NSLocalizedString("connecting to electrum", comment: "")
+		}
+		
+		let allChannelsReady = channels.allSatisfy { $0.isTerminated || $0.isUsable }
+		if !allChannelsReady {
+			return NSLocalizedString("restoring connections", comment: "")
+		}
+		
+		return nil
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func connectionsChanged(_ newConnections: Connections) {
+		log.trace("connectionsChanged()")
+		
+		connections = newConnections
+	}
+	
+	func channelsChanged(_ newChannels: [LocalChannelInfo]) {
+		log.trace("channelsChanged()")
+		
+		channels = newChannels
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func didLongPressTitle() {
+		log.trace("didLongPressTitle()")
+		
+		allowAbortOverride = true
+	}
+	
+	func getStarted() {
+		log.trace("getStarted()")
+		
+		startConsolidationOperation()
+	}
+	
+	func retryOperation() {
+		log.trace("retryOperation()")
+		
+		startConsolidationOperation()
+	}
+	
+	func abortOperation() {
+		log.trace("abortOperation()")
+		
+		closeView()
+	}
+	
+	func closeView() {
+		log.trace("closeView()")
+		
+		Prefs.shared.hasMergedChannelsForSplicing = true
+		if type == .sheet {
+			presentationMode.wrappedValue.dismiss()
+		}
 	}
 	
 	// --------------------------------------------------
@@ -437,43 +568,6 @@ struct MergeChannelsView: View {
 				operationInProgress = false
 				operationFailedAtLeastOnce = true
 			}
-		}
-	}
-	
-	// --------------------------------------------------
-	// MARK: Actions
-	// --------------------------------------------------
-	
-	func didLongPressTitle() {
-		log.trace("didLongPressTitle()")
-		
-		allowAbortOverride = true
-	}
-	
-	func getStarted() {
-		log.trace("getStarted()")
-		
-		startConsolidationOperation()
-	}
-	
-	func retryOperation() {
-		log.trace("retryOperation()")
-		
-		startConsolidationOperation()
-	}
-	
-	func abortOperation() {
-		log.trace("abortOperation()")
-		
-		closeView()
-	}
-	
-	func closeView() {
-		log.trace("closeView()")
-		
-		Prefs.shared.hasMergedChannelsForSplicing = true
-		if type == .sheet {
-			presentationMode.wrappedValue.dismiss()
 		}
 	}
 }

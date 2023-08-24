@@ -19,39 +19,28 @@ class ObservableConnectionsMonitor: ObservableObject {
 	@Published var disconnectedAt: Date? = nil
 	@Published var connectingAt: Date? = nil
 	
-	private var watcher: Ktor_ioCloseable?
+	private var cancellables = Set<AnyCancellable>()
 	
 	init() {
 		let connectionsManager = Biz.business.connectionsManager
 		let currentConnections = connectionsManager.currentValue
 		
 		connections = currentConnections
-		update(currentConnections)
+		connectionsChanged(currentConnections)
 		
-		let swiftFlow = SwiftFlow<Connections>(origin: connectionsManager.connections)
-		
-		watcher = swiftFlow.watch {[weak self](newConnections: Connections?) in
-			if let newConnections = newConnections {
-				self?.update(newConnections)
-			}
-		}
+		connectionsManager.publisher().sink {[weak self](newConnections: Connections) in
+			self?.connectionsChanged(newConnections)
+			
+		}.store(in: &cancellables)
 	}
 	
 	#if DEBUG // For debugging UI: Force connection state
 	init(fakeConnections: Connections) {
 		connections = fakeConnections
-		watcher = nil
 	}
 	#endif
 	
-	deinit {
-		let _watcher = watcher
-		DispatchQueue.main.async {
-			_watcher?.close()
-		}
-	}
-	
-	private func update(_ newConnections: Connections) {
+	private func connectionsChanged(_ newConnections: Connections) {
 		connections = newConnections
 		
 		// Connection logic:
@@ -104,7 +93,6 @@ class CustomElectrumServerObserver: ObservableObject {
 	@Published var problem: Problem? = nil
 	
 	private var cancellables = Set<AnyCancellable>()
-	private var watcher: Ktor_ioCloseable?
 	
 	private var lastElectrumClose: Lightning_kmpConnection.CLOSED? = nil
 	private var electrumConfig: ElectrumConfigPrefs?
@@ -112,13 +100,10 @@ class CustomElectrumServerObserver: ObservableObject {
 	init() {
 		let connectionsManager = Biz.business.connectionsManager
 		
-		let swiftFlow = SwiftFlow<Connections>(origin: connectionsManager.connections)
-		
-		watcher = swiftFlow.watch {[weak self](newConnections: Connections?) in
-			if let newConnections = newConnections {
-				self?.connectionsChanged(newConnections)
-			}
-		}
+		connectionsManager.publisher().sink {[weak self](newConnections: Connections) in
+			self?.connectionsChanged(newConnections)
+			
+		}.store(in: &cancellables)
 		
 		electrumConfig = GroupPrefs.shared.electrumConfig
 		GroupPrefs.shared.electrumConfigPublisher.sink {[weak self](config: ElectrumConfigPrefs?) in
@@ -188,13 +173,6 @@ class CustomElectrumServerObserver: ObservableObject {
 			
 		} else {
 			problem = nil
-		}
-	}
-	
-	deinit {
-		let _watcher = watcher
-		DispatchQueue.main.async {
-			_watcher?.close()
 		}
 	}
 }
