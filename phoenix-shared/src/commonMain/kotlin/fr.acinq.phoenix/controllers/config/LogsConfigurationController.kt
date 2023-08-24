@@ -27,7 +27,7 @@ class AppLogsConfigurationController(
         logMemory = business.logMemory
     )
 
-    private val numberOfFiles = 3 // Edit for longer files
+    private val numberOfFiles = 15 // Edit for longer files
 
     override fun process(intent: LogsConfiguration.Intent) {
         when (intent) {
