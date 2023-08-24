@@ -71,7 +71,7 @@ fun ChannelsView(
         }
         channelsState?.values?.toList()?.let { channels ->
             if (ChannelsConsolidationHelper.canConsolidate(channels)) {
-                CanConsolidateView(channels, onConsolidateButtonClick)
+                CanConsolidateView(onConsolidateButtonClick)
             }
         }
         ChannelsList(channels = channelsState, onChannelClick = onChannelClick)
@@ -122,15 +122,15 @@ private fun ChannelsList(
 private fun ChannelLine(channel: LocalChannelInfo, onClick: () -> Unit) {
     Row(modifier = Modifier
         .clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.channeldetails_title), onClick = onClick)
-        .padding(horizontal = 16.dp, vertical = 16.dp),
+        .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
             shape = CircleShape,
             color = if (channel.isUsable) positiveColor else if (channel.isTerminated) negativeColor else mutedTextColor,
-            modifier = Modifier.size(6.dp)
+            modifier = Modifier.size(8.dp)
         ) {}
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(18.dp))
         Text(
             text = channel.stateName,
             modifier = Modifier.weight(1.0f),
@@ -152,18 +152,15 @@ private fun ChannelLine(channel: LocalChannelInfo, onClick: () -> Unit) {
 
 @Composable
 private fun CanConsolidateView(
-    channels: List<LocalChannelInfo>,
     onConsolidateButtonClick: () -> Unit,
 ) {
-    Card(
-        internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-        Text(text = stringResource(id = R.string.channeldetails_can_consolidate))
-        Spacer(modifier = Modifier.height(8.dp))
+    Card(modifier = Modifier.fillMaxWidth()) {
         Button(
             text = stringResource(id = R.string.channeldetails_can_consolidate_button),
-            icon = R.drawable.ic_arrow_next,
+            icon = R.drawable.ic_merge,
             onClick = onConsolidateButtonClick,
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
         )
     }
 }

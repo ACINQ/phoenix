@@ -255,8 +255,7 @@
 
     <string name="channeldetails_title">Channel details</string>
     <string name="channeldetails_not_found">No active channel exists for that identifier.</string>
-    <string name="channeldetails_can_consolidate">Your channels can be consolidated into 1 single channel. Consolidation is recommended to improve the efficiency of the wallet, or upgrade to splicing if these channels are legacy.</string>
-    <string name="channeldetails_can_consolidate_button">Consolidate</string>
+    <string name="channeldetails_can_consolidate_button">Merge my channels…</string>
     <string name="channeldetails_channel_id">Channel id</string>
     <string name="channeldetails_state">State</string>
     <string name="channeldetails_spendable">Balance</string>
@@ -782,8 +781,8 @@
     <!-- channels consolidation -->
 
     <string name="consolidation_title">Channels consolidation</string>
-    <string name="consolidation_instructions">This screen allows you to consolidate several legacy channels into a single one with support for splicing.</string>
-    <string name="consolidation_not_needed">Your channels do not need consolidation.</string>
+    <string name="consolidation_instructions">This screen allows you to merge legacy channels into a single one that supports splicing.</string>
+    <string name="consolidation_not_needed">Consolidation is not needed.</string>
     <string name="consolidation_init">You have %1$s channels that can be consolidated.</string>
     <string name="consolidation_button">Start consolidation</string>
     <string name="consolidation_in_progress">Consolidation in progress…</string>

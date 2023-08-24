@@ -17,12 +17,14 @@
 package fr.acinq.phoenix.android.settings.channels
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -73,24 +75,24 @@ private fun ConsolidationSteps(
             Card {
                 Button(
                     text = stringResource(id = R.string.consolidation_button),
+                    icon = R.drawable.ic_merge,
                     onClick = onConsolidationClick,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
         ChannelsConsolidationState.InProgress -> {
-            Card {
+            Card(modifier = Modifier.fillMaxWidth()) {
                 ProgressView(text = stringResource(id = R.string.consolidation_in_progress))
             }
         }
         is ChannelsConsolidationState.Done -> {
-            when (val result = state.result) {
-                is ChannelsConsolidationResult.Success -> {
-                    Card {
+            Card(modifier = Modifier.fillMaxWidth(), internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)) {
+                when (val result = state.result) {
+                    is ChannelsConsolidationResult.Success -> {
                         Text(text = stringResource(id = R.string.consolidation_success, result.channels.size))
                     }
-                }
-                is ChannelsConsolidationResult.Failure -> {
-                    Card {
+                    is ChannelsConsolidationResult.Failure -> {
                         ErrorMessage(
                             header = stringResource(id = R.string.consolidation_failure_title),
                             details = when (result) {
