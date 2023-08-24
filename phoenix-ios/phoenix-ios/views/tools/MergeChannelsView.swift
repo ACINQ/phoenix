@@ -440,9 +440,11 @@ struct MergeChannelsView: View {
 			return NSLocalizedString("connecting to electrum", comment: "")
 		}
 		
-		let allChannelsReady = channels.allSatisfy { $0.isTerminated || $0.isUsable }
-		if !allChannelsReady {
-			return NSLocalizedString("restoring connections", comment: "")
+		if !operationInProgress {
+			let allChannelsReady = channels.allSatisfy { $0.isTerminated || $0.isUsable }
+			if !allChannelsReady {
+				return NSLocalizedString("restoring connections", comment: "")
+			}
 		}
 		
 		return nil
