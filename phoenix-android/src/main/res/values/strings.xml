@@ -255,7 +255,6 @@
 
     <string name="channeldetails_title">Channel details</string>
     <string name="channeldetails_not_found">No active channel exists for that identifier.</string>
-    <string name="channeldetails_can_consolidate_button">Merge my channels…</string>
     <string name="channeldetails_channel_id">Channel id</string>
     <string name="channeldetails_state">State</string>
     <string name="channeldetails_spendable">Balance</string>
@@ -777,20 +776,5 @@
     <string name="reset_wallet_success">Wallet has been successfully reset</string>
     <string name="reset_wallet_success_details">Moving back to init screen…</string>
     <string name="reset_wallet_failure_title">Reset failed</string>
-
-    <!-- channels consolidation -->
-
-    <string name="consolidation_title">Channels consolidation</string>
-    <string name="consolidation_instructions">This screen allows you to merge legacy channels into a single one that supports splicing.</string>
-    <string name="consolidation_not_needed">Consolidation is not needed.</string>
-    <string name="consolidation_init">You have %1$s channels that can be consolidated.</string>
-    <string name="consolidation_button">Start consolidation</string>
-    <string name="consolidation_in_progress">Consolidation in progress…</string>
-    <string name="consolidation_success">%1$d channels have been successfully consolidated</string>
-    <string name="consolidation_failure_title">Consolidation has failed</string>
-    <string name="consolidation_failure_channels_being_created">Channels are being created</string>
-    <string name="consolidation_failure_channels_dust">%1$d/%2$d channels are below 546 sat and will be closed, their funds will go to Bitcoin miners.</string>
-    <string name="consolidation_failure_invalid_address">Invalid swap address</string>
-    <string name="consolidation_failure_no_channels">No channels available for consolidation</string>
 
 </resources>

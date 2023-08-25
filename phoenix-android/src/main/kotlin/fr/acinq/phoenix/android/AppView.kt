@@ -71,7 +71,6 @@ import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.settings.channels.ChannelDetailsView
-import fr.acinq.phoenix.android.settings.channels.ChannelsConsolidationView
 import fr.acinq.phoenix.android.settings.channels.ChannelsView
 import fr.acinq.phoenix.android.settings.displayseed.DisplaySeedView
 import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
@@ -296,7 +295,6 @@ fun AppView(
                     ChannelsView(
                         onBackClick = { navController.popBackStack() },
                         onChannelClick = { navController.navigate("${Screen.ChannelDetails.route}?id=$it") },
-                        onConsolidateButtonClick = { navController.navigate(Screen.ChannelsConsolidation.route) },
                     )
                 }
                 composable(
@@ -374,9 +372,6 @@ fun AppView(
                 }
                 composable(Screen.ResetWallet.route) {
                     ResetWallet(onBackClick = { navController.popBackStack() })
-                }
-                composable(Screen.ChannelsConsolidation.route) {
-                    ChannelsConsolidationView(onBackClick = { navController.popBackStack() })
                 }
             }
         }

@@ -47,14 +47,12 @@ import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.LocalChannelInfo
-import fr.acinq.phoenix.utils.migrations.ChannelsConsolidationHelper
 
 
 @Composable
 fun ChannelsView(
     onBackClick: () -> Unit,
     onChannelClick: (String) -> Unit,
-    onConsolidateButtonClick: () -> Unit,
 ) {
     val log = logger("ChannelsView")
 
@@ -68,11 +66,6 @@ fun ChannelsView(
         )
         if (!channelsState.isNullOrEmpty()) {
             LightningBalanceView(balance = balance)
-        }
-        channelsState?.values?.toList()?.let { channels ->
-            if (ChannelsConsolidationHelper.canConsolidate(channels)) {
-                CanConsolidateView(onConsolidateButtonClick)
-            }
         }
         ChannelsList(channels = channelsState, onChannelClick = onChannelClick)
     }
@@ -147,20 +140,5 @@ private fun ChannelLine(channel: LocalChannelInfo, onClick: () -> Unit) {
         channel.currentFundingAmount?.let {
             AmountView(amount = it.toMilliSatoshi(), unitTextStyle = MaterialTheme.typography.caption)
         } ?: Text("--")
-    }
-}
-
-@Composable
-private fun CanConsolidateView(
-    onConsolidateButtonClick: () -> Unit,
-) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Button(
-            text = stringResource(id = R.string.channeldetails_can_consolidate_button),
-            icon = R.drawable.ic_merge,
-            onClick = onConsolidateButtonClick,
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start,
-        )
     }
 }
