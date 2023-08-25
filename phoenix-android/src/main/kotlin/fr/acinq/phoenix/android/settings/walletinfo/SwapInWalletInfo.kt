@@ -72,8 +72,6 @@ fun SwapInWalletInfo(
                 }
                 is LiquidityPolicy.Auto -> {
                     Text(text = annotatedStringResource(id = R.string.walletinfo_onchain_swapin_policy_auto_details, policy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true)))
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = stringResource(id = R.string.walletinfo_onchain_swapin_policy_auto_startup))
                 }
                 null -> {}
             }

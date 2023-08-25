@@ -146,17 +146,7 @@ struct SwapInWalletDetails: View {
 				
 			} // </VStack>
 			.padding(.bottom, 5)
-			
-			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 5) {
-				Image(systemName: "pipe.and.drop")
-					.frame(minWidth: iconWidth, alignment: Alignment.leadingFirstTextBaseline)
-					.read(iconWidthReader)
-				Text("Swaps are only attempted at application startup.")
-			}
-			.font(.subheadline)
-			.foregroundColor(Color(UIColor.systemOrange))
-			.padding(.top, 5)
-			
+
 		} // </Section>
 		.assignMaxPreference(for: iconWidthReader.key, to: $iconWidth)
 	}

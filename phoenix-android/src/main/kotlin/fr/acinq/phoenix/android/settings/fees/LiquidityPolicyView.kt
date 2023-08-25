@@ -131,7 +131,6 @@ fun LiquidityPolicyView(
                 }
             }
 
-            var showSuccessFeedback by remember { mutableStateOf(false) }
             Card {
                 val keyboardManager = LocalSoftwareKeyboardController.current
                 val skipAbsoluteFeeCheck = if (liquidityPolicyPrefs is LiquidityPolicy.Auto) liquidityPolicyPrefs.skipAbsoluteFeeCheck else false
@@ -153,24 +152,11 @@ fun LiquidityPolicyView(
                         scope.launch {
                             if (newPolicy != null) {
                                 UserPrefs.saveLiquidityPolicy(context, newPolicy)
-                                if (newPolicy is LiquidityPolicy.Auto) showSuccessFeedback = true
                                 peerManager.updatePeerLiquidityPolicy(newPolicy)
                                 notificationsManager.dismissAllNotifications()
-                                delay(5000)
-                                showSuccessFeedback = false
                             }
                         }
                     },
-                )
-            }
-
-            if (showSuccessFeedback) {
-                Text(
-                    text = stringResource(id = R.string.liquiditypolicy_save_done),
-                    style = MaterialTheme.typography.body1.copy(fontSize = 14.sp, textAlign = TextAlign.Center),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
                 )
             }
 
