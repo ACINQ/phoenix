@@ -169,7 +169,7 @@ class WatchTower {
 			finishTask(false)
 		}
 		
-		peer = business.getPeer()
+		peer = business.peerManager.peerStateValue()
 		guard let _peer = peer else {
 			// If there's not a peer, then the wallet is locked.
 			return finishTask(true)

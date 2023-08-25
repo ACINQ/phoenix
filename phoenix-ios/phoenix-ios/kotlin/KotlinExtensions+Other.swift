@@ -3,14 +3,23 @@ import PhoenixShared
 import Combine
 import CryptoKit
 
-extension PhoenixBusiness {
-	
-	func getPeer() -> Lightning_kmpPeer? {
-		self.peerManager.peerState.value_ as? Lightning_kmpPeer
-	}
-}
-
 extension PeerManager {
+	
+	func peerStateValue() -> Lightning_kmpPeer? {
+		return peerState.value_ as? Lightning_kmpPeer
+	}
+	
+	func channelsFlowValue() -> [Bitcoin_kmpByteVector32: LocalChannelInfo] {
+		if let value = self.channelsFlow.value_ as? [Bitcoin_kmpByteVector32: LocalChannelInfo] {
+			return value
+		} else {
+			return [:]
+		}
+	}
+	
+	func channelsValue() -> [LocalChannelInfo] {
+		return channelsFlowValue().map { $1 }
+	}
 	
 	func finalWalletValue() -> Lightning_kmpWalletState.WalletWithConfirmations {
 		if let value = self.finalWallet.value_ as? Lightning_kmpWalletState.WalletWithConfirmations {
@@ -114,18 +123,6 @@ extension ConnectionsManager {
 	
 	var currentValue: Connections {
 		return connections.value_ as! Connections
-	}
-	
-	var publisher: CurrentValueSubject<Connections, Never> {
-
-		let publisher = CurrentValueSubject<Connections, Never>(currentValue)
-
-		let swiftFlow = SwiftFlow<Connections>(origin: connections)
-		swiftFlow.watch {[weak publisher](connections: Connections?) in
-			publisher?.send(connections!)
-		}
-
-		return publisher
 	}
 	
 	var asyncStream: AsyncStream<Connections> {

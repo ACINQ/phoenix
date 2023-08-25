@@ -13,31 +13,6 @@ fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 
-// MARK: -
-extension Lightning_kmpPeer {
-	
-	fileprivate struct _Key {
-		static var channelsPublisher = 0
-	}
-	
-	typealias ChannelsMap = [Bitcoin_kmpByteVector32: Lightning_kmpChannelState]
-	
-	func channelsPublisher() -> AnyPublisher<ChannelsMap, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.channelsPublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `channelsFlow: StateFlow<Map<ByteVector32, ChannelState>>`
-			///
-			KotlinCurrentValueSubject<NSDictionary, ChannelsMap>(
-				self.channelsFlow
-			)
-			.eraseToAnyPublisher()
-		}
-	}
-}
-
-// MARK: -
 extension Lightning_kmpElectrumClient {
 	
 	fileprivate struct _Key {

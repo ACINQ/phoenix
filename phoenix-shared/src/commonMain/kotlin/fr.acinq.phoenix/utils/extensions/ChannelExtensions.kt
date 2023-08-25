@@ -30,6 +30,33 @@ fun ChannelStateWithCommitments.minDepthForFunding(nodeParams: NodeParams): Int 
     )
 }
 
+fun ChannelState.isTerminated(): Boolean {
+    return when (this) {
+        is Syncing -> state.isTerminated()
+        is Offline -> state.isTerminated()
+        is Closing, is Closed, is Aborted -> true
+        else -> false
+    }
+}
+
+fun ChannelState.isBeingCreated(): Boolean {
+    return when (this) {
+        is Syncing -> state.isBeingCreated()
+        is Offline -> state.isBeingCreated()
+        is LegacyWaitForFundingLocked,
+        is LegacyWaitForFundingConfirmed,
+        is WaitForAcceptChannel,
+        is WaitForChannelReady,
+        is WaitForFundingConfirmed,
+        is WaitForFundingCreated,
+        is WaitForFundingSigned,
+        is WaitForInit,
+        is WaitForOpenChannel,
+        is WaitForRemotePublishFutureCommitment -> true
+        else -> false
+    }
+}
+
 /**
  * The balance that we can use to spend. Uses the [Commitment.availableBalanceForSend] method under the hood.
  * For some states, this balance is forced to null.

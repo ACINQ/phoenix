@@ -139,6 +139,28 @@ extension BalanceManager {
 }
 
 // MARK: -
+extension ConnectionsManager {
+	
+	fileprivate struct _Key {
+		static var publisher = 0
+	}
+	
+	func publisher() -> AnyPublisher<Connections, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.publisher) {
+			
+			// Transforming from Kotlin:
+			// `connections: StateFlow<Connections>`
+			//
+			KotlinCurrentValueSubject<Connections, Connections>(
+				self.connections
+			)
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+// MARK: -
 extension CurrencyManager {
 	
 	fileprivate struct _Key {

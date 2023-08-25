@@ -442,7 +442,7 @@ struct MinerFeeSheet: View {
 		
 		guard
 			let satsPerByte_number = try? parsedSatsPerByte.get(),
-			let peer = Biz.business.getPeer(),
+			let peer = Biz.business.peerManager.peerStateValue(),
 			let scriptBytes = Parser.shared.addressToPublicKeyScript(chain: Biz.business.chain, address: btcAddress)
 		else {
 			minerFeeInfo = nil

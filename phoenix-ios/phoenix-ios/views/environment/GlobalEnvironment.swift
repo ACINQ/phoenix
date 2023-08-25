@@ -41,6 +41,8 @@ struct GlobalEnvironment: ViewModifier {
 		currencyPrefs = CurrencyPrefs()
 		deepLinkManager = DeepLinkManager()
 		controllerFactory = Biz.business.controllers
+		instance_main = nil
+		instance_sheet = nil
 	}
 	
 	private init(

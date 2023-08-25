@@ -30,6 +30,7 @@
 		C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A2327BC90150A3E1493D /* AboutView.swift */; };
 		C8D7ABC95B979B59AF5A7CA7 /* InitializationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A209301A31C14A982ECD /* InitializationView.swift */; };
 		C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */; };
+		DC04C2632A9009890021F2E8 /* MergeChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC04C2622A9009890021F2E8 /* MergeChannelsView.swift */; };
 		DC0732EC263CA6C3004CB88D /* PaymentOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0732EB263CA6C3004CB88D /* PaymentOptionsView.swift */; };
 		DC08A51827FB39530041603B /* AnimatedChevron.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC08A51727FB39530041603B /* AnimatedChevron.swift */; };
 		DC08A51A27FB6C5F0041603B /* TopTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC08A51927FB6C5F0041603B /* TopTab.swift */; };
@@ -63,6 +64,7 @@
 		DC1B325029FC3D5900F7F45F /* OnChainDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B324F29FC3D5900F7F45F /* OnChainDetails.swift */; };
 		DC1D2B4B2593EB860036AD38 /* Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1D2B4A2593EB850036AD38 /* Currency.swift */; };
 		DC1D2B502594CE900036AD38 /* FormattedAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1D2B4F2594CE900036AD38 /* FormattedAmount.swift */; };
+		DC26D0BB2A93BD0F006763B3 /* EffectsLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = DC26D0BA2A93BD0F006763B3 /* EffectsLibrary */; };
 		DC27E4C42791C58C00C777CC /* PaymentsBackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27E4C32791C58C00C777CC /* PaymentsBackupView.swift */; };
 		DC27E4CB2791D17A00C777CC /* RecoveryPhraseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27E4C92791D17A00C777CC /* RecoveryPhraseView.swift */; };
 		DC27E4CC2791D17A00C777CC /* CloudBackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27E4CA2791D17A00C777CC /* CloudBackupView.swift */; };
@@ -269,6 +271,8 @@
 		DCFA8759260E6F2E00AE8953 /* IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA8758260E6F2E00AE8953 /* IntroView.swift */; };
 		DCFA876D260E91E600AE8953 /* IntroContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA876C260E91E600AE8953 /* IntroContainer.swift */; };
 		DCFAEFC92A72F48700330088 /* SwapInWalletDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFAEFC82A72F48700330088 /* SwapInWalletDetails.swift */; };
+		DCFB8DF72A94066100947698 /* Task+Sleep.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFB8DF62A94066100947698 /* Task+Sleep.swift */; };
+		DCFB8DF92A94112A00947698 /* Dictionary+MapKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */; };
 		DCFC72042862237400D6B293 /* Asserts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFC72032862237400D6B293 /* Asserts.swift */; };
 		DCFD079126D84A380020DD8E /* HorizontalActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFD079026D84A380020DD8E /* HorizontalActivity.swift */; };
 		F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */; };
@@ -371,6 +375,7 @@
 		C8D7A607F036B3184C3D6EED /* QRCodeScanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeScanner.swift; sourceTree = "<group>"; };
 		C8D7A986A61CCD64FA661B88 /* DisplayConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayConfigurationView.swift; sourceTree = "<group>"; };
 		C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationView.swift; sourceTree = "<group>"; };
+		DC04C2622A9009890021F2E8 /* MergeChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeChannelsView.swift; sourceTree = "<group>"; };
 		DC0732EB263CA6C3004CB88D /* PaymentOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentOptionsView.swift; sourceTree = "<group>"; };
 		DC08A51727FB39530041603B /* AnimatedChevron.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedChevron.swift; sourceTree = "<group>"; };
 		DC08A51927FB6C5F0041603B /* TopTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopTab.swift; sourceTree = "<group>"; };
@@ -589,6 +594,8 @@
 		DCFA8758260E6F2E00AE8953 /* IntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroView.swift; sourceTree = "<group>"; };
 		DCFA876C260E91E600AE8953 /* IntroContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroContainer.swift; sourceTree = "<group>"; };
 		DCFAEFC82A72F48700330088 /* SwapInWalletDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInWalletDetails.swift; sourceTree = "<group>"; };
+		DCFB8DF62A94066100947698 /* Task+Sleep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Task+Sleep.swift"; sourceTree = "<group>"; };
+		DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+MapKeys.swift"; sourceTree = "<group>"; };
 		DCFC72032862237400D6B293 /* Asserts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asserts.swift; sourceTree = "<group>"; };
 		DCFD079026D84A380020DD8E /* HorizontalActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalActivity.swift; sourceTree = "<group>"; };
 		F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogsConfigurationView.swift; sourceTree = "<group>"; };
@@ -600,6 +607,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DCA5391A29F1DDE7001BD3D5 /* SegmentedPicker in Frameworks */,
+				DC26D0BB2A93BD0F006763B3 /* EffectsLibrary in Frameworks */,
 				DC46BAE426C6FDD300E760A6 /* CircularCheckmarkProgress in Frameworks */,
 				DCC9D99C267BEB3D00EA36DD /* CloudKit.framework in Frameworks */,
 				DC39D4E5286B4A7E0030F18D /* Popovers in Frameworks */,
@@ -978,6 +986,7 @@
 				DC1706D826A71D8E00BAFCD0 /* UnlockErrorView.swift */,
 				DC71E7322728645B0063613D /* CurrencyConverterView.swift */,
 				DC09086225B626B300A46136 /* AppStatusPopover.swift */,
+				DC04C2622A9009890021F2E8 /* MergeChannelsView.swift */,
 			);
 			path = tools;
 			sourceTree = "<group>";
@@ -1108,6 +1117,8 @@
 				DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */,
 				DC5A935229846043004F19FD /* FileHandle+Async.swift */,
 				DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */,
+				DCFB8DF62A94066100947698 /* Task+Sleep.swift */,
+				DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -1298,6 +1309,7 @@
 				DC46BAE326C6FDD300E760A6 /* CircularCheckmarkProgress */,
 				DC39D4E4286B4A7E0030F18D /* Popovers */,
 				DCA5391929F1DDE7001BD3D5 /* SegmentedPicker */,
+				DC26D0BA2A93BD0F006763B3 /* EffectsLibrary */,
 			);
 			productName = "phoenix-ios";
 			productReference = 7555FF7B242A565900829871 /* Phoenix.app */;
@@ -1353,6 +1365,7 @@
 			name = "phoenix-ios-framework";
 			packageProductDependencies = (
 				DCA5391829F1DAA3001BD3D5 /* SegmentedPicker */,
+				DC26D0B92A93BA8C006763B3 /* EffectsLibrary */,
 			);
 			productName = "phoenix-ios-framework";
 			productReference = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */;
@@ -1423,6 +1436,7 @@
 				DC46BAE226C6FDD300E760A6 /* XCRemoteSwiftPackageReference "CircularCheckmarkProgress" */,
 				DC39D4E3286B4A7E0030F18D /* XCRemoteSwiftPackageReference "Popovers" */,
 				DCA5391729F1DAA3001BD3D5 /* XCRemoteSwiftPackageReference "SwiftySegmentedPicker" */,
+				DC26D0B82A93BA8C006763B3 /* XCRemoteSwiftPackageReference "effects-library" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -1560,6 +1574,7 @@
 				DCE1E5FA26418183005465B8 /* Toast.swift in Sources */,
 				DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
+				DCFB8DF92A94112A00947698 /* Dictionary+MapKeys.swift in Sources */,
 				DCB876322735AAB500657570 /* UserDefaults+Codable.swift in Sources */,
 				DCD777D226DE9FE800979A12 /* DelayedSave.swift in Sources */,
 				DCEE3E542931446A00EB4DFF /* Collections+AsInt.swift in Sources */,
@@ -1601,6 +1616,7 @@
 				53BEFF4EDB40975C2123C63D /* ui.swift in Sources */,
 				DCACF6FD2566D0BA0009B01E /* SecurityFile.swift in Sources */,
 				DC118C0C27B561210080BBAC /* CurrencyAmount.swift in Sources */,
+				DC04C2632A9009890021F2E8 /* MergeChannelsView.swift in Sources */,
 				DC46BAF726CACCF700E760A6 /* KotlinExtensions+Conversion.swift in Sources */,
 				DC9545C5294905FB008FCEF4 /* NotificationContent.swift in Sources */,
 				DC142140261E72E40075857A /* AnyHTML.swift in Sources */,
@@ -1721,6 +1737,7 @@
 				DCACF7092566D0F00009B01E /* AppAccessView.swift in Sources */,
 				DC27E4D1279753EC00C777CC /* TextFieldNumberStyler.swift in Sources */,
 				DC46CB1628D9F30500C4EAC7 /* LoadingView.swift in Sources */,
+				DCFB8DF72A94066100947698 /* Task+Sleep.swift in Sources */,
 				DC39D4EF287497440030F18D /* SmartModal.swift in Sources */,
 				DC2F431A27B699800006FCC4 /* ModifyInvoiceSheet.swift in Sources */,
 				DCCCEAB528F6DA2A0047871A /* RootView.swift in Sources */,
@@ -2313,6 +2330,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		DC26D0B82A93BA8C006763B3 /* XCRemoteSwiftPackageReference "effects-library" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/GetStream/effects-library";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		DC39D4E3286B4A7E0030F18D /* XCRemoteSwiftPackageReference "Popovers" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/aheze/Popovers";
@@ -2348,6 +2373,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		DC26D0B92A93BA8C006763B3 /* EffectsLibrary */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DC26D0B82A93BA8C006763B3 /* XCRemoteSwiftPackageReference "effects-library" */;
+			productName = EffectsLibrary;
+		};
+		DC26D0BA2A93BD0F006763B3 /* EffectsLibrary */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DC26D0B82A93BA8C006763B3 /* XCRemoteSwiftPackageReference "effects-library" */;
+			productName = EffectsLibrary;
+		};
 		DC39D4E4286B4A7E0030F18D /* Popovers */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DC39D4E3286B4A7E0030F18D /* XCRemoteSwiftPackageReference "Popovers" */;

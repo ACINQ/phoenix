@@ -70,6 +70,8 @@ import fr.acinq.phoenix.android.payments.history.CsvExportView
 import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
+import fr.acinq.phoenix.android.settings.channels.ChannelDetailsView
+import fr.acinq.phoenix.android.settings.channels.ChannelsView
 import fr.acinq.phoenix.android.settings.displayseed.DisplaySeedView
 import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
 import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
@@ -292,7 +294,7 @@ fun AppView(
                 composable(Screen.Channels.route) {
                     ChannelsView(
                         onBackClick = { navController.popBackStack() },
-                        onChannelClick = { navController.navigate("${Screen.ChannelDetails.route}?id=$it") }
+                        onChannelClick = { navController.navigate("${Screen.ChannelDetails.route}?id=$it") },
                     )
                 }
                 composable(

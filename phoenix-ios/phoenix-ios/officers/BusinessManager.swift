@@ -60,10 +60,16 @@ class BusinessManager {
 	///
 	public let swapInRejectedPublisher = CurrentValueSubject<Lightning_kmpLiquidityEventsRejected?, Never>(nil)
 
+	/// Reports the most recent state of `IosMigrationHelper.shouldMigrateChannels()`.
+	/// When true, the (blocking) upgrade mechanism must be re-run.
+	///
+	public let canMergeChannelsForSplicingPublisher = CurrentValueSubject<Bool, Never>(false)
+	
 	private var walletInfo: WalletManager.WalletInfo? = nil
 	private var pushToken: String? = nil
 	private var fcmToken: String? = nil
 	private var peerConnectionState: Lightning_kmpConnection? = nil
+	private var hasStartedSwapInWallet: Bool = false
 	
 	private var longLivedTask: UIBackgroundTaskIdentifier = .invalid
 	
@@ -94,15 +100,11 @@ class BusinessManager {
 			others: GroupPrefs.shared.preferredFiatCurrencies
 		)
 		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
-
-		let lp = Prefs.shared.liquidityPolicy
-		log.debug("lp.effectiveMaxFeeSats = \(lp.effectiveMaxFeeSats)")
-		log.debug("lp.effectiveMaxFeeBasisPoints = \(lp.effectiveMaxFeeBasisPoints)")
 		
 		let startupParams = StartupParams(
 			requestCheckLegacyChannels: false,
 			isTorEnabled: GroupPrefs.shared.isTorEnabled,
-			liquidityPolicy: lp.toKotlin(),
+			liquidityPolicy: Prefs.shared.liquidityPolicy.toKotlin(),
 			trustedSwapInTxs: Set()
 		)
 		business.start(startupParams: startupParams)
@@ -124,6 +126,7 @@ class BusinessManager {
 		swapInRejectedPublisher.send(nil)
 		walletInfo = nil
 		peerConnectionState = nil
+		hasStartedSwapInWallet = false
 		paymentsPageFetchers.removeAll()
 
 		start()
@@ -134,9 +137,10 @@ class BusinessManager {
 	// --------------------------------------------------
 	
 	private func registerForNotifications() {
+		log.trace("registerForNotifications()")
 		
 		// Connection status observer
-		business.connectionsManager.publisher
+		business.connectionsManager.publisher()
 			.sink { (connections: Connections) in
 			
 				self.connectionsChanged(connections)
@@ -223,6 +227,28 @@ class BusinessManager {
 					if self.swapInRejectedPublisher.value != nil {
 						log.debug("Received Lightning_kmpLiquidityEventsAccepted")
 						self.swapInRejectedPublisher.value = nil
+					}
+				}
+			}
+			.store(in: &cancellables)
+		
+		// Monitor for unfinished "merge-channels for splicing" upgrade.
+		//
+		business.peerManager.channelsPublisher()
+			.sink { (channels: [LocalChannelInfo]) in
+				
+				let shouldMigrate = IosMigrationHelper.shared.shouldMigrateChannels(channels: channels)
+				self.canMergeChannelsForSplicingPublisher.send(shouldMigrate)
+				
+				if !self.hasStartedSwapInWallet && !shouldMigrate {
+					self.hasStartedSwapInWallet = true
+					Task { @MainActor in
+						do {
+							let peer = try await Biz.business.peerManager.getPeer()
+							try await peer.startWatchSwapInWallet()
+						} catch {
+							log.error("peer.startWatchSwapInWallet(): error: \(error)")
+						}
 					}
 				}
 			}
