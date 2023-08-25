@@ -1483,7 +1483,7 @@ struct ValidateView: View {
 			
 			guard
 				let minerFeeInfo = minerFeeInfo,
-				let peer = Biz.business.getPeer(),
+				let peer = Biz.business.peerManager.peerStateValue(),
 				spliceOutInProgress == false
 			else {
 				return

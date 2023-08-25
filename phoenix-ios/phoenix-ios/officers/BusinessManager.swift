@@ -69,6 +69,7 @@ class BusinessManager {
 	private var pushToken: String? = nil
 	private var fcmToken: String? = nil
 	private var peerConnectionState: Lightning_kmpConnection? = nil
+	private var hasStartedSwapInWallet: Bool = false
 	
 	private var longLivedTask: UIBackgroundTaskIdentifier = .invalid
 	
@@ -125,6 +126,7 @@ class BusinessManager {
 		swapInRejectedPublisher.send(nil)
 		walletInfo = nil
 		peerConnectionState = nil
+		hasStartedSwapInWallet = false
 		paymentsPageFetchers.removeAll()
 
 		start()
@@ -237,6 +239,18 @@ class BusinessManager {
 				
 				let shouldMigrate = IosMigrationHelper.shared.shouldMigrateChannels(channels: channels)
 				self.canMergeChannelsForSplicingPublisher.send(shouldMigrate)
+				
+				if !self.hasStartedSwapInWallet && !shouldMigrate {
+					self.hasStartedSwapInWallet = true
+					Task { @MainActor in
+						do {
+							let peer = try await Biz.business.peerManager.getPeer()
+							try await peer.startWatchSwapInWallet()
+						} catch {
+							log.error("peer.startWatchSwapInWallet(): error: \(error)")
+						}
+					}
+				}
 			}
 			.store(in: &cancellables)
 	}

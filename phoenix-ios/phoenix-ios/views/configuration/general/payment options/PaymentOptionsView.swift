@@ -233,7 +233,7 @@ struct PaymentOptionsView: View {
 
 func defaultMaxFees() -> MaxFees {
 	
-	let peer = Biz.business.getPeer()
+	let peer = Biz.business.peerManager.peerStateValue()
 	if let defaultMaxFees = peer?.walletParams.trampolineFees.last {
 		return MaxFees.fromTrampolineFees(defaultMaxFees)
 	} else {

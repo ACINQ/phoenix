@@ -3,14 +3,11 @@ import PhoenixShared
 import Combine
 import CryptoKit
 
-extension PhoenixBusiness {
-	
-	func getPeer() -> Lightning_kmpPeer? {
-		self.peerManager.peerState.value_ as? Lightning_kmpPeer
-	}
-}
-
 extension PeerManager {
+	
+	func peerStateValue() -> Lightning_kmpPeer? {
+		return peerState.value_ as? Lightning_kmpPeer
+	}
 	
 	func channelsFlowValue() -> [Bitcoin_kmpByteVector32: LocalChannelInfo] {
 		if let value = self.channelsFlow.value_ as? [Bitcoin_kmpByteVector32: LocalChannelInfo] {
