@@ -247,6 +247,9 @@ class NodeService : Service() {
             )
         )
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
+        serviceScope.launch {
+            business.peerManager.getPeer().startWatchSwapInWallet()
+        }
 
         serviceScope.launch {
             val token = InternalData.getFcmToken(applicationContext).first()
