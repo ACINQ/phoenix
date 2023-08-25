@@ -18,70 +18,50 @@ package fr.acinq.phoenix.utils.migrations
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.Feature
-import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.channel.ChannelCommand
-import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
-import fr.acinq.lightning.channel.states.Closing
-import fr.acinq.lightning.channel.states.Normal
+import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.io.WrappedChannelCommand
-import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LocalChannelInfo
-import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.isBeingCreated
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import org.kodein.log.LoggerFactory
+import kotlinx.coroutines.flow.map
 import org.kodein.log.newLogger
 
-object ChannelsConsolidationHelper {
+object IosMigrationHelper {
 
     /**
-     * Channels can be consolidated if:
-     * - there's only 1 active channel but it's not dual-funding.
-     * - there are several active channels (even if they are dual-funding).
+     * We should migrate channels if there is at least 1 active channels that is not dual-funding.
      */
-    fun canConsolidate(channels: List<LocalChannelInfo>): Boolean {
-        val activeChannels = channels.filter { it.isUsable }
-        return when {
-            activeChannels.size == 1 && !isDualFunding(activeChannels.first()) -> true
-            activeChannels.size > 1 -> true
-            else -> false
-        }
-    }
-
-    private fun isDualFunding(channel: LocalChannelInfo): Boolean {
-        return when (val state = channel.state) {
-            is ChannelStateWithCommitments -> {
-                state.commitments.params.channelFeatures.hasFeature(Feature.DualFunding)
-            }
-            else -> {
-                false
+    fun shouldMigrateChannels(channels: List<LocalChannelInfo>): Boolean {
+        return channels.any {
+            when (val state = it.state) {
+                is Offline -> state.state.isLegacy()
+                is Syncing -> state.state.isLegacy()
+                else -> state.isLegacy()
             }
         }
     }
 
-    suspend fun consolidateChannels(
+    private fun ChannelState.isLegacy(): Boolean {
+        return this is ChannelStateWithCommitments
+            && this !is ShuttingDown && this !is Negotiating && this !is Closing && this !is Closed && this !is Aborted
+            && !this.commitments.params.channelFeatures.hasFeature(Feature.DualFunding)
+    }
+
+    suspend fun doMigrateChannels(
         biz: PhoenixBusiness,
-        ignoreDust: Boolean
-    ): ChannelsConsolidationResult {
-        return consolidateChannels(
-            loggerFactory = biz.loggerFactory,
-            chain = biz.chain,
-            peerManager = biz.peerManager,
-            ignoreDust = ignoreDust
-        )
-    }
+    ): IosMigrationResult {
 
-    suspend fun consolidateChannels(
-        loggerFactory: LoggerFactory,
-        chain: NodeParams.Chain,
-        peerManager: PeerManager,
-        ignoreDust: Boolean
-    ): ChannelsConsolidationResult {
+        val loggerFactory = biz.loggerFactory
+        val peerManager = biz.peerManager
+        val chain = biz.chain
+
         try {
             val log = loggerFactory.newLogger(this::class)
 
@@ -90,91 +70,72 @@ object ChannelsConsolidationHelper {
             val closingScript = Parser.addressToPublicKeyScript(chain, swapInAddress)
             if (closingScript == null) {
                 log.info { "aborting: could not get a valid closing script" }
-                return ChannelsConsolidationResult.Failure.InvalidClosingScript
+                return IosMigrationResult.Failure.InvalidClosingScript
             }
 
             // checking channels
-            val allChannels = peerManager.channelsFlow.filterNotNull().first().values.toList()
-            if (allChannels.isEmpty()) {
-                log.info { "aborting: no channels available" }
-                return ChannelsConsolidationResult.Failure.NoChannelsAvailable
-            } else if (allChannels.any { it.state.isBeingCreated() }) {
+            val channelsToMigrate = peerManager.channelsFlow.filterNotNull().first().values.toList().filter { it.state.isLegacy() }
+            if (channelsToMigrate.isEmpty()) {
+                log.info { "aborting: no channels to migrate" }
+                return IosMigrationResult.Failure.NoChannelsAvailable
+            } else if (channelsToMigrate.any { it.state.isBeingCreated() }) {
                 log.info { "aborting: some channels are being created" }
-                return ChannelsConsolidationResult.Failure.ChannelsBeingCreated
-            }
-
-            // check dust
-            val channelsToConsolidate = allChannels.filter { it.state is Normal }
-            val dustChannels = channelsToConsolidate.filter {
-                val balance = it.localBalance ?: 0.msat
-                balance > 0.msat && balance < 546_000.msat
-            }
-            if (!ignoreDust) {
-                if (dustChannels.isNotEmpty()) {
-                    log.info { "aborting: ${dustChannels.size}/${channelsToConsolidate.size} dust channels" }
-                    return ChannelsConsolidationResult.Failure.DustChannels(
-                        dustChannels = dustChannels.map { it.channelId }.toSet(),
-                        allChannels = channelsToConsolidate.map { it.channelId }.toSet(),
-                    )
-                }
+                return IosMigrationResult.Failure.ChannelsBeingCreated
             }
 
             // Tell the swap-in wallet to "pause".
             // That is: don't try to use any of the UTXOs until we're done with our migration.
             peer.stopWatchSwapInWallet()
-            val finalUtxoCount = peer.swapInWallet.walletStateFlow.value.utxos.size + channelsToConsolidate.size
 
-            // Migrate channels
-            log.info { "consolidating ${channelsToConsolidate.size} channels to $swapInAddress" }
+            log.info { "migrating ${channelsToMigrate.size} channels to $swapInAddress" }
+            // Close all channels in parallel
             val command = ChannelCommand.Close.MutualClose(
                 scriptPubKey = ByteVector(closingScript),
                 feerates = null
             )
-            channelsToConsolidate.forEach {
+            channelsToMigrate.forEach {
                 peer.send(WrappedChannelCommand(ByteVector32.fromValidHex(it.channelId), command))
             }
-
-            // Wait for the closing tx publication for each consolidated channel (map of channelId -> isPublished)
+            // Wait for the closing tx publication for each consolidated channel (map of channelId -> closing tx id)
             val closingTxs: MutableMap<ByteVector32, ByteVector32> = mutableMapOf()
-            val notPublished = channelsToConsolidate.map { ByteVector32.fromValidHex(it.channelId) }.toMutableSet()
-            while (notPublished.isNotEmpty()) {
-                log.info { "checking closing status of ${notPublished.size} channel(s)" }
-                val channels = peer.channels
-                notPublished.forEach { channelId ->
-                    val channel = channels[channelId]
-                    if (channel is Closing && channel.mutualClosePublished.isNotEmpty()) {
-                        log.info { "mutual-close published for channel=$channelId" }
-                        closingTxs[channelId] = channel.mutualClosePublished.first().tx.txid
-                        notPublished.remove(channelId)
-                    } else {
-                        log.info { "ignore channel=$channelId in state=${channel?.stateName}" }
-                    }
-                }
-                log.info { "${channelsToConsolidate.size - notPublished.size}/${channelsToConsolidate.size} closing published" }
-                if (notPublished.isNotEmpty()) {
-                    peer.channelsFlow.first { it != channels }
+            channelsToMigrate.map { ByteVector32.fromValidHex(it.channelId) }.forEach { channelId ->
+                // Wait until closing tx is published
+                val channel = peer.channelsFlow
+                    .map { it[channelId] }
+                    .filterNotNull()
+                    .filterIsInstance<Closing>()
+                    .first { it.mutualClosePublished.isNotEmpty() }
+                val closingTx = channel.mutualClosePublished.first()
+                log.info { "mutual-close txid=${closingTx.tx.txid} published for channel=$channelId" }
+                if (closingTx.toLocalOutput != null) {
+                    closingTxs[channelId] = closingTx.tx.txid
+                } else {
+                    log.info { "txid=${closingTx.tx.txid} ignored (dust)" }
                 }
             }
-            log.info { "${closingTxs.size} channels closed to $closingScript" }
+            log.info { "${closingTxs.size} channels closed to ${closingScript.byteVector().toHex()}" }
 
-            // Wait for UTXOs to arrive in swap-in wallet before resuming.
-            peer.swapInWallet.walletStateFlow.first { it.utxos.size == finalUtxoCount }
+            // Wait for all UTXOs to arrive in swap-in wallet.
+            peer.swapInWallet.walletStateFlow
+                .map { it.utxos.map { it.outPoint.txid } }
+                .first { txidsInWallet -> closingTxs.values.all { txid -> txidsInWallet.contains(txid) } }
+            log.info { "all mutual-close txids found in swap-in wallet" }
+            // Resume swap-in
             peer.startWatchSwapInWallet()
 
-            return ChannelsConsolidationResult.Success(closingTxs)
+            return IosMigrationResult.Success(closingTxs)
         } catch (e: Exception) {
-            return ChannelsConsolidationResult.Failure.Generic(e)
+            return IosMigrationResult.Failure.Generic(e)
         }
     }
 }
 
-sealed class ChannelsConsolidationResult {
-    data class Success(val closingTxs: Map<ByteVector32, ByteVector32>) : ChannelsConsolidationResult()
-    sealed class Failure : ChannelsConsolidationResult() {
+sealed class IosMigrationResult {
+    data class Success(val closingTxs: Map<ByteVector32, ByteVector32>) : IosMigrationResult()
+    sealed class Failure : IosMigrationResult() {
         data class Generic(val error: Throwable) : Failure()
         object InvalidClosingScript : Failure()
         object NoChannelsAvailable : Failure()
         object ChannelsBeingCreated : Failure()
-        data class DustChannels(val dustChannels: Set<String>, val allChannels: Set<String>) : Failure()
     }
 }

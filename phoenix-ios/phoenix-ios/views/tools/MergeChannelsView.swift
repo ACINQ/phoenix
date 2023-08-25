@@ -21,11 +21,10 @@ struct MergeChannelsView: View {
 	
 	let type: MergeChannelsViewType
 	
-	@State var consolidationResult: ChannelsConsolidationResult? = nil
+	@State var consolidationResult: IosMigrationResult? = nil
 	@State var operationInProgress = false
 	@State var operationCompleted = false
 	@State var operationFailedAtLeastOnce = false
-	@State var ignoreDust = false
 	@State var allowAbortOverride = false // e.g. allows user to go force-close channels
 	
 	@State var connections: Connections = Biz.business.connectionsManager.currentValue
@@ -203,34 +202,23 @@ struct MergeChannelsView: View {
 			} // </HStack>
 			.foregroundColor(.appPositive)
 			
-		} else if let _ = consolidationResult as? ChannelsConsolidationResult.Failure {
-			
-			if let failure = consolidationResult as? ChannelsConsolidationResult.FailureDustChannels {
-				let (btcAmt, fiatAmt) = dustAmount(failure)
+		} else if let _ = consolidationResult as? IosMigrationResult.Failure {
+
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				Image(systemName: "wrench.adjustable")
 				
-				HStack(alignment: VerticalAlignment.center, spacing: 4) {
-					Image(systemName: "wrench.adjustable")
-					Text("Operation will cost \(btcAmt.string) (≈ \(fiatAmt.string))")
+				if let _ = consolidationResult as? IosMigrationResult.FailureChannelsBeingCreated {
+					Text("Failed: Existing channels found in mid-creation state")
+				} else if let _ = consolidationResult as? IosMigrationResult.FailureInvalidClosingScript {
+					Text("Failed: Invalid closing script")
+				} else if let failure = consolidationResult as? IosMigrationResult.FailureGeneric {
+					Text("Failure: \(failure.error.message ?? "Generic error")")
+				} else {
+					Text("Failure: Unknown error")
 				}
-				
-			} else {
-				
-				HStack(alignment: VerticalAlignment.center, spacing: 4) {
-					Image(systemName: "wrench.adjustable")
-					
-					if let _ = consolidationResult as? ChannelsConsolidationResult.FailureChannelsBeingCreated {
-						Text("Failed: Existing channels found in mid-creation state")
-					} else if let _ = consolidationResult as? ChannelsConsolidationResult.FailureInvalidClosingScript {
-						Text("Failed: Invalid closing script")
-					} else if let failure = consolidationResult as? ChannelsConsolidationResult.FailureGeneric {
-						Text("Failure: \(failure.error.message ?? "Generic error")")
-					} else {
-						Text("Failure: Unknown error")
-					}
-				}
-				.foregroundColor(.appNegative)
 			}
-			
+			.foregroundColor(.appNegative)
+
 		} else {
 			
 			Text("Upgrade your channels to get started now.")
@@ -400,19 +388,6 @@ struct MergeChannelsView: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func dustAmount(
-		_ failure: ChannelsConsolidationResult.FailureDustChannels
-	) -> (FormattedAmount, FormattedAmount) {
-		
-		let allChannels: [String: LocalChannelInfo] = Biz.business.peerManager.channelsFlowValue().mapKeys { $0.toHex() }
-		let dustChannels: [LocalChannelInfo] = failure.dustChannels.compactMap { allChannels[$0] }
-		let dustChannelsMsat = dustChannels.map { $0.localBalance?.msat ?? Int64(0) }.sum()
-		
-		let btc = Utils.formatBitcoin(currencyPrefs, msat: dustChannelsMsat)
-		let fiat = Utils.formatFiat(currencyPrefs, msat: dustChannelsMsat)
-		return (btc, fiat)
-	}
-	
 	func startRetryButtonDisabled() -> Bool {
 		
 		return operationInProgress || operationCompleted || pendingConnectionsOrChannels()
@@ -515,26 +490,24 @@ struct MergeChannelsView: View {
 		}
 		
 		let _biz = Biz.business
-		let _ignoreDust = ignoreDust
 		
 		operationInProgress = true
 		Task { @MainActor in
 			
 			do {
-				consolidationResult = try await ChannelsConsolidationHelper.shared.consolidateChannels(
-					biz: _biz,
-					ignoreDust: _ignoreDust
+				consolidationResult = try await IosMigrationHelper.shared.doMigrateChannels(
+					biz: _biz
 				)
 				operationInProgress = false
 				
-				if let _ = consolidationResult as? ChannelsConsolidationResult.Success {
-					log.debug("consolidationResult: Success")
+				if let _ = consolidationResult as? IosMigrationResult.Success {
+					log.debug("migrationResult: Success")
 					
 					operationCompleted = true
 					closeView()
 					
-				} else if let _ = consolidationResult as? ChannelsConsolidationResult.FailureNoChannelsAvailable {
-					log.debug("consolidationResult: FailureNoChannelsAvailable")
+				} else if let _ = consolidationResult as? IosMigrationResult.FailureNoChannelsAvailable {
+					log.debug("migrationResult: FailureNoChannelsAvailable")
 					
 					// This is treated as success, because it could be that the user has a wallet, but zero channels.
 					operationCompleted = true
@@ -543,28 +516,21 @@ struct MergeChannelsView: View {
 				} else {
 					operationFailedAtLeastOnce = true
 					
-					if let _ = consolidationResult as? ChannelsConsolidationResult.FailureDustChannels {
-						log.debug("consolidationResult: FailureDustChannels")
+					if let _ = consolidationResult as? IosMigrationResult.FailureChannelsBeingCreated {
+						log.debug("migrationResult: FailureChannelsBeingCreated")
 						
-						// If the user chooses to continue the operation after this,
-						// they're agreeing to send the dust in their channels to the miners.
-						ignoreDust = true
+					} else if let _ = consolidationResult as? IosMigrationResult.FailureInvalidClosingScript {
+						log.debug("migrationResult: FailureInvalidClosingScript")
 						
-					} else if let _ = consolidationResult as? ChannelsConsolidationResult.FailureChannelsBeingCreated {
-						log.debug("consolidationResult: FailureChannelsBeingCreated")
-						
-					} else if let _ = consolidationResult as? ChannelsConsolidationResult.FailureInvalidClosingScript {
-						log.debug("consolidationResult: FailureInvalidClosingScript")
-						
-					} else if let _ = consolidationResult as? ChannelsConsolidationResult.FailureGeneric {
-						log.debug("consolidationResult: FailureGeneric")
+					} else if let _ = consolidationResult as? IosMigrationResult.FailureGeneric {
+						log.debug("migrationResult: FailureGeneric")
 					}
 				}
 				
 			} catch {
-				log.error("Error in consolidateChannels: \(error)")
+				log.error("Error in doMigrateChannels: \(error)")
 				
-				consolidationResult = ChannelsConsolidationResult.FailureGeneric(
+				consolidationResult = IosMigrationResult.FailureGeneric(
 					error: KotlinThrowable(message: "Exception thrown")
 				)
 				operationInProgress = false

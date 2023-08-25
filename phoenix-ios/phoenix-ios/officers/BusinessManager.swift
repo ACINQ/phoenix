@@ -60,7 +60,7 @@ class BusinessManager {
 	///
 	public let swapInRejectedPublisher = CurrentValueSubject<Lightning_kmpLiquidityEventsRejected?, Never>(nil)
 
-	/// Reports the most recent state of `ChannelsConsolidationHelper.canConsolidate()`.
+	/// Reports the most recent state of `IosMigrationHelper.shouldMigrateChannels()`.
 	/// When true, the (blocking) upgrade mechanism must be re-run.
 	///
 	public let canMergeChannelsForSplicingPublisher = CurrentValueSubject<Bool, Never>(false)
@@ -235,8 +235,8 @@ class BusinessManager {
 		business.peerManager.channelsPublisher()
 			.sink { (channels: [LocalChannelInfo]) in
 				
-				let canConsolidate = ChannelsConsolidationHelper.shared.canConsolidate(channels: channels)
-				self.canMergeChannelsForSplicingPublisher.send(canConsolidate)
+				let shouldMigrate = IosMigrationHelper.shared.shouldMigrateChannels(channels: channels)
+				self.canMergeChannelsForSplicingPublisher.send(shouldMigrate)
 			}
 			.store(in: &cancellables)
 	}
