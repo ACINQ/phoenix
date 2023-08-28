@@ -74,7 +74,7 @@ sealed interface Lnurl {
          * Throws an exception if the source is malformed or invalid.
          */
         fun extractLnurl(source: String): Lnurl {
-            val input = Parser.trimMatchingPrefix(source, Parser.lightningPrefixes + Parser.bitcoinPrefixes + Parser.lightningPrefixes)
+            val input = Parser.trimMatchingPrefix(source, Parser.lightningPrefixes + Parser.bitcoinPrefixes + Parser.lnurlPrefixes)
             val url: Url = try {
                 parseBech32Url(input)
             } catch (bech32Ex: Exception) {
