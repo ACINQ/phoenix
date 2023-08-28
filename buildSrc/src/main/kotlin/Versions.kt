@@ -4,10 +4,10 @@ object Versions {
     const val torMobile = "0.2.0"
 
     const val kotlin = "1.8.21"
-    const val coroutines = "1.7.0"
-    const val serialization = "1.5.0"
+    const val coroutines = "1.7.2"
+    const val serialization = "1.5.1"
 
-    const val ktor = "2.0.3"
+    const val ktor = "2.3.2"
     const val sqlDelight = "1.5.5"
     const val kodeinMemory = "0.8.0"
 
