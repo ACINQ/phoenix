@@ -69,7 +69,6 @@ class BusinessManager {
 	private var pushToken: String? = nil
 	private var fcmToken: String? = nil
 	private var peerConnectionState: Lightning_kmpConnection? = nil
-	private var hasStartedSwapInWallet: Bool = false
 	
 	private var longLivedTask: UIBackgroundTaskIdentifier = .invalid
 	
@@ -110,6 +109,7 @@ class BusinessManager {
 		business.start(startupParams: startupParams)
 		
 		registerForNotifications()
+		startTasks()
 	}
 
 	public func stop() {
@@ -126,14 +126,13 @@ class BusinessManager {
 		swapInRejectedPublisher.send(nil)
 		walletInfo = nil
 		peerConnectionState = nil
-		hasStartedSwapInWallet = false
 		paymentsPageFetchers.removeAll()
 
 		start()
 	}
 	
 	// --------------------------------------------------
-	// MARK: Notification Registration
+	// MARK: Startup
 	// --------------------------------------------------
 	
 	private func registerForNotifications() {
@@ -239,20 +238,28 @@ class BusinessManager {
 				
 				let shouldMigrate = IosMigrationHelper.shared.shouldMigrateChannels(channels: channels)
 				self.canMergeChannelsForSplicingPublisher.send(shouldMigrate)
-				
-				if !self.hasStartedSwapInWallet && !shouldMigrate {
-					self.hasStartedSwapInWallet = true
-					Task { @MainActor in
-						do {
-							let peer = try await Biz.business.peerManager.getPeer()
-							try await peer.startWatchSwapInWallet()
-						} catch {
-							log.error("peer.startWatchSwapInWallet(): error: \(error)")
-						}
-					}
-				}
 			}
 			.store(in: &cancellables)
+	}
+	
+	func startTasks() {
+		log.trace("startTasks()")
+		
+		Task { @MainActor in
+			let channelsStream = self.business.peerManager.channelsPublisher().values
+			do {
+				for try await channels in channelsStream {
+					let shouldMigrate = IosMigrationHelper.shared.shouldMigrateChannels(channels: channels)
+					if !shouldMigrate {
+						let peer = try await Biz.business.peerManager.getPeer()
+						try await peer.startWatchSwapInWallet()
+					}
+					break
+				}
+			} catch {
+				log.error("peer.startWatchSwapInWallet(): error: \(error)")
+			}
+		} // </Task>
 	}
 	
 	// --------------------------------------------------
