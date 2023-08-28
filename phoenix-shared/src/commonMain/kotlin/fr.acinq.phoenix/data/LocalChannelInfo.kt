@@ -39,7 +39,7 @@ data class LocalChannelInfo(
     val isBooting: Boolean,
 ) {
     /** True if the channel is terminated and will never be usable again. */
-    val isTerminated by lazy { state is Closing || state is Closed || state is Aborted }
+    val isTerminated by lazy { state.isTerminated() }
     /** True if the channel can be used to send/receive payments. */
     val isUsable by lazy { state is Normal && !isBooting }
     /** A string version of the state's class. */

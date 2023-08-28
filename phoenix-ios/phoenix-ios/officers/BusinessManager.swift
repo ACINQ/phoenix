@@ -60,6 +60,11 @@ class BusinessManager {
 	///
 	public let swapInRejectedPublisher = CurrentValueSubject<Lightning_kmpLiquidityEventsRejected?, Never>(nil)
 
+	/// Reports the most recent state of `IosMigrationHelper.shouldMigrateChannels()`.
+	/// When true, the (blocking) upgrade mechanism must be re-run.
+	///
+	public let canMergeChannelsForSplicingPublisher = CurrentValueSubject<Bool, Never>(false)
+	
 	private var walletInfo: WalletManager.WalletInfo? = nil
 	private var pushToken: String? = nil
 	private var fcmToken: String? = nil
@@ -94,20 +99,17 @@ class BusinessManager {
 			others: GroupPrefs.shared.preferredFiatCurrencies
 		)
 		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
-
-		let lp = Prefs.shared.liquidityPolicy
-		log.debug("lp.effectiveMaxFeeSats = \(lp.effectiveMaxFeeSats)")
-		log.debug("lp.effectiveMaxFeeBasisPoints = \(lp.effectiveMaxFeeBasisPoints)")
 		
 		let startupParams = StartupParams(
 			requestCheckLegacyChannels: false,
 			isTorEnabled: GroupPrefs.shared.isTorEnabled,
-			liquidityPolicy: lp.toKotlin(),
+			liquidityPolicy: Prefs.shared.liquidityPolicy.toKotlin(),
 			trustedSwapInTxs: Set()
 		)
 		business.start(startupParams: startupParams)
 		
 		registerForNotifications()
+		startTasks()
 	}
 
 	public func stop() {
@@ -130,13 +132,14 @@ class BusinessManager {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Notification Registration
+	// MARK: Startup
 	// --------------------------------------------------
 	
 	private func registerForNotifications() {
+		log.trace("registerForNotifications()")
 		
 		// Connection status observer
-		business.connectionsManager.publisher
+		business.connectionsManager.publisher()
 			.sink { (connections: Connections) in
 			
 				self.connectionsChanged(connections)
@@ -227,6 +230,36 @@ class BusinessManager {
 				}
 			}
 			.store(in: &cancellables)
+		
+		// Monitor for unfinished "merge-channels for splicing" upgrade.
+		//
+		business.peerManager.channelsPublisher()
+			.sink { (channels: [LocalChannelInfo]) in
+				
+				let shouldMigrate = IosMigrationHelper.shared.shouldMigrateChannels(channels: channels)
+				self.canMergeChannelsForSplicingPublisher.send(shouldMigrate)
+			}
+			.store(in: &cancellables)
+	}
+	
+	func startTasks() {
+		log.trace("startTasks()")
+		
+		Task { @MainActor in
+			let channelsStream = self.business.peerManager.channelsPublisher().values
+			do {
+				for try await channels in channelsStream {
+					let shouldMigrate = IosMigrationHelper.shared.shouldMigrateChannels(channels: channels)
+					if !shouldMigrate {
+						let peer = try await Biz.business.peerManager.getPeer()
+						try await peer.startWatchSwapInWallet()
+					}
+					break
+				}
+			} catch {
+				log.error("peer.startWatchSwapInWallet(): error: \(error)")
+			}
+		} // </Task>
 	}
 	
 	// --------------------------------------------------

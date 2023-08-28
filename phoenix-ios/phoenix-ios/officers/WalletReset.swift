@@ -121,7 +121,9 @@ class WalletReset {
 		log.trace("step1()")
 		progress.send(.disconnecting)
 		
-		Biz.business.connectionsManager.publisher.sink { (connections: Connections) in
+		let connectionsManager = Biz.business.connectionsManager
+		
+		connectionsManager.publisher().sink { (connections: Connections) in
 			self.connectionsChanged(connections)
 		}
 		.store(in: &cancellables)
@@ -129,6 +131,8 @@ class WalletReset {
 		Biz.business.appConnectionsDaemon?.incrementDisconnectCount(
 			target: AppConnectionsDaemon.ControlTarget.companion.All
 		)
+		
+		self.connectionsChanged(connectionsManager.currentValue)
 	}
 	
 	/**

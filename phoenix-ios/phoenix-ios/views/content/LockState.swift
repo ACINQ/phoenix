@@ -1,6 +1,6 @@
 import Foundation
 
-enum WalletExistence {
+enum WalletExistence: CustomStringConvertible {
 	
 	/// We don't know if a wallet exists or not.
 	/// We're still waiting for initialization to complete.
@@ -8,6 +8,14 @@ enum WalletExistence {
 	
 	case exists
 	case doesNotExist
+	
+	var description: String {
+		switch self {
+			case .unknown      : return "unknown"
+			case .exists       : return "exists"
+			case .doesNotExist : return "doesNotExist"
+		}
+	}
 }
 
 class LockState: ObservableObject {

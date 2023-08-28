@@ -17,7 +17,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo_blue_launch" translatesAutoresizingMaskIntoConstraints="NO" id="7qp-HP-ekU">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo_green_launch" translatesAutoresizingMaskIntoConstraints="NO" id="7qp-HP-ekU">
                                 <rect key="frame" x="111" y="352" width="192" height="192"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="192" id="8Ug-hb-mb2"/>
@@ -39,7 +39,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="logo_blue_launch" width="192" height="192"/>
+        <image name="logo_green_launch" width="192" height="192"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

@@ -165,18 +165,18 @@ extension Prefs {
 			// So we're taking the simplest approach, and force-firing the associated PassthroughSubject publishers.
 			
 			let prefs = Prefs.shared
-			if #available(iOS 16, *) {
-				
+			
+			// On iOS 15:
+			//   * Causes a crash
+			//   * Solution is to delay these calls until next runloop cycle
+			//
+			// On iOS 16
+			//   * Causes a runtime warning: Publishing changes from within view updates is not allowed
+			//   * Solution is to delay these calls until next runloop cycle
+			// 
+			DispatchQueue.main.async {
 				prefs.backupSeed.hasUploadedSeed_publisher.send()
 				prefs.backupSeed.manualBackup_taskDone_publisher.send()
-				
-			} else {
-				
-				// Workaround for iOS 15 crash: Need to delay these calls until next runloop cycle
-				DispatchQueue.main.async {
-					prefs.backupSeed.hasUploadedSeed_publisher.send()
-					prefs.backupSeed.manualBackup_taskDone_publisher.send()
-				}
 			}
 		})
 		.eraseToAnyPublisher()

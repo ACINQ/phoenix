@@ -200,7 +200,6 @@
     <string name="walletinfo_onchain_swapin_help">Les fonds envoyés vers ce wallet sont automatiquement basculés (\"swap\") sur Lightning.</string>
     <string name="walletinfo_onchain_swapin_policy_view">Cliquez pour configurer.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">Les fonds seront automatiquement basculés sur Lightning si les frais sont <b>inférieurs à %1$s</b>.</string>
-    <string name="walletinfo_onchain_swapin_policy_auto_startup">Le swap sera tenté au prochain démarrage de l\'application.</string>
     <string name="walletinfo_onchain_swapin_policy_disabled_details">La gestion des channels automatisée <b>est désactivée</b>. Les fonds ne seront pas basculés sur Lightning et vont rester sur ce wallet.</string>
     <string name="walletinfo_onchain_swapin_empty">Il n\'y a pas de fonds en attente de swap.</string>
 
@@ -230,7 +229,6 @@
     <string name="liquiditypolicy_advanced_pay_to_open_label">Déroger au max pour les paiements Lightning</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">Si cette option est active, les paiements entrants Lightning seront acceptés même si les frais excèdent le maximum autorisé. Seule la valeur en pourcent ci-dessus sera vérifiée.\n\nAttention: si le mempool Bitcoin est plein, certains paiements Lightning entrants pourraient s\'avérer coûteux.</string>
     <string name="liquiditypolicy_save_button">Enregistrer mes préferences</string>
-    <string name="liquiditypolicy_save_done">Préférences enregistrée.\nLes swaps seront tentés de nouveau au prochain démarrage de l\'application.</string>
 
     <string name="liquiditypolicy_help">
       Phoenix vous permet de recevoir des paiements sur la blockchain Bitcoin elle-même (L1), ainsi que sur la couche Lightning de Bitcoin (L2).

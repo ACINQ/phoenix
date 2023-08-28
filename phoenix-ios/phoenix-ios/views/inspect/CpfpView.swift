@@ -622,7 +622,7 @@ struct CpfpView: View {
 		
 		guard
 			let satsPerByte_number = try? parsedSatsPerByte.get(),
-			let peer = Biz.business.getPeer()
+			let peer = Biz.business.peerManager.peerStateValue()
 		else {
 			minerFeeInfo = nil
 			return
@@ -704,7 +704,7 @@ struct CpfpView: View {
 		
 		guard
 			let minerFeeInfo = minerFeeInfo,
-			let peer = Biz.business.getPeer()
+			let peer = Biz.business.peerManager.peerStateValue()
 		else {
 			return
 		}

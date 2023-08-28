@@ -200,7 +200,6 @@
     <string name="walletinfo_onchain_swapin_help">Funds sent to this on-chain wallet are automatically swapped to Lightning.</string>
     <string name="walletinfo_onchain_swapin_policy_view">Tap to configure.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">On-chain funds will automatically be swapped to Lightning if the fee is <b>less than %1$s</b>.</string>
-    <string name="walletinfo_onchain_swapin_policy_auto_startup">Swaps are attempted at application startup.</string>
     <string name="walletinfo_onchain_swapin_policy_disabled_details">Automated fee policy <b>is disabled</b>. Funds will not be swapped. They will remain on this wallet.</string>
     <string name="walletinfo_onchain_swapin_empty">There are no swaps in progress.</string>
 
@@ -230,7 +229,6 @@
     <string name="liquiditypolicy_advanced_pay_to_open_label">Skip absolute fee check for Lightning</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">When enabled, incoming Lightning payments will ignore the absolute max fee limit. Only the percentage check will apply.\n\nAttention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive.</string>
     <string name="liquiditypolicy_save_button">Save policy</string>
-    <string name="liquiditypolicy_save_done">Policy saved.\nSwaps will be attempted at the next restart.</string>
 
     <string name="liquiditypolicy_help">
       Phoenix allows you to receive payments on Bitcoin\'s blockchain (L1) and Bitcoin\'s Lightning layer (L2).

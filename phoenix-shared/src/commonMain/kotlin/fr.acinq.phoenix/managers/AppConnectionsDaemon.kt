@@ -458,7 +458,7 @@ class AppConnectionsDaemon(
                 logger.info { "next $name connection attempt in $pause" }
                 delay(pause)
                 val minPause = 0.25.seconds
-                val maxPause = 60.seconds
+                val maxPause = 8.seconds
                 pause = (pause.coerceAtLeast(minPause) * 2).coerceAtMost(maxPause)
                 connect()
             } else if (it == Connection.ESTABLISHED) {

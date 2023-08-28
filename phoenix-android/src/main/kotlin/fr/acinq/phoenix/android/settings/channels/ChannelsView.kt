@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ACINQ SAS
+ * Copyright 2023 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 
-package fr.acinq.phoenix.android.settings
+package fr.acinq.phoenix.android.settings.channels
 
 
 import androidx.compose.foundation.clickable
@@ -37,7 +37,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -57,7 +56,7 @@ fun ChannelsView(
 ) {
     val log = logger("ChannelsView")
 
-    val channelsState = business.peerManager.channelsFlow.collectAsState()
+    val channelsState by business.peerManager.channelsFlow.collectAsState()
     val balance by business.balanceManager.balance.collectAsState()
 
     DefaultScreenLayout(isScrollable = false) {
@@ -65,10 +64,10 @@ fun ChannelsView(
             onBackClick = onBackClick,
             title = stringResource(id = R.string.channelsview_title),
         )
-        if (!channelsState.value.isNullOrEmpty()) {
+        if (!channelsState.isNullOrEmpty()) {
             LightningBalanceView(balance = balance)
         }
-        ChannelsList(channels = channelsState.value, onChannelClick = onChannelClick)
+        ChannelsList(channels = channelsState, onChannelClick = onChannelClick)
     }
 }
 
@@ -116,15 +115,15 @@ private fun ChannelsList(
 private fun ChannelLine(channel: LocalChannelInfo, onClick: () -> Unit) {
     Row(modifier = Modifier
         .clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.channeldetails_title), onClick = onClick)
-        .padding(horizontal = 16.dp, vertical = 16.dp),
+        .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
             shape = CircleShape,
             color = if (channel.isUsable) positiveColor else if (channel.isTerminated) negativeColor else mutedTextColor,
-            modifier = Modifier.size(6.dp)
+            modifier = Modifier.size(8.dp)
         ) {}
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(18.dp))
         Text(
             text = channel.stateName,
             modifier = Modifier.weight(1.0f),
