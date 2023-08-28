@@ -83,7 +83,6 @@ import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.android.utils.share
 import fr.acinq.phoenix.managers.WalletBalance
 
-
 @Composable
 fun ReceiveView(
     onBackClick: () -> Unit,
@@ -278,6 +277,15 @@ private fun LightningInvoiceView(
         hasChannels = channels?.isNotEmpty(),
         amount = customAmount,
         onMessageClick = { navController.navigate(Screen.LiquidityPolicy.route) },
+    )
+
+    Spacer(modifier = Modifier.height(16.dp))
+    HSeparator(width = 50.dp)
+    Spacer(modifier = Modifier.height(24.dp))
+    BorderButton(
+        text = stringResource(id = R.string.receive_lnurl_button),
+        icon = R.drawable.ic_scan,
+        onClick = { navController.navigate(Screen.ScanData.route) },
     )
 }
 

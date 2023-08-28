@@ -102,6 +102,7 @@
     <string name="receive_lightning_error">Could not generate invoice</string>
     <string name="receive_lightning_share_subject">Lightning invoice</string>
     <string name="receive_lightning_share_title">Share this Lightning invoice with…</string>
+    <string name="receive_lnurl_button">Use LNURL link</string>
 
     <string name="receive_lightning_edit_button">Edit</string>
     <string name="receive_lightning_edit_title">Edit invoice</string>
