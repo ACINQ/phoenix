@@ -1533,7 +1533,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "SrcFrmk=\"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework\"\necho \"SrcFrmk = $SrcFrmk\"\n\nDstFrmk=\"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\"\necho \"DstFrmk = $DstFrmk\"\n\necho \"cp -R $SrcFrmk/ $DstFrmk/\"\ncp -R \"$SrcFrmk/\" \"$DstFrmk/\"\n\necho \"cp -R $SrcFrmk.dSYM/ $DstFrmk.dSYM/\"\ncp -R \"$SrcFrmk.dSYM/\" \"$DstFrmk.dSYM/\"\n";
+			shellScript = "SrcFrmk=\"$SRCROOT/../phoenix-shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/PhoenixShared.framework\"\necho \"SrcFrmk = $SrcFrmk\"\n\nDstFrmk=\"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\"\necho \"DstFrmk = $DstFrmk\"\n\necho \"rm -R $DstFrmk/Frameworks\"\nrm -R \"$DstFrmk/Frameworks\"\n\necho \"cp -R $SrcFrmk/ $DstFrmk/\"\ncp -R \"$SrcFrmk/\" \"$DstFrmk/\"\n\necho \"cp -R $SrcFrmk.dSYM/ $DstFrmk.dSYM/\"\ncp -R \"$SrcFrmk.dSYM/\" \"$DstFrmk.dSYM/\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
