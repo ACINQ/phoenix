@@ -94,10 +94,10 @@ class AppConfigurationManager(
     /** Fetches and parses the wallet context from the wallet context remote endpoint. Returns null if resource is unavailable or unreadable. */
     private suspend fun fetchWalletContext(): WalletContext? {
         return try {
-            httpClient.get("https://acinq.co/phoenix/walletcontext.json2")
+            httpClient.get("https://acinq.co/phoenix/walletcontext.json")
         } catch (e1: Exception) {
             try {
-                httpClient.get("https://s3.eu-west-1.amazonaws.com/acinq.co/phoenix/walletcontext.json2")
+                httpClient.get("https://s3.eu-west-1.amazonaws.com/acinq.co/phoenix/walletcontext.json")
             } catch (e2: Exception) {
                 logger.error { "failed to fetch wallet context: ${e2.message?.take(200)}" }
                 null
