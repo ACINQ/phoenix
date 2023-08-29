@@ -24,8 +24,8 @@ android {
         applicationId = "fr.acinq.phoenix.mainnet"
         minSdk = 26
         targetSdk = 33
-        versionCode = 57
-        versionName = "2.0.3"
+        versionCode = 58
+        versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

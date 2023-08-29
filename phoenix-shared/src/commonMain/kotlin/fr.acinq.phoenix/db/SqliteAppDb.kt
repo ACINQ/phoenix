@@ -9,7 +9,6 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.Notification
-import fr.acinq.phoenix.data.WalletContext
 import fr.acinq.phoenix.db.notifications.NotificationsQueries
 import fracinqphoenixdb.Exchange_rates
 import fracinqphoenixdb.Notifications
@@ -17,9 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlinx.serialization.json.Json
 
 class SqliteAppDb(private val driver: SqlDriver) {
 
@@ -33,11 +29,9 @@ class SqliteAppDb(private val driver: SqlDriver) {
         )
     )
 
-    private val paramsQueries = database.walletParamsQueries
     private val priceQueries = database.exchangeRatesQueries
     private val keyValueStoreQueries = database.keyValueStoreQueries
     private val notificationsQueries = NotificationsQueries(database)
-    private val json = Json { ignoreUnknownKeys = true }
 
     /**
      * Save a list of [ExchangeRate] items to the database.
@@ -118,52 +112,6 @@ class SqliteAppDb(private val driver: SqlDriver) {
         withContext(Dispatchers.Default) {
             priceQueries.delete(fiat)
         }
-    }
-
-    suspend fun setWalletContext(version: WalletContext.Version, rawData: String): WalletContext.V0? {
-        withContext(Dispatchers.Default) {
-            paramsQueries.transaction {
-                paramsQueries.get(version.name).executeAsOneOrNull()?.run {
-                    paramsQueries.update(
-                        version = this.version,
-                        data_ = rawData,
-                        updated_at = Clock.System.now().toEpochMilliseconds()
-                    )
-                } ?: run {
-                    paramsQueries.insert(
-                        version = version.name,
-                        data_ = rawData,
-                        updated_at = Clock.System.now().toEpochMilliseconds()
-                    )
-                }
-            }
-        }
-
-        return getWalletContextOrNull(version).second
-    }
-
-    suspend fun getWalletContextOrNull(version: WalletContext.Version): Pair<Long, WalletContext.V0?> =
-        withContext(Dispatchers.Default) {
-            paramsQueries.get(version.name, ::mapWalletContext).executeAsOneOrNull()
-        } ?: (Instant.DISTANT_PAST.toEpochMilliseconds() to null)
-
-    private fun mapWalletContext(
-        version: String,
-        data: String,
-        updated_at: Long
-    ): Pair<Long, WalletContext.V0?> {
-        val walletContext = when (WalletContext.Version.valueOf(version)) {
-            WalletContext.Version.V0 -> try {
-                json.decodeFromString(
-                    WalletContext.V0.serializer(),
-                    data
-                )
-            } catch (e: Exception) {
-                null
-            }
-        }
-
-        return updated_at to walletContext
     }
 
     suspend fun getValue(key: String): Pair<ByteArray, Long>? {

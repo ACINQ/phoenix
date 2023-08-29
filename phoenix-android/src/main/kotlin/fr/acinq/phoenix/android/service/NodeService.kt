@@ -6,6 +6,7 @@ import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.text.format.DateUtils
 import androidx.annotation.WorkerThread
 import androidx.compose.runtime.mutableStateListOf
 import androidx.core.app.NotificationManagerCompat
@@ -18,6 +19,7 @@ import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.io.PaymentReceived
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.security.EncryptedSeed
@@ -267,13 +269,24 @@ class NodeService : Service() {
     }
 
     private fun monitorPaymentsWhenHeadless(peerManager: PeerManager, nodeParamsManager: NodeParamsManager, currencyManager: CurrencyManager) {
-
         serviceScope.launch {
             nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents.collect { event ->
                 // TODO: click on notif must deeplink to the notification screen
                 when (event) {
                     is LiquidityEvents.Rejected -> {
                         log.debug("processing liquidity_event=$event")
+                        if (event.source == LiquidityEvents.Source.OnChainWallet) {
+                            val lastRejectedSwap = UserPrefs.getLastRejectedOnchainSwap(applicationContext).first()
+                            if (lastRejectedSwap != null
+                                && lastRejectedSwap.first == event.amount
+                                && currentTimestampMillis() - lastRejectedSwap.second <= 1 * DateUtils.DAY_IN_MILLIS
+                            ) {
+                                log.debug("ignore this liquidity event as a similar notification was recently displayed")
+                                return@collect
+                            } else {
+                                UserPrefs.saveRejectedOnchainSwap(applicationContext, event)
+                            }
+                        }
                         when (val reason = event.reason) {
                             is LiquidityEvents.Rejected.Reason.PolicySetToDisabled -> {
                                 SystemNotificationHelper.notifyPaymentRejectedPolicyDisabled(applicationContext, event.source, event.amount)
