@@ -2,9 +2,13 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
+import fr.acinq.lightning.CltvExpiryDelta
+import fr.acinq.lightning.InvoiceDefaultRoutingFees
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.UpgradeRequired
+import fr.acinq.lightning.WalletParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
@@ -12,6 +16,8 @@ import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.states.Offline
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.payment.LiquidityPolicy
+import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.InitTlv
 import fr.acinq.lightning.wire.TlvStream
 import fr.acinq.phoenix.PhoenixBusiness
@@ -93,8 +99,24 @@ class PeerManager(
     init {
         launch {
             val nodeParams = nodeParamsManager.nodeParams.filterNotNull().first()
-            val walletParams = configurationManager.chainContext.filterNotNull().first().walletParams()
             val startupParams = configurationManager.startupParams.filterNotNull().first()
+
+            val walletParams = WalletParams(
+                trampolineNode = NodeParamsManager.trampolineNodeUri,
+                trampolineFees = listOf(
+                    TrampolineFees(
+                        feeBase = 4.sat,
+                        feeProportional = 4_000,
+                        cltvExpiryDelta = CltvExpiryDelta(576)
+                    )
+                ),
+                invoiceDefaultRoutingFees = InvoiceDefaultRoutingFees(
+                    feeBase = 1_000.msat,
+                    feeProportional = 100,
+                    cltvExpiryDelta = CltvExpiryDelta(144)
+                ),
+                swapInConfirmations = NodeParamsManager.swapInConfirmations,
+            )
 
             var initTlvs = TlvStream.empty<InitTlv>()
             if (startupParams.requestCheckLegacyChannels) {

@@ -36,7 +36,6 @@ import fr.acinq.phoenix.data.*
 import kotlinx.coroutines.*
 
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun IntroView(
     onFinishClick: () -> Unit
@@ -44,7 +43,6 @@ fun IntroView(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState()
-    val walletParams = business.appConfigurationManager.chainContext.collectAsState()
 
     HorizontalPager(count = 3, state = pagerState) { index ->
         BackHandler { context.findActivity().moveTaskToBack(false) }
@@ -54,7 +52,6 @@ fun IntroView(
             )
             1 -> ChannelsInfoView(
                 onNextClick = { scope.launch { pagerState.animateScrollToPage(2) } },
-                walletContext = walletParams.value,
             )
             2 -> SelfCustodyView(
                 onNextClick = {
@@ -99,7 +96,6 @@ private fun WelcomeView(
 @Composable
 private fun ChannelsInfoView(
     onNextClick: () -> Unit,
-    walletContext: WalletContext.V0.ChainContext?,
 ) {
     IntroLayout(
         topContent = {
@@ -113,9 +109,6 @@ private fun ChannelsInfoView(
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(16.dp))
-//            val (feePercent, minFeeAmount) = walletContext?.let {
-//                DecimalFormat("0.####").format(it.payToOpen.v1.feePercent * 100) to it.payToOpen.v1.minFeeSat.sat
-//            } ?: ("???" to "???")
             Text(text = stringResource(id = R.string.intro_channels_sub1), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
        },
         navContent = {

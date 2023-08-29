@@ -19,18 +19,13 @@ import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.long
+import kotlinx.serialization.json.*
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.math.*
 import kotlin.time.*
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-
 
 class AppConfigurationManager(
     private val appDb: SqliteAppDb,
@@ -51,7 +46,6 @@ class AppConfigurationManager(
     private val logger = newLogger(loggerFactory)
 
     init {
-        initWalletContext()
         watchElectrumMessages()
     }
 
@@ -66,41 +60,16 @@ class AppConfigurationManager(
         stopJobs()
     }
 
-    private val currentWalletContextVersion = WalletContext.Version.V0
-
-    private val _walletContextInitialized = MutableStateFlow<Boolean>(false)
-
-    private val _chainContext = MutableStateFlow<WalletContext.V0.ChainContext?>(null)
-    val chainContext: StateFlow<WalletContext.V0.ChainContext?> = _chainContext
-
-    private fun initWalletContext() = launch {
-        val (timestamp, localContext) = appDb.getWalletContextOrNull(WalletContext.Version.V0)
-
-        val freshness = (currentTimestampMillis() - timestamp).milliseconds
-        logger.info { "local context was updated $freshness ago" }
-
-//        val timeout = if (freshness < 48.hours) {
-//            2.seconds
-//        } else {
-//            2.seconds * max(freshness.inWholeDays.toInt(), 5)
-//        } // max=10s
-
-        // TODO are we using TOR? -> increase timeout
-
-//        val walletContext = try {
-//            withTimeout(timeout) {
-//                fetchAndStoreWalletContext() ?: localContext
-//            }
-//        } catch (t: TimeoutCancellationException) {
-//            logger.warning { "unable to refresh context from remote, using local fallback" }
-//            localContext
-//        }
-
-        _chainContext.value = localContext?.export(chain)
-        logger.info { "chainContext=$chainContext" }
-
-        _walletContextInitialized.value = true
+    /** Cancels [walletContextPollingJob] and [mempoolFeerateJob]. */
+    private fun stopJobs() {
+        launch {
+            mempoolFeerateJob?.cancelAndJoin()
+            walletContextPollingJob?.cancelAndJoin()
+        }
     }
+
+    private val _walletContext = MutableStateFlow<WalletContext?>(null)
+    val walletContext = _walletContext.asStateFlow()
 
     /** Track the job that polls the wallet-context endpoint, so that we can cancel/restart it when needed. */
     private var walletContextPollingJob: Job? = null
@@ -108,16 +77,13 @@ class AppConfigurationManager(
     /** Starts a coroutine that continuously polls the wallet-context endpoint. The coroutine is tracked in [walletContextPollingJob]. */
     private fun startWalletContextJob() {
         launch {
-            // suspend until `initWalletContext()` is complete
-            _walletContextInitialized.filter { it }.first()
             walletContextPollingJob = launch {
-                var pause = 0.5.seconds
+                var pause = 30.seconds
                 while (isActive) {
-                    pause = (pause * 2).coerceAtMost(5.minutes)
-                    fetchAndStoreWalletContext()?.let {
-                        val chainContext = it.export(chain)
-                        _chainContext.value = chainContext
-                        pause = 60.minutes
+                    pause = (pause * 2).coerceAtMost(10.minutes)
+                    fetchWalletContext()?.let {
+                        _walletContext.value = it
+                        pause = 180.minutes
                     }
                     delay(pause)
                 }
@@ -125,17 +91,8 @@ class AppConfigurationManager(
         }
     }
 
-    /** Cancels [walletContextPollingJob] and [mempoolFeerateJob]. */
-    private fun stopJobs() {
-        launch {
-            // suspend until `initWalletContext()` is complete
-            _walletContextInitialized.filter { it }.first()
-            mempoolFeerateJob?.cancelAndJoin()
-            walletContextPollingJob?.cancelAndJoin()
-        }
-    }
-
-    private suspend fun fetchAndStoreWalletContext(): WalletContext.V0? {
+    /** Fetches and parses the wallet context from the wallet context remote endpoint. Returns null if resource is unavailable or unreadable. */
+    private suspend fun fetchWalletContext(): WalletContext? {
         return try {
             httpClient.get("https://acinq.co/phoenix/walletcontext.json")
         } catch (e1: Exception) {
@@ -145,8 +102,29 @@ class AppConfigurationManager(
                 logger.error { "failed to fetch wallet context: ${e2.message?.take(200)}" }
                 null
             }
-        }?.let {
-            appDb.setWalletContext(currentWalletContextVersion, it.bodyAsText())
+        }?.let { response ->
+            if (response.status.isSuccess()) {
+                Json.decodeFromString<JsonObject>(response.bodyAsText(Charsets.UTF_8))
+            } else {
+                logger.error { "wallet-context returned status=${response.status}" }
+                null
+            }
+        }?.let { json ->
+            logger.debug { "fetched wallet-context=$json" }
+            try {
+                val base = json[chain.name.lowercase()]!!
+                val isMempoolFull = base.jsonObject["mempool"]?.jsonObject?.get("v1")?.jsonObject?.get("high_usage")?.jsonPrimitive?.booleanOrNull
+                val androidLatestVersion = base.jsonObject["version"]?.jsonPrimitive?.intOrNull
+                val androidLatestCriticalVersion = base.jsonObject["latest_critical_version"]?.jsonPrimitive?.intOrNull
+                WalletContext(
+                    isMempoolFull = isMempoolFull ?: false,
+                    androidLatestVersion = androidLatestVersion ?: 0,
+                    androidLatestCriticalVersion = androidLatestCriticalVersion ?: 0,
+                )
+            } catch (e: Exception) {
+                logger.error { "could not parse wallet-context response: ${e.message}" }
+                null
+            }
         }
     }
 
