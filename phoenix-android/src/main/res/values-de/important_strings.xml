@@ -22,7 +22,230 @@
 -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
+    <!-- system notifications -->
+
+    <string name="notif_headless_title_default">Phoenix läuft im Hintergrund</string>
+    <string name="notif_headless_received">+%1$s empfangen</string>
+
+    <string name="notif_pending_settlement_title">Bitte öffnen Sie Phoenix</string>
+    <string name="notif_pending_settlement_message">Eine eingehende Zahlung steht aus.</string>
+
+    <string name="notif_missed_title">Verpasste eingehende Zahlung</string>
+    <string name="notif_missed_unavailable">Phoenix konnte nicht im Hintergrund gestartet werden.</string>
+
+    <string name="notif_rejected_deposit_title">On-chain Einzahlung ausstehend (+%1$s)</string>
+    <string name="notif_rejected_payment_title">Zahlung abgelehnt (+%1$s)</string>
+    <string name="notif_rejected_policy_disabled">Automatisches Kanal-Management ist deaktiviert. Sie können es in den Einstellungen aktivieren.</string>
+    <string name="notif_rejected_over_absolute">Die Gebühr wäre %1$s, aber Ihr Gebührenlimit beträgt %2$s. Sie können dies in den Einstellungen anpassen.</string>
+    <string name="notif_rejected_over_relative">Die Gebühr wäre %1$s, was mehr als %2$s%% des zu empfangenden Betrags ist. Sie können dies in den Einstellungen anpassen.</string>
+    <string name="notif_rejected_channels_initializing">Ihre Kanäle werden gerade initialisiert und konnten die Zahlung nicht empfangen. Versuchen Sie es später noch mal.</string>
+
+    <string name="notif_watcher_revoked_commit_title">Bitte öffnen Sie Phoenix</string>
+    <string name="notif_watcher_revoked_commit_message">Einige Ihrer Kanäle wurden möglicherweise geschlossen.</string>
+	
+	<!-- init wallet / automated wallet creation -->
+
+    <string name="initwallet_create">Neue Wallet erstellen</string>
+    <string name="initwallet_restore">Meine Wallet wiederherstellen</string>
+
+    <string name="restore_disclaimer_message">Phoenix kann nur off-chain-Guthaben wiederherstellen, das von dieser App verwaltet wurde.\n\nEin Seed, der nicht von Phoenix generiert wurde, kann nicht importiert werden.\n\nStellen Sie außerdem sicher, dass Sie nicht bereits eine andere Phoenix-Wallet mit demselben Seed betreiben.</string>
+    <string name="restore_disclaimer_checkbox">Ich verstehe.</string>
+
+    <string name="restore_instructions">Der Seed für deine Wallet ist eine Liste mit 12 englischen Wörtern. Schreiben Sie jedes Wort dieser Liste in die folgende Box.</string>
+    <string name="restore_input_label">Wort #%1$s eingeben</string>
+    <string name="restore_input_invalid">Dieses Wort ist ungültig.</string>
+    <string name="restore_seed_valid">Dieser Seed ist gültig</string>
+    <string name="restore_seed_valid_details">Sie können jetzt fortfahren und Ihre Wallet wiederherstellen</string>
+    <string name="restore_seed_invalid">Dieser Seed ist ungültig</string>
+    <string name="restore_seed_invalid_details">Stellen Sie sicher, dass Sie die richtigen Wörter in der richtigen Reihenfolge eingegeben haben.</string>
+    <string name="restore_import_button">Wiederherstellen</string>
+
+	<!-- upgrade required dialog -->
+
+    <string name="upgraderequired_title">Update erforderlich</string>
+    <string name="upgraderequired_message">Diese Version von Phoenix (v%1$s) ist nicht mit Ihrer Wallet kompatibel. Bitte aktualisieren Sie die App oder benutzen Sie eine kompatible Version.</string>
+    <string name="upgraderequired_button">Update über Google Play</string>
+	
+	<!-- receive view: warning about fee/liquidity -->
+
+    <string name="receive_lightning_warning_title_surefail">Zahlung wird fehlschlagen</string>
+    <string name="receive_lightning_warning_title_mayfail">Zahlung könnte fehlschlagen</string>
+    <string name="receive_lightning_warning_title_fee_expected">Gebühr erwartet</string>
+
+    <string name="receive_lightning_warning_fee_insufficient_liquidity">Eingangskapazität ist unzureichend.</string>
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Eingangskapazität ist unzureichend und automatisches Kanal-Management ist deaktiviert.\nTippen, um dies zu konfigurieren.</string>
+    <string name="receive_lightning_warning_fee_within_policy">Eine Gebühr über %1$s (≈ %2$s) kann erforderlich sein, um diese Zahlung zu empfangen.\nTippen, um dies zu konfigurieren.</string>
+    <string name="receive_lightning_warning_fee_exceeds_policy">Die Gebühr wird wahrscheinlich Ihr Limit übersteigen (%1$s).\nTippen, um dies zu konfigurieren.</string>
+	
+	<!-- scanning errors -->
+
+    <string name="scan_error_expired">Die Rechnung ist abgelaufen.</string>
+    <string name="scan_error_already_paid">Diese Zahlung wurde bereits getätigt.</string>
+    <string name="scan_error_invalid_chain">Diese Zahlung verwendet nicht die gleiche Blockchain wie Ihre Wallet.</string>
+    <string name="scan_error_lnurl_invalid">Dieser LNURL-Link konnte nicht verarbeitet werden. Stellen Sie sicher, dass er gültig ist.</string>
+    <string name="scan_error_lnurl_service_error">Der LNURL-Dienst hat einen Fehler zurückgegeben.</string>
+    <string name="scan_error_lnurl_unsupported">Dieser LNURL-Typ wird noch nicht unterstützt.</string>
+    <string name="scan_error_invalid_generic">Diese Daten haben ein unbekanntes Format und können nicht verarbeitet werden.</string>
+
+    <!-- validation -->
+
+    <string name="validation_below_min">Muss mindestens %1$s sein</string>
+    <string name="validation_above_max">Darf nicht mehr als %1$s sein</string>
+
+    <!-- closing channels -->
+
+    <string name="mutualclose_input_label">Bitcoin-Adresse</string>
+    <string name="mutualclose_input_instructions">Sende das gesamte Guthaben an eine Bitcoin-Wallet. Alle Zahlungskanäle werden geschlossen.</string>
+    <string name="mutualclose_confirm_title">Kanal-Schließung bestätigen</string>
+    <string name="mutualclose_confirm_details">Das gesamte Guthaben wir hier hin gesendet:</string>
+
+    <string name="forceclose_title">Force-Close durchführen</string>
+    <string name="forceclose_instructions">Hiermit können Sie die Schließung Ihrer Kanäle erzwingen.\n\nDies ist kein \"magisches Allheilmittel\", um eventuelle Probleme zu lösen: Es ist lediglich eine Sicherheitsfunktion und <b>sollte nur im äußersten Notfall verwendet werden</b>. Zum Beispiel, wenn Ihr Peer (ACINQ) dauerhaft verschwindet und Sie Ihr Guthaben nicht mehr nutzen können. <b>In allen anderen Fällen, in denen Sie Probleme mit Phoenix haben, sollten Sie sich an den Support wenden</b>.\n\nEin Force-Close kostet Sie Geld (zur Deckung der On-Chain-Gebühren) und führt dazu, dass Ihr Guthaben für einige Tage eingefroren wird.\n\n<b>Deinstallieren Sie die App nicht, bevor Ihre Kanäle vollständig geschlossen sind, anderenfalls werden Sie Geld verlieren.</b>\n\n<b>Verwenden Sie diese Funktion nicht, wenn Sie nicht genau wissen, was sie bewirkt.</b></string>
+    <string name="forceclose_address_label">Das Guthaben wird anschließend an die finale Wallet gesendet:</string>
+
+    <string name="forceclose_confirm_title">Force-Close bestätigen</string>
+    <string name="forceclose_confirm_details">Das gesamte Guthaben wird nach einigen Tagen an Ihre finale Wallet gesendet.</string>
+    <string name="forceclose_button">Schließung all meiner Kanäle erzwingen</string>
+	
+	<!-- in-app notifications -->
+
     <string name="inappnotif_migration_from_legacy">Glückwunsch! Ihre Wallet wurde aktualisiert.</string>
     <string name="inappnotif_migration_from_legacy_action">Änderungen einsehen</string>
+	
+	<string name="inappnotif_backup_seed_message">Erstellen Sie ein Backup Ihrer Wallet, um keine Bitcoins zu verlieren.</string>
+    <string name="inappnotif_backup_seed_action">Wallet-Backup erstellen</string>
+
+    <string name="inappnotif_notification_permission_message">Benachrichtigungen sind in den Android-Einstellungen deaktiviert. Phoenix kann Sie nicht benachrichtigen, wenn eine Zahlung durchgeführt wird.</string>
+    <string name="inappnotif_notification_permission_enable">Aktivieren</string>
+
+    <string name="inappnotif_watchtower_late_message">Phoenix beobachtet die Blockchain regelmäßig im Hintergrund, war aber in den letzten Tagen nicht in der Lage, dies zu tun.\n\nStellen Sie sicher, dass Phoenix nicht durch Android blockiert wird, sodass eine Verbindung zu Electrum möglich ist.</string>
+    <string name="inappnotif_watchtower_late_action">Schließen</string>
+
+    <string name="inappnotif_upgrade_message">Ein Update ist verfügbar</string>
+    <string name="inappnotif_upgrade_critical_message">Ein wichtiges Update ist verfügbar. Sie sollten Phoenix so bald wie möglich aktualisieren.</string>
+    <string name="inappnotif_upgrade_button">Update über Google Play</string>
+
+    <string name="inappnotif_mempool_full_message">Der Bitcoin mempool ist voll und die on-chain Gebühren sind hoch.</string>
+    <string name="inappnotif_mempool_full_action">Erfahren Sie inwiefern Phoenix davon betroffen ist</string>
+
+    <string name="inappnotif_payment_onchain_pending_title">On-chain Guthaben ausstehend (+%1$s)</string>
+    <string name="inappnotif_payment_rejected_title">Zahlung abgelehnt (+%1$s)</string>
+    <string name="inappnotif_payment_rejected_disabled">Automatisches Kanal-Management ist deaktiviert.</string>
+    <string name="inappnotif_payment_rejected_over_absolute">Die Gebühr wäre %1$s, aber Ihr Gebührenlimit beträgt %2$s.</string>
+    <string name="inappnotif_payment_rejected_over_relative">Die Gebühr wäre %1$s, was mehr als %2$s%% des zu empfangenden Betrags ist.</string>
+    <string name="inappnotif_payment_rejected_channel_initializing">Ihre Kanäle werden gerade initialisiert und konnten die Zahlung nicht empfangen.</string>
+    <string name="inappnotif_payment_rejected_tweak_setting">Tippen, um zu bestätigen.</string>
+
+    <string name="inappnotif_watchtower_nominal_title">Watchtower-Bericht</string>
+    <plurals name="inappnotif_watchtower_nominal_description">
+        <item quantity="one">%1$d Kanal wurde erfolgreich geprüft am %2$s. Es wurden keine Probleme festgestellt.</item>
+        <item quantity="other">%1$d Kanäle wurden erfolgreich geprüft am %2$s. Es wurden keine Probleme festgestellt</item>
+    </plurals>
+    <string name="inappnotif_watchtower_revokedfound_title">Watchtower-Alarm</string>
+    <string name="inappnotif_watchtower_revokedfound_description">Revoked commitments wurden am %1$s für folgende(n) Kanal/Kanäle gefunden: %2$s. Dieser Kanal kann geschlossen werden.</string>
+	
+	<!-- settings: display seed -->
+
+    <string name="displayseed_instructions">Die Wiederherstellungsphrase (manchmal auch Seed genannt) ist eine Liste von 12 englischen Wörtern. Mit ihr können Sie bei Bedarf wieder vollen Zugriff auf Ihr Guthaben erlangen.\n\n<b>Nur Sie allein sind im Besitz dieses Seeds. Verwahren Sie ihn geschützt vor Zugriff durch Dritte.</b>\n\n<b>Geben Sie den Seed an niemanden weiter</b>.\nVorsicht vor Phishing! Die Entwickler von Phoenix werden Sie niemals nach Ihrem Seed fragen.\n\n<b>Verlieren Sie den Seed nicht</b>.\nVerwahren Sie ihn an einem sicheren Ort (nicht auf diesem Gerät). Wenn Sie den Seed und dieses Gerät verlieren, haben Sie Ihr Guthaben verloren.</string>
+    <string name="displayseed_authenticate_button">Seed anzeigen</string>
+    <string name="displayseed_dialog_header">SEED SICHER VERWAHREN.\nNICHT WEITERGEBEN.</string>
+    <string name="displayseed_backup_notice_header">Sie haben kein Backup Ihrer Wiederherstellungsphrase erstellt!</string>
+    <string name="displayseed_backup_notice_details">Wenn Sie kein Backup erstellen und den Zugang zu Phoenix verlieren, verlieren Sie Ihr Guthaben!</string>
+    <string name="displayseed_backup_checkbox">Ich habe meine Wiederherstellungsphrase sicher verwahrt.</string>
+    <string name="displayseed_loss_disclaimer_checkbox">Ich verstehe, dass ich bei Verlust meines Geräts und meiner Wiederherstellungsphrase das Guthaben in meiner Wallet verliere.</string>
+
+    <!-- payment details -->
+
+    <string name="paymentdetails_funding_fees_label">Miner-Gebühren</string>
+    <string name="paymentdetails_funding_fees_desc">Gebühren, die an die Miner des Bitcoin-Netzwerks für die Verarbeitung der On-Chain-Transaktion gezahlt werden.</string>
+    <string name="paymentdetails_service_fees_label">Service-Gebühr</string>
+    <string name="paymentdetails_service_fees_desc">Gebühren für die Einrichtung eines neuen Zahlungskanals. Dies ist nicht immer erforderlich.</string>
+
+    <!-- lnurl -->
+
+    <string name="lnurl_auth_instructions">Sie können sich anonym anmelden und einen Vorgang autorisieren auf:</string>
+    <string name="lnurl_withdraw_header">Sie können Guthaben abheben von\n<b>%1$s</b>.</string>
+    <string name="lnurl_withdraw_success">Der Antrag auf Auszahlung wurde an <b>%1$s</b> übermittelt.\n\nEs kann einige Zeit dauern, bis das Guthaben überwiesen wird. Bitte lassen Sie die App in der Zwischenzeit geöffnet.</string>
+
+    <!-- Tor -->
+
+    <string name="tor_settings_subtitle">Phoenix kann Tor verwenden, um Ihre IP vor den anderen Knoten im Lightning Netzwerk und den Electrum Servern zu schützen.\n\nDie Aktivierung von Tor verbessert Ihre Privatsphäre, kann aber zu Zahlungsproblemen führen, wenn Ihre Verbindung instabil ist.</string>
+
+    <!-- about -->
+
+    <string name="about_general_content">Phoenix ist eine Bitcoin-Wallet, die das Lightning-Netzwerk zum Senden und Empfangen von Zahlungen nutzt.\n\nEs ist eine kostenlose Open-Source-Software, entwickelt von <a href="https://phoenix.acinq.co">ACINQ</a> unter der <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0 Lizenz</a>.</string>
+    <string name="about_seed_title">Sicherung Ihres Schlüssels</string>
+    <string name="about_seed_content">Diese Wallet ist self-custodial: <b>Sie haben die alleinige Verfügungsgewalt über den 12 Wörter umfassenden Seed-Schlüssel der Wallet</b>.\n\nMit diesem Schlüssel haben Sie Zugang zu Ihrem Guthaben. Geben Sie ihn niemandem weiter und schützen Sie sich vor Phishing.</string>
+    <string name="about_rates_title">Wechselkurse</string>
+    <string name="about_rates_content">Bitcoin/Fiat-Wechselkurse werden von verschiedenen Drittanbieter-APIs abgerufen:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nDiese Kurse sind möglicherweise nicht ganz korrekt. Überprüfen Sie immer den tatsächlichen Bitcoin-Betrag, bevor Sie eine Zahlung senden.</string>
+
+    <!-- introduction screens -->
+
+    <string name="intro_welcome_title">Willkommen!</string>
+    <string name="intro_welcome_sub1">Mit Phoenix ist das Senden und Empfangen von Bitcoin einfach und sicher.</string>
+    <string name="intro_welcome_next_button">Weiter</string>
+
+    <string name="intro_channels_title">Bitcoin supercharged</string>
+    <string name="intro_channels_sub1">Phoenix nutzt Zahlungskanäle, um Bitcoin schnell und privat zu machen.</string>
+    <string name="intro_channels_next_button">Weiter</string>
+
+    <string name="intro_selfcustody_title">Ihr Schlüssel, Ihre Bitcoins</string>
+    <string name="intro_selfcustody_sub1">Phoenix ist self-custodial. Sie haben die Kontrolle.</string>
+    <string name="intro_selfcustody_sub2">Sie können Ihre Wallet jederzeit mit Ihrem geheimen Schlüssel wiederherstellen. Bewahren Sie ihn sicher auf!</string>
+    <string name="intro_selfcustody_next_button">Los geht\'s</string>
+
+    <!-- wallet info -->
+
+    <string name="walletinfo_onchain_swapin">Swap-in Wallet</string>
+    <string name="walletinfo_onchain_swapin_help">Guthaben, das an diese On-Chain-Wallet gesendet wird, wird automatisch in Lightning umgewandelt.</string>
+    <string name="walletinfo_onchain_swapin_policy_view">Tippen, um dies zu konfigurieren.</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details">On-Chain-Guthaben wird automatisch in Lightning umgewandelt, wenn die Gebühr <b>weniger als %1$s</b> beträgt.</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled_details">Die automatische Gebührenregelung <b>ist deaktiviert</b>. Guthaben werden nicht umgewandelt. Sie verbleiben in dieser Wallet.</string>
+    <string name="walletinfo_onchain_swapin_empty">Es sind keine Swaps in Bearbeitung.</string>
+
+    <string name="walletinfo_onchain_final_about">Eine On-Chain-Wallet, die von Ihrem Seed abgeleitet ist.\n\nWenn Ihre Lightning-Kanäle geschlossen werden, werden die entsprechenden Guthaben standardmäßig an die finale Wallet gesendet.</string>
+
+    <!-- settings: liquidity policy for channels creation -->
+
+    <string name="liquiditypolicy_instructions">Eingehende Zahlungen erfordern manchmal On-Chain-Transaktionen. Dies geschieht nicht immer, sondern nur bei Bedarf.</string>
+    <string name="liquiditypolicy_fees_estimation">Die Gebühren werden derzeit auf etwa <b>%1$s</b> (≈%2$s) geschätzt.</string>
+    <string name="liquiditypolicy_disable_label">Automatisches Kanal-Management</string>
+    <string name="liquiditypolicy_disable_desc">Eingehende Zahlungen, die On-Chain-Transaktionen erfordern, werden abgelehnt.</string>
+
+    <string name="liquiditypolicy_fees_base_label">Maximale Gebühr</string>
+    <string name="liquiditypolicy_fees_base_help">Zahlungen, deren Gebühren diesen Wert überschreiten, werden abgelehnt.</string>
+    <string name="liquiditypolicy_fees_base_too_low">Dieser Wert ist zu niedrig.</string>
+    <string name="liquiditypolicy_fees_base_below_estimation">Unter der erwarteten Gebühr. Einige Zahlungen können abgelehnt werden.</string>
+
+    <string name="liquiditypolicy_advanced_menu">Erweiterte Optionen</string>
+    <string name="liquiditypolicy_advanced_disable">Kanal-Management ist deaktiviert. Diese Funktion kann in den Einstellungen der Kanalverwaltung aktiviert werden.</string>
+    <string name="liquiditypolicy_advanced_disclaimer_header">Achtung!</string>
+    <string name="liquiditypolicy_advanced_disclaimer_message">Dieser Bereich ist für fortgeschrittene Benutzer gedacht. Ändern Sie diese Einstellungen nur, wenn Sie wissen, was sie bewirken.</string>
+
+    <string name="liquiditypolicy_advanced_verifications_title">Zusätzliche Überprüfungen</string>
+    <string name="liquiditypolicy_advanced_fees_prop_label">Überprüfung des Prozentsatzes</string>
+    <string name="liquiditypolicy_advanced_fees_prop_help">Prüfen Sie die Gebühr in Relation zum erhaltenen Betrag. Diese Option ist nützlich, um bei kleinen Zahlungen die Verhältnismäßigkeit zu prüfen.</string>
+    <string name="liquiditypolicy_advanced_overrides_title">Ausnahmen</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_label">Überprüfung der absoluten Gebühren für Lightning überspringen</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_help">Wenn diese Option aktiviert ist, wird bei eingehenden Lightning-Zahlungen die absolute Gebührenobergrenze ignoriert. Nur der Prozentwert wird geprüft.\n\nAchtung: Wenn die Bitcoin-Mempool-Gebühren hoch sind, könnten eingehende LN-Zahlungen, die eine On-Chain-Transaktion erfordern, teuer werden.</string>
+    <string name="liquiditypolicy_save_button">Richtlinien speichern</string>
+
+    <string name="liquiditypolicy_help">
+      Phoenix ermöglicht es Ihnen, Zahlungen auf der Bitcoin-Blockchain (L1) und dem Bitcoin-Lightning-Layer (L2) zu empfangen.
+      \n\n
+      - der Blockchain-Layer (L1) ist langsamer und im Allgemeinen deutlich teurer (erfordert Gebühren für Miner)
+      \n
+      - der Lightning-Layer (L2) ist wesentlich schneller und in der Regel auch wesentlich billiger (insbesondere bei kleineren Zahlungen).
+      \n\n
+      Wenn Sie eine Zahlung auf L1 erhalten, wechselt Phoenix den Betrag automatisch auf L2, <b>WENN</b> die Miner-Gebühren den von Ihnen konfigurierten Gebührenrichtlinien entsprechen.
+      \n\n
+      Zahlungen, die Sie auf L2 erhalten, können unverzüglich und gebührenfrei empfangen werden. Manchmal ist jedoch eine L1-Transaktion erforderlich, um den L2-Zahlungskanal zu verwalten. Dies passiert automatisch <b>WENN</b> die Miner-Gebühren den von Ihnen festgelegten Gebührenrichtlinien entsprechen.
+    </string>
+
+    <!-- CPFP -->
+
+    <string name="cpfp_title">Transaktionen beschleunigen</string>
+    <string name="cpfp_instructions">Sie können für all Ihre unbestätigten Transaktionen eine höhere effektive Gebührenrate festlegen, um die Miner zu motivieren, Ihre Zahlungen zu bevorzugen.</string>
+    <string name="cpfp_splice_error_actual_below_user">Diese Gebührenrate liegt unter der, die Ihre unbestätigten Transaktionen bereits verwenden. Verwenden Sie eine höhere, um diese Zahlungen zu beschleunigen.</string>
 
 </resources>
