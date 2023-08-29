@@ -21,10 +21,14 @@ import android.text.format.DateUtils
 import androidx.datastore.preferences.core.*
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.CltvExpiryDelta
+import fr.acinq.lightning.LiquidityEvents
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.ServerAddress
+import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -206,6 +210,21 @@ object UserPrefs {
     private val INCOMING_MAX_PROP_FEE_INTERNAL_TRACKER = intPreferencesKey("INCOMING_MAX_PROP_FEE_INTERNAL_TRACKER")
     fun getIncomingMaxPropFeeInternal(context: Context): Flow<Int?> = prefs(context).map {
         it[INCOMING_MAX_PROP_FEE_INTERNAL_TRACKER] ?: NodeParamsManager.defaultLiquidityPolicy.maxRelativeFeeBasisPoints
+    }
+
+    // -- system notifications
+
+    /** Do not spam user with several notifications for the same on-chain deposit. */
+    private val LAST_REJECTED_ONCHAIN_SWAP_AMOUNT = longPreferencesKey("LAST_REJECTED_ONCHAIN_SWAP_AMOUNT")
+    private val LAST_REJECTED_ONCHAIN_SWAP_TIMESTAMP = longPreferencesKey("LAST_REJECTED_ONCHAIN_SWAP_TIMESTAMP")
+    fun getLastRejectedOnchainSwap(context: Context): Flow<Pair<MilliSatoshi, Long>?> = prefs(context).map {
+        val amount = it[LAST_REJECTED_ONCHAIN_SWAP_AMOUNT]
+        val timestamp = it[LAST_REJECTED_ONCHAIN_SWAP_TIMESTAMP]
+        if (amount != null && timestamp != null) amount.msat to timestamp else null
+    }
+    suspend fun saveRejectedOnchainSwap(context: Context, liquidityEvent: LiquidityEvents.Rejected) = context.userPrefs.edit {
+        it[LAST_REJECTED_ONCHAIN_SWAP_AMOUNT] = liquidityEvent.amount.msat
+        it[LAST_REJECTED_ONCHAIN_SWAP_TIMESTAMP] = currentTimestampMillis()
     }
 
     // -- lnurl
