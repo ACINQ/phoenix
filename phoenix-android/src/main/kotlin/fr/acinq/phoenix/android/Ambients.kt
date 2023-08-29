@@ -39,7 +39,6 @@ val LocalBitcoinUnit = compositionLocalOf { BitcoinUnit.Sat }
 val LocalFiatCurrency = compositionLocalOf { FiatCurrency.USD }
 val LocalExchangeRates = compositionLocalOf<List<ExchangeRate>> { listOf() }
 val LocalShowInFiat = compositionLocalOf { false }
-val LocalWalletContext = compositionLocalOf <WalletContext.V0.ChainContext?> { null }
 val LocalElectrumServer = compositionLocalOf<ServerAddress?> { null }
 val isDarkTheme: Boolean
     @Composable

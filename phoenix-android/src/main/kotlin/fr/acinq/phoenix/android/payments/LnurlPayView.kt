@@ -58,7 +58,7 @@ fun LnurlPayView(
     onBackClick: () -> Unit,
     onSendLnurlPayClick: (Scan.Intent.LnurlPayFlow) -> Unit
 ) {
-    val log = logger("SendLightningPaymentView")
+    val log = logger("LnurlPayView")
     log.info { "init lnurl-pay view with url=${model.paymentIntent}" }
 
     val context = LocalContext.current

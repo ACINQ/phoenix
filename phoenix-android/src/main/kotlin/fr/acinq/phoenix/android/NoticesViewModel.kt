@@ -58,10 +58,10 @@ class NoticesViewModel(val appConfigurationManager: AppConfigurationManager) : V
     }
 
     private suspend fun monitorWalletContext() {
-        appConfigurationManager.chainContext.collect {
-            val isMempoolFull = it?.mempool?.v1?.highUsage ?: false
-            val isUpdateAvailable = it?.version?.let { it > BuildConfig.VERSION_CODE } ?: false
-            val isCriticalUpdateAvailable = it?.latestCriticalVersion?.let { it > BuildConfig.VERSION_CODE } ?: false
+        appConfigurationManager.walletContext.collect {
+            val isMempoolFull = it?.isMempoolFull ?: false
+            val isUpdateAvailable = it?.androidLatestVersion?.let { it > BuildConfig.VERSION_CODE } ?: false
+            val isCriticalUpdateAvailable = it?.androidLatestCriticalVersion?.let { it > BuildConfig.VERSION_CODE } ?: false
 
             if (isMempoolFull) {
                 addNotice(Notice.MempoolFull)
