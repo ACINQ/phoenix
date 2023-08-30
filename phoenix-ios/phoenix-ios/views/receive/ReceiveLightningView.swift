@@ -39,8 +39,6 @@ struct ReceiveLightningView: View {
 	}
 	@State var activeSheet: ReceiveViewSheet? = nil
 	
-	@State var payToOpen_enabled = true
-	
 	@State var channels: [LocalChannelInfo] = []
 	@State var liquidityPolicy: LiquidityPolicy = Prefs.shared.liquidityPolicy
 	@State var notificationPermissions = NotificationsManager.shared.permissions.value
@@ -61,7 +59,6 @@ struct ReceiveLightningView: View {
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
-	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	
 	// For the cicular buttons: [copy, share, edit]
@@ -112,9 +109,6 @@ struct ReceiveLightningView: View {
 		}
 		.onReceive(lastIncomingPaymentPublisher) {
 			lastIncomingPaymentChanged($0)
-		}
-		.onReceive(chainContextPublisher) {
-			chainContextChanged($0)
 		}
 		.onReceive(channelsPublisher) {
 			channelsChanged($0)
@@ -202,11 +196,6 @@ struct ReceiveLightningView: View {
 				)
 				.matchedGeometryEffect(id: "qrCodeView_outer", in: qrCodeAnimation_outer)
 				.padding(.top)
-			
-			if !payToOpen_enabled {
-				payToOpenDisabledWarning()
-					.padding(.top, 8)
-			}
 			
 			VStack(alignment: .center) {
 			
@@ -533,35 +522,6 @@ struct ReceiveLightningView: View {
 	}
 	
 	@ViewBuilder
-	func payToOpenDisabledWarning() -> some View {
-		
-		HStack(alignment: VerticalAlignment.top, spacing: 0) {
-			Image(systemName: "exclamationmark.triangle")
-				.imageScale(.large)
-				.padding(.trailing, 10)
-				.foregroundColor(Color(UIColor.tertiaryLabel))
-			Text(
-				"""
-				Channel creation has been temporarily disabled. \
-				You may not be able to receive some payments.
-				"""
-			)
-			.multilineTextAlignment(.center)
-			Image(systemName: "exclamationmark.triangle")
-				.imageScale(.large)
-				.padding(.leading, 10)
-				.foregroundColor(Color(UIColor.tertiaryLabel))
-		}
-		.font(.caption)
-		.padding(12)
-		.background(
-			RoundedRectangle(cornerRadius: 8)
-				.stroke(Color.appAccent, lineWidth: 1)
-		)
-		.padding([.leading, .trailing], 10)
-	}
-	
-	@ViewBuilder
 	func backgroundPaymentsDisabledWarning(paddingTop: CGFloat? = nil) -> some View {
 		
 		if notificationPermissions == .disabled {
@@ -773,12 +733,6 @@ struct ReceiveLightningView: View {
 				presentationMode.wrappedValue.dismiss()
 			}
 		}
-	}
-	
-	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
-		log.trace("chainContextChanged()")
-		
-		payToOpen_enabled = context.payToOpen.v1.status is WalletContext.V0ServiceStatusActive
 	}
 	
 	func channelsChanged(_ channels: [LocalChannelInfo]) {

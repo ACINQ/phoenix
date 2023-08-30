@@ -23,7 +23,7 @@ class NoticeMonitor: ObservableObject {
 	
 	// Raw publisher for all WalletContext settings fetched from the cloud.
 	// See specific functions below for simple getters. E.g.: `hasNotice_mempoolFull`
-	@Published var chainContext: WalletContext.V0ChainContext? = nil
+	@Published var walletContext: WalletContext? = nil
 	
 	@Published var notificationPermissions = NotificationsManager.shared.permissions.value
 	@Published var bgRefreshStatus = NotificationsManager.shared.backgroundRefreshStatus.value
@@ -54,9 +54,9 @@ class NoticeMonitor: ObservableObject {
 			}
 			.store(in: &cancellables)
 		
-		Biz.business.appConfigurationManager.chainContextPublisher()
-			.sink {[weak self](context: WalletContext.V0ChainContext) in
-				self?.chainContext = context
+		Biz.business.appConfigurationManager.walletContextPublisher()
+			.sink {[weak self](context: WalletContext) in
+				self?.walletContext = context
 			}
 			.store(in: &cancellables)
 		
@@ -91,7 +91,7 @@ class NoticeMonitor: ObservableObject {
 	}
 	
 	var hasNotice_mempoolFull: Bool {
-		return chainContext?.mempool.v1.highUsage ?? false
+		return walletContext?.isMempoolFull ?? false
 	}
 	
 	var hasNotice_backgroundPayments: Bool {

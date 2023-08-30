@@ -77,18 +77,18 @@ extension PeerManager {
 extension AppConfigurationManager {
 	
 	fileprivate struct _Key {
-		static var chainContextPublisher = 0
+		static var walletContextPublisher = 0
 	}
 	
-	func chainContextPublisher() -> AnyPublisher<WalletContext.V0ChainContext, Never> {
+	func walletContextPublisher() -> AnyPublisher<WalletContext, Never> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.chainContextPublisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.walletContextPublisher) {
 			
 			// Transforming from Kotlin:
-			// `chainContext: StateFlow<WalletContext.V0.ChainContext?>`
+			// `walletContext: StateFlow<WalletContext?>`
 			//
-			KotlinCurrentValueSubject<WalletContext.V0ChainContext, WalletContext.V0ChainContext?>(
-				self.chainContext
+			KotlinCurrentValueSubject<WalletContext, WalletContext?>(
+				self.walletContext
 			)
 			.compactMap { $0 }
 			.eraseToAnyPublisher()

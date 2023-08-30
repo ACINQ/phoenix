@@ -103,13 +103,7 @@ class PeerManager(
 
             val walletParams = WalletParams(
                 trampolineNode = NodeParamsManager.trampolineNodeUri,
-                trampolineFees = listOf(
-                    TrampolineFees(
-                        feeBase = 4.sat,
-                        feeProportional = 4_000,
-                        cltvExpiryDelta = CltvExpiryDelta(576)
-                    )
-                ),
+                trampolineFees = defaultTrampolineFees,
                 invoiceDefaultRoutingFees = InvoiceDefaultRoutingFees(
                     feeBase = 1_000.msat,
                     feeProportional = 100,
@@ -165,6 +159,14 @@ class PeerManager(
             }
         }
     }
+
+    var defaultTrampolineFees: List<TrampolineFees> = listOf(
+        TrampolineFees(
+            feeBase = 4.sat,
+            feeProportional = 4_000,
+            cltvExpiryDelta = CltvExpiryDelta(576)
+        )
+    )
 
     suspend fun getPeer() = peerState.filterNotNull().first()
 
