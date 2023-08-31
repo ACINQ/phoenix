@@ -369,6 +369,7 @@
     <string name="paymentdetails_desc_keysend">Donation</string>
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>
     <string name="paymentdetails_desc_swapin">On-chain deposit</string>
+    <string name="paymentdetails_desc_identifier">Payment to %1$s</string>
 
     <string name="paymentdetails_edit_dialog_title">Add a custom description to this payment</string>
     <string name="paymentdetails_edit_dialog_input_label">Description</string>

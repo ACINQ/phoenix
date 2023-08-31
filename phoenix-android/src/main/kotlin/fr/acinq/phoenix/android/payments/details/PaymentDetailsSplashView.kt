@@ -105,7 +105,7 @@ fun PaymentDetailsSplashView(
             LnurlPayInfoView(data.payment as LightningOutgoingPayment, data.metadata.lnurl!!)
         }
         PaymentDescriptionView(data = data, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
-        PaymentDestinationView(payment = payment)
+        PaymentDestinationView(data = data)
         PaymentFeeView(payment = payment)
 
         data.payment.errorMessage()?.let { errorMessage ->
@@ -332,6 +332,13 @@ private fun LnurlPayInfoView(payment: LightningOutgoingPayment, metadata: LnurlP
             Text(text = metadata.pay.callback.host)
         }
     }
+    metadata.pay.metadata.lnid?.takeIf { it.isNotBlank() }?.let {
+        SplashLabelRow(label = stringResource(id = R.string.paymentdetails_lnurlpay_service)) {
+            SelectionContainer {
+                Text(text = metadata.pay.callback.host)
+            }
+        }
+    }
     metadata.successAction?.let {
         LnurlSuccessAction(payment = payment, action = it)
     }
@@ -450,8 +457,8 @@ private fun PaymentDescriptionView(
 }
 
 @Composable
-private fun PaymentDestinationView(payment: WalletPayment) {
-    when (payment) {
+private fun PaymentDestinationView(data: WalletPaymentInfo) {
+    when (val payment = data.payment) {
         is OnChainOutgoingPayment -> {
             Spacer(modifier = Modifier.height(8.dp))
             SplashLabelRow(label = stringResource(id = R.string.paymentdetails_destination_label), icon = R.drawable.ic_chain) {
@@ -463,6 +470,16 @@ private fun PaymentDestinationView(payment: WalletPayment) {
                             is SpliceCpfpOutgoingPayment -> stringResource(id = R.string.paymentdetails_destination_cpfp_value)
                         }
                     )
+                }
+            }
+        }
+        is LightningOutgoingPayment -> {
+            data.metadata.lnurl?.pay?.metadata?.lnid?.takeIf { it.isNotBlank() }?.let {lnid ->
+                Spacer(modifier = Modifier.height(8.dp))
+                SplashLabelRow(label = stringResource(id = R.string.paymentdetails_destination_label), icon = R.drawable.ic_zap) {
+                    SelectionContainer {
+                        Text(text = lnid)
+                    }
                 }
             }
         }
