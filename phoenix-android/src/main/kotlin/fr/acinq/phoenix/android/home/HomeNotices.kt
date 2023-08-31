@@ -64,7 +64,7 @@ fun NoticesButtonRow(
 
     val navController = navController
     val context = LocalContext.current
-    val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+
     val elementsCount = notices.size + notifications.size
 
     // clicking on a notice may execute the notice's action if there are no other messages. Otherwise, redirect to the notifications page.
@@ -80,16 +80,19 @@ fun NoticesButtonRow(
                 { openLink(context, "https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet") }
             }
             is Notice.NotificationPermission -> {
-                val isPermissionDenied = notificationPermission.status.isGranted
-                if (isPermissionDenied || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                    {
-                        context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.fromParts("package", context.packageName, null)
-                        })
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+                    val isPermissionDenied = notificationPermission.status.isGranted
+                    if (isPermissionDenied) {
+                        {
+                            context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                data = Uri.fromParts("package", context.packageName, null)
+                            })
+                        }
+                    } else {
+                        { notificationPermission.launchPermissionRequest() }
                     }
-                } else {
-                    { notificationPermission.launchPermissionRequest() }
-                }
+                } else null
             }
             is Notice.MempoolFull -> null
         }

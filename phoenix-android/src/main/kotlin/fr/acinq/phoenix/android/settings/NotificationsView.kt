@@ -164,39 +164,40 @@ private fun PermamentNotice(
             )
         }
         Notice.NotificationPermission -> {
-            val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
-            if (!notificationPermission.status.isGranted) {
-                val isPermissionDenied = notificationPermission.status.shouldShowRationale
-                val scope = rememberCoroutineScope()
-                val dismissState = rememberDismissState(
-                    confirmStateChange = {
-                        if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
-                            scope.launch {
-                                UserPrefs.saveShowNotificationPermissionReminder(context, false)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+                if (!notificationPermission.status.isGranted) {
+                    val isPermissionDenied = notificationPermission.status.shouldShowRationale
+                    val dismissState = rememberDismissState(
+                        confirmStateChange = {
+                            if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
+                                scope.launch {
+                                    UserPrefs.saveShowNotificationPermissionReminder(context, false)
+                                }
                             }
-                        }
-                        true
-                    }
-                )
-                SwipeToDismiss(
-                    state = dismissState,
-                    background = {},
-                    dismissThresholds = { FractionalThreshold(0.8f) },
-                ) {
-                    ImportantNotification(
-                        icon = R.drawable.ic_notification,
-                        message = stringResource(id = R.string.inappnotif_notification_permission_message),
-                        actionText = stringResource(id = R.string.inappnotif_notification_permission_enable),
-                        onActionClick = {
-                            if (isPermissionDenied || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                                context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                    data = Uri.fromParts("package", context.packageName, null)
-                                })
-                            } else {
-                                notificationPermission.launchPermissionRequest()
-                            }
+                            true
                         }
                     )
+                    SwipeToDismiss(
+                        state = dismissState,
+                        background = {},
+                        dismissThresholds = { FractionalThreshold(0.8f) },
+                    ) {
+                        ImportantNotification(
+                            icon = R.drawable.ic_notification,
+                            message = stringResource(id = R.string.inappnotif_notification_permission_message),
+                            actionText = stringResource(id = R.string.inappnotif_notification_permission_enable),
+                            onActionClick = {
+                                if (isPermissionDenied) {
+                                    context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                        data = Uri.fromParts("package", context.packageName, null)
+                                    })
+                                } else {
+                                    notificationPermission.launchPermissionRequest()
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
