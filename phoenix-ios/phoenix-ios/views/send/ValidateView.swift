@@ -813,6 +813,15 @@ struct ValidateView: View {
 		return nil
 	}
 	
+	func defaultTrampolineFees() -> Lightning_kmpTrampolineFees? {
+		
+		guard let peer = Biz.business.peerManager.peerStateValue() else {
+			return nil
+		}
+		
+		return peer.walletParams.trampolineFees.first
+	}
+	
 	func paymentNumbers() -> PaymentNumbers? {
 		
 		guard let recipientAmountMsat = parsedAmountMsat() else {
@@ -831,7 +840,7 @@ struct ValidateView: View {
 		let lightningFeeMsat: Int64
 		if mvi.model is Scan.Model_OnChainFlow {
 			lightningFeeMsat = 0
-		} else if let trampolineFees = Biz.business.peerManager.defaultTrampolineFees.first {
+		} else if let trampolineFees = defaultTrampolineFees() {
 			let p1 = Utils.toMsat(sat: trampolineFees.feeBase)
 			let f2 = Double(trampolineFees.feeProportional) / 1_000_000
 			let p2 = Int64(Double(recipientAmountMsat) * f2)
@@ -1441,7 +1450,7 @@ struct ValidateView: View {
 		
 		guard
 			let msat = parsedAmountMsat(),
-			let trampolineFees = Biz.business.peerManager.defaultTrampolineFees.first
+			let trampolineFees = defaultTrampolineFees()
 		else {
 			return
 		}
