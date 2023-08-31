@@ -24,5 +24,7 @@
 
     <string name="inappnotif_migration_from_legacy">Gratulujeme! Vaše peněženka byla aktualizována.</string>
     <string name="inappnotif_migration_from_legacy_action">Podívejte se na změny</string>
+    <string name="inappnotif_migration_from_legacy_dialog_title">Vaše adresa v řetězci Bitcoin se změnila</string>
+    <string name="inappnotif_migration_from_legacy_dialog_body">Nepoužívejte znovu své staré adresy! Nebudou již fungovat.\n\nKontaktujte podporu, pokud jste tak náhodou učinili.</string>
 
 </resources>

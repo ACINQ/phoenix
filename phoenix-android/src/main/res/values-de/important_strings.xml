@@ -111,6 +111,8 @@
 
     <string name="inappnotif_migration_from_legacy">Glückwunsch! Ihre Wallet wurde aktualisiert.</string>
     <string name="inappnotif_migration_from_legacy_action">Änderungen einsehen</string>
+    <string name="inappnotif_migration_from_legacy_dialog_title">Ihre On-Chain Bitcoin-Adresse hat sich geändert</string>
+    <string name="inappnotif_migration_from_legacy_dialog_body">Verwenden Sie Ihre alten Adressen NICHT wieder! Sie werden nicht mehr funktionieren.\n\nKontaktieren Sie den Support, wenn Sie dies versehentlich getan haben.</string>
 	
 	<string name="inappnotif_backup_seed_message">Erstellen Sie ein Backup Ihrer Wallet, um keine Bitcoins zu verlieren.</string>
     <string name="inappnotif_backup_seed_action">Wallet-Backup erstellen</string>

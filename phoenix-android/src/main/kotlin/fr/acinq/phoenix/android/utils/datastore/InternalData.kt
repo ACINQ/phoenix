@@ -56,10 +56,15 @@ object InternalData {
     // -- Whether a seed backup warning should be displayed - computed from SEED_MANUAL_BACKUP_DONE & SEED_LOSS_DISCLAIMER_READ
     fun showSeedBackupNotice(context: Context) = prefs(context).map { it[SEED_MANUAL_BACKUP_DONE] != true || it[SEED_LOSS_DISCLAIMER_READ] != true }
 
-    // -- Show a message when the migration has been done.
+    // -- Show a notice when the migration has been done.
     private val LEGACY_MIGRATION_MESSSAGE_SHOWN = booleanPreferencesKey("LEGACY_MIGRATION_MESSSAGE_SHOWN")
     fun getLegacyMigrationMessageShown(context: Context): Flow<Boolean> = prefs(context).map { it[LEGACY_MIGRATION_MESSSAGE_SHOWN] ?: false }
     suspend fun saveLegacyMigrationMessageShown(context: Context, isShown: Boolean) = context.internalData.edit { it[LEGACY_MIGRATION_MESSSAGE_SHOWN] = isShown }
+
+    // -- Show a dialog about the swap-in address change when the migration has been done.
+    private val LEGACY_MIGRATION_ADDRESS_WARNING_SHOWN = booleanPreferencesKey("LEGACY_MIGRATION_ADDRESS_WARNING_SHOWN")
+    fun getLegacyMigrationAddressWarningShown(context: Context): Flow<Boolean> = prefs(context).map { it[LEGACY_MIGRATION_ADDRESS_WARNING_SHOWN] ?: false }
+    suspend fun saveLegacyMigrationAddressWarningShown(context: Context, isShown: Boolean) = context.internalData.edit { it[LEGACY_MIGRATION_ADDRESS_WARNING_SHOWN] = isShown }
 
     // -- Show introduction screen at startup. True by default.
     private val SHOW_INTRO = booleanPreferencesKey("SHOW_INTRO")
