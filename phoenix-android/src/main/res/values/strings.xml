@@ -342,6 +342,14 @@
     <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d confirmation(s)</string>
     <string name="paymentdetails_status_confirmed">Confirmed on-chain</string>
 
+    <string name="paymentdetails_lnurlpay_service">Serviced by</string>
+    <string name="paymentdetails_lnurlpay_action_message_label">Message</string>
+    <string name="paymentdetails_lnurlpay_action_url_label">Link</string>
+    <string name="paymentdetails_lnurlpay_action_url_button">Open link</string>
+    <string name="paymentdetails_lnurlpay_action_aes_label">Message</string>
+    <string name="paymentdetails_lnurlpay_action_aes_decrypting">Decrypting message…</string>
+    <string name="paymentdetails_lnurlpay_action_aes_not_paid">Payment must be paid to decrypt the message.</string>
+
     <string name="paymentdetails_desc_label">Desc.</string>
     <string name="paymentdetails_desc_custom_title">Add note</string>
     <string name="paymentdetails_desc_custom_info">You can attach a note to this payment.</string>

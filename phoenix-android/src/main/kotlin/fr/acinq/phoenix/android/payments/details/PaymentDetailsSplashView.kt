@@ -23,6 +23,7 @@ import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -52,17 +53,22 @@ import fr.acinq.phoenix.android.payments.cpfp.CpfpView
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
+import fr.acinq.phoenix.data.LnurlPayMetadata
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.errorMessage
 import fr.acinq.phoenix.utils.extensions.minDepthForFunding
 import fr.acinq.phoenix.utils.extensions.state
+import io.ktor.http.Url
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 @Composable
 fun PaymentDetailsSplashView(
@@ -95,6 +101,9 @@ fun PaymentDetailsSplashView(
         )
         Spacer(modifier = Modifier.height(36.dp))
 
+        if (data.payment is LightningOutgoingPayment && data.metadata.lnurl != null) {
+            LnurlPayInfoView(data.payment as LightningOutgoingPayment, data.metadata.lnurl!!)
+        }
         PaymentDescriptionView(data = data, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
         PaymentDestinationView(payment = payment)
         PaymentFeeView(payment = payment)
@@ -268,7 +277,7 @@ private fun PaymentStatus(
                 val channelMinDepth by produceState<Int?>(initialValue = null, key1 = Unit) {
                     nodeParams?.let { params ->
                         val channelId = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.OnChainIncomingPayment>()?.firstOrNull()?.channelId
-                        channelId?.let { peerManager.getChannelWithCommitments(it)?.minDepthForFunding(params) }
+                        value = channelId?.let { peerManager.getChannelWithCommitments(it)?.minDepthForFunding(params) }
                     }
                 }
                 ConfirmationView(it.txId, it.channelId, isConfirmed = it.confirmedAt != null, onCpfpSuccess, channelMinDepth)
@@ -317,15 +326,77 @@ private fun PaymentStatusIcon(
 }
 
 @Composable
+private fun LnurlPayInfoView(payment: LightningOutgoingPayment, metadata: LnurlPayMetadata) {
+    SplashLabelRow(label = stringResource(id = R.string.paymentdetails_lnurlpay_service)) {
+        SelectionContainer {
+            Text(text = metadata.pay.callback.host)
+        }
+    }
+    metadata.successAction?.let {
+        LnurlSuccessAction(payment = payment, action = it)
+    }
+}
+
+@Composable
+private fun LnurlSuccessAction(payment: LightningOutgoingPayment, action: LnurlPay.Invoice.SuccessAction) {
+    when (action) {
+        is LnurlPay.Invoice.SuccessAction.Message -> {
+            SplashLabelRow(label = stringResource(id = R.string.paymentdetails_lnurlpay_action_message_label)) {
+                SelectionContainer {
+                    Text(text = action.message)
+                }
+            }
+        }
+        is LnurlPay.Invoice.SuccessAction.Url -> {
+            SplashLabelRow(label = stringResource(id = R.string.paymentdetails_lnurlpay_action_url_label)) {
+                Text(text = action.description)
+                WebLink(text = stringResource(id = R.string.paymentdetails_lnurlpay_action_url_button), url = action.url.toString())
+            }
+        }
+        is LnurlPay.Invoice.SuccessAction.Aes -> {
+            SplashLabelRow(label = stringResource(id = R.string.paymentdetails_lnurlpay_action_aes_label)) {
+                val status = payment.status
+                if (status is LightningOutgoingPayment.Status.Completed.Succeeded.OffChain) {
+                    val deciphered by produceState<String?>(initialValue = null) {
+                        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+                        cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(status.preimage.toByteArray(), "AES"), IvParameterSpec(action.iv.toByteArray()))
+                        value = String(cipher.doFinal(action.ciphertext.toByteArray()), Charsets.UTF_8)
+                    }
+                    Text(text = action.description)
+                    when (deciphered) {
+                        null -> ProgressView(text = stringResource(id = R.string.paymentdetails_lnurlpay_action_aes_decrypting), padding = PaddingValues(0.dp))
+                        else -> {
+                            val url = try {
+                                Url(deciphered!!)
+                            } catch (e: Exception) {
+                                null
+                            }
+                            if (url != null) {
+                                WebLink(text = stringResource(id = R.string.paymentdetails_lnurlpay_action_url_button), url = url.toString())
+                            } else {
+                                SelectionContainer {
+                                    Text(text = deciphered!!)
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Text(text = stringResource(id = R.string.paymentdetails_lnurlpay_action_aes_decrypting))
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun PaymentDescriptionView(
     data: WalletPaymentInfo,
     onMetadataDescriptionUpdate: (WalletPaymentId, String?) -> Unit,
-
 ) {
     var showEditDescriptionDialog by remember { mutableStateOf(false) }
 
     val peer by business.peerManager.peerState.collectAsState()
-    val paymentDesc = data.payment.smartDescription(LocalContext.current)
+    val paymentDesc = data.metadata.lnurl?.description ?: data.payment.smartDescription(LocalContext.current)
     val customDesc = remember(data) { data.metadata.userDescription?.takeIf { it.isNotBlank() } }
     SplashLabelRow(label = stringResource(id = R.string.paymentdetails_desc_label)) {
         val isLegacyMigration = data.isLegacyMigration(peer)
@@ -384,13 +455,15 @@ private fun PaymentDestinationView(payment: WalletPayment) {
         is OnChainOutgoingPayment -> {
             Spacer(modifier = Modifier.height(8.dp))
             SplashLabelRow(label = stringResource(id = R.string.paymentdetails_destination_label), icon = R.drawable.ic_chain) {
-                Text(
-                    text = when (payment) {
-                        is SpliceOutgoingPayment -> payment.address
-                        is ChannelCloseOutgoingPayment -> payment.address
-                        is SpliceCpfpOutgoingPayment -> stringResource(id = R.string.paymentdetails_destination_cpfp_value)
-                    }
-                )
+                SelectionContainer {
+                    Text(
+                        text = when (payment) {
+                            is SpliceOutgoingPayment -> payment.address
+                            is ChannelCloseOutgoingPayment -> payment.address
+                            is SpliceCpfpOutgoingPayment -> stringResource(id = R.string.paymentdetails_destination_cpfp_value)
+                        }
+                    )
+                }
             }
         }
         else -> Unit

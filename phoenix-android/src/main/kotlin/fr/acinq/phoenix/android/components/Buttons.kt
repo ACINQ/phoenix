@@ -370,11 +370,11 @@ fun Clickable(
 fun WebLink(
     text: String,
     url: String,
+    modifier: Modifier = Modifier,
     fontSize: TextUnit = MaterialTheme.typography.body1.fontSize,
     iconSize: Dp = ButtonDefaults.IconSize,
     space: Dp = 8.dp,
     maxLines: Int = Int.MAX_VALUE,
-    modifier: Modifier = Modifier,
     onClickLabel: String = stringResource(id = R.string.accessibility_link),
 ) {
     val context = LocalContext.current
