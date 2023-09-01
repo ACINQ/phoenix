@@ -279,14 +279,16 @@ private fun LightningInvoiceView(
         onMessageClick = { navController.navigate(Screen.LiquidityPolicy.route) },
     )
 
-    Spacer(modifier = Modifier.height(16.dp))
-    HSeparator(width = 50.dp)
-    Spacer(modifier = Modifier.height(24.dp))
-    BorderButton(
-        text = stringResource(id = R.string.receive_lnurl_button),
-        icon = R.drawable.ic_scan,
-        onClick = { navController.navigate(Screen.ScanData.route) },
-    )
+    if ((state is ReceiveViewModel.LightningInvoiceState.Init || state is ReceiveViewModel.LightningInvoiceState.Show) && !isEditing) {
+        Spacer(modifier = Modifier.height(16.dp))
+        HSeparator(width = 50.dp)
+        Spacer(modifier = Modifier.height(24.dp))
+        BorderButton(
+            text = stringResource(id = R.string.receive_lnurl_button),
+            icon = R.drawable.ic_scan,
+            onClick = { navController.navigate(Screen.ScanData.route) },
+        )
+    }
 }
 
 @Composable
