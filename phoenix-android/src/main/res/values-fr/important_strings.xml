@@ -107,6 +107,9 @@
     <string name="receive_lightning_warning_fee_within_policy">Des frais de %1$s (≈ %2$s) pourraient être nécessaire pour recevoir ce paiement.\nCliquez pour configurer.</string>
     <string name="receive_lightning_warning_fee_exceeds_policy">Ces frais vont probablement excéder le max configuré dans vos préférences (%1$s).\nCliquez pour configurer.</string>
 
+    <string name="receive_onchain_legacy_warning_title">Note suite à la migration</string>
+    <string name="receive_onchain_legacy_warning">Il s\'agit de votre nouvelle adresse. Ne réutilisez pas vos anciennes adresses Bitcoin d\'avant la migration !</string>
+
     <!-- scanning errors -->
 
     <string name="scan_error_expired">Cette requête a expiré.</string>

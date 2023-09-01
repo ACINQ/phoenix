@@ -102,6 +102,9 @@
     <string name="receive_lightning_warning_fee_within_policy">Puede ser necesaria una tasa de %1$s (≈ %2$s) para recibir este pago.\nPuntee para configurarlo.</string>
     <string name="receive_lightning_warning_fee_exceeds_policy">La tasa será probablemente superior a su límite máximo (%1$s).\nPuntee para configurarlo.</string>
 
+    <string name="receive_onchain_legacy_warning_title">Aviso de migración</string>
+    <string name="receive_onchain_legacy_warning">Esta es su nueva dirección. No reutilice sus antiguas direcciones Bitcoin anteriores a la migración.</string>
+
     <!-- scanning errors -->
 
     <string name="scan_error_expired">Esta factura ha caducado.</string>

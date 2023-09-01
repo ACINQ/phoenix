@@ -107,6 +107,9 @@
     <string name="receive_lightning_warning_fee_within_policy">K přijetí této platby může být vyžadován poplatek ve výši %1$s (≈ %2$s).\nKlepnutím na položku nakonfigurujete.</string>
     <string name="receive_lightning_warning_fee_exceeds_policy">Poplatek bude pravděpodobně vyšší než váš maximální limit (%1$s)..\nKlepnutím na položku nakonfigurujete</string>
 
+    <string name="receive_onchain_legacy_warning_title">Oznámení o migraci</string>
+    <string name="receive_onchain_legacy_warning">Toto je vaše nová adresa. Nepoužívejte znovu své staré adresy Bitcoin z doby před migrací!</string>
+
     <!-- scanning errors -->
 
     <string name="scan_error_expired">Platnost této faktury vypršela.</string>

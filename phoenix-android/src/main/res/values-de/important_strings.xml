@@ -100,7 +100,10 @@
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Eingangskapazität ist unzureichend und automatisches Kanal-Management ist deaktiviert.\nTippen, um dies zu konfigurieren.</string>
     <string name="receive_lightning_warning_fee_within_policy">Eine Gebühr über %1$s (≈ %2$s) kann erforderlich sein, um diese Zahlung zu empfangen.\nTippen, um dies zu konfigurieren.</string>
     <string name="receive_lightning_warning_fee_exceeds_policy">Die Gebühr wird wahrscheinlich Ihr Limit übersteigen (%1$s).\nTippen, um dies zu konfigurieren.</string>
-	
+
+    <string name="receive_onchain_legacy_warning_title">Hinweis zur Migration</string>
+    <string name="receive_onchain_legacy_warning">Dies ist Ihre neue Adresse. Verwenden Sie Ihre alten Bitcoin-Adressen von vor der Migration nicht wieder!</string>
+
 	<!-- scanning errors -->
 
     <string name="scan_error_expired">Die Rechnung ist abgelaufen.</string>

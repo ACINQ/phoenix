@@ -107,6 +107,9 @@
     <string name="receive_lightning_warning_fee_within_policy">A %1$s (≈ %2$s) fee may be needed to receive this payment.\nTap to configure.</string>
     <string name="receive_lightning_warning_fee_exceeds_policy">The fee will probably be above your max limit (%1$s).\nTap to configure.</string>
 
+    <string name="receive_onchain_legacy_warning_title">Migration notice</string>
+    <string name="receive_onchain_legacy_warning">This is your new address. Do not reuse your old Bitcoin addresses from before migration!</string>
+
     <!-- scanning errors -->
 
     <string name="scan_error_expired">This invoice is expired.</string>
