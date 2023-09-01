@@ -20,13 +20,18 @@ import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.Feature
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.io.WrappedChannelCommand
+import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sum
+import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.isBeingCreated
+import fr.acinq.phoenix.utils.extensions.localBalance
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -52,6 +57,29 @@ object IosMigrationHelper {
         return this is ChannelStateWithCommitments
             && this !is ShuttingDown && this !is Negotiating && this !is Closing && this !is Closed && this !is Aborted
             && !this.commitments.params.channelFeatures.hasFeature(Feature.DualFunding)
+    }
+
+    /**
+     * There may be certain "costs" associated with closing a channel:
+     * - if the channel balance is below the dust limit, then the funds go to the miners
+     * - the channel balance automatically gets truncated from millisatoshis to satoshis
+     *   (e.g. 12,345.678 sats => 12,345 sats), so a few msats may be dropped
+     */
+    fun migrationCosts(channels: List<LocalChannelInfo>): MilliSatoshi {
+        return channels.filter { channel ->
+            when (val state = channel.state) {
+                is Offline -> state.state.isLegacy()
+                is Syncing -> state.state.isLegacy()
+                else -> state.isLegacy()
+            }
+        }.map {
+            val balance = it.localBalance ?: 0.msat
+            if (balance < 546_000.msat) {
+                balance
+            } else {
+                balance - balance.truncateToSatoshi().toMilliSatoshi()
+            }
+        }.sum()
     }
 
     suspend fun doMigrateChannels(
