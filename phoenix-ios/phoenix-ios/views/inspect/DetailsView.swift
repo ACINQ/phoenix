@@ -48,29 +48,7 @@ struct DetailsView: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			if case .sheet(let closeAction) = type {
-				HStack(alignment: VerticalAlignment.center, spacing: 0) {
-					Button {
-						presentationMode.wrappedValue.dismiss()
-					} label: {
-						Image(systemName: "chevron.backward")
-							.imageScale(.medium)
-							.font(.title3.weight(.semibold))
-					}
-					Spacer()
-					Button {
-						closeAction()
-					} label: {
-						Image(systemName: "xmark")
-							.imageScale(.medium)
-							.font(.title3)
-					}
-				} // </VStack>
-				.padding()
-				
-			} else {
-				Spacer().frame(height: 25)
-			}
+			header()
 				
 			DetailsInfoGrid(
 				paymentInfo: $paymentInfo,
@@ -79,6 +57,34 @@ struct DetailsView: View {
 			)
 		}
 		.background(Color.primaryBackground)
+	}
+	
+	@ViewBuilder
+	func header() -> some View {
+		
+		if case .sheet(let closeAction) = type {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Button {
+					presentationMode.wrappedValue.dismiss()
+				} label: {
+					Image(systemName: "chevron.backward")
+						.imageScale(.medium)
+						.font(.title3.weight(.semibold))
+				}
+				Spacer()
+				Button {
+					closeAction()
+				} label: {
+					Image(systemName: "xmark")
+						.imageScale(.medium)
+						.font(.title3)
+				}
+			} // </VStack>
+			.padding()
+			
+		} else {
+			Spacer().frame(height: 25)
+		}
 	}
 }
 
@@ -1656,7 +1662,7 @@ fileprivate struct InlineSection<Header: View, Content: View>: View {
 			.padding(.vertical, 10)
 			.padding(.horizontal, 16)
 			.background {
-				Color.white.cornerRadius(10)
+				Color(UIColor.secondarySystemGroupedBackground).cornerRadius(10)
 			}
 			.padding(.horizontal, 16)
 		}

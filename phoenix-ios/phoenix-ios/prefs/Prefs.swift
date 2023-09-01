@@ -20,7 +20,6 @@ fileprivate enum Key: String {
 	case isNewWallet
 	case invoiceExpirationDays
 	case liquidityPolicy
-	case maxFees
 	case hideAmounts = "hideAmountsOnHomeScreen"
 	case showOriginalFiatAmount
 	case recentPaymentsConfig
@@ -29,6 +28,7 @@ fileprivate enum Key: String {
 
 fileprivate enum KeyDeprecated: String {
 	case recentPaymentSeconds
+	case maxFees
 }
 
 /// Standard app preferences, stored in the iOS UserDefaults system.
@@ -103,20 +103,6 @@ class Prefs {
 	var liquidityPolicy: LiquidityPolicy {
 		get { defaults.liquidityPolicy?.jsonDecode() ?? LiquidityPolicy.defaultPolicy() }
 		set { defaults.liquidityPolicy = newValue.jsonEncode() }
-	}
-	
-	lazy private(set) var maxFeesPublisher: AnyPublisher<MaxFees?, Never> = {
-		defaults.publisher(for: \.maxFees, options: [.initial, .new])
-			.map({ (data: Data?) -> MaxFees? in
-				data?.jsonDecode()
-			})
-			.removeDuplicates()
-			.eraseToAnyPublisher()
-	}()
-	
-	var maxFees: MaxFees? {
-		get { defaults.maxFees?.jsonDecode() }
-		set { defaults.maxFees = newValue?.jsonEncode() }
 	}
 	
 	var hideAmounts: Bool {
@@ -273,7 +259,6 @@ class Prefs {
 		defaults.removeObject(forKey: Key.isNewWallet.rawValue)
 		defaults.removeObject(forKey: Key.invoiceExpirationDays.rawValue)
 		defaults.removeObject(forKey: Key.liquidityPolicy.rawValue)
-		defaults.removeObject(forKey: Key.maxFees.rawValue)
 		defaults.removeObject(forKey: Key.hideAmounts.rawValue)
 		defaults.removeObject(forKey: Key.showOriginalFiatAmount.rawValue)
 		defaults.removeObject(forKey: Key.recentPaymentsConfig.rawValue)
@@ -309,11 +294,6 @@ extension UserDefaults {
 	@objc fileprivate var liquidityPolicy: Data? {
 		get { data(forKey: Key.liquidityPolicy.rawValue) }
 		set { set(newValue, forKey: Key.liquidityPolicy.rawValue) }
-	}
-
-	@objc fileprivate var maxFees: Data? {
-		get { data(forKey: Key.maxFees.rawValue) }
-		set { set(newValue, forKey: Key.maxFees.rawValue) }
 	}
 
 	@objc fileprivate var hideAmounts: Bool {

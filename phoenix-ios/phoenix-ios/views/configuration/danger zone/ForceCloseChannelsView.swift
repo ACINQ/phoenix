@@ -97,7 +97,7 @@ struct ForceCloseChannelsView : MVIView {
 				
 				Text("Force close allows you to unilaterally close your channels.")
 				
-				Text(styled: NSLocalizedString(
+				Text(
 					"""
 					This feature is not a "fix everything magic button". \
 					It is here as a safety measure and \
@@ -105,18 +105,16 @@ struct ForceCloseChannelsView : MVIView {
 					For example, if your peer (ACINQ) disappears permanently, \
 					preventing you from spending your money. In all other cases, \
 					**if you experience issues with Phoenix you should contact support**.
-					""",
-					comment: "ForceCloseChannelsView"
-				))
+					"""
+				)
 				
-				Text(styled: NSLocalizedString(
+				Text(
 					"""
 					Force closing channels will cost you money (to cover the on-chain fees) \
 					and will cause your funds to be locked for days. \
 					**Do not uninstall the app until your channels are fully closed or you will lose money.**
-					""",
-					comment: "ForceCloseChannelsView"
-				))
+					"""
+				)
 				
 				Text("Do not use this feature if you don't fully understand what it does.")
 					.bold()
@@ -207,19 +205,15 @@ struct ForceCloseChannelsView : MVIView {
 					.padding(.bottom, 30)
 
 				let expectedTxCount = nonZeroChannelsCount()
-				let msg = (expectedTxCount > 1)
-					? String(format: NSLocalizedString(
-						"Expect to receive %d separate payments.",
-						comment:	"label text"
-					), expectedTxCount)
-					: NSLocalizedString(
-						"The closing transaction is in your transactions list.",
-						comment: "label text"
-					)
-					
-				Text(styled: msg)
-					.multilineTextAlignment(.leading)
-					.fixedSize(horizontal: false, vertical: true) // Workaround for SwiftUI bugs
+				Group {
+					if expectedTxCount > 1 {
+						Text("Expect to receive \(expectedTxCount) separate payments.")
+					} else {
+						Text("The closing transaction is in your transactions list.")
+					}
+				}
+				.multilineTextAlignment(.leading)
+				.fixedSize(horizontal: false, vertical: true) // Workaround for SwiftUI bugs
 
 			} // </VStack>
 			.padding(.vertical, 8)

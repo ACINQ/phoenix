@@ -135,6 +135,10 @@ class DeviceInfo: ObservableObject {
 	/// Used to limit the width of text-heavy content on iPad.
 	///
 	var textColumnMaxWidth: CGFloat {
+		return DeviceInfo.textColumnMaxWidth
+	}
+	
+	static var textColumnMaxWidth: CGFloat {
 		return 500
 	}
 }

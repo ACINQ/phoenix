@@ -135,25 +135,6 @@ struct LiquidityPolicy: Equatable, Codable {
 	}
 }
 
-struct MaxFees: Equatable, Codable {
-	let feeBaseSat: Int64
-	let feeProportionalMillionths: Int64
-	
-	static func fromTrampolineFees(_ fees: Lightning_kmpTrampolineFees) -> MaxFees {
-		return MaxFees(
-			feeBaseSat: fees.feeBase.sat,
-			feeProportionalMillionths: fees.feeProportional
-		)
-	}
-	
-	func toKotlin() -> PhoenixShared.MaxFees {
-		return PhoenixShared.MaxFees(
-			feeBase: Bitcoin_kmpSatoshi(sat: self.feeBaseSat),
-			feeProportionalMillionths: self.feeProportionalMillionths
-		)
-	}
-}
-
 enum RecentPaymentsConfig: Equatable, Codable, Identifiable {
 	case withinTime(seconds: Int)
 	case mostRecent(count: Int)

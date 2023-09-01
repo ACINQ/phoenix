@@ -138,13 +138,12 @@ struct LiquidityPolicyView: View {
 		
 		Section {
 			
-			Text(styled: NSLocalizedString(
+			Text(
 				"""
 				Incoming payments sometimes require on-chain transactions. \
 				This does not always happen, only when needed.
-				""",
-				comment: "liquidity policy screen"
-			))
+				"""
+			)
 		}
 	}
 	
@@ -175,10 +174,7 @@ struct LiquidityPolicyView: View {
 				let btcAmt = Utils.formatBitcoin(currencyPrefs, sat: sat)
 				let fiatAmt = Utils.formatFiat(currencyPrefs, sat: sat)
 				
-				Text(styled: String(format: NSLocalizedString(
-					"Fees are currently estimated at around **%@** (≈ %@).",
-					comment:	"Fee estimate"
-				), btcAmt.string, fiatAmt.string))
+				Text("Fees are currently estimated at around **\(btcAmt.string)** (≈ \(fiatAmt.string)).")
 			}
 			
 		} /* Section.*/header: {

@@ -124,41 +124,14 @@ struct PaymentsBackupView: View {
 	@ViewBuilder
 	func cellularDataOption() -> some View {
 		
-		// alignmentGuide explanation:
-		//
-		// The Toggle wants to vertically align its switch in the center of the body:
-		//
-		// |body| |switch|
-		//
-		// This works good when the body is a single line.
-		// But with multiple lines it looks like:
-		//
-		// |line1|
-		// |line2| |switch|
-		// |line3|
-		//
-		// This isn't what we want.
-		// So we use a custom VerticalAlignment to achieve our desired result.
-		//
-		// Here's how it works:
-		// - The toggle queries its body for the VerticalAlignment.center value
-		// - Our body is our Label
-		// - So in `Step A` below, we override the Label's VerticalAlignment.center value to
-		//   return instead the VerticalAlignment.centerTopLine value
-		// - And in `Step B` below, we provide the value for VerticalAlignment.centerTopLine.
-		//
-		// A good resource on alignment guides can be found here:
-		// https://swiftui-lab.com/alignment-guides/
-		
-		Toggle(isOn: $backupTransactions_useCellularData) {
+		HStack(alignment: VerticalAlignment.centerTopLine) { // <- Custom VerticalAlignment
+			
 			Label {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-						Text("Use cellular data")
-					}
-					.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
-						d[VerticalAlignment.center] // Step B
-					}
+					Text("Use cellular data")
+						.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
+							d[VerticalAlignment.center]
+						}
 					
 					let explanation = backupTransactions_useCellularData ?
 						NSLocalizedString(
@@ -174,29 +147,37 @@ struct PaymentsBackupView: View {
 						.lineLimit(nil) // text is getting truncated for some reason
 						.font(.callout)
 						.foregroundColor(Color.secondary)
-				}
+				} // </VStack>
 			} icon: {
 				Image(systemName: "network")
 					.renderingMode(.template)
 					.imageScale(.medium)
 					.foregroundColor(Color.appAccent)
 			} // </Label>
-			.alignmentGuide(VerticalAlignment.center) { d in
-				d[VerticalAlignment.centerTopLine] // Step A
-			}
-		} // </Toggle>
+			
+			Spacer()
+			
+			Toggle("", isOn: $backupTransactions_useCellularData)
+				.labelsHidden()
+				.padding(.trailing, 2)
+				.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
+					d[VerticalAlignment.center]
+				}
+			
+		} // </HStack>
 	}
 	
 	@ViewBuilder
 	func uploadDelaysOption() -> some View {
 		
-		Toggle(isOn: $backupTransactions_useUploadDelay) {
+		HStack(alignment: VerticalAlignment.centerTopLine) { // <- Custom VerticalAlignment
+			
 			Label {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
 					Text("Randomize upload delays")
-					.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
-						d[VerticalAlignment.center]
-					}
+						.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
+							d[explicit: VerticalAlignment.center] ?? d[VerticalAlignment.center]
+						}
 					
 					let explanation = backupTransactions_useUploadDelay ?
 						NSLocalizedString(
@@ -213,17 +194,27 @@ struct PaymentsBackupView: View {
 						.font(.callout)
 						.foregroundColor(Color.secondary)
 						
-				}
+				} // </VStack>
 			} icon: {
 				Image(systemName: "timer")
 					.renderingMode(.template)
 					.imageScale(.medium)
 					.foregroundColor(Color.appAccent)
-			}
-			.alignmentGuide(VerticalAlignment.center) { d in
-				d[VerticalAlignment.centerTopLine]
-			}
-		}
+					.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
+						d[VerticalAlignment.center]
+					}
+			} // </Label>
+			
+			Spacer()
+			
+			Toggle("", isOn: $backupTransactions_useUploadDelay)
+				.labelsHidden()
+				.padding(.trailing, 2)
+				.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
+					d[VerticalAlignment.center]
+				}
+			
+		} // </HStack>
 	}
 	
 	func didToggle_backupTransactions_enabled(_ flag: Bool) {

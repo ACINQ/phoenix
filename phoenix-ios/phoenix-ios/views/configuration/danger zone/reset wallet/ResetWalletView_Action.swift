@@ -30,15 +30,11 @@ struct ResetWalletView_Action: View {
 	@State private var deleteSeedState = DeleteState.waitingToStart
 	@State private var deleteLocalProgress = WalletReset.Progress.starting
 	
-	let syncTx_pendingSettingsPublisher = Biz.syncManager!.syncTxManager.pendingSettingsPublisher
-	let syncTx_statePublisher = Biz.syncManager!.syncTxManager.statePublisher
-	
-	let syncSeed_statePublisher = Biz.syncManager!.syncSeedManager.statePublisher
-	
-	let walletCloser_progressPublisher = WalletReset.shared.progress
-	
 	@State var visible = false
 	@State var didAppear = false
+	
+	@State var syncSeedManager = Biz.syncManager!.syncSeedManager
+	@State var syncTxManager = Biz.syncManager!.syncTxManager
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -48,8 +44,10 @@ struct ResetWalletView_Action: View {
 	var body: some View {
 		
 		ZStack {
-			Color.clear   // an additional layer
-				.zIndex(0) // for animation purposes
+			// An additional layer for animation purposes
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+				.zIndex(0)
 			
 			if visible {
 				navWrappedContent()
@@ -67,11 +65,38 @@ struct ResetWalletView_Action: View {
 		
 		NavigationWrapper {
 			content()
+				.navigationTitle(NSLocalizedString("Resetting Wallet", comment: "Navigation bar title"))
+				.navigationBarTitleDisplayMode(.inline)
 		}
 	}
 	
 	@ViewBuilder
 	func content() -> some View {
+		
+		ZStack {
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
+			// On iPad, the list looks goofy when full-screen.
+			list()
+				.frame(maxWidth: DeviceInfo.textColumnMaxWidth)
+		}
+		.onReceive(syncTxManager.pendingSettingsPublisher) {
+			syncTx_pendingSettingsChanged($0)
+		}
+		.onReceive(syncTxManager.statePublisher) {
+			syncTx_stateChanged($0)
+		}
+		.onReceive(syncSeedManager.statePublisher) {
+			syncSeed_stateChanged($0)
+		}
+		.onReceive(WalletReset.shared.progress) {
+			walletCloser_progressChanged($0)
+		}
+	}
+	
+	@ViewBuilder
+	func list() -> some View {
 		
 		List {
 			let showSteps = deleteTransactionHistory || deleteSeedBackup
@@ -99,20 +124,6 @@ struct ResetWalletView_Action: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.navigationTitle(NSLocalizedString("Resetting Wallet", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
-		.onReceive(syncTx_pendingSettingsPublisher) {
-			syncTx_pendingSettingsChanged($0)
-		}
-		.onReceive(syncTx_statePublisher) {
-			syncTx_stateChanged($0)
-		}
-		.onReceive(syncSeed_statePublisher) {
-			syncSeed_stateChanged($0)
-		}
-		.onReceive(walletCloser_progressPublisher) {
-			walletCloser_progressChanged($0)
-		}
 	}
 	
 	@ViewBuilder
@@ -121,12 +132,7 @@ struct ResetWalletView_Action: View {
 		Section {
 			
 			Label {
-				Text(styled: NSLocalizedString(
-					"""
-					Deleting **payment history** from iCloud
-					""",
-					comment: "ResetWalletView_Delete_Action"
-				))
+				Text("Deleting **payment history** from iCloud")
 			} icon: {
 				Image(systemName: "icloud.fill")
 			}
@@ -147,12 +153,7 @@ struct ResetWalletView_Action: View {
 		Section {
 			
 			Label {
-				Text(styled: NSLocalizedString(
-					"""
-					Deleting **recovery phrase** from iCloud
-					""",
-					comment: "ResetWalletView_Delete_Action"
-				))
+				Text("Deleting **recovery phrase** from iCloud")
 			} icon: {
 				Image(systemName: "icloud.fill")
 			}
@@ -233,12 +234,7 @@ struct ResetWalletView_Action: View {
 		Section {
 			
 			Label {
-				Text(styled: NSLocalizedString(
-					"""
-					Deleting data from **this device**
-					""",
-					comment: "ResetWalletView_Delete_Action"
-				))
+				Text("Deleting data from **this device**")
 			} icon: {
 				Image(systemName: "folder")
 			}
@@ -355,11 +351,11 @@ struct ResetWalletView_Action: View {
 			return
 		}
 		didAppear = true
-		
+
 		withAnimation {
 			visible = true
 		}
-		
+
 		DispatchQueue.main.asyncAfter(deadline: .now() + startDelay) {
 			action_next()
 		}

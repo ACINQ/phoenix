@@ -91,7 +91,6 @@
 		DC355E212A44D838008E8A8E /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E202A44D838008E8A8E /* NotificationsView.swift */; };
 		DC355E232A45FAF2008E8A8E /* NestedObservableObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E222A45FAF2008E8A8E /* NestedObservableObject.swift */; };
 		DC355E252A45FDD3008E8A8E /* NoticeMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E242A45FDD3008E8A8E /* NoticeMonitor.swift */; };
-		DC384D7F265BF36600131772 /* StyledString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D7E265BF36600131772 /* StyledString.swift */; };
 		DC384D81265C12B700131772 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D80265C12B700131772 /* Cache.swift */; };
 		DC384D83265C32F100131772 /* TextField+Verbatim.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D82265C32F100131772 /* TextField+Verbatim.swift */; };
 		DC39A2662A12C04D00F59E39 /* LiquidityPolicyHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC39A2652A12C04D00F59E39 /* LiquidityPolicyHelp.swift */; };
@@ -209,7 +208,6 @@
 		DCB0DBB1255AEE22005B29C8 /* PhoenixShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DCB30E522A0A948000E7D7A2 /* WalletInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB30E512A0A948000E7D7A2 /* WalletInfoView.swift */; };
 		DCB30E542A0AABAF00E7D7A2 /* InfoPopoverWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB30E532A0AABAF00E7D7A2 /* InfoPopoverWindow.swift */; };
-		DCB30E572A0C2FF900E7D7A2 /* MaxFeeConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB30E562A0C2FF900E7D7A2 /* MaxFeeConfiguration.swift */; };
 		DCB30E592A0C3F8200E7D7A2 /* LiquidityPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB30E582A0C3F8200E7D7A2 /* LiquidityPolicyView.swift */; };
 		DCB4108729028EF900CE4FF9 /* Prefs+BackupSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB4108629028EF900CE4FF9 /* Prefs+BackupSeed.swift */; };
 		DCB410892902D5BF00CE4FF9 /* PaymentsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB410882902D5BF00CE4FF9 /* PaymentsSection.swift */; };
@@ -437,7 +435,6 @@
 		DC355E222A45FAF2008E8A8E /* NestedObservableObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NestedObservableObject.swift; sourceTree = "<group>"; };
 		DC355E242A45FDD3008E8A8E /* NoticeMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeMonitor.swift; sourceTree = "<group>"; };
 		DC384D7C265BE41900131772 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = fr; path = fr.lproj/about.html; sourceTree = "<group>"; };
-		DC384D7E265BF36600131772 /* StyledString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyledString.swift; sourceTree = "<group>"; };
 		DC384D80265C12B700131772 /* Cache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		DC384D82265C32F100131772 /* TextField+Verbatim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextField+Verbatim.swift"; sourceTree = "<group>"; };
 		DC39A2652A12C04D00F59E39 /* LiquidityPolicyHelp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiquidityPolicyHelp.swift; sourceTree = "<group>"; };
@@ -535,7 +532,6 @@
 		DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PhoenixShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCB30E512A0A948000E7D7A2 /* WalletInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletInfoView.swift; sourceTree = "<group>"; };
 		DCB30E532A0AABAF00E7D7A2 /* InfoPopoverWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoPopoverWindow.swift; sourceTree = "<group>"; };
-		DCB30E562A0C2FF900E7D7A2 /* MaxFeeConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaxFeeConfiguration.swift; sourceTree = "<group>"; };
 		DCB30E582A0C3F8200E7D7A2 /* LiquidityPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityPolicyView.swift; sourceTree = "<group>"; };
 		DCB4108629028EF900CE4FF9 /* Prefs+BackupSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+BackupSeed.swift"; sourceTree = "<group>"; };
 		DCB410882902D5BF00CE4FF9 /* PaymentsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentsSection.swift; sourceTree = "<group>"; };
@@ -867,8 +863,6 @@
 				DC2DC8672906AC0B0079E570 /* BitcoinUnitSelector.swift */,
 				DC2CE54F28A52AD90070A2E1 /* RecentPaymentsConfig.swift */,
 				DCDAA73F2971C29700B406A8 /* RecentPaymentsSelector.swift */,
-				DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */,
-				DC63BDF829AEB8180067A361 /* BackgroundPaymentsSelector.swift */,
 			);
 			path = "display configuration";
 			sourceTree = "<group>";
@@ -926,7 +920,6 @@
 				DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */,
 				DC48D2C32593DE30008D138C /* TextFieldCurrencyStyler.swift */,
 				DC27E4D0279753EC00C777CC /* TextFieldNumberStyler.swift */,
-				DC384D7E265BF36600131772 /* StyledString.swift */,
 				DCD5FF4226A0D34B009CC666 /* EqualSizes.swift */,
 				DCCC7FD426B0A006008ACD9B /* SquareSize.swift */,
 				DCAEF8F4276131A600015993 /* CheckboxToggleStyle.swift */,
@@ -1150,7 +1143,8 @@
 			isa = PBXGroup;
 			children = (
 				DC0732EB263CA6C3004CB88D /* PaymentOptionsView.swift */,
-				DCB30E562A0C2FF900E7D7A2 /* MaxFeeConfiguration.swift */,
+				DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */,
+				DC63BDF829AEB8180067A361 /* BackgroundPaymentsSelector.swift */,
 			);
 			path = "payment options";
 			sourceTree = "<group>";
@@ -1628,7 +1622,6 @@
 				DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */,
 				DC0D2EA52939269800284608 /* KotlinExtensions+CloudKit.swift in Sources */,
 				DC355E232A45FAF2008E8A8E /* NestedObservableObject.swift in Sources */,
-				DC384D7F265BF36600131772 /* StyledString.swift in Sources */,
 				DC5F1C4A28DDAA49007A55ED /* ResetWalletView_Confirm.swift in Sources */,
 				DC1B325029FC3D5900F7F45F /* OnChainDetails.swift in Sources */,
 				DC39D4E7286BB2130030F18D /* PaymentLayerChoice.swift in Sources */,
@@ -1691,7 +1684,6 @@
 				DCAC5B7027726FC80077BB98 /* DeepLink.swift in Sources */,
 				DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */,
 				DCDD9ECE28637474001800A3 /* Orientation.swift in Sources */,
-				DCB30E572A0C2FF900E7D7A2 /* MaxFeeConfiguration.swift in Sources */,
 				DCDD9ECB28637242001800A3 /* MainView.swift in Sources */,
 				DCDD9ED2286377C5001800A3 /* MainView_Small.swift in Sources */,
 				C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */,

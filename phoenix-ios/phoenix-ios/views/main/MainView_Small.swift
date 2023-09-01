@@ -359,6 +359,7 @@ struct MainView_Small: View {
 		// ------------------------------
 		// | [img] Receive | [img] Send |
 		// ------------------------------
+		//                 ^ might not be centered, but at least the buttons fit on 1 line
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
@@ -423,6 +424,16 @@ struct MainView_Small: View {
 	
 	@ViewBuilder
 	func footer_accessibility(buttonTextColor: Color) -> some View {
+		
+		// There's a large font being used, and possibly a small screen too.
+		// Horizontal space is so tight that we can't get the 2 buttons on a single line.
+		//
+		// So we're going to put them on multiple lines.
+		//
+		// -----------------
+		//   [img] Receive
+		//   [img] Send
+		// -----------------
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			Spacer()
