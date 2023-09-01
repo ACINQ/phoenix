@@ -132,12 +132,7 @@ struct ResetWalletView_Action: View {
 		Section {
 			
 			Label {
-				Text(styled: NSLocalizedString(
-					"""
-					Deleting **payment history** from iCloud
-					""",
-					comment: "ResetWalletView_Delete_Action"
-				))
+				Text("Deleting **payment history** from iCloud")
 			} icon: {
 				Image(systemName: "icloud.fill")
 			}
@@ -158,12 +153,7 @@ struct ResetWalletView_Action: View {
 		Section {
 			
 			Label {
-				Text(styled: NSLocalizedString(
-					"""
-					Deleting **recovery phrase** from iCloud
-					""",
-					comment: "ResetWalletView_Delete_Action"
-				))
+				Text("Deleting **recovery phrase** from iCloud")
 			} icon: {
 				Image(systemName: "icloud.fill")
 			}
@@ -244,12 +234,7 @@ struct ResetWalletView_Action: View {
 		Section {
 			
 			Label {
-				Text(styled: NSLocalizedString(
-					"""
-					Deleting data from **this device**
-					""",
-					comment: "ResetWalletView_Delete_Action"
-				))
+				Text("Deleting data from **this device**")
 			} icon: {
 				Image(systemName: "folder")
 			}

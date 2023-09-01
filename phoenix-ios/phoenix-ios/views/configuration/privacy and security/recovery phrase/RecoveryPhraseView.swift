@@ -134,13 +134,12 @@ struct RecoveryPhraseList: View {
 						.font(.callout)
 						.bold()
 						
-						Text(styled: NSLocalizedString(
+						Text(
 							"""
 							If you do not back it up and you lose access to Phoenix \
 							you will **lose your funds**!
-							""",
-							comment: "BackupView"
-						))
+							"""
+						)
 						.font(.subheadline)
 					} // </VStack>
 					Spacer() // ensure label takes up full width
@@ -180,22 +179,20 @@ struct RecoveryPhraseList: View {
 				)
 				.fontWeight(.bold)
 				
-				Text(styled: NSLocalizedString(
+				Text(
 					"""
 					**Do not share this seed with anyone.** \
 					Beware of phishing. The developers of Phoenix will never ask for your seed.
-					""",
-					comment: "ManualBackupView"
-				))
+					"""
+				)
 				
-				Text(styled: NSLocalizedString(
+				Text(
 					"""
 					**Do not lose this seed.** \
 					Save it somewhere safe (not on this phone). \
 					If you lose your seed and your phone, you've lost your funds.
-					""",
-					comment: "ManualBackupView"
-				))
+					"""
+				)
 					
 			} // </VStack>
 			.padding(.vertical, 15)

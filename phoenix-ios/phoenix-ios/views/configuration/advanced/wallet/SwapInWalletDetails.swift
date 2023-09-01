@@ -125,13 +125,12 @@ struct SwapInWalletDetails: View {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 20) {
 				
 				let maxFee = maxSwapInFee()
-				Text(styled: NSLocalizedString(
+				Text(
 					"""
 					On-chain funds will automatically be swapped to Lightning if the \
 					fee is **less than \(maxFee.string)**.
-					""",
-					comment: "Swap-in wallet details"
-				))
+					"""
+				)
 				
 				Button {
 					navigateToLiquiditySettings()

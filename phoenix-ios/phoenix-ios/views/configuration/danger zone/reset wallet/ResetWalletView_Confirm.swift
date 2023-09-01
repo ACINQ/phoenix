@@ -101,13 +101,7 @@ struct ResetWalletView_Confirm: MVISubView, ViewName {
 	func section_transactionHistory(_ idx: Int) -> some View {
 		
 		Section {
-			
-			Text(styled: NSLocalizedString(
-				"""
-				The **payment history** for this wallet will be deleted from your iCloud account.
-				""",
-				comment: "ResetWalletView_Review"
-			))
+			Text("The **payment history** for this wallet will be deleted from your iCloud account.")
 			
 		} header: {
 			Text("Step #\(idx)")
@@ -119,13 +113,7 @@ struct ResetWalletView_Confirm: MVISubView, ViewName {
 	func section_seedBackup(_ idx: Int) -> some View {
 		
 		Section {
-			
-			Text(styled: NSLocalizedString(
-				"""
-				The **seed backup** for this wallet will be deleted from your iCloud account.
-				""",
-				comment: "ResetWalletView_Review"
-			))
+			Text("The **seed backup** for this wallet will be deleted from your iCloud account.")
 			
 		} header: {
 			Text("Step #\(idx)")
@@ -140,12 +128,11 @@ struct ResetWalletView_Confirm: MVISubView, ViewName {
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 15) {
 				
-				Text(styled: NSLocalizedString(
+				Text(
 					"""
 					The wallet will be completely deleted from **this device**.
-					""",
-					comment: "ResetWalletView_Review"
-				))
+					"""
+				)
 				
 				Text(
 					"""

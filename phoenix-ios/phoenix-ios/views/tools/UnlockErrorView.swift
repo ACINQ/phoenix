@@ -100,12 +100,9 @@ struct UnlockErrorView: View {
 			)
 			.padding(.bottom, 30)
 			
-			Text(styled: NSLocalizedString(
-				"If the problem persists, please contact support at **phoenix@acinq.co**.",
-				comment: "ErrorView"
-			))
-			.multilineTextAlignment(.center)
-			.padding(.bottom)
+			Text("If the problem persists, please contact support at **phoenix@acinq.co**.")
+				.multilineTextAlignment(.center)
+				.padding(.bottom)
 			
 			Button {
 				showDetails()
