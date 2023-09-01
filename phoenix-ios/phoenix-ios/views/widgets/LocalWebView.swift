@@ -25,7 +25,7 @@ struct LocalWebView: UIViewRepresentable {
 		webView.allowsBackForwardNavigationGestures = false
 		webView.scrollView.isScrollEnabled = true
 		webView.scrollView.verticalScrollIndicatorInsets = scrollIndicatorInsets
-		webView.scrollView.clipsToBounds = false
+		webView.scrollView.clipsToBounds = true
 		webView.isOpaque = false // prevents white flash in dark mode
 		return webView
 	}
