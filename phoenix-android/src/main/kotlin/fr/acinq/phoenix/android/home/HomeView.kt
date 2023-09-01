@@ -47,6 +47,7 @@ import fr.acinq.phoenix.android.utils.findActivity
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -253,8 +254,10 @@ fun HomeView(
 
     LaunchedEffect(Unit) {
         if (LegacyPrefsDatastore.hasMigratedFromLegacy(context).first()) {
-            InternalData.getLegacyMigrationAddressWarningShown(context).collect { shown ->
-                showAddressWarningDialog = !shown
+            combine(InternalData.getLegacyMigrationMessageShown(context), InternalData.getLegacyMigrationAddressWarningShown(context)) { noticeShown, dialogShown ->
+                noticeShown || dialogShown
+            }.collect {
+                showAddressWarningDialog = !it
             }
         }
     }
