@@ -145,7 +145,7 @@ struct MergeChannelsView: View {
 				subtitle: "select miner fee when sending on-chain"
 			)
 			bulletRow(
-				title: "Bump fess",
+				title: "Bump fees",
 				subtitle: "to speed up on-chain payments"
 			)
 			bulletRow(
