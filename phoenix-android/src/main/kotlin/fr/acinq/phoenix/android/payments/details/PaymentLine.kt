@@ -167,7 +167,12 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
     val desc = when (isLegacyMigration) {
         null -> stringResource(id = R.string.paymentdetails_desc_closing_channel) // not sure yet, but we still know it's a closing
         true -> stringResource(id = R.string.paymentdetails_desc_legacy_migration)
-        false -> metadata.userDescription ?: payment.smartDescription(context)
+        false -> metadata.userDescription
+            ?: metadata.lnurl?.pay?.metadata?.lnid?.takeIf { it.isNotBlank() }?.let {
+                stringResource(id = R.string.paymentdetails_desc_identifier, it)
+            }
+            ?: metadata.lnurl?.description
+            ?: payment.smartDescription(context)
     }
 
     Text(

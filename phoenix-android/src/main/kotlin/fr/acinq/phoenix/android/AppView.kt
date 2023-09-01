@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android
 
 import android.Manifest
 import android.net.Uri
+import android.os.Build
 import android.text.format.DateUtils
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -130,7 +131,7 @@ fun AppView(
         )
 
         val noticesViewModel = viewModel<NoticesViewModel>(factory = NoticesViewModel.Factory(appConfigurationManager = business.appConfigurationManager))
-        monitorNotices(vm = noticesViewModel)
+        MonitorNotices(vm = noticesViewModel)
 
         val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
         if (legacyAppStatus.value is LegacyAppStatus.Required && navController.currentDestination?.route != Screen.SwitchToLegacy.route) {
@@ -405,7 +406,7 @@ fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId, 
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-private fun monitorNotices(
+private fun MonitorNotices(
     vm: NoticesViewModel
 ) {
     val context = LocalContext.current
@@ -420,22 +421,24 @@ private fun monitorNotices(
         }
     }
 
-    val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
-    if (!notificationPermission.status.isGranted) {
-        LaunchedEffect(Unit) {
-            if (UserPrefs.getShowNotificationPermissionReminder(context).first()) {
-                vm.addNotice(Notice.NotificationPermission)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+        if (!notificationPermission.status.isGranted) {
+            LaunchedEffect(Unit) {
+                if (UserPrefs.getShowNotificationPermissionReminder(context).first()) {
+                    vm.addNotice(Notice.NotificationPermission)
+                }
             }
+        } else {
+            vm.removeNotice(Notice.NotificationPermission)
         }
-    } else {
-        vm.removeNotice(Notice.NotificationPermission)
-    }
-    LaunchedEffect(Unit) {
-        UserPrefs.getShowNotificationPermissionReminder(context).collect {
-            if (it && !notificationPermission.status.isGranted) {
-                vm.addNotice(Notice.NotificationPermission)
-            } else {
-                vm.removeNotice(Notice.NotificationPermission)
+        LaunchedEffect(Unit) {
+            UserPrefs.getShowNotificationPermissionReminder(context).collect {
+                if (it && !notificationPermission.status.isGranted) {
+                    vm.addNotice(Notice.NotificationPermission)
+                } else {
+                    vm.removeNotice(Notice.NotificationPermission)
+                }
             }
         }
     }

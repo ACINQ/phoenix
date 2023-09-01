@@ -81,6 +81,7 @@ import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.android.utils.share
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.WalletBalance
 
 @Composable
@@ -279,14 +280,16 @@ private fun LightningInvoiceView(
         onMessageClick = { navController.navigate(Screen.LiquidityPolicy.route) },
     )
 
-    Spacer(modifier = Modifier.height(16.dp))
-    HSeparator(width = 50.dp)
-    Spacer(modifier = Modifier.height(24.dp))
-    BorderButton(
-        text = stringResource(id = R.string.receive_lnurl_button),
-        icon = R.drawable.ic_scan,
-        onClick = { navController.navigate(Screen.ScanData.route) },
-    )
+    if ((state is ReceiveViewModel.LightningInvoiceState.Init || state is ReceiveViewModel.LightningInvoiceState.Show) && !isEditing) {
+        Spacer(modifier = Modifier.height(16.dp))
+        HSeparator(width = 50.dp)
+        Spacer(modifier = Modifier.height(24.dp))
+        BorderButton(
+            text = stringResource(id = R.string.receive_lnurl_button),
+            icon = R.drawable.ic_scan,
+            onClick = { navController.navigate(Screen.ScanData.route) },
+        )
+    }
 }
 
 @Composable
@@ -369,6 +372,17 @@ private fun BitcoinAddressView(
             HSeparator(width = 50.dp)
             Spacer(modifier = Modifier.height(16.dp))
             QRCodeDetail(label = stringResource(id = R.string.receive_bitcoin_address_label), value = state.address)
+
+            val isFromLegacy by LegacyPrefsDatastore.hasMigratedFromLegacy(context).collectAsState(initial = false)
+            if (isFromLegacy) {
+                Spacer(modifier = Modifier.height(24.dp))
+                InfoMessage(
+                    header = stringResource(id = R.string.receive_onchain_legacy_warning_title),
+                    details = stringResource(id = R.string.receive_onchain_legacy_warning),
+                    detailsStyle = MaterialTheme.typography.subtitle2,
+                    alignment = Alignment.CenterHorizontally
+                )
+            }
         }
         is ReceiveViewModel.BitcoinAddressState.Error -> {
             ErrorMessage(

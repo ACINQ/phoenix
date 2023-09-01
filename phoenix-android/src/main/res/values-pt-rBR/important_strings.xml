@@ -22,7 +22,265 @@
 -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
+    <!-- system notifications -->
+
+    <string name="notif_headless_title_default">O Phoenix está sendo executado em segundo plano</string>
+    <string name="notif_headless_received">Recebeu +%1$s</string>
+
+    <string name="notif_pending_settlement_title">Por favor, inicie o Phoenix</string>
+    <string name="notif_pending_settlement_message">Uma liquidação recebida está pendente.</string>
+
+    <string name="notif_missed_title">Pagamento recebido perdido</string>
+    <string name="notif_missed_unavailable">O Phoenix não pôde ser iniciado em segundo plano.</string>
+
+    <string name="notif_rejected_deposit_title">Depósito em cadeia pendente (+%1$s)</string>
+    <string name="notif_rejected_payment_title">Pagamento rejeitado (+%1$s)</string>
+    <string name="notif_rejected_policy_disabled">O gerenciamento automatizado de canais está desativado. Você pode alterar isso nas configurações.</string>
+    <string name="notif_rejected_over_absolute">A taxa foi de %1$s, mas sua taxa máxima foi definida como %2$s. Você pode ajustar isso nas configurações.</string>
+    <string name="notif_rejected_over_relative">A taxa foi de %1$s, que é mais do que %2$s%% do valor recebido. Você pode ajustar isso nas configurações.</string>
+    <string name="notif_rejected_channels_initializing">Seus canais estavam sendo inicializados e não puderam aceitar esse pagamento. Tente novamente mais tarde.</string>
+
+    <string name="notif_watcher_revoked_commit_title">Por favor, inicie o Phoenix</string>
+    <string name="notif_watcher_revoked_commit_message">Alguns de seus canais podem ter sido fechados.</string>
+
+    <!-- settings list -->
+
+    <string name="settings_general_title">General</string>
+    <string name="settings_security_title">Privacidade e segurança</string>
+    <string name="settings_advanced_title">Avançado</string>
+    <string name="settings_danger_title">Zona de perigo</string>
+
+    <string name="settings_display_prefs">Exibição</string>
+    <string name="settings_wallet_info">Informações da carteira</string>
+    <string name="settings_liquidity_policy">Gerenciamento de canais</string>
+    <string name="settings_display_seed">Frase de recuperação</string>
+    <string name="settings_access_control">Controle de acesso</string>
+    <string name="settings_list_channels">Canais de pagamento</string>
+    <string name="settings_logs">Logs</string>
+    <string name="settings_electrum">Electrum servers</string>
+    <string name="settings_reset_wallet">Redefinir carteira</string>
+    <string name="settings_mutual_close">Fechar canais</string>
+    <string name="settings_force_close">Fechar canais à força</string>
+    <string name="settings_tor">Tor</string>
+    <string name="settings_about">Sobre</string>
+    <string name="settings_payment_settings">Opções de pagamento</string>
+    <string name="settings_payment_history">Histórico de pagamentos</string>
+    <string name="settings_notifications">Notificações</string>
+
+    <!-- home: bottom menu -->
+
+    <string name="menu_settings">Configurações</string>
+    <string name="menu_send">Enviar</string>
+    <string name="menu_receive">Receber</string>
+
+    <!-- init wallet / automated wallet creation -->
+
+    <string name="initwallet_create">Criar nova carteira</string>
+    <string name="initwallet_restore">Restaurar minha carteira</string>
+
+    <string name="restore_disclaimer_message">O Phoenix só pode restaurar fundos fora da cadeia que foram gerenciados por este aplicativo.\n\nA importação de uma semente que NÃO foi criada pelo Phoenix não restaurará nenhum fundo.\n\nVerifique também se você já não está executando outra carteira Phoenix com a mesma semente.</string>
+    <string name="restore_disclaimer_checkbox">Eu entendo.</string>
+
+    <string name="restore_instructions">A semente de sua carteira é uma lista de 12 palavras em inglês. Digite cada palavra dessa lista na caixa abaixo.</string>
+    <string name="restore_input_label">Digite a palavra #%1$s</string>
+    <string name="restore_input_invalid">Esta não é uma palavra válida.</string>
+    <string name="restore_seed_valid">Esta semente é válida</string>
+    <string name="restore_seed_valid_details">Agora você pode prosseguir e restaurar sua carteira</string>
+    <string name="restore_seed_invalid">Esta semente não é válida</string>
+    <string name="restore_seed_invalid_details">Verifique se você digitou as palavras corretas na ordem correta.</string>
+    <string name="restore_import_button">Restaurar</string>
+
+    <!-- upgrade required dialog -->
+
+    <string name="upgraderequired_title">Atualização necessária</string>
+    <string name="upgraderequired_message">Esta versão do Phoenix (v%1$s) não é compatível com sua carteira. Atualize ou use uma versão compatível.</string>
+    <string name="upgraderequired_button">Atualizar no Google Play</string>
+
+    <!-- receive view: warning about fee/liquidity -->
+
+    <string name="receive_lightning_warning_title_surefail">O pagamento falhará</string>
+    <string name="receive_lightning_warning_title_mayfail">O pagamento pode falhar</string>
+    <string name="receive_lightning_warning_title_fee_expected">Taxa esperada</string>
+
+    <string name="receive_lightning_warning_fee_insufficient_liquidity">A liquidez de entrada é insuficiente.</string>
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">A liquidez de entrada é insuficiente e você desativou o gerenciamento automatizado de canais.\nToque para configurar.</string>
+    <string name="receive_lightning_warning_fee_within_policy">Uma taxa de %1$s (≈ %2$s) pode ser necessária para receber esse pagamento.\nToque para configurar.</string>
+    <string name="receive_lightning_warning_fee_exceeds_policy">A taxa provavelmente estará acima do seu limite máximo (%1$s).\nToque para configurar.</string>
+
+    <string name="receive_onchain_legacy_warning_title">Aviso de migração</string>
+    <string name="receive_onchain_legacy_warning">Esse é seu novo endereço. Não reutilize seus endereços Bitcoin antigos de antes da migração!</string>
+
+    <!-- scanning errors -->
+
+    <string name="scan_error_expired">Esta fatura está expirada.</string>
+    <string name="scan_error_already_paid">Este pagamento já foi pago.</string>
+    <string name="scan_error_invalid_chain">Este pagamento não usa o mesmo blockchain que sua carteira.</string>
+    <string name="scan_error_lnurl_invalid">Falha ao processar esse link LNURL. Verifique se ele é válido.</string>
+    <string name="scan_error_lnurl_service_error">O serviço LNURL retornou um erro.</string>
+    <string name="scan_error_lnurl_unsupported">Este tipo de LNURL ainda não é suportado.</string>
+    <string name="scan_error_invalid_generic">Esses dados usam um formato desconhecido e não podem ser processados.</string>
+
+    <!-- validation -->
+
+    <string name="validation_below_min">Deve ser pelo menos %1$s</string>
+    <string name="validation_above_max">Não deve ser mais do que %1$s</string>
+
+    <!-- closing channels -->
+
+    <string name="mutualclose_input_label">Endereço de Bitcoin</string>
+    <string name="mutualclose_input_instructions">Envie todos os fundos para uma carteira de Bitcoin. Todos os canais de pagamento serão fechados.</string>
+    <string name="mutualclose_confirm_title">Confirmar fechamento</string>
+    <string name="mutualclose_confirm_details">Todos os fundos serão enviados para:</string>
+
+    <string name="forceclose_title">Forçar o fechamento de canais</string>
+    <string name="forceclose_instructions">Essa tela permite que você feche unilateralmente seus canais.\n\nEste não é um botão mágico para "consertar tudo": ele está aqui como uma medida de segurança e <b>deve ser usado somente em cenários extremos</b>. Por exemplo, se seu par (ACINQ) desaparecer permanentemente, impedindo-o de gastar seu dinheiro.Em todos os outros casos, <b>se tiver problemas com o Phoenix, entre em contato com o suporte</b>.\n\nO fechamento forçado de canais lhe custará dinheiro (para cobrir as taxas na cadeia) e fará com que seus fundos fiquem bloqueados por dias.\n\n<b>Não desinstale o aplicativo até que seus canais estejam totalmente fechados, ou você perderá dinheiro.</b>\n\n<b>Não use esse recurso se você não entender completamente o que ele faz.</b></string>
+    <string name="forceclose_address_label">Os fundos serão eventualmente enviados para a carteira final:</string>
+
+    <string name="forceclose_confirm_title">Confirmar o fechamento forçado</string>
+    <string name="forceclose_confirm_details">Todos os fundos serão enviados para sua carteira final, após um atraso.</string>
+    <string name="forceclose_button">Forçar o fechamento de todos os meus canais</string>
+
+    <!-- in-app notifications -->
+
     <string name="inappnotif_migration_from_legacy">Parabéns! Sua carteira foi atualizada.</string>
     <string name="inappnotif_migration_from_legacy_action">Veja as mudanças</string>
+    <string name="inappnotif_migration_from_legacy_dialog_title">Seu endereço de Bitcoin na cadeia foi alterado</string>
+    <string name="inappnotif_migration_from_legacy_dialog_body">Não reutilize seus endereços antigos! Eles não funcionarão mais.\n\nEntre em contato com o suporte se tiver feito isso acidentalmente.</string>
+
+    <string name="inappnotif_backup_seed_message">Faça backup de sua carteira para evitar a perda de seus bitcoins.</string>
+    <string name="inappnotif_backup_seed_action">Fazer backup da minha carteira</string>
+
+    <string name="inappnotif_notification_permission_message">As notificações estão desativadas nas configurações do Android. O Phoenix não poderá notificá-lo quando um pagamento estiver sendo processado.</string>
+    <string name="inappnotif_notification_permission_enable">Ativar</string>
+
+    <string name="inappnotif_watchtower_late_message">O Phoenix monitora regularmente o blockchain quando está em segundo plano, mas não conseguiu fazer isso nos últimos dias.\n\nCertifique-se de que o Android não bloqueie o Phoenix e que ele possa se conectar à Electrum.</string>
+    <string name="inappnotif_watchtower_late_action">Dispensar</string>
+
+    <string name="inappnotif_upgrade_message">Uma atualização está disponível</string>
+    <string name="inappnotif_upgrade_critical_message">Uma atualização crítica está disponível. Você deve atualizar o Phoenix o mais rápido possível.</string>
+    <string name="inappnotif_upgrade_button">Atualizar no Google Play</string>
+
+    <string name="inappnotif_mempool_full_message">O mempool do Bitcoin está cheio e as taxas na cadeia estão altas.</string>
+    <string name="inappnotif_mempool_full_action">Veja como a Phoenix é afetada</string>
+
+    <string name="inappnotif_payment_onchain_pending_title">Fundos pendentes na cadeia (+%1$s)</string>
+    <string name="inappnotif_payment_rejected_title">Pagamento rejeitado (+%1$s)</string>
+    <string name="inappnotif_payment_rejected_disabled">O gerenciamento automatizado de canais está desativado.</string>
+    <string name="inappnotif_payment_rejected_over_absolute">A taxa foi de %1$s, mas sua taxa máxima foi definida como %2$s.</string>
+    <string name="inappnotif_payment_rejected_over_relative">A taxa foi de %1$s, que é mais do que %2$s%% do valor.</string>
+    <string name="inappnotif_payment_rejected_channel_initializing">Seus canais ainda estão sendo inicializados e não puderam receber esse pagamento.</string>
+    <string name="inappnotif_payment_rejected_tweak_setting">Toque para configurar.</string>
+
+    <string name="inappnotif_watchtower_nominal_title">Watchtower report</string>
+    <plurals name="inappnotif_watchtower_nominal_description">
+        <item quantity="one">O canal %1$d foi verificado com êxito em %2$s. Nenhum problema foi encontrado.</item>
+        <item quantity="many">%1$d canais foram verificados com sucesso em %2$s. Nenhum problema foi encontrado.</item>
+    </plurals>
+    <string name="inappnotif_watchtower_revokedfound_title">Watchtower alert</string>
+    <string name="inappnotif_watchtower_revokedfound_description">Foram encontrados compromissos revogados em %1$s para o(s) canal(is): %2$s. Esse canal pode ser fechado.</string>
+
+    <!-- settings: display seed -->
+
+    <string name="displayseed_instructions">A frase de recuperação (às vezes chamada de seed) é uma lista de 12 palavras em inglês. Ela permite que você recupere o acesso total aos seus fundos, se necessário.\n\n<b>Only you alone possess this seed. Keep it private.</b>\n\n<b>Não compartilhe essa semente com ninguém</b>.\nCuidado com o phishing. Os desenvolvedores do Phoenix nunca solicitarão sua semente.\n\n<b>Não perca essa semente</b>.\nSalve-o em um lugar seguro (não neste telefone). Se você perder seu seed e seu telefone, perderá seus fundos.</string>
+    <string name="displayseed_authenticate_button">Exibir sementes</string>
+    <string name="displayseed_dialog_header">MANTENHA ESTA SEMENTE EM SEGURANÇA.\nNÃO COMPARTILHE.</string>
+    <string name="displayseed_backup_notice_header">Você não fez o backup de sua frase de recuperação!</string>
+    <string name="displayseed_backup_notice_details">Se você não fizer o backup e perder o acesso ao Phoenix, perderá seus fundos!</string>
+    <string name="displayseed_backup_checkbox">Salvei minha frase de recuperação em algum lugar seguro.</string>
+    <string name="displayseed_loss_disclaimer_checkbox">Entendo que, se eu perder meu telefone e minha frase de recuperação, perderei os fundos da minha carteira.</string>
+
+    <!-- payment details -->
+
+    <string name="paymentdetails_funding_fees_label">Taxas do minerador</string>
+    <string name="paymentdetails_funding_fees_desc">Taxas pagas aos mineradores da rede Bitcoin para processar a transação na cadeia.</string>
+    <string name="paymentdetails_service_fees_label">Taxas de serviço</string>
+    <string name="paymentdetails_service_fees_desc">Taxas pagas pela criação de um novo canal de pagamento. Isso nem sempre é necessário.</string>
+
+    <!-- lnurl -->
+
+    <string name="lnurl_auth_instructions">Você pode fazer login anonimamente e autorizar uma ação:</string>
+    <string name="lnurl_withdraw_header">Você pode resgatar fundos de\n<b>%1$s</b>.</string>
+    <string name="lnurl_withdraw_success">A solicitação de saque foi enviada para <b>%1$s</b>.\n\nPode levar algum tempo até que os fundos sejam enviados. Enquanto isso, mantenha o aplicativo on-line.</string>
+
+    <!-- Tor -->
+
+    <string name="tor_settings_subtitle">A Phoenix pode usar o Tor para proteger seu IP dos outros nós da Lightning Network e dos servidores da Electrum.\n\nA ativação do Tor melhorará sua privacidade, mas poderá causar problemas de pagamento se sua conexão for instável.</string>
+
+    <!-- about -->
+
+    <string name="about_general_content">A Phoenix é uma carteira de Bitcoin que usa a rede Lightning para enviar e receber pagamentos.\n\nÉ um software de código aberto livre, desenvolvido por <a href="https://phoenix.acinq.co">ACINQ</a> sob a <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">licença do Apache 2.0</a>.</string>
+    <string name="about_seed_title">Proteção de sua chave</string>
+    <string name="about_seed_content">Essa carteira tem custódia própria: <b>você tem a custódia exclusiva da chave semente de 12 palavras da carteira</b>.\n\nEssa chave dá acesso ao seu dinheiro. Não a revele a ninguém e tome cuidado com phishing.</string>
+    <string name="about_rates_title">Taxas de câmbio</string>
+    <string name="about_rates_content">As taxas de câmbio de Bitcoin/fiat são recuperadas de várias APIs de terceiros:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nEssas taxas podem não ser precisas. Sempre verifique o valor real do Bitcoin antes de enviar um pagamento.</string>
+
+    <!-- introduction screens -->
+
+    <string name="intro_welcome_title">Bem-vindos!</string>
+    <string name="intro_welcome_sub1">Com a Phoenix, enviar e receber bitcoins é fácil e seguro.</string>
+    <string name="intro_welcome_next_button">Seguinte</string>
+
+    <string name="intro_channels_title">Bitcoin supercharged</string>
+    <string name="intro_channels_sub1">A Phoenix usa canais de pagamento para tornar o Bitcoin rápido e privado.</string>
+    <string name="intro_channels_next_button">Seguinte</string>
+
+    <string name="intro_selfcustody_title">Sua chave, seus bitcoins</string>
+    <string name="intro_selfcustody_sub1">A Phoenix é autocustodial. Você assume o controle.</string>
+    <string name="intro_selfcustody_sub2">Você pode restaurar sua carteira a qualquer momento usando sua chave secreta. Mantenha-a segura!</string>
+    <string name="intro_selfcustody_next_button">Comece a usar</string>
+
+    <!-- wallet info -->
+
+    <string name="walletinfo_onchain_swapin">Swap-in wallet</string>
+    <string name="walletinfo_onchain_swapin_help">Os fundos enviados para essa carteira na cadeia são automaticamente trocados para o Lightning.</string>
+    <string name="walletinfo_onchain_swapin_policy_view">Toque para configurar.</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details">Os fundos on-chain serão automaticamente trocados para o Lightning se a taxa for <b>inferior a %1$s</b>.</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled_details">A política de taxas automatizadas <b>está desativada</b>. Os fundos não serão trocados. Eles permanecerão nessa carteira.</string>
+    <string name="walletinfo_onchain_swapin_empty">Não há swaps em andamento.</string>
+
+    <string name="walletinfo_onchain_final_about">Uma carteira na cadeia derivada de sua semente.\n\nA carteira final é para onde os fundos são enviados por padrão quando seus canais Lightning são fechados.</string>
+
+    <!-- settings: liquidity policy for channels creation -->
+
+    <string name="liquiditypolicy_instructions">Os pagamentos recebidos às vezes exigem transações na cadeia. Isso nem sempre acontece, apenas quando necessário.</string>
+    <string name="liquiditypolicy_fees_estimation">Atualmente, as taxas são estimadas em cerca de <b>%1$s</b> (≈%2$s).</string>
+    <string name="liquiditypolicy_disable_label">Gerenciamento automatizado de canais</string>
+    <string name="liquiditypolicy_disable_desc">Os pagamentos recebidos que exigem operações na cadeia serão rejeitados.</string>
+
+    <string name="liquiditypolicy_fees_base_label">Valor máximo da taxa</string>
+    <string name="liquiditypolicy_fees_base_help">Os pagamentos cujas taxas excederem esse valor serão rejeitados.</string>
+    <string name="liquiditypolicy_fees_base_too_low">Esse valor é muito baixo.</string>
+    <string name="liquiditypolicy_fees_base_below_estimation">Abaixo da taxa esperada. Alguns pagamentos podem ser rejeitados.</string>
+
+    <string name="liquiditypolicy_advanced_menu">Opções avançadas</string>
+    <string name="liquiditypolicy_advanced_disable">O gerenciamento de canais está desativado. Ele pode ser ativado na tela de configuração do gerenciamento de canais.</string>
+    <string name="liquiditypolicy_advanced_disclaimer_header">Atenção!</string>
+    <string name="liquiditypolicy_advanced_disclaimer_message">Esta tela é para usuários avançados. Não altere essas configurações a menos que entenda seus propósitos.</string>
+
+    <string name="liquiditypolicy_advanced_verifications_title">Verificações adicionais</string>
+    <string name="liquiditypolicy_advanced_fees_prop_label">Verificação de porcentagem</string>
+    <string name="liquiditypolicy_advanced_fees_prop_help">Verifica a taxa em relação ao valor recebido. Essa opção é útil como uma verificação de sanidade para pagamentos pequenos.</string>
+    <string name="liquiditypolicy_advanced_overrides_title">Substituições de política</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_label">Pular verificação de taxa absoluta para o Lightning</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_help">Quando ativado, os pagamentos recebidos do Lightning ignorarão o limite de taxa máxima absoluta. Somente a verificação de porcentagem será aplicada.\n\nAtenção: se a taxa de mempool do Bitcoin for alta, os pagamentos LN recebidos que exigem uma operação na cadeia poderão ser caros.</string>
+    <string name="liquiditypolicy_save_button">Salvar política</string>
+
+    <string name="liquiditypolicy_help">
+      O Phoenix permite que você receba pagamentos no blockchain do Bitcoin (L1) e na camada Lightning do Bitcoin (L2).
+      \n\n
+      - a camada de blockchain (L1) é mais lenta e geralmente muito mais cara (requer taxas de mineração)
+      \n
+      - a camada Lightning (L2) é muito mais rápida e, em geral, muito mais barata (especialmente para pagamentos menores)
+      \n\n
+      Quando você receber um pagamento em L1, o Phoenix moverá automaticamente os fundos para L2 <b>SE</b> as taxas do minerador estiverem de acordo com sua política de taxas configurada.
+      \n\n
+      Os pagamentos que você recebe no L2 podem ser recebidos instantaneamente e sem taxas. No entanto, ocasionalmente, uma operação L1 também é necessária para gerenciar o canal de pagamento L2. Isso pode ser feito automaticamente <b>SE</b> as taxas do minerador aderirem à sua política de taxas configurada.
+    </string>
+
+    <!-- CPFP -->
+
+    <string name="cpfp_title">Acelerar minhas transações.</string>
+    <string name="cpfp_instructions">Você pode fazer com que todas as suas transações não confirmadas usem uma taxa efetiva mais alta para incentivar os mineradores a favorecer seus pagamentos.</string>
+    <string name="cpfp_splice_error_actual_below_user">Essa taxa está abaixo da taxa que suas transações não confirmadas já estão usando. Use uma taxa mais alta para acelerar esses pagamentos.</string>
 
 </resources>

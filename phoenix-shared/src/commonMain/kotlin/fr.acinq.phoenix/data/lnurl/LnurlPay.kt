@@ -50,7 +50,9 @@ sealed class LnurlPay : Lnurl.Qualified {
             val identifier: String?,
             val email: String?,
             val unknown: JsonArray?
-        )
+        ) {
+            val lnid: String? by lazy { email ?: identifier }
+        }
     }
 
     /**

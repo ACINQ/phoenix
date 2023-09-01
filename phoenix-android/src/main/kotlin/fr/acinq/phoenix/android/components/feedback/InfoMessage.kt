@@ -27,9 +27,9 @@ import fr.acinq.phoenix.android.R
 fun InfoMessage(
     header: String,
     details: String,
+    modifier: Modifier = Modifier,
     headerStyle: TextStyle = MaterialTheme.typography.body2,
     detailsStyle: TextStyle = MaterialTheme.typography.subtitle2,
-    modifier: Modifier = Modifier,
     alignment: Alignment.Horizontal = Alignment.Start,
 ) {
     FeedbackMessage(

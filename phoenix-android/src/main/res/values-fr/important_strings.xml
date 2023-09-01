@@ -43,6 +43,36 @@
     <string name="notif_watcher_revoked_commit_title">Veuillez démarrer Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Certains de vos canaux pourraient avoir fermé.</string>
 
+    <!-- settings list -->
+
+    <string name="settings_general_title">Général</string>
+    <string name="settings_security_title">Vie privée &amp; sécurité</string>
+    <string name="settings_advanced_title">Avancé</string>
+    <string name="settings_danger_title">Zone à risques</string>
+
+    <string name="settings_display_prefs">Affichage</string>
+    <string name="settings_wallet_info">Information sur le wallet</string>
+    <string name="settings_liquidity_policy">Gestion des canaux</string>
+    <string name="settings_display_seed">Phrase de sauvegarde phrase</string>
+    <string name="settings_access_control">Contrôle d\'accès</string>
+    <string name="settings_list_channels">Canaux de paiements</string>
+    <string name="settings_logs">Logs</string>
+    <string name="settings_electrum">Serveur Electrum</string>
+    <string name="settings_reset_wallet">Réinitialisation du wallet</string>
+    <string name="settings_mutual_close">Fermeture des canaux</string>
+    <string name="settings_force_close">Fermeture forcée des canaux</string>
+    <string name="settings_tor">Tor</string>
+    <string name="settings_about">À propos</string>
+    <string name="settings_payment_settings">Options de paiement</string>
+    <string name="settings_payment_history">Historique de paiement</string>
+    <string name="settings_notifications">Notifications</string>
+
+    <!-- home: bottom menu -->
+
+    <string name="menu_settings">Configuration</string>
+    <string name="menu_send">Envoyer</string>
+    <string name="menu_receive">Recevoir</string>
+
     <!-- init wallet / automated wallet creation -->
 
     <string name="initwallet_create">Créer un nouveau wallet</string>
@@ -76,6 +106,9 @@
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Votre liquidité entrante est insuffisante et vous avez désactivé la gestion des channels automatisée.\nCliquez pour configurer.</string>
     <string name="receive_lightning_warning_fee_within_policy">Des frais de %1$s (≈ %2$s) pourraient être nécessaire pour recevoir ce paiement.\nCliquez pour configurer.</string>
     <string name="receive_lightning_warning_fee_exceeds_policy">Ces frais vont probablement excéder le max configuré dans vos préférences (%1$s).\nCliquez pour configurer.</string>
+
+    <string name="receive_onchain_legacy_warning_title">Note suite à la migration</string>
+    <string name="receive_onchain_legacy_warning">Il s\'agit de votre nouvelle adresse. Ne réutilisez pas vos anciennes adresses Bitcoin d\'avant la migration !</string>
 
     <!-- scanning errors -->
 
@@ -119,7 +152,7 @@
     <string name="inappnotif_watchtower_late_action">Fermer</string>
 
     <string name="inappnotif_upgrade_message">Mise à jour disponible</string>
-    <string name="inappnotif_upgrade_critical_message">Une mise à jour critique est disponible. Vous devriez mettre à jour Phoenix le plus rapidement possible..</string>
+    <string name="inappnotif_upgrade_critical_message">Une mise à jour critique est disponible. Vous devriez mettre à jour Phoenix le plus rapidement possible.</string>
     <string name="inappnotif_upgrade_button">Mettre à jour sur Google Play</string>
 
     <string name="inappnotif_mempool_full_message">Le mempool Bitcoin est plein, et les frais sur la chaîne sont élevés.</string>
@@ -127,6 +160,8 @@
 
     <string name="inappnotif_migration_from_legacy">Félicitations! Votre wallet a été mis à jour.</string>
     <string name="inappnotif_migration_from_legacy_action">Voir les nouveautés</string>
+    <string name="inappnotif_migration_from_legacy_dialog_title">Votre adresse Bitcoin a changé</string>
+    <string name="inappnotif_migration_from_legacy_dialog_body">Ne réutilisez pas vos anciennes adresses de swap ! Elles ne fonctionneront plus.\n\nContactez le support si vous le faisiez accidentellement.</string>
 
     <string name="inappnotif_payment_onchain_pending_title">Dépôt on-chain en attente (+%1$s)</string>
     <string name="inappnotif_payment_rejected_title">Paiement refusé (+%1$s)</string>

@@ -37,8 +37,9 @@ val mainnetElectrumServers = listOf(
                 "2n62mHT9vfKhTGIoOXR989v6FA+EIYAklIL2ptX3vLqqvOnRjB122b9eT5ZpZhNi" +
                 "uwIDAQAB"
     ),
-    electrumServer(host = "e.keff.org"),
-    electrumServer(host = "tardis.bauerj.eu", publicKey =
+    // electrumServer(host = "e.keff.org"), certificate has expired
+    electrumServer(
+        host = "tardis.bauerj.eu", publicKey =
                 "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEArnwocjdtIf+Pfpw0DAW2" +
                 "QQlQUA3VV7s/ttr0KHrDFwnvhfm6odxfUgW9REfxvxcp7xRJsp2ovFZzKj6uwOWg" +
                 "43Ewr0sTvOjyPmJdVMHAxpDCmm6BcF4cD7zs9OZfYsz5Yv0tewN9yh6DBt6fPkXT" +
@@ -51,7 +52,8 @@ val mainnetElectrumServers = listOf(
                 "F4l7hYM8ZOtxq4pi1Xjy/e2uBCDcaogAik1ciLFSrR2ai33eevi3YcTiB0DjLK9z" +
                 "DUx5CoQGwyhJcRopglpX+AFQry659ngRnvxdFJYmUH7CQQ/ofvdkOZ6m4hv1tVVn" +
                 "3GtwazLKQKgN6dKyHuuaj0ECAwEAAQ=="),
-    electrumServer(host = "VPS.hsmiths.com", publicKey =
+    electrumServer(
+        host = "VPS.hsmiths.com", publicKey =
                 "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAx6SVh9svGg1cYMn4uxvt" +
                 "D9XS1IS/TSWV+1vZkovG1Hk5b8451B0hN48ZpzeWiMozxNPncBIVYsDw37YZkDGw" +
                 "yn4Akb1vFdgJtKiJrDKFVhLKPMZncOWQjnt9qcip04G7aTe2RqmUlLCTDbgr9G3T" +

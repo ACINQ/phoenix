@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android.home
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,20 +28,28 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.MotionLayout
 import androidx.constraintlayout.compose.MotionScene
 import androidx.constraintlayout.compose.layoutId
 import fr.acinq.phoenix.android.*
+import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.PrimarySeparator
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
+import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.findActivity
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.WalletPaymentId
-
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeView(
@@ -229,6 +238,27 @@ fun HomeView(
                 allPaymentsCount = allPaymentsCount
             )
             BottomBar(Modifier, onSettingsClick, onReceiveClick, onSendClick)
+        }
+    }
+
+    var showAddressWarningDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    if (showAddressWarningDialog){
+        Dialog(
+            onDismiss = { scope.launch { InternalData.saveLegacyMigrationAddressWarningShown(context, true) } },
+            title = stringResource(id = R.string.inappnotif_migration_from_legacy_dialog_title),
+        ) {
+            Text(text = annotatedStringResource(id = R.string.inappnotif_migration_from_legacy_dialog_body), modifier = Modifier.padding(horizontal = 24.dp, vertical = 0.dp))
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (LegacyPrefsDatastore.hasMigratedFromLegacy(context).first()) {
+            combine(InternalData.getLegacyMigrationMessageShown(context), InternalData.getLegacyMigrationAddressWarningShown(context)) { noticeShown, dialogShown ->
+                noticeShown || dialogShown
+            }.collect {
+                showAddressWarningDialog = !it
+            }
         }
     }
 }

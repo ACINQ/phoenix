@@ -21,11 +21,7 @@ struct PaymentOptionsView: View {
 
 	@State var userDefinedMaxFees: MaxFees? = Prefs.shared.maxFees
 	
-	@State var payToOpen_feePercent: Double = 0.0
-	@State var payToOpen_minFeeSat: Int64 = 0
-	
 	let maxFeesPublisher = Prefs.shared.maxFeesPublisher
-	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
 	
 	@Environment(\.openURL) var openURL
 	@EnvironmentObject var smartModalState: SmartModalState
@@ -53,9 +49,6 @@ struct PaymentOptionsView: View {
 		.listBackgroundColor(.primaryBackground)
 		.onReceive(maxFeesPublisher) {
 			maxFeesChanged($0)
-		}
-		.onReceive(chainContextPublisher) {
-			chainContextChanged($0)
 		}
 	}
 	
@@ -176,15 +169,6 @@ struct PaymentOptionsView: View {
 		return "\(base.string) + \(proportional)%"
 	}
 	
-	func formatFeePercent() -> String {
-		
-		let formatter = NumberFormatter()
-		formatter.minimumFractionDigits = 0
-		formatter.maximumFractionDigits = 3
-		
-		return formatter.string(from: NSNumber(value: payToOpen_feePercent))!
-	}
-	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
@@ -221,13 +205,6 @@ struct PaymentOptionsView: View {
 		log.trace("maxFeesChanged()")
 		
 		userDefinedMaxFees = newMaxFees
-	}
-	
-	func chainContextChanged(_ context: WalletContext.V0ChainContext) {
-		log.trace("chainContextChanged()")
-		
-		payToOpen_feePercent = context.payToOpen.v1.feePercent * 100 // 0.01 => 1%
-		payToOpen_minFeeSat = context.payToOpen.v1.minFeeSat
 	}
 }
 

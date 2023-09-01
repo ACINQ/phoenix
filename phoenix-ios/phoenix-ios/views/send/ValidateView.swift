@@ -69,9 +69,6 @@ struct ValidateView: View {
 	let balancePublisher = Biz.business.balanceManager.balancePublisher()
 	@State var balanceMsat: Int64 = 0
 	
-	let chainContextPublisher = Biz.business.appConfigurationManager.chainContextPublisher()
-	@State var chainContext: WalletContext.V0ChainContext? = nil
-	
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
 	// For the cicular buttons: [metadata, tip, comment]
@@ -171,9 +168,6 @@ struct ValidateView: View {
 		}
 		.onReceive(balancePublisher) {
 			balanceDidChange($0)
-		}
-		.onReceive(chainContextPublisher) {
-			chainContextDidChange($0)
 		}
 		.task {
 			await fetchMempoolRecommendedFees()
@@ -466,7 +460,7 @@ struct ValidateView: View {
 			backgroundFill: Color.appAccent,
 			disabledBackgroundFill: Color.gray
 		))
-		.disabled(problem != nil || isDisconnected || chainContext == nil || spliceOutInProgress)
+		.disabled(problem != nil || isDisconnected || spliceOutInProgress)
 		.accessibilityHint(paymentButtonHint())
 	}
 	
@@ -488,11 +482,6 @@ struct ValidateView: View {
 					}
 				}
 				.padding(.top, 4)
-				
-			} else if chainContext == nil {
-				
-				Text("Unable to fetch fees")
-					.foregroundColor(.appNegative)
 				
 			} else if let spliceOutProblem {
 				
@@ -824,6 +813,15 @@ struct ValidateView: View {
 		return nil
 	}
 	
+	func defaultTrampolineFees() -> Lightning_kmpTrampolineFees? {
+		
+		guard let peer = Biz.business.peerManager.peerStateValue() else {
+			return nil
+		}
+		
+		return peer.walletParams.trampolineFees.first
+	}
+	
 	func paymentNumbers() -> PaymentNumbers? {
 		
 		guard let recipientAmountMsat = parsedAmountMsat() else {
@@ -842,9 +840,9 @@ struct ValidateView: View {
 		let lightningFeeMsat: Int64
 		if mvi.model is Scan.Model_OnChainFlow {
 			lightningFeeMsat = 0
-		} else if let chainContext, let trampolineFees = chainContext.trampoline.v3.first {
-			let p1 = Utils.toMsat(sat: trampolineFees.feeBaseSat)
-			let f2 = Double(trampolineFees.feePerMillionths) / 1_000_000
+		} else if let trampolineFees = defaultTrampolineFees() {
+			let p1 = Utils.toMsat(sat: trampolineFees.feeBase)
+			let f2 = Double(trampolineFees.feeProportional) / 1_000_000
 			let p2 = Int64(Double(recipientAmountMsat) * f2)
 			lightningFeeMsat = p1 + p2
 		} else {
@@ -1006,12 +1004,6 @@ struct ValidateView: View {
 				}
 			}
 		}
-	}
-	
-	func chainContextDidChange(_ context: WalletContext.V0ChainContext) -> Void {
-		log.trace("chainContextDidChange()")
-		
-		chainContext = context
 	}
 	
 	func balanceDidChange(_ balance: Lightning_kmpMilliSatoshi?) {
@@ -1458,7 +1450,7 @@ struct ValidateView: View {
 		
 		guard
 			let msat = parsedAmountMsat(),
-			let trampolineFees = chainContext?.walletParams().trampolineFees.first
+			let trampolineFees = defaultTrampolineFees()
 		else {
 			return
 		}

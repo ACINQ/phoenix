@@ -485,6 +485,7 @@ object LegacyMigrationHelper {
     }
 }
 
+/** Returns true if the payment is a channel-close made by the legacy app to the node's swap-in address. Uses the [LegacyMigrationHelper.migrationDescFlag] metadata flag. */
 fun WalletPaymentInfo.isLegacyMigration(peer: Peer?): Boolean? {
     val p = payment
     return when {
