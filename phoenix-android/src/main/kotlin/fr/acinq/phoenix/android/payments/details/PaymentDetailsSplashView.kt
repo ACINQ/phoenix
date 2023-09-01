@@ -332,13 +332,6 @@ private fun LnurlPayInfoView(payment: LightningOutgoingPayment, metadata: LnurlP
             Text(text = metadata.pay.callback.host)
         }
     }
-    metadata.pay.metadata.lnid?.takeIf { it.isNotBlank() }?.let {
-        SplashLabelRow(label = stringResource(id = R.string.paymentdetails_lnurlpay_service)) {
-            SelectionContainer {
-                Text(text = metadata.pay.callback.host)
-            }
-        }
-    }
     metadata.successAction?.let {
         LnurlSuccessAction(payment = payment, action = it)
     }
