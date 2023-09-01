@@ -43,6 +43,36 @@
     <string name="notif_watcher_revoked_commit_title">Veuillez démarrer Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Certains de vos canaux pourraient avoir fermé.</string>
 
+    <!-- settings list -->
+
+    <string name="settings_general_title">Général</string>
+    <string name="settings_security_title">Vie privée &amp; sécurité</string>
+    <string name="settings_advanced_title">Avancé</string>
+    <string name="settings_danger_title">Zone à risques</string>
+
+    <string name="settings_display_prefs">Affichage</string>
+    <string name="settings_wallet_info">Information sur le wallet</string>
+    <string name="settings_liquidity_policy">Gestion des canaux</string>
+    <string name="settings_display_seed">Phrase de sauvegarde phrase</string>
+    <string name="settings_access_control">Contrôle d\'accès</string>
+    <string name="settings_list_channels">Canaux de paiements</string>
+    <string name="settings_logs">Logs</string>
+    <string name="settings_electrum">Serveur Electrum</string>
+    <string name="settings_reset_wallet">Réinitialisation du wallet</string>
+    <string name="settings_mutual_close">Fermeture des canaux</string>
+    <string name="settings_force_close">Fermeture forcée des canaux</string>
+    <string name="settings_tor">Tor</string>
+    <string name="settings_about">À propos</string>
+    <string name="settings_payment_settings">Options de paiement</string>
+    <string name="settings_payment_history">Historique de paiement</string>
+    <string name="settings_notifications">Notifications</string>
+
+    <!-- home: bottom menu -->
+
+    <string name="menu_settings">Configuration</string>
+    <string name="menu_send">Envoyer</string>
+    <string name="menu_receive">Recevoir</string>
+
     <!-- init wallet / automated wallet creation -->
 
     <string name="initwallet_create">Créer un nouveau wallet</string>
@@ -119,7 +149,7 @@
     <string name="inappnotif_watchtower_late_action">Fermer</string>
 
     <string name="inappnotif_upgrade_message">Mise à jour disponible</string>
-    <string name="inappnotif_upgrade_critical_message">Une mise à jour critique est disponible. Vous devriez mettre à jour Phoenix le plus rapidement possible..</string>
+    <string name="inappnotif_upgrade_critical_message">Une mise à jour critique est disponible. Vous devriez mettre à jour Phoenix le plus rapidement possible.</string>
     <string name="inappnotif_upgrade_button">Mettre à jour sur Google Play</string>
 
     <string name="inappnotif_mempool_full_message">Le mempool Bitcoin est plein, et les frais sur la chaîne sont élevés.</string>

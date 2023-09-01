@@ -189,31 +189,6 @@
     <string name="btn_pause_connecting">Verbindung zur Gegenstelle wird hergestellt…</string>
     <string name="btn_pause_connecting_electrum">Verbindung zu Electrum wird hergestellt…</string>
 
-    <!-- settings list -->
-
-    <string name="settings_general_title">Allgemein</string>
-    <string name="settings_security_title">Privatsphäre &amp; Sicherheit</string>
-    <string name="settings_advanced_title">Erweitert</string>
-    <string name="settings_danger_title">Gefahrenzone</string>
-
-    <string name="settings_display_prefs">Ansicht</string>
-    <string name="settings_wallet_info">Wallet-Informationen</string>
-    <string name="settings_liquidity_policy">Kanal-Verwaltung</string>
-    <string name="settings_display_seed">Wiederherstellungsphrase</string>
-    <string name="settings_access_control">Zugriffskontrolle</string>
-    <string name="settings_fees">Gebühren-Einstellungen</string>
-    <string name="settings_list_channels">Zahlungskanäle</string>
-    <string name="settings_logs">Logs</string>
-    <string name="settings_electrum">Electrum-Server</string>
-    <string name="settings_reset_wallet">Wallet zurücksetzen</string>
-    <string name="settings_mutual_close">Kanäle schließen</string>
-    <string name="settings_force_close">Kanäle force-closen</string>
-    <string name="settings_tor">Tor</string>
-    <string name="settings_about">Über Phoenix</string>
-    <string name="settings_payment_settings">Zahlungs-Optionen</string>
-    <string name="settings_payment_history">Zahlungs-Historie</string>
-    <string name="settings_notifications">Benachrichtigungen</string>
-
     <!-- mutual close -->
 
     <string name="mutualclose_title">Meine Wallet leeren</string>

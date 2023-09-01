@@ -42,7 +42,31 @@
 
     <string name="notif_watcher_revoked_commit_title">Bitte öffnen Sie Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Einige Ihrer Kanäle wurden möglicherweise geschlossen.</string>
-	
+
+    <!-- settings list -->
+
+    <string name="settings_general_title">Allgemein</string>
+    <string name="settings_security_title">Privatsphäre &amp; Sicherheit</string>
+    <string name="settings_advanced_title">Erweitert</string>
+    <string name="settings_danger_title">Gefahrenzone</string>
+
+    <string name="settings_display_prefs">Ansicht</string>
+    <string name="settings_wallet_info">Wallet-Informationen</string>
+    <string name="settings_liquidity_policy">Kanal-Verwaltung</string>
+    <string name="settings_display_seed">Wiederherstellungsphrase</string>
+    <string name="settings_access_control">Zugriffskontrolle</string>
+    <string name="settings_list_channels">Zahlungskanäle</string>
+    <string name="settings_logs">Logs</string>
+    <string name="settings_electrum">Electrum-Server</string>
+    <string name="settings_reset_wallet">Wallet zurücksetzen</string>
+    <string name="settings_mutual_close">Kanäle schließen</string>
+    <string name="settings_force_close">Kanäle force-closen</string>
+    <string name="settings_tor">Tor</string>
+    <string name="settings_about">Über Phoenix</string>
+    <string name="settings_payment_settings">Zahlungs-Optionen</string>
+    <string name="settings_payment_history">Zahlungs-Historie</string>
+    <string name="settings_notifications">Benachrichtigungen</string>
+
 	<!-- init wallet / automated wallet creation -->
 
     <string name="initwallet_create">Neue Wallet erstellen</string>
