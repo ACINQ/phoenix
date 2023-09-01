@@ -57,59 +57,27 @@ struct PaymentCell : View {
 	@ViewBuilder
 	var body: some View {
 		
-		HStack {
-			if let payment = fetched?.payment {
-				
-				switch payment.state() {
-				case WalletPaymentState.successonchain:
-					
-					Image(systemName: "link.circle.fill")
-						.resizable()
-						.frame(width: 26, height: 26)
-						.foregroundColor(Color.appAccent)
-						.padding(.vertical, 4)
-					
-				case WalletPaymentState.successoffchain:
-					
-					Image("payment_holder_def_success")
-						.foregroundColor(Color.accentColor)
-						.padding(4)
-						.background(
-							RoundedRectangle(cornerRadius: .infinity)
-								.fill(Color.appAccent)
-						)
-					
-				case WalletPaymentState.pendingonchain:
-					
-					Image("payment_holder_def_pending")
-						.foregroundColor(Color.appAccent)
-						.padding(4)
-					
-				case WalletPaymentState.pendingoffchain:
-					
-					Image("payment_holder_def_pending")
-						.foregroundColor(Color.appAccent)
-						.padding(4)
-					
-				case WalletPaymentState.failure:
-					
-					Image("payment_holder_def_failed")
-						.foregroundColor(Color.appAccent)
-						.padding(4)
-					
-				default:
-					Image(systemName: "doc.text.magnifyingglass")
-						.padding(4)
-					
-				} // </switch>
-				
-			} else {
-				
-				Image(systemName: "doc.text.magnifyingglass")
-					.padding(4)
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			
+			Group {
+				if let payment = fetched?.payment {
+					switch payment.state() {
+						case WalletPaymentState.successonchain  : Image(systemName: "link.circle.fill")
+						case WalletPaymentState.successoffchain : Image(systemName: "checkmark.circle.fill")
+						case WalletPaymentState.pendingonchain  : Image(systemName: "clock.fill")
+						case WalletPaymentState.pendingoffchain : Image(systemName: "clock.fill")
+						case WalletPaymentState.failure         : Image(systemName: "x.circle.fill")
+						default                                 : Image(systemName: "magnifyingglass.circle.fill")
+					}
+				} else {
+					Image(systemName: "magnifyingglass.circle.fill")
+				}
 			}
+			.font(.title3)
+			.imageScale(.large)
+			.foregroundColor(.appAccent)
 
-			VStack(alignment: .leading) {
+			VStack(alignment: HorizontalAlignment.leading) {
 				Text(paymentDescription())
 					.lineLimit(1)
 					.truncationMode(.tail)
@@ -120,10 +88,10 @@ struct PaymentCell : View {
 					.foregroundColor(.secondary)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
-			.padding([.leading, .trailing], 6)
+			.padding(.leading, 12)
+			.padding(.trailing, 6)
 
 			let (amount, isFailure, isOutgoing) = paymentAmountInfo()
-			
 			if currencyPrefs.hideAmounts {
 				
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
@@ -155,7 +123,7 @@ struct PaymentCell : View {
 						.foregroundColor(.gray)
 					Text_CurrencyName(currency: amount.currency, fontTextStyle: .caption)
 						.foregroundColor(.gray)
-				}
+				} // </HStack>
 				.accessibilityElement()
 				.accessibilityLabel("\(isOutgoing ? "-" : "+")\(amount.string)")
 				
