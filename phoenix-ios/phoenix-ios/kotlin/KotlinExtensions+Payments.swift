@@ -56,12 +56,18 @@ extension WalletPaymentInfo {
 				return sanitize(invoice.paymentRequest.description_)
 			}
 			
-		} else if let outgoingPayment = payment as? Lightning_kmpLightningOutgoingPayment {
+		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
 			
-			if let normal = outgoingPayment.details.asNormal() {
-				return sanitize(normal.paymentRequest.desc())
-			} else if let swapOut = outgoingPayment.details.asSwapOut() {
-				return sanitize(swapOut.address)
+			if let lightningPayment = payment as? Lightning_kmpLightningOutgoingPayment {
+			
+				if let normal = lightningPayment.details.asNormal() {
+					return sanitize(normal.paymentRequest.desc())
+				} else if let swapOut = lightningPayment.details.asSwapOut() {
+					return sanitize(swapOut.address)
+				}
+				
+			} else if let spliceOut = outgoingPayment as? Lightning_kmpSpliceOutgoingPayment {
+				return sanitize(spliceOut.address)
 			}
 		}
 		
@@ -80,15 +86,20 @@ extension WalletPaymentInfo {
 				return NSLocalizedString("On-chain deposit", comment: "Payment description for received deposit")
 			}
 			
-		} else if let outgoingPayment = payment as? Lightning_kmpLightningOutgoingPayment {
-	
-			if let _ = outgoingPayment.details.asKeySend() {
-				return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
+		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
+			
+			if let lightningPayment = outgoingPayment as? Lightning_kmpLightningOutgoingPayment {
+				
+				if let _ = lightningPayment.details.asKeySend() {
+					return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
+				}
+				
+			} else if let _ = outgoingPayment as? Lightning_kmpChannelCloseOutgoingPayment {
+				return NSLocalizedString("Channel closing", comment: "Payment description for channel closing")
+				
+			} else if let _ = outgoingPayment as? Lightning_kmpSpliceCpfpOutgoingPayment {
+				return NSLocalizedString("Bump fees", comment: "Payment description for splice CPFP")
 			}
-			
-		} else if let _ = payment as? Lightning_kmpChannelCloseOutgoingPayment {
-			
-			return NSLocalizedString("Channel closing", comment: "Payment description for channel closing")
 		}
 	
 		return NSLocalizedString("No description", comment: "placeholder text")
