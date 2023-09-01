@@ -11,19 +11,44 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+fileprivate enum NavLinkTag: String {
+	case BackgroundPaymentsSelector
+}
 
 struct PaymentOptionsView: View {
+	
+	@ViewBuilder
+	var body: some View {
+		ScrollViewReader { scrollViewProxy in
+			PaymentOptionsList(scrollViewProxy: scrollViewProxy)
+		}
+	}
+}
+
+fileprivate struct PaymentOptionsList: View {
+	
+	let scrollViewProxy: ScrollViewProxy
+	
+	@State private var navLinkTag: NavLinkTag? = nil
 	
 	@State var defaultPaymentDescription: String = Prefs.shared.defaultPaymentDescription ?? ""
 	
 	@State var invoiceExpirationDays: Int = Prefs.shared.invoiceExpirationDays
 	let invoiceExpirationDaysOptions = [7, 30, 60]
 
-	@State var userDefinedMaxFees: MaxFees? = Prefs.shared.maxFees
+	@State var notificationSettings = NotificationsManager.shared.settings.value
 	
-	let maxFeesPublisher = Prefs.shared.maxFeesPublisher
+	@State var firstAppearance = true
+	
+	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
+	@State private var swiftUiBugWorkaroundIdx = 0
+	
+	@Namespace var sectionID_incomingPayments
+	@Namespace var sectionID_backgroundPayments
 	
 	@Environment(\.openURL) var openURL
+	
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// --------------------------------------------------
@@ -43,12 +68,21 @@ struct PaymentOptionsView: View {
 		
 		List {
 			section_incomingPayments()
-			section_outgoingPayments()
+			section_backgroundPayments()
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onReceive(maxFeesPublisher) {
-			maxFeesChanged($0)
+		.onAppear {
+			onAppear()
+		}
+		.onChange(of: navLinkTag) {
+			navLinkTagChanged($0)
+		}
+		.onChange(of: deepLinkManager.deepLink) {
+			deepLinkChanged($0)
+		}
+		.onReceive(NotificationsManager.shared.settings) {
+			notificationSettings = $0
 		}
 	}
 	
@@ -63,6 +97,7 @@ struct PaymentOptionsView: View {
 			Text("Incoming payments")
 			
 		} // </Section>
+		.id(sectionID_incomingPayments)
 	}
 	
 	@ViewBuilder
@@ -125,48 +160,165 @@ struct PaymentOptionsView: View {
 	}
 	
 	@ViewBuilder
-	func section_outgoingPayments() -> some View {
+	func section_backgroundPayments() -> some View {
 		
-		Section {
+		Section(header: Text("Background Payments")) {
 			
-			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-				Text("Maximum fee for outgoing Lightning payments")
-					.padding(.bottom, 8)
+			let config = BackgroundPaymentsConfig.fromSettings(notificationSettings)
+			let hideAmount = NSLocalizedString("(hide amount)", comment: "Background payments configuration")
+			
+			navLink(.BackgroundPaymentsSelector) {
 				
-				Button {
-					showMaxFeeSheet()
-				} label: {
-					Text(maxFeesString())
-				}
-				
-			} // </VStack>
-			.padding([.top, .bottom], 8)
-			
-			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-				Text("Phoenix will try to make the payment using the minimum fee possible.")
-			}
-			.font(.callout)
-			.foregroundColor(Color.secondary)
-			.padding([.top, .bottom], 8)
-			
-		} /* Section.*/header: {
-			Text("Outgoing payments")
+				Group { // Compiler workaround: Type '()' cannot conform to 'View'
+					switch config {
+					case .receiveQuietly(let discreet):
+						HStack(alignment: VerticalAlignment.center, spacing: 4) {
+							Text("Receive quietly")
+							if discreet {
+								Text(verbatim: hideAmount)
+									.font(.subheadline)
+									.foregroundColor(.secondary)
+								}
+							}
+						
+					case .fullVisibility(let discreet):
+						HStack(alignment: VerticalAlignment.center, spacing: 4) {
+							Text("Visible")
+							if discreet {
+								Text(verbatim: hideAmount)
+									.font(.subheadline)
+									.foregroundColor(.secondary)
+								}
+							}
+						
+					case .customized(let discreet):
+						HStack(alignment: VerticalAlignment.center, spacing: 4) {
+							Text("Customized")
+							if discreet {
+								Text(verbatim: hideAmount)
+									.font(.subheadline)
+									.foregroundColor(.secondary)
+								}
+							}
+						
+					case .disabled:
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("Disabled")
+							Spacer()
+							Image(systemName: "exclamationmark.triangle")
+								.renderingMode(.template)
+								.foregroundColor(Color.appWarn)
+							}
+						
+					} // </switch>
+				} // </Group>
+			} // </navLink>
 			
 		} // </Section>
+		.id(sectionID_backgroundPayments)
+	}
+	
+	@ViewBuilder
+	private func navLink<Content>(
+		_ tag: NavLinkTag,
+		label: () -> Content
+	) -> some View where Content: View {
+		
+		NavigationLink(
+			destination: navLinkView(tag),
+			tag: tag,
+			selection: $navLinkTag,
+			label: label
+		)
+	}
+	
+	@ViewBuilder
+	private func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+			case .BackgroundPaymentsSelector : BackgroundPaymentsSelector()
+		}
 	}
 	
 	// --------------------------------------------------
-	// MARK: View Helpers
+	// MARK: Notifications
 	// --------------------------------------------------
 	
-	func maxFeesString() -> String {
+	func onAppear() {
+		log.trace("onAppear()")
 		
-		let currentFees = userDefinedMaxFees ?? defaultMaxFees()
+		if firstAppearance {
+			firstAppearance = false
+			
+			if let deepLink = deepLinkManager.deepLink {
+				DispatchQueue.main.async { // iOS 14 issues workaround
+					deepLinkChanged(deepLink)
+				}
+			}
+		}
+	}
+	
+	func deepLinkChanged(_ value: DeepLink?) {
+		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
 		
-		let base = Utils.formatBitcoin(sat: currentFees.feeBaseSat, bitcoinUnit: .sat)
-		let proportional = formatProportionalFee(currentFees.feeProportionalMillionths)
+		// This is a hack, courtesy of bugs in Apple's NavigationLink:
+		// https://developer.apple.com/forums/thread/677333
+		//
+		// Summary:
+		// There's some quirky code in SwiftUI that is resetting our navLinkTag.
+		// Several bizarre workarounds have been proposed.
+		// I've tried every one of them, and none of them work (at least, without bad side-effects).
+		//
+		// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
+		// and forcibly undo it.
 		
-		return "\(base.string) + \(proportional)%"
+		if let value = value {
+			
+			// Navigate towards deep link (if needed)
+			var newNavLinkTag: NavLinkTag? = nil
+			switch value {
+				case .paymentHistory     : break
+				case .backup             : break
+				case .drainWallet        : break
+				case .electrum           : break
+				case .backgroundPayments : newNavLinkTag = NavLinkTag.BackgroundPaymentsSelector
+				case .liquiditySettings  : break
+				case .forceCloseChannels : break
+			}
+			
+			if let newNavLinkTag = newNavLinkTag {
+				
+				self.swiftUiBugWorkaround = newNavLinkTag
+				self.swiftUiBugWorkaroundIdx += 1
+				clearSwiftUiBugWorkaround(delay: 1.5)
+				
+				// Interesting bug in SwiftUI:
+				// If the navLinkTag you're targetting is scrolled off the screen,
+				// the you won't be able to navigate to it.
+				// My understanding is that List is lazy, and this somehow prevents triggering the navigation.
+				// The workaround is to manually scroll to the item to ensure it's onscreen,
+				// at which point we can activate the navLinkTag trigger.
+				//
+				scrollViewProxy.scrollTo(sectionID_backgroundPayments)
+				DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+					self.navLinkTag = newNavLinkTag // Trigger/push the view
+				}
+			}
+			
+		} else {
+			// We reached the final destination of the deep link
+			clearSwiftUiBugWorkaround(delay: 0.0)
+		}
+	}
+	
+	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
+		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
+		
+		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
+				
+			log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
+			self.navLinkTag = forcedNavLinkTag
+		}
 	}
 	
 	// --------------------------------------------------
@@ -185,14 +337,6 @@ struct PaymentOptionsView: View {
 		Prefs.shared.invoiceExpirationDays = self.invoiceExpirationDays
 	}
 	
-	func showMaxFeeSheet() {
-		log.trace("showMaxFeeSheet()")
-		
-		smartModalState.display(dismissable: false) {
-			MaxFeeConfiguration()
-		}
-	}
-	
 	func openFaqButtonTapped() -> Void {
 		log.trace("openFaqButtonTapped()")
 		
@@ -201,32 +345,20 @@ struct PaymentOptionsView: View {
 		}
 	}
 	
-	func maxFeesChanged(_ newMaxFees: MaxFees?) {
-		log.trace("maxFeesChanged()")
+	// --------------------------------------------------
+	// MARK: Workarounds
+	// --------------------------------------------------
+	
+	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
 		
-		userDefinedMaxFees = newMaxFees
+		let idx = self.swiftUiBugWorkaroundIdx
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+			
+			if self.swiftUiBugWorkaroundIdx == idx {
+				log.trace("swiftUiBugWorkaround = nil")
+				self.swiftUiBugWorkaround = nil
+			}
+		}
 	}
-}
-
-func defaultMaxFees() -> MaxFees {
-	
-	let peer = Biz.business.peerManager.peerStateValue()
-	if let defaultMaxFees = peer?.walletParams.trampolineFees.last {
-		return MaxFees.fromTrampolineFees(defaultMaxFees)
-	} else {
-		return MaxFees(feeBaseSat: 0, feeProportionalMillionths: 0)
-	}
-}
-
-func formatProportionalFee(_ feeProportionalMillionths: Int64) -> String {
-	
-	let percent = Double(feeProportionalMillionths) / Double(1_000_000)
-	
-	let formatter = NumberFormatter()
-	formatter.numberStyle = .percent
-	formatter.percentSymbol = ""
-	formatter.paddingCharacter = ""
-	formatter.minimumFractionDigits = 2
-	
-	return formatter.string(from: NSNumber(value: percent))!
 }
