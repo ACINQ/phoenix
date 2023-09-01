@@ -169,9 +169,10 @@
     <string name="inappnotif_payment_rejected_tweak_setting">Klepnutím na položku provedete konfiguraci.</string>
 
     <string name="inappnotif_watchtower_nominal_title">Watchtower report</string>
-    <plurals name="inappnotif_watchtower_nominal_description" tools:ignore="MissingQuantity">
+    <plurals name="inappnotif_watchtower_nominal_description">
         <item quantity="one">%1$d kanál byl úspěšně zkontrolován na %2$s. Nebyly nalezeny žádné problémy.</item>
-        <item quantity="other">%1$d kanálů bylo úspěšně zkontrolováno na %2$s. Nebyly nalezeny žádné problémy.</item>
+        <item quantity="few">%1$d kanálů bylo úspěšně zkontrolováno na %2$s. Nebyly nalezeny žádné problémy.</item>
+        <item quantity="many">%1$d kanálů bylo úspěšně zkontrolováno na %2$s. Nebyly nalezeny žádné problémy.</item>
     </plurals>
     <string name="inappnotif_watchtower_revokedfound_title">Watchtower alert</string>
     <string name="inappnotif_watchtower_revokedfound_description">Na kanálu (kanálech) %1$s byly nalezeny odvolané závazky: %2$s. Tento kanál může být uzavřen.</string>
