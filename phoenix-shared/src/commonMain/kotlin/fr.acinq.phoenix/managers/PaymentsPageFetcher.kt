@@ -58,9 +58,11 @@ class PaymentsPageFetcher(
 
         if (this.offset == offset && this.count == count && this.seconds == Int.MIN_VALUE) {
             // No changes
+            log.debug { "ignoring: no changes" }
             return
         }
         this.job?.let {
+            log.debug { "cancelling previous job" }
             it.cancel()
             this.job = null
         }
@@ -76,17 +78,20 @@ class PaymentsPageFetcher(
 
         val offsetSnapshot = offset
         val countSnapshot = count
+        val subscriptionIdxSnapshot = subscriptionIdx
         this.job = launch {
             val db = databaseManager.paymentsDb()
             db.listPaymentsOrderFlow(
                 count = countSnapshot,
                 skip = offsetSnapshot
             ).collect {
-                _paymentsPage.value = PaymentsPage(
-                    offset = offsetSnapshot,
-                    count = countSnapshot,
-                    rows = it
-                )
+                if (subscriptionIdxSnapshot == subscriptionIdx) {
+                    _paymentsPage.value = PaymentsPage(
+                        offset = offsetSnapshot,
+                        count = countSnapshot,
+                        rows = it
+                    )
+                }
             }
         }
     }
@@ -94,10 +99,15 @@ class PaymentsPageFetcher(
     fun subscribeToInFlight(offset: Int, count: Int) {
         log.debug { "subscribeToInFlight(offset=$offset, count=$count)" }
 
-        if (this.offset == offset && this.count == count && this.seconds == seconds) {
-            log.debug { "ignoring: no changes" }
+        if (this.offset == offset && this.count == count && this.seconds == 0) {
             // No changes
+            log.debug { "ignoring: no changes" }
             return
+        }
+        this.job?.let {
+            log.debug { "cancelling previous job" }
+            it.cancel()
+            this.job = null
         }
 
         this.offset = offset.coerceAtLeast(minimumValue = 0)
@@ -107,17 +117,20 @@ class PaymentsPageFetcher(
 
         val offsetSnapshot = offset
         val countSnapshot = count
+        val subscriptionIdxSnapshot = subscriptionIdx
         this.job = launch {
             val db = databaseManager.paymentsDb()
             db.listOutgoingInFlightPaymentsOrderFlow(
                 count = countSnapshot,
                 skip = offsetSnapshot
             ).collect { rows ->
-                _paymentsPage.value = PaymentsPage(
-                    offset = offsetSnapshot,
-                    count = countSnapshot,
-                    rows = rows
-                )
+                if (subscriptionIdxSnapshot == subscriptionIdx) {
+                    _paymentsPage.value = PaymentsPage(
+                        offset = offsetSnapshot,
+                        count = countSnapshot,
+                        rows = rows
+                    )
+                }
             }
         }
     }
@@ -130,8 +143,8 @@ class PaymentsPageFetcher(
             return
         }
         if (this.offset == offset && this.count == count && this.seconds == seconds) {
-            log.debug { "ignoring: no changes" }
             // No changes
+            log.debug { "ignoring: no changes" }
             return
         }
 
@@ -151,6 +164,7 @@ class PaymentsPageFetcher(
             return
         }
         job?.let {
+            log.debug { "cancelling previous job" }
             it.cancel()
             job = null
         }
@@ -158,6 +172,7 @@ class PaymentsPageFetcher(
         val offsetSnapshot = offset
         val countSnapshot = count
         val secondsSnapshot = seconds
+        val subscriptionIdxSnapshot = subscriptionIdx
         job = launch {
             val db = databaseManager.paymentsDb()
             val date = Clock.System.now() - secondsSnapshot.seconds
@@ -166,12 +181,14 @@ class PaymentsPageFetcher(
                 count = countSnapshot,
                 skip = offsetSnapshot
             ).collect { rows ->
-                _paymentsPage.value = PaymentsPage(
-                    offset = offsetSnapshot,
-                    count = countSnapshot,
-                    rows = rows
-                )
-                resetRefreshJob(idx, rows)
+                if (subscriptionIdxSnapshot == subscriptionIdx) {
+                    _paymentsPage.value = PaymentsPage(
+                        offset = offsetSnapshot,
+                        count = countSnapshot,
+                        rows = rows
+                    )
+                    resetRefreshJob(idx, rows)
+                }
             }
         }
     }
@@ -184,6 +201,7 @@ class PaymentsPageFetcher(
             return
         }
         this.refreshJob?.let {
+            log.debug { "cancelling previous refreshJob" }
             it.cancel()
             this.refreshJob = null
         }
