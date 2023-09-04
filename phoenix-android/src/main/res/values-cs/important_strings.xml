@@ -33,7 +33,7 @@
     <string name="notif_missed_title">Zmeškaná příchozí platba</string>
     <string name="notif_missed_unavailable">Phoenix se nepodařilo spustit na pozadí.</string>
 
-    <string name="notif_rejected_deposit_title">On-Chain Záloha čeká na vyřízení (+%1$s)</string>
+    <string name="notif_rejected_deposit_title">On-Chain záloha čeká na vyřízení (+%1$s)</string>
     <string name="notif_rejected_payment_title">Zamítnutí platby (+%1$s)</string>
     <string name="notif_rejected_policy_disabled">Automatická správa kanálů je zakázána. To můžete změnit v nastavení.</string>
     <string name="notif_rejected_over_absolute">Poplatek činil %1$s, ale váš maximální poplatek byl nastaven na %2$s. To můžete upravit v nastavení.</string>
@@ -144,7 +144,7 @@
 
     <string name="inappnotif_migration_from_legacy">Gratulujeme! Vaše peněženka byla aktualizována.</string>
     <string name="inappnotif_migration_from_legacy_action">Podívejte se na změny</string>
-    <string name="inappnotif_migration_from_legacy_dialog_title">Vaše na adresa Bitcoin Blockchainu se změnila</string>
+    <string name="inappnotif_migration_from_legacy_dialog_title">Vaše Bitcoin On-Chain adresa se změnila</string>
     <string name="inappnotif_migration_from_legacy_dialog_body">Nepoužívejte znovu své staré adresy! Nebudou již fungovat.\n\nKontaktujte podporu, pokud jste tak náhodou učinili.</string>
 
     <string name="inappnotif_backup_seed_message">Zálohujte svou peněženku, abyste zabránili ztrátě bitcoinů.</string>
@@ -235,7 +235,7 @@
     <string name="walletinfo_onchain_swapin">Swap-in peněženka</string>
     <string name="walletinfo_onchain_swapin_help">Prostředky zaslané do této On-Chain peněženky se automaticky převádějí do Lightningu.</string>
     <string name="walletinfo_onchain_swapin_policy_view">Klepnutím na položku provedete konfiguraci.</string>
-    <string name="walletinfo_onchain_swapin_policy_auto_details">Pokud je poplatek <b>menší než %1$s</b>, budou prostředky na Blockchainu automaticky převedeny do služby Lightning.</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details">Pokud je poplatek <b>menší než %1$s</b>, budou On-Chain prostředky automaticky převedeny do Lightning.</string>
     <string name="walletinfo_onchain_swapin_policy_disabled_details">Automatizovaná poplatková politika <b>je vypnutá</b>. Prostředky nebudou vyměňovány. Zůstanou na této peněžence.</string>
     <string name="walletinfo_onchain_swapin_empty">Neprobíhají žádné výměny.</string>
 
