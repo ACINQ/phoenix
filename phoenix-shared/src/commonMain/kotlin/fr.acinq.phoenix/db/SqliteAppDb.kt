@@ -82,7 +82,16 @@ class SqliteAppDb(private val driver: SqlDriver) {
         //
         return priceQueries.list(mapper = { fiat, price, type, source, updated_at ->
             ExchangeRate.Row(fiat, price, type, source, updated_at)
-        }).asFlow().mapToList().map {
+        })
+        .asFlow()
+        .map {
+            withContext(Dispatchers.Default) {
+                database.transactionWithResult {
+                    it.executeAsList()
+                }
+            }
+        }
+        .map {
             it.mapNotNull { row ->
                 FiatCurrency.valueOfOrNull(row.fiat)?.let { fiatCurrency ->
                     when (row.type) {
