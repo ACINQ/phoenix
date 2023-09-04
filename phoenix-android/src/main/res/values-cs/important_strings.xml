@@ -235,7 +235,7 @@
     <string name="walletinfo_onchain_swapin">Swap-in peněženka</string>
     <string name="walletinfo_onchain_swapin_help">Prostředky zaslané do této On-Chain peněženky se automaticky převádějí do Lightningu.</string>
     <string name="walletinfo_onchain_swapin_policy_view">Klepnutím na položku provedete konfiguraci.</string>
-    <string name="walletinfo_onchain_swapin_policy_auto_details">Pokud je poplatek <b>menší než %1$s</b>, budou On-Chain prostředky automaticky převedeny do Lightning.</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details">Pokud je poplatek <b>menší než %1$s</b>, budou On-Chain prostředky automaticky převedeny do Lightningu.</string>
     <string name="walletinfo_onchain_swapin_policy_disabled_details">Automatizovaná poplatková politika <b>je vypnutá</b>. Prostředky nebudou vyměňovány. Zůstanou na této peněžence.</string>
     <string name="walletinfo_onchain_swapin_empty">Neprobíhají žádné výměny.</string>
 
