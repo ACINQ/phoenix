@@ -211,7 +211,7 @@
 
     <string name="about_general_content">Phoenix je peněženka Bitcoin využívající síť Lightning pro odesílání a přijímání plateb.\n\nJedná se o bezplatný software s otevřeným zdrojovým kódem, který vyvinula společnost <a href="https://phoenix.acinq.co">ACINQ</a> pod <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">licencí Apache 2.0</a>.</string>
     <string name="about_seed_title">Zabezpečení klíče</string>
-    <string name="about_seed_content">Tuto peněženku si spravujete sami(self-custody): <b>Vy jediní jste zodpověďni za správu 12-ti slovného Seed klíče</b>.\n\nTento klíč umožňuje přístup k vašim penězům. Nikomu ho neprozrazujte a dejte si pozor na phishing.</string>
+    <string name="about_seed_content">Tuto peněženku si spravujete sami (self-custody): <b>Vy jediní jste zodpověďni za správu 12-ti slovného Seed klíče</b>.\n\nTento klíč umožňuje přístup k vašim penězům. Nikomu ho neprozrazujte a dejte si pozor na phishing.</string>
     <string name="about_rates_title">Směnné kurzy</string>
     <string name="about_rates_content">Směnné kurzy bitcoinu/fiatu jsou získávány z různých rozhraní API třetích stran:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nTyto sazby nemusí být přesné. Před odesláním platby vždy zkontrolujte skutečnou částku v bitcoinech.</string>
 
