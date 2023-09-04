@@ -223,15 +223,15 @@ struct MergeChannelsView: View {
 			
 			bulletRow(
 				title: "Your address for on-chain deposits will change",
-				subtitle: "don't use addresses from the previous version"
+				subtitle: "Don't use addresses from the previous version."
 			)
 			
 			let msats = migrationCosts()
 			if msats > 0 {
 				let (btcAmt, fiatAmt) = formattedMigrationCosts(msats)
 				bulletRow(
-					title: "The operation will cost \(btcAmt.string) (≈ \(fiatAmt.string))",
-					subtitle: "the fees go to the bitcoin miners"
+					title: "The migration will cost \(btcAmt.string) (≈ \(fiatAmt.string))",
+					subtitle: "Channels with less than the Bitcoin dust limit (546 satoshi) cannot be migrated. Their balance go to the bitcoin miners."
 				)
 			}
 			
