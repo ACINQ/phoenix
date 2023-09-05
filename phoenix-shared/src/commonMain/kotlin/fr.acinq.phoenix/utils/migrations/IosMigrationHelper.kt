@@ -60,10 +60,10 @@ object IosMigrationHelper {
     }
 
     /**
-     * There may be certain "costs" associated with closing a channel:
-     * - if the channel balance is below the dust limit, then the funds go to the miners
-     * - the channel balance automatically gets truncated from millisatoshis to satoshis
-     *   (e.g. 12,345.678 sats => 12,345 sats), so a few msats may be dropped
+     * There may be certain "costs" associated with closing a channel: if the channel's balance is below the dust limit,
+     * then the funds go to the miners.
+     *
+     * Channels with balance under 1 sat are ignored.
      */
     fun migrationCosts(channels: List<LocalChannelInfo>): MilliSatoshi {
         return channels.filter { channel ->
@@ -72,13 +72,8 @@ object IosMigrationHelper {
                 is Syncing -> state.state.isLegacy()
                 else -> state.isLegacy()
             }
-        }.map {
-            val balance = it.localBalance ?: 0.msat
-            if (balance < 546_000.msat) {
-                balance
-            } else {
-                balance - balance.truncateToSatoshi().toMilliSatoshi()
-            }
+        }.mapNotNull { channel ->
+            channel.localBalance?.takeIf { it >= 1_000.msat && it < 546_000.msat }
         }.sum()
     }
 
