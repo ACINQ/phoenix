@@ -818,6 +818,7 @@ struct HomeView : MVIView {
 	// --------------------------------------------------
 	
 	func paymentsPageFetcher_subscribe() {
+		log.trace("paymentsPageFetcher_subscribe()")
 		
 		switch recentPaymentsConfig {
 		case .withinTime(let seconds):

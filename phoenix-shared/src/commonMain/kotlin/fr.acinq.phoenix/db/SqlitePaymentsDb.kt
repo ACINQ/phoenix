@@ -40,6 +40,7 @@ import fracinqphoenixdb.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
@@ -415,8 +416,16 @@ class SqlitePaymentsDb(
 
     // ---- list ALL payments
 
-    suspend fun listPaymentsCountFlow(): Flow<Long> = withContext(Dispatchers.Default) {
-        aggrQueries.listAllPaymentsCount(::allPaymentsCountMapper).asFlow().mapToOne()
+    fun listPaymentsCountFlow(): Flow<Long> {
+        return aggrQueries.listAllPaymentsCount(::allPaymentsCountMapper)
+            .asFlow()
+            .map {
+                withContext(Dispatchers.Default) {
+                    database.transactionWithResult {
+                        it.executeAsOne()
+                    }
+                }
+            }
     }
 
     suspend fun listIncomingPaymentsNotYetConfirmed(): Flow<List<IncomingPayment>> = withContext(Dispatchers.Default) {
@@ -424,39 +433,63 @@ class SqlitePaymentsDb(
     }
 
     /** Returns a flow of incoming payments within <count, skip>. This flow is updated when the data change in the database. */
-    suspend fun listPaymentsOrderFlow(
+    fun listPaymentsOrderFlow(
         count: Int,
         skip: Int
-    ): Flow<List<WalletPaymentOrderRow>> = withContext(Dispatchers.Default) {
-        aggrQueries.listAllPaymentsOrder(
+    ): Flow<List<WalletPaymentOrderRow>>  {
+        return aggrQueries.listAllPaymentsOrder(
             limit = count.toLong(),
             offset = skip.toLong(),
             mapper = ::allPaymentsOrderMapper
-        ).asFlow().mapToList()
+        )
+        .asFlow()
+        .map {
+            withContext(Dispatchers.Default) {
+                database.transactionWithResult {
+                    it.executeAsList()
+                }
+            }
+        }
     }
 
-    suspend fun listRecentPaymentsOrderFlow(
+    fun listRecentPaymentsOrderFlow(
         date: Long,
         count: Int,
         skip: Int
-    ): Flow<List<WalletPaymentOrderRow>> = withContext(Dispatchers.Default) {
-        aggrQueries.listRecentPaymentsOrder(
+    ): Flow<List<WalletPaymentOrderRow>> {
+        return aggrQueries.listRecentPaymentsOrder(
             date = date,
             limit = count.toLong(),
             offset = skip.toLong(),
             mapper = ::allPaymentsOrderMapper
-        ).asFlow().mapToList()
+        )
+        .asFlow()
+        .map {
+            withContext(Dispatchers.Default) {
+                database.transactionWithResult {
+                    it.executeAsList()
+                }
+            }
+        }
     }
 
-    suspend fun listOutgoingInFlightPaymentsOrderFlow(
+    fun listOutgoingInFlightPaymentsOrderFlow(
         count: Int,
         skip: Int
-    ): Flow<List<WalletPaymentOrderRow>> = withContext(Dispatchers.Default) {
-        aggrQueries.listOutgoingInFlightPaymentsOrder(
+    ): Flow<List<WalletPaymentOrderRow>> {
+        return aggrQueries.listOutgoingInFlightPaymentsOrder(
             limit = count.toLong(),
             offset = skip.toLong(),
             mapper = ::allPaymentsOrderMapper
-        ).asFlow().mapToList()
+        )
+        .asFlow()
+        .map {
+            withContext(Dispatchers.Default) {
+                database.transactionWithResult {
+                    it.executeAsList()
+                }
+            }
+        }
     }
 
     /**
