@@ -168,9 +168,8 @@ struct BizNotificationCell: View {
 	
 	@ViewBuilder
 	var body: some View {
-		
 		if let reason = item.notification as? PhoenixShared.Notification.PaymentRejected {
-			
+
 			if let reason = reason as? PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee {
 				body_overAbsoluteFee(Either.Left(reason))
 			} else if let reason = reason as? PhoenixShared.Notification.PaymentRejected.OverRelativeFee {
@@ -178,19 +177,19 @@ struct BizNotificationCell: View {
 			} 	else {
 				body_paymentRejected(reason)
 			}
-			
+
 		} else if let reason = item.notification as? PhoenixShared.WatchTowerOutcome {
-			
+
 			if let reason = reason as? PhoenixShared.WatchTowerOutcome.Nominal {
 				body_watchTowerSuccess(reason)
-				
+
 			} else if let reason = reason as? PhoenixShared.WatchTowerOutcome.RevokedFound {
 				body_watchTowerRevoked(reason)
-				
+
 			} else if let reason = reason as? PhoenixShared.WatchTowerOutcome.Unknown {
 				body_watchTowerUnknown(reason)
 			}
-			
+
 		} else {
 			EmptyView()
 		}
