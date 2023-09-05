@@ -27,12 +27,18 @@ class CloudKitDb(
 
     init {
         launch {
-            val ckQueries = database.cloudKitPaymentsQueries
-            val fetchQueueCountFlow = ckQueries.fetchQueueCount().asFlow().mapToOne()
-
-            fetchQueueCountFlow.collect { count ->
-                _queueCount.value = count
-            }
+            database.cloudKitPaymentsQueries.fetchQueueCount()
+                .asFlow()
+                .map {
+                    withContext(Dispatchers.Default) {
+                        database.transactionWithResult {
+                            it.executeAsOne()
+                        }
+                    }
+                }
+                .collect { count ->
+                    _queueCount.value = count
+                }
         }
     }
 
