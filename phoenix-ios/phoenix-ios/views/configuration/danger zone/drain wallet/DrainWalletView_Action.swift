@@ -97,20 +97,16 @@ struct DrainWalletView_Action: MVISubView {
 		
 		Section {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 15) {
-				
-				let msg = (expectedTxCount > 1)
-					? String(format: NSLocalizedString(
-						"Expect to receive %d separate payments.",
-						comment: "label text"
-					), expectedTxCount)
-					: NSLocalizedString(
-						"The closing transaction is in your transactions list.",
-						comment: "label text"
-					)
 
 				Label {
-					Text(styled: msg)
-						.fixedSize(horizontal: false, vertical: true)
+					Group {
+						if expectedTxCount > 1 {
+							Text("Expect to receive \(expectedTxCount) separate payments.")
+						} else {
+							Text("The closing transaction is in your transactions list.")
+						}
+					}
+					.fixedSize(horizontal: false, vertical: true)
 				} icon: {
 					Image(systemName: "archivebox")
 						.imageScale(.medium)

@@ -572,18 +572,21 @@ struct HomeView : MVIView {
 		if noticeMonitor.hasNotice_backgroundPayments { count += 1 }
 		if noticeMonitor.hasNotice_watchTower         { count += 1 }
 		
-		count += bizNotifications.count
+		// ignore business notifications, unless we have notifications from `noticeMonitor`
+		if count >= 1 {
+			count += bizNotifications.count
+		}
 		
 		return count
 	}
 	
 	func primaryBizNotification() -> PhoenixShared.NotificationsManager.NotificationItem? {
-		
-		let firstPaymentRejectedNotification = bizNotifications.first { item in
-			return item.notification is PhoenixShared.Notification.PaymentRejected
-		}
-		
-		return firstPaymentRejectedNotification ?? bizNotifications.first
+		return nil
+//		let firstPaymentRejectedNotification = bizNotifications.first { item in
+//			return item.notification is PhoenixShared.Notification.PaymentRejected
+//		}
+//
+//		return firstPaymentRejectedNotification ?? bizNotifications.first
 	}
 	
 	// --------------------------------------------------
@@ -818,6 +821,7 @@ struct HomeView : MVIView {
 	// --------------------------------------------------
 	
 	func paymentsPageFetcher_subscribe() {
+		log.trace("paymentsPageFetcher_subscribe()")
 		
 		switch recentPaymentsConfig {
 		case .withinTime(let seconds):

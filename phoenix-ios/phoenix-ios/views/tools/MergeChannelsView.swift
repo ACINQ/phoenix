@@ -21,6 +21,8 @@ struct MergeChannelsView: View {
 	
 	let type: MergeChannelsViewType
 	
+	@State var selectedPage = 0
+	
 	@State var consolidationResult: IosMigrationResult? = nil
 	@State var operationInProgress = false
 	@State var operationCompleted = false
@@ -35,6 +37,8 @@ struct MergeChannelsView: View {
 	
 	@State var subsequentButtonsRow_truncated_title3 = false
 	@State var subsequentButtonsRow_truncated_headline = false
+	
+	@State var longLivedTask: UIBackgroundTaskIdentifier = .invalid
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -64,14 +68,13 @@ struct MergeChannelsView: View {
 				.padding(.top, 40)
 				.padding(.bottom, 40)
 				
-			info()
-				.padding(.horizontal, 40) // more inset
-			
-			Spacer()
-			
-			footer()
-				.padding(.horizontal)
-				.padding(.bottom, 40)
+			TabView(selection: $selectedPage) {
+				
+				page0().tag(0)
+				page1().tag(1)
+			}
+			.tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+			.padding(.bottom, 40)
 			
 		} // </VStack>
 		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
@@ -96,7 +99,20 @@ struct MergeChannelsView: View {
 	}
 	
 	@ViewBuilder
-	func info() -> some View {
+	func page0() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			page0_info()
+				.padding(.horizontal, 40) // more inset than footer
+			Spacer()
+			page0_footer()
+				.padding(.horizontal)
+		}
+	}
+	
+	@ViewBuilder
+	func page0_info() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
@@ -104,7 +120,7 @@ struct MergeChannelsView: View {
 				.foregroundColor(.secondary)
 				.padding(.bottom, 20)
 			
-			info_bulletRows()
+			page0_info_bulletRows()
 				.padding(.bottom, 40)
 			
 			Text("Learn more from our [blog post](https://acinq.co/blog/phoenix-splicing-update).")
@@ -112,27 +128,27 @@ struct MergeChannelsView: View {
 	}
 	
 	@ViewBuilder
-	func info_bulletRows() -> some View {
+	func page0_info_bulletRows() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
 			
-			info_bulletRow(
+			bulletRow(
 				title: "Splicing",
 				subtitle: "3rd generation lightning tech"
 			)
-			info_bulletRow(
+			bulletRow(
 				title: "Trustless swaps",
 				subtitle: "on-chain <-> lightning"
 			)
-			info_bulletRow(
+			bulletRow(
 				title: "Control on-chain fees",
 				subtitle: "select miner fee when sending on-chain"
 			)
-			info_bulletRow(
-				title: "Bump fess",
+			bulletRow(
+				title: "Bump fees",
 				subtitle: "to speed up on-chain payments"
 			)
-			info_bulletRow(
+			bulletRow(
 				title: "Better predictability",
 				subtitle: "know when fees may occur"
 			)
@@ -141,48 +157,103 @@ struct MergeChannelsView: View {
 	}
 	
 	@ViewBuilder
-	func info_bulletRow(title: LocalizedStringKey, subtitle: LocalizedStringKey) -> some View {
-		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-			
-			HStack(alignment: VerticalAlignment.center, spacing: 4) {
-				Image(systemName: "circle.fill")
-					.imageScale(.small)
-					.font(.caption2)
-					.foregroundColor(.secondary)
-				Text(title)
-					.font(.headline)
-			}
-			.padding(.bottom, 4)
-			
-			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
-				Image(systemName: "circle.fill")
-					.imageScale(.small)
-					.font(.caption2)
-					.foregroundColor(.clear)
-				Text(subtitle)
-					.font(.subheadline)
-					.foregroundColor(.secondary)
-			}
-		}
-	}
-	
-	@ViewBuilder
-	func footer() -> some View {
+	func page0_footer() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Spacer(minLength: 0)
+				
+				Button {
+					nextPage()
+				} label: {
+					Label("Next", systemImage: "arrow.forward")
+						.font(.title3)
+				}
+				.buttonStyle(.borderedProminent)
+				.buttonBorderShape(.capsule)
+				
+				Spacer(minLength: 0)
+			} // </HStack>
+			.padding(.bottom, 16)
 			
-			footer_operationStatus()
-				.padding(.bottom, 16)
-			footer_buttonsRow()
-				.padding(.bottom, 16)
-			footer_connectionStatus()
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				ProgressView()
+					.progressViewStyle(CircularProgressViewStyle(tint: Color.clear))
+				
+				Text(verbatim: "")
+				
+			} // </HStack>
+			.accessibilityHidden(true)
 			
 		} // </VStack>
 	}
 	
 	@ViewBuilder
-	func footer_operationStatus() -> some View {
+	func page1() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			page1_info()
+				.padding(.horizontal, 40) // more inset than footer
+			Spacer()
+			page1_footer()
+				.padding(.horizontal)
+			
+		} // </VStack>
+	}
+	
+	@ViewBuilder
+	func page1_info() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
+			Text("Notes:")
+				.foregroundColor(.secondary)
+				.padding(.bottom, 20)
+			
+			page1_info_bulletRows()
+				.padding(.bottom, 40)
+		}
+	}
+	
+	@ViewBuilder
+	func page1_info_bulletRows() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
+			
+			bulletRow(
+				title: "Your address for on-chain deposits will change",
+				subtitle: "Don't use addresses from the previous version."
+			)
+			
+			let msats = migrationCosts()
+			if msats > 0 {
+				let (btcAmt, fiatAmt) = formattedMigrationCosts(msats)
+				bulletRow(
+					title: "The migration will cost \(btcAmt.string) (≈ \(fiatAmt.string))",
+					subtitle: "Channels with less than the Bitcoin dust limit (546 satoshi) cannot be migrated. Their balance go to the bitcoin miners."
+				)
+			}
+			
+		} // </VStack>
+	}
+	
+	@ViewBuilder
+	func page1_footer() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			page1_footer_operationStatus()
+				.padding(.bottom, 16)
+			page1_footer_buttonsRow()
+				.padding(.bottom, 16)
+			page1_footer_connectionStatus()
+			
+		} // </VStack>
+	}
+	
+	@ViewBuilder
+	func page1_footer_operationStatus() -> some View {
 		
 		if operationInProgress {
 			
@@ -226,28 +297,28 @@ struct MergeChannelsView: View {
 	}
 	
 	@ViewBuilder
-	func footer_buttonsRow() -> some View {
+	func page1_footer_buttonsRow() -> some View {
 		
 		Group {
 			if operationFailedAtLeastOnce {
-				footer_subsequentButtonsRow()
+				page1_footer_subsequentButtonsRow()
 			} else {
-				footer_initialButtonsRow()
+				page1_footer_initialButtonsRow()
 			}
 		}
 	}
 	
 	@ViewBuilder
-	func footer_initialButtonsRow() -> some View {
+	func page1_footer_initialButtonsRow() -> some View {
 		
 		if initialButtonsRow_truncated_headline {
 
-			footer_initialButtonsRow(buttonFont: .callout, lineLimit: nil)
+			page1_footer_initialButtonsRow(buttonFont: .callout, lineLimit: nil)
 
 		} else if initialButtonsRow_truncated_title3 {
 
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				footer_initialButtonsRow(buttonFont: .headline, lineLimit: 1)
+				page1_footer_initialButtonsRow(buttonFont: .headline, lineLimit: 1)
 			} wasTruncated: {
 				initialButtonsRow_truncated_headline = true
 			}
@@ -255,7 +326,7 @@ struct MergeChannelsView: View {
 		} else {
 
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				footer_initialButtonsRow(buttonFont: .title3, lineLimit: 1)
+				page1_footer_initialButtonsRow(buttonFont: .title3, lineLimit: 1)
 			} wasTruncated: {
 				initialButtonsRow_truncated_title3 = true
 			}
@@ -263,7 +334,7 @@ struct MergeChannelsView: View {
 	}
 	
 	@ViewBuilder
-	func footer_initialButtonsRow(buttonFont: Font, lineLimit: Int?) -> some View {
+	func page1_footer_initialButtonsRow(buttonFont: Font, lineLimit: Int?) -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			Spacer(minLength: 0)
@@ -300,16 +371,16 @@ struct MergeChannelsView: View {
 	}
 	
 	@ViewBuilder
-	func footer_subsequentButtonsRow() -> some View {
+	func page1_footer_subsequentButtonsRow() -> some View {
 		
 		if subsequentButtonsRow_truncated_headline {
 
-			footer_subsequentButtonsRow(buttonFont: .callout, lineLimit: nil)
+			page1_footer_subsequentButtonsRow(buttonFont: .callout, lineLimit: nil)
 
 		} else if subsequentButtonsRow_truncated_title3 {
 
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				footer_subsequentButtonsRow(buttonFont: .headline, lineLimit: 1)
+				page1_footer_subsequentButtonsRow(buttonFont: .headline, lineLimit: 1)
 			} wasTruncated: {
 				subsequentButtonsRow_truncated_headline = true
 			}
@@ -317,7 +388,7 @@ struct MergeChannelsView: View {
 		} else {
 
 			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				footer_subsequentButtonsRow(buttonFont: .title3, lineLimit: 1)
+				page1_footer_subsequentButtonsRow(buttonFont: .title3, lineLimit: 1)
 			} wasTruncated: {
 				subsequentButtonsRow_truncated_title3 = true
 			}
@@ -325,7 +396,7 @@ struct MergeChannelsView: View {
 	}
 	
 	@ViewBuilder
-	func footer_subsequentButtonsRow(buttonFont: Font, lineLimit: Int?) -> some View {
+	func page1_footer_subsequentButtonsRow(buttonFont: Font, lineLimit: Int?) -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			Spacer(minLength: 0)
@@ -360,7 +431,7 @@ struct MergeChannelsView: View {
 	}
 	
 	@ViewBuilder
-	func footer_connectionStatus() -> some View {
+	func page1_footer_connectionStatus() -> some View {
 		
 		if let pendingStatus = notReadyString() {
 			
@@ -384,9 +455,65 @@ struct MergeChannelsView: View {
 		}
 	}
 	
+	@ViewBuilder
+	func bulletRow(title: LocalizedStringKey, subtitle: LocalizedStringKey) -> some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
+			HStack(alignment: VerticalAlignment.centerTopLine, spacing: 4) {
+				Image(systemName: "circle.fill")
+					.imageScale(.small)
+					.font(.caption2)
+					.foregroundColor(.secondary)
+					.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
+						d[VerticalAlignment.center]
+					}
+				
+				ZStack(alignment: Alignment.topLeading) {
+					Text(title)
+						.foregroundColor(.clear)
+						.lineLimit(1)
+						.truncationMode(.tail)
+						.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
+							d[VerticalAlignment.center]
+						}
+						.accessibilityHidden(true)
+					Text(title)
+				} // </ZStack>
+				.font(.headline)
+				
+			} // </HStack>
+			.padding(.bottom, 4)
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				Image(systemName: "circle.fill")
+					.imageScale(.small)
+					.font(.caption2)
+					.foregroundColor(.clear)
+				Text(subtitle)
+					.font(.subheadline)
+					.foregroundColor(.secondary)
+			} // </HStack>
+			
+		} // </VStack>
+	}
+	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	func migrationCosts() -> Int64 {
+		
+		return IosMigrationHelper.shared.migrationCosts(channels: channels).msat
+	}
+	
+	func formattedMigrationCosts(_ msats: Int64) -> (FormattedAmount, FormattedAmount) {
+		
+		let btcAmt = Utils.formatBitcoin(currencyPrefs, msat: msats)
+		let fiatAmt = Utils.formatFiat(currencyPrefs, msat: msats)
+		
+		return (btcAmt, fiatAmt)
+	}
 	
 	func startRetryButtonDisabled() -> Bool {
 		
@@ -451,6 +578,15 @@ struct MergeChannelsView: View {
 		allowAbortOverride = true
 	}
 	
+	func nextPage() {
+		log.trace("nextPage()")
+		
+		withAnimation {
+			selectedPage = 1
+			UIAccessibility.post(notification: .screenChanged, argument: nil)
+		}
+	}
+	
 	func getStarted() {
 		log.trace("getStarted()")
 		
@@ -489,14 +625,13 @@ struct MergeChannelsView: View {
 			return
 		}
 		
-		let _biz = Biz.business
-		
 		operationInProgress = true
 		Task { @MainActor in
 			
+			self.beginLongLivedTask()
 			do {
 				consolidationResult = try await IosMigrationHelper.shared.doMigrateChannels(
-					biz: _biz
+					biz: Biz.business
 				)
 				operationInProgress = false
 				
@@ -536,6 +671,45 @@ struct MergeChannelsView: View {
 				operationInProgress = false
 				operationFailedAtLeastOnce = true
 			}
+			
+			self.endLongLivedTask()
+		}
+	}
+	
+	func beginLongLivedTask() {
+		log.trace("beginLongLivedTask()")
+		assertMainThread()
+		
+		if longLivedTask == .invalid {
+			
+			log.debug("UIApplication.shared.beginBackgroundTask()")
+			longLivedTask = UIApplication.shared.beginBackgroundTask {
+				self.endLongLivedTask()
+			}
+			
+			log.debug("Biz.business.appConnectionsDaemon.decrementDisconnectCount()")
+			Biz.business.appConnectionsDaemon?.decrementDisconnectCount(
+				target: AppConnectionsDaemon.ControlTarget.companion.All
+			)
+		}
+	}
+	
+	func endLongLivedTask() {
+		log.trace("endLongLivedTask()")
+		assertMainThread()
+		
+		if longLivedTask != .invalid {
+			
+			let task = longLivedTask
+			longLivedTask = .invalid
+			
+			log.debug("UIApplication.shared.endBackgroundTask()")
+			UIApplication.shared.endBackgroundTask(task)
+			
+			log.debug("Biz.business.appConnectionsDaemon.incrementDisconnectCount()")
+			Biz.business.appConnectionsDaemon?.incrementDisconnectCount(
+				target: AppConnectionsDaemon.ControlTarget.companion.All
+			)
 		}
 	}
 }

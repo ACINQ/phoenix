@@ -42,6 +42,8 @@ struct ReceiveView: MVIView {
 	@StateObject var toast = Toast()
 	
 	@Environment(\.colorScheme) var colorScheme
+	
+	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var popoverState: PopoverState
 	
 	// --------------------------------------------------
@@ -95,11 +97,12 @@ struct ReceiveView: MVIView {
 			}
 			
 			customTabBar()
-				.padding(.top, 15)
+				.padding(.top, 20)
+				.padding(.bottom, deviceInfo.isFaceID ? 10 : 20)
 				.background(
 					Color.mutedBackground
 						.cornerRadius(15, corners: [.topLeft, .topRight])
-						.edgesIgnoringSafeArea(.bottom) // background color should extend to bottom of screen
+						.edgesIgnoringSafeArea([.horizontal, .bottom])
 				)
 			
 		} // </VStack>

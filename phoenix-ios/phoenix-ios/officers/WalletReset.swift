@@ -256,6 +256,9 @@ class WalletReset {
 		LockState.shared.walletExistence = .doesNotExist
 		LockState.shared.isUnlocked = true
 		
+		// walletExistence = .doesNotExist => User prompted to create/restore wallet => does not need upgrade screen
+		Prefs.shared.hasMergedChannelsForSplicing = true
+		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
 			self.finish()
 		}
