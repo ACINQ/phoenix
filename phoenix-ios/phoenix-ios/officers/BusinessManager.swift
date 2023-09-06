@@ -252,7 +252,7 @@ class BusinessManager {
 					let shouldMigrate = IosMigrationHelper.shared.shouldMigrateChannels(channels: channels)
 					if !shouldMigrate {
 						let peer = try await Biz.business.peerManager.getPeer()
-						try await peer.startWatchSwapInWallet()
+						// try await peer.startWatchSwapInWallet()
 					}
 					break
 				}

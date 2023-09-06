@@ -657,14 +657,14 @@ struct SummaryView: View {
 		log.trace("checkConfirmations()")
 		
 		do {
-			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: onChainPayment.txId)
-			
-			let confirmations = result?.intValue ?? 0
-			log.debug("checkConfirmations(): => \(confirmations)")
-			
-			self.blockchainConfirmations = confirmations
-			return confirmations
-			
+//			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: onChainPayment.txId)
+//
+//			let confirmations = result?.intValue ?? 0
+//			log.debug("checkConfirmations(): => \(confirmations)")
+//
+//			self.blockchainConfirmations = confirmations
+//			return confirmations
+			return 0 // TODO ElectrumClient.getConfirmations will be reworked to NOT require the blockheight.
 		} catch {
 			log.error("checkConfirmations(): error: \(error)")
 			return 0

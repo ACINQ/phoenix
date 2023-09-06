@@ -455,14 +455,15 @@ struct CpfpView: View {
 		log.trace("checkConfirmations()")
 		
 		do {
-			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: onChainPayment.txId)
-			
-			let confirmations = result?.intValue ?? 0
-			log.debug("checkConfirmations(): => \(confirmations)")
-			
-			if confirmations > 0 {
-				self.txAlreadyMined = true
-			}
+//			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: onChainPayment.txId)
+//
+//			let confirmations = result?.intValue ?? 0
+//			log.debug("checkConfirmations(): => \(confirmations)")
+//
+//			if confirmations > 0 {
+//				self.txAlreadyMined = true
+//			}
+			self.txAlreadyMined = true // TODO ElectrumClient.getConfirmations will be reworked to NOT require the blockheight.
 			
 		} catch {
 			log.error("electrumClient.getConfirmations(): \(error)")

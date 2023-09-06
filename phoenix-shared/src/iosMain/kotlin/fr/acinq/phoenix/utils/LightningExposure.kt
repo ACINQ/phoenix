@@ -263,5 +263,5 @@ fun ChannelCommand.Commitment.Splice.Response.Failure.asDisconnected(): ChannelC
 }
 
 suspend fun ElectrumClient.kotlin_getConfirmations(txid: ByteVector32): Int? {
-    return this.getConfirmations(txid)
+    return 0 // this.getConfirmations(txid)
 }

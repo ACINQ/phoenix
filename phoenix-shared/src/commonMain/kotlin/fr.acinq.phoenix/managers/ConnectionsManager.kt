@@ -49,14 +49,14 @@ class ConnectionsManager(
         launch {
             combine(
                 peerManager.getPeer().connectionState,
-                electrumClient.connectionState,
+                electrumClient.connectionStatus,
                 networkMonitor.networkState,
                 appConfigurationManager.isTorEnabled.filterNotNull(),
                 tor.state.connectionState(this)
-            ) { peerState, electrumState, internetState, torEnabled, torState ->
+            ) { peerState, electrumStatus, internetState, torEnabled, torState ->
                 Connections(
                     peer = peerState,
-                    electrum = electrumState,
+                    electrum = electrumStatus.toConnectionState(),
                     internet = when (internetState) {
                         NetworkState.Available -> Connection.ESTABLISHED
                         NetworkState.NotAvailable -> Connection.CLOSED(reason = null)
