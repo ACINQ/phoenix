@@ -52,7 +52,7 @@ fun LnurlWithdrawView(
     val prefUnit = preferredAmountUnit
     val rate = fiatRate
 
-    var amount by remember { mutableStateOf<MilliSatoshi?>(model.lnurlWithdraw.minWithdrawable) }
+    var amount by remember { mutableStateOf<MilliSatoshi?>(model.lnurlWithdraw.maxWithdrawable) }
     var amountErrorMessage by remember { mutableStateOf("") }
 
     SplashLayout(
