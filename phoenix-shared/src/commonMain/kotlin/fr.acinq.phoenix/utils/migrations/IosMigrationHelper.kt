@@ -108,7 +108,7 @@ object IosMigrationHelper {
 
             // Tell the swap-in wallet to "pause".
             // That is: don't try to use any of the UTXOs until we're done with our migration.
-            // FIXME peer.stopWatchSwapInWallet()
+            peer.stopWatchSwapInWallet()
 
             log.info { "migrating ${channelsToMigrate.size} channels to $swapInAddress" }
             // Close all channels in parallel
@@ -144,7 +144,7 @@ object IosMigrationHelper {
                 .first { txidsInWallet -> closingTxs.values.all { txid -> txidsInWallet.contains(txid) } }
             log.info { "all mutual-close txids found in swap-in wallet" }
             // Resume swap-in
-            // FIXME peer.startWatchSwapInWallet()
+            peer.startWatchSwapInWallet()
 
             return IosMigrationResult.Success(closingTxs)
         } catch (e: Exception) {

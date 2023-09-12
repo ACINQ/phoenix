@@ -600,19 +600,19 @@ private fun ConfirmationView(
         )
     } else {
 
-        suspend fun getConfirmations(blockHeight: Int): Int {
-            val confirmations = electrumClient.getConfirmations(txId, blockHeight)
+        suspend fun getConfirmations(): Int {
+            val confirmations = electrumClient.getConfirmations(txId)
             log.info { "retrieved confirmations count=$confirmations from electrum for tx=${txId.toHex()}" }
             return confirmations ?: run {
                 log.debug { "retrying getConfirmations from Electrum in 5 sec" }
                 delay(5_000)
-                getConfirmations(blockHeight)
+                getConfirmations()
             }
         }
 
         val confirmations by produceState<Int?>(initialValue = null) {
-            val electrumStatus = electrumClient.connectionStatus.filterIsInstance<ElectrumConnectionStatus.Connected>().first()
-            val confirmations = getConfirmations(blockHeight = electrumStatus.height)
+            electrumClient.connectionStatus.filterIsInstance<ElectrumConnectionStatus.Connected>().first()
+            val confirmations = getConfirmations()
             value = confirmations
         }
         confirmations?.let { conf ->

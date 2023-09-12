@@ -250,7 +250,7 @@ class NodeService : Service() {
         )
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
         serviceScope.launch {
-            // FIXME business.peerManager.getPeer().startWatchSwapInWallet()
+            business.peerManager.getPeer().startWatchSwapInWallet()
         }
 
         serviceScope.launch {
