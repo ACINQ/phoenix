@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.fiatRate
@@ -96,10 +97,14 @@ fun LnurlWithdrawView(
                     )
                     Spacer(modifier = Modifier.height(32.dp))
                 }
+
+                val channels by business.peerManager.channelsFlow.collectAsState()
+                val areChannelsUsable = channels?.values?.all { it.isUsable } ?: false
+
                 FilledButton(
-                    text = stringResource(id = R.string.lnurl_withdraw_confirm_button),
+                    text = if (!areChannelsUsable) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.lnurl_withdraw_confirm_button),
                     icon = R.drawable.ic_receive,
-                    enabled = amount != null && amountErrorMessage.isBlank(),
+                    enabled = areChannelsUsable && amount != null && amountErrorMessage.isBlank(),
                 ) {
                     amount?.let {
                         onWithdrawClick(

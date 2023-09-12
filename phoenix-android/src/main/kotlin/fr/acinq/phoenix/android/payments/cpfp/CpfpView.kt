@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.channel.ChannelCommand
-import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -74,8 +73,9 @@ fun CpfpView(
         }
     }
 
-    val connections by business.connectionsManager.connections.collectAsState()
-    val isConnected = connections.global is Connection.ESTABLISHED
+    val channels by business.peerManager.channelsFlow.collectAsState()
+    val areChannelsUsable = channels?.values?.all { it.isUsable } ?: false
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -85,9 +85,9 @@ fun CpfpView(
         when (val state = vm.state) {
             is CpfpState.Init -> {
                 BorderButton(
-                    text = if (!isConnected) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.cpfp_prepare_button),
+                    text = if (!areChannelsUsable) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.cpfp_prepare_button),
                     icon = R.drawable.ic_build,
-                    enabled = isConnected,
+                    enabled = areChannelsUsable,
                     onClick = { vm.estimateFee(channelId, feerate) },
                     backgroundColor = Color.Transparent,
                 )
@@ -101,9 +101,9 @@ fun CpfpView(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 FilledButton(
-                    text = if (!isConnected) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.cpfp_execute_button),
+                    text = if (!areChannelsUsable) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.cpfp_execute_button),
                     icon = R.drawable.ic_check,
-                    enabled = isConnected,
+                    enabled = areChannelsUsable,
                     onClick = { vm.executeCpfp(channelId, state.actualFeerate) }
                 )
             }

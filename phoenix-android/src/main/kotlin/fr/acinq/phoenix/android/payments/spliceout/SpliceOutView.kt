@@ -34,7 +34,6 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
-import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -124,8 +123,8 @@ fun SendSpliceOutView(
             }
         }
 
-        val connections by business.connectionsManager.connections.collectAsState()
-        val isConnected = connections.global is Connection.ESTABLISHED
+        val channels by business.peerManager.channelsFlow.collectAsState()
+        val areChannelsUsable = channels?.values?.all { it.isUsable } ?: false
 
         when (val state = vm.state) {
             is SpliceOutState.Init, is SpliceOutState.Error -> {
@@ -144,9 +143,9 @@ fun SendSpliceOutView(
                     )
                 }
                 BorderButton(
-                    text = if (!isConnected) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_spliceout_prepare_button),
+                    text = if (!areChannelsUsable) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_spliceout_prepare_button),
                     icon = R.drawable.ic_build,
-                    enabled = isConnected && amountErrorMessage.isBlank(),
+                    enabled = areChannelsUsable && amountErrorMessage.isBlank(),
                     onClick = {
                         val finalAmount = amount
                         val finalFeerate = feerate
@@ -183,9 +182,9 @@ fun SendSpliceOutView(
                     )
                 } else {
                     FilledButton(
-                        text = if (!isConnected) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
+                        text = if (!areChannelsUsable) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
                         icon = R.drawable.ic_send,
-                        enabled = isConnected && amountErrorMessage.isBlank()
+                        enabled = areChannelsUsable && amountErrorMessage.isBlank()
                     ) {
                         vm.executeSpliceOut(state.userAmount, state.actualFeerate, address)
                     }
