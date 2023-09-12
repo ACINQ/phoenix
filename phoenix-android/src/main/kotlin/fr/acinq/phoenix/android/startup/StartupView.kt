@@ -21,6 +21,7 @@ import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -33,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.LockState
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
@@ -93,7 +95,7 @@ fun StartupView(
 }
 
 @Composable
-private fun LoadOrUnlock(
+private fun ColumnScope.LoadOrUnlock(
     isLockActive: Boolean,
     lockState: LockState,
     walletState: WalletState?,
@@ -109,7 +111,7 @@ private fun LoadOrUnlock(
     if (isLockActive && BiometricsHelper.canAuthenticate(context)) {
         when (lockState) {
             is LockState.Locked -> {
-                LaunchedEffect(key1 = true) {
+                val promptScreenLock = {
                     val promptInfo = BiometricPrompt.PromptInfo.Builder().apply {
                         setTitle(context.getString(R.string.authprompt_title))
                         setAllowedAuthenticators(BiometricsHelper.authCreds)
@@ -121,6 +123,14 @@ private fun LoadOrUnlock(
                         onCancel = { log.debug { "cancelled auth prompt" } }
                     ).authenticate(promptInfo)
                 }
+                LaunchedEffect(key1 = true) {
+                    promptScreenLock()
+                }
+                BorderButton(
+                    text = stringResource(id = R.string.startup_manual_unlock_button),
+                    icon = R.drawable.ic_shield,
+                    onClick = promptScreenLock
+                )
             }
             is LockState.Unlocked -> {
                 LoadingView(

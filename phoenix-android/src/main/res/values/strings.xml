@@ -64,6 +64,7 @@
     <string name="startup_binding_service">Binding service…</string>
     <string name="startup_wait">Preparing wallet…</string>
     <string name="startup_wait_legacy_check">Checking legacy wallet…</string>
+    <string name="startup_manual_unlock_button">Unlock</string>
     <string name="startup_checking_seed">Unlocking…</string>
     <string name="startup_starting">Starting…</string>
     <string name="startup_error_generic">The application could not start.\n\nError details: %1$s</string>
