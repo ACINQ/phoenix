@@ -35,10 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import fr.acinq.lightning.utils.mkTree
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
@@ -47,11 +45,9 @@ import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.SettingButton
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigate
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
-import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 
 
@@ -129,26 +125,9 @@ fun SettingsView() {
                     },
                     modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
                 )
-                val log = logger("DEBUG")
-                val electrumClient = business.electrumClient
-                val peerManager = business.peerManager
-                Button(
-                    text = "Log coroutine tree (DEBUG)",
-                    icon = R.drawable.ic_text,
-                    onClick = {
-                        scope.launch {
-                            val peer = peerManager.getPeer()
-                            log.info { ">>>> coroutines-peer\n${peer.coroutineContext.job.mkTree()}" }
-                            log.info { ">>>> coroutines-electrum\n${electrumClient.coroutineContext.job.mkTree()}" }
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
-                )
             }
         }
 
         Spacer(Modifier.height(32.dp))
-
-
     }
 }

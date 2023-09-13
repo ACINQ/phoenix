@@ -49,7 +49,7 @@ import org.kodein.log.newLogger
 import org.kodein.log.withShortPackageKeepLast
 import org.kodein.memory.file.Path
 import org.kodein.memory.file.resolve
-
+import kotlin.time.Duration.Companion.seconds
 
 class PhoenixBusiness(
     internal val ctx: PlatformContext
@@ -83,7 +83,7 @@ class PhoenixBusiness(
 
     val chain: NodeParams.Chain = NodeParamsManager.chain
 
-    val electrumClient by lazy { ElectrumClient(null, MainScope(), loggerFactory) }
+    val electrumClient by lazy { ElectrumClient(scope = MainScope(), loggerFactory = loggerFactory, pingInterval = 30.seconds, rpcTimeout = 10.seconds) }
     internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope(), loggerFactory) }
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
@@ -120,7 +120,6 @@ class PhoenixBusiness(
      */
     fun stop() {
         electrumClient.stop()
-        electrumClient.cancel()
         electrumWatcher.stop()
         electrumWatcher.cancel()
         appConnectionsDaemon?.cancel()
