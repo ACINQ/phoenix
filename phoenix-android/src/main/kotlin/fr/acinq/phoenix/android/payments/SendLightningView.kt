@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -42,7 +41,6 @@ import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.utils.extensions.isAmountlessTrampoline
-
 
 @Composable
 fun SendLightningPaymentView(
@@ -121,13 +119,13 @@ fun SendLightningPaymentView(
             }
         }
         Spacer(modifier = Modifier.height(36.dp))
-        val connections by business.connectionsManager.connections.collectAsState()
-        val isConnected = connections.global is Connection.ESTABLISHED
+        val channels by business.peerManager.channelsFlow.collectAsState()
+        val areChannelsUsable = channels?.values?.all { it.isUsable } ?: false
         Row(verticalAlignment = Alignment.CenterVertically) {
             FilledButton(
-                text = if (!isConnected) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
+                text = if (!areChannelsUsable) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
                 icon = R.drawable.ic_send,
-                enabled = isConnected && amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
+                enabled = areChannelsUsable && amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
             ) {
                 safeLet(amount, trampolineFees) { amt, fees ->
                     onPayClick(Scan.Intent.InvoiceFlow.SendInvoicePayment(paymentRequest = paymentRequest, amount = amt, trampolineFees = fees))

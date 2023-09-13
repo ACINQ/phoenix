@@ -142,4 +142,16 @@ class LnurlWithdrawTest {
         val lnurl = Lnurl.extractLnurl("$defaultLnurl?tag=withdraw")
         assertIs<Lnurl.Request>(lnurl)
     }
+
+    @Test
+    fun lud17() {
+        val validClearLud17 = "acinq.co/lnurlwithdraw/token123-abc?some-parameter=USD"
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurlw://$validClearLud17"))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurlw:$validClearLud17"))
+        assertTrue { Lnurl.extractLnurl("lnurlw:$validClearLud17").initialUrl.protocol.isSecure() }
+
+        val validOnionLud17 = "lnurlw://acinq.onion/lnurlwithdraw/token123-abc?some-parameter=USD"
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl(validOnionLud17))
+        assertTrue { !Lnurl.extractLnurl(validOnionLud17).initialUrl.protocol.isSecure() }
+    }
 }

@@ -252,6 +252,16 @@ class ParserTest {
             val trimmed = Parser.trimMatchingPrefix(Parser.removeExcessInput(input), Parser.bitcoinPrefixes + Parser.lightningPrefixes + Parser.lnurlPrefixes)
             assertEquals(payload, trimmed)
         }
+
+        // lud-17 prefixes should NOT be trimmed - they are handled separately
+        listOf(
+            "keyauth:LNURL1DP68GURN8GHJ7MRWW4EXCTNXD9SHG6NPVCHXXMMD9AKXUATJDSKKCMM8D9HR7ARPVU7KCMM8D9HZV6E3843KYV3SVYCRZDN9V5URVWRZ89JRWCMRX3NXZVMPVDNRJVT9V5UKGDECV3JRYVFCXA3KGVNXX9NRSCN9XYERGDF4VFNXVCEEXFSN2WP482E5EP",
+            "lnurp:LNURL1DP68GURN8GHJ7MRWW4EXCTNXD9SHG6NPVCHXXMMD9AKXUATJDSKHQCTE8AEK2UMND9HKU0TRVGERQCFSXYMX2EFCXCUXYWTYXA3KXDRXVYEKZCMX8YCK2EFEVSMNSERYXGCNSDMRVSEXVVTX8P3X2VFJXS6N2CNXVE3NJVNPX5UR242GXTQ",
+            "lnurlw:LNURL1DP68GURN8GHJ7MRWW4EXCTNXD9SHG6NPVCHXXMMD9AKXUATJDSKHW6T5DPJ8YCTH8AEK2UMND9HKU0FKVESNZDFEX4SNXENZV4JNWWF3VENXVV3H8YUXYE3JXQMNJCF4VYMNSCEKXFSKGC3S8YENVCEJVDJXXVRXXSUKGCMY8QERSCFKXFJRZ0FPS8D",
+        ).forEach { input ->
+            val trimmed = Parser.trimMatchingPrefix(Parser.removeExcessInput(input), Parser.bitcoinPrefixes + Parser.lightningPrefixes + Parser.lnurlPrefixes)
+            assertEquals(input, trimmed)
+        }
     }
 
 }

@@ -93,7 +93,7 @@ class LnurlManager(
 
         val builder = URLBuilder(intent.callback)
         builder.appendParameter(name = "amount", value = amount.msat.toString())
-        if (comment != null && comment.isNotEmpty()) {
+        if (!comment.isNullOrEmpty()) {
             builder.appendParameter(name = "comment", value = comment)
         }
         val callback = builder.build()
