@@ -30,15 +30,15 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ProgressView(
     text: String,
-    textStyle: TextStyle = MaterialTheme.typography.body1,
     modifier: Modifier = Modifier,
+    textStyle: TextStyle = MaterialTheme.typography.body1,
     padding: PaddingValues = PaddingValues(16.dp),
     progressCircleSize: Dp = 20.dp,
     progressCircleWidth: Dp = 2.dp,
     space: Dp = 8.dp,
 ) {
     Row(
-        modifier.padding(padding)
+        modifier.padding(padding),
     ) {
         CircularProgressIndicator(Modifier.size(progressCircleSize), strokeWidth = progressCircleWidth)
         Spacer(Modifier.width(space))

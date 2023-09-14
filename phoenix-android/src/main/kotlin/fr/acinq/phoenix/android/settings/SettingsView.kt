@@ -66,7 +66,7 @@ fun SettingsView(
     val notifications = business.notificationsManager.notifications.collectAsState()
 
     DefaultScreenLayout {
-        DefaultScreenHeader(onBackClick = { nc.popBackStack() }) {
+        DefaultScreenHeader(onBackClick = { nc.navigate(Screen.Home) }) {
             Text(
                 text = stringResource(id = R.string.menu_settings),
                 modifier = Modifier

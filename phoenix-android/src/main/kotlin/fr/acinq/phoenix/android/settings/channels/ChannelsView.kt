@@ -23,12 +23,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -53,6 +58,7 @@ import fr.acinq.phoenix.data.LocalChannelInfo
 fun ChannelsView(
     onBackClick: () -> Unit,
     onChannelClick: (String) -> Unit,
+    onImportChannelsDataClick: () -> Unit,
 ) {
     val log = logger("ChannelsView")
 
@@ -62,7 +68,24 @@ fun ChannelsView(
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(
             onBackClick = onBackClick,
-            title = stringResource(id = R.string.channelsview_title),
+            content = {
+                var showAdvancedMenuPopIn by remember { mutableStateOf(false) }
+                Text(text = stringResource(id = R.string.channelsview_title))
+                Spacer(modifier = Modifier.weight(1f))
+                Box(contentAlignment = Alignment.TopEnd) {
+                    DropdownMenu(expanded = showAdvancedMenuPopIn, onDismissRequest = { showAdvancedMenuPopIn = false }) {
+                        DropdownMenuItem(onClick = onImportChannelsDataClick, contentPadding = PaddingValues(horizontal = 12.dp)) {
+                            Text(stringResource(R.string.channelsview_menu_import_channels), style = MaterialTheme.typography.body1)
+                        }
+                    }
+                    Button(
+                        icon = R.drawable.ic_menu_dots,
+                        iconTint = MaterialTheme.colors.onSurface,
+                        padding = PaddingValues(12.dp),
+                        onClick = { showAdvancedMenuPopIn = true }
+                    )
+                }
+            }
         )
         if (!channelsState.isNullOrEmpty()) {
             LightningBalanceView(balance = balance)
