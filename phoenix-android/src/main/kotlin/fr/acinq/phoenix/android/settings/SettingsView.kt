@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,8 +36,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
@@ -52,21 +55,27 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun SettingsView() {
+fun SettingsView(
+    noticesViewModel: NoticesViewModel
+) {
     val nc = navController
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var debugClickCount by remember { mutableStateOf(0) }
+    val notices = noticesViewModel.notices.values
+    val notifications = business.notificationsManager.notifications.collectAsState()
 
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = { nc.popBackStack() }) {
             Text(
                 text = stringResource(id = R.string.menu_settings),
-                modifier = Modifier.padding(vertical = 12.dp).clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = { debugClickCount += 1 }
-                )
+                modifier = Modifier
+                    .padding(vertical = 12.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { debugClickCount += 1 }
+                    )
             )
         }
 
@@ -78,7 +87,11 @@ fun SettingsView() {
             SettingButton(text = stringResource(R.string.settings_payment_settings), icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings) })
             SettingButton(text = stringResource(R.string.settings_liquidity_policy), icon = R.drawable.ic_settings, onClick = { nc.navigate(Screen.LiquidityPolicy) })
             SettingButton(text = stringResource(R.string.settings_payment_history), icon = R.drawable.ic_list, onClick = { nc.navigate(Screen.PaymentsHistory) })
-            SettingButton(text = stringResource(R.string.settings_notifications), icon = R.drawable.ic_notification, onClick = { nc.navigate(Screen.Notifications) })
+            SettingButton(
+                text = stringResource(R.string.settings_notifications) + ((notices.size + notifications.value.size).takeIf { it > 0 }?.let { " ($it)"} ?: ""),
+                icon = R.drawable.ic_notification,
+                onClick = { nc.navigate(Screen.Notifications) }
+            )
         }
 
         // -- privacy & security
