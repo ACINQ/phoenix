@@ -612,7 +612,7 @@
 
     <!-- settings: options for payments -->
 
-    <string name="paymentsettings_title">Options &amp; fees</string>
+    <string name="paymentsettings_title">Payment options</string>
 
     <string name="paymentsettings_category_incoming">Incoming payments</string>
     <string name="paymentsettings_category_outgoing">Outgoing payments</string>
