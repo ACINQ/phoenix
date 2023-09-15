@@ -548,6 +548,7 @@
     <string name="prefs_display_theme_light_label">Light theme</string>
     <string name="prefs_display_theme_system_label">Follow system</string>
     <string name="prefs_display_explorer_label">Onchain explorer</string>
+    <string name="prefs_locale_label">Application language</string>
 
     <!-- settings: electrum server -->
 
