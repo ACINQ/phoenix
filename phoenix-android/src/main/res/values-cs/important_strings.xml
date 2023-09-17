@@ -62,7 +62,7 @@
     <string name="settings_mutual_close">Uzavření kanálů</string>
     <string name="settings_force_close">Vynucené zavření kanálů</string>
     <string name="settings_tor">Tor</string>
-    <string name="settings_about">Informace o peněžence</string>
+    <string name="settings_about">O aplikaci</string>
     <string name="settings_payment_settings">Možnosti platby</string>
     <string name="settings_payment_history">Historie plateb</string>
     <string name="settings_notifications">Oznámení</string>
@@ -264,7 +264,7 @@
     <string name="liquiditypolicy_advanced_overrides_title">Přepsání zásad</string>
     <string name="liquiditypolicy_advanced_pay_to_open_label">Přeskočit kontrolu konečných poplatků za Lightning</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">Pokud je tato funkce povolena, příchozí platby Lightning budou ignorovat konečný maximální limit poplatků. Uplatní se pouze procentuální kontrola.\n\nPozor: pokud jsou vysoké poplatky v mempoolu Bitcoinu, příchozí Lightning platby vyžadující operaci na Blockchainu by mohly být drahé.</string>
-    <string name="liquiditypolicy_save_button">Zásady ukládání</string>
+    <string name="liquiditypolicy_save_button">Uložit zásady</string>
 
     <string name="liquiditypolicy_help">
       Phoenix umožňuje přijímat platby na blockchainu Bitcoinu (L1) a na Lightning vrstvě Bitcoinu (L2).
