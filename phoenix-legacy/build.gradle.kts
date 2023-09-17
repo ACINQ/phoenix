@@ -31,18 +31,18 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
-    val libCode = 59
+    val libCode = 61
     getByName("debug") {
       resValue("string", "CHAIN", chain)
       buildConfigField("String", "CHAIN", chain)
       buildConfigField("int", "LIB_CODE", libCode.toString()) // lib version code
-      buildConfigField("String", "LIB_COMMIT", "\"${gitCommitHash()}\"") // lib version name
+      buildConfigField("String", "LIB_COMMIT", "\"1.4.27 (legacy) - ${gitCommitHash()}\"") // lib version name
     }
     getByName("release") {
       resValue("string", "CHAIN", chain)
       buildConfigField("String", "CHAIN", chain)
       buildConfigField("int", "LIB_CODE", libCode.toString()) // lib version code
-      buildConfigField("String", "LIB_COMMIT", "\"${gitCommitHash()}\"") // lib version name
+      buildConfigField("String", "LIB_COMMIT", "1.4.27 (legacy) - ${gitCommitHash()}") // lib version name
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }

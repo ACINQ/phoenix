@@ -59,29 +59,31 @@ fun AboutView() {
         Card {
             Text(
                 text = annotatedStringResource(id = R.string.about_version, BuildConfig.VERSION_NAME),
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             )
         }
         Card {
             SettingButton(
-                text = R.string.about_faq_link,
+                text = stringResource(id = R.string.about_faq_link),
                 icon = R.drawable.ic_help_circle,
                 onClick = { openLink(context, "https://phoenix.acinq.co/faq") }
             )
             SettingButton(
-                text = R.string.about_support_link,
+                text = stringResource(R.string.about_support_link),
                 icon = R.drawable.ic_message_circle,
                 onClick = { openLink(context, "https://phoenix.acinq.co/support") }
             )
         }
         Card {
             SettingButton(
-                text = R.string.about_privacy_link,
+                text = stringResource(R.string.about_privacy_link),
                 icon = R.drawable.ic_shield,
                 onClick = { openLink(context, "https://phoenix.acinq.co/privacy") }
             )
             SettingButton(
-                text = R.string.about_terms_link,
+                text = stringResource(R.string.about_terms_link),
                 icon = R.drawable.ic_text,
                 onClick = { openLink(context, "https://phoenix.acinq.co/terms") }
             )

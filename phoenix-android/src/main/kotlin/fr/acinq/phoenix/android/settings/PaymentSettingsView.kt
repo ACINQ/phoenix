@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.settings
 
-import android.text.format.DateUtils
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -62,7 +61,7 @@ fun PaymentSettingsView(
     var showExpiryDialog by rememberSaveable { mutableStateOf(false) }
 
     val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(LocalContext.current).collectAsState(initial = "")
-    val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState(initial = -1L)
+    val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState(null)
 
     val prefLnurlAuthSchemeState = UserPrefs.getLnurlAuthScheme(context).collectAsState(initial = null)
 
@@ -82,9 +81,10 @@ fun PaymentSettingsView(
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_expiry_title),
                 description = when (invoiceDefaultExpiry) {
-                    1 * DateUtils.WEEK_IN_MILLIS / 1_000 -> stringResource(id = R.string.paymentsettings_expiry_one_week)
-                    2 * DateUtils.WEEK_IN_MILLIS / 1_000 -> stringResource(id = R.string.paymentsettings_expiry_two_weeks)
-                    3 * DateUtils.WEEK_IN_MILLIS / 1_000 -> stringResource(id = R.string.paymentsettings_expiry_three_weeks)
+                    null -> stringResource(id = R.string.utils_unknown)
+                    1 * 604800L -> stringResource(id = R.string.paymentsettings_expiry_one_week)
+                    2 * 604800L -> stringResource(id = R.string.paymentsettings_expiry_two_weeks)
+                    3 * 604800L -> stringResource(id = R.string.paymentsettings_expiry_three_weeks)
                     else -> stringResource(id = R.string.paymentsettings_expiry_value, NumberFormat.getInstance().format(invoiceDefaultExpiry))
                 },
                 onClick = { showExpiryDialog = true }
@@ -140,16 +140,17 @@ fun PaymentSettingsView(
     }
 
     if (showExpiryDialog) {
-        DefaultExpiryInvoiceDialog(
-            expiry = invoiceDefaultExpiry,
-            onDismiss = { showExpiryDialog = false },
-            onConfirm = {
-                scope.launch { UserPrefs.saveInvoiceDefaultExpiry(context, it.toLong()) }
-                showExpiryDialog = false
-            }
-        )
+        invoiceDefaultExpiry?.let {
+            DefaultExpiryInvoiceDialog(
+                expiry = it,
+                onDismiss = { showExpiryDialog = false },
+                onConfirm = {
+                    scope.launch { UserPrefs.saveInvoiceDefaultExpiry(context, it.toLong()) }
+                    showExpiryDialog = false
+                }
+            )
+        }
     }
-
 }
 
 @Composable

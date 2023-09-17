@@ -32,13 +32,13 @@ class AppElectrumConfigurationController(
             combine(
                 configurationManager.electrumConfig,
                 appConnectionsDaemon.lastElectrumServerAddress,
-                electrumClient.connectionState,
+                electrumClient.connectionStatus,
                 configurationManager.electrumMessages,
-                transform = { configState, currentServer, connectionState, message ->
+                transform = { configState, currentServer, connectionStatus, message ->
                     ElectrumConfiguration.Model(
                         configuration = configState,
                         currentServer = currentServer,
-                        connection = connectionState,
+                        connection = connectionStatus.toConnectionState(),
                         blockHeight = message?.blockHeight ?: 0,
                         tipTimestamp = message?.header?.time ?: 0,
                     )

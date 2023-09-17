@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,7 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import fr.acinq.lightning.utils.mkTree
+import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.business
@@ -47,67 +48,75 @@ import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.SettingButton
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigate
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
-import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun SettingsView() {
+fun SettingsView(
+    noticesViewModel: NoticesViewModel
+) {
     val nc = navController
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var debugClickCount by remember { mutableStateOf(0) }
+    val notices = noticesViewModel.notices.values
+    val notifications = business.notificationsManager.notifications.collectAsState()
 
     DefaultScreenLayout {
-        DefaultScreenHeader(onBackClick = { nc.popBackStack() }) {
+        DefaultScreenHeader(onBackClick = { nc.navigate(Screen.Home) }) {
             Text(
                 text = stringResource(id = R.string.menu_settings),
-                modifier = Modifier.padding(vertical = 12.dp).clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = { debugClickCount += 1 }
-                )
+                modifier = Modifier
+                    .padding(vertical = 12.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { debugClickCount += 1 }
+                    )
             )
         }
 
         // -- general
         CardHeader(text = stringResource(id = R.string.settings_general_title))
         Card {
-            SettingButton(text = R.string.settings_about, icon = R.drawable.ic_help_circle, onClick = { nc.navigate(Screen.About) })
-            SettingButton(text = R.string.settings_display_prefs, icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences) })
-            SettingButton(text = R.string.settings_payment_settings, icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings) })
-            SettingButton(text = R.string.settings_liquidity_policy, icon = R.drawable.ic_settings, onClick = { nc.navigate(Screen.LiquidityPolicy) })
-            SettingButton(text = R.string.settings_payment_history, icon = R.drawable.ic_list, onClick = { nc.navigate(Screen.PaymentsHistory) })
-            SettingButton(text = R.string.settings_notifications, icon = R.drawable.ic_notification, onClick = { nc.navigate(Screen.Notifications) })
+            SettingButton(text = stringResource(R.string.settings_about), icon = R.drawable.ic_help_circle, onClick = { nc.navigate(Screen.About) })
+            SettingButton(text = stringResource(R.string.settings_display_prefs), icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences) })
+            SettingButton(text = stringResource(R.string.settings_payment_settings), icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings) })
+            SettingButton(text = stringResource(R.string.settings_liquidity_policy), icon = R.drawable.ic_settings, onClick = { nc.navigate(Screen.LiquidityPolicy) })
+            SettingButton(text = stringResource(R.string.settings_payment_history), icon = R.drawable.ic_list, onClick = { nc.navigate(Screen.PaymentsHistory) })
+            SettingButton(
+                text = stringResource(R.string.settings_notifications) + ((notices.size + notifications.value.size).takeIf { it > 0 }?.let { " ($it)"} ?: ""),
+                icon = R.drawable.ic_notification,
+                onClick = { nc.navigate(Screen.Notifications) }
+            )
         }
 
         // -- privacy & security
         CardHeader(text = stringResource(id = R.string.settings_security_title))
         Card {
-            SettingButton(text = R.string.settings_access_control, icon = R.drawable.ic_unlock, onClick = { nc.navigate(Screen.AppLock) })
-            SettingButton(text = R.string.settings_display_seed, icon = R.drawable.ic_key, onClick = { nc.navigate(Screen.DisplaySeed) })
-            SettingButton(text = R.string.settings_electrum, icon = R.drawable.ic_chain, onClick = { nc.navigate(Screen.ElectrumServer) })
-            SettingButton(text = R.string.settings_tor, icon = R.drawable.ic_tor_shield, onClick = { nc.navigate(Screen.TorConfig) })
+            SettingButton(text = stringResource(R.string.settings_access_control), icon = R.drawable.ic_unlock, onClick = { nc.navigate(Screen.AppLock) })
+            SettingButton(text = stringResource(R.string.settings_display_seed), icon = R.drawable.ic_key, onClick = { nc.navigate(Screen.DisplaySeed) })
+            SettingButton(text = stringResource(R.string.settings_electrum), icon = R.drawable.ic_chain, onClick = { nc.navigate(Screen.ElectrumServer) })
+            SettingButton(text = stringResource(R.string.settings_tor), icon = R.drawable.ic_tor_shield, onClick = { nc.navigate(Screen.TorConfig) })
         }
 
         // -- advanced
         CardHeader(text = stringResource(id = R.string.settings_advanced_title))
         Card {
-            SettingButton(text = R.string.settings_wallet_info, icon = R.drawable.ic_box, onClick = { nc.navigate(Screen.WalletInfo) })
-            SettingButton(text = R.string.settings_list_channels, icon = R.drawable.ic_zap, onClick = { nc.navigate(Screen.Channels) })
-            SettingButton(text = R.string.settings_logs, icon = R.drawable.ic_text, onClick = { nc.navigate(Screen.Logs) })
+            SettingButton(text = stringResource(R.string.settings_wallet_info), icon = R.drawable.ic_box, onClick = { nc.navigate(Screen.WalletInfo) })
+            SettingButton(text = stringResource(R.string.settings_list_channels), icon = R.drawable.ic_zap, onClick = { nc.navigate(Screen.Channels) })
+            SettingButton(text = stringResource(R.string.settings_logs), icon = R.drawable.ic_text, onClick = { nc.navigate(Screen.Logs) })
         }
         // -- advanced
         CardHeader(text = stringResource(id = R.string.settings_danger_title))
         Card {
 //            SettingButton(text = R.string.settings_reset_wallet, icon = R.drawable.ic_trash, onClick = { nc.navigate(Screen.ResetWallet) })
-            SettingButton(text = R.string.settings_mutual_close, icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose) })
+            SettingButton(text = stringResource(R.string.settings_mutual_close), icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose) })
             SettingButton(
-                text = R.string.settings_force_close,
+                text = stringResource(R.string.settings_force_close),
                 textStyle = MaterialTheme.typography.button.copy(color = negativeColor),
                 icon = R.drawable.ic_alert_triangle,
                 iconTint = negativeColor,
@@ -129,26 +138,9 @@ fun SettingsView() {
                     },
                     modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
                 )
-                val log = logger("DEBUG")
-                val electrumClient = business.electrumClient
-                val peerManager = business.peerManager
-                Button(
-                    text = "Log coroutine tree (DEBUG)",
-                    icon = R.drawable.ic_text,
-                    onClick = {
-                        scope.launch {
-                            val peer = peerManager.getPeer()
-                            log.info { ">>>> coroutines-peer\n${peer.coroutineContext.job.mkTree()}" }
-                            log.info { ">>>> coroutines-electrum\n${electrumClient.coroutineContext.job.mkTree()}" }
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
-                )
             }
         }
 
         Spacer(Modifier.height(32.dp))
-
-
     }
 }

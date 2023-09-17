@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.Duration
@@ -292,7 +294,7 @@ class AppConnectionsDaemon(
                         logger.info { "starting electrum connection loop" }
                         electrumConnectionJob = connectionLoop(
                             name = "Electrum",
-                            statusStateFlow = electrumClient.connectionState
+                            statusStateFlow = electrumClient.connectionStatus.map { it.toConnectionState() }.stateIn(this)
                         ) {
                             val electrumServerAddress: ServerAddress? = configurationManager.electrumConfig.value?.let { electrumConfig ->
                                 when (electrumConfig) {
@@ -303,10 +305,9 @@ class AppConnectionsDaemon(
                             if (electrumServerAddress == null) {
                                 logger.info { "ignoring electrum connection opportunity because no server is configured yet" }
                             } else {
-                                logger.info { "starting actual electrum connection job to server=$electrumServerAddress" }
-                                electrumClient.socketBuilder = tcpSocketBuilder()
                                 try {
-                                    electrumClient.connect(electrumServerAddress)
+                                    logger.info { "starting actual electrum connection job to server=$electrumServerAddress" }
+                                    electrumClient.connect(electrumServerAddress, tcpSocketBuilder())
                                 } catch (e: Exception) {
                                     logger.error(e) { "error when connecting to electrum: "}
                                 }

@@ -40,9 +40,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.blockchain.electrum.ElectrumConnectionStatus
 import fr.acinq.lightning.blockchain.electrum.getConfirmations
 import fr.acinq.lightning.db.*
-import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.android.LocalBitcoinUnit
@@ -63,7 +63,7 @@ import fr.acinq.phoenix.utils.extensions.minDepthForFunding
 import fr.acinq.phoenix.utils.extensions.state
 import io.ktor.http.Url
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.crypto.Cipher
@@ -599,7 +599,6 @@ private fun ConfirmationView(
             onClick = { openLink(context, txUrl) }
         )
     } else {
-        val connectionsManager = business.connectionsManager
 
         suspend fun getConfirmations(): Int {
             val confirmations = electrumClient.getConfirmations(txId)
@@ -612,7 +611,7 @@ private fun ConfirmationView(
         }
 
         val confirmations by produceState<Int?>(initialValue = null) {
-            connectionsManager.connections.filter { it.electrum is Connection.ESTABLISHED }.first()
+            electrumClient.connectionStatus.filterIsInstance<ElectrumConnectionStatus.Connected>().first()
             val confirmations = getConfirmations()
             value = confirmations
         }

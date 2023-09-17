@@ -20,7 +20,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:hardwareAccelerated="true"
-        android:theme="@style/default_theme">
+        android:theme="@style/default_theme"
+        android:localeConfig="@xml/locales_config">
 
         <!-- Set custom default icon for notifications -->
         <meta-data

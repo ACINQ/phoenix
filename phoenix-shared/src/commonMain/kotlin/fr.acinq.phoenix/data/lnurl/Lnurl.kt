@@ -76,9 +76,10 @@ sealed interface Lnurl {
         fun extractLnurl(source: String): Lnurl {
             val input = Parser.trimMatchingPrefix(source, Parser.lightningPrefixes + Parser.bitcoinPrefixes + Parser.lnurlPrefixes)
             val url: Url = try {
+                log.debug { "parsing as lnurl source=$source" }
                 parseBech32Url(input)
             } catch (bech32Ex: Exception) {
-                log.info { "cannot parse source=$input as bech32 lnurl: ${bech32Ex.message ?: bech32Ex::class}" }
+                log.info { "cannot parse source as a bech32 lnurl: ${bech32Ex.message ?: bech32Ex::class}" }
                 try {
                     if (lud17Schemes.any { input.startsWith(it, ignoreCase = true) }) {
                         parseNonBech32Lud17(input)
@@ -88,7 +89,7 @@ sealed interface Lnurl {
                         parseNonBech32Http(input)
                     }
                 } catch (nonBech32Ex: Exception) {
-                    log.info { "cannot parse source=$input as non-bech32 lnurl: ${nonBech32Ex.message ?: nonBech32Ex::class}" }
+                    log.info { "cannot parse source as non-bech32 lnurl: ${nonBech32Ex.message ?: nonBech32Ex::class}" }
                     throw LnurlError.Invalid(cause = nonBech32Ex)
                 }
             }
@@ -114,7 +115,7 @@ sealed interface Lnurl {
         }
 
         /** Lnurls are originally bech32 encoded. If unreadable, throw an exception. */
-        internal fun parseBech32Url(source: String): Url {
+        private fun parseBech32Url(source: String): Url {
             val (hrp, data) = Bech32.decode(source)
             val payload = Bech32.five2eight(data, 0).decodeToString()
             log.debug { "reading serialized lnurl with hrp=$hrp and payload=$payload" }
@@ -124,40 +125,51 @@ sealed interface Lnurl {
         }
 
         /** Lnurls sometimes hide in regular http urls, under the lightning parameter. */
-        internal fun parseNonBech32Http(source: String): Url {
+        private fun parseNonBech32Http(source: String): Url {
             val urlBuilder = URLBuilder(source)
-            if (!urlBuilder.protocol.isSecure()) throw LnurlError.UnsafeResource
             val lightningParam = urlBuilder.parameters["lightning"]
             return if (!lightningParam.isNullOrBlank()) {
                 // this url contains a lnurl fallback which takes priority - and must be bech32 encoded
                 parseBech32Url(lightningParam)
             } else {
+                if (!urlBuilder.protocol.isSecure()) throw LnurlError.UnsafeResource
                 urlBuilder.build()
             }
         }
 
-        private val lud17Schemes = listOf("lnurlp", "lnurlw", "keyauth")
+        private val lud17Schemes = listOf(
+            "phoenix:lnurlp://", "phoenix:lnurlp:",
+            "lnurlp://", "lnurlp:",
+            "phoenix:lnurlw://", "phoenix:lnurlw:",
+            "lnurlw://", "lnurlw:",
+            "phoenix:keyauth://", "phoenix:keyauth:",
+            "keyauth://", "keyauth:",
+        )
 
-        /** Converts LUD-17 lnurls (using a custom lnurl scheme like lnurlc, lnurlp, etc...) into a regular http url. */
-        internal fun parseNonBech32Lud17(source: String): Url {
-            return URLBuilder(source).apply {
+        /** Converts LUD-17 lnurls (using a custom lnurl scheme like lnurlc, lnurlp, keyauth) into a regular http url. */
+        private fun parseNonBech32Lud17(source: String): Url {
+            val matchingPrefix = lud17Schemes.firstOrNull { source.startsWith(it, ignoreCase = true) }
+            val stripped = if (matchingPrefix != null) {
+                source.drop(matchingPrefix.length)
+            } else {
+                throw IllegalArgumentException("source does not use a lud17 scheme: $source")
+            }
+            log.debug { "lud-17 scheme found - transforming input into an http request" }
+            return URLBuilder(stripped).apply {
                 encodedPath.split("/", ignoreCase = true, limit = 2).let {
                     this.host = it.first()
                     this.encodedPath = "/${it.drop(1).joinToString()}"
                 }
-                protocol = when {
-                    lud17Schemes.contains(protocol.name) -> if (this.host.endsWith(".onion")) {
-                        URLProtocol.HTTP
-                    } else {
-                        URLProtocol.HTTPS
-                    }
-                    else -> throw IllegalArgumentException("unreadable url=$source")
+                protocol = if (this.host.endsWith(".onion")) {
+                    URLProtocol.HTTP
+                } else {
+                    URLProtocol.HTTPS
                 }
             }.build()
         }
 
         /** LUD-16 support: https://github.com/fiatjaf/lnurl-rfc/blob/luds/16.md */
-        internal fun parseInternetIdentifier(source: String): Url {
+        private fun parseInternetIdentifier(source: String): Url {
 
             // Ignore excess input, including additional lines, and leading/trailing whitespace
             val line = source.lines().firstOrNull { it.isNotBlank() }?.trim() ?: throw RuntimeException("identifier has an empty leading line")

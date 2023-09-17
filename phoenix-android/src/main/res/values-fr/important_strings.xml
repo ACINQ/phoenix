@@ -53,7 +53,7 @@
     <string name="settings_display_prefs">Affichage</string>
     <string name="settings_wallet_info">Information sur le wallet</string>
     <string name="settings_liquidity_policy">Gestion des canaux</string>
-    <string name="settings_display_seed">Phrase de sauvegarde phrase</string>
+    <string name="settings_display_seed">Phrase de sauvegarde</string>
     <string name="settings_access_control">Contrôle d\'accès</string>
     <string name="settings_list_channels">Canaux de paiements</string>
     <string name="settings_logs">Logs</string>
@@ -64,7 +64,7 @@
     <string name="settings_tor">Tor</string>
     <string name="settings_about">À propos</string>
     <string name="settings_payment_settings">Options de paiement</string>
-    <string name="settings_payment_history">Historique de paiement</string>
+    <string name="settings_payment_history">Historique des paiements</string>
     <string name="settings_notifications">Notifications</string>
 
     <!-- home: bottom menu -->

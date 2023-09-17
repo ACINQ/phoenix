@@ -36,6 +36,8 @@ import fr.acinq.phoenix.android.PhoenixApplication
 import org.kodein.log.frontend.slf4jFrontend
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
 @Composable
 fun logger(name: String? = null): org.kodein.log.Logger {
@@ -52,15 +54,58 @@ fun logger(name: String? = null): org.kodein.log.Logger {
 
 object Logging {
 
-    const val LOGS_DIR = "logs"
-    const val CURRENT_LOG_FILE = "phoenix.log"
-    const val ARCHIVED_LOG_FILE = "phoenix.archive-%i.log"
+    private const val LOGS_DIR = "logs"
+    private const val CURRENT_LOG_FILE = "phoenix.log"
+    private const val ARCHIVED_LOG_FILE = "phoenix.archive-%i.log"
 
-    fun getLastLogFile(context: Context): File {
-        return File(File(context.filesDir, LOGS_DIR), CURRENT_LOG_FILE)
+    fun exportLogFile(context: Context): File {
+        val export = File(File(context.filesDir, LOGS_DIR), "phoenix_export.log")
+        val exportOutputStream = FileOutputStream(export)
+        val exportChannel = exportOutputStream.channel
+
+        // write archive-1 to export file, if available
+        File(File(context.filesDir, LOGS_DIR), "phoenix.archive-1.log").takeIf {
+            it.exists() && it.isFile && it.canRead()
+        }?.let {
+            FileInputStream(it)
+        }?.also {
+            val channel = it.channel
+            channel.transferTo(0, channel.size(), exportChannel)
+            channel.close()
+        }?.close()
+
+        // write current log file to export file, if available
+        File(File(context.filesDir, LOGS_DIR), CURRENT_LOG_FILE).takeIf {
+            it.exists() && it.isFile && it.canRead()
+        }?.let {
+            FileInputStream(it)
+        }?.also {
+            val channel = it.channel
+            channel.transferTo(0, channel.size(), exportChannel)
+            channel.close()
+        }?.close()
+
+        exportChannel.close()
+        exportOutputStream.close()
+        return export
     }
 
     fun setupLogger(context: Context) {
+        // cleanup export file
+        val export = File(File(context.filesDir, LOGS_DIR), "phoenix_export.log")
+        if (export.exists() && export.isFile) {
+            try {
+                export.delete()
+            } catch (_: Exception) {}
+        }
+        // cleanup unused archive-2 file
+        val archive2 = File(File(context.filesDir, LOGS_DIR), "phoenix.archive-2.log")
+        if (archive2.exists() && archive2.isFile) {
+            try {
+                archive2.delete()
+            } catch (_: Exception) {}
+        }
+
         val lc = LoggerFactory.getILoggerFactory() as LoggerContext
         lc.reset()
 
@@ -114,7 +159,7 @@ object Logging {
         rollingPolicy.context = lc
         rollingPolicy.setParent(appender)
         rollingPolicy.minIndex = 1
-        rollingPolicy.maxIndex = 2
+        rollingPolicy.maxIndex = 1
         rollingPolicy.fileNamePattern = File(logsDir, ARCHIVED_LOG_FILE).absolutePath
         rollingPolicy.start()
 

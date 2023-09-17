@@ -58,7 +58,7 @@ import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.home.HomeView
 import fr.acinq.phoenix.android.startup.LegacySwitcherView
-import fr.acinq.phoenix.android.home.NotificationsView
+import fr.acinq.phoenix.android.settings.NotificationsView
 import fr.acinq.phoenix.android.startup.StartupView
 import fr.acinq.phoenix.android.init.CreateWalletView
 import fr.acinq.phoenix.android.init.InitWallet
@@ -73,6 +73,7 @@ import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.settings.channels.ChannelDetailsView
 import fr.acinq.phoenix.android.settings.channels.ChannelsView
+import fr.acinq.phoenix.android.settings.channels.ImportChannelsData
 import fr.acinq.phoenix.android.settings.displayseed.DisplaySeedView
 import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
 import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
@@ -279,7 +280,7 @@ fun AppView(
                     })
                 }
                 composable(Screen.Settings.route) {
-                    SettingsView()
+                    SettingsView(noticesViewModel)
                 }
                 composable(Screen.DisplaySeed.route) {
                     DisplaySeedView()
@@ -292,8 +293,13 @@ fun AppView(
                 }
                 composable(Screen.Channels.route) {
                     ChannelsView(
-                        onBackClick = { navController.popBackStack() },
+                        onBackClick = {
+                            navController.navigate(Screen.Settings) {
+                                popUpTo(Screen.Settings.route) { inclusive = true }
+                            }
+                        },
                         onChannelClick = { navController.navigate("${Screen.ChannelDetails.route}?id=$it") },
+                        onImportChannelsDataClick = { navController.navigate(Screen.ImportChannelsData)}
                     )
                 }
                 composable(
@@ -302,6 +308,9 @@ fun AppView(
                 ) {
                     val channelId = it.arguments?.getString("id")
                     ChannelDetailsView(onBackClick = { navController.popBackStack() }, channelId = channelId)
+                }
+                composable(Screen.ImportChannelsData.route) {
+                    ImportChannelsData(onBackClick = { navController.popBackStack() })
                 }
                 composable(Screen.MutualClose.route) {
                     MutualCloseView(onBackClick = { navController.popBackStack() })

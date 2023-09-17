@@ -222,7 +222,7 @@ fun SettingSwitch(
 
 @Composable
 fun SettingButton(
-    text: Int,
+    text: String,
     icon: Int,
     textStyle: TextStyle = MaterialTheme.typography.button,
     iconTint: Color = MaterialTheme.colors.onSurface,
@@ -231,7 +231,7 @@ fun SettingButton(
 ) {
     Button(
         onClick = onClick,
-        text = stringResource(id = text),
+        text = text,
         textStyle = textStyle,
         icon = icon,
         iconTint = iconTint,

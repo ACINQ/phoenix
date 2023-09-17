@@ -30,9 +30,9 @@ import fr.acinq.phoenix.android.utils.negativeColor
 @Composable
 fun ErrorMessage(
     header: String,
+    modifier: Modifier = Modifier,
     details: CharSequence? = null,
     padding: PaddingValues = PaddingValues(16.dp),
-    modifier: Modifier = Modifier,
     alignment: Alignment.Horizontal = Alignment.Start,
 ) {
     FeedbackMessage(

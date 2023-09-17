@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.home
+package fr.acinq.phoenix.android.settings
 
 import android.Manifest
 import android.content.Intent
