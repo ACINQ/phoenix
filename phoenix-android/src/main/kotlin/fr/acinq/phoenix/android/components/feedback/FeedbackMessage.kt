@@ -38,15 +38,15 @@ import fr.acinq.phoenix.android.components.TextWithIcon
 @Composable
 fun FeedbackMessage(
     header: String,
-    details: CharSequence? = null,
     icon: Int,
     iconColor: Color,
+    modifier: Modifier = Modifier,
+    details: CharSequence? = null,
     iconSize: Dp = 20.dp,
     space: Dp = 8.dp,
     headerStyle: TextStyle = MaterialTheme.typography.body2,
     detailsStyle: TextStyle = MaterialTheme.typography.subtitle2,
     padding: PaddingValues = PaddingValues(16.dp),
-    modifier: Modifier = Modifier,
     alignment: Alignment.Horizontal = Alignment.Start,
 ) {
     Column(

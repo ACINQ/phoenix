@@ -145,7 +145,7 @@ object UserPrefs {
     suspend fun saveInvoiceDefaultDesc(context: Context, description: String) = context.userPrefs.edit { it[INVOICE_DEFAULT_DESC] = description }
 
     private val INVOICE_DEFAULT_EXPIRY = longPreferencesKey("INVOICE_DEFAULT_EXPIRY")
-    fun getInvoiceDefaultExpiry(context: Context): Flow<Long> = prefs(context).map { it[INVOICE_DEFAULT_EXPIRY] ?: (7 * DateUtils.WEEK_IN_MILLIS / 1000) }
+    fun getInvoiceDefaultExpiry(context: Context): Flow<Long> = prefs(context).map { it[INVOICE_DEFAULT_EXPIRY] ?: (DateUtils.WEEK_IN_MILLIS / 1000) }
     suspend fun saveInvoiceDefaultExpiry(context: Context, expirySeconds: Long) = context.userPrefs.edit { it[INVOICE_DEFAULT_EXPIRY] = expirySeconds }
 
     private val TRAMPOLINE_MAX_BASE_FEE = longPreferencesKey("TRAMPOLINE_MAX_BASE_FEE")

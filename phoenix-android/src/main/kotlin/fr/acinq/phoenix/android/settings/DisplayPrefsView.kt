@@ -17,6 +17,11 @@
 package fr.acinq.phoenix.android.settings
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.annotation.RequiresApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
@@ -27,8 +32,8 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.UserTheme
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.label
 import fr.acinq.phoenix.android.utils.labels
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -36,6 +41,7 @@ import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @Composable
 fun DisplayPrefsView() {
@@ -48,6 +54,9 @@ fun DisplayPrefsView() {
             BitcoinUnitPreference(context = context, scope = scope)
             FiatCurrencyPreference(context = context, scope = scope)
             UserThemePreference(context = context, scope = scope)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                AppLocaleSetting(context = context)
+            }
         }
     }
 }
@@ -126,6 +135,20 @@ private fun UserThemePreference(context: Context, scope: CoroutineScope) {
                 UserPrefs.saveUserTheme(context, it.item)
                 prefEnabled = true
             }
+        }
+    )
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@Composable
+private fun AppLocaleSetting(context: Context) {
+    SettingInteractive(
+        title = stringResource(id = R.string.prefs_locale_label),
+        description = Locale.getDefault().displayLanguage.replaceFirstChar { it.uppercase() }, // context.getSystemService(LocaleManager::class.java).applicationLocales.get(0).language,
+        onClick = {
+            context.startActivity(Intent(Settings.ACTION_APP_LOCALE_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+            })
         }
     )
 }

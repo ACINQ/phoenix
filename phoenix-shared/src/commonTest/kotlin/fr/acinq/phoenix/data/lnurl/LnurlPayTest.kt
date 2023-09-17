@@ -15,6 +15,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 class LnurlPayTest {
 
@@ -89,16 +90,66 @@ class LnurlPayTest {
     @Test
     fun execute_internet_identifier() {
         runBlocking {
-            val client = HttpClient {
-                install(ContentNegotiation) {
-                    json(json = Json { ignoreUnknownKeys = true })
-                }
+            val engine = MockEngine {
+                respond(
+                    content = ByteReadChannel("""
+                        {
+                            "minSendable":1000,
+                            "maxSendable":100000000,
+                            "commentAllowed":150,
+                            "tag":"payRequest",
+                            "metadata":"[[\"text/plain\",\"acinq - Welcome to my zbd.gg page!\"]]",
+                            "callback":"https://api.zebedee.io/v0/process-static-charges/whatever",
+                            "payerData":{
+                                "name":{"mandatory":false},
+                                "identifier":{"mandatory":false}
+                            },
+                            "disposable":false,
+                            "allowsNostr":true,
+                            "nostrPubkey":"12345"
+                        }
+                    """.trimIndent()),
+                    status = HttpStatusCode.OK,
+                    headers = headersOf(HttpHeaders.ContentType, "application/json")
+                )
             }
+            val client = fakeClient(engine)
             val lnurl = Lnurl.extractLnurl("acinq@zbd.gg")
             assertIs<Lnurl.Request>(lnurl)
             val response: HttpResponse = client.get(lnurl.initialUrl)
             val json = Lnurl.processLnurlResponse(response)
             assertEquals("payRequest", json.get("tag")!!.jsonPrimitive.content)
         }
+    }
+
+    private val validBech32Lnurl = "LNURL1DP68GURN8GHJ7MRWW4EXCTNXD9SHG6NPVCHXXMMD9AKXUATJDSKHQCTE8AEK2UMND9HKU0TRVGERQCFSXYMX2EFCXCUXYWTYXA3KXDRXVYEKZCMX8YCK2EFEVSMNSERYXGCNSDMRVSEXVVTX8P3X2VFJXS6N2CNXVE3NJVNPX5UR242GXTQ"
+
+    @Test
+    fun bech32() {
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl(validBech32Lnurl))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lightning://$validBech32Lnurl"))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lightning:$validBech32Lnurl"))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurl://$validBech32Lnurl"))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurl:$validBech32Lnurl"))
+    }
+
+    @Test
+    fun lud17() {
+        val validClearLud17 = "acinq.co/lnurlpay/token123-abc?some-parameter=USD"
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("phoenix:lnurlp://$validClearLud17"))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurlp://$validClearLud17"))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurlp:$validClearLud17"))
+        assertTrue { Lnurl.extractLnurl("lnurlp:$validClearLud17").initialUrl.protocol.isSecure() }
+
+        val validOnionLud17 = "lnurlp://acinq.onion/lnurlpay/token123-abc?some-parameter=USD"
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl(validOnionLud17))
+        assertTrue { !Lnurl.extractLnurl(validOnionLud17).initialUrl.protocol.isSecure() }
+    }
+
+    @Test
+    fun lnurl_in_http_param() {
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("https://acinq.co?param1=123&lightning=$validBech32Lnurl"))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("http://service.com/api/test?lightning=$validBech32Lnurl"))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("test://whatever/token?lightning=$validBech32Lnurl"))
     }
 }

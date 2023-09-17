@@ -8,12 +8,14 @@ import org.kodein.log.Logger
 import org.kodein.log.frontend.printLogIn
 import org.kodein.memory.file.Path
 import org.kodein.memory.file.createDirs
+import org.kodein.memory.file.delete
+import org.kodein.memory.file.listDir
+import org.kodein.memory.file.name
 import org.kodein.memory.file.openWriteableFile
 import org.kodein.memory.file.resolve
 import org.kodein.memory.text.putString
 import org.kodein.memory.use
 import kotlin.time.Duration.Companion.seconds
-
 
 class LogMemory(val directory: Path) : LogFrontend, CoroutineScope by MainScope() {
 
@@ -31,7 +33,9 @@ class LogMemory(val directory: Path) : LogFrontend, CoroutineScope by MainScope(
 
     init {
         directory.createDirs()
-
+        launch {
+            deleteOldLogs()
+        }
         launch {
             while (true) {
                 delay(every)
@@ -47,6 +51,20 @@ class LogMemory(val directory: Path) : LogFrontend, CoroutineScope by MainScope(
             lines.add(Line(Clock.System.now(), tag, entry, message))
             if (lines.size >= threshold) rotate()
         }
+    }
+
+    private fun deleteOldLogs() {
+        directory
+            .listDir()
+            .sortedByDescending { it.name }
+            .filter { it.name.endsWith(".txt") }
+            .drop(20)
+            .toList()
+            .forEach {
+                try {
+                    it.delete()
+                } catch (_: Exception) {}
+            }
     }
 
     fun rotate(): Job {

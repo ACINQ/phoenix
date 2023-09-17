@@ -47,6 +47,7 @@ sealed class Screen(val route: String) {
     object TorConfig : Screen("settings/tor")
     object Channels : Screen("settings/channels")
     object ChannelDetails : Screen("settings/channeldetails")
+    object ImportChannelsData : Screen("settings/importchannels")
     object MutualClose : Screen("settings/mutualclose")
     object ForceClose : Screen("settings/forceclose")
     object Preferences : Screen("settings/preferences")

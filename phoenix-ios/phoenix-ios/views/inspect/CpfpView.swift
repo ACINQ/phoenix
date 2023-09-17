@@ -456,14 +456,13 @@ struct CpfpView: View {
 		
 		do {
 			let result = try await Biz.business.electrumClient.kotlin_getConfirmations(txid: onChainPayment.txId)
-			
+
 			let confirmations = result?.intValue ?? 0
 			log.debug("checkConfirmations(): => \(confirmations)")
-			
+
 			if confirmations > 0 {
 				self.txAlreadyMined = true
 			}
-			
 		} catch {
 			log.error("electrumClient.getConfirmations(): \(error)")
 		}

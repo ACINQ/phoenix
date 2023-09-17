@@ -127,7 +127,7 @@ class PaymentsManager(
         }
     }
 
-    /** Watches transactions that are unconfirmed, check their confirmation status, and update relevant payments. */
+    /** Watches transactions that are unconfirmed, checks their confirmation status at each block, and updates relevant payments. */
     private suspend fun monitorUnconfirmedTransactions() {
         val paymentsDb = paymentsDb()
         // We need to recheck anytime either:
@@ -137,15 +137,17 @@ class PaymentsManager(
             paymentsDb.listUnconfirmedTransactions(),
             configurationManager.electrumMessages
         ) { unconfirmedTxs, header ->
-            Pair(unconfirmedTxs, header)
-        }.collect { (unconfirmedTxs, _) ->
-            val unconfirmedTxIds = unconfirmedTxs.map { it.byteVector32() }
-            log.info { "monitoring unconfirmed txs=$unconfirmedTxIds" }
-            unconfirmedTxIds.forEach { txId ->
-                electrumClient.getConfirmations(txId)?.let { conf ->
-                    if (conf > 0) {
-                        log.info { "transaction $txId has $conf confirmations, updating database" }
-                        paymentsDb.setConfirmed(txId)
+            unconfirmedTxs to header?.blockHeight
+        }.collect { (unconfirmedTxs, blockHeight) ->
+            if (blockHeight != null) {
+                val unconfirmedTxIds = unconfirmedTxs.map { it.byteVector32() }
+                log.debug { "checking confirmation status of ${unconfirmedTxIds.size} txs at block=$blockHeight" }
+                unconfirmedTxIds.forEach { txId ->
+                    electrumClient.getConfirmations(txId)?.let { conf ->
+                        if (conf > 0) {
+                            log.info { "transaction $txId has $conf confirmations, updating database" }
+                            paymentsDb.setConfirmed(txId)
+                        }
                     }
                 }
             }

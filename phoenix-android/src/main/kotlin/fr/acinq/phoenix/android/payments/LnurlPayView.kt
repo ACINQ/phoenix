@@ -170,10 +170,14 @@ fun LnurlPayView(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                 }
+
+                val channels by business.peerManager.channelsFlow.collectAsState()
+                val areChannelsUsable = channels?.values?.all { it.isUsable } ?: false
+
                 FilledButton(
-                    text = stringResource(id = R.string.lnurl_pay_pay_button),
+                    text = if (!areChannelsUsable) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.lnurl_pay_pay_button),
                     icon = R.drawable.ic_send,
-                    enabled = amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
+                    enabled = areChannelsUsable && amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
                 ) {
                     safeLet(trampolineFees, amount) { fees, amt ->
                         onSendLnurlPayClick(
