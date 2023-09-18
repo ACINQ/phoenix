@@ -21,7 +21,6 @@ import com.squareup.sqldelight.runtime.coroutines.mapToList
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.Notification
-import fr.acinq.phoenix.data.WatchTowerOutcome
 import fr.acinq.phoenix.db.AppDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -125,29 +124,7 @@ internal class NotificationsQueries(val database: AppDatabase) {
                         source = data.source,
                     )
                 }
-                is NotificationData.WatchTowerOutcome.Nominal.V0 -> {
-                    WatchTowerOutcome.Nominal(
-                        id = UUID.fromString(id),
-                        createdAt = created_at,
-                        readAt = read_at,
-                        channelsWatchedCount = data.channelsWatchedCount
-                    )
-                }
-                is NotificationData.WatchTowerOutcome.RevokedFound.V0 -> {
-                    WatchTowerOutcome.RevokedFound(
-                        id = UUID.fromString(id),
-                        createdAt = created_at,
-                        readAt = read_at,
-                        channels = data.channels
-                    )
-                }
-                NotificationData.WatchTowerOutcome.Unknown.V0 -> {
-                    WatchTowerOutcome.Unknown(
-                        id = UUID.fromString(id),
-                        createdAt = created_at,
-                        readAt = read_at,
-                    )
-                }
+                is NotificationData.WatchTowerOutcome -> null
                 null -> null
             }
         }

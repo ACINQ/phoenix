@@ -3,15 +3,15 @@ This document provides guidelines for localizing the **new** Android application
 ## What to translate
 
 String resources are contained in two separate files:
-- [`important_strings.xml`](https://github.com/ACINQ/phoenix/blob/master/phoenix-legacy/src/main/res/values/important_strings.xml): a "short" file that contains the most important resources, like instructions, guidelines, or error messages.
-- [`strings.xml`](https://github.com/ACINQ/phoenix/blob/master/phoenix-legacy/src/main/res/values/strings.xml): contains all the less important resources.
+- [`important_strings.xml`](https://github.com/ACINQ/phoenix/blob/master/phoenix-android/src/main/res/values/important_strings.xml): a "short" file that contains the most important resources, like instructions, guidelines, or error messages.
+- [`strings.xml`](https://github.com/ACINQ/phoenix/blob/master/phoenix-android/src/main/res/values/strings.xml): contains all the less important resources.
 
 ## How to add a new language
 
 1. Fork and clone this project ([How-to](https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project))
 2. Create a new branch, for example `translate_mylanguagecode`, where my `mylanguagecode` could be `fr` or `it`.
 3. Create a new folder for this language, named `values-mylanguagecode`, in `phoenix-android/src/main/res`. For example, for french you would create a `values-fr` folder.
-4. Copy the `phoenix-android/src/main/res/values/important_strings.xml` and `phoenix-android/src/main/res/values/important_strings.xml` files into this new folder.
+4. Copy the `phoenix-android/src/main/res/values/important_strings.xml` and `phoenix-android/src/main/res/values/strings.xml` files into this new folder.
 5. You can now start the translation work proper.
 6. Then submit a pull request to start the review.
 

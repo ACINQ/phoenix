@@ -18,7 +18,10 @@ package fr.acinq.phoenix.android.settings
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
@@ -27,14 +30,19 @@ import androidx.core.content.FileProvider
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.SettingButton
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.shareFile
 
+private sealed class LogsExportState {
+    object Init: LogsExportState()
+    object Exporting: LogsExportState()
+    object Failed: LogsExportState()
+}
 @Composable
 fun LogsView() {
     val log = logger("LogsView")
@@ -48,33 +56,60 @@ fun LogsView() {
             title = stringResource(id = R.string.logs_title),
         )
         Card {
+            var viewLogState by remember { mutableStateOf<LogsExportState>(LogsExportState.Init) }
             SettingButton(
-                text = R.string.logs_view_button,
+                text = when (viewLogState) {
+                    is LogsExportState.Init -> stringResource(id = R.string.logs_view_button)
+                    is LogsExportState.Exporting -> stringResource(id = R.string.logs_exporting)
+                    is LogsExportState.Failed -> stringResource(id = R.string.logs_failed)
+
+                },
                 icon = R.drawable.ic_eye,
+                enabled = viewLogState !is LogsExportState.Exporting,
                 onClick = {
-                    val logFile = Logging.getLastLogFile(context)
-                    val uri = FileProvider.getUriForFile(context, authority, logFile)
-                    val localViewIntent: Intent = Intent().apply {
-                        action = Intent.ACTION_VIEW
-                        type = "text/plain"
-                        setDataAndType(uri, "text/plain")
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    viewLogState = LogsExportState.Exporting
+                    try {
+                        val logFile = Logging.exportLogFile(context)
+                        val uri = FileProvider.getUriForFile(context, authority, logFile)
+                        val localViewIntent: Intent = Intent().apply {
+                            action = Intent.ACTION_VIEW
+                            type = "text/plain"
+                            setDataAndType(uri, "text/plain")
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        val viewIntent = Intent.createChooser(localViewIntent, context.getString(R.string.logs_view_with))
+                        context.startActivity(viewIntent)
+                        viewLogState = LogsExportState.Init
+                    } catch (e: Exception) {
+                        viewLogState = LogsExportState.Failed
                     }
-                    val viewIntent = Intent.createChooser(localViewIntent, context.getString(R.string.logs_view_with))
-                    context.startActivity(viewIntent)
                 }
             )
+
+            var shareLogState by remember { mutableStateOf<LogsExportState>(LogsExportState.Init) }
             SettingButton(
-                text = R.string.logs_share_button,
+                text = when (shareLogState) {
+                    is LogsExportState.Init -> stringResource(id = R.string.logs_share_button)
+                    is LogsExportState.Exporting -> stringResource(id = R.string.logs_exporting)
+                    is LogsExportState.Failed -> stringResource(id = R.string.logs_failed)
+
+                },
                 icon = R.drawable.ic_share,
+                enabled = shareLogState !is LogsExportState.Exporting,
                 onClick = {
-                    val logFile = Logging.getLastLogFile(context)
-                    shareFile(
-                        context = context,
-                        data = FileProvider.getUriForFile(context, authority, logFile),
-                        subject = context.getString(R.string.logs_share_subject),
-                        chooserTitle = context.getString(R.string.logs_share_title)
-                    )
+                    shareLogState = LogsExportState.Exporting
+                    try {
+                        val logFile = Logging.exportLogFile(context)
+                        shareFile(
+                            context = context,
+                            data = FileProvider.getUriForFile(context, authority, logFile),
+                            subject = context.getString(R.string.logs_share_subject),
+                            chooserTitle = context.getString(R.string.logs_share_title)
+                        )
+                        shareLogState = LogsExportState.Init
+                    } catch (e: Exception) {
+                        shareLogState = LogsExportState.Failed
+                    }
                 }
             )
         }

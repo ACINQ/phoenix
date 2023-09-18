@@ -117,10 +117,10 @@ docker build -t phoenix_build .
 
 ```shell
 # If you're on linux:
-docker run --rm -v $(pwd):/home/ubuntu/phoenix/phoenix-android/build/outputs -w /home/ubuntu/phoenix phoenix_build ./gradlew :phoenix-android:assemble
+docker run --rm -v $(pwd):/home/ubuntu/phoenix/phoenix-android/build/outputs -w /home/ubuntu/phoenix phoenix_build ./gradlew :phoenix-android:assembleRelease
 
 # If you're on Windows:
-docker run --rm -v ${pwd}:/home/ubuntu/phoenix/phoenix-android/build/outputs -w //home/ubuntu/phoenix phoenix_build ./gradlew :phoenix-android:assemble
+docker run --rm -v ${pwd}:/home/ubuntu/phoenix/phoenix-android/build/outputs -w //home/ubuntu/phoenix phoenix_build ./gradlew :phoenix-android:assembleRelease
 ```
 
 6. APK files are found in the `apk` folder.

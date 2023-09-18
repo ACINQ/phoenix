@@ -8,7 +8,7 @@ Phoenix is a Bitcoin wallet developed by [ACINQ](https://acinq.co), that allows 
 
 ---
 
-:rotating_light: This wallet is self-custodial. Your key, your bitcoins. But make sure you backup your key so you do not lose your money. Do not share your key with anyone.
+:rotating_light: This wallet is self-custodial. It means that, when creating a new wallet, a 12-words recovery phrase is generated. Only you have it. It is your responsibility to make a backup of that recovery phrase. It gives full access to your funds, so do not share it with anyone. If you lose the recovery phrase, your funds are lost.
 
 ---
 
@@ -20,16 +20,18 @@ Head to our website for more information:
 ## Download
 
 Phoenix is available for Android and iOS:
-- for iOS: [on the App Store](https://apps.apple.com/us/app/phoenix-wallet/id1544097028), requires iOS 14+.
-- for Android: [on Google Play](https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet), or [get the APK from the releases](https://github.com/ACINQ/phoenix/releases)
+- for iOS: [on the App Store](https://apps.apple.com/us/app/phoenix-wallet/id1544097028) - requires iOS 14+.
+- for Android: [on Google Play](https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet), or [get the APK from the releases](https://github.com/ACINQ/phoenix/releases) - requires Android 8+.
 
 ## Build and test Phoenix
 
-Phoenix is currently separated into two codebases:
-- the legacy Android app, found in the `phoenix-legacy` folder, using our own Scala [eclair-core](https://github.com/ACINQ/eclair) library for Lightning. Instructions to build this app are provided [here](https://github.com/ACINQ/phoenix/blob/master/phoenix-legacy/BUILD.md)
-- the iOS app found in the `phoenix-ios` folder, using our own Kotlin MultiPlatform [lightning-kmp](https://github.com/ACINQ/lightning-kmp) library for Lightning. Instructions to build this app are provided [here](https://github.com/ACINQ/phoenix/blob/master/BUILD.md)
+Phoenix is separated in 3 modules:
+- `phoenix-shared`: business logic written in Kotlin, shared between the iOS and the Android applications. Uses [lightning-kmp](https://github.com/ACINQ/lightning-kmp) for everything Lightning/Bitcoin related.
+- `phoenix-android`: the UI for the new Android application, written in Kotlin and Jetpack Compose. Instructions to build this app are provided [here](https://github.com/ACINQ/phoenix/blob/master/phoenix-android/BUILD.md).
+- `phoenix-ios`: the UI for the iOS application, written in Swift. Instructions to build this app are provided [here](https://github.com/ACINQ/phoenix/blob/master/BUILD.md).
 
-The `phoenix-android` folder contains the new Android app that shares code with the iOS app and use lightning-kmp. This app is not ready yet. It will eventually replace the legacy Android app.
+About about the legacy Android app:
+`phoenix-legacy` contains the old, legacy Android application (version 1.x), using [eclair-core](https://github.com/ACINQ/eclair) for Lightning. This application has been replaced by `phoenix-android`. However, this legacy app is still embedded in the new production application for migration purposes. It will be removed eventually.
 
 ## Contribute
 

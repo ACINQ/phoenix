@@ -1,0 +1,302 @@
+<!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="app_name">Phoenix</string>
+
+    <!-- system notification channels -->
+
+    <string name="notification_channels_watcher_title">Observation des canaux</string>
+    <string name="notification_channels_watcher_desc">Affiché lorsqu\'il faut lancer Phoenix.</string>
+
+    <string name="notification_pending_settlement_title">Paiement en suspens</string>
+    <string name="notification_pending_settlement_desc">Affiché lorsque Phoenix doit être démarré pour terminer un paiement.</string>
+
+    <string name="notification_missed_payment_title">Paiement rejeté</string>
+    <string name="notification_missed_payment_desc">Affiché lorsqu\'un paiement est rejeté par insuffisance de liquidité.</string>
+
+    <string name="notification_received_payment_title">Paiement reçu</string>
+    <string name="notification_received_payment_desc">Affiché lorsqu\'un paiement est reçu et que l\'appli est éteinte.</string>
+
+    <string name="notification_headless_title">Arrière-plan</string>
+    <string name="notification_headless_desc">Vous notifie que Phoenix fonctionne en arrière plan.</string>
+
+    <!-- init wallet / automated wallet creation -->
+
+    <string name="autocreate_generating">Création de votre portefeuille…</string>
+    <string name="autocreate_error">Échec de la création du portefeuille</string>
+
+    <string name="restore_title">Restaurer mon portefeuille</string>
+    <string name="restore_disclaimer_next">Suivant</string>
+    <string name="restore_in_progress">Restauration du portefeuille…</string>
+
+    <!-- Auth prompt (v2) -->
+
+    <string name="authprompt_title">Déverrouiller pour continuer</string>
+
+    <!-- Startup -->
+
+    <string name="startup_wait_prefs">Initialisation…</string>
+    <string name="startup_binding_service">Liaison au service…</string>
+    <string name="startup_wait">Préparation du portefeuille…</string>
+    <string name="startup_wait_legacy_check">Vérification de l\'ancien portefeuille…</string>
+    <string name="startup_manual_unlock_button">Déverrouiller</string>
+    <string name="startup_checking_seed">Déverrouillage…</string>
+    <string name="startup_starting">Démarrage…</string>
+    <string name="startup_error_generic">L\'application n\'a pas pu démarrer.\n\nDétails de l\'erreur : %1$s</string>
+
+    <!-- Switch between legacy/modern apps -->
+
+    <string name="legacyswitch_title">Application historique</string>
+    <string name="legacyswitch_restart">Relancer l\'application historique</string>
+
+    <!-- Payment line -->
+
+    <string name="paymentline_prefix_sent">-</string>
+    <string name="paymentline_prefix_received">+</string>
+    <string name="paymentline_desc_pending_onchain">Attente de confirmations</string>
+    <string name="paymentline_desc_pending_offchain">Paiement en cours</string>
+    <string name="paymentline_desc_success_onchain">Paiement confirmé</string>
+    <string name="paymentline_desc_success_offchain">Paiement réussi</string>
+    <string name="paymentline_desc_failed">Paiement échoué</string>
+
+    <!-- Receive screen -->
+
+    <string name="receive_help_qr">QR Code de l\'adresse ou de la requête de paiement</string>
+
+    <string name="receive_bitcoin_title">Bitcoin</string>
+    <string name="receive_bitcoin_help">Ce QR code représente une adresse Bitcoin classique.\n\nCelle-ci est compréhensible par presque tous les services et wallets Bitcoin, mais les paiements seront plus lents à arriver.</string>
+    <string name="receive_bitcoin_address_label">Adresse</string>
+    <string name="receive_bitcoin_error">Échec de la génération de l\'adresse</string>
+    <string name="receive_bitcoin_share_title">Adresse Bitcoin</string>
+    <string name="receive_bitcoin_share_subject">Partagez cette adresse Bitcoin avec…</string>
+
+    <string name="receive_lightning_title">Lightning</string>
+    <string name="receive_lightning_help">Ce QR code est une requête de paiement Lightning.\n\nLes paiements Lightning sont très rapides et habituellement moins cher, mais certains wallets et services ne les comprennent pas encore.\n\nDans ce cas, défilez sur la droite pour afficher une adresse Bitcoin classique.</string>
+    <string name="receive_lightning_generating">Création d\'une requête de paiement…</string>
+    <string name="receive_lightning_amount_label">Montant</string>
+    <string name="receive_lightning_desc_label">Desc</string>
+    <string name="receive_lightning_error">Échec de la création de la requête</string>
+    <string name="receive_lightning_share_subject">Paiement Lightning</string>
+    <string name="receive_lightning_share_title">Partagez cette requête de paiement Lightning avec…</string>
+    <string name="receive_lnurl_button">Utiliser un lien LNURL</string>
+
+    <string name="receive_lightning_edit_button">Éditer</string>
+    <string name="receive_lightning_edit_title">Éditer une requête</string>
+    <string name="receive_lightning_edit_amount_label">Montant (optionnel)</string>
+    <string name="receive_lightning_edit_amount_placeholder">Montant demandé</string>
+    <string name="receive_lightning_edit_desc_label">Description (optionnel)</string>
+    <string name="receive_lightning_edit_desc_placeholder">Entrez une description pour cette requête</string>
+    <string name="receive_lightning_edit_generate_button">Créer une requête</string>
+
+    <!-- send -->
+
+    <string name="send_balance_prefix">Solde:</string>
+    <string name="send_error_amount_too_large">Le montant est trop élevé.</string>
+    <string name="send_error_amount_negative">Le montant ne peut pas être négatif.</string>
+    <string name="send_error_amount_invalid">Ce montant n\'est pas valide.</string>
+    <string name="send_error_amount_over_balance">Ce montant excède votre solde.</string>
+    <string name="send_error_amount_overpaying">Le montant ne peut excéder %1$s.</string>
+    <string name="send_error_amount_below_requested">Ce montant est inférieur au montant demandé de %1$s.</string>
+    <string name="send_destination_label">Envoyer à</string>
+    <string name="send_description_label">Description</string>
+    <string name="send_trampoline_fee_label">Frais</string>
+    <string name="send_trampoline_fee_no_amount">N/A</string>
+    <string name="send_trampoline_fee_loading">Calcul des frais…</string>
+    <string name="send_trampoline_amountless_warning_label">Requête sans montant</string>
+    <string name="send_trampoline_amountless_warning_details">La requête pour ce paiement ne précise pas de montant. Cela peut être exploité par des noeuds malicieux pendant le paiement.\n\nPour plus de sécurité, <b>demandez au destinataire de spécifier un montant</b> lorsqu\'il crée sa requête de paiement.</string>
+    <string name="send_connecting_button">Préparation des canaux…</string>
+    <string name="send_pay_button">Payer</string>
+
+    <string name="send_paymentmode_onchain">Payer sur chaîne</string>
+    <string name="send_paymentmode_onchain_desc">Les transactions sur la chaîne Bitcoin sont généralement plus lentes et adaptées au gros paiements.</string>
+    <string name="send_paymentmode_lightning">Payer via Lightning</string>
+    <string name="send_paymentmode_lightning_desc">Les paiement Lightning sont rapides et adaptés aux petits montants.</string>
+
+    <string name="send_spliceout_address_label">Adresse</string>
+    <string name="send_spliceout_feerate_label">Taux de frais</string>
+    <string name="send_spliceout_feerate_waiting_for_value">Récupération des taux…</string>
+
+    <string name="send_spliceout_error_invalid_feerate">Veuillez saisir un taux valide.</string>
+    <string name="send_spliceout_error_cannot_afford_fees">Le montant total excède votre solde</string>
+    <string name="send_spliceout_error_failure">Le paiement a échoué</string>
+
+    <string name="send_spliceout_prepare_button">Préparer la transaction</string>
+    <string name="send_spliceout_prepare_in_progress">Préparation de la transaction…</string>
+    <string name="send_spliceout_execute_in_progress">Exécution du splice…</string>
+    <string name="send_spliceout_complete_recap_amount">Montant</string>
+    <string name="send_spliceout_complete_recap_fee">Frais de minage</string>
+    <string name="send_spliceout_complete_recap_fee_details">Utilise un taux effective de %1$s sat/vbyte.</string>
+    <string name="send_spliceout_complete_recap_total">Total</string>
+
+    <!-- scan -->
+
+    <string name="scan_reading">Lecture des données…</string>
+    <string name="scan_manual_input_button">Saisie manuelle</string>
+    <string name="scan_paste_button">Coller depuis le presse-papiers</string>
+    <string name="scan_request_camera_access">Autoriser l\'accès à la caméra</string>
+    <string name="scan_request_camera_access_denied">L\'accès à la caméra a été refusé</string>
+    <string name="scan_instructions">Scannez un QR Code contenant une requête de paiement, une adresse Bitcoin, ou un lien LNURL</string>
+
+    <string name="scan_lnurl_fetching">Récupération des données auprès du service…</string>
+
+    <string name="scan_manual_input_title">Saisie manuelle</string>
+    <string name="scan_manual_input_instructions">Saisissez une requête de paiement Lightning, un LNURL, ou une adresse Ligthning que vous souhaitez payer.</string>
+    <string name="scan_manual_input_label">Requête ou adresse de paiement</string>
+
+    <!-- utils: misc strings -->
+
+    <string name="utils_rounded">≈</string>
+    <string name="utils_converted_amount">≈ %1$s</string>
+    <string name="utils_no_conversion">Taux de change Bitcoin indisponible</string>
+    <string name="utils_amount_hint">Montant</string>
+
+    <string name="utils_proceed">Procéder</string>
+    <string name="utils_cancel">Annuler</string>
+    <string name="utils_date_just_now">à l\'instant</string>
+    <string name="utils_unknown">N/A</string>
+    <string name="utils_loading_data">Chargement des données…</string>
+    <string name="utils_loading_prefs">Chargement des préférences…</string>
+    <string name="utils_copied">Copié dans le presse-papiers</string>
+
+    <string name="accessibility_link">Ouvrir le lien dans un navigateur</string>
+    <string name="accessibility_explorer_link">Ouvrir la transaction dans un explorateur</string>
+    <string name="validation_empty">Ce champ ne peut être vide</string>
+    <string name="validation_invalid_amount">Veuillez saisir un montant valide</string>
+    <string name="validation_invalid_number">Veuillez saisir un chiffre valide</string>
+    <string name="validation_no_decimal">Ce champ doit être un nombre entier</string>
+
+    <string name="btn_back">Revenir en arrière</string>
+    <string name="btn_next">Suivant</string>
+    <string name="btn_copy">Copier</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_save">Sauver</string>
+    <string name="btn_confirm">Confirmer</string>
+    <string name="btn_cancel">Annuler</string>
+    <string name="btn_close">Fermer</string>
+    <string name="btn_pause_connecting">Connexion au pair…</string>
+    <string name="btn_pause_connecting_electrum">Connexion à electrum…</string>
+
+    <!-- mutual close -->
+
+    <string name="mutualclose_title">Vider mon portefeuille</string>
+    <string name="mutualclose_loading">Chargement…</string>
+    <string name="mutualclose_checking_balance">Vérification du solde…</string>
+    <string name="mutualclose_balance">Solde: <b>%1$s</b> (≈ %2$s)</string>
+    <string name="mutualclose_no_channels">Ce portefeuille n\'a pas de canaux éligibles à une clôture.</string>
+    <string name="mutualclose_input_placeholder">Saisissez une adresse Bitcoin</string>
+    <string name="mutualclose_button">Vider mon portefeuille</string>
+    <string name="mutualclose_error_chain_mismatch">Cette adresse utilise une blockchain différente</string>
+    <string name="mutualclose_error_chain_reqparams">Cette adresse utilise des fonctionnalités non supportées</string>
+    <string name="mutualclose_error_chain_generic">Cette adresse n\'est pas compatible</string>
+    <string name="mutualclose_done">%1$d canaux ont été fermés. Vous pourrez trouver le détail dans la page d\'accueil.</string>
+    <string name="mutualclose_inprogress">Veuillez patienter…</string>
+
+    <string name="forceclose_no_channels">Aucun canaux éligible à une clôture.</string>
+
+    <!-- channels view -->
+
+    <string name="channelsview_title">Canaux de paiements</string>
+    <string name="channelsview_menu_import_channels">Importer des canaux</string>
+    <string name="channelsview_balance">Solde</string>
+    <string name="channelsview_balance_about">Il s\'agit du solde de vos canaux actifs. C\'est ce que vous pouvez dépenser via Lightning.</string>
+    <string name="channelsview_loading_channels">Chargement des canaux…</string>
+    <string name="channelsview_no_channels">Vous n\'avez pas encore de canaux.\n\nCes canaux seront crées automatiquement au besoin.</string>
+
+    <!-- channels details -->
+
+    <string name="channeldetails_title">Détails du canal</string>
+    <string name="channeldetails_not_found">Aucun canal actif n\'existe pour cet identifiant.</string>
+    <string name="channeldetails_channel_id">Identifiant du canal</string>
+    <string name="channeldetails_state">État</string>
+    <string name="channeldetails_spendable">Solde</string>
+
+    <string name="channeldetails_commitments">Commitments actifs</string>
+    <string name="channeldetails_inactive_commitments">Commitments inactifs</string>
+    <string name="channeldetails_commitment_funding_tx_id">Tx de financement:</string>
+    <string name="channeldetails_commitment_funding_tx_index">Tx index:</string>
+    <string name="channeldetails_commitment_balance">Solde:</string>
+    <string name="channeldetails_commitment_funding_capacity">Capacité:</string>
+    <string name="channeldetails_commitment_linked_payments">Suscité par:</string>
+
+    <string name="channeldetails_json">Afficher les données brutes</string>
+    <string name="channeldetails_share">Partager</string>
+    <string name="channeldetails_share_subject">Données du canal</string>
+    <string name="channeldetails_share_title">Partager les données du canal</string>
+
+    <!-- manual channels data import -->
+
+    <string name="channelimport_title">Importer des données de canal</string>
+    <string name="channelimport_instructions">Cet écran est un outil de debug utilisé pour importer manuellement des données de canaux chiffrées.\n\nUtiliser avec prudence.</string>
+    <string name="channelimport_input_label">Données</string>
+    <string name="channelimport_import_button">Importer</string>
+    <string name="channelimport_importing">Import des données…</string>
+    <string name="channelimport_success">Import réussi</string>
+    <string name="channelimport_success_restart">Vous devez maintenant redémarrer Phoenix.</string>
+    <string name="channelimport_error_title">Import échoué</string>
+    <string name="channelimport_error_malformed">Les données sont malformées. Un blob hexa est attendu.</string>
+    <string name="channelimport_error_decryption">Les données n\'ont pas pu être déchiffrées.</string>
+    <string name="channelimport_error_unknown_version">La version %1$d n\'est pas supportée</string>
+
+    <!-- home: balance section & misc -->
+
+    <string name="home__balance_loading">Chargement…</string>
+    <string name="home__onchain_incoming">+%1$s</string>
+
+    <string name="home__faq_button">FAQ</string>
+    <string name="home__payments_none">Vous n\'avez pas fait de paiement récemment.\n\nUtilisez les boutons ci-dessous pour envoyer et recevoir des paiement.</string>
+    <string name="home__payments_none_incoming">Un dépôt est en cours.\n\nUne fois confirmé, le paiement apparaîtra ici.</string>
+    <string name="home__payments_header">Paiement récents</string>
+    <string name="home__payments_more_button">Montrer tous les paiements…</string>
+    <string name="home__connection__electrum_late">Electrum en retard</string>
+    <string name="home__connection__bad_cert">Certificat Electrum</string>
+    <string name="home__connection__connecting">Connexion…</string>
+    <string name="home__connection__tor_active">Tor actif</string>
+
+    <!-- in-app notifications -->
+
+    <string name="inappnotif_title">Notifications</string>
+    <string name="inappnotif_notices_title">Messages important</string>
+    <string name="inappnotif_payments_title">Activité récente</string>
+    <string name="inappnotif_empty">Aucune notifications pour l\'instant</string>
+
+    <!-- settings: display seed -->
+
+    <string name="displayseed_title">Phrase de sauvegarde</string>
+    <string name="displayseed_loading">Déverrouillage de la clé…</string>
+    <string name="displayseed_error_details">La clé n\'a pas pu étre déverrouillée</string>
+    <string name="displayseed_derivation_path">Seed BIP39 avec chemin de dérivation BIP84</string>
+    <string name="displayseed_loading_prefs">Chargement des préférences…</string>
+    <string name="displayseed_backup_title">Confirmation de la sauvegarde</string>
+
+    <!-- settings: logs -->
+
+    <string name="logs_title">Logs applicatifs</string>
+    <string name="logs_exporting">Export des logs…</string>
+    <string name="logs_failed">Erreur: les logs n\'ont pu être exportés</string>
+    <string name="logs_view_button">Voir les logs…</string>
+    <string name="logs_view_with">Voir les logs avec…</string>
+    <string name="logs_share_button">Partagez les logs…</string>
+    <string name="logs_share_subject">Phoenix App logs</string>
+    <string name="logs_share_title">Partagez les logs Phoenix…</string>
+
+    <!-- payment details -->
+
+    <string name="paymentdetails_title">Détails de paiement</string>
+    <string name="paymentdetails_loading">Chargement des données du paiement…</string>
+    <string name="paymentdetails_error">Les détails pour ce paiement n\'ont pas pu être trouvées</string>
+
+</resources>

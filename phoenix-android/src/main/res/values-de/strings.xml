@@ -586,7 +586,7 @@
 
     <!-- settings: options for payments -->
 
-    <string name="paymentsettings_title">Optionen &amp; Gebühren</string>
+    <string name="paymentsettings_title">Zahlungs-Optionen</string>
 
     <string name="paymentsettings_category_incoming">Eingehende Zahlungen</string>
     <string name="paymentsettings_category_outgoing">Ausgehende Zahlungen</string>
