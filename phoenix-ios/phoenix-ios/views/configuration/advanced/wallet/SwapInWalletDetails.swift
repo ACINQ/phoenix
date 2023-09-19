@@ -336,6 +336,7 @@ struct SwapInWalletDetails: View {
 		
 		let paymentRejected = bizNotifications
 			.compactMap { $0.notification as? PhoenixShared.Notification.PaymentRejected }
+			.filter { $0.source == Lightning_kmpLiquidityEventsSource.onchainwallet }
 			.first
 		
 		if let overAbsoluteFee = paymentRejected as? PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee {
