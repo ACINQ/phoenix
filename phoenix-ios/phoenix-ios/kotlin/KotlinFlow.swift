@@ -5,59 +5,36 @@ import PhoenixShared
  * The `KotlinPassthroughSubject` & `KotlinCurrentValueSubject` publishers allow us to work
  * with Kotlin's `Flow` & `StateFlow` types, but using native Publisher types.
  *
- * Both `KotlinPassthroughSubject` & `KotlinCurrentValueSubject` are defined with 2 generic types:
+ * Both `KotlinPassthroughSubject` & `KotlinCurrentValueSubject` are defined with a generic type:
  *
- * - Input: This is the exported type from Kotlin, and will be an objective-c type (AnyObject)
- * - Output: This is the type we want to consume in Swift
+ * - Output: This is the exported type from Kotlin, and will be an objective-c type (AnyObject)
  *
- * The conversion will be performed in this manner:
- * ```
- * kotlinFlow.watch {[weak self](value: Input?) in
- *   if let value = value as? Output {
- *     self?.publisher.send(value)
- *   }
- * }
- * ```
- *
- * By defining the Ouput type, you control conversions, and whether or not to allow nil values.
- * ```
- * // This will convert from NSDictionary, to native Swift Dictionary type.
- * // It will also filter out any nil values emitted from the underlying Kotlin StateFlow.
- * KotlinPassthroughSubject<NSDictionary, [String: Lightning_kmpMilliSatoshi]>
- *
- * // This will convert from NSString to native Swift String type.
- * // It will allow optional values to be emitted from the underlying Kotlin StateFlow.
- * KotlinCurrentValueSubject<NSString, String?>
- * ```
+ * The published type is always optional, i.e. `Output?`
  *
  * Note that `SwiftFlow` is defined in:
  * phoenix-shared/src/commonMain/kotlin/fr.acinq.phoenix/utils/SwiftFlow.kt
 */
 
-class KotlinPassthroughSubject<Input: AnyObject, Output: Any>: Publisher {
+class KotlinPassthroughSubject<ObjCType: AnyObject>: Publisher {
 	
+	typealias Output = ObjCType?
 	typealias Failure = Never
 	
-	private let wrapped: PassthroughSubject<Output, Failure>
+	private let wrapped: PassthroughSubject<ObjCType?, Failure>
 	private var watcher: Ktor_ioCloseable? = nil
 	
-	convenience init(_ flow: Kotlinx_coroutines_coreFlow) {
+	init(_ flow: Kotlinx_coroutines_coreFlow) {
 		
-		self.init(SwiftFlow(origin: flow))
-	}
-	
-	init(_ swiftFlow: SwiftFlow<Input>) {
+		let flowWrapper = SwiftFlow<ObjCType>(origin: flow)
 		
-		// There's no need to retain the SwiftFlow instance variable.
-		// Because the SwiftFlow instance itself doesn't maintain any state.
+		// There's no need to retain the SwiftFlow instance variable,
+		// because the instance itself doesn't maintain any state.
 		// All state is encapsulated in the watch method.
 		
-		wrapped = PassthroughSubject<Output, Failure>()
+		wrapped = PassthroughSubject<ObjCType?, Failure>()
 		
-		watcher = swiftFlow.watch {[weak self](value: Input?) in
-			if let value = value as? Output {
-				self?.wrapped.send(value)
-			}
+		watcher = flowWrapper.watch {[weak self](value: ObjCType?) in
+			self?.wrapped.send(value)
 		}
 	}
 
@@ -77,31 +54,27 @@ class KotlinPassthroughSubject<Input: AnyObject, Output: Any>: Publisher {
 	}
 }
 
-class KotlinCurrentValueSubject<Input: AnyObject, Output: Any>: Publisher {
+class KotlinCurrentValueSubject<ObjCType: AnyObject>: Publisher {
 	
+	typealias Output = ObjCType?
 	typealias Failure = Never
 	
-	private let wrapped: CurrentValueSubject<Output, Failure>
+	private let wrapped: CurrentValueSubject<ObjCType?, Failure>
 	private var watcher: Ktor_ioCloseable? = nil
 	
-	convenience init(_ stateFlow: Kotlinx_coroutines_coreStateFlow) {
+	init(_ stateFlow: Kotlinx_coroutines_coreStateFlow) {
 		
-		self.init(SwiftStateFlow(origin: stateFlow))
-	}
-	
-	init(_ swiftStateFlow: SwiftStateFlow<Input>) {
+		let stateFlowWrapper = SwiftStateFlow<ObjCType>(origin: stateFlow)
 		
-		// There's no need to retain the SwiftStateFlow instance variable.
-		// Because the SwiftStateFlow instance itself doesn't maintain any state.
+		// There's no need to retain the SwiftStateFlow instance variable,
+		// because the instance itself doesn't maintain any state.
 		// All state is encapsulated in the watch method.
 		
-		let initialValue = swiftStateFlow.value_ as! Output
+		let initialValue = stateFlowWrapper.value_
 		wrapped = CurrentValueSubject(initialValue)
 		
-		watcher = swiftStateFlow.watch {[weak self](value: Input?) in
-			if let value = value as? Output {
-				self?.wrapped.send(value)
-			}
+		watcher = stateFlowWrapper.watch {[weak self](value: ObjCType?) in
+			self?.wrapped.send(value)
 		}
 	}
 	
@@ -114,7 +87,7 @@ class KotlinCurrentValueSubject<Input: AnyObject, Output: Any>: Publisher {
 		}
 	}
 	
-	var value: Output {
+	var value: Output? {
 		get {
 			return wrapped.value
 		}
