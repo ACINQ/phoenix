@@ -285,6 +285,7 @@ struct HomeView : MVIView {
 			
 				if swapInRejected != nil {
 					Image(systemName: "zzz")
+						.foregroundColor(.appNegative)
 						.padding(.trailing, 2)
 				} else {
 					Image(systemName: "link")
@@ -317,16 +318,18 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	func notices() -> some View {
 		
-		Group {
-			let count = noticeCount()
-			if count > 1 {
-				notice_multiple(count: count)
-			} else if count == 1 {
-				notice_single()
+		let count = noticeCount()
+		if count > 0 {
+			Group {
+				if count > 1 {
+					notice_multiple(count: count)
+				} else if count == 1 {
+					notice_single()
+				}
 			}
+			.frame(maxWidth: deviceInfo.textColumnMaxWidth)
+			.padding([.leading, .trailing, .bottom], 10)
 		}
-		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
-		.padding([.leading, .trailing, .bottom], 10)
 	}
 	
 	@ViewBuilder
@@ -404,7 +407,7 @@ struct HomeView : MVIView {
 				NotificationCell.mempoolFull(action: flag ? openMempoolFullURL : nil)
 				
 			} else if let item = primaryBizNotification() {
-				BizNotificationCell(action: flag ? {} : nil, item: item)
+				BizNotificationCell(item: item, location: .HomeView, action: flag ? {} : nil)
 			}
 		}
 		.font(.caption)
@@ -581,12 +584,12 @@ struct HomeView : MVIView {
 	}
 	
 	func primaryBizNotification() -> PhoenixShared.NotificationsManager.NotificationItem? {
-		return nil
-//		let firstPaymentRejectedNotification = bizNotifications.first { item in
-//			return item.notification is PhoenixShared.Notification.PaymentRejected
-//		}
-//
-//		return firstPaymentRejectedNotification ?? bizNotifications.first
+		
+		let firstPaymentRejectedNotification = bizNotifications.first { item in
+			return item.notification is PhoenixShared.Notification.PaymentRejected
+		}
+		
+		return firstPaymentRejectedNotification ?? bizNotifications.first
 	}
 	
 	// --------------------------------------------------

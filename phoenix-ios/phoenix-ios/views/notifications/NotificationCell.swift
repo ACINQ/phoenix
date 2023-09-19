@@ -160,8 +160,14 @@ class NotificationCell {
 
 struct BizNotificationCell: View {
 	
-	let action: (() -> Void)?
+	enum Location {
+		case HomeView
+		case NotificationsView
+	}
+	
 	let item: PhoenixShared.NotificationsManager.NotificationItem
+	let location: Location
+	let action: (() -> Void)?
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -171,9 +177,11 @@ struct BizNotificationCell: View {
 		if let reason = item.notification as? PhoenixShared.Notification.PaymentRejected {
 
 			if let reason = reason as? PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee {
-				body_overAbsoluteFee(Either.Left(reason))
+				body_paymentRejected_overFee(Either.Left(reason))
+				
 			} else if let reason = reason as? PhoenixShared.Notification.PaymentRejected.OverRelativeFee {
-				body_overAbsoluteFee(Either.Right(reason))
+				body_paymentRejected_overFee(Either.Right(reason))
+				
 			} 	else {
 				body_paymentRejected(reason)
 			}
@@ -196,7 +204,7 @@ struct BizNotificationCell: View {
 	}
 	
 	@ViewBuilder
-	func body_overAbsoluteFee(
+	func body_paymentRejected_overFee(
 		_ either: Either<
 			PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee,
 			PhoenixShared.Notification.PaymentRejected.OverRelativeFee
@@ -206,14 +214,19 @@ struct BizNotificationCell: View {
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
 			let amt = Utils.formatBitcoin(currencyPrefs, msat: amount(either))
-			
-			if isOnChain(either) {
-				Text("On-chain funds pending (+\(amt.string))")
-					.font(.headline)
-			} else {
-				Text("Payment rejected (+\(amt.string))")
-					.font(.headline)
+			Group {
+				if isOnChain(either) {
+					switch location {
+					case .HomeView:
+						Text("On-chain funds pending") // amount is already displayed on screen
+					case .NotificationsView:
+						Text("On-chain funds pending (+\(amt.string))")
+					}
+				} else {
+					Text("Payment rejected (+\(amt.string))")
+				}
 			}
+			.font(.headline)
 			
 			switch either {
 			case .Left(let reason):
