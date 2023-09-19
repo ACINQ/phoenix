@@ -25,6 +25,10 @@ class DeviceInfo: ObservableObject {
 		return windowSize
 	}
 	
+	var isIPhone: Bool {
+		return UIDevice.current.userInterfaceIdiom == .phone
+	}
+	
 	var isIPad: Bool {
 		return UIDevice.current.userInterfaceIdiom == .pad
 	}
