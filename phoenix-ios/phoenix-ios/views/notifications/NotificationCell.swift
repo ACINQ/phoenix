@@ -160,8 +160,14 @@ class NotificationCell {
 
 struct BizNotificationCell: View {
 	
-	let action: (() -> Void)?
+	enum Location {
+		case HomeView_Single(preAction: ()->Void)
+		case HomeView_Multiple
+		case NotificationsView(preAction: ()->Void)
+	}
+	
 	let item: PhoenixShared.NotificationsManager.NotificationItem
+	let location: Location
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -171,9 +177,11 @@ struct BizNotificationCell: View {
 		if let reason = item.notification as? PhoenixShared.Notification.PaymentRejected {
 
 			if let reason = reason as? PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee {
-				body_overAbsoluteFee(Either.Left(reason))
+				body_paymentRejected_overFee(Either.Left(reason))
+				
 			} else if let reason = reason as? PhoenixShared.Notification.PaymentRejected.OverRelativeFee {
-				body_overAbsoluteFee(Either.Right(reason))
+				body_paymentRejected_overFee(Either.Right(reason))
+				
 			} 	else {
 				body_paymentRejected(reason)
 			}
@@ -196,7 +204,7 @@ struct BizNotificationCell: View {
 	}
 	
 	@ViewBuilder
-	func body_overAbsoluteFee(
+	func body_paymentRejected_overFee(
 		_ either: Either<
 			PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee,
 			PhoenixShared.Notification.PaymentRejected.OverRelativeFee
@@ -205,15 +213,27 @@ struct BizNotificationCell: View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
-			let amt = Utils.formatBitcoin(currencyPrefs, msat: amount(either))
-			
-			if isOnChain(either) {
-				Text("On-chain funds pending (+\(amt.string))")
-					.font(.headline)
-			} else {
-				Text("Payment rejected (+\(amt.string))")
-					.font(.headline)
-			}
+			// Title
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Group {
+					let amt = Utils.formatBitcoin(currencyPrefs, msat: amount(either))
+					if isOnChain(either) {
+						Text("On-chain funds pending (+\(amt.string))")
+					} else {
+						Text("Payment rejected (+\(amt.string))")
+					}
+				}
+				.font(.headline)
+				
+				if isDismissable() {
+					Spacer(minLength: 0)
+					Button {
+						dismiss()
+					} label: {
+						Image(systemName: "xmark")
+					}
+				}
+			} // </HStack>
 			
 			switch either {
 			case .Left(let reason):
@@ -238,23 +258,9 @@ struct BizNotificationCell: View {
 				
 			} // </switch>
 			
-			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
-				if action != nil {
-					Button {
-						navigateToLiquiditySettings()
-					} label: {
-						Text("Check fee settings")
-							.font(.callout)
-					}
-				}
-				Spacer(minLength: 0)
-				Text(timestamp())
-					.font(.caption)
-					.foregroundColor(.secondary)
-			} // </HStack>
-			.padding(.top, action != nil ? 15 : 5)
+			body_paymentRejected_footer()
 			
-		} // </VStac>
+		} // </VStack>
 		.accessibilityElement(children: .combine)
 		.accessibilityAddTraits(.isButton)
 		.accessibilitySortPriority(47)
@@ -267,9 +273,21 @@ struct BizNotificationCell: View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
-			let amt = Utils.formatBitcoin(currencyPrefs, msat: reason.amount)
-			Text("Payment rejected (+\(amt.string))")
-				.font(.headline)
+			// Title
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				let amt = Utils.formatBitcoin(currencyPrefs, msat: reason.amount)
+				Text("Payment rejected (+\(amt.string))")
+					.font(.headline)
+				
+				if isDismissable() {
+					Spacer(minLength: 0)
+					Button {
+						dismiss()
+					} label: {
+						Image(systemName: "xmark")
+					}
+				}
+			} // </HStack>
 			
 			Group {
 				if reason is PhoenixShared.Notification.PaymentRejected.FeePolicyDisabled {
@@ -284,26 +302,33 @@ struct BizNotificationCell: View {
 			}
 			.padding(.top, 10)
 			
-			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
-				if action != nil {
-					Button {
-						navigateToLiquiditySettings()
-					} label: {
-						Text("Check fee settings")
-							.font(.callout)
-					}
-				}
-				Spacer(minLength: 0)
-				Text(timestamp())
-					.font(.caption)
-					.foregroundColor(.secondary)
-			} // </HStack>
-			.padding(.top, action != nil ? 15 : 5)
+			body_paymentRejected_footer()
 			
 		} // </VStac>
 		.accessibilityElement(children: .combine)
 		.accessibilityAddTraits(.isButton)
 		.accessibilitySortPriority(47)
+	}
+	
+	@ViewBuilder
+	func body_paymentRejected_footer() -> some View {
+		
+		let showAction = shouldShowAction()
+		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
+			if showAction {
+				Button {
+					navigateToLiquiditySettings()
+				} label: {
+					Text("Check fee settings")
+						.font(.callout)
+				}
+			}
+			Spacer(minLength: 0)
+			Text(timestamp())
+				.font(.caption)
+				.foregroundColor(.secondary)
+		} // </HStack>
+		.padding(.top, showAction ? 15 : 5)
 	}
 	
 	@ViewBuilder
@@ -313,8 +338,21 @@ struct BizNotificationCell: View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 			
-			Text("Watchtower report")
-				.font(.headline)
+			// Title
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text("Watchtower report")
+					.font(.headline)
+				
+				if isDismissable() {
+					Spacer(minLength: 0)
+					Button {
+						dismiss()
+					} label: {
+						Image(systemName: "xmark")
+					}
+				}
+				
+			} // </HStack>
 			
 			if reason.channelsWatchedCount == 1 {
 				Text("1 channel was successfully checked. No issues were found.")
@@ -337,8 +375,20 @@ struct BizNotificationCell: View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 			
-			Text("Watchtower alert")
-				.font(.headline)
+			// Title
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text("Watchtower alert")
+					.font(.headline)
+				
+				if isDismissable() {
+					Spacer(minLength: 0)
+					Button {
+						dismiss()
+					} label: {
+						Image(systemName: "xmark")
+					}
+				}
+			} // </HStack>
 			
 			Text("Revoked commits found on \(reason.channels.count) channel(s)!")
 				.font(.callout)
@@ -359,8 +409,20 @@ struct BizNotificationCell: View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 			
-			Text("Watchtower unable to complete")
-				.font(.headline)
+			// Title
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text("Watchtower unable to complete")
+					.font(.headline)
+				
+				if isDismissable() {
+					Spacer(minLength: 0)
+					Button {
+						dismiss()
+					} label: {
+						Image(systemName: "xmark")
+					}
+				}
+			} // </HStack>
 			
 			Text("A new attempt is scheduled in a few hours.")
 				.font(.callout)
@@ -369,6 +431,24 @@ struct BizNotificationCell: View {
 		.accessibilityElement(children: .combine)
 		.accessibilityAddTraits(.isButton)
 		.accessibilitySortPriority(47)
+	}
+	
+	func isDismissable() -> Bool {
+		
+		switch location {
+			case .HomeView_Single   : return true
+			case .HomeView_Multiple : return false
+			case .NotificationsView : return false
+		}
+	}
+	
+	func shouldShowAction() -> Bool {
+		
+		switch location {
+			case .HomeView_Single   : return true
+			case .HomeView_Multiple : return false
+			case .NotificationsView : return true
+		}
 	}
 	
 	func timestamp() -> String {
@@ -434,9 +514,17 @@ struct BizNotificationCell: View {
 	func navigateToLiquiditySettings() {
 		log.trace("navigateToLiquiditySettings()")
 		
-		if let action {
-			action()
+		switch location {
+			case .HomeView_Single(let preAction)   : preAction()
+			case .HomeView_Multiple                : break
+			case .NotificationsView(let preAction) : preAction()
 		}
 		deepLinkManager.broadcast(.liquiditySettings)
+	}
+		
+	func dismiss() {
+		log.trace("dismiss()")
+		
+		Biz.business.notificationsManager.dismissNotifications(ids: item.ids)
 	}
 }

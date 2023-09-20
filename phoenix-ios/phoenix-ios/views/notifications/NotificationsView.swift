@@ -142,7 +142,7 @@ struct NotificationsView : View {
 		Section {
 			
 			ForEach(self.bizNotifications_payment) { item in
-				BizNotificationCell(action: closeSheet, item: item)
+				BizNotificationCell(item: item, location: .NotificationsView(preAction: closeSheet))
 					.padding(12)
 					.background(
 						RoundedRectangle(cornerRadius: 8)
@@ -171,7 +171,7 @@ struct NotificationsView : View {
 		Section {
 			
 			ForEach(self.bizNotifications_watchtower) { item in
-				BizNotificationCell(action: closeSheet, item: item)
+				BizNotificationCell(item: item, location: .NotificationsView(preAction: closeSheet))
 					.padding(12)
 					.background(
 						RoundedRectangle(cornerRadius: 8)

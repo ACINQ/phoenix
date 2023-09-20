@@ -53,7 +53,7 @@ struct HomeView : MVIView {
 	@State var incomingSwapAnimationsRemaining = 0
 	
 	let bizNotificationsPublisher = Biz.business.notificationsManager.notificationsPublisher()
-	@State var bizNotifications: [PhoenixShared.NotificationsManager.NotificationItem] = []
+	@State var filteredBizNotifications: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	
 	@State var didAppear = false
 	
@@ -285,6 +285,7 @@ struct HomeView : MVIView {
 			
 				if swapInRejected != nil {
 					Image(systemName: "zzz")
+						.foregroundColor(.appNegative)
 						.padding(.trailing, 2)
 				} else {
 					Image(systemName: "link")
@@ -317,16 +318,18 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	func notices() -> some View {
 		
-		Group {
-			let count = noticeCount()
-			if count > 1 {
-				notice_multiple(count: count)
-			} else if count == 1 {
-				notice_single()
+		let count = noticeCount()
+		if count > 0 {
+			Group {
+				if count > 1 {
+					notice_multiple(count: count)
+				} else if count == 1 {
+					notice_single()
+				}
 			}
+			.frame(maxWidth: deviceInfo.textColumnMaxWidth)
+			.padding([.leading, .trailing, .bottom], 10)
 		}
-		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
-		.padding([.leading, .trailing, .bottom], 10)
 	}
 	
 	@ViewBuilder
@@ -334,7 +337,7 @@ struct HomeView : MVIView {
 		
 		NoticeBox {
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				notice_primary(includeAction: false)
+				notice_primary(isSingle: false)
 					.read(noticeBoxContentHeightReader)
 				
 				if let dividerHeight = noticeBoxContentHeight {
@@ -380,31 +383,35 @@ struct HomeView : MVIView {
 	func notice_single() -> some View {
 		
 		NoticeBox {
-			notice_primary(includeAction: true)
+			notice_primary(isSingle: true)
 		}
 	}
 	
 	@ViewBuilder
-	func notice_primary(includeAction flag: Bool) -> some View {
+	func notice_primary(isSingle: Bool) -> some View {
 		
 		Group {
 			if noticeMonitor.hasNotice_backupSeed {
-				NotificationCell.backupSeed(action: flag ? navigateToBackup : nil)
+				NotificationCell.backupSeed(action: isSingle ? navigateToBackup : nil)
 				
 			} else if noticeMonitor.hasNotice_electrumServer {
-				NotificationCell.electrumServer(action: flag ? navigationToElecrumServer : nil)
+				NotificationCell.electrumServer(action: isSingle ? navigationToElecrumServer : nil)
 				
 			} else if noticeMonitor.hasNotice_backgroundPayments {
-				NotificationCell.backgroundPayments(action: flag ? navigationToBackgroundPayments : nil)
+				NotificationCell.backgroundPayments(action: isSingle ? navigationToBackgroundPayments : nil)
 				
 			} else if noticeMonitor.hasNotice_watchTower {
-				NotificationCell.watchTower(action: flag ? fixBackgroundAppRefreshDisabled : nil)
+				NotificationCell.watchTower(action: isSingle ? fixBackgroundAppRefreshDisabled : nil)
 				
 			} else if noticeMonitor.hasNotice_mempoolFull {
-				NotificationCell.mempoolFull(action: flag ? openMempoolFullURL : nil)
+				NotificationCell.mempoolFull(action: isSingle ? openMempoolFullURL : nil)
 				
 			} else if let item = primaryBizNotification() {
-				BizNotificationCell(action: flag ? {} : nil, item: item)
+				let location = isSingle ?
+				   BizNotificationCell.Location.HomeView_Single(preAction: {})
+				 : BizNotificationCell.Location.HomeView_Multiple
+				
+				BizNotificationCell(item: item, location: location)
 			}
 		}
 		.font(.caption)
@@ -572,21 +579,19 @@ struct HomeView : MVIView {
 		if noticeMonitor.hasNotice_backgroundPayments { count += 1 }
 		if noticeMonitor.hasNotice_watchTower         { count += 1 }
 		
-		// ignore business notifications, unless we have notifications from `noticeMonitor`
-		if count >= 1 {
-			count += bizNotifications.count
-		}
+		// NB: filteredBizNotifications only includes those we wish to display on the Home screen
+		count += filteredBizNotifications.count
 		
 		return count
 	}
 	
 	func primaryBizNotification() -> PhoenixShared.NotificationsManager.NotificationItem? {
-		return nil
-//		let firstPaymentRejectedNotification = bizNotifications.first { item in
-//			return item.notification is PhoenixShared.Notification.PaymentRejected
-//		}
-//
-//		return firstPaymentRejectedNotification ?? bizNotifications.first
+		
+		let firstPaymentRejectedNotification = filteredBizNotifications.first { item in
+			return item.notification is PhoenixShared.Notification.PaymentRejected
+		}
+		
+		return firstPaymentRejectedNotification ?? filteredBizNotifications.first
 	}
 	
 	// --------------------------------------------------
@@ -682,10 +687,20 @@ struct HomeView : MVIView {
 	func bizNotificationsChanged(_ list: [PhoenixShared.NotificationsManager.NotificationItem]) {
 		log.trace("bizNotificationsChanges()")
 		
-		if !list.isEmpty {
-			log.debug("list = \(list)")
-		}
-		bizNotifications = list
+		filteredBizNotifications = list.filter({ item in
+			
+			if let paymentRejected = item.notification as? PhoenixShared.Notification.PaymentRejected {
+				// Remove items where source == onChain
+				return !(paymentRejected.source == Lightning_kmpLiquidityEventsSource.onchainwallet)
+				
+			} else if let watchTower = item.notification as? PhoenixShared.WatchTowerOutcome {
+				// Remove "Nominal" notifications (which just mean everything is working as expected)
+				return !(watchTower is PhoenixShared.WatchTowerOutcome.Nominal)
+				
+			} else {
+				return true
+			}
+		})
 	}
 	
 	fileprivate func footerCellDidAppear() {
