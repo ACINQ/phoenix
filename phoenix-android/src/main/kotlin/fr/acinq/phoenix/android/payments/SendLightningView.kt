@@ -119,13 +119,12 @@ fun SendLightningPaymentView(
             }
         }
         Spacer(modifier = Modifier.height(36.dp))
-        val channels by business.peerManager.channelsFlow.collectAsState()
-        val areChannelsUsable = channels?.values?.all { it.isUsable } ?: false
+        val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
         Row(verticalAlignment = Alignment.CenterVertically) {
             FilledButton(
-                text = if (!areChannelsUsable) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
+                text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
                 icon = R.drawable.ic_send,
-                enabled = areChannelsUsable && amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
+                enabled = mayDoPayments && amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
             ) {
                 safeLet(amount, trampolineFees) { amt, fees ->
                     onPayClick(Scan.Intent.InvoiceFlow.SendInvoicePayment(paymentRequest = paymentRequest, amount = amt, trampolineFees = fees))

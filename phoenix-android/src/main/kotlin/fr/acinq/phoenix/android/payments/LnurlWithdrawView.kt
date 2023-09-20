@@ -98,13 +98,11 @@ fun LnurlWithdrawView(
                     Spacer(modifier = Modifier.height(32.dp))
                 }
 
-                val channels by business.peerManager.channelsFlow.collectAsState()
-                val areChannelsUsable = channels?.values?.all { it.isUsable } ?: false
-
+                val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
                 FilledButton(
-                    text = if (!areChannelsUsable) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.lnurl_withdraw_confirm_button),
+                    text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.lnurl_withdraw_confirm_button),
                     icon = R.drawable.ic_receive,
-                    enabled = areChannelsUsable && amount != null && amountErrorMessage.isBlank(),
+                    enabled = mayDoPayments && amount != null && amountErrorMessage.isBlank(),
                 ) {
                     amount?.let {
                         onWithdrawClick(

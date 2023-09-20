@@ -73,9 +73,7 @@ fun CpfpView(
         }
     }
 
-    val channels by business.peerManager.channelsFlow.collectAsState()
-    val areChannelsUsable = channels?.values?.all { it.isUsable } ?: false
-
+    val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -85,9 +83,9 @@ fun CpfpView(
         when (val state = vm.state) {
             is CpfpState.Init -> {
                 BorderButton(
-                    text = if (!areChannelsUsable) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.cpfp_prepare_button),
+                    text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.cpfp_prepare_button),
                     icon = R.drawable.ic_build,
-                    enabled = areChannelsUsable,
+                    enabled = mayDoPayments,
                     onClick = { vm.estimateFee(channelId, feerate) },
                     backgroundColor = Color.Transparent,
                 )
@@ -101,9 +99,9 @@ fun CpfpView(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 FilledButton(
-                    text = if (!areChannelsUsable) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.cpfp_execute_button),
+                    text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.cpfp_execute_button),
                     icon = R.drawable.ic_check,
-                    enabled = areChannelsUsable,
+                    enabled = mayDoPayments,
                     onClick = { vm.executeCpfp(channelId, state.actualFeerate) }
                 )
             }

@@ -118,7 +118,7 @@
     <string name="send_trampoline_fee_loading">Calcul des frais…</string>
     <string name="send_trampoline_amountless_warning_label">Requête sans montant</string>
     <string name="send_trampoline_amountless_warning_details">La requête pour ce paiement ne précise pas de montant. Cela peut être exploité par des noeuds malicieux pendant le paiement.\n\nPour plus de sécurité, <b>demandez au destinataire de spécifier un montant</b> lorsqu\'il crée sa requête de paiement.</string>
-    <string name="send_connecting_button">Préparation des canaux…</string>
+    <string name="send_connecting_button">En attente des canaux…</string>
     <string name="send_pay_button">Payer</string>
 
     <string name="send_paymentmode_onchain">Payer sur chaîne</string>

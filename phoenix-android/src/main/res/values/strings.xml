@@ -130,7 +130,7 @@
     <string name="send_trampoline_fee_loading">Loading fee…</string>
     <string name="send_trampoline_amountless_warning_label">Amountless invoice</string>
     <string name="send_trampoline_amountless_warning_details">The invoice for this payment does not request a specific amount. This may be exploited by malicious nodes during the payment.\n\nTo be safe, <b>ask the recipient to specify an amount</b> when generating the invoice.</string>
-    <string name="send_connecting_button">Readying channels…</string>
+    <string name="send_connecting_button">Waiting for channels…</string>
     <string name="send_pay_button">Pay</string>
 
     <string name="send_paymentmode_onchain">Pay on-chain</string>

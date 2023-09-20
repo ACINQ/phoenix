@@ -123,9 +123,7 @@ fun SendSpliceOutView(
             }
         }
 
-        val channels by business.peerManager.channelsFlow.collectAsState()
-        val areChannelsUsable = channels?.values?.all { it.isUsable } ?: false
-
+        val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
         when (val state = vm.state) {
             is SpliceOutState.Init, is SpliceOutState.Error -> {
                 Spacer(modifier = Modifier.height(24.dp))
@@ -143,9 +141,9 @@ fun SendSpliceOutView(
                     )
                 }
                 BorderButton(
-                    text = if (!areChannelsUsable) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_spliceout_prepare_button),
+                    text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_spliceout_prepare_button),
                     icon = R.drawable.ic_build,
-                    enabled = areChannelsUsable && amountErrorMessage.isBlank(),
+                    enabled = mayDoPayments && amountErrorMessage.isBlank(),
                     onClick = {
                         val finalAmount = amount
                         val finalFeerate = feerate
@@ -182,9 +180,9 @@ fun SendSpliceOutView(
                     )
                 } else {
                     FilledButton(
-                        text = if (!areChannelsUsable) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
+                        text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
                         icon = R.drawable.ic_send,
-                        enabled = areChannelsUsable && amountErrorMessage.isBlank()
+                        enabled = mayDoPayments && amountErrorMessage.isBlank()
                     ) {
                         vm.executeSpliceOut(state.userAmount, state.actualFeerate, address)
                     }
