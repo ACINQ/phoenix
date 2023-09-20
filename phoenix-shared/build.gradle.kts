@@ -37,9 +37,7 @@ kotlin {
                     kotlinOptions.freeCompilerArgs += listOf("-linker-options", "-application_extension")
                     // workaround for xcode 15 and kotlin < 1.9.10: 
                     // https://youtrack.jetbrains.com/issue/KT-60230/Native-unknown-options-iossimulatorversionmin-sdkversion-with-Xcode-15-beta-3
-                    if (System.getenv("XCODE_VERSION_MAJOR") == "1500") {
-                        linkerOpts += "-ld64"
-                    }
+                    linkerOpts += "-ld64"
                 }
             }
         }
