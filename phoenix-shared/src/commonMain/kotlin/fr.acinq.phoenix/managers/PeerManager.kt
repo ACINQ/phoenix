@@ -13,15 +13,18 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
+import fr.acinq.lightning.channel.states.Normal
 import fr.acinq.lightning.channel.states.Offline
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.payment.LiquidityPolicy
+import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.InitTlv
 import fr.acinq.lightning.wire.TlvStream
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LocalChannelInfo
+import fr.acinq.phoenix.utils.extensions.isTerminated
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.kodein.log.Logger
@@ -94,6 +97,27 @@ class PeerManager(
         scope = this,
         started = SharingStarted.Lazily,
         initialValue = null,
+    )
+
+    /**
+     * FIXME: Temporary workaround. Must be done in lightning-kmp with proper testing.
+     * See [Peer.waitForPeerReady]
+     *
+     * Return true if peer is connected & channels are normal. Terminated channels are ignored.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val mayDoPayments = peerState.filterNotNull().flatMapLatest { peer ->
+        combine(peer.connectionState, peer.channelsFlow) { connectionState, channels ->
+            when {
+                connectionState !is Connection.ESTABLISHED -> false
+                channels.isEmpty() -> true
+                else -> channels.values.filterNot { it.isTerminated() }.all { it is Normal }
+            }
+        }
+    }.stateIn(
+        scope = this,
+        started = SharingStarted.Lazily,
+        initialValue = false
     )
 
     init {

@@ -192,6 +192,7 @@ struct SummaryView: View {
 					
 				} else if let completedAtDate = payment.completedAtDate {
 					Text(completedAtDate.format())
+						.multilineTextAlignment(.center)
 						.font(.subheadline)
 						.foregroundColor(.secondary)
 				}
@@ -257,6 +258,7 @@ struct SummaryView: View {
 				
 				if let completedAtDate = payment.completedAtDate {
 					Text(completedAtDate.format())
+						.multilineTextAlignment(.center)
 						.font(Font.subheadline)
 						.foregroundColor(.secondary)
 				}

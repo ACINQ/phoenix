@@ -28,7 +28,7 @@ extension PeerManager {
 			// ```
 			// peerState: StateFlow<Peer?>
 			// ```
-			KotlinCurrentValueSubject<Lightning_kmpPeer, Lightning_kmpPeer?>(
+			KotlinCurrentValueSubject<Lightning_kmpPeer>(
 				self.peerState
 			)
 			.compactMap { $0 }
@@ -44,10 +44,10 @@ extension PeerManager {
 			// ```
 			// channelsFlow: StateFlow<Map<ByteVector32, LocalChannelInfo>?>
 			// ```
-			KotlinCurrentValueSubject<NSDictionary, [Bitcoin_kmpByteVector32: LocalChannelInfo]?>(
+			KotlinCurrentValueSubject<NSDictionary>(
 				self.channelsFlow
 			)
-			.compactMap { $0 }
+			.compactMap { $0 as? [Bitcoin_kmpByteVector32: LocalChannelInfo] }
 			.map { Array($0.values) }
 			.eraseToAnyPublisher()
 		}
@@ -61,10 +61,7 @@ extension PeerManager {
 			// ```
 			// finalWallet: StateFlow<WalletState.WalletWithConfirmations?>
 			// ```
-			KotlinCurrentValueSubject<
-				Lightning_kmpWalletState.WalletWithConfirmations,
-				Lightning_kmpWalletState.WalletWithConfirmations?
-			>(
+			KotlinCurrentValueSubject<Lightning_kmpWalletState.WalletWithConfirmations>(
 				self.finalWallet
 			)
 			.map { $0 ?? Lightning_kmpWalletState.WalletWithConfirmations.empty() }
@@ -87,7 +84,7 @@ extension AppConfigurationManager {
 			// Transforming from Kotlin:
 			// `walletContext: StateFlow<WalletContext?>`
 			//
-			KotlinCurrentValueSubject<WalletContext, WalletContext?>(
+			KotlinCurrentValueSubject<WalletContext>(
 				self.walletContext
 			)
 			.compactMap { $0 }
@@ -111,7 +108,7 @@ extension BalanceManager {
 			// Transforming from Kotlin:
 			// `balance: StateFlow<MilliSatoshi?>`
 			//
-			KotlinCurrentValueSubject<Lightning_kmpMilliSatoshi, Lightning_kmpMilliSatoshi?>(
+			KotlinCurrentValueSubject<Lightning_kmpMilliSatoshi>(
 				self.balance
 			)
 			.eraseToAnyPublisher()
@@ -126,10 +123,7 @@ extension BalanceManager {
 			// ```
 			// swapInWallet: StateFlow<WalletState.WalletWithConfirmations?>
 			// ```
-			KotlinCurrentValueSubject<
-				Lightning_kmpWalletState.WalletWithConfirmations,
-				Lightning_kmpWalletState.WalletWithConfirmations?
-			>(
+			KotlinCurrentValueSubject<Lightning_kmpWalletState.WalletWithConfirmations>(
 				self.swapInWallet
 			)
 			.map { $0 ?? Lightning_kmpWalletState.WalletWithConfirmations.empty() }
@@ -152,9 +146,10 @@ extension ConnectionsManager {
 			// Transforming from Kotlin:
 			// `connections: StateFlow<Connections>`
 			//
-			KotlinCurrentValueSubject<Connections, Connections>(
+			KotlinCurrentValueSubject<Connections>(
 				self.connections
 			)
+			.compactMap { $0 }
 			.eraseToAnyPublisher()
 		}
 	}
@@ -175,9 +170,10 @@ extension CurrencyManager {
 			// Transforming from Kotlin:
 			// `ratesFlow: StateFlow<List<ExchangeRate>>`
 			//
-			KotlinCurrentValueSubject<NSArray, [ExchangeRate]>(
+			KotlinCurrentValueSubject<NSArray>(
 				self.ratesFlow
 			)
+			.compactMap { $0 as? [ExchangeRate] }
 			.eraseToAnyPublisher()
 		}
 	}
@@ -189,9 +185,10 @@ extension CurrencyManager {
 			// Transforming from Kotlin:
 			// `refreshFlow: StateFlow<Set<FiatCurrency>>`
 			//
-			KotlinCurrentValueSubject<NSSet, Set<FiatCurrency>>(
+			KotlinCurrentValueSubject<NSSet>(
 				self.refreshFlow
 			)
+			.compactMap { $0 as? Set<FiatCurrency> }
 			.map { (targets: Set<FiatCurrency>) -> Bool in
 				return !targets.isEmpty
 			}
@@ -214,7 +211,7 @@ extension NodeParamsManager {
 			// Transforming from Kotlin:
 			// `nodeParams: StateFlow<NodeParams?>`
 			//
-			KotlinCurrentValueSubject<Lightning_kmpNodeParams, Lightning_kmpNodeParams?>(
+			KotlinCurrentValueSubject<Lightning_kmpNodeParams>(
 				self.nodeParams
 			)
 			.compactMap { $0 }
@@ -262,9 +259,10 @@ extension PhoenixShared.NotificationsManager {
 			// Transforming from Kotlin:
 			// `notifications = StateFlow<List<Pair<Set<UUID>, Notification>>>`
 			// 
-			KotlinCurrentValueSubject<NSArray, Array<AnyObject>>(
+			KotlinCurrentValueSubject<NSArray>(
 				self.notifications
 			)
+			.compactMap { $0 as? Array<AnyObject> }
 			.map { originalArray in
 				let transformedArray: [NotificationItem] = originalArray.compactMap { value in
 					guard
@@ -300,9 +298,10 @@ extension PaymentsManager {
 			// Transforming from Kotlin:
 			// `paymentsCount: StateFlow<Long>`
 			//
-			KotlinCurrentValueSubject<KotlinLong, Int64>(
+			KotlinCurrentValueSubject<KotlinLong>(
 				self.paymentsCount
 			)
+			.compactMap { $0?.int64Value }
 			.eraseToAnyPublisher()
 		}
 	}
@@ -314,7 +313,7 @@ extension PaymentsManager {
 			// Transforming from Kotlin:
 			// `lastCompletedPayment: StateFlow<WalletPayment?>`
 			//
-			KotlinCurrentValueSubject<Lightning_kmpWalletPayment, Lightning_kmpWalletPayment?>(
+			KotlinCurrentValueSubject<Lightning_kmpWalletPayment>(
 				self.lastCompletedPayment
 			)
 			.compactMap { $0 }
@@ -329,12 +328,10 @@ extension PaymentsManager {
 			// Transforming from Kotlin:
 			// `lastCompletedPayment: StateFlow<WalletPayment?>`
 			//
-			KotlinCurrentValueSubject<Lightning_kmpWalletPayment, Lightning_kmpWalletPayment?>(
+			KotlinCurrentValueSubject<Lightning_kmpWalletPayment>(
 				self.lastCompletedPayment
 			)
-			.compactMap {
-				return $0 as? Lightning_kmpIncomingPayment
-			}
+			.compactMap { $0 as? Lightning_kmpIncomingPayment }
 			.eraseToAnyPublisher()
 		}
 	}
@@ -346,12 +343,11 @@ extension PaymentsManager {
 			// Transforming from Kotlin:
 			// `inFlightOutgoingPayments: StateFlow<Set<UUID>>`
 			//
-			KotlinCurrentValueSubject<NSSet, Set<Lightning_kmpUUID>>(
+			KotlinCurrentValueSubject<NSSet>(
 				self.inFlightOutgoingPayments
 			)
-			.map {
-				return $0.count
-			}
+			.compactMap { $0 as? Set<Lightning_kmpUUID> }
+			.map { $0.count }
 			.eraseToAnyPublisher()
 		}
 	}
@@ -371,9 +367,10 @@ extension PaymentsPageFetcher {
 			// Transforming from Kotlin:
 			// `paymentsPage: StateFlow<PaymentsPage>`
 			//
-			KotlinCurrentValueSubject<PaymentsPage, PaymentsPage>(
+			KotlinCurrentValueSubject<PaymentsPage>(
 				self.paymentsPage
 			)
+			.compactMap { $0 as? PaymentsPage }
 			.eraseToAnyPublisher()
 		}
 	}
@@ -394,12 +391,10 @@ extension CloudKitDb {
 			/// Transforming from Kotlin:
 			/// `queueCount: StateFlow<Long>`
 			///
-			KotlinCurrentValueSubject<KotlinLong, KotlinLong>(
+			KotlinCurrentValueSubject<KotlinLong>(
 				self.queueCount
 			)
-			.map {
-				$0.int64Value
-			}
+			.compactMap { $0?.int64Value }
 			.eraseToAnyPublisher()
 		}
 	}

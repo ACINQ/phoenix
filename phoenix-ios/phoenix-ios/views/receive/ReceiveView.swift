@@ -39,9 +39,12 @@ struct ReceiveView: MVIView {
 	)
 	@State var tabBarButtonHeight: CGFloat? = nil
 	
+	@State var truncationDetection_standard: [DynamicTypeSize: Bool] = [:]
+	
 	@StateObject var toast = Toast()
 	
 	@Environment(\.colorScheme) var colorScheme
+	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var popoverState: PopoverState
@@ -111,6 +114,23 @@ struct ReceiveView: MVIView {
 	@ViewBuilder
 	func customTabBar() -> some View {
 		
+		let dts = dynamicTypeSize
+		let truncationDetected_standard = truncationDetection_standard[dts] ?? false
+		
+		Group {
+			if truncationDetected_standard {
+				customTabBar_accessibility(dts)
+			} else {
+				customTabBar_standard(dts)
+			}
+		}
+		.clipped() // SwiftUI force-extends height of button to bottom of screen for some odd reason
+		.assignMaxPreference(for: tabBarButtonHeightReader.key, to: $tabBarButtonHeight)
+	}
+	
+	@ViewBuilder
+	func customTabBar_standard(_ dts: DynamicTypeSize) -> some View {
+		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
 			Spacer(minLength: 2)
@@ -120,9 +140,16 @@ struct ReceiveView: MVIView {
 			} label: {
 				HStack(alignment: VerticalAlignment.center, spacing: 4) {
 					Image(systemName: "bolt").font(.title2).imageScale(.large)
-					VStack(alignment: HorizontalAlignment.center, spacing: 4) {
-						Text("Lightning")
-						Text("(layer 2)").font(.footnote.weight(.thin)).opacity(0.7)
+					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+						VStack(alignment: HorizontalAlignment.center, spacing: 4) {
+							Text("Lightning")
+							Text("(layer 2)").font(.footnote.weight(.thin)).opacity(0.7)
+						}
+						.lineLimit(1)
+						.minimumScaleFactor(0.9)
+					} wasTruncated: {
+						log.debug("truncationDetected_standard[\(dts)] = true")
+						self.truncationDetection_standard[dts] = true
 					}
 				}
 			}
@@ -140,9 +167,16 @@ struct ReceiveView: MVIView {
 			} label: {
 				HStack(alignment: VerticalAlignment.center, spacing: 4) {
 					Image(systemName: "link").font(.title2).imageScale(.large)
-					VStack(alignment: HorizontalAlignment.center, spacing: 4) {
-						Text("Blockchain")
-						Text("(layer 1)").font(.footnote.weight(.thin)).opacity(0.7)
+					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
+						VStack(alignment: HorizontalAlignment.center, spacing: 4) {
+							Text("Blockchain")
+							Text("(layer 1)").font(.footnote.weight(.thin)).opacity(0.7)
+						}
+						.lineLimit(1)
+						.minimumScaleFactor(0.9)
+					} wasTruncated: {
+						log.debug("truncationDetected_standard[\(dts)] = true")
+						self.truncationDetection_standard[dts] = true
 					}
 				}
 			}
@@ -152,8 +186,52 @@ struct ReceiveView: MVIView {
 			Spacer(minLength: 2)
 			
 		} // </HStack>
-		.clipped() // SwiftUI force-extends height of button to bottom of screen for some odd reason
-		.assignMaxPreference(for: tabBarButtonHeightReader.key, to: $tabBarButtonHeight)
+	}
+	
+	@ViewBuilder
+	func customTabBar_accessibility(_ dts: DynamicTypeSize) -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			
+			Spacer(minLength: 0)
+			
+			Button {
+				didSelectTab(.lightning)
+			} label: {
+				VStack(alignment: HorizontalAlignment.center, spacing: 4) {
+					Image(systemName: "bolt").font(.title2).imageScale(.large)
+					Text("Lightning")
+					Text("(layer 2)").font(.footnote.weight(.thin)).opacity(0.7)
+				}
+				.lineLimit(1)
+				.minimumScaleFactor(0.5)
+			}
+			.foregroundColor(selectedTab == .lightning ? Color.appAccent : Color.primary)
+			.read(tabBarButtonHeightReader)
+			
+			Spacer(minLength: 0)
+			if let tabBarButtonHeight {
+				Divider().frame(width: 1, height: tabBarButtonHeight).background(Color.borderColor)
+				Spacer(minLength: 0)
+			}
+			
+			Button {
+				didSelectTab(.blockchain)
+			} label: {
+				VStack(alignment: HorizontalAlignment.center, spacing: 4) {
+					Image(systemName: "link").font(.title2).imageScale(.large)
+					Text("Blockchain")
+					Text("(layer 1)").font(.footnote.weight(.thin)).opacity(0.7)
+				}
+				.lineLimit(1)
+				.minimumScaleFactor(0.5)
+			}
+			.foregroundColor(selectedTab == .blockchain ? Color.appAccent : Color.primary)
+			.read(tabBarButtonHeightReader)
+			
+			Spacer(minLength: 0)
+			
+		} // </HStack>
 	}
 	
 	// --------------------------------------------------

@@ -26,6 +26,12 @@ struct SwapInWalletDetails: View {
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	
+	let swapInRejectedPublisher = Biz.swapInRejectedPublisher
+	@State var swapInRejected: Lightning_kmpLiquidityEventsRejected? = nil
+	
+	let bizNotificationsPublisher = Biz.business.notificationsManager.notificationsPublisher()
+	@State var bizNotifications: [PhoenixShared.NotificationsManager.NotificationItem] = []
+	
 	@State var blockchainExplorerTxid: String? = nil
 	
 	enum NavBarButtonWidth: Preference {}
@@ -104,6 +110,7 @@ struct SwapInWalletDetails: View {
 		
 		List {
 			section_info()
+			section_lastAttempt()
 			section_confirmed()
 			section_unconfirmed()
 		}
@@ -115,6 +122,12 @@ struct SwapInWalletDetails: View {
 		.onReceive(swapInWalletPublisher) {
 			swapInWalletChanged($0)
 		}
+		.onReceive(swapInRejectedPublisher) {
+			swapInRejectedStateChange($0)
+		}
+		.onReceive(bizNotificationsPublisher) {
+			bizNotificationsChanged($0)
+		}
 	}
 	
 	@ViewBuilder
@@ -124,13 +137,38 @@ struct SwapInWalletDetails: View {
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 20) {
 				
-				let maxFee = maxSwapInFee()
-				Text(
-					"""
-					On-chain funds will automatically be swapped to Lightning if the \
-					fee is **less than \(maxFee.string)**.
-					"""
-				)
+				if !liquidityPolicy.enabled {
+					
+					Text(
+						"""
+						You have **disabled** automated channel management. \
+						Funds will not be swapped, and will be unavailable for spending within Phoenix.
+						"""
+					)
+					
+				} else {
+					
+					let (maxFee, isPercentBased) = maxSwapInFeeDetails()
+					if isPercentBased {
+						
+						let percent = basisPointsAsPercent(liquidityPolicy.effectiveMaxFeeBasisPoints)
+						Text(
+							"""
+							On-chain funds will automatically be swapped to Lightning if the \
+							fee is **less than \(percent)** (\(maxFee.string)) of the amount.
+							"""
+						)
+						
+					} else {
+						
+						Text(
+							"""
+							On-chain funds will automatically be swapped to Lightning if the \
+							fee is **less than \(maxFee.string)**.
+							"""
+						)
+					}
+				}
 				
 				Button {
 					navigateToLiquiditySettings()
@@ -148,6 +186,37 @@ struct SwapInWalletDetails: View {
 
 		} // </Section>
 		.assignMaxPreference(for: iconWidthReader.key, to: $iconWidth)
+	}
+	
+	@ViewBuilder
+	func section_lastAttempt() -> some View {
+		
+		if liquidityPolicy.enabled, let notification = paymentRejectedNotification() {
+			
+			Section {
+				
+				switch notification {
+				case .Left(let reason):
+					
+					let actualFee = Utils.formatBitcoin(currencyPrefs, msat: reason.fee)
+					let maxAllowedFee = Utils.formatBitcoin(currencyPrefs, sat: reason.maxAbsoluteFee)
+					
+					Text("The fee was **\(actualFee.string)** but your max fee was set to **\(maxAllowedFee.string)**.")
+					
+				case .Right(let reason):
+					
+					let actualFee = Utils.formatBitcoin(currencyPrefs, msat: reason.fee)
+					let percent = basisPointsAsPercent(reason.maxRelativeFeeBasisPoints)
+					
+					Text("The fee was **\(actualFee.string)** which is more than **\(percent)** of the amount.")
+					
+				} // </switch>
+				
+			} header: {
+				Text("Last Attempt")
+				
+			} // </Section>
+		}
 	}
 	
 	@ViewBuilder
@@ -238,9 +307,8 @@ struct SwapInWalletDetails: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func maxSwapInFee() -> FormattedAmount {
+	func maxSwapInFeeDetails() -> (FormattedAmount, Bool) {
 		
-		let effectiveMax: Int64
 		let absoluteMax: Int64 = liquidityPolicy.effectiveMaxFeeSats
 		
 		let swapInBalance: Int64 = swapInWallet.totalBalance.sat
@@ -249,14 +317,53 @@ struct SwapInWalletDetails: View {
 			let maxPercent: Double = Double(liquidityPolicy.effectiveMaxFeeBasisPoints) / Double(10_000)
 			let percentMax: Int64 = Int64(Double(swapInBalance) * maxPercent)
 			
-			effectiveMax = min(absoluteMax, percentMax)
-			
-		} else {
-			
-			effectiveMax = absoluteMax
+			if percentMax < absoluteMax {
+				
+				let formatted = Utils.formatBitcoin(currencyPrefs, sat: percentMax)
+				return (formatted, true)
+			}
 		}
 		
-		return Utils.formatBitcoin(currencyPrefs, sat: effectiveMax)
+		let formatted = Utils.formatBitcoin(currencyPrefs, sat: absoluteMax)
+		return (formatted, false)
+	}
+	
+	func paymentRejectedNotification(
+	) -> Either<
+		PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee,
+		PhoenixShared.Notification.PaymentRejected.OverRelativeFee
+	>? {
+		
+		let paymentRejected = bizNotifications
+			.compactMap { $0.notification as? PhoenixShared.Notification.PaymentRejected }
+			.filter { $0.source == Lightning_kmpLiquidityEventsSource.onchainwallet }
+			.first
+		
+		if let overAbsoluteFee = paymentRejected as? PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee {
+			return Either.Left(overAbsoluteFee)
+		}
+		if let overRelativeFee = paymentRejected as? PhoenixShared.Notification.PaymentRejected.OverRelativeFee {
+			return Either.Right(overRelativeFee)
+		}
+		
+		return nil
+	}
+	
+	func basisPointsAsPercent(_ basisPoints: Int32) -> String {
+		
+		// Example: 30% == 3,000 basis points
+		//
+		// 3,000 / 100       => 30.0 => 3000%
+		// 3,000 / 100 / 100 =>  0.3 => 30%
+		
+		let percent = Double(basisPoints) / Double(10_000)
+		
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .percent
+		formatter.minimumFractionDigits = 0
+		formatter.maximumFractionDigits = 2
+		
+		return formatter.string(from: NSNumber(value: percent)) ?? "?%"
 	}
 	
 	func confirmedBalance() -> (FormattedAmount, FormattedAmount) {
@@ -314,6 +421,21 @@ struct SwapInWalletDetails: View {
 		log.trace("swapInWalletChanged()")
 		
 		swapInWallet = newValue
+	}
+	
+	func swapInRejectedStateChange(_ state: Lightning_kmpLiquidityEventsRejected?) {
+		log.trace("swapInRejectedStateChange()")
+		
+		swapInRejected = state
+	}
+	
+	func bizNotificationsChanged(_ list: [PhoenixShared.NotificationsManager.NotificationItem]) {
+		log.trace("bizNotificationsChanges()")
+		
+		if !list.isEmpty {
+			log.debug("list = \(list)")
+		}
+		bizNotifications = list
 	}
 	
 	// --------------------------------------------------
