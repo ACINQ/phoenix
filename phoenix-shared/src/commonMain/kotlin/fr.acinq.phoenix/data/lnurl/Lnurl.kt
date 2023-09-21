@@ -118,7 +118,6 @@ sealed interface Lnurl {
         private fun parseBech32Url(source: String): Url {
             val (hrp, data) = Bech32.decode(source)
             val payload = Bech32.five2eight(data, 0).decodeToString()
-            log.debug { "reading serialized lnurl with hrp=$hrp and payload=$payload" }
             val url = URLBuilder(payload).build()
             if (!url.protocol.isSecure()) throw LnurlError.UnsafeResource
             return url
@@ -208,11 +207,11 @@ sealed interface Lnurl {
             return try {
                 if (response.status.isSuccess()) {
                     val json: JsonObject = Json.decodeFromString(response.bodyAsText(Charsets.UTF_8))
-                    log.debug { "lnurl service=${url.host} returned response=$json" }
+                    log.debug { "lnurl service=${url.host} returned response=${json.toString().take(100)}" }
                     if (json["status"]?.jsonPrimitive?.content?.trim()?.equals("error", true) == true) {
-                        log.error { "lnurl service=${url.host} returned error=$json" }
-                        val message = json["reason"]?.jsonPrimitive?.content ?: ""
-                        throw LnurlError.RemoteFailure.Detailed(url.host, message.take(160).replace("<", ""))
+                        val errorMessage = json["reason"]?.jsonPrimitive?.content ?: ""
+                        log.error { "lnurl service=${url.host} returned error=$errorMessage" }
+                        throw LnurlError.RemoteFailure.Detailed(url.host, errorMessage.take(160).replace("<", ""))
                     } else {
                         json
                     }

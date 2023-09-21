@@ -26,4 +26,8 @@ data class LnurlWithdraw(
     val defaultDescription: String,
     val minWithdrawable: MilliSatoshi,
     val maxWithdrawable: MilliSatoshi
-) : Lnurl.Qualified
+) : Lnurl.Qualified {
+    override fun toString(): String {
+        return "LnurlWithdraw(defaultDescription='$defaultDescription', minWithdrawable=$minWithdrawable, maxWithdrawable=$maxWithdrawable, initialUrl=$initialUrl, callback=$callback)".take(100)
+    }
+}
