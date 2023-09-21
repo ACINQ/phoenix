@@ -57,6 +57,7 @@
 		DC16965F27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC16965E27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift */; };
 		DC1706D926A71D8E00BAFCD0 /* UnlockErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1706D826A71D8E00BAFCD0 /* UnlockErrorView.swift */; };
 		DC175C1C28F008AE0086B9A6 /* WalletReset.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC175C1B28F008AE0086B9A6 /* WalletReset.swift */; };
+		DC1771B42ABC99CE00B286C7 /* WebsiteLinkPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1771B32ABC99CE00B286C7 /* WebsiteLinkPopover.swift */; };
 		DC1844032A2690BB004D9578 /* MinerFeeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1844022A2690BB004D9578 /* MinerFeeSheet.swift */; };
 		DC18C418256FE22300A2D083 /* Prefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC18C417256FE22300A2D083 /* Prefs.swift */; };
 		DC18C41D256FF91100A2D083 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC18C41C256FF91100A2D083 /* Utils.swift */; };
@@ -402,6 +403,7 @@
 		DC16965E27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Currency.swift"; sourceTree = "<group>"; };
 		DC1706D826A71D8E00BAFCD0 /* UnlockErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockErrorView.swift; sourceTree = "<group>"; };
 		DC175C1B28F008AE0086B9A6 /* WalletReset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletReset.swift; sourceTree = "<group>"; };
+		DC1771B32ABC99CE00B286C7 /* WebsiteLinkPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteLinkPopover.swift; sourceTree = "<group>"; };
 		DC1844022A2690BB004D9578 /* MinerFeeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinerFeeSheet.swift; sourceTree = "<group>"; };
 		DC18C417256FE22300A2D083 /* Prefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prefs.swift; sourceTree = "<group>"; };
 		DC18C41C256FF91100A2D083 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
@@ -842,6 +844,7 @@
 				DC118C0927B457F70080BBAC /* LnurlFlowErrorNotice.swift */,
 				DCEAE5B82943D64B00320C46 /* MsatRange.swift */,
 				DCB62F482A5E09F900912A71 /* SpliceOutProblem.swift */,
+				DC1771B32ABC99CE00B286C7 /* WebsiteLinkPopover.swift */,
 			);
 			path = send;
 			sourceTree = "<group>";
@@ -1655,6 +1658,7 @@
 				DCFAEFC92A72F48700330088 /* SwapInWalletDetails.swift in Sources */,
 				DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */,
 				DCFC72042862237400D6B293 /* Asserts.swift in Sources */,
+				DC1771B42ABC99CE00B286C7 /* WebsiteLinkPopover.swift in Sources */,
 				DCCD046127EE045C007D57A5 /* DetailsView.swift in Sources */,
 				DC6CF35B2938F32E001837EE /* ListBackgroundColor.swift in Sources */,
 				DC641C82282188E700862DCD /* Utils+CurrencyPrefs.swift in Sources */,
