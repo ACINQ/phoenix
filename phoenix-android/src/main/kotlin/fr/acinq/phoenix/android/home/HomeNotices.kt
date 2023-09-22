@@ -65,7 +65,7 @@ fun NoticesButtonRow(
     val now = currentTimestampMillis()
     val recentRejectedOffchainCount = notifications.map { it.second }
         .filterIsInstance<Notification.PaymentRejected>()
-        .filter { it.source == LiquidityEvents.Source.OffChainPayment && (now - it.createdAt) < 3 * DateUtils.HOUR_IN_MILLIS }
+        .filter { it.source == LiquidityEvents.Source.OffChainPayment && (now - it.createdAt) < 15 * DateUtils.HOUR_IN_MILLIS }
         .size
 
     // don't display anything if there are no permanent notices or rejected offchain payments
