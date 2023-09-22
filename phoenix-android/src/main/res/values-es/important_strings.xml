@@ -160,8 +160,8 @@
 
     <string name="inappnotif_payment_onchain_pending_title">Fondos en cadena pendientes (+%1$s)</string>
     <plurals name="inappnotif_payments_rejection_overview">
-        <item quantity="one">%1$d pago rechazado recientemente</item>
-        <item quantity="many">%1$d pagos rechazados recientemente</item>
+        <item quantity="one">%1$d cobro rechazado recientemente</item>
+        <item quantity="many">%1$d cobros rechazados recientemente</item>
     </plurals>
     <string name="inappnotif_payment_rejected_title">Pago rechazado (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">La gestión automática de canales está desactivada.</string>

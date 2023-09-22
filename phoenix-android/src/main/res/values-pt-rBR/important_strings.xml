@@ -165,8 +165,8 @@
 
     <string name="inappnotif_payment_onchain_pending_title">Fundos pendentes na cadeia (+%1$s)</string>
     <plurals name="inappnotif_payments_rejection_overview">
-        <item quantity="one">%1$d pagamento rejeitado recentemente</item>
-        <item quantity="many">%1$d pagamentos rejeitados recentemente</item>
+        <item quantity="one">%1$d pagamento recebido recentemente rejeitado</item>
+        <item quantity="many">%1$d pagamentos recebidos recentemente rejeitados</item>
     </plurals>
     <string name="inappnotif_payment_rejected_title">Pagamento rejeitado (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">O gerenciamento automatizado de canais está desativado.</string>

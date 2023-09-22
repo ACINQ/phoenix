@@ -159,8 +159,8 @@
 
     <string name="inappnotif_payment_onchain_pending_title">On-chain Guthaben ausstehend (+%1$s)</string>
     <plurals name="inappnotif_payments_rejection_overview">
-        <item quantity="one">%1$d Zahlung kürzlich abgelehnt</item>
-        <item quantity="other">%1$d Zahlungen kürzlich abgelehnt</item>
+        <item quantity="one">%1$d kürzlich abgelehnter Zahlungseingang</item>
+        <item quantity="other">%1$d kürzlich abgelehnte Zahlungseingänge</item>
     </plurals>
     <string name="inappnotif_payment_rejected_title">Zahlung abgelehnt (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">Automatisches Kanal-Management ist deaktiviert.</string>
