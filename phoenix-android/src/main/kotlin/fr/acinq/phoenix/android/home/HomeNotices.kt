@@ -21,6 +21,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.text.format.DateUtils
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -32,25 +33,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.phoenix.android.LocalNavController
 import fr.acinq.phoenix.android.Notice
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.openLink
-import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.data.Notification
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun NoticesButtonRow(
     modifier: Modifier = Modifier,
@@ -59,26 +62,50 @@ fun NoticesButtonRow(
     onNavigateToNotificationsList: () -> Unit,
 ) {
     val filteredNotices = notices.filterIsInstance<Notice.ShowInHome>().sortedBy { it.priority }
-    // don't display anything if there are no permanent notices
-    if (filteredNotices.isEmpty()) return
+    val now = currentTimestampMillis()
+    val recentRejectedOffchainCount = notifications.map { it.second }
+        .filterIsInstance<Notification.PaymentRejected>()
+        .filter { it.source == LiquidityEvents.Source.OffChainPayment && (now - it.createdAt) < 15 * DateUtils.HOUR_IN_MILLIS }
+        .size
 
-    val navController = navController
+    // don't display anything if there are no permanent notices or rejected offchain payments
+    if (filteredNotices.isEmpty() && recentRejectedOffchainCount == 0) return
+
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (recentRejectedOffchainCount > 0) {
+            PaymentsRejectedShortView(recentRejectedOffchainCount, onNavigateToNotificationsList)
+        }
+        filteredNotices.firstOrNull()?.let {
+            FirstNoticeView(notice = it, messagesCount = notices.size + notifications.size, onNavigateToNotificationsList = onNavigateToNotificationsList)
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun FirstNoticeView(
+    modifier: Modifier = Modifier,
+    notice: Notice.ShowInHome,
+    messagesCount: Int,
+    onNavigateToNotificationsList: () -> Unit,
+) {
     val context = LocalContext.current
+    val navController = LocalNavController.current
 
-    val elementsCount = notices.size + notifications.size
-
-    // clicking on a notice may execute the notice's action if there are no other messages. Otherwise, redirect to the notifications page.
-    val onClick: (() -> Unit)? = if (elementsCount == 1 && filteredNotices.isNotEmpty()) {
-        when (filteredNotices.first()) {
+    val onClick = if (messagesCount == 1) {
+        when (notice) {
             is Notice.MigrationFromLegacy -> {
                 { openLink(context, "https://acinq.co/blog/phoenix-splicing-update") }
             }
+
             is Notice.BackupSeedReminder -> {
-                { navController.navigate(Screen.DisplaySeed.route) }
+                { navController?.navigate(Screen.DisplaySeed.route) ?: Unit }
             }
+
             is Notice.CriticalUpdateAvailable, is Notice.UpdateAvailable -> {
                 { openLink(context, "https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet") }
             }
+
             is Notice.NotificationPermission -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
@@ -94,7 +121,8 @@ fun NoticesButtonRow(
                     }
                 } else null
             }
-            is Notice.MempoolFull -> null
+
+            is Notice.MempoolFull -> onNavigateToNotificationsList
         }
     } else {
         onNavigateToNotificationsList
@@ -103,43 +131,46 @@ fun NoticesButtonRow(
     Row(
         modifier = modifier
             .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colors.surface)
             .fillMaxWidth()
-            .then(if (onClick != null) {
-                Modifier.clickable(
-                    onClick = onClick,
-                    role = Role.Button,
-                    onClickLabel = "Show notifications",
-                )
-            } else Modifier)
+            .then(
+                if (onClick != null) {
+                    Modifier.clickable(onClick = onClick, role = Role.Button, onClickLabel = "Show notifications")
+                } else {
+                    Modifier
+                }
+            )
             .padding(horizontal = 12.dp, vertical = 12.dp),
         verticalAlignment = Alignment.Top
     ) {
-        filteredNotices.firstOrNull()?.let { notice ->
-            when (notice) {
-                Notice.MigrationFromLegacy -> {
-                    NoticeView(text = stringResource(id = R.string.inappnotif_migration_from_legacy), icon = R.drawable.ic_party_popper)
-                }
-                Notice.MempoolFull -> {
-                    NoticeView(text = stringResource(id = R.string.inappnotif_mempool_full_message), icon = R.drawable.ic_alert_triangle)
-                }
-                Notice.UpdateAvailable -> {
-                    NoticeView(text = stringResource(id = R.string.inappnotif_upgrade_message), icon = R.drawable.ic_restore)
-                }
-                Notice.CriticalUpdateAvailable -> {
-                    NoticeView(text = stringResource(id = R.string.inappnotif_upgrade_critical_message), icon = R.drawable.ic_restore)
-                }
-                Notice.BackupSeedReminder -> {
-                    NoticeView(text = stringResource(id = R.string.inappnotif_backup_seed_message), icon = R.drawable.ic_key)
-                }
-                Notice.NotificationPermission -> {
-                    NoticeView(text = stringResource(id = R.string.inappnotif_notification_permission_message), icon = R.drawable.ic_notification)
-                }
+        when (notice) {
+            Notice.MigrationFromLegacy -> {
+                NoticeTextView(text = stringResource(id = R.string.inappnotif_migration_from_legacy), icon = R.drawable.ic_party_popper)
+            }
+
+            Notice.MempoolFull -> {
+                NoticeTextView(text = stringResource(id = R.string.inappnotif_mempool_full_message), icon = R.drawable.ic_alert_triangle)
+            }
+
+            Notice.UpdateAvailable -> {
+                NoticeTextView(text = stringResource(id = R.string.inappnotif_upgrade_message), icon = R.drawable.ic_restore)
+            }
+
+            Notice.CriticalUpdateAvailable -> {
+                NoticeTextView(text = stringResource(id = R.string.inappnotif_upgrade_critical_message), icon = R.drawable.ic_restore)
+            }
+
+            Notice.BackupSeedReminder -> {
+                NoticeTextView(text = stringResource(id = R.string.inappnotif_backup_seed_message), icon = R.drawable.ic_key)
+            }
+
+            Notice.NotificationPermission -> {
+                NoticeTextView(text = stringResource(id = R.string.inappnotif_notification_permission_message), icon = R.drawable.ic_notification)
             }
         }
 
-        if (elementsCount > 1) {
+        if (messagesCount > 1) {
             Spacer(modifier = Modifier.width(12.dp))
             Box(
                 Modifier
@@ -150,7 +181,7 @@ fun NoticesButtonRow(
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
-                text = "+${elementsCount - 1}",
+                text = "+${messagesCount - 1}",
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .clip(RoundedCornerShape(10.dp))
@@ -163,12 +194,38 @@ fun NoticesButtonRow(
 }
 
 @Composable
-private fun RowScope.NoticeView(
+private fun PaymentsRejectedShortView(
+    rejectedPaymentsCount: Int,
+    onNavigateToNotificationsList: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colors.surface)
+            .fillMaxWidth()
+            .clickable(onClick = onNavigateToNotificationsList, role = Role.Button, onClickLabel = "Show payments notifications")
+            .padding(horizontal = 12.dp, vertical = 12.dp),
+    ) {
+        TextWithIcon(
+            text = pluralStringResource(id = R.plurals.inappnotif_payments_rejection_overview, count = rejectedPaymentsCount, rejectedPaymentsCount),
+            textStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
+            icon = R.drawable.ic_info,
+            iconTint = MaterialTheme.colors.primary,
+            space = 10.dp
+        )
+    }
+}
+
+@Composable
+private fun RowScope.NoticeTextView(
     text: String,
     icon: Int? = null,
 ) {
     if (icon != null) {
-        PhoenixIcon(resourceId = icon, tint = MaterialTheme.colors.primary, modifier = Modifier.align(Alignment.Top).offset(y = (2).dp))
+        PhoenixIcon(resourceId = icon, tint = MaterialTheme.colors.primary, modifier = Modifier
+            .align(Alignment.Top)
+            .offset(y = (2).dp))
         Spacer(modifier = Modifier.width(10.dp))
     }
     Text(

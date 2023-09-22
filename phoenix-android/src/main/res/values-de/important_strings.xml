@@ -158,6 +158,10 @@
     <string name="inappnotif_mempool_full_action">Erfahren Sie inwiefern Phoenix davon betroffen ist</string>
 
     <string name="inappnotif_payment_onchain_pending_title">On-chain Guthaben ausstehend (+%1$s)</string>
+    <plurals name="inappnotif_payments_rejection_overview">
+        <item quantity="one">%1$d kürzlich abgelehnter Zahlungseingang</item>
+        <item quantity="other">%1$d kürzlich abgelehnte Zahlungseingänge</item>
+    </plurals>
     <string name="inappnotif_payment_rejected_title">Zahlung abgelehnt (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">Automatisches Kanal-Management ist deaktiviert.</string>
     <string name="inappnotif_payment_rejected_over_absolute">Die Gebühr wäre %1$s, aber Ihr Gebührenlimit beträgt %2$s.</string>

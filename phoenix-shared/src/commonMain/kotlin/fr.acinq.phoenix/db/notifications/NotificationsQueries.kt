@@ -55,8 +55,11 @@ internal class NotificationsQueries(val database: AppDatabase) {
     }
 
     /**
-     * Returns a list of unread notifications, grouped by content in order to avoid duplicates/spamming the UU. The set of UUIDs can be
-     * used to execute an action on all the actual relevant data in the database (for example, to mark those notifications as read).
+     * Returns a list of unread notifications, grouped by type (i.e. [Notification]), in order to avoid spamming the UI
+     * with duplicates.
+     *
+     * The set of UUIDs linked to a [Notification] can be used to execute an action on all the actual relevant data in the
+     * database (for example, to mark those notifications as read).
      */
     fun listUnread(): Flow<List<Pair<Set<UUID>, Notification>>> {
         return queries.listUnread().asFlow().mapToList().map {
