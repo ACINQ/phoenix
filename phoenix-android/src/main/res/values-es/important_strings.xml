@@ -159,6 +159,10 @@
     <string name="inappnotif_mempool_full_action">Vea cómo afecta a Phoenix</string>
 
     <string name="inappnotif_payment_onchain_pending_title">Fondos en cadena pendientes (+%1$s)</string>
+    <plurals name="inappnotif_payments_rejection_overview">
+        <item quantity="one">%1$d pago rechazado recientemente</item>
+        <item quantity="many">%1$d pagos rechazados recientemente</item>
+    </plurals>
     <string name="inappnotif_payment_rejected_title">Pago rechazado (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">La gestión automática de canales está desactivada.</string>
     <string name="inappnotif_payment_rejected_over_absolute">La tasa era de %1$s, pero su tasa máxima estaba fijada en %2$s.</string>
@@ -169,7 +173,7 @@
     <string name="inappnotif_watchtower_nominal_title">Informe de la Watchtower</string>
     <plurals name="inappnotif_watchtower_nominal_description">
         <item quantity="one">Se ha comprobado correctamente el canal %1$d en %2$s. No se ha encontrado ningún problema.</item>
-        <item quantity="other">Se han comprobado correctamente %1$d canales en %2$s. No se ha encontrado ningún problema.</item>
+        <item quantity="many">Se han comprobado correctamente %1$d canales en %2$s. No se ha encontrado ningún problema.</item>
     </plurals>
     <string name="inappnotif_watchtower_revokedfound_title">Alerta de la Watchtower</string>
     <string name="inappnotif_watchtower_revokedfound_description">Se han encontrado compromisos revocados en %1$s para canal(es): %2$s. Este canal puede cerrarse.</string>

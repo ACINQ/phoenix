@@ -44,6 +44,10 @@ class NotificationsManager(
     private val log = newLogger(loggerFactory)
 
     private val _notifications = MutableStateFlow<List<Pair<Set<UUID>, Notification>>>(emptyList())
+    /**
+     * List of notifications grouped by notification type. The <Set<UUID>> can be used
+     * to execute an action on all the underlying notification data in the database.
+     */
     val notifications = _notifications.asStateFlow()
 
     init {
