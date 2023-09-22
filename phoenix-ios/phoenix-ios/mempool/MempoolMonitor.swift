@@ -27,6 +27,7 @@ actor MempoolMonitor {
 	private let internetReconnectedPublisher = PassthroughSubject<Void, Never>()
 	
 	private let networkMonitor = NWPathMonitor()
+	private var previouslyHadInternet = false
 	
 	/// Must use shared instance
 	private init() {
@@ -40,7 +41,6 @@ actor MempoolMonitor {
 	private func startNetworkMonitor() {
 		log.trace("startNetworkMonitor()")
 		
-		var wasDisconnected = true
 		networkMonitor.pathUpdateHandler = {(path: NWPath) -> Void in
 			
 			let hasInternet: Bool
@@ -51,14 +51,22 @@ actor MempoolMonitor {
 				@unknown default         : hasInternet = false
 			}
 			
-			if hasInternet && wasDisconnected {
-				log.debug("Detected internet reconnection...")
-				self.internetReconnectedPublisher.send()
+			Task {
+				await self.hasInternetChanged(hasInternet)
 			}
-			wasDisconnected = !hasInternet
 		}
 		
 		networkMonitor.start(queue: DispatchQueue.main)
+	}
+	
+	private func hasInternetChanged(_ hasInternet: Bool) {
+		log.trace("hasInternetChanged(\(hasInternet)")
+		
+		if hasInternet && !previouslyHadInternet {
+			log.debug("Detected internet reconnection...")
+			internetReconnectedPublisher.send()
+		}
+		previouslyHadInternet = hasInternet
 	}
 	
 	private func incrementListenerCount() {

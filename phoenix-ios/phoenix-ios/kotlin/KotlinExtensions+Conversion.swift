@@ -44,11 +44,11 @@ extension Data {
 
 extension Array {
 	
-	func toKotlinArray<Element: AnyObject>() -> KotlinArray<Element> {
+	func toKotlinArray<Item: AnyObject>() -> KotlinArray<Item> {
 		
 		return KotlinArray(size: Int32(self.count)) { (i: KotlinInt) in
-			var shutUpCompiler: Element? = nil
-			shutUpCompiler = (self[i.intValue] as! Element)
+			var shutUpCompiler: Item? = nil
+			shutUpCompiler = (self[i.intValue] as! Item)
 			return shutUpCompiler
 		}
 	}
