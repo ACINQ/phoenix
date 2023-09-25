@@ -2,13 +2,34 @@
   "sourceLanguage" : "en",
   "strings" : {
     "" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
     },
     " " : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
     },
     " " : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
     },
     " (not available)" : {
       "localizations" : {
@@ -67,17 +88,44 @@
       }
     },
     " (now)" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " (ahora)"
+          }
+        }
+      }
     },
     " (original)" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " (original)"
+          }
+        }
+      }
     },
     " (Path %@)" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " (Ruta %@)"
+          }
+        }
+      }
     },
     "-" : {
       "extractionState" : "manual",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -87,10 +135,24 @@
       }
     },
     "..." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
     },
     "(at time of payment)" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(al momento del pago)"
+          }
+        }
+      }
     },
     "(Bitcoin address)" : {
       "comment" : "Type of text being copied",
@@ -105,17 +167,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(Dirección Bitcoin)"
-          }
-        }
-      }
-    },
-    "(coming soon)" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "(již brzy)"
           }
         }
       }
@@ -328,22 +379,65 @@
       }
     },
     "(e.g. btc address payment was sent to)" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(por ejemplo, dirección btc a la que se envió el pago)"
+          }
+        }
+      }
     },
     "(even if Phoenix isn't running)" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(incluso si Phoenix no se está ejecutando)"
+          }
+        }
+      }
     },
     "(hide amount)" : {
-      "comment" : "Background payments configuration"
+      "comment" : "Background payments configuration",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(ocultar cantidad)"
+          }
+        }
+      }
     },
     "(inclusive)" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(inclusiva)"
+          }
+        }
+      }
     },
     "(layer 1)" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(capa 1)"
+          }
+        }
+      }
     },
     "(layer 2)" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(capa 2)"
+          }
+        }
+      }
     },
     "(Lightning invoice)" : {
       "comment" : "Type of text being copied",
@@ -482,10 +576,26 @@
       }
     },
     "(totalPaymentCount) in-flight payments" : {
-      "comment" : "Recent payments footer"
+      "comment" : "Recent payments footer",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(totalPaymentCount) pagos en camino"
+          }
+        }
+      }
     },
     "(totalPaymentCount) recent payments" : {
-      "comment" : "Recent payments footer"
+      "comment" : "Recent payments footer",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(totalPaymentCount) pagos recientes"
+          }
+        }
+      }
     },
     "(you provided this address)" : {
       "localizations" : {
@@ -516,7 +626,14 @@
       }
     },
     "*" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
     },
     "**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." : {
       "comment" : "RecoverySeedView",
@@ -583,11 +700,24 @@
             "state" : "new",
             "value" : "#%1$lld: %2$@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
         }
       }
     },
     "%" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
     },
     "%@" : {
       "localizations" : {
@@ -596,12 +726,24 @@
             "state" : "translated",
             "value" : "%@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
         }
       }
     },
     "%@ days" : {
       "extractionState" : "manual",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ días"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -691,7 +833,14 @@
       }
     },
     "%@ sats/vByte" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
     },
     "%@ seconds" : {
       "localizations" : {
@@ -745,6 +894,12 @@
             "state" : "translated",
             "value" : "%1$@.%2$@ vteřin"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@.%@ segundos"
+          }
         }
       }
     },
@@ -783,6 +938,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@%2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
           }
         }
       }
@@ -847,22 +1008,64 @@
       }
     },
     "%d channels were successfully checked. No issues were found." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d canales fueron verificados exitosamente. No se encontraron problemas."
+          }
+        }
+      }
     },
     "%lld" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
     },
     "%lld characters remaining" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld letras restantes"
+          }
+        }
+      }
     },
     "%lld confirmations" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld confirmaciones"
+          }
+        }
+      }
     },
     "%lld days" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld días"
+          }
+        }
+      }
     },
     "%lld milliseconds" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld milisegundos"
+          }
+        }
+      }
     },
     "%lld of %lld" : {
       "localizations" : {
@@ -871,18 +1074,44 @@
             "state" : "new",
             "value" : "%1$lld of %2$lld"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld de %2$lld"
+          }
         }
       }
     },
     "%lld payments" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld pagos"
+          }
+        }
+      }
     },
     "%lld remaining" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld restante"
+          }
+        }
+      }
     },
     "+" : {
       "extractionState" : "manual",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -937,22 +1166,64 @@
       }
     },
     "≈ 1 hour" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ 1 hora"
+          }
+        }
+      }
     },
     "≈ 1+ days" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ 1+ días"
+          }
+        }
+      }
     },
     "≈ 10 minutes" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ 10 minutos"
+          }
+        }
+      }
     },
     "≈ 30 minutes" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ 30 minutos"
+          }
+        }
+      }
     },
     "☹️" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
     },
     "😃" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
     },
     "1 channel" : {
       "localizations" : {
@@ -983,10 +1254,24 @@
       }
     },
     "1 channel was successfully checked. No issues were found." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 canal fue verificado exitosamente. No se encontraron problemas."
+          }
+        }
+      }
     },
     "1 confirmation" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 confirmación"
+          }
+        }
+      }
     },
     "1 in-flight outgoing payment" : {
       "comment" : "Recent payments footer",
@@ -1007,13 +1292,37 @@
       }
     },
     "1 in-flight payment" : {
-      "comment" : "Recent payments footer"
+      "comment" : "Recent payments footer",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 pago en camino"
+          }
+        }
+      }
     },
     "1 minute" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 minuto"
+          }
+        }
+      }
     },
     "1 payment" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 pago"
+          }
+        }
+      }
     },
     "1 payment within the last 2 hours" : {
       "comment" : "Recent payments footer",
@@ -1118,43 +1427,145 @@
       }
     },
     "1 recent payment" : {
-      "comment" : "Recent payments footer"
+      "comment" : "Recent payments footer",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 pago reciente"
+          }
+        }
+      }
     },
     "2 hours" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 horas"
+          }
+        }
+      }
     },
     "3 days" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 días"
+          }
+        }
+      }
     },
     "3 payments" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 pagos"
+          }
+        }
+      }
     },
     "3rd generation lightning tech" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tecnología de Lightning de tercera generación"
+          }
+        }
+      }
     },
     "5 payments" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 pagos"
+          }
+        }
+      }
     },
     "6+ confirmations" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "6+ confirmaciones"
+          }
+        }
+      }
     },
     "7 days" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 días"
+          }
+        }
+      }
     },
     "10 minutes" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 minutos"
+          }
+        }
+      }
     },
     "10 payments" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 pagos"
+          }
+        }
+      }
     },
     "15 payments" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15 pagos"
+          }
+        }
+      }
     },
     "20 payments" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "20 pagos"
+          }
+        }
+      }
     },
     "24 hours" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "24 horas"
+          }
+        }
+      }
     },
     "A backup phrase is generated, storing all the information needed to restore your Bitcoin funds." : {
       "extractionState" : "manual",
@@ -1220,11 +1631,24 @@
             "state" : "new",
             "value" : "A fee of %1$@ (≈ %2$@) may be needed to receive this payment."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es posible que se necesite una tarifa de %1$@ (≈ %2$@) para recibir este pago."
+          }
         }
       }
     },
     "A new attempt is scheduled in a few hours." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Está previsto un nuevo intento en unas horas."
+          }
+        }
+      }
     },
     "A random Electrum server will be selected on each connection attempt." : {
       "localizations" : {
@@ -1283,7 +1707,14 @@
       }
     },
     "Abort" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abortar"
+          }
+        }
+      }
     },
     "About" : {
       "comment" : "Navigation bar title",
@@ -1315,13 +1746,35 @@
       }
     },
     "Accelerate transaction" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acelerar transacción"
+          }
+        }
+      }
     },
     "Accelerate Transactions" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acelerar transacciones"
+          }
+        }
+      }
     },
     "Acceptable range" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rango aceptable"
+          }
+        }
+      }
     },
     "Access to Phoenix is protected by biometrics." : {
       "localizations" : {
@@ -1352,7 +1805,14 @@
       }
     },
     "active commitments" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "compromisos activos"
+          }
+        }
+      }
     },
     "Add optional comment" : {
       "localizations" : {
@@ -1377,7 +1837,15 @@
       }
     },
     "adding to existing channel" : {
-      "comment" : "Transaction Info: Explanation"
+      "comment" : "Transaction Info: Explanation",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "agregando al canal existente"
+          }
+        }
+      }
     },
     "address" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -1511,7 +1979,14 @@
       }
     },
     "All payment channels will be closed." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos los canales de pago estarán cerrados."
+          }
+        }
+      }
     },
     "Already paid" : {
       "comment" : "Error title",
@@ -1537,7 +2012,14 @@
       }
     },
     "amount" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cantidad"
+          }
+        }
+      }
     },
     "Amount (optional)" : {
       "comment" : "TextField placeholder",
@@ -1569,10 +2051,24 @@
       }
     },
     "amount at time of payment" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cantidad al momento del pago"
+          }
+        }
+      }
     },
     "amount based on current exchange rate" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cantidad basada en el tipo de cambio actual"
+          }
+        }
+      }
     },
     "Amount exceeds your balance" : {
       "comment" : "error message",
@@ -1604,13 +2100,34 @@
       }
     },
     "amount in %@" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cantidad en %@"
+          }
+        }
+      }
     },
     "Amount is too high." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cantidad es demasiado alta."
+          }
+        }
+      }
     },
     "Amount is too low." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cantidad es demasiado baja."
+          }
+        }
+      }
     },
     "Amount must be (exactBitcoin.string)" : {
       "comment" : "error message",
@@ -1849,10 +2366,24 @@
       }
     },
     "An on-chain wallet derived from your seed.\n\nThe final wallet is where funds are sent by default when your lightning channels are closed." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una billetera en cadena derivada de tu semilla.\n\nLa billetera final es donde se envían los fondos de forma predeterminada cuando sus canales Lightning están cerrados."
+          }
+        }
+      }
     },
     "An on-chain wallet derived from your seed.\n\nThe swap-in wallet is a bridge to Lightning. Funds on this wallet will automatically be moved to Lightning according to your liquidity policy setting." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una billetera en cadena derivada de tu semilla.\n\nLa billetera de intercambio es un puente hacia Lightning. Los fondos de esta billetera se transferirán automáticamente a Lightning de acuerdo con la configuración de su política de liquidez."
+          }
+        }
+      }
     },
     "An unknown error occurred." : {
       "comment" : "error details",
@@ -2022,7 +2553,14 @@
       }
     },
     "App status" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estado de la aplicación"
+          }
+        }
+      }
     },
     "App theme" : {
       "localizations" : {
@@ -2110,16 +2648,11 @@
       }
     },
     "Attention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive." : {
-
-    },
-    "Australian Dollar" : {
-      "comment" : "Currency name: AUD",
-      "extractionState" : "manual",
       "localizations" : {
-        "cs" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Australský dolar"
+            "value" : "Atención: si la tarifa del mempool de Bitcoin es alta, los pagos entrantes de LN que requieran una operación en cadena podrían resultar costosos."
           }
         }
       }
@@ -2200,10 +2733,24 @@
       }
     },
     "Automated channel management" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestión automatizada de canales"
+          }
+        }
+      }
     },
     "Automated incoming liquidity is disabled in your incoming fee settings." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La liquidez entrante automatizada está deshabilitada en la configuración de tarifas entrantes."
+          }
+        }
+      }
     },
     "Automatic Channel Creation" : {
       "extractionState" : "manual",
@@ -2264,19 +2811,55 @@
       }
     },
     "Background payments" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagos en 2º. plano"
+          }
+        }
+      }
     },
     "Background Payments" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagos en 2º. plano"
+          }
+        }
+      }
     },
     "Background payments disabled" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagos en segundo plano deshabilitados"
+          }
+        }
+      }
     },
     "Background payments disabled. " : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagos en segundo plano deshabilitados."
+          }
+        }
+      }
     },
     "Background payments enabled" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagos en segundo plano habilitados"
+          }
+        }
+      }
     },
     "Backup" : {
       "extractionState" : "manual",
@@ -2295,30 +2878,15 @@
         }
       }
     },
-    "Backup seed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zálohovat seed"
-          }
-        }
-      }
-    },
-    "Backup transactions" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Záložní transakce"
-          }
-        }
-      }
-    },
     "Backup your recovery phrase to prevent losing your funds." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haga una copia de seguridad de su frase de recuperación para evitar perder sus fondos."
+          }
+        }
+      }
     },
     "Backup your recovery phrase to prevent losing your funds. " : {
       "extractionState" : "manual",
@@ -2350,10 +2918,24 @@
       }
     },
     "Bad certificate !" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Mal certificado!"
+          }
+        }
+      }
     },
     "balance" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "saldo"
+          }
+        }
+      }
     },
     "Base amount: (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
@@ -2372,28 +2954,25 @@
         }
       }
     },
-    "Base fee must be at least %@." : {
-      "extractionState" : "manual",
+    "Below the expected fee. Some payments may be rejected." : {
       "localizations" : {
-        "ar" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "يجب ان تكون الرسوم الأساسية كحد ادنى %@."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les frais de base doivent être d’au moins %@."
+            "value" : "Por debajo de la tarifa esperada. Algunos pagos pueden ser rechazados."
           }
         }
       }
     },
-    "Below the expected fee. Some payments may be rejected." : {
-
-    },
     "Better predictability" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mejor previsibilidad"
+          }
+        }
+      }
     },
     "Biometrics" : {
       "localizations" : {
@@ -2560,7 +3139,15 @@
       }
     },
     "Bitcoin network fees paid for on-chain transaction." : {
-      "comment" : "Fees explanation"
+      "comment" : "Fees explanation",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarifas de la red Bitcoin pagadas por transacciones en cadena."
+          }
+        }
+      }
     },
     "Bitcoin network fees paid for on-chain transaction. Payment required 1 transaction." : {
       "comment" : "Fees explanation",
@@ -2623,7 +3210,14 @@
       }
     },
     "Bitcoin supercharged" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitcoin sobrealimentado"
+          }
+        }
+      }
     },
     "bitcoin txids" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -2712,10 +3306,24 @@
       }
     },
     "Blockchain" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blockchain"
+          }
+        }
+      }
     },
     "Blockchain Explorer" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explorador de blockchain"
+          }
+        }
+      }
     },
     "blockchain tx" : {
       "extractionState" : "manual",
@@ -2746,29 +3354,46 @@
         }
       }
     },
-    "Brazilian Real" : {
-      "comment" : "Currency name: BRL",
-      "extractionState" : "manual",
+    "broadcast" : {
       "localizations" : {
-        "cs" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Brazilský real"
+            "value" : "transmisión"
           }
         }
       }
     },
-    "broadcast" : {
-
-    },
     "broadcast at" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fecha de transmisión"
+          }
+        }
+      }
     },
     "Bump Fee (CPFP)" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aumentar las tarifas (CPFP)"
+          }
+        }
+      }
     },
     "Bump fees" : {
-      "comment" : "Payment description for splice CPFP"
+      "comment" : "Payment description for splice CPFP",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aumentar las tarifas"
+          }
+        }
+      }
     },
     "By default, Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." : {
       "localizations" : {
@@ -2799,25 +3424,34 @@
       }
     },
     "Calculating amount…" : {
-
-    },
-    "can send" : {
-
-    },
-    "Canadian Dollar" : {
-      "comment" : "Currency name: CAD",
-      "extractionState" : "manual",
       "localizations" : {
-        "cs" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kanadský dolar"
+            "value" : "Calculando la cantidad..."
+          }
+        }
+      }
+    },
+    "can send" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "puede enviar"
           }
         }
       }
     },
     "cancel" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cancelar"
+          }
+        }
+      }
     },
     "Cancel" : {
       "localizations" : {
@@ -2848,7 +3482,14 @@
       }
     },
     "capacity" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "capacidad"
+          }
+        }
+      }
     },
     "Chain mismatch" : {
       "comment" : "Error title",
@@ -3006,31 +3647,95 @@
       }
     },
     "Channel management" : {
-      "comment" : "Navigation Bar Title"
+      "comment" : "Navigation Bar Title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestión de canales"
+          }
+        }
+      }
     },
     "Channel not idle" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canal no inactivo"
+          }
+        }
+      }
     },
     "Channels closed" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canales cerrados"
+          }
+        }
+      }
     },
     "Channels initializing..." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canales inicializándose..."
+          }
+        }
+      }
     },
     "Channels with less than the Bitcoin dust limit (546 satoshi) cannot be migrated. Their balance go to the bitcoin miners." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los canales con menos del límite de polvo de Bitcoin (546 satoshi) no se pueden migrar. Su saldo va a los mineros de bitcoins."
+          }
+        }
+      }
     },
     "Check fee settings" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verificar configuración de tarifas"
+          }
+        }
+      }
     },
     "Check it " : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisalo"
+          }
+        }
+      }
     },
     "Check spelling & internet connection" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa la ortografía y la conexión a Internet"
+          }
+        }
+      }
     },
     "Checking blockchain…" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprobando el blockchain..."
+          }
+        }
+      }
     },
     "Checking channel state..." : {
       "extractionState" : "manual",
@@ -3084,37 +3789,33 @@
       }
     },
     "Checking server certificate…" : {
-
-    },
-    "Checks the fee relative to the incoming payment amount. This is helpful for small payments." : {
-
-    },
-    "Chilean Peso" : {
-      "comment" : "Currency name: CLP",
-      "extractionState" : "manual",
       "localizations" : {
-        "cs" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chilské peso"
+            "value" : "Comprobando el certificado del servidor..."
           }
         }
       }
     },
-    "Chinese Yuan" : {
-      "comment" : "Currency name: CNY",
-      "extractionState" : "manual",
+    "Checks the fee relative to the incoming payment amount. This is helpful for small payments." : {
       "localizations" : {
-        "cs" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Čínský jüan"
+            "value" : "Comprueba la tarifa relativa al monto del pago entrante. Esto es útil para pagos pequeños."
           }
         }
       }
     },
     "Choose image" : {
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige imagen"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3124,7 +3825,14 @@
       }
     },
     "Choose payment type" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige el tipo de pago"
+          }
+        }
+      }
     },
     "claimed amount" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -3179,7 +3887,14 @@
       }
     },
     "Clear textfield" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar campo de texto"
+          }
+        }
+      }
     },
     "Close" : {
       "comment" : "Button",
@@ -3264,10 +3979,24 @@
       }
     },
     "Close full screen" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar pantalla completa"
+          }
+        }
+      }
     },
     "Close sheet" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar hoja"
+          }
+        }
+      }
     },
     "Closing Status" : {
       "comment" : "Title in DetailsView_IncomingPayment",
@@ -3306,6 +4035,12 @@
             "state" : "translated",
             "value" : "Cloudová záloha"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respaldo en la nube"
+          }
         }
       }
     },
@@ -3317,6 +4052,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Záloha na Cloudu"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respaldo en la Nube"
           }
         }
       }
@@ -3513,7 +4254,14 @@
       }
     },
     "Common Name:" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre común:"
+          }
+        }
+      }
     },
     "completed at" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -3574,7 +4322,14 @@
       }
     },
     "Configure fee settings" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar los ajustes de tarifas"
+          }
+        }
+      }
     },
     "Confirm" : {
       "localizations" : {
@@ -3605,7 +4360,15 @@
       }
     },
     "Confirm Drain" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmar"
+          }
+        }
+      }
     },
     "Confirm Payment" : {
       "comment" : "Navigation bar title",
@@ -3637,7 +4400,15 @@
       }
     },
     "Confirm Reset" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmar"
+          }
+        }
+      }
     },
     "Confirm Withdraw" : {
       "comment" : "Navigation bar title",
@@ -3663,13 +4434,34 @@
       }
     },
     "confirmed" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "confirmado"
+          }
+        }
+      }
     },
     "confirmed at" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "confirmado en"
+          }
+        }
+      }
     },
     "Confirmed Balance" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saldo confirmado"
+          }
+        }
+      }
     },
     "Connected" : {
       "comment" : "Connection status\nConnection state",
@@ -3876,20 +4668,55 @@
             "state" : "translated",
             "value" : "Stav připojení"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estado de conexión"
+          }
         }
       }
     },
     "Connection status: %@" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estado de conexión: %@"
+          }
+        }
+      }
     },
     "Contact support if needed." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Póngase en contacto con el soporte si es necesario."
+          }
+        }
+      }
     },
     "continue to next step" : {
-      "comment" : "VoiceOver hint"
+      "comment" : "VoiceOver hint",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "continuar con el siguiente paso"
+          }
+        }
+      }
     },
     "Control on-chain fees" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controlar las tarifas en cadena"
+          }
+        }
+      }
     },
     "Copied QR code image to pasteboard!" : {
       "comment" : "Toast message",
@@ -3989,7 +4816,14 @@
       }
     },
     "Copy certificate" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar certificado"
+          }
+        }
+      }
     },
     "Copy Image" : {
       "localizations" : {
@@ -4020,7 +4854,14 @@
       }
     },
     "Copy Image (QR code)" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar imagen (código QR)"
+          }
+        }
+      }
     },
     "Copy link" : {
       "localizations" : {
@@ -4073,13 +4914,34 @@
       }
     },
     "Copy Text (bitcoin address)" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar texto (dirección bitcoin)"
+          }
+        }
+      }
     },
     "Copy Text (lightning invoice)" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar texto (factura lightning)"
+          }
+        }
+      }
     },
     "Copy transaction id" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar ID de transacción"
+          }
+        }
+      }
     },
     "Could not connect to host:" : {
       "localizations" : {
@@ -4111,6 +4973,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تعذر الاتصال بالخدمة"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo conectar al servicio"
           }
         },
         "fr" : {
@@ -4210,18 +5078,6 @@
         }
       }
     },
-    "Croation Kuna" : {
-      "comment" : "Currency name: HRK",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chorvatská kuna"
-          }
-        }
-      }
-    },
     "Currency converter" : {
       "comment" : "HomeView: Tools menu: Label",
       "localizations" : {
@@ -4269,10 +5125,24 @@
       }
     },
     "Currency picker" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selector de moneda"
+          }
+        }
+      }
     },
     "Custom electrum server: bad certificate !" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servidor electrum personalizado: ¡certificado incorrecto!"
+          }
+        }
+      }
     },
     "Customize amount" : {
       "extractionState" : "manual",
@@ -4298,22 +5168,31 @@
       }
     },
     "Customize in iOS Settings" : {
-
-    },
-    "Customize tip" : {
-
-    },
-    "Customized" : {
-
-    },
-    "Czech Koruna" : {
-      "comment" : "Currency name: CZK",
-      "extractionState" : "manual",
       "localizations" : {
-        "cs" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Česká koruna"
+            "value" : "Personalizar en la configuración de iOS"
+          }
+        }
+      }
+    },
+    "Customize tip" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizar sugerencia"
+          }
+        }
+      }
+    },
+    "Customized" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizado"
           }
         }
       }
@@ -4348,16 +5227,11 @@
       }
     },
     "Danger Zone" : {
-
-    },
-    "Danish Krone" : {
-      "comment" : "Currency name: DKK",
-      "extractionState" : "manual",
       "localizations" : {
-        "cs" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dánská koruna"
+            "value" : "Zona de peligro"
           }
         }
       }
@@ -4392,7 +5266,14 @@
       }
     },
     "Decrease value" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disminuir valor"
+          }
+        }
+      }
     },
     "Default payment description" : {
       "localizations" : {
@@ -4423,49 +5304,154 @@
       }
     },
     "Delete" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar"
+          }
+        }
+      }
     },
     "Delete all wallet data from this device." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimine todos los datos de la billetera de este dispositivo."
+          }
+        }
+      }
     },
     "Delete payment" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar pago"
+          }
+        }
+      }
     },
     "Delete payment history from my iCloud account." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar el historial de pagos de mi cuenta de iCloud."
+          }
+        }
+      }
     },
     "Delete payment?" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Eliminar pago?"
+          }
+        }
+      }
     },
     "Delete seed backup from my iCloud account." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar la copia de seguridad de la frase de recuperación de mi cuenta de iCloud."
+          }
+        }
+      }
     },
     "Delete Wallet" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar billetera"
+          }
+        }
+      }
     },
     "Deleted database files" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivos de base de datos eliminados"
+          }
+        }
+      }
     },
     "Deleted keychain items" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elementos eliminados del llavero"
+          }
+        }
+      }
     },
     "Deleting **payment history** from iCloud" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminando **historial de pagos** de iCloud"
+          }
+        }
+      }
     },
     "Deleting **recovery phrase** from iCloud" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminando **frase de recuperación** de iCloud"
+          }
+        }
+      }
     },
     "Deleting data from **this device**" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminando datos de **este dispositivo**"
+          }
+        }
+      }
     },
     "Deleting data from iCloud…" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminando datos de iCloud…"
+          }
+        }
+      }
     },
     "Deleting database files…" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminando archivos de base de datos…"
+          }
+        }
+      }
     },
     "Deleting keychain items…" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminando elementos del llavero..."
+          }
+        }
+      }
     },
     "Deleting record zone..." : {
       "localizations" : {
@@ -4599,7 +5585,14 @@
       }
     },
     "Description" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descripción"
+          }
+        }
+      }
     },
     "Description (optional)" : {
       "comment" : "TextField placeholder",
@@ -4653,7 +5646,14 @@
       }
     },
     "Descriptor" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descriptor de salida"
+          }
+        }
+      }
     },
     "Details" : {
       "comment" : "Navigation bar title",
@@ -4685,10 +5685,24 @@
       }
     },
     "Disabled" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivado"
+          }
+        }
+      }
     },
     "Disabling backup…" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deshabilitando la copia de seguridad…"
+          }
+        }
+      }
     },
     "Discard Changes" : {
       "localizations" : {
@@ -4713,13 +5727,34 @@
       }
     },
     "Disconnected during splice-out attempt" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desconectado durante el intento de splice-out"
+          }
+        }
+      }
     },
     "Dismiss popover" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descartar ventana emergente"
+          }
+        }
+      }
     },
     "Dismiss sheet" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descartar hoja"
+          }
+        }
+      }
     },
     "Display" : {
       "localizations" : {
@@ -4891,10 +5926,24 @@
       }
     },
     "Don't lose your funds:" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No pierdas tus fondos:"
+          }
+        }
+      }
     },
     "Don't use addresses from the previous version." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No utilice direcciones de la versión anterior."
+          }
+        }
+      }
     },
     "Donation" : {
       "comment" : "Payment description for received KeySend",
@@ -4920,7 +5969,14 @@
       }
     },
     "Done" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listo"
+          }
+        }
+      }
     },
     "Downloading payments" : {
       "localizations" : {
@@ -4951,7 +6007,14 @@
       }
     },
     "Downloading payments from cloud" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargando pagos desde la nube"
+          }
+        }
+      }
     },
     "Drain my wallet" : {
       "localizations" : {
@@ -5170,10 +6233,24 @@
       }
     },
     "Email:" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correo:"
+          }
+        }
+      }
     },
     "empty" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vacío"
+          }
+        }
+      }
     },
     "Enable iCloud backup" : {
       "localizations" : {
@@ -5182,14 +6259,34 @@
             "state" : "translated",
             "value" : "تمكين النسخ الاحتياطي على iCloud"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Habilite copia de seguridad de iCloud"
+          }
         }
       }
     },
     "Enable notifications in the Notification Center" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir notificaciones"
+          }
+        }
+      }
     },
     "End date" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fecha final"
+          }
+        }
+      }
     },
     "Enter a Lightning invoice, LNURL, or Lightning address you want to send money to." : {
       "localizations" : {
@@ -5439,20 +6536,14 @@
         }
       }
     },
-    "Euro" : {
-      "comment" : "Currency name: EUR",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Euro"
-          }
-        }
-      }
-    },
     "example payment" : {
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ejemplo de pago"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5469,11 +6560,24 @@
             "state" : "translated",
             "value" : "مثال لدفع :"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ejemplo de pago :"
+          }
         }
       }
     },
     "example.com" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ejemplo.com"
+          }
+        }
+      }
     },
     "Expect to receive %d separate payments." : {
       "comment" : "label text",
@@ -5506,10 +6610,24 @@
       }
     },
     "Expect to receive %lld separate payments." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espere recibir %lld pagos por separado."
+          }
+        }
+      }
     },
     "Explore" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explorar"
+          }
+        }
+      }
     },
     "Exponential backoff" : {
       "localizations" : {
@@ -5534,16 +6652,46 @@
       }
     },
     "Export" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar"
+          }
+        }
+      }
     },
     "Export Payments" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar Pagos"
+          }
+        }
+      }
     },
     "Export your payment history in CSV (comma separated value) format." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporte su historial de pagos en formato CSV (valores separados por comas)."
+          }
+        }
+      }
     },
     "Exporting Failed" : {
-      "comment" : "TxHistoryExporter"
+      "comment" : "TxHistoryExporter",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportación fallida"
+          }
+        }
+      }
     },
     "External" : {
       "localizations" : {
@@ -5602,19 +6750,54 @@
       }
     },
     "Failed payment" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago fallido"
+          }
+        }
+      }
     },
     "Failed: Existing channels found in mid-creation state" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fallo: canales existentes encontrados en estado de creación media"
+          }
+        }
+      }
     },
     "Failed: Invalid closing script" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fallo: script de cierre no válido"
+          }
+        }
+      }
     },
     "Failure: %@" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falla: %@"
+          }
+        }
+      }
     },
     "Failure: Unknown error" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fallo: error desconocido"
+          }
+        }
+      }
     },
     "FAQ" : {
       "comment" : "HomeView: Tools menu: Label",
@@ -5646,7 +6829,14 @@
       }
     },
     "Fee expected" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarifa esperada"
+          }
+        }
+      }
     },
     "Fee for on-the-fly channel creation:" : {
       "extractionState" : "manual",
@@ -5741,6 +6931,12 @@
             "state" : "new",
             "value" : "Fees are currently estimated at around **%1$@** (≈ %2$@)."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualmente, las tarifas se estiman en alrededor de **%1$@** (≈ %2$@)."
+          }
         }
       }
     },
@@ -5826,7 +7022,14 @@
       }
     },
     "Fetched %lld item" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtenido %lld artículo"
+          }
+        }
+      }
     },
     "Fetched %lld items" : {
 
@@ -5935,10 +7138,24 @@
       "comment" : "Navigation Bar Title"
     },
     "Fix " : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arreglar "
+          }
+        }
+      }
     },
     "Fix It" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arreglalo"
+          }
+        }
+      }
     },
     "For more information, see the FAQ" : {
       "extractionState" : "manual",
@@ -6105,7 +7322,14 @@
       }
     },
     "Found %lld wallets in iCloud" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se encontró %lld billeteras en iCloud"
+          }
+        }
+      }
     },
     "Found 1 wallet in iCloud" : {
       "localizations" : {
@@ -6336,25 +7560,34 @@
       }
     },
     "Get Started" : {
-
-    },
-    "Good news! Your transaction has been mined!" : {
-
-    },
-    "Great British Pound" : {
-      "comment" : "Currency name: GBP",
-      "extractionState" : "manual",
       "localizations" : {
-        "cs" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Britská Libra"
+            "value" : "Empezar"
+          }
+        }
+      }
+    },
+    "Good news! Your transaction has been mined!" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Buenas noticias! ¡Tu transacción ha sido minada!"
           }
         }
       }
     },
     "Here you can export the application logs, or share them." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aquí puede exportar los registros de la aplicación o compartirlos."
+          }
+        }
+      }
     },
     "Here you can extract and visualize application logs, as well as share them." : {
       "extractionState" : "manual",
@@ -6386,28 +7619,45 @@
       }
     },
     "hidden amount" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cantidad oculta"
+          }
+        }
+      }
     },
     "Hidden balance" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saldo oculto"
+          }
+        }
+      }
     },
     "High Priority" : {
 
     },
     "Home screen" : {
-      "comment" : "Navigation bar title"
-    },
-    "Home Screen" : {
-
-    },
-    "Hong Kong Dollar" : {
-      "comment" : "Currency name: HKD",
-      "extractionState" : "manual",
+      "comment" : "Navigation bar title",
       "localizations" : {
-        "cs" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hongkongský dolar"
+            "value" : "Pantalla de inicio"
+          }
+        }
+      }
+    },
+    "Home Screen" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pantalla de inicio"
           }
         }
       }
@@ -6501,18 +7751,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hôte :"
-          }
-        }
-      }
-    },
-    "Hungarian Forint" : {
-      "comment" : "Currency name: HUF",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maďarský forint"
           }
         }
       }
@@ -6636,20 +7874,15 @@
     "I understand that if I lose my recovery phrase, then I will lose the funds in my wallet." : {
 
     },
-    "Icelandic Króna" : {
-      "comment" : "Currency name: ISK",
-      "extractionState" : "manual",
+    "iCloud" : {
       "localizations" : {
-        "cs" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Islandská koruna"
+            "value" : "iCloud"
           }
         }
       }
-    },
-    "iCloud" : {
-
     },
     "iCloud account temporarily unavailable" : {
       "comment" : "reason for iCloud error",
@@ -6681,6 +7914,12 @@
             "state" : "translated",
             "value" : "النسخ الاحتياطي على iCloud"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respaldo en iCloud"
+          }
         }
       }
     },
@@ -6691,11 +7930,24 @@
             "state" : "translated",
             "value" : "النسخ الاحتياطي على iCloud"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respaldo en iCloud"
+          }
         }
       }
     },
     "iCloud backup not completed!" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡La copia de seguridad de iCloud no se completó!"
+          }
+        }
+      }
     },
     "iCloud network failure" : {
       "comment" : "reason for iCloud failure",
@@ -6842,7 +8094,14 @@
       }
     },
     "If you enable background payments, then you can receive payments as long as your device is connected to the internet." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si habilita los pagos en segundo plano, podrá recibir pagos siempre que su dispositivo esté conectado a Internet."
+          }
+        }
+      }
     },
     "If you switch to a new device (or reinstall the app) then you'll lose your payment history." : {
       "localizations" : {
@@ -6972,7 +8231,14 @@
       }
     },
     "in-flight payments" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pagos en camino"
+          }
+        }
+      }
     },
     "inactive commitments" : {
 
@@ -6996,7 +8262,14 @@
 
     },
     "Include original fiat value" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incluir el valor fiat original"
+          }
+        }
+      }
     },
     "Includes Bitcoin network miner fees, and the fee for the Swap-Out service." : {
       "comment" : "Fees explanation",
@@ -7045,18 +8318,6 @@
     },
     "Increase value" : {
 
-    },
-    "Indian Rupee" : {
-      "comment" : "Currency name: INR",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Indická rupie"
-          }
-        }
-      }
     },
     "info" : {
       "comment" : "button label - try to make it short",
@@ -7278,18 +8539,6 @@
         }
       }
     },
-    "Japanese Yen" : {
-      "comment" : "Currency name: JPY",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Japonský jen"
-          }
-        }
-      }
-    },
     "just now" : {
       "comment" : "Timestamp for notification",
       "localizations" : {
@@ -7424,18 +8673,6 @@
     },
     "know when fees may occur" : {
 
-    },
-    "Korean Won" : {
-      "comment" : "Currency name: KRW",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Korejský Won"
-          }
-        }
-      }
     },
     "Last Attempt" : {
 
@@ -7578,13 +8815,28 @@
       }
     },
     "Lightning" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lightning"
+          }
+        }
+      }
     },
     "lightning fee" : {
 
     },
     "Lightning fee amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
-      "comment" : "VoiceOver label: PaymentSummaryView"
+      "comment" : "VoiceOver label: PaymentSummaryView",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monto de la tarifa Lightning: (percent), (amountBitcoin), ≈(amountFiat)"
+          }
+        }
+      }
     },
     "Lightning Fees" : {
       "comment" : "Label in SummaryInfoGrid",
@@ -7691,7 +8943,14 @@
       }
     },
     "Lightning invoice" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Factura lightning"
+          }
+        }
+      }
     },
     "Lightning network" : {
       "localizations" : {
@@ -7747,39 +9006,6 @@
         }
       }
     },
-    "line 1" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ligne 1"
-          }
-        }
-      }
-    },
-    "line 2" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ligne 2"
-          }
-        }
-      }
-    },
-    "line 3" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ligne 3"
-          }
-        }
-      }
-    },
     "Link" : {
       "comment" : "lnurl-auth: login button title",
       "localizations" : {
@@ -7827,10 +9053,24 @@
       }
     },
     "lnurl-auth" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lnurl-auth"
+          }
+        }
+      }
     },
     "lnurl-pay" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lnurl-pay"
+          }
+        }
+      }
     },
     "Loading wallet..." : {
 
@@ -8193,45 +9433,6 @@
     "max absolute" : {
 
     },
-    "max base fee" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "frais de base maximum"
-          }
-        }
-      }
-    },
-    "max base fee :" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الحد الأقصى للرسوم الأساسية"
-          }
-        }
-      }
-    },
-    "Max base fee (satoshis)" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الحد الأقصى للرسوم الأساسية (بالساتوشي)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Frais de base maximum (satoshis)"
-          }
-        }
-      }
-    },
     "max fee" : {
       "localizations" : {
         "fr" : {
@@ -8261,45 +9462,6 @@
     },
     "max percent" : {
 
-    },
-    "max proportional fee" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "frais proportionnels maximum"
-          }
-        }
-      }
-    },
-    "max proportional fee :" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الحد الأقصى للرسوم النسبيّة"
-          }
-        }
-      }
-    },
-    "Max proportional fee (%)" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الحد الأقصى للرسوم النسبيّة (%)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Frais proportionnels maximum (%)"
-          }
-        }
-      }
     },
     "max:" : {
 
@@ -8332,23 +9494,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Maximum amount is %1$@, ≈%2$@"
-          }
-        }
-      }
-    },
-    "Maximum base fee is %@." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "اعلى حد للرسوم الاساسية هو %@."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les frais de base sont au max %@."
           }
         }
       }
@@ -8687,18 +9832,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nouveau canal (créé automatiquement)"
-          }
-        }
-      }
-    },
-    "New Zealand Dollar" : {
-      "comment" : "Currency name: NZD",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Novozélandský dolar"
           }
         }
       }
@@ -11158,13 +12291,34 @@
       }
     },
     "Seed backup not stored in iCloud." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La copia de seguridad de la frase de recuperación no se almacena en iCloud."
+          }
+        }
+      }
     },
     "Select a fee to see the amount." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccione una tarifa para ver el monto."
+          }
+        }
+      }
     },
     "select miner fee when sending on-chain" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "seleccione la tarifa de minero al enviar en cadena"
+          }
+        }
+      }
     },
     "Send" : {
       "localizations" : {
@@ -11896,34 +13050,110 @@
 
     },
     "Show most recent 1 payment" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar 1 pago más reciente"
+          }
+        }
+      }
     },
     "Show most recent 3 payments" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar los 3 pagos más recientes"
+          }
+        }
+      }
     },
     "Show most recent 5 payments" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar los 5 pagos más recientes"
+          }
+        }
+      }
     },
     "Show most recent 10 payments" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar los 10 pagos más recientes"
+          }
+        }
+      }
     },
     "Show most recent 15 payments" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar los 15 pagos más recientes"
+          }
+        }
+      }
     },
     "Show most recent 20 payments" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar los 20 pagos más recientes"
+          }
+        }
+      }
     },
     "Show most recent:" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar lo más reciente:"
+          }
+        }
+      }
     },
     "Show only in-flight payments" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar solo pagos en camino"
+          }
+        }
+      }
     },
     "Show only:" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar solo:"
+          }
+        }
+      }
     },
     "Show original fiat amount" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar cantidad fiat original"
+          }
+        }
+      }
     },
     "Show payments within the last 1 minute" : {
       "comment" : "Recent payments option"
@@ -12617,10 +13847,24 @@
       }
     },
     "The displayed fiat value will be the current price, based on the current fiat/bitcoin exchange rate." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El valor fiat mostrado será el precio actual, basado en el tipo de cambio actual fiat/bitcoin."
+          }
+        }
+      }
     },
     "The displayed fiat value will be the price you paid at the time of the payment." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El valor fiat mostrado será el precio que pagó en el momento del pago."
+          }
+        }
+      }
     },
     "The fee is **%@%%** with a minimum fee of **%@**." : {
       "comment" : "IntroView",
@@ -12969,17 +14213,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cette adresse est dérivée de votre clé et vous appartient."
-          }
-        }
-      }
-    },
-    "This app is experimental. Please backup your seed. You can report issues to phoenix@acinq.co." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tato aplikace je experimentální. Zálohujte prosím svůj seed. Problémy můžete nahlásit na phoenix@acinq.co."
           }
         }
       }
