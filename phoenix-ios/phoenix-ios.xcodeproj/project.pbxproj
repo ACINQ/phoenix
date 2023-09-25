@@ -74,7 +74,6 @@
 		DC2CE3AF29AFEB0500BA0B00 /* Bundle+Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */; };
 		DC2CE54D28A3D2F50070A2E1 /* TruncatableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2CE54C28A3D2F50070A2E1 /* TruncatableView.swift */; };
 		DC2CE55028A52AD90070A2E1 /* RecentPaymentsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2CE54F28A52AD90070A2E1 /* RecentPaymentsConfig.swift */; };
-		DC2CFA93273C7874007AACB9 /* Currencies.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC2CFA91273C7874007AACB9 /* Currencies.strings */; };
 		DC2DC8682906AC0B0079E570 /* BitcoinUnitSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2DC8672906AC0B0079E570 /* BitcoinUnitSelector.swift */; };
 		DC2DC86A2906AC620079E570 /* FiatCurrencySelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2DC8692906AC620079E570 /* FiatCurrencySelector.swift */; };
 		DC2F431427B6972C0006FCC4 /* SwapInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F431327B6972C0006FCC4 /* SwapInView.swift */; };
@@ -118,8 +117,6 @@
 		DC49DA8E258BB882005BC4BC /* ScaledButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */; };
 		DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC59377027516296003B4B53 /* Sequence+Sum.swift */; };
 		DC5A935329846044004F19FD /* FileHandle+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5A935229846043004F19FD /* FileHandle+Async.swift */; };
-		DC5AF4542677BBF7003C911B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC5AF4522677BBF7003C911B /* InfoPlist.strings */; };
-		DC5AF4572677BBF7003C911B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC5AF4552677BBF7003C911B /* Localizable.strings */; };
 		DC5CA4ED28F83C3B0048A737 /* DrainWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */; };
 		DC5CA4EF28F842F10048A737 /* MVI+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5CA4EE28F842F10048A737 /* MVI+Extensions.swift */; };
 		DC5EE4C927679C6300A3035C /* RestoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5EE4C827679C6300A3035C /* RestoreView.swift */; };
@@ -152,6 +149,9 @@
 		DC682FE8258175CE00CA1114 /* Popover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC682FE7258175CE00CA1114 /* Popover.swift */; };
 		DC6CF35B2938F32E001837EE /* ListBackgroundColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6CF35A2938F32E001837EE /* ListBackgroundColor.swift */; };
 		DC6D26E329E76557006A7814 /* AnimatedClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6D26E229E76557006A7814 /* AnimatedClock.swift */; };
+		DC6D68252AC1DD5C0099929F /* Currencies.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DC6D68242AC1DD5C0099929F /* Currencies.xcstrings */; };
+		DC6D68272AC1DD5C0099929F /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DC6D68262AC1DD5C0099929F /* Localizable.xcstrings */; };
+		DC6D68292AC1DD5C0099929F /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DC6D68282AC1DD5C0099929F /* InfoPlist.xcstrings */; };
 		DC71E7302723240E0063613D /* KotlinObservables.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E72F2723240E0063613D /* KotlinObservables.swift */; };
 		DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E7322728645B0063613D /* CurrencyConverterView.swift */; };
 		DC71E7352728A5720063613D /* KotlinIdentifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E7342728A5720063613D /* KotlinIdentifiable.swift */; };
@@ -363,9 +363,6 @@
 		7555FF9C242A565B00829871 /* phoenix-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "phoenix-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "phoenix-iosUITests.swift"; sourceTree = "<group>"; };
 		7555FFA2242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		967728A5267D16B00072C5F0 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		967728A6267D16B00072C5F0 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
-		96F5FBE627AD7A6A00EF5DFC /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Currencies.strings; sourceTree = "<group>"; };
 		C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrumConfigurationView.swift; sourceTree = "<group>"; };
 		C8D7A209301A31C14A982ECD /* InitializationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitializationView.swift; sourceTree = "<group>"; };
 		C8D7A2327BC90150A3E1493D /* AboutView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
@@ -383,8 +380,6 @@
 		DC0994AF263A074C003031CA /* InfoGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoGrid.swift; sourceTree = "<group>"; };
 		DC0D2EA42939269800284608 /* KotlinExtensions+CloudKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+CloudKit.swift"; sourceTree = "<group>"; };
 		DC0D2EA62939273B00284608 /* KotlinExtensions+Payments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Payments.swift"; sourceTree = "<group>"; };
-		DC0E31B626EF85B4002071C6 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
-		DC0E31B726EF85B4002071C6 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DC0E31B826EF85B4002071C6 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = cs; path = cs.lproj/about.html; sourceTree = "<group>"; };
 		DC0E31BA26EFDED4002071C6 /* VSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VSlider.swift; sourceTree = "<group>"; };
 		DC118BF727B44E6E0080BBAC /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
@@ -419,7 +414,6 @@
 		DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Icon.swift"; sourceTree = "<group>"; };
 		DC2CE54C28A3D2F50070A2E1 /* TruncatableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TruncatableView.swift; sourceTree = "<group>"; };
 		DC2CE54F28A52AD90070A2E1 /* RecentPaymentsConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecentPaymentsConfig.swift; sourceTree = "<group>"; };
-		DC2CFA92273C7874007AACB9 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Currencies.strings; sourceTree = "<group>"; };
 		DC2DC8672906AC0B0079E570 /* BitcoinUnitSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinUnitSelector.swift; sourceTree = "<group>"; };
 		DC2DC8692906AC620079E570 /* FiatCurrencySelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiatCurrencySelector.swift; sourceTree = "<group>"; };
 		DC2F431327B6972C0006FCC4 /* SwapInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInView.swift; sourceTree = "<group>"; };
@@ -460,8 +454,6 @@
 		DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaledButtonStyle.swift; sourceTree = "<group>"; };
 		DC59377027516296003B4B53 /* Sequence+Sum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Sum.swift"; sourceTree = "<group>"; };
 		DC5A935229846043004F19FD /* FileHandle+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileHandle+Async.swift"; sourceTree = "<group>"; };
-		DC5AF4532677BBF7003C911B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		DC5AF4562677BBF7003C911B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrainWalletView.swift; sourceTree = "<group>"; };
 		DC5CA4EE28F842F10048A737 /* MVI+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MVI+Extensions.swift"; sourceTree = "<group>"; };
 		DC5EE4C827679C6300A3035C /* RestoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestoreView.swift; sourceTree = "<group>"; };
@@ -485,6 +477,9 @@
 		DC682FE7258175CE00CA1114 /* Popover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Popover.swift; sourceTree = "<group>"; };
 		DC6CF35A2938F32E001837EE /* ListBackgroundColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListBackgroundColor.swift; sourceTree = "<group>"; };
 		DC6D26E229E76557006A7814 /* AnimatedClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedClock.swift; sourceTree = "<group>"; };
+		DC6D68242AC1DD5C0099929F /* Currencies.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Currencies.xcstrings; sourceTree = "<group>"; };
+		DC6D68262AC1DD5C0099929F /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		DC6D68282AC1DD5C0099929F /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		DC71E72F2723240E0063613D /* KotlinObservables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinObservables.swift; sourceTree = "<group>"; };
 		DC71E7322728645B0063613D /* CurrencyConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterView.swift; sourceTree = "<group>"; };
 		DC71E7342728A5720063613D /* KotlinIdentifiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinIdentifiable.swift; sourceTree = "<group>"; };
@@ -586,8 +581,6 @@
 		DCEE3E532931446A00EB4DFF /* Collections+AsInt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collections+AsInt.swift"; sourceTree = "<group>"; };
 		DCEE8997288605FD00FE42DD /* PaymentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCell.swift; sourceTree = "<group>"; };
 		DCEFD921276A796800001767 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
-		DCF9312C279F1A4D00FD7776 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		DCF9312D279F1A6200FD7776 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DCF9312F279F1BD900FD7776 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = ar; path = ar.lproj/about.html; sourceTree = "<group>"; };
 		DCFA8758260E6F2E00AE8953 /* IntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroView.swift; sourceTree = "<group>"; };
 		DCFA876C260E91E600AE8953 /* IntroContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroContainer.swift; sourceTree = "<group>"; };
@@ -761,9 +754,9 @@
 				DC67654D25655D93004D4263 /* Colors.xcassets */,
 				7555FF89242A565B00829871 /* LaunchScreen.storyboard */,
 				7555FF8C242A565B00829871 /* Info.plist */,
-				DC2CFA91273C7874007AACB9 /* Currencies.strings */,
-				DC5AF4552677BBF7003C911B /* Localizable.strings */,
-				DC5AF4522677BBF7003C911B /* InfoPlist.strings */,
+				DC6D68242AC1DD5C0099929F /* Currencies.xcstrings */,
+				DC6D68262AC1DD5C0099929F /* Localizable.xcstrings */,
+				DC6D68282AC1DD5C0099929F /* InfoPlist.xcstrings */,
 				DC72C2F025A3CBD6008A927A /* GoogleService-Info.plist */,
 				DC72C2B925A3A450008A927A /* Phoenix.entitlements */,
 				7555FF86242A565B00829871 /* Preview Content */,
@@ -1454,16 +1447,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				DC99E94D25BA258C00FB20F7 /* about.html in Resources */,
-				DC2CFA93273C7874007AACB9 /* Currencies.strings in Resources */,
-				DC5AF4572677BBF7003C911B /* Localizable.strings in Resources */,
 				7555FF8B242A565B00829871 /* LaunchScreen.storyboard in Resources */,
 				DC9E7EC62A1295B100A5F1D0 /* liquidity.html in Resources */,
 				DC99E95825BA2BA800FB20F7 /* common.css in Resources */,
+				DC6D68272AC1DD5C0099929F /* Localizable.xcstrings in Resources */,
 				7555FF88242A565B00829871 /* Preview Assets.xcassets in Resources */,
+				DC6D68292AC1DD5C0099929F /* InfoPlist.xcstrings in Resources */,
 				DC67654E25655D93004D4263 /* Colors.xcassets in Resources */,
 				DC72C2F125A3CBD6008A927A /* GoogleService-Info.plist in Resources */,
 				DC34399F276CEFB600CAA73A /* Assets.xcassets in Resources */,
-				DC5AF4542677BBF7003C911B /* InfoPlist.strings in Resources */,
+				DC6D68252AC1DD5C0099929F /* Currencies.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1848,37 +1841,6 @@
 				7555FF8A242A565B00829871 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-		DC2CFA91273C7874007AACB9 /* Currencies.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DC2CFA92273C7874007AACB9 /* es */,
-				96F5FBE627AD7A6A00EF5DFC /* fr */,
-			);
-			name = Currencies.strings;
-			sourceTree = "<group>";
-		};
-		DC5AF4522677BBF7003C911B /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DC5AF4532677BBF7003C911B /* es */,
-				967728A5267D16B00072C5F0 /* fr */,
-				DC0E31B726EF85B4002071C6 /* cs */,
-				DCF9312C279F1A4D00FD7776 /* ar */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		DC5AF4552677BBF7003C911B /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DC5AF4562677BBF7003C911B /* es */,
-				967728A6267D16B00072C5F0 /* fr */,
-				DC0E31B626EF85B4002071C6 /* cs */,
-				DCF9312D279F1A6200FD7776 /* ar */,
-			);
-			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		DC99E94825BA258C00FB20F7 /* about.html */ = {
