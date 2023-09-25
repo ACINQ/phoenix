@@ -166,4 +166,8 @@ data class LnurlAuth(
             }
         }
     }
+
+    override fun toString(): String {
+        return "LnurlAuth(action=$action, initialUrl=$initialUrl)".take(100)
+    }
 }

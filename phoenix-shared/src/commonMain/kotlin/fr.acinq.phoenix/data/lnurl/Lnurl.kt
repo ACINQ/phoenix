@@ -79,7 +79,6 @@ sealed interface Lnurl {
                 log.debug { "parsing as lnurl source=$source" }
                 parseBech32Url(input)
             } catch (bech32Ex: Exception) {
-                log.info { "cannot parse source as a bech32 lnurl: ${bech32Ex.message ?: bech32Ex::class}" }
                 try {
                     if (lud17Schemes.any { input.startsWith(it, ignoreCase = true) }) {
                         parseNonBech32Lud17(input)
@@ -89,7 +88,7 @@ sealed interface Lnurl {
                         parseNonBech32Http(input)
                     }
                 } catch (nonBech32Ex: Exception) {
-                    log.info { "cannot parse source as non-bech32 lnurl: ${nonBech32Ex.message ?: nonBech32Ex::class}" }
+                    log.info { "cannot parse source as non-bech32 lnurl: ${nonBech32Ex.message ?: nonBech32Ex::class} or as a bech32 lnurl: ${bech32Ex.message ?: bech32Ex::class}" }
                     throw LnurlError.Invalid(cause = nonBech32Ex)
                 }
             }
@@ -118,7 +117,6 @@ sealed interface Lnurl {
         private fun parseBech32Url(source: String): Url {
             val (hrp, data) = Bech32.decode(source)
             val payload = Bech32.five2eight(data, 0).decodeToString()
-            log.debug { "reading serialized lnurl with hrp=$hrp and payload=$payload" }
             val url = URLBuilder(payload).build()
             if (!url.protocol.isSecure()) throw LnurlError.UnsafeResource
             return url
@@ -208,11 +206,11 @@ sealed interface Lnurl {
             return try {
                 if (response.status.isSuccess()) {
                     val json: JsonObject = Json.decodeFromString(response.bodyAsText(Charsets.UTF_8))
-                    log.debug { "lnurl service=${url.host} returned response=$json" }
+                    log.debug { "lnurl service=${url.host} returned response=${json.toString().take(100)}" }
                     if (json["status"]?.jsonPrimitive?.content?.trim()?.equals("error", true) == true) {
-                        log.error { "lnurl service=${url.host} returned error=$json" }
-                        val message = json["reason"]?.jsonPrimitive?.content ?: ""
-                        throw LnurlError.RemoteFailure.Detailed(url.host, message.take(160).replace("<", ""))
+                        val errorMessage = json["reason"]?.jsonPrimitive?.content ?: ""
+                        log.error { "lnurl service=${url.host} returned error=$errorMessage" }
+                        throw LnurlError.RemoteFailure.Detailed(url.host, errorMessage.take(160).replace("<", ""))
                     } else {
                         json
                     }

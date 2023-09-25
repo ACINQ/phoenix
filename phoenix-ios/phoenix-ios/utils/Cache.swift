@@ -27,25 +27,11 @@ import Foundation
 ///
 class Cache<Key: Hashable, Value: Any> {
 	
-	private class CacheItem<Value: Any> {
-		
-		unowned var prev: CacheItem<Value>? = nil // linked-list pointer
-		unowned var next: CacheItem<Value>? = nil // linked-list pointer
-		
-		var key: Key
-		var value: Value
-		
-		init(key: Key, value: Value) {
-			self.key = key
-			self.value = value
-		}
-	}
-	
 	private var _countLimit: Int
-	private var _dict: [Key: CacheItem<Value>]
+	private var _dict: [Key: CacheItem<Key, Value>]
 	
-	private unowned var mostRecentCacheItem: CacheItem<Value>? = nil
-	private unowned var leastRecentCacheItem: CacheItem<Value>? = nil
+	private unowned var mostRecentCacheItem: CacheItem<Key, Value>? = nil
+	private unowned var leastRecentCacheItem: CacheItem<Key, Value>? = nil
 	
 	#if Cache_Enable_Statistics
 	private(set) var hitCount: UInt64 = 0
@@ -284,5 +270,19 @@ class Cache<Key: Hashable, Value: Any> {
 		}
 		
 		return results
+	}
+}
+
+fileprivate class CacheItem<Key: Hashable, Value: Any> {
+	
+	unowned var prev: CacheItem<Key, Value>? = nil // linked-list pointer
+	unowned var next: CacheItem<Key, Value>? = nil // linked-list pointer
+	
+	var key: Key
+	var value: Value
+	
+	init(key: Key, value: Value) {
+		self.key = key
+		self.value = value
 	}
 }

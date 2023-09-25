@@ -69,7 +69,7 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
             state = SpliceOutState.Error.Thrown(e)
         }) {
             state = SpliceOutState.Preparing(userAmount = amount, feeratePerByte = feeratePerByte)
-            log.info("preparing splice-out for amount=$amount feerate=${feeratePerByte}sat/vb address=$address")
+            log.debug("preparing splice-out for amount=$amount feerate=${feeratePerByte}sat/vb address=$address")
             val userFeerate = FeeratePerKw(FeeratePerByte(feeratePerByte))
             val scriptPubKey = Parser.addressToPublicKeyScript(chain, address)!!.byteVector()
             val res = peerManager.getPeer().estimateFeeForSpliceOut(
@@ -94,7 +94,7 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
     ) {
         if (state is SpliceOutState.ReadyToSend) {
             state = SpliceOutState.Executing(amount, feerate)
-            log.info("executing splice-out with for=$amount feerate=${feerate}sat/vb address=$address")
+            log.debug("executing splice-out with for=$amount feerate=${feerate}sat/vb address=$address")
             viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
                 log.error("error when executing splice-out: ", e)
                 state = SpliceOutState.Error.Thrown(e)

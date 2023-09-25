@@ -122,7 +122,7 @@ class PaymentsFetcher(
         val key = cacheKey(row, options)
         log.debug { "fetching payment for key=$key" }
         cache[key]?.let {
-            log.debug { "payment found in cache for key=$key, returning info=${it.info}" }
+            log.debug { "payment found in cache for key=$key" }
             continuation.resumeWith(kotlin.Result.success(it.info))
             return@suspendCoroutine
         }

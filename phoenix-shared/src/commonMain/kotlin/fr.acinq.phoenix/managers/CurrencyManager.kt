@@ -502,7 +502,7 @@ class CurrencyManager(
         if (targets.isEmpty()) {
             return
         } else {
-            log.info { "Fetching ${targets.size} exchange rate(s) from ${api.name}" }
+            log.debug { "fetching ${targets.size} exchange rate(s) from ${api.name}" }
             addRefreshTargets(targets)
         }
 
@@ -516,16 +516,13 @@ class CurrencyManager(
         }
         if (fetchedRates.isNotEmpty()) {
             appDb.saveExchangeRates(fetchedRates)
-            log.info { "Successfully refreshed ${fetchedRates.size} exchange rate(s) from ${api.name}" }
+            log.debug { "successfully refreshed ${fetchedRates.size} exchange rate(s) from ${api.name}" }
         }
 
         val fetchedCurrencies = fetchedRates.map { it.fiatCurrency }.toSet()
         val failedCurrencies = targets.minus(fetchedCurrencies)
         if (failedCurrencies.isNotEmpty()) {
-            log.error {
-                "Failed to refresh ${failedCurrencies.size} exchange rate(s) from ${api.name}\n" +
-                " -> ${failedCurrencies.joinToString(",")}"
-            }
+            log.info { "failed to refresh ${failedCurrencies.size} exchange rate(s) from ${api.name}: ${failedCurrencies.joinToString(",").take(30)}" }
         }
 
         // Update all the corresponding values in `refreshList`
@@ -544,14 +541,14 @@ class CurrencyManager(
         val httpResponse: HttpResponse? = try {
             httpClient.get(urlString = "https://blockchain.info/ticker")
         } catch (e: Exception) {
-            log.error { "Failed to get http response from blockchain.info: $e" }
+            log.error { "failed to get exchange rates from blockchain.info: ${e.message}" }
             null
         }
         val parsedResponse: BlockchainInfoResponse? = httpResponse?.let {
             try {
                 json.decodeFromString<BlockchainInfoResponse>(it.bodyAsText())
             } catch (e: Exception) {
-                log.error { "Failed to parse json response from blockchain.info: $e" }
+                log.error { "failed to read exchange rates response from blockchain.info: ${e.message}" }
                 null
             }
         }
@@ -580,14 +577,14 @@ class CurrencyManager(
         val httpResponse: HttpResponse? = try {
             httpClient.get(urlString = "https://api.coinbase.com/v2/exchange-rates?currency=USD")
         } catch (e: Exception) {
-            log.error { "Failed to get http response from api.coinbase.com: $e" }
+            log.error { "failed to get exchange rates from api.coinbase.com: $e" }
             null
         }
         val parsedResponse: CoinbaseResponse? = httpResponse?.let {
             try {
                 json.decodeFromString<CoinbaseResponse>(it.bodyAsText())
             } catch (e: Exception) {
-                log.error { "Failed to parse json response from api.coinbase.com: $e" }
+                log.error { "failed to get exchange rates response from api.coinbase.com: $e" }
                 null
             }
         }
@@ -660,12 +657,12 @@ class CurrencyManager(
                 val httpResponse: HttpResponse = try {
                     http.get("https://api.coindesk.com/v1/bpi/currentprice/$fiat.json")
                 } catch (e: Exception) {
-                    throw WrappedException(e, fiatCurrency, "failed to fetch price from api.coindesk.com")
+                    throw WrappedException(e, fiatCurrency, "failed to get exchange rates from api.coindesk.com")
                 }
                 val parsedResponse: CoinDeskResponse = try {
                     json.decodeFromString(httpResponse.body())
                 } catch (e: Exception) {
-                    throw WrappedException(e, fiatCurrency, "failed to parse price from api.coindesk.com")
+                    throw WrappedException(e, fiatCurrency, "failed to read exchange rates response from api.coindesk.com")
                 }
                 val usdRate = parsedResponse.bpi["USD"]
                 val fiatRate = parsedResponse.bpi[fiat]
@@ -710,14 +707,14 @@ class CurrencyManager(
         val httpResponse: HttpResponse? = try {
             httpClient.get(urlString = "https://api.bluelytics.com.ar/v2/latest")
         } catch (e: Exception) {
-            log.error { "Failed to get http response from api.bluelytics.com.ar: $e" }
+            log.error { "failed to get exchange rates from api.bluelytics.com.ar: $e" }
             null
         }
         val parsedResponse: BluelyticsResponse? = httpResponse?.let {
             try {
                 json.decodeFromString<BluelyticsResponse>(httpResponse.bodyAsText())
             } catch (e: Exception) {
-                log.error { "Failed to parse json response from api.bluelytics.com.ar: $e" }
+                log.error { "failed to get exchange rates response from api.bluelytics.com.ar: $e" }
                 null
             }
         }
@@ -744,14 +741,14 @@ class CurrencyManager(
         val httpResponse: HttpResponse? = try {
             httpClient.get(urlString = "https://api.yadio.io/exrates/USD")
         } catch (e: Exception) {
-            log.error { "Failed to get http response from api.yadio.io: $e" }
+            log.error { "failed to get exchange rates from api.yadio.io: $e" }
             null
         }
         val parsedResponse: YadioResponse? = httpResponse?.let {
             try {
                 json.decodeFromString<YadioResponse>(httpResponse.bodyAsText())
             } catch (e: Exception) {
-                log.error { "Failed to parse json response from api.yadio.io: $e" }
+                log.error { "failed to get exchange rates response from api.yadio.io: $e" }
                 null
             }
         }

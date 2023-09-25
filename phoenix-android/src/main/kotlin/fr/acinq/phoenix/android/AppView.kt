@@ -251,7 +251,7 @@ fun AppView(
                     val paymentId = if (id != null && direction != null) WalletPaymentId.create(direction, id) else null
                     if (paymentId != null) {
                         RequireStarted(walletState, nextUri = "phoenix:payments/${direction}/${id}") {
-                            log.info { "navigating to payment-details id=$id" }
+                            log.debug { "navigating to payment-details id=$id" }
                             PaymentDetailsView(
                                 paymentId = paymentId,
                                 onBackClick = {

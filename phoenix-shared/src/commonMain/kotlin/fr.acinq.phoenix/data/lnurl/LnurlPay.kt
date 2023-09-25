@@ -24,7 +24,6 @@ import fr.acinq.phoenix.data.lnurl.Lnurl.Companion.format
 import fr.acinq.phoenix.data.lnurl.Lnurl.Companion.log
 import fr.acinq.phoenix.db.cloud.b64Decode
 import io.ktor.http.*
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
 
 sealed class LnurlPay : Lnurl.Qualified {
@@ -52,6 +51,14 @@ sealed class LnurlPay : Lnurl.Qualified {
             val unknown: JsonArray?
         ) {
             val lnid: String? by lazy { email ?: identifier }
+
+            override fun toString(): String {
+                return "Metadata(plainText=$plainText, longDesc=${longDesc?.take(50)}, identifier=$identifier, email=$email, imagePng=${imagePng?.take(10)}, imageJpg=${imageJpg?.take(10)})"
+            }
+        }
+
+        override fun toString(): String {
+            return "Intent(minSendable=$minSendable, maxSendable=$maxSendable, metadata=$metadata, maxCommentLength=$maxCommentLength, initialUrl=$initialUrl, callback=$callback)".take(100)
         }
     }
 

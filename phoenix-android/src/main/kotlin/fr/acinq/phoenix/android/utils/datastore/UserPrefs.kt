@@ -105,7 +105,7 @@ object UserPrefs {
         val host = it[PREFS_ELECTRUM_ADDRESS_HOST]?.takeIf { it.isNotBlank() }
         val port = it[PREFS_ELECTRUM_ADDRESS_PORT]
         val pinnedKey = it[PREFS_ELECTRUM_ADDRESS_PINNED_KEY]?.takeIf { it.isNotBlank() }
-        log.info("retrieved electrum address from datastore, host=$host port=$port key=$pinnedKey")
+        log.debug("retrieved electrum address from datastore, host=$host port=$port key=$pinnedKey")
         if (host != null && port != null && pinnedKey == null) {
             ServerAddress(host, port, TcpSocket.TLS.TRUSTED_CERTIFICATES())
         } else if (host != null && port != null && pinnedKey != null) {
@@ -187,7 +187,7 @@ object UserPrefs {
     }
 
     suspend fun saveLiquidityPolicy(context: Context, policy: LiquidityPolicy) = context.userPrefs.edit {
-        log.info("saving new liquidity policy=$policy")
+        log.debug("saving new liquidity policy=$policy")
         val serialisable = when (policy) {
             is LiquidityPolicy.Auto -> InternalLiquidityPolicy.Auto(policy.maxRelativeFeeBasisPoints, policy.maxAbsoluteFee, policy.skipAbsoluteFeeCheck)
             is LiquidityPolicy.Disable -> InternalLiquidityPolicy.Disable

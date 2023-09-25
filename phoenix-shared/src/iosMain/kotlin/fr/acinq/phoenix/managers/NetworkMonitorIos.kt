@@ -46,23 +46,23 @@ actual class NetworkMonitor actual constructor(
         nw_path_monitor_set_update_handler(monitor) { path ->
             val status = when (nw_path_get_status(path)) {
                 nw_path_status_satisfied -> {
-                    logger.info { "status = nw_path_status_satisfied" }
+                    logger.debug { "status = nw_path_status_satisfied" }
                     NetworkState.Available
                 }
                 nw_path_status_satisfiable -> {
-                    logger.info { "status = nw_path_status_satisfiable" }
+                    logger.debug { "status = nw_path_status_satisfiable" }
                     NetworkState.Available
                 }
                 nw_path_status_unsatisfied -> {
-                    logger.info { "status = nw_path_status_unsatisfied" }
+                    logger.debug { "status = nw_path_status_unsatisfied" }
                     NetworkState.NotAvailable
                 }
                 nw_path_status_invalid -> {
-                    logger.info { "status = nw_path_status_invalid" }
+                    logger.debug { "status = nw_path_status_invalid" }
                     NetworkState.NotAvailable
                 }
                 else -> {
-                    logger.info { "status = nw_path_status_unknown" }
+                    logger.debug { "status = nw_path_status_unknown" }
                     NetworkState.NotAvailable
                 }
             }

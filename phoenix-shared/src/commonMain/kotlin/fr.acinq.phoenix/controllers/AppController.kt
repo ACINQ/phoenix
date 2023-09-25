@@ -32,7 +32,7 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(loggerFactory: Logge
             }
         }
 
-        logger.info { "initial model=${truncateLog(firstModel)}" }
+        logger.debug { "initial model=${truncateLog(firstModel)}" }
 
         launch {
             modelChanges.consumeEach { change ->

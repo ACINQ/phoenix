@@ -25,38 +25,38 @@ actual class NetworkMonitor actual constructor(loggerFactory: LoggerFactory, val
 
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
-                        logger.info { "network is now $network" }
+                        logger.debug { "network is now $network" }
                         connectivityManager.isDefaultNetworkActive
                         _networkState.value = NetworkState.Available
                     }
 
                     override fun onBlockedStatusChanged(network: Network, blocked: Boolean) {
                         super.onBlockedStatusChanged(network, blocked)
-                        logger.info { "block status change to $blocked for network=$network"}
+                        logger.debug { "block status change to $blocked for network=$network"}
                     }
 
                     override fun onCapabilitiesChanged(network : Network, networkCapabilities : NetworkCapabilities) {
-                        logger.info { "default network changed capabilities to $networkCapabilities" }
+                        logger.debug { "default network changed capabilities to $networkCapabilities" }
                     }
 
                     override fun onLinkPropertiesChanged(network : Network, linkProperties : LinkProperties) {
-                        logger.info { "default network changed link properties to $linkProperties" }
+                        logger.debug { "default network changed link properties to $linkProperties" }
                     }
 
                     override fun onLosing(network: Network, maxMsToLive: Int) {
                         super.onLosing(network, maxMsToLive)
-                        logger.info { "losing network in ${maxMsToLive}ms..." }
+                        logger.debug { "losing network in ${maxMsToLive}ms..." }
                     }
 
                     override fun onLost(network: Network) {
                         super.onLost(network)
-                        logger.info { "network lost, last default was $network" }
+                        logger.info { "network has been lost" }
                         _networkState.value = NetworkState.NotAvailable
                     }
 
                     override fun onUnavailable() {
                         super.onUnavailable()
-                        logger.info { "network unavailable" }
+                        logger.info { "network is unavailable" }
                         _networkState.value = NetworkState.NotAvailable
                     }
                 }

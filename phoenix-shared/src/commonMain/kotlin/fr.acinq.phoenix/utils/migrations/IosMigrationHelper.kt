@@ -92,7 +92,7 @@ object IosMigrationHelper {
             val swapInAddress = peer.swapInAddress
             val closingScript = Parser.addressToPublicKeyScript(chain, swapInAddress)
             if (closingScript == null) {
-                log.info { "aborting: could not get a valid closing script" }
+                log.warning { "aborting: could not get a valid closing script" }
                 return IosMigrationResult.Failure.InvalidClosingScript
             }
 

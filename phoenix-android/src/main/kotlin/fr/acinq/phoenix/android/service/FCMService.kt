@@ -46,7 +46,7 @@ class FCMService : FirebaseMessagingService() {
                 }
             }
             else -> {
-                log.info("starting phoenix foreground service with reason=$reason")
+                log.debug("starting phoenix foreground service with reason=$reason")
                 startPhoenixForegroundService(reason)
             }
         }

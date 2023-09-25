@@ -176,12 +176,12 @@ private fun LoadingView(
                 is KeyState.Error.Unreadable -> Text(stringResource(id = R.string.startup_error_generic, keyState.message ?: ""))
                 is KeyState.Error.UnhandledSeedType -> Text(stringResource(id = R.string.startup_error_generic, "Unhandled seed type"))
                 is KeyState.Present -> {
-                    log.info { "wallet ready to start with legacyAppStatus=$legacyAppStatus" }
+                    log.debug { "wallet ready to start with legacyAppStatus=$legacyAppStatus" }
                     when (legacyAppStatus) {
                         LegacyAppStatus.Unknown -> {
                             if (Wallet.getEclairDBFile(context).exists()) {
                                 Text(stringResource(id = R.string.startup_wait_legacy_check))
-                                log.info { "found legacy database file while in unknown legacy status; switching to legacy app" }
+                                log.debug { "found legacy database file while in unknown legacy status; switching to legacy app" }
                                 LaunchedEffect(true) {
                                     LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
                                 }

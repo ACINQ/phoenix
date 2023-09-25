@@ -23,6 +23,9 @@ struct SendView: MVIView {
 	
 	@StateObject var toast = Toast()
 	
+	@EnvironmentObject var popoverState: PopoverState
+	
+	@Environment(\.openURL) var openURL
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -128,6 +131,8 @@ struct SendView: MVIView {
 		log.trace("showErrorToast()")
 		
 		let msg: String
+		var websiteLink: URL? = nil
+		
 		if model.reason is Scan.BadRequestReason_Expired {
 			
 			msg = NSLocalizedString(
@@ -168,6 +173,12 @@ struct SendView: MVIView {
 					comment: "Error message - scanning lightning invoice"
 				)
 			case is LnurlError.RemoteFailure_Unreadable:
+				
+				let scheme = serviceError.url.protocol.name.lowercased()
+				if scheme == "https" || scheme == "http" {
+					websiteLink = URL(string: serviceError.url.description())
+				}
+				
 				msg = NSLocalizedString(
 					"Unreadable response from service: \(origin)",
 					comment: "Error message - scanning lightning invoice"
@@ -195,19 +206,47 @@ struct SendView: MVIView {
 				comment: "Error message - scanning lightning invoice"
 			)
 		}
-		toast.pop(
-			msg,
-			colorScheme: colorScheme.opposite,
-			style: .chrome,
-			duration: 30.0,
-			alignment: .middle,
-			showCloseButton: true
-		)
+		
+		if let websiteLink {
+			popoverState.display(dismissable: true) {
+				WebsiteLinkPopover(
+					link: websiteLink,
+					copyAction: copyLink,
+					openAction: openLink
+				)
+			}
+			
+		} else {
+			toast.pop(
+				msg,
+				colorScheme: colorScheme.opposite,
+				style: .chrome,
+				duration: 30.0,
+				alignment: .middle,
+				showCloseButton: true
+			)
+		}
 	}
 	
 	func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
 		log.trace("didReceiveExternalLightningUrl()")
 		
 		mvi.intent(Scan.Intent_Parse(request: urlStr))
+	}
+	
+	func copyLink(_ url: URL) -> Void {
+		log.trace("copyLink()")
+		
+		UIPasteboard.general.string = url.absoluteString
+		toast.pop(
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+			colorScheme: colorScheme.opposite
+		)
+	}
+	
+	func openLink(_ url: URL) -> Void {
+		log.trace("openLink()")
+		
+		openURL(url)
 	}
 }

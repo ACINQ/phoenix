@@ -164,6 +164,11 @@
     <string name="inappnotif_migration_from_legacy_dialog_body">Ne réutilisez pas vos anciennes adresses de swap ! Elles ne fonctionneront plus.\n\nContactez le support si vous le faisiez accidentellement.</string>
 
     <string name="inappnotif_payment_onchain_pending_title">Dépôt on-chain en attente (+%1$s)</string>
+    <plurals name="inappnotif_payments_rejection_overview">
+        <item quantity="one">%1$d paiement entrant refusé récemment</item>
+        <item quantity="many">%1$d paiements entrants refusés récemment</item>
+        <item quantity="other">%1$d paiements entrants refusés récemment</item>
+    </plurals>
     <string name="inappnotif_payment_rejected_title">Paiement refusé (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">La gestion des channels automatisée est désactivée.</string>
     <string name="inappnotif_payment_rejected_over_absolute">Les frais étaient de %1$s, mais votre max est de %2$s.</string>

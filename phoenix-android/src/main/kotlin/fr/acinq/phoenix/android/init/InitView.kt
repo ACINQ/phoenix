@@ -119,7 +119,7 @@ internal class InitViewModel(controller: InitializationController) : MVIControll
         onSeedWritten: () -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
         if (writingState == WritingSeedState.Init) {
-            log.info("a new wallet has been generated, writing mnemonics to disk...")
+            log.debug("writing mnemonics to disk...")
             try {
                 writingState = WritingSeedState.Writing(mnemonics)
                 val existing = SeedManager.loadSeedFromDisk(context)
@@ -128,7 +128,7 @@ internal class InitViewModel(controller: InitializationController) : MVIControll
                     SeedManager.writeSeedToDisk(context, encrypted)
                     writingState = WritingSeedState.WrittenToDisk(encrypted)
                     LegacyPrefsDatastore.saveStartLegacyApp(context, if (isNewWallet) LegacyAppStatus.NotRequired else LegacyAppStatus.Unknown)
-                    log.info("mnemonics has been written to disk")
+                    log.info("a new wallet has been generated and mnemonics have been written to disk")
                 } else {
                     log.warn("cannot overwrite existing seed=${existing.name()}")
                     writingState = WritingSeedState.WrittenToDisk(existing)
