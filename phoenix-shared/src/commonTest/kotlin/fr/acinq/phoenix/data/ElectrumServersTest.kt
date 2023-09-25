@@ -1,10 +1,12 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.lightning.blockchain.electrum.ElectrumConnectionStatus
+import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.io.TcpSocket
-import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.ServerAddress
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import org.kodein.log.LoggerFactory
 import kotlin.test.Ignore
@@ -46,16 +48,16 @@ class ElectrumServersTest {
     fun connect_and_get_fee_mainnet() = runBlocking {
         val res = mainnetElectrumServers.map { server ->
             try {
-                val client = ElectrumClient(TcpSocket.Builder(), this, LoggerFactory.default).apply { connect(server) }
-
-                client.connectionState.first { it is Connection.CLOSED }
-                client.connectionState.first { it is Connection.ESTABLISHING }
-                client.connectionState.first { it is Connection.ESTABLISHED }
-                client.estimateFees(1)
-
+                val client = ElectrumClient(scope = this, loggerFactory = LoggerFactory.default, pingInterval = 30.seconds, rpcTimeout = 5.seconds)
+                client.connect(socketBuilder = TcpSocket.Builder(), serverAddress = server)
+                withTimeout(5.seconds) {
+                    client.connectionStatus.filterIsInstance<ElectrumConnectionStatus.Connected>().first()
+                    val fees = client.estimateFees(1)
+                    println("✅ ${fees?.let { FeeratePerByte(it) }} sat/b (1 block) from ${server.host}:${server.port}")
+                }
                 client.disconnect()
                 client.stop()
-                println("✅ successfully established connection with ${server.host}:${server.port}")
+
                 true
             } catch (e: Exception) {
                 println("❌ failed to establish connection with ${server.host}:${server.port} with tls=${server.tls::class.simpleName}: ${e.message}")
