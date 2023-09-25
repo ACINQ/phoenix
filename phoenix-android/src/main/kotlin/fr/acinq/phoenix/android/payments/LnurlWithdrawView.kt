@@ -47,7 +47,7 @@ fun LnurlWithdrawView(
     onWithdrawClick: (Scan.Intent.LnurlWithdrawFlow) -> Unit
 ) {
     val log = logger("LnurlWithdrawView")
-    log.info { "init lnurl-withdraw view with url=${model.lnurlWithdraw}" }
+    log.debug { "init lnurl-withdraw view with url=${model.lnurlWithdraw}" }
 
     val context = LocalContext.current
     val prefUnit = preferredAmountUnit

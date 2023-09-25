@@ -224,7 +224,7 @@ class PeerManager(
 
     private suspend fun monitorNodeEvents(nodeParams: NodeParams) {
         nodeParams.nodeEvents.collect { event ->
-            logger.info { "collecting node_event=${event::class.simpleName}" }
+            logger.debug { "collecting node_event=${event::class.simpleName}" }
             when (event) {
                 is LiquidityEvents.Rejected -> {
                     notificationsManager.saveLiquidityEventNotification(event)

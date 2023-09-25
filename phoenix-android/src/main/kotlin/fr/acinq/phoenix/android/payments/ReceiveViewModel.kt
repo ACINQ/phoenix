@@ -89,7 +89,7 @@ class ReceiveViewModel(
                 expirySeconds = expirySeconds
             )
             lightningQRBitmap = BitmapHelper.generateBitmap(pr.write()).asImageBitmap()
-            log.info("generated new invoice=${pr.write()}")
+            log.debug("generated new invoice=${pr.write()}")
             lightningInvoiceState = LightningInvoiceState.Show(pr)
         }
     }

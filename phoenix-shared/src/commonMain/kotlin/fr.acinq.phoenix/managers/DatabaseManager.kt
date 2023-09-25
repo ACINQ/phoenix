@@ -43,7 +43,7 @@ class DatabaseManager(
         launch {
             nodeParamsManager.nodeParams.collect { nodeParams ->
                 if (nodeParams == null) return@collect
-                log.info { "nodeParams available: building databases..." }
+                log.debug { "nodeParams available: building databases..." }
 
                 val nodeIdHash = nodeParams.nodeId.hash160().toHexString()
                 val channelsDb = SqliteChannelsDb(

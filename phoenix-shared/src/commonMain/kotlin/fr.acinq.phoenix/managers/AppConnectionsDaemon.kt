@@ -111,6 +111,14 @@ class AppConnectionsDaemon(
             val safeDec = disconnectCount.let { if (it == Int.MIN_VALUE) it else it - 1 }
             return copy(disconnectCount = safeDec)
         }
+
+        override fun toString(): String {
+            val details = when {
+                torIsEnabled -> "should_connect=${if (disconnectCount <= 0) "YES" else "NO ($disconnectCount)" } internet=${if (internetIsAvailable) "OK" else "NOK"} tor=${if (torIsAvailable) "OK" else "NOK" }"
+                else -> "should_connect=${if (disconnectCount <= 0) "YES" else "NO ($disconnectCount)" } internet=${if (internetIsAvailable) "OK" else "NOK"}"
+            }
+            return "can_connect=${canConnect.toString().uppercase()} ($details)"
+        }
     }
 
     private val torControlFlow = MutableStateFlow(TrafficControl())
@@ -136,15 +144,17 @@ class AppConnectionsDaemon(
         ) = launch {
             controlChanges.consumeEach { change ->
                 val newState = controlFlow.value.change()
-                logger.info { "$label = $newState" }
+                if (newState.walletIsAvailable && (label == "peer" || label == "electrum")) {
+                    logger.info { "$label $newState" }
+                }
                 controlFlow.value = newState
             }
         }
 
-        enableControlFlow("torControlFlow", torControlFlow, torControlChanges)
-        enableControlFlow("peerControlFlow", peerControlFlow, peerControlChanges)
-        enableControlFlow("electrumControlFlow", electrumControlFlow, electrumControlChanges)
-        enableControlFlow("httpApiControlFlow", httpApiControlFlow, httpApiControlChanges)
+        enableControlFlow("tor", torControlFlow, torControlChanges)
+        enableControlFlow("peer", peerControlFlow, peerControlChanges)
+        enableControlFlow("electrum", electrumControlFlow, electrumControlChanges)
+        enableControlFlow("apis", httpApiControlFlow, httpApiControlChanges)
 
         // Wallet monitor
         launch {
@@ -242,7 +252,7 @@ class AppConnectionsDaemon(
                     }
                 if (forceDisconnect || !it.canConnect) {
                     peerConnectionJob?.let { job ->
-                        logger.info { "cancel peer connection loop" }
+                        logger.debug { "cancel peer connection loop" }
                         job.cancelAndJoin()
                         peer.disconnect()
                         peerConnectionJob = null
@@ -250,17 +260,17 @@ class AppConnectionsDaemon(
                 }
                 if (it.canConnect) {
                     if (peerConnectionJob == null) {
-                        logger.info { "starting peer connection loop" }
+                        logger.debug { "starting peer connection loop" }
                         peerConnectionJob = connectionLoop(
                             name = "Peer",
                             statusStateFlow = peer.connectionState,
                         ) {
-                            logger.info { "starting actual peer connection job" }
                             peer.socketBuilder = tcpSocketBuilder()
                             try {
+                                logger.info { "calling Peer.connect" }
                                 peer.connect()
                             } catch (e: Exception) {
-                                logger.error(e) { "error when connecting to peer: "}
+                                logger.error { "error when connecting to peer: ${e.message ?: e::class.simpleName}" }
                             }
                         }
                     }
@@ -283,7 +293,7 @@ class AppConnectionsDaemon(
                     }
                 if (forceDisconnect || !it.canConnect) {
                     electrumConnectionJob?.let { job ->
-                        logger.info { "cancel electrum connection loop" }
+                        logger.debug { "cancel electrum connection loop" }
                         job.cancelAndJoin()
                         electrumClient.disconnect()
                         electrumConnectionJob = null
@@ -291,7 +301,7 @@ class AppConnectionsDaemon(
                 }
                 if (it.canConnect) {
                     if (electrumConnectionJob == null) {
-                        logger.info { "starting electrum connection loop" }
+                        logger.debug { "starting electrum connection loop" }
                         electrumConnectionJob = connectionLoop(
                             name = "Electrum",
                             statusStateFlow = electrumClient.connectionStatus.map { it.toConnectionState() }.stateIn(this)
@@ -303,13 +313,13 @@ class AppConnectionsDaemon(
                                 }
                             }
                             if (electrumServerAddress == null) {
-                                logger.info { "ignoring electrum connection opportunity because no server is configured yet" }
+                                logger.debug { "ignoring electrum connection opportunity because no server is configured yet" }
                             } else {
                                 try {
-                                    logger.info { "starting actual electrum connection job to server=$electrumServerAddress" }
+                                    logger.info { "calling ElectrumClient.connect to server=$electrumServerAddress" }
                                     electrumClient.connect(electrumServerAddress, tcpSocketBuilder())
                                 } catch (e: Exception) {
-                                    logger.error(e) { "error when connecting to electrum: "}
+                                    logger.error { "error when connecting to electrum: ${e.message ?: e::class.simpleName}"}
                                 }
                             }
                             _lastElectrumServerAddress.value = electrumServerAddress
@@ -345,16 +355,15 @@ class AppConnectionsDaemon(
         launch {
             var previousElectrumConfig: ElectrumConfig? = null
             configurationManager.electrumConfig.collect { newElectrumConfig ->
-                logger.info { "electrum config changed from=$previousElectrumConfig to $newElectrumConfig" }
                 val changed = when (val oldElectrumConfig = previousElectrumConfig) {
                     null -> newElectrumConfig != null
                     else -> newElectrumConfig != oldElectrumConfig
                 }
                 if (changed) {
-                    logger.info { "electrum config changed: reconnecting..." }
+                    logger.info { "electrum config has changed: from=$previousElectrumConfig to $newElectrumConfig, reconnecting..." }
                     electrumControlChanges.send { copy(configVersion = configVersion + 1) }
                 } else {
-                    logger.info { "electrum config: no changes" }
+                    logger.debug { "electrum config: no changes" }
                 }
                 previousElectrumConfig = newElectrumConfig
             }

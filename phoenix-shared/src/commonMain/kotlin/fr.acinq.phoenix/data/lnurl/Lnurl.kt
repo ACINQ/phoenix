@@ -79,7 +79,6 @@ sealed interface Lnurl {
                 log.debug { "parsing as lnurl source=$source" }
                 parseBech32Url(input)
             } catch (bech32Ex: Exception) {
-                log.info { "cannot parse source as a bech32 lnurl: ${bech32Ex.message ?: bech32Ex::class}" }
                 try {
                     if (lud17Schemes.any { input.startsWith(it, ignoreCase = true) }) {
                         parseNonBech32Lud17(input)
@@ -89,7 +88,7 @@ sealed interface Lnurl {
                         parseNonBech32Http(input)
                     }
                 } catch (nonBech32Ex: Exception) {
-                    log.info { "cannot parse source as non-bech32 lnurl: ${nonBech32Ex.message ?: nonBech32Ex::class}" }
+                    log.info { "cannot parse source as non-bech32 lnurl: ${nonBech32Ex.message ?: nonBech32Ex::class} or as a bech32 lnurl: ${bech32Ex.message ?: bech32Ex::class}" }
                     throw LnurlError.Invalid(cause = nonBech32Ex)
                 }
             }

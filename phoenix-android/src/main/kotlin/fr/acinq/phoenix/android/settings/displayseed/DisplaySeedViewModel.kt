@@ -55,7 +55,7 @@ class DisplaySeedViewModel : ViewModel() {
                     state.value = ReadingSeedState.Error(keyState.message ?: "n/a")
                 }
                 else -> {
-                    log.info("unable to read seed in state=$keyState")
+                    log.warn("unable to read seed in state=$keyState")
                     state.value = ReadingSeedState.Error("unhandled state=${keyState::class.simpleName}")
                 }
             }

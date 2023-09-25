@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity() {
         // force the intent flag to single top, in order to avoid [handleDeepLink] to finish the current activity.
         // this would otherwise clear the app view model, i.e. loose the state which virtually reboots the app
         // TODO: look into detaching the app state from the activity
-        log.info("receive new_intent=$intent")
+        log.debug("receive new_intent=$intent")
         intent!!.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         this.navController?.handleDeepLink(intent)
     }
@@ -129,18 +129,18 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val isDataMigrationExpected = LegacyPrefsDatastore.getDataMigrationExpected(applicationContext).filterNotNull().first()
             if (isDataMigrationExpected) {
-                log.info("ignoring tryReconnect when data migration is in progress")
+                log.debug("ignoring tryReconnect when data migration is in progress")
             } else {
                 val connections = business.connectionsManager.connections.value
                 if (connections.electrum !is Connection.ESTABLISHED) {
                     lifecycleScope.launch {
-                        log.info("resuming app with electrum conn=${connections.electrum}, reconnecting...")
+                        log.info("resuming app with electrum conn=${connections.electrum}, forcing reconnection...")
                         daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Electrum)
                     }
                 }
                 if (connections.peer !is Connection.ESTABLISHED) {
                     lifecycleScope.launch {
-                        log.info("resuming app with peer conn=${connections.peer}, reconnecting...")
+                        log.info("resuming app with peer conn=${connections.peer}, forcing reconnection...")
                         daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
                     }
                 }
@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             log.error("failed to unbind activity from node service: {}", e.localizedMessage)
         }
-        log.info("destroyed main activity")
+        log.debug("destroyed main activity")
     }
 
 }

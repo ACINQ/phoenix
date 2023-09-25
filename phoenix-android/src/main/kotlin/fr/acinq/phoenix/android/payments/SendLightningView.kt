@@ -50,7 +50,7 @@ fun SendLightningPaymentView(
     onPayClick: (Scan.Intent.InvoiceFlow.SendInvoicePayment) -> Unit
 ) {
     val log = logger("SendLightningPaymentView")
-    log.info { "init sendview amount=${paymentRequest.amount} desc=${paymentRequest.description}" }
+    log.debug { "init sendview amount=${paymentRequest.amount} desc=${paymentRequest.description}" }
 
     val context = LocalContext.current
     val balance = business.balanceManager.balance.collectAsState(null).value

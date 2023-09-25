@@ -18,7 +18,6 @@ package fr.acinq.phoenix.android
 
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.ServiceConnection
 import android.os.IBinder
 import androidx.compose.runtime.getValue
@@ -28,8 +27,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import fr.acinq.phoenix.android.security.EncryptedSeed
-import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.service.NodeService
 import fr.acinq.phoenix.android.service.WalletState
 import org.slf4j.LoggerFactory
@@ -46,12 +43,12 @@ class AppViewModel() : ViewModel() {
     /** Connection to the NodeService. */
     val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(component: ComponentName, bind: IBinder) {
-            log.info("connected to NodeService")
+            log.debug("connected to NodeService")
             _service.value = (bind as NodeService.NodeBinder).getService()
         }
 
         override fun onServiceDisconnected(component: ComponentName) {
-            log.info("disconnected from NodeService")
+            log.debug("disconnected from NodeService")
             _service.postValue(null)
         }
     }
@@ -65,7 +62,7 @@ class AppViewModel() : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         service?.shutdown()
-        log.info("AppViewModel has been cleared")
+        log.debug("AppViewModel has been cleared")
     }
 }
 
@@ -77,12 +74,12 @@ class WalletStateLiveData(service: MutableLiveData<NodeService?>) : MediatorLive
         value = service.value?.state?.value ?: WalletState.Disconnected
         addSource(service) { s ->
             if (s == null) {
-                log.info("lost service, force state to Disconnected and remove source")
+                log.debug("lost service, force state to Disconnected and remove source")
                 serviceState?.let { removeSource(it) }
                 serviceState = null
                 value = WalletState.Disconnected
             } else {
-                log.info("service connected, now mirroring service's internal state")
+                log.debug("service connected, now mirroring service's internal state")
                 serviceState = s.state
                 addSource(s.state) {
                     value = it

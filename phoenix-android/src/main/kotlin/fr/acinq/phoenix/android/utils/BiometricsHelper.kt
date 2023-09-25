@@ -63,7 +63,7 @@ object BiometricsHelper {
         activity, object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationError(errorCode: Int, errorString: CharSequence) {
                 super.onAuthenticationError(errorCode, errorString)
-                log.info("authentication error: ($errorCode) $errorString")
+                log.warn("authentication error: ($errorCode) $errorString")
                 if (errorCode != BiometricPrompt.ERROR_NEGATIVE_BUTTON && errorCode != BiometricPrompt.ERROR_USER_CANCELED) {
                     onFailure(errorCode)
                 } else {
@@ -73,13 +73,13 @@ object BiometricsHelper {
 
             override fun onAuthenticationFailed() {
                 super.onAuthenticationFailed()
-                log.info("authentication failure")
+                log.debug("authentication failure")
                 onFailure(null)
             }
 
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
-                log.info("authentication success")
+                log.debug("authentication success")
                 onSuccess(result.cryptoObject)
             }
         }

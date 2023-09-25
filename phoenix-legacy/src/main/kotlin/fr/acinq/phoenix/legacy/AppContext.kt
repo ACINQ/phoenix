@@ -142,7 +142,7 @@ abstract class AppContext : Application() {
 
   /** Get wallet context data from remote endpoint behind cdn. */
   private fun fetchWalletContext(context: Context) {
-    log.info("fetching context from ${Constants.WALLET_CONTEXT_URL}")
+    log.debug("fetching context from ${Constants.WALLET_CONTEXT_URL}")
     Wallet.httpClient.newCall(Request.Builder().url(Constants.WALLET_CONTEXT_URL).build()).enqueue(object : Callback {
       override fun onFailure(call: Call, e: IOException) {
         log.warn("failed to fetch context from ${Constants.WALLET_CONTEXT_URL}: ", e)
@@ -172,7 +172,7 @@ abstract class AppContext : Application() {
 
   /** Retrieve wallet context data from remote endpoint using raw s3 url. */
   private fun fetchWalletContextFallback(context: Context) {
-    log.info("fetching context from ${Constants.WALLET_CONTEXT_URL_FALLBACK}")
+    log.debug("fetching context from ${Constants.WALLET_CONTEXT_URL_FALLBACK}")
     Wallet.httpClient.newCall(Request.Builder().url(Constants.WALLET_CONTEXT_URL_FALLBACK).build()).enqueue(object : Callback {
       override fun onFailure(call: Call, e: IOException) {
         log.warn("failed to fetch context from ${Constants.WALLET_CONTEXT_URL_FALLBACK}: ", e)
@@ -230,7 +230,7 @@ abstract class AppContext : Application() {
     val latestVersion = json.getInt("version")
     val latestCriticalVersion = json.getInt("latest_critical_version")
     if (installedVersion < latestCriticalVersion) {
-      log.info("a critical update (v$latestCriticalVersion) is deemed available")
+      log.debug("a critical update (v$latestCriticalVersion) is deemed available")
       inAppNotifs?.add(InAppNotifications.UPGRADE_WALLET_CRITICAL)
     } else if (latestVersion - installedVersion >= 2) {
       inAppNotifs?.add(InAppNotifications.UPGRADE_WALLET)
@@ -258,7 +258,7 @@ abstract class AppContext : Application() {
       Constants.DEFAULT_TRAMPOLINE_SETTINGS
     }
     trampolineFeeSettings.postValue(remoteTrampolineSettings)
-    log.info("trampoline settings=$remoteTrampolineSettings")
+    log.debug("trampoline settings=$remoteTrampolineSettings")
 
     // -- swap-out settings
     val remoteSwapOutSettings = try {
@@ -275,7 +275,7 @@ abstract class AppContext : Application() {
       Constants.DEFAULT_SWAP_OUT_SETTINGS
     }
     swapOutSettings.postValue(remoteSwapOutSettings)
-    log.info("swap-out settings=$remoteSwapOutSettings")
+    log.debug("swap-out settings=$remoteSwapOutSettings")
 
     // -- swap-in settings
     val remoteSwapInSettings = try {
@@ -292,7 +292,7 @@ abstract class AppContext : Application() {
       null
     }
     swapInSettings.postValue(remoteSwapInSettings)
-    log.info("swap-in settings=$remoteSwapInSettings")
+    log.debug("swap-in settings=$remoteSwapInSettings")
 
     // -- pay-to-open settings
     val remotePayToOpenSettings = try {
@@ -309,7 +309,7 @@ abstract class AppContext : Application() {
       null
     }
     payToOpenSettings.postValue(remotePayToOpenSettings)
-    log.info("pay-to-open settings=$remotePayToOpenSettings")
+    log.debug("pay-to-open settings=$remotePayToOpenSettings")
   }
 
   private fun handleBlockchainInfoTicker(context: Context): Callback {

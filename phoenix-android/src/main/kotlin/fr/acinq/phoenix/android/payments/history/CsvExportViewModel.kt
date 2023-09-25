@@ -132,7 +132,7 @@ class CsvExportViewModel(
             }
             val paymentsCount = rows.size - 1 // offset header row
             if (paymentsCount <= 1) {
-                log.info("no data found for this export attempt")
+                log.debug("no data found for this export attempt")
                 state = CsvExportState.NoData
             } else {
                 // create file & write to disk
@@ -145,7 +145,7 @@ class CsvExportViewModel(
                 }
                 writer.close()
                 val uri = FileProvider.getUriForFile(context, authority, file)
-                log.info("processed $paymentsCount payments to export")
+                log.info("processed $paymentsCount payments CSV export")
                 state = CsvExportState.Success(paymentsCount, uri)
             }
         }

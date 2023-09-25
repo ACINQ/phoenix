@@ -66,10 +66,10 @@ class NodeService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        log.info("creating node service...")
+        log.debug("creating node service...")
         notificationManager = NotificationManagerCompat.from(this)
         refreshFcmToken()
-        log.info("service created")
+        log.debug("service created")
     }
 
     private fun refreshFcmToken() {
@@ -87,7 +87,7 @@ class NodeService : Service() {
     // =========================================================== //
 
     override fun onBind(intent: Intent?): IBinder {
-        log.info("binding node service from intent=$intent")
+        log.debug("binding node service from intent=$intent")
         // UI is binding to the service. The service is not headless anymore and we can remove the notification.
         isHeadless = false
         receivedInBackground.clear()
@@ -130,7 +130,7 @@ class NodeService : Service() {
     /** Called when an intent is called for this service. */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        log.info("start service from intent [ intent=$intent, flag=$flags, startId=$startId ]")
+        log.debug("start service from intent [ intent=$intent, flag=$flags, startId=$startId ]")
         val reason = intent?.getStringExtra(EXTRA_REASON)
 
         val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext)
@@ -142,14 +142,14 @@ class NodeService : Service() {
             }
             encryptedSeed is EncryptedSeed.V2.NoAuth -> {
                 encryptedSeed.decrypt().let {
-                    log.info("successfully decrypted seed in the background, starting wallet...")
+                    log.debug("successfully decrypted seed in the background, starting wallet...")
                     val notif = SystemNotificationHelper.notifyRunningHeadless(applicationContext)
                     startForeground(SystemNotificationHelper.HEADLESS_NOTIF_ID, notif)
                     startBusiness(it, requestCheckLegacyChannels = false)
                 }
             }
             else -> {
-                log.info("unhandled incoming payment with seed=${encryptedSeed?.name()} reason=$reason")
+                log.warn("unhandled incoming payment with seed=${encryptedSeed?.name()} reason=$reason")
                 val notif = when (reason) {
                     "IncomingPayment" -> SystemNotificationHelper.notifyPaymentMissedAppUnavailable(applicationContext)
                     "PendingSettlement" -> SystemNotificationHelper.notifyPendingSettlement(applicationContext)
@@ -342,7 +342,7 @@ class NodeService : Service() {
      */
     @Synchronized
     private fun updateState(newState: WalletState, lazy: Boolean = true) {
-        log.info("updating state from {} to {} with headless={}", _state.value?.name, newState.name, isHeadless)
+        log.debug("updating state from {} to {} with headless={}", _state.value?.name, newState.name, isHeadless)
         if (_state.value != newState) {
             if (lazy) {
                 _state.postValue(newState)

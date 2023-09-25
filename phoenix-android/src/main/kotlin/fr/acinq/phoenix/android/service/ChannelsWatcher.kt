@@ -47,7 +47,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
 
             val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
             if (legacyAppStatus !is LegacyAppStatus.NotRequired) {
-                log.info("abort channels-watcher service in state=${legacyAppStatus.name()}")
+                log.info("aborting channels-watcher service in state=${legacyAppStatus.name()}")
                 InternalData.saveChannelsWatcherOutcome(applicationContext, Outcome.Nominal(currentTimestampMillis()))
                 return Result.success()
             }

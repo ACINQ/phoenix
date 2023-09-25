@@ -105,7 +105,7 @@ class PhoenixBusiness(
     val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(loggerFactory)) }
 
     fun start(startupParams: StartupParams) {
-        logger.info { "starting with params=$startupParams" }
+        logger.debug { "starting with params=$startupParams" }
         if (appConnectionsDaemon == null) {
             logger.debug { "start business" }
             appConfigurationManager.setStartupParams(startupParams)
@@ -142,7 +142,7 @@ class PhoenixBusiness(
     // The (node_id, fcm_token) tuple only needs to be registered once.
     // And after that, only if the tuple changes (e.g. different fcm_token).
     suspend fun registerFcmToken(token: String?) {
-        logger.info { "registering token=$token" }
+        logger.debug { "registering token=$token" }
         peerManager.getPeer().registerFcmToken(token)
     }
 
