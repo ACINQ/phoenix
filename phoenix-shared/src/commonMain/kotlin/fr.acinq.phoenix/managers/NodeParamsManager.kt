@@ -22,6 +22,7 @@ import fr.acinq.lightning.NodeUri
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.shared.BuildVersions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
@@ -64,7 +65,10 @@ class NodeParamsManager(
                     liquidityPolicy = MutableStateFlow(startupParams.liquidityPolicy),
                 )
             }.collect {
+                log.info { "hello!" }
                 log.info { "nodeid=${it.nodeId}" }
+                log.info { "commit=${BuildVersions.PHOENIX_COMMIT}" }
+                log.info { "lightning-kmp version=${BuildVersions.LIGHTNING_KMP_VERSION}" }
                 _nodeParams.value = it
             }
         }
