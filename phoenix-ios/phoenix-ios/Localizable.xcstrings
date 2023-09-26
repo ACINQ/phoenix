@@ -94,6 +94,12 @@
             "state" : "translated",
             "value" : " (ahora)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(maintenant)"
+          }
         }
       }
     },
@@ -104,6 +110,12 @@
             "state" : "translated",
             "value" : " (original)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(à l'époque)"
+          }
         }
       }
     },
@@ -113,6 +125,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : " (Ruta %@)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " (Chemin %@)"
           }
         }
       }
@@ -141,6 +159,12 @@
             "state" : "translated",
             "value" : ""
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "..."
+          }
         }
       }
     },
@@ -150,6 +174,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(al momento del pago)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(au moment du paiement)"
           }
         }
       }
@@ -167,6 +197,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(Dirección Bitcoin)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(adresse Bitcoin)"
           }
         }
       }
@@ -244,6 +280,12 @@
             "state" : "translated",
             "value" : "(count) pagos en camino"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(count) paiements sortants en cours"
+          }
         }
       }
     },
@@ -260,6 +302,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(count) pagos en las últimas 2 horas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(count) paiements les 2 dernières heures"
           }
         }
       }
@@ -278,6 +326,12 @@
             "state" : "translated",
             "value" : "(count) pagos en los últimos 3 días"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(count) paiements les 3 derniers jours"
+          }
         }
       }
     },
@@ -294,6 +348,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(count) pagos en los últimos 7 días"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(count) paiements les 7 derniers jours"
           }
         }
       }
@@ -312,6 +372,12 @@
             "state" : "translated",
             "value" : "(count) pagos en los últimos 10 minutos"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(count) paiements ces 10 dernières minutes"
+          }
         }
       }
     },
@@ -329,6 +395,12 @@
             "state" : "translated",
             "value" : "(count) pagos en las últimas 24 horas"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(count) paiements ces 24 dernières heures"
+          }
         }
       }
     },
@@ -345,6 +417,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(count) pagos en el último minuto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(count) paiements il y a moins d'une minute"
           }
         }
       }
@@ -385,6 +463,12 @@
             "state" : "translated",
             "value" : "(por ejemplo, dirección btc a la que se envió el pago)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(par ex, adresse bitcoin vers laquelle ce paiement a été envoyé)"
+          }
         }
       }
     },
@@ -394,6 +478,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(incluso si Phoenix no se está ejecutando)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(même si Phoenix ne tourne pas)"
           }
         }
       }
@@ -406,6 +496,12 @@
             "state" : "translated",
             "value" : "(ocultar cantidad)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(cacher le montant)"
+          }
         }
       }
     },
@@ -415,6 +511,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(inclusiva)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(inclusif)"
           }
         }
       }
@@ -426,6 +528,12 @@
             "state" : "translated",
             "value" : "(capa 1)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(couche 1)"
+          }
         }
       }
     },
@@ -435,6 +543,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(capa 2)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(couche 2)"
           }
         }
       }
@@ -583,6 +697,12 @@
             "state" : "translated",
             "value" : "(totalPaymentCount) pagos en camino"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(totalPaymentCount) paiements en cours"
+          }
         }
       }
     },
@@ -593,6 +713,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(totalPaymentCount) pagos recientes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(totalPaymentCount) paiements récents"
           }
         }
       }
@@ -631,6 +757,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*"
           }
         }
       }
@@ -706,6 +838,12 @@
             "state" : "translated",
             "value" : ""
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "#%1$lld: %2$@"
+          }
         }
       }
     },
@@ -715,6 +853,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%"
           }
         }
       }
@@ -731,6 +875,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
           }
         }
       }
@@ -839,6 +989,12 @@
             "state" : "translated",
             "value" : ""
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ sats/vByte"
+          }
         }
       }
     },
@@ -900,6 +1056,12 @@
             "state" : "translated",
             "value" : "%@.%@ segundos"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@.%@ secondes"
+          }
         }
       }
     },
@@ -944,6 +1106,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@%@"
           }
         }
       }
@@ -1014,6 +1182,12 @@
             "state" : "translated",
             "value" : "%d canales fueron verificados exitosamente. No se encontraron problemas."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d canaux ont été contrôlés. Aucun problème n'a été détecté."
+          }
         }
       }
     },
@@ -1023,6 +1197,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
           }
         }
       }
@@ -1034,6 +1214,12 @@
             "state" : "translated",
             "value" : "%lld letras restantes"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld caractères restants"
+          }
         }
       }
     },
@@ -1043,6 +1229,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld confirmaciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld confirmations"
           }
         }
       }
@@ -1054,6 +1246,12 @@
             "state" : "translated",
             "value" : "%lld días"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld jours"
+          }
         }
       }
     },
@@ -1063,6 +1261,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld milisegundos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld millisecondes"
           }
         }
       }
@@ -1080,6 +1284,12 @@
             "state" : "translated",
             "value" : "%1$lld de %2$lld"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld de %2$lld"
+          }
         }
       }
     },
@@ -1090,6 +1300,12 @@
             "state" : "translated",
             "value" : "%lld pagos"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld paiements"
+          }
         }
       }
     },
@@ -1099,6 +1315,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld restante"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld restants"
           }
         }
       }
@@ -1172,6 +1394,12 @@
             "state" : "translated",
             "value" : "≈ 1 hora"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ 1 heure"
+          }
         }
       }
     },
@@ -1181,6 +1409,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "≈ 1+ días"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ 1+ jour"
           }
         }
       }
@@ -1192,6 +1426,12 @@
             "state" : "translated",
             "value" : "≈ 10 minutos"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ 10 minutes"
+          }
         }
       }
     },
@@ -1201,6 +1441,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "≈ 30 minutos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ 30 minutes"
           }
         }
       }
@@ -1212,6 +1458,12 @@
             "state" : "translated",
             "value" : ""
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "☹️"
+          }
         }
       }
     },
@@ -1221,6 +1473,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "😃"
           }
         }
       }
@@ -1260,6 +1518,12 @@
             "state" : "translated",
             "value" : "1 canal fue verificado exitosamente. No se encontraron problemas."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 canal vérifié avec succès. Aucun problème trouvé"
+          }
         }
       }
     },
@@ -1269,6 +1533,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 confirmación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 confirmation"
           }
         }
       }
@@ -1288,6 +1558,12 @@
             "state" : "translated",
             "value" : "1 pago en camino"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 paiement sortant en cours"
+          }
         }
       }
     },
@@ -1298,6 +1574,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 pago en camino"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 paiement en cours"
           }
         }
       }
@@ -1310,6 +1592,12 @@
             "state" : "translated",
             "value" : "1 minuto"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 minute"
+          }
         }
       }
     },
@@ -1320,6 +1608,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 pago"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 paiement"
           }
         }
       }
@@ -1338,6 +1632,12 @@
             "state" : "translated",
             "value" : "1 pago en las últimas 2 horas"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 paiement les 2 dernières heures"
+          }
         }
       }
     },
@@ -1354,6 +1654,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 pago en los últimos días "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 paiement les 3 derniers jours"
           }
         }
       }
@@ -1372,6 +1678,12 @@
             "state" : "translated",
             "value" : "1 pago en los últimos 7 días"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 paiement les 7 derniers jours"
+          }
         }
       }
     },
@@ -1388,6 +1700,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 pago en los últimos 10 minutos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 paiement les 10 dernières minutes"
           }
         }
       }
@@ -1406,6 +1724,12 @@
             "state" : "translated",
             "value" : "1 pago en el último minuto"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 paiement la dernière minute"
+          }
         }
       }
     },
@@ -1423,6 +1747,12 @@
             "state" : "translated",
             "value" : "1 pago en las últimas 24 horas"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 paiement les dernières 24 heures"
+          }
         }
       }
     },
@@ -1433,6 +1763,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 pago reciente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 paiement récent"
           }
         }
       }
@@ -1445,6 +1781,12 @@
             "state" : "translated",
             "value" : "2 horas"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 heures"
+          }
         }
       }
     },
@@ -1456,26 +1798,32 @@
             "state" : "translated",
             "value" : "3 días"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 jours"
+          }
         }
       }
     },
     "3 payments" : {
       "comment" : "Recent payments option",
       "localizations" : {
-        "es" : {
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "3 pagos"
+            "value" : "3 paiement"
           }
         }
       }
     },
     "3rd generation lightning tech" : {
       "localizations" : {
-        "es" : {
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tecnología de Lightning de tercera generación"
+            "value" : "Technologie lightning de 3ème génération"
           }
         }
       }
@@ -1483,10 +1831,10 @@
     "5 payments" : {
       "comment" : "Recent payments option",
       "localizations" : {
-        "es" : {
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "5 pagos"
+            "value" : "5 paiements"
           }
         }
       }
@@ -1497,6 +1845,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "6+ confirmaciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "6+ confirmations"
           }
         }
       }
@@ -1509,6 +1863,12 @@
             "state" : "translated",
             "value" : "7 días"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 jours"
+          }
         }
       }
     },
@@ -1519,6 +1879,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "10 minutos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 minutes"
           }
         }
       }
@@ -1531,6 +1897,12 @@
             "state" : "translated",
             "value" : "10 pagos"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 paiements"
+          }
         }
       }
     },
@@ -1541,6 +1913,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "15 pagos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15 paiements"
           }
         }
       }
@@ -1553,6 +1931,12 @@
             "state" : "translated",
             "value" : "20 pagos"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "20 paiements"
+          }
         }
       }
     },
@@ -1563,6 +1947,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "24 horas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "24 heures"
           }
         }
       }
@@ -1637,6 +2027,12 @@
             "state" : "translated",
             "value" : "Es posible que se necesite una tarifa de %1$@ (≈ %2$@) para recibir este pago."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des frais de %1$@ (≈ %2$@) seront peut être nécessaires à la réception de ce paiement."
+          }
         }
       }
     },
@@ -1646,6 +2042,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Está previsto un nuevo intento en unas horas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une nouvelle tentative est prévue dans quelques heures"
           }
         }
       }
@@ -1701,7 +2103,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une erreur temporaire est survenue, et le chargement de Phoenix ne peut se pousuivre."
+            "value" : "Une erreur temporaire est survenue, et le chargement de Phoenix ne peut se poursuivre."
           }
         }
       }
@@ -1712,6 +2114,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abortar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler"
           }
         }
       }
@@ -1752,6 +2160,12 @@
             "state" : "translated",
             "value" : "Acelerar transacción"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accélérer mes transactions"
+          }
         }
       }
     },
@@ -1763,6 +2177,12 @@
             "state" : "translated",
             "value" : "Acelerar transacciones"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accélérer mes transactions"
+          }
         }
       }
     },
@@ -1772,6 +2192,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rango aceptable"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Place acceptable"
           }
         }
       }
@@ -1811,6 +2237,12 @@
             "state" : "translated",
             "value" : "compromisos activos"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commitments actifs"
+          }
         }
       }
     },
@@ -1844,6 +2276,12 @@
             "state" : "translated",
             "value" : "agregando al canal existente"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoute au channel existant"
+          }
         }
       }
     },
@@ -1860,6 +2298,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "dirección"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "adresse"
           }
         }
       }
@@ -1985,6 +2429,12 @@
             "state" : "translated",
             "value" : "Todos los canales de pago estarán cerrados."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tous les canaux de paiements seront fermés"
+          }
         }
       }
     },
@@ -2017,6 +2467,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "cantidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "montant"
           }
         }
       }
@@ -2057,6 +2513,12 @@
             "state" : "translated",
             "value" : "cantidad al momento del pago"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "montant au moment du paiement"
+          }
         }
       }
     },
@@ -2066,6 +2528,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "cantidad basada en el tipo de cambio actual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mont basé sur le taux d'échange actuel"
           }
         }
       }
@@ -2106,6 +2574,12 @@
             "state" : "translated",
             "value" : "cantidad en %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "montant en %@"
+          }
         }
       }
     },
@@ -2116,6 +2590,12 @@
             "state" : "translated",
             "value" : "La cantidad es demasiado alta."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le montant est trop élevé"
+          }
         }
       }
     },
@@ -2125,6 +2605,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La cantidad es demasiado baja."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le montant est trop bas"
           }
         }
       }
@@ -2339,6 +2825,12 @@
             "state" : "translated",
             "value" : "cantidad enviada"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "montant envoyé"
+          }
         }
       }
     },
@@ -2372,6 +2864,12 @@
             "state" : "translated",
             "value" : "Una billetera en cadena derivada de tu semilla.\n\nLa billetera final es donde se envían los fondos de forma predeterminada cuando sus canales Lightning están cerrados."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un wallet on-chain dérivé de la clé de votre wallet.\n\nLe wallet final est là où les fonds sont envoyés par défaut lorsque vos canaux Lightning sont fermés."
+          }
         }
       }
     },
@@ -2381,6 +2879,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Una billetera en cadena derivada de tu semilla.\n\nLa billetera de intercambio es un puente hacia Lightning. Los fondos de esta billetera se transferirán automáticamente a Lightning de acuerdo con la configuración de su política de liquidez."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le wallet de swap-in est un pont vers  Lightning. Les fonds versés sur ce wallet seront automatiquement déplacés vers Lightning, en accord avec votre configuration de gestion de channels."
           }
         }
       }
@@ -2559,6 +3063,12 @@
             "state" : "translated",
             "value" : "Estado de la aplicación"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statut de l'appli"
+          }
         }
       }
     },
@@ -2654,6 +3164,12 @@
             "state" : "translated",
             "value" : "Atención: si la tarifa del mempool de Bitcoin es alta, los pagos entrantes de LN que requieran una operación en cadena podrían resultar costosos."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attention : si les frais sur le réseau Bitcoin sont élevés, les paiements Lightning qui nécessitent une opération sur la chaîne pourraient s'avérer coûteux."
+          }
         }
       }
     },
@@ -2739,6 +3255,12 @@
             "state" : "translated",
             "value" : "Gestión automatizada de canales"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestion automatisée des channels"
+          }
         }
       }
     },
@@ -2748,6 +3270,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La liquidez entrante automatizada está deshabilitada en la configuración de tarifas entrantes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La gestion automatisée des channels est désactivée."
           }
         }
       }
@@ -2818,6 +3346,12 @@
             "state" : "translated",
             "value" : "Pagos en 2º. plano"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement en arrière-plan"
+          }
         }
       }
     },
@@ -2827,6 +3361,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pagos en 2º. plano"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement en arrière-plan"
           }
         }
       }
@@ -2838,6 +3378,12 @@
             "state" : "translated",
             "value" : "Pagos en segundo plano deshabilitados"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement en arrière-plan désactivés"
+          }
         }
       }
     },
@@ -2848,6 +3394,12 @@
             "state" : "translated",
             "value" : "Pagos en segundo plano deshabilitados."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement en arrière-plan désactivés."
+          }
         }
       }
     },
@@ -2857,6 +3409,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pagos en segundo plano habilitados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement en arrière-plan activés"
           }
         }
       }
@@ -2875,6 +3433,12 @@
             "state" : "translated",
             "value" : "Respaldo"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarde"
+          }
         }
       }
     },
@@ -2884,6 +3448,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Haga una copia de seguridad de su frase de recuperación para evitar perder sus fondos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faites une sauvegarde de votre clé pour éviter de perdre vos fonds."
           }
         }
       }
@@ -2924,6 +3494,12 @@
             "state" : "translated",
             "value" : "¡Mal certificado!"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certificat invalide !"
+          }
         }
       }
     },
@@ -2933,6 +3509,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "saldo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "solde"
           }
         }
       }
@@ -2951,6 +3533,12 @@
             "state" : "translated",
             "value" : "Cantidad base: (amountBitcoin), ≈(amountFiat)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montant de base: (amountBitcoin), ≈(amountFiat)"
+          }
         }
       }
     },
@@ -2961,6 +3549,12 @@
             "state" : "translated",
             "value" : "Por debajo de la tarifa esperada. Algunos pagos pueden ser rechazados."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En deçà des frais attendus. Certains paiements pourraient être rejetés."
+          }
         }
       }
     },
@@ -2970,6 +3564,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mejor previsibilidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meilleure prédictabilité"
           }
         }
       }
@@ -3146,6 +3746,12 @@
             "state" : "translated",
             "value" : "Tarifas de la red Bitcoin pagadas por transacciones en cadena."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frais de réseau payés pour une transaction sur la chaîne Bitcoin"
+          }
         }
       }
     },
@@ -3174,7 +3780,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Frais de réseau Bitcoin payés pour des transactions on-chain. Ce paiement a nécessité 1 transaction."
+            "value" : "Frais de réseau payés pour des transactions sur la chaîne Bitcoin. Ce paiement a nécessité 1 transaction."
           }
         }
       }
@@ -3204,7 +3810,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Frais de réseau Bitcoin payés pour des transactions on-chain. Ce paiement a nécessité (txCount) transactions."
+            "value" : "Frais de réseau payés pour des transactions sur la chaîne Bitcoin. Ce paiement a nécessité (txCount) transactions."
           }
         }
       }
@@ -3215,6 +3821,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bitcoin sobrealimentado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitcoin déchaîné"
           }
         }
       }
@@ -3312,6 +3924,12 @@
             "state" : "translated",
             "value" : "Blockchain"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaîne Bitcoin"
+          }
         }
       }
     },
@@ -3321,6 +3939,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Explorador de blockchain"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explorateur blockchain"
           }
         }
       }
@@ -3361,6 +3985,12 @@
             "state" : "translated",
             "value" : "transmisión"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "émis"
+          }
         }
       }
     },
@@ -3370,6 +4000,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "fecha de transmisión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "émis à"
           }
         }
       }
@@ -3381,6 +4017,12 @@
             "state" : "translated",
             "value" : "aumentar las tarifas (CPFP)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Augmenter les frais (CPFP)"
+          }
         }
       }
     },
@@ -3391,6 +4033,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "aumentar las tarifas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accélérer les transactions"
           }
         }
       }
@@ -3430,6 +4078,12 @@
             "state" : "translated",
             "value" : "Calculando la cantidad..."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calcul du montant..."
+          }
         }
       }
     },
@@ -3440,6 +4094,12 @@
             "state" : "translated",
             "value" : "puede enviar"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "capacité d'envoi"
+          }
         }
       }
     },
@@ -3449,6 +4109,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "cancelar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "annuler"
           }
         }
       }
@@ -3487,6 +4153,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "capacidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "capacité"
           }
         }
       }
@@ -3654,6 +4326,12 @@
             "state" : "translated",
             "value" : "Gestión de canales"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestion automatisée des channels"
+          }
         }
       }
     },
@@ -3663,6 +4341,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Canal no inactivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canal non inactif"
           }
         }
       }
@@ -3674,6 +4358,12 @@
             "state" : "translated",
             "value" : "Canales cerrados"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canaux fermés"
+          }
         }
       }
     },
@@ -3683,6 +4373,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Canales inicializándose..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Initialisation des canaux"
           }
         }
       }
@@ -3694,6 +4390,12 @@
             "state" : "translated",
             "value" : "Los canales con menos del límite de polvo de Bitcoin (546 satoshi) no se pueden migrar. Su saldo va a los mineros de bitcoins."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les canaux contenant moins que la dust-limit Bitcoin (546 satoshi) ne peuvent pas être migrés. Leur solde ira aux mineurs Bitcoin."
+          }
         }
       }
     },
@@ -3703,6 +4405,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verificar configuración de tarifas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurer les frais max"
           }
         }
       }
@@ -3714,6 +4422,12 @@
             "state" : "translated",
             "value" : "Revisalo"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifier"
+          }
         }
       }
     },
@@ -3724,6 +4438,12 @@
             "state" : "translated",
             "value" : "Revisa la ortografía y la conexión a Internet"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifier les typo et votre connexion internet"
+          }
         }
       }
     },
@@ -3733,6 +4453,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Comprobando el blockchain..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérification de la chaîne"
           }
         }
       }
@@ -3795,6 +4521,12 @@
             "state" : "translated",
             "value" : "Comprobando el certificado del servidor..."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérification du certificat"
+          }
         }
       }
     },
@@ -3804,6 +4536,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Comprueba la tarifa relativa al monto del pago entrante. Esto es útil para pagos pequeños."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifie les frais relatifs au montant entrant. Ce contrôle est utile pour les petits montants."
           }
         }
       }
@@ -3830,6 +4568,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Elige el tipo de pago"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez le mode de paiement"
           }
         }
       }
@@ -3892,6 +4636,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Borrar campo de texto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer la saisie"
           }
         }
       }
@@ -3985,6 +4735,12 @@
             "state" : "translated",
             "value" : "Cerrar pantalla completa"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Femer le plein écran"
+          }
         }
       }
     },
@@ -3994,6 +4750,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cerrar hoja"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer la page"
           }
         }
       }
@@ -4041,6 +4803,12 @@
             "state" : "translated",
             "value" : "Respaldo en la nube"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarde dans le cloud"
+          }
         }
       }
     },
@@ -4058,6 +4826,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Respaldo en la Nube"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarde dans le cloud"
           }
         }
       }
@@ -4260,6 +5034,12 @@
             "state" : "translated",
             "value" : "Nombre común:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Common Name :"
+          }
         }
       }
     },
@@ -4328,6 +5108,12 @@
             "state" : "translated",
             "value" : "Configurar los ajustes de tarifas"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurer les frais max"
+          }
         }
       }
     },
@@ -4366,6 +5152,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Confirmar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmer la fermeture"
           }
         }
       }
@@ -4407,6 +5199,12 @@
             "state" : "translated",
             "value" : "Confirmar"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmer la réinitialisation"
+          }
         }
       }
     },
@@ -4440,6 +5238,12 @@
             "state" : "translated",
             "value" : "confirmado"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "confirmé"
+          }
         }
       }
     },
@@ -4450,6 +5254,12 @@
             "state" : "translated",
             "value" : "confirmado en"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "confirmé à"
+          }
         }
       }
     },
@@ -4459,6 +5269,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saldo confirmado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solde confirmé"
           }
         }
       }
@@ -4674,6 +5490,12 @@
             "state" : "translated",
             "value" : "Estado de conexión"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "État de la connexion"
+          }
         }
       }
     },
@@ -4684,6 +5506,12 @@
             "state" : "translated",
             "value" : "Estado de conexión: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "État de la connexion: %@"
+          }
         }
       }
     },
@@ -4693,6 +5521,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Póngase en contacto con el soporte si es necesario."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contactez le support si besoin"
           }
         }
       }
@@ -4705,6 +5539,12 @@
             "state" : "translated",
             "value" : "continuar con el siguiente paso"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "continuer à la prochaine étape"
+          }
         }
       }
     },
@@ -4714,6 +5554,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Controlar las tarifas en cadena"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contrôle des frais on-chain"
           }
         }
       }
@@ -4784,6 +5630,12 @@
             "state" : "translated",
             "value" : "copiar"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "copier"
+          }
         }
       }
     },
@@ -4822,6 +5674,12 @@
             "state" : "translated",
             "value" : "Copiar certificado"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier le certificat"
+          }
         }
       }
     },
@@ -4859,6 +5717,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copiar imagen (código QR)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier le QR code"
           }
         }
       }
@@ -4920,6 +5784,12 @@
             "state" : "translated",
             "value" : "Copiar texto (dirección bitcoin)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier le text (adresse Bitcoin)"
+          }
         }
       }
     },
@@ -4930,6 +5800,12 @@
             "state" : "translated",
             "value" : "Copiar texto (factura lightning)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier le texte (requête Lightning)"
+          }
         }
       }
     },
@@ -4939,6 +5815,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copiar ID de transacción"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier l'identifiant de transaction"
           }
         }
       }
@@ -4996,6 +5878,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se pudo conectar al servicio: (origin)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de se connecter au service: (origin)"
           }
         }
       }
@@ -5131,6 +6019,12 @@
             "state" : "translated",
             "value" : "Selector de moneda"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélection de la monnaie"
+          }
         }
       }
     },
@@ -5140,6 +6034,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Servidor electrum personalizado: ¡certificado incorrecto!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveur Electrum personnalisé : certificat invalide"
           }
         }
       }
@@ -5174,6 +6074,12 @@
             "state" : "translated",
             "value" : "Personalizar en la configuración de iOS"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier dans les paramètres iOS"
+          }
         }
       }
     },
@@ -5184,6 +6090,12 @@
             "state" : "translated",
             "value" : "Personalizar sugerencia"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le pourboire"
+          }
         }
       }
     },
@@ -5193,6 +6105,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Personalizado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personnalisé"
           }
         }
       }
@@ -5233,6 +6151,12 @@
             "state" : "translated",
             "value" : "Zona de peligro"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zone à risques"
+          }
         }
       }
     },
@@ -5272,6 +6196,12 @@
             "state" : "translated",
             "value" : "Disminuir valor"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diminuer la valeur"
+          }
         }
       }
     },
@@ -5310,6 +6240,12 @@
             "state" : "translated",
             "value" : "Borrar"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer"
+          }
         }
       }
     },
@@ -5319,6 +6255,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Elimine todos los datos de la billetera de este dispositivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer toutes les données du portefeuille de cet appareil"
           }
         }
       }
@@ -5330,6 +6272,12 @@
             "state" : "translated",
             "value" : "Eliminar pago"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le paiement"
+          }
         }
       }
     },
@@ -5339,6 +6287,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eliminar el historial de pagos de mi cuenta de iCloud."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer l'historique de paiement de mon compte iCloud."
           }
         }
       }
@@ -5350,6 +6304,12 @@
             "state" : "translated",
             "value" : "¿Eliminar pago?"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le paiement ?"
+          }
         }
       }
     },
@@ -5359,6 +6319,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eliminar la copia de seguridad de la frase de recuperación de mi cuenta de iCloud."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer la sauvegarde de ma clé de mon compte iCloud."
           }
         }
       }
@@ -5370,6 +6336,12 @@
             "state" : "translated",
             "value" : "Eliminar billetera"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le portefeuille"
+          }
         }
       }
     },
@@ -5379,6 +6351,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Archivos de base de datos eliminados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fichiers de base de données supprimés"
           }
         }
       }
@@ -5390,6 +6368,12 @@
             "state" : "translated",
             "value" : "Elementos eliminados del llavero"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Données de la keychain supprimés"
+          }
         }
       }
     },
@@ -5399,6 +6383,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eliminando **historial de pagos** de iCloud"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suppression de **l'historique des paiements** d'iCloud"
           }
         }
       }
@@ -5410,6 +6400,12 @@
             "state" : "translated",
             "value" : "Eliminando **frase de recuperación** de iCloud"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suppression de **la sauvegarde de la clé** d'iCloud"
+          }
         }
       }
     },
@@ -5419,6 +6415,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eliminando datos de **este dispositivo**"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suppression des données de **cet appareil**"
           }
         }
       }
@@ -5430,6 +6432,12 @@
             "state" : "translated",
             "value" : "Eliminando datos de iCloud…"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suppression des données d'iCloud..."
+          }
         }
       }
     },
@@ -5440,6 +6448,12 @@
             "state" : "translated",
             "value" : "Eliminando archivos de base de datos…"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suppression des fichiers de base de données..."
+          }
         }
       }
     },
@@ -5449,6 +6463,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eliminando elementos del llavero..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suppression des données de la keychain..."
           }
         }
       }
@@ -5476,7 +6496,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Suppression du registre…"
+            "value" : "Suppression des registres…"
           }
         }
       }
@@ -5498,7 +6518,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Suppression de la clé de recouvrement sur iCloud…"
+            "value" : "Suppression de la clé de sauvegarde sur iCloud…"
           }
         }
       }
@@ -5591,6 +6611,12 @@
             "state" : "translated",
             "value" : "Descripción"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Description"
+          }
         }
       }
     },
@@ -5652,6 +6678,12 @@
             "state" : "translated",
             "value" : "Descriptor de salida"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descripteur"
+          }
         }
       }
     },
@@ -5691,6 +6723,12 @@
             "state" : "translated",
             "value" : "Desactivado"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactivé"
+          }
         }
       }
     },
@@ -5700,6 +6738,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Deshabilitando la copia de seguridad…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactivation de la sauvegarde..."
           }
         }
       }
@@ -5733,6 +6777,12 @@
             "state" : "translated",
             "value" : "Desconectado durante el intento de splice-out"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déconnexion durant le splice-out"
+          }
         }
       }
     },
@@ -5743,6 +6793,12 @@
             "state" : "translated",
             "value" : "Descartar ventana emergente"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer la bulle"
+          }
         }
       }
     },
@@ -5752,6 +6808,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Descartar hoja"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer la fiche"
           }
         }
       }
@@ -5932,6 +6994,12 @@
             "state" : "translated",
             "value" : "No pierdas tus fondos:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ne perdez pas vos fonds :"
+          }
         }
       }
     },
@@ -5941,6 +7009,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No utilice direcciones de la versión anterior."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ne réutilisez pas les adresses de l'ancienne version"
           }
         }
       }
@@ -5974,6 +7048,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Listo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fait"
           }
         }
       }
@@ -6012,6 +7092,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Descargando pagos desde la nube"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Téléchargement des paiements depuis le cloud"
           }
         }
       }
@@ -6052,6 +7138,12 @@
             "state" : "translated",
             "value" : "Vaciar billetera"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vider mon portefeuille"
+          }
         }
       }
     },
@@ -6068,6 +7160,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "editar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "éditer"
           }
         }
       }
@@ -6142,6 +7240,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Editar Pago"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Éditer le paiement"
           }
         }
       }
@@ -6239,6 +7343,12 @@
             "state" : "translated",
             "value" : "Correo:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email :"
+          }
         }
       }
     },
@@ -6248,6 +7358,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "vacío"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vide"
           }
         }
       }
@@ -6265,6 +7381,12 @@
             "state" : "translated",
             "value" : "Habilite copia de seguridad de iCloud"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer la sauvegarde iCloud"
+          }
         }
       }
     },
@@ -6275,6 +7397,12 @@
             "state" : "translated",
             "value" : "Permitir notificaciones"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoriser les notifications dans le Centre de Notifications iOS"
+          }
         }
       }
     },
@@ -6284,6 +7412,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fecha final"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date de fin"
           }
         }
       }
@@ -6566,6 +7700,12 @@
             "state" : "translated",
             "value" : "ejemplo de pago :"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "example de paiement :"
+          }
         }
       }
     },
@@ -6575,6 +7715,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ejemplo.com"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "example.com"
           }
         }
       }
@@ -6616,6 +7762,12 @@
             "state" : "translated",
             "value" : "Espere recibir %lld pagos por separado."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attendez vous à recevoir %lld paiements séparés."
+          }
         }
       }
     },
@@ -6625,6 +7777,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Explorar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explorer"
           }
         }
       }
@@ -6658,6 +7816,12 @@
             "state" : "translated",
             "value" : "Exportar"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter"
+          }
         }
       }
     },
@@ -6669,6 +7833,12 @@
             "state" : "translated",
             "value" : "Exportar Pagos"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter les paiements"
+          }
         }
       }
     },
@@ -6678,6 +7848,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Exporte su historial de pagos en formato CSV (valores separados por comas)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportez votre historique de paiement au format CSV (format pour tableur)."
           }
         }
       }
@@ -6689,6 +7865,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Exportación fallida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec de l'export"
           }
         }
       }
@@ -6756,6 +7938,12 @@
             "state" : "translated",
             "value" : "Pago fallido"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement échoué"
+          }
         }
       }
     },
@@ -6765,6 +7953,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fallo: canales existentes encontrados en estado de creación media"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur: vous avez des canaux de paiement en cours création"
           }
         }
       }
@@ -6776,6 +7970,12 @@
             "state" : "translated",
             "value" : "Fallo: script de cierre no válido"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur: l'adresse de migration est invalide"
+          }
         }
       }
     },
@@ -6786,6 +7986,12 @@
             "state" : "translated",
             "value" : "Falla: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur: %@"
+          }
         }
       }
     },
@@ -6795,6 +8001,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fallo: error desconocido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur: un problème est survenu"
           }
         }
       }
@@ -6834,6 +8046,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tarifa esperada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frais attendus"
           }
         }
       }
@@ -6937,6 +8155,12 @@
             "state" : "translated",
             "value" : "Actualmente, las tarifas se estiman en alrededor de **%1$@** (≈ %2$@)."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les frais sont actuellement estimés aux alentours de **%1$@** (≈ %2$@)."
+          }
         }
       }
     },
@@ -7028,11 +8252,24 @@
             "state" : "translated",
             "value" : "Obtenido %lld artículo"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Récupération de %lld item"
+          }
         }
       }
     },
     "Fetched %lld items" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Récupération de %lld items"
+          }
+        }
+      }
     },
     "Fetching Invoice" : {
       "comment" : "Progress title",
@@ -7081,7 +8318,14 @@
       }
     },
     "fetching more rows..." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "récupération de nouvelles données..."
+          }
+        }
+      }
     },
     "Fiat" : {
       "localizations" : {
@@ -7135,7 +8379,15 @@
       }
     },
     "Final wallet" : {
-      "comment" : "Navigation Bar Title"
+      "comment" : "Navigation Bar Title",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wallet final"
+          }
+        }
+      }
     },
     "Fix " : {
       "localizations" : {
@@ -7143,6 +8395,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Arreglar "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corriger"
           }
         }
       }
@@ -7153,6 +8411,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Arreglalo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corriger"
           }
         }
       }
@@ -7273,7 +8537,14 @@
       }
     },
     "Force-close channels" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forcer la clôture"
+          }
+        }
+      }
     },
     "Forwarding Invoice" : {
       "comment" : "Progress title",
@@ -7328,6 +8599,12 @@
             "state" : "translated",
             "value" : "Se encontró %lld billeteras en iCloud"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld portefeuilles trouvés dans iCloud"
+          }
         }
       }
     },
@@ -7354,7 +8631,14 @@
       }
     },
     "full payment history" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "historique des paiements"
+          }
+        }
+      }
     },
     "Full Screen" : {
       "localizations" : {
@@ -7385,10 +8669,24 @@
       }
     },
     "funding tx" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "transaction de création"
+          }
+        }
+      }
     },
     "funding txid" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "identifiant de la tx de création"
+          }
+        }
+      }
     },
     "Funds can be sent to a Bitcoin wallet. Make sure the address is correct before sending." : {
       "extractionState" : "manual",
@@ -7566,6 +8864,12 @@
             "state" : "translated",
             "value" : "Empezar"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Démarrer"
+          }
         }
       }
     },
@@ -7576,6 +8880,12 @@
             "state" : "translated",
             "value" : "¡Buenas noticias! ¡Tu transacción ha sido minada!"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bravo ! Votre transaction a été minée."
+          }
         }
       }
     },
@@ -7585,6 +8895,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aquí puede exportar los registros de la aplicación o compartirlos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportez et partagez les logs de l'application."
           }
         }
       }
@@ -7625,6 +8941,12 @@
             "state" : "translated",
             "value" : "cantidad oculta"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "montant caché"
+          }
         }
       }
     },
@@ -7635,11 +8957,24 @@
             "state" : "translated",
             "value" : "Saldo oculto"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montant caché"
+          }
         }
       }
     },
     "High Priority" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Priorité élevée"
+          }
+        }
+      }
     },
     "Home screen" : {
       "comment" : "Navigation bar title",
@@ -7648,6 +8983,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pantalla de inicio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écran d'accueil"
           }
         }
       }
@@ -7658,6 +8999,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pantalla de inicio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écran d'accueil"
           }
         }
       }
@@ -7708,7 +9055,14 @@
       }
     },
     "Host returned status code %d:" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le service a retourné le statut %d"
+          }
+        }
+      }
     },
     "Host returned unreadable response:" : {
       "comment" : "error details",
@@ -7872,11 +9226,24 @@
       }
     },
     "I understand that if I lose my recovery phrase, then I will lose the funds in my wallet." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je comprends que si je perds ma clé de sauvegarde, alors je perdrai les fonds dans mon wallet."
+          }
+        }
+      }
     },
     "iCloud" : {
       "localizations" : {
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud"
+          }
+        },
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "iCloud"
@@ -7920,6 +9287,12 @@
             "state" : "translated",
             "value" : "Respaldo en iCloud"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarde iCloud"
+          }
         }
       }
     },
@@ -7936,6 +9309,12 @@
             "state" : "translated",
             "value" : "Respaldo en iCloud"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarde iCloud"
+          }
         }
       }
     },
@@ -7945,6 +9324,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "¡La copia de seguridad de iCloud no se completó!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sauvegarde iCloud n'a pas abouti"
           }
         }
       }
@@ -8038,6 +9423,12 @@
             "state" : "translated",
             "value" : "Si se hace correctamente, la auto-copia es la opción mas segura."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faite correctement, la sauvegarde manuelle est la plus sécurisée."
+          }
         }
       }
     },
@@ -8100,6 +9491,12 @@
             "state" : "translated",
             "value" : "Si habilita los pagos en segundo plano, podrá recibir pagos siempre que su dispositivo esté conectado a Internet."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous activez les paiements en arrière plan, alors vous pourrez recevoir des paiements tant que votre appareil est connecté à internet."
+          }
         }
       }
     },
@@ -8132,10 +9529,24 @@
       }
     },
     "If you're planning on deleting your wallet data, we recommend waiting until after the closing transactions have been confirmed on the blockchain." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous prévoyez de réinitialiser votre wallet, attendez d'abord que toutes les transactions de clôture de channels soient confirmées sur la blockchain."
+          }
+        }
+      }
     },
     "Ignore" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorer"
+          }
+        }
+      }
     },
     "Image" : {
       "localizations" : {
@@ -8199,7 +9610,14 @@
       }
     },
     "Important messages" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Messages importants"
+          }
+        }
+      }
     },
     "In order to receive this payment, a new payment channel was opened. This is not always required." : {
       "comment" : "Fees explanation",
@@ -8237,29 +9655,84 @@
             "state" : "translated",
             "value" : "pagos en camino"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "paiements en cours"
+          }
         }
       }
     },
     "inactive commitments" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "commitments inactifs"
+          }
+        }
+      }
     },
     "Inbound liquidity is insufficient and you have disabled automated channel management." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre liquidité entrante est insuffisante et vous avez désactivé la gestion automatisée des channels."
+          }
+        }
+      }
     },
     "Inbound liquidity is insufficient." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidité entrante insuffisante"
+          }
+        }
+      }
     },
     "Include amount received" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclure le montant reçu"
+          }
+        }
+      }
     },
     "Include description" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclure la description"
+          }
+        }
+      }
     },
     "Include notes" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclure les notes"
+          }
+        }
+      }
     },
     "Include origin & destination" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclure l'origine et la destination"
+          }
+        }
+      }
     },
     "Include original fiat value" : {
       "localizations" : {
@@ -8267,6 +9740,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Incluir el valor fiat original"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclure la valeur fiduciaire originale"
           }
         }
       }
@@ -8284,6 +9763,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Incluye las taridas del miner de Bitcoin y la tarifa del servicio Swap-Out."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclue les frais de minage du réseau Bitcoin, et les frais pour le service de swap-out."
           }
         }
       }
@@ -8305,19 +9790,54 @@
       }
     },
     "Incoming payments" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiements entrants"
+          }
+        }
+      }
     },
     "Incoming payments sometimes require on-chain transactions. This does not always happen, only when needed." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les paiements entrants nécessitent parfois de faire des transactions sur la chaîne. Ceci n'arrive pas systématiquement, uniquement si besoin."
+          }
+        }
+      }
     },
     "Incoming payments that require on-chain operations will be rejected." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les paiements entrants nécessitant des opérations sur la chaîne seront rejetés."
+          }
+        }
+      }
     },
     "Incoming payments whose fees exceed this value will be rejected." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les paiements entrants nécessitant des frais excédant cette valeur seront rejetés."
+          }
+        }
+      }
     },
     "Increase value" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Augmenter la valeur"
+          }
+        }
+      }
     },
     "info" : {
       "comment" : "button label - try to make it short",
@@ -8343,7 +9863,14 @@
       }
     },
     "Insufficient funds" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fonds insuffisants"
+          }
+        }
+      }
     },
     "Internet" : {
       "comment" : "AppStatusPopover: label",
@@ -8369,10 +9896,24 @@
       }
     },
     "Invalid bitcoin address" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse bitcoin invalide"
+          }
+        }
+      }
     },
     "Invalid date range" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intervalle invalide"
+          }
+        }
+      }
     },
     "Invalid Lightning Request" : {
       "comment" : "toast warning",
@@ -8382,6 +9923,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Neplatný Lighning požadavek"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requête de paiement invalide"
           }
         }
       }
@@ -8409,7 +9956,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Port invalide. Plage acceptée : 1-65535"
+            "value" : "Port invalide. Interval accepté : 1-65535"
           }
         }
       }
@@ -8466,7 +10013,14 @@
       }
     },
     "invoice" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "requête"
+          }
+        }
+      }
     },
     "invoice created" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -8498,7 +10052,14 @@
       }
     },
     "invoice description" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "description de la requête"
+          }
+        }
+      }
     },
     "Invoice expiration" : {
       "localizations" : {
@@ -8672,10 +10233,24 @@
       }
     },
     "know when fees may occur" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vous saurez quand des frais induits sont à prévoir"
+          }
+        }
+      }
     },
     "Last Attempt" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dernière tentative"
+          }
+        }
+      }
     },
     "layer 1 -> 2" : {
       "comment" : "Transaction Info: Explanation",
@@ -8736,7 +10311,14 @@
       }
     },
     "Learn more from our [blog post](https://acinq.co/blog/phoenix-splicing-update)." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En savoir plus sur [notre article de blog](https://acinq.co/blog/phoenix-splicing-update)."
+          }
+        }
+      }
     },
     "Legal" : {
       "localizations" : {
@@ -8761,7 +10343,14 @@
       }
     },
     "Less options" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus d'options"
+          }
+        }
+      }
     },
     "Let's go " : {
       "localizations" : {
@@ -8821,11 +10410,24 @@
             "state" : "translated",
             "value" : "Lightning"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lightning"
+          }
         }
       }
     },
     "lightning fee" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "frais lightning"
+          }
+        }
+      }
     },
     "Lightning fee amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
@@ -8834,6 +10436,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Monto de la tarifa Lightning: (percent), (amountBitcoin), ≈(amountFiat)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montant des frais Lightning : (percent), (amountBitcoin), ≈(amountFiat)"
           }
         }
       }
@@ -8851,6 +10459,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tarifas Lightning"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frais Lightning"
           }
         }
       }
@@ -8949,6 +10563,12 @@
             "state" : "translated",
             "value" : "Factura lightning"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requête Lightning"
+          }
         }
       }
     },
@@ -8981,7 +10601,14 @@
       }
     },
     "Lightning payments are fast and best suited for smaller payments." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les paiements Lightning sont rapides et adaptés aux petits montants"
+          }
+        }
+      }
     },
     "Lightning peer" : {
       "comment" : "AppStatusPopover: label",
@@ -9059,6 +10686,12 @@
             "state" : "translated",
             "value" : "lnurl-auth"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lnurl-auth"
+          }
         }
       }
     },
@@ -9069,14 +10702,34 @@
             "state" : "translated",
             "value" : "lnurl-pay"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lnurl-pay"
+          }
         }
       }
     },
     "Loading wallet..." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement du portefeuille..."
+          }
+        }
+      }
     },
     "Loading…" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement..."
+          }
+        }
+      }
     },
     "local / remote" : {
       "localizations" : {
@@ -9249,7 +10902,14 @@
       }
     },
     "Low Priority" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Priorité basse"
+          }
+        }
+      }
     },
     "Malformed JPG image data" : {
       "localizations" : {
@@ -9331,6 +10991,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Respaldo manual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarde manuelle"
           }
         }
       }
@@ -9431,7 +11097,14 @@
       }
     },
     "max absolute" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "frais absolus max"
+          }
+        }
+      }
     },
     "max fee" : {
       "localizations" : {
@@ -9451,20 +11124,54 @@
             "state" : "translated",
             "value" : "أقصى حد للرسوم :"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "frais max :"
+          }
         }
       }
     },
     "Max fee amount" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montant max des frais"
+          }
+        }
+      }
     },
     "Max fee percent" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pourcentage max des frais"
+          }
+        }
+      }
     },
     "max percent" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pourcentage max"
+          }
+        }
+      }
     },
     "max:" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "max:"
+          }
+        }
+      }
     },
     "Max: " : {
       "localizations" : {
@@ -9495,6 +11202,12 @@
             "state" : "new",
             "value" : "Maximum amount is %1$@, ≈%2$@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le montant maximum est %1$@, ≈%2$@"
+          }
         }
       }
     },
@@ -9516,7 +11229,14 @@
       }
     },
     "Maximum length is %lld characters" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Longueur maximum de %lld caractères"
+          }
+        }
+      }
     },
     "Maximum proportional fee is %@." : {
       "extractionState" : "manual",
@@ -9536,10 +11256,24 @@
       }
     },
     "Medium Priority" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Priorité intermédiaire"
+          }
+        }
+      }
     },
     "Mempool" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mempool"
+          }
+        }
+      }
     },
     "Message" : {
       "comment" : "Label in SummaryInfoGrid",
@@ -9595,11 +11329,24 @@
             "state" : "translated",
             "value" : "Mexické Peso"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peso mexicain"
+          }
         }
       }
     },
     "min:" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "min :"
+          }
+        }
+      }
     },
     "Min: " : {
       "localizations" : {
@@ -9624,10 +11371,24 @@
       }
     },
     "miner fee" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "frais de minage"
+          }
+        }
+      }
     },
     "Miner fee" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frais de minage"
+          }
+        }
+      }
     },
     "Miner fee amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
@@ -9643,14 +11404,35 @@
             "state" : "translated",
             "value" : "Monto de la tarifa del miner: (percent), (amountBitcoin), ≈(amountFiat)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montant des frais de minage : (percent), (amountBitcoin), ≈(amountFiat)"
+          }
         }
       }
     },
     "miner fees" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "frais de minage"
+          }
+        }
+      }
     },
     "Miner Fees" : {
-      "comment" : "Label in SummaryInfoGrid"
+      "comment" : "Label in SummaryInfoGrid",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frais de minage"
+          }
+        }
+      }
     },
     "Minimum amount is %@, ≈%@" : {
       "localizations" : {
@@ -9658,6 +11440,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Minimum amount is %1$@, ≈%2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le montant minimal est %1$@, ≈%2$@"
           }
         }
       }
@@ -9691,10 +11479,24 @@
       }
     },
     "More info " : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus d'informations"
+          }
+        }
+      }
     },
     "More options" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus d'options"
+          }
+        }
+      }
     },
     "Name" : {
       "localizations" : {
@@ -9894,7 +11696,14 @@
       }
     },
     "No available channels. Please check your internet connection." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas de canaux disponibles. Vérifiez votre connexion internet."
+          }
+        }
+      }
     },
     "no description" : {
       "comment" : "placeholder: invoice is description-less",
@@ -9983,10 +11792,24 @@
       }
     },
     "No payments yet" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas de paiements"
+          }
+        }
+      }
     },
     "No pending transactions" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas de transactions en cours"
+          }
+        }
+      }
     },
     "No personal data will be shared with this service." : {
       "localizations" : {
@@ -10011,10 +11834,24 @@
       }
     },
     "No Priority" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune priorité"
+          }
+        }
+      }
     },
     "Node id" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identifiant de noeud"
+          }
+        }
+      }
     },
     "non-invoice payment" : {
       "comment" : "Transaction Info: Explanation",
@@ -10075,7 +11912,14 @@
       }
     },
     "Note: Server must have a certificate" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noter : le serveur doit avoir un certificat"
+          }
+        }
+      }
     },
     "Note: Server must have a valid certificate" : {
       "extractionState" : "manual",
@@ -10152,7 +11996,14 @@
       }
     },
     "Notifications" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications"
+          }
+        }
+      }
     },
     "now" : {
       "localizations" : {
@@ -10240,13 +12091,35 @@
       }
     },
     "on-chain <-> lightning" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "chaîne Bitcoin <-> lightning"
+          }
+        }
+      }
     },
     "On-chain deposit" : {
-      "comment" : "Payment description for received deposit"
+      "comment" : "Payment description for received deposit",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dépôt sur la chaîne"
+          }
+        }
+      }
     },
     "On-chain funds pending (+%@)" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fonds en attente sur la chaîne (+%@)"
+          }
+        }
+      }
     },
     "On-chain funds will automatically be swapped to Lightning if the fee is **less than %@** (%@) of the amount." : {
       "localizations" : {
@@ -10255,11 +12128,24 @@
             "state" : "new",
             "value" : "On-chain funds will automatically be swapped to Lightning if the fee is **less than %1$@** (%2$@) of the amount."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les dépôts sur la chaîne seront automatiquement basculés sur Lightning (swap-in) si les frais représentent **moins de %1$@** (%2$@) du montant."
+          }
         }
       }
     },
     "On-chain funds will automatically be swapped to Lightning if the fee is **less than %@**." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les dépôts sur la chaîne seront automatiquement basculés sur Lightning (swap-in) si les frais sont **inférieurs à %@**."
+          }
+        }
+      }
     },
     "On-Chain Payment" : {
       "comment" : "Generic description for L1 payment",
@@ -10275,11 +12161,24 @@
             "state" : "translated",
             "value" : "Pagos en cadena (On-Chain)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement on-chain"
+          }
         }
       }
     },
     "On-chain transactions are slow, but the fees can be less for large payments." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les transactions sur la chaîne sont lentes, mais les frais y sont moins élevés pour les gros paiements."
+          }
+        }
+      }
     },
     "Only show in-flight outgoing payments." : {
       "comment" : "Recent payments option",
@@ -10295,6 +12194,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Solo mostrar pagos en camino."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uniquement montrer les paiements en cours."
           }
         }
       }
@@ -10328,10 +12233,24 @@
       }
     },
     "Open" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir"
+          }
+        }
+      }
     },
     "Open iOS Settings for Phoenix" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les paramètres iOS pour Phoenix"
+          }
+        }
+      }
     },
     "open link" : {
       "localizations" : {
@@ -10362,10 +12281,24 @@
       }
     },
     "opens browser" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ouvre le navigateur"
+          }
+        }
+      }
     },
     "opens email app" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ouvre l'appli de mail"
+          }
+        }
+      }
     },
     "other" : {
       "comment" : "Option in currency picker list. Sends user to Currency Converter",
@@ -10381,11 +12314,24 @@
             "state" : "translated",
             "value" : "otro"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "autre"
+          }
         }
       }
     },
     "Other" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autre"
+          }
+        }
+      }
     },
     "Output" : {
       "comment" : "Label in SummaryInfoGrid",
@@ -10474,7 +12420,14 @@
       }
     },
     "Path: %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chemin : %@"
+          }
+        }
+      }
     },
     "Pay" : {
       "localizations" : {
@@ -10505,25 +12458,74 @@
       }
     },
     "Pay " : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payer"
+          }
+        }
+      }
     },
     "Pay %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payer %@"
+          }
+        }
+      }
     },
     "Pay %@ " : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payer %@"
+          }
+        }
+      }
     },
     "Pay Invoice" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payer la requête"
+          }
+        }
+      }
     },
     "Pay on-chain" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payer sur la chaîne"
+          }
+        }
+      }
     },
     "Pay with Lightning" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payer avec Lightning"
+          }
+        }
+      }
     },
     "Payment" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement"
+          }
+        }
+      }
     },
     "Payment channels" : {
       "comment" : "Navigation bar title",
@@ -10584,7 +12586,14 @@
       }
     },
     "Payment channels are automatically created when you receive payments." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les canaux de paiement sont créés automatiquement quand vous recevez des paiements."
+          }
+        }
+      }
     },
     "Payment channels are automatically created when you receive payments. Use the **Receive** screen to receive via the Lightning network." : {
       "comment" : "CloseChannelsView\n   ForceCloseChannelsView",
@@ -10617,10 +12626,25 @@
       }
     },
     "payment description" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "description du paiement"
+          }
+        }
+      }
     },
     "Payment Details" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Détails du paiement"
+          }
+        }
+      }
     },
     "payment hash" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -10652,19 +12676,54 @@
       }
     },
     "Payment history" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Historique des paiements"
+          }
+        }
+      }
     },
     "Payment History" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Historique des paiements"
+          }
+        }
+      }
     },
     "Payment history not stored in iCloud." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'historique des paiements n'est pas stocké sur iCloud"
+          }
+        }
+      }
     },
     "Payment may fail" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce paiement pourrait échouer"
+          }
+        }
+      }
     },
     "Payment options" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options de paiement"
+          }
+        }
+      }
     },
     "Payment Options" : {
       "comment" : "Navigation Bar Title",
@@ -10690,7 +12749,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Options des paiements"
+            "value" : "Options de paiement"
           }
         }
       }
@@ -10725,7 +12784,14 @@
       }
     },
     "Payment Part #%lld" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tranche de paiement #%lld"
+          }
+        }
+      }
     },
     "Payment Parts" : {
       "comment" : "Title in DetailsView_IncomingPayment",
@@ -10751,16 +12817,30 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Parties de paiement"
+            "value" : "Tranches de paiement"
           }
         }
       }
     },
     "payment preimage" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "préimage du paiement"
+          }
+        }
+      }
     },
     "Payment received" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement reçu"
+          }
+        }
+      }
     },
     "Payment Received" : {
       "comment" : "Title in DetailsView_IncomingPayment",
@@ -10792,7 +12872,14 @@
       }
     },
     "Payment rejected (+%@)" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement rejeté (+%@)"
+          }
+        }
+      }
     },
     "Payment Request" : {
       "comment" : "Title in DetailsView_IncomingPayment",
@@ -10891,7 +12978,14 @@
       }
     },
     "Payment sent" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement envoyé"
+          }
+        }
+      }
     },
     "Payment Sent" : {
       "comment" : "Title in DetailsView_IncomingPayment",
@@ -10923,7 +13017,14 @@
       }
     },
     "Payment will fail" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le paiement va échouer"
+          }
+        }
+      }
     },
     "Payments" : {
       "comment" : "Navigation bar title",
@@ -10938,6 +13039,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pagos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiements"
           }
         }
       }
@@ -10993,6 +13100,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "النسخ الاحتياطي للمدفوعات"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarde des paiements"
           }
         }
       }
@@ -11055,13 +13168,34 @@
       }
     },
     "pending on-chain confirmation" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "confirmation en attente sur la chaîne"
+          }
+        }
+      }
     },
     "Pending payment" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement en cours"
+          }
+        }
+      }
     },
     "Percentage Check" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contrôle en relatif"
+          }
+        }
+      }
     },
     "Phoenix" : {
       "localizations" : {
@@ -11150,6 +13284,12 @@
             "state" : "translated",
             "value" : "Phoenix zatím protokol LNURL nepodporuje"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix ne supporte pas encore ce protocole LNURL"
+          }
         }
       }
     },
@@ -11205,16 +13345,44 @@
       }
     },
     "Phoenix is self-custodial. You take control." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix est souverain. Vous avez le contrôle de la clé du portefeuille."
+          }
+        }
+      }
     },
     "Phoenix uses payment channels to make Bitcoin fast and private." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix utilise des canaux de paiement pour rendre les paiements Bitcoin rapides et privés."
+          }
+        }
+      }
     },
     "Phoenix v2 has arrived!" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix v2 est arrivé !"
+          }
+        }
+      }
     },
     "Phoenix Version: %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version de Phoenix : %@"
+          }
+        }
+      }
     },
     "Phoenix will try to make the payment using the minimum fee possible." : {
       "extractionState" : "manual",
@@ -11234,7 +13402,14 @@
       }
     },
     "Please check your connection." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez vérifier votre connexion."
+          }
+        }
+      }
     },
     "Please enable Face ID" : {
       "comment" : "Error message in LockView",
@@ -11295,10 +13470,24 @@
       }
     },
     "Please ensure the address is correct" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez vous assurer que l'adresse est correcte."
+          }
+        }
+      }
     },
     "Please enter a valid amount." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez saisir un montant valide."
+          }
+        }
+      }
     },
     "Please restart Phoenix" : {
       "localizations" : {
@@ -11358,7 +13547,14 @@
       }
     },
     "Please sign into iCloud." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veuillez vous authentifier dans iCloud."
+          }
+        }
+      }
     },
     "Please try again" : {
       "localizations" : {
@@ -11383,10 +13579,24 @@
       }
     },
     "plus hidden amount incoming" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "plus un montant entrant masqué"
+          }
+        }
+      }
     },
     "Policy Override" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dérogations"
+          }
+        }
+      }
     },
     "Polish Zloty" : {
       "comment" : "Currency name: PLN",
@@ -11396,6 +13606,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Polský zlotý"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zloty polonais"
           }
         }
       }
@@ -11429,7 +13645,14 @@
       }
     },
     "Prepare Transaction" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préparer la transaction"
+          }
+        }
+      }
     },
     "Privacy" : {
       "comment" : "Navigation bar title",
@@ -11461,7 +13684,14 @@
       }
     },
     "Privacy & Security" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vie privée et Sécurité"
+          }
+        }
+      }
     },
     "Proportianal fee must be at least %@." : {
       "extractionState" : "manual",
@@ -11475,10 +13705,24 @@
       }
     },
     "QR code" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR code"
+          }
+        }
+      }
     },
     "Quick tip" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourci pour les pourboires"
+          }
+        }
+      }
     },
     "Random server" : {
       "comment" : "Connection info",
@@ -11611,10 +13855,25 @@
       }
     },
     "Raw Data" : {
-      "comment" : "ChannelsConfigurationView/ChannelInfoPopup/TabBar"
+      "comment" : "ChannelsConfigurationView/ChannelInfoPopup/TabBar",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Données brutes"
+          }
+        }
+      }
     },
     "Ready For Swap" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prêt à basculer sur Lightning"
+          }
+        }
+      }
     },
     "reason" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -11675,10 +13934,24 @@
       }
     },
     "Receive payment" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recevoir des paiements"
+          }
+        }
+      }
     },
     "Receive quietly" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réception silencieuse"
+          }
+        }
+      }
     },
     "RECEIVED" : {
       "localizations" : {
@@ -11738,13 +14011,36 @@
       }
     },
     "Received multiple payments" : {
-      "comment" : "Push notification title"
+      "comment" : "Push notification title",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Multiples paiements reçus"
+          }
+        }
+      }
     },
     "Received payment" : {
-      "comment" : "Push notification title"
+      "comment" : "Push notification title",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement reçu"
+          }
+        }
+      }
     },
     "Recent activity" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activité récente"
+          }
+        }
+      }
     },
     "recipient pubkey" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -11828,6 +14124,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recovery Seed"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clé de sauvegarde"
           }
         }
       }
@@ -11945,7 +14247,14 @@
       }
     },
     "Remove" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer"
+          }
+        }
+      }
     },
     "Requesting Swap-In Address..." : {
       "extractionState" : "manual",
@@ -12033,16 +14342,46 @@
       }
     },
     "Reset user preferences" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser les préférences utilisateur"
+          }
+        }
+      }
     },
     "Reset wallet" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser le wallet"
+          }
+        }
+      }
     },
     "Resetting user preferences…" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialisation des préférences utilisateur..."
+          }
+        }
+      }
     },
     "Resetting Wallet" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialisation du wallet"
+          }
+        }
+      }
     },
     "Restore my wallet" : {
       "comment" : "Navigation bar title",
@@ -12074,19 +14413,54 @@
       }
     },
     "restoring connections" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "rétablissement des connexions"
+          }
+        }
+      }
     },
     "Retry" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réessayer"
+          }
+        }
+      }
     },
     "Review" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Examiner"
+          }
+        }
+      }
     },
     "Review Transaction" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Examiner la transaction"
+          }
+        }
+      }
     },
     "Revoked commits found on %lld channel(s)!" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commitments révoqués détectés sur %lld canaux !"
+          }
+        }
+      }
     },
     "Romanian Leu" : {
       "comment" : "Currency name: RON",
@@ -12096,6 +14470,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rumunský Leu"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lei roumain"
           }
         }
       }
@@ -12109,11 +14489,24 @@
             "state" : "translated",
             "value" : "Ruský rubl"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rouble russe"
+          }
         }
       }
     },
     "sat" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sat"
+          }
+        }
+      }
     },
     "Satoshis are often preferred because it's easier to work with whole numbers rather than fractions." : {
       "localizations" : {
@@ -12172,6 +14565,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Uložte na bezpečné místo (ne na tento telefon). Pokud ztratíte svůj seed a telefon, ztratíte své finanční prostředky"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegardez la dans un endroit sûr (pas sur ce téléphone). Si vous perdez votre clé et votre téléphone, vous perdez vos fonds."
           }
         }
       }
@@ -12297,6 +14696,12 @@
             "state" : "translated",
             "value" : "La copia de seguridad de la frase de recuperación no se almacena en iCloud."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La clé de sauvegarde n'est pas stockée dans iCloud."
+          }
         }
       }
     },
@@ -12307,6 +14712,12 @@
             "state" : "translated",
             "value" : "Seleccione una tarifa para ver el monto."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionner les frais pour voir le montant final."
+          }
         }
       }
     },
@@ -12316,6 +14727,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "seleccione la tarifa de minero al enviar en cadena"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "choisissez les frais de minage quand vous payez sur la chaîne"
           }
         }
       }
@@ -12349,7 +14766,14 @@
       }
     },
     "Send all funds to a Bitcoin wallet." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyez tous vos fonds vers une adresse Bitcoin"
+          }
+        }
+      }
     },
     "Send Failed" : {
       "comment" : "Title in DetailsView_IncomingPayment",
@@ -12433,13 +14857,34 @@
       }
     },
     "Send payment" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyer le paiement"
+          }
+        }
+      }
     },
     "Send To" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyer à"
+          }
+        }
+      }
     },
     "Sending funds…" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoi des fonds..."
+          }
+        }
+      }
     },
     "Sending payment" : {
       "comment" : "Navigation bar title",
@@ -12607,10 +15052,24 @@
       }
     },
     "Server certificate is trusted." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le certificat est approuvé."
+          }
+        }
+      }
     },
     "Server has untrusted certificate." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le serveur utilise un certificat non reconnu."
+          }
+        }
+      }
     },
     "Server returned error: %@" : {
       "comment" : "error details",
@@ -12776,7 +15235,15 @@
       }
     },
     "Service Fees" : {
-      "comment" : "Label in SummaryInfoGrid"
+      "comment" : "Label in SummaryInfoGrid",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frais de service"
+          }
+        }
+      }
     },
     "Service returned unreadable response" : {
       "comment" : "Error message - scanning lightning invoice",
@@ -12832,10 +15299,24 @@
       }
     },
     "SHA1 Fingerprint:" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empreinte SHA1 :"
+          }
+        }
+      }
     },
     "SHA256 Fingerprint:" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empreinte SHA256 :"
+          }
+        }
+      }
     },
     "share" : {
       "comment" : "button label - try to make it short",
@@ -12850,6 +15331,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "compartir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "partager"
           }
         }
       }
@@ -12911,7 +15398,14 @@
       }
     },
     "Share Image (QR code)" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partager l'image (QR code)"
+          }
+        }
+      }
     },
     "Share Text" : {
       "localizations" : {
@@ -12942,7 +15436,14 @@
       }
     },
     "Share Text (lightning invoice)" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partager le texte (requête Lightning)"
+          }
+        }
+      }
     },
     "Share the logs" : {
       "localizations" : {
@@ -13047,7 +15548,14 @@
       }
     },
     "Show advanced options" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les options avancées"
+          }
+        }
+      }
     },
     "Show most recent 1 payment" : {
       "comment" : "Recent payments option",
@@ -13056,6 +15564,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostrar 1 pago más reciente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer le paiement le plus récent"
           }
         }
       }
@@ -13068,6 +15582,12 @@
             "state" : "translated",
             "value" : "Mostrar los 3 pagos más recientes"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les 3 derniers paiements"
+          }
         }
       }
     },
@@ -13078,6 +15598,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostrar los 5 pagos más recientes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les 5 derniers paiements"
           }
         }
       }
@@ -13090,6 +15616,12 @@
             "state" : "translated",
             "value" : "Mostrar los 10 pagos más recientes"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les 10 derniers paiements"
+          }
         }
       }
     },
@@ -13100,6 +15632,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostrar los 15 pagos más recientes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les 15 derniers paiements"
           }
         }
       }
@@ -13112,6 +15650,12 @@
             "state" : "translated",
             "value" : "Mostrar los 20 pagos más recientes"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les 20 derniers paiements"
+          }
         }
       }
     },
@@ -13121,6 +15665,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostrar lo más reciente:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer le plus récent :"
           }
         }
       }
@@ -13132,6 +15682,12 @@
             "state" : "translated",
             "value" : "Mostrar solo pagos en camino"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer uniquement les paiements en cours"
+          }
         }
       }
     },
@@ -13141,6 +15697,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostrar solo:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer uniquement :"
           }
         }
       }
@@ -13152,11 +15714,25 @@
             "state" : "translated",
             "value" : "Mostrar cantidad fiat original"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer le montant fiduciaire d'origine"
+          }
         }
       }
     },
     "Show payments within the last 1 minute" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les paiements faits dans la dernière minute"
+          }
+        }
+      }
     },
     "Show payments within the last 1 minute." : {
       "comment" : "Recent payments option",
@@ -13173,11 +15749,25 @@
             "state" : "translated",
             "value" : "Mostrar pagos en el último minuto."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les paiements faits dans la dernière minute."
+          }
         }
       }
     },
     "Show payments within the last 2 hours" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les paiements faits dans les deux dernières heures"
+          }
+        }
+      }
     },
     "Show payments within the last 2 hours." : {
       "comment" : "Recent payments option",
@@ -13194,11 +15784,25 @@
             "state" : "translated",
             "value" : "Mostrar pagos en las últimas 2 horas."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les paiements faits dans les deux dernières heures."
+          }
         }
       }
     },
     "Show payments within the last 3 days" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les paiements faits dans les trois derniers jours"
+          }
+        }
+      }
     },
     "Show payments within the last 3 days." : {
       "comment" : "Recent payments option",
@@ -13215,11 +15819,25 @@
             "state" : "translated",
             "value" : "Mostrar pagos en los últimos 3 días."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les paiements faits dans les trois derniers jours."
+          }
         }
       }
     },
     "Show payments within the last 7 days" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les paiements faits dans les septs derniers jours"
+          }
+        }
+      }
     },
     "Show payments within the last 7 days." : {
       "comment" : "Recent payments option",
@@ -13236,11 +15854,25 @@
             "state" : "translated",
             "value" : "Mostrar pagos en los últimos 7 días."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les paiements faits dans les sept derniers jours."
+          }
         }
       }
     },
     "Show payments within the last 10 minutes" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les paiements faits dans les dix dernières minutes"
+          }
+        }
+      }
     },
     "Show payments within the last 10 minutes." : {
       "comment" : "Recent payments option",
@@ -13257,11 +15889,25 @@
             "state" : "translated",
             "value" : "Mostrar pagos en los últimos 10 minutos."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les paiements faits dans les dix dernières minutes."
+          }
         }
       }
     },
     "Show payments within the last 24 hours" : {
-      "comment" : "Recent payments option"
+      "comment" : "Recent payments option",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les paiements faits dans les 24 dernières heures"
+          }
+        }
+      }
     },
     "Show payments within the last 24 hours." : {
       "comment" : "Recent payments option",
@@ -13278,11 +15924,24 @@
             "state" : "translated",
             "value" : "Mostrar pagos en las últimas 24 horas."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les paiements faits dans les 24 dernières heures."
+          }
         }
       }
     },
     "Show payments within the last:" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montrer les paiements faits dans les dernières :"
+          }
+        }
+      }
     },
     "Sign into iCloud to backup your payments" : {
       "localizations" : {
@@ -13321,6 +15980,12 @@
             "state" : "translated",
             "value" : "Singapurský dolar"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dollar singapourien"
+          }
         }
       }
     },
@@ -13353,10 +16018,24 @@
       }
     },
     "Skip absolute fee check for Lightning" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorer la limite max des frais pour Lightning"
+          }
+        }
+      }
     },
     "Skip For Now" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorer pour l'instant"
+          }
+        }
+      }
     },
     "Some Services Disabled" : {
       "localizations" : {
@@ -13416,25 +16095,75 @@
       }
     },
     "Splice already in progress" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un splice est déjà en cours"
+          }
+        }
+      }
     },
     "Splice Out" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Splice-out"
+          }
+        }
+      }
     },
     "Splice-In" : {
-      "comment" : "Transaction Info: Value"
+      "comment" : "Transaction Info: Value",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Splice-in"
+          }
+        }
+      }
     },
     "Splice-out session error" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de session splice-out"
+          }
+        }
+      }
     },
     "Splicing" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Splicing"
+          }
+        }
+      }
     },
     "Start date" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date de début"
+          }
+        }
+      }
     },
     "state" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "état"
+          }
+        }
+      }
     },
     "Status" : {
       "localizations" : {
@@ -13465,13 +16194,35 @@
       }
     },
     "Step #%lld" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étape #%lld"
+          }
+        }
+      }
     },
     "Subject:" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sujet :"
+          }
+        }
+      }
     },
     "Summary" : {
-      "comment" : "ChannelsConfigurationView/ChannelInfoPopup/TabBar"
+      "comment" : "ChannelsConfigurationView/ChannelInfoPopup/TabBar",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En résumé"
+          }
+        }
+      }
     },
     "Swap Fees" : {
       "comment" : "Label in SummaryInfoGrid",
@@ -13486,6 +16237,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tarifas Swap"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frais de swap"
           }
         }
       }
@@ -13527,6 +16284,12 @@
             "state" : "translated",
             "value" : "Swap Out"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swap-out"
+          }
         }
       }
     },
@@ -13560,7 +16323,15 @@
       }
     },
     "Swap-in wallet" : {
-      "comment" : "Navigation Bar Title"
+      "comment" : "Navigation Bar Title",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portefeuille de swap-in"
+          }
+        }
+      }
     },
     "Swap-Out" : {
       "comment" : "Transaction Info: Value",
@@ -13600,6 +16371,12 @@
             "state" : "translated",
             "value" : "Švédská koruna"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couronne suédoise"
+          }
         }
       }
     },
@@ -13611,6 +16388,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Švýcarský frank"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Franc suisse"
           }
         }
       }
@@ -13653,11 +16436,24 @@
             "state" : "translated",
             "value" : "Tchajwanský dolar"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dollar taiwanais"
+          }
         }
       }
     },
     "Tap for more info" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appuyez pour plus d'infos"
+          }
+        }
+      }
     },
     "Terminate App" : {
       "localizations" : {
@@ -13696,14 +16492,34 @@
             "state" : "translated",
             "value" : "Thajský baht"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Baht thailandais"
+          }
         }
       }
     },
     "The **payment history** for this wallet will be deleted from your iCloud account." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'**historique de paiements** pour ce wallet sera supprimée de votre compte iCloud."
+          }
+        }
+      }
     },
     "The **seed backup** for this wallet will be deleted from your iCloud account." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La **sauvegarde de votre clé** sera supprimée de votre compte iCloud."
+          }
+        }
+      }
     },
     "The address is for %@, but you're on %@" : {
       "comment" : "Error message - parsing bitcoin address",
@@ -13736,7 +16552,15 @@
       }
     },
     "The address is not for %@" : {
-      "comment" : "Error message - parsing bitcoin address"
+      "comment" : "Error message - parsing bitcoin address",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'adresse n'est pas %@"
+          }
+        }
+      }
     },
     "The backup phrase, known as a seed, is a list of 12 English words. It allows you to recover full access to your funds if needed." : {
       "extractionState" : "manual",
@@ -13745,6 +16569,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Záložní fráze, známá jako seed, je seznam 12 anglických slov. V případě potřeby vám umožní obnovit plný přístup k vašim finančním prostředkům."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La clé de sauvegarde, aussi connu sous le nom de graine ou \"seed\", est une liste de 12 mots en anglais. Elle vous permet de récupérer l'accès complet à vos fonds si besoin."
           }
         }
       }
@@ -13815,6 +16645,12 @@
             "state" : "translated",
             "value" : "معاملات إغلاق القنوات موجودة في قائمة المعاملات الخاصة بك على __الشاشة الرئيسية__. ويمكنك عرض حالة قنواتك في شاشة __قائمة القنوات__."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La transaction de fermeture sera visible dans votre historique de paiement."
+          }
         }
       }
     },
@@ -13853,6 +16689,12 @@
             "state" : "translated",
             "value" : "El valor fiat mostrado será el precio actual, basado en el tipo de cambio actual fiat/bitcoin."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La valeur fiduciaire sera affichée au prix courant, basé sur les taux de change publics entre monnaie fiduciaire/bitcoin."
+          }
         }
       }
     },
@@ -13862,6 +16704,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El valor fiat mostrado será el precio que pagó en el momento del pago."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La valeur fiduciaire sera affichée au prix de change au moment où le paiement a été fait."
           }
         }
       }
@@ -13903,6 +16751,12 @@
             "state" : "new",
             "value" : "The fee was **%1$@** but your max fee was set to **%2$@**."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les frais étaient de **%1$@** mais vos frais maximum étaient de **%2$@**."
+          }
         }
       }
     },
@@ -13912,6 +16766,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "The fee was **%1$@** which is more than **%2$@** of the amount."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les frais étaient de **%1$@** ce qui est plus que **%2$@** du montant."
           }
         }
       }
@@ -13923,6 +16783,12 @@
             "state" : "new",
             "value" : "The fee was %1$@ but your max fee was set to %2$@."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les frais étaient de %1$@ mais vos frais maximum étaient de %2$@."
+          }
         }
       }
     },
@@ -13933,17 +16799,44 @@
             "state" : "new",
             "value" : "The fee was %1$@ which is more than %2$@ of the amount."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les frais étaient de %1$@ ce qui est plus que %2$@ du montant."
+          }
         }
       }
     },
     "The fee will probably be above your max limit (%@)." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les frais vont probablement dépasser votre limite max (%@)"
+          }
+        }
+      }
     },
     "The final wallet is where funds are sent by default when your Lightning channels are closed." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le wallet final est là où les fonds sont envoyés par défaut lorsque vos canaux Lightning sont fermés."
+          }
+        }
+      }
     },
     "The following steps will be performed:" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les actions suivantes seront appliquées :"
+          }
+        }
+      }
     },
     "The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount** in the payment request." : {
       "comment" : "SendView",
@@ -14035,10 +16928,25 @@
       }
     },
     "The invoice is not for (reason.expected.name)" : {
-      "comment" : "Error message - scanning lightning invoice"
+      "comment" : "Error message - scanning lightning invoice",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette requête n'est pas pour (reason.expected.name)"
+          }
+        }
+      }
     },
     "The invoice is not for %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette requête n'est pas pour %@"
+          }
+        }
+      }
     },
     "The migration will cost %@ (≈ %@)" : {
       "localizations" : {
@@ -14046,6 +16954,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "The migration will cost %1$@ (≈ %2$@)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La migration va coûter %1$@ (≈ %2$@)"
           }
         }
       }
@@ -14115,6 +17029,12 @@
             "state" : "translated",
             "value" : "El servicio ((origin)) parece estar fuera de línea, o tienen un servidor inactivo"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le service ((origin)) semble être hors-ligne, ou leur serveur est indisponible."
+          }
         }
       }
     },
@@ -14131,6 +17051,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El servicio ((origin)) no admite direcciones Lightning o no conoce a este usuario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le service ((origin)) ne supporte pas les adresses Lightning, ou bien ne connaît pas cet utilisateur."
           }
         }
       }
@@ -14165,13 +17091,34 @@
       }
     },
     "The transaction may take 30 minutes or more to confirm on the bitcoin blockchain" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La transaction pourrait prendre plus de 30 minutes pour confirmer sur la chaîne"
+          }
+        }
+      }
     },
     "The wallet will be completely deleted from **this device**." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le portefeuille sera complètement effacé de **cet appareil**."
+          }
+        }
+      }
     },
     "The watchtower occasionally runs in the background (every few days) and monitors your funds to ensure everything is safe." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une routine tourne régulièrement en arrière plan pour surveiller et s'assurer que vos canaux de paiement sont en sécurité."
+          }
+        }
+      }
     },
     "Theme" : {
       "localizations" : {
@@ -14218,7 +17165,14 @@
       }
     },
     "This appears to be a website (not a lightning invoice):" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il semble que ce lien soit pour un site web (et non une requête de paiement)"
+          }
+        }
+      }
     },
     "This doesn't appear to be a Lightning invoice" : {
       "comment" : "Error message - scanning lightning invoice",
@@ -14366,7 +17320,14 @@
       }
     },
     "This feerate is below what your transactions are already using. It should be higher to have any effects." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce taux de frais est en deçà de ce que vos transactions utilisent déjà. Il doit être plus élevé afin d'avoir un quelconque effet."
+          }
+        }
+      }
     },
     "This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." : {
       "extractionState" : "manual",
@@ -14484,10 +17445,24 @@
       }
     },
     "This will reset the app, as if you had just installed it." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette opération va réinitialiser l'application, comme si vous veniez de l'installer."
+          }
+        }
+      }
     },
     "This will reset the app. You will be taken to the Intro screen, and prompted to create or restore a wallet." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette opération va réinitialiser l'application. Vous serez redirigé vers l'écran d'introduction vous permettant de créer ou restaure un portefeuille."
+          }
+        }
+      }
     },
     "Throughout the app, you can tap on most amounts to toggle between bitcoin and fiat." : {
       "localizations" : {
@@ -14589,6 +17564,12 @@
             "state" : "translated",
             "value" : "Cantidad de propina: (percent), (amountBitcoin), ≈(amountFiat)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montant du pourboire : (percent), (amountBitcoin), ≈(amountFiat)"
+          }
         }
       }
     },
@@ -14605,6 +17586,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cantidad de propina: (tipBtcn), ≈(tipFiat), cantidad total: (ttlBtcn), ≈(ttlFiat)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "montant du pourboire : (tipBtcn), ≈(tipFiat), montant total : (ttlBtcn), ≈(ttlFiat)"
           }
         }
       }
@@ -14638,7 +17625,14 @@
       }
     },
     "To enable background payments:" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour activer les paiements en arrière-plan"
+          }
+        }
+      }
     },
     "To fix this re-enable Background App Refresh via: Settings -> General -> Background App Refresh" : {
       "extractionState" : "manual",
@@ -14757,10 +17751,24 @@
       }
     },
     "to speed up on-chain payments" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "augmentez à chaud les frais de vos transaction en attente sur la chaîne"
+          }
+        }
+      }
     },
     "Tools" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outils"
+          }
+        }
+      }
     },
     "Tor" : {
       "comment" : "AppStatusPopover: label\nNavigation bar title",
@@ -14878,7 +17886,14 @@
       }
     },
     "total" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "total"
+          }
+        }
+      }
     },
     "total amount" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -14925,6 +17940,12 @@
             "state" : "translated",
             "value" : "El monto total excede su saldo"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le montant total excède votre solde"
+          }
         }
       }
     },
@@ -14942,6 +17963,12 @@
             "state" : "translated",
             "value" : "Cantidad total: (amountBitcoin), ≈(amountFiat)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montant total : (amountBitcoin), ≈(amountFiat)"
+          }
         }
       }
     },
@@ -14958,6 +17985,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cantidad total: (btcnAmt.string), ≈(fiatAmt.string)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "montant total : (btcnAmt.string), ≈(fiatAmt.string)"
           }
         }
       }
@@ -14977,6 +18010,12 @@
             "state" : "translated",
             "value" : "Cantidad total: (ttlBtcn) ≈(ttlFiat)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "montant total : (ttlBtcn) ≈(ttlFiat)"
+          }
         }
       }
     },
@@ -14994,11 +18033,24 @@
             "state" : "translated",
             "value" : "Cantidad total: ≈(btcnAmt.string)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "montant total : ≈(btcnAmt.string)"
+          }
         }
       }
     },
     "Total balance is %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le montant total est %@"
+          }
+        }
+      }
     },
     "Transactions" : {
       "extractionState" : "manual",
@@ -15014,14 +18066,34 @@
             "state" : "translated",
             "value" : "Transacciones"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transactions"
+          }
         }
       }
     },
     "Trust certificate & pin public key" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accepter ce certificat et épingler sa clé publique"
+          }
+        }
+      }
     },
     "Trustless swaps" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swaps sans intermédiaire de confiance"
+          }
+        }
+      }
     },
     "Try again later" : {
       "localizations" : {
@@ -15081,7 +18153,14 @@
       }
     },
     "tx index" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "index de la tx"
+          }
+        }
+      }
     },
     "type" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -15164,13 +18243,35 @@
       }
     },
     "Unable to extract public key!" : {
-      "comment" : "Toast message"
+      "comment" : "Toast message",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d'extraire la clé publique !"
+          }
+        }
+      }
     },
     "Unconfirmed Balance" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solde non confirmé"
+          }
+        }
+      }
     },
     "Unexpected error: %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur inattendue: %@"
+          }
+        }
+      }
     },
     "United States Dollar" : {
       "comment" : "Currency name: USD",
@@ -15180,6 +18281,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Americký dolar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dollar américain"
           }
         }
       }
@@ -15296,10 +18403,24 @@
       }
     },
     "Unknown reason." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raison inconnue."
+          }
+        }
+      }
     },
     "Unknown splice-out error" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de splice-out inconnue."
+          }
+        }
+      }
     },
     "Unlock your seed." : {
       "comment" : "Biometrics prompt",
@@ -15344,6 +18465,12 @@
             "state" : "translated",
             "value" : "Respuesta ilegible del servicio: (origin)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réponse illisible du service : (origin)"
+          }
         }
       }
     },
@@ -15376,16 +18503,44 @@
       }
     },
     "Updating internals…" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mise à jour des données internes..."
+          }
+        }
+      }
     },
     "Upgrade your channels to get started now." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettez à niveau vos canaux de paiement"
+          }
+        }
+      }
     },
     "Upgraded channels!" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canaux mis à niveau !"
+          }
+        }
+      }
     },
     "Upgrading channels..." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mise à niveau des canaux..."
+          }
+        }
+      }
     },
     "Uploading payments" : {
       "localizations" : {
@@ -15552,7 +18707,14 @@
       }
     },
     "Use the payments screen to view your full payment history." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisez l'écran des paiements pour visualiser l'intégralité de votre historique"
+          }
+        }
+      }
     },
     "Use this feature to transfer __all__ your funds to a Bitcoin address." : {
       "comment" : "CloseChannelsView",
@@ -15642,7 +18804,14 @@
       }
     },
     "view on blockchain" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "voir sur la chaîne"
+          }
+        }
+      }
     },
     "View source" : {
       "localizations" : {
@@ -15661,22 +18830,65 @@
       }
     },
     "Visible" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visible"
+          }
+        }
+      }
     },
     "Waiting For 3 Confirmations" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En attente de 3 confirmations"
+          }
+        }
+      }
     },
     "waiting for confirmations" : {
-      "comment" : "explanation for pending transaction"
+      "comment" : "explanation for pending transaction",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "en attente de confirmations"
+          }
+        }
+      }
     },
     "Waiting for confirmations" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En attente de confirmations"
+          }
+        }
+      }
     },
     "WAITING FOR CONFIRMATIONS" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EN ATTENTE DE CONFIRMATIONS"
+          }
+        }
+      }
     },
     "Waiting for iCloud credentials." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En attente des identifiants iCloud."
+          }
+        }
+      }
     },
     "waiting for internet" : {
       "comment" : "button text",
@@ -15736,7 +18948,14 @@
       }
     },
     "Waiting for internet." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En attente d'internet"
+          }
+        }
+      }
     },
     "Waiting for internet…" : {
       "localizations" : {
@@ -15761,10 +18980,24 @@
       }
     },
     "Waiting for keychain…" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En attente de la keychain..."
+          }
+        }
+      }
     },
     "Waiting to start…" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En attente du démarrage..."
+          }
+        }
+      }
     },
     "Waiting..." : {
       "localizations" : {
@@ -15817,10 +19050,25 @@
       }
     },
     "Wallet Balance" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solde du portefeuille"
+          }
+        }
+      }
     },
     "Wallet info" : {
-      "comment" : "Navigation Bar Title"
+      "comment" : "Navigation Bar Title",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info portefeuille"
+          }
+        }
+      }
     },
     "Wallet name (optional)" : {
       "localizations" : {
@@ -15829,11 +19077,24 @@
             "state" : "translated",
             "value" : "اسم المحفظة (اختياري)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom du portefeuille (optionnel)"
+          }
         }
       }
     },
     "wallet: %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "portefeuille: %@"
+          }
+        }
+      }
     },
     "Warning" : {
       "localizations" : {
@@ -15864,28 +19125,84 @@
       }
     },
     "Warning: background payments disabled" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avertissement: paiements en arrière plan désactivés"
+          }
+        }
+      }
     },
     "Watchtower" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour de contrôle"
+          }
+        }
+      }
     },
     "Watchtower alert" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alerte tour de contrôle"
+          }
+        }
+      }
     },
     "Watchtower Disabled" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour de contrôle désactivée"
+          }
+        }
+      }
     },
     "Watchtower disabled. " : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour de contrôle désactivée"
+          }
+        }
+      }
     },
     "Watchtower report" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Information tour de contrôle"
+          }
+        }
+      }
     },
     "Watchtower unable to complete" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour de contrôle n'a pas pu terminer"
+          }
+        }
+      }
     },
     "We do not store any user-identifying information on our servers." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nous ne stockons pas de données identifiant l'utilisateur sur nos serveurs."
+          }
+        }
+      }
     },
     "Welcome!" : {
       "localizations" : {
@@ -15916,13 +19233,34 @@
       }
     },
     "What's new:" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les nouveautés :"
+          }
+        }
+      }
     },
     "When enabled, incoming Lightning payments will ignore the absolute max fee limit. Only the percentage check will apply." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quand cette option est activée, les paiements entrants Lightning ignoreront la limite max des frais. Seul un contrôle relatif en pourcentage sera fait."
+          }
+        }
+      }
     },
     "will be sent to:" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sera envoyé à :"
+          }
+        }
+      }
     },
     "Will connect to:" : {
       "comment" : "Connection status",
@@ -16028,6 +19366,12 @@
             "state" : "translated",
             "value" : "مع الرسوم الأساسية التي تم اختيارها، نوصي برسوم نسبيّة كحد أدنى %@٪."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avec les frais configurés, nous recommandons des frais en pourcentage d'au moins %@%%."
+          }
         }
       }
     },
@@ -16078,7 +19422,14 @@
       }
     },
     "With Phoenix, sending and receiving bitcoins is easy and safe." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avec Phoenix, envoyer et recevoir des bitcoins n'a jamais été si simple et sûr."
+          }
+        }
+      }
     },
     "Would you like to be notified when somebody sends you a payment?" : {
       "extractionState" : "manual",
@@ -16197,6 +19548,12 @@
             "state" : "translated",
             "value" : "Usted es responsable de hacer una copia de seguridad de su frase de recuperación."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous êtes responsable de la sauvegarde de votre clé."
+          }
         }
       }
     },
@@ -16208,11 +19565,24 @@
             "state" : "translated",
             "value" : "Jste zodpovědní za vytvoření záložní kopie vašeho seedu."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous êtes responsable de la sauvegarde de votre clé."
+          }
         }
       }
     },
     "You are responsible for storing your recovery phrase." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous êtes responsable de la sauvegarde de votre clé."
+          }
+        }
+      }
     },
     "You can also use the **Payment Channels** screen to inspect the state of your channels." : {
       "comment" : "CloseChannelsView\n   ForceCloseChannelsView",
@@ -16273,16 +19643,44 @@
       }
     },
     "You can make all your unconfirmed transactions use a higher effective feerate to encourage miners to favour your payments." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez faire utiliser à vos transactions un taux de frais plus élevés, afin d'encourager les mineurs du réseau Bitcoin à privilégier vos paiements."
+          }
+        }
+      }
     },
     "You can only receive payments if Phoenix is running in the foreground." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous ne pouvez recevoir des paiements que si Phoenix tourne en premier plan."
+          }
+        }
+      }
     },
     "You can receive payments as long as your device is connected to the internet." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez recevoir des paiements tant que votre appareil a accès à Internet."
+          }
+        }
+      }
     },
     "You can restore your wallet at anytime using your secret key. Keep it safe!" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez restaurer les fonds de votre portefeuille à tout instant en utilisant votre clé secrète. Gardez-là en sûreté !"
+          }
+        }
+      }
     },
     "You can use your wallet to anonymously sign and authorize an action on:" : {
       "localizations" : {
@@ -16393,7 +19791,14 @@
       }
     },
     "You disabled \"background app refresh\" for Phoenix which prevents the watchtower from running. Please enable it to ensure your funds remain safe." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez désactivé l'\"actualisation en arrière plan\", ce qui empêchera la tour de contrôle de fonctionner. Veuillez réactiver cette option pour que vos fonds restent en sûreté."
+          }
+        }
+      }
     },
     "You don't have any payment channels." : {
       "localizations" : {
@@ -16424,10 +19829,24 @@
       }
     },
     "You enabled iCloud backup for your recovery phrase, but the backup didn't complete." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez activé la sauvegarde de votre clé sur iCloud, mais cela n'a pas fonctionné."
+          }
+        }
+      }
     },
     "You have **disabled** automated channel management. Funds will not be swapped, and will be unavailable for spending within Phoenix." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez **désactivé** la gestion automatisée des canaux. Les fonds ne seront pas basculés sur Lightning, et ne seront pas dépensable depuis Phoenix"
+          }
+        }
+      }
     },
     "You have already paid this invoice." : {
       "localizations" : {
@@ -16481,7 +19900,14 @@
       }
     },
     "You have disabled background payments." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez désactivé les paiements en arrière-plan."
+          }
+        }
+      }
     },
     "You have disabled notifications for this app." : {
       "extractionState" : "manual",
@@ -16593,6 +20019,12 @@
             "state" : "new",
             "value" : "You will pay %1$@ (≈ %2$@) to the Bitcoin miners."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous paierez %1$@ (≈ %2$@) aux mineurs du réseau Bitcoin."
+          }
         }
       }
     },
@@ -16626,10 +20058,24 @@
       }
     },
     "Your account balance of:" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre solde de :"
+          }
+        }
+      }
     },
     "Your address for on-chain deposits will change" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre adresse pour les dépôts sur la chaîne va changer"
+          }
+        }
+      }
     },
     "Your comment will be sent when you pay." : {
       "localizations" : {
@@ -16654,7 +20100,14 @@
       }
     },
     "Your key, your bitcoins" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre clé, vos bitcoins"
+          }
+        }
+      }
     },
     "Your Node ID:" : {
       "extractionState" : "manual",
