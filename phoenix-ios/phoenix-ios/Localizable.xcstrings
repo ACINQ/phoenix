@@ -3462,6 +3462,7 @@
       }
     },
     "Coming Soon" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

@@ -171,19 +171,23 @@ fileprivate struct ConfigurationList: View {
 			}
 			.id(linkID_DisplayConfiguration)
 	
-			navLink(.PaymentOptions) {
-				Label { Text("Payment options") } icon: {
-					Image(systemName: "wrench")
+			if hasWallet {
+				navLink(.PaymentOptions) {
+					Label { Text("Payment options") } icon: {
+						Image(systemName: "wrench")
+					}
 				}
+				.id(linkID_PaymentOptions)
 			}
-			.id(linkID_PaymentOptions)
 			
-			navLink(.ChannelManagement) {
-				Label { Text("Channel management") } icon: {
-					Image(systemName: "wand.and.stars")
+			if hasWallet {
+				navLink(.ChannelManagement) {
+					Label { Text("Channel management") } icon: {
+						Image(systemName: "wand.and.stars")
+					}
 				}
+				.id(linkID_ChannelManagement)
 			}
-			.id(linkID_ChannelManagement)
 			
 		} // </Section: General>
 	}

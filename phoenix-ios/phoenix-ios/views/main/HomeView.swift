@@ -19,9 +19,6 @@ fileprivate let PAGE_COUNT_INCREMENT = 25
 
 struct HomeView : MVIView {
 	
-	private let phoenixBusiness = Biz.business
-	private let encryptedNodeId = Biz.encryptedNodeId!
-	private let paymentsManager = Biz.business.paymentsManager
 	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "HomeView")
 	
 	let showSwapInWallet: () -> Void
@@ -655,7 +652,7 @@ struct HomeView : MVIView {
 		// so as long as we're fetching from the database, we might as well fetch everything we need.
 		let options = WalletPaymentFetchOptions.companion.All
 		
-		paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
+		Biz.business.paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
 			
 			if activeSheet == nil, let result = result {
 				activeSheet = .paymentView(payment: result) // triggers display of PaymentView sheet
@@ -821,7 +818,7 @@ struct HomeView : MVIView {
 		log.trace("didSelectPayment()")
 		
 		// pretty much guaranteed to be in the cache
-		let fetcher = paymentsManager.fetcher
+		let fetcher = Biz.business.paymentsManager.fetcher
 		let options = PaymentCell.fetchOptions
 		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
 			
