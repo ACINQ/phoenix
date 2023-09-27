@@ -1778,6 +1778,12 @@
     },
     "3rd generation lightning tech" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lightning tech 3. generace"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1986,6 +1992,12 @@
     },
     "A fee of %@ (≈ %@) may be needed to receive this payment." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "K přijetí této platby může být vyžadován poplatek ve výši %1$@ (≈ %2$@)."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -2142,6 +2154,12 @@
     "Accelerate Transactions" : {
       "comment" : "Navigation bar title",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zrychlení mých transakcí."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3129,6 +3147,12 @@
     },
     "Attention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pozor: pokud jsou vysoké poplatky v mempoolu Bitcoinu, příchozí Lightning platby vyžadující operaci na Blockchainu by mohly být drahé."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3220,6 +3244,12 @@
     },
     "Automated channel management" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatizovaná správa kanálů"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3236,6 +3266,12 @@
     },
     "Automated incoming liquidity is disabled in your incoming fee settings." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatická správa kanálů je zakázána."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3414,6 +3450,12 @@
     },
     "Backup your recovery phrase to prevent losing your funds." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zálohujte svou peněženku, abyste zabránili ztrátě bitcoinů."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3514,6 +3556,12 @@
     },
     "Below the expected fee. Some payments may be rejected." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nižší než očekávaný poplatek. Některé platby mohou být odmítnuty."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3530,6 +3578,12 @@
     },
     "Better predictability" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lepší předvídatelnost"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3787,6 +3841,12 @@
     },
     "Bitcoin supercharged" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitcoin supercharged"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3982,6 +4042,12 @@
     },
     "Bump Fee (CPFP)" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Urychlení plateb (CPFP)"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3999,6 +4065,12 @@
     "Bump fees" : {
       "comment" : "Payment description for splice CPFP",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Urychlení plateb"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4291,6 +4363,12 @@
     "Channel management" : {
       "comment" : "Navigation Bar Title",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Správa kanálů"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4355,6 +4433,12 @@
     },
     "Channels with less than the Bitcoin dust limit (546 satoshi) cannot be migrated. Their balance go to the bitcoin miners." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kanály s méně než limitem Bitcoin Dust (546 satoshi) nelze migrovat. Jejich zůstatek připadne těžařům bitcoinů."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5520,6 +5604,12 @@
     },
     "Control on-chain fees" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontrola poplatků v řetězci"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6576,6 +6666,12 @@
     },
     "Description" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Popis"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6975,6 +7071,12 @@
     },
     "Don't use addresses from the previous version." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nepoužívejte adresy z předchozí verze"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7362,6 +7464,12 @@
     },
     "Enable notifications in the Notification Center" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Povolení oznámení v oznamovacím centru iOS"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7398,6 +7506,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "أدخل فاتورة برق أو LNURL أو عنوان برق تريد إرسال الأموال إليه."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadejte Lightningovou fakturu, LNURL nebo Lightningovou adresu na kterou chcete poslat peníze."
           }
         },
         "es" : {
@@ -8829,6 +8943,12 @@
     },
     "Get Started" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Začněte"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8938,6 +9058,12 @@
     },
     "High Priority" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vysoká priorita"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9087,6 +9213,12 @@
             "value" : "لقد حفظت عبارة الاسترداد الخاصة بي في مكان آمن."
           }
         },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obnovovací frázi jsem si uložil na bezpečné místo."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9137,6 +9269,12 @@
             "value" : "أتفهم أن Apple قد تشارك بيانات iCloud الخاصة بي مع الوكالات الحكومية عند الطلب."
           }
         },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beru na vědomí, že společnost Apple může na požádání sdílet mé údaje z iCloudu s vládními agenturami."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9157,6 +9295,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "أتفهم أن بعض موظفي Apple قد يتمكنون من الوصول إلى بيانات iCloud الخاصة بي."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chápu, že někteří zaměstnanci společnosti Apple mohou mít přístup k mým datům na iCloudu."
           }
         },
         "es" : {
@@ -9181,6 +9325,12 @@
             "value" : "أتفهم أنني إذا فقدت هاتفي وعبارة الاسترداد الخاصة بي، فسأخسر الأموال الموجودة في محفظتي."
           }
         },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chápu, že pokud ztratím telefon a obnovovací frázi, přijdu o prostředky v peněžence."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9197,6 +9347,12 @@
     },
     "I understand that if I lose my recovery phrase, then I will lose the funds in my wallet." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chápu, že pokud ztratím telefon a obnovovací frázi, přijdu o prostředky v peněžence."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9440,6 +9596,12 @@
             "value" : "إذا لم تقم بعمل نسخة احتياطية وفقدت الوصول إلى Phoenix، **فستفقد أموالك**!"
           }
         },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokud ji nezálohujete a ztratíte přístup k Phoenixu, **přijdete o své prostředky**!"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9587,6 +9749,12 @@
     },
     "Important messages" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Důležité zprávy"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9658,6 +9826,12 @@
     },
     "Inbound liquidity is insufficient and you have disabled automated channel management." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Příchozí likvidita není dostatečná a máte zakázanou automatickou správu kanálů."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9668,6 +9842,12 @@
     },
     "Inbound liquidity is insufficient." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Příchozí likvidita není dostatečná."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9783,6 +9963,12 @@
     },
     "Incoming payments sometimes require on-chain transactions. This does not always happen, only when needed." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Příchozí platby někdy vyžadují On-Chain transakce. K tomu nedochází vždy, pouze v případě potřeby."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9793,6 +9979,12 @@
     },
     "Incoming payments that require on-chain operations will be rejected." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Příchozí platby, které vyžadují operace na Blockchainu, budou odmítnuty."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10216,6 +10408,12 @@
     },
     "know when fees may occur" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vědět, kdy může dojít k obvinění."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10294,6 +10492,12 @@
     },
     "Learn more from our [blog post](https://acinq.co/blog/phoenix-splicing-update)." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zjistěte více z [našeho příspěvku na blogu](https://acinq.co/blog/phoenix-splicing-update)."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10584,6 +10788,12 @@
     },
     "Lightning payments are fast and best suited for smaller payments." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lightning platby jsou rychlé a nejvhodnější pro menší platby."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10885,6 +11095,12 @@
     },
     "Low Priority" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nízká priorita"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11222,6 +11438,12 @@
     },
     "Medium Priority" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Střední priorita"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11491,6 +11713,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تسمية محفظتك سيجعل إدارة عدة محافظ امرًا سهلًا."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pojmenování peněženky usnadňuje správu více peněženek."
           }
         },
         "es" : {
@@ -12088,6 +12316,12 @@
     },
     "On-chain funds will automatically be swapped to Lightning if the fee is **less than %@** (%@) of the amount." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokud je poplatek **menší než %1$@** (%2$@), budou prostředky na Blockchainu automaticky převedeny do služby Lightning."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -12137,6 +12371,12 @@
     },
     "On-chain transactions are slow, but the fees can be less for large payments." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transakce on-chain jsou pomalé, ale u velkých plateb mohou být poplatky nižší."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12850,6 +13090,12 @@
     },
     "Payment rejected (+%@)" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platba zamítnuta (+%@)"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13305,6 +13551,12 @@
     },
     "Phoenix is self-custodial. You take control." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix je Self-Custody. Přebíráte kontrolu."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13315,6 +13567,12 @@
     },
     "Phoenix uses payment channels to make Bitcoin fast and private." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix používá platební kanály, aby byl Bitcoin rychlý a soukromý."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13325,6 +13583,12 @@
     },
     "Phoenix v2 has arrived!" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix v2 je tu!"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13634,7 +13898,7 @@
         }
       }
     },
-    "Proportianal fee must be at least %@." : {
+    "Proportional fee must be at least %@." : {
       "extractionState" : "manual",
       "localizations" : {
         "fr" : {
@@ -13975,6 +14239,12 @@
     },
     "Recent activity" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nedávná aktivita"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -14018,6 +14288,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "عبارة الاسترداد"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obnovovací fráze"
           }
         },
         "fr" : {
@@ -14628,6 +14904,12 @@
     },
     "select miner fee when sending on-chain" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vybrat poplatek za těžbu při odesílání v řetězci"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15142,6 +15424,12 @@
     "Service Fees" : {
       "comment" : "Label in SummaryInfoGrid",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poplatky za službu"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15916,6 +16204,12 @@
     },
     "Skip For Now" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prozatím přeskočit"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16561,6 +16855,12 @@
     },
     "The fee was **%@** but your max fee was set to **%@**." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poplatek činil **%1$@**, ale váš maximální poplatek byl nastaven na **%2$@**."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -16577,6 +16877,12 @@
     },
     "The fee was **%@** which is more than **%@** of the amount." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poplatek byl **%1$@**, což je více než **%2$@** částky."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -16593,6 +16899,12 @@
     },
     "The fee was %@ but your max fee was set to %@." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poplatek byl %1$@, ale váš maximální poplatek byl nastaven na %2$@."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -16609,6 +16921,12 @@
     },
     "The fee was %@ which is more than %@ of the amount." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poplatek byl %1$@, což je více než %2$@ částky."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -16635,6 +16953,12 @@
     },
     "The final wallet is where funds are sent by default when your Lightning channels are closed." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konečná peněženka je místo, kam se ve výchozím nastavení posílají prostředky, když jsou vaše Lightning kanály uzavřeny."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -16765,6 +17089,12 @@
     },
     "The migration will cost %@ (≈ %@)" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Migrace bude stát %1$@ (≈ %2$@)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -16785,6 +17115,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "عبارة الاسترداد (تسمى أحيانًا seed)، هي قائمة من 12 كلمة إنجليزية. تسمح لك باستعادة الوصول الكامل لأموالك إذا لزم الأمر."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obnovovací fráze (někdy nazývaná Seed) je seznam 12 anglických slov. V případě potřeby umožňuje obnovit plný přístup k finančním prostředkům."
           }
         },
         "es" : {
@@ -17136,6 +17472,12 @@
     },
     "This feerate is below what your transactions are already using. It should be higher to have any effects." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tato hodnota je nižší než hodnota, kterou již používají vaše nepotvrzené transakce. Pro urychlení těchto plateb použijte vyšší."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17567,6 +17909,12 @@
     },
     "to speed up on-chain payments" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "zvýšit sazbu poplatků za vaše platby"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -17902,6 +18250,12 @@
     },
     "Trustless swaps" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swap bez důvěry"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18311,6 +18665,12 @@
     },
     "Upgrade your channels to get started now." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgradujte své kanály a začněte hned."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19053,6 +19413,12 @@
     },
     "When enabled, incoming Lightning payments will ignore the absolute max fee limit. Only the percentage check will apply." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokud je tato funkce povolena, příchozí platby Lightning budou ignorovat konečný maximální limit poplatků. Uplatní se pouze procentuální kontrola."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19204,6 +19570,12 @@
     },
     "With Phoenix, sending and receiving bitcoins is easy and safe." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "S Phoenixem je posílání a přijímání bitcoinů snadné a bezpečné."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19322,6 +19694,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "عمل نسخة احتياطية لعبارة الاسترداد هي مسؤوليتك."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Za uložení obnovovací fráze jste zodpovědní vy."
           }
         },
         "es" : {
@@ -19621,6 +19999,12 @@
     },
     "You have **disabled** automated channel management. Funds will not be swapped, and will be unavailable for spending within Phoenix." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Máte **vypnutou** automatickou správu kanálů. Prostředky nebudou vyměněny a nebudou k dispozici pro utrácení v rámci Phoenixu."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19727,6 +20111,12 @@
             "value" : "لم تقم بالنسخ الاحتياطي لعبارة الاسترداد الخاصة بك!"
           }
         },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nemáte zálohovanou obnovovací frázi!"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19795,6 +20185,12 @@
     },
     "You will pay %@ (≈ %@) to the Bitcoin miners." : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Těžařům bitcoinů zaplatíte %1$@ (≈ %2$@)."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -19850,6 +20246,12 @@
     },
     "Your address for on-chain deposits will change" : {
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaše adresa pro vklady na řetězci se změní."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",

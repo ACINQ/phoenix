@@ -1,0 +1,51 @@
+<!--
+  ~ Copyright 2023 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+	<style></style>
+</head>
+<body>
+<p>
+	Phoenix umožňuje přijímat platby na blockchainu Bitcoinu (L1) a
+	na Lightning vrstvě Bitcoinu (L2).
+</p>
+<ul>
+	<li>
+		vrstva blockchainu (L1) je pomalejší a obecně mnohem
+		dražší (vyžaduje poplatky těžařům).
+	</li>
+	<li>
+		vrstva Lightning (L2) je mnohem rychlejší a obecně mnohem
+		levnější (zejména pro menší platby).
+	</li>
+</ul>
+<p>
+	Když obdržíte platbu na L1, Phoenix automaticky přesune prostředky
+	na L2, <b>pokud</b> poplatky těžařů odpovídají vašim nastaveným
+	zásadám poplatků.
+</p>
+<p>
+	Platby, které obdržíte na L2, můžete obdržet okamžitě a za nulové
+	poplatky. Občas je však pro správu platebního kanálu L2 nutná i
+	operace L1. To lze provést automaticky, <b>pokud</b> poplatky
+	těžařů odpovídají nastaveným zásadám poplatků.
+</p>
+</body>
+</html>
