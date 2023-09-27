@@ -751,22 +751,6 @@
         }
       }
     },
-    "*" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "*"
-          }
-        }
-      }
-    },
     "**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." : {
       "comment" : "RecoverySeedView",
       "localizations" : {
@@ -1451,38 +1435,6 @@
         }
       }
     },
-    "☹️" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "☹️"
-          }
-        }
-      }
-    },
-    "😃" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "😃"
-          }
-        }
-      }
-    },
     "1 channel" : {
       "localizations" : {
         "ar" : {
@@ -1810,6 +1762,12 @@
     "3 payments" : {
       "comment" : "Recent payments option",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 pagos"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1820,6 +1778,12 @@
     },
     "3rd generation lightning tech" : {
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tercera generación de tecnología lightning"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1831,6 +1795,12 @@
     "5 payments" : {
       "comment" : "Recent payments option",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 pagos"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9540,6 +9510,12 @@
     },
     "Ignore" : {
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorar"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9611,6 +9587,12 @@
     },
     "Important messages" : {
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mensajes importantes"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11116,23 +11098,6 @@
         }
       }
     },
-    "max fee :" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أقصى حد للرسوم :"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "frais max :"
-          }
-        }
-      }
-    },
     "Max fee amount" : {
       "localizations" : {
         "fr" : {
@@ -12282,6 +12247,12 @@
     },
     "opens browser" : {
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "abre el navegador"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12292,6 +12263,12 @@
     },
     "opens email app" : {
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "abre la aplicación de correo electrónico"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -13275,24 +13252,6 @@
         }
       }
     },
-    "Phoenix does not support the LNURL protocol yet" : {
-      "comment" : "Error message - scanning lightning invoice",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Phoenix zatím protokol LNURL nepodporuje"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Phoenix ne supporte pas encore ce protocole LNURL"
-          }
-        }
-      }
-    },
     "Phoenix does not support this type of LNURL yet" : {
       "comment" : "Error message - scanning lightning invoice",
       "localizations" : {
@@ -13594,24 +13553,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dérogations"
-          }
-        }
-      }
-    },
-    "Polish Zloty" : {
-      "comment" : "Currency name: PLN",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Polský zlotý"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zloty polonais"
           }
         }
       }
@@ -14458,42 +14399,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Commitments révoqués détectés sur %lld canaux !"
-          }
-        }
-      }
-    },
-    "Romanian Leu" : {
-      "comment" : "Currency name: RON",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rumunský Leu"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lei roumain"
-          }
-        }
-      }
-    },
-    "Russian Ruble" : {
-      "comment" : "Currency name: RUB",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ruský rubl"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rouble russe"
           }
         }
       }
@@ -15971,24 +15876,6 @@
         }
       }
     },
-    "Singapore Dollar" : {
-      "comment" : "Currency name: SGD",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Singapurský dolar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dollar singapourien"
-          }
-        }
-      }
-    },
     "Skip" : {
       "localizations" : {
         "ar" : {
@@ -16362,42 +16249,6 @@
         }
       }
     },
-    "Swedish Krona" : {
-      "comment" : "Currency name: SEK",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Švédská koruna"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Couronne suédoise"
-          }
-        }
-      }
-    },
-    "Swiss Franc" : {
-      "comment" : "Currency name: CHF",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Švýcarský frank"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Franc suisse"
-          }
-        }
-      }
-    },
     "System" : {
       "comment" : "App theme option",
       "localizations" : {
@@ -16423,24 +16274,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Système"
-          }
-        }
-      }
-    },
-    "Taiwan Dollar" : {
-      "comment" : "Currency name: TWD",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tchajwanský dolar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dollar taiwanais"
           }
         }
       }
@@ -16479,24 +16312,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fermer l’application"
-          }
-        }
-      }
-    },
-    "Thai Baht" : {
-      "comment" : "Currency name: THB",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Thajský baht"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Baht thailandais"
           }
         }
       }
@@ -18273,24 +18088,6 @@
         }
       }
     },
-    "United States Dollar" : {
-      "comment" : "Currency name: USD",
-      "extractionState" : "manual",
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Americký dolar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dollar américain"
-          }
-        }
-      }
-    },
     "Unknown" : {
       "comment" : "Connection state",
       "localizations" : {
@@ -19196,6 +18993,12 @@
     },
     "We do not store any user-identifying information on our servers." : {
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No almacenamos ninguna información de identificación del usuario en nuestros servidores."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19234,6 +19037,12 @@
     },
     "What's new:" : {
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qué hay de nuevo:"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -19343,34 +19152,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Va activer la synchronisation icloud"
-          }
-        }
-      }
-    },
-    "With configured base fee, we recommend a proportional fee of at least %@%." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Avec ces frais de base, nous recommandons des frais proportionnels d’au moins %1$@%2$."
-          }
-        }
-      }
-    },
-    "With configured base fee, we recommend a proportional fee of at least %@%%." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مع الرسوم الأساسية التي تم اختيارها، نوصي برسوم نسبيّة كحد أدنى %@٪."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Avec les frais configurés, nous recommandons des frais en pourcentage d'au moins %@%%."
           }
         }
       }
