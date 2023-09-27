@@ -153,21 +153,7 @@ fileprivate struct ConfigurationList: View {
 			.id(linkID_About)
 		
 			navLink(.DisplayConfiguration) {
-				Label {
-					switch notificationPermissions {
-					case .disabled:
-						HStack(alignment: VerticalAlignment.center, spacing: 0) {
-							Text("Display")
-							Spacer()
-							Image(systemName: "exclamationmark.triangle")
-								.renderingMode(.template)
-								.foregroundColor(Color.appWarn)
-						}
-						
-					default:
-						Text("Display")
-					}
-				} icon: {
+				Label { Text("Display") } icon: {
 					Image(systemName: "paintbrush.pointed")
 				}
 			}
@@ -175,12 +161,22 @@ fileprivate struct ConfigurationList: View {
 	
 			if hasWallet {
 				navLink(.PaymentOptions) {
-					Label { Text("Payment options") } icon: {
+					Label {
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("Payment options")
+							if notificationPermissions == .disabled {
+								Spacer()
+								Image(systemName: "exclamationmark.triangle")
+									.renderingMode(.template)
+									.foregroundColor(Color.appWarn)
+							}
+						} // </HStack>
+					} icon: {
 						Image(systemName: "wrench")
-					}
+					} // </Label>
 				}
 				.id(linkID_PaymentOptions)
-			}
+			} // </if hasWallet>
 			
 			if hasWallet {
 				navLink(.ChannelManagement) {
