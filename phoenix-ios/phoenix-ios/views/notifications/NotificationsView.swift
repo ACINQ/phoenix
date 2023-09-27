@@ -166,7 +166,7 @@ struct NotificationsView : View {
 			}
 			
 		} header: {
-			Text("Important messages")
+			Text("Important messages").padding(.leading, 12)
 		}
 		.listRowBackground(Color.clear)
 		.listRowInsets(EdgeInsets(top: 5, leading: 1, bottom: 5, trailing: 1))
@@ -196,7 +196,7 @@ struct NotificationsView : View {
 			}
 			
 		} header: {
-			Text("Recent activity")
+			Text("Recent activity").padding(.leading, 12)
 		}
 		.listRowInsets(EdgeInsets(top: 5, leading: 1, bottom: 5, trailing: 1))
 		.listRowSeparator(.hidden) // remove lines between items
@@ -218,7 +218,7 @@ struct NotificationsView : View {
 			}
 			
 		} header: {
-			Text("Watchtower")
+			Text("Watchtower").padding(.leading, 12)
 		}
 		.listRowInsets(EdgeInsets(top: 5, leading: 1, bottom: 5, trailing: 1))
 		.listRowSeparator(.hidden) // remove lines between items
