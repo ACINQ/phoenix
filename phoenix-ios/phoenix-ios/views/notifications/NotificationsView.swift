@@ -11,10 +11,17 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+enum NotificationsViewType {
+	
+	case sheet
+	case embedded
+}
 
 struct NotificationsView : View {
 	
-	@ObservedObject var noticeMonitor: NoticeMonitor
+	let type: NotificationsViewType
+	
+	@StateObject var noticeMonitor = NoticeMonitor()
 	
 	let bizNotificationsPublisher = Biz.business.notificationsManager.notificationsPublisher()
 	
@@ -34,9 +41,14 @@ struct NotificationsView : View {
 	@ViewBuilder
 	var body: some View {
 		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-			header()
-			content()
+		Group {
+			switch type {
+			case .sheet:
+				body_sheet()
+				
+			case .embedded:
+				body_embedded()
+			}
 		}
 		.onReceive(bizNotificationsPublisher) {
 			bizNotificationsChanged($0)
@@ -44,7 +56,28 @@ struct NotificationsView : View {
 	}
 	
 	@ViewBuilder
-	func header() -> some View {
+	func body_sheet() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			sheetHeader()
+			Color.primaryBackground.frame(height: 15)
+			content()
+		}
+	}
+	
+	@ViewBuilder
+	func body_embedded() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			Color.primaryBackground.frame(height: 15)
+			content()
+		}
+		.navigationTitle("Notifications")
+		.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func sheetHeader() -> some View {
 		
 		HStack {
 			Spacer().frame(width: 30)
@@ -82,6 +115,10 @@ struct NotificationsView : View {
 			}
 			if !bizNotifications_watchtower.isEmpty {
 				section_watchtower()
+			}
+			
+			if !hasImportantNotifications() && bizNotifications_payment.isEmpty && bizNotifications_watchtower.isEmpty {
+				section_empty()
 			}
 		}
 		.listStyle(.insetGrouped)
@@ -162,7 +199,7 @@ struct NotificationsView : View {
 			Text("Recent activity")
 		}
 		.listRowInsets(EdgeInsets(top: 5, leading: 1, bottom: 5, trailing: 1))
-		.listRowSeparator(.hidden)   // remove lines between items
+		.listRowSeparator(.hidden) // remove lines between items
 	}
 	
 	@ViewBuilder
@@ -184,7 +221,23 @@ struct NotificationsView : View {
 			Text("Watchtower")
 		}
 		.listRowInsets(EdgeInsets(top: 5, leading: 1, bottom: 5, trailing: 1))
-		.listRowSeparator(.hidden)   // remove lines between items
+		.listRowSeparator(.hidden) // remove lines between items
+	}
+	
+	@ViewBuilder
+	func section_empty() -> some View {
+		
+		Section {
+			
+			Label {
+				Text("No notifications")
+			} icon: {
+				Image(systemName: "tray")
+			}
+			.padding(12)
+		}
+		.listRowInsets(EdgeInsets(top: 5, leading: 1, bottom: 5, trailing: 1))
+		.listRowSeparator(.hidden) // remove lines between items
 	}
 	
 	// --------------------------------------------------
@@ -208,11 +261,21 @@ struct NotificationsView : View {
 		log.trace("bizNotificationsChanges()")
 		
 		bizNotifications_payment = list.filter({ item in
-			return item.notification is PhoenixShared.Notification.PaymentRejected
+			if let paymentRejected = item.notification as? PhoenixShared.Notification.PaymentRejected {
+				// Remove items where source == onChain
+				return !(paymentRejected.source == Lightning_kmpLiquidityEventsSource.onchainwallet)
+			} else {
+				return false
+			}
 		})
 		
 		bizNotifications_watchtower = list.filter({ item in
-			return item.notification is PhoenixShared.WatchTowerOutcome
+			if let watchTower = item.notification as? PhoenixShared.WatchTowerOutcome {
+				// Remove "Nominal" notifications (which just mean everything is working as expected)
+				return !(watchTower is PhoenixShared.WatchTowerOutcome.Nominal)
+			} else {
+				return false
+			}
 		})
 	}
 	

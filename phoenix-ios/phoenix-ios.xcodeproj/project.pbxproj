@@ -115,6 +115,10 @@
 		DC4864DA29D4E52C00ACD539 /* BgRefreshDisabledPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4864D929D4E52C00ACD539 /* BgRefreshDisabledPopover.swift */; };
 		DC48D2C42593DE30008D138C /* TextFieldCurrencyStyler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC48D2C32593DE30008D138C /* TextFieldCurrencyStyler.swift */; };
 		DC49DA8E258BB882005BC4BC /* ScaledButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */; };
+		DC49FE992AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49FE982AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift */; };
+		DC49FE9B2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49FE9A2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift */; };
+		DC49FE9C2AC49E0400D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49FE9A2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift */; };
+		DC49FE9D2AC49E0800D8D2E2 /* KotlinExtensions+Bitcoin.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49FE982AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift */; };
 		DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC59377027516296003B4B53 /* Sequence+Sum.swift */; };
 		DC5A935329846044004F19FD /* FileHandle+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5A935229846043004F19FD /* FileHandle+Async.swift */; };
 		DC5CA4ED28F83C3B0048A737 /* DrainWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */; };
@@ -451,6 +455,8 @@
 		DC4864D929D4E52C00ACD539 /* BgRefreshDisabledPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgRefreshDisabledPopover.swift; sourceTree = "<group>"; };
 		DC48D2C32593DE30008D138C /* TextFieldCurrencyStyler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldCurrencyStyler.swift; sourceTree = "<group>"; };
 		DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaledButtonStyle.swift; sourceTree = "<group>"; };
+		DC49FE982AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Bitcoin.swift"; sourceTree = "<group>"; };
+		DC49FE9A2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Lightning.swift"; sourceTree = "<group>"; };
 		DC59377027516296003B4B53 /* Sequence+Sum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Sum.swift"; sourceTree = "<group>"; };
 		DC5A935229846043004F19FD /* FileHandle+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileHandle+Async.swift"; sourceTree = "<group>"; };
 		DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrainWalletView.swift; sourceTree = "<group>"; };
@@ -883,6 +889,8 @@
 				DC16965E27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift */,
 				DC0D2EA62939273B00284608 /* KotlinExtensions+Payments.swift */,
 				DC46BAED26CACCF700E760A6 /* KotlinExtensions+Other.swift */,
+				DC49FE9A2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift */,
+				DC49FE982AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift */,
 				DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */,
 				DC46BAF026CACCF700E760A6 /* KotlinFutures.swift */,
 				DC71E7342728A5720063613D /* KotlinIdentifiable.swift */,
@@ -1572,6 +1580,7 @@
 				DC682FE8258175CE00CA1114 /* Popover.swift in Sources */,
 				DC1844032A2690BB004D9578 /* MinerFeeSheet.swift in Sources */,
 				DC39A2662A12C04D00F59E39 /* LiquidityPolicyHelp.swift in Sources */,
+				DC49FE9B2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */,
 				DCACF6FA2566D0BA0009B01E /* KeyStoreError.swift in Sources */,
 				DC0E31BB26EFDED4002071C6 /* VSlider.swift in Sources */,
 				DC27E4CB2791D17A00C777CC /* RecoveryPhraseView.swift in Sources */,
@@ -1606,6 +1615,7 @@
 				DC04C2632A9009890021F2E8 /* MergeChannelsView.swift in Sources */,
 				DC46BAF726CACCF700E760A6 /* KotlinExtensions+Conversion.swift in Sources */,
 				DC9545C5294905FB008FCEF4 /* NotificationContent.swift in Sources */,
+				DC49FE992AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift in Sources */,
 				DC142140261E72E40075857A /* AnyHTML.swift in Sources */,
 				DC2CE3AF29AFEB0500BA0B00 /* Bundle+Icon.swift in Sources */,
 				DC1916B029CB6C1D00917F06 /* Text_CurrencyName.swift in Sources */,
@@ -1788,12 +1798,14 @@
 				DCA6DECE282AB12B0073C658 /* SecurityFile.swift in Sources */,
 				DC32FB3529A3D3FE009912AC /* XpcManager.swift in Sources */,
 				DC9545C429490321008FCEF4 /* NotificationContent.swift in Sources */,
+				DC49FE9C2AC49E0400D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */,
 				DCA6DEC72829BFD70073C658 /* CrossProcessCommunication.swift in Sources */,
 				DC641C7428208BD600862DCD /* String+VersionComparison.swift in Sources */,
 				DCA6DEC92829C3180073C658 /* GenericPasswordConvertible.swift in Sources */,
 				DCEB2797282D7ADC0096B87E /* KotlinFlow.swift in Sources */,
 				DC641C78282171EA00862DCD /* KotlinAssociatedObject.swift in Sources */,
 				DCA6DECA2829C31B0073C658 /* KeyStoreError.swift in Sources */,
+				DC49FE9D2AC49E0800D8D2E2 /* KotlinExtensions+Bitcoin.swift in Sources */,
 				DC422F3629392C0000E72253 /* Int+ToDate.swift in Sources */,
 				DC641C83282189AC00862DCD /* Utils.swift in Sources */,
 				DC0D2EA8293928E100284608 /* KotlinExtensions+Payments.swift in Sources */,

@@ -18,6 +18,7 @@ fileprivate enum NavLinkTag: String {
 	case DisplayConfiguration
 	case PaymentOptions
 	case ChannelManagement
+	case Notifications
 	// Privacy & Security
 	case AppAccess
 	case RecoveryPhrase
@@ -68,6 +69,7 @@ fileprivate struct ConfigurationList: View {
 	@Namespace var linkID_DisplayConfiguration
 	@Namespace var linkID_PaymentOptions
 	@Namespace var linkID_ChannelManagement
+	@Namespace var linkID_Notifications
 	@Namespace var linkID_AppAccess
 	@Namespace var linkID_RecoveryPhrase
 	@Namespace var linkID_ElectrumServer
@@ -187,6 +189,15 @@ fileprivate struct ConfigurationList: View {
 					}
 				}
 				.id(linkID_ChannelManagement)
+			}
+			
+			if hasWallet {
+				navLink(.Notifications) {
+					Label { Text("Notifications") } icon: {
+						Image(systemName: "tray")
+					}
+				}
+				.id(linkID_Notifications)
 			}
 			
 		} // </Section: General>
@@ -364,6 +375,7 @@ fileprivate struct ConfigurationList: View {
 			case .DisplayConfiguration  : DisplayConfigurationView()
 			case .PaymentOptions        : PaymentOptionsView()
 			case .ChannelManagement     : LiquidityPolicyView()
+			case .Notifications         : NotificationsView(type: .embedded)
 		// Privacy & Security
 			case .AppAccess             : AppAccessView()
 			case .RecoveryPhrase        : RecoveryPhraseView()
@@ -546,6 +558,7 @@ fileprivate struct ConfigurationList: View {
 			case .DisplayConfiguration  : return linkID_DisplayConfiguration
 			case .PaymentOptions        : return linkID_PaymentOptions
 			case .ChannelManagement     : return linkID_ChannelManagement
+			case .Notifications         : return linkID_Notifications
 			
 			case .AppAccess             : return linkID_AppAccess
 			case .RecoveryPhrase        : return linkID_RecoveryPhrase
@@ -574,21 +587,5 @@ fileprivate struct ConfigurationList: View {
 				self.swiftUiBugWorkaround = nil
 			}
 		}
-	}
-}
-
-class ConfigurationView_Previews: PreviewProvider {
-
-	static var previews: some View {
-		
-		ConfigurationView().mock(
-			Configuration.ModelFullMode()
-		)
-		.previewDevice("iPhone 11")
-		
-		ConfigurationView().mock(
-			Configuration.ModelSimpleMode()
-		)
-		.previewDevice("iPhone 11")
 	}
 }

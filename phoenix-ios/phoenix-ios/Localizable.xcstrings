@@ -861,6 +861,9 @@
     "%lld days" : {
 
     },
+    "%lld incoming payments recently rejected" : {
+
+    },
     "%lld milliseconds" : {
 
     },
@@ -1008,6 +1011,9 @@
     },
     "1 in-flight payment" : {
       "comment" : "Recent payments footer"
+    },
+    "1 incoming payment recently rejected" : {
+
     },
     "1 minute" : {
       "comment" : "Recent payments option"
@@ -8849,6 +8855,9 @@
           }
         }
       }
+    },
+    "No notifications" : {
+
     },
     "No payments yet" : {
 
