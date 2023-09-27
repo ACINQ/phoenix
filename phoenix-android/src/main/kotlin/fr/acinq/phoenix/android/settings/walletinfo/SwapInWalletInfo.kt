@@ -113,13 +113,14 @@ private fun SwappableBalanceView(
 private fun NotSwappableWalletView(
     wallet: WalletState.WalletWithConfirmations
 ) {
-    CardHeader(text = stringResource(id = R.string.walletinfo_not_swappable_title, wallet.minConfirmations))
+    val minConfirmations = wallet.swapInParams.minConfirmations
+    CardHeader(text = stringResource(id = R.string.walletinfo_not_swappable_title, minConfirmations))
     Card {
         wallet.weaklyConfirmed.forEach {
-            UtxoRow(it, (wallet.minConfirmations - wallet.confirmationsNeeded(it)) to wallet.minConfirmations)
+            UtxoRow(it, (minConfirmations - wallet.confirmationsNeeded(it)) to minConfirmations)
         }
         wallet.unconfirmed.forEach {
-            UtxoRow(it, null to wallet.minConfirmations)
+            UtxoRow(it, null to minConfirmations)
         }
     }
 }
