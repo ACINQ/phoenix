@@ -2,8 +2,10 @@ package fr.acinq.phoenix.utils
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.ChannelEvents
+import fr.acinq.lightning.DefaultSwapInParams
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.NodeEvents
+import fr.acinq.lightning.SwapInParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumMiniWallet
 import fr.acinq.lightning.blockchain.electrum.WalletState
@@ -264,4 +266,12 @@ fun ChannelCommand.Commitment.Splice.Response.Failure.asDisconnected(): ChannelC
 
 suspend fun ElectrumClient.kotlin_getConfirmations(txid: ByteVector32): Int? {
     return this.getConfirmations(txid)
+}
+
+fun defaultSwapInParams(): SwapInParams {
+    return SwapInParams(
+        minConfirmations = DefaultSwapInParams.MinConfirmations,
+        maxConfirmations = DefaultSwapInParams.MaxConfirmations,
+        refundDelay = DefaultSwapInParams.RefundDelay
+    )
 }
