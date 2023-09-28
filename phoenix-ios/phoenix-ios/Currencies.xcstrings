@@ -274,10 +274,24 @@
       }
     },
     "black market" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mercado negro"
+          }
+        }
+      }
     },
     "blue market" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mercado azul"
+          }
+        }
+      }
     },
     "BMD" : {
       "comment" : "Bermudan Dollar",
@@ -759,7 +773,14 @@
       }
     },
     "free market" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mercado libre"
+          }
+        }
+      }
     },
     "GBP" : {
       "comment" : "Great British Pound",
@@ -1749,7 +1770,14 @@
       }
     },
     "official rate" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tarifa oficial"
+          }
+        }
+      }
     },
     "OMR" : {
       "comment" : "Omani Rial",

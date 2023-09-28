@@ -141,7 +141,7 @@ struct RangeSheet: View {
 					Text(verbatim: "≈\(minFiatAmount.string)")
 						.padding(.leading, 4)
 				} else {
-					Text(" ")
+					Text(verbatim: " ")
 				}
 				
 				Text("max:").bold()
@@ -154,7 +154,7 @@ struct RangeSheet: View {
 					Text(verbatim: "≈\(maxFiatAmount.string)")
 						.padding(.leading, 4)
 				} else {
-					Text(" ")
+					Text(verbatim: " ")
 				}
 			}
 			.read(exampleHeightReader)
