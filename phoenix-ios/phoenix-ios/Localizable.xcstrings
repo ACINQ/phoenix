@@ -1239,6 +1239,9 @@
         }
       }
     },
+    "%lld incoming payments recently rejected" : {
+
+    },
     "%lld milliseconds" : {
       "localizations" : {
         "es" : {
@@ -1535,6 +1538,9 @@
           }
         }
       }
+    },
+    "1 incoming payment recently rejected" : {
+
     },
     "1 minute" : {
       "comment" : "Recent payments option",
@@ -5031,6 +5037,7 @@
       }
     },
     "Coming Soon" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11983,6 +11990,9 @@
           }
         }
       }
+    },
+    "No notifications" : {
+
     },
     "No payments yet" : {
       "localizations" : {

@@ -19,9 +19,6 @@ fileprivate let PAGE_COUNT_INCREMENT = 25
 
 struct HomeView : MVIView {
 	
-	private let phoenixBusiness = Biz.business
-	private let encryptedNodeId = Biz.encryptedNodeId!
-	private let paymentsManager = Biz.business.paymentsManager
 	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "HomeView")
 	
 	let showSwapInWallet: () -> Void
@@ -53,7 +50,8 @@ struct HomeView : MVIView {
 	@State var incomingSwapAnimationsRemaining = 0
 	
 	let bizNotificationsPublisher = Biz.business.notificationsManager.notificationsPublisher()
-	@State var filteredBizNotifications: [PhoenixShared.NotificationsManager.NotificationItem] = []
+	@State var bizNotifications_payment: [PhoenixShared.NotificationsManager.NotificationItem] = []
+	@State var bizNotifications_watchtower: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	
 	@State var didAppear = false
 	
@@ -161,7 +159,7 @@ struct HomeView : MVIView {
 			case .notificationsView:
 				
 				NotificationsView(
-					noticeMonitor: noticeMonitor
+					type: .sheet
 				)
 				.modifier(GlobalEnvironment.sheetInstance())
 			}
@@ -318,26 +316,42 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	func notices() -> some View {
 		
-		let count = noticeCount()
-		if count > 0 {
-			Group {
-				if count > 1 {
-					notice_multiple(count: count)
-				} else if count == 1 {
-					notice_single()
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			let count_missedPayments = notificationCount_missedLightningPayments()
+			if count_missedPayments > 0 {
+				NoticeBox {
+					notice_missedPayment_content(count: count_missedPayments)
 				}
+				.contentShape(Rectangle()) // make Spacer area tappable
+				.onTapGesture {
+					openNotificationsSheet()
+				}
+				.frame(maxWidth: deviceInfo.textColumnMaxWidth)
+				.padding([.leading, .trailing, .bottom], 10)
 			}
-			.frame(maxWidth: deviceInfo.textColumnMaxWidth)
-			.padding([.leading, .trailing, .bottom], 10)
+			
+			let count_other = notificationCount_other()
+			if count_other > 0 {
+				Group {
+					if count_other > 1 {
+						notice_other_multiple(totalCount: count_missedPayments + count_other)
+					} else {
+						notice_other_single()
+					}
+				}
+				.frame(maxWidth: deviceInfo.textColumnMaxWidth)
+				.padding([.leading, .trailing, .bottom], 10)
+			}
 		}
 	}
 	
 	@ViewBuilder
-	func notice_multiple(count: Int) -> some View {
+	func notice_other_multiple(totalCount: Int) -> some View {
 		
 		NoticeBox {
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				notice_primary(isSingle: false)
+				notice_other_content(isSingle: false)
 					.read(noticeBoxContentHeightReader)
 				
 				if let dividerHeight = noticeBoxContentHeight {
@@ -350,7 +364,7 @@ struct HomeView : MVIView {
 				}
 				
 				Group {
-					let remainingCount = count - 1
+					let remainingCount = totalCount - 1
 					if remainingCount < 100 {
 						Text(verbatim: "+\(remainingCount)")
 							.padding(.top, 2)
@@ -380,15 +394,15 @@ struct HomeView : MVIView {
 	}
 	
 	@ViewBuilder
-	func notice_single() -> some View {
+	func notice_other_single() -> some View {
 		
 		NoticeBox {
-			notice_primary(isSingle: true)
+			notice_other_content(isSingle: true)
 		}
 	}
 	
 	@ViewBuilder
-	func notice_primary(isSingle: Bool) -> some View {
+	func notice_other_content(isSingle: Bool) -> some View {
 		
 		Group {
 			if noticeMonitor.hasNotice_backupSeed {
@@ -406,7 +420,7 @@ struct HomeView : MVIView {
 			} else if noticeMonitor.hasNotice_mempoolFull {
 				NotificationCell.mempoolFull(action: isSingle ? openMempoolFullURL : nil)
 				
-			} else if let item = primaryBizNotification() {
+			} else if let item = bizNotifications_watchtower.first {
 				let location = isSingle ?
 				   BizNotificationCell.Location.HomeView_Single(preAction: {})
 				 : BizNotificationCell.Location.HomeView_Multiple
@@ -415,6 +429,28 @@ struct HomeView : MVIView {
 			}
 		}
 		.font(.caption)
+	}
+	
+	@ViewBuilder
+	func notice_missedPayment_content(count: Int) -> some View {
+		
+		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+			Image(systemName: "info.circle")
+				.imageScale(.large)
+				.padding(.trailing, 10)
+				.accessibilityHidden(true)
+				.accessibilityLabel("Warning")
+			
+			if count == 1 {
+				Text("1 incoming payment recently rejected")
+			} else {
+				Text("\(count) incoming payments recently rejected")
+			}
+		} // </HStack>
+		.font(.caption)
+		.accessibilityElement(children: .combine)
+		.accessibilityAddTraits(.isButton)
+		.accessibilitySortPriority(47)
 	}
 	
 	@ViewBuilder
@@ -570,7 +606,12 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func noticeCount() -> Int {
+	func notificationCount_missedLightningPayments() -> Int {
+		
+		return bizNotifications_payment.count
+	}
+	
+	func notificationCount_other() -> Int {
 		
 		var count = 0
 		if noticeMonitor.hasNotice_backupSeed         { count += 1 }
@@ -579,19 +620,14 @@ struct HomeView : MVIView {
 		if noticeMonitor.hasNotice_backgroundPayments { count += 1 }
 		if noticeMonitor.hasNotice_watchTower         { count += 1 }
 		
-		// NB: filteredBizNotifications only includes those we wish to display on the Home screen
-		count += filteredBizNotifications.count
+		count += bizNotifications_watchtower.count
 		
 		return count
 	}
 	
-	func primaryBizNotification() -> PhoenixShared.NotificationsManager.NotificationItem? {
+	func notificationCount_total() -> Int {
 		
-		let firstPaymentRejectedNotification = filteredBizNotifications.first { item in
-			return item.notification is PhoenixShared.Notification.PaymentRejected
-		}
-		
-		return firstPaymentRejectedNotification ?? filteredBizNotifications.first
+		return notificationCount_missedLightningPayments() + notificationCount_other()
 	}
 	
 	// --------------------------------------------------
@@ -655,7 +691,7 @@ struct HomeView : MVIView {
 		// so as long as we're fetching from the database, we might as well fetch everything we need.
 		let options = WalletPaymentFetchOptions.companion.All
 		
-		paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
+		Biz.business.paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
 			
 			if activeSheet == nil, let result = result {
 				activeSheet = .paymentView(payment: result) // triggers display of PaymentView sheet
@@ -687,18 +723,27 @@ struct HomeView : MVIView {
 	func bizNotificationsChanged(_ list: [PhoenixShared.NotificationsManager.NotificationItem]) {
 		log.trace("bizNotificationsChanges()")
 		
-		filteredBizNotifications = list.filter({ item in
-			
+		let cutOffDate = Date.now.toMilliseconds().minus(hours: 15)
+		
+		bizNotifications_payment = list.filter({ item in
 			if let paymentRejected = item.notification as? PhoenixShared.Notification.PaymentRejected {
 				// Remove items where source == onChain
-				return !(paymentRejected.source == Lightning_kmpLiquidityEventsSource.onchainwallet)
-				
-			} else if let watchTower = item.notification as? PhoenixShared.WatchTowerOutcome {
+				if paymentRejected.source == Lightning_kmpLiquidityEventsSource.offchainpayment {
+					return paymentRejected.createdAt > cutOffDate
+				} else {
+					return false
+				}
+			} else {
+				return false
+			}
+		})
+		
+		bizNotifications_watchtower = list.filter({ item in
+			if let watchTower = item.notification as? PhoenixShared.WatchTowerOutcome {
 				// Remove "Nominal" notifications (which just mean everything is working as expected)
 				return !(watchTower is PhoenixShared.WatchTowerOutcome.Nominal)
-				
 			} else {
-				return true
+				return false
 			}
 		})
 	}
@@ -821,7 +866,7 @@ struct HomeView : MVIView {
 		log.trace("didSelectPayment()")
 		
 		// pretty much guaranteed to be in the cache
-		let fetcher = paymentsManager.fetcher
+		let fetcher = Biz.business.paymentsManager.fetcher
 		let options = PaymentCell.fetchOptions
 		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
 			
