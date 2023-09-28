@@ -43,6 +43,10 @@ extension Lightning_kmpWalletState.WalletWithConfirmations {
 	}
 	
 	static func empty() -> Lightning_kmpWalletState.WalletWithConfirmations {
-		return Lightning_kmpWalletState.WalletWithConfirmations(minConfirmations: 1, currentBlockHeight: 1, all: [])
+		return Lightning_kmpWalletState.WalletWithConfirmations(
+			swapInParams: LightningExposureKt.defaultSwapInParams(),
+			currentBlockHeight: 1,
+			all: []
+		)
 	}
 }
