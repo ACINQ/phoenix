@@ -239,7 +239,10 @@
     <string name="walletinfo_onchain_swapin_help">Funds sent to this on-chain wallet are automatically swapped to Lightning.</string>
     <string name="walletinfo_onchain_swapin_policy_view">Tap to configure.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">On-chain funds will automatically be swapped to Lightning if the fee is <b>less than %1$s</b>.</string>
-    <string name="walletinfo_onchain_swapin_policy_disabled_details">Automated fee policy <b>is disabled</b>. Funds will not be swapped. They will remain on this wallet.</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled_details">Automated channels management <b>is disabled</b>. Funds will not be swapped. They will remain on this wallet.</string>
+    <string name="walletinfo_onchain_swapin_last_attempt">Last attempt (%1$s).</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_disabled">Channels management was disabled.</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Channels were still initializing.</string>
     <string name="walletinfo_onchain_swapin_empty">There are no swaps in progress.</string>
 
     <string name="walletinfo_onchain_final_about">An on-chain wallet derived from your seed.\n\nThe final wallet is where funds are sent by default when your Lightning channels are closed.</string>

@@ -234,6 +234,9 @@
     <string name="walletinfo_onchain_swapin_policy_view">Tippen, um dies zu konfigurieren.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">On-Chain-Guthaben wird automatisch in Lightning umgewandelt, wenn die Gebühr <b>weniger als %1$s</b> beträgt.</string>
     <string name="walletinfo_onchain_swapin_policy_disabled_details">Die automatische Gebührenregelung <b>ist deaktiviert</b>. Guthaben werden nicht umgewandelt. Sie verbleiben in dieser Wallet.</string>
+    <string name="walletinfo_onchain_swapin_last_attempt">Letzter Versuch (%1$s).</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_disabled">Die automatische Gebührenregelung ist deaktiviert.</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Channels were still initializing.</string>
     <string name="walletinfo_onchain_swapin_empty">Es sind keine Swaps in Bearbeitung.</string>
 
     <string name="walletinfo_onchain_final_about">Eine On-Chain-Wallet, die von Ihrem Seed abgeleitet ist.\n\nWenn Ihre Lightning-Kanäle geschlossen werden, werden die entsprechenden Guthaben standardmäßig an die finale Wallet gesendet.</string>
