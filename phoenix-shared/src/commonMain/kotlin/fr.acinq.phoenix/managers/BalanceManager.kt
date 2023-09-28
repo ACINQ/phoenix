@@ -5,7 +5,6 @@ import fr.acinq.lightning.*
 import fr.acinq.lightning.blockchain.electrum.SwapInManager
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.electrum.balance
-import fr.acinq.lightning.channel.Helpers
 import fr.acinq.lightning.channel.states.ChannelState
 import fr.acinq.lightning.channel.states.PersistedChannelState
 import fr.acinq.lightning.io.Peer
@@ -86,7 +85,7 @@ class BalanceManager(
      * See [SwapInManager.reservedWalletInputs] for details.
      */
     private suspend fun monitorSwapInBalance(peer: Peer) {
-        val swapInConfirmations = peer.walletParams.swapInConfirmations
+        val swapInParams = peer.walletParams.swapInParams
         combine(peer.currentTipFlow.filterNotNull(), peer.channelsFlow, peer.swapInWallet.walletStateFlow) { (currentBlockHeight, _), channels, swapInWallet ->
             val reservedInputs = SwapInManager.reservedWalletInputs(channels.values.filterIsInstance<PersistedChannelState>())
             val walletWithoutReserved = WalletState(
@@ -97,7 +96,7 @@ class BalanceManager(
             )
             walletWithoutReserved.withConfirmations(
                 currentBlockHeight = currentBlockHeight,
-                minConfirmations = swapInConfirmations
+                swapInParams = swapInParams
             )
         }.collect { wallet ->
             _swapInWallet.value = wallet

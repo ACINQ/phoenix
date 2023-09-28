@@ -1,7 +1,7 @@
 import Foundation
 import PhoenixShared
 import Combine
-import CryptoKit
+
 
 extension PeerManager {
 	
@@ -59,63 +59,10 @@ extension WalletBalance {
 	}
 }
 
-extension Lightning_kmpConnection {
+extension PhoenixShared.Notification {
 	
-	func localizedText() -> String {
-		switch self {
-		case is CLOSED       : return NSLocalizedString("Offline", comment: "Connection state")
-		case is ESTABLISHING : return NSLocalizedString("Connecting…", comment: "Connection state")
-		case is ESTABLISHED  : return NSLocalizedString("Connected", comment: "Connection state")
-		default              : return NSLocalizedString("Unknown", comment: "Connection state")
-		}
-	}
-}
-
-extension Lightning_kmpWalletState.WalletWithConfirmations {
-	
-	var unconfirmedBalance: Bitcoin_kmpSatoshi {
-		let balance = unconfirmed.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
-		return Bitcoin_kmpSatoshi(sat: balance)
-	}
-	
-	var weaklyConfirmedBalance: Bitcoin_kmpSatoshi {
-		let balance = weaklyConfirmed.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
-		return Bitcoin_kmpSatoshi(sat: balance)
-	}
-	
-	var deeplyConfirmedBalance: Bitcoin_kmpSatoshi {
-		let balance = deeplyConfirmed.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
-		return Bitcoin_kmpSatoshi(sat: balance)
-	}
-	
-	var anyConfirmedBalance: Bitcoin_kmpSatoshi {
-		let anyConfirmedTx = weaklyConfirmed + deeplyConfirmed
-		let balance = anyConfirmedTx.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
-		return Bitcoin_kmpSatoshi(sat: balance)
-	}
-	
-	var totalBalance: Bitcoin_kmpSatoshi {
-		let allTx = unconfirmed + weaklyConfirmed + deeplyConfirmed
-		let balance = allTx.map { $0.amount }.reduce(Int64(0)) { $0 + $1.toLong() }
-		return Bitcoin_kmpSatoshi(sat: balance)
-	}
-	
-	static func empty() -> Lightning_kmpWalletState.WalletWithConfirmations {
-		return Lightning_kmpWalletState.WalletWithConfirmations(minConfirmations: 1, currentBlockHeight: 1, all: [])
-	}
-}
-
-extension Bitcoin_kmpByteVector32 {
-	
-	static func random() -> Bitcoin_kmpByteVector32 {
-		
-		let key = SymmetricKey(size: .bits256) // 256 / 8 = 32
-		
-		let data = key.withUnsafeBytes {(bytes: UnsafeRawBufferPointer) -> Data in
-			return Data(bytes: bytes.baseAddress!, count: bytes.count)
-		}
-		
-		return Bitcoin_kmpByteVector32(bytes: data.toKotlinByteArray())
+	var createdAtDate: Date {
+		return createdAt.toDate(from: .milliseconds)
 	}
 }
 

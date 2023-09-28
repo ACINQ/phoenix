@@ -33,12 +33,12 @@
     <string name="notif_missed_title">Zmeškaná příchozí platba</string>
     <string name="notif_missed_unavailable">Nepodařilo se spustit Phoenix na pozadí.</string>
 
-    <string name="notif_rejected_deposit_title">On-Chain Záloha čeká na vyřízení (+%1$s)</string>
+    <string name="notif_rejected_deposit_title">On-Chain záloha čeká na vyřízení (+%1$s)</string>
     <string name="notif_rejected_payment_title">Zamítnutí platby (+%1$s)</string>
     <string name="notif_rejected_policy_disabled">Automatická správa kanálů je zakázána. Můžete to změnit v nastavení.</string>
     <string name="notif_rejected_over_absolute">Poplatek činil %1$s, ale váš maximální poplatek byl nastaven na %2$s. Můžete to upravit v nastavení.</string>
     <string name="notif_rejected_over_relative">Poplatek činil %1$s, což je více než %2$s%% z přijaté částky. Můžete to upravit v nastavení.</string>
-        <string name="notif_rejected_channels_initializing">Vaše kanály se inicializovaly a nemohly tuto platbu přijmout. Zkuste to později.</string>
+    <string name="notif_rejected_channels_initializing">Vaše kanály se inicializovaly a nemohly tuto platbu přijmout. Zkuste to později.</string>
 
     <string name="notif_watcher_revoked_commit_title">Spusťte prosím Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Některý z vašich kanálů mohl být uzavřen.</string>
@@ -216,7 +216,7 @@
 
     <string name="about_general_content">Phoenix je Bitcoin peněženka využívající síť Lightning pro odesílání a přijímání plateb.\n\nJedná se o bezplatný software s otevřeným zdrojovým kódem, který vyvinula společnost <a href="https://phoenix.acinq.co">ACINQ</a> pod <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">licencí Apache 2.0</a>.</string>
     <string name="about_seed_title">Zabezpečení klíče</string>
-    <string name="about_seed_content">Tuto peněženku si spravujete sami (self-custody): <b>Vy jediní jste zodpověďni za správu 12-ti slovného Seed klíče</b>.\n\nTento klíč umožňuje přístup k vašim prostředkům. Nikomu ho neprozrazujte a dejte si pozor na phishing.</string>
+    <string name="about_seed_content">Tuto peněženku si spravujete sami (self-custody): <b>Vy jediní jste zodpovědni za správu 12-ti slovného Seed klíče</b>.\n\nTento klíč umožňuje přístup k vašim prostředkům. Nikomu ho neprozrazujte a dejte si pozor na phishing.</string>
     <string name="about_rates_title">Směnné kurzy</string>
     <string name="about_rates_content">Směnné kurzy bitcoinu/fiatu jsou získávány z různých rozhraní API třetích stran:\n\n- Blockchain.info\n- powered by Coindesk.com\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nTyto sazby nemusí být přesné. Před odesláním platby vždy zkontrolujte skutečnou částku v bitcoinech.</string>
 
@@ -242,6 +242,9 @@
     <string name="walletinfo_onchain_swapin_policy_view">Klepnutím na položku provedete konfiguraci.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">Pokud je poplatek <b>menší než %1$s</b>, budou prostředky na Blockchainu automaticky převedeny do služby Lightning.</string>
     <string name="walletinfo_onchain_swapin_policy_disabled_details">Automatizovaná poplatková politika <b>je vypnutá</b>. Prostředky nebudou vyměňovány. Zůstanou na této peněžence.</string>
+    <string name="walletinfo_onchain_swapin_last_attempt">Poslední pokus (%1$s).</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_disabled">Automatizovaná poplatková politika je vypnutá.</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Vaše kanály byly inicializovány.</string>
     <string name="walletinfo_onchain_swapin_empty">Neprobíhají žádné výměny.</string>
 
     <string name="walletinfo_onchain_final_about">On-Chain peněženka odvozená od vašeho seedu.\n\nKonečná peněženka je místo, kam se ve výchozím nastavení posílají prostředky, když jsou vaše Lightning kanály uzavřeny.</string>

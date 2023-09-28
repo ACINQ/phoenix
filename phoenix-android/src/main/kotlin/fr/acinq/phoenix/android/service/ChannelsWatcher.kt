@@ -121,11 +121,11 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
     companion object {
         private val log = LoggerFactory.getLogger(ChannelsWatcher::class.java)
         private const val WATCHER_WORKER_TAG = BuildConfig.APPLICATION_ID + ".ChannelsWatcher"
-        private val ELECTRUM_TIMEOUT_MILLIS = 5 * 60_000L
+        private const val ELECTRUM_TIMEOUT_MILLIS = 5 * 60_000L
 
         fun schedule(context: Context) {
             log.info("scheduling channels watcher")
-            val work = PeriodicWorkRequest.Builder(ChannelsWatcher::class.java, 60, TimeUnit.HOURS, 12, TimeUnit.HOURS)
+            val work = PeriodicWorkRequest.Builder(ChannelsWatcher::class.java, 36, TimeUnit.HOURS, 12, TimeUnit.HOURS)
                 .addTag(WATCHER_WORKER_TAG)
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(WATCHER_WORKER_TAG, ExistingPeriodicWorkPolicy.UPDATE, work.build())
         }

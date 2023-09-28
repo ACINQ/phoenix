@@ -1,0 +1,52 @@
+<!--
+  ~ Copyright 2023 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+	<style></style>
+</head>
+<body>
+<p>
+	Phoenix vous permet de recevoir des paiements via la chaîne Bitcoin
+	(couche 1, dite L1) et via Lightning (couche 2, dite L2).
+</p>
+<ul>
+	<li>
+		Les paiements sur la chaîne Bitcoin (L1) sont plus lents,
+		et généralement plus coûteux (car ils impliquent des frais de minage).
+	</li>
+	<li>
+		Les paiements sur la couche Lightning (L2) sont bien plus rapides,
+		et généralement moins coûteux (surtout pour les petits montants).
+	</li>
+</ul>
+<p>
+	Lorsque vous recevez des paiements via la couche L1, Phoenix basculera automatiquement
+	ces fonds vers la couche L2, <b>si et seulement si</b> les frais induits sont conformes aux
+	paramètres de gestion que vous avez configurés.
+</p>
+<p>
+	Les paiements que vous recevez sur la couche L2 peuvent quant à eux être reçus instantanément et sans
+	frais induits. Cela dit, de façon occasionnelle, certains paiements L2 entraîneront une opération sur
+	la couche L1, et cela pour des questions de gestion du canal de paiement L2. Cette opération sera
+	faite automatiquement <b>si et seulement si</b> les frais sont sont conformes aux
+	paramètres de gestion que vous avez configurés.
+</p>
+</body>
+</html>

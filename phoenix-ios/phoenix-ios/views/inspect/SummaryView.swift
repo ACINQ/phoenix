@@ -1274,7 +1274,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 						Text(amount.digits)
 					}
 					
-					Text(" ")
+					Text(verbatim: " ")
 					Text_CurrencyName(currency: amount.currency, fontTextStyle: .body)
 					
 				} // </HStack>

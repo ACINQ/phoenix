@@ -269,6 +269,7 @@ class NodeService : Service() {
     }
 
     private fun monitorPaymentsWhenHeadless(peerManager: PeerManager, nodeParamsManager: NodeParamsManager, currencyManager: CurrencyManager) {
+        val monitoringStartedAt = currentTimestampMillis()
         serviceScope.launch {
             nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents.collect { event ->
                 // TODO: click on notif must deeplink to the notification screen
@@ -276,10 +277,14 @@ class NodeService : Service() {
                     is LiquidityEvents.Rejected -> {
                         log.debug("processing liquidity_event=$event")
                         if (event.source == LiquidityEvents.Source.OnChainWallet) {
-                            val lastRejectedSwap = UserPrefs.getLastRejectedOnchainSwap(applicationContext).first()
+                            // we do not want to trigger a notification every time this event is emitted (each new block)
+                            // though if the app just started, we always want to display a notification
+                            val lastRejectedSwap = UserPrefs.getLastRejectedOnchainSwap(applicationContext).first().takeIf {
+                                currentTimestampMillis() - monitoringStartedAt >= 7 * DateUtils.MINUTE_IN_MILLIS
+                            }
                             if (lastRejectedSwap != null
                                 && lastRejectedSwap.first == event.amount
-                                && currentTimestampMillis() - lastRejectedSwap.second <= 1 * DateUtils.DAY_IN_MILLIS
+                                && currentTimestampMillis() - lastRejectedSwap.second <= 2 * DateUtils.HOUR_IN_MILLIS
                             ) {
                                 log.debug("ignore this liquidity event as a similar notification was recently displayed")
                                 return@collect

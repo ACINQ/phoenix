@@ -18,6 +18,7 @@ fileprivate enum NavLinkTag: String {
 	case DisplayConfiguration
 	case PaymentOptions
 	case ChannelManagement
+	case Notifications
 	// Privacy & Security
 	case AppAccess
 	case RecoveryPhrase
@@ -68,6 +69,7 @@ fileprivate struct ConfigurationList: View {
 	@Namespace var linkID_DisplayConfiguration
 	@Namespace var linkID_PaymentOptions
 	@Namespace var linkID_ChannelManagement
+	@Namespace var linkID_Notifications
 	@Namespace var linkID_AppAccess
 	@Namespace var linkID_RecoveryPhrase
 	@Namespace var linkID_ElectrumServer
@@ -151,39 +153,48 @@ fileprivate struct ConfigurationList: View {
 			.id(linkID_About)
 		
 			navLink(.DisplayConfiguration) {
-				Label {
-					switch notificationPermissions {
-					case .disabled:
-						HStack(alignment: VerticalAlignment.center, spacing: 0) {
-							Text("Display")
-							Spacer()
-							Image(systemName: "exclamationmark.triangle")
-								.renderingMode(.template)
-								.foregroundColor(Color.appWarn)
-						}
-						
-					default:
-						Text("Display")
-					}
-				} icon: {
+				Label { Text("Display") } icon: {
 					Image(systemName: "paintbrush.pointed")
 				}
 			}
 			.id(linkID_DisplayConfiguration)
 	
-			navLink(.PaymentOptions) {
-				Label { Text("Payment options") } icon: {
-					Image(systemName: "wrench")
+			if hasWallet {
+				navLink(.PaymentOptions) {
+					Label {
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("Payment options")
+							if notificationPermissions == .disabled {
+								Spacer()
+								Image(systemName: "exclamationmark.triangle")
+									.renderingMode(.template)
+									.foregroundColor(Color.appWarn)
+							}
+						} // </HStack>
+					} icon: {
+						Image(systemName: "wrench")
+					} // </Label>
 				}
-			}
-			.id(linkID_PaymentOptions)
+				.id(linkID_PaymentOptions)
+			} // </if hasWallet>
 			
-			navLink(.ChannelManagement) {
-				Label { Text("Channel management") } icon: {
-					Image(systemName: "wand.and.stars")
+			if hasWallet {
+				navLink(.ChannelManagement) {
+					Label { Text("Channel management") } icon: {
+						Image(systemName: "wand.and.stars")
+					}
 				}
+				.id(linkID_ChannelManagement)
 			}
-			.id(linkID_ChannelManagement)
+			
+			if hasWallet {
+				navLink(.Notifications) {
+					Label { Text("Notifications") } icon: {
+						Image(systemName: "tray")
+					}
+				}
+				.id(linkID_Notifications)
+			}
 			
 		} // </Section: General>
 	}
@@ -360,6 +371,7 @@ fileprivate struct ConfigurationList: View {
 			case .DisplayConfiguration  : DisplayConfigurationView()
 			case .PaymentOptions        : PaymentOptionsView()
 			case .ChannelManagement     : LiquidityPolicyView()
+			case .Notifications         : NotificationsView(type: .embedded)
 		// Privacy & Security
 			case .AppAccess             : AppAccessView()
 			case .RecoveryPhrase        : RecoveryPhraseView()
@@ -542,6 +554,7 @@ fileprivate struct ConfigurationList: View {
 			case .DisplayConfiguration  : return linkID_DisplayConfiguration
 			case .PaymentOptions        : return linkID_PaymentOptions
 			case .ChannelManagement     : return linkID_ChannelManagement
+			case .Notifications         : return linkID_Notifications
 			
 			case .AppAccess             : return linkID_AppAccess
 			case .RecoveryPhrase        : return linkID_RecoveryPhrase
@@ -570,21 +583,5 @@ fileprivate struct ConfigurationList: View {
 				self.swiftUiBugWorkaround = nil
 			}
 		}
-	}
-}
-
-class ConfigurationView_Previews: PreviewProvider {
-
-	static var previews: some View {
-		
-		ConfigurationView().mock(
-			Configuration.ModelFullMode()
-		)
-		.previewDevice("iPhone 11")
-		
-		ConfigurationView().mock(
-			Configuration.ModelSimpleMode()
-		)
-		.previewDevice("iPhone 11")
 	}
 }

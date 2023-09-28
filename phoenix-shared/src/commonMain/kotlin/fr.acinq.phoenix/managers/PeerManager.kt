@@ -3,9 +3,11 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.CltvExpiryDelta
+import fr.acinq.lightning.DefaultSwapInParams
 import fr.acinq.lightning.InvoiceDefaultRoutingFees
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.SwapInParams
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.UpgradeRequired
 import fr.acinq.lightning.WalletParams
@@ -75,7 +77,12 @@ class PeerManager(
         combine(peer.currentTipFlow.filterNotNull(), peer.finalWallet.walletStateFlow) { (currentBlockHeight, _), wallet ->
             wallet.withConfirmations(
                 currentBlockHeight = currentBlockHeight,
-                minConfirmations = 0 // the final wallet does not need to distinguish between weakly/deeply confirmed txs
+                // the final wallet does not need to distinguish between weakly/deeply confirmed txs
+                swapInParams = SwapInParams(
+                    minConfirmations = 0,
+                    maxConfirmations = Int.MAX_VALUE,
+                    refundDelay = Int.MAX_VALUE,
+                )
             )
         }
     }.stateIn(
@@ -90,7 +97,7 @@ class PeerManager(
         combine(peer.currentTipFlow.filterNotNull(), peer.swapInWallet.walletStateFlow) { (currentBlockHeight, _), wallet ->
             wallet.withConfirmations(
                 currentBlockHeight = currentBlockHeight,
-                minConfirmations = peer.walletParams.swapInConfirmations
+                swapInParams = peer.walletParams.swapInParams
             )
         }
     }.stateIn(
@@ -139,7 +146,11 @@ class PeerManager(
                     feeProportional = 100,
                     cltvExpiryDelta = CltvExpiryDelta(144)
                 ),
-                swapInConfirmations = NodeParamsManager.swapInConfirmations,
+                swapInParams = SwapInParams(
+                    minConfirmations = DefaultSwapInParams.MinConfirmations,
+                    maxConfirmations = DefaultSwapInParams.MaxConfirmations,
+                    refundDelay = DefaultSwapInParams.RefundDelay,
+                ),
             )
 
             var initTlvs = TlvStream.empty<InitTlv>()
@@ -152,7 +163,7 @@ class PeerManager(
                 initTlvs = initTlvs.addOrUpdate(InitTlv.PhoenixAndroidLegacyNodeId(legacyNodeId = legacyKey.publicKey, signature = signature))
             }
 
-            logger.debug { "instantiating peer with walletParams=$walletParams initTlvs=$initTlvs startupParams=$startupParams" }
+            logger.info { "instantiating peer with:\n    walletParams=$walletParams\n    initTlvs=$initTlvs\n    startupParams=$startupParams" }
 
             val peer = Peer(
                 initTlvStream = initTlvs,

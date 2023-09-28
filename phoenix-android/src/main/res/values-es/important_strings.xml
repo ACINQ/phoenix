@@ -235,6 +235,9 @@
     <string name="walletinfo_onchain_swapin_policy_view">Puntee para configurar.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">Los fondos en cadena se cambiarán automáticamente a Lightning si la tasa es <b>inferior a %1$s</b>.</string>
     <string name="walletinfo_onchain_swapin_policy_disabled_details">La política de tasas automatizadas <b>está desactivada</b>. Los fondos no serán intercambiados. Permanecerán en esta cartera.</string>
+    <string name="walletinfo_onchain_swapin_last_attempt">Último intento (%1$s).</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_disabled">La política de tasas automatizadas está desactivada.</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Sus canales aún se estaban inicializando.</string>
     <string name="walletinfo_onchain_swapin_empty">No hay intercambios en curso.</string>
 
     <string name="walletinfo_onchain_final_about">Una cartera en la cadena derivada de su semilla.\n\nLa cartera final es donde se envían los fondos por defecto cuando se cierran sus canales Lightning.</string>

@@ -14,6 +14,10 @@ extension Int64 {
 			case .seconds      : return Date(timeIntervalSince1970: TimeInterval(self))
 		}
 	}
+	
+	func minus(hours: Int) -> Int64 {
+		return self - Int64(1_000 * 60 * 60 * hours)
+	}
 }
 
 extension Date {

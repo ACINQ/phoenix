@@ -190,7 +190,7 @@ struct BackgroundPaymentsSelector: View {
 					Text("You can only receive payments if Phoenix is running in the foreground.")
 						.font(.callout)
 				} icon: {
-					Text("☹️").font(.headline)
+					Text(verbatim: "☹️").font(.headline)
 				}
 				.padding(.bottom)
 				
@@ -207,7 +207,7 @@ struct BackgroundPaymentsSelector: View {
 					}
 					.font(.callout)
 				} icon: {
-					Text("😃").font(.headline)
+					Text(verbatim: "😃").font(.headline)
 				}
 				.padding(.bottom, 30)
 				
@@ -215,7 +215,7 @@ struct BackgroundPaymentsSelector: View {
 					VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 						Text("To enable background payments:")
 						HStack(alignment: VerticalAlignment.top, spacing: 8) {
-							Text("*").bold()
+							Text(verbatim: "*").bold()
 							Button {
 								customizeInIosSettings()
 							} label: {
@@ -223,7 +223,7 @@ struct BackgroundPaymentsSelector: View {
 							}
 						}
 						HStack(alignment: VerticalAlignment.top, spacing: 8) {
-							Text("*").bold()
+							Text(verbatim: "*").bold()
 							Text("Enable notifications in the Notification Center")
 						}
 					}

@@ -651,7 +651,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				Text("Splice-In")
 			
 			} else {
-				Text("")
+				Text(verbatim: "")
 			}
 		}
 	}

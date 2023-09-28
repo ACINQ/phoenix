@@ -370,7 +370,7 @@ extension PaymentsPageFetcher {
 			KotlinCurrentValueSubject<PaymentsPage>(
 				self.paymentsPage
 			)
-			.compactMap { $0 as? PaymentsPage }
+			.compactMap { $0 }
 			.eraseToAnyPublisher()
 		}
 	}

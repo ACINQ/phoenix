@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.electrum.balance
@@ -46,8 +47,11 @@ import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.data.Notification
+import java.text.DecimalFormat
 
 @Composable
 fun SwapInWalletInfo(
@@ -100,6 +104,38 @@ fun SwapInWalletInfo(
 private fun SwappableBalanceView(
     balance: MilliSatoshi,
 ) {
+    // display recent failed attempts for swaps corresponding to this amount
+    val notifications by business.notificationsManager.notifications.collectAsState()
+    notifications.map { it.second }
+        .filterIsInstance<Notification.PaymentRejected>()
+        .firstOrNull {
+            it.source == LiquidityEvents.Source.OnChainWallet && it.amount == balance
+        }?.let {
+            val btcUnit = LocalBitcoinUnit.current
+            CardHeader(text = stringResource(id = R.string.walletinfo_onchain_swapin_last_attempt, it.createdAt.toRelativeDateString()))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                Text(
+                    text =  when (it) {
+                        is Notification.OverAbsoluteFee -> stringResource(
+                            id = R.string.inappnotif_payment_rejected_over_absolute,
+                            it.fee.toPrettyString(btcUnit, withUnit = true),
+                            it.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true),
+                        )
+                        is Notification.OverRelativeFee -> stringResource(
+                            id = R.string.inappnotif_payment_rejected_over_relative,
+                            it.fee.toPrettyString(btcUnit, withUnit = true),
+                            DecimalFormat("0.##").format(it.maxRelativeFeeBasisPoints.toDouble() / 100),
+                        )
+                        is Notification.FeePolicyDisabled -> stringResource(id = R.string.walletinfo_onchain_swapin_last_attempt_disabled)
+                        is Notification.ChannelsInitializing -> stringResource(id = R.string.walletinfo_onchain_swapin_last_attempt_channels_init)
+                    },
+                )
+            }
+        }
+
     CardHeader(text = stringResource(id = R.string.walletinfo_swappable_title))
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -113,13 +149,14 @@ private fun SwappableBalanceView(
 private fun NotSwappableWalletView(
     wallet: WalletState.WalletWithConfirmations
 ) {
-    CardHeader(text = stringResource(id = R.string.walletinfo_not_swappable_title, wallet.minConfirmations))
+    val minConfirmations = wallet.swapInParams.minConfirmations
+    CardHeader(text = stringResource(id = R.string.walletinfo_not_swappable_title, minConfirmations))
     Card {
         wallet.weaklyConfirmed.forEach {
-            UtxoRow(it, (wallet.minConfirmations - wallet.confirmationsNeeded(it)) to wallet.minConfirmations)
+            UtxoRow(it, (minConfirmations - wallet.confirmationsNeeded(it)) to minConfirmations)
         }
         wallet.unconfirmed.forEach {
-            UtxoRow(it, null to wallet.minConfirmations)
+            UtxoRow(it, null to minConfirmations)
         }
     }
 }
