@@ -154,7 +154,6 @@ abstract class AppContext : Application() {
         try {
           if (response.isSuccessful && body != null) {
             val json = JSONObject(body.string()).getJSONObject(BuildConfig.CHAIN)
-            log.debug("fetched context={}", json.toString(2))
             handleWalletContext(json)
             Prefs.saveWalletContext(context, json)
           } else {
@@ -183,7 +182,6 @@ abstract class AppContext : Application() {
         try {
           if (response.isSuccessful && body != null) {
             val json = JSONObject(body.string()).getJSONObject(BuildConfig.CHAIN)
-            log.debug("fetched context={}", json.toString(2))
             handleWalletContext(json)
             Prefs.saveWalletContext(context, json)
           } else {
