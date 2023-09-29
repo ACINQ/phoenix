@@ -95,7 +95,7 @@ private fun SwapInWalletView(onSwapInWalletClick: () -> Unit) {
         onClick = onSwapInWalletClick,
     ) {
         swapInWallet?.let { wallet ->
-            OnchainBalanceView(confirmed = wallet.deeplyConfirmed.balance, unconfirmed = wallet.unconfirmed.balance + wallet.weaklyConfirmed.balance)
+            OnchainBalanceView(confirmed = (wallet.deeplyConfirmed + wallet.lockedUntilRefund + wallet.readyForRefund).balance, unconfirmed = wallet.unconfirmed.balance + wallet.weaklyConfirmed.balance)
         } ?: ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
         keyManager?.let {
             HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)

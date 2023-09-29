@@ -184,7 +184,7 @@ fun HomeView(
 
     MVIView(CF::home) { model, _ ->
         val balance = model.balance
-        val notices = noticesViewModel.notices.values.toList()
+        val notices = noticesViewModel.notices
         val notifications by business.notificationsManager.notifications.collectAsState(emptyList())
 
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -216,10 +216,11 @@ fun HomeView(
                 )
                 PrimarySeparator(modifier = Modifier.layoutId("separator"))
                 if (notices.isNotEmpty() || notifications.isNotEmpty()) {
-                    NoticesButtonRow(
+                    HomeNotices(
                         modifier = Modifier.layoutId("notices"),
-                        notices = noticesViewModel.notices.values.toList(),
+                        notices = notices,
                         notifications = notifications,
+                        onNavigateToSwapInWallet = onShowSwapInWallet,
                         onNavigateToNotificationsList = onShowNotifications,
                     )
                 } else {

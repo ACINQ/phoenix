@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavDeepLink
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -57,9 +58,6 @@ import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.home.HomeView
-import fr.acinq.phoenix.android.startup.LegacySwitcherView
-import fr.acinq.phoenix.android.settings.NotificationsView
-import fr.acinq.phoenix.android.startup.StartupView
 import fr.acinq.phoenix.android.init.CreateWalletView
 import fr.acinq.phoenix.android.init.InitWallet
 import fr.acinq.phoenix.android.init.RestoreWalletView
@@ -80,6 +78,8 @@ import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
+import fr.acinq.phoenix.android.startup.LegacySwitcherView
+import fr.acinq.phoenix.android.startup.StartupView
 import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
@@ -131,7 +131,10 @@ fun AppView(
             )
         )
 
-        val noticesViewModel = viewModel<NoticesViewModel>(factory = NoticesViewModel.Factory(appConfigurationManager = business.appConfigurationManager))
+        val noticesViewModel = viewModel<NoticesViewModel>(factory = NoticesViewModel.Factory(
+            appConfigurationManager = business.appConfigurationManager,
+            peerManager = business.peerManager
+        ))
         MonitorNotices(vm = noticesViewModel)
 
         val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
@@ -354,7 +357,12 @@ fun AppView(
                         onFinalWalletClick = { navController.navigate(Screen.WalletInfo.FinalWallet.route) },
                     )
                 }
-                composable(Screen.WalletInfo.SwapInWallet.route) {
+                composable(
+                    Screen.WalletInfo.SwapInWallet.route,
+                    deepLinks = listOf(
+                        navDeepLink { uriPattern = "phoenix:swapinwallet" }
+                    )
+                ) {
                     SwapInWalletInfo(
                         onBackClick = { navController.popBackStack() },
                         onViewChannelPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
@@ -363,7 +371,7 @@ fun AppView(
                 composable(Screen.WalletInfo.FinalWallet.route) {
                     FinalWalletInfo(onBackClick = { navController.popBackStack() })
                 }
-                composable(Screen.LiquidityPolicy.route) {
+                composable(Screen.LiquidityPolicy.route, deepLinks = listOf(navDeepLink { uriPattern ="phoenix:liquiditypolicy" })) {
                     LiquidityPolicyView(
                         onBackClick = { navController.popBackStack() },
                         onAdvancedClick = { navController.navigate(Screen.AdvancedLiquidityPolicy.route) }
@@ -413,6 +421,7 @@ fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId, 
     navController.navigate("${Screen.PaymentDetails.route}?direction=${id.dbType.value}&id=${id.dbId}&fromEvent=${isFromEvent}")
 }
 
+
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 private fun MonitorNotices(
@@ -425,7 +434,7 @@ private fun MonitorNotices(
             if (it) {
                 vm.addNotice(Notice.BackupSeedReminder)
             } else {
-                vm.removeNotice(Notice.BackupSeedReminder)
+                vm.removeNotice<Notice.BackupSeedReminder>()
             }
         }
     }
@@ -439,14 +448,14 @@ private fun MonitorNotices(
                 }
             }
         } else {
-            vm.removeNotice(Notice.NotificationPermission)
+            vm.removeNotice<Notice.NotificationPermission>()
         }
         LaunchedEffect(Unit) {
             UserPrefs.getShowNotificationPermissionReminder(context).collect {
                 if (it && !notificationPermission.status.isGranted) {
                     vm.addNotice(Notice.NotificationPermission)
                 } else {
-                    vm.removeNotice(Notice.NotificationPermission)
+                    vm.removeNotice<Notice.NotificationPermission>()
                 }
             }
         }
@@ -457,7 +466,7 @@ private fun MonitorNotices(
             if (currentTimestampMillis() - it.timestamp > 6 * DateUtils.DAY_IN_MILLIS) {
                 vm.addNotice(Notice.WatchTowerLate)
             } else {
-                vm.removeNotice(Notice.WatchTowerLate)
+                vm.removeNotice<Notice.WatchTowerLate>()
             }
         }
     }
@@ -468,7 +477,7 @@ private fun MonitorNotices(
                 if (!shown) {
                     vm.addNotice(Notice.MigrationFromLegacy)
                 } else {
-                    vm.removeNotice(Notice.MigrationFromLegacy)
+                    vm.removeNotice<Notice.MigrationFromLegacy>()
                 }
             }
         }

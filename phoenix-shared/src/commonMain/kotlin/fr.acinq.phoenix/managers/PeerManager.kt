@@ -13,6 +13,7 @@ import fr.acinq.lightning.UpgradeRequired
 import fr.acinq.lightning.WalletParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.WalletState
+import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.states.Normal
@@ -26,7 +27,10 @@ import fr.acinq.lightning.wire.InitTlv
 import fr.acinq.lightning.wire.TlvStream
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LocalChannelInfo
+import fr.acinq.phoenix.utils.extensions.deeplyConfirmedToExpiry
+import fr.acinq.phoenix.utils.extensions.timeoutIn
 import fr.acinq.phoenix.utils.extensions.isTerminated
+import fr.acinq.phoenix.utils.extensions.nextTimeout
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.kodein.log.Logger
@@ -77,7 +81,7 @@ class PeerManager(
         combine(peer.currentTipFlow.filterNotNull(), peer.finalWallet.walletStateFlow) { (currentBlockHeight, _), wallet ->
             wallet.withConfirmations(
                 currentBlockHeight = currentBlockHeight,
-                // the final wallet does not need to distinguish between weakly/deeply confirmed txs
+                // the final wallet does not need to distinguish between weak/deep/locked txs
                 swapInParams = SwapInParams(
                     minConfirmations = 0,
                     maxConfirmations = Int.MAX_VALUE,
@@ -105,6 +109,9 @@ class PeerManager(
         started = SharingStarted.Lazily,
         initialValue = null,
     )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val swapInNextTimeout = swapInWallet.filterNotNull().mapLatest { it.nextTimeout }
 
     /**
      * FIXME: Temporary workaround. Must be done in lightning-kmp with proper testing.
@@ -240,9 +247,11 @@ class PeerManager(
                 is LiquidityEvents.Rejected -> {
                     notificationsManager.saveLiquidityEventNotification(event)
                 }
+
                 is UpgradeRequired -> {
                     _upgradeRequired.value = true
                 }
+
                 else -> {}
             }
         }

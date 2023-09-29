@@ -16,13 +16,18 @@
 
 package fr.acinq.phoenix.android.utils
 
+import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
+import android.text.format.DateUtils
+import androidx.compose.ui.res.stringResource
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
@@ -31,9 +36,11 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -44,11 +51,13 @@ import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 import java.text.DecimalFormat
 import java.util.Random
+import kotlin.math.ceil
 
 object SystemNotificationHelper {
     private const val PAYMENT_FAILED_NOTIF_ID = 354319
     private const val PAYMENT_FAILED_NOTIF_CHANNEL = "${BuildConfig.APPLICATION_ID}.PAYMENT_FAILED_NOTIF"
     private const val PAYMENT_RECEIVED_NOTIF_CHANNEL = "${BuildConfig.APPLICATION_ID}.PAYMENT_RECEIVED_NOTIF"
+
     private const val SETTLEMENT_PENDING_NOTIF_ID = 354322
     private const val SETTLEMENT_PENDING_NOTIF_CHANNEL = "${BuildConfig.APPLICATION_ID}.SETTLEMENT_PENDING_NOTIF"
 
@@ -58,28 +67,35 @@ object SystemNotificationHelper {
     private const val CHANNELS_WATCHER_ALERT_ID = 354324
     private const val CHANNELS_WATCHER_ALERT_CHANNEL = "${BuildConfig.APPLICATION_ID}.CHANNELS_WATCHER"
 
+    private const val SWAP_TIMEOUT_ID = 354325
+    private const val SWAP_TIMEOUT_CHANNEL = "${BuildConfig.APPLICATION_ID}.SWAP_TIMEOUT"
+
     private val log = LoggerFactory.getLogger(this::class.java)
+
+    /** If the remaining blocks count before a swap timeout is lower than this, we should mention it in the notification. */
+    private const val SWAP_TIMEOUT_THRESHOLD_IN_BLOCKS = 144 * 30  * 2 // ~2 months
 
     fun registerNotificationChannels(context: Context) {
         // notification channels (android 8+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.getSystemService(NotificationManager::class.java)?.createNotificationChannels(
-                listOf(
-                    NotificationChannel(HEADLESS_NOTIF_CHANNEL, context.getString(R.string.notification_headless_title), NotificationManager.IMPORTANCE_DEFAULT).apply {
-                        description = context.getString(R.string.notification_headless_desc)
-                    },
-                    NotificationChannel(PAYMENT_RECEIVED_NOTIF_CHANNEL, context.getString(R.string.notification_pending_settlement_title), NotificationManager.IMPORTANCE_HIGH).apply {
-                        description = context.getString(R.string.notification_pending_settlement_desc)
-                    },
-                    NotificationChannel(PAYMENT_RECEIVED_NOTIF_CHANNEL, context.getString(R.string.notification_received_payment_title), NotificationManager.IMPORTANCE_LOW).apply {
-                        description = context.getString(R.string.notification_received_payment_desc)
-                    },
-                    NotificationChannel(PAYMENT_FAILED_NOTIF_CHANNEL, context.getString(R.string.notification_missed_payment_title), NotificationManager.IMPORTANCE_DEFAULT).apply {
-                        description = context.getString(R.string.notification_missed_payment_desc)
-                    },
-                )
+        context.getSystemService(NotificationManager::class.java)?.createNotificationChannels(
+            listOf(
+                NotificationChannel(HEADLESS_NOTIF_CHANNEL, context.getString(R.string.notification_headless_title), NotificationManager.IMPORTANCE_DEFAULT).apply {
+                    description = context.getString(R.string.notification_headless_desc)
+                },
+                NotificationChannel(SETTLEMENT_PENDING_NOTIF_CHANNEL, context.getString(R.string.notification_pending_settlement_title), NotificationManager.IMPORTANCE_HIGH).apply {
+                    description = context.getString(R.string.notification_pending_settlement_desc)
+                },
+                NotificationChannel(PAYMENT_RECEIVED_NOTIF_CHANNEL, context.getString(R.string.notification_received_payment_title), NotificationManager.IMPORTANCE_LOW).apply {
+                    description = context.getString(R.string.notification_received_payment_desc)
+                },
+                NotificationChannel(PAYMENT_FAILED_NOTIF_CHANNEL, context.getString(R.string.notification_missed_payment_title), NotificationManager.IMPORTANCE_DEFAULT).apply {
+                    description = context.getString(R.string.notification_missed_payment_desc)
+                },
+                NotificationChannel(SWAP_TIMEOUT_CHANNEL, context.getString(R.string.notification_swap_timeout_title), NotificationManager.IMPORTANCE_HIGH).apply {
+                    description = context.getString(R.string.notification_swap_timeout_desc)
+                },
             )
-        }
+        )
     }
 
     fun notifyRunningHeadless(context: Context): Notification {
@@ -87,61 +103,103 @@ object SystemNotificationHelper {
             setContentTitle(context.getString(R.string.notif_headless_title_default))
             setSmallIcon(R.drawable.ic_phoenix_outline)
         }.build().also {
-            NotificationManagerCompat.from(context).notify(HEADLESS_NOTIF_ID, it)
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                NotificationManagerCompat.from(context).notify(HEADLESS_NOTIF_ID, it)
+            }
         }
     }
 
-    private fun notifyPaymentFailed(context: Context, title: String, message: String): Notification {
+    private fun notifyPaymentFailed(context: Context, title: String, message: String, deepLink: String?): Notification {
         return NotificationCompat.Builder(context, PAYMENT_FAILED_NOTIF_CHANNEL).apply {
             setContentTitle(title)
             setContentText(message)
             setStyle(NotificationCompat.BigTextStyle().bigText(message))
             setSmallIcon(R.drawable.ic_phoenix_outline)
-            setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE))
+            val intent = deepLink?.let {
+                Intent(Intent.ACTION_VIEW, it.toUri(), context, MainActivity::class.java)
+            } ?: Intent(context, MainActivity::class.java)
+            setContentIntent(
+                TaskStackBuilder.create(context).run {
+                    addNextIntentWithParentStack(intent)
+                    getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
+                }
+            )
+
             setAutoCancel(true)
         }.build().also {
-            NotificationManagerCompat.from(context).notify(PAYMENT_FAILED_NOTIF_ID, it)
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                NotificationManagerCompat.from(context).notify(PAYMENT_FAILED_NOTIF_ID, it)
+            }
         }
     }
 
-    fun notifyPaymentRejectedPolicyDisabled(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi): Notification {
+    fun notifyPaymentRejectedPolicyDisabled(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, nextTimeoutRemainingBlocks: Int?): Notification {
         return notifyPaymentFailed(
             context = context,
             title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
                 amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
-            message = context.getString(R.string.notif_rejected_policy_disabled),
+            message = when {
+                source == LiquidityEvents.Source.OnChainWallet && nextTimeoutRemainingBlocks != null && nextTimeoutRemainingBlocks < SWAP_TIMEOUT_THRESHOLD_IN_BLOCKS -> {
+                    val remainingTimeMillis = nextTimeoutRemainingBlocks * 10 * DateUtils.MINUTE_IN_MILLIS
+                    context.getString(R.string.notif_rejected_policy_disabled_timeout, (currentTimestampMillis() + remainingTimeMillis).toAbsoluteDateString())
+                }
+                else -> {
+                    context.getString(R.string.notif_rejected_policy_disabled)
+                }
+            },
+            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:liquiditypolicy",
         )
     }
 
-    fun notifyPaymentRejectedChannelsInitializing(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi): Notification {
+    fun notifyPaymentRejectedChannelsInitializing(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, nextTimeoutRemainingBlocks: Int?): Notification {
         return notifyPaymentFailed(
             context = context,
             title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
                 amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
             message = context.getString(R.string.notif_rejected_channels_initializing),
+            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:liquiditypolicy",
         )
     }
 
-    fun notifyPaymentRejectedOverAbsolute(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, fee: MilliSatoshi, absoluteMax: Satoshi): Notification {
+    fun notifyPaymentRejectedOverAbsolute(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, fee: MilliSatoshi, absoluteMax: Satoshi, nextTimeoutRemainingBlocks: Int?): Notification {
         return notifyPaymentFailed(
             context = context,
             title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
                 amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
-            message = context.getString(R.string.notif_rejected_over_absolute,
-                fee.toPrettyString(BitcoinUnit.Sat, withUnit = true),
-                absoluteMax.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
+            message = when {
+                source == LiquidityEvents.Source.OnChainWallet && nextTimeoutRemainingBlocks != null && nextTimeoutRemainingBlocks < SWAP_TIMEOUT_THRESHOLD_IN_BLOCKS -> {
+                    val remainingTimeMillis = nextTimeoutRemainingBlocks * 10 * DateUtils.MINUTE_IN_MILLIS
+                    context.getString(R.string.notif_rejected_over_absolute_timeout, fee.toPrettyString(BitcoinUnit.Sat, withUnit = true),
+                        absoluteMax.toPrettyString(BitcoinUnit.Sat, withUnit = true), (currentTimestampMillis() + remainingTimeMillis).toAbsoluteDateString()
+                    )
+                }
+                else -> {
+                    context.getString(R.string.notif_rejected_over_absolute, fee.toPrettyString(BitcoinUnit.Sat, withUnit = true),
+                        absoluteMax.toPrettyString(BitcoinUnit.Sat, withUnit = true))
+                }
+            },
+            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:liquiditypolicy",
         )
     }
 
-    fun notifyPaymentRejectedOverRelative(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, fee: MilliSatoshi, percentMax: Int): Notification {
+    fun notifyPaymentRejectedOverRelative(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, fee: MilliSatoshi, percentMax: Int, nextTimeoutRemainingBlocks: Int?): Notification {
         return notifyPaymentFailed(
             context = context,
             title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
                 amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
-            message = context.getString(R.string.notif_rejected_over_relative,
-                fee.toPrettyString(BitcoinUnit.Sat, withUnit = true),
-                DecimalFormat("0.##").format(percentMax.toDouble() / 100),
-            ),
+            message = when {
+                source == LiquidityEvents.Source.OnChainWallet && nextTimeoutRemainingBlocks != null && nextTimeoutRemainingBlocks < SWAP_TIMEOUT_THRESHOLD_IN_BLOCKS -> {
+                    val remainingTimeMillis = nextTimeoutRemainingBlocks * 10 * DateUtils.MINUTE_IN_MILLIS
+                    context.getString(R.string.notif_rejected_over_relative_timeout, fee.toPrettyString(BitcoinUnit.Sat, withUnit = true),
+                        DecimalFormat("0.##").format(percentMax.toDouble() / 100), (currentTimestampMillis() + remainingTimeMillis).toAbsoluteDateString()
+                    )
+                }
+                else -> {
+                    context.getString(R.string.notif_rejected_over_relative, fee.toPrettyString(BitcoinUnit.Sat, withUnit = true),
+                        DecimalFormat("0.##").format(percentMax.toDouble() / 100))
+                }
+            },
+            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:liquiditypolicy",
         )
     }
 
@@ -150,6 +208,7 @@ object SystemNotificationHelper {
             context = context,
             title = context.getString(R.string.notif_missed_title),
             message = context.getString(R.string.notif_missed_unavailable),
+            deepLink = null
         )
     }
 
@@ -162,7 +221,9 @@ object SystemNotificationHelper {
             setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE))
             setAutoCancel(true)
         }.build().also {
-            NotificationManagerCompat.from(context).notify(SETTLEMENT_PENDING_NOTIF_ID, it)
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                NotificationManagerCompat.from(context).notify(SETTLEMENT_PENDING_NOTIF_ID, it)
+            }
         }
     }
 
@@ -213,7 +274,9 @@ object SystemNotificationHelper {
             })
             setAutoCancel(true)
         }.build().also {
-            NotificationManagerCompat.from(context).notify(if (isHeadless) HEADLESS_NOTIF_ID else Random().nextInt(), it)
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                NotificationManagerCompat.from(context).notify(if (isHeadless) HEADLESS_NOTIF_ID else Random().nextInt(), it)
+            }
         }
     }
 
@@ -224,7 +287,10 @@ object SystemNotificationHelper {
             setSmallIcon(R.drawable.ic_phoenix_outline)
             setAutoCancel(true)
         }.let {
-            NotificationManagerCompat.from(context).notify(CHANNELS_WATCHER_ALERT_ID, it.build())
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                NotificationManagerCompat.from(context).notify(CHANNELS_WATCHER_ALERT_ID, it.build())
+            }
         }
     }
+
 }

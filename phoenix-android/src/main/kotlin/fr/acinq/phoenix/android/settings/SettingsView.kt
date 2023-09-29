@@ -62,7 +62,7 @@ fun SettingsView(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var debugClickCount by remember { mutableStateOf(0) }
-    val notices = noticesViewModel.notices.values
+    val notices = noticesViewModel.notices
     val notifications = business.notificationsManager.notifications.collectAsState()
 
     DefaultScreenLayout {

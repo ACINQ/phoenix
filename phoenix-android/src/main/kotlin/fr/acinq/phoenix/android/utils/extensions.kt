@@ -30,6 +30,9 @@ import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import java.security.cert.CertificateException
 import java.util.*
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * Utility method rebinding any exceptions thrown by a method into another exception, using the origin exception as the root cause.
@@ -44,6 +47,14 @@ inline fun <T> tryWith(exception: Exception, action: () -> T): T = try {
 
 inline fun <T1 : Any, T2 : Any, R : Any> safeLet(p1: T1?, p2: T2?, block: (T1, T2) -> R?): R? {
     return if (p1 != null && p2 != null) block(p1, p2) else null
+}
+
+@OptIn(ExperimentalContracts::class)
+inline fun <T, R> T.ifLet(block: (T) -> R): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+    return block(this)
 }
 
 fun Context.findActivity(): MainActivity {

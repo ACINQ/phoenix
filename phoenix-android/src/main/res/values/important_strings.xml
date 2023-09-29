@@ -35,9 +35,12 @@
 
     <string name="notif_rejected_deposit_title">On-chain deposit pending (+%1$s)</string>
     <string name="notif_rejected_payment_title">Payment rejected (+%1$s)</string>
-    <string name="notif_rejected_policy_disabled">Automated channel management is disabled. You can change that in the settings.</string>
-    <string name="notif_rejected_over_absolute">The fee was %1$s, but your max fee was set to %2$s. You can tweak that in the settings.</string>
-    <string name="notif_rejected_over_relative">The fee was %1$s which is more than %2$s%% of the amount received. You can tweak that in the settings.</string>
+    <string name="notif_rejected_policy_disabled">Automated channel management is disabled. Tap for details.</string>
+    <string name="notif_rejected_policy_disabled_timeout">Automated channel management is disabled. This deposit will expire by %1$s.</string>
+    <string name="notif_rejected_over_absolute">The fee was %1$s, but your max fee was set to %2$s. Tap for details.</string>
+    <string name="notif_rejected_over_absolute_timeout">The fee was %1$s, but your max fee was set to %2$s. This deposit will expire by %3$s.</string>
+    <string name="notif_rejected_over_relative">The fee was %1$s which is more than %2$s%% of the amount received. Tap for details.</string>
+    <string name="notif_rejected_over_relative_timeout">The fee was %1$s which is more than %2$s%% of the amount received. This deposit will expire by %3$s.</string>
     <string name="notif_rejected_channels_initializing">Your channels were initializing and could not accept that payment. Try again later.</string>
 
     <string name="notif_watcher_revoked_commit_title">Please start Phoenix</string>
@@ -153,6 +156,9 @@
     <string name="inappnotif_notification_permission_message">Notifications are disabled in Android settings. Phoenix won\'t be able to notify you when a payment is processing.</string>
     <string name="inappnotif_notification_permission_enable">Enable</string>
 
+    <string name="inappnotif_swapin_timeout_message">A deposit will expire soon.</string>
+    <string name="inappnotif_swapin_timeout_action">View details</string>
+
     <string name="inappnotif_watchtower_late_message">Phoenix regularly monitors the blockchain when in the background, but was unable to do so the last few days.\n\nMake sure Android does not block Phoenix, and that it can connect to Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Dismiss</string>
 
@@ -174,6 +180,7 @@
     <string name="inappnotif_payment_rejected_over_relative">The fee was %1$s which is more than %2$s%% of the amount.</string>
     <string name="inappnotif_payment_rejected_channel_initializing">Your channels are still initializing and could not receive that payment.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Tap to configure.</string>
+    <string name="inappnotif_payment_rejected_view_wallet">View details</string>
 
     <string name="inappnotif_watchtower_nominal_title">Watchtower report</string>
     <plurals name="inappnotif_watchtower_nominal_description">
@@ -236,14 +243,26 @@
     <!-- wallet info -->
 
     <string name="walletinfo_onchain_swapin">Swap-in wallet</string>
-    <string name="walletinfo_onchain_swapin_help">Funds sent to this on-chain wallet are automatically swapped to Lightning.</string>
-    <string name="walletinfo_onchain_swapin_policy_view">Tap to configure.</string>
-    <string name="walletinfo_onchain_swapin_policy_auto_details">On-chain funds will automatically be swapped to Lightning if the fee is <b>less than %1$s</b>.</string>
-    <string name="walletinfo_onchain_swapin_policy_disabled_details">Automated channels management <b>is disabled</b>. Funds will not be swapped. They will remain on this wallet.</string>
-    <string name="walletinfo_onchain_swapin_last_attempt">Last attempt (%1$s).</string>
+    <string name="walletinfo_onchain_swapin_help">Funds sent to this on-chain wallet are automatically swapped to Lightning if the conditions are right.</string>
+    <string name="walletinfo_onchain_swapin_help_faq_link">See how it works</string>
+    <string name="walletinfo_onchain_swapin_policy_view">Tap to configure</string>
+    <string name="walletinfo_onchain_swapin_empty">There are no swaps in progress.</string>
+
+    <string name="walletinfo_onchain_swapin_policy_auto_details">Funds are automatically swapped to Lightning if the fee is <b>less than %1$s</b> (can be configured).</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details_timeout">Funds not swapped <b>after %1$d months</b> are recoverable on-chain.</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled_details">Automated channels management <b>is disabled</b>. Funds will remain on-chain. No swap will occur.</string>
+
+    <string name="walletinfo_onchain_swapin_last_attempt">A swap attempt failed %1$s</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">Channels management was disabled.</string>
     <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Channels were still initializing.</string>
-    <string name="walletinfo_onchain_swapin_empty">There are no swaps in progress.</string>
+    <string name="walletinfo_onchain_swapin_timeout_1day">This swap will expire in a day!</string>
+    <string name="walletinfo_onchain_swapin_timeout">This swap will expire in %1$s days.</string>
+
+    <string name="walletinfo_onchain_swapin_locked_title">Timed out</string>
+    <string name="walletinfo_onchain_swapin_locked_description">These funds will be available from %1$s days onwards.</string>
+
+    <string name="walletinfo_onchain_swapin_refund_title">Cancelled funds</string>
+    <string name="walletinfo_onchain_swapin_refund_description">These funds were not be swapped in time. Use the wallet\'s descriptor to access them.</string>
 
     <string name="walletinfo_onchain_final_about">An on-chain wallet derived from your seed.\n\nThe final wallet is where funds are sent by default when your Lightning channels are closed.</string>
 

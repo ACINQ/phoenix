@@ -68,7 +68,7 @@ fun NotificationsView(
     val log = logger("NotificationsView")
     val notificationsManager = business.notificationsManager
     // TODO: filter rejected payments where the fee policy was X, but the fee policy is now Y
-    val notices = noticesViewModel.notices.values.toList().sortedBy { it.priority }
+    val notices = noticesViewModel.notices.sortedBy { it.priority }
     val notifications by notificationsManager.notifications.collectAsState(emptyList())
 
     DefaultScreenLayout(isScrollable = false) {
@@ -139,6 +139,7 @@ private fun PermamentNotice(
                 }
             )
         }
+
         Notice.BackupSeedReminder -> {
             ImportantNotification(
                 icon = R.drawable.ic_key,
@@ -147,6 +148,7 @@ private fun PermamentNotice(
                 onActionClick = { nc?.navigate(Screen.DisplaySeed.route) }
             )
         }
+
         Notice.CriticalUpdateAvailable -> {
             ImportantNotification(
                 icon = R.drawable.ic_arrow_down_circle,
@@ -155,6 +157,7 @@ private fun PermamentNotice(
                 onActionClick = { openLink(context, "https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet") }
             )
         }
+
         Notice.UpdateAvailable -> {
             ImportantNotification(
                 icon = R.drawable.ic_arrow_down_circle,
@@ -163,6 +166,7 @@ private fun PermamentNotice(
                 onActionClick = { openLink(context, "https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet") }
             )
         }
+
         Notice.NotificationPermission -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
@@ -201,6 +205,7 @@ private fun PermamentNotice(
                 }
             }
         }
+
         Notice.MempoolFull -> {
             ImportantNotification(
                 icon = R.drawable.ic_alert_triangle,
@@ -209,6 +214,7 @@ private fun PermamentNotice(
                 onActionClick = { openLink(context, "https://phoenix.acinq.co/faq#high-mempool-size-impacts") },
             )
         }
+
         Notice.WatchTowerLate -> {
             val scope = rememberCoroutineScope()
             ImportantNotification(
@@ -218,6 +224,15 @@ private fun PermamentNotice(
                 onActionClick = {
                     scope.launch { InternalData.saveChannelsWatcherOutcome(context, ChannelsWatcher.Outcome.Nominal(currentTimestampMillis())) }
                 }
+            )
+        }
+
+        is Notice.SwapInCloseToTimeout -> {
+            ImportantNotification(
+                icon = R.drawable.ic_alert_triangle,
+                message = stringResource(id = R.string.inappnotif_swapin_timeout_message),
+                actionText = stringResource(id = R.string.inappnotif_swapin_timeout_action),
+                onActionClick = { nc?.navigate(Screen.WalletInfo.SwapInWallet.route) },
             )
         }
     }
@@ -233,8 +248,10 @@ private fun PaymentNotification(
     when (notification) {
         is Notification.PaymentRejected -> {
             DimissibleNotification(
-                title = stringResource(id = if (notification.source == LiquidityEvents.Source.OnChainWallet) R.string.inappnotif_payment_onchain_pending_title else R.string.inappnotif_payment_rejected_title,
-                    notification.amount.toPrettyString(btcUnit, withUnit = true)),
+                title = stringResource(
+                    id = if (notification.source == LiquidityEvents.Source.OnChainWallet) R.string.inappnotif_payment_onchain_pending_title else R.string.inappnotif_payment_rejected_title,
+                    notification.amount.toPrettyString(btcUnit, withUnit = true)
+                ),
                 body = when (notification) {
                     is Notification.FeePolicyDisabled -> stringResource(id = R.string.inappnotif_payment_rejected_disabled)
                     is Notification.OverAbsoluteFee -> stringResource(
@@ -242,16 +259,23 @@ private fun PaymentNotification(
                         notification.fee.toPrettyString(btcUnit, withUnit = true),
                         notification.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true),
                     )
+
                     is Notification.OverRelativeFee -> stringResource(
                         id = R.string.inappnotif_payment_rejected_over_relative,
                         notification.fee.toPrettyString(btcUnit, withUnit = true),
                         DecimalFormat("0.##").format(notification.maxRelativeFeeBasisPoints.toDouble() / 100),
                     )
+
                     is Notification.ChannelsInitializing -> stringResource(id = R.string.inappnotif_payment_rejected_channel_initializing)
                 },
                 bottomText = when (notification) {
-                    is Notification.ChannelsInitializing -> stringResource(id = R.string.inappnotif_payment_rejected_tweak_setting)
-                    is Notification.OverAbsoluteFee, is Notification.OverRelativeFee, is Notification.FeePolicyDisabled -> stringResource(id = R.string.inappnotif_payment_rejected_tweak_setting)
+                    is Notification.OverAbsoluteFee, is Notification.OverRelativeFee, is Notification.FeePolicyDisabled -> {
+                        if (notification.source == LiquidityEvents.Source.OnChainWallet) {
+                            stringResource(id = R.string.inappnotif_payment_rejected_view_wallet)
+                        } else {
+                            stringResource(id = R.string.inappnotif_payment_rejected_tweak_setting)
+                        }
+                    }
                     else -> null
                 },
                 timestamp = notification.createdAt,
@@ -264,22 +288,26 @@ private fun PaymentNotification(
                             { nc?.navigate(Screen.LiquidityPolicy.route) }
                         }
                     }
+
                     else -> null
                 }
             )
         }
+
         is WatchTowerOutcome.Nominal -> DimissibleNotification(
             title = stringResource(id = R.string.inappnotif_watchtower_nominal_title),
             body = pluralStringResource(id = R.plurals.inappnotif_watchtower_nominal_description, count = notification.channelsWatchedCount, notification.channelsWatchedCount, notification.createdAt.toAbsoluteDateTimeString()),
             timestamp = notification.createdAt,
             onRead = { onNotificationRead(notification.id) },
         )
+
         is WatchTowerOutcome.RevokedFound -> DimissibleNotification(
             title = stringResource(id = R.string.inappnotif_watchtower_revokedfound_title),
             body = stringResource(id = R.string.inappnotif_watchtower_revokedfound_description, notification.createdAt.toAbsoluteDateTimeString(), notification.channels.joinToString { it.toHex() }),
             timestamp = notification.createdAt,
             onRead = { onNotificationRead(notification.id) },
         )
+
         is WatchTowerOutcome.Unknown -> {
             // ignored
         }
@@ -299,9 +327,11 @@ private fun ImportantNotification(
         externalPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
     ) {
         Row(modifier = Modifier.padding(top = 12.dp, start = 16.dp, end = 16.dp)) {
-            PhoenixIcon(resourceId = icon, tint = MaterialTheme.colors.primary, modifier = Modifier
-                .size(18.dp)
-                .offset(y = 2.dp))
+            PhoenixIcon(
+                resourceId = icon, tint = MaterialTheme.colors.primary, modifier = Modifier
+                    .size(18.dp)
+                    .offset(y = 2.dp)
+            )
             Spacer(modifier = Modifier.width(10.dp))
             Column(modifier = Modifier.alignByBaseline()) {
                 Text(text = message, style = MaterialTheme.typography.body1.copy(fontSize = 16.sp))
@@ -355,9 +385,11 @@ private fun DimissibleNotification(
                 bottomText?.let {
                     Text(text = it, style = MaterialTheme.typography.caption.copy(fontSize = 14.sp), modifier = Modifier.alignByBaseline())
                 }
-                Spacer(modifier = Modifier
-                    .weight(1f)
-                    .widthIn(min = 8.dp))
+                Spacer(
+                    modifier = Modifier
+                        .weight(1f)
+                        .widthIn(min = 8.dp)
+                )
                 Text(
                     text = timestamp.toRelativeDateString(),
                     style = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
