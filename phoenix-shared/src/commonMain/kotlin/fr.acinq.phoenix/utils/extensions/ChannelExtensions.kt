@@ -39,6 +39,12 @@ fun ChannelState.isTerminated(): Boolean {
     }
 }
 
+fun ChannelState.isLegacyWait(): Boolean {
+    return this is LegacyWaitForFundingConfirmed
+            || (this is Offline && this.state is LegacyWaitForFundingConfirmed)
+            || (this is Syncing && this.state is LegacyWaitForFundingConfirmed)
+}
+
 fun ChannelState.isBeingCreated(): Boolean {
     return when (this) {
         is Syncing -> state.isBeingCreated()

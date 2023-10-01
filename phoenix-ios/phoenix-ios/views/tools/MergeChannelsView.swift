@@ -543,7 +543,7 @@ struct MergeChannelsView: View {
 		}
 		
 		if !operationInProgress {
-			let allChannelsReady = channels.allSatisfy { $0.isTerminated || $0.isUsable }
+			let allChannelsReady = channels.allSatisfy { $0.isTerminated || $0.isUsable || $0.isLegacyWait }
 			if !allChannelsReady {
 				return NSLocalizedString("restoring connections", comment: "")
 			}

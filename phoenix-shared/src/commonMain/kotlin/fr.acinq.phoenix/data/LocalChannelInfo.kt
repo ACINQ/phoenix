@@ -42,6 +42,8 @@ data class LocalChannelInfo(
     val isTerminated by lazy { state.isTerminated() }
     /** True if the channel can be used to send/receive payments. */
     val isUsable by lazy { state is Normal && !isBooting }
+    /** True if the channel is `LegacyWaitForFundingConfirmed`, i.e., it may be a zombie channel. */
+    val isLegacyWait by lazy { state.isLegacyWait() }
     /** A string version of the state's class. */
     val stateName by lazy { state.stateName }
     // FIXME: we should also expose the raw channel's balance, which is what should be used in the channel's details screen, rather than the "smart" spendable balance returned by `localBalance()`
