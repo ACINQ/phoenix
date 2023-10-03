@@ -1536,9 +1536,41 @@ struct ValidateView: View {
 			} else {
 				
 				saveTipPercentInPrefs()
+				
+				let updateMsat: Lightning_kmpMilliSatoshi
+				if currency.type == .bitcoin {
+					updateMsat = Lightning_kmpMilliSatoshi(msat: msat)
+				} else {
+					// Workaround for WalletOfSatoshi bug:
+					//
+					// It's common for a user to enter an amount in fiat,
+					// and a proper conversion will often yield an amount with non-zero msat component.
+					//
+					// For example: 1.00 USD ==> 3,652.451 sat
+					//                                 ^^^
+					//                                 non-zero millisats
+					//
+					// However, when making a LN payment to a Lightning address,
+					// the WoS service does not properly handle millisats and will generate an invoice
+					// whose amount is rounded UP to the nearest whole satoshi.
+					// In the example above, they would generate an invoice for 3,653 sat.
+					// 
+					// As such Phoenix correctly rejects the invoice, because the generated amount
+					// does not match the expected amount.
+					//
+					// Even though this is a bug in WoS, Phoenix is regularly blamed for the problem.
+					// So our workaround is to trim the msat component in this scenario.
+					//
+					// For more information:
+					// https://github.com/ACINQ/phoenix/issues/388
+					//
+					let truncatedToSat = Lightning_kmpMilliSatoshi(msat: msat).truncateToSatoshi()
+					updateMsat = Lightning_kmpMilliSatoshi(sat: truncatedToSat)
+				}
+				
 				mvi.intent(Scan.Intent_LnurlPayFlow_RequestInvoice(
 					paymentIntent: model.paymentIntent,
-					amount: Lightning_kmpMilliSatoshi(msat: msat),
+					amount: updateMsat,
 					trampolineFees: trampolineFees,
 					comment: comment
 				))
