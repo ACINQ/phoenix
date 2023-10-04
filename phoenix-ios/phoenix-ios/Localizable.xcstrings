@@ -11846,6 +11846,28 @@
         }
       }
     },
+    "Migration Notice" : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oznámení o migraci"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aviso de migración"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note suite à la migration"
+          }
+        }
+      }
+    },
     "min:" : {
       "localizations" : {
         "es" : {
@@ -18687,6 +18709,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ceci est une adresse de swap. Elle n’est pas contrôlée par votre portefeuille. Les dépôts on-chain seront convertis en canaux de paiement Lightning."
+          }
+        }
+      }
+    },
+    "This is your new address. Do not reuse your old Bitcoin address from before migration." : {
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toto je vaše nová adresa. Nepoužívejte znovu své staré Bitcoin adresy z doby před migrací!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta es su nueva dirección. No reutilice sus antiguas direcciones Bitcoin anteriores a la migración."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il s'agit de votre nouvelle adresse. Ne réutilisez pas vos anciennes adresses Bitcoin d'avant la migration !"
           }
         }
       }
