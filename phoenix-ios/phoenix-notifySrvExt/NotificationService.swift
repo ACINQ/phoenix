@@ -36,14 +36,16 @@ class NotificationService: UNNotificationServiceExtension {
 
 	private var contentHandler: ((UNNotificationContent) -> Void)?
 	private var bestAttemptContent: UNMutableNotificationContent?
-
+	
 	private var xpcStarted: Bool = false
 	private var phoenixStarted: Bool = false
-	private var done: Bool = false
+	private var srvExtDone: Bool = false
 	
+	private var isConnectedToPeer = false
 	private var receivedPayments: [Lightning_kmpIncomingPayment] = []
 	
 	private var totalTimer: Timer? = nil
+	private var connectionTimer: Timer? = nil
 	private var postPaymentTimer: Timer? = nil
 	
 	private var cancellables = Set<AnyCancellable>()
@@ -94,6 +96,10 @@ class NotificationService: UNNotificationServiceExtension {
 		log.trace("startTotalTimer()")
 		assertMainThread()
 		
+		guard totalTimer == nil else {
+			return
+		}
+		
 		// The OS gives us 30 seconds to fetch data, and then invoke the completionHandler.
 		// Failure to properly "clean up" in this way will result in the OS reprimanding us.
 		// So we set a timer to ensure we stop before the max allowed.
@@ -109,13 +115,47 @@ class NotificationService: UNNotificationServiceExtension {
 		}
 	}
 	
+	private func startConnectionTimer() {
+		log.trace("startConnectionTimer()")
+		assertMainThread()
+		
+		guard connectionTimer == nil else {
+			return
+		}
+		
+		log.debug("GroupPrefs.shared.srvExtConnection = now")
+		GroupPrefs.shared.srvExtConnection = Date.now
+		
+		connectionTimer = Timer.scheduledTimer(
+			withTimeInterval : 2.0,
+			repeats          : true
+		) {[weak self](_: Timer) in
+		
+			if let self = self {
+				log.debug("connectionsTimer.fire()")
+				log.debug("GroupPrefs.shared.srvExtConnection = now")
+				GroupPrefs.shared.srvExtConnection = Date.now
+			}
+		}
+	}
+	
 	private func startPostPaymentTimer() {
 		log.trace("startPostPaymentTimer()")
 		assertMainThread()
 		
+		// This method is called everytime we receive a payment,
+		// and it's possible we receive multiple payments.
+		// So for every payment, we want to restart the timer.
 		postPaymentTimer?.invalidate()
+		
+	#if DEBUG
+		let delay: TimeInterval = 5.0
+	#else
+		let delay: TimeInterval = 5.0
+	#endif
+		
 		postPaymentTimer = Timer.scheduledTimer(
-			withTimeInterval : 5.0,
+			withTimeInterval : delay,
 			repeats          : false
 		) {[weak self](_: Timer) -> Void in
 			
@@ -134,7 +174,7 @@ class NotificationService: UNNotificationServiceExtension {
 		log.trace("startXpc()")
 		assertMainThread()
 		
-		if !xpcStarted && !done {
+		if !xpcStarted && !srvExtDone {
 			xpcStarted = true
 			
 			XpcManager.shared.register {[weak self] in
@@ -159,13 +199,25 @@ class NotificationService: UNNotificationServiceExtension {
 		assertMainThread()
 		
 		// This means the main phoenix app is running.
-		// So we can allow it to handle the payment.
-		//
-		// And we don't have to wait for the main app to finish handling the payment.
-		// Because whatever we emit from this app extension won't be displayed to the user.
-		// That is, the modified push content we emit isn't actually shown to the user.
 		
-		displayPushNotification()
+		if isConnectedToPeer {
+		
+			// But we're already connected to the peer, and processing the payment.
+			// So we're going to continue working on the payment,
+			// and the main app will have to wait for us to finish before connecting to the peer itself.
+			
+			log.debug("isConnectedToPeer is true => continue processing incoming payment")
+			
+		} else {
+			
+			// Since we're not connected yet, we'll just go ahead and allow the main app to handle the payment.
+			//
+			// And we don't have to wait for the main app to finish handling the payment.
+			// Because whatever we emit from this app extension won't be displayed to the user.
+			// That is, the modified push content we emit isn't actually shown to the user.
+			
+			displayPushNotification()
+		}
 	}
 	
 	// --------------------------------------------------
@@ -176,12 +228,17 @@ class NotificationService: UNNotificationServiceExtension {
 		log.trace("startPhoenix()")
 		assertMainThread()
 		
-		if !phoenixStarted && !done {
+		if !phoenixStarted && !srvExtDone {
 			phoenixStarted = true
 			
-			PhoenixManager.shared.register(didReceivePayment: {[weak self](payment: Lightning_kmpIncomingPayment) in
-				self?.didReceivePayment(payment)
-			})
+			PhoenixManager.shared.register(
+				connectionsListener: {[weak self](connections: Connections) in
+					self?.connectionsChanged(connections)
+				},
+				paymentListener: {[weak self](payment: Lightning_kmpIncomingPayment) in
+					self?.didReceivePayment(payment)
+				}
+			)
 			PhoenixManager.shared.connect()
 		}
 	}
@@ -198,12 +255,24 @@ class NotificationService: UNNotificationServiceExtension {
 		}
 	}
 	
+	private func connectionsChanged(_ connections: Connections) {
+		log.trace("connectionsChanged(): isConnectedToPeer = \(connections.peer.isEstablished())")
+		assertMainThread()
+		
+		isConnectedToPeer = connections.peer.isEstablished()
+		if isConnectedToPeer && !srvExtDone {
+			startConnectionTimer()
+		}
+	}
+	
 	private func didReceivePayment(_ payment: Lightning_kmpIncomingPayment) {
 		log.trace("didReceivePayment()")
 		assertMainThread()
 		
 		receivedPayments.append(payment)
-		startPostPaymentTimer()
+		if !srvExtDone {
+			startPostPaymentTimer()
+		}
 	}
 	
 	// --------------------------------------------------
@@ -214,10 +283,10 @@ class NotificationService: UNNotificationServiceExtension {
 		log.trace("displayPushNotification()")
 		assertMainThread()
 		
-		guard !done else {
+		guard !srvExtDone else {
 			return
 		}
-		done = true
+		srvExtDone = true
 		
 		guard
 			let contentHandler = contentHandler,
@@ -228,6 +297,8 @@ class NotificationService: UNNotificationServiceExtension {
 		
 		totalTimer?.invalidate()
 		totalTimer = nil
+		connectionTimer?.invalidate()
+		connectionTimer = nil
 		postPaymentTimer?.invalidate()
 		postPaymentTimer = nil
 		stopXpc()

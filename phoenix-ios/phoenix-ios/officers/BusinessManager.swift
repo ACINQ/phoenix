@@ -65,6 +65,12 @@ class BusinessManager {
 	///
 	public let canMergeChannelsForSplicingPublisher = CurrentValueSubject<Bool, Never>(false)
 	
+	/// Reports whether or not the notifySrvExt process is running, and connected to the Peer.
+	/// When this is true, we (the main app process) are prevented from connecting to the Peer
+	/// (otherwise doing so would force-disconnect the notifySrvExt, which may be processing an incoming payment)
+	///
+	public let srvExtConnectedToPeer = CurrentValueSubject<Bool, Never>(false)
+	
 	private var walletInfo: WalletManager.WalletInfo? = nil
 	private var pushToken: String? = nil
 	private var fcmToken: String? = nil
@@ -240,6 +246,58 @@ class BusinessManager {
 				self.canMergeChannelsForSplicingPublisher.send(shouldMigrate)
 			}
 			.store(in: &cancellables)
+		
+		// Monitor for notifySrvExt being active & connected to Peer
+		//
+		GroupPrefs.shared.srvExtConnectionPublisher
+			.sink { (date: Date) in
+			
+				log.debug("srvExtConnectionPublisher.fire()")
+				
+				let elapsed = date.timeIntervalSinceNow * -1.0
+				log.debug("elapsed = \(elapsed)")
+				
+				let isConnected = elapsed < 5.0 /* seconds */
+				log.debug("isConnected = \(isConnected)")
+				
+				self.srvExtConnectedToPeer.send(isConnected)
+				
+				if isConnected {
+					let delay = 5.0 - elapsed
+					DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+						if GroupPrefs.shared.srvExtConnection == date {
+							log.debug("srvExtConnection.clear()")
+							GroupPrefs.shared.srvExtConnection = Date(timeIntervalSince1970: 0)
+						}
+					}
+				}
+			}
+			.store(in: &cancellables)
+		
+		var srvExtWasConnectedToPeer = false
+		self.srvExtConnectedToPeer
+			.sink { (isConnected: Bool) in
+			
+				log.debug("srvExtConnectedToPeer(): isConnected = \(isConnected)")
+				
+				let wasConnected = srvExtWasConnectedToPeer
+				srvExtWasConnectedToPeer = isConnected
+				log.debug("wasConnected = \(wasConnected)")
+				
+				if isConnected && !wasConnected {
+					log.debug("incrementDisconnectCount(target: Peer)")
+					Biz.business.appConnectionsDaemon?.incrementDisconnectCount(
+						target: AppConnectionsDaemon.ControlTarget.companion.Peer
+					)
+					
+				} else if !isConnected && wasConnected {
+					log.debug("decrementDisconnectCount(target: Peer)")
+					Biz.business.appConnectionsDaemon?.decrementDisconnectCount(
+						target: AppConnectionsDaemon.ControlTarget.companion.Peer
+					)
+				}
+				
+			}.store(in: &cancellables)
 	}
 	
 	func startTasks() {

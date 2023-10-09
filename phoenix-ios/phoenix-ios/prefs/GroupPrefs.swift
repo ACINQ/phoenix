@@ -29,6 +29,7 @@ fileprivate enum Key: String {
 	case badgeCount
 	case discreetNotifications
 	case liquidityPolicy
+	case srvExtConnection
 }
 
 /// Group preferences, stored in the iOS UserDefaults system.
@@ -162,6 +163,20 @@ class GroupPrefs {
 		set { defaults.liquidityPolicy = newValue.jsonEncode() }
 	}
 	
+	lazy private(set) var srvExtConnectionPublisher: AnyPublisher<Date, Never> = {
+		defaults.publisher(for: \.srvExtConnection, options: [.initial, .new])
+			.map({ (timeInterval: Double) -> Date in
+				Date(timeIntervalSince1970: timeInterval)
+			})
+			.removeDuplicates()
+			.eraseToAnyPublisher()
+	}()
+	
+	var srvExtConnection: Date {
+		get { Date(timeIntervalSince1970: defaults.srvExtConnection) }
+		set { defaults.srvExtConnection = newValue.timeIntervalSince1970 }
+	}
+	
 	// --------------------------------------------------
 	// MARK: Push Notifications
 	// --------------------------------------------------
@@ -287,5 +302,10 @@ extension UserDefaults {
 	@objc fileprivate var liquidityPolicy: Data? {
 		get { data(forKey: Key.liquidityPolicy.rawValue) }
 		set { set(newValue, forKey: Key.liquidityPolicy.rawValue) }
+	}
+	
+	@objc fileprivate var srvExtConnection: Double {
+		get { double(forKey: Key.srvExtConnection.rawValue) }
+		set { set(newValue, forKey: Key.srvExtConnection.rawValue) }
 	}
 }
