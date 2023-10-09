@@ -21,13 +21,13 @@ enum XpcMessage {
 	case unavailable
 }
 
-fileprivate let msgPing_mainApp: Int32 = 1
-fileprivate let msgPong_mainApp: Int32 = 2
-fileprivate let msgUnavailable_mainApp: Int32 = 3
+fileprivate let msgPing_mainApp: UInt64             = 0b0001
+fileprivate let msgPong_mainApp: UInt64             = 0b0010
+fileprivate let msgUnavailable_mainApp: UInt64      = 0b0011
 
-fileprivate let msgPing_notifySrvExt: Int32 = 4
-fileprivate let msgPong_notifySrvExt: Int32 = 5
-fileprivate let msgUnavailable_notifySrvExt: Int32 = 6
+fileprivate let msgPing_notifySrvExt: UInt64        = 0b0100
+fileprivate let msgPong_notifySrvExt: UInt64        = 0b1000
+fileprivate let msgUnavailable_notifySrvExt: UInt64 = 0b1100
 
 
 class CrossProcessCommunication {
@@ -43,7 +43,7 @@ class CrossProcessCommunication {
 	private var channel: String? = nil
 	
 	private var notifyToken: Int32 = NOTIFY_TOKEN_INVALID
-	private var suspendCount: Int32 = 0
+	private var suspendCount: UInt32 = 0
 	
 	/// Must use static `shared` instance
 	private init() {}
@@ -143,64 +143,11 @@ class CrossProcessCommunication {
 			guard let self = self else {
 				return
 			}
-			let actor = self.actor
 			
-			var state: UInt64 = 0
-			notify_get_state(token, &state)
+			var msg: UInt64 = 0
+			notify_get_state(token, &msg)
 			
-			// Convert from UInt64 to Int32 and extract proper sign (positive/negative)
-			let signal = Int32(truncatingIfNeeded: Int64(bitPattern: state))
-			
-			if actor == .mainApp {
-				
-				if signal == msgPing_mainApp ||
-				   signal == msgPong_mainApp ||
-				   signal == msgUnavailable_mainApp {
-					
-					log.debug("ignorning own message")
-					
-				} else if signal == msgPing_notifySrvExt {
-					
-					log.debug("received message: ping (from notifySrvExt)")
-					self.notifyReceivedMessage(.available)
-					self.sendMessage(msgPong_mainApp)
-					
-				} else if signal == msgPong_notifySrvExt {
-					
-					log.debug("received message: pong (from notifySrvExt)")
-					self.notifyReceivedMessage(.available)
-					
-				} else if signal == msgUnavailable_notifySrvExt {
-					
-					log.debug("received message: unavailable (from notifySrvExt)")
-					self.notifyReceivedMessage(.unavailable)
-				}
-				
-			} else if actor == .notifySrvExt {
-				
-				if signal == msgPing_notifySrvExt ||
-				   signal == msgPong_notifySrvExt ||
-				   signal == msgUnavailable_notifySrvExt {
-					
-					log.debug("ignorning own message")
-					
-				} else if signal == msgPing_mainApp {
-					
-					log.debug("received message: ping (from mainApp)")
-					self.notifyReceivedMessage(.available)
-					self.sendMessage(msgPong_notifySrvExt)
-					
-				} else if signal == msgPong_mainApp {
-					
-					log.debug("received message: pong (from mainApp)")
-					self.notifyReceivedMessage(.available)
-					
-				} else if signal == msgUnavailable_mainApp {
-					
-					log.debug("received message: unavailable (from mainApp)")
-					self.notifyReceivedMessage(.unavailable)
-				}
-			}
+			self.receiveMessage(msg)
 		}
 		
 		if notify_is_valid_token(notifyToken) {
@@ -224,27 +171,91 @@ class CrossProcessCommunication {
 		}
 	}
 	
-	private func sendMessage(_ msg: Int32) {
+	private func receiveMessage(_ msg: UInt64) {
 		
-		switch msg {
-			case msgPing_mainApp             : log.trace("sendMessage(ping_mainApp)")
-			case msgPong_mainApp             : log.trace("sendMessage(pong_mainApp)")
-			case msgUnavailable_mainApp      : log.trace("sendMessage(unavailable_mainApp)")
-			case msgPing_notifySrvExt        : log.trace("sendMessage(ping_notifySrvExt)")
-			case msgPong_notifySrvExt        : log.trace("sendMessage(pong_notifySrvExt)")
-			case msgUnavailable_notifySrvExt : log.trace("sendMessage(unavailable_notifySrvExt)")
-			default                          : log.trace("sendMessage(unknown)")
+		let msgStr = messageToString(msg)
+		guard let actor else {
+			log.warning("receiveMessage(\(msgStr)): ignored: actor == nil")
+			return
 		}
+		
+		switch actor {
+		case .mainApp:
+			
+			switch msg {
+			case msgPing_mainApp : fallthrough
+			case msgPong_mainApp : fallthrough
+			case msgUnavailable_mainApp:
+				log.debug("ignorning own message: \(msgStr)")
+				
+			case msgPing_notifySrvExt:
+				log.debug("received message: \(msgStr)")
+				notifyReceivedMessage(.available)
+				sendMessage(msgPong_mainApp)
+				
+			case msgPong_notifySrvExt:
+				log.debug("received message: \(msgStr)")
+				notifyReceivedMessage(.available)
+				
+			case msgUnavailable_notifySrvExt:
+				log.debug("received message: \(msgStr)")
+				notifyReceivedMessage(.unavailable)
+				
+			default:
+				log.debug("received unknown message: \(msg)")
+				
+			} // </switch msg>
+			
+		case .notifySrvExt:
+			
+			switch msg {
+			case msgPing_notifySrvExt: fallthrough
+			case msgPong_notifySrvExt: fallthrough
+			case msgUnavailable_notifySrvExt:
+				log.debug("ignorning own message: \(msgStr)")
+				
+			case msgPing_mainApp:
+				log.debug("received message: \(msgStr)")
+				notifyReceivedMessage(.available)
+				sendMessage(msgPong_notifySrvExt)
+				
+			case msgPong_mainApp:
+				log.debug("received message: \(msgStr)")
+				notifyReceivedMessage(.available)
+				
+			case msgUnavailable_mainApp:
+				log.debug("received message: \(msgStr)")
+				notifyReceivedMessage(.unavailable)
+				
+			default:
+				log.debug("received unknown message: \(msg)")
+				
+			} // </switch msg>
+		} // </switch actor>
+	}
+	
+	private func sendMessage(_ msg: UInt64) {
+		log.trace("sendMessage(\(self.messageToString(msg)))")
 		
 		guard notify_is_valid_token(notifyToken), let channel = channel else {
 			return
 		}
 		
-		// Convert Int32 into UInt64 without losing sign
-		let state = UInt64(UInt32(bitPattern: msg))
-		
-		notify_set_state(notifyToken, state)
+		notify_set_state(notifyToken, msg)
 		notify_post((channel as NSString).utf8String)
+	}
+	
+	private func messageToString(_ msg: UInt64) -> String {
+		
+		switch msg {
+			case msgPing_mainApp             : return "ping(from:mainApp)"
+			case msgPong_mainApp             : return "pong(from:mainApp)"
+			case msgUnavailable_mainApp      : return "unavailable(from:mainApp)"
+			case msgPing_notifySrvExt        : return "ping(from:notifySrvExt)"
+			case msgPong_notifySrvExt        : return "pong(from:notifySrvExt)"
+			case msgUnavailable_notifySrvExt : return "unavailable(from:notifySrvExt)"
+			default                          : return "unknown"
+		}
 	}
 	
 	private func notifyReceivedMessage(_ msg: XpcMessage) {
@@ -270,8 +281,10 @@ class CrossProcessCommunication {
 				log.debug("notify_suspend()")
 				notify_suspend(self.notifyToken)
 			} else {
-				log.debug("suspendCount += 1")
-				self.suspendCount += 1
+				if (self.suspendCount < UInt32.max) {
+					log.debug("suspendCount += 1")
+					self.suspendCount += 1
+				}
 			}
 		}
 	}
@@ -284,8 +297,10 @@ class CrossProcessCommunication {
 				log.debug("notify_resume()")
 				notify_resume(self.notifyToken)
 			} else {
-				log.debug("suspendCount -= 1")
-				self.suspendCount -= 1
+				if (self.suspendCount > 0) {
+					log.debug("suspendCount -= 1")
+					self.suspendCount -= 1
+				}
 			}
 		}
 	}
