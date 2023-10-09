@@ -27,7 +27,7 @@ struct LiquidityPolicyView: View {
 	let examplePayments: [Int64] = [2_000, 8_000, 20_000, 50_000]
 	@State var examplePaymentsIdx = 1
 	
-	@State var lightningOverride = false
+	@State var lightningOverride: Bool
 	
 	@State var mempoolRecommendedResponse: MempoolRecommendedResponse? = nil
 	
@@ -55,25 +55,27 @@ struct LiquidityPolicyView: View {
 	
 	init() {
 		
-		let defaultLp = NodeParamsManager.companion.defaultLiquidityPolicy
 		let userLp = GroupPrefs.shared.liquidityPolicy
 		
 		let __isEnabled = userLp.enabled
 		
-		let sats = userLp.maxFeeSats ?? defaultLp.maxAbsoluteFee.sat
+		let sats = userLp.effectiveMaxFeeSats
 		let __maxFeeAmt = LiquidityPolicyView.formattedMaxFeeAmt(sat: sats)
 		let __parsedMaxFeeAmt: Result<NSNumber, TextFieldNumberStylerError> = .success(NSNumber(value: sats))
 		
-		let basisPoints = userLp.maxFeeBasisPoints ?? defaultLp.maxRelativeFeeBasisPoints
+		let basisPoints = userLp.effectiveMaxFeeBasisPoints
 		let percent = Double(basisPoints) / Double(100)
 		let __maxFeePrcnt = LiquidityPolicyView.formattedMaxFeePrcnt(percent: percent)
 		let __parsedMaxFeePrcnt: Result<NSNumber, TextFieldNumberStylerError> = .success(NSNumber(value: percent))
+		
+		let __lightningOverride = userLp.effectiveSkipAbsoluteFeeCheck
 		
 		self._isEnabled = State(initialValue: __isEnabled)
 		self._maxFeeAmt = State(initialValue: __maxFeeAmt)
 		self._parsedMaxFeeAmt = State(initialValue: __parsedMaxFeeAmt)
 		self._maxFeePrcnt = State(initialValue: __maxFeePrcnt)
 		self._parsedMaxFeePrcnt = State(initialValue: __parsedMaxFeePrcnt)
+		self._lightningOverride = State(initialValue: __lightningOverride)
 	}
 	
 	// --------------------------------------------------
