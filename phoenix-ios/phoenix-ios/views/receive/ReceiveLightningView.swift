@@ -40,7 +40,7 @@ struct ReceiveLightningView: View {
 	@State var activeSheet: ReceiveViewSheet? = nil
 	
 	@State var channels: [LocalChannelInfo] = []
-	@State var liquidityPolicy: LiquidityPolicy = Prefs.shared.liquidityPolicy
+	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy
 	@State var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State var modificationAmount: CurrencyAmount? = nil
@@ -113,7 +113,7 @@ struct ReceiveLightningView: View {
 		.onReceive(channelsPublisher) {
 			channelsChanged($0)
 		}
-		.onReceive(Prefs.shared.liquidityPolicyPublisher) {
+		.onReceive(GroupPrefs.shared.liquidityPolicyPublisher) {
 			liquidityPolicyChanged($0)
 		}
 		.onReceive(NotificationsManager.shared.permissions) {

@@ -56,7 +56,7 @@ struct LiquidityPolicyView: View {
 	init() {
 		
 		let defaultLp = NodeParamsManager.companion.defaultLiquidityPolicy
-		let userLp = Prefs.shared.liquidityPolicy
+		let userLp = GroupPrefs.shared.liquidityPolicy
 		
 		let __isEnabled = userLp.enabled
 		
@@ -914,7 +914,7 @@ struct LiquidityPolicyView: View {
 			log.info("updated.maxFeeSats: \(sats?.description ?? "nil")")
 			log.info("updated.maxFeeBasisPoints: \(basisPoints?.description ?? "nil")")
 					
-			Prefs.shared.liquidityPolicy = LiquidityPolicy(
+			GroupPrefs.shared.liquidityPolicy = LiquidityPolicy(
 				enabled: true,
 				maxFeeSats: sats,
 				maxFeeBasisPoints: basisPoints,
@@ -923,7 +923,7 @@ struct LiquidityPolicyView: View {
 			
 		} else {
 			
-			Prefs.shared.liquidityPolicy = LiquidityPolicy(
+			GroupPrefs.shared.liquidityPolicy = LiquidityPolicy(
 				enabled: false,
 				maxFeeSats: nil,
 				maxFeeBasisPoints: nil,

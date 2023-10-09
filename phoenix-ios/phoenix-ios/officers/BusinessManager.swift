@@ -103,7 +103,7 @@ class BusinessManager {
 		let startupParams = StartupParams(
 			requestCheckLegacyChannels: false,
 			isTorEnabled: GroupPrefs.shared.isTorEnabled,
-			liquidityPolicy: Prefs.shared.liquidityPolicy.toKotlin(),
+			liquidityPolicy: GroupPrefs.shared.liquidityPolicy.toKotlin(),
 			trustedSwapInTxs: Set()
 		)
 		business.start(startupParams: startupParams)
@@ -182,7 +182,7 @@ class BusinessManager {
 			.store(in: &cancellables)
 		
 		// Liquidity policy
-		Prefs.shared.liquidityPolicyPublisher.dropFirst()
+		GroupPrefs.shared.liquidityPolicyPublisher.dropFirst()
 			.sink { (policy: LiquidityPolicy) in
 			
 				Task { @MainActor in

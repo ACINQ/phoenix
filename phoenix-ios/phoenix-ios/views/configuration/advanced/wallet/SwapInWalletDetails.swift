@@ -21,7 +21,7 @@ struct SwapInWalletDetails: View {
 	let location: ViewLocation
 	let popTo: (PopToDestination) -> Void
 	
-	@State var liquidityPolicy: LiquidityPolicy = Prefs.shared.liquidityPolicy
+	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy
 	
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
@@ -116,7 +116,7 @@ struct SwapInWalletDetails: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onReceive(Prefs.shared.liquidityPolicyPublisher) {
+		.onReceive(GroupPrefs.shared.liquidityPolicyPublisher) {
 			liquidityPolicyChanged($0)
 		}
 		.onReceive(swapInWalletPublisher) {
