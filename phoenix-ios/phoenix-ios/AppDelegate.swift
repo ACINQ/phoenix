@@ -218,8 +218,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
 	) {
 		log.trace("application(_:didReceiveRemoteNotification:fetchCompletionHandler:)")
+		log.debug("remote notification: \(userInfo)")
 		
-		Biz.processPushNotification(userInfo, completionHandler)
+		// If the app is in the foreground:
+		// - we can ignore this notification
+		//
+		// If the app is in the background:
+		// - this notification was delivered to the notifySrvExt, which is in charge of processing it
+		
+		DispatchQueue.main.async {
+			completionHandler(.noData)
+		}
 	}
 	
 	func messaging(
