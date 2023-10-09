@@ -181,6 +181,12 @@ class GroupPrefs {
 	// MARK: Push Notifications
 	// --------------------------------------------------
 	
+	lazy private(set) var badgeCountPublisher: AnyPublisher<Int, Never> = {
+		defaults.publisher(for: \.badgeCount, options: [.initial, .new])
+			.removeDuplicates()
+			.eraseToAnyPublisher()
+	}()
+	
 	var badgeCount: Int {
 		get { defaults.badgeCount }
 		set { defaults.badgeCount = newValue }
