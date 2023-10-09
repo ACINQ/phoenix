@@ -13,6 +13,11 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct LiquidityPolicyView: View {
 	
+	let initialIsEnabled: Bool
+	let initialMaxFeeAmountSats: Int64
+	let initialMaxFeeBasisPoints: Int32
+	let initialSkipAbsoluteFeeCheck: Bool
+	
 	@State var isEnabled: Bool
 	
 	@State var maxFeeAmt: String
@@ -53,22 +58,29 @@ struct LiquidityPolicyView: View {
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
 	init() {
 		
 		let userLp = GroupPrefs.shared.liquidityPolicy
 		
 		let __isEnabled = userLp.enabled
 		
-		let sats = userLp.effectiveMaxFeeSats
-		let __maxFeeAmt = LiquidityPolicyView.formattedMaxFeeAmt(sat: sats)
-		let __parsedMaxFeeAmt: Result<NSNumber, TextFieldNumberStylerError> = .success(NSNumber(value: sats))
+		let __sats = userLp.effectiveMaxFeeSats
+		let __maxFeeAmt = LiquidityPolicyView.formattedMaxFeeAmt(sat: __sats)
+		let __parsedMaxFeeAmt: Result<NSNumber, TextFieldNumberStylerError> = .success(NSNumber(value: __sats))
 		
-		let basisPoints = userLp.effectiveMaxFeeBasisPoints
-		let percent = Double(basisPoints) / Double(100)
-		let __maxFeePrcnt = LiquidityPolicyView.formattedMaxFeePrcnt(percent: percent)
-		let __parsedMaxFeePrcnt: Result<NSNumber, TextFieldNumberStylerError> = .success(NSNumber(value: percent))
+		let __basisPoints = userLp.effectiveMaxFeeBasisPoints
+		let __percent = Double(__basisPoints) / Double(100)
+		let __maxFeePrcnt = LiquidityPolicyView.formattedMaxFeePrcnt(percent: __percent)
+		let __parsedMaxFeePrcnt: Result<NSNumber, TextFieldNumberStylerError> = .success(NSNumber(value: __percent))
 		
 		let __lightningOverride = userLp.effectiveSkipAbsoluteFeeCheck
+		
+		self.initialIsEnabled = __isEnabled
+		self.initialMaxFeeAmountSats = __sats
+		self.initialMaxFeeBasisPoints = __basisPoints
+		self.initialSkipAbsoluteFeeCheck = __lightningOverride
 		
 		self._isEnabled = State(initialValue: __isEnabled)
 		self._maxFeeAmt = State(initialValue: __maxFeeAmt)
@@ -88,6 +100,8 @@ struct LiquidityPolicyView: View {
 		content()
 			.navigationTitle(NSLocalizedString("Channel management", comment: "Navigation Bar Title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarBackButtonHidden(true)
+			.navigationBarItems(leading: backButton())
 	}
 	
 	@ViewBuilder
@@ -128,6 +142,26 @@ struct LiquidityPolicyView: View {
 		}
 		.task {
 			await fetchMempoolRecommendedFees()
+		}
+	}
+	
+	@ViewBuilder
+	func backButton() -> some View {
+		
+		Button {
+			didTapBackButton()
+		} label: {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				if hasChanges() {
+					Image(systemName: "chevron.backward")
+						.font(.headline.weight(.semibold))
+					Text("Save")
+						.padding(.leading, 3)
+				} else {
+					Image(systemName: "chevron.backward")
+						.font(.headline.weight(.semibold))
+				}
+			}
 		}
 	}
 	
@@ -844,6 +878,27 @@ struct LiquidityPolicyView: View {
 	}
 	
 	// --------------------------------------------------
+	// MARK: Helpers: Other
+	// --------------------------------------------------
+	
+	func hasChanges() -> Bool {
+		
+		if isEnabled {
+		
+			if !initialIsEnabled { return true }
+			if initialMaxFeeAmountSats != effectiveMaxFeeAmountSats() { return true }
+			if initialMaxFeeBasisPoints != effectiveMaxFeeBasisPoints() { return true }
+			if initialSkipAbsoluteFeeCheck != lightningOverride { return true }
+			
+		} else {
+		
+			if initialIsEnabled { return true }
+		}
+		
+		return false
+	}
+	
+	// --------------------------------------------------
 	// MARK: Tasks
 	// --------------------------------------------------
 	
@@ -854,6 +909,18 @@ struct LiquidityPolicyView: View {
 			if Task.isCancelled {
 				return
 			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onDisappear() {
+		log.trace("onDisappear()")
+		
+		if hasChanges() {
+			saveChanges()
 		}
 	}
 	
@@ -893,14 +960,14 @@ struct LiquidityPolicyView: View {
 		examplePaymentsIdx += 1
 	}
 	
-	func discardChanges() {
-		log.trace("discardChanges()")
+	func didTapBackButton() {
+		log.trace("didTapBackButton()")
 		
-		// Todo...
+		presentationMode.wrappedValue.dismiss()
 	}
 	
-	func onDisappear() {
-		log.trace("onDisappear()")
+	func saveChanges() {
+		log.trace("saveChanges()")
 		
 		if isEnabled {
 			
