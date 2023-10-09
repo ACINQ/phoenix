@@ -273,6 +273,8 @@
   <string name="legacy_inappnotif_background_worker_cannot_run">Phoenix potřebuje běžet na pozadí čas od času. Ujistěte se, že vaše zařízení neukončuje agresivně tuto aplikaci kvůli šetření baterie.</string>
   <string name="legacy_inappnotif_upgrade">Je dostupná nová aktualizace.</string>
   <string name="legacy_inappnotif_upgrade_critical">Je dostupná kritická aktualizace. Peněženka nemusí fungovat správně pokud nebude aktualizována.</string>
+  <string name="legacy_inappnotif_prepare_migration">The old Phoenix will be gone soon. Time to upgrade!</string>
+  <string name="legacy_inappnotif_prepare_migration_action">Upgrade to the new Phoenix</string>
 
   <!-- //////////////// display seed //////////////// -->
 
@@ -420,7 +422,7 @@
   <!-- //////////////// Migration to KMP //////////////// -->
 
   <string name="legacy_migration_title">Phoenix upgrade</string>
-  <string name="legacy_migration_ready_message">Upgrade na nejnovější verzi Phoenixu se špičkovým Lightning enginem a novými funkcemi.\n\nVaše kanály budou sloučeny dohromady. Tento proces je automatizovaný.\n\nPo dokončení migrace již nepoužívejte staré výměnné adresy.</string>
+  <string name="legacy_migration_ready_message">Od 1. listopadu budou starší služby (swapy a kanály on-the-fly) vypnuty.\n\nUpgrade na nejnovější verzi Phoenixu se špičkovým Lightning enginem a novými funkcemi.\n\nVaše kanály budou sloučeny dohromady. Tento proces je automatizovaný.\n\nPo dokončení migrace již nepoužívejte staré výměnné adresy.</string>
   <string name="legacy_migration_prepare_button">Upgrade</string>
   <string name="legacy_migration_prepare_button_disconnected">Připojení…</string>
   <string name="legacy_migration_dismiss_button">Teď ne</string>

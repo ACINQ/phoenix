@@ -388,8 +388,8 @@
   <string name="legacy_inappnotif_upgrade_critical">A critical update is available. The wallet may malfunction if not updated.</string>
   <string name="legacy_inappnotif_mempool_high_usage">Bitcoin mempool is full and fees are high.</string>
   <string name="legacy_inappnotif_mempool_high_usage_action">See how Phoenix is affected</string>
-  <string name="legacy_inappnotif_prepare_migration">Phoenix can upgrade to a new better version.</string>
-  <string name="legacy_inappnotif_prepare_migration_action">Prepare migration</string>
+  <string name="legacy_inappnotif_prepare_migration">The old Phoenix will be gone soon. Time to upgrade!</string>
+  <string name="legacy_inappnotif_prepare_migration_action">Upgrade to the new Phoenix</string>
 
   <!-- //////////////// display seed //////////////// -->
 
@@ -793,7 +793,7 @@ legacy_
   <!-- //////////////// Migration to KMP //////////////// -->
 
   <string name="legacy_migration_title">Phoenix upgrade</string>
-  <string name="legacy_migration_ready_message">Upgrade to the latest version of Phoenix, with a cutting-edge Lightning engine and new features.\n\nYour channels will be merged together. This process is automated.\n\nAfter migration is complete, do not re-use your old swap-in addresses.</string>
+  <string name="legacy_migration_ready_message">Starting from November 1st, legacy services (swaps and on-the-fly channels) will be disabled.\n\nUpgrade to the new version of Phoenix, with a cutting-edge Lightning engine and new features.\n\nYour channels will be merged together. This process is automated.\n\nAfter migration is complete, do not re-use your old swap-in addresses.</string>
   <string name="legacy_migration_prepare_button">Upgrade</string>
   <string name="legacy_migration_prepare_button_disconnected">Connecting…</string>
   <string name="legacy_migration_dismiss_button">Not now</string>
@@ -803,7 +803,7 @@ legacy_
   <string name="legacy_migration_paused_force_close">You cannot upgrade now: some channels are being force-closed.\n\nTry again later when these channel have been completely closed. Note that force-close can take several days to complete.</string>
   <string name="legacy_migration_paused_disconnected">You cannot upgrade now because you are disconnected from Lightning and/or Electrum.\n\nTry again later when connection has been established.</string>
 
-  <string name="legacy_migration_confirm_title">Confirm migration</string>
+  <string name="legacy_migration_confirm_title">Confirm upgrade</string>
   <string name="legacy_migration_confirm_dust">%1$d of %2$d channels are empty, or hold less than the Bitcoin dust limit (546 sat).\n\nThey will be closed, their balance if any will go to the Bitcoin miners, and their inbound liquidity will not be preserved.</string>
   <string name="legacy_migration_confirm_proceed">Proceed</string>
   <string name="legacy_migration_confirm_cancel">Cancel</string>
@@ -815,7 +815,7 @@ legacy_
   <string name="legacy_migration_closing_channels">Closing channels (%1$d/%2$d)</string>
   <string name="legacy_migration_monitoring_channels_publish">Publishing transactions (%1$s/%2$d)</string>
 
-  <string name="legacy_migration_complete_title">Migration complete</string>
+  <string name="legacy_migration_complete_title">Upgrade complete</string>
   <string name="legacy_migration_complete_details">Switching to the new app…</string>
 
   <string name="legacy_migration_failure_title">Upgrade has failed</string>

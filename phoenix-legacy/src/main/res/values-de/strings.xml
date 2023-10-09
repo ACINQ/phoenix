@@ -399,6 +399,8 @@
   <string name="legacy_inappnotif_upgrade_critical">Ein kritisches Update ist verfügbar. Die Wallet könnte fehlerhaft funktionieren, wenn sie nicht aktualisiert wird.</string>
   <string name="legacy_inappnotif_mempool_high_usage">Bitcoin-Mempool ist voll und die Gebühren sind hoch.</string>
   <string name="legacy_inappnotif_mempool_high_usage_action">Sehen Sie, wie Phoenix betroffen ist</string>
+  <string name="legacy_inappnotif_prepare_migration">Der alte Phoenix wird bald verschwinden. Zeit für ein Upgrade!</string>
+  <string name="legacy_inappnotif_prepare_migration_action">Upgrade auf die neue Phoenix</string>
 
   <!-- //////////////// display seed //////////////// -->
 
@@ -818,7 +820,7 @@
   <!-- //////////////// Migration to KMP //////////////// -->
 
   <string name="legacy_migration_title">Phoenix Upgrade</string>
-  <string name="legacy_migration_ready_message">Upgrade auf die neueste Version von Phoenix, mit einer hochmodernen Lightning-Engine und neuen Funktionen.\n\nIhre Kanäle werden zusammengeführt. Dieser Prozess ist automatisiert.\n\nWenn die Migration abgeschlossen ist, sollten Sie Ihre alten Swap-Adressen nicht wieder verwenden.</string>
+  <string name="legacy_migration_ready_message">Ab dem 1. November werden die alten Dienste (Swaps und On-the-fly-Kanäle) deaktiviert.\n\nUpgrade auf die neueste Version von Phoenix, mit einer hochmodernen Lightning-Engine und neuen Funktionen.\n\nIhre Kanäle werden zusammengeführt. Dieser Prozess ist automatisiert.\n\nWenn die Migration abgeschlossen ist, sollten Sie Ihre alten Swap-Adressen nicht wieder verwenden.</string>
   <string name="legacy_migration_prepare_button">Upgrade</string>
   <string name="legacy_migration_prepare_button_disconnected">Verbindung herstellen…</string>
   <string name="legacy_migration_dismiss_button">Nicht jetzt</string>
