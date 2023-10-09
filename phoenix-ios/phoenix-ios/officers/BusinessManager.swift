@@ -139,7 +139,7 @@ class BusinessManager {
 		log.trace("registerForNotifications()")
 		
 		// Connection status observer
-		business.connectionsManager.publisher()
+		business.connectionsManager.connectionsPublisher()
 			.sink { (connections: Connections) in
 			
 				self.connectionsChanged(connections)

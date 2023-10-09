@@ -78,7 +78,7 @@ struct MergeChannelsView: View {
 			
 		} // </VStack>
 		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
-		.onReceive(Biz.business.connectionsManager.publisher()) {
+		.onReceive(Biz.business.connectionsManager.connectionsPublisher()) {
 			connectionsChanged($0)
 		}
 		.onReceive(Biz.business.peerManager.channelsPublisher()) {
