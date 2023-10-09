@@ -31,7 +31,7 @@ struct ElectrumConfigurationView: MVIView {
 		var status: String
 		var address: String
 		
-		if mvi.model.connection is Lightning_kmpConnection.ESTABLISHED {
+		if mvi.model.connection.isEstablished() {
 			
 			status = NSLocalizedString("Connected to:", comment: "Connection status")
 			if let server = mvi.model.currentServer {
@@ -40,7 +40,7 @@ struct ElectrumConfigurationView: MVIView {
 				address = "?" // this state shouldn't be possible
 			}
 			
-		} else if mvi.model.connection is Lightning_kmpConnection.ESTABLISHING {
+		} else if mvi.model.connection.isEstablishing() {
 			
 			status = NSLocalizedString("Connecting to:", comment: "Connection status")
 			if let server = mvi.model.currentServer {

@@ -391,12 +391,11 @@ class BusinessManager {
 	private func connectionsChanged(_ connections: Connections) -> Void {
 		log.trace("connectionsChanged()")
 		
-		let prvPeerConnectionState = peerConnectionState
-		peerConnectionState = connections.peer
+		let oldPeerConnectionState = peerConnectionState ?? Lightning_kmpConnection.CLOSED(reason: nil)
+		let newPeerConnectionState = connections.peer
+		peerConnectionState = newPeerConnectionState
 		
-		if !(prvPeerConnectionState is Lightning_kmpConnection.ESTABLISHED) &&
-			(peerConnectionState is Lightning_kmpConnection.ESTABLISHED)
-		{
+		if !oldPeerConnectionState.isEstablished() && newPeerConnectionState.isEstablished() {
 			maybeRegisterFcmToken()
 		}
 	}

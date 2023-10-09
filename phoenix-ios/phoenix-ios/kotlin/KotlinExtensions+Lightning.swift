@@ -3,6 +3,16 @@ import PhoenixShared
 
 extension Lightning_kmpConnection {
 	
+	func isClosed() -> Bool {
+		return self is Lightning_kmpConnection.CLOSED
+	}
+	func isEstablishing() -> Bool {
+		return self is Lightning_kmpConnection.ESTABLISHING
+	}
+	func isEstablished() -> Bool {
+		return self is Lightning_kmpConnection.ESTABLISHED
+	}
+	
 	func localizedText() -> String {
 		switch self {
 		case is CLOSED       : return NSLocalizedString("Offline", comment: "Connection state")

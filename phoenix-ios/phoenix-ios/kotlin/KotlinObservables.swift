@@ -56,7 +56,7 @@ class ObservableConnectionsMonitor: ObservableObject {
 		// Only in the event that we connect are the timestamps reset.
 		// This allows our UI logic to properly count forward from these timestamps
 		
-		if newConnections.global is Lightning_kmpConnection.ESTABLISHED {
+		if newConnections.global.isEstablished() {
 			// All connections are established
 			if disconnectedAt != nil {
 				disconnectedAt = nil

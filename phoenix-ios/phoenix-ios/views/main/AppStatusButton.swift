@@ -89,7 +89,7 @@ struct AppStatusButton: View {
 	func buttonContent() -> some View {
 		
 		let connectionStatus = connectionsMonitor.connections.global
-		if connectionStatus is Lightning_kmpConnection.CLOSED {
+		if connectionStatus.isClosed() {
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
 				if showText {
 					Text(NSLocalizedString("Offline", comment: "Connection state"))
@@ -102,7 +102,7 @@ struct AppStatusButton: View {
 					.squareFrame()
 			}
 		}
-		else if connectionStatus is Lightning_kmpConnection.ESTABLISHING {
+		else if connectionStatus.isEstablishing() {
 			HStack(alignment: .firstTextBaseline, spacing: 0) {
 				if showText {
 					Text(NSLocalizedString("Connecting…", comment: "Connection state"))

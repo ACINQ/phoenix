@@ -125,11 +125,11 @@ struct AppStatusPopover: View {
 		let txt: String
 		let img: String
 		
-		if globalStatus is Lightning_kmpConnection.CLOSED {
+		if globalStatus.isClosed() {
 			txt = NSLocalizedString("Offline", comment: "Connection status")
 			img = "bolt.slash.fill"
 			
-		} else if globalStatus is Lightning_kmpConnection.ESTABLISHING {
+		} else if globalStatus.isEstablishing() {
 			txt = NSLocalizedString("Connecting…", comment: "Connection status")
 			img = "bolt.slash"
 			
@@ -386,13 +386,13 @@ fileprivate struct ConnectionCell: View {
 				.imageScale(.small)
 				.accessibilityHidden(true)
 
-			if connection is Lightning_kmpConnection.ESTABLISHED{
+			if connection.isEstablished() {
 				bullet.foregroundColor(.appPositive)
 			}
-			else if connection is Lightning_kmpConnection.ESTABLISHING {
+			else if connection.isEstablishing() {
 				bullet.foregroundColor(.appWarn)
 			}
-			else if connection is Lightning_kmpConnection.CLOSED {
+			else /* connection.isClosed() */ {
 				bullet.foregroundColor(.appNegative)
 			}
 
