@@ -64,6 +64,12 @@ class AppMigration {
 			Prefs.shared.performMigration("44", completionPublisher)
 		}
 		
+		// v2.0.6 (build 65)
+		// - UserDefault value (liquidityPolicy) moved to shared group
+		if currentBuild.isVersion(greaterThanOrEqualTo: "65") && previousBuild.isVersion(lessThan: "65") {
+			GroupPrefs.shared.performMigration("65", completionPublisher)
+		}
+		
 		completionPublisher.value -= 1
 	}
 	

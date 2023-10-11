@@ -78,7 +78,7 @@ struct MergeChannelsView: View {
 			
 		} // </VStack>
 		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
-		.onReceive(Biz.business.connectionsManager.publisher()) {
+		.onReceive(Biz.business.connectionsManager.connectionsPublisher()) {
 			connectionsChanged($0)
 		}
 		.onReceive(Biz.business.peerManager.channelsPublisher()) {
@@ -532,13 +532,13 @@ struct MergeChannelsView: View {
 	
 	func notReadyString() -> String? {
 		
-		if !(connections.internet is Lightning_kmpConnection.ESTABLISHED) {
+		if !(connections.internet.isEstablished()) {
 			return NSLocalizedString("waiting for internet", comment: "")
 		}
-		if !(connections.peer is Lightning_kmpConnection.ESTABLISHED) {
+		if !(connections.peer.isEstablished()) {
 			return NSLocalizedString("connecting to peer", comment: "")
 		}
-		if !(connections.electrum is Lightning_kmpConnection.ESTABLISHED) {
+		if !(connections.electrum.isEstablished()) {
 			return NSLocalizedString("connecting to electrum", comment: "")
 		}
 		

@@ -12,6 +12,7 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+typealias ConnectionsListener = (Connections) -> Void
 typealias PaymentListener = (Lightning_kmpIncomingPayment) -> Void
 
 /**
@@ -40,7 +41,8 @@ class PhoenixManager {
 	public let business: PhoenixBusiness
 	
 	private var queue = DispatchQueue(label: "PhoenixManager")
-	private var listener: PaymentListener? = nil
+	private var connectionsListener: ConnectionsListener? = nil
+	private var paymentListener: PaymentListener? = nil
 	
 	private var isFirstConnect = true
 	
@@ -67,18 +69,34 @@ class PhoenixManager {
 		let startupParams = StartupParams(
 			requestCheckLegacyChannels: false,
 			isTorEnabled: GroupPrefs.shared.isTorEnabled,
-			liquidityPolicy: NodeParamsManager.companion.defaultLiquidityPolicy,
+			liquidityPolicy: GroupPrefs.shared.liquidityPolicy.toKotlin(),
 			trustedSwapInTxs: Set()
 		)
 		business.start(startupParams: startupParams)
 	}
 	
-	public func register(didReceivePayment newListener: @escaping PaymentListener) {
-		log.trace("register(didReceivePayment:)")
+	// --------------------------------------------------
+	// MARK: Public Functions
+	// --------------------------------------------------
+	
+	public func register(
+		connectionsListener: @escaping ConnectionsListener,
+		paymentListener: @escaping PaymentListener
+	) {
+		log.trace("register(::)")
+		
+		let wasAlreadyUnlocked = business.walletManager.isLoaded()
 		
 		queue.async { [self] in
-			if listener == nil {
-				listener = newListener
+			self.connectionsListener = connectionsListener
+			self.paymentListener = paymentListener
+		
+			if wasAlreadyUnlocked {
+				// The new instance (`UNNotificationServiceExtension`) needs to know the current connection state.
+				DispatchQueue.main.async {
+					let connections = business.connectionsManager.currentValue
+					self.connectionsChanged(connections)
+				}
 			}
 		}
 	}
@@ -87,7 +105,8 @@ class PhoenixManager {
 		log.trace("unregister()")
 		
 		queue.async { [self] in
-			listener = nil
+			self.connectionsListener = nil
+			self.paymentListener = nil
 		}
 	}
 	
@@ -98,9 +117,9 @@ class PhoenixManager {
 			
 			if isFirstConnect {
 				isFirstConnect = false
-				_unlock()
+				unlock()
 			} else {
-				_reconnect()
+				reconnect()
 			}
 		}
 	}
@@ -116,8 +135,17 @@ class PhoenixManager {
 		}
 	}
 	
-	private func _reconnect() {
-		log.trace("_reconnect()")
+	public func exchangeRate(fiatCurrency: FiatCurrency) -> ExchangeRate.BitcoinPriceRate? {
+		
+		return Utils.exchangeRate(for: fiatCurrency, fromRates: fiatExchangeRates)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Private Functions
+	// --------------------------------------------------
+	
+	private func reconnect() {
+		log.trace("reconnect()")
 		
 		// Kotlin needs to be accessed only on the main thread
 		DispatchQueue.main.async { [self] in
@@ -127,12 +155,12 @@ class PhoenixManager {
 		}
 	}
 	
-	private func _unlock() {
-		log.trace("_unlock()")
+	private func unlock() {
+		log.trace("unlock()")
 		
 		let connectWithMnemonics = {(mnemonics: [String]?) in
 			DispatchQueue.main.async {
-				self._connect(mnemonics: mnemonics)
+				self.connect(mnemonics: mnemonics)
 			}
 		}
 		
@@ -159,19 +187,25 @@ class PhoenixManager {
 		}
 	}
 	
-	private func _connect(mnemonics: [String]?) {
-		log.trace("_connect(mnemoncis:)")
+	private func connect(mnemonics: [String]?) {
+		log.trace("connect(mnemoncis:)")
+		assertMainThread()
 		
 		guard let mnemonics = mnemonics else {
 			return
 		}
 
-		let pushReceivedAt = Date()
+		business.connectionsManager.connectionsPublisher().sink {
+			[weak self](connections: Connections) in
+			
+			self?.connectionsChanged(connections)
+		}
+		.store(in: &cancellables)
 		
+		let pushReceivedAt = Date()
 		business.paymentsManager.lastIncomingPaymentPublisher().sink {
 			[weak self](payment: Lightning_kmpIncomingPayment) in
-				
-			assertMainThread()
+			
 			guard
 				let paymentReceivedAt = payment.received?.receivedAtDate,
 				paymentReceivedAt > pushReceivedAt
@@ -180,45 +214,46 @@ class PhoenixManager {
 				return
 			}
 			
-			self?._didReceivedPayment(payment)
+			self?.didReceivePayment(payment)
+		}
+		.store(in: &cancellables)
 		
-		}.store(in: &cancellables)
-		
-		business.currencyManager.ratesPubliser().sink {[weak self](rates: [ExchangeRate]) in
+		business.currencyManager.ratesPubliser().sink {
+			[weak self](rates: [ExchangeRate]) in
 			
+			assertMainThread() // var `fiatExchangeRates` should be accessed/updated only on main thread
 			self?.fiatExchangeRates = rates
-			
-		}.store(in: &cancellables)
+		}
+		.store(in: &cancellables)
 		
 		let seed = business.walletManager.mnemonicsToSeed(mnemonics: mnemonics, passphrase: "")
 		business.walletManager.loadWallet(seed: seed)
-		
-		_refreshCurrencyExchangeRate()
-	}
-	
-	private func _didReceivedPayment(_ payment: Lightning_kmpIncomingPayment) {
-		log.trace("_didReceivePayment(_)")
-		
-		queue.async { [self] in
-			
-			if let listener = listener {
-				DispatchQueue.main.async {
-					listener(payment)
-				}
-			}
-		}
-	}
-	
-	private func _refreshCurrencyExchangeRate() {
-		log.trace("_refreshCurrencyExchangeRate()")
-		assertMainThread()
 		
 		let primaryFiatCurrency = GroupPrefs.shared.fiatCurrency
 		business.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
 	}
 	
-	public func exchangeRate(fiatCurrency: FiatCurrency) -> ExchangeRate.BitcoinPriceRate? {
+	private func connectionsChanged(_ connections: Connections) {
+		log.trace("connectionsChanged(_)")
 		
-		return Utils.exchangeRate(for: fiatCurrency, fromRates: fiatExchangeRates)
+		queue.async { [self] in
+			if let listener = self.connectionsListener {
+				DispatchQueue.main.async {
+					listener(connections)
+				}
+			}
+		}
+	}
+	
+	private func didReceivePayment(_ payment: Lightning_kmpIncomingPayment) {
+		log.trace("didReceivePayment(_)")
+		
+		queue.async { [self] in
+			if let listener = self.paymentListener {
+				DispatchQueue.main.async {
+					listener(payment)
+				}
+			}
+		}
 	}
 }

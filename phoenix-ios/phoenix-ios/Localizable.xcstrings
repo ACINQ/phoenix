@@ -7377,7 +7377,7 @@
       }
     },
     "Electrum server" : {
-      "comment" : "AppStatusPopover: label\nNavigation bar title",
+      "comment" : "Navigation bar title",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15021,6 +15021,9 @@
         }
       }
     },
+    "Receiving in background…" : {
+
+    },
     "Recent activity" : {
       "localizations" : {
         "cs" : {
@@ -19184,7 +19187,7 @@
       }
     },
     "Tor" : {
-      "comment" : "AppStatusPopover: label\nNavigation bar title",
+      "comment" : "Navigation bar title",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

@@ -28,6 +28,8 @@ fileprivate enum Key: String {
 	case isTorEnabled
 	case badgeCount
 	case discreetNotifications
+	case liquidityPolicy
+	case srvExtConnection
 }
 
 /// Group preferences, stored in the iOS UserDefaults system.
@@ -147,9 +149,43 @@ class GroupPrefs {
 		set { defaults.isTorEnabled = newValue }
 	}
 	
+	lazy private(set) var liquidityPolicyPublisher: AnyPublisher<LiquidityPolicy, Never> = {
+		defaults.publisher(for: \.liquidityPolicy, options: [.initial, .new])
+			.map({ (data: Data?) -> LiquidityPolicy in
+				data?.jsonDecode() ?? LiquidityPolicy.defaultPolicy()
+			})
+			.removeDuplicates()
+			.eraseToAnyPublisher()
+	}()
+	
+	var liquidityPolicy: LiquidityPolicy {
+		get { defaults.liquidityPolicy?.jsonDecode() ?? LiquidityPolicy.defaultPolicy() }
+		set { defaults.liquidityPolicy = newValue.jsonEncode() }
+	}
+	
+	lazy private(set) var srvExtConnectionPublisher: AnyPublisher<Date, Never> = {
+		defaults.publisher(for: \.srvExtConnection, options: [.initial, .new])
+			.map({ (timeInterval: Double) -> Date in
+				Date(timeIntervalSince1970: timeInterval)
+			})
+			.removeDuplicates()
+			.eraseToAnyPublisher()
+	}()
+	
+	var srvExtConnection: Date {
+		get { Date(timeIntervalSince1970: defaults.srvExtConnection) }
+		set { defaults.srvExtConnection = newValue.timeIntervalSince1970 }
+	}
+	
 	// --------------------------------------------------
 	// MARK: Push Notifications
 	// --------------------------------------------------
+	
+	lazy private(set) var badgeCountPublisher: AnyPublisher<Int, Never> = {
+		defaults.publisher(for: \.badgeCount, options: [.initial, .new])
+			.removeDuplicates()
+			.eraseToAnyPublisher()
+	}()
 	
 	var badgeCount: Int {
 		get { defaults.badgeCount }
@@ -175,6 +211,8 @@ class GroupPrefs {
 		defaults.removeObject(forKey: Key.isTorEnabled.rawValue)
 		defaults.removeObject(forKey: Key.badgeCount.rawValue)
 		defaults.removeObject(forKey: Key.discreetNotifications.rawValue)
+		defaults.removeObject(forKey: Key.liquidityPolicy.rawValue)
+		defaults.removeObject(forKey: Key.srvExtConnection.rawValue)
 	}
 
 	// --------------------------------------------------
@@ -197,55 +235,61 @@ class GroupPrefs {
 	private func performMigration_toBuild40() {
 		log.trace("performMigration_toBuild40()")
 		
-		let MigrateToGroup = {(key: Key) in
+		migrateToGroup(Key.currencyType)
+		migrateToGroup(Key.bitcoinUnit)
+		migrateToGroup(Key.fiatCurrency)
+		migrateToGroup(Key.currencyConverterList)
+		migrateToGroup(Key.electrumConfig)
+	}
+	
+	private func performMigration_toBuild65() {
+		log.trace("performMigration_toBuild65()")
+		
+		migrateToGroup(Key.liquidityPolicy)
+	}
+	
+	private func migrateToGroup(_ key: Key) {
+		
+		let savedGrp = UserDefaults.group.value(forKey: key.rawValue)
+		if savedGrp == nil {
 			
-			let savedGrp = UserDefaults.group.value(forKey: key.rawValue)
-			if savedGrp == nil {
+			let savedStd = UserDefaults.standard.value(forKey: key.rawValue)
+			if savedStd != nil {
 				
-				let savedStd = UserDefaults.standard.value(forKey: key.rawValue)
-				if savedStd != nil {
-					
-					UserDefaults.group.set(savedStd, forKey: key.rawValue)
-					UserDefaults.standard.removeObject(forKey: key.rawValue)
-				}
+				UserDefaults.group.set(savedStd, forKey: key.rawValue)
+				UserDefaults.standard.removeObject(forKey: key.rawValue)
 			}
 		}
-		
-		MigrateToGroup(Key.currencyType)
-		MigrateToGroup(Key.bitcoinUnit)
-		MigrateToGroup(Key.fiatCurrency)
-		MigrateToGroup(Key.currencyConverterList)
-		MigrateToGroup(Key.electrumConfig)
 	}
 }
 
 extension UserDefaults {
-
+	
 	@objc fileprivate var currencyType: Data? {
 		get { data(forKey: Key.currencyType.rawValue) }
 		set { set(newValue, forKey: Key.currencyType.rawValue) }
 	}
-
+	
 	@objc fileprivate var fiatCurrency: String? {
 		get { string(forKey: Key.fiatCurrency.rawValue) }
 		set { set(newValue, forKey: Key.fiatCurrency.rawValue) }
 	}
-
+	
 	@objc fileprivate var bitcoinUnit: String? {
 		get { string(forKey: Key.bitcoinUnit.rawValue) }
 		set { set(newValue, forKey: Key.bitcoinUnit.rawValue) }
 	}
-
+	
 	@objc fileprivate var currencyConverterList: String? {
 		get { string(forKey: Key.currencyConverterList.rawValue) }
 		set { set(newValue, forKey: Key.currencyConverterList.rawValue) }
 	}
-
+	
 	@objc fileprivate var electrumConfig: Data? {
 		get { data(forKey: Key.electrumConfig.rawValue) }
 		set { set(newValue, forKey: Key.electrumConfig.rawValue) }
 	}
-
+	
 	@objc fileprivate var isTorEnabled: Bool {
 		get { bool(forKey: Key.isTorEnabled.rawValue) }
 		set { set(newValue, forKey: Key.isTorEnabled.rawValue) }
@@ -259,5 +303,15 @@ extension UserDefaults {
 	@objc fileprivate var discreetNotifications: Bool {
 		get { bool(forKey: Key.discreetNotifications.rawValue) }
 		set { set(newValue, forKey: Key.discreetNotifications.rawValue) }
+	}
+	
+	@objc fileprivate var liquidityPolicy: Data? {
+		get { data(forKey: Key.liquidityPolicy.rawValue) }
+		set { set(newValue, forKey: Key.liquidityPolicy.rawValue) }
+	}
+	
+	@objc fileprivate var srvExtConnection: Double {
+		get { double(forKey: Key.srvExtConnection.rawValue) }
+		set { set(newValue, forKey: Key.srvExtConnection.rawValue) }
 	}
 }

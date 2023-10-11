@@ -136,12 +136,12 @@ extension BalanceManager {
 extension ConnectionsManager {
 	
 	fileprivate struct _Key {
-		static var publisher = 0
+		static var connectionsPublisher = 0
 	}
 	
-	func publisher() -> AnyPublisher<Connections, Never> {
+	func connectionsPublisher() -> AnyPublisher<Connections, Never> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.publisher) {
+		self.getSetAssociatedObject(storageKey: &_Key.connectionsPublisher) {
 			
 			// Transforming from Kotlin:
 			// `connections: StateFlow<Connections>`
