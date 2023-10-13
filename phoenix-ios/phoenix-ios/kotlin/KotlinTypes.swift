@@ -91,7 +91,6 @@ extension LnurlError {
 
 	typealias Pay_Invoice = LnurlError.PayInvoice
 	typealias Pay_Invoice_InvalidAmount = LnurlError.PayInvoiceInvalidAmount
-	typealias Pay_Invoice_InvalidHash = LnurlError.PayInvoiceInvalidHash
 	typealias Pay_Invoice_Malformed = LnurlError.PayInvoiceMalformed
 }
 

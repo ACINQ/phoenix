@@ -531,7 +531,6 @@
     <string name="lnurl_pay_error_invalid_chain">The invoice returned by <b>%1$s</b> does not use the same chain as your wallet.</string>
     <string name="lnurl_pay_error_already_paid">The invoice returned by <b>%1$s</b> has already been paid.</string>
     <string name="lnurl_pay_error_invalid_amount">The invoice returned by <b>%1$s</b> has an incorrect amount.</string>
-    <string name="lnurl_pay_error_invalid_hash">The invoice returned by <b>%1$s</b> does not match the request details.</string>
     <string name="lnurl_pay_error_invalid_malformed">The invoice returned by <b>%1$s</b> is malformed.</string>
 
     <!-- settings: display preferences -->

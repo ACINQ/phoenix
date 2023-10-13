@@ -488,7 +488,6 @@
     <string name="lnurl_pay_error_invalid_chain">Die von <b>%1$s</b> übermittelte Rechnung verwendet nicht dieselbe Blockchain wie Ihre Wallet.</string>
     <string name="lnurl_pay_error_already_paid">Die von <b>%1$s</b> übermittelte Rechnung wurde bereits bezahlt.</string>
     <string name="lnurl_pay_error_invalid_amount">Die von <b>%1$s</b> übermittelte Rechnung enthält einen falschen Betrag.</string>
-    <string name="lnurl_pay_error_invalid_hash">Die von <b>%1$s</b> übermittelte Rechnung stimmt nicht mit den Angaben in der Anfrage überein.</string>
     <string name="lnurl_pay_error_invalid_malformed">Die von <b>%1$s</b> übermittelte Rechnung ist fehlerhaft.</string>
 
     <!-- settings: display preferences -->

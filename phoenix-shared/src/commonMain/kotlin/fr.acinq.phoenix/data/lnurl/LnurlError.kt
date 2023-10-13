@@ -45,7 +45,6 @@ sealed class LnurlError(override val message: String? = null) : RuntimeException
                 val context: String
             ) : Invoice("malformed: $context")
 
-            data class InvalidHash(override val origin: String) : Invoice("paymentRequest.h value doesn't match metadata hash")
             data class InvalidAmount(override val origin: String) : Invoice("paymentRequest.amount doesn't match user input")
         }
     }

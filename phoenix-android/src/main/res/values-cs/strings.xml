@@ -510,7 +510,6 @@
     <string name="lnurl_pay_error_invalid_chain">Faktura vrácená <b>%1$s</b> nepoužívá stený blockchain jako vaše peněženka.</string>
     <string name="lnurl_pay_error_already_paid">Faktura vrácená <b>%1$s</b> již byla zaplacena.</string>
     <string name="lnurl_pay_error_invalid_amount">Faktura vrácená <b>%1$s</b> obsahuje neplatnou částku.</string>
-    <string name="lnurl_pay_error_invalid_hash">Faktura vrácená <b>%1$s</b> neodpovídá údajům v požadavku.</string>
     <string name="lnurl_pay_error_invalid_malformed">Faktura vrácená <b>%1$s</b> je chybná.</string>
 
     <!-- settings: display preferences -->
