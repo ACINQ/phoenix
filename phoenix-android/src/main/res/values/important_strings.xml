@@ -262,7 +262,7 @@
     <string name="walletinfo_onchain_swapin_locked_description">These funds will be available from %1$s days onwards.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Cancelled funds</string>
-    <string name="walletinfo_onchain_swapin_refund_description">These funds were not be swapped in time. Use the wallet\'s descriptor to access them.</string>
+    <string name="walletinfo_onchain_swapin_refund_description">These funds were not swapped in time. Use the wallet\'s descriptor to access them.</string>
 
     <string name="walletinfo_onchain_final_about">An on-chain wallet derived from your seed.\n\nThe final wallet is where funds are sent by default when your Lightning channels are closed.</string>
 
