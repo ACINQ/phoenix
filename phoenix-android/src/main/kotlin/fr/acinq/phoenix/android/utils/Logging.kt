@@ -109,7 +109,6 @@ object Logging {
         val lc = LoggerFactory.getILoggerFactory() as LoggerContext
         lc.reset()
 
-        val logcatAppender = getLogcatAppender(lc)
         val localFileAppender = getLocalFileAppender(context, lc)
 
         // set level
@@ -118,8 +117,12 @@ object Logging {
 
         val root = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
         root.level = if (BuildConfig.DEBUG) Level.DEBUG else Level.INFO
-        root.addAppender(logcatAppender)
         root.addAppender(localFileAppender)
+
+        if (BuildConfig.DEBUG) {
+            val logcatAppender = getLogcatAppender(lc)
+            root.addAppender(logcatAppender)
+        }
     }
 
     private fun getLogcatAppender(lc: LoggerContext): Appender<ILoggingEvent> {

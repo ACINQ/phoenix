@@ -72,9 +72,6 @@ fun HomeNotices(
         .filter { it.source == LiquidityEvents.Source.OffChainPayment && (now - it.createdAt) < 15 * DateUtils.HOUR_IN_MILLIS }
         .size
 
-    // don't display anything if there are no permanent notices or rejected offchain payments
-    if (filteredNotices.isEmpty() && recentRejectedOffchainCount == 0) return
-
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (recentRejectedOffchainCount > 0) {
             PaymentsRejectedShortView(recentRejectedOffchainCount, onNavigateToNotificationsList)
