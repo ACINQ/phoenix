@@ -19,7 +19,6 @@ fileprivate enum Key: String {
 	case recentTipPercents
 	case isNewWallet
 	case invoiceExpirationDays
-	case liquidityPolicy
 	case hideAmounts = "hideAmountsOnHomeScreen"
 	case showOriginalFiatAmount
 	case recentPaymentsConfig
@@ -89,20 +88,6 @@ class Prefs {
 	
 	var invoiceExpirationSeconds: Int64 {
 		return Int64(invoiceExpirationDays) * Int64(60 * 60 * 24)
-	}
-	
-	lazy private(set) var liquidityPolicyPublisher: AnyPublisher<LiquidityPolicy, Never> = {
-		defaults.publisher(for: \.liquidityPolicy, options: [.initial, .new])
-			.map({ (data: Data?) -> LiquidityPolicy in
-				data?.jsonDecode() ?? LiquidityPolicy.defaultPolicy()
-			})
-			.removeDuplicates()
-			.eraseToAnyPublisher()
-	}()
-	
-	var liquidityPolicy: LiquidityPolicy {
-		get { defaults.liquidityPolicy?.jsonDecode() ?? LiquidityPolicy.defaultPolicy() }
-		set { defaults.liquidityPolicy = newValue.jsonEncode() }
 	}
 	
 	var hideAmounts: Bool {
@@ -206,6 +191,29 @@ class Prefs {
 	lazy private(set) var backupSeed: Prefs_BackupSeed = {
 		return Prefs_BackupSeed()
 	}()
+	
+	// --------------------------------------------------
+	// MARK: Reset Wallet
+	// --------------------------------------------------
+
+	func resetWallet(encryptedNodeId: String) {
+
+		// Purposefully not resetting:
+		// - Key.theme: App feels weird when this changes unexpectedly.
+
+		defaults.removeObject(forKey: Key.defaultPaymentDescription.rawValue)
+		defaults.removeObject(forKey: Key.showChannelsRemoteBalance.rawValue)
+		defaults.removeObject(forKey: Key.recentTipPercents.rawValue)
+		defaults.removeObject(forKey: Key.isNewWallet.rawValue)
+		defaults.removeObject(forKey: Key.invoiceExpirationDays.rawValue)
+		defaults.removeObject(forKey: Key.hideAmounts.rawValue)
+		defaults.removeObject(forKey: Key.showOriginalFiatAmount.rawValue)
+		defaults.removeObject(forKey: Key.recentPaymentsConfig.rawValue)
+		defaults.removeObject(forKey: Key.hasMergedChannelsForSplicing.rawValue)
+		
+		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
+		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
+	}
 
 	// --------------------------------------------------
 	// MARK: Migration
@@ -243,30 +251,6 @@ class Prefs {
 			defaults.removeObject(forKey: oldKey)
 		}
 	}
-	
-	// --------------------------------------------------
-	// MARK: Reset Wallet
-	// --------------------------------------------------
-
-	func resetWallet(encryptedNodeId: String) {
-
-		// Purposefully not resetting:
-		// - Key.theme: App feels weird when this changes unexpectedly.
-
-		defaults.removeObject(forKey: Key.defaultPaymentDescription.rawValue)
-		defaults.removeObject(forKey: Key.showChannelsRemoteBalance.rawValue)
-		defaults.removeObject(forKey: Key.recentTipPercents.rawValue)
-		defaults.removeObject(forKey: Key.isNewWallet.rawValue)
-		defaults.removeObject(forKey: Key.invoiceExpirationDays.rawValue)
-		defaults.removeObject(forKey: Key.liquidityPolicy.rawValue)
-		defaults.removeObject(forKey: Key.hideAmounts.rawValue)
-		defaults.removeObject(forKey: Key.showOriginalFiatAmount.rawValue)
-		defaults.removeObject(forKey: Key.recentPaymentsConfig.rawValue)
-		defaults.removeObject(forKey: Key.hasMergedChannelsForSplicing.rawValue)
-		
-		self.backupTransactions.resetWallet(encryptedNodeId: encryptedNodeId)
-		self.backupSeed.resetWallet(encryptedNodeId: encryptedNodeId)
-	}
 }
 
 extension UserDefaults {
@@ -289,11 +273,6 @@ extension UserDefaults {
 	@objc fileprivate var invoiceExpirationDays: Int {
 		get { integer(forKey: Key.invoiceExpirationDays.rawValue) }
 		set { set(newValue, forKey: Key.invoiceExpirationDays.rawValue) }
-	}
-	
-	@objc fileprivate var liquidityPolicy: Data? {
-		get { data(forKey: Key.liquidityPolicy.rawValue) }
-		set { set(newValue, forKey: Key.liquidityPolicy.rawValue) }
 	}
 
 	@objc fileprivate var hideAmounts: Bool {

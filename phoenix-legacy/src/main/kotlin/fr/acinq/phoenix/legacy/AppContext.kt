@@ -204,7 +204,7 @@ abstract class AppContext : Application() {
       val isMigrationEnabled = if (json.has("migration")) {
         json.getJSONObject("migration").getBoolean("kmp_enabled")
       } else {
-        false
+        true
       }
       if (isMigrationEnabled) {
         inAppNotifs?.add(InAppNotifications.PREPARE_WALLET_MIGRATION)

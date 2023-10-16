@@ -60,7 +60,7 @@ actor MempoolMonitor {
 	}
 	
 	private func hasInternetChanged(_ hasInternet: Bool) {
-		log.trace("hasInternetChanged(\(hasInternet)")
+		log.trace("hasInternetChanged(\(hasInternet))")
 		
 		if hasInternet && !previouslyHadInternet {
 			log.debug("Detected internet reconnection...")

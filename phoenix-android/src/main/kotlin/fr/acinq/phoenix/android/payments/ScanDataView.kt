@@ -58,6 +58,7 @@ import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ScanController
 import fr.acinq.phoenix.controllers.payments.Scan
+import fr.acinq.phoenix.data.lnurl.LnurlError
 
 
 class ScanDataViewModel(controller: ScanController) : MVIControllerViewModel<Scan.Model, Scan.Intent>(controller) {
@@ -287,18 +288,23 @@ private fun ScanErrorView(
     model: Scan.Model.BadRequest,
     onErrorDialogDismiss: () -> Unit,
 ) {
-    val errorMessage = when (model.reason) {
+    val message = when (val reason = model.reason) {
         is Scan.BadRequestReason.Expired -> stringResource(R.string.scan_error_expired)
         is Scan.BadRequestReason.ChainMismatch -> stringResource(R.string.scan_error_invalid_chain)
         is Scan.BadRequestReason.AlreadyPaidInvoice -> stringResource(R.string.scan_error_already_paid)
-        is Scan.BadRequestReason.ServiceError -> stringResource(R.string.scan_error_lnurl_service_error)
+        is Scan.BadRequestReason.ServiceError -> when (val error = reason.error) {
+            is LnurlError.RemoteFailure.Code -> stringResource(R.string.lnurl_error_remote_code, reason.url.host, error.code.value.toString())
+            is LnurlError.RemoteFailure.CouldNotConnect -> stringResource(R.string.lnurl_error_remote_connection, reason.url.host)
+            is LnurlError.RemoteFailure.Detailed -> stringResource(R.string.lnurl_error_remote_details, reason.url.host, error.reason)
+            is LnurlError.RemoteFailure.Unreadable -> stringResource(R.string.lnurl_error_remote_unreadable, reason.url.host)
+        }
         is Scan.BadRequestReason.InvalidLnurl -> stringResource(R.string.scan_error_lnurl_invalid)
         is Scan.BadRequestReason.UnsupportedLnurl -> stringResource(R.string.scan_error_lnurl_unsupported)
         is Scan.BadRequestReason.UnknownFormat -> stringResource(R.string.scan_error_invalid_generic)
     }
     Dialog(
         onDismiss = onErrorDialogDismiss,
-        content = { Text(errorMessage, modifier = Modifier.padding(top = 24.dp, start = 24.dp, end = 24.dp)) }
+        content = { Text(text = message, modifier = Modifier.padding(top = 24.dp, start = 24.dp, end = 24.dp)) }
     )
 }
 

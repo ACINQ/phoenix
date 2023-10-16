@@ -210,7 +210,7 @@ sealed interface Lnurl {
                     if (json["status"]?.jsonPrimitive?.content?.trim()?.equals("error", true) == true) {
                         val errorMessage = json["reason"]?.jsonPrimitive?.content ?: ""
                         log.error { "lnurl service=${url.host} returned error=$errorMessage" }
-                        throw LnurlError.RemoteFailure.Detailed(url.host, errorMessage.take(160).replace("<", ""))
+                        throw LnurlError.RemoteFailure.Detailed(url.host, errorMessage.take(90).replace("<", ""))
                     } else {
                         json
                     }

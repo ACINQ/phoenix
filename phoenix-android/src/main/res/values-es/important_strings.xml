@@ -30,11 +30,17 @@
     <string name="notif_pending_settlement_title">Por favor, inicie Phoenix</string>
     <string name="notif_pending_settlement_message">Está pendiente una liquidación.</string>
 
+    <string name="notif_missed_title">Se ha producido un impago</string>
+    <string name="notif_missed_unavailable">Phoenix no pudo arrancar en segundo plano.</string>
+
     <string name="notif_rejected_deposit_title">Depósito en cadena pendiente (+%1$s)</string>
     <string name="notif_rejected_payment_title">Pago rechazado (+%1$s)</string>
     <string name="notif_rejected_policy_disabled">La gestión automática de canales está desactivada. Puede cambiarlo en la configuración.</string>
+    <string name="notif_rejected_policy_disabled_timeout">La gestión automática de canales está desactivada. Este depósito expirará el %1$s.</string>
     <string name="notif_rejected_over_absolute">La tasa era %1$s, pero tu tarifa máxima estaba fijada en %2$s. Puedes modificarlo en los ajustes.</string>
+    <string name="notif_rejected_over_absolute_timeout">La tasa era %1$s, pero tu tarifa máxima estaba fijada en %2$s. Este depósito expirará el %3$s.</string>
     <string name="notif_rejected_over_relative">La tasa fue de %1$s, que es más del %2$s%% del importe recibido. Puedes modificarlo en la configuración.</string>
+    <string name="notif_rejected_over_relative_timeout">La tasa fue de %1$s, que es más del %2$s%% del importe recibido. Este depósito expirará el %3$s.</string>
     <string name="notif_rejected_channels_initializing">Sus canales se estaban inicializando y no pudieron aceptar ese pago. Vuelva a intentarlo más tarde.</string>
 
     <string name="notif_watcher_revoked_commit_title">Por favor, inicie Phoenix</string>
@@ -148,6 +154,9 @@
     <string name="inappnotif_notification_permission_message">Las notificaciones están desactivadas en los ajustes de Android. Phoenix no podrá notificarte cuando se esté procesando un pago.</string>
     <string name="inappnotif_notification_permission_enable">Activar</string>
 
+    <string name="inappnotif_swapin_timeout_message">Un depósito expirará pronto.</string>
+    <string name="inappnotif_swapin_timeout_action">Ver detalles</string>
+
     <string name="inappnotif_watchtower_late_message">Phoenix monitorea regularmente el blockchain cuando está en segundo plano, pero no pudo hacerlo los últimos días.\n\nAsegúrate de que Android no bloquee Phoenix, y que pueda conectarse a Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Desestimar</string>
 
@@ -169,6 +178,7 @@
     <string name="inappnotif_payment_rejected_over_relative">La tasa ascendía a %1$s, lo que supone más del %2$s%% del importe.</string>
     <string name="inappnotif_payment_rejected_channel_initializing">Sus canales aún se están inicializando y no han podido recibir ese pago.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Puntee para configurar.</string>
+    <string name="inappnotif_payment_rejected_view_wallet">Ver detalles</string>
 
     <string name="inappnotif_watchtower_nominal_title">Informe de la Watchtower</string>
     <plurals name="inappnotif_watchtower_nominal_description">
@@ -232,13 +242,24 @@
 
     <string name="walletinfo_onchain_swapin">Cartera swap-in</string>
     <string name="walletinfo_onchain_swapin_help">Los fondos enviados a esta cartera en cadena se cambian automáticamente a Lightning.</string>
+    <string name="walletinfo_onchain_swapin_help_faq_link">Vea cómo funciona</string>
     <string name="walletinfo_onchain_swapin_policy_view">Puntee para configurar.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">Los fondos en cadena se cambiarán automáticamente a Lightning si la tasa es <b>inferior a %1$s</b>.</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details_timeout">Los fondos no cambiados <b>después de %1$d meses</b> son recuperables en cadena.</string>
     <string name="walletinfo_onchain_swapin_policy_disabled_details">La política de tasas automatizadas <b>está desactivada</b>. Los fondos no serán intercambiados. Permanecerán en esta cartera.</string>
     <string name="walletinfo_onchain_swapin_last_attempt">Último intento (%1$s).</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">La política de tasas automatizadas está desactivada.</string>
     <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Sus canales aún se estaban inicializando.</string>
     <string name="walletinfo_onchain_swapin_empty">No hay intercambios en curso.</string>
+
+    <string name="walletinfo_onchain_swapin_timeout_1day">Este swap caducará en un día.</string>
+    <string name="walletinfo_onchain_swapin_timeout">Este swap vencerá en %1$s días.</string>
+
+    <string name="walletinfo_onchain_swapin_locked_title">Expirados</string>
+    <string name="walletinfo_onchain_swapin_locked_description">Estos fondos estarán disponibles a partir de %1$s días.</string>
+
+    <string name="walletinfo_onchain_swapin_refund_title">Cancelados</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Estos fondos no fueron canjeados a tiempo. Utilice el descriptor de la cartera para acceder a ellos.</string>
 
     <string name="walletinfo_onchain_final_about">Una cartera en la cadena derivada de su semilla.\n\nLa cartera final es donde se envían los fondos por defecto cuando se cierran sus canales Lightning.</string>
 

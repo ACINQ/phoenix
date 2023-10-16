@@ -209,7 +209,7 @@ struct EditInfoView: View {
 			HStack(alignment: .center, spacing: 4) {
 				Image(systemName: "chevron.backward")
 					.imageScale(.medium)
-					.font(.title3.weight(.semibold))
+					.font(.headline.weight(.semibold))
 				Text("Save")
 					.font(.title3)
 			}

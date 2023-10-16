@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,13 +53,16 @@ import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.utils.borderColor
+import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.data.Notification
+import kotlinx.coroutines.launch
 
 @Composable
-fun NoticesButtonRow(
+fun HomeNotices(
     modifier: Modifier = Modifier,
     notices: List<Notice>,
     notifications: List<Pair<Set<UUID>, Notification>>,
+    onNavigateToSwapInWallet: () -> Unit,
     onNavigateToNotificationsList: () -> Unit,
 ) {
     val filteredNotices = notices.filterIsInstance<Notice.ShowInHome>().sortedBy { it.priority }
@@ -68,15 +72,17 @@ fun NoticesButtonRow(
         .filter { it.source == LiquidityEvents.Source.OffChainPayment && (now - it.createdAt) < 15 * DateUtils.HOUR_IN_MILLIS }
         .size
 
-    // don't display anything if there are no permanent notices or rejected offchain payments
-    if (filteredNotices.isEmpty() && recentRejectedOffchainCount == 0) return
-
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (recentRejectedOffchainCount > 0) {
             PaymentsRejectedShortView(recentRejectedOffchainCount, onNavigateToNotificationsList)
         }
         filteredNotices.firstOrNull()?.let {
-            FirstNoticeView(notice = it, messagesCount = notices.size + notifications.size, onNavigateToNotificationsList = onNavigateToNotificationsList)
+            FirstNoticeView(
+                notice = it,
+                messagesCount = notices.size + notifications.size,
+                onNavigateToSwapInWallet = onNavigateToSwapInWallet,
+                onNavigateToNotificationsList = onNavigateToNotificationsList
+            )
         }
     }
 }
@@ -87,10 +93,12 @@ private fun FirstNoticeView(
     modifier: Modifier = Modifier,
     notice: Notice.ShowInHome,
     messagesCount: Int,
+    onNavigateToSwapInWallet: () -> Unit,
     onNavigateToNotificationsList: () -> Unit,
 ) {
     val context = LocalContext.current
     val navController = LocalNavController.current
+    val scope = rememberCoroutineScope()
 
     val onClick = if (messagesCount == 1) {
         when (notice) {
@@ -121,6 +129,8 @@ private fun FirstNoticeView(
                     }
                 } else null
             }
+
+            is Notice.SwapInCloseToTimeout -> onNavigateToSwapInWallet
 
             is Notice.MempoolFull -> onNavigateToNotificationsList
         }
@@ -167,6 +177,10 @@ private fun FirstNoticeView(
 
             Notice.NotificationPermission -> {
                 NoticeTextView(text = stringResource(id = R.string.inappnotif_notification_permission_message), icon = R.drawable.ic_notification)
+            }
+
+            is Notice.SwapInCloseToTimeout -> {
+                NoticeTextView(text = stringResource(id = R.string.inappnotif_swapin_timeout_message), icon = R.drawable.ic_alert_triangle)
             }
         }
 
@@ -231,6 +245,6 @@ private fun RowScope.NoticeTextView(
     Text(
         text = text,
         style = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
-        modifier = Modifier.weight(1f),
+        modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
     )
 }

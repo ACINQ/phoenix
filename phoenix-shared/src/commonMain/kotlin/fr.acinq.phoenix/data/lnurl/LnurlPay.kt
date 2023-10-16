@@ -117,18 +117,6 @@ sealed class LnurlPay : Lnurl.Qualified {
                     throw LnurlError.Pay.Invoice.Malformed(origin, "unreadable pr")
                 }
 
-                // From the [spec](https://github.com/fiatjaf/lnurl-rfc/blob/luds/06.md):
-                //
-                // - LN WALLET Verifies that h tag in provided invoice is a hash of
-                //   metadata string converted to byte array in UTF-8 encoding.
-                //
-                // Note: h tag == descriptionHash
-                val expectedHash = Crypto.sha256(intent.metadata.raw.encodeToByteArray())
-                val actualHash = paymentRequest.descriptionHash?.toByteArray()
-                if (!expectedHash.contentEquals(actualHash)) {
-                    throw LnurlError.Pay.Invoice.InvalidHash(origin)
-                }
-
                 val successAction = parseSuccessAction(origin, json)
                 return Invoice(intent.initialUrl, paymentRequest, successAction)
             } catch (t: Throwable) {

@@ -161,7 +161,6 @@ fun LnurlPayView(
                             is Scan.LnurlPayError.ChainMismatch -> annotatedStringResource(R.string.lnurl_pay_error_invalid_chain, model.paymentIntent.callback.host)
                             is Scan.LnurlPayError.BadResponseError -> when (val errorDetail = error.err) {
                                 is LnurlError.Pay.Invoice.InvalidAmount -> annotatedStringResource(R.string.lnurl_pay_error_invalid_amount, errorDetail.origin)
-                                is LnurlError.Pay.Invoice.InvalidHash -> annotatedStringResource(R.string.lnurl_pay_error_invalid_hash, errorDetail.origin)
                                 is LnurlError.Pay.Invoice.Malformed -> annotatedStringResource(R.string.lnurl_pay_error_invalid_malformed, errorDetail.origin)
                             }
                             is Scan.LnurlPayError.RemoteError -> getRemoteErrorMessage(error = error.err)

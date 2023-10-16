@@ -123,10 +123,10 @@ fun FilledButton(
 @Composable
 fun InlineButton(
     text: String,
+    modifier: Modifier = Modifier,
     icon: Int? = null,
     fontSize: TextUnit = MaterialTheme.typography.body1.fontSize,
     iconSize: Dp = ButtonDefaults.IconSize,
-    modifier: Modifier = Modifier,
     padding: PaddingValues = PaddingValues(horizontal = 2.dp, vertical = 1.dp),
     space: Dp = 6.dp,
     maxLines: Int = Int.MAX_VALUE,
@@ -237,8 +237,8 @@ fun PhoenixIcon(
 @Composable
 fun Button(
     onClick: () -> Unit,
-    onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
+    onLongClick: (() -> Unit)? = null,
     text: String? = null,
     icon: Int? = null,
     iconTint: Color = MaterialTheme.colors.primary,
@@ -373,6 +373,7 @@ fun WebLink(
     modifier: Modifier = Modifier,
     fontSize: TextUnit = MaterialTheme.typography.body1.fontSize,
     iconSize: Dp = ButtonDefaults.IconSize,
+    padding: PaddingValues = PaddingValues(horizontal = 2.dp, vertical = 1.dp),
     space: Dp = 8.dp,
     maxLines: Int = Int.MAX_VALUE,
     onClickLabel: String = stringResource(id = R.string.accessibility_link),
@@ -383,6 +384,7 @@ fun WebLink(
         icon = R.drawable.ic_external_link,
         fontSize = fontSize,
         iconSize = iconSize,
+        padding = padding,
         space = space,
         maxLines = maxLines,
         onClickLabel = onClickLabel,

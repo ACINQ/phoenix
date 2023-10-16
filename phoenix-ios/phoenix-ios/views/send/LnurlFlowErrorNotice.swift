@@ -99,13 +99,6 @@ struct LnurlFlowErrorNotice: View {
 					Text("Malformed: \(details.context)")
 						.font(.system(.subheadline, design: .monospaced))
 					
-				} else if let details = err.err as? LnurlError.Pay_Invoice_InvalidHash {
-					
-					Text("Host: \(details.origin)")
-						.font(.system(.subheadline, design: .monospaced))
-					Text("Error: invalid hash")
-						.font(.system(.subheadline, design: .monospaced))
-					
 				} else if let details = err.err as? LnurlError.Pay_Invoice_InvalidAmount {
 				 
 					Text("Host: \(details.origin)")

@@ -22,6 +22,7 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.*
 import androidx.navigation.compose.rememberNavController
@@ -52,6 +53,8 @@ class MainActivity : AppCompatActivity() {
         appViewModel.walletState.observe(this) {
             log.debug("wallet state update=${it.name}")
         }
+
+        intent?.fixUri()
 
         // reset required status to expected if needed
         lifecycleScope.launch {
@@ -101,11 +104,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        // force the intent flag to single top, in order to avoid [handleDeepLink] to finish the current activity.
+        // force the intent flag to single top, in order to avoid [handleDeepLink] finish the current activity.
         // this would otherwise clear the app view model, i.e. loose the state which virtually reboots the app
         // TODO: look into detaching the app state from the activity
-        log.debug("receive new_intent=$intent")
-        intent!!.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        log.info("receive new_intent=$intent")
+        intent?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        intent?.fixUri()
         this.navController?.handleDeepLink(intent)
     }
 
@@ -156,6 +160,24 @@ class MainActivity : AppCompatActivity() {
             log.error("failed to unbind activity from node service: {}", e.localizedMessage)
         }
         log.debug("destroyed main activity")
+    }
+
+    /**
+     * There are many apps launching LN-themed URIs, and they use all kind of pattern. This methods fixes them so they are standard
+     * and can deeplink to the appropriate screen of the application.
+     *
+     * For example, instead of `phoenix:<invoice>`, use `lightning:<invoice>`.
+     *
+     * Note: [Intent] fields are mutable.
+     */
+    private fun Intent.fixUri() {
+        val initialUri = this.data
+        val scheme = initialUri?.scheme
+        val ssp = initialUri?.schemeSpecificPart
+        if (scheme == "phoenix" && ssp != null && (ssp.startsWith("lnbc") || ssp.startsWith("lntb"))) {
+            this.data = "lightning:$ssp".toUri()
+            log.debug("rewritten intent uri from $initialUri to ${intent.data}")
+        }
     }
 
 }

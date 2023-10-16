@@ -36,8 +36,11 @@
     <string name="notif_rejected_deposit_title">Dépôt on-chain en attente (+%1$s)</string>
     <string name="notif_rejected_payment_title">Paiement entrant refusé (+%1$s)</string>
     <string name="notif_rejected_policy_disabled">La gestion des canaux automatisée est désactivée. Cette configuration peut être changée.</string>
+    <string name="notif_rejected_policy_disabled_timeout">La gestion des canaux automatisée est désactivée. Le dépôt expirera le %1$s.</string>
     <string name="notif_rejected_over_absolute">Les frais étaient de %1$s, mais votre max est de %2$s. Cette configuration peut être changée.</string>
+    <string name="notif_rejected_over_absolute_timeout">Les frais étaient de %1$s, mais votre max est de %2$s. Le dépôt expirera le %3$s.</string>
     <string name="notif_rejected_over_relative">Les frais étaient de %1$s et dépassent %2$s%% du montant. Cette configuration peut être changée.</string>
+    <string name="notif_rejected_over_relative_timeout">Les frais étaient de %1$s et dépassent %2$s%% du montant. Le dépôt expirera le %3$s.</string>
     <string name="notif_rejected_channels_initializing">Vos canaux de paiement étaient en initialisation, et n\'ont pu accepter ce paiement.</string>
 
     <string name="notif_watcher_revoked_commit_title">Veuillez démarrer Phoenix</string>
@@ -148,6 +151,9 @@
     <string name="inappnotif_notification_permission_message">Les notifications systèmes sont désactivées dans les préferences Android. Phoenix ne pourra pas vous indiquer lorsque des paiements sont en cours, ou rejetés.</string>
     <string name="inappnotif_notification_permission_enable">Activer</string>
 
+    <string name="inappnotif_swapin_timeout_message">Un dépôt va bientôt expirer.</string>
+    <string name="inappnotif_swapin_timeout_action">Voir les détails</string>
+
     <string name="inappnotif_watchtower_late_message">Phoenix vérifie périodiquement la blockchain lorsque l\'application est éteinte. Ces derniers jours elle n\'a pas pu le faire. \n\nAssurez vous qu\'Android ne restreigne pas Phoenix, et que l\'application puisse se connecter à Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Fermer</string>
 
@@ -175,6 +181,7 @@
     <string name="inappnotif_payment_rejected_over_relative">Les frais de %1$s représentaient plus de %2$s%% du montant.</string>
     <string name="inappnotif_payment_rejected_channel_initializing">Vous canaux étaient en initialisation et n\'ont pu recevoir ce paiement.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Cliquez pour configurer.</string>
+    <string name="inappnotif_payment_rejected_view_wallet">Voir les détails</string>
 
     <string name="inappnotif_watchtower_nominal_title">Veille en arrière-plan</string>
     <plurals name="inappnotif_watchtower_nominal_description" tools:ignore="MissingQuantity">
@@ -238,13 +245,24 @@
 
     <string name="walletinfo_onchain_swapin">Swap-in wallet</string>
     <string name="walletinfo_onchain_swapin_help">Les fonds envoyés vers ce wallet sont automatiquement basculés (\"swap\") sur Lightning.</string>
+    <string name="walletinfo_onchain_swapin_help_faq_link">Voir comment ça marche</string>
     <string name="walletinfo_onchain_swapin_policy_view">Cliquez pour configurer.</string>
-    <string name="walletinfo_onchain_swapin_policy_auto_details">Les fonds seront automatiquement basculés sur Lightning si les frais sont <b>inférieurs à %1$s</b>.</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details">Les fonds seront automatiquement basculés sur Lightning si les frais sont <b>inférieurs à %1$s</b> (configurable).</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details_timeout">Les fonds qui ne sont pas sur Lightning <b>après %1$d mois</b> seront récupérables on-chain.</string>
     <string name="walletinfo_onchain_swapin_policy_disabled_details">La gestion des canaux automatisée <b>est désactivée</b>. Les fonds ne seront pas basculés sur Lightning et vont rester sur ce wallet.</string>
     <string name="walletinfo_onchain_swapin_last_attempt">Dernière tentative (%1$s).</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">La gestion des canaux automatisée était désactivée.</string>
     <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Les canaux étaient encore en cours d\'initialisation.</string>
     <string name="walletinfo_onchain_swapin_empty">Il n\'y a pas de fonds en attente de swap.</string>
+
+    <string name="walletinfo_onchain_swapin_timeout_1day">Ce swap va expirer dans moins d\'une journée!</string>
+    <string name="walletinfo_onchain_swapin_timeout">Ce swap va expirer dans %1$s jours.</string>
+
+    <string name="walletinfo_onchain_swapin_locked_title">Expirés</string>
+    <string name="walletinfo_onchain_swapin_locked_description">Ces fonds seront disponibles d\'ici %1$s jours.</string>
+
+    <string name="walletinfo_onchain_swapin_refund_title">Annulés</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Ces fonds n\'ont pas été swappés à temps. Utilisez le descriptor du wallet pour accéder à ces fonds.</string>
 
     <string name="walletinfo_onchain_final_about">Un wallet on-chain dérivé de votre clé.\n\nLe wallet final est par défaut là où les fonds seront envoyés lorsqu\'un canal de paiement ferme.</string>
 

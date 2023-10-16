@@ -24,8 +24,8 @@ android {
         applicationId = "fr.acinq.phoenix.mainnet"
         minSdk = 26
         targetSdk = 33
-        versionCode = 65
-        versionName = "2.0.10"
+        versionCode = 66
+        versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations.addAll(listOf("en", "fr", "de", "es", "cs", "pt-rBR"))
     }
@@ -121,6 +121,7 @@ dependencies {
     implementation("androidx.compose.material:material:${Versions.Android.compose}")
     implementation("androidx.compose.animation:animation:${Versions.Android.compose}")
     implementation("androidx.compose.animation:animation-graphics:${Versions.Android.compose}")
+    implementation("androidx.compose.material3:material3:1.1.2")
     // -- jetpack compose: navigation
     implementation("androidx.navigation:navigation-compose:${Versions.Android.navCompose}")
     // -- jetpack compose: accompanist (utility library for compose)

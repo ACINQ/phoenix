@@ -28,7 +28,7 @@ class ObservableConnectionsMonitor: ObservableObject {
 		connections = currentConnections
 		connectionsChanged(currentConnections)
 		
-		connectionsManager.publisher().sink {[weak self](newConnections: Connections) in
+		connectionsManager.connectionsPublisher().sink {[weak self](newConnections: Connections) in
 			self?.connectionsChanged(newConnections)
 			
 		}.store(in: &cancellables)
@@ -56,7 +56,7 @@ class ObservableConnectionsMonitor: ObservableObject {
 		// Only in the event that we connect are the timestamps reset.
 		// This allows our UI logic to properly count forward from these timestamps
 		
-		if newConnections.global is Lightning_kmpConnection.ESTABLISHED {
+		if newConnections.global.isEstablished() {
 			// All connections are established
 			if disconnectedAt != nil {
 				disconnectedAt = nil
@@ -100,7 +100,7 @@ class CustomElectrumServerObserver: ObservableObject {
 	init() {
 		let connectionsManager = Biz.business.connectionsManager
 		
-		connectionsManager.publisher().sink {[weak self](newConnections: Connections) in
+		connectionsManager.connectionsPublisher().sink {[weak self](newConnections: Connections) in
 			self?.connectionsChanged(newConnections)
 			
 		}.store(in: &cancellables)

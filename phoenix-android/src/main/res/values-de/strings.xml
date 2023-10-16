@@ -488,7 +488,6 @@
     <string name="lnurl_pay_error_invalid_chain">Die von <b>%1$s</b> übermittelte Rechnung verwendet nicht dieselbe Blockchain wie Ihre Wallet.</string>
     <string name="lnurl_pay_error_already_paid">Die von <b>%1$s</b> übermittelte Rechnung wurde bereits bezahlt.</string>
     <string name="lnurl_pay_error_invalid_amount">Die von <b>%1$s</b> übermittelte Rechnung enthält einen falschen Betrag.</string>
-    <string name="lnurl_pay_error_invalid_hash">Die von <b>%1$s</b> übermittelte Rechnung stimmt nicht mit den Angaben in der Anfrage überein.</string>
     <string name="lnurl_pay_error_invalid_malformed">Die von <b>%1$s</b> übermittelte Rechnung ist fehlerhaft.</string>
 
     <!-- settings: display preferences -->
@@ -654,7 +653,7 @@
     <string name="walletinfo_xpub">Master public key</string>
     <string name="walletinfo_path">(Pfad: %1$s)</string>
     <string name="walletinfo_swappable_title">Bereit für Swap</string>
-    <string name="walletinfo_not_swappable_title">Warte auf %1$d Bestätigungen</string>
+    <string name="walletinfo_confirming_title">Warte auf %1$d Bestätigungen</string>
     <string name="walletinfo_confirmed_title">Bestätigtes Guthaben</string>
     <string name="walletinfo_unconfirmed_title">Unbestätigtes Guthaben</string>
     <string name="walletinfo_incoming_balance">+%1$s eingehend</string>

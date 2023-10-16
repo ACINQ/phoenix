@@ -123,7 +123,7 @@ class WalletReset {
 		
 		let connectionsManager = Biz.business.connectionsManager
 		
-		connectionsManager.publisher().sink { (connections: Connections) in
+		connectionsManager.connectionsPublisher().sink { (connections: Connections) in
 			self.connectionsChanged(connections)
 		}
 		.store(in: &cancellables)

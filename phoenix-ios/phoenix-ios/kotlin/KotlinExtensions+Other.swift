@@ -99,13 +99,16 @@ extension Connections {
 	
 	func oneOrMoreEstablishing() -> Bool {
 		
-		if self.internet is Lightning_kmpConnection.ESTABLISHING {
+		if self.internet.isEstablishing() {
 			return true
 		}
-		if self.peer is Lightning_kmpConnection.ESTABLISHING {
+		if self.peer.isEstablishing() {
 			return true
 		}
-		if self.electrum is Lightning_kmpConnection.ESTABLISHING {
+		if self.electrum.isEstablishing() {
+			return true
+		}
+		if self.torEnabled && self.tor.isEstablishing() {
 			return true
 		}
 		return false

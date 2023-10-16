@@ -89,12 +89,12 @@ struct CloudBackupView: View {
 				if hasChanges {
 					if canSave {
 						Image(systemName: "chevron.backward")
-							.font(.title3.weight(.semibold))
+							.font(.headline.weight(.semibold))
 						Text("Save")
 							.padding(.leading, 3)
 					} else {
 						Image(systemName: "chevron.backward")
-							.font(.title3.weight(.semibold))
+							.font(.headline.weight(.semibold))
 							.foregroundColor(.appNegative)
 						Text("Cancel")
 							.padding(.leading, 3)
@@ -102,7 +102,7 @@ struct CloudBackupView: View {
 					}
 				} else {
 					Image(systemName: "chevron.backward")
-						.font(.title3.weight(.semibold))
+						.font(.headline.weight(.semibold))
 				}
 			}
 		}

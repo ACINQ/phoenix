@@ -18,6 +18,8 @@ struct AppStatusPopover: View {
 
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
+	@State var srvExtConnectedToPeer = Biz.srvExtConnectedToPeer.value
+	
 	@State var syncState: SyncTxManager_State = .initializing
 	@State var pendingSettings: SyncTxManager_PendingSettings? = nil
 	
@@ -65,6 +67,9 @@ struct AppStatusPopover: View {
 			)
 		}
 		.assignMaxPreference(for: titleIconWidthReader.key, to: $titleIconWidth)
+		.onReceive(Biz.srvExtConnectedToPeer) {
+			srvExtConnectedToPeerChanged($0)
+		}
 		.onReceive(syncManager.statePublisher) {
 			syncStateChanged($0)
 		}
@@ -92,28 +97,29 @@ struct AppStatusPopover: View {
 			.accessibilityLabel("Connection status: \(txt)")
 			
 			ConnectionCell(
-				label: NSLocalizedString("Internet", comment: "AppStatusPopover: label"),
-				connection: connectionsMonitor.connections.internet
+				connection: connectionsMonitor.connections.internet,
+				label: "Internet"
 			)
 			.padding(.bottom, 8)
 			
 			if connectionsMonitor.connections.torEnabled {
 				ConnectionCell(
-					label: NSLocalizedString("Tor", comment: "AppStatusPopover: label"),
-					connection: connectionsMonitor.connections.tor
+					connection: connectionsMonitor.connections.tor,
+					label: "Tor"
 				)
 				.padding(.bottom, 8)
 			}
 			
 			ConnectionCell(
-				label: NSLocalizedString("Lightning peer", comment: "AppStatusPopover: label"),
-				connection: connectionsMonitor.connections.peer
+				connection: connectionsMonitor.connections.peer,
+				label: "Lightning peer",
+				status: srvExtConnectedToPeer ? "Receiving in background…" : nil
 			)
 			.padding(.bottom, 8)
 			
 			ConnectionCell(
-				label: NSLocalizedString("Electrum server", comment: "AppStatusPopover: label"),
-				connection: connectionsMonitor.connections.electrum
+				connection: connectionsMonitor.connections.electrum,
+				label: "Electrum server"
 			)
 		
 		} // </VStack>
@@ -125,11 +131,11 @@ struct AppStatusPopover: View {
 		let txt: String
 		let img: String
 		
-		if globalStatus is Lightning_kmpConnection.CLOSED {
+		if globalStatus.isClosed() {
 			txt = NSLocalizedString("Offline", comment: "Connection status")
 			img = "bolt.slash.fill"
 			
-		} else if globalStatus is Lightning_kmpConnection.ESTABLISHING {
+		} else if globalStatus.isEstablishing() {
 			txt = NSLocalizedString("Connecting…", comment: "Connection status")
 			img = "bolt.slash"
 			
@@ -352,6 +358,12 @@ struct AppStatusPopover: View {
 		} // </VStack>
 	}
 	
+	func srvExtConnectedToPeerChanged(_ newValue: Bool) {
+		log.trace("srvExtConnectedToPeerChanged()")
+		
+		srvExtConnectedToPeer = newValue
+	}
+	
 	func syncStateChanged(_ newSyncState: SyncTxManager_State) {
 		log.trace("syncStateChanged()")
 		
@@ -375,30 +387,55 @@ struct AppStatusPopover: View {
 
 fileprivate struct ConnectionCell: View {
 	
-	let label: String
 	let connection: Lightning_kmpConnection
-
+	let label: LocalizedStringKey
+	let status: LocalizedStringKey?
+	
+	init(connection: Lightning_kmpConnection, label: LocalizedStringKey, status: LocalizedStringKey? = nil) {
+		self.connection = connection
+		self.label = label
+		self.status = status
+	}
+	
 	@ViewBuilder
 	var body: some View {
 		
-		HStack(alignment: VerticalAlignment.center) {
+		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 			let bullet = Image(systemName: "circle.fill")
 				.imageScale(.small)
+				.layoutPriority(3)
 				.accessibilityHidden(true)
 
-			if connection is Lightning_kmpConnection.ESTABLISHED{
+			if connection.isEstablished() {
 				bullet.foregroundColor(.appPositive)
 			}
-			else if connection is Lightning_kmpConnection.ESTABLISHING {
+			else if connection.isEstablishing() {
 				bullet.foregroundColor(.appWarn)
 			}
-			else if connection is Lightning_kmpConnection.CLOSED {
+			else /* connection.isClosed() */ {
 				bullet.foregroundColor(.appNegative)
 			}
 
-			Text(verbatim: "\(label):")
+			Text(label).padding(.leading)
+				.multilineTextAlignment(.leading)
+				.layoutPriority(1)
+			
+			Text(verbatim: ":")
+				.layoutPriority(2)
+			
 			Spacer()
-			Text(connection.localizedText())
+			if let status {
+				Text(status)
+					.lineLimit(3)
+					.multilineTextAlignment(.trailing)
+					.fixedSize(horizontal: false, vertical: true) // text truncation bugs
+			} else {
+				Text(connection.localizedText())
+					.lineLimit(3)
+					.multilineTextAlignment(.trailing)
+					.fixedSize(horizontal: false, vertical: true) // text truncation bugs
+					
+			}
 			
 		} // </HStack>
 		.font(.callout)

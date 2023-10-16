@@ -516,7 +516,7 @@ struct ValidateView: View {
 	// --------------------------------------------------
 
 	var isDisconnected: Bool {
-		return !(connectionsMonitor.connections.global is Lightning_kmpConnection.ESTABLISHED)
+		return !connectionsMonitor.connections.global.isEstablished()
 	}
 	
 	func currencyStyler() -> TextFieldCurrencyStyler {
@@ -651,13 +651,13 @@ struct ValidateView: View {
 	
 	func disconnectedText() -> String {
 		
-		if !(connectionsMonitor.connections.internet is Lightning_kmpConnection.ESTABLISHED) {
+		if !connectionsMonitor.connections.internet.isEstablished() {
 			return NSLocalizedString("waiting for internet", comment: "button text")
 		}
-		if !(connectionsMonitor.connections.peer is Lightning_kmpConnection.ESTABLISHED) {
+		if !connectionsMonitor.connections.peer.isEstablished() {
 			return NSLocalizedString("connecting to peer", comment: "button text")
 		}
-		if !(connectionsMonitor.connections.electrum is Lightning_kmpConnection.ESTABLISHED) {
+		if !connectionsMonitor.connections.electrum.isEstablished() {
 			return NSLocalizedString("connecting to electrum", comment: "button text")
 		}
 		return ""

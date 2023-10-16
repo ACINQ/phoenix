@@ -18,6 +18,7 @@ package fr.acinq.phoenix.db.notifications
 
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
+import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.Notification
@@ -63,7 +64,7 @@ internal class NotificationsQueries(val database: AppDatabase) {
      */
     fun listUnread(): Flow<List<Pair<Set<UUID>, Notification>>> {
         return queries.listUnread().asFlow().mapToList().map {
-            it.mapNotNull { row ->
+            val notifs = it.mapNotNull { row ->
                 val ids = row.grouped_ids.split(";").map { UUID.fromString(it) }.toSet()
                 val notif = mapToNotification(row.id, row.type_version, row.data_json, row.max ?: 0, null)
                 if (notif != null) {
@@ -74,6 +75,23 @@ internal class NotificationsQueries(val database: AppDatabase) {
                     null
                 }
             }
+
+            val (pendingSwaps, others) = notifs.partition {
+                val notif = it.second
+                notif is Notification.PaymentRejected && notif.source == LiquidityEvents.Source.OnChainWallet
+            }
+
+            // group swap notification by amount, and flatten the list
+            val pendingSwapsGroupedByAmount = pendingSwaps.mapNotNull {
+                val notif = it.second
+                if (notif is Notification.PaymentRejected) notif.amount to it else null
+            }.groupBy { it.first }.map {
+                val sameNotificationGroups = it.value.map { it.second }
+                val uuids = sameNotificationGroups.map { it.first }.flatten().toSet()
+                uuids to sameNotificationGroups.first().second
+            }
+
+            (pendingSwapsGroupedByAmount + others).sortedByDescending { it.second.createdAt }
         }
     }
 

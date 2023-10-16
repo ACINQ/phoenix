@@ -17,9 +17,19 @@
 package fr.acinq.phoenix.android.home
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -34,8 +44,11 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.MotionLayout
 import androidx.constraintlayout.compose.MotionScene
 import androidx.constraintlayout.compose.layoutId
-import fr.acinq.phoenix.android.*
+import fr.acinq.phoenix.android.CF
+import fr.acinq.phoenix.android.NoticesViewModel
+import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.PrimarySeparator
 import fr.acinq.phoenix.android.components.mvi.MVIView
@@ -184,7 +197,7 @@ fun HomeView(
 
     MVIView(CF::home) { model, _ ->
         val balance = model.balance
-        val notices = noticesViewModel.notices.values.toList()
+        val notices = noticesViewModel.notices
         val notifications by business.notificationsManager.notifications.collectAsState(emptyList())
 
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -215,16 +228,13 @@ fun HomeView(
                     onShowChannels = onShowChannels,
                 )
                 PrimarySeparator(modifier = Modifier.layoutId("separator"))
-                if (notices.isNotEmpty() || notifications.isNotEmpty()) {
-                    NoticesButtonRow(
-                        modifier = Modifier.layoutId("notices"),
-                        notices = noticesViewModel.notices.values.toList(),
-                        notifications = notifications,
-                        onNavigateToNotificationsList = onShowNotifications,
-                    )
-                } else {
-                    Box(modifier = Modifier.layoutId("notices"))
-                }
+                HomeNotices(
+                    modifier = Modifier.layoutId("notices"),
+                    notices = notices,
+                    notifications = notifications,
+                    onNavigateToSwapInWallet = onShowSwapInWallet,
+                    onNavigateToNotificationsList = onShowNotifications,
+                )
             }
 
             PaymentsList(

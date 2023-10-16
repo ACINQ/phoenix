@@ -28,7 +28,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		return UIApplication.shared.delegate as! AppDelegate
 	}
 
-	private var cancellables = Set<AnyCancellable>()
+	private var appCancellables = Set<AnyCancellable>()
+	private var groupPrefsCancellables = Set<AnyCancellable>()
 	private var isInBackground = false
 
 	public var externalLightningUrlPublisher = PassthroughSubject<String, Never>()
@@ -92,26 +93,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		// Firebase broke application lifecycle functions with their stupid swizzling stuff.
 		nc.publisher(for: UIApplication.didBecomeActiveNotification).sink { _ in
 			self._applicationDidBecomeActive(application)
-		}.store(in: &cancellables)
+		}.store(in: &appCancellables)
 		
 		nc.publisher(for: UIApplication.willResignActiveNotification).sink { _ in
 			self._applicationWillResignActive(application)
-		}.store(in: &cancellables)
+		}.store(in: &appCancellables)
 		
 		nc.publisher(for: UIApplication.didEnterBackgroundNotification).sink { _ in
 			self._applicationDidEnterBackground(application)
-		}.store(in: &cancellables)
+		}.store(in: &appCancellables)
 		
 		nc.publisher(for: UIApplication.willEnterForegroundNotification).sink { _ in
 			self._applicationWillEnterForeground(application)
-		}.store(in: &cancellables)
+		}.store(in: &appCancellables)
 
 		CrossProcessCommunication.shared.start(actor: .mainApp) { (_: XpcMessage) in
 			self.didReceivePaymentViaAppExtension()
 		}
-
+		
 		NotificationsManager.shared.requestPermissionForProvisionalNotifications()
-
+		
 		return true
 	}
 	
@@ -130,15 +131,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	func _applicationDidBecomeActive(_ application: UIApplication) {
 		log.trace("### applicationDidBecomeActive(_:)")
 		
-		if GroupPrefs.shared.badgeCount > 0 {
-			didReceivePaymentViaAppExtension()
-		}
-		GroupPrefs.shared.badgeCount = 0
-		UIApplication.shared.applicationIconBadgeNumber = 0
+		GroupPrefs.shared.badgeCountPublisher.sink {[self](count: Int) in
+			if count > 0 {
+				self.didReceivePaymentViaAppExtension()
+				GroupPrefs.shared.badgeCount = 0
+				UIApplication.shared.applicationIconBadgeNumber = 0
+			}
+		}.store(in: &groupPrefsCancellables)
 	}
 	
 	func _applicationWillResignActive(_ application: UIApplication) {
 		log.trace("### applicationWillResignActive(_:)")
+
+		groupPrefsCancellables.removeAll()
 	}
 	
 	func _applicationDidEnterBackground(_ application: UIApplication) {
@@ -218,8 +223,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
 	) {
 		log.trace("application(_:didReceiveRemoteNotification:fetchCompletionHandler:)")
-		
-		Biz.processPushNotification(userInfo, completionHandler)
+		log.debug("remote notification: \(userInfo)")
+
+		// If the app is in the foreground:
+		// - we can ignore this notification
+		//
+		// If the app is in the background:
+		// - this notification was delivered to the notifySrvExt, which is in charge of processing it
+
+		DispatchQueue.main.async {
+			completionHandler(.noData)
+		}
 	}
 	
 	func messaging(
@@ -228,7 +242,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	) {
 		log.trace("messaging(_:didReceiveRegistrationToken:)")
 		log.debug("Firebase registration token: \(String(describing: fcmToken))")
-
+		
 		assertMainThread()
 		
 		if let fcmToken = fcmToken {
@@ -242,8 +256,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 
 	private func didReceivePaymentViaAppExtension() {
 		log.trace("didReceivePaymentViaAppExtension()")
-
-		// This usually happens when:
+		
+		// This function is called when:
 		// - phoenix was running in the background
 		// - a received push notification launched our notification-service-extension
 		// - our app extension received an incoming payment

@@ -147,7 +147,7 @@ fun Connection.asEstablishing(): Connection.ESTABLISHING? = when (this) {
     else -> null
 }
 
-fun Connection.isEstablished(): Connection.ESTABLISHED? = when (this) {
+fun Connection.asEstablished(): Connection.ESTABLISHED? = when (this) {
     is Connection.ESTABLISHED -> this
     else -> null
 }
