@@ -107,6 +107,8 @@ class BalanceManager(
                     wallet.confirmationsNeeded(it)
                 },
                 unconfirmed = wallet.unconfirmed.balance,
+                locked = wallet.lockedUntilRefund.balance,
+                readyForRefund = wallet.readyForRefund.balance
             )
         }
     }
@@ -115,21 +117,25 @@ class BalanceManager(
 /**
  * Helper class representing the balance of the swap-in wallet. See [WalletState.WalletWithConfirmations].
  *
- * @param deeplyConfirmed amount that is confirmed and that can be used for a swap. This amount would always be 0 if we were to
+ * @param deeplyConfirmed balance that is confirmed and that can be used for a swap. This amount would always be 0 if we were to
  *      systematically accept swaps. But swaps can fail, or be rejected (fee too high).
- * @param weaklyConfirmed  amount that is confirmed but not deep enough for a swap.
+ * @param weaklyConfirmed  balance that is confirmed but not deep enough for a swap.
  * @param weaklyConfirmedMinBlockNeeded minimum depth that the wallet's weakly confirmed utxos must reach.
- * @param unconfirmed amount that is not confirmed yet.
+ * @param unconfirmed balance that is not confirmed yet.
+ * @param locked balance that cannot be swapped anymore, but cannot be spent yet either.
+ * @param readyForRefund balance that cannot be swapped anymore, but can be spent unilaterally.
  */
 data class WalletBalance(
     val deeplyConfirmed: Satoshi,
     val weaklyConfirmed: Satoshi,
     val weaklyConfirmedMinBlockNeeded: Int?,
+    val locked: Satoshi,
+    val readyForRefund: Satoshi,
     val unconfirmed: Satoshi,
 ) {
-    val total get() = deeplyConfirmed + weaklyConfirmed + unconfirmed
+    val total get() = readyForRefund + locked + deeplyConfirmed + weaklyConfirmed + unconfirmed
 
     companion object {
-        fun empty() = WalletBalance(0.sat, 0.sat, null, 0.sat)
+        fun empty() = WalletBalance(0.sat, 0.sat, null, 0.sat, 0.sat, 0.sat)
     }
 }

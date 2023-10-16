@@ -677,7 +677,7 @@
     <string name="walletinfo_xpub">Hlavní veřejný klíč</string>
     <string name="walletinfo_path">(Cesta: %1$s)</string>
     <string name="walletinfo_swappable_title">Připraveno na swap</string>
-    <string name="walletinfo_not_swappable_title">Čekání na %1$d potvrzení</string>
+    <string name="walletinfo_confirming_title">Čekání na %1$d potvrzení</string>
     <string name="walletinfo_confirmed_title">Potvrzený zůstatek</string>
     <string name="walletinfo_unconfirmed_title">Nepotvrzený zůstatek</string>
     <string name="walletinfo_incoming_balance">Přichází +%1$s</string>

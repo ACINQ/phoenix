@@ -18,8 +18,14 @@ package fr.acinq.phoenix.android.utils.datastore
 
 import android.content.Context
 import androidx.datastore.preferences.core.*
+import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.LiquidityEvents
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.service.ChannelsWatcher
 import fr.acinq.phoenix.legacy.internalData
+import fr.acinq.phoenix.legacy.userPrefs
 import fr.acinq.phoenix.legacy.utils.Prefs as LegacyPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -78,6 +84,21 @@ object InternalData {
     }
     suspend fun saveChannelsWatcherOutcome(context: Context, outcome: ChannelsWatcher.Outcome) = context.internalData.edit {
         it[CHANNELS_WATCHER_OUTCOME] = json.encodeToString(outcome)
+    }
+
+    // -- system notifications
+
+    /** Do not spam user with duplicate notifications for the same on-chain deposit. */
+    private val LAST_REJECTED_ONCHAIN_SWAP_AMOUNT = longPreferencesKey("LAST_REJECTED_ONCHAIN_SWAP_AMOUNT")
+    private val LAST_REJECTED_ONCHAIN_SWAP_TIMESTAMP = longPreferencesKey("LAST_REJECTED_ONCHAIN_SWAP_TIMESTAMP")
+    fun getLastRejectedOnchainSwap(context: Context): Flow<Pair<MilliSatoshi, Long>?> = prefs(context).map {
+        val amount = it[LAST_REJECTED_ONCHAIN_SWAP_AMOUNT]
+        val timestamp = it[LAST_REJECTED_ONCHAIN_SWAP_TIMESTAMP]
+        if (amount != null && timestamp != null) amount.msat to timestamp else null
+    }
+    suspend fun saveLastRejectedOnchainSwap(context: Context, liquidityEvent: LiquidityEvents.Rejected) = context.internalData.edit {
+        it[LAST_REJECTED_ONCHAIN_SWAP_AMOUNT] = liquidityEvent.amount.msat
+        it[LAST_REJECTED_ONCHAIN_SWAP_TIMESTAMP] = currentTimestampMillis()
     }
 
     private fun prefs(context: Context): Flow<Preferences> {

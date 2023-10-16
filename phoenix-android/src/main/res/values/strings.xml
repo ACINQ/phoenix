@@ -34,6 +34,9 @@
     <string name="notification_headless_title">Running in the background</string>
     <string name="notification_headless_desc">Tells you when Phoenix is running in the background.</string>
 
+    <string name="notification_swap_timeout_title">Swap timeout</string>
+    <string name="notification_swap_timeout_desc">Tells you when a swap is going to timeout.</string>
+
     <!-- init wallet / automated wallet creation -->
 
     <string name="autocreate_generating">Creating your wallet…</string>
@@ -696,7 +699,8 @@
     <string name="walletinfo_xpub">Master public key</string>
     <string name="walletinfo_path">(Path: %1$s)</string>
     <string name="walletinfo_swappable_title">Ready for swap</string>
-    <string name="walletinfo_not_swappable_title">Waiting for %1$d confirmations</string>
+    <string name="walletinfo_confirming_title">Waiting for %1$d confirmations</string>
+    <string name="walletinfo_confirming_more">+%1$d more…</string>
     <string name="walletinfo_confirmed_title">Confirmed balance</string>
     <string name="walletinfo_unconfirmed_title">Unconfirmed balance</string>
     <string name="walletinfo_incoming_balance">+%1$s incoming</string>

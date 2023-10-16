@@ -34,11 +34,15 @@ import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.CurrencyManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
-import java.lang.Runnable
 import java.util.concurrent.locks.ReentrantLock
 
 class NodeService : Service() {
@@ -235,7 +239,9 @@ class NodeService : Service() {
         val preferredFiatCurrency = UserPrefs.getFiatCurrency(applicationContext).first()
         val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(decryptedPayload))
 
-        monitorPaymentsWhenHeadless(business.peerManager, business.nodeParamsManager, business.currencyManager)
+        serviceScope.launch { monitorPaymentsWhenHeadless(business.peerManager, business.currencyManager) }
+        serviceScope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager) }
+
         business.walletManager.loadWallet(seed)
         business.appConfigurationManager.updatePreferredFiatCurrencies(
             AppConfigurationManager.PreferredFiatCurrencies(primary = preferredFiatCurrency, others = emptySet())
@@ -268,70 +274,71 @@ class NodeService : Service() {
         return WalletState.Started.Kmm(business)
     }
 
-    private fun monitorPaymentsWhenHeadless(peerManager: PeerManager, nodeParamsManager: NodeParamsManager, currencyManager: CurrencyManager) {
+    private suspend fun monitorNodeEvents(peerManager: PeerManager, nodeParamsManager: NodeParamsManager) {
         val monitoringStartedAt = currentTimestampMillis()
-        serviceScope.launch {
-            nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents.collect { event ->
-                // TODO: click on notif must deeplink to the notification screen
-                when (event) {
-                    is LiquidityEvents.Rejected -> {
-                        log.debug("processing liquidity_event=$event")
-                        if (event.source == LiquidityEvents.Source.OnChainWallet) {
-                            // we do not want to trigger a notification every time this event is emitted (each new block)
-                            // though if the app just started, we always want to display a notification
-                            val lastRejectedSwap = UserPrefs.getLastRejectedOnchainSwap(applicationContext).first().takeIf {
-                                currentTimestampMillis() - monitoringStartedAt >= 7 * DateUtils.MINUTE_IN_MILLIS
-                            }
-                            if (lastRejectedSwap != null
-                                && lastRejectedSwap.first == event.amount
-                                && currentTimestampMillis() - lastRejectedSwap.second <= 2 * DateUtils.HOUR_IN_MILLIS
-                            ) {
-                                log.debug("ignore this liquidity event as a similar notification was recently displayed")
-                                return@collect
-                            } else {
-                                UserPrefs.saveRejectedOnchainSwap(applicationContext, event)
-                            }
+        combine(peerManager.swapInNextTimeout, nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents) { nextTimeout, nodeEvent ->
+            nextTimeout to nodeEvent
+        }.collect { (nextTimeout, event) ->
+            // TODO: click on notif must deeplink to the notification screen
+            when (event) {
+                is LiquidityEvents.Rejected -> {
+                    log.debug("processing liquidity_event=$event")
+                    if (event.source == LiquidityEvents.Source.OnChainWallet) {
+                        // Check the last time a rejected on-chain swap notification has been shown. If recent, we do not want to trigger a notification every time.
+                        val lastRejectedSwap = InternalData.getLastRejectedOnchainSwap(applicationContext).first().takeIf {
+                            // However, if the app started < 2 min ago, we always want to display a notification. So we'll ignore this check ^
+                            currentTimestampMillis() - monitoringStartedAt >= 2 * DateUtils.MINUTE_IN_MILLIS
                         }
-                        when (val reason = event.reason) {
-                            is LiquidityEvents.Rejected.Reason.PolicySetToDisabled -> {
-                                SystemNotificationHelper.notifyPaymentRejectedPolicyDisabled(applicationContext, event.source, event.amount)
-                            }
-                            is LiquidityEvents.Rejected.Reason.TooExpensive.OverAbsoluteFee -> {
-                                SystemNotificationHelper.notifyPaymentRejectedOverAbsolute(applicationContext, event.source, event.amount, event.fee, reason.maxAbsoluteFee)
-                            }
-                            is LiquidityEvents.Rejected.Reason.TooExpensive.OverRelativeFee -> {
-                                SystemNotificationHelper.notifyPaymentRejectedOverRelative(applicationContext, event.source, event.amount, event.fee, reason.maxRelativeFeeBasisPoints)
-                            }
-                            LiquidityEvents.Rejected.Reason.ChannelInitializing -> {
-                                SystemNotificationHelper.notifyPaymentRejectedChannelsInitializing(applicationContext, event.source, event.amount)
-                            }
+                        if (lastRejectedSwap != null
+                            && lastRejectedSwap.first == event.amount
+                            && currentTimestampMillis() - lastRejectedSwap.second <= 2 * DateUtils.HOUR_IN_MILLIS
+                        ) {
+                            log.debug("ignore this liquidity event as a similar notification was recently displayed")
+                            return@collect
+                        } else {
+                            InternalData.saveLastRejectedOnchainSwap(applicationContext, event)
                         }
                     }
-                    else -> Unit
+                    when (val reason = event.reason) {
+                        is LiquidityEvents.Rejected.Reason.PolicySetToDisabled -> {
+                            SystemNotificationHelper.notifyPaymentRejectedPolicyDisabled(applicationContext, event.source, event.amount, nextTimeout?.second)
+                        }
+                        is LiquidityEvents.Rejected.Reason.TooExpensive.OverAbsoluteFee -> {
+                            SystemNotificationHelper.notifyPaymentRejectedOverAbsolute(applicationContext, event.source, event.amount, event.fee, reason.maxAbsoluteFee, nextTimeout?.second)
+                        }
+                        is LiquidityEvents.Rejected.Reason.TooExpensive.OverRelativeFee -> {
+                            SystemNotificationHelper.notifyPaymentRejectedOverRelative(applicationContext, event.source, event.amount, event.fee, reason.maxRelativeFeeBasisPoints, nextTimeout?.second)
+                        }
+                        LiquidityEvents.Rejected.Reason.ChannelInitializing -> {
+                            SystemNotificationHelper.notifyPaymentRejectedChannelsInitializing(applicationContext, event.source, event.amount, nextTimeout?.second)
+                        }
+                    }
                 }
+                else -> Unit
             }
         }
-        serviceScope.launch {
-            peerManager.getPeer().eventsFlow.collect { event ->
-                when (event) {
-                    is PaymentReceived -> {
-                        if (isHeadless) {
-                            receivedInBackground.add(event.received.amount)
-                            SystemNotificationHelper.notifyPaymentsReceived(
-                                context = applicationContext,
-                                paymentHash = event.incomingPayment.paymentHash,
-                                amount = event.received.amount,
-                                rates = currencyManager.ratesFlow.value,
-                                isHeadless = isHeadless && receivedInBackground.size == 1
-                            )
+    }
 
-                            // push back service shutdown by 60s - maybe we'll receive more payments?
-                            shutdownHandler.removeCallbacksAndMessages(null)
-                            shutdownHandler.postDelayed(shutdownRunnable, 60 * 1000)
-                        }
+    private suspend fun monitorPaymentsWhenHeadless(peerManager: PeerManager, currencyManager: CurrencyManager) {
+        peerManager.getPeer().eventsFlow.collect { event ->
+            when (event) {
+                is PaymentReceived -> {
+                    if (isHeadless) {
+                        receivedInBackground.add(event.received.amount)
+                        SystemNotificationHelper.notifyPaymentsReceived(
+                            context = applicationContext,
+                            paymentHash = event.incomingPayment.paymentHash,
+                            amount = event.received.amount,
+                            rates = currencyManager.ratesFlow.value,
+                            isHeadless = isHeadless && receivedInBackground.size == 1
+                        )
+
+                        // push back service shutdown by 60s - maybe we'll receive more payments?
+                        shutdownHandler.removeCallbacksAndMessages(null)
+                        shutdownHandler.postDelayed(shutdownRunnable, 60 * 1000)
                     }
-                    else -> Unit
                 }
+                else -> Unit
             }
         }
     }

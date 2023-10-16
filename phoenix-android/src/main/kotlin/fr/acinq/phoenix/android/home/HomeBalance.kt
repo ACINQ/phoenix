@@ -33,6 +33,7 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.preferredAmountUnit
@@ -93,9 +94,14 @@ private fun IncomingBalance(
 ) {
     val balance = swapInBalance.total.toMilliSatoshi() + pendingChannelsBalance
     if (balance > 0.msat) {
+        val nextSwapTimeout by business.peerManager.swapInNextTimeout.collectAsState(initial = null)
         val undecidedSwapBalance = swapInBalance.unconfirmed + swapInBalance.weaklyConfirmed
         FilledButton(
-            icon = if (undecidedSwapBalance == 0.sat && pendingChannelsBalance == 0.msat) R.drawable.ic_sleep else R.drawable.ic_clock,
+            icon = when {
+                nextSwapTimeout?.let { it.second < 144 } ?: false -> R.drawable.ic_alert_triangle
+                undecidedSwapBalance == 0.sat && pendingChannelsBalance == 0.msat -> R.drawable.ic_sleep
+                else -> R.drawable.ic_clock
+            },
             iconTint = MaterialTheme.typography.caption.color,
             text = if (balanceDisplayMode == HomeAmountDisplayMode.REDACTED) "****" else {
                 stringResource(id = R.string.home__onchain_incoming, balance.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true))

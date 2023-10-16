@@ -121,6 +121,7 @@ dependencies {
     implementation("androidx.compose.material:material:${Versions.Android.compose}")
     implementation("androidx.compose.animation:animation:${Versions.Android.compose}")
     implementation("androidx.compose.animation:animation-graphics:${Versions.Android.compose}")
+    implementation("androidx.compose.material3:material3:1.1.2")
     // -- jetpack compose: navigation
     implementation("androidx.navigation:navigation-compose:${Versions.Android.navCompose}")
     // -- jetpack compose: accompanist (utility library for compose)

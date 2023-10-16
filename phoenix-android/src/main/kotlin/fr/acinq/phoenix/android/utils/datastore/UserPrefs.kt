@@ -212,21 +212,6 @@ object UserPrefs {
         it[INCOMING_MAX_PROP_FEE_INTERNAL_TRACKER] ?: NodeParamsManager.defaultLiquidityPolicy.maxRelativeFeeBasisPoints
     }
 
-    // -- system notifications
-
-    /** Do not spam user with several notifications for the same on-chain deposit. */
-    private val LAST_REJECTED_ONCHAIN_SWAP_AMOUNT = longPreferencesKey("LAST_REJECTED_ONCHAIN_SWAP_AMOUNT")
-    private val LAST_REJECTED_ONCHAIN_SWAP_TIMESTAMP = longPreferencesKey("LAST_REJECTED_ONCHAIN_SWAP_TIMESTAMP")
-    fun getLastRejectedOnchainSwap(context: Context): Flow<Pair<MilliSatoshi, Long>?> = prefs(context).map {
-        val amount = it[LAST_REJECTED_ONCHAIN_SWAP_AMOUNT]
-        val timestamp = it[LAST_REJECTED_ONCHAIN_SWAP_TIMESTAMP]
-        if (amount != null && timestamp != null) amount.msat to timestamp else null
-    }
-    suspend fun saveRejectedOnchainSwap(context: Context, liquidityEvent: LiquidityEvents.Rejected) = context.userPrefs.edit {
-        it[LAST_REJECTED_ONCHAIN_SWAP_AMOUNT] = liquidityEvent.amount.msat
-        it[LAST_REJECTED_ONCHAIN_SWAP_TIMESTAMP] = currentTimestampMillis()
-    }
-
     // -- lnurl
 
     private val LNURL_AUTH_SCHEME = intPreferencesKey("LNURL_AUTH_SCHEME")

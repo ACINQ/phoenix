@@ -16,11 +16,13 @@
 
 package fr.acinq.phoenix.android
 
-import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import fr.acinq.phoenix.managers.AppConfigurationManager
+import fr.acinq.phoenix.managers.PeerManager
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
@@ -30,7 +32,8 @@ sealed class Notice() {
 
     object MigrationFromLegacy : ShowInHome(1)
     object CriticalUpdateAvailable : ShowInHome(2)
-    object BackupSeedReminder : ShowInHome(3)
+    object SwapInCloseToTimeout : ShowInHome(3)
+    object BackupSeedReminder : ShowInHome(5)
     object MempoolFull : ShowInHome(10)
     object UpdateAvailable : ShowInHome(20)
     object NotificationPermission : ShowInHome(30)
@@ -40,21 +43,24 @@ sealed class Notice() {
     object WatchTowerLate : DoNotShowInHome()
 }
 
-class NoticesViewModel(val appConfigurationManager: AppConfigurationManager) : ViewModel() {
+class NoticesViewModel(val appConfigurationManager: AppConfigurationManager, val peerManager: PeerManager) : ViewModel() {
     val log = LoggerFactory.getLogger(this::class.java)
 
-    val notices = mutableStateMapOf<Notice, Notice>()
+    val notices = mutableStateListOf<Notice>()
 
     init {
         viewModelScope.launch { monitorWalletContext() }
+        viewModelScope.launch { monitorSwapInCloseToTimeout() }
     }
 
     fun addNotice(notice: Notice) {
-        notices[notice] = notice
+        if (notices.none { it == notice }) {
+            notices.add(notice)
+        }
     }
 
-    fun removeNotice(notice: Notice) {
-        notices.remove(notice)
+    inline fun <reified N : Notice> removeNotice() {
+        notices.filterIsInstance<N>().forEach { notices.remove(it) }
     }
 
     private suspend fun monitorWalletContext() {
@@ -67,28 +73,38 @@ class NoticesViewModel(val appConfigurationManager: AppConfigurationManager) : V
             if (isMempoolFull) {
                 addNotice(Notice.MempoolFull)
             } else {
-                removeNotice(Notice.MempoolFull)
+                removeNotice<Notice.MempoolFull>()
             }
 
             if (isCriticalUpdateAvailable) {
                 addNotice(Notice.CriticalUpdateAvailable)
-                removeNotice(Notice.UpdateAvailable)
+                removeNotice<Notice.UpdateAvailable>()
             } else if (isUpdateAvailable) {
                 addNotice(Notice.UpdateAvailable)
-                removeNotice(Notice.CriticalUpdateAvailable)
+                removeNotice<Notice.CriticalUpdateAvailable>()
             } else {
-                removeNotice(Notice.UpdateAvailable)
-                removeNotice(Notice.CriticalUpdateAvailable)
+                removeNotice<Notice.UpdateAvailable>()
+                removeNotice<Notice.CriticalUpdateAvailable>()
+            }
+        }
+    }
+
+    private suspend fun monitorSwapInCloseToTimeout() {
+        peerManager.swapInNextTimeout.filterNotNull().collect { (_, nextTimeoutRemainingBlocks) ->
+            when {
+                nextTimeoutRemainingBlocks < 144 * 30 -> addNotice(Notice.SwapInCloseToTimeout)
+                else -> removeNotice<Notice.SwapInCloseToTimeout>()
             }
         }
     }
 
     class Factory(
         private val appConfigurationManager: AppConfigurationManager,
+        private val peerManager: PeerManager
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return NoticesViewModel(appConfigurationManager) as T
+            return NoticesViewModel(appConfigurationManager, peerManager) as T
         }
     }
 }

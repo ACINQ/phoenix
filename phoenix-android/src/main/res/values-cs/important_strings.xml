@@ -36,8 +36,11 @@
     <string name="notif_rejected_deposit_title">On-Chain záloha čeká na vyřízení (+%1$s)</string>
     <string name="notif_rejected_payment_title">Zamítnutí platby (+%1$s)</string>
     <string name="notif_rejected_policy_disabled">Automatická správa kanálů je zakázána. Můžete to změnit v nastavení.</string>
+    <string name="notif_rejected_policy_disabled_timeout">Automatická správa kanálů je zakázána. Platnost této zálohy vyprší %1$s.</string>
     <string name="notif_rejected_over_absolute">Poplatek činil %1$s, ale váš maximální poplatek byl nastaven na %2$s. Můžete to upravit v nastavení.</string>
+    <string name="notif_rejected_over_absolute_timeout">Poplatek činil %1$s, ale váš maximální poplatek byl nastaven na %2$s. Platnost této zálohy vyprší %3$s.</string>
     <string name="notif_rejected_over_relative">Poplatek činil %1$s, což je více než %2$s%% z přijaté částky. Můžete to upravit v nastavení.</string>
+    <string name="notif_rejected_over_relative_timeout">Poplatek činil %1$s, což je více než %2$s%% z přijaté částky. Platnost této zálohy vyprší %3$s.</string>
     <string name="notif_rejected_channels_initializing">Vaše kanály se inicializovaly a nemohly tuto platbu přijmout. Zkuste to později.</string>
 
     <string name="notif_watcher_revoked_commit_title">Spusťte prosím Phoenix</string>
@@ -153,6 +156,9 @@
     <string name="inappnotif_notification_permission_message">Oznámení jsou v nastavení systému Android zakázána. Phoenix vás nebude moci upozornit na zpracování platby.</string>
     <string name="inappnotif_notification_permission_enable">Povolit</string>
 
+    <string name="inappnotif_swapin_timeout_message">Záloha brzy vyprší.</string>
+    <string name="inappnotif_swapin_timeout_action">Zobrazit podrobnosti</string>
+
     <string name="inappnotif_watchtower_late_message">Phoenix pravidelně monitoruje Blockchain na pozadí, ale v posledních dnech se mu to nedařilo.\n\nUjistěte se, že systém Android neblokuje aplikaci Phoenix a že se může připojit ke službě Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Odmítnout</string>
 
@@ -175,6 +181,7 @@
     <string name="inappnotif_payment_rejected_over_relative">Poplatek byl %1$s, což je více než %2$s%% částky.</string>
     <string name="inappnotif_payment_rejected_channel_initializing">Vaše kanály se stále inicializují a nemohly tuto platbu přijmout.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Klepnutím na položku provedete konfiguraci.</string>
+    <string name="inappnotif_payment_rejected_view_wallet">Zobrazit podrobnosti</string>
 
     <string name="inappnotif_watchtower_nominal_title">Watchtower report</string>
     <plurals name="inappnotif_watchtower_nominal_description">
@@ -239,13 +246,24 @@
 
     <string name="walletinfo_onchain_swapin">Swap-in peněženka</string>
     <string name="walletinfo_onchain_swapin_help">Prostředky zaslané do této On-Chain peněženky se automaticky převádějí do Lightningu.</string>
+    <string name="walletinfo_onchain_swapin_help_faq_link">Podívejte se, jak to funguje</string>
     <string name="walletinfo_onchain_swapin_policy_view">Klepnutím na položku provedete konfiguraci.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">Pokud je poplatek <b>menší než %1$s</b>, budou prostředky na Blockchainu automaticky převedeny do služby Lightning.</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details_timeout">Prostředky, které nebyly vyměněny <b>po %1$d měsících</b>, lze získat zpět na řetězci.</string>
     <string name="walletinfo_onchain_swapin_policy_disabled_details">Automatizovaná poplatková politika <b>je vypnutá</b>. Prostředky nebudou vyměňovány. Zůstanou na této peněžence.</string>
     <string name="walletinfo_onchain_swapin_last_attempt">Poslední pokus (%1$s).</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">Automatizovaná poplatková politika je vypnutá.</string>
     <string name="walletinfo_onchain_swapin_last_attempt_channels_init">Vaše kanály byly inicializovány.</string>
     <string name="walletinfo_onchain_swapin_empty">Neprobíhají žádné výměny.</string>
+
+    <string name="walletinfo_onchain_swapin_timeout_1day">Platnost této výměny vyprší za den!</string>
+    <string name="walletinfo_onchain_swapin_timeout">Tento swap vyprší za %1$s dní.</string>
+
+    <string name="walletinfo_onchain_swapin_locked_title">Vyčerpané prostředky</string>
+    <string name="walletinfo_onchain_swapin_locked_description">Tyto prostředky budou k dispozici za %1$s dní.</string>
+
+    <string name="walletinfo_onchain_swapin_refund_title">Zrušené prostředky</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Tyto prostředky nebyly včas vyměněny. Pro jejich zpřístupnění použijte deskriptor peněženky.</string>
 
     <string name="walletinfo_onchain_final_about">On-Chain peněženka odvozená od vašeho seedu.\n\nKonečná peněženka je místo, kam se ve výchozím nastavení posílají prostředky, když jsou vaše Lightning kanály uzavřeny.</string>
 
