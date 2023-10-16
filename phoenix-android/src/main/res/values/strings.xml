@@ -504,7 +504,7 @@
 
     <!-- lnurl: common remote error messages -->
 
-    <string name="lnurl_error_remote_details">The service <b>%1$s</b> responded with an error:\n\n<i>%2$s</i>.\n\nContact their support if needed.</string>
+    <string name="lnurl_error_remote_details">The service <b>%1$s</b> responded with an error:\n\n<i>%2$s</i>\n\nContact their support if needed.</string>
     <string name="lnurl_error_remote_code">The service <b>%1$s</b> returned an HTTP error (%2$s).\n\nContact their support if needed.</string>
     <string name="lnurl_error_remote_unreadable">The service <b>%1$s</b> returned a malformed message.</string>
     <string name="lnurl_error_remote_connection">Could not connect to service <b>%1$s</b>.</string>

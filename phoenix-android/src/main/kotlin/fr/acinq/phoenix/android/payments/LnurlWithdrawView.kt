@@ -135,8 +135,8 @@ fun getRemoteErrorMessage(
     error: LnurlError.RemoteFailure
 ): AnnotatedString {
     return when (error) {
-        is LnurlError.RemoteFailure.Code -> annotatedStringResource(id = R.string.lnurl_error_remote_code, error.origin, error.code)
-        is LnurlError.RemoteFailure.CouldNotConnect -> annotatedStringResource(id = R.string.lnurl_error_remote_code, error.origin)
+        is LnurlError.RemoteFailure.Code -> annotatedStringResource(id = R.string.lnurl_error_remote_code, error.origin, error.code.value.toString())
+        is LnurlError.RemoteFailure.CouldNotConnect -> annotatedStringResource(id = R.string.lnurl_error_remote_connection, error.origin)
         is LnurlError.RemoteFailure.Detailed -> annotatedStringResource(id = R.string.lnurl_error_remote_details, error.origin, error.reason)
         is LnurlError.RemoteFailure.Unreadable -> annotatedStringResource(id = R.string.lnurl_error_remote_unreadable, error.origin)
     }
