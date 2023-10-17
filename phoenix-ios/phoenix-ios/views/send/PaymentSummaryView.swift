@@ -342,9 +342,9 @@ struct PaymentSummaryView: View {
 			fiat_total = unknownFiatAmount
 		}
 		
-		let percent_tip = percentString(nums.tipPercent)
-		let percent_lightningFee = percentString(nums.lightningFeePercent)
-		let percent_minerFee = percentString(nums.minerFeePercent)
+		let percent_tip = generalPercentString(nums.tipPercent)
+		let percent_lightningFee = lightningPercentString(nums.lightningFeePercent)
+		let percent_minerFee = generalPercentString(nums.minerFeePercent)
 		
 		return PaymentSummaryStrings(
 			bitcoin_base         : bitcoin_base,
@@ -367,7 +367,7 @@ struct PaymentSummaryView: View {
 		)
 	}
 	
-	func percentString(_ value: Double) -> String {
+	func generalPercentString(_ value: Double) -> String {
 
 		let formatter = NumberFormatter()
 		formatter.numberStyle = .percent
@@ -381,6 +381,28 @@ struct PaymentSummaryView: View {
 		}
 		
 		return formatter.string(from: NSNumber(value: value)) ?? ""
+	}
+	
+	func lightningPercentString(_ value: Double) -> String {
+
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .percent
+		formatter.minimumFractionDigits = 1
+		formatter.maximumFractionDigits = 1
+		formatter.roundingMode = .halfUp
+		
+		// The actual lightning fee is: 4 sats + 0.4%
+		// But this often gets communicated as simply "0.4%"...
+		// So we want to be more specific when the payment amount is smaller.
+		
+		if value < 0.0041 { // if amount > 40,000 sats
+			return formatter.string(from: NSNumber(value: value)) ?? ""
+			
+		} else {
+			let percentStr = formatter.string(from: NSNumber(value: 0.004)) ?? ""
+			let flatStr = Utils.formatBitcoin(sat: 4, bitcoinUnit: .sat)
+			return "\(percentStr) + \(flatStr.string)"
+		}
 	}
 	
 	func accessibilityLabel_baseAmount(_ info: PaymentSummaryStrings) -> String {
