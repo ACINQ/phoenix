@@ -2858,6 +2858,7 @@
       }
     },
     "An on-chain wallet derived from your seed.\n\nThe swap-in wallet is a bridge to Lightning. Funds on this wallet will automatically be moved to Lightning according to your liquidity policy setting." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4184,6 +4185,9 @@
           }
         }
       }
+    },
+    "Cancelled Funds" : {
+
     },
     "capacity" : {
       "localizations" : {
@@ -7730,6 +7734,7 @@
       }
     },
     "Error: invalid hash" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8839,6 +8844,9 @@
           }
         }
       }
+    },
+    "Funds not swapped **after 4 months** are recoverable on-chain" : {
+
     },
     "Funds sent" : {
       "localizations" : {
@@ -10618,6 +10626,7 @@
       }
     },
     "Last Attempt" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -10632,6 +10641,9 @@
           }
         }
       }
+    },
+    "Last attempt failed" : {
+
     },
     "layer 1 -> 2" : {
       "comment" : "Transaction Info: Explanation",
@@ -18406,6 +18418,9 @@
         }
       }
     },
+    "The swap-in wallet is a bridge to Lightning. Funds on this wallet will automatically be moved to Lightning according to your liquidity policy setting." : {
+
+    },
     "The transaction may take 30 minutes or more to confirm on the bitcoin blockchain" : {
       "localizations" : {
         "es" : {
@@ -18475,6 +18490,9 @@
           }
         }
       }
+    },
+    "These funds were not swapped in time. Use the wallet's descriptor to access them." : {
+
     },
     "This address is derived from your seed and belongs to you." : {
       "localizations" : {
@@ -18883,6 +18901,9 @@
           }
         }
       }
+    },
+    "Timed-Out Funds" : {
+
     },
     "timestamp" : {
       "comment" : "Label in DetailsView_IncomingPayment",

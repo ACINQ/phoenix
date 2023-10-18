@@ -142,8 +142,6 @@ struct WalletInfoView: View {
 				InfoPopoverWindow {
 					Text(
 						"""
-						An on-chain wallet derived from your seed.
-						
 						The swap-in wallet is a bridge to Lightning. \
 						Funds on this wallet will automatically be moved to Lightning \
 						according to your liquidity policy setting.
@@ -318,82 +316,11 @@ struct WalletInfoView: View {
 		unconfirmed : Bitcoin_kmpSatoshi
 	) -> some View {
 		
-		let hasPositiveConfirmed = confirmed.sat > 0
-		let hasPositiveUnconfirmed = unconfirmed.sat > 0
+		let total = confirmed.sat + unconfirmed.sat
+		let (btcAmt, fiatAmt) = formattedBalances(total)
 		
-		if hasPositiveConfirmed && hasPositiveUnconfirmed {
-		
-		/*	This looks a bit crowded...
-			I think it looks cleaner if we simply display the total in this scenario.
-			If the user wants more information, there's the SwapInWalletDetails screen.
-		 
-			if #available(iOS 16, *) {
-				Grid(horizontalSpacing: 8, verticalSpacing: 12) {
-					GridRow(alignment: VerticalAlignment.firstTextBaseline) {
-						Text("confirmed")
-							.textCase(.lowercase)
-							.font(.subheadline)
-							.foregroundColor(.secondary)
-							.gridColumnAlignment(.trailing)
-						
-						Text(verbatim: confirmed.0.string) +
-						Text(verbatim: " ≈ \(confirmed.1.string)").foregroundColor(.secondary)
-					}
-					GridRow(alignment: VerticalAlignment.firstTextBaseline) {
-						Text("unconfirmed")
-							.textCase(.lowercase)
-							.font(.subheadline)
-							.foregroundColor(.secondary)
-							.gridColumnAlignment(.trailing)
-						
-						Text(verbatim: unconfirmed.0.string) +
-						Text(verbatim: " ≈ \(unconfirmed.1.string)").foregroundColor(.secondary)
-					}
-				} // </Grid>
-			} else {
-				VStack(alignment: HorizontalAlignment.leading, spacing: 12) {
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 8) {
-						Text("confirmed")
-							.textCase(.lowercase)
-							.font(.subheadline)
-							.foregroundColor(.secondary)
-						
-						Text(verbatim: confirmed.0.string) +
-						Text(verbatim: " ≈ \(confirmed.1.string)").foregroundColor(.secondary)
-					}
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 8) {
-						Text("unconfirmed")
-							.textCase(.lowercase)
-							.font(.subheadline)
-							.foregroundColor(.secondary)
-						
-						Text(verbatim: unconfirmed.0.string) +
-						Text(verbatim: " ≈ \(unconfirmed.1.string)").foregroundColor(.secondary)
-					}
-				} // </VStack>
-			}
-		*/
-			
-			let total = confirmed.sat + unconfirmed.sat
-			let (btcAmt, fiatAmt) = formattedBalances(total)
-			
-			Text(verbatim: "\(btcAmt.string) ") +
-			Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
-			
-		} else if hasPositiveUnconfirmed {
-			
-			let (btcAmt, fiatAmt) = formattedBalances(unconfirmed)
-			
-			Text(verbatim: "\(btcAmt.string) ") +
-			Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
-			
-		} else {
-			
-			let (btcAmt, fiatAmt) = formattedBalances(confirmed)
-			
-			Text(verbatim: btcAmt.string) +
-			Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
-		}
+		Text(verbatim: "\(btcAmt.string) ") +
+		Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
 	}
 	
 	@ViewBuilder
