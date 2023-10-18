@@ -270,14 +270,16 @@ class AppConnectionsDaemon(
                                 val connectTimeout = when {
                                     it.torIsEnabled && connectionAttempt <= 6 -> 15.seconds
                                     it.torIsEnabled -> 30.seconds
+                                    connectionAttempt <= 1 -> 1.seconds
                                     connectionAttempt <= 3 -> 2.seconds
-                                    connectionAttempt <= 6 -> 5.seconds
+                                    connectionAttempt <= 6 -> 4.seconds
                                     connectionAttempt <= 10 -> 7.seconds
                                     else -> 10.seconds
                                 }
                                 val handshakeTimeout = when {
                                     it.torIsEnabled && connectionAttempt <= 6 -> 20.seconds
                                     it.torIsEnabled -> 40.seconds
+                                    connectionAttempt <= 1 -> 2.seconds
                                     connectionAttempt <= 3 -> 4.seconds
                                     connectionAttempt <= 6 -> 7.seconds
                                     connectionAttempt <= 10 -> 10.seconds
@@ -496,8 +498,9 @@ class AppConnectionsDaemon(
         statusStateFlow.collect {
             if (it is Connection.CLOSED) {
                 val pause = connectionPause(connectionCounter)
-                logger.info { "next $name connection attempt in $pause" }
+                logger.info { "next $name connection attempt #$connectionCounter in $pause" }
                 delay(pause)
+                connectionCounter++
                 connect(connectionCounter)
             } else if (it == Connection.ESTABLISHED) {
                 connectionCounter = 0
