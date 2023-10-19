@@ -18494,6 +18494,12 @@
     "These funds were not swapped in time. Use the wallet's descriptor to access them." : {
 
     },
+    "These funds will be available from %lld days onwards." : {
+
+    },
+    "These funds will be available from 1 day onwards." : {
+
+    },
     "This address is derived from your seed and belongs to you." : {
       "localizations" : {
         "ar" : {
@@ -18841,6 +18847,12 @@
           }
         }
       }
+    },
+    "This swap will expire in %lld days" : {
+
+    },
+    "This swap will expire in 1 day" : {
+
     },
     "This will reset the app, as if you had just installed it." : {
       "localizations" : {

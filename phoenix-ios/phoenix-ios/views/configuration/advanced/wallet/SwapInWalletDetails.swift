@@ -253,6 +253,7 @@ struct SwapInWalletDetails: View {
 			Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
 			
 			subsection_confirmed_lastAttempt()
+			subsection_confirmed_expirationWarning()
 			
 		} header: {
 			Text("Ready For Swap")
@@ -292,6 +293,24 @@ struct SwapInWalletDetails: View {
 	}
 	
 	@ViewBuilder
+	func subsection_confirmed_expirationWarning() -> some View {
+		
+		if let days = expirationWarningInDays() {
+			
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 5) {
+				Image(systemName: "exclamationmark.triangle")
+				if days == 1 {
+					Text("This swap will expire in 1 day")
+				} else {
+					Text("This swap will expire in \(days) days")
+				}
+			} // </HStack>
+			.foregroundColor(.appNegative)
+			
+		} // </if let days>
+	}
+	
+	@ViewBuilder
 	func section_timedOut() -> some View {
 		
 		Section {
@@ -299,6 +318,18 @@ struct SwapInWalletDetails: View {
 			let (btcAmt, fiatAmt) = timedOutBalance()
 			Text(verbatim: "\(btcAmt.string)") +
 			Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
+			
+			if let days = nextRefundInDays() {
+				Group {
+					if days <= 1 {
+						Text("These funds will be available from 1 day onwards.")
+					} else {
+						Text("These funds will be available from \(days) days onwards.")
+					}
+				}
+				.font(.callout)
+				.foregroundColor(.secondary)
+			}
 			
 		} header: {
 			Text("Timed-Out Funds")
@@ -423,6 +454,46 @@ struct SwapInWalletDetails: View {
 		return (btcAmt, fiatAmt)
 	}
 	
+	/// Returns non-nil if any "ready for swap" UTXO's have an expiration date that
+	/// is less than 30 days away.
+	func expirationWarningInDays() -> Int? {
+		
+		let wallet = swapInWallet.readyForSwapWallet()
+		
+		let maxConfirmations = wallet.swapInParams.maxConfirmations
+		let remainingConfirmationsList = wallet.deeplyConfirmed.map {
+			maxConfirmations - wallet.confirmations(utxo: $0)
+		}
+		
+		if let minRemainingConfirmations = remainingConfirmationsList.min() {
+			let days: Double = Double(minRemainingConfirmations) / 144.0
+			let result = Int(days.rounded(.awayFromZero))
+			if result < 30 {
+				return result
+			}
+		}
+		
+		return nil
+	}
+	
+	/// Returns non-nil if there are any "timed-out funds" UTXO's.
+	/// The value represents the oldest UTXO in the category, which will be available to redeem next.
+	/// The value is in days (rounded up).
+	func nextRefundInDays() -> Int? {
+		
+		let confirmationsNeeded = swapInWallet.swapInParams.refundDelay
+		let pendingConfirmationsList = swapInWallet.lockedUntilRefund.map {
+			confirmationsNeeded - swapInWallet.confirmations(utxo: $0)
+		}
+		
+		if let minPendingConfirmations = pendingConfirmationsList.min() {
+			let days: Double = Double(minPendingConfirmations) / 144.0
+			return Int(days.rounded(.awayFromZero))
+		}
+		
+		return nil
+	}
+	
 	func confirmationDialogBinding() -> Binding<Bool> {
 		
 		return Binding( // SwiftUI only allows for 1 ".sheet"
@@ -451,7 +522,10 @@ struct SwapInWalletDetails: View {
 		log.trace("swapInWalletChanged()")
 		
 	#if DEBUG
-		swapInWallet = newValue.fakeBlockHeight(plus: Int32(144 * 30 * 7))
+	//	swapInWallet = newValue.fakeBlockHeight(plus: Int32(144 * 31 * 3)) // 3 months: test expirationWarning
+	//	swapInWallet = newValue.fakeBlockHeight(plus: Int32(144 * 30 * 4)) // 4 months: test lockedUntilRefund
+	//	swapInWallet = newValue.fakeBlockHeight(plus: Int32(144 * 30 * 6)) // 6 months: test readyForRefund
+		swapInWallet = newValue
 	#else
 		swapInWallet = newValue
 	#endif
