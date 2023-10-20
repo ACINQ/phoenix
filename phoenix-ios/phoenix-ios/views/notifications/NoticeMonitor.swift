@@ -15,20 +15,20 @@ fileprivate var log = Logger(OSLog.disabled)
 
 class NoticeMonitor: ObservableObject {
 	
-	@Published var isNewWallet = Prefs.shared.isNewWallet
-	@Published var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
-	@Published var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(
+	@Published private var isNewWallet = Prefs.shared.isNewWallet
+	@Published private var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
+	@Published private var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(
 		encryptedNodeId: Biz.encryptedNodeId!
 	)
 	
-	// Raw publisher for all WalletContext settings fetched from the cloud.
-	// See specific functions below for simple getters. E.g.: `hasNotice_mempoolFull`
-	@Published var walletContext: WalletContext? = nil
+	@Published private var walletContext: WalletContext? = nil
 	
-	@Published var notificationPermissions = NotificationsManager.shared.permissions.value
-	@Published var bgRefreshStatus = NotificationsManager.shared.backgroundRefreshStatus.value
+	@Published private var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 	
-	@NestedObservableObject var customElectrumServerObserver = CustomElectrumServerObserver()
+	@Published private var notificationPermissions = NotificationsManager.shared.permissions.value
+	@Published private var bgRefreshStatus = NotificationsManager.shared.backgroundRefreshStatus.value
+	
+	@NestedObservableObject private var customElectrumServerObserver = CustomElectrumServerObserver()
 	
 	private var cancellables = Set<AnyCancellable>()
 	
@@ -60,6 +60,12 @@ class NoticeMonitor: ObservableObject {
 			}
 			.store(in: &cancellables)
 		
+		Biz.business.balanceManager.swapInWalletPublisher()
+			.sink {[weak self](wallet: Lightning_kmpWalletState.WalletWithConfirmations) in
+				self?.swapInWallet = wallet
+			}
+			.store(in: &cancellables)
+		
 		NotificationsManager.shared.permissions
 			.sink {[weak self](permissions: NotificationPermissions) in
 				self?.notificationPermissions = permissions
@@ -73,11 +79,22 @@ class NoticeMonitor: ObservableObject {
 			.store(in: &cancellables)
 	}
 	
+	var hasNotice: Bool {
+		
+		if hasNotice_backupSeed { return true }
+		if hasNotice_electrumServer { return true }
+		if hasNotice_swapInExpiration { return true }
+		if hasNotice_mempoolFull { return true }
+		if hasNotice_backgroundPayments { return true }
+		if hasNotice_watchTower { return true }
+		
+		return false
+	}
 	
 	var hasNotice_backupSeed: Bool {
 		if isNewWallet {
 			// It's a new wallet. We don't bug them about backing up their seed until
-			// they've actually done something with thie wallet.
+			// they've actually done something with this wallet.
 			return false
 		} else if !backupSeed_enabled && !manualBackup_taskDone {
 			return true
@@ -88,6 +105,10 @@ class NoticeMonitor: ObservableObject {
 	
 	var hasNotice_electrumServer: Bool {
 		return customElectrumServerObserver.problem == .badCertificate
+	}
+	
+	var hasNotice_swapInExpiration: Bool {
+		return swapInWallet.expirationWarningInDays() != nil
 	}
 	
 	var hasNotice_mempoolFull: Bool {

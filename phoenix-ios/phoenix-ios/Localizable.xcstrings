@@ -1986,6 +1986,9 @@
         }
       }
     },
+    "A deposit will expire soon." : {
+
+    },
     "A fee of %@ (≈ %@) may be needed to receive this payment." : {
       "localizations" : {
         "cs" : {
@@ -3390,7 +3393,11 @@
         }
       }
     },
+    "Background payments disabled." : {
+
+    },
     "Background payments disabled. " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4470,6 +4477,7 @@
       }
     },
     "Check it " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -8494,6 +8502,7 @@
       }
     },
     "Fix " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -10764,6 +10773,7 @@
       }
     },
     "Let's go " : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12057,6 +12067,7 @@
       }
     },
     "More info " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -15732,6 +15743,7 @@
       }
     },
     "See how Phoenix is affected" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20811,7 +20823,11 @@
         }
       }
     },
+    "Watchtower disabled." : {
+
+    },
     "Watchtower disabled. " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {

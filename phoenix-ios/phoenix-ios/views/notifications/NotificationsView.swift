@@ -132,37 +132,56 @@ struct NotificationsView : View {
 			
 			if noticeMonitor.hasNotice_backupSeed {
 				NoticeBox(backgroundColor: .mutedBackground) {
-					NotificationCell.backupSeed(action: navigateToBackup)
+					NotificationCell.backupSeed()
 				}
 				.font(.callout)
+				.contentShape(Rectangle()) // make Spacer area tappable
+				.onTapGesture { navigateToBackup() }
 			}
 			
 			if noticeMonitor.hasNotice_electrumServer {
 				NoticeBox(backgroundColor: .mutedBackground) {
-					NotificationCell.electrumServer(action: navigationToElecrumServer)
+					NotificationCell.electrumServer()
 				}
 				.font(.callout)
+				.contentShape(Rectangle()) // make Spacer area tappable
+				.onTapGesture { navigateToElectrumServer() }
+			}
+			
+			if noticeMonitor.hasNotice_swapInExpiration {
+				NoticeBox(backgroundColor: .mutedBackground) {
+					NotificationCell.swapInExpiration()
+				}
+				.font(.callout)
+				.contentShape(Rectangle()) // make Spacer area tappable
+				.onTapGesture { navigateToSwapInWallet() }
 			}
 			
 			if noticeMonitor.hasNotice_backgroundPayments {
 				NoticeBox(backgroundColor: .mutedBackground) {
-					NotificationCell.backgroundPayments(action: navigationToBackgroundPayments)
+					NotificationCell.backgroundPayments()
 				}
 				.font(.callout)
+				.contentShape(Rectangle()) // make Spacer area tappable
+				.onTapGesture { navigateToBackgroundPayments() }
 			}
 			
 			if noticeMonitor.hasNotice_watchTower {
 				NoticeBox(backgroundColor: .mutedBackground) {
-					NotificationCell.watchTower(action: fixBackgroundAppRefreshDisabled)
+					NotificationCell.watchTower()
 				}
 				.font(.callout)
+				.contentShape(Rectangle()) // make Spacer area tappable
+				.onTapGesture { fixBackgroundAppRefreshDisabled() }
 			}
 			
 			if noticeMonitor.hasNotice_mempoolFull {
 				NoticeBox(backgroundColor: .mutedBackground) {
-					NotificationCell.mempoolFull(action: openMempoolFullURL)
+					NotificationCell.mempoolFull()
 				}
 				.font(.callout)
+				.contentShape(Rectangle()) // make Spacer area tappable
+				.onTapGesture { openMempoolFullURL() }
 			}
 			
 		} header: {
@@ -246,11 +265,7 @@ struct NotificationsView : View {
 	
 	func hasImportantNotifications() -> Bool {
 		
-		return noticeMonitor.hasNotice_backupSeed
-		    || noticeMonitor.hasNotice_electrumServer
-		    || noticeMonitor.hasNotice_backgroundPayments
-		    || noticeMonitor.hasNotice_watchTower
-		    || noticeMonitor.hasNotice_mempoolFull
+		return noticeMonitor.hasNotice
 	}
 	
 	// --------------------------------------------------
@@ -290,14 +305,21 @@ struct NotificationsView : View {
 		deepLinkManager.broadcast(DeepLink.backup)
 	}
 	
-	func navigationToElecrumServer() {
+	func navigateToElectrumServer() {
 		log.trace("navigateToElectrumServer()")
 		
 		presentationMode.wrappedValue.dismiss()
 		deepLinkManager.broadcast(DeepLink.electrum)
 	}
 	
-	func navigationToBackgroundPayments() {
+	func navigateToSwapInWallet() {
+		log.trace("navigateToSwapInWallet()")
+		
+		presentationMode.wrappedValue.dismiss()
+		deepLinkManager.broadcast(DeepLink.swapInWallet)
+	}
+	
+	func navigateToBackgroundPayments() {
 		log.trace("navigateToBackgroundPayments()")
 		
 		presentationMode.wrappedValue.dismiss()

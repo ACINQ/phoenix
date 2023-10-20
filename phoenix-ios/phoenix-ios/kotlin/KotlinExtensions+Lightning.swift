@@ -62,18 +62,40 @@ extension Lightning_kmpWalletState.WalletWithConfirmations {
 		return Bitcoin_kmpSatoshi(sat: balance)
 	}
 	
-	func readyForSwapWallet() -> Lightning_kmpWalletState.WalletWithConfirmations {
-		
+	/// The `deeplyConfirmed` property contains UTXO's that are also represented in
+	/// `lockedUntilRefund` & `readyForRefund`. This property is a subset of
+	/// `deeplyConfirmed` that excludes those 2 categories.
+	///
+	var readyForSwap: [Lightning_kmpWalletState.Utxo] {
 		let timedOut = Set(self.lockedUntilRefund + self.readyForRefund)
-		let readyForSwap = self.deeplyConfirmed.filter {
+		return deeplyConfirmed.filter {
 			!timedOut.contains($0)
 		}
+	}
+	
+	var readyForSwapBalance: Bitcoin_kmpSatoshi {
+		let balance = readyForSwap.map { $0.amount.toLong() }.sum()
+		return Bitcoin_kmpSatoshi(sat: balance)
+	}
+	
+	/// Returns non-nil if any "ready for swap" UTXO's have an expiration date that
+	/// is less than 30 days away.
+	func expirationWarningInDays() -> Int? {
 		
-		return Lightning_kmpWalletState.WalletWithConfirmations(
-			swapInParams: self.swapInParams,
-			currentBlockHeight: self.currentBlockHeight,
-			all: readyForSwap
-		)
+		let maxConfirmations = swapInParams.maxConfirmations
+		let remainingConfirmationsList = readyForSwap.map {
+			maxConfirmations - confirmations(utxo: $0)
+		}
+		
+		if let minRemainingConfirmations = remainingConfirmationsList.min() {
+			let days: Double = Double(minRemainingConfirmations) / 144.0
+			let result = Int(days.rounded(.awayFromZero))
+			if result < 30 {
+				return result
+			}
+		}
+		
+		return nil
 	}
 	
 	#if DEBUG

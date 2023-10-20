@@ -295,7 +295,7 @@ struct SwapInWalletDetails: View {
 	@ViewBuilder
 	func subsection_confirmed_expirationWarning() -> some View {
 		
-		if let days = expirationWarningInDays() {
+		if let days = swapInWallet.expirationWarningInDays() {
 			
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 5) {
 				Image(systemName: "exclamationmark.triangle")
@@ -430,7 +430,7 @@ struct SwapInWalletDetails: View {
 	
 	func confirmedBalance() -> (FormattedAmount, FormattedAmount) {
 		
-		let sats = swapInWallet.readyForSwapWallet().deeplyConfirmedBalance
+		let sats = swapInWallet.readyForSwapBalance
 		return formattedBalances(sats)
 	}
 	
@@ -452,28 +452,6 @@ struct SwapInWalletDetails: View {
 		let fiatAmt = Utils.formatFiat(currencyPrefs, sat: sats)
 		
 		return (btcAmt, fiatAmt)
-	}
-	
-	/// Returns non-nil if any "ready for swap" UTXO's have an expiration date that
-	/// is less than 30 days away.
-	func expirationWarningInDays() -> Int? {
-		
-		let wallet = swapInWallet.readyForSwapWallet()
-		
-		let maxConfirmations = wallet.swapInParams.maxConfirmations
-		let remainingConfirmationsList = wallet.deeplyConfirmed.map {
-			maxConfirmations - wallet.confirmations(utxo: $0)
-		}
-		
-		if let minRemainingConfirmations = remainingConfirmationsList.min() {
-			let days: Double = Double(minRemainingConfirmations) / 144.0
-			let result = Int(days.rounded(.awayFromZero))
-			if result < 30 {
-				return result
-			}
-		}
-		
-		return nil
 	}
 	
 	/// Returns non-nil if there are any "timed-out funds" UTXO's.

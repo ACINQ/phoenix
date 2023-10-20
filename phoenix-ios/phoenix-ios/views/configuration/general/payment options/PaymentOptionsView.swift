@@ -284,6 +284,7 @@ fileprivate struct PaymentOptionsList: View {
 				case .backgroundPayments : newNavLinkTag = NavLinkTag.BackgroundPaymentsSelector
 				case .liquiditySettings  : break
 				case .forceCloseChannels : break
+				case .swapInWallet       : break
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
