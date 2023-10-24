@@ -540,6 +540,7 @@ struct MainView_Small: View {
 				case .backgroundPayments : newNavLinkTag = .ConfigurationView ; delay *= 3
 				case .liquiditySettings  : newNavLinkTag = .ConfigurationView ; delay *= 3
 				case .forceCloseChannels : newNavLinkTag = .ConfigurationView ; delay *= 2
+				case .swapInWallet       : newNavLinkTag = .ConfigurationView ; delay *= 2
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {

@@ -19,6 +19,7 @@ enum DeepLink: String, Equatable {
 	case backgroundPayments
 	case liquiditySettings
 	case forceCloseChannels
+	case swapInWallet
 }
 
 class DeepLinkManager: ObservableObject {

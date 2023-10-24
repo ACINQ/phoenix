@@ -616,6 +616,7 @@ struct MainView_Big: View {
 				case .backgroundPayments : showSettings()
 				case .liquiditySettings  : showSettings()
 				case .forceCloseChannels : showSettings()
+				case .swapInWallet       : showSettings()
 			}
 		}
 	}

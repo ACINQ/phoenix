@@ -457,6 +457,7 @@ fileprivate struct ConfigurationList: View {
 				case .backgroundPayments : newNavLinkTag = .PaymentOptions       ; delay *= 2
 				case .liquiditySettings  : newNavLinkTag = .ChannelManagement    ; delay *= 1
 				case .forceCloseChannels : newNavLinkTag = .ForceCloseChannels   ; delay *= 1
+				case .swapInWallet       : newNavLinkTag = .WalletInfo           ; delay *= 2
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {

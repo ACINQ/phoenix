@@ -12,10 +12,17 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+fileprivate enum NavLinkTag: String {
+	case SwapInWalletDetails
+	case FinalWalletDetails
+}
+
 
 struct WalletInfoView: View {
 	
 	let popTo: (PopToDestination) -> Void
+	
+	@State private var navLinkTag: NavLinkTag? = nil
 	
 	@State var didAppear = false
 	@State var popToDestination: PopToDestination? = nil
@@ -31,12 +38,16 @@ struct WalletInfoView: View {
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
 	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
+	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
+	@State private var swiftUiBugWorkaroundIdx = 0
+	
 	@StateObject var toast = Toast()
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -65,6 +76,12 @@ struct WalletInfoView: View {
 		.listBackgroundColor(.primaryBackground)
 		.onAppear() {
 			onAppear()
+		}
+		.onChange(of: deepLinkManager.deepLink) {
+			deepLinkChanged($0)
+		}
+		.onChange(of: navLinkTag) {
+			navLinkTagChanged($0)
 		}
 		.onReceive(swapInWalletPublisher) {
 			swapInWalletChanged($0)
@@ -115,7 +132,7 @@ struct WalletInfoView: View {
 		
 		Section {
 			
-			NavigationLink(destination: SwapInWalletDetails(location: .embedded, popTo: popToWrapper)) {
+			navLink(.SwapInWalletDetails) {
 				subsection_swapInWallet_balance()
 			}
 			subsection_swapInWallet_descriptor()
@@ -142,8 +159,6 @@ struct WalletInfoView: View {
 				InfoPopoverWindow {
 					Text(
 						"""
-						An on-chain wallet derived from your seed.
-						
 						The swap-in wallet is a bridge to Lightning. \
 						Funds on this wallet will automatically be moved to Lightning \
 						according to your liquidity policy setting.
@@ -199,7 +214,7 @@ struct WalletInfoView: View {
 		
 		Section {
 			
-			NavigationLink(destination: FinalWalletDetails()) {
+			navLink(.FinalWalletDetails) {
 				subsection_finalWallet_balance()
 			}
 			subsection_finalWallet_masterPublicKey()
@@ -318,82 +333,11 @@ struct WalletInfoView: View {
 		unconfirmed : Bitcoin_kmpSatoshi
 	) -> some View {
 		
-		let hasPositiveConfirmed = confirmed.sat > 0
-		let hasPositiveUnconfirmed = unconfirmed.sat > 0
+		let total = confirmed.sat + unconfirmed.sat
+		let (btcAmt, fiatAmt) = formattedBalances(total)
 		
-		if hasPositiveConfirmed && hasPositiveUnconfirmed {
-		
-		/*	This looks a bit crowded...
-			I think it looks cleaner if we simply display the total in this scenario.
-			If the user wants more information, there's the SwapInWalletDetails screen.
-		 
-			if #available(iOS 16, *) {
-				Grid(horizontalSpacing: 8, verticalSpacing: 12) {
-					GridRow(alignment: VerticalAlignment.firstTextBaseline) {
-						Text("confirmed")
-							.textCase(.lowercase)
-							.font(.subheadline)
-							.foregroundColor(.secondary)
-							.gridColumnAlignment(.trailing)
-						
-						Text(verbatim: confirmed.0.string) +
-						Text(verbatim: " ≈ \(confirmed.1.string)").foregroundColor(.secondary)
-					}
-					GridRow(alignment: VerticalAlignment.firstTextBaseline) {
-						Text("unconfirmed")
-							.textCase(.lowercase)
-							.font(.subheadline)
-							.foregroundColor(.secondary)
-							.gridColumnAlignment(.trailing)
-						
-						Text(verbatim: unconfirmed.0.string) +
-						Text(verbatim: " ≈ \(unconfirmed.1.string)").foregroundColor(.secondary)
-					}
-				} // </Grid>
-			} else {
-				VStack(alignment: HorizontalAlignment.leading, spacing: 12) {
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 8) {
-						Text("confirmed")
-							.textCase(.lowercase)
-							.font(.subheadline)
-							.foregroundColor(.secondary)
-						
-						Text(verbatim: confirmed.0.string) +
-						Text(verbatim: " ≈ \(confirmed.1.string)").foregroundColor(.secondary)
-					}
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 8) {
-						Text("unconfirmed")
-							.textCase(.lowercase)
-							.font(.subheadline)
-							.foregroundColor(.secondary)
-						
-						Text(verbatim: unconfirmed.0.string) +
-						Text(verbatim: " ≈ \(unconfirmed.1.string)").foregroundColor(.secondary)
-					}
-				} // </VStack>
-			}
-		*/
-			
-			let total = confirmed.sat + unconfirmed.sat
-			let (btcAmt, fiatAmt) = formattedBalances(total)
-			
-			Text(verbatim: "\(btcAmt.string) ") +
-			Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
-			
-		} else if hasPositiveUnconfirmed {
-			
-			let (btcAmt, fiatAmt) = formattedBalances(unconfirmed)
-			
-			Text(verbatim: "\(btcAmt.string) ") +
-			Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
-			
-		} else {
-			
-			let (btcAmt, fiatAmt) = formattedBalances(confirmed)
-			
-			Text(verbatim: btcAmt.string) +
-			Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
-		}
+		Text(verbatim: "\(btcAmt.string) ") +
+		Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
 	}
 	
 	@ViewBuilder
@@ -413,6 +357,29 @@ struct WalletInfoView: View {
 		Image(systemName: "square.on.square")
 			.foregroundColor(.clear)
 			.accessibilityHidden(true)
+	}
+	
+	@ViewBuilder
+	private func navLink<Content>(
+		_ tag: NavLinkTag,
+		label: () -> Content
+	) -> some View where Content: View {
+		
+		NavigationLink(
+			destination: navLinkView(tag),
+			tag: tag,
+			selection: $navLinkTag,
+			label: label
+		)
+	}
+	
+	@ViewBuilder
+	private func navLinkView(_ tag: NavLinkTag) -> some View {
+		
+		switch tag {
+			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded, popTo: popToWrapper)
+			case .FinalWalletDetails  : FinalWalletDetails()
+		}
 	}
 	
 	// --------------------------------------------------
@@ -473,6 +440,12 @@ struct WalletInfoView: View {
 		if !didAppear {
 			didAppear = true
 			
+			if let deepLink = deepLinkManager.deepLink {
+				DispatchQueue.main.async { // iOS 14 issues workaround
+					deepLinkChanged(deepLink)
+				}
+			}
+			
 		} else {
 			
 			if let destination = popToDestination {
@@ -487,6 +460,60 @@ struct WalletInfoView: View {
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
+	
+	func deepLinkChanged(_ value: DeepLink?) {
+		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		
+		// This is a hack, courtesy of bugs in Apple's NavigationLink:
+		// https://developer.apple.com/forums/thread/677333
+		//
+		// Summary:
+		// There's some quirky code in SwiftUI that is resetting our navLinkTag.
+		// Several bizarre workarounds have been proposed.
+		// I've tried every one of them, and none of them work (at least, without bad side-effects).
+		//
+		// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
+		// and forcibly undo it.
+		
+		if let value = value {
+			
+			// Navigate towards deep link (if needed)
+			var newNavLinkTag: NavLinkTag? = nil
+			switch value {
+				case .paymentHistory     : break
+				case .backup             : break
+				case .drainWallet        : break
+				case .electrum           : break
+				case .backgroundPayments : break
+				case .liquiditySettings  : break
+				case .forceCloseChannels : break
+				case .swapInWallet       : newNavLinkTag = NavLinkTag.SwapInWalletDetails
+			}
+			
+			if let newNavLinkTag = newNavLinkTag {
+				
+				self.swiftUiBugWorkaround = newNavLinkTag
+				self.swiftUiBugWorkaroundIdx += 1
+				clearSwiftUiBugWorkaround(delay: 1.5)
+				
+				self.navLinkTag = newNavLinkTag // Trigger/push the view
+			}
+			
+		} else {
+			// We reached the final destination of the deep link
+			clearSwiftUiBugWorkaround(delay: 0.0)
+		}
+	}
+	
+	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
+		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
+		
+		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
+				
+			log.debug("Blocking SwiftUI's attempt to reset our navLinkTag")
+			self.navLinkTag = forcedNavLinkTag
+		}
+	}
 	
 	func swapInWalletChanged(_ newValue: Lightning_kmpWalletState.WalletWithConfirmations) {
 		log.trace("swapInWalletChanged()")
@@ -512,5 +539,22 @@ struct WalletInfoView: View {
 			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
 			colorScheme: colorScheme.opposite
 		)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Workarounds
+	// --------------------------------------------------
+	
+	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
+		
+		let idx = self.swiftUiBugWorkaroundIdx
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+			
+			if self.swiftUiBugWorkaroundIdx == idx {
+				log.trace("swiftUiBugWorkaround = nil")
+				self.swiftUiBugWorkaround = nil
+			}
+		}
 	}
 }

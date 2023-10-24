@@ -167,6 +167,7 @@
 		DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC81B79E25BF2AA200F5A52C /* MVI.swift */; };
 		DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC82EED529789853007A5853 /* TxHistoryExporter.swift */; };
 		DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */; };
+		DC9130A02AE045FA00F9B8C6 /* Sequence+Sum.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC59377027516296003B4B53 /* Sequence+Sum.swift */; };
 		DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9473F9261270B4008D7242 /* MVI+Mock.swift */; };
 		DC9545C429490321008FCEF4 /* NotificationContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9545C329490321008FCEF4 /* NotificationContent.swift */; };
 		DC9545C5294905FB008FCEF4 /* NotificationContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9545C329490321008FCEF4 /* NotificationContent.swift */; };
@@ -275,6 +276,7 @@
 		DCFAEFC92A72F48700330088 /* SwapInWalletDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFAEFC82A72F48700330088 /* SwapInWalletDetails.swift */; };
 		DCFB8DF72A94066100947698 /* Task+Sleep.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFB8DF62A94066100947698 /* Task+Sleep.swift */; };
 		DCFB8DF92A94112A00947698 /* Dictionary+MapKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */; };
+		DCFBC5592AE2CFEF00E3A418 /* BizNotificationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFBC5582AE2CFEF00E3A418 /* BizNotificationCell.swift */; };
 		DCFC72042862237400D6B293 /* Asserts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFC72032862237400D6B293 /* Asserts.swift */; };
 		DCFD079126D84A380020DD8E /* HorizontalActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFD079026D84A380020DD8E /* HorizontalActivity.swift */; };
 		F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */; };
@@ -593,6 +595,7 @@
 		DCFAEFC82A72F48700330088 /* SwapInWalletDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInWalletDetails.swift; sourceTree = "<group>"; };
 		DCFB8DF62A94066100947698 /* Task+Sleep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Task+Sleep.swift"; sourceTree = "<group>"; };
 		DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+MapKeys.swift"; sourceTree = "<group>"; };
+		DCFBC5582AE2CFEF00E3A418 /* BizNotificationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BizNotificationCell.swift; sourceTree = "<group>"; };
 		DCFC72032862237400D6B293 /* Asserts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asserts.swift; sourceTree = "<group>"; };
 		DCFD079026D84A380020DD8E /* HorizontalActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalActivity.swift; sourceTree = "<group>"; };
 		F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogsConfigurationView.swift; sourceTree = "<group>"; };
@@ -1015,6 +1018,7 @@
 				DC355E242A45FDD3008E8A8E /* NoticeMonitor.swift */,
 				DC355E1E2A44A235008E8A8E /* NotificationCell.swift */,
 				DC355E202A44D838008E8A8E /* NotificationsView.swift */,
+				DCFBC5582AE2CFEF00E3A418 /* BizNotificationCell.swift */,
 			);
 			path = notifications;
 			sourceTree = "<group>";
@@ -1753,6 +1757,7 @@
 				DC27E4C42791C58C00C777CC /* PaymentsBackupView.swift in Sources */,
 				DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */,
 				DCA125752A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift in Sources */,
+				DCFBC5592AE2CFEF00E3A418 /* BizNotificationCell.swift in Sources */,
 				DC46CB1228D9AAB000C4EAC7 /* LockState.swift in Sources */,
 				DC2F431427B6972C0006FCC4 /* SwapInView.swift in Sources */,
 				DC71E7352728A5720063613D /* KotlinIdentifiable.swift in Sources */,
@@ -1786,6 +1791,7 @@
 				DC641C7328208B7F00862DCD /* UserDefaults+Codable.swift in Sources */,
 				DCA6DED1282ABA930073C658 /* KeychainConstants.swift in Sources */,
 				DCEB2796282D7AAB0096B87E /* KotlinTypes.swift in Sources */,
+				DC9130A02AE045FA00F9B8C6 /* Sequence+Sum.swift in Sources */,
 				DCB511CA281AED58001BC525 /* NotificationService.swift in Sources */,
 				DCA6DEC82829C3150073C658 /* GenericPasswordStore.swift in Sources */,
 				DCA6DECD282AB10C0073C658 /* SharedSecurity.swift in Sources */,

@@ -1986,6 +1986,9 @@
         }
       }
     },
+    "A deposit will expire soon." : {
+
+    },
     "A fee of %@ (≈ %@) may be needed to receive this payment." : {
       "localizations" : {
         "cs" : {
@@ -2858,6 +2861,7 @@
       }
     },
     "An on-chain wallet derived from your seed.\n\nThe swap-in wallet is a bridge to Lightning. Funds on this wallet will automatically be moved to Lightning according to your liquidity policy setting." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3389,7 +3393,11 @@
         }
       }
     },
+    "Background payments disabled." : {
+
+    },
     "Background payments disabled. " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4185,6 +4193,9 @@
         }
       }
     },
+    "Cancelled Funds" : {
+
+    },
     "capacity" : {
       "localizations" : {
         "es" : {
@@ -4466,6 +4477,7 @@
       }
     },
     "Check it " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -7730,6 +7742,7 @@
       }
     },
     "Error: invalid hash" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8489,6 +8502,7 @@
       }
     },
     "Fix " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -8839,6 +8853,9 @@
           }
         }
       }
+    },
+    "Funds not swapped **after 4 months** are recoverable on-chain" : {
+
     },
     "Funds sent" : {
       "localizations" : {
@@ -10618,6 +10635,7 @@
       }
     },
     "Last Attempt" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -10632,6 +10650,9 @@
           }
         }
       }
+    },
+    "Last attempt failed" : {
+
     },
     "layer 1 -> 2" : {
       "comment" : "Transaction Info: Explanation",
@@ -10752,6 +10773,7 @@
       }
     },
     "Let's go " : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12045,6 +12067,7 @@
       }
     },
     "More info " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -15720,6 +15743,7 @@
       }
     },
     "See how Phoenix is affected" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18406,6 +18430,9 @@
         }
       }
     },
+    "The swap-in wallet is a bridge to Lightning. Funds on this wallet will automatically be moved to Lightning according to your liquidity policy setting." : {
+
+    },
     "The transaction may take 30 minutes or more to confirm on the bitcoin blockchain" : {
       "localizations" : {
         "es" : {
@@ -18475,6 +18502,15 @@
           }
         }
       }
+    },
+    "These funds were not swapped in time. Use the wallet's descriptor to access them." : {
+
+    },
+    "These funds will be available from %lld days onwards." : {
+
+    },
+    "These funds will be available from 1 day onwards." : {
+
     },
     "This address is derived from your seed and belongs to you." : {
       "localizations" : {
@@ -18824,6 +18860,12 @@
         }
       }
     },
+    "This swap will expire in %lld days" : {
+
+    },
+    "This swap will expire in 1 day" : {
+
+    },
     "This will reset the app, as if you had just installed it." : {
       "localizations" : {
         "es" : {
@@ -18883,6 +18925,9 @@
           }
         }
       }
+    },
+    "Timed-Out Funds" : {
+
     },
     "timestamp" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -20778,7 +20823,11 @@
         }
       }
     },
+    "Watchtower disabled." : {
+
+    },
     "Watchtower disabled. " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
