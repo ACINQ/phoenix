@@ -5622,7 +5622,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Controlar las tarifas en cadena"
+            "value" : "Control de las tarifas en cadena"
           }
         },
         "fr" : {
@@ -10623,7 +10623,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "saber cuándo pueden ocurrir cargos"
+            "value" : "para saber cuándo pueden ocurrir cargos"
           }
         },
         "fr" : {
