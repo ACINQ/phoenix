@@ -40,6 +40,7 @@ import kotlinx.coroutines.*
 fun IntroView(
     onFinishClick: () -> Unit
 ) {
+    val internalData = application.internalDataRepository
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState()
@@ -56,7 +57,7 @@ fun IntroView(
             2 -> SelfCustodyView(
                 onNextClick = {
                     scope.launch {
-                        InternalData.saveShowIntro(context, false)
+                        internalData.saveShowIntro(false)
                         onFinishClick()
                     }
                 }

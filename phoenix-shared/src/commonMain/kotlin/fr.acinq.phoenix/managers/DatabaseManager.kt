@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.managers
 
+import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.db.ChannelsDb
 import fr.acinq.lightning.db.Databases
@@ -16,7 +17,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
-import org.kodein.memory.text.toHexString
 
 class DatabaseManager(
     loggerFactory: LoggerFactory,
@@ -45,7 +45,7 @@ class DatabaseManager(
                 if (nodeParams == null) return@collect
                 log.debug { "nodeParams available: building databases..." }
 
-                val nodeIdHash = nodeParams.nodeId.hash160().toHexString()
+                val nodeIdHash = nodeParams.nodeId.hash160().byteVector().toHex()
                 val channelsDb = SqliteChannelsDb(
                     driver = createChannelsDbDriver(ctx, chain, nodeIdHash)
                 )

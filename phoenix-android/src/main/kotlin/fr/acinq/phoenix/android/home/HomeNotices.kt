@@ -53,9 +53,7 @@ import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.utils.borderColor
-import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.data.Notification
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeNotices(

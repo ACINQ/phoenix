@@ -36,12 +36,11 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
-import fr.acinq.phoenix.android.security.KeyState
+import fr.acinq.phoenix.android.security.SeedFileState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.init.Initialization
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
-import kotlinx.coroutines.flow.first
 
 
 @Composable
@@ -53,7 +52,7 @@ fun CreateWalletView(
 
     val vm: InitViewModel = viewModel(factory = InitViewModel.Factory(controllerFactory, CF::initialization))
 
-    val keyState = produceState<KeyState>(initialValue = KeyState.Unknown, true) {
+    val seedFileState = produceState<SeedFileState>(initialValue = SeedFileState.Unknown, true) {
         value = SeedManager.getSeedState(context)
     }
 
@@ -64,8 +63,8 @@ fun CreateWalletView(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        when (keyState.value) {
-            is KeyState.Absent -> {
+        when (seedFileState.value) {
+            is SeedFileState.Absent -> {
                 Text(stringResource(id = R.string.autocreate_generating))
                 MVIView(CF::initialization) { model, postIntent ->
                     when (model) {
@@ -94,7 +93,7 @@ fun CreateWalletView(
                     }
                 }
             }
-            KeyState.Unknown -> {
+            SeedFileState.Unknown -> {
                 Text(stringResource(id = R.string.startup_wait))
             }
             else -> {

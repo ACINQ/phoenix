@@ -20,7 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import fr.acinq.phoenix.android.security.EncryptedSeed
-import fr.acinq.phoenix.android.security.KeyState
+import fr.acinq.phoenix.android.security.SeedFileState
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,7 +38,7 @@ class DisplaySeedViewModel : ViewModel() {
     val log = LoggerFactory.getLogger(this::class.java)
     val state = mutableStateOf<ReadingSeedState>(ReadingSeedState.Init)
 
-    fun readSeed(keyState: KeyState) {
+    fun readSeed(seedFileState: SeedFileState) {
         if (state.value == ReadingSeedState.ReadingSeed) return
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             log.error("failed to read seed: ${e.message}")
@@ -46,17 +46,17 @@ class DisplaySeedViewModel : ViewModel() {
         }) {
             state.value = ReadingSeedState.ReadingSeed
             when {
-                keyState is KeyState.Present && keyState.encryptedSeed is EncryptedSeed.V2.NoAuth -> {
-                    val words = EncryptedSeed.toMnemonics(keyState.encryptedSeed.decrypt())
+                seedFileState is SeedFileState.Present && seedFileState.encryptedSeed is EncryptedSeed.V2.NoAuth -> {
+                    val words = EncryptedSeed.toMnemonics(seedFileState.encryptedSeed.decrypt())
                     delay(300)
                     state.value = ReadingSeedState.Decrypted(words)
                 }
-                keyState is KeyState.Error.Unreadable -> {
-                    state.value = ReadingSeedState.Error(keyState.message ?: "n/a")
+                seedFileState is SeedFileState.Error.Unreadable -> {
+                    state.value = ReadingSeedState.Error(seedFileState.message ?: "n/a")
                 }
                 else -> {
-                    log.warn("unable to read seed in state=$keyState")
-                    state.value = ReadingSeedState.Error("unhandled state=${keyState::class.simpleName}")
+                    log.warn("unable to read seed in state=$seedFileState")
+                    state.value = ReadingSeedState.Error("unhandled state=${seedFileState::class.simpleName}")
                 }
             }
         }

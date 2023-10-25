@@ -35,13 +35,13 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.safeLet
@@ -53,11 +53,12 @@ fun DisplaySeedView() {
     val log = logger("DisplaySeedView")
     val nc = navController
     val context = LocalContext.current
+    val internalData = application.internalDataRepository
     val scope = rememberCoroutineScope()
 
-    val isBackupDone by InternalData.isManualSeedBackupDone(context).collectAsState(initial = null)
-    val isDisclaimerRead by InternalData.isSeedLossDisclaimerRead(context).collectAsState(initial = null)
-    val showBackupNotice by InternalData.showSeedBackupNotice(context).collectAsState(initial = false)
+    val isBackupDone by internalData.isManualSeedBackupDone.collectAsState(initial = null)
+    val isDisclaimerRead by internalData.isSeedLossDisclaimerRead.collectAsState(initial = null)
+    val showBackupNotice by internalData.showSeedBackupNotice.collectAsState(initial = false)
 
     val vm = viewModel<DisplaySeedViewModel>()
 
@@ -117,7 +118,7 @@ fun DisplaySeedView() {
                     padding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                     checked = backupChecked,
                     onCheckedChange = {
-                        scope.launch { InternalData.saveManualSeedBackupDone(context, it) }
+                        scope.launch { internalData.saveManualSeedBackupDone(it) }
                     },
                 )
                 Checkbox(
@@ -125,7 +126,7 @@ fun DisplaySeedView() {
                     padding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                     checked = disclaimerChecked,
                     onCheckedChange = {
-                        scope.launch { InternalData.saveSeedLossDisclaimerRead(context, it) }
+                        scope.launch { internalData.saveSeedLossDisclaimerRead(it) }
                     }
                 )
             } ?: ProgressView(text = stringResource(id = R.string.displayseed_loading_prefs))
