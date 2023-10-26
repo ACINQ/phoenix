@@ -2877,6 +2877,9 @@
         }
       }
     },
+    "An unknown error has occurred." : {
+
+    },
     "An unknown error occurred." : {
       "comment" : "error details",
       "localizations" : {
@@ -6257,6 +6260,12 @@
           }
         }
       }
+    },
+    "Data could not be decrypted by this wallet." : {
+
+    },
+    "Data is malformed. An encrypted hex blob is expected." : {
+
     },
     "Decrease value" : {
       "localizations" : {
@@ -9833,6 +9842,15 @@
         }
       }
     },
+    "Import channels" : {
+      "comment" : "Navigation bar title"
+    },
+    "Import has failed" : {
+
+    },
+    "Import successful" : {
+
+    },
     "Important messages" : {
       "localizations" : {
         "cs" : {
@@ -9854,6 +9872,9 @@
           }
         }
       }
+    },
+    "Importing data…" : {
+
     },
     "In order to receive this payment, a new payment channel was opened. This is not always required." : {
       "comment" : "Fees explanation",
@@ -13091,6 +13112,9 @@
           }
         }
       }
+    },
+    "Paste encrypted data blob here" : {
+
     },
     "Paste from clipboard" : {
       "localizations" : {
@@ -18832,6 +18856,9 @@
         }
       }
     },
+    "This screen is a debugging tool that can be used to manually import encrypted channels data.\n\nUse with caution." : {
+
+    },
     "This seed is invalid and cannot be imported.\n\nPlease try again" : {
       "localizations" : {
         "ar" : {
@@ -20319,6 +20346,9 @@
         }
       }
     },
+    "Version %d is not supported" : {
+
+    },
     "via" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "localizations" : {
@@ -21738,6 +21768,9 @@
           }
         }
       }
+    },
+    "You must now restart Phoenix." : {
+
     },
     "You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments. You can use a third-party service to make the offchain->onchain swap." : {
       "comment" : "Error message - scanning lightning invoice",
