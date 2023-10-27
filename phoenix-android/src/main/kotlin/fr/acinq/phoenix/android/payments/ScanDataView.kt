@@ -21,6 +21,7 @@ import android.Manifest
 import android.content.Intent
 import android.net.*
 import android.provider.*
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -179,6 +180,9 @@ fun ReadDataView(
     Box(Modifier.fillMaxSize()) {
 
         if (initialInput.isNullOrBlank()) {
+            BackHandler {
+                scanView?.pause()
+            }
             ScannerView(
                 onScanViewBinding = { scanView = it },
                 onScannedText = onScannedText
@@ -216,7 +220,10 @@ fun ReadDataView(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(id = R.string.btn_cancel),
                 icon = R.drawable.ic_arrow_back,
-                onClick = onBackClick
+                onClick = {
+                    scanView?.pause()
+                    onBackClick()
+                }
             )
         }
 
