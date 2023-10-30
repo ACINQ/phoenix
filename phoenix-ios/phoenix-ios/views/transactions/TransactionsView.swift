@@ -201,7 +201,7 @@ struct TransactionsView: View {
 		
 		if let selectedItem {
 			PaymentView(
-				type: .embedded(popTo: popTo),
+				location: .embedded(popTo: popTo),
 				paymentInfo: selectedItem
 			)
 			

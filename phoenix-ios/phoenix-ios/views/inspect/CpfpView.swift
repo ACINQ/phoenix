@@ -35,7 +35,7 @@ enum CpfpError: Error {
 
 struct CpfpView: View {
 	
-	let type: PaymentViewType
+	let location: PaymentView.Location
 	let onChainPayment: Lightning_kmpOnChainOutgoingPayment
 	
 	@State var minerFeeInfo: MinerFeeCPFP?
@@ -79,7 +79,7 @@ struct CpfpView: View {
 	@ViewBuilder
 	var body: some View {
 		
-		switch type {
+		switch location {
 		case .sheet:
 			main()
 				.navigationTitle(NSLocalizedString("Accelerate Transactions", comment: "Navigation bar title"))
@@ -123,7 +123,7 @@ struct CpfpView: View {
 	@ViewBuilder
 	func header() -> some View {
 		
-		if case .sheet(let closeAction) = type {
+		if case .sheet(let closeAction) = location {
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				Button {
 					presentationMode.wrappedValue.dismiss()
@@ -723,7 +723,7 @@ struct CpfpView: View {
 				if let problem = SpliceOutProblem.fromResponse(response) {
 					self.cpfpError = .executeError(problem: problem)
 				} else {
-					switch type {
+					switch location {
 					case .sheet(let closeAction):
 						closeAction()
 					case .embedded(let popTo):

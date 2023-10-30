@@ -14,7 +14,7 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct DetailsView: View {
 	
-	let type: PaymentViewType
+	let location: PaymentView.Location
 	@Binding var paymentInfo: WalletPaymentInfo
 	
 	@Binding var showOriginalFiatValue: Bool
@@ -25,7 +25,7 @@ struct DetailsView: View {
 	@ViewBuilder
 	var body: some View {
 		
-		switch type {
+		switch location {
 		case .sheet:
 			content()
 				.navigationTitle(NSLocalizedString("Details", comment: "Navigation bar title"))
@@ -62,7 +62,7 @@ struct DetailsView: View {
 	@ViewBuilder
 	func header() -> some View {
 		
-		if case .sheet(let closeAction) = type {
+		if case .sheet(let closeAction) = location {
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				Button {
 					presentationMode.wrappedValue.dismiss()
