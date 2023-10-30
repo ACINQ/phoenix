@@ -92,7 +92,7 @@ struct MainView_Small: View {
 				.navigationBarHidden(true)
 		}
 		.sheet(isPresented: $showingMergeChannelsView) {
-			MergeChannelsView(type: .sheet)
+			MergeChannelsView(location: .sheet)
 		}
 	}
 	
