@@ -159,7 +159,7 @@ struct HomeView : MVIView {
 			case .notificationsView:
 				
 				NotificationsView(
-					type: .sheet
+					location: .sheet
 				)
 				.modifier(GlobalEnvironment.sheetInstance())
 			}
