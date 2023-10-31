@@ -29,6 +29,7 @@ struct ReceiveView: MVIView {
 	@State var lastAmount: Lightning_kmpMilliSatoshi? = nil
 	
 	@State var receiveLightningView_didAppear = false
+	@State var showSendView = false
 	
 	@State var swapIn_enabled = true
 	
@@ -68,7 +69,25 @@ struct ReceiveView: MVIView {
 					.accessibilityHidden(true)
 			}
 			
-			customTabView()
+			if showSendView {
+				SendView(location: .ReceiveView)
+					.zIndex(5) // needed for proper animation
+					.transition(
+						.asymmetric(
+							insertion: .move(edge: .bottom),
+							removal: .move(edge: .bottom)
+						)
+					)
+			} else {
+				customTabView()
+					.zIndex(4) // needed for proper animation
+					.transition(
+						.asymmetric(
+							insertion: .identity,
+							removal: .opacity
+						)
+					)
+			}
 			
 			toast.view()
 		}
@@ -87,7 +106,8 @@ struct ReceiveView: MVIView {
 				ReceiveLightningView(
 					mvi: mvi,
 					toast: toast,
-					didAppear: $receiveLightningView_didAppear
+					didAppear: $receiveLightningView_didAppear,
+					showSendView: $showSendView
 				)
 				
 			case .blockchain:

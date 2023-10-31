@@ -15713,6 +15713,9 @@
         }
       }
     },
+    "Scan withdraw" : {
+
+    },
     "Security" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -15949,6 +15952,9 @@
           }
         }
       }
+    },
+    "Send Money" : {
+
     },
     "Send payment" : {
       "localizations" : {
@@ -18751,6 +18757,9 @@
           }
         }
       }
+    },
+    "This is not a withdraw request. Do you want to **send money** to somebody?" : {
+
     },
     "This is your new address. Do not reuse your old Bitcoin address from before migration." : {
       "localizations" : {

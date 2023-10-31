@@ -14,6 +14,8 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct ScanView: View {
 	
+	let location: SendView.Location
+	
 	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
 	@ObservedObject var toast: Toast
 	
@@ -428,14 +430,39 @@ struct ScanView: View {
 	func modelDidChange(_ newModel: Scan.Model) {
 		log.trace("modelDidChange()")
 		
-		if ignoreScanner {
-			// Flow:
-			// - User taps "manual input"
-			// - User types in something and taps "OK"
-			// - We send Scan.Intent.Parse()
-			// - We just got back a response from our request
-			//
-			ignoreScanner = false
+		switch mvi.model {
+		case _ as Scan.Model_Ready,
+			  _ as Scan.Model_BadRequest:
+			
+			if ignoreScanner {
+				// Flow:
+				// - User taps "manual input"
+				// - User types in something and taps "OK"
+				// - We send Scan.Intent.Parse()
+				// - We just got back a response from our request
+				//
+				ignoreScanner = false
+			}
+			
+		case _ as Scan.Model_InvoiceFlow,
+		     _ as Scan.Model_OnChainFlow,
+		     _ as Scan.Model_LnurlPayFlow,
+		     _ as Scan.Model_LnurlAuthFlow:
+			
+			if location == .ReceiveView {
+				// The user tapped the "Receive" button, and then tapped the "Scan withdraw" button.
+				// But then they might proceed to scan the QR code to send a payment.
+				// When this happens, the ScanView remains on screen,
+				// while the user is prompted to accept/reject the "send payment" flow.
+				//
+				// In this scenario, we want to pause/ignore the scanner.
+				if !ignoreScanner {
+					ignoreScanner = true
+				}
+			}
+			
+		default:
+			break
 		}
 	}
 	
