@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
   <string name="legacy_app_name">Phoenix (Testnet)</string>
 
   <!-- //////////////// system notification channels //////////////// -->
@@ -119,8 +119,6 @@
   <string name="legacy_receive_share_button">Share…</string>
 
   <string name="legacy_receive_min_amount_pay_to_open"><![CDATA[Your wallet is empty. First payment you receive must be at least <b>%1$s</b>.]]></string>
-  <string name="legacy_receive_paytoopen_disabled">Channel creation has been disabled. You may not be able to receive some payments.</string>
-  <string name="legacy_receive_paytoopen_disabled_nochannels">Channel creation has been disabled. You will not be able to receive any payments.</string>
   <string name="legacy_receive_address_label">Address</string>
   <string name="legacy_receive_withdraw_button">Use LNURL link</string>
 
@@ -130,25 +128,19 @@
     <br /><br />
     Deposits must be at least <b>%1$s</b>. The fee is <b>%2$s%%</b> (<b>%3$s</b> minimum).
   ]]></string>
-  <string name="legacy_receive_swap_in_error_message">Could not get a Bitcoin address from the swap service.\n\nPlease try again later.</string>
+  <string name="legacy_receive_swap_in_error_message">Could not get a Bitcoin address from the swap service.</string>
   <string name="legacy_receive_swap_in_unknown"><![CDATA[
-    <b>Unavailable</b>
-    <br /><br />
-    Please try again later.
+    <b>Service unavailable</b>
   ]]></string>
   <string name="legacy_receive_swap_in_disabled"><![CDATA[
-    <b>Service disabled</b>
+    <b>Swaps are disabled</b>
     <br /><br />
-    The on-chain deposit swap service has been disabled.
-    <br /><br />
-    Try again later.
+    Upgrade to the new Phoenix to receive on-chain payments.
   ]]></string>
   <string name="legacy_receive_swap_in_disabled_mempool"><![CDATA[
     <b>Service disabled</b>
     <br /><br />
     The Bitcoin mempool is congested and fees are very high. The on-chain deposit swap service has been temporarily disabled.
-    <br /><br />
-    Try again later.
   ]]></string>
   <string name="legacy_receive_swap_in_progress_message">Requesting a Bitcoin address…</string>
   <string name="legacy_receive_swap_in_disclaimer_title">Receive with a Bitcoin address</string>
@@ -184,7 +176,7 @@
   ]]></string>
   <string name="legacy_send_error_sending">There was an internal error when trying to send this payment. No money was sent.</string>
   <string name="legacy_send_pay_button">Pay</string>
-  <string name="legacy_send_swap_service_disabled">The swap service for paying on-chain addresses has been disabled.\n\nPlease use a third-party service.</string>
+  <string name="legacy_send_swap_service_disabled">Swaps are disabled.\n\nUpgrade to the new Phoenix to make trustless on-chain payments.</string>
   <string name="legacy_send_swap_in_progress">Preparing transaction</string>
   <string name="legacy_send_swap_error">Swap to chain has failed. Please try again.</string>
   <string name="legacy_send_swap_required_button">Prepare transaction</string>
@@ -388,7 +380,7 @@
   <string name="legacy_inappnotif_upgrade_critical">A critical update is available. The wallet may malfunction if not updated.</string>
   <string name="legacy_inappnotif_mempool_high_usage">Bitcoin mempool is full and fees are high.</string>
   <string name="legacy_inappnotif_mempool_high_usage_action">See how Phoenix is affected</string>
-  <string name="legacy_inappnotif_prepare_migration">The old Phoenix will be gone soon. Time to upgrade!</string>
+  <string name="legacy_inappnotif_prepare_migration">The old Phoenix app is deprecated. Swaps and on-the-fly channels are disabled.</string>
   <string name="legacy_inappnotif_prepare_migration_action">Upgrade to the new Phoenix</string>
 
   <!-- //////////////// display seed //////////////// -->
