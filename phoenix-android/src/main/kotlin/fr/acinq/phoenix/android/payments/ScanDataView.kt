@@ -180,16 +180,16 @@ fun ReadDataView(
     Box(Modifier.fillMaxSize()) {
 
         if (initialInput.isNullOrBlank()) {
-            BackHandler {
-                scanView?.pause()
-            }
             ScannerView(
                 onScanViewBinding = { scanView = it },
                 onScannedText = onScannedText
             )
             CameraPermissionsView {
-                LaunchedEffect(key1 = model, key2 = initialInput) {
+                DisposableEffect(key1 = model) {
                     if (model is Scan.Model.Ready && initialInput.isNullOrBlank()) scanView?.resume()
+                    onDispose {
+                        scanView?.pause()
+                    }
                 }
             }
         }
@@ -220,10 +220,7 @@ fun ReadDataView(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(id = R.string.btn_cancel),
                 icon = R.drawable.ic_arrow_back,
-                onClick = {
-                    scanView?.pause()
-                    onBackClick()
-                }
+                onClick = onBackClick
             )
         }
 
