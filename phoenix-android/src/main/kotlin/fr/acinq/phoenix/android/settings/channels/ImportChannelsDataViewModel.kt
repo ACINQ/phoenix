@@ -20,14 +20,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import fr.acinq.bitcoin.ByteVector
-import fr.acinq.lightning.channel.states.PersistedChannelState
-import fr.acinq.lightning.serialization.Encryption.from
-import fr.acinq.lightning.serialization.Serialization
-import fr.acinq.lightning.wire.EncryptedChannelData
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
-import fr.acinq.secp256k1.Hex
+import fr.acinq.phoenix.utils.import.ChannelsImportHelper
+import fr.acinq.phoenix.utils.import.ChannelsImportResult
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -37,13 +34,7 @@ import org.slf4j.LoggerFactory
 sealed class ImportChannelsDataState {
     object Init : ImportChannelsDataState()
     object Importing : ImportChannelsDataState()
-    object Success : ImportChannelsDataState()
-    sealed class Failure : ImportChannelsDataState() {
-        data class Generic(val t: Throwable): Failure()
-        object MalformedData : Failure()
-        object DecryptionError : Failure()
-        data class UnknownVersion(val version: Int) : Failure()
-    }
+    data class Done(val result: ChannelsImportResult): ImportChannelsDataState()
 }
 
 class ImportChannelsDataViewModel(val peerManager: PeerManager, val nodeParamsManager: NodeParamsManager) : ViewModel() {
@@ -51,42 +42,21 @@ class ImportChannelsDataViewModel(val peerManager: PeerManager, val nodeParamsMa
     private val log = LoggerFactory.getLogger(this::class.java)
     val state = mutableStateOf<ImportChannelsDataState>(ImportChannelsDataState.Init)
 
-    fun importData(data: String) {
+    fun importData(data: String, business: PhoenixBusiness) {
         if (state.value == ImportChannelsDataState.Importing) return
         viewModelScope.launch(
             Dispatchers.Default + CoroutineExceptionHandler { _, e ->
                 log.error("failed to import channels data: ", e)
-                state.value = ImportChannelsDataState.Failure.Generic(e)
+                state.value = ImportChannelsDataState.Done(ChannelsImportResult.Failure.Generic(e))
             }
         ) {
             state.value = ImportChannelsDataState.Importing
             delay(300)
-            val deserializedData = try {
-                EncryptedChannelData(ByteVector(Hex.decode(data)))
-            } catch(e: Exception) {
-                log.error("failed to deserialize data blob: ", e)
-                state.value = ImportChannelsDataState.Failure.MalformedData
-                return@launch
-            }
-            PersistedChannelState
-                .from(nodeParamsManager.nodeParams.value!!.nodePrivateKey, deserializedData)
-                .onFailure {
-                    log.error("failed to decrypt channel state: ", it)
-                    state.value = ImportChannelsDataState.Failure.DecryptionError
-                }
-                .onSuccess { res ->
-                    when (res) {
-                        is Serialization.DeserializationResult.Success -> {
-                            val peer = peerManager.getPeer()
-                            peer.db.channels.addOrUpdateChannel(res.state)
-                            state.value = ImportChannelsDataState.Success
-                        }
-                        is Serialization.DeserializationResult.UnknownVersion -> {
-                            log.error("cannot use channel state: unknown version=${res.version}")
-                            state.value = ImportChannelsDataState.Failure.UnknownVersion(res.version)
-                        }
-                    }
-                }
+            val result = ChannelsImportHelper.doImportChannels(
+                data = data,
+                biz = business
+            )
+            state.value = ImportChannelsDataState.Done(result)
         }
     }
 
