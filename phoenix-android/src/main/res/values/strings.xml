@@ -294,7 +294,7 @@
 
     <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">You have not made any payments recently.\n\nUse the Receive and Send buttons at the bottom of this screen to get started!</string>
-    <string name="home__payments_none_incoming">A deposit is incoming.\n\nOnce confirmed, you will see the payment here.</string>
+    <string name="home__payments_none_incoming">An on-chain deposit is incoming.\n\nOnce swapped, it will appear here.</string>
     <string name="home__payments_header">Recent payments</string>
     <string name="home__payments_more_button">Show all payments…</string>
     <string name="home__connection__electrum_late">Electrum late</string>
