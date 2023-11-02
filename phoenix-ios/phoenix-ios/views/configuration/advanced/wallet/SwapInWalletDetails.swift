@@ -13,12 +13,12 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct SwapInWalletDetails: View {
 	
-	enum ViewLocation {
+	enum Location {
 		case popover
 		case embedded
 	}
 	
-	let location: ViewLocation
+	let location: Location
 	let popTo: (PopToDestination) -> Void
 	
 	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy

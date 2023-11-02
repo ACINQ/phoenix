@@ -11,15 +11,15 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-enum NotificationsViewType {
-	
-	case sheet
-	case embedded
-}
 
 struct NotificationsView : View {
 	
-	let type: NotificationsViewType
+	enum Location {
+		case sheet
+		case embedded
+	}
+	
+	let location: NotificationsView.Location
 	
 	@StateObject var noticeMonitor = NoticeMonitor()
 	
@@ -42,7 +42,7 @@ struct NotificationsView : View {
 	var body: some View {
 		
 		Group {
-			switch type {
+			switch location {
 			case .sheet:
 				body_sheet()
 				

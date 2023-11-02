@@ -151,7 +151,7 @@ struct HomeView : MVIView {
 			case .paymentView(let selectedPayment):
 				
 				PaymentView(
-					type: .sheet(closeAction: { self.activeSheet = nil }),
+					location: .sheet(closeAction: { self.activeSheet = nil }),
 					paymentInfo: selectedPayment
 				)
 				.modifier(GlobalEnvironment.sheetInstance())
@@ -159,7 +159,7 @@ struct HomeView : MVIView {
 			case .notificationsView:
 				
 				NotificationsView(
-					type: .sheet
+					location: .sheet
 				)
 				.modifier(GlobalEnvironment.sheetInstance())
 			}

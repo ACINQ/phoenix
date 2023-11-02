@@ -11,40 +11,41 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-enum PaymentViewType {
-	
-	/// We need an explicit close operation here because:
-	/// - we're going to use a NavigationView
-	/// - we need to programmatically close the sheet from any layer in the navigation stack
-	/// - the general API to pop a view from the nav stack is `presentationMode.wrappedValue.dismiss()`
-	/// - the general API to dismiss a sheet is `presentationMode.wrappedValue.dismiss()`
-	/// - thus we cannot use the general API
-	case sheet(closeAction: () -> Void)
-	
-	case embedded(popTo: (PopToDestination) -> Void)
-}
 
 struct PaymentView: View {
-
-	let type: PaymentViewType
+	
+	enum Location {
+	 
+		/// We need an explicit close operation here because:
+		/// - we're going to use a NavigationView
+		/// - we need to programmatically close the sheet from any layer in the navigation stack
+		/// - the general API to pop a view from the nav stack is `presentationMode.wrappedValue.dismiss()`
+		/// - the general API to dismiss a sheet is `presentationMode.wrappedValue.dismiss()`
+		/// - thus we cannot use the general API
+		case sheet(closeAction: () -> Void)
+		
+		case embedded(popTo: (PopToDestination) -> Void)
+	}
+	
+	let location: Location
 	let paymentInfo: WalletPaymentInfo
 	
 	@ViewBuilder
 	var body: some View {
 		
-		switch type {
+		switch location {
 		case .sheet:
-			PaymentViewSheet(type: type, paymentInfo: paymentInfo)
+			PaymentViewSheet(location: location, paymentInfo: paymentInfo)
 			
 		case .embedded:
-			SummaryView(type: type, paymentInfo: paymentInfo)
+			SummaryView(location: location, paymentInfo: paymentInfo)
 		}
 	}
 }
 
 fileprivate struct PaymentViewSheet: View {
 	
-	let type: PaymentViewType
+	let location: PaymentView.Location
 	let paymentInfo: WalletPaymentInfo
 	
 	@EnvironmentObject var shortSheetState: ShortSheetState
@@ -59,7 +60,7 @@ fileprivate struct PaymentViewSheet: View {
 		ZStack {
 			
 			NavigationWrapper {
-				SummaryView(type: type, paymentInfo: paymentInfo)
+				SummaryView(location: location, paymentInfo: paymentInfo)
 			}
 			.edgesIgnoringSafeArea(.all)
 			.zIndex(0) // needed for proper animation

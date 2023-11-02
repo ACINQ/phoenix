@@ -92,7 +92,7 @@ struct MainView_Small: View {
 				.navigationBarHidden(true)
 		}
 		.sheet(isPresented: $showingMergeChannelsView) {
-			MergeChannelsView(type: .sheet)
+			MergeChannelsView(location: .sheet)
 		}
 	}
 	
@@ -502,7 +502,7 @@ struct MainView_Small: View {
 			case .ConfigurationView   : ConfigurationView()
 			case .TransactionsView    : TransactionsView()
 			case .ReceiveView         : ReceiveView()
-			case .SendView            : SendView(controller: externalLightningRequest)
+			case .SendView            : SendView(location: .MainView, controller: externalLightningRequest)
 			case .CurrencyConverter   : CurrencyConverterView()
 			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded, popTo: popTo)
 		}
