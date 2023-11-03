@@ -44,7 +44,6 @@ class ReceiveViewModel : ViewModel() {
   val invoice = MutableLiveData<Pair<PaymentRequest, String?>?>()
   val bitmap = MutableLiveData<Bitmap?>()
   val state = MutableLiveData<ReceiveState>()
-  val payToOpenDisabled = MutableLiveData(false)
   val showMinFundingPayToOpen = MutableLiveData(false)
 
   init {

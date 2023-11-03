@@ -40,7 +40,7 @@ sealed class EncryptedSeed {
 
     /** This seed is encrypted with a key that does *NOT* require user unlock. */
     class NoAuth(override val iv: ByteArray, override val ciphertext: ByteArray) : V2(KeystoreHelper.KEY_NO_AUTH) {
-      fun decrypt(): ByteArray = tryWith(GeneralSecurityException()) { getDecryptionCipher().doFinal(ciphertext) }
+      fun decrypt(): ByteArray = getDecryptionCipher().doFinal(ciphertext)
 
       companion object {
         fun encrypt(seed: ByteArray): NoAuth = tryWith(GeneralSecurityException()) {

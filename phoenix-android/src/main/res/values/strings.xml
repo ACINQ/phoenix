@@ -67,10 +67,30 @@
     <string name="startup_binding_service">Binding service…</string>
     <string name="startup_wait">Preparing wallet…</string>
     <string name="startup_wait_legacy_check">Checking legacy wallet…</string>
+    <string name="startup_switching_to_legacy">Switching to legacy wallet…</string>
     <string name="startup_manual_unlock_button">Unlock</string>
     <string name="startup_checking_seed">Unlocking…</string>
+    <string name="startup_unlocked">Access granted…</string>
+    <string name="startup_unlock_failure">Unlock failed</string>
+    <string name="startup_unlock_failure_keystore">Android keystore error</string>
+    <string name="startup_unlock_failure_unhandled_version">Unhandled seed version (%1$s)</string>
+    <string name="startup_unlock_failure_unhandled_version_details">Contact support by email for assistance</string>
+    <string name="startup_unlock_failure_fallback">Unlock with seed</string>
+
+    <string name="startup_fallback_instructions">Enter your 12-words recovery to unlock the wallet.\n\nWords must be entered in the correct order, and separated with a single space.</string>
+    <string name="startup_fallback_input_label">Enter word #%1$d</string>
+    <string name="startup_fallback_input_label_error">No more than 12 words!</string>
+    <string name="startup_fallback_incomplete">Enter the complete seed to proceed further.</string>
+    <string name="startup_fallback_invalid">This seed is not valid. Make sure the words are correct and in order.</string>
+    <string name="startup_fallback_unlock_button">Unlock wallet</string>
+    <string name="startup_fallback_checking">Checking seed…</string>
+    <string name="startup_fallback_error_default">An error occurred. Please try again.</string>
+    <string name="startup_fallback_error_incorrect_seed">This seed does not match your wallet.</string>
+    <string name="startup_fallback_success_match">Seed matches.\nWriting to disk…</string>
+    <string name="startup_fallback_success_starting">Starting Phoenix…</string>
+
     <string name="startup_starting">Starting…</string>
-    <string name="startup_error_generic">The application could not start.\n\nError details: %1$s</string>
+    <string name="startup_error_generic">The application could not start.</string>
 
     <!-- Switch between legacy/modern apps -->
 
@@ -274,7 +294,7 @@
 
     <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">You have not made any payments recently.\n\nUse the Receive and Send buttons at the bottom of this screen to get started!</string>
-    <string name="home__payments_none_incoming">A deposit is incoming.\n\nOnce confirmed, you will see the payment here.</string>
+    <string name="home__payments_none_incoming">An on-chain deposit is incoming.\n\nOnce swapped, it will appear here.</string>
     <string name="home__payments_header">Recent payments</string>
     <string name="home__payments_more_button">Show all payments…</string>
     <string name="home__connection__electrum_late">Electrum late</string>

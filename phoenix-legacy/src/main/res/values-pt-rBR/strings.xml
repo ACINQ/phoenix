@@ -119,8 +119,6 @@
   <string name="legacy_receive_share_button">Compartilhar…</string>
 
   <string name="legacy_receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de no mínimo <b>%1$s</b>.]]></string>
-  <string name="legacy_receive_paytoopen_disabled">A abertura de canais foi desativada. Alguns pagamentos não poderão ser recebidos.</string>
-  <string name="legacy_receive_paytoopen_disabled_nochannels">A abertura de canais foi desativada. Você não poderá receber pagamentos.</string>
 
   <string name="legacy_receive_address_label">Endereço</string>
   <string name="legacy_receive_withdraw_button">Usar link LNURL</string>

@@ -20,16 +20,20 @@ import android.content.Intent
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
+import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.legacy.AppContext
+import fr.acinq.phoenix.legacy.internalData
 import fr.acinq.phoenix.utils.PlatformContext
 
 class PhoenixApplication : AppContext() {
     val business by lazy { PhoenixBusiness(PlatformContext(this)) }
+    lateinit var internalDataRepository: InternalDataRepository
 
     override fun onCreate() {
         super.onCreate()
         Logging.setupLogger(applicationContext)
         SystemNotificationHelper.registerNotificationChannels(applicationContext)
+        internalDataRepository = InternalDataRepository(applicationContext.internalData)
     }
 
     override fun onLegacyFinish() {

@@ -371,7 +371,7 @@ fileprivate struct ConfigurationList: View {
 			case .DisplayConfiguration  : DisplayConfigurationView()
 			case .PaymentOptions        : PaymentOptionsView()
 			case .ChannelManagement     : LiquidityPolicyView()
-			case .Notifications         : NotificationsView(type: .embedded)
+			case .Notifications         : NotificationsView(location: .embedded)
 		// Privacy & Security
 			case .AppAccess             : AppAccessView()
 			case .RecoveryPhrase        : RecoveryPhraseView()
@@ -457,6 +457,7 @@ fileprivate struct ConfigurationList: View {
 				case .backgroundPayments : newNavLinkTag = .PaymentOptions       ; delay *= 2
 				case .liquiditySettings  : newNavLinkTag = .ChannelManagement    ; delay *= 1
 				case .forceCloseChannels : newNavLinkTag = .ForceCloseChannels   ; delay *= 1
+				case .swapInWallet       : newNavLinkTag = .WalletInfo           ; delay *= 2
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {

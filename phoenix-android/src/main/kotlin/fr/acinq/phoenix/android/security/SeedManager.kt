@@ -21,13 +21,13 @@ import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import java.io.File
 
-sealed class KeyState {
+sealed class SeedFileState {
     fun isReady() = this is Present
 
-    object Unknown : KeyState()
-    object Absent : KeyState()
-    data class Present(internal val encryptedSeed: EncryptedSeed.V2) : KeyState()
-    sealed class Error : KeyState() {
+    object Unknown : SeedFileState()
+    object Absent : SeedFileState()
+    data class Present(internal val encryptedSeed: EncryptedSeed.V2) : SeedFileState()
+    sealed class Error : SeedFileState() {
         data class Unreadable(val message: String?) : Error()
         object UnhandledSeedType : Error()
     }
@@ -45,15 +45,15 @@ object SeedManager {
     /** Extract the encrypted seed from app private dir. */
     fun loadSeedFromDisk(context: Context): EncryptedSeed? = loadSeedFromDir(getDatadir(context), SEED_FILE)
 
-    fun getSeedState(context: Context): KeyState = try {
+    fun getSeedState(context: Context): SeedFileState = try {
         when (val seed = loadSeedFromDisk(context)) {
-            null -> KeyState.Absent
-            is EncryptedSeed.V2.NoAuth -> KeyState.Present(seed)
-            else -> KeyState.Error.UnhandledSeedType
+            null -> SeedFileState.Absent
+            is EncryptedSeed.V2.NoAuth -> SeedFileState.Present(seed)
+            else -> SeedFileState.Error.UnhandledSeedType
         }
     } catch (e: Exception) {
         log.error(e) { "failed to read seed: " }
-        KeyState.Error.Unreadable(e.localizedMessage)
+        SeedFileState.Error.Unreadable(e.localizedMessage)
     }
 
     /** Extract an encrypted seed contained in a given file/folder. */
@@ -76,9 +76,9 @@ object SeedManager {
         }
     }
 
-    fun writeSeedToDisk(context: Context, seed: EncryptedSeed.V2) = writeSeedToDir(getDatadir(context), seed)
+    fun writeSeedToDisk(context: Context, seed: EncryptedSeed.V2, overwrite: Boolean = false) = writeSeedToDir(getDatadir(context), seed, overwrite)
 
-    private fun writeSeedToDir(dir: File, seed: EncryptedSeed.V2) {
+    private fun writeSeedToDir(dir: File, seed: EncryptedSeed.V2, overwrite: Boolean) {
         // 1 - create dir
         if (!dir.exists()) {
             dir.mkdirs()
@@ -94,7 +94,7 @@ object SeedManager {
             log.warning { "seed check do not match!" }
 //            throw WriteErrorCheckDontMatch
         }
-        temp.copyTo(File(dir, SEED_FILE))
+        temp.copyTo(File(dir, SEED_FILE), overwrite)
         temp.delete()
     }
 

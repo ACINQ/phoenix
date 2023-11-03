@@ -97,8 +97,6 @@
   <string name="legacy_receive_share_button">Partager…</string>
 
   <string name="legacy_receive_min_amount_pay_to_open"><![CDATA[Votre portefeuille est vide. Votre premier versement doit être d\'au moins <b>%1$s</b>.]]></string>
-  <string name="legacy_receive_paytoopen_disabled">La création de canaux Lightning a été désactivée. Certains paiements ne pourront pas être reçus.</string>
-  <string name="legacy_receive_paytoopen_disabled_nochannels">La création de canaux Lightning a été désactivée. Vous ne pourrez pas recevoir de paiements.</string>
   <string name="legacy_receive_address_label">Adresse</string>
   <string name="legacy_receive_withdraw_button">Utiliser un lien LNURL</string>
 

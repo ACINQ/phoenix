@@ -88,7 +88,7 @@ struct ContentView: View {
 		switch lockState.walletExistence {
 		case .exists:
 			if !hasMergedChannelsForSplicing {
-				MergeChannelsView(type: .standalone)
+				MergeChannelsView(location: .standalone)
 			} else {
 				MainView()
 			}

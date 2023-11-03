@@ -56,7 +56,7 @@ struct MainView_BigPrimary: View {
 				.navigationBarHidden(true)
 		}
 		.sheet(isPresented: $showingMergeChannelsView) {
-			MergeChannelsView(type: .sheet)
+			MergeChannelsView(location: .sheet)
 		}
 	}
 	
@@ -184,7 +184,7 @@ struct MainView_BigPrimary: View {
 		if let tag = navLinkTag {
 			switch tag {
 				case .ReceiveView : ReceiveView()
-				case .SendView    : SendView(controller: externalLightningRequest)
+				case .SendView    : SendView(location: .MainView, controller: externalLightningRequest)
 			}
 		} else {
 			EmptyView()

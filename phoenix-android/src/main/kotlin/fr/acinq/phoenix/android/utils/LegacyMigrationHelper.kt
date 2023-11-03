@@ -35,12 +35,10 @@ import fr.acinq.lightning.db.*
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.FinalFailure
-import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
-import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
@@ -69,17 +67,17 @@ object LegacyMigrationHelper {
     ) {
         log.info("started migrating legacy user preferences")
 
-        val business = (context as PhoenixApplication).business
+        val (business, internalData) = (context as PhoenixApplication).run { business to internalDataRepository }
         val appConfigurationManager = business.appConfigurationManager
 
         // -- utils
 
-        InternalData.saveLastUsedAppCode(context, Prefs.getLastVersionUsed(context))
+        internalData.saveLastUsedAppCode(Prefs.getLastVersionUsed(context))
         val backupWasDone = Prefs.getMnemonicsSeenTimestamp(context) > 0
-        InternalData.saveManualSeedBackupDone(context, backupWasDone)
-        InternalData.saveSeedLossDisclaimerRead(context, backupWasDone)
-        Prefs.getFCMToken(context)?.let { InternalData.saveFcmToken(context, it) }
-        InternalData.saveShowIntro(context, Prefs.showFTUE(context))
+        internalData.saveManualSeedBackupDone(backupWasDone)
+        internalData.saveSeedLossDisclaimerRead(backupWasDone)
+        Prefs.getFCMToken(context)?.let { internalData.saveFcmToken(it) }
+        internalData.saveShowIntro(Prefs.showFTUE(context))
 
         // -- display
 

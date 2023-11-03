@@ -151,7 +151,7 @@ struct HomeView : MVIView {
 			case .paymentView(let selectedPayment):
 				
 				PaymentView(
-					type: .sheet(closeAction: { self.activeSheet = nil }),
+					location: .sheet(closeAction: { self.activeSheet = nil }),
 					paymentInfo: selectedPayment
 				)
 				.modifier(GlobalEnvironment.sheetInstance())
@@ -159,7 +159,7 @@ struct HomeView : MVIView {
 			case .notificationsView:
 				
 				NotificationsView(
-					type: .sheet
+					location: .sheet
 				)
 				.modifier(GlobalEnvironment.sheetInstance())
 			}
@@ -390,45 +390,74 @@ struct HomeView : MVIView {
 		.onTapGesture {
 			openNotificationsSheet()
 		}
-		
 	}
 	
 	@ViewBuilder
 	func notice_other_single() -> some View {
 		
-		NoticeBox {
-			notice_other_content(isSingle: true)
+		if noticeMonitor.hasNotice {
+			NoticeBox {
+				notice_other_content(isSingle: true)
+			}
+			.contentShape(Rectangle()) // make Spacer area tappable
+			.onTapGesture {
+				if noticeMonitor.hasNotice_backupSeed {
+					navigateToBackup()
+				} else if noticeMonitor.hasNotice_electrumServer {
+					navigationToElecrumServer()
+				} else if noticeMonitor.hasNotice_swapInExpiration {
+					showSwapInWallet()
+				} else if noticeMonitor.hasNotice_backgroundPayments {
+					navigationToBackgroundPayments()
+				} else if noticeMonitor.hasNotice_watchTower {
+					fixBackgroundAppRefreshDisabled()
+				} else if noticeMonitor.hasNotice_mempoolFull {
+					openMempoolFullURL()
+				}
+			}
+			
+		} else {
+			NoticeBox {
+				notice_other_content(isSingle: true)
+			}
 		}
 	}
 	
 	@ViewBuilder
 	func notice_other_content(isSingle: Bool) -> some View {
 		
-		Group {
-			if noticeMonitor.hasNotice_backupSeed {
-				NotificationCell.backupSeed(action: isSingle ? navigateToBackup : nil)
-				
-			} else if noticeMonitor.hasNotice_electrumServer {
-				NotificationCell.electrumServer(action: isSingle ? navigationToElecrumServer : nil)
-				
-			} else if noticeMonitor.hasNotice_backgroundPayments {
-				NotificationCell.backgroundPayments(action: isSingle ? navigationToBackgroundPayments : nil)
-				
-			} else if noticeMonitor.hasNotice_watchTower {
-				NotificationCell.watchTower(action: isSingle ? fixBackgroundAppRefreshDisabled : nil)
-				
-			} else if noticeMonitor.hasNotice_mempoolFull {
-				NotificationCell.mempoolFull(action: isSingle ? openMempoolFullURL : nil)
-				
-			} else if let item = bizNotifications_watchtower.first {
-				let location = isSingle ?
-				   BizNotificationCell.Location.HomeView_Single(preAction: {})
-				 : BizNotificationCell.Location.HomeView_Multiple
-				
-				BizNotificationCell(item: item, location: location)
-			}
+		if noticeMonitor.hasNotice_backupSeed {
+			NotificationCell.backupSeed()
+				.font(.footnote)
+			
+		} else if noticeMonitor.hasNotice_electrumServer {
+			NotificationCell.electrumServer()
+				.font(.footnote)
+			
+		} else if noticeMonitor.hasNotice_swapInExpiration {
+			NotificationCell.swapInExpiration()
+				.font(.footnote)
+			
+		} else if noticeMonitor.hasNotice_backgroundPayments {
+			NotificationCell.backgroundPayments()
+				.font(.footnote)
+			
+		} else if noticeMonitor.hasNotice_watchTower {
+			NotificationCell.watchTower()
+				.font(.footnote)
+			
+		} else if noticeMonitor.hasNotice_mempoolFull {
+			NotificationCell.mempoolFull()
+				.font(.footnote)
+			
+		} else if let item = bizNotifications_watchtower.first {
+			let location = isSingle ?
+			   BizNotificationCell.Location.HomeView_Single(preAction: {})
+			 : BizNotificationCell.Location.HomeView_Multiple
+			
+			BizNotificationCell(item: item, location: location)
+				.font(.caption)
 		}
-		.font(.caption)
 	}
 	
 	@ViewBuilder
@@ -616,6 +645,7 @@ struct HomeView : MVIView {
 		var count = 0
 		if noticeMonitor.hasNotice_backupSeed         { count += 1 }
 		if noticeMonitor.hasNotice_electrumServer     { count += 1 }
+		if noticeMonitor.hasNotice_swapInExpiration   { count += 1 }
 		if noticeMonitor.hasNotice_mempoolFull        { count += 1 }
 		if noticeMonitor.hasNotice_backgroundPayments { count += 1 }
 		if noticeMonitor.hasNotice_watchTower         { count += 1 }

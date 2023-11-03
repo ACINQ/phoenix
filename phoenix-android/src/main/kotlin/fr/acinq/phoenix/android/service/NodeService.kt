@@ -7,7 +7,6 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.text.format.DateUtils
-import androidx.annotation.WorkerThread
 import androidx.compose.runtime.mutableStateListOf
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LiveData
@@ -20,13 +19,14 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.io.PaymentReceived
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
-import fr.acinq.phoenix.android.utils.datastore.InternalData
+import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
@@ -49,6 +49,7 @@ class NodeService : Service() {
 
     private val log = LoggerFactory.getLogger(this::class.java)
     private val serviceScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+    lateinit var internalData: InternalDataRepository
     private val binder = NodeBinder()
 
     /** True if the service is running headless (that is without a GUI). In that case we should show a notification */
@@ -59,8 +60,8 @@ class NodeService : Service() {
     private lateinit var notificationManager: NotificationManagerCompat
 
     /** State of the wallet, provides access to the business when started. Private so that it's not mutated from the outside. */
-    private val _state = MutableLiveData<WalletState>(WalletState.Off)
-    val state: LiveData<WalletState> get() = _state
+    private val _state = MutableLiveData<NodeServiceState>(NodeServiceState.Off)
+    val state: LiveData<NodeServiceState> get() = _state
 
     /** Lock for state updates */
     private val stateLock = ReentrantLock()
@@ -71,6 +72,7 @@ class NodeService : Service() {
     override fun onCreate() {
         super.onCreate()
         log.debug("creating node service...")
+        internalData = (applicationContext as PhoenixApplication).internalDataRepository
         notificationManager = NotificationManagerCompat.from(this)
         refreshFcmToken()
         log.debug("service created")
@@ -82,7 +84,7 @@ class NodeService : Service() {
                 log.warn("fetching FCM registration token failed: ", task.exception)
                 return@OnCompleteListener
             }
-            task.result?.let { serviceScope.launch { InternalData.saveFcmToken(applicationContext, it) } }
+            task.result?.let { serviceScope.launch { internalData.saveFcmToken(it) } }
         })
     }
 
@@ -121,10 +123,9 @@ class NodeService : Service() {
 
     /** Shutdown the node, close connections and stop the service */
     fun shutdown() {
-        // closeConnections()
-        log.info("shutting down service in state=${state.value?.name}")
+        log.info("shutting down service in state=${_state.value?.name}")
         stopSelf()
-        updateState(WalletState.Off)
+        _state.value = NodeServiceState.Off
     }
 
     // =========================================================== //
@@ -139,18 +140,17 @@ class NodeService : Service() {
 
         val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext)
         when {
-            state.value is WalletState.Started -> {
+            _state.value is NodeServiceState.Running -> {
                 // NOTE: the notification will NOT be shown if the app is already running
                 val notif = SystemNotificationHelper.notifyRunningHeadless(applicationContext)
                 startForeground(SystemNotificationHelper.HEADLESS_NOTIF_ID, notif)
             }
             encryptedSeed is EncryptedSeed.V2.NoAuth -> {
-                encryptedSeed.decrypt().let {
-                    log.debug("successfully decrypted seed in the background, starting wallet...")
-                    val notif = SystemNotificationHelper.notifyRunningHeadless(applicationContext)
-                    startForeground(SystemNotificationHelper.HEADLESS_NOTIF_ID, notif)
-                    startBusiness(it, requestCheckLegacyChannels = false)
-                }
+                val seed = encryptedSeed.decrypt()
+                log.debug("successfully decrypted seed in the background, starting wallet...")
+                val notif = SystemNotificationHelper.notifyRunningHeadless(applicationContext)
+                startForeground(SystemNotificationHelper.HEADLESS_NOTIF_ID, notif)
+                startBusiness(seed, requestCheckLegacyChannels = false)
             }
             else -> {
                 log.warn("unhandled incoming payment with seed=${encryptedSeed?.name()} reason=$reason")
@@ -176,76 +176,81 @@ class NodeService : Service() {
 
     /**
      * Start the node business logic.
-     * @param decryptedPayload Must be the decrypted payload of an [EncryptedSeed] object.
+     * @param decryptedMnemonics Must be the decrypted payload of an [EncryptedSeed] object.
      */
-    fun startBusiness(decryptedPayload: ByteArray, requestCheckLegacyChannels: Boolean) {
-        serviceScope.launch(Dispatchers.Main + CoroutineExceptionHandler { _, e ->
-            log.error("error when checking node state consistency before startup: ", e)
+    fun startBusiness(decryptedMnemonics: ByteArray, requestCheckLegacyChannels: Boolean) {
+        stateLock.lock()
+        if (_state.value != NodeServiceState.Off) {
+            log.warn("ignore attempt to start business in state=${_state.value}")
+            return
+        } else {
+            _state.postValue(NodeServiceState.Init)
+        }
+        stateLock.unlock()
+
+        serviceScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+            log.error("error when starting node: ", e)
+            _state.postValue(NodeServiceState.Error(e))
+            if (isHeadless) {
+                shutdown()
+                stopForeground(STOP_FOREGROUND_REMOVE)
+            }
         }) {
+//        serviceScope.launch(Dispatchers.Main + CoroutineExceptionHandler { _, e ->
+//            log.error("error when checking node state consistency before startup: ", e)
+//        }) {
             // Check node state consistency. Use a lock because the [doStartNode] method can be called concurrently.
             // If the node is already starting, started, or in error, the method returns.
-            val canProceed = try {
-                stateLock.lock()
-                val state = _state.value
-                if (state !is WalletState.Off) {
-                    log.warn("ignore attempt to start kit with app state=${state?.name}")
-                    false
-                } else {
-                    updateState(WalletState.Bootstrap.Init, lazy = false)
-                    true
-                }
-            } catch (e: Exception) {
-                log.error("error in state check when starting kit: ", e)
-                false
-            } finally {
-                stateLock.unlock()
-            }
 
-            if (canProceed) {
-                serviceScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-                    log.error("error when starting node: ", e)
-                    updateState(WalletState.Error.Generic(e.localizedMessage ?: e.javaClass.simpleName))
-                    if (isHeadless) {
-                        shutdown()
-                        stopForeground(STOP_FOREGROUND_REMOVE)
-                    }
-                }) {
-                    log.debug("initiating node startup from state=${_state.value?.name} with requestCLC=$requestCheckLegacyChannels")
-                    val state = doStartNode(decryptedPayload, requestCheckLegacyChannels)
-                    updateState(state)
-                }
-            }
+//        try {
+
+
+            log.info("starting node from service state=${_state.value?.name} with checkLegacyChannels=$requestCheckLegacyChannels")
+            doStartBusiness(decryptedMnemonics, requestCheckLegacyChannels)
+            ChannelsWatcher.schedule(applicationContext)
+            _state.postValue(NodeServiceState.Running)
+//        } catch (e: Exception) {
+//            log.error("error when starting node: ", e)
+//            _state.value = NodeServiceState.Error(e)
+//            if (isHeadless) {
+//                shutdown()
+//                stopForeground(STOP_FOREGROUND_REMOVE)
+//            }
+//        }
         }
     }
 
-    @WorkerThread
-    private suspend fun doStartNode(
-        decryptedPayload: ByteArray,
+    private suspend fun doStartBusiness(
+        decryptedMnemonics: ByteArray,
         requestCheckLegacyChannels: Boolean,
-    ): WalletState.Started {
-        log.info("starting up node...")
-
+    ) {
         // migrate legacy preferences if needed
         if (LegacyPrefsDatastore.getPrefsMigrationExpected(applicationContext).first() == true) {
             LegacyMigrationHelper.migrateLegacyPreferences(applicationContext)
             LegacyPrefsDatastore.savePrefsMigrationExpected(applicationContext, false)
         }
 
+        // retrieve preferences before starting business
         val business = (applicationContext as? PhoenixApplication)?.business ?: throw RuntimeException("invalid context type, should be PhoenixApplication")
         val electrumServer = UserPrefs.getElectrumServer(applicationContext).first()
         val isTorEnabled = UserPrefs.getIsTorEnabled(applicationContext).first()
         val liquidityPolicy = UserPrefs.getLiquidityPolicy(applicationContext).first()
         val trustedSwapInTxs = LegacyPrefsDatastore.getMigrationTrustedSwapInTxs(applicationContext).first()
         val preferredFiatCurrency = UserPrefs.getFiatCurrency(applicationContext).first()
-        val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(decryptedPayload))
 
         serviceScope.launch { monitorPaymentsWhenHeadless(business.peerManager, business.currencyManager) }
         serviceScope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager) }
+        serviceScope.launch { monitorFcmToken(business) }
 
+        // preparing business
+        val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(decryptedMnemonics))
         business.walletManager.loadWallet(seed)
+        business.appConfigurationManager.updateElectrumConfig(electrumServer)
         business.appConfigurationManager.updatePreferredFiatCurrencies(
             AppConfigurationManager.PreferredFiatCurrencies(primary = preferredFiatCurrency, others = emptySet())
         )
+
+        // start business
         business.start(
             StartupParams(
                 requestCheckLegacyChannels = requestCheckLegacyChannels,
@@ -254,24 +259,17 @@ class NodeService : Service() {
                 trustedSwapInTxs = trustedSwapInTxs.map { ByteVector32.fromValidHex(it) }.toSet()
             )
         )
-        business.appConfigurationManager.updateElectrumConfig(electrumServer)
+
+        // start the swap-in wallet watcher
         serviceScope.launch {
             business.peerManager.getPeer().startWatchSwapInWallet()
         }
+    }
 
-        serviceScope.launch {
-            val token = InternalData.getFcmToken(applicationContext).first()
-            log.debug("retrieved from prefs fcm token=$token")
-            var hasRegisteredToken = false
-            business.connectionsManager.connections.collect {
-                if (it.peer == Connection.ESTABLISHED && !hasRegisteredToken) {
-                    business.registerFcmToken(token)
-                    hasRegisteredToken = true
-                }
-            }
-        }
-        ChannelsWatcher.schedule(applicationContext)
-        return WalletState.Started.Kmm(business)
+    private suspend fun monitorFcmToken(business: PhoenixBusiness) {
+        val token = internalData.getFcmToken.filterNotNull().first()
+        business.connectionsManager.connections.first { it.peer == Connection.ESTABLISHED }
+        business.registerFcmToken(token)
     }
 
     private suspend fun monitorNodeEvents(peerManager: PeerManager, nodeParamsManager: NodeParamsManager) {
@@ -285,7 +283,7 @@ class NodeService : Service() {
                     log.debug("processing liquidity_event=$event")
                     if (event.source == LiquidityEvents.Source.OnChainWallet) {
                         // Check the last time a rejected on-chain swap notification has been shown. If recent, we do not want to trigger a notification every time.
-                        val lastRejectedSwap = InternalData.getLastRejectedOnchainSwap(applicationContext).first().takeIf {
+                        val lastRejectedSwap = internalData.getLastRejectedOnchainSwap.first().takeIf {
                             // However, if the app started < 2 min ago, we always want to display a notification. So we'll ignore this check ^
                             currentTimestampMillis() - monitoringStartedAt >= 2 * DateUtils.MINUTE_IN_MILLIS
                         }
@@ -296,7 +294,7 @@ class NodeService : Service() {
                             log.debug("ignore this liquidity event as a similar notification was recently displayed")
                             return@collect
                         } else {
-                            InternalData.saveLastRejectedOnchainSwap(applicationContext, event)
+                            internalData.saveLastRejectedOnchainSwap(event)
                         }
                     }
                     when (val reason = event.reason) {
@@ -340,29 +338,6 @@ class NodeService : Service() {
                 }
                 else -> Unit
             }
-        }
-    }
-
-    // =========================================================== //
-    //                 STATE UPDATE & NOTIFICATIONS                //
-    // =========================================================== //
-
-    /**
-     * Update the app mutable [_state] and show a notification if the service is headless.
-     * @param newState The new state of the app.
-     * @param lazy `true` to update with postValue, `false` to commit the state directly. If not lazy, this method MUST be called from the main thread!
-     */
-    @Synchronized
-    private fun updateState(newState: WalletState, lazy: Boolean = true) {
-        log.debug("updating state from {} to {} with headless={}", _state.value?.name, newState.name, isHeadless)
-        if (_state.value != newState) {
-            if (lazy) {
-                _state.postValue(newState)
-            } else {
-                _state.value = newState
-            }
-        } else {
-            log.debug("ignored attempt to update state=${_state.value} to state=$newState")
         }
     }
 

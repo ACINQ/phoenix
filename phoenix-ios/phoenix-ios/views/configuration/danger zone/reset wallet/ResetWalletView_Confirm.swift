@@ -11,7 +11,7 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct ResetWalletView_Confirm: MVISubView, ViewName {
+struct ResetWalletView_Confirm: MVISubView {
 	
 	@ObservedObject var mvi: MVIState<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>
 	
@@ -416,7 +416,7 @@ struct ResetWalletView_Confirm: MVISubView, ViewName {
 	// --------------------------------------------------
 	
 	func deleteWallet() {
-		log.trace("[\(viewName)] deleteWallet()")
+		log.trace("deleteWallet()")
 		
 		if let scene = UIApplication.shared.connectedScenes.first,
 			let sceneDelegate = scene.delegate as? UIWindowSceneDelegate,

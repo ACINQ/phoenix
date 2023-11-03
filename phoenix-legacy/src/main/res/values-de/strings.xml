@@ -111,8 +111,6 @@
   <string name="legacy_receive_min_amount_pay_to_open">
     <![CDATA[Ihre Wallet ist leer. Die erste Zahlung, die Sie erhalten, muss mindestens <b>%1$s</b> betragen.]]>
   </string>
-  <string name="legacy_receive_paytoopen_disabled">Die Erstellung von Kanälen wurde deaktiviert. Möglicherweise können Sie einige Zahlungen nicht erhalten.</string>
-  <string name="legacy_receive_paytoopen_disabled_nochannels">Die Erstellung von Kanälen wurde deaktiviert. Sie werden keine Zahlungen erhalten können.</string>
   <string name="legacy_receive_address_label">Adresse</string>
   <string name="legacy_receive_withdraw_button">Benutze LNURL Link</string>
 

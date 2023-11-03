@@ -51,7 +51,7 @@ import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.security.KeyState
+import fr.acinq.phoenix.android.security.SeedFileState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
@@ -71,7 +71,7 @@ fun RestoreWalletView(
     val context = LocalContext.current
     val vm: InitViewModel = viewModel(factory = InitViewModel.Factory(controllerFactory, CF::initialization))
 
-    val keyState = produceState<KeyState>(initialValue = KeyState.Unknown, true) {
+    val seedFileState = produceState<SeedFileState>(initialValue = SeedFileState.Unknown, true) {
         value = SeedManager.getSeedState(context)
     }
 
@@ -80,8 +80,8 @@ fun RestoreWalletView(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.restore_title),
         )
-        when (keyState.value) {
-            is KeyState.Absent -> {
+        when (seedFileState.value) {
+            is SeedFileState.Absent -> {
                 when (val state = vm.restoreWalletState) {
                     is RestoreWalletViewState.Disclaimer -> {
                         DisclaimerView(onClickNext = { vm.restoreWalletState = RestoreWalletViewState.Restore })
@@ -91,7 +91,7 @@ fun RestoreWalletView(
                     }
                 }
             }
-            KeyState.Unknown -> {
+            SeedFileState.Unknown -> {
                 Text(stringResource(id = R.string.startup_wait))
             }
             else -> {

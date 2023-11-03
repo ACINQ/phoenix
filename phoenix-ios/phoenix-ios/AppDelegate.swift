@@ -138,6 +138,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 				UIApplication.shared.applicationIconBadgeNumber = 0
 			}
 		}.store(in: &groupPrefsCancellables)
+		
+		// We've had reports of the app's badge (number) not getting cleared:
+		// https://github.com/ACINQ/phoenix/issues/451
+		//
+		// The implementation assumes that `GroupPrefs.badgeCount` & `UIApp.applicationIconBadgeNumber`
+		// are always in-sync. But if somehow they get out-of-sync, then the bug would reproduce.
+		// It's not entirely clear how that would happen...
+		// but it's safe to always clear the badge here anyways.
+		//
+		UIApplication.shared.applicationIconBadgeNumber = 0
 	}
 	
 	func _applicationWillResignActive(_ application: UIApplication) {

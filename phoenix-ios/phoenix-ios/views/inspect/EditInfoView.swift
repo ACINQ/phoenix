@@ -14,7 +14,7 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct EditInfoView: View {
 	
-	let type: PaymentViewType
+	let location: PaymentView.Location
 	@Binding var paymentInfo: WalletPaymentInfo
 	
 	let defaultDescText: String
@@ -34,9 +34,9 @@ struct EditInfoView: View {
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	init(type: PaymentViewType, paymentInfo: Binding<WalletPaymentInfo>) {
+	init(location: PaymentView.Location, paymentInfo: Binding<WalletPaymentInfo>) {
 		
-		self.type = type
+		self.location = location
 		_paymentInfo = paymentInfo
 		
 		let pi = paymentInfo.wrappedValue
@@ -68,7 +68,7 @@ struct EditInfoView: View {
 	@ViewBuilder
 	var body: some View {
 		
-		switch type {
+		switch location {
 		case .sheet:
 			main()
 				.navigationTitle(NSLocalizedString("Edit Info", comment: "Navigation bar title"))
@@ -92,7 +92,7 @@ struct EditInfoView: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 		
-			switch type {
+			switch location {
 			case .sheet:
 				HStack(alignment: VerticalAlignment.center, spacing: 0) {
 					saveButton()

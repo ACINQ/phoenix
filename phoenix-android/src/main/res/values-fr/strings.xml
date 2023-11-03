@@ -56,7 +56,7 @@
     <string name="startup_manual_unlock_button">Déverrouiller</string>
     <string name="startup_checking_seed">Déverrouillage…</string>
     <string name="startup_starting">Démarrage…</string>
-    <string name="startup_error_generic">L\'application n\'a pas pu démarrer.\n\nDétails de l\'erreur : %1$s</string>
+    <string name="startup_error_generic">L\'application n\'a pas pu démarrer.</string>
 
     <!-- Switch between legacy/modern apps -->
 

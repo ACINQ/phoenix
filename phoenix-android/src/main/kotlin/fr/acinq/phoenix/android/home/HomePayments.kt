@@ -58,7 +58,7 @@ fun ColumnScope.PaymentsList(
         if (payments.isEmpty()) {
             Text(
                 text = when {
-                    swapInBalance.total > 0.sat -> stringResource(id = R.string.home__payments_none_incoming)
+                    swapInBalance.unconfirmed + swapInBalance.weaklyConfirmed > 0.sat -> stringResource(id = R.string.home__payments_none_incoming)
                     else -> stringResource(id = R.string.home__payments_none)
                 },
                 style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center),
