@@ -183,8 +183,13 @@ struct ReceiveLightningView: View {
 	func mainPortrait() -> some View {
 		
 		VStack {
-			qrCodeWrapperView()
+			
+			Text("Lightning Invoice")
+				.font(.title3)
+				.foregroundColor(Color(UIColor.tertiaryLabel))
 				.padding(.top)
+			
+			qrCodeWrapperView()
 			
 			VStack(alignment: .center) {
 			

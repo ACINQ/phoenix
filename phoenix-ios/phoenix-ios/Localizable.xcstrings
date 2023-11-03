@@ -512,6 +512,7 @@
       }
     },
     "(layer 1)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -528,6 +529,7 @@
       }
     },
     "(layer 2)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2296,6 +2298,7 @@
       }
     },
     "Address" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3741,6 +3744,9 @@
         }
       }
     },
+    "Bitcoin Address" : {
+
+    },
     "Bitcoin mempool is full and fees are high." : {
       "localizations" : {
         "ar" : {
@@ -3955,6 +3961,7 @@
       }
     },
     "Blockchain" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -11020,6 +11027,9 @@
         }
       }
     },
+    "Lightning Invoice" : {
+
+    },
     "Lightning network" : {
       "localizations" : {
         "ar" : {
@@ -17276,6 +17286,7 @@
       }
     },
     "Some Services Disabled" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -17547,6 +17558,7 @@
     },
     "Swap In" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -17842,6 +17854,7 @@
       }
     },
     "The bitcoin mempool is congested and fees are very high. The on-chain swap service has been temporarily disabled." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -19623,6 +19636,7 @@
       }
     },
     "Try again later" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
