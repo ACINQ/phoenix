@@ -184,8 +184,11 @@ fun ReadDataView(
                 onScannedText = onScannedText
             )
             CameraPermissionsView {
-                LaunchedEffect(key1 = model, key2 = initialInput) {
+                DisposableEffect(key1 = model, key2 = initialInput) {
                     if (model is Scan.Model.Ready && initialInput.isNullOrBlank()) scanView?.resume()
+                    onDispose {
+                        scanView?.pause()
+                    }
                 }
             }
         }
