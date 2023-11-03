@@ -21,7 +21,6 @@ import android.Manifest
 import android.content.Intent
 import android.net.*
 import android.provider.*
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -185,7 +184,7 @@ fun ReadDataView(
                 onScannedText = onScannedText
             )
             CameraPermissionsView {
-                DisposableEffect(key1 = model) {
+                DisposableEffect(key1 = model, key2 = initialInput) {
                     if (model is Scan.Model.Ready && initialInput.isNullOrBlank()) scanView?.resume()
                     onDispose {
                         scanView?.pause()
