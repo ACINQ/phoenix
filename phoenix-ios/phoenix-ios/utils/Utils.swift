@@ -58,7 +58,7 @@ class Utils {
 			default/*.bitcoin*/: msat = amount * Millisatoshis_Per_Bitcoin
 		}
 		
-		if let result = Int64(exactly: msat.rounded(.towardZero)) {
+		if let result = Int64(exactly: msat.rounded(.toNearestOrAwayFromZero)) {
 			return result
 		} else {
 			return (msat > 0) ? Int64.max : Int64.min
