@@ -42,9 +42,6 @@ struct HomeView : MVIView {
 	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 	
-	let swapInRejectedPublisher = Biz.swapInRejectedPublisher
-	@State var swapInRejected: Lightning_kmpLiquidityEventsRejected? = nil
-	
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
 	@State var incomingSwapAnimationsRemaining = 0
@@ -122,9 +119,6 @@ struct HomeView : MVIView {
 		}
 		.onReceive(swapInWalletPublisher) {
 			swapInWalletChanged($0)
-		}
-		.onReceive(swapInRejectedPublisher) {
-			swapInRejectedStateChange($0)
 		}
 		.onReceive(bizNotificationsPublisher) {
 			bizNotificationsChanged($0)
@@ -279,14 +273,21 @@ struct HomeView : MVIView {
 				? Utils.hiddenAmount(currencyPrefs)
 				: Utils.format(currencyPrefs, sat: incomingSat)
 			
+			let unconfirmedBalance = swapInWallet.unconfirmedBalance.sat
+			let weaklyConfirmedBalance = swapInWallet.weaklyConfirmedBalance.sat
+			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
-				if swapInRejected != nil {
-					Image(systemName: "zzz")
+				if let _ = swapInWallet.expirationWarningInDays() { // less than 30 days away
+					Image(systemName: "exclamationmark.triangle")
 						.foregroundColor(.appNegative)
 						.padding(.trailing, 2)
+				} else if unconfirmedBalance == 0 && weaklyConfirmedBalance == 0 {
+					Image(systemName: "zzz")
+						.foregroundColor(.appWarn)
+						.padding(.trailing, 2)
 				} else {
-					Image(systemName: "link")
+					Image(systemName: "clock")
 						.padding(.trailing, 2)
 				}
 				
@@ -742,12 +743,6 @@ struct HomeView : MVIView {
 			// So let's add a little animation to draw the user's attention to it.
 			startAnimatingIncomingSwapText()
 		}
-	}
-	
-	func swapInRejectedStateChange(_ state: Lightning_kmpLiquidityEventsRejected?) {
-		log.trace("swapInRejectedStateChange()")
-		
-		swapInRejected = state
 	}
 	
 	func bizNotificationsChanged(_ list: [PhoenixShared.NotificationsManager.NotificationItem]) {
