@@ -92,7 +92,7 @@ struct MainView_Small: View {
 				.navigationBarHidden(true)
 		}
 		.sheet(isPresented: $showingMergeChannelsView) {
-			MergeChannelsView(type: .sheet)
+			MergeChannelsView(location: .sheet)
 		}
 	}
 	
@@ -502,7 +502,7 @@ struct MainView_Small: View {
 			case .ConfigurationView   : ConfigurationView()
 			case .TransactionsView    : TransactionsView()
 			case .ReceiveView         : ReceiveView()
-			case .SendView            : SendView(controller: externalLightningRequest)
+			case .SendView            : SendView(location: .MainView, controller: externalLightningRequest)
 			case .CurrencyConverter   : CurrencyConverterView()
 			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded, popTo: popTo)
 		}
@@ -540,6 +540,7 @@ struct MainView_Small: View {
 				case .backgroundPayments : newNavLinkTag = .ConfigurationView ; delay *= 3
 				case .liquiditySettings  : newNavLinkTag = .ConfigurationView ; delay *= 3
 				case .forceCloseChannels : newNavLinkTag = .ConfigurationView ; delay *= 2
+				case .swapInWallet       : newNavLinkTag = .ConfigurationView ; delay *= 2
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {

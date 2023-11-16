@@ -55,7 +55,7 @@
     <string name="startup_wait_legacy_check">Überprüfe Legacy-Wallet…</string>
     <string name="startup_checking_seed">Entsperren…</string>
     <string name="startup_starting">Starten…</string>
-    <string name="startup_error_generic">Die App konnte nicht gestartet werden.\n\nFehler-Details: %1$s</string>
+    <string name="startup_error_generic">Die App konnte nicht gestartet werden.</string>
 
     <!-- Switch between legacy/modern apps -->
 

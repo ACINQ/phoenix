@@ -247,7 +247,6 @@ class ReceiveFragment : BaseFragment() {
     }) {
       val channels = app.requireService.getChannels().filter { it.state() is `NORMAL$` || it.state() is `WAIT_FOR_FUNDING_CONFIRMED$` || it.state() is `OFFLINE$` }
       model.showMinFundingPayToOpen.postValue(channels.isEmpty() && swapInSettings.minFunding.`$greater`(Satoshi(0)))
-      model.payToOpenDisabled.postValue(payToOpenSettings.status is ServiceStatus.Disabled)
 
       launch(Dispatchers.Main) {
         val prettyPayToOpenMinFunding = Converter.printAmountPretty(payToOpenSettings.minFunding, context, withUnit = true)
@@ -257,13 +256,6 @@ class ReceiveFragment : BaseFragment() {
 
         mBinding.swapInInfo.text = Converter.html(getString(R.string.legacy_receive_swap_in_info, prettySwapInMinFunding, prettySwapInPercentFee, prettySwapInMinFee))
         mBinding.minFundingPayToOpen.text = Converter.html(getString(R.string.legacy_receive_min_amount_pay_to_open, prettyPayToOpenMinFunding))
-        if (payToOpenSettings.status is ServiceStatus.Disabled) {
-          if (channels.isEmpty()) {
-            mBinding.payToOpenDisabledMessage.text = getString(R.string.legacy_receive_paytoopen_disabled_nochannels)
-          } else {
-            mBinding.payToOpenDisabledMessage.text = getString(R.string.legacy_receive_paytoopen_disabled)
-          }
-        }
       }
     }
   }

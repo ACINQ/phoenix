@@ -23,6 +23,7 @@ struct ReceiveLightningView: View {
 	@ObservedObject var toast: Toast
 	
 	@Binding var didAppear: Bool
+	@Binding var showSendView: Bool
 	
 	@StateObject var qrCode = QRCode()
 
@@ -182,20 +183,13 @@ struct ReceiveLightningView: View {
 	func mainPortrait() -> some View {
 		
 		VStack {
-			qrCodeView()
-				.frame(width: 200, height: 200)
-				.padding(.all, 20)
-				.background(Color.white)
-				.cornerRadius(20)
-				.overlay(
-					RoundedRectangle(cornerRadius: 20)
-						.strokeBorder(
-							ReceiveView.qrCodeBorderColor(colorScheme),
-							lineWidth: 1
-						)
-				)
-				.matchedGeometryEffect(id: "qrCodeView_outer", in: qrCodeAnimation_outer)
+			
+			Text("Lightning Invoice")
+				.font(.title3)
+				.foregroundColor(Color(UIColor.tertiaryLabel))
 				.padding(.top)
+			
+			qrCodeWrapperView()
 			
 			VStack(alignment: .center) {
 			
@@ -220,8 +214,16 @@ struct ReceiveLightningView: View {
 			}
 			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			
-			backgroundPaymentsDisabledWarning()
-			inboundFeeWarnings()
+			scanWithdrawButton()
+				.padding([.top, .bottom])
+				.padding(.top, 5) // a little extra
+			
+			if notificationPermissions == .disabled {
+				backgroundPaymentsDisabledWarning()
+			}
+			if let warning = inboundFeeWarning() {
+				inboundFeeInfo(warning)
+			}
 			
 			Spacer()
 			
@@ -233,19 +235,7 @@ struct ReceiveLightningView: View {
 		
 		HStack {
 			
-			qrCodeView()
-				.frame(width: 200, height: 200)
-				.padding(.all, 20)
-				.background(Color.white)
-				.cornerRadius(20)
-				.overlay(
-					RoundedRectangle(cornerRadius: 20)
-						.strokeBorder(
-							ReceiveView.qrCodeBorderColor(colorScheme),
-							lineWidth: 1
-						)
-				)
-				.matchedGeometryEffect(id: "qrCodeView_outer", in: qrCodeAnimation_outer)
+			qrCodeWrapperView()
 				.padding([.top, .bottom])
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 20) {
@@ -270,8 +260,17 @@ struct ReceiveLightningView: View {
 					.font(.footnote)
 					.foregroundColor(.secondary)
 				
-				backgroundPaymentsDisabledWarning(paddingTop: 8)
-				inboundFeeWarnings(paddingTop: 8)
+				scanWithdrawButton()
+					.padding(.top, 8)
+				
+				if notificationPermissions == .disabled {
+					backgroundPaymentsDisabledWarning()
+						.padding(.top, 8)
+				}
+				if let warning = inboundFeeWarning() {
+					inboundFeeInfo(warning)
+						.padding(.top, 8)
+				}
 				
 				Spacer()
 			}
@@ -318,6 +317,24 @@ struct ReceiveLightningView: View {
 				Spacer()
 			}
 		}
+	}
+	
+	@ViewBuilder
+	func qrCodeWrapperView() -> some View {
+		
+		qrCodeView()
+			.frame(width: 200, height: 200)
+			.padding(.all, 20)
+			.background(Color.white)
+			.cornerRadius(20)
+			.overlay(
+				RoundedRectangle(cornerRadius: 20)
+					.strokeBorder(
+						ReceiveView.qrCodeBorderColor(colorScheme),
+						lineWidth: 1
+					)
+			)
+			.matchedGeometryEffect(id: "qrCodeView_outer", in: qrCodeAnimation_outer)
 	}
 	
 	@ViewBuilder
@@ -522,59 +539,65 @@ struct ReceiveLightningView: View {
 	}
 	
 	@ViewBuilder
-	func backgroundPaymentsDisabledWarning(paddingTop: CGFloat? = nil) -> some View {
+	func scanWithdrawButton() -> some View {
 		
-		if notificationPermissions == .disabled {
-			
-			// The user has disabled "background payments"
-			
-			Button {
-				navigationToBackgroundPayments()
-			} label: {
-				Label {
-					Text("Background payments disabled")
-				} icon: {
-					Image(systemName: "exclamationmark.triangle")
-						.renderingMode(.template)
-				}
-				.foregroundColor(.appNegative)
+		Button {
+			withAnimation {
+				showSendView = true
 			}
-			.padding(.top, paddingTop)
-			.accessibilityLabel("Warning: background payments disabled")
-			.accessibilityHint("Tap for more info")
+		} label: {
+			Label {
+				Text("Scan withdraw")
+			} icon: {
+				Image(systemName: "qrcode.viewfinder")
+			}
 		}
 	}
 	
 	@ViewBuilder
-	func inboundFeeWarnings(paddingTop: CGFloat? = nil) -> some View {
+	func backgroundPaymentsDisabledWarning() -> some View {
 		
+		// The user has disabled "background payments"
+		Button {
+			navigationToBackgroundPayments()
+		} label: {
+			Label {
+				Text("Background payments disabled")
+			} icon: {
+				Image(systemName: "exclamationmark.triangle")
+					.renderingMode(.template)
+			}
+			.foregroundColor(.appNegative)
+		}
+		.accessibilityLabel("Warning: background payments disabled")
+		.accessibilityHint("Tap for more info")
+	}
+	
+	@ViewBuilder
+	func inboundFeeInfo(_ warning: InboundFeeWarning) -> some View {
 		
-		if let warning = inboundFeeWarning() {
+		VStack(alignment: HorizontalAlignment.center, spacing: 10) {
+			Label {
+				Text(warning.title)
+			} icon: {
+				Image(systemName: "info.circle").foregroundColor(.appAccent)
+			}
+			.font(.headline)
 			
-			VStack(alignment: HorizontalAlignment.center, spacing: 10) {
-				Label {
-					Text(warning.title)
-				} icon: {
-					Image(systemName: "info.circle").foregroundColor(.appAccent)
-				}
-				.font(.headline)
-				
-				Text(warning.message)
-					.multilineTextAlignment(.center)
-					.font(.callout)
-				
-				if warning.showButton {
-					Button {
-						navigateToLiquiditySettings()
-					} label: {
-						Text("Check fee settings")
-							.font(.callout)
-					}
+			Text(warning.message)
+				.multilineTextAlignment(.center)
+				.font(.callout)
+			
+			if warning.showButton {
+				Button {
+					navigateToLiquiditySettings()
+				} label: {
+					Text("Check fee settings")
+						.font(.callout)
 				}
 			}
-			.padding(.horizontal)
-			.padding(.top, paddingTop)
 		}
+		.padding(.horizontal)
 	}
 	
 	@ViewBuilder

@@ -512,6 +512,7 @@
       }
     },
     "(layer 1)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -528,6 +529,7 @@
       }
     },
     "(layer 2)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1986,6 +1988,9 @@
         }
       }
     },
+    "A deposit will expire soon." : {
+
+    },
     "A fee of %@ (≈ %@) may be needed to receive this payment." : {
       "localizations" : {
         "cs" : {
@@ -2293,6 +2298,7 @@
       }
     },
     "Address" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2858,6 +2864,7 @@
       }
     },
     "An on-chain wallet derived from your seed.\n\nThe swap-in wallet is a bridge to Lightning. Funds on this wallet will automatically be moved to Lightning according to your liquidity policy setting." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2872,6 +2879,9 @@
           }
         }
       }
+    },
+    "An unknown error has occurred." : {
+
     },
     "An unknown error occurred." : {
       "comment" : "error details",
@@ -3389,7 +3399,11 @@
         }
       }
     },
+    "Background payments disabled." : {
+
+    },
     "Background payments disabled. " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3730,6 +3744,9 @@
         }
       }
     },
+    "Bitcoin Address" : {
+
+    },
     "Bitcoin mempool is full and fees are high." : {
       "localizations" : {
         "ar" : {
@@ -3944,6 +3961,7 @@
       }
     },
     "Blockchain" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4184,6 +4202,9 @@
           }
         }
       }
+    },
+    "Cancelled Funds" : {
+
     },
     "capacity" : {
       "localizations" : {
@@ -4466,6 +4487,7 @@
       }
     },
     "Check it " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -5610,7 +5632,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Controlar las tarifas en cadena"
+            "value" : "Control de las tarifas en cadena"
           }
         },
         "fr" : {
@@ -6245,6 +6267,12 @@
           }
         }
       }
+    },
+    "Data could not be decrypted by this wallet." : {
+
+    },
+    "Data is malformed. An encrypted hex blob is expected." : {
+
     },
     "Decrease value" : {
       "localizations" : {
@@ -7730,6 +7758,7 @@
       }
     },
     "Error: invalid hash" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8489,6 +8518,7 @@
       }
     },
     "Fix " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -8839,6 +8869,9 @@
           }
         }
       }
+    },
+    "Funds not swapped **after 4 months** are recoverable on-chain" : {
+
     },
     "Funds sent" : {
       "localizations" : {
@@ -9816,6 +9849,15 @@
         }
       }
     },
+    "Import channels" : {
+      "comment" : "Navigation bar title"
+    },
+    "Import has failed" : {
+
+    },
+    "Import successful" : {
+
+    },
     "Important messages" : {
       "localizations" : {
         "cs" : {
@@ -9837,6 +9879,9 @@
           }
         }
       }
+    },
+    "Importing data…" : {
+
     },
     "In order to receive this payment, a new payment channel was opened. This is not always required." : {
       "comment" : "Fees explanation",
@@ -10606,7 +10651,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "saber cuándo pueden ocurrir cargos"
+            "value" : "para saber cuándo pueden ocurrir cargos"
           }
         },
         "fr" : {
@@ -10618,6 +10663,7 @@
       }
     },
     "Last Attempt" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -10632,6 +10678,9 @@
           }
         }
       }
+    },
+    "Last attempt failed" : {
+
     },
     "layer 1 -> 2" : {
       "comment" : "Transaction Info: Explanation",
@@ -10752,6 +10801,7 @@
       }
     },
     "Let's go " : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10976,6 +11026,9 @@
           }
         }
       }
+    },
+    "Lightning Invoice" : {
+
     },
     "Lightning network" : {
       "localizations" : {
@@ -12045,6 +12098,7 @@
       }
     },
     "More info " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -13068,6 +13122,9 @@
           }
         }
       }
+    },
+    "Paste encrypted data blob here" : {
+
     },
     "Paste from clipboard" : {
       "localizations" : {
@@ -15690,6 +15747,9 @@
         }
       }
     },
+    "Scan withdraw" : {
+
+    },
     "Security" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -15720,6 +15780,7 @@
       }
     },
     "See how Phoenix is affected" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15925,6 +15986,9 @@
           }
         }
       }
+    },
+    "Send Money" : {
+
     },
     "Send payment" : {
       "localizations" : {
@@ -17222,6 +17286,7 @@
       }
     },
     "Some Services Disabled" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -17493,6 +17558,7 @@
     },
     "Swap In" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -17788,6 +17854,7 @@
       }
     },
     "The bitcoin mempool is congested and fees are very high. The on-chain swap service has been temporarily disabled." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18406,6 +18473,9 @@
         }
       }
     },
+    "The swap-in wallet is a bridge to Lightning. Funds on this wallet will automatically be moved to Lightning according to your liquidity policy setting." : {
+
+    },
     "The transaction may take 30 minutes or more to confirm on the bitcoin blockchain" : {
       "localizations" : {
         "es" : {
@@ -18475,6 +18545,15 @@
           }
         }
       }
+    },
+    "These funds were not swapped in time. Use the wallet's descriptor to access them." : {
+
+    },
+    "These funds will be available from %lld days onwards." : {
+
+    },
+    "These funds will be available from 1 day onwards." : {
+
     },
     "This address is derived from your seed and belongs to you." : {
       "localizations" : {
@@ -18716,6 +18795,9 @@
         }
       }
     },
+    "This is not a withdraw request. Do you want to **send money** to somebody?" : {
+
+    },
     "This is your new address. Do not reuse your old Bitcoin address from before migration." : {
       "localizations" : {
         "cs" : {
@@ -18796,6 +18878,9 @@
         }
       }
     },
+    "This screen is a debugging tool that can be used to manually import encrypted channels data.\n\nUse with caution." : {
+
+    },
     "This seed is invalid and cannot be imported.\n\nPlease try again" : {
       "localizations" : {
         "ar" : {
@@ -18823,6 +18908,12 @@
           }
         }
       }
+    },
+    "This swap will expire in %lld days" : {
+
+    },
+    "This swap will expire in 1 day" : {
+
     },
     "This will reset the app, as if you had just installed it." : {
       "localizations" : {
@@ -18883,6 +18974,9 @@
           }
         }
       }
+    },
+    "Timed-Out Funds" : {
+
     },
     "timestamp" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -19542,6 +19636,7 @@
       }
     },
     "Try again later" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20274,6 +20369,9 @@
         }
       }
     },
+    "Version %d is not supported" : {
+
+    },
     "via" : {
       "comment" : "Label in DetailsView_IncomingPayment",
       "localizations" : {
@@ -20778,7 +20876,11 @@
         }
       }
     },
+    "Watchtower disabled." : {
+
+    },
     "Watchtower disabled. " : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -21689,6 +21791,9 @@
           }
         }
       }
+    },
+    "You must now restart Phoenix." : {
+
     },
     "You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments. You can use a third-party service to make the offchain->onchain swap." : {
       "comment" : "Error message - scanning lightning invoice",

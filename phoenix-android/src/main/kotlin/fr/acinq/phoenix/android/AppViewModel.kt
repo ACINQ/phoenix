@@ -20,18 +20,22 @@ package fr.acinq.phoenix.android
 import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.IBinder
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.phoenix.android.service.NodeService
-import fr.acinq.phoenix.android.service.WalletState
+import fr.acinq.phoenix.android.service.NodeServiceState
+import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import org.slf4j.LoggerFactory
 
-class AppViewModel() : ViewModel() {
+class AppViewModel(
+    private val internalDataRepository: InternalDataRepository
+) : ViewModel() {
     val log = LoggerFactory.getLogger(AppViewModel::class.java)
 
     /** Monitoring the state of the service - null if the service is disconnected. */
@@ -54,30 +58,43 @@ class AppViewModel() : ViewModel() {
     }
 
     /** Mirrors the node state using a MediatorLiveData. A LiveData object is used because this object can be used outside of compose. */
-    val walletState = WalletStateLiveData(_service)
+    val serviceState = ServiceStateLiveData(_service)
 
-    /** Tells if the UI is locked with biometrics. */
-    var lockState by mutableStateOf<LockState>(LockState.Locked.Default)
+    val isScreenLocked = mutableStateOf(true)
+
+    fun saveIsScreenLocked(isLocked: Boolean) {
+        isScreenLocked.value = isLocked
+    }
 
     override fun onCleared() {
         super.onCleared()
         service?.shutdown()
         log.debug("AppViewModel has been cleared")
     }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+                val application = checkNotNull(extras[APPLICATION_KEY] as? PhoenixApplication)
+                return AppViewModel(application.internalDataRepository) as T
+            }
+        }
+    }
 }
 
-class WalletStateLiveData(service: MutableLiveData<NodeService?>) : MediatorLiveData<WalletState>() {
+class ServiceStateLiveData(service: MutableLiveData<NodeService?>) : MediatorLiveData<NodeServiceState>() {
     private val log = LoggerFactory.getLogger(this::class.java)
-    private var serviceState: LiveData<WalletState>? = null
+    private var serviceState: LiveData<NodeServiceState>? = null
 
     init {
-        value = service.value?.state?.value ?: WalletState.Disconnected
+        value = service.value?.state?.value ?: NodeServiceState.Disconnected
         addSource(service) { s ->
             if (s == null) {
                 log.debug("lost service, force state to Disconnected and remove source")
                 serviceState?.let { removeSource(it) }
                 serviceState = null
-                value = WalletState.Disconnected
+                value = NodeServiceState.Disconnected
             } else {
                 log.debug("service connected, now mirroring service's internal state")
                 serviceState = s.state

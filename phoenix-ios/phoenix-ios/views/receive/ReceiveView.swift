@@ -11,11 +11,6 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-enum SelectedTab {
-	case lightning
-	case blockchain
-}
-
 struct ReceiveView: MVIView {
 	
 	@StateObject var mvi = MVIState({ $0.receive() })
@@ -23,23 +18,17 @@ struct ReceiveView: MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
-	@State var selectedTab: SelectedTab = .lightning
+	enum Tab: Int, CaseIterable, Identifiable {
+		case lightning = 0
+		case blockchain = 1
+
+		var id: Self { self }
+	}
 	
-	@State var lastDescription: String? = nil
-	@State var lastAmount: Lightning_kmpMilliSatoshi? = nil
+	@State var selectedTab: Tab = .lightning
 	
 	@State var receiveLightningView_didAppear = false
-	
-	@State var swapIn_enabled = true
-	
-	enum TabBarButtonHeight: Preference {}
-	let tabBarButtonHeightReader = GeometryPreferenceReader(
-		key: AppendValue<TabBarButtonHeight>.self,
-		value: { [$0.size.height] }
-	)
-	@State var tabBarButtonHeight: CGFloat? = nil
-	
-	@State var truncationDetection_standard: [DynamicTypeSize: Bool] = [:]
+	@State var showSendView = false
 	
 	@StateObject var toast = Toast()
 	
@@ -60,7 +49,7 @@ struct ReceiveView: MVIView {
 			
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
-			
+
 			if BusinessManager.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
@@ -68,12 +57,33 @@ struct ReceiveView: MVIView {
 					.accessibilityHidden(true)
 			}
 			
-			customTabView()
-			
+			content()
 			toast.view()
-		}
-		.onChange(of: mvi.model) { newModel in
-			onModelChange(model: newModel)
+			
+		} // </ZStack>
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
+		if showSendView {
+			SendView(location: .ReceiveView)
+				.zIndex(5) // needed for proper animation
+				.transition(
+					.asymmetric(
+						insertion: .move(edge: .bottom),
+						removal: .move(edge: .bottom)
+					)
+				)
+		} else {
+			customTabView()
+				.zIndex(4) // needed for proper animation
+				.transition(
+					.asymmetric(
+						insertion: .identity,
+						removal: .opacity
+					)
+				)
 		}
 	}
 	
@@ -81,156 +91,108 @@ struct ReceiveView: MVIView {
 	func customTabView() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			
-			switch selectedTab {
-			case .lightning:
+		
+			TabView(selection: $selectedTab) {
+				
 				ReceiveLightningView(
 					mvi: mvi,
 					toast: toast,
-					didAppear: $receiveLightningView_didAppear
+					didAppear: $receiveLightningView_didAppear,
+					showSendView: $showSendView
 				)
+				.tag(Tab.lightning)
 				
-			case .blockchain:
 				SwapInView(
-					mvi: mvi,
-					toast: toast,
-					lastDescription: $lastDescription,
-					lastAmount: $lastAmount
+					toast: toast
 				)
+				.tag(Tab.blockchain)
 			}
+			.tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
 			
-			customTabBar()
-				.padding(.top, 20)
-				.padding(.bottom, deviceInfo.isFaceID ? 10 : 20)
-				.background(
-					Color.mutedBackground
-						.cornerRadius(15, corners: [.topLeft, .topRight])
-						.edgesIgnoringSafeArea([.horizontal, .bottom])
-				)
+			customTabViewStyle()
 			
 		} // </VStack>
 	}
 	
 	@ViewBuilder
-	func customTabBar() -> some View {
+	func customTabViewStyle() -> some View {
 		
-		let dts = dynamicTypeSize
-		let truncationDetected_standard = truncationDetection_standard[dts] ?? false
-		
-		Group {
-			if truncationDetected_standard {
-				customTabBar_accessibility(dts)
-			} else {
-				customTabBar_standard(dts)
-			}
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			customTabViewStyle_IconsRow()
 		}
-		.clipped() // SwiftUI force-extends height of button to bottom of screen for some odd reason
-		.assignMaxPreference(for: tabBarButtonHeightReader.key, to: $tabBarButtonHeight)
+		.padding(.horizontal)
+		.padding(.top, 20)
+		.padding(.bottom, deviceInfo.isFaceID ? 10 : 20)
+		.background(
+			Color.mutedBackground
+				.cornerRadius(15, corners: [.topLeft, .topRight])
+				.edgesIgnoringSafeArea([.horizontal, .bottom])
+		)
 	}
 	
 	@ViewBuilder
-	func customTabBar_standard(_ dts: DynamicTypeSize) -> some View {
+	func customTabViewStyle_IconsRow() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
-			Spacer(minLength: 2)
+			Button {
+				moveToPreviousTab()
+			} label: {
+				Image(systemName: "chevron.backward")
+			}
+			.disabled(selectedTab == Tab.lightning)
+			
+			Spacer()
+			customTabViewStyle_Icons()
+			Spacer()
 			
 			Button {
-				didSelectTab(.lightning)
+				moveToNextTab()
 			} label: {
-				HStack(alignment: VerticalAlignment.center, spacing: 4) {
-					Image(systemName: "bolt").font(.title2).imageScale(.large)
-					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-						VStack(alignment: HorizontalAlignment.center, spacing: 4) {
-							Text("Lightning")
-							Text("(layer 2)").font(.footnote.weight(.thin)).opacity(0.7)
-						}
-						.lineLimit(1)
-						.minimumScaleFactor(0.9)
-					} wasTruncated: {
-						log.debug("truncationDetected_standard[\(dts)] = true")
-						self.truncationDetection_standard[dts] = true
-					}
-				}
+				Image(systemName: "chevron.forward")
 			}
-			.foregroundColor(selectedTab == .lightning ? Color.appAccent : Color.primary)
-			.read(tabBarButtonHeightReader)
-			
-			Spacer(minLength: 2)
-			if let tabBarButtonHeight {
-				Divider().frame(width: 1, height: tabBarButtonHeight).background(Color.borderColor)
-				Spacer(minLength: 2)
-			}
-			
-			Button {
-				didSelectTab(.blockchain)
-			} label: {
-				HStack(alignment: VerticalAlignment.center, spacing: 4) {
-					Image(systemName: "link").font(.title2).imageScale(.large)
-					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-						VStack(alignment: HorizontalAlignment.center, spacing: 4) {
-							Text("Blockchain")
-							Text("(layer 1)").font(.footnote.weight(.thin)).opacity(0.7)
-						}
-						.lineLimit(1)
-						.minimumScaleFactor(0.9)
-					} wasTruncated: {
-						log.debug("truncationDetected_standard[\(dts)] = true")
-						self.truncationDetection_standard[dts] = true
-					}
-				}
-			}
-			.foregroundColor(selectedTab == .blockchain ? Color.appAccent : Color.primary)
-			.read(tabBarButtonHeightReader)
-			
-			Spacer(minLength: 2)
+			.disabled(selectedTab == Tab.blockchain)
 			
 		} // </HStack>
 	}
 	
 	@ViewBuilder
-	func customTabBar_accessibility(_ dts: DynamicTypeSize) -> some View {
+	func customTabViewStyle_Icons() -> some View {
 		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			
-			Spacer(minLength: 0)
-			
-			Button {
-				didSelectTab(.lightning)
-			} label: {
-				VStack(alignment: HorizontalAlignment.center, spacing: 4) {
-					Image(systemName: "bolt").font(.title2).imageScale(.large)
-					Text("Lightning")
-					Text("(layer 2)").font(.footnote.weight(.thin)).opacity(0.7)
-				}
-				.lineLimit(1)
-				.minimumScaleFactor(0.5)
-			}
-			.foregroundColor(selectedTab == .lightning ? Color.appAccent : Color.primary)
-			.read(tabBarButtonHeightReader)
-			
-			Spacer(minLength: 0)
-			if let tabBarButtonHeight {
-				Divider().frame(width: 1, height: tabBarButtonHeight).background(Color.borderColor)
-				Spacer(minLength: 0)
-			}
-			
-			Button {
-				didSelectTab(.blockchain)
-			} label: {
-				VStack(alignment: HorizontalAlignment.center, spacing: 4) {
-					Image(systemName: "link").font(.title2).imageScale(.large)
-					Text("Blockchain")
-					Text("(layer 1)").font(.footnote.weight(.thin)).opacity(0.7)
-				}
-				.lineLimit(1)
-				.minimumScaleFactor(0.5)
-			}
-			.foregroundColor(selectedTab == .blockchain ? Color.appAccent : Color.primary)
-			.read(tabBarButtonHeightReader)
-			
-			Spacer(minLength: 0)
-			
+		HStack(alignment: VerticalAlignment.center, spacing: 15) {
+			ForEach(Tab.allCases) { tab in
+				
+				let isSelected = (tab == selectedTab)
+				let imageSize: CGFloat = isSelected ? 30 : 15
+				let imageColor: Color = isSelected ? Color.primary : Color.secondary
+				
+				switch tab {
+				case .lightning:
+					Button {
+						selectTabWithAnimation(tab)
+					} label: {
+						Image(systemName: "bolt")
+							.resizable()
+							.scaledToFill()
+							.frame(width: imageSize, height: imageSize)
+							.foregroundColor(imageColor)
+					}
+					.disabled(isSelected)
+					
+				case .blockchain:
+					Button {
+						selectTabWithAnimation(tab)
+					} label: {
+						Image(systemName: "link")
+							.resizable()
+							.scaledToFill()
+							.frame(width: imageSize, height: imageSize)
+							.foregroundColor(imageColor)
+					}
+					.disabled(isSelected)
+					
+				} // </switch tab>
+			} // </ForEach>
 		} // </HStack>
 	}
 	
@@ -238,36 +200,30 @@ struct ReceiveView: MVIView {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func onModelChange(model: Receive.Model) -> Void {
-		log.trace("onModelChange()")
+	func moveToPreviousTab() {
+		log.trace("moveToPreviousTab()")
 		
-		if let m = model as? Receive.Model_Generated {
-			lastDescription = m.desc
-			lastAmount = m.amount
+		switch selectedTab {
+			case Tab.lightning  : break
+			case Tab.blockchain : selectTabWithAnimation(.lightning)
 		}
 	}
 	
-	func didSelectTab(_ tab: SelectedTab) {
+	func moveToNextTab() {
+		log.trace("moveToNextTab()")
 		
-		switch tab {
-		case .lightning:
-			mvi.intent(Receive.IntentAsk(
-				amount: lastAmount,
-				desc: lastDescription,
-				expirySeconds: Prefs.shared.invoiceExpirationSeconds
-			))
-			
-		case .blockchain:
-			if swapIn_enabled {
-				mvi.intent(Receive.IntentRequestSwapIn())
-			} else {
-				popoverState.display(dismissable: true) {
-					SwapInDisabledPopover()
-				}
-			}
+		switch selectedTab {
+			case Tab.lightning  : selectTabWithAnimation(.blockchain)
+			case Tab.blockchain : break
 		}
+	}
+	
+	func selectTabWithAnimation(_ tab: Tab) {
 		
-		selectedTab = tab
+		withAnimation {
+			selectedTab = tab
+			UIAccessibility.post(notification: .screenChanged, argument: nil)
+		}
 	}
 	
 	// --------------------------------------------------

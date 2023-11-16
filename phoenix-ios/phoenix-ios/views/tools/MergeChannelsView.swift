@@ -12,14 +12,14 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-enum MergeChannelsViewType {
-	case standalone
-	case sheet
-}
-
 struct MergeChannelsView: View {
 	
-	let type: MergeChannelsViewType
+	enum Location {
+		case standalone
+		case sheet
+	}
+	
+	let location: Location
 	
 	@State var selectedPage = 0
 	
@@ -609,7 +609,7 @@ struct MergeChannelsView: View {
 		log.trace("closeView()")
 		
 		Prefs.shared.hasMergedChannelsForSplicing = true
-		if type == .sheet {
+		if location == .sheet {
 			presentationMode.wrappedValue.dismiss()
 		}
 	}

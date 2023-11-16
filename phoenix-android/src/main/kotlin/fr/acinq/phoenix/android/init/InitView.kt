@@ -80,7 +80,7 @@ sealed class WritingSeedState {
     data class Error(val e: Throwable) : WritingSeedState()
 }
 
-internal class InitViewModel(controller: InitializationController) : MVIControllerViewModel<Initialization.Model, Initialization.Intent>(controller) {
+class InitViewModel(controller: InitializationController) : MVIControllerViewModel<Initialization.Model, Initialization.Intent>(controller) {
 
     /** State of the view */
     var writingState by mutableStateOf<WritingSeedState>(WritingSeedState.Init)

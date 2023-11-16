@@ -271,23 +271,6 @@
           app:layout_goneMarginTop="@dimen/space_md" />
 
         <TextView
-          android:id="@+id/pay_to_open_disabled_message"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_lg"
-          android:layout_marginTop="@dimen/space_md_p"
-          android:layout_marginEnd="@dimen/space_lg"
-          android:textAlignment="center"
-          android:textSize="@dimen/text_md"
-          android:text="@string/legacy_receive_paytoopen_disabled"
-          android:visibility="@{model.payToOpenDisabled}"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/raw_invoice"
-          app:layout_constraintWidth_max="@dimen/max_width_sm"
-          app:layout_goneMarginTop="@dimen/space_md" />
-
-        <TextView
           android:id="@+id/min_funding_pay_to_open"
           android:layout_width="0dp"
           android:layout_height="wrap_content"
@@ -300,7 +283,7 @@
           android:visibility="@{model.state == PaymentGenerationState.DONE &amp;&amp; model.showMinFundingPayToOpen}"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/pay_to_open_disabled_message"
+          app:layout_constraintTop_toBottomOf="@id/raw_invoice"
           app:layout_constraintWidth_max="@dimen/max_width_sm"
           app:layout_goneMarginTop="@dimen/space_md" />
 

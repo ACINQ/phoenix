@@ -13,12 +13,12 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct SwapInWalletDetails: View {
 	
-	enum ViewLocation {
+	enum Location {
 		case popover
 		case embedded
 	}
 	
-	let location: ViewLocation
+	let location: Location
 	let popTo: (PopToDestination) -> Void
 	
 	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy
@@ -29,24 +29,7 @@ struct SwapInWalletDetails: View {
 	let swapInRejectedPublisher = Biz.swapInRejectedPublisher
 	@State var swapInRejected: Lightning_kmpLiquidityEventsRejected? = nil
 	
-	let bizNotificationsPublisher = Biz.business.notificationsManager.notificationsPublisher()
-	@State var bizNotifications: [PhoenixShared.NotificationsManager.NotificationItem] = []
-	
 	@State var blockchainExplorerTxid: String? = nil
-	
-	enum NavBarButtonWidth: Preference {}
-	let navBarButtonWidthReader = GeometryPreferenceReader(
-		key: AppendValue<NavBarButtonWidth>.self,
-		value: { [$0.size.width] }
-	)
-	@State var navBarButtonWidth: CGFloat? = nil
-	
-	enum IconWidth: Preference {}
-	let iconWidthReader = GeometryPreferenceReader(
-		key: AppendValue<IconWidth>.self,
-		value: { [$0.size.width] }
-	)
-	@State var iconWidth: CGFloat? = nil
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -67,6 +50,7 @@ struct SwapInWalletDetails: View {
 		}
 		.navigationTitle(NSLocalizedString("Swap-in wallet", comment: "Navigation Bar Title"))
 		.navigationBarTitleDisplayMode(.inline)
+		.onAppear { onAppear() }
 	}
 	
 	@ViewBuilder
@@ -78,9 +62,8 @@ struct SwapInWalletDetails: View {
 				Image(systemName: "xmark")
 					.imageScale(.medium)
 					.font(.title3)
-					.foregroundColor(.clear)
+					.foregroundColor(.clear) // invisible
 					.accessibilityHidden(true)
-					.frame(width: navBarButtonWidth)
 				
 				Spacer(minLength: 0)
 				Text("Swap-in wallet")
@@ -92,16 +75,13 @@ struct SwapInWalletDetails: View {
 				Button {
 					closePopover()
 				} label: {
-					Image(systemName: "xmark") // must match size of chevron.backward above
+					Image(systemName: "xmark")
 						.imageScale(.medium)
 						.font(.title3)
 				}
-				.read(navBarButtonWidthReader)
-				.frame(width: navBarButtonWidth)
 				
 			} // </HStack>
 			.padding()
-			.assignMaxPreference(for: navBarButtonWidthReader.key, to: $navBarButtonWidth)
 		}
 	}
 	
@@ -110,9 +90,16 @@ struct SwapInWalletDetails: View {
 		
 		List {
 			section_info()
-			section_lastAttempt()
+			if hasUnconfirmedUtxos() {
+				section_unconfirmed()
+			}
 			section_confirmed()
-			section_unconfirmed()
+			if hasTimedOutUtxos() {
+				section_timedOut()
+			}
+			if hasCancelledUtxos() {
+				section_cancelled()
+			}
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
@@ -125,9 +112,6 @@ struct SwapInWalletDetails: View {
 		.onReceive(swapInRejectedPublisher) {
 			swapInRejectedStateChange($0)
 		}
-		.onReceive(bizNotificationsPublisher) {
-			bizNotificationsChanged($0)
-		}
 	}
 	
 	@ViewBuilder
@@ -135,7 +119,7 @@ struct SwapInWalletDetails: View {
 		
 		Section {
 			
-			VStack(alignment: HorizontalAlignment.leading, spacing: 20) {
+			VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 				
 				if !liquidityPolicy.enabled {
 					
@@ -170,13 +154,16 @@ struct SwapInWalletDetails: View {
 					}
 				}
 				
+				Text("Funds not swapped **after 4 months** are recoverable on-chain")
+					.font(.callout)
+					.foregroundColor(.secondary)
+					.padding(.bottom, 10)
+				
 				Button {
 					navigateToLiquiditySettings()
 				} label: {
 					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 5) {
 						Image(systemName: "gearshape.fill")
-							.frame(minWidth: iconWidth, alignment: Alignment.leadingFirstTextBaseline)
-							.read(iconWidthReader)
 						Text("Configure fee settings")
 					}
 				}
@@ -184,53 +171,6 @@ struct SwapInWalletDetails: View {
 			} // </VStack>
 			.padding(.bottom, 5)
 
-		} // </Section>
-		.assignMaxPreference(for: iconWidthReader.key, to: $iconWidth)
-	}
-	
-	@ViewBuilder
-	func section_lastAttempt() -> some View {
-		
-		if liquidityPolicy.enabled, let notification = paymentRejectedNotification() {
-			
-			Section {
-				
-				switch notification {
-				case .Left(let reason):
-					
-					let actualFee = Utils.formatBitcoin(currencyPrefs, msat: reason.fee)
-					let maxAllowedFee = Utils.formatBitcoin(currencyPrefs, sat: reason.maxAbsoluteFee)
-					
-					Text("The fee was **\(actualFee.string)** but your max fee was set to **\(maxAllowedFee.string)**.")
-					
-				case .Right(let reason):
-					
-					let actualFee = Utils.formatBitcoin(currencyPrefs, msat: reason.fee)
-					let percent = basisPointsAsPercent(reason.maxRelativeFeeBasisPoints)
-					
-					Text("The fee was **\(actualFee.string)** which is more than **\(percent)** of the amount.")
-					
-				} // </switch>
-				
-			} header: {
-				Text("Last Attempt")
-				
-			} // </Section>
-		}
-	}
-	
-	@ViewBuilder
-	func section_confirmed() -> some View {
-		
-		Section {
-			
-			let confirmed = confirmedBalance()
-			Text(verbatim: "\(confirmed.0.string)") +
-			Text(verbatim: " ≈ \(confirmed.1.string)").foregroundColor(.secondary)
-			
-		} header: {
-			Text("Ready For Swap")
-			
 		} // </Section>
 	}
 	
@@ -303,6 +243,119 @@ struct SwapInWalletDetails: View {
 		} // </confirmationDialog>
 	}
 	
+	@ViewBuilder
+	func section_confirmed() -> some View {
+		
+		Section {
+			
+			let (btcAmt, fiatAmt) = confirmedBalance()
+			Text(verbatim: "\(btcAmt.string)") +
+			Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
+			
+			subsection_confirmed_lastAttempt()
+			subsection_confirmed_expirationWarning()
+			
+		} header: {
+			Text("Ready For Swap")
+			
+		} // </Section>
+	}
+	
+	@ViewBuilder
+	func subsection_confirmed_lastAttempt() -> some View {
+		
+		if liquidityPolicy.enabled, let lastRejection = swapInRejected {
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
+				
+				Text("Last attempt failed")
+					.foregroundColor(.appWarn)
+				
+				if let reason = lastRejection.reason as?
+						Lightning_kmpLiquidityEventsRejected.ReasonTooExpensiveOverAbsoluteFee
+				{
+					let actualFee = Utils.formatBitcoin(currencyPrefs, msat: lastRejection.fee)
+					let maxAllowedFee = Utils.formatBitcoin(currencyPrefs, sat: reason.maxAbsoluteFee)
+					
+					Text("The fee was **\(actualFee.string)** but your max fee was set to **\(maxAllowedFee.string)**.")
+					
+				} else if let reason = lastRejection.reason as?
+								Lightning_kmpLiquidityEventsRejected.ReasonTooExpensiveOverRelativeFee
+				{
+					let actualFee = Utils.formatBitcoin(currencyPrefs, msat: lastRejection.fee)
+					let percent = basisPointsAsPercent(reason.maxRelativeFeeBasisPoints)
+					
+					Text("The fee was **\(actualFee.string)** which is more than **\(percent)** of the amount.")
+				}
+				
+			} // </VStack>
+		}
+	}
+	
+	@ViewBuilder
+	func subsection_confirmed_expirationWarning() -> some View {
+		
+		if let days = swapInWallet.expirationWarningInDays() {
+			
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 5) {
+				Image(systemName: "exclamationmark.triangle")
+				if days == 1 {
+					Text("This swap will expire in 1 day")
+				} else {
+					Text("This swap will expire in \(days) days")
+				}
+			} // </HStack>
+			.foregroundColor(.appNegative)
+			
+		} // </if let days>
+	}
+	
+	@ViewBuilder
+	func section_timedOut() -> some View {
+		
+		Section {
+			
+			let (btcAmt, fiatAmt) = timedOutBalance()
+			Text(verbatim: "\(btcAmt.string)") +
+			Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
+			
+			if let days = nextRefundInDays() {
+				Group {
+					if days <= 1 {
+						Text("These funds will be available from 1 day onwards.")
+					} else {
+						Text("These funds will be available from \(days) days onwards.")
+					}
+				}
+				.font(.callout)
+				.foregroundColor(.secondary)
+			}
+			
+		} header: {
+			Text("Timed-Out Funds")
+			
+		} // </Section>
+	}
+	
+	@ViewBuilder
+	func section_cancelled() -> some View {
+		
+		Section {
+			
+			let (btcAmt, fiatAmt) = cancelledBalance()
+			Text(verbatim: "\(btcAmt.string)") +
+			Text(verbatim: " ≈ \(fiatAmt.string)").foregroundColor(.secondary)
+			
+			Text("These funds were not swapped in time. Use the wallet's descriptor to access them.")
+				.font(.callout)
+				.foregroundColor(.secondary)
+			
+		} header: {
+			Text("Cancelled Funds")
+			
+		} // </Section>
+	}
+	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
@@ -328,27 +381,6 @@ struct SwapInWalletDetails: View {
 		return (formatted, false)
 	}
 	
-	func paymentRejectedNotification(
-	) -> Either<
-		PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee,
-		PhoenixShared.Notification.PaymentRejected.OverRelativeFee
-	>? {
-		
-		let paymentRejected = bizNotifications
-			.compactMap { $0.notification as? PhoenixShared.Notification.PaymentRejected }
-			.filter { $0.source == Lightning_kmpLiquidityEventsSource.onchainwallet }
-			.first
-		
-		if let overAbsoluteFee = paymentRejected as? PhoenixShared.Notification.PaymentRejected.OverAbsoluteFee {
-			return Either.Left(overAbsoluteFee)
-		}
-		if let overRelativeFee = paymentRejected as? PhoenixShared.Notification.PaymentRejected.OverRelativeFee {
-			return Either.Right(overRelativeFee)
-		}
-		
-		return nil
-	}
-	
 	func basisPointsAsPercent(_ basisPoints: Int32) -> String {
 		
 		// Example: 30% == 3,000 basis points
@@ -366,14 +398,19 @@ struct SwapInWalletDetails: View {
 		return formatter.string(from: NSNumber(value: percent)) ?? "?%"
 	}
 	
-	func confirmedBalance() -> (FormattedAmount, FormattedAmount) {
+	func hasUnconfirmedUtxos() -> Bool {
 		
-		let confirmed = swapInWallet.deeplyConfirmedBalance
+		return !swapInWallet.weaklyConfirmed.isEmpty || !swapInWallet.unconfirmed.isEmpty
+	}
+	
+	func hasTimedOutUtxos() -> Bool {
 		
-		let btcAmt = Utils.formatBitcoin(currencyPrefs, sat: confirmed)
-		let fiatAmt = Utils.formatFiat(currencyPrefs, sat: confirmed)
+		return !swapInWallet.lockedUntilRefund.isEmpty
+	}
+	
+	func hasCancelledUtxos() -> Bool {
 		
-		return (btcAmt, fiatAmt)
+		return !swapInWallet.readyForRefund.isEmpty
 	}
 	
 	func unconfirmedUtxos() -> [UtxoWrapper] {
@@ -391,12 +428,48 @@ struct SwapInWalletDetails: View {
 		return wrappedUtxos
 	}
 	
+	func confirmedBalance() -> (FormattedAmount, FormattedAmount) {
+		
+		let sats = swapInWallet.readyForSwapBalance
+		return formattedBalances(sats)
+	}
+	
+	func timedOutBalance() -> (FormattedAmount, FormattedAmount) {
+		
+		let sats = swapInWallet.lockedUntilRefundBalance
+		return formattedBalances(sats)
+	}
+	
+	func cancelledBalance() -> (FormattedAmount, FormattedAmount) {
+		
+		let sats = swapInWallet.readyForRefundBalance
+		return formattedBalances(sats)
+	}
+	
 	func formattedBalances(_ sats: Bitcoin_kmpSatoshi) -> (FormattedAmount, FormattedAmount) {
 		
 		let btcAmt = Utils.formatBitcoin(currencyPrefs, sat: sats)
 		let fiatAmt = Utils.formatFiat(currencyPrefs, sat: sats)
 		
 		return (btcAmt, fiatAmt)
+	}
+	
+	/// Returns non-nil if there are any "timed-out funds" UTXO's.
+	/// The value represents the oldest UTXO in the category, which will be available to redeem next.
+	/// The value is in days (rounded up).
+	func nextRefundInDays() -> Int? {
+		
+		let confirmationsNeeded = swapInWallet.swapInParams.refundDelay
+		let pendingConfirmationsList = swapInWallet.lockedUntilRefund.map {
+			confirmationsNeeded - swapInWallet.confirmations(utxo: $0)
+		}
+		
+		if let minPendingConfirmations = pendingConfirmationsList.min() {
+			let days: Double = Double(minPendingConfirmations) / 144.0
+			return Int(days.rounded(.awayFromZero))
+		}
+		
+		return nil
 	}
 	
 	func confirmationDialogBinding() -> Binding<Bool> {
@@ -411,6 +484,12 @@ struct SwapInWalletDetails: View {
 	// MARK: Notifications
 	// --------------------------------------------------
 	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		// Reserved...
+	}
+	
 	func liquidityPolicyChanged(_ newValue: LiquidityPolicy) {
 		log.trace("liquidityPolicyChanged()")
 		
@@ -420,22 +499,20 @@ struct SwapInWalletDetails: View {
 	func swapInWalletChanged(_ newValue: Lightning_kmpWalletState.WalletWithConfirmations) {
 		log.trace("swapInWalletChanged()")
 		
+	#if DEBUG
+	//	swapInWallet = newValue.fakeBlockHeight(plus: Int32(144 * 31 * 3)) // 3 months: test expirationWarning
+	//	swapInWallet = newValue.fakeBlockHeight(plus: Int32(144 * 30 * 4)) // 4 months: test lockedUntilRefund
+	//	swapInWallet = newValue.fakeBlockHeight(plus: Int32(144 * 30 * 6)) // 6 months: test readyForRefund
 		swapInWallet = newValue
+	#else
+		swapInWallet = newValue
+	#endif
 	}
 	
 	func swapInRejectedStateChange(_ state: Lightning_kmpLiquidityEventsRejected?) {
 		log.trace("swapInRejectedStateChange()")
 		
 		swapInRejected = state
-	}
-	
-	func bizNotificationsChanged(_ list: [PhoenixShared.NotificationsManager.NotificationItem]) {
-		log.trace("bizNotificationsChanges()")
-		
-		if !list.isEmpty {
-			log.debug("list = \(list)")
-		}
-		bizNotifications = list
 	}
 	
 	// --------------------------------------------------

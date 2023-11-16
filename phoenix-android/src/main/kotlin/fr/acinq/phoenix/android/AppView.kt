@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavDeepLink
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -67,7 +66,7 @@ import fr.acinq.phoenix.android.payments.ScanDataView
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.history.CsvExportView
 import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
-import fr.acinq.phoenix.android.service.WalletState
+import fr.acinq.phoenix.android.service.NodeServiceState
 import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.settings.channels.ChannelDetailsView
 import fr.acinq.phoenix.android.settings.channels.ChannelsView
@@ -81,7 +80,6 @@ import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
 import fr.acinq.phoenix.android.startup.LegacySwitcherView
 import fr.acinq.phoenix.android.startup.StartupView
 import fr.acinq.phoenix.android.utils.appBackground
-import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -142,7 +140,7 @@ fun AppView(
             navController.navigate(Screen.SwitchToLegacy.route)
         }
 
-        val walletState by appVM.walletState.observeAsState(null)
+        val walletState by appVM.serviceState.observeAsState(null)
 
         Column(
             Modifier
@@ -428,9 +426,10 @@ private fun MonitorNotices(
     vm: NoticesViewModel
 ) {
     val context = LocalContext.current
+    val internalData = application.internalDataRepository
 
     LaunchedEffect(Unit) {
-        InternalData.showSeedBackupNotice(context).collect {
+        internalData.showSeedBackupNotice.collect {
             if (it) {
                 vm.addNotice(Notice.BackupSeedReminder)
             } else {
@@ -462,7 +461,7 @@ private fun MonitorNotices(
     }
 
     LaunchedEffect(Unit) {
-        InternalData.getChannelsWatcherOutcome(context).filterNotNull().collect {
+        internalData.getChannelsWatcherOutcome.filterNotNull().collect {
             if (currentTimestampMillis() - it.timestamp > 6 * DateUtils.DAY_IN_MILLIS) {
                 vm.addNotice(Notice.WatchTowerLate)
             } else {
@@ -473,7 +472,7 @@ private fun MonitorNotices(
 
     LaunchedEffect(Unit) {
         if (LegacyPrefsDatastore.hasMigratedFromLegacy(context).first()) {
-            InternalData.getLegacyMigrationMessageShown(context).collect { shown ->
+            internalData.getLegacyMigrationMessageShown.collect { shown ->
                 if (!shown) {
                     vm.addNotice(Notice.MigrationFromLegacy)
                 } else {
@@ -486,15 +485,15 @@ private fun MonitorNotices(
 
 @Composable
 private fun RequireStarted(
-    walletState: WalletState?,
+    serviceState: NodeServiceState?,
     nextUri: String? = null,
     children: @Composable () -> Unit
 ) {
     val log = logger("Navigation")
-    if (walletState == null) {
+    if (serviceState == null) {
         // do nothing
-    } else if (walletState !is WalletState.Started) {
-        log.debug { "access to screen has been denied (state=${walletState.name})" }
+    } else if (serviceState !is NodeServiceState.Running) {
+        log.debug { "access to screen has been denied (state=${serviceState.name})" }
         val nc = navController
         nc.navigate("${Screen.Startup.route}?next=$nextUri") {
             popUpTo(nc.graph.id) { inclusive = true }
@@ -502,15 +501,6 @@ private fun RequireStarted(
     } else {
         children()
     }
-}
-
-sealed class LockState {
-    sealed class Locked : LockState() {
-        object Default : Locked()
-        data class WithError(val code: Int?) : Locked()
-    }
-
-    object Unlocked : LockState()
 }
 
 @Composable

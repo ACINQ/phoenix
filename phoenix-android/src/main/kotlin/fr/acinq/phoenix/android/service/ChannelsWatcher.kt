@@ -24,7 +24,6 @@ import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
-import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.data.WatchTowerOutcome
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
@@ -43,21 +42,21 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
 
     override suspend fun doWork(): Result {
         var notificationsManager: NotificationsManager? = null
-        try {
+        val application = applicationContext as? PhoenixApplication ?: run {
+            log.error("phoenix application is not available, channels-watcher job did not run")
+            return Result.failure()
+        }
 
+        val internalData = application.internalDataRepository
+        try {
             val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
             if (legacyAppStatus !is LegacyAppStatus.NotRequired) {
                 log.info("aborting channels-watcher service in state=${legacyAppStatus.name()}")
-                InternalData.saveChannelsWatcherOutcome(applicationContext, Outcome.Nominal(currentTimestampMillis()))
+                internalData.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
                 return Result.success()
             }
 
-            val business = (applicationContext as? PhoenixApplication)?.business ?: run {
-                log.error("phoenix business is not available, channels-watcher job did not run")
-                InternalData.saveChannelsWatcherOutcome(applicationContext, Outcome.Unknown(currentTimestampMillis()))
-                return Result.failure()
-            }
-
+            val business = application.business
             notificationsManager = business.notificationsManager
 
             val peer = withTimeout(60_000) {
@@ -67,7 +66,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             val channelsBeforeWatching = peer.bootChannelsFlow.filterNotNull().first()
             if (channelsBeforeWatching.isEmpty()) {
                 log.info("no channels found, nothing to watch")
-                InternalData.saveChannelsWatcherOutcome(applicationContext, Outcome.Nominal(currentTimestampMillis()))
+                internalData.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
                 return Result.success()
             } else {
                 log.info("watching ${channelsBeforeWatching.size} channels")
@@ -99,11 +98,11 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             if (unknownRevokedAfterWatching.isNotEmpty()) {
                 log.warn("new revoked commits found, notifying user")
                 notificationsManager.saveWatchTowerOutcome(WatchTowerOutcome.RevokedFound(channels = unknownRevokedAfterWatching))
-                InternalData.saveChannelsWatcherOutcome(applicationContext, Outcome.RevokedFound(currentTimestampMillis()))
+                internalData.saveChannelsWatcherOutcome(Outcome.RevokedFound(currentTimestampMillis()))
                 SystemNotificationHelper.notifyRevokedCommits(applicationContext)
             } else {
                 notificationsManager.saveWatchTowerOutcome(WatchTowerOutcome.Nominal(channelsWatchedCount = peer.channels.size))
-                InternalData.saveChannelsWatcherOutcome(applicationContext, Outcome.Nominal(currentTimestampMillis()))
+                internalData.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
                 log.info("channels-watcher job completed, no revoked commit found")
             }
 
@@ -111,7 +110,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
         } catch (e: Exception) {
             log.error("failed to run channels-watcher job: ", e)
             notificationsManager?.saveWatchTowerOutcome(WatchTowerOutcome.Unknown())
-            InternalData.saveChannelsWatcherOutcome(applicationContext, Outcome.Unknown(currentTimestampMillis()))
+            internalData.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
             return Result.failure()
         } finally {
 

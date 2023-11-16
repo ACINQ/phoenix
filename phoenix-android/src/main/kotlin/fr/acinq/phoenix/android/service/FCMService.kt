@@ -4,10 +4,10 @@ import android.content.Intent
 import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
-import fr.acinq.phoenix.android.utils.datastore.InternalData
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 
@@ -61,7 +61,8 @@ class FCMService : FirebaseMessagingService() {
         serviceScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.warn("failed to save fcm token after onNewToken event: {}", e.localizedMessage)
         }) {
-            InternalData.saveFcmToken(applicationContext, token)
+            val internalData = (applicationContext as PhoenixApplication).internalDataRepository
+            internalData.saveFcmToken(token)
         }
     }
 }

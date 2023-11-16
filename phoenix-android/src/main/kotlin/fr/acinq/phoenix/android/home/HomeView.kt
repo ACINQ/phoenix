@@ -48,13 +48,13 @@ import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.PrimarySeparator
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
-import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.findActivity
 import fr.acinq.phoenix.android.utils.logger
@@ -85,6 +85,7 @@ fun HomeView(
     val connectionsState by paymentsViewModel.connectionsFlow.collectAsState(null)
     val electrumMessages by business.appConfigurationManager.electrumMessages.collectAsState()
     val balanceDisplayMode by UserPrefs.getHomeAmountDisplayMode(context).collectAsState(initial = HomeAmountDisplayMode.REDACTED)
+    val internalData = application.internalDataRepository
 
     var showConnectionsDialog by remember { mutableStateOf(false) }
     if (showConnectionsDialog) {
@@ -255,7 +256,7 @@ fun HomeView(
     val scope = rememberCoroutineScope()
     if (showAddressWarningDialog){
         Dialog(
-            onDismiss = { scope.launch { InternalData.saveLegacyMigrationAddressWarningShown(context, true) } },
+            onDismiss = { scope.launch { internalData.saveLegacyMigrationAddressWarningShown(true) } },
             title = stringResource(id = R.string.inappnotif_migration_from_legacy_dialog_title),
         ) {
             Text(text = annotatedStringResource(id = R.string.inappnotif_migration_from_legacy_dialog_body), modifier = Modifier.padding(horizontal = 24.dp, vertical = 0.dp))
@@ -264,7 +265,7 @@ fun HomeView(
 
     LaunchedEffect(Unit) {
         if (LegacyPrefsDatastore.hasMigratedFromLegacy(context).first()) {
-            combine(InternalData.getLegacyMigrationMessageShown(context), InternalData.getLegacyMigrationAddressWarningShown(context)) { noticeShown, dialogShown ->
+            combine(internalData.getLegacyMigrationMessageShown, internalData.getLegacyMigrationAddressWarningShown) { noticeShown, dialogShown ->
                 noticeShown || dialogShown
             }.collect {
                 showAddressWarningDialog = !it

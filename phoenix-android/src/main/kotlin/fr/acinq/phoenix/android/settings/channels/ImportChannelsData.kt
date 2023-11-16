@@ -40,9 +40,8 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.utils.positiveColor
-import shapeless.Succ
+import fr.acinq.phoenix.utils.import.ChannelsImportResult
 
 @Composable
 fun ImportChannelsData(
@@ -76,51 +75,54 @@ fun ImportChannelsData(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            val business = business
             when (val state = vm.state.value) {
                 ImportChannelsDataState.Init -> {
                     Button(
                         text = stringResource(id = R.string.channelimport_import_button),
                         icon = R.drawable.ic_restore,
-                        onClick = { vm.importData(dataInput.trim()) },
+                        onClick = { vm.importData(dataInput.trim(), business) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
                 ImportChannelsDataState.Importing -> {
                     ProgressView(text = stringResource(id = R.string.channelimport_importing),)
                 }
-                ImportChannelsDataState.Success -> {
-                    Dialog(
-                        onDismiss = {},
-                        properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnBackPress = false, dismissOnClickOutside = false),
-                        buttons = null,
-                        buttonsTopMargin = 0.dp
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(32.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                is ImportChannelsDataState.Done -> when (val result = state.result) {
+                    is ChannelsImportResult.Success -> {
+                        Dialog(
+                            onDismiss = {},
+                            properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnBackPress = false, dismissOnClickOutside = false),
+                            buttons = null,
+                            buttonsTopMargin = 0.dp
                         ) {
-                            TextWithIcon(
-                                text = stringResource(id = R.string.channelimport_success),
-                                textStyle = MaterialTheme.typography.body2,
-                                icon = R.drawable.ic_check,
-                                iconTint = positiveColor,
-                            )
-                            Text(text = stringResource(id = R.string.channelimport_success_restart), textAlign = TextAlign.Center)
+                            Column(
+                                modifier = Modifier.padding(32.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                TextWithIcon(
+                                    text = stringResource(id = R.string.channelimport_success),
+                                    textStyle = MaterialTheme.typography.body2,
+                                    icon = R.drawable.ic_check,
+                                    iconTint = positiveColor,
+                                )
+                                Text(text = stringResource(id = R.string.channelimport_success_restart), textAlign = TextAlign.Center)
+                            }
                         }
                     }
-                }
-                is ImportChannelsDataState.Failure -> {
-                    ErrorMessage(
-                        header = stringResource(id = R.string.channelimport_error_title),
-                        details = when (state) {
-                            is ImportChannelsDataState.Failure.Generic -> state.t.localizedMessage
-                            is ImportChannelsDataState.Failure.MalformedData -> stringResource(id = R.string.channelimport_error_decryption)
-                            is ImportChannelsDataState.Failure.DecryptionError -> stringResource(id = R.string.channelimport_error_decryption)
-                            is ImportChannelsDataState.Failure.UnknownVersion -> stringResource(id = R.string.channelimport_error_unknown_version, state.version)
-                        },
-                        alignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    is ChannelsImportResult.Failure -> {
+                        ErrorMessage(
+                            header = stringResource(id = R.string.channelimport_error_title),
+                            details = when (result) {
+                                is ChannelsImportResult.Failure.Generic -> result.error.message
+                                is ChannelsImportResult.Failure.MalformedData -> stringResource(id = R.string.channelimport_error_decryption)
+                                is ChannelsImportResult.Failure.DecryptionError -> stringResource(id = R.string.channelimport_error_decryption)
+                                is ChannelsImportResult.Failure.UnknownVersion -> stringResource(id = R.string.channelimport_error_unknown_version, result.version)
+                            },
+                            alignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         }

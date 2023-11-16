@@ -87,8 +87,6 @@
   <string name="legacy_receive_share_title">شارك طلب الدفع هذا مع...</string>
   <string name="legacy_receive_share_button">المشاركة…</string>
   <string name="legacy_receive_min_amount_pay_to_open"><![CDATA[محفظتك فارغة. يجب أن تكون الدفعة الأولى التي تتلقاها <b>%1$s</b> على الأقل.]]></string>
-  <string name="legacy_receive_paytoopen_disabled">تم تعطيل إنشاء القناة مؤقتًا. قد لا تتمكن من تلقي بعض المدفوعات.</string>
-  <string name="legacy_receive_paytoopen_disabled_nochannels">تم تعطيل إنشاء القناة مؤقتًا. لن تتمكن من تلقي أي مدفوعات.</string>
   <string name="legacy_receive_address_label">العنوان</string>
   <string name="legacy_receive_withdraw_button">استخدم رابط LNURL</string>
   <string name="legacy_receive_swap_in_button">أظهر عنوان بيتكوين</string>

@@ -16,10 +16,19 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct SendView: MVIView {
 	
+	enum Location {
+		case MainView
+		case ReceiveView
+	}
+	
+	let location: Location
+	
 	@StateObject var mvi: MVIState<Scan.Model, Scan.Intent>
 	
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
+	
+	@State var needsAcceptWarning = true
 	
 	@StateObject var toast = Toast()
 	
@@ -29,7 +38,9 @@ struct SendView: MVIView {
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	init(controller: AppScanController? = nil) {
+	init(location: Location, controller: AppScanController? = nil) {
+		
+		self.location = location
 		
 		if let controller = controller {
 			self._mvi = StateObject(wrappedValue: MVIState(controller))
@@ -40,11 +51,19 @@ struct SendView: MVIView {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: ViewBuilders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var view: some View {
 		
 		ZStack {
-			content
+			if location == .ReceiveView && needsAcceptWarning {
+				content_limited()
+			} else {
+				content_normal()
+			}
 			toast.view()
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -57,7 +76,7 @@ struct SendView: MVIView {
 	}
 
 	@ViewBuilder
-	var content: some View {
+	func content_normal() -> some View {
 		
 		// ZIndex: [
 		//   0: LoginView
@@ -72,7 +91,7 @@ struct SendView: MVIView {
 		     _ as Scan.Model_BadRequest,
 		     _ as Scan.Model_LnurlServiceFetch:
 
-			ScanView(mvi: mvi, toast: toast)
+			ScanView(location: location, mvi: mvi, toast: toast)
 				.zIndex(4)
 
 		case _ as Scan.Model_InvoiceFlow_InvoiceRequest,
@@ -108,6 +127,17 @@ struct SendView: MVIView {
 		}
 	}
 	
+	@ViewBuilder
+	func content_limited() -> some View {
+		
+		ScanView(location: location, mvi: mvi, toast: toast)
+			.zIndex(4)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
 	func modelDidChange(_ newModel: Scan.Model) {
 		log.trace("modelDidChange()")
 		
@@ -115,6 +145,22 @@ struct SendView: MVIView {
 		case let model as Scan.Model_BadRequest:
 			
 			showErrorToast(model)
+		
+		case _ as Scan.Model_LnurlWithdrawFlow,
+		     _ as Scan.Model_LnurlAuthFlow:
+			
+			if location == .ReceiveView {
+				needsAcceptWarning = false
+			}
+			
+		case _ as Scan.Model_InvoiceFlow_InvoiceRequest,
+		     _ as Scan.Model_OnChainFlow,
+		     _ as Scan.Model_LnurlPayFlow_LnurlPayRequest,
+		     _ as Scan.Model_LnurlPayFlow_LnurlPayFetch:
+			
+			if location == .ReceiveView {
+				showSendPaymentWarning()
+			}
 			
 		case is Scan.Model_InvoiceFlow_Sending,
 		     is Scan.Model_LnurlPayFlow_Sending:
@@ -126,6 +172,16 @@ struct SendView: MVIView {
 			break
 		}
 	}
+	
+	func didReceiveExternalLightningUrl(_ urlStr: String) {
+		log.trace("didReceiveExternalLightningUrl()")
+		
+		mvi.intent(Scan.Intent_Parse(request: urlStr))
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
 	
 	func showErrorToast(_ model: Scan.Model_BadRequest) -> Void {
 		log.trace("showErrorToast()")
@@ -228,13 +284,22 @@ struct SendView: MVIView {
 		}
 	}
 	
-	func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
-		log.trace("didReceiveExternalLightningUrl()")
+	func showSendPaymentWarning() {
+		log.trace("showSendPaymentWarning()")
 		
-		mvi.intent(Scan.Intent_Parse(request: urlStr))
+		popoverState.display(dismissable: false) {
+			PaymentWarningPopover(
+				cancelAction: {
+					mvi.intent(Scan.IntentReset())
+				},
+				continueAction: {
+					needsAcceptWarning = false
+				}
+			)
+		}
 	}
 	
-	func copyLink(_ url: URL) -> Void {
+	func copyLink(_ url: URL) {
 		log.trace("copyLink()")
 		
 		UIPasteboard.general.string = url.absoluteString
@@ -244,7 +309,7 @@ struct SendView: MVIView {
 		)
 	}
 	
-	func openLink(_ url: URL) -> Void {
+	func openLink(_ url: URL) {
 		log.trace("openLink()")
 		
 		openURL(url)

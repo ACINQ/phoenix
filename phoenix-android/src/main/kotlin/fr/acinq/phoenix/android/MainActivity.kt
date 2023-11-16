@@ -45,12 +45,13 @@ import org.slf4j.LoggerFactory
 class MainActivity : AppCompatActivity() {
 
     val log: Logger = LoggerFactory.getLogger(MainActivity::class.java)
-    private val appViewModel by viewModels<AppViewModel>()
+    private val appViewModel: AppViewModel by viewModels { AppViewModel.Factory }
+
     private var navController: NavHostController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appViewModel.walletState.observe(this) {
+        appViewModel.serviceState.observe(this) {
             log.debug("wallet state update=${it.name}")
         }
 

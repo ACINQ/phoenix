@@ -16,46 +16,24 @@
 
 package fr.acinq.phoenix.android.service
 
-import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.android.business
 
 /**
- * This class represent the state of the wallet in regard to the underlying LN node.
- * 4 main states:
- * - Off = the wallet is not started
- * - Bootstrap = the wallet is starting (e.g unlocking the seed)
+ * This class represent the state of the node service.
+ * - Off = the service has not started the node
+ * - Init = the wallet is starting
  * - Started = the wallet is unlocked and the node will now try to connect and establish channels
  * - Error = the node could not start
  */
-sealed class WalletState {
+sealed class NodeServiceState {
 
-    val name: String = this.javaClass.simpleName
+    val name: String by lazy { this.javaClass.simpleName }
 
     /** Default state, the node is not started. */
-    object Off : WalletState()
+    object Off : NodeServiceState()
 
     /** This is an utility state that is used when the binding between the service holding the state and the consumers of that state is disconnected. */
-    object Disconnected : WalletState()
-
-    /** This is a transition state. The node is starting up and will soon either go to Started, or to Error. */
-    sealed class Bootstrap : WalletState() {
-        object Init : Bootstrap()
-        object Tor : Bootstrap()
-        object Node : Bootstrap()
-    }
-
-    /** The node is started and we should be able to access the kit/api for the legacy app, or the [PhoenixBusiness] class. */
-    sealed class Started : WalletState() {
-        // sealed class Legacy(internal val kit: Kit, internal val xpub: Xpub) : Started() {
-        //     internal val _api: Eclair by lazy {
-        //         EclairImpl(kit)
-        //     }
-        // }
-        data class Kmm(val business: PhoenixBusiness) : Started()
-    }
-
-    /** Startup has failed, the state contains the error details. */
-    sealed class Error : WalletState() {
-        data class Generic(val message: String) : Error()
-    }
+    object Disconnected : NodeServiceState()
+    object Init : NodeServiceState()
+    object Running : NodeServiceState()
+    data class Error(val cause: Throwable) : NodeServiceState()
 }

@@ -66,7 +66,7 @@
     <string name="startup_wait_legacy_check">Kontrola starší peněženky…</string>
     <string name="startup_checking_seed">Odemykání…</string>
     <string name="startup_starting">Spouštění…</string>
-    <string name="startup_error_generic">Aplikaci nebylo možné spustit.\n\nPodrobnosti chyby: %1$s</string>
+    <string name="startup_error_generic">Aplikaci nebylo možné spustit.</string>
 
     <!-- Switch between legacy/modern apps -->
 
@@ -484,7 +484,7 @@
     <!-- lnurl: common remote error messages -->
 
     <string name="lnurl_error_remote_details">Služba <b>%1$s</b> odpověděla s chybou:\n\n<i>%2$s</i>.\n\nV případě potřeby kontaktujte jejich podporu.</string>
-    <string name="lnurl_error_remote_code">Slžuba <b>%1$s</b> vrátila HTTP chybu (%2$s).\n\nV případě potřeby kontaktujte jejich podporu.</string>
+    <string name="lnurl_error_remote_code">Služba <b>%1$s</b> vrátila HTTP chybu (%2$s).\n\nV případě potřeby kontaktujte jejich podporu.</string>
     <string name="lnurl_error_remote_unreadable">Služba <b>%1$s</b> vrátila chybnou zprávu.</string>
     <string name="lnurl_error_remote_connection">Nepodařilo se připojit ke službě <b>%1$s</b>.</string>
 

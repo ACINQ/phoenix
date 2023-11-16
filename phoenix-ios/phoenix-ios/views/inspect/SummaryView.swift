@@ -14,7 +14,7 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct SummaryView: View {
 	
-	let type: PaymentViewType
+	let location: PaymentView.Location
 	
 	@State var paymentInfo: WalletPaymentInfo
 	@State var paymentInfoIsStale: Bool
@@ -51,9 +51,9 @@ struct SummaryView: View {
 	)
 	@State var buttonHeight: CGFloat? = nil
 	
-	init(type: PaymentViewType, paymentInfo: WalletPaymentInfo) {
+	init(location: PaymentView.Location, paymentInfo: WalletPaymentInfo) {
 		
-		self.type = type
+		self.location = location
 		
 		// Try to optimize by using the in-memory cache.
 		// If we get a cache hit, we can skip the UI refresh/flicker.
@@ -85,7 +85,7 @@ struct SummaryView: View {
 	@ViewBuilder
 	var body: some View {
 		
-		switch type {
+		switch location {
 		case .sheet:
 			main()
 				.navigationTitle("")
@@ -118,7 +118,7 @@ struct SummaryView: View {
 			}
 
 			// Close button in upper right-hand corner
-			if case .sheet(let closeAction) = type {
+			if case .sheet(let closeAction) = location {
 				VStack {
 					HStack {
 						Spacer()
@@ -585,7 +585,7 @@ struct SummaryView: View {
 	@ViewBuilder
 	func detailsView() -> some View {
 		DetailsView(
-			type: wrappedType(),
+			location: wrappedLocation(),
 			paymentInfo: $paymentInfo,
 			showOriginalFiatValue: $showOriginalFiatValue,
 			showFiatValueExplanation: $showFiatValueExplanation
@@ -595,7 +595,7 @@ struct SummaryView: View {
 	@ViewBuilder
 	func editInfoView() -> some View {
 		EditInfoView(
-			type: wrappedType(),
+			location: wrappedLocation(),
 			paymentInfo: $paymentInfo
 		)
 	}
@@ -603,7 +603,7 @@ struct SummaryView: View {
 	@ViewBuilder
 	func cpfpView(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) -> some View {
 		CpfpView(
-			type: wrappedType(),
+			location: wrappedLocation(),
 			onChainPayment: onChainPayment
 		)
 	}
@@ -641,11 +641,11 @@ struct SummaryView: View {
 		}
 	}
 	
-	func wrappedType() -> PaymentViewType {
+	func wrappedLocation() -> PaymentView.Location {
 		
-		switch type {
+		switch location {
 		case .sheet(_):
-			return type
+			return location
 		case .embedded(_):
 			return .embedded(popTo: popToWrapper)
 		}
@@ -803,7 +803,7 @@ struct SummaryView: View {
 		log.trace("popToWrapper(\(destination))")
 		
 		popToDestination = destination
-		if case .embedded(let popTo) = type {
+		if case .embedded(let popTo) = location {
 			popTo(destination)
 		}
 	}
@@ -841,7 +841,7 @@ struct SummaryView: View {
 			})
 		}
 		
-		switch type {
+		switch location {
 		case .sheet(let closeAction):
 			closeAction()
 		case .embedded:

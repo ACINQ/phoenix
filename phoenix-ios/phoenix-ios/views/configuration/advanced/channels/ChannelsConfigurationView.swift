@@ -104,7 +104,7 @@ fileprivate struct ChannelsView : View {
 	@Binding var showChannelsRemoteBalance: Bool
 	@ObservedObject var toast: Toast
 	
-	@State var forceCloseChannelsOpen = false
+	@State var importChannelsOpen = false
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -116,8 +116,8 @@ fileprivate struct ChannelsView : View {
 		ZStack {
 			if #unavailable(iOS 16.0) {
 				NavigationLink(
-					destination: forceCloseChannelsView(),
-					isActive: $forceCloseChannelsOpen
+					destination: importChannelsView(),
+					isActive: $importChannelsOpen
 				) {
 					EmptyView()
 				}
@@ -150,29 +150,29 @@ fileprivate struct ChannelsView : View {
 			
 		} // </ZStack>
 		.navigationBarItems(trailing: menuButton())
-		.navigationStackDestination(isPresented: $forceCloseChannelsOpen) { // For iOS 16+
-			forceCloseChannelsView()
+		.navigationStackDestination(isPresented: $importChannelsOpen) { // For iOS 16+
+			importChannelsView()
 		}
 	}
 	
 	@ViewBuilder
-	func forceCloseChannelsView() -> some View {
-		ForceCloseChannelsView()
+	func importChannelsView() -> some View {
+		ImportChannelsView()
 	}
 	
 	@ViewBuilder
 	func menuButton() -> some View {
 		
 		Menu {
-		//	Button {
-		//		sharing = mvi.model.json
-		//	} label: {
-		//		Label {
-		//			Text(verbatim: "Share all")
-		//		} icon: {
-		//			Image(systemName: "square.and.arrow.up")
-		//		}
-		//	}
+			Button {
+				importChannels()
+			} label: {
+				Label {
+					Text("Import channels")
+				} icon: {
+					Image(systemName: "square.and.arrow.down")
+				}
+			}
 			Button {
 				closeAllChannels()
 			} label: {
@@ -218,6 +218,12 @@ fileprivate struct ChannelsView : View {
 		)
 	}
 	
+	func importChannels() {
+		log.trace("importChannels()")
+		
+		importChannelsOpen = true
+	}
+	
 	func closeAllChannels() {
 		log.trace("closeAllChannels()")
 		
@@ -230,7 +236,10 @@ fileprivate struct ChannelsView : View {
 	func forceCloseAllChannels() {
 		log.trace("forceCloseAllChannels()")
 		
-		forceCloseChannelsOpen = true
+		presentationMode.wrappedValue.dismiss()
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
+			deepLinkManager.broadcast(.forceCloseChannels)
+		}
 	}
 }
 

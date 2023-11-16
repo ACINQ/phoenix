@@ -50,7 +50,6 @@ import fr.acinq.phoenix.android.service.ChannelsWatcher
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
-import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.safeLet
@@ -122,6 +121,7 @@ private fun PermamentNotice(
     notice: Notice
 ) {
     val context = LocalContext.current
+    val internalData = application.internalDataRepository
     val nc = LocalNavController.current
     val scope = rememberCoroutineScope()
 
@@ -134,7 +134,7 @@ private fun PermamentNotice(
                 onActionClick = {
                     openLink(context, "https://acinq.co/blog/phoenix-splicing-update")
                     scope.launch {
-                        InternalData.saveLegacyMigrationMessageShown(context, true)
+                        internalData.saveLegacyMigrationMessageShown(true)
                     }
                 }
             )
@@ -222,7 +222,7 @@ private fun PermamentNotice(
                 message = stringResource(id = R.string.inappnotif_watchtower_late_message),
                 actionText = stringResource(id = R.string.inappnotif_watchtower_late_action),
                 onActionClick = {
-                    scope.launch { InternalData.saveChannelsWatcherOutcome(context, ChannelsWatcher.Outcome.Nominal(currentTimestampMillis())) }
+                    scope.launch { internalData.saveChannelsWatcherOutcome(ChannelsWatcher.Outcome.Nominal(currentTimestampMillis())) }
                 }
             )
         }
