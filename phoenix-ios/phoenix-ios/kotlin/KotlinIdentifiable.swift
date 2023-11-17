@@ -55,3 +55,10 @@ extension Lightning_kmpWalletState.Utxo: Identifiable {
 		return "\(previousTx.txid.toHex()):\(outputIndex):\(blockHeight)"
 	}
 }
+
+extension Lightning_kmpSensitiveTaskEventsTaskIdentifier.InteractiveTx: Identifiable {
+	
+	public var id: String {
+		return "\(self.channelId.toHex()):\(self.fundingTxIndex)"
+	}
+}
