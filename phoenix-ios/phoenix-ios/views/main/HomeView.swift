@@ -278,7 +278,7 @@ struct HomeView : MVIView {
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
-				if let _ = swapInWallet.expirationWarningInDays() { // less than 30 days away
+				if let days = swapInWallet.expirationWarningInDays(), days <= 1 {
 					Image(systemName: "exclamationmark.triangle")
 						.foregroundColor(.appNegative)
 						.padding(.trailing, 2)
