@@ -5,6 +5,7 @@ import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.DefaultSwapInParams
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.NodeEvents
+import fr.acinq.lightning.SensitiveTaskEvents
 import fr.acinq.lightning.SwapInParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumMiniWallet
@@ -19,6 +20,10 @@ import fr.acinq.lightning.channel.states.Offline
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.NativeSocketException
+import fr.acinq.lightning.io.PaymentNotSent
+import fr.acinq.lightning.io.PaymentProgress
+import fr.acinq.lightning.io.PaymentSent
+import fr.acinq.lightning.io.PeerEvent
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.Connection
@@ -274,4 +279,34 @@ fun defaultSwapInParams(): SwapInParams {
         maxConfirmations = DefaultSwapInParams.MaxConfirmations,
         refundDelay = DefaultSwapInParams.RefundDelay
     )
+}
+
+fun SensitiveTaskEvents.asTaskStarted(): SensitiveTaskEvents.TaskStarted? = when (this) {
+    is SensitiveTaskEvents.TaskStarted -> this
+    else -> null
+}
+
+fun SensitiveTaskEvents.asTaskEnded(): SensitiveTaskEvents.TaskEnded? = when (this) {
+    is SensitiveTaskEvents.TaskEnded -> this
+    else -> null
+}
+
+fun SensitiveTaskEvents.TaskIdentifier.asInteractiveTx(): SensitiveTaskEvents.TaskIdentifier.InteractiveTx? = when (this) {
+    is SensitiveTaskEvents.TaskIdentifier.InteractiveTx -> this
+    else -> null
+}
+
+fun PeerEvent.asPaymentProgress(): PaymentProgress? = when (this) {
+    is PaymentProgress -> this
+    else -> null
+}
+
+fun PeerEvent.asPaymentSent(): PaymentSent? = when (this) {
+    is PaymentSent -> this
+    else -> null
+}
+
+fun PeerEvent.asPaymentNotSent(): PaymentNotSent? = when (this) {
+    is PaymentNotSent -> this
+    else -> null
 }

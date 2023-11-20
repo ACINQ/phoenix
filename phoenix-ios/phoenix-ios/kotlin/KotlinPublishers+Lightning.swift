@@ -12,6 +12,27 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+extension Lightning_kmpPeer {
+	
+	fileprivate struct _Key {
+		static var eventsFlowPublisher = 0
+	}
+	
+	func eventsFlowPublisher() -> AnyPublisher<Lightning_kmpPeerEvent, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.eventsFlowPublisher) {
+			
+			/// Transforming from Kotlin:
+			/// `eventsFlow: SharedFlow<PeerEvent>`
+			///
+			KotlinPassthroughSubject<Lightning_kmpPeerEvent>(
+				self.eventsFlow
+			)
+			.compactMap { $0 }
+			.eraseToAnyPublisher()
+		}
+	}
+}
 
 extension Lightning_kmpElectrumClient {
 	

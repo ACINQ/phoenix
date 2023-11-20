@@ -58,13 +58,6 @@ class PaymentsManager(
     val lastCompletedPayment: StateFlow<WalletPayment?> = _lastCompletedPayment
 
     /**
-     * The in-flight flow tracks payments that are being sent. This is used by iOS in case the app goes into the
-     * background and the iOS app needs to start a long-lived task so that the payment can still go through.
-     */
-    private val _inFlightOutgoingPayments = MutableStateFlow<Set<UUID>>(setOf())
-    val inFlightOutgoingPayments: StateFlow<Set<UUID>> = _inFlightOutgoingPayments
-
-    /**
      * Provides a default PaymentsFetcher for use by the app.
      * (You can also create your own instances if needed.)
      */
@@ -82,8 +75,6 @@ class PaymentsManager(
         launch { monitorLastCompletedPayment(currentTimestampMillis()) }
 
         launch { monitorUnconfirmedTransactions() }
-
-        launch { monitorInflightOutgoingPayments() }
     }
 
     private suspend fun monitorPaymentsCountInDb() {
@@ -105,24 +96,6 @@ class PaymentsManager(
                     }
                     break
                 }
-            }
-        }
-    }
-
-    /** Monitors in-flight outgoing payments from peer events and forward them to the [_inFlightOutgoingPayments] flow. */
-    private suspend fun monitorInflightOutgoingPayments() {
-        peerManager.getPeer().eventsFlow.collect { event ->
-            when (event) {
-                is PaymentProgress -> {
-                    addToInFlightOutgoingPayments(event.request.paymentId)
-                }
-                is PaymentSent -> {
-                    removeFromInFlightOutgoingPayments(event.request.paymentId)
-                }
-                is PaymentNotSent -> {
-                    removeFromInFlightOutgoingPayments(event.request.paymentId)
-                }
-                else -> Unit
             }
         }
     }
@@ -152,20 +125,6 @@ class PaymentsManager(
                 }
             }
         }
-    }
-
-    /** Adds to StateFlow<Set<UUID>> */
-    private fun addToInFlightOutgoingPayments(id: UUID) {
-        val oldSet = _inFlightOutgoingPayments.value
-        val newSet = oldSet.plus(id)
-        _inFlightOutgoingPayments.value = newSet
-    }
-
-    /** Removes from StateFlow<Set<UUID>> */
-    private fun removeFromInFlightOutgoingPayments(id: UUID) {
-        val oldSet = _inFlightOutgoingPayments.value
-        val newSet = oldSet.minus(id)
-        _inFlightOutgoingPayments.value = newSet
     }
 
     private suspend fun paymentsDb(): SqlitePaymentsDb {
