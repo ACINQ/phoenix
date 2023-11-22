@@ -70,6 +70,14 @@
     <string name="settings_payment_history">Historie plateb</string>
     <string name="settings_notifications">Oznámení</string>
 
+    <!-- home: swap help -->
+
+    <string name="home_swapin_help_pending">Čeká na 3 potvrzení.</string>
+    <string name="home_swapin_help_ready_fee">Vklady se nasadí do Lightningu, když jsou poplatky za těžbu nižší než %1$s.</string>
+    <string name="home_swapin_help_ready_disabled">Vklady zůstanou na řetězci, protože automatická správa kanálů je vypnutá.</string>
+    <string name="home_swapin_help_generic">Peníze na řetězci byly uloženy do vaší peněženky.</string>
+    <string name="home_swapin_help_button">Tlačítko pro podrobnosti</string>
+
     <!-- home: bottom menu -->
 
     <string name="menu_settings">Nastavení</string>
@@ -303,6 +311,10 @@
       \n\n
       Platby, které obdržíte na L2, můžete obdržet okamžitě a za nulové poplatky. Občas je však pro správu platebního kanálu L2 nutná i operace L1. To lze provést automaticky, <b>pokud</b> poplatky těžařů odpovídají nastaveným zásadám poplatků.
     </string>
+
+    <!-- payment line -->
+
+    <string name="paymentline_outgoing_unconfirmed">Nepotvrzeno - klepnutím zrychlíte</string>
 
     <!-- CPFP -->
 

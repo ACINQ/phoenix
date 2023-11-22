@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -631,7 +632,7 @@ private fun ConfirmationView(
                     )
                     Text(
                         text = stringResource(id = R.string.paymentdetails_status_unconfirmed_zero_bump),
-                        style = MaterialTheme.typography.caption.copy(fontSize = 14.sp)
+                        style = MaterialTheme.typography.button.copy(fontSize = 14.sp, color = MaterialTheme.colors.primary, fontWeight = FontWeight.Bold),
                     )
                 }
             } else {

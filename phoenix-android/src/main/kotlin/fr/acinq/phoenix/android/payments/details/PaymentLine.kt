@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
+import fr.acinq.lightning.db.OnChainOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.phoenix.android.R
@@ -151,7 +152,11 @@ fun PaymentLine(
                 }
             }
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = payment.createdAt.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
+            if (payment is OnChainOutgoingPayment && payment.confirmedAt == null) {
+                Text(text = stringResource(id = R.string.paymentline_outgoing_unconfirmed), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
+            } else {
+                Text(text = payment.createdAt.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
+            }
         }
     }
 }
@@ -162,9 +167,8 @@ private fun PaymentDescription(paymentInfo: WalletPaymentInfo, modifier: Modifie
     val payment = paymentInfo.payment
     val metadata = paymentInfo.metadata
     val peer by business.peerManager.peerState.collectAsState()
-    val isLegacyMigration = paymentInfo.isLegacyMigration(peer)
 
-    val desc = when (isLegacyMigration) {
+    val desc = when (paymentInfo.isLegacyMigration(peer)) {
         null -> stringResource(id = R.string.paymentdetails_desc_closing_channel) // not sure yet, but we still know it's a closing
         true -> stringResource(id = R.string.paymentdetails_desc_legacy_migration)
         false -> metadata.userDescription

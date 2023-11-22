@@ -70,6 +70,14 @@
     <string name="settings_payment_history">Histórico de pagamentos</string>
     <string name="settings_notifications">Notificações</string>
 
+    <!-- home: swap help -->
+
+    <string name="home_swapin_help_pending">Aguardando 3 confirmações.</string>
+    <string name="home_swapin_help_ready_fee">Os depósitos serão implantados no Lightning quando as taxas de mineração estiverem abaixo de %1$s.</string>
+    <string name="home_swapin_help_ready_disabled">Os depósitos permanecerão na cadeia porque o gerenciamento automatizado de canais está desativado.</string>
+    <string name="home_swapin_help_generic">Os fundos on-chain foram depositados em sua carteira.</string>
+    <string name="home_swapin_help_button">Toque para obter detalhes</string>
+
     <!-- home: bottom menu -->
 
     <string name="menu_settings">Configurações</string>
@@ -243,7 +251,7 @@
     <!-- wallet info -->
 
     <string name="walletinfo_onchain_swapin">Swap-in wallet</string>
-    <string name="walletinfo_onchain_swapin_help">Os fundos enviados para essa carteira na cadeia são automaticamente trocados para o Lightning.</string>
+    <string name="walletinfo_onchain_swapin_help">Phoenix é uma carteira Lightning. Os fundos recebidos na cadeia serão então transferidos automaticamente para o Lightning, de acordo com suas configurações de gerenciamento de canais.</string>
     <string name="walletinfo_onchain_swapin_help_faq_link">Veja como funciona</string>
     <string name="walletinfo_onchain_swapin_policy_view">Toque para configurar.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">Os fundos on-chain serão automaticamente trocados para o Lightning se a taxa for <b>inferior a %1$s</b>.</string>
@@ -301,6 +309,10 @@
       \n\n
       Os pagamentos que você recebe no L2 podem ser recebidos instantaneamente e sem taxas. No entanto, ocasionalmente, uma operação L1 também é necessária para gerenciar o canal de pagamento L2. Isso pode ser feito automaticamente <b>SE</b> as taxas do minerador aderirem à sua política de taxas configurada.
     </string>
+
+    <!-- payment line -->
+
+    <string name="paymentline_outgoing_unconfirmed">Não confirmado - toque para acelerar</string>
 
     <!-- CPFP -->
 

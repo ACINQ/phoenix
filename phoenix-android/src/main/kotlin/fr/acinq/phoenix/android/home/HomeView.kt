@@ -76,7 +76,6 @@ fun HomeView(
     onTorClick: () -> Unit,
     onElectrumClick: () -> Unit,
     onShowSwapInWallet: () -> Unit,
-    onShowChannels: () -> Unit,
     onShowNotifications: () -> Unit,
 ) {
     val log = logger("HomeView")
@@ -226,7 +225,6 @@ fun HomeView(
                     swapInBalance = swapInBalance.value,
                     unconfirmedChannelsBalance = pendingChannelsBalance.value,
                     onShowSwapInWallet = onShowSwapInWallet,
-                    onShowChannels = onShowChannels,
                 )
                 PrimarySeparator(modifier = Modifier.layoutId("separator"))
                 HomeNotices(

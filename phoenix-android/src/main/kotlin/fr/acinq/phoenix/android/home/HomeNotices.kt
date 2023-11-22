@@ -29,7 +29,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -96,7 +95,6 @@ private fun FirstNoticeView(
 ) {
     val context = LocalContext.current
     val navController = LocalNavController.current
-    val scope = rememberCoroutineScope()
 
     val onClick = if (messagesCount == 1) {
         when (notice) {
@@ -158,7 +156,7 @@ private fun FirstNoticeView(
             }
 
             Notice.MempoolFull -> {
-                NoticeTextView(text = stringResource(id = R.string.inappnotif_mempool_full_message), icon = R.drawable.ic_alert_triangle)
+                NoticeTextView(text = stringResource(id = R.string.inappnotif_mempool_full_message), icon = R.drawable.ic_info)
             }
 
             Notice.UpdateAvailable -> {

@@ -19,16 +19,31 @@ package fr.acinq.phoenix.android.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -167,42 +182,56 @@ fun RowScope.IconPopup(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     var showPopup by remember { mutableStateOf(false) }
-    if (showPopup) {
-        Popup(
-            onDismissRequest = { showPopup = false },
-            offset = IntOffset(x = -200, y = 54)
+    spaceLeft?.let { Spacer(Modifier.width(it)) }
+    Box {
+        BorderButton(
+            icon = icon,
+            iconTint = if (showPopup) MaterialTheme.colors.onPrimary else colorAtRest,
+            backgroundColor = if (showPopup) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
+            borderColor = if (showPopup) MaterialTheme.colors.primary else colorAtRest,
+            padding = PaddingValues(iconPadding),
+            modifier = modifier.size(iconSize),
+            interactionSource = interactionSource,
+            onClick = { showPopup = true }
+        )
+        if (showPopup) {
+            PopupDialog(onDismiss = { showPopup = false }, message = popupMessage, button = popupLink?.let { (text, link) ->
+                { WebLink(text = text, url = link, fontSize = 14.sp, modifier = Modifier.fillMaxWidth(), padding = PaddingValues(horizontal = 10.dp, vertical = 8.dp)) }
+            })
+        }
+    }
+    spaceRight?.let { Spacer(Modifier.width(it)) }
+}
+
+@Composable
+fun PopupDialog(
+    onDismiss: () -> Unit,
+    message: String,
+    button: @Composable (() -> Unit)? = null,
+) {
+    Popup(
+        alignment = Alignment.TopCenter,
+        offset = IntOffset(x = 0, y = 58),
+        onDismissRequest = onDismiss,
+    ) {
+        Surface(
+            modifier = Modifier.widthIn(min = 280.dp, max = 280.dp),
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colors.primary),
+            elevation = 6.dp,
         ) {
-            Surface(
-                modifier = Modifier
-                    .padding(horizontal = 4.dp)
-                    .widthIn(min = 280.dp, max = 280.dp),
-                shape = RoundedCornerShape(8.dp),
-                border = BorderStroke(1.dp, MaterialTheme.colors.primary),
-                elevation = 6.dp,
-            ) {
-                Column(modifier = Modifier.padding(10.dp)) {
-                    Text(
-                        text = popupMessage,
-                        style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
-                    )
-                    popupLink?.let { (text, link) ->
-                        Spacer(modifier = Modifier.height(8.dp))
-                        WebLink(text = text, url = link, fontSize = 14.sp)
-                    }
+            Column() {
+                Text(
+                    modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 8.dp),
+                    text = message,
+                    style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
+                )
+                button?.let {
+                    it()
+                } ?: run {
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }
     }
-    spaceLeft?.let { Spacer(Modifier.width(it)) }
-    BorderButton(
-        icon = icon,
-        iconTint = if (showPopup) MaterialTheme.colors.onPrimary else colorAtRest,
-        backgroundColor = if (showPopup) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
-        borderColor = if (showPopup) MaterialTheme.colors.primary else colorAtRest,
-        padding = PaddingValues(iconPadding),
-        modifier = modifier.size(iconSize),
-        interactionSource = interactionSource,
-        onClick = { showPopup = true }
-    )
-    spaceRight?.let { Spacer(Modifier.width(it)) }
 }

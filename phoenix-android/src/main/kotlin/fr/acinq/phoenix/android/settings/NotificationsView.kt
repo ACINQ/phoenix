@@ -208,10 +208,10 @@ private fun PermamentNotice(
 
         Notice.MempoolFull -> {
             ImportantNotification(
-                icon = R.drawable.ic_alert_triangle,
+                icon = R.drawable.ic_info,
                 message = stringResource(id = R.string.inappnotif_mempool_full_message),
                 actionText = stringResource(id = R.string.inappnotif_mempool_full_action),
-                onActionClick = { openLink(context, "https://phoenix.acinq.co/faq#high-mempool-size-impacts") },
+                onActionClick = { openLink(context, "https://phoenix.acinq.co/faq#is-phoenix-affected-by-high-on-chain-fees") },
             )
         }
 

@@ -257,8 +257,7 @@
     <string name="home__onchain_incoming">+%1$s</string>
 
     <string name="home__faq_button">FAQ</string>
-    <string name="home__payments_none">Vous n\'avez pas fait de paiement récemment.\n\nUtilisez les boutons ci-dessous pour envoyer et recevoir des paiement.</string>
-    <string name="home__payments_none_incoming">Un dépôt est en cours.\n\nUne fois confirmé, le paiement apparaîtra ici.</string>
+    <string name="home__payments_none">Utilisez les boutons Envoyer et Recevoir ci-dessous pour débuter !</string>
     <string name="home__payments_header">Paiement récents</string>
     <string name="home__payments_more_button">Montrer tous les paiements…</string>
     <string name="home__connection__electrum_late">Electrum en retard</string>

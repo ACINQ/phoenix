@@ -16,6 +16,8 @@
 
 package fr.acinq.phoenix.android.settings.walletinfo
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,6 +45,7 @@ import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
@@ -76,31 +79,37 @@ fun SwapInWalletInfo(
             onBackClick = onBackClick,
             title = stringResource(id = R.string.walletinfo_onchain_swapin),
             helpMessage = stringResource(id = R.string.walletinfo_onchain_swapin_help),
-            helpMessageLink = stringResource(id = R.string.walletinfo_onchain_swapin_help_faq_link) to "https://phoenix.acinq.co/faq"
+            helpMessageLink = stringResource(id = R.string.walletinfo_onchain_swapin_help_faq_link)
+                to "https://phoenix.acinq.co/faq#can-i-deposit-funds-on-chain-to-phoenix-and-how-long-does-it-take-before-i-can-use-it",
         )
-        Card(
-            internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-            onClick = onViewChannelPolicyClick,
-        ) {
-            when (val policy = liquidityPolicyInPrefs) {
-                is LiquidityPolicy.Disable -> {
-                    Text(text = stringResource(id = R.string.walletinfo_onchain_swapin_policy_disabled_details))
-                }
-                is LiquidityPolicy.Auto -> {
-                    Text(text = annotatedStringResource(id = R.string.walletinfo_onchain_swapin_policy_auto_details, policy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true)))
-                    swapInWallet?.swapInParams?.maxConfirmations?.let {
-                        Spacer(Modifier.height(8.dp))
-                        Text(text = annotatedStringResource(id = R.string.walletinfo_onchain_swapin_policy_auto_details_timeout, ceil(it.toDouble() / (144 * 30)).toInt()))
+        Card {
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                Spacer(modifier = Modifier.height(12.dp))
+                when (val policy = liquidityPolicyInPrefs) {
+                    is LiquidityPolicy.Disable -> {
+                        Text(text = annotatedStringResource(id = R.string.walletinfo_onchain_swapin_policy_disabled_details))
                     }
+                    is LiquidityPolicy.Auto -> {
+                        Text(text = annotatedStringResource(id = R.string.walletinfo_onchain_swapin_policy_auto_details, policy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true)))
+                        swapInWallet?.swapInParams?.maxConfirmations?.let {
+                            Spacer(Modifier.height(8.dp))
+                            Text(text = annotatedStringResource(id = R.string.walletinfo_onchain_swapin_policy_auto_details_timeout, ceil(it.toDouble() / (144 * 30)).toInt()))
+                        }
+                    }
+                    null -> {}
                 }
-                null -> {}
+                Spacer(modifier = Modifier.height(8.dp))
             }
-            Spacer(Modifier.height(16.dp))
-            TextWithIcon(
+            Button(
                 text = stringResource(id = R.string.walletinfo_onchain_swapin_policy_view),
-                textStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary),
+                textStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.primary),
                 icon = R.drawable.ic_settings,
-                iconTint = MaterialTheme.colors.primary
+                iconTint = MaterialTheme.colors.primary,
+                onClick = onViewChannelPolicyClick,
+                modifier = Modifier.fillMaxWidth(),
+                padding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                space = 8.dp,
+                horizontalArrangement = Arrangement.Start,
             )
         }
 
@@ -113,14 +122,13 @@ fun SwapInWalletInfo(
                     textAlign = TextAlign.Center
                 )
             } else {
-
                 val waitingForSwap = wallet.unconfirmed + wallet.weaklyConfirmed
                 if (waitingForSwap.isNotEmpty()) {
                     WaitingForConfirmations(wallet = wallet)
                 }
 
                 if (wallet.deeplyConfirmed.balance > 0.sat) {
-                    ReadyForSwapView(wallet = wallet, onViewChannelPolicyClick)
+                    ReadyForSwapView(wallet = wallet)
                 }
 
                 if (wallet.lockedUntilRefund.balance > 0.sat) {
@@ -164,7 +172,6 @@ private fun WaitingForConfirmations(
 @Composable
 private fun ReadyForSwapView(
     wallet: WalletState.WalletWithConfirmations,
-    onViewChannelPolicyClick: () -> Unit,
 ) {
     val swappableUtxos = wallet.deeplyConfirmed
     val swappableBalance = swappableUtxos.balance.toMilliSatoshi()
@@ -179,7 +186,6 @@ private fun ReadyForSwapView(
     Card(
         modifier = Modifier.fillMaxWidth(),
         internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-        //onClick = { showDetailsSheet = true },
     ) {
         BalanceRow(balance = swappableBalance)
 

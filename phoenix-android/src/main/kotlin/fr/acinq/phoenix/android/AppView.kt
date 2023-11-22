@@ -201,7 +201,6 @@ fun AppView(
                             onTorClick = { navController.navigate(Screen.TorConfig) },
                             onElectrumClick = { navController.navigate(Screen.ElectrumServer) },
                             onShowSwapInWallet = { navController.navigate(Screen.WalletInfo.SwapInWallet) },
-                            onShowChannels = { navController.navigate(Screen.Channels) },
                             onShowNotifications = { navController.navigate(Screen.Notifications) }
                         )
                     }

@@ -46,6 +46,20 @@
     <string name="notif_watcher_revoked_commit_title">Bitte öffnen Sie Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Einige Ihrer Kanäle wurden möglicherweise geschlossen.</string>
 
+    <!-- home: swap help -->
+
+    <string name="home_swapin_help_pending">Wartet auf 3 Bestätigungen.</string>
+    <string name="home_swapin_help_ready_fee">Einzahlungen werden auf Lightning übertragen, wenn die Mining-Gebühren unter %1$s liegen.</string>
+    <string name="home_swapin_help_ready_disabled">Einlagen bleiben auf der Chain, da die automatische Kanalverwaltung deaktiviert ist.</string>
+    <string name="home_swapin_help_generic">On-Chain Guthaben wurde auf Ihre Wallet eingezahlt.</string>
+    <string name="home_swapin_help_button">Tippen Sie für Details</string>
+
+    <!-- home: bottom menu -->
+
+    <string name="menu_settings">Einstellungen</string>
+    <string name="menu_send">Senden</string>
+    <string name="menu_receive">Empfangen</string>
+
     <!-- settings list -->
 
     <string name="settings_general_title">Allgemein</string>
@@ -237,7 +251,7 @@
     <!-- wallet info -->
 
     <string name="walletinfo_onchain_swapin">Swap-in Wallet</string>
-    <string name="walletinfo_onchain_swapin_help">Guthaben, das an diese On-Chain-Wallet gesendet wird, wird automatisch in Lightning umgewandelt.</string>
+    <string name="walletinfo_onchain_swapin_help">Phoenix ist eine Lightning Wallet. Guthaben, die auf der Chain eingehen, wird zunächst automatisch in Lightning umgewandelt, je nach Ihren Einstellungen für die Kanalverwaltung..</string>
     <string name="walletinfo_onchain_swapin_help_faq_link">Sehen Sie, wie es funktioniert</string>
     <string name="walletinfo_onchain_swapin_policy_view">Tippen, um dies zu konfigurieren.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">On-Chain-Guthaben wird automatisch in Lightning umgewandelt, wenn die Gebühr <b>weniger als %1$s</b> beträgt.</string>
@@ -295,6 +309,10 @@
       \n\n
       Zahlungen, die Sie auf L2 erhalten, können unverzüglich und gebührenfrei empfangen werden. Manchmal ist jedoch eine L1-Transaktion erforderlich, um den L2-Zahlungskanal zu verwalten. Dies passiert automatisch <b>WENN</b> die Miner-Gebühren den von Ihnen festgelegten Gebührenrichtlinien entsprechen.
     </string>
+
+    <!-- payment line -->
+
+    <string name="paymentline_outgoing_unconfirmed">Unbestätigt - zum Beschleunigen antippen</string>
 
     <!-- CPFP -->
 

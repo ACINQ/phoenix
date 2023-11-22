@@ -57,11 +57,8 @@ fun ColumnScope.PaymentsList(
     Column(modifier = modifier.weight(1f, fill = true), horizontalAlignment = Alignment.CenterHorizontally) {
         if (payments.isEmpty()) {
             Text(
-                text = when {
-                    swapInBalance.unconfirmed + swapInBalance.weaklyConfirmed > 0.sat -> stringResource(id = R.string.home__payments_none_incoming)
-                    else -> stringResource(id = R.string.home__payments_none)
-                },
-                style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center),
+                text = stringResource(id = R.string.home__payments_none),
+                style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center, fontSize = 14.sp),
                 modifier = Modifier
                     .padding(horizontal = 32.dp)
                     .widthIn(max = 250.dp)

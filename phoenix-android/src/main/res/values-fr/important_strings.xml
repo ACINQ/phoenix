@@ -70,6 +70,14 @@
     <string name="settings_payment_history">Historique des paiements</string>
     <string name="settings_notifications">Notifications</string>
 
+    <!-- home: swap help -->
+
+    <string name="home_swapin_help_pending">En attente de 3 confirmations.</string>
+    <string name="home_swapin_help_ready_fee">Les dépôts se déploieront sur Lightning quand les frais de minage seront sous %1$s.</string>
+    <string name="home_swapin_help_ready_disabled">Les dépôts resteront sur la chaîne car la gestion automatique des canaux est désactivée.</string>
+    <string name="home_swapin_help_generic">Des fonds on-chain on été déposés sur votre wallet.</string>
+    <string name="home_swapin_help_button">Voir les détails</string>
+
     <!-- home: bottom menu -->
 
     <string name="menu_settings">Configuration</string>
@@ -244,7 +252,7 @@
     <!-- wallet info -->
 
     <string name="walletinfo_onchain_swapin">Swap-in wallet</string>
-    <string name="walletinfo_onchain_swapin_help">Les fonds envoyés vers ce wallet sont automatiquement basculés (\"swap\") sur Lightning.</string>
+    <string name="walletinfo_onchain_swapin_help">Phoenix est un portefeuille Lightning. Les paiements reçus on-chain seront automatiquement basculés sur Lightning, selon ce que votre configuration de gestion des canaux permet.</string>
     <string name="walletinfo_onchain_swapin_help_faq_link">Voir comment ça marche</string>
     <string name="walletinfo_onchain_swapin_policy_view">Cliquez pour configurer.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">Les fonds seront automatiquement basculés sur Lightning si les frais sont <b>inférieurs à %1$s</b> (configurable).</string>
@@ -302,6 +310,10 @@
       \n\n
       Les paiement reçus sur la couche L2 peuvent être reçus instantanéments et sans frais. Cela dit, des opérations L1 sont parfois nécessaires au bon fonctionnement du canal de paiement L2. Cela est fait automatiquement <b>si et seulement si</b> les frais de minage sont conformes à votre configuration.
     </string>
+
+    <!-- payment line -->
+
+    <string name="paymentline_outgoing_unconfirmed">Non confirmé - cliquez pour accélérer</string>
 
     <!-- CPFP -->
 

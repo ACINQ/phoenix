@@ -70,6 +70,14 @@
     <string name="settings_payment_history">Payment history</string>
     <string name="settings_notifications">Notifications</string>
 
+    <!-- home: swap help -->
+
+    <string name="home_swapin_help_pending">Waiting for 3 confirmations.</string>
+    <string name="home_swapin_help_ready_fee">Deposits will deploy to Lightning when mining fees are below %1$s.</string>
+    <string name="home_swapin_help_ready_disabled">Deposits will remain on-chain because automated channels management is disabled.</string>
+    <string name="home_swapin_help_generic">On-chain funds have been deposited into your wallet.</string>
+    <string name="home_swapin_help_button">Tap for details</string>
+
     <!-- home: bottom menu -->
 
     <string name="menu_settings">Settings</string>
@@ -166,7 +174,7 @@
     <string name="inappnotif_upgrade_critical_message">A critical update is available. You should update Phoenix as soon as possible.</string>
     <string name="inappnotif_upgrade_button">Update on Google Play</string>
 
-    <string name="inappnotif_mempool_full_message">The Bitcoin mempool is full and on-chain fees are high.</string>
+    <string name="inappnotif_mempool_full_message">On-chain fees are high.</string>
     <string name="inappnotif_mempool_full_action">See how Phoenix is affected</string>
 
     <string name="inappnotif_payment_onchain_pending_title">On-chain funds pending (+%1$s)</string>
@@ -243,14 +251,14 @@
     <!-- wallet info -->
 
     <string name="walletinfo_onchain_swapin">Swap-in wallet</string>
-    <string name="walletinfo_onchain_swapin_help">Funds sent to this on-chain wallet are automatically swapped to Lightning if the conditions are right.</string>
+    <string name="walletinfo_onchain_swapin_help">Phoenix is a Lightning wallet. Funds received on-chain will then be moved into Lightning automatically, according to your channel management settings.</string>
     <string name="walletinfo_onchain_swapin_help_faq_link">See how it works</string>
     <string name="walletinfo_onchain_swapin_policy_view">Tap to configure</string>
     <string name="walletinfo_onchain_swapin_empty">There are no swaps in progress.</string>
 
-    <string name="walletinfo_onchain_swapin_policy_auto_details">Funds are automatically swapped to Lightning if the fee is <b>less than %1$s</b> (can be configured).</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details">On-chain funds are automatically swapped into Lightning if the fee paid to miners is <b>less than %1$s</b> (can be configured).</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details_timeout">Funds not swapped <b>after %1$d months</b> are recoverable on-chain.</string>
-    <string name="walletinfo_onchain_swapin_policy_disabled_details">Automated channels management <b>is disabled</b>. Funds will remain on-chain. No swap will occur.</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled_details">Automated channels management <b>is disabled</b>. No swap will occur, funds will remain on-chain.</string>
 
     <string name="walletinfo_onchain_swapin_last_attempt">A swap attempt failed %1$s</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">Channels management was disabled.</string>
@@ -302,6 +310,10 @@
       \n\n
       Payments you receive on L2 can be received instantly and for zero fees. However, occasionally an L1 operation is also required in order to manage the L2 payment channel. This can be done automatically <b>IF</b> the miner fees adhere to your configured fee policy.
     </string>
+
+    <!-- payment line -->
+
+    <string name="paymentline_outgoing_unconfirmed">Unconfirmed - tap to accelerate</string>
 
     <!-- CPFP -->
 

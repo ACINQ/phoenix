@@ -70,6 +70,14 @@
     <string name="settings_payment_history">Historial de pagos</string>
     <string name="settings_notifications">Notificaciones</string>
 
+    <!-- home: swap help -->
+
+    <string name="home_swapin_help_pending">En espera de 3 confirmaciones.</string>
+    <string name="home_swapin_help_ready_fee">Los depósitos se desplegarán en Lightning cuando las tasas de minería sean inferiores a %1$s.</string>
+    <string name="home_swapin_help_ready_disabled">Los depósitos permanecerán en cadena porque la gestión automatizada de canales está desactivada.</string>
+    <string name="home_swapin_help_generic">Se han depositado fondos on-chain en tu cartera.</string>
+    <string name="home_swapin_help_button">Ver detalles</string>
+
     <!-- home: bottom menu -->
 
     <string name="menu_settings">Configuración</string>
@@ -292,6 +300,10 @@
     <string name="liquiditypolicy_save_button">Guardar política</string>
 
     <string name="liquiditypolicy_help">Con Phoenix, puedes recibir pagos en la cadena de bloques de Bitcoin (capa 1) y en la red Lightning de Bitcoin (capa 2). \n\n - La capa de la cadena de bloques (capa 1) es más lenta y, en general, mucho más cara (requiere comisiones de minería). \n - La capa de la red Lightning (capa 2) es mucho más rápida y, en general, mucho más barata (especialmente para los pagos pequeños). \n\n Cuando recibas un pago en la capa 1, Phoenix trasladará automáticamente los fondos a la capa 2 <b>SI</b> las comisiones de minería cumplen con la política de comisiones que hayas configurado. \n\n Los pagos que te envíen en la capa 2 pueden recibirse al instante y sin comisiones. Sin embargo, en ocasiones, también es necesaria una operación en la capa 1 para gestionar el canal de pago de la capa 2. Esto puede hacerse automáticamente <b>SI</b> las comisiones de minería cumplen con la política de comisiones que hayas configurado.</string>
+
+    <!-- payment line -->
+
+    <string name="paymentline_outgoing_unconfirmed">No confirmado - puntear para acelerar</string>
 
     <!-- CPFP -->
 
