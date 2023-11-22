@@ -91,6 +91,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-json:${Versions.ktor}")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor}")
                 implementation("io.ktor:ktor-client-content-negotiation:${Versions.ktor}")
+                implementation("io.ktor:ktor-client-logging:${Versions.ktor}")
                 // sqldelight
                 implementation("com.squareup.sqldelight:runtime:${Versions.sqlDelight}")
                 implementation("com.squareup.sqldelight:coroutines-extensions:${Versions.sqlDelight}")

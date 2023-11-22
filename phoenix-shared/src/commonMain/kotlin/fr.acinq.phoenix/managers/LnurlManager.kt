@@ -21,10 +21,14 @@ import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.lnurl.*
 import io.ktor.client.*
+import io.ktor.client.plugins.api.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.client.utils.EmptyContent
 import io.ktor.http.*
+import io.ktor.http.content.OutgoingContent
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -43,11 +47,28 @@ class LnurlManager(
 ) : CoroutineScope by MainScope() {
 
     // use special client for lnurl since we dont want ktor to break when receiving non-2xx response
+    val CustomHeaderPlugin = createClientPlugin("CustomHeaderPlugin") {
+        transformRequestBody { request, content, bodyType ->
+            if (request.method == HttpMethod.Get && content is EmptyContent) {
+                log.debug { "transformRequestBody: GET + EmptyContent => NoContent" }
+                object : OutgoingContent.NoContent() {
+                    override val contentLength: Long? = null
+                }
+            } else {
+                null
+            }
+        }
+    }
+
     private val httpClient: HttpClient by lazy {
         HttpClient {
             install(ContentNegotiation) {
                 json(json = Json { ignoreUnknownKeys = true })
                 expectSuccess = false
+            }
+            install(CustomHeaderPlugin)
+            install(Logging) {
+                level = LogLevel.ALL
             }
         }
     }
