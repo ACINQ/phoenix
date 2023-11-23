@@ -66,7 +66,7 @@ import fr.acinq.phoenix.android.payments.ScanDataView
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.history.CsvExportView
 import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
-import fr.acinq.phoenix.android.service.NodeServiceState
+import fr.acinq.phoenix.android.services.NodeServiceState
 import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.settings.channels.ChannelDetailsView
 import fr.acinq.phoenix.android.settings.channels.ChannelsView

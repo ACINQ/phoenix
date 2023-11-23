@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.service
+package fr.acinq.phoenix.android.services
 
 
 /**

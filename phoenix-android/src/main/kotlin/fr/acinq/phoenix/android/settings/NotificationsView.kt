@@ -46,7 +46,7 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.service.ChannelsWatcher
+import fr.acinq.phoenix.android.services.ChannelsWatcher
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
