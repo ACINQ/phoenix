@@ -47,9 +47,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.LightningOutgoingPayment
-import fr.acinq.lightning.db.OnChainOutgoingPayment
 import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
+import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -152,7 +152,8 @@ fun PaymentLine(
                 }
             }
             Spacer(modifier = Modifier.height(2.dp))
-            if (payment is OnChainOutgoingPayment && payment.confirmedAt == null) {
+            if ((payment is SpliceOutgoingPayment && payment.confirmedAt == null)
+                || (payment is SpliceCpfpOutgoingPayment && payment.confirmedAt == null)) {
                 Text(text = stringResource(id = R.string.paymentline_outgoing_unconfirmed), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
             } else {
                 Text(text = payment.createdAt.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
