@@ -354,7 +354,7 @@ class BusinessManager {
 	///
 	@discardableResult
 	func loadWallet(
-		mnemonics: [String],
+		recoveryPhrase: RecoveryPhrase,
 		seed knownSeed: KotlinByteArray? = nil,
 		walletRestoreType: WalletRestoreType? = nil
 	) -> Bool {
@@ -370,7 +370,10 @@ class BusinessManager {
 			return false
 		}
 		
-		let seed = knownSeed ?? business.walletManager.mnemonicsToSeed(mnemonics: mnemonics, passphrase: "")
+		let seed = knownSeed ?? business.walletManager.mnemonicsToSeed(
+			mnemonics  : recoveryPhrase.mnemonicsArray,
+			passphrase : ""
+		)
 		let _walletInfo = business.walletManager.loadWallet(seed: seed)
 		
 		self.walletInfo = _walletInfo
@@ -411,7 +414,7 @@ class BusinessManager {
 
 		self.syncManager = SyncManager(
 			chain: business.chain,
-			mnemonics: mnemonics,
+			recoveryPhrase: recoveryPhrase,
 			cloudKey: cloudKey,
 			encryptedNodeId: encryptedNodeId
 		)
