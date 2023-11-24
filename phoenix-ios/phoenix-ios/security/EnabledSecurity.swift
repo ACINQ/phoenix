@@ -7,22 +7,23 @@ struct EnabledSecurity: OptionSet, CustomStringConvertible {
 	let rawValue: Int
 
 	static let biometrics       = EnabledSecurity(rawValue: 1 << 0)
-	static let advancedSecurity = EnabledSecurity(rawValue: 1 << 1)
+	static let passcodeFallback = EnabledSecurity(rawValue: 1 << 1)
+	static let advancedSecurity = EnabledSecurity(rawValue: 1 << 2)
 
 	static let none: EnabledSecurity = []
 	
 	var description: String {
-		var str = "["
+		var items = [String]()
+		items.reserveCapacity(3)
 		if contains(.biometrics) {
-			str.append("biometrics")
+			items.append("biometrics")
+		}
+		if contains(.passcodeFallback) {
+			items.append("passcodeFallback")
 		}
 		if contains(.advancedSecurity) {
-			if str.count > 1 {
-				str.append(", ")
-			}
-			str.append("advancedSecurity")
+			items.append("advancedSecurity")
 		}
-		
-		return str.appending("]")
+		return "[\(items.joined(separator: ","))]"
 	}
 }
