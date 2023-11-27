@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import org.kodein.log.Logger
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.Duration
@@ -35,7 +36,13 @@ class AppConnectionsDaemon(
     private val tcpSocketBuilder: suspend () -> TcpSocket.Builder,
     private val tor: Tor,
     private val electrumClient: ElectrumClient,
-) : CoroutineScope by MainScope() {
+//) : CoroutineScope by MainScope() {
+) : CoroutineScope by CoroutineScope(CoroutineName("appconndaemon") + SupervisorJob() + Dispatchers.Main + CoroutineExceptionHandler { _, e ->
+    println("error in AppConnectionDaemon coroutine scope: ${e.message}")
+    val logger = loggerFactory.newLogger(Logger.Tag(AppConnectionsDaemon::class))
+    logger.error(e) { "error in AppConnectionDaemon coroutine scope: " }
+}) {
+
 
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,

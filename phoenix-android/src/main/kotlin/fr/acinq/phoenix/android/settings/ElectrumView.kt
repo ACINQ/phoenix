@@ -34,13 +34,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
@@ -62,7 +62,6 @@ fun ElectrumView() {
     val scope = rememberCoroutineScope()
     val prefElectrumServer = LocalElectrumServer.current
     var showCustomServerDialog by rememberSaveable { mutableStateOf(false) }
-    val vm = viewModel<ElectrumViewModel>()
 
     DefaultScreenLayout {
         DefaultScreenHeader(
@@ -78,7 +77,6 @@ fun ElectrumView() {
                 if (showCustomServerDialog) {
                     ElectrumServerDialog(
                         initialAddress = prefElectrumServer,
-                        onCheck = vm::checkCertificate,
                         onConfirm = { address ->
                             scope.launch {
                                 UserPrefs.saveElectrumServer(context, address)
@@ -86,11 +84,7 @@ fun ElectrumView() {
                                 showCustomServerDialog = false
                             }
                         },
-                        onDismiss = {
-                            scope.launch {
-                                showCustomServerDialog = false
-                            }
-                        }
+                        onDismiss = { showCustomServerDialog = false }
                     )
                 }
 
@@ -154,17 +148,22 @@ fun ElectrumView() {
 @Composable
 private fun ElectrumServerDialog(
     initialAddress: ServerAddress?,
-    onCheck: suspend (String, Int) -> ElectrumViewModel.CertificateCheckState,
     onConfirm: (ServerAddress?) -> Unit,
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val keyboardManager = LocalSoftwareKeyboardController.current
+
     var useCustomServer by rememberSaveable { mutableStateOf(initialAddress != null) }
     var address by rememberSaveable { mutableStateOf(initialAddress?.run { "$host:$port" } ?: "") }
+    val host = remember(address) { address.trim().substringBeforeLast(":").takeIf { it.isNotBlank() } }
+    val port = remember(address) { address.trim().substringAfterLast(":").toIntOrNull() ?: 50002 }
+    val isOnionHost = remember(address) { host?.endsWith(".onion") ?: false }
+
     var addressError by rememberSaveable { mutableStateOf(false) }
-    var connectionCheck by remember { mutableStateOf<ElectrumViewModel.CertificateCheckState>(ElectrumViewModel.CertificateCheckState.Init) }
+
+    val vm = viewModel<ElectrumDialogViewModel>()
 
     Dialog(
         onDismiss = onDismiss,
@@ -181,12 +180,13 @@ private fun ElectrumServerDialog(
                     text = stringResource(id = R.string.electrum_dialog_checkbox),
                     checked = useCustomServer,
                     onCheckedChange = {
-                        useCustomServer = it
-                        if (!it) {
-                            connectionCheck = ElectrumViewModel.CertificateCheckState.Init
+                        addressError = false
+                        if (useCustomServer != it) {
+                            vm.state = ElectrumDialogViewModel.CertificateCheckState.Init
                         }
+                        useCustomServer = it
                     },
-                    enabled = connectionCheck != ElectrumViewModel.CertificateCheckState.Checking
+                    enabled = vm.state !is ElectrumDialogViewModel.CertificateCheckState.Checking
                 )
                 TextInput(
                     modifier = Modifier.fillMaxWidth(),
@@ -194,30 +194,41 @@ private fun ElectrumServerDialog(
                     onTextChange = {
                         addressError = false
                         if (address != it) {
-                            connectionCheck = ElectrumViewModel.CertificateCheckState.Init
+                            vm.state = ElectrumDialogViewModel.CertificateCheckState.Init
                         }
                         address = it
                     },
                     maxLines = 4,
                     staticLabel = stringResource(id = R.string.electrum_dialog_input),
-                    enabled = useCustomServer && connectionCheck != ElectrumViewModel.CertificateCheckState.Checking
+                    enabled = useCustomServer && vm.state !is ElectrumDialogViewModel.CertificateCheckState.Checking,
+                    errorMessage = if (addressError) stringResource(id = R.string.electrum_dialog_invalid_input) else null
                 )
-                if (addressError) {
-                    Text(stringResource(id = R.string.electrum_dialog_invalid_input))
+                if (isOnionHost) {
+                    TextWithIcon(
+                        text = stringResource(id = R.string.electrum_connection_dialog_onion_port),
+                        textStyle = MaterialTheme.typography.subtitle2,
+                        icon = R.drawable.ic_info,
+                    )
+                } else {
+                    TextWithIcon(
+                        text = stringResource(id = R.string.electrum_connection_dialog_tls_port),
+                        textStyle = MaterialTheme.typography.subtitle2,
+                        icon = R.drawable.ic_info,
+                    )
                 }
             }
-            Spacer(modifier = Modifier.height(24.dp))
-            when (val check = connectionCheck) {
-                ElectrumViewModel.CertificateCheckState.Init, is ElectrumViewModel.CertificateCheckState.Failure -> {
-                    if (check is ElectrumViewModel.CertificateCheckState.Failure) {
-                        Text(
-                            text = stringResource(
-                                R.string.electrum_dialog_cert_failure, when (check.e) {
-                                    is UnresolvedAddressException -> stringResource(R.string.electrum_dialog_cert_unresolved)
-                                    else -> check.e.message ?: check.e.javaClass.simpleName
-                                }
-                            ),
-                            modifier = Modifier.padding(horizontal = 24.dp)
+            Spacer(modifier = Modifier.height(12.dp))
+            when (val state = vm.state) {
+                ElectrumDialogViewModel.CertificateCheckState.Init, is ElectrumDialogViewModel.CertificateCheckState.Failure -> {
+                    if (state is ElectrumDialogViewModel.CertificateCheckState.Failure) {
+                        ErrorMessage(
+                            header = stringResource(R.string.electrum_dialog_cert_failure),
+                            details = when (state.e) {
+                                is UnresolvedAddressException -> stringResource(R.string.electrum_dialog_cert_unresolved)
+                                else -> state.e.message ?: state.e.javaClass.simpleName
+                            },
+                            alignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth()
                         )
                         Spacer(Modifier.height(16.dp))
                     }
@@ -227,13 +238,14 @@ private fun ElectrumServerDialog(
                             onClick = {
                                 keyboardManager?.hide()
                                 if (useCustomServer) {
-                                    if (address.matches("""(.*):*(\d*)""".toRegex())) {
-                                        val (host, port) = address.trim().run {
-                                            substringBeforeLast(":") to (substringAfterLast(":").toIntOrNull() ?: 50002)
-                                        }
+                                    val host = host
+                                    if (address.matches("""(.*):*(\d*)""".toRegex()) && host != null) {
                                         scope.launch {
-                                            connectionCheck = ElectrumViewModel.CertificateCheckState.Checking
-                                            connectionCheck = onCheck(host, port)
+                                            if (isOnionHost) {
+                                                onConfirm(ServerAddress(host, port, TcpSocket.TLS.DISABLED))
+                                            } else {
+                                                vm.checkCertificate(host, port, onCertificateValid = onConfirm)
+                                            }
                                         }
                                     } else {
                                         addressError = true
@@ -242,22 +254,22 @@ private fun ElectrumServerDialog(
                                     onConfirm(null)
                                 }
                             },
-                            text = stringResource(id = R.string.electrum_dialog_cert_check_button),
+                            enabled = !addressError,
+                            text = if (useCustomServer) {
+                                stringResource(id = R.string.electrum_dialog_cert_check_button)
+                            } else {
+                                stringResource(id = R.string.btn_ok)
+                            },
                         )
                     }
                 }
-                ElectrumViewModel.CertificateCheckState.Checking -> {
+                ElectrumDialogViewModel.CertificateCheckState.Checking -> {
                     Row(Modifier.align(Alignment.End)) {
                         ProgressView(text = stringResource(id = R.string.electrum_dialog_cert_checking))
                     }
                 }
-                is ElectrumViewModel.CertificateCheckState.Valid -> {
-                    LaunchedEffect(Unit) {
-                        onConfirm(ServerAddress(check.host, check.port, TcpSocket.TLS.TRUSTED_CERTIFICATES()))
-                    }
-                }
-                is ElectrumViewModel.CertificateCheckState.Rejected -> {
-                    val cert = check.certificate
+                is ElectrumDialogViewModel.CertificateCheckState.Rejected -> {
+                    val cert = state.certificate
                     Column(
                         Modifier
                             .background(mutedBgColor)
@@ -313,7 +325,7 @@ private fun ElectrumServerDialog(
                             icon = R.drawable.ic_check_circle,
                             iconTint = positiveColor,
                             space = 8.dp,
-                            onClick = { onConfirm(ServerAddress(check.host, check.port, TcpSocket.TLS.PINNED_PUBLIC_KEY(Base64.encodeToString(cert.publicKey.encoded, Base64.NO_WRAP)))) },
+                            onClick = { onConfirm(ServerAddress(state.host, state.port, TcpSocket.TLS.PINNED_PUBLIC_KEY(Base64.encodeToString(cert.publicKey.encoded, Base64.NO_WRAP)))) },
                         )
                     }
                 }

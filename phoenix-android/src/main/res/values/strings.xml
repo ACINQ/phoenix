@@ -576,10 +576,9 @@
     <string name="electrum_title">Electrum server</string>
     <string name="electrum_about">To secure your payment channels Phoenix monitors the Bitcoin blockchain through Electrum servers.\n\nBy default, random servers are used. You can also configure Phoenix to connect only to your own server.</string>
     <string name="electrum_block_height_label">Block height</string>
-    <string name="electrum_tip_label">Tip timestamp</string>
-    <string name="electrum_fee_rate_next_label">Feerate 1 block</string>
-    <string name="electrum_fee_rate_funding_label">Feerate 144 blocks</string>
     <string name="electrum_connection_label">Server</string>
+    <string name="electrum_connection_dialog_tls_port">Use the TLS port (default 50002).</string>
+    <string name="electrum_connection_dialog_onion_port">Use the plain TCP port, not the TLS one, since this is an onion service.</string>
 
     <string name="electrum_connection_closed_with_random">Disconnected from Electrum</string>
     <string name="electrum_connection_closed_with_custom">Disconnected from %1$s</string>
@@ -595,7 +594,7 @@
     <string name="electrum_dialog_invalid_input">This address is invalid.</string>
     <string name="electrum_dialog_cert_check_button">Connect</string>
     <string name="electrum_dialog_cert_checking">Checking certificate…</string>
-    <string name="electrum_dialog_cert_failure">Failed to connect:\n%1$s</string>
+    <string name="electrum_dialog_cert_failure">Failed to connect</string>
     <string name="electrum_dialog_cert_unresolved">This address cannot be resolved.</string>
     <string name="electrum_dialog_cert_header">Untrusted certificate</string>
     <string name="electrum_dialog_cert_sha1">SHA1 Fingerprint</string>

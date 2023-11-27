@@ -232,7 +232,7 @@ fun ReadDataView(
         }
 
         if (model is Scan.Model.LnurlServiceFetch) {
-            Card(modifier = Modifier.align(Alignment.Center), internalPadding = PaddingValues(24.dp)) {
+            Card(modifier = Modifier.align(Alignment.Center), internalPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)) {
                 ProgressView(text = stringResource(R.string.scan_lnurl_fetching))
             }
         }

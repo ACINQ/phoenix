@@ -16,11 +16,17 @@
 
 package fr.acinq.phoenix.android.settings
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.utils.ServerAddress
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.network.tls.*
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -31,21 +37,28 @@ import java.security.cert.CertPathValidatorException
 import java.security.cert.Certificate
 import kotlin.time.Duration.Companion.seconds
 
-class ElectrumViewModel : ViewModel() {
+class ElectrumDialogViewModel : ViewModel() {
     val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-    internal suspend fun checkCertificate(host: String, port: Int): CertificateCheckState {
-        return withContext(viewModelScope.coroutineContext + Dispatchers.IO) {
+    var state by mutableStateOf<CertificateCheckState>(CertificateCheckState.Init)
+
+    internal suspend fun checkCertificate(host: String, port: Int, onCertificateValid: (ServerAddress) -> Unit) {
+        return withContext(viewModelScope.coroutineContext + Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+            log.error("error in checkCertificate: ", e)
+            state = CertificateCheckState.Failure(e)
+        }) {
+            state = CertificateCheckState.Checking
             delay(500) // add a small pause for better ux
             try {
                 withTimeout(10.seconds) {
-                    val socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(host, port).tls(viewModelScope.coroutineContext + Dispatchers.IO)
+                    val socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(host, port).tls(this.coroutineContext)
                     socket.close()
-                    CertificateCheckState.Valid(host, port)
+                    onCertificateValid(ServerAddress(host, port, TcpSocket.TLS.TRUSTED_CERTIFICATES()))
+                    state = CertificateCheckState.Init
                 }
             } catch (e: Exception) {
                 log.error("failed to connect to $host:$port: ${e.message}: ", e)
-                when (e) {
+                state = when (e) {
                     is java.security.cert.CertificateException -> {
                         val cause = e.cause
                         if (cause is CertPathValidatorException) {
@@ -75,11 +88,10 @@ class ElectrumViewModel : ViewModel() {
         }
     }
 
-    internal sealed class CertificateCheckState {
+    sealed class CertificateCheckState {
         object Init : CertificateCheckState()
-        object Checking : CertificateCheckState()
-        data class Valid(val host: String, val port: Int) : CertificateCheckState()
+        object Checking : CertificateCheckState()q
         data class Rejected(val host: String, val port: Int, val certificate: Certificate) : CertificateCheckState()
-        data class Failure(val e: Exception) : CertificateCheckState()
+        data class Failure(val e: Throwable) : CertificateCheckState()
     }
 }

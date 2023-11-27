@@ -534,9 +534,6 @@
     <string name="electrum_title">Electrum server</string>
     <string name="electrum_about">K zabezpečení vašich platebních kanálů Phoenix monitoruje Bitcoinový blockchain skrz Electrum servery.\n\nVe výchozím nastavení se používají náhodné servery. Phoenix můžete také nakonfigurovat tak, aby se připojoval pouze k vašemu vlastnímu serveru.</string>
     <string name="electrum_block_height_label">Výška bloku</string>
-    <string name="electrum_tip_label">Časové razítko tipu</string>
-    <string name="electrum_fee_rate_next_label">Poplatky za 1 blok</string>
-    <string name="electrum_fee_rate_funding_label">Poplatky za 144 bloků</string>
     <string name="electrum_connection_label">Server</string>
 
     <string name="electrum_connection_closed_with_random">Odpojeno od Electrum</string>
@@ -553,7 +550,7 @@
     <string name="electrum_dialog_invalid_input">Tato adresa je neplatná.</string>
     <string name="electrum_dialog_cert_check_button">Připojit</string>
     <string name="electrum_dialog_cert_checking">Kontrola certifikátu…</string>
-    <string name="electrum_dialog_cert_failure">Nepodařilo se připojit:\n%1$s</string>
+    <string name="electrum_dialog_cert_failure">Nepodařilo se připojit</string>
     <string name="electrum_dialog_cert_unresolved">Adresu se nepodařilo přeložit.</string>
     <string name="electrum_dialog_cert_header">Nedůvěryhodný certifikát</string>
     <string name="electrum_dialog_cert_sha1">SHA1 Fingerprint</string>
