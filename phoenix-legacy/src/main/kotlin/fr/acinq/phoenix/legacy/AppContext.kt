@@ -145,7 +145,7 @@ abstract class AppContext : Application() {
     log.debug("fetching context from ${Constants.WALLET_CONTEXT_URL}")
     Wallet.httpClient.newCall(Request.Builder().url(Constants.WALLET_CONTEXT_URL).build()).enqueue(object : Callback {
       override fun onFailure(call: Call, e: IOException) {
-        log.warn("failed to fetch context from ${Constants.WALLET_CONTEXT_URL}: ", e)
+        log.warn("failed to fetch context from ${Constants.WALLET_CONTEXT_URL}: ${e.message}")
         fetchWalletContextFallback(context)
       }
 
@@ -174,7 +174,7 @@ abstract class AppContext : Application() {
     log.debug("fetching context from ${Constants.WALLET_CONTEXT_URL_FALLBACK}")
     Wallet.httpClient.newCall(Request.Builder().url(Constants.WALLET_CONTEXT_URL_FALLBACK).build()).enqueue(object : Callback {
       override fun onFailure(call: Call, e: IOException) {
-        log.warn("failed to fetch context from ${Constants.WALLET_CONTEXT_URL_FALLBACK}: ", e)
+        log.warn("failed to fetch context from ${Constants.WALLET_CONTEXT_URL_FALLBACK}: ${e.message}")
       }
 
       override fun onResponse(call: Call, response: Response) {

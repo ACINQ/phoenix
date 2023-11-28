@@ -70,6 +70,14 @@
     <string name="settings_payment_history">Historique des paiements</string>
     <string name="settings_notifications">Notifications</string>
 
+    <!-- home: swap help -->
+
+    <string name="home_swapin_help_pending">En attente de 3 confirmations.</string>
+    <string name="home_swapin_help_ready_fee">Les dépôts se déploieront sur Lightning quand les frais de minage seront sous %1$s.</string>
+    <string name="home_swapin_help_ready_disabled">Les dépôts resteront sur la chaîne car la gestion automatique des canaux est désactivée.</string>
+    <string name="home_swapin_help_generic">Des fonds on-chain on été déposés sur votre wallet.</string>
+    <string name="home_swapin_help_button">Voir les détails</string>
+
     <!-- home: bottom menu -->
 
     <string name="menu_settings">Configuration</string>
@@ -170,11 +178,8 @@
     <string name="inappnotif_migration_from_legacy_dialog_body">Ne réutilisez pas vos anciennes adresses de swap ! Elles ne fonctionneront plus.\n\nContactez le support si vous le faisiez accidentellement.</string>
 
     <string name="inappnotif_payment_onchain_pending_title">Dépôt on-chain en attente (+%1$s)</string>
-    <plurals name="inappnotif_payments_rejection_overview">
-        <item quantity="one">%1$d paiement entrant refusé récemment</item>
-        <item quantity="many">%1$d paiements entrants refusés récemment</item>
-        <item quantity="other">%1$d paiements entrants refusés récemment</item>
-    </plurals>
+    <string name="inappnotif_payments_rejection_overview_one">Un paiement entrant a été refusé récemment</string>
+    <string name="inappnotif_payments_rejection_overview_many">%1$d paiements entrants refusés récemment</string>
     <string name="inappnotif_payment_rejected_title">Paiement refusé (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">La gestion des canaux automatisée est désactivée.</string>
     <string name="inappnotif_payment_rejected_over_absolute">Les frais étaient de %1$s, mais votre max est de %2$s.</string>
@@ -184,10 +189,8 @@
     <string name="inappnotif_payment_rejected_view_wallet">Voir les détails</string>
 
     <string name="inappnotif_watchtower_nominal_title">Veille en arrière-plan</string>
-    <plurals name="inappnotif_watchtower_nominal_description" tools:ignore="MissingQuantity">
-        <item quantity="one">%1$d canal a été contrôlé le %2$s. Aucun problème trouvé.</item>
-        <item quantity="other">%1$d canaux ont été contrôlés le %2$s. Aucun problème trouvé.</item>
-    </plurals>
+    <string name="inappnotif_watchtower_nominal_description_one">%1$d canal a été contrôlé le %2$s. Aucun problème trouvé.</string>
+    <string name="inappnotif_watchtower_nominal_description_many">%1$d canaux ont été contrôlés le %2$s. Aucun problème trouvé.</string>
     <string name="inappnotif_watchtower_revokedfound_title">Alerte de veille</string>
     <string name="inappnotif_watchtower_revokedfound_description">Des commitments révoqués ont été détectés le %1$s sur les canaux(s): %2$s. Ces canaux pourraient fermer.</string>
 
@@ -244,7 +247,7 @@
     <!-- wallet info -->
 
     <string name="walletinfo_onchain_swapin">Swap-in wallet</string>
-    <string name="walletinfo_onchain_swapin_help">Les fonds envoyés vers ce wallet sont automatiquement basculés (\"swap\") sur Lightning.</string>
+    <string name="walletinfo_onchain_swapin_help">Phoenix est un portefeuille Lightning. Les paiements reçus on-chain seront automatiquement basculés sur Lightning, selon ce que votre configuration de gestion des canaux permet.</string>
     <string name="walletinfo_onchain_swapin_help_faq_link">Voir comment ça marche</string>
     <string name="walletinfo_onchain_swapin_policy_view">Cliquez pour configurer.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">Les fonds seront automatiquement basculés sur Lightning si les frais sont <b>inférieurs à %1$s</b> (configurable).</string>
@@ -302,6 +305,10 @@
       \n\n
       Les paiement reçus sur la couche L2 peuvent être reçus instantanéments et sans frais. Cela dit, des opérations L1 sont parfois nécessaires au bon fonctionnement du canal de paiement L2. Cela est fait automatiquement <b>si et seulement si</b> les frais de minage sont conformes à votre configuration.
     </string>
+
+    <!-- payment line -->
+
+    <string name="paymentline_outgoing_unconfirmed">Non confirmé - cliquez pour accélérer</string>
 
     <!-- CPFP -->
 

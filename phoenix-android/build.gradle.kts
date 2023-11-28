@@ -27,7 +27,7 @@ android {
         versionCode = 67
         versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resourceConfigurations.addAll(listOf("en", "fr", "de", "es", "cs", "pt-rBR"))
+        resourceConfigurations.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR"))
     }
 
     buildTypes {

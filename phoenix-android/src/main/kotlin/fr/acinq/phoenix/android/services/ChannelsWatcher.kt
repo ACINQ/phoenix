@@ -14,21 +14,32 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.service
+package fr.acinq.phoenix.android.services
 
 import android.content.Context
-import androidx.work.*
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
 import fr.acinq.lightning.channel.states.Closing
 import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
-import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
+import fr.acinq.phoenix.android.security.EncryptedSeed
+import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.data.WatchTowerOutcome
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import fr.acinq.phoenix.managers.NotificationsManager
+import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeout
@@ -41,50 +52,67 @@ import java.util.concurrent.TimeUnit
 class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
+        log.info("starting channels watcher job")
         var notificationsManager: NotificationsManager? = null
-        val application = applicationContext as? PhoenixApplication ?: run {
-            log.error("phoenix application is not available, channels-watcher job did not run")
-            return Result.failure()
+
+        val application = applicationContext as PhoenixApplication
+        val internalData = application.internalDataRepository
+        val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
+        if (legacyAppStatus !is LegacyAppStatus.NotRequired) {
+            log.info("aborting channels-watcher service in state=${legacyAppStatus.name()}")
+            internalData.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
+            return Result.success()
         }
 
-        val internalData = application.internalDataRepository
         try {
-            val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first()
-            if (legacyAppStatus !is LegacyAppStatus.NotRequired) {
-                log.info("aborting channels-watcher service in state=${legacyAppStatus.name()}")
-                internalData.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
-                return Result.success()
+            val business = PhoenixBusiness(PlatformContext(applicationContext))
+            notificationsManager = business.notificationsManager
+            when (val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext)) {
+                is EncryptedSeed.V2.NoAuth -> {
+                    val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(encryptedSeed.decrypt()))
+                    business.walletManager.loadWallet(seed)
+
+                    val isTorEnabled = UserPrefs.getIsTorEnabled(applicationContext).first()
+                    val liquidityPolicy = UserPrefs.getLiquidityPolicy(applicationContext).first()
+                    val electrumServer = UserPrefs.getElectrumServer(applicationContext).first()
+
+                    business.appConfigurationManager.updateElectrumConfig(electrumServer)
+                    business.start(StartupParams(requestCheckLegacyChannels = false, isTorEnabled = isTorEnabled, liquidityPolicy = liquidityPolicy, trustedSwapInTxs = emptySet()))
+                }
+                else -> {
+                    internalData.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
+                    return Result.success()
+                }
             }
 
-            val business = application.business
-            notificationsManager = business.notificationsManager
-
-            val peer = withTimeout(60_000) {
+            business.appConnectionsDaemon!!.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Peer)
+            business.appConnectionsDaemon!!.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Http)
+            val peer = withTimeout(5_000) {
                 business.peerManager.getPeer()
             }
 
-            val channelsBeforeWatching = peer.bootChannelsFlow.filterNotNull().first()
-            if (channelsBeforeWatching.isEmpty()) {
+            val channelsAtBoot = peer.bootChannelsFlow.filterNotNull().first()
+            if (channelsAtBoot.isEmpty()) {
                 log.info("no channels found, nothing to watch")
                 internalData.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
                 return Result.success()
             } else {
-                log.info("watching ${channelsBeforeWatching.size} channels")
+                log.info("watching ${channelsAtBoot.size} channel(s)")
             }
 
             // connect electrum (and only electrum), and wait for the watcher to catch-up
-            val upToDate = withTimeout(ELECTRUM_TIMEOUT_MILLIS) {
+            withTimeout(ELECTRUM_TIMEOUT_MILLIS) {
                 peer.watcher.openUpToDateFlow().first()
             }
+            log.info("electrum watcher is up-to-date")
             business.appConnectionsDaemon?.decrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Electrum)
-            log.info("electrum watcher is up-to-date, timestamp $upToDate (${upToDate.toAbsoluteDateTimeString()})")
 
-            val revokedCommitsBeforeWatching = channelsBeforeWatching.map { (channelId, state) ->
+            val revokedCommitsBeforeWatching = channelsAtBoot.map { (channelId, state) ->
                 (state as? Closing)?.revokedCommitPublished?.let { channelId to it }
             }.filterNotNull().toMap()
 
-            log.debug("there were initially ${revokedCommitsBeforeWatching.size} channel(s) with revoked commitments")
-            log.debug("checking for new revoked commitments on ${peer.channels} channels")
+            log.info("there were initially ${revokedCommitsBeforeWatching.size} channel(s) with revoked commitments")
+            log.info("checking for new revoked commitments on ${peer.channels.size} channel(s)")
             val unknownRevokedAfterWatching = peer.channels.filter { (channelId, state) ->
                 state is Closing && state.revokedCommitPublished.any {
                     val isKnown = revokedCommitsBeforeWatching[channelId]?.contains(it) ?: false
@@ -101,9 +129,9 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
                 internalData.saveChannelsWatcherOutcome(Outcome.RevokedFound(currentTimestampMillis()))
                 SystemNotificationHelper.notifyRevokedCommits(applicationContext)
             } else {
+                log.info("no revoked commit found, channels-watcher job completed successfully")
                 notificationsManager.saveWatchTowerOutcome(WatchTowerOutcome.Nominal(channelsWatchedCount = peer.channels.size))
                 internalData.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
-                log.info("channels-watcher job completed, no revoked commit found")
             }
 
             return Result.success()

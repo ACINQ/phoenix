@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -164,7 +165,7 @@ private fun PaymentStatus(
                     isAnimated = false,
                     color = mutedTextColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, canBeBumped = false, onCpfpSuccess = onCpfpSuccess)
             }
             else -> {
                 PaymentStatusIcon(
@@ -175,7 +176,7 @@ private fun PaymentStatus(
                     isAnimated = fromEvent,
                     color = positiveColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, canBeBumped = false, onCpfpSuccess)
             }
         }
         is SpliceOutgoingPayment -> when (payment.confirmedAt) {
@@ -186,7 +187,7 @@ private fun PaymentStatus(
                     isAnimated = false,
                     color = mutedTextColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, canBeBumped = true, onCpfpSuccess = onCpfpSuccess)
             }
             else -> {
                 PaymentStatusIcon(
@@ -197,7 +198,7 @@ private fun PaymentStatus(
                     isAnimated = fromEvent,
                     color = positiveColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, canBeBumped = true, onCpfpSuccess = onCpfpSuccess)
             }
         }
         is SpliceCpfpOutgoingPayment -> when (payment.confirmedAt) {
@@ -208,7 +209,7 @@ private fun PaymentStatus(
                     isAnimated = false,
                     color = mutedTextColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, canBeBumped = true, onCpfpSuccess = onCpfpSuccess)
             }
             else -> {
                 PaymentStatusIcon(
@@ -219,7 +220,7 @@ private fun PaymentStatus(
                     isAnimated = fromEvent,
                     color = positiveColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, canBeBumped = true, onCpfpSuccess = onCpfpSuccess)
             }
         }
         is IncomingPayment -> {
@@ -280,7 +281,7 @@ private fun PaymentStatus(
                         value = channelId?.let { peerManager.getChannelWithCommitments(it)?.minDepthForFunding(params) }
                     }
                 }
-                ConfirmationView(it.txId, it.channelId, isConfirmed = it.confirmedAt != null, onCpfpSuccess, channelMinDepth)
+                ConfirmationView(it.txId, it.channelId, isConfirmed = it.confirmedAt != null, canBeBumped = false, onCpfpSuccess = onCpfpSuccess, channelMinDepth)
             }
         }
     }
@@ -578,6 +579,7 @@ private fun ConfirmationView(
     txId: ByteVector32,
     channelId: ByteVector32,
     isConfirmed: Boolean,
+    canBeBumped: Boolean,
     onCpfpSuccess: () -> Unit,
     minDepth: Int? = null, // sometimes we know how many confirmations are needed
 ) {
@@ -619,7 +621,7 @@ private fun ConfirmationView(
             if (conf == 0) {
                 Card(
                     internalPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                    onClick = { showBumpTxDialog = true },
+                    onClick = if (canBeBumped) { { showBumpTxDialog = true } } else null,
                     backgroundColor = Color.Transparent,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -629,10 +631,13 @@ private fun ConfirmationView(
                         textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp, color = MaterialTheme.colors.primary),
                         iconTint = MaterialTheme.colors.primary
                     )
-                    Text(
-                        text = stringResource(id = R.string.paymentdetails_status_unconfirmed_zero_bump),
-                        style = MaterialTheme.typography.caption.copy(fontSize = 14.sp)
-                    )
+
+                    if (canBeBumped) {
+                        Text(
+                            text = stringResource(id = R.string.paymentdetails_status_unconfirmed_zero_bump),
+                            style = MaterialTheme.typography.button.copy(fontSize = 14.sp, color = MaterialTheme.colors.primary, fontWeight = FontWeight.Bold),
+                        )
+                    }
                 }
             } else {
                 FilledButton(

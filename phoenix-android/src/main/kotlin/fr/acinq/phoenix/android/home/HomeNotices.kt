@@ -29,12 +29,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -96,7 +94,6 @@ private fun FirstNoticeView(
 ) {
     val context = LocalContext.current
     val navController = LocalNavController.current
-    val scope = rememberCoroutineScope()
 
     val onClick = if (messagesCount == 1) {
         when (notice) {
@@ -158,7 +155,7 @@ private fun FirstNoticeView(
             }
 
             Notice.MempoolFull -> {
-                NoticeTextView(text = stringResource(id = R.string.inappnotif_mempool_full_message), icon = R.drawable.ic_alert_triangle)
+                NoticeTextView(text = stringResource(id = R.string.inappnotif_mempool_full_message), icon = R.drawable.ic_info)
             }
 
             Notice.UpdateAvailable -> {
@@ -220,7 +217,11 @@ private fun PaymentsRejectedShortView(
             .padding(horizontal = 12.dp, vertical = 12.dp),
     ) {
         TextWithIcon(
-            text = pluralStringResource(id = R.plurals.inappnotif_payments_rejection_overview, count = rejectedPaymentsCount, rejectedPaymentsCount),
+            text = if (rejectedPaymentsCount == 1) {
+                stringResource(id = R.string.inappnotif_payments_rejection_overview_one)
+            } else {
+                stringResource(id = R.string.inappnotif_payments_rejection_overview_many, rejectedPaymentsCount)
+            },
             textStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
             icon = R.drawable.ic_info,
             iconTint = MaterialTheme.colors.primary,
@@ -243,6 +244,8 @@ private fun RowScope.NoticeTextView(
     Text(
         text = text,
         style = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
-        modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
+        modifier = Modifier
+            .weight(1f)
+            .align(Alignment.CenterVertically),
     )
 }

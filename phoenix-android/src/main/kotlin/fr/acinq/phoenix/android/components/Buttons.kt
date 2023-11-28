@@ -147,7 +147,8 @@ fun InlineButton(
         backgroundColor = Color.Transparent,
         shape = RoundedCornerShape(6.dp),
         maxLines = maxLines,
-        textStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary, fontSize = fontSize, textDecoration = TextDecoration.Underline)
+        textStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary, fontSize = fontSize, textDecoration = TextDecoration.Underline),
+        horizontalArrangement = Arrangement.Start,
     )
 }
 

@@ -254,8 +254,7 @@
     <string name="home__onchain_incoming">+%1$s</string>
 
     <string name="home__faq_button">FAQ</string>
-    <string name="home__payments_none">V poslední době jste neprovedli žádné platby.\n\nPomocí tlačítek Přijmout a Odeslat v dolní části této obrazovky můžete začít!</string>
-    <string name="home__payments_none_incoming">Přichází vklad.\n\nPo potvrzení se platba zobrazí zde.</string>
+    <string name="home__payments_none">Pomocí tlačítek Přijmout a Odeslat v dolní části této obrazovky můžete začít!</string>
     <string name="home__payments_header">Nedávné platby</string>
     <string name="home__payments_more_button">Ukázat všechny platby…</string>
     <string name="home__connection__electrum_late">Electrum late</string>

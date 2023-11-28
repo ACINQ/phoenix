@@ -28,7 +28,7 @@ import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
-import fr.acinq.phoenix.android.service.ChannelsWatcher
+import fr.acinq.phoenix.android.services.ChannelsWatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -102,7 +102,13 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
 
     /** Returns the last hannels-watcher job result. */
     val getChannelsWatcherOutcome: Flow<ChannelsWatcher.Outcome?> = safeData.map {
-        it[CHANNELS_WATCHER_OUTCOME]?.let { json.decodeFromString(it) }
+        it[CHANNELS_WATCHER_OUTCOME]?.let {
+            try {
+                json.decodeFromString(it)
+            } catch (e: Exception) {
+                null
+            }
+        }
     }
     suspend fun saveChannelsWatcherOutcome(outcome: ChannelsWatcher.Outcome) = internalData.edit {
         it[CHANNELS_WATCHER_OUTCOME] = json.encodeToString(outcome)

@@ -1,4 +1,4 @@
-package fr.acinq.phoenix.android.service
+package fr.acinq.phoenix.android.services
 
 import android.content.Intent
 import androidx.core.content.ContextCompat

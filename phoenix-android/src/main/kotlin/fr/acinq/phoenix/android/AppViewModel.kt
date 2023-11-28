@@ -28,8 +28,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.CreationExtras
-import fr.acinq.phoenix.android.service.NodeService
-import fr.acinq.phoenix.android.service.NodeServiceState
+import fr.acinq.phoenix.android.services.NodeService
+import fr.acinq.phoenix.android.services.NodeServiceState
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import org.slf4j.LoggerFactory
 

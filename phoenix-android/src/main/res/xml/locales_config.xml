@@ -20,6 +20,7 @@
     <locale android:name="fr"/>
     <locale android:name="de"/>
     <locale android:name="es"/>
+    <locale android:name="es_419"/>
     <locale android:name="cs"/>
     <locale android:name="pt-BR"/>
 </locale-config>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.service
+package fr.acinq.phoenix.android.services
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -24,9 +24,9 @@ import android.content.Intent
  * This receiver is started when the device has booted, and schedules background jobs.
  */
 class BootReceiver : BroadcastReceiver() {
-  override fun onReceive(context: Context, intent: Intent) {
-    if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
-      ChannelsWatcher.schedule(context)
+    override fun onReceive(context: Context, intent: Intent) {
+        if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
+            ChannelsWatcher.schedule(context)
+        }
     }
-  }
 }

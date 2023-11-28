@@ -1,4 +1,4 @@
-package fr.acinq.phoenix.android.service
+package fr.acinq.phoenix.android.services
 
 import android.app.Service
 import android.content.Intent
@@ -196,27 +196,10 @@ class NodeService : Service() {
                 stopForeground(STOP_FOREGROUND_REMOVE)
             }
         }) {
-//        serviceScope.launch(Dispatchers.Main + CoroutineExceptionHandler { _, e ->
-//            log.error("error when checking node state consistency before startup: ", e)
-//        }) {
-            // Check node state consistency. Use a lock because the [doStartNode] method can be called concurrently.
-            // If the node is already starting, started, or in error, the method returns.
-
-//        try {
-
-
             log.info("starting node from service state=${_state.value?.name} with checkLegacyChannels=$requestCheckLegacyChannels")
             doStartBusiness(decryptedMnemonics, requestCheckLegacyChannels)
-            ChannelsWatcher.schedule(applicationContext)
+            ChannelsWatcher.scheduleASAP(applicationContext)
             _state.postValue(NodeServiceState.Running)
-//        } catch (e: Exception) {
-//            log.error("error when starting node: ", e)
-//            _state.value = NodeServiceState.Error(e)
-//            if (isHeadless) {
-//                shutdown()
-//                stopForeground(STOP_FOREGROUND_REMOVE)
-//            }
-//        }
         }
     }
 
