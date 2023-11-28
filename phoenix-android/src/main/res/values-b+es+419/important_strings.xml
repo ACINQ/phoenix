@@ -193,7 +193,7 @@
 
     <!-- settings: display seed -->
 
-    <string name="displayseed_instructions">La frase de recuperación (denominada en ocasiones “semilla&quot;), es una lista de 12 palabras en inglés. Con la semilla, puedes recuperar el acceso total a tus fondos en caso de que sea necesario.\n\n<b>Solo te pertenece a ti, así que guárdala en privado.</b>\n\n<b>No compartas la semilla con nadie.</b>\nTen cuidado con el phishing. Los desarrolladores de Phoenix nunca te pedirán tu semilla.\n\n<b>No pierdas la semilla.</b>\nGuárdala en un lugar seguro (no en este teléfono). Si pierdes la semilla y el teléfono, perderás tus fondos.</string>
+    <string name="displayseed_instructions">La frase de recuperación (denominada en ocasiones \&quot;semilla\&quot;), es una lista de 12 palabras en inglés. Con la semilla, puedes recuperar el acceso total a tus fondos en caso de que sea necesario.\n\n<b>Solo te pertenece a ti, así que guárdala en privado.</b>\n\n<b>No compartas la semilla con nadie.</b>\nTen cuidado con el phishing. Los desarrolladores de Phoenix nunca te pedirán tu semilla.\n\n<b>No pierdas la semilla.</b>\nGuárdala en un lugar seguro (no en este teléfono). Si pierdes la semilla y el teléfono, perderás tus fondos.</string>
     <string name="displayseed_authenticate_button">Mostrar semilla</string>
     <string name="displayseed_dialog_header">PROTEGE ESTA SEMILLA.\nNO LA COMPARTAS.</string>
     <string name="displayseed_backup_notice_header">No has hecho una copia de seguridad de tu frase de recuperación.</string>
