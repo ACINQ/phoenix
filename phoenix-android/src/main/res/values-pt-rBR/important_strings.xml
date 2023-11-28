@@ -178,10 +178,9 @@
     <string name="inappnotif_mempool_full_action">Veja como a Phoenix é afetada</string>
 
     <string name="inappnotif_payment_onchain_pending_title">Fundos pendentes na cadeia (+%1$s)</string>
-    <plurals name="inappnotif_payments_rejection_overview">
-        <item quantity="one">%1$d pagamento recebido recentemente rejeitado</item>
-        <item quantity="many">%1$d pagamentos recebidos recentemente rejeitados</item>
-    </plurals>
+
+    <string name="inappnotif_payments_rejection_overview_one">1 pagamento recebido recentemente rejeitado</string>
+    <string name="inappnotif_payments_rejection_overview_many">%1$d pagamentos recebidos recentemente rejeitados</string>
     <string name="inappnotif_payment_rejected_title">Pagamento rejeitado (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">O gerenciamento automatizado de canais está desativado.</string>
     <string name="inappnotif_payment_rejected_over_absolute">A taxa foi de %1$s, mas sua taxa máxima foi definida como %2$s.</string>
@@ -191,10 +190,8 @@
     <string name="inappnotif_payment_rejected_view_wallet">Ver detalhes</string>
 
     <string name="inappnotif_watchtower_nominal_title">Watchtower report</string>
-    <plurals name="inappnotif_watchtower_nominal_description">
-        <item quantity="one">O canal %1$d foi verificado com êxito em %2$s. Nenhum problema foi encontrado.</item>
-        <item quantity="many">%1$d canais foram verificados com sucesso em %2$s. Nenhum problema foi encontrado.</item>
-    </plurals>
+    <string name="inappnotif_watchtower_nominal_description_one">O canal %1$d foi verificado com êxito em %2$s. Nenhum problema foi encontrado.</string>
+    <string name="inappnotif_watchtower_nominal_description_many">%1$d canais foram verificados com sucesso em %2$s. Nenhum problema foi encontrado.</string>
     <string name="inappnotif_watchtower_revokedfound_title">Watchtower alert</string>
     <string name="inappnotif_watchtower_revokedfound_description">Foram encontrados compromissos revogados em %1$s para o(s) canal(is): %2$s. Esse canal pode ser fechado.</string>
 

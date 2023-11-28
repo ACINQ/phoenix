@@ -178,10 +178,8 @@
     <string name="inappnotif_mempool_full_action">Erfahren Sie inwiefern Phoenix davon betroffen ist</string>
 
     <string name="inappnotif_payment_onchain_pending_title">On-chain Guthaben ausstehend (+%1$s)</string>
-    <plurals name="inappnotif_payments_rejection_overview">
-        <item quantity="one">%1$d kürzlich abgelehnter Zahlungseingang</item>
-        <item quantity="other">%1$d kürzlich abgelehnte Zahlungseingänge</item>
-    </plurals>
+    <string name="inappnotif_payments_rejection_overview_one">1 kürzlich abgelehnter Zahlungseingang</string>
+    <string name="inappnotif_payments_rejection_overview_many">%1$d kürzlich abgelehnte Zahlungseingänge</string>
     <string name="inappnotif_payment_rejected_title">Zahlung abgelehnt (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">Automatisches Kanal-Management ist deaktiviert.</string>
     <string name="inappnotif_payment_rejected_over_absolute">Die Gebühr wäre %1$s, aber Ihr Gebührenlimit beträgt %2$s.</string>
@@ -191,10 +189,8 @@
     <string name="inappnotif_payment_rejected_view_wallet">Details ansehen</string>
 
     <string name="inappnotif_watchtower_nominal_title">Watchtower-Bericht</string>
-    <plurals name="inappnotif_watchtower_nominal_description">
-        <item quantity="one">%1$d Kanal wurde erfolgreich geprüft am %2$s. Es wurden keine Probleme festgestellt.</item>
-        <item quantity="other">%1$d Kanäle wurden erfolgreich geprüft am %2$s. Es wurden keine Probleme festgestellt</item>
-    </plurals>
+    <string name="inappnotif_watchtower_nominal_description_one">%1$d Kanal wurde erfolgreich geprüft am %2$s. Es wurden keine Probleme festgestellt.</string>
+    <string name="inappnotif_watchtower_nominal_description_many">%1$d Kanäle wurden erfolgreich geprüft am %2$s. Es wurden keine Probleme festgestellt.</string>
     <string name="inappnotif_watchtower_revokedfound_title">Watchtower-Alarm</string>
     <string name="inappnotif_watchtower_revokedfound_description">Revoked commitments wurden am %1$s für folgende(n) Kanal/Kanäle gefunden: %2$s. Dieser Kanal kann geschlossen werden.</string>
 	

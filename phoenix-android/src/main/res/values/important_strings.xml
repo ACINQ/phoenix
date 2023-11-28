@@ -178,10 +178,8 @@
     <string name="inappnotif_mempool_full_action">See how Phoenix is affected</string>
 
     <string name="inappnotif_payment_onchain_pending_title">On-chain funds pending (+%1$s)</string>
-    <plurals name="inappnotif_payments_rejection_overview">
-        <item quantity="one">%1$d incoming payment rejected recently</item>
-        <item quantity="other">%1$d incoming payments rejected recently</item>
-    </plurals>
+    <string name="inappnotif_payments_rejection_overview_one">An incoming payment has been recently rejected</string>
+    <string name="inappnotif_payments_rejection_overview_many">%1$d incoming payments recently rejected</string>
     <string name="inappnotif_payment_rejected_title">Payment rejected (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">Automated channel management is disabled.</string>
     <string name="inappnotif_payment_rejected_over_absolute">The fee was %1$s, but your max fee was set to %2$s.</string>
@@ -191,10 +189,8 @@
     <string name="inappnotif_payment_rejected_view_wallet">View details</string>
 
     <string name="inappnotif_watchtower_nominal_title">Watchtower report</string>
-    <plurals name="inappnotif_watchtower_nominal_description">
-        <item quantity="one">%1$d channel was successfully checked on %2$s. No issues were found.</item>
-        <item quantity="other">%1$d channels were successfully checked on %2$s. No issues were found.</item>
-    </plurals>
+    <string name="inappnotif_watchtower_nominal_description_one">%1$d channel was successfully checked on %2$s. No issues were found.</string>
+    <string name="inappnotif_watchtower_nominal_description_many">%1$d channels were successfully checked on %2$s. No issues were found.</string>
     <string name="inappnotif_watchtower_revokedfound_title">Watchtower alert</string>
     <string name="inappnotif_watchtower_revokedfound_description">Revoked commitments were found on %1$s for channel(s): %2$s. This channel may be closed.</string>
 

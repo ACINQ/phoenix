@@ -178,10 +178,8 @@
     <string name="inappnotif_mempool_full_action">Vea cómo afecta a Phoenix</string>
 
     <string name="inappnotif_payment_onchain_pending_title">Fondos pendientes en la cadena (+%1$s)</string>
-    <plurals name="inappnotif_payments_rejection_overview">
-        <item quantity="one">Recientemente se rechazó %1$d pago entrante</item>
-        <item quantity="other">Recientemente se rechazaron %1$d pagos entrantes</item>
-    </plurals>
+    <string name="inappnotif_payments_rejection_overview_one">Recientemente se rechazó 1 pago entrante</string>
+    <string name="inappnotif_payments_rejection_overview_many">Recientemente se rechazaron %1$d pagos entrantes</string>
     <string name="inappnotif_payment_rejected_title">Pago rechazado (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">La gestión automatizada de canales está desactivada.</string>
     <string name="inappnotif_payment_rejected_over_absolute">La comisión fue de %1$s, pero el límite máximo se fijó en %2$s.</string>
@@ -191,10 +189,8 @@
     <string name="inappnotif_payment_rejected_view_wallet">Ver detalles</string>
 
     <string name="inappnotif_watchtower_nominal_title">Reporte de watchtower</string>
-    <plurals name="inappnotif_watchtower_nominal_description">
-        <item quantity="one">Se comprobó correctamente %1$d canal en %2$s. No se encontraron problemas.</item>
-        <item quantity="other">Se comprobaron correctamente %1$d canales en %2$s. No se encontraron problemas.</item>
-    </plurals>
+    <string name="inappnotif_watchtower_nominal_description_one">Se comprobó correctamente %1$d canal en %2$s. No se encontraron problemas.</string>
+    <string name="inappnotif_watchtower_nominal_description_many">Se comprobaron correctamente %1$d canales en %2$s. No se encontraron problemas.</string>
     <string name="inappnotif_watchtower_revokedfound_title">Alerta de watchtower</string>
     <string name="inappnotif_watchtower_revokedfound_description">Se encontraron compromisos revocados en %1$s para el/los canal(es): %2$s. Este canal puede estar cerrado.</string>
 

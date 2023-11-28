@@ -32,7 +32,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -296,7 +295,11 @@ private fun PaymentNotification(
 
         is WatchTowerOutcome.Nominal -> DimissibleNotification(
             title = stringResource(id = R.string.inappnotif_watchtower_nominal_title),
-            body = pluralStringResource(id = R.plurals.inappnotif_watchtower_nominal_description, count = notification.channelsWatchedCount, notification.channelsWatchedCount, notification.createdAt.toAbsoluteDateTimeString()),
+            body = if (notification.channelsWatchedCount == 1) {
+                stringResource(id = R.string.inappnotif_watchtower_nominal_description_one, notification.channelsWatchedCount, notification.createdAt.toAbsoluteDateTimeString())
+            } else {
+                stringResource(id = R.string.inappnotif_watchtower_nominal_description_many, notification.channelsWatchedCount, notification.createdAt.toAbsoluteDateTimeString())
+            },
             timestamp = notification.createdAt,
             onRead = { onNotificationRead(notification.id) },
         )

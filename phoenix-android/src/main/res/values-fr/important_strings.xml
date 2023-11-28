@@ -178,11 +178,8 @@
     <string name="inappnotif_migration_from_legacy_dialog_body">Ne réutilisez pas vos anciennes adresses de swap ! Elles ne fonctionneront plus.\n\nContactez le support si vous le faisiez accidentellement.</string>
 
     <string name="inappnotif_payment_onchain_pending_title">Dépôt on-chain en attente (+%1$s)</string>
-    <plurals name="inappnotif_payments_rejection_overview">
-        <item quantity="one">%1$d paiement entrant refusé récemment</item>
-        <item quantity="many">%1$d paiements entrants refusés récemment</item>
-        <item quantity="other">%1$d paiements entrants refusés récemment</item>
-    </plurals>
+    <string name="inappnotif_payments_rejection_overview_one">Un paiement entrant a été refusé récemment</string>
+    <string name="inappnotif_payments_rejection_overview_many">%1$d paiements entrants refusés récemment</string>
     <string name="inappnotif_payment_rejected_title">Paiement refusé (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">La gestion des canaux automatisée est désactivée.</string>
     <string name="inappnotif_payment_rejected_over_absolute">Les frais étaient de %1$s, mais votre max est de %2$s.</string>
@@ -192,10 +189,8 @@
     <string name="inappnotif_payment_rejected_view_wallet">Voir les détails</string>
 
     <string name="inappnotif_watchtower_nominal_title">Veille en arrière-plan</string>
-    <plurals name="inappnotif_watchtower_nominal_description" tools:ignore="MissingQuantity">
-        <item quantity="one">%1$d canal a été contrôlé le %2$s. Aucun problème trouvé.</item>
-        <item quantity="other">%1$d canaux ont été contrôlés le %2$s. Aucun problème trouvé.</item>
-    </plurals>
+    <string name="inappnotif_watchtower_nominal_description_one">%1$d canal a été contrôlé le %2$s. Aucun problème trouvé.</string>
+    <string name="inappnotif_watchtower_nominal_description_many">%1$d canaux ont été contrôlés le %2$s. Aucun problème trouvé.</string>
     <string name="inappnotif_watchtower_revokedfound_title">Alerte de veille</string>
     <string name="inappnotif_watchtower_revokedfound_description">Des commitments révoqués ont été détectés le %1$s sur les canaux(s): %2$s. Ces canaux pourraient fermer.</string>
 

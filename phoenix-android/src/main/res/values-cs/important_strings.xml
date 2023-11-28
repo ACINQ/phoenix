@@ -178,11 +178,8 @@
     <string name="inappnotif_mempool_full_action">Podívejte se, jak je ovlivněn Phoenix</string>
 
     <string name="inappnotif_payment_onchain_pending_title">On-Chain finanční prostředky čekají na vyřízení (+%1$s)</string>
-    <plurals name="inappnotif_payments_rejection_overview">
-        <item quantity="one">%1$d nedávno zamítnutá příchozí platba</item>
-        <item quantity="few">%1$d nedávno zamítnuté příchozí platby</item>
-        <item quantity="many">%1$d nedávno zamítnutých příchozích plateb</item>
-    </plurals>
+    <string name="inappnotif_payments_rejection_overview_one">1 nedávno zamítnutá příchozí platba</string>
+    <string name="inappnotif_payments_rejection_overview_many">%1$d nedávno zamítnutých příchozích plateb</string>
     <string name="inappnotif_payment_rejected_title">Platba zamítnuta (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">Automatická správa kanálů je zakázána.</string>
     <string name="inappnotif_payment_rejected_over_absolute">Poplatek byl %1$s, ale váš maximální poplatek byl nastaven na %2$s.</string>
@@ -192,11 +189,8 @@
     <string name="inappnotif_payment_rejected_view_wallet">Zobrazit podrobnosti</string>
 
     <string name="inappnotif_watchtower_nominal_title">Watchtower report</string>
-    <plurals name="inappnotif_watchtower_nominal_description">
-        <item quantity="one">%1$d kanál byl úspěšně zkontrolován na %2$s. Nebyly nalezeny žádné problémy.</item>
-        <item quantity="few">%1$d kanálů bylo úspěšně zkontrolováno na %2$s. Nebyly nalezeny žádné problémy.</item>
-        <item quantity="many">%1$d kanálů bylo úspěšně zkontrolováno na %2$s. Nebyly nalezeny žádné problémy.</item>
-    </plurals>
+    <string name="inappnotif_watchtower_nominal_description_one">%1$d kanál byl úspěšně zkontrolován na %2$s. Nebyly nalezeny žádné problémy.</string>
+    <string name="inappnotif_watchtower_nominal_description_many">%1$d kanálů bylo úspěšně zkontrolováno na %2$s. Nebyly nalezeny žádné problémy.</string>
     <string name="inappnotif_watchtower_revokedfound_title">Watchtower alert</string>
     <string name="inappnotif_watchtower_revokedfound_description">Na kanálu (kanálech) %1$s byly nalezeny odvolané závazky: %2$s. Tento kanál může být uzavřen.</string>
 
