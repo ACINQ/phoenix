@@ -90,7 +90,7 @@ class ElectrumDialogViewModel : ViewModel() {
 
     sealed class CertificateCheckState {
         object Init : CertificateCheckState()
-        object Checking : CertificateCheckState()q
+        object Checking : CertificateCheckState()
         data class Rejected(val host: String, val port: Int, val certificate: Certificate) : CertificateCheckState()
         data class Failure(val e: Throwable) : CertificateCheckState()
     }
