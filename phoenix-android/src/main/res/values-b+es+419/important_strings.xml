@@ -69,7 +69,7 @@
 
     <!-- home: swap help -->
 
-    <string name="home_swapin_help_pending">Esperando 3 confirmaciones</string>
+    <string name="home_swapin_help_pending">Esperando 3 confirmaciones.</string>
     <string name="home_swapin_help_ready_fee">Los depósitos se transferirán a Lightning cuando las comisiones de minería sean inferiores a %1$s.</string>
     <string name="home_swapin_help_ready_disabled">Los depósitos permanecerán en la cadena porque la gestión automatizada de canales está desactivada.</string>
     <string name="home_swapin_help_generic">Los fondos en la cadena se depositaron en la billetera.</string>
