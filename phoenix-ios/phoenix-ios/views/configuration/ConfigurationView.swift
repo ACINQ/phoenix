@@ -49,10 +49,8 @@ fileprivate struct ConfigurationList: View {
 	
 	let scrollViewProxy: ScrollViewProxy
 	
-	@State var isFaceID = true
-	@State var isTouchID = false
-	
 	@State private var navLinkTag: NavLinkTag? = nil
+	@State private var prvNavLinkTag: NavLinkTag? = nil
 	
 	@State private var notificationPermissions = NotificationsManager.shared.permissions.value
 	
@@ -62,8 +60,10 @@ fileprivate struct ConfigurationList: View {
 	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
 	@State private var swiftUiBugWorkaroundIdx = 0
 	
-	@State var didAppear = false
+	@State var firstAppearance = false
 	@State var popToDestination: PopToDestination? = nil
+	
+	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
 	
 	@Namespace var linkID_About
 	@Namespace var linkID_DisplayConfiguration
@@ -84,6 +84,7 @@ fileprivate struct ConfigurationList: View {
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	init(scrollViewProxy: ScrollViewProxy) {
@@ -207,7 +208,7 @@ fileprivate struct ConfigurationList: View {
 			if hasWallet {
 				navLink(.AppAccess) {
 					Label { Text("App access") } icon: {
-						Image(systemName: isTouchID ? "touchid" : "faceid")
+						Image(systemName: isTouchID() ? "touchid" : "faceid")
 					}
 				}
 				.id(linkID_AppAccess)
@@ -398,6 +399,16 @@ fileprivate struct ConfigurationList: View {
 		return Biz.business.walletManager.isLoaded()
 	}
 	
+	func isTouchID() -> Bool {
+		
+		switch biometricSupport {
+			case .touchID_available    : fallthrough
+			case .touchID_notEnrolled  : fallthrough
+			case .touchID_notAvailable : return true
+			default                    : return false
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
@@ -405,28 +416,18 @@ fileprivate struct ConfigurationList: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		let support = AppSecurity.shared.deviceBiometricSupport()
-		switch support {
-			case .touchID_available    : fallthrough
-			case .touchID_notEnrolled  : fallthrough
-			case .touchID_notAvailable : isTouchID = true
-			default                    : isTouchID = false
-		}
-		switch support {
-			case .faceID_available    : fallthrough
-			case .faceID_notEnrolled  : fallthrough
-			case .faceID_notAvailable : isFaceID = true
-			default                   : isFaceID = false
-		}
-		
-		if !didAppear {
-			didAppear = true
+		if firstAppearance {
+			firstAppearance = false
 			
 			if let deepLink = deepLinkManager.deepLink {
 				DispatchQueue.main.async {
 					deepLinkChanged(deepLink)
 				}
 			}
+		} else {
+			// Returning from subview
+			
+			biometricSupport = AppSecurity.shared.deviceBiometricSupport()
 		}
 	}
 	
@@ -519,6 +520,31 @@ fileprivate struct ConfigurationList: View {
 					log.warning("Invalid popToDestination")
 				}
 			}
+			
+			// If the user is returning from the "App Access" screen,
+			// and they still haven't backed up their recovery phrase...
+			//
+			if (prvNavLinkTag == .AppAccess) && (backupSeedState == .notBackedUp) {
+				
+				let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+				if enabledSecurity.contains(.biometrics) && !enabledSecurity.contains(.passcodeFallback) {
+					
+					// Enabling biometrics without the passcode fallback option opens the user to additional risks.
+					// A hardware failure can break FaceID/TouchID, which would lock them out of Phoenix.
+					// So we present a warning in this situation.
+					
+					popoverState.display(dismissable: true) {
+						RecoveryPhraseBackupPopover(
+							isTouchID: isTouchID(),
+							backupAction: backupNow
+						)
+					}
+				}
+			}
+			
+			prvNavLinkTag = nil
+		} else {
+			prvNavLinkTag = navLinkTag
 		}
 	}
 	
@@ -537,6 +563,12 @@ fileprivate struct ConfigurationList: View {
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
+	
+	func backupNow() {
+		log.trace("backupNow()")
+		
+		self.navLinkTag = .RecoveryPhrase
+	}
 	
 	func popTo(_ destination: PopToDestination) {
 		log.trace("popTo(\(destination))")
@@ -584,5 +616,70 @@ fileprivate struct ConfigurationList: View {
 				self.swiftUiBugWorkaround = nil
 			}
 		}
+	}
+}
+
+fileprivate struct RecoveryPhraseBackupPopover: View, ViewName {
+	
+	let isTouchID: Bool
+	let backupAction: ()->Void
+	
+	@EnvironmentObject var popoverState: PopoverState
+	
+	@ViewBuilder
+	var body: some View {
+	
+		VStack(alignment: HorizontalAlignment.leading, spacing: 12) {
+			
+			Label {
+				Text("You have not backed up your recovery phrase!")
+					.bold()
+			} icon: {
+				Image(systemName: "exclamationmark.circle")
+					.renderingMode(.template)
+					.imageScale(.large)
+					.foregroundColor(Color.appWarn)
+			}
+			.font(.callout)
+			
+			Label {
+				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+					Text("You will **lose your funds** if:").padding(.bottom, 4)
+					if isTouchID {
+						Text("* Touch ID stops working due to hardware damage")
+					} else {
+						Text("* Face ID stops working due to hardware damage")
+					}
+					Text("* Your phone is lost or stolen")
+					Text("* Your phone stops working")
+				}
+			} icon: {
+				Image(systemName: "exclamationmark.circle")
+					.imageScale(.large)
+					.foregroundColor(.clear) // <- hidden
+					.accessibilityHidden(true)
+			}
+			.font(.callout)
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Spacer()
+				Button {
+					backupNow()
+				} label: {
+					Text("Backup Now")
+						.font(.title3)
+				}
+			}
+			.padding(.top, 4)
+		}
+		.padding()
+	}
+	
+	func backupNow() {
+		log.trace("[\(viewName)] backupNow()")
+		
+		popoverState.close(animationCompletion: {
+			backupAction()
+		})
 	}
 }

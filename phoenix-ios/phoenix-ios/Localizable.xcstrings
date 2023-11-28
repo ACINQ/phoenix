@@ -743,6 +743,18 @@
         }
       }
     },
+    "* Face ID stops working due to hardware damage" : {
+
+    },
+    "* Touch ID stops working due to hardware damage" : {
+
+    },
+    "* Your phone is lost or stolen" : {
+
+    },
+    "* Your phone stops working" : {
+
+    },
     "**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." : {
       "comment" : "RecoverySeedView",
       "localizations" : {
@@ -3464,6 +3476,9 @@
           }
         }
       }
+    },
+    "Backup Now" : {
+
     },
     "Backup your recovery phrase to prevent losing your funds." : {
       "localizations" : {
@@ -21865,6 +21880,9 @@
           }
         }
       }
+    },
+    "You will **lose your funds** if:" : {
+
     },
     "You will pay %@ (≈ %@) to the Bitcoin miners." : {
       "localizations" : {
