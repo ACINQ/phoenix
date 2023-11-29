@@ -11,6 +11,7 @@
 		DC33C5732A7C45220053D785 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC33C5722A7C45220053D785 /* ContentView.swift */; };
 		DC33C5752A7C45240053D785 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC33C5742A7C45240053D785 /* Assets.xcassets */; };
 		DC33C5782A7C45240053D785 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC33C5772A7C45240053D785 /* Preview Assets.xcassets */; };
+		DC9148B82B179B52002605C3 /* BigPatternSketchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9148B72B179B52002605C3 /* BigPatternSketchView.swift */; };
 		DCFDA5782A81665F000F094C /* Data+Hexadecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFDA5772A81665F000F094C /* Data+Hexadecimal.swift */; };
 		DCFDA57A2A81A207000F094C /* String+Padding.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFDA5792A81A207000F094C /* String+Padding.swift */; };
 		DCFDA57C2A82C431000F094C /* PatternSketchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFDA57B2A82C431000F094C /* PatternSketchView.swift */; };
@@ -32,6 +33,7 @@
 		DC33C5722A7C45220053D785 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		DC33C5742A7C45240053D785 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DC33C5772A7C45240053D785 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		DC9148B72B179B52002605C3 /* BigPatternSketchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigPatternSketchView.swift; sourceTree = "<group>"; };
 		DCFDA5772A81665F000F094C /* Data+Hexadecimal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Hexadecimal.swift"; sourceTree = "<group>"; };
 		DCFDA5792A81A207000F094C /* String+Padding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Padding.swift"; sourceTree = "<group>"; };
 		DCFDA57B2A82C431000F094C /* PatternSketchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatternSketchView.swift; sourceTree = "<group>"; };
@@ -89,6 +91,7 @@
 				DCFDA5832A82C663000F094C /* Categories */,
 				DCFDA58E2A83EB95000F094C /* Types */,
 				DCFDA5912A83EBDA000F094C /* Utils */,
+				DC9148B92B179B61002605C3 /* Retired */,
 			);
 			path = MobileBorderWallet;
 			sourceTree = "<group>";
@@ -99,6 +102,14 @@
 				DC33C5772A7C45240053D785 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		DC9148B92B179B61002605C3 /* Retired */ = {
+			isa = PBXGroup;
+			children = (
+				DC9148B72B179B52002605C3 /* BigPatternSketchView.swift */,
+			);
+			path = Retired;
 			sourceTree = "<group>";
 		};
 		DCFDA5832A82C663000F094C /* Categories */ = {
@@ -158,7 +169,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					DC33C56C2A7C45220053D785 = {
 						CreatedOnToolsVersion = 14.3.1;
@@ -202,6 +213,7 @@
 			files = (
 				DCFDA5902A83EBC5000F094C /* WalletInfo.swift in Sources */,
 				DCFDA57E2A82C455000F094C /* DotPoint.swift in Sources */,
+				DC9148B82B179B52002605C3 /* BigPatternSketchView.swift in Sources */,
 				DCFDA57A2A81A207000F094C /* String+Padding.swift in Sources */,
 				DCFDA5892A82DA2B000F094C /* Bip39.swift in Sources */,
 				DC33C5732A7C45220053D785 /* ContentView.swift in Sources */,
@@ -257,6 +269,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -317,6 +330,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;

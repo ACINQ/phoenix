@@ -3,13 +3,8 @@ import os.log
 
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "PatternSketchView"
+	category: "BigPatternSketchView"
 )
-
-enum PatternSketchViewType: Equatable, Hashable {
-	case backup(wallet: WalletInfo)
-	case decrypt(backup: EntropyGridBackup)
-}
 
 fileprivate struct Line {
 	var points = [CGPoint]()
@@ -20,18 +15,13 @@ fileprivate enum CanvasAction {
 	case tap
 }
 
-fileprivate enum NavLinkTag_PatternSketchView: Hashable {
-	case finishBackup(userPattern: Set<DotPoint>, backup: EntropyGridBackup)
-	case displayWallet(wallet: WalletInfo)
-}
-
-struct PatternSketchView: View {
+struct BigPatternSketchView: View {
 	
-	let type: PatternSketchViewType
+	/// The number of rows in the grid.
+	let gridWidth: UInt16 = 12
 	
-	/// The number of rows and columns of the grid.
-	/// Note that the grid must be a square.
-	let gridSize: UInt16 = 8
+	/// The number of columns in the grid.
+	let gridHeight: UInt16 = 18
 	
 	/// Every item on the grid is represented by a dot.
 	/// This is the size (diameter) of the dot.
@@ -51,7 +41,8 @@ struct PatternSketchView: View {
 	let tapDotSize: CGFloat = 5
 	
 	/// The size of the Canvas area the user draws/taps in
-	let canvasFrameSize: CGFloat = 300
+	let canvasFrameWidth: CGFloat = 300
+	let canvasFrameHeight: CGFloat = 450
 	
 	/// The width of the border surrounding the canvas
 	let canvasBorderSize: CGFloat = 4
@@ -65,8 +56,6 @@ struct PatternSketchView: View {
 	@State private var actionOrder: [CanvasAction] = []
 	
 	@State private var linesHidden = false
-	
-	@EnvironmentObject var router: Router
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -85,66 +74,15 @@ struct PatternSketchView: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			Spacer()
+			Spacer(minLength: 0)
 			
-			instructions()
-				.padding(.bottom, 40)
 			canvas()
 				.padding(.bottom, 20)
 			canvasControlOptions()
 			
-			Spacer()
-			
-			Button {
-				continueToNextStep()
-			} label: {
-				Text("Continue")
-			}
-			.font(.title2)
-			.disabled(activeDots.isEmpty)
-			.padding(.bottom, 20)
+			Spacer(minLength: 0)
 			
 		} // </VStack>
-		.navigationDestination(for: NavLinkTag_PatternSketchView.self) { tag in
-			
-			switch tag {
-			case .finishBackup(let userPattern, let backup):
-				FinishBackupView(userPattern: userPattern, backup: backup)
-				
-			case .displayWallet(let wallet):
-				DisplayWalletView(wallet: wallet, type: .afterBackup)
-			}
-		}
-	}
-	
-	@ViewBuilder
-	func instructions() -> some View {
-		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Spacer(minLength: 0)
-			
-			switch type {
-			case .backup(_):
-				Text(
-					"""
-					Draw a pattern below.
-					You will need to memorize this pattern.
-					"""
-				)
-				.multilineTextAlignment(.center)
-				
-			case .decrypt(_):
-				Text(
-					"""
-					Draw the correct pattern to restore your wallet.
-					"""
-				)
-				.multilineTextAlignment(.center)
-			}
-			
-			Spacer(minLength: 0)
-		}
-		.frame(width: canvasFrameSize)
 	}
 	
 	@ViewBuilder
@@ -152,11 +90,11 @@ struct PatternSketchView: View {
 		
 		Canvas { context, size in
 			
-			let hSpace = size.width / CGFloat(gridSize + 1)
-			let vSpace = size.height / CGFloat(gridSize + 1)
+			let hSpace = size.width / CGFloat(gridWidth + 1)
+			let vSpace = size.height / CGFloat(gridHeight + 1)
 
-			for gridY in 0..<gridSize {
-				for gridX in 0..<gridSize {
+			for gridY in 0..<gridHeight {
+				for gridX in 0..<gridWidth {
 					
 					let detected = activeDots[DotPoint(x: gridX, y: gridY)] ?? false
 					if detected {
@@ -214,7 +152,7 @@ struct PatternSketchView: View {
 			
 		} // </Canvas>
 		.gesture(dragGesture())
-		.frame(width: canvasFrameSize, height: canvasFrameSize)
+		.frame(width: canvasFrameWidth, height: canvasFrameHeight)
 		.padding(.all, canvasBorderSize)
 		.border(Color(uiColor: .darkGray), width: canvasBorderSize)
 	}
@@ -319,11 +257,11 @@ struct PatternSketchView: View {
 		
 		let allLines = lines + [currentLine]
 		
-		let hSpace = canvasFrameSize / CGFloat(gridSize + 1)
-		let vSpace = canvasFrameSize / CGFloat(gridSize + 1)
+		let hSpace = canvasFrameWidth / CGFloat(gridWidth + 1)
+		let vSpace = canvasFrameHeight / CGFloat(gridHeight + 1)
 
-		for gridY in 0..<gridSize {
-			for gridX in 0..<gridSize {
+		for gridY in 0..<gridHeight {
+			for gridX in 0..<gridWidth {
 				
 				// Do any of the drawn lines intersect with this dot ?
 				// Remember that the "dot detection circle" is bigger than the dot itself.
@@ -492,49 +430,5 @@ struct PatternSketchView: View {
 		taps.removeAll()
 		activeDots.removeAll()
 		actionOrder.removeAll()
-	}
-	
-	func continueToNextStep() {
-		log.trace("continueToNextStep()")
-		
-	//	performUnitTests()
-		
-		let userPattern: [DotPoint] = activeDots.filter { $0.value }.map { $0.key }
-
-		switch type {
-		case .backup(let wallet):
-			// Note: We should actually be doing this on a background thread
-			let backup = MobileBorderWalletUtils.generateEntropyGridBackup(
-				userPattern: userPattern,
-				wallet: wallet
-			)
-
-			router.navPath.append(NavLinkTag_PatternSketchView.finishBackup(
-				userPattern: Set(userPattern),
-				backup: backup
-			))
-
-		case .decrypt(let backup):
-
-			let wallet = MobileBorderWalletUtils.restoreFromBackup(userPattern: userPattern, backup: backup)
-			router.navPath.append(NavLinkTag_PatternSketchView.displayWallet(wallet: wallet))
-		}
-	}
-	
-	// --------------------------------------------------
-	// MARK: Testing
-	// --------------------------------------------------
-	
-	func performUnitTests() {
-		log.trace("performUnitTests()")
-		
-		let userPattern: [DotPoint] = activeDots.filter { $0.value }.map { $0.key }
-		let salt = Data(fromHex: "a381fd3913c2edcd4fe118c397e35c3a")!
-		
-		Task {
-			MobileBorderWalletUtils.test_extractLocation(userPattern: userPattern, salt: salt)
-			MobileBorderWalletUtils.test_extractPoint(userPattern: userPattern, salt: salt)
-			MobileBorderWalletUtils.test_roundTrip1()
-		}
 	}
 }

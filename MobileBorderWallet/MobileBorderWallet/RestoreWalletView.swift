@@ -10,10 +10,19 @@ fileprivate enum NavLinkTag_RestoreWalletView: Equatable, Hashable {
 	case decrypt(backup: EntropyGridBackup)
 }
 
+struct CloudBackupRow: Equatable, Identifiable {
+	let fileURL: URL
+	let cloudInfo: EntropyGridCloudBackup
+	
+	var id: String {
+		return fileURL.absoluteString
+	}
+}
+
 struct RestoreWalletView: View {
 	
 	@State var isLoading = true
-	@State var cloudBackups: [EntropyGridCloudBackup] = []
+	@State var cloudBackups: [CloudBackupRow] = []
 	
 	@EnvironmentObject var router: Router
 	
@@ -54,30 +63,38 @@ struct RestoreWalletView: View {
 		} else {
 			
 			List {
-				ForEach(0..<cloudBackups.count, id: \.self) { index in
-					row(cloudBackups[index])
-				}
-			}
+				ForEach(cloudBackups) { cloudBackupRow in
+					listRow(cloudBackupRow)
+						.swipeActions(allowsFullSwipe: false) {
+							Button(role: .destructive) {
+								deleteRow(cloudBackupRow)
+							} label: {
+								Label("Delete", systemImage: "trash.fill")
+							}
+						}
+					
+				} // </ForEach>
+			} // </List>
 			.listStyle(.insetGrouped)
 		}
 	}
 	
 	@ViewBuilder
-	func row(_ cloudBackup: EntropyGridCloudBackup) -> some View {
+	func listRow(_ row: CloudBackupRow) -> some View {
 		
 		Button {
-			didTapRow(cloudBackup)
+			didTapRow(row)
 		} label: {
 			Label {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 6) {
-					let name = cloudBackup.name.trimmingCharacters(in: .whitespacesAndNewlines)
+					let name = row.cloudInfo.name.trimmingCharacters(in: .whitespacesAndNewlines)
 					if name.isEmpty {
 						Text("Wallet").font(.headline)
 					} else {
 						Text(name).font(.headline)
 					}
 					
-					Text("created: \(visibleStringForDate(cloudBackup.timestamp))")
+					Text("created: \(visibleStringForDate(row.cloudInfo.timestamp))")
 						.font(.subheadline)
 						.foregroundColor(.secondary)
 				}
@@ -107,14 +124,22 @@ struct RestoreWalletView: View {
 					includingPropertiesForKeys: nil
 				)
 				
-				var availableBackups: [EntropyGridCloudBackup] = []
+				var availableBackups: [CloudBackupRow] = []
 				for fileURL in files {
 					if fileURL.pathExtension == "json" {
 						let data = try Data(contentsOf: fileURL)
 						
-						let backup = try JSONDecoder().decode(EntropyGridCloudBackup.self, from: data)
-						availableBackups.append(backup)
+						let cloudInfo = try JSONDecoder().decode(EntropyGridCloudBackup.self, from: data)
+						availableBackups.append(CloudBackupRow(fileURL: fileURL, cloudInfo: cloudInfo))
 					}
+				}
+				
+				availableBackups.sort { row1, row2 in
+					// Return true if the first argument should be ordered before the second argument.
+					// Otherwise return false.
+					//
+					// We want to sort the backups such that the most RECENT is at the beginning (index zero).
+					return row1.cloudInfo.timestamp > row2.cloudInfo.timestamp
 				}
 				
 				DispatchQueue.main.async {
@@ -137,9 +162,23 @@ struct RestoreWalletView: View {
 		return formatter.string(from: date)
 	}
 	
-	func didTapRow(_ cloudBackup: EntropyGridCloudBackup) {
+	func didTapRow(_ row: CloudBackupRow) {
 		log.trace("didTapRow()")
 		
-		router.navPath.append(NavLinkTag_RestoreWalletView.decrypt(backup: cloudBackup.backup))
+		router.navPath.append(NavLinkTag_RestoreWalletView.decrypt(backup: row.cloudInfo.backup))
+	}
+	
+	func deleteRow(_ row: CloudBackupRow) {
+		log.trace("deleteRow(\(row.fileURL.lastPathComponent)")
+		
+		do {
+			try FileManager.default.removeItem(at: row.fileURL)
+			if let index = cloudBackups.firstIndex(where: { $0 == row }) {
+				cloudBackups.remove(at: index)
+			}
+			
+		} catch {
+			log.debug("Error deleting file: \(error)")
+		}
 	}
 }

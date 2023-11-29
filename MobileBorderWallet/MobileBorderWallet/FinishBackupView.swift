@@ -24,6 +24,20 @@ struct FinishBackupView: View {
 	@ViewBuilder
 	var body: some View {
 		
+		GeometryReader { geometry in
+			ScrollView(.vertical) {
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					Spacer(minLength: 0)
+					content()
+					Spacer(minLength: 0)
+				}
+			}
+		}
+	}
+		
+	@ViewBuilder
+	func content() -> some View {
+		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
 			Spacer()

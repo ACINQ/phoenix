@@ -9,6 +9,7 @@ fileprivate var log = Logger(
 fileprivate enum NavLinkTag_ContentView: Equatable, Hashable {
 	case createNewWallet(wallet: WalletInfo)
 	case restoreWallet
+	case bigPattern
 }
 
 struct ContentView: View {
@@ -30,7 +31,7 @@ struct ContentView: View {
 	@ViewBuilder
 	func content() -> some View {
 		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+		VStack(alignment: HorizontalAlignment.center, spacing: 60) {
 			
 			Button {
 				createNewWallet()
@@ -38,12 +39,16 @@ struct ContentView: View {
 				Text("Create new wallet")
 					.font(.title2)
 			}
-			.padding(.bottom, 60)
 			
 			NavigationLink(value: NavLinkTag_ContentView.restoreWallet) {
 				Text("Restore wallet")
 					.font(.title2)
 			}
+			
+		//	NavigationLink(value: NavLinkTag_ContentView.bigPattern) {
+		//		Text("Big pattern")
+		//			.font(.title2)
+		//	}
 			
 		} // </VStack>
 		.navigationDestination(for: NavLinkTag_ContentView.self) { tag in
@@ -54,6 +59,9 @@ struct ContentView: View {
 				
 			case .restoreWallet:
 				RestoreWalletView()
+				
+			case .bigPattern:
+				BigPatternSketchView()
 			}
 		}
 	}

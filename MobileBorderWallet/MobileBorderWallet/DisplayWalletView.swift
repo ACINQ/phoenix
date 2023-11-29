@@ -20,6 +20,8 @@ struct DisplayWalletView: View {
 	let wallet: WalletInfo
 	let type: DisplayWalletViewType
 	
+	@EnvironmentObject var router: Router
+	
 	@ViewBuilder
 	var body: some View {
 		
@@ -62,14 +64,22 @@ struct DisplayWalletView: View {
 					Text("#12: \(wallet.finalWordNumber)")
 				}
 			}
+			.padding(.bottom, 40)
 			
-			if type == .beforeBackup {
-				
+			switch type {
+			case .beforeBackup:
 				NavigationLink(value: NavLinkTag_DisplayWalletView.backupWallet) {
 					Text("Backup wallet").font(.title2)
 				}
-				.padding(.top, 40)
+				
+			case .afterBackup:
+				Button {
+					router.popToRoot()
+				} label: {
+					Text("Done").font(.title2)
+				}
 			}
+			
 		} // </VStack>
 		.navigationDestination(for: NavLinkTag_DisplayWalletView.self) { _ in
 			
