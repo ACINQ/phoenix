@@ -12,15 +12,12 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
-
-<!--
+  --><!--
   ~ This file contains string resources related to important messages in the app, and should be translated as a priority.
   ~ It should be kept as small as possible.
   ~
   ~ Most technical resource strings should stay in the default `strings.xml` file.
--->
-<resources>
+--><resources>
 
     <!-- system notifications -->
 
@@ -60,7 +57,7 @@
     <string name="settings_access_control">Control de acceso</string>
     <string name="settings_list_channels">Canales de pago</string>
     <string name="settings_logs">Registros</string>
-    <string name="settings_electrum">Servidor Electrum</string>
+    <string name="settings_electrum">Servidor de Electrum</string>
     <string name="settings_reset_wallet">Restablecer billetera</string>
     <string name="settings_mutual_close">Cerrar canales</string>
     <string name="settings_force_close">Forzar el cierre de canales</string>
@@ -72,10 +69,10 @@
 
     <!-- home: swap help -->
 
-    <string name="home_swapin_help_pending">En espera de 3 confirmaciones.</string>
-    <string name="home_swapin_help_ready_fee">Los depósitos se desplegarán en Lightning cuando las tasas de minería sean inferiores a %1$s.</string>
-    <string name="home_swapin_help_ready_disabled">Los depósitos permanecerán en cadena porque la gestión automatizada de canales está desactivada.</string>
-    <string name="home_swapin_help_generic">Se han depositado fondos on-chain en tu cartera.</string>
+    <string name="home_swapin_help_pending">Esperando 3 confirmaciones.</string>
+    <string name="home_swapin_help_ready_fee">Los depósitos se transferirán a Lightning cuando las comisiones de minería sean inferiores a %1$s.</string>
+    <string name="home_swapin_help_ready_disabled">Los depósitos permanecerán en la cadena porque la gestión automatizada de canales está desactivada.</string>
+    <string name="home_swapin_help_generic">Los fondos en la cadena se depositaron en la billetera.</string>
     <string name="home_swapin_help_button">Ver detalles</string>
 
     <!-- home: bottom menu -->
@@ -109,8 +106,8 @@
 
     <!-- receive view: warning about fee/liquidity -->
 
-    <string name="receive_lightning_warning_title_surefail">El pago no se abonará</string>
-    <string name="receive_lightning_warning_title_mayfail">Es posible que no se abone el pago</string>
+    <string name="receive_lightning_warning_title_surefail">El pago no se realizará</string>
+    <string name="receive_lightning_warning_title_mayfail">Es posible que no se realice el pago</string>
     <string name="receive_lightning_warning_title_fee_expected">Comisión prevista</string>
 
     <string name="receive_lightning_warning_fee_insufficient_liquidity">La liquidez entrante es insuficiente.</string>
@@ -124,7 +121,7 @@
     <!-- scanning errors -->
 
     <string name="scan_error_expired">Esta factura está vencida.</string>
-    <string name="scan_error_already_paid">Este pago ya se abonó.</string>
+    <string name="scan_error_already_paid">Este pago ya se realizó.</string>
     <string name="scan_error_invalid_chain">Este pago no usa la misma cadena de bloques de la billetera.</string>
     <string name="scan_error_lnurl_invalid">Error al procesar este enlace LNURL. Comprueba que sea válido.</string>
     <string name="scan_error_lnurl_service_error">El servicio LNURL generó un error.</string>
@@ -174,12 +171,12 @@
     <string name="inappnotif_upgrade_critical_message">Una actualización importante está disponible. Deberías actualizar Phoenix lo antes posible.</string>
     <string name="inappnotif_upgrade_button">Actualizar en Google Play</string>
 
-    <string name="inappnotif_mempool_full_message">El pool de memoria de Bitcoin está lleno y las comisiones en la cadena son elevadas.</string>
-    <string name="inappnotif_mempool_full_action">Vea cómo afecta a Phoenix</string>
+    <string name="inappnotif_mempool_full_message">Las comisiones en la cadena son elevadas.</string>
+    <string name="inappnotif_mempool_full_action">Ver cómo afecta a Phoenix</string>
 
     <string name="inappnotif_payment_onchain_pending_title">Fondos pendientes en la cadena (+%1$s)</string>
-    <string name="inappnotif_payments_rejection_overview_one">Recientemente se rechazó 1 pago entrante</string>
-    <string name="inappnotif_payments_rejection_overview_many">Recientemente se rechazaron %1$d pagos entrantes</string>
+    <string name="inappnotif_payments_rejection_overview_one">Recientemente se rechazó un pago entrante</string>
+    <string name="inappnotif_payments_rejection_overview_many">%1$d pagos entrantes rechazados recientemente</string>
     <string name="inappnotif_payment_rejected_title">Pago rechazado (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">La gestión automatizada de canales está desactivada.</string>
     <string name="inappnotif_payment_rejected_over_absolute">La comisión fue de %1$s, pero el límite máximo se fijó en %2$s.</string>
@@ -247,14 +244,14 @@
     <!-- wallet info -->
 
     <string name="walletinfo_onchain_swapin">Billetera de intercambio</string>
-    <string name="walletinfo_onchain_swapin_help">Los fondos enviados a esta billetera en la cadena se cambian automáticamente a Lightning si se dan las condiciones adecuadas.</string>
+    <string name="walletinfo_onchain_swapin_help">Phoenix es una billetera de Lightning. Los fondos recibidos en la cadena se transferirán automáticamente a Lightning, según tu configuración de gestión de canales.</string>
     <string name="walletinfo_onchain_swapin_help_faq_link">Ver cómo funciona</string>
     <string name="walletinfo_onchain_swapin_policy_view">Tocar para configurar</string>
     <string name="walletinfo_onchain_swapin_empty">No hay intercambios en curso.</string>
 
-    <string name="walletinfo_onchain_swapin_policy_auto_details">Los fondos se cambian automáticamente a Lightning si la comisión es <b>inferior a %1$s</b> (puede configurarse).</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details">Los fondos en la cadena se intercambian automáticamente a Lightning si la comisión pagada a los mineros es <b>inferior a %1$s</b> (se puede configurar).</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details_timeout">Los fondos que no se intercambien <b>después de %1$d meses</b> se pueden recuperar en la cadena.</string>
-    <string name="walletinfo_onchain_swapin_policy_disabled_details">La gestión automatizada de canales <b>está desactivada</b>. Los fondos permanecerán en la cadena. No se realizará el intercambio.</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled_details">La gestión automatizada de canales <b>está desactivada</b>. No se realizará el intercambio, así que los fondos permanecerán en la cadena.</string>
 
     <string name="walletinfo_onchain_swapin_last_attempt">Error al intentar realizar el intercambio %1$s</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">La gestión de canales estaba desactivada.</string>
@@ -272,7 +269,7 @@
 
     <!-- settings: liquidity policy for channels creation -->
 
-    <string name="liquiditypolicy_instructions">Los pagos entrantes a veces requieren transacciones en la cadena. No siempre ocurre así, solo cuando es necesario.</string>
+    <string name="liquiditypolicy_instructions">Los pagos entrantes a veces requieren transacciones en la cadena. No siempre ocurre así; solo cuando es necesario.</string>
     <string name="liquiditypolicy_fees_estimation">Las comisiones se calculan actualmente en unos <b>%1$s</b> (≈%2$s).</string>
     <string name="liquiditypolicy_disable_label">Gestión automatizada de canales</string>
     <string name="liquiditypolicy_disable_desc">Los pagos entrantes que requieran operaciones en la cadena se rechazarán.</string>
@@ -292,19 +289,19 @@
     <string name="liquiditypolicy_advanced_fees_prop_help">Comprueba la comisión en relación con el importe recibido. Esta opción es útil para realizar una prueba de cordura en el caso de pagos pequeños.</string>
     <string name="liquiditypolicy_advanced_overrides_title">Anulación de política</string>
     <string name="liquiditypolicy_advanced_pay_to_open_label">Omitir la comprobación de comisión absoluta para Lightning</string>
-    <string name="liquiditypolicy_advanced_pay_to_open_help">Cuando se activa, los pagos entrantes de Lightning ignoran el límite absoluto de la comisión máxima. Solo se aplicará la comprobación porcentual.\n\nCuidado: si la comisión en el pool de memoria de Bitcoin es alta, los pagos entrantes de Lightning que requieran una operación en la cadena podrían resultar caros.</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_help">Cuando se activa, los pagos entrantes de Lightning ignoran el límite absoluto de la comisión máxima. Solo se aplicará la comprobación porcentual.\n\nCuidado: si la tasa de comisión en el pool de memoria de Bitcoin es alta, los pagos entrantes de Lightning que requieran una operación en la cadena podrían resultar caros.</string>
     <string name="liquiditypolicy_save_button">Guardar política</string>
 
     <string name="liquiditypolicy_help">Con Phoenix, puedes recibir pagos en la cadena de bloques de Bitcoin (capa 1) y en la red Lightning de Bitcoin (capa 2). \n\n - La capa de la cadena de bloques (capa 1) es más lenta y, en general, mucho más cara (requiere comisiones de minería). \n - La capa de la red Lightning (capa 2) es mucho más rápida y, en general, mucho más barata (especialmente para los pagos pequeños). \n\n Cuando recibas un pago en la capa 1, Phoenix trasladará automáticamente los fondos a la capa 2 <b>SI</b> las comisiones de minería cumplen con la política de comisiones que hayas configurado. \n\n Los pagos que te envíen en la capa 2 pueden recibirse al instante y sin comisiones. Sin embargo, en ocasiones, también es necesaria una operación en la capa 1 para gestionar el canal de pago de la capa 2. Esto puede hacerse automáticamente <b>SI</b> las comisiones de minería cumplen con la política de comisiones que hayas configurado.</string>
 
     <!-- payment line -->
 
-    <string name="paymentline_outgoing_unconfirmed">No confirmado - puntear para acelerar</string>
+    <string name="paymentline_outgoing_unconfirmed">Sin confirmar (tocar para acelerar)</string>
 
     <!-- CPFP -->
 
     <string name="cpfp_title">Acelerar mis transacciones.</string>
-    <string name="cpfp_instructions">Puedes aumentar la comisión de todas tus transacciones no confirmadas para incentivar a los mineros a favorecer tus pagos.</string>
-    <string name="cpfp_splice_error_actual_below_user">Esta comisión es inferior a la que ya usan tus transacciones no confirmadas. Usa una comisión más alta.</string>
+    <string name="cpfp_instructions">Puedes aumentar la tasa de comisión de todas tus transacciones no confirmadas a fin de que los mineros tengan un incentivo para favorecer tus pagos.</string>
+    <string name="cpfp_splice_error_actual_below_user">Esta tasa de comisión es inferior a la que ya usan tus transacciones no confirmadas. Usa una tasa de comisión más alta.</string>
 
 </resources>
