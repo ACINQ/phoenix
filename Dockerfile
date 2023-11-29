@@ -1,5 +1,5 @@
 # base image to build eclair-core
-FROM eclipse-temurin:11.0.20_8-jdk-alpine as ECLAIR_CORE_BUILD
+FROM eclipse-temurin:11.0.21_9-jdk-alpine as ECLAIR_CORE_BUILD
 
 # this is necessary to extract the eclair-core version that we need to clone for the build
 COPY ./buildSrc/src/main/kotlin/Versions.kt .
@@ -30,7 +30,7 @@ RUN git clone https://github.com/ACINQ/eclair -b v$(cat eclair-core-version.txt)
 RUN cd eclair && mvn install -pl eclair-core -am -Dmaven.test.skip=true
 
 # main build image
-FROM ubuntu:22.10
+FROM ubuntu:23.10
 
 ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8
@@ -38,8 +38,8 @@ ENV LANGUAGE en_US:en
 # get latest version number from https://developer.android.com/studio/index.html, bottom section
 ENV ANDROID_CMDLINETOOLS_FILE commandlinetools-linux-8092744_latest.zip
 ENV ANDROID_CMDLINETOOLS_URL https://dl.google.com/android/repository/${ANDROID_CMDLINETOOLS_FILE}
-ENV ANDROID_API_LEVELS android-30
-ENV ANDROID_BUILD_TOOLS_VERSION 30.0.2
+ENV ANDROID_API_LEVELS android-33
+ENV ANDROID_BUILD_TOOLS_VERSION 33.0.2
 ENV ANDROID_NDK_VERSION 23.1.7779620
 ENV CMAKE_VERSION 3.18.1
 ENV ANDROID_HOME /usr/local/android-sdk
@@ -64,7 +64,7 @@ RUN mkdir /usr/local/android-sdk && \
     rm ${ANDROID_CMDLINETOOLS_FILE}
 
 # install sdk packages
-RUN echo y | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" "cmake;${CMAKE_VERSION}" "ndk;${ANDROID_NDK_VERSION}" "patcher;v4" "platforms;${ANDROID_API_LEVELS}"
+RUN echo y | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" "cmake;${CMAKE_VERSION}" "ndk;${ANDROID_NDK_VERSION}" "platforms;${ANDROID_API_LEVELS}"
 
 # build tor library
 RUN git clone https://github.com/ACINQ/Tor_Onion_Proxy_Library && \
