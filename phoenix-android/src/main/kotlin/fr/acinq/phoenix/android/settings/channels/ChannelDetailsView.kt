@@ -174,7 +174,7 @@ private fun CommitmentDetailsView(
     val btcUnit = LocalBitcoinUnit.current
     val paymentsManager = business.paymentsManager
     val linkedPayments by produceState<List<WalletPayment>>(initialValue = emptyList()) {
-        value = paymentsManager.listPaymentsForTxId(ByteVector32.fromValidHex(commitment.fundingTxId))
+        value = paymentsManager.listPaymentsForTxId(commitment.fundingTxId)
     }
 
     SettingWithDecoration(

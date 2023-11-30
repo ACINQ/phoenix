@@ -14,6 +14,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.io.PaymentReceived
@@ -239,7 +240,7 @@ class NodeService : Service() {
                 requestCheckLegacyChannels = requestCheckLegacyChannels,
                 isTorEnabled = isTorEnabled,
                 liquidityPolicy = liquidityPolicy,
-                trustedSwapInTxs = trustedSwapInTxs.map { ByteVector32.fromValidHex(it) }.toSet()
+                trustedSwapInTxs = trustedSwapInTxs.map { TxId(it) }.toSet()
             )
         )
 

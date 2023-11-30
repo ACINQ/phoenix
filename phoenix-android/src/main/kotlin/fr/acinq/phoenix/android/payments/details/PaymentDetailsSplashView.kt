@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.blockchain.electrum.ElectrumConnectionStatus
 import fr.acinq.lightning.blockchain.electrum.getConfirmations
 import fr.acinq.lightning.db.*
@@ -576,7 +577,7 @@ private fun EditPaymentDetails(
 
 @Composable
 private fun ConfirmationView(
-    txId: ByteVector32,
+    txId: TxId,
     channelId: ByteVector32,
     isConfirmed: Boolean,
     canBeBumped: Boolean,
@@ -584,7 +585,7 @@ private fun ConfirmationView(
     minDepth: Int? = null, // sometimes we know how many confirmations are needed
 ) {
     val log = logger("PaymentDetailsSplashView")
-    val txUrl = txUrl(txId = txId.toHex())
+    val txUrl = txUrl(txId = txId)
     val context = LocalContext.current
     val electrumClient = business.electrumClient
     var showBumpTxDialog by remember { mutableStateOf(false) }
@@ -604,9 +605,9 @@ private fun ConfirmationView(
 
         suspend fun getConfirmations(): Int {
             val confirmations = electrumClient.getConfirmations(txId)
-            log.debug { "retrieved confirmations count=$confirmations from electrum for tx=${txId.toHex()}" }
+            log.debug { "retrieved confirmations=$confirmations from electrum for tx=$txId" }
             return confirmations ?: run {
-                log.debug { "retrying getConfirmations from Electrum in 5 sec" }
+                log.debug { "retrying getConfirmations from electrum in 5 sec" }
                 delay(5_000)
                 getConfirmations()
             }
