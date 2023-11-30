@@ -23,6 +23,7 @@ import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.channel.ChannelException
 import fr.acinq.lightning.db.*
@@ -309,7 +310,7 @@ class SqlitePaymentsDb(
         }
     }
 
-    override suspend fun setLocked(txId: ByteVector32) {
+    override suspend fun setLocked(txId: TxId) {
         database.transaction {
             val lockedAt = currentTimestampMillis()
             linkTxToPaymentQueries.setLocked(txId, lockedAt)
@@ -335,7 +336,7 @@ class SqlitePaymentsDb(
         }
     }
 
-    suspend fun setConfirmed(txId: ByteVector32) = withContext(Dispatchers.Default) {
+    suspend fun setConfirmed(txId: TxId) = withContext(Dispatchers.Default) {
         database.transaction {
             val confirmedAt = currentTimestampMillis()
             linkTxToPaymentQueries.setConfirmed(txId, confirmedAt)
@@ -366,7 +367,7 @@ class SqlitePaymentsDb(
     }
 
     suspend fun listPaymentsForTxId(
-        txId: ByteVector32
+        txId: TxId
     ): List<WalletPayment> = withContext(Dispatchers.Default) {
         database.transactionWithResult {
             linkTxToPaymentQueries.listWalletPaymentIdsForTx(txId).mapNotNull {

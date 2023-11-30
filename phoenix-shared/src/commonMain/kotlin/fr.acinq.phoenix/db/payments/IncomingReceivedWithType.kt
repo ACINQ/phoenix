@@ -25,6 +25,7 @@ package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.utils.UUID
@@ -159,7 +160,7 @@ sealed class IncomingReceivedWithData {
                         serviceFee = it.fees,
                         miningFee = 0.sat,
                         channelId = it.channelId ?: ByteVector32.Zeroes,
-                        txId = ByteVector32.Zeroes,
+                        txId = TxId(ByteVector32.Zeroes),
                         confirmedAt = 0,
                         lockedAt = 0,
                     )
@@ -173,7 +174,7 @@ sealed class IncomingReceivedWithData {
                                 serviceFee = it.fees,
                                 miningFee = 0.sat,
                                 channelId = it.channelId ?: ByteVector32.Zeroes,
-                                txId = ByteVector32.Zeroes,
+                                txId = TxId(ByteVector32.Zeroes),
                                 confirmedAt = 0,
                                 lockedAt = 0,
                             )
@@ -183,7 +184,7 @@ sealed class IncomingReceivedWithData {
                                 serviceFee = it.fees,
                                 miningFee = 0.sat,
                                 channelId = it.channelId ?: ByteVector32.Zeroes,
-                                txId = ByteVector32.Zeroes,
+                                txId = TxId(ByteVector32.Zeroes),
                                 confirmedAt = 0,
                                 lockedAt = 0,
                             )
@@ -199,7 +200,7 @@ sealed class IncomingReceivedWithData {
                             serviceFee = it.fees,
                             miningFee = 0.sat,
                             channelId = it.channelId ?: ByteVector32.Zeroes,
-                            txId = ByteVector32.Zeroes,
+                            txId = TxId(ByteVector32.Zeroes),
                             confirmedAt = 0,
                             lockedAt = 0,
                         )
@@ -208,7 +209,7 @@ sealed class IncomingReceivedWithData {
                             serviceFee = it.fees,
                             miningFee = 0.sat,
                             channelId = it.channelId ?: ByteVector32.Zeroes,
-                            txId = ByteVector32.Zeroes,
+                            txId = TxId(ByteVector32.Zeroes),
                             confirmedAt = 0,
                             lockedAt = 0,
                         )
@@ -217,7 +218,7 @@ sealed class IncomingReceivedWithData {
                             serviceFee = it.serviceFee,
                             miningFee = it.miningFee,
                             channelId = it.channelId,
-                            txId = it.txId,
+                            txId = TxId(it.txId),
                             confirmedAt = it.confirmedAt,
                             lockedAt = it.lockedAt,
                         )
@@ -226,7 +227,7 @@ sealed class IncomingReceivedWithData {
                             serviceFee = it.serviceFee,
                             miningFee = it.miningFee,
                             channelId = it.channelId,
-                            txId = it.txId,
+                            txId = TxId(it.txId),
                             confirmedAt = it.confirmedAt,
                             lockedAt = it.lockedAt,
                         )
@@ -246,7 +247,7 @@ fun List<IncomingPayment.ReceivedWith>.mapToDb(): Pair<IncomingReceivedWithTypeV
             serviceFee = it.serviceFee,
             miningFee = it.miningFee,
             channelId = it.channelId,
-            txId = it.txId,
+            txId = it.txId.value,
             confirmedAt = it.confirmedAt,
             lockedAt = it.lockedAt,
         )
@@ -255,7 +256,7 @@ fun List<IncomingPayment.ReceivedWith>.mapToDb(): Pair<IncomingReceivedWithTypeV
             serviceFee = it.serviceFee,
             miningFee = it.miningFee,
             channelId = it.channelId,
-            txId = it.txId,
+            txId = it.txId.value,
             confirmedAt = it.confirmedAt,
             lockedAt = it.lockedAt,
         )

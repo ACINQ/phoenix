@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.db.cloud
 
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
@@ -30,7 +31,7 @@ data class SpliceOutgoingPaymentWrapper(
         amountSat = payment.recipientAmount.sat,
         address = payment.address,
         miningFeeSat = payment.miningFees.sat,
-        txId = payment.txId.toByteArray(),
+        txId = payment.txId.value.toByteArray(),
         channelId = payment.channelId.toByteArray(),
         createdAt = payment.createdAt,
         confirmedAt = payment.confirmedAt,
@@ -43,7 +44,7 @@ data class SpliceOutgoingPaymentWrapper(
         recipientAmount = amountSat.sat,
         address = address,
         miningFees = miningFeeSat.sat,
-        txId = txId.toByteVector32(),
+        txId = TxId(txId),
         channelId = channelId.toByteVector32(),
         createdAt = createdAt,
         confirmedAt = confirmedAt,

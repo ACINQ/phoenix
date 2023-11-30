@@ -126,7 +126,7 @@ class CsvWriter {
                         is IncomingPayment.Origin.OnChain -> {
                             // append txs ids if any, nothing otherwise
                             val inputs = origin.localInputs.takeIf { it.isNotEmpty() }?.joinToString("\n- ") {
-                                it.txid.toHex()
+                                it.txid.toString()
                             }?.let { "\n$it" } ?: ""
                             "Swap-in to ${config.swapInAddress}$inputs"
                         }

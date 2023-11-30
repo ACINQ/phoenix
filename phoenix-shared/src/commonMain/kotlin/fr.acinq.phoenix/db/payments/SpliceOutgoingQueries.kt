@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.db.payments
 
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
@@ -35,7 +36,7 @@ class SpliceOutgoingQueries(val database: PaymentsDatabase) {
                 address = payment.address,
                 mining_fees_sat = payment.miningFees.sat,
                 channel_id = payment.channelId.toByteArray(),
-                tx_id = payment.txId.toByteArray(),
+                tx_id = payment.txId.value.toByteArray(),
                 created_at = payment.createdAt,
                 confirmed_at = payment.confirmedAt,
                 locked_at = payment.lockedAt
@@ -82,7 +83,7 @@ class SpliceOutgoingQueries(val database: PaymentsDatabase) {
                 recipientAmount = recipient_amount_sat.sat,
                 address = address,
                 miningFees = mining_fees_sat.sat,
-                txId = tx_id.toByteVector32(),
+                txId = TxId(tx_id),
                 channelId = channel_id.toByteVector32(),
                 createdAt = created_at,
                 confirmedAt = confirmed_at,

@@ -2,6 +2,7 @@ package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.lightning.utils.sat
@@ -238,7 +239,7 @@ data class StartupParams(
     /** The liquidity policy must be injected into the node params manager. */
     val liquidityPolicy: LiquidityPolicy,
     /** List of transaction ids that can be used for swap-in even if they are zero-conf. */
-    val trustedSwapInTxs: Set<ByteVector32>,
+    val trustedSwapInTxs: Set<TxId>,
     // TODO: add custom electrum address, fiat currencies, ...
 )
 

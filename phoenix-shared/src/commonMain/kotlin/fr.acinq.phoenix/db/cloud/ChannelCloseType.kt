@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.db.cloud
 
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.utils.UUID
@@ -34,7 +35,7 @@ data class ChannelClosePaymentWrapper(
         address = payment.address,
         isSentToDefaultAddress = payment.isSentToDefaultAddress,
         miningFeeSat = payment.miningFees.sat,
-        txId = payment.txId.toByteArray(),
+        txId = payment.txId.value.toByteArray(),
         createdAt = payment.createdAt,
         confirmedAt = payment.confirmedAt,
         lockedAt = payment.lockedAt,
@@ -49,7 +50,7 @@ data class ChannelClosePaymentWrapper(
         address = address,
         isSentToDefaultAddress = isSentToDefaultAddress,
         miningFees = miningFeeSat.sat,
-        txId = txId.toByteVector32(),
+        txId = TxId(txId),
         createdAt = createdAt,
         confirmedAt = confirmedAt,
         lockedAt = lockedAt,

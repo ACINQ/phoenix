@@ -23,6 +23,7 @@ package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.OutPoint
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.db.payments.DbTypesHelper.decodeBlob
@@ -71,7 +72,7 @@ sealed class IncomingOriginData {
                 IncomingOriginTypeVersion.INVOICE_V0 -> format.decodeFromString<Invoice.V0>(json).let { IncomingPayment.Origin.Invoice(PaymentRequest.read(it.paymentRequest)) }
                 IncomingOriginTypeVersion.SWAPIN_V0 -> format.decodeFromString<SwapIn.V0>(json).let { IncomingPayment.Origin.SwapIn(it.address) }
                 IncomingOriginTypeVersion.ONCHAIN_V0 -> format.decodeFromString<OnChain.V0>(json).let {
-                    IncomingPayment.Origin.OnChain(it.txId, it.outpoints.toSet())
+                    IncomingPayment.Origin.OnChain(TxId(it.txId), it.outpoints.toSet())
                 }
             }
         }
@@ -86,5 +87,5 @@ fun IncomingPayment.Origin.mapToDb(): Pair<IncomingOriginTypeVersion, ByteArray>
     is IncomingPayment.Origin.SwapIn -> IncomingOriginTypeVersion.SWAPIN_V0 to
             Json.encodeToString(IncomingOriginData.SwapIn.V0(address)).toByteArray(Charsets.UTF_8)
     is IncomingPayment.Origin.OnChain -> IncomingOriginTypeVersion.ONCHAIN_V0 to
-            Json.encodeToString(IncomingOriginData.OnChain.V0(txid, localInputs.toList())).toByteArray(Charsets.UTF_8)
+            Json.encodeToString(IncomingOriginData.OnChain.V0(txId.value, localInputs.toList())).toByteArray(Charsets.UTF_8)
 }

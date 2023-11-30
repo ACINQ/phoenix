@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.getConfirmations
@@ -110,12 +111,11 @@ class PaymentsManager(
             paymentsDb.listUnconfirmedTransactions(),
             configurationManager.electrumMessages
         ) { unconfirmedTxs, header ->
-            unconfirmedTxs to header?.blockHeight
+            unconfirmedTxs.map { TxId(it) } to header?.blockHeight
         }.collect { (unconfirmedTxs, blockHeight) ->
             if (blockHeight != null) {
-                val unconfirmedTxIds = unconfirmedTxs.map { it.byteVector32() }
-                log.debug { "checking confirmation status of ${unconfirmedTxIds.size} txs at block=$blockHeight" }
-                unconfirmedTxIds.forEach { txId ->
+                log.debug { "checking confirmation status of ${unconfirmedTxs.size} txs at block=$blockHeight" }
+                unconfirmedTxs.forEach { txId ->
                     electrumClient.getConfirmations(txId)?.let { conf ->
                         if (conf > 0) {
                             log.debug { "transaction $txId has $conf confirmations, updating database" }
@@ -144,7 +144,7 @@ class PaymentsManager(
      * payment(s) that triggered that change.
      */
     suspend fun listPaymentsForTxId(
-        txId: ByteVector32
+        txId: TxId
     ): List<WalletPayment> {
         return paymentsDb().listPaymentsForTxId(txId)
     }

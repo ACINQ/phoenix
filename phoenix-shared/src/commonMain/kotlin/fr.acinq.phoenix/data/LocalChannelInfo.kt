@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.channel.states.*
 import fr.acinq.lightning.json.JsonSerializers
@@ -66,7 +67,7 @@ data class LocalChannelInfo(
                 val changes = state.commitments.changes
                 state.commitments.active.map {
                     CommitmentInfo(
-                        fundingTxId = it.fundingTxId.toHex(),
+                        fundingTxId = it.fundingTxId,
                         fundingTxIndex = it.fundingTxIndex,
                         fundingAmount = it.fundingAmount,
                         balanceForSend = it.availableBalanceForSend(params, changes)
@@ -84,7 +85,7 @@ data class LocalChannelInfo(
                 val changes = state.commitments.changes
                 state.commitments.inactive.map {
                     CommitmentInfo(
-                        fundingTxId = it.fundingTxId.toHex(),
+                        fundingTxId = it.fundingTxId,
                         fundingTxIndex = it.fundingTxIndex,
                         fundingAmount = it.fundingAmount,
                         balanceForSend = it.availableBalanceForSend(params, changes)
@@ -99,7 +100,7 @@ data class LocalChannelInfo(
 
     /** Stripped-down commitment, easier to consume from the frontend. */
     data class CommitmentInfo(
-        val fundingTxId: String,
+        val fundingTxId: TxId,
         val fundingTxIndex: Long,
         val fundingAmount: Satoshi,
         val balanceForSend: MilliSatoshi,
