@@ -465,16 +465,23 @@ struct MinerFeeSheet: View {
 					targetFeerate: feePerKw
 				)
 				
-				let updatedFeePerKw: Lightning_kmpFeeratePerKw = pair!.first!
-				let fee: Bitcoin_kmpSatoshi = pair!.second!
-				
-				if self.satsPerByte == originalSatsPerByte {
-					self.minerFeeInfo = MinerFeeInfo(pubKeyScript: scriptVector, feerate: updatedFeePerKw, minerFee: fee)
+				if let pair = pair,
+				   let updatedFeePerKw: Lightning_kmpFeeratePerKw = pair.first,
+				   let fee: Bitcoin_kmpSatoshi = pair.second
+				{
+					if self.satsPerByte == originalSatsPerByte {
+						self.minerFeeInfo = MinerFeeInfo(
+							pubKeyScript: scriptVector,
+							feerate: updatedFeePerKw,
+							minerFee: fee
+						)
+					}
+				} else {
+					log.error("Error: peer.estimateFeeForSpliceOut() == nil")
 				}
 				
 			} catch {
 				log.error("Error: \(error)")
-				self.minerFeeInfo = nil
 			}
 			
 		} // </Task>
