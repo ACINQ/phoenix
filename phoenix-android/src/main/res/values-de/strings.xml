@@ -506,8 +506,6 @@
     <string name="electrum_title">Electrum-Server</string>
     <string name="electrum_about">Um Ihre Zahlungskanäle zu sichern, überwacht Phoenix die Bitcoin-Blockchain über Electrum-Server.\n\nStandardmäßig werden zufällige Server verwendet. Sie können Phoenix auch so konfigurieren, dass es sich nur mit Ihrem eigenen Server verbindet.</string>
     <string name="electrum_block_height_label">Blockhöhe</string>
-    <string name="electrum_fee_rate_next_label">Gebührenrate 1 Block</string>
-    <string name="electrum_fee_rate_funding_label">Gebührenrate 144 Blöcke</string>
     <string name="electrum_connection_label">Server</string>
 
     <string name="electrum_connection_closed_with_random">Keine Verbindung zu Electrum</string>
@@ -524,7 +522,7 @@
     <string name="electrum_dialog_invalid_input">Diese Adresse ist ungültig.</string>
     <string name="electrum_dialog_cert_check_button">Verbinden</string>
     <string name="electrum_dialog_cert_checking">Prüfe Zertifikat…</string>
-    <string name="electrum_dialog_cert_failure">Verbindung fehlgeschlagen:\n%1$s</string>
+    <string name="electrum_dialog_cert_failure">Verbindung fehlgeschlagen</string>
     <string name="electrum_dialog_cert_unresolved">Diese Adresse konnte nicht aufgelöst werden.</string>
     <string name="electrum_dialog_cert_header">Nicht vertrauenswürdiges Zertifikat</string>
     <string name="electrum_dialog_cert_sha1">SHA1 Fingerabdruck</string>
