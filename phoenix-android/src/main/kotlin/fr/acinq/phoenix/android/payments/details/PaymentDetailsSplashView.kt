@@ -628,7 +628,7 @@ private fun ConfirmationView(
                 ) {
                     TextWithIcon(
                         text = stringResource(R.string.paymentdetails_status_unconfirmed_zero),
-                        icon = R.drawable.ic_rocket,
+                        icon = if (canBeBumped) R.drawable.ic_rocket else R.drawable.ic_clock,
                         textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp, color = MaterialTheme.colors.primary),
                         iconTint = MaterialTheme.colors.primary
                     )
