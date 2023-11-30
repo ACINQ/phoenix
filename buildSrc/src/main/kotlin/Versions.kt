@@ -1,6 +1,6 @@
 object Versions {
-    const val lightningKmp = "1.5.12-SNAPSHOT"
-    const val secp256k1 = "0.10.1"
+    const val lightningKmp = "1.5.12"
+    const val secp256k1 = "0.11.0"
     const val torMobile = "0.2.0"
 
     const val kotlin = "1.8.21"
