@@ -195,7 +195,7 @@ private fun OnchainBalanceView(
 @Composable
 fun UtxoRow(utxo: WalletState.Utxo, progress: Pair<Int?, Int>?) {
     val context = LocalContext.current
-    val txUrl = txUrl(txId = utxo.outPoint.txid.toHex())
+    val txUrl = txUrl(txId = utxo.outPoint.txid)
     Row(
         modifier = Modifier
             .clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.accessibility_explorer_link)) {
@@ -217,7 +217,7 @@ fun UtxoRow(utxo: WalletState.Utxo, progress: Pair<Int?, Int>?) {
             )
         }
         Text(
-            text = utxo.outPoint.txid.toHex(),
+            text = utxo.outPoint.txid.toString(),
             modifier = Modifier.weight(1f),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

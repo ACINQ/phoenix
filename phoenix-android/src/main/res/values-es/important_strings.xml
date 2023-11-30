@@ -63,11 +63,21 @@
     <string name="restore_seed_invalid_details">Asegúrate de haber introducido las palabras correctas en el orden correcto</string>
     <string name="restore_import_button">Restaurar</string>
 
-    <!-- settings list -->
+    <!-- home: swap help -->
+
+    <string name="home_swapin_help_pending">En espera de 3 confirmaciones.</string>
+    <string name="home_swapin_help_ready_fee">Los depósitos se desplegarán en Lightning cuando las tasas de minería sean inferiores a %1$s.</string>
+    <string name="home_swapin_help_ready_disabled">Los depósitos permanecerán en cadena porque la gestión automatizada de canales está desactivada.</string>
+    <string name="home_swapin_help_generic">Se han depositado fondos on-chain en tu cartera.</string>
+    <string name="home_swapin_help_button">Ver detalles</string>
+
+    <!-- home: bottom menu -->
 
     <string name="menu_settings">Configuración</string>
     <string name="menu_send">Enviar</string>
     <string name="menu_receive">Recibir</string>
+
+    <!-- settings list -->
 
     <string name="settings_general_title">Configuración general</string>
     <string name="settings_security_title">Privacidad y seguridad</string>
@@ -168,10 +178,8 @@
     <string name="inappnotif_mempool_full_action">Vea cómo afecta a Phoenix</string>
 
     <string name="inappnotif_payment_onchain_pending_title">Fondos en cadena pendientes (+%1$s)</string>
-    <plurals name="inappnotif_payments_rejection_overview">
-        <item quantity="one">%1$d cobro rechazado recientemente</item>
-        <item quantity="many">%1$d cobros rechazados recientemente</item>
-    </plurals>
+    <string name="inappnotif_payments_rejection_overview_one">1 cobro rechazado recientemente</string>
+    <string name="inappnotif_payments_rejection_overview_many">%1$d cobros rechazados recientemente</string>
     <string name="inappnotif_payment_rejected_title">Pago rechazado (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">La gestión automática de canales está desactivada.</string>
     <string name="inappnotif_payment_rejected_over_absolute">La tasa era de %1$s, pero su tasa máxima estaba fijada en %2$s.</string>
@@ -181,10 +189,8 @@
     <string name="inappnotif_payment_rejected_view_wallet">Ver detalles</string>
 
     <string name="inappnotif_watchtower_nominal_title">Informe de la Watchtower</string>
-    <plurals name="inappnotif_watchtower_nominal_description">
-        <item quantity="one">Se ha comprobado correctamente el canal %1$d en %2$s. No se ha encontrado ningún problema.</item>
-        <item quantity="many">Se han comprobado correctamente %1$d canales en %2$s. No se ha encontrado ningún problema.</item>
-    </plurals>
+    <string name="inappnotif_watchtower_nominal_description_one">Se ha comprobado correctamente el canal %1$d en %2$s. No se ha encontrado ningún problema.</string>
+    <string name="inappnotif_watchtower_nominal_description_many">Se han comprobado correctamente %1$d canales en %2$s. No se ha encontrado ningún problema.</string>
     <string name="inappnotif_watchtower_revokedfound_title">Alerta de la Watchtower</string>
     <string name="inappnotif_watchtower_revokedfound_description">Se han encontrado compromisos revocados en %1$s para canal(es): %2$s. Este canal puede cerrarse.</string>
 
@@ -241,7 +247,7 @@
     <!-- wallet info -->
 
     <string name="walletinfo_onchain_swapin">Cartera swap-in</string>
-    <string name="walletinfo_onchain_swapin_help">Los fondos enviados a esta cartera en cadena se cambian automáticamente a Lightning.</string>
+    <string name="walletinfo_onchain_swapin_help">Phoenix es una cartera Lightning. Los fondos recibidos en la cadena se moverán automáticamente a Lightning, de acuerdo con la configuración de gestión del canal.</string>
     <string name="walletinfo_onchain_swapin_help_faq_link">Vea cómo funciona</string>
     <string name="walletinfo_onchain_swapin_policy_view">Puntee para configurar.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">Los fondos en cadena se cambiarán automáticamente a Lightning si la tasa es <b>inferior a %1$s</b>.</string>
@@ -299,6 +305,10 @@
       \n\n
       Los pagos que reciba en la L2 pueden recibirse al instante y sin tasas. Sin embargo, en ocasiones también es necesaria una operación L1 para gestionar el canal de pago L2. Esto puede hacerse automáticamente <b>SI</b> las tasas de los mineros se adhieren a su política de tasas configurada.
     </string>
+
+    <!-- payment line -->
+
+    <string name="paymentline_outgoing_unconfirmed">No confirmado - puntear para acelerar</string>
 
     <!-- CPFP -->
 

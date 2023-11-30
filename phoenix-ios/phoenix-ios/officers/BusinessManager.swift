@@ -76,7 +76,7 @@ class BusinessManager {
 	private var fcmToken: String? = nil
 	private var peerConnectionState: Lightning_kmpConnection? = nil
 	
-	private var longLivedTask: UIBackgroundTaskIdentifier = .invalid
+	private var longLivedTasks = [String: UIBackgroundTaskIdentifier]()
 	
 	private var paymentsPageFetchers = [String: PaymentsPageFetcher]()
 	private var cancellables = Set<AnyCancellable>()
@@ -153,14 +153,21 @@ class BusinessManager {
 			.store(in: &cancellables)
 		
 		// In-flight payments observer
-		business.paymentsManager.inFlightOutgoingPaymentsPublisher()
-			.sink { (count: Int) in
+		business.peerManager.peerStatePublisher()
+			.flatMap { $0.eventsFlowPublisher() }
+			.sink { (event: Lightning_kmpPeerEvent) in
 				
-				log.debug("inFlightOutgoingPaymentsPublisher: count = \(count)")
-				if count > 0 {
-					self.beginLongLivedTask()
-				} else {
-					self.endLongLivedTask()
+				if let paymentProgress = event as? Lightning_kmpPaymentProgress {
+					let paymentId = paymentProgress.request.paymentId.description()
+					self.beginLongLivedTask(id: paymentId)
+					
+				} else if let paymentSent = event as? Lightning_kmpPaymentSent {
+					let paymentId = paymentSent.request.paymentId.description()
+					self.endLongLivedTask(id: paymentId)
+					
+				} else if let paymentNotSent = event as? Lightning_kmpPaymentNotSent {
+					let paymentId = paymentNotSent.request.paymentId.description()
+					self.endLongLivedTask(id: paymentId)
 				}
 			}
 			.store(in: &cancellables)
@@ -211,6 +218,19 @@ class BusinessManager {
 				{
 					log.debug("Received Lightning_kmpLiquidityEventsRejected: \(rejected)")
 					self.swapInRejectedPublisher.value = rejected
+					
+				} else if let task = event as? Lightning_kmpSensitiveTaskEvents {
+					
+					if let taskStarted = task as? Lightning_kmpSensitiveTaskEventsTaskStarted {
+						if let taskIdentifier = taskStarted.id.asInteractiveTx() {
+							self.beginLongLivedTask(id: taskIdentifier.id)
+						}
+						
+					} else if let taskEnded = task as? Lightning_kmpSensitiveTaskEventsTaskEnded {
+						if let taskIdentifier = taskEnded.id.asInteractiveTx() {
+							self.endLongLivedTask(id: taskIdentifier.id)
+						}
+					}
 				}
 			}
 			.store(in: &cancellables)
@@ -515,14 +535,19 @@ class BusinessManager {
 	// However, in order to differentiate from the new BGTask's introduced in iOS 13,
 	// we're now calling these "long-lived tasks".
 	
-	func beginLongLivedTask() {
-		log.trace("beginLongLivedTask()")
+	func beginLongLivedTask(id: String, timeout: TimeInterval = 180) {
+		log.trace("beginLongLivedTask(id: '\(id)')")
 		assertMainThread()
 		
-		if longLivedTask == .invalid {
-			longLivedTask = UIApplication.shared.beginBackgroundTask { [weak self] in
-				self?.endLongLivedTask()
+		if longLivedTasks[id] == nil {
+			longLivedTasks[id] = UIApplication.shared.beginBackgroundTask {
+				self.endLongLivedTask(id: id)
 			}
+			
+			DispatchQueue.main.asyncAfter(deadline: .now() + timeout) {
+				self.endLongLivedTask(id: id)
+			}
+			
 			log.debug("Invoking: business.decrementDisconnectCount()")
 			business.appConnectionsDaemon?.decrementDisconnectCount(
 				target: AppConnectionsDaemon.ControlTarget.companion.All
@@ -530,16 +555,13 @@ class BusinessManager {
 		}
 	}
 	
-	func endLongLivedTask() {
-		log.trace("endLongLivedTask()")
+	func endLongLivedTask(id: String) {
+		log.trace("endLongLivedTask(id: '\(id)')")
 		assertMainThread()
 		
-		if longLivedTask != .invalid {
-			
-			let task = longLivedTask
-			longLivedTask = .invalid
-			
+		if let task = longLivedTasks.removeValue(forKey: id) {
 			UIApplication.shared.endBackgroundTask(task)
+			
 			log.debug("Invoking: business.incrementDisconnectCount()")
 			business.appConnectionsDaemon?.incrementDisconnectCount(
 				target: AppConnectionsDaemon.ControlTarget.companion.All

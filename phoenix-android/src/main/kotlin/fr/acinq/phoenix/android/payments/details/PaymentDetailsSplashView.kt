@@ -36,10 +36,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.blockchain.electrum.ElectrumConnectionStatus
 import fr.acinq.lightning.blockchain.electrum.getConfirmations
 import fr.acinq.lightning.db.*
@@ -164,7 +166,7 @@ private fun PaymentStatus(
                     isAnimated = false,
                     color = mutedTextColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, canBeBumped = false, onCpfpSuccess = onCpfpSuccess)
             }
             else -> {
                 PaymentStatusIcon(
@@ -175,7 +177,7 @@ private fun PaymentStatus(
                     isAnimated = fromEvent,
                     color = positiveColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, canBeBumped = false, onCpfpSuccess)
             }
         }
         is SpliceOutgoingPayment -> when (payment.confirmedAt) {
@@ -186,7 +188,7 @@ private fun PaymentStatus(
                     isAnimated = false,
                     color = mutedTextColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, canBeBumped = true, onCpfpSuccess = onCpfpSuccess)
             }
             else -> {
                 PaymentStatusIcon(
@@ -197,7 +199,7 @@ private fun PaymentStatus(
                     isAnimated = fromEvent,
                     color = positiveColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, canBeBumped = true, onCpfpSuccess = onCpfpSuccess)
             }
         }
         is SpliceCpfpOutgoingPayment -> when (payment.confirmedAt) {
@@ -208,7 +210,7 @@ private fun PaymentStatus(
                     isAnimated = false,
                     color = mutedTextColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = false, canBeBumped = true, onCpfpSuccess = onCpfpSuccess)
             }
             else -> {
                 PaymentStatusIcon(
@@ -219,7 +221,7 @@ private fun PaymentStatus(
                     isAnimated = fromEvent,
                     color = positiveColor,
                 )
-                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, onCpfpSuccess)
+                ConfirmationView(payment.txId, payment.channelId, isConfirmed = true, canBeBumped = true, onCpfpSuccess = onCpfpSuccess)
             }
         }
         is IncomingPayment -> {
@@ -280,7 +282,7 @@ private fun PaymentStatus(
                         value = channelId?.let { peerManager.getChannelWithCommitments(it)?.minDepthForFunding(params) }
                     }
                 }
-                ConfirmationView(it.txId, it.channelId, isConfirmed = it.confirmedAt != null, onCpfpSuccess, channelMinDepth)
+                ConfirmationView(it.txId, it.channelId, isConfirmed = it.confirmedAt != null, canBeBumped = false, onCpfpSuccess = onCpfpSuccess, channelMinDepth)
             }
         }
     }
@@ -575,14 +577,15 @@ private fun EditPaymentDetails(
 
 @Composable
 private fun ConfirmationView(
-    txId: ByteVector32,
+    txId: TxId,
     channelId: ByteVector32,
     isConfirmed: Boolean,
+    canBeBumped: Boolean,
     onCpfpSuccess: () -> Unit,
     minDepth: Int? = null, // sometimes we know how many confirmations are needed
 ) {
     val log = logger("PaymentDetailsSplashView")
-    val txUrl = txUrl(txId = txId.toHex())
+    val txUrl = txUrl(txId = txId)
     val context = LocalContext.current
     val electrumClient = business.electrumClient
     var showBumpTxDialog by remember { mutableStateOf(false) }
@@ -602,9 +605,9 @@ private fun ConfirmationView(
 
         suspend fun getConfirmations(): Int {
             val confirmations = electrumClient.getConfirmations(txId)
-            log.debug { "retrieved confirmations count=$confirmations from electrum for tx=${txId.toHex()}" }
+            log.debug { "retrieved confirmations=$confirmations from electrum for tx=$txId" }
             return confirmations ?: run {
-                log.debug { "retrying getConfirmations from Electrum in 5 sec" }
+                log.debug { "retrying getConfirmations from electrum in 5 sec" }
                 delay(5_000)
                 getConfirmations()
             }
@@ -619,20 +622,23 @@ private fun ConfirmationView(
             if (conf == 0) {
                 Card(
                     internalPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                    onClick = { showBumpTxDialog = true },
+                    onClick = if (canBeBumped) { { showBumpTxDialog = true } } else null,
                     backgroundColor = Color.Transparent,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     TextWithIcon(
                         text = stringResource(R.string.paymentdetails_status_unconfirmed_zero),
-                        icon = R.drawable.ic_rocket,
+                        icon = if (canBeBumped) R.drawable.ic_rocket else R.drawable.ic_clock,
                         textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp, color = MaterialTheme.colors.primary),
                         iconTint = MaterialTheme.colors.primary
                     )
-                    Text(
-                        text = stringResource(id = R.string.paymentdetails_status_unconfirmed_zero_bump),
-                        style = MaterialTheme.typography.caption.copy(fontSize = 14.sp)
-                    )
+
+                    if (canBeBumped) {
+                        Text(
+                            text = stringResource(id = R.string.paymentdetails_status_unconfirmed_zero_bump),
+                            style = MaterialTheme.typography.button.copy(fontSize = 14.sp, color = MaterialTheme.colors.primary, fontWeight = FontWeight.Bold),
+                        )
+                    }
                 }
             } else {
                 FilledButton(

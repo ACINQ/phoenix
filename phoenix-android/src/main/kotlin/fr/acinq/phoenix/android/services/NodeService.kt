@@ -1,4 +1,4 @@
-package fr.acinq.phoenix.android.service
+package fr.acinq.phoenix.android.services
 
 import android.app.Service
 import android.content.Intent
@@ -14,6 +14,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.io.PaymentReceived
@@ -196,27 +197,10 @@ class NodeService : Service() {
                 stopForeground(STOP_FOREGROUND_REMOVE)
             }
         }) {
-//        serviceScope.launch(Dispatchers.Main + CoroutineExceptionHandler { _, e ->
-//            log.error("error when checking node state consistency before startup: ", e)
-//        }) {
-            // Check node state consistency. Use a lock because the [doStartNode] method can be called concurrently.
-            // If the node is already starting, started, or in error, the method returns.
-
-//        try {
-
-
             log.info("starting node from service state=${_state.value?.name} with checkLegacyChannels=$requestCheckLegacyChannels")
             doStartBusiness(decryptedMnemonics, requestCheckLegacyChannels)
-            ChannelsWatcher.schedule(applicationContext)
+            ChannelsWatcher.scheduleASAP(applicationContext)
             _state.postValue(NodeServiceState.Running)
-//        } catch (e: Exception) {
-//            log.error("error when starting node: ", e)
-//            _state.value = NodeServiceState.Error(e)
-//            if (isHeadless) {
-//                shutdown()
-//                stopForeground(STOP_FOREGROUND_REMOVE)
-//            }
-//        }
         }
     }
 
@@ -256,7 +240,7 @@ class NodeService : Service() {
                 requestCheckLegacyChannels = requestCheckLegacyChannels,
                 isTorEnabled = isTorEnabled,
                 liquidityPolicy = liquidityPolicy,
-                trustedSwapInTxs = trustedSwapInTxs.map { ByteVector32.fromValidHex(it) }.toSet()
+                trustedSwapInTxs = trustedSwapInTxs.map { TxId(it) }.toSet()
             )
         )
 

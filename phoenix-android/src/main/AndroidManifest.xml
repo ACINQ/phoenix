@@ -75,7 +75,7 @@
 
         <!-- firebase cloud messaging -->
         <service
-            android:name="fr.acinq.phoenix.android.service.FCMService"
+            android:name="fr.acinq.phoenix.android.services.FCMService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -84,13 +84,13 @@
 
         <!-- node service -->
         <service
-            android:name="fr.acinq.phoenix.android.service.NodeService"
+            android:name="fr.acinq.phoenix.android.services.NodeService"
             android:exported="false"
             android:stopWithTask="false" />
 
         <!-- broadcast receivers -->
         <receiver
-            android:name="fr.acinq.phoenix.android.service.BootReceiver"
+            android:name="fr.acinq.phoenix.android.services.BootReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

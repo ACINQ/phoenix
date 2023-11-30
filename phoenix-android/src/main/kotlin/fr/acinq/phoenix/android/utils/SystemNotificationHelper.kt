@@ -82,6 +82,9 @@ object SystemNotificationHelper {
                 NotificationChannel(HEADLESS_NOTIF_CHANNEL, context.getString(R.string.notification_headless_title), NotificationManager.IMPORTANCE_DEFAULT).apply {
                     description = context.getString(R.string.notification_headless_desc)
                 },
+                NotificationChannel(CHANNELS_WATCHER_ALERT_CHANNEL, context.getString(R.string.notification_channels_watcher_title), NotificationManager.IMPORTANCE_HIGH).apply {
+                    description = context.getString(R.string.notification_channels_watcher_desc)
+                },
                 NotificationChannel(SETTLEMENT_PENDING_NOTIF_CHANNEL, context.getString(R.string.notification_pending_settlement_title), NotificationManager.IMPORTANCE_HIGH).apply {
                     description = context.getString(R.string.notification_pending_settlement_desc)
                 },
@@ -285,6 +288,7 @@ object SystemNotificationHelper {
             setContentTitle(context.getString(R.string.notif_watcher_revoked_commit_title))
             setContentText(context.getString(R.string.notif_watcher_revoked_commit_message))
             setSmallIcon(R.drawable.ic_phoenix_outline)
+            setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE))
             setAutoCancel(true)
         }.let {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {

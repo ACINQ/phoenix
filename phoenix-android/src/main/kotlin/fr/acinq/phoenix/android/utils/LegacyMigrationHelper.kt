@@ -21,6 +21,7 @@ import com.google.common.net.HostAndPort
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.eclair.db.IncomingPaymentStatus
 import fr.acinq.eclair.db.OutgoingPaymentStatus
@@ -167,7 +168,7 @@ object LegacyMigrationHelper {
             try {
                 val parentId = it.key
                 val paymentMeta = legacyMetaRepository.get(parentId.toString())
-                val payment = modernizeLegacyOutgoingPayment(business.chain.chainHash, parentId, it.value, paymentMeta)
+                val payment = modernizeLegacyOutgoingPayment(business.chain, parentId, it.value, paymentMeta)
 
                 // save payment to database
                 newPaymentsDb.addOutgoingPayment(payment)
@@ -300,7 +301,7 @@ object LegacyMigrationHelper {
                     serviceFee = payToOpenMeta?.fee_sat?.sat?.toMilliSatoshi() ?: 0.msat,
                     miningFee = 0.sat,
                     channelId = ByteVector32.Zeroes,
-                    txId = ByteVector32.Zeroes,
+                    txId = TxId(ByteVector32.Zeroes),
                     confirmedAt = status.receivedAt(),
                     lockedAt = status.receivedAt()
                 )
@@ -325,7 +326,7 @@ object LegacyMigrationHelper {
         JavaConversions.asJavaCollection(payments).toList().groupBy { UUID.fromString(it.parentId().toString()) }
 
     fun modernizeLegacyOutgoingPayment(
-        chainHash: ByteVector32,
+        chain: NodeParams.Chain,
         parentId: UUID,
         listOfParts: List<fr.acinq.eclair.db.OutgoingPayment>,
         paymentMeta: PaymentMeta?,
@@ -344,7 +345,7 @@ object LegacyMigrationHelper {
                 address = paymentMeta?.closing_main_output_script ?: "",
                 isSentToDefaultAddress = paymentMeta?.closing_type != ClosingType.Mutual.code,
                 miningFees = 0.sat,
-                txId = paymentMeta?.getSpendingTxs()?.firstOrNull()?.let { ByteVector32.fromValidHex(it) } ?: ByteVector32.Zeroes,
+                txId = TxId(paymentMeta?.getSpendingTxs()?.firstOrNull()?.let { ByteVector32.fromValidHex(it) } ?: ByteVector32.Zeroes),
                 createdAt = head.createdAt(),
                 confirmedAt = closedAt,
                 lockedAt = closedAt,
@@ -367,7 +368,7 @@ object LegacyMigrationHelper {
             LightningOutgoingPayment.Details.SwapOut(
                 address = paymentMeta.swap_out_address ?: "",
                 paymentRequest = paymentRequest ?: PaymentRequest.create(
-                    chainHash = chainHash,
+                    chainHash = chain.chainHash,
                     amount = head.recipientAmount().toLong().msat,
                     paymentHash = head.paymentHash().bytes().toArray().byteVector32(),
                     privateKey = Lightning.randomKey(),

@@ -25,7 +25,7 @@ import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.android.service.NodeService
+import fr.acinq.phoenix.android.services.NodeService
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.nodeIdHash
 import kotlinx.coroutines.CoroutineExceptionHandler

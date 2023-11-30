@@ -71,7 +71,7 @@ import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.security.SeedFileState
 import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.android.service.NodeServiceState
+import fr.acinq.phoenix.android.services.NodeServiceState
 import fr.acinq.phoenix.android.utils.BiometricsHelper
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs

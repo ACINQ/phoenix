@@ -32,7 +32,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,7 +45,7 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.service.ChannelsWatcher
+import fr.acinq.phoenix.android.services.ChannelsWatcher
 import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
@@ -208,10 +207,10 @@ private fun PermamentNotice(
 
         Notice.MempoolFull -> {
             ImportantNotification(
-                icon = R.drawable.ic_alert_triangle,
+                icon = R.drawable.ic_info,
                 message = stringResource(id = R.string.inappnotif_mempool_full_message),
                 actionText = stringResource(id = R.string.inappnotif_mempool_full_action),
-                onActionClick = { openLink(context, "https://phoenix.acinq.co/faq#high-mempool-size-impacts") },
+                onActionClick = { openLink(context, "https://phoenix.acinq.co/faq#is-phoenix-affected-by-high-on-chain-fees") },
             )
         }
 
@@ -296,7 +295,11 @@ private fun PaymentNotification(
 
         is WatchTowerOutcome.Nominal -> DimissibleNotification(
             title = stringResource(id = R.string.inappnotif_watchtower_nominal_title),
-            body = pluralStringResource(id = R.plurals.inappnotif_watchtower_nominal_description, count = notification.channelsWatchedCount, notification.channelsWatchedCount, notification.createdAt.toAbsoluteDateTimeString()),
+            body = if (notification.channelsWatchedCount == 1) {
+                stringResource(id = R.string.inappnotif_watchtower_nominal_description_one, notification.channelsWatchedCount, notification.createdAt.toAbsoluteDateTimeString())
+            } else {
+                stringResource(id = R.string.inappnotif_watchtower_nominal_description_many, notification.channelsWatchedCount, notification.createdAt.toAbsoluteDateTimeString())
+            },
             timestamp = notification.createdAt,
             onRead = { onNotificationRead(notification.id) },
         )

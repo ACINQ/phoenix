@@ -309,7 +309,7 @@ private fun DetailsForChannelClose(
     )
     TechnicalRow(
         label = stringResource(id = R.string.paymentdetails_closing_tx_label),
-        content = { TransactionLinkButton(txId = payment.txId.toHex()) }
+        content = { TransactionLinkButton(txId = payment.txId) }
     )
     TechnicalRowSelectable(
         label = stringResource(id = R.string.paymentdetails_closing_type_label),
@@ -329,7 +329,7 @@ private fun DetailsForCpfp(
 ) {
     TechnicalRow(
         label = stringResource(id = R.string.paymentdetails_splice_cpfp_transaction_label),
-        content = { TransactionLinkButton(txId = payment.txId.toHex()) }
+        content = { TransactionLinkButton(txId = payment.txId) }
     )
 }
 
@@ -347,7 +347,7 @@ private fun DetailsForSpliceOut(
     )
     TechnicalRow(
         label = stringResource(id = R.string.paymentdetails_splice_out_tx_label),
-        content = { TransactionLinkButton(txId = payment.txId.toHex()) }
+        content = { TransactionLinkButton(txId = payment.txId) }
     )
 
 }
@@ -374,7 +374,7 @@ private fun DetailsForIncoming(
                     Row {
                         Text(text = stringResource(id = R.string.paymentdetails_dualswapin_tx_value, index + 1))
                         Spacer(modifier = Modifier.width(4.dp))
-                        TransactionLinkButton(txId = outpoint.txid.toHex())
+                        TransactionLinkButton(txId = outpoint.txid)
                     }
                 }
             }
@@ -414,7 +414,7 @@ private fun ReceivedWithNewChannel(
     }
     TechnicalRow(
         label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = receivedWith.txId.toHex()) }
+        content = { TransactionLinkButton(txId = receivedWith.txId) }
     )
     TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
 }
@@ -435,7 +435,7 @@ private fun ReceivedWithSpliceIn(
     }
     TechnicalRow(
         label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = receivedWith.txId.toHex()) }
+        content = { TransactionLinkButton(txId = receivedWith.txId) }
     )
     TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
 }

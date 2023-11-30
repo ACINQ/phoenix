@@ -235,20 +235,13 @@
     <string name="channeldetails_share_subject">Kanal-Daten</string>
     <string name="channeldetails_share_title">Teile Kanal-Daten</string>
 
-    <!-- home: bottom menu -->
-
-    <string name="menu_settings">Einstellungen</string>
-    <string name="menu_send">Senden</string>
-    <string name="menu_receive">Empfangen</string>
-
     <!-- home: balance section & misc -->
 
     <string name="home__balance_loading">Lädt…</string>
     <string name="home__onchain_incoming">+%1$s</string>
 
     <string name="home__faq_button">FAQ</string>
-    <string name="home__payments_none">Sie haben bisher keine Zahlungen vorgenommen.\n\nVerwenden Sie die Schaltflächen Empfangen und Senden unten auf diesem Fenster, um loszulegen!</string>
-    <string name="home__payments_none_incoming">Eine Zahlung wird erwartet.\n\nNachdem sie bestätigt ist, wird die Zahlung hier angezeigt.</string>
+    <string name="home__payments_none">Verwenden Sie die Schaltflächen Empfangen und Senden unten auf diesem Fenster, um loszulegen!</string>
     <string name="home__payments_header">Aktuelle Zahlungen</string>
     <string name="home__payments_more_button">Alle Zahlungen anzeigen…</string>
 	<string name="home__connection__electrum_late">Electrum unsynchron</string>
@@ -513,8 +506,6 @@
     <string name="electrum_title">Electrum-Server</string>
     <string name="electrum_about">Um Ihre Zahlungskanäle zu sichern, überwacht Phoenix die Bitcoin-Blockchain über Electrum-Server.\n\nStandardmäßig werden zufällige Server verwendet. Sie können Phoenix auch so konfigurieren, dass es sich nur mit Ihrem eigenen Server verbindet.</string>
     <string name="electrum_block_height_label">Blockhöhe</string>
-    <string name="electrum_fee_rate_next_label">Gebührenrate 1 Block</string>
-    <string name="electrum_fee_rate_funding_label">Gebührenrate 144 Blöcke</string>
     <string name="electrum_connection_label">Server</string>
 
     <string name="electrum_connection_closed_with_random">Keine Verbindung zu Electrum</string>
@@ -531,7 +522,7 @@
     <string name="electrum_dialog_invalid_input">Diese Adresse ist ungültig.</string>
     <string name="electrum_dialog_cert_check_button">Verbinden</string>
     <string name="electrum_dialog_cert_checking">Prüfe Zertifikat…</string>
-    <string name="electrum_dialog_cert_failure">Verbindung fehlgeschlagen:\n%1$s</string>
+    <string name="electrum_dialog_cert_failure">Verbindung fehlgeschlagen</string>
     <string name="electrum_dialog_cert_unresolved">Diese Adresse konnte nicht aufgelöst werden.</string>
     <string name="electrum_dialog_cert_header">Nicht vertrauenswürdiges Zertifikat</string>
     <string name="electrum_dialog_cert_sha1">SHA1 Fingerabdruck</string>

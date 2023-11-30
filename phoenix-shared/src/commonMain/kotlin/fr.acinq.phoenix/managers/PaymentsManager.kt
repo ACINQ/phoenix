@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.getConfirmations
@@ -58,13 +59,6 @@ class PaymentsManager(
     val lastCompletedPayment: StateFlow<WalletPayment?> = _lastCompletedPayment
 
     /**
-     * The in-flight flow tracks payments that are being sent. This is used by iOS in case the app goes into the
-     * background and the iOS app needs to start a long-lived task so that the payment can still go through.
-     */
-    private val _inFlightOutgoingPayments = MutableStateFlow<Set<UUID>>(setOf())
-    val inFlightOutgoingPayments: StateFlow<Set<UUID>> = _inFlightOutgoingPayments
-
-    /**
      * Provides a default PaymentsFetcher for use by the app.
      * (You can also create your own instances if needed.)
      */
@@ -82,8 +76,6 @@ class PaymentsManager(
         launch { monitorLastCompletedPayment(currentTimestampMillis()) }
 
         launch { monitorUnconfirmedTransactions() }
-
-        launch { monitorInflightOutgoingPayments() }
     }
 
     private suspend fun monitorPaymentsCountInDb() {
@@ -109,24 +101,6 @@ class PaymentsManager(
         }
     }
 
-    /** Monitors in-flight outgoing payments from peer events and forward them to the [_inFlightOutgoingPayments] flow. */
-    private suspend fun monitorInflightOutgoingPayments() {
-        peerManager.getPeer().eventsFlow.collect { event ->
-            when (event) {
-                is PaymentProgress -> {
-                    addToInFlightOutgoingPayments(event.request.paymentId)
-                }
-                is PaymentSent -> {
-                    removeFromInFlightOutgoingPayments(event.request.paymentId)
-                }
-                is PaymentNotSent -> {
-                    removeFromInFlightOutgoingPayments(event.request.paymentId)
-                }
-                else -> Unit
-            }
-        }
-    }
-
     /** Watches transactions that are unconfirmed, checks their confirmation status at each block, and updates relevant payments. */
     private suspend fun monitorUnconfirmedTransactions() {
         val paymentsDb = paymentsDb()
@@ -137,12 +111,11 @@ class PaymentsManager(
             paymentsDb.listUnconfirmedTransactions(),
             configurationManager.electrumMessages
         ) { unconfirmedTxs, header ->
-            unconfirmedTxs to header?.blockHeight
+            unconfirmedTxs.map { TxId(it) } to header?.blockHeight
         }.collect { (unconfirmedTxs, blockHeight) ->
             if (blockHeight != null) {
-                val unconfirmedTxIds = unconfirmedTxs.map { it.byteVector32() }
-                log.debug { "checking confirmation status of ${unconfirmedTxIds.size} txs at block=$blockHeight" }
-                unconfirmedTxIds.forEach { txId ->
+                log.debug { "checking confirmation status of ${unconfirmedTxs.size} txs at block=$blockHeight" }
+                unconfirmedTxs.forEach { txId ->
                     electrumClient.getConfirmations(txId)?.let { conf ->
                         if (conf > 0) {
                             log.debug { "transaction $txId has $conf confirmations, updating database" }
@@ -152,20 +125,6 @@ class PaymentsManager(
                 }
             }
         }
-    }
-
-    /** Adds to StateFlow<Set<UUID>> */
-    private fun addToInFlightOutgoingPayments(id: UUID) {
-        val oldSet = _inFlightOutgoingPayments.value
-        val newSet = oldSet.plus(id)
-        _inFlightOutgoingPayments.value = newSet
-    }
-
-    /** Removes from StateFlow<Set<UUID>> */
-    private fun removeFromInFlightOutgoingPayments(id: UUID) {
-        val oldSet = _inFlightOutgoingPayments.value
-        val newSet = oldSet.minus(id)
-        _inFlightOutgoingPayments.value = newSet
     }
 
     private suspend fun paymentsDb(): SqlitePaymentsDb {
@@ -185,7 +144,7 @@ class PaymentsManager(
      * payment(s) that triggered that change.
      */
     suspend fun listPaymentsForTxId(
-        txId: ByteVector32
+        txId: TxId
     ): List<WalletPayment> {
         return paymentsDb().listPaymentsForTxId(txId)
     }

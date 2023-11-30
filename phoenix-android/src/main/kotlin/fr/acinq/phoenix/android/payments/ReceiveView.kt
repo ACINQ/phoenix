@@ -97,9 +97,9 @@ fun ReceiveView(
 
     // When a on-chain payment has been received, go back to the home screen (via the onSwapInReceived callback)
     LaunchedEffect(key1 = Unit) {
-        var previousBalance: WalletBalance? = null
+        var previousBalance: WalletBalance = WalletBalance.empty()
         balanceManager.swapInWalletBalance.collect {
-            if (previousBalance != null && it.total > 0.sat && it != previousBalance) {
+            if (previousBalance != WalletBalance.empty() && it.total > 0.sat && it != previousBalance) {
                 onSwapInReceived()
             } else {
                 previousBalance = it

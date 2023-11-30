@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.acinq.bitcoin.TxId
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.utils.copyToClipboard
@@ -147,7 +148,8 @@ fun InlineButton(
         backgroundColor = Color.Transparent,
         shape = RoundedCornerShape(6.dp),
         maxLines = maxLines,
-        textStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary, fontSize = fontSize, textDecoration = TextDecoration.Underline)
+        textStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary, fontSize = fontSize, textDecoration = TextDecoration.Underline),
+        horizontalArrangement = Arrangement.Start,
     )
 }
 
@@ -397,10 +399,10 @@ fun WebLink(
 @Composable
 fun TransactionLinkButton(
     modifier: Modifier = Modifier,
-    txId: String,
+    txId: TxId,
 ) {
     WebLink(
-        text = txId,
+        text = txId.toString(),
         url = txUrl(txId = txId),
         space = 4.dp,
         maxLines = 1,
@@ -412,7 +414,7 @@ fun TransactionLinkButton(
 }
 
 @Composable
-fun txUrl(txId: String): String {
+fun txUrl(txId: TxId): String {
     return business.blockchainExplorer.txUrl(txId = txId, website = BlockchainExplorer.Website.MempoolSpace)
 }
 

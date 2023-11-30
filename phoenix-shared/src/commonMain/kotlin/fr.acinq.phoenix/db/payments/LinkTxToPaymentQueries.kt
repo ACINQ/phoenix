@@ -18,8 +18,7 @@ package fr.acinq.phoenix.db.payments
 
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.byteVector32
+import fr.acinq.bitcoin.TxId
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.PaymentsDatabase
 import kotlinx.coroutines.flow.*
@@ -31,20 +30,20 @@ class LinkTxToPaymentQueries(val database: PaymentsDatabase) {
         return linkTxQueries.listUnconfirmed().asFlow().mapToList()
     }
 
-    fun listWalletPaymentIdsForTx(txId: ByteVector32): List<WalletPaymentId> {
-        return linkTxQueries.getPaymentIdForTx(tx_id = txId.toByteArray()).executeAsList()
+    fun listWalletPaymentIdsForTx(txId: TxId): List<WalletPaymentId> {
+        return linkTxQueries.getPaymentIdForTx(tx_id = txId.value.toByteArray()).executeAsList()
             .mapNotNull { WalletPaymentId.create(it.type, it.id) }
     }
 
-    fun linkTxToPayment(txId: ByteVector32, walletPaymentId: WalletPaymentId) {
-        linkTxQueries.linkTxToPayment(tx_id = txId.toByteArray(), type = walletPaymentId.dbType.value, id = walletPaymentId.dbId)
+    fun linkTxToPayment(txId: TxId, walletPaymentId: WalletPaymentId) {
+        linkTxQueries.linkTxToPayment(tx_id = txId.value.toByteArray(), type = walletPaymentId.dbType.value, id = walletPaymentId.dbId)
     }
 
-    fun setConfirmed(txId: ByteVector32, confirmedAt: Long) {
-        linkTxQueries.setConfirmed(tx_id = txId.toByteArray(), confirmed_at = confirmedAt)
+    fun setConfirmed(txId: TxId, confirmedAt: Long) {
+        linkTxQueries.setConfirmed(tx_id = txId.value.toByteArray(), confirmed_at = confirmedAt)
     }
 
-    fun setLocked(txId: ByteVector32, lockedAt: Long) {
-        linkTxQueries.setLocked(tx_id = txId.toByteArray(), locked_at = lockedAt)
+    fun setLocked(txId: TxId, lockedAt: Long) {
+        linkTxQueries.setLocked(tx_id = txId.value.toByteArray(), locked_at = lockedAt)
     }
 }

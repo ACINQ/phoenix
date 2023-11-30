@@ -16,18 +16,22 @@
 
 package fr.acinq.phoenix.android.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
@@ -50,7 +54,6 @@ fun HomeBalance(
     swapInBalance: WalletBalance,
     unconfirmedChannelsBalance: MilliSatoshi,
     onShowSwapInWallet: () -> Unit,
-    onShowChannels: () -> Unit,
     balanceDisplayMode: HomeAmountDisplayMode,
 ) {
     if (balance == null) {
@@ -92,25 +95,81 @@ private fun IncomingBalance(
     onShowSwapInWallet: () -> Unit,
     balanceDisplayMode: HomeAmountDisplayMode,
 ) {
+    var showSwapInHelp by remember { mutableStateOf(false) }
     val balance = swapInBalance.total.toMilliSatoshi() + pendingChannelsBalance
     if (balance > 0.msat) {
         val nextSwapTimeout by business.peerManager.swapInNextTimeout.collectAsState(initial = null)
-        val undecidedSwapBalance = swapInBalance.unconfirmed + swapInBalance.weaklyConfirmed
-        FilledButton(
-            icon = when {
-                nextSwapTimeout?.let { it.second < 144 } ?: false -> R.drawable.ic_alert_triangle
-                undecidedSwapBalance == 0.sat && pendingChannelsBalance == 0.msat -> R.drawable.ic_sleep
-                else -> R.drawable.ic_clock
-            },
-            iconTint = MaterialTheme.typography.caption.color,
-            text = if (balanceDisplayMode == HomeAmountDisplayMode.REDACTED) "****" else {
-                stringResource(id = R.string.home__onchain_incoming, balance.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true))
-            },
-            textStyle = MaterialTheme.typography.caption,
-            space = 4.dp,
-            padding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            backgroundColor = Color.Transparent,
-            onClick = onShowSwapInWallet,
-        )
+        val pendingSwapBalance = swapInBalance.unconfirmed + swapInBalance.weaklyConfirmed
+        Clickable(
+            modifier = Modifier.clip(CircleShape),
+            onClick = { showSwapInHelp = true },
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextWithIcon(
+                    text = if (balanceDisplayMode == HomeAmountDisplayMode.REDACTED) "****" else {
+                        stringResource(id = R.string.home__onchain_incoming, balance.toPrettyString(preferredAmountUnit, fiatRate, withUnit = true))
+                    },
+                    textStyle = MaterialTheme.typography.caption,
+                    icon = when {
+                        nextSwapTimeout?.let { it.second < 144 } ?: false -> R.drawable.ic_alert_triangle
+                        pendingSwapBalance == 0.sat && pendingChannelsBalance == 0.msat -> R.drawable.ic_sleep
+                        else -> R.drawable.ic_clock
+                    },
+                    iconTint = MaterialTheme.typography.caption.color,
+                    space = 4.dp,
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                PhoenixIcon(
+                    resourceId = R.drawable.ic_help_circle,
+                    modifier = Modifier
+                        .size(18.dp)
+                        .clip(CircleShape)
+                        .then(if (showSwapInHelp) Modifier.background(MaterialTheme.colors.primary) else Modifier),
+                    tint = if (showSwapInHelp) MaterialTheme.colors.onPrimary else MaterialTheme.colors.primary,
+                )
+
+                if (showSwapInHelp) {
+                    val liquidityPolicyInPrefs by UserPrefs.getLiquidityPolicy(LocalContext.current).collectAsState(null)
+                    val bitcoinUnit = LocalBitcoinUnit.current
+                    PopupDialog(
+                        onDismiss = { showSwapInHelp = false },
+                        message = when {
+                            swapInBalance.deeplyConfirmed > 0.sat -> {
+                                when (val policy = liquidityPolicyInPrefs) {
+                                    is LiquidityPolicy.Disable -> {
+                                        stringResource(id = R.string.home_swapin_help_ready_disabled)
+                                    }
+                                    is LiquidityPolicy.Auto -> {
+                                        stringResource(id = R.string.home_swapin_help_ready_fee, policy.maxAbsoluteFee.toPrettyString(bitcoinUnit, withUnit = true))
+                                    }
+                                    else -> {
+                                        stringResource(id = R.string.home_swapin_help_generic)
+                                    }
+                                }
+                            }
+                            pendingSwapBalance > 0.sat && swapInBalance.deeplyConfirmed == 0.sat -> {
+                                stringResource(id = R.string.home_swapin_help_pending)
+                            }
+                            else -> {
+                                stringResource(id = R.string.home_swapin_help_generic)
+                            }
+                        },
+                        button = {
+                            Button(
+                                text = stringResource(id = R.string.home_swapin_help_button),
+                                onClick = onShowSwapInWallet,
+                                textStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.primary, fontSize = 14.sp, textDecoration = TextDecoration.Underline),
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start,
+                                padding = PaddingValues(horizontal = 10.dp, vertical = 8.dp)
+                            )
+                        }
+                    )
+                }
+            }
+        }
     }
 }

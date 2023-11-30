@@ -288,7 +288,6 @@ extension PaymentsManager {
 		static var paymentsCountPublisher = 0
 		static var lastCompletedPaymentPublisher = 0
 		static var lastIncomingPaymentPublisher = 0
-		static var inFlightOutgoingPaymentsPublisher = 0
 	}
 	
 	func paymentsCountPublisher() -> AnyPublisher<Int64, Never> {
@@ -332,22 +331,6 @@ extension PaymentsManager {
 				self.lastCompletedPayment
 			)
 			.compactMap { $0 as? Lightning_kmpIncomingPayment }
-			.eraseToAnyPublisher()
-		}
-	}
-	
-	func inFlightOutgoingPaymentsPublisher() -> AnyPublisher<Int, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.inFlightOutgoingPaymentsPublisher) {
-			
-			// Transforming from Kotlin:
-			// `inFlightOutgoingPayments: StateFlow<Set<UUID>>`
-			//
-			KotlinCurrentValueSubject<NSSet>(
-				self.inFlightOutgoingPayments
-			)
-			.compactMap { $0 as? Set<Lightning_kmpUUID> }
-			.map { $0.count }
 			.eraseToAnyPublisher()
 		}
 	}
