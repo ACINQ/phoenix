@@ -12,7 +12,8 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  --><resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+  -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Phoenix (Testnet)</string>
 
     <!-- system notification channels -->
@@ -37,12 +38,12 @@
 
     <!-- init wallet / automated wallet creation -->
 
-    <string name="autocreate_generating">Creando tu billetera...</string>
+    <string name="autocreate_generating">Creando tu billetera…</string>
     <string name="autocreate_error">Error al crear la billetera</string>
 
     <string name="restore_title">Restaurar mi billetera</string>
     <string name="restore_disclaimer_next">Siguiente</string>
-    <string name="restore_in_progress"> Restaurando tu billetera...</string>
+    <string name="restore_in_progress"> Restaurando tu billetera…</string>
 
     <!-- Auth prompt (v2) -->
 
@@ -61,14 +62,14 @@
 
     <!-- Startup -->
 
-    <string name="startup_wait_prefs">Inicializando...</string>
-    <string name="startup_binding_service">Vinculando el servicio...</string>
-    <string name="startup_wait">Preparando la billetera...</string>
-    <string name="startup_wait_legacy_check">Comprobando la billetera heredada...</string>
-    <string name="startup_switching_to_legacy">Cambiando a la billetera heredada...</string>
+    <string name="startup_wait_prefs">Inicializando…</string>
+    <string name="startup_binding_service">Vinculando el servicio…</string>
+    <string name="startup_wait">Preparando la billetera…</string>
+    <string name="startup_wait_legacy_check">Comprobando la billetera heredada…</string>
+    <string name="startup_switching_to_legacy">Cambiando a la billetera heredada…</string>
     <string name="startup_manual_unlock_button">Desbloquear</string>
-    <string name="startup_checking_seed">Desbloqueando...</string>
-    <string name="startup_unlocked">Acceso concedido...</string>
+    <string name="startup_checking_seed">Desbloqueando…</string>
+    <string name="startup_unlocked">Acceso concedido…</string>
     <string name="startup_unlock_failure">Error al desbloquear</string>
     <string name="startup_unlock_failure_keystore">Error de Android Keystore</string>
     <string name="startup_unlock_failure_unhandled_version">Versión de semilla no controlada (%1$s)</string>
@@ -81,13 +82,13 @@
     <string name="startup_fallback_incomplete">Ingresa la semilla completa para continuar.</string>
     <string name="startup_fallback_invalid">Esta semilla no es válida. Comprueba que las palabras estén correctas y en orden.</string>
     <string name="startup_fallback_unlock_button">Desbloquear billetera</string>
-    <string name="startup_fallback_checking">Comprobando la semilla...</string>
+    <string name="startup_fallback_checking">Comprobando la semilla…</string>
     <string name="startup_fallback_error_default">Se produjo un error. Intenta de nuevo.</string>
     <string name="startup_fallback_error_incorrect_seed">Esta semilla no coincide con la billetera.</string>
-    <string name="startup_fallback_success_match">La semilla coincide.\nEscribiendo en el disco...</string>
-    <string name="startup_fallback_success_starting">Iniciando Phoenix...</string>
+    <string name="startup_fallback_success_match">La semilla coincide.\nEscribiendo en el disco…</string>
+    <string name="startup_fallback_success_starting">Iniciando Phoenix…</string>
 
-    <string name="startup_starting">Iniciando...</string>
+    <string name="startup_starting">Iniciando…</string>
     <string name="startup_error_generic">No se pudo iniciar la aplicación.</string>
 
     <!-- Switch between legacy/modern apps -->
@@ -114,16 +115,16 @@
     <string name="receive_bitcoin_address_label">Dirección</string>
     <string name="receive_bitcoin_error">No se pudo generar una dirección de Bitcoin</string>
     <string name="receive_bitcoin_share_title">Dirección de Bitcoin</string>
-    <string name="receive_bitcoin_share_subject">Compartir esta dirección de Bitcoin con...</string>
+    <string name="receive_bitcoin_share_subject">Compartir esta dirección de Bitcoin con…</string>
 
     <string name="receive_lightning_title">Lightning</string>
     <string name="receive_lightning_help">Este código QR es una factura de Lightning.\n\nLos pagos mediante Lightning son muy rápidos y normalmente más baratos, pero es posible que aún no sean compatibles con algunas billeteras y servicios.\n\nEn ese caso, desliza el dedo hacia la derecha para obtener una dirección normal de Bitcoin.</string>
-    <string name="receive_lightning_generating">Generando...</string>
+    <string name="receive_lightning_generating">Generando…</string>
     <string name="receive_lightning_amount_label">Importe</string>
     <string name="receive_lightning_desc_label">Desc</string>
     <string name="receive_lightning_error">No se pudo generar la factura</string>
     <string name="receive_lightning_share_subject">Factura de Lightning</string>
-    <string name="receive_lightning_share_title">Compartir esta dirección de Lightning con...</string>
+    <string name="receive_lightning_share_title">Compartir esta dirección de Lightning con…</string>
     <string name="receive_lnurl_button">Usar enlace LNURL</string>
 
     <string name="receive_lightning_edit_button">Editar</string>
@@ -148,10 +149,10 @@
     <string name="send_description_label">Descripción</string>
     <string name="send_trampoline_fee_label">Comisión</string>
     <string name="send_trampoline_fee_no_amount">N/D</string>
-    <string name="send_trampoline_fee_loading">Cargando comisión...</string>
+    <string name="send_trampoline_fee_loading">Cargando comisión…</string>
     <string name="send_trampoline_amountless_warning_label">Factura sin importe</string>
     <string name="send_trampoline_amountless_warning_details">La factura de este pago no solicita un importe concreto. Los nodos malintencionados pueden aprovecharse de esto durante el pago.\n\nPara mayor seguridad, <b>pídele al destinatario que especifique un importe</b> al generar la factura.</string>
-    <string name="send_connecting_button">Esperando canales...</string>
+    <string name="send_connecting_button">Esperando canales…</string>
     <string name="send_pay_button">Pagar</string>
 
     <string name="send_paymentmode_onchain">Pagar en la cadena</string>
@@ -161,15 +162,15 @@
 
     <string name="send_spliceout_address_label">Dirección</string>
     <string name="send_spliceout_feerate_label">Tasa de comisión</string>
-    <string name="send_spliceout_feerate_waiting_for_value">Obteniendo la tasa de comisión actual...</string>
+    <string name="send_spliceout_feerate_waiting_for_value">Obteniendo la tasa de comisión actual…</string>
 
     <string name="send_spliceout_error_invalid_feerate">Ingresa una tasa de comisión válida.</string>
     <string name="send_spliceout_error_cannot_afford_fees">El total supera el saldo</string>
     <string name="send_spliceout_error_failure">Error al procesar el pago</string>
 
     <string name="send_spliceout_prepare_button">Preparar transacción</string>
-    <string name="send_spliceout_prepare_in_progress">Preparando transacción...</string>
-    <string name="send_spliceout_execute_in_progress">Ejecutando empalme...</string>
+    <string name="send_spliceout_prepare_in_progress">Preparando transacción…</string>
+    <string name="send_spliceout_execute_in_progress">Ejecutando empalme…</string>
     <string name="send_spliceout_complete_recap_amount">Importe</string>
     <string name="send_spliceout_complete_recap_fee">Comisión de minería</string>
     <string name="send_spliceout_complete_recap_fee_details">Usa una tasa de comisión efectiva de %1$s sat/vbyte.</string>
@@ -177,14 +178,14 @@
 
     <!-- scan -->
 
-    <string name="scan_reading">Escaneo de lectura...</string>
+    <string name="scan_reading">Escaneo de lectura…</string>
     <string name="scan_manual_input_button">Ingreso manual</string>
     <string name="scan_paste_button">Pegar datos desde el portapapeles</string>
     <string name="scan_request_camera_access">Tocar para conceder permiso a la cámara</string>
     <string name="scan_request_camera_access_denied">Se negó el permiso a la cámara</string>
     <string name="scan_instructions">Escanea un código QR que contenga una solicitud de pago, una dirección de Bitcoin o una LNURL.</string>
 
-    <string name="scan_lnurl_fetching">Obteniendo datos del servicio...</string>
+    <string name="scan_lnurl_fetching">Obteniendo datos del servicio…</string>
 
     <string name="scan_manual_input_title">Ingreso manual</string>
     <string name="scan_manual_input_instructions">Ingresa una factura de Lightning, LNURL o dirección de Lightning a la que quieras enviar dinero.</string>
@@ -202,8 +203,8 @@
     <string name="utils_cancel">Cancelar</string>
     <string name="utils_date_just_now">ahora mismo</string>
     <string name="utils_unknown">N/D</string>
-    <string name="utils_loading_data">Cargando datos...</string>
-    <string name="utils_loading_prefs">Cargando preferencias...</string>
+    <string name="utils_loading_data">Cargando datos…</string>
+    <string name="utils_loading_prefs">Cargando preferencias…</string>
     <string name="utils_copied">Se copió al portapapeles</string>
 
     <string name="accessibility_link">Abrir enlace en un navegador</string>
@@ -221,14 +222,14 @@
     <string name="btn_confirm">Confirmar</string>
     <string name="btn_cancel">Cancelar</string>
     <string name="btn_close">Cerrar</string>
-    <string name="btn_pause_connecting">Conectándose a par...</string>
-    <string name="btn_pause_connecting_electrum">Conectándose a Electrum...</string>
+    <string name="btn_pause_connecting">Conectándose a par…</string>
+    <string name="btn_pause_connecting_electrum">Conectándose a Electrum…</string>
 
     <!-- mutual close -->
 
     <string name="mutualclose_title">Vaciar mi billetera</string>
-    <string name="mutualclose_loading">Cargando...</string>
-    <string name="mutualclose_checking_balance">Comprobando saldo...</string>
+    <string name="mutualclose_loading">Cargando…</string>
+    <string name="mutualclose_checking_balance">Comprobando saldo…</string>
     <string name="mutualclose_balance">Saldo: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">La billetera no tiene canales que se puedan cerrar.</string>
     <string name="mutualclose_input_placeholder">Ingresa una dirección de Bitcoin aquí</string>
@@ -237,7 +238,7 @@
     <string name="mutualclose_error_chain_reqparams">Esta dirección usa funciones no compatibles</string>
     <string name="mutualclose_error_chain_generic">Esta dirección no es compatible</string>
     <string name="mutualclose_done">%1$d canal(es) cerrado(s). Puedes encontrar los detalles en la pantalla de inicio.</string>
-    <string name="mutualclose_inprogress">Espera...</string>
+    <string name="mutualclose_inprogress">Espera…</string>
 
     <string name="forceclose_no_channels">No hay canales que se puedan cerrar.</string>
 
@@ -247,7 +248,7 @@
     <string name="channelsview_menu_import_channels">Importar canales</string>
     <string name="channelsview_balance">Saldo</string>
     <string name="channelsview_balance_about">Este es el saldo total de los canales activos. Es lo que puedes gastar en Lightning.</string>
-    <string name="channelsview_loading_channels">Cargando datos de canales...</string>
+    <string name="channelsview_loading_channels">Cargando datos de canales…</string>
     <string name="channelsview_no_channels">Aún no tienes canales.\n\nSe creará automáticamente un nuevo canal de pago cuando sea necesario.</string>
 
     <!-- channels details -->
@@ -277,7 +278,7 @@
     <string name="channelimport_instructions">Esta pantalla es una herramienta de depuración que puede usarse para importar manualmente los datos de canales encriptados.\n\nUtilizar con precaución.</string>
     <string name="channelimport_input_label">Blob de datos</string>
     <string name="channelimport_import_button">Importar</string>
-    <string name="channelimport_importing">Importando datos...</string>
+    <string name="channelimport_importing">Importando datos…</string>
     <string name="channelimport_success">Importación correcta</string>
     <string name="channelimport_success_restart">Debes reiniciar Phoenix ahora.</string>
     <string name="channelimport_error_title">Error de importación</string>
@@ -287,16 +288,16 @@
 
     <!-- home: balance section & misc -->
 
-    <string name="home__balance_loading">Cargando...</string>
+    <string name="home__balance_loading">Cargando…</string>
     <string name="home__onchain_incoming">+%1$s</string>
 
     <string name="home__faq_button">Preguntas frecuentes</string>
     <string name="home__payments_none">Usa los botones \&amp;quot;Recibir\&amp;quot; y \&amp;quot;Enviar\&amp;quot; en la parte inferior de esta pantalla para empezar.</string>
     <string name="home__payments_header">Pagos recientes</string>
-    <string name="home__payments_more_button">Mostrar todos los pagos...</string>
+    <string name="home__payments_more_button">Mostrar todos los pagos…</string>
     <string name="home__connection__electrum_late">Retraso de Electrum</string>
     <string name="home__connection__bad_cert">Certificado de Electrum</string>
-    <string name="home__connection__connecting">Conectando...</string>
+    <string name="home__connection__connecting">Conectando…</string>
     <string name="home__connection__tor_active">Tor activado</string>
 
     <!-- in-app notifications -->
@@ -309,32 +310,32 @@
     <!-- settings: display seed -->
 
     <string name="displayseed_title">Frase de recuperación</string>
-    <string name="displayseed_loading">Desbloqueando semilla...</string>
+    <string name="displayseed_loading">Desbloqueando semilla…</string>
     <string name="displayseed_error_details">No se pudo desbloquear la semilla</string>
     <string name="displayseed_derivation_path">Semilla BIP39 con ruta de derivación BIP84 estándar</string>
-    <string name="displayseed_loading_prefs">Cargando preferencias...</string>
+    <string name="displayseed_loading_prefs">Cargando preferencias…</string>
     <string name="displayseed_backup_title">Confirmación de copia de seguridad</string>
 
     <!-- settings: logs -->
 
     <string name="logs_title">Registros de la aplicación</string>
-    <string name="logs_exporting">Exportando registros...</string>
+    <string name="logs_exporting">Exportando registros…</string>
     <string name="logs_failed">Error: no se pudieron exportar los registros</string>
-    <string name="logs_view_button">Ver registros...</string>
-    <string name="logs_view_with">Ver registros con...</string>
-    <string name="logs_share_button">Compartir registros...</string>
+    <string name="logs_view_button">Ver registros…</string>
+    <string name="logs_view_with">Ver registros con…</string>
+    <string name="logs_share_button">Compartir registros…</string>
     <string name="logs_share_subject">Registros de la aplicación Phoenix</string>
-    <string name="logs_share_title">Compartir registros de Phoenix...</string>
+    <string name="logs_share_title">Compartir registros de Phoenix…</string>
 
     <!-- payment details -->
 
     <string name="paymentdetails_title">Detalles del pago</string>
-    <string name="paymentdetails_loading">Cargando detalles del pago...</string>
+    <string name="paymentdetails_loading">Cargando detalles del pago…</string>
     <string name="paymentdetails_error">No se encuentran los detalles del pago</string>
 
     <string name="paymentdetails_status_channelclose_confirmed"><b>COMPLETO</b> %1$s</string>
     <string name="paymentdetails_status_sent_successful"><b>ENVIADO</b> %1$s</string>
-    <string name="paymentdetails_status_sent_pending">Pendiente...</string>
+    <string name="paymentdetails_status_sent_pending">Pendiente…</string>
     <string name="paymentdetails_status_sent_failed"><b>FALLIDO</b>\nNo se envió dinero.</string>
 
     <string name="paymentdetails_status_received_pending">Aún no se ha recibido.</string>
@@ -342,7 +343,7 @@
     <string name="paymentdetails_status_received_successful"><b>RECIBIDO</b> %1$s</string>
 
     <string name="paymentdetails_status_unconfirmed">Esperando confirmaciones</string>
-    <string name="paymentdetails_status_unconfirmed_fetching">Obteniendo el estado...</string>
+    <string name="paymentdetails_status_unconfirmed_fetching">Obteniendo el estado…</string>
     <string name="paymentdetails_status_unconfirmed_zero">0 confirmaciones</string>
     <string name="paymentdetails_status_unconfirmed_zero_bump">Tocar para acelerar</string>
     <string name="paymentdetails_status_unconfirmed_default">%1$d confirmación(es)</string>
@@ -354,7 +355,7 @@
     <string name="paymentdetails_lnurlpay_action_url_label">Enlace</string>
     <string name="paymentdetails_lnurlpay_action_url_button">Abrir enlace</string>
     <string name="paymentdetails_lnurlpay_action_aes_label">Mensaje</string>
-    <string name="paymentdetails_lnurlpay_action_aes_decrypting">Desencriptando mensaje...</string>
+    <string name="paymentdetails_lnurlpay_action_aes_decrypting">Desencriptando mensaje…</string>
     <string name="paymentdetails_lnurlpay_action_aes_not_paid">El pago debe efectuarse para desencriptar el mensaje.</string>
 
     <string name="paymentdetails_desc_label">Desc.</string>
@@ -461,7 +462,7 @@
     <!-- settings: access control -->
 
     <string name="accessctrl_title">Acceso a la aplicación</string>
-    <string name="accessctrl_loading">Obteniendo datos...</string>
+    <string name="accessctrl_loading">Obteniendo datos…</string>
 
     <string name="accessctrl_auth_error_header">No se puede activar el bloqueo de pantalla</string>
     <string name="accessctrl_auth_error_no_hw">No hay hardware de autenticación adecuado en este dispositivo.</string>
@@ -513,7 +514,7 @@
     <string name="lnurl_withdraw_amount_label">Importe que se recibirá</string>
     <string name="lnurl_withdraw_description_label">Detalles</string>
     <string name="lnurl_withdraw_confirm_button">Canjear</string>
-    <string name="lnurl_withdraw_wait">Solicitando fondos...</string>
+    <string name="lnurl_withdraw_wait">Solicitando fondos…</string>
     <string name="lnurl_withdraw_amount_invalid">El importe es inválido.</string>
     <string name="lnurl_withdraw_amount_below_min">El importe debe ser al menos %1$s.</string>
     <string name="lnurl_withdraw_amount_above_max">El importe no puede superar %1$s.</string>
@@ -534,9 +535,9 @@
     <string name="lnurl_pay_comment_label">Mi mensaje</string>
     <string name="lnurl_pay_comment_instructions">Puedes adjuntar un mensaje al pago. Este mensaje se enviará al destinatario.</string>
     <string name="lnurl_pay_pay_button">Pagar</string>
-    <string name="lnurl_pay_requesting_invoice">Solicitando factura...</string>
-    <string name="lnurl_pay_checking_invoice">Comprobando factura...</string>
-    <string name="lnurl_pay_sending_payment">Enviando pago...</string>
+    <string name="lnurl_pay_requesting_invoice">Solicitando factura…</string>
+    <string name="lnurl_pay_checking_invoice">Comprobando factura…</string>
+    <string name="lnurl_pay_sending_payment">Enviando pago…</string>
 
     <string name="lnurl_pay_amount_empty">El importe no debe estar vacío</string>
     <string name="lnurl_pay_amount_below_min">El importe debe ser al menos %1$s.</string>
@@ -574,9 +575,6 @@
     <string name="electrum_title">Servidor de Electrum</string>
     <string name="electrum_about">Para proteger sus canales de pago, Phoenix supervisa la cadena de bloques de Bitcoin a través de los servidores de Electrum.\n\nPor defecto, se utilizan servidores aleatorios. También puedes configurar Phoenix para que se conecte únicamente a tu propio servidor.</string>
     <string name="electrum_block_height_label">Altura de bloques</string>
-    <string name="electrum_tip_label">Marca de tiempo del tip</string>
-    <string name="electrum_fee_rate_next_label">Tasa de comisión 1 bloque</string>
-    <string name="electrum_fee_rate_funding_label">Tasa de comisión 144 bloques</string>
     <string name="electrum_connection_label">Servidor</string>
 
     <string name="electrum_connection_closed_with_random">Desconectado de Electrum</string>
@@ -592,7 +590,7 @@
     <string name="electrum_dialog_input">Dirección del servidor (host:puerto)</string>
     <string name="electrum_dialog_invalid_input">Esta dirección es inválida.</string>
     <string name="electrum_dialog_cert_check_button">Conectar</string>
-    <string name="electrum_dialog_cert_checking">Comprobando certificado...</string>
+    <string name="electrum_dialog_cert_checking">Comprobando certificado…</string>
     <string name="electrum_dialog_cert_failure">Error de conexión:\n%1$s</string>
     <string name="electrum_dialog_cert_unresolved">Esta dirección no se puede resolver.</string>
     <string name="electrum_dialog_cert_header">Certificado no fiable</string>
@@ -607,7 +605,7 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
-    <string name="tor_settings_unknown">Comprobando preferencias...</string>
+    <string name="tor_settings_unknown">Comprobando preferencias…</string>
     <string name="tor_settings_enabled">Tor está activado</string>
     <string name="tor_settings_enabled_description">Las conexiones a la red Lightning y a los servidores de Electrum estarán protegidas.</string>
     <string name="tor_settings_disabled">Tor está desactivado</string>
@@ -615,7 +613,7 @@
     <string name="tor_settings_confirm_enable_title">¿Seguro que quieres activar Tor? Ten en cuenta que, para obtener mejores resultados, se recomienda crear también una nueva billetera.</string>
     <string name="tor_settings_state_unknown">El proxy de Tor aún no se ha iniciado.</string>
     <string name="tor_settings_state_closed">El proxy de Tor está apagado. \nEspera y comprueba tu conexión a Internet.</string>
-    <string name="tor_settings_state_starting">Iniciando proxy de Tor...</string>
+    <string name="tor_settings_state_starting">Iniciando proxy de Tor…</string>
     <string name="tor_settings_state_started">Tor está en línea</string>
     <string name="tor_settings_state_about_perfs">Ten en cuenta que la red Tor es un proyecto abierto que funciona con donaciones. En ocasiones, puede ser muy lento, lo que afectará al rendimiento de la aplicación.</string>
 
@@ -629,7 +627,7 @@
     <string name="conndialog_tor">Tor</string>
     <string name="conndialog_lightning">Par</string>
     <string name="conndialog_accessibility_desc">Gestionar la conexión para %1$s</string>
-    <string name="conndialog_connecting">Conectando...</string>
+    <string name="conndialog_connecting">Conectando…</string>
     <string name="conndialog_connected">Conectado</string>
     <string name="conndialog_connected_electrum_behind">El servidor de Electrum registra un retraso (bloque $1$d)</string>
     <string name="conndialog_closed">Desconectado</string>
@@ -654,7 +652,7 @@
     <string name="paymentsettings_category_lnurl">LNURL</string>
 
     <string name="paymentsettings_defaultdesc_title">Descripción de la factura</string>
-    <string name="paymentsettings_defaultdesc_none">No se ha establecido una descripción...</string>
+    <string name="paymentsettings_defaultdesc_none">No se ha establecido una descripción…</string>
     <string name="paymentsettings_defaultdesc_dialog_title">Descripción predeterminada</string>
     <string name="paymentsettings_defaultdesc_dialog_description">Las facturas usarán esta descripción de forma predeterminada. Puedes anularla según cada caso.</string>
     <string name="paymentsettings_defaultdesc_dialog_label">Descripción de la factura</string>
@@ -698,7 +696,7 @@
     <string name="payments_export_in_progress">Exportando pago #%1$d</string>
     <string name="payments_export_success">%1$d pagos exportados correctamente</string>
     <string name="payments_export_share_subject">Phoenix - pagos de %1$s a %2$s</string>
-    <string name="payments_export_share_title">Comparte pagos de Phoenix...</string>
+    <string name="payments_export_share_title">Comparte pagos de Phoenix…</string>
     <string name="payments_export_share_button">Compartir archivo</string>
     <string name="payments_export_error">Error de exportación.</string>
     <string name="payments_export_no_data">No se encontraron pagos.</string>
@@ -720,7 +718,7 @@
     <string name="walletinfo_confirmed_title">Saldo confirmado</string>
     <string name="walletinfo_unconfirmed_title">Saldo sin confirmar</string>
     <string name="walletinfo_incoming_balance">+%1$s entrante</string>
-    <string name="walletinfo_loading_data">Cargando datos de la billetera...</string>
+    <string name="walletinfo_loading_data">Cargando datos de la billetera…</string>
 
     <string name="walletinfo_lightning">Lightning</string>
     <string name="walletinfo_nodeid">Identificador de nodo</string>
@@ -733,10 +731,10 @@
     <!-- settings: liquidity policy for channels creation -->
 
     <string name="liquiditypolicy_title">Gestión de canales</string>
-    <string name="liquiditypolicy_fees_estimation_loading">Obteniendo tasa de comisión...</string>
+    <string name="liquiditypolicy_fees_estimation_loading">Obteniendo tasa de comisión…</string>
     <string name="liquiditypolicy_fees_header">Mi configuración de comisiones</string>
     <string name="liquiditypolicy_advanced_title">Gestión avanzada de canales</string>
-    <string name="liquiditypolicy_loading">Obteniendo política...</string>
+    <string name="liquiditypolicy_loading">Obteniendo política…</string>
 
     <!-- CPFP splices -->
 
@@ -744,10 +742,10 @@
     <string name="cpfp_feerate_value">%1$s sat/vbyte</string>
 
     <string name="cpfp_prepare_button">Preparar pago</string>
-    <string name="cpfp_estimating">Calculando comisiones...</string>
+    <string name="cpfp_estimating">Calculando comisiones…</string>
     <string name="cpfp_estimation">Pagarás <b>%1$s</b> a los mineros de Bitcoin</string>
     <string name="cpfp_execute_button">Ejecutar el pago</string>
-    <string name="cpfp_executing">Ejecutando el pago...</string>
+    <string name="cpfp_executing">Ejecutando el pago…</string>
     <string name="cpfp_success">Pago completado</string>
     <string name="cpfp_failure_title">Error al ejecutar el pago</string>
     <string name="cpfp_error_title">No se puede continuar</string>
@@ -790,9 +788,9 @@
     <string name="reset_wallet_confirm_seed_responsibility">Eres responsable de guardar tu frase de recuperación.</string>
     <string name="reset_wallet_confirm_button">Borrar billetera (todavía no funciona)</string>
 
-    <string name="reset_wallet_deleting">Borrando datos de la billetera...</string>
+    <string name="reset_wallet_deleting">Borrando datos de la billetera…</string>
     <string name="reset_wallet_success">La billetera se restableció correctamente</string>
-    <string name="reset_wallet_success_details">Volviendo a la pantalla de inicio...</string>
+    <string name="reset_wallet_success_details">Volviendo a la pantalla de inicio…</string>
     <string name="reset_wallet_failure_title">Error de restablecimiento</string>
 
 </resources>
