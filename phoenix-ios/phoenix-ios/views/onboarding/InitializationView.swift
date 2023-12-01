@@ -165,9 +165,11 @@ struct InitializationView: MVIView {
 	func createWallet(model: Initialization.ModelGeneratedWallet) -> Void {
 		log.trace("createWallet()")
 		
-		AppSecurity.shared.addKeychainEntry(mnemonics: model.mnemonics) { (error: Error?) in
+		let recoveryPhrase = RecoveryPhrase(mnemonics : model.mnemonics)
+		
+		AppSecurity.shared.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
 			if error == nil {
-				Biz.loadWallet(mnemonics: model.mnemonics, seed: model.seed)
+				Biz.loadWallet(recoveryPhrase: recoveryPhrase, seed: model.seed)
 			}
 		}
 	}

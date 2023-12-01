@@ -29,14 +29,14 @@ class SyncManager {
 	
 	init(
 		chain: Lightning_kmpNodeParams.Chain,
-		mnemonics: [String],
+		recoveryPhrase: RecoveryPhrase,
 		cloudKey: Bitcoin_kmpByteVector32,
 		encryptedNodeId: String
 	) {
 		
 		syncSeedManager = SyncSeedManager(
 			chain: chain,
-			mnemonics: mnemonics,
+			recoveryPhrase: recoveryPhrase,
 			encryptedNodeId: encryptedNodeId
 		)
 		syncTxManager = SyncTxManager(

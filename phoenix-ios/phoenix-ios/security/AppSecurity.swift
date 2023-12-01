@@ -39,10 +39,24 @@ enum BiometricSupport {
 struct UnlockError {
 	let readSecurityFileError: ReadSecurityFileError?
 	let readKeychainError: ReadKeychainError?
+	let readRecoveryPhraseError: ReadRecoveryPhraseError?
 	
-	init(_ readSecurityFileError: ReadSecurityFileError?, _ readKeychainError: ReadKeychainError?) {
+	init(_ readSecurityFileError: ReadSecurityFileError?) {
 		self.readSecurityFileError = readSecurityFileError
+		self.readKeychainError = nil
+		self.readRecoveryPhraseError = nil
+	}
+	
+	init(_ readKeychainError: ReadKeychainError?) {
+		self.readSecurityFileError = nil
 		self.readKeychainError = readKeychainError
+		self.readRecoveryPhraseError = nil
+	}
+	
+	init(_ readRecoveryPhraseError: ReadRecoveryPhraseError?) {
+		self.readSecurityFileError = nil
+		self.readKeychainError = nil
+		self.readRecoveryPhraseError = readRecoveryPhraseError
 	}
 }
 
@@ -109,24 +123,8 @@ class AppSecurity {
 			
 		} catch {
 			// Don't throw from this error as it's an optimization
-			log.error("Error excluding \(url.lastPathComponent) from backup \(String(describing: error))")
+			log.error("Error excluding \(url.lastPathComponent) from backup \(error)")
 		}
-	}
-	
-	private func validateParameter(mnemonics: [String]) -> Data {
-		
-		precondition(mnemonics.count == 12, "Invalid parameter: mnemonics.count")
-		
-		let space = " "
-		precondition(mnemonics.allSatisfy { !$0.contains(space) },
-		  "Invalid parameter: mnemonics.word")
-		
-		let mnemonicsData = mnemonics.joined(separator: space).data(using: .utf8)
-		
-		precondition(mnemonicsData != nil,
-		  "Invalid parameter: mnemonics.work contains non-utf8 characters")
-		
-		return mnemonicsData!
 	}
 	
 	private func calculateEnabledSecurity(_ securityFile: SecurityFile) -> EnabledSecurity {
@@ -136,8 +134,15 @@ class AppSecurity {
 		if securityFile.biometrics != nil {
 			enabledSecurity.insert(.biometrics)
 			enabledSecurity.insert(.advancedSecurity)
-		} else if (securityFile.keychain != nil) && self.getSoftBiometricsEnabled() {
-			enabledSecurity.insert(.biometrics)
+			
+		} else if securityFile.keychain != nil {
+			if getSoftBiometricsEnabled() {
+				enabledSecurity.insert(.biometrics)
+				
+				if getPasscodeFallbackEnabled() {
+					enabledSecurity.insert(.passcodeFallback)
+				}
+			}
 		}
 		
 		return enabledSecurity
@@ -221,37 +226,25 @@ class AppSecurity {
 	///
 	public func tryUnlockWithKeychain(
 		completion: @escaping (
-			_ mnemonics: [String]?,
+			_ recoveryPhrase: RecoveryPhrase?,
 			_ configuration: EnabledSecurity,
 			_ error: UnlockError?
 		) -> Void
 	) {
 		
-		let finish = {(mnemonics: [String]?, configuration: EnabledSecurity) -> Void in
+		let finish = {(recoveryPhrase: RecoveryPhrase?, configuration: EnabledSecurity) -> Void in
 			
 			DispatchQueue.main.async {
 				self.publishEnabledSecurity(configuration)
-				completion(mnemonics, configuration, nil)
+				completion(recoveryPhrase, configuration, nil)
 			}
 		}
 		
-		let dangerZone1 = {(error: ReadSecurityFileError, configuration: EnabledSecurity) -> Void in
-			
-			let danger = UnlockError(error, nil)
+		let dangerZone = {(error: UnlockError, configuration: EnabledSecurity) -> Void in
 			
 			DispatchQueue.main.async {
 				self.publishEnabledSecurity(configuration)
-				completion(nil, configuration, danger)
-			}
-		}
-		
-		let dangerZone2 = {(error: ReadKeychainError, configuration: EnabledSecurity) -> Void in
-			
-			let danger = UnlockError(nil, error)
-			
-			DispatchQueue.main.async {
-				self.publishEnabledSecurity(configuration)
-				completion(nil, configuration, danger)
+				completion(nil, configuration, error)
 			}
 		}
 		
@@ -264,45 +257,53 @@ class AppSecurity {
 			let diskResult = SharedSecurity.shared.readSecurityJsonFromDisk()
 			
 			switch diskResult {
+			case .failure(let reason):
+				
+				let securityFile = SecurityFile()
+				let configuration = self.calculateEnabledSecurity(securityFile)
+				
+				switch reason {
+				case .fileNotFound:
+					return finish(nil, configuration)
+					
+				case .errorReadingFile: fallthrough
+				case .errorDecodingFile:
+					return dangerZone(UnlockError(reason), configuration)
+				}
+				
+			case .success(let securityFile):
+					
+				let configuration = self.calculateEnabledSecurity(securityFile)
+					
+				let keychainResult = SharedSecurity.shared.readKeychainEntry(securityFile)
+				switch keychainResult {
 				case .failure(let reason):
-					
-					let securityFile = SecurityFile()
-					let configuration = self.calculateEnabledSecurity(securityFile)
-					
+							
 					switch reason {
-						case .fileNotFound:
-							return finish(nil, configuration)
-							
-						case .errorReadingFile: fallthrough
-						case .errorDecodingFile:
-							return dangerZone1(reason, configuration)
+					case .keychainOptionNotEnabled:
+						return finish(nil, configuration)
+						
+					case .keychainBoxCorrupted: fallthrough
+					case .errorReadingKey: fallthrough
+					case .keyNotFound: fallthrough
+					case .errorOpeningBox:
+						return dangerZone(UnlockError(reason), configuration)
 					}
 					
-				case .success(let securityFile):
+				case .success(let cleartextData):
 					
-					let configuration = self.calculateEnabledSecurity(securityFile)
-					
-					let keychainResult = SharedSecurity.shared.readKeychainEntry(securityFile)
-					switch keychainResult {
-						case .failure(let reason):
-							
-							switch reason {
-								case .keychainOptionNotEnabled:
-									return finish(nil, configuration)
-									
-								case .keychainBoxCorrupted: fallthrough
-								case .errorReadingKey: fallthrough
-								case .keyNotFound: fallthrough
-								case .errorOpeningBox: fallthrough
-								case .invalidMnemonics:
-									return dangerZone2(reason, configuration)
-							}
-							
-						case .success(let mnemonics):
-							return finish(mnemonics, configuration)
-					}
-			}
-		}
+					let decodeResult = SharedSecurity.shared.decodeRecoveryPhrase(cleartextData)
+					switch decodeResult {
+					case .failure(let reason):
+						return dangerZone(UnlockError(reason), configuration)
+						
+					case .success(let recoveryPhrase):
+						return finish(recoveryPhrase, configuration)
+						
+					} // </switch decodeResult>
+				} // </switch keychainResult>
+			} // </switch diskResult>
+		} // </queue.async>
 	}
 	
 	/// Updates the keychain & security file to include a keychain entry.
@@ -314,10 +315,9 @@ class AppSecurity {
 	/// - the user is explicitly disabling existing security options
 	///
 	public func addKeychainEntry(
-		mnemonics  : [String],
-		completion : @escaping (_ error: Error?) -> Void
+		recoveryPhrase : RecoveryPhrase,
+		completion     : @escaping (_ error: Error?) -> Void
 	) {
-		let mnemonicsData = validateParameter(mnemonics: mnemonics)
 		
 		let succeed = {(securityFile: SecurityFile) -> Void in
 			DispatchQueue.main.async {
@@ -333,6 +333,14 @@ class AppSecurity {
 			}
 		}
 		
+		let recoveryPhraseData: Data
+		do {
+			recoveryPhraseData = try JSONEncoder().encode(recoveryPhrase)
+		} catch {
+			log.error("recoveryPhrase.jsonEncoding error")
+			return fail(error)
+		}
+		
 		// Disk IO ahead - get off the main thread.
 		// Also - go thru the serial queue for proper thread safety.
 		queue.async {
@@ -341,7 +349,7 @@ class AppSecurity {
 			
 			let sealedBox: ChaChaPoly.SealedBox
 			do {
-				sealedBox = try ChaChaPoly.seal(mnemonicsData, using: lockingKey)
+				sealedBox = try ChaChaPoly.seal(recoveryPhraseData, using: lockingKey)
 			} catch {
 				return fail(error)
 			}
@@ -359,22 +367,21 @@ class AppSecurity {
 			//    The security.json file doesn't exist.
 			//
 			// 2. User has existing security options, but is choosing to disable them.
-			//    The given databaseKey corresponds to the existing database file.
 			//    There are existing entries in the keychain.
 			//    The security.json file exists, and contains entries.
 			//
 			// 3. Something bad happened during app launch.
-			//    We discovered a corrupt database, a corrupt security.json,
+			//    We discovered a corrupt security.json file,
 			//    or necessary keychain entries have gone missing.
 			//    When this occurs, the system invokes the various `backup` functions.
-			//    This creates a copy of the database, security.json file & keychain entries.
+			//    This creates a copy of the security.json file & keychain entries.
 			//    Afterwards this function is called.
 			//    And we can treat this scenario as the equivalent of a first app launch.
 			//
 			// So situation #2 is the dangerous one.
 			// Consider what happens if:
 			//
-			// - we delete the touchID entry from the database
+			// - we delete the existing entry from the OS keychain
 			// - then the app crashes
 			//
 			// Answer => we just lost the user's data ! :(
@@ -408,18 +415,18 @@ class AppSecurity {
 				          accessGroup: self.sharedAccessGroup(),
 				               mixins: query)
 			} catch {
-				log.error("keychain.storeKey(account: keychain): error: \(String(describing: error))")
+				log.error("keychain.storeKey(account: keychain): error: \(error)")
 				return fail(error)
 			}
 			
 			do {
 				try self.writeToDisk(securityFile: securityFile)
 			} catch {
-				log.error("writeToDisk(securityFile): error: \(String(describing: error))")
+				log.error("writeToDisk(securityFile): error: \(error)")
 				return fail(error)
 			}
 			
-			// Now we can safely delete the biometric entry in the database (if it exists)
+			// Now we can safely delete the previous entry in the OS keychain (if it exists)
 			do {
 				try keychain.deleteKey(
 					account     : keychain_accountName_biometrics,
@@ -470,7 +477,7 @@ class AppSecurity {
 					               mixins: query)
 					
 				} catch {
-					log.error("keychain.storeKey(account: softBiometrics): error: \(String(describing: error))")
+					log.error("keychain.storeKey(account: softBiometrics): error: \(error)")
 					return fail(error)
 				}
 				
@@ -482,7 +489,7 @@ class AppSecurity {
 					)
 				
 				} catch {
-					log.error("keychain.deleteKey(account: softBiometrics): error: \(String(describing: error))")
+					log.error("keychain.deleteKey(account: softBiometrics): error: \(error)")
 					return fail(error)
 				}
 			}
@@ -506,7 +513,87 @@ class AppSecurity {
 			enabled = value != nil
 			
 		} catch {
-			log.error("keychain.readKey(account: softBiometrics): error: \(String(describing: error))")
+			log.error("keychain.readKey(account: softBiometrics): error: \(error)")
+		}
+		
+		return enabled
+	}
+	
+	public func setPasscodeFallback(
+		enabled    : Bool,
+		completion : @escaping (_ error: Error?) -> Void
+	) -> Void {
+		
+		let succeed = {
+			let securityFile = self.readFromDisk()
+			DispatchQueue.main.async {
+				let newEnabledSecurity = self.calculateEnabledSecurity(securityFile)
+				self.publishEnabledSecurity(newEnabledSecurity)
+				completion(nil)
+			}
+		}
+		
+		let fail = {(_ error: Error) -> Void in
+			DispatchQueue.main.async {
+				completion(error)
+			}
+		}
+		
+		// Disk IO ahead - get off the main thread.
+		// Also - go thru the serial queue for proper thread safety.
+		queue.async {
+			
+			let keychain = GenericPasswordStore()
+			let account = keychain_accountName_passcodeFallback
+			
+			if enabled {
+				do {
+					var query = [String: Any]()
+					query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+					
+					try keychain.storeKey( "true",
+									  account: account,
+								 accessGroup: self.privateAccessGroup(),
+										mixins: query)
+					
+				} catch {
+					log.error("keychain.storeKey(account: passcodeFallback): error: \(error)")
+					return fail(error)
+				}
+				
+			} else {
+				do {
+					try keychain.deleteKey(
+						account     : account,
+						accessGroup : self.privateAccessGroup()
+					)
+				
+				} catch {
+					log.error("keychain.deleteKey(account: passcodeFallback): error: \(error)")
+					return fail(error)
+				}
+			}
+			
+			succeed()
+		
+		} // </queue.async>
+	}
+	
+	public func getPasscodeFallbackEnabled() -> Bool {
+		
+		let keychain = GenericPasswordStore()
+		let account = keychain_accountName_passcodeFallback
+		
+		var enabled = false
+		do {
+			let value: String? = try keychain.readKey(
+				account     : account,
+				accessGroup : privateAccessGroup()
+			)
+			enabled = value != nil
+			
+		} catch {
+			log.error("keychain.readKey(account: passcodeFallback): error: \(error)")
 		}
 		
 		return enabled
@@ -527,48 +614,8 @@ class AppSecurity {
 	///
 	public func tryUnlockWithBiometrics(
 		prompt: String? = nil,
-		completion: @escaping (_ result: Result<[String], Error>) -> Void
+		completion: @escaping (_ result: Result<RecoveryPhrase, Error>) -> Void
 	) {
-		let succeed = {(_ mnemonics: [String]) in
-			DispatchQueue.main.async {
-				completion(Result.success(mnemonics))
-			}
-		}
-		
-		let fail = {(_ error: Error) -> Void in
-			DispatchQueue.main.async {
-				completion(Result.failure(error))
-			}
-		}
-		
-		// "Advanced security" technique removed in v1.4.
-		// Replaced with notification-service-extension,
-		// with ability to receive payments when app is running in the background.
-		// 
-		let disableAdvancedSecurityAndSucceed = {(_ mnemonics: [String]) in
-			
-			self.addKeychainEntry(mnemonics: mnemonics) { _ in
-				succeed(mnemonics)
-			}
-		}
-		
-		let trySoftBiometrics = {(_ securityFile: SecurityFile) -> Void in
-			
-			let result = SharedSecurity.shared.readKeychainEntry(securityFile)
-			switch result {
-			case .failure(let error):
-				fail(error)
-			
-			case .success(let mnemonics):
-				self.tryGenericBiometrics { (success, error) in
-					if success {
-						succeed(mnemonics)
-					} else {
-						fail(error ?? genericError(401, "Biometrics prompt failed / cancelled"))
-					}
-				}
-			}
-		}
 		
 		// Disk IO ahead - get off the main thread.
 		// Also - go thru the serial queue for proper thread safety.
@@ -578,95 +625,179 @@ class AppSecurity {
 			// If the file doesn't exist, an empty SecurityFile is returned.
 			let securityFile = self.readFromDisk()
 			
-			// The file tells us which security options have been enabled.
-			// If there isn't a keychain entry, then we cannot unlock the seed.
-			guard
-				let keyInfo_biometrics = securityFile.biometrics as? KeyInfo_ChaChaPoly,
-				let sealedBox_biometrics = try? keyInfo_biometrics.toSealedBox()
-			else {
-				
-				if self.getSoftBiometricsEnabled() {
-					return trySoftBiometrics(securityFile)
-				} else {
-					return fail(genericError(400, "SecurityFile doesn't have biometrics entry"))
-				}
+			if securityFile.biometrics != nil {
+				self.tryUnlockWithHardBiometrics(securityFile, prompt, completion)
+			} else {
+				self.tryUnlockWithSoftBiometrics(securityFile, prompt, completion)
 			}
-			
-			let context = LAContext()
-			context.localizedReason = prompt ?? self.biometricsPrompt()
-			
-			var query = [String: Any]()
-			query[kSecUseAuthenticationContext as String] = context
-			
-			let keychain = GenericPasswordStore()
-			let account = keychain_accountName_biometrics
-		
-			let fetchedKey: SymmetricKey?
-			do {
-				fetchedKey = try keychain.readKey(
-					account     : account,
-					accessGroup : self.privateAccessGroup(),
-					mixins      : query
-				)
-			} catch {
-				return fail(error)
-			}
-			
-			guard let lockingKey = fetchedKey else {
-				return fail(genericError(401, "Biometrics keychain entry missing"))
-			}
-		
-			// Decrypt the databaseKey using the lockingKey
-			let mnemonicsData: Data
-			do {
-				mnemonicsData = try ChaChaPoly.open(sealedBox_biometrics, using: lockingKey)
-			} catch {
-				return fail(error)
-			}
-			
-			guard let mnemonicsString = String(data: mnemonicsData, encoding: .utf8) else {
-				return fail(genericError(500, "Keychain data is invalid"))
-			}
-			let mnemonics = mnemonicsString.split(separator: " ").map { String($0) }
-			
-		#if targetEnvironment(simulator)
-			
-			// On the iOS simulator you can fake Touch ID.
-			//
-			// Features -> Touch ID -> Enroll
-			//                      -> Matching touch
-			//                      -> Non-matching touch
-			//
-			// However, it has some shortcomings.
-			//
-			// On the device:
-			//     Attempting to read the entry from the keychain will prompt
-			//     the user to authenticate with Touch ID. And the keychain
-			//     entry is only returned if Touch ID succeeds.
-			//
-			// On the simulator:
-			//     Attempting to read the entry from the keychain always succceeds.
-			//     It does NOT prompt the user for Touch ID,
-			//     giving the appearance that we didn't code something properly.
-			//     But in reality, this is just a bug in the iOS simulator.
-			//
-			// So we're going to fake it here.
-			
-			self.tryGenericBiometrics {(success, error) in
-			
-				if let error = error {
-					fail(error)
-				} else {
-					disableAdvancedSecurityAndSucceed(mnemonics)
-				}
-			}
-		#else
-		
-			// iOS device
-			disableAdvancedSecurityAndSucceed(mnemonics)
-		
-		#endif
 		}
+	}
+	
+	/// This function is called when "advanced security" is detected.
+	///
+	/// This type of security was removed in v1.4.
+	/// It was replaced with the notification-service-extension,
+	/// with ability to receive payments when app is running in the background.
+	///
+	private func tryUnlockWithHardBiometrics(
+		_ securityFile : SecurityFile,
+		_ prompt       : String? = nil,
+		_ completion   : @escaping (_ result: Result<RecoveryPhrase, Error>) -> Void
+	) {
+		
+		let succeed = {(_ recoveryPhrase: RecoveryPhrase) in
+			DispatchQueue.main.async {
+				completion(Result.success(recoveryPhrase))
+			}
+		}
+		
+		let fail = {(_ error: Error) -> Void in
+			DispatchQueue.main.async {
+				completion(Result.failure(error))
+			}
+		}
+		
+		// The "advanced security" technique removed in v1.4.
+		// Replaced with notification-service-extension,
+		// with ability to receive payments when app is running in the background.
+		//
+		let disableAdvancedSecurityAndSucceed = {(_ recoveryPhrase: RecoveryPhrase) in
+			
+			self.addKeychainEntry(recoveryPhrase: recoveryPhrase) { _ in
+				succeed(recoveryPhrase)
+			}
+		}
+		
+		// The security.json file tells us which security options have been enabled.
+		// This function should only be called if the `biometrics` entry is present.
+		guard
+			let keyInfo_biometrics = securityFile.biometrics as? KeyInfo_ChaChaPoly,
+			let sealedBox_biometrics = try? keyInfo_biometrics.toSealedBox()
+		else {
+			
+			return fail(genericError(400, "SecurityFile.biometrics entry is corrupt"))
+		}
+		
+		
+		let context = LAContext()
+		context.localizedReason = prompt ?? self.biometricsPrompt()
+		context.localizedFallbackTitle = "" // passcode fallback disbaled
+		
+		var query = [String: Any]()
+		query[kSecUseAuthenticationContext as String] = context
+		
+		let keychain = GenericPasswordStore()
+		let account = keychain_accountName_biometrics
+	
+		let fetchedKey: SymmetricKey?
+		do {
+			fetchedKey = try keychain.readKey(
+				account     : account,
+				accessGroup : self.privateAccessGroup(),
+				mixins      : query
+			)
+		} catch {
+			return fail(error)
+		}
+		
+		guard let lockingKey = fetchedKey else {
+			return fail(genericError(401, "Biometrics keychain entry missing"))
+		}
+	
+		// Decrypt the databaseKey using the lockingKey
+		let cleartextData: Data
+		do {
+			cleartextData = try ChaChaPoly.open(sealedBox_biometrics, using: lockingKey)
+		} catch {
+			return fail(error)
+		}
+		
+		let recoveryPhrase: RecoveryPhrase
+		do {
+			recoveryPhrase = try SharedSecurity.shared.decodeRecoveryPhrase(cleartextData).get()
+		} catch {
+			return fail(error)
+		}
+		
+	#if targetEnvironment(simulator)
+		
+		// On the iOS simulator you can fake Touch ID.
+		//
+		// Features -> Touch ID -> Enroll
+		//                      -> Matching touch
+		//                      -> Non-matching touch
+		//
+		// However, it has some shortcomings.
+		//
+		// On the device:
+		//     Attempting to read the entry from the keychain will prompt
+		//     the user to authenticate with Touch ID. And the keychain
+		//     entry is only returned if Touch ID succeeds.
+		//
+		// On the simulator:
+		//     Attempting to read the entry from the keychain always succceeds.
+		//     It does NOT prompt the user for Touch ID,
+		//     giving the appearance that we didn't code something properly.
+		//     But in reality, this is just a bug in the iOS simulator.
+		//
+		// So we're going to fake it here.
+		
+		self.tryGenericBiometrics {(success, error) in
+		
+			if let error = error {
+				fail(error)
+			} else {
+				disableAdvancedSecurityAndSucceed(recoveryPhrase)
+			}
+		}
+	#else
+	
+		// iOS device
+		disableAdvancedSecurityAndSucceed(recoveryPhrase)
+	
+	#endif
+	}
+	
+	private func tryUnlockWithSoftBiometrics(
+		_ securityFile : SecurityFile,
+		_ prompt       : String? = nil,
+		_ completion   : @escaping (_ result: Result<RecoveryPhrase, Error>) -> Void
+	) {
+		
+		let succeed = {(_ recoveryPhrase: RecoveryPhrase) in
+			DispatchQueue.main.async {
+				completion(Result.success(recoveryPhrase))
+			}
+		}
+		
+		let fail = {(_ error: Error) -> Void in
+			DispatchQueue.main.async {
+				completion(Result.failure(error))
+			}
+		}
+		
+		let keychainResult = SharedSecurity.shared.readKeychainEntry(securityFile)
+		switch keychainResult {
+		case .failure(let error):
+			fail(error)
+		
+		case .success(let cleartextData):
+			
+			let decodeResult = SharedSecurity.shared.decodeRecoveryPhrase(cleartextData)
+			switch decodeResult {
+			case .failure(let error):
+				fail(error)
+				
+			case .success(let recoveryPhrase):
+				self.tryGenericBiometrics { (success, error) in
+					if success {
+						succeed(recoveryPhrase)
+					} else {
+						fail(error ?? genericError(401, "Biometrics prompt failed / cancelled"))
+					}
+				}
+			} // </switch decodeResult>
+		} // </switch keychainResult>
 	}
 	
 	private func tryGenericBiometrics(
@@ -675,7 +806,18 @@ class AppSecurity {
 	) -> Void {
 		
 		let context = LAContext()
-		context.evaluatePolicy( .deviceOwnerAuthenticationWithBiometrics,
+		
+		let policy: LAPolicy
+		if getPasscodeFallbackEnabled() {
+			// Biometrics + Passcode Fallback
+			policy = .deviceOwnerAuthentication
+		} else {
+			// Biometrics only
+			policy = .deviceOwnerAuthenticationWithBiometrics
+			context.localizedFallbackTitle = "" // passcode fallback disabled
+		}
+		
+		context.evaluatePolicy( policy,
 		       localizedReason: prompt ?? self.biometricsPrompt(),
 		                 reply: completion)
 	}
@@ -845,7 +987,7 @@ class AppSecurity {
 				accessGroup : privateAccessGroup() // <- old location
 			)
 		} catch {
-			log.error("keychain.readKey(account: keychain, group: nil): error: \(String(describing: error))")
+			log.error("keychain.readKey(account: keychain, group: nil): error: \(error)")
 		}
 		
 		if let lockingKey = savedKey {
@@ -861,7 +1003,7 @@ class AppSecurity {
 					accessGroup : sharedAccessGroup() // <- new location
 				)
 			} catch {
-				log.error("keychain.deleteKey(account: keychain, group: shared): error: \(String(describing: error))")
+				log.error("keychain.deleteKey(account: keychain, group: shared): error: \(error)")
 			}
 			do {
 				var query = [String: Any]()
@@ -887,9 +1029,9 @@ class AppSecurity {
 				
 			} catch {
 				if !migrated {
-					log.error("keychain.storeKey(account: keychain, group: shared): error: \(String(describing: error))")
+					log.error("keychain.storeKey(account: keychain, group: shared): error: \(error)")
 				} else {
-					log.error("keychain.deleteKey(account: keychain, group: private): error: \(String(describing: error))")
+					log.error("keychain.deleteKey(account: keychain, group: private): error: \(error)")
 				}
 			}
 		}

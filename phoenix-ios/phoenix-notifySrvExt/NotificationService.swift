@@ -131,7 +131,7 @@ class NotificationService: UNNotificationServiceExtension {
 			repeats          : true
 		) {[weak self](_: Timer) in
 		
-			if let self = self {
+			if let _ = self {
 				log.debug("connectionsTimer.fire()")
 				log.debug("GroupPrefs.shared.srvExtConnection = now")
 				GroupPrefs.shared.srvExtConnection = Date.now
