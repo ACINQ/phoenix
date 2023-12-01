@@ -203,26 +203,31 @@ sealed interface Lnurl {
          */
         suspend fun processLnurlResponse(response: HttpResponse): JsonObject {
             val url = response.request.url
-            return try {
-                if (response.status.isSuccess()) {
-                    val json: JsonObject = Json.decodeFromString(response.bodyAsText(Charsets.UTF_8))
-                    log.debug { "lnurl service=${url.host} returned response=${json.toString().take(100)}" }
-                    if (json["status"]?.jsonPrimitive?.content?.trim()?.equals("error", true) == true) {
-                        val errorMessage = json["reason"]?.jsonPrimitive?.content ?: ""
-                        log.error { "lnurl service=${url.host} returned error=$errorMessage" }
-                        throw LnurlError.RemoteFailure.Detailed(url.host, errorMessage.take(90).replace("<", ""))
-                    } else {
-                        json
-                    }
-                } else {
-                    throw LnurlError.RemoteFailure.Code(url.host, response.status)
-                }
+            val json: JsonObject = try {
+                // From the LUD-01 specs:
+                // > HTTP Status Codes and Content-Type:
+                // > Neither status codes or any HTTP Header has any meaning. Servers may use
+                // > whatever they want. Clients should ignore them [...] and just parse the
+                // > response body as JSON, then interpret it accordingly.
+                Json.decodeFromString(response.bodyAsText(Charsets.UTF_8))
             } catch (e: Exception) {
                 log.error(e) { "unhandled response from url=$url: " }
-                when (e) {
-                    is LnurlError.RemoteFailure -> throw e
-                    else -> throw LnurlError.RemoteFailure.Unreadable(url.host)
+                throw LnurlError.RemoteFailure.Unreadable(url.host)
+            }
+
+            log.debug { "lnurl service=${url.host} returned response=${json.toString().take(100)}" }
+            return if (json["status"]?.jsonPrimitive?.content?.trim()?.equals("error", true) == true) {
+                val errorMessage = json["reason"]?.jsonPrimitive?.content?.trim() ?: ""
+                if (errorMessage.isNotEmpty()) {
+                    log.error { "lnurl service=${url.host} returned error=$errorMessage" }
+                    throw LnurlError.RemoteFailure.Detailed(url.host, errorMessage.take(90).replace("<", ""))
+                } else if (!response.status.isSuccess()) {
+                    throw LnurlError.RemoteFailure.Code(url.host, response.status)
+                } else {
+                    throw LnurlError.RemoteFailure.Unreadable(url.host)
                 }
+            } else {
+                json
             }
         }
 
