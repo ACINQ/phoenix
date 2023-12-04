@@ -116,12 +116,12 @@ class MobileBorderWalletUtils {
 		// Within the large buffer (i.e. 256 bits), what are the bits we want to extract ?
 		//
 		// Buffer: 1100011110111110000100110000100011001010111001000011111100010111...
-		//                   ^          ^
-		//                   ^      bufferBitEndIdx = 20
-		//             bufferBitStartIdx = 10
+		//                    ^          ^
+		//                    ^       bufferBitEndIdx = 22
+		//              bufferBitStartIdx = 11
 		
-		let bufferBitStartIdx = index * 10
-		let bufferBitEndIdx = bufferBitStartIdx + 10
+		let bufferBitStartIdx = index * 11
+		let bufferBitEndIdx = bufferBitStartIdx + 11
 		
 		// In order to extract these bits, we're first going to extract 32 bits from the buffer.
 		// We just need to make sure we don't "buffer overflow" when we're near the edges.
@@ -164,24 +164,24 @@ class MobileBorderWalletUtils {
 		// Now we want to extract just the correct bits from our chunk:
 		//
 		// 10111110000100110000100011001010
-		//   ^^^^^^^^^^
+		//    ^^^^^^^^^^^
 		//
 		// To achieve this we first "drop" the low bits by shifting to the right:
-		// 00000000000000000000101111100001
-		//                       ^^^^^^^^^^
+		// 00000000000000000010111110000100
+		//                      ^^^^^^^^^^^
 		//
 		// Then we drop the high bits:
-		//   00000000000000000000101111100001
-		// & 00000000000000000000001111111111
+		//   00000000000000000010111110000100
+		// & 00000000000000000000011111111111
 		//   --------------------------------
-		// = 00000000000000000000001111100001
+		// = 00000000000000000000011110000100
 		//
 		// And we're left with just our target bits.
 		
 		let dropLowBits = 32 - (bufferBitEndIdx - chunkBitStartIdx)
 		var result = chunk >> dropLowBits
 		
-		let mask: UInt32 = ~(UInt32.max << 10)
+		let mask: UInt32 = ~(UInt32.max << 11)
 		result = result & mask
 		
 		return UInt16(clamping: result)
@@ -189,13 +189,13 @@ class MobileBorderWalletUtils {
 	
 	private static func extractPoint(_ location: UInt16) -> DotPoint {
 		
-		// The point is expected to be 10 bits.
+		// The point is expected to be 11 bits.
 		// So if it has higher bits activated, it's a bug in `extractLocation`.
-		precondition(location < 1024)
+		precondition(location < 2048)
 		
 		// Example location:
 		// 0000001111100001
-		//       ^^^
+		//      ^^^^
 		//        x ^^^^^^^
 		//            y
 		
@@ -358,13 +358,13 @@ class MobileBorderWalletUtils {
 				
 				originalBitPattern += bigEndian.toBinaryString()
 			}
-			originalBitPattern = String(originalBitPattern.prefix(230))
+			originalBitPattern = String(originalBitPattern.prefix(253))
 			
 			var extractedBitPattern: String = ""
 			for index in 0..<23 {
 				let bits = extractLocation(ptr, index: index)
 	
-				extractedBitPattern += bits.toBinaryString(minPrecision: 10)
+				extractedBitPattern += bits.toBinaryString(minPrecision: 11)
 			}
 			
 			if originalBitPattern == extractedBitPattern {
@@ -392,18 +392,25 @@ class MobileBorderWalletUtils {
 				
 				originalBitPattern += bigEndian.toBinaryString()
 			}
-			originalBitPattern = String(originalBitPattern.prefix(230))
+			originalBitPattern = String(originalBitPattern.prefix(253))
 			
 			var extractedBitPattern: String = ""
+			var extractedPoints: [DotPoint] = []
 			for index in 0..<23 {
 				let bits = extractLocation(ptr, index: index)
 				let point = extractPoint(bits)
 				
-				let x = UInt16(clamping: point.x).toBinaryString(minPrecision: 3)
-				let y = UInt16(clamping: point.y).toBinaryString(minPrecision: 7)
+				let x = UInt16(clamping: point.x)
+				let y = UInt16(clamping: point.y)
 				
-				extractedBitPattern += x + y
+				extractedBitPattern += x.toBinaryString(minPrecision: 4)
+				extractedBitPattern += y.toBinaryString(minPrecision: 7)
+				
+				extractedPoints.append(DotPoint(x: x, y: y))
 			}
+			
+			let ep = extractedPoints.map { $0.description }.joined(separator: ",")
+			log.debug("extractedPoints: \(ep)")
 			
 			if originalBitPattern == extractedBitPattern {
 				log.debug("test_extractPoint: SUCCESS")
