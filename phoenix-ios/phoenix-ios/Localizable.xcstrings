@@ -18293,8 +18293,12 @@
         }
       }
     },
+    "The invoice is not for (chainMismatch.expected.name)" : {
+      "comment" : "Error message - scanning lightning invoice"
+    },
     "The invoice is not for (reason.expected.name)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -18456,6 +18460,12 @@
           }
         }
       }
+    },
+    "The service ((origin)) returned error code: (rfCode.code.value)" : {
+      "comment" : "Error message - scanning lightning invoice"
+    },
+    "The service ((origin)) returned error message: (rfDetailed.reason)" : {
+      "comment" : "Error message - scanning lightning invoice"
     },
     "The simulator cannot access the camera. Please use the clipboard." : {
       "comment" : "Warning for iOS Simulator (only for devs)",
