@@ -60,7 +60,7 @@ fun ElectrumView() {
     val nc = navController
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val prefElectrumServer = LocalElectrumServer.current
+    val electrumServerInPrefs by UserPrefs.getElectrumServer(context).collectAsState(initial = null)
     var showCustomServerDialog by rememberSaveable { mutableStateOf(false) }
 
     DefaultScreenLayout {
@@ -76,7 +76,7 @@ fun ElectrumView() {
                 val config = model.configuration
                 if (showCustomServerDialog) {
                     ElectrumServerDialog(
-                        initialAddress = prefElectrumServer,
+                        initialAddress = electrumServerInPrefs,
                         onConfirm = { address ->
                             scope.launch {
                                 UserPrefs.saveElectrumServer(context, address)

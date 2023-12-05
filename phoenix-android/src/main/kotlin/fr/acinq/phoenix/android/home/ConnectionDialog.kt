@@ -53,7 +53,7 @@ import fr.acinq.phoenix.managers.Connections
 
 @Composable
 fun ConnectionDialog(
-    connections: Connections?,
+    connections: Connections,
     electrumBlockheight: Int,
     onClose: () -> Unit,
     onTorClick: () -> Unit,
@@ -63,7 +63,7 @@ fun ConnectionDialog(
 
     Dialog(title = stringResource(id = R.string.conndialog_title), onDismiss = onClose) {
         Column {
-            if (connections?.internet != Connection.ESTABLISHED) {
+            if (connections.internet != Connection.ESTABLISHED) {
                 Text(
                     text = stringResource(id = R.string.conndialog_network),
                     modifier = Modifier.padding(top = 16.dp, start = 24.dp, end = 24.dp)

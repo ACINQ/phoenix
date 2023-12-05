@@ -13,7 +13,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
@@ -38,6 +37,7 @@ import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
@@ -69,6 +69,11 @@ class NodeService : Service() {
 
     /** List of payments received while the app is in the background */
     private val receivedInBackground = mutableStateListOf<MilliSatoshi>()
+
+    // jobs monitoring events/payments after business start
+    private var monitorPaymentsJob: Job? = null
+    private var monitorNodeEventsJob: Job? = null
+    private var monitorFcmTokenJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -125,8 +130,9 @@ class NodeService : Service() {
     /** Shutdown the node, close connections and stop the service */
     fun shutdown() {
         log.info("shutting down service in state=${_state.value?.name}")
+        monitorNodeEventsJob?.cancel()
         stopSelf()
-        _state.value = NodeServiceState.Off
+        _state.postValue(NodeServiceState.Off)
     }
 
     // =========================================================== //
@@ -215,16 +221,16 @@ class NodeService : Service() {
         }
 
         // retrieve preferences before starting business
-        val business = (applicationContext as? PhoenixApplication)?.business ?: throw RuntimeException("invalid context type, should be PhoenixApplication")
+        val business = (applicationContext as? PhoenixApplication)?.business?.first() ?: throw RuntimeException("invalid context type, should be PhoenixApplication")
         val electrumServer = UserPrefs.getElectrumServer(applicationContext).first()
         val isTorEnabled = UserPrefs.getIsTorEnabled(applicationContext).first()
         val liquidityPolicy = UserPrefs.getLiquidityPolicy(applicationContext).first()
         val trustedSwapInTxs = LegacyPrefsDatastore.getMigrationTrustedSwapInTxs(applicationContext).first()
         val preferredFiatCurrency = UserPrefs.getFiatCurrency(applicationContext).first()
 
-        serviceScope.launch { monitorPaymentsWhenHeadless(business.peerManager, business.currencyManager) }
-        serviceScope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager) }
-        serviceScope.launch { monitorFcmToken(business) }
+        monitorPaymentsJob = serviceScope.launch { monitorPaymentsWhenHeadless(business.peerManager, business.currencyManager) }
+        monitorNodeEventsJob = serviceScope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager) }
+        monitorFcmTokenJob = serviceScope.launch { monitorFcmToken(business) }
 
         // preparing business
         val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(decryptedMnemonics))

@@ -59,6 +59,8 @@ object UserPrefs {
         }
     }
 
+    suspend fun clear(context: Context) = context.userPrefs.edit { it.clear() }
+
     // -- unit, fiat, conversion...
 
     private val BITCOIN_UNIT = stringPreferencesKey("BITCOIN_UNIT")

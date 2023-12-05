@@ -786,14 +786,15 @@
 
     <string name="reset_wallet_confirm_title">Confirm reset</string>
     <string name="reset_wallet_confirm_header">The wallet will be completely deleted from <b>this device</b>.</string>
-    <string name="reset_wallet_confirm_details">This will reset the app. You will be taken to the Intro screen, and prompted to create or restore a wallet.</string>
+    <string name="reset_wallet_confirm_details">This will reset the app. Your payments history will be lost. You will be taken to the Intro screen, and prompted to create or restore a wallet.</string>
     <string name="reset_wallet_confirm_seed_balance">Don\'t lose your funds:\n%1$s (≈ %2$s).</string>
     <string name="reset_wallet_confirm_seed_responsibility">You are responsible for storing your recovery phrase.</string>
-    <string name="reset_wallet_confirm_button">Delete wallet (does not work yet)</string>
-
-    <string name="reset_wallet_deleting">Deleting wallet data…</string>
-    <string name="reset_wallet_success">Wallet has been successfully reset</string>
-    <string name="reset_wallet_success_details">Moving back to init screen…</string>
+    <string name="reset_wallet_confirm_button">Delete wallet</string>
+    <string name="reset_wallet_shutting_down">Shutting down…</string>
+    <string name="reset_wallet_deleting_prefs">Deleting preferences…</string>
+    <string name="reset_wallet_deleting_seed">Deleting seed…</string>
+    <string name="reset_wallet_deleting_db">Deleting databases…</string>
+    <string name="reset_wallet_success">The wallet has been successfully reset.</string>
     <string name="reset_wallet_failure_title">Reset failed</string>
 
 </resources>

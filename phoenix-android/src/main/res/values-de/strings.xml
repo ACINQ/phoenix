@@ -716,11 +716,9 @@
     <string name="reset_wallet_confirm_details">Dadurch wird die App zurückgesetzt. Es erscheint der Start-Bildschirm mit der Aufforderung, eine Wallet zu erstellen oder wiederherzustellen.</string>
     <string name="reset_wallet_confirm_seed_balance">Verlieren Sie Ihr Guthaben nicht:\n%1$s (≈ %2$s).</string>
     <string name="reset_wallet_confirm_seed_responsibility">Sie sind für die Speicherung Ihrer Wiederherstellungsphrase verantwortlich.</string>
-    <string name="reset_wallet_confirm_button">Wallet löschen (funktioniert noch nicht)</string>
+    <string name="reset_wallet_confirm_button">Wallet löschen</string>
 
-    <string name="reset_wallet_deleting">Wallet-Daten werden gelöscht…</string>
     <string name="reset_wallet_success">Wallet wurde erfolgreich zurückgesetzt</string>
-    <string name="reset_wallet_success_details">Zurück zum Startbildschirm…</string>
     <string name="reset_wallet_failure_title">Zurücksetzen fehlgeschlagen</string>
 
 </resources>

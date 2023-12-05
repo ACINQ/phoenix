@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android.utils
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import ch.qos.logback.classic.Level
@@ -48,7 +49,11 @@ fun logger(name: String? = null): org.kodein.log.Logger {
     return if (application !is PhoenixApplication) { // Preview mode
         remember(tag) { org.kodein.log.LoggerFactory(slf4jFrontend).newLogger(tag) }
     } else {
-        remember(tag) { application.business.loggerFactory.newLogger(tag) }
+        val businessState = application.business.collectAsState()
+        when (val business = businessState.value) {
+            null -> remember(tag) { org.kodein.log.LoggerFactory(slf4jFrontend).newLogger(tag) }
+            else -> remember(tag) { business.loggerFactory.newLogger(tag) }
+        }
     }
 }
 

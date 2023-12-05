@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -36,6 +37,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -53,6 +55,7 @@ import androidx.navigation.navOptions
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.openLink
@@ -95,44 +98,53 @@ import org.kodein.memory.util.currentTimestampMillis
 
 
 @Composable
+fun LoadingAppView() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(text = "Initializing...")
+    }
+}
+
+@Composable
 fun AppView(
+    business: PhoenixBusiness,
     appVM: AppViewModel,
     navController: NavHostController,
 ) {
     val log = logger("Navigation")
     log.debug { "init app view composition" }
 
-    val fiatRates = application.business.currencyManager.ratesFlow.collectAsState(listOf())
     val context = LocalContext.current
     val isAmountInFiat = UserPrefs.getIsAmountInFiat(context).collectAsState(false)
     val fiatCurrency = UserPrefs.getFiatCurrency(context).collectAsState(initial = FiatCurrency.USD)
     val bitcoinUnit = UserPrefs.getBitcoinUnit(context).collectAsState(initial = BitcoinUnit.Sat)
-    val electrumServer = UserPrefs.getElectrumServer(context).collectAsState(initial = null)
-    val business = application.business
+    val fiatRates by business.currencyManager.ratesFlow.collectAsState(emptyList())
 
     CompositionLocalProvider(
         LocalBusiness provides business,
         LocalControllerFactory provides business.controllers,
         LocalNavController provides navController,
-        LocalExchangeRates provides fiatRates.value,
+        LocalExchangeRates provides fiatRates,
         LocalBitcoinUnit provides bitcoinUnit.value,
         LocalFiatCurrency provides fiatCurrency.value,
         LocalShowInFiat provides isAmountInFiat.value,
-        LocalElectrumServer provides electrumServer.value,
     ) {
-
         // we keep a view model storing payments so that we don't have to fetch them every time
-        val paymentsViewModel: PaymentsViewModel = viewModel(
+        val paymentsViewModel = viewModel<PaymentsViewModel>(
             factory = PaymentsViewModel.Factory(
                 connectionsFlow = business.connectionsManager.connections,
                 paymentsManager = business.paymentsManager,
             )
         )
-
-        val noticesViewModel = viewModel<NoticesViewModel>(factory = NoticesViewModel.Factory(
-            appConfigurationManager = business.appConfigurationManager,
-            peerManager = business.peerManager
-        ))
+        val noticesViewModel = viewModel<NoticesViewModel>(
+            factory = NoticesViewModel.Factory(
+                appConfigurationManager = business.appConfigurationManager,
+                peerManager = business.peerManager
+            )
+        )
         MonitorNotices(vm = noticesViewModel)
 
         val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
@@ -148,6 +160,7 @@ fun AppView(
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
+
             NavHost(navController = navController, startDestination = "${Screen.Startup.route}?next={next}") {
                 composable(
                     route = "${Screen.Startup.route}?next={next}",
@@ -384,7 +397,16 @@ fun AppView(
                     )
                 }
                 composable(Screen.ResetWallet.route) {
-                    ResetWallet(onBackClick = { navController.popBackStack() })
+                    appVM.service?.let { nodeService ->
+                        val application = application
+                        ResetWallet(
+                            onShutdownBusiness = application::shutdownBusiness,
+                            onShutdownService = nodeService::shutdown,
+                            onPrefsClear = application::clearPreferences,
+                            onBusinessReset = application::resetBusiness,
+                            onBackClick = { navController.popBackStack() }
+                        )
+                    }
                 }
             }
         }
