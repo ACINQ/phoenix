@@ -808,17 +808,16 @@ struct SummaryView: View {
 		}
 	}
 	
-	func exploreTx(_ txId: Bitcoin_kmpByteVector32, website: BlockchainExplorer.Website) {
+	func exploreTx(_ txId: Bitcoin_kmpTxId, website: BlockchainExplorer.Website) {
 		log.trace("exploreTX()")
 		
-		let txIdStr = txId.toHex()
-		let txUrlStr = Biz.business.blockchainExplorer.txUrl(txId: txIdStr, website: website)
+		let txUrlStr = Biz.business.blockchainExplorer.txUrl(txId: txId, website: website)
 		if let txUrl = URL(string: txUrlStr) {
 			UIApplication.shared.open(txUrl)
 		}
 	}
 	
-	func copyTxId(_ txId: Bitcoin_kmpByteVector32) {
+	func copyTxId(_ txId: Bitcoin_kmpTxId) {
 		log.trace("copyTxId()")
 		
 		UIPasteboard.general.string = txId.toHex()

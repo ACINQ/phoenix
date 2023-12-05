@@ -9,8 +9,8 @@ struct UtxoWrapper: Identifiable {
 		return utxo.amount
 	}
 	
-	var txid: String {
-		return utxo.previousTx.txid.toHex()
+	var txid: Bitcoin_kmpTxId {
+		return utxo.previousTx.txid
 	}
 	
 	var id: String {

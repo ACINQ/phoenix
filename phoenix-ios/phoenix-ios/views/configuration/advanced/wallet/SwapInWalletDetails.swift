@@ -29,7 +29,7 @@ struct SwapInWalletDetails: View {
 	let swapInRejectedPublisher = Biz.swapInRejectedPublisher
 	@State var swapInRejected: Lightning_kmpLiquidityEventsRejected? = nil
 	
-	@State var blockchainExplorerTxid: String? = nil
+	@State var blockchainExplorerTxid: Bitcoin_kmpTxId? = nil
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -221,24 +221,25 @@ struct SwapInWalletDetails: View {
 			isPresented: confirmationDialogBinding(),
 			titleVisibility: .automatic
 		) {
-			let txid = blockchainExplorerTxid ?? ""
-			Button {
-				exploreTx(txid, website: BlockchainExplorer.WebsiteMempoolSpace())
-			} label: {
-				Text(verbatim: "Mempool.space") // no localization needed
-					.textCase(.none)
-			}
-			Button {
-				exploreTx(txid, website: BlockchainExplorer.WebsiteBlockstreamInfo())
-			} label: {
-				Text(verbatim: "Blockstream.info") // no localization needed
-					.textCase(.none)
-			}
-			Button {
-				copyTxId(txid)
-			} label: {
-				Text("Copy transaction id")
-					.textCase(.none)
+			if let txid = blockchainExplorerTxid {
+				Button {
+					exploreTx(txid, website: BlockchainExplorer.WebsiteMempoolSpace())
+				} label: {
+					Text(verbatim: "Mempool.space") // no localization needed
+						.textCase(.none)
+				}
+				Button {
+					exploreTx(txid, website: BlockchainExplorer.WebsiteBlockstreamInfo())
+				} label: {
+					Text(verbatim: "Blockstream.info") // no localization needed
+						.textCase(.none)
+				}
+				Button {
+					copyTxId(txid)
+				} label: {
+					Text("Copy transaction id")
+						.textCase(.none)
+				}
 			}
 		} // </confirmationDialog>
 	}
@@ -519,7 +520,7 @@ struct SwapInWalletDetails: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func exploreTx(_ txid: String, website: BlockchainExplorer.Website) {
+	func exploreTx(_ txid: Bitcoin_kmpTxId, website: BlockchainExplorer.Website) {
 		log.trace("exploreTX()")
 		
 		let txUrlStr = Biz.business.blockchainExplorer.txUrl(txId: txid, website: website)
@@ -528,10 +529,10 @@ struct SwapInWalletDetails: View {
 		}
 	}
 	
-	func copyTxId(_ txid: String) {
+	func copyTxId(_ txid: Bitcoin_kmpTxId) {
 		log.trace("copyTxId()")
 		
-		UIPasteboard.general.string = txid
+		UIPasteboard.general.string = txid.toHex()
 	}
 	
 	func navigateToLiquiditySettings() {

@@ -403,7 +403,7 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 				showBlockchainExplorerOptions = true
 			} label: {
 				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
-					Text(txId).lineLimit(1).truncationMode(.middle)
+					Text(txId.toHex()).lineLimit(1).truncationMode(.middle)
 					Image(systemName: "link").imageScale(.small)
 				}
 			}
@@ -479,7 +479,7 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func exploreTx(_ txId: String, website: BlockchainExplorer.Website) {
+	func exploreTx(_ txId: Bitcoin_kmpTxId, website: BlockchainExplorer.Website) {
 		log.trace("exploreTX()")
 		
 		let txUrlStr = Biz.business.blockchainExplorer.txUrl(txId: txId, website: website)
@@ -488,10 +488,10 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 		}
 	}
 	
-	func copyTxId(_ txId: String) {
+	func copyTxId(_ txId: Bitcoin_kmpTxId) {
 		log.trace("copyTxId()")
 		
-		UIPasteboard.general.string = txId
+		UIPasteboard.general.string = txId.toHex()
 	}
 	
 	// --------------------------------------------------
