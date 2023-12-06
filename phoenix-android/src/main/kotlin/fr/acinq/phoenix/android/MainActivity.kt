@@ -117,8 +117,9 @@ class MainActivity : AppCompatActivity() {
         // force the intent flag to single top, in order to avoid [handleDeepLink] finish the current activity.
         // this would otherwise clear the app view model, i.e. loose the state which virtually reboots the app
         // TODO: look into detaching the app state from the activity
-        log.info("receive new_intent=$intent")
+        log.info("receive new_intent with data=${intent?.data}")
         intent?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+
         intent?.fixUri()
         this.navController?.handleDeepLink(intent)
     }

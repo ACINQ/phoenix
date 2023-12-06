@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.android
 
 import android.Manifest
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.text.format.DateUtils
@@ -237,10 +238,10 @@ fun AppView(
                         navDeepLink { uriPattern = "scanview:{data}" },
                     )
                 ) {
-                    val input = it.arguments?.getString("data")
-                    RequireStarted(walletState, nextUri = "scanview:$input") {
+                    val intent = it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
+                    RequireStarted(walletState, nextUri = "scanview:${intent?.data?.toString()}") {
                         ScanDataView(
-                            input = input,
+                            input = intent?.data?.toString()?.substringAfter("scanview:"),
                             onBackClick = { popToHome(navController) },
                             onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") }
                         )
