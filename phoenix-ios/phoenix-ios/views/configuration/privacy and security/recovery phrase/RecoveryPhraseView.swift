@@ -36,7 +36,7 @@ struct RecoveryPhraseList: View {
 	
 	@State var isDecrypting = false
 	@State var revealSeed = false
-	@State var mnemonics: [String] = []
+	@State var recoveryPhrase: RecoveryPhrase? = nil
 	
 	@State var legal_taskDone: Bool
 	@State var legal_lossRisk: Bool
@@ -106,10 +106,14 @@ struct RecoveryPhraseList: View {
 		.listBackgroundColor(.primaryBackground)
 		.sheet(isPresented: $revealSeed) {
 			
-			RecoveryPhraseReveal(
-				isShowing: $revealSeed,
-				mnemonics: $mnemonics
-			)
+			if let recoveryPhrase = recoveryPhrase {
+				RecoveryPhraseReveal(
+					isShowing: $revealSeed,
+					recoveryPhrase: recoveryPhrase
+				)
+			} else {
+				EmptyView()
+			}
 		}
 		.onAppear {
 			onAppear()
@@ -338,8 +342,8 @@ struct RecoveryPhraseList: View {
 		
 		isDecrypting = true
 		
-		let Succeed = {(result: [String]) in
-			mnemonics = result
+		let Succeed = {(result: RecoveryPhrase) in
+			recoveryPhrase = result
 			revealSeed = true
 			isDecrypting = false
 		}
@@ -350,10 +354,10 @@ struct RecoveryPhraseList: View {
 		
 		let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
 		if enabledSecurity == .none {
-			AppSecurity.shared.tryUnlockWithKeychain { (mnemonics, _, _) in
+			AppSecurity.shared.tryUnlockWithKeychain { (recoveryPhrase, _, _) in
 				
-				if let mnemonics = mnemonics {
-					Succeed(mnemonics)
+				if let recoveryPhrase {
+					Succeed(recoveryPhrase)
 				} else {
 					Fail()
 				}
@@ -362,8 +366,9 @@ struct RecoveryPhraseList: View {
 			let prompt = NSLocalizedString("Unlock your seed.", comment: "Biometrics prompt")
 			
 			AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
-				if case .success(let mnemonics) = result {
-					Succeed(mnemonics)
+				
+				if case .success(let recoveryPhrase) = result {
+					Succeed(recoveryPhrase)
 				} else {
 					Fail()
 				}
@@ -665,11 +670,12 @@ fileprivate struct SyncErrorDetails: View, ViewName {
 fileprivate struct RecoveryPhraseReveal: View {
 	
 	@Binding var isShowing: Bool
-	@Binding var mnemonics: [String]
+	let recoveryPhrase: RecoveryPhrase
 	
 	@State var truncationDetected: Bool = false
 	
 	func mnemonic(_ idx: Int) -> String {
+		let mnemonics = recoveryPhrase.mnemonicsArray
 		return (mnemonics.count > idx) ? mnemonics[idx] : " "
 	}
 	
@@ -859,25 +865,5 @@ fileprivate struct RecoveryPhraseReveal: View {
 	func close() {
 		log.trace("[RecoverySeedReveal] close()")
 		isShowing = false
-	}
-}
-
-class RecoveryPhraseView_Previews: PreviewProvider {
-	
-	@State static var revealSeed: Bool = true
-	@State static var testMnemonics = [
-		"witch", "collapse", "practice", "feed", "shame", "open",
-		"despair", "creek", "road", "again", "ice", "least"
-	]
-	
-	static var previews: some View {
-		
-		RecoveryPhraseReveal(isShowing: $revealSeed, mnemonics: $testMnemonics)
-			.preferredColorScheme(.light)
-			.previewDevice("iPhone 8")
-		
-		RecoveryPhraseReveal(isShowing: $revealSeed, mnemonics: $testMnemonics)
-			.preferredColorScheme(.dark)
-			.previewDevice("iPhone 8")
 	}
 }

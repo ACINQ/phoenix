@@ -93,10 +93,12 @@ struct ManualRestoreView: MVIView {
 	func finishAndRestoreWallet(model: RestoreWallet.ModelValidMnemonics) -> Void {
 		log.trace("finishAndRestoreWallet()")
 		
-		AppSecurity.shared.addKeychainEntry(mnemonics: mnemonics) { (error: Error?) in
+		let recoveryPhrase = RecoveryPhrase(mnemonics : model.mnemonics)
+
+		AppSecurity.shared.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
 			if error == nil {
 				Biz.loadWallet(
-					mnemonics: mnemonics,
+					recoveryPhrase: recoveryPhrase,
 					seed: model.seed,
 					walletRestoreType: .fromManualEntry
 				)

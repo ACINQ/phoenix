@@ -22,21 +22,24 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.collectAsState
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.*
 import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.io.PhoenixAndroidLegacyInfoEvent
 import fr.acinq.lightning.utils.Connection
-import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.services.NodeService
 import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
 import fr.acinq.phoenix.legacy.utils.*
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flattenMerge
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -49,6 +52,7 @@ class MainActivity : AppCompatActivity() {
 
     private var navController: NavHostController? = null
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appViewModel.serviceState.observe(this) {
@@ -78,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         // listen to legacy channels events on the peer's event bus
         lifecycleScope.launch {
             val application = (application as PhoenixApplication)
-            application.business.peerManager.getPeer().eventsFlow.collect {
+            application.business.filterNotNull().map { it.peerManager.getPeer().eventsFlow }.flattenMerge().collect {
                 if (it is PhoenixAndroidLegacyInfoEvent) {
                     if (it.info.hasChannels) {
                         log.info("legacy channels have been found")
@@ -95,9 +99,14 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             navController = rememberNavController()
+            val businessState = (application as PhoenixApplication).business.collectAsState()
+
             navController?.let {
                 PhoenixAndroidTheme(it) {
-                    AppView(appViewModel, it)
+                    when (val business = businessState.value) {
+                        null -> LoadingAppView()
+                        else -> AppView(business, appViewModel, it)
+                    }
                 }
             }
         }
@@ -108,8 +117,9 @@ class MainActivity : AppCompatActivity() {
         // force the intent flag to single top, in order to avoid [handleDeepLink] finish the current activity.
         // this would otherwise clear the app view model, i.e. loose the state which virtually reboots the app
         // TODO: look into detaching the app state from the activity
-        log.info("receive new_intent=$intent")
+        log.info("receive new_intent with data=${intent?.data}")
         intent?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+
         intent?.fixUri()
         this.navController?.handleDeepLink(intent)
     }
@@ -123,30 +133,29 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val business = (application as? PhoenixApplication)?.business
-        val daemon = business?.appConnectionsDaemon
-        if (daemon != null) {
-            tryReconnect(business, daemon)
-        }
+        tryReconnect()
     }
 
-    private fun tryReconnect(business: PhoenixBusiness, daemon: AppConnectionsDaemon) {
+    private fun tryReconnect() {
         lifecycleScope.launch {
             val isDataMigrationExpected = LegacyPrefsDatastore.getDataMigrationExpected(applicationContext).filterNotNull().first()
             if (isDataMigrationExpected) {
                 log.debug("ignoring tryReconnect when data migration is in progress")
             } else {
-                val connections = business.connectionsManager.connections.value
-                if (connections.electrum !is Connection.ESTABLISHED) {
-                    lifecycleScope.launch {
-                        log.info("resuming app with electrum conn=${connections.electrum}, forcing reconnection...")
-                        daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Electrum)
+                (application as? PhoenixApplication)?.business?.value?.let { business ->
+                    val daemon = business.appConnectionsDaemon ?: return@launch
+                    val connections = business.connectionsManager.connections.value
+                    if (connections.electrum !is Connection.ESTABLISHED) {
+                        lifecycleScope.launch {
+                            log.info("resuming app with electrum conn=${connections.electrum}, forcing reconnection...")
+                            daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Electrum)
+                        }
                     }
-                }
-                if (connections.peer !is Connection.ESTABLISHED) {
-                    lifecycleScope.launch {
-                        log.info("resuming app with peer conn=${connections.peer}, forcing reconnection...")
-                        daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
+                    if (connections.peer !is Connection.ESTABLISHED) {
+                        lifecycleScope.launch {
+                            log.info("resuming app with peer conn=${connections.peer}, forcing reconnection...")
+                            daemon.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
+                        }
                     }
                 }
             }

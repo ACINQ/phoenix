@@ -64,6 +64,8 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
         }
     }
 
+    suspend fun clear() = internalData.edit { it.clear() }
+
     val isScreenLocked: Flow<Boolean> = safeData.map { it[IS_SCREEN_LOCKED] ?: false }
     suspend fun saveIsScreenLocked(isLocked: Boolean) {
         internalData.edit { it[IS_SCREEN_LOCKED] = isLocked }

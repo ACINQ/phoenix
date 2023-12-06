@@ -51,12 +51,22 @@ import fr.acinq.phoenix.managers.Connections
 fun TopBar(
     modifier: Modifier = Modifier,
     onConnectionsStateButtonClick: () -> Unit,
-    connectionsState: Connections?,
+    connections: Connections,
     electrumBlockheight: Int,
     onTorClick: () -> Unit,
     isTorEnabled: Boolean?
 ) {
     val context = LocalContext.current
+    val connectionsTransition = rememberInfiniteTransition(label = "animateConnectionsBadge")
+    val connectionsButtonAlpha by connectionsTransition.animateFloat(
+        label = "animateConnectionsBadge",
+        initialValue = 0.3f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes { durationMillis = 500 },
+            repeatMode = RepeatMode.Reverse
+        ),
+    )
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -64,18 +74,9 @@ fun TopBar(
             .height(40.dp)
             .clipToBounds()
     ) {
-        if (connectionsState?.electrum !is Connection.ESTABLISHED || connectionsState.peer !is Connection.ESTABLISHED) {
-            val connectionsTransition = rememberInfiniteTransition()
-            val connectionsButtonAlpha by connectionsTransition.animateFloat(
-                initialValue = 0.3f,
-                targetValue = 1f,
-                animationSpec = infiniteRepeatable(
-                    animation = keyframes { durationMillis = 500 },
-                    repeatMode = RepeatMode.Reverse
-                )
-            )
-            val electrumConnection = connectionsState?.electrum
-            val isBadElectrumCert = electrumConnection != null && electrumConnection is Connection.CLOSED && electrumConnection.isBadCertificate()
+        if (connections.electrum !is Connection.ESTABLISHED || connections.peer !is Connection.ESTABLISHED) {
+            val electrumConnection = connections.electrum
+            val isBadElectrumCert = electrumConnection is Connection.CLOSED && electrumConnection.isBadCertificate()
             FilledButton(
                 text = stringResource(id = if (isBadElectrumCert) R.string.home__connection__bad_cert else R.string.home__connection__connecting),
                 icon = if (isBadElectrumCert) R.drawable.ic_alert_triangle else R.drawable.ic_connection_lost,
@@ -88,16 +89,7 @@ fun TopBar(
                 modifier = Modifier.alpha(connectionsButtonAlpha)
             )
         } else if (electrumBlockheight < 795_000) {
-            // FIXME use a dynamic blockheight
-            val connectionsTransition = rememberInfiniteTransition()
-            val connectionsButtonAlpha by connectionsTransition.animateFloat(
-                initialValue = 0.3f,
-                targetValue = 1f,
-                animationSpec = infiniteRepeatable(
-                    animation = keyframes { durationMillis = 500 },
-                    repeatMode = RepeatMode.Reverse
-                )
-            )
+            // FIXME use a dynamic blockheight ^
             FilledButton(
                 text = stringResource(id = R.string.home__connection__electrum_late),
                 icon = R.drawable.ic_alert_triangle,
@@ -110,7 +102,7 @@ fun TopBar(
                 modifier = Modifier.alpha(connectionsButtonAlpha)
             )
         } else if (isTorEnabled == true) {
-            if (connectionsState.tor is Connection.ESTABLISHED) {
+            if (connections.tor is Connection.ESTABLISHED) {
                 FilledButton(
                     text = stringResource(id = R.string.home__connection__tor_active),
                     icon = R.drawable.ic_tor_shield_ok,

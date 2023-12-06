@@ -17,7 +17,7 @@ struct FinalWalletDetails: View {
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
 	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
-	@State var blockchainExplorerTxid: String? = nil
+	@State var blockchainExplorerTxid: Bitcoin_kmpTxId? = nil
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
@@ -87,7 +87,7 @@ struct FinalWalletDetails: View {
 				ForEach(utxos) { utxo in
 					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 						
-						Text(utxo.txid)
+						Text(utxo.txid.toHex())
 							.font(.subheadline)
 							.foregroundColor(.secondary)
 							.lineLimit(1)
@@ -122,24 +122,25 @@ struct FinalWalletDetails: View {
 			isPresented: confirmationDialogBinding(),
 			titleVisibility: .automatic
 		) {
-			let txid = blockchainExplorerTxid ?? ""
-			Button {
-				exploreTx(txid, website: BlockchainExplorer.WebsiteMempoolSpace())
-			} label: {
-				Text(verbatim: "Mempool.space") // no localization needed
-					.textCase(.none)
-			}
-			Button {
-				exploreTx(txid, website: BlockchainExplorer.WebsiteBlockstreamInfo())
-			} label: {
-				Text(verbatim: "Blockstream.info") // no localization needed
-					.textCase(.none)
-			}
-			Button {
-				copyTxId(txid)
-			} label: {
-				Text("Copy transaction id")
-					.textCase(.none)
+			if let txid = blockchainExplorerTxid {
+				Button {
+					exploreTx(txid, website: BlockchainExplorer.WebsiteMempoolSpace())
+				} label: {
+					Text(verbatim: "Mempool.space") // no localization needed
+						.textCase(.none)
+				}
+				Button {
+					exploreTx(txid, website: BlockchainExplorer.WebsiteBlockstreamInfo())
+				} label: {
+					Text(verbatim: "Blockstream.info") // no localization needed
+						.textCase(.none)
+				}
+				Button {
+					copyTxId(txid)
+				} label: {
+					Text("Copy transaction id")
+						.textCase(.none)
+				}
 			}
 		} // </confirmationDialog>
 	}
@@ -203,7 +204,7 @@ struct FinalWalletDetails: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func exploreTx(_ txid: String, website: BlockchainExplorer.Website) {
+	func exploreTx(_ txid: Bitcoin_kmpTxId, website: BlockchainExplorer.Website) {
 		log.trace("exploreTX()")
 		
 		let txUrlStr = Biz.business.blockchainExplorer.txUrl(txId: txid, website: website)
@@ -212,9 +213,9 @@ struct FinalWalletDetails: View {
 		}
 	}
 	
-	func copyTxId(_ txid: String) {
+	func copyTxId(_ txid: Bitcoin_kmpTxId) {
 		log.trace("copyTxId()")
 		
-		UIPasteboard.general.string = txid
+		UIPasteboard.general.string = txid.toHex()
 	}
 }

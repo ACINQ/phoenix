@@ -21,16 +21,25 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.legacy.AppContext
 import fr.acinq.phoenix.legacy.internalData
+import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
+import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import fr.acinq.phoenix.utils.PlatformContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class PhoenixApplication : AppContext() {
-    val business by lazy { PhoenixBusiness(PlatformContext(this)) }
+
+    private val _business = MutableStateFlow<PhoenixBusiness?>(null) // by lazy { MutableStateFlow(PhoenixBusiness(PlatformContext(applicationContext))) }
+    val business = _business.asStateFlow()
+
     lateinit var internalDataRepository: InternalDataRepository
 
     override fun onCreate() {
         super.onCreate()
+        _business.value = PhoenixBusiness(PlatformContext(applicationContext))
         Logging.setupLogger(applicationContext)
         SystemNotificationHelper.registerNotificationChannels(applicationContext)
         internalDataRepository = InternalDataRepository(applicationContext.internalData)
@@ -40,5 +49,21 @@ class PhoenixApplication : AppContext() {
         applicationContext.startActivity(Intent(applicationContext, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         })
+    }
+
+    fun shutdownBusiness() {
+        log.info("business=${business.value}")
+        business.value?.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
+        business.value?.stop()
+    }
+    fun resetBusiness() {
+        _business.value = PhoenixBusiness(PlatformContext(this))
+        log.info("business=$business")
+    }
+
+    suspend fun clearPreferences() {
+        internalDataRepository.clear()
+        UserPrefs.clear(applicationContext)
+        LegacyPrefsDatastore.clear(applicationContext)
     }
 }

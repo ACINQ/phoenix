@@ -3,6 +3,13 @@ import PhoenixShared
 import CryptoKit
 
 
+extension Bitcoin_kmpTxId {
+	
+	func toHex() -> String {
+		return self.value.toHex()
+	}
+}
+
 extension Bitcoin_kmpByteVector32 {
 	
 	static func random() -> Bitcoin_kmpByteVector32 {

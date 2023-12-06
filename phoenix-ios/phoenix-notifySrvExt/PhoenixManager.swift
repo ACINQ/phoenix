@@ -94,7 +94,7 @@ class PhoenixManager {
 			if wasAlreadyUnlocked {
 				// The new instance (`UNNotificationServiceExtension`) needs to know the current connection state.
 				DispatchQueue.main.async {
-					let connections = business.connectionsManager.currentValue
+					let connections = self.business.connectionsManager.currentValue
 					self.connectionsChanged(connections)
 				}
 			}
@@ -158,9 +158,9 @@ class PhoenixManager {
 	private func unlock() {
 		log.trace("unlock()")
 		
-		let connectWithMnemonics = {(mnemonics: [String]?) in
+		let connectWithRecoveryPhrase = {(recoveryPhrase: RecoveryPhrase?) in
 			DispatchQueue.main.async {
-				self.connect(mnemonics: mnemonics)
+				self._connect(recoveryPhrase: recoveryPhrase)
 			}
 		}
 		
@@ -172,26 +172,36 @@ class PhoenixManager {
 			
 			switch diskResult {
 			case .failure(_):
-				connectWithMnemonics(nil)
+				connectWithRecoveryPhrase(nil)
 				
 			case .success(let securityFile):
 				
 				let keychainResult = SharedSecurity.shared.readKeychainEntry(securityFile)
 				switch keychainResult {
 				case .failure(_):
-					connectWithMnemonics(nil)
-				case .success(let mnemonics):
-					connectWithMnemonics(mnemonics)
-				}
-			}
+					connectWithRecoveryPhrase(nil)
+					
+				case .success(let cleartextData):
+					
+					let decodeResult = SharedSecurity.shared.decodeRecoveryPhrase(cleartextData)
+					switch decodeResult {
+					case .failure(_):
+						connectWithRecoveryPhrase(nil)
+						
+					case .success(let recoveryPhrase):
+						connectWithRecoveryPhrase(recoveryPhrase)
+						
+					} // </switch decodeResult>
+				} // </switch keychainResult>
+			} // </switch diskResult>
 		}
 	}
 	
-	private func connect(mnemonics: [String]?) {
-		log.trace("connect(mnemoncis:)")
+	private func _connect(recoveryPhrase: RecoveryPhrase?) {
+		log.trace("_connect(recoveryPhrase:)")
 		assertMainThread()
 		
-		guard let mnemonics = mnemonics else {
+		guard let recoveryPhrase = recoveryPhrase else {
 			return
 		}
 
@@ -226,7 +236,10 @@ class PhoenixManager {
 		}
 		.store(in: &cancellables)
 		
-		let seed = business.walletManager.mnemonicsToSeed(mnemonics: mnemonics, passphrase: "")
+		let seed = business.walletManager.mnemonicsToSeed(
+			mnemonics: recoveryPhrase.mnemonicsArray,
+			passphrase: ""
+		)
 		business.walletManager.loadWallet(seed: seed)
 		
 		let primaryFiatCurrency = GroupPrefs.shared.fiatCurrency

@@ -24,8 +24,13 @@ enum ReadKeychainError: Error {
 	case errorReadingKey(underlying: Error)
 	case keyNotFound
 	case errorOpeningBox(underlying: Error)
-	case invalidMnemonics
 }
+
+enum ReadRecoveryPhraseError: Error {
+	case invalidCiphertext
+	case invalidJSON
+}
+
 
 /// Encompasses security operations shared between phoenix & phoenix-notifySrvExt
 ///
@@ -98,7 +103,7 @@ class SharedSecurity {
 	// MARK: Keychain
 	// --------------------------------------------------------------------------------
 	
-	func readKeychainEntry(_ securityFile: SecurityFile) -> Result<[String], ReadKeychainError> {
+	public func readKeychainEntry(_ securityFile: SecurityFile) -> Result<Data, ReadKeychainError> {
 		
 		// The securityFile tells us which security options have been enabled.
 		// If there isn't a keychain entry, then we cannot unlock the seed.
@@ -134,20 +139,50 @@ class SharedSecurity {
 		}
 		
 		// Decrypt the databaseKey using the lockingKey
-		let mnemonicsData: Data
+		let cleartextData: Data
 		do {
-			mnemonicsData = try ChaChaPoly.open(sealedBox, using: lockingKey)
+			cleartextData = try ChaChaPoly.open(sealedBox, using: lockingKey)
 		} catch {
 			log.error("readKeychainEntry(): error: openingBox: \(String(describing: error))")
 			return .failure(.errorOpeningBox(underlying: error))
 		}
 		
-		guard let mnemonicsString = String(data: mnemonicsData, encoding: .utf8) else {
-			log.error("readKeychainEntry(): error: invalidMnemonics")
-			return .failure(.invalidMnemonics)
+		return .success(cleartextData)
+	}
+	
+	// --------------------------------------------------------------------------------
+	// MARK: Recovery Phrase
+	// --------------------------------------------------------------------------------
+	
+	public func decodeRecoveryPhrase(_ cleartextData: Data) -> Result<RecoveryPhrase, ReadRecoveryPhraseError> {
+		
+		guard let cleartextString = String(data: cleartextData, encoding: .utf8) else {
+			log.error("decodeRecoveryPhrase(): error: invalid ciphertext")
+			return .failure(.invalidCiphertext)
 		}
 		
-		let mnemonics = mnemonicsString.split(separator: " ").map { String($0) }
-		return .success(mnemonics)
+		// Version 1:
+		// - cleartextString is mnemonicString
+		// - language is english
+		//
+		// Version 2:
+		// - cleartextString is JSON-encoded RecoveryPhrase
+		
+		let result: RecoveryPhrase
+		if cleartextString.starts(with: "{") {
+			
+			do {
+				result = try JSONDecoder().decode(RecoveryPhrase.self, from: cleartextData)
+			} catch {
+				log.error("decodeRecoveryPhrase(): error: invalid json")
+				return .failure(.invalidJSON)
+			}
+			
+		} else {
+			
+			result = RecoveryPhrase(mnemonics: cleartextString)
+		}
+		
+		return .success(result)
 	}
 }

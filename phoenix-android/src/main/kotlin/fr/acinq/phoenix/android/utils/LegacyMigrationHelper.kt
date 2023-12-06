@@ -51,11 +51,14 @@ import fr.acinq.phoenix.legacy.utils.Prefs
 import fr.acinq.phoenix.legacy.utils.ThemeHelper
 import fr.acinq.phoenix.legacy.utils.Wallet
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConversions
 import scala.collection.JavaConverters
 import scala.collection.Seq
+
 
 object LegacyMigrationHelper {
 
@@ -68,7 +71,7 @@ object LegacyMigrationHelper {
     ) {
         log.info("started migrating legacy user preferences")
 
-        val (business, internalData) = (context as PhoenixApplication).run { business to internalDataRepository }
+        val (business, internalData) = (context as PhoenixApplication).run { business.filterNotNull().first() to internalDataRepository }
         val appConfigurationManager = business.appConfigurationManager
 
         // -- utils
@@ -158,7 +161,7 @@ object LegacyMigrationHelper {
         log.info("opened legacy payments db")
 
         // 2 - get the new payments database
-        val business = (context as PhoenixApplication).business
+        val business = (context as PhoenixApplication).business.filterNotNull().first()
         val newPaymentsDb = business.databaseManager.paymentsDb()
 
         // 3 - extract all outgoing payments from the legacy database, and save them to the new database

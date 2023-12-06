@@ -224,13 +224,13 @@ struct LockView: View {
 		}
 		biometricsAttemptInProgress = true
 		
-		AppSecurity.shared.tryUnlockWithBiometrics {(result: Result<[String], Error>) in
+		AppSecurity.shared.tryUnlockWithBiometrics {(result: Result<RecoveryPhrase, Error>) in
 			
 			biometricsAttemptInProgress = false
 			
 			switch result {
-				case .success(let mnemonics):
-					Biz.loadWallet(mnemonics: mnemonics)
+				case .success(let recoveryPhrase):
+					Biz.loadWallet(recoveryPhrase: recoveryPhrase)
 					withAnimation(.easeInOut) {
 						lockState.isUnlocked = true
 					}

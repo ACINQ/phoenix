@@ -39,6 +39,8 @@ object LegacyPrefsDatastore {
     }
   }
 
+  suspend fun clear(context: Context) = context.legacyPrefs.edit { it.clear() }
+
   private val LEGACY_APP_STATUS = stringPreferencesKey("LEGACY_APP_STATUS")
   fun getLegacyAppStatus(context: Context): Flow<LegacyAppStatus> = prefs(context).map {
     when (it[LEGACY_APP_STATUS]) {
