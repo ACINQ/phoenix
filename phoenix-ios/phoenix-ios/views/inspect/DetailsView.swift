@@ -716,12 +716,12 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 						titleVisibility: .automatic
 					) {
 						Button {
-							exploreTx(txIdStr, website: BlockchainExplorer.WebsiteMempoolSpace())
+							exploreTx(txId, website: BlockchainExplorer.WebsiteMempoolSpace())
 						} label: {
 							Text(verbatim: "Mempool.space") // no localization needed
 						}
 						Button {
-							exploreTx(txIdStr, website: BlockchainExplorer.WebsiteBlockstreamInfo())
+							exploreTx(txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
 						} label: {
 							Text(verbatim: "Blockstream.info") // no localization needed
 						}
@@ -1580,7 +1580,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		return nil
 	}
 	
-	func txId(receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> Bitcoin_kmpByteVector32? {
+	func txId(receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> Bitcoin_kmpTxId? {
 		
 		if let newChannel = receivedWith.asNewChannel() {
 			
@@ -1615,7 +1615,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func exploreTx(_ txId: String, website: BlockchainExplorer.Website) {
+	func exploreTx(_ txId: Bitcoin_kmpTxId, website: BlockchainExplorer.Website) {
 		log.trace("exploreTX()")
 		
 		let txUrlStr = Biz.business.blockchainExplorer.txUrl(txId: txId, website: website)
