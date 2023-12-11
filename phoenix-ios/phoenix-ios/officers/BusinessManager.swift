@@ -200,7 +200,13 @@ class BusinessManager {
 			
 				Task { @MainActor in
 					do {
+						log.debug("invoking peerManager.updatePeerLiquidityPolicy()...")
 						try await self.business.peerManager.updatePeerLiquidityPolicy(newPolicy: policy.toKotlin())
+						
+						if self.swapInRejectedPublisher.value != nil {
+							log.debug("Received updated liquidityPolicy: clearing swapInRejectedPublisher")
+							self.swapInRejectedPublisher.value = nil
+						}
 					} catch {
 						log.error("Error: biz.peerManager.updatePeerLiquidityPolicy: \(error)")
 					}
@@ -250,7 +256,7 @@ class BusinessManager {
 				
 				if wallet.deeplyConfirmedBalance.sat == 0 {
 					if self.swapInRejectedPublisher.value != nil {
-						log.debug("Received Lightning_kmpLiquidityEventsAccepted")
+						log.debug("Received Lightning_kmpLiquidityEventsAccepted: clearing swapInRejectedPublisher")
 						self.swapInRejectedPublisher.value = nil
 					}
 				}
