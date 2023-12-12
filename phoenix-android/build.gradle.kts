@@ -25,7 +25,7 @@ android {
         minSdk = 26
         targetSdk = 33
         versionCode = 70
-        versionName = gitCommitHash()
+        versionName = "2.0.15"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR"))
     }
