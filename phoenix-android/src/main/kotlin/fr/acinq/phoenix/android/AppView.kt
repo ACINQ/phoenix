@@ -93,6 +93,8 @@ import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.utils.extensions.id
+import io.ktor.http.decodeURLPart
+import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import org.kodein.memory.util.currentTimestampMillis
@@ -169,8 +171,8 @@ fun AppView(
                         navArgument("next") { type = NavType.StringType; nullable = true }
                     ),
                 ) {
-                    val nextScreenLink = it.arguments?.getString("next")
-                    log.debug { "navigating to startup with next=$nextScreenLink" }
+                    val intent = it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
+                    val nextScreenLink = intent?.data?.getQueryParameter("next")?.decodeURLPart()
                     StartupView(
                         appVM = appVM,
                         onShowIntro = { navController.navigate(Screen.Intro.route) },
@@ -178,8 +180,10 @@ fun AppView(
                         onBusinessStarted = {
                             val next = nextScreenLink?.takeUnless { it.isBlank() }?.let { Uri.parse(it) }
                             if (next == null || !navController.graph.hasDeepLink(next)) {
+                                log.debug { "redirecting from startup to home" }
                                 popToHome(navController)
                             } else {
+                                log.debug { "redirecting from startup to $next" }
                                 navController.navigate(next, navOptions = navOptions {
                                     popUpTo(navController.graph.id) { inclusive = true }
                                 })
@@ -240,8 +244,13 @@ fun AppView(
                 ) {
                     val intent = it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
                     RequireStarted(walletState, nextUri = "scanview:${intent?.data?.toString()}") {
+                        val input = intent?.data?.toString()?.substringAfter("scanview:")?.takeIf {
+                            // prevents forwarding an internal deeplink intent coming from androidx-navigation framework.
+                            // TODO properly parse deeplinks following f0ae90444a23cc17d6d7407dfe43c0c8d20e62fc
+                            !it.contains("androidx.navigation")
+                        }
                         ScanDataView(
-                            input = intent?.data?.toString()?.substringAfter("scanview:"),
+                            input = input,
                             onBackClick = { popToHome(navController) },
                             onAuthSchemeInfoClick = { navController.navigate("${Screen.PaymentSettings.route}/true") }
                         )
@@ -515,9 +524,8 @@ private fun RequireStarted(
     if (serviceState == null) {
         // do nothing
     } else if (serviceState !is NodeServiceState.Running) {
-        log.debug { "access to screen has been denied (state=${serviceState.name})" }
         val nc = navController
-        nc.navigate("${Screen.Startup.route}?next=$nextUri") {
+        nc.navigate("${Screen.Startup.route}?next=${nextUri?.encodeURLParameter()}") {
             popUpTo(nc.graph.id) { inclusive = true }
         }
     } else {
