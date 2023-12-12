@@ -64,6 +64,7 @@ fun AdvancedIncomingFeePolicy(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val peerManager = business.peerManager
+    val notificationsManager = business.notificationsManager
 
     val maxSatFeePrefsFlow = UserPrefs.getIncomingMaxSatFeeInternal(context).collectAsState(null)
     val maxPropFeePrefsFlow = UserPrefs.getIncomingMaxPropFeeInternal(context).collectAsState(null)
@@ -129,6 +130,7 @@ fun AdvancedIncomingFeePolicy(
                                 newPolicy?.let {
                                     UserPrefs.saveLiquidityPolicy(context, newPolicy)
                                     peerManager.updatePeerLiquidityPolicy(newPolicy)
+                                    notificationsManager.dismissAllNotifications()
                                 }
                             }
                         },
