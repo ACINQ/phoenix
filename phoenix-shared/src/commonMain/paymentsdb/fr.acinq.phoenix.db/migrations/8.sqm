@@ -1,0 +1,18 @@
+import fr.acinq.phoenix.db.payments.InboundLiquidityLeaseTypeVersion;
+
+-- Migration: v8 -> v9
+--
+-- Changes:
+-- * add a new inbound_liquidity_outgoing_payments table to store inbound liquidity payments
+
+CREATE TABLE IF NOT EXISTS inbound_liquidity_outgoing_payments (
+    id TEXT NOT NULL PRIMARY KEY,
+    mining_fees_sat INTEGER NOT NULL,
+    channel_id BLOB NOT NULL,
+    tx_id BLOB NOT NULL,
+    lease_type TEXT AS InboundLiquidityLeaseTypeVersion NOT NULL,
+    lease_blob BLOB NOT NULL,
+    created_at INTEGER NOT NULL,
+    confirmed_at INTEGER DEFAULT NULL,
+    locked_at INTEGER DEFAULT NULL
+);
