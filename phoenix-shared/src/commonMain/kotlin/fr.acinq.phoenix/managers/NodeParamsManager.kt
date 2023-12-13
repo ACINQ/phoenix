@@ -84,7 +84,7 @@ class NodeParamsManager(
         val defaultLiquidityPolicy = LiquidityPolicy.Auto(maxAbsoluteFee = 5_000.sat, maxRelativeFeeBasisPoints = 50_00 /* 50% */, skipAbsoluteFeeCheck = false)
         val liquidityLeaseRate = LiquidityAds.LeaseRate(
             leaseDuration = 0,
-            fundingWeight = 609, // 1-input (wpkh)/2-outputs (wpkh+wsh)
+            fundingWeight = 271 * 2, // 2-inputs (wpkh)/ 0-change
             leaseFeeProportional = 100, // 1%
             leaseFeeBase = 0.sat,
             maxRelayFeeProportional = 100,
