@@ -31,7 +31,7 @@ fun WalletPayment.id(): String = when (this) {
 fun WalletPayment.state(): WalletPaymentState = when (this) {
     is InboundLiquidityOutgoingPayment -> when (lockedAt) {
         null -> WalletPaymentState.PendingOnChain
-        else -> WalletPaymentState.SuccessOffChain
+        else -> WalletPaymentState.SuccessOnChain
     }
     is OnChainOutgoingPayment -> when (confirmedAt) {
         null -> WalletPaymentState.PendingOnChain
