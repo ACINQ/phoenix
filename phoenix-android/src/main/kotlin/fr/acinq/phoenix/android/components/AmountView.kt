@@ -34,6 +34,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
@@ -148,7 +149,7 @@ fun AmountWithAltView(
 fun ColumnScope.AmountWithFiatBelow(
     amount: MilliSatoshi,
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
-    fiatTextStyle: TextStyle = MaterialTheme.typography.caption,
+    fiatTextStyle: TextStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
 ) {
     val prefBtcUnit = LocalBitcoinUnit.current
     val prefFiatCurrency = LocalFiatCurrency.current
@@ -160,6 +161,30 @@ fun ColumnScope.AmountWithFiatBelow(
         text = stringResource(id = R.string.utils_converted_amount, amount.toPrettyString(prefFiatCurrency, fiatRate, withUnit = true)),
         style = fiatTextStyle,
     )
+}
+
+/** Outputs a column with the amount in bitcoin on top, and the fiat amount below. */
+@Composable
+fun AmountWithFiatBeside(
+    amount: MilliSatoshi,
+    amountTextStyle: TextStyle = MaterialTheme.typography.body1,
+    fiatTextStyle: TextStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+) {
+    val prefBtcUnit = LocalBitcoinUnit.current
+    val prefFiatCurrency = LocalFiatCurrency.current
+    Row {
+        Text(
+            text = amount.toPrettyString(prefBtcUnit, withUnit = true),
+            style = amountTextStyle,
+            modifier = Modifier.alignByBaseline(),
+        )
+        Spacer(modifier = Modifier.width(6.dp))
+        Text(
+            text = stringResource(id = R.string.utils_converted_amount, amount.toPrettyString(prefFiatCurrency, fiatRate, withUnit = true)),
+            style = fiatTextStyle,
+            modifier = Modifier.alignByBaseline(),
+        )
+    }
 }
 
 /** Outputs a row with the amount in bitcoin on the left, and the fiat amount on the right. */

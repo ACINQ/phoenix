@@ -210,6 +210,12 @@
     <string name="paymentdetails_funding_fees_desc">Fees paid to the Bitcoin network miners to process the on-chain transaction.</string>
     <string name="paymentdetails_service_fees_label">Service fees</string>
     <string name="paymentdetails_service_fees_desc">Fees paid for the creation of a new payment channel. This is not always required.</string>
+    <string name="paymentdetails_liquidity_service_fee_label">Service fees</string>
+    <string name="paymentdetails_liquidity_service_fee_help">Fees paid to the Bitcoin network miners to process the on-chain transaction.</string>
+    <string name="paymentdetails_liquidity_miner_fee_label">Miner fees</string>
+    <string name="paymentdetails_liquidity_miner_fee_help">Fees paid for the liquidity service.</string>
+    <string name="paymentdetails_liquidity_lease_duration_label">Duration</string>
+    <string name="paymentdetails_liquidity_lease_duration_value">1 year</string>
 
     <!-- lnurl -->
 
@@ -294,6 +300,7 @@
     <string name="liquiditypolicy_advanced_pay_to_open_label">Skip absolute fee check for Lightning</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">When enabled, incoming Lightning payments will ignore the absolute max fee limit. Only the percentage check will apply.\n\nAttention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive.</string>
     <string name="liquiditypolicy_save_button">Save policy</string>
+    <string name="liquiditypolicy_request_button">Request inbound liquidity</string>
 
     <string name="liquiditypolicy_help">
       Phoenix allows you to receive payments on Bitcoin\'s blockchain (L1) and Bitcoin\'s Lightning layer (L2).
@@ -306,6 +313,32 @@
       \n\n
       Payments you receive on L2 can be received instantly and for zero fees. However, occasionally an L1 operation is also required in order to manage the L2 payment channel. This can be done automatically <b>IF</b> the miner fees adhere to your configured fee policy.
     </string>
+
+    <!-- settings: liquidity request -->
+
+    <string name="liquidityads_title">Request inbound liquidity</string>
+    <string name="liquidityads_instructions">Inbound liquidity lets you avoid on-chain transactions fees for future payments received over Lightning.\n\nBy requesting more liquidity now, you can save fees later.</string>
+    <string name="liquidityads_current_liquidity">Current liquidity: </string>
+
+    <string name="liquidityads_amount_label">Liquidity</string>
+    <string name="liquidityads_estimate_button">Estimate liquidity cost</string>
+    <string name="liquidityads_estimating_spinner">Estimating cost…</string>
+    <string name="liquidityads_estimate_details_miner_fees">Miner fee</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">This fee goes to Bitcoin miners to process the transaction.\n\nThis fee is an estimation, using a feerate of %1$d sat/vbyte.</string>
+    <string name="liquidityads_estimate_details_service_fees">Service fee</string>
+    <string name="liquidityads_estimate_details_service_fees_help">This fee goes to the service providing the liquidity.</string>
+    <string name="liquidityads_estimate_details_duration">Duration</string>
+    <string name="liquidityads_estimate_details_duration_value">1 year</string>
+    <string name="liquidityads_estimate_details_duration_help">The additional capacity will be preserved for that duration.</string>
+    <string name="liquidityads_estimate_above_25">The total fee is more than 25% of the amount requested.</string>
+
+    <string name="liquidityads_request_button">Accept</string>
+    <string name="liquidityads_requesting_spinner">Processing splice…</string>
+
+    <string name="liquidityads_success">Liquidity successfully added!</string>
+
+    <string name="liquidityads_error_header">Liquidity request has failed</string>
+    <string name="liquidityads_error_channels_unavailable">Channels are not available. Try again later.</string>
 
     <!-- payment line -->
 

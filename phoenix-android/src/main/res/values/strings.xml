@@ -247,8 +247,12 @@
 
     <string name="channelsview_title">Payment channels</string>
     <string name="channelsview_menu_import_channels">Import channels</string>
+    <string name="channelsview_header">Overview</string>
     <string name="channelsview_balance">Balance</string>
     <string name="channelsview_balance_about">This is the aggregated balance of your active channels. It\'s what you can spend over Lightning.</string>
+    <string name="channelsview_inbound">Inbound liquidity</string>
+    <string name="channelsview_inbound_about">This is what your channels can receive over Lightning without having to pay on-chain fees.</string>
+    <string name="channelsview_inbound_request_button">Request liquidity</string>
     <string name="channelsview_loading_channels">Loading channel data…</string>
     <string name="channelsview_no_channels">You don\'t have any channels yet.\n\nA new payment channel will be created automatically when needed.</string>
 
@@ -259,6 +263,7 @@
     <string name="channeldetails_channel_id">Channel id</string>
     <string name="channeldetails_state">State</string>
     <string name="channeldetails_spendable">Balance</string>
+    <string name="channeldetails_receivable">Inbound liquidity</string>
 
     <string name="channeldetails_commitments">Active commitments</string>
     <string name="channeldetails_inactive_commitments">Inactive commitments</string>
@@ -300,6 +305,7 @@
     <string name="home__connection__bad_cert">Electrum certificate</string>
     <string name="home__connection__connecting">Connecting…</string>
     <string name="home__connection__tor_active">Tor enabled</string>
+    <string name="home_request_liquidity">Liquidity</string>
 
     <!-- in-app notifications -->
 
@@ -334,6 +340,7 @@
     <string name="paymentdetails_loading">Loading payment details…</string>
     <string name="paymentdetails_error">Could not find payment details</string>
 
+    <string name="paymentdetails_status_inbound_liquidity_success"><b>LIQUIDITY ADDED</b> %1$s</string>
     <string name="paymentdetails_status_channelclose_confirmed"><b>COMPLETE</b> %1$s</string>
     <string name="paymentdetails_status_sent_successful"><b>SENT</b> %1$s</string>
     <string name="paymentdetails_status_sent_pending">Pending…</string>
@@ -375,6 +382,7 @@
     <string name="paymentdetails_desc_closing_channel">Closing channel</string>
     <string name="paymentdetails_desc_legacy_migration">Migration from legacy app</string>
     <string name="paymentdetails_desc_cpfp">Bump transactions</string>
+    <string name="paymentdetails_desc_inbound_liquidity">+%1$s inbound liquidity</string>
     <string name="paymentdetails_desc_keysend">Donation</string>
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>
     <string name="paymentdetails_desc_swapin">On-chain deposit</string>
@@ -398,6 +406,7 @@
     <string name="paymentdetails_closing">Channel closing payment</string>
     <string name="paymentdetails_splice_outgoing">Outgoing splice payment</string>
     <string name="paymentdetails_splice_cpfp_outgoing">Accelerate on-chain transactions</string>
+    <string name="paymentdetails_inbound_liquidity">Request inbound liquidity</string>
     <string name="paymentdetails_normal_outgoing">Standard outgoing Lightning payment</string>
     <string name="paymentdetails_normal_incoming">Standard incoming Lightning payment</string>
     <string name="paymentdetails_swapin">Swap-in Bitcoin deposit</string>
@@ -413,6 +422,9 @@
     <string name="paymentdetails_splice_out_tx_label">Splice transaction</string>
     <string name="paymentdetails_dualswapin_tx_label">Transactions</string>
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
+
+    <string name="paymentdetails_liquidity_amount_label">Liquidity amount</string>
+    <string name="paymentdetails_liquidity_signature_label">Liquidity request details</string>
 
     <string name="paymentdetails_closing_channel_label">Closing channel</string>
     <string name="paymentdetails_closing_address_label">Closing address</string>
@@ -777,6 +789,7 @@
     <string name="splice_error_interactive_session">Interactive tx session failed [%1$s]</string>
     <string name="splice_error_invalid_pubkey">Invalid splice-out pubkey script</string>
     <string name="splice_error_splice_in_progress">A splice payment is already in progress</string>
+    <string name="splice_error_invalid_liquidity_ads">Invalid liquidity-ads request: [%1$s]</string>
 
     <!-- reset wallet -->
 

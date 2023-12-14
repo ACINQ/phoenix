@@ -78,6 +78,7 @@ import fr.acinq.phoenix.android.settings.channels.ImportChannelsData
 import fr.acinq.phoenix.android.settings.displayseed.DisplaySeedView
 import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
 import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
+import fr.acinq.phoenix.android.payments.liquidity.RequestLiquidityView
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
@@ -219,7 +220,8 @@ fun AppView(
                             onTorClick = { navController.navigate(Screen.TorConfig) },
                             onElectrumClick = { navController.navigate(Screen.ElectrumServer) },
                             onShowSwapInWallet = { navController.navigate(Screen.WalletInfo.SwapInWallet) },
-                            onShowNotifications = { navController.navigate(Screen.Notifications) }
+                            onShowNotifications = { navController.navigate(Screen.Notifications) },
+                            onRequestLiquidityClick = { navController.navigate(Screen.LiquidityRequest.route) },
                         )
                     }
                 }
@@ -322,7 +324,7 @@ fun AppView(
                             }
                         },
                         onChannelClick = { navController.navigate("${Screen.ChannelDetails.route}?id=$it") },
-                        onImportChannelsDataClick = { navController.navigate(Screen.ImportChannelsData)}
+                        onImportChannelsDataClick = { navController.navigate(Screen.ImportChannelsData)},
                     )
                 }
                 composable(
@@ -394,8 +396,12 @@ fun AppView(
                 composable(Screen.LiquidityPolicy.route, deepLinks = listOf(navDeepLink { uriPattern ="phoenix:liquiditypolicy" })) {
                     LiquidityPolicyView(
                         onBackClick = { navController.popBackStack() },
-                        onAdvancedClick = { navController.navigate(Screen.AdvancedLiquidityPolicy.route) }
+                        onAdvancedClick = { navController.navigate(Screen.AdvancedLiquidityPolicy.route) },
+                        onRequestLiquidityClick = { navController.navigate(Screen.LiquidityRequest.route) },
                     )
+                }
+                composable(Screen.LiquidityRequest.route, deepLinks = listOf(navDeepLink { uriPattern ="phoenix:requestliquidity" })) {
+                    RequestLiquidityView(onBackClick = { navController.popBackStack() },)
                 }
                 composable(Screen.AdvancedLiquidityPolicy.route) {
                     AdvancedIncomingFeePolicy(onBackClick = { navController.popBackStack() })

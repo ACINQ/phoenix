@@ -77,6 +77,7 @@ fun HomeView(
     onElectrumClick: () -> Unit,
     onShowSwapInWallet: () -> Unit,
     onShowNotifications: () -> Unit,
+    onRequestLiquidityClick: () -> Unit,
 ) {
     val log = logger("HomeView")
     val context = LocalContext.current
@@ -216,7 +217,8 @@ fun HomeView(
                     connections = connections,
                     electrumBlockheight = electrumMessages?.blockHeight ?: 0,
                     isTorEnabled = torEnabledState.value,
-                    onTorClick = onTorClick
+                    onTorClick = onTorClick,
+                    onRequestLiquidityClick = onRequestLiquidityClick,
                 )
                 HomeBalance(
                     modifier = Modifier.layoutId("balance"),

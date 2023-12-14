@@ -199,18 +199,7 @@ fun SendSpliceOutView(
                 Spacer(modifier = Modifier.height(24.dp))
                 ErrorMessage(
                     header = stringResource(id = R.string.send_spliceout_error_failure),
-                    details = when (state.result) {
-                        is ChannelCommand.Commitment.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, state.result.reason)
-                        is ChannelCommand.Commitment.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
-                        is ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotIdle -> stringResource(id = R.string.splice_error_channel_not_idle)
-                        is ChannelCommand.Commitment.Splice.Response.Failure.Disconnected -> stringResource(id = R.string.splice_error_disconnected)
-                        is ChannelCommand.Commitment.Splice.Response.Failure.FundingFailure -> stringResource(id = R.string.splice_error_funding_error, state.result.reason.javaClass.simpleName)
-                        is ChannelCommand.Commitment.Splice.Response.Failure.InsufficientFunds -> stringResource(id = R.string.splice_error_insufficient_funds)
-                        is ChannelCommand.Commitment.Splice.Response.Failure.CannotStartSession -> stringResource(id = R.string.splice_error_cannot_start_session)
-                        is ChannelCommand.Commitment.Splice.Response.Failure.InteractiveTxSessionFailed -> stringResource(id = R.string.splice_error_interactive_session, state.result.reason.javaClass.simpleName)
-                        is ChannelCommand.Commitment.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> stringResource(id = R.string.splice_error_invalid_pubkey)
-                        is ChannelCommand.Commitment.Splice.Response.Failure.SpliceAlreadyInProgress -> stringResource(id = R.string.splice_error_splice_in_progress)
-                    },
+                    details = spliceFailureDetails(spliceFailure = state.result),
                     alignment = Alignment.CenterHorizontally
                 )
             }
@@ -235,4 +224,19 @@ private fun SpliceOutFeeSummaryView(
         AmountWithFiatBelow(amount = total.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
     }
     // TODO: show a warning if the fee is too large
+}
+
+@Composable
+fun spliceFailureDetails(spliceFailure: ChannelCommand.Commitment.Splice.Response.Failure): String = when (spliceFailure) {
+    is ChannelCommand.Commitment.Splice.Response.Failure.AbortedByPeer -> stringResource(id = R.string.splice_error_aborted_by_peer, spliceFailure.reason)
+    is ChannelCommand.Commitment.Splice.Response.Failure.CannotCreateCommitTx -> stringResource(id = R.string.splice_error_cannot_create_commit)
+    is ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotIdle -> stringResource(id = R.string.splice_error_channel_not_idle)
+    is ChannelCommand.Commitment.Splice.Response.Failure.Disconnected -> stringResource(id = R.string.splice_error_disconnected)
+    is ChannelCommand.Commitment.Splice.Response.Failure.FundingFailure -> stringResource(id = R.string.splice_error_funding_error, spliceFailure.reason.javaClass.simpleName)
+    is ChannelCommand.Commitment.Splice.Response.Failure.InsufficientFunds -> stringResource(id = R.string.splice_error_insufficient_funds)
+    is ChannelCommand.Commitment.Splice.Response.Failure.CannotStartSession -> stringResource(id = R.string.splice_error_cannot_start_session)
+    is ChannelCommand.Commitment.Splice.Response.Failure.InteractiveTxSessionFailed -> stringResource(id = R.string.splice_error_interactive_session, spliceFailure.reason.javaClass.simpleName)
+    is ChannelCommand.Commitment.Splice.Response.Failure.InvalidSpliceOutPubKeyScript -> stringResource(id = R.string.splice_error_invalid_pubkey)
+    is ChannelCommand.Commitment.Splice.Response.Failure.SpliceAlreadyInProgress -> stringResource(id = R.string.splice_error_splice_in_progress)
+    is ChannelCommand.Commitment.Splice.Response.Failure.InvalidLiquidityAds -> stringResource(id = R.string.splice_error_invalid_liquidity_ads, spliceFailure.reason.details())
 }
