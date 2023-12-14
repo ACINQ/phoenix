@@ -20,7 +20,9 @@ import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.NodeUri
 import fr.acinq.lightning.payment.LiquidityPolicy
+import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.shared.BuildVersions
 import kotlinx.coroutines.CoroutineScope
@@ -80,6 +82,13 @@ class NodeParamsManager(
         val trampolineNodeUri = NodeUri(id = trampolineNodeId, "13.248.222.197", 9735)
         const val remoteSwapInXpub = "tpubDAmCFB21J9ExKBRPDcVxSvGs9jtcf8U1wWWbS1xTYmnUsuUHPCoFdCnEGxLE3THSWcQE48GHJnyz8XPbYUivBMbLSMBifFd3G9KmafkM9og"
         val defaultLiquidityPolicy = LiquidityPolicy.Auto(maxAbsoluteFee = 5_000.sat, maxRelativeFeeBasisPoints = 50_00 /* 50% */, skipAbsoluteFeeCheck = false)
-        const val swapInConfirmations = 3
+        val liquidityLeaseRate = LiquidityAds.LeaseRate(
+            leaseDuration = 0,
+            fundingWeight = 271 * 2, // 2-inputs (wpkh)/ 0-change
+            leaseFeeProportional = 100, // 1%
+            leaseFeeBase = 0.sat,
+            maxRelayFeeProportional = 100,
+            maxRelayFeeBase = 1_000.msat
+        )
     }
 }

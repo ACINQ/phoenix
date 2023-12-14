@@ -78,6 +78,9 @@ class SqlitePaymentsDb(
         ),
         channel_close_outgoing_paymentsAdapter = Channel_close_outgoing_payments.Adapter(
             closing_info_typeAdapter = EnumColumnAdapter()
+        ),
+        inbound_liquidity_outgoing_paymentsAdapter = Inbound_liquidity_outgoing_payments.Adapter(
+            lease_typeAdapter = EnumColumnAdapter()
         )
     )
 
@@ -89,6 +92,7 @@ class SqlitePaymentsDb(
     private val aggrQueries = database.aggregatedQueriesQueries
     private val metaQueries = MetadataQueries(database)
     private val linkTxToPaymentQueries = LinkTxToPaymentQueries(database)
+    private val inboundLiquidityQueries = InboundLiquidityQueries(database)
 
     private val cloudKitDb = makeCloudKitDb(database)
 
@@ -135,6 +139,10 @@ class SqlitePaymentsDb(
                     }
                     is SpliceCpfpOutgoingPayment -> {
                         cpfpQueries.addCpfpPayment(outgoingPayment)
+                        linkTxToPaymentQueries.linkTxToPayment(outgoingPayment.txId, outgoingPayment.walletPaymentId())
+                    }
+                    is InboundLiquidityOutgoingPayment -> {
+                        inboundLiquidityQueries.add(outgoingPayment)
                         linkTxToPaymentQueries.linkTxToPayment(outgoingPayment.txId, outgoingPayment.walletPaymentId())
                     }
                 }
@@ -263,6 +271,18 @@ class SqlitePaymentsDb(
         }
     }
 
+    suspend fun getInboundLiquidityOutgoingPayment(
+        id: UUID,
+        options: WalletPaymentFetchOptions
+    ): Pair<InboundLiquidityOutgoingPayment, WalletPaymentMetadata?>? = withContext(Dispatchers.Default) {
+        database.transactionWithResult {
+            inboundLiquidityQueries.get(id)?.let {
+                val metadata = metaQueries.getMetadata(id = it.walletPaymentId(), options)
+                it to metadata
+            }
+        }
+    }
+
     // ---- list outgoing
 
     override suspend fun listLightningOutgoingPayments(
@@ -331,6 +351,9 @@ class SqlitePaymentsDb(
                     is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> {
                         cpfpQueries.setLocked(walletPaymentId.id, lockedAt)
                     }
+                    is WalletPaymentId.InboundLiquidityOutgoingPaymentId -> {
+                        inboundLiquidityQueries.setLocked(walletPaymentId.id, lockedAt)
+                    }
                 }
             }
         }
@@ -357,6 +380,9 @@ class SqlitePaymentsDb(
                     is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> {
                         cpfpQueries.setConfirmed(walletPaymentId.id, confirmedAt)
                     }
+                    is WalletPaymentId.InboundLiquidityOutgoingPaymentId -> {
+                        inboundLiquidityQueries.setConfirmed(walletPaymentId.id, confirmedAt)
+                    }
                 }
             }
         }
@@ -377,6 +403,7 @@ class SqlitePaymentsDb(
                     is WalletPaymentId.ChannelCloseOutgoingPaymentId -> channelCloseQueries.getChannelCloseOutgoingPayment(it.id)
                     is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> cpfpQueries.getCpfp(it.id)
                     is WalletPaymentId.SpliceOutgoingPaymentId -> spliceOutQueries.getSpliceOutPayment(it.id)
+                    is WalletPaymentId.InboundLiquidityOutgoingPaymentId -> inboundLiquidityQueries.get(it.id)
                 }
             }
         }
@@ -614,6 +641,9 @@ class SqlitePaymentsDb(
                         id = paymentId.dbId
                     )
                 }
+                is WalletPaymentId.InboundLiquidityOutgoingPaymentId -> {
+                    database.inboundLiquidityOutgoingQueries.delete(id = paymentId.dbId)
+                }
             }
             didDeleteWalletPayment(paymentId, database)
         }
@@ -641,6 +671,7 @@ class SqlitePaymentsDb(
                 WalletPaymentId.DbType.SPLICE_OUTGOING.value -> WalletPaymentId.SpliceOutgoingPaymentId.fromString(id)
                 WalletPaymentId.DbType.CHANNEL_CLOSE_OUTGOING.value -> WalletPaymentId.ChannelCloseOutgoingPaymentId.fromString(id)
                 WalletPaymentId.DbType.SPLICE_CPFP_OUTGOING.value -> WalletPaymentId.SpliceCpfpOutgoingPaymentId.fromString(id)
+                WalletPaymentId.DbType.INBOUND_LIQUIDITY_OUTGOING.value -> WalletPaymentId.InboundLiquidityOutgoingPaymentId.fromString(id)
                 else -> throw UnhandledPaymentType(type)
             }
             return WalletPaymentOrderRow(

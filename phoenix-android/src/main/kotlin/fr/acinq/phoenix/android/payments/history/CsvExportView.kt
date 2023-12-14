@@ -20,6 +20,7 @@ import android.text.format.DateUtils
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,6 +32,7 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.utils.Converter.toBasicAbsoluteDateString
+import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.android.utils.shareFile
@@ -140,21 +142,30 @@ fun CsvExportView(
                         iconTint = positiveColor,
                         modifier = Modifier.padding(16.dp)
                     )
+                    val subject = remember {
+                        context.getString(
+                            R.string.payments_export_share_subject,
+                            startTimestamp?.toBasicAbsoluteDateString() ?: "N/A", endTimestamp.toBasicAbsoluteDateString()
+                        )
+                    }
+                    Button(
+                        text = stringResource(id = R.string.btn_copy),
+                        icon = R.drawable.ic_copy,
+                        onClick = { copyToClipboard(context, data = state.content, dataLabel = subject) },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                     Button(
                         text = stringResource(R.string.payments_export_share_button),
                         icon = R.drawable.ic_share,
                         onClick = {
                             shareFile(
                                 context, data = state.uri,
-                                subject = context.getString(
-                                    R.string.payments_export_share_subject,
-                                    startTimestamp?.toBasicAbsoluteDateString() ?: "N/A", endTimestamp.toBasicAbsoluteDateString()
-                                ),
+                                subject = subject,
                                 chooserTitle = context.getString(R.string.payments_export_share_title),
                                 mimeType = "text/csv"
                             )
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }

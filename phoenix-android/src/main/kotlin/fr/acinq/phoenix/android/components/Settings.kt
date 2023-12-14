@@ -48,6 +48,19 @@ fun Setting(modifier: Modifier = Modifier, title: String, description: String?) 
 }
 
 @Composable
+fun Setting(modifier: Modifier = Modifier, title: String, content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        Text(title, style = MaterialTheme.typography.body2)
+        Spacer(modifier = Modifier.height(2.dp))
+        content()
+    }
+}
+
+@Composable
 fun SettingWithCopy(
     title: String,
     titleMuted: String? = null,
@@ -56,7 +69,9 @@ fun SettingWithCopy(
 ) {
     val context = LocalContext.current
     Row {
-        Column(modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp).weight(1f)) {
+        Column(modifier = Modifier
+            .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
+            .weight(1f)) {
             Row {
                 Text(
                     text = title,
