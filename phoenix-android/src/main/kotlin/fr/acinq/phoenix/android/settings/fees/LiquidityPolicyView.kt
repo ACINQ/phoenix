@@ -162,7 +162,7 @@ fun LiquidityPolicyView(
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Button(
                         text = stringResource(id = R.string.liquiditypolicy_request_button),
-                        icon = R.drawable.ic_restore,
+                        icon = R.drawable.ic_bucket,
                         onClick = {
                             keyboardManager?.hide()
                             onRequestLiquidityClick()

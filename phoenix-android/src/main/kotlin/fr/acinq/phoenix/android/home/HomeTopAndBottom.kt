@@ -124,34 +124,28 @@ fun TopBar(
             }
         }
         Spacer(modifier = Modifier.weight(1f))
-        Row(
-            modifier = Modifier
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colors.surface),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (!channelsState.isNullOrEmpty()) {
-                BorderButton(
-                    text = stringResource(id = R.string.home_request_liquidity),
-                    icon = R.drawable.ic_arrow_down_circle,
-                    onClick = onRequestLiquidityClick,
-                    iconTint = MaterialTheme.colors.onSurface,
-                    textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = MaterialTheme.colors.onSurface),
-                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 0.dp, bottomEnd = 0.dp, bottomStart = 16.dp),
-                    space = 8.dp,
-                    padding = PaddingValues(8.dp),
-                )
-            }
-            Button(
-                text = stringResource(R.string.home__faq_button),
-                icon = R.drawable.ic_help_circle,
-                iconTint = MaterialTheme.colors.onSurface,
-                onClick = { openLink(context, "https://phoenix.acinq.co/faq") },
-                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
+        if (!channelsState.isNullOrEmpty()) {
+            BorderButton(
+                text = stringResource(id = R.string.home_request_liquidity),
+                icon = R.drawable.ic_bucket,
+                onClick = onRequestLiquidityClick,
+                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = MaterialTheme.colors.onSurface),
+                backgroundColor = MaterialTheme.colors.surface,
                 space = 8.dp,
                 padding = PaddingValues(8.dp),
             )
+            Spacer(modifier = Modifier.width(4.dp))
         }
+        FilledButton(
+            text = stringResource(R.string.home__faq_button),
+            icon = R.drawable.ic_help_circle,
+            iconTint = MaterialTheme.colors.onSurface,
+            onClick = { openLink(context, "https://phoenix.acinq.co/faq") },
+            textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp),
+            backgroundColor = MaterialTheme.colors.surface,
+            space = 8.dp,
+            padding = PaddingValues(8.dp),
+        )
     }
 }
 

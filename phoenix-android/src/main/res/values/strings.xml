@@ -305,7 +305,7 @@
     <string name="home__connection__bad_cert">Electrum certificate</string>
     <string name="home__connection__connecting">Connecting…</string>
     <string name="home__connection__tor_active">Tor enabled</string>
-    <string name="home_request_liquidity">Liquidity</string>
+    <string name="home_request_liquidity">Request liquidity</string>
 
     <!-- in-app notifications -->
 

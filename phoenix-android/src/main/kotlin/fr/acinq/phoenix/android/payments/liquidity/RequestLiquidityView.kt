@@ -99,8 +99,8 @@ fun RequestLiquidityView(
         bottomContent = {
             if (channelsState.isNullOrEmpty()) {
                 InfoMessage(
-                    header = "No channels yet!",
-                    details = "You first need funds in the wallet to use this feature."
+                    header = stringResource(id = R.string.liquidityads_no_channels_header),
+                    details = stringResource(id = R.string.liquidityads_no_channels_details)
                 )
             } else {
                 RequestLiquidityBottomSection()
@@ -120,18 +120,19 @@ private fun RequestLiquidityTopSection() {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
-            painter = painterResource(id = R.drawable.intro_btc),
+            painter = painterResource(id = R.drawable.bucket_noto),
             contentDescription = null,
-            modifier = Modifier.size(96.dp),
+            modifier = Modifier.size(82.dp),
         )
+        Spacer(modifier = Modifier.height(20.dp))
         Row {
             Text(
-                text = "Plan ahead your liquidity",
+                text = stringResource(id = R.string.liquidityads_header),
                 style = MaterialTheme.typography.h4,
             )
             IconPopup(
                 popupMessage = stringResource(id = R.string.liquidityads_instructions),
-                popupLink = "More info" to "https://phoenix.acinq.co/faq",
+                popupLink = stringResource(id = R.string.liquidityads_faq_link) to "https://phoenix.acinq.co/faq#what-is-inbound-liquidity",
                 colorAtRest = MaterialTheme.colors.primary,
             )
         }
