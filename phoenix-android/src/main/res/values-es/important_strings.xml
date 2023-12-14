@@ -210,6 +210,12 @@
     <string name="paymentdetails_funding_fees_desc">Tasas pagadas a los mineros de la red Bitcoin para procesar la transacción en la cadena.</string>
     <string name="paymentdetails_service_fees_label">Tasas de servicio</string>
     <string name="paymentdetails_service_fees_desc">Tasas pagadas por la creación de un nuevo canal de pago. Esto no siempre es necesario.</string>
+    <string name="paymentdetails_liquidity_service_fee_label">Tasas de servicio</string>.
+    <string name="paymentdetails_liquidity_service_fee_help">Tasas pagadas por el servicio de liquidez.</string>
+    <string name="paymentdetails_liquidity_miner_fee_label">Tasas mineras</string>
+    <string name="paymentdetails_liquidity_miner_fee_help">Tasa pagada a los mineros de la red Bitcoin para procesar la transacción en cadena.</string>
+    <string name="paymentdetails_liquidity_lease_duration_label">Duración</string>
+    <string name="paymentdetails_liquidity_lease_duration_value">1 año</string>
 
     <!-- lnurl -->
 
@@ -293,6 +299,7 @@
     <string name="liquiditypolicy_advanced_pay_to_open_label">Omitir la comprobación absoluta de tasas para Lightning</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">Si se activa esta opción, los pagos entrantes de Lightning ignorarán el límite máximo absoluto de tasas. Solo se aplicará la comprobación de porcentaje.\n\nAtención: si el feerate de mempool de Bitcoin es alto, los pagos entrantes de LN que requieran una operación en la cadena podrían ser caros.</string>
     <string name="liquiditypolicy_save_button">Salvar configuración</string>
+    <string name="liquiditypolicy_request_button">Solicitar liquidez entrante</string>
 
     <string name="liquiditypolicy_help">
       Phoenix permite recibir pagos en la blockchain de Bitcoin (L1) y en la capa Lightning de Bitcoin (L2).
@@ -305,6 +312,35 @@
       \n\n
       Los pagos que reciba en la L2 pueden recibirse al instante y sin tasas. Sin embargo, en ocasiones también es necesaria una operación L1 para gestionar el canal de pago L2. Esto puede hacerse automáticamente <b>SI</b> las tasas de los mineros se adhieren a su política de tasas configurada.
     </string>
+
+    <!-- settings: liquidity request -->
+
+    <string name="liquidityads_no_channels_header">¡Aún no hay canales!</string>
+    <string name="liquidityads_no_channels_details">Primero necesitas fondos en la cartera para utilizar esta función.</string>
+    <string name="liquidityads_header">Planifica con antelación tu liquidez</string>
+    <string name="liquidityads_instructions">La liquidez entrante te permite evitar las tasas por transacciones en la cadena para futuros pagos recibidos a través de Lightning.\n\nAl solicitar más liquidez ahora, puedes ahorrarte tasas más adelante.</string>
+    <string name="liquidityads_faq_link">Más información</string>
+    <string name="liquidityads_current_liquidity">Liquidez actual: </string>
+
+    <string name="liquidityads_amount_label">Solicitar liquidez</string>
+    <string name="liquidityads_estimate_button">Estimar el coste de liquidez</string>
+    <string name="liquidityads_estimating_spinner">Estimar coste…</string>
+    <string name="liquidityads_estimate_details_miner_fees">Tasa del minero</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Esta tasa se destina a los mineros de Bitcoin para procesar la transacción.\n\nEsta tasa es una estimación, utilizando una tasa de %1$d sat/vbyte.</string>
+    <string name="liquidityads_estimate_details_service_fees">Tasa de servicio</string>
+    <string name="liquidityads_estimate_details_service_fees_help">Esta tasa se destina al servicio que proporciona la liquidez.</string>
+    <string name="liquidityads_estimate_details_duration">Duración</string>
+    <string name="liquidityads_estimate_details_duration_value">1 año</string>
+    <string name="liquidityads_estimate_details_duration_help">La capacidad adicional se conservará durante esa duración.</string>
+    <string name="liquidityads_estimate_above_25">La tasa total es superior al 25% del importe solicitado.</string>
+
+    <string name="liquidityads_request_button">Aceptar</string>
+    <string name="liquidityads_requesting_spinner">Procesando empalme…</string>
+
+    <string name="liquidityads_success">¡Liquidez añadida con éxito!</string>
+
+    <string name="liquidityads_error_header">Solicitud de liquidez fallida</string>
+    <string name="liquidityads_error_channels_unavailable">Los canales no están disponibles. Vuelva a intentarlo más tarde.</string>
 
     <!-- payment line -->
 

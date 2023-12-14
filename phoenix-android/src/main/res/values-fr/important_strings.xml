@@ -210,6 +210,12 @@
     <string name="paymentdetails_funding_fees_desc">Frais payés aux mineurs du réseau Bitcoin pour traiter la transaction on-chain.</string>
     <string name="paymentdetails_service_fees_label">Frais de\nservice</string>
     <string name="paymentdetails_service_fees_desc">Frais payés pour la création d\'un nouveau canal de paiement. Cette action n\'est pas toujours nécessaire.</string>
+    <string name="paymentdetails_liquidity_service_fee_label">Frais de\nservice</string>
+    <string name="paymentdetails_liquidity_service_fee_help">Frais payés pour le service de liquidité.</string>
+    <string name="paymentdetails_liquidity_miner_fee_label">Frais de\nminage</string>
+    <string name="paymentdetails_liquidity_miner_fee_help">Frais payés aux mineurs du réseau Bitcoin pour traiter la transaction sur la chaîne.</string>
+    <string name="paymentdetails_liquidity_lease_duration_label">Durée</string>
+    <string name="paymentdetails_liquidity_lease_duration_value">1 an</string>
 
     <!-- lnurl -->
 
@@ -293,6 +299,7 @@
     <string name="liquiditypolicy_advanced_pay_to_open_label">Déroger au max pour les paiements Lightning</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">Si cette option est active, les paiements entrants Lightning seront acceptés même si les frais excèdent le maximum autorisé. Seule la valeur en pourcent ci-dessus sera vérifiée.\n\nAttention: si le mempool Bitcoin est saturé, certains paiements Lightning entrants pourraient s\'avérer coûteux.</string>
     <string name="liquiditypolicy_save_button">Enregistrer mes préferences</string>
+    <string name="liquiditypolicy_request_button">Requérir des liquidités entrantes</string>
 
     <string name="liquiditypolicy_help">
       Phoenix vous permet de recevoir des paiements sur la blockchain Bitcoin elle-même (L1), ainsi que sur la couche Lightning de Bitcoin (L2).
@@ -305,6 +312,35 @@
       \n\n
       Les paiement reçus sur la couche L2 peuvent être reçus instantanéments et sans frais. Cela dit, des opérations L1 sont parfois nécessaires au bon fonctionnement du canal de paiement L2. Cela est fait automatiquement <b>si et seulement si</b> les frais de minage sont conformes à votre configuration.
     </string>
+
+    <!-- settings: liquidity request -->
+
+    <string name="liquidityads_no_channels_header">Vous n\'avez pas de canaux!</string>
+    <string name="liquidityads_no_channels_details">Vous devez d\'abord avoir des fonds dans le portefeuille pour utiliser cette fonctionnalité.</string>
+    <string name="liquidityads_header">Planifiez vos liquidités</string>
+    <string name="liquidityads_instructions">Avoir de la liquidité entrante vous permet d\'éviter les frais de transactions sur la chaîne pour les futurs paiements reçus via Lightning.\n\nEn ajoutant de la liquidité maintenant, vous pouvez économiser des frais plus tard.</string>
+    <string name="liquidityads_faq_link">Plus d\'infos</string>
+    <string name="liquidityads_current_liquidity">Votre liquidité actuelle :</string>
+
+    <string name="liquidityads_amount_label">Demande de liquidité</string>
+    <string name="liquidityads_estimate_button">Estimer le coût de la liquidité</string>
+    <string name="liquidityads_estimating_spinner">Estimation du coût…</string>
+    <string name="liquidityads_estimate_details_miner_fees">Frais de minage</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Cette commission est versée aux mineurs de Bitcoin pour traiter la transaction.\n\nCette commission est une estimation, utilisant un taux de %1$d sat/vbyte.</string>
+    <string name="liquidityads_estimate_details_service_fees">Frais de service</string>
+    <string name="liquidityads_estimate_details_service_fees_help">Cette commission est destinée au service qui fournit la liquidité.</string>
+    <string name="liquidityads_estimate_details_duration">Durée</string>
+    <string name="liquidityads_estimate_details_duration_value">1 an</string>
+    <string name="liquidityads_estimate_details_duration_help">La capacité supplémentaire sera préservée pendant cette durée.</string>
+    <string name="liquidityads_estimate_above_25">Les frais totaux sont supérieurs à 25% du montant demandé.</string>
+
+    <string name="liquidityads_request_button">Accepter</string>
+    <string name="liquidityads_requesting_spinner">Traitement du splice…</string>
+
+    <string name="liquidityads_success">Liquidité ajoutée avec succès!</string>
+
+    <string name="liquidityads_error_header">La demande de liquidité a échoué</string>
+    <string name="liquidityads_error_channels_unavailable">Vos canaux ne sont pas disponibles. Réessayez plus tard.</string>
 
     <!-- payment line -->
 

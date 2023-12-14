@@ -207,6 +207,12 @@
     <string name="paymentdetails_funding_fees_desc">Comisiones pagadas a los mineros de la red Bitcoin para procesar la transacción en la cadena.</string>
     <string name="paymentdetails_service_fees_label">Comisiones de servicio</string>
     <string name="paymentdetails_service_fees_desc">Comisiones abonadas por la creación de un nuevo canal de pago. No siempre se requieren.</string>
+    <string name="paymentdetails_liquidity_service_fee_label">Comisiones de servicio</string>.
+    <string name="paymentdetails_liquidity_service_fee_help">Comisiones pagadas por el servicio de liquidez.</string>
+    <string name="paymentdetails_liquidity_miner_fee_label">Comisiones de minería</string>
+    <string name="paymentdetails_liquidity_miner_fee_help">Comisiones pagadas a los mineros de la red Bitcoin para procesar la transacción en la cadena.</string>
+    <string name="paymentdetails_liquidity_lease_duration_label">Duración</string>
+    <string name="paymentdetails_liquidity_lease_duration_value">1 año</string>
 
     <!-- lnurl -->
 
@@ -291,8 +297,38 @@
     <string name="liquiditypolicy_advanced_pay_to_open_label">Omitir la comprobación de comisión absoluta para Lightning</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">Cuando se activa, los pagos entrantes de Lightning ignoran el límite absoluto de la comisión máxima. Solo se aplicará la comprobación porcentual.\n\nCuidado: si la tasa de comisión en el pool de memoria de Bitcoin es alta, los pagos entrantes de Lightning que requieran una operación en la cadena podrían resultar caros.</string>
     <string name="liquiditypolicy_save_button">Guardar política</string>
+    <string name="liquiditypolicy_request_button">Solicitar liquidez entrante</string>
 
     <string name="liquiditypolicy_help">Con Phoenix, puedes recibir pagos en la cadena de bloques de Bitcoin (capa 1) y en la red Lightning de Bitcoin (capa 2). \n\n - La capa de la cadena de bloques (capa 1) es más lenta y, en general, mucho más cara (requiere comisiones de minería). \n - La capa de la red Lightning (capa 2) es mucho más rápida y, en general, mucho más barata (especialmente para los pagos pequeños). \n\n Cuando recibas un pago en la capa 1, Phoenix trasladará automáticamente los fondos a la capa 2 <b>SI</b> las comisiones de minería cumplen con la política de comisiones que hayas configurado. \n\n Los pagos que te envíen en la capa 2 pueden recibirse al instante y sin comisiones. Sin embargo, en ocasiones, también es necesaria una operación en la capa 1 para gestionar el canal de pago de la capa 2. Esto puede hacerse automáticamente <b>SI</b> las comisiones de minería cumplen con la política de comisiones que hayas configurado.</string>
+
+    <!-- settings: liquidity request -->
+
+    <string name="liquidityads_no_channels_header">¡Aún no hay canales!</string>
+    <string name="liquidityads_no_channels_details">Primero necesitas fondos en la cartera para utilizar esta función.</string>
+    <string name="liquidityads_header">Planifica con antelación tu liquidez</string>
+    <string name="liquidityads_instructions">La liquidez entrante te permite evitar las tasas por transacciones en la cadena para futuros pagos recibidos a través de Lightning.\n\nAl solicitar más liquidez ahora, puedes ahorrarte tasas más adelante.</string>
+    <string name="liquidityads_faq_link">Más información</string>
+    <string name="liquidityads_current_liquidity">Liquidez actual: </string>
+
+    <string name="liquidityads_amount_label">Solicitar liquidez</string>
+    <string name="liquidityads_estimate_button">Estimar el coste de liquidez</string>
+    <string name="liquidityads_estimating_spinner">Estimar coste…</string>
+    <string name="liquidityads_estimate_details_miner_fees">Tasa del minero</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Esta tasa se destina a los mineros de Bitcoin para procesar la transacción.\n\nEsta tasa es una estimación, utilizando una tasa de %1$d sat/vbyte.</string>
+    <string name="liquidityads_estimate_details_service_fees">Tasa de servicio</string>
+    <string name="liquidityads_estimate_details_service_fees_help">Esta tasa se destina al servicio que proporciona la liquidez.</string>
+    <string name="liquidityads_estimate_details_duration">Duración</string>
+    <string name="liquidityads_estimate_details_duration_value">1 año</string>
+    <string name="liquidityads_estimate_details_duration_help">La capacidad adicional se conservará durante esa duración.</string>
+    <string name="liquidityads_estimate_above_25">La tasa total es superior al 25% del importe solicitado.</string>
+
+    <string name="liquidityads_request_button">Aceptar</string>
+    <string name="liquidityads_requesting_spinner">Procesando empalme…</string>
+
+    <string name="liquidityads_success">¡Liquidez añadida con éxito!</string>
+
+    <string name="liquidityads_error_header">Solicitud de liquidez fallida</string>
+    <string name="liquidityads_error_channels_unavailable">Los canales no están disponibles. Vuelva a intentarlo más tarde.</string>
 
     <!-- payment line -->
 

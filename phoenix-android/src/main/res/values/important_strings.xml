@@ -316,7 +316,6 @@
 
     <!-- settings: liquidity request -->
 
-    <string name="liquidityads_title">Request inbound liquidity</string>
     <string name="liquidityads_no_channels_header">No channels yet!</string>
     <string name="liquidityads_no_channels_details">You first need funds in the wallet to use this feature.</string>
     <string name="liquidityads_header">Plan ahead your liquidity</string>

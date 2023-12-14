@@ -210,6 +210,12 @@
     <string name="paymentdetails_funding_fees_desc">Gebühren, die an die Miner des Bitcoin-Netzwerks für die Verarbeitung der On-Chain-Transaktion gezahlt werden.</string>
     <string name="paymentdetails_service_fees_label">Service-Gebühr</string>
     <string name="paymentdetails_service_fees_desc">Gebühren für die Einrichtung eines neuen Zahlungskanals. Dies ist nicht immer erforderlich.</string>
+    <string name="paymentdetails_liquidity_service_fee_label">Service-Gebühr</string>
+    <string name="paymentdetails_liquidity_service_fee_help">Gebühren für die Liquiditätsdienstleistung.</string>
+    <string name="paymentdetails_liquidity_miner_fee_label">Miner-Gebühren</string>
+    <string name="paymentdetails_liquidity_miner_fee_help">Gebühren, die an die Miner des Bitcoin-Netzwerks für die Verarbeitung der On-Chain-Transaktion gezahlt werden.</string>
+    <string name="paymentdetails_liquidity_lease_duration_label">Dauer</string>
+    <string name="paymentdetails_liquidity_lease_duration_value">1 Jahr</string>
 
     <!-- lnurl -->
 
@@ -293,6 +299,7 @@
     <string name="liquiditypolicy_advanced_pay_to_open_label">Überprüfung der absoluten Gebühren für Lightning überspringen</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">Wenn diese Option aktiviert ist, wird bei eingehenden Lightning-Zahlungen die absolute Gebührenobergrenze ignoriert. Nur der Prozentwert wird geprüft.\n\nAchtung: Wenn die Bitcoin-Mempool-Gebühren hoch sind, könnten eingehende LN-Zahlungen, die eine On-Chain-Transaktion erfordern, teuer werden.</string>
     <string name="liquiditypolicy_save_button">Richtlinien speichern</string>
+    <string name="liquiditypolicy_request_button">Anforderung eingehender Liquidität</string>
 
     <string name="liquiditypolicy_help">
       Phoenix ermöglicht es Ihnen, Zahlungen auf der Bitcoin-Blockchain (L1) und dem Bitcoin-Lightning-Layer (L2) zu empfangen.
@@ -305,6 +312,35 @@
       \n\n
       Zahlungen, die Sie auf L2 erhalten, können unverzüglich und gebührenfrei empfangen werden. Manchmal ist jedoch eine L1-Transaktion erforderlich, um den L2-Zahlungskanal zu verwalten. Dies passiert automatisch <b>WENN</b> die Miner-Gebühren den von Ihnen festgelegten Gebührenrichtlinien entsprechen.
     </string>
+
+    <!-- settings: liquidity request -->
+
+    <string name="liquidityads_no_channels_header">Noch keine Kanäle!</string>
+    <string name="liquidityads_no_channels_details">Sie benötigen zunächst Guthaben in der Wallet, um diese Funktion zu nutzen.</string>
+    <string name="liquidityads_header">Planen Sie Ihre Liquidität voraus</string>
+    <string name="liquidityads_instructions">Mit eingehender Liquidität können Sie On-Chain-Transaktionsgebühren für zukünftige Zahlungen, die über Lightning eingehen, vermeiden.\n\nIndem Sie jetzt mehr Liquidität anfordern, können Sie später Gebühren sparen.</string>
+    <string name="liquidityads_faq_link">Mehr Informationen</string>
+    <string name="liquidityads_current_liquidity">Aktuelle Liquidität: </string>
+
+    <string name="liquidityads_amount_label">Liquidität anfordern</string>
+    <string name="liquidityads_estimate_button">Liquiditätskosten schätzen</string>
+    <string name="liquidityads_estimating_spinner">Kosten abschätzen…</string>
+    <string name="liquidityads_estimate_details_miner_fees">Miner-Gebühren</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Diese Gebühr geht an Bitcoin-Miner, um die Transaktion zu verarbeiten.\n\nDiese Gebühr ist eine Schätzung, die eine Feerate von %1$d sat/vbyte verwendet.</string>
+    <string name="liquidityads_estimate_details_service_fees">Service-Gebühr</string>
+    <string name="liquidityads_estimate_details_service_fees_help">Diese Gebühr geht an den Dienst, der die Liquidität bereitstellt.</string>
+    <string name="liquidityads_estimate_details_duration">Dauer</string>
+    <string name="liquidityads_estimate_details_duration_value">1 Jahr</string>
+    <string name="liquidityads_estimate_details_duration_help">Die zusätzliche Kapazität bleibt für diese Dauer erhalten.</string>
+    <string name="liquidityads_estimate_above_25">Die Gesamtgebühr beträgt mehr als 25% des angeforderten Betrags.</string>
+
+    <string name="liquidityads_request_button">Annehmen</string>
+    <string name="liquidityads_requesting_spinner">Bearbeitung des Splice…</string>
+
+    <string name="liquidityads_success">Liquidität erfolgreich hinzugefügt!</string>
+
+    <string name="liquidityads_error_header">Liquiditätsanfrage ist fehlgeschlagen</string>
+    <string name="liquidityads_error_channels_unavailable">Kanäle sind nicht verfügbar. Versuchen Sie es später erneut.</string>
 
     <!-- payment line -->
 
