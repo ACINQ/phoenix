@@ -117,14 +117,18 @@ private fun LightningBalanceView(
                 Surface(
                     shape = RoundedCornerShape(1.dp),
                     color = MaterialTheme.colors.primary,
-                    modifier = Modifier.size(6.dp).offset(y = 2.dp)
+                    modifier = Modifier
+                        .size(6.dp)
+                        .offset(y = 2.dp)
                 ) {}
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = stringResource(id = R.string.channelsview_balance),
                     style = MaterialTheme.typography.body2,
                 )
+                IconPopup(popupMessage = stringResource(id = R.string.channelsview_balance_about))
                 Spacer(modifier = Modifier.weight(1f))
+                IconPopup(popupMessage = stringResource(id = R.string.channelsview_inbound_about), spaceLeft = 0.dp, spaceRight = 4.dp)
                 Text(
                     text = stringResource(id = R.string.channelsview_inbound),
                     style = MaterialTheme.typography.body2,
@@ -133,7 +137,9 @@ private fun LightningBalanceView(
                 Surface(
                     shape = RoundedCornerShape(1.dp),
                     color = MaterialTheme.colors.primary.copy(alpha = ProgressIndicatorDefaults.IndicatorBackgroundOpacity),
-                    modifier = Modifier.size(6.dp).offset(y = 2.dp)
+                    modifier = Modifier
+                        .size(6.dp)
+                        .offset(y = 2.dp)
                 ) {}
             }
             Spacer(modifier = Modifier.height(2.dp))

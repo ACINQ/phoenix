@@ -178,7 +178,7 @@ private fun RequestLiquidityBottomSection() {
             )
             SatoshiSlider(
                 modifier = Modifier
-                    .widthIn(max = 130.dp)
+                    .widthIn(max = 180.dp)
                     .offset(x = (-5).dp, y = (-8).dp),
                 possibleValues = LiquidityLimits.liquidityOptions,
                 onAmountChange = { newAmount ->
