@@ -5,6 +5,8 @@ import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.getConfirmations
+import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
+import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentProgress
@@ -91,9 +93,13 @@ class PaymentsManager(
             if (index > 0) {
                 for (row in list) {
                     val paymentInfo = fetcher.getPayment(row, WalletPaymentFetchOptions.None)
-                    val completedAt = paymentInfo?.payment?.completedAt
-                    if (completedAt != null && completedAt > appLaunchTimestamp) {
-                        _lastCompletedPayment.value = paymentInfo.payment
+                    if (paymentInfo?.payment is InboundLiquidityOutgoingPayment || paymentInfo?.payment is SpliceCpfpOutgoingPayment) {
+                        // ignore cpfp/inbound
+                    } else {
+                        val completedAt = paymentInfo?.payment?.completedAt
+                        if (completedAt != null && completedAt > appLaunchTimestamp) {
+                            _lastCompletedPayment.value = paymentInfo.payment
+                        }
                     }
                     break
                 }
