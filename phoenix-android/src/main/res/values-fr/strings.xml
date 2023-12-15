@@ -270,7 +270,7 @@
     <!-- in-app notifications -->
 
     <string name="inappnotif_title">Notifications</string>
-    <string name="inappnotif_notices_title">Messages important</string>
+    <string name="inappnotif_notices_title">Messages importants</string>
     <string name="inappnotif_payments_title">Activité récente</string>
     <string name="inappnotif_empty">Aucune notifications pour l\'instant</string>
 
@@ -296,8 +296,63 @@
 
     <!-- payment details -->
 
-    <string name="paymentdetails_title">Détails de paiement</string>
+    <string name="paymentdetails_title">Détails du paiement</string>
     <string name="paymentdetails_loading">Chargement des données du paiement…</string>
-    <string name="paymentdetails_error">Les détails pour ce paiement n\'ont pas pu être trouvées</string>
+    <string name="paymentdetails_error">Détails du paiement introuvable</string>
+
+    <string name="paymentdetails_status_inbound_liquidity_success"><b>AJOUT DE LIQUIDITÉ</b> %1$s</string>
+    <string name="paymentdetails_status_channelclose_confirmed"><b>CLÔTURÉ</b> %1$s</string>
+    <string name="paymentdetails_status_sent_successful"><b>ENVOYÉ</b> %1$s</string>
+    <string name="paymentdetails_status_sent_pending">En attente…</string>
+    <string name="paymentdetails_status_sent_failed"><b>ÉCHEC</b>\nAucun argent n\'a été envoyé.</string>
+
+    <string name="paymentdetails_status_received_pending">Pas encore reçu.</string>
+    <string name="paymentdetails_status_received_paytoopen_pending">En attente de l\'ouverture du canal</string>
+    <string name="paymentdetails_status_received_successful"><b>REÇU</b> %1$s</string>
+
+    <string name="paymentdetails_status_unconfirmed">En attente de confirmations</string>
+    <string name="paymentdetails_status_unconfirmed_fetching">Récupération du statut…</string>
+    <string name="paymentdetails_status_unconfirmed_zero">0 confirmation</string>
+    <string name="paymentdetails_status_unconfirmed_zero_bump">Cliquez pour accélérer</string>
+    <string name="paymentdetails_status_unconfirmed_default">%1$d confirmation(s)</string>
+    <string name="paymentdetails_status_unconfirmed_with_depth">%1$d/%2$d confirmation(s)</string>
+    <string name="paymentdetails_status_confirmed">Confirmé sur la chaîne</string>
+
+    <string name="paymentdetails_lnurlpay_service">Servi par</string>
+    <string name="paymentdetails_lnurlpay_action_message_label">Message</string>
+    <string name="paymentdetails_lnurlpay_action_url_label">Lien</string>
+    <string name="paymentdetails_lnurlpay_action_url_button">Ouvrir le lien</string>
+    <string name="paymentdetails_lnurlpay_action_aes_label">Message</string>
+    <string name="paymentdetails_lnurlpay_action_aes_decrypting">Déchiffrement du message…</string>
+    <string name="paymentdetails_lnurlpay_action_aes_not_paid">Le paiement doit d\'abord être réglé pour déchiffrer le message.</string>
+
+    <string name="paymentdetails_desc_label">Desc.</string>
+    <string name="paymentdetails_destination_label">Envoyé à</string>
+    <string name="paymentdetails_destination_cpfp_value">Mineurs Bitcoin</string>
+    <string name="paymentdetails_fees_label">Frais</string>
+    <string name="paymentdetails_error_label">Erreur</string>
+    <string name="paymentdetails_no_description">Sans description</string>
+    <string name="paymentdetails_info_uniclose">Ce paiement a eu lieu suite à un conflit dans un canal Lightning.</string>
+
+    <string name="paymentdetails_onchain_confirmation">Confirmations</string>
+
+    <string name="paymentdetails_desc_splice_out">Paiement on-chain</string>
+    <string name="paymentdetails_desc_closing_channel">Fermeture de canal</string>
+    <string name="paymentdetails_desc_legacy_migration">Migration depuis l\'ancienne appli</string>
+    <string name="paymentdetails_desc_cpfp">Accélération de transactions</string>
+    <string name="paymentdetails_desc_inbound_liquidity">+%1$s de liquidité entrante</string>
+    <string name="paymentdetails_desc_keysend">Don</string>
+    <string name="paymentdetails_desc_swapout">Swap-out vers %1$s</string>
+    <string name="paymentdetails_desc_swapin">Dépôt on-chain</string>
+    <string name="paymentdetails_desc_identifier">Paiement vers %1$s</string>
+
+    <string name="paymentdetails_edit_dialog_title">Ajouter une description personnalisée à ce paiement</string>
+    <string name="paymentdetails_edit_dialog_input_label">Description</string>
+    <string name="paymentdetails_attach_desc_button">Joindre une note</string>
+    <string name="paymentdetails_edit_desc_button">Éditer la note</string>
+    <string name="paymentdetails_details_button">Détails techniques</string>
+
+    <string name="paymentdetails_failure_recipient_unknown_or_liquidity">Le destinataire n\'est pas joignable, ou bien ne dispose pas de suffisamment de liquidité pour accepter le paiement.</string>
+    <string name="paymentdetails_failure_invalid_details">Le paiement a été rejeté par le destinataire.\nCela survient généralement lorsque la requête de paiement a déjà été payée, ou lorsque cette requête a expiré.</string>
 
 </resources>
