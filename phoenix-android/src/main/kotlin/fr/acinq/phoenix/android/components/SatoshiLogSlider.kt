@@ -23,56 +23,57 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import kotlin.math.roundToInt
+import kotlin.math.log10
+import kotlin.math.pow
 
-/** A slider to pick a Satoshi value from an array of accepted values. */
+/** A logarithmic slider to get a Satoshi value. Can be used to get a feerate for example. */
 @Composable
-fun SatoshiSlider(
+fun SatoshiLogSlider(
     modifier: Modifier = Modifier,
+    amount: Satoshi,
     onAmountChange: (Satoshi) -> Unit,
-    onErrorStateChange: (Boolean) -> Unit,
-    possibleValues: Array<Satoshi>,
+    minAmount: Satoshi = 1.sat,
+    maxAmount: Satoshi = 500.sat,
     enabled: Boolean = true,
+    steps: Int = 30,
 ) {
     val context = LocalContext.current
-    var index by remember { mutableStateOf(0.0f) }
+    val minAmountLog = remember { log10(minAmount.sat.toFloat()) }
+    val maxAmountLog = remember { log10(maxAmount.sat.toFloat()) }
+    var amountLog by remember { mutableStateOf(log10(amount.sat.toFloat())) }
+
     var errorMessage by remember { mutableStateOf("") }
-    val valuesCount = remember(possibleValues) { possibleValues.size - 1 }
 
     Column(modifier = modifier.enableOrFade(enabled)) {
         Slider(
-            value = index,
+            value = amountLog,
             onValueChange = {
                 errorMessage = ""
                 try {
-                    index = it
-                    val amountPicked = possibleValues[index.roundToInt()]
-                    onAmountChange(amountPicked)
-                    onErrorStateChange(false)
+                    amountLog = it
+                    val valueSat = 10f.pow(it).toLong().sat
+                    onAmountChange(valueSat)
                 } catch (e: Exception) {
-                    errorMessage = context.getString(R.string.validation_invalid_amount)
-                    onErrorStateChange(true)
+                    errorMessage = context.getString(R.string.validation_invalid_number)
                 }
             },
-            valueRange = 0.0f..valuesCount.toFloat(),
-            steps = valuesCount - 1, // steps = spaces in-between options
+            valueRange = minAmountLog..maxAmountLog,
+            steps = steps,
             enabled = enabled,
             colors = SliderDefaults.colors(
                 activeTrackColor = MaterialTheme.colors.primary,
                 inactiveTrackColor = MaterialTheme.colors.primary.copy(alpha = 0.4f),
                 activeTickColor = MaterialTheme.colors.primary,
-                inactiveTickColor = MaterialTheme.colors.primary.copy(alpha = 0.5f),
+                inactiveTickColor = Color.Transparent,
             )
         )
 

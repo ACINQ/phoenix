@@ -26,6 +26,7 @@ import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import java.security.cert.CertificateException
@@ -132,4 +133,5 @@ fun WalletPayment.smartDescription(context: Context): String? = when (this) {
     is SpliceOutgoingPayment -> context.getString(R.string.paymentdetails_desc_splice_out)
     is ChannelCloseOutgoingPayment -> context.getString(R.string.paymentdetails_desc_closing_channel)
     is SpliceCpfpOutgoingPayment -> context.getString(R.string.paymentdetails_desc_cpfp)
+    is InboundLiquidityOutgoingPayment -> context.getString(R.string.paymentdetails_desc_inbound_liquidity, lease.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
 }?.takeIf { it.isNotBlank() }

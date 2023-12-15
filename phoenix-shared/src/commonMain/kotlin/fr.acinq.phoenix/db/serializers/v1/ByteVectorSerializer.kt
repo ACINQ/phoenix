@@ -16,11 +16,25 @@
 
 package fr.acinq.phoenix.db.serializers.v1
 
+import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.ByteVector64
 
 
 object ByteVector32Serializer : AbstractStringSerializer<ByteVector32>(
     name = "ByteVector32",
     toString = ByteVector32::toHex,
     fromString = ::ByteVector32
+)
+
+object ByteVector64Serializer : AbstractStringSerializer<ByteVector64>(
+    name = "ByteVector64",
+    toString = ByteVector64::toHex,
+    fromString = ::ByteVector64
+)
+
+object ByteVectorSerializer : AbstractStringSerializer<ByteVector>(
+    name = "ByteVector",
+    toString = ByteVector::toHex,
+    fromString = ::ByteVector
 )

@@ -60,6 +60,7 @@ sealed class Screen(val route: String) {
         object FinalWallet: Screen("settings/walletinfo/final")
     }
     object LiquidityPolicy: Screen("settings/liquiditypolicy")
+    object LiquidityRequest: Screen("settings/requestliquidity")
     object AdvancedLiquidityPolicy: Screen("settings/advancedliquiditypolicy")
     object Notifications: Screen("notifications")
     object ResetWallet: Screen("settings/resetwallet")

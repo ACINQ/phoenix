@@ -210,6 +210,12 @@
     <string name="paymentdetails_funding_fees_desc">Poplatky placené těžařům Bitcoinové sítě za zpracování On-Chain transakce.</string>
     <string name="paymentdetails_service_fees_label">Poplatky za službu</string>
     <string name="paymentdetails_service_fees_desc">Poplatky za vytvoření nového platebního kanálu. Toto není vždy vyžadováno.</string>
+    <string name="paymentdetails_liquidity_service_fee_label">Poplatky za službu</string>
+    <string name="paymentdetails_liquidity_service_fee_help">Poplatky za službu likvidity.</string>
+    <string name="paymentdetails_liquidity_miner_fee_label">Poplatky těžařům</string>
+    <string name="paymentdetails_liquidity_miner_fee_help">Poplatky placené těžařům Bitcoinové sítě za zpracování On-Chain transakce.</string>
+    <string name="paymentdetails_liquidity_lease_duration_label">Duration</string>
+    <string name="paymentdetails_liquidity_lease_duration_value">1 rok</string>
 
     <!-- lnurl -->
 
@@ -293,6 +299,7 @@
     <string name="liquiditypolicy_advanced_pay_to_open_label">Přeskočit kontrolu konečných poplatků za Lightning</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">Pokud je tato funkce povolena, příchozí platby Lightning budou ignorovat konečný maximální limit poplatků. Uplatní se pouze procentuální kontrola.\n\nPozor: pokud jsou vysoké poplatky v mempoolu Bitcoinu, příchozí Lightning platby vyžadující operaci na Blockchainu by mohly být drahé.</string>
     <string name="liquiditypolicy_save_button">Uložit zásady</string>
+    <string name="liquiditypolicy_request_button">Požádat o příchozí likviditu</string>
 
     <string name="liquiditypolicy_help">
       Phoenix umožňuje přijímat platby na blockchainu Bitcoinu (L1) a na Lightning vrstvě Bitcoinu (L2).
@@ -305,6 +312,36 @@
       \n\n
       Platby, které obdržíte na L2, můžete obdržet okamžitě a za nulové poplatky. Občas je však pro správu platebního kanálu L2 nutná i operace L1. To lze provést automaticky, <b>pokud</b> poplatky těžařů odpovídají nastaveným zásadám poplatků.
     </string>
+
+    <!-- settings: liquidity request -->
+
+    <string name="liquidityads_no_channels_header">Zatím žádné kanály!</string>
+    <string name="liquidityads_no_channels_details">Pro použití této funkce potřebujete nejprve prostředky v peněžence.</string>
+    <string name="liquidityads_header">Plánujte si dopředu likviditu</string>
+    <string name="liquidityads_instructions">Příchozí likvidita vám umožní vyhnout se poplatkům za transakce na řetězci u budoucích plateb přijatých přes Lightning.\n\nPokud si nyní zažádáte o větší likviditu, můžete později ušetřit poplatky.</string>
+    <string name="liquidityads_faq_link">Více informací</string>
+    <string name="liquidityads_current_liquidity">Aktuální likvidita: </string>
+
+    <string name="liquidityads_amount_label">Požádat o likviditu</string>
+    <string name="liquidityads_estimate_button">Odhad nákladů na likviditu</string>
+    <string name="liquidityads_estimating_spinner">Odhad nákladů…</string>
+    <string name="liquidityads_estimate_details_miner_fees">Poplatek za miner</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Příspěvek na těžební poplatek za podkladovou transakci v řetězci.</string>
+    <string name="liquidityads_estimate_details_service_fees">Poplatek za služby</string>
+    <string name="liquidityads_estimate_details_service_fees_help">Tento poplatek jde službě poskytující likviditu.</string>
+    <string name="liquidityads_estimate_details_duration">Duration</string>
+    <string name="liquidityads_estimate_details_duration_value">1 rok</string>
+    <string name="liquidityads_estimate_details_duration_help">Dodatečná kapacita bude zachována po tuto dobu.</string>
+    <string name="liquidityads_estimate_above_25">Celkový poplatek je vyšší než 25 % požadované částky.</string>
+    <string name="liquidityads_over_balance">Celkové poplatky přesahují váš zůstatek.</string>
+
+    <string name="liquidityads_request_button">Přijmout</string>
+    <string name="liquidityads_requesting_spinner">Zpracování splice…</string>
+
+    <string name="liquidityads_success">Likvidita byla úspěšně přidána!</string>
+
+    <string name="liquidityads_error_header">Žádost o likviditu se nezdařila</string>
+    <string name="liquidityads_error_channels_unavailable">Kanály nejsou k dispozici. Zkuste to později.</string>
 
     <!-- payment line -->
 

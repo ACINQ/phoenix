@@ -23,9 +23,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProgressIndicatorDefaults
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -36,17 +39,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.settings.walletinfo.BalanceRow
+import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
@@ -64,6 +70,7 @@ fun ChannelsView(
 
     val channelsState by business.peerManager.channelsFlow.collectAsState()
     val balance by business.balanceManager.balance.collectAsState()
+    val inboundLiquidity = channelsState?.values?.map { it.availableForReceive }?.filterNotNull()?.sum()
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(
@@ -75,7 +82,10 @@ fun ChannelsView(
                 Box(contentAlignment = Alignment.TopEnd) {
                     DropdownMenu(expanded = showAdvancedMenuPopIn, onDismissRequest = { showAdvancedMenuPopIn = false }) {
                         DropdownMenuItem(onClick = onImportChannelsDataClick, contentPadding = PaddingValues(horizontal = 12.dp)) {
-                            Text(stringResource(R.string.channelsview_menu_import_channels), style = MaterialTheme.typography.body1)
+                            Text(
+                                text = stringResource(R.string.channelsview_menu_import_channels),
+                                style = MaterialTheme.typography.body1,
+                            )
                         }
                     }
                     Button(
@@ -88,7 +98,7 @@ fun ChannelsView(
             }
         )
         if (!channelsState.isNullOrEmpty()) {
-            LightningBalanceView(balance = balance)
+            LightningBalanceView(balance = balance, inboundLiquidity = inboundLiquidity)
         }
         ChannelsList(channels = channelsState, onChannelClick = onChannelClick)
     }
@@ -96,15 +106,73 @@ fun ChannelsView(
 
 @Composable
 private fun LightningBalanceView(
-    balance: MilliSatoshi?
+    balance: MilliSatoshi?,
+    inboundLiquidity: MilliSatoshi?,
 ) {
-    CardHeader(text = stringResource(id = R.string.channelsview_balance))
-    Card(
-        internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-        BalanceRow(balance = balance)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = stringResource(id = R.string.channelsview_balance_about), style = MaterialTheme.typography.subtitle2)
+    var showHelp by remember { mutableStateOf(false) }
+    CardHeader(text = stringResource(id = R.string.channelsview_header))
+    Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), onClick = { showHelp = !showHelp }) {
+        if (balance != null && inboundLiquidity != null) {
+            val balanceVsInbound = remember(balance, inboundLiquidity) {
+                (balance.msat.toFloat() / (balance.msat + inboundLiquidity.msat))
+                    .coerceIn(0.1f, 0.9f) // unreadable otherwise
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(
+                    shape = RoundedCornerShape(1.dp),
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier
+                        .size(6.dp)
+                        .offset(y = 2.dp)
+                ) {}
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = stringResource(id = R.string.channelsview_balance),
+                    style = MaterialTheme.typography.body2,
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = stringResource(id = R.string.channelsview_inbound),
+                    style = MaterialTheme.typography.body2,
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Surface(
+                    shape = RoundedCornerShape(1.dp),
+                    color = MaterialTheme.colors.primary.copy(alpha = ProgressIndicatorDefaults.IndicatorBackgroundOpacity),
+                    modifier = Modifier
+                        .size(6.dp)
+                        .offset(y = 2.dp)
+                ) {}
+            }
+            Spacer(modifier = Modifier.height(2.dp))
+            LinearProgressIndicator(
+                progress = balanceVsInbound,
+                modifier = Modifier
+                    .height(8.dp)
+                    .fillMaxWidth(),
+                strokeCap = StrokeCap.Round,
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Row {
+                Column {
+                    AmountWithFiatBelow(amount = balance)
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Column(horizontalAlignment = Alignment.End) {
+                    AmountWithFiatBelow(amount = inboundLiquidity)
+                }
+            }
+
+            if (showHelp) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = annotatedStringResource(id = R.string.channelsview_balance_about), style = MaterialTheme.typography.subtitle2)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = annotatedStringResource(id = R.string.channelsview_inbound_about), style = MaterialTheme.typography.subtitle2)
+            }
+
+        } else {
+            ProgressView(text = stringResource(id = R.string.channelsview_loading_channels))
+        }
     }
 }
 

@@ -5,6 +5,7 @@
 package fr.acinq.phoenix.db.serializers
 
 import fr.acinq.bitcoin.OutPoint
+import fr.acinq.bitcoin.TxHash
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.phoenix.db.serializers.v1.OutpointSerializer
@@ -27,10 +28,10 @@ class OutpointDbDbSerializerTest {
 
     @Test
     fun serialize_outpoint() {
-        val txHash1 = randomBytes32()
+        val txHash1 = TxHash(randomBytes32())
         val outpoint1 = OutPoint(txHash1, 1) //"1:$txId"
         assertEquals("\"$txHash1:1\"", json.encodeToString(outpoint1))
-        val txHash2 = randomBytes32()
+        val txHash2 = TxHash(randomBytes32())
         val outpoint2 = OutPoint(txHash2, 999)
         assertEquals("[\"$txHash1:1\",\"$txHash2:999\"]", json.encodeToString(listOf(outpoint1, outpoint2)))
         println(json.encodeToString(listOf(outpoint1, outpoint2)))
@@ -41,7 +42,7 @@ class OutpointDbDbSerializerTest {
         val data = "[\"dba843431559d17371c1c10b3d2c1c1568ca0afb4ef6a4dd2b348fc54967fcc2:1\",\"33f088b296f0a3e56fa58df6b5d362a5202a6f5c0086980feb69de1e6a8618f5:999\"]"
         assertEquals(
             Hex.decode("dba843431559d17371c1c10b3d2c1c1568ca0afb4ef6a4dd2b348fc54967fcc2").byteVector32(),
-            json.decodeFromString<List<OutPoint>>(data)[0].hash
+            json.decodeFromString<List<OutPoint>>(data)[0].hash.value
         )
         assertEquals(
             999,

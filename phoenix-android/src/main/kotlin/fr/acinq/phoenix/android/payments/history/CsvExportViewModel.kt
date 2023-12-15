@@ -45,7 +45,7 @@ import java.io.FileWriter
 sealed class CsvExportState {
     object Init : CsvExportState()
     data class Generating(val exportedCount: Int) : CsvExportState()
-    data class Success(val paymentsCount: Int, val uri: Uri) : CsvExportState()
+    data class Success(val paymentsCount: Int, val uri: Uri, val content: String) : CsvExportState()
     object NoData : CsvExportState()
     data class Failed(val error: Throwable) : CsvExportState()
 }
@@ -145,8 +145,9 @@ class CsvExportViewModel(
                 }
                 writer.close()
                 val uri = FileProvider.getUriForFile(context, authority, file)
+                val content = rows.joinToString(separator = "")
                 log.info("processed $paymentsCount payments CSV export")
-                state = CsvExportState.Success(paymentsCount, uri)
+                state = CsvExportState.Success(paymentsCount, uri, content)
             }
         }
     }

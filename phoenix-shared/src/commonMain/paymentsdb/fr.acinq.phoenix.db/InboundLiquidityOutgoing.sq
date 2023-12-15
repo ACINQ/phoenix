@@ -1,0 +1,34 @@
+import fr.acinq.phoenix.db.payments.InboundLiquidityLeaseTypeVersion;
+
+-- Stores in a flat row payments standing for an inbound liquidity request (which are done through a splice).
+-- The lease data are stored in a complex column, as a json-encoded blob. See InboundLiquidityLeaseType file.
+CREATE TABLE IF NOT EXISTS inbound_liquidity_outgoing_payments (
+    id TEXT NOT NULL PRIMARY KEY,
+    mining_fees_sat INTEGER NOT NULL,
+    channel_id BLOB NOT NULL,
+    tx_id BLOB NOT NULL,
+    lease_type TEXT AS InboundLiquidityLeaseTypeVersion NOT NULL,
+    lease_blob BLOB NOT NULL,
+    created_at INTEGER NOT NULL,
+    confirmed_at INTEGER DEFAULT NULL,
+    locked_at INTEGER DEFAULT NULL
+);
+
+insert:
+INSERT INTO inbound_liquidity_outgoing_payments (
+    id, mining_fees_sat, channel_id, tx_id, lease_type, lease_blob, created_at, confirmed_at, locked_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+setConfirmed:
+UPDATE inbound_liquidity_outgoing_payments SET confirmed_at=? WHERE id=?;
+
+setLocked:
+UPDATE inbound_liquidity_outgoing_payments SET locked_at=? WHERE id=?;
+
+get:
+SELECT id, mining_fees_sat, channel_id, tx_id, lease_type, lease_blob, created_at, confirmed_at, locked_at
+FROM inbound_liquidity_outgoing_payments
+WHERE id=?;
+
+delete:
+DELETE FROM inbound_liquidity_outgoing_payments WHERE id=?;

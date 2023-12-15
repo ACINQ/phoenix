@@ -17,10 +17,13 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.PublicKey
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.NodeUri
 import fr.acinq.lightning.payment.LiquidityPolicy
+import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.shared.BuildVersions
 import kotlinx.coroutines.CoroutineScope
@@ -80,6 +83,28 @@ class NodeParamsManager(
         val trampolineNodeUri = NodeUri(id = trampolineNodeId, "3.33.236.230", 9735)
         const val remoteSwapInXpub = "xpub69q3sDXXsLuHVbmTrhqmEqYqTTsXJKahdfawXaYuUt6muf1PbZBnvqzFcwiT8Abpc13hY8BFafakwpPbVkatg9egwiMjed1cRrPM19b2Ma7"
         val defaultLiquidityPolicy = LiquidityPolicy.Auto(maxAbsoluteFee = 5_000.sat, maxRelativeFeeBasisPoints = 50_00 /* 50% */, skipAbsoluteFeeCheck = false)
-        const val swapInConfirmations = 3
+
+        fun liquidityLeaseRate(amount: Satoshi): LiquidityAds.LeaseRate {
+            // WARNING : THIS MUST BE KEPT IN SYNC WITH LSP OTHERWISE FUNDING REQUEST WILL BE REJECTED BY PHOENIX
+            val fundingWeight = if (amount <= 100_000.sat) {
+                271 * 2 // 2-inputs (wpkh) / 0-change
+            } else if (amount <= 250_000.sat) {
+                271 * 2 // 2-inputs (wpkh) / 0-change
+            } else if (amount <= 500_000.sat) {
+                271 * 4 // 4-inputs (wpkh) / 0-change
+            } else if (amount <= 1_000_000.sat) {
+                271 * 4 // 4-inputs (wpkh) / 0-change
+            } else {
+                271 * 6 // 6-inputs (wpkh) / 0-change
+            }
+            return LiquidityAds.LeaseRate(
+                leaseDuration = 0,
+                fundingWeight = fundingWeight,
+                leaseFeeProportional = 100, // 1%
+                leaseFeeBase = 0.sat,
+                maxRelayFeeProportional = 100,
+                maxRelayFeeBase = 1_000.msat
+            )
+        }
     }
 }

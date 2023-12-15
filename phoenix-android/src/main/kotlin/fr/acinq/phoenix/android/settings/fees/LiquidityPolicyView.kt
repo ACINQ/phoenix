@@ -34,9 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.sat
@@ -50,10 +48,8 @@ import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
-import fr.acinq.phoenix.android.utils.orange
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.MempoolFeerate
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -61,6 +57,7 @@ import kotlinx.coroutines.launch
 fun LiquidityPolicyView(
     onBackClick: () -> Unit,
     onAdvancedClick: () -> Unit,
+    onRequestLiquidityClick: () -> Unit,
 ) {
     val log = logger("LiquidityPolicyView")
     val context = LocalContext.current
@@ -131,8 +128,8 @@ fun LiquidityPolicyView(
                 }
             }
 
+            val keyboardManager = LocalSoftwareKeyboardController.current
             Card {
-                val keyboardManager = LocalSoftwareKeyboardController.current
                 val skipAbsoluteFeeCheck = if (liquidityPolicyPrefs is LiquidityPolicy.Auto) liquidityPolicyPrefs.skipAbsoluteFeeCheck else false
                 val newPolicy = when {
                     isPolicyDisabled -> LiquidityPolicy.Disable
@@ -158,6 +155,21 @@ fun LiquidityPolicyView(
                         }
                     },
                 )
+            }
+
+            val channelsState by business.peerManager.channelsFlow.collectAsState()
+            if (!channelsState.isNullOrEmpty()) {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Button(
+                        text = stringResource(id = R.string.liquiditypolicy_request_button),
+                        icon = R.drawable.ic_bucket,
+                        onClick = {
+                            keyboardManager?.hide()
+                            onRequestLiquidityClick()
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
 
         } else {
@@ -235,7 +247,7 @@ private fun EditMaxFee(
         Spacer(modifier = Modifier.height(16.dp))
         HSeparator(width = 50.dp)
         Spacer(modifier = Modifier.height(12.dp))
-        when (val feerate = mempoolFeerate) {
+        when (mempoolFeerate) {
             null -> ProgressView(text = stringResource(id = R.string.liquiditypolicy_fees_estimation_loading), progressCircleSize = 16.dp, padding = PaddingValues(0.dp))
             else -> {
                 val fiatCurrency = LocalFiatCurrency.current
@@ -245,8 +257,8 @@ private fun EditMaxFee(
                     Text(
                         text = annotatedStringResource(
                             id = R.string.liquiditypolicy_fees_estimation,
-                            feerate.swapEstimationFee(hasNoChannels).toPrettyString(BitcoinUnit.Sat, withUnit = true),
-                            feerate.swapEstimationFee(hasNoChannels).toPrettyString(fiatCurrency, fiatRate, withUnit = true)
+                            mempoolFeerate.swapEstimationFee(hasNoChannels).toPrettyString(BitcoinUnit.Sat, withUnit = true),
+                            mempoolFeerate.swapEstimationFee(hasNoChannels).toPrettyString(fiatCurrency, fiatRate, withUnit = true)
                         )
                     )
                 }

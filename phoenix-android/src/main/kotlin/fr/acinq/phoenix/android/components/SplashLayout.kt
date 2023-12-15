@@ -129,15 +129,16 @@ fun SplashLabelRow(
             .alignByBaseline(),
         ) {
             Spacer(modifier = Modifier.weight(1f))
-            if (helpMessage != null) {
-                IconPopup(modifier = Modifier.offset(y = (-3).dp), popupMessage = helpMessage, spaceLeft = 0.dp, spaceRight = 4.dp)
-            }
+
             Text(
                 text = label.uppercase(),
                 style = MaterialTheme.typography.subtitle1.copy(fontSize = 12.sp, textAlign = TextAlign.End),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
+            if (helpMessage != null) {
+                IconPopup(modifier = Modifier.offset(y = (-3).dp), popupMessage = helpMessage, spaceLeft = 4.dp, spaceRight = 0.dp)
+            }
             if (icon != null) {
                 Spacer(modifier = Modifier.width(4.dp))
                 Image(
