@@ -179,7 +179,6 @@ class PeerManager(
                 socketBuilder = null,
                 scope = MainScope()
             )
-            peer.liquidityRatesFlow.value = NodeParamsManager.liquidityLeaseRate
             _peer.value = peer
 
             launch { monitorNodeEvents(nodeParams) }

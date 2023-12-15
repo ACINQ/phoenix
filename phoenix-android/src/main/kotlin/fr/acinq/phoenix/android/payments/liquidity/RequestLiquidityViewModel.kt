@@ -24,6 +24,7 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.phoenix.managers.AppConfigurationManager
+import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +66,8 @@ class RequestLiquidityViewModel(val peerManager: PeerManager, val appConfigManag
             val feerate = appConfigManager.mempoolFeerate.filterNotNull().first().economy
             peer.estimateFeeForInboundLiquidity(
                 amount = amount,
-                targetFeerate = FeeratePerKw(feerate)
+                targetFeerate = FeeratePerKw(feerate),
+                leaseRate = NodeParamsManager.liquidityLeaseRate(amount),
             ).let { response ->
                 state.value = when (response) {
                     null -> RequestLiquidityState.Error.NoChannelsAvailable
@@ -88,7 +90,8 @@ class RequestLiquidityViewModel(val peerManager: PeerManager, val appConfigManag
             val peer = peerManager.getPeer()
             peer.requestInboundLiquidity(
                 amount = amount,
-                feerate = feerate
+                feerate = feerate,
+                leaseRate = NodeParamsManager.liquidityLeaseRate(amount),
             ).let { response ->
                 state.value = when (response) {
                     null -> RequestLiquidityState.Error.NoChannelsAvailable

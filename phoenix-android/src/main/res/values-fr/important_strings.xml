@@ -326,7 +326,7 @@
     <string name="liquidityads_estimate_button">Estimer le coût de la liquidité</string>
     <string name="liquidityads_estimating_spinner">Estimation du coût…</string>
     <string name="liquidityads_estimate_details_miner_fees">Frais de minage</string>
-    <string name="liquidityads_estimate_details_miner_fees_help">Cette commission est versée aux mineurs de Bitcoin pour traiter la transaction.\n\nCette valeur est une estimation.</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Cette commission est versée aux mineurs de Bitcoin pour traiter la transaction.</string>
     <string name="liquidityads_estimate_details_service_fees">Frais de service</string>
     <string name="liquidityads_estimate_details_service_fees_help">Cette commission est destinée au service qui fournit la liquidité.</string>
     <string name="liquidityads_estimate_details_duration">Durée</string>
