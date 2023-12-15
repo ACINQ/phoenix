@@ -40,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
@@ -51,6 +52,7 @@ import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
@@ -80,7 +82,10 @@ fun ChannelsView(
                 Box(contentAlignment = Alignment.TopEnd) {
                     DropdownMenu(expanded = showAdvancedMenuPopIn, onDismissRequest = { showAdvancedMenuPopIn = false }) {
                         DropdownMenuItem(onClick = onImportChannelsDataClick, contentPadding = PaddingValues(horizontal = 12.dp)) {
-                            Text(stringResource(R.string.channelsview_menu_import_channels), style = MaterialTheme.typography.body1)
+                            Text(
+                                text = stringResource(R.string.channelsview_menu_import_channels),
+                                style = MaterialTheme.typography.body1,
+                            )
                         }
                     }
                     Button(
@@ -93,9 +98,7 @@ fun ChannelsView(
             }
         )
         if (!channelsState.isNullOrEmpty()) {
-            LightningBalanceView(balance = balance,
-                inboundLiquidity = inboundLiquidity,
-            )
+            LightningBalanceView(balance = balance, inboundLiquidity = inboundLiquidity)
         }
         ChannelsList(channels = channelsState, onChannelClick = onChannelClick)
     }
@@ -106,8 +109,9 @@ private fun LightningBalanceView(
     balance: MilliSatoshi?,
     inboundLiquidity: MilliSatoshi?,
 ) {
-    CardHeader(text = stringResource(id = R.string.channelsview_balance))
-    Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)) {
+    var showHelp by remember { mutableStateOf(false) }
+    CardHeader(text = stringResource(id = R.string.channelsview_header))
+    Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), onClick = { showHelp = !showHelp }) {
         if (balance != null && inboundLiquidity != null) {
             val balanceVsInbound = remember(balance, inboundLiquidity) {
                 (balance.msat.toFloat() / (balance.msat + inboundLiquidity.msat))
@@ -126,9 +130,7 @@ private fun LightningBalanceView(
                     text = stringResource(id = R.string.channelsview_balance),
                     style = MaterialTheme.typography.body2,
                 )
-                IconPopup(popupMessage = stringResource(id = R.string.channelsview_balance_about))
                 Spacer(modifier = Modifier.weight(1f))
-                IconPopup(popupMessage = stringResource(id = R.string.channelsview_inbound_about), spaceLeft = 0.dp, spaceRight = 4.dp)
                 Text(
                     text = stringResource(id = R.string.channelsview_inbound),
                     style = MaterialTheme.typography.body2,
@@ -160,6 +162,16 @@ private fun LightningBalanceView(
                     AmountWithFiatBelow(amount = inboundLiquidity)
                 }
             }
+
+            if (showHelp) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = annotatedStringResource(id = R.string.channelsview_balance_about), style = MaterialTheme.typography.subtitle2)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = annotatedStringResource(id = R.string.channelsview_inbound_about), style = MaterialTheme.typography.subtitle2)
+            }
+
+        } else {
+            ProgressView(text = stringResource(id = R.string.channelsview_loading_channels))
         }
     }
 }

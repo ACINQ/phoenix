@@ -249,9 +249,9 @@
     <string name="channelsview_menu_import_channels">Import channels</string>
     <string name="channelsview_header">Overview</string>
     <string name="channelsview_balance">Balance</string>
-    <string name="channelsview_balance_about">This is the aggregated balance of your active channels. It\'s what you can spend over Lightning.</string>
+    <string name="channelsview_balance_about"><b>Balance</b> is the aggregated balance of your active channels. It\'s what you can spend over Lightning.</string>
     <string name="channelsview_inbound">Inbound liquidity</string>
-    <string name="channelsview_inbound_about">This is what your channels can receive over Lightning without having to pay on-chain fees.</string>
+    <string name="channelsview_inbound_about"><b>Inbound liquidity</b> is what your channels can receive over Lightning without having to go on-chain and pay fees.</string>
     <string name="channelsview_loading_channels">Loading channel data…</string>
     <string name="channelsview_no_channels">You don\'t have any channels yet.\n\nA new payment channel will be created automatically when needed.</string>
 

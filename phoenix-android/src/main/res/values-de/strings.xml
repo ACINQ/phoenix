@@ -210,7 +210,9 @@
 
     <string name="channelsview_title">Zahlungs-Kanäle</string>
     <string name="channelsview_balance">Guthaben</string>
-    <string name="channelsview_balance_about">Dies ist das gesamte Guthaben Ihrer aktiven Kanäle. Diesen Betrag können Sie über Lightning ausgeben.</string>
+    <string name="channelsview_balance_about"><b>Guthaben</b> ist das gesamte Guthaben Ihrer aktiven Kanäle. Diesen Betrag können Sie über Lightning ausgeben.</string>
+    <string name="channelsview_inbound">Inbound-Liquidität</string>
+    <string name="channelsview_inbound_about"><b>Inbound-Liquidität</b> ist das, was Ihre Kanäle über Lightning erhalten können, ohne in die Chain gehen und Gebühren zahlen zu müssen.</string>
     <string name="channelsview_loading_channels">Lade Kanal-Daten…</string>
     <string name="channelsview_no_channels">Sie haben noch keine Kanäle.\n\nEin neuer Zahlungskanal wird automatisch erstellt, wenn er benötigt wird.</string>
 

@@ -212,7 +212,9 @@
     <string name="channelsview_title">Canaux de paiements</string>
     <string name="channelsview_menu_import_channels">Importer des canaux</string>
     <string name="channelsview_balance">Solde</string>
-    <string name="channelsview_balance_about">Il s\'agit du solde de vos canaux actifs. C\'est ce que vous pouvez dépenser via Lightning.</string>
+    <string name="channelsview_balance_about">Votre <b>solde</b> est le total du solde de vos canaux actifs. C\'est ce que vous pouvez dépenser via Lightning.</string>
+    <string name="channelsview_inbound">Liquidité entrante</string>
+    <string name="channelsview_inbound_about">Votre <b>liquidité entrante</b> est ce que vos canaux de paiements peuvent recevoir via Lightning sans avoir à passer sur la chaîne et y payer des frais.</string>
     <string name="channelsview_loading_channels">Chargement des canaux…</string>
     <string name="channelsview_no_channels">Vous n\'avez pas encore de canaux.\n\nCes canaux seront crées automatiquement au besoin.</string>
 
