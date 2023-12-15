@@ -321,19 +321,20 @@
     <string name="liquidityads_header">Plan ahead your liquidity</string>
     <string name="liquidityads_instructions">Inbound liquidity lets you avoid on-chain transactions fees for future payments received over Lightning.\n\nBy requesting more liquidity now, you can save fees later.</string>
     <string name="liquidityads_faq_link">More info</string>
-    <string name="liquidityads_current_liquidity">Current liquidity: </string>
+    <string name="liquidityads_current_liquidity">Current liquidity</string>
 
     <string name="liquidityads_amount_label">Request liquidity</string>
     <string name="liquidityads_estimate_button">Estimate liquidity cost</string>
     <string name="liquidityads_estimating_spinner">Estimating cost…</string>
     <string name="liquidityads_estimate_details_miner_fees">Miner fee</string>
-    <string name="liquidityads_estimate_details_miner_fees_help">This fee goes to Bitcoin miners to process the transaction.\n\nThis fee is an estimation, using a feerate of %1$d sat/vbyte.</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">This fee goes to Bitcoin miners to process the transaction.\n\nThis fee is an estimation.</string>
     <string name="liquidityads_estimate_details_service_fees">Service fee</string>
     <string name="liquidityads_estimate_details_service_fees_help">This fee goes to the service providing the liquidity.</string>
     <string name="liquidityads_estimate_details_duration">Duration</string>
     <string name="liquidityads_estimate_details_duration_value">1 year</string>
     <string name="liquidityads_estimate_details_duration_help">The additional capacity will be preserved for that duration.</string>
-    <string name="liquidityads_estimate_above_25">The total fee is more than 25% of the amount requested.</string>
+    <string name="liquidityads_estimate_above_25">The total fee is more than 25% of the liquidity amount requested.</string>
+    <string name="liquidityads_over_balance">The total fees exceed your balance.</string>
 
     <string name="liquidityads_request_button">Accept</string>
     <string name="liquidityads_requesting_spinner">Processing splice…</string>

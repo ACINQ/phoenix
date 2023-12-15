@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.lightning.blockchain.fee.FeeratePerByte
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.utils.sat
@@ -86,9 +86,11 @@ fun RequestLiquidityView(
 ) {
     val balance by business.balanceManager.balance.collectAsState(null)
     val channelsState by business.peerManager.channelsFlow.collectAsState()
+    val currentInbound = channelsState?.values?.mapNotNull { it.availableForReceive }?.sum()
+
     SplashLayout(
         header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
-        topContent = { RequestLiquidityTopSection() },
+        topContent = { RequestLiquidityTopSection(currentInbound) },
         bottomContent = {
             if (channelsState.isNullOrEmpty()) {
                 InfoMessage(
@@ -96,16 +98,16 @@ fun RequestLiquidityView(
                     details = stringResource(id = R.string.liquidityads_no_channels_details)
                 )
             } else {
-                RequestLiquidityBottomSection()
+                balance?.let {
+                    RequestLiquidityBottomSection(it)
+                } ?: ProgressView(text = stringResource(id = R.string.utils_loading_data))
             }
         },
     )
 }
 
 @Composable
-private fun RequestLiquidityTopSection() {
-    val channelsState by business.peerManager.channelsFlow.collectAsState()
-
+private fun RequestLiquidityTopSection(inboundLiquidity: MilliSatoshi?) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -130,8 +132,7 @@ private fun RequestLiquidityTopSection() {
             )
         }
         Spacer(modifier = Modifier.height(2.dp))
-        val currentInbound = channelsState?.values?.map { it.availableForReceive }?.filterNotNull()?.sum()
-        currentInbound?.let {
+        inboundLiquidity?.let {
             Row {
                 Text(
                     text = stringResource(id = R.string.liquidityads_current_liquidity),
@@ -152,7 +153,9 @@ private fun RequestLiquidityTopSection() {
 }
 
 @Composable
-private fun RequestLiquidityBottomSection() {
+private fun RequestLiquidityBottomSection(
+    balance: MilliSatoshi
+) {
 
     val peerManager = business.peerManager
     val appConfigManager = business.appConfigurationManager
@@ -167,11 +170,11 @@ private fun RequestLiquidityBottomSection() {
             AmountWithFiatBelow(
                 amount = amount.toMilliSatoshi(),
                 amountTextStyle = MaterialTheme.typography.body2,
-                fiatTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
+                fiatTextStyle = MaterialTheme.typography.subtitle2,
             )
             SatoshiSlider(
                 modifier = Modifier
-                    .widthIn(max = 180.dp)
+                    .widthIn(max = 165.dp)
                     .offset(x = (-5).dp, y = (-8).dp),
                 possibleValues = LiquidityLimits.liquidityOptions,
                 onAmountChange = { newAmount ->
@@ -206,17 +209,21 @@ private fun RequestLiquidityBottomSection() {
             }
             LeaseEstimationView(amountRequested = amount, leaseFees = state.fees, actualFeerate = state.actualFeerate)
             Spacer(modifier = Modifier.height(24.dp))
-            FilledButton(
-                text = stringResource(id = R.string.liquidityads_request_button),
-                icon = R.drawable.ic_check_circle,
-                enabled = !isAmountError,
-                onClick = {
-                    vm.requestInboundLiquidity(
-                        amount = state.amount,
-                        feerate = state.actualFeerate,
-                    )
-                },
-            )
+            if (state.fees.serviceFee + state.fees.miningFee.toMilliSatoshi() > balance) {
+                ErrorMessage(header = "Total fees exceed your balance")
+            } else {
+                FilledButton(
+                    text = stringResource(id = R.string.liquidityads_request_button),
+                    icon = R.drawable.ic_check_circle,
+                    enabled = !isAmountError,
+                    onClick = {
+                        vm.requestInboundLiquidity(
+                            amount = state.amount,
+                            feerate = state.actualFeerate,
+                        )
+                    },
+                )
+            }
         }
         is RequestLiquidityState.Requesting -> {
             ProgressView(text = stringResource(id = R.string.liquidityads_requesting_spinner))
@@ -253,7 +260,7 @@ private fun LeaseEstimationView(
 ) {
     SplashLabelRow(
         label = stringResource(id = R.string.liquidityads_estimate_details_miner_fees),
-        helpMessage = stringResource(id = R.string.liquidityads_estimate_details_miner_fees_help, FeeratePerByte(actualFeerate).feerate.sat)
+        helpMessage = stringResource(id = R.string.liquidityads_estimate_details_miner_fees_help,)
     ) {
         AmountWithFiatBelow(amount = leaseFees.miningFee.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body2)
     }
@@ -278,11 +285,16 @@ private fun LeaseEstimationView(
     }
 
     val totalFees = leaseFees.miningFee.toMilliSatoshi() + leaseFees.serviceFee
-    if (totalFees > amountRequested.toMilliSatoshi() * 0.25) {
-        SplashLabelRow(
-            label = "",
-            icon = R.drawable.ic_alert_triangle
-        ) {
+    SplashLabelRow(label = "") {
+        Spacer(modifier = Modifier.height(8.dp))
+        HSeparator(width = 60.dp)
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+    SplashLabelRow(
+        label = stringResource(id = R.string.send_spliceout_complete_recap_total),
+    ) {
+        AmountWithFiatBelow(amount = totalFees, amountTextStyle = MaterialTheme.typography.body2)
+        if (totalFees > amountRequested.toMilliSatoshi() * 0.25) {
             Text(
                 text = stringResource(id = R.string.liquidityads_estimate_above_25),
                 style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)

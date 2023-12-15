@@ -326,13 +326,14 @@
     <string name="liquidityads_estimate_button">Odhad nákladů na likviditu</string>
     <string name="liquidityads_estimating_spinner">Odhad nákladů…</string>
     <string name="liquidityads_estimate_details_miner_fees">Poplatek za miner</string>
-    <string name="liquidityads_estimate_details_miner_fees_help">Tento poplatek jde těžařům bitcoinů za zpracování transakce.\n\nTento poplatek je odhad, přičemž se používá feerate %1$d sat/vbyte.</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Tento poplatek jde těžařům bitcoinů za zpracování transakce.\n\nTento poplatek je odhad.</string>
     <string name="liquidityads_estimate_details_service_fees">Poplatek za služby</string>
     <string name="liquidityads_estimate_details_service_fees_help">Tento poplatek jde službě poskytující likviditu.</string>
     <string name="liquidityads_estimate_details_duration">Duration</string>
     <string name="liquidityads_estimate_details_duration_value">1 rok</string>
     <string name="liquidityads_estimate_details_duration_help">Dodatečná kapacita bude zachována po tuto dobu.</string>
     <string name="liquidityads_estimate_above_25">Celkový poplatek je vyšší než 25 % požadované částky.</string>
+    <string name="liquidityads_over_balance">Celkové poplatky přesahují váš zůstatek.</string>
 
     <string name="liquidityads_request_button">Přijmout</string>
     <string name="liquidityads_requesting_spinner">Zpracování splice…</string>

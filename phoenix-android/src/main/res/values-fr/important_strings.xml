@@ -326,13 +326,14 @@
     <string name="liquidityads_estimate_button">Estimer le coût de la liquidité</string>
     <string name="liquidityads_estimating_spinner">Estimation du coût…</string>
     <string name="liquidityads_estimate_details_miner_fees">Frais de minage</string>
-    <string name="liquidityads_estimate_details_miner_fees_help">Cette commission est versée aux mineurs de Bitcoin pour traiter la transaction.\n\nCette commission est une estimation, utilisant un taux de %1$d sat/vbyte.</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Cette commission est versée aux mineurs de Bitcoin pour traiter la transaction.\n\nCette valeur est une estimation.</string>
     <string name="liquidityads_estimate_details_service_fees">Frais de service</string>
     <string name="liquidityads_estimate_details_service_fees_help">Cette commission est destinée au service qui fournit la liquidité.</string>
     <string name="liquidityads_estimate_details_duration">Durée</string>
     <string name="liquidityads_estimate_details_duration_value">1 an</string>
     <string name="liquidityads_estimate_details_duration_help">La capacité supplémentaire sera préservée pendant cette durée.</string>
-    <string name="liquidityads_estimate_above_25">Les frais totaux sont supérieurs à 25% du montant demandé.</string>
+    <string name="liquidityads_estimate_above_25">Le total des frais est supérieur à 25% du montant de liquidité demandé.</string>
+    <string name="liquidityads_over_balance">Le total des frais dépasse votre solde.</string>
 
     <string name="liquidityads_request_button">Accepter</string>
     <string name="liquidityads_requesting_spinner">Traitement du splice…</string>

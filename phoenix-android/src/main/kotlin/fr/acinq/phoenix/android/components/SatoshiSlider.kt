@@ -29,12 +29,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import kotlin.math.roundToInt
 
 /** A slider to pick a Satoshi value from an array of accepted values. */
 @Composable
@@ -46,8 +46,9 @@ fun SatoshiSlider(
     enabled: Boolean = true,
 ) {
     val context = LocalContext.current
-    var index by remember { mutableStateOf(1.0f) }
+    var index by remember { mutableStateOf(0.0f) }
     var errorMessage by remember { mutableStateOf("") }
+    val valuesCount = remember(possibleValues) { possibleValues.size - 1 }
 
     Column(modifier = modifier.enableOrFade(enabled)) {
         Slider(
@@ -56,7 +57,7 @@ fun SatoshiSlider(
                 errorMessage = ""
                 try {
                     index = it
-                    val amountPicked = possibleValues[index.toInt() - 1]
+                    val amountPicked = possibleValues[index.roundToInt()]
                     onAmountChange(amountPicked)
                     onErrorStateChange(false)
                 } catch (e: Exception) {
@@ -64,14 +65,14 @@ fun SatoshiSlider(
                     onErrorStateChange(true)
                 }
             },
-            valueRange = 1.0f..possibleValues.size.toFloat(),
-            steps = possibleValues.size,
+            valueRange = 0.0f..valuesCount.toFloat(),
+            steps = valuesCount - 1, // steps = spaces in-between options
             enabled = enabled,
             colors = SliderDefaults.colors(
                 activeTrackColor = MaterialTheme.colors.primary,
                 inactiveTrackColor = MaterialTheme.colors.primary.copy(alpha = 0.4f),
                 activeTickColor = MaterialTheme.colors.primary,
-                inactiveTickColor = Color.Transparent,
+                inactiveTickColor = MaterialTheme.colors.primary.copy(alpha = 0.5f),
             )
         )
 

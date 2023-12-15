@@ -326,13 +326,15 @@
     <string name="liquidityads_estimate_button">Liquiditätskosten schätzen</string>
     <string name="liquidityads_estimating_spinner">Kosten abschätzen…</string>
     <string name="liquidityads_estimate_details_miner_fees">Miner-Gebühren</string>
-    <string name="liquidityads_estimate_details_miner_fees_help">Diese Gebühr geht an Bitcoin-Miner, um die Transaktion zu verarbeiten.\n\nDiese Gebühr ist eine Schätzung, die eine Feerate von %1$d sat/vbyte verwendet.</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Diese Gebühr geht an Bitcoin-Miner, um die Transaktion zu verarbeiten.\n\nDiese Gebühr ist eine Schätzung.</string>
     <string name="liquidityads_estimate_details_service_fees">Service-Gebühr</string>
     <string name="liquidityads_estimate_details_service_fees_help">Diese Gebühr geht an den Dienst, der die Liquidität bereitstellt.</string>
     <string name="liquidityads_estimate_details_duration">Dauer</string>
     <string name="liquidityads_estimate_details_duration_value">1 Jahr</string>
     <string name="liquidityads_estimate_details_duration_help">Die zusätzliche Kapazität bleibt für diese Dauer erhalten.</string>
     <string name="liquidityads_estimate_above_25">Die Gesamtgebühr beträgt mehr als 25% des angeforderten Betrags.</string>
+    <string name="liquidityads_over_balance">Die gesamten Gebühren übersteigen Ihr Guthaben.</string>
+
 
     <string name="liquidityads_request_button">Annehmen</string>
     <string name="liquidityads_requesting_spinner">Bearbeitung des Splice…</string>

@@ -327,13 +327,14 @@
     <string name="liquidityads_estimate_button">Estimar custo de liquidez</string>
     <string name="liquidityads_estimating_spinner">Estimando o custo…</string>
     <string name="liquidityads_estimate_details_miner_fees">Taxa do minerador</string>
-    <string name="liquidityads_estimate_details_miner_fees_help">Esta taxa vai para os mineradores de Bitcoin para processar a transação.\n\nEsta taxa é uma estimativa, usando uma taxa de %1$d sat/vbyte.</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Esta taxa vai para os mineradores de Bitcoin para processar a transação.\n\nEsta taxa é uma estimativa.</string>
     <string name="liquidityads_estimate_details_service_fees">Taxa de serviço</string>
     <string name="liquidityads_estimate_details_service_fees_help">Esta taxa vai para o serviço que fornece a liquidez.</string>
     <string name="liquidityads_estimate_details_duration">Duração</string>
     <string name="liquidityads_estimate_details_duration_value">1 ano</string>
     <string name="liquidityads_estimate_details_duration_help">A capacidade adicional será preservada durante esse período.</string>
     <string name="liquidityads_estimate_above_25">A taxa total é superior a 25% do valor solicitado.</string>
+    <string name="liquidityads_over_balance">O total de taxas excede seu saldo.</string>
 
     <string name="liquidityads_request_button">Aceitar</string>
     <string name="liquidityads_requesting_spinner">Processando emenda…</string>
