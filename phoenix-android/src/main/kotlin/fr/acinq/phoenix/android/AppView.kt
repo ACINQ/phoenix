@@ -172,7 +172,11 @@ fun AppView(
                         navArgument("next") { type = NavType.StringType; nullable = true }
                     ),
                 ) {
-                    val intent = it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
+                    val intent = try {
+                        it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
+                    } catch (e: Exception) {
+                        null
+                    }
                     val nextScreenLink = intent?.data?.getQueryParameter("next")?.decodeURLPart()
                     StartupView(
                         appVM = appVM,
@@ -244,7 +248,11 @@ fun AppView(
                         navDeepLink { uriPattern = "scanview:{data}" },
                     )
                 ) {
-                    val intent = it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
+                    val intent = try {
+                        it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
+                    } catch (e: Exception) {
+                        null
+                    }
                     RequireStarted(walletState, nextUri = "scanview:${intent?.data?.toString()}") {
                         val input = intent?.data?.toString()?.substringAfter("scanview:")?.takeIf {
                             // prevents forwarding an internal deeplink intent coming from androidx-navigation framework.
