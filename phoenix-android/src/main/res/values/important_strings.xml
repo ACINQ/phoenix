@@ -327,7 +327,7 @@
     <string name="liquidityads_estimate_button">Estimate liquidity cost</string>
     <string name="liquidityads_estimating_spinner">Estimating cost…</string>
     <string name="liquidityads_estimate_details_miner_fees">Miner fee</string>
-    <string name="liquidityads_estimate_details_miner_fees_help">This fee goes to Bitcoin miners to process the transaction.</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Mining fee contribution for the underlying on-chain transaction.</string>
     <string name="liquidityads_estimate_details_service_fees">Service fee</string>
     <string name="liquidityads_estimate_details_service_fees_help">This fee goes to the service providing the liquidity.</string>
     <string name="liquidityads_estimate_details_duration">Duration</string>

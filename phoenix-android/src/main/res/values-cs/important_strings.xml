@@ -326,7 +326,7 @@
     <string name="liquidityads_estimate_button">Odhad nákladů na likviditu</string>
     <string name="liquidityads_estimating_spinner">Odhad nákladů…</string>
     <string name="liquidityads_estimate_details_miner_fees">Poplatek za miner</string>
-    <string name="liquidityads_estimate_details_miner_fees_help">Tento poplatek jde těžařům bitcoinů za zpracování transakce.</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Příspěvek na těžební poplatek za podkladovou transakci v řetězci.</string>
     <string name="liquidityads_estimate_details_service_fees">Poplatek za služby</string>
     <string name="liquidityads_estimate_details_service_fees_help">Tento poplatek jde službě poskytující likviditu.</string>
     <string name="liquidityads_estimate_details_duration">Duration</string>

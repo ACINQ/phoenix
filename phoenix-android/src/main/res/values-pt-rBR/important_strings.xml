@@ -327,7 +327,7 @@
     <string name="liquidityads_estimate_button">Estimar custo de liquidez</string>
     <string name="liquidityads_estimating_spinner">Estimando o custo…</string>
     <string name="liquidityads_estimate_details_miner_fees">Taxa do minerador</string>
-    <string name="liquidityads_estimate_details_miner_fees_help">Esta taxa vai para os mineradores de Bitcoin para processar a transação.</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Contribuição da taxa de mineração para a transação subjacente na cadeia.</string>
     <string name="liquidityads_estimate_details_service_fees">Taxa de serviço</string>
     <string name="liquidityads_estimate_details_service_fees_help">Esta taxa vai para o serviço que fornece a liquidez.</string>
     <string name="liquidityads_estimate_details_duration">Duração</string>

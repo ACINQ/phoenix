@@ -326,7 +326,7 @@
     <string name="liquidityads_estimate_button">Liquiditätskosten schätzen</string>
     <string name="liquidityads_estimating_spinner">Kosten abschätzen…</string>
     <string name="liquidityads_estimate_details_miner_fees">Miner-Gebühren</string>
-    <string name="liquidityads_estimate_details_miner_fees_help">Diese Gebühr geht an Bitcoin-Miner, um die Transaktion zu verarbeiten.</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Beitrag zur Mining-Gebühr für die zugrunde liegende On-Chain-Transaktion.</string>
     <string name="liquidityads_estimate_details_service_fees">Service-Gebühr</string>
     <string name="liquidityads_estimate_details_service_fees_help">Diese Gebühr geht an den Dienst, der die Liquidität bereitstellt.</string>
     <string name="liquidityads_estimate_details_duration">Dauer</string>
