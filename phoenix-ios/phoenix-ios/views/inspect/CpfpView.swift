@@ -26,7 +26,8 @@ struct MinerFeeCPFP {
 }
 
 enum CpfpError: Error {
-	case feeTooLow
+	case feeBelowMinimum
+	case feeNotIncreased
 	case noChannels
 	case errorThrown(message: String)
 	case executeError(problem: SpliceOutProblem)
@@ -180,7 +181,7 @@ struct CpfpView: View {
 			minerFeeFormula()
 				.padding(.bottom)
 			
-			payButton()
+			footer()
 		}
 		.padding(.horizontal, 40)
 	}
@@ -387,7 +388,7 @@ struct CpfpView: View {
 	}
 	
 	@ViewBuilder
-	func payButton() -> some View {
+	func footer() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 10) {
 			
@@ -412,7 +413,13 @@ struct CpfpView: View {
 				
 				Group {
 					switch cpfpError {
-					case .feeTooLow:
+					case .feeBelowMinimum:
+						if let mrr = mempoolRecommendedResponse {
+							Text("Feerate below minimum allowed by mempool: \(satsPerByteString(mrr.minimumFee))")
+						} else {
+							Text("Feerate below minimum allowed by mempool.")
+						}
+					case .feeNotIncreased:
 						Text(
 							"""
 							This feerate is below what your transactions are already using. \
@@ -527,15 +534,19 @@ struct CpfpView: View {
 		}
 		
 		let doubleValue = mempoolRecommendedResponse.feeForPriority(priority)
-			
+		let stringValue = satsPerByteString(doubleValue)
+		
+		return (doubleValue, stringValue)
+	}
+	
+	func satsPerByteString(_ value: Double) -> String {
+		
 		let nf = NumberFormatter()
 		nf.numberStyle = .decimal
 		nf.minimumFractionDigits = 0
 		nf.maximumFractionDigits = 1
 		
-		let stringValue = nf.string(from: NSNumber(value: doubleValue)) ?? "?"
-		
-		return (doubleValue, stringValue)
+		return nf.string(from: NSNumber(value: value)) ?? "?"
 	}
 	
 	func satsPerByteString(_ priority: MinerFeePriority) -> String {
@@ -619,22 +630,25 @@ struct CpfpView: View {
 	func satsPerByteChanged() {
 		log.trace("satsPerByteChanged(): \(satsPerByte)")
 		
+		minerFeeInfo = nil
 		guard
 			let satsPerByte_number = try? parsedSatsPerByte.get(),
 			let peer = Biz.business.peerManager.peerStateValue()
 		else {
-			minerFeeInfo = nil
 			return
 		}
+		
+		if let mrr = mempoolRecommendedResponse, mrr.minimumFee > satsPerByte_number.doubleValue {
+			cpfpError = .feeBelowMinimum
+			return
+		}
+		cpfpError = nil
 		
 		let originalSatsPerByte = satsPerByte
 		
 		let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
 		let effectiveFeerate = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)
 		let effectiveFeeratePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: effectiveFeerate)
-		
-		cpfpError = nil
-		minerFeeInfo = nil
 		
 		Task { @MainActor in
 			
@@ -680,8 +694,8 @@ struct CpfpView: View {
 						minerFee: minerFee
 					)
 				} else {
-					log.error("Error: peer.estimateFeeForSpliceCpfp() => too low")
-					self.cpfpError = .feeTooLow
+					log.error("Error: peer.estimateFeeForSpliceCpfp() => fee not increased")
+					self.cpfpError = .feeNotIncreased
 				}
 				
 			} else {
@@ -697,6 +711,9 @@ struct CpfpView: View {
 		
 		// The UI will change, so we need to reset the geometry measurements
 		priorityBoxWidth = nil
+		
+		// Might need to display an error (if minimumFee increased)
+		satsPerByteChanged()
 	}
 	
 	func executePayment() {
