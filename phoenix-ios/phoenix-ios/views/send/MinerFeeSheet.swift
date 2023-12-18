@@ -467,13 +467,13 @@ struct MinerFeeSheet: View {
 				
 				if let pair = pair,
 				   let updatedFeePerKw: Lightning_kmpFeeratePerKw = pair.first,
-				   let fee: Bitcoin_kmpSatoshi = pair.second
+				   let fees: Lightning_kmpChannelCommand.CommitmentSpliceFees = pair.second
 				{
 					if self.satsPerByte == originalSatsPerByte {
 						self.minerFeeInfo = MinerFeeInfo(
 							pubKeyScript: scriptVector,
 							feerate: updatedFeePerKw,
-							minerFee: fee
+							minerFee: fees.miningFee
 						)
 					}
 				} else {

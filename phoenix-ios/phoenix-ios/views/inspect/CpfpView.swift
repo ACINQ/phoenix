@@ -638,7 +638,7 @@ struct CpfpView: View {
 		
 		Task { @MainActor in
 			
-			var pair: KotlinPair<Lightning_kmpFeeratePerKw, Bitcoin_kmpSatoshi>? = nil
+			var pair: KotlinPair<Lightning_kmpFeeratePerKw, Lightning_kmpChannelCommand.CommitmentSpliceFees>? = nil
 			do {
 				pair = try await peer.estimateFeeForSpliceCpfp(
 					channelId: onChainPayment.channelId,
@@ -658,7 +658,8 @@ struct CpfpView: View {
 				let cpfpFeeratePerKw: Lightning_kmpFeeratePerKw = pair.first!
 				let cpfpFeerate = Lightning_kmpFeeratePerByte(feeratePerKw: cpfpFeeratePerKw)
 				
-				let minerFee: Bitcoin_kmpSatoshi = pair.second!
+				let spliceFees: Lightning_kmpChannelCommand.CommitmentSpliceFees = pair.second!
+				let minerFee: Bitcoin_kmpSatoshi = spliceFees.miningFee
 					
 				// From the docs (in lightning-kmp):
 				//
