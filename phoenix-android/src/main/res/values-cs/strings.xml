@@ -225,7 +225,7 @@
     <string name="channelsview_balance">Zůstatek</string>
     <string name="channelsview_balance_about"><b>Zůstatek</b>: Toto je souhrnný zůstatek vašich aktivních kanálů. Tolik můžete utratit přes Lightning.</string>
     <string name="channelsview_inbound">Příchozí likvidita</string>
-    <string name="channelsview_inbound_about"><b>Příchozí likvidita</b> je to, co mohou vaše kanály získat přes Lightning, aniž by musely přejít na řetězec a platit poplatky.</string>
+    <string name="channelsview_inbound_about"><b>Příchozí likvidita</b> je to, co mohou vaše kanály přijmout přes Lightning, aniž by musely přejít na on-chain a platit poplatky.</string>
     <string name="channelsview_loading_channels">Načítání údajů o kanálech…</string>
     <string name="channelsview_no_channels">Zatím nemáte žádné kanály.\n\nNový platební kanál se otevře automaticky, když bude potřeba.</string>
 
@@ -736,7 +736,7 @@
 
     <!-- reset wallet -->
 
-    <string name="reset_wallet_title">Resetovat peněženku</string>
+    <string name="reset_wallet_title">Smazat peněženku</string>
     <string name="reset_wallet_instructions_header">Smazat veškerá data peněženky z tohoto zařízení</string>
     <string name="reset_wallet_instructions_details">Toto resetuje aplikaci tak, jako byste ji právě nainstalovali.</string>
     <string name="reset_wallet_review_button">Zhodnotit</string>
