@@ -63,7 +63,7 @@ class RequestLiquidityViewModel(val peerManager: PeerManager, val appConfigManag
             state.value = RequestLiquidityState.Error.Thrown(e)
         }) {
             val peer = peerManager.getPeer()
-            val feerate = appConfigManager.mempoolFeerate.filterNotNull().first().economy
+            val feerate = appConfigManager.mempoolFeerate.filterNotNull().first().hour
             peer.estimateFeeForInboundLiquidity(
                 amount = amount,
                 targetFeerate = FeeratePerKw(feerate),
