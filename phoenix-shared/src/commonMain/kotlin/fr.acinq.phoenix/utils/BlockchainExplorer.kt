@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.utils
 
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.NodeParams
 
 
@@ -10,7 +11,7 @@ class BlockchainExplorer(private val chain: NodeParams.Chain) {
         object BlockstreamInfo: Website("https://blockstream.info")
     }
 
-    fun txUrl(txId: String, website: Website = Website.MempoolSpace): String {
+    fun txUrl(txId: TxId, website: Website = Website.MempoolSpace): String {
         return when (website) {
             Website.MempoolSpace -> {
                 when (chain) {

@@ -18,6 +18,7 @@ package fr.acinq.phoenix.utils.migrations
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.Feature
 import fr.acinq.lightning.MilliSatoshi
@@ -120,7 +121,7 @@ object IosMigrationHelper {
                 peer.send(WrappedChannelCommand(ByteVector32.fromValidHex(it.channelId), command))
             }
             // Wait for the closing tx publication for each consolidated channel (map of channelId -> closing tx id)
-            val closingTxs: MutableMap<ByteVector32, ByteVector32> = mutableMapOf()
+            val closingTxs: MutableMap<ByteVector32, TxId> = mutableMapOf()
             channelsToMigrate.map { ByteVector32.fromValidHex(it.channelId) }.forEach { channelId ->
                 // Wait until closing tx is published
                 val channel = peer.channelsFlow
@@ -154,7 +155,7 @@ object IosMigrationHelper {
 }
 
 sealed class IosMigrationResult {
-    data class Success(val closingTxs: Map<ByteVector32, ByteVector32>) : IosMigrationResult()
+    data class Success(val closingTxs: Map<ByteVector32, TxId>) : IosMigrationResult()
     sealed class Failure : IosMigrationResult() {
         data class Generic(val error: Throwable) : Failure()
         object InvalidClosingScript : Failure()

@@ -18,11 +18,15 @@ package fr.acinq.phoenix.android.settings.walletinfo
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -42,10 +46,8 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.mutedTextColor
-import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.managers.finalOnChainWalletPath
 
 @Composable
@@ -65,20 +67,36 @@ fun WalletInfoView(
 
 @Composable
 private fun OffChainWalletView(onLightningWalletClick: () -> Unit) {
-    val context = LocalContext.current
     val nodeParams by business.nodeParamsManager.nodeParams.collectAsState()
-    CardHeader(text = stringResource(id = R.string.walletinfo_lightning))
-    Card {
-        LightningNodeIdView(nodeId = nodeParams?.nodeId?.toString(), onLightningWalletClick)
+    var showLegacyNodeId by remember { mutableStateOf(false) }
 
-        val isDataMigrationExpected by LegacyPrefsDatastore.getDataMigrationExpected(context).collectAsState(initial = null)
-        if (isDataMigrationExpected != null) {
-            val keyManager by business.walletManager.keyManager.collectAsState()
+    CardHeader(text = stringResource(id = R.string.walletinfo_lightning))
+    Spacer(Modifier.height(8.dp))
+    Card(externalPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp)) {
+        LightningNodeIdView(nodeId = nodeParams?.nodeId?.toString(), onLightningWalletClick)
+        val keyManager by business.walletManager.keyManager.collectAsState()
+        if (showLegacyNodeId) {
             keyManager?.let {
                 SettingWithCopy(title = stringResource(id = R.string.walletinfo_legacy_nodeid), value = it.nodeKeys.legacyNodeKey.publicKey.toHex())
             }
         }
     }
+
+    if (!showLegacyNodeId) {
+        Button(
+            text = stringResource(id = R.string.walletinfo_legacy_nodeid_toggle),
+            icon = R.drawable.ic_chevron_down,
+            onClick = { showLegacyNodeId = true },
+            modifier = Modifier.padding(horizontal = 32.dp),
+            shape = RoundedCornerShape(bottomStart = 10.dp, bottomEnd = 10.dp),
+            backgroundColor = MaterialTheme.colors.surface,
+            textStyle = MaterialTheme.typography.subtitle2,
+            space = 6.dp,
+            padding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+        )
+    }
+
+    Spacer(Modifier.height(8.dp))
 }
 
 @Composable
@@ -141,27 +159,15 @@ private fun LightningNodeIdView(
     nodeId: String?,
     onClick: () -> Unit
 ) {
-    val context = LocalContext.current
     if (nodeId == null) {
         ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
     } else {
         Clickable(onClick = onClick) {
-            Row {
-                Column(modifier = Modifier
-                    .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
-                    .weight(1f)) {
-                    Text(
-                        text = stringResource(id = R.string.walletinfo_nodeid),
-                        style = MaterialTheme.typography.body2,
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(text = nodeId, style = MaterialTheme.typography.subtitle2)
-                }
-                Button(
-                    icon = R.drawable.ic_copy,
-                    onClick = { copyToClipboard(context, nodeId, context.getString(R.string.walletinfo_nodeid)) }
-                )
-            }
+            SettingWithCopy(
+                title = stringResource(id = R.string.walletinfo_nodeid),
+                value = nodeId,
+                maxLinesValue = 2
+            )
         }
     }
 }
@@ -195,7 +201,7 @@ private fun OnchainBalanceView(
 @Composable
 fun UtxoRow(utxo: WalletState.Utxo, progress: Pair<Int?, Int>?) {
     val context = LocalContext.current
-    val txUrl = txUrl(txId = utxo.outPoint.txid.toHex())
+    val txUrl = txUrl(txId = utxo.outPoint.txid)
     Row(
         modifier = Modifier
             .clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.accessibility_explorer_link)) {
@@ -217,7 +223,7 @@ fun UtxoRow(utxo: WalletState.Utxo, progress: Pair<Int?, Int>?) {
             )
         }
         Text(
-            text = utxo.outPoint.txid.toHex(),
+            text = utxo.outPoint.txid.toString(),
             modifier = Modifier.weight(1f),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

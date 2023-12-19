@@ -18,6 +18,7 @@ package fr.acinq.phoenix.utils.migrations
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.ChannelClosingType
@@ -82,7 +83,7 @@ object LegacyChannelCloseHelper {
                         || closingType == ChannelClosingType.Remote
                         || closingType == ChannelClosingType.Other),
             miningFees = fees,
-            txId = closingTxId ?: ByteVector32.Zeroes,
+            txId = TxId(closingTxId ?: ByteVector32.Zeroes),
             createdAt = createdAt,
             confirmedAt = confirmedAt ?: createdAt,
             lockedAt = confirmedAt ?: createdAt,

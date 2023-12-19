@@ -100,6 +100,7 @@ fun PaymentDetailsTechnicalView(
                     is SpliceOutgoingPayment -> DetailsForSpliceOut(payment)
                     is ChannelCloseOutgoingPayment -> DetailsForChannelClose(payment)
                     is SpliceCpfpOutgoingPayment -> DetailsForCpfp(payment)
+                    is InboundLiquidityOutgoingPayment -> DetailsForInboundLiquidity(payment)
                 }
             }
 
@@ -134,8 +135,8 @@ private fun HeaderForOutgoing(
                     is LightningOutgoingPayment.Details.KeySend -> stringResource(R.string.paymentdetails_keysend)
                 }
                 is SpliceCpfpOutgoingPayment -> stringResource(id = R.string.paymentdetails_splice_cpfp_outgoing)
+                is InboundLiquidityOutgoingPayment -> stringResource(id = R.string.paymentdetails_inbound_liquidity)
             }
-
         )
     }
 
@@ -143,6 +144,10 @@ private fun HeaderForOutgoing(
     TechnicalRow(label = stringResource(id = R.string.paymentdetails_status_label)) {
         Text(
             when (payment) {
+                is InboundLiquidityOutgoingPayment -> when (payment.lockedAt) {
+                    null -> stringResource(R.string.paymentdetails_status_pending)
+                    else -> stringResource(R.string.paymentdetails_status_success)
+                }
                 is OnChainOutgoingPayment -> when (payment.confirmedAt) {
                     null -> stringResource(R.string.paymentdetails_status_pending)
                     else -> stringResource(R.string.paymentdetails_status_success)
@@ -214,6 +219,30 @@ private fun AmountSection(
     rateThen: ExchangeRate.BitcoinPriceRate?
 ) {
     when (payment) {
+        is InboundLiquidityOutgoingPayment -> {
+            TechnicalRowAmount(
+                label = stringResource(id = R.string.paymentdetails_liquidity_amount_label),
+                amount = payment.lease.amount.toMilliSatoshi(),
+                rateThen = rateThen,
+                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+            )
+            TechnicalRowAmount(
+                label = stringResource(id = R.string.paymentdetails_liquidity_miner_fee_label),
+                amount = payment.miningFees.toMilliSatoshi(),
+                rateThen = rateThen,
+                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+            )
+            TechnicalRowAmount(
+                label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
+                amount = payment.lease.fees.serviceFee.toMilliSatoshi(),
+                rateThen = rateThen,
+                mSatDisplayPolicy = MSatDisplayPolicy.SHOW
+            )
+            TechnicalRowSelectable(
+                label = stringResource(id = R.string.paymentdetails_liquidity_signature_label),
+                value = payment.lease.sellerSig.toHex(),
+            )
+        }
         is OutgoingPayment -> {
             TechnicalRowAmount(
                 label = stringResource(id = R.string.paymentdetails_amount_sent_label),
@@ -309,7 +338,7 @@ private fun DetailsForChannelClose(
     )
     TechnicalRow(
         label = stringResource(id = R.string.paymentdetails_closing_tx_label),
-        content = { TransactionLinkButton(txId = payment.txId.toHex()) }
+        content = { TransactionLinkButton(txId = payment.txId) }
     )
     TechnicalRowSelectable(
         label = stringResource(id = R.string.paymentdetails_closing_type_label),
@@ -329,7 +358,21 @@ private fun DetailsForCpfp(
 ) {
     TechnicalRow(
         label = stringResource(id = R.string.paymentdetails_splice_cpfp_transaction_label),
-        content = { TransactionLinkButton(txId = payment.txId.toHex()) }
+        content = { TransactionLinkButton(txId = payment.txId) }
+    )
+}
+
+@Composable
+private fun DetailsForInboundLiquidity(
+    payment: InboundLiquidityOutgoingPayment
+) {
+    TechnicalRow(
+        label = stringResource(id = R.string.paymentdetails_tx_id_label),
+        content = { TransactionLinkButton(txId = payment.txId) }
+    )
+    TechnicalRowSelectable(
+        label = stringResource(id = R.string.paymentdetails_channel_id_label),
+        value = payment.channelId.toHex(),
     )
 }
 
@@ -347,7 +390,7 @@ private fun DetailsForSpliceOut(
     )
     TechnicalRow(
         label = stringResource(id = R.string.paymentdetails_splice_out_tx_label),
-        content = { TransactionLinkButton(txId = payment.txId.toHex()) }
+        content = { TransactionLinkButton(txId = payment.txId) }
     )
 
 }
@@ -374,7 +417,7 @@ private fun DetailsForIncoming(
                     Row {
                         Text(text = stringResource(id = R.string.paymentdetails_dualswapin_tx_value, index + 1))
                         Spacer(modifier = Modifier.width(4.dp))
-                        TransactionLinkButton(txId = outpoint.txid.toHex())
+                        TransactionLinkButton(txId = outpoint.txid)
                     }
                 }
             }
@@ -414,7 +457,7 @@ private fun ReceivedWithNewChannel(
     }
     TechnicalRow(
         label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = receivedWith.txId.toHex()) }
+        content = { TransactionLinkButton(txId = receivedWith.txId) }
     )
     TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
 }
@@ -435,7 +478,7 @@ private fun ReceivedWithSpliceIn(
     }
     TechnicalRow(
         label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        content = { TransactionLinkButton(txId = receivedWith.txId.toHex()) }
+        content = { TransactionLinkButton(txId = receivedWith.txId) }
     )
     TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_amount_received_label), amount = receivedWith.amount, rateThen = rateThen)
 }

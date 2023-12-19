@@ -23,7 +23,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,13 +38,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.VSeparator
 import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.isBadCertificate
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.android.utils.orange
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.android.utils.warningColor
 import fr.acinq.phoenix.managers.Connections
@@ -51,12 +57,24 @@ import fr.acinq.phoenix.managers.Connections
 fun TopBar(
     modifier: Modifier = Modifier,
     onConnectionsStateButtonClick: () -> Unit,
-    connectionsState: Connections?,
+    connections: Connections,
     electrumBlockheight: Int,
     onTorClick: () -> Unit,
-    isTorEnabled: Boolean?
+    isTorEnabled: Boolean?,
+    onRequestLiquidityClick: () -> Unit,
 ) {
+    val channelsState by business.peerManager.channelsFlow.collectAsState()
     val context = LocalContext.current
+    val connectionsTransition = rememberInfiniteTransition(label = "animateConnectionsBadge")
+    val connectionsButtonAlpha by connectionsTransition.animateFloat(
+        label = "animateConnectionsBadge",
+        initialValue = 0.3f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes { durationMillis = 500 },
+            repeatMode = RepeatMode.Reverse
+        ),
+    )
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -64,18 +82,9 @@ fun TopBar(
             .height(40.dp)
             .clipToBounds()
     ) {
-        if (connectionsState?.electrum !is Connection.ESTABLISHED || connectionsState.peer !is Connection.ESTABLISHED) {
-            val connectionsTransition = rememberInfiniteTransition()
-            val connectionsButtonAlpha by connectionsTransition.animateFloat(
-                initialValue = 0.3f,
-                targetValue = 1f,
-                animationSpec = infiniteRepeatable(
-                    animation = keyframes { durationMillis = 500 },
-                    repeatMode = RepeatMode.Reverse
-                )
-            )
-            val electrumConnection = connectionsState?.electrum
-            val isBadElectrumCert = electrumConnection != null && electrumConnection is Connection.CLOSED && electrumConnection.isBadCertificate()
+        if (connections.electrum !is Connection.ESTABLISHED || connections.peer !is Connection.ESTABLISHED) {
+            val electrumConnection = connections.electrum
+            val isBadElectrumCert = electrumConnection is Connection.CLOSED && electrumConnection.isBadCertificate()
             FilledButton(
                 text = stringResource(id = if (isBadElectrumCert) R.string.home__connection__bad_cert else R.string.home__connection__connecting),
                 icon = if (isBadElectrumCert) R.drawable.ic_alert_triangle else R.drawable.ic_connection_lost,
@@ -88,16 +97,7 @@ fun TopBar(
                 modifier = Modifier.alpha(connectionsButtonAlpha)
             )
         } else if (electrumBlockheight < 795_000) {
-            // FIXME use a dynamic blockheight
-            val connectionsTransition = rememberInfiniteTransition()
-            val connectionsButtonAlpha by connectionsTransition.animateFloat(
-                initialValue = 0.3f,
-                targetValue = 1f,
-                animationSpec = infiniteRepeatable(
-                    animation = keyframes { durationMillis = 500 },
-                    repeatMode = RepeatMode.Reverse
-                )
-            )
+            // FIXME use a dynamic blockheight ^
             FilledButton(
                 text = stringResource(id = R.string.home__connection__electrum_late),
                 icon = R.drawable.ic_alert_triangle,
@@ -110,7 +110,7 @@ fun TopBar(
                 modifier = Modifier.alpha(connectionsButtonAlpha)
             )
         } else if (isTorEnabled == true) {
-            if (connectionsState.tor is Connection.ESTABLISHED) {
+            if (connections.tor is Connection.ESTABLISHED) {
                 FilledButton(
                     text = stringResource(id = R.string.home__connection__tor_active),
                     icon = R.drawable.ic_tor_shield_ok,
@@ -124,6 +124,18 @@ fun TopBar(
             }
         }
         Spacer(modifier = Modifier.weight(1f))
+        if (!channelsState.isNullOrEmpty()) {
+            BorderButton(
+                text = stringResource(id = R.string.home_request_liquidity),
+                icon = R.drawable.ic_bucket,
+                onClick = onRequestLiquidityClick,
+                textStyle = MaterialTheme.typography.button.copy(fontSize = 12.sp, color = MaterialTheme.colors.onSurface),
+                backgroundColor = MaterialTheme.colors.surface,
+                space = 8.dp,
+                padding = PaddingValues(8.dp),
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+        }
         FilledButton(
             text = stringResource(R.string.home__faq_button),
             icon = R.drawable.ic_help_circle,

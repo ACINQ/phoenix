@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.DefaultSwapInParams
 import fr.acinq.lightning.LiquidityEvents
@@ -269,7 +270,7 @@ fun ChannelCommand.Commitment.Splice.Response.Failure.asDisconnected(): ChannelC
     else -> null
 }
 
-suspend fun ElectrumClient.kotlin_getConfirmations(txid: ByteVector32): Int? {
+suspend fun ElectrumClient.kotlin_getConfirmations(txid: TxId): Int? {
     return this.getConfirmations(txid)
 }
 

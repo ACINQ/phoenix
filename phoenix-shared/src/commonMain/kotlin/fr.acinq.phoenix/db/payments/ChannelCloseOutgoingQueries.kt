@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.db.payments
 
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
@@ -40,7 +41,7 @@ class ChannelCloseOutgoingQueries(val database: PaymentsDatabase) {
                 address = payment.address,
                 is_default_address = if (payment.isSentToDefaultAddress) 1 else 0,
                 mining_fees_sat = payment.miningFees.sat,
-                tx_id = payment.txId.toByteArray(),
+                tx_id = payment.txId.value.toByteArray(),
                 created_at = payment.createdAt,
                 confirmed_at = payment.confirmedAt,
                 locked_at = payment.lockedAt,
@@ -87,7 +88,7 @@ class ChannelCloseOutgoingQueries(val database: PaymentsDatabase) {
                 address = address,
                 isSentToDefaultAddress = is_default_address == 1L,
                 miningFees = mining_fees_sat.sat,
-                txId = tx_id.toByteVector32(),
+                txId = TxId(tx_id),
                 createdAt = created_at,
                 confirmedAt = confirmed_at,
                 lockedAt = locked_at,

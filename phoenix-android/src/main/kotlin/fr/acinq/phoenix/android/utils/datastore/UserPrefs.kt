@@ -59,6 +59,8 @@ object UserPrefs {
         }
     }
 
+    suspend fun clear(context: Context) = context.userPrefs.edit { it.clear() }
+
     // -- unit, fiat, conversion...
 
     private val BITCOIN_UNIT = stringPreferencesKey("BITCOIN_UNIT")
@@ -187,7 +189,7 @@ object UserPrefs {
     }
 
     suspend fun saveLiquidityPolicy(context: Context, policy: LiquidityPolicy) = context.userPrefs.edit {
-        log.debug("saving new liquidity policy=$policy")
+        log.info("saving new liquidity policy=$policy")
         val serialisable = when (policy) {
             is LiquidityPolicy.Auto -> InternalLiquidityPolicy.Auto(policy.maxRelativeFeeBasisPoints, policy.maxAbsoluteFee, policy.skipAbsoluteFeeCheck)
             is LiquidityPolicy.Disable -> InternalLiquidityPolicy.Disable

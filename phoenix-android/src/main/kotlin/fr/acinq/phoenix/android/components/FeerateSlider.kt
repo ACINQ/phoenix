@@ -90,7 +90,7 @@ fun FeerateSlider(
             }
         }
 
-        SatoshiSlider(
+        SatoshiLogSlider(
             modifier = Modifier
                 .widthIn(max = 130.dp)
                 .offset(x = (-4).dp, y = (-8).dp),

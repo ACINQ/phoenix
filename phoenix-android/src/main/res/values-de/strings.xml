@@ -210,7 +210,9 @@
 
     <string name="channelsview_title">Zahlungs-Kanäle</string>
     <string name="channelsview_balance">Guthaben</string>
-    <string name="channelsview_balance_about">Dies ist das gesamte Guthaben Ihrer aktiven Kanäle. Diesen Betrag können Sie über Lightning ausgeben.</string>
+    <string name="channelsview_balance_about"><b>Guthaben</b> ist das gesamte Guthaben Ihrer aktiven Kanäle. Diesen Betrag können Sie über Lightning ausgeben.</string>
+    <string name="channelsview_inbound">Inbound-Liquidität</string>
+    <string name="channelsview_inbound_about"><b>Inbound-Liquidität</b> ist das, was Ihre Kanäle über Lightning erhalten können, ohne in die Chain gehen und Gebühren zahlen zu müssen.</string>
     <string name="channelsview_loading_channels">Lade Kanal-Daten…</string>
     <string name="channelsview_no_channels">Sie haben noch keine Kanäle.\n\nEin neuer Zahlungskanal wird automatisch erstellt, wenn er benötigt wird.</string>
 
@@ -506,8 +508,6 @@
     <string name="electrum_title">Electrum-Server</string>
     <string name="electrum_about">Um Ihre Zahlungskanäle zu sichern, überwacht Phoenix die Bitcoin-Blockchain über Electrum-Server.\n\nStandardmäßig werden zufällige Server verwendet. Sie können Phoenix auch so konfigurieren, dass es sich nur mit Ihrem eigenen Server verbindet.</string>
     <string name="electrum_block_height_label">Blockhöhe</string>
-    <string name="electrum_fee_rate_next_label">Gebührenrate 1 Block</string>
-    <string name="electrum_fee_rate_funding_label">Gebührenrate 144 Blöcke</string>
     <string name="electrum_connection_label">Server</string>
 
     <string name="electrum_connection_closed_with_random">Keine Verbindung zu Electrum</string>
@@ -524,7 +524,7 @@
     <string name="electrum_dialog_invalid_input">Diese Adresse ist ungültig.</string>
     <string name="electrum_dialog_cert_check_button">Verbinden</string>
     <string name="electrum_dialog_cert_checking">Prüfe Zertifikat…</string>
-    <string name="electrum_dialog_cert_failure">Verbindung fehlgeschlagen:\n%1$s</string>
+    <string name="electrum_dialog_cert_failure">Verbindung fehlgeschlagen</string>
     <string name="electrum_dialog_cert_unresolved">Diese Adresse konnte nicht aufgelöst werden.</string>
     <string name="electrum_dialog_cert_header">Nicht vertrauenswürdiges Zertifikat</string>
     <string name="electrum_dialog_cert_sha1">SHA1 Fingerabdruck</string>
@@ -718,11 +718,9 @@
     <string name="reset_wallet_confirm_details">Dadurch wird die App zurückgesetzt. Es erscheint der Start-Bildschirm mit der Aufforderung, eine Wallet zu erstellen oder wiederherzustellen.</string>
     <string name="reset_wallet_confirm_seed_balance">Verlieren Sie Ihr Guthaben nicht:\n%1$s (≈ %2$s).</string>
     <string name="reset_wallet_confirm_seed_responsibility">Sie sind für die Speicherung Ihrer Wiederherstellungsphrase verantwortlich.</string>
-    <string name="reset_wallet_confirm_button">Wallet löschen (funktioniert noch nicht)</string>
+    <string name="reset_wallet_confirm_button">Wallet löschen</string>
 
-    <string name="reset_wallet_deleting">Wallet-Daten werden gelöscht…</string>
     <string name="reset_wallet_success">Wallet wurde erfolgreich zurückgesetzt</string>
-    <string name="reset_wallet_success_details">Zurück zum Startbildschirm…</string>
     <string name="reset_wallet_failure_title">Zurücksetzen fehlgeschlagen</string>
 
 </resources>

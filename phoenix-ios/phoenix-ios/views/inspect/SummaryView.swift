@@ -324,7 +324,7 @@ struct SummaryView: View {
 					}
 				} // </confirmationDialog>
 				
-				if confirmations == 0 {
+				if confirmations == 0 && supportsBumpFee(onChainPayment) {
 					NavigationLink(destination: cpfpView(onChainPayment)) {
 						Label {
 							Text("Accelerate transaction")
@@ -651,6 +651,15 @@ struct SummaryView: View {
 		}
 	}
 	
+	func supportsBumpFee(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) -> Bool {
+		
+		switch onChainPayment {
+			case is Lightning_kmpSpliceOutgoingPayment     : return true
+			case is Lightning_kmpSpliceCpfpOutgoingPayment : return true
+			default                                        : return false
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Tasks
 	// --------------------------------------------------
@@ -808,17 +817,16 @@ struct SummaryView: View {
 		}
 	}
 	
-	func exploreTx(_ txId: Bitcoin_kmpByteVector32, website: BlockchainExplorer.Website) {
+	func exploreTx(_ txId: Bitcoin_kmpTxId, website: BlockchainExplorer.Website) {
 		log.trace("exploreTX()")
 		
-		let txIdStr = txId.toHex()
-		let txUrlStr = Biz.business.blockchainExplorer.txUrl(txId: txIdStr, website: website)
+		let txUrlStr = Biz.business.blockchainExplorer.txUrl(txId: txId, website: website)
 		if let txUrl = URL(string: txUrlStr) {
 			UIApplication.shared.open(txUrl)
 		}
 	}
 	
-	func copyTxId(_ txId: Bitcoin_kmpByteVector32) {
+	func copyTxId(_ txId: Bitcoin_kmpTxId) {
 		log.trace("copyTxId()")
 		
 		UIPasteboard.general.string = txId.toHex()

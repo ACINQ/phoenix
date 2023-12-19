@@ -72,11 +72,11 @@
 
     <!-- home: swap help -->
 
-    <string name="home_swapin_help_pending">Čeká na 3 potvrzení.</string>
-    <string name="home_swapin_help_ready_fee">Vklady se nasadí do Lightningu, když jsou poplatky za těžbu nižší než %1$s.</string>
-    <string name="home_swapin_help_ready_disabled">Vklady zůstanou na řetězci, protože automatická správa kanálů je vypnutá.</string>
-    <string name="home_swapin_help_generic">Peníze na řetězci byly uloženy do vaší peněženky.</string>
-    <string name="home_swapin_help_button">Tlačítko pro podrobnosti</string>
+    <string name="home_swapin_help_pending">Čekání na 3 potvrzení.</string>
+    <string name="home_swapin_help_ready_fee">Vklady se přidají do Lightningu, když jsou poplatky za těžbu nižší než %1$s.</string>
+    <string name="home_swapin_help_ready_disabled">Vklady zůstanou on-chain, protože automatická správa kanálů je vypnutá.</string>
+    <string name="home_swapin_help_generic">On-chain peníze byly vloženy do vaší peněženky.</string>
+    <string name="home_swapin_help_button">Klikněte pro podrobnosti</string>
 
     <!-- home: bottom menu -->
 
@@ -178,9 +178,9 @@
     <string name="inappnotif_mempool_full_action">Podívejte se, jak je ovlivněn Phoenix</string>
 
     <string name="inappnotif_payment_onchain_pending_title">On-Chain finanční prostředky čekají na vyřízení (+%1$s)</string>
-    <string name="inappnotif_payments_rejection_overview_one">1 nedávno zamítnutá příchozí platba</string>
-    <string name="inappnotif_payments_rejection_overview_many">%1$d nedávno zamítnutých příchozích plateb</string>
-    <string name="inappnotif_payment_rejected_title">Platba zamítnuta (+%1$s)</string>
+    <string name="inappnotif_payments_rejection_overview_one">Příchozí platba byla nedávno odmítnuta</string>
+    <string name="inappnotif_payments_rejection_overview_many">%1$d nedávno odmítnutých příchozích plateb</string>
+    <string name="inappnotif_payment_rejected_title">Platba odmítnuta (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">Automatická správa kanálů je zakázána.</string>
     <string name="inappnotif_payment_rejected_over_absolute">Poplatek byl %1$s, ale váš maximální poplatek byl nastaven na %2$s.</string>
     <string name="inappnotif_payment_rejected_over_relative">Poplatek byl %1$s, což je více než %2$s%% částky.</string>
@@ -188,7 +188,7 @@
     <string name="inappnotif_payment_rejected_tweak_setting">Klepnutím na položku provedete konfiguraci.</string>
     <string name="inappnotif_payment_rejected_view_wallet">Zobrazit podrobnosti</string>
 
-    <string name="inappnotif_watchtower_nominal_title">Watchtower report</string>
+    <string name="inappnotif_watchtower_nominal_title">Hlášení Watchtower</string>
     <string name="inappnotif_watchtower_nominal_description_one">%1$d kanál byl úspěšně zkontrolován na %2$s. Nebyly nalezeny žádné problémy.</string>
     <string name="inappnotif_watchtower_nominal_description_many">%1$d kanálů bylo úspěšně zkontrolováno na %2$s. Nebyly nalezeny žádné problémy.</string>
     <string name="inappnotif_watchtower_revokedfound_title">Watchtower alert</string>
@@ -210,6 +210,12 @@
     <string name="paymentdetails_funding_fees_desc">Poplatky placené těžařům Bitcoinové sítě za zpracování On-Chain transakce.</string>
     <string name="paymentdetails_service_fees_label">Poplatky za službu</string>
     <string name="paymentdetails_service_fees_desc">Poplatky za vytvoření nového platebního kanálu. Toto není vždy vyžadováno.</string>
+    <string name="paymentdetails_liquidity_service_fee_label">Poplatky za službu</string>
+    <string name="paymentdetails_liquidity_service_fee_help">Poplatky za službu likvidity.</string>
+    <string name="paymentdetails_liquidity_miner_fee_label">Poplatky těžařům</string>
+    <string name="paymentdetails_liquidity_miner_fee_help">Poplatky placené těžařům Bitcoinové sítě za zpracování on-chain transakce.</string>
+    <string name="paymentdetails_liquidity_lease_duration_label">Doba trvání</string>
+    <string name="paymentdetails_liquidity_lease_duration_value">1 rok</string>
 
     <!-- lnurl -->
 
@@ -293,6 +299,7 @@
     <string name="liquiditypolicy_advanced_pay_to_open_label">Přeskočit kontrolu konečných poplatků za Lightning</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">Pokud je tato funkce povolena, příchozí platby Lightning budou ignorovat konečný maximální limit poplatků. Uplatní se pouze procentuální kontrola.\n\nPozor: pokud jsou vysoké poplatky v mempoolu Bitcoinu, příchozí Lightning platby vyžadující operaci na Blockchainu by mohly být drahé.</string>
     <string name="liquiditypolicy_save_button">Uložit zásady</string>
+    <string name="liquiditypolicy_request_button">Požádat o příchozí likviditu</string>
 
     <string name="liquiditypolicy_help">
       Phoenix umožňuje přijímat platby na blockchainu Bitcoinu (L1) a na Lightning vrstvě Bitcoinu (L2).
@@ -301,19 +308,49 @@
       \n
       - vrstva Lightning (L2) je mnohem rychlejší a obecně mnohem levnější (zejména pro menší platby).
       \n\n
-      Když obdržíte platbu na L1, Phoenix automaticky přesune prostředky na L2, <b>pokud</b> poplatky těžařů odpovídají vašim nastaveným zásadám poplatků.
+      Když obdržíte platbu na L1, Phoenix automaticky přesune prostředky na L2, <b>POKUD</b> poplatky těžařům odpovídají vašim nastaveným zásadám poplatků.
       \n\n
-      Platby, které obdržíte na L2, můžete obdržet okamžitě a za nulové poplatky. Občas je však pro správu platebního kanálu L2 nutná i operace L1. To lze provést automaticky, <b>pokud</b> poplatky těžařů odpovídají nastaveným zásadám poplatků.
+      Platby, které obdržíte na L2, můžete obdržet okamžitě a za nulové poplatky. Občas je však pro správu platebního kanálu L2 nutná i operace L1. To lze provést automaticky, <b>POKUD</b> poplatky těžařům odpovídají nastaveným zásadám poplatků.
     </string>
+
+    <!-- settings: liquidity request -->
+
+    <string name="liquidityads_no_channels_header">Zatím žádné kanály!</string>
+    <string name="liquidityads_no_channels_details">Pro použití této funkce potřebujete nejprve prostředky v peněžence.</string>
+    <string name="liquidityads_header">Plánujte si dopředu likviditu</string>
+    <string name="liquidityads_instructions">Příchozí likvidita vám umožní vyhnout se poplatkům za on-chain transakce u budoucích plateb přijatých přes Lightning.\n\nPokud si nyní zažádáte o větší likviditu, můžete později ušetřit poplatky.</string>
+    <string name="liquidityads_faq_link">Více informací</string>
+    <string name="liquidityads_current_liquidity">Aktuální likvidita: </string>
+
+    <string name="liquidityads_amount_label">Požádat o likviditu</string>
+    <string name="liquidityads_estimate_button">Odhad ceny likvidity</string>
+    <string name="liquidityads_estimating_spinner">Odhadování ceny…</string>
+    <string name="liquidityads_estimate_details_miner_fees">Poplatek těžařům</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Příspěvek na poplatek těžařům za podkladovou on-chain transakci.</string>
+    <string name="liquidityads_estimate_details_service_fees">Poplatek za službu</string>
+    <string name="liquidityads_estimate_details_service_fees_help">Tento poplatek jde službě poskytující likviditu.</string>
+    <string name="liquidityads_estimate_details_duration">Doba trvání</string>
+    <string name="liquidityads_estimate_details_duration_value">1 rok</string>
+    <string name="liquidityads_estimate_details_duration_help">Dodatečná kapacita bude zachována po tuto dobu.</string>
+    <string name="liquidityads_estimate_above_25">Celkový poplatek je vyšší než 25 % požadované částky.</string>
+    <string name="liquidityads_over_balance">Celkové poplatky přesahují váš zůstatek.</string>
+
+    <string name="liquidityads_request_button">Přijmout</string>
+    <string name="liquidityads_requesting_spinner">Zpracovává se splice…</string>
+
+    <string name="liquidityads_success">Likvidita byla úspěšně přidána!</string>
+
+    <string name="liquidityads_error_header">Žádost o likviditu se nezdařila</string>
+    <string name="liquidityads_error_channels_unavailable">Kanály nejsou k dispozici. Zkuste to později.</string>
 
     <!-- payment line -->
 
-    <string name="paymentline_outgoing_unconfirmed">Nepotvrzeno - klepnutím zrychlíte</string>
+    <string name="paymentline_outgoing_unconfirmed">Nepotvrzeno - klikněte pro zrychlení</string>
 
     <!-- CPFP -->
 
     <string name="cpfp_title">Zrychlení mých transakcí.</string>
-    <string name="cpfp_instructions">Všechny vaše nepotvrzené transakce mohou využít vyšší poplatek, aby těžaři upřednostnili vaši transakci.</string>
-    <string name="cpfp_splice_error_actual_below_user">Tato hodnota je nižší než hodnota, kterou již používají vaše nepotvrzené transakce. Pro urychlení těchto plateb použijte vyšší.</string>
+    <string name="cpfp_instructions">Všechny vaše nepotvrzené transakce mohou využít vyšší poplatek, aby těžaři upřednostnili vaši platbu.</string>
+    <string name="cpfp_splice_error_actual_below_user">Tento poplatek je nižší než který již používají vaše nepotvrzené transakce. Zvolte vyšší poplatek.</string>
 
 </resources>

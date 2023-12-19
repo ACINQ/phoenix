@@ -17,9 +17,11 @@ fileprivate var log = Logger(OSLog.disabled)
 struct AppAccessView : View {
 	
 	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
-	@State var biometricsEnabled = AppSecurity.shared.enabledSecurityPublisher.value.contains(.biometrics)
+	@State var biometricsEnabled: Bool
+	@State var passcodeFallbackEnabled: Bool
 	
 	@State var ignoreToggle_biometricsEnabled = false
+	@State var ignoreToggle_passcodeFallbackEnabled = false
 	
 	@Environment(\.colorScheme) var colorScheme
 	
@@ -27,6 +29,18 @@ struct AppAccessView : View {
 		UIApplication.willEnterForegroundNotification
 	)
 	
+	init() {
+		let enabledSecurity: EnabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+		
+		_biometricsEnabled = State(initialValue: enabledSecurity.contains(.biometrics))
+		_passcodeFallbackEnabled = State(initialValue: enabledSecurity.contains(.passcodeFallback))
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
+	
+	@ViewBuilder
 	var body: some View {
 		
 		content()
@@ -38,73 +52,90 @@ struct AppAccessView : View {
 	func content() -> some View {
 		
 		List {
-			Section {
-				Toggle(isOn: $biometricsEnabled) {
-					Label {
-						switch biometricSupport {
-						case .touchID_available:
-							Text("Require Touch ID")
-							
-						case .touchID_notAvailable:
-							Text("Require Touch ID") + Text(" (not available)").foregroundColor(.secondary)
-						
-						case .touchID_notEnrolled:
-							Text("Require Touch ID") + Text(" (not enrolled)").foregroundColor(.secondary)
-						
-						case .faceID_available:
-							Text("Require Face ID")
-						
-						case .faceID_notAvailable:
-							Text("Require Face ID") + Text(" (not available)").foregroundColor(.secondary)
-						
-						case .faceID_notEnrolled:
-							Text("Require Face ID") + Text(" (not enrolled)").foregroundColor(.secondary)
-						
-						default:
-							Text("Biometrics") + Text(" (not available)").foregroundColor(.secondary)
-						}
-					} icon: {
-						Image(systemName: isTouchID() ? "touchid" : "faceid")
-							.renderingMode(.template)
-							.imageScale(.medium)
-							.foregroundColor(Color.appAccent)
-					}
-					
-				} // </Toggle>
-				.onChange(of: biometricsEnabled) { value in
-					self.toggleBiometrics(value)
-				}
-				.disabled(!biometricSupport.isAvailable())
-				
-				// Implicit divider added here
-				
-				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-					
-					securityLabel()
-						.padding(.top, 5)
-					
-				} // </VStack>
-				.padding(.vertical, 10)
-				
-			} // </Section>
-		} // </List>
+			section_primary()
+		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onReceive(willEnterForegroundPublisher, perform: { _ in
+		.onReceive(willEnterForegroundPublisher) { _ in
 			onWillEnterForeground()
-		})
+		}
 		.onAppear {
 			onAppear()
 		}
 	}
 	
 	@ViewBuilder
-	func securityLabel() -> some View {
+	func section_primary() -> some View {
+		
+		Section {
+			toggle_biometrics()
+			
+			// Implicit divider added here
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+				
+				statusLabel()
+					.padding(.top, 5)
+				
+				if biometricsEnabled {
+					passcodeFallbackOption()
+						.padding(.top, 30)
+				}
+				
+			} // </VStack>
+			.padding(.vertical, 10)
+			
+		} // </Section>
+	}
+	
+	@ViewBuilder
+	func toggle_biometrics() -> some View {
+		
+		Toggle(isOn: $biometricsEnabled) {
+			Label {
+				switch biometricSupport {
+				case .touchID_available:
+					Text("Require Touch ID")
+					
+				case .touchID_notAvailable:
+					Text("Require Touch ID") + Text(" (not available)").foregroundColor(.secondary)
+				
+				case .touchID_notEnrolled:
+					Text("Require Touch ID") + Text(" (not enrolled)").foregroundColor(.secondary)
+				
+				case .faceID_available:
+					Text("Require Face ID")
+				
+				case .faceID_notAvailable:
+					Text("Require Face ID") + Text(" (not available)").foregroundColor(.secondary)
+				
+				case .faceID_notEnrolled:
+					Text("Require Face ID") + Text(" (not enrolled)").foregroundColor(.secondary)
+				
+				default:
+					Text("Biometrics") + Text(" (not available)").foregroundColor(.secondary)
+				}
+			} icon: {
+				Image(systemName: isTouchID() ? "touchid" : "faceid")
+					.renderingMode(.template)
+					.imageScale(.medium)
+					.foregroundColor(Color.appAccent)
+			}
+			
+		} // </Toggle>
+		.onChange(of: biometricsEnabled) { value in
+			self.toggleBiometrics(value)
+		}
+		.disabled(!biometricSupport.isAvailable())
+	}
+	
+	@ViewBuilder
+	func statusLabel() -> some View {
 		
 		if biometricsEnabled {
 			
 			Label {
-				Text("Access to Phoenix is protected by biometrics.")
+				Text("Access to Phoenix is protected")
 					.fixedSize(horizontal: false, vertical: true) // SwiftUI truncating text
 			} icon: {
 				Image(systemName: "checkmark.shield")
@@ -132,20 +163,61 @@ struct AppAccessView : View {
 		}
 	}
 	
-	func onAppear() -> Void {
-		log.trace("onAppear()")
+	@ViewBuilder
+	func passcodeFallbackOption() -> some View {
 		
-		log.debug("enabledSecurity = \(AppSecurity.shared.enabledSecurityPublisher.value)")
+		HStack(alignment: VerticalAlignment.centerTopLine) { // <- Custom VerticalAlignment
+			
+			Label {
+				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+					Text("Allow passcode fallback")
+						.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
+							d[VerticalAlignment.center]
+						}
+					
+					Group {
+						if isTouchID() {
+							Text("If Touch ID fails, you can enter your iOS passcode to access Phoenix.")
+								.padding(.top, 8)
+								.padding(.bottom, 16)
+							Text("This is less secure, but more durable. Touch ID can stop working due to hardware damage.")
+						} else {
+							Text("If Face ID fails, you can enter your iOS passcode to access Phoenix.")
+								.padding(.top, 8)
+								.padding(.bottom, 16)
+							Text("This is less secure, but more durable. Face ID can stop working due to hardware damage.")
+						}
+					}
+					.lineLimit(nil)
+					.font(.callout)
+					.foregroundColor(.secondary)
+					
+				} // </VStack>
+			} icon: {
+				Image(systemName: "circle.grid.3x3")
+					.renderingMode(.template)
+					.imageScale(.medium)
+					.foregroundColor(Color.appAccent)
+			} // </Label>
+			
+			Spacer()
+			
+			Toggle("", isOn: $passcodeFallbackEnabled)
+				.labelsHidden()
+				.padding(.trailing, 2)
+				.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
+					d[VerticalAlignment.center]
+				}
+				.onChange(of: passcodeFallbackEnabled) { value in
+					self.togglePasscodeFallback(value)
+				}
+			
+		} // </HStack>
 	}
 	
-	func onWillEnterForeground() -> Void {
-		print("onWillEnterForeground()")
-		
-		// When the app returns from being in the background, the biometric status may have changed.
-		// For example: .touchID_notEnrolled => .touchID_available
-		
-		self.biometricSupport = AppSecurity.shared.deviceBiometricSupport()
-	}
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
 	
 	func isTouchID() -> Bool {
 		
@@ -161,6 +233,29 @@ struct AppAccessView : View {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onAppear() -> Void {
+		log.trace("onAppear()")
+		
+		log.debug("enabledSecurity = \(AppSecurity.shared.enabledSecurityPublisher.value)")
+	}
+	
+	func onWillEnterForeground() -> Void {
+		print("onWillEnterForeground()")
+		
+		// When the app returns from being in the background, the biometric status may have changed.
+		// For example: .touchID_notEnrolled => .touchID_available
+		
+		self.biometricSupport = AppSecurity.shared.deviceBiometricSupport()
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
 	func toggleBiometrics(_ flag: Bool) {
 		log.trace("toggleBiometrics()")
 		
@@ -171,10 +266,10 @@ struct AppAccessView : View {
 		
 		if flag { // toggle => ON
 			
-			enableSoftBiometrics { (success: Bool) in
-				if !success {
+			AppSecurity.shared.setSoftBiometrics(enabled: true) { (error: Error?) in
+				if error != nil {
 					self.ignoreToggle_biometricsEnabled = true
-					self.biometricsEnabled = false // failed to enable soft => disabled
+					self.biometricsEnabled = false // failed to enable == disabled
 				}
 			}
 			
@@ -190,66 +285,53 @@ struct AppAccessView : View {
 			
 			let failedToDisable = {
 				self.ignoreToggle_biometricsEnabled = true
-				self.biometricsEnabled = true // failed to disable soft => enabled
+				self.biometricsEnabled = true // failed to disable == enabled
 			}
 			
-			let prompt = localizedDisableBiometricsPrompt()
+			let prompt = NSLocalizedString("Authenticate to disable biometrics.", comment: "User prompt")
 			
 			AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
 				
-				if case .success(_) = result {
-					disableSoftBiometrics { (success: Bool) in
-						if !success {
+				switch result {
+				case .success(_):
+					AppSecurity.shared.setSoftBiometrics(enabled: false) { (error: Error?) in
+						if error != nil {
 							failedToDisable()
 						}
 					}
-				} else {
+					
+				case .failure(_):
 					failedToDisable()
 				}
 			}
 		}
 	}
 	
-	func localizedDisableBiometricsPrompt() -> String {
+	func togglePasscodeFallback(_ flag: Bool) {
+		log.trace("togglePasscodeFallback()")
 		
-		return NSLocalizedString("Authenticate to disable biometrics.", comment: "User prompt")
-	}
-	
-	func enableSoftBiometrics(
-		completion: @escaping (_ success: Bool) -> Void
-	) -> Void {
-		
-		log.trace("enableSoftBiometrics()")
-		
-		// CurrentState:
-		// - SecurityFile.keychain != nil
-		// - AppSecurity.shared.softBiometrics = false
-		//
-		// TargetState:
-		// - SecurityFile.keychain != nil
-		// - AppSecurity.shared.softBiometrics = true
-		
-		AppSecurity.shared.setSoftBiometrics(enabled: true) { (error: Error?) in
-			completion(error == nil)
+		if ignoreToggle_passcodeFallbackEnabled {
+			ignoreToggle_passcodeFallbackEnabled = false
+			return
 		}
-	}
-	
-	func disableSoftBiometrics(
-		completion: @escaping (_ success: Bool) -> Void
-	) -> Void {
 		
-		log.trace("disableSoftBiometrics()")
-		
-		// CurrentState:
-		// - SecurityFile.keychain != nil
-		// - AppSecurity.shared.softBiometrics = true
-		//
-		// TargetState:
-		// - SecurityFile.keychain != nil
-		// - AppSecurity.shared.softBiometrics = false
-		
-		AppSecurity.shared.setSoftBiometrics(enabled: false) { (error: Error?) in
-			completion(error == nil)
+		if flag { // toggle => ON
+			
+			AppSecurity.shared.setPasscodeFallback(enabled: true) { (error: Error?) in
+				if error != nil {
+					self.ignoreToggle_passcodeFallbackEnabled = true
+					self.passcodeFallbackEnabled = false // failed to enable == disabled
+				}
+			}
+			
+		} else { // toggle => OFF
+			
+			AppSecurity.shared.setPasscodeFallback(enabled: false) { (error: Error?) in
+				if error != nil {
+					self.ignoreToggle_passcodeFallbackEnabled = true
+					self.passcodeFallbackEnabled = true // failed to disable == enabled
+				}
+			}
 		}
 	}
 }

@@ -149,6 +149,8 @@
 		DC67654E25655D93004D4263 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC67654D25655D93004D4263 /* Colors.xcassets */; };
 		DC67E40B27F3798600496C04 /* AnimatedMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC67E40A27F3798600496C04 /* AnimatedMenu.swift */; };
 		DC682FE8258175CE00CA1114 /* Popover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC682FE7258175CE00CA1114 /* Popover.swift */; };
+		DC6ACC582B10F0220079179B /* RecoveryPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6ACC572B10F0220079179B /* RecoveryPhrase.swift */; };
+		DC6ACC592B10F4FE0079179B /* RecoveryPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6ACC572B10F0220079179B /* RecoveryPhrase.swift */; };
 		DC6CF35B2938F32E001837EE /* ListBackgroundColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6CF35A2938F32E001837EE /* ListBackgroundColor.swift */; };
 		DC6D26E329E76557006A7814 /* AnimatedClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6D26E229E76557006A7814 /* AnimatedClock.swift */; };
 		DC6D68252AC1DD5C0099929F /* Currencies.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DC6D68242AC1DD5C0099929F /* Currencies.xcstrings */; };
@@ -483,6 +485,7 @@
 		DC67654D25655D93004D4263 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		DC67E40A27F3798600496C04 /* AnimatedMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedMenu.swift; sourceTree = "<group>"; };
 		DC682FE7258175CE00CA1114 /* Popover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Popover.swift; sourceTree = "<group>"; };
+		DC6ACC572B10F0220079179B /* RecoveryPhrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryPhrase.swift; sourceTree = "<group>"; };
 		DC6CF35A2938F32E001837EE /* ListBackgroundColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListBackgroundColor.swift; sourceTree = "<group>"; };
 		DC6D26E229E76557006A7814 /* AnimatedClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedClock.swift; sourceTree = "<group>"; };
 		DC6D68242AC1DD5C0099929F /* Currencies.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Currencies.xcstrings; sourceTree = "<group>"; };
@@ -1137,6 +1140,7 @@
 				DCACF6F92566D0BA0009B01E /* GenericPasswordConvertible.swift */,
 				DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */,
 				DCE77A5527C5240500F0FA24 /* TLSConnectionCheck.swift */,
+				DC6ACC572B10F0220079179B /* RecoveryPhrase.swift */,
 			);
 			path = security;
 			sourceTree = "<group>";
@@ -1711,6 +1715,7 @@
 				DCAEF8F727628BEB00015993 /* Either.swift in Sources */,
 				DCA6DECC282AAA740073C658 /* SharedSecurity.swift in Sources */,
 				DC5CA4EF28F842F10048A737 /* MVI+Extensions.swift in Sources */,
+				DC6ACC582B10F0220079179B /* RecoveryPhrase.swift in Sources */,
 				DCD7E0F128ED89A0009C30E5 /* GlobalEnvironment.swift in Sources */,
 				DC09086325B626B300A46136 /* AppStatusPopover.swift in Sources */,
 				DC0732EC263CA6C3004CB88D /* PaymentOptionsView.swift in Sources */,
@@ -1811,6 +1816,7 @@
 				DC32FB3529A3D3FE009912AC /* XpcManager.swift in Sources */,
 				DC9545C429490321008FCEF4 /* NotificationContent.swift in Sources */,
 				DC49FE9C2AC49E0400D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */,
+				DC6ACC592B10F4FE0079179B /* RecoveryPhrase.swift in Sources */,
 				DCA6DEC72829BFD70073C658 /* CrossProcessCommunication.swift in Sources */,
 				DC641C7428208BD600862DCD /* String+VersionComparison.swift in Sources */,
 				DCA6DEC92829C3180073C658 /* GenericPasswordConvertible.swift in Sources */,
@@ -2015,7 +2021,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Blue";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-ios/Phoenix.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 67;
+				CURRENT_PROJECT_VERSION = 68;
 				DEVELOPMENT_ASSET_PATHS = "\"phoenix-ios/Preview Content\"";
 				DEVELOPMENT_TEAM = XD77LN4376;
 				ENABLE_PREVIEWS = YES;
@@ -2040,7 +2046,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Blue";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-ios/Phoenix.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 67;
+				CURRENT_PROJECT_VERSION = 68;
 				DEVELOPMENT_ASSET_PATHS = "\"phoenix-ios/Preview Content\"";
 				DEVELOPMENT_TEAM = XD77LN4376;
 				ENABLE_PREVIEWS = YES;
@@ -2141,7 +2147,7 @@
 			buildSettings = {
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 67;
+				CURRENT_PROJECT_VERSION = 68;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -2170,7 +2176,7 @@
 			buildSettings = {
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 67;
+				CURRENT_PROJECT_VERSION = 68;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -2200,7 +2206,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-notifySrvExt/phoenix-notifySrvExt.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 67;
+				CURRENT_PROJECT_VERSION = 68;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "phoenix-notifySrvExt/Info.plist";
@@ -2227,7 +2233,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-notifySrvExt/phoenix-notifySrvExt.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 67;
+				CURRENT_PROJECT_VERSION = 68;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "phoenix-notifySrvExt/Info.plist";

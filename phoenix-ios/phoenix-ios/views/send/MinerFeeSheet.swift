@@ -24,6 +24,7 @@ struct MinerFeeSheet: View {
 	@Binding var mempoolRecommendedResponse: MempoolRecommendedResponse?
 	
 	@State var explicitlySelectedPriority: MinerFeePriority? = nil
+	@State var feeBelowMinimum: Bool = false
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@EnvironmentObject var smartModalState: SmartModalState
@@ -296,8 +297,8 @@ struct MinerFeeSheet: View {
 	@ViewBuilder
 	func footer() -> some View {
 		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Spacer()
+		VStack(alignment: HorizontalAlignment.center, spacing: 10) {
+			
 			Button {
 				reviewTransactionButtonTapped()
 			} label: {
@@ -305,7 +306,19 @@ struct MinerFeeSheet: View {
 			}
 			.font(.title3)
 			.disabled(minerFeeInfo == nil)
-			Spacer()
+			
+			if feeBelowMinimum {
+				Group {
+					if let mrr = mempoolRecommendedResponse {
+						Text("Feerate below minimum allowed by mempool: \(satsPerByteString(mrr.minimumFee))")
+					} else {
+						Text("Feerate below minimum allowed by mempool.")
+					}
+				}
+				.font(.callout)
+				.foregroundColor(.appNegative)
+				.multilineTextAlignment(.center)
+			}
 		}
 		.padding()
 		.padding(.top)
@@ -348,15 +361,19 @@ struct MinerFeeSheet: View {
 		}
 		
 		let doubleValue = mempoolRecommendedResponse.feeForPriority(priority)
-			
+		let stringValue = satsPerByteString(doubleValue)
+		
+		return (doubleValue, stringValue)
+	}
+	
+	func satsPerByteString(_ value: Double) -> String {
+		
 		let nf = NumberFormatter()
 		nf.numberStyle = .decimal
 		nf.minimumFractionDigits = 0
 		nf.maximumFractionDigits = 1
 		
-		let stringValue = nf.string(from: NSNumber(value: doubleValue)) ?? "?"
-		
-		return (doubleValue, stringValue)
+		return nf.string(from: NSNumber(value: value)) ?? "?"
 	}
 	
 	func satsPerByteString(_ priority: MinerFeePriority) -> String {
@@ -440,13 +457,20 @@ struct MinerFeeSheet: View {
 	func satsPerByteChanged() {
 		log.trace("satsPerByteChanged(): \(satsPerByte)")
 		
+		minerFeeInfo = nil
 		guard
 			let satsPerByte_number = try? parsedSatsPerByte.get(),
 			let peer = Biz.business.peerManager.peerStateValue(),
 			let scriptBytes = Parser.shared.addressToPublicKeyScript(chain: Biz.business.chain, address: btcAddress)
 		else {
-			minerFeeInfo = nil
 			return
+		}
+		
+		if let mrr = mempoolRecommendedResponse, mrr.minimumFee > satsPerByte_number.doubleValue {
+			feeBelowMinimum = true
+			return
+		} else {
+			feeBelowMinimum = false
 		}
 		
 		let originalSatsPerByte = satsPerByte
@@ -456,7 +480,6 @@ struct MinerFeeSheet: View {
 		let feePerByte = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)
 		let feePerKw = Lightning_kmpFeeratePerKw(feeratePerByte: feePerByte)
 		
-		minerFeeInfo = nil
 		Task { @MainActor in
 			do {
 				let pair = try await peer.estimateFeeForSpliceOut(
@@ -465,16 +488,23 @@ struct MinerFeeSheet: View {
 					targetFeerate: feePerKw
 				)
 				
-				let updatedFeePerKw: Lightning_kmpFeeratePerKw = pair!.first!
-				let fee: Bitcoin_kmpSatoshi = pair!.second!
-				
-				if self.satsPerByte == originalSatsPerByte {
-					self.minerFeeInfo = MinerFeeInfo(pubKeyScript: scriptVector, feerate: updatedFeePerKw, minerFee: fee)
+				if let pair = pair,
+				   let updatedFeePerKw: Lightning_kmpFeeratePerKw = pair.first,
+				   let fees: Lightning_kmpChannelCommand.CommitmentSpliceFees = pair.second
+				{
+					if self.satsPerByte == originalSatsPerByte {
+						self.minerFeeInfo = MinerFeeInfo(
+							pubKeyScript: scriptVector,
+							feerate: updatedFeePerKw,
+							minerFee: fees.miningFee
+						)
+					}
+				} else {
+					log.error("Error: peer.estimateFeeForSpliceOut() == nil")
 				}
 				
 			} catch {
 				log.error("Error: \(error)")
-				self.minerFeeInfo = nil
 			}
 			
 		} // </Task>
@@ -485,6 +515,9 @@ struct MinerFeeSheet: View {
 		
 		// The UI will change, so we need to reset the geometry measurements
 		priorityBoxWidth = nil
+		
+		// Might need to display an error (if minimumFee increased)
+		satsPerByteChanged()
 	}
 	
 	func closeButtonTapped() {

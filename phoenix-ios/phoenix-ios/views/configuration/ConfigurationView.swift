@@ -49,9 +49,6 @@ fileprivate struct ConfigurationList: View {
 	
 	let scrollViewProxy: ScrollViewProxy
 	
-	@State var isFaceID = true
-	@State var isTouchID = false
-	
 	@State private var navLinkTag: NavLinkTag? = nil
 	
 	@State private var notificationPermissions = NotificationsManager.shared.permissions.value
@@ -62,8 +59,10 @@ fileprivate struct ConfigurationList: View {
 	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
 	@State private var swiftUiBugWorkaroundIdx = 0
 	
-	@State var didAppear = false
+	@State var firstAppearance = false
 	@State var popToDestination: PopToDestination? = nil
+	
+	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
 	
 	@Namespace var linkID_About
 	@Namespace var linkID_DisplayConfiguration
@@ -207,7 +206,7 @@ fileprivate struct ConfigurationList: View {
 			if hasWallet {
 				navLink(.AppAccess) {
 					Label { Text("App access") } icon: {
-						Image(systemName: isTouchID ? "touchid" : "faceid")
+						Image(systemName: isTouchID() ? "touchid" : "faceid")
 					}
 				}
 				.id(linkID_AppAccess)
@@ -398,6 +397,16 @@ fileprivate struct ConfigurationList: View {
 		return Biz.business.walletManager.isLoaded()
 	}
 	
+	func isTouchID() -> Bool {
+		
+		switch biometricSupport {
+			case .touchID_available    : fallthrough
+			case .touchID_notEnrolled  : fallthrough
+			case .touchID_notAvailable : return true
+			default                    : return false
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
@@ -405,28 +414,18 @@ fileprivate struct ConfigurationList: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		let support = AppSecurity.shared.deviceBiometricSupport()
-		switch support {
-			case .touchID_available    : fallthrough
-			case .touchID_notEnrolled  : fallthrough
-			case .touchID_notAvailable : isTouchID = true
-			default                    : isTouchID = false
-		}
-		switch support {
-			case .faceID_available    : fallthrough
-			case .faceID_notEnrolled  : fallthrough
-			case .faceID_notAvailable : isFaceID = true
-			default                   : isFaceID = false
-		}
-		
-		if !didAppear {
-			didAppear = true
+		if firstAppearance {
+			firstAppearance = false
 			
 			if let deepLink = deepLinkManager.deepLink {
 				DispatchQueue.main.async {
 					deepLinkChanged(deepLink)
 				}
 			}
+		} else {
+			// Returning from subview
+			
+			biometricSupport = AppSecurity.shared.deviceBiometricSupport()
 		}
 	}
 	

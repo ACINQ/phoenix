@@ -139,6 +139,9 @@ fun ScanDataView(
                             onPayOnchainClick = {
                                 showPaymentModeDialog = true
                                 postIntent(Scan.Intent.Parse(request = model.uri.copy(paymentRequest = null).write()))
+                            },
+                            onDismiss = {
+                                showPaymentModeDialog = false
                             }
                         )
                     }
@@ -227,12 +230,8 @@ fun ReadDataView(
             ScanErrorView(model, onFeedbackDismiss)
         }
 
-        if (model is Scan.Model.BadRequest) {
-            ScanErrorView(model, onFeedbackDismiss)
-        }
-
         if (model is Scan.Model.LnurlServiceFetch) {
-            Card(modifier = Modifier.align(Alignment.Center), internalPadding = PaddingValues(24.dp)) {
+            Card(modifier = Modifier.align(Alignment.Center), internalPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)) {
                 ProgressView(text = stringResource(R.string.scan_lnurl_fetching))
             }
         }
@@ -315,24 +314,27 @@ private fun ScanErrorView(
 private fun ChoosePaymentModeDialog(
     onPayOnchainClick: () -> Unit,
     onPayOffchainClick: () -> Unit,
+    onDismiss: () -> Unit,
 ) {
-    Dialog(onDismiss = {}, properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false), isScrollable = true) {
+    Dialog(onDismiss = onDismiss, properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = true), isScrollable = true, buttons = null) {
         Clickable(onClick = onPayOnchainClick) {
-            Row(modifier = Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                 PhoenixIcon(resourceId = R.drawable.ic_chain)
                 Spacer(Modifier.width(16.dp))
                 Column {
                     Text(text = stringResource(id = R.string.send_paymentmode_onchain), style = MaterialTheme.typography.body2)
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(text = stringResource(id = R.string.send_paymentmode_onchain_desc), style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
                 }
             }
         }
         Clickable(onClick = onPayOffchainClick) {
-            Row(modifier = Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(modifier = Modifier.padding(horizontal = 24.dp, vertical = 18.dp), verticalAlignment = Alignment.CenterVertically) {
                 PhoenixIcon(resourceId = R.drawable.ic_zap)
                 Spacer(Modifier.width(16.dp))
                 Column {
                     Text(text = stringResource(id = R.string.send_paymentmode_lightning), style = MaterialTheme.typography.body2)
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(text = stringResource(id = R.string.send_paymentmode_lightning_desc), style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
                 }
             }

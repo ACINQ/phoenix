@@ -223,7 +223,9 @@
 
     <string name="channelsview_title">Platební kanály</string>
     <string name="channelsview_balance">Zůstatek</string>
-    <string name="channelsview_balance_about">Toto je souhrnný zůstatek vašich aktivních kanálů. Tolik můžete utratit přes Lightning.</string>
+    <string name="channelsview_balance_about"><b>Zůstatek</b>: Toto je souhrnný zůstatek vašich aktivních kanálů. Tolik můžete utratit přes Lightning.</string>
+    <string name="channelsview_inbound">Příchozí likvidita</string>
+    <string name="channelsview_inbound_about"><b>Příchozí likvidita</b> je to, co mohou vaše kanály přijmout přes Lightning, aniž by musely přejít na on-chain a platit poplatky.</string>
     <string name="channelsview_loading_channels">Načítání údajů o kanálech…</string>
     <string name="channelsview_no_channels">Zatím nemáte žádné kanály.\n\nNový platební kanál se otevře automaticky, když bude potřeba.</string>
 
@@ -534,9 +536,6 @@
     <string name="electrum_title">Electrum server</string>
     <string name="electrum_about">K zabezpečení vašich platebních kanálů Phoenix monitoruje Bitcoinový blockchain skrz Electrum servery.\n\nVe výchozím nastavení se používají náhodné servery. Phoenix můžete také nakonfigurovat tak, aby se připojoval pouze k vašemu vlastnímu serveru.</string>
     <string name="electrum_block_height_label">Výška bloku</string>
-    <string name="electrum_tip_label">Časové razítko tipu</string>
-    <string name="electrum_fee_rate_next_label">Poplatky za 1 blok</string>
-    <string name="electrum_fee_rate_funding_label">Poplatky za 144 bloků</string>
     <string name="electrum_connection_label">Server</string>
 
     <string name="electrum_connection_closed_with_random">Odpojeno od Electrum</string>
@@ -553,7 +552,7 @@
     <string name="electrum_dialog_invalid_input">Tato adresa je neplatná.</string>
     <string name="electrum_dialog_cert_check_button">Připojit</string>
     <string name="electrum_dialog_cert_checking">Kontrola certifikátu…</string>
-    <string name="electrum_dialog_cert_failure">Nepodařilo se připojit:\n%1$s</string>
+    <string name="electrum_dialog_cert_failure">Nepodařilo se připojit</string>
     <string name="electrum_dialog_cert_unresolved">Adresu se nepodařilo přeložit.</string>
     <string name="electrum_dialog_cert_header">Nedůvěryhodný certifikát</string>
     <string name="electrum_dialog_cert_sha1">SHA1 Fingerprint</string>
@@ -737,7 +736,7 @@
 
     <!-- reset wallet -->
 
-    <string name="reset_wallet_title">Resetovat peněženku</string>
+    <string name="reset_wallet_title">Smazat peněženku</string>
     <string name="reset_wallet_instructions_header">Smazat veškerá data peněženky z tohoto zařízení</string>
     <string name="reset_wallet_instructions_details">Toto resetuje aplikaci tak, jako byste ji právě nainstalovali.</string>
     <string name="reset_wallet_review_button">Zhodnotit</string>
@@ -747,11 +746,9 @@
     <string name="reset_wallet_confirm_details">Toto resetuje aplikaci. Zobrazí se úvodní obrazovka s výzvou k vytvoření nebo obnovení peněženky.</string>
     <string name="reset_wallet_confirm_seed_balance">Neztraťte své prostředky:\n%1$s (≈ %2$s).</string>
     <string name="reset_wallet_confirm_seed_responsibility">Za uložení obnovovací fráze jste zodpovědní vy.</string>
-    <string name="reset_wallet_confirm_button">Smazat peněženku (zatím nefunguje)</string>
+    <string name="reset_wallet_confirm_button">Smazat peněženku</string>
 
-    <string name="reset_wallet_deleting">Mazání dat peněženky…</string>
     <string name="reset_wallet_success">Peněženka byla úspěšně resetována</string>
-    <string name="reset_wallet_success_details">Přesouvání na úvodní obrazovku…</string>
     <string name="reset_wallet_failure_title">Reset selhal</string>
 
 </resources>

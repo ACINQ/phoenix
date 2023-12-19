@@ -50,6 +50,7 @@ class CloudDataTest {
             is SpliceOutgoingPayment -> data.spliceOutgoing?.unwrap()
             is ChannelCloseOutgoingPayment -> data.channelClose?.unwrap()
             is SpliceCpfpOutgoingPayment -> data.spliceCpfp?.unwrap()
+            is InboundLiquidityOutgoingPayment -> TODO()
         }
         assertNotNull(decoded)
 
@@ -113,7 +114,7 @@ class CloudDataTest {
     fun incoming__receivedWith_newChannel() = runTest {
         val invoice = createInvoice(preimage, 10_000_000.msat)
         val receivedWith = IncomingPayment.ReceivedWith.NewChannel(
-            amount = 7_000_000.msat, miningFee = 2_000.sat, serviceFee = 1_000_000.msat, channelId = channelId, txId = randomBytes32(), confirmedAt = 500, lockedAt = 800
+            amount = 7_000_000.msat, miningFee = 2_000.sat, serviceFee = 1_000_000.msat, channelId = channelId, txId = TxId(randomBytes32()), confirmedAt = 500, lockedAt = 800
         )
         testRoundtrip(
             IncomingPayment(
@@ -136,8 +137,8 @@ class CloudDataTest {
         val expectedChannelId = Hex.decode("e8a0e7ba91a485ed6857415cc0c60f77eda6cb1ebe1da841d42d7b4388cc2bcc").byteVector32()
         val expectedReceived = IncomingPayment.Received(
             receivedWith = listOf(
-                IncomingPayment.ReceivedWith.NewChannel(amount = 7_000_000.msat, miningFee = 0.sat, serviceFee = 3_000_000.msat, channelId = expectedChannelId, txId = ByteVector32.Zeroes, confirmedAt = 0, lockedAt = 0),
-                IncomingPayment.ReceivedWith.NewChannel(amount = 9_000_000.msat, miningFee = 0.sat, serviceFee = 6_000_000.msat, channelId = expectedChannelId, txId = ByteVector32.Zeroes, confirmedAt = 0, lockedAt = 0)
+                IncomingPayment.ReceivedWith.NewChannel(amount = 7_000_000.msat, miningFee = 0.sat, serviceFee = 3_000_000.msat, channelId = expectedChannelId, txId = TxId(ByteVector32.Zeroes), confirmedAt = 0, lockedAt = 0),
+                IncomingPayment.ReceivedWith.NewChannel(amount = 9_000_000.msat, miningFee = 0.sat, serviceFee = 6_000_000.msat, channelId = expectedChannelId, txId = TxId(ByteVector32.Zeroes), confirmedAt = 0, lockedAt = 0)
             ),
             receivedAt = 1658246347319
         )
@@ -197,7 +198,7 @@ class CloudDataTest {
                 address = bitcoinAddress,
                 isSentToDefaultAddress = false,
                 miningFees = 1_000.sat,
-                txId = randomBytes32(),
+                txId = TxId(randomBytes32()),
                 createdAt = 1000,
                 confirmedAt = null,
                 lockedAt = null,
@@ -216,7 +217,7 @@ class CloudDataTest {
                 address = bitcoinAddress,
                 isSentToDefaultAddress = true,
                 miningFees = 5_000.sat,
-                txId = randomBytes32(),
+                txId = TxId(randomBytes32()),
                 createdAt = 1000,
                 confirmedAt = 5000,
                 lockedAt = 7000,
@@ -299,7 +300,7 @@ class CloudDataTest {
                 recipientAmount = 1_000_000.sat,
                 address = bitcoinAddress,
                 miningFees = 3400.sat,
-                txId = randomBytes32(),
+                txId = TxId(randomBytes32()),
                 channelId = randomBytes32(),
                 createdAt = 150,
                 confirmedAt = 240,

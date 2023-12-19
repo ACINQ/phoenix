@@ -77,11 +77,12 @@ fun HomeView(
     onElectrumClick: () -> Unit,
     onShowSwapInWallet: () -> Unit,
     onShowNotifications: () -> Unit,
+    onRequestLiquidityClick: () -> Unit,
 ) {
     val log = logger("HomeView")
     val context = LocalContext.current
     val torEnabledState = UserPrefs.getIsTorEnabled(context).collectAsState(initial = null)
-    val connectionsState by paymentsViewModel.connectionsFlow.collectAsState(null)
+    val connections by business.connectionsManager.connections.collectAsState()
     val electrumMessages by business.appConfigurationManager.electrumMessages.collectAsState()
     val balanceDisplayMode by UserPrefs.getHomeAmountDisplayMode(context).collectAsState(initial = HomeAmountDisplayMode.REDACTED)
     val internalData = application.internalDataRepository
@@ -89,7 +90,7 @@ fun HomeView(
     var showConnectionsDialog by remember { mutableStateOf(false) }
     if (showConnectionsDialog) {
         ConnectionDialog(
-            connections = connectionsState,
+            connections = connections,
             electrumBlockheight = electrumMessages?.blockHeight ?: 0,
             onClose = { showConnectionsDialog = false },
             onTorClick = onTorClick,
@@ -213,10 +214,11 @@ fun HomeView(
                 TopBar(
                     modifier = Modifier.layoutId("topBar"),
                     onConnectionsStateButtonClick = { showConnectionsDialog = true },
-                    connectionsState = connectionsState,
+                    connections = connections,
                     electrumBlockheight = electrumMessages?.blockHeight ?: 0,
                     isTorEnabled = torEnabledState.value,
-                    onTorClick = onTorClick
+                    onTorClick = onTorClick,
+                    onRequestLiquidityClick = onRequestLiquidityClick,
                 )
                 HomeBalance(
                     modifier = Modifier.layoutId("balance"),

@@ -48,6 +48,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
@@ -55,6 +56,8 @@ import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.components.AmountWithFiatBelow
+import fr.acinq.phoenix.android.components.AmountWithFiatBeside
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
@@ -131,7 +134,15 @@ private fun ChannelSummaryView(
                 Setting(title = stringResource(id = R.string.channeldetails_state), description = channel.stateName)
                 Setting(
                     title = stringResource(id = R.string.channeldetails_spendable),
-                    description = channel.localBalance?.toPrettyString(btcUnit, withUnit = true) ?: stringResource(id = R.string.utils_unknown)
+                    content = {
+                        channel.localBalance?.let { AmountWithFiatBeside(amount = it) } ?: Text(text = stringResource(id = R.string.utils_unknown))
+                    }
+                )
+                Setting(
+                    title = stringResource(id = R.string.channeldetails_receivable),
+                    content = {
+                        channel.availableForReceive?.let { AmountWithFiatBeside(amount = it) } ?: Text(text = stringResource(id = R.string.utils_unknown))
+                    }
                 )
                 SettingInteractive(
                     title = stringResource(id = R.string.channeldetails_json),
@@ -174,7 +185,7 @@ private fun CommitmentDetailsView(
     val btcUnit = LocalBitcoinUnit.current
     val paymentsManager = business.paymentsManager
     val linkedPayments by produceState<List<WalletPayment>>(initialValue = emptyList()) {
-        value = paymentsManager.listPaymentsForTxId(ByteVector32.fromValidHex(commitment.fundingTxId))
+        value = paymentsManager.listPaymentsForTxId(commitment.fundingTxId)
     }
 
     SettingWithDecoration(
@@ -214,6 +225,7 @@ private fun CommitmentDetailsView(
                                     payment is IncomingPayment && payment.origin is IncomingPayment.Origin.OnChain -> "swap-in"
                                     payment is SpliceOutgoingPayment -> "swap-out"
                                     payment is SpliceCpfpOutgoingPayment -> "cpfp"
+                                    payment is InboundLiquidityOutgoingPayment -> "inbound liquidity"
                                     else -> "other"
                                 },
                                 onClick = {

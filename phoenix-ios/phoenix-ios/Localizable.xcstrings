@@ -2191,7 +2191,11 @@
         }
       }
     },
+    "Access to Phoenix is protected" : {
+
+    },
     "Access to Phoenix is protected by biometrics." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2427,6 +2431,9 @@
           }
         }
       }
+    },
+    "Allow passcode fallback" : {
+
     },
     "Already paid" : {
       "comment" : "Error title",
@@ -8223,6 +8230,12 @@
         }
       }
     },
+    "Feerate below minimum allowed by mempool: %@" : {
+
+    },
+    "Feerate below minimum allowed by mempool." : {
+
+    },
     "Fees" : {
       "comment" : "Label in SummaryInfoGrid",
       "localizations" : {
@@ -9648,6 +9661,9 @@
         }
       }
     },
+    "If Face ID fails, you can enter your iOS passcode to access Phoenix." : {
+
+    },
     "If the problem persists, please contact support at **phoenix@acinq.co**." : {
       "comment" : "ErrorView",
       "localizations" : {
@@ -9676,6 +9692,9 @@
           }
         }
       }
+    },
+    "If Touch ID fails, you can enter your iOS passcode to access Phoenix." : {
+
     },
     "If you do not back it up and you lose access to Phoenix you will **lose your funds**!" : {
       "comment" : "BackupView",
@@ -18280,8 +18299,12 @@
         }
       }
     },
+    "The invoice is not for (chainMismatch.expected.name)" : {
+      "comment" : "Error message - scanning lightning invoice"
+    },
     "The invoice is not for (reason.expected.name)" : {
       "comment" : "Error message - scanning lightning invoice",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -18443,6 +18466,12 @@
           }
         }
       }
+    },
+    "The service ((origin)) returned error code: (rfCode.code.value)" : {
+      "comment" : "Error message - scanning lightning invoice"
+    },
+    "The service ((origin)) returned error message: (rfDetailed.reason)" : {
+      "comment" : "Error message - scanning lightning invoice"
     },
     "The simulator cannot access the camera. Please use the clipboard." : {
       "comment" : "Warning for iOS Simulator (only for devs)",
@@ -18794,6 +18823,12 @@
           }
         }
       }
+    },
+    "This is less secure, but more durable. Face ID can stop working due to hardware damage." : {
+
+    },
+    "This is less secure, but more durable. Touch ID can stop working due to hardware damage." : {
+
     },
     "This is not a withdraw request. Do you want to **send money** to somebody?" : {
 

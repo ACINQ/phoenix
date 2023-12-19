@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.android
 
 import android.Manifest
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.text.format.DateUtils
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -36,6 +38,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -53,6 +56,7 @@ import androidx.navigation.navOptions
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.openLink
@@ -74,6 +78,7 @@ import fr.acinq.phoenix.android.settings.channels.ImportChannelsData
 import fr.acinq.phoenix.android.settings.displayseed.DisplaySeedView
 import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
 import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
+import fr.acinq.phoenix.android.payments.liquidity.RequestLiquidityView
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
@@ -89,50 +94,61 @@ import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import fr.acinq.phoenix.utils.extensions.id
+import io.ktor.http.decodeURLPart
+import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import org.kodein.memory.util.currentTimestampMillis
 
 
 @Composable
+fun LoadingAppView() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(text = "Initializing...")
+    }
+}
+
+@Composable
 fun AppView(
+    business: PhoenixBusiness,
     appVM: AppViewModel,
     navController: NavHostController,
 ) {
     val log = logger("Navigation")
     log.debug { "init app view composition" }
 
-    val fiatRates = application.business.currencyManager.ratesFlow.collectAsState(listOf())
     val context = LocalContext.current
     val isAmountInFiat = UserPrefs.getIsAmountInFiat(context).collectAsState(false)
     val fiatCurrency = UserPrefs.getFiatCurrency(context).collectAsState(initial = FiatCurrency.USD)
     val bitcoinUnit = UserPrefs.getBitcoinUnit(context).collectAsState(initial = BitcoinUnit.Sat)
-    val electrumServer = UserPrefs.getElectrumServer(context).collectAsState(initial = null)
-    val business = application.business
+    val fiatRates by business.currencyManager.ratesFlow.collectAsState(emptyList())
 
     CompositionLocalProvider(
         LocalBusiness provides business,
         LocalControllerFactory provides business.controllers,
         LocalNavController provides navController,
-        LocalExchangeRates provides fiatRates.value,
+        LocalExchangeRates provides fiatRates,
         LocalBitcoinUnit provides bitcoinUnit.value,
         LocalFiatCurrency provides fiatCurrency.value,
         LocalShowInFiat provides isAmountInFiat.value,
-        LocalElectrumServer provides electrumServer.value,
     ) {
-
         // we keep a view model storing payments so that we don't have to fetch them every time
-        val paymentsViewModel: PaymentsViewModel = viewModel(
+        val paymentsViewModel = viewModel<PaymentsViewModel>(
             factory = PaymentsViewModel.Factory(
                 connectionsFlow = business.connectionsManager.connections,
                 paymentsManager = business.paymentsManager,
             )
         )
-
-        val noticesViewModel = viewModel<NoticesViewModel>(factory = NoticesViewModel.Factory(
-            appConfigurationManager = business.appConfigurationManager,
-            peerManager = business.peerManager
-        ))
+        val noticesViewModel = viewModel<NoticesViewModel>(
+            factory = NoticesViewModel.Factory(
+                appConfigurationManager = business.appConfigurationManager,
+                peerManager = business.peerManager
+            )
+        )
         MonitorNotices(vm = noticesViewModel)
 
         val legacyAppStatus = LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
@@ -148,6 +164,7 @@ fun AppView(
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
+
             NavHost(navController = navController, startDestination = "${Screen.Startup.route}?next={next}") {
                 composable(
                     route = "${Screen.Startup.route}?next={next}",
@@ -155,8 +172,12 @@ fun AppView(
                         navArgument("next") { type = NavType.StringType; nullable = true }
                     ),
                 ) {
-                    val nextScreenLink = it.arguments?.getString("next")
-                    log.debug { "navigating to startup with next=$nextScreenLink" }
+                    val intent = try {
+                        it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
+                    } catch (e: Exception) {
+                        null
+                    }
+                    val nextScreenLink = intent?.data?.getQueryParameter("next")?.decodeURLPart()
                     StartupView(
                         appVM = appVM,
                         onShowIntro = { navController.navigate(Screen.Intro.route) },
@@ -164,8 +185,10 @@ fun AppView(
                         onBusinessStarted = {
                             val next = nextScreenLink?.takeUnless { it.isBlank() }?.let { Uri.parse(it) }
                             if (next == null || !navController.graph.hasDeepLink(next)) {
+                                log.debug { "redirecting from startup to home" }
                                 popToHome(navController)
                             } else {
+                                log.debug { "redirecting from startup to $next" }
                                 navController.navigate(next, navOptions = navOptions {
                                     popUpTo(navController.graph.id) { inclusive = true }
                                 })
@@ -201,7 +224,8 @@ fun AppView(
                             onTorClick = { navController.navigate(Screen.TorConfig) },
                             onElectrumClick = { navController.navigate(Screen.ElectrumServer) },
                             onShowSwapInWallet = { navController.navigate(Screen.WalletInfo.SwapInWallet) },
-                            onShowNotifications = { navController.navigate(Screen.Notifications) }
+                            onShowNotifications = { navController.navigate(Screen.Notifications) },
+                            onRequestLiquidityClick = { navController.navigate(Screen.LiquidityRequest.route) },
                         )
                     }
                 }
@@ -224,8 +248,17 @@ fun AppView(
                         navDeepLink { uriPattern = "scanview:{data}" },
                     )
                 ) {
-                    val input = it.arguments?.getString("data")
-                    RequireStarted(walletState, nextUri = "scanview:$input") {
+                    val intent = try {
+                        it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
+                    } catch (e: Exception) {
+                        null
+                    }
+                    RequireStarted(walletState, nextUri = "scanview:${intent?.data?.toString()}") {
+                        val input = intent?.data?.toString()?.substringAfter("scanview:")?.takeIf {
+                            // prevents forwarding an internal deeplink intent coming from androidx-navigation framework.
+                            // TODO properly parse deeplinks following f0ae90444a23cc17d6d7407dfe43c0c8d20e62fc
+                            !it.contains("androidx.navigation")
+                        }
                         ScanDataView(
                             input = input,
                             onBackClick = { popToHome(navController) },
@@ -299,7 +332,7 @@ fun AppView(
                             }
                         },
                         onChannelClick = { navController.navigate("${Screen.ChannelDetails.route}?id=$it") },
-                        onImportChannelsDataClick = { navController.navigate(Screen.ImportChannelsData)}
+                        onImportChannelsDataClick = { navController.navigate(Screen.ImportChannelsData)},
                     )
                 }
                 composable(
@@ -371,8 +404,12 @@ fun AppView(
                 composable(Screen.LiquidityPolicy.route, deepLinks = listOf(navDeepLink { uriPattern ="phoenix:liquiditypolicy" })) {
                     LiquidityPolicyView(
                         onBackClick = { navController.popBackStack() },
-                        onAdvancedClick = { navController.navigate(Screen.AdvancedLiquidityPolicy.route) }
+                        onAdvancedClick = { navController.navigate(Screen.AdvancedLiquidityPolicy.route) },
+                        onRequestLiquidityClick = { navController.navigate(Screen.LiquidityRequest.route) },
                     )
+                }
+                composable(Screen.LiquidityRequest.route, deepLinks = listOf(navDeepLink { uriPattern ="phoenix:requestliquidity" })) {
+                    RequestLiquidityView(onBackClick = { navController.popBackStack() },)
                 }
                 composable(Screen.AdvancedLiquidityPolicy.route) {
                     AdvancedIncomingFeePolicy(onBackClick = { navController.popBackStack() })
@@ -384,7 +421,16 @@ fun AppView(
                     )
                 }
                 composable(Screen.ResetWallet.route) {
-                    ResetWallet(onBackClick = { navController.popBackStack() })
+                    appVM.service?.let { nodeService ->
+                        val application = application
+                        ResetWallet(
+                            onShutdownBusiness = application::shutdownBusiness,
+                            onShutdownService = nodeService::shutdown,
+                            onPrefsClear = application::clearPreferences,
+                            onBusinessReset = application::resetBusiness,
+                            onBackClick = { navController.popBackStack() }
+                        )
+                    }
                 }
             }
         }
@@ -492,9 +538,8 @@ private fun RequireStarted(
     if (serviceState == null) {
         // do nothing
     } else if (serviceState !is NodeServiceState.Running) {
-        log.debug { "access to screen has been denied (state=${serviceState.name})" }
         val nc = navController
-        nc.navigate("${Screen.Startup.route}?next=$nextUri") {
+        nc.navigate("${Screen.Startup.route}?next=${nextUri?.encodeURLParameter()}") {
             popUpTo(nc.graph.id) { inclusive = true }
         }
     } else {

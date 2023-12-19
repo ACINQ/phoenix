@@ -189,7 +189,7 @@
     <string name="scan_lnurl_fetching">Fetching data from service…</string>
 
     <string name="scan_manual_input_title">Manual input</string>
-    <string name="scan_manual_input_instructions">Enter a Lightning invoice, LNURL, or Lightning address you want to send money to.</string>
+    <string name="scan_manual_input_instructions">Enter a Lightning invoice, LNURL or Lightning address you want to send money to.</string>
     <string name="scan_manual_input_label">Invoice or LN address</string>
 
     <!-- utils: misc strings -->
@@ -247,8 +247,11 @@
 
     <string name="channelsview_title">Payment channels</string>
     <string name="channelsview_menu_import_channels">Import channels</string>
+    <string name="channelsview_header">Overview</string>
     <string name="channelsview_balance">Balance</string>
-    <string name="channelsview_balance_about">This is the aggregated balance of your active channels. It\'s what you can spend over Lightning.</string>
+    <string name="channelsview_balance_about"><b>Balance</b> is the aggregated balance of your active channels. It\'s what you can spend over Lightning.</string>
+    <string name="channelsview_inbound">Inbound liquidity</string>
+    <string name="channelsview_inbound_about"><b>Inbound liquidity</b> is what your channels can receive over Lightning without having to go on-chain and pay fees.</string>
     <string name="channelsview_loading_channels">Loading channel data…</string>
     <string name="channelsview_no_channels">You don\'t have any channels yet.\n\nA new payment channel will be created automatically when needed.</string>
 
@@ -259,6 +262,7 @@
     <string name="channeldetails_channel_id">Channel id</string>
     <string name="channeldetails_state">State</string>
     <string name="channeldetails_spendable">Balance</string>
+    <string name="channeldetails_receivable">Inbound liquidity</string>
 
     <string name="channeldetails_commitments">Active commitments</string>
     <string name="channeldetails_inactive_commitments">Inactive commitments</string>
@@ -300,6 +304,7 @@
     <string name="home__connection__bad_cert">Electrum certificate</string>
     <string name="home__connection__connecting">Connecting…</string>
     <string name="home__connection__tor_active">Tor enabled</string>
+    <string name="home_request_liquidity">Request liquidity</string>
 
     <!-- in-app notifications -->
 
@@ -334,6 +339,7 @@
     <string name="paymentdetails_loading">Loading payment details…</string>
     <string name="paymentdetails_error">Could not find payment details</string>
 
+    <string name="paymentdetails_status_inbound_liquidity_success"><b>LIQUIDITY ADDED</b> %1$s</string>
     <string name="paymentdetails_status_channelclose_confirmed"><b>COMPLETE</b> %1$s</string>
     <string name="paymentdetails_status_sent_successful"><b>SENT</b> %1$s</string>
     <string name="paymentdetails_status_sent_pending">Pending…</string>
@@ -375,6 +381,7 @@
     <string name="paymentdetails_desc_closing_channel">Closing channel</string>
     <string name="paymentdetails_desc_legacy_migration">Migration from legacy app</string>
     <string name="paymentdetails_desc_cpfp">Bump transactions</string>
+    <string name="paymentdetails_desc_inbound_liquidity">+%1$s inbound liquidity</string>
     <string name="paymentdetails_desc_keysend">Donation</string>
     <string name="paymentdetails_desc_swapout">Swap-out to %1$s</string>
     <string name="paymentdetails_desc_swapin">On-chain deposit</string>
@@ -398,6 +405,7 @@
     <string name="paymentdetails_closing">Channel closing payment</string>
     <string name="paymentdetails_splice_outgoing">Outgoing splice payment</string>
     <string name="paymentdetails_splice_cpfp_outgoing">Accelerate on-chain transactions</string>
+    <string name="paymentdetails_inbound_liquidity">Request inbound liquidity</string>
     <string name="paymentdetails_normal_outgoing">Standard outgoing Lightning payment</string>
     <string name="paymentdetails_normal_incoming">Standard incoming Lightning payment</string>
     <string name="paymentdetails_swapin">Swap-in Bitcoin deposit</string>
@@ -413,6 +421,9 @@
     <string name="paymentdetails_splice_out_tx_label">Splice transaction</string>
     <string name="paymentdetails_dualswapin_tx_label">Transactions</string>
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
+
+    <string name="paymentdetails_liquidity_amount_label">Liquidity amount</string>
+    <string name="paymentdetails_liquidity_signature_label">Liquidity request details</string>
 
     <string name="paymentdetails_closing_channel_label">Closing channel</string>
     <string name="paymentdetails_closing_address_label">Closing address</string>
@@ -576,10 +587,9 @@
     <string name="electrum_title">Electrum server</string>
     <string name="electrum_about">To secure your payment channels Phoenix monitors the Bitcoin blockchain through Electrum servers.\n\nBy default, random servers are used. You can also configure Phoenix to connect only to your own server.</string>
     <string name="electrum_block_height_label">Block height</string>
-    <string name="electrum_tip_label">Tip timestamp</string>
-    <string name="electrum_fee_rate_next_label">Feerate 1 block</string>
-    <string name="electrum_fee_rate_funding_label">Feerate 144 blocks</string>
     <string name="electrum_connection_label">Server</string>
+    <string name="electrum_connection_dialog_tls_port">Use the TLS port (default 50002).</string>
+    <string name="electrum_connection_dialog_onion_port">Use the plain TCP port, not the TLS one, since this is an onion service.</string>
 
     <string name="electrum_connection_closed_with_random">Disconnected from Electrum</string>
     <string name="electrum_connection_closed_with_custom">Disconnected from %1$s</string>
@@ -595,7 +605,7 @@
     <string name="electrum_dialog_invalid_input">This address is invalid.</string>
     <string name="electrum_dialog_cert_check_button">Connect</string>
     <string name="electrum_dialog_cert_checking">Checking certificate…</string>
-    <string name="electrum_dialog_cert_failure">Failed to connect:\n%1$s</string>
+    <string name="electrum_dialog_cert_failure">Failed to connect</string>
     <string name="electrum_dialog_cert_unresolved">This address cannot be resolved.</string>
     <string name="electrum_dialog_cert_header">Untrusted certificate</string>
     <string name="electrum_dialog_cert_sha1">SHA1 Fingerprint</string>
@@ -726,6 +736,7 @@
 
     <string name="walletinfo_lightning">Lightning</string>
     <string name="walletinfo_nodeid">Node id</string>
+    <string name="walletinfo_legacy_nodeid_toggle">Show legacy node id</string>
     <string name="walletinfo_legacy_nodeid">Legacy node id</string>
     <string name="walletinfo_offchain_balance">Balance</string>
     <string name="walletinfo_offchain_channels">Payment channels</string>
@@ -777,6 +788,7 @@
     <string name="splice_error_interactive_session">Interactive tx session failed [%1$s]</string>
     <string name="splice_error_invalid_pubkey">Invalid splice-out pubkey script</string>
     <string name="splice_error_splice_in_progress">A splice payment is already in progress</string>
+    <string name="splice_error_invalid_liquidity_ads">Invalid liquidity-ads request: [%1$s]</string>
 
     <!-- reset wallet -->
 
@@ -787,14 +799,15 @@
 
     <string name="reset_wallet_confirm_title">Confirm reset</string>
     <string name="reset_wallet_confirm_header">The wallet will be completely deleted from <b>this device</b>.</string>
-    <string name="reset_wallet_confirm_details">This will reset the app. You will be taken to the Intro screen, and prompted to create or restore a wallet.</string>
+    <string name="reset_wallet_confirm_details">This will reset the app. Your payments history will be lost. You will be taken to the Intro screen, and prompted to create or restore a wallet.</string>
     <string name="reset_wallet_confirm_seed_balance">Don\'t lose your funds:\n%1$s (≈ %2$s).</string>
     <string name="reset_wallet_confirm_seed_responsibility">You are responsible for storing your recovery phrase.</string>
-    <string name="reset_wallet_confirm_button">Delete wallet (does not work yet)</string>
-
-    <string name="reset_wallet_deleting">Deleting wallet data…</string>
-    <string name="reset_wallet_success">Wallet has been successfully reset</string>
-    <string name="reset_wallet_success_details">Moving back to init screen…</string>
+    <string name="reset_wallet_confirm_button">Delete wallet</string>
+    <string name="reset_wallet_shutting_down">Shutting down…</string>
+    <string name="reset_wallet_deleting_prefs">Deleting preferences…</string>
+    <string name="reset_wallet_deleting_seed">Deleting seed…</string>
+    <string name="reset_wallet_deleting_db">Deleting databases…</string>
+    <string name="reset_wallet_success">The wallet has been successfully reset.</string>
     <string name="reset_wallet_failure_title">Reset failed</string>
 
 </resources>

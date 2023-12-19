@@ -3,6 +3,7 @@ package fr.acinq.phoenix.utils
 import fr.acinq.bitcoin.Block
 import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.PublicKey
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.MilliSatoshi
@@ -42,7 +43,7 @@ class CsvWriterTests {
                         serviceFee = 3_000_000.msat,
                         miningFee = 0.sat,
                         channelId = randomBytes32(),
-                        txId = randomBytes32(),
+                        txId = TxId(randomBytes32()),
                         confirmedAt = 1000,
                         lockedAt = 2000,
                     )
@@ -229,7 +230,7 @@ class CsvWriterTests {
     fun testRow_Incoming_NewChannel_DualSwapIn() {
         val payment = IncomingPayment(
             preimage = randomBytes32(),
-            origin = IncomingPayment.Origin.OnChain(txid = randomBytes32(), localInputs = setOf()),
+            origin = IncomingPayment.Origin.OnChain(txId = TxId(randomBytes32()), localInputs = setOf()),
             received = IncomingPayment.Received(
                 receivedWith = listOf(
                     IncomingPayment.ReceivedWith.NewChannel(
@@ -237,7 +238,7 @@ class CsvWriterTests {
                         serviceFee = 2_931_000.msat,
                         miningFee = 69.sat,
                         channelId = randomBytes32(),
-                        txId = randomBytes32(),
+                        txId = TxId(randomBytes32()),
                         confirmedAt = 500,
                         lockedAt = 1000
                     )
@@ -305,7 +306,7 @@ class CsvWriterTests {
             isSentToDefaultAddress = false,
             miningFees = 1_400.sat,
             channelId = randomBytes32(),
-            txId = randomBytes32(),
+            txId = TxId(randomBytes32()),
             createdAt = 1675353533694,
             confirmedAt = 1675353533694,
             lockedAt = null,

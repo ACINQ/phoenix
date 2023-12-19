@@ -46,7 +46,7 @@ class SqlitePaymentsDatabaseTest {
 
     private val preimage2 = randomBytes32()
     private val receivedWith2 = listOf(
-        IncomingPayment.ReceivedWith.NewChannel(amount = 1_995_000.msat, serviceFee = 5_000.msat, channelId = randomBytes32(), txId = randomBytes32(), miningFee = 100.sat, confirmedAt = 100, lockedAt = 200)
+        IncomingPayment.ReceivedWith.NewChannel(amount = 1_995_000.msat, serviceFee = 5_000.msat, channelId = randomBytes32(), txId = TxId(randomBytes32()), miningFee = 100.sat, confirmedAt = 100, lockedAt = 200)
     )
 
     val origin3 = IncomingPayment.Origin.SwapIn(address = "1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb")
@@ -87,7 +87,7 @@ class SqlitePaymentsDatabaseTest {
         val paymentHash = Crypto.sha256(preimage).toByteVector32()
         val origin = IncomingPayment.Origin.Invoice(createInvoice(preimage, 1_000_000_000.msat))
         val channelId = randomBytes32()
-        val txId = randomBytes32()
+        val txId = TxId(randomBytes32())
         val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(amount = 600_000_000.msat, serviceFee = 5_000.msat, miningFee = 100.sat, channelId = channelId, txId = txId, confirmedAt = 100, lockedAt = 50)
         val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(amount = 400_000_000.msat, serviceFee = 5_000.msat, miningFee = 200.sat, channelId = channelId, txId = txId, confirmedAt = 115, lockedAt = 75)
         val receivedWith = listOf(mppPart1, mppPart2)
@@ -103,7 +103,7 @@ class SqlitePaymentsDatabaseTest {
         val paymentHash = Crypto.sha256(preimage).toByteVector32()
         val origin = IncomingPayment.Origin.Invoice(createInvoice(preimage, 1_000_000_000.msat))
         val channelId = randomBytes32()
-        val txId = randomBytes32()
+        val txId = TxId(randomBytes32())
         val mppPart1 = IncomingPayment.ReceivedWith.NewChannel(amount = 500_000_000.msat, serviceFee = 5_000.msat, miningFee = 200.sat, channelId = channelId, txId = txId, confirmedAt = 100, lockedAt = 50)
         val mppPart2 = IncomingPayment.ReceivedWith.NewChannel(amount = 500_000_000.msat, serviceFee = 5_000.msat, miningFee = 150.sat, channelId = channelId, txId = txId, confirmedAt = 115, lockedAt = 75)
         val receivedWith = listOf(mppPart1, mppPart2)
@@ -201,7 +201,7 @@ class SqlitePaymentsDatabaseTest {
         isSentToDefaultAddress = false,
         miningFees = 500.sat,
         channelId = randomBytes32(),
-        txId = randomBytes32(),
+        txId = TxId(randomBytes32()),
         createdAt = 100,
         confirmedAt = null,
         lockedAt = null,
@@ -238,7 +238,7 @@ class SqlitePaymentsDatabaseTest {
         assertEquals("foobar", close.address)
         assertEquals(ByteVector32.Zeroes, close.channelId)
         assertEquals(true, close.isSentToDefaultAddress)
-        assertEquals("ecf2b7c9cfa745e23f4b6a47f9ceb19b0f630e0d73e4442ef326d3da24c903f5", close.txId.toHex())
+        assertEquals("ecf2b7c9cfa745e23f4b6a47f9ceb19b0f630e0d73e4442ef326d3da24c903f5", close.txId.toString())
         assertEquals(ChannelClosingType.Local, close.closingType)
         assertEquals(100, close.createdAt)
         assertEquals(200, close.confirmedAt)

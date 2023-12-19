@@ -126,7 +126,7 @@ class CsvWriter {
                         is IncomingPayment.Origin.OnChain -> {
                             // append txs ids if any, nothing otherwise
                             val inputs = origin.localInputs.takeIf { it.isNotEmpty() }?.joinToString("\n- ") {
-                                it.txid.toHex()
+                                it.txid.toString()
                             }?.let { "\n$it" } ?: ""
                             "Swap-in to ${config.swapInAddress}$inputs"
                         }
@@ -139,6 +139,7 @@ class CsvWriter {
                     is SpliceOutgoingPayment -> "Outgoing splice to ${payment.address}"
                     is ChannelCloseOutgoingPayment -> "Channel closing to ${payment.address}"
                     is SpliceCpfpOutgoingPayment -> "Accelerate transactions with CPFP"
+                    is InboundLiquidityOutgoingPayment -> "+${payment.lease.amount.sat} sat inbound liquidity"
                 }
                 row += ",${processField(details)}"
             }

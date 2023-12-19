@@ -21,6 +21,7 @@ import com.google.common.net.HostAndPort
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.eclair.db.IncomingPaymentStatus
 import fr.acinq.eclair.db.OutgoingPaymentStatus
@@ -50,11 +51,14 @@ import fr.acinq.phoenix.legacy.utils.Prefs
 import fr.acinq.phoenix.legacy.utils.ThemeHelper
 import fr.acinq.phoenix.legacy.utils.Wallet
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConversions
 import scala.collection.JavaConverters
 import scala.collection.Seq
+
 
 object LegacyMigrationHelper {
 
@@ -67,7 +71,7 @@ object LegacyMigrationHelper {
     ) {
         log.info("started migrating legacy user preferences")
 
-        val (business, internalData) = (context as PhoenixApplication).run { business to internalDataRepository }
+        val (business, internalData) = (context as PhoenixApplication).run { business.filterNotNull().first() to internalDataRepository }
         val appConfigurationManager = business.appConfigurationManager
 
         // -- utils
@@ -157,7 +161,7 @@ object LegacyMigrationHelper {
         log.info("opened legacy payments db")
 
         // 2 - get the new payments database
-        val business = (context as PhoenixApplication).business
+        val business = (context as PhoenixApplication).business.filterNotNull().first()
         val newPaymentsDb = business.databaseManager.paymentsDb()
 
         // 3 - extract all outgoing payments from the legacy database, and save them to the new database
@@ -167,7 +171,7 @@ object LegacyMigrationHelper {
             try {
                 val parentId = it.key
                 val paymentMeta = legacyMetaRepository.get(parentId.toString())
-                val payment = modernizeLegacyOutgoingPayment(business.chain.chainHash, parentId, it.value, paymentMeta)
+                val payment = modernizeLegacyOutgoingPayment(business.chain, parentId, it.value, paymentMeta)
 
                 // save payment to database
                 newPaymentsDb.addOutgoingPayment(payment)
@@ -300,7 +304,7 @@ object LegacyMigrationHelper {
                     serviceFee = payToOpenMeta?.fee_sat?.sat?.toMilliSatoshi() ?: 0.msat,
                     miningFee = 0.sat,
                     channelId = ByteVector32.Zeroes,
-                    txId = ByteVector32.Zeroes,
+                    txId = TxId(ByteVector32.Zeroes),
                     confirmedAt = status.receivedAt(),
                     lockedAt = status.receivedAt()
                 )
@@ -325,7 +329,7 @@ object LegacyMigrationHelper {
         JavaConversions.asJavaCollection(payments).toList().groupBy { UUID.fromString(it.parentId().toString()) }
 
     fun modernizeLegacyOutgoingPayment(
-        chainHash: ByteVector32,
+        chain: NodeParams.Chain,
         parentId: UUID,
         listOfParts: List<fr.acinq.eclair.db.OutgoingPayment>,
         paymentMeta: PaymentMeta?,
@@ -344,7 +348,7 @@ object LegacyMigrationHelper {
                 address = paymentMeta?.closing_main_output_script ?: "",
                 isSentToDefaultAddress = paymentMeta?.closing_type != ClosingType.Mutual.code,
                 miningFees = 0.sat,
-                txId = paymentMeta?.getSpendingTxs()?.firstOrNull()?.let { ByteVector32.fromValidHex(it) } ?: ByteVector32.Zeroes,
+                txId = TxId(paymentMeta?.getSpendingTxs()?.firstOrNull()?.let { ByteVector32.fromValidHex(it) } ?: ByteVector32.Zeroes),
                 createdAt = head.createdAt(),
                 confirmedAt = closedAt,
                 lockedAt = closedAt,
@@ -367,7 +371,7 @@ object LegacyMigrationHelper {
             LightningOutgoingPayment.Details.SwapOut(
                 address = paymentMeta.swap_out_address ?: "",
                 paymentRequest = paymentRequest ?: PaymentRequest.create(
-                    chainHash = chainHash,
+                    chainHash = chain.chainHash,
                     amount = head.recipientAmount().toLong().msat,
                     paymentHash = head.paymentHash().bytes().toArray().byteVector32(),
                     privateKey = Lightning.randomKey(),

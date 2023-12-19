@@ -1,9 +1,12 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.getConfirmations
+import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
+import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentProgress
@@ -90,9 +93,13 @@ class PaymentsManager(
             if (index > 0) {
                 for (row in list) {
                     val paymentInfo = fetcher.getPayment(row, WalletPaymentFetchOptions.None)
-                    val completedAt = paymentInfo?.payment?.completedAt
-                    if (completedAt != null && completedAt > appLaunchTimestamp) {
-                        _lastCompletedPayment.value = paymentInfo.payment
+                    if (paymentInfo?.payment is InboundLiquidityOutgoingPayment || paymentInfo?.payment is SpliceCpfpOutgoingPayment) {
+                        // ignore cpfp/inbound
+                    } else {
+                        val completedAt = paymentInfo?.payment?.completedAt
+                        if (completedAt != null && completedAt > appLaunchTimestamp) {
+                            _lastCompletedPayment.value = paymentInfo.payment
+                        }
                     }
                     break
                 }
@@ -110,12 +117,11 @@ class PaymentsManager(
             paymentsDb.listUnconfirmedTransactions(),
             configurationManager.electrumMessages
         ) { unconfirmedTxs, header ->
-            unconfirmedTxs to header?.blockHeight
+            unconfirmedTxs.map { TxId(it) } to header?.blockHeight
         }.collect { (unconfirmedTxs, blockHeight) ->
             if (blockHeight != null) {
-                val unconfirmedTxIds = unconfirmedTxs.map { it.byteVector32() }
-                log.debug { "checking confirmation status of ${unconfirmedTxIds.size} txs at block=$blockHeight" }
-                unconfirmedTxIds.forEach { txId ->
+                log.debug { "checking confirmation status of ${unconfirmedTxs.size} txs at block=$blockHeight" }
+                unconfirmedTxs.forEach { txId ->
                     electrumClient.getConfirmations(txId)?.let { conf ->
                         if (conf > 0) {
                             log.debug { "transaction $txId has $conf confirmations, updating database" }
@@ -144,7 +150,7 @@ class PaymentsManager(
      * payment(s) that triggered that change.
      */
     suspend fun listPaymentsForTxId(
-        txId: ByteVector32
+        txId: TxId
     ): List<WalletPayment> {
         return paymentsDb().listPaymentsForTxId(txId)
     }
@@ -159,6 +165,7 @@ class PaymentsManager(
             is WalletPaymentId.SpliceOutgoingPaymentId -> paymentsDb().getSpliceOutgoingPayment(id.id, options)
             is WalletPaymentId.ChannelCloseOutgoingPaymentId -> paymentsDb().getChannelCloseOutgoingPayment(id.id, options)
             is WalletPaymentId.SpliceCpfpOutgoingPaymentId -> paymentsDb().getSpliceCpfpOutgoingPayment(id.id, options)
+            is WalletPaymentId.InboundLiquidityOutgoingPaymentId -> paymentsDb().getInboundLiquidityOutgoingPayment(id.id, options)
         }?.let {
             WalletPaymentInfo(
                 payment = it.first,

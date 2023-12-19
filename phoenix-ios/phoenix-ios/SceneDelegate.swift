@@ -263,20 +263,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		firstUnlockAttempted = true
 		
 		AppSecurity.shared.tryUnlockWithKeychain {
-			(mnemonics: [String]?, enabledSecurity: EnabledSecurity, error: UnlockError?) in
+			(recoveryPhrase: RecoveryPhrase?, enabledSecurity: EnabledSecurity, error: UnlockError?) in
 
 			// There are multiple potential configurations:
 			//
-			// - no wallet         => mnemoncis == nil, enabledSecurity is empty
-			// - no security       => mnemonics != nil, enabledSecurity is empty
-			// - standard security => mnemonics != nil, enabledSecurity is non-empty
-			// - advanced security => mnemonics == nil, enabledSecurity is non-empty
+			// - no wallet         => recoveryPhrase == nil, enabledSecurity is empty
+			// - no security       => recoveryPhrase != nil, enabledSecurity is empty
+			// - standard security => recoveryPhrase != nil, enabledSecurity is non-empty
+			// - advanced security => recoveryPhrase == nil, enabledSecurity is non-empty
 			//
 			// Another way to think about it:
 			// - standard security => biometrics only protect the UI, wallet can immediately be loaded
 			// - advanced security => biometrics required to unlock both the UI and the seed
 
-			if mnemonics == nil && enabledSecurity.isEmpty && error == nil {
+			if recoveryPhrase == nil && enabledSecurity.isEmpty && error == nil {
+
 				// The user doesn't have a wallet yet.
 				LockState.shared.walletExistence = .doesNotExist
 				
@@ -290,9 +291,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 				LockState.shared.walletExistence = .exists
 			}
 			
-			if let mnemonics = mnemonics {
+			if let recoveryPhrase {
 				// Load wallet into memory. (UI may or may not be locked.)
-				Biz.loadWallet(mnemonics: mnemonics)
+				Biz.loadWallet(recoveryPhrase: recoveryPhrase)
 			}
 		
 			if let error = error {

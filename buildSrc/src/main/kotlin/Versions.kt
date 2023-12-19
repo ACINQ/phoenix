@@ -1,6 +1,6 @@
 object Versions {
-    const val lightningKmp = "1.5.12-SNAPSHOT"
-    const val secp256k1 = "0.10.1"
+    const val lightningKmp = "1.5.14"
+    const val secp256k1 = "0.11.0"
     const val torMobile = "0.2.0"
 
     const val kotlin = "1.8.21"
@@ -37,7 +37,7 @@ object Versions {
     }
 
     object AndroidLegacy {
-        const val eclair = "0.4.22-android-phoenix"
+        const val eclair = "0.4.23-android-phoenix"
 
         const val safeArgs = "2.4.2"
         const val appCompat = "1.3.0"

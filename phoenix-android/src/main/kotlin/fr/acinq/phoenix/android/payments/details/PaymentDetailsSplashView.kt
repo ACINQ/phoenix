@@ -41,11 +41,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.blockchain.electrum.ElectrumConnectionStatus
 import fr.acinq.lightning.blockchain.electrum.getConfirmations
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
+import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -85,7 +87,11 @@ fun PaymentDetailsSplashView(
         topContent = { PaymentStatus(data.payment, fromEvent, onCpfpSuccess = onBackClick) }
     ) {
         AmountView(
-            amount = if (payment is OutgoingPayment) payment.amount - payment.fees else payment.amount,
+            amount = when (payment) {
+                is InboundLiquidityOutgoingPayment -> payment.amount
+                is OutgoingPayment -> payment.amount - payment.fees
+                is IncomingPayment -> payment.amount
+            },
             amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 30.sp),
             separatorSpace = 4.dp,
             prefix = stringResource(id = if (payment is OutgoingPayment) R.string.paymentline_prefix_sent else R.string.paymentline_prefix_received)
@@ -108,6 +114,9 @@ fun PaymentDetailsSplashView(
         PaymentDescriptionView(data = data, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
         PaymentDestinationView(data = data)
         PaymentFeeView(payment = payment)
+        if (payment is InboundLiquidityOutgoingPayment) {
+            InboundLiquidityLeaseDetails(lease = payment.lease)
+        }
 
         data.payment.errorMessage()?.let { errorMessage ->
             Spacer(modifier = Modifier.height(8.dp))
@@ -284,6 +293,26 @@ private fun PaymentStatus(
                 ConfirmationView(it.txId, it.channelId, isConfirmed = it.confirmedAt != null, canBeBumped = false, onCpfpSuccess = onCpfpSuccess, channelMinDepth)
             }
         }
+        is InboundLiquidityOutgoingPayment -> when (val lockedAt = payment.lockedAt) {
+            null -> {
+                PaymentStatusIcon(
+                    message = null,
+                    imageResId = R.drawable.ic_payment_details_pending_onchain_static,
+                    isAnimated = false,
+                    color = mutedTextColor,
+                )
+            }
+            else -> {
+                PaymentStatusIcon(
+                    message = {
+                        Text(text = annotatedStringResource(id = R.string.paymentdetails_status_inbound_liquidity_success, lockedAt.toRelativeDateString()))
+                    },
+                    imageResId = if (fromEvent) R.drawable.ic_payment_details_success_animated else R.drawable.ic_payment_details_success_static,
+                    isAnimated = fromEvent,
+                    color = positiveColor,
+                )
+            }
+        }
     }
 }
 
@@ -453,6 +482,7 @@ private fun PaymentDescriptionView(
 @Composable
 private fun PaymentDestinationView(data: WalletPaymentInfo) {
     when (val payment = data.payment) {
+        is InboundLiquidityOutgoingPayment -> {}
         is OnChainOutgoingPayment -> {
             Spacer(modifier = Modifier.height(8.dp))
             SplashLabelRow(label = stringResource(id = R.string.paymentdetails_destination_label), icon = R.drawable.ic_chain) {
@@ -462,6 +492,7 @@ private fun PaymentDestinationView(data: WalletPaymentInfo) {
                             is SpliceOutgoingPayment -> payment.address
                             is ChannelCloseOutgoingPayment -> payment.address
                             is SpliceCpfpOutgoingPayment -> stringResource(id = R.string.paymentdetails_destination_cpfp_value)
+                            else -> stringResource(id = R.string.utils_unknown)
                         }
                     )
                 }
@@ -509,6 +540,22 @@ private fun PaymentFeeView(payment: WalletPayment) {
                 Text(text = payment.fees.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
             }
         }
+        payment is InboundLiquidityOutgoingPayment -> {
+            Spacer(modifier = Modifier.height(8.dp))
+            SplashLabelRow(
+                label = stringResource(id = R.string.paymentdetails_liquidity_miner_fee_label),
+                helpMessage = stringResource(id = R.string.paymentdetails_liquidity_miner_fee_help)
+            ) {
+                Text(text = payment.miningFees.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            SplashLabelRow(
+                label = stringResource(id = R.string.paymentdetails_liquidity_service_fee_label),
+                helpMessage = stringResource(id = R.string.paymentdetails_liquidity_service_fee_help)
+            ) {
+                Text(text = payment.lease.fees.serviceFee.toPrettyString(btcUnit, withUnit = true, mSatDisplayPolicy = MSatDisplayPolicy.SHOW_IF_ZERO_SATS))
+            }
+        }
         payment is IncomingPayment -> {
             val receivedWithNewChannel = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.NewChannel>() ?: emptyList()
             val receivedWithSpliceIn = payment.received?.receivedWith?.filterIsInstance<IncomingPayment.ReceivedWith.SpliceIn>() ?: emptyList()
@@ -535,6 +582,14 @@ private fun PaymentFeeView(payment: WalletPayment) {
             }
         }
         else -> {}
+    }
+}
+
+@Composable
+private fun InboundLiquidityLeaseDetails(lease: LiquidityAds.Lease) {
+    Spacer(modifier = Modifier.height(8.dp))
+    SplashLabelRow(label = stringResource(id = R.string.paymentdetails_liquidity_lease_duration_label)) {
+        Text(text = stringResource(id = R.string.paymentdetails_liquidity_lease_duration_value))
     }
 }
 
@@ -576,7 +631,7 @@ private fun EditPaymentDetails(
 
 @Composable
 private fun ConfirmationView(
-    txId: ByteVector32,
+    txId: TxId,
     channelId: ByteVector32,
     isConfirmed: Boolean,
     canBeBumped: Boolean,
@@ -584,7 +639,7 @@ private fun ConfirmationView(
     minDepth: Int? = null, // sometimes we know how many confirmations are needed
 ) {
     val log = logger("PaymentDetailsSplashView")
-    val txUrl = txUrl(txId = txId.toHex())
+    val txUrl = txUrl(txId = txId)
     val context = LocalContext.current
     val electrumClient = business.electrumClient
     var showBumpTxDialog by remember { mutableStateOf(false) }
@@ -604,9 +659,9 @@ private fun ConfirmationView(
 
         suspend fun getConfirmations(): Int {
             val confirmations = electrumClient.getConfirmations(txId)
-            log.debug { "retrieved confirmations count=$confirmations from electrum for tx=${txId.toHex()}" }
+            log.debug { "retrieved confirmations=$confirmations from electrum for tx=$txId" }
             return confirmations ?: run {
-                log.debug { "retrying getConfirmations from Electrum in 5 sec" }
+                log.debug { "retrying getConfirmations from electrum in 5 sec" }
                 delay(5_000)
                 getConfirmations()
             }
@@ -620,14 +675,14 @@ private fun ConfirmationView(
         confirmations?.let { conf ->
             if (conf == 0) {
                 Card(
-                    internalPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                    internalPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                     onClick = if (canBeBumped) { { showBumpTxDialog = true } } else null,
                     backgroundColor = Color.Transparent,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     TextWithIcon(
                         text = stringResource(R.string.paymentdetails_status_unconfirmed_zero),
-                        icon = R.drawable.ic_rocket,
+                        icon = if (canBeBumped) R.drawable.ic_rocket else R.drawable.ic_clock,
                         textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp, color = MaterialTheme.colors.primary),
                         iconTint = MaterialTheme.colors.primary
                     )

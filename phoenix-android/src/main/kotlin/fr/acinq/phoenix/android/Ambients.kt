@@ -22,7 +22,6 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
-import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
@@ -40,7 +39,6 @@ val LocalBitcoinUnit = compositionLocalOf { BitcoinUnit.Sat }
 val LocalFiatCurrency = compositionLocalOf { FiatCurrency.USD }
 val LocalExchangeRates = compositionLocalOf<List<ExchangeRate>> { listOf() }
 val LocalShowInFiat = compositionLocalOf { false }
-val LocalElectrumServer = compositionLocalOf<ServerAddress?> { null }
 val isDarkTheme: Boolean
     @Composable
     get() = LocalTheme.current.let { it == UserTheme.DARK || (it == UserTheme.SYSTEM && isSystemInDarkTheme()) }
