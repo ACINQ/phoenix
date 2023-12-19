@@ -324,7 +324,7 @@ struct SummaryView: View {
 					}
 				} // </confirmationDialog>
 				
-				if confirmations == 0 {
+				if confirmations == 0 && supportsBumpFee(onChainPayment) {
 					NavigationLink(destination: cpfpView(onChainPayment)) {
 						Label {
 							Text("Accelerate transaction")
@@ -648,6 +648,15 @@ struct SummaryView: View {
 			return location
 		case .embedded(_):
 			return .embedded(popTo: popToWrapper)
+		}
+	}
+	
+	func supportsBumpFee(_ onChainPayment: Lightning_kmpOnChainOutgoingPayment) -> Bool {
+		
+		switch onChainPayment {
+			case is Lightning_kmpSpliceOutgoingPayment     : return true
+			case is Lightning_kmpSpliceCpfpOutgoingPayment : return true
+			default                                        : return false
 		}
 	}
 	

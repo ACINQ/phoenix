@@ -319,7 +319,7 @@
     <string name="liquidityads_no_channels_header">No channels yet!</string>
     <string name="liquidityads_no_channels_details">You first need funds in the wallet to use this feature.</string>
     <string name="liquidityads_header">Plan ahead your liquidity</string>
-    <string name="liquidityads_instructions">Inbound liquidity lets you avoid on-chain transactions fees for future payments received over Lightning.\n\nBy requesting more liquidity now, you can save fees later.</string>
+    <string name="liquidityads_instructions">Inbound liquidity lets you avoid on-chain transaction fees for future payments received over Lightning.\n\nBy requesting more liquidity now, you can save fees later.</string>
     <string name="liquidityads_faq_link">More info</string>
     <string name="liquidityads_current_liquidity">Current liquidity</string>
 

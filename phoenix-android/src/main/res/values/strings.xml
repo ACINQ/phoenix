@@ -189,7 +189,7 @@
     <string name="scan_lnurl_fetching">Fetching data from service…</string>
 
     <string name="scan_manual_input_title">Manual input</string>
-    <string name="scan_manual_input_instructions">Enter a Lightning invoice, LNURL, or Lightning address you want to send money to.</string>
+    <string name="scan_manual_input_instructions">Enter a Lightning invoice, LNURL or Lightning address you want to send money to.</string>
     <string name="scan_manual_input_label">Invoice or LN address</string>
 
     <!-- utils: misc strings -->
