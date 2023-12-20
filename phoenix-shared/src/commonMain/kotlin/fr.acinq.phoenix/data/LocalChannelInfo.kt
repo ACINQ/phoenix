@@ -53,7 +53,7 @@ data class LocalChannelInfo(
     /** The channel's receive capacity - should be accurate but still depends on the network feerate. */
     val availableForReceive by lazy {
         when (state) {
-            is ChannelStateWithCommitments -> state.commitments.availableBalanceForReceive()
+            is Normal -> state.commitments.availableBalanceForReceive()
             else -> null
         }
     }
