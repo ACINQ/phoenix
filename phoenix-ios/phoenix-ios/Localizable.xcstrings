@@ -571,7 +571,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(por ejemplo, el pago a la dirección de BTC se envió a)"
+            "value" : "(por ejemplo, dirección de BTC a la que se envió el pago)"
           }
         },
         "fr" : {
