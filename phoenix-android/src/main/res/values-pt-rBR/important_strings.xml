@@ -127,7 +127,6 @@
     <string name="scan_error_already_paid">Este pagamento já foi pago.</string>
     <string name="scan_error_invalid_chain">Este pagamento não usa o mesmo blockchain que sua carteira.</string>
     <string name="scan_error_lnurl_invalid">Falha ao processar esse link LNURL. Verifique se ele é válido.</string>
-    <string name="scan_error_lnurl_service_error">O serviço LNURL retornou um erro.</string>
     <string name="scan_error_lnurl_unsupported">Este tipo de LNURL ainda não é suportado.</string>
     <string name="scan_error_invalid_generic">Esses dados usam um formato desconhecido e não podem ser processados.</string>
 
