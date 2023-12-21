@@ -353,4 +353,9 @@
     <string name="cpfp_instructions">Vous pouvez faire utiliser à vos transactions non confirmées un taux de frais effectif plus élevé afin d\'encourager les mineurs Bitcoin à les privilégier.</string>
     <string name="cpfp_splice_error_actual_below_user">Ces frais sont inférieurs à ceux que vos transactions non confirmées utilisent déjà. Utilisez une valeur plus élevée pour accélérer ces paiements.</string>
 
+    <!-- Lightning payment errors -->
+
+    <string name="outgoing_finalfailure_alreadypaid">Ce paiement a déjà été réglé.</string>
+    <string name="outgoing_finalfailure_noroutefound">Le destinataire de ce paiement n\'est pas joignable, ou bien ne dispose pas de suffisamment de liquidité entrante.</string>
+
 </resources>

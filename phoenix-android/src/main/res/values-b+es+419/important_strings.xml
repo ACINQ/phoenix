@@ -341,4 +341,9 @@
     <string name="cpfp_instructions">Puedes aumentar la tasa de comisión de todas tus transacciones no confirmadas a fin de que los mineros tengan un incentivo para favorecer tus pagos.</string>
     <string name="cpfp_splice_error_actual_below_user">Esta tasa de comisión es inferior a la que ya usan tus transacciones no confirmadas. Usa una tasa de comisión más alta.</string>
 
+    <!-- Lightning payment errors -->
+
+    <string name="outgoing_finalfailure_alreadypaid">Esta factura ya ha sido pagada.</string>
+    <string name="outgoing_finalfailure_noroutefound">El destinatario no está localizable o no tiene suficiente liquidez entrante.</string>
+
 </resources>

@@ -354,4 +354,9 @@
     <string name="cpfp_instructions">Você pode fazer com que todas as suas transações não confirmadas usem uma taxa efetiva mais alta para incentivar os mineradores a favorecer seus pagamentos.</string>
     <string name="cpfp_splice_error_actual_below_user">Essa taxa está abaixo da taxa que suas transações não confirmadas já estão usando. Use uma taxa mais alta para acelerar esses pagamentos.</string>
 
+    <!-- Lightning payment errors -->
+
+    <string name="outgoing_finalfailure_alreadypaid">Este pagamento já foi pago.</string>
+    <string name="outgoing_finalfailure_noroutefound">O destinatário não está contactável ou não tem liquidez de entrada suficiente.</string>
+
 </resources>

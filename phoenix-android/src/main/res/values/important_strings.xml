@@ -354,4 +354,9 @@
     <string name="cpfp_instructions">You can make all your unconfirmed transactions use a higher feerate to encourage miners to favour your payments.</string>
     <string name="cpfp_splice_error_actual_below_user">This feerate is less than what your unconfirmed transactions are already using. Use a higher feerate.</string>
 
+    <!-- Lightning payment errors -->
+
+    <string name="outgoing_finalfailure_alreadypaid">This invoice has already been paid.</string>
+    <string name="outgoing_finalfailure_noroutefound">Recipient is not reachable, or does not have enough inbound liquidity.</string>
+
 </resources>

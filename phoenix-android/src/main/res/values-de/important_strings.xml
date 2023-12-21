@@ -354,4 +354,9 @@
     <string name="cpfp_instructions">Sie können für all Ihre unbestätigten Transaktionen eine höhere effektive Gebührenrate festlegen, um die Miner zu motivieren, Ihre Zahlungen zu bevorzugen.</string>
     <string name="cpfp_splice_error_actual_below_user">Diese Gebührenrate liegt unter der, die Ihre unbestätigten Transaktionen bereits verwenden. Verwenden Sie eine höhere, um diese Zahlungen zu beschleunigen.</string>
 
+    <!-- Lightning payment errors -->
+
+    <string name="outgoing_finalfailure_alreadypaid">Diese Zahlung wurde bereits getätigt.</string>
+    <string name="outgoing_finalfailure_noroutefound">Der Empfänger ist nicht erreichbar oder hat nicht genügend Liquidität im Eingang.</string>
+
 </resources>
