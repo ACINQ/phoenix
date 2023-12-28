@@ -118,7 +118,7 @@
     <string name="receive_bitcoin_share_subject">Compartir esta dirección de Bitcoin con…</string>
 
     <string name="receive_lightning_title">Lightning</string>
-    <string name="receive_lightning_help">Este código QR es una factura de Lightning.\n\nLos pagos mediante Lightning son muy rápidos y normalmente más baratos, pero es posible que aún no sean compatibles con algunas billeteras y servicios.\n\nEn ese caso, desliza el dedo hacia la derecha para obtener una dirección normal de Bitcoin.</string>
+    <string name="receive_lightning_help">Este código QR es una factura de Lightning.\n\nLos pagos mediante Lightning son muy rápidos y normalmente más baratos, pero es posible que aún no sean compatibles con algunas billeteras y servicios.\n\nEn ese caso, desliza el dedo hacia la izquierda para obtener una dirección normal de Bitcoin.</string>
     <string name="receive_lightning_generating">Generando…</string>
     <string name="receive_lightning_amount_label">Importe</string>
     <string name="receive_lightning_desc_label">Desc</string>
@@ -247,9 +247,9 @@
     <string name="channelsview_title">Canales de pago</string>
     <string name="channelsview_menu_import_channels">Importar canales</string>
     <string name="channelsview_balance">Saldo</string>
-    <string name="channelsview_balance_about"><b>Saldo</b> este el saldo total de los canales activos. Es lo que puedes gastar en Lightning.</string>
+    <string name="channelsview_balance_about">El <b>saldo</b> es el monto total de los canales activos. Es lo que puedes gastar en Lightning.</string>
     <string name="channelsview_inbound">Liquidez entrante</string>
-    <string name="channelsview_inbound_about">La <b>liquidez entrante</b> es lo que tus canales pueden recibir a través de Lightning sin tener que ir a la cadena y pagar tasas.</string>
+    <string name="channelsview_inbound_about">La <b>liquidez entrante<b> es lo que los canales pueden recibir a través de Lightning sin tener que recurrir a la cadena y pagar comisiones.</string>
     <string name="channelsview_loading_channels">Cargando datos de canales…</string>
     <string name="channelsview_no_channels">Aún no tienes canales.\n\nSe creará automáticamente un nuevo canal de pago cuando sea necesario.</string>
 
@@ -608,11 +608,11 @@
 
     <string name="tor_settings_title">Tor</string>
     <string name="tor_settings_unknown">Comprobando preferencias…</string>
-    <string name="tor_settings_enabled">Tor está activado</string>
+    <string name="tor_settings_enabled">Tor está activada</string>
     <string name="tor_settings_enabled_description">Las conexiones a la red Lightning y a los servidores de Electrum estarán protegidas.</string>
-    <string name="tor_settings_disabled">Tor está desactivado</string>
-    <string name="tor_settings_confirm_disable_title">¿Seguro que quieres desactivar Tor?</string>
-    <string name="tor_settings_confirm_enable_title">¿Seguro que quieres activar Tor? Ten en cuenta que, para obtener mejores resultados, se recomienda crear también una nueva billetera.</string>
+    <string name="tor_settings_disabled">Tor está desactivada</string>
+    <string name="tor_settings_confirm_disable_title">¿Seguro quieres desactivar Tor?</string>
+    <string name="tor_settings_confirm_enable_title">¿Seguro quieres activar Tor? Ten en cuenta que, para obtener mejores resultados, se recomienda crear también una nueva billetera.</string>
     <string name="tor_settings_state_unknown">El proxy de Tor aún no se ha iniciado.</string>
     <string name="tor_settings_state_closed">El proxy de Tor está apagado. \nEspera y comprueba tu conexión a Internet.</string>
     <string name="tor_settings_state_starting">Iniciando proxy de Tor…</string>
