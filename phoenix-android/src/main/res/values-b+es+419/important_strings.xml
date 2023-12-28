@@ -34,10 +34,10 @@
     <string name="notif_rejected_payment_title">Pago rechazado (+%1$s)</string>
     <string name="notif_rejected_policy_disabled">La gestión automatizada de canales está desactivada. Toca para obtener más información.</string>
     <string name="notif_rejected_policy_disabled_timeout">La gestión automatizada de canales está desactivada. Este depósito vencerá el %1$s.</string>
-    <string name="notif_rejected_over_absolute">La comisión fue de %1$s, pero el límite máximo se fijó en %2$s. Toca para obtener más información.</string>
-    <string name="notif_rejected_over_absolute_timeout">La comisión fue de %1$s, pero el límite máximo se fijó en %2$s. Este depósito vencerá el %3$s.</string>
-    <string name="notif_rejected_over_relative">La comisión fue de %1$s, que es más del %2$s%% del importe recibido. Toca para obtener más información.</string>
-    <string name="notif_rejected_over_relative_timeout">La comisión fue de %1$s, que es más del %2$s%% del importe recibido. Este depósito vencerá el %3$s.</string>
+    <string name="notif_rejected_over_absolute">La comisión fue %1$s, pero el límite máximo se fijó en %2$s. Toca para obtener más información.</string>
+    <string name="notif_rejected_over_absolute_timeout">La comisión fue %1$s, pero el límite máximo se fijó en %2$s. Este depósito vencerá el %3$s.</string>
+    <string name="notif_rejected_over_relative">La comisión fue %1$s, que es más del %2$s%% del importe recibido. Toca para obtener más información.</string>
+    <string name="notif_rejected_over_relative_timeout">La comisión fue %1$s, que es más del %2$s%% del importe recibido. Este depósito vencerá el %3$s.</string>
     <string name="notif_rejected_channels_initializing">Los canales se estaban inicializando, por lo que no se pudo aceptar el pago. Intenta de nuevo más tarde.</string>
 
     <string name="notif_watcher_revoked_commit_title">Inicia Phoenix</string>
@@ -60,7 +60,7 @@
     <string name="settings_electrum">Servidor de Electrum</string>
     <string name="settings_reset_wallet">Restablecer billetera</string>
     <string name="settings_mutual_close">Cerrar canales</string>
-    <string name="settings_force_close">Forzar el cierre de canales</string>
+    <string name="settings_force_close">Forzar cierre de canales</string>
     <string name="settings_tor">Tor</string>
     <string name="settings_about">Información</string>
     <string name="settings_payment_settings">Opciones de pago</string>
@@ -141,7 +141,7 @@
     <string name="mutualclose_confirm_details">Todos los fondos se enviarán a:</string>
 
     <string name="forceclose_title">Forzar el cierre de canales</string>
-    <string name="forceclose_instructions">En esta pantalla, puedes cerrar unilateralmente tus canales.\n\nNo se trata de un botón mágico para \&quot;arreglarlo todo&quot;\: es una medida de seguridad y <b>solo debe usarse en situaciones extremas</b>. Por ejemplo, si tu par (ACINQ) desaparece permanentemente, lo que te impide gastar tu dinero. En los demás casos, <b>si tienes problemas con Phoenix, debes ponerte en contacto con el servicio de asistencia</b>.\n\nForzar el cierre de canales te costará dinero (para cubrir las comisiones en la cadena) y bloqueará tus fondos durante varios días.\n\n<b>No desinstales la aplicación hasta que los canales se hayan cerrado por completo o perderás dinero.</b>\n\n<b>No uses esta función si no entiendes bien para qué sirve.</b></string>
+    <string name="forceclose_instructions">En esta pantalla, puedes cerrar unilateralmente tus canales.\n\nNo se trata de un botón mágico para \&quot;solucionarlo todo&quot;\: es una medida de seguridad y <b>solo debe usarse en situaciones extremas</b>. Por ejemplo, si tu par (ACINQ) desaparece permanentemente, lo que te impide gastar tu dinero. En los demás casos, <b>si tienes problemas con Phoenix, debes ponerte en contacto con el servicio de asistencia</b>.\n\nForzar el cierre de canales te costará dinero (para cubrir las comisiones en la cadena) y bloqueará tus fondos durante varios días.\n\n<b>No desinstales la aplicación hasta que los canales se hayan cerrado por completo o perderás dinero.</b>\n\n<b>No uses esta función si no entiendes bien para qué sirve.</b></string>
     <string name="forceclose_address_label">Los fondos se enviarán en última instancia a la billetera final:</string>
 
     <string name="forceclose_confirm_title">Confirmar cierre forzado</string>
@@ -179,16 +179,16 @@
     <string name="inappnotif_payments_rejection_overview_many">%1$d pagos entrantes rechazados recientemente</string>
     <string name="inappnotif_payment_rejected_title">Pago rechazado (+%1$s)</string>
     <string name="inappnotif_payment_rejected_disabled">La gestión automatizada de canales está desactivada.</string>
-    <string name="inappnotif_payment_rejected_over_absolute">La comisión fue de %1$s, pero el límite máximo se fijó en %2$s.</string>
-    <string name="inappnotif_payment_rejected_over_relative">La comisión fue de %1$s, que es más del %2$s%% del importe.</string>
+    <string name="inappnotif_payment_rejected_over_absolute">La comisión fue %1$s, pero el límite máximo se fijó en %2$s.</string>
+    <string name="inappnotif_payment_rejected_over_relative">La comisión fue %1$s, que es más del %2$s%% del importe.</string>
     <string name="inappnotif_payment_rejected_channel_initializing">Los canales todavía se están inicializando, por lo que no se pudo recibir ese pago.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">Toca para configurar.</string>
     <string name="inappnotif_payment_rejected_view_wallet">Ver detalles</string>
 
-    <string name="inappnotif_watchtower_nominal_title">Reporte de watchtower</string>
+    <string name="inappnotif_watchtower_nominal_title">Reporte de torre de vigilancia</string>
     <string name="inappnotif_watchtower_nominal_description_one">Se comprobó correctamente %1$d canal en %2$s. No se encontraron problemas.</string>
     <string name="inappnotif_watchtower_nominal_description_many">Se comprobaron correctamente %1$d canales en %2$s. No se encontraron problemas.</string>
-    <string name="inappnotif_watchtower_revokedfound_title">Alerta de watchtower</string>
+    <string name="inappnotif_watchtower_revokedfound_title">Alerta de torre de vigilancia</string>
     <string name="inappnotif_watchtower_revokedfound_description">Se encontraron compromisos revocados en %1$s para el/los canal(es): %2$s. Este canal puede estar cerrado.</string>
 
     <!-- settings: display seed -->
@@ -304,32 +304,32 @@
     <!-- settings: liquidity request -->
 
     <string name="liquidityads_no_channels_header">¡Aún no hay canales!</string>
-    <string name="liquidityads_no_channels_details">Primero necesitas fondos en la cartera para utilizar esta función.</string>
+    <string name="liquidityads_no_channels_details">Primero debes tener fondos en la billetera para utilizar esta función.</string>
     <string name="liquidityads_header">Planifica con antelación tu liquidez</string>
-    <string name="liquidityads_instructions">La liquidez entrante te permite evitar las tasas por transacciones en la cadena para futuros pagos recibidos a través de Lightning.\n\nAl solicitar más liquidez ahora, puedes ahorrarte tasas más adelante.</string>
+    <string name="liquidityads_instructions">La liquidez entrante te permite evitar las comisiones por transacciones en la cadena para futuros pagos recibidos a través de Lightning.\n\nSi solicitas más liquidez ahora, puedes ahorrarte comisiones más adelante.</string>
     <string name="liquidityads_faq_link">Más información</string>
-    <string name="liquidityads_current_liquidity">Liquidez actual: </string>
+    <string name="liquidityads_current_liquidity">Liquidez actual</string>
 
     <string name="liquidityads_amount_label">Solicitar liquidez</string>
-    <string name="liquidityads_estimate_button">Estimar el coste de liquidez</string>
-    <string name="liquidityads_estimating_spinner">Estimar coste…</string>
-    <string name="liquidityads_estimate_details_miner_fees">Comisiones de mineria</string>
-    <string name="liquidityads_estimate_details_miner_fees_help">Contribución a la comisiones de mineria por la transacción subyacente en la cadena.</string>
-    <string name="liquidityads_estimate_details_service_fees">Comisiones de servicio</string>
-    <string name="liquidityads_estimate_details_service_fees_help">Esta tasa se destina al servicio que proporciona la liquidez.</string>
+    <string name="liquidityads_estimate_button">Calcular el costo de liquidez</string>
+    <string name="liquidityads_estimating_spinner">Calculando costo…</string>
+    <string name="liquidityads_estimate_details_miner_fees">Comisión de minería</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Contribución a las comisiones de minería para la transacción subyacente en la cadena.</string>
+    <string name="liquidityads_estimate_details_service_fees">Comisión de servicio</string>
+    <string name="liquidityads_estimate_details_service_fees_help">Esta comisión se destina al servicio que proporciona la liquidez.</string>
     <string name="liquidityads_estimate_details_duration">Duración</string>
     <string name="liquidityads_estimate_details_duration_value">1 año</string>
     <string name="liquidityads_estimate_details_duration_help">La capacidad adicional se conservará durante esa duración.</string>
-    <string name="liquidityads_estimate_above_25">El total de comisiones es superior al 25% del importe solicitado.</string>
-    <string name="liquidityads_over_balance">El total de comisiones supera tu saldo.</string>
+    <string name="liquidityads_estimate_above_25">La comisión total es superior al 25% del importe solicitado.</string>
+    <string name="liquidityads_over_balance">La comisión total supera el saldo.</string>
 
     <string name="liquidityads_request_button">Aceptar</string>
     <string name="liquidityads_requesting_spinner">Procesando empalme…</string>
 
-    <string name="liquidityads_success">¡Liquidez añadida con éxito!</string>
+    <string name="liquidityads_success">La liquidez se agregó correctamente.</string>
 
-    <string name="liquidityads_error_header">Solicitud de liquidez fallida</string>
-    <string name="liquidityads_error_channels_unavailable">Los canales no están disponibles. Vuelva a intentarlo más tarde.</string>
+    <string name="liquidityads_error_header">Error al solicitar liquidez</string>
+    <string name="liquidityads_error_channels_unavailable">Los canales no están disponibles. Vuelve a intentarlo más tarde.</string>
 
     <!-- payment line -->
 
