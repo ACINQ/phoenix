@@ -124,7 +124,6 @@
     <string name="scan_error_already_paid">Este pago ya se realizó.</string>
     <string name="scan_error_invalid_chain">Este pago no usa la misma cadena de bloques de la billetera.</string>
     <string name="scan_error_lnurl_invalid">Error al procesar este enlace LNURL. Comprueba que sea válido.</string>
-    <string name="scan_error_lnurl_service_error">El servicio LNURL generó un error.</string>
     <string name="scan_error_lnurl_unsupported">Este tipo de LNURL aún no es compatible.</string>
     <string name="scan_error_invalid_generic">Estos datos usan un formato desconocido por lo que no se pueden procesar.</string>
 

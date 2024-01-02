@@ -127,7 +127,6 @@
     <string name="scan_error_already_paid">Ce paiement a déjà été réglé.</string>
     <string name="scan_error_invalid_chain">Ce paiement n\'utilise pas la même blockchain que votre wallet.</string>
     <string name="scan_error_lnurl_invalid">Ce lien LNURL n\'a pas pu être traité. Assurez-vous qu\'il soit valide.</string>
-    <string name="scan_error_lnurl_service_error">Le service offrant ce lien LNURL a retourné une erreur.</string>
     <string name="scan_error_lnurl_unsupported">Ce type de lien LNURL n\'est pas supporté.</string>
     <string name="scan_error_invalid_generic">Ce contenu est mal formatté ou bien n\'est pas géré par Phoenix.</string>
 

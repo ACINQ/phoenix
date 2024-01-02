@@ -127,7 +127,6 @@
     <string name="scan_error_already_paid">Tato platba již byla uhrazena.</string>
     <string name="scan_error_invalid_chain">Tato platba nepoužívá stejný blockchain jako vaše peněženka.</string>
     <string name="scan_error_lnurl_invalid">Tento LNURL odkaz se nepodařilo zpracovat. Ujistěte se, že je platný.</string>
-    <string name="scan_error_lnurl_service_error">Služba LNURL vrátila chybu.</string>
     <string name="scan_error_lnurl_unsupported">Tento typ LNURL zatím není podporován.</string>
     <string name="scan_error_invalid_generic">Tato data používají neznámý formát a nelze je zpracovat.</string>
 
