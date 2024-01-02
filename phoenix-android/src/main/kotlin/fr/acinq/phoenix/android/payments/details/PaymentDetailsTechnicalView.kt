@@ -302,7 +302,7 @@ private fun DetailsForLightningOutgoingPayment(
             InvoiceSection(paymentRequest = details.paymentRequest)
         }
         is LightningOutgoingPayment.Details.SwapOut -> {
-            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_swapout_address_label), value = details.address)
+            TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_bitcoin_address_label), value = details.address)
             TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = details.paymentHash.toHex())
         }
         is LightningOutgoingPayment.Details.KeySend -> {
@@ -329,15 +329,15 @@ private fun DetailsForChannelClose(
     payment: ChannelCloseOutgoingPayment
 ) {
     TechnicalRowSelectable(
-        label = stringResource(id = R.string.paymentdetails_closing_channel_label),
+        label = stringResource(id = R.string.paymentdetails_channel_id_label),
         value = payment.channelId.toHex()
     )
     TechnicalRowSelectable(
-        label = stringResource(id = R.string.paymentdetails_closing_address_label),
+        label = stringResource(id = R.string.paymentdetails_bitcoin_address_label),
         value = payment.address
     )
     TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_closing_tx_label),
+        label = stringResource(id = R.string.paymentdetails_tx_id_label),
         content = { TransactionLinkButton(txId = payment.txId) }
     )
     TechnicalRowSelectable(
@@ -357,7 +357,7 @@ private fun DetailsForCpfp(
     payment: SpliceCpfpOutgoingPayment
 ) {
     TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_splice_cpfp_transaction_label),
+        label = stringResource(id = R.string.paymentdetails_tx_id_label),
         content = { TransactionLinkButton(txId = payment.txId) }
     )
 }
@@ -385,11 +385,11 @@ private fun DetailsForSpliceOut(
         value = payment.channelId.toHex()
     )
     TechnicalRowSelectable(
-        label = stringResource(id = R.string.paymentdetails_splice_out_address_label),
+        label = stringResource(id = R.string.paymentdetails_bitcoin_address_label),
         value = payment.address
     )
     TechnicalRow(
-        label = stringResource(id = R.string.paymentdetails_splice_out_tx_label),
+        label = stringResource(id = R.string.paymentdetails_tx_id_label),
         content = { TransactionLinkButton(txId = payment.txId) }
     )
 

@@ -127,7 +127,6 @@
     <string name="scan_error_already_paid">Ce paiement a déjà été réglé.</string>
     <string name="scan_error_invalid_chain">Ce paiement n\'utilise pas la même blockchain que votre wallet.</string>
     <string name="scan_error_lnurl_invalid">Ce lien LNURL n\'a pas pu être traité. Assurez-vous qu\'il soit valide.</string>
-    <string name="scan_error_lnurl_service_error">Le service offrant ce lien LNURL a retourné une erreur.</string>
     <string name="scan_error_lnurl_unsupported">Ce type de lien LNURL n\'est pas supporté.</string>
     <string name="scan_error_invalid_generic">Ce contenu est mal formatté ou bien n\'est pas géré par Phoenix.</string>
 
@@ -144,29 +143,29 @@
     <string name="mutualclose_confirm_details">Tous vos fonds seront envoyés à:</string>
 
     <string name="forceclose_title">Fermeture unilatérale</string>
-    <string name="forceclose_instructions">Cet écran vous permet de forcer la fermeture de vos canaux de paiement de façon unilatérale.\n\nCeci n\'est pas une fonctionnalité magique, mais une mesure de sécurité à <b>n\'utiliser qu\'en dernier recours</b>. Par exemple si votre noeud pair (ACINQ) devait disparaître de façon permanente, vous empêchant d\'effectuer des paiements. Dans tous les autres cas, <b>si vous avez des difficultés à utiliser Phoenix, vous devriez contacter le support</b>.\n\nLa fermeture unilatérale vous coûtera de l\'argent (pour les frais on-chain), et verrouillera l\'accès aux fonds pour plusieurs jours.\n\n<b>Ne désinstallez pas l\'application tant que les canaux ne sont pas complètement fermés, ou vous perdrez l\'accès aux fonds.</b>\n\n<b>N\'utilisez pas cette fonctionnalité si vous ne comprenez pas ce qu\'elle fait.</b></string>
+    <string name="forceclose_instructions">Cet écran vous permet de forcer la fermeture de vos canaux de paiement de façon unilatérale.\n\nIl s\'agit d\'une mesure de sécurité à <b>n\'utiliser qu\'en dernier recours</b>, par exemple si votre noeud pair (ACINQ) devait disparaître de façon permanente, vous empêchant d\'effectuer des paiements. Dans tous les autres cas, <b>si vous avez des difficultés à utiliser Phoenix, vous devriez contacter le support</b>.\n\nLa fermeture unilatérale vous coûtera de l\'argent (pour les frais on-chain), et verrouillera l\'accès aux fonds pour plusieurs jours.\n\n<b>Ne désinstallez pas l\'application tant que les canaux ne sont pas complètement fermés, ou vous perdrez l\'accès aux fonds.</b>\n\n<b>N\'utilisez pas cette fonctionnalité si vous ne comprenez pas ce qu\'elle fait.</b></string>
     <string name="forceclose_address_label">Les fonds seront envoyés au wallet final:</string>
 
-    <string name="forceclose_confirm_title">Confirmation de la fermeture forcée</string>
+    <string name="forceclose_confirm_title">Confirmer la fermeture forcée</string>
     <string name="forceclose_confirm_details">Tous les fonds seront envoyés vers le wallet final, après expiration d\'un délai.</string>
-    <string name="forceclose_button">Forcer la fermeture de tous mes canaux</string>
+    <string name="forceclose_button">Forcer la fermeture</string>
 
     <!-- in-app notifications -->
 
     <string name="inappnotif_backup_seed_message">Sauvegardez votre wallet afin de ne pas perdre vos bitcoins.</string>
     <string name="inappnotif_backup_seed_action">Sauvegarder mon wallet</string>
 
-    <string name="inappnotif_notification_permission_message">Les notifications systèmes sont désactivées dans les préferences Android. Phoenix ne pourra pas vous indiquer lorsque des paiements sont en cours, ou rejetés.</string>
+    <string name="inappnotif_notification_permission_message">Les notifications système sont désactivées dans les préferences Android. Phoenix ne pourra pas vous indiquer lorsque des paiements sont en cours, ou rejetés.</string>
     <string name="inappnotif_notification_permission_enable">Activer</string>
 
     <string name="inappnotif_swapin_timeout_message">Un dépôt va bientôt expirer.</string>
     <string name="inappnotif_swapin_timeout_action">Voir les détails</string>
 
-    <string name="inappnotif_watchtower_late_message">Phoenix vérifie périodiquement la blockchain lorsque l\'application est éteinte. Ces derniers jours elle n\'a pas pu le faire. \n\nAssurez vous qu\'Android ne restreigne pas Phoenix, et que l\'application puisse se connecter à Electrum.</string>
+    <string name="inappnotif_watchtower_late_message">Phoenix vérifie périodiquement la blockchain lorsque l\'application est éteinte. Ces derniers jours elle n\'a pas pu le faire.\n\nAssurez vous qu\'Android ne restreigne pas Phoenix, et que l\'application puisse se connecter à Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Fermer</string>
 
     <string name="inappnotif_upgrade_message">Mise à jour disponible</string>
-    <string name="inappnotif_upgrade_critical_message">Une mise à jour critique est disponible. Vous devriez mettre à jour Phoenix le plus rapidement possible.</string>
+    <string name="inappnotif_upgrade_critical_message">Une mise à jour critique est disponible. Mettez à jour Phoenix dès que possible.</string>
     <string name="inappnotif_upgrade_button">Mettre à jour sur Google Play</string>
 
     <string name="inappnotif_mempool_full_message">Le mempool Bitcoin est plein, et les frais sur la chaîne sont élevés.</string>
@@ -302,22 +301,22 @@
     <string name="liquiditypolicy_request_button">Requérir des liquidités entrantes</string>
 
     <string name="liquiditypolicy_help">
-      Phoenix vous permet de recevoir des paiements sur la blockchain Bitcoin elle-même (L1), ainsi que sur la couche Lightning de Bitcoin (L2).
+      Phoenix vous permet de recevoir des paiements sur la blockchain Bitcoin elle-même (dite L1), ainsi que sur la couche Lightning de Bitcoin (dite L2).
       \n\n
-      - la couche blockchain (L1) est plus lente, et généralement plus chère (nécessite des frais de minage).
+      - la couche blockchain (L1) est plus lente, et généralement plus chère (car elle entraîne systématiquement des frais de minage).
       \n
       - la couche Lightning (L2) est bien plus rapide, et généralement moins chère (surtout pour les petits paiements).
       \n\n
       Quand vous recevez des paiements sur la couche L1, Phoenix va automatiquement les transférer sur la couche L2 <b>si et seulement si</b> les frais de minage afférents sont acceptables au regard de la configuration des frais que vous utilisez.
       \n\n
-      Les paiement reçus sur la couche L2 peuvent être reçus instantanéments et sans frais. Cela dit, des opérations L1 sont parfois nécessaires au bon fonctionnement du canal de paiement L2. Cela est fait automatiquement <b>si et seulement si</b> les frais de minage sont conformes à votre configuration.
+      Les paiement reçus sur la couche L2 peuvent être reçus instantanément et sans frais. Cela dit, des opérations L1 restent parfois nécessaires au bon fonctionnement du canal de paiement L2. Elles seront faites automatiquement <b>si et seulement si</b> les frais de minage afférents sont conformes aux limites définies par votre portefeuille.
     </string>
 
     <!-- settings: liquidity request -->
 
     <string name="liquidityads_no_channels_header">Vous n\'avez pas de canaux!</string>
     <string name="liquidityads_no_channels_details">Vous devez d\'abord avoir des fonds dans le portefeuille pour utiliser cette fonctionnalité.</string>
-    <string name="liquidityads_header">Planifiez vos liquidités</string>
+    <string name="liquidityads_header">Planifiez votre liquidité</string>
     <string name="liquidityads_instructions">Avoir de la liquidité entrante vous permet d\'éviter les frais de transactions sur la chaîne pour les futurs paiements reçus via Lightning.\n\nEn ajoutant de la liquidité maintenant, vous pouvez économiser des frais plus tard.</string>
     <string name="liquidityads_faq_link">Plus d\'infos</string>
     <string name="liquidityads_current_liquidity">Votre liquidité actuelle :</string>
@@ -352,5 +351,10 @@
     <string name="cpfp_title">Accélérer mes transactions.</string>
     <string name="cpfp_instructions">Vous pouvez faire utiliser à vos transactions non confirmées un taux de frais effectif plus élevé afin d\'encourager les mineurs Bitcoin à les privilégier.</string>
     <string name="cpfp_splice_error_actual_below_user">Ces frais sont inférieurs à ceux que vos transactions non confirmées utilisent déjà. Utilisez une valeur plus élevée pour accélérer ces paiements.</string>
+
+    <!-- Lightning payment errors -->
+
+    <string name="outgoing_finalfailure_alreadypaid">Ce paiement a déjà été réglé.</string>
+    <string name="outgoing_finalfailure_noroutefound">Le destinataire de ce paiement n\'est pas joignable, ou bien ne dispose pas de suffisamment de liquidité entrante.</string>
 
 </resources>

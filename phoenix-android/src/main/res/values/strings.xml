@@ -63,18 +63,15 @@
 
     <!-- Startup -->
 
-    <string name="startup_wait_prefs">Initializing…</string>
     <string name="startup_binding_service">Binding service…</string>
     <string name="startup_wait">Preparing wallet…</string>
     <string name="startup_wait_legacy_check">Checking legacy wallet…</string>
-    <string name="startup_switching_to_legacy">Switching to legacy wallet…</string>
     <string name="startup_manual_unlock_button">Unlock</string>
     <string name="startup_checking_seed">Unlocking…</string>
     <string name="startup_unlocked">Access granted…</string>
     <string name="startup_unlock_failure">Unlock failed</string>
     <string name="startup_unlock_failure_keystore">Android keystore error</string>
     <string name="startup_unlock_failure_unhandled_version">Unhandled seed version (%1$s)</string>
-    <string name="startup_unlock_failure_unhandled_version_details">Contact support by email for assistance</string>
     <string name="startup_unlock_failure_fallback">Unlock with seed</string>
 
     <string name="startup_fallback_instructions">Enter your 12-words recovery to unlock the wallet.\n\nWords must be entered in the correct order, and separated with a single space.</string>
@@ -172,19 +169,16 @@
     <string name="send_spliceout_prepare_button">Prepare transaction</string>
     <string name="send_spliceout_prepare_in_progress">Preparing transaction…</string>
     <string name="send_spliceout_execute_in_progress">Executing splice…</string>
-    <string name="send_spliceout_complete_recap_amount">Amount</string>
     <string name="send_spliceout_complete_recap_fee">Miner fee</string>
     <string name="send_spliceout_complete_recap_fee_details">Uses an effective feerate of %1$s sat/vbyte.</string>
     <string name="send_spliceout_complete_recap_total">Total</string>
 
     <!-- scan -->
 
-    <string name="scan_reading">Reading scan…</string>
     <string name="scan_manual_input_button">Manual input</string>
     <string name="scan_paste_button">Paste data from clipboard</string>
     <string name="scan_request_camera_access">Tap to grant camera permission</string>
     <string name="scan_request_camera_access_denied">Camera permission has been denied</string>
-    <string name="scan_instructions">Scan a QR code containing a payment request, a Bitcoin address or a LNURL</string>
 
     <string name="scan_lnurl_fetching">Fetching data from service…</string>
 
@@ -198,10 +192,7 @@
     <string name="utils_converted_amount">≈ %1$s</string>
     <string name="utils_unknown_amount" translatable="false">!?</string>
     <string name="utils_no_conversion">BTC exchange rate unavailable</string>
-    <string name="utils_amount_hint">Amount</string>
 
-    <string name="utils_proceed">Proceed</string>
-    <string name="utils_cancel">Cancel</string>
     <string name="utils_date_just_now">just now</string>
     <string name="utils_unknown">N/A</string>
     <string name="utils_loading_data">Loading data…</string>
@@ -223,8 +214,6 @@
     <string name="btn_confirm">Confirm</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_close">Close</string>
-    <string name="btn_pause_connecting">Connecting to peer…</string>
-    <string name="btn_pause_connecting_electrum">Connecting to electrum…</string>
 
     <!-- mutual close -->
 
@@ -233,13 +222,11 @@
     <string name="mutualclose_checking_balance">Checking balance…</string>
     <string name="mutualclose_balance">Balance: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">The wallet does not have any channels that are eligible for closing.</string>
-    <string name="mutualclose_input_placeholder">Enter a Bitcoin address here</string>
     <string name="mutualclose_button">Drain my wallet</string>
     <string name="mutualclose_error_chain_mismatch">This address uses a different blockchain</string>
     <string name="mutualclose_error_chain_reqparams">This address uses unsupported features</string>
     <string name="mutualclose_error_chain_generic">This address is not supported</string>
     <string name="mutualclose_done">%1$d channel(s) have been closed. You can find the details in the home screen.</string>
-    <string name="mutualclose_inprogress">Please wait…</string>
 
     <string name="forceclose_no_channels">No channels eligible for closing.</string>
 
@@ -267,7 +254,6 @@
     <string name="channeldetails_commitments">Active commitments</string>
     <string name="channeldetails_inactive_commitments">Inactive commitments</string>
     <string name="channeldetails_commitment_funding_tx_id">Funding tx:</string>
-    <string name="channeldetails_commitment_funding_tx_index">Tx index:</string>
     <string name="channeldetails_commitment_balance">Balance:</string>
     <string name="channeldetails_commitment_funding_capacity">Capacity:</string>
     <string name="channeldetails_commitment_linked_payments">Triggered by:</string>
@@ -298,7 +284,6 @@
 
     <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">Use the Receive and Send buttons at the bottom of this screen to get started!</string>
-    <string name="home__payments_header">Recent payments</string>
     <string name="home__payments_more_button">Show all payments…</string>
     <string name="home__connection__electrum_late">Electrum late</string>
     <string name="home__connection__bad_cert">Electrum certificate</string>
@@ -335,7 +320,6 @@
 
     <!-- payment details -->
 
-    <string name="paymentdetails_title">Payment details</string>
     <string name="paymentdetails_loading">Loading payment details…</string>
     <string name="paymentdetails_error">Could not find payment details</string>
 
@@ -363,19 +347,14 @@
     <string name="paymentdetails_lnurlpay_action_url_button">Open link</string>
     <string name="paymentdetails_lnurlpay_action_aes_label">Message</string>
     <string name="paymentdetails_lnurlpay_action_aes_decrypting">Decrypting message…</string>
-    <string name="paymentdetails_lnurlpay_action_aes_not_paid">Payment must be paid to decrypt the message.</string>
 
     <string name="paymentdetails_desc_label">Desc.</string>
-    <string name="paymentdetails_desc_custom_title">Add note</string>
-    <string name="paymentdetails_desc_custom_info">You can attach a note to this payment.</string>
     <string name="paymentdetails_destination_label">Sent to</string>
     <string name="paymentdetails_destination_cpfp_value">Bitcoin miners</string>
     <string name="paymentdetails_fees_label">Fees</string>
     <string name="paymentdetails_error_label">Error</string>
     <string name="paymentdetails_no_description">No description</string>
     <string name="paymentdetails_info_uniclose">This payment happened following a conflict in a channel.</string>
-
-    <string name="paymentdetails_onchain_confirmation">Confirmations</string>
 
     <string name="paymentdetails_desc_splice_out">On-chain payment</string>
     <string name="paymentdetails_desc_closing_channel">Closing channel</string>
@@ -393,11 +372,6 @@
     <string name="paymentdetails_edit_desc_button">Edit note</string>
     <string name="paymentdetails_details_button">Technical details</string>
 
-    <string name="paymentdetails_failure_recipient_unknown_or_liquidity">Recipient is not reachable, or does not have enough inbound liquidity.</string>
-    <string name="paymentdetails_failure_invalid_details">Payment rejected by the recipient.\nThis usually occurs when the invoice has already been paid or when it contains an expiration date, and you attempted to send a payment after the expiration.</string>
-    <string name="paymentdetails_failure_trampoline_fees">No route found with current fee setting. Try with higher fees.</string>
-    <string name="paymentdetails_failure_trampoline_fees_action">Edit my fee setting</string>
-
     <!-- payment details: technicals data -->
 
     <string name="paymentdetails_technical_title">Technical details</string>
@@ -412,22 +386,15 @@
     <string name="paymentdetails_swapout">Swap-out to Bitcoin address</string>
     <string name="paymentdetails_keysend">Keysend (spontaneous payment)</string>
     <string name="paymentdetails_swapin_address_label">Deposit address</string>
-    <string name="paymentdetails_swapout_address_label">Bitcoin address</string>
-
-    <string name="paymentdetails_splice_cpfp_transaction_label">Bump transaction</string>
+    <string name="paymentdetails_bitcoin_address_label">Bitcoin address</string>
 
     <string name="paymentdetails_splice_out_channel_label">Spliced channel</string>
-    <string name="paymentdetails_splice_out_address_label">Splice address</string>
-    <string name="paymentdetails_splice_out_tx_label">Splice transaction</string>
     <string name="paymentdetails_dualswapin_tx_label">Transactions</string>
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
-    <string name="paymentdetails_liquidity_amount_label">Liquidity amount</string>
-    <string name="paymentdetails_liquidity_signature_label">Liquidity request details</string>
+    <string name="paymentdetails_liquidity_amount_label">Amount requested</string>
+    <string name="paymentdetails_liquidity_signature_label">Signature</string>
 
-    <string name="paymentdetails_closing_channel_label">Closing channel</string>
-    <string name="paymentdetails_closing_address_label">Closing address</string>
-    <string name="paymentdetails_closing_tx_label">Closing transaction</string>
     <string name="paymentdetails_closing_type_label">Closing type</string>
     <string name="paymentdetails_closing_type_mutual">Mutual</string>
     <string name="paymentdetails_closing_type_local">Local</string>
@@ -450,8 +417,6 @@
     <string name="paymentdetails_parts_label">Payment parts (%1$d)</string>
     <string name="paymentdetails_part_label">Part</string>
     <string name="paymentdetails_part_hops_label">Hops</string>
-    <string name="paymentdetails_part_transaction_label">Transaction id</string>
-    <string name="paymentdetails_part_claimed_label">Claimed</string>
 
     <string name="paymentdetails_received_with_label">Received via</string>
     <string name="paymentdetails_received_with_splicein">Splice-in (adding to existing channel)</string>
@@ -489,9 +454,6 @@
     <string name="accessctrl_auth_error_too_old">This version of Android is not compatible.</string>
     <string name="accessctrl_auth_error_unhandled">Unhandled error code: %1$d</string>
 
-    <string name="accessctrl_error_cipher">Unable to get cipher: %1$s</string>
-    <string name="accessctrl_error_auth">Authentication failed.</string>
-
     <string name="accessctrl_screen_lock_switch">Screen lock</string>
     <string name="accessctrl_screen_lock_switch_desc">Lock access to the app with Android\'s screen lock/fingerprint</string>
 
@@ -523,11 +485,8 @@
 
     <!-- lnurl-withdraw -->
 
-    <string name="lnurl_withdraw_amount_label">Amount to receive</string>
-    <string name="lnurl_withdraw_description_label">Details</string>
     <string name="lnurl_withdraw_confirm_button">Redeem</string>
     <string name="lnurl_withdraw_wait">Requesting funds…</string>
-    <string name="lnurl_withdraw_amount_invalid">Amount is invalid.</string>
     <string name="lnurl_withdraw_amount_below_min">Amount must be at least %1$s.</string>
     <string name="lnurl_withdraw_amount_above_max">Amount cannot exceed %1$s.</string>
     <string name="lnurl_withdraw_error_header">Withdrawal has failed:</string>
@@ -548,14 +507,9 @@
     <string name="lnurl_pay_comment_instructions">You can attach a message to the payment. This message will be sent to the recipient.</string>
     <string name="lnurl_pay_pay_button">Pay</string>
     <string name="lnurl_pay_requesting_invoice">Requesting invoice…</string>
-    <string name="lnurl_pay_checking_invoice">Checking invoice…</string>
-    <string name="lnurl_pay_sending_payment">Sending payment…</string>
 
-    <string name="lnurl_pay_amount_empty">Amount must not be empty</string>
     <string name="lnurl_pay_amount_below_min">Amount must be at least %1$s</string>
     <string name="lnurl_pay_amount_above_max">Amount must be at most %1$s</string>
-    <string name="lnurl_pay_amount_above_balance">Amount exceeds your balance</string>
-    <string name="lnurl_pay_amount_invalid">Invalid amount</string>
 
     <string name="lnurl_pay_error_header">Payment has failed.</string>
     <string name="lnurl_pay_error_invalid_chain">The invoice returned by <b>%1$s</b> does not use the same chain as your wallet.</string>
@@ -579,7 +533,6 @@
     <string name="prefs_display_theme_dark_label">Dark theme</string>
     <string name="prefs_display_theme_light_label">Light theme</string>
     <string name="prefs_display_theme_system_label">Follow system</string>
-    <string name="prefs_display_explorer_label">Onchain explorer</string>
     <string name="prefs_locale_label">Application language</string>
 
     <!-- settings: electrum server -->
@@ -587,7 +540,6 @@
     <string name="electrum_title">Electrum server</string>
     <string name="electrum_about">To secure your payment channels Phoenix monitors the Bitcoin blockchain through Electrum servers.\n\nBy default, random servers are used. You can also configure Phoenix to connect only to your own server.</string>
     <string name="electrum_block_height_label">Block height</string>
-    <string name="electrum_connection_label">Server</string>
     <string name="electrum_connection_dialog_tls_port">Use the TLS port (default 50002).</string>
     <string name="electrum_connection_dialog_onion_port">Use the plain TCP port, not the TLS one, since this is an onion service.</string>
 
@@ -621,10 +573,7 @@
     <string name="tor_settings_title">Tor</string>
     <string name="tor_settings_unknown">Checking preferences…</string>
     <string name="tor_settings_enabled">Tor is enabled</string>
-    <string name="tor_settings_enabled_description">Connections to the Lightning network and Electrum servers will be protected.</string>
     <string name="tor_settings_disabled">Tor is disabled</string>
-    <string name="tor_settings_confirm_disable_title">Are you sure you want to disable Tor?</string>
-    <string name="tor_settings_confirm_enable_title">Are you sure you want to enable Tor? Note that for best result, it\'s recommended to start a new wallet as well.</string>
     <string name="tor_settings_state_unknown">The Tor proxy is not started yet.</string>
     <string name="tor_settings_state_closed">The Tor proxy is shutdown.\nPlease wait and check your Internet connection.</string>
     <string name="tor_settings_state_starting">Starting Tor proxy…</string>
@@ -650,7 +599,6 @@
     <!-- settings: about -->
 
     <string name="about_title">About Phoenix</string>
-    <string name="about_general_title">About</string>
     <string name="about_version">Phoenix version: <b>%1$s</b></string>
     <string name="about_faq_link">Any questions? Check the FAQ</string>
     <string name="about_support_link">Support</string>
@@ -662,7 +610,6 @@
     <string name="paymentsettings_title">Payment options</string>
 
     <string name="paymentsettings_category_incoming">Incoming payments</string>
-    <string name="paymentsettings_category_outgoing">Outgoing payments</string>
     <string name="paymentsettings_category_lnurl">LNURL</string>
 
     <string name="paymentsettings_defaultdesc_title">Invoice description</string>
@@ -738,8 +685,6 @@
     <string name="walletinfo_nodeid">Node id</string>
     <string name="walletinfo_legacy_nodeid_toggle">Show legacy node id</string>
     <string name="walletinfo_legacy_nodeid">Legacy node id</string>
-    <string name="walletinfo_offchain_balance">Balance</string>
-    <string name="walletinfo_offchain_channels">Payment channels</string>
 
     <string name="walletinfo_onchain_final">Final wallet</string>
 

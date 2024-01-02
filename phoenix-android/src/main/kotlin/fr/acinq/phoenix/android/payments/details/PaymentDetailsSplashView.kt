@@ -45,6 +45,7 @@ import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.blockchain.electrum.ElectrumConnectionStatus
 import fr.acinq.lightning.blockchain.electrum.getConfirmations
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.wire.LiquidityAds
@@ -118,12 +119,12 @@ fun PaymentDetailsSplashView(
             InboundLiquidityLeaseDetails(lease = payment.lease)
         }
 
-        data.payment.errorMessage()?.let { errorMessage ->
-            Spacer(modifier = Modifier.height(8.dp))
-            SplashLabelRow(label = stringResource(id = R.string.paymentdetails_error_label)) {
-                Text(text = errorMessage)
+        if (payment is LightningOutgoingPayment) {
+            (payment.status as? LightningOutgoingPayment.Status.Completed.Failed)?.let {
+                PaymentErrorView(status = it)
             }
         }
+
         Spacer(modifier = Modifier.height(48.dp))
         BorderButton(
             text = stringResource(id = R.string.paymentdetails_details_button),
@@ -499,7 +500,7 @@ private fun PaymentDestinationView(data: WalletPaymentInfo) {
             }
         }
         is LightningOutgoingPayment -> {
-            data.metadata.lnurl?.pay?.metadata?.lnid?.takeIf { it.isNotBlank() }?.let {lnid ->
+            data.metadata.lnurl?.pay?.metadata?.lnid?.takeIf { it.isNotBlank() }?.let { lnid ->
                 Spacer(modifier = Modifier.height(8.dp))
                 SplashLabelRow(label = stringResource(id = R.string.paymentdetails_destination_label), icon = R.drawable.ic_zap) {
                     SelectionContainer {
@@ -594,6 +595,16 @@ private fun InboundLiquidityLeaseDetails(lease: LiquidityAds.Lease) {
 }
 
 @Composable
+private fun PaymentErrorView(status: LightningOutgoingPayment.Status.Completed.Failed) {
+    translatePaymentError(failure = status.reason)?.let {
+        Spacer(modifier = Modifier.height(8.dp))
+        SplashLabelRow(label = stringResource(id = R.string.paymentdetails_error_label)) {
+            Text(text = it)
+        }
+    }
+}
+
+@Composable
 private fun EditPaymentDetails(
     initialDescription: String?,
     onConfirm: (String?) -> Unit,
@@ -676,7 +687,9 @@ private fun ConfirmationView(
             if (conf == 0) {
                 Card(
                     internalPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-                    onClick = if (canBeBumped) { { showBumpTxDialog = true } } else null,
+                    onClick = if (canBeBumped) {
+                        { showBumpTxDialog = true }
+                    } else null,
                     backgroundColor = Color.Transparent,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -734,5 +747,24 @@ private fun BumpTransactionDialog(
         buttons = null,
     ) {
         CpfpView(channelId = channelId, onSuccess = onSuccess)
+    }
+}
+
+@Composable
+private fun translatePaymentError(failure: FinalFailure): String? {
+    return when (failure) {
+        FinalFailure.RetryExhausted -> stringResource(id = R.string.outgoing_finalfailure_noroutefound)
+        FinalFailure.NoRouteToRecipient -> stringResource(id = R.string.outgoing_finalfailure_noroutefound)
+        FinalFailure.RecipientUnreachable -> stringResource(id = R.string.outgoing_finalfailure_noroutefound)
+
+        FinalFailure.AlreadyPaid -> stringResource(id = R.string.outgoing_finalfailure_alreadypaid)
+
+        FinalFailure.NoAvailableChannels,
+        FinalFailure.InsufficientBalance,
+        FinalFailure.FeaturesNotSupported,
+        FinalFailure.InvalidPaymentAmount,
+        FinalFailure.InvalidPaymentId,
+        FinalFailure.UnknownError,
+        FinalFailure.WalletRestarted -> null
     }
 }

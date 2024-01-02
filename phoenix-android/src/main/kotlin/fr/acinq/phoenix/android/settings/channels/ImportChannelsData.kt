@@ -56,7 +56,7 @@ fun ImportChannelsData(
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.channelimport_title))
         Card(internalPadding = PaddingValues(16.dp)) {
-            Text(text = stringResource(id = R.string.legacy_channels_import_instructions))
+            Text(text = stringResource(id = R.string.channelimport_instructions))
             Spacer(modifier = Modifier.height(24.dp))
             TextInput(
                 text = dataInput,
@@ -115,7 +115,7 @@ fun ImportChannelsData(
                             header = stringResource(id = R.string.channelimport_error_title),
                             details = when (result) {
                                 is ChannelsImportResult.Failure.Generic -> result.error.message
-                                is ChannelsImportResult.Failure.MalformedData -> stringResource(id = R.string.channelimport_error_decryption)
+                                is ChannelsImportResult.Failure.MalformedData -> stringResource(id = R.string.channelimport_error_malformed)
                                 is ChannelsImportResult.Failure.DecryptionError -> stringResource(id = R.string.channelimport_error_decryption)
                                 is ChannelsImportResult.Failure.UnknownVersion -> stringResource(id = R.string.channelimport_error_unknown_version, result.version)
                             },

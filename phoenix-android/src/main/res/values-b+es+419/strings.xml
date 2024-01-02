@@ -49,31 +49,17 @@
 
     <string name="authprompt_title">Desbloquear para continuar</string>
 
-    <!-- utils: placeholders -->
-
-    <string name="lipsum_short" translatable="false">Etiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas.</string>
-    <string name="lipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut facilisis lectus. Integer massa tellus, suscipit sit amet felis vitae, blandit consectetur dolor. Fusce volutpat id magna id vestibulum. Integer a erat lacinia, placerat risus a, fermentum justo. Etiam euismod tincidunt dolor vel posuere. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur non euismod dui. Morbi enim dui, blandit sed erat sit amet, porta pulvinar odio. Cras metus felis, vestibulum eu consequat vitae, consectetur quis nulla. Fusce vulputate, elit et luctus sodales, metus metus elementum sem, eget commodo nunc nunc in ex. Sed aliquam eros nibh, ac volutpat turpis accumsan vitae. Cras suscipit ipsum accumsan aliquam interdum.</string>
-    <string name="lipsum_long" translatable="false">
-    Praesent ut nisi fringilla, pharetra dui sit amet, ornare urna. Donec at ultrices nunc. Fusce gravida metus vitae viverra egestas. In hac habitasse platea dictumst. Proin consequat fringilla felis, vehicula vehicula turpis ullamcorper nec. Pellentesque urna massa, blandit cursus metus et, ultrices consectetur neque. Suspendisse hendrerit venenatis mi ac tincidunt. Morbi hendrerit orci vitae erat luctus, at dignissim turpis accumsan. Integer elementum est eu tincidunt ullamcorper. Phasellus varius porttitor vestibulum. Maecenas faucibus ullamcorper diam, ac commodo dui fringilla sed. Aliquam arcu velit, porta eu sem vel, rhoncus bibendum dolor.
-    \nEtiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas. Nam tempor euismod erat eget scelerisque. Integer sit amet laoreet erat. Duis enim turpis, vehicula eu justo vitae, dapibus auctor mauris. Aenean euismod eleifend dui a aliquet. Aliquam eleifend malesuada tortor ornare volutpat. In augue tortor, gravida et volutpat elementum, iaculis non sapien. Etiam dolor nisi, pulvinar a rhoncus ac, eleifend ac libero. In lobortis enim vitae ultricies viverra. Maecenas accumsan elementum sem, nec pharetra urna maximus maximus.
-    \nIn sit amet volutpat ligula, ac pretium dolor. Phasellus posuere rhoncus magna quis fermentum. Ut risus turpis, fermentum facilisis mollis in, porttitor eget erat. Donec luctus egestas ligula et interdum. Phasellus vitae hendrerit sem, at vehicula nulla. Curabitur mollis risus quis metus euismod ullamcorper. Nam eu aliquet mi. Duis id urna ac urna iaculis blandit. Morbi eros dui, congue a posuere efficitur, imperdiet a nisi. Morbi non orci non lorem aliquet tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pulvinar, mi vitae sollicitudin dignissim, nunc urna facilisis massa, ut scelerisque mi felis in sapien.
-    \nNam felis felix, tristique commodo odio eget, imperdiet viverra erat. Donec venenatis magna pulvinar, finibus leo id, gravida augue. Integer ante leo, bibendum ac nibh quis, auctor commodo quam. Sed luctus vitae quam vel condimentum. Mauris eu rhoncus mauris. Fusce enim diam, consequat a odio sit amet, accumsan cursus nisl. Etiam lectus nunc, lacinia id purus sit amet, pulvinar auctor odio. Maecenas vitae arcu sit amet est cursus maximus. Nullam ac sapien non nibh tempor rhoncus. Mauris dignissim cursus libero quis egestas.
-    </string>
-
     <!-- Startup -->
 
-    <string name="startup_wait_prefs">Inicializando…</string>
     <string name="startup_binding_service">Vinculando el servicio…</string>
     <string name="startup_wait">Preparando la billetera…</string>
     <string name="startup_wait_legacy_check">Comprobando la billetera heredada…</string>
-    <string name="startup_switching_to_legacy">Cambiando a la billetera heredada…</string>
     <string name="startup_manual_unlock_button">Desbloquear</string>
     <string name="startup_checking_seed">Desbloqueando…</string>
     <string name="startup_unlocked">Acceso concedido…</string>
     <string name="startup_unlock_failure">Error al desbloquear</string>
     <string name="startup_unlock_failure_keystore">Error de Android Keystore</string>
     <string name="startup_unlock_failure_unhandled_version">Versión de semilla no controlada (%1$s)</string>
-    <string name="startup_unlock_failure_unhandled_version_details">Ponte en contacto con el servicio de asistencia por correo electrónico</string>
     <string name="startup_unlock_failure_fallback">Desbloquear con semilla</string>
 
     <string name="startup_fallback_instructions">Ingresa tus 12 palabras de recuperación para desbloquear la billetera.\n\nLas palabras deben ingresarse en el orden correcto y estar separadas por un solo espacio.</string>
@@ -171,19 +157,16 @@
     <string name="send_spliceout_prepare_button">Preparar transacción</string>
     <string name="send_spliceout_prepare_in_progress">Preparando transacción…</string>
     <string name="send_spliceout_execute_in_progress">Ejecutando empalme…</string>
-    <string name="send_spliceout_complete_recap_amount">Importe</string>
     <string name="send_spliceout_complete_recap_fee">Comisión de minería</string>
     <string name="send_spliceout_complete_recap_fee_details">Usa una tasa de comisión efectiva de %1$s sat/vbyte.</string>
     <string name="send_spliceout_complete_recap_total">Total</string>
 
     <!-- scan -->
 
-    <string name="scan_reading">Escaneo de lectura…</string>
     <string name="scan_manual_input_button">Ingreso manual</string>
     <string name="scan_paste_button">Pegar datos desde el portapapeles</string>
     <string name="scan_request_camera_access">Tocar para conceder permiso a la cámara</string>
     <string name="scan_request_camera_access_denied">Se negó el permiso a la cámara</string>
-    <string name="scan_instructions">Escanea un código QR que contenga una solicitud de pago, una dirección de Bitcoin o una LNURL.</string>
 
     <string name="scan_lnurl_fetching">Obteniendo datos del servicio…</string>
 
@@ -197,10 +180,7 @@
     <string name="utils_converted_amount">≈ %1$s</string>
     <string name="utils_unknown_amount" translatable="false">!?</string>
     <string name="utils_no_conversion">La tasa de cambio de BTC no está disponible</string>
-    <string name="utils_amount_hint">Importe</string>
 
-    <string name="utils_proceed">Proceder</string>
-    <string name="utils_cancel">Cancelar</string>
     <string name="utils_date_just_now">ahora mismo</string>
     <string name="utils_unknown">N/D</string>
     <string name="utils_loading_data">Cargando datos…</string>
@@ -222,8 +202,6 @@
     <string name="btn_confirm">Confirmar</string>
     <string name="btn_cancel">Cancelar</string>
     <string name="btn_close">Cerrar</string>
-    <string name="btn_pause_connecting">Conectándose a par…</string>
-    <string name="btn_pause_connecting_electrum">Conectándose a Electrum…</string>
 
     <!-- mutual close -->
 
@@ -232,13 +210,11 @@
     <string name="mutualclose_checking_balance">Comprobando saldo…</string>
     <string name="mutualclose_balance">Saldo: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">La billetera no tiene canales que se puedan cerrar.</string>
-    <string name="mutualclose_input_placeholder">Ingresa una dirección de Bitcoin aquí</string>
     <string name="mutualclose_button">Vaciar mi billetera</string>
     <string name="mutualclose_error_chain_mismatch">Esta dirección usa una cadena de bloques diferente</string>
     <string name="mutualclose_error_chain_reqparams">Esta dirección usa funciones no compatibles</string>
     <string name="mutualclose_error_chain_generic">Esta dirección no es compatible</string>
     <string name="mutualclose_done">%1$d canal(es) cerrado(s). Puedes encontrar los detalles en la pantalla de inicio.</string>
-    <string name="mutualclose_inprogress">Espera…</string>
 
     <string name="forceclose_no_channels">No hay canales que se puedan cerrar.</string>
 
@@ -264,7 +240,6 @@
     <string name="channeldetails_commitments">Compromisos activos</string>
     <string name="channeldetails_inactive_commitments">Compromisos inactivos</string>
     <string name="channeldetails_commitment_funding_tx_id">Transacción de fondos:</string>
-    <string name="channeldetails_commitment_funding_tx_index">Índice de transacción:</string>
     <string name="channeldetails_commitment_balance">Saldo:</string>
     <string name="channeldetails_commitment_funding_capacity">Capacidad:</string>
     <string name="channeldetails_commitment_linked_payments">Iniciado por:</string>
@@ -295,7 +270,6 @@
 
     <string name="home__faq_button">Preguntas frecuentes</string>
     <string name="home__payments_none">Usa los botones \&amp;quot;Recibir\&amp;quot; y \&amp;quot;Enviar\&amp;quot; en la parte inferior de esta pantalla para empezar.</string>
-    <string name="home__payments_header">Pagos recientes</string>
     <string name="home__payments_more_button">Mostrar todos los pagos…</string>
     <string name="home__connection__electrum_late">Retraso de Electrum</string>
     <string name="home__connection__bad_cert">Certificado de Electrum</string>
@@ -331,7 +305,6 @@
 
     <!-- payment details -->
 
-    <string name="paymentdetails_title">Detalles del pago</string>
     <string name="paymentdetails_loading">Cargando detalles del pago…</string>
     <string name="paymentdetails_error">No se encuentran los detalles del pago</string>
 
@@ -358,19 +331,14 @@
     <string name="paymentdetails_lnurlpay_action_url_button">Abrir enlace</string>
     <string name="paymentdetails_lnurlpay_action_aes_label">Mensaje</string>
     <string name="paymentdetails_lnurlpay_action_aes_decrypting">Desencriptando mensaje…</string>
-    <string name="paymentdetails_lnurlpay_action_aes_not_paid">El pago debe efectuarse para desencriptar el mensaje.</string>
 
     <string name="paymentdetails_desc_label">Desc.</string>
-    <string name="paymentdetails_desc_custom_title">Agregar nota</string>
-    <string name="paymentdetails_desc_custom_info">Puedes adjuntar una nota a este pago.</string>
     <string name="paymentdetails_destination_label">Enviado a</string>
     <string name="paymentdetails_destination_cpfp_value">Mineros de Bitcoin</string>
     <string name="paymentdetails_fees_label">Comisiones</string>
     <string name="paymentdetails_error_label">Error</string>
     <string name="paymentdetails_no_description">Sin descripción</string>
     <string name="paymentdetails_info_uniclose">Este pago se efectuó a raíz de un conflicto en un canal.</string>
-
-    <string name="paymentdetails_onchain_confirmation">Confirmaciones</string>
 
     <string name="paymentdetails_desc_splice_out">Pago en la cadena</string>
     <string name="paymentdetails_desc_closing_channel">Canal de cierre</string>
@@ -387,11 +355,6 @@
     <string name="paymentdetails_edit_desc_button">Editar nota</string>
     <string name="paymentdetails_details_button">Detalles técnicos</string>
 
-    <string name="paymentdetails_failure_recipient_unknown_or_liquidity">El destinatario no está disponible o no tiene suficiente liquidez entrante.</string>
-    <string name="paymentdetails_failure_invalid_details">Pago rechazado por el destinatario.\nEsto suele ocurrir cuando la factura ya se pagó o cuando tiene fecha de caducidad e intentaste enviar un pago después del vencimiento.</string>
-    <string name="paymentdetails_failure_trampoline_fees">No se encontró ninguna ruta con la configuración de comisiones actual. Inténtalo con comisiones más altas.</string>
-    <string name="paymentdetails_failure_trampoline_fees_action">Editar mi configuración de comisiones</string>
-
     <!-- payment details: technicals data -->
 
     <string name="paymentdetails_technical_title">Detalles técnicos</string>
@@ -405,19 +368,12 @@
     <string name="paymentdetails_swapout">Intercambio a dirección de Bitcoin</string>
     <string name="paymentdetails_keysend">Keysend (pago espontáneo)</string>
     <string name="paymentdetails_swapin_address_label">Dirección de depósito</string>
-    <string name="paymentdetails_swapout_address_label">Dirección de Bitcoin</string>
-
-    <string name="paymentdetails_splice_cpfp_transaction_label">Impulsar transacción</string>
+    <string name="paymentdetails_bitcoin_address_label">Dirección de Bitcoin</string>
 
     <string name="paymentdetails_splice_out_channel_label">Canal empalmado</string>
-    <string name="paymentdetails_splice_out_address_label">Dirección de empalme</string>
-    <string name="paymentdetails_splice_out_tx_label">Transacción de empalme</string>
     <string name="paymentdetails_dualswapin_tx_label">Transacciones</string>
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
-    <string name="paymentdetails_closing_channel_label">Canal de cierre</string>
-    <string name="paymentdetails_closing_address_label">Dirección de cierre</string>
-    <string name="paymentdetails_closing_tx_label">Transacción de cierre</string>
     <string name="paymentdetails_closing_type_label">Tipo de cierre</string>
     <string name="paymentdetails_closing_type_mutual">Muto</string>
     <string name="paymentdetails_closing_type_local">Local</string>
@@ -440,8 +396,6 @@
     <string name="paymentdetails_parts_label">Partes del pago (%1$d)</string>
     <string name="paymentdetails_part_label">Parte</string>
     <string name="paymentdetails_part_hops_label">Saltos</string>
-    <string name="paymentdetails_part_transaction_label">Identificador de transacción</string>
-    <string name="paymentdetails_part_claimed_label">Reclamado</string>
 
     <string name="paymentdetails_received_with_label">Recibido a través de</string>
     <string name="paymentdetails_received_with_splicein">Empalme (agregando al canal existente)</string>
@@ -479,9 +433,6 @@
     <string name="accessctrl_auth_error_too_old">Esta versión de Android no es compatible.</string>
     <string name="accessctrl_auth_error_unhandled">Código de error no controlado: %1$d</string>
 
-    <string name="accessctrl_error_cipher">No se puede obtener el cifrado: %1$s</string>
-    <string name="accessctrl_error_auth">Error de autenticación.</string>
-
     <string name="accessctrl_screen_lock_switch">Bloqueo de pantalla</string>
     <string name="accessctrl_screen_lock_switch_desc">Bloquea el acceso a la aplicación con el bloqueo de pantalla o la huella dactilar de Android.</string>
 
@@ -513,11 +464,8 @@
 
     <!-- lnurl-withdraw -->
 
-    <string name="lnurl_withdraw_amount_label">Importe que se recibirá</string>
-    <string name="lnurl_withdraw_description_label">Detalles</string>
     <string name="lnurl_withdraw_confirm_button">Canjear</string>
     <string name="lnurl_withdraw_wait">Solicitando fondos…</string>
-    <string name="lnurl_withdraw_amount_invalid">El importe es inválido.</string>
     <string name="lnurl_withdraw_amount_below_min">El importe debe ser al menos %1$s.</string>
     <string name="lnurl_withdraw_amount_above_max">El importe no puede superar %1$s.</string>
     <string name="lnurl_withdraw_error_header">Error al retirar:</string>
@@ -538,14 +486,9 @@
     <string name="lnurl_pay_comment_instructions">Puedes adjuntar un mensaje al pago. Este mensaje se enviará al destinatario.</string>
     <string name="lnurl_pay_pay_button">Pagar</string>
     <string name="lnurl_pay_requesting_invoice">Solicitando factura…</string>
-    <string name="lnurl_pay_checking_invoice">Comprobando factura…</string>
-    <string name="lnurl_pay_sending_payment">Enviando pago…</string>
 
-    <string name="lnurl_pay_amount_empty">El importe no debe estar vacío</string>
     <string name="lnurl_pay_amount_below_min">El importe debe ser al menos %1$s.</string>
     <string name="lnurl_pay_amount_above_max">El importe debe ser como máximo %1$s.</string>
-    <string name="lnurl_pay_amount_above_balance">El importe supera el saldo</string>
-    <string name="lnurl_pay_amount_invalid">Importe inválido</string>
 
     <string name="lnurl_pay_error_header">Error al procesar el pago.</string>
     <string name="lnurl_pay_error_invalid_chain">La factura devuelta por <b>%1$s</b> no usa la misma cadena de la billetera.</string>
@@ -569,7 +512,6 @@
     <string name="prefs_display_theme_dark_label">Tema oscuro</string>
     <string name="prefs_display_theme_light_label">Tema claro</string>
     <string name="prefs_display_theme_system_label">Igual que el del sistema</string>
-    <string name="prefs_display_explorer_label">Explorador de la cadena</string>
     <string name="prefs_locale_label">Idioma de la aplicación</string>
 
     <!-- settings: electrum server -->
@@ -577,7 +519,6 @@
     <string name="electrum_title">Servidor de Electrum</string>
     <string name="electrum_about">Para proteger sus canales de pago, Phoenix supervisa la cadena de bloques de Bitcoin a través de los servidores de Electrum.\n\nPor defecto, se utilizan servidores aleatorios. También puedes configurar Phoenix para que se conecte únicamente a tu propio servidor.</string>
     <string name="electrum_block_height_label">Altura de bloques</string>
-    <string name="electrum_connection_label">Servidor</string>
 
     <string name="electrum_connection_closed_with_random">Desconectado de Electrum</string>
     <string name="electrum_connection_closed_with_custom">Desconectado de %1$s</string>
@@ -609,10 +550,7 @@
     <string name="tor_settings_title">Tor</string>
     <string name="tor_settings_unknown">Comprobando preferencias…</string>
     <string name="tor_settings_enabled">Tor está activada</string>
-    <string name="tor_settings_enabled_description">Las conexiones a la red Lightning y a los servidores de Electrum estarán protegidas.</string>
     <string name="tor_settings_disabled">Tor está desactivada</string>
-    <string name="tor_settings_confirm_disable_title">¿Seguro quieres desactivar Tor?</string>
-    <string name="tor_settings_confirm_enable_title">¿Seguro quieres activar Tor? Ten en cuenta que, para obtener mejores resultados, se recomienda crear también una nueva billetera.</string>
     <string name="tor_settings_state_unknown">El proxy de Tor aún no se ha iniciado.</string>
     <string name="tor_settings_state_closed">El proxy de Tor está apagado. \nEspera y comprueba tu conexión a Internet.</string>
     <string name="tor_settings_state_starting">Iniciando proxy de Tor…</string>
@@ -638,7 +576,6 @@
     <!-- settings: about -->
 
     <string name="about_title">Información sobre Phoenix</string>
-    <string name="about_general_title">Información</string>
     <string name="about_version">Versión de Phoenix: <b>%1$s</b></string>
     <string name="about_faq_link">¿Tienes preguntas? Consulta las preguntas frecuentes</string>
     <string name="about_support_link">Asistencia</string>
@@ -650,7 +587,6 @@
     <string name="paymentsettings_title">Opciones de pago</string>
 
     <string name="paymentsettings_category_incoming">Pagos entrantes</string>
-    <string name="paymentsettings_category_outgoing">Pagos salientes</string>
     <string name="paymentsettings_category_lnurl">LNURL</string>
 
     <string name="paymentsettings_defaultdesc_title">Descripción de la factura</string>
@@ -725,8 +661,6 @@
     <string name="walletinfo_lightning">Lightning</string>
     <string name="walletinfo_nodeid">Identificador de nodo</string>
     <string name="walletinfo_legacy_nodeid">Identificador de nodo heredado</string>
-    <string name="walletinfo_offchain_balance">Saldo</string>
-    <string name="walletinfo_offchain_channels">Canales de pago</string>
 
     <string name="walletinfo_onchain_final">Billetera final</string>
 
