@@ -49,7 +49,6 @@
 
     <!-- Startup -->
 
-    <string name="startup_wait_prefs">Initialisieren…</string>
     <string name="startup_binding_service">Dienst wird eingebunden…</string>
     <string name="startup_wait">Wallet wird vorbereitet…</string>
     <string name="startup_wait_legacy_check">Überprüfe Legacy-Wallet…</string>
