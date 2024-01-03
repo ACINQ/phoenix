@@ -1,10 +1,12 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.DefaultSwapInParams
 import fr.acinq.lightning.LiquidityEvents
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.NodeEvents
 import fr.acinq.lightning.SensitiveTaskEvents
 import fr.acinq.lightning.SwapInParams
@@ -12,6 +14,7 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumMiniWallet
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.electrum.getConfirmations
+import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.channel.states.Aborted
 import fr.acinq.lightning.channel.states.ChannelState
@@ -24,10 +27,13 @@ import fr.acinq.lightning.io.NativeSocketException
 import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentProgress
 import fr.acinq.lightning.io.PaymentSent
+import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.PeerEvent
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.lightning.wire.LiquidityAds
+import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 
 /**
  * Class types from lightning-kmp & bitcoin-kmp are not exported to iOS unless we explicitly
@@ -215,6 +221,11 @@ fun LiquidityPolicy.asAuto(): LiquidityPolicy.Auto? = when (this) {
     else -> null
 }
 
+fun ChannelCommand.Commitment.Splice.Response.asCreated(): ChannelCommand.Commitment.Splice.Response.Created? = when (this) {
+    is ChannelCommand.Commitment.Splice.Response.Created -> this
+    else -> null
+}
+
 fun ChannelCommand.Commitment.Splice.Response.asFailure(): ChannelCommand.Commitment.Splice.Response.Failure? = when (this) {
     is ChannelCommand.Commitment.Splice.Response.Failure -> this
     else -> null
@@ -237,6 +248,11 @@ fun ChannelCommand.Commitment.Splice.Response.Failure.asSpliceAlreadyInProgress(
 
 fun ChannelCommand.Commitment.Splice.Response.Failure.asChannelNotIdle(): ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotIdle? = when (this) {
     is ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotIdle -> this
+    else -> null
+}
+
+fun ChannelCommand.Commitment.Splice.Response.Failure.asInvalidLiquidityAds(): ChannelCommand.Commitment.Splice.Response.Failure.InvalidLiquidityAds? = when (this) {
+    is ChannelCommand.Commitment.Splice.Response.Failure.InvalidLiquidityAds -> this
     else -> null
 }
 
@@ -310,4 +326,62 @@ fun PeerEvent.asPaymentSent(): PaymentSent? = when (this) {
 fun PeerEvent.asPaymentNotSent(): PaymentNotSent? = when (this) {
     is PaymentNotSent -> this
     else -> null
+}
+
+/**
+ * The class LiquidityAds.LeaseRate is NOT exposed to iOS.
+ * That is, it's exposed via Objective-C, but cannot be mapped to Swift.
+ * The following error message is displayed in Xcode:
+ *
+ * > Imported declaration 'PhoenixSharedLightning_kmpLiquidityAdsLeaseRate' could
+ * > not be mapped to 'Lightning_kmpLiquidityAds.LeaseRate'
+ *
+ * The end result is that any function that uses this class as a parameter,
+ * or as a return value, is NOT available to Swift.
+ *
+ * The fix is to start using TouchLab's SKIE library,
+ * which (in my experience) fixes all these problems.
+ * But in the meantime, we're working around it by exposing our own class & wrapper functions.
+ */
+data class LiquidityAds_LeaseRate(
+    val leaseDuration: Int,
+    val fundingWeight: Int,
+    val leaseFeeProportional: Int,
+    val leaseFeeBase: Satoshi,
+    val maxRelayFeeProportional: Int,
+    val maxRelayFeeBase: MilliSatoshi
+) {
+    constructor(src: LiquidityAds.LeaseRate) : this(
+        leaseDuration = src.leaseDuration,
+        fundingWeight = src.fundingWeight,
+        leaseFeeProportional = src.leaseFeeProportional,
+        leaseFeeBase = src.leaseFeeBase,
+        maxRelayFeeProportional = src.maxRelayFeeProportional,
+        maxRelayFeeBase = src.maxRelayFeeBase
+    )
+
+    fun unwrap() = LiquidityAds.LeaseRate(
+        leaseDuration = this.leaseDuration,
+        fundingWeight = this.fundingWeight,
+        leaseFeeProportional = this.leaseFeeProportional,
+        leaseFeeBase = this.leaseFeeBase,
+        maxRelayFeeProportional = this.maxRelayFeeProportional,
+        maxRelayFeeBase = this.maxRelayFeeBase
+    )
+}
+
+suspend fun Peer._estimateFeeForInboundLiquidity(
+    amount: Satoshi,
+    targetFeerate: FeeratePerKw,
+    leaseRate: LiquidityAds_LeaseRate
+): Pair<FeeratePerKw, ChannelCommand.Commitment.Splice.Fees>? {
+    return this.estimateFeeForInboundLiquidity(amount, targetFeerate, leaseRate.unwrap())
+}
+
+suspend fun Peer._requestInboundLiquidity(
+    amount: Satoshi,
+    feerate: FeeratePerKw,
+    leaseRate: LiquidityAds_LeaseRate
+): ChannelCommand.Commitment.Splice.Response? {
+    return this.requestInboundLiquidity(amount, feerate, leaseRate.unwrap())
 }

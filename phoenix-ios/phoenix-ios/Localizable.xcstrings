@@ -200,6 +200,9 @@
         }
       }
     },
+    "(additional space in bucket)" : {
+
+    },
     "(at time of payment)" : {
       "localizations" : {
         "es" : {
@@ -827,6 +830,9 @@
         }
       }
     },
+    "(space in bucket to receive)" : {
+
+    },
     "(This is your address - derived from your seed. You alone possess your seed.)" : {
       "localizations" : {
         "ar" : {
@@ -1010,6 +1016,9 @@
           }
         }
       }
+    },
+    "**Imagine that your wallet is a bucket**, and your balance is the water in the bucket." : {
+
     },
     "#%lld: %@" : {
       "localizations" : {
@@ -1418,6 +1427,7 @@
     },
     "%d channels" : {
       "comment" : "Count != 1",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1745,6 +1755,9 @@
         }
       }
     },
+    "|" : {
+
+    },
     "≈ 1 hour" : {
       "localizations" : {
         "es" : {
@@ -1833,7 +1846,11 @@
         }
       }
     },
+    "≈%@" : {
+
+    },
     "1 channel" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2216,6 +2233,9 @@
           }
         }
       }
+    },
+    "1 year" : {
+
     },
     "2 hours" : {
       "comment" : "Recent payments option",
@@ -2722,6 +2742,9 @@
         }
       }
     },
+    "Aborted by peer" : {
+
+    },
     "About" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -2896,6 +2919,18 @@
           }
         }
       }
+    },
+    "Add liquidity" : {
+
+    },
+    "Add Liquidity" : {
+
+    },
+    "Add liquidity failed!" : {
+
+    },
+    "Add liquidity:" : {
+
     },
     "Add optional comment" : {
       "localizations" : {
@@ -4569,6 +4604,9 @@
         }
       }
     },
+    "Balance" : {
+
+    },
     "Base amount: (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
       "localizations" : {
@@ -5416,6 +5454,12 @@
         }
       }
     },
+    "Cannot create commit tx" : {
+
+    },
+    "Cannot start session" : {
+
+    },
     "capacity" : {
       "localizations" : {
         "es" : {
@@ -5437,6 +5481,9 @@
           }
         }
       }
+    },
+    "Capacity" : {
+
     },
     "Chain mismatch" : {
       "comment" : "Error title",
@@ -5468,6 +5515,7 @@
       }
     },
     "Channel Balance Display:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -7827,6 +7875,9 @@
         }
       }
     },
+    "Current inbound liquidity:" : {
+
+    },
     "Custom electrum server: bad certificate !" : {
       "localizations" : {
         "es" : {
@@ -8823,6 +8874,9 @@
         }
       }
     },
+    "Disconnected" : {
+
+    },
     "Disconnected during splice-out attempt" : {
       "localizations" : {
         "es" : {
@@ -9307,6 +9361,9 @@
           }
         }
       }
+    },
+    "Duration" : {
+
     },
     "edit" : {
       "comment" : "button label - try to make it short",
@@ -9975,6 +10032,9 @@
           }
         }
       }
+    },
+    "Estimate liquidity cost" : {
+
     },
     "example payment" : {
       "localizations" : {
@@ -11313,6 +11373,9 @@
         }
       }
     },
+    "Funding failure" : {
+
+    },
     "funding tx" : {
       "localizations" : {
         "es" : {
@@ -12391,6 +12454,9 @@
         }
       }
     },
+    "If the bucket needs to be resized to allow for more water, that will require an on-chain operation with a mining fee." : {
+
+    },
     "If the problem persists, please contact support at **phoenix@acinq.co**." : {
       "comment" : "ErrorView",
       "localizations" : {
@@ -12804,6 +12870,9 @@
         }
       }
     },
+    "Inbound Liquidity" : {
+
+    },
     "Inbound liquidity is insufficient and you have disabled automated channel management." : {
       "localizations" : {
         "cs" : {
@@ -13200,6 +13269,9 @@
         }
       }
     },
+    "Interactive tx session failed" : {
+
+    },
     "Internet" : {
       "comment" : "AppStatusPopover: label",
       "localizations" : {
@@ -13303,6 +13375,9 @@
         }
       }
     },
+    "Invalid liquidity ads" : {
+
+    },
     "Invalid port. Valid range: [1 - 65535]" : {
       "localizations" : {
         "ar" : {
@@ -13399,6 +13474,9 @@
           }
         }
       }
+    },
+    "Invalid splice-out pubKeyScript" : {
+
     },
     "invoice" : {
       "localizations" : {
@@ -14353,6 +14431,9 @@
         }
       }
     },
+    "Liquidity successfully added!" : {
+
+    },
     "lnurl-auth" : {
       "localizations" : {
         "es" : {
@@ -14442,6 +14523,7 @@
       }
     },
     "local / remote" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14470,6 +14552,7 @@
       }
     },
     "local / total" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -15441,6 +15524,9 @@
         }
       }
     },
+    "Miner Fee" : {
+
+    },
     "Miner fee amount: (percent), (amountBitcoin), ≈(amountFiat)" : {
       "comment" : "VoiceOver label: PaymentSummaryView",
       "localizations" : {
@@ -15542,6 +15628,9 @@
           }
         }
       }
+    },
+    "Mining fee contribution for the underlying on-chain transaction." : {
+
     },
     "Modify" : {
       "localizations" : {
@@ -15804,6 +15893,9 @@
         }
       }
     },
+    "New inbound liquidity:" : {
+
+    },
     "Next" : {
       "localizations" : {
         "ar" : {
@@ -15998,6 +16090,9 @@
           }
         }
       }
+    },
+    "No funds were transferred." : {
+
     },
     "No notifications" : {
       "localizations" : {
@@ -17209,6 +17304,9 @@
           }
         }
       }
+    },
+    "Payment Channels" : {
+
     },
     "Payment channels are automatically created when needed." : {
       "extractionState" : "manual",
@@ -18475,6 +18573,9 @@
         }
       }
     },
+    "Plan Ahead" : {
+
+    },
     "Please check your connection." : {
       "localizations" : {
         "es" : {
@@ -18909,6 +19010,9 @@
           }
         }
       }
+    },
+    "Purchase liquidity" : {
+
     },
     "QR code" : {
       "localizations" : {
@@ -21077,6 +21181,9 @@
         }
       }
     },
+    "Service Fee" : {
+
+    },
     "Service Fees" : {
       "comment" : "Label in SummaryInfoGrid",
       "localizations" : {
@@ -22292,6 +22399,9 @@
         }
       }
     },
+    "Spending = pouring water out\nReceiving = adding more water" : {
+
+    },
     "Splice already in progress" : {
       "localizations" : {
         "es" : {
@@ -22424,6 +22534,9 @@
           }
         }
       }
+    },
+    "Start over" : {
+
     },
     "state" : {
       "localizations" : {
@@ -22863,6 +22976,9 @@
           }
         }
       }
+    },
+    "The additional capacity will be preserved for that duration." : {
+
     },
     "The address is for %@, but you're on %@" : {
       "comment" : "Error message - parsing bitcoin address",
@@ -23766,6 +23882,9 @@
         }
       }
     },
+    "The total fees exceed your balance" : {
+
+    },
     "The transaction may take 30 minutes or more to confirm on the bitcoin blockchain" : {
       "localizations" : {
         "es" : {
@@ -24050,6 +24169,9 @@
           }
         }
       }
+    },
+    "This fee goes to the service providing the liquidity." : {
+
     },
     "This fee is dynamic, and may change depending on the conditions of the bitcoin network." : {
       "extractionState" : "manual",
@@ -25674,6 +25796,9 @@
           }
         }
       }
+    },
+    "Unknown reason" : {
+
     },
     "Unknown reason." : {
       "localizations" : {
@@ -27343,6 +27468,9 @@
         }
       }
     },
+    "You added %@" : {
+
+    },
     "You are on bitcoin chain %@, but the invoice is for %@." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -28035,6 +28163,9 @@
           }
         }
       }
+    },
+    "You may be able to reduce your fees by increasing your bucket size ahead of a series of incoming payments." : {
+
     },
     "You must now restart Phoenix." : {
       "localizations" : {
