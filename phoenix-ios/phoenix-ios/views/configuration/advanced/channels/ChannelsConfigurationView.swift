@@ -155,63 +155,12 @@ struct ChannelsConfigurationView: View {
 				}
 				.font(.callout)
 				.foregroundColor(.primary.opacity(0.6))
-				
-				subsection_capacity(localMsats + remoteMsats)
 			}
 			.padding(.vertical, 4)
 			
 		} header: {
 			Text("Balance")
 		}
-	}
-	
-	@ViewBuilder
-	func subsection_capacity(_ capacityMsats: Int64) -> some View {
-		
-		let dividerThickness = CGFloat(2)
-		let dividerColor = Color(UIColor.systemGray5)
-		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			
-			HStack(alignment: VerticalAlignment.bottom, spacing: 2) {
-				Divider()
-					.frame(width: dividerThickness, height: capacityHeight ?? 8)
-					.overlay(dividerColor)
-				Spacer(minLength: 0)
-				Text("Capacity")
-					.padding(.bottom, 2)
-					.read(capacityHeightReader)
-				Spacer(minLength: 0)
-				Divider()
-					.frame(width: dividerThickness, height: capacityHeight ?? 8)
-					.overlay(dividerColor)
-			}
-			.assignMaxPreference(for: capacityHeightReader.key, to: $capacityHeight)
-			
-			Divider()
-				.frame(height: dividerThickness)
-				.overlay(dividerColor)
-			
-			let capacityBitcoin = Utils.formatBitcoin(msat: capacityMsats, bitcoinUnit: .sat, policy: .hideMsats)
-			let capacityFiat = Utils.formatFiat(currencyPrefs, msat: capacityMsats)
-			
-			HStack(alignment: VerticalAlignment.center, spacing: 8) {
-			
-				Text(capacityBitcoin.string)
-					.foregroundColor(.primary.opacity(0.8))
-				
-				Text("|")
-					.foregroundColor(.primary.opacity(0.7))
-				
-				Text("≈\(capacityFiat.string)")
-					.foregroundColor(.primary.opacity(0.6))
-			}
-			.font(.callout)
-			.padding(.top, 2)
-			
-		} // </VStack>
-		.padding(.horizontal, 8)
-		.padding(.top, 4)
 	}
 	
 	@ViewBuilder

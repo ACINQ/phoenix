@@ -1755,9 +1755,6 @@
         }
       }
     },
-    "|" : {
-
-    },
     "≈ 1 hour" : {
       "localizations" : {
         "es" : {
@@ -5481,9 +5478,6 @@
           }
         }
       }
-    },
-    "Capacity" : {
-
     },
     "Chain mismatch" : {
       "comment" : "Error title",
