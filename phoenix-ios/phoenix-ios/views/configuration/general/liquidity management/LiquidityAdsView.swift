@@ -34,6 +34,7 @@ struct LiquidityAdsView: View {
 	@State var isEstimating: Bool = false
 	@State var isPurchasing: Bool = false
 	@State var isPurchased: Bool = false
+	@State var channelsNotAvailable: Bool = false
 	
 	@State var popoverPresent_minerFee = false
 	@State var popoverPresent_serviceFee = false
@@ -222,7 +223,7 @@ struct LiquidityAdsView: View {
 	func section_estimateCostButton() -> some View {
 		
 		Section {
-			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			VStack(alignment: HorizontalAlignment.center, spacing: 8) {
 				
 				Button {
 					estimateCost()
@@ -238,6 +239,12 @@ struct LiquidityAdsView: View {
 				}
 				.font(.headline)
 				.disabled(isEstimating)
+				
+				if channelsNotAvailable {
+					Text("Channels are not available, try again later")
+						.font(.callout)
+						.foregroundColor(.appNegative)
+				}
 				
 			} // </VStack>
 			.frame(maxWidth: .infinity)
@@ -389,7 +396,12 @@ struct LiquidityAdsView: View {
 			.disabled(isPurchasing || popoverPresent || _insufficientFunds)
 			.font(.headline)
 			
-			if _insufficientFunds {
+			if channelsNotAvailable {
+				Text("Channels are not available, try again later")
+					.font(.callout)
+					.foregroundColor(.appNegative)
+				
+			} else if _insufficientFunds {
 				Text("The total fees exceed your balance")
 					.font(.callout)
 					.foregroundColor(.appNegative)
@@ -725,6 +737,7 @@ struct LiquidityAdsView: View {
 				Lightning_kmpFeeratePerKw,
 				Lightning_kmpChannelCommand.CommitmentSpliceFees>? = nil
 			
+			var _channelsNotAvailable = false
 			do {
 				pair = try await peer._estimateFeeForInboundLiquidity(
 					amount: amount,
@@ -734,6 +747,7 @@ struct LiquidityAdsView: View {
 				
 				if pair == nil {
 					log.error("peer.estimateFeeForInboundLiquidity() == nil")
+					_channelsNotAvailable = true
 				}
 				
 			} catch {
@@ -757,6 +771,7 @@ struct LiquidityAdsView: View {
 				)
 			}
 			
+			channelsNotAvailable = _channelsNotAvailable
 			isEstimating = false
 		} // </Task>
 	}
@@ -776,6 +791,7 @@ struct LiquidityAdsView: View {
 		Task { @MainActor in
 			
 			var result: Lightning_kmpChannelCommand.CommitmentSpliceResponse? = nil
+			var _channelsNotAvailable = false
 			do {
 				result = try await peer._requestInboundLiquidity(
 					amount: feeInfo.params.amount,
@@ -785,13 +801,20 @@ struct LiquidityAdsView: View {
 				
 				if result == nil {
 					log.error("peer.requestInboundLiquidity() == nil")
+					_channelsNotAvailable = true
 				}
 				
 			} catch {
 				log.error("peer.requestInboundLiquidity(): error: \(error)")
 			}
 			
-			finalResult = result ?? Lightning_kmpChannelCommand.CommitmentSpliceResponseFailureDisconnected()
+			if let result {
+				finalResult = result
+			} else if !_channelsNotAvailable {
+				finalResult = Lightning_kmpChannelCommand.CommitmentSpliceResponseFailureDisconnected()
+			}
+			
+			channelsNotAvailable = _channelsNotAvailable
 			isPurchasing = false
 			isPurchased = (result?.asCreated() != nil)
 			
