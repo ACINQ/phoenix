@@ -1,8 +1,14 @@
 package fr.acinq.phoenix.utils
 
+import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.ByteVector64
+import fr.acinq.bitcoin.Crypto
+import fr.acinq.bitcoin.PrivateKey
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
+import fr.acinq.bitcoin.io.ByteArrayOutput
 import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.DefaultSwapInParams
 import fr.acinq.lightning.LiquidityEvents
@@ -21,6 +27,7 @@ import fr.acinq.lightning.channel.states.ChannelState
 import fr.acinq.lightning.channel.states.Closed
 import fr.acinq.lightning.channel.states.Closing
 import fr.acinq.lightning.channel.states.Offline
+import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.NativeSocketException
@@ -32,6 +39,7 @@ import fr.acinq.lightning.io.PeerEvent
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.lightning.wire.LightningCodecs
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 
@@ -359,7 +367,6 @@ data class LiquidityAds_LeaseRate(
         maxRelayFeeProportional = src.maxRelayFeeProportional,
         maxRelayFeeBase = src.maxRelayFeeBase
     )
-
     fun unwrap() = LiquidityAds.LeaseRate(
         leaseDuration = this.leaseDuration,
         fundingWeight = this.fundingWeight,
@@ -368,6 +375,72 @@ data class LiquidityAds_LeaseRate(
         maxRelayFeeProportional = this.maxRelayFeeProportional,
         maxRelayFeeBase = this.maxRelayFeeBase
     )
+}
+
+data class LiquidityAds_LeaseFees(
+    val miningFee: Satoshi,
+    val serviceFee: Satoshi
+) {
+    constructor(src: LiquidityAds.LeaseFees) : this(
+        miningFee = src.miningFee,
+        serviceFee = src.serviceFee
+    )
+    fun unwrap() = LiquidityAds.LeaseFees(
+        miningFee = this.miningFee,
+        serviceFee = this.serviceFee
+    )
+
+    val total: Satoshi = unwrap().total
+}
+
+data class LiquidityAds_LeaseWitness(
+    val fundingScript: ByteVector,
+    val leaseDuration: Int,
+    val leaseEnd: Int,
+    val maxRelayFeeProportional: Int,
+    val maxRelayFeeBase: MilliSatoshi
+) {
+    constructor(src: LiquidityAds.LeaseWitness) : this(
+        fundingScript = src.fundingScript,
+        leaseDuration = src.leaseDuration,
+        leaseEnd = src.leaseEnd,
+        maxRelayFeeProportional = src.maxRelayFeeProportional,
+        maxRelayFeeBase = src.maxRelayFeeBase
+    )
+    fun unwrap() = LiquidityAds.LeaseWitness(
+        fundingScript = this.fundingScript,
+        leaseDuration = this.leaseDuration,
+        leaseEnd = this.leaseEnd,
+        maxRelayFeeProportional = this.maxRelayFeeProportional,
+        maxRelayFeeBase = this.maxRelayFeeBase
+    )
+
+    fun sign(nodeKey: PrivateKey): ByteVector64 = unwrap().sign(nodeKey)
+    fun verify(nodeId: PublicKey, sig: ByteVector64): Boolean = unwrap().verify(nodeId, sig)
+    fun encode(): ByteArray = unwrap().encode()
+}
+
+data class LiquidityAds_Lease(
+    val amount: Satoshi,
+    val fees: LiquidityAds_LeaseFees,
+    val sellerSig: ByteVector64,
+    val witness: LiquidityAds_LeaseWitness
+) {
+    constructor(src: LiquidityAds.Lease) : this(
+        amount = src.amount,
+        fees = LiquidityAds_LeaseFees(src.fees),
+        sellerSig = src.sellerSig,
+        witness = LiquidityAds_LeaseWitness(src.witness)
+    )
+    fun unwrap() = LiquidityAds.Lease(
+        amount = this.amount,
+        fees = this.fees.unwrap(),
+        sellerSig = this.sellerSig,
+        witness = this.witness.unwrap()
+    )
+
+    val start: Int = unwrap().start
+    val expiry: Int = unwrap().expiry
 }
 
 suspend fun Peer._estimateFeeForInboundLiquidity(
@@ -385,3 +458,6 @@ suspend fun Peer._requestInboundLiquidity(
 ): ChannelCommand.Commitment.Splice.Response? {
     return this.requestInboundLiquidity(amount, feerate, leaseRate.unwrap())
 }
+
+val InboundLiquidityOutgoingPayment._lease: LiquidityAds_Lease
+    get() = LiquidityAds_Lease(this.lease)

@@ -1698,6 +1698,9 @@
         }
       }
     },
+    "+(amount.string) inbound liquidity" : {
+      "comment" : "Payment description for inbound liquidity"
+    },
     "+%@ incoming" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -10717,6 +10720,9 @@
         }
       }
     },
+    "Fees paid for the liquidity service." : {
+      "comment" : "Fees explanation"
+    },
     "Fetched %@ item" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -14424,6 +14430,9 @@
           }
         }
       }
+    },
+    "Liquidity Added" : {
+
     },
     "Liquidity successfully added!" : {
 
