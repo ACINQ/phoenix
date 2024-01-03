@@ -22,6 +22,7 @@ struct HomeView : MVIView {
 	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "HomeView")
 	
 	let showSwapInWallet: () -> Void
+	let showLiquidityAds: () -> Void
 	
 	@StateObject var mvi = MVIState({ $0.home() })
 
@@ -41,6 +42,9 @@ struct HomeView : MVIView {
 	
 	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
+	
+	@State var channels: [LocalChannelInfo] = []
+	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
@@ -78,8 +82,12 @@ struct HomeView : MVIView {
 	// MARK: Init
 	// --------------------------------------------------
 	
-	init(showSwapInWallet: @escaping () -> Void) {
+	init(
+		showSwapInWallet: @escaping () -> Void,
+		showLiquidityAds: @escaping () -> Void
+	) {
 		self.showSwapInWallet = showSwapInWallet
+		self.showLiquidityAds = showLiquidityAds
 		self.paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
 	}
 	
@@ -119,6 +127,9 @@ struct HomeView : MVIView {
 		}
 		.onReceive(swapInWalletPublisher) {
 			swapInWalletChanged($0)
+		}
+		.onReceive(channelsPublisher) {
+			channelsChanged($0)
 		}
 		.onReceive(bizNotificationsPublisher) {
 			bizNotificationsChanged($0)
@@ -166,6 +177,7 @@ struct HomeView : MVIView {
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			totalBalance()
 			incomingBalance()
+			addLiquidityButton()
 		}
 		.padding([.top, .leading, .trailing])
 		.padding(.bottom, 30)
@@ -311,6 +323,19 @@ struct HomeView : MVIView {
 			.accessibilityElement(children: .combine)
 			.accessibilityHint("pending on-chain confirmation")
 			.accessibilitySortPriority(48)
+		}
+	}
+	
+	@ViewBuilder
+	func addLiquidityButton() -> some View {
+		
+		if showAddLiquidityButton() {
+			Text("add liquidity")
+				.font(.callout)
+				.foregroundColor(.secondary)
+				.onTapGesture { showLiquidityAds() }
+				.padding(.top, 7)
+				.padding(.bottom, 2)
 		}
 	}
 	
@@ -661,6 +686,17 @@ struct HomeView : MVIView {
 		return notificationCount_missedLightningPayments() + notificationCount_other()
 	}
 	
+	func showAddLiquidityButton() -> Bool {
+		
+		let hasNoChannels = channels.filter { !$0.isTerminated }.isEmpty
+		if hasNoChannels {
+			// Cannot purchase liquidity without any channels
+			return false
+		}
+		
+		return true
+	}
+	
 	// --------------------------------------------------
 	// MARK: View Lifecycle
 	// --------------------------------------------------
@@ -743,6 +779,12 @@ struct HomeView : MVIView {
 			// So let's add a little animation to draw the user's attention to it.
 			startAnimatingIncomingSwapText()
 		}
+	}
+	
+	func channelsChanged(_ channels: [LocalChannelInfo]) {
+		log.trace("channelsChanged()")
+		
+		self.channels = channels
 	}
 	
 	func bizNotificationsChanged(_ list: [PhoenixShared.NotificationsManager.NotificationItem]) {

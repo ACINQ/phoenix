@@ -390,9 +390,10 @@ fileprivate struct ConfigurationList: View {
 			case .About                 : AboutView()
 			case .DisplayConfiguration  : DisplayConfigurationView()
 			case .PaymentOptions        : PaymentOptionsView()
-			case .ChannelManagement     : LiquidityPolicyView()
-			case .LiquidityManagement   : LiquidityAdsView()
 			case .Notifications         : NotificationsView(location: .embedded)
+		// Fees
+			case .ChannelManagement     : LiquidityPolicyView()
+			case .LiquidityManagement   : LiquidityAdsView(location: .embedded)
 		// Privacy & Security
 			case .AppAccess             : AppAccessView()
 			case .RecoveryPhrase        : RecoveryPhraseView()

@@ -14,14 +14,12 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct LiquidityAdsView: View {
 	
-	let liquidityOptions: [Bitcoin_kmpSatoshi] = [
-		Bitcoin_kmpSatoshi(sat:    100_000),
-		Bitcoin_kmpSatoshi(sat:    250_000),
-		Bitcoin_kmpSatoshi(sat:    500_000),
-		Bitcoin_kmpSatoshi(sat:  1_000_000),
-		Bitcoin_kmpSatoshi(sat:  2_000_000),
-		Bitcoin_kmpSatoshi(sat: 10_000_000)
-	]
+	enum Location {
+		case popover
+		case embedded
+	}
+	
+	let location: Location
 		
 	@State var channels: [LocalChannelInfo] = []
 	@State var balanceMsat: Int64? = nil
@@ -42,11 +40,21 @@ struct LiquidityAdsView: View {
 	@State var popoverPresent_serviceFee = false
 	@State var popoverPresent_duration = false
 	
+	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	var popoverPresent: Bool {
 		return popoverPresent_minerFee || popoverPresent_serviceFee || popoverPresent_duration
 	}
+	
+	let liquidityOptions: [Bitcoin_kmpSatoshi] = [
+		Bitcoin_kmpSatoshi(sat:    100_000),
+		Bitcoin_kmpSatoshi(sat:    250_000),
+		Bitcoin_kmpSatoshi(sat:    500_000),
+		Bitcoin_kmpSatoshi(sat:  1_000_000),
+		Bitcoin_kmpSatoshi(sat:  2_000_000),
+		Bitcoin_kmpSatoshi(sat: 10_000_000)
+	]
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -55,21 +63,56 @@ struct LiquidityAdsView: View {
 	@ViewBuilder
 	var body: some View {
 		
-		content()
-			.navigationTitle("Add Liquidity")
-			.navigationBarTitleDisplayMode(.inline)
-			.toolbar {
-				ToolbarItem(placement: .navigationBarTrailing) {
-					Button {
-						showHelpSheet = true
-					} label: {
-						Image(systemName: "questionmark.circle")
-					}
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			header()
+			content()
+		}
+		.navigationTitle("Add Liquidity")
+		.navigationBarTitleDisplayMode(.inline)
+		.toolbar {
+			ToolbarItem(placement: .navigationBarTrailing) {
+				Button {
+					showHelpSheet = true
+				} label: {
+					Image(systemName: "questionmark.circle")
 				}
 			}
-			.sheet(isPresented: $showHelpSheet) {
-				LiquidityAdsHelp(isShowing: $showHelpSheet)
-			}
+		}
+		.sheet(isPresented: $showHelpSheet) {
+			LiquidityAdsHelp(isShowing: $showHelpSheet)
+		}
+	}
+	
+	@ViewBuilder
+	func header() -> some View {
+		
+		if location == .popover {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				
+				Image(systemName: "xmark")
+					.imageScale(.medium)
+					.font(.title3)
+					.foregroundColor(.clear) // invisible
+					.accessibilityHidden(true)
+				
+				Spacer(minLength: 0)
+				Text("Add Liquidity")
+					.font(.headline)
+					.fontWeight(.medium)
+					.lineLimit(1)
+				Spacer(minLength: 0)
+				
+				Button {
+					closePopover()
+				} label: {
+					Image(systemName: "xmark")
+						.imageScale(.medium)
+						.font(.title3)
+				}
+				
+			} // </HStack>
+			.padding()
+		}
 	}
 	
 	@ViewBuilder
@@ -817,6 +860,12 @@ struct LiquidityAdsView: View {
 		
 		feeInfo = nil
 		finalResult = nil
+	}
+	
+	func closePopover() {
+		log.trace("closePopover")
+		
+		popoverState.close()
 	}
 }
 

@@ -826,6 +826,7 @@
 			children = (
 				C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */,
 				DCACF6E02566CEC40009B01E /* general */,
+				DC949E6B2B45FC5E00E80BB5 /* fees */,
 				DCACF6E42566CF850009B01E /* privacy and security */,
 				DCACF6DF2566CEC40009B01E /* advanced */,
 				DCA3B41D2A53434700E6B231 /* danger zone */,
@@ -1019,6 +1020,15 @@
 			path = "liquidity management";
 			sourceTree = "<group>";
 		};
+		DC949E6B2B45FC5E00E80BB5 /* fees */ = {
+			isa = PBXGroup;
+			children = (
+				DCA3B41B2A52226300E6B231 /* channel management */,
+				DC784A0F2B31E9FD0018DC4A /* liquidity management */,
+			);
+			path = fees;
+			sourceTree = "<group>";
+		};
 		DC99E94725BA258C00FB20F7 /* html */ = {
 			isa = PBXGroup;
 			children = (
@@ -1106,8 +1116,6 @@
 				C8D7A2327BC90150A3E1493D /* AboutView.swift */,
 				DC2DC8662906ABE70079E570 /* display configuration */,
 				DCB30E552A0C2FB400E7D7A2 /* payment options */,
-				DCA3B41B2A52226300E6B231 /* channel management */,
-				DC784A0F2B31E9FD0018DC4A /* liquidity management */,
 			);
 			path = general;
 			sourceTree = "<group>";
