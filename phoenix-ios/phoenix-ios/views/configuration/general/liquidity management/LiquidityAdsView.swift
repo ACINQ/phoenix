@@ -36,6 +36,8 @@ struct LiquidityAdsView: View {
 	@State var isPurchased: Bool = false
 	@State var channelsNotAvailable: Bool = false
 	
+	@State var showHelpSheet = false
+	
 	@State var popoverPresent_minerFee = false
 	@State var popoverPresent_serviceFee = false
 	@State var popoverPresent_duration = false
@@ -56,13 +58,25 @@ struct LiquidityAdsView: View {
 		content()
 			.navigationTitle("Add Liquidity")
 			.navigationBarTitleDisplayMode(.inline)
+			.toolbar {
+				ToolbarItem(placement: .navigationBarTrailing) {
+					Button {
+						showHelpSheet = true
+					} label: {
+						Image(systemName: "questionmark.circle")
+					}
+				}
+			}
+			.sheet(isPresented: $showHelpSheet) {
+				LiquidityAdsHelp(isShowing: $showHelpSheet)
+			}
 	}
 	
 	@ViewBuilder
 	func content() -> some View {
 		
 		List {
-			section_info()
+			section_teaser()
 			if let finalResult {
 				section_result(finalResult)
 			} else {
@@ -88,41 +102,21 @@ struct LiquidityAdsView: View {
 	}
 	
 	@ViewBuilder
-	func section_info() -> some View {
+	func section_teaser() -> some View {
 		
 		Section {
-			
-			VStack(alignment: HorizontalAlignment.leading, spacing: 24) {
+			VStack(alignment: HorizontalAlignment.center, spacing: 18) {
 				
-				Text("**Imagine that your wallet is a bucket**, and your balance is the water in the bucket.")
+				Image("bucket")
+					.resizable()
+					.scaledToFit()
+					.frame(maxWidth: 100, maxHeight: 100)
 				
-				HStack(alignment: VerticalAlignment.top, spacing: 8) {
-					Image("bucket")
-						.resizable()
-						.scaledToFit()
-						.frame(maxWidth: 50, maxHeight: 50)
-					
-					Text(
-						"""
-						Spending = pouring water out
-						Receiving = adding more water
-						"""
-					)
-				} // </HStack>
-				
-				Text(
-				"""
-				If the bucket needs to be resized to allow for more water, \
-				that will require an on-chain operation with a mining fee.
-				""")
-				
-				Text(
-				"""
-				You may be able to reduce your fees by increasing your bucket size \
-				ahead of a series of incoming payments.
-				""")
+				Text("Plan ahead to save money later")
+					.font(.title3)
 				
 			} // </VStack>
+			.frame(maxWidth: .infinity)
 		} // </Section>
 	}
 	
@@ -148,12 +142,9 @@ struct LiquidityAdsView: View {
 						.clipped()
 						Spacer()
 				}
-				.opacity(0.5)
+				.opacity(0.30)
 			} // </Background>
-			
-		} header: {
-			Text("Plan Ahead")
-		}
+		} // </Section>
 	}
 	
 	@ViewBuilder

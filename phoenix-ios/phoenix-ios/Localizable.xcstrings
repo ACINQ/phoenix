@@ -1098,6 +1098,9 @@
         }
       }
     },
+    "%@ [more info](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)" : {
+
+    },
     "%@ days" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -18586,7 +18589,7 @@
         }
       }
     },
-    "Plan Ahead" : {
+    "Plan ahead to save money later" : {
 
     },
     "Please check your connection." : {
