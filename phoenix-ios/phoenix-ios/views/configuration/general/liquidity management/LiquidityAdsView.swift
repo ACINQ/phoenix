@@ -748,10 +748,11 @@ struct LiquidityAdsView: View {
 			}
 			
 			if let pair = pair,
-				let fees: Lightning_kmpChannelCommand.CommitmentSpliceFees = pair.second
+			   let feerate: Lightning_kmpFeeratePerKw = pair.first,
+			   let fees: Lightning_kmpChannelCommand.CommitmentSpliceFees = pair.second
 			{
 				feeInfo = LiquidityFeeInfo(
-					params: LiquidityFeeParams(amount: amount, feerate: feePerKw, leaseRate: leaseRate),
+					params: LiquidityFeeParams(amount: amount, feerate: feerate, leaseRate: leaseRate),
 					estimate: LiquidityFeeEstimate(minerFee: fees.miningFee, serviceFee: fees.serviceFee)
 				)
 			}
