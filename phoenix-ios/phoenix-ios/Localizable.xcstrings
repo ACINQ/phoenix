@@ -5025,8 +5025,12 @@
         }
       }
     },
+    "bitcoin txid" : {
+
+    },
     "bitcoin txids" : {
       "comment" : "Label in DetailsView_IncomingPayment",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14432,6 +14436,9 @@
       }
     },
     "Liquidity Added" : {
+
+    },
+    "liquidity amount" : {
 
     },
     "Liquidity successfully added!" : {
@@ -25328,6 +25335,9 @@
           }
         }
       }
+    },
+    "transaction" : {
+
     },
     "Transactions" : {
       "extractionState" : "manual",

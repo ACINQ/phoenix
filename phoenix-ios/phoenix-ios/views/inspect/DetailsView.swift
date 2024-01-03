@@ -178,7 +178,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				header("Payment Received")
 			} content: {
 				paymentReceived_receivedAt(received)
-				amountReceived(msat: received.amount)
+				common_amountReceived(msat: received.amount)
 				payment_standardFees(incomingPayment)
 				payment_minerFees(incomingPayment)
 			}
@@ -244,9 +244,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				} content: {
 					offChain_completedAt(offChain)
 					offChain_elapsed(outgoingPayment)
-					outgoing_amountSent(outgoingPayment)
+					common_amountSent(msat: outgoingPayment.amount)
 					offChain_fees(outgoingPayment)
-					amountReceived(msat: lightningPayment.recipientAmount)
+					common_amountReceived(msat: lightningPayment.recipientAmount)
 					offChain_recipientPubkey(lightningPayment)
 				}
 			
@@ -278,9 +278,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			} content: {
 				onChain_broadcastAt(spliceOut)
 				onChain_confirmedAt(spliceOut)
-				outgoing_amountSent(outgoingPayment)
+				common_amountSent(msat: outgoingPayment.amount)
 				onChain_minerFees(spliceOut)
-				amountReceived(sat: spliceOut.recipientAmount)
+				common_amountReceived(sat: spliceOut.recipientAmount)
 				onChain_btcTxid(spliceOut)
 			}
 		
@@ -300,9 +300,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			} content: {
 				onChain_broadcastAt(channelClosing)
 				onChain_confirmedAt(channelClosing)
-				outgoing_amountSent(outgoingPayment)
+				common_amountSent(msat: outgoingPayment.amount)
 				onChain_minerFees(channelClosing)
-				amountReceived(sat: channelClosing.recipientAmount)
+				common_amountReceived(sat: channelClosing.recipientAmount)
 				onChain_btcTxid(channelClosing)
 			}
 			
@@ -315,6 +315,18 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				onChain_confirmedAt(spliceCpfp)
 				onChain_minerFees(spliceCpfp)
 				onChain_btcTxid(spliceCpfp)
+			}
+			
+		} else if let liquidityPayment = outgoingPayment as? Lightning_kmpInboundLiquidityOutgoingPayment {
+			
+			InlineSection {
+				header("Inbound Liquidity")
+			} content: {
+				liquidityPayment_liqudityAmount(liquidityPayment)
+				payment_minerFees(outgoingPayment)
+				payment_serviceFees(outgoingPayment)
+				liquidityPayment_spliceTxid(liquidityPayment)
+				liquidityPayment_channelId(liquidityPayment)
 			}
 		}
 	}
@@ -355,6 +367,10 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			.multilineTextAlignment(.trailing)
 			.foregroundColor(.secondary)
 	}
+	
+	// --------------------------------------------------
+	// MARK: View Builders: Rows
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	func lnurl_service(_ lnurlPay: LnurlPay.Intent) -> some View {
@@ -658,28 +674,10 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func paymentReceived_channelId(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
-		let identifier: String = #function
 		
 		if let channelId = receivedWith.asNewChannel()?.channelId ?? receivedWith.asSpliceIn()?.channelId {
 			
-			InfoGridRowWrapper(
-				identifier: identifier,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
-			) {
-				keyColumn("channel id")
-				
-			} valueColumn: {
-				
-				let str = channelId.toHex()
-				Text(str)
-					.contextMenu {
-						Button(action: {
-							UIPasteboard.general.string = str
-						}) {
-							Text("Copy")
-						}
-					}
-			}
+			common_channelId(channelId)
 		}
 	}
 	
@@ -688,45 +686,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		let identifier: String = #function
 		
 		if let txId = self.txId(receivedWith: receivedWith) {
-			
-			InfoGridRowWrapper(
-				identifier: identifier,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
-			) {
-				keyColumn("funding txid")
-				
-			} valueColumn: {
-				
-				let txIdStr = txId.toHex()
-				Text(txIdStr)
-					.contextMenu {
-						Button(action: {
-							UIPasteboard.general.string = txIdStr
-						}) {
-							Text("Copy")
-						}
-						Button {
-							showBlockchainExplorerOptions = true
-						} label: {
-							Text("Explore")
-						}
-					}
-					.confirmationDialog("Blockchain Explorer",
-						isPresented: $showBlockchainExplorerOptions,
-						titleVisibility: .automatic
-					) {
-						Button {
-							exploreTx(txId, website: BlockchainExplorer.WebsiteMempoolSpace())
-						} label: {
-							Text(verbatim: "Mempool.space") // no localization needed
-						}
-						Button {
-							exploreTx(txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
-						} label: {
-							Text(verbatim: "Blockstream.info") // no localization needed
-						}
-					} // </confirmationDialog>
-			}
+			common_btcTxid(txId, title: "funding txid")
 		}
 	}
 	
@@ -787,29 +747,39 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func channelClosing_channelId(
-		_ channelClosing: Lightning_kmpChannelCloseOutgoingPayment
+	func payment_serviceFees(
+		_ payment: Lightning_kmpWalletPayment
 	) -> some View {
 		let identifier: String = #function
 		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			keyColumn("channel id")
+		if let serviceFees = payment.serviceFees(), serviceFees.0 > 0 {
 			
-		} valueColumn: {
-			
-			let str = channelClosing.channelId.toHex()
-			Text(str)
-				.contextMenu {
-					Button(action: {
-						UIPasteboard.general.string = str
-					}) {
-						Text("Copy")
-					}
-				}
+			InfoGridRowWrapper(
+				identifier: identifier,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				
+				keyColumn(verbatim: serviceFees.1)
+				
+			} valueColumn: {
+				
+				commonValue_amounts(
+					identifier: identifier,
+					displayAmounts: displayAmounts(
+						msat: Lightning_kmpMilliSatoshi(msat: serviceFees.0),
+						originalFiat: paymentInfo.metadata.originalFiat
+					)
+				)
+			}
 		}
+	}
+	
+	@ViewBuilder
+	func channelClosing_channelId(
+		_ channelClosing: Lightning_kmpChannelCloseOutgoingPayment
+	) -> some View {
+		
+		common_channelId(channelClosing.channelId)
 	}
 	
 	@ViewBuilder
@@ -1049,97 +1019,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	func onChain_btcTxid(
 		_ onChain: Lightning_kmpOnChainOutgoingPayment
 	) -> some View {
-		let identifier: String = #function
 		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			keyColumn("bitcoin txids")
-			
-		} valueColumn: {
-			
-			let txid = onChain.txId.toHex()
-			Text(txid)
-				.contextMenu {
-					Button(action: {
-						UIPasteboard.general.string = txid
-					}) {
-						Text("Copy")
-					}
-				}
-			
-		} // </InfoGridRowWrapper>
-	}
-	
-	@ViewBuilder
-	func outgoing_amountSent(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
-		let identifier: String = #function
-		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			keyColumn("amount sent")
-			
-		} valueColumn: {
-			
-			commonValue_amounts(
-				identifier: identifier,
-				displayAmounts: displayAmounts(
-					msat: outgoingPayment.amount,
-					originalFiat: paymentInfo.metadata.originalFiat
-				)
-			)
-		}
-	}
-	
-	@ViewBuilder
-	func amountReceived(
-		msat: Lightning_kmpMilliSatoshi
-	) -> some View {
-		let identifier: String = #function
-		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			keyColumn("amount received")
-			
-		} valueColumn: {
-			
-			commonValue_amounts(
-				identifier: identifier,
-				displayAmounts: displayAmounts(
-					msat: msat,
-					originalFiat: paymentInfo.metadata.originalFiat
-				)
-			)
-		}
-	}
-	
-	@ViewBuilder
-	func amountReceived(
-		sat: Bitcoin_kmpSatoshi
-	) -> some View {
-		let identifier: String = #function
-		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			keyColumn("amount received")
-			
-		} valueColumn: {
-			
-			commonValue_amounts(
-				identifier: identifier,
-				displayAmounts: displayAmounts(
-					sat: sat,
-					originalFiat: paymentInfo.metadata.originalFiat
-				)
-			)
-		}
+		common_btcTxid(onChain.txId, title: "bitcoin txid")
 	}
 	
 	@ViewBuilder
@@ -1155,9 +1036,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			keyColumn("timestamp")
 			
 		} valueColumn: {
-			
 			commonValue_date(date: failed.completedAtDate)
-		}
+			
+		} // </InfoGridRowWrapper>
 	}
 	
 	@ViewBuilder
@@ -1171,9 +1052,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			keyColumn("reason")
 			
 		} valueColumn: {
-			
 			Text(failed.reason.description)
-		}
+			
+		} // </InfoGridRowWrapper>
 	}
 	
 	@ViewBuilder
@@ -1280,6 +1161,196 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			}
 		}
 	}
+	
+	@ViewBuilder
+	func liquidityPayment_liqudityAmount(
+		_ payment: Lightning_kmpInboundLiquidityOutgoingPayment
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("liquidity amount")
+			
+		} valueColumn: {
+			
+			commonValue_amounts(
+				identifier: identifier,
+				displayAmounts: displayAmounts(
+					sat: payment._lease.amount,
+					originalFiat: paymentInfo.metadata.originalFiat
+				)
+			)
+		}
+	}
+	
+	@ViewBuilder
+	func liquidityPayment_spliceTxid(
+		_ payment: Lightning_kmpInboundLiquidityOutgoingPayment
+	) -> some View {
+		
+		common_btcTxid(payment.txId, title: "transaction")
+	}
+	
+	@ViewBuilder
+	func liquidityPayment_channelId(
+		_ payment: Lightning_kmpInboundLiquidityOutgoingPayment
+	) -> some View {
+		
+		common_channelId(payment.channelId)
+	}
+	
+	@ViewBuilder
+	func common_amountSent(
+		msat: Lightning_kmpMilliSatoshi
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("amount sent")
+			
+		} valueColumn: {
+			
+			commonValue_amounts(
+				identifier: identifier,
+				displayAmounts: displayAmounts(
+					msat: msat,
+					originalFiat: paymentInfo.metadata.originalFiat
+				)
+			)
+		}
+	}
+	
+	@ViewBuilder
+	func common_amountReceived(
+		msat: Lightning_kmpMilliSatoshi
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("amount received")
+			
+		} valueColumn: {
+			
+			commonValue_amounts(
+				identifier: identifier,
+				displayAmounts: displayAmounts(
+					msat: msat,
+					originalFiat: paymentInfo.metadata.originalFiat
+				)
+			)
+		}
+	}
+	
+	@ViewBuilder
+	func common_amountReceived(
+		sat: Bitcoin_kmpSatoshi
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("amount received")
+			
+		} valueColumn: {
+			
+			commonValue_amounts(
+				identifier: identifier,
+				displayAmounts: displayAmounts(
+					sat: sat,
+					originalFiat: paymentInfo.metadata.originalFiat
+				)
+			)
+		}
+	}
+	
+	@ViewBuilder
+	func common_channelId(
+		_ channelId: Bitcoin_kmpByteVector32
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn("channel id")
+			
+		} valueColumn: {
+			
+			let str = channelId.toHex()
+			Text(str)
+				.contextMenu {
+					Button(action: {
+						UIPasteboard.general.string = str
+					}) {
+						Text("Copy")
+					}
+				}
+		}
+	}
+	
+	@ViewBuilder
+	func common_btcTxid(
+		_ txId  : Bitcoin_kmpTxId,
+		  title : LocalizedStringKey
+	) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			keyColumn(title)
+			
+		} valueColumn: {
+			
+			let txIdStr = txId.toHex()
+			Text(txIdStr)
+				.contextMenu {
+					Button(action: {
+						UIPasteboard.general.string = txIdStr
+					}) {
+						Text("Copy")
+					}
+					Button {
+						showBlockchainExplorerOptions = true
+					} label: {
+						Text("Explore")
+					}
+				} // </contextMenu>
+				.confirmationDialog("Blockchain Explorer",
+					isPresented: $showBlockchainExplorerOptions,
+					titleVisibility: .automatic
+				) {
+					Button {
+						exploreTx(txId, website: BlockchainExplorer.WebsiteMempoolSpace())
+					} label: {
+						Text(verbatim: "Mempool.space") // no localization needed
+					}
+					Button {
+						exploreTx(txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
+					} label: {
+						Text(verbatim: "Blockstream.info") // no localization needed
+					}
+				} // </confirmationDialog>
+			
+		} // </InfoGridRowWrapper>
+	}
+	
+	// --------------------------------------------------
+	// MARK: View Builders: Values
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	func commonValue_date(date: Date) -> some View {
