@@ -2834,6 +2834,9 @@
         }
       }
     },
+    "Accept" : {
+
+    },
     "Acceptable range" : {
       "localizations" : {
         "es" : {
@@ -16890,6 +16893,7 @@
       }
     },
     "opens email app" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -19027,9 +19031,6 @@
         }
       }
     },
-    "Purchase liquidity" : {
-
-    },
     "QR code" : {
       "localizations" : {
         "es" : {
@@ -20609,6 +20610,7 @@
     },
     "Send feedback" : {
       "comment" : "HomeView: Tools menu: Label",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -22676,6 +22678,9 @@
           }
         }
       }
+    },
+    "Support" : {
+      "comment" : "HomeView: Tools menu: Label"
     },
     "Swap Fees" : {
       "comment" : "Label in SummaryInfoGrid",

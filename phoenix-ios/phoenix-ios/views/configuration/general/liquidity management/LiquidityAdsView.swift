@@ -380,7 +380,7 @@ struct LiquidityAdsView: View {
 					} else {
 						Image(systemName: "checkmark.circle")
 					}
-					Text("Purchase liquidity")
+					Text("Accept")
 				}
 			}
 			.buttonStyle(.borderless) // prevents trigger when row tapped

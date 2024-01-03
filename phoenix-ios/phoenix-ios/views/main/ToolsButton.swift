@@ -101,14 +101,14 @@ struct ToolsMenu: View {
 			}
 			
 			Button {
-				sendFeedbackButtonTapped()
+				supportButtonTapped()
 			} label: {
 				Label(
-					NSLocalizedString("Send feedback", comment: "HomeView: Tools menu: Label"),
+					NSLocalizedString("Support", comment: "HomeView: Tools menu: Label"),
 					image: "email"
 				)
 			}
-			.accessibilityHint("opens email app")
+			.accessibilityHint("opens browser")
 			
 			Button {
 				faqButtonTapped()
@@ -117,28 +117,6 @@ struct ToolsMenu: View {
 					NSLocalizedString("FAQ", comment: "HomeView: Tools menu: Label"),
 					systemImage: "safari"
 				)
-			}
-			.accessibilityHint("opens browser")
-			
-			Button {
-				twitterButtonTapped()
-			} label: {
-				Label {
-					Text(verbatim: "Twitter")
-				} icon: {
-					Image("twitter")
-				}
-			}
-			.accessibilityHint("opens browser")
-			
-			Button {
-				telegramButtonTapped()
-			} label: {
-				Label {
-					Text(verbatim: "Telegram")
-				} icon: {
-					Image("telegram")
-				}
 			}
 			.accessibilityHint("opens browser")
 			
@@ -165,40 +143,32 @@ struct ToolsMenu: View {
 		openCurrencyConverter()
 	}
 	
-	func sendFeedbackButtonTapped() {
-		log.trace("sendFeedbackButtonTapped()")
-		
-		let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-		let device = UIDevice.current
-		
-		var body = "Phoenix v\(appVersion ?? "x.y.z") "
-		body += "(\(device.systemName) \(device.systemVersion))"
-		
-		var comps = URLComponents()
-		comps.scheme = "mailto"
-		comps.path = "phoenix@acinq.co"
-		comps.queryItems = [
-			URLQueryItem(name: "subject", value: "Phoenix iOS Feedback"),
-			URLQueryItem(name: "body", value: body)
-		]
-
-		if let url = comps.url {
-			openURL(url)
-		}
-	}
+//	func sendFeedbackButtonTapped() {
+//		log.trace("sendFeedbackButtonTapped()")
+//		
+//		let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+//		let device = UIDevice.current
+//		
+//		var body = "Phoenix v\(appVersion ?? "x.y.z") "
+//		body += "(\(device.systemName) \(device.systemVersion))"
+//		
+//		var comps = URLComponents()
+//		comps.scheme = "mailto"
+//		comps.path = "phoenix@acinq.co"
+//		comps.queryItems = [
+//			URLQueryItem(name: "subject", value: "Phoenix iOS Feedback"),
+//			URLQueryItem(name: "body", value: body)
+//		]
+//
+//		if let url = comps.url {
+//			openURL(url)
+//		}
+//	}
 	
-	func telegramButtonTapped() {
-		log.trace("telegramButtonTapped()")
+	func supportButtonTapped() {
+		log.trace("supportButtonTapped")
 		
-		if let url = URL(string: "https://t.me/phoenix_wallet") {
-			openURL(url)
-		}
-	}
-	
-	func twitterButtonTapped() {
-		log.trace("twitterButtonTapped()")
-		
-		if let url = URL(string: "https://twitter.com/PhoenixWallet") {
+		if let url = URL(string: "https://phoenix.acinq.co/support") {
 			openURL(url)
 		}
 	}
