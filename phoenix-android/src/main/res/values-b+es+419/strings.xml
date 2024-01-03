@@ -225,7 +225,7 @@
     <string name="channelsview_balance">Saldo</string>
     <string name="channelsview_balance_about">El <b>saldo</b> es el monto total de los canales activos. Es lo que puedes gastar en Lightning.</string>
     <string name="channelsview_inbound">Liquidez entrante</string>
-    <string name="channelsview_inbound_about">La <b>liquidez entrante<b> es lo que los canales pueden recibir a través de Lightning sin tener que recurrir a la cadena y pagar comisiones.</string>
+    <string name="channelsview_inbound_about">La <b>liquidez entrante</b> es lo que los canales pueden recibir a través de Lightning sin tener que recurrir a la cadena y pagar comisiones.</string>
     <string name="channelsview_loading_channels">Cargando datos de canales…</string>
     <string name="channelsview_no_channels">Aún no tienes canales.\n\nSe creará automáticamente un nuevo canal de pago cuando sea necesario.</string>
 
