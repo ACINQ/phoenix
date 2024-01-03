@@ -57,21 +57,18 @@ enum class CloudDataVersion(val value: Int) {
 @Serializable
 @OptIn(ExperimentalSerializationApi::class)
 data class CloudData(
-    @ByteString
     @SerialName("i")
     val incoming: IncomingPaymentWrapper?,
-    @ByteString
     @SerialName("o")
     val outgoing: LightningOutgoingPaymentWrapper?,
-    @ByteString
     @SerialName("so")
     val spliceOutgoing: SpliceOutgoingPaymentWrapper? = null,
-    @ByteString
     @SerialName("cc")
     val channelClose: ChannelClosePaymentWrapper? = null,
-    @ByteString
     @SerialName("sc")
     val spliceCpfp: SpliceCpfpPaymentWrapper? = null,
+    @SerialName("il")
+    val inboundLiquidity: InboundLiquidityPaymentWrapper? = null,
     @SerialName("v")
     val version: Int,
     @ByteString
@@ -84,6 +81,7 @@ data class CloudData(
         spliceOutgoing = null,
         channelClose = null,
         spliceCpfp = null,
+        inboundLiquidity = null,
         version = CloudDataVersion.V0.value,
         padding = ByteArray(size = 0)
     )
@@ -94,6 +92,7 @@ data class CloudData(
         spliceOutgoing = if (outgoing is SpliceOutgoingPayment) SpliceOutgoingPaymentWrapper(outgoing) else null,
         channelClose = if (outgoing is ChannelCloseOutgoingPayment) ChannelClosePaymentWrapper(outgoing) else null,
         spliceCpfp = if (outgoing is SpliceCpfpOutgoingPayment) SpliceCpfpPaymentWrapper(outgoing) else null,
+        inboundLiquidity = if (outgoing is InboundLiquidityOutgoingPayment) InboundLiquidityPaymentWrapper(outgoing) else null,
         version = CloudDataVersion.V0.value,
         padding = ByteArray(size = 0)
     )
@@ -113,6 +112,7 @@ data class CloudData(
         spliceOutgoing != null -> spliceOutgoing.unwrap()
         channelClose != null -> channelClose.unwrap()
         spliceCpfp != null -> spliceCpfp.unwrap()
+        inboundLiquidity != null -> inboundLiquidity.unwrap()
         else -> null
     }
 
