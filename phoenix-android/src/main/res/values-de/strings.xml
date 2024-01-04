@@ -640,8 +640,7 @@
     <string name="mempool_fastest">≈ Nächster Block</string>
     <string name="mempool_halfhour">≈ 30 Minuten</string>
     <string name="mempool_hour">≈ 1 Stunde</string>
-    <string name="mempool_eco">Mehr als 1 Stunde</string>
-    <string name="mempool_slow">Keine Priorität</string>
+    <string name="mempool_slow">Niedrige Gebührenrate</string>
 
     <!-- splice errors -->
 
