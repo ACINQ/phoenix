@@ -127,7 +127,6 @@
     <string name="scan_error_already_paid">Tato platba již byla uhrazena.</string>
     <string name="scan_error_invalid_chain">Tato platba nepoužívá stejný blockchain jako vaše peněženka.</string>
     <string name="scan_error_lnurl_invalid">Tento LNURL odkaz se nepodařilo zpracovat. Ujistěte se, že je platný.</string>
-    <string name="scan_error_lnurl_service_error">Služba LNURL vrátila chybu.</string>
     <string name="scan_error_lnurl_unsupported">Tento typ LNURL zatím není podporován.</string>
     <string name="scan_error_invalid_generic">Tato data používají neznámý formát a nelze je zpracovat.</string>
 
@@ -352,5 +351,10 @@
     <string name="cpfp_title">Zrychlení mých transakcí.</string>
     <string name="cpfp_instructions">Všechny vaše nepotvrzené transakce mohou využít vyšší poplatek, aby těžaři upřednostnili vaši platbu.</string>
     <string name="cpfp_splice_error_actual_below_user">Tento poplatek je nižší než který již používají vaše nepotvrzené transakce. Zvolte vyšší poplatek.</string>
+
+    <!-- Lightning payment errors -->
+
+    <string name="outgoing_finalfailure_alreadypaid">Tato platba již byla uhrazena.</string>
+    <string name="outgoing_finalfailure_noroutefound">Příjemce není dosažitelný nebo nemá dostatečnou příchozí likviditu.</string>
 
 </resources>

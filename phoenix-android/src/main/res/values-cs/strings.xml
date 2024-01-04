@@ -47,20 +47,8 @@
 
     <string name="authprompt_title">Pro pokračování odemkněte</string>
 
-    <!-- utils: placeholders -->
-
-    <string name="lipsum_short" translatable="false">Etiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas.</string>
-    <string name="lipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut facilisis lectus. Integer massa tellus, suscipit sit amet felis vitae, blandit consectetur dolor. Fusce volutpat id magna id vestibulum. Integer a erat lacinia, placerat risus a, fermentum justo. Etiam euismod tincidunt dolor vel posuere. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur non euismod dui. Morbi enim dui, blandit sed erat sit amet, porta pulvinar odio. Cras metus felis, vestibulum eu consequat vitae, consectetur quis nulla. Fusce vulputate, elit et luctus sodales, metus metus elementum sem, eget commodo nunc nunc in ex. Sed aliquam eros nibh, ac volutpat turpis accumsan vitae. Cras suscipit ipsum accumsan aliquam interdum.</string>
-    <string name="lipsum_long" translatable="false">
-    Praesent ut nisi fringilla, pharetra dui sit amet, ornare urna. Donec at ultrices nunc. Fusce gravida metus vitae viverra egestas. In hac habitasse platea dictumst. Proin consequat fringilla felis, vehicula vehicula turpis ullamcorper nec. Pellentesque urna massa, blandit cursus metus et, ultrices consectetur neque. Suspendisse hendrerit venenatis mi ac tincidunt. Morbi hendrerit orci vitae erat luctus, at dignissim turpis accumsan. Integer elementum est eu tincidunt ullamcorper. Phasellus varius porttitor vestibulum. Maecenas faucibus ullamcorper diam, ac commodo dui fringilla sed. Aliquam arcu velit, porta eu sem vel, rhoncus bibendum dolor.
-    \nEtiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas. Nam tempor euismod erat eget scelerisque. Integer sit amet laoreet erat. Duis enim turpis, vehicula eu justo vitae, dapibus auctor mauris. Aenean euismod eleifend dui a aliquet. Aliquam eleifend malesuada tortor ornare volutpat. In augue tortor, gravida et volutpat elementum, iaculis non sapien. Etiam dolor nisi, pulvinar a rhoncus ac, eleifend ac libero. In lobortis enim vitae ultricies viverra. Maecenas accumsan elementum sem, nec pharetra urna maximus maximus.
-    \nIn sit amet volutpat ligula, ac pretium dolor. Phasellus posuere rhoncus magna quis fermentum. Ut risus turpis, fermentum facilisis mollis in, porttitor eget erat. Donec luctus egestas ligula et interdum. Phasellus vitae hendrerit sem, at vehicula nulla. Curabitur mollis risus quis metus euismod ullamcorper. Nam eu aliquet mi. Duis id urna ac urna iaculis blandit. Morbi eros dui, congue a posuere efficitur, imperdiet a nisi. Morbi non orci non lorem aliquet tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pulvinar, mi vitae sollicitudin dignissim, nunc urna facilisis massa, ut scelerisque mi felis in sapien.
-    \nNam felis felix, tristique commodo odio eget, imperdiet viverra erat. Donec venenatis magna pulvinar, finibus leo id, gravida augue. Integer ante leo, bibendum ac nibh quis, auctor commodo quam. Sed luctus vitae quam vel condimentum. Mauris eu rhoncus mauris. Fusce enim diam, consequat a odio sit amet, accumsan cursus nisl. Etiam lectus nunc, lacinia id purus sit amet, pulvinar auctor odio. Maecenas vitae arcu sit amet est cursus maximus. Nullam ac sapien non nibh tempor rhoncus. Mauris dignissim cursus libero quis egestas.
-    </string>
-
     <!-- Startup -->
 
-    <string name="startup_wait_prefs">Inicializování…</string>
     <string name="startup_binding_service">Připojování služby…</string>
     <string name="startup_wait">Připravování peněženky…</string>
     <string name="startup_wait_legacy_check">Kontrola starší peněženky…</string>
@@ -148,19 +136,16 @@
     <string name="send_spliceout_prepare_button">Připravit transakci</string>
     <string name="send_spliceout_prepare_in_progress">Připravování transakce…</string>
     <string name="send_spliceout_execute_in_progress">Spouštění splicu…</string>
-    <string name="send_spliceout_complete_recap_amount">Částka</string>
     <string name="send_spliceout_complete_recap_fee">Poplatek těžařovi</string>
     <string name="send_spliceout_complete_recap_fee_details">Používá efektivní velikost poplatku %1$s sat/vbyte.</string>
     <string name="send_spliceout_complete_recap_total">Celkem</string>
 
     <!-- scan -->
 
-    <string name="scan_reading">Čtení skenu…</string>
     <string name="scan_manual_input_button">Ruční vstup</string>
     <string name="scan_paste_button">Vložit data ze schránky</string>
     <string name="scan_request_camera_access">Klepnutím udělíte povolení k fotoaparátu</string>
     <string name="scan_request_camera_access_denied">Povolení k použití fotoaparátu bylo zamítnuto</string>
-    <string name="scan_instructions">Naskenujte QR kód obsahující platební požadavek, Bitcoinovou adresu nebo LNURL</string>
 
     <string name="scan_lnurl_fetching">Získávání dat ze služby…</string>
 
@@ -174,10 +159,6 @@
     <string name="utils_converted_amount">≈ %1$s</string>
     <string name="utils_unknown_amount" translatable="false">!?</string>
     <string name="utils_no_conversion">Směnný kurz BTC není k dispozici</string>
-    <string name="utils_amount_hint">Částka</string>
-
-    <string name="utils_proceed">Pokračovat</string>
-    <string name="utils_cancel">Zrušit</string>
     <string name="utils_date_just_now">Právě teď</string>
     <string name="utils_unknown">N/A</string>
     <string name="utils_loading_data">Načítání dat…</string>
@@ -199,8 +180,6 @@
     <string name="btn_confirm">Potvrdit</string>
     <string name="btn_cancel">Zrušit</string>
     <string name="btn_close">Zavřít</string>
-    <string name="btn_pause_connecting">Připojování k peeru…</string>
-    <string name="btn_pause_connecting_electrum">Připojování k electrum…</string>
 
     <!-- mutual close -->
 
@@ -209,13 +188,11 @@
     <string name="mutualclose_checking_balance">Kontroluji zůstatek…</string>
     <string name="mutualclose_balance">Zůstatek: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">Peněženka nemá žádné kanály, které by bylo možné uzavřít.</string>
-    <string name="mutualclose_input_placeholder">Zadejte zde Bitcoinovou adresu</string>
     <string name="mutualclose_button">Vyprázdnit peněženku</string>
     <string name="mutualclose_error_chain_mismatch">Tato adresa používá jiný blockchain</string>
     <string name="mutualclose_error_chain_reqparams">Tato adresa používá nepodporované funkce</string>
     <string name="mutualclose_error_chain_generic">Tato adresa není podporována</string>
     <string name="mutualclose_done">Počet uzavřených kanálů: %1$d. Podrobnosti najdete na domovské obrazovce.</string>
-    <string name="mutualclose_inprogress">Počkejte prosím…</string>
 
     <string name="forceclose_no_channels">Žádné kanály k uzavření.</string>
 
@@ -240,7 +217,6 @@
     <string name="channeldetails_commitments">Aktivní závazky</string>
     <string name="channeldetails_inactive_commitments">Neaktivní závazky</string>
     <string name="channeldetails_commitment_funding_tx_id">Financující tx:</string>
-    <string name="channeldetails_commitment_funding_tx_index">Index tx:</string>
     <string name="channeldetails_commitment_balance">Zůstatek:</string>
     <string name="channeldetails_commitment_funding_capacity">Kapacita:</string>
     <string name="channeldetails_commitment_linked_payments">Vyvoláno:</string>
@@ -257,7 +233,6 @@
 
     <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">Pomocí tlačítek Přijmout a Odeslat v dolní části této obrazovky můžete začít!</string>
-    <string name="home__payments_header">Nedávné platby</string>
     <string name="home__payments_more_button">Ukázat všechny platby…</string>
     <string name="home__connection__electrum_late">Electrum late</string>
     <string name="home__connection__bad_cert">Electrum certifikát</string>
@@ -291,7 +266,6 @@
 
     <!-- payment details -->
 
-    <string name="paymentdetails_title">Podrobnosti platby</string>
     <string name="paymentdetails_loading">Načítání podrobností platby…</string>
     <string name="paymentdetails_error">Nepodařilo se najít podrobnosti o platbě</string>
 
@@ -318,19 +292,14 @@
     <string name="paymentdetails_lnurlpay_action_url_button">Otevřít odkaz</string>
     <string name="paymentdetails_lnurlpay_action_aes_label">Zpráva</string>
     <string name="paymentdetails_lnurlpay_action_aes_decrypting">Dešifrování zprávy…</string>
-    <string name="paymentdetails_lnurlpay_action_aes_not_paid">Pro rozšifrování zprávy musí být platba zaplacena.</string>
 
     <string name="paymentdetails_desc_label">Popis</string>
-    <string name="paymentdetails_desc_custom_title">Přidat poznámku</string>
-    <string name="paymentdetails_desc_custom_info">K této platbě můžete přidat poznámku.</string>
     <string name="paymentdetails_destination_label">Odesláno</string>
     <string name="paymentdetails_destination_cpfp_value">Bitcoinoví těžaři</string>
     <string name="paymentdetails_fees_label">Poplatky</string>
     <string name="paymentdetails_error_label">Chyba</string>
     <string name="paymentdetails_no_description">Žádný popis</string>
     <string name="paymentdetails_info_uniclose">K této platbě došlo po konfliktu v kanálu.</string>
-
-    <string name="paymentdetails_onchain_confirmation">Potvrzení</string>
 
     <string name="paymentdetails_desc_splice_out">On-Chain platba</string>
     <string name="paymentdetails_desc_closing_channel">Zavírání kanálu</string>
@@ -347,11 +316,6 @@
     <string name="paymentdetails_edit_desc_button">Upravit poznámku</string>
     <string name="paymentdetails_details_button">Technické detaily</string>
 
-    <string name="paymentdetails_failure_recipient_unknown_or_liquidity">Příjemce není dosažitelný nebo nemá dostatečnou příchozí likviditu.</string>
-    <string name="paymentdetails_failure_invalid_details">Příjemce odmítl platbu.\nK tomu obvykle dochází, pokud byla faktura již uhrazena nebo pokud obsahuje datum platnosti a vy jste se pokusili odeslat platbu po jejím vypršení.</string>
-    <string name="paymentdetails_failure_trampoline_fees">Při aktuálním nastavení poplatků nebyla nalezena žádná trasa. Zkuste to s vyššími poplatky.</string>
-    <string name="paymentdetails_failure_trampoline_fees_action">Upravit mé nastavení poplatků</string>
-
     <!-- payment details: technicals data -->
 
     <string name="paymentdetails_technical_title">Technické detaily</string>
@@ -365,19 +329,12 @@
     <string name="paymentdetails_swapout">Swap-out na Bitcoinovou adresu</string>
     <string name="paymentdetails_keysend">Keysend (spontánní platba)</string>
     <string name="paymentdetails_swapin_address_label">Adresa vkladu</string>
-    <string name="paymentdetails_swapout_address_label">Bitcoinová adresa</string>
-
-    <string name="paymentdetails_splice_cpfp_transaction_label">Zrychlit transakci</string>
+    <string name="paymentdetails_bitcoin_address_label">Bitcoinová adresa</string>
 
     <string name="paymentdetails_splice_out_channel_label">Spliced kanál</string>
-    <string name="paymentdetails_splice_out_address_label">Splice adresa</string>
-    <string name="paymentdetails_splice_out_tx_label">Splice transakce</string>
     <string name="paymentdetails_dualswapin_tx_label">Transakce</string>
     <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
 
-    <string name="paymentdetails_closing_channel_label">Uzavření kanálu</string>
-    <string name="paymentdetails_closing_address_label">Konečná adresa</string>
-    <string name="paymentdetails_closing_tx_label">Uzavírací transakce</string>
     <string name="paymentdetails_closing_type_label">Typ uzavření</string>
     <string name="paymentdetails_closing_type_mutual">Vzájemný</string>
     <string name="paymentdetails_closing_type_local">Lokální</string>
@@ -400,8 +357,6 @@
     <string name="paymentdetails_parts_label">Části platby (%1$d)</string>
     <string name="paymentdetails_part_label">Část</string>
     <string name="paymentdetails_part_hops_label">Skoky</string>
-    <string name="paymentdetails_part_transaction_label">ID transakce</string>
-    <string name="paymentdetails_part_claimed_label">Přijato</string>
 
     <string name="paymentdetails_received_with_label">Přijato přes</string>
     <string name="paymentdetails_received_with_splicein">Splice-in (přidání do existujícího kanálu)</string>
@@ -439,9 +394,6 @@
     <string name="accessctrl_auth_error_too_old">Tato verze systému Android není kompatibilní.</string>
     <string name="accessctrl_auth_error_unhandled">Neošetřená chyba: %1$d</string>
 
-    <string name="accessctrl_error_cipher">Nelze získat šifru: %1$s</string>
-    <string name="accessctrl_error_auth">Ověření selhalo.</string>
-
     <string name="accessctrl_screen_lock_switch">Zámek obrazovky</string>
     <string name="accessctrl_screen_lock_switch_desc">Zamknout přístup k aplikaci pomocí zámku obrazoky/otisku prstu</string>
 
@@ -473,11 +425,8 @@
 
     <!-- lnurl-withdraw -->
 
-    <string name="lnurl_withdraw_amount_label">Částka k obdržení</string>
-    <string name="lnurl_withdraw_description_label">Detaily</string>
     <string name="lnurl_withdraw_confirm_button">Vybrat</string>
     <string name="lnurl_withdraw_wait">Získávání prostředků…</string>
-    <string name="lnurl_withdraw_amount_invalid">Částka je neplatná.</string>
     <string name="lnurl_withdraw_amount_below_min">Částka musí být alespoň %1$s.</string>
     <string name="lnurl_withdraw_amount_above_max">Částka nemůže přesáhnout %1$s.</string>
     <string name="lnurl_withdraw_error_header">Výběr selhal:</string>
@@ -498,14 +447,9 @@
     <string name="lnurl_pay_comment_instructions">K platbě můžete připojit zprávu. Tato zpráva bude odeslána příjemci.</string>
     <string name="lnurl_pay_pay_button">Zaplatit</string>
     <string name="lnurl_pay_requesting_invoice">Získávání faktury…</string>
-    <string name="lnurl_pay_checking_invoice">Kontrola faktury…</string>
-    <string name="lnurl_pay_sending_payment">Posílání platby…</string>
 
-    <string name="lnurl_pay_amount_empty">Částka nesmí být prázdná</string>
     <string name="lnurl_pay_amount_below_min">Částka musí být alespoň %1$s</string>
     <string name="lnurl_pay_amount_above_max">Částka musí být nejvýše %1$s</string>
-    <string name="lnurl_pay_amount_above_balance">Částka přesahuje váš zůstatek</string>
-    <string name="lnurl_pay_amount_invalid">Neplatná částka</string>
 
     <string name="lnurl_pay_error_header">Platba selhala.</string> 
     <string name="lnurl_pay_error_invalid_chain">Faktura vrácená <b>%1$s</b> nepoužívá stený blockchain jako vaše peněženka.</string>
@@ -529,14 +473,12 @@
     <string name="prefs_display_theme_dark_label">Tmavý motiv</string>
     <string name="prefs_display_theme_light_label">Světlý motiv</string>
     <string name="prefs_display_theme_system_label">Podle systému</string>
-    <string name="prefs_display_explorer_label">On-Chain průzkumník</string>
 
     <!-- settings: electrum server -->
 
     <string name="electrum_title">Electrum server</string>
     <string name="electrum_about">K zabezpečení vašich platebních kanálů Phoenix monitoruje Bitcoinový blockchain skrz Electrum servery.\n\nVe výchozím nastavení se používají náhodné servery. Phoenix můžete také nakonfigurovat tak, aby se připojoval pouze k vašemu vlastnímu serveru.</string>
     <string name="electrum_block_height_label">Výška bloku</string>
-    <string name="electrum_connection_label">Server</string>
 
     <string name="electrum_connection_closed_with_random">Odpojeno od Electrum</string>
     <string name="electrum_connection_closed_with_custom">Odpojeno od %1$s</string>
@@ -568,10 +510,7 @@
     <string name="tor_settings_title">Tor</string>
     <string name="tor_settings_unknown">Kontrola nastavneí…</string>
     <string name="tor_settings_enabled">Tor je zapnutý</string>
-    <string name="tor_settings_enabled_description">Připojení k Lightning Network a Electrum serverům bude chráněno.</string>
     <string name="tor_settings_disabled">Tor je vypnutý</string>
-    <string name="tor_settings_confirm_disable_title">Opravdu chcete vypnout Tor?</string>
-    <string name="tor_settings_confirm_enable_title">Opravdu chcete zapnout Tor? Pamatujte, že pro nejlepší výsledek je doporučeno začít s novou peněženkou.</string>
     <string name="tor_settings_state_unknown">Tor proxy server ještě nebyl spuštěn.</string>
     <string name="tor_settings_state_closed">Tor proxy server je vypnutý.\nPočkejte prosím a zkontrolujte své internetové připojení.</string>
     <string name="tor_settings_state_starting">Zapínání Tor proxy serveru…</string>
@@ -597,7 +536,6 @@
     <!-- settings: about -->
 
     <string name="about_title">O Phoenixu</string>
-    <string name="about_general_title">O aplikaci</string>
     <string name="about_version">Verze Phoenix: <b>%1$s</b></string>
     <string name="about_faq_link">máte otázky? Podívejte se na časté dotazy</string>
     <string name="about_support_link">Podpora</string>
@@ -609,7 +547,6 @@
     <string name="paymentsettings_title">Nastavení &amp; poplatky</string>
 
     <string name="paymentsettings_category_incoming">Příchozí platby</string>
-    <string name="paymentsettings_category_outgoing">Odchozí platby</string>
     <string name="paymentsettings_category_lnurl">LNURL</string>
 
     <string name="paymentsettings_defaultdesc_title">Popis faktury</string>
@@ -683,8 +620,6 @@
     <string name="walletinfo_lightning">Lightning</string>
     <string name="walletinfo_nodeid">ID Uzlu</string>
     <string name="walletinfo_legacy_nodeid">ID Legacy uzlu</string>
-    <string name="walletinfo_offchain_balance">Zůstatek</string>
-    <string name="walletinfo_offchain_channels">Platební kanály</string>
 
     <string name="walletinfo_onchain_final">Konečná peněženka</string>
 

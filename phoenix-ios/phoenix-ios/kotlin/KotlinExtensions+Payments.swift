@@ -99,6 +99,13 @@ extension WalletPaymentInfo {
 				
 			} else if let _ = outgoingPayment as? Lightning_kmpSpliceCpfpOutgoingPayment {
 				return NSLocalizedString("Bump fees", comment: "Payment description for splice CPFP")
+				
+			} else if let il = outgoingPayment as? Lightning_kmpInboundLiquidityOutgoingPayment {
+				let amount = Utils.formatBitcoin(sat: il._lease.amount, bitcoinUnit: .sat)
+				return NSLocalizedString(
+					"+\(amount.string) inbound liquidity",
+					comment: "Payment description for inbound liquidity"
+				)
 			}
 		}
 	

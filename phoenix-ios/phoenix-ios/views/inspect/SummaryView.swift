@@ -176,7 +176,10 @@ struct SummaryView: View {
 				.accessibilityHidden(true)
 			VStack {
 				Group {
-					if payment is Lightning_kmpOutgoingPayment {
+					if payment is Lightning_kmpInboundLiquidityOutgoingPayment {
+						Text("Liquidity Added")
+					}
+					else if payment is Lightning_kmpOutgoingPayment {
 						Text("SENT")
 							.accessibilityLabel("Payment sent")
 					} else {
@@ -184,7 +187,8 @@ struct SummaryView: View {
 							.accessibilityLabel("Payment received")
 					}
 				}
-				.font(Font.title2.bold())
+				.textCase(.uppercase)
+				.font(.title2.bold())
 				.padding(.bottom, 2)
 				
 				if let onChainPayment = payment as? Lightning_kmpOnChainOutgoingPayment {
@@ -891,7 +895,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	
 	@State var popoverPresent_standardFees = false
 	@State var popoverPresent_minerFees = false
-	@State var popoverPresent_swapFees = false
+	@State var popoverPresent_serviceFees = false
 	
 	@Environment(\.openURL) var openURL
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
@@ -914,30 +918,10 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			paymentTypeRow()
 			channelClosingRow()
 			
-			if let standardFees = paymentInfo.payment.standardFees() {
-				paymentFeesRow(
-					msat: standardFees.0,
-					title: standardFees.1,
-					explanation: standardFees.2,
-					binding: $popoverPresent_standardFees
-				)
-			}
-			if let minerFees = paymentInfo.payment.minerFees() {
-				paymentFeesRow(
-					msat: minerFees.0,
-					title: minerFees.1,
-					explanation: minerFees.2,
-					binding: $popoverPresent_minerFees
-				)
-			}
-			if let swapOutFees = paymentInfo.payment.swapOutFees() {
-				paymentFeesRow(
-					msat: swapOutFees.0,
-					title: swapOutFees.1,
-					explanation: swapOutFees.2,
-					binding: $popoverPresent_swapFees
-				)
-			}
+			paymentFeesRow_StandardFees()
+			paymentFeesRow_MinerFees()
+			paymentFeesRow_ServiceFees()
+			paymentDurationRow()
 			
 			paymentErrorRow()
 		}
@@ -1235,6 +1219,45 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
+	func paymentFeesRow_StandardFees() -> some View {
+		
+		if let standardFees = paymentInfo.payment.standardFees() {
+			paymentFeesRow(
+				msat: standardFees.0,
+				title: standardFees.1,
+				explanation: standardFees.2,
+				binding: $popoverPresent_standardFees
+			)
+		}
+	}
+	
+	@ViewBuilder
+	func paymentFeesRow_MinerFees() -> some View {
+		
+		if let minerFees = paymentInfo.payment.minerFees() {
+			paymentFeesRow(
+				msat: minerFees.0,
+				title: minerFees.1,
+				explanation: minerFees.2,
+				binding: $popoverPresent_minerFees
+			)
+		}
+	}
+	
+	@ViewBuilder
+	func paymentFeesRow_ServiceFees() -> some View {
+		
+		if let serviceFees = paymentInfo.payment.serviceFees() {
+			paymentFeesRow(
+				msat: serviceFees.0,
+				title: serviceFees.1,
+				explanation: serviceFees.2,
+				binding: $popoverPresent_serviceFees
+			)
+		}
+	}
+	
+	@ViewBuilder
 	func paymentFeesRow(
 		msat: Int64,
 		title: String,
@@ -1308,6 +1331,30 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			} // </HStack>
 			
 		} // </InfoGridRow>
+	}
+	
+	@ViewBuilder
+	func paymentDurationRow() -> some View {
+		let identifier: String = #function
+		
+		if let _ = paymentInfo.payment as? Lightning_kmpInboundLiquidityOutgoingPayment {
+			
+			InfoGridRow(
+				identifier: identifier,
+				vAlignment: .firstTextBaseline,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
+			) {
+				
+				keyColumn("Duration")
+				
+			} valueColumn: {
+				
+				Text("1 year")
+				
+			} // </InfoGridRow>
+		}
 	}
 	
 	@ViewBuilder

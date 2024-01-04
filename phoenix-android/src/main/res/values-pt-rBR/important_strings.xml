@@ -127,7 +127,6 @@
     <string name="scan_error_already_paid">Este pagamento já foi pago.</string>
     <string name="scan_error_invalid_chain">Este pagamento não usa o mesmo blockchain que sua carteira.</string>
     <string name="scan_error_lnurl_invalid">Falha ao processar esse link LNURL. Verifique se ele é válido.</string>
-    <string name="scan_error_lnurl_service_error">O serviço LNURL retornou um erro.</string>
     <string name="scan_error_lnurl_unsupported">Este tipo de LNURL ainda não é suportado.</string>
     <string name="scan_error_invalid_generic">Esses dados usam um formato desconhecido e não podem ser processados.</string>
 
@@ -353,5 +352,10 @@
     <string name="cpfp_title">Acelerar minhas transações.</string>
     <string name="cpfp_instructions">Você pode fazer com que todas as suas transações não confirmadas usem uma taxa efetiva mais alta para incentivar os mineradores a favorecer seus pagamentos.</string>
     <string name="cpfp_splice_error_actual_below_user">Essa taxa está abaixo da taxa que suas transações não confirmadas já estão usando. Use uma taxa mais alta para acelerar esses pagamentos.</string>
+
+    <!-- Lightning payment errors -->
+
+    <string name="outgoing_finalfailure_alreadypaid">Este pagamento já foi pago.</string>
+    <string name="outgoing_finalfailure_noroutefound">O destinatário não está contactável ou não tem liquidez de entrada suficiente.</string>
 
 </resources>

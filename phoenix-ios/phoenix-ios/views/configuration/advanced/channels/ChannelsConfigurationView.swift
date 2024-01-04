@@ -1,5 +1,4 @@
 import SwiftUI
-import SegmentedPicker
 import PhoenixShared
 import os.log
 
@@ -16,12 +15,30 @@ fileprivate var log = Logger(OSLog.disabled)
 struct ChannelsConfigurationView: View {
 	
 	@State var sharing: String? = nil
-	@State var showChannelsRemoteBalance = Prefs.shared.showChannelsRemoteBalance
-	
-	@StateObject var toast = Toast()
 	
 	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	@State var channels: [LocalChannelInfo] = []
+	
+	@State var importChannelsOpen = false
+	
+	enum CapacityHeight: Preference {}
+	let capacityHeightReader = GeometryPreferenceReader(
+		key: AppendValue<CapacityHeight>.self,
+		value: { [$0.size.height] }
+	)
+	@State var capacityHeight: CGFloat? = nil
+	
+	@StateObject var toast = Toast()
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
+	@EnvironmentObject var popoverState: PopoverState
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
 	
 	@ViewBuilder
 	var body: some View {
@@ -32,86 +49,12 @@ struct ChannelsConfigurationView: View {
 			.onReceive(channelsPublisher) {
 				channels = $0
 			}
-			.onDisappear {
-				onDisappear()
-			}
 			.navigationTitle(NSLocalizedString("Payment channels", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
 	func content() -> some View {
-		
-		if (channels.isEmpty) {
-			NoChannelsView(
-				channels: $channels,
-				sharing: $sharing,
-				showChannelsRemoteBalance: $showChannelsRemoteBalance,
-				toast: toast
-			)
-		} else {
-			ChannelsView(
-				channels: $channels,
-				sharing: $sharing,
-				showChannelsRemoteBalance: $showChannelsRemoteBalance,
-				toast: toast
-			)
-		}
-	}
-	
-	func onDisappear() {
-		log.trace("onDisappear()")
-		
-		Prefs.shared.showChannelsRemoteBalance = showChannelsRemoteBalance
-	}
-}
-
-fileprivate struct NoChannelsView : View {
-	
-	@Binding var channels: [LocalChannelInfo]
-	@Binding var sharing: String?
-	@Binding var showChannelsRemoteBalance: Bool
-	@ObservedObject var toast: Toast
-	
-	var body: some View {
-		
-		VStack {
-			
-			List {
-				Section {
-					VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-						Text("You don't have any payment channels.")
-							.multilineTextAlignment(.center)
-					}
-				}
-			}
-			.listStyle(.insetGrouped)
-			
-			Spacer(minLength: 0)
-			
-			FooterView(
-				showChannelsRemoteBalance: $showChannelsRemoteBalance,
-				toast: toast
-			)
-		}
-	}
-}
-
-fileprivate struct ChannelsView : View {
-	
-	@Binding var channels: [LocalChannelInfo]
-	@Binding var sharing: String?
-	@Binding var showChannelsRemoteBalance: Bool
-	@ObservedObject var toast: Toast
-	
-	@State var importChannelsOpen = false
-	
-	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	
-	@EnvironmentObject var popoverState: PopoverState
-	@EnvironmentObject var deepLinkManager: DeepLinkManager
-	
-	var body: some View {
 		
 		ZStack {
 			if #unavailable(iOS 16.0) {
@@ -125,26 +68,16 @@ fileprivate struct ChannelsView : View {
 				
 			} // else: uses.navigationStackDestination()
 			
-			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				
-				Color.primaryBackground.frame(height: 25)
-				
-				ScrollView {
-					LazyVStack(pinnedViews: [.sectionHeaders]) {
-						Section(header: header()) {
-							ForEach(channels, id: \.channelId) { channel in
-								row(channel: channel)
-							}
-						}
-					}
+			List {
+				if channels.isEmpty {
+					section_noChannels()
+				} else {
+					section_balance()
+					section_channels()
 				}
-				
-				FooterView(
-					showChannelsRemoteBalance: $showChannelsRemoteBalance,
-					toast: toast
-				)
-				
-			} // </VStack>
+			}
+			.listStyle(.insetGrouped)
+			.listBackgroundColor(.primaryBackground)
 			
 			toast.view()
 			
@@ -156,8 +89,121 @@ fileprivate struct ChannelsView : View {
 	}
 	
 	@ViewBuilder
-	func importChannelsView() -> some View {
-		ImportChannelsView()
+	func section_noChannels() -> some View {
+		
+		Section {
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				Text("You don't have any payment channels.")
+					.multilineTextAlignment(.center)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func section_balance() -> some View {
+		
+		Section {
+			VStack(alignment: HorizontalAlignment.center, spacing: 4) {
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 4) {
+					Image(systemName: "square.fill")
+						.font(.subheadline)
+						.imageScale(.small)
+						.foregroundColor(localBalanceColor())
+					Text("Balance")
+					Spacer(minLength: 0)
+					Text("Inbound Liquidity")
+					Image(systemName: "square.fill")
+						.imageScale(.small)
+						.font(.subheadline)
+						.foregroundColor(remoteBalanceColor())
+				}
+				
+				let (localMsats, remoteMsats) = localAndRemoteMsats()
+				
+				ProgressView(value: Double(localMsats), total: Double(localMsats + remoteMsats))
+					.tint(localBalanceColor())
+					.background(remoteBalanceColor())
+					.padding(.vertical, 4)
+				
+				let localBitcoin = Utils.formatBitcoin(
+					msat: localMsats,
+					bitcoinUnit: .sat,
+					policy: .showMsatsIfZeroSats
+				)
+				let remoteBitcoin = Utils.formatBitcoin(
+					msat: remoteMsats,
+					bitcoinUnit: .sat,
+					policy: .showMsatsIfZeroSats
+				)
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 2) {
+					Text(localBitcoin.string)
+					Spacer(minLength: 0)
+					Text(remoteBitcoin.string)
+				}
+				.font(.callout)
+				.foregroundColor(.primary.opacity(0.8))
+				
+				let localFiat = Utils.formatFiat(currencyPrefs, msat: localMsats)
+				let remoteFiat = Utils.formatFiat(currencyPrefs, msat: remoteMsats)
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 2) {
+					Text("≈\(localFiat.string)")
+					Spacer(minLength: 0)
+					Text("≈\(remoteFiat.string)")
+				}
+				.font(.callout)
+				.foregroundColor(.primary.opacity(0.6))
+			}
+			.padding(.vertical, 4)
+			
+		} header: {
+			Text("Balance")
+		}
+	}
+	
+	@ViewBuilder
+	func section_channels() -> some View {
+		
+		Section {
+			ForEach(channels, id: \.channelId) { channel in
+				row_channel(channel)
+			}
+			
+		} header: {
+			Text("Payment Channels")
+		}
+	}
+	
+	@ViewBuilder
+	func row_channel(_ channel: LocalChannelInfo) -> some View {
+		
+		Button {
+			showChannelInfoPopover(channel)
+		} label: {
+		
+			HStack(alignment: VerticalAlignment.center, spacing: 8) {
+				Image("ic_bullet")
+					.resizable()
+					.aspectRatio(contentMode: .fit)
+					.frame(width: 10, height: 10)
+					.foregroundColor(channel.isUsable ? .appPositive : .appNegative)
+			
+				Text(channel.stateName)
+					.foregroundColor(Color.primary)
+				
+				Spacer()
+				
+				if let tuple = channelBalances(channel) {
+					Text(verbatim: "\(tuple.0.digits) / \(tuple.1.digits) sat")
+						.foregroundColor(Color.primary)
+				}
+			} // </HStack>
+		//	.padding([.leading], 10)
+			.padding([.top, .bottom], 8)
+		//	.padding(.trailing)
+		} // </Button>
 	}
 	
 	@ViewBuilder
@@ -173,22 +219,24 @@ fileprivate struct ChannelsView : View {
 					Image(systemName: "square.and.arrow.down")
 				}
 			}
-			Button {
-				closeAllChannels()
-			} label: {
-				Label {
-					Text(verbatim: "Close all")
-				} icon: {
-					Image(systemName: "xmark.circle")
+			if !channels.isEmpty {
+				Button {
+					closeAllChannels()
+				} label: {
+					Label {
+						Text(verbatim: "Close all")
+					} icon: {
+						Image(systemName: "xmark.circle")
+					}
 				}
-			}
-			Button(role: .destructive) {
-				forceCloseAllChannels()
-			} label: {
-				Label {
-					Text(verbatim: "Force close all")
-				} icon: {
-					Image(systemName: "exclamationmark.triangle")
+				Button(role: .destructive) {
+					forceCloseAllChannels()
+				} label: {
+					Label {
+						Text(verbatim: "Force close all")
+					} icon: {
+						Image(systemName: "exclamationmark.triangle")
+					}
 				}
 			}
 			
@@ -198,24 +246,76 @@ fileprivate struct ChannelsView : View {
 	}
 	
 	@ViewBuilder
-	func header() -> some View {
-		
-		ChannelHeaderView(
-			channels: $channels,
-			sharing: $sharing,
-			showChannelsRemoteBalance: $showChannelsRemoteBalance
-		)
+	func importChannelsView() -> some View {
+		ImportChannelsView()
 	}
 	
-	@ViewBuilder
-	func row(channel: LocalChannelInfo) -> some View {
+	// --------------------------------------------------
+	// MARK: View Helpers
+	// --------------------------------------------------
+	
+	func localBalanceColor() -> Color {
+		if BusinessManager.isTestnet {
+			return Color.appAccentTestnet
+		} else {
+			return Color.appAccentMainnet
+		}
+	}
+	
+	func remoteBalanceColor() -> Color {
+		return Color.appAccentOrange
+	}
+	
+	func localAndRemoteMsats() -> (Int64, Int64) {
 		
-		ChannelRowView(
-			channel: channel,
-			sharing: $sharing,
-			showChannelsRemoteBalance: $showChannelsRemoteBalance,
-			toast: toast
+		let localMsats = channels.map { channel in
+			channel.localBalance?.msat ?? Int64(0)
+		}.sum()
+		
+		let remoteMsats = channels.map { channel in
+			channel.availableForReceive?.msat ?? Int64(0)
+		}.sum()
+		
+		log.debug("localMsats(\(localMsats)), remoteMsats(\(remoteMsats))")
+		return (localMsats, remoteMsats)
+	}
+	
+	func channelBalances(_ channel: LocalChannelInfo) -> (FormattedAmount, FormattedAmount)? {
+		
+		guard let localMsats = channel.localBalance?.msat,
+				let remoteMsats = channel.availableForReceive?.msat
+		else {
+			return nil
+		}
+		
+		let local = Utils.formatBitcoin(
+			msat: localMsats,
+			bitcoinUnit: .sat,
+			policy: .showMsatsIfZeroSats
 		)
+		let remote = Utils.formatBitcoin(
+			msat: remoteMsats,
+			bitcoinUnit: .sat,
+			policy: .showMsatsIfZeroSats
+		)
+		
+		return (local, remote)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func showChannelInfoPopover(_ channel: LocalChannelInfo) {
+		log.trace("showChannelInfoPopover()")
+		
+		popoverState.display(dismissable: true) {
+			ChannelInfoPopup(
+				channel: channel,
+				sharing: $sharing,
+				toast: toast
+			)
+		}
 	}
 	
 	func importChannels() {
@@ -240,214 +340,5 @@ fileprivate struct ChannelsView : View {
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
 			deepLinkManager.broadcast(.forceCloseChannels)
 		}
-	}
-}
-
-struct ChannelHeaderView: View {
-	
-	@Binding var channels: [LocalChannelInfo]
-	@Binding var sharing: String?
-	@Binding var showChannelsRemoteBalance: Bool
-	
-	@Environment(\.colorScheme) var colorScheme
-	
-	var body: some View {
-		HStack {
-			
-			if channels.count == 1 {
-				Text("1 channel")
-			} else {
-				Text(String(format: NSLocalizedString(
-					"%d channels",
-					comment: "Count != 1"),
-					channels.count
-				))
-			}
-			
-			Spacer()
-			
-			let (numerator, denominator) = balances()
-			Text(verbatim: "\(numerator.digits) / \(denominator.digits) sat")
-		}
-		.frame(maxWidth: .infinity)
-		.padding()
-		.background(Color.primaryBackground)
-	}
-	
-	func balances() -> (FormattedAmount, FormattedAmount) {
-		
-		let localMsats = channels.map { channel in
-			channel.localBalance?.msat ?? Int64(0)
-		}
-		.reduce(into: Int64(0)) { result, next in
-			result += next
-		}
-		let totalSats = channels.map { channel in
-			channel.currentFundingAmount?.sat ?? Int64(0)
-		}
-		.reduce(into: Int64(0)) { result, next in
-			result += next
-		}
-		
-		let totalMsats = Utils.toMsat(sat: totalSats)
-		
-		let numerator_msats = localMsats
-		let denominator_msats = showChannelsRemoteBalance ? (totalMsats - localMsats) : totalMsats
-		
-		let numerator = Utils.formatBitcoin(
-			msat: numerator_msats,
-			bitcoinUnit: .sat,
-			policy: .showMsatsIfZeroSats
-		)
-		let denominator = Utils.formatBitcoin(
-			msat: denominator_msats,
-			bitcoinUnit: .sat,
-			policy: .hideMsats
-		)
-		
-		return (numerator, denominator)
-	}
-}
-
-fileprivate struct ChannelRowView: View {
-	
-	let channel: LocalChannelInfo
-	@Binding var sharing: String?
-	@Binding var showChannelsRemoteBalance: Bool
-	@ObservedObject var toast: Toast
-	
-	@EnvironmentObject var popoverState: PopoverState
-	
-	var body: some View {
-		
-		VStack {
-			
-			Button {
-				showChannelInfoPopover()
-			} label: {
-			
-				HStack {
-					Image("ic_bullet")
-						.resizable()
-						.aspectRatio(contentMode: .fit)
-						.frame(width: 10, height: 10)
-						.foregroundColor(channel.isUsable ? .appPositive : .appNegative)
-				
-					Text(channel.stateName)
-						.foregroundColor(Color.primary)
-					
-					Spacer()
-					
-					if let tuple = balances() {
-						Text(verbatim: "\(tuple.0.digits) / \(tuple.1.digits) sat")
-							.foregroundColor(Color.primary)
-					}
-				}
-				.padding([.leading], 10)
-				.padding([.top, .bottom], 8)
-				.padding(.trailing)
-			}
-			
-			Divider()
-		}
-	}
-	
-	func balances() -> (FormattedAmount, FormattedAmount)? {
-		
-		guard let localMsats = channel.localBalance?.msat,
-				let totalSats = channel.currentFundingAmount?.sat
-		else {
-			return nil
-		}
-		
-		let totalMsats = Utils.toMsat(sat: totalSats)
-		
-		let numerator_msats = localMsats
-		let denominator_msats = showChannelsRemoteBalance ? (totalMsats - localMsats) : totalMsats
-		
-		let numerator = Utils.formatBitcoin(
-			msat: numerator_msats,
-			bitcoinUnit: .sat,
-			policy: .showMsatsIfZeroSats
-		)
-		let denominator = Utils.formatBitcoin(
-			msat: denominator_msats,
-			bitcoinUnit: .sat,
-			policy: .hideMsats
-		)
-		
-		return (numerator, denominator)
-	}
-	
-	func showChannelInfoPopover() {
-		log.trace("showChannelInfoPopover()")
-		
-		popoverState.display(dismissable: true) {
-			ChannelInfoPopup(
-				channel: channel,
-				sharing: $sharing,
-				toast: toast
-			)
-		}
-	}
-}
-
-fileprivate struct FooterView: View, ViewName {
-	
-	@Binding var showChannelsRemoteBalance: Bool
-	@ObservedObject var toast: Toast
-	
-	@Environment(\.colorScheme) var colorScheme
-	
-	var body: some View {
-		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 12) {
-			
-			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-				
-				Text("Channel Balance Display:")
-					.font(.footnote)
-					.padding(.trailing, 4)
-				
-				Spacer()
-				
-				Button {
-					showChannelsRemoteBalance.toggle()
-				} label: {
-					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
-						if showChannelsRemoteBalance {
-							Text("local / remote")
-						} else {
-							Text("local / total")
-						}
-						Image(systemName: "arrow.2.squarepath")
-							.imageScale(.medium)
-					}
-					.font(.footnote)
-				}
-			}
-			
-		} // </VStack>
-		.frame(maxWidth: .infinity, alignment: .leading)
-		.padding([.top, .bottom], 10)
-		.padding([.leading, .trailing])
-		.background(
-			Color(
-				colorScheme == ColorScheme.light
-				? UIColor.primaryBackground
-				: UIColor.secondarySystemGroupedBackground
-			)
-			.edgesIgnoringSafeArea(.bottom)
-		)
-	}
-	
-	func copyNodeID(_ nodeID: String) {
-		log.trace("[\(viewName)] copyNodeID")
-		
-		UIPasteboard.general.string = nodeID
-		toast.pop(
-			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
-			colorScheme: colorScheme.opposite
-		)
 	}
 }

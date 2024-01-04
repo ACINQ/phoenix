@@ -210,7 +210,7 @@ private fun RequestLiquidityBottomSection(
             LeaseEstimationView(amountRequested = amount, leaseFees = state.fees, actualFeerate = state.actualFeerate)
             Spacer(modifier = Modifier.height(24.dp))
             if (state.fees.serviceFee + state.fees.miningFee.toMilliSatoshi() > balance) {
-                ErrorMessage(header = "Total fees exceed your balance")
+                ErrorMessage(header = stringResource(id = R.string.liquidityads_over_balance))
             } else {
                 FilledButton(
                     text = stringResource(id = R.string.liquidityads_request_button),

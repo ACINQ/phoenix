@@ -49,7 +49,6 @@
 
     <!-- Startup -->
 
-    <string name="startup_wait_prefs">Initialisation…</string>
     <string name="startup_binding_service">Liaison au service…</string>
     <string name="startup_wait">Préparation du portefeuille…</string>
     <string name="startup_wait_legacy_check">Vérification de l\'ancien portefeuille…</string>
@@ -137,19 +136,16 @@
     <string name="send_spliceout_prepare_button">Préparer la transaction</string>
     <string name="send_spliceout_prepare_in_progress">Préparation de la transaction…</string>
     <string name="send_spliceout_execute_in_progress">Exécution du splice…</string>
-    <string name="send_spliceout_complete_recap_amount">Montant</string>
     <string name="send_spliceout_complete_recap_fee">Frais de minage</string>
     <string name="send_spliceout_complete_recap_fee_details">Utilise un taux effective de %1$s sat/vbyte.</string>
     <string name="send_spliceout_complete_recap_total">Total</string>
 
     <!-- scan -->
 
-    <string name="scan_reading">Lecture des données…</string>
     <string name="scan_manual_input_button">Saisie manuelle</string>
     <string name="scan_paste_button">Coller depuis le presse-papiers</string>
     <string name="scan_request_camera_access">Autoriser l\'accès à la caméra</string>
     <string name="scan_request_camera_access_denied">L\'accès à la caméra a été refusé</string>
-    <string name="scan_instructions">Scannez un QR Code contenant une requête de paiement, une adresse Bitcoin, ou un lien LNURL</string>
 
     <string name="scan_lnurl_fetching">Récupération des données auprès du service…</string>
 
@@ -162,10 +158,7 @@
     <string name="utils_rounded">≈</string>
     <string name="utils_converted_amount">≈ %1$s</string>
     <string name="utils_no_conversion">Taux de change Bitcoin indisponible</string>
-    <string name="utils_amount_hint">Montant</string>
 
-    <string name="utils_proceed">Procéder</string>
-    <string name="utils_cancel">Annuler</string>
     <string name="utils_date_just_now">à l\'instant</string>
     <string name="utils_unknown">N/A</string>
     <string name="utils_loading_data">Chargement des données…</string>
@@ -187,8 +180,6 @@
     <string name="btn_confirm">Confirmer</string>
     <string name="btn_cancel">Annuler</string>
     <string name="btn_close">Fermer</string>
-    <string name="btn_pause_connecting">Connexion au pair…</string>
-    <string name="btn_pause_connecting_electrum">Connexion à electrum…</string>
 
     <!-- mutual close -->
 
@@ -197,13 +188,11 @@
     <string name="mutualclose_checking_balance">Vérification du solde…</string>
     <string name="mutualclose_balance">Solde: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">Ce portefeuille n\'a pas de canaux éligibles à une clôture.</string>
-    <string name="mutualclose_input_placeholder">Saisissez une adresse Bitcoin</string>
     <string name="mutualclose_button">Vider mon portefeuille</string>
     <string name="mutualclose_error_chain_mismatch">Cette adresse utilise une blockchain différente</string>
     <string name="mutualclose_error_chain_reqparams">Cette adresse utilise des fonctionnalités non supportées</string>
     <string name="mutualclose_error_chain_generic">Cette adresse n\'est pas compatible</string>
     <string name="mutualclose_done">%1$d canaux ont été fermés. Vous pourrez trouver le détail dans la page d\'accueil.</string>
-    <string name="mutualclose_inprogress">Veuillez patienter…</string>
 
     <string name="forceclose_no_channels">Aucun canaux éligible à une clôture.</string>
 
@@ -229,7 +218,6 @@
     <string name="channeldetails_commitments">Commitments actifs</string>
     <string name="channeldetails_inactive_commitments">Commitments inactifs</string>
     <string name="channeldetails_commitment_funding_tx_id">Tx de financement:</string>
-    <string name="channeldetails_commitment_funding_tx_index">Tx index:</string>
     <string name="channeldetails_commitment_balance">Solde:</string>
     <string name="channeldetails_commitment_funding_capacity">Capacité:</string>
     <string name="channeldetails_commitment_linked_payments">Suscité par:</string>
@@ -260,7 +248,6 @@
 
     <string name="home__faq_button">FAQ</string>
     <string name="home__payments_none">Utilisez les boutons Envoyer et Recevoir ci-dessous pour débuter !</string>
-    <string name="home__payments_header">Paiement récents</string>
     <string name="home__payments_more_button">Montrer tous les paiements…</string>
     <string name="home__connection__electrum_late">Electrum en retard</string>
     <string name="home__connection__bad_cert">Certificat Electrum</string>
@@ -296,7 +283,6 @@
 
     <!-- payment details -->
 
-    <string name="paymentdetails_title">Détails du paiement</string>
     <string name="paymentdetails_loading">Chargement des données du paiement…</string>
     <string name="paymentdetails_error">Détails du paiement introuvable</string>
 
@@ -324,7 +310,6 @@
     <string name="paymentdetails_lnurlpay_action_url_button">Ouvrir le lien</string>
     <string name="paymentdetails_lnurlpay_action_aes_label">Message</string>
     <string name="paymentdetails_lnurlpay_action_aes_decrypting">Déchiffrement du message…</string>
-    <string name="paymentdetails_lnurlpay_action_aes_not_paid">Le paiement doit d\'abord être réglé pour déchiffrer le message.</string>
 
     <string name="paymentdetails_desc_label">Desc.</string>
     <string name="paymentdetails_destination_label">Envoyé à</string>
@@ -333,8 +318,6 @@
     <string name="paymentdetails_error_label">Erreur</string>
     <string name="paymentdetails_no_description">Sans description</string>
     <string name="paymentdetails_info_uniclose">Ce paiement a eu lieu suite à un conflit dans un canal Lightning.</string>
-
-    <string name="paymentdetails_onchain_confirmation">Confirmations</string>
 
     <string name="paymentdetails_desc_splice_out">Paiement on-chain</string>
     <string name="paymentdetails_desc_closing_channel">Fermeture de canal</string>
@@ -352,7 +335,89 @@
     <string name="paymentdetails_edit_desc_button">Éditer la note</string>
     <string name="paymentdetails_details_button">Détails techniques</string>
 
-    <string name="paymentdetails_failure_recipient_unknown_or_liquidity">Le destinataire n\'est pas joignable, ou bien ne dispose pas de suffisamment de liquidité pour accepter le paiement.</string>
-    <string name="paymentdetails_failure_invalid_details">Le paiement a été rejeté par le destinataire.\nCela survient généralement lorsque la requête de paiement a déjà été payée, ou lorsque cette requête a expiré.</string>
+    <!-- payment details: technicals data -->
+
+    <string name="paymentdetails_technical_title">Détails techniques</string>
+    <string name="paymentdetails_payment_type_label">Type de paiement</string>
+    <string name="paymentdetails_closing">Clôture de canal de paiement</string>
+    <string name="paymentdetails_splice_outgoing">Splice sortant</string>
+    <string name="paymentdetails_splice_cpfp_outgoing">Accélération de transactions on-chain</string>
+    <string name="paymentdetails_inbound_liquidity">Requête de liquidité entrante</string>
+    <string name="paymentdetails_normal_outgoing">Paiement Lightning sortant</string>
+    <string name="paymentdetails_normal_incoming">Paiement Lightning entrant</string>
+    <string name="paymentdetails_swapin">Dépôt on-chain (swap-in)</string>
+    <string name="paymentdetails_swapout">Swap-out vers une adresse Bitcoin</string>
+    <string name="paymentdetails_keysend">Keysend (paiement spontané)</string>
+    <string name="paymentdetails_swapin_address_label">Adresse de dépôt on-chain</string>
+    <string name="paymentdetails_bitcoin_address_label">Adresse Bitcoin</string>
+
+    <string name="paymentdetails_splice_out_channel_label">Canal splicé</string>
+    <string name="paymentdetails_dualswapin_tx_label">Transactions</string>
+    <string name="paymentdetails_dualswapin_tx_value">- #%1$s:</string>
+
+    <string name="paymentdetails_liquidity_amount_label">Liquidité demandée</string>
+    <string name="paymentdetails_liquidity_signature_label">Signature</string>
+
+    <string name="paymentdetails_closing_type_label">Type de clôture</string>
+    <string name="paymentdetails_closing_type_mutual">Mutuelle</string>
+    <string name="paymentdetails_closing_type_local">Locale</string>
+    <string name="paymentdetails_closing_type_remote">Remote</string>
+    <string name="paymentdetails_closing_type_revoked">Revocation</string>
+    <string name="paymentdetails_closing_type_other">Autre</string>
+
+    <string name="paymentdetails_pubkey_label">Clé publique du destinataire</string>
+    <string name="paymentdetails_payment_request_description_label">Description de la requête de paiement</string>
+    <string name="paymentdetails_payment_hash_label">Hash du paiement</string>
+    <string name="paymentdetails_payment_request_label">Requête de paiement</string>
+    <string name="paymentdetails_preimage_label">Préimage</string>
+
+    <string name="paymentdetails_status_label">Statut du paiement</string>
+    <string name="paymentdetails_status_success">Succès</string>
+    <string name="paymentdetails_status_confirming">En confirmation</string>
+    <string name="paymentdetails_status_pending">En attente</string>
+    <string name="paymentdetails_status_failed">Échoué</string>
+
+    <string name="paymentdetails_parts_label">Parties du paiement (%1$d)</string>
+    <string name="paymentdetails_part_label">Partie</string>
+    <string name="paymentdetails_part_hops_label">Saut</string>
+
+    <string name="paymentdetails_received_with_label">Reçu via</string>
+    <string name="paymentdetails_received_with_splicein">Splice-in (ajout vers un canal existant)</string>
+    <string name="paymentdetails_received_with_channel">Nouveau canal (créé automatiquement)</string>
+    <string name="paymentdetails_received_with_lightning">Paiement lightning</string>
+    <string name="paymentdetails_channel_id_label">Identifiant du canal</string>
+    <string name="paymentdetails_tx_id_label">Transaction</string>
+
+    <string name="paymentdetails_created_at_label">Créé le</string>
+    <string name="paymentdetails_completed_at_label">Terminé le</string>
+    <string name="paymentdetails_elapsed_label">Temps écoulé</string>
+    <string name="paymentdetails_elapsed">%1$s ms</string>
+
+    <string name="paymentdetails_invoice_requested_label">Montant demandé</string>
+    <string name="paymentdetails_amount_sent_label">Montant envoyé (frais inclus)</string>
+    <string name="paymentdetails_amount_received_label">Montant reçu</string>
+    <string name="paymentdetails_amount_rate_now">≈ %1$s (actuel)</string>
+    <string name="paymentdetails_amount_rate_then">≈ %1$s (à l\'époque)</string>
+
+    <!-- settings: access control -->
+
+    <string name="accessctrl_title">Contrôle d\'accès</string>
+    <string name="accessctrl_loading">Récupération des données…</string>
+
+    <string name="accessctrl_auth_error_header">Le verrouillage ne peut pas être activé</string>
+    <string name="accessctrl_auth_error_no_hw">Cet appareil ne dispose pas d\'équipement biométrique adéquat.</string>
+    <string name="accessctrl_auth_error_hw_unavailable">L\'équipement biométrique de cet appareil est indisponible.</string>
+    <string name="accessctrl_auth_error_none_enrolled">Veuillez préalablement enregistrer un code PIN/schéma/empreinte digitale dans Android.</string>
+    <string name="accessctrl_auth_error_update_required">L\'équipement biométrique de cet appareil n\'est pas sécurisé. Une mise à jour Android de sécurité est requise.</string>
+    <string name="accessctrl_auth_error_unsupported">Non supporté par cette version d\'Android.</string>
+    <string name="accessctrl_auth_error_lockout">Nombre de tentatives trop élevé. Réessayez plus tard.</string>
+    <string name="accessctrl_auth_error_vendor">Erreur matérielle non gérée.</string>
+    <string name="accessctrl_auth_error_timeout">Tentative d\'authentification expirée.</string>
+    <string name="accessctrl_auth_error_cancelled">L\'authentification a été annulée.</string>
+    <string name="accessctrl_auth_error_too_old">Cette version d\'Android est incompatible.</string>
+    <string name="accessctrl_auth_error_unhandled">Code d\'erreur non géré : %1$d</string>
+
+    <string name="accessctrl_screen_lock_switch">Verrouillage écran</string>
+    <string name="accessctrl_screen_lock_switch_desc">Contrôle l\'accès à l\'application via le système de verrouillage système d\'Android.</string>
 
 </resources>

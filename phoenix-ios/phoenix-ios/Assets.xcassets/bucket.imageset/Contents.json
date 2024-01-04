@@ -1,0 +1,15 @@
+{
+  "images" : [
+    {
+      "filename" : "emoji_u1faa3.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  },
+  "properties" : {
+    "preserves-vector-representation" : true
+  }
+}

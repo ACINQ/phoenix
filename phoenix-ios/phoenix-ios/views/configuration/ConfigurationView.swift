@@ -17,8 +17,10 @@ fileprivate enum NavLinkTag: String {
 	case About
 	case DisplayConfiguration
 	case PaymentOptions
-	case ChannelManagement
 	case Notifications
+	// Fees
+	case ChannelManagement
+	case LiquidityManagement
 	// Privacy & Security
 	case AppAccess
 	case RecoveryPhrase
@@ -68,6 +70,7 @@ fileprivate struct ConfigurationList: View {
 	@Namespace var linkID_DisplayConfiguration
 	@Namespace var linkID_PaymentOptions
 	@Namespace var linkID_ChannelManagement
+	@Namespace var linkID_LiquidityManagement
 	@Namespace var linkID_Notifications
 	@Namespace var linkID_AppAccess
 	@Namespace var linkID_RecoveryPhrase
@@ -114,6 +117,9 @@ fileprivate struct ConfigurationList: View {
 			let hasWallet = hasWallet()
 			
 			section_general(hasWallet)
+			if hasWallet {
+				section_fees(hasWallet)
+			}
 			section_privacyAndSecurity(hasWallet)
 			section_advanced(hasWallet)
 			if hasWallet {
@@ -178,15 +184,6 @@ fileprivate struct ConfigurationList: View {
 			} // </if hasWallet>
 			
 			if hasWallet {
-				navLink(.ChannelManagement) {
-					Label { Text("Channel management") } icon: {
-						Image(systemName: "wand.and.stars")
-					}
-				}
-				.id(linkID_ChannelManagement)
-			}
-			
-			if hasWallet {
 				navLink(.Notifications) {
 					Label { Text("Notifications") } icon: {
 						Image(systemName: "tray")
@@ -196,6 +193,35 @@ fileprivate struct ConfigurationList: View {
 			}
 			
 		} // </Section: General>
+	}
+	
+	@ViewBuilder
+	func section_fees(_ hasWallet: Bool) -> some View {
+		
+		Section(header: Text("Fees")) {
+			if hasWallet {
+				navLink(.ChannelManagement) {
+					Label { Text("Channel management") } icon: {
+						Image(systemName: "wand.and.stars")
+					}
+				}
+				.id(linkID_ChannelManagement)
+			}
+			
+			if hasWallet {
+				navLink(.LiquidityManagement) {
+					Label { Text("Add liquidity") } icon: {
+						Image("bucket_monochrome")
+							.renderingMode(.template)
+							.resizable()
+							.aspectRatio(contentMode: .fit)
+							.frame(width: 20, height: 20)
+							.foregroundColor(.appAccent)
+					}
+				}
+				.id(linkID_LiquidityManagement)
+			}
+		}
 	}
 	
 	@ViewBuilder
@@ -369,8 +395,10 @@ fileprivate struct ConfigurationList: View {
 			case .About                 : AboutView()
 			case .DisplayConfiguration  : DisplayConfigurationView()
 			case .PaymentOptions        : PaymentOptionsView()
-			case .ChannelManagement     : LiquidityPolicyView()
 			case .Notifications         : NotificationsView(location: .embedded)
+		// Fees
+			case .ChannelManagement     : LiquidityPolicyView()
+			case .LiquidityManagement   : LiquidityAdsView(location: .embedded)
 		// Privacy & Security
 			case .AppAccess             : AppAccessView()
 			case .RecoveryPhrase        : RecoveryPhraseView()
@@ -554,6 +582,7 @@ fileprivate struct ConfigurationList: View {
 			case .DisplayConfiguration  : return linkID_DisplayConfiguration
 			case .PaymentOptions        : return linkID_PaymentOptions
 			case .ChannelManagement     : return linkID_ChannelManagement
+			case .LiquidityManagement   : return linkID_LiquidityManagement
 			case .Notifications         : return linkID_Notifications
 			
 			case .AppAccess             : return linkID_AppAccess

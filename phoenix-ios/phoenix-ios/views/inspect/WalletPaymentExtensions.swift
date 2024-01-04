@@ -224,11 +224,24 @@ extension Lightning_kmpWalletPayment {
 		return nil
 	}
 	
-	func swapOutFees() -> (Int64, String, String)? {
+	func serviceFees() -> (Int64, String, String)? {
 		
-		if let outgoingPayment = self as? Lightning_kmpLightningOutgoingPayment,
-		   let _ = outgoingPayment.details.asSwapOut() {
+		if let il = self as? Lightning_kmpInboundLiquidityOutgoingPayment {
 			
+			let sat = il._lease.fees.serviceFee
+			let msat = Utils.toMsat(sat: sat)
+			
+			let title = NSLocalizedString("Service Fees", comment: "Label in SummaryInfoGrid")
+			let exp = NSLocalizedString(
+				"Fees paid for the liquidity service.",
+				comment: "Fees explanation"
+			)
+			
+			return (msat, title, exp)
+			
+		} else if let outgoingPayment = self as? Lightning_kmpLightningOutgoingPayment,
+		          let _ = outgoingPayment.details.asSwapOut()
+		{
 			let msat = outgoingPayment.fees.msat - outgoingPayment.routingFee.msat
 			
 			let title = NSLocalizedString("Swap Fees", comment: "Label in SummaryInfoGrid")
