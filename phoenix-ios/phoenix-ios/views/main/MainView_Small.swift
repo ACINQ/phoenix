@@ -18,6 +18,7 @@ fileprivate enum NavLinkTag: String {
 	case SendView
 	case CurrencyConverter
 	case SwapInWalletDetails
+	case LiquidityAdsView
 }
 
 struct MainView_Small: View {
@@ -150,7 +151,10 @@ struct MainView_Small: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			header()
-			HomeView(showSwapInWallet: showSwapInWallet)
+			HomeView(
+				showSwapInWallet: showSwapInWallet,
+				showLiquidityAds: showLiquidityAds
+			)
 			footer()
 		}
 	}
@@ -505,6 +509,7 @@ struct MainView_Small: View {
 			case .SendView            : SendView(location: .MainView, controller: externalLightningRequest)
 			case .CurrencyConverter   : CurrencyConverterView()
 			case .SwapInWalletDetails : SwapInWalletDetails(location: .embedded, popTo: popTo)
+			case .LiquidityAdsView    : LiquidityAdsView(location: .embedded)
 		}
 	}
 	
@@ -639,6 +644,12 @@ struct MainView_Small: View {
 		log.trace("showSwapInWallet()")
 		
 		navLinkTag = .SwapInWalletDetails
+	}
+	
+	func showLiquidityAds() {
+		log.trace("showLiquidityAds()")
+		
+		navLinkTag = .LiquidityAdsView
 	}
 	
 	func popTo(_ destination: PopToDestination) {

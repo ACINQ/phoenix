@@ -88,6 +88,7 @@ class CloudKitDb(
             val spliceOutgoingQueries = SpliceOutgoingQueries(database)
             val channelCloseOutgoingQueries = ChannelCloseOutgoingQueries(database)
             val spliceCpfpOutgoingQueries = SpliceCpfpOutgoingQueries(database)
+            val inboundLiquidityQueries = InboundLiquidityQueries(database)
             val metaQueries = MetadataQueries(database)
 
             val rowids = mutableListOf<Long>()
@@ -126,6 +127,9 @@ class CloudKitDb(
                             }
                             WalletPaymentId.DbType.SPLICE_CPFP_OUTGOING.value -> {
                                 WalletPaymentId.SpliceCpfpOutgoingPaymentId.fromString(row.id)
+                            }
+                            WalletPaymentId.DbType.INBOUND_LIQUIDITY_OUTGOING.value -> {
+                                WalletPaymentId.InboundLiquidityOutgoingPaymentId.fromString(row.id)
                             }
                             else -> null
                         }
@@ -215,6 +219,20 @@ class CloudKitDb(
                         }
                     } // </outgoing_splice_cpfp_payments>
 
+                uniquePaymentIds
+                    .filterIsInstance<WalletPaymentId.InboundLiquidityOutgoingPaymentId>()
+                    .forEach { paymentId ->
+                        inboundLiquidityQueries.get(
+                            id = paymentId.id
+                        )?.let { payment ->
+                            rowMap[paymentId] = WalletPaymentInfo(
+                                payment = payment,
+                                metadata = metadataPlaceholder,
+                                fetchOptions = emptyOptions
+                            )
+                        }
+                    } // <outgoing_liquidity_payments>
+
                 val fetchOptions = WalletPaymentFetchOptions.All
                 uniquePaymentIds.forEach { paymentId ->
                     metaQueries.getMetadata(paymentId, fetchOptions)?.let { metadata ->
@@ -273,6 +291,8 @@ class CloudKitDb(
                                 WalletPaymentId.DbType.CHANNEL_CLOSE_OUTGOING.value ->
                                     outgoing.add(row.unpadded_size)
                                 WalletPaymentId.DbType.SPLICE_CPFP_OUTGOING.value ->
+                                    outgoing.add(row.unpadded_size)
+                                WalletPaymentId.DbType.INBOUND_LIQUIDITY_OUTGOING.value ->
                                     outgoing.add(row.unpadded_size)
                             }
                         }
@@ -383,6 +403,7 @@ class CloudKitDb(
         val spliceOutList = downloadedPayments.filterIsInstance<SpliceOutgoingPayment>()
         val channelCloseList = downloadedPayments.filterIsInstance<ChannelCloseOutgoingPayment>()
         val spliceCpfpList = downloadedPayments.filterIsInstance<SpliceCpfpOutgoingPayment>()
+        val inboundLiquidityList = downloadedPayments.filterIsInstance<InboundLiquidityOutgoingPayment>()
 
         // We are seeing crashes when accessing the ByteArray values in updateMetadata.
         // So we need a workaround.
@@ -396,6 +417,7 @@ class CloudKitDb(
             val spliceOutQueries = SpliceOutgoingQueries(database)
             val channelCloseOutQueries = ChannelCloseOutgoingQueries(database)
             val spliceCpfpQueries = SpliceCpfpOutgoingQueries(database)
+            val inboundLiquidityQueries = InboundLiquidityQueries(database)
             val metaQueries = database.paymentsMetadataQueries
 
             database.transaction {
@@ -563,6 +585,31 @@ class CloudKitDb(
                         val lockedAt = payment.lockedAt
                         if (existing.lockedAt == null && lockedAt != null) {
                             spliceCpfpQueries.setLocked(
+                                id = payment.id,
+                                lockedAt = lockedAt
+                            )
+                        }
+                    }
+                }
+
+                inboundLiquidityList.forEach { payment ->
+
+                    val existing = inboundLiquidityQueries.get(id = payment.id)
+                    if (existing == null) {
+                        inboundLiquidityQueries.add(payment = payment)
+
+                    } else {
+                        val confirmedAt = payment.confirmedAt
+                        if (existing.confirmedAt == null && confirmedAt != null) {
+                            inboundLiquidityQueries.setConfirmed(
+                                id = payment.id,
+                                confirmedAt = confirmedAt
+                            )
+                        }
+
+                        val lockedAt = payment.lockedAt
+                        if (existing.lockedAt == null && lockedAt != null) {
+                            inboundLiquidityQueries.setLocked(
                                 id = payment.id,
                                 lockedAt = lockedAt
                             )

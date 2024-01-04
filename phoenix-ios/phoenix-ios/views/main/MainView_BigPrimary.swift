@@ -111,8 +111,11 @@ struct MainView_BigPrimary: View {
 	func primary_body() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			HomeView(showSwapInWallet: showSwapInWallet)
-				.padding(.bottom, 15)
+			HomeView(
+				showSwapInWallet: showSwapInWallet,
+				showLiquidityAds: showLiquidityAds
+			)
+			.padding(.bottom, 15)
 			primary_footer()
 		}
 		.padding(.bottom, 60)
@@ -286,6 +289,15 @@ struct MainView_BigPrimary: View {
 		
 		popoverState.display(dismissable: true) {
 			SwapInWalletDetails(location: .popover, popTo: popTo)
+				.frame(maxHeight: 600)
+		}
+	}
+	
+	func showLiquidityAds() {
+		log.trace("showLiquidityAds()")
+		
+		popoverState.display(dismissable: true) {
+			LiquidityAdsView(location: .popover)
 				.frame(maxHeight: 600)
 		}
 	}

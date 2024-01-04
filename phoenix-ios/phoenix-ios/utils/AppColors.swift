@@ -10,13 +10,14 @@ extension Color {
 	// See Colors.xcassets for RGB values.
 	// The assets catalog allows us to customize the values for light vs dark modes.
 	
-	static var appAccent: Color {
-		get {
-			return Color(UIColor.appAccent) // see below: extension UIColor
-		}
-	}
+	static var appAccent = Color(UIColor.appAccent) // see below: extension UIColor
 	
-	static var appPositive: Color = Color("appAccentGreen")
+	static var appAccentTestnet = Color(UIColor.appAccentTestnet)
+	static var appAccentMainnet = Color(UIColor.appAccentMainnet)
+	
+	static var appAccentOrange = Color("appAccentOrange")
+	
+	static var appPositive = Color("appAccentGreen")
 	static let appNegative = Color("appNegative")
 	static let appWarn = Color("appWarn")
 	
@@ -32,15 +33,16 @@ extension UIColor {
 	
 	static var appAccent: UIColor {
 		if BusinessManager.isTestnet {
-			return UIColor(named: "appAccentBlue")!
+			return UIColor.appAccentTestnet
 		} else {
-			return UIColor(named: "appAccentGreen")!
+			return UIColor.appAccentMainnet
 		}
 	}
 	
-	static var primaryBackground: UIColor {
-		return UIColor(named: "primaryBackground")!
-	}
+	static var appAccentTestnet = UIColor(named: "appAccentBlue")!
+	static var appAccentMainnet = UIColor(named: "appAccentGreen")!
+	
+	static var primaryBackground = UIColor(named: "primaryBackground")!
 	
 	/// Note that UITraitCollection.current may be incorrect if accessed from a background thread.
 	///
