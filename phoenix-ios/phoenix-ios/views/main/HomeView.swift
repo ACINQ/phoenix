@@ -141,7 +141,13 @@ struct HomeView : MVIView {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			balance()
-				.padding(.bottom, 25)
+			if showAddLiquidityButton() {
+				addLiquidityButton()
+					.padding(.top, 15)
+					.padding(.bottom, 15)
+			} else {
+				Spacer().frame(height: 25)
+			}
 			notices()
 			paymentsList()
 		}
@@ -177,7 +183,6 @@ struct HomeView : MVIView {
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			totalBalance()
 			incomingBalance()
-			addLiquidityButton()
 		}
 		.padding([.top, .leading, .trailing])
 		.padding(.bottom, 30)
@@ -329,14 +334,17 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	func addLiquidityButton() -> some View {
 		
-		if showAddLiquidityButton() {
+		Button {
+			showLiquidityAds()
+		} label: {
 			Text("add liquidity")
-				.font(.callout)
-				.foregroundColor(.secondary)
-				.onTapGesture { showLiquidityAds() }
-				.padding(.top, 7)
-				.padding(.bottom, 2)
+				.font(.subheadline)
+				.foregroundColor(.appAccent)
+				.padding(.vertical, -4)
+				.padding(.horizontal, -1)
 		}
+		.buttonStyle(.bordered)
+		.buttonBorderShape(ButtonBorderShape.capsule)
 	}
 	
 	@ViewBuilder

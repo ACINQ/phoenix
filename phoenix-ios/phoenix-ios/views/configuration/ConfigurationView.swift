@@ -211,7 +211,9 @@ fileprivate struct ConfigurationList: View {
 			if hasWallet {
 				navLink(.LiquidityManagement) {
 					Label { Text("Add liquidity") } icon: {
-						Image(systemName: "gauge.with.dots.needle.bottom.50percent.badge.plus")
+						Image("bucket_monochrome")
+							.renderingMode(.template)
+							.foregroundColor(.appAccent)
 					}
 				}
 				.id(linkID_LiquidityManagement)
