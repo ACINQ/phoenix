@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="24" height="24">
+	<path
+        d="M12.651 1.808c-5.98 0-9.457.819-9.81 2.086-.022.91.297 1.95.591 2.685 0 0 1.635 1.738 9.23 1.738s9.193-1.567 9.427-1.829c.323-.81.371-1.729.372-2.594-.353-1.267-3.83-2.086-9.81-2.086Z"
+        style="display:inline;fill:none;stroke:#000;stroke-width:1.5;stroke-dasharray:none;stroke-opacity:1"
+    />
+    <path
+        d="M4.185 7.036 5.562 19.27c.14 1.534 2.945 3.503 7.152 3.503 4.206 0 6.977-1.845 7.151-3.503l1.373-12.196c-1.107.542-3.498 1.237-8.558 1.237-5.03 0-7.437-.761-8.495-1.276z"
+        style="display:inline;fill:none;fill-opacity:1;stroke:#000;stroke-width:1.5;stroke-dasharray:none;stroke-opacity:1"
+    />
+    <path
+        d="M3.964 7.491s-4.45 3.564-2.005 6.214c2.444 2.65 12.51-5.074 12.51-5.074"
+        style="display:inline;fill:none;fill-opacity:1;stroke:#000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+    />
+    <path
+        d="M5.22 4.699c5.17 1.41 9.137 1.305 14.776.156"
+        style="fill:none;fill-opacity:1;stroke:#000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+    />
+</svg>

@@ -213,6 +213,9 @@ fileprivate struct ConfigurationList: View {
 					Label { Text("Add liquidity") } icon: {
 						Image("bucket_monochrome")
 							.renderingMode(.template)
+							.resizable()
+							.aspectRatio(contentMode: .fit)
+							.frame(width: 20, height: 20)
 							.foregroundColor(.appAccent)
 					}
 				}

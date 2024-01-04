@@ -150,11 +150,6 @@ struct LiquidityAdsView: View {
 		Section {
 			VStack(alignment: HorizontalAlignment.center, spacing: 18) {
 				
-				Image("bucket")
-					.resizable()
-					.scaledToFit()
-					.frame(maxWidth: 100, maxHeight: 100)
-				
 				Text("Plan ahead to save money later")
 					.font(.title3)
 				
