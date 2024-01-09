@@ -161,6 +161,9 @@ fun ScanDataView(
             is Scan.Model.LnurlWithdrawFlow -> {
                 LnurlWithdrawView(model = model, onBackClick = onBackClick, onWithdrawClick = { postIntent(it) })
             }
+            is Scan.Model.LnAddressOverDns -> {
+                LnAddressOverDnsView(model = model, trampolineFees = trampolineFees, onBackClick = onBackClick, onSendClick = { postIntent(it) })
+            }
         }
     }
 }

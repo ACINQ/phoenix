@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.controllers.payments
 
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.NodeParams
@@ -129,6 +130,14 @@ object Scan {
                 override val auth: LnurlAuth,
                 val error: LoginError?
             ) : LnurlAuthFlow()
+        }
+
+        data class LnAddressOverDns(
+            val domain: String,
+            val username: String,
+            val nodeId: PublicKey,
+        ): Model() {
+            val userDomain by lazy { "$username.$domain" }
         }
     }
 

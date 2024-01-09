@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.controllers.payments
 
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.*
 import fr.acinq.lightning.db.LightningOutgoingPayment
@@ -30,11 +31,22 @@ import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.chain
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Url
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.utils.io.charsets.Charsets
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
 import org.kodein.log.LoggerFactory
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -103,6 +115,8 @@ class AppScanController(
 
         Parser.readPaymentRequest(input)?.let {
             processLightningInvoice(it)
+        } ?: readDnsAddress(input)?.let {
+            processDnsAddress(username = it.first, domain = it.second)
         } ?: readLnurl(input)?.let {
             processLnurl(it)
         } ?: readBitcoinAddress(input)?.let {
@@ -476,6 +490,87 @@ class AppScanController(
             Scan.BadRequestReason.AlreadyPaidInvoice
         } else {
             null
+        }
+    }
+
+    private fun readDnsAddress(input: String): Pair<String, String>? = try {
+        // Ignore excess input, including additional lines, and leading/trailing whitespace
+        val line = input.lines().firstOrNull { it.isNotBlank() }?.trim() ?: throw RuntimeException("identifier has an empty leading line")
+        val token = line.split("\\s+".toRegex()).firstOrNull() ?: throw RuntimeException("identifier has invalid chars")
+
+        val components = token.split("@")
+        if (components.size != 2) {
+            throw RuntimeException("identifier must contain one @ delimiter")
+        }
+
+        val username = components[0].lowercase()
+        val domain = components[1]
+
+        if (domain == "acinq.co") {
+            username to domain
+        } else {
+            throw RuntimeException("not a dns demo address")
+        }
+    } catch (e: Exception) {
+        logger.warning { "cannot read dns address $input" }
+        null
+    }
+
+    private suspend fun processDnsAddress(
+        username: String,
+        domain: String,
+    ) {
+        model(Scan.Model.LnurlServiceFetch)
+        val dnsPath = "$username.$domain."
+        val httpClient: HttpClient by lazy {
+            HttpClient {
+                install(ContentNegotiation) {
+                    json(json = Json { ignoreUnknownKeys = true })
+                    expectSuccess = true
+                }
+            }
+        }
+
+        // list of resolvers: https://dnsprivacy.org/public_resolvers/
+        // curl https://dns.google/resolve?name=alice.acinq.co&type=TXT
+        // curl --http2 -H "accept: application/dns-json" "https://1.1.1.1/dns-query?name=bob.acinq.co&type=TXT"
+        // curl -H "accept: application/dns-json" "https://mozilla.cloudflare-dns.com/dns-query?name=alice.acinq.co&type=TXT"
+        val url = Url("https://dns.google/resolve?name=$dnsPath&type=TXT")
+
+        try {
+            val response = httpClient.get(url)
+            val json = Json.decodeFromString<JsonObject>(response.bodyAsText(Charsets.UTF_8))
+            Lnurl.log.debug { "dns resolved to ${json.toString().take(100)}" }
+
+            val status = json["Status"]?.jsonPrimitive?.intOrNull
+            if (status == null || status > 0) throw RuntimeException("invalid status=$status")
+
+            val ad = json["AD"]?.jsonPrimitive?.booleanOrNull
+            if (ad != true) throw RuntimeException("invalid AD=$ad -- MITM?")
+
+            val records = json["Answer"]?.jsonArray
+            if (records.isNullOrEmpty()) throw RuntimeException("no answers resolved for that query=${url.encodedPathAndQuery}!")
+
+            val matchingRecord = records.filterIsInstance<JsonObject>().firstOrNull {
+                logger.info { "inspecting record=$it" }
+                logger.info { "  dnsPath=$dnsPath" }
+                logger.info { "  record's name=${it["name"]?.jsonPrimitive?.content}" }
+                logger.info { "  record's data=${it["data"]?.jsonPrimitive?.content}" }
+                it["name"]?.jsonPrimitive?.content == dnsPath
+            } ?: throw RuntimeException("no record with name '$dnsPath'")
+
+            val nodeId = matchingRecord["data"]?.jsonPrimitive?.content?.substringAfter("node_id:")
+            if (nodeId.isNullOrBlank()) throw RuntimeException("no node_id found in data $matchingRecord")
+
+            model(Scan.Model.LnAddressOverDns(
+                username = username,
+                domain = domain,
+                nodeId = PublicKey.fromHex(nodeId)
+            ))
+
+        } catch (e: Exception) {
+            logger.error(e) { "error when resolving $dnsPath: ${e.message}" }
+            model(Scan.Model.BadRequest(request = url.toString(), reason = Scan.BadRequestReason.InvalidLnurl(url)))
         }
     }
 
