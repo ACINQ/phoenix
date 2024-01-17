@@ -683,7 +683,6 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func paymentReceived_fundingTxId(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
-		let identifier: String = #function
 		
 		if let txId = self.txId(receivedWith: receivedWith) {
 			common_btcTxid(txId, title: "funding txid")

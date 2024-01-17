@@ -19468,6 +19468,7 @@
     },
     "Received multiple payments" : {
       "comment" : "Push notification title",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {

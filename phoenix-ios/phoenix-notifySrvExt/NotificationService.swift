@@ -239,7 +239,6 @@ class NotificationService: UNNotificationServiceExtension {
 					self?.didReceivePayment(payment)
 				}
 			)
-			PhoenixManager.shared.connect()
 		}
 	}
 	
@@ -250,7 +249,6 @@ class NotificationService: UNNotificationServiceExtension {
 		if phoenixStarted {
 			phoenixStarted = false
 			
-			PhoenixManager.shared.disconnect()
 			PhoenixManager.shared.unregister()
 		}
 	}
