@@ -25,6 +25,7 @@ struct MinerFeeSheet: View {
 	
 	@State var explicitlySelectedPriority: MinerFeePriority? = nil
 	@State var feeBelowMinimum: Bool = false
+	@State var showLowMinerFeeWarning: Bool = false
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@EnvironmentObject var smartModalState: SmartModalState
@@ -42,6 +43,13 @@ struct MinerFeeSheet: View {
 	)
 	@State var priorityBoxWidth: CGFloat? = nil
 	
+	enum FooterContentHeight: Preference {}
+	let footerContentHeightReader = GeometryPreferenceReader(
+		key: AppendValue<FooterContentHeight>.self,
+		value: { [$0.size.height] }
+	)
+	@State var footerContentHeight: CGFloat? = nil
+	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -49,16 +57,26 @@ struct MinerFeeSheet: View {
 	@ViewBuilder
 	var body: some View {
 		
-		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			header()
-			content()
-			footer()
-		}
-		.onChange(of: satsPerByte) { _ in
-			satsPerByteChanged()
-		}
-		.onChange(of: mempoolRecommendedResponse) { _ in
-			mempoolRecommendedResponseChanged()
+		if showLowMinerFeeWarning {
+			LowMinerFeeWarning(showLowMinerFeeWarning: $showLowMinerFeeWarning)
+				.onAppear {
+					smartModalState.dismissable = false
+				}
+		} else {
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				header()
+				content()
+				footer()
+			}
+			.onChange(of: satsPerByte) { _ in
+				satsPerByteChanged()
+			}
+			.onChange(of: mempoolRecommendedResponse) { _ in
+				mempoolRecommendedResponseChanged()
+			}
+			.onAppear {
+				smartModalState.dismissable = true
+			}
 		}
 	}
 	
@@ -79,7 +97,7 @@ struct MinerFeeSheet: View {
 					.frame(width: 30, height: 30)
 			}
 			.accessibilityLabel("Close")
-			.accessibilityHidden(smartModalState.currentItem?.dismissable ?? false)
+			.accessibilityHidden(smartModalState.dismissable)
 		}
 		.padding(.horizontal)
 		.padding(.vertical, 8)
@@ -297,7 +315,7 @@ struct MinerFeeSheet: View {
 	@ViewBuilder
 	func footer() -> some View {
 		
-		VStack(alignment: HorizontalAlignment.center, spacing: 10) {
+		ZStack {
 			
 			Button {
 				reviewTransactionButtonTapped()
@@ -305,20 +323,24 @@ struct MinerFeeSheet: View {
 				Text("Review Transaction")
 			}
 			.font(.title3)
+			.read(footerContentHeightReader)
+			.frame(height: footerContentHeight, alignment: .bottom)
 			.disabled(minerFeeInfo == nil)
+			.isHidden(feeBelowMinimum)
 			
-			if feeBelowMinimum {
-				Group {
-					if let mrr = mempoolRecommendedResponse {
-						Text("Feerate below minimum allowed by mempool: \(satsPerByteString(mrr.minimumFee))")
-					} else {
-						Text("Feerate below minimum allowed by mempool.")
-					}
+			Group {
+				if let mrr = mempoolRecommendedResponse {
+					Text("Feerate below minimum allowed by mempool: \(satsPerByteString(mrr.minimumFee))")
+				} else {
+					Text("Feerate below minimum allowed by mempool.")
 				}
-				.font(.callout)
-				.foregroundColor(.appNegative)
-				.multilineTextAlignment(.center)
 			}
+			.font(.callout)
+			.foregroundColor(.appNegative)
+			.multilineTextAlignment(.center)
+			.read(footerContentHeightReader)
+			.frame(height: footerContentHeight, alignment: .bottom)
+			.isHidden(!feeBelowMinimum)
 		}
 		.padding()
 		.padding(.top)
@@ -432,6 +454,18 @@ struct MinerFeeSheet: View {
 		return (btc, fiat)
 	}
 	
+	func requiresLowMinerFeeWarning() -> Bool {
+		
+		guard
+			let satsPerByte_number = try? parsedSatsPerByte.get(),
+			let mrr = mempoolRecommendedResponse
+		else {
+			return false
+		}
+		
+		return satsPerByte_number.doubleValue < mrr.economyFee
+	}
+	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
@@ -522,11 +556,109 @@ struct MinerFeeSheet: View {
 	
 	func closeButtonTapped() {
 		log.trace("closeButtonTapped()")
-		smartModalState.close()
+		showWarningOrClose()
 	}
 	
 	func reviewTransactionButtonTapped() {
 		log.trace("reviewTransactionButtonTapped()")
+		showWarningOrClose()
+	}
+	
+	func showWarningOrClose() {
+		log.trace("showWarningOrClose()")
+		
+		if requiresLowMinerFeeWarning() {
+			showLowMinerFeeWarning = true
+		} else {
+			smartModalState.close()
+		}
+	}
+}
+
+// MARK: -
+
+struct LowMinerFeeWarning: View {
+	
+	@Binding var showLowMinerFeeWarning: Bool
+	
+	@EnvironmentObject var smartModalState: SmartModalState
+	
+	@ViewBuilder
+	var body: some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			header()
+			content()
+			footer()
+		}
+	}
+	
+	@ViewBuilder
+	func header() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			Text("Low feerate!")
+				.font(.title3)
+				.accessibilityAddTraits(.isHeader)
+				.accessibilitySortPriority(100)
+			Spacer()
+		}
+		.padding(.horizontal)
+		.padding(.vertical, 8)
+		.background(
+			Color(UIColor.secondarySystemBackground)
+				.cornerRadius(15, corners: [.topLeft, .topRight])
+		)
+		.padding(.bottom, 4)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			Text(
+			"""
+			Transactions with insufficient feerate may linger for days or weeks without confirming.
+			
+			Choosing the feerate is your responsibility. \
+			Once sent, this transaction cannot be cancelled, only accelerated with higer fees.
+			
+			Are you sure you want to proceed?
+			"""
+			)
+		}
+		.padding(.horizontal)
+		.padding(.top)
+	}
+	
+	@ViewBuilder
+	func footer() -> some View {
+		
+		HStack(alignment: .center, spacing: 0) {
+			Spacer()
+			
+			Button("Cancel") {
+				cancelButtonTapped()
+			}
+			.padding(.trailing)
+				
+			Button("Confirm") {
+				confirmButtonTapped()
+			}
+		}
+		.font(.title3)
+		.padding()
+		.padding(.top)
+	}
+	
+	func cancelButtonTapped() {
+		log.trace("[LowMinerFeeWarning] cancelButtonTapped()")
+		showLowMinerFeeWarning = false
+	}
+	
+	func confirmButtonTapped() {
+		log.trace("[LowMinerFeeWarning] confirmButtonTapped()")
 		smartModalState.close()
 	}
 }
