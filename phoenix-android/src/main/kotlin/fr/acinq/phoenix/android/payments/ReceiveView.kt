@@ -133,12 +133,11 @@ private fun ReceiveViewPages(
     defaultInvoiceDescription: String,
     defaultInvoiceExpiry: Long,
 ) {
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState(pageCount = { 2 })
     // we need to be responsive in some subcomponents, like the edit-invoice buttons
     BoxWithConstraints {
         HorizontalPager(
             modifier = Modifier.fillMaxHeight(),
-            pageCount = 2,
             state = pagerState,
             contentPadding = PaddingValues(horizontal = when {
                 maxWidth <= 240.dp -> 30.dp

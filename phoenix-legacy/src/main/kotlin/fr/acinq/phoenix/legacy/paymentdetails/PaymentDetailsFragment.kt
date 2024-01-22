@@ -367,11 +367,11 @@ class PaymentDetailsViewModel(
     state.value = PaymentDetailsState.Init
   }
 
-  val onchainAddress: LiveData<String?> = Transformations.map(paymentMeta) {
+  val onchainAddress: LiveData<String?> = paymentMeta.map {
     it?.swap_in_address ?: it?.swap_out_address ?: it?.closing_main_output_script
   }
 
-  val closingType: LiveData<String> = Transformations.map(paymentMeta) {
+  val closingType: LiveData<String> = paymentMeta.map {
     when (it?.closing_type) {
       ClosingType.Mutual.code -> appContext.getString(R.string.legacy_paymentdetails_closing_type_mutual)
       ClosingType.Local.code -> appContext.getString(R.string.legacy_paymentdetails_closing_type_local)
@@ -381,11 +381,11 @@ class PaymentDetailsViewModel(
     }
   }
 
-  val swapOutFeerate: LiveData<String> = Transformations.map(paymentMeta) {
+  val swapOutFeerate: LiveData<String> = paymentMeta.map {
     it?.swap_out_feerate_per_byte?.run { "$this sat/byte" } ?: ""
   }
 
-  val pubkey: LiveData<String> = Transformations.map(state) {
+  val pubkey: LiveData<String> = state.map {
     when (it) {
       is PaymentDetailsState.Outgoing.Sent.Closing -> ""
       is PaymentDetailsState.Outgoing -> it.parts.first().recipientNodeId().toString()
@@ -393,7 +393,7 @@ class PaymentDetailsViewModel(
     }
   }
 
-  val description: LiveData<String?> = Transformations.map(state) { state ->
+  val description: LiveData<String?> = state.map { state ->
     (when (state) {
       is PaymentDetailsState.Outgoing -> state.description
       is PaymentDetailsState.Incoming.Received.Normal -> state.getDescription()
@@ -401,7 +401,7 @@ class PaymentDetailsViewModel(
     }).takeIf { !it.isNullOrBlank() }
   }
 
-  val paymentHash: LiveData<String> = Transformations.map(state) {
+  val paymentHash: LiveData<String> = state.map {
     when (it) {
       is PaymentDetailsState.Outgoing -> it.parts.first().paymentHash().toString()
       is PaymentDetailsState.Incoming -> it.payment.paymentRequest().paymentHash().toString()
@@ -409,7 +409,7 @@ class PaymentDetailsViewModel(
     }
   }
 
-  val paymentRequest: LiveData<String> = Transformations.map(state) {
+  val paymentRequest: LiveData<String> = state.map {
     when {
       it is PaymentDetailsState.Outgoing && it.parts.first().paymentRequest().isDefined -> PaymentRequest.write(it.parts.first().paymentRequest().get())
       it is PaymentDetailsState.Incoming -> PaymentRequest.write(it.payment.paymentRequest())
@@ -417,7 +417,7 @@ class PaymentDetailsViewModel(
     }
   }
 
-  val preimage: LiveData<String> = Transformations.map(state) {
+  val preimage: LiveData<String> = state.map {
     when (it) {
       is PaymentDetailsState.Outgoing.Sent -> (it.parts.first().status() as OutgoingPaymentStatus.Succeeded).paymentPreimage().toString()
       is PaymentDetailsState.Incoming -> it.payment.paymentPreimage().toString()
@@ -425,7 +425,7 @@ class PaymentDetailsViewModel(
     }
   }
 
-  val createdAt: LiveData<String> = Transformations.map(state) {
+  val createdAt: LiveData<String> = state.map {
     when (it) {
       is PaymentDetailsState.Outgoing -> DateFormat.getDateTimeInstance().format(it.parts.first().createdAt())
       is PaymentDetailsState.Incoming -> DateFormat.getDateTimeInstance().format(it.payment.createdAt())
@@ -433,7 +433,7 @@ class PaymentDetailsViewModel(
     }
   }
 
-  val completedAt: LiveData<String> = Transformations.map(state) {
+  val completedAt: LiveData<String> = state.map {
     when (it) {
       is PaymentDetailsState.Outgoing.Sent -> (it.parts.first().status() as OutgoingPaymentStatus.Succeeded).completedAt()
       is PaymentDetailsState.Outgoing.Failed -> (it.parts.first().status() as OutgoingPaymentStatus.Failed).completedAt()
@@ -448,7 +448,7 @@ class PaymentDetailsViewModel(
     }?.let { t -> DateFormat.getDateTimeInstance().format(t) } ?: ""
   }
 
-  val showFailedOutgoingPaymentAction: LiveData<Boolean> = Transformations.map(state) { state ->
+  val showFailedOutgoingPaymentAction: LiveData<Boolean> = state.map { state ->
     state is PaymentDetailsState.Outgoing.Failed && state.failureType is OutgoingFailure.TrampolineFee
   }
 

@@ -17,12 +17,12 @@ object Versions {
 
     object Android {
         const val coreKtx = "1.9.0"
-        const val lifecycle = "2.5.1"
+        const val lifecycle = "2.7.0"
         const val prefs = "1.2.0"
         const val datastore = "1.0.0"
-        const val compose = "1.4.3"
-        const val composeCompiler = "1.4.7"
-        const val navCompose = "2.5.3"
+        const val compose = "1.6.0-rc01"
+        const val composeCompiler = "1.5.8"
+        const val navCompose = "2.7.6"
         const val accompanist = "0.30.1"
         const val composeConstraintLayout = "1.1.0-alpha09"
         const val biometrics = "1.1.0"
@@ -38,13 +38,13 @@ object Versions {
     object AndroidLegacy {
         const val eclair = "0.4.23-android-phoenix"
 
-        const val safeArgs = "2.4.2"
+        const val safeArgs = "2.7.6"
         const val appCompat = "1.3.0"
         const val material = "1.7.0"
         const val navigation = "2.4.2"
         const val constraint = "2.0.4"
         const val lifecycleExtensions = "2.2.0"
-        const val lifecycle = "2.4.0"
+        const val lifecycle = "2.7.0"
         const val work = "2.8.1"
         const val viewpager = "1.0.0"
         const val eventbus = "3.1.1"
