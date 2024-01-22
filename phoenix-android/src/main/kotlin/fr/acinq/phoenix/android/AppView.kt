@@ -56,6 +56,7 @@ import androidx.navigation.navOptions
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.components.Dialog
@@ -98,7 +99,6 @@ import io.ktor.http.decodeURLPart
 import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import org.kodein.memory.util.currentTimestampMillis
 
 
 @Composable

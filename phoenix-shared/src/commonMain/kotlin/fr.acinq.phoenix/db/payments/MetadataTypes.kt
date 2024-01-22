@@ -9,7 +9,6 @@ import io.ktor.http.*
 import kotlinx.serialization.*
 import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
-import org.kodein.memory.util.freeze
 
 /**
  * Represents the data stored in the `payments_metadata` table, within columns:
@@ -287,14 +286,6 @@ data class WalletPaymentMetadataRow(
             && original_fiat == null
             && user_description == null
             && user_notes == null
-    }
-
-    /**
-     * This function exists because the `freeze()`
-     * function isn't exposed to iOS.
-     */
-    fun copyAndFreeze(): WalletPaymentMetadataRow {
-        return this.freeze()
     }
 
     companion object {

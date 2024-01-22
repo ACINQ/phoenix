@@ -1,15 +1,14 @@
 object Versions {
     const val lightningKmp = "1.5.15-SNAPSHOT"
-    const val secp256k1 = "0.11.0"
-    const val torMobile = "0.2.0"
+    const val secp256k1 = "0.13.0-SNAPSHOT"
+    const val torMobile = "0.3.0-SNAPSHOT"
 
-    const val kotlin = "1.8.21"
-    const val coroutines = "1.7.2"
-    const val serialization = "1.5.1"
+    const val kotlin = "1.9.22"
+    const val coroutines = "1.7.3"
+    const val serialization = "1.6.2"
 
-    const val ktor = "2.3.2"
+    const val ktor = "2.3.7"
     const val sqlDelight = "1.5.5"
-    const val kodeinMemory = "0.8.0"
 
     const val slf4j = "1.7.30"
     const val junit = "4.13"

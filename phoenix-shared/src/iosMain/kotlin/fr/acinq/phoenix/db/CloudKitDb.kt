@@ -11,7 +11,6 @@ import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.payments.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import org.kodein.memory.util.freeze
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -679,7 +678,7 @@ class CloudKitDb(
         //
         return metadata.mapValues { (_, metadataRow) ->
             metadataRow.copy(
-                recordBlob = metadataRow.recordBlob.copyOf().freeze()
+                recordBlob = metadataRow.recordBlob
             )
         }
     }

@@ -55,7 +55,7 @@ kotlin {
         }
     }
 
-    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach {
+    listOf(iosX64(), iosArm64()).forEach {
         it.binaries {
             framework {
                 baseName = "PhoenixShared"
@@ -94,8 +94,6 @@ kotlin {
                 // sqldelight
                 implementation("com.squareup.sqldelight:runtime:${Versions.sqlDelight}")
                 implementation("com.squareup.sqldelight:coroutines-extensions:${Versions.sqlDelight}")
-                // file system
-                api("org.kodein.memory:kodein-memory-files:${Versions.kodeinMemory}")
             }
         }
 
@@ -120,7 +118,7 @@ kotlin {
                     implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
                 }
             }
-            val androidTest by getting {
+            val androidUnitTest by getting {
                 dependencies {
                     implementation(kotlin("test-junit"))
                     implementation("androidx.test.ext:junit:1.1.3")
@@ -142,7 +140,6 @@ kotlin {
         // -- ios sources
         val iosX64Main by getting
         val iosArm64Main by getting
-        val iosSimulatorArm64Main by getting
         val iosMain by creating {
             dependsOn(commonMain)
             dependencies {
@@ -151,12 +148,10 @@ kotlin {
             }
             iosX64Main.dependsOn(this)
             iosArm64Main.dependsOn(this)
-            iosSimulatorArm64Main.dependsOn(this)
         }
 
         val iosX64Test by getting
         val iosArm64Test by getting
-        val iosSimulatorArm64Test by getting
         val iosTest by creating {
             dependsOn(commonTest)
             dependencies {
@@ -164,7 +159,6 @@ kotlin {
             }
             iosX64Test.dependsOn(this)
             iosArm64Test.dependsOn(this)
-            iosSimulatorArm64Test.dependsOn(this)
         }
 
         all {
