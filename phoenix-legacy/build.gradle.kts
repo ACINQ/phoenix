@@ -23,11 +23,11 @@ fun gitCommitHash(): String {
 val chain: String by project
 
 android {
-  compileSdk = 33
+  namespace = "fr.acinq.phoenix.legacy"
+  compileSdk = 34
   ndkVersion = "23.1.7779620"
   defaultConfig {
     minSdk = 26
-    targetSdk = 33
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {

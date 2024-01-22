@@ -19,11 +19,12 @@ fun gitCommitHash(): String {
 val chain: String by project
 
 android {
-    compileSdk = 33
+    namespace = "fr.acinq.phoenix.android"
+    compileSdk = 34
     defaultConfig {
         applicationId = "fr.acinq.phoenix.testnet"
         minSdk = 26
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 73
         versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
