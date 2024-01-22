@@ -293,7 +293,7 @@ object LegacyMigrationHelper {
                 }
             } else {
                 IncomingPayment.Origin.Invoice(
-                    paymentRequest = PaymentRequest.read(fr.acinq.eclair.payment.PaymentRequest.write(payment.paymentRequest()))
+                    paymentRequest = PaymentRequest.read(fr.acinq.eclair.payment.PaymentRequest.write(payment.paymentRequest())).get()
                 )
             }
 
@@ -363,7 +363,7 @@ object LegacyMigrationHelper {
         }
 
         val paymentRequest = if (head.paymentRequest().isDefined) {
-            PaymentRequest.read(fr.acinq.eclair.payment.PaymentRequest.write(head.paymentRequest().get()))
+            PaymentRequest.read(fr.acinq.eclair.payment.PaymentRequest.write(head.paymentRequest().get())).get()
         } else null
 
         // retrieve details from the first payment in the list

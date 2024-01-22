@@ -20,6 +20,7 @@ import fr.acinq.bitcoin.*
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.Try
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.data.*
 import io.ktor.http.*
@@ -70,10 +71,9 @@ object Parser {
     /** Reads a payment request after stripping prefixes. Return null if input is invalid. */
     fun readPaymentRequest(
         input: String
-    ): PaymentRequest? = try {
-        PaymentRequest.read(trimMatchingPrefix(removeExcessInput(input), lightningPrefixes))
-    } catch (t: Throwable) {
-        null
+    ): PaymentRequest? = when (val res = PaymentRequest.read(trimMatchingPrefix(removeExcessInput(input), lightningPrefixes))) {
+        is Try.Success -> res.get()
+        is Try.Failure -> null
     }
 
     /**
@@ -117,10 +117,9 @@ object Parser {
         val label = url.parameters["label"]
         val message = url.parameters["message"]
         val lightning = url.parameters["lightning"]?.let {
-            try {
-                PaymentRequest.read(it)
-            } catch (e: Exception) {
-                null
+            when (val res = PaymentRequest.read(it)) {
+                is Try.Success -> res.get()
+                is Try.Failure -> null
             }
         }
         val otherParams = ParametersBuilder().apply {
