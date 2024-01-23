@@ -330,7 +330,7 @@ struct MinerFeeSheet: View {
 			
 			Group {
 				if let mrr = mempoolRecommendedResponse {
-					Text("Feerate below minimum allowed by mempool: \(satsPerByteString(mrr.minimumFee))")
+					Text("Feerate below minimum allowed by mempool: \(satsPerByteString(mrr.minimumFee)) sats/vByte")
 				} else {
 					Text("Feerate below minimum allowed by mempool.")
 				}
@@ -638,12 +638,12 @@ struct LowMinerFeeWarning: View {
 		HStack(alignment: .center, spacing: 0) {
 			Spacer()
 			
-			Button("Cancel") {
+			Button("Back") {
 				cancelButtonTapped()
 			}
 			.padding(.trailing)
 				
-			Button("Confirm") {
+			Button("I understand") {
 				confirmButtonTapped()
 			}
 		}
