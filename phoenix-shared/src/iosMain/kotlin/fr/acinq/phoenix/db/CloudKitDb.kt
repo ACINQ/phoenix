@@ -1,7 +1,6 @@
 package fr.acinq.phoenix.db
 
 import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
@@ -319,10 +318,6 @@ class CloudKitDb(
         deleteFromMetadata: List<WalletPaymentId>,
         updateMetadata: Map<WalletPaymentId, MetadataRow>
     ) {
-        // We are seeing crashes when accessing the ByteArray values in updateMetadata.
-        // So we need a workaround.
-        val sanitizedMetadata = sanitizeMetadata(updateMetadata)
-
         withContext(Dispatchers.Default) {
             val ckQueries = database.cloudKitPaymentsQueries
 
@@ -339,7 +334,7 @@ class CloudKitDb(
                     )
                 }
 
-                sanitizedMetadata.forEach { (paymentId, row) ->
+                updateMetadata.forEach { (paymentId, row) ->
                     val rowExists = ckQueries.existsMetadata(
                         type = paymentId.dbType.value,
                         id = paymentId.dbId
@@ -403,10 +398,6 @@ class CloudKitDb(
         val channelCloseList = downloadedPayments.filterIsInstance<ChannelCloseOutgoingPayment>()
         val spliceCpfpList = downloadedPayments.filterIsInstance<SpliceCpfpOutgoingPayment>()
         val inboundLiquidityList = downloadedPayments.filterIsInstance<InboundLiquidityOutgoingPayment>()
-
-        // We are seeing crashes when accessing the ByteArray values in updateMetadata.
-        // So we need a workaround.
-        val sanitizedMetadata = sanitizeMetadata(updateMetadata)
 
         withContext(Dispatchers.Default) {
 
@@ -641,7 +632,7 @@ class CloudKitDb(
                     }
                 } // </payments_metadata table>
 
-                sanitizedMetadata.forEach { (paymentId, row) ->
+                updateMetadata.forEach { (paymentId, row) ->
                     val rowExists = ckQueries.existsMetadata(
                         type = paymentId.dbType.value,
                         id = paymentId.dbId
@@ -664,22 +655,6 @@ class CloudKitDb(
                     }
                 } // </cloudkit_payments_metadata table>
             }
-        }
-    }
-
-    private fun sanitizeMetadata(
-        metadata: Map<WalletPaymentId, MetadataRow>
-    ): Map<WalletPaymentId, MetadataRow> {
-
-        // We are seeing crashes when accessing the ByteArray values in the map:
-        // > "illegal attempt to access non-shared kotlin.ByteArray"
-        //
-        // This is perhaps because the Map was created in Swift, and passed to Kotlin.
-        //
-        return metadata.mapValues { (_, metadataRow) ->
-            metadataRow.copy(
-                recordBlob = metadataRow.recordBlob
-            )
         }
     }
 
