@@ -51,16 +51,22 @@ val mainnetElectrumServers = listOf(
                 "FpnUWGuW4F+0MdBRwBwt0ar8uy/2mHxNCn62X6vtBDIjCVkI/Kl54PjmOLyUmbpr" +
                 "F4l7hYM8ZOtxq4pi1Xjy/e2uBCDcaogAik1ciLFSrR2ai33eevi3YcTiB0DjLK9z" +
                 "DUx5CoQGwyhJcRopglpX+AFQry659ngRnvxdFJYmUH7CQQ/ofvdkOZ6m4hv1tVVn" +
-                "3GtwazLKQKgN6dKyHuuaj0ECAwEAAQ=="),
+                "3GtwazLKQKgN6dKyHuuaj0ECAwEAAQ=="
+    ),
     electrumServer(
         host = "VPS.hsmiths.com", publicKey =
-                "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAx6SVh9svGg1cYMn4uxvt" +
-                "D9XS1IS/TSWV+1vZkovG1Hk5b8451B0hN48ZpzeWiMozxNPncBIVYsDw37YZkDGw" +
-                "yn4Akb1vFdgJtKiJrDKFVhLKPMZncOWQjnt9qcip04G7aTe2RqmUlLCTDbgr9G3T" +
-                "DLXx3kNSBHD0fiA/DTR2W8t2BfwlpEZiA2ZPZ2CgmQX6TXE1jfCP8mDE81jsnta4" +
-                "FVnCgh3Bj4zp8bhxnWd4S2T40FEsoX8uLeYp/HzcQJu0LDXOOTGpANskc+GA+fC9" +
-                "WYnDFMQ1p502zyRXOszEsMMQbqT8xfyE8oG+Ge6yUWeD0DDli0YRvDISxt54jE6k" +
-                "YQIDAQAB"
+                "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAwaNR7gST8KEAwc7tGTZP" +
+                "1T6qVhg+KjqY1LpvkZ8m1QBPh+j6HsTjB4+RiH1MerqMWVLD9dEZEYZsEUREySyb" +
+                "G3szQ1nf+GZkn3XorKyvX29B0aZow3ZdAKwTXF51jwCE/G7j3UpteKIYoX/egoUq" +
+                "G8k/N3q0jxUZXGEY33BhHGAdiuRAk70QDIUjh1zuPHVED9tE9fc/qeJ/ZlQbQHzK" +
+                "Y820JcqR1JingTufVps26SyiOHO+jzlRGsO3qHpAmtc1ikEJt1dPS53Rcu8LojF0" +
+                "kgKZ5oCgGSCWU/+T+8xffp/y5GrV7lxlFNNwM2HFLvx24r2ovYujMzd45VgQ+rIG" +
+                "V1FcAVDXsarNtSV2R5YmyldScRnzR5IEHcPWPFXMuMvZR31COtD99pXsoS60JO9S" +
+                "Bd7DMcbU/aXxlyfltla58JS3RV27Uem01YkIfx9d0QW07TXPRmWfQNQ1aZV4Iyfn" +
+                "oWJnYRR36BOI3TIZKGBSFYvvojNh6noeRVp/BCDRmsi4lL3PLAAH3jKJ2jGjXnZ7" +
+                "uQNlxsC6ZDL9yezndEjpRYQPYZLrUGOOuNKJReSHtWw83U6wd/5TyI8NRGkHZlCi" +
+                "585YChjthLYR8fdfHR2sAvMf0pfqBQgV8sNQ3qIZdpaVZIr0wXucsKDGhsZO3Zym" +
+                "FlzYsP0snim4LMNIlQ+W8N8CAwEAAQ=="
     ),
     electrumServer(
         host = "electrum.qtornado.com", publicKey =
