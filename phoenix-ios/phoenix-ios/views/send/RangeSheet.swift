@@ -42,6 +42,7 @@ struct RangeSheet: View {
 	@ViewBuilder
 	func header() -> some View {
 		
+		let dismissable: Bool = smartModalState.dismissable
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			Text("Acceptable range")
 				.font(.title3)
@@ -56,7 +57,7 @@ struct RangeSheet: View {
 					.frame(width: 30, height: 30)
 			}
 			.accessibilityLabel("Close")
-			.accessibilityHidden(smartModalState.currentItem?.dismissable ?? false)
+			.accessibilityHidden(dismissable)
 		} // <HStack>
 		.padding(.horizontal)
 		.padding(.vertical, 8)

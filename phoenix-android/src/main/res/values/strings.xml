@@ -714,11 +714,10 @@
 
     <string name="mempool_unknown_feerate_title">Unknown mempool state</string>
     <string name="mempool_unknown_feerate_details">Phoenix was unable to retrieve the current state of the mempool and cannot estimate the speed of your transactions.\n\nCheck the mempool manually on an explorer, and use a adequate value!</string>
-    <string name="mempool_fastest">≈ Next block</string>
-    <string name="mempool_halfhour">≈ 30 minutes</string>
+    <string name="mempool_fastest">≈ 10 minutes</string>
+    <string name="mempool_halfhour">≈ 30 minutes</string>`
     <string name="mempool_hour">≈ 1 hour</string>
-    <string name="mempool_eco">More than 1 hour</string>
-    <string name="mempool_slow">No priority</string>
+    <string name="mempool_slow">Low feerate</string>
 
     <!-- splice errors -->
 

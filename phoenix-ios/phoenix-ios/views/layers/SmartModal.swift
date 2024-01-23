@@ -36,11 +36,27 @@ public class SmartModalState: ObservableObject {
 	}
 	
 	var currentItem: SmartModalItem? {
-		
 		if isIPad {
-			return popoverState.publisher.value
+			return popoverState.currentItem
 		} else {
-			return shortSheetState.publisher.value
+			return shortSheetState.currentItem
+		}
+	}
+	
+	var dismissable: Bool {
+		get {
+			if isIPad {
+				return popoverState.dismissable
+			} else {
+				return shortSheetState.dismissable
+			}
+		}
+		set {
+			if isIPad {
+				popoverState.dismissable = newValue
+			} else {
+				shortSheetState.dismissable = newValue
+			}
 		}
 	}
 	
@@ -97,8 +113,4 @@ public class SmartModalState: ObservableObject {
 	}
 }
 
-protocol SmartModalItem {
-	
-	/// Whether or not the item is dimissable by tapping outside the item's view.
-	var dismissable: Bool { get }
-}
+protocol SmartModalItem {}

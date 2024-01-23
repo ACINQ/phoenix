@@ -67,26 +67,26 @@ fileprivate struct PaymentViewSheet: View {
 			.accessibilityHidden(shortSheetItem != nil || popoverItem != nil)
 			
 			if let shortSheetItem = shortSheetItem {
-				ShortSheetWrapper(dismissable: shortSheetItem.dismissable) {
+				ShortSheetWrapper(dismissable: shortSheetState.dismissable) {
 					shortSheetItem.view
 				}
 				.zIndex(1) // needed for proper animation
 			}
 			
 			if let popoverItem = popoverItem {
-				PopoverWrapper(dismissable: popoverItem.dismissable) {
+				PopoverWrapper(dismissable: popoverState.dismissable) {
 					popoverItem.view
 				}
 				.zIndex(2) // needed for proper animation
 			}
 			
 		} // </ZStack>
-		.onReceive(shortSheetState.publisher) { (item: ShortSheetItem?) in
+		.onReceive(shortSheetState.itemPublisher) { (item: ShortSheetItem?) in
 			withAnimation {
 				shortSheetItem = item
 			}
 		}
-		.onReceive(popoverState.publisher) { (item: PopoverItem?) in
+		.onReceive(popoverState.itemPublisher) { (item: PopoverItem?) in
 			withAnimation {
 				popoverItem = item
 			}

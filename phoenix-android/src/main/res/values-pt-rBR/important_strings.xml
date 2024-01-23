@@ -358,4 +358,11 @@
     <string name="outgoing_finalfailure_alreadypaid">Este pagamento já foi pago.</string>
     <string name="outgoing_finalfailure_noroutefound">O destinatário não está contactável ou não tem liquidez de entrada suficiente.</string>
 
+    <!-- low feerate disclaimer -->
+
+    <string name="send_low_feerate_dialog_title">Taxas baixas!</string>
+    <string name="send_low_feerate_dialog_body1">Os pagamentos com taxas baixas podem permanecer por dias ou semanas sem confirmação.</string>
+    <string name="send_low_feerate_dialog_body2">É sua responsabilidade selecionar a taxa. Uma vez enviado, esse pagamento não pode ser cancelado, somente acelerado com taxas mais altas.</string>
+    <string name="send_low_feerate_dialog_body3">Tem certeza de que deseja prosseguir?</string>
+
 </resources>

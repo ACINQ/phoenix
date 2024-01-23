@@ -357,4 +357,11 @@
     <string name="outgoing_finalfailure_alreadypaid">Tato platba již byla uhrazena.</string>
     <string name="outgoing_finalfailure_noroutefound">Příjemce není dosažitelný nebo nemá dostatečnou příchozí likviditu.</string>
 
+    <!-- low feerate disclaimer -->
+
+    <string name="send_low_feerate_dialog_title">Nízké poplatky!</string>
+    <string name="send_low_feerate_dialog_body1">Platby za nízké poplatky mohou trvat několik dní nebo týdnů bez potvrzení.</string>
+    <string name="send_low_feerate_dialog_body2">Výběr poplatků je na vaši zodpovědnost. Po odeslání nelze tuto platbu zrušit, pouze urychlit vyššími poplatky.</string>
+    <string name="send_low_feerate_dialog_body3">Jste si jisti, že chcete pokračovat?</string>
+
 </resources>

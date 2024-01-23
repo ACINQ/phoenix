@@ -27,7 +27,7 @@ struct UnlockErrorView: View {
 			main.zIndex(0) // needed for proper animation
 
 			if let popoverItem = popoverItem {
-				PopoverWrapper(dismissable: popoverItem.dismissable) {
+				PopoverWrapper(dismissable: popoverState.dismissable) {
 					popoverItem.view
 				}
 				.zIndex(1) // needed for proper animation
@@ -36,7 +36,7 @@ struct UnlockErrorView: View {
 			toast.view()
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.onReceive(popoverState.publisher) { (item: PopoverItem?) in
+		.onReceive(popoverState.itemPublisher) { (item: PopoverItem?) in
 			withAnimation {
 				popoverItem = item
 			}

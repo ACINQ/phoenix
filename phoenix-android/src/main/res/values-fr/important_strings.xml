@@ -357,4 +357,11 @@
     <string name="outgoing_finalfailure_alreadypaid">Ce paiement a déjà été réglé.</string>
     <string name="outgoing_finalfailure_noroutefound">Le destinataire de ce paiement n\'est pas joignable, ou bien ne dispose pas de suffisamment de liquidité entrante.</string>
 
+    <!-- low feerate disclaimer -->
+
+    <string name="send_low_feerate_dialog_title">Frais faibles!</string>
+    <string name="send_low_feerate_dialog_body1">Les transactions utilisant des frais trop faibles peuvent rester en attente de confirmation pendant des jours, voire des semaines.</string>
+    <string name="send_low_feerate_dialog_body2">Le choix des frais est de votre responsabilité. Une fois envoyé, ce paiement ne pourra pas être annulé, seulement accéléré en utilisant des frais plus élevés.</string>
+    <string name="send_low_feerate_dialog_body3">Êtes-vous sûr de vouloir continuer ?</string>
+
 </resources>
