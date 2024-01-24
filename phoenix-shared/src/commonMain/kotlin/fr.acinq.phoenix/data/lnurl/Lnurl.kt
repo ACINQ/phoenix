@@ -18,13 +18,13 @@ package fr.acinq.phoenix.data.lnurl
 
 import fr.acinq.bitcoin.Bech32
 import fr.acinq.lightning.utils.msat
+import fr.acinq.phoenix.globalLoggerFactory
 import fr.acinq.phoenix.utils.Parser
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.charsets.*
 import kotlinx.serialization.json.*
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 
 /**
  * This class describes the various types of Lnurls supported by phoenix:
@@ -62,7 +62,7 @@ sealed interface Lnurl {
     }
 
     companion object {
-        internal val log = newLogger(LoggerFactory.default)
+        internal val log = globalLoggerFactory.appendingTag("Lnurl")
         internal val format: Json = Json { ignoreUnknownKeys = true }
 
         /**

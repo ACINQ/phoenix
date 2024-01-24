@@ -1,14 +1,14 @@
 package fr.acinq.phoenix.managers
 
+import co.touchlab.kermit.Logger
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.utils.Cache
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
@@ -25,7 +25,7 @@ import kotlin.coroutines.suspendCoroutine
  * always provide an up-to-date WalletPayment instance in response to your query.
  */
 class PaymentsFetcher(
-    val loggerFactory: LoggerFactory,
+    val loggerFactory: Logger,
     private var paymentsManager: PaymentsManager,
     cacheSizeLimit: Int
 ): CoroutineScope by MainScope() {
@@ -39,7 +39,7 @@ class PaymentsFetcher(
         val info: WalletPaymentInfo?
     )
 
-    private val log = newLogger(loggerFactory)
+    private val log = loggerFactory.appendingTag("PaymentsFetcher")
 
     // Using a strict cache to ensure eviction based on actual usage
     private var cache = Cache<String, Result>(sizeLimit = cacheSizeLimit)

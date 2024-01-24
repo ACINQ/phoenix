@@ -22,6 +22,7 @@ import fr.acinq.bitcoin.crypto.Pack
 import fr.acinq.bitcoin.crypto.hmac
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.phoenix.data.lnurl.Lnurl.Companion.log
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import io.ktor.http.*
 
 data class LnurlAuth(

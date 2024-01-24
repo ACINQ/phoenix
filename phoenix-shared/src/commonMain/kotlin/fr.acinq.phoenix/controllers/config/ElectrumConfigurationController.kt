@@ -1,19 +1,18 @@
 package fr.acinq.phoenix.controllers.config
 
+import co.touchlab.kermit.Logger
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import fr.acinq.phoenix.controllers.AppController
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
 
 
 class AppElectrumConfigurationController(
-    loggerFactory: LoggerFactory,
+    loggerFactory: Logger,
     private val configurationManager: AppConfigurationManager,
     private val electrumClient: ElectrumClient,
     private val appConnectionsDaemon: AppConnectionsDaemon?
@@ -22,7 +21,7 @@ class AppElectrumConfigurationController(
     firstModel = ElectrumConfiguration.Model()
 ) {
     constructor(business: PhoenixBusiness): this(
-        loggerFactory = business.loggerFactory,
+        loggerFactory = business.newLoggerFactory,
         configurationManager = business.appConfigurationManager,
         electrumClient = business.electrumClient,
         appConnectionsDaemon = business.appConnectionsDaemon

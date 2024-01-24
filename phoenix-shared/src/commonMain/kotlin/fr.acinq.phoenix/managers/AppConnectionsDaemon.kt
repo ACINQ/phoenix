@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.managers
 
+import co.touchlab.kermit.Logger
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.Connection
@@ -7,6 +8,7 @@ import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.phoenix.utils.TorHelper.connectionState
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import fr.acinq.tor.Tor
 import fr.acinq.tor.TorState
 import kotlinx.coroutines.*
@@ -19,14 +21,12 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 
 class AppConnectionsDaemon(
-    loggerFactory: LoggerFactory,
+    loggerFactory: Logger,
     private val configurationManager: AppConfigurationManager,
     private val walletManager: WalletManager,
     private val peerManager: PeerManager,
@@ -38,7 +38,7 @@ class AppConnectionsDaemon(
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness) : this(
-        loggerFactory = business.loggerFactory,
+        loggerFactory = business.newLoggerFactory,
         configurationManager = business.appConfigurationManager,
         walletManager = business.walletManager,
         peerManager = business.peerManager,
@@ -49,7 +49,7 @@ class AppConnectionsDaemon(
         electrumClient = business.electrumClient
     )
 
-    private val logger = newLogger(loggerFactory)
+    private val logger = loggerFactory.appendingTag("AppConnectionsDaemon")
 
     private var peerConnectionJob: Job? = null
     private var electrumConnectionJob: Job? = null

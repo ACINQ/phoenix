@@ -2,17 +2,17 @@ package fr.acinq.phoenix.managers
 
 import android.content.Context
 import android.net.*
+import co.touchlab.kermit.Logger
 import fr.acinq.phoenix.utils.PlatformContext
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 
 
-actual class NetworkMonitor actual constructor(loggerFactory: LoggerFactory, val ctx: PlatformContext) : CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.Default) {
+actual class NetworkMonitor actual constructor(loggerFactory: Logger, val ctx: PlatformContext) : CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.Default) {
 
-    val logger = newLogger(loggerFactory)
+    val logger = loggerFactory.appendingTag("NetworkMonitor")
 
     private val _networkState = MutableStateFlow(NetworkState.NotAvailable)
     actual val networkState: StateFlow<NetworkState> = _networkState

@@ -16,6 +16,11 @@
 
 package fr.acinq.phoenix
 
+import co.touchlab.kermit.Logger
+import co.touchlab.kermit.loggerConfigInit
+import co.touchlab.kermit.NoTagFormatter
+import co.touchlab.kermit.platformLogWriter
+import co.touchlab.kermit.Severity
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
@@ -34,6 +39,7 @@ import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.createAppDbDriver
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.*
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import fr.acinq.tor.Tor
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -45,25 +51,33 @@ import kotlinx.coroutines.cancel
 import kotlinx.serialization.json.Json
 import org.kodein.log.LoggerFactory
 import org.kodein.log.frontend.defaultLogFrontend
-import org.kodein.log.newLogger
 import org.kodein.log.withShortPackageKeepLast
 import kotlin.time.Duration.Companion.seconds
+
+object globalLoggerFactory : Logger(
+    config = loggerConfigInit(platformLogWriter(NoTagFormatter),
+        minSeverity = Severity.Info
+    ),
+    tag = "PhoenixShared"
+)
 
 class PhoenixBusiness(
     internal val ctx: PlatformContext
 ) {
 
-    val loggerFactory = LoggerFactory(
-        defaultLogFrontend.withShortPackageKeepLast(1),
+    val oldLoggerFactory = LoggerFactory(
+        defaultLogFrontend.withShortPackageKeepLast(1)
     )
 
-    private val logger = loggerFactory.newLogger(this::class)
+    val newLoggerFactory = globalLoggerFactory
+
+    private val logger = newLoggerFactory.appendingTag("PhoenixBusiness")
 
     private val tcpSocketBuilder = TcpSocket.Builder()
     internal val tcpSocketBuilderFactory = suspend {
         val isTorEnabled = appConfigurationManager.isTorEnabled.filterNotNull().first()
         if (isTorEnabled) {
-            tcpSocketBuilder.torProxy(loggerFactory)
+            tcpSocketBuilder.torProxy(newLoggerFactory)
         } else {
             tcpSocketBuilder
         }
@@ -79,13 +93,13 @@ class PhoenixBusiness(
 
     val chain: NodeParams.Chain = NodeParamsManager.chain
 
-    val electrumClient by lazy { ElectrumClient(scope = MainScope(), loggerFactory = loggerFactory, pingInterval = 30.seconds, rpcTimeout = 10.seconds) }
-    internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope(), loggerFactory) }
+    val electrumClient by lazy { ElectrumClient(scope = MainScope(), loggerFactory = oldLoggerFactory, pingInterval = 30.seconds, rpcTimeout = 10.seconds) }
+    internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope(), oldLoggerFactory) }
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
 
     val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
-    val networkMonitor by lazy { NetworkMonitor(loggerFactory, ctx) }
+    val networkMonitor by lazy { NetworkMonitor(newLoggerFactory, ctx) }
     val walletManager by lazy { WalletManager(chain) }
     val nodeParamsManager by lazy { NodeParamsManager(this) }
     val databaseManager by lazy { DatabaseManager(this) }
@@ -98,7 +112,7 @@ class PhoenixBusiness(
     val lnurlManager by lazy { LnurlManager(this) }
     val notificationsManager by lazy { NotificationsManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
-    val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(loggerFactory)) }
+    val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(newLoggerFactory)) }
 
     fun start(startupParams: StartupParams) {
         logger.debug { "starting with params=$startupParams" }
@@ -166,9 +180,6 @@ class PhoenixBusiness(
 
         override fun electrumConfiguration(): ElectrumConfigurationController =
             AppElectrumConfigurationController(_this)
-
-        override fun logsConfiguration(): LogsConfigurationController =
-            AppLogsConfigurationController(_this)
 
         override fun closeChannelsConfiguration(): CloseChannelsConfigurationController =
             AppCloseChannelsConfigurationController(_this, isForceClose = false)

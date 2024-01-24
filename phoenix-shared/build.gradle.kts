@@ -94,6 +94,8 @@ kotlin {
                 // sqldelight
                 implementation("com.squareup.sqldelight:runtime:${Versions.sqlDelight}")
                 implementation("com.squareup.sqldelight:coroutines-extensions:${Versions.sqlDelight}")
+                // kermit logger
+                implementation("co.touchlab:kermit:2.0.2")
             }
         }
 

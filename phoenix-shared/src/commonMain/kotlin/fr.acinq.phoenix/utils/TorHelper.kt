@@ -1,19 +1,19 @@
 package fr.acinq.phoenix.utils
 
+import co.touchlab.kermit.Logger
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import fr.acinq.tor.Tor
 import fr.acinq.tor.TorState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.stateIn
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
+
 
 object TorHelper {
-    fun torLogger(loggerFactory: LoggerFactory): (Tor.LogLevel, String) -> Unit {
-        val logger = loggerFactory.newLogger(Tor::class)
+    fun torLogger(loggerFactory: Logger): (Tor.LogLevel, String) -> Unit {
+        val logger = loggerFactory.appendingTag("Tor")
         return { level, message ->
             when (level) {
                 Tor.LogLevel.DEBUG -> logger.debug { message }

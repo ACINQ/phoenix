@@ -1,15 +1,15 @@
 package fr.acinq.phoenix.controllers.main
 
+import co.touchlab.kermit.Logger
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.managers.BalanceManager
 import fr.acinq.phoenix.managers.PaymentsManager
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
 
 
 class AppHomeController(
-    loggerFactory: LoggerFactory,
+    loggerFactory: Logger,
     private val paymentsManager: PaymentsManager,
     private val balanceManager: BalanceManager
 ) : AppController<Home.Model, Home.Intent>(
@@ -17,7 +17,7 @@ class AppHomeController(
     firstModel = Home.emptyModel
 ) {
     constructor(business: PhoenixBusiness): this(
-        loggerFactory = business.loggerFactory,
+        loggerFactory = business.newLoggerFactory,
         paymentsManager = business.paymentsManager,
         balanceManager = business.balanceManager
     )

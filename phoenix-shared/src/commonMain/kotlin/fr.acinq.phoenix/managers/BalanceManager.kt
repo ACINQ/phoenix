@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.managers
 
+import co.touchlab.kermit.Logger
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.*
 import fr.acinq.lightning.blockchain.electrum.SwapInManager
@@ -13,26 +14,25 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.utils.extensions.localBalance
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 
 class BalanceManager(
-    loggerFactory: LoggerFactory,
+    loggerFactory: Logger,
     private val peerManager: PeerManager,
     private val databaseManager: DatabaseManager
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness): this(
-        loggerFactory = business.loggerFactory,
+        loggerFactory = business.newLoggerFactory,
         peerManager = business.peerManager,
         databaseManager = business.databaseManager
     )
 
-    private val log = newLogger(loggerFactory)
+    private val log = loggerFactory.appendingTag("BalanceManager")
 
     /** The aggregated channels' balance. This is the user's LN funds in the wallet. See [ChannelState.localBalance] */
     private val _balance = MutableStateFlow<MilliSatoshi?>(null)

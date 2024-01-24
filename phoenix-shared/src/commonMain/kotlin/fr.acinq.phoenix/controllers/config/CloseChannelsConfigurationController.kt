@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.controllers.config
 
+import co.touchlab.kermit.Logger
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.NodeParams
@@ -12,11 +13,11 @@ import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration.Model.ChannelInfoStatus
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.localBalance
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
 
 class AppCloseChannelsConfigurationController(
-    loggerFactory: LoggerFactory,
+    loggerFactory: Logger,
     private val peerManager: PeerManager,
     private val chain: NodeParams.Chain,
     private val isForceClose: Boolean
@@ -25,7 +26,7 @@ class AppCloseChannelsConfigurationController(
     firstModel = CloseChannelsConfiguration.Model.Loading
 ) {
     constructor(business: PhoenixBusiness, isForceClose: Boolean): this(
-        loggerFactory = business.loggerFactory,
+        loggerFactory = business.newLoggerFactory,
         peerManager = business.peerManager,
         chain = business.chain,
         isForceClose = isForceClose

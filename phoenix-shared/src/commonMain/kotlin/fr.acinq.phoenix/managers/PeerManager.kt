@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.managers
 
+import co.touchlab.kermit.Logger
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.CltvExpiryDelta
@@ -28,14 +29,13 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.utils.extensions.isTerminated
 import fr.acinq.phoenix.utils.extensions.nextTimeout
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import org.kodein.log.Logger
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
+
 
 class PeerManager(
-    loggerFactory: LoggerFactory,
+    loggerFactory: Logger,
     private val nodeParamsManager: NodeParamsManager,
     private val databaseManager: DatabaseManager,
     private val configurationManager: AppConfigurationManager,
@@ -43,12 +43,12 @@ class PeerManager(
     private val electrumWatcher: ElectrumWatcher,
 ) : CoroutineScope by CoroutineScope(CoroutineName("peer") + SupervisorJob() + Dispatchers.Main + CoroutineExceptionHandler { _, e ->
     println("error in Peer coroutine scope: ${e.message}")
-    val logger = loggerFactory.newLogger(Logger.Tag(PeerManager::class))
+    val logger = loggerFactory.appendingTag("PeerManager")
     logger.error(e) { "error in Peer scope: " }
 }) {
 
     constructor(business: PhoenixBusiness) : this(
-        loggerFactory = business.loggerFactory,
+        loggerFactory = business.newLoggerFactory,
         nodeParamsManager = business.nodeParamsManager,
         databaseManager = business.databaseManager,
         configurationManager = business.appConfigurationManager,
@@ -56,7 +56,7 @@ class PeerManager(
         electrumWatcher = business.electrumWatcher,
     )
 
-    private val logger = newLogger(loggerFactory)
+    private val logger = loggerFactory.appendingTag("PeerManager")
 
     private val _peer = MutableStateFlow<Peer?>(null)
     val peerState: StateFlow<Peer?> = _peer

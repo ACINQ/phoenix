@@ -1,23 +1,23 @@
 package fr.acinq.phoenix.controllers.main
 
+import co.touchlab.kermit.Logger
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.managers.WalletManager
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
 
 
 class AppContentController(
-    loggerFactory: LoggerFactory,
+    loggerFactory: Logger,
     private val walletManager: WalletManager
 ) : AppController<Content.Model, Content.Intent>(
     loggerFactory = loggerFactory,
     firstModel = Content.Model.Waiting
 ) {
     constructor(business: PhoenixBusiness): this(
-        loggerFactory = business.loggerFactory,
+        loggerFactory = business.newLoggerFactory,
         walletManager = business.walletManager
     )
 

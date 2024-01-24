@@ -291,6 +291,7 @@ struct TxHistoryExporter: View {
 			set: {
 				if !$0 {
 					if let tmpFileUrl = shareUrl {
+						shareUrl = nil
 						DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 5.0) {
 							do {
 								try FileManager.default.removeItem(at: tmpFileUrl)
@@ -299,7 +300,6 @@ struct TxHistoryExporter: View {
 								log.error("Error deleting tmp file: \(error)")
 							}
 						}
-						shareUrl = nil
 					}
 				}
 			}

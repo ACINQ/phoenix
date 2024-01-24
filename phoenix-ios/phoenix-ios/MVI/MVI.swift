@@ -262,11 +262,6 @@ class FakeControllerFactory: ControllerFactory {
 			fatalError("Missing @Environment: ControllerFactory")
 		}
 
-	func logsConfiguration() ->
-		MVIController<LogsConfiguration.Model, LogsConfiguration.Intent> {
-			fatalError("Missing @Environment: ControllerFactory")
-		}
-
 	func receive() ->
 		MVIController<Receive.Model, Receive.Intent> {
 			fatalError("Missing @Environment: ControllerFactory")

@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.managers
 
+import co.touchlab.kermit.Logger
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.NodeParams
@@ -26,28 +27,31 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.shared.BuildVersions
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
+
 
 class NodeParamsManager(
-    loggerFactory: LoggerFactory,
+    oldLoggerFactory: LoggerFactory,
+    newLoggerFactory: Logger,
     chain: NodeParams.Chain,
     walletManager: WalletManager,
     appConfigurationManager: AppConfigurationManager,
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness): this(
-        loggerFactory = business.loggerFactory,
+        oldLoggerFactory = business.oldLoggerFactory,
+        newLoggerFactory = business.newLoggerFactory,
         chain = business.chain,
         walletManager = business.walletManager,
         appConfigurationManager = business.appConfigurationManager,
     )
 
-    private val log = newLogger(loggerFactory)
+    private val log = newLoggerFactory.appendingTag("NodeParamsManager")
 
     private val _nodeParams = MutableStateFlow<NodeParams?>(null)
     val nodeParams: StateFlow<NodeParams?> = _nodeParams
@@ -60,7 +64,7 @@ class NodeParamsManager(
             ) { keyManager, startupParams ->
                 NodeParams(
                     chain = chain,
-                    loggerFactory = loggerFactory,
+                    loggerFactory = oldLoggerFactory,
                     keyManager = keyManager,
                 ).copy(
                     alias = "phoenix",

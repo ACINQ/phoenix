@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.managers
 
+import co.touchlab.kermit.Logger
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.HeaderSubscriptionResponse
@@ -11,6 +12,7 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -20,8 +22,6 @@ import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.*
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 import kotlin.math.*
 import kotlin.time.*
 import kotlin.time.Duration.Companion.minutes
@@ -32,18 +32,18 @@ class AppConfigurationManager(
     private val httpClient: HttpClient,
     private val electrumWatcher: ElectrumWatcher,
     private val chain: NodeParams.Chain,
-    loggerFactory: LoggerFactory
+    loggerFactory: Logger
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness) : this(
-        loggerFactory = business.loggerFactory,
+        loggerFactory = business.newLoggerFactory,
         chain = business.chain,
         appDb = business.appDb,
         httpClient = business.httpClient,
         electrumWatcher = business.electrumWatcher,
     )
 
-    private val logger = newLogger(loggerFactory)
+    private val logger = loggerFactory.appendingTag("AppConfigurationManager")
 
     init {
         watchElectrumMessages()

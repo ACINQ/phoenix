@@ -16,10 +16,12 @@
 
 package fr.acinq.phoenix.managers
 
+import co.touchlab.kermit.Logger
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.lnurl.*
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
@@ -34,11 +36,10 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
+
 
 class LnurlManager(
-    loggerFactory: LoggerFactory,
+    loggerFactory: Logger,
     private val walletManager: WalletManager
 ) : CoroutineScope by MainScope() {
 
@@ -53,11 +54,11 @@ class LnurlManager(
     }
 
     constructor(business: PhoenixBusiness) : this(
-        loggerFactory = business.loggerFactory,
+        loggerFactory = business.newLoggerFactory,
         walletManager = business.walletManager
     )
 
-    private val log = newLogger(loggerFactory)
+    private val log = loggerFactory.appendingTag("LnurlManager")
 
     /** Executes an HTTP GET request on the provided url and parses the JSON response into an [Lnurl] object. */
     fun executeLnurl(url: Url): Deferred<Lnurl> = async {

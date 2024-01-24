@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.controllers.payments
 
+import co.touchlab.kermit.Logger
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.*
 import fr.acinq.lightning.db.LightningOutgoingPayment
@@ -30,19 +31,19 @@ import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.chain
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import io.ktor.http.Url
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.JsonObject
-import org.kodein.log.LoggerFactory
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
 
 class AppScanController(
-    loggerFactory: LoggerFactory,
+    loggerFactory: Logger,
     firstModel: Scan.Model?,
     private val peerManager: PeerManager,
     private val lnurlManager: LnurlManager,
@@ -66,7 +67,7 @@ class AppScanController(
     private var sendWithdrawInvoiceTask: Deferred<JsonObject>? = null
 
     constructor(business: PhoenixBusiness, firstModel: Scan.Model?) : this(
-        loggerFactory = business.loggerFactory,
+        loggerFactory = business.newLoggerFactory,
         firstModel = firstModel,
         peerManager = business.peerManager,
         lnurlManager = business.lnurlManager,

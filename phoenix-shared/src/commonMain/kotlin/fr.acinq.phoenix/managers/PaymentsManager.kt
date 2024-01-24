@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.managers
 
+import co.touchlab.kermit.Logger
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.byteVector32
@@ -15,6 +16,7 @@ import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqlitePaymentsDb
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,12 +24,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 
 
 class PaymentsManager(
-    private val loggerFactory: LoggerFactory,
+    private val loggerFactory: Logger,
     private val configurationManager: AppConfigurationManager,
     private val peerManager: PeerManager,
     private val databaseManager: DatabaseManager,
@@ -35,14 +35,14 @@ class PaymentsManager(
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness) : this(
-        loggerFactory = business.loggerFactory,
+        loggerFactory = business.newLoggerFactory,
         configurationManager = business.appConfigurationManager,
         peerManager = business.peerManager,
         databaseManager = business.databaseManager,
         electrumClient = business.electrumClient
     )
 
-    private val log = newLogger(loggerFactory)
+    private val log = loggerFactory.appendingTag("PaymentsManager")
 
     /**
      * A flow containing the total number of payments in the database,

@@ -16,11 +16,10 @@
 
 package fr.acinq.phoenix.db
 
+import co.touchlab.kermit.Logger
 import com.squareup.sqldelight.EnumColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToList
-import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.TxId
@@ -37,22 +36,21 @@ import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.db.payments.LinkTxToPaymentQueries
 import fr.acinq.phoenix.managers.CurrencyManager
+import fr.acinq.phoenix.utils.loggerExtensions.*
 import fracinqphoenixdb.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 
 class SqlitePaymentsDb(
-    loggerFactory: LoggerFactory,
+    loggerFactory: Logger,
     private val driver: SqlDriver,
     private val currencyManager: CurrencyManager? = null
 ) : PaymentsDb {
 
-    private val log = newLogger(loggerFactory)
+    private val log = loggerFactory.appendingTag("SqlitePaymentsDb")
 
     private val database = PaymentsDatabase(
         driver = driver,

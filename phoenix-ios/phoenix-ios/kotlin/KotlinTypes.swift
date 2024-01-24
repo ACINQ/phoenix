@@ -98,11 +98,3 @@ extension LnurlAuth {
 	typealias Scheme_DEFAULT = LnurlAuth.SchemeDEFAULT_SCHEME
 	typealias Scheme_ANDROID_LEGACY = LnurlAuth.SchemeANDROID_LEGACY_SCHEME
 }
-
-extension LogsConfiguration {
-	typealias Model_Awaiting = ModelAwaiting
-	typealias Model_Exporting = ModelExporting
-	typealias Model_Ready = ModelReady
-	
-	typealias Intent_Export = IntentExport
-}
