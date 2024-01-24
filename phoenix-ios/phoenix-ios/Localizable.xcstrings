@@ -4355,6 +4355,9 @@
         }
       }
     },
+    "Back" : {
+
+    },
     "Background payments" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -10633,6 +10636,9 @@
           }
         }
       }
+    },
+    "Feerate below minimum allowed by mempool: %@ sats/vByte" : {
+
     },
     "Feerate below minimum allowed by mempool." : {
       "localizations" : {
