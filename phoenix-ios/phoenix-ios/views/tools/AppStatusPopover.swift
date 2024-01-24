@@ -56,7 +56,7 @@ struct AppStatusPopover: View {
 					close()
 				}
 				.font(.title2)
-				.accessibilityHidden(popoverState.publisher.value?.dismissable ?? false)
+				.accessibilityHidden(popoverState.dismissable)
 				
 			}
 			.padding(.top, 10)

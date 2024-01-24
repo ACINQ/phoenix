@@ -345,4 +345,11 @@
     <string name="outgoing_finalfailure_alreadypaid">Esta factura ya ha sido pagada.</string>
     <string name="outgoing_finalfailure_noroutefound">El destinatario no está localizable o no tiene suficiente liquidez entrante.</string>
 
+    <!-- low feerate disclaimer -->
+
+    <string name="send_low_feerate_dialog_title">¡Baja comisión!</string>
+    <string name="send_low_feerate_dialog_body1">Los pagos con comisiones bajas pueden pasar días o semanas sin confirmarse.</string>
+    <string name="send_low_feerate_dialog_body2">La selección de comisiones es su responsabilidad. Una vez enviado, este pago no puede ser cancelado, sólo acelerado con comisiones más altas.</string>
+    <string name="send_low_feerate_dialog_body3">¿Está seguro de que desea continuar?</string>
+
 </resources>

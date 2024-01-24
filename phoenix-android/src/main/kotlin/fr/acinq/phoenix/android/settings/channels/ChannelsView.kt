@@ -40,7 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
@@ -97,7 +96,7 @@ fun ChannelsView(
                 }
             }
         )
-        if (!channelsState.isNullOrEmpty()) {
+        if (!channelsState?.values?.filter { it.isUsable }.isNullOrEmpty()) {
             LightningBalanceView(balance = balance, inboundLiquidity = inboundLiquidity)
         }
         ChannelsList(channels = channelsState, onChannelClick = onChannelClick)
@@ -115,7 +114,8 @@ private fun LightningBalanceView(
         if (balance != null && inboundLiquidity != null) {
             val balanceVsInbound = remember(balance, inboundLiquidity) {
                 (balance.msat.toFloat() / (balance.msat + inboundLiquidity.msat))
-                    .coerceIn(0.1f, 0.9f) // unreadable otherwise
+                    .coerceIn(0.1f, 0.9f)// unreadable otherwise
+                    .takeUnless { it.isNaN() }
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(
@@ -145,13 +145,15 @@ private fun LightningBalanceView(
                 ) {}
             }
             Spacer(modifier = Modifier.height(2.dp))
-            LinearProgressIndicator(
-                progress = balanceVsInbound,
-                modifier = Modifier
-                    .height(8.dp)
-                    .fillMaxWidth(),
-                strokeCap = StrokeCap.Round,
-            )
+            if (balanceVsInbound != null) {
+                LinearProgressIndicator(
+                    progress = balanceVsInbound,
+                    modifier = Modifier
+                        .height(8.dp)
+                        .fillMaxWidth(),
+                    strokeCap = StrokeCap.Round,
+                )
+            }
             Spacer(modifier = Modifier.height(2.dp))
             Row {
                 Column {

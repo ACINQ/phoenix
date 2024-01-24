@@ -33,47 +33,37 @@ typealias PaymentListener = (Lightning_kmpIncomingPayment) -> Void
  * This means that the following instances are recycled (continue existing in memory):
  * - PhoenixManager.shared
  * - XpcManager.shared
+ *
+ * ---------------------
+ * # Architecture notes:
+ *
+ * In a previous implementation, we created the `PhoenixBusiness` instance once,
+ * and then simply performed a reconnect if we needed to handle multiple push notifications.
+ * However, we encountered some technical problems with the approach...
+ *
+ * In lightning-kmp, the IncomingPaymentsHandler stores payment parts in memory.
+ * If payment parts arrive slowly, the the background & foreground processes may
+ * have a different view of the current state, or even handle the same part differently.
+ *
+ * Ultimately, this is a problem we'd like to fix in lightning-kmp. But for now,
+ * a simple half-fix is to ensure the background process always uses a fresh lightning instance.
  */
 class PhoenixManager {
 	
 	public static let shared = PhoenixManager()
-	
-	public let business: PhoenixBusiness
-	
-	private var queue = DispatchQueue(label: "PhoenixManager")
+
 	private var connectionsListener: ConnectionsListener? = nil
 	private var paymentListener: PaymentListener? = nil
 	
-	private var isFirstConnect = true
-	
-	private var publisher: AnyPublisher<Lightning_kmpIncomingPayment, Never>? = nil
-	
-	private var fiatExchangeRates: [ExchangeRate] = []
+	private var business: PhoenixBusiness? = nil
+	private var oldBusiness: PhoenixBusiness? = nil
+
 	private var cancellables = Set<AnyCancellable>()
-	
-	private init() {
-		business = PhoenixBusiness(ctx: PlatformContext())
-		
-		let electrumConfig = GroupPrefs.shared.electrumConfig
-		business.appConfigurationManager.updateElectrumConfig(server: electrumConfig?.serverAddress)
-		
-		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
-			primary: GroupPrefs.shared.fiatCurrency,
-			others: GroupPrefs.shared.preferredFiatCurrencies
-		)
-		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
-		
-		business.networkMonitor.disable()
-		business.currencyManager.disableAutoRefresh()
-		
-		let startupParams = StartupParams(
-			requestCheckLegacyChannels: false,
-			isTorEnabled: GroupPrefs.shared.isTorEnabled,
-			liquidityPolicy: GroupPrefs.shared.liquidityPolicy.toKotlin(),
-			trustedSwapInTxs: Set()
-		)
-		business.start(startupParams: startupParams)
-	}
+	private var oldCancellables = Set<AnyCancellable>()
+
+	private var fiatExchangeRates: [ExchangeRate] = []
+
+	private init() {} // Must use shared instance
 	
 	// --------------------------------------------------
 	// MARK: Public Functions
@@ -84,55 +74,23 @@ class PhoenixManager {
 		paymentListener: @escaping PaymentListener
 	) {
 		log.trace("register(::)")
+		assertMainThread()
+
+		self.connectionsListener = connectionsListener
+		self.paymentListener = paymentListener
 		
-		let wasAlreadyUnlocked = business.walletManager.isLoaded()
-		
-		queue.async { [self] in
-			self.connectionsListener = connectionsListener
-			self.paymentListener = paymentListener
-		
-			if wasAlreadyUnlocked {
-				// The new instance (`UNNotificationServiceExtension`) needs to know the current connection state.
-				DispatchQueue.main.async {
-					let connections = self.business.connectionsManager.currentValue
-					self.connectionsChanged(connections)
-				}
-			}
-		}
+		setupBusiness()
+		unlock()
 	}
 	
 	public func unregister() {
 		log.trace("unregister()")
+		assertMainThread()
 
-		queue.async { [self] in
-			self.connectionsListener = nil
-			self.paymentListener = nil
-		}
-	}
-	
-	public func connect() {
-		log.trace("connect()")
+		self.connectionsListener = nil
+		self.paymentListener = nil
 		
-		queue.async { [self] in
-			
-			if isFirstConnect {
-				isFirstConnect = false
-				unlock()
-			} else {
-				reconnect()
-			}
-		}
-	}
-	
-	public func disconnect() {
-		log.trace("disconnect()")
-		
-		// Kotlin needs to be accessed only on the main thread
-		DispatchQueue.main.async { [self] in
-			business.appConnectionsDaemon?.incrementDisconnectCount(
-				target: AppConnectionsDaemon.ControlTarget.companion.All
-			)
-		}
+		teardownBusiness()
 	}
 	
 	public func exchangeRate(fiatCurrency: FiatCurrency) -> ExchangeRate.BitcoinPriceRate? {
@@ -141,26 +99,125 @@ class PhoenixManager {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Private Functions
+	// MARK: Business management
 	// --------------------------------------------------
 	
-	private func reconnect() {
-		log.trace("reconnect()")
-		
-		// Kotlin needs to be accessed only on the main thread
-		DispatchQueue.main.async { [self] in
-			business.appConnectionsDaemon?.decrementDisconnectCount(
-				target: AppConnectionsDaemon.ControlTarget.companion.All
-			)
+	private func setupBusiness() {
+		log.trace("setupBusiness()")
+		assertMainThread()
+
+		guard business == nil else {
+			log.warning("ignoring: business != nil")
+			return
 		}
+
+		let newBusiness = PhoenixBusiness(ctx: PlatformContext())
+
+		newBusiness.networkMonitor.disable()
+		newBusiness.currencyManager.disableAutoRefresh()
+
+		let electrumConfig = GroupPrefs.shared.electrumConfig
+		newBusiness.appConfigurationManager.updateElectrumConfig(server: electrumConfig?.serverAddress)
+		
+		let primaryFiatCurrency = GroupPrefs.shared.fiatCurrency
+		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
+			primary: primaryFiatCurrency,
+			others: GroupPrefs.shared.preferredFiatCurrencies
+		)
+		newBusiness.appConfigurationManager.updatePreferredFiatCurrencies(
+			current: preferredFiatCurrencies
+		)
+
+		let startupParams = StartupParams(
+			requestCheckLegacyChannels: false,
+			isTorEnabled: GroupPrefs.shared.isTorEnabled,
+			liquidityPolicy: GroupPrefs.shared.liquidityPolicy.toKotlin(),
+			trustedSwapInTxs: Set()
+		)
+		newBusiness.start(startupParams: startupParams)
+
+		newBusiness.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
+
+		newBusiness.connectionsManager.connectionsPublisher().sink {
+			[weak self](connections: Connections) in
+
+			self?.connectionsChanged(connections)
+		}
+		.store(in: &cancellables)
+
+		let pushReceivedAt = Date()
+		newBusiness.paymentsManager.lastIncomingPaymentPublisher().sink {
+			[weak self](payment: Lightning_kmpIncomingPayment) in
+
+			guard
+				let paymentReceivedAt = payment.received?.receivedAtDate,
+				paymentReceivedAt > pushReceivedAt
+			else {
+				// Ignoring - this is the most recently received incomingPayment, but not a new one
+				return
+			}
+
+			self?.didReceivePayment(payment)
+		}
+		.store(in: &cancellables)
+
+		newBusiness.currencyManager.ratesPubliser().sink {
+			[weak self](rates: [ExchangeRate]) in
+
+			assertMainThread() // var `fiatExchangeRates` should be accessed/updated only on main thread
+			self?.fiatExchangeRates = rates
+		}
+		.store(in: &cancellables)
+
+		// Setup complete
+		business = newBusiness
 	}
-	
+
+	private func teardownBusiness() {
+		log.trace("teardownBusiness()")
+		assertMainThread()
+
+		guard let currentBusiness = business else {
+			log.warning("ignoring: business == nil")
+			return
+		}
+
+		if let prvBusiness = oldBusiness {
+			prvBusiness.stop()
+			oldBusiness = nil
+			oldCancellables.removeAll()
+		}
+
+		oldBusiness = currentBusiness
+		business = nil
+		cancellables.removeAll()
+
+		currentBusiness.connectionsManager.connectionsPublisher().sink {
+			[weak self](connections: Connections) in
+
+			self?.oldConnectionsChanged(connections)
+		}
+		.store(in: &oldCancellables)
+
+		currentBusiness.appConnectionsDaemon?.incrementDisconnectCount(
+			target: AppConnectionsDaemon.ControlTarget.companion.All
+		)
+
+		// Safety mechanism: To make sure nothing falls between the cracks,
+		// and the oldBusiness doesn't get properly cleaned up.
+		oldConnectionsChanged(currentBusiness.connectionsManager.currentValue)
+	}
+
+	// --------------------------------------------------
+	// MARK: Flow
+	// --------------------------------------------------
+
 	private func unlock() {
 		log.trace("unlock()")
 		
 		let connectWithRecoveryPhrase = {(recoveryPhrase: RecoveryPhrase?) in
 			DispatchQueue.main.async {
-				self._connect(recoveryPhrase: recoveryPhrase)
+				self.connect(recoveryPhrase: recoveryPhrase)
 			}
 		}
 		
@@ -197,75 +254,75 @@ class PhoenixManager {
 		}
 	}
 	
-	private func _connect(recoveryPhrase: RecoveryPhrase?) {
-		log.trace("_connect(recoveryPhrase:)")
+	private func connect(recoveryPhrase: RecoveryPhrase?) {
+		log.trace("connect(recoveryPhrase:)")
 		assertMainThread()
 		
 		guard let recoveryPhrase = recoveryPhrase else {
+			log.warning("ignoring: recoveryPhrase == nil")
+			return
+		}
+		guard let business = business else {
+			log.warning("ignoring: business == nil")
 			return
 		}
 
-		business.connectionsManager.connectionsPublisher().sink {
-			[weak self](connections: Connections) in
-			
-			self?.connectionsChanged(connections)
-		}
-		.store(in: &cancellables)
-		
-		let pushReceivedAt = Date()
-		business.paymentsManager.lastIncomingPaymentPublisher().sink {
-			[weak self](payment: Lightning_kmpIncomingPayment) in
-			
-			guard
-				let paymentReceivedAt = payment.received?.receivedAtDate,
-				paymentReceivedAt > pushReceivedAt
-			else {
-				// Ignoring - this is the most recently received incomingPayment, but not a new one
-				return
-			}
-			
-			self?.didReceivePayment(payment)
-		}
-		.store(in: &cancellables)
-		
-		business.currencyManager.ratesPubliser().sink {
-			[weak self](rates: [ExchangeRate]) in
-			
-			assertMainThread() // var `fiatExchangeRates` should be accessed/updated only on main thread
-			self?.fiatExchangeRates = rates
-		}
-		.store(in: &cancellables)
-		
 		let seed = business.walletManager.mnemonicsToSeed(
 			mnemonics: recoveryPhrase.mnemonicsArray,
 			passphrase: ""
 		)
 		business.walletManager.loadWallet(seed: seed)
-		
-		let primaryFiatCurrency = GroupPrefs.shared.fiatCurrency
-		business.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
 	}
-	
+
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+
 	private func connectionsChanged(_ connections: Connections) {
 		log.trace("connectionsChanged(_)")
-		
-		queue.async { [self] in
-			if let listener = self.connectionsListener {
-				DispatchQueue.main.async {
-					listener(connections)
-				}
-			}
+		assertMainThread()
+
+		if let listener = self.connectionsListener {
+			listener(connections)
 		}
 	}
 	
 	private func didReceivePayment(_ payment: Lightning_kmpIncomingPayment) {
 		log.trace("didReceivePayment(_)")
-		
-		queue.async { [self] in
-			if let listener = self.paymentListener {
-				DispatchQueue.main.async {
-					listener(payment)
-				}
+		assertMainThread()
+
+		if let listener = self.paymentListener {
+			listener(payment)
+		}
+	}
+
+	// --------------------------------------------------
+	// MARK: Cleanup
+	// --------------------------------------------------
+
+	private func oldConnectionsChanged(_ connections: Connections) {
+		log.trace("oldConnectionsChanged(_)")
+
+		switch connections.peer {
+			case is Lightning_kmpConnection.ESTABLISHED  : log.debug("oldConnections.peer = ESTABLISHED")
+			case is Lightning_kmpConnection.ESTABLISHING : log.debug("oldConnections.peer = ESTABLISHING")
+			case is Lightning_kmpConnection.CLOSED       : log.debug("oldConnections.peer = CLOSED")
+			default                                      : log.debug("oldConnections.peer = UNKNOWN")
+		}
+		switch connections.electrum {
+			case is Lightning_kmpConnection.ESTABLISHED  : log.debug("oldConnections.electrum = ESTABLISHED")
+			case is Lightning_kmpConnection.ESTABLISHING : log.debug("oldConnections.electrum = ESTABLISHING")
+			case is Lightning_kmpConnection.CLOSED       : log.debug("oldConnections.electrum = CLOSED")
+			default                                      : log.debug("oldConnections.electrum = UNKNOWN")
+		}
+
+		if connections.peer is Lightning_kmpConnection.CLOSED &&
+			connections.electrum is Lightning_kmpConnection.CLOSED
+		{
+			if let prvBusiness = oldBusiness {
+				prvBusiness.stop()
+				oldBusiness = nil
+				oldCancellables.removeAll()
 			}
 		}
 	}

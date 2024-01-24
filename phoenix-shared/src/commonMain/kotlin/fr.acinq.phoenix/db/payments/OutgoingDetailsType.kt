@@ -77,9 +77,9 @@ sealed class OutgoingDetailsData {
         @Suppress("DEPRECATION")
         fun deserialize(typeVersion: OutgoingDetailsTypeVersion, blob: ByteArray): LightningOutgoingPayment.Details? = DbTypesHelper.decodeBlob(blob) { json, format ->
             when (typeVersion) {
-                OutgoingDetailsTypeVersion.NORMAL_V0 -> format.decodeFromString<Normal.V0>(json).let { LightningOutgoingPayment.Details.Normal(PaymentRequest.read(it.paymentRequest)) }
+                OutgoingDetailsTypeVersion.NORMAL_V0 -> format.decodeFromString<Normal.V0>(json).let { LightningOutgoingPayment.Details.Normal(PaymentRequest.read(it.paymentRequest).get()) }
                 OutgoingDetailsTypeVersion.KEYSEND_V0 -> format.decodeFromString<KeySend.V0>(json).let { LightningOutgoingPayment.Details.KeySend(it.preimage) }
-                OutgoingDetailsTypeVersion.SWAPOUT_V0 -> format.decodeFromString<SwapOut.V0>(json).let { LightningOutgoingPayment.Details.SwapOut(it.address, PaymentRequest.read(it.paymentRequest), it.swapOutFee) }
+                OutgoingDetailsTypeVersion.SWAPOUT_V0 -> format.decodeFromString<SwapOut.V0>(json).let { LightningOutgoingPayment.Details.SwapOut(it.address, PaymentRequest.read(it.paymentRequest).get(), it.swapOutFee) }
                 OutgoingDetailsTypeVersion.CLOSING_V0 -> null
             }
         }

@@ -840,6 +840,8 @@ struct ValidateView: View {
 		let lightningFeeMsat: Int64
 		if mvi.model is Scan.Model_OnChainFlow {
 			lightningFeeMsat = 0
+		} else if let _ = lnurlWithdraw() {
+			lightningFeeMsat = 0
 		} else if let trampolineFees = defaultTrampolineFees() {
 			let p1 = Utils.toMsat(sat: trampolineFees.feeBase)
 			let f2 = Double(trampolineFees.feeProportional) / 1_000_000

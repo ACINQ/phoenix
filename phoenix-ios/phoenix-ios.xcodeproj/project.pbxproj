@@ -171,8 +171,6 @@
 		DC9130A02AE045FA00F9B8C6 /* Sequence+Sum.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC59377027516296003B4B53 /* Sequence+Sum.swift */; };
 		DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9473F9261270B4008D7242 /* MVI+Mock.swift */; };
 		DC949E6A2B45B1EC00E80BB5 /* LiquidityAdsHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC949E692B45B1EC00E80BB5 /* LiquidityAdsHelp.swift */; };
-		DC9545C429490321008FCEF4 /* NotificationContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9545C329490321008FCEF4 /* NotificationContent.swift */; };
-		DC9545C5294905FB008FCEF4 /* NotificationContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9545C329490321008FCEF4 /* NotificationContent.swift */; };
 		DC98D3962AF170AC005BD177 /* PaymentWarningPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC98D3952AF170AC005BD177 /* PaymentWarningPopover.swift */; };
 		DC98D3982AF2AE41005BD177 /* ReceiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC98D3972AF2AE41005BD177 /* ReceiveView.swift */; };
 		DC99E90925B78FA800FB20F7 /* EnabledSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E90825B78FA800FB20F7 /* EnabledSecurity.swift */; };
@@ -509,7 +507,6 @@
 		DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplicationState+Phoenix.swift"; sourceTree = "<group>"; };
 		DC9473F9261270B4008D7242 /* MVI+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MVI+Mock.swift"; sourceTree = "<group>"; };
 		DC949E692B45B1EC00E80BB5 /* LiquidityAdsHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityAdsHelp.swift; sourceTree = "<group>"; };
-		DC9545C329490321008FCEF4 /* NotificationContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationContent.swift; sourceTree = "<group>"; };
 		DC98D3952AF170AC005BD177 /* PaymentWarningPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentWarningPopover.swift; sourceTree = "<group>"; };
 		DC98D3972AF2AE41005BD177 /* ReceiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveView.swift; sourceTree = "<group>"; };
 		DC99E90825B78FA800FB20F7 /* EnabledSecurity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnabledSecurity.swift; sourceTree = "<group>"; };
@@ -1192,7 +1189,6 @@
 			children = (
 				DC641C6E282085F500862DCD /* phoenix-notifySrvExt.entitlements */,
 				DCB511C9281AED58001BC525 /* NotificationService.swift */,
-				DC9545C329490321008FCEF4 /* NotificationContent.swift */,
 				DC641C6A2820803100862DCD /* PhoenixManager.swift */,
 				DC32FB3429A3D3FE009912AC /* XpcManager.swift */,
 				DCB511CB281AED58001BC525 /* Info.plist */,
@@ -1653,7 +1649,6 @@
 				DC118C0C27B561210080BBAC /* CurrencyAmount.swift in Sources */,
 				DC04C2632A9009890021F2E8 /* MergeChannelsView.swift in Sources */,
 				DC46BAF726CACCF700E760A6 /* KotlinExtensions+Conversion.swift in Sources */,
-				DC9545C5294905FB008FCEF4 /* NotificationContent.swift in Sources */,
 				DC49FE992AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift in Sources */,
 				DC142140261E72E40075857A /* AnyHTML.swift in Sources */,
 				DC2CE3AF29AFEB0500BA0B00 /* Bundle+Icon.swift in Sources */,
@@ -1842,7 +1837,6 @@
 				DC641C7C282172BB00862DCD /* DelayedSave.swift in Sources */,
 				DCA6DECE282AB12B0073C658 /* SecurityFile.swift in Sources */,
 				DC32FB3529A3D3FE009912AC /* XpcManager.swift in Sources */,
-				DC9545C429490321008FCEF4 /* NotificationContent.swift in Sources */,
 				DC49FE9C2AC49E0400D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */,
 				DC6ACC592B10F4FE0079179B /* RecoveryPhrase.swift in Sources */,
 				DCA6DEC72829BFD70073C658 /* CrossProcessCommunication.swift in Sources */,
@@ -2049,7 +2043,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Green";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-ios/Phoenix.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 69;
+				CURRENT_PROJECT_VERSION = 70;
 				DEVELOPMENT_ASSET_PATHS = "\"phoenix-ios/Preview Content\"";
 				DEVELOPMENT_TEAM = XD77LN4376;
 				ENABLE_PREVIEWS = YES;
@@ -2078,7 +2072,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Green";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-ios/Phoenix.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 69;
+				CURRENT_PROJECT_VERSION = 70;
 				DEVELOPMENT_ASSET_PATHS = "\"phoenix-ios/Preview Content\"";
 				DEVELOPMENT_TEAM = XD77LN4376;
 				ENABLE_PREVIEWS = YES;
@@ -2183,7 +2177,7 @@
 			buildSettings = {
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 69;
+				CURRENT_PROJECT_VERSION = 70;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -2212,7 +2206,7 @@
 			buildSettings = {
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 69;
+				CURRENT_PROJECT_VERSION = 70;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -2242,7 +2236,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-notifySrvExt/phoenix-notifySrvExt.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 69;
+				CURRENT_PROJECT_VERSION = 70;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "phoenix-notifySrvExt/Info.plist";
@@ -2269,7 +2263,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_ENTITLEMENTS = "phoenix-notifySrvExt/phoenix-notifySrvExt.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 69;
+				CURRENT_PROJECT_VERSION = 70;
 				DEVELOPMENT_TEAM = XD77LN4376;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "phoenix-notifySrvExt/Info.plist";

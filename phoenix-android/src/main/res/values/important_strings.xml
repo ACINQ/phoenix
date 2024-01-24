@@ -358,4 +358,11 @@
     <string name="outgoing_finalfailure_alreadypaid">This invoice has already been paid.</string>
     <string name="outgoing_finalfailure_noroutefound">Recipient is not reachable, or does not have enough inbound liquidity.</string>
 
+    <!-- low feerate disclaimer -->
+
+    <string name="send_low_feerate_dialog_title">Low feerate!</string>
+    <string name="send_low_feerate_dialog_body1">Transactions with insufficient feerate may linger for days or weeks without confirming.</string>
+    <string name="send_low_feerate_dialog_body2">Choosing the feerate is your responsibility. Once sent, this transaction cannot be cancelled, only accelerated with higher fees.</string>
+    <string name="send_low_feerate_dialog_body3">Are you sure you want to proceed?</string>
+
 </resources>

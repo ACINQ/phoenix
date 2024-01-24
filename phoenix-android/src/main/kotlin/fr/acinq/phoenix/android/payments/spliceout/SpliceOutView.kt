@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.payments
+package fr.acinq.phoenix.android.payments.spliceout
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelCommand
@@ -41,9 +42,8 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.payments.spliceout.SpliceOutState
-import fr.acinq.phoenix.android.payments.spliceout.SpliceOutViewModel
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
 
@@ -66,6 +66,7 @@ fun SendSpliceOutView(
     val peerManager = business.peerManager
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
     val balance = business.balanceManager.balance.collectAsState(null).value
+    val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
     val vm = viewModel<SpliceOutViewModel>(factory = SpliceOutViewModel.Factory(peerManager, business.chain))
 
     var feerate by remember { mutableStateOf(mempoolFeerate?.halfHour?.feerate) }
@@ -104,9 +105,9 @@ fun SendSpliceOutView(
         }
     ) {
         SplashLabelRow(label = stringResource(id = R.string.send_spliceout_feerate_label)) {
-            feerate?.let {
+            feerate?.let { currentFeerate ->
                 FeerateSlider(
-                    feerate = it,
+                    feerate = currentFeerate,
                     onFeerateChange = { newFeerate ->
                         if (vm.state != SpliceOutState.Init && feerate != newFeerate) {
                             vm.state = SpliceOutState.Init
@@ -117,29 +118,17 @@ fun SendSpliceOutView(
                 )
             } ?: ProgressView(text = stringResource(id = R.string.send_spliceout_feerate_waiting_for_value), padding = PaddingValues(0.dp))
         }
+
         SplashLabelRow(label = stringResource(R.string.send_spliceout_address_label), icon = R.drawable.ic_chain) {
             SelectionContainer {
                 Text(text = address)
             }
         }
 
-        val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
         when (val state = vm.state) {
             is SpliceOutState.Init, is SpliceOutState.Error -> {
                 Spacer(modifier = Modifier.height(24.dp))
-                if (state is SpliceOutState.Error.Thrown) {
-                    ErrorMessage(
-                        header = stringResource(id = R.string.send_spliceout_error_failure),
-                        details = state.e.localizedMessage,
-                        alignment = Alignment.CenterHorizontally,
-                    )
-                } else if (state is SpliceOutState.Error.NoChannels) {
-                    ErrorMessage(
-                        header = stringResource(id = R.string.send_spliceout_error_failure),
-                        details = stringResource(id = R.string.splice_error_nochannels),
-                        alignment = Alignment.CenterHorizontally,
-                    )
-                }
+                SpliceOutErrorView(state = state)
                 BorderButton(
                     text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_spliceout_prepare_button),
                     icon = R.drawable.ic_build,
@@ -163,30 +152,13 @@ fun SendSpliceOutView(
                 ProgressView(text = stringResource(id = R.string.send_spliceout_prepare_in_progress))
             }
             is SpliceOutState.ReadyToSend -> {
-                SplashLabelRow(label = "") {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    HSeparator(width = 60.dp)
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-                val total = state.userAmount + state.estimatedFee
-                SpliceOutFeeSummaryView(fee = state.estimatedFee, total = total, userFeerate = state.userFeerate, actualFeerate = state.actualFeerate)
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                if (balance != null && total.toMilliSatoshi() > balance) {
-                    ErrorMessage(
-                        header = stringResource(R.string.send_spliceout_error_cannot_afford_fees),
-                        alignment = Alignment.CenterHorizontally,
-                    )
-                } else {
-                    FilledButton(
-                        text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
-                        icon = R.drawable.ic_send,
-                        enabled = mayDoPayments && amountErrorMessage.isBlank()
-                    ) {
-                        vm.executeSpliceOut(state.userAmount, state.actualFeerate, address)
-                    }
-                }
+                SpliceOutReadyView(
+                    state = state,
+                    balance = balance,
+                    isAmountValid = amountErrorMessage.isBlank(),
+                    mayDoPayments = mayDoPayments,
+                    onExecute = { vm.executeSpliceOut(state.userAmount, state.actualFeerate, address) },
+                )
             }
             is SpliceOutState.Executing -> {
                 Spacer(modifier = Modifier.height(24.dp))
@@ -204,6 +176,91 @@ fun SendSpliceOutView(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun SpliceOutErrorView(state: SpliceOutState) {
+    when (state) {
+        is SpliceOutState.Error.Thrown -> {
+            ErrorMessage(
+                header = stringResource(id = R.string.send_spliceout_error_failure),
+                details = state.e.localizedMessage,
+                alignment = Alignment.CenterHorizontally,
+            )
+        }
+        is SpliceOutState.Error.NoChannels -> {
+            ErrorMessage(
+                header = stringResource(id = R.string.send_spliceout_error_failure),
+                details = stringResource(id = R.string.splice_error_nochannels),
+                alignment = Alignment.CenterHorizontally,
+            )
+        }
+        else -> {}
+    }
+}
+
+@Composable
+private fun SpliceOutReadyView(
+    state: SpliceOutState.ReadyToSend,
+    balance: MilliSatoshi?,
+    isAmountValid: Boolean,
+    mayDoPayments: Boolean,
+    onExecute: () -> Unit,
+) {
+    SplashLabelRow(label = "") {
+        Spacer(modifier = Modifier.height(16.dp))
+        HSeparator(width = 60.dp)
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+    val total = state.userAmount + state.estimatedFee
+    SpliceOutFeeSummaryView(fee = state.estimatedFee, total = total, userFeerate = state.userFeerate, actualFeerate = state.actualFeerate)
+
+    Spacer(modifier = Modifier.height(24.dp))
+
+    var showDisclaimer by remember { mutableStateOf(false) }
+    if (showDisclaimer) {
+        Dialog(
+            onDismiss = { showDisclaimer = false },
+            buttons = null,
+            title = stringResource(id = R.string.send_low_feerate_dialog_title)
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(text = annotatedStringResource(id = R.string.send_low_feerate_dialog_body1))
+                Text(text = stringResource(id = R.string.send_low_feerate_dialog_body2))
+                Text(text = stringResource(id = R.string.send_low_feerate_dialog_body3))
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Button(
+                    text = stringResource(id = R.string.btn_cancel),
+                    onClick = { showDisclaimer = false },
+                )
+                Button(
+                    text = stringResource(id = R.string.btn_confirm),
+                    onClick = onExecute,
+                    icon = R.drawable.ic_check_circle,
+                    space = 8.dp,
+                )
+            }
+        }
+    }
+
+    if (balance == null || total.toMilliSatoshi() > balance) {
+        ErrorMessage(
+            header = stringResource(R.string.send_spliceout_error_cannot_afford_fees),
+            alignment = Alignment.CenterHorizontally,
+        )
+    } else {
+        FilledButton(
+            text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
+            icon = R.drawable.ic_send,
+            enabled = mayDoPayments && isAmountValid,
+            onClick = { showDisclaimer = true },
+        )
     }
 }
 

@@ -239,7 +239,6 @@ class NotificationService: UNNotificationServiceExtension {
 					self?.didReceivePayment(payment)
 				}
 			)
-			PhoenixManager.shared.connect()
 		}
 	}
 	
@@ -250,7 +249,6 @@ class NotificationService: UNNotificationServiceExtension {
 		if phoenixStarted {
 			phoenixStarted = false
 			
-			PhoenixManager.shared.disconnect()
 			PhoenixManager.shared.unregister()
 		}
 	}
@@ -309,23 +307,60 @@ class NotificationService: UNNotificationServiceExtension {
 			
 		} else { // received 1 or more payments
 			
-			let paymentInfos = receivedPayments.map { payment in
-				WalletPaymentInfo(
-					payment: payment,
-					metadata: WalletPaymentMetadata.empty(),
-					fetchOptions: WalletPaymentFetchOptions.companion.None
-				)
-			}
-			
 			let bitcoinUnit = GroupPrefs.shared.bitcoinUnit
 			let fiatCurrency = GroupPrefs.shared.fiatCurrency
 			let exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
 			
-			bestAttemptContent.fillForReceivedPayments(
-				payments: paymentInfos,
-				bitcoinUnit: bitcoinUnit,
-				exchangeRate: exchangeRate
-			)
+			var msat: Int64 = 0
+			for payment in receivedPayments {
+				msat += payment.amount.msat
+			}
+			
+			let bitcoinAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
+			
+			var fiatAmt: FormattedAmount? = nil
+			if let exchangeRate {
+				fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
+			}
+			
+			var amountString = bitcoinAmt.string
+			if let fiatAmt {
+				amountString += " (≈\(fiatAmt.string))"
+			}
+			
+			if receivedPayments.count == 1 {
+				bestAttemptContent.title =
+					NSLocalizedString("Received payment", comment: "Push notification title")
+				
+				if !GroupPrefs.shared.discreetNotifications {
+					let paymentInfo = WalletPaymentInfo(
+						payment: receivedPayments.first!,
+						metadata: WalletPaymentMetadata.empty(),
+						fetchOptions: WalletPaymentFetchOptions.companion.None
+					)
+					if let desc = paymentInfo.paymentDescription(), desc.count > 0 {
+						bestAttemptContent.body = "\(amountString): \(desc)"
+					} else {
+						bestAttemptContent.body = amountString
+					}
+				}
+				
+			} else {
+				bestAttemptContent.title =
+					NSLocalizedString("Received multiple payments", comment: "Push notification title")
+				
+				if !GroupPrefs.shared.discreetNotifications {
+					bestAttemptContent.body = amountString
+				}
+			}
+			
+			// The user can independently enable/disable:
+			// - alerts
+			// - badges
+			// So we may only be able to badge the app icon, and that's it.
+			
+			GroupPrefs.shared.badgeCount += receivedPayments.count
+			bestAttemptContent.badge = NSNumber(value: GroupPrefs.shared.badgeCount)
 		}
 		
 		contentHandler(bestAttemptContent)

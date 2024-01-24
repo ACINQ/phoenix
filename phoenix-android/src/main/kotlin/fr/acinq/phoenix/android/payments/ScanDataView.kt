@@ -54,6 +54,7 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.databinding.ScanViewBinding
+import fr.acinq.phoenix.android.payments.spliceout.SendSpliceOutView
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ScanController

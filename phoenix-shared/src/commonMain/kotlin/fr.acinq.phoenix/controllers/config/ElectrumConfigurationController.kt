@@ -7,6 +7,7 @@ import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import fr.acinq.phoenix.controllers.AppController
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 
@@ -15,7 +16,7 @@ class AppElectrumConfigurationController(
     loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,
     private val electrumClient: ElectrumClient,
-    private val appConnectionsDaemon: AppConnectionsDaemon
+    private val appConnectionsDaemon: AppConnectionsDaemon?
 ) : AppController<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>(
     loggerFactory = loggerFactory,
     firstModel = ElectrumConfiguration.Model()
@@ -24,14 +25,14 @@ class AppElectrumConfigurationController(
         loggerFactory = business.loggerFactory,
         configurationManager = business.appConfigurationManager,
         electrumClient = business.electrumClient,
-        appConnectionsDaemon = business.appConnectionsDaemon!!
+        appConnectionsDaemon = business.appConnectionsDaemon
     )
 
     init {
         launch {
             combine(
                 configurationManager.electrumConfig,
-                appConnectionsDaemon.lastElectrumServerAddress,
+                appConnectionsDaemon?.lastElectrumServerAddress ?: flow { null },
                 electrumClient.connectionStatus,
                 configurationManager.electrumMessages,
                 transform = { configState, currentServer, connectionStatus, message ->

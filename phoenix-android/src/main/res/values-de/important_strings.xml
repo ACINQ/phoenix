@@ -358,4 +358,11 @@
     <string name="outgoing_finalfailure_alreadypaid">Diese Zahlung wurde bereits getätigt.</string>
     <string name="outgoing_finalfailure_noroutefound">Der Empfänger ist nicht erreichbar oder hat nicht genügend Liquidität im Eingang.</string>
 
+    <!-- low feerate disclaimer -->
+
+    <string name="send_low_feerate_dialog_title">Niedrige Gebühren!</string>
+    <string name="send_low_feerate_dialog_body1">Zahlungen mit niedrigen Gebühren können sich über Tage oder Wochen hinziehen, ohne bestätigt zu werden.</string>
+    <string name="send_low_feerate_dialog_body2">Die Auswahl der Gebühren liegt in Ihrer Verantwortung. Einmal abgeschickt, kann diese Zahlung nicht mehr storniert, sondern nur noch mit höheren Gebühren beschleunigt werden.</string>
+    <string name="send_low_feerate_dialog_body3">Sind Sie sicher, dass Sie fortfahren möchten?</string>
+
 </resources>

@@ -20,6 +20,7 @@ import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.Try
 import fr.acinq.phoenix.data.lnurl.Lnurl.Companion.format
 import fr.acinq.phoenix.data.lnurl.Lnurl.Companion.log
 import fr.acinq.phoenix.db.cloud.b64Decode
@@ -111,10 +112,9 @@ sealed class LnurlPay : Lnurl.Qualified {
         ): Invoice {
             try {
                 val pr = json["pr"]?.jsonPrimitive?.content ?: throw LnurlError.Pay.Invoice.Malformed(origin, "missing pr")
-                val paymentRequest = try {
-                    PaymentRequest.read(pr) // <- throws
-                } catch (t: Throwable) {
-                    throw LnurlError.Pay.Invoice.Malformed(origin, "unreadable pr")
+                val paymentRequest = when (val res = PaymentRequest.read(pr)) {
+                    is Try.Success -> res.result
+                    is Try.Failure -> throw LnurlError.Pay.Invoice.Malformed(origin, res.error.message ?: res.error::class.toString())
                 }
 
                 val successAction = parseSuccessAction(origin, json)

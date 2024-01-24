@@ -30,6 +30,32 @@ fileprivate let msgPong_notifySrvExt: UInt64        = 0b1000
 fileprivate let msgUnavailable_notifySrvExt: UInt64 = 0b1100
 
 
+/**
+ * This class uses mach messaging to communicate between the main app & notifySrvExt background process.
+ * The communication is minimal, and is designed to allow each process to know if the other is running.
+ *
+ * Architecture notes:
+ *
+ * To use mach messaging, we have to create a channel using a name.
+ * However, any other process on the system (including other apps)
+ * can use this channel if they know the name.
+ * For this reason, we don't use a hard-coded name.
+ * Instead we randomly generate a name (using a UUID), and write the name to a file.
+ * The file is stored in the shared container for Phoenix,
+ * so it can only be read by the main app & notifySrv process.
+ *
+ * There are only 3 messages we send/receive on the channel:
+ * - ping
+ * - pong
+ * - unavailable
+ *
+ * Each message is unique per-process, so it can easily be determined which process sent the message.
+ * When the process starts, it posts a ping message to the channel.
+ * When a process receives a ping message from the other process, it responds with a pong.
+ * When a process suspends, it posts an unavailable message.
+ *
+ * Using these simple primitives, we're able to determine if the other process is active.
+ */
 class CrossProcessCommunication {
 	
 	public static let shared = CrossProcessCommunication()

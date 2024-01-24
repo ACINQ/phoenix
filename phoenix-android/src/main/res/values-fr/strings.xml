@@ -420,4 +420,13 @@
     <string name="accessctrl_screen_lock_switch">Verrouillage écran</string>
     <string name="accessctrl_screen_lock_switch_desc">Contrôle l\'accès à l\'application via le système de verrouillage système d\'Android.</string>
 
+    <!-- mempool -->
+
+    <string name="mempool_unknown_feerate_title">Frais mempool introuvables</string>
+    <string name="mempool_unknown_feerate_details">Phoenix n\'a pas pu vérifier l\'état actuel du mempool Bitcoin, et ne peut donc pas estimer la rapidité des transactions.\n\nVérifiez le mempool manuellement via un explorateur, et utilisez une valeur pertinente.</string>
+    <string name="mempool_fastest">≈ 10 minutes</string>
+    <string name="mempool_halfhour">≈ 30 minutes</string>`
+    <string name="mempool_hour">≈ 1 heure</string>
+    <string name="mempool_slow">Frais bas</string>
+
 </resources>
