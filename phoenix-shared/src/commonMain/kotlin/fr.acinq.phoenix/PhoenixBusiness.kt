@@ -21,6 +21,7 @@ import co.touchlab.kermit.loggerConfigInit
 import co.touchlab.kermit.NoTagFormatter
 import co.touchlab.kermit.platformLogWriter
 import co.touchlab.kermit.Severity
+import co.touchlab.kermit.StaticConfig
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
@@ -55,8 +56,9 @@ import org.kodein.log.withShortPackageKeepLast
 import kotlin.time.Duration.Companion.seconds
 
 object globalLoggerFactory : Logger(
-    config = loggerConfigInit(platformLogWriter(NoTagFormatter),
-        minSeverity = Severity.Info
+    config = StaticConfig(
+        minSeverity = Severity.Info,
+        logWriterList = phoenixLogWriters()
     ),
     tag = "PhoenixShared"
 )
