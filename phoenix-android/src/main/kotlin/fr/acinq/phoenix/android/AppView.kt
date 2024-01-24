@@ -177,7 +177,11 @@ fun AppView(
                     } catch (e: Exception) {
                         null
                     }
-                    val nextScreenLink = intent?.data?.getQueryParameter("next")?.decodeURLPart()
+                    val nextScreenLink = try {
+                        intent?.data?.getQueryParameter("next")?.decodeURLPart()
+                    } catch (e: Exception) {
+                        null
+                    }
                     StartupView(
                         appVM = appVM,
                         onShowIntro = { navController.navigate(Screen.Intro.route) },
