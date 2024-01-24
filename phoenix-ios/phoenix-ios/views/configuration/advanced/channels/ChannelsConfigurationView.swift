@@ -72,7 +72,9 @@ struct ChannelsConfigurationView: View {
 				if channels.isEmpty {
 					section_noChannels()
 				} else {
-					section_balance()
+					if hasUsableChannels() {
+						section_balance()
+					}
 					section_channels()
 				}
 			}
@@ -253,6 +255,11 @@ struct ChannelsConfigurationView: View {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	func hasUsableChannels() -> Bool {
+		
+		return channels.contains { $0.isUsable }
+	}
 	
 	func localBalanceColor() -> Color {
 		if BusinessManager.isTestnet {
