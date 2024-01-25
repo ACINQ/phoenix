@@ -1,10 +1,12 @@
 package fr.acinq.phoenix.utils
 
 import co.touchlab.kermit.LogWriter
-import co.touchlab.kermit.platformLogWriter
+import co.touchlab.kermit.OSLogWriter
 
-/**
- * Todo: Replace this with an appropriate LogWriter for iOS.
- * The default implementation of `platformLogWriter` returns `LogcatWriter()`.
- */
-actual fun phoenixLogWriters(): List<LogWriter> = listOf(OSLogWriter())
+actual fun phoenixLogWriters(ctx: PlatformContext): List<LogWriter> {
+    return if (ctx.logger != null) {
+        listOf(PassthruLogWriter(ctx))
+    } else {
+        listOf(OSLogWriter())
+    }
+}

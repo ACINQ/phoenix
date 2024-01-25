@@ -1,25 +1,38 @@
+@file:OptIn(ExperimentalForeignApi::class, ExperimentalNativeApi::class)
+
 package fr.acinq.phoenix.utils
 
+import co.touchlab.kermit.DefaultFormatter
+import co.touchlab.kermit.LogWriter
+import co.touchlab.kermit.Message
+import co.touchlab.kermit.MessageStringFormatter
+import co.touchlab.kermit.Severity
+import co.touchlab.kermit.Tag
 import co.touchlab.kermit.darwin.*
-import kotlin.native.concurrent.AtomicReference
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlin.concurrent.AtomicReference
 import platform.darwin.OS_LOG_TYPE_DEBUG
 import platform.darwin.OS_LOG_TYPE_DEFAULT
 import platform.darwin.OS_LOG_TYPE_ERROR
 import platform.darwin.OS_LOG_TYPE_FAULT
 import platform.darwin.OS_LOG_TYPE_INFO
 import platform.darwin.os_log_type_t
+import kotlin.experimental.ExperimentalNativeApi
 
 /**
  * This is based off the implementation in Kermit.
  * Except their implementation is broken:
  * https://github.com/touchlab/Kermit/pull/381
  */
+@OptIn(ExperimentalNativeApi::class)
 open class OSLogWriter internal constructor(
     private val messageStringFormatter: MessageStringFormatter,
     private val darwinLogger: DarwinLogger
 ) : LogWriter() {
 
-    constructor(messageStringFormatter: MessageStringFormatter = DefaultFormatter) : this(messageStringFormatter, DarwinLoggerActual)
+    constructor(
+        messageStringFormatter: MessageStringFormatter = DefaultFormatter
+    ) : this(messageStringFormatter, DarwinLoggerActual)
 
     override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
         callLog(
@@ -62,6 +75,7 @@ internal interface DarwinLogger {
     fun log(tag: String, type: os_log_type_t, message: String)
 }
 
+@OptIn(ExperimentalForeignApi::class)
 private object DarwinLoggerActual : DarwinLogger {
     private val _logMap = AtomicReference(mapOf<String, darwin_os_log_t>())
     fun splitTag(tag: String): Pair<String, String> {

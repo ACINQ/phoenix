@@ -17,11 +17,10 @@
 package fr.acinq.phoenix
 
 import co.touchlab.kermit.Logger
-import co.touchlab.kermit.loggerConfigInit
-import co.touchlab.kermit.NoTagFormatter
-import co.touchlab.kermit.platformLogWriter
+import co.touchlab.kermit.MutableLoggerConfig
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.StaticConfig
+import co.touchlab.kermit.mutableLoggerConfigInit
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
@@ -56,10 +55,7 @@ import org.kodein.log.withShortPackageKeepLast
 import kotlin.time.Duration.Companion.seconds
 
 object globalLoggerFactory : Logger(
-    config = StaticConfig(
-        minSeverity = Severity.Info,
-        logWriterList = phoenixLogWriters()
-    ),
+    config = mutableLoggerConfigInit(minSeverity = Severity.Verbose),
     tag = "PhoenixShared"
 )
 
@@ -71,9 +67,18 @@ class PhoenixBusiness(
         defaultLogFrontend.withShortPackageKeepLast(1)
     )
 
-    val newLoggerFactory = globalLoggerFactory
-
+    val newLoggerFactory = Logger(
+        config = StaticConfig( // StaticConfig is faster than MutableLoggerConfig
+            logWriterList = phoenixLogWriters(ctx),
+            minSeverity = globalLoggerFactory.config.minSeverity
+        ),
+        tag = globalLoggerFactory.tag
+    )
     private val logger = newLoggerFactory.appendingTag("PhoenixBusiness")
+
+    init {
+        globalLoggerFactory.mutableConfig.logWriterList = newLoggerFactory.config.logWriterList
+    }
 
     private val tcpSocketBuilder = TcpSocket.Builder()
     internal val tcpSocketBuilderFactory = suspend {

@@ -84,10 +84,10 @@ class BusinessManager {
 	// --------------------------------------------------
 	// MARK: Init
 	// --------------------------------------------------
-
+	
 	private init() { // must use shared instance
 		
-		business = PhoenixBusiness(ctx: PlatformContext())
+		business = PhoenixBusiness(ctx: PlatformContext(logger: KotlinLogger.shared.logger))
 		BusinessManager._isTestnet = business.chain.isTestnet()
 	}
 	

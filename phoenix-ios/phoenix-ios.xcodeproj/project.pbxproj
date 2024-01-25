@@ -240,6 +240,10 @@
 		DCCD045F27EE0301007D57A5 /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD045E27EE0301007D57A5 /* SummaryView.swift */; };
 		DCCD046127EE045C007D57A5 /* DetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD046027EE045C007D57A5 /* DetailsView.swift */; };
 		DCCD046327EE04E1007D57A5 /* WalletPaymentExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD046227EE04E1007D57A5 /* WalletPaymentExtensions.swift */; };
+		DCCFE6A42B63021E002FFF11 /* KotlinLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6A32B63021E002FFF11 /* KotlinLogger.swift */; };
+		DCCFE6A62B63028A002FFF11 /* UnfairLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6A52B63028A002FFF11 /* UnfairLock.swift */; };
+		DCCFE6A72B630836002FFF11 /* KotlinLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6A32B63021E002FFF11 /* KotlinLogger.swift */; };
+		DCCFE6A82B63083F002FFF11 /* UnfairLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFE6A52B63028A002FFF11 /* UnfairLock.swift */; };
 		DCD1208728663F4A00EB39C5 /* TransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD1208628663F4A00EB39C5 /* TransactionsView.swift */; };
 		DCD5FF4326A0D34B009CC666 /* EqualSizes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD5FF4226A0D34B009CC666 /* EqualSizes.swift */; };
 		DCD777D226DE9FE800979A12 /* DelayedSave.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD777D126DE9FE800979A12 /* DelayedSave.swift */; };
@@ -569,6 +573,8 @@
 		DCCD045E27EE0301007D57A5 /* SummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryView.swift; sourceTree = "<group>"; };
 		DCCD046027EE045C007D57A5 /* DetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsView.swift; sourceTree = "<group>"; };
 		DCCD046227EE04E1007D57A5 /* WalletPaymentExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletPaymentExtensions.swift; sourceTree = "<group>"; };
+		DCCFE6A32B63021E002FFF11 /* KotlinLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinLogger.swift; sourceTree = "<group>"; };
+		DCCFE6A52B63028A002FFF11 /* UnfairLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnfairLock.swift; sourceTree = "<group>"; };
 		DCD1208628663F4A00EB39C5 /* TransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsView.swift; sourceTree = "<group>"; };
 		DCD5FF4226A0D34B009CC666 /* EqualSizes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EqualSizes.swift; sourceTree = "<group>"; };
 		DCD777D126DE9FE800979A12 /* DelayedSave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayedSave.swift; sourceTree = "<group>"; };
@@ -701,6 +707,7 @@
 				DCAEF8F627628BEB00015993 /* Either.swift */,
 				DCDD9ECD28637474001800A3 /* Orientation.swift */,
 				DC355E222A45FAF2008E8A8E /* NestedObservableObject.swift */,
+				DCCFE6A52B63028A002FFF11 /* UnfairLock.swift */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -913,6 +920,7 @@
 				DC46BAEF26CACCF700E760A6 /* KotlinPublishers+Phoenix.swift */,
 				DCB62F462A5DF19D00912A71 /* KotlinPublishers+Lightning.swift */,
 				DC74174A270F332700F7E3E3 /* KotlinTypes.swift */,
+				DCCFE6A32B63021E002FFF11 /* KotlinLogger.swift */,
 			);
 			path = kotlin;
 			sourceTree = "<group>";
@@ -1653,6 +1661,7 @@
 				DC118C0C27B561210080BBAC /* CurrencyAmount.swift in Sources */,
 				DC04C2632A9009890021F2E8 /* MergeChannelsView.swift in Sources */,
 				DC46BAF726CACCF700E760A6 /* KotlinExtensions+Conversion.swift in Sources */,
+				DCCFE6A42B63021E002FFF11 /* KotlinLogger.swift in Sources */,
 				DC49FE992AC49C6300D8D2E2 /* KotlinExtensions+Bitcoin.swift in Sources */,
 				DC142140261E72E40075857A /* AnyHTML.swift in Sources */,
 				DC2CE3AF29AFEB0500BA0B00 /* Bundle+Icon.swift in Sources */,
@@ -1737,6 +1746,7 @@
 				DCCC7FD526B0A006008ACD9B /* SquareSize.swift in Sources */,
 				DC2CE54D28A3D2F50070A2E1 /* TruncatableView.swift in Sources */,
 				DCDD9ED628637FD7001800A3 /* AppStatusButton.swift in Sources */,
+				DCCFE6A62B63028A002FFF11 /* UnfairLock.swift in Sources */,
 				DCB493D1269F890D001B0F09 /* SyncTxManager_PendingSettings.swift in Sources */,
 				DCAEF8F727628BEB00015993 /* Either.swift in Sources */,
 				DCA6DECC282AAA740073C658 /* SharedSecurity.swift in Sources */,
@@ -1829,6 +1839,7 @@
 				DCEB2796282D7AAB0096B87E /* KotlinTypes.swift in Sources */,
 				DC9130A02AE045FA00F9B8C6 /* Sequence+Sum.swift in Sources */,
 				DCB511CA281AED58001BC525 /* NotificationService.swift in Sources */,
+				DCCFE6A82B63083F002FFF11 /* UnfairLock.swift in Sources */,
 				DCA6DEC82829C3150073C658 /* GenericPasswordStore.swift in Sources */,
 				DCA6DECD282AB10C0073C658 /* SharedSecurity.swift in Sources */,
 				DCEB2799282D7B260096B87E /* KotlinExtensions+Conversion.swift in Sources */,
@@ -1846,6 +1857,7 @@
 				DCA6DEC72829BFD70073C658 /* CrossProcessCommunication.swift in Sources */,
 				DC641C7428208BD600862DCD /* String+VersionComparison.swift in Sources */,
 				DCA6DEC92829C3180073C658 /* GenericPasswordConvertible.swift in Sources */,
+				DCCFE6A72B630836002FFF11 /* KotlinLogger.swift in Sources */,
 				DCEB2797282D7ADC0096B87E /* KotlinFlow.swift in Sources */,
 				DC641C78282171EA00862DCD /* KotlinAssociatedObject.swift in Sources */,
 				DCA6DECA2829C31B0073C658 /* KeyStoreError.swift in Sources */,
