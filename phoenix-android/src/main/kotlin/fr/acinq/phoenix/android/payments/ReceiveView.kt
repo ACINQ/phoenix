@@ -31,6 +31,9 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -140,12 +143,14 @@ private fun ReceiveViewPages(
             modifier = Modifier.fillMaxHeight(),
             pageCount = 2,
             state = pagerState,
-            contentPadding = PaddingValues(horizontal = when {
-                maxWidth <= 240.dp -> 30.dp
-                maxWidth <= 320.dp -> 40.dp
-                maxWidth <= 480.dp -> 44.dp
-                else -> 52.dp
-            }),
+            contentPadding = PaddingValues(
+                horizontal = when {
+                    maxWidth <= 240.dp -> 30.dp
+                    maxWidth <= 320.dp -> 40.dp
+                    maxWidth <= 480.dp -> 44.dp
+                    else -> 52.dp
+                }
+            ),
             verticalAlignment = Alignment.Top
         ) { index ->
             val maxWidth = maxWidth
@@ -498,9 +503,11 @@ private fun QRCodeDetail(label: String, content: @Composable () -> Unit) {
                 .width(80.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Column(modifier = Modifier
-            .alignBy(FirstBaseline)
-            .widthIn(min = 100.dp)) {
+        Column(
+            modifier = Modifier
+                .alignBy(FirstBaseline)
+                .widthIn(min = 100.dp)
+        ) {
             content()
         }
     }
@@ -608,66 +615,103 @@ private fun IncomingLiquidityWarning(
     when {
         // strong warning => no channels + fee policy is disabled
         hasChannels == false && liquidityPolicy is LiquidityPolicy.Disable -> {
-            Clickable(onClick = onMessageClick) {
-                WarningMessage(
-                    header = stringResource(id = R.string.receive_lightning_warning_title_surefail),
-                    details = stringResource(id = R.string.receive_lightning_warning_fee_policy_disabled_insufficient_liquidity),
-                    headerStyle = MaterialTheme.typography.body2.copy(fontSize = 15.sp),
-                    alignment = Alignment.CenterHorizontally,
-                )
-            }
+            IncomingLiquiditySmartWarning(
+                header = stringResource(id = R.string.receive_lightning_warning_title_surefail),
+                message = stringResource(id = R.string.receive_lightning_warning_fee_policy_disabled_insufficient_liquidity),
+                onClick = onMessageClick,
+                isHardWarning = true,
+            )
         }
         // warning: liquidity is short => message depends on the fee policy used
         hasChannels == false || (availableForReceive != null && amount != null && amount >= availableForReceive) -> {
             when {
                 // no fee policy => strong warning
                 liquidityPolicy is LiquidityPolicy.Disable -> {
-                    Clickable(onClick = onMessageClick, internalPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)) {
-                        InfoMessage(
-                            header = stringResource(id = R.string.receive_lightning_warning_title_mayfail),
-                            details = stringResource(id = R.string.receive_lightning_warning_fee_policy_disabled_insufficient_liquidity),
-                            headerStyle = MaterialTheme.typography.body1.copy(fontSize = 15.sp),
-                            alignment = Alignment.CenterHorizontally,
-                        )
-                    }
+                    IncomingLiquiditySmartWarning(
+                        header = stringResource(id = R.string.receive_lightning_warning_title_mayfail),
+                        message = stringResource(id = R.string.receive_lightning_warning_fee_policy_disabled_insufficient_liquidity),
+                        onClick = onMessageClick,
+                        isHardWarning = true,
+                    )
                 }
                 // no fee information available => basic warning
                 swapFee == null -> {
-                    Clickable(onClick = onMessageClick) {
-                        InfoMessage(
-                            header = stringResource(id = R.string.receive_lightning_warning_title_fee_expected),
-                            details = stringResource(id = R.string.receive_lightning_warning_fee_insufficient_liquidity),
-                            headerStyle = MaterialTheme.typography.body1.copy(fontSize = 15.sp),
-                            alignment = Alignment.CenterHorizontally,
-                        )
-                    }
+                    IncomingLiquiditySmartWarning(
+                        header = stringResource(id = R.string.receive_lightning_warning_title_fee_expected),
+                        message = stringResource(id = R.string.receive_lightning_warning_fee_insufficient_liquidity),
+                        onClick = onMessageClick,
+                        isHardWarning = true,
+                    )
                 }
                 // fee policy is short => light warning
                 liquidityPolicy is LiquidityPolicy.Auto && swapFee > liquidityPolicy.maxAbsoluteFee -> {
-                    Clickable(onClick = onMessageClick) {
-                        InfoMessage(
-                            header = stringResource(id = R.string.receive_lightning_warning_title_mayfail),
-                            details = stringResource(id = R.string.receive_lightning_warning_fee_exceeds_policy, liquidityPolicy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true)),
-                            headerStyle = MaterialTheme.typography.body1.copy(fontSize = 15.sp),
-                            alignment = Alignment.CenterHorizontally,
-                        )
-                    }
+                    IncomingLiquiditySmartWarning(
+                        header = stringResource(id = R.string.receive_lightning_warning_title_mayfail),
+                        message = stringResource(id = R.string.receive_lightning_warning_fee_exceeds_policy, liquidityPolicy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true)),
+                        onClick = onMessageClick,
+                        isHardWarning = true,
+                    )
                 }
                 // fee policy is within bounds => light warning
                 liquidityPolicy is LiquidityPolicy.Auto -> {
-                    Clickable(onClick = onMessageClick) {
-                        InfoMessage(
-                            header = stringResource(id = R.string.receive_lightning_warning_title_fee_expected),
-                            details = stringResource(
-                                id = R.string.receive_lightning_warning_fee_within_policy, swapFee.toPrettyString(btcUnit, withUnit = true),
-                                swapFee.toPrettyString(fiatUnit, fiatRate, withUnit = true)
-                            ),
-                            headerStyle = MaterialTheme.typography.body1.copy(fontSize = 15.sp),
-                            alignment = Alignment.CenterHorizontally,
-                        )
-                    }
+                    IncomingLiquiditySmartWarning(
+                        header = stringResource(id = R.string.receive_lightning_warning_title_fee_expected),
+                        message = stringResource(
+                            id = R.string.receive_lightning_warning_fee_within_policy, swapFee.toPrettyString(btcUnit, withUnit = true),
+                            swapFee.toPrettyString(fiatUnit, fiatRate, withUnit = true)
+                        ),
+                        onClick = onMessageClick,
+                        isHardWarning = true,
+                    )
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun IncomingLiquiditySmartWarning(
+    header: String,
+    message: String,
+    onClick: () -> Unit,
+    isHardWarning: Boolean,
+) {
+    if (isHardWarning) {
+        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        ModalBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = {},
+        ) {
+            Text(
+                text = header,
+                style = MaterialTheme.typography.body2
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = message)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Not enough liquidity, and fee limit is too low!")
+            Spacer(modifier = Modifier.height(16.dp))
+            Row {
+                Button(
+                    text = "Keep current limit",
+                    onClick = { /*TODO*/ },
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    text = "Bump fee limit",
+                    onClick = { /*TODO*/ },
+                )
+            }
+        }
+    } else {
+        Clickable(onClick = onClick) {
+            InfoMessage(
+                header = header,
+                details = message,
+                headerStyle = MaterialTheme.typography.body1.copy(fontSize = 15.sp),
+                alignment = Alignment.CenterHorizontally,
+            )
         }
     }
 }
