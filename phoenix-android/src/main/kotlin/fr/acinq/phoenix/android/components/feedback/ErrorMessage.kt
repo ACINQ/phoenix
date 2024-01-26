@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.android.utils.spannableStringToAnnotatedString
 
 @Composable
 fun ErrorMessage(
@@ -39,8 +40,8 @@ fun ErrorMessage(
         header = header,
         details = when (details) {
             null -> null
-            is AnnotatedString -> annotatedStringResource(id = R.string.component_error_message_details, details)
-            else -> stringResource(id = R.string.component_error_message_details, details.toString())
+            is AnnotatedString -> spannableStringToAnnotatedString(details)
+            else -> details.toString()
         },
         icon = R.drawable.ic_alert_triangle,
         iconColor = negativeColor,

@@ -80,6 +80,7 @@ import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
 import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
 import fr.acinq.phoenix.android.payments.liquidity.RequestLiquidityView
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
+import fr.acinq.phoenix.android.settings.walletinfo.SwapInSignerView
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
 import fr.acinq.phoenix.android.startup.LegacySwitcherView
@@ -400,7 +401,11 @@ fun AppView(
                     SwapInWalletInfo(
                         onBackClick = { navController.popBackStack() },
                         onViewChannelPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
+                        onAdvancedClick = { navController.navigate(Screen.WalletInfo.SwapInSigner.route) },
                     )
+                }
+                composable(Screen.WalletInfo.SwapInSigner.route) {
+                    SwapInSignerView(onBackClick = { navController.popBackStack() })
                 }
                 composable(Screen.WalletInfo.FinalWallet.route) {
                     FinalWalletInfo(onBackClick = { navController.popBackStack() })
