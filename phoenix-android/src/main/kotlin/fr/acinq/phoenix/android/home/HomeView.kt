@@ -58,6 +58,7 @@ import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.findActivity
 import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.data.canRequestLiquidity
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -79,11 +80,15 @@ fun HomeView(
     onRequestLiquidityClick: () -> Unit,
 ) {
     val context = LocalContext.current
+
+    val internalData = application.internalDataRepository
     val torEnabledState = UserPrefs.getIsTorEnabled(context).collectAsState(initial = null)
+    val balanceDisplayMode by UserPrefs.getHomeAmountDisplayMode(context).collectAsState(initial = HomeAmountDisplayMode.REDACTED)
+
     val connections by business.connectionsManager.connections.collectAsState()
     val electrumMessages by business.appConfigurationManager.electrumMessages.collectAsState()
-    val balanceDisplayMode by UserPrefs.getHomeAmountDisplayMode(context).collectAsState(initial = HomeAmountDisplayMode.REDACTED)
-    val internalData = application.internalDataRepository
+    val channels by business.peerManager.channelsFlow.collectAsState()
+    val inFlightPaymentsCount = remember(channels) { channels?.values?.map { it.inflightPaymentsCount }?.sum() ?: 0 }
 
     var showConnectionsDialog by remember { mutableStateOf(false) }
     if (showConnectionsDialog) {
@@ -214,8 +219,10 @@ fun HomeView(
                     onConnectionsStateButtonClick = { showConnectionsDialog = true },
                     connections = connections,
                     electrumBlockheight = electrumMessages?.blockHeight ?: 0,
+                    inFlightPaymentsCount = inFlightPaymentsCount,
                     isTorEnabled = torEnabledState.value,
                     onTorClick = onTorClick,
+                    showRequestLiquidity = channels.canRequestLiquidity(),
                     onRequestLiquidityClick = onRequestLiquidityClick,
                 )
                 HomeBalance(
