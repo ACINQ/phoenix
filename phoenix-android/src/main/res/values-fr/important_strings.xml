@@ -113,10 +113,19 @@
     <string name="receive_lightning_warning_title_mayfail">Ce paiement pourrait échouer.</string>
     <string name="receive_lightning_warning_title_fee_expected">Des frais sont attendus.</string>
 
-    <string name="receive_lightning_warning_fee_insufficient_liquidity">Votre liquidité entrante est insuffisante.</string>
-    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Votre liquidité entrante est insuffisante et vous avez désactivé la gestion des channels automatisée.\nCliquez pour configurer.</string>
-    <string name="receive_lightning_warning_fee_within_policy">Des frais de %1$s (≈ %2$s) pourraient être nécessaire pour recevoir ce paiement.\nCliquez pour configurer.</string>
-    <string name="receive_lightning_warning_fee_exceeds_policy">Ces frais vont probablement excéder le max configuré dans vos préférences (%1$s).\nCliquez pour configurer.</string>
+    <string name="receive_lightning_warning_hint_show_details">Plus d\'informations</string>
+
+    <string name="receive_lightning_sheet_dismiss">Fermer</string>
+    <string name="receive_lightning_sheet_button_enable">Activer la gestion auto</string>
+    <string name="receive_lightning_sheet_button_configure">Configurer les frais max</string>
+
+    <string name="receive_lightning_warning_message_fee_expected">Une opération on-chain va être probablement nécessaire pour recevoir ce montant.\n\nLes frais seront d\'environ %1$s.</string>
+    <string name="receive_lightning_warning_message_fee_expected_unknown">Une opération on-chain va être probablement nécessaire pour recevoir ce montant.</string>
+
+    <string name="receive_lightning_warning_message_above_limit">Des frais de %1$s sont estimés pour recevoir ce montant, and ces frais dépassent votre limite autorisée de %2$s.\n\nAugmentez cette limite, ou bien demandez de la liquidité supplémentaire.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">Des frais de %1$s sont estimés pour recevoir ce montant, ce qui représente plus de %2$s%% du montant.\n\nAugmentez cette limite, ou bien demandez de la liquidité supplémentaire.</string>
+
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Votre liquidité entrante est insuffisante pour ce montant, et la gestion automatisée des channels est désactivée.</string>
 
     <string name="receive_onchain_legacy_warning_title">Note suite à la migration</string>
     <string name="receive_onchain_legacy_warning">Il s\'agit de votre nouvelle adresse. Ne réutilisez pas vos anciennes adresses Bitcoin d\'avant la migration !</string>
