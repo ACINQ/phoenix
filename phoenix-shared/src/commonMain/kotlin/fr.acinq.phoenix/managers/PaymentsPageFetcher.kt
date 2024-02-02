@@ -1,8 +1,8 @@
 package fr.acinq.phoenix.managers
 
-import co.touchlab.kermit.Logger
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.lightning.logging.debug
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,11 +28,11 @@ data class PaymentsPage(
 }
 
 class PaymentsPageFetcher(
-    loggerFactory: Logger,
+    loggerFactory: LoggerFactory,
     private val databaseManager: DatabaseManager
 ): CoroutineScope by MainScope() {
 
-    private val log = loggerFactory.appendingTag("PaymentsPageFetcher")
+    private val log = loggerFactory.newLogger(this::class)
 
     private var offset: Int = 0
     private var count: Int = 0

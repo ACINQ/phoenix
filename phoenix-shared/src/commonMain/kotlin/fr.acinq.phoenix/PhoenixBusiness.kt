@@ -16,15 +16,11 @@
 
 package fr.acinq.phoenix
 
-import co.touchlab.kermit.Logger
-import co.touchlab.kermit.MutableLoggerConfig
-import co.touchlab.kermit.Severity
-import co.touchlab.kermit.StaticConfig
-import co.touchlab.kermit.mutableLoggerConfigInit
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.logging.debug
 import fr.acinq.phoenix.controllers.*
 import fr.acinq.phoenix.controllers.config.*
 import fr.acinq.phoenix.controllers.init.AppInitController
@@ -39,7 +35,7 @@ import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.createAppDbDriver
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.*
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.phoenix.utils.logger.PhoenixLoggerFactory
 import fr.acinq.tor.Tor
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -49,42 +45,21 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.cancel
 import kotlinx.serialization.json.Json
-import org.kodein.log.LoggerFactory
-import org.kodein.log.frontend.defaultLogFrontend
-import org.kodein.log.withShortPackageKeepLast
 import kotlin.time.Duration.Companion.seconds
-
-object globalLoggerFactory : Logger(
-    config = mutableLoggerConfigInit(minSeverity = Severity.Verbose),
-    tag = "PhoenixShared"
-)
 
 class PhoenixBusiness(
     internal val ctx: PlatformContext
 ) {
-
-    val oldLoggerFactory = LoggerFactory(
-        defaultLogFrontend.withShortPackageKeepLast(1)
-    )
-
-    val newLoggerFactory = Logger(
-        config = StaticConfig( // StaticConfig is faster than MutableLoggerConfig
-            logWriterList = phoenixLogWriters(ctx),
-            minSeverity = globalLoggerFactory.config.minSeverity
-        ),
-        tag = globalLoggerFactory.tag
-    )
-    private val logger = newLoggerFactory.appendingTag("PhoenixBusiness")
-
-    init {
-        globalLoggerFactory.mutableConfig.logWriterList = newLoggerFactory.config.logWriterList
-    }
+    // this logger factory will be used throughout the project (including dependencies like lightning-kmp) to
+    // create new [Logger] instances, and output logs to platform dependent writers.
+    val loggerFactory = PhoenixLoggerFactory(ctx)
+    private val logger = loggerFactory.newLogger(this::class)
 
     private val tcpSocketBuilder = TcpSocket.Builder()
     internal val tcpSocketBuilderFactory = suspend {
         val isTorEnabled = appConfigurationManager.isTorEnabled.filterNotNull().first()
         if (isTorEnabled) {
-            tcpSocketBuilder.torProxy(newLoggerFactory)
+            tcpSocketBuilder.torProxy(loggerFactory)
         } else {
             tcpSocketBuilder
         }
@@ -100,13 +75,13 @@ class PhoenixBusiness(
 
     val chain: NodeParams.Chain = NodeParamsManager.chain
 
-    val electrumClient by lazy { ElectrumClient(scope = MainScope(), loggerFactory = oldLoggerFactory, pingInterval = 30.seconds, rpcTimeout = 10.seconds) }
-    internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope(), oldLoggerFactory) }
+    val electrumClient by lazy { ElectrumClient(scope = MainScope(), loggerFactory = loggerFactory, pingInterval = 30.seconds, rpcTimeout = 10.seconds) }
+    internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope(), loggerFactory) }
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
 
     val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
-    val networkMonitor by lazy { NetworkMonitor(newLoggerFactory, ctx) }
+    val networkMonitor by lazy { NetworkMonitor(loggerFactory, ctx) }
     val walletManager by lazy { WalletManager(chain) }
     val nodeParamsManager by lazy { NodeParamsManager(this) }
     val databaseManager by lazy { DatabaseManager(this) }
@@ -119,7 +94,7 @@ class PhoenixBusiness(
     val lnurlManager by lazy { LnurlManager(this) }
     val notificationsManager by lazy { NotificationsManager(this) }
     val blockchainExplorer by lazy { BlockchainExplorer(chain) }
-    val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(newLoggerFactory)) }
+    val tor by lazy { Tor(getApplicationCacheDirectoryPath(ctx), TorHelper.torLogger(loggerFactory)) }
 
     fun start(startupParams: StartupParams) {
         logger.debug { "starting with params=$startupParams" }

@@ -126,7 +126,7 @@ fun StartupView(
                     activity = context.findActivity(),
                     onSuccess = { appVM.saveIsScreenLocked(false) },
                     onFailure = { appVM.saveIsScreenLocked(true) },
-                    onCancel = { log.debug { "cancelled auth prompt" } }
+                    onCancel = { /*log.debug { "cancelled auth prompt" }*/ }
                 ).authenticate(promptInfo)
             }
             LaunchedEffect(key1 = true) {
@@ -188,7 +188,7 @@ private fun DecryptSeedAndStartBusiness(
         is SeedFileState.Error.Unreadable -> Text(stringResource(id = R.string.startup_error_generic, seedFileState.message ?: ""))
         is SeedFileState.Error.UnhandledSeedType -> Text(stringResource(id = R.string.startup_error_generic, "Unhandled seed type"))
         is SeedFileState.Present -> {
-            log.debug { "wallet ready to start with legacyAppStatus=${legacyAppStatus?.name()}" }
+//            log.debug { "wallet ready to start with legacyAppStatus=${legacyAppStatus?.name()}" }
             val decryptionState by vm.decryptionState
             when (val state = decryptionState) {
                 is StartupDecryptionState.Init -> {
@@ -201,7 +201,7 @@ private fun DecryptSeedAndStartBusiness(
                         LegacyAppStatus.Unknown -> {
                             if (Wallet.getEclairDBFile(context).exists()) {
                                 Text(stringResource(id = R.string.startup_wait_legacy_check))
-                                log.debug { "found legacy database file while in unknown legacy status; switching to legacy app" }
+//                                log.debug { "found legacy database file while in unknown legacy status; switching to legacy app" }
                                 LaunchedEffect(true) {
                                     LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
                                 }

@@ -21,6 +21,7 @@ import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.*
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.SendPayment
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
@@ -31,7 +32,8 @@ import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.chain
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.lightning.logging.error
+import fr.acinq.lightning.logging.info
 import io.ktor.http.Url
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
@@ -43,7 +45,7 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
 
 class AppScanController(
-    loggerFactory: Logger,
+    loggerFactory: LoggerFactory,
     firstModel: Scan.Model?,
     private val peerManager: PeerManager,
     private val lnurlManager: LnurlManager,
@@ -67,7 +69,7 @@ class AppScanController(
     private var sendWithdrawInvoiceTask: Deferred<JsonObject>? = null
 
     constructor(business: PhoenixBusiness, firstModel: Scan.Model?) : this(
-        loggerFactory = business.newLoggerFactory,
+        loggerFactory = business.loggerFactory,
         firstModel = firstModel,
         peerManager = business.peerManager,
         lnurlManager = business.lnurlManager,
@@ -482,7 +484,7 @@ class AppScanController(
 
     /** Reads a lnurl and return either a lnurl-auth (i.e. a http query that must not be called automatically), or the actual url embedded in the lnurl (that can be called afterwards). */
     private fun readLnurl(input: String): Lnurl? = try {
-        Lnurl.extractLnurl(input)
+        Lnurl.extractLnurl(input, logger)
     } catch (t: Throwable) {
         null
     }
@@ -509,7 +511,7 @@ class AppScanController(
     private fun readLNURLFallback(input: String): Lnurl? = try {
         val url = Url(input)
         url.parameters["lightning"]?.let { fallback ->
-            Lnurl.extractLnurl(fallback)
+            Lnurl.extractLnurl(fallback, logger)
         }
     } catch (t: Throwable) {
         null

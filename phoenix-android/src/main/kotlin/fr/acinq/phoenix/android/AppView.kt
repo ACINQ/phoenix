@@ -120,7 +120,7 @@ fun AppView(
     navController: NavHostController,
 ) {
     val log = logger("Navigation")
-    log.debug { "init app view composition" }
+    log.debug("init app view composition")
 
     val context = LocalContext.current
     val isAmountInFiat = UserPrefs.getIsAmountInFiat(context).collectAsState(false)
@@ -190,10 +190,10 @@ fun AppView(
                         onBusinessStarted = {
                             val next = nextScreenLink?.takeUnless { it.isBlank() }?.let { Uri.parse(it) }
                             if (next == null || !navController.graph.hasDeepLink(next)) {
-                                log.debug { "redirecting from startup to home" }
+//                                log.debug { "redirecting from startup to home" }
                                 popToHome(navController)
                             } else {
-                                log.debug { "redirecting from startup to $next" }
+//                                log.debug { "redirecting from startup to $next" }
                                 navController.navigate(next, navOptions = navOptions {
                                     popUpTo(navController.graph.id) { inclusive = true }
                                 })
@@ -291,7 +291,7 @@ fun AppView(
                     val paymentId = if (id != null && direction != null) WalletPaymentId.create(direction, id) else null
                     if (paymentId != null) {
                         RequireStarted(walletState, nextUri = "phoenix:payments/${direction}/${id}") {
-                            log.debug { "navigating to payment-details id=$id" }
+//                            log.debug { "navigating to payment-details id=$id" }
                             PaymentDetailsView(
                                 paymentId = paymentId,
                                 onBackClick = {
@@ -450,7 +450,7 @@ fun AppView(
     val isDataMigrationExpected by LegacyPrefsDatastore.getDataMigrationExpected(context).collectAsState(initial = null)
     val lastCompletedPayment by business.paymentsManager.lastCompletedPayment.collectAsState()
     lastCompletedPayment?.let {
-        log.debug { "completed payment=${lastCompletedPayment?.id()} with data-migration=$isDataMigrationExpected" }
+//        log.debug { "completed payment=${lastCompletedPayment?.id()} with data-migration=$isDataMigrationExpected" }
         LaunchedEffect(key1 = it.walletPaymentId()) {
             if (isDataMigrationExpected == false) {
                 navigateToPaymentDetails(navController, id = it.walletPaymentId(), isFromEvent = true)

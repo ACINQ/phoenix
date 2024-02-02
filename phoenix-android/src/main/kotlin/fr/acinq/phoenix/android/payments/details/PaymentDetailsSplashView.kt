@@ -670,9 +670,9 @@ private fun ConfirmationView(
 
         suspend fun getConfirmations(): Int {
             val confirmations = electrumClient.getConfirmations(txId)
-            log.debug { "retrieved confirmations=$confirmations from electrum for tx=$txId" }
+//            log.debug { "retrieved confirmations=$confirmations from electrum for tx=$txId" }
             return confirmations ?: run {
-                log.debug { "retrying getConfirmations from electrum in 5 sec" }
+//                log.debug { "retrying getConfirmations from electrum in 5 sec" }
                 delay(5_000)
                 getConfirmations()
             }

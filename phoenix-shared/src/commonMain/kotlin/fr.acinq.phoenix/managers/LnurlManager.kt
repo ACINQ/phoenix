@@ -16,12 +16,12 @@
 
 package fr.acinq.phoenix.managers
 
-import co.touchlab.kermit.Logger
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.lnurl.*
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.lightning.logging.error
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
@@ -39,7 +39,7 @@ import kotlinx.serialization.json.JsonObject
 
 
 class LnurlManager(
-    loggerFactory: Logger,
+    loggerFactory: LoggerFactory,
     private val walletManager: WalletManager
 ) : CoroutineScope by MainScope() {
 
@@ -54,11 +54,11 @@ class LnurlManager(
     }
 
     constructor(business: PhoenixBusiness) : this(
-        loggerFactory = business.newLoggerFactory,
+        loggerFactory = business.loggerFactory,
         walletManager = business.walletManager
     )
 
-    private val log = loggerFactory.appendingTag("LnurlManager")
+    private val log = loggerFactory.newLogger(this::class)
 
     /** Executes an HTTP GET request on the provided url and parses the JSON response into an [Lnurl] object. */
     fun executeLnurl(url: Url): Deferred<Lnurl> = async {
@@ -68,7 +68,7 @@ class LnurlManager(
             throw LnurlError.RemoteFailure.CouldNotConnect(origin = url.host)
         }
         try {
-            val json = Lnurl.processLnurlResponse(response)
+            val json = Lnurl.processLnurlResponse(response, log)
             return@async Lnurl.parseLnurlJson(url, json)
         } catch (e: Exception) {
             when (e) {
@@ -106,7 +106,7 @@ class LnurlManager(
             throw LnurlError.RemoteFailure.CouldNotConnect(origin)
         }
 
-        val json = Lnurl.processLnurlResponse(response)
+        val json = Lnurl.processLnurlResponse(response, log)
         val invoice = LnurlPay.parseLnurlPayInvoice(intent, origin, json)
 
         // SPECS: LN WALLET verifies that the amount in the provided invoice equals the amount previously specified by user.
@@ -141,7 +141,7 @@ class LnurlManager(
 
         // SPECS: even if the response is an error, the invoice may still be paid by the service
         // we still parse the response to see what's up.
-        Lnurl.processLnurlResponse(response)
+        Lnurl.processLnurlResponse(response, log)
     }
 
     suspend fun signAndSendAuthRequest(
@@ -166,7 +166,7 @@ class LnurlManager(
             throw LnurlError.RemoteFailure.CouldNotConnect(origin = url.host)
         }
 
-        Lnurl.processLnurlResponse(response) // throws on any/all non-success
+        Lnurl.processLnurlResponse(response, log) // throws on any/all non-success
     }
 }
 

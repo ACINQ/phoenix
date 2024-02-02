@@ -1,20 +1,20 @@
 package fr.acinq.phoenix.controllers.init
 
-import co.touchlab.kermit.Logger
 import fr.acinq.bitcoin.MnemonicCode
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import kotlinx.coroutines.launch
 
 
 class AppInitController(
-    loggerFactory: Logger
+    loggerFactory: LoggerFactory
 ) : AppController<Initialization.Model, Initialization.Intent>(
     loggerFactory = loggerFactory,
     firstModel = Initialization.Model.Ready
 ) {
     constructor(business: PhoenixBusiness): this(
-        loggerFactory = business.newLoggerFactory
+        loggerFactory = business.loggerFactory
     )
 
     override fun process(intent: Initialization.Intent) {

@@ -58,7 +58,7 @@ fun SendSpliceOutView(
     onSpliceOutSuccess: () -> Unit,
 ) {
     val log = logger("SendSpliceOut")
-    log.debug { "init splice-out with amount=$requestedAmount address=$address" }
+//    log.debug { "init splice-out with amount=$requestedAmount address=$address" }
 
     val context = LocalContext.current
     val prefBtcUnit = LocalBitcoinUnit.current

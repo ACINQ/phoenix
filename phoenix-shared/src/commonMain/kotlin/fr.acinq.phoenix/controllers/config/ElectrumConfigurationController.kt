@@ -6,13 +6,14 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import fr.acinq.phoenix.controllers.AppController
+import fr.acinq.lightning.logging.LoggerFactory
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 
 class AppElectrumConfigurationController(
-    loggerFactory: Logger,
+    loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,
     private val electrumClient: ElectrumClient,
     private val appConnectionsDaemon: AppConnectionsDaemon?
@@ -21,7 +22,7 @@ class AppElectrumConfigurationController(
     firstModel = ElectrumConfiguration.Model()
 ) {
     constructor(business: PhoenixBusiness): this(
-        loggerFactory = business.newLoggerFactory,
+        loggerFactory = business.loggerFactory,
         configurationManager = business.appConfigurationManager,
         electrumClient = business.electrumClient,
         appConnectionsDaemon = business.appConnectionsDaemon

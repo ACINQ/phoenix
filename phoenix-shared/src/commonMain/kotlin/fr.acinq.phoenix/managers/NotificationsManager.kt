@@ -16,15 +16,15 @@
 
 package fr.acinq.phoenix.managers
 
-import co.touchlab.kermit.Logger
 import fr.acinq.lightning.LiquidityEvents
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.Notification
 import fr.acinq.phoenix.data.WatchTowerOutcome
 import fr.acinq.phoenix.db.SqliteAppDb
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.lightning.logging.debug
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,16 +32,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class NotificationsManager(
-    private val loggerFactory: Logger,
+    private val loggerFactory: LoggerFactory,
     private val appDb: SqliteAppDb,
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness) : this(
-        loggerFactory = business.newLoggerFactory,
+        loggerFactory = business.loggerFactory,
         appDb = business.appDb,
     )
 
-    private val log = loggerFactory.appendingTag("NotificationsManager")
+    private val log = loggerFactory.newLogger(this::class)
 
     private val _notifications = MutableStateFlow<List<Pair<Set<UUID>, Notification>>>(emptyList())
     /**

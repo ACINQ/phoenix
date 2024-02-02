@@ -1,22 +1,17 @@
 package fr.acinq.phoenix.managers
 
-import co.touchlab.kermit.Logger
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.TxId
-import fr.acinq.bitcoin.byteVector32
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.getConfirmations
 import fr.acinq.lightning.db.InboundLiquidityOutgoingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
-import fr.acinq.lightning.io.PaymentNotSent
-import fr.acinq.lightning.io.PaymentProgress
-import fr.acinq.lightning.io.PaymentSent
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqlitePaymentsDb
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.lightning.logging.debug
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +22,7 @@ import kotlinx.coroutines.launch
 
 
 class PaymentsManager(
-    private val loggerFactory: Logger,
+    private val loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,
     private val peerManager: PeerManager,
     private val databaseManager: DatabaseManager,
@@ -35,14 +30,14 @@ class PaymentsManager(
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness) : this(
-        loggerFactory = business.newLoggerFactory,
+        loggerFactory = business.loggerFactory,
         configurationManager = business.appConfigurationManager,
         peerManager = business.peerManager,
         databaseManager = business.databaseManager,
         electrumClient = business.electrumClient
     )
 
-    private val log = loggerFactory.appendingTag("PaymentsManager")
+    private val log = loggerFactory.newLogger(this::class)
 
     /**
      * A flow containing the total number of payments in the database,

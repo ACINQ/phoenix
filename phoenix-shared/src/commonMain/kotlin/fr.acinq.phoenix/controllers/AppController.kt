@@ -1,7 +1,7 @@
 package fr.acinq.phoenix.controllers
 
-import co.touchlab.kermit.Logger
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.logging.debug
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 
 abstract class AppController<M : MVI.Model, I : MVI.Intent>(
-    loggerFactory: Logger,
+    loggerFactory: LoggerFactory,
     firstModel: M
 ) : MVI.Controller<M, I>(firstModel), CoroutineScope {
 
@@ -17,7 +17,7 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(
 
     override val coroutineContext = MainScope().coroutineContext + job
 
-    protected val logger = loggerFactory.appendingTag(this::class.simpleName ?: "?")
+    protected val logger = loggerFactory.newLogger(this::class)
 
     internal val models = MutableStateFlow(firstModel)
 

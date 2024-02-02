@@ -23,9 +23,9 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.TxId
-import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.channel.ChannelException
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.FailureMessage
@@ -36,7 +36,6 @@ import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.db.payments.LinkTxToPaymentQueries
 import fr.acinq.phoenix.managers.CurrencyManager
-import fr.acinq.phoenix.utils.loggerExtensions.*
 import fracinqphoenixdb.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -45,12 +44,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class SqlitePaymentsDb(
-    loggerFactory: Logger,
+    loggerFactory: LoggerFactory,
     private val driver: SqlDriver,
     private val currencyManager: CurrencyManager? = null
 ) : PaymentsDb {
 
-    private val log = loggerFactory.appendingTag("SqlitePaymentsDb")
+    private val log = loggerFactory.newLogger(this::class)
 
     private val database = PaymentsDatabase(
         driver = driver,

@@ -1,26 +1,28 @@
 package fr.acinq.phoenix.managers
 
 import co.touchlab.kermit.Logger
+import co.touchlab.kermit.Severity
+import co.touchlab.kermit.StaticConfig
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.db.ChannelsDb
 import fr.acinq.lightning.db.Databases
 import fr.acinq.lightning.db.PaymentsDb
-import fr.acinq.lightning.utils.toByteVector
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.db.SqliteChannelsDb
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.phoenix.db.createChannelsDbDriver
 import fr.acinq.phoenix.db.createPaymentsDbDriver
 import fr.acinq.phoenix.utils.PlatformContext
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.lightning.logging.debug
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class DatabaseManager(
-    loggerFactory: Logger,
+    loggerFactory: LoggerFactory,
     private val ctx: PlatformContext,
     private val chain: NodeParams.Chain,
     private val nodeParamsManager: NodeParamsManager,
@@ -28,15 +30,14 @@ class DatabaseManager(
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness): this(
-        loggerFactory = business.newLoggerFactory,
+        loggerFactory = business.loggerFactory,
         ctx = business.ctx,
         chain = business.chain,
         nodeParamsManager = business.nodeParamsManager,
         currencyManager = business.currencyManager
     )
 
-    private val log = loggerFactory.appendingTag("DatabaseManager")
-
+    private val log = loggerFactory.newLogger(this::class)
     private val _databases = MutableStateFlow<Databases?>(null)
     val databases: StateFlow<Databases?> = _databases
 
@@ -47,12 +48,11 @@ class DatabaseManager(
                 log.debug { "nodeParams available: building databases..." }
 
                 val nodeIdHash = nodeParams.nodeId.hash160().byteVector().toHex()
-            //  val nodeIdHash = nodeParams.nodeId.hash160().toByteVector().toHex()
                 val channelsDb = SqliteChannelsDb(
                     driver = createChannelsDbDriver(ctx, chain, nodeIdHash)
                 )
                 val paymentsDb = SqlitePaymentsDb(
-                    loggerFactory,
+                    loggerFactory = loggerFactory,
                     driver = createPaymentsDbDriver(ctx, chain, nodeIdHash),
                     currencyManager = currencyManager
                 )

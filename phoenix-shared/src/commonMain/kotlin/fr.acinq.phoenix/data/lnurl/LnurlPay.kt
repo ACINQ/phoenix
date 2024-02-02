@@ -16,15 +16,13 @@
 
 package fr.acinq.phoenix.data.lnurl
 
+import co.touchlab.kermit.Logger
 import fr.acinq.bitcoin.ByteVector
-import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.Try
 import fr.acinq.phoenix.data.lnurl.Lnurl.Companion.format
-import fr.acinq.phoenix.data.lnurl.Lnurl.Companion.log
 import fr.acinq.phoenix.db.cloud.b64Decode
-import fr.acinq.phoenix.utils.loggerExtensions.*
 import io.ktor.http.*
 import kotlinx.serialization.json.*
 
@@ -198,7 +196,7 @@ sealed class LnurlPay : Lnurl.Qualified {
                         else -> unknown.add(it)
                     }
                 } catch (e: Exception) {
-                    log.warning { "could not decode raw meta=$it: ${e.message}" }
+                    Logger.w("LnurlPay") { "could not decode raw lnurlpay-meta=$it: ${e.message}" }
                 }
             }
             LnurlPay.Intent.Metadata(
@@ -214,7 +212,7 @@ sealed class LnurlPay : Lnurl.Qualified {
                 }
             )
         } catch (e: Exception) {
-            log.error(e) { "could not decode raw meta=$raw: " }
+            Logger.e("LnurlPay") { "could not decode raw lnurlpay-meta=$raw: ${e.message}" }
             throw LnurlError.Pay.Intent.InvalidMetadata(raw)
         }
     }

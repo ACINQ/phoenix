@@ -1,10 +1,12 @@
 package fr.acinq.phoenix.managers
 
-import co.touchlab.kermit.Logger
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.lightning.logging.debug
+import fr.acinq.lightning.logging.error
+import fr.acinq.lightning.logging.info
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -40,20 +42,20 @@ import kotlin.time.Duration.Companion.seconds
  * Manages fetching and updating exchange rates.
  */
 class CurrencyManager(
-    loggerFactory: Logger,
+    loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,
     private val appDb: SqliteAppDb,
     private val httpClient: HttpClient
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness) : this(
-        loggerFactory = business.newLoggerFactory,
+        loggerFactory = business.loggerFactory,
         configurationManager = business.appConfigurationManager,
         appDb = business.appDb,
         httpClient = business.httpClient
     )
 
-    private val log = loggerFactory.appendingTag("CurrencyManager")
+    private val log = loggerFactory.newLogger(this::class)
 
     private val json = Json {
         ignoreUnknownKeys = true

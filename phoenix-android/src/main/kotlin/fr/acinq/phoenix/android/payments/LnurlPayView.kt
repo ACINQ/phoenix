@@ -59,7 +59,7 @@ fun LnurlPayView(
     onSendLnurlPayClick: (Scan.Intent.LnurlPayFlow) -> Unit
 ) {
     val log = logger("LnurlPayView")
-    log.debug { "init lnurl-pay view with url=${model.paymentIntent}" }
+//    log.debug { "init lnurl-pay view with url=${model.paymentIntent}" }
 
     val context = LocalContext.current
     val balance = business.balanceManager.balance.collectAsState(null).value

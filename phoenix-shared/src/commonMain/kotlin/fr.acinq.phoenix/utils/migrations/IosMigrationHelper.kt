@@ -31,7 +31,8 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.extensions.isBeingCreated
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.lightning.logging.info
+import fr.acinq.lightning.logging.warning
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -80,12 +81,12 @@ object IosMigrationHelper {
         biz: PhoenixBusiness,
     ): IosMigrationResult {
 
-        val loggerFactory = biz.newLoggerFactory
+        val loggerFactory = biz.loggerFactory
         val peerManager = biz.peerManager
         val chain = biz.chain
 
         try {
-            val log = loggerFactory.appendingTag("IosMigrationHelper")
+            val log = loggerFactory.newLogger(this::class)
 
             val peer = peerManager.getPeer()
             val swapInAddress = peer.swapInAddress

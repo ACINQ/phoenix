@@ -30,7 +30,6 @@ import fr.acinq.secp256k1.Hex
 import kotlinx.coroutines.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import org.kodein.log.LoggerFactory
 
 object TestConstants {
 

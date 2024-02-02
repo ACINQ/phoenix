@@ -1,18 +1,19 @@
 package fr.acinq.phoenix.managers
 
-import co.touchlab.kermit.Logger
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.HeaderSubscriptionResponse
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.lightning.logging.debug
+import fr.acinq.lightning.logging.error
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -32,18 +33,18 @@ class AppConfigurationManager(
     private val httpClient: HttpClient,
     private val electrumWatcher: ElectrumWatcher,
     private val chain: NodeParams.Chain,
-    loggerFactory: Logger
+    loggerFactory: LoggerFactory
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness) : this(
-        loggerFactory = business.newLoggerFactory,
+        loggerFactory = business.loggerFactory,
         chain = business.chain,
         appDb = business.appDb,
         httpClient = business.httpClient,
         electrumWatcher = business.electrumWatcher,
     )
 
-    private val logger = loggerFactory.appendingTag("AppConfigurationManager")
+    private val logger = loggerFactory.newLogger(this::class)
 
     init {
         watchElectrumMessages()

@@ -264,7 +264,7 @@ fun BoxScope.ScannerView(
                     override fun barcodeResult(result: BarcodeResult?) {
                         result?.text?.trim()?.takeIf { it.isNotBlank() }?.let {
                             scanView.pause()
-                            log.debug { "scanned text=$it" }
+//                            log.debug { "scanned text=$it" }
                             onScannedText(it)
                         }
                     }

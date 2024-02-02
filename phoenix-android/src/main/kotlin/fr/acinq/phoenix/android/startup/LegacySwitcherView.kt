@@ -50,7 +50,7 @@ fun LegacySwitcherView(
     val business = business
     val connectionsDaemon = business.appConnectionsDaemon
     val legacyAppStatus by LegacyPrefsDatastore.getLegacyAppStatus(context).collectAsState(initial = null)
-    log.debug { "legacy switcher with legacyAppStatus=${legacyAppStatus}" }
+//    log.debug { "legacy switcher with legacyAppStatus=${legacyAppStatus}" }
 
     Column(
         modifier = Modifier
@@ -77,7 +77,7 @@ fun LegacySwitcherView(
                     scope.launch {
                         if (legacyAppStatus == LegacyAppStatus.Required.InitStart) {
                             LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Running)
-                            log.info { "switching to legacy app" }
+//                            log.info { "switching to legacy app" }
                             context.startActivity(Intent(context, MainActivity::class.java).apply {
                                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                             })

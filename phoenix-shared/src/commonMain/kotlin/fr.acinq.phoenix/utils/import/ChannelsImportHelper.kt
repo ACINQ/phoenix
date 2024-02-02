@@ -6,7 +6,7 @@ import fr.acinq.lightning.serialization.Encryption.from
 import fr.acinq.lightning.serialization.Serialization
 import fr.acinq.lightning.wire.EncryptedChannelData
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.lightning.logging.error
 import fr.acinq.secp256k1.Hex
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -20,8 +20,8 @@ object ChannelsImportHelper {
     ): ChannelsImportResult {
 
         try {
-            val loggerFactory = biz.newLoggerFactory
-            val log = loggerFactory.appendingTag("ChannelsImportHelper")
+            val loggerFactory = biz.loggerFactory
+            val log = loggerFactory.newLogger(this::class)
 
             val nodeParams = biz.nodeParamsManager.nodeParams.filterNotNull().first()
             val peer = biz.peerManager.getPeer()

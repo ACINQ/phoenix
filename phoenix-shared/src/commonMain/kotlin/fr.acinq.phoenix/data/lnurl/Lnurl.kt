@@ -16,11 +16,13 @@
 
 package fr.acinq.phoenix.data.lnurl
 
+import co.touchlab.kermit.Logger
 import fr.acinq.bitcoin.Bech32
 import fr.acinq.lightning.utils.msat
-import fr.acinq.phoenix.globalLoggerFactory
 import fr.acinq.phoenix.utils.Parser
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.lightning.logging.debug
+import fr.acinq.lightning.logging.error
+import fr.acinq.lightning.logging.info
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.charsets.*
@@ -62,7 +64,6 @@ sealed interface Lnurl {
     }
 
     companion object {
-        internal val log = globalLoggerFactory.appendingTag("Lnurl")
         internal val format: Json = Json { ignoreUnknownKeys = true }
 
         /**
@@ -73,22 +74,22 @@ sealed interface Lnurl {
          *
          * Throws an exception if the source is malformed or invalid.
          */
-        fun extractLnurl(source: String): Lnurl {
+        fun extractLnurl(source: String, logger: Logger): Lnurl {
             val input = Parser.trimMatchingPrefix(source, Parser.lightningPrefixes + Parser.bitcoinPrefixes + Parser.lnurlPrefixes)
             val url: Url = try {
-                log.debug { "parsing as lnurl source=$source" }
+                logger.debug { "parsing as lnurl source=$source" }
                 parseBech32Url(input)
             } catch (bech32Ex: Exception) {
                 try {
                     if (lud17Schemes.any { input.startsWith(it, ignoreCase = true) }) {
-                        parseNonBech32Lud17(input)
+                        parseNonBech32Lud17(input, logger)
                     } else if (input.contains('@')) {
                         parseInternetIdentifier(input)
                     } else {
                         parseNonBech32Http(input)
                     }
                 } catch (nonBech32Ex: Exception) {
-                    log.info { "cannot parse source as non-bech32 lnurl: ${nonBech32Ex.message ?: nonBech32Ex::class} or as a bech32 lnurl: ${bech32Ex.message ?: bech32Ex::class}" }
+                    logger.info { "cannot parse source as non-bech32 lnurl: ${nonBech32Ex.message ?: nonBech32Ex::class} or as a bech32 lnurl: ${bech32Ex.message ?: bech32Ex::class}" }
                     throw LnurlError.Invalid(cause = nonBech32Ex)
                 }
             }
@@ -145,14 +146,14 @@ sealed interface Lnurl {
         )
 
         /** Converts LUD-17 lnurls (using a custom lnurl scheme like lnurlc, lnurlp, keyauth) into a regular http url. */
-        private fun parseNonBech32Lud17(source: String): Url {
+        private fun parseNonBech32Lud17(source: String, logger: Logger): Url {
             val matchingPrefix = lud17Schemes.firstOrNull { source.startsWith(it, ignoreCase = true) }
             val stripped = if (matchingPrefix != null) {
                 source.drop(matchingPrefix.length)
             } else {
                 throw IllegalArgumentException("source does not use a lud17 scheme: $source")
             }
-            log.debug { "lud-17 scheme found - transforming input into an http request" }
+            logger.debug { "lud-17 scheme found - transforming input into an http request" }
             return URLBuilder(stripped).apply {
                 encodedPath.split("/", ignoreCase = true, limit = 2).let {
                     this.host = it.first()
@@ -201,7 +202,7 @@ sealed interface Lnurl {
          * - [LnurlError.RemoteFailure.Unreadable] if response is not valid JSON
          * - [LnurlError.RemoteFailure.Detailed] if service reports an internal error message (`{ status: "error", reason: "..." }`)
          */
-        suspend fun processLnurlResponse(response: HttpResponse): JsonObject {
+        suspend fun processLnurlResponse(response: HttpResponse, logger: Logger): JsonObject {
             val url = response.request.url
             val json: JsonObject = try {
                 // From the LUD-01 specs:
@@ -211,15 +212,15 @@ sealed interface Lnurl {
                 // > response body as JSON, then interpret it accordingly.
                 Json.decodeFromString(response.bodyAsText(Charsets.UTF_8))
             } catch (e: Exception) {
-                log.error(e) { "unhandled response from url=$url: " }
+                logger.error(e) { "unhandled response from url=$url: " }
                 throw LnurlError.RemoteFailure.Unreadable(url.host)
             }
 
-            log.debug { "lnurl service=${url.host} returned response=${json.toString().take(100)}" }
+            logger.debug { "lnurl service=${url.host} returned response=${json.toString().take(100)}" }
             return if (json["status"]?.jsonPrimitive?.content?.trim()?.equals("error", true) == true) {
                 val errorMessage = json["reason"]?.jsonPrimitive?.content?.trim() ?: ""
                 if (errorMessage.isNotEmpty()) {
-                    log.error { "lnurl service=${url.host} returned error=$errorMessage" }
+                    logger.error { "lnurl service=${url.host} returned error=$errorMessage" }
                     throw LnurlError.RemoteFailure.Detailed(url.host, errorMessage.take(90).replace("<", ""))
                 } else if (!response.status.isSuccess()) {
                     throw LnurlError.RemoteFailure.Code(url.host, response.status)

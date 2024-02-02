@@ -16,42 +16,39 @@
 
 package fr.acinq.phoenix.managers
 
-import co.touchlab.kermit.Logger
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.NodeUri
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.shared.BuildVersions
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.lightning.logging.info
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.kodein.log.LoggerFactory
 
 
 class NodeParamsManager(
-    oldLoggerFactory: LoggerFactory,
-    newLoggerFactory: Logger,
+    loggerFactory: LoggerFactory,
     chain: NodeParams.Chain,
     walletManager: WalletManager,
     appConfigurationManager: AppConfigurationManager,
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness): this(
-        oldLoggerFactory = business.oldLoggerFactory,
-        newLoggerFactory = business.newLoggerFactory,
+        loggerFactory = business.loggerFactory,
         chain = business.chain,
         walletManager = business.walletManager,
         appConfigurationManager = business.appConfigurationManager,
     )
 
-    private val log = newLoggerFactory.appendingTag("NodeParamsManager")
+    private val log = loggerFactory.newLogger(this::class)
 
     private val _nodeParams = MutableStateFlow<NodeParams?>(null)
     val nodeParams: StateFlow<NodeParams?> = _nodeParams
@@ -64,7 +61,7 @@ class NodeParamsManager(
             ) { keyManager, startupParams ->
                 NodeParams(
                     chain = chain,
-                    loggerFactory = oldLoggerFactory,
+                    loggerFactory = loggerFactory,
                     keyManager = keyManager,
                 ).copy(
                     alias = "phoenix",

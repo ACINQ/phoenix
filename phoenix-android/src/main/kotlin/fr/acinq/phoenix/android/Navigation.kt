@@ -18,8 +18,6 @@ package fr.acinq.phoenix.android
 
 import androidx.navigation.NavController
 import androidx.navigation.NavOptionsBuilder
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 
 
 sealed class Screen(val route: String) {

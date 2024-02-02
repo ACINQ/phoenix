@@ -18,6 +18,7 @@ package fr.acinq.phoenix.controllers.payments
 
 import co.touchlab.kermit.Logger
 import fr.acinq.lightning.Lightning.randomBytes32
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.Either
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
@@ -26,14 +27,14 @@ import kotlinx.coroutines.launch
 
 
 class AppReceiveController(
-    loggerFactory: Logger,
+    loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
 ) : AppController<Receive.Model, Receive.Intent>(
     loggerFactory = loggerFactory,
     firstModel = Receive.Model.Awaiting
 ) {
     constructor(business: PhoenixBusiness) : this(
-        loggerFactory = business.newLoggerFactory,
+        loggerFactory = business.loggerFactory,
         peerManager = business.peerManager,
     )
 

@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.controllers.main
 
 import co.touchlab.kermit.Logger
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.managers.WalletManager
@@ -10,14 +11,14 @@ import kotlinx.coroutines.launch
 
 
 class AppContentController(
-    loggerFactory: Logger,
+    loggerFactory: LoggerFactory,
     private val walletManager: WalletManager
 ) : AppController<Content.Model, Content.Intent>(
     loggerFactory = loggerFactory,
     firstModel = Content.Model.Waiting
 ) {
     constructor(business: PhoenixBusiness): this(
-        loggerFactory = business.newLoggerFactory,
+        loggerFactory = business.loggerFactory,
         walletManager = business.walletManager
     )
 

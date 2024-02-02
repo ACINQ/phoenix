@@ -41,7 +41,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 
 @Composable
-fun logger(name: String? = null): org.kodein.log.Logger {
+fun loggerKodein(name: String? = null): org.kodein.log.Logger {
     val context = LocalContext.current
     val application = context.applicationContext
     val tag = name?.let { org.kodein.log.Logger.Tag(BuildConfig.APPLICATION_ID, it) } ?: org.kodein.log.Logger.Tag(context::class)
@@ -49,12 +49,31 @@ fun logger(name: String? = null): org.kodein.log.Logger {
     return if (application !is PhoenixApplication) { // Preview mode
         remember(tag) { org.kodein.log.LoggerFactory(slf4jFrontend).newLogger(tag) }
     } else {
-        val businessState = application.business.collectAsState()
-        when (val business = businessState.value) {
-            null -> remember(tag) { org.kodein.log.LoggerFactory(slf4jFrontend).newLogger(tag) }
-            else -> remember(tag) { business.loggerFactory.newLogger(tag) }
-        }
+//        val businessState = application.business.collectAsState()
+//        when (val business = businessState.value) {
+//            null -> remember(tag) { org.kodein.log.LoggerFactory(slf4jFrontend).newLogger(tag) }
+//            else -> remember(tag) { business.newLoggerFactory.newLogger(tag) }
+//        }
+        remember(tag) { org.kodein.log.LoggerFactory(slf4jFrontend).newLogger(tag) }
     }
+}
+
+@Composable
+fun logger(name: String? = null): org.slf4j.Logger {
+    return remember(name) { LoggerFactory.getLogger(name) }
+//    val context = LocalContext.current
+//    val application = context.applicationContext
+//    val tag = name?.let { org.kodein.log.Logger.Tag(BuildConfig.APPLICATION_ID, it) } ?: org.kodein.log.Logger.Tag(context::class)
+//
+//    return if (application !is PhoenixApplication) { // Preview mode
+//        remember(tag) { org.kodein.log.LoggerFactory(slf4jFrontend).newLogger(tag) }
+//    } else {
+//        val businessState = application.business.collectAsState()
+//        when (val business = businessState.value) {
+//            null -> remember(tag) { org.kodein.log.LoggerFactory(slf4jFrontend).newLogger(tag) }
+//            else -> remember(tag) { business.newLoggerFactory.newLogger(tag) }
+//        }
+//    }
 }
 
 object Logging {

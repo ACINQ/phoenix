@@ -1,8 +1,11 @@
 package fr.acinq.phoenix.utils
 
-import co.touchlab.kermit.Logger
 import fr.acinq.lightning.utils.Connection
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.lightning.logging.LoggerFactory
+import fr.acinq.lightning.logging.debug
+import fr.acinq.lightning.logging.error
+import fr.acinq.lightning.logging.info
+import fr.acinq.lightning.logging.warning
 import fr.acinq.tor.Tor
 import fr.acinq.tor.TorState
 import kotlinx.coroutines.CoroutineScope
@@ -12,8 +15,8 @@ import kotlinx.coroutines.flow.stateIn
 
 
 object TorHelper {
-    fun torLogger(loggerFactory: Logger): (Tor.LogLevel, String) -> Unit {
-        val logger = loggerFactory.appendingTag("Tor")
+    fun torLogger(loggerFactory: LoggerFactory): (Tor.LogLevel, String) -> Unit {
+        val logger = loggerFactory.newLogger("Tor")
         return { level, message ->
             when (level) {
                 Tor.LogLevel.DEBUG -> logger.debug { message }

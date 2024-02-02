@@ -1,6 +1,5 @@
 package fr.acinq.phoenix.managers
 
-import co.touchlab.kermit.Logger
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.CltvExpiryDelta
@@ -19,6 +18,7 @@ import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.states.Normal
 import fr.acinq.lightning.channel.states.Offline
 import fr.acinq.lightning.io.Peer
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.msat
@@ -29,13 +29,15 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.utils.extensions.isTerminated
 import fr.acinq.phoenix.utils.extensions.nextTimeout
-import fr.acinq.phoenix.utils.loggerExtensions.*
+import fr.acinq.lightning.logging.debug
+import fr.acinq.lightning.logging.error
+import fr.acinq.lightning.logging.info
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 
 class PeerManager(
-    loggerFactory: Logger,
+    loggerFactory: LoggerFactory,
     private val nodeParamsManager: NodeParamsManager,
     private val databaseManager: DatabaseManager,
     private val configurationManager: AppConfigurationManager,
@@ -43,12 +45,12 @@ class PeerManager(
     private val electrumWatcher: ElectrumWatcher,
 ) : CoroutineScope by CoroutineScope(CoroutineName("peer") + SupervisorJob() + Dispatchers.Main + CoroutineExceptionHandler { _, e ->
     println("error in Peer coroutine scope: ${e.message}")
-    val logger = loggerFactory.appendingTag("PeerManager")
+    val logger = loggerFactory.newLogger("PeerManager")
     logger.error(e) { "error in Peer scope: " }
 }) {
 
     constructor(business: PhoenixBusiness) : this(
-        loggerFactory = business.newLoggerFactory,
+        loggerFactory = business.loggerFactory,
         nodeParamsManager = business.nodeParamsManager,
         databaseManager = business.databaseManager,
         configurationManager = business.appConfigurationManager,
@@ -56,7 +58,7 @@ class PeerManager(
         electrumWatcher = business.electrumWatcher,
     )
 
-    private val logger = loggerFactory.appendingTag("PeerManager")
+    private val logger = loggerFactory.newLogger(this::class)
 
     private val _peer = MutableStateFlow<Peer?>(null)
     val peerState: StateFlow<Peer?> = _peer
