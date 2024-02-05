@@ -32,12 +32,10 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.logger
 
 
 @Composable
 fun AboutView() {
-    val log = logger("AboutView")
     val nc = navController
     val context = LocalContext.current
 

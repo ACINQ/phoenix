@@ -56,7 +56,6 @@ import java.text.NumberFormat
 
 @Composable
 fun ElectrumView() {
-    val log = logger("ElectrumView")
     val nc = navController
     val context = LocalContext.current
     val scope = rememberCoroutineScope()

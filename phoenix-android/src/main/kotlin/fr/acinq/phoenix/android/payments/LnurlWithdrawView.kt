@@ -36,7 +36,6 @@ import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.preferredAmountUnit
 import fr.acinq.phoenix.android.utils.Converter.toPrettyStringWithFallback
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.lnurl.LnurlError
 
@@ -46,9 +45,6 @@ fun LnurlWithdrawView(
     onBackClick: () -> Unit,
     onWithdrawClick: (Scan.Intent.LnurlWithdrawFlow) -> Unit
 ) {
-    val log = logger("LnurlWithdrawView")
-//    log.debug { "init lnurl-withdraw view with url=${model.lnurlWithdraw}" }
-
     val context = LocalContext.current
     val prefUnit = preferredAmountUnit
     val rate = fiatRate

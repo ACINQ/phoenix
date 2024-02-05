@@ -34,17 +34,13 @@ import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.orange
 import fr.acinq.phoenix.android.utils.positiveColor
 import kotlinx.coroutines.launch
 
 @Composable
-fun TorConfigView(
-
-) {
-    val log = logger("TorSettingView")
+fun TorConfigView() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val business = business

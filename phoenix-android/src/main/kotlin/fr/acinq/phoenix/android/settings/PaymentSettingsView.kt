@@ -42,7 +42,6 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
@@ -51,7 +50,6 @@ import java.text.NumberFormat
 fun PaymentSettingsView(
     initialShowLnurlAuthSchemeDialog: Boolean = false,
 ) {
-    val log = logger("PaymentSettingsView")
     val nc = navController
     val scope = rememberCoroutineScope()
     val context = LocalContext.current

@@ -46,7 +46,6 @@ import fr.acinq.phoenix.android.preferredAmountUnit
 import fr.acinq.phoenix.android.utils.BitmapHelper
 import fr.acinq.phoenix.android.utils.Converter.toPrettyStringWithFallback
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.safeLet
 import fr.acinq.phoenix.controllers.payments.Scan
 import fr.acinq.phoenix.data.lnurl.LnurlError
@@ -58,9 +57,6 @@ fun LnurlPayView(
     onBackClick: () -> Unit,
     onSendLnurlPayClick: (Scan.Intent.LnurlPayFlow) -> Unit
 ) {
-    val log = logger("LnurlPayView")
-//    log.debug { "init lnurl-pay view with url=${model.paymentIntent}" }
-
     val context = LocalContext.current
     val balance = business.balanceManager.balance.collectAsState(null).value
     val prefUnit = preferredAmountUnit

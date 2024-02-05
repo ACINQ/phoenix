@@ -66,7 +66,6 @@ sealed class RestoreWalletViewState {
 fun RestoreWalletView(
     onSeedWritten: () -> Unit
 ) {
-    val log = logger("RestoreWalletView")
     val nc = navController
     val context = LocalContext.current
     val vm: InitViewModel = viewModel(factory = InitViewModel.Factory(controllerFactory, CF::initialization))

@@ -52,7 +52,6 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
@@ -65,8 +64,6 @@ fun ChannelsView(
     onChannelClick: (String) -> Unit,
     onImportChannelsDataClick: () -> Unit,
 ) {
-    val log = logger("ChannelsView")
-
     val channelsState by business.peerManager.channelsFlow.collectAsState()
     val balance by business.balanceManager.balance.collectAsState()
     val inboundLiquidity = channelsState?.values?.mapNotNull { it.availableForReceive }?.sum()

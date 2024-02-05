@@ -57,7 +57,6 @@ import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.findActivity
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
 import kotlinx.coroutines.flow.combine
@@ -79,7 +78,6 @@ fun HomeView(
     onShowNotifications: () -> Unit,
     onRequestLiquidityClick: () -> Unit,
 ) {
-    val log = logger("HomeView")
     val context = LocalContext.current
     val torEnabledState = UserPrefs.getIsTorEnabled(context).collectAsState(initial = null)
     val connections by business.connectionsManager.connections.collectAsState()

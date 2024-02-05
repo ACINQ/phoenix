@@ -77,7 +77,6 @@ import fr.acinq.phoenix.android.navigateToPaymentDetails
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.copyToClipboard
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.share
@@ -90,7 +89,6 @@ fun ChannelDetailsView(
     onBackClick: () -> Unit,
     channelId: String?,
 ) {
-    val log = logger("ChannelDetailsView")
     val channelsState = business.peerManager.channelsFlow.collectAsState()
 
     DefaultScreenLayout(isScrollable = false) {

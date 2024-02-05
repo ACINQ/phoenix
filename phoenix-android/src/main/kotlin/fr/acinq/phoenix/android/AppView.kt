@@ -95,7 +95,6 @@ import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.LegacyPrefsDatastore
-import fr.acinq.phoenix.utils.extensions.id
 import io.ktor.http.decodeURLPart
 import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.flow.filterNotNull
@@ -190,10 +189,10 @@ fun AppView(
                         onBusinessStarted = {
                             val next = nextScreenLink?.takeUnless { it.isBlank() }?.let { Uri.parse(it) }
                             if (next == null || !navController.graph.hasDeepLink(next)) {
-//                                log.debug { "redirecting from startup to home" }
+                                log.debug("redirecting from startup to home")
                                 popToHome(navController)
                             } else {
-//                                log.debug { "redirecting from startup to $next" }
+                                log.debug("redirecting from startup to $next")
                                 navController.navigate(next, navOptions = navOptions {
                                     popUpTo(navController.graph.id) { inclusive = true }
                                 })
@@ -291,7 +290,7 @@ fun AppView(
                     val paymentId = if (id != null && direction != null) WalletPaymentId.create(direction, id) else null
                     if (paymentId != null) {
                         RequireStarted(walletState, nextUri = "phoenix:payments/${direction}/${id}") {
-//                            log.debug { "navigating to payment-details id=$id" }
+                            log.debug("navigating to payment-details id=$id")
                             PaymentDetailsView(
                                 paymentId = paymentId,
                                 onBackClick = {
@@ -545,7 +544,6 @@ private fun RequireStarted(
     nextUri: String? = null,
     children: @Composable () -> Unit
 ) {
-    val log = logger("Navigation")
     if (serviceState == null) {
         // do nothing
     } else if (serviceState !is NodeServiceState.Running) {

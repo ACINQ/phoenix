@@ -35,7 +35,6 @@ import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.SettingButton
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.Logging
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.shareFile
 
 private sealed class LogsExportState {
@@ -45,7 +44,6 @@ private sealed class LogsExportState {
 }
 @Composable
 fun LogsView() {
-    val log = logger("LogsView")
     val nc = navController
     val context = LocalContext.current
     val authority = remember { "${BuildConfig.APPLICATION_ID}.provider" }

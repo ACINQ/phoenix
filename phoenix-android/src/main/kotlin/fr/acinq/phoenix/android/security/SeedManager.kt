@@ -17,8 +17,7 @@
 package fr.acinq.phoenix.android.security
 
 import android.content.Context
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
+import org.slf4j.LoggerFactory
 import java.io.File
 
 sealed class SeedFileState {
@@ -36,7 +35,7 @@ sealed class SeedFileState {
 object SeedManager {
     private val BASE_DATADIR = "node-data"
     private const val SEED_FILE = "seed.dat"
-    private val log = newLogger(LoggerFactory.default)
+    private val log = LoggerFactory.getLogger(this::class.java) // newLogger(LoggerFactory.default)
 
     fun getDatadir(context: Context): File {
         return File(context.filesDir, BASE_DATADIR)
@@ -52,7 +51,7 @@ object SeedManager {
             else -> SeedFileState.Error.UnhandledSeedType
         }
     } catch (e: Exception) {
-        log.error(e) { "failed to read seed: " }
+        log.error("failed to read seed: ", e)
         SeedFileState.Error.Unreadable(e.localizedMessage)
     }
 
@@ -91,7 +90,7 @@ object SeedManager {
         // 3 - decrypt temp file and check validity; if correct, move temp file to final file
         val checkSeed = loadSeedFromDir(dir, temp.name) as EncryptedSeed.V2
         if (!checkSeed.ciphertext.contentEquals(seed.ciphertext)) {
-            log.warning { "seed check do not match!" }
+            log.warn("seed check do not match!")
 //            throw WriteErrorCheckDontMatch
         }
         temp.copyTo(File(dir, SEED_FILE), overwrite)

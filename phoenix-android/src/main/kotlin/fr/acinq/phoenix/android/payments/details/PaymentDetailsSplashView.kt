@@ -649,7 +649,6 @@ private fun ConfirmationView(
     onCpfpSuccess: () -> Unit,
     minDepth: Int? = null, // sometimes we know how many confirmations are needed
 ) {
-    val log = logger("PaymentDetailsSplashView")
     val txUrl = txUrl(txId = txId)
     val context = LocalContext.current
     val electrumClient = business.electrumClient
