@@ -18,15 +18,10 @@ package fr.acinq.phoenix.utils.logger
 
 import co.touchlab.kermit.Logger
 import fr.acinq.lightning.logging.LoggerFactory
-import fr.acinq.phoenix.utils.PlatformContext
-import kotlin.reflect.KClass
 
-class PhoenixLoggerFactory(private val platformContext: PlatformContext) : LoggerFactory {
-
-    override fun newLogger(cls: KClass<*>): Logger = newLogger(tag = cls.qualifiedName ?: cls.simpleName ?: "Anonymous")
-
+class PhoenixLoggerFactory(val config: PhoenixLoggerConfig) : LoggerFactory {
     override fun newLogger(tag: String): Logger = Logger(
-        config = PhoenixLoggerConfig(platformContext),
+        config = config,
         tag = tag
     )
 }

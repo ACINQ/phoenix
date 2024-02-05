@@ -35,6 +35,7 @@ import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.createAppDbDriver
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.*
+import fr.acinq.phoenix.utils.logger.PhoenixLoggerConfig
 import fr.acinq.phoenix.utils.logger.PhoenixLoggerFactory
 import fr.acinq.tor.Tor
 import io.ktor.client.*
@@ -52,7 +53,7 @@ class PhoenixBusiness(
 ) {
     // this logger factory will be used throughout the project (including dependencies like lightning-kmp) to
     // create new [Logger] instances, and output logs to platform dependent writers.
-    val loggerFactory = PhoenixLoggerFactory(ctx)
+    val loggerFactory = PhoenixLoggerFactory(PhoenixLoggerConfig(ctx))
     private val logger = loggerFactory.newLogger(this::class)
 
     private val tcpSocketBuilder = TcpSocket.Builder()
