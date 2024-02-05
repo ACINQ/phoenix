@@ -1,11 +1,14 @@
 package fr.acinq.phoenix.data.lnurl
 
 import fr.acinq.lightning.utils.msat
+import fr.acinq.phoenix.utils.testLoggerFactory
 import io.ktor.http.*
 import kotlinx.serialization.json.*
 import kotlin.test.*
 
 class LnurlWithdrawTest {
+    val logger = testLoggerFactory.newLogger(this::class)
+
     private val defaultLnurl = URLBuilder("https://lnurl.service.com/withdraw/token12345").build()
 
     @Test
@@ -139,19 +142,19 @@ class LnurlWithdrawTest {
 
     @Test
     fun test_extractLnurl_ignores_unknown_tag() {
-        val lnurl = Lnurl.extractLnurl("$defaultLnurl?tag=withdraw")
+        val lnurl = Lnurl.extractLnurl("$defaultLnurl?tag=withdraw", logger)
         assertIs<Lnurl.Request>(lnurl)
     }
 
     @Test
     fun lud17() {
         val validClearLud17 = "acinq.co/lnurlwithdraw/token123-abc?some-parameter=USD"
-        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurlw://$validClearLud17"))
-        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurlw:$validClearLud17"))
-        assertTrue { Lnurl.extractLnurl("lnurlw:$validClearLud17").initialUrl.protocol.isSecure() }
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurlw://$validClearLud17", logger))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurlw:$validClearLud17", logger))
+        assertTrue { Lnurl.extractLnurl("lnurlw:$validClearLud17", logger).initialUrl.protocol.isSecure() }
 
         val validOnionLud17 = "lnurlw://acinq.onion/lnurlwithdraw/token123-abc?some-parameter=USD"
-        assertIs<Lnurl.Request>(Lnurl.extractLnurl(validOnionLud17))
-        assertTrue { !Lnurl.extractLnurl(validOnionLud17).initialUrl.protocol.isSecure() }
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl(validOnionLud17, logger))
+        assertTrue { !Lnurl.extractLnurl(validOnionLud17, logger).initialUrl.protocol.isSecure() }
     }
 }

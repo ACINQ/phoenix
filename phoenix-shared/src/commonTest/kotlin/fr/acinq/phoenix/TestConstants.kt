@@ -26,6 +26,7 @@ import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector32
+import fr.acinq.phoenix.utils.testLoggerFactory
 import fr.acinq.secp256k1.Hex
 import kotlinx.coroutines.*
 import kotlin.time.Duration
@@ -41,7 +42,7 @@ object TestConstants {
         val keyManager = LocalKeyManager(seed, NodeParams.Chain.Regtest, swapInServerXpub)
         val nodeParams = NodeParams(
             chain = NodeParams.Chain.Regtest,
-            loggerFactory = LoggerFactory.default,
+            loggerFactory = testLoggerFactory,
             keyManager = keyManager,
         ).copy(
             alias = "bob",

@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.data.lnurl
 
 import fr.acinq.lightning.utils.msat
+import fr.acinq.phoenix.utils.testLoggerFactory
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -18,6 +19,8 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class LnurlPayTest {
+
+    val logger = testLoggerFactory.newLogger(this::class)
 
     private val validContent = """
         {
@@ -55,7 +58,7 @@ class LnurlPayTest {
                 )
             }
             val response: HttpResponse = fakeClient(engine).get("https://acinq.co")
-            val json = Lnurl.processLnurlResponse(response)
+            val json = Lnurl.processLnurlResponse(response, logger)
             assertEquals("payRequest", json.get("tag")!!.jsonPrimitive.content)
 
             val lnurl = Lnurl.parseLnurlJson(Url("https://acinq.co"), json)
@@ -79,7 +82,7 @@ class LnurlPayTest {
                 )
             }
             val response: HttpResponse = fakeClient(engine).get("https://acinq.co")
-            val json = Lnurl.processLnurlResponse(response)
+            val json = Lnurl.processLnurlResponse(response, logger)
             assertEquals("payRequest", json.get("tag")!!.jsonPrimitive.content)
 
             val lnurl = Lnurl.parseLnurlJson(Url("https://acinq.co"), json)
@@ -114,10 +117,10 @@ class LnurlPayTest {
                 )
             }
             val client = fakeClient(engine)
-            val lnurl = Lnurl.extractLnurl("acinq@zbd.gg")
+            val lnurl = Lnurl.extractLnurl("acinq@zbd.gg", logger)
             assertIs<Lnurl.Request>(lnurl)
             val response: HttpResponse = client.get(lnurl.initialUrl)
-            val json = Lnurl.processLnurlResponse(response)
+            val json = Lnurl.processLnurlResponse(response, logger)
             assertEquals("payRequest", json.get("tag")!!.jsonPrimitive.content)
         }
     }
@@ -126,30 +129,30 @@ class LnurlPayTest {
 
     @Test
     fun bech32() {
-        assertIs<Lnurl.Request>(Lnurl.extractLnurl(validBech32Lnurl))
-        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lightning://$validBech32Lnurl"))
-        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lightning:$validBech32Lnurl"))
-        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurl://$validBech32Lnurl"))
-        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurl:$validBech32Lnurl"))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl(validBech32Lnurl, logger))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lightning://$validBech32Lnurl", logger))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lightning:$validBech32Lnurl", logger))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurl://$validBech32Lnurl", logger))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurl:$validBech32Lnurl", logger))
     }
 
     @Test
     fun lud17() {
         val validClearLud17 = "acinq.co/lnurlpay/token123-abc?some-parameter=USD"
-        assertIs<Lnurl.Request>(Lnurl.extractLnurl("phoenix:lnurlp://$validClearLud17"))
-        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurlp://$validClearLud17"))
-        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurlp:$validClearLud17"))
-        assertTrue { Lnurl.extractLnurl("lnurlp:$validClearLud17").initialUrl.protocol.isSecure() }
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("phoenix:lnurlp://$validClearLud17", logger))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurlp://$validClearLud17", logger))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("lnurlp:$validClearLud17", logger))
+        assertTrue { Lnurl.extractLnurl("lnurlp:$validClearLud17", logger).initialUrl.protocol.isSecure() }
 
         val validOnionLud17 = "lnurlp://acinq.onion/lnurlpay/token123-abc?some-parameter=USD"
-        assertIs<Lnurl.Request>(Lnurl.extractLnurl(validOnionLud17))
-        assertTrue { !Lnurl.extractLnurl(validOnionLud17).initialUrl.protocol.isSecure() }
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl(validOnionLud17, logger))
+        assertTrue { !Lnurl.extractLnurl(validOnionLud17, logger).initialUrl.protocol.isSecure() }
     }
 
     @Test
     fun lnurl_in_http_param() {
-        assertIs<Lnurl.Request>(Lnurl.extractLnurl("https://acinq.co?param1=123&lightning=$validBech32Lnurl"))
-        assertIs<Lnurl.Request>(Lnurl.extractLnurl("http://service.com/api/test?lightning=$validBech32Lnurl"))
-        assertIs<Lnurl.Request>(Lnurl.extractLnurl("test://whatever/token?lightning=$validBech32Lnurl"))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("https://acinq.co?param1=123&lightning=$validBech32Lnurl", logger))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("http://service.com/api/test?lightning=$validBech32Lnurl", logger))
+        assertIs<Lnurl.Request>(Lnurl.extractLnurl("test://whatever/token?lightning=$validBech32Lnurl", logger))
     }
 }
