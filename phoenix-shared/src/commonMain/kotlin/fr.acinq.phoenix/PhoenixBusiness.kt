@@ -20,6 +20,7 @@ import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
 import fr.acinq.phoenix.controllers.*
 import fr.acinq.phoenix.controllers.config.*
@@ -36,7 +37,6 @@ import fr.acinq.phoenix.db.createAppDbDriver
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.logger.PhoenixLoggerConfig
-import fr.acinq.phoenix.utils.logger.PhoenixLoggerFactory
 import fr.acinq.tor.Tor
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -53,7 +53,7 @@ class PhoenixBusiness(
 ) {
     // this logger factory will be used throughout the project (including dependencies like lightning-kmp) to
     // create new [Logger] instances, and output logs to platform dependent writers.
-    val loggerFactory = PhoenixLoggerFactory(PhoenixLoggerConfig(ctx))
+    val loggerFactory = LoggerFactory(PhoenixLoggerConfig(ctx))
     private val logger = loggerFactory.newLogger(this::class)
 
     private val tcpSocketBuilder = TcpSocket.Builder()
