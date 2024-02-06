@@ -72,7 +72,7 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
             state = SpliceOutState.Preparing(userAmount = amount, feeratePerByte = feeratePerByte)
             log.debug("preparing splice-out for amount=$amount feerate=${feeratePerByte}sat/vb address=$address")
             val userFeerate = FeeratePerKw(FeeratePerByte(feeratePerByte))
-            val scriptPubKey = Parser.addressToPublicKeyScript(chain, address)!!.byteVector()
+            val scriptPubKey = Parser.addressToPublicKeyScriptOrNull(chain, address)!!.byteVector()
             val res = peerManager.getPeer().estimateFeeForSpliceOut(
                 amount = amount,
                 targetFeerate = userFeerate,
@@ -107,7 +107,7 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
             }) {
                 val response = peerManager.getPeer().spliceOut(
                     amount = amount,
-                    scriptPubKey = Parser.addressToPublicKeyScript(chain, address)!!.byteVector(),
+                    scriptPubKey = Parser.addressToPublicKeyScriptOrNull(chain, address)!!.byteVector(),
                     feerate = feerate,
                 )
                 when (response) {

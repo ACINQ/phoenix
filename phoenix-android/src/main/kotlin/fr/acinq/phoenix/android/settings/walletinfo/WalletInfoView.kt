@@ -122,7 +122,7 @@ private fun SwapInWalletView(onSwapInWalletClick: () -> Unit) {
             HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
             SettingWithCopy(
                 title = stringResource(id = R.string.walletinfo_descriptor),
-                value = it.swapInOnChainWallet.descriptor,
+                value = it.swapInOnChainWallet.legacyDescriptor,
                 maxLinesValue = 2
             )
             SettingWithCopy(

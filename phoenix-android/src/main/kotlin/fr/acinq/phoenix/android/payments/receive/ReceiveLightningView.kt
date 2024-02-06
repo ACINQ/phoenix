@@ -111,7 +111,7 @@ fun LightningInvoiceView(
     LaunchedEffect(key1 = Unit) {
         paymentsManager.lastCompletedPayment.collect {
             val state = vm.lightningInvoiceState
-            if (state is ReceiveViewModel.LightningInvoiceState.Show && it is IncomingPayment && state.paymentRequest.paymentHash == it.paymentHash) {
+            if (state is LightningInvoiceState.Show && it is IncomingPayment && state.paymentRequest.paymentHash == it.paymentHash) {
                 vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = expiry)
             }
         }
@@ -120,9 +120,9 @@ fun LightningInvoiceView(
     val onEdit = { vm.isEditingLightningInvoice = true }
 
     InvoiceHeader(
-        label = stringResource(id = R.string.receive_lightning_title),
+        icon = R.drawable.ic_zap,
         helpMessage = stringResource(id = R.string.receive_lightning_help),
-        icon = R.drawable.ic_zap
+        content = { Text(text = stringResource(id = R.string.receive_lightning_title)) },
     )
 
     val navController = navController
@@ -141,8 +141,8 @@ fun LightningInvoiceView(
                 onFeeManagementClick = onFeeManagementClick,
             )
         }
-        state is ReceiveViewModel.LightningInvoiceState.Init || state is ReceiveViewModel.LightningInvoiceState.Generating -> {
-            if (state is ReceiveViewModel.LightningInvoiceState.Init) {
+        state is LightningInvoiceState.Init || state is LightningInvoiceState.Generating -> {
+            if (state is LightningInvoiceState.Init) {
                 LaunchedEffect(key1 = Unit) {
                     vm.generateInvoice(amount = customAmount, description = customDesc, expirySeconds = expiry)
                 }
@@ -154,7 +154,7 @@ fun LightningInvoiceView(
             Spacer(modifier = Modifier.height(32.dp))
             CopyShareEditButtons(onCopy = { }, onShare = { }, onEdit = onEdit, maxWidth = maxWidth)
         }
-        state is ReceiveViewModel.LightningInvoiceState.Show -> {
+        state is LightningInvoiceState.Show -> {
             DisplayLightningInvoice(
                 paymentRequest = state.paymentRequest,
                 bitmap = vm.lightningQRBitmap,
@@ -163,7 +163,7 @@ fun LightningInvoiceView(
                 maxWidth = maxWidth,
             )
         }
-        state is ReceiveViewModel.LightningInvoiceState.Error -> {
+        state is LightningInvoiceState.Error -> {
             ErrorMessage(
                 header = stringResource(id = R.string.receive_lightning_error),
                 details = state.e.localizedMessage
@@ -171,7 +171,7 @@ fun LightningInvoiceView(
         }
     }
 
-    if ((state is ReceiveViewModel.LightningInvoiceState.Init || state is ReceiveViewModel.LightningInvoiceState.Show) && !isEditing) {
+    if ((state is LightningInvoiceState.Init || state is LightningInvoiceState.Show) && !isEditing) {
         Spacer(modifier = Modifier.height(24.dp))
         HSeparator(width = 50.dp)
         Spacer(modifier = Modifier.height(24.dp))

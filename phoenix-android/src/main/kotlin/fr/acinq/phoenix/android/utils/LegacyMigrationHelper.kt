@@ -493,7 +493,7 @@ fun WalletPaymentInfo.isLegacyMigration(peer: Peer?): Boolean? {
     return when {
         p !is ChannelCloseOutgoingPayment -> false
         peer == null -> null
-        p.address == peer.swapInAddress && metadata.userDescription == LegacyMigrationHelper.migrationDescFlag -> true
+        p.address == peer.swapInWallet.legacySwapInAddress && metadata.userDescription == LegacyMigrationHelper.migrationDescFlag -> true
         else -> false
     }
 }

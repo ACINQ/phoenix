@@ -111,6 +111,7 @@
     <string name="receive_bitcoin_title">Bitcoin</string>
     <string name="receive_bitcoin_help">This QR code is a classic Bitcoin address.\n\nIt can be read by almost any Bitcoin service/wallet, but payments will be slower to arrive.</string>
     <string name="receive_bitcoin_address_label">Address</string>
+    <string name="receive_bitcoin_generating">Synchronizing address…</string>
     <string name="receive_bitcoin_error">Could not generate a bitcoin address</string>
     <string name="receive_bitcoin_share_title">Bitcoin address</string>
     <string name="receive_bitcoin_share_subject">Share this Bitcoin address with…</string>
@@ -201,6 +202,7 @@
 
     <string name="accessibility_link">Open link in a browser</string>
     <string name="accessibility_explorer_link">Open transaction in an explorer</string>
+    <string name="accessibility_address_explorer_link">Open address in an explorer</string>
     <string name="validation_empty">This field cannot be blank</string>
     <string name="validation_invalid_amount">Please enter a valid amount</string>
     <string name="validation_invalid_number">Please enter a valid number</string>
@@ -627,6 +629,12 @@
     <string name="paymentsettings_expiry_value">%1$s seconds</string>
 
     <string name="paymentsettings_lnurlauth_scheme_title">LNURL authentication scheme</string>
+
+    <string name="paymentsettings_swap_format_title">Bitcoin address format</string>
+    <string name="paymentsettings_swap_format_legacy_title">Legacy</string>
+    <string name="paymentsettings_swap_format_legacy_desc">This format is less efficient and the fees will be higher. Also, the address is not rotated. However, it will be understood by almost every services and wallets.</string>
+    <string name="paymentsettings_swap_format_taproot_title">Taproot</string>
+    <string name="paymentsettings_swap_format_taproot_desc">This is the format by default. Transactions are cheaper and addresses are rotated. However, the addresses may not be understood by some services.</string>
 
     <!-- settings: currencies -->
 

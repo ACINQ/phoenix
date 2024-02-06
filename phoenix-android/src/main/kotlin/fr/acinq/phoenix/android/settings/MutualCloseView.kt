@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
+import fr.acinq.bitcoin.BitcoinError
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.*
@@ -159,7 +160,10 @@ fun MutualCloseView(
                                         is Either.Left -> {
                                             val error = validation.value
                                             addressErrorMessage = when (error) {
-                                                is BitcoinAddressError.ChainMismatch -> context.getString(R.string.mutualclose_error_chain_mismatch)
+                                                is BitcoinAddressError.InvalidScript -> when (error.error) {
+                                                    is BitcoinError.ChainHashMismatch -> context.getString(R.string.mutualclose_error_chain_mismatch)
+                                                    else -> context.getString(R.string.mutualclose_error_chain_generic)
+                                                }
                                                 is BitcoinAddressError.UnhandledRequiredParams -> context.getString(R.string.mutualclose_error_chain_reqparams)
                                                 else -> context.getString(R.string.mutualclose_error_chain_generic)
                                             }

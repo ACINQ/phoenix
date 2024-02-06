@@ -401,6 +401,23 @@ fun WebLink(
 }
 
 @Composable
+fun AddressLinkButton(
+    modifier: Modifier = Modifier,
+    address: String,
+) {
+    WebLink(
+        text = address,
+        url = addressUrl(address = address),
+        space = 4.dp,
+        maxLines = 1,
+        fontSize = 15.sp,
+        iconSize = 14.dp,
+        onClickLabel = stringResource(id = R.string.accessibility_address_explorer_link),
+        modifier = modifier,
+    )
+}
+
+@Composable
 fun TransactionLinkButton(
     modifier: Modifier = Modifier,
     txId: TxId,
@@ -420,6 +437,11 @@ fun TransactionLinkButton(
 @Composable
 fun txUrl(txId: TxId): String {
     return business.blockchainExplorer.txUrl(txId = txId, website = BlockchainExplorer.Website.MempoolSpace)
+}
+
+@Composable
+fun addressUrl(address: String): String {
+    return business.blockchainExplorer.addressUrl(addr = address, website = BlockchainExplorer.Website.MempoolSpace)
 }
 
 fun openLink(context: Context, link: String) {
