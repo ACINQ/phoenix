@@ -118,7 +118,7 @@
     <string name="receive_lightning_sheet_button_configure">Höchstgebühren konfigurieren</string>
 
     <string name="receive_lightning_warning_message_fee_expected">Es wird wahrscheinlich eine Transaktion auf der Kette benötigen, um diesen Betrag zu erhalten. Die Gebühren werden ungefähr %1$s betragen.</string>
-    <string name="receive_lightning_warning_message_fee_expected_unknown">Es wird wahrscheinlich eine Transaktion auf der Kette notwendig sein, um diesen Betrag zu erhalten.</string>.
+    <string name="receive_lightning_warning_message_fee_expected_unknown">Es wird wahrscheinlich eine On-Chain-Transaktion notwendig sein, um diesen Betrag zu erhalten.</string>.
 
     <string name="receive_lightning_warning_message_above_limit">Eine Gebühr von %1$s wird für den Erhalt dieses Betrages geschätzt, und diese Gebühr überschreitet Ihr genehmigtes Limit von %2$s.\n\nErhöhen Sie dieses Limit oder fordern Sie zusätzliche Liquidität an.</string>
     <string name="receive_lightning_warning_message_above_limit_percent">Eine Gebühr von %1$s wird für den Erhalt dieses Betrages geschätzt, und diese Gebühren übersteigen %2$s%% des Betrags.\n\nErhöhen Sie dieses Limit oder fordern Sie zusätzliche Liquidität an.</string>
