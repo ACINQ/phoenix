@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit
 class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        log.info("starting channels watcher job")
+        log.info("starting channels-watcher job")
         var notificationsManager: NotificationsManager? = null
 
         val application = applicationContext as PhoenixApplication
@@ -64,8 +64,8 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             return Result.success()
         }
 
+        val business = PhoenixBusiness(PlatformContext(applicationContext))
         try {
-            val business = PhoenixBusiness(PlatformContext(applicationContext))
             notificationsManager = business.notificationsManager
             when (val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext)) {
                 is EncryptedSeed.V2.NoAuth -> {
@@ -141,7 +141,9 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             internalData.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
             return Result.failure()
         } finally {
-
+            business.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
+            business.stop()
+            log.info("stopped channels-watcher business")
         }
     }
 
