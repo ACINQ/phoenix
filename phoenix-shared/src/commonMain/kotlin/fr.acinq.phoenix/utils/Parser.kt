@@ -85,12 +85,12 @@ object Parser {
     fun readBitcoinAddress(
         chain: NodeParams.Chain,
         input: String
-    ): Either<BitcoinAddressError, BitcoinUri> {
+    ): Either<BitcoinUriError, BitcoinUri> {
         val cleanInput = removeExcessInput(input)
         val url = try {
             Url(cleanInput)
         } catch (e: Exception) {
-            return Either.Left(BitcoinAddressError.UnknownFormat)
+            return Either.Left(BitcoinUriError.InvalidUri)
         }
 
         // -- get address
@@ -101,7 +101,7 @@ object Parser {
         // -- read parameters
         val requiredParams = url.parameters.entries().filter { it.key.startsWith("req-") }.map { it.key to it.value.joinToString(";") }
         if (requiredParams.isNotEmpty()) {
-            return Either.Left(BitcoinAddressError.UnhandledRequiredParams(requiredParams))
+            return Either.Left(BitcoinUriError.UnhandledRequiredParams(requiredParams))
         }
 
         val amountSplit = url.parameters["amount"]?.trim()?.split(".", ignoreCase = true, limit = 2)
@@ -129,8 +129,8 @@ object Parser {
         }.build()
 
         return when (val res = Bitcoin.addressToPublicKeyScript(chain.chainHash, address)) {
-            is Either.Left -> Either.Left(BitcoinAddressError.InvalidScript(res.left))
-            is Either.Right -> Either.Right(BitcoinUri(chain, Script.write(res.right).toString(), label, message, amount, lightning, otherParams))
+            is Either.Left -> Either.Left(BitcoinUriError.InvalidScript(res.left))
+            is Either.Right -> Either.Right(BitcoinUri(chain, address, label, message, amount, lightning, otherParams))
         }
     }
 

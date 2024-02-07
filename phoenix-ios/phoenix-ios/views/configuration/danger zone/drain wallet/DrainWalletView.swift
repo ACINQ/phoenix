@@ -335,7 +335,7 @@ struct DrainWalletView: MVIView {
 			
 			log.debug("result.error = \(error)")
 			
-			if let error = error as? BitcoinAddressError.ChainMismatch {
+			if let error = error as? BitcoinUriError.ChainMismatch {
 				detailedErrorMsg = String(format: NSLocalizedString(
 					"""
 					The address is not for %@

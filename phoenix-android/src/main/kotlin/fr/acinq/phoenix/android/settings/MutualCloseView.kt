@@ -47,6 +47,7 @@ import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration
 import fr.acinq.phoenix.data.BitcoinAddressError
+import fr.acinq.phoenix.data.BitcoinUriError
 import fr.acinq.phoenix.utils.Parser
 
 
@@ -160,11 +161,11 @@ fun MutualCloseView(
                                         is Either.Left -> {
                                             val error = validation.value
                                             addressErrorMessage = when (error) {
-                                                is BitcoinAddressError.InvalidScript -> when (error.error) {
+                                                is BitcoinUriError.InvalidScript -> when (error.error) {
                                                     is BitcoinError.ChainHashMismatch -> context.getString(R.string.mutualclose_error_chain_mismatch)
                                                     else -> context.getString(R.string.mutualclose_error_chain_generic)
                                                 }
-                                                is BitcoinAddressError.UnhandledRequiredParams -> context.getString(R.string.mutualclose_error_chain_reqparams)
+                                                is BitcoinUriError.UnhandledRequiredParams -> context.getString(R.string.mutualclose_error_chain_reqparams)
                                                 else -> context.getString(R.string.mutualclose_error_chain_generic)
                                             }
                                         }

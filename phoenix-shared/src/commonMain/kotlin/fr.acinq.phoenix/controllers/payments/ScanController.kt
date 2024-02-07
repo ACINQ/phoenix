@@ -132,13 +132,13 @@ class AppScanController(
     /** Return the adequate model for a Bitcoin address result. */
     private suspend fun processBitcoinAddress(
         input: String,
-        result: Either<BitcoinAddressError, BitcoinUri>
+        result: Either<BitcoinUriError, BitcoinUri>
     ) {
         model(when (result) {
             is Either.Right -> Scan.Model.OnchainFlow(uri = result.value)
             is Either.Left -> {
                 val error = result.value
-                if (error is BitcoinAddressError.InvalidScript && error.error is BitcoinError.ChainHashMismatch) {
+                if (error is BitcoinUriError.InvalidScript && error.error is BitcoinError.ChainHashMismatch) {
                     Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.ChainMismatch(expected = chain))
                 } else {
                     Scan.Model.BadRequest(request = input, reason = Scan.BadRequestReason.UnknownFormat)
@@ -490,14 +490,11 @@ class AppScanController(
         null
     }
 
-    /**
-     * Invokes `Parser.readBitcoinAddress`, but maps the
-     * generic `BitcoinAddressError.UnknownFormat` to a null result instead.
-     */
-    private fun readBitcoinAddress(input: String): Either<BitcoinAddressError, BitcoinUri>? {
+    /** Invokes `Parser.readBitcoinAddress`, but maps [BitcoinUriError.InvalidUri] to a null result instead of a fatal error. */
+    private fun readBitcoinAddress(input: String): Either<BitcoinUriError, BitcoinUri>? {
         return when (val result = Parser.readBitcoinAddress(chain, input)) {
             is Either.Left -> when (result.left) {
-                is BitcoinAddressError.UnknownFormat -> null
+                is BitcoinUriError.InvalidUri -> null
                 else -> result
             }
             is Either.Right -> result

@@ -52,8 +52,8 @@ data class BitcoinUri(
     }
 }
 
-sealed class BitcoinAddressError {
-    data class InvalidScript(val error: BitcoinError): BitcoinAddressError()
-    data class UnhandledRequiredParams(val parameters: List<Pair<String, String>>): BitcoinAddressError()
-    object UnknownFormat: BitcoinAddressError()
+sealed class BitcoinUriError {
+    data class InvalidScript(val error: BitcoinError): BitcoinUriError()
+    data class UnhandledRequiredParams(val parameters: List<Pair<String, String>>): BitcoinUriError()
+    object InvalidUri: BitcoinUriError()
 }

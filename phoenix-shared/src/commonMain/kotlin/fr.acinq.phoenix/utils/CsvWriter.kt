@@ -123,11 +123,7 @@ class CsvWriter {
                         is IncomingPayment.Origin.KeySend -> "Incoming LN payment (keysend)"
                         is IncomingPayment.Origin.SwapIn -> "Swap-in to ${origin.address ?: "N/A"}"
                         is IncomingPayment.Origin.OnChain -> {
-                            // append txs ids if any, nothing otherwise
-                            val inputs = origin.localInputs.takeIf { it.isNotEmpty() }?.joinToString("\n- ") {
-                                it.txid.toString()
-                            }?.let { "\n$it" } ?: ""
-                            "Swap-in inputs:$inputs"
+                            "Swap-in with inputs: ${origin.localInputs.map { it.txid.toString() } }"
                         }
                     }
                     is LightningOutgoingPayment -> when (val details = payment.details) {

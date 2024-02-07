@@ -17,22 +17,23 @@
 package fr.acinq.phoenix.utils
 
 
+import fr.acinq.bitcoin.BitcoinError
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.sat
-import fr.acinq.phoenix.data.BitcoinAddressError
+import fr.acinq.phoenix.data.BitcoinUriError
 import fr.acinq.phoenix.data.BitcoinUri
 import io.ktor.http.*
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 
 class ParserTest {
 
     @Test
     fun parse_bitcoin_uri_with_valid_addresses() {
-        listOf<Pair<String, Either<BitcoinAddressError, BitcoinUri>>>(
+        listOf<Pair<String, Either<BitcoinUriError, BitcoinUri>>>(
             "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem" to Either.Right(
                 BitcoinUri(NodeParams.Chain.Mainnet, "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem")
             ),
@@ -49,7 +50,7 @@ class ParserTest {
             assertEquals(it.second, Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, it.first))
         }
 
-        listOf<Pair<String, Either<BitcoinAddressError, BitcoinUri>>>(
+        listOf<Pair<String, Either<BitcoinUriError, BitcoinUri>>>(
             "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn" to Either.Right(
                 BitcoinUri(NodeParams.Chain.Testnet, "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn")
             ),
@@ -70,46 +71,52 @@ class ParserTest {
         }
     }
 
-    // TODO enable it again once bitcoin-lib parser returns typed errors
-    @Ignore
+    @Test
     fun parse_bitcoin_uri_chain_mismatch() {
         assertEquals(
-            expected = Either.Left(BitcoinAddressError.ChainMismatch(expected = NodeParams.Chain.Testnet)),
+            expected = Either.Left(BitcoinUriError.InvalidScript(error = BitcoinError.ChainHashMismatch)),
             actual = Parser.readBitcoinAddress(NodeParams.Chain.Testnet, "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3")
         )
         assertEquals(
-            expected = Either.Left(BitcoinAddressError.ChainMismatch(expected = NodeParams.Chain.Mainnet)),
+            expected = Either.Left(BitcoinUriError.InvalidScript(error = BitcoinError.ChainHashMismatch)),
             actual = Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx")
         )
     }
 
     @Test
     fun parse_bitcoin_uri_with_invalid_addresses() {
-        listOf<Pair<String, Either<BitcoinAddressError, BitcoinUri>>>(
-            "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhe" to Either.Left(BitcoinAddressError.UnknownFormat),
-            "btc:17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhe" to Either.Left(BitcoinAddressError.UnknownFormat),
-        ).forEach {
-            assertEquals(it.second, Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, it.first))
-        }
+        assertIs<Either.Left<BitcoinUriError.InvalidScript>>(
+            Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhe")
+        )
     }
 
     @Test
-    fun parse_bitcoin_uri_with_various_prefixes() {
-        listOf<Pair<String, Either<BitcoinAddressError, BitcoinUri>>>(
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4" to Either.Right(
-                BitcoinUri(NodeParams.Chain.Mainnet, "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
-            ),
-            "bitcoin://bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4" to Either.Right(
-                BitcoinUri(NodeParams.Chain.Mainnet, "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
-            ),
-        ).forEach {
-            assertEquals(it.second, Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, it.first))
-        }
+    fun parse_bitcoin_uri_with_bitcoin_prefixes() {
+        assertIs<Either.Right<BitcoinUri>>(
+            Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
+        )
+        assertIs<Either.Right<BitcoinUri>>(
+            Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, "bitcoin://bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
+        )
+    }
+
+    @Test
+    fun parse_bitcoin_uri_with_non_bitcoin_prefixes() {
+        // non-bitcoin prefixes are not trimmed, so error is invalid script
+        assertIs<Either.Left<BitcoinUriError.InvalidScript>>(
+            Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, "btc:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
+        )
+        assertIs<Either.Left<BitcoinUriError.InvalidScript>>(
+            Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, "lightning:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
+        )
+        assertIs<Either.Left<BitcoinUriError.InvalidScript>>(
+            Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, "lnurl://bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
+        )
     }
 
     @Test
     fun parse_bitcoin_uri_with_parameters() {
-        listOf<Pair<String, Either<BitcoinAddressError, BitcoinUri>>>(
+        listOf<Pair<String, Either<BitcoinUriError, BitcoinUri>>>(
             // ignore unhandled params
             "bitcoin:1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa?somethingyoudontunderstand=50&somethingelseyoudontget=999" to Either.Right(
                 BitcoinUri(
@@ -128,7 +135,7 @@ class ParserTest {
             ),
             // fail if uri contains required params we don't understand
             "bitcoin:175tWpb8K1S7NmH4Zx6rewF9WQrcZv245W?req-somethingyoudontunderstand=50&req-somethingelseyoudontget=999" to Either.Left(
-                BitcoinAddressError.UnhandledRequiredParams(parameters = listOf("req-somethingyoudontunderstand" to "50", "req-somethingelseyoudontget" to "999"))
+                BitcoinUriError.UnhandledRequiredParams(parameters = listOf("req-somethingyoudontunderstand" to "50", "req-somethingelseyoudontget" to "999"))
             ),
         ).forEach {
             assertEquals(it.second, Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, it.first))
@@ -137,7 +144,7 @@ class ParserTest {
 
     @Test
     fun parse_bitcoin_uri_with_lightning_invoice() {
-        listOf<Pair<String, Either<BitcoinAddressError, BitcoinUri>>>(
+        listOf<Pair<String, Either<BitcoinUriError, BitcoinUri>>>(
             // valid lightning invoice
             "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?foo=bar&lightning=lntb15u1p05vazrpp5apz75ghtq3ynmc5qm98tsgucmsav44fyffpguhzdep2kcgkfme4sdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5v4hqr48qe0u7al6lxwdpmp3w6k7evjdavm0lh7arpv3qaf038s5st2d8k8vvmxyav2wkfym9jp4mk64srmswgh7l6sqtq7l4xl3nknf8snltamvpw5p3yl9nxg0ax9k0698rr94qx6unrv8yhccmh4z9ghcq77hxps" to Either.Right(
                 BitcoinUri(
@@ -154,14 +161,15 @@ class ParserTest {
             "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lightning=" to Either.Right(
                 BitcoinUri(chain = NodeParams.Chain.Mainnet, address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
             ),
-        ).forEach {
-            assertEquals(it.second, Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, it.first))
+        ).forEach { (address, expected) ->
+            val uri = Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, address)
+            assertEquals(expected, uri)
         }
     }
 
     @Test
     fun parse_bitcoin_uri_with_amount() {
-        listOf<Pair<String, Either<BitcoinAddressError, BitcoinUri>>>(
+        listOf<Pair<String, Either<BitcoinUriError, BitcoinUri>>>(
             "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0.0123  " to Either.Right(
                 BitcoinUri(
                     chain = NodeParams.Chain.Mainnet,
