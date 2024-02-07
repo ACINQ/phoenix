@@ -29,6 +29,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
@@ -338,6 +339,7 @@ fun Clickable(
     enabled: Boolean = true,
     textStyle: TextStyle = MaterialTheme.typography.button,
     backgroundColor: Color = Color.Unspecified, // transparent by default!
+    shape: Shape = RectangleShape,
     clickDescription: String = "",
     internalPadding: PaddingValues = PaddingValues(0.dp),
     content: @Composable () -> Unit,
@@ -348,11 +350,12 @@ fun Clickable(
     )
     val contentColor by colors.contentColor(true)
     Surface(
-        shape = RectangleShape,
+        shape = shape,
         color = backgroundColor,
         contentColor = contentColor,
         elevation = 0.dp,
         modifier = modifier
+            .clip(shape)
             .clickable(
                 onClick = onClick,
                 enabled = enabled,

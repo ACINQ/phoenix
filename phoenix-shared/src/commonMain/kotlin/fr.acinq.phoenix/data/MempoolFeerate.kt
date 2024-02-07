@@ -32,13 +32,17 @@ data class MempoolFeerate(
     val minimum: FeeratePerByte,
     val timestamp: Long,
 ) {
-    /** A service fee is expected if no channels. */
+    /**
+     * Estimates roughly the cost of a dual-funded splice, using the current feerate and an arbitrary tx weight.
+     *
+     * An additional service fee is expected if there's no channels already.
+     */
     fun swapEstimationFee(hasNoChannels: Boolean): Satoshi {
         return Transactions.weight2fee(feerate = FeeratePerKw(hour), weight = DualFundingPayToSpliceWeight) + if (hasNoChannels) 1000.sat else 0.sat
     }
 
     companion object {
         /** Spending a channel output and adding funds from a wpkh wallet with one change output: 2-inputs (wpkh+wsh)/2-outputs (wpkh+wsh) */
-        val DualFundingPayToSpliceWeight = 992
+        const val DualFundingPayToSpliceWeight = 992
     }
 }

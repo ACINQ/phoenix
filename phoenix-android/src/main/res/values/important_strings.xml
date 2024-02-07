@@ -111,12 +111,20 @@
 
     <string name="receive_lightning_warning_title_surefail">Payment will fail</string>
     <string name="receive_lightning_warning_title_mayfail">Payment may fail</string>
-    <string name="receive_lightning_warning_title_fee_expected">Fee expected</string>
+    <string name="receive_lightning_warning_title_fee_expected">On-chain fee expected</string>
+    <string name="receive_lightning_warning_hint_show_details">Tap to know more</string>
 
-    <string name="receive_lightning_warning_fee_insufficient_liquidity">Inbound liquidity is insufficient.</string>
-    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Inbound liquidity is insufficient and you have disabled automated channel management.\nTap to configure.</string>
-    <string name="receive_lightning_warning_fee_within_policy">A %1$s (≈ %2$s) fee may be needed to receive this payment.\nTap to configure.</string>
-    <string name="receive_lightning_warning_fee_exceeds_policy">The fee will probably be above your max limit (%1$s).\nTap to configure.</string>
+    <string name="receive_lightning_sheet_dismiss">Dismiss</string>
+    <string name="receive_lightning_sheet_button_enable">Enable automated channels</string>
+    <string name="receive_lightning_sheet_button_configure">Configure fee limit</string>
+
+    <string name="receive_lightning_warning_message_fee_expected">An on-chain operation will be likely required for you to receive this amount.\n\nThe fee is estimated to be around %1$s.</string>
+    <string name="receive_lightning_warning_message_fee_expected_unknown">An on-chain operation will likely be required for you to receive this amount.</string>
+
+    <string name="receive_lightning_warning_message_above_limit">A fee of %1$s is expected to receive this amount, and that fee is above your limit of %2$s.\n\nIncrease this limit in the channels management settings, or request additional liquidity.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">A fee of %1$s is expected to receive this amount, and that fee is more than %2$s%% of the amount.\n\nIncrease this limit in the channels management settings, or request additional liquidity.</string>
+
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Inbound liquidity is insufficient for this amount, and you have disabled automated channel management.</string>
 
     <string name="receive_onchain_legacy_warning_title">Migration notice</string>
     <string name="receive_onchain_legacy_warning">This is your new address. Do not reuse your old Bitcoin addresses from before migration!</string>

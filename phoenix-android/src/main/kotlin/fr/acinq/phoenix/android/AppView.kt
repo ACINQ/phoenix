@@ -65,7 +65,7 @@ import fr.acinq.phoenix.android.init.CreateWalletView
 import fr.acinq.phoenix.android.init.InitWallet
 import fr.acinq.phoenix.android.init.RestoreWalletView
 import fr.acinq.phoenix.android.intro.IntroView
-import fr.acinq.phoenix.android.payments.ReceiveView
+import fr.acinq.phoenix.android.payments.receive.ReceiveView
 import fr.acinq.phoenix.android.payments.ScanDataView
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.history.CsvExportView
@@ -237,7 +237,9 @@ fun AppView(
                 composable(Screen.Receive.route) {
                     ReceiveView(
                         onSwapInReceived = { popToHome(navController) },
-                        onBackClick = { navController.popBackStack() }
+                        onBackClick = { navController.popBackStack() },
+                        onScanDataClick = { navController.navigate(Screen.ScanData.route) },
+                        onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },
                     )
                 }
                 composable(
