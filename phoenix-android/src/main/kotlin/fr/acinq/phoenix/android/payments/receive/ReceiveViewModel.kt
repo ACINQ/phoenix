@@ -71,7 +71,6 @@ class ReceiveViewModel(
 
     var lightningInvoiceState by mutableStateOf<LightningInvoiceState>(LightningInvoiceState.Init)
     var currentSwapAddress by mutableStateOf<BitcoinAddressState>(BitcoinAddressState.Init)
-    val swapAddresses = mutableStateListOf<Pair<String, WalletState.Companion.AddressState>>()
 
     /** Bitmap containing the LN invoice qr code. It is not stored in the state to avoid brutal transitions and flickering. */
     var lightningQRBitmap by mutableStateOf<ImageBitmap?>(null)
@@ -81,7 +80,6 @@ class ReceiveViewModel(
     var isEditingLightningInvoice by mutableStateOf(false)
 
     init {
-        monitorSwapAddresses()
         monitorCurrentSwapAddress()
     }
 
@@ -108,25 +106,6 @@ class ReceiveViewModel(
             lightningQRBitmap = BitmapHelper.generateBitmap(pr.write()).asImageBitmap()
             log.debug("generated new invoice=${pr.write()}")
             lightningInvoiceState = LightningInvoiceState.Show(pr)
-        }
-    }
-
-    @UiThread
-    private fun monitorSwapAddresses() {
-        viewModelScope.launch {
-            peerManager.getPeer().swapInWallet.wallet.walletStateFlow.collect { walletState ->
-                val newAddresses = walletState.addresses.toList().sortedByDescending {
-                    val meta = it.second.meta
-                    if (meta is WalletState.Companion.AddressMeta.Derived) {
-                        meta.index
-                    } else {
-                        -1 // legacy address goes to the bottom
-                    }
-                }
-                log.info("swap-in wallet addresses update: ${swapAddresses.size} -> ${newAddresses.size}")
-                swapAddresses.clear()
-                swapAddresses.addAll(newAddresses)
-            }
         }
     }
 

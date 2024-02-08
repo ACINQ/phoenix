@@ -45,6 +45,7 @@ import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.MenuButton
 import fr.acinq.phoenix.android.components.SettingButton
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigate
@@ -82,12 +83,12 @@ fun SettingsView(
         // -- general
         CardHeader(text = stringResource(id = R.string.settings_general_title))
         Card {
-            SettingButton(text = stringResource(R.string.settings_about), icon = R.drawable.ic_help_circle, onClick = { nc.navigate(Screen.About) })
-            SettingButton(text = stringResource(R.string.settings_display_prefs), icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences) })
-            SettingButton(text = stringResource(R.string.settings_payment_settings), icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings) })
-            SettingButton(text = stringResource(R.string.settings_liquidity_policy), icon = R.drawable.ic_settings, onClick = { nc.navigate(Screen.LiquidityPolicy) })
-            SettingButton(text = stringResource(R.string.settings_payment_history), icon = R.drawable.ic_list, onClick = { nc.navigate(Screen.PaymentsHistory) })
-            SettingButton(
+            MenuButton(text = stringResource(R.string.settings_about), icon = R.drawable.ic_help_circle, onClick = { nc.navigate(Screen.About) })
+            MenuButton(text = stringResource(R.string.settings_display_prefs), icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences) })
+            MenuButton(text = stringResource(R.string.settings_payment_settings), icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings) })
+            MenuButton(text = stringResource(R.string.settings_liquidity_policy), icon = R.drawable.ic_settings, onClick = { nc.navigate(Screen.LiquidityPolicy) })
+            MenuButton(text = stringResource(R.string.settings_payment_history), icon = R.drawable.ic_list, onClick = { nc.navigate(Screen.PaymentsHistory) })
+            MenuButton(
                 text = stringResource(R.string.settings_notifications) + ((notices.size + notifications.value.size).takeIf { it > 0 }?.let { " ($it)"} ?: ""),
                 icon = R.drawable.ic_notification,
                 onClick = { nc.navigate(Screen.Notifications) }

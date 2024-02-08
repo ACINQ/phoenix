@@ -261,7 +261,7 @@
     <!-- wallet info -->
 
     <string name="walletinfo_onchain_swapin">Swap-in wallet</string>
-    <string name="walletinfo_onchain_swapin_help">Phoenix is a Lightning wallet. Funds received on-chain will then be moved into Lightning automatically, according to your channel management settings.</string>
+    <string name="walletinfo_onchain_swapin_help">The swap-in wallet manages on-chain funds deposited to Phoenix.\n\nIt swaps them automatically to Lightning when possible, according to your channels management setting.</string>
     <string name="walletinfo_onchain_swapin_help_faq_link">See how it works</string>
     <string name="walletinfo_onchain_swapin_policy_view">Tap to configure</string>
     <string name="walletinfo_onchain_swapin_empty">There are no swaps in progress.</string>
@@ -282,7 +282,7 @@
     <string name="walletinfo_onchain_swapin_refund_title">Cancelled funds</string>
     <string name="walletinfo_onchain_swapin_refund_description">These funds were not swapped in time. Use the wallet\'s descriptor to access them.</string>
 
-    <string name="walletinfo_onchain_final_about">An on-chain wallet derived from your seed.\n\nThe final wallet is where funds are sent by default when your Lightning channels are closed.</string>
+    <string name="walletinfo_onchain_final_about">The final wallet is where funds are sent when your Lightning channels are closed or when there is a problem. It usually should be empty.</string>
 
     <!-- settings: liquidity policy for channels creation -->
 

@@ -81,8 +81,9 @@ import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
 import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
 import fr.acinq.phoenix.android.payments.liquidity.RequestLiquidityView
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
+import fr.acinq.phoenix.android.settings.walletinfo.SwapInAddresses
 import fr.acinq.phoenix.android.settings.walletinfo.SwapInSignerView
-import fr.acinq.phoenix.android.settings.walletinfo.SwapInWalletInfo
+import fr.acinq.phoenix.android.settings.walletinfo.SwapInWallet
 import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
 import fr.acinq.phoenix.android.startup.LegacySwitcherView
 import fr.acinq.phoenix.android.startup.StartupView
@@ -390,6 +391,7 @@ fun AppView(
                         onBackClick = { navController.popBackStack() },
                         onLightningWalletClick = { navController.navigate(Screen.Channels.route) },
                         onSwapInWalletClick = { navController.navigate(Screen.WalletInfo.SwapInWallet.route) },
+                        onSwapInWalletInfoClick = { navController.navigate(Screen.WalletInfo.SwapInAddresses.route) },
                         onFinalWalletClick = { navController.navigate(Screen.WalletInfo.FinalWallet.route) },
                     )
                 }
@@ -399,11 +401,14 @@ fun AppView(
                         navDeepLink { uriPattern = "phoenix:swapinwallet" }
                     )
                 ) {
-                    SwapInWalletInfo(
+                    SwapInWallet(
                         onBackClick = { navController.popBackStack() },
                         onViewChannelPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
                         onAdvancedClick = { navController.navigate(Screen.WalletInfo.SwapInSigner.route) },
                     )
+                }
+                composable(Screen.WalletInfo.SwapInAddresses.route) {
+                    SwapInAddresses(onBackClick = { navController.popBackStack() })
                 }
                 composable(Screen.WalletInfo.SwapInSigner.route) {
                     SwapInSignerView(onBackClick = { navController.popBackStack() })

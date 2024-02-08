@@ -142,7 +142,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             return Result.failure()
         } finally {
             business.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
-            business.stop()
+            business.stop(includingDatabase = false)
             log.info("stopped channels-watcher business")
         }
     }
