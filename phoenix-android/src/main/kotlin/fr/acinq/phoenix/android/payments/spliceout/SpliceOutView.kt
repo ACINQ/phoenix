@@ -46,6 +46,7 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
+import fr.acinq.phoenix.data.MempoolFeerate
 
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -154,6 +155,7 @@ fun SendSpliceOutView(
             is SpliceOutState.ReadyToSend -> {
                 SpliceOutReadyView(
                     state = state,
+                    mempoolFeerate = mempoolFeerate,
                     balance = balance,
                     isAmountValid = amountErrorMessage.isBlank(),
                     mayDoPayments = mayDoPayments,
@@ -203,6 +205,7 @@ private fun SpliceOutErrorView(state: SpliceOutState) {
 @Composable
 private fun SpliceOutReadyView(
     state: SpliceOutState.ReadyToSend,
+    mempoolFeerate: MempoolFeerate?,
     balance: MilliSatoshi?,
     isAmountValid: Boolean,
     mayDoPayments: Boolean,
@@ -259,7 +262,14 @@ private fun SpliceOutReadyView(
             text = if (!mayDoPayments) stringResource(id = R.string.send_connecting_button) else stringResource(id = R.string.send_pay_button),
             icon = R.drawable.ic_send,
             enabled = mayDoPayments && isAmountValid,
-            onClick = { showDisclaimer = true },
+            onClick = {
+                if (mempoolFeerate != null && FeeratePerByte(state.userFeerate).feerate < mempoolFeerate.hour.feerate) {
+                    showDisclaimer = true
+                } else {
+                    showDisclaimer = false
+                    onExecute()
+                }
+            },
         )
     }
 }
