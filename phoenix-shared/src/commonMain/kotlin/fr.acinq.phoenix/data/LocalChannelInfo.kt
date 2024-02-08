@@ -131,9 +131,9 @@ data class LocalChannelInfo(
 fun Map<ByteVector32, LocalChannelInfo>?.availableForReceive(): MilliSatoshi? {
     val activeChannels = this?.values ?: return null
     return when {
+        activeChannels.isEmpty() -> 0.msat
         activeChannels.all { it.isBooting } -> null
         activeChannels.all { it.state is Syncing } -> null
-        activeChannels.isEmpty() -> 0.msat
         else -> activeChannels.map {
             if (it.state is Syncing || it.isBooting) {
                 null
@@ -150,3 +150,9 @@ fun Map<ByteVector32, LocalChannelInfo>?.availableForReceive(): MilliSatoshi? {
         }
     }
 }
+
+/** Liquidity can be requested if you have at least 1 usable channel. */
+fun Map<ByteVector32, LocalChannelInfo>?.canRequestLiquidity(): Boolean {
+    return this?.values?.any { it.isUsable } ?: false
+}
+

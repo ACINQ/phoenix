@@ -67,7 +67,6 @@ import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnit
-import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountInput
@@ -90,6 +89,7 @@ import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.share
 import fr.acinq.phoenix.data.availableForReceive
+import fr.acinq.phoenix.data.canRequestLiquidity
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 
@@ -322,31 +322,21 @@ private fun EvaluateLiquidityIssuesForPayment(
     val context = LocalContext.current
 
     val channelsMap by business.peerManager.channelsFlow.collectAsState()
-    val availableForReceive = remember(channelsMap) { channelsMap?.availableForReceive() }
+    val canRequestLiquidity = remember(channelsMap) { channelsMap.canRequestLiquidity() }
+    val availableForReceive = remember(channelsMap) { channelsMap.availableForReceive() }
 
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
     val swapFee = remember(mempoolFeerate) { mempoolFeerate?.swapEstimationFee(hasNoChannels = channelsMap?.values?.filterNot { it.isTerminated }.isNullOrEmpty()) }
 
     val liquidityPolicyPrefs = UserPrefs.getLiquidityPolicy(context).collectAsState(null)
 
-    when(val liquidityPolicy = liquidityPolicyPrefs.value) {
+    when (val liquidityPolicy = liquidityPolicyPrefs.value) {
         null -> {}
         // when fee policy is disabled, we are more aggressive with the warning (dialog is shown immediately)
         is LiquidityPolicy.Disable -> {
             when {
-                // liquidity probably insufficient => the payment MAY fail
-                availableForReceive != null && amount != null && amount >= availableForReceive -> {
-                    IncomingLiquidityWarning(
-                        header = stringResource(id = R.string.receive_lightning_warning_title_mayfail),
-                        message = stringResource(id = R.string.receive_lightning_warning_fee_policy_disabled_insufficient_liquidity),
-                        onFeeManagementClick = onFeeManagementClick,
-                        showDialogImmediately = !isEditing,
-                        isSevere = true,
-                        useEnablePolicyWording = true,
-                    )
-                }
                 // no channels or no liquidity => the payment WILL fail
-                availableForReceive != null && availableForReceive == 0.msat -> {
+                availableForReceive == 0.msat || (availableForReceive != null && amount != null && amount >= availableForReceive) -> {
                     IncomingLiquidityWarning(
                         header = stringResource(id = R.string.receive_lightning_warning_title_surefail),
                         message = stringResource(id = R.string.receive_lightning_warning_fee_policy_disabled_insufficient_liquidity),
@@ -372,24 +362,17 @@ private fun EvaluateLiquidityIssuesForPayment(
 
                 // fee > limit and there's no liquidity
                 // => warning that limit should be raised, but not shown immediately
-                swapFee != null && !liquidityPolicy.skipAbsoluteFeeCheck && swapFee > liquidityPolicy.maxAbsoluteFee && availableForReceive == 0.msat -> {
+                swapFee != null && !liquidityPolicy.skipAbsoluteFeeCheck && swapFee > liquidityPolicy.maxAbsoluteFee
+                        && (availableForReceive == 0.msat || (amount != null && availableForReceive != null && amount > availableForReceive)) -> {
                     IncomingLiquidityWarning(
                         header = stringResource(id = R.string.receive_lightning_warning_title_surefail),
-                        message = stringResource(id = R.string.receive_lightning_warning_message_above_limit, swapFee.toPrettyString(btcUnit, withUnit = true), liquidityPolicy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true)),
+                        message = if (canRequestLiquidity) {
+                            stringResource(id = R.string.receive_lightning_warning_message_above_limit_or_liquidity, swapFee.toPrettyString(btcUnit, withUnit = true), liquidityPolicy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true))
+                        } else {
+                            stringResource(id = R.string.receive_lightning_warning_message_above_limit, swapFee.toPrettyString(btcUnit, withUnit = true), liquidityPolicy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true))
+                        },
                         onFeeManagementClick = onFeeManagementClick,
-                        showDialogImmediately = !isEditing && swapFee > liquidityPolicy.maxAbsoluteFee * 1.5, // extra aggressive if we know for sure it's going to fail
-                        isSevere = true,
-                        useEnablePolicyWording = false,
-                    )
-                }
-                // fee > limit and the amount is above available liquidity
-                // => strong warning that limit should be raised
-                swapFee != null && !liquidityPolicy.skipAbsoluteFeeCheck && swapFee > liquidityPolicy.maxAbsoluteFee && amount != null && availableForReceive != null && amount > availableForReceive -> {
-                    IncomingLiquidityWarning(
-                        header = stringResource(id = R.string.receive_lightning_warning_title_mayfail),
-                        message = stringResource(id = R.string.receive_lightning_warning_message_above_limit, swapFee.toPrettyString(btcUnit, withUnit = true), liquidityPolicy.maxAbsoluteFee.toPrettyString(btcUnit, withUnit = true)),
-                        onFeeManagementClick = onFeeManagementClick,
-                        showDialogImmediately = !isEditing && swapFee > liquidityPolicy.maxAbsoluteFee * 1.5, // extra aggressive if we know for sure it's going to fail,
+                        showDialogImmediately = !isEditing,
                         isSevere = true,
                         useEnablePolicyWording = false,
                     )
@@ -403,12 +386,16 @@ private fun EvaluateLiquidityIssuesForPayment(
                 // => strong warning that limit should be raised
                 swapFee != null && amount != null && availableForReceive != null
                         && amount > 0.msat && amount > availableForReceive && swapFee.toMilliSatoshi() > amount * liquidityPolicy.maxRelativeFeeBasisPoints / 10_000 -> {
+                    val prettyPercent = DecimalFormat("0.##").format(liquidityPolicy.maxRelativeFeeBasisPoints.toDouble() / 100)
                     IncomingLiquidityWarning(
-                        header = stringResource(id = R.string.receive_lightning_warning_title_mayfail),
-                        message = stringResource(id = R.string.receive_lightning_warning_message_above_limit_percent, swapFee.toPrettyString(btcUnit, withUnit = true),
-                            DecimalFormat("0.##").format(liquidityPolicy.maxRelativeFeeBasisPoints.toDouble() / 100)),
+                        header = stringResource(id = R.string.receive_lightning_warning_title_surefail),
+                        message = if (canRequestLiquidity) {
+                            stringResource(id = R.string.receive_lightning_warning_message_above_limit_percent_or_liquidity, swapFee.toPrettyString(btcUnit, withUnit = true), prettyPercent)
+                        } else {
+                            stringResource(id = R.string.receive_lightning_warning_message_above_limit_percent, swapFee.toPrettyString(btcUnit, withUnit = true), prettyPercent)
+                        },
                         onFeeManagementClick = onFeeManagementClick,
-                        showDialogImmediately = !isEditing && swapFee > liquidityPolicy.maxAbsoluteFee * 1.5, // extra aggressive if we know for sure it's going to fail,
+                        showDialogImmediately = !isEditing,
                         isSevere = true,
                         useEnablePolicyWording = false,
                     )
@@ -430,7 +417,7 @@ private fun EvaluateLiquidityIssuesForPayment(
                             stringResource(id = R.string.receive_lightning_warning_message_fee_expected, swapFee.toPrettyString(btcUnit, withUnit = true))
                         },
                         onFeeManagementClick = onFeeManagementClick,
-                        showDialogImmediately = false,
+                        showDialogImmediately = !isEditing,
                         isSevere = false,
                         useEnablePolicyWording = false,
                     )
@@ -446,7 +433,7 @@ private fun EvaluateLiquidityIssuesForPayment(
                             stringResource(id = R.string.receive_lightning_warning_message_fee_expected, swapFee.toPrettyString(btcUnit, withUnit = true))
                         },
                         onFeeManagementClick = onFeeManagementClick,
-                        showDialogImmediately = false,
+                        showDialogImmediately = !isEditing,
                         isSevere = false,
                         useEnablePolicyWording = false,
                     )
@@ -483,9 +470,11 @@ private fun IncomingLiquidityWarning(
             contentColor = MaterialTheme.colors.onSurface,
             scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
         ) {
-            Column(modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 50.dp)) {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 0.dp, start = 24.dp, end = 24.dp, bottom = 50.dp)
+            ) {
                 Text(
                     text = header,
                     style = MaterialTheme.typography.h4
@@ -498,11 +487,13 @@ private fun IncomingLiquidityWarning(
                     horizontalAlignment = Alignment.End
                 ) {
                     BorderButton(
-                        text = stringResource(id = if (useEnablePolicyWording) {
-                            R.string.receive_lightning_sheet_button_enable
-                        } else {
-                            R.string.receive_lightning_sheet_button_configure
-                        }),
+                        text = stringResource(
+                            id = if (useEnablePolicyWording) {
+                                R.string.receive_lightning_sheet_button_enable
+                            } else {
+                                R.string.receive_lightning_sheet_button_configure
+                            }
+                        ),
                         icon = if (useEnablePolicyWording) R.drawable.ic_tool else R.drawable.ic_plus,
                         onClick = onFeeManagementClick,
                     )

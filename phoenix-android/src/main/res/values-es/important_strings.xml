@@ -110,7 +110,6 @@
     <!-- receive view: warning about fee/liquidity -->
 
     <string name="receive_lightning_warning_title_surefail">El pago fallará</string>
-    <string name="receive_lightning_warning_title_mayfail">El pago puede fracasar</string>
     <string name="receive_lightning_warning_title_fee_expected">Tasa prevista</string>
 
     <string name="receive_lightning_warning_hint_show_details">Más información</string>
@@ -122,8 +121,10 @@
     <string name="receive_lightning_warning_message_fee_expected">Probablemente será necesaria una transacción en la cadena para recibir esta cantidad.\n\nLas comisiones serán de aproximadamente %1$s.</string>
     <string name="receive_lightning_warning_message_fee_expected_unknown">Probablemente será necesaria una transacción en la cadena para recibir esta cantidad.</string>
 
-    <string name="receive_lightning_warning_message_above_limit">Se estima una tasa de %1$s por recibir este importe, y esta tasa excede su límite autorizado de %2$s.\n\nAumente este límite o solicite liquidez adicional.</string>
-    <string name="receive_lightning_warning_message_above_limit_percent">Se estiman unas tasas de %1$s para recibir este importe, y estas tasas superan el %2$s%% del importe.\n\nAumente este límite o solicite liquidez adicional..</string>
+    <string name="receive_lightning_warning_message_above_limit">Se estima una tasa de %1$s por recibir este importe, y esta tasa excede su límite autorizado de %2$s.\n\nAumenta este límite en los ajustes de gestión de canales.</string>
+    <string name="receive_lightning_warning_message_above_limit_or_liquidity">Se estima una tasa de %1$s por recibir este importe, y esta tasa excede su límite autorizado de %2$s.\n\nAumente este límite o solicite liquidez adicional.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">Se estiman unas tasas de %1$s para recibir este importe, y estas tasas superan el %2$s%% del importe.\n\nAumenta este límite en los ajustes de gestión de canales.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Se estiman unas tasas de %1$s para recibir este importe, y estas tasas superan el %2$s%% del importe.\n\nAumente este límite o solicite liquidez adicional.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">La liquidez entrante es insuficiente y tienes desactivada la gestión automatizada de canales.</string>
 

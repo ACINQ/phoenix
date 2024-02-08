@@ -51,6 +51,7 @@ import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.orange
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.android.utils.warningColor
+import fr.acinq.phoenix.data.canRequestLiquidity
 import fr.acinq.phoenix.managers.Connections
 
 @Composable
@@ -124,7 +125,7 @@ fun TopBar(
             }
         }
         Spacer(modifier = Modifier.weight(1f))
-        if (!channelsState.isNullOrEmpty()) {
+        if (channelsState.canRequestLiquidity()) {
             BorderButton(
                 text = stringResource(id = R.string.home_request_liquidity),
                 icon = R.drawable.ic_bucket,

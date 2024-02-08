@@ -110,7 +110,6 @@
     <!-- receive view: warning about fee/liquidity -->
 
     <string name="receive_lightning_warning_title_surefail">Payment will fail</string>
-    <string name="receive_lightning_warning_title_mayfail">Payment may fail</string>
     <string name="receive_lightning_warning_title_fee_expected">On-chain fee expected</string>
     <string name="receive_lightning_warning_hint_show_details">Tap to know more</string>
 
@@ -121,8 +120,10 @@
     <string name="receive_lightning_warning_message_fee_expected">An on-chain operation will be likely required for you to receive this amount.\n\nThe fee is estimated to be around %1$s.</string>
     <string name="receive_lightning_warning_message_fee_expected_unknown">An on-chain operation will likely be required for you to receive this amount.</string>
 
-    <string name="receive_lightning_warning_message_above_limit">A fee of %1$s is expected to receive this amount, and that fee is above your limit of %2$s.\n\nIncrease this limit in the channels management settings, or request additional liquidity.</string>
-    <string name="receive_lightning_warning_message_above_limit_percent">A fee of %1$s is expected to receive this amount, and that fee is more than %2$s%% of the amount.\n\nIncrease this limit in the channels management settings, or request additional liquidity.</string>
+    <string name="receive_lightning_warning_message_above_limit">A fee of %1$s is expected to receive this amount, and that fee is above your limit of %2$s.\n\nIncrease this limit in the channel management settings.</string>
+    <string name="receive_lightning_warning_message_above_limit_or_liquidity">A fee of %1$s is expected to receive this amount, and that fee is above your limit of %2$s.\n\nIncrease this limit in the channel management settings, or request additional liquidity.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">A fee of %1$s is expected to receive this amount, and that fee is more than %2$s%% of the amount.\n\nIncrease this limit in the channel management settings.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">A fee of %1$s is expected to receive this amount, and that fee is more than %2$s%% of the amount.\n\nIncrease this limit in the channel management settings, or request additional liquidity.</string>
 
     <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Inbound liquidity is insufficient for this amount, and you have disabled automated channel management.</string>
 
