@@ -24,8 +24,8 @@ android {
         applicationId = "fr.acinq.phoenix.mainnet"
         minSdk = 26
         targetSdk = 33
-        versionCode = 74
-        versionName = "2.1.2"
+        versionCode = 75
+        versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR"))
     }
@@ -127,7 +127,6 @@ dependencies {
     // -- jetpack compose: accompanist (utility library for compose)
     implementation("com.google.accompanist:accompanist-systemuicontroller:${Versions.Android.accompanist}")
     implementation("com.google.accompanist:accompanist-permissions:${Versions.Android.accompanist}")
-    implementation("com.google.accompanist:accompanist-pager:${Versions.Android.accompanist}")
     // -- constraint layout for compose
     implementation("androidx.constraintlayout:constraintlayout-compose:${Versions.Android.composeConstraintLayout}")
 

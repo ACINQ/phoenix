@@ -183,13 +183,14 @@ fun AmountInput(
     staticLabel: String?,
     placeholder: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
+    forceUnit: CurrencyUnit? = null,
 ) {
 
     val context = LocalContext.current
     val prefBitcoinUnit = LocalBitcoinUnit.current
     val prefFiat = LocalFiatCurrency.current
     val rate = fiatRate
-    val units = listOf<CurrencyUnit>(BitcoinUnit.Sat, BitcoinUnit.Bit, BitcoinUnit.MBtc, BitcoinUnit.Btc, prefFiat)
+    val units = forceUnit?.let { listOf(it) } ?: listOf<CurrencyUnit>(BitcoinUnit.Sat, BitcoinUnit.Bit, BitcoinUnit.MBtc, BitcoinUnit.Btc, prefFiat)
     val focusManager = LocalFocusManager.current
     val customTextSelectionColors = TextSelectionColors(
         handleColor = MaterialTheme.colors.primary.copy(alpha = 0.7f),
@@ -257,7 +258,7 @@ fun AmountInput(
                 colors = outlinedTextFieldColors(),
                 interactionSource = interactionSource,
                 shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.padding(bottom = 8.dp, top = if (staticLabel != null) 14.dp else 0.dp)
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp, top = if (staticLabel != null) 14.dp else 0.dp)
             )
         }
 

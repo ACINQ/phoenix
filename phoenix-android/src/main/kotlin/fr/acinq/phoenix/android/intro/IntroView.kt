@@ -19,6 +19,8 @@ package fr.acinq.phoenix.android.intro
 import androidx.activity.compose.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
@@ -26,16 +28,14 @@ import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.*
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.*
-import fr.acinq.phoenix.android.utils.datastore.*
-import fr.acinq.phoenix.data.*
 import kotlinx.coroutines.*
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun IntroView(
     onFinishClick: () -> Unit
@@ -45,7 +45,7 @@ fun IntroView(
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState()
 
-    HorizontalPager(count = 3, state = pagerState) { index ->
+    HorizontalPager(pageCount = 3, state = pagerState) { index ->
         BackHandler { context.findActivity().moveTaskToBack(false) }
         when (index) {
             0 -> WelcomeView(

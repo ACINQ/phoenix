@@ -110,13 +110,21 @@
     <!-- receive view: warning about fee/liquidity -->
 
     <string name="receive_lightning_warning_title_surefail">O pagamento falhará</string>
-    <string name="receive_lightning_warning_title_mayfail">O pagamento pode falhar</string>
     <string name="receive_lightning_warning_title_fee_expected">Taxa esperada</string>
 
-    <string name="receive_lightning_warning_fee_insufficient_liquidity">A liquidez de entrada é insuficiente.</string>
-    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">A liquidez de entrada é insuficiente e você desativou o gerenciamento automatizado de canais.\nToque para configurar.</string>
-    <string name="receive_lightning_warning_fee_within_policy">Uma taxa de %1$s (≈ %2$s) pode ser necessária para receber esse pagamento.\nToque para configurar.</string>
-    <string name="receive_lightning_warning_fee_exceeds_policy">A taxa provavelmente estará acima do seu limite máximo (%1$s).\nToque para configurar.</string>
+    <string name="receive_lightning_sheet_dismiss">Fechar</string>
+    <string name="receive_lightning_sheet_button_enable">Ativar o tratamento automatizado</string>
+    <string name="receive_lightning_sheet_button_configure">Configurar taxas máximas</string>
+
+    <string name="receive_lightning_warning_message_fee_expected">Provavelmente será necessária uma transação na cadeia para receber esse valor.\n\nAs taxas serão de aproximadamente %1$s.</string>
+    <string name="receive_lightning_warning_message_fee_expected_unknown">Provavelmente será necessária uma transação na cadeia para receber esse valor.</string>
+
+    <string name="receive_lightning_warning_message_above_limit">Estima-se uma taxa de %1$s para receber esse valor, e essa taxa excede seu limite autorizado de %2$s.\n\nAumente esse limite.</string>
+    <string name="receive_lightning_warning_message_above_limit_or_liquidity">Estima-se uma taxa de %1$s para receber esse valor, e essa taxa excede seu limite autorizado de %2$s.\n\nAumente esse limite ou solicite liquidez adicional.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">Estima-se uma taxa de %1$s para receber esse valor, e essas taxas excedem %2$s%% do valor.\n\nAumente esse limite.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Estima-se uma taxa de %1$s para receber esse valor, e essas taxas excedem %2$s%% do valor.\n\nAumente esse limite ou solicite liquidez adicional.</string>
+
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">A liquidez recebida é insuficiente e você desativou o gerenciamento automatizado de canais.</string>
 
     <string name="receive_onchain_legacy_warning_title">Aviso de migração</string>
     <string name="receive_onchain_legacy_warning">Esse é seu novo endereço. Não reutilize seus endereços Bitcoin antigos de antes da migração!</string>

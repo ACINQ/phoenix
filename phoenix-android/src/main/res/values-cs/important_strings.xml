@@ -110,13 +110,22 @@
     <!-- receive view: warning about fee/liquidity -->
 
     <string name="receive_lightning_warning_title_surefail">Platba se nezdaří</string>
-    <string name="receive_lightning_warning_title_mayfail">Platba může selhat</string>
     <string name="receive_lightning_warning_title_fee_expected">Očekávaný poplatek</string>
+    <string name="receive_lightning_warning_hint_show_details">Více informací</string>
 
-    <string name="receive_lightning_warning_fee_insufficient_liquidity">Příchozí likvidita není dostatečná.</string>
-    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Příchozí likvidita není dostatečná a máte zakázanou automatickou správu kanálů.\nKlepnutím na položku nakonfigurujete.</string>
-    <string name="receive_lightning_warning_fee_within_policy">K přijetí této platby může být vyžadován poplatek ve výši %1$s (≈ %2$s).\nKlepnutím na položku nakonfigurujete.</string>
-    <string name="receive_lightning_warning_fee_exceeds_policy">Poplatek bude pravděpodobně vyšší než váš maximální limit (%1$s)..\nKlepnutím na položku nakonfigurujete</string>
+    <string name="receive_lightning_sheet_dismiss">Zavření</string>
+    <string name="receive_lightning_sheet_button_enable">Povolit automatické kanály</string>
+    <string name="receive_lightning_sheet_button_configure">Nastavení limitu poplatků</string>
+
+    <string name="receive_lightning_warning_message_fee_expected">Pro příjem této částky bude pravděpodobně nutná operace v řetězci.\n\nPoplatek se odhaduje na přibližně %1$s.</string>
+    <string name="receive_lightning_warning_message_fee_expected_unknown">Pro obdržení této částky bude pravděpodobně nutná operace na řetězci.</string>
+
+    <string name="receive_lightning_warning_message_above_limit">Pro obdržení této částky se očekává poplatek ve výši %1$s a tento poplatek je vyšší než váš limit %2$s.\n\nZvyšte tento limit v nastavení správy kanálů.</string>
+    <string name="receive_lightning_warning_message_above_limit_or_liquidity">Pro obdržení této částky se očekává poplatek ve výši %1$s a tento poplatek je vyšší než váš limit %2$s.\n\nZvýšte tento limit v nastavení správy kanálů nebo požádejte o dodatečnou likviditu.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">Očekává se, že tuto částku obdrží poplatek ve výši %1$s, a tento poplatek je vyšší než %2$s% částky.\n\nZvyšte tento limit v nastavení správy kanálů.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Očekává se, že tuto částku obdrží poplatek ve výši %1$s, a tento poplatek je vyšší než %2$s% částky.\n\nZvýšte tento limit v nastavení správy kanálů, nebo požádejte o dodatečnou likviditu.</string>
+
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Příchozí likvidita není dostatečná a máte zakázanou automatickou správu kanálů.</string>
 
     <string name="receive_onchain_legacy_warning_title">Oznámení o migraci</string>
     <string name="receive_onchain_legacy_warning">Toto je vaše nová adresa. Nepoužívejte znovu své staré Bitcoin adresy z doby před migrací!</string>

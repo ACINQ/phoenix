@@ -110,13 +110,23 @@
     <!-- receive view: warning about fee/liquidity -->
 
     <string name="receive_lightning_warning_title_surefail">Ce paiement va échouer.</string>
-    <string name="receive_lightning_warning_title_mayfail">Ce paiement pourrait échouer.</string>
     <string name="receive_lightning_warning_title_fee_expected">Des frais sont attendus.</string>
 
-    <string name="receive_lightning_warning_fee_insufficient_liquidity">Votre liquidité entrante est insuffisante.</string>
-    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Votre liquidité entrante est insuffisante et vous avez désactivé la gestion des channels automatisée.\nCliquez pour configurer.</string>
-    <string name="receive_lightning_warning_fee_within_policy">Des frais de %1$s (≈ %2$s) pourraient être nécessaire pour recevoir ce paiement.\nCliquez pour configurer.</string>
-    <string name="receive_lightning_warning_fee_exceeds_policy">Ces frais vont probablement excéder le max configuré dans vos préférences (%1$s).\nCliquez pour configurer.</string>
+    <string name="receive_lightning_warning_hint_show_details">Plus d\'informations</string>
+
+    <string name="receive_lightning_sheet_dismiss">Fermer</string>
+    <string name="receive_lightning_sheet_button_enable">Activer la gestion auto</string>
+    <string name="receive_lightning_sheet_button_configure">Configurer les frais max</string>
+
+    <string name="receive_lightning_warning_message_fee_expected">Une opération on-chain va être probablement nécessaire pour recevoir ce montant.\n\nLes frais seront d\'environ %1$s.</string>
+    <string name="receive_lightning_warning_message_fee_expected_unknown">Une opération on-chain va être probablement nécessaire pour recevoir ce montant.</string>
+
+    <string name="receive_lightning_warning_message_above_limit">Des frais de %1$s sont estimés pour recevoir ce montant, et ces frais dépassent votre limite autorisée de %2$s.\n\nAugmentez cette limite dans les préférences de gestion des canaux.</string>
+    <string name="receive_lightning_warning_message_above_limit_or_liquidity">Des frais de %1$s sont estimés pour recevoir ce montant, et ces frais dépassent votre limite autorisée de %2$s.\n\nAugmentez cette limite, ou bien demandez de la liquidité supplémentaire.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">Des frais de %1$s sont estimés pour recevoir ce montant, ce qui représente plus de %2$s%% du montant.\n\nAugmentez cette limite dans les préférences de gestion des canaux.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Des frais de %1$s sont estimés pour recevoir ce montant, ce qui représente plus de %2$s%% du montant.\n\nAugmentez cette limite, ou bien demandez de la liquidité supplémentaire.</string>
+
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Votre liquidité entrante est insuffisante pour ce montant, et la gestion automatisée des channels est désactivée.</string>
 
     <string name="receive_onchain_legacy_warning_title">Note suite à la migration</string>
     <string name="receive_onchain_legacy_warning">Il s\'agit de votre nouvelle adresse. Ne réutilisez pas vos anciennes adresses Bitcoin d\'avant la migration !</string>
@@ -298,7 +308,7 @@
     <string name="liquiditypolicy_advanced_pay_to_open_label">Déroger au max pour les paiements Lightning</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">Si cette option est active, les paiements entrants Lightning seront acceptés même si les frais excèdent le maximum autorisé. Seule la valeur en pourcent ci-dessus sera vérifiée.\n\nAttention: si le mempool Bitcoin est saturé, certains paiements Lightning entrants pourraient s\'avérer coûteux.</string>
     <string name="liquiditypolicy_save_button">Enregistrer mes préferences</string>
-    <string name="liquiditypolicy_request_button">Requérir des liquidités entrantes</string>
+    <string name="liquiditypolicy_request_button">Demander de la liquidité</string>
 
     <string name="liquiditypolicy_help">
       Phoenix vous permet de recevoir des paiements sur la blockchain Bitcoin elle-même (dite L1), ainsi que sur la couche Lightning de Bitcoin (dite L2).

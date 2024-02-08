@@ -211,12 +211,16 @@ fileprivate struct ConfigurationList: View {
 			if hasWallet {
 				navLink(.LiquidityManagement) {
 					Label { Text("Add liquidity") } icon: {
-						Image("bucket_monochrome")
-							.renderingMode(.template)
-							.resizable()
-							.aspectRatio(contentMode: .fit)
-							.frame(width: 20, height: 20)
-							.foregroundColor(.appAccent)
+						if #available(iOS 17, *) {
+							Image("bucket_monochrome_symbol")
+						} else {
+							Image("bucket_monochrome")
+								.renderingMode(.template)
+								.resizable()
+								.aspectRatio(contentMode: .fit)
+								.frame(width: 20, height: 20)
+								.foregroundColor(.appAccent)
+						}
 					}
 				}
 				.id(linkID_LiquidityManagement)

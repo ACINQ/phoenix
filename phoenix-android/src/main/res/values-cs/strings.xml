@@ -602,7 +602,6 @@
     <!-- components -->
 
     <string name="component_calendar_inclusive">(včetně)</string>
-    <string name="component_error_message_details">Cause: %1$s</string>
 
     <!-- settings: wallet info -->
 

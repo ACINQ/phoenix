@@ -17,12 +17,15 @@
 package fr.acinq.phoenix.android.settings.walletinfo
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +33,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -51,6 +56,7 @@ import fr.acinq.phoenix.android.components.CardHeader
 import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.HSeparator
+import fr.acinq.phoenix.android.components.IconPopup
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
@@ -67,20 +73,40 @@ import kotlin.math.roundToInt
 fun SwapInWalletInfo(
     onBackClick: () -> Unit,
     onViewChannelPolicyClick: () -> Unit,
+    onAdvancedClick: () -> Unit,
 ) {
     val context = LocalContext.current
     val btcUnit = LocalBitcoinUnit.current
 
     val liquidityPolicyInPrefs by UserPrefs.getLiquidityPolicy(context).collectAsState(null)
     val swapInWallet by business.peerManager.swapInWallet.collectAsState()
+    var showAdvancedMenuPopIn by remember { mutableStateOf(false) }
 
     DefaultScreenLayout(isScrollable = true) {
         DefaultScreenHeader(
             onBackClick = onBackClick,
-            title = stringResource(id = R.string.walletinfo_onchain_swapin),
-            helpMessage = stringResource(id = R.string.walletinfo_onchain_swapin_help),
-            helpMessageLink = stringResource(id = R.string.walletinfo_onchain_swapin_help_faq_link)
-                to "https://phoenix.acinq.co/faq#can-i-deposit-funds-on-chain-to-phoenix-and-how-long-does-it-take-before-i-can-use-it",
+            content = {
+                Text(text = stringResource(id = R.string.walletinfo_onchain_swapin))
+                IconPopup(
+                    popupMessage = stringResource(id = R.string.walletinfo_onchain_swapin_help),
+                    popupLink = stringResource(id = R.string.walletinfo_onchain_swapin_help_faq_link)
+                        to "https://phoenix.acinq.co/faq#can-i-deposit-funds-on-chain-to-phoenix-and-how-long-does-it-take-before-i-can-use-it"
+                )
+                Spacer(Modifier.weight(1f))
+                Box(contentAlignment = Alignment.TopEnd) {
+                    DropdownMenu(expanded = showAdvancedMenuPopIn, onDismissRequest = { showAdvancedMenuPopIn = false }) {
+                        DropdownMenuItem(onClick = onAdvancedClick, contentPadding = PaddingValues(horizontal = 12.dp)) {
+                            Text(stringResource(R.string.swapin_signer_title), style = MaterialTheme.typography.body1)
+                        }
+                    }
+                    Button(
+                        icon = R.drawable.ic_menu_dots,
+                        iconTint = MaterialTheme.colors.onSurface,
+                        padding = PaddingValues(12.dp),
+                        onClick = { showAdvancedMenuPopIn = true }
+                    )
+                }
+            }
         )
         Card {
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {

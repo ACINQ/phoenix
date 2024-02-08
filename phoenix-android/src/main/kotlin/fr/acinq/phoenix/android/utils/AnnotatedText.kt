@@ -53,7 +53,7 @@ fun annotatedStringResource(@StringRes id: Int): AnnotatedString {
     }
 }
 
-private fun spannableStringToAnnotatedString(
+fun spannableStringToAnnotatedString(
     text: CharSequence
 ): AnnotatedString {
     return if (text is Spanned) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.payments
+package fr.acinq.phoenix.android.payments.receive
 
 import androidx.annotation.UiThread
 import androidx.compose.runtime.getValue

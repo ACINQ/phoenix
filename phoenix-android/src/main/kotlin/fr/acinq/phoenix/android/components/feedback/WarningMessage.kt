@@ -31,11 +31,11 @@ import fr.acinq.phoenix.android.utils.orange
 fun WarningMessage(
     header: String,
     details: String,
+    modifier: Modifier = Modifier,
     headerStyle: TextStyle = MaterialTheme.typography.body2,
     detailsStyle: TextStyle = MaterialTheme.typography.subtitle2,
     space: Dp = 8.dp,
     padding: PaddingValues = PaddingValues(16.dp),
-    modifier: Modifier = Modifier,
     alignment: Alignment.Horizontal = Alignment.Start,
 ) {
     FeedbackMessage(

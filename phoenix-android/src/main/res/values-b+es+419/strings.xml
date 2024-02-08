@@ -642,7 +642,6 @@
     <!-- components -->
 
     <string name="component_calendar_inclusive">(incluso)</string>
-    <string name="component_error_message_details">Causa: %1$s</string>
 
     <!-- settings: wallet info -->
 

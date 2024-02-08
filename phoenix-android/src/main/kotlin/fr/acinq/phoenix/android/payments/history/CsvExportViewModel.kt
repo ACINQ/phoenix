@@ -32,6 +32,7 @@ import fr.acinq.phoenix.android.utils.Converter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.smartDescription
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.db.SqlitePaymentsDb
+import fr.acinq.phoenix.managers.DatabaseManager
 import fr.acinq.phoenix.managers.PaymentsFetcher
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.CsvWriter
@@ -52,7 +53,7 @@ sealed class CsvExportState {
 
 class CsvExportViewModel(
     private val peerManager: PeerManager,
-    private val paymentsDb: SqlitePaymentsDb,
+    private val dbManager: DatabaseManager,
     private val paymentsFetcher: PaymentsFetcher,
 ) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -102,7 +103,7 @@ class CsvExportViewModel(
             val rows = mutableListOf<String>()
             rows += CsvWriter.makeHeaderRow(csvConfig)
             while (fetching) {
-                paymentsDb.listRangeSuccessfulPaymentsOrder(
+                dbManager.paymentsDb().listRangeSuccessfulPaymentsOrder(
                     startDate = startTimestampMillis!!,
                     endDate = endTimestampMillis,
                     count = batchSize,
@@ -157,7 +158,7 @@ class CsvExportViewModel(
             log.error("failed to get oldest completed payment timestamp: ", e)
             state = CsvExportState.Failed(e)
         }) {
-            paymentsDb.getOldestCompletedDate().let {
+            dbManager.paymentsDb().getOldestCompletedDate().let {
                 oldestCompletedTimestamp = it
                 if (startTimestampMillis == null) startTimestampMillis = it
             }
@@ -166,12 +167,12 @@ class CsvExportViewModel(
 
     class Factory(
         private val peerManager: PeerManager,
-        private val paymentsDb: SqlitePaymentsDb,
+        private val dbManager: DatabaseManager,
         private val paymentsFetcher: PaymentsFetcher,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return CsvExportViewModel(peerManager, paymentsDb, paymentsFetcher) as T
+            return CsvExportViewModel(peerManager, dbManager, paymentsFetcher) as T
         }
     }
 }
