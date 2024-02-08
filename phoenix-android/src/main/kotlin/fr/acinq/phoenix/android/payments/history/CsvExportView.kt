@@ -36,7 +36,6 @@ import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.android.utils.shareFile
-import fr.acinq.phoenix.db.SqlitePaymentsDb
 
 
 @Composable
@@ -48,7 +47,7 @@ fun CsvExportView(
     val vm: CsvExportViewModel = viewModel(
         factory = CsvExportViewModel.Factory(
             peerManager = business.peerManager,
-            paymentsDb = business.databaseManager.databases.value!!.payments as SqlitePaymentsDb,
+            dbManager = business.databaseManager,
             paymentsFetcher = business.paymentsManager.fetcher,
         )
     )
