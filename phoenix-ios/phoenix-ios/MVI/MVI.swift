@@ -1,17 +1,13 @@
 import SwiftUI
 import PhoenixShared
 import Combine
-import os.log
 
+fileprivate let filename = "MVI"
 #if DEBUG && false
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "MVI"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 class MVIState<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 	

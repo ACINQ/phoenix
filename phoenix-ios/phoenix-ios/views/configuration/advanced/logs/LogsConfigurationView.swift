@@ -1,17 +1,13 @@
 import SwiftUI
 import PhoenixShared
-import os.log
 import OSLog
 
+fileprivate let filename = "LogsConfigurationView"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "LogsConfigurationView"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 struct LogsConfigurationView: View {
 
@@ -120,16 +116,101 @@ struct LogsConfigurationView: View {
 		
 		isExporting = true
 		Task.detached {
-			await asyncExport()
+			await asyncExport_logFiles()
 		}
 	}
 	
 	// --------------------------------------------------
 	// MARK: Exporting
 	// --------------------------------------------------
+
+	nonisolated func asyncExport_logFiles() async {
+		log.trace("asyncExport_logFiles()")
+		
+		do {
+			let logsDirectory = try LoggerFactory.logsDirectory()
+			
+			let options: FileManager.DirectoryEnumerationOptions = [
+				.skipsHiddenFiles,
+				.skipsPackageDescendants,
+				.skipsSubdirectoryDescendants
+			]
+			let allUrls = try FileManager.default.contentsOfDirectory(
+				at: logsDirectory,
+				includingPropertiesForKeys: [],
+				options: options
+			)
+			
+			let logFileUrls = allUrls.filter { $0.lastPathComponent.hasSuffix(".log") }
+			
+			// Architecture notes:
+			// Our primary concern here is not speed but memory usage.
+			// 
+			// Idea for future improvement:
+			// - Create an AsyncStream for each log file (that outputs LogFileEntryTimestamp items)
+			// - Combine multiple streams into a single AsyncStream
+			// - The combined stream simply outputs the earliest item from each substream
+			//
+			// This would drastically reduce memory pressure,
+			// and allow us to write to the temp file at the same time
+			// that we're reading from the log files.
+			
+			var allEntries: [LogFileEntryTimestamp] = []
+			for url in logFileUrls {
+				let entries = try await LogFileParser.lightParse(url)
+				
+				let filename = url.lastPathComponent
+				let processAbbreviation: String
+				if filename.hasPrefix(LoggerFactory.friendlyProcessName_foreground) {
+					processAbbreviation = "FG"
+				} else if filename.hasPrefix(LoggerFactory.friendlyProcessName_background) {
+					processAbbreviation = "BG"
+				} else {
+					processAbbreviation = "??"
+				}
+				
+				let updatedEntries = entries.map { entry in
+					LogFileEntryTimestamp(
+						raw: "[\(processAbbreviation)] \(entry.raw)",
+						timestamp: entry.timestamp
+					)
+				}
+				
+				allEntries.append(contentsOf: updatedEntries)
+			}
+			
+			allEntries.sort { (a, b) in
+				return a.timestamp < b.timestamp
+			}
+			
+			let random = UUID().uuidString
+				.replacingOccurrences(of: "-", with: "")
+				.substring(location: 0, length: 8)
+			
+			let tempDir = FileManager.default.temporaryDirectory
+			let tempFilename = "\(random).log"
+			let tempFile = tempDir.appendingPathComponent(tempFilename, isDirectory: false)
+			
+			let entriesData = allEntries.map { $0.raw }.joined(separator: "\n").data(using: .utf8)!
+			try entriesData.write(to: tempFile)
+			
+			await exportingFinished(tempFile)
+			
+		} catch {
+			log.error("Error exporting logs: \(error)")
+			await exportingFailed()
+		}
+	}
+
+/*	This doesn't work, because Apple broke OSLogStore on iOS:
+ 	- You're unable to fetch log statements from previous app launches (of your own app)
+	- You're unable to fetch log statements from app extensions (part of your own app)
 	
-	nonisolated func asyncExport() async {
-		log.trace("asyncExport()")
+	This makes OSLogStore practically worthless for our purposes.
+	And we're forced to switch to another logging solution that actually works.
+	
+	nonisolated func asyncExport_osLogStore() async {
+		log.trace("asyncExport_osLogStore()")
 		
 		do {
 			let store = try OSLogStore(scope: .currentProcessIdentifier)
@@ -159,6 +240,7 @@ struct LogsConfigurationView: View {
 			await exportingFailed()
 		}
 	}
+*/
 	
 	@MainActor
 	private func exportingFailed() {

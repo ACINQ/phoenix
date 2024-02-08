@@ -1,17 +1,13 @@
 import Foundation
 import Combine
 import PhoenixShared
-import os.log
 
+fileprivate let filename = "WalletReset"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "WalletReset"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 /// Facilitates deleting the local data for a user's wallet.
 ///

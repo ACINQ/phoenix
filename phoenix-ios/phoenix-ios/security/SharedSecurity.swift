@@ -1,16 +1,12 @@
 import Foundation
 import CryptoKit
-import os.log
 
+fileprivate let filename = "SharedSecurity"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "SharedSecurity"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 enum ReadSecurityFileError: Error {
 	case fileNotFound

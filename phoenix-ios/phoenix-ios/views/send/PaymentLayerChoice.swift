@@ -1,16 +1,12 @@
 import SwiftUI
 import PhoenixShared
-import os.log
 
+fileprivate let filename = "PaymentLayerChoice"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "PaymentLayerChoice"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 struct PaymentLayerChoice: View {
 	

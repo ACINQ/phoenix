@@ -1,13 +1,10 @@
 import SwiftUI
-import os.log
 
+fileprivate let filename = "AnyHTML"
 #if DEBUG && false
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "AnyHTML"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 /// The `AnyHTML` class is an ObservableObject designed to asynchronously

@@ -1,6 +1,7 @@
 import Foundation
 import PhoenixShared
-import os.log
+import Logging
+
 
 class KotlinLogger {
 	
@@ -16,15 +17,29 @@ class KotlinLogger {
 	
 	private func splitTag(_ tag: String) -> (String, String) {
 		
-		// The tag is something like: "PhoenixShared.PhoenixBusiness.BalanceManager"
-		// We want to split that into ("PhoenixShared.PhoenixBusiness", "BalanceManager")
+		// The tag is something like:
+		// - "fr.acinq.lightning.blockchain.electrum.ElectrumWatcher"
+		// - "fr.acinq.phoenix.managers.CurrencyManager"
+		//
+		// We want to split this into something like:
+		// - ("lightning-kmp", "ElectrumWatcher")
+		// - ("phoenix-kmp", "CurrencyManager")
+		//
+		// So there's a clear: (module, filename)
 		
 		if let idx = tag.lastIndex(of: ".") {
 			let idxPlusOne = tag.index(after: idx)
 			if idxPlusOne != tag.endIndex {
-				let subsystem = String(tag.prefix(upTo: idx))
-				let category = String(tag.suffix(from: idxPlusOne))
-				return (subsystem, category)
+				let subsystem = tag.prefix(upTo: idx)
+				let filename = String(tag.suffix(from: idxPlusOne))
+				
+				if subsystem.hasPrefix("fr.acinq.lightning") {
+					return ("lightning-kmp", filename)
+				} else if subsystem.hasPrefix("fr.acinq.phoenix") {
+					return ("phoenix-kmp", filename)
+				} else {
+					return (String(subsystem), filename)
+				}
 			}
 		}
 		
@@ -37,8 +52,8 @@ class KotlinLogger {
 				return cachedLogger
 			}
 			
-			let (subsystem, category) = splitTag(tag)
-			let newLogger = Logger(subsystem: subsystem, category: category)
+			let (module, filename) = self.splitTag(tag)
+			let newLogger = LoggerFactory.shared.logger(module: module, filename: filename, level: .trace)
 			loggers[tag] = newLogger
 			
 			return newLogger

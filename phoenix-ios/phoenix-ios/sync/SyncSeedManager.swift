@@ -3,15 +3,12 @@ import PhoenixShared
 import CloudKit
 import Combine
 import Network
-import os.log
 
+fileprivate let filename = "SyncSeedManager"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "SyncSeedManager"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 fileprivate let record_column_mnemonics = "mnemonics"

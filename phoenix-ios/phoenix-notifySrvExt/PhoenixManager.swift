@@ -1,15 +1,12 @@
 import Foundation
 import PhoenixShared
 import Combine
-import os.log
 
+fileprivate let filename = "PhoenixManager"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "PhoenixManager"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 typealias ConnectionsListener = (Connections) -> Void

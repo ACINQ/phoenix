@@ -1,17 +1,13 @@
 import Foundation
 import Combine
 import Network
-import os.log
 
+fileprivate let filename = "TLSConnectionCheck"
 #if DEBUG && true
-fileprivate var log = Logger(
-	subsystem: Bundle.main.bundleIdentifier!,
-	category: "TLSConnectionCheck"
-)
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = Logger(OSLog.disabled)
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
-
 
 enum TLSConnectionStatus {
 	case trusted
