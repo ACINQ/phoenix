@@ -18,6 +18,7 @@ package fr.acinq.phoenix.utils
 
 
 import fr.acinq.bitcoin.BitcoinError
+import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.payment.PaymentRequest
@@ -33,42 +34,16 @@ class ParserTest {
 
     @Test
     fun parse_bitcoin_uri_with_valid_addresses() {
-        listOf<Pair<String, Either<BitcoinUriError, BitcoinUri>>>(
-            "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem" to Either.Right(
-                BitcoinUri(NodeParams.Chain.Mainnet, "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem")
-            ),
-            "3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX" to Either.Right(
-                BitcoinUri(NodeParams.Chain.Mainnet, "3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX")
-            ),
-            "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4" to Either.Right(
-                BitcoinUri(NodeParams.Chain.Mainnet, "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
-            ),
-            "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3" to Either.Right(
-                BitcoinUri(NodeParams.Chain.Mainnet, "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3")
-            ),
-        ).forEach {
-            assertEquals(it.second, Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, it.first))
-        }
+        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, "3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, "bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3"))
 
-        listOf<Pair<String, Either<BitcoinUriError, BitcoinUri>>>(
-            "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn" to Either.Right(
-                BitcoinUri(NodeParams.Chain.Testnet, "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn")
-            ),
-            "2MzQwSSnBHWHqSAqtTVQ6v47XtaisrJa1Vc" to Either.Right(
-                BitcoinUri(NodeParams.Chain.Testnet, "2MzQwSSnBHWHqSAqtTVQ6v47XtaisrJa1Vc")
-            ),
-            "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx" to Either.Right(
-                BitcoinUri(NodeParams.Chain.Testnet, "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx")
-            ),
-            "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7" to Either.Right(
-                BitcoinUri(NodeParams.Chain.Testnet, "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7")
-            ),
-            "tb1p607g5ea77m370pey3y5rg58fz7542hnpg40rs2cqw6w69yt5lf2qlktj2a" to Either.Right(
-                BitcoinUri(NodeParams.Chain.Testnet, "tb1p607g5ea77m370pey3y5rg58fz7542hnpg40rs2cqw6w69yt5lf2qlktj2a")
-            ),
-        ).forEach {
-            assertEquals(it.second, Parser.readBitcoinAddress(NodeParams.Chain.Testnet, it.first))
-        }
+        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(NodeParams.Chain.Testnet, "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(NodeParams.Chain.Testnet, "2MzQwSSnBHWHqSAqtTVQ6v47XtaisrJa1Vc"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(NodeParams.Chain.Testnet, "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(NodeParams.Chain.Testnet, "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7"))
+        assertIs<Either.Right<BitcoinUri>>(Parser.readBitcoinAddress(NodeParams.Chain.Testnet, "tb1p607g5ea77m370pey3y5rg58fz7542hnpg40rs2cqw6w69yt5lf2qlktj2a"))
     }
 
     @Test
@@ -122,6 +97,7 @@ class ParserTest {
                 BitcoinUri(
                     chain = NodeParams.Chain.Mainnet,
                     address = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                    script = ByteVector("76a91462e907b15cbf27d5425399ebf6f0fb50ebb88f1888ac"),
                     ignoredParams = ParametersBuilder().apply { set("somethingyoudontunderstand", "50"); set("somethingelseyoudontget", "999") }.build()
                 )
             ),
@@ -130,6 +106,7 @@ class ParserTest {
                 BitcoinUri(
                     chain = NodeParams.Chain.Mainnet,
                     address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
                     ignoredParams = ParametersBuilder().apply { set("pj", "https://acinq.co") }.build()
                 )
             ),
@@ -148,18 +125,20 @@ class ParserTest {
             // valid lightning invoice
             "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?foo=bar&lightning=lntb15u1p05vazrpp5apz75ghtq3ynmc5qm98tsgucmsav44fyffpguhzdep2kcgkfme4sdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5v4hqr48qe0u7al6lxwdpmp3w6k7evjdavm0lh7arpv3qaf038s5st2d8k8vvmxyav2wkfym9jp4mk64srmswgh7l6sqtq7l4xl3nknf8snltamvpw5p3yl9nxg0ax9k0698rr94qx6unrv8yhccmh4z9ghcq77hxps" to Either.Right(
                 BitcoinUri(
-                    chain = NodeParams.Chain.Mainnet, address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    chain = NodeParams.Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
                     paymentRequest = PaymentRequest.read("lntb15u1p05vazrpp5apz75ghtq3ynmc5qm98tsgucmsav44fyffpguhzdep2kcgkfme4sdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5v4hqr48qe0u7al6lxwdpmp3w6k7evjdavm0lh7arpv3qaf038s5st2d8k8vvmxyav2wkfym9jp4mk64srmswgh7l6sqtq7l4xl3nknf8snltamvpw5p3yl9nxg0ax9k0698rr94qx6unrv8yhccmh4z9ghcq77hxps").get(),
                     ignoredParams = ParametersBuilder().apply { set("foo", "bar") }.build()
                 )
             ),
             // invalid lightning invoice
             "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lightning=lntb15u1p05vazrpp" to Either.Right(
-                BitcoinUri(chain = NodeParams.Chain.Mainnet, address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
+                BitcoinUri(chain = NodeParams.Chain.Mainnet, address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"))
             ),
             // empty lightning invoice
             "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?lightning=" to Either.Right(
-                BitcoinUri(chain = NodeParams.Chain.Mainnet, address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
+                BitcoinUri(chain = NodeParams.Chain.Mainnet, address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"))
             ),
         ).forEach { (address, expected) ->
             val uri = Parser.readBitcoinAddress(NodeParams.Chain.Mainnet, address)
@@ -174,6 +153,7 @@ class ParserTest {
                 BitcoinUri(
                     chain = NodeParams.Chain.Mainnet,
                     address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
                     amount = 12_30000.sat
                 )
             ),
@@ -181,6 +161,7 @@ class ParserTest {
                 BitcoinUri(
                     chain = NodeParams.Chain.Mainnet,
                     address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
                     amount = 1_234_56789.sat
                 )
             ),
@@ -188,6 +169,7 @@ class ParserTest {
                 BitcoinUri(
                     chain = NodeParams.Chain.Mainnet,
                     address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
                     amount = 21_000_000_000_00000.sat
                 )
             ),
@@ -196,6 +178,7 @@ class ParserTest {
                 BitcoinUri(
                     chain = NodeParams.Chain.Mainnet,
                     address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
                     amount = null
                 )
             ),
@@ -204,6 +187,7 @@ class ParserTest {
                 BitcoinUri(
                     chain = NodeParams.Chain.Mainnet,
                     address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
                     amount = null
                 )
             ),
@@ -212,6 +196,7 @@ class ParserTest {
                 BitcoinUri(
                     chain = NodeParams.Chain.Mainnet,
                     address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
                     amount = null
                 )
             ),
@@ -220,6 +205,7 @@ class ParserTest {
                 BitcoinUri(
                     chain = NodeParams.Chain.Mainnet,
                     address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
                     amount = null
                 )
             ),
@@ -228,6 +214,7 @@ class ParserTest {
                 BitcoinUri(
                     chain = NodeParams.Chain.Mainnet,
                     address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
                     amount = null
                 )
             )

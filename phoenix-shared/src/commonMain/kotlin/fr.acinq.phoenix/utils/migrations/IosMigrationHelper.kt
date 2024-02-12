@@ -113,7 +113,7 @@ object IosMigrationHelper {
             log.info { "migrating ${channelsToMigrate.size} channels to $swapInAddress" }
             // Close all channels in parallel
             val command = ChannelCommand.Close.MutualClose(
-                scriptPubKey = ByteVector(closingScript),
+                scriptPubKey = closingScript,
                 feerates = null
             )
             channelsToMigrate.forEach {
@@ -136,7 +136,7 @@ object IosMigrationHelper {
                     log.info { "txid=${closingTx.tx.txid} ignored (dust)" }
                 }
             }
-            log.info { "${closingTxs.size} channels closed to ${closingScript.byteVector().toHex()}" }
+            log.info { "${closingTxs.size} channels closed to ${closingScript.toHex()}" }
 
             // Wait for all UTXOs to arrive in swap-in wallet.
             peer.swapInWallet.wallet.walletStateFlow

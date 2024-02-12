@@ -490,7 +490,7 @@ struct MinerFeeSheet: View {
 		guard
 			let satsPerByte_number = try? parsedSatsPerByte.get(),
 			let peer = Biz.business.peerManager.peerStateValue(),
-			let scriptBytes = Parser.shared.addressToPublicKeyScriptOrNull(chain: Biz.business.chain, address: btcAddress)
+			let scriptVector = Parser.shared.addressToPublicKeyScriptOrNull(chain: Biz.business.chain, address: btcAddress)
 		else {
 			return
 		}
@@ -503,7 +503,6 @@ struct MinerFeeSheet: View {
 		}
 		
 		let originalSatsPerByte = satsPerByte
-		let scriptVector = Bitcoin_kmpByteVector(bytes: scriptBytes)
 		
 		let satsPerByte_satoshi = Bitcoin_kmpSatoshi(sat: satsPerByte_number.int64Value)
 		let feePerByte = Lightning_kmpFeeratePerByte(feerate: satsPerByte_satoshi)

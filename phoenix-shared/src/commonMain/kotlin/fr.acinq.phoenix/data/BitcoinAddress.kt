@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.BitcoinError
+import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.payment.PaymentRequest
@@ -26,6 +27,7 @@ data class BitcoinUri(
     val chain: NodeParams.Chain,
     /** Actual Bitcoin address; may be different than the source, e.g. if the source is an URI like "bitcoin:xyz?param=123". */
     val address: String,
+    val script: ByteVector,
     // Bip-21 parameters
     val label: String? = null,
     val message: String? = null,

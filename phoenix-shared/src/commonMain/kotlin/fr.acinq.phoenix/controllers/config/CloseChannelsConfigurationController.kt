@@ -1,6 +1,5 @@
 package fr.acinq.phoenix.controllers.config
 
-import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.channel.*
@@ -105,15 +104,13 @@ class AppCloseChannelsConfigurationController(
     }
 
     override fun process(intent: CloseChannelsConfiguration.Intent) {
-        var scriptPubKey : ByteArray? = null
-        if (intent is CloseChannelsConfiguration.Intent.MutualCloseAllChannels) {
-            scriptPubKey = Parser.addressToPublicKeyScriptOrNull(chain, intent.address)
-            if (scriptPubKey == null) {
-                throw IllegalArgumentException(
-                    "Address is invalid. Caller MUST validate user input via parseBitcoinAddress"
-                )
+        val scriptPubKey = if (intent is CloseChannelsConfiguration.Intent.MutualCloseAllChannels) {
+            try {
+                Parser.readBitcoinAddress(chain, intent.address).right!!.script
+            } catch (e: Exception) {
+                throw IllegalArgumentException("Address is invalid. Caller MUST validate user input via readBitcoinAddress")
             }
-        }
+        } else null
 
         launch {
             val peer = peerManager.getPeer()
@@ -126,7 +123,7 @@ class AppCloseChannelsConfigurationController(
             filteredChannels.keys.forEach { channelId ->
                 val command: ChannelCommand = if (scriptPubKey != null) {
                     logger.info { "(mutual) closing channel=${channelId.toHex()}" }
-                    ChannelCommand.Close.MutualClose(scriptPubKey = ByteVector(scriptPubKey), feerates = null)
+                    ChannelCommand.Close.MutualClose(scriptPubKey = scriptPubKey, feerates = null)
                 } else {
                     logger.info { "(force) closing channel=${channelId.toHex()}" }
                     ChannelCommand.Close.ForceClose

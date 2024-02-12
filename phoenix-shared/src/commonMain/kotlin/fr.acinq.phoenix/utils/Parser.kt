@@ -130,12 +130,12 @@ object Parser {
 
         return when (val res = Bitcoin.addressToPublicKeyScript(chain.chainHash, address)) {
             is Either.Left -> Either.Left(BitcoinUriError.InvalidScript(res.left))
-            is Either.Right -> Either.Right(BitcoinUri(chain, address, label, message, amount, lightning, otherParams))
+            is Either.Right -> Either.Right(BitcoinUri(chain, address, res.right.let { Script.write(it) }.byteVector(), label, message, amount, lightning, otherParams))
         }
     }
 
     /** Transforms a bitcoin address into a public key script if valid, otherwise returns null. */
-    fun addressToPublicKeyScriptOrNull(chain: NodeParams.Chain, address: String): ByteArray? {
-        return readBitcoinAddress(chain, address).right?.address?.encodeToByteArray()
+    fun addressToPublicKeyScriptOrNull(chain: NodeParams.Chain, address: String): ByteVector? {
+        return readBitcoinAddress(chain, address).right?.script
     }
 }
