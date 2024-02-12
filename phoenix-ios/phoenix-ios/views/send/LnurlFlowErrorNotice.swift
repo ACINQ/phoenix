@@ -46,7 +46,7 @@ struct LnurlFlowErrorNotice: View {
 						.frame(width: 30, height: 30)
 				}
 				.accessibilityLabel("Close")
-				.accessibilityHidden(popoverState.publisher.value?.dismissable ?? false)
+				.accessibilityHidden(popoverState.dismissable)
 			}
 			.padding(.horizontal)
 			.padding(.vertical, 8)

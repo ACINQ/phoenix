@@ -602,7 +602,6 @@
     <!-- components -->
 
     <string name="component_calendar_inclusive">(včetně)</string>
-    <string name="component_error_message_details">Cause: %1$s</string>
 
     <!-- settings: wallet info -->
 
@@ -652,8 +651,7 @@
     <string name="mempool_fastest">≈ Další blok</string>
     <string name="mempool_halfhour">≈ 30 minut</string>
     <string name="mempool_hour">≈ 1 hodina</string>
-    <string name="mempool_eco">Více než 1 hodina</string>
-    <string name="mempool_slow">Bez priority</string>
+    <string name="mempool_slow">Nízký poplatek</string>
 
     <!-- splice errors -->
 

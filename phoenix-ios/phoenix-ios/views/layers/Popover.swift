@@ -24,18 +24,24 @@ public class PopoverState: ObservableObject {
 	/// - view will animate on screen (onWillAppear)
 	/// - view has animated off screen (onDidDisappear)
 	///
-	var publisher = CurrentValueSubject<PopoverItem?, Never>(nil)
+	var itemPublisher = CurrentValueSubject<PopoverItem?, Never>(nil)
 	
 	/// Fires when:
 	/// - view will animate off screen (onWillDisapper)
 	///
 	var closePublisher = PassthroughSubject<Void, Never>()
 	
-	/// For compatibility with SmartModal API
-	/// 
+	/// Whether or not the popover is dismissable by tapping outside the popover.
+	///
+	var dismissablePublisher = CurrentValueSubject<Bool, Never>(true)
+	
 	var currentItem: PopoverItem? {
-		
-		return publisher.value
+		return itemPublisher.value
+	}
+	
+	var dismissable: Bool {
+		get { dismissablePublisher.value }
+		set { dismissablePublisher.send(newValue) }
 	}
 	
 	func display<Content: View>(
@@ -43,8 +49,8 @@ public class PopoverState: ObservableObject {
 		@ViewBuilder builder: () -> Content,
 		onWillDisappear: (() -> Void)? = nil
 	) {
-		publisher.send(PopoverItem(
-			dismissable: dismissable,
+		dismissablePublisher.send(dismissable)
+		itemPublisher.send(PopoverItem(
 			view: builder().anyView
 		))
 		if let willDisappearLambda = onWillDisappear {
@@ -59,9 +65,9 @@ public class PopoverState: ObservableObject {
 	func close(animationCompletion: @escaping () -> Void) {
 		
 		var cancellables = Set<AnyCancellable>()
-		publisher.sink { (item: PopoverItem?) in
+		itemPublisher.sink { (item: PopoverItem?) in
 			
-			// NB: This fires right away because publisher is CurrentValueSubject.
+			// NB: This fires right away because itemPublisher is CurrentValueSubject.
 			// It only means `onDidDisappear` if item is nil.
 			if item == nil {
 				animationCompletion()
@@ -87,7 +93,7 @@ public class PopoverState: ObservableObject {
 	func onNextDidDisappear(_ action: @escaping () -> Void) {
 		
 		var cancellables = Set<AnyCancellable>()
-		publisher.sink { (item: PopoverItem?) in
+		itemPublisher.sink { (item: PopoverItem?) in
 			
 			if item == nil {
 				action()
@@ -102,9 +108,6 @@ public class PopoverState: ObservableObject {
 ///
 public struct PopoverItem: SmartModalItem {
 	
-	/// Whether or not the popover is dimissable by tapping outside the popover.
-	let dismissable: Bool
-	
 	/// The view to be displayed in the popover window.
 	/// (Use the View.anyView extension function.)
 	let view: AnyView
@@ -112,12 +115,17 @@ public struct PopoverItem: SmartModalItem {
 
 struct PopoverWrapper<Content: View>: View {
 
-	let dismissable: Bool
 	let content: () -> Content
 	
+	@State var dismissable: Bool
 	@State var animation: CGFloat = 0.0
 	
 	@EnvironmentObject var popoverState: PopoverState
+	
+	init(dismissable: Bool, content: @escaping () -> Content) {
+		self.dismissable = dismissable
+		self.content = content
+	}
 	
 	var body: some View {
 		
@@ -171,6 +179,9 @@ struct PopoverWrapper<Content: View>: View {
 				animation = 2
 			}
 		}
+		.onReceive(popoverState.dismissablePublisher) { newValue in
+			dismissable = newValue
+		}
 		.onAnimationCompleted(for: animation) {
 			animationCompleted()
 		}
@@ -183,7 +194,7 @@ struct PopoverWrapper<Content: View>: View {
 		} else if animation == 2 {
 			// Popover is now hidden
 			UIAccessibility.post(notification: .screenChanged, argument: nil)
-			popoverState.publisher.send(nil)
+			popoverState.itemPublisher.send(nil)
 		}
 	}
 }

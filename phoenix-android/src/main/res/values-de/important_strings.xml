@@ -110,13 +110,22 @@
 	<!-- receive view: warning about fee/liquidity -->
 
     <string name="receive_lightning_warning_title_surefail">Zahlung wird fehlschlagen</string>
-    <string name="receive_lightning_warning_title_mayfail">Zahlung könnte fehlschlagen</string>
     <string name="receive_lightning_warning_title_fee_expected">Gebühr erwartet</string>
+    <string name="receive_lightning_warning_hint_show_details">Mehr Informationen</string>
 
-    <string name="receive_lightning_warning_fee_insufficient_liquidity">Eingangskapazität ist unzureichend.</string>
-    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Eingangskapazität ist unzureichend und automatisches Kanal-Management ist deaktiviert.\nTippen, um dies zu konfigurieren.</string>
-    <string name="receive_lightning_warning_fee_within_policy">Eine Gebühr über %1$s (≈ %2$s) kann erforderlich sein, um diese Zahlung zu empfangen.\nTippen, um dies zu konfigurieren.</string>
-    <string name="receive_lightning_warning_fee_exceeds_policy">Die Gebühr wird wahrscheinlich Ihr Limit übersteigen (%1$s).\nTippen, um dies zu konfigurieren.</string>
+    <string name="receive_lightning_sheet_dismiss">Schließen</string>
+    <string name="receive_lightning_sheet_button_enable">Automatisches Management aktivieren</string>
+    <string name="receive_lightning_sheet_button_configure">Höchstgebühren konfigurieren</string>
+
+    <string name="receive_lightning_warning_message_fee_expected">Es wird wahrscheinlich eine On-Chain-Transaktion benötigen, um diesen Betrag zu erhalten. Die Gebühren werden ungefähr %1$s betragen.</string>
+    <string name="receive_lightning_warning_message_fee_expected_unknown">Es wird wahrscheinlich eine On-Chain-Transaktion notwendig sein, um diesen Betrag zu erhalten.</string>.
+
+    <string name="receive_lightning_warning_message_above_limit">Eine Gebühr von %1$s wird für den Erhalt dieses Betrages geschätzt, und diese Gebühr überschreitet Ihr genehmigtes Limit von %2$s.\n\nErhöhen Sie dieses Limit in den Kanal-Management-Einstellungen.</string>
+    <string name="receive_lightning_warning_message_above_limit_or_liquidity">Eine Gebühr von %1$s wird für den Erhalt dieses Betrages geschätzt, und diese Gebühr überschreitet Ihr genehmigtes Limit von %2$s.\n\nErhöhen Sie dieses Limit oder fordern Sie zusätzliche Liquidität an.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">Eine Gebühr von %1$s wird für den Erhalt dieses Betrages geschätzt, und diese Gebühren übersteigen %2$s%% des Betrags.\n\nErhöhen Sie dieses Limit in den Kanal-Management-Einstellungen.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Eine Gebühr von %1$s wird für den Erhalt dieses Betrages geschätzt, und diese Gebühren übersteigen %2$s%% des Betrags.\n\nErhöhen Sie dieses Limit oder fordern Sie zusätzliche Liquidität an.</string>
+
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Eingangskapazität ist unzureichend und automatisches Kanal-Management ist deaktiviert.</string>
 
     <string name="receive_onchain_legacy_warning_title">Hinweis zur Migration</string>
     <string name="receive_onchain_legacy_warning">Dies ist Ihre neue Adresse. Verwenden Sie Ihre alten Bitcoin-Adressen von vor der Migration nicht wieder!</string>
@@ -357,5 +366,12 @@
 
     <string name="outgoing_finalfailure_alreadypaid">Diese Zahlung wurde bereits getätigt.</string>
     <string name="outgoing_finalfailure_noroutefound">Der Empfänger ist nicht erreichbar oder hat nicht genügend Liquidität im Eingang.</string>
+
+    <!-- low feerate disclaimer -->
+
+    <string name="send_low_feerate_dialog_title">Niedrige Gebühren!</string>
+    <string name="send_low_feerate_dialog_body1">Zahlungen mit niedrigen Gebühren können sich über Tage oder Wochen hinziehen, ohne bestätigt zu werden.</string>
+    <string name="send_low_feerate_dialog_body2">Die Auswahl der Gebühren liegt in Ihrer Verantwortung. Einmal abgeschickt, kann diese Zahlung nicht mehr storniert, sondern nur noch mit höheren Gebühren beschleunigt werden.</string>
+    <string name="send_low_feerate_dialog_body3">Sind Sie sicher, dass Sie fortfahren möchten?</string>
 
 </resources>

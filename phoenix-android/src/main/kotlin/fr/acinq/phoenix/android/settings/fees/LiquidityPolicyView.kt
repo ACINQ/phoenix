@@ -50,6 +50,7 @@ import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.MempoolFeerate
+import fr.acinq.phoenix.data.canRequestLiquidity
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -158,7 +159,7 @@ fun LiquidityPolicyView(
             }
 
             val channelsState by business.peerManager.channelsFlow.collectAsState()
-            if (!channelsState.isNullOrEmpty()) {
+            if (channelsState.canRequestLiquidity()) {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Button(
                         text = stringResource(id = R.string.liquiditypolicy_request_button),

@@ -75,16 +75,13 @@ fun FeerateSlider(
                         Text(text = stringResource(id = R.string.mempool_fastest), maxLines = 1)
                     }
                     feerate >= mempoolFeerate.halfHour.feerate -> {
-                        Text(text = stringResource(id = R.string.mempool_halfhour))
+                        Text(text = stringResource(id = R.string.mempool_halfhour), maxLines = 1)
                     }
                     feerate >= mempoolFeerate.hour.feerate -> {
-                        Text(text = stringResource(id = R.string.mempool_hour))
-                    }
-                    feerate >= mempoolFeerate.economy.feerate -> {
-                        Text(text = stringResource(id = R.string.mempool_eco))
+                        Text(text = stringResource(id = R.string.mempool_hour), maxLines = 1)
                     }
                     else -> {
-                        TextWithIcon(text = stringResource(id = R.string.mempool_slow), icon = R.drawable.ic_alert_triangle, iconTint = MaterialTheme.colors.onSurface, space = 4.dp)
+                        TextWithIcon(text = stringResource(id = R.string.mempool_slow), icon = R.drawable.ic_alert_triangle, iconTint = MaterialTheme.colors.onSurface, space = 4.dp, maxLines = 1)
                     }
                 }
             }

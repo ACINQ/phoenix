@@ -257,62 +257,6 @@ class NotificationsManager {
 	// MARK: Display
 	// --------------------------------------------------
 	
-	func displayLocalNotification_receivedPayment(_ payment: Lightning_kmpIncomingPayment) {
-		log.trace("displayLocalNotification_receivedPayment()")
-		
-		// We are having problems interacting with the `payment` parameter outside the main thread.
-		// This might have to do with the goofy Kotlin freezing stuff.
-		// So let's be safe and always operate on the main thread here.
-		//
-		let handler = {(settings: UNNotificationSettings) -> Void in
-			
-			guard settings.authorizationStatus == .authorized else {
-				return
-			}
-			
-			let paymentInfos = [
-				WalletPaymentInfo(
-					payment: payment,
-					metadata: WalletPaymentMetadata.empty(),
-					fetchOptions: WalletPaymentFetchOptions.companion.None
-				)
-			]
-			
-			let currencyPrefs = GlobalEnvironment.currencyPrefs
-			let bitcoinUnit = currencyPrefs.bitcoinUnit
-			let fiatCurrency = currencyPrefs.fiatCurrency
-			let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
-			
-			let content = UNMutableNotificationContent()
-			content.fillForReceivedPayments(
-				payments: paymentInfos,
-				bitcoinUnit: bitcoinUnit,
-				exchangeRate: exchangeRate
-			)
-			
-			let request = UNNotificationRequest(
-				identifier: payment.id(),
-				content: content,
-				trigger: nil
-			)
-			
-			UNUserNotificationCenter.current().add(request) { error in
-				if let error = error {
-					log.error("NotificationCenter.add(request): error: \(String(describing: error))")
-				}
-			}
-		}
-		
-		UNUserNotificationCenter.current().getNotificationSettings { settings in
-			
-			if Thread.isMainThread {
-				handler(settings)
-			} else {
-				DispatchQueue.main.async { handler(settings) }
-			}
-		}
-	}
-	
 	public func displayLocalNotification_revokedCommit() {
 		log.trace("displayLocalNotification_revokedCommit()")
 		

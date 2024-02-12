@@ -24,20 +24,33 @@ public class ShortSheetState: ObservableObject {
 	/// - sheet view will animate on screen (onWillAppear)
 	/// - sheet view has animated off screen (onDidDisappear)
 	///
-	var publisher = CurrentValueSubject<ShortSheetItem?, Never>(nil)
+	var itemPublisher = CurrentValueSubject<ShortSheetItem?, Never>(nil)
 	
 	/// Fires when:
 	/// - sheet view will animate off screen (onWillDisapper)
 	///
 	var closePublisher = PassthroughSubject<Void, Never>()
 	
+	/// Whether or not the sheet is dimissable by tapping outside the sheet.
+	///
+	var dismissablePublisher = CurrentValueSubject<Bool, Never>(true)
+	
+	var currentItem: ShortSheetItem? {
+		return itemPublisher.value
+	}
+	
+	var dismissable: Bool {
+		get { dismissablePublisher.value }
+		set { dismissablePublisher.send(newValue) }
+	}
+	
 	func display<Content: View>(
 		dismissable: Bool,
 		@ViewBuilder builder: () -> Content,
 		onWillDisappear: (() -> Void)? = nil
 	) {
-		publisher.send(ShortSheetItem(
-			dismissable: dismissable,
+		dismissablePublisher.send(dismissable)
+		itemPublisher.send(ShortSheetItem(
 			view: builder().anyView
 		))
 		if let willDisappearLambda = onWillDisappear {
@@ -52,9 +65,9 @@ public class ShortSheetState: ObservableObject {
 	func close(animationCompletion: @escaping () -> Void) {
 		
 		var cancellables = Set<AnyCancellable>()
-		publisher.sink { (item: ShortSheetItem?) in
+		itemPublisher.sink { (item: ShortSheetItem?) in
 			
-			// NB: This fires right away because publisher is CurrentValueSubject.
+			// NB: This fires right away because itemPublisher is CurrentValueSubject.
 			// It only means `onDidDisappear` if item is nil.
 			if item == nil {
 				animationCompletion()
@@ -80,7 +93,7 @@ public class ShortSheetState: ObservableObject {
 	func onNextDidDisappear(_ action: @escaping () -> Void) {
 		
 		var cancellables = Set<AnyCancellable>()
-		publisher.sink { (item: ShortSheetItem?) in
+		itemPublisher.sink { (item: ShortSheetItem?) in
 			
 			if item == nil {
 				action()
@@ -95,9 +108,6 @@ public class ShortSheetState: ObservableObject {
 ///
 public struct ShortSheetItem: SmartModalItem {
 	
-	/// Whether or not the popover is dimissable by tapping outside the popover.
-	let dismissable: Bool
-	
 	/// The view to be displayed in the sheet.
 	/// (Use the View.anyView extension function.)
 	let view: AnyView
@@ -105,12 +115,17 @@ public struct ShortSheetItem: SmartModalItem {
 
 struct ShortSheetWrapper<Content: View>: View {
 
-	let dismissable: Bool
 	let content: () -> Content
 	
+	@State var dismissable: Bool
 	@State var animation: CGFloat = 0.0
 	
 	@EnvironmentObject var shortSheetState: ShortSheetState
+	
+	init(dismissable: Bool, content: @escaping () -> Content) {
+		self.dismissable = dismissable
+		self.content = content
+	}
 	
 	var body: some View {
 		
@@ -156,6 +171,9 @@ struct ShortSheetWrapper<Content: View>: View {
 				animation = 2
 			}
 		}
+		.onReceive(shortSheetState.dismissablePublisher) { newValue in
+			dismissable = newValue
+		}
 		.onAnimationCompleted(for: animation) {
 			animationCompleted()
 		}
@@ -169,7 +187,7 @@ struct ShortSheetWrapper<Content: View>: View {
 		else if animation == 2 {
 			// ShortSheet is now hidden
 			UIAccessibility.post(notification: .screenChanged, argument: nil)
-			shortSheetState.publisher.send(nil)
+			shortSheetState.itemPublisher.send(nil)
 		}
 	}
 }

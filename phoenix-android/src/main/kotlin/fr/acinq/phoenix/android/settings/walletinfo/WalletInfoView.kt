@@ -113,13 +113,21 @@ private fun SwapInWalletView(onSwapInWalletClick: () -> Unit) {
         onClick = onSwapInWalletClick,
     ) {
         swapInWallet?.let { wallet ->
-            OnchainBalanceView(confirmed = (wallet.deeplyConfirmed + wallet.lockedUntilRefund + wallet.readyForRefund).balance, unconfirmed = wallet.unconfirmed.balance + wallet.weaklyConfirmed.balance)
+            OnchainBalanceView(
+                confirmed = (wallet.deeplyConfirmed + wallet.lockedUntilRefund + wallet.readyForRefund).balance,
+                unconfirmed = wallet.unconfirmed.balance + wallet.weaklyConfirmed.balance
+            )
         } ?: ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
         keyManager?.let {
             HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
             SettingWithCopy(
                 title = stringResource(id = R.string.walletinfo_descriptor),
                 value = it.swapInOnChainWallet.descriptor,
+                maxLinesValue = 2
+            )
+            SettingWithCopy(
+                title = stringResource(id = R.string.walletinfo_swapin_user_pubkey),
+                value = it.swapInOnChainWallet.userPublicKey.toHex(),
                 maxLinesValue = 2
             )
         }
@@ -184,7 +192,13 @@ private fun OnchainBalanceView(
         when (confirmed) {
             null -> Text(text = stringResource(id = R.string.walletinfo_loading_data), color = mutedTextColor)
             else -> {
-                AmountView(amount = confirmed.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.h4, forceUnit = btcUnit, modifier = Modifier.alignByBaseline(), onClick = null)
+                AmountView(
+                    amount = confirmed.toMilliSatoshi(),
+                    amountTextStyle = MaterialTheme.typography.h4,
+                    forceUnit = btcUnit,
+                    modifier = Modifier.alignByBaseline(),
+                    onClick = null
+                )
                 unconfirmed.takeUnless { it == 0.sat }?.let {
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -229,7 +243,12 @@ fun UtxoRow(utxo: WalletState.Utxo, progress: Pair<Int?, Int>?) {
             overflow = TextOverflow.Ellipsis,
             fontSize = 14.sp
         )
-        AmountView(amount = utxo.amount.toMilliSatoshi(), amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp), unitTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp), prefix = "+")
+        AmountView(
+            amount = utxo.amount.toMilliSatoshi(),
+            amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
+            unitTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
+            prefix = "+"
+        )
     }
 }
 

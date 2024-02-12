@@ -642,7 +642,6 @@
     <!-- components -->
 
     <string name="component_calendar_inclusive">(incluso)</string>
-    <string name="component_error_message_details">Causa: %1$s</string>
 
     <!-- settings: wallet info -->
 
@@ -693,8 +692,7 @@
     <string name="mempool_fastest">≈ Próximo bloque</string>
     <string name="mempool_halfhour">≈ 30 minutos</string>
     <string name="mempool_hour">≈ 1 hora</string>
-    <string name="mempool_eco">Más de 1 hora</string>
-    <string name="mempool_slow">Sin prioridad</string>
+    <string name="mempool_slow">Baja comisión</string>
 
     <!-- splice errors -->
 

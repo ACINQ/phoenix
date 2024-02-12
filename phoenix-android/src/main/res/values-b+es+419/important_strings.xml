@@ -107,13 +107,23 @@
     <!-- receive view: warning about fee/liquidity -->
 
     <string name="receive_lightning_warning_title_surefail">El pago no se realizará</string>
-    <string name="receive_lightning_warning_title_mayfail">Es posible que no se realice el pago</string>
     <string name="receive_lightning_warning_title_fee_expected">Comisión prevista</string>
 
-    <string name="receive_lightning_warning_fee_insufficient_liquidity">La liquidez entrante es insuficiente.</string>
-    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">La liquidez entrante es insuficiente y tienes desactivada la gestión automatizada de canales.\nToca para configurar.</string>
-    <string name="receive_lightning_warning_fee_within_policy">Es posible que se necesite una comisión de %1$s (≈ %2$s) para recibir este pago.\nToca para configurar.</string>
-    <string name="receive_lightning_warning_fee_exceeds_policy">La comisión será probablemente superior al límite máximo (%1$s).\nToca para configurar.</string>
+    <string name="receive_lightning_warning_hint_show_details">Más información</string>
+
+    <string name="receive_lightning_sheet_dismiss">Cerrar</string>
+    <string name="receive_lightning_sheet_button_enable">Activar la gestión automátizada</string>
+    <string name="receive_lightning_sheet_button_configure">Configurar comisiones máximas</string>
+
+    <string name="receive_lightning_warning_message_fee_expected">Probablemente será necesaria una transacción en la cadena para recibir esta cantidad.\n\nLas comisiones serán de aproximadamente %1$s.</string>
+    <string name="receive_lightning_warning_message_fee_expected_unknown">Probablemente será necesaria una transacción en la cadena para recibir esta cantidad.</string>
+
+    <string name="receive_lightning_warning_message_above_limit">Se estima una comisión de %1$s por recibir este importe, y esta comisión excede su límite autorizado de %2$s.\n\nAumenta este límite en los ajustes de gestión de canales.</string>
+    <string name="receive_lightning_warning_message_above_limit_or_liquidity">Se estima una comisión de %1$s por recibir este importe, y esta comisión excede su límite autorizado de %2$s.\n\nAumente este límite o solicite liquidez adicional.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">Se estiman unas comisiones de %1$s para recibir este importe, y estas comisiones superan el %2$s%% del importe.\n\nAumenta este límite en los ajustes de gestión de canales.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Se estiman unas comisiones de %1$s para recibir este importe, y estas comisiones superan el %2$s%% del importe.\n\nAumente este límite o solicite liquidez adicional.</string>
+
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">La liquidez entrante es insuficiente y tienes desactivada la gestión automatizada de canales.</string>
 
     <string name="receive_onchain_legacy_warning_title">Aviso de migración</string>
     <string name="receive_onchain_legacy_warning">Esta es tu nueva dirección. No reutilices las direcciones antiguas de Bitcoin que tenías antes de la migración.</string>
@@ -344,5 +354,12 @@
 
     <string name="outgoing_finalfailure_alreadypaid">Esta factura ya ha sido pagada.</string>
     <string name="outgoing_finalfailure_noroutefound">El destinatario no está localizable o no tiene suficiente liquidez entrante.</string>
+
+    <!-- low feerate disclaimer -->
+
+    <string name="send_low_feerate_dialog_title">¡Baja comisión!</string>
+    <string name="send_low_feerate_dialog_body1">Los pagos con comisiones bajas pueden pasar días o semanas sin confirmarse.</string>
+    <string name="send_low_feerate_dialog_body2">La selección de comisiones es su responsabilidad. Una vez enviado, este pago no puede ser cancelado, sólo acelerado con comisiones más altas.</string>
+    <string name="send_low_feerate_dialog_body3">¿Está seguro de que desea continuar?</string>
 
 </resources>

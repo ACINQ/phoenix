@@ -16,21 +16,24 @@
 
 package fr.acinq.phoenix.android.components.feedback
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 
 @Composable
 fun InfoMessage(
     header: String,
-    details: String,
     modifier: Modifier = Modifier,
+    details: String? = null,
     headerStyle: TextStyle = MaterialTheme.typography.body2,
     detailsStyle: TextStyle = MaterialTheme.typography.subtitle2,
     alignment: Alignment.Horizontal = Alignment.Start,
+    padding: PaddingValues = PaddingValues(16.dp),
 ) {
     FeedbackMessage(
         header = header,
@@ -41,5 +44,6 @@ fun InfoMessage(
         iconColor = MaterialTheme.colors.primary,
         modifier = modifier,
         alignment = alignment,
+        padding = padding,
     )
 }
