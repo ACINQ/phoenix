@@ -4,7 +4,7 @@ import PhoenixShared
 enum SpliceOutProblem: Error {
 	case insufficientFunds
 	case spliceAlreadyInProgress
-	case channelNotIdle
+	case channelNotQuiescent
 	case sessionError
 	case disconnected
 	case other
@@ -16,8 +16,8 @@ enum SpliceOutProblem: Error {
 			return String(localized: "Insufficient funds")
 		case .spliceAlreadyInProgress:
 			return String(localized: "Splice already in progress")
-		case .channelNotIdle:
-			return String(localized: "Channel not idle")
+		case .channelNotQuiescent:
+			return String(localized: "Splice has been aborted")
 		case .sessionError:
 			return String(localized: "Splice-out session error")
 		case .disconnected:
@@ -45,8 +45,8 @@ enum SpliceOutProblem: Error {
 		if let _ = failure.asSpliceAlreadyInProgress() {
 			return .spliceAlreadyInProgress
 		}
-		if let _ = failure.asChannelNotIdle() {
-			return .channelNotIdle
+		if let _ = failure.asChannelNotQuiescent() {
+			return .channelNotQuiescent
 		}
 		if let _ = failure.asFundingFailure() {
 			return .sessionError

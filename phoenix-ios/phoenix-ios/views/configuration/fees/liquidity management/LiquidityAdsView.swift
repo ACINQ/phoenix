@@ -575,8 +575,10 @@ struct LiquidityAdsView: View {
 				Text("Invalid splice-out pubKeyScript")
 			} else if let _ = failure.asSpliceAlreadyInProgress() {
 				Text("Splice already in progress")
-			} else if let _ = failure.asChannelNotIdle() {
-				Text("Channel not idle")
+			} else if let _ = failure.asChannelNotQuiescent() {
+				Text("Splice has been aborted")
+			} else if let _ = failure.asConcurrentRemoteSplice() {
+				Text("Concurrent splice in progress")
 			} else if let _ = failure.asInvalidLiquidityAds() {
 				Text("Invalid liquidity ads")
 			} else if let _ = failure.asFundingFailure() {
