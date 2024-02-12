@@ -114,7 +114,6 @@ kotlin {
                     implementation("io.ktor:ktor-network:${Versions.ktor}")
                     implementation("io.ktor:ktor-network-tls:${Versions.ktor}")
                     implementation("io.ktor:ktor-client-android:${Versions.ktor}")
-                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}")
                     implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
                 }
             }
@@ -123,7 +122,6 @@ kotlin {
                     implementation(kotlin("test-junit"))
                     implementation("androidx.test.ext:junit:1.1.3")
                     implementation("androidx.test.espresso:espresso-core:3.4.0")
-                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutines}")
                     val currentOs = org.gradle.internal.os.OperatingSystem.current()
                     val target = when {
                         currentOs.isLinux -> "linux"

@@ -94,10 +94,6 @@ dependencies {
 
     implementation("com.google.android.material:material:1.7.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
-        version { strictly(Versions.coroutines) }
-    }
-
     // -- AndroidX
     implementation("androidx.core:core-ktx:${Versions.Android.coreKtx}")
     // -- AndroidX: livedata

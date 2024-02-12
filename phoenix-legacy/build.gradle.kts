@@ -84,7 +84,6 @@ dependencies {
   // ANDROIDX
   implementation("androidx.core:core-ktx:${Versions.Android.coreKtx}")
   implementation("androidx.appcompat:appcompat:${Versions.AndroidLegacy.appCompat}")
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.serialization}")
   // ANDROIDX - navigation
   implementation("androidx.navigation:navigation-fragment-ktx:${Versions.AndroidLegacy.navigation}")
   implementation("androidx.navigation:navigation-ui-ktx:${Versions.AndroidLegacy.navigation}")
