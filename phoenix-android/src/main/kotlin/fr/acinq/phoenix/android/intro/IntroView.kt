@@ -43,9 +43,9 @@ fun IntroView(
     val internalData = application.internalDataRepository
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState(pageCount = { 3 })
 
-    HorizontalPager(pageCount = 3, state = pagerState) { index ->
+    HorizontalPager(state = pagerState) { index ->
         BackHandler { context.findActivity().moveTaskToBack(false) }
         when (index) {
             0 -> WelcomeView(

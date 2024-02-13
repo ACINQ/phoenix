@@ -33,7 +33,7 @@ class PaymentsAdapter : RecyclerView.Adapter<PaymentHolder>() {
 
   private var showFooter = false
 
-  private val mPrefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
+  private val mPrefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String? ->
     if (key == Prefs.PREFS_SHOW_AMOUNT_IN_FIAT) {
       notifyDataSetChanged()
     }

@@ -46,7 +46,7 @@
           android:pathData="M 7.5 12.5 L 10.5 15.5 L 16.5 9.5"
           android:fillColor="#00000000"
           android:strokeColor="?attr/colorPrimary"
-          android:strokeWidth="2"
+          android:strokeWidth="0.5"
           android:trimPathEnd="0"
           android:strokeLineCap="round"
           android:strokeLineJoin="round"/>
@@ -61,8 +61,8 @@
           android:propertyName="strokeWidth"
           android:startOffset="300"
           android:duration="700"
-          android:valueFrom="3"
-          android:valueTo="11"
+          android:valueFrom="0"
+          android:valueTo="3"
           android:valueType="floatType"
           android:interpolator="@android:anim/overshoot_interpolator"/>
         <objectAnimator
@@ -83,8 +83,8 @@
         <objectAnimator
           android:propertyName="strokeWidth"
           android:duration="1000"
-          android:valueFrom="2"
-          android:valueTo="6"
+          android:valueFrom="0.5"
+          android:valueTo="2"
           android:valueType="floatType"
           android:interpolator="@android:anim/bounce_interpolator"/>
         <objectAnimator
@@ -110,15 +110,15 @@
       <set>
         <objectAnimator
           android:propertyName="scaleX"
-          android:duration="800"
-          android:valueFrom="0.6"
+          android:duration="600"
+          android:valueFrom="0.7"
           android:valueTo="1"
           android:valueType="floatType"
           android:interpolator="@android:anim/overshoot_interpolator"/>
         <objectAnimator
           android:propertyName="scaleY"
-          android:duration="800"
-          android:valueFrom="0.6"
+          android:duration="600"
+          android:valueFrom="0.7"
           android:valueTo="1"
           android:valueType="floatType"
           android:interpolator="@android:anim/overshoot_interpolator"/>

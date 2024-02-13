@@ -5719,28 +5719,6 @@
         }
       }
     },
-    "Channel not idle" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Canal no inactivo"
-          }
-        },
-        "es-419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Canal no inactivo"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Canal non inactif"
-          }
-        }
-      }
-    },
     "Channels are not available, try again later" : {
 
     },
@@ -6671,6 +6649,9 @@
           }
         }
       }
+    },
+    "Concurrent splice in progress" : {
+
     },
     "Configuration" : {
       "localizations" : {
@@ -22454,6 +22435,9 @@
           }
         }
       }
+    },
+    "Splice has been aborted" : {
+
     },
     "Splice Out" : {
       "localizations" : {

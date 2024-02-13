@@ -724,7 +724,8 @@
     <string name="splice_error_nochannels">You don\'t have any channels</string>
     <string name="splice_error_aborted_by_peer">Aborted by peer [%1$s]</string>
     <string name="splice_error_cannot_create_commit">Unable to create a new commitment</string>
-    <string name="splice_error_channel_not_idle">Channel is not available</string>
+    <string name="splice_error_concurrent_remote">There\'s another splice in progress</string>
+    <string name="splice_error_channel_not_quiescent">Aborted due to an error</string>
     <string name="splice_error_disconnected">Channel is disconnected</string>
     <string name="splice_error_funding_error">Funding has failed [%1$s]</string>
     <string name="splice_error_insufficient_funds">Not enough funds</string>

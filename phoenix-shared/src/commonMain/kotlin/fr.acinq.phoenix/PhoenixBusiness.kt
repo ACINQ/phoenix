@@ -47,18 +47,14 @@ import org.kodein.log.LoggerFactory
 import org.kodein.log.frontend.defaultLogFrontend
 import org.kodein.log.newLogger
 import org.kodein.log.withShortPackageKeepLast
-import org.kodein.memory.file.Path
-import org.kodein.memory.file.resolve
 import kotlin.time.Duration.Companion.seconds
 
 class PhoenixBusiness(
     internal val ctx: PlatformContext
 ) {
-    internal val logMemory = LogMemory(Path(getApplicationFilesDirectoryPath(ctx)).resolve("logs"))
 
     val loggerFactory = LoggerFactory(
         defaultLogFrontend.withShortPackageKeepLast(1),
-        logMemory.withShortPackageKeepLast(1)
     )
 
     private val logger = loggerFactory.newLogger(this::class)
@@ -136,7 +132,6 @@ class PhoenixBusiness(
         currencyManager.cancel()
         lnurlManager.cancel()
         notificationsManager.cancel()
-        logMemory.cancel()
     }
 
     // The (node_id, fcm_token) tuple only needs to be registered once.

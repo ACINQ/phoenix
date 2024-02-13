@@ -92,7 +92,6 @@ class BalanceManager(
                 addresses = swapInWallet.addresses.map { (address, unspent) ->
                     address to unspent.filterNot { reservedInputs.contains(it.outPoint) }
                 }.toMap().filter { it.value.isNotEmpty() },
-                parentTxs = swapInWallet.parentTxs,
             )
             walletWithoutReserved.withConfirmations(
                 currentBlockHeight = currentBlockHeight,

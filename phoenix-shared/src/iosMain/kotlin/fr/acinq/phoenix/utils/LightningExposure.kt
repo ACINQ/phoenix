@@ -254,8 +254,13 @@ fun ChannelCommand.Commitment.Splice.Response.Failure.asSpliceAlreadyInProgress(
     else -> null
 }
 
-fun ChannelCommand.Commitment.Splice.Response.Failure.asChannelNotIdle(): ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotIdle? = when (this) {
-    is ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotIdle -> this
+fun ChannelCommand.Commitment.Splice.Response.Failure.asChannelNotQuiescent(): ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotQuiescent? = when (this) {
+    is ChannelCommand.Commitment.Splice.Response.Failure.ChannelNotQuiescent -> this
+    else -> null
+}
+
+fun ChannelCommand.Commitment.Splice.Response.Failure.asConcurrentRemoteSplice(): ChannelCommand.Commitment.Splice.Response.Failure.ConcurrentRemoteSplice? = when (this) {
+    is ChannelCommand.Commitment.Splice.Response.Failure.ConcurrentRemoteSplice -> this
     else -> null
 }
 
