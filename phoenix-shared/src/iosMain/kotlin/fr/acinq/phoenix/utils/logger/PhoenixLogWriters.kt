@@ -25,6 +25,8 @@ actual fun phoenixLogWriters(ctx: PlatformContext): List<LogWriter> {
     return if (ctx.logger != null) {
         listOf(PassthruLogWriter(ctx))
     } else {
-        listOf(OSLogWriter())
+        // OSLogWriter is disabled for now, as the current version of OSLogStore is buggy
+        // listOf(OSLogWriter())
+        throw IllegalArgumentException("A valid logger must be provided. OSLogWriter is disabled.")
     }
 }
